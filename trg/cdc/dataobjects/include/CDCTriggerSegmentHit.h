@@ -22,7 +22,7 @@ namespace Belle2 {
     CDCTriggerSegmentHit():
       m_segmentID(0), m_priorityPosition(0), m_leftRight(0),
       m_priorityTime(0), m_fastestTime(0), m_foundTime(0),
-      m_eWire(65535), m_quadrant(-1)
+      m_eWire(65535), m_quadrant(-1), m_hitpattern(0)
     { }
 
     /** constructor using continuous TS ID. */
@@ -32,7 +32,11 @@ namespace Belle2 {
                          short priorityTime,
                          short fastestTime,
                          short foundTime,
-                         short quadrant = -1);
+                         short quadrant = -1,
+                         std::vector<float> hittime = std::vector<float>(),
+                         unsigned int hitpattern = 0,
+                         std::vector<float> adcinfo  = std::vector<float>(),
+                         unsigned int adcpattern = -1);
 
     /** constructor using super layer ID and TS ID in layer (== central wire ID). */
     CDCTriggerSegmentHit(unsigned short iSL,
@@ -42,10 +46,17 @@ namespace Belle2 {
                          short priorityTime,
                          short fastestTime,
                          short foundTime,
-                         short quadrant = -1);
+                         short quadrant = -1,
+                         std::vector<float> hittime = std::vector<float>(),
+                         unsigned int hitpattern = 0,
+                         std::vector<float> adcinfo  = std::vector<float>(),
+                         unsigned int adcpattern = -1);
+
 
     /** constructor using continuous TS ID and a reference to the priority hit
-     *  (to save some calculations). */
+     *  (to save some calculations).
+     * （ Add adc here only) */
+
     CDCTriggerSegmentHit(const CDCHit& priorityHit,
                          unsigned short segmentID,
                          unsigned short priorityPosition,
@@ -53,7 +64,12 @@ namespace Belle2 {
                          short priorityTime,
                          short fastestTime,
                          short foundTime,
-                         short quadrant = -1);
+                         short quadrant = -1,
+                         std::vector<float> hittime = std::vector<float>(),
+                         unsigned int hitpattern = 0,
+                         std::vector<float> adcinfo  = std::vector<float>(),
+                         unsigned int adcpattern = -1);
+
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerSegmentHit() { }
@@ -78,6 +94,14 @@ namespace Belle2 {
     /** get hit time of priority cell in trigger clocks
      *  alias for priorityTime for backwards compatibility */
     short getTDCCount() const { return m_priorityTime; }
+    /** get hit pattern in a segment hit */
+    unsigned int gethitpattern() const { return m_hitpattern; }
+    /** get adc pattern in a segment hit */
+    unsigned int getadcpattern() const { return m_adcpattern; }
+    /** get hit pattern in a segment hit */
+    std::vector<float> gethittime() const { return m_hittime; }
+    /** get ADC Full information in a segment hit */
+    std::vector<float> getadc() const { return m_adcinfo; }
 
     /** get super layer number. */
     unsigned short getISuperLayer() const
@@ -133,8 +157,21 @@ namespace Belle2 {
     /** quadrant */
     short m_quadrant;
 
+    /** hit pattern */
+    unsigned int m_hitpattern;
+
+    /** hit pattern with hit time*/
+    std::vector<float> m_hittime;
+
+    /** adc pattern*/
+    unsigned int m_adcpattern;
+
+    /* Full ADC information*/
+    std::vector<float> m_adcinfo;
+
+
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerSegmentHit, 4);
+    ClassDef(CDCTriggerSegmentHit, 5);
   };
 }
 #endif

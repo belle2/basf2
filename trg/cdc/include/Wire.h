@@ -74,8 +74,8 @@ namespace Belle2 {
     /// returns a pointer to a neighbor wire. This function is expensive.
     const TRGCDCWire* neighbor(unsigned) const;
 
-    /// returns true if a given wire is consective in a layer.
-    bool consective(const TRGCDCWire&) const;
+    /// returns true if a given wire is consecutive in a layer.
+    bool consecutive(const TRGCDCWire&) const;
 
     /// returns true if a given wire is adjacent.
     bool adjacent(const TRGCDCWire&) const;
@@ -107,10 +107,16 @@ namespace Belle2 {
     /// set signal |= newSignal
     void addSignal(const TRGSignal& newSignal);
 
+    /// set signal |= newSignal
+    void addSignal_adc(const TRGSignal& newSignal);
+
   public:// TRG
 
     /// returns an input to the trigger. This is sync'ed to 1GHz clock.
     const TRGSignal& signal(void) const override;
+
+    /// returns an input to the trigger. This is sync'ed to 1GHz clock.
+    const TRGSignal& signal_adc(void) const override;
 
   private:
 
@@ -120,6 +126,9 @@ namespace Belle2 {
 
     /// Trigger output.
     mutable TRGSignal _signal;
+
+    /// Trigger output. with adc cut.
+    mutable TRGSignal _signal_adc;
 
     /// Complete access from TRGCDC.
     friend class TRGCDC;
@@ -159,8 +168,15 @@ namespace Belle2 {
   }
 
   inline
+  void
+  TRGCDCWire::addSignal_adc(const TRGSignal& newSignal)
+  {
+    _signal_adc |= newSignal;
+  }
+
+  inline
   bool
-  TRGCDCWire::consective(const TRGCDCWire& w) const
+  TRGCDCWire::consecutive(const TRGCDCWire& w) const
   {
     if (neighbor(2) == & w) return true;
     else if (neighbor(3) == & w) return true;
@@ -222,6 +238,13 @@ namespace Belle2 {
   TRGCDCWire::signal(void) const
   {
     return _signal;
+  }
+
+  inline
+  const TRGSignal&
+  TRGCDCWire::signal_adc(void) const
+  {
+    return _signal_adc;
   }
 
 } // namespace Belle2

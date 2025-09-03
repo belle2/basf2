@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -42,9 +41,9 @@ class EventInfoHarvester(harvesting.HarvestingModule):
                  vtx_cdc_reco_tracks_name="VTXCDCRecoTracks"
                  ):
         """Expecting a name for the output file"""
-        super(EventInfoHarvester, self).__init__(foreach='EventMetaData',
-                                                 output_file_name=output_file_name,
-                                                 )
+        super().__init__(foreach='EventMetaData',
+                         output_file_name=output_file_name,
+                         )
 
         #: cached value of the PXDClusters StoreArray
         self.pxd_clusters_name = pxd_clusters_name
@@ -134,8 +133,8 @@ class TrackInfoHarvester(harvesting.HarvestingModule):
                  ):
         """Expecting a name for the output file and the name of the RecoTracks StoreArray
            to operate on. The latter defaults to 'RecoTracks'"""
-        super(TrackInfoHarvester, self).__init__(foreach=reco_tracks_name,
-                                                 output_file_name=output_file_name)
+        super().__init__(foreach=reco_tracks_name,
+                         output_file_name=output_file_name)
 
         #: cached value of the SVDCDCRecoTracks StoreArray
         self.svd_cdc_reco_tracks_name = svd_cdc_reco_tracks_name
@@ -211,9 +210,9 @@ class HitInfoHarvester(harvesting.HarvestingModule):
 
     def __init__(self, output_file_name, reco_tracks_name="RecoTracks"):
         """Expecting a name for the output file and the name of the RecoTracks StoreArray
-           to operate on. The latter dafaults to 'RecoTracks'"""
-        super(HitInfoHarvester, self).__init__(foreach=reco_tracks_name,
-                                               output_file_name=output_file_name)
+           to operate on. The latter defaults to 'RecoTracks'"""
+        super().__init__(foreach=reco_tracks_name,
+                         output_file_name=output_file_name)
 
     def peel(self, reco_track):
         """Extract and store information about each RecoTrack's hits"""
@@ -227,7 +226,7 @@ class HitInfoHarvester(harvesting.HarvestingModule):
 
         # Getting residuals for each hit of the RecoTrack
         for hit_info in reco_track.getRelationsWith("RecoHitInformations"):
-            layer = np.float("nan")
+            layer = float("nan")
             if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_SVD:
                 hit = hit_info.getRelated("SVDClusters")
                 layer = hit.getSensorID().getLayerNumber()

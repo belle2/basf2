@@ -18,14 +18,12 @@
 """
 
 from tracking.validation.run import TrackingValidationRun
-import tracking
+from tracking import add_tracking_reconstruction
 import logging
 import basf2
 VALIDATION_OUTPUT_FILE = 'FullTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
-
-basf2.set_random_seed(1337)
 
 
 class FullBkg(TrackingValidationRun):
@@ -35,7 +33,7 @@ class FullBkg(TrackingValidationRun):
     #: Y(4S) events with background overlay
     root_input_file = '../EvtGenSim.root'
     #: use the complete track-reconstruction chain
-    finder_module = staticmethod(tracking.add_tracking_reconstruction)
+    finder_module = staticmethod(add_tracking_reconstruction)
     #: Define the user parameters for the track-finding module
     tracking_coverage = {
         'WhichParticles': [],  # Include all particles, also secondaries
@@ -62,6 +60,7 @@ class FullBkg(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = FullBkg()
     validation_run.configure_and_execute_from_commandline()
 
@@ -70,3 +69,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     if ACTIVE:
         main()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

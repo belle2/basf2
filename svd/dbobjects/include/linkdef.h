@@ -70,11 +70,16 @@
 
 #pragma link C++ class Belle2::SVDRecoConfiguration +; // checksum=0x4c478ea9, version=3
 #pragma link C++ class Belle2::SVDClusterTimeShifter +; // checksum=0x3c1500b8, version=1
+#pragma link C++ class Belle2::SVDAbsoluteClusterTimeShift +; // checksum=0x5e6570dd, version=1
 
 #pragma link C++ class Belle2::SVDTimeGroupingParameters +; // checksum=0xbd78f1eb, implicit, version=1
 #pragma link C++ class Belle2::SVDTimeGroupingConfiguration +; // checksum=0xfa3204bf, version=1
 
 #pragma link C++ class Belle2::SVDSpacePointSNRFractionSelector +; // checksum=0x217f15e4, version=1
+
+#pragma link C++ class Belle2::SVDdEdxPDFs+; // checksum=0x6d7012eb, version=1
+
+#pragma link C++ class Belle2::SVDDQMPlotsConfiguration +; // checksum=0xcc833139, version=2
 
 #endif
 
@@ -134,7 +139,7 @@
 
 
 // SVDRecoConfiguration
-// New member object, m_useSVDSpacePointSNRFractionSelectorFor6Samples is added in verion 3.
+// New member object, m_useSVDSpacePointSNRFractionSelectorFor6Samples is added in version 3.
 #pragma read \
   sourceClass="Belle2::SVDRecoConfiguration"\
   source=""\
@@ -144,7 +149,7 @@
   code="{ m_useSVDSpacePointSNRFractionFor6Samples = false;}" \
 
 // SVDRecoConfiguration
-// New member object, m_useSVDSpacePointSNRFractionSelectorFor3Samples is added in verion 3.
+// New member object, m_useSVDSpacePointSNRFractionSelectorFor3Samples is added in version 3.
 #pragma read \
   sourceClass="Belle2::SVDRecoConfiguration"\
   source=""\

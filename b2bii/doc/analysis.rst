@@ -17,7 +17,7 @@ over converted ROOT files.
 
 Global tags
 ~~~~~~~~~~~
-As all basf2 analysis, the necessary payloads are handled by basf2 and are stored
+As all ``basf2`` analyses, the necessary payloads are handled by ``basf2`` and are stored
 in the corresponding global tags in the conditions database at BNL.
 
 To avoid creating excess load to the BNL server, we have prepared a local database
@@ -28,7 +28,7 @@ global tags.
 If you use an older release than ``release-05-02`` or ``light-2103-oceanos``, the
 following two lines **must** be added in the beginning of your b2bii analysis script:
 
-.. code-block:: python3
+.. code-block:: python
 
    basf2.conditions.metadata_providers = ["/sw/belle/b2bii/database/conditions/b2bii.sqlite"]
    basf2.conditions.payload_locations = ["/sw/belle/b2bii/database/conditions/"]
@@ -39,8 +39,8 @@ following two lines **must** be added in the beginning of your b2bii analysis sc
    release older than the recommended ones.
 
 
-It is very easy to run any existing basf2 analysis python script over the Belle MC
-or data. If you already have a working basf2 physics analysis python script that
+It is very easy to run any existing ``basf2`` analysis python script over the Belle MC
+or data. If you already have a working ``basf2`` physics analysis python script that
 performs some kind of reconstruction, you simply need to replace the loading of
 Belle II MDST files with the Belle MDST files and executing the conversion.
 
@@ -50,13 +50,13 @@ This function has input parameters to specify the input MDST files to be convert
 flag to specify whether or not the fix_mdst should be applied or not (it should!)
 and path.
 
-.. code-block:: python3
+.. code-block:: python
 
    from b2biiConversion import convertBelleMdstToBelleIIMdst
    convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, path=my_path)
 
-- ``inputBelleMDSTFile`` : a BASF mdst file name or an url of the mdst file location.
-- ``path=my_path`` : your basf2 steering process path.
+- ``inputBelleMDSTFile`` : a basf mdst file name or an url of the mdst file location.
+- ``path=my_path`` : your ``basf2`` steering process path.
 
 Examples of analysis steering files can be found in example directory of the b2bii package:
 

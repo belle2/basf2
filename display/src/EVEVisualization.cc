@@ -1,3 +1,11 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 //For GFTrack visualisation:
 /* Copyright 2011, Technische Universitaet Muenchen,
    Author: Karl Bicker
@@ -76,7 +84,6 @@
 #include <TMatrixD.h>
 #include <TMatrixDSymEigen.h>
 
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/algorithm/string/find.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -102,7 +109,7 @@ namespace {
 
   /** TEveGeoShape contains a TGeoShape and feels responsible for deletion; but TGeoShape is owned by global TGeoManager.
    *
-   * What we want is deletion by TEve (after changing events), so we explictly remove the object
+   * What we want is deletion by TEve (after changing events), so we explicitly remove the object
    * from TGeoManager's garbage collection list. (some objects might not be in the list because these
    * things are horribly inconsistent. doesn't hurt to try though.)
    */
@@ -679,7 +686,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
                 continue;
               }
 
-              const VXD::SensorInfoBase& sensor = geo.get(recoHit->getSensorID());
+              const VXD::SensorInfoBase& sensor = geo.getSensorInfo(recoHit->getSensorID());
               double du, dv;
               ROOT::Math::XYZVector a = o; //defines position of sensor plane
               double hit_res_u = hit_cov(0, 0);
@@ -707,7 +714,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
               const TMatrixD& eVec = eigen_values.GetEigenVectors();
               double pseudo_res_0 = m_errorScale * std::sqrt(ev(0));
               double pseudo_res_1 = m_errorScale * std::sqrt(ev(1));
-              // finished calcluating, got the values -----------------------------------
+              // finished calculating, got the values -----------------------------------
 
               // calculate the semiaxis of the error ellipse ----------------------------
               cov_shape->SetShape(new TGeoEltu(pseudo_res_0, pseudo_res_1, 0.0105));
@@ -1070,7 +1077,7 @@ void EVEVisualization::addSimHit(const CDCSimHit* hit, const MCParticle* particl
 void EVEVisualization::addSimHit(const PXDSimHit* hit, const MCParticle* particle)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
+  const ROOT::Math::XYZVector& global_pos = geo.getSensorInfo(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const VTXSimHit* hit, const MCParticle* particle)
@@ -1082,7 +1089,7 @@ void EVEVisualization::addSimHit(const VTXSimHit* hit, const MCParticle* particl
 void EVEVisualization::addSimHit(const SVDSimHit* hit, const MCParticle* particle)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
+  const ROOT::Math::XYZVector& global_pos = geo.getSensorInfo(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const KLMSimHit* hit, const MCParticle* particle)
@@ -1133,7 +1140,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     mctrack = tparticle;
     mctrack.fTDecay = particle->getDecayTime();
     mctrack.fVDecay.Set(B2Vector3D(particle->getDecayVertex()));
-    mctrack.fDecayed = !boost::math::isinf(mctrack.fTDecay);
+    mctrack.fDecayed = !std::isinf(mctrack.fTDecay);
     mctrack.fIndex = particle->getIndex();
     m_mcparticleTracks[particle].track = new TEveTrack(&mctrack, m_trackpropagator);
 
@@ -1152,7 +1159,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
         m_mcparticleTracks[particle].track->AddPathMark(
           TEvePathMark(
             //Add the last trajectory point as decay point to prevent TEve to
-            //propagate beyond the end of the track. So lets compare the adress
+            //propagate beyond the end of the track. So lets compare the address
             //to the address of last point and choose the pathmark accordingly
             (&pt == &trajectory.back()) ? TEvePathMark::kDecay : TEvePathMark::kReference,
             TEveVector(pt.x, pt.y, pt.z),
@@ -1367,7 +1374,7 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
   //eVec(i,j) uses the method/overloaded operator ( . ) of the TMatrixT class to return the matrix entry.
   ROOT::Math::XYZVector eVec2(eVec(0, 1), eVec(1, 1), eVec(2, 1));
   ROOT::Math::XYZVector eVec3(eVec(0, 2), eVec(1, 2), eVec(2, 2));
-  // got everything we need -----------------------------------------------------   //Eigenvalues(semi axis) of the covariance matrix accquired!
+  // got everything we need -----------------------------------------------------   //Eigenvalues(semi axis) of the covariance matrix acquired!
 
 
   TGeoRotation det_rot("det_rot", (eVec1.Theta() * 180) / TMath::Pi(), (eVec1.Phi() * 180) / TMath::Pi(),
@@ -1581,7 +1588,7 @@ void EVEVisualization::addROI(const ROIid* roi)
 void EVEVisualization::addRecoHit(const SVDCluster* hit, TEveStraightLineSet* lines)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
+  const VXD::SensorInfoBase& sensor = geo.getSensorInfo(hit->getSensorID());
 
   ROOT::Math::XYZVector a, b;
   if (hit->isUCluster()) {
@@ -1775,14 +1782,17 @@ void EVEVisualization::addARICHHit(const ARICHHit* hit)
   int hitModule = hit->getModule();
   float fi = arichGeo->getDetectorPlane().getSlotPhi(hitModule);
 
-  B2Vector3D centerPos3D =  hit->getPosition();
+  ROOT::Math::XYZVector  centerPos3D =  hit->getPosition();
 
-  B2Vector3D channelX(1, 0, 0);    channelX.RotateZ(fi);
-  B2Vector3D channelY(0, 1, 0);    channelY.RotateZ(fi);
+  ROOT::Math::RotationZ rotZ(fi);
+  ROOT::Math::XYZVector channelX(1, 0, 0);
+  ROOT::Math::XYZVector channelY(0, 1, 0);
+  channelX = rotZ * channelX;
+  channelY = rotZ * channelY;
 
   auto* arichbox = boxCreator(centerPos3D,
-                              ROOT::Math::XYZVector(arichGeo->getMasterVolume().momentumToGlobal(channelX)),
-                              ROOT::Math::XYZVector(arichGeo->getMasterVolume().momentumToGlobal(channelY)),
+                              arichGeo->getMasterVolume().momentumToGlobal(channelX),
+                              arichGeo->getMasterVolume().momentumToGlobal(channelY),
                               0.49, 0.49, 0.05);
   arichbox->SetMainColor(kOrange + 10);
   arichbox->SetName((std::to_string(hitModule)).c_str());

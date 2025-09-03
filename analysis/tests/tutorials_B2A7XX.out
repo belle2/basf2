@@ -1,44 +1,48 @@
 [INFO] Steering file: tutorials_B2A7XX.py
 TFile: B2A701-ContinuumSuppression_Input.root
 TTree: tree
-TBranch: __experiment__, 0
-TBranch: __run__, 0
-TBranch: __event__, 0
-TBranch: __production__, 0
-TBranch: __candidate__, 0
-TBranch: __ncandidates__, 0
-TBranch: __weight__, 0
-TBranch: R2, 0
-TBranch: thrustBm, 0
-TBranch: thrustOm, 0
-TBranch: cosTBTO, 0
-TBranch: cosTBz, 0
-TBranch: KSFWVariables__boet__bc, 0
-TBranch: KSFWVariables__bomm2__bc, 0
-TBranch: KSFWVariables__bohso00__bc, 0
-TBranch: KSFWVariables__bohso02__bc, 0
-TBranch: KSFWVariables__bohso04__bc, 0
-TBranch: KSFWVariables__bohso10__bc, 0
-TBranch: KSFWVariables__bohso12__bc, 0
-TBranch: KSFWVariables__bohso14__bc, 0
-TBranch: KSFWVariables__bohso20__bc, 0
-TBranch: KSFWVariables__bohso22__bc, 0
-TBranch: KSFWVariables__bohso24__bc, 0
-TBranch: KSFWVariables__bohoo0__bc, 0
-TBranch: KSFWVariables__bohoo1__bc, 0
-TBranch: KSFWVariables__bohoo2__bc, 0
-TBranch: KSFWVariables__bohoo3__bc, 0
-TBranch: KSFWVariables__bohoo4__bc, 0
-TBranch: CleoConeCS__bo1__bc, 0
-TBranch: CleoConeCS__bo2__bc, 0
-TBranch: CleoConeCS__bo3__bc, 0
-TBranch: CleoConeCS__bo4__bc, 0
-TBranch: CleoConeCS__bo5__bc, 0
-TBranch: CleoConeCS__bo6__bc, 0
-TBranch: CleoConeCS__bo7__bc, 0
-TBranch: CleoConeCS__bo8__bc, 0
-TBranch: CleoConeCS__bo9__bc, 0
-TBranch: isNotContinuumEvent, 0
+No entry found
+TBranch: __experiment__
+TBranch: __run__
+TBranch: __event__
+TBranch: __production__
+TBranch: __candidate__
+TBranch: __ncandidates__
+TBranch: __eventType__
+TBranch: __weight__
+TBranch: R2
+TBranch: thrustBm
+TBranch: thrustOm
+TBranch: cosTBTO
+TBranch: cosTBz
+TBranch: KSFWVariables__boet__bc
+TBranch: KSFWVariables__bomm2__bc
+TBranch: KSFWVariables__bohso00__bc
+TBranch: KSFWVariables__bohso01__bc
+TBranch: KSFWVariables__bohso02__bc
+TBranch: KSFWVariables__bohso03__bc
+TBranch: KSFWVariables__bohso04__bc
+TBranch: KSFWVariables__bohso10__bc
+TBranch: KSFWVariables__bohso12__bc
+TBranch: KSFWVariables__bohso14__bc
+TBranch: KSFWVariables__bohso20__bc
+TBranch: KSFWVariables__bohso22__bc
+TBranch: KSFWVariables__bohso24__bc
+TBranch: KSFWVariables__bohoo0__bc
+TBranch: KSFWVariables__bohoo1__bc
+TBranch: KSFWVariables__bohoo2__bc
+TBranch: KSFWVariables__bohoo3__bc
+TBranch: KSFWVariables__bohoo4__bc
+TBranch: CleoConeCS__bo1__bc
+TBranch: CleoConeCS__bo2__bc
+TBranch: CleoConeCS__bo3__bc
+TBranch: CleoConeCS__bo4__bc
+TBranch: CleoConeCS__bo5__bc
+TBranch: CleoConeCS__bo6__bc
+TBranch: CleoConeCS__bo7__bc
+TBranch: CleoConeCS__bo8__bc
+TBranch: CleoConeCS__bo9__bc
+TBranch: isNotContinuumEvent
 TFile: B2A703-ContinuumSuppression_MVAExpert.root
 TTree: tree
 TBranch: __experiment__, 0
@@ -47,6 +51,7 @@ TBranch: __event__, 19405010
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: R2, 0.2085
 TBranch: thrustBm, 0.9919
@@ -56,7 +61,9 @@ TBranch: cosTBz, 0.4902
 TBranch: KSFWVariables__boet__bc, 10.33
 TBranch: KSFWVariables__bomm2__bc, -2.208
 TBranch: KSFWVariables__bohso00__bc, 0.8699
+TBranch: KSFWVariables__bohso01__bc, 0
 TBranch: KSFWVariables__bohso02__bc, -0.04065
+TBranch: KSFWVariables__bohso03__bc, 0
 TBranch: KSFWVariables__bohso04__bc, -0.1515
 TBranch: KSFWVariables__bohso10__bc, 0.3317
 TBranch: KSFWVariables__bohso12__bc, -0.03392
@@ -78,7 +85,7 @@ TBranch: CleoConeCS__bo6__bc, 0.743
 TBranch: CleoConeCS__bo7__bc, 0.1164
 TBranch: CleoConeCS__bo8__bc, 1.426
 TBranch: CleoConeCS__bo9__bc, 1.326
-TBranch: isNotContinuumEvent, 1
+TBranch: isNotContinuumEvent, True
 TBranch: extraInfo__boFastBDT__bc, 1
 TBranch: transformedNetworkOutput__boFastBDT__cm0__pt1__cm1__pt0__bc, inf
 TFile: B2A704-EventShape.root
@@ -87,6 +94,7 @@ TBranch: __experiment__, 0
 TBranch: __run__, 0
 TBranch: __event__, 1
 TBranch: __production__, 0
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: foxWolframR1, 0.00453
 TBranch: foxWolframR2, 0.1189
@@ -119,6 +127,7 @@ TBranch: __experiment__, 0
 TBranch: __run__, 0
 TBranch: __event__, 1
 TBranch: __production__, 0
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: missingMomentumOfEvent, 0.2986
 TBranch: missingMomentumOfEvent_Px, 0.2169

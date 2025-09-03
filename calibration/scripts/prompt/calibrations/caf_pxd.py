@@ -134,7 +134,7 @@ def get_calibrations(input_data, **kwargs):
         specific_iov = first_iov if iCal > 0 else output_iov
         basf2.B2INFO(f"Total number of files actually used as input = {len(input_files)} for the output {specific_iov}")
         cal = hot_pixel_mask_calibration(
-                cal_name="{}_PXDHotPixelMaskCalibration_BeamorPhysics".format(iCal + 1),
+                cal_name=f"{iCal + 1}_PXDHotPixelMaskCalibration_BeamorPhysics",
                 input_files=input_files,
                 **cal_kwargs)
         cal.algorithms[0].params = {"iov_coverage": specific_iov}
@@ -160,7 +160,7 @@ def get_calibrations(input_data, **kwargs):
             input_data, lambda x: input_data[x] in chunk) if k]))
         basf2.B2INFO(f"Total number of files actually used as input = {len(input_files)} for the output {specific_iov}")
         cal = hot_pixel_mask_calibration(
-                cal_name="{}_PXDHotPixelMaskCalibration_Cosmic".format(iCal + 1),
+                cal_name=f"{iCal + 1}_PXDHotPixelMaskCalibration_Cosmic",
                 input_files=input_files,
                 run_type='cosmic',
                 **cal_kwargs)

@@ -34,11 +34,11 @@ given set of FastBDT options.
 * The ``ValidationAndOptimisationTask`` uses the trained weight files and cut values
 provided to run the tracking chain with the weight file under test, and also
 runs the tracking validation.
-* Finally, the ``MainTask`` is the "brain" of the script. It invokes the
+* Finally, the ``SummaryTask`` is the "brain" of the script. It invokes the
 ``ValidationAndOptimisationTask`` with the different combinations of FastBDT options
 and cut values on the MVA classifier output.
 
-Due to the dependencies, the calls of the task are reversed. The MainTask
+Due to the dependencies, the calls of the task are reversed. The SummaryTask
 calls the ``ValidationAndOptimisationTask`` with different FastBDT options and cut
 values, and the ``ValidationAndOptimisationTask`` itself calls the required teacher,
 training, and simulation tasks.
@@ -61,7 +61,7 @@ requires both the teacher task, as it needs the weightfile to be present, and
 also a data collection task, because it needs a dataset for testing classifier.
 
 The final task that defines which tasks need to be done for the steering file to
-finish is the ``MainTask``. When you only want to run parts of the
+finish is the ``SummaryTask``. When you only want to run parts of the
 training/validation pipeline, you can comment out requirements in the Master
 task or replace them by lower-level tasks during debugging.
 
@@ -140,8 +140,12 @@ you, e.g.::
 """
 
 import itertools
+import json
+import os
 import subprocess
+import tempfile
 
+import basf2_mva
 import basf2
 # from tracking import add_track_finding
 from tracking.path_utils import add_hit_preparation_modules, add_cdc_track_finding, add_svd_standalone_tracking
@@ -150,6 +154,7 @@ import background
 import simulation
 
 from ckf_training import my_basf2_mva_teacher, create_fbdt_option_string
+from tracking_mva_filter_payloads.write_tracking_mva_filter_payloads_to_db import write_tracking_mva_filter_payloads_to_db
 
 # wrap python modules that are used here but not in the externals into a try except block
 install_helpstring_formatter = ("\nCould not find {module} python module.Try installing it via\n"
@@ -163,7 +168,33 @@ except ModuleNotFoundError:
     raise
 
 
-class GenerateSimTask(Basf2PathTask):
+class LSFTask(b2luigi.Task):
+    """
+    Simple task that defines the configuration of the LSF batch submission.
+    """
+
+    #: batch system
+    batch_system = 'lsf'
+    #: queue
+    queue = 's'
+
+    def __init__(self, *args, **kwargs):
+        """Constructor."""
+        super().__init__(*args, **kwargs)
+        #: set the job name (inherited variable)
+        self.job_name = self.task_id
+
+
+class LSFMemoryIntensiveTask(LSFTask):
+    """
+    Same as LSFTask, but for memory-intensive tasks.
+    """
+
+    #: number of job slots
+    job_slots = '4'
+
+
+class GenerateSimTask(Basf2PathTask, LSFTask):
     """
     Generate simulated Monte Carlo with background overlay.
 
@@ -185,8 +216,6 @@ class GenerateSimTask(Basf2PathTask):
         hashed=True
         #: \endcond
     )
-    #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
-    queue = 'l'
 
     #: Name of the ROOT output file with generated and simulated events.
     def output_file_name(self, n_events=None, random_seed=None):
@@ -221,10 +250,12 @@ class GenerateSimTask(Basf2PathTask):
         )
         path.add_module("EvtGenInput")
         bkg_files = ""
+        # \cond suppress doxygen warning
         if self.experiment_number == 0:
             bkg_files = background.get_background_files()
         else:
             bkg_files = background.get_background_files(self.bkgfiles_dir)
+        # \endcond
 
         simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, usePXDDataReduction=False)
 
@@ -234,10 +265,16 @@ class GenerateSimTask(Basf2PathTask):
         )
         return path
 
+    def remove_output(self):
+        """
+        Default function from base b2luigi.Task class.
+        """
+        self._remove_output()
+
 
 # I don't use the default MergeTask or similar because they only work if every input file is called the same.
 # Additionally, I want to add more features like deleting the original input to save storage space.
-class SplitNMergeSimTask(Basf2Task):
+class SplitNMergeSimTask(Basf2Task, LSFTask):
     """
     Generate simulated Monte Carlo with background overlay.
 
@@ -259,8 +296,6 @@ class SplitNMergeSimTask(Basf2Task):
         hashed=True
         #: \endcond
     )
-    #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
-    queue = 'sx'
 
     #: Name of the ROOT output file with generated and simulated events.
     def output_file_name(self, n_events=None, random_seed=None):
@@ -288,12 +323,12 @@ class SplitNMergeSimTask(Basf2Task):
         """
         This task requires several GenerateSimTask to be finished so that he required number of events is created.
         """
-        n_events_per_task = MainTask.n_events_per_task
+        n_events_per_task = SummaryTask.n_events_per_task
         quotient, remainder = divmod(self.n_events, n_events_per_task)
         for i in range(quotient):
             yield GenerateSimTask(
                 bkgfiles_dir=self.bkgfiles_dir,
-                num_processes=MainTask.num_processes,
+                num_processes=SummaryTask.num_processes,
                 random_seed=self.random_seed + '_' + str(i).zfill(3),
                 n_events=n_events_per_task,
                 experiment_number=self.experiment_number,
@@ -301,7 +336,7 @@ class SplitNMergeSimTask(Basf2Task):
         if remainder > 0:
             yield GenerateSimTask(
                 bkgfiles_dir=self.bkgfiles_dir,
-                num_processes=MainTask.num_processes,
+                num_processes=SummaryTask.num_processes,
                 random_seed=self.random_seed + '_' + str(quotient).zfill(3),
                 n_events=remainder,
                 experiment_number=self.experiment_number,
@@ -314,20 +349,33 @@ class SplitNMergeSimTask(Basf2Task):
         """
         create_output_dirs(self)
 
-        file_list = [item for sublist in self.get_input_file_names().values() for item in sublist]
+        file_list = [f for f in self.get_all_input_file_names()]
         print("Merge the following files:")
         print(file_list)
         cmd = ["b2file-merge", "-f"]
         args = cmd + [self.get_output_file_name(self.output_file_name())] + file_list
         subprocess.check_call(args)
+
+    def on_success(self):
+        """
+        On success method.
+        """
         print("Finished merging. Now remove the input files to save space.")
-        cmd2 = ["rm", "-f"]
-        for tempfile in file_list:
-            args = cmd2 + [tempfile]
-            subprocess.check_call(args)
+        file_list = [f for f in self.get_all_input_file_names()]
+        for input_file in file_list:
+            try:
+                os.remove(input_file)
+            except FileNotFoundError:
+                pass
+
+    def remove_output(self):
+        """
+        Default function from base b2luigi.Task class.
+        """
+        self._remove_output()
 
 
-class ResultRecordingTask(Basf2PathTask):
+class ResultRecordingTask(Basf2PathTask, LSFTask):
     """
     Task to record data for the final result filter. This only requires found and MC-matched SVD and CDC tracks that need to be
     merged, all state filters are set to "all"
@@ -356,7 +404,7 @@ class ResultRecordingTask(Basf2PathTask):
         This task requires that the training SplitMergeSimTask is finished.
         """
         yield SplitNMergeSimTask(
-            bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
+            bkgfiles_dir=SummaryTask.bkgfiles_by_exp[self.experiment_number],
             random_seed=self.random_seed,
             n_events=self.n_events_training,
             experiment_number=self.experiment_number,
@@ -372,8 +420,8 @@ class ResultRecordingTask(Basf2PathTask):
         path = basf2.create_path()
 
         # get all the file names from the list of input files that are meant for training
-        file_list = [fname for sublist in self.get_input_file_names().values()
-                     for fname in sublist if "generated_mc_N" in fname and "training" in fname and fname.endswith(".root")]
+        file_list = [fname for fname in self.get_all_input_file_names()
+                     if "generated_mc_N" in fname and "training" in fname and fname.endswith(".root")]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")
@@ -435,8 +483,14 @@ class ResultRecordingTask(Basf2PathTask):
             result_filter_records_name=self.get_output_file_name(self.result_filter_records_name),
         )
 
+    def remove_output(self):
+        """
+        Default function from base b2luigi.Task class.
+        """
+        self._remove_output()
 
-class CKFResultFilterTeacherTask(Basf2Task):
+
+class CKFResultFilterTeacherTask(Basf2Task, LSFMemoryIntensiveTask):
     """
     A teacher task runs the basf2 mva teacher on the training data provided by a
     data collection task.
@@ -476,10 +530,9 @@ class CKFResultFilterTeacherTask(Basf2Task):
         #: \endcond
     )
 
-    def get_weightfile_xml_identifier(self, fast_bdt_option=None):
+    def get_weightfile_identifier(self, fast_bdt_option=None):
         """
-        Name of the xml weightfile that is created by the teacher task.
-        It is subsequently used as a local weightfile in the following validation tasks.
+        Name of weightfile that is created by the teacher task.
 
         :param fast_bdt_option: FastBDT option that is used to train this MVA
         """
@@ -487,7 +540,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
             fast_bdt_option = self.fast_bdt_option
         fast_bdt_string = create_fbdt_option_string(fast_bdt_option)
         weightfile_name = "trk_CDCToSVDSeedResultFilter" + fast_bdt_string
-        return weightfile_name + ".xml"
+        return weightfile_name
 
     def requires(self):
         """
@@ -505,7 +558,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
         Generate list of output files that the task should produce.
         The task is considered finished if and only if the outputs all exist.
         """
-        yield self.add_to_output(self.get_weightfile_xml_identifier())
+        yield self.add_to_output(self.get_weightfile_identifier() + ".root")
 
     def process(self):
         """
@@ -516,18 +569,26 @@ class CKFResultFilterTeacherTask(Basf2Task):
         is inherited from ``Basf2Task``.
         """
         records_files = self.get_input_file_names(self.result_filter_records_name)
-
+        weightfile_identifier = self.get_weightfile_identifier()
         my_basf2_mva_teacher(
             records_files=records_files,
             tree_name="records",
-            weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier()),
+            weightfile_identifier=weightfile_identifier,
             target_variable=self.training_target,
             exclude_variables=self.exclude_variables,
             fast_bdt_option=self.fast_bdt_option,
         )
+        basf2_mva.download(weightfile_identifier, self.get_output_file_name(weightfile_identifier + ".root"))
+
+    def remove_output(self):
+        """
+        Default function from base b2luigi.Task class.
+        """
+        self._remove_output()
 
 
-class ValidationAndOptimisationTask(Basf2PathTask):
+class ValidationAndOptimisationTask(Basf2PathTask, LSFTask):
+
     """
     Validate the performance of the trained filters by trying various combinations of FastBDT options, as well as cut values for
     the states, the number of best candidates kept after each filter, and similar for the result filter.
@@ -547,6 +608,9 @@ class ValidationAndOptimisationTask(Basf2PathTask):
     #: Value of the cut on the MVA classifier output for a result candidate.
     result_filter_cut = b2luigi.FloatParameter()
 
+    # prepend the testing payloads
+    basf2.conditions.prepend_testing_payloads("localdb/database.txt")
+
     def output(self):
         """
         Generate list of output files that the task should produce.
@@ -554,7 +618,7 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         """
         fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
         yield self.add_to_output(
-            f"cdc_svd_merger_ckf_validation{fbdt_string}_{self.result_filter_cut}.root")
+            f"cdc_svd_merger_ckf_validation{fbdt_string}{self.result_filter_cut}.root")
 
     def requires(self):
         """
@@ -569,7 +633,7 @@ class ValidationAndOptimisationTask(Basf2PathTask):
             random_seed='training'
         )
         yield SplitNMergeSimTask(
-            bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
+            bkgfiles_dir=SummaryTask.bkgfiles_by_exp[self.experiment_number],
             experiment_number=self.experiment_number,
             n_events=self.n_events_testing,
             random_seed="optimisation",
@@ -582,8 +646,8 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         path = basf2.create_path()
 
         # get all the file names from the list of input files that are meant for optimisation / validation
-        file_list = [fname for sublist in self.get_input_file_names().values()
-                     for fname in sublist if "generated_mc_N" in fname and "optimisation" in fname and fname.endswith(".root")]
+        file_list = [fname for fname in self.get_all_input_file_names()
+                     if "generated_mc_N" in fname and "optimisation" in fname and fname.endswith(".root")]
         path.add_module("RootInput", inputFileNames=file_list)
 
         path.add_module("Gearbox")
@@ -607,6 +671,18 @@ class ValidationAndOptimisationTask(Basf2PathTask):
 
         direction = "backward"
         fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
+
+        # write the tracking MVA filter parameters and the cut on MVA classifier to be applied on a local db
+        iov = [0, 0, 0, -1]
+        write_tracking_mva_filter_payloads_to_db(
+            f"trk_CDCToSVDSeedResultFilterParameter{fbdt_string}",
+            iov,
+            f"trk_CDCToSVDSeedResultFilter{fbdt_string}",
+            self.result_filter_cut)
+
+        basf2.conditions.prepend_testing_payloads("localdb/database.txt")
+        result_filter_parameters = {"DBPayloadName": f"trk_CDCToSVDSeedResultFilterParameter{fbdt_string}"}
+
         path.add_module(
             "CDCToSVDSeedCKF",
             inputRecoTrackStoreArrayName=cdc_reco_tracks,
@@ -624,9 +700,8 @@ class ValidationAndOptimisationTask(Basf2PathTask):
             writeOutDirection=direction,
             endEarly=False,
             filter='mva_with_relations',
-            filterParameters={
-                "identifier": self.get_input_file_names(f"trk_CDCToSVDSeedResultFilter{fbdt_string}.xml")[0],
-                "cut": self.result_filter_cut})
+            filterParameters=result_filter_parameters
+            )
 
         path.add_module('RelatedTracksCombiner',
                         VXDRecoTracksStoreArrayName=svd_reco_tracks,
@@ -647,7 +722,7 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         path.add_module(
             CombinedTrackingValidationModule(
                 output_file_name=self.get_output_file_name(
-                    f"cdc_svd_merger_ckf_validation{fbdt_string}_{self.result_filter_cut}.root"),
+                    f"cdc_svd_merger_ckf_validation{fbdt_string}{self.result_filter_cut}.root"),
                 reco_tracks_name=reco_tracks,
                 mc_reco_tracks_name=mc_reco_tracks,
                 name="",
@@ -662,14 +737,17 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         """
         return self.create_optimisation_and_validation_path()
 
+    def remove_output(self):
+        """
+        Default function from base b2luigi.Task class.
+        """
+        self._remove_output()
 
-class MainTask(b2luigi.WrapperTask):
+
+class SummaryTask(b2luigi.Task):
     """
-    Wrapper task that needs to finish for b2luigi to finish running this steering file.
-
-    It is done if the outputs of all required subtasks exist.  It is thus at the
-    top of the luigi task graph.  Edit the ``requires`` method to steer which
-    tasks and with which parameters you want to run.
+    Task that collects and summarizes the main figure-of-merits from all the
+    (validation and optimisation) child taks.
     """
     #: Number of events to generate for the training data set.
     n_events_training = b2luigi.get_setting(
@@ -701,6 +779,17 @@ class MainTask(b2luigi.WrapperTask):
     #: Transform dictionary keys (exp. numbers) from strings to int
     bkgfiles_by_exp = {int(key): val for (key, val) in bkgfiles_by_exp.items()}
 
+    #: Use local resources
+    batch_system = 'local'
+    #: Output file name
+    output_file_name = 'summary.json'
+
+    def output(self):
+        """
+        Output method.
+        """
+        yield self.add_to_output(self.output_file_name)
+
     def requires(self):
         """
         Generate list of tasks that needs to be done for luigi to finish running
@@ -730,9 +819,50 @@ class MainTask(b2luigi.WrapperTask):
                 result_filter_cut=cut_value,
             )
 
+    def run(self):
+        """
+        Run method.
+        """
+        import ROOT  # noqa
+
+        # These are the "TNtuple" names to check for
+        ntuple_names = (
+            'MCSideTrackingValidationModule_overview_figures_of_merit',
+            'PRSideTrackingValidationModule_overview_figures_of_merit',
+            'PRSideTrackingValidationModule_subdetector_figures_of_merit'
+        )
+
+        # Collect the information in a dictionary...
+        output_dict = {}
+        all_files = self.get_all_input_file_names()
+        for idx, single_file in enumerate(all_files):
+            with ROOT.TFile.Open(single_file, 'READ') as f:
+                branch_data = {}
+                for ntuple_name in ntuple_names:
+                    ntuple = f.Get(ntuple_name)
+                    for i in range(min(1, ntuple.GetEntries())):  # Here we expect only 1 entry
+                        ntuple.GetEntry(i)
+                        for branch in ntuple.GetListOfBranches():
+                            name = branch.GetName()
+                            value = getattr(ntuple, name)
+                            branch_data[name] = value
+                branch_data['file_path'] = single_file
+                output_dict[f'{idx}'] = branch_data
+
+        # ... and store the information in a JSON file
+        with open(self.get_output_file_name(self.output_file_name), 'w') as f:
+            json.dump(output_dict, f, indent=4)
+
+    def remove_output(self):
+        """
+        Default function from base b2luigi.Task class.
+        """
+        self._remove_output()
+
 
 if __name__ == "__main__":
+
     b2luigi.set_setting("env_script", "./setup_basf2.sh")
-    b2luigi.set_setting("batch_system", "htcondor")
+    b2luigi.set_setting("scratch_dir", tempfile.gettempdir())
     workers = b2luigi.get_setting("workers", default=1)
-    b2luigi.process(MainTask(), workers=workers, batch=True)
+    b2luigi.process(SummaryTask(), workers=workers, batch=True)

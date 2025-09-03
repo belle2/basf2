@@ -146,7 +146,7 @@ namespace Belle2 {
     SVDPulseShapeCalibrations m_PulseShapeCal; /**< pulse shape payload*/
     SVDPedestalCalibrations m_PedestalCal; /**< pedestal payload*/
     //    SVDOccupancyCalibrations m_OccupancyCal; /**< occupancy payload*/
-    //    SVDHotStripsCalibrations m_HotStripsCal; /**< hot strips calibration*/
+    SVDHotStripsCalibrations m_HotStripsCal; /**< hot strips calibration*/
 
     /** MASKS */
     SVDHistograms<TH1F>* m_hMask = nullptr; /**< masked strips histo */
@@ -186,8 +186,8 @@ namespace Belle2 {
     //HOT STRIPS
     SVDHistograms<TH1F>* m_hHotstrips = nullptr; /**< hot strips histo */
     SVDHistograms<TH2F>* m_h2Hotstrips = nullptr; /**< hotstrips VS strip 2D histo */
-    SVDHistograms<TH1F>* hm_hot_strips = nullptr; /**< hot strips per sensor*/    SVDSummaryPlots* m_hHotStripsSummary =
-      nullptr; /**< hot strip summary  histo */
+    SVDHistograms<TH1F>* hm_hot_strips = nullptr; /**< hot strips per sensor*/
+    SVDSummaryPlots* m_hHotStripsSummary = nullptr; /**< hot strip summary  histo */
   };
 }
 

@@ -40,7 +40,7 @@ namespace Belle2 {
      * For the creation of histograms the THFFactory or the Create- functions should be used. */
     virtual void DefineFlags();
 
-    /** Acccess to the EventLevelTrackingInfo object in the datastore. */
+    /** Access to the EventLevelTrackingInfo object in the datastore. */
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
 
     /** Monitors the Error flags set by the tracking code. As of the time of implementation there only were two flags:

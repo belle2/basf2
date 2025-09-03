@@ -77,6 +77,7 @@ B2BIIMdstInputModule::B2BIIMdstInputModule() : Module()
            "The number sequences (e.g. 23:42,101) defining the entries which are processed for each inputFileName."
            "Must be specified exactly once for each file to be opened."
            "The first event has the number 0.", emptyvector);
+  addParam("evtgenProcessing", m_evtgenProcessing, "Flag to switch on only evtgen processing", false);
 }
 
 
@@ -226,7 +227,7 @@ void B2BIIMdstInputModule::event()
   StoreObjPtr<EventMetaData> evtmetadata;
 
   // Read next event: We try to read the next event from the current file
-  // if thist fails, open the next file and try again
+  // if this fails, open the next file and try again
   // if we cannot open the next file then stop processing
   while (!readNextEvent()) {
     if (!openNextFile()) {
@@ -239,6 +240,24 @@ void B2BIIMdstInputModule::event()
   // Convert the Belle_event -> EventMetaData
   // Get Belle_event_Manager
   Belle::Belle_event_Manager& evman = Belle::Belle_event_Manager::get_manager();
+  if (evman.count() == 0) {
+    if (m_evtgenProcessing) {
+      if (!m_fileMetadata) {
+        m_fileMetadata.create();
+        Conditions::Configuration::getInstance().setInputGlobaltags({"B2BII"});
+      } else {
+        // Make sure we don't process real data and MC in the same process
+        if (m_fileMetadata->isMC() == false) {
+          B2FATAL("Information whether we process real or simulated data has changed. Refusing to continue");
+        }
+      }
+      return;
+    } else {
+      B2FATAL("No event found in the event manager, the input mdst file might be corrupted. "
+              "If you are running on evtgen's output, please set the evtgenProcessing flag to true.");
+    }
+  }
+
   Belle::Belle_event& evt = evman[0];
 
   // Check if RUNHEAD is available if not create one using the event.

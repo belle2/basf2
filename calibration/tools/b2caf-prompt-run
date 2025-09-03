@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -64,7 +63,7 @@ The values are lists of directory paths and the corresponding (Experiment, Run).
     input_data_path = Path(args.input_data)
     if not input_data_path.is_file():
         raise FileNotFoundError(f"The file {input_data_path.as_posix()} does not exist")
-    with open(input_data_path, 'r') as input_data_file:
+    with open(input_data_path) as input_data_file:
         input_data = json.load(input_data_file)
 
     # Currently not all backend subparsers include this option
@@ -148,7 +147,7 @@ Generally it is best not to set anything in the prompt script itself. Just use t
     caf_config_path = Path(args.caf_config)
     if not caf_config_path.is_file():
         raise FileNotFoundError(f"The file {caf_config_path.as_posix()} does not exist")
-    with open(caf_config_path, 'r') as caf_config_file:
+    with open(caf_config_path) as caf_config_file:
         caf_config = json.load(caf_config_file)
 
     # if for caf_script is given an full path import it from there, otherwise import it
@@ -173,7 +172,7 @@ Generally it is best not to set anything in the prompt script itself. Just use t
     required_input_data_names = cal_module.settings.input_data_names
     if not required_input_data_names.issubset(frozenset(input_data_files.keys())):
         error_message = (f"The input data does not contain all of the required input names.\n"
-                         f"Required: {sorted(cal_module.input_data_names)}\n"
+                         f"Required: {sorted(cal_module.settings.input_data_names)}\n"
                          f"Input:    {sorted(input_data_files.keys())}")
         raise KeyError(error_message)
 
@@ -184,6 +183,18 @@ Generally it is best not to set anything in the prompt script itself. Just use t
         # Overwrite/merge the default Calibration Settings with JSON
         B2INFO("Overwriting values in 'expert_config' by using the values from the config JSON file.")
         expert_config = {**expert_config, **caf_config["expert_config"]}
+
+    # Check if the input_data_files IOVs are consistent with the requested_iov IOV
+    # If they are not in the requested_iov IOV, remove them from the input_data_files list
+    requested_iov = IoV(*caf_config["requested_iov"])
+    to_exclude = []
+    for input_name in input_data_files:
+        for filename in input_data_files[input_name]:
+            if not requested_iov.contains(input_data_files[input_name][filename]):
+                B2WARNING(f"Provided input file {filename} from input data name {input_name} with {input_data_files[input_name][filename]} is not contained in the requested IOV ({requested_iov}). Excluding this file.")
+                to_exclude.append({"input_name":input_name,"filename":filename})
+    for exclusion in to_exclude:
+        del input_data_files[exclusion["input_name"]][exclusion["filename"]]
 
     calibrations = cal_module.get_calibrations(input_data_files,
                                                requested_iov=IoV(*caf_config["requested_iov"]),
@@ -212,7 +223,7 @@ Generally it is best not to set anything in the prompt script itself. Just use t
             elif args.max_subjobs:
                 collection.max_collector_jobs = args.max_subjobs
         # Although we set the collection database chain already. The algorithm needs the overall Calibration database chain
-        # to be set. Otherwise it doesn't know which Collection's databse chain to use.
+        # to be set. Otherwise it doesn't know which Collection's database chain to use.
         cal.reset_database(apply_to_default_collection=False)
         for global_tag in caf_config["database_chain"]:
             cal.use_central_database(global_tag)

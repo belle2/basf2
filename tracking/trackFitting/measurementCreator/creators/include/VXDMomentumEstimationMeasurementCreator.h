@@ -26,7 +26,7 @@ namespace Belle2 {
     explicit VXDMomentumEstimationMeasurementCreator(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
       BaseMeasurementCreatorFromCoordinateMeasurement<HitType, detector>(measurementFactory) {}
 
-    /** Desctructor. */
+    /** Destructor. */
     virtual ~VXDMomentumEstimationMeasurementCreator() { }
 
     /** Set the parameters of the fit functions and whether to use the thickness or not or the tracking seeds or not. */

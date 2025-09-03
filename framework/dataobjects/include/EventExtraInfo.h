@@ -52,10 +52,58 @@ namespace Belle2 {
     /** Grab the names in this event extra info (for printing etc) */
     std::vector<std::string> getNames() const;
 
+
+    /** Return given value if set.
+     *
+     * throws std::out_of_range if variable is not set.
+     */
+    std::string getExtraStringInfo(const std::string& name) const;
+
+    /** Return whether the extra string info with the given name is set. */
+    bool hasExtraStringInfo(const std::string& name) const;
+
+
+    /** Removes extra string info from event */
+    void removeExtraStringInfo();
+
+    /** Sets the user-defined data of given name to the given value.
+     *
+     * throws std::out_of_range if variable is already set.
+     */
+    void addExtraStringInfo(const std::string& name, const std::string& value);
+
+    /** Sets the user-defined data of given name to the given value.
+     * Does not throw anything if the value is already set.
+     * Overrides existing values
+     */
+    void setExtraStringInfo(const std::string& name, const std::string& value);
+
+    /** Grab the names in this event extra string info (for printing etc) */
+    std::vector<std::string> getStringInfoNames() const;
+
+    /** Add the event type information if it is not already set.
+     * Helper function for the GeneratorBaseModule. */
+    void addEventTypeIfNotSet(const std::string& eventType)
+    {
+      /**
+       * Event type may already be set if there are multiple generator calls
+       * with subsequent selection of generated events by another module.
+       */
+      if (!hasExtraStringInfo("eventType"))
+        addExtraStringInfo(std::string("eventType"), eventType);
+    };
+
+    /** Get the event type information.
+     * Helper function for the VariablesToNtupleModule*/
+    std::string getEventType() const;
+
   private:
     std::map<std::string, float> eventExtraInfo; /**< map variable names to values. */
 
-    ClassDef(EventExtraInfo, 2); /**< Class to store event extra info. */
+    std::map<std::string, std::string> eventExtraStringInfo; /**< map variable names to values for string data type. */
+
+    ClassDef(EventExtraInfo, 3); /**< Class to store event extra info. */
+    // v3. Add m_eventType
   };
 
 } // end namespace Belle2

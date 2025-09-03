@@ -19,21 +19,17 @@
 
 /* ECL headers. */
 #include <ecl/dataobjects/ECLElementNumbers.h>
-#include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
-#include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreArray.h>
 
 class TTree;
 
 namespace Belle2 {
   class ECLCrystalCalib;
   class ECLReferenceCrystalPerCrateCalib;
-  class ECLChannelMapper;
 
 
   /**

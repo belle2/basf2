@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <cassert>
 #include <cmath>
 #include <string>
 #include "framework/logging/Logger.h"
@@ -287,7 +288,7 @@ namespace Belle2 {
 
 // Helicity Amplitudes
 // overall factor GF/sqrt(2) Vcb omitted
-// Wilson coefficients cXX ommited
+// Wilson coefficients cXX omitted
 
 // SM
   double EvtBSemiTauonicHelicityAmplitudeCalculator::helampSM(double mtau, int tauhel, int Dhel, double w, double costau) const

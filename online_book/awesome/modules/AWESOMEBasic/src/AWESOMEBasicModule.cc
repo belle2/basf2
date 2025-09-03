@@ -37,8 +37,8 @@ AWESOMEBasicModule::AWESOMEBasicModule() :
 {
   setDescription("Here you can enter a description of the module which can be displayed during runtime.");
   /* We can define parameters which can be set from the steering file. The arguments are:
-   * name, reference to the veriable where the value will be stored, description, default value.
-   * If the default value is ommited the user has to specify this parameter, otherwise an error is produced. */
+   * name, reference to the variable where the value will be stored, description, default value.
+   * If the default value is omitted the user has to specify this parameter, otherwise an error is produced. */
   addParam("intParameter", m_intParameter,
            "Useless parameter of type integer", 0);
   addParam("doubleParameter", m_doubleParameter,

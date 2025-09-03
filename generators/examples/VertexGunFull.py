@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -32,7 +31,7 @@ vertex1.param('thetaParams', [17, 150])
 vertex1.param('phiGeneration', 'uniform')
 vertex1.param('phiParams', [0, 360])
 
-# make sure all particles of vertex1 in one event start at the same postion
+# make sure all particles of vertex1 in one event start at the same position
 vertex1.param('independentVertices', False)
 
 vertex1.param('vertexGeneration', 'fixed')
@@ -57,7 +56,7 @@ vertex2.param('thetaParams', [17, 150])
 vertex2.param('phiGeneration', 'uniform')
 vertex2.param('phiParams', [0, 360])
 
-# make sure all particles of vertex2 in one event start at the same postion
+# make sure all particles of vertex2 in one event start at the same position
 vertex2.param('independentVertices', False)
 
 vertex2.param('vertexGeneration', 'fixed')
@@ -82,7 +81,7 @@ vertex3.param('thetaParams', [60, 120])
 vertex3.param('phiGeneration', 'uniform')
 vertex3.param('phiParams', [0, 360])
 
-# make sure all particles of vertex3 in one event start at the same postion
+# make sure all particles of vertex3 in one event start at the same position
 vertex3.param('independentVertices', False)
 
 vertex3.param('vertexGeneration', 'fixed')

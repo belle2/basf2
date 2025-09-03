@@ -71,6 +71,9 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("DoSmearing", m_doSmearing,
            "If false, drift length will not be smeared.", true);
 
+  addParam("DoAlphaCorrection", m_alphaCorrection,
+           "If true, some hits will be removed for better charge asymmetry simulation.", false);
+
   addParam("TrigTimeJitter", m_trigTimeJitter,
            "Magnitude (w) of trigger timing jitter (ns). The trigger timing is randuminzed uniformly in a time window of [-w/2, +w/2].",
            0.);
@@ -130,7 +133,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("OffsetForGetTriggerBin", m_offsetForTriggerBin, "Input to getCDCTriggerBin(offset), either of 0,1,2 or 3",
            m_offsetForTriggerBin);
   addParam("TrgTimingOffsetInCount", m_trgTimingOffsetInCount,
-           "L1 trigger timing offset in count, [0,7] in a trigger bin. The defaut value is from exp14, while the value from exp12 is 2. This run dependence may be taken into account later if needed",
+           "L1 trigger timing offset in count, [0,7] in a trigger bin. The default value is from exp14, while the value from exp12 is 2. This run dependence may be taken into account later if needed",
            m_trgTimingOffsetInCount);
   addParam("ShiftOfTimeWindowIn32Count", m_shiftOfTimeWindowIn32Count,
            "Shift of time window in 32count for synchronization (L1 timing=0)", m_shiftOfTimeWindowIn32Count);
@@ -273,6 +276,12 @@ void CDCDigitizerModule::initialize()
     B2FATAL("CDCCorrToThresholds invalid!");
   }
 
+  if (m_alphaCorrection) {
+    if (!m_alphaScaleFactorsFromDB.isValid()) {
+      B2FATAL("CDCAlphaScaleFactorForAsymmetry invalid!");
+    }
+  }
+
 #if defined(CDC_DEBUG)
   cout << " " << endl;
   cout << "CDCDigitizer initialize" << endl;
@@ -300,7 +309,7 @@ void CDCDigitizerModule::initialize()
 
   // Set timing sim. mode
   if (m_useDB4FEE) {
-    if (m_synchronization) { // syncronization
+    if (m_synchronization) { // synchronization
       m_tSimMode = 0;
     } else {
       if (m_randomization) { // radomization
@@ -544,7 +553,7 @@ void CDCDigitizerModule::event()
     }
 
     // Reject totally-dead wire; to be replaced by isDeadWire() in future
-    // N.B. The following lines for badwire must be after the above lines for trigger becuse badwires are different between trigger and tracking.
+    // N.B. The following lines for badwire must be after the above lines for trigger because badwires are different between trigger and tracking.
     // Badwires for trigger are taken into account separately in the tsim module
     if (m_cdcgp->isBadWire(m_wireID)) {
       //      std::cout<<"badwire= " << m_wireID.getICLayer() <<" "<< m_wireID.getIWire() << std::endl;
@@ -681,6 +690,25 @@ void CDCDigitizerModule::event()
     if (!m_outputNegativeDriftTime &&
         iterSignalMap->second.m_driftTime < 0.) {
       continue;
+    }
+
+    //apply correction on alpha, to calibrate the charge asymmetry at hit-level
+    if (m_alphaCorrection) {
+      int iHits = iterSignalMap->second.m_simHitIndex;
+      m_aCDCSimHit = m_simHits[iHits];
+      m_posWire  = m_aCDCSimHit->getPosWire();
+      m_momentum = m_aCDCSimHit->getMomentum();
+      int iLayer = m_aCDCSimHit->getWireID().getICLayer();
+      double alpha = m_cdcgp->getAlpha(m_posWire, m_momentum);
+
+      double Scale = m_alphaScaleFactorsFromDB->getScaleFactor(iLayer, alpha);
+      double random = gRandom->Uniform();
+      if ((Scale < 1) && (alpha > 0)) {
+        if (random > Scale) continue ; // remove this hit
+      }
+      if ((Scale > 1) && (alpha < 0)) {
+        if (random > 1. / Scale) continue ; // remove this hit
+      }
     }
 
     //N.B. No bias (+ or -0.5 count) is introduced on average in digitization by the real TDC (info. from KEK electronics division). So round off (t0 - drifttime) below.
@@ -1143,7 +1171,7 @@ void CDCDigitizerModule::setFEElectronics()
     }
   }
 
-  //ovewrite    values for specific channels if mode=1
+  //overwrite    values for specific channels if mode=1
   //set typical values for all channels if mode=0
   for (const auto& fpp : (*m_fEElectronicsFromDB)) {
     int bdi = fpp.getBoardID();
@@ -1374,7 +1402,7 @@ void CDCDigitizerModule::addXTalk()
 
         //Set TOT for signal+background case. It is assumed that the start timing
         //of a pulse (input to ADC) is given by the TDC-count. This is an
-        //approximation becasue analog (for ADC) and digital (for TDC) parts are
+        //approximation because analog (for ADC) and digital (for TDC) parts are
         //different in the front-end electronics.
         unsigned short s1 = tdc4Sg; //start time of 1st pulse
         unsigned short s2 = tdc4Bg; //start time of 2nd pulse

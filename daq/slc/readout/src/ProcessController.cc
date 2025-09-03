@@ -65,7 +65,6 @@ bool ProcessController::load(int timeout)
   if (timeout > 0) {
     if (!m_info.waitReady(timeout)) {
       throw (RCHandlerException("Failed to boot " + m_parname));
-      return false;
     }
   }
   m_callback->set(m_parname + ".pid", m_process.get_id());

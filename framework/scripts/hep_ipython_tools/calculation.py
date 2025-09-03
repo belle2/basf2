@@ -48,7 +48,7 @@ class Calculation:
 
     def stop(self, index=None):
         """
-        Kill the processes. Please keep in mind that killing a process is normaly accompanied with data loss.
+        Kill the processes. Please keep in mind that killing a process is normally accompanied with data loss.
         """
         def f(process):
             if self.is_running(process):

@@ -352,8 +352,7 @@ if __name__ == "__main__":
             if ecount > argsVar["max_failed_comparison"]:
                 sys.exit(1)
         else:
-            print("Cannot check for failed comparisons, "
-                  "no output folder in {}".format(plots_result_folder))
+            print(f"Cannot check for failed comparisons, no output folder in {plots_result_folder}")
 
     # perform checks
     for c in c_parsed:

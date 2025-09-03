@@ -1,0 +1,55 @@
+# EventType: 1210052103
+# Descriptor: Y(4S) -> B+ B-
+#                     [B+ -> (K*+ -> K_S0 pi+) (omega -> pi+ pi- pi0)]
+#                      B- -> anything
+# NickName: Bu_Kstar+omega_KSpi+_pipipi0
+# Documentation:    2 Body hadronic decay, fL=0.5
+# Tested: Yes
+# Responsible: Rajesh Pramanik
+# Email: r.pramanik@iitg.ac.in
+# Cuts: None
+# Date: 20240820
+
+
+#
+# Aliases
+#
+#
+Alias      K_S0sig   K_S0
+Alias      pi0sig   pi0
+Alias      omegasig   omega
+Alias      K*+sig   K*+
+Alias      K*-sig   K*-
+ChargeConj K*+sig K*-sig
+
+#
+# Decay
+#
+Decay Upsilon(4S)
+0.5 B+sig B-                   VSS;
+0.5 B+ B-sig                   VSS;
+Enddecay
+
+Decay B+sig
+1.0  K*+sig  omegasig SVV_HELAMP  0.5 0.0 0.71 0.0 0.5 0.0 ;
+Enddecay
+CDecay B-sig
+
+Decay  K*+sig
+1.0     K_S0sig  pi+  VSS;
+Enddecay
+CDecay K*-sig
+
+Decay K_S0sig
+1.0 pi+ pi- PHOTOS PHSP;
+Enddecay
+#
+Decay  omegasig
+1.0 pi- pi+  pi0sig PHOTOS OMEGA_DALITZ;
+Enddecay
+#
+Decay pi0sig
+1.0 gamma gamma PHSP;
+Enddecay
+
+End

@@ -89,7 +89,7 @@ at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
            "alter the 3-hit filters. The inner vector should contain exactly two strings. The first entry is interpreted as index (integer). "
            "The second entry is interpreted as function used to create a TF1. The variable to be altered will be assumed to be called \"x\" "
            "and in addition \"[0]\" can be used which will be interpreted as FullSecID of the static sector the filter is attached to. No other "
-           "parameter is allowd. The structure of the 2-hit filter is as follows:     " + structure3HitFilter +
+           "parameter is allowed. The structure of the 2-hit filter is as follows:     " + structure3HitFilter +
            "    Example: [(1, \"12\"), (3, \"sin(x)\"), (4, \"x + [0]\")]    PS: use this feature only if you know what you are doing!",
            m_threeHitFilterAdjustFunctions);
 }
@@ -141,7 +141,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 {
 
 
-  // TODO: Most of these informations are not used at all.
+  // TODO: Most of the information is not used at all.
   //        It seems to me (EP) that only the SectorDividers are used.
 
   // TODO: find a better way to put the configs into the framework
@@ -179,6 +179,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   bootstrapSectorMap(config1);
 
 
+  // 11th Oct. 2023: removed to prevent that corresponding training samples are generated. Still want to keep it to not forget how it is done.
+  /*
   // same as config1 but allows the PXD layers
   // default for VXD tracking (SVD+PXD)
   SectorMapConfig config1point1;
@@ -198,6 +200,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1point1.rarenessThreshold = 0.; //0.001;
   config1point1.quantiles = {0., 1.};  //{0.005, 1. - 0.005};
   bootstrapSectorMap(config1point1);
+  */
 
   // same as config1 but allows up to 7 layers
   // default for VTX tracking
@@ -236,7 +239,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
   VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
   segmentFilters->setConfig(config);
 
-  // TO DO: All these informations must be retrieved from the geometry
+  // TO DO: The whole information must be retrieved from the geometry
   CompactSecIDs compactSecIds;
 
   std::vector< double > uDividersMinusLastOne = config.uSectorDivider;

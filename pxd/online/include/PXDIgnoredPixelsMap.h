@@ -69,7 +69,7 @@ namespace Belle2 {
 
     /** Structure holding sets of ignored pixel ranges for all sensors by sensor id (unsigned short). */
     std::unordered_map<unsigned short, IgnoredPixelsRangeSet> m_Map;
-    /** Structure holding sets of ingored single pixels for all sensors by sensor id (unsigned short). */
+    /** Structure holding sets of ignored single pixels for all sensors by sensor id (unsigned short). */
     std::unordered_map<unsigned short, IgnoredSinglePixelsSet> m_MapSingles;
 
     /** Set of ignored pixel ranges for the most currently queried sensor */

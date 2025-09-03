@@ -11,7 +11,8 @@
 #include <vector>
 #include <string>
 #include <analysis/VariableManager/Manager.h>
-#include <framework/geometry/B2Vector3.h>
+
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   class Particle;
@@ -40,6 +41,47 @@ namespace Belle2 {
      */
     double particleTagVz(const Particle* particle);
 
+    /**
+     * Returns x component of the Y4S vertex.
+     * The result is meaningful only with the Tag vertex tube constraint and
+     * SigB reconstructed with TreeFitter with ipConstraint.
+     */
+    double getY4Sx(const Particle* part);
+
+    /**
+     * Returns y component of the Y4S vertex.
+     * The result is meaningful only with the Tag vertex tube constraint and
+     * SigB reconstructed with TreeFitter with ipConstraint.
+     */
+    double getY4Sy(const Particle* part);
+
+    /**
+     * Returns z component of the Y4S vertex.
+     * The result is meaningful only with the Tag vertex tube constraint and
+     * SigB reconstructed with TreeFitter with ipConstraint.
+     */
+    double getY4Sz(const Particle* part);
+
+    /**
+     * Returns reconstructed Signal B proper decay time.
+     * The result is meaningful only with the Tag vertex tube constraint and
+     * SigB reconstructed with TreeFitter with ipConstraint.
+     */
+    double getSigBdecayTime(const Particle* part);
+
+    /**
+     * Returns reconstructed Tag B proper decay time.
+     * The result is meaningful only with the Tag vertex tube constraint and
+     * SigB reconstructed with TreeFitter with ipConstraint.
+     */
+    double getTagBdecayTime(const Particle* part);
+
+    /**
+     * Returns DeltaT calculated as a difference of tSigB and tTagB, i.e. not from the projection along boost vector
+     * The result is meaningful only with the Tag vertex tube constraint and
+     * SigB reconstructed with TreeFitter with ipConstraint.
+     */
+    double getDeltaT3D(const Particle* part);
 
     /**
      * return MC X component of the tag vertex
@@ -412,7 +454,7 @@ namespace Belle2 {
      * and the true tag B decay vertex.
      *
      */
-    B2Vector3D tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex);
+    ROOT::Math::XYZVector tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
      * Returns the X coordinate of the vector between the mc particle corresponding to the ith tag vtx track
@@ -439,7 +481,7 @@ namespace Belle2 {
      * return  the true momentum of the MC particle corresponding to the ith tag vtx track.
      *
      */
-    B2Vector3D tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex);
+    ROOT::Math::XYZVector tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
      * return the X component of the true momentum of the MC particle corresponding to the ith tag vtx track.
@@ -463,7 +505,7 @@ namespace Belle2 {
      * return the true origin of the MC particle corresponding to the ith tag vtx track.
      *
      */
-    B2Vector3D tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex);
+    ROOT::Math::XYZVector tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
      * return the X component of the true origin of the MC particle corresponding to the ith tag vtx track.

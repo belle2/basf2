@@ -519,7 +519,7 @@ def structparser(token):
             return [token]
         # Split the format string into a list of 'q', '4h' etc.
         formatlist = re.findall(STRUCT_SPLIT_RE, m.group('fmt'))
-        # Now deal with mulitiplicative factors, 4h -> hhhh etc.
+        # Now deal with multiplicative factors, 4h -> hhhh etc.
         fmt = ''.join([f[-1] * int(f[:-1]) if len(f) != 1 else
                        f for f in formatlist])
         if endian == '@':
@@ -779,7 +779,7 @@ class Bits(object):
 
     def __new__(cls, auto=None, length=None, offset=None, _cache=None, **kwargs):
         # For instances auto-initialised with a string we intern the
-        # instance for re-use.
+        # instance for reuse.
         if _cache is None:
             _cache = {}
         try:
@@ -1301,7 +1301,7 @@ class Bits(object):
             data = bytearray((s + 7) // 8)
             self._datastore = ByteStore(data, s, 0)
             return
-        if isinstance(s, collections.Iterable):
+        if isinstance(s, collections.abc.Iterable):
             # Evaluate each item as True or False and set bits to 1 or 0.
             self._setbin_unsafe(''.join(str(int(bool(x))) for x in s))
             return
@@ -1377,7 +1377,7 @@ class Bits(object):
                   "The allowed range is [0, {2}]."
             raise CreationError(msg, uint, length, (1 << length) - 1)
         if uint < 0:
-            raise CreationError("uint cannot be initialsed by a negative number.")
+            raise CreationError("uint cannot be initialised by a negative number.")
         s = hex(uint)[2:]
         s = s.rstrip('L')
         if len(s) & 1:
@@ -3140,7 +3140,7 @@ class BitArray(Bits):
         else:
             if step != 1:
                 # convert to binary string and use string slicing
-                # TODO: Horribly inefficent
+                # TODO: Horribly inefficient
                 temp = list(self._getbin())
                 v = list(Bits(value)._getbin())
                 temp.__setitem__(key, v)
@@ -3224,7 +3224,7 @@ class BitArray(Bits):
         else:
             if step != 1:
                 # convert to binary string and use string slicing
-                # TODO: Horribly inefficent
+                # TODO: Horribly inefficient
                 temp = list(self._getbin())
                 temp.__delitem__(key)
                 self._setbin_unsafe(''.join(temp))
@@ -3508,7 +3508,7 @@ class BitArray(Bits):
         if pos is None:
             self._invert_all()
             return
-        if not isinstance(pos, collections.Iterable):
+        if not isinstance(pos, collections.abc.Iterable):
             pos = (pos,)
         length = self.len
 
@@ -3596,7 +3596,7 @@ class BitArray(Bits):
                     bytesizes.append(PACK_CODE_SIZE[f])
                 else:
                     bytesizes.extend([PACK_CODE_SIZE[f[-1]]] * int(f[:-1]))
-        elif isinstance(fmt, collections.Iterable):
+        elif isinstance(fmt, collections.abc.Iterable):
             bytesizes = fmt
             for bytesize in bytesizes:
                 if not isinstance(bytesize, numbers.Integral) or bytesize < 0:
@@ -3816,7 +3816,7 @@ class ConstBitStream(Bits):
         return self._pos // 8
 
     def _setbitpos(self, pos):
-        """Move to absolute postion bit in bitstream."""
+        """Move to absolute position bit in bitstream."""
         if pos < 0:
             raise ValueError("Bit position cannot be negative.")
         if pos > self.len:

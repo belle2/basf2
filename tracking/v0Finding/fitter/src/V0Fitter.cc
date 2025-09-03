@@ -359,7 +359,7 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   const int pdgTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
   genfit::AbsTrackRep* plusRepresentation = recoTrackPlus->getTrackRepresentationForPDG(pdgTrackPlus);
   if ((plusRepresentation == nullptr) or (not recoTrackPlus->wasFitSuccessful(plusRepresentation))) {
-    B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue savely anyway.");
+    B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue safely anyway.");
     return false;
   }
 
@@ -368,7 +368,7 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   const int pdgTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
   genfit::AbsTrackRep* minusRepresentation = recoTrackMinus->getTrackRepresentationForPDG(pdgTrackMinus);
   if ((minusRepresentation == nullptr) or (not recoTrackMinus->wasFitSuccessful(minusRepresentation))) {
-    B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue savely anyway.");
+    B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue safely anyway.");
     return false;
   }
 

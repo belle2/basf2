@@ -40,6 +40,9 @@ VXDTFTrainingDataCollectorModule::VXDTFTrainingDataCollectorModule() :
 
   addParam("NameTag", m_PARAMNameTag, "A name tag that will be attached to the name of the output file. If left empty (\"\") a "
            "random number will be attached!", std::string(""));
+
+  addParam("outputDir", m_PARAMoutputDir,
+           "Name of the output directory. The output file created by this module will be written into that directory.", m_PARAMoutputDir);
 }
 
 /**
@@ -63,7 +66,7 @@ void VXDTFTrainingDataCollectorModule::initialize()
     }
 
     SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> >
-    newMap(setup.first, nameAppendix);
+    newMap(setup.first, nameAppendix, m_PARAMoutputDir);
 
     m_secMapTrainers.push_back(std::move(newMap));
 

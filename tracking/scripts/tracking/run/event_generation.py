@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -413,7 +412,7 @@ def setup_tracking_detector(path):
     components = ["BeamPipe", "PXD", "SVD", "CDC", "MagneticField"]
     override = [
         ("/DetectorComponent[@name='MagneticField']//Component[@type='3d'][2]/ExcludeRadiusMax",
-         "4.20", "m", )  # Remove the second compontent which is the magnetic field outside the tracking volumn.
+         "4.20", "m", )  # Remove the second component which is the magnetic field outside the tracking volume.
     ]
 
     adjustments.adjust_module(path, "Gearbox", override=override)
@@ -448,7 +447,7 @@ def setup_tracking_detector_vtx_constant_b(path):
 def setup_cdc_cr_test(path):
     components = ["CDC"]
     override = [
-        # Reset the top volume to accomodate cosmics that can hit all parts of the detector
+        # Reset the top volume to accommodate cosmics that can hit all parts of the detector
         ("/Global/length", "8.", "m"),
         ("/Global/width", "8.", "m"),
         ("/Global/height", "1.5", "m"),

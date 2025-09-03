@@ -72,7 +72,9 @@ TOPRingPlotterModule::TOPRingPlotterModule() : Module()
            "Set true to save the histograms of the maps in addition to the list of sampled pseudo-digits", false);
   addParam("saveLLScan", m_saveLLScan,
            "Set true to save the results of the LL scan. Requires to add TOPLLScannerModule to the path", false);
-
+  addParam("dumpOtherSlots", m_dumpOtherSlots,
+           "Instead of saving the TOP response for the single slot extrapolated from the given particle list, set true to save the response of all other slots. This excludes the one associated to the list. Good for studying background hits.",
+           false);
 }
 
 
@@ -409,10 +411,12 @@ void TOPRingPlotterModule::event()
       continue;
 
     // Save the digit info for all the topDigits in the module where the track was extrapolated
+    // If `dumpOtherSlots` is true, then instead save all other modules.
     for (const auto& digi : digits) {
       // if we have a cluster, save the digits from the two modules closer to the cluster
       if (m_nDigits >= m_MaxPhotons) break;
-      if ((digi.getModuleID() == moduleID) || (!isFromTrack && digi.getModuleID() == moduleID + deltaModule)) {
+      if ((!m_dumpOtherSlots && digi.getModuleID() == moduleID) || (!m_dumpOtherSlots && !isFromTrack
+          && digi.getModuleID() == moduleID + deltaModule) || (m_dumpOtherSlots == true && digi.getModuleID() != moduleID)) {
         m_digitTime[m_nDigits] = digi.getTime();
         m_digitChannel[m_nDigits] = digi.getChannel();
         m_digitPixel[m_nDigits] = digi.getPixelID();

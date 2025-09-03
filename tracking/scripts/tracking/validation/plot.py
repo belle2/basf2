@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -25,6 +24,7 @@ from tracking.root_utils import root_cd, root_save_name
 from tracking.validation import statistics
 
 import logging
+# @cond internal_test
 
 
 def get_logger():
@@ -38,7 +38,7 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
-#: A map from quanity name symbols to their usual units in Belle II standard units.
+#: A map from quantity name symbols to their usual units in Belle II standard units.
 units_by_quantity_name = {
     'x': 'cm',
     'y': 'cm',
@@ -109,7 +109,7 @@ def compose_axis_label(quantity_name, unit=None):
     if unit is None:
         axis_label = quantity_name
     else:
-        axis_label = '%s (%s)' % (quantity_name, unit)
+        axis_label = f'{quantity_name} ({unit})'
 
     return axis_label
 
@@ -157,7 +157,7 @@ def get1DBinningFromReference(name, refFileName):
 StatsEntry = ROOT.TParameter(float)
 
 
-class ValidationPlot(object):
+class ValidationPlot:
 
     """Class for generating a validation plot for the Belle II validation page.
 
@@ -356,7 +356,7 @@ class ValidationPlot(object):
                 self.ylabel = 'probability'
 
             min_y = 0
-            if(is_asymmetry):
+            if (is_asymmetry):
                 min_y = -1.05
             for histogram in self.histograms:
                 histogram.SetMinimum(min_y)
@@ -410,7 +410,7 @@ class ValidationPlot(object):
 
         # Trying to make the graph lines invisible
         color_index = 0  # white
-        # Transperent white
+        # Transparent white
         graph.SetLineColorAlpha(color_index, 0)
         graph.SetLineStyle(self.very_sparse_dots_line_style_index)
 
@@ -616,7 +616,7 @@ class ValidationPlot(object):
         return self
 
     def fit_gaus(self, z_score=None):
-        """Fit a gaus belle curve to the central portion of a one dimensional histogram
+        """Fit a Gaus bell curve to the central portion of a one dimensional histogram
 
         The fit is applied to the central mean +- z_score * std interval of the histogram,
         such that it is less influence by non gaussian tails further away than the given z score.
@@ -688,7 +688,7 @@ class ValidationPlot(object):
         Parameters
         ----------
         formula : str or TF1
-            Formula string or TH1 to be fitted. See TF1 constructurs for that is a valid formula
+            Formula string or TH1 to be fitted. See TF1 constructors for that is a valid formula
         options : str
            Options string to be used in the fit. See TH1::Fit()
         lower_bound : float
@@ -782,9 +782,9 @@ class ValidationPlot(object):
 
             # give a custom pvalue warning / error zone if requested
             if self.pvalue_error is not None:
-                meta_options.append("pvalue-error={}".format(self.pvalue_error))
+                meta_options.append(f"pvalue-error={self.pvalue_error}")
             if self.pvalue_warn is not None:
-                meta_options.append("pvalue-warn={}".format(self.pvalue_warn))
+                meta_options.append(f"pvalue-warn={self.pvalue_warn}")
 
             # Indicator if the y axes should be displayed as a logarithmic scale
             if self.y_log:
@@ -972,11 +972,11 @@ class ValidationPlot(object):
         if np.isfinite(value) and value == np.round(value):
             return str(int(value))
         else:
-            formated_value = "{:.5g}".format(value)
+            formated_value = f"{value:.5g}"
 
             # if the label is to long, switch to shorter "e" format
             if len(formated_value) > 8:
-                formated_value = "{:.3e}".format(value)
+                formated_value = f"{value:.3e}"
             return formated_value
 
     def create_1d(self,
@@ -1265,7 +1265,7 @@ class ValidationPlot(object):
     def fill_into_tgrapherror(self, graph, xs, ys, filter=None):
         """fill point values and error of the x and y axis into the graph"""
 
-        assert(len(xs[0]) == len(ys[0]))
+        assert (len(xs[0]) == len(ys[0]))
         # set the overall amount of points
         graph.Set(len(xs[0]))
 
@@ -1289,10 +1289,9 @@ class ValidationPlot(object):
 
         if max_n_data:
             if x_n_data > max_n_data or y_n_data > max_n_data:
-                get_logger().warning("Number of points in scatter graph %s exceed limit %s" %
-                                     (self.name, max_n_data))
+                get_logger().warning(f"Number of points in scatter graph {self.name} exceed limit {max_n_data}")
 
-                get_logger().warning("Cropping  %s" % max_n_data)
+                get_logger().warning(f"Cropping  {max_n_data}")
 
                 xs = xs[0:max_n_data]
                 ys = ys[0:max_n_data]
@@ -1691,7 +1690,7 @@ class ValidationPlot(object):
             Preset bin edges or preset number of desired bins.
             The default, None, means the bound should be extracted from data.
             The rice rule is used the determine the number of bins.
-            If a list of floats is given return them immediatly.
+            If a list of floats is given return them immediately.
         lower_bound : float or None, optional
             Preset lower bound of the binning range.
             The default, None, means the bound should be extracted from data.
@@ -1721,7 +1720,7 @@ class ValidationPlot(object):
             # Special value for the flat distribution binning
             n_bins = None
 
-        elif isinstance(bins, collections.Iterable):
+        elif isinstance(bins, collections.abc.Iterable):
             # Bins is considered as an array
             # Construct a float array forwardable to root.
             bin_edges = bins
@@ -1738,7 +1737,7 @@ class ValidationPlot(object):
 
             # Do not allow negative bin numbers
             if not n_bins > 0:
-                message = 'Cannot accept n_bins=%s as number of bins, because it is not a number greater than 0.' % bins
+                message = f'Cannot accept n_bins={bins} as number of bins, because it is not a number greater than 0.'
                 raise ValueError(message)
 
         # Coerce values to a numpy array. Do not copy if already a numpy array.
@@ -1807,8 +1806,8 @@ class ValidationPlot(object):
         if lower_bound != upper_bound:
             if bins == "flat":
                 debug("Creating flat distribution binning")
-                precentiles = np.linspace(0.0, 100.0, n_bin_edges)
-                bin_edges = np.unique(np.nanpercentile(xs[(lower_bound <= xs) & (xs <= upper_bound)], precentiles))
+                percentiles = np.linspace(0.0, 100.0, n_bin_edges)
+                bin_edges = np.unique(np.nanpercentile(xs[(lower_bound <= xs) & (xs <= upper_bound)], percentiles))
             else:
                 # Correct the upper bound such that all values are strictly smaller than the upper bound
                 # Make one step in single precision in the positive direction
@@ -1850,7 +1849,7 @@ class ValidationPlot(object):
         and always include them in the range if it finds any.
         Exceptional values means exact values that appear often in the series for whatever reason.
         Possible reasons include
-        * Interal / default values
+        * Integral / default values
         * Failed evaluation conditions
         * etc.
         which should be not cropped away automatically if you are locking on the quality of your data.
@@ -1925,7 +1924,7 @@ class ValidationPlot(object):
             n_bins = int(n_bins)
             # Do not allow negative bin numbers
             if not n_bins > 0:
-                message = 'Cannot accept n_bins=%s as number of bins, because it is not a number greater than 0.' % n_bins
+                message = f'Cannot accept n_bins={n_bins} as number of bins, because it is not a number greater than 0.'
                 raise ValueError(message)
 
         return n_bins, lower_bound, upper_bound
@@ -1973,7 +1972,7 @@ class ValidationPlot(object):
         make_symmetric = False
         exclude_outliers = outlier_z_score is not None and (lower_bound is None or upper_bound is None)
 
-        # Look for exceptionally frequent values in the series, e.g. interal delta values like -999
+        # Look for exceptionally frequent values in the series, e.g. integral delta values like -999
         if include_exceptionals or exclude_outliers:
             exceptional_xs = self.get_exceptional_values(finite_xs)
             exceptional_indices = np.in1d(finite_xs, exceptional_xs)
@@ -1981,7 +1980,7 @@ class ValidationPlot(object):
         # Prepare for the estimation of outliers
         if exclude_outliers:
             if not np.all(exceptional_indices):
-                # Exclude excecptional values from the estimation to be unbiased
+                # Exclude exceptional values from the estimation to be unbiased
                 # even in case exceptional values fall into the central region near the mean
                 x_mean, x_std = self.get_robust_mean_and_std(finite_xs[~exceptional_indices])
             else:
@@ -2139,13 +2138,13 @@ class ValidationPlot(object):
         # Formula string looks like 0*[0]+0*[1]+0*[2]+...
         formula_string = '+'.join('0*[' + str(i) + ']' for i in range(len(additional_stats)))
 
-        # Compose a function that carries the addtional information
+        # Compose a function that carries the additional information
         additional_stats_tf1 = ROOT.TF1("Stats", formula_string, lower_bound, upper_bound)
 
         for (i, (label, value)) in enumerate(additional_stats.items()):
             # root 6 does not like labels with spaces ..
             # bug report:  https://sft.its.cern.ch/jira/browse/ROOT-7460
-            # therefor this workaround:
+            # therefore this workaround:
             label = label.replace(" ", "-")
             additional_stats_tf1.SetParName(i, label)
             additional_stats_tf1.FixParameter(i, value)
@@ -2385,3 +2384,5 @@ def test():
 
 if __name__ == '__main__':
     test()
+
+# @endcond

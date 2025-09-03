@@ -53,9 +53,9 @@ namespace Belle2 {
   };
 
 
-//**************  METHODES of the Collector
+//**************  METHODS of the Collector
 //       virtual void initSectors (std::map<std::pair<unsigned int, unsigned int>, std::vector<int>> sectors);
-//     // Beginn Run, safe sectors here
+//     // Begin Run, safe sectors here
 //
 //     virtual void initPersistent (); // Init Persistence
 //     virtual void intEvent ();  // Clusters import, Sector fill
@@ -76,7 +76,7 @@ namespace Belle2 {
 //     virtual int importTC (int pass_index, std::string died_at, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Cell_IDs); // TC Import
 //     virtual void updateTC (int tcid, std::string died_at, std::vector<int> accepted, std::vector<int> rejected); // TC Update
 //
-//     virtual void silentKill (); // Für alle folgenden Updates
+//     virtual void silentKill (); // For all future Updates
 //     virtual void safeInformation ();
 //
 //
@@ -158,7 +158,7 @@ namespace Belle2 {
     }
 
     // 1. Sectors init
-    //KeySectors dosn't function => so pair Int int
+    //KeySectors doesn't function => so pair Int int
     std::map<std::pair<unsigned int, unsigned int>, std::vector<int>> sectors_display_all_pass;
     std::vector<int> sectors_display_friends;
 

@@ -188,8 +188,11 @@ namespace Belle2 {
       0.95, 0.95, 0.95, 0.95, 1.00, 1.00, 0.50, 0.20, 0.55, 1.00, 0.40, 0.70, 1.00, 0.90
     }; /**<upper limit value in each bin*/
 
-    TH1* m_rtype = nullptr; /**< histogram from DQMInfo with runtype */
-    TString m_runtype; /**< string with runtype: physics or cosmic */
+    /** Run type flag for physics runs. */
+    bool m_IsPhysicsRun;
+
+    //mirabelle
+    Belle2::MonitoringObject* m_mon_h_eff_shifter_fast = nullptr; /**< Mirabelle, MonitoringObject for m_h_eff_shifter_fast */
 
 #ifdef _BELLE2_EPICS
     chid mychid[n_eff_shifter];// hard limit max 10 parameters

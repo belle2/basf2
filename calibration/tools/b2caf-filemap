@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -94,7 +93,7 @@ def get_argparser():
                                                  "Outputs a dictionary in a pickle file to --output-file.")
     parser.add_argument("filepath_pattern", help="""The file path pattern that will be passed to glob. """
                         """Selects the files to use in the map. """
-                        """e.g. "/hsm/belle2/bdata/Data/Raw/e0003/r0495[5,6]\*/\*\*/\*.root" """)
+                        r"""e.g. "/hsm/belle2/bdata/Data/Raw/e0003/r0495[5,6]\*/\*\*/\*.root" """)
     parser.add_argument("--method", "-m", help="The method by which you want to create the mapping. "
                         "If your files are from '/hsm/belle2/bdata/Data/Raw' then you can try to use 'raw'. "
                         "This is much faster as it generates the IoVs by using the directory structure of raw files. "
@@ -133,7 +132,7 @@ def main():
     import pickle
     with open(args.output_file, 'bw') as iov_map_file:
         pickle.dump(file_to_iov, iov_map_file)
-        print("Saved the file to ioV map to file '{}'.".format(args.output_file))
+        print(f"Saved the file to ioV map to file '{args.output_file}'.")
 
 if __name__ == "__main__":
     import sys

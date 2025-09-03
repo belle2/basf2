@@ -140,7 +140,7 @@ namespace Belle2 {
     H0->move(1260, 0);
 #endif
 
-    //...Old mapping (trasan methode)...
+    //...Old mapping (trasan method)...
     if (_doit == 0 || _doit == 1) {
 
       //...Create patterns...
@@ -171,7 +171,7 @@ namespace Belle2 {
       }
     }
 
-    //...Kaiyu's methode...
+    //...Kaiyu's method...
     else {
       mappingByFile(mappingFilePlus, mappingFileMinus);
     }
@@ -872,7 +872,6 @@ namespace Belle2 {
       trackList2DFitted.push_back(& aTrack);
 
       CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
-      double phi02D;
       vector<double> nWires(9);
       vector<double> rr(9);
       vector<double> rr2D;
@@ -962,12 +961,7 @@ namespace Belle2 {
         else if (fLRLUT) LR[iSL] = lutLR[iSL];
         else LR[iSL] = 3;
       }//End superlayer loop
-      // 2D fit values from IW 2D fitter
-      phi02D = aTrack.helix().phi0();
-      if (aTrack.charge() < 0) {
-        phi02D = phi02D - M_PI;
-        if (phi02D < 0) phi02D = phi02D + 2 * M_PI;
-      }
+
       // Get 2D fit values from JB 2D fitter
       // Set phi2DError for 2D fit
       vector<double>phi2DError(5);
@@ -1145,7 +1139,7 @@ namespace Belle2 {
     c.append(links);
 
     if (TRGDebug::level()) {
-      cout << TRGDebug::tab() << "attched segments below" << endl;
+      cout << TRGDebug::tab() << "attached segments below" << endl;
       cout << TRGDebug::tab(4);
       for (unsigned j = 0; j < segments.size(); j++) {
         cout << segments[j]->name();

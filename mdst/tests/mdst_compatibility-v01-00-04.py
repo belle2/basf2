@@ -11,7 +11,7 @@
 """
 Test backwards compatibility for an mdst file produced with release-01-00-04.
 
-See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
+See https://xwiki.desy.de/xwiki/rest/p/0a372 if this test fails.
 
 CHANGES since release-01-00-04:
 

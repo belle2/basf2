@@ -12,6 +12,7 @@
 #include <framework/pcore/Mergeable.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/utilities/KeyValuePrinter.h>
+#include <framework/core/MetadataService.h>
 
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -23,6 +24,7 @@
 #include <filesystem>
 #include <iostream>
 #include <iomanip>
+#include <memory>
 #include <string>
 #include <set>
 #include <regex>
@@ -50,6 +52,7 @@ int main(int argc, char* argv[])
   // Parse options
   std::string outputfilename;
   std::vector<std::string> inputfilenames;
+  std::string jsonfilename;
   po::options_description options("Options");
   options.add_options()
   ("help,h", "print all available options")
@@ -58,6 +61,7 @@ int main(int argc, char* argv[])
   ("force,f", "overwrite existing file")
   ("no-catalog", "don't register output file in file catalog, This is now the default")
   ("add-to-catalog", "register the output file in the file catalog")
+  ("job-information", po::value<std::string>(&jsonfilename), "create json file with metadata of output file and execution status")
   ("quiet,q", "if given don't print infos, just warnings and errors");
   po::positional_options_description positional;
   positional.add("output", 1);
@@ -83,6 +87,12 @@ The following restrictions apply:
   - The event tree needs to contain the same DataStore entries in all files.
 )DOC");
     return 1;
+  }
+
+  //Initialize metadata service
+  MetadataService::Instance();
+  if (!jsonfilename.empty()) {
+    MetadataService::Instance().setJsonFileName(jsonfilename);
   }
 
   // Remove the {module:} from log messages
@@ -115,9 +125,12 @@ The following restrictions apply:
   std::set<std::string> allUsers;
   // EventInfo for the high/low event numbers of the final FileMetaData
   std::optional<EventInfo> lowEvt, highEvt;
-  // set of all branch names in the event tree to compare against to make sure
+  // map of sets of all branch names in the event trees to compare against to make sure
   // that they're the same in all files
-  std::set<std::string> allEventBranches;
+  std::map<std::string, std::set<std::string>> allEventBranches;
+  // set of all ntuple trees names to compare against to make sure
+  // that they're the same in all files (if they exist)
+  std::set<std::string> allEventTrees;
   // Release version to compare against. Same as FileMetaData::getRelease() but with the optional -modified removed
   std::string outputRelease;
 
@@ -130,23 +143,37 @@ The following restrictions apply:
       RootIOUtilities::RootFileInfo fileInfo(input);
       // Ok, load the FileMetaData from the tree
       const auto &fileMetaData = fileInfo.getFileMetaData();
+      auto description = fileMetaData.getDataDescription();
+      auto isNtuple = description.find("isNtupleMetaData");
       // File looks usable, start checking metadata ...
       B2INFO("adding file " << std::quoted(input));
       if(LogSystem::Instance().isLevelEnabled(LogConfig::c_Info)) fileMetaData.Print("all");
-
-      auto branches = fileInfo.getBranchNames();
-      if(branches.empty()) {
-        throw std::runtime_error("Could not find any branches in event tree");
-      }
-      if(allEventBranches.empty()) {
-        std::swap(allEventBranches,branches);
+      auto trees = fileInfo.getTreeNames();
+      if(allEventTrees.empty()) {
+        std::swap(allEventTrees,trees);
       }else{
-        if(branches!=allEventBranches){
-          B2ERROR("Branches in " << std::quoted(input) << " differ from "
+        if(trees!=allEventTrees){
+          B2ERROR("Trees in " << std::quoted(input) << " differ from "
               << std::quoted(inputfilenames.front()));
+          continue;
         }
       }
-
+      for(const auto& tree : allEventTrees) {
+        auto branches = ((tree=="tree") &&
+                         ((isNtuple==description.end()) || (isNtuple->second != "True"))
+                        ) ? fileInfo.getBranchNames() : fileInfo.getNtupleBranchNames(tree);
+        if(branches.empty()) {
+          throw std::runtime_error("Could not find any branches in " + tree);
+        }
+        if(allEventBranches[tree].empty()) {
+          std::swap(allEventBranches[tree],branches);
+        }else{
+          if(branches!=allEventBranches[tree]){
+            B2ERROR("Branches in " << std::quoted(input + ":" + tree) << " differ from "
+                << std::quoted(inputfilenames.front() + ":" + tree));
+          }
+        }
+      }
       // File looks good so far, now fix the persistent stuff, i.e. merge all
       // objects in persistent tree
       for(TObject* brObj: *fileInfo.getPersistentTree().GetListOfBranches()){
@@ -157,7 +184,7 @@ The following restrictions apply:
         // Make sure the branch is mergeable
         if(!br) continue;
         if(!br->GetTargetClass()->InheritsFrom(Mergeable::Class())){
-          B2ERROR("Branch " << std::quoted(br->GetName()) << " in persistent tree not inheriting from Mergable");
+          B2ERROR("Branch " << std::quoted(br->GetName()) << " in persistent tree not inheriting from Mergeable");
           continue;
         }
         // Ok, it's an object we now how to handle so get it from the tree
@@ -305,52 +332,58 @@ The following restrictions apply:
       outputMetaData->setRandomSeed("");
   }
   RootIOUtilities::setCreationData(*outputMetaData);
+  // Set (again) the release, since it's overwritten by the previous line
+  outputMetaData->setRelease(outputRelease);
 
   // OK we have a valid FileMetaData and merged all persistent objects, now do
   // the conversion of the event trees and create the output file.
-  TFile output(outputfilename.c_str(), "RECREATE");
-  if (output.IsZombie()) {
+  auto output = std::unique_ptr<TFile>{TFile::Open(outputfilename.c_str(), "RECREATE")};
+  if (output == nullptr or output->IsZombie()) {
     B2ERROR("Could not create output file " << std::quoted(outputfilename));
     return 1;
   }
 
-  TTree* outputEventTree{nullptr};
-  for (const auto& input : inputfilenames) {
-    B2INFO("processing events from " << std::quoted(input));
-    TFile tfile(input.c_str());
-    auto* tree = dynamic_cast<TTree*>(tfile.Get("tree"));
-    if(!outputEventTree){
-      output.cd();
-      outputEventTree = tree->CloneTree(0);
-    }else{
-      outputEventTree->CopyAddresses(tree);
+  for (const auto& treeName : allEventTrees) {
+    TTree* outputEventTree{nullptr};
+    for (const auto& input : inputfilenames) {
+      B2INFO("processing events from " << std::quoted(input + ":" + treeName));
+      auto tfile = std::unique_ptr<TFile>{TFile::Open(input.c_str(), "READ")};
+      // At this point, we already checked that the input files are valid and exist
+      // so it's safe to access tfile directly
+      auto* tree = dynamic_cast<TTree*>(tfile->Get(treeName.c_str()));
+      if (!outputEventTree){
+        output->cd();
+        outputEventTree = tree->CloneTree(0);
+      } else {
+        outputEventTree->CopyAddresses(tree);
+      }
+      // Now let's copy all entries without unpacking (fast), layout the
+      // baskets in an optimal order for sequential reading (SortBasketByEntry)
+      // and rebuild the index in case some parts of the index are missing
+      outputEventTree->CopyEntries(tree, -1, "fast SortBasketsByEntry BuildIndexOnError");
+      // and reset the branch addresses to not be connected anymore
+      outputEventTree->CopyAddresses(tree, true);
+      // finally clean up and close file.
+      delete tree;
+      tfile->Close();
     }
-    // Now let's copy all entries without unpacking (fast), layout the
-    // baskets in an optimal order for sequential reading (SortBasketByEntry)
-    // and rebuild the index in case some parts of the index are missing
-    outputEventTree->CopyEntries(tree, -1, "fast SortBasketsByEntry BuildIndexOnError");
-    // and reset the branch addresses to not be connected anymore
-    outputEventTree->CopyAddresses(tree, true);
-    // finally clean up and close file.
-    delete tree;
-    tfile.Close();
+    assert(outputEventTree);
+    // make sure we have an index ...
+    if(!outputEventTree->GetTreeIndex()) {
+      B2INFO("No Index found: building new index");
+      RootIOUtilities::buildIndex(outputEventTree);
+    }
+    // and finally write the tree
+    output->cd();
+    outputEventTree->Write();
+    // check if the number of full events in the metadata is zero:
+    // if so calculate number of full events now:
+    if (outputMetaData->getNFullEvents() == 0) {
+      outputMetaData->setNFullEvents(outputEventTree->GetEntries("EventMetaData.m_errorFlag == 0"));
+    }
   }
-  assert(outputEventTree);
-  // make sure we have an index ...
-  if(!outputEventTree->GetTreeIndex()) {
-    B2INFO("No Index found: building new index");
-    RootIOUtilities::buildIndex(outputEventTree);
-  }
-  // and finally write the tree
-  output.cd();
-  outputEventTree->Write();
-  B2INFO("Done processing events");
 
-  // check if the number of full events in the metadata is zero:
-  // if so calculate number of full events now:
-  if (outputMetaData->getNFullEvents() == 0) {
-    outputMetaData->setNFullEvents(outputEventTree->GetEntries("EventMetaData.m_errorFlag == 0"));
-  }
+  B2INFO("Done processing events");
 
   // we need to set the LFN to the absolute path name
   outputMetaData->setLfn(fs::absolute(outputfilename).string());
@@ -360,7 +393,7 @@ The following restrictions apply:
   }
   B2INFO("Writing FileMetaData");
   // Create persistent tree
-  output.cd();
+  output->cd();
   TTree outputMetaDataTree("persistent", "persistent");
   outputMetaDataTree.Branch("FileMetaData", &outputMetaData);
   for(auto &it: persistentMergeables){
@@ -374,6 +407,14 @@ The following restrictions apply:
     delete val.second.first;
   }
   persistentMergeables.clear();
+  auto outputMetaDataCopy = *outputMetaData;
   delete outputMetaData;
-  output.Close();
+  output->Close();
+
+  // and now add it to the metadata service
+  MetadataService::Instance().addRootOutputFile(outputfilename, &outputMetaDataCopy, "b2file-merge");
+
+  // report completion in job metadata
+  MetadataService::Instance().addBasf2Status("finished successfully");
+  MetadataService::Instance().finishBasf2();
 }

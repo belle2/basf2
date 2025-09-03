@@ -48,7 +48,7 @@ namespace Belle2 {
   public:
 
     /** initialize */
-    void initialize(int);
+    void initialize(void);
     /**simulates ECL trigger for Global Cosmic data  */
     void simulate01(int);
     /**simulates ECL trigger for Data Analysis */
@@ -85,7 +85,7 @@ namespace Belle2 {
     /** set # of considered TC in energy weighted Timing method */
     void setNofTopTC(int noftoptc) {m_NofTopTC = noftoptc;}
     /** make LowMultiTriggerBit **/
-    void makeLowMultiTriggerBit(std::vector<int>, std::vector<double>);
+    void makeLowMultiTriggerBit(std::vector<int>, std::vector<double>, int);
 
     /** make Trigger bit except for Low Multiplicity related bit **/
     /*
@@ -94,7 +94,8 @@ namespace Belle2 {
                         int, int, int, int, int, int, int,
                         int, int, int, int);
     */
-    void makeTriggerBit(int, int, int, int, double, int, int,
+    void makeTriggerBit(int, int, int, int, double,
+                        int, int, int, int, int,
                         std::vector<int>, int, int, int, int,
                         int, int, int, int, int, int, int,
                         int, int, int, int, int);//one int parameter was added for taub2b3
@@ -105,6 +106,17 @@ namespace Belle2 {
     int getTriggerbit(int i) {return m_Triggerbit[i];}
     //! Get Low Multiplicity Trigger Bit
     int getLowmultibit() {return m_Lowmultibit;}
+
+    //! set conversion factor of ADC to Energy in Lab in GeV
+    void setADCtoEnergy(const double ADCtoEnergy)
+    {
+      m_ADCtoEnergy = ADCtoEnergy;
+    }
+    //! set Total Energy Threshold (low, high, lum)
+    void setTotalEnergyThreshold(const std::vector<double>& iTotalEnergy)
+    {
+      m_TotalEnergy = iTotalEnergy;
+    }
     //! set 2D Bhabha Energy Threshold
     void set2DBhabhaThreshold(const std::vector<double>& i2DBhabhaThresholdFWD,
                               const std::vector<double>& i2DBhabhaThresholdBWD)
@@ -112,38 +124,42 @@ namespace Belle2 {
       m_2DBhabhaThresholdFWD = i2DBhabhaThresholdFWD;
       m_2DBhabhaThresholdBWD = i2DBhabhaThresholdBWD;
     }
-    //! set 3D selection Bhabha Energy Threshold
-    void set3DBhabhaSelectionThreshold(const std::vector<double>& i3DBhabhaSelectionThreshold)
-    {
-      m_3DBhabhaSelectionThreshold = i3DBhabhaSelectionThreshold;
-    };
     //! set 3D veto Bhabha Energy Threshold
     void set3DBhabhaVetoThreshold(const std::vector<double>& i3DBhabhaVetoThreshold)
     {
       m_3DBhabhaVetoThreshold = i3DBhabhaVetoThreshold;
     };
-
-    //! set 3D selection Bhabha Energy Angle
-    void set3DBhabhaSelectionAngle(const std::vector<double>& i3DBhabhaSelectionAngle)
-    {
-      m_3DBhabhaSelectionAngle = i3DBhabhaSelectionAngle;
-    };
     //! set 3D veto Bhabha Energy Angle
-    void set3DBhabhaVetoAngle(const std::vector<double>& i3DBhabhaVetoAngle)
+    void set3DBhabhaVetoAngle(const std::vector<int>& i3DBhabhaVetoAngle)
     {
       m_3DBhabhaVetoAngle = i3DBhabhaVetoAngle;
     };
+    //! set 3D selection Bhabha Energy Threshold
+    void set3DBhabhaSelectionThreshold(const std::vector<double>& i3DBhabhaSelectionThreshold)
+    {
+      m_3DBhabhaSelectionThreshold = i3DBhabhaSelectionThreshold;
+    };
+    //! set 3D selection Bhabha Energy Angle
+    void set3DBhabhaSelectionAngle(const std::vector<int>& i3DBhabhaSelectionAngle)
+    {
+      m_3DBhabhaSelectionAngle = i3DBhabhaSelectionAngle;
+    };
+    //! set 3D selection Bhabha Energy PreScale
+    void set3DBhabhaSelectionPreScale(const std::vector<int>& i3DBhabhaSelectionPreScale)
+    {
+      m_3DBhabhaSelectionPreScale = i3DBhabhaSelectionPreScale;
+    };
     //! set mumu bit Threshold
-    void setmumuThreshold(int mumuThreshold) {m_mumuThreshold = mumuThreshold; }
-    //! set mumu bit Angle selection
-    void setmumuAngle(const std::vector<double>& imumuAngle)
+    void setmumuThreshold(double mumuThreshold) {m_mumuThreshold = mumuThreshold; }
+    //! set mumu bit Angle
+    void setmumuAngle(const std::vector<int>& imumuAngle)
     {
       m_mumuAngle = imumuAngle;
     }
-    //! set 3D Bhabha addtion Angle selection
-    void set3DBhabhaAddAngleCut(const std::vector<double>&  i3DBhabhaAddAngleCut)
+    //! set hie12 3D Bhabha addition Angle
+    void sethie12BhabhaVetoAngle(const std::vector<int>&  ihie12BhabhaVetoAngle)
     {
-      m_3DBhabhaAddAngleCut = i3DBhabhaAddAngleCut;
+      m_hie12BhabhaVetoAngle = ihie12BhabhaVetoAngle;
     }
     //! set tau b2b 2 cluster angle cut
     void setTaub2bAngleCut(const std::vector<int>& itaub2bAngleCut)
@@ -156,55 +172,59 @@ namespace Belle2 {
       m_taub2bEtotCut = itaub2bEtotCut;
     }
     //! set tau b2b  1Cluster energy cut
-    void setTaub2bClusterECut(double itaub2bClusterECut1,
-                              double itaub2bClusterECut2)
+    void setTaub2bCLELabCut(double itaub2bCLELabCut)
     {
-      m_taub2bClusterECut1 = itaub2bClusterECut1;
-      m_taub2bClusterECut2 = itaub2bClusterECut2;
+      m_taub2bCLELabCut = itaub2bCLELabCut;
     }
     //! set taub2b2 cut
     void setTaub2b2Cut(const std::vector<int>& iTaub2b2AngleCut,
                        const double iTaub2b2EtotCut,
-                       const double iTaub2b2CLEEndcapCut,
-                       const double iTaub2b2CLECut)
+                       const std::vector<double>& iTaub2b2CLELabCut)
     {
-      m_taub2b2AngleCut     = iTaub2b2AngleCut;
-      m_taub2b2EtotCut      = iTaub2b2EtotCut;
-      m_taub2b2CLEEndcapCut = iTaub2b2CLEEndcapCut;
-      m_taub2b2CLECut       = iTaub2b2CLECut;
+      m_taub2b2AngleCut  = iTaub2b2AngleCut;
+      m_taub2b2EtotCut   = iTaub2b2EtotCut;
+      m_taub2b2CLELabCut = iTaub2b2CLELabCut;
     }
     //! set taub2b3 cut
     void setTaub2b3Cut(const std::vector<int>& iTaub2b3AngleCut,
                        const double iTaub2b3EtotCut,
-                       const double iTaub2b3CLEb2bCut,
-                       const double iTaub2b3CLELowCut,
-                       const double iTaub2b3CLEHighCut)
+                       const double iTaub2b3CLEb2bLabCut,
+                       const std::vector<double>& iTaub2b3CLELabCut)
     {
       m_taub2b3AngleCut     = iTaub2b3AngleCut;
       m_taub2b3EtotCut      = iTaub2b3EtotCut;
-      m_taub2b3CLEb2bCut    = iTaub2b3CLEb2bCut;
-      m_taub2b3CLELowCut    = iTaub2b3CLELowCut;
-      m_taub2b3CLEHighCut   = iTaub2b3CLEHighCut;
-    }
-    //! set the number of cluster exceeding 300 MeV
-    void setn300MeVClusterThreshold(int n300MeVCluster)
-    {
-      m_n300MeVCluster = n300MeVCluster;
+      m_taub2b3CLEb2bLabCut = iTaub2b3CLEb2bLabCut;
+      m_taub2b3CLELabCut    = iTaub2b3CLELabCut;
     }
     //! set mumu bit Threshold
     void setECLBurstThreshold(int ECLBurstThreshold)
     {
       m_ECLBurstThreshold = (double) ECLBurstThreshold;
     }
-    //! set Total Energy Theshold (low, high, lum)
-    void setTotalEnergyThreshold(const std::vector<double>& iTotalEnergy)
+    //! set Low Multiplicity cluster E cut in Lab in GeV
+    void setlmlCLELabCut(const std::vector<double>& ilmlCLELabCut)
     {
-      m_TotalEnergy = iTotalEnergy;
+      m_lmlCLELabCut = ilmlCLELabCut;
     }
-    //! set Low Multiplicity Threshold
-    void setLowMultiplicityThreshold(const std::vector<double>& iLowMultiThreshold)
+    //! set Low Multiplicity cluster E cut in CMS in GeV
+    void setlmlCLECMSCut(const std::vector<double>& ilmlCLECMSCut)
     {
-      m_LowMultiThreshold = iLowMultiThreshold;
+      m_lmlCLECMSCut = ilmlCLECMSCut;
+    }
+    //! set the number of cluster for lml00
+    void setlml00NCLforMinE(const int ilml00NCLforMinE)
+    {
+      m_lml00NCLforMinE = ilml00NCLforMinE;
+    }
+    //! set the number of cluster for lml12
+    void setlml12NCLforMinE(const int ilml12NCLforMinE)
+    {
+      m_lml12NCLforMinE = ilml12NCLforMinE;
+    }
+    //! set ThetaID for lml13
+    void setlml13ThetaIdSelection(const int ilml13ThetaIdSelection)
+    {
+      m_lml13ThetaIdSelection = ilml13ThetaIdSelection;
     }
     //! set theta ID region (low and high) of 3DBhabhaVeto InTrack for gg selection
     void set3DBhabhaVetoInTrackThetaRegion(const std::vector<int>& i3DBhabhaVetoInTrackThetaRegion)
@@ -212,10 +232,17 @@ namespace Belle2 {
       m_3DBhabhaVetoInTrackThetaRegion = i3DBhabhaVetoInTrackThetaRegion;
     }
     //! set energy threshold(low and high) of event timing quality flag (GeV)
-    void setEventTimingQualityThresholds(const std::vector<double>& iEventTimingQualityThresholds)
+    void setEventTimingQualityThreshold(const std::vector<double>& iEventTimingQualityThreshold)
     {
-      m_EventTimingQualityThresholds = iEventTimingQualityThresholds;
+      m_EventTimingQualityThreshold = iEventTimingQualityThreshold;
     }
+    //! (hie4) CL E cut for miniimum energy cluster in Lab in GeV
+    void sethie4LowCLELabCut(const double hie4LowCLELabCut)
+    {
+      m_hie4LowCLELabCut = hie4LowCLELabCut;
+    }
+    //! set parameters for TrgEclBhabha
+    void setBhabhaParameter(void);
 
   private:
 
@@ -250,7 +277,7 @@ namespace Belle2 {
     /** TRG Decision overlap window */
     double m_OverlapWindow;
 
-    /** clutering option*/
+    /** clustering option*/
     int m_Clustering;
     /** Bhabha option*/
     int m_Bhabha;
@@ -262,72 +289,78 @@ namespace Belle2 {
     int m_ClusterLimit;
     //! ECL Trigger  bit
     int m_Triggerbit[4];
-    //!  Low Multiplicity bit
+    //! Low Multiplicity bit
     int m_Lowmultibit;
-    //!  Bhabha Prescale Factor
+    //! Bhabha Prescale Factor
     int m_PrescaleFactor;
-    //! Bhabha Prescale Countor
+    //! Bhabha Prescale Counter
     int m_PrescaleCounter;
 
+    //! conversion factor of ADC to Energy in Lab in GeV
+    double m_ADCtoEnergy;
+    //! Total Energy Threshold (low, high, lum) in Lab in GeV
+    std::vector<double> m_TotalEnergy;
     //! 2D Bhabha Energy Threshold
     std::vector<double> m_2DBhabhaThresholdFWD;
     //! 2D Bhabha Energy Threshold
     std::vector<double> m_2DBhabhaThresholdBWD;
-    //! 3D Selection Bhabha Energy Threshold
-    std::vector<double> m_3DBhabhaSelectionThreshold;
     //! 3D Veto Bhabha Energy Threshold
     std::vector<double> m_3DBhabhaVetoThreshold;
-    //! 3D Selection Bhabha Energy Angle
-    std::vector<double> m_3DBhabhaSelectionAngle;
     //! 3D Veto Bhabha Energy Angle
-    std::vector<double> m_3DBhabhaVetoAngle;
+    std::vector<int> m_3DBhabhaVetoAngle;
+    //! 3D Selection Bhabha Energy Threshold
+    std::vector<double> m_3DBhabhaSelectionThreshold;
+    //! 3D Selection Bhabha Energy Angle
+    std::vector<int> m_3DBhabhaSelectionAngle;
+    //! 3D Selection Bhabha Energy PreScale
+    std::vector<int> m_3DBhabhaSelectionPreScale;
     //! mumu bit Energy Threshold
     double m_mumuThreshold;
     //! mumu bit  Angle
-    std::vector<double> m_mumuAngle;
-    //! Angle selection of additional Bhabha addition in CM frame
-    std::vector<double> m_3DBhabhaAddAngleCut;
+    std::vector<int> m_mumuAngle;
+    //! hie12 angle selection of additional Bhabha addition in CM frame in degree
+    std::vector<int> m_hie12BhabhaVetoAngle;
     //! tau b2b 2 cluster angle cut (degree)
     //! (dphi low, dphi high, theta_sum low, theta_sum high)
     std::vector<int> m_taub2bAngleCut;
     //! tau b2b total energy (TC theta ID =1-17) (GeV)
     double m_taub2bEtotCut;
-    //! taub2b one Cluster energy selection (GeV)
-    double m_taub2bClusterECut1;
-    //! taub2b one Cluster energy selection (GeV)
-    double m_taub2bClusterECut2;
+    //! taub2b one Cluster energy selection in Lab (GeV)
+    double m_taub2bCLELabCut;
     //! taub2b2 angle selection(degree)
     //! (3,2,1,0) = (dphi low, dphi high, theta_sum low, theta_sum high)
     std::vector<int> m_taub2b2AngleCut;
     //! taub2b2 total energy (TC theta ID =1-17) (GeV)
     double m_taub2b2EtotCut;
-    //! taub2b2 cluster energy cut for endcap cluster (GeV)
-    double m_taub2b2CLEEndcapCut;
-    //! taub2b2 cluseter energy cut (GeV)
-    double m_taub2b2CLECut;
+    //! taub2b2 cluster energy cut(high, low) (GeV) in lab
+    std::vector<double> m_taub2b2CLELabCut;
     //! taub2b3 selection cuts
     //! (3,2,1,0) = (dphi low, dphi high, theta_sum low, theta_sum high)
     std::vector<int> m_taub2b3AngleCut;
     //! taub2b3 total energy (TC theta ID =1-17) (GeV)
     double m_taub2b3EtotCut;
     //! taub2b3 cluster energy cut in lab for one of b2b clusters (GeV)
-    double m_taub2b3CLEb2bCut;
-    //! taub2b3 cluster energy low cut in lab for all clusters (GeV)
-    double m_taub2b3CLELowCut;
-    //! taub2b3 cluster energy high cut in lab for all clusters (GeV)
-    double m_taub2b3CLEHighCut;
-    //! The number of Cluster exceeding 300 MeV
-    int m_n300MeVCluster;
+    double m_taub2b3CLEb2bLabCut;
+    //! taub2b3 cluster energy cut(low and high) in lab for all clusters (GeV)
+    std::vector<double> m_taub2b3CLELabCut;
     //!ECL Burst Bit Threshold
     double m_ECLBurstThreshold;
-    //! Total Energy Theshold (low, high, lum)
-    std::vector<double> m_TotalEnergy;
-    //! Low Multiplicity Threshold
-    std::vector<double> m_LowMultiThreshold;
+    //! Low Multiplicity cluster E cut in Lab in GeV
+    std::vector<double> m_lmlCLELabCut;
+    //! Low Multiplicity cluster E cut in CMS in GeV
+    std::vector<double> m_lmlCLECMSCut;
+    //! the number of cluster for lml00
+    int m_lml00NCLforMinE;
+    //! the number of cluster for lml12
+    int m_lml12NCLforMinE;
+    //! ThetaID for lml13
+    int m_lml13ThetaIdSelection;
     //! Theta region (low, high) of 3D Bhabha Veto InTrack
     std::vector<int> m_3DBhabhaVetoInTrackThetaRegion;
     //! energy threshold(low, high) for quality flag (GeV)
-    std::vector<double> m_EventTimingQualityThresholds;
+    std::vector<double> m_EventTimingQualityThreshold;
+    //! (hie4) CL E cut for minimum energy cluster in Lab in GeV
+    double m_hie4LowCLELabCut;
 
     /** Mapping object */
     TrgEclMapping* m_obj_map;
@@ -337,9 +370,9 @@ namespace Belle2 {
     TrgEclTiming* m_obj_timing;
     /**  Bhabha object */
     TrgEclBhabha* m_obj_bhabha;
-    /**  Beam Backgroud veto object */
+    /**  Beam Background veto object */
     TrgEclBeamBKG* m_obj_beambkg;
-    /**  Beam Backgroud veto object */
+    /**  Beam Background veto object */
     TrgEclDataBase* m_obj_database;
 
   };

@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 """
 Scripts and functions to set the BeamParameters from known configurations
@@ -188,8 +195,11 @@ def calculate_beamspot(pos_her, pos_ler, size_her, size_ler, angle_her, angle_le
 
 
 def add_beamparameters(path, name, E_cms=None, **argk):
-    """Add BeamParameter module to a given path
-
+    """Add BeamParameter module to a given path.
+       Note that if you append this to the path, you will not
+       read the configuration of BeamParameters from the database
+       Beware that this function does not mimic at all the behaviour
+       of the official MC samples.
     Args:
         path (basf2.Path instance): path to add the module to
         name (str): name of the beamparameter settings to use
@@ -202,7 +212,7 @@ def add_beamparameters(path, name, E_cms=None, **argk):
     values = calculate_beamparameters(name, E_cms)
     # add a BeamParametes module to the path
     module = path.add_module("BeamParameters")
-    module.set_name("BeamParameters:%s" % name)
+    module.set_name(f"BeamParameters:{name}")
     # finally, set all parameters and return the module
     module.param(values)
     # and override parameters with any additional keyword arguments
@@ -262,32 +272,104 @@ def calculate_beamparameters(name, E_cms=None):
         her = __get_4vector(values["energyHER"], values["angleXHER"])
         mass = (her + ler).M()
         scale = E_cms / mass
-        B2INFO("Scaling beam energies by %g to obtain E_cms = %g GeV" % (scale, E_cms))
+        B2INFO(f"Scaling beam energies by {scale:g} to obtain E_cms = {E_cms:g} GeV")
         values["energyHER"] *= scale
         values["energyLER"] *= scale
 
     return values
 
 
+def _get_collisions_invariant_mass(experiment, run, verbose=False):
+    """
+    Convenient function for getting the collisions invariant mass by querying the BeamParameters object in the Conditions Database.
+    Calling this function directly might have undesired side effects: users should always use
+    :func:`get_collisions_invariant_mass()` in their steering files.
+
+    Args:
+        experiment (int): experiment number of the basf2 process
+        run (int): run number of the basf2 process
+        verbose (bool): if True, it prints some INFO messages, e.g. the invariant mass retrieved from the CDB
+    """
+    from ROOT import Belle2 as B2  # noqa
+    # Initialize the datastore and create an EventMetaData object
+    B2.DataStore.Instance().setInitializeActive(True)
+    event_meta_data = B2.PyStoreObj('EventMetaData')
+    event_meta_data.registerInDataStore()
+    event_meta_data.assign(B2.EventMetaData(0, run, experiment), True)
+    B2.DataStore.Instance().setInitializeActive(False)
+    # Get the invariant mass by querying the database
+    beams = B2.PyDBObj('BeamParameters')
+    if not beams.isValid():
+        B2FATAL('BeamParameters is not valid')
+    collisions_invariant_mass = beams.getMass()
+    # Print some messages if requested
+    if verbose:
+        B2INFO('Info for BeamParameters:\n'
+               f'  collisions invariant mass [GeV]: {collisions_invariant_mass}\n'
+               f'  IoV: {beams.getIoV().getExperimentLow()}, {beams.getIoV().getRunLow()}, '
+               f'{beams.getIoV().getExperimentHigh()}. {beams.getIoV().getRunHigh()}\n'
+               f'  revision: {beams.getRevision()}\n'
+               f'  globaltag: {beams.getGlobaltag()}')
+    # Before returning, run some cleanup
+    B2.DataStore.Instance().reset()
+    B2.Database.reset()
+    return collisions_invariant_mass
+
+
+def get_collisions_invariant_mass(experiment, run, verbose=False):
+    """
+    Convenient function for getting the collisions invariant mass by querying the BeamParameters object in the Conditions Database.
+    It is useful for setting the center of mass energy when producing Monte Carlo samples with external generators (e.g. MadGraph,
+    WHIZARD) which are not directly interfaced with basf2.
+
+    Args:
+        experiment (int): experiment number of the basf2 process
+        run (int): run number of the basf2 process
+        verbose (bool): if True, it prints some INFO messages, e.g. the invariant mass retrieved from the CDB
+    """
+
+    def _run_function_in_process(func, *args, **kwargs):
+        """
+        Small helper function for running another function in a process and thus avoiding undesired side effects.
+        """
+        from multiprocessing import Pool  # noqa
+        # Create a Pool with a single process
+        with Pool(processes=1) as pool:
+            # Use apply_async to execute the function and get the result
+            result = pool.apply_async(func, args, kwargs)
+            # Wait for the result and retrieve it
+            output = result.get()
+        return output
+
+    # Run _get_collisions_invariant_mass with the helper function to avoid issues with basf2
+    return _run_function_in_process(
+        func=_get_collisions_invariant_mass, experiment=experiment, run=run, verbose=verbose
+    )
+
+
 if __name__ == "__main__":
     # if called directly we will
     # 1. calculate the beamspot for the SuperKEKB preset and display it if possible
     # 2. calculate beam energies for Y1S - Y5S and offresonance
+    #: \cond Doxygen_suppress
     np.set_printoptions(precision=3)
+    #: \endcond
 
     # calculate beamspot for SuperKEKB for testing
     #: beamparameter defaults for SuperKEKB
     values = beamparameter_presets["SuperKEKB"][1]
+    #: \cond Doxygen_suppress
     beampos_spot, cov_spot = calculate_beamspot(
         [0, 0, 0], [0, 0, 0],
         values["bunchHER"], values["bunchLER"],
         values["angleXHER"], values["angleXLER"],
     )
+    #: \endcond
     print("Beamspot position:")
     print(beampos_spot)
     print("Beamspot covariance:")
     print(cov_spot)
-    print("Beamspot dimensions (in mm, axes in arbitary order):")
+    print("Beamspot dimensions (in mm, axes in arbitrary order):")
     print(np.linalg.eig(cov_spot)[0] ** .5 * 10)
 
     # see if we can plot it
@@ -303,9 +385,11 @@ if __name__ == "__main__":
         points_ler = np.random.multivariate_normal([0, 0, 0], cov_ler, 1000)
         #: random points according to calculated beamspot
         points_spot = np.random.multivariate_normal(beampos_spot, cov_spot, 1000)
+        #: \cond Doxygen_suppress
         pl.scatter(points_her[:, 2], points_her[:, 0], s=5, marker=".", c="b", edgecolors="None", label="HER")
         pl.scatter(points_ler[:, 2], points_ler[:, 0], s=5, marker=".", c="r", edgecolors="None", label="LER")
         pl.scatter(points_spot[:, 2], points_spot[:, 0], s=5, marker=".", c="g", edgecolors="None", label="spot")
+        #: \endcond
         pl.legend()
         pl.xlabel("z / cm")
         pl.ylabel("x / cm")
@@ -344,17 +428,16 @@ if __name__ == "__main__":
     for name, energy in sorted(targets.items()):
         #: scaling between nominal and target CMS energy
         scale = energy / mass
-        print("""\
-            "%s": ("SuperKEKB", {  # m(%s) = %.3f GeV
-                "energyHER": %.3f,
-                "energyLER": %.3f,
-            }),""" % (name, name, energy, eher * scale, eler * scale))
+        print(f"""            "{name}": ("SuperKEKB", {{  # m({name}) = {energy:.3f} GeV
+                "energyHER": {eher * scale:.3f},
+                "energyLER": {eler * scale:.3f},
+            }}),""")
 
     for name, energy in sorted(targets.items()):
         #: scaling between nominal and target CMS energy for off resoncane, i.e. 60MeV lower
         scale = (energy - 60e-3) / mass
         print("""\
-            "%s-off": ("%s", {  # m(%s) - 60 MeV = %.3f GeV
-                "energyHER": %.3f,
-                "energyLER": %.3f,
-            }),""" % (name, name, name, energy - 60e-3, eher * scale, eler * scale))
+            "{}-off": ("{}", {{  # m({}) - 60 MeV = {:.3f} GeV
+                "energyHER": {:.3f},
+                "energyLER": {:.3f},
+            }}),""".format(name, name, name, energy - 60e-3, eher * scale, eler * scale))

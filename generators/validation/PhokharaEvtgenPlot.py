@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 <header>
@@ -11,6 +10,8 @@
 
 import ROOT
 import math
+
+#: \cond Doxygen_suppress
 
 nbins_ratio = 91
 emin_ratio = 6.05
@@ -249,6 +250,8 @@ functions.Add(ROOT.TNamed('Description', 'J/psi helicity angle'))
 functions.Add(ROOT.TNamed('Check', 'Should be distributed as (1 + cos^2 theta)'))
 functions.Add(ROOT.TNamed('Contact', contact))
 functions.Add(ROOT.TNamed('MetaOptions', 'shifter'))
+
+#: \endcond
 
 output_file.cd()
 h_ratio.Write()

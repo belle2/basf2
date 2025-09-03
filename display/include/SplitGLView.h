@@ -41,7 +41,7 @@ namespace Belle2 {
     void           onMouseOver(TGLPhysicalShape* shape);
     /** change camera type, given one of EMenuCommands. */
     void updateCamera(int cameraAction);
-    /** toggle wether the active viewer may be rotated (not that useful for projections). */
+    /** toggle whether the active viewer may be rotated (not that useful for projections). */
     void           toggleOrthoRotate();
     /** Toggle state of the 'Ortho allow dolly' menu entry. */
     void           toggleOrthoDolly();

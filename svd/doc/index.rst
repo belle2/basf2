@@ -39,4 +39,4 @@ In the following we describe the ``svd`` package .
 
 .. toctree:: dbstore
 
-.. toctree:: todo
+.. toctree:: SVDVariables

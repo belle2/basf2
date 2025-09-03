@@ -29,7 +29,7 @@ from prompt.utils import events_in_basf2_file
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name='KLM channel status',
-    expert_username='sayan97',
+    expert_username='ph21c026',
     description=__doc__,
     input_data_formats=['raw'],
     input_data_names=['raw_beam', 'raw_cosmic', 'raw_physics'],
@@ -40,11 +40,6 @@ settings = CalibrationSettings(
                        INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']],
         'raw_physics': [INPUT_DATA_FILTERS['Run Type']['physics'],
                         f"NOT {INPUT_DATA_FILTERS['Data Tag']['random_calib']}",
-                        INPUT_DATA_FILTERS['Data Tag']['bhabha_all_calib'],
-                        INPUT_DATA_FILTERS['Data Tag']['gamma_gamma_calib'],
-                        INPUT_DATA_FILTERS['Data Tag']['hadron_calib'],
-                        INPUT_DATA_FILTERS['Data Tag']['mumu_tight_or_highm_calib'],
-                        INPUT_DATA_FILTERS['Data Tag']['radmumu_calib'],
                         INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
     },
     depends_on=[])
@@ -131,7 +126,7 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Algorithm setup
-
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import KLMChannelStatusAlgorithm
 
     alg = KLMChannelStatusAlgorithm()

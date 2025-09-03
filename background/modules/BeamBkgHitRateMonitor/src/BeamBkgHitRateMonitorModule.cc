@@ -62,6 +62,7 @@ BeamBkgHitRateMonitorModule::BeamBkgHitRateMonitorModule() : Module()
            string("tree"));
   m_trgTypes.push_back(TRGSummary::TTYP_DPHY);
   m_trgTypes.push_back(TRGSummary::TTYP_RAND);
+  m_trgTypes.push_back(TRGSummary::TTYP_POIS);
   addParam("trgTypes", m_trgTypes,
            "trigger types for event selection (see TRGSummary.h for definitions). "
            "Empty list means all trigger types.",
@@ -102,7 +103,8 @@ BeamBkgHitRateMonitorModule::BeamBkgHitRateMonitorModule() : Module()
            "CDC: flag to enable the CDC background hit (crosstakl, noise) filter", true);
   addParam("cdcEnableMarkBackgroundHit", m_cdcEnableMarkBackgroundHit,
            "CDC: flag to enable to mark background flag on CDCHit (set 0x100 bit for CDCHit::m_status).", false);
-
+  addParam("detectors", m_detectors,
+           "Detectors to be included in the output tree, if empty, all detectors are included", m_detectors);
 }
 
 BeamBkgHitRateMonitorModule::~BeamBkgHitRateMonitorModule()
@@ -124,27 +126,52 @@ void BeamBkgHitRateMonitorModule::initialize()
   m_fileMetaData.isOptional(); // enables to run the module with simulation
 
   // create, set and append hit rate monitoring classes
-  auto* pxd = new Background::PXDHitRateCounter();
-  m_monitors.push_back(pxd);
-  auto* svd = new Background::SVDHitRateCounter(m_svdShaperDigitsName, m_svdThrCharge,
-                                                m_svdIgnoreHotStripsPayload,
-                                                m_svdIgnoreMaskedStripsPayload);
-  m_monitors.push_back(svd);
-  auto* cdc = new Background::CDCHitRateCounter(m_cdcTimeWindowLowerEdgeSmallCell,  m_cdcTimeWindowUpperEdgeSmallCell,
-                                                m_cdcTimeWindowLowerEdgeNormalCell, m_cdcTimeWindowUpperEdgeNormalCell,
-                                                m_cdcEnableBadWireTreatment, m_cdcEnableBackgroundHitFilter,
-                                                m_cdcEnableMarkBackgroundHit);
-  m_monitors.push_back(cdc);
-  auto* top = new Background::TOPHitRateCounter(m_topTimeOffset, m_topTimeWindow);
-  m_monitors.push_back(top);
-  auto* arich = new Background::ARICHHitRateCounter();
-  m_monitors.push_back(arich);
-  auto* ecl = new Background::ECLHitRateCounter();
-  m_monitors.push_back(ecl);
-  auto* vtx = new Background::VTXHitRateCounter();
-  m_monitors.push_back(vtx);
-  auto* klm = new Background::KLMHitRateCounter();
-  m_monitors.push_back(klm);
+  std::string detectors;
+  for (const auto& detector : m_detectors) detectors += detector + " ";
+  if (detectors.find("PXD") != string::npos or detectors.empty()) {
+    auto* pxd = new Background::PXDHitRateCounter();
+    m_monitors.push_back(pxd);
+  }
+
+  if (detectors.find("SVD") != string::npos or detectors.empty()) {
+    auto* svd = new Background::SVDHitRateCounter(m_svdShaperDigitsName, m_svdThrCharge,
+                                                  m_svdIgnoreHotStripsPayload,
+                                                  m_svdIgnoreMaskedStripsPayload);
+    m_monitors.push_back(svd);
+  }
+
+  if (detectors.find("CDC") != string::npos or detectors.empty()) {
+    auto* cdc = new Background::CDCHitRateCounter(m_cdcTimeWindowLowerEdgeSmallCell,  m_cdcTimeWindowUpperEdgeSmallCell,
+                                                  m_cdcTimeWindowLowerEdgeNormalCell, m_cdcTimeWindowUpperEdgeNormalCell,
+                                                  m_cdcEnableBadWireTreatment, m_cdcEnableBackgroundHitFilter,
+                                                  m_cdcEnableMarkBackgroundHit);
+    m_monitors.push_back(cdc);
+  }
+
+  if (detectors.find("TOP") != string::npos or detectors.empty()) {
+    auto* top = new Background::TOPHitRateCounter(m_topTimeOffset, m_topTimeWindow);
+    m_monitors.push_back(top);
+  }
+
+  if (detectors.find("ARICH") != string::npos or detectors.empty()) {
+    auto* arich = new Background::ARICHHitRateCounter();
+    m_monitors.push_back(arich);
+  }
+
+  if (detectors.find("ECL") != string::npos or detectors.empty()) {
+    auto* ecl = new Background::ECLHitRateCounter();
+    m_monitors.push_back(ecl);
+  }
+
+  if (detectors.find("VTX") != string::npos or detectors.empty()) {
+    auto* vtx = new Background::VTXHitRateCounter();
+    m_monitors.push_back(vtx);
+  }
+
+  if (detectors.find("KLM") != string::npos or detectors.empty()) {
+    auto* klm = new Background::KLMHitRateCounter();
+    m_monitors.push_back(klm);
+  }
 
   // open output root file
   m_file = TFile::Open(m_outputFileName.c_str(), "RECREATE");

@@ -17,9 +17,9 @@ Below the instructions how to retrain, apply and evaluate the MVAs for the :ref:
   The Flip&Refit tool uses two MVAs:
 
   1. 1st MVA: select the RecoTracks to be flipped looking at low level variables (eg: ndf, cdc hits number, pxd hits etc)
-  2. 2nd MVA: takes the fitResults from the original and the flipped Tracks as input to decide wich one to keep
+  2. 2nd MVA: takes the fitResults from the original and the flipped Tracks as input to decide which one to keep
 
-  The steps for sample generation, training and performance evlauation are similar, and are described in the following.
+  The steps for sample generation, training and performance evaluation are similar, and are described in the following.
 
 step 1: sample generation
 """""""""""""""""""""""""
@@ -52,7 +52,7 @@ An example for the 1st MVA is reported below:
 .. note::
 
   * the training and test samples can be generated using the instructions of the step 1
-  * for additional informations on the parameters of the script, check its help:
+  * for additional information on the parameters of the script, check its help:
 
     .. code:: bash
 
@@ -85,8 +85,8 @@ How to use the local weight file in the reconstruction
 
 In case the user wants to use the local database, i.e. the payload created locally instead of the default one,
 the user should modify the parameter ``identifier`` of the ``FlipQuality`` module.
-Running the standard tracking chain, the easier thing to do is to directly mody the
-paremeter in the the utility function ``add_flipping_of_recoTracks`` in ``tracking/scripts/tracking/path_utils.py``
+Running the standard tracking chain, the easier thing to do is to directly modify the
+parameter in the the utility function ``add_flipping_of_recoTracks`` in ``tracking/scripts/tracking/path_utils.py``
 in the following way:
 
 .. code:: python
@@ -97,7 +97,7 @@ in the following way:
 
 .. note::
 
-  if new variables added in the MVA, make sure the ``/tracking/trackFitting/trackQualityEstimator/variableExtractors/include/FlipRecoTrackExtractor.h`` is also updated.
+  If new variables are added to the MVA, make sure to also update the corresponding ``/tracking/modules/flipAndRefit/utilities/include/FlipRecoTrackExtractor.h`` or ``/tracking/modules/flipAndRefit/utilities/include/Flip2ndRecoTrackExtractor.h``.
 
 
 

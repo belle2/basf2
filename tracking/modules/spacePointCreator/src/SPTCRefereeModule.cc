@@ -52,13 +52,13 @@ SPTCRefereeModule::SPTCRefereeModule() : Module()
            "Check if two subsequent SpacePoints are on the same sensor",
            m_PARAMcheckSameSensor);
   addParam("checkMinDistance", m_PARAMcheckMinDistance,
-           "Check if two subsequent SpacePoints are seperated by more than 'minDistance'",
+           "Check if two subsequent SpacePoints are separated by more than 'minDistance'",
            m_PARAMcheckMinDistance);
   addParam("checkCurling", m_PARAMcheckCurling,
            "Check the SpacePointTrackCand for curling behaviour and mark it as curling if it does",
            m_PARAMcheckCurling);
   addParam("splitCurlers", m_PARAMsplitCurlers,
-           "Split curling SpacePointTrackCands and save the TrackStubs in seperate StoreArrays",
+           "Split curling SpacePointTrackCands and save the TrackStubs in separate StoreArrays",
            m_PARAMsplitCurlers);
   addParam("keepOnlyFirstPart", m_PARAMkeepOnlyFirstPart,
            "Keep only the first part of a curling SpacePointTrackCand (e.g. when only this is needed)",
@@ -78,7 +78,7 @@ SPTCRefereeModule::SPTCRefereeModule() : Module()
 
   // other
   addParam("minDistance", m_PARAMminDistance,
-           "Minimal Distance [cm] that two subsequent SpacePoints have to be seperated if 'checkMinDistance' is enabled",
+           "Minimal Distance [cm] that two subsequent SpacePoints have to be separated if 'checkMinDistance' is enabled",
            m_PARAMminDistance);
   addParam("setOrigin", m_PARAMsetOrigin, "WARNING: still need to find out the units that are used internally! "
            "Reset origin to given point. Used for determining the direction of flight of a particle for a "
@@ -535,7 +535,7 @@ SPTCRefereeModule::splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, 
       trackStub.setFlightDirection(dirOfFlight);
       dirOfFlight = !dirOfFlight;
 
-      // trackStub index starts at 1 for curling SPTCs. NOTE: this might be subject to chagnes with the new bitfield in SpacePointTrackCand
+      // trackStub index starts at 1 for curling SPTCs. NOTE: this might be subject to changes with the new bitfield in SpacePointTrackCand
       trackStub.setTrackStubIndex(iTs + 1);
 
       // determine and set the referee status of this trackStub based upon the information from the previous tests
@@ -641,7 +641,7 @@ SPTCRefereeModule::getDirsOfFlightSpacePoints(const std::vector<const Belle2::Sp
 // =============================================== GET DIRECTION OF FLIGHT FROM POSITION AND MOMENTUM =============================
 bool SPTCRefereeModule::getDirOfFlightPosMom(B2Vector3F position, B2Vector3F momentum, B2Vector3F origin)
 {
-  // calculate the positon relative to the set origin, and add the momentum to the position to get the direction of flight
+  // calculate the position relative to the set origin, and add the momentum to the position to get the direction of flight
   B2Vector3F originToHit = position - origin;
 
   B2DEBUG(20, "Position relative to origin: (" << originToHit.x() << "," << originToHit.y() << "," << originToHit.z() <<
@@ -651,7 +651,7 @@ bool SPTCRefereeModule::getDirOfFlightPosMom(B2Vector3F position, B2Vector3F mom
   // get dot product of momentum and hit position for the perpendicular component only!
   float dot_xy = originToHit.x() * momentum.x() + originToHit.y() * momentum.y();
 
-  B2DEBUG(20, "result dot product xy component between postion and momentum: " << dot_xy);
+  B2DEBUG(20, "result dot product xy component between position and momentum: " << dot_xy);
 
   if (dot_xy < 0) {
     B2DEBUG(20, "Direction of flight is inwards for this hit");

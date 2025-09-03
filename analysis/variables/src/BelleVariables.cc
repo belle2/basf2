@@ -16,23 +16,16 @@
 #include <analysis/variables/Variables.h>
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/ECLVariables.h>
-#include <analysis/variables/TrackVariables.h>
 #include <analysis/variables/V0DaughterTrackVariables.h>
 #include <mdst/dataobjects/Track.h>
-#include <analysis/variables/VertexVariables.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
-#include <framework/database/DBObjPtr.h>
-#include <mdst/dbobjects/BeamSpot.h>
-
-#include <framework/datastore/StoreArray.h>
 #include <b2bii/dataobjects/BelleTrkExtra.h>
 
+#include <cmath>
 #include <TVectorF.h>
-
-#include <limits>
 
 namespace Belle2 {
   namespace Variable {
@@ -49,7 +42,7 @@ namespace Belle2 {
         B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
         return false;
       }
-      if (abs(KS->getPDGCode()) != Const::Kshort.getPDGCode())
+      if (std::abs(KS->getPDGCode()) != Const::Kshort.getPDGCode())
         B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
 
       // If goodKs exists, return the value
@@ -63,12 +56,12 @@ namespace Belle2 {
       double dphi = acos(((particleDX(KS) * particlePx(KS)) + (particleDY(KS) * particlePy(KS))) / (fl * sqrt(particlePx(KS) * particlePx(
                            KS) + particlePy(KS) * particlePy(KS))));
       // particleDRho returns track d0 relative to IP for tracks
-      double dr = std::min(abs(particleDRho(d0)), abs(particleDRho(d1)));
+      double dr = std::min(std::abs(particleDRho(d0)), std::abs(particleDRho(d1)));
       double zdist = v0DaughterZ0Diff(KS);
 
-      bool low = p < 0.5 && abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;
-      bool mid = p < 1.5 && p > 0.5 && abs(zdist) < 1.8 && dr > 0.03 && dphi < 0.1 && fl > .08;
-      bool high = p > 1.5 && abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
+      bool low = p < 0.5 && std::abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;
+      bool mid = p < 1.5 && p > 0.5 && std::abs(zdist) < 1.8 && dr > 0.03 && dphi < 0.1 && fl > .08;
+      bool high = p > 1.5 && std::abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
 
       if (low || mid || high) {
         return true;
@@ -89,7 +82,7 @@ namespace Belle2 {
         B2WARNING("goodBelleLambda is only defined for a particle with charged daughters");
         return 0.;
       }
-      if (abs(Lambda->getPDGCode()) != Const::Lambda.getPDGCode()) {
+      if (std::abs(Lambda->getPDGCode()) != Const::Lambda.getPDGCode()) {
         B2WARNING("goodBelleLambda is being applied to a candidate with PDG " << Lambda->getPDGCode());
       }
 
@@ -97,21 +90,21 @@ namespace Belle2 {
         return Lambda->getExtraInfo("goodLambda");
 
       double p = particleP(Lambda);
-      double dr = std::min(abs(particleDRho(d0)), abs(particleDRho(d1)));
+      double dr = std::min(std::abs(particleDRho(d0)), std::abs(particleDRho(d1)));
       double zdist = v0DaughterZ0Diff(Lambda);
       double dphi = acos(cosAngleBetweenMomentumAndVertexVectorInXYPlane(Lambda));
       // Flight distance of Lambda0 in xy plane
       double fl = particleDRho(Lambda);
 
       // goodBelleLambda == 1 (optimized for proton PID > 0.6)
-      bool high1 = p >= 1.5 && abs(zdist) < 12.9 && dr > 0.008 && dphi < 0.09 && fl > 0.22;
-      bool mid1 = p >= 0.5 && p < 1.5 && abs(zdist) < 9.8 && dr > 0.01 && dphi < 0.18 && fl > 0.16;
-      bool low1 = p < 0.5 && abs(zdist) < 2.4 && dr > 0.027 && dphi < 1.2 && fl > 0.11;
+      bool high1 = p >= 1.5 && std::abs(zdist) < 12.9 && dr > 0.008 && dphi < 0.09 && fl > 0.22;
+      bool mid1 = p >= 0.5 && p < 1.5 && std::abs(zdist) < 9.8 && dr > 0.01 && dphi < 0.18 && fl > 0.16;
+      bool low1 = p < 0.5 && std::abs(zdist) < 2.4 && dr > 0.027 && dphi < 1.2 && fl > 0.11;
 
       // goodBelleLambda == 2 (optimized without PID selection)
-      bool high2 = p >= 1.5 && abs(zdist) < 7.7 && dr > 0.018 && dphi < 0.07 && fl > 0.35;
-      bool mid2 = p >= 0.5 && p < 1.5 && abs(zdist) < 2.1 && dr > 0.033 && dphi < 0.10 && fl > 0.24;
-      bool low2 = p < 0.5 && abs(zdist) < 1.9 && dr > 0.059 && dphi < 0.6 && fl > 0.17;
+      bool high2 = p >= 1.5 && std::abs(zdist) < 7.7 && dr > 0.018 && dphi < 0.07 && fl > 0.35;
+      bool mid2 = p >= 0.5 && p < 1.5 && std::abs(zdist) < 2.1 && dr > 0.033 && dphi < 0.10 && fl > 0.24;
+      bool low2 = p < 0.5 && std::abs(zdist) < 1.9 && dr > 0.059 && dphi < 0.6 && fl > 0.17;
 
       if (low2 || mid2 || high2) {
         return 2.0;
@@ -278,6 +271,22 @@ namespace Belle2 {
       return belleTrkExtra->getPathLength();
     }
 
+    double BelleTofMass(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return Const::doubleNaN;
+      }
+      double time = belleTrkExtra->getTof();
+      double length = belleTrkExtra->getPathLength();
+      double p = particle->getP(); //3-momentum
+      double tofbeta = length / time / Belle2::Const::speedOfLight;
+      double tofmass = p * sqrt(1. / (tofbeta * tofbeta) - 1.); //(GeV)
+
+      return tofmass;
+    }
+
     double BelledEdx(const Particle* particle)
     {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
@@ -427,6 +436,10 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
 [Legacy] Returns the track path length. This is defined from the closest point to the z-axis up to TOF counter. (Belle only).
 
 )DOC", "cm");
+
+    REGISTER_VARIABLE("BelleTofMass", BelleTofMass, R"DOC(
+[Legacy] Returns the TOF mass calculated from the time of flight and path length. (Belle only).
+)DOC", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("BelledEdx", BelledEdx, R"DOC(
 [Legacy] Returns the dE/dx measured in the CDC. (Belle only).

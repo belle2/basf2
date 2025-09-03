@@ -1,0 +1,42 @@
+# EventType: 1213052108
+# Descriptor: [B- -> [D0 -> [K_S0 -> pi- pi+] pi+ pi-] [K*- -> K- pi0]]
+# NickName: Bu_DK*-_DtoKSpi+pi-
+# Documentation: background study for phi3 BPGGSZ analysis using B->D*h
+# Tested:yes
+# PhysicsWG: BHadronic WG
+# Responsible: Ansu Johnson
+# Email: ansujohnson@physics.iitm.ac.in
+# Cuts: None
+# Date: 21/11/2023
+#
+Alias K*-sig K*-
+Alias K*+sig K*+
+ChargeConj K*+sig K*-sig
+Alias      K_S0sig  K_S0
+
+# Upsilon(4S) decay
+Decay Upsilon(4S)
+0.500 B-sig B+   PHOTOS VSS;
+0.500 B- B+sig   PHOTOS VSS;
+Enddecay
+
+Decay B-sig
+1.000 K*-sig D0sig PHOTOS SVS;
+Enddecay
+CDecay B+sig
+
+Decay D0sig
+1.000 K_S0sig pi+ pi- PHOTOS PHSP;
+Enddecay
+CDecay anti-D0sig
+
+Decay K*-sig
+1.000 K- pi0   VSS;
+Enddecay
+CDecay K*+sig
+
+Decay K_S0sig
+1.0 pi+ pi- PHSP;
+Enddecay
+
+End

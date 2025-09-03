@@ -75,7 +75,7 @@ namespace Belle2::Conditions {
       const auto payloads = get(url);
       if (!payloads.is_array()) throw std::runtime_error("expected array");
       for (const auto& info : payloads) {
-        if (!info.is_object()) throw std::runtime_error("excpected payload object");
+        if (!info.is_object()) throw std::runtime_error("expected payload object");
         const auto& payload = info.at("payload");
         const auto& iov = info.at("payloadIov");
         addPayload(PayloadMetadata(

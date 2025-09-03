@@ -73,7 +73,7 @@ int NSMVar::size() const
 {
   int s = 1;
   switch (m_type) {
-    case NONE: s = 0; return 0;
+    case NONE: return 0;
     case INT: s = 4; break;
     case FLOAT: s = 4; break;
     case TEXT: return m_len + 1;

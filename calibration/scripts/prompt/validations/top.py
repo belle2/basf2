@@ -16,6 +16,7 @@ from prompt import ValidationSettings
 from ROOT import TFile, TH1F, TGraph, TCanvas, TLegend, gROOT, gStyle, PyConfig
 from basf2 import B2ERROR
 import sys
+import glob
 
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='TOP post-tracking calibration',
@@ -71,7 +72,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     h_core = TH1F("h_core", "Core width of residuals; slot; sigma [ps]", 16, 0.5, 16.5)
     h_out = TH1F("h_out", "Outlayers (more than 3 sigma); slot; fraction [%]", 16, 0.5, 16.5)
     for slot in range(1, 17):
-        name = "slot" + '{:0=2d}'.format(slot)
+        name = "slot" + f'{slot:02d}'
         h = file_in.Get("channelT0_" + name)
         channelT0s.append(h)
         r = TH1F("residuals_" + name, "ChannelT0, " + name + "; residuals [ns]", 200, -1.0, 1.0)
@@ -138,7 +139,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
                 graphs.append(g_under)
     canvas.Print(outputFileName)
 
-    # make plots of channelT0 residual distirbutions
+    # make plots of channelT0 residual distributions
 
     canvas.Clear()
     canvas.Divide(4, 4)
@@ -200,7 +201,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     histos = []
     for slot in range(1, 17):
         canvas.cd(slot)
-        h = file_in.Get("moduleT0_slot" + '{:0=2d}'.format(slot))
+        h = file_in.Get("moduleT0_slot" + f'{slot:02d}')
         if h:
             h.Scale(1000)
             h.SetYTitle(h.GetYaxis().GetTitle().replace('[ns]', '[ps]'))
@@ -254,7 +255,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     legends = []
     for slot in range(1, 17):
         canvas.cd(slot)
-        name = "slot" + '{:0=2d}'.format(slot)
+        name = "slot" + f'{slot:02d}'
         histos = [file_in.Get("numActive_" + name), file_in.Get("numActiveCalibrated_" + name)]
         legend = TLegend(0.1, 0.1, 0.7, 0.3)
         legends.append(legend)
@@ -264,6 +265,8 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
                 h.SetMinimum(0.0)
                 h.SetMaximum(1.05)
                 text = h.GetTitle().split(',')[0]
+                if text == "Active":
+                    text += " channels"
                 h.SetTitle(name)
                 h.SetLineColor(i+1)
                 h.Draw(opt)
@@ -280,7 +283,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     legends = []
     for slot in range(1, 17):
         canvas.cd(slot)
-        name = "slot" + '{:0=2d}'.format(slot)
+        name = "slot" + f'{slot:02d}'
         histos = [file_in.Get("numTBCalibrated_" + name), file_in.Get("numT0Calibrated_" + name)]
         legend = TLegend(0.1, 0.1, 0.7, 0.3)
         legends.append(legend)
@@ -306,8 +309,8 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     legends = []
     for slot in range(1, 17):
         canvas.cd(slot)
-        name = "slot" + '{:0=2d}'.format(slot)
-        h = file_in.Get("thrEffi_slot" + '{:0=2d}'.format(slot))
+        name = "slot" + f'{slot:02d}'
+        h = file_in.Get("thrEffi_slot" + f'{slot:02d}')
         legend = TLegend(0.1, 0.1, 0.7, 0.3)
         legends.append(legend)
         if h:
@@ -338,6 +341,9 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
 
     canvas.Clear()
     canvas.Divide(2, 2)
+    gStyle.SetOptStat("e")
+    gStyle.SetStatY(0.99)
+
     offsets = [file_in.Get("svdOffset"), file_in.Get("cdcOffset")]
     sigmas = [file_in.Get("svdSigma"), file_in.Get("cdcSigma")]
     components = ['SVD', 'CDC']
@@ -407,6 +413,49 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
             h.Draw()
 
     canvas.Print(outputFileName)
+    gStyle.SetOptStat(0)
+
+    # plot RQE
+
+    gStyle.SetOptStat("rmei")
+    canvas.Clear()
+    canvas.Divide(2, 2)
+
+    rqe_path = job_path + '/TOP_photonYields/0/algorithm_output/photonYields-*.root'
+    rqeFileNames = glob.glob(rqe_path)
+    if len(rqeFileNames) == 0:
+        B2ERROR(rqe_path + ": no such files")
+    rqeFiles = []
+    rqeHistos = []
+    for fileName in sorted(rqeFileNames):
+        rqeFile = TFile.Open(fileName)
+        if not rqeFile:
+            B2ERROR(rqeFile + ": can't be open")
+            continue
+        rqeFiles.append(rqeFile)
+        histos = [rqeFile.Get("RQE"), rqeFile.Get("RQEerr")]
+        expNo = fileName.split('/')[-1].split('-')[1]
+        for h in histos:
+            if h:
+                h.SetTitle(expNo)
+        rqeHistos += histos
+        if len(rqeHistos) == 4:
+            for i, h in enumerate(rqeHistos):
+                canvas.cd(1 + i)
+                if h:
+                    h.Draw()
+            canvas.Print(outputFileName)
+            rqeHistos = []
+            canvas.Clear()
+            canvas.Divide(2, 2)
+
+    if len(rqeHistos) > 0:
+        for i, h in enumerate(rqeHistos):
+            canvas.cd(1 + i)
+            if h:
+                h.Draw()
+        canvas.Print(outputFileName)
+    gStyle.SetOptStat(0)
 
     # close pdf file
 
@@ -418,7 +467,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     canvas.Divide(4, 4)
     for slot in range(1, 17):
         canvas.cd(slot)
-        h = file_in.Get("hits_slot" + '{:0=2d}'.format(slot))
+        h = file_in.Get("hits_slot" + f'{slot:02d}')
         if h:
             h.Draw("colz")
     canvas.SaveAs(outputFileName.replace('.pdf', 'Hits.png'))

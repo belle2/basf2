@@ -105,7 +105,7 @@ TRGGRLProjectsModule::TRGGRLProjectsModule() : Module()
            "Name of the StoreArray holding the tracks made by the neural network (NN).",
            string("TRGCDCNeuroTracks"));
   addParam("2DmatchCollection", m_2DmatchCollectionName,
-           "Name of the StoreArray holding the macthed tracks and clusters made by the 2D fitter.",
+           "Name of the StoreArray holding the matched tracks and clusters made by the 2D fitter.",
            string("TRG2DMatchTracks"));
   addParam("PhimatchCollection", m_phimatch_tracklist, "the 2d tracklist with associated cluster", std::string("TRGPhiMatchTracks"));
   addParam("KLMmatchCollection", m_klmmatch_tracklist, "the 2d tracklist with KLM", std::string("TRGKLMMatchTracks"));
@@ -176,6 +176,7 @@ void
 TRGGRLProjectsModule::beginRun()
 {
   B2DEBUG(20, "TRGGDLModule ... beginRun called ");
+  m_falsebits.clear();
   //...GDL config. name...
 }
 //-----------------------------------------------------------------------------------------
@@ -578,10 +579,13 @@ void TRGGRLProjectsModule::event()
   // bha_type13: 33
   bool bha_type13 = (ECLtoGDL[1] & (1 << (33 - 32 * 1))) != 0;
 
-  bool nclst_0 = (eclTrgClusterArray.getEntries() & (1 << 0)) != 0;
-  bool nclst_1 = (eclTrgClusterArray.getEntries() & (1 << 1)) != 0;
-  bool nclst_2 = (eclTrgClusterArray.getEntries() & (1 << 2)) != 0;
-  bool nclst_3 = (eclTrgClusterArray.getEntries() & (1 << 3)) != 0;
+  unsigned int icn = (ECLtoGDL[1] >> (50 - 32 * 1)) & 0x7F;
+  if (icn > 14)
+    icn = 15;
+  bool nclst_0 = (icn >> 0) & 0x1;
+  bool nclst_1 = (icn >> 1) & 0x1;
+  bool nclst_2 = (icn >> 2) & 0x1;
+  bool nclst_3 = (icn >> 3) & 0x1;
 
   // ecl_bg_0: 57
   bool ecl_bg_0 = (ECLtoGDL[1] & (1 << (57 - 32 * 1))) != 0;
@@ -651,6 +655,7 @@ void TRGGRLProjectsModule::event()
   bool ehigh1 = (ECLtoGDL[2] & (1 << (90 - 32 * 2))) != 0;
   bool ehigh2 = (ECLtoGDL[2] & (1 << (91 - 32 * 2))) != 0;
   bool ehigh3 = (ECLtoGDL[2] & (1 << (92 - 32 * 2))) != 0;
+  bool ehigh4 = (ECLtoGDL[2] & (1u << (95 - 32 * 2))) != 0;
 
   //---------------------------------------------------------------------
   //..Other input bits
@@ -876,6 +881,7 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ehigh1") {bit = ehigh1;}
     else if (bitname == "ehigh2") {bit = ehigh2;}
     else if (bitname == "ehigh3") {bit = ehigh3;}
+    else if (bitname == "ehigh4") {bit = ehigh4;}
 
     else if (bitname == "klm_hit") {bit = klm_hit;}
     else if (bitname == "klm_0") {bit = klm_0;}
@@ -977,7 +983,12 @@ void TRGGRLProjectsModule::event()
 
     //DITTO: please don't change the WARNING message below.
     //If you change it, please update the test trg_tsim_check_warnings.py accordingly.
-    else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
+    //else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
+    else {
+      bit = false;
+      bool notcontain = std::find(m_falsebits.begin(), m_falsebits.end(), bitname) == m_falsebits.end();
+      if (notcontain) m_falsebits.push_back(bitname);
+    }
 
     trgInfo->setInputBits(i, bit);
   }
@@ -988,6 +999,11 @@ void
 TRGGRLProjectsModule::endRun()
 {
   B2DEBUG(20, "TRGGRLProjectsModule ... endRun called ");
+  if (m_falsebits.size() > 0) {
+    for (const std::string& bitname : m_falsebits) {
+      B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
+    }
+  }
 }
 
 

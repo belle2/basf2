@@ -19,6 +19,7 @@ Untested method Track::addStatusBits
 Untested method Track::getInfoHTML
 Untested method Track::getStatusBit
 Untested method Track::getTrackFitResultByName
+Untested method Track::getTrackFitResultWithBestPValue
 Untested method Track::getTrackFitResultWithClosestMassByName
 Untested method Track::getTrackFitResults
 Untested method Track::getTrackFitResultsByName
@@ -48,10 +49,13 @@ Untested method EventLevelTrackingInfo::setSVDSpacePointCreatorAbortionFlag
 Untested method EventLevelTrackingInfo::setUnspecifiedTrackFindingFailure
 Untested method EventLevelTrackingInfo::setVTXCKFAbortionFlag
 Untested method EventLevelTrackingInfo::setVXDTF2AbortionFlag
+Untested method PIDLikelihood::addPreOfficialLikelihood
 Untested method PIDLikelihood::getDeltaLogL
 Untested method PIDLikelihood::getInfoHTML
+Untested method PIDLikelihood::getPreOfficialLikelihood
 Untested method PIDLikelihood::printArray
 Untested method PIDLikelihood::setLogLikelihood
+Untested method PIDLikelihood::subtractMaximum
 Untested method ECLCluster::addHypothesis
 Untested method ECLCluster::addStatus
 Untested method ECLCluster::hasStatus
@@ -107,13 +111,15 @@ Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBWD
 Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBarrel
 Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripFWD
 Untested method KLMCluster::setClusterPosition
-Untested method KLMCluster::setErrorP
-Untested method KLMCluster::setErrorX
-Untested method KLMCluster::setErrorY
-Untested method KLMCluster::setErrorZ
+Untested method KLMCluster::setClusterTrackRotationAngle
+Untested method KLMCluster::setClusterTrackSeparation
+Untested method KLMCluster::setClusterTrackSeparationAngle
 Untested method KLMCluster::setInnermostLayer
 Untested method KLMCluster::setLayers
 Untested method KLMCluster::setMomentumMag
+Untested method KLMCluster::setShapeStdDev1
+Untested method KLMCluster::setShapeStdDev2
+Untested method KLMCluster::setShapeStdDev3
 Untested method KLMCluster::setTime
 Untested method TRGSummary::getInfoHTML
 Untested method TRGSummary::getInputBitNumber
@@ -161,6 +167,12 @@ Untested method MCParticle::setSeenInDetector
 Untested method MCParticle::setStatus
 Untested method MCParticle::setValidVertex
 Untested method MCParticle::setVirtual
+Untested method EventLevelTriggerTimeInfo::addEventT0SourceFromCDC
+Untested method EventLevelTriggerTimeInfo::addEventT0SourceFromECL
+Untested method EventLevelTriggerTimeInfo::addEventT0SourceFromSVD
+Untested method EventLevelTriggerTimeInfo::addEventT0Sources
+Untested method EventLevelTriggerTimeInfo::hasEventT0Sources
+Untested method EventLevelTriggerTimeInfo::resetEventT0Sources
 Untested method EventLevelTriggerTimeInfo::setBunchNumber
 Untested method EventLevelTriggerTimeInfo::setInvalid
 Untested method EventLevelTriggerTimeInfo::setIsHER
@@ -169,6 +181,10 @@ Untested method EventLevelTriggerTimeInfo::setRevo2
 Untested method EventLevelTriggerTimeInfo::setTimeSinceLastInjection
 Untested method EventLevelTriggerTimeInfo::setTimeSincePrevTrigger
 Untested method EventLevelTriggerTimeInfo::setValid
+Untested method EventLevelTriggerTimeInfo::unsetEventT0SourceFromCDC
+Untested method EventLevelTriggerTimeInfo::unsetEventT0SourceFromECL
+Untested method EventLevelTriggerTimeInfo::unsetEventT0SourceFromSVD
+Untested method EventLevelTriggerTimeInfo::unsetEventT0Sources
 [INFO] ========================================================================
 [INFO] >>> Start new run: 0
 [INFO] ------------------------------------------------------------------------
@@ -336,6 +352,7 @@ Track#5:
   getTrackTime(): nan
   isFlippedAndRefitted(): False
   wasRefined(): False
+No data for Kinks
 TrackFitResult#0:
 [INFO] Conditions Database: found working metadata provider
 	provider = ${BELLE2_CONDB_METADATA}
@@ -1219,13 +1236,27 @@ TrackFitResult#15:
     0.0153364
   getTransverseMomentum(): 0.438381
   getZ0(): 0.0295699
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -493.81
   getLogL(<type: mu->): -471.66
   getLogL(<type: pi+>): -465.399
   getLogL(<type: K+>): -592.247
   getLogL(<type: p+>): -759.615
   getLogL(<type: deuteron>): -606.277
+  getLogarithmicProbability(<type: e->): -28.4126
+  getLogarithmicProbability(<type: mu->): -6.26105
+  getLogarithmicProbability(<type: pi+>): 6.26105
+  getLogarithmicProbability(<type: K+>): -126.849
+  getLogarithmicProbability(<type: p+>): -294.218
+  getLogarithmicProbability(<type: deuteron>): -140.88
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 4.57705e-13
   getProbability(<type: mu->): 0.00190561
@@ -1233,6 +1264,7 @@ PIDLikelihood#0:
   getProbability(<type: K+>): 8.13055e-56
   getProbability(<type: p+>): 1.67067e-128
   getProbability(<type: deuteron>): 6.55758e-62
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -1240,12 +1272,25 @@ PIDLikelihood#0:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#1:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -222.279
   getLogL(<type: mu->): -157.809
   getLogL(<type: pi+>): -169.121
   getLogL(<type: K+>): -171.493
   getLogL(<type: p+>): -190.403
   getLogL(<type: deuteron>): -313.722
+  getLogarithmicProbability(<type: e->): -64.4704
+  getLogarithmicProbability(<type: mu->): 11.2233
+  getLogarithmicProbability(<type: pi+>): -11.3126
+  getLogarithmicProbability(<type: K+>): -13.6839
+  getLogarithmicProbability(<type: p+>): -32.5939
+  getLogarithmicProbability(<type: deuteron>): -155.914
   getMostLikely(): <type: mu->
   getProbability(<type: e->): 1.00199e-28
   getProbability(<type: mu->): 0.999987
@@ -1253,6 +1298,7 @@ PIDLikelihood#1:
   getProbability(<type: K+>): 1.14072e-06
   getProbability(<type: p+>): 6.99255e-15
   getProbability(<type: deuteron>): 1.9392e-68
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -1260,12 +1306,25 @@ PIDLikelihood#1:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#2:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): True
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -219.272
   getLogL(<type: mu->): -568.206
   getLogL(<type: pi+>): -240.307
   getLogL(<type: K+>): -257.294
   getLogL(<type: p+>): -250.17
   getLogL(<type: deuteron>): -301.503
+  getLogarithmicProbability(<type: e->): 21.0349
+  getLogarithmicProbability(<type: mu->): -348.934
+  getLogarithmicProbability(<type: pi+>): -21.035
+  getLogarithmicProbability(<type: K+>): -38.022
+  getLogarithmicProbability(<type: p+>): -30.8975
+  getLogarithmicProbability(<type: deuteron>): -82.2314
   getMostLikely(): <type: e->
   getProbability(<type: e->): 1
   getProbability(<type: mu->): 2.88412e-152
@@ -1273,6 +1332,7 @@ PIDLikelihood#2:
   getProbability(<type: K+>): 3.07091e-17
   getProbability(<type: p+>): 3.81414e-14
   getProbability(<type: deuteron>): 1.9381e-36
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -1280,12 +1340,25 @@ PIDLikelihood#2:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#3:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -39.8558
   getLogL(<type: mu->): -27.5763
   getLogL(<type: pi+>): -24.4838
   getLogL(<type: K+>): -26.9323
   getLogL(<type: p+>): -26.6325
   getLogL(<type: deuteron>): -28.2122
+  getLogarithmicProbability(<type: e->): -15.613
+  getLogarithmicProbability(<type: mu->): -3.29713
+  getLogarithmicProbability(<type: pi+>): 1.30017
+  getLogarithmicProbability(<type: K+>): -2.61913
+  getLogarithmicProbability(<type: p+>): -2.29348
+  getLogarithmicProbability(<type: deuteron>): -3.95028
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 1.65719e-07
   getProbability(<type: mu->): 0.0356697
@@ -1293,6 +1366,7 @@ PIDLikelihood#3:
   getProbability(<type: K+>): 0.0679172
   getProbability(<type: p+>): 0.091664
   getProbability(<type: deuteron>): 0.0188858
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): False
@@ -1300,12 +1374,25 @@ PIDLikelihood#3:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#4:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -10.2395
   getLogL(<type: mu->): -10.2831
   getLogL(<type: pi+>): -10.2447
   getLogL(<type: K+>): -19.7062
   getLogL(<type: p+>): -25.0989
   getLogL(<type: deuteron>): -24.8235
+  getLogarithmicProbability(<type: e->): -0.668931
+  getLogarithmicProbability(<type: mu->): -0.734236
+  getLogarithmicProbability(<type: pi+>): -0.67682
+  getLogarithmicProbability(<type: K+>): -10.5493
+  getLogarithmicProbability(<type: p+>): -15.942
+  getLogarithmicProbability(<type: deuteron>): -15.6665
   getMostLikely(): <type: e->
   getProbability(<type: e->): 0.338736
   getProbability(<type: mu->): 0.324266
@@ -1313,6 +1400,7 @@ PIDLikelihood#4:
   getProbability(<type: K+>): 2.62124e-05
   getProbability(<type: p+>): 1.19252e-07
   getProbability(<type: deuteron>): 1.57075e-07
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): False
@@ -1320,12 +1408,25 @@ PIDLikelihood#4:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#5:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -208.699
   getLogL(<type: mu->): -201.236
   getLogL(<type: pi+>): -198.315
   getLogL(<type: K+>): -173.245
   getLogL(<type: p+>): -190.659
   getLogL(<type: deuteron>): -190.272
+  getLogarithmicProbability(<type: e->): -35.4536
+  getLogarithmicProbability(<type: mu->): -27.9911
+  getLogarithmicProbability(<type: pi+>): -25.0694
+  getLogarithmicProbability(<type: K+>): 16.5085
+  getLogarithmicProbability(<type: p+>): -17.4137
+  getLogarithmicProbability(<type: deuteron>): -17.0271
   getMostLikely(): <type: K+>
   getProbability(<type: e->): 4.0057e-16
   getProbability(<type: mu->): 6.97618e-13
@@ -1333,6 +1434,7 @@ PIDLikelihood#5:
   getProbability(<type: K+>): 1
   getProbability(<type: p+>): 2.73721e-08
   getProbability(<type: deuteron>): 4.02938e-08
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): True
@@ -3211,10 +3313,14 @@ ECLCluster#36:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
+No data for EventLevelClusteringInfo
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (44.3,-185.5,-189.9)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.973626
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -3238,6 +3344,9 @@ KLMCluster#0:
     -> KlIds#0 (weight: 1)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#7 (weight: 1)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 10.4447
 KlId#0:
   getKlId(): 1
@@ -5688,6 +5797,7 @@ MCParticle#55:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] EXP:        0        RUN:        0        EVT:        2
 EventMetaData:
   getErrorFlag(): 0
@@ -5897,6 +6007,7 @@ Track#7:
   getTrackTime(): nan
   isFlippedAndRefitted(): False
   wasRefined(): False
+No data for Kinks
 TrackFitResult#0:
   get4Momentum(): (-0.41381,-0.0745542,0.156042,0.469708)
   getChargeSign(): 1
@@ -7107,13 +7218,27 @@ TrackFitResult#21:
     2.67078
   getTransverseMomentum(): 0.258881
   getZ0(): 0.0186024
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -466.037
   getLogL(<type: mu->): -425.313
   getLogL(<type: pi+>): -420.046
   getLogL(<type: K+>): -519.139
   getLogL(<type: p+>): -601.656
   getLogL(<type: deuteron>): -475.989
+  getLogarithmicProbability(<type: e->): -45.9966
+  getLogarithmicProbability(<type: mu->): -5.26697
+  getLogarithmicProbability(<type: pi+>): 5.26697
+  getLogarithmicProbability(<type: K+>): -99.0983
+  getLogarithmicProbability(<type: p+>): -181.616
+  getLogarithmicProbability(<type: deuteron>): -55.9485
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 1.05665e-20
   getProbability(<type: mu->): 0.00513275
@@ -7121,6 +7246,7 @@ PIDLikelihood#0:
   getProbability(<type: K+>): 9.16561e-44
   getProbability(<type: p+>): 1.33456e-79
   getProbability(<type: deuteron>): 5.03338e-25
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -7128,12 +7254,25 @@ PIDLikelihood#0:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#1:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -422.718
   getLogL(<type: mu->): -417.285
   getLogL(<type: pi+>): -389.371
   getLogL(<type: K+>): -435.891
   getLogL(<type: p+>): -579.066
   getLogL(<type: deuteron>): -502.856
+  getLogarithmicProbability(<type: e->): -33.347
+  getLogarithmicProbability(<type: mu->): -27.9142
+  getLogarithmicProbability(<type: pi+>): 27.9099
+  getLogarithmicProbability(<type: K+>): -46.5208
+  getLogarithmicProbability(<type: p+>): -189.696
+  getLogarithmicProbability(<type: deuteron>): -113.485
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 3.29298e-15
   getProbability(<type: mu->): 7.53351e-13
@@ -7141,6 +7280,7 @@ PIDLikelihood#1:
   getProbability(<type: K+>): 6.25596e-21
   getProbability(<type: p+>): 4.13238e-83
   getProbability(<type: deuteron>): 5.17612e-50
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -7148,12 +7288,25 @@ PIDLikelihood#1:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#2:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): False
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -139.986
   getLogL(<type: mu->): -134.138
   getLogL(<type: pi+>): -131.955
   getLogL(<type: K+>): -161.181
   getLogL(<type: p+>): -161.181
   getLogL(<type: deuteron>): -161.181
+  getLogarithmicProbability(<type: e->): -8.13757
+  getLogarithmicProbability(<type: mu->): -2.18319
+  getLogarithmicProbability(<type: pi+>): 2.17998
+  getLogarithmicProbability(<type: K+>): -29.333
+  getLogarithmicProbability(<type: p+>): -29.333
+  getLogarithmicProbability(<type: deuteron>): -29.333
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.000292262
   getProbability(<type: mu->): 0.101271
@@ -7161,6 +7314,7 @@ PIDLikelihood#2:
   getProbability(<type: K+>): 1.82316e-13
   getProbability(<type: p+>): 1.82316e-13
   getProbability(<type: deuteron>): 1.82316e-13
+  isAvailable(): True
   isAvailable(<set: SVD>): False
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -7168,12 +7322,25 @@ PIDLikelihood#2:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#3:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): False
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -865.052
   getLogL(<type: mu->): -869.958
   getLogL(<type: pi+>): -861.135
   getLogL(<type: K+>): -1073.63
   getLogL(<type: p+>): -1029.99
   getLogL(<type: deuteron>): -1064.65
+  getLogarithmicProbability(<type: e->): -3.91732
+  getLogarithmicProbability(<type: mu->): -8.84258
+  getLogarithmicProbability(<type: pi+>): 3.9098
+  getLogarithmicProbability(<type: K+>): -212.51
+  getLogarithmicProbability(<type: p+>): -168.874
+  getLogarithmicProbability(<type: deuteron>): -203.537
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.0195062
   getProbability(<type: mu->): 0.000144429
@@ -7181,6 +7348,7 @@ PIDLikelihood#3:
   getProbability(<type: K+>): 5.10557e-93
   getProbability(<type: p+>): 4.56168e-74
   getProbability(<type: deuteron>): 4.02599e-89
+  isAvailable(): True
   isAvailable(<set: SVD>): False
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -7188,12 +7356,25 @@ PIDLikelihood#3:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#4:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): False
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -291.057
   getLogL(<type: mu->): -279.265
   getLogL(<type: pi+>): -274.019
   getLogL(<type: K+>): -345.117
   getLogL(<type: p+>): -276.196
   getLogL(<type: deuteron>): -332.597
+  getLogarithmicProbability(<type: e->): -17.1498
+  getLogarithmicProbability(<type: mu->): -5.35281
+  getLogarithmicProbability(<type: pi+>): 2.13144
+  getLogarithmicProbability(<type: K+>): -71.2103
+  getLogarithmicProbability(<type: p+>): -2.18214
+  getLogarithmicProbability(<type: deuteron>): -58.6904
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 3.5639e-08
   getProbability(<type: mu->): 0.00471254
@@ -7201,6 +7382,7 @@ PIDLikelihood#4:
   getProbability(<type: K+>): 1.18506e-31
   getProbability(<type: p+>): 0.101366
   getProbability(<type: deuteron>): 3.24417e-26
+  isAvailable(): True
   isAvailable(<set: SVD>): False
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -7208,12 +7390,25 @@ PIDLikelihood#4:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#5:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): False
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -57.5101
   getLogL(<type: mu->): -65.2698
   getLogL(<type: pi+>): -52.5459
   getLogL(<type: K+>): -61.9654
   getLogL(<type: p+>): -85.2441
   getLogL(<type: deuteron>): -58.2245
+  getLogarithmicProbability(<type: e->): -4.96774
+  getLogarithmicProbability(<type: mu->): -12.7343
+  getLogarithmicProbability(<type: pi+>): 4.55773
+  getLogarithmicProbability(<type: K+>): -9.42987
+  getLogarithmicProbability(<type: p+>): -32.7086
+  getLogarithmicProbability(<type: deuteron>): -5.6856
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.00691076
   getProbability(<type: mu->): 2.94823e-06
@@ -7221,6 +7416,7 @@ PIDLikelihood#5:
   getProbability(<type: K+>): 8.02833e-05
   getProbability(<type: p+>): 6.23479e-15
   getProbability(<type: deuteron>): 0.00338301
+  isAvailable(): True
   isAvailable(<set: SVD>): False
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -7228,12 +7424,25 @@ PIDLikelihood#5:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): True
 PIDLikelihood#6:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -30.6299
   getLogL(<type: mu->): -23.2437
   getLogL(<type: pi+>): -19.1857
   getLogL(<type: K+>): -19.8696
   getLogL(<type: p+>): -20.3306
   getLogL(<type: deuteron>): -20.9198
+  getLogarithmicProbability(<type: e->): -12.1457
+  getLogarithmicProbability(<type: mu->): -4.75092
+  getLogarithmicProbability(<type: pi+>): -0.0166261
+  getLogarithmicProbability(<type: K+>): -1.09741
+  getLogarithmicProbability(<type: p+>): -1.67464
+  getLogarithmicProbability(<type: deuteron>): -2.34394
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 5.31095e-06
   getProbability(<type: mu->): 0.0085697
@@ -7241,6 +7450,7 @@ PIDLikelihood#6:
   getProbability(<type: K+>): 0.250226
   getProbability(<type: p+>): 0.157806
   getProbability(<type: deuteron>): 0.0875488
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): False
@@ -7248,12 +7458,25 @@ PIDLikelihood#6:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#7:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): True
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -28.4554
   getLogL(<type: mu->): -25.5145
   getLogL(<type: pi+>): -20.1832
   getLogL(<type: K+>): -21.9799
   getLogL(<type: p+>): -33.4707
   getLogL(<type: deuteron>): -34.6304
+  getLogarithmicProbability(<type: e->): -8.42974
+  getLogarithmicProbability(<type: mu->): -5.48493
+  getLogarithmicProbability(<type: pi+>): 1.7664
+  getLogarithmicProbability(<type: K+>): -1.80174
+  getLogarithmicProbability(<type: p+>): -13.4453
+  getLogarithmicProbability(<type: deuteron>): -14.605
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.00021823
   getProbability(<type: mu->): 0.0041317
@@ -7261,6 +7484,7 @@ PIDLikelihood#7:
   getProbability(<type: K+>): 0.141639
   getProbability(<type: p+>): 1.44809e-06
   getProbability(<type: deuteron>): 4.54061e-07
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): False
@@ -9265,10 +9489,14 @@ ECLCluster#38:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
+No data for EventLevelClusteringInfo
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (212.836,12.2027,149.3)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -9293,6 +9521,9 @@ KLMCluster#0:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#29 (weight: 0.600051)
     -> MCParticles#54 (weight: 0.39995)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 12.466
 KlId#0:
   getKlId(): 1
@@ -11786,6 +12017,7 @@ MCParticle#56:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] EXP:        0        RUN:        0        EVT:        3
 EventMetaData:
   getErrorFlag(): 0
@@ -11927,6 +12159,7 @@ Track#4:
   getTrackTime(): nan
   isFlippedAndRefitted(): False
   wasRefined(): False
+No data for Kinks
 TrackFitResult#0:
   get4Momentum(): (-0.613985,0.619082,0.0134006,0.883119)
   getChargeSign(): -1
@@ -12752,13 +12985,27 @@ TrackFitResult#14:
     -1.84311
   getTransverseMomentum(): 0.158492
   getZ0(): 153.114
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -380.124
   getLogL(<type: mu->): -803.553
   getLogL(<type: pi+>): -396.261
   getLogL(<type: K+>): -459.546
   getLogL(<type: p+>): -462.156
   getLogL(<type: deuteron>): -586.98
+  getLogarithmicProbability(<type: e->): 16.1368
+  getLogarithmicProbability(<type: mu->): -423.429
+  getLogarithmicProbability(<type: pi+>): -16.1368
+  getLogarithmicProbability(<type: K+>): -79.4217
+  getLogarithmicProbability(<type: p+>): -82.032
+  getLogarithmicProbability(<type: deuteron>): -206.856
   getMostLikely(): <type: e->
   getProbability(<type: e->): 1
   getProbability(<type: mu->): 1.27956e-184
@@ -12766,6 +13013,7 @@ PIDLikelihood#0:
   getProbability(<type: K+>): 3.21799e-35
   getProbability(<type: p+>): 2.36572e-36
   getProbability(<type: deuteron>): 1.45782e-90
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -12773,12 +13021,25 @@ PIDLikelihood#0:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#1:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -411.274
   getLogL(<type: mu->): -409.987
   getLogL(<type: pi+>): -365.656
   getLogL(<type: K+>): -443.86
   getLogL(<type: p+>): -593.661
   getLogL(<type: deuteron>): -490.124
+  getLogarithmicProbability(<type: e->): -45.6182
+  getLogarithmicProbability(<type: mu->): -44.3314
+  getLogarithmicProbability(<type: pi+>): 44.0875
+  getLogarithmicProbability(<type: K+>): -78.2043
+  getLogarithmicProbability(<type: p+>): -228.005
+  getLogarithmicProbability(<type: deuteron>): -124.468
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 1.54261e-20
   getProbability(<type: mu->): 5.58644e-20
@@ -12786,6 +13047,7 @@ PIDLikelihood#1:
   getProbability(<type: K+>): 1.08724e-34
   getProbability(<type: p+>): 9.52191e-100
   getProbability(<type: deuteron>): 8.79374e-55
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -12793,12 +13055,25 @@ PIDLikelihood#1:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#2:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -437.655
   getLogL(<type: mu->): -868.92
   getLogL(<type: pi+>): -469.067
   getLogL(<type: K+>): -486.909
   getLogL(<type: p+>): -512.719
   getLogL(<type: deuteron>): -614.597
+  getLogarithmicProbability(<type: e->): 31.4113
+  getLogarithmicProbability(<type: mu->): -431.264
+  getLogarithmicProbability(<type: pi+>): -31.4113
+  getLogarithmicProbability(<type: K+>): -49.2535
+  getLogarithmicProbability(<type: p+>): -75.0636
+  getLogarithmicProbability(<type: deuteron>): -176.942
   getMostLikely(): <type: e->
   getProbability(<type: e->): 1
   getProbability(<type: mu->): 5.06161e-188
@@ -12806,6 +13081,7 @@ PIDLikelihood#2:
   getProbability(<type: K+>): 4.06898e-22
   getProbability(<type: p+>): 2.51366e-33
   getProbability(<type: deuteron>): 1.4293e-77
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -12813,12 +13089,25 @@ PIDLikelihood#2:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#3:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): True
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -213.169
   getLogL(<type: mu->): -293.104
   getLogL(<type: pi+>): -188.963
   getLogL(<type: K+>): -178.755
   getLogL(<type: p+>): -182.986
   getLogL(<type: deuteron>): -263.877
+  getLogarithmicProbability(<type: e->): -34.4282
+  getLogarithmicProbability(<type: mu->): -114.363
+  getLogarithmicProbability(<type: pi+>): -10.222
+  getLogarithmicProbability(<type: K+>): 4.22813
+  getLogarithmicProbability(<type: p+>): -4.2307
+  getLogarithmicProbability(<type: deuteron>): -85.1361
   getMostLikely(): <type: K+>
   getProbability(<type: e->): 1.1169e-15
   getProbability(<type: mu->): 2.15153e-50
@@ -12826,6 +13115,7 @@ PIDLikelihood#3:
   getProbability(<type: K+>): 0.98563
   getProbability(<type: p+>): 0.0143337
   getProbability(<type: deuteron>): 1.06131e-37
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -12833,12 +13123,25 @@ PIDLikelihood#3:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#4:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): False
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -122.899
   getLogL(<type: mu->): -122.924
   getLogL(<type: pi+>): -122.105
   getLogL(<type: K+>): -130.326
   getLogL(<type: p+>): -126.182
   getLogL(<type: deuteron>): -208.964
+  getLogarithmicProbability(<type: e->): -1.17057
+  getLogarithmicProbability(<type: mu->): -1.20373
+  getLogarithmicProbability(<type: pi+>): 0.0937321
+  getLogarithmicProbability(<type: K+>): -8.86826
+  getLogarithmicProbability(<type: p+>): -4.71508
+  getLogarithmicProbability(<type: deuteron>): -87.5062
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.236751
   getProbability(<type: mu->): 0.230812
@@ -12846,6 +13149,7 @@ PIDLikelihood#4:
   getProbability(<type: K+>): 0.000140767
   getProbability(<type: p+>): 0.00887958
   getProbability(<type: deuteron>): 9.9203e-39
+  isAvailable(): True
   isAvailable(<set: SVD>): False
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -14044,10 +14348,14 @@ ECLCluster#22:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
+No data for EventLevelClusteringInfo
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (-122.412,166.129,-17.9667)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 1.79054
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -14072,11 +14380,17 @@ KLMCluster#0:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#10 (weight: 0.516221)
     -> MCParticles#23 (weight: 0.483779)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 13.6572
 KLMCluster#1:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (-122.412,166.129,-111.3)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.65766
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -14101,11 +14415,17 @@ KLMCluster#1:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#10 (weight: 0.702801)
     -> MCParticles#23 (weight: 0.297199)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 13.6572
 KLMCluster#2:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (55.7973,-212.852,-159.3)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -14129,6 +14449,9 @@ KLMCluster#2:
     -> KlIds#2 (weight: 1)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#22 (weight: 1)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 2.14459
 KlId#0:
   getKlId(): 1
@@ -16324,6 +16647,7 @@ MCParticle#47:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] EXP:        0        RUN:        0        EVT:        4
 EventMetaData:
   getErrorFlag(): 0
@@ -16793,6 +17117,7 @@ V0#3:
     -> Tracks#8
     -> Tracks#12
   getV0Hypothesis(): <type: anti-Lambda0>
+No data for Kinks
 TrackFitResult#0:
   get4Momentum(): (-0.00230703,0.236596,-0.0379177,0.277309)
   getChargeSign(): 1
@@ -19873,13 +20198,27 @@ TrackFitResult#55:
     2.01908
   getTransverseMomentum(): 0.242914
   getZ0(): 0.0108449
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): False
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -441.393
   getLogL(<type: mu->): -449.203
   getLogL(<type: pi+>): -433.505
   getLogL(<type: K+>): -477.036
   getLogL(<type: p+>): -480.234
   getLogL(<type: deuteron>): -705.899
+  getLogarithmicProbability(<type: e->): -7.88803
+  getLogarithmicProbability(<type: mu->): -15.6985
+  getLogarithmicProbability(<type: pi+>): 7.88763
+  getLogarithmicProbability(<type: K+>): -43.5318
+  getLogarithmicProbability(<type: p+>): -46.7296
+  getLogarithmicProbability(<type: deuteron>): -272.394
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.000375067
   getProbability(<type: mu->): 1.5214e-07
@@ -19887,6 +20226,7 @@ PIDLikelihood#0:
   getProbability(<type: K+>): 1.24273e-19
   getProbability(<type: p+>): 5.07687e-21
   getProbability(<type: deuteron>): 5.01904e-119
+  isAvailable(): True
   isAvailable(<set: SVD>): False
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -19894,12 +20234,25 @@ PIDLikelihood#0:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): True
 PIDLikelihood#1:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -431.397
   getLogL(<type: mu->): -381.86
   getLogL(<type: pi+>): -352.415
   getLogL(<type: K+>): -560.479
   getLogL(<type: p+>): -451.295
   getLogL(<type: deuteron>): -434.973
+  getLogarithmicProbability(<type: e->): -78.9819
+  getLogarithmicProbability(<type: mu->): -29.4442
+  getLogarithmicProbability(<type: pi+>): 29.4442
+  getLogarithmicProbability(<type: K+>): -208.064
+  getLogarithmicProbability(<type: p+>): -98.8792
+  getLogarithmicProbability(<type: deuteron>): -82.5576
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 4.99554e-35
   getProbability(<type: mu->): 1.63142e-13
@@ -19907,6 +20260,7 @@ PIDLikelihood#1:
   getProbability(<type: K+>): 4.35666e-91
   getProbability(<type: p+>): 1.14112e-43
   getProbability(<type: deuteron>): 1.39865e-36
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -19914,12 +20268,25 @@ PIDLikelihood#1:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#2:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -574.937
   getLogL(<type: mu->): -510.804
   getLogL(<type: pi+>): -510.557
   getLogL(<type: K+>): -683.242
   getLogL(<type: p+>): -610.102
   getLogL(<type: deuteron>): -604.199
+  getLogarithmicProbability(<type: e->): -64.9566
+  getLogarithmicProbability(<type: mu->): -0.246674
+  getLogarithmicProbability(<type: pi+>): 0.246674
+  getLogarithmicProbability(<type: K+>): -173.263
+  getLogarithmicProbability(<type: p+>): -100.122
+  getLogarithmicProbability(<type: deuteron>): -94.2191
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 6.16155e-29
   getProbability(<type: mu->): 0.438642
@@ -19927,6 +20294,7 @@ PIDLikelihood#2:
   getProbability(<type: K+>): 5.66281e-76
   getProbability(<type: p+>): 3.29147e-44
   getProbability(<type: deuteron>): 1.2055e-41
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -19934,12 +20302,25 @@ PIDLikelihood#2:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#3:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -385.231
   getLogL(<type: mu->): -350.65
   getLogL(<type: pi+>): -344.55
   getLogL(<type: K+>): -365.478
   getLogL(<type: p+>): -413.912
   getLogL(<type: deuteron>): -569.599
+  getLogarithmicProbability(<type: e->): -40.6835
+  getLogarithmicProbability(<type: mu->): -6.10052
+  getLogarithmicProbability(<type: pi+>): 6.10052
+  getLogarithmicProbability(<type: K+>): -20.9311
+  getLogarithmicProbability(<type: p+>): -69.3652
+  getLogarithmicProbability(<type: deuteron>): -225.052
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 2.1448e-18
   getProbability(<type: mu->): 0.00223668
@@ -19947,6 +20328,7 @@ PIDLikelihood#3:
   getProbability(<type: K+>): 8.1234e-10
   getProbability(<type: p+>): 7.5006e-31
   getProbability(<type: deuteron>): 1.82454e-98
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -19954,12 +20336,25 @@ PIDLikelihood#3:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#4:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -387.888
   getLogL(<type: mu->): -355.454
   getLogL(<type: pi+>): -350.279
   getLogL(<type: K+>): -410.505
   getLogL(<type: p+>): -556.369
   getLogL(<type: deuteron>): -415.676
+  getLogarithmicProbability(<type: e->): -37.6145
+  getLogarithmicProbability(<type: mu->): -5.1748
+  getLogarithmicProbability(<type: pi+>): 5.1748
+  getLogarithmicProbability(<type: K+>): -60.2315
+  getLogarithmicProbability(<type: p+>): -206.096
+  getLogarithmicProbability(<type: deuteron>): -65.4025
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 4.61577e-17
   getProbability(<type: mu->): 0.0056255
@@ -19967,6 +20362,7 @@ PIDLikelihood#4:
   getProbability(<type: K+>): 6.94711e-27
   getProbability(<type: p+>): 3.11671e-90
   getProbability(<type: deuteron>): 3.94499e-29
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -19974,12 +20370,25 @@ PIDLikelihood#4:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#5:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -500.599
   getLogL(<type: mu->): -455.267
   getLogL(<type: pi+>): -451.954
   getLogL(<type: K+>): -564.724
   getLogL(<type: p+>): -637.357
   getLogL(<type: deuteron>): -524.085
+  getLogarithmicProbability(<type: e->): -48.6809
+  getLogarithmicProbability(<type: mu->): -3.31339
+  getLogarithmicProbability(<type: pi+>): 3.31339
+  getLogarithmicProbability(<type: K+>): -112.806
+  getLogarithmicProbability(<type: p+>): -185.439
+  getLogarithmicProbability(<type: deuteron>): -72.1673
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 7.21328e-22
   getProbability(<type: mu->): 0.0351148
@@ -19987,6 +20396,7 @@ PIDLikelihood#5:
   getProbability(<type: K+>): 1.02069e-49
   getProbability(<type: p+>): 2.91633e-81
   getProbability(<type: deuteron>): 4.55117e-32
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -19994,12 +20404,25 @@ PIDLikelihood#5:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#6:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -423.563
   getLogL(<type: mu->): -360.161
   getLogL(<type: pi+>): -370.605
   getLogL(<type: K+>): -402.394
   getLogL(<type: p+>): -498.898
   getLogL(<type: deuteron>): -483.899
+  getLogarithmicProbability(<type: e->): -63.4025
+  getLogarithmicProbability(<type: mu->): 10.4442
+  getLogarithmicProbability(<type: pi+>): -10.4442
+  getLogarithmicProbability(<type: K+>): -42.2332
+  getLogarithmicProbability(<type: p+>): -138.738
+  getLogarithmicProbability(<type: deuteron>): -123.738
   getMostLikely(): <type: mu->
   getProbability(<type: e->): 2.91514e-28
   getProbability(<type: mu->): 0.999971
@@ -20007,6 +20430,7 @@ PIDLikelihood#6:
   getProbability(<type: K+>): 4.55339e-19
   getProbability(<type: p+>): 5.58499e-61
   getProbability(<type: deuteron>): 1.82541e-54
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -20014,12 +20438,25 @@ PIDLikelihood#6:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#7:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -92.6745
   getLogL(<type: mu->): -91.4771
   getLogL(<type: pi+>): -89.2298
   getLogL(<type: K+>): -127.493
   getLogL(<type: p+>): -109.358
   getLogL(<type: deuteron>): -164.259
+  getLogarithmicProbability(<type: e->): -3.54513
+  getLogarithmicProbability(<type: mu->): -2.27877
+  getLogarithmicProbability(<type: pi+>): 1.98345
+  getLogarithmicProbability(<type: K+>): -38.3923
+  getLogarithmicProbability(<type: p+>): -20.2567
+  getLogarithmicProbability(<type: deuteron>): -75.1585
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.028055
   getProbability(<type: mu->): 0.0928966
@@ -20027,6 +20464,7 @@ PIDLikelihood#7:
   getProbability(<type: K+>): 2.12046e-17
   getProbability(<type: p+>): 1.59458e-09
   getProbability(<type: deuteron>): 2.28595e-33
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -20034,12 +20472,25 @@ PIDLikelihood#7:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#8:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): False
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -518.542
   getLogL(<type: mu->): -447.575
   getLogL(<type: pi+>): -456.538
   getLogL(<type: K+>): -489.413
   getLogL(<type: p+>): -578.786
   getLogL(<type: deuteron>): -537.72
+  getLogarithmicProbability(<type: e->): -70.9671
+  getLogarithmicProbability(<type: mu->): 8.96332
+  getLogarithmicProbability(<type: pi+>): -8.96332
+  getLogarithmicProbability(<type: K+>): -41.838
+  getLogarithmicProbability(<type: p+>): -131.211
+  getLogarithmicProbability(<type: deuteron>): -90.1449
   getMostLikely(): <type: mu->
   getProbability(<type: e->): 1.51144e-31
   getProbability(<type: mu->): 0.999872
@@ -20047,6 +20498,7 @@ PIDLikelihood#8:
   getProbability(<type: K+>): 6.76092e-19
   getProbability(<type: p+>): 1.03686e-57
   getProbability(<type: deuteron>): 7.0889e-40
+  isAvailable(): True
   isAvailable(<set: SVD>): False
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): True
@@ -20054,12 +20506,25 @@ PIDLikelihood#8:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#9:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): True
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -256.872
   getLogL(<type: mu->): -247.289
   getLogL(<type: pi+>): -222.934
   getLogL(<type: K+>): -239.305
   getLogL(<type: p+>): -279.934
   getLogL(<type: deuteron>): -412.439
+  getLogarithmicProbability(<type: e->): -33.9381
+  getLogarithmicProbability(<type: mu->): -24.3548
+  getLogarithmicProbability(<type: pi+>): 16.3701
+  getLogarithmicProbability(<type: K+>): -16.3705
+  getLogarithmicProbability(<type: p+>): -56.9999
+  getLogarithmicProbability(<type: deuteron>): -189.504
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 1.8233e-15
   getProbability(<type: mu->): 2.6476e-11
@@ -20067,6 +20532,7 @@ PIDLikelihood#9:
   getProbability(<type: K+>): 7.76943e-08
   getProbability(<type: p+>): 1.75898e-25
   getProbability(<type: deuteron>): 5.00373e-83
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -20074,12 +20540,25 @@ PIDLikelihood#9:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): True
 PIDLikelihood#10:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): True
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -235.395
   getLogL(<type: mu->): -220.093
   getLogL(<type: pi+>): -218.089
   getLogL(<type: K+>): -245.023
   getLogL(<type: p+>): -350.919
   getLogL(<type: deuteron>): -264.092
+  getLogarithmicProbability(<type: e->): -17.4318
+  getLogarithmicProbability(<type: mu->): -2.00357
+  getLogarithmicProbability(<type: pi+>): 2.00357
+  getLogarithmicProbability(<type: K+>): -27.0599
+  getLogarithmicProbability(<type: p+>): -132.956
+  getLogarithmicProbability(<type: deuteron>): -46.1287
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 2.68822e-08
   getProbability(<type: mu->): 0.118829
@@ -20087,6 +20566,7 @@ PIDLikelihood#10:
   getProbability(<type: K+>): 1.77028e-12
   getProbability(<type: p+>): 1.81115e-58
   getProbability(<type: deuteron>): 9.25891e-21
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -20094,12 +20574,25 @@ PIDLikelihood#10:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#11:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -268.14
   getLogL(<type: mu->): -230.742
   getLogL(<type: pi+>): -231.102
   getLogL(<type: K+>): -259.145
   getLogL(<type: p+>): -435.557
   getLogL(<type: deuteron>): -291.111
+  getLogarithmicProbability(<type: e->): -37.927
+  getLogarithmicProbability(<type: mu->): 0.359283
+  getLogarithmicProbability(<type: pi+>): -0.359283
+  getLogarithmicProbability(<type: K+>): -28.9327
+  getLogarithmicProbability(<type: p+>): -205.344
+  getLogarithmicProbability(<type: deuteron>): -60.8986
   getMostLikely(): <type: mu->
   getProbability(<type: e->): 3.3767e-17
   getProbability(<type: mu->): 0.588867
@@ -20107,6 +20600,7 @@ PIDLikelihood#11:
   getProbability(<type: K+>): 2.72068e-13
   getProbability(<type: p+>): 6.61165e-90
   getProbability(<type: deuteron>): 3.565e-27
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -20114,12 +20608,25 @@ PIDLikelihood#11:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#12:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): True
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): True
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -154.315
   getLogL(<type: mu->): -130.884
   getLogL(<type: pi+>): -122.724
   getLogL(<type: K+>): -163.59
   getLogL(<type: p+>): -231.474
   getLogL(<type: deuteron>): -172.428
+  getLogarithmicProbability(<type: e->): -31.5908
+  getLogarithmicProbability(<type: mu->): -8.16035
+  getLogarithmicProbability(<type: pi+>): 8.16035
+  getLogarithmicProbability(<type: K+>): -40.866
+  getLogarithmicProbability(<type: p+>): -108.75
+  getLogarithmicProbability(<type: deuteron>): -49.7043
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 1.90666e-14
   getProbability(<type: mu->): 0.000285682
@@ -20127,6 +20634,7 @@ PIDLikelihood#12:
   getProbability(<type: K+>): 1.78704e-18
   getProbability(<type: p+>): 5.89378e-48
   getProbability(<type: deuteron>): 2.59248e-22
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): True
   isAvailable(<set: TOP>): False
@@ -20134,12 +20642,25 @@ PIDLikelihood#12:
   isAvailable(<set: ECL>): True
   isAvailable(<set: KLM>): False
 PIDLikelihood#13:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -22.6697
   getLogL(<type: mu->): -23.6527
   getLogL(<type: pi+>): -21.3386
   getLogL(<type: K+>): -20.0585
   getLogL(<type: p+>): -18.6322
   getLogL(<type: deuteron>): -17.9123
+  getLogarithmicProbability(<type: e->): -5.25172
+  getLogarithmicProbability(<type: mu->): -6.23798
+  getLogarithmicProbability(<type: pi+>): -3.90592
+  getLogarithmicProbability(<type: K+>): -2.57216
+  getLogarithmicProbability(<type: p+>): -0.869376
+  getLogarithmicProbability(<type: deuteron>): 0.433785
   getMostLikely(): <type: deuteron>
   getProbability(<type: e->): 0.00521119
   getProbability(<type: mu->): 0.00194998
@@ -20147,6 +20668,7 @@ PIDLikelihood#13:
   getProbability(<type: K+>): 0.0709519
   getProbability(<type: p+>): 0.295384
   getProbability(<type: deuteron>): 0.606777
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): False
@@ -20154,12 +20676,25 @@ PIDLikelihood#13:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#14:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): False
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): False
+  areAllAvailable(<set: KLM>): False
   getLogL(<type: e->): -19.0283
   getLogL(<type: mu->): -15.4072
   getLogL(<type: pi+>): -13.2274
   getLogL(<type: K+>): -23.5825
   getLogL(<type: p+>): -21.8526
   getLogL(<type: deuteron>): -17.3661
+  getLogarithmicProbability(<type: e->): -5.92246
+  getLogarithmicProbability(<type: mu->): -2.1988
+  getLogarithmicProbability(<type: pi+>): 2.02312
+  getLogarithmicProbability(<type: K+>): -10.4793
+  getLogarithmicProbability(<type: p+>): -8.74929
+  getLogarithmicProbability(<type: deuteron>): -4.24879
   getMostLikely(): <type: pi+>
   getProbability(<type: e->): 0.00267144
   getProbability(<type: mu->): 0.0998582
@@ -20167,6 +20702,7 @@ PIDLikelihood#14:
   getProbability(<type: K+>): 2.81104e-05
   getProbability(<type: p+>): 0.000158549
   getProbability(<type: deuteron>): 0.0140804
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): False
@@ -20174,12 +20710,25 @@ PIDLikelihood#14:
   isAvailable(<set: ECL>): False
   isAvailable(<set: KLM>): False
 PIDLikelihood#15:
+  areAllAvailable(): False
+  areAllAvailable(<set: SVD>): True
+  areAllAvailable(<set: CDC>): False
+  areAllAvailable(<set: TOP>): True
+  areAllAvailable(<set: ARICH>): False
+  areAllAvailable(<set: ECL>): True
+  areAllAvailable(<set: KLM>): True
   getLogL(<type: e->): -296.831
   getLogL(<type: mu->): -251.169
   getLogL(<type: pi+>): -259.075
   getLogL(<type: K+>): -289.451
   getLogL(<type: p+>): -312.052
   getLogL(<type: deuteron>): -323.21
+  getLogarithmicProbability(<type: e->): -45.6624
+  getLogarithmicProbability(<type: mu->): 7.90581
+  getLogarithmicProbability(<type: pi+>): -7.90581
+  getLogarithmicProbability(<type: K+>): -38.2826
+  getLogarithmicProbability(<type: p+>): -60.883
+  getLogarithmicProbability(<type: deuteron>): -72.0409
   getMostLikely(): <type: mu->
   getProbability(<type: e->): 1.47595e-20
   getProbability(<type: mu->): 0.999632
@@ -20187,6 +20736,7 @@ PIDLikelihood#15:
   getProbability(<type: K+>): 2.36632e-17
   getProbability(<type: p+>): 3.62134e-27
   getProbability(<type: deuteron>): 5.16452e-32
+  isAvailable(): True
   isAvailable(<set: SVD>): True
   isAvailable(<set: CDC>): False
   isAvailable(<set: TOP>): True
@@ -22489,10 +23039,14 @@ ECLCluster#44:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
+No data for EventLevelClusteringInfo
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (190.069,-98.2696,-27.3)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 1.18459
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -22516,11 +23070,17 @@ KLMCluster#0:
     -> KlIds#0 (weight: 1)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#42 (weight: 1)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 0.502517
 KLMCluster#1:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (113.689,-200.31,-55.6)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -22544,11 +23104,17 @@ KLMCluster#1:
     -> KlIds#1 (weight: 1)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#19 (weight: 1)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 0.502517
 KLMCluster#2:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (59.088,-203.886,121.3)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.993588
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -22573,11 +23139,17 @@ KLMCluster#2:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#25 (weight: 0.999875)
     -> MCParticles#49 (weight: 0.000125138)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 0.502517
 KLMCluster#3:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (-68.912,204.029,229.3)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.993588
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -22603,6 +23175,9 @@ KLMCluster#3:
     -> MCParticles#46 (weight: 0.189487)
     -> MCParticles#65 (weight: 0.0754985)
     -> MCParticles#66 (weight: 0.735014)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 0.502517
 KlId#0:
   getKlId(): 1
@@ -25451,6 +26026,7 @@ MCParticle#66:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 0
 [INFO] ========================================================================

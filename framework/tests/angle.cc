@@ -30,8 +30,6 @@ namespace {
     EXPECT_DOUBLE_EQ(error, myBaseAngle.getError());
     EXPECT_DOUBLE_EQ(angle * TMath::RadToDeg(), myBaseAngle.getAngleInDeg());
     EXPECT_DOUBLE_EQ(error * TMath::RadToDeg(), myBaseAngle.getErrorInDeg());
-    EXPECT_DOUBLE_EQ(angle - error, myBaseAngle.getLowerIntervalBoundary());
-    EXPECT_DOUBLE_EQ(angle + error, myBaseAngle.getUpperIntervalBoundary());
   }
 
   TEST(Angle, ThetaAngle)

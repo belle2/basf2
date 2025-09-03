@@ -11,7 +11,7 @@
 """
 Check that all the classdef versions and class checksums are consistent to prevent accidental mismatch:
 
-If one forgets to increase the ClassDef but the streamer info checksum changes this will trigger a test failure. We can distuingish
+If one forgets to increase the ClassDef but the streamer info checksum changes this will trigger a test failure. We can distinguish
 
 1. ClassDef version changed unnecessary
 2. forgot to change ClassDef
@@ -19,27 +19,28 @@ If one forgets to increase the ClassDef but the streamer info checksum changes t
 """
 
 import sys
+
 from b2test_utils import get_object_with_name, get_streamer_checksums
 
 #: A mapping name -> version, checksum of the expected objects
 EXPECTED_CHECKSUMS = {
-    'Belle2::Const::DetectorSet': (1, 1222446098),
-    'Belle2::ECLCluster': (15, 835771092),
-    'Belle2::EventLevelClusteringInfo': (4, 1906636092),
-    'Belle2::EventLevelTrackingInfo': (3, 1207148192),
-    'Belle2::EventMetaData': (4, 2999207747),
-    'Belle2::FileMetaData': (11, 3436141238),
-    'Belle2::KLMCluster': (2, 2615188022),
-    'Belle2::KlId': (2, 230716330),
-    'Belle2::PIDLikelihood': (3, 36434623),
-    'Belle2::RelationContainer': (1, 1725678837),
-    'Belle2::RelationElement': (1, 1883389510),
-    'Belle2::RelationsInterface<TObject>': (0, 3862127315),
-    'Belle2::SoftwareTriggerResult': (5, 241059817),
-    'Belle2::TRGSummary': (7, 1658421299),
-    'Belle2::Track': (6, 327743743),
-    'Belle2::TrackFitResult': (10, 1213379524),
-    'Belle2::V0': (4, 422320450),
+    "Belle2::Const::DetectorSet": (1, 1222446098),
+    "Belle2::ECLCluster": (16, 2788194468),
+    "Belle2::EventLevelClusteringInfo": (4, 1906636092),
+    "Belle2::EventLevelTrackingInfo": (3, 1207148192),
+    "Belle2::EventMetaData": (4, 2999207747),
+    "Belle2::FileMetaData": (11, 3436141238),
+    "Belle2::KLMCluster": (4, 668746673),
+    "Belle2::KlId": (2, 230716330),
+    "Belle2::PIDLikelihood": (5, 1179368204),
+    "Belle2::RelationContainer": (1, 1725678837),
+    "Belle2::RelationElement": (1, 1883389510),
+    "Belle2::RelationsInterface<TObject>": (0, 3862127315),
+    "Belle2::SoftwareTriggerResult": (5, 241059817),
+    "Belle2::TRGSummary": (8, 1324488555),
+    "Belle2::Track": (7, 4188963807),
+    "Belle2::TrackFitResult": (11, 3094698344),
+    "Belle2::V0": (5, 910068346),
 }
 
 #: Object names part of mdst
@@ -72,11 +73,15 @@ if __name__ == "__main__":
     #: dictionary of objects to (version, checksum)
     found = get_streamer_checksums(objects)
     # we don't care about TObject ...
-    if 'TObject' in found:
-        del found['TObject']
+    if "TObject" in found:
+        del found["TObject"]
 
     # print list we found to be able to copy pasta
-    print("found_checksums = {\n    " + "\n    ".join(f"{k!r}: {v!r}," for k, v in sorted(found.items())) + "\n}")
+    print(
+        "found_checksums = {\n    "
+        + "\n    ".join(f"{k!r}: {v!r}," for k, v in sorted(found.items()))
+        + "\n}"
+    )
     for key, (version, checksum) in found.items():
         if key not in EXPECTED_CHECKSUMS:
             problems.append(f"There is no {key} in the checksum dictionary!")
@@ -89,26 +94,36 @@ if __name__ == "__main__":
         expected_version, expected_checksum = EXPECTED_CHECKSUMS[key]
 
         if expected_version != version and expected_checksum == checksum:
-            problems.append(f"The version for {key} has changed (expected={expected_version}, found={version}) "
-                            f"while the checksum has not. This probably means the ClassDef version was increased unnecessarily. "
-                            f"If this is intentional please update the expected version in this test")
+            problems.append(
+                f"The version for {key} has changed (expected={expected_version}, found={version}) "
+                f"while the checksum has not. This probably means the ClassDef version was increased unnecessarily. "
+                f"If this is intentional please update the expected version in this test"
+            )
         elif expected_version == version and expected_checksum != checksum:
-            problems.append(f"The checksum for {key} has changed (expected={expected_checksum}, found={checksum}) "
-                            f"while the version has not. This probably means you forgot to increase the ClassDef version "
-                            f"after changing the class. Please update the ClassDef version and the expected values in this test")
+            problems.append(
+                f"The checksum for {key} has changed (expected={expected_checksum}, found={checksum}) "
+                f"while the version has not. This probably means you forgot to increase the ClassDef version "
+                f"after changing the class. Please update the ClassDef version and the expected values in this test"
+            )
         elif expected_version != version and expected_checksum != checksum:
-            problems.append(f"The version and checksum for {key} have changed, (expected version={expected_version}, "
-                            f"checksum={expected_checksum}, found version={version}, checksum={checksum}). "
-                            f"Please update the expected values")
+            problems.append(
+                f"The version and checksum for {key} have changed, (expected version={expected_version}, "
+                f"checksum={expected_checksum}, found version={version}, checksum={checksum}). "
+                f"Please update the expected values"
+            )
         del EXPECTED_CHECKSUMS[key]
 
     for remaining, (version, checksum) in EXPECTED_CHECKSUMS.items():
-        problems.append(f"Additional class expected but not needed: {remaining} (version {version}, checksum {checksum})")
+        problems.append(
+            f"Additional class expected but not needed: {remaining} (version {version}, checksum {checksum})"
+        )
 
     if not problems:
         print("Check finished")
     else:
         problems = "\n\t * ".join([""] + problems)
-        print("Check failed: Most likely a mdst class has been modified and the list of expected checksums needs to be adjusted:",
-              problems)
+        print(
+            "Check failed: Most likely a mdst class has been modified and the list of expected checksums needs to be adjusted:",
+            problems,
+        )
         sys.exit(1)

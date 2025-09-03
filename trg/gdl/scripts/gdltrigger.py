@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -10,7 +9,7 @@
 ##########################################################################
 
 import basf2 as b2
-emptypath = b2.create_path()
+import modularAnalysis as ma
 
 
 def add_gdl_trigger(path, SimulationMode=1, FilterEvents=False, simulateT0jitter=False, Belle2Phase="Phase2"):
@@ -18,7 +17,7 @@ def add_gdl_trigger(path, SimulationMode=1, FilterEvents=False, simulateT0jitter
     add the gdl module to path
     @param path            module is added to this path
     @param SimulationMode  the simulation mode in TSIM, 1: fast simulation,
-                           trigger algoritm simulation only, no firmware simulation
+                           trigger algorithm simulation only, no firmware simulation
                            2: full simulation, both trigger algorithm and firmware
                            are simulated
     @param FilterEvents    if True only the events that pass the L1 trigger will
@@ -30,6 +29,6 @@ def add_gdl_trigger(path, SimulationMode=1, FilterEvents=False, simulateT0jitter
     trggdl.param('SimulationMode', SimulationMode)
     trggdl.param('Belle2Phase', Belle2Phase)
     trggdl.param('simulateT0jitter', simulateT0jitter)
-    if FilterEvents:
-        trggdl.if_value('<1', emptypath)
     path.add_module(trggdl)
+    if FilterEvents:
+        ma.applyEventCuts('L1Trigger == 1', path)

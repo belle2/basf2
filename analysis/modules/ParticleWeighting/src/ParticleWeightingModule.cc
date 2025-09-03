@@ -34,9 +34,13 @@ REG_MODULE(ParticleWeighting);
 ParticleWeightingModule::ParticleWeightingModule() : Module()
 {
   setDescription("Append weights from the database into the extraInfo of Particles.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("tableName", m_tableName, "ID of table used for reweighing");
   addParam("particleList", m_inputListName, "Name of the ParticleList to reduce to the best candidates");
   addParam("selectedDaughters", m_selectedDaughters, "Daughters for which one wants to append weights", std::string(""));
+  addParam("allowToSkip", m_allowToSkip,
+           "If False (default), the basf2 process stops when the payload is not available. If True, this module is skipped.",
+           false);
 }
 
 
@@ -64,7 +68,15 @@ void ParticleWeightingModule::initialize()
   m_inputList.isRequired(m_inputListName);
   if (m_selectedDaughters != "")
     m_decayDescriptor.init(m_selectedDaughters);
-  m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
+
+  m_ParticleWeightingLookUpTable = std::make_unique<OptionalDBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
+
+  if (!(*m_ParticleWeightingLookUpTable)) {
+    if (m_allowToSkip)
+      B2INFO("The payload for the " << m_tableName << " is not available! This module will do nothing.");
+    else
+      B2ERROR("The payload for the " << m_tableName << " is not available! The basf2 process will not start.");
+  }
 }
 
 
@@ -74,6 +86,8 @@ void ParticleWeightingModule::event()
     B2WARNING("Input list " << m_inputList.getName() << " was not created?");
     return;
   }
+
+  if (!(*m_ParticleWeightingLookUpTable)) return;
 
   const unsigned int numParticles = m_inputList->getListSize();
   for (unsigned int i = 0; i < numParticles; i++) {

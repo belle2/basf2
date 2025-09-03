@@ -10,13 +10,10 @@
 // Own header.
 #include <background/modules/BeamBkgMixer/BeamBkgMixerModule.h>
 
-
-
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/core/ModuleParam.templateDetails.h>
@@ -34,7 +31,6 @@
 #include <simulation/dataobjects/BeamBackHit.h>
 
 // MetaData
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/BackgroundInfo.h>
 
 // Root
@@ -155,7 +151,7 @@ void BeamBkgMixerModule::initialize()
       continue;
     }
 
-    // check the file existance
+    // check the file existence
     TFile* f = TFile::Open(file.c_str(), "READ");
     if (!f) {
       B2ERROR(file << ": file not found");
@@ -402,7 +398,7 @@ void BeamBkgMixerModule::event()
       bkg.eventCount++;
       if (bkg.eventCount >= bkg.numEvents) {
         bkg.eventCount = 0;
-        std::string message = "BeamBkgMixer: events of " + bkg.type + " will be re-used";
+        std::string message = "BeamBkgMixer: events of " + bkg.type + " will be reused";
         m_reused[message] += 1;
         if (m_reused[message] == 1) B2INFO(message);
         bkgInfo->incrementReusedCounter(bkg.index);
@@ -449,7 +445,7 @@ void BeamBkgMixerModule::event()
       bkg.eventCount++;
       if (bkg.eventCount >= bkg.numEvents) {
         bkg.eventCount = 0;
-        std::string message = "BeamBkgMixer: events of " + bkg.type + " will be re-used";
+        std::string message = "BeamBkgMixer: events of " + bkg.type + " will be reused";
         m_reused[message] += 1;
         if (m_reused[message] == 1) B2INFO(message);
         bkgInfo->incrementReusedCounter(bkg.index);
@@ -483,7 +479,7 @@ void BeamBkgMixerModule::event()
       bkg.eventCount++;
       if (bkg.eventCount >= bkg.numEvents) {
         bkg.eventCount = 0;
-        std::string message = "BeamBkgMixer: events of " + bkg.type + " will be re-used";
+        std::string message = "BeamBkgMixer: events of " + bkg.type + " will be reused";
         m_reused[message] += 1;
         if (m_reused[message] == 1) B2INFO(message);
         bkgInfo->incrementReusedCounter(bkg.index);
@@ -504,11 +500,11 @@ void BeamBkgMixerModule::terminate()
 
   B2INFO("BeamBkgMixer - reused samples:");
   for (const auto& message : m_reused) {
-    B2INFO(message.first << "(occured " << message.second << " times)");
+    B2INFO(message.first << "(occurred " << message.second << " times)");
   }
   B2INFO("BeamBkgMixer - rejected events:");
   for (const auto& message : m_rejected) {
-    B2INFO(message.first << "(occured " << message.second << " times)");
+    B2INFO(message.first << "(occurred " << message.second << " times)");
   }
 
   for (auto& bkg : m_backgrounds) {

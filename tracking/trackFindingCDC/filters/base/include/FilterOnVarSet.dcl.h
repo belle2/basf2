@@ -52,7 +52,7 @@ namespace Belle2 {
       Weight operator()(const Object& obj) override;
 
     public:
-      /// Steal the set of variables form this filter - filter becomes disfunctional afterwards.
+      /// Steal the set of variables form this filter - filter becomes dysfunctional afterwards.
       std::unique_ptr<AVarSet> releaseVarSet()&& ;
 
     protected:
@@ -61,6 +61,9 @@ namespace Belle2 {
 
       /// Setter for the set of variables
       void setVarSet(std::unique_ptr<AVarSet> varSet);
+
+      /// Forward prefixed parameters of this findlet to the module parameter list.
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     private:
       /// Instance of the variable set to be used in the filter.
@@ -74,7 +77,7 @@ namespace Belle2 {
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Convience template to create a filter operating on a specific set of variables.
+    /// Convenience template to create a filter operating on a specific set of variables.
     template<class AVarSet>
     class FilterOnVarSet: public OnVarSet<Filter<typename AVarSet::Object> > {
 

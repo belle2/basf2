@@ -21,6 +21,11 @@
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <svd/dbobjects/SVDDQMPlotsConfiguration.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+
+#include <framework/database/DBObjPtr.h>
+
 #include "TH2D.h"
 
 namespace Belle2 {
@@ -65,6 +70,8 @@ namespace Belle2 {
     StoreArray<SVDCluster> m_svdClusters; /**< SVDCluster StoreArray*/
     StoreArray<SVDIntercept> m_intercepts; /**< SVDIntercept StoreArray*/
     StoreArray<RecoTrack> m_recoTracks; /**< RecoTrack StoreArray*/
+    StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer; /**< Store Object for reading the trigger decision. */
+    DBObjPtr<SVDDQMPlotsConfiguration> m_svdPlotsConfig; /**< SVD DQM plots configuration */
 
     float m_fiducialU; /**< stay away from the U border by m_fiducialU (in cm)*/
     float m_fiducialV; /**< stay away from the U border by m_fiducialU (in cm)*/
@@ -84,6 +91,12 @@ namespace Belle2 {
 
     std::string m_histogramDirectoryName; /**< name of the directory where to store the histograms*/
 
+    bool m_3Samples = false;  /**< if true enable 3 samples histograms analysis */
+
+    bool m_skipRejectedEvents = false;   /**< if true skip events rejected by HLT */
+
+    bool m_useParamFromDB = true; /**< if true read back from DB configuration parameters */
+
     bool m_saveExpertHistos; /**< save additional histograms id set True*/
 
     int m_u_bins; /**< number of U-bins for expert histogram*/
@@ -99,11 +112,11 @@ namespace Belle2 {
 
 
     SVDSummaryPlots* m_TrackHits = nullptr; /**< track hits summary plot*/
-    SVDSummaryPlots* m_TrackHits3 = nullptr; /**< track hits summary plot for 3 samples*/
-    SVDSummaryPlots* m_TrackHits6 = nullptr; /**< track hits summary plot for 6 samples*/
+    SVDSummaryPlots* m_TrackHits3Sample = nullptr; /**< track hits summary plot for 3 samples*/
+    SVDSummaryPlots* m_TrackHits6Sample = nullptr; /**< track hits summary plot for 6 samples*/
     SVDSummaryPlots* m_MatchedHits = nullptr; /**< matched hits summary plot*/
-    SVDSummaryPlots* m_MatchedHits3 = nullptr; /**< matched hits summary plot for 3 samples*/
-    SVDSummaryPlots* m_MatchedHits6 = nullptr; /**< matched hits summary plot for 6 samples*/
+    SVDSummaryPlots* m_MatchedHits3Sample = nullptr; /**< matched hits summary plot for 3 samples*/
+    SVDSummaryPlots* m_MatchedHits6Sample = nullptr; /**< matched hits summary plot for 6 samples*/
 
   };
 }

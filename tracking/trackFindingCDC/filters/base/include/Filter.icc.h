@@ -28,12 +28,6 @@ namespace Belle2 {
     Filter<AObject>::~Filter() = default;
 
     template <class AObject>
-    void Filter<AObject>::exposeParameters(ModuleParamList* moduleParamListw __attribute__((unused)),
-                                           const std::string& prefix  __attribute__((unused)))
-    {
-    }
-
-    template <class AObject>
     bool Filter<AObject>::needsTruthInformation()
     {
       return false;
@@ -49,6 +43,16 @@ namespace Belle2 {
     Weight Filter<AObject>::operator()(const Object* obj)
     {
       return obj ? operator()(*obj) : NAN;
+    }
+
+    template <class AObject>
+    std::vector<float> Filter<AObject>::operator()(const std::vector <Object*>& objs)
+    {
+      std::vector<float> out;
+      for (const auto& obj : objs) {
+        out.push_back(operator()(obj));
+      }
+      return out;
     }
   }
 }

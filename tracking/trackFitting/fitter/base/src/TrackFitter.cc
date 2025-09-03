@@ -42,39 +42,40 @@ int TrackFitter::createCorrectPDGCodeForChargedStable(const Const::ChargedStable
   return currentPdgCode;
 }
 
-bool TrackFitter::fit(RecoTrack& recoTrack) const
+bool TrackFitter::fit(RecoTrack& recoTrack, bool resortHits) const
 {
   if (not recoTrack.getRepresentations().empty() and recoTrack.getCardinalRepresentation()) {
-    return fit(recoTrack, recoTrack.getCardinalRepresentation());
+    return fit(recoTrack, recoTrack.getCardinalRepresentation(), resortHits);
   } else {
-    return fit(recoTrack, Const::pion);
+    return fit(recoTrack, Const::pion, resortHits);
   }
 }
 
-bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const
+bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType, bool resortHits) const
 {
   const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(particleType, recoTrack);
   genfit::AbsTrackRep* trackRepresentation = RecoTrackGenfitAccess::createOrReturnRKTrackRep(recoTrack,
                                              currentPdgCode);
 
-  return fit(recoTrack, trackRepresentation);
+  return fit(recoTrack, trackRepresentation, resortHits);
 }
 
-bool TrackFitter::fit(RecoTrack& recoTrack, const int pdgCode) const
+bool TrackFitter::fit(RecoTrack& recoTrack, const int pdgCode, bool resortHits) const
 {
   genfit::AbsTrackRep* trackRepresentation = RecoTrackGenfitAccess::createOrReturnRKTrackRep(recoTrack,
                                              pdgCode);
 
-  return fit(recoTrack, trackRepresentation);
+  return fit(recoTrack, trackRepresentation, resortHits);
 }
 
-bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation) const
+bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation, bool resortHits) const
 {
   // Fit the track
   try {
     // Delete the old information to start from scratch
     recoTrack.deleteFittedInformationForRepresentation(&trackRepresentation);
-    m_fitter->processTrackWithRep(&RecoTrackGenfitAccess::getGenfitTrack(recoTrack), &trackRepresentation);
+    B2DEBUG(28, "resortHits is set to " << resortHits << " when fitting the tracks");
+    m_fitter->processTrackWithRep(&RecoTrackGenfitAccess::getGenfitTrack(recoTrack), &trackRepresentation, resortHits);
   } catch (genfit::Exception& e) {
     B2WARNING(e.getExcString());
   }
@@ -104,7 +105,7 @@ bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
   return recoTrack.wasFitSuccessful(&trackRepresentation);
 }
 
-bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresentation) const
+bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresentation, bool resortHits) const
 {
   B2ASSERT("No fitter was loaded! Have you reset the fitter to an invalid one?", m_fitter);
 
@@ -129,28 +130,56 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
 
   const auto previousSetting = gErrorIgnoreLevel; // Save current log level
   gErrorIgnoreLevel = m_gErrorIgnoreLevel; // Set the log level defined in the TrackFitter
-  auto fitWithoutCheckResult = fitWithoutCheck(recoTrack, *trackRepresentation);
+  auto fitWithoutCheckResult = fitWithoutCheck(recoTrack, *trackRepresentation, resortHits);
   gErrorIgnoreLevel = previousSetting; // Restore previous setting
   return fitWithoutCheckResult;
 }
 
-void TrackFitter::resetFitterToDefaultSettings()
+void TrackFitter::resetFitterToDBSettings(const DAFConfiguration::ETrackFitType trackFitType)
 {
-  if (!m_DAFparameters.isValid())
-    B2FATAL("DAF parameters are not available.");
-  genfit::DAF* dafFitter = new genfit::DAF(m_DAFparameters->getAnnealingScheme(),
-                                           m_DAFparameters->getMinimumIterations(),
-                                           m_DAFparameters->getMaximumIterations(),
-                                           m_DAFparameters->getMinimumIterationsForPVal(),
+  if (!m_DAFConfiguration.isValid())
+    B2FATAL("DAF Configuration is not available.");
+
+  const DAFParameters* DAFParams = m_DAFConfiguration->getDAFParameters(trackFitType);
+  if (!DAFParams)
+    B2FATAL("DAF parameters for " << trackFitType << " is not available.");
+
+  genfit::DAF* dafFitter = new genfit::DAF(DAFParams->getAnnealingScheme(),
+                                           DAFParams->getMinimumIterations(),
+                                           DAFParams->getMaximumIterations(),
+                                           DAFParams->getMinimumIterationsForPVal(),
                                            true,
-                                           m_DAFparameters->getDeltaPValue(),
-                                           m_DAFparameters->getDeltaWeight(),
-                                           m_DAFparameters->getProbabilityCut());
-  dafFitter->setMaxFailedHits(m_DAFparameters->getMaximumFailedHits());
-
+                                           DAFParams->getDeltaPValue(),
+                                           DAFParams->getDeltaWeight(),
+                                           DAFParams->getProbabilityCut(),
+                                           DAFParams->getMinimumPValue());
+  dafFitter->setMaxFailedHits(DAFParams->getMaximumFailedHits());
   m_fitter.reset(dafFitter);
-
   m_skipDirtyCheck = false;
+}
+
+void TrackFitter::resetFitterToUserSettings(DAFParameters* DAFParams)
+{
+  if (DAFParams == nullptr)
+    B2FATAL("DAF parameters are not available.");
+  genfit::DAF* dafFitter = new genfit::DAF(DAFParams->getAnnealingScheme(),
+                                           DAFParams->getMinimumIterations(),
+                                           DAFParams->getMaximumIterations(),
+                                           DAFParams->getMinimumIterationsForPVal(),
+                                           true,
+                                           DAFParams->getDeltaPValue(),
+                                           DAFParams->getDeltaWeight(),
+                                           DAFParams->getProbabilityCut(),
+                                           DAFParams->getMinimumPValue());
+  dafFitter->setMaxFailedHits(DAFParams->getMaximumFailedHits());
+  m_fitter.reset(dafFitter);
+  m_skipDirtyCheck = false;
+}
+
+void TrackFitter::resetFitterToCosmicsSettings()
+{
+  // If cosmics run it forces to use the c_Cosmics settings in DAFConfiguration
+  resetFitterToDBSettings(DAFConfiguration::c_Cosmics);
 }
 
 void TrackFitter::resetFitter(const std::shared_ptr<genfit::AbsFitter>& fitter)

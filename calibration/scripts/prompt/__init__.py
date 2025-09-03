@@ -30,8 +30,7 @@ INPUT_DATA_FILTERS = {"Magnet": {"On": "On",
                                    "cosmic": "cosmic",
                                    "debug": "debug", "null": "null",
                                    "physics": "physics"},
-                      "Data Tag": {"hlt_skim": "hlt_skim",
-                                   "bhabha_all_calib": "bhabha_all_calib",
+                      "Data Tag": {"bhabha_all_calib": "bhabha_all_calib",
                                    "cosmic_calib": "cosmic_calib",
                                    "gamma_gamma_calib": "gamma_gamma_calib",
                                    "hadron_calib": "hadron_calib",
@@ -40,7 +39,7 @@ INPUT_DATA_FILTERS = {"Magnet": {"On": "On",
                                    "offip_calib": "offip_calib",
                                    "radmumu_calib": "radmumu_calib",
                                    "random_calib": "random_calib",
-                                   "delayedbhabha": "delayedbhabha",
+                                   "delayedbhabha_calib": "delayedbhabha_calib",
                                    "single_gamma_mc": "single_gamma_mc"},
                       "Data Quality Tag": {">=30 Minute Run": ">=30 Minute Run",
                                            "Bad For Alignment": "Bad For Alignment",
@@ -89,7 +88,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
             To exclude specific filters, pre-append with *NOT* e.g.
             {"all_events": ["mumu_tight_or_highm_calib", "hadron_calib", "Good", "On"],
             "offres_photon_events": ["gamma_gamma_calib", "Good", "NOT On"]}.
-            Not selecting a specfic filters (e.g. Magnet) is equivalent to not having any requirements, e.g. (Either)
+            Not selecting a specific filters (e.g. Magnet) is equivalent to not having any requirements, e.g. (Either)
 
         depends_on (list(CalibrationSettings)): The settings variables of the other prompt calibrations that you want
             want to depend on. This will allow the external automatic system to understand the overall ordering of

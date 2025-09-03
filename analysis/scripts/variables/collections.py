@@ -105,6 +105,12 @@ klm_cluster = [
     'klmClusterIsBackwardEKLM',
     'klmClusterTheta',
     'klmClusterPhi',
+    'klmClusterTrackDistance',
+    'klmClusterTrackSeparationAngle',
+    'klmClusterTrackRotationAngle',
+    'klmClusterShapeStdDev1',
+    'klmClusterShapeStdDev2',
+    'klmClusterShapeStdDev3',
     'nKLMClusterTrackMatches',
     'nMatchedKLMClusters',
 ]
@@ -383,4 +389,11 @@ belle_track_hit = [
     "BelleLastCDCHitX",
     "BelleLastCDCHitY",
     "BelleLastCDCHitZ"
+]
+
+#: EventT0 sources
+eventT0_sources = [
+    "eventT0CalculatedWithSVDInfo",
+    "eventT0CalculatedWithCDCInfo",
+    "eventT0CalculatedWithECLInfo"
 ]

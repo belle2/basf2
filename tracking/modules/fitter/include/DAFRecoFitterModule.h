@@ -10,7 +10,7 @@
 #include <tracking/modules/fitter/BaseRecoFitterModule.h>
 #include <genfit/DAF.h>
 
-#include <tracking/dbobjects/DAFparameters.h>
+#include <tracking/dbobjects/DAFConfiguration.h>
 
 namespace Belle2 {
 
@@ -28,10 +28,13 @@ namespace Belle2 {
     /** Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001. */
     double m_param_probabilityCut;
 
-    /// DAF parameters Database OjbPtr
-    DBObjPtr<DAFparameters> m_DAFparameters;
+    /** DAF Configuration Database OjbPtr */
+    DBObjPtr<DAFConfiguration> m_DAFConfiguration;
 
-    /// Boolean to only show the warning about changed DAF parameters on first occurance but not each time a DAF instance is created
+    /** Track Fit type to select the proper DAFParameter from DAFConfiguration; by default c_Default */
+    short m_trackFitType = DAFConfiguration::c_Default;
+
+    /** Boolean to only show the warning about changed DAF parameters on first occurrence but not each time a DAF instance is created */
     mutable bool m_changedParametersMessageWasShown = false;
   };
 }

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -23,7 +22,7 @@ def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             "expressreco" (default) if running on the ExpressReco system
                             "hlt" if running on the HLT online reconstructon nodes
                             If running on the hlt, you may want to output less or other DQM plots
-                            due to the limited bandwith of the HLT nodes.
+                            due to the limited bandwidth of the HLT nodes.
     @param dqm_mode: How to split up the path for online/HLT.
                      For dqm_mode == "dont_care" all the DQM modules should be added.
                      For dqm_mode == "all_events" only the DQM modules which should run on all events
@@ -49,8 +48,8 @@ def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
     # KLM2 (requires mu+ particle list from add_analysis_dqm)
     if (components is None or ('KLM' in components and 'CDC' in components)) and (dqm_mode in ["dont_care", "filtered"]):
-        path.add_module("KLMDQM2", MuonListName='mu+:all',
-                        MinimalMatchingDigits=12,
+        path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM',
+                        MinimalMatchingDigits=14,
                         MinimalMatchingDigitsOuterLayers=0,
                         MinimalMomentumNoOuterLayers=4.0,
                         SoftwareTriggerName="")

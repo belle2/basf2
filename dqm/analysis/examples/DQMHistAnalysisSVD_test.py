@@ -20,12 +20,17 @@
 
 import basf2 as b2
 import sys
+import re
 
 argv = sys.argv
 if len(argv) < 2:
     print('\nUsage: %s input_filename\n' % argv[0])
     exit(1)
 inputFile = sys.argv[1]
+fileOut = sys.argv[2]
+
+exp_nr = int(re.findall(r'\d+', inputFile)[0])
+run_nr = int(re.findall(r'\d+', inputFile)[1])
 
 # Set log level
 b2.set_log_level(b2.LogLevel.INFO)
@@ -39,28 +44,49 @@ main.add_module('DQMHistAnalysisInputRootFile',
                 RunList=[0],
                 FileList=[inputFile],
                 EventsList=[1],
-                SelectHistograms=["DQMInfo/rtype",
-                                  "SVDExpReco/*",
-                                  "SVDUnpacker/DQMUnpackerHisto",
-                                  "SVDClsTrk/SVDTRK_ClusterTimeV456",
-                                  "SVDEfficiency/*"],
-                EventInterval=1,
-                NullHistogramMode=False,
-                AutoCanvas=False)
-# main.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
+                RunType='physics',
+                EventInterval=1)
 
 main.add_module('Gearbox')
 main.add_module('Geometry')
 
+# enable EPICS
+main.add_module('DQMHistAnalysisEpicsEnable')
+
+# Analysis module to calculate unpacker error
+main.add_module('DQMHistAnalysisSVDUnpacker',
+                samples3=False)
+
 # Analysis module to calculate occupancy of each sensor and check control plots
-main.add_module('DQMHistAnalysisSVDGeneral')
+main.add_module('DQMHistAnalysisSVDOccupancy',
+                samples3=False)
+
+# Analysis module to calculate cluster time on tracks
+main.add_module('DQMHistAnalysisSVDClustersOnTrack',
+                samples3=False)
 
 # Analysis module to calculate efficiency of each sensor
-main.add_module('DQMHistAnalysisSVDEfficiency')
+main.add_module('DQMHistAnalysisSVDEfficiency',
+                samples3=False)
+
+# mirabelle
+main.add_module('DQMHistAnalysisSVDOnMiraBelle')
+
+# Save canvases based on histograms used to prepare monitoring variables and monitoring variables to root file
+main.add_module('DQMHistAnalysisOutputMonObj',
+                exp=exp_nr,
+                run=run_nr)
+
+# Dose analysis
+# main.add_module('DQMHistAnalysisSVDDose')
+
+# injection
+# main.add_module('DQMHistInjection')
 
 # Output canvases to root file
 main.add_module('DQMHistAnalysisOutputFile',
-                HistoFile="output_dqmHistAnalysis.root",
+                OutputFolder="./",
+                Filename=fileOut,
                 SaveHistos=False,
                 SaveCanvases=True)
 

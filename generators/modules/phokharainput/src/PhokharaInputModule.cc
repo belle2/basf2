@@ -23,7 +23,7 @@ REG_MODULE(PhokharaInput);
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
-PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
+PhokharaInputModule::PhokharaInputModule() : GeneratorBaseModule(), m_initial(BeamParameters::c_smearVertex)
 {
   //Set module properties
   setDescription("Generates radiative return events with PHOKHARA 10.");
@@ -82,6 +82,7 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
            defaultParameterFile);
   addParam("BeamEnergySpread", m_BeamEnergySpread,
            "Simulate beam-energy spread (initializes PHOKHARA for every event - very slow).", false);
+
 }
 
 //-----------------------------------------------------------------
@@ -95,7 +96,7 @@ PhokharaInputModule::~PhokharaInputModule()
 //-----------------------------------------------------------------
 //                 Initialize
 //-----------------------------------------------------------------
-void PhokharaInputModule::initialize()
+void PhokharaInputModule::generatorInitialize()
 {
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();
@@ -138,7 +139,7 @@ void PhokharaInputModule::initialize()
 //-----------------------------------------------------------------
 //                 Event
 //-----------------------------------------------------------------
-void PhokharaInputModule::event()
+void PhokharaInputModule::generatorEvent()
 {
 
   // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)

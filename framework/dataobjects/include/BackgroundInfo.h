@@ -17,7 +17,7 @@
 namespace Belle2 {
 
   /**
-   * This class stores the information about what background was mixed or overlayed.
+   * This class stores the information about what background was mixed or overlaid.
    */
   class BackgroundInfo: public Mergeable {
 
@@ -44,12 +44,13 @@ namespace Belle2 {
       BackgroundMetaData::BG_TAG tag = BackgroundMetaData::bg_none;  /**< background tag denoting type */
       std::string type; /**< background type */
       BackgroundMetaData::EFileType fileType = BackgroundMetaData::c_Usual; /**< file type */
-      std::vector<std::string> fileNames;     /**< file names */
+      std::vector<std::string> fileNames; /**< file names */
       double realTime = 0;         /**< real time of BG samlpe */
       unsigned numEvents = 0;      /**< number of events (tree entries) in the sample */
       double scaleFactor = 1;      /**< scale factor for the rate */
       double rate = 0;             /**< background rate of the sample */
       unsigned reused = 0;         /**< number of times the sample is reused */
+      int runNumber = 0;           /**< run number of run-dependent overlay, otherwise 0 */
     };
 
     /**
@@ -132,7 +133,7 @@ namespace Belle2 {
     void setWrapAround(bool wrapAround) {m_wrapAround = wrapAround;}
 
     /**
-     * Set maximal alowed energy deposited in ECL to use BG events
+     * Set maximal allowed energy deposited in ECL to use BG events
      * @param maxEdepECL energy cut [GeV]
      */
     void setMaxEdepECL(double maxEdepECL) {m_maxEdepECL = maxEdepECL;}
@@ -214,7 +215,7 @@ namespace Belle2 {
     bool getWrapAround() const {return m_wrapAround;}
 
     /**
-     * Returns maximal alowed energy deposited in ECL to use BG events
+     * Returns maximal allowed energy deposited in ECL to use BG events
      * @return energy cut [GeV]
      */
     double getMaxEdepECL() const {return m_maxEdepECL;}
@@ -273,7 +274,7 @@ namespace Belle2 {
     double m_maxEdepECL = 0;  /**< maximal allowed deposited energy in ECL */
     std::string m_extensionName; /**< name added to default branch names of background */
 
-    ClassDefOverride(BackgroundInfo, 4); /**< Class definition */
+    ClassDefOverride(BackgroundInfo, 5); /**< Class definition */
   };
 }
 

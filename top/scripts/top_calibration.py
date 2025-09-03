@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -19,6 +18,7 @@ from reconstruction import add_cosmics_reconstruction
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 from caf.framework import Calibration, Collection
 from caf.strategies import SequentialRunByRun, SingleIOV, SequentialBoundaries
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import TOP
 
 
@@ -587,7 +587,7 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=None,
             collection.backend_args = backend_args
 
         #   add collection to calibration
-        cal.add_collection(name='slot_' + '{:0=2d}'.format(slot), collection=collection)
+        cal.add_collection(name='slot_' + f'{slot:02d}', collection=collection)
 
     #   algorithm: it just greps the last iterations of collections and prepares the payload
     algorithm = TOP.TOPAlignmentAlgorithm()
@@ -639,7 +639,7 @@ def channel_mask_calibration(inputFiles, globalTags=None, localDBs=None, unpack=
 def offset_calibration(inputFiles, globalTags=None, localDBs=None,
                        new_cdst_format=True):
     '''
-    Returns calibration object for common T0 calibration with method BF
+    Returns calibration object for the calibration of offsets
     :param inputFiles: A list of input files in cdst data format
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
@@ -687,9 +687,58 @@ def offset_calibration(inputFiles, globalTags=None, localDBs=None,
     return cal
 
 
+def photonYields_calibration(inputFiles, sample='dimuon', globalTags=None, localDBs=None):
+    '''
+    Returns calibration object for photon pixel yields aimed for PMT ageing studies and for finding optically decoupled PMT's
+    :param inputFiles: A list of input files in cdst data format
+    :param sample: data sample ('dimuon' or 'bhabha')
+    :param globalTags: a list of global tags, highest priority first
+    :param localDBs: a list of local databases, highest priority first
+    '''
+
+    #   create path
+    main = basf2.create_path()
+
+    #   add basic modules
+    main.add_module('RootInput')
+    main.add_module('Gearbox')
+    main.add_module('Geometry')
+    main.add_module('Ext')
+    main.add_module('TOPUnpacker')
+    main.add_module('TOPRawDigitConverter')
+    main.add_module('TOPChannelMasker')
+    main.add_module('TOPBunchFinder')
+    if sample == 'bhabha':
+        main.add_module('TOPPDFDebugger', pdgCodes=[11])
+    else:
+        main.add_module('TOPPDFDebugger', pdgCodes=[13])
+
+    #   collector module
+    collector = basf2.register_module('TOPPhotonYieldsCollector')
+    collector.param('sample', sample)
+    collector.param('granularity', 'run')
+
+    #   algorithm
+    algorithm = TOP.TOPPhotonYieldsAlgorithm()
+
+    #   define calibration
+    cal = Calibration(name='TOP_photonYields', collector=collector,
+                      algorithms=algorithm, input_files=inputFiles)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
+    cal.pre_collector_path = main
+    cal.strategies = SequentialBoundaries  # Was SingleIOV before proc12
+
+    return cal
+
+
 def calibration_validation(inputFiles, sample='dimuon', globalTags=None, localDBs=None, new_cdst_format=True):
     '''
-    Returns calibration object for final module T0 calibration with method LL
+    Returns calibration object for calibration validation
     :param inputFiles: A list of input files in cdst data format
     :param sample: data sample ('dimuon' or 'bhabha')
     :param globalTags: a list of global tags, highest priority first

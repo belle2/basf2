@@ -55,6 +55,15 @@ namespace Belle2 {
     };
 
     /**
+     * Enum for identifying run type
+     * (beam or cosmic)
+     */
+    enum ERunType {
+      c_Beam,
+      c_Cosmic
+    };
+
+    /**
     * Converts Const::EDetector object to string.
     * @param det Const::EDetector object to be converted to string
     * @return converted string
@@ -127,12 +136,12 @@ namespace Belle2 {
         /**
          * Operator ==.
          */
-        bool operator==(const Iterator& iterator);
+        bool operator==(const Iterator& iterator) const;
 
         /**
          * Operator !=.
          */
-        bool operator!=(const Iterator& iterator);
+        bool operator!=(const Iterator& iterator) const;
 
         /**
          * Get index.
@@ -171,7 +180,7 @@ namespace Belle2 {
       DetectorSet& operator=(const DetectorSet&) = default;
 
       /**
-       * Constructor for a set containig one detector ID.
+       * Constructor for a set containing one detector ID.
        * @param det  The ID of the detector.
        */
       // cppcheck-suppress noExplicitConstructor
@@ -302,7 +311,7 @@ namespace Belle2 {
       RestrictedDetectorSet(const DetectorSet& set): DetectorSet(set) {checkSet();}
 
       /**
-       * Constructor for a set containg one detector ID.
+       * Constructor for a set containing one detector ID.
        * @param det  The detector ID.
        */
       // cppcheck-suppress noExplicitConstructor
@@ -504,7 +513,7 @@ namespace Belle2 {
      */
     class ParticleSet {
     public:
-      /** Emtpy constructor. */
+      /** Empty constructor. */
       ParticleSet() = default;
 
       /** Copy constructor to make sure particles belong to correct set. */
@@ -689,6 +698,7 @@ namespace Belle2 {
     static const double eMobilitySi;  /**< Electron mobility in intrinsic Silicon at room temperature */
 
     static const double doubleNaN; /**< quiet_NaN */
+    static const float  floatNaN;  /**< quiet_NaN */
 
   private:
     /**

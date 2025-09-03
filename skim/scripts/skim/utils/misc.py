@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -74,7 +73,7 @@ def resolve_skim_modules(SkimsOrModules, *, LocalModule=None):
         elif name in Registry.modules:
             skims.extend(Registry.get_skims_in_module(name))
 
-    duplicates = set([skim for skim in skims if skims.count(skim) > 1])
+    duplicates = {skim for skim in skims if skims.count(skim) > 1}
     if duplicates:
         raise RuntimeError(
             f"Skim{'s'*(len(duplicates)>1)} requested more than once: {', '.join(duplicates)}"
@@ -209,11 +208,16 @@ def fancy_skim_header(SkimClass):
     if isinstance(category, list):
         category = ", ".join(category)
 
+    # If multiple contacts were given, split them up:
+    contacts = re.split(r",\s+and\s+|\s+and\s+|,\s+&\s+|\s+&\s+|,\s+|\s*\n\s*", contact)
     # If the contact is of the form "NAME <EMAIL>" or "NAME (EMAIL)", then make it a link
-    match = re.match("([^<>()`]+) [<(]([^<>()`]+@[^<>()`]+)[>)]", contact)
-    if match:
-        name, email = match[1], match[2]
-        contact = f"`{name} <mailto:{email}>`_"
+    matches = [re.match("([^<>()`]+) [<(]([^<>()`]+@[^<>()`]+)[>)]", contact) for contact in contacts]
+    for i, match in enumerate(matches):
+        if match:
+            name, email = match[1], match[2]
+            contacts[i] = f"`{name} <mailto:{email}>`_"
+        else:
+            contacts[i] = contacts[i]
 
     header = f"""
     Note:
@@ -222,7 +226,7 @@ def fancy_skim_header(SkimClass):
         * **Skim LFN code**: {SkimCode}
         * **Category**: {category}
         * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}
-        * **Contact**: {contact}
+        * **Contact{"s"*(len(contacts) > 1)}**: {", ".join(contacts)}
     """
 
     if SkimClass.ApplyHLTHadronCut:
@@ -261,6 +265,6 @@ def dry_run_steering_file(SteeringFile):
         stderr = proc.stderr.decode("utf-8")
 
         raise RuntimeError(
-            f"An error occured while dry-running steering file {SteeringFile}\n"
+            f"An error occurred while dry-running steering file {SteeringFile}\n"
             f"Script output:\n{stdout}\n{stderr}"
         )

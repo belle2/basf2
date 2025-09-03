@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -20,7 +19,7 @@ import sys
 
 print('***')
 print('*** Used steering script:')
-with open(sys.argv[0], 'r') as fin:
+with open(sys.argv[0]) as fin:
     print(fin.read(), end="")
 print('*** end of the script.')
 print('***')
@@ -39,7 +38,7 @@ main.add_module('Geometry')
 main.add_module('SVDCoGTimeEstimator')
 main.add_module('SVDSimpleClusterizer', Clusters="SVDClusters")
 
-# add tracking recontruction
+# add tracking reconstruction
 add_tracking_reconstruction(main, components=['SVD'])
 # remove cut on CoG in SpacePointCreator
 for module in main.modules():

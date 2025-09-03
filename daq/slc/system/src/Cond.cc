@@ -63,8 +63,7 @@ bool Cond::wait(Mutex& mutex, const unsigned int sec, const unsigned int msec)
   gettimeofday(&now, NULL);
   timeout.tv_sec = now.tv_sec + sec;
   timeout.tv_nsec = now.tv_usec * 1000 + msec;
-  int stat = 0;
-  if ((stat = pthread_cond_timedwait(&m_cond_t, &mutex.m_mu, &timeout)) != 0) {
+  if (pthread_cond_timedwait(&m_cond_t, &mutex.m_mu, &timeout) != 0) { // check on stat code
     return false;
   }
   return true;

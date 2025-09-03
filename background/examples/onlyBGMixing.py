@@ -20,7 +20,7 @@ import glob
 # Example of simulation/reconstruction of events with beam background only.
 #
 # This example runs full simulation of beam BG only events using BeamBkgMixer module,
-# then runs full reconstruction and finaly writes the results to mdst file.
+# then runs full reconstruction and finally writes the results to mdst file.
 # ----------------------------------------------------------------------------------
 
 b2.set_log_level(b2.LogLevel.ERROR)
@@ -44,7 +44,7 @@ eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Simulation
-add_simulation(main, bkgfiles=bg, bkgOverlay=False)
+add_simulation(main, bkgfiles=bg, bkgOverlay=False, simulateT0jitter=False)
 
 # Reconstruction
 add_reconstruction(main)

@@ -777,7 +777,7 @@ namespace Belle2 {
     /// Name of the store array of the eklm hits.
     const std::string& getStoreArrayNameOfEKLMHits() const { return m_storeArrayNameOfEKLMHits; }
 
-    /// Name of the store array of the reco hit informations.
+    /// Name of the store array of the reco hit information.
     const std::string& getStoreArrayNameOfRecoHitInformation() const { return m_storeArrayNameOfRecoHitInformation; }
 
     /// Revert the sorting order of the RecoHitInformation
@@ -945,11 +945,6 @@ namespace Belle2 {
     std::string m_storeArrayNameOfEKLMHits = "";
     /// Store array of added RecoHitInformation.
     std::string m_storeArrayNameOfRecoHitInformation = "";
-    /// Bool is hits were added to track after fitting and the measurements should be recalculated.
-    /// will be true after ROOT deserialization, which means the measurements will be recreated
-    bool m_dirtyFlag = true;
-    /// Flag used in the MCRecoTracksMatcherModule
-    MatchingStatus m_matchingStatus = MatchingStatus::c_undefined;
     /// Quality index for classification of fake vs. MC-matched Tracks.
     float m_qualityIndicator = NAN;
     /// Quality index for flipping.
@@ -964,16 +959,21 @@ namespace Belle2 {
     float m_ingoingArmTime = NAN;
     /// Error of the track time of the ingoing arm
     float m_ingoingArmTimeError = NAN;
+    /// Flag used in the MCRecoTracksMatcherModule
+    MatchingStatus m_matchingStatus = MatchingStatus::c_undefined;
+    /// Number of SVD clusters of the outgoing arm
+    int m_nSVDHitsOfOutgoingArm = 0;
+    /// Number of SVD clusters of the ingoing arm
+    int m_nSVDHitsOfIngoingArm = 0;
+    /// Bool is hits were added to track after fitting and the measurements should be recalculated.
+    /// will be true after ROOT deserialization, which means the measurements will be recreated
+    bool m_dirtyFlag = true;
     /// true if the arms times are already computed, false otherwise
     bool m_isArmTimeComputed = false;
     /// Internal storage of the final ingoing arm time is set
     bool m_hasIngoingArmTime = false;
     /// Internal storage of the final outgoing arm time is set
     bool m_hasOutgoingArmTime = false;
-    /// Number of SVD clusters of the outgoing arm
-    int m_nSVDHitsOfOutgoingArm = 0;
-    /// Number of SVD clusters of the ingoing arm
-    int m_nSVDHitsOfIngoingArm = 0;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.

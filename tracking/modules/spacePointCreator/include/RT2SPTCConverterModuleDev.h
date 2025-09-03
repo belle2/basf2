@@ -121,13 +121,13 @@ namespace Belle2 {
     /** if true only RecoTracks with successful fit will be converted */
     bool m_convertFittedOnly = false;
 
-    /** data members used fot the NoKickCuts method */
+    /** data members used for the NoKickCuts method */
     NoKickRTSel* m_trackSel; /**< member to call method of NoKickCuts selection */
     std::string m_noKickCutsFile; /**< name of TFile of the cuts */
     bool m_noKickOutput; /**< true=produce TFile with effects of NoKickCuts on tracks */
 
 
-    int m_ncut = 0; /**< counter of the cuttet tracks */
+    int m_ncut = 0; /**< counter of the cut tracks */
     int m_npass = 0; /**< counter of the selected tracks */
 
 

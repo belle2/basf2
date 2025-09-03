@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -77,7 +76,7 @@ particlegun.param('varyNTracks', False)
 #                maximal transverse momentum, [min_pt, max_pt]
 # - polyline:    create the momentum to follow an arbitrary distribution given
 #                as a list of x and y coordinates. All y coordinates must be
-#                non-negative and at leas one y coordinate must be positive
+#                non-negative and at least one y coordinate must be positive
 #                [x1, x2, ..., xn, y1, y2, ..., yn]
 # - polylinePt:  same as polyline but for the transverse momentum, not the
 #                total momentum.

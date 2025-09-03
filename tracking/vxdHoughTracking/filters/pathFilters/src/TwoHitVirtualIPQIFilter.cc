@@ -7,7 +7,6 @@
  **************************************************************************/
 #include <tracking/vxdHoughTracking/filters/pathFilters/TwoHitVirtualIPQIFilter.h>
 #include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
-// #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>

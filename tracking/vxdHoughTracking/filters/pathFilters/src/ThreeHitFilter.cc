@@ -7,7 +7,6 @@
  **************************************************************************/
 #include <tracking/vxdHoughTracking/filters/pathFilters/ThreeHitFilter.h>
 #include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
-// #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/BFieldManager.h>

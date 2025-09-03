@@ -15,14 +15,17 @@ Alias K*+sig K*+
 Alias K*-sig K*-
 
 Decay Upsilon(4S)
-1.000  B0 anti-B0 B0sig anti-B0sig VSS_BMIX dm;
+0.5  B+  B-sig      VSS;
+0.5  B+sig  B-      VSS;
 Enddecay
 
-Decay B0sig
+Decay B+sig
 1.000    phisig K*+sig    SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
-
 Enddecay
-CDecay anti-B0sig
+
+Decay B-sig
+1.000    phisig K*-sig    SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
+Enddecay
 
 Decay phisig
 1.0     K+      K-     PHOTOS VSS;
@@ -31,6 +34,9 @@ Enddecay
 Decay K*+sig
 1.0   K_L0       pi+   VSS;
 Enddecay
-CDecay anti-K*+sig
+
+Decay K*-sig
+1.0   K_L0       pi+   VSS;
+Enddecay
 
 End

@@ -224,7 +224,8 @@ const std::string Belle2::VTX::VTXClusterPositionEstimator::getFullName(const st
 int Belle2::VTX::VTXClusterPositionEstimator::getClusterkind(const Belle2::VTXCluster& cluster) const
 {
   Belle2::VxdID sensorID = cluster.getSensorID();
-  const Belle2::VTX::SensorInfo& Info = dynamic_cast<const Belle2::VTX::SensorInfo&>(Belle2::VXD::GeoCache::get(sensorID));
+  const Belle2::VTX::SensorInfo& Info = dynamic_cast<const Belle2::VTX::SensorInfo&>
+                                        (Belle2::VXD::GeoCache::getInstance().getSensorInfo(sensorID));
 
   std::set<int> pixelkinds;
   for (const Belle2::VTXDigit& digit : cluster.getRelationsTo<Belle2::VTXDigit>("VTXDigits")) {
@@ -246,7 +247,8 @@ int Belle2::VTX::VTXClusterPositionEstimator::getClusterkind(const Belle2::VTXCl
 int Belle2::VTX::VTXClusterPositionEstimator::getClusterkind(const std::vector<Belle2::VTX::Pixel>& pixels,
     const Belle2::VxdID& sensorID) const
 {
-  const Belle2::VTX::SensorInfo& Info = dynamic_cast<const Belle2::VTX::SensorInfo&>(Belle2::VXD::GeoCache::get(sensorID));
+  const Belle2::VTX::SensorInfo& Info = dynamic_cast<const Belle2::VTX::SensorInfo&>
+                                        (Belle2::VXD::GeoCache::getInstance().getSensorInfo(sensorID));
 
   std::set<int> pixelkinds;
   for (const Belle2::VTX::Pixel& pix : pixels) {

@@ -35,8 +35,8 @@ Belle2::VTX::VTXGainCalibrator& Belle2::VTX::VTXGainCalibrator::getInstance()
 
 float Belle2::VTX::VTXGainCalibrator::getGainCorrection(Belle2::VxdID id, unsigned int uid, unsigned int vid) const
 {
-  unsigned int rowsPerBin = Belle2::VXD::GeoCache::getInstance().get(id).getVCells() / m_gains.getBinsV();
-  unsigned int drainsPerBin = 4 * Belle2::VXD::GeoCache::getInstance().get(id).getUCells() / m_gains.getBinsU();
+  unsigned int rowsPerBin = Belle2::VXD::GeoCache::getInstance().getSensorInfo(id).getVCells() / m_gains.getBinsV();
+  unsigned int drainsPerBin = 4 * Belle2::VXD::GeoCache::getInstance().getSensorInfo(id).getUCells() / m_gains.getBinsU();
   unsigned int uBin = (uid * 4 + vid % 4) / drainsPerBin;
   unsigned int vBin = vid / rowsPerBin;
   return m_gains.getContent(id.getID(), uBin, vBin);
@@ -44,7 +44,7 @@ float Belle2::VTX::VTXGainCalibrator::getGainCorrection(Belle2::VxdID id, unsign
 
 float Belle2::VTX::VTXGainCalibrator::getADUToEnergy(Belle2::VxdID id, unsigned int uid, unsigned int vid) const
 {
-  Belle2::VTX::SensorInfo info = dynamic_cast<const Belle2::VTX::SensorInfo&>(Belle2::VXD::GeoCache::get(id));
+  Belle2::VTX::SensorInfo info = dynamic_cast<const Belle2::VTX::SensorInfo&>(Belle2::VXD::GeoCache::getInstance().getSensorInfo(id));
   float ADCUnit = info.getADCunit();
   float Gq = info.getGq();
   return Const::ehEnergy * ADCUnit / Gq / getGainCorrection(id, uid, vid);
@@ -54,7 +54,7 @@ float Belle2::VTX::VTXGainCalibrator::getADUToEnergy(Belle2::VxdID id, unsigned 
 
 unsigned short Belle2::VTX::VTXGainCalibrator::getBinU(VxdID id, unsigned int uid, unsigned int vid, unsigned short nBinsU) const
 {
-  unsigned int drainsPerBin = 4 * Belle2::VXD::GeoCache::getInstance().get(id).getUCells() / nBinsU;
+  unsigned int drainsPerBin = 4 * Belle2::VXD::GeoCache::getInstance().getSensorInfo(id).getUCells() / nBinsU;
   return (uid * 4 + vid % 4) / drainsPerBin;
 }
 
@@ -65,7 +65,7 @@ unsigned short Belle2::VTX::VTXGainCalibrator::getBinU(VxdID id, unsigned int ui
 
 unsigned short Belle2::VTX::VTXGainCalibrator::getBinV(VxdID id, unsigned int vid, unsigned short nBinsV) const
 {
-  unsigned int rowsPerBin = Belle2::VXD::GeoCache::getInstance().get(id).getVCells() / nBinsV;
+  unsigned int rowsPerBin = Belle2::VXD::GeoCache::getInstance().getSensorInfo(id).getVCells() / nBinsV;
   return vid / rowsPerBin;
 }
 

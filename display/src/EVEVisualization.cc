@@ -1083,7 +1083,7 @@ void EVEVisualization::addSimHit(const PXDSimHit* hit, const MCParticle* particl
 void EVEVisualization::addSimHit(const VTXSimHit* hit, const MCParticle* particle)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
+  const ROOT::Math::XYZVector& global_pos = geo.getSensorInfo(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const SVDSimHit* hit, const MCParticle* particle)

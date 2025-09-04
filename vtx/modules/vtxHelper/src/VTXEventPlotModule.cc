@@ -53,7 +53,7 @@ void VTXEventPlotModule::beginRun()
   for (VxdID layer : geo.getLayers(SensorInfo::VTX)) {
     for (VxdID ladder : geo.getLadders(layer)) {
       for (VxdID sensorID : geo.getSensors(ladder)) {
-        const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+        const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
         if (m_maxVCell < info.getVCells()) m_maxVCell = info.getVCells()  ;
         if (m_maxUCell < info.getUCells()) m_maxUCell = info.getUCells()  ;
       }
@@ -99,7 +99,7 @@ void VTXEventPlotModule::event()
       occ++;
     }
 
-    const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(currentVxdId));
+    const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(currentVxdId));
     occ = 100.0 * occ / info.getVCells() / info.getUCells();
 
     h->Draw("colz");

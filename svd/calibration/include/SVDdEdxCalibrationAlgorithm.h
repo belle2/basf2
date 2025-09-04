@@ -66,11 +66,6 @@ namespace Belle2 {
     void setMinEvtsPerTree(const double& value) { m_MinEvtsPerTree = value; }
 
     /**
-     * set the number of events to generate, per momentum bin, for the payloads
-     */
-    void setNEventsToGenerate(const int& value) { m_NToGenerate = value; }
-
-    /**
      * reimplement the profile histogram calculation
      */
     void setCustomProfile(bool value = true) { m_CustomProfile = value; }
@@ -114,7 +109,7 @@ namespace Belle2 {
     int m_MinEvtsPerTree =
       100;                                                 /**< number of events in TTree below which we don't try to fit */
     int m_NToGenerate =
-      5000000;                                                     /**< the number of events to be generated in each momentum bin in the new payloads */
+      5e6;                                                     /**< the number of events to be generated in each momentum bin in the new payloads. Please do not change this number unless it's really needed. It is crucial that this is consistent between data and MC payloads, as it affects the minimal possible PID probability value after normalisation. */
     bool m_CustomProfile = 1; /**< reimplement profile histogram calculation instead of the ROOT implementation? */
     bool m_UsePionBGFunctionForEverything =
       0; /**< Assume that the dEdx:betagamma trend is the same for all hadrons; use the pion trend as representative */

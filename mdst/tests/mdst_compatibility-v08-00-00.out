@@ -40,12 +40,14 @@ Untested method EventLevelTrackingInfo::setCDCLayer
 Untested method EventLevelTrackingInfo::setNCDCHitsNotAssigned
 Untested method EventLevelTrackingInfo::setNCDCHitsNotAssignedPostCleaning
 Untested method EventLevelTrackingInfo::setNCDCSegments
+Untested method EventLevelTrackingInfo::setNVTXClustersInLayer
 Untested method EventLevelTrackingInfo::setNVXDClustersInLayer
 Untested method EventLevelTrackingInfo::setPXDCKFAbortionFlag
 Untested method EventLevelTrackingInfo::setSVDCKFAbortionFlag
 Untested method EventLevelTrackingInfo::setSVDFirstSampleTime
 Untested method EventLevelTrackingInfo::setSVDSpacePointCreatorAbortionFlag
 Untested method EventLevelTrackingInfo::setUnspecifiedTrackFindingFailure
+Untested method EventLevelTrackingInfo::setVTXCKFAbortionFlag
 Untested method EventLevelTrackingInfo::setVXDTF2AbortionFlag
 Untested method PIDLikelihood::addPreOfficialLikelihood
 Untested method PIDLikelihood::getDeltaLogL
@@ -3562,6 +3564,13 @@ EventLevelTrackingInfo:
   getNCDCHitsNotAssigned(): 309
   getNCDCHitsNotAssignedPostCleaning(): 186
   getNCDCSegments(): 50
+  getNVTXClustersInLayer(1): 0
+  getNVTXClustersInLayer(2): 0
+  getNVTXClustersInLayer(3): 0
+  getNVTXClustersInLayer(4): 0
+  getNVTXClustersInLayer(5): 0
+  getNVTXClustersInLayer(6): 0
+  getNVTXClustersInLayer(7): 0
   getSVDFirstSampleTime(): 0
   hasAnErrorFlag(): False
   hasCDCLayer(0): True
@@ -3624,6 +3633,7 @@ EventLevelTrackingInfo:
   hasSVDCKFAbortionFlag(): False
   hasSVDSpacePointCreatorAbortionFlag(): False
   hasUnspecifiedTrackFindingFailure(): False
+  hasVTXCKFAbortionFlag(): False
   hasVXDTF2AbortionFlag(): False
 PIDLikelihood#0:
   areAllAvailable(): False
@@ -13691,6 +13701,13 @@ EventLevelTrackingInfo:
   getNCDCHitsNotAssigned(): 279
   getNCDCHitsNotAssignedPostCleaning(): 212
   getNCDCSegments(): 32
+  getNVTXClustersInLayer(1): 0
+  getNVTXClustersInLayer(2): 0
+  getNVTXClustersInLayer(3): 0
+  getNVTXClustersInLayer(4): 0
+  getNVTXClustersInLayer(5): 0
+  getNVTXClustersInLayer(6): 0
+  getNVTXClustersInLayer(7): 0
   getSVDFirstSampleTime(): 0
   hasAnErrorFlag(): False
   hasCDCLayer(0): True
@@ -13753,6 +13770,7 @@ EventLevelTrackingInfo:
   hasSVDCKFAbortionFlag(): False
   hasSVDSpacePointCreatorAbortionFlag(): False
   hasUnspecifiedTrackFindingFailure(): False
+  hasVTXCKFAbortionFlag(): False
   hasVXDTF2AbortionFlag(): False
 PIDLikelihood#0:
   areAllAvailable(): False
@@ -21498,6 +21516,13 @@ EventLevelTrackingInfo:
   getNCDCHitsNotAssigned(): 44
   getNCDCHitsNotAssignedPostCleaning(): 13
   getNCDCSegments(): 4
+  getNVTXClustersInLayer(1): 0
+  getNVTXClustersInLayer(2): 0
+  getNVTXClustersInLayer(3): 0
+  getNVTXClustersInLayer(4): 0
+  getNVTXClustersInLayer(5): 0
+  getNVTXClustersInLayer(6): 0
+  getNVTXClustersInLayer(7): 0
   getSVDFirstSampleTime(): 0
   hasAnErrorFlag(): False
   hasCDCLayer(0): False
@@ -21560,6 +21585,7 @@ EventLevelTrackingInfo:
   hasSVDCKFAbortionFlag(): False
   hasSVDSpacePointCreatorAbortionFlag(): False
   hasUnspecifiedTrackFindingFailure(): False
+  hasVTXCKFAbortionFlag(): False
   hasVXDTF2AbortionFlag(): False
 PIDLikelihood#0:
   areAllAvailable(): False

@@ -240,8 +240,5 @@ namespace Belle2 {
 
     //! Map storing the standard number degrees of freedom for a single hit by detector */
     std::map<int, NDF> m_ndf_by_detId = {{Const::PXD, 2}, {Const::SVD, 1}, {Const::VTX, 2}, {Const::CDC, 1}};
-
-    //! Flag to indicated whether the Monte Carlo track are on the DataStore
-    bool m_mcParticlesPresent = false;
   };
 }

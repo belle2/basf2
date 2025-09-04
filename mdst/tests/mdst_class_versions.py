@@ -27,7 +27,7 @@ EXPECTED_CHECKSUMS = {
     "Belle2::Const::DetectorSet": (1, 1222446098),
     "Belle2::ECLCluster": (16, 2788194468),
     "Belle2::EventLevelClusteringInfo": (4, 1906636092),
-    "Belle2::EventLevelTrackingInfo": (3, 1207148192),
+    "Belle2::EventLevelTrackingInfo": (4, 1160013694),
     "Belle2::EventMetaData": (4, 2999207747),
     "Belle2::FileMetaData": (11, 3436141238),
     "Belle2::KLMCluster": (4, 668746673),

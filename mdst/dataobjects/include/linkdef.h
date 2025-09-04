@@ -25,7 +25,7 @@
 #pragma link C++ class pair<Belle2::TrackFitResult*, Belle2::TrackFitResult*>+; // checksum=0x62cc1b16, version=-1
 #pragma link C++ class pair<Belle2::Track*, Belle2::Track*>+; // checksum=0x43730546, version=-1
 #pragma link C++ class pair<short, short>+; // checksum=0x7069a6e4, version=-1
-#pragma link C++ class Belle2::EventLevelTrackingInfo+; // checksum=0x4524677e, version=3
+#pragma link C++ class Belle2::EventLevelTrackingInfo+; // checksum=0x4524677e, version=4
 #pragma link C++ class Belle2::TRGSummary+; // checksum=0x4ef2176b, version=8
 #pragma link C++ class Belle2::SoftwareTriggerResult+; // checksum=0xe5e47e9, version=5
 #pragma link C++ class Belle2::EventLevelTriggerTimeInfo+; // checksum=0x1d9e5f4f, version=2

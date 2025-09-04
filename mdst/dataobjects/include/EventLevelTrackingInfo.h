@@ -358,6 +358,6 @@ namespace Belle2 {
     /** Set of further flags useful in the context of tracking reconstruction. */
     std::bitset<16> m_flagBlock;
 
-    ClassDef(EventLevelTrackingInfo, 3); /**< ROOTification. */
+    ClassDef(EventLevelTrackingInfo, 4); /**< ROOTification. */
   };
 }

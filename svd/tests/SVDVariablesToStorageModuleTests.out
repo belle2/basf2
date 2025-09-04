@@ -17,8 +17,8 @@ TBranch: SVDClusterSize, 4
 TBranch: SVDClusterTime, -0.848
 TBranch: SVDTrackPrime, nan
 TBranch: SVDResidual, nan
-TBranch: SVDLayer, 3
-TBranch: SVDLadder, 1
-TBranch: SVDSensor, 2
+TBranch: SVDLayer, 6
+TBranch: SVDLadder, 5
+TBranch: SVDSensor, 0
 TBranch: SVDSide, True
 Test passed. Cleaning up.

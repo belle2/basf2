@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef VXDMisalignmentModule_H
-#define VXDMisalignmentModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -42,5 +41,3 @@ namespace Belle2 {
 
   } // end namespace VXD
 } // end namespace Belle2
-
-#endif // VXDMisalignmentModule_H

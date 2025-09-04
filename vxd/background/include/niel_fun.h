@@ -5,8 +5,8 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef _VXD_TNiel_
-#define _VXD_TNiel_
+
+#pragma once
 
 #include <string>
 
@@ -34,5 +34,3 @@ public:
   double getNielFactor(double EMeV);
 
 };
-
-#endif

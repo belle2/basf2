@@ -8,10 +8,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
-#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
+    class VXDHoughState;
     /// Base filter for hits stored in the VXDHoughState
     using BaseRelationFilter = TrackFindingCDC::Filter<std::pair<const VXDHoughState*, const VXDHoughState*>>;
   }

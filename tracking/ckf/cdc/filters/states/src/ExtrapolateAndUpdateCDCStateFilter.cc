@@ -7,13 +7,15 @@
  **************************************************************************/
 #include <tracking/ckf/cdc/filters/states/ExtrapolateAndUpdateCDCStateFilter.h>
 
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;

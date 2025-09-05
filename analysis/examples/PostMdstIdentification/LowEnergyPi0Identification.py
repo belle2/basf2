@@ -53,7 +53,7 @@ if arguments.belle1:
     payload_name_suffix = 'Belle1'
     tag = ma.getAnalysisGlobaltagB2BII()
 else:
-    payload_name_suffix = 'Belle2Release5'
+    payload_name_suffix = 'Belle2Release6'
     tag = ma.getAnalysisGlobaltag()
 
 # lowEnergyPi0Identification requires a payload stored in the analysis global tag
@@ -76,6 +76,3 @@ analysis_path.add_module('Progress')
 
 # Process the events.
 basf2.process(analysis_path)
-
-# Print out the summary.
-print(basf2.statistics)

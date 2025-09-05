@@ -33,7 +33,7 @@ main.add_module('RootOutput', outputFileName=sys.argv[2])
 main.add_module('Progress')
 
 # Processing.
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(basf2.statistics)

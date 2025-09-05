@@ -15,7 +15,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <algorithm>
-#include <limits>
 
 namespace Belle2::Variable {
 
@@ -41,7 +40,7 @@ namespace Belle2::Variable {
   {
     const auto* bkgDescription = getBackgroundDescription();
     if (not bkgDescription)
-      return std::numeric_limits<int>::quiet_NaN();
+      return 0;
     return bkgDescription->reused;
   }
 
@@ -49,7 +48,7 @@ namespace Belle2::Variable {
   {
     const auto* bkgDescription = getBackgroundDescription();
     if (not bkgDescription)
-      return std::numeric_limits<int>::quiet_NaN();
+      return 0;
     return bkgDescription->numEvents;
   }
 

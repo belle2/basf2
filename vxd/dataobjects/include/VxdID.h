@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef VXDID_H
-#define VXDID_H
+#pragma once
 
 #include <string>
 #include <ostream>
@@ -134,5 +133,3 @@ namespace Belle2 {
   /** Print id to stream by converting it to string */
   std::ostream& operator<<(std::ostream& out, const VxdID& id);
 }
-
-#endif //VXDID_H

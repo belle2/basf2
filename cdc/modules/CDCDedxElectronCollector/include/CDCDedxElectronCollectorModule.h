@@ -13,13 +13,10 @@
 #include <calibration/CalibrationCollectorModule.h>
 
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/ECLCluster.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <cdc/dataobjects/CDCDedxTrack.h>
 #include <cdc/dbobjects/CDCDedxWireGain.h>

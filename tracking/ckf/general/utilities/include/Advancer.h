@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
 #include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
 
-#include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/SharedPlanePtr.h>
 
 #include <string>

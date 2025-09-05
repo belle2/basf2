@@ -15,6 +15,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include "utilities/TestParticleFactory.h"
 using namespace std;

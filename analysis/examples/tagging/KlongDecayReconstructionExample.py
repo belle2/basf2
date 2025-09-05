@@ -86,6 +86,3 @@ ma.variablesToNtuple('B0', variables=variableList, filename="Reconstruct_jpsi_kl
 
 # Process all modules added to the main path
 basf2.process(main)
-
-# Print out the summary
-print(basf2.statistics)

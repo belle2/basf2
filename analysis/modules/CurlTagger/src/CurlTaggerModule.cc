@@ -10,6 +10,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <analysis/variables/TrackVariables.h>
@@ -21,6 +22,7 @@
 
 //Module Includes
 #include <analysis/modules/CurlTagger/Bundle.h>
+#include <analysis/modules/CurlTagger/Selector.h>
 #include <analysis/modules/CurlTagger/SelectorCut.h>
 #include <analysis/modules/CurlTagger/SelectorMVA.h>
 
@@ -149,7 +151,7 @@ void CurlTaggerModule::event()
         if (bundlesResponse.size() > 0) {
           auto maxElement = std::max_element(bundlesResponse.begin(), bundlesResponse.end());
           if (*maxElement > m_ResponseCut) {
-            int maxPosition = std::distance(std::begin(bundlesResponse), maxElement);
+            int maxPosition = std::distance(bundlesResponse.begin(), maxElement);
             bundles[maxPosition].addParticle(iPart);
             addedParticleToBundle = true;
           }

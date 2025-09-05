@@ -157,9 +157,6 @@ main.add_module(progress)
 # Process events
 b2.process(main)
 
-# Print call statistics
-print(b2.statistics)
-
 # Make basic performance plots
 # com = 'root -l ' + options.filename + ' ' + home + '/arich/utility/scripts/plotEfficiency.C'
 # os.system(com)

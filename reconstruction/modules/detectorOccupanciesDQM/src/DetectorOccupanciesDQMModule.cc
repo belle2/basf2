@@ -8,6 +8,16 @@
 
 #include "reconstruction/modules/detectorOccupanciesDQM/DetectorOccupanciesDQMModule.h"
 
+#include <framework/dataobjects/EventMetaData.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <mdst/dataobjects/TRGSummary.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMHit1d.h>
+#include <klm/dataobjects/KLMDigit.h>
+#include <arich/dataobjects/ARICHHit.h>
+#include <top/dataobjects/TOPDigit.h>
+
 #include <TDirectory.h>
 
 

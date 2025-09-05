@@ -32,11 +32,11 @@ mypath = b2.create_path()
 # ..override ECL geometry if requested
 newGeom = 0
 narg = len(sys.argv)
-if(narg == 2):
+if (narg == 2):
     newGeom = int(sys.argv[1])
-if(newGeom == 1):
+if (newGeom == 1):
     b2.conditions.globaltags = ['ecl_alignment']
-if(newGeom == 2):
+if (newGeom == 2):
     b2.conditions.prepend_testing_payloads("localdb/database.txt")
 print(b2.conditions.globaltags)
 inputMdst(
@@ -49,5 +49,5 @@ mypath.add_module('Geometry')
 mypath.add_module('ECLDumpGeometry')
 
 # ..Process the events
-b2.process(mypath)
+b2.process(mypath, calculateStatistics=True)
 print(b2.statistics)

@@ -23,5 +23,5 @@ simulation.add_simulation(main)
 main.add_module("RootOutput")
 main.add_module("Progress")
 
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 print(basf2.statistics)

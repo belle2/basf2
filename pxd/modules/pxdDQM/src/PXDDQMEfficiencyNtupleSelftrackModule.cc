@@ -7,10 +7,13 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDDQMEfficiencyNtupleSelftrackModule.h>
+
+#include <pxd/dataobjects/PXDCluster.h>
 #include <tracking/dataobjects/ROIid.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <pxd/reconstruction/PXDPixelMasker.h>
-#include <mdst/dataobjects/Track.h>
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/VectorUtil.h>
 

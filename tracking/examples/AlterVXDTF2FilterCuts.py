@@ -73,5 +73,5 @@ main.add_module(eventinfosetter)
 main.add_module(SMBSM1)
 b2.print_path(main)
 # run path
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

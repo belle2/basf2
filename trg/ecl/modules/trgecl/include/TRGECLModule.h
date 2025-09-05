@@ -58,7 +58,7 @@ namespace Belle2 {
   private: //! Parameters
 
     /** Debug level.*/
-    int m_debugLevel;
+    int m_debugLevel = 0;
 
     /** Config. file name.*/
     std::string m_configFilename;
@@ -88,26 +88,24 @@ namespace Belle2 {
     int m_nRun = 0;
     //!  Event number
     int m_nEvent = 0;
-    //! Bhabha option
-    int m_Bhabha;
     //! Clustering option
-    int m_Clustering;
+    int m_Clustering = 1;
     //! Cluster Limit
-    int m_ClusterLimit;
+    int m_ClusterLimit = 6;
     //! Eventtiming option
-    int m_EventTiming;
+    int m_EventTiming = 1;
     //! Trigger decision time window
-    double m_TimeWindow;
+    double m_TimeWindow = 250.0;
     //! Trigger decision overlap window in order to avoid boundary effect
-    double m_OverlapWindow;
+    double m_OverlapWindow = 125.0;
     //! # of considered TC in energy weighted Timing method
-    int m_NofTopTC;
+    int m_NofTopTC = 3;
     //! Event selection
-    int m_SelectEvent;
+    int m_SelectEvent = 1;
     //! Flag to use Condition DB
-    bool m_ConditionDB;
+    bool m_ConditionDB = true;
     //! conversion factor of ADC to Energy in GeV
-    double m_ADCtoEnergy;
+    double m_ADCtoEnergy = 0.0;
     //! Total Energy Threshold (low, high, lum) in Lab in GeV
     std::vector<double> m_TotalEnergy;
     //! 2D Bhabha Energy Threshold
@@ -125,7 +123,7 @@ namespace Belle2 {
     //! 3D Selection Bhabha preselection
     std::vector<int> m_3DBhabhaSelectionPreScale;
     //! mumu bit Energy Threshold
-    double m_mumuThreshold;
+    double m_mumuThreshold = 0.0;
     //! mumu bit  Angle
     std::vector<int> m_mumuAngle;
     //! Low Multiplicity cluster E cut in Lab in GeV
@@ -133,13 +131,13 @@ namespace Belle2 {
     //! Low Multiplicity cluster E cut in CMS in GeV
     std::vector<double> m_lmlCLECMSCut;
     //! lml0 the number of cluster for minimum energy
-    int m_lml00NCLforMinE;
+    int m_lml00NCLforMinE = 0;
     //! lml12 the number of cluster for minimum energy
-    int m_lml12NCLforMinE;
+    int m_lml12NCLforMinE = 0;
     //! lml13 cluster ThetaID selection
-    int m_lml13ThetaIdSelection;
+    int m_lml13ThetaIdSelection = 0;
     //!ECL Burst Bit Threshold
-    double m_ECLBurstThreshold;
+    double m_ECLBurstThreshold = 0.0;
     //! Energy threshold(low, high) of event timing quality flag (GeV)
     std::vector<double> m_EventTimingQualityThreshold;
     //! Theta region (low, high) of 3D Bhabha Veto InTrack
@@ -148,27 +146,27 @@ namespace Belle2 {
     //! (dphi low, dphi high, theta_sum low, theta_sum high)
     std::vector<int> m_taub2bAngleCut;
     //! taub2b total energy (TC theta ID =1-17) (GeV)
-    double m_taub2bEtotCut;
+    double m_taub2bEtotCut = 0.0;
     //! taub2b Cluster energy selection in Lab (GeV)
-    double m_taub2bCLELabCut;
+    double m_taub2bCLELabCut = 0.0;
     //! (hie1 and hie2) 2 cluster angle cut in CMS in degree for Bhabha veto in hie1 and hie2
     std::vector<int> m_hie12BhabhaVetoAngle;
     //! taub2b2 total energy cut in Lab (GeV)
-    double m_taub2b2EtotCut;
+    double m_taub2b2EtotCut = 0.0;
     //! taub2b2 two Cluster angle cut (degree)
     std::vector<int> m_taub2b2AngleCut;
     //! taub2b2 cluster energy cut(low, high) (GeV) in lab
     std::vector<double> m_taub2b2CLELabCut;
     //! taub2b3 total energy cut in lab (GeV)
-    double m_taub2b3EtotCut;
+    double m_taub2b3EtotCut = 0.0;
     //! taub2b3 two Cluster angle cut in cms (degree)
     std::vector<int> m_taub2b3AngleCut;
     //! taub2b3 cluster energy cut in lab for one of b2b clusters (GeV)
-    double m_taub2b3CLEb2bLabCut;
+    double m_taub2b3CLEb2bLabCut = 0.0;
     //! taub2b3 cluster energy cut(low and high) in lab for all clusters (GeV)
     std::vector<double> m_taub2b3CLELabCut;
     //! (hie4) CL E cut for minimum energy cluster
-    double m_hie4LowCLELabCut;
+    double m_hie4LowCLELabCut = 0.0;
 
     //! ETM (ecl trigger master) to generate all trigger bits of ecl trigger
     TrgEclMaster* etm;

@@ -12,15 +12,12 @@
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dbobjects/CDCBadWires.h>
-#include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
 #include <TH2F.h>
 #include <TFitResult.h>
-#include <TH1F.h>
 #include <TF1.h>
 #include <TGraphAsymmErrors.h>
 #include <TMath.h>
-#include <math.h>
 
 using namespace Belle2;
 using namespace CDC;

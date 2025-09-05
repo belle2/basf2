@@ -88,6 +88,4 @@ main.add_module(CheckData()).set_name("checkdata 3")
 
 basf2.print_path(main)
 basf2.process(main)
-
-print(basf2.statistics)
 # @endcond

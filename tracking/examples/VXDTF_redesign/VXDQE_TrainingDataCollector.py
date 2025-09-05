@@ -62,7 +62,7 @@ def main():
     path.add_module(data)
 
     b2.print_path(path)
-    b2.process(path)
+    b2.process(path, calculateStatistics=True)
     print(b2.statistics)
 
 

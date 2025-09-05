@@ -250,25 +250,48 @@ def injection_validation(path, suffix):
         plt.close()
 
 
-def mom_validation(path, suffix, modes=("acos", "negCosth", "posCosth"), prefix=""):
-    pdf_path = os.path.join("plots", "validation", f"dedx_vs_mom_{prefix}{suffix}.pdf")
-    os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+def mom_validation(path, suffix):
 
-    with PdfPages(pdf_path) as pdf:
-        for mode in modes:
+    cos_labels = [
+        "acos",
+        "cos$\\theta > 0.0$",
+        "cos$\\theta < 0.0$",
+        "cos$\\theta \\leq -0.8$",
+        "cos$\\theta > -0.8$ and $\\cos\\theta \\leq -0.6$",
+        "cos$\\theta > -0.6$ and $\\cos\\theta \\leq -0.4$",
+        "cos$\\theta > -0.4$ and $\\cos\\theta \\leq -0.2$",
+        "cos$\\theta > -0.2$ and $\\cos\\theta \\leq 0$",
+        "cos$\\theta > 0$ and $\\cos\\theta \\leq 0.2$",
+        "cos$\\theta > 0.2$ and $\\cos\\theta \\leq 0.4$",
+        "cos$\\theta > 0.4$ and $\\cos\\theta \\leq 0.6$",
+        "cos$\\theta > 0.6$ and $\\cos\\theta \\leq 0.8$",
+        "cos$\\theta > 0.8$"
+    ]
+
+    # Define output PDFs
+    pdf_paths = {
+        "low": os.path.join("plots", "validation", f"dedx_vs_mom_{suffix}.pdf"),
+        "high": os.path.join("plots", "validation", f"dedx_vs_mom_{suffix}_cosbins.pdf"),
+    }
+    os.makedirs(os.path.dirname(pdf_paths["low"]), exist_ok=True)
+
+    with PdfPages(pdf_paths["low"]) as pdf_low, PdfPages(pdf_paths["high"]) as pdf_high:
+        for i in range(13):
             try:
-                val_path_el = os.path.join(path, "plots", "mom", f"dedx_vs_mom_{prefix}{mode}_elec_{suffix}.txt")
-                val_path_po = os.path.join(path, "plots", "mom", f"dedx_vs_mom_{prefix}{mode}_posi_{suffix}.txt")
+                val_path_el = os.path.join(path, "plots", "mom",
+                                           f"dedx_vs_mom_{i}_elec_{suffix}.txt")
+                val_path_po = os.path.join(path, "plots", "mom",
+                                           f"dedx_vs_mom_{i}_posi_{suffix}.txt")
 
                 df_el = pd.read_csv(val_path_el, sep=" ", header=None,
                                     names=["mom", "mean", "mean_err", "reso", "reso_err"])
                 df_po = pd.read_csv(val_path_po, sep=" ", header=None,
                                     names=["mom", "mean", "mean_err", "reso", "reso_err"])
             except FileNotFoundError:
-                logger.error(f"Momentum data files not found for mode={mode} in {path}/plots/mom/")
+                logger.error(f"Missing momentum data for bin {i} (suffix={suffix})")
                 continue
 
-            df_el['mom'] *= -1
+            df_el['mom'] *= -1  # flip electron momentum
 
             fig, ax = plt.subplots(2, 2, figsize=(20, 12))
 
@@ -304,10 +327,18 @@ def mom_validation(path, suffix, modes=("acos", "negCosth", "posCosth"), prefix=
                               fmt='*', markersize=10, rasterized=True, label='positron')
                 ax_i.legend(fontsize=17)
                 ax_i.set_title(panel["title"], fontsize=14)
+                if i == 3 and panel["df_col"] == "reso":
+                    ymin, ymax = ax_i.get_ylim()
+                    ax_i.set_ylim(ymin, ymax * 1.5)
 
-            fig.suptitle(f"dE/dx vs Momentum ({prefix}{mode})", fontsize=20)
+            fig.suptitle(f"dE/dx vs Momentum ({cos_labels[i]})", fontsize=20)
             plt.tight_layout()
-            pdf.savefig(fig)
+
+            # Save to correct PDF
+            if i <= 2:
+                pdf_low.savefig(fig)
+            else:
+                pdf_high.savefig(fig)
             plt.close()
 
 
@@ -408,8 +439,6 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
             logger.info("Processing momentum validation plots...")
             mom_validation(val_path, suffix)
 
-            logger.info("Processing momentum validation plots in cos bins...")
-            mom_validation(val_path, suffix, prefix="inCos_")
             logger.info("Processing 1D validation plots...")
             oneDcell_validation(val_path, suffix)
 

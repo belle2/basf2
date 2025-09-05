@@ -133,25 +133,28 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   m_tbins = vtlocaledges.size() - 1;
   m_tedges = &vtlocaledges[0];
 
-  std::array<std::array<std::vector<TH1D*>, 2>, 3> hdedx_mom, hdedx_mom_inCos;
+  std::array<std::array<std::vector<TH1D*>, 2>, 13> hdedx_mom;
   std::array<std::vector<TH1D*>, 2> hdedx_mom_peaks, hdedx_inj, hdedx_oned;
   TH1D* htimes = new TH1D("htimes", "", m_tbins, m_tedges);
 
   const double momBinWidth = (m_momMax - m_momMin) / m_momBins;
   const double momBinW = (4.0 - m_momMin) / 4;
 
-  std::string scos[3] = {"acos", "posCosth", "negCosth"};
+  std::string scos[13] = {"acos", "cos#theta > 0.0", "cos#theta < 0.0", "cos#theta <= -0.8",
+                          "cos#theta > -0.8 and cos#theta <= -0.6",
+                          "cos#theta > -0.6 and cos#theta <= -0.4", "cos#theta > -0.4 and cos#theta <= -0.2",
+                          "cos#theta > -0.2 and cos#theta <= 0", "cos#theta > 0 and cos#theta <= 0.2",
+                          "cos#theta > 0.2 and cos#theta <= 0.4", "cos#theta > 0.4 and cos#theta <= 0.6",
+                          "cos#theta > 0.6 and cos#theta <= 0.8", "cos#theta > 0.8"
+                         };
   std::string stype[2] = {"posi", "elec"};
   std::string sLayer[2] = {"IL", "OL"};
 
   // Define histograms for momentum bins and charge types
-  for (int ic = 0; ic < 3; ic++) {
+  for (int ic = 0; ic < 13; ic++) {
     for (int it = 0; it < 2; ++it) {
       hdedx_mom[ic][it].resize(m_momBins);
-      hdedx_mom_inCos[ic][it].resize(m_momBins);
-
-      defineHisto(hdedx_mom[ic][it], "mom", Form("%s_%s", scos[ic].data(), stype[it].data()));
-      defineHisto(hdedx_mom_inCos[ic][it], "mom", Form("inCos_%s_%s", scos[ic].data(), stype[it].data()));
+      defineHisto(hdedx_mom[ic][it], "mom", Form("%d_%s", ic, stype[it].data()));
     }
   }
 
@@ -167,7 +170,7 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   }
 
   double eaBW = (m_eaMax - m_eaMin) / m_eaBin;
-  double icos[2] = {0, -1};
+  double icos[3] = {0, -1, -1};
   double chgtype;
 
   // Loop over all the entries in the tree
@@ -181,7 +184,11 @@ void CDCDedxValidationAlgorithm::radeeValidation()
     int binIndex = static_cast<int>((abs(p) - m_momMin) / momBinWidth);
 
     // Determine cos(theta) category
-    icos[1] = (costh > 0) ? 1 : ((costh < 0) ? 2 : 0);
+
+    icos[1] = (costh > 0) ? 1 : 2;
+    icos[2] = int((costh + 1.0) / 0.2) + 3;
+    if (icos[2] < 3)  icos[2] = 3;
+    if (icos[2] > 12) icos[2] = 12;
 
     // Determine charge type
     chgtype = (charge > 0) ? 0 : 1;
@@ -190,11 +197,7 @@ void CDCDedxValidationAlgorithm::radeeValidation()
     if (binIndex >= 0 && binIndex < m_momBins) {
       hdedx_mom[icos[0]][chgtype][binIndex]->Fill(dedx);
       hdedx_mom[icos[1]][chgtype][binIndex]->Fill(dedx);
-
-      if (costh > -0.3 && costh < 0.3) {
-        hdedx_mom_inCos[icos[0]][chgtype][binIndex]->Fill(dedx);
-        hdedx_mom_inCos[icos[1]][chgtype][binIndex]->Fill(dedx);
-      }
+      hdedx_mom[icos[2]][chgtype][binIndex]->Fill(dedx);
     }
 
     // Add larger times to the last bin
@@ -231,11 +234,9 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   }
 
 
-  for (int ic = 0; ic < 3; ic++) {
+  for (int ic = 0; ic < 13; ic++) {
     for (int it = 0; it < 2; ++it) {
-      printCanvas(hdedx_mom[ic][it], Form("plots/mom/dedx_vs_mom_%s_%s_%s", scos[ic].data(), stype[it].data(), m_suffix.data()), "mom");
-      printCanvas(hdedx_mom_inCos[ic][it], Form("plots/mom/dedx_vs_mom_inCos_%s_%s_%s", scos[ic].data(), stype[it].data(),
-                                                m_suffix.data()), "mom");
+      printCanvas(hdedx_mom[ic][it], Form("plots/mom/dedx_vs_mom_%d_%s_%s", ic, stype[it].data(), m_suffix.data()), "mom");
     }
   }
   for (int it = 0; it < 2; ++it) {

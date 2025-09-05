@@ -95,23 +95,37 @@ HadronSaturation::printEvents(int firstevent = 0, int nevents = 50)
 
 }
 
-double HadronSaturation::myFunction(double alpha, double gamma, double delta, double power, double ratio)
+double HadronSaturation::myFunction(double alpha, double gamma, double delta,
+                                    double power, double ratio)
 {
-
   unsigned int nevt = m_dedx.size();
-  double chisq = 0, dedxsum = 0;
-  std::vector< double > vdedxavg;
+  if (nevt == 0) {
+    B2ERROR("HadronSaturation::myFunction called with no events!");
+    return 1e9; // large chi2 to signal bad fit
+  }
 
-  // Compute the average value (across cos(theta)) for each bin of beta-gamma.
-  // NOTE: the correction is not constrained to a certain value (1), it
-  // changes as a function of beta gamma...
+  if (m_cosbins <= 0) {
+    B2ERROR("HadronSaturation::myFunction invalid cosbins = " << m_cosbins);
+    return 1e9;
+  }
+
+  double chisq = 0;
+  double dedxsum = 0;
+  std::vector<double> vdedxavg;
+
   CDCDedxHadSat hadsat;
 
-  double dedxcor;
+  // --- compute averages ---
   for (unsigned int i = 0; i < nevt; i++) {
+    double dedxcor = hadsat.D2I(
+                       m_costheta[i],
+                       hadsat.I2D(m_costheta[i], 1.0, alpha, gamma, delta, power, ratio) * m_dedx[i],
+                       alpha, gamma, delta, power, ratio);
 
-    dedxcor = hadsat.D2I(m_costheta[i], hadsat.I2D(m_costheta[i], 1.0, alpha, gamma, delta, power, ratio) * m_dedx[i], alpha, gamma,
-                         delta, power, ratio);
+    if (!std::isfinite(dedxcor)) {
+      B2WARNING("Non-finite dedxcor at event " << i);
+      continue;
+    }
 
     dedxsum += dedxcor;
 
@@ -122,13 +136,26 @@ double HadronSaturation::myFunction(double alpha, double gamma, double delta, do
     }
   }
 
-  // Construct a chi^2 value for the difference between the average in a cosine bin
-  // to the actual values
-  for (unsigned int i = 0; i < nevt; i++) {
-    dedxcor = hadsat.D2I(m_costheta[i], hadsat.I2D(m_costheta[i], 1.0, alpha, gamma, delta, power, ratio) * m_dedx[i], alpha, gamma,
-                         delta, power, ratio);
+  if (vdedxavg.empty()) {
+    B2ERROR("HadronSaturation::myFunction failed to compute averages!");
+    return 1e9;
+  }
 
-    int j = (int)i / m_cosbins;
+  // --- compute chi2 ---
+  for (unsigned int i = 0; i < nevt; i++) {
+    double dedxcor = hadsat.D2I(
+                       m_costheta[i],
+                       hadsat.I2D(m_costheta[i], 1.0, alpha, gamma, delta, power, ratio) * m_dedx[i],
+                       alpha, gamma, delta, power, ratio);
+
+    if (!std::isfinite(dedxcor) || m_dedxerror[i] <= 0) continue;
+
+    int j = i / m_cosbins;
+    if (j >= int(vdedxavg.size())) {
+      B2WARNING("Index " << j << " out of range for vdedxavg!");
+      continue;
+    }
+
     chisq += pow((dedxcor - vdedxavg[j]) / m_dedxerror[i], 2);
     B2INFO("\t " << i << ") " << dedxcor << "/" << vdedxavg[j] << ", error was "
            << m_dedxerror[i] << " De = " << hadsat.I2D(m_costheta[i], 1.0, alpha, gamma, delta, power, ratio) <<
@@ -148,19 +175,29 @@ void
 HadronSaturation::fitSaturation()
 {
 
+  if (m_dedx.empty()) {
+    B2ERROR("HadronSaturation::fitSaturation - no data to fit!");
+    return;
+  }
+
   B2INFO("\t Performing the hadron saturation fit...");
 
   // Construct the fitter
   TFitter* minimizer = new TFitter(5);
   minimizer->SetFCN(HadronSaturation::minuitFunction);
 
-  minimizer->SetParameter(0, "alpha", m_alpha, gRandom->Rndm() * 0.001, -5.0, 5.0);
-  minimizer->SetParameter(1, "gamma", m_gamma, gRandom->Rndm() * 0.001, -5.0, 5.0);
-  minimizer->SetParameter(2, "delta", m_delta, gRandom->Rndm() * 0.001, 0, 0.50);
-  minimizer->SetParameter(3, "power", m_power, gRandom->Rndm() * 0.01, 0.05, 2.5);
-  minimizer->SetParameter(4, "ratio", m_ratio, gRandom->Rndm() * 0.01, 0.5, 2);
-  minimizer->FixParameter(2);
-  minimizer->FixParameter(4);
+  auto setPar = [&](int idx, const char* name, double val, double step,
+  double low, double high, bool fix = false) {
+    minimizer->SetParameter(idx, name, val, step, low, high);
+    if (fix) minimizer->FixParameter(idx);
+  };
+
+  // Set initial parameters with reasonable ranges
+  setPar(0, "alpha", m_alpha, gRandom->Rndm() * 0.001, -5.0, 5.0);
+  setPar(1, "gamma", m_gamma, gRandom->Rndm() * 0.001, -5.0, 5.0);
+  setPar(2, "delta", m_delta, gRandom->Rndm() * 0.001, 0, 0.50, true);
+  setPar(3, "power", m_power, gRandom->Rndm() * 0.01, 0.05, 2.5);
+  setPar(4, "ratio", m_ratio, gRandom->Rndm() * 0.01, 0.5, 2, true);
 
   // Set minuit fitting strategy
   double arg[10];
@@ -178,7 +215,10 @@ HadronSaturation::fitSaturation()
   double eps_machine(std::numeric_limits<double>::epsilon());
   minimizer->ExecuteCommand("SET EPS", &eps_machine, 1);
 
-  double fitpar[5], fiterr[5];
+
+  double maxcalls(5000.), tolerance(0.1);
+  double arglist[] = {maxcalls, tolerance};
+  unsigned int nargs(2);
 
   for (int i = 0; i < 30; ++i) {
 
@@ -190,9 +230,7 @@ HadronSaturation::fitSaturation()
     minimizer->FixParameter(2);
     minimizer->FixParameter(4);
 
-    double maxcalls(5000.), tolerance(0.1);
-    double arglist[] = {maxcalls, tolerance};
-    unsigned int nargs(2);
+
     minimizer->ExecuteCommand("MIGRAD", arglist, nargs);
     minimizer->ExecuteCommand("MIGRAD", arglist, nargs);
     int status = minimizer->ExecuteCommand("HESSE", arglist, nargs);
@@ -218,9 +256,12 @@ HadronSaturation::fitSaturation()
 
     if (status != 0) {
       B2INFO("\t HadronSaturation::ERROR - BAD FIT!");
+      delete minimizer;
       return;
     }
   }
+
+  double fitpar[5], fiterr[5];
 
   for (int par = 0; par < 5; ++par) {
     fitpar[par] = minimizer->GetParameter(par);
@@ -241,15 +282,14 @@ HadronSaturation::fitSaturation()
   minimizer->GetStats(chi2, edm, errdef, nvpar, nparx);
   B2INFO("\t\t Fit chi^2: " << chi2);
 
-  std::ofstream parfile;
-  parfile.open("sat-pars.fit.txt");
-
-  parfile << fitpar[0] << std::endl;
-  parfile << fitpar[1] << std::endl;
-  parfile << fitpar[2] << std::endl;
-  parfile << fitpar[3] << std::endl;
-  parfile << fitpar[4] << std::endl;
-  parfile.close();
+  // write result file
+  std::ofstream parfile("sat-pars.fit.txt");
+  if (parfile.is_open()) {
+    for (int i = 0; i < 5; ++i) parfile << fitpar[i] << std::endl;
+    parfile.close();
+  } else {
+    B2WARNING("Unable to open sat-pars.fit.txt for writing fit parameters");
+  }
 
   delete minimizer;
 }

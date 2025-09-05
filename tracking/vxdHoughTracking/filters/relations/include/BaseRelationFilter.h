@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 
 namespace Belle2 {

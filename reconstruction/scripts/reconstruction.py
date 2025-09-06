@@ -194,7 +194,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                   addClusterExpertModules=addClusterExpertModules,
                                   reconstruct_cdst=reconstruct_cdst,
                                   legacy_ecl_charged_pid=legacy_ecl_charged_pid,
-                                  switch_off_slow_modules_for_online=switch_off_slow_modules_for_online)
+                                  switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
+                                  useVTX=useVTX)
 
     # Add the modules calculating the software trigger skims
     if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
@@ -299,8 +300,7 @@ def add_prefilter_reconstruction(path,
     # In case of cdst reconstruction ...
     if reconstruct_cdst and not useVTX:
         add_special_vxd_modules(path, components=components)
-    if reconstruct_cdst == 'rawFormat' and not add_modules_for_trigger_calculation and not useVTX:
-        add_dedx_modules(path, components=components)
+    if reconstruct_cdst == 'rawFormat' and not add_modules_for_trigger_calculation:
         return
 
     # Add prefilter posttracking modules
@@ -319,7 +319,8 @@ def add_postfilter_reconstruction(path,
                                   addClusterExpertModules=True,
                                   reconstruct_cdst=None,
                                   legacy_ecl_charged_pid=False,
-                                  switch_off_slow_modules_for_online=False):
+                                  switch_off_slow_modules_for_online=False,
+                                  useVTX=False):
     """
     This function adds the reconstruction modules not required to calculate HLT filter decision to a path.
 
@@ -379,7 +380,8 @@ def add_postfilter_reconstruction(path,
         components=components,
         addClusterExpertModules=addClusterExpertModules,
         legacy_ecl_charged_pid=legacy_ecl_charged_pid,
-        run_klm_dnn=run_klm_dnn
+        run_klm_dnn=run_klm_dnn,
+        useVTX=useVTX,
     )
 
     # Prune tracks
@@ -578,7 +580,8 @@ def add_postfilter_posttracking_reconstruction(path,
                                                cosmics=False,
                                                for_cdst_analysis=False,
                                                legacy_ecl_charged_pid=False,
-                                               run_klm_dnn=True):
+                                               run_klm_dnn=True,
+                                               useVTX=False):
     """
     This function adds to the path the standard reconstruction modules whoose outputs are not needed in the filter.
 
@@ -595,7 +598,7 @@ def add_postfilter_posttracking_reconstruction(path,
         false on HLT and ExpressReco.
     """
 
-    add_dedx_modules(path, components, for_cdst_analysis=for_cdst_analysis)
+    add_dedx_modules(path, components, for_cdst_analysis=for_cdst_analysis, useVTX=useVTX)
     add_top_modules(path, components, cosmics=cosmics)
     add_arich_modules(path, components)
 
@@ -658,7 +661,8 @@ def add_posttracking_reconstruction(path,
                                                addClusterExpertModules=addClusterExpertModules,
                                                cosmics=cosmics,
                                                for_cdst_analysis=for_cdst_analysis,
-                                               legacy_ecl_charged_pid=legacy_ecl_charged_pid)
+                                               legacy_ecl_charged_pid=legacy_ecl_charged_pid,
+                                               useVTX=useVTX)
 
     # Prune tracks as soon as the post-tracking steps are complete
     # Not add prune tracks modules in prepare_cdst_analysis()

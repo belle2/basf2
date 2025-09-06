@@ -100,7 +100,7 @@ def extract_features(reco_track):
 
     # Hit 0
     hit = vtx_hits[0]
-    sensor_info = Belle2.VXD.GeoCache.get(hit.getSensorID())
+    sensor_info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(hit.getSensorID())
     position = sensor_info.pointToGlobal(TVector3(hit.getU(), hit.getV(), 0), True)
 
     data[0] = position.X()
@@ -115,7 +115,7 @@ def extract_features(reco_track):
 
     # Hit 1
     hit = vtx_hits[1]
-    sensor_info = Belle2.VXD.GeoCache.get(hit.getSensorID())
+    sensor_info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(hit.getSensorID())
     position = sensor_info.pointToGlobal(TVector3(hit.getU(), hit.getV(), 0), True)
 
     data[9] = position.X()
@@ -130,7 +130,7 @@ def extract_features(reco_track):
 
     # Hit 2
     hit = vtx_hits[2]
-    sensor_info = Belle2.VXD.GeoCache.get(hit.getSensorID())
+    sensor_info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(hit.getSensorID())
     position = sensor_info.pointToGlobal(TVector3(hit.getU(), hit.getV(), 0), True)
 
     data[18] = position.X()
@@ -156,7 +156,7 @@ def extract_features(reco_track):
         data[35] = 0
     else:
         hit = vtx_hits[3]
-        sensor_info = Belle2.VXD.GeoCache.get(hit.getSensorID())
+        sensor_info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(hit.getSensorID())
         position = sensor_info.pointToGlobal(TVector3(hit.getU(), hit.getV(), 0), True)
 
         data[27] = position.X()

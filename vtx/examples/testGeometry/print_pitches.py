@@ -14,10 +14,6 @@
 #############################################################
 
 import basf2 as b2
-from simulation import add_simulation
-from reconstruction import add_mc_reconstruction
-
-import ROOT
 from ROOT import Belle2
 
 import argparse
@@ -39,7 +35,7 @@ class VTXPrintPitches(b2.Module):
         for cluster in Belle2.PyStoreArray('VTXClusters'):
 
             # Now let's store some data
-            sensor_info = Belle2.VXD.GeoCache.get(cluster.getSensorID())
+            sensor_info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(cluster.getSensorID())
             pitchU = sensor_info.getUPitch(cluster.getV())
             pitchV = sensor_info.getVPitch(cluster.getV())
             # Print the pitch obtained from the sensor info

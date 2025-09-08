@@ -359,8 +359,9 @@ void StatisticsTimingHLTDQMModule::event()
 
   if (m_TTDInfo.isValid()) {
 
-    double c_revolutionTime = m_bunchStructure->getRFBucketsPerRevolution() / (m_clockSettings->getAcceleratorRF() * 1e3);
-    double c_globalClock = m_clockSettings->getGlobalClockFrequency() * 1e3;
+    double c_revolutionTime = m_bunchStructure->getRFBucketsPerRevolution() / (m_clockSettings->getAcceleratorRF() *
+                              1e3); // [microsceonds]
+    double c_globalClock = m_clockSettings->getGlobalClockFrequency() * 1e3; // [microseconds]
 
     double timeSinceLastInj = m_TTDInfo->getTimeSinceLastInjection() / c_globalClock;
     double timeInBeamCycle = timeSinceLastInj - (int)(timeSinceLastInj / c_revolutionTime) * c_revolutionTime;

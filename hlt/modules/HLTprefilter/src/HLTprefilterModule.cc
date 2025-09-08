@@ -11,6 +11,19 @@
 #include <framework/logging/Logger.h>
 
 #include <iostream>
+
+#include <framework/dbobjects/BunchStructure.h>
+
+#include <framework/dbobjects/HardwareClockSettings.h>
+
+#include <mdst/dataobjects/TRGSummary.h>
+
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+
+#include <cdc/dataobjects/CDCHit.h>
+
+#include <ecl/dataobjects/ECLDigit.h>
+
 using namespace Belle2;
 
 REG_MODULE(HLTprefilter);
@@ -78,8 +91,8 @@ void HLTprefilterModule::event()
 
     if (m_TTDInfo.isValid()) {
 
-      double c_revolutionTime = m_bunchStructure->getRFBucketsPerRevolution() / (m_clockSettings->getAcceleratorRF() * 1e3);
-      double c_globalClock = m_clockSettings->getGlobalClockFrequency() * 1e3;
+      double c_revolutionTime = m_bunchStructure->getRFBucketsPerRevolution() / (m_clockSettings->getAcceleratorRF() * 1e3); // [microseconds]
+      double c_globalClock = m_clockSettings->getGlobalClockFrequency() * 1e3; // [microseconds]
 
       double timeSinceLastInj = m_TTDInfo->getTimeSinceLastInjection() / c_globalClock;
       double timeInBeamCycle = timeSinceLastInj - (int)(timeSinceLastInj / c_revolutionTime) * c_revolutionTime;

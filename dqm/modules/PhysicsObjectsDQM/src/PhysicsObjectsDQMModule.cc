@@ -180,16 +180,15 @@ void PhysicsObjectsDQMModule::event()
         for (unsigned int i = 0; i < ks0Particles->getListSize(); i++) {
           Particle* mergeKsCand = ks0Particles->getParticle(i);
           const double isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
-          double ks_merged_mass = mergeKsCand->getMass();
 
-          if (isKsCandGood && 0.45 < ks_merged_mass && ks_merged_mass < 0.55) {
-            m_h_nKshortAllH->Fill(ks_merged_mass);                   // Fill all Ks events
+          if (isKsCandGood) {
+            m_h_nKshortAllH->Fill(mergeKsCand->getMass());                   // Fill all Ks events
             if (index == 1) {
-              m_h_nKshortActiveH->Fill(ks_merged_mass);              // Fill Ks events from active veto
+              m_h_nKshortActiveH->Fill(mergeKsCand->getMass());              // Fill Ks events from active veto
               if (!m_injStrip)
-                m_h_nKshortActiveNotTimeH->Fill(ks_merged_mass);       // Fill Ks events retained after timing cut of HLTprefilter
+                m_h_nKshortActiveNotTimeH->Fill(mergeKsCand->getMass());       // Fill Ks events retained after timing cut of HLTprefilter
               if (!m_cdceclcut)
-                m_h_nKshortActiveNotCDCECLH->Fill(ks_merged_mass);   // Fill Ks events retained after CDC-ECL cut of HLTprefilter
+                m_h_nKshortActiveNotCDCECLH->Fill(mergeKsCand->getMass());   // Fill Ks events retained after CDC-ECL cut of HLTprefilter
             }
           }
         }

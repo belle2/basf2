@@ -1084,8 +1084,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       double c_revolutionTime = m_bunchStructure->getRFBucketsPerRevolution() / (m_clockSettings->getAcceleratorRF() * 1e3);
       double c_globalClock = m_clockSettings->getGlobalClockFrequency() * 1e3;
 
-      double timeSinceLastInj = m_TTDInfo->getTimeSinceLastInjection() / c_globalClock;
-      double timeInBeamCycle = timeSinceLastInj - (int)(timeSinceLastInj / c_revolutionTime) * c_revolutionTime;
+      double timeSinceLastInj = m_TTDInfo->getTimeSinceLastInjection() / c_globalClock; // [microseconds]
+      double timeInBeamCycle = timeSinceLastInj - (int)(timeSinceLastInj / c_revolutionTime) * c_revolutionTime; // [microseconds]
 
       bool LER_strip = (m_LERtimeSinceLastInjectionMin < timeSinceLastInj && timeSinceLastInj < m_LERtimeSinceLastInjectionMax
                         && m_LERtimeInBeamCycleMin < timeInBeamCycle && timeInBeamCycle < m_LERtimeInBeamCycleMax);

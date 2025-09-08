@@ -92,8 +92,6 @@ namespace Belle2::SoftwareTrigger {
     DBObjPtr<BunchStructure> m_bunchStructure; /**< bunch structure (fill pattern) */
     /// Define object for HardwareClockSettings class
     DBObjPtr<HardwareClockSettings> m_clockSettings; /**< hardware clock settings */
-    /// Trigger summary
-    StoreObjPtr<TRGSummary> m_trgSummary;
 
     /// CDChits StoreArray
     StoreArray<CDCHit> m_cdcHits;

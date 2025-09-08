@@ -10,14 +10,10 @@
 
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
-#include "RooRealVar.h"
-#include "RooGaussian.h"
-#include "RooAddPdf.h"
-#include "RooArgList.h"
-#include "RooArgSet.h"
-#include "RooChebychev.h"
-#include "RooMsgService.h"
-#include "RooFit.h"
+
+// RooFit forward declarations
+class RooRealVar;
+class RooAddPdf;
 
 namespace Belle2 {
 
@@ -64,6 +60,10 @@ namespace Belle2 {
 
     MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
 
+    RooRealVar* m_KsInvMass = nullptr; /**<Invariant mass of KS for HLTPrefilter monitoring*/
+    RooRealVar* m_sig = nullptr; /**<Number of Ks events from fit*/
+    RooRealVar* m_bkg = nullptr; /**<Number of background from fit*/
+    RooAddPdf*  m_KsPdf = nullptr; /**<Fit PDF for Ks invariant mass*/
   };
 
 } // Belle2 namespace

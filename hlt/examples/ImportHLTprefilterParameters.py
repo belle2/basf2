@@ -24,7 +24,7 @@ parameters.setLERtimeInBeamCycleMax(1.55)
 parameters.setHERtimeInBeamCycleMin(2.2)
 parameters.setHERtimeInBeamCycleMax(2.33)
 
-parameters.setECLDigitsMax(3000)
+parameters.setECLDigitsMax(3300)
 parameters.setCDCHitsMax(2500)
 
 parameters.setHLTprefilterMode(0)

@@ -9,7 +9,7 @@
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
-//#include <hlt/dbobjects/HLTprefilterParameters.h>
+#include <hlt/dbobjects/HLTprefilterParameters.h>
 #include <framework/dbobjects/BunchStructure.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 #include <framework/database/DBObjPtr.h>
@@ -102,7 +102,7 @@ namespace Belle2::SoftwareTrigger {
     StoreArray<ECLDigit> m_eclDigits;
 
     /// HLTprefilterParameters Database OjbPtr
-    /*DBObjPtr<HLTprefilterParameters> m_hltPrefilterParameters;*/ /**< HLT prefilter parameters */
+    DBObjPtr<HLTprefilterParameters> m_hltPrefilterParameters; /**< HLT prefilter parameters */
 
     /// Define thresholds for variables. By default, no events are skipped based upon these requirements. (Set everything to zero by default)
     /// Minimum threshold of timeSinceLastInjection for LER injection

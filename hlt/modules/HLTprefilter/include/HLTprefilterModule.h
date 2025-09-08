@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 /* HLT headers. */
-//#include <hlt/dbobjects/HLTprefilterParameters.h>
+#include <hlt/dbobjects/HLTprefilterParameters.h>
 #include <hlt/softwaretrigger/core/utilities.h>
 
 /* Basf2 headers. */
@@ -107,7 +107,7 @@ namespace Belle2 {
     uint32_t m_HLTprefilterMode = 0; /** == 0 for timing cuts, == 1 for CDC-ECL cut */
 
     /// HLTprefilterParameters Database OjbPtr
-    /*DBObjPtr<HLTprefilterParameters> m_hltPrefilterParameters;*/ /**< HLT prefilter parameters */
+    DBObjPtr<HLTprefilterParameters> m_hltPrefilterParameters; /**< HLT prefilter parameters */
 
     // Prescale for accepting HLTprefilter lines, by default we randomly accept 1 out of every 1000 events
     unsigned int m_HLTprefilterPrescale = 1000;

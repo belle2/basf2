@@ -18,6 +18,7 @@ void ONNXExpert::load(Weightfile& weightfile)
 {
   std::string onnxModelFileName = weightfile.generateFileName();
   weightfile.getFile("ONNX_Modelfile", onnxModelFileName);
+  weightfile.getOptions(m_general_options);
 
   // Ensure single-threaded execution, see
   // https://onnxruntime.ai/docs/performance/tune-performance/threading.html

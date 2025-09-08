@@ -24,6 +24,7 @@ namespace Belle2 {
 //template <class T> class StoreObjPtr;
   class SoftwareTriggerResult;
   class TRGSummary;
+  class ParticleList;
 
   /**
    * Physics objects DQM module.

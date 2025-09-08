@@ -10,22 +10,25 @@
 #include <hlt/dbobjects/HLTprefilterParameters.h>
 #include <hlt/softwaretrigger/core/utilities.h>
 
-/* Basf2 headers. */
-#include <framework/dbobjects/BunchStructure.h>
-#include <framework/dbobjects/HardwareClockSettings.h>
+/* BASF2 header */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <mdst/dataobjects/TRGSummary.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <ecl/dataobjects/ECLDigit.h>
 /* C++ headers. */
 #include <cstdint>
 
 namespace Belle2 {
+
+  // Forward declarations
+  class BunchStructure;
+  class HardwareClockSettings;
+  class TRGSummary;
+  class EventLevelTriggerTimeInfo;
+  class CDCHit;
+  class ECLDigit;
+
   /**
    * Prefilter module to suppress the injection background
    */

@@ -81,7 +81,6 @@ void FilterCalculator::requireStoreArrays()
   m_eclClusters.isRequired();
   m_l1Trigger.isOptional();
   m_bitsNN.isOptional();
-  m_trgSummary.isOptional();
   m_TTDInfo.isOptional();
   m_cdcHits.isOptional();
   m_eclDigits.isOptional();
@@ -1073,7 +1072,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
   int index = 0; //events accepted in the passive veto window but not in the active
   try {
-    if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1; //events in active veto
+    if (m_l1Trigger->testInput("passive_veto") == 1 &&  m_l1Trigger->testInput("cdcecl_veto") == 0) index = 1; //events in active veto
   } catch (const std::exception&) {
   }
 

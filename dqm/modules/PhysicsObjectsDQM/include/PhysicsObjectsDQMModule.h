@@ -12,17 +12,18 @@
 
 #include <framework/core/HistoModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
-
-#include <mdst/dataobjects/TRGSummary.h>
-
 #include <TH1F.h>
 
 #include <string>
 
+#include <framework/datastore/StoreObjPtr.h>
+
 namespace Belle2 {
+
+// Forward declarations
+//template <class T> class StoreObjPtr;
+  class SoftwareTriggerResult;
+  class TRGSummary;
 
   /**
    * Physics objects DQM module.
@@ -113,8 +114,9 @@ namespace Belle2 {
     std::string m_hadbphysDQM = "";
 
     /** Objects relevant to HLTprefilter monitoring */
-    /** trigger summary */
-    StoreObjPtr<TRGSummary> m_trgSummary;
+
+    /**  Store Object with the trigger result */
+    StoreObjPtr<TRGSummary> m_l1Trigger;
 
     /** Trigger identifier string used to select events for HLTprefilter histograms */
     std::string m_triggerIdentifierHLT = "";
@@ -124,6 +126,14 @@ namespace Belle2 {
     TH1F* m_h_nKshortActiveH = nullptr; /** Histogram for Ks events : active veto */
     TH1F* m_h_nKshortActiveNotTimeH = nullptr; /** Histogram for Ks events : && active veto && !timing cut */
     TH1F* m_h_nKshortActiveNotCDCECLH = nullptr; /* Histogram for Ks events : && active veto && !cdcecl cut */
+
+    /** HLTPriflter lines */
+    std::string m_prefilter_Injection_Strip = "software_trigger_cut&filter&prefilter_InjectionStrip";
+    std::string m_prefilter_CDCECL_Cut = "software_trigger_cut&filter&prefilter_CDCECLthreshold";
+
+    /** Flags for HLTPriflter lines */
+    bool m_injStrip = false;
+    bool m_cdceclcut = false;
 
   };
 

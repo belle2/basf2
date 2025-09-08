@@ -22,6 +22,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/TRGSummary.h>
 #include <hlt/softwaretrigger/calculations/utilities.h>
 #include <TDirectory.h>
 #include <map>
@@ -111,6 +112,7 @@ void PhysicsObjectsDQMModule::initialize()
 
   StoreObjPtr<SoftwareTriggerResult> result;
   result.isOptional();
+  m_l1Trigger.isOptional();
 }
 
 
@@ -148,7 +150,7 @@ void PhysicsObjectsDQMModule::event()
 
   const std::map<std::string, int>& results = result->getResults();
 
-  //--- Prefilter monitoring ---//
+  //--- HLTPrefilter monitoring ---//
   // Check if events pass HLT cut //
   if (results.find(m_triggerIdentifierHLT) == results.end()) {
     //Cannot find the m_triggerIdentifierHLT
@@ -157,23 +159,18 @@ void PhysicsObjectsDQMModule::event()
     const bool HLT_accept = (result->getResult(m_triggerIdentifierHLT) == SoftwareTriggerCutResult::c_accept);
     if (HLT_accept != false) {
 
-      //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
+      //find out if events are in the passive veto (i=0) or in the active veto window (i=1)
       int index = 0; //events accepted in the passive veto window but not in the active
       try {
-        if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1; //events in active veto
+        if (m_l1Trigger->testInput("passive_veto") == 1 &&  m_l1Trigger->testInput("cdcecl_veto") == 0) index = 1; //events in active veto
       } catch (const std::exception&) {
       }
 
-      std::string HLTprefilter_Injection_Strip = "software_trigger_cut&filter&HLTprefilter_InjectionStrip";
-      std::string HLTprefilter_CDCECL_Cut = "software_trigger_cut&filter&HLTprefilter_CDCECLthreshold";
-      bool injStrip = false;
-      bool cdceclcut = false;
-
-      if (results.find(HLTprefilter_Injection_Strip) != results.end()) {
-        injStrip = (result->getNonPrescaledResult(HLTprefilter_Injection_Strip) == SoftwareTriggerCutResult::c_accept);
+      if (results.find(m_prefilter_Injection_Strip) != results.end()) {
+        m_injStrip = (result->getNonPrescaledResult(m_prefilter_Injection_Strip) == SoftwareTriggerCutResult::c_accept);
       }
-      if (results.find(HLTprefilter_CDCECL_Cut) != results.end()) {
-        cdceclcut = (result->getNonPrescaledResult(HLTprefilter_CDCECL_Cut) == SoftwareTriggerCutResult::c_accept);
+      if (results.find(m_prefilter_CDCECL_Cut) != results.end()) {
+        m_cdceclcut = (result->getNonPrescaledResult(m_prefilter_CDCECL_Cut) == SoftwareTriggerCutResult::c_accept);
       }
 
       // Iterate over Ks particle list //
@@ -189,9 +186,9 @@ void PhysicsObjectsDQMModule::event()
             m_h_nKshortAllH->Fill(ks_merged_mass);                   // Fill all Ks events
             if (index == 1) {
               m_h_nKshortActiveH->Fill(ks_merged_mass);              // Fill Ks events from active veto
-              if (!injStrip)
+              if (!m_injStrip)
                 m_h_nKshortActiveNotTimeH->Fill(ks_merged_mass);       // Fill Ks events retained after timing cut of HLTprefilter
-              if (!cdceclcut)
+              if (!m_cdceclcut)
                 m_h_nKshortActiveNotCDCECLH->Fill(ks_merged_mass);   // Fill Ks events retained after CDC-ECL cut of HLTprefilter
             }
           }

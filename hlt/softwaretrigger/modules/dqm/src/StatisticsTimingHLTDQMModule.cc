@@ -326,8 +326,8 @@ void StatisticsTimingHLTDQMModule::event()
       if (m_triggerResult.isValid()) {
         const auto results = m_triggerResult->getResults();
 
-        std::string HLTprefilter_Injection_Strip = "software_trigger_cut&filter&HLTprefilter_InjectionStrip";
-        std::string HLTprefilter_CDCECL_Cut = "software_trigger_cut&filter&HLTprefilter_CDCECLthreshold";
+        std::string HLTprefilter_Injection_Strip = "software_trigger_cut&filter&prefilter_InjectionStrip";
+        std::string HLTprefilter_CDCECL_Cut = "software_trigger_cut&filter&prefilter_CDCECLthreshold";
         bool injStrip = false;
         bool cdceclcut = false;
 

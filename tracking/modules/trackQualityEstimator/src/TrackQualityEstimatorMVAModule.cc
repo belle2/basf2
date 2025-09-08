@@ -69,6 +69,22 @@ void TrackQualityEstimatorMVAModule::initialize()
 
   m_mvaExpert = std::make_unique<MVAExpert>(m_weightFileIdentifier, m_variableSet);
   m_mvaExpert->initialize();
+
+  int cdc_length = m_cdcRecoTracksStoreArrayBacktrackChain.size();
+  // Check the length of backtrack chain
+  if (cdc_length == 0) {
+    B2ERROR("The length of CDC backtrack chain is zero.");
+  }
+  // The last item must be "RecoTrack"
+  else if (m_cdcRecoTracksStoreArrayBacktrackChain[cdc_length - 1] != "RecoTrack") {
+    B2ERROR("The last item of CDC backtrack chain is not \"RecoTrack\".");
+  }
+  int svd_length = m_svdecoTracksStoreArrayBacktrackChain.size();
+  if (svd_length == 0) {
+    B2ERROR("The length of SVD backtrack chain is zero.");
+  } else if (m_svdRecoTracksStoreArrayBacktrackChain[svd_length - 1] != "RecoTrack") {
+    B2ERROR("The last item of SVD backtrack chain is not \"RecoTrack\".");
+  }
 }
 
 void TrackQualityEstimatorMVAModule::beginRun()
@@ -83,10 +99,7 @@ void TrackQualityEstimatorMVAModule::event()
 
     RecoTrack* cdcRecoTrack{&recoTrack};
     int length = m_cdcRecoTracksStoreArrayBacktrackChain.size();
-    // The last item must be "RecoTrack"
-    if (m_cdcRecoTracksStoreArrayBacktrackChain[length - 1] != "RecoTrack") {
-      B2ERROR("The last item of CDC backtrack chain is not \"RecoTrack\".");
-    }
+    // The last item is checked to be "RecoTrack", so begin with the second last item
     for (int i = length - 2; i >= 0; i--) {
       std::string& name = m_cdcRecoTracksStoreArrayBacktrackChain[i];
       cdcRecoTrack = cdcRecoTrack->getRelatedTo<RecoTrack>(name);
@@ -97,10 +110,7 @@ void TrackQualityEstimatorMVAModule::event()
 
     RecoTrack* svdRecoTrack{&recoTrack};
     length = m_svdRecoTracksStoreArrayBacktrackChain.size();
-    // The last item must be "RecoTrack"
-    if (m_svdRecoTracksStoreArrayBacktrackChain[length - 1] != "RecoTrack") {
-      B2ERROR("The last item of SVD backtrack chain is not \"RecoTrack\".");
-    }
+    // The last item is checked to be "RecoTrack", so begin with the second last item
     for (int i = length - 2; i >= 0; i--) {
       std::string& name = m_svdRecoTracksStoreArrayBacktrackChain[i];
       svdRecoTrack = svdRecoTrack->getRelatedTo<RecoTrack>(name);

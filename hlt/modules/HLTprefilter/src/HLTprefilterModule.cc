@@ -39,7 +39,7 @@ void HLTprefilterModule::initialize()
 
 void HLTprefilterModule::beginRun()
 {
-/*	
+	
   if (!m_hltPrefilterParameters.isValid())
     B2FATAL("HLTprefilter parameters are not available.");
   m_LERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMin();
@@ -58,8 +58,6 @@ void HLTprefilterModule::beginRun()
 
   m_HLTprefilterPrescale = m_hltPrefilterParameters->getHLTprefilterPrescale();
 
-
-*/
 }
 
 void HLTprefilterModule::event()

@@ -77,7 +77,7 @@ void TrackQETrainingDataCollectorModule::initialize()
   else if (m_cdcRecoTracksStoreArrayBacktrackChain[cdc_length - 1] != "RecoTrack") {
     B2ERROR("The last item of CDC backtrack chain is not \"RecoTrack\".");
   }
-  int svd_length = m_svdecoTracksStoreArrayBacktrackChain.size();
+  int svd_length = m_svdRecoTracksStoreArrayBacktrackChain.size();
   if (svd_length == 0) {
     B2ERROR("The length of SVD backtrack chain is zero.");
   } else if (m_svdRecoTracksStoreArrayBacktrackChain[svd_length - 1] != "RecoTrack") {

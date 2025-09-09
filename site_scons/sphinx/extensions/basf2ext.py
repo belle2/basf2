@@ -184,6 +184,13 @@ class ModuleListDirective(Directive):
         return all_nodes
 
 
+def doxygen_file_page(filename: str) -> str:
+    base, ext = os.path.splitext(os.path.basename(filename))
+    if ext.startswith("."):
+        ext = ext[1:]
+    return f"{base}_8{ext}_source.html"
+
+
 #: \cond Doxygen_suppress
 class VariableListDirective(Directive):
     has_content = False
@@ -193,6 +200,7 @@ class VariableListDirective(Directive):
         "regex-filter": directives.unchanged,
         "description-regex-filter": directives.unchanged,
         "noindex": directives.flag,
+        "filename": directives.unchanged,
     }
 #: \endcond
 
@@ -224,22 +232,29 @@ class VariableListDirective(Directive):
 
         all_nodes = []
         env = self.state.document.settings.env
+        baseurl = env.app.config.basf2_doxygen_baseurl
         for var in sorted(all_variables, key=lambda x: x.name):
 
             # for overloaded variables, we might have to flag noindex in the
             # variable description so also check for that
             index = self.noindex
+            desc = var.description
             if ":noindex:" in var.description:
                 index = ["    :noindex:"]
-                var.description = var.description.replace(":noindex:", "")
+                desc = desc.replace(":noindex:", "")
 
-            docstring = var.description.splitlines()
+            docstring = desc.splitlines()
             # pretend to be the autodoc extension to let other events process
             # the doc string. Enables Google/Numpy docstrings as well as a bit
             # of doxygen docstring conversion we have
             env.app.emit('autodoc-process-docstring', "b2:variable", var.name, var, None, docstring)
 
             description = [f".. b2:variable:: {var.name}"] + index + [""]
+            if "filename" in self.options:
+                filename = self.options["filename"]
+                page = doxygen_file_page(filename)
+                link = f"{baseurl}{page}"
+                description.insert(1, f"    :source: {link}")
             description += ["    " + e for e in docstring]
             if "group" not in self.options:
                 description += ["", f"    :Group: {var.group}"]
@@ -331,6 +346,7 @@ def setup(app):
     app.add_config_value("basf2_repository", "", True)
     app.add_config_value("basf2_commitid", "", True)
     app.add_config_value("basf2_issues", "", True)
+    app.add_config_value("basf2_doxygen_baseurl", "", "env")
     app.add_domain(Basf2Domain)
     app.add_directive("b2-modules", ModuleListDirective)
     app.add_directive("b2-variables", VariableListDirective)

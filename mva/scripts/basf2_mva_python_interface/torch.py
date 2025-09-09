@@ -11,8 +11,10 @@
 
 import tempfile
 import pathlib
+import pickle
 import numpy as np
-import torch
+import torch as pytorch
+from basf2 import B2INFO
 
 
 class State(object):
@@ -34,6 +36,34 @@ class State(object):
             setattr(self, key, value)
 
 
+class PickleModule:
+    """
+    Custom PickleModule with a custom Unpickler
+
+    to be passed via the `pickle_module` argument in `torch.load`
+    """
+    class Unpickler(pickle.Unpickler):
+        """
+        Custom Unpickler that tries to find missing classes in the current global namespace.
+
+        This is needed since the move to per-python-mva-method module instances in which the classes live now.
+        """
+        def find_class(self, module, name):
+            """
+            If class can't be retrieved the regular way,
+            try to take from global namespace
+            """
+            try:
+                return super().find_class(module, name)
+            except (ModuleNotFoundError, AttributeError):
+                B2INFO(f"Missing class: {module}.{name}")
+                if name in globals():
+                    B2INFO(f"Using `{name}` from global namespace")
+                    return globals()[name]
+                else:
+                    raise
+
+
 def feature_importance(state):
     """
     Return a list containing the feature importances.
@@ -42,7 +72,7 @@ def feature_importance(state):
     return []
 
 
-class myModel(torch.nn.Module):
+class myModel(pytorch.nn.Module):
     """
     My dense neural network
     """
@@ -55,13 +85,13 @@ class myModel(torch.nn.Module):
         super(myModel, self).__init__()
 
         #: a dense model with one hidden layer
-        self.network = torch.nn.Sequential(
-            torch.nn.Linear(number_of_features, 128),
-            torch.nn.ReLU(),
-            torch.nn.Linear(128, 128),
-            torch.nn.ReLU(),
-            torch.nn.Linear(128, 1),
-            torch.nn.Sigmoid(),
+        self.network = pytorch.nn.Sequential(
+            pytorch.nn.Linear(number_of_features, 128),
+            pytorch.nn.ReLU(),
+            pytorch.nn.Linear(128, 128),
+            pytorch.nn.ReLU(),
+            pytorch.nn.Linear(128, 1),
+            pytorch.nn.Sigmoid(),
         )
 
     def forward(self, x):
@@ -77,17 +107,26 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     Returns default torch model
     """
 
-    state = State(myModel(number_of_features).to("cpu"))
+    # Note: if you override this function, need to pass all arguments of
+    # get_model that you need explicitly as kwargs to State!
+    state = State(
+        myModel(number_of_features).to("cpu"),
+        number_of_features=number_of_features,
+        number_of_spectators=number_of_spectators,
+        number_of_events=number_of_events,
+        training_fraction=training_fraction,
+        parameters=parameters,
+    )
     print(state.model)
 
     if parameters is None:
         parameters = {}
 
-    state.optimizer = torch.optim.SGD(state.model.parameters(), parameters.get('learning_rate', 1e-3))
+    state.optimizer = pytorch.optim.SGD(state.model.parameters(), parameters.get('learning_rate', 1e-3))
 
     # we recreate the loss function on each batch so that we can pass in the weights
     # this is a weird feature of how torch handles event weights
-    state.loss_fn = torch.nn.BCELoss
+    state.loss_fn = pytorch.nn.BCELoss
 
     return state
 
@@ -98,9 +137,9 @@ def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     # transform to torch tensor and store the validation sample for later use
     device = "cpu"
-    state.Xtest = torch.from_numpy(Xtest).to(device)
-    state.ytest = torch.from_numpy(ytest).to(device)
-    state.wtest = torch.from_numpy(wtest).to(device)
+    state.Xtest = pytorch.from_numpy(Xtest).to(device)
+    state.ytest = pytorch.from_numpy(ytest).to(device)
+    state.wtest = pytorch.from_numpy(wtest).to(device)
     return state
 
 
@@ -117,9 +156,9 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     """
     # transform to torch tensor
     device = "cpu"
-    tensor_x = torch.from_numpy(X).to(device)
-    tensor_y = torch.from_numpy(y).to(device).type(torch.float)
-    tensor_w = torch.from_numpy(w).to(device)
+    tensor_x = pytorch.from_numpy(X).to(device)
+    tensor_y = pytorch.from_numpy(y).to(device).type(pytorch.float)
+    tensor_w = pytorch.from_numpy(w).to(device)
 
     # Compute prediction and loss
     loss_fn = state.loss_fn(weight=tensor_w)
@@ -139,11 +178,11 @@ def partial_fit(state, X, S, y, w, epoch, batch):
         if len(state.ytest) > 0:
             # run the validation set:
             state.model.eval()
-            with torch.no_grad():
+            with pytorch.no_grad():
                 test_pred = state.model(state.Xtest)
             test_loss_fn = state.loss_fn(weight=state.wtest)
             test_loss = test_loss_fn(test_pred, state.ytest).item()
-            test_correct = (test_pred.round() == state.ytest).type(torch.float).sum().item()
+            test_correct = (test_pred.round() == state.ytest).type(pytorch.float).sum().item()
 
             print(f"Epoch: {epoch-1:04d},\t Training Cost: {np.mean((state.avg_costs)):.4f},"
                   f"\t Testing Cost: {test_loss:.4f}, \t Testing Accuracy: {test_correct/len(state.ytest)}")
@@ -165,8 +204,8 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    with torch.no_grad():
-        r = state.model(torch.from_numpy(X)).detach().numpy()
+    with pytorch.no_grad():
+        r = state.model(pytorch.from_numpy(X)).detach().numpy()
     if r.shape[1] == 1:
         r = r[:, 0]  # cannot use squeeze because we might have output of shape [1,X classes]
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
@@ -176,29 +215,48 @@ def load(obj):
     """
     Load the trained torch model into state.
     """
+    file_names, files, collection_keys, collections_to_store = obj
+    collections = {key: value for key, value in zip(collection_keys, collections_to_store)}
+
     with tempfile.TemporaryDirectory() as temp_path:
         temp_path = pathlib.Path(temp_path)
 
-        file_names = obj[0]
         for file_index, file_name in enumerate(file_names):
             path = temp_path.joinpath(pathlib.Path(file_name))
             path.parents[0].mkdir(parents=True, exist_ok=True)
-
             with open(path, 'w+b') as file:
-                file.write(bytes(obj[1][file_index]))
+                file.write(bytes(files[file_index]))
 
-        # state = get_model(*args, **kwargs)
-        # model = torch.jit.load(temp_path.joinpath(file_names[0]))
-        # model.load_state_dict(torch.load(temp_path.joinpath(file_names[0])))
-        model = torch.load(temp_path.joinpath(file_names[0]))
-        model.eval()  # sets dropout and batch norm layers to eval mode
+        # load model
+        try:
+            weights = pytorch.load(temp_path.joinpath(file_names[0]), weights_only=True)
+            state = get_model(
+                **{
+                    k: collections.get(k, None)
+                    for k in [
+                        "number_of_features",
+                        "number_of_spectators",
+                        "number_of_events",
+                        "training_fraction",
+                        "parameters",
+                    ]
+                }
+            )
+            state.model.load_state_dict(weights)
+            model = state.model
+        except pickle.UnpicklingError:
+            # in this case weights_only failed and we may have a legacy model stored via pickle
+            # -> try to unpickle with custom Unpickler
+            model = pytorch.load(temp_path.joinpath(file_names[0]), pickle_module=PickleModule)
+            state = State(model)
+
+        model.eval()
         device = "cpu"
         model.to(device)
-        state = State(model)
 
     # load everything else we saved
-    for index, key in enumerate(obj[2]):
-        setattr(state, key, obj[3][index])
+    for key, value in collections.items():
+        setattr(state, key, value)
     return state
 
 
@@ -211,10 +269,10 @@ def end_fit(state):
         temp_path = pathlib.Path(temp_path)
 
         # this creates:
-        # path/my_model.pt
-        torch.save(state.model, temp_path.joinpath('my_model.pt'))
+        # path/weights.pt
+        pytorch.save(state.model.state_dict(), temp_path / "weights.pt")
 
-        file_names = ['my_model.pt']
+        file_names = ['weights.pt']
         files = []
         for file_name in file_names:
             with open(temp_path.joinpath(file_name), 'rb') as file:

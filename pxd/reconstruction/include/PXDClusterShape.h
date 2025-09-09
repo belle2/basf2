@@ -8,10 +8,15 @@
 
 #pragma once
 
-#include <pxd/reconstruction/ClusterCandidate.h>
+#include <map>
+#include <string>
 
 namespace Belle2 {
+  class VxdID;
+
   namespace PXD {
+
+    class ClusterCandidate;
 
     /** Type specifies cluster shape type */
     enum class pxdClusterShapeType {

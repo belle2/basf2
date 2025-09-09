@@ -17,6 +17,7 @@ import ROOT
 from ROOT import Belle2
 
 from ROOT import gSystem
+# @cond internal_test
 gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
 
@@ -572,3 +573,5 @@ class QueueStereoQuadTreePlotter(StereoQuadTreePlotter):
         fileName = tempfile.gettempdir() + "/" + datetime.now().isoformat() + '.svg'
         plt.savefig(fileName)
         self.file_list.append(fileName)
+
+# @endcond

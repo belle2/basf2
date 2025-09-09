@@ -15,6 +15,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 settings = CalibrationSettings(
     name="ecl_energy",
     expert_username="hearty",
+    subsystem="ecl",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=[
@@ -42,7 +43,10 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],
     expert_config={"eCmsScale": 1.0,  # Ecms/10.58, typically 0.9943 for offpeak
-                   "ee5x5_min_entries": 100})
+                   "ee5x5_min_entries": 100},
+    produced_payloads=["ECLCrystalEnergy", "ECLExpMuMuE", "ECLCrystalEnergyMuMu", "ECLExpGammaGammaE",
+                       "ECLCrystalEnergyGammaGamma", "ECLExpee5x5E", "ECLCrystalEnergyee5x5", "ECLeedPhiData",
+                       "ECLeedPhiMC"])
 
 # --------------------------------------------------------------
 # ..Raise clustering seed threshold in ECLCRFinder

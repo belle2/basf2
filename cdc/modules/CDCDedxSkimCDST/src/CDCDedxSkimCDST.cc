@@ -8,15 +8,16 @@
 
 #include <cdc/modules/CDCDedxSkimCDST/CDCDedxSkimCDST.h>
 
-#include <mdst/dataobjects/Track.h>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/Track.h>
 
 #include <framework/datastore/SelectSubset.h>
 
 #include <unordered_set>
 
 using namespace Belle2;
-using namespace Dedx;
 
 REG_MODULE(CDCDedxSkimCDST);
 

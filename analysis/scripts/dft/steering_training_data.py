@@ -46,7 +46,6 @@ def create_train_data(
     main.add_module('ProgressBar')
 
     b2.process(main, max_events)
-    print(b2.statistics)
 
 
 def test_expert(working_dir, file_names, identifier, output_variable='networkOutput', environmentType='default',
@@ -72,7 +71,6 @@ def test_expert(working_dir, file_names, identifier, output_variable='networkOut
     main.add_module('ProgressBar')
 
     b2.process(main, max_events)
-    print(b2.statistics)
 
 
 def test_expert_jpsi(working_dir, file_names, prefix, environmentType='default', max_events=0):
@@ -117,4 +115,3 @@ def test_expert_jpsi(working_dir, file_names, prefix, environmentType='default',
     main.add_module('ProgressBar')
 
     b2.process(main, max_events)
-    print(b2.statistics)

@@ -9,10 +9,7 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/database/DBArray.h>
-#include <framework/database/DBObjPtr.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
@@ -20,9 +17,6 @@
 #include <mdst/dataobjects/TRGSummary.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/HitPatternVXD.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <rawdata/dataobjects/RawCDC.h>
@@ -113,7 +107,8 @@ namespace Belle2 {
     Long64_t m_nEvents = 0;          /**< Number of events processed */
     TH1F* m_hNEvents = nullptr;      /**< Histogram of num. events */
     TH1F* m_hOcc = nullptr;          /**< Histogram of occupancy */
-    TH2F* m_hADC  = nullptr;         /**< Histogram of ADC with track associated hits for all boards (0-299) */
+    TH2F* m_hADCBoard  = nullptr;    /**< Histogram of ADC with track associated hits for all boards (0-299) */
+    TH2F* m_hADCLayer  = nullptr;    /**< Histogram of ADC with track associated hits for all layers (0-55) */
     TH2F* m_hTDC = nullptr;          /**< Histogram of TDC with track associated hits for all boards (0-299) */
     TH2F* m_hHit  = nullptr;         /**< Histogram of Hits for all layers (0-55) */
     TH2F* m_hBit = nullptr;          /**< Histogram of online databit removed */

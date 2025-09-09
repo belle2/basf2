@@ -6,7 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/MCParticleInfo.h>
 
 using namespace Belle2;

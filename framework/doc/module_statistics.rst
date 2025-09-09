@@ -4,12 +4,12 @@ Module Statistics
 The basf2 software takes extensive statistics during event processing about the
 memory consumption and execution time of all modules. For most users a simple
 print of the `statistics` object will be enough and creates a text table of the
-execution times and memory conumption::
+execution times and memory consumption::
 
     import basf2
     print(basf2.statistics)
 
-However the statistics object provides full access to all the separate values
+However, the statistics object provides full access to all the separate values
 directly in python if needed. See
 :download:`module_statistics.py </framework/examples/module_statistics.py>` for a full example.
 

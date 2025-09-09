@@ -566,9 +566,9 @@ int TauDecayMarkerModule::getProngOfDecay(const MCParticle& p)
   for (MCParticle* d : daughters) {
     if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
     // TODO: Improve how to identify a final state particle.
-    bool isChargedFinalState = find(begin(finalStatePDGs),
-                                    end(finalStatePDGs),
-                                    abs(d->getPDG())) != end(finalStatePDGs);
+    bool isChargedFinalState = find(finalStatePDGs.begin(),
+                                    finalStatePDGs.end(),
+                                    abs(d->getPDG())) != finalStatePDGs.end();
     if (isChargedFinalState) ret++;
     else ret += getProngOfDecay(*d);
   }

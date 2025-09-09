@@ -1023,7 +1023,7 @@ namespace Belle2 {
       bool useHighestProbMassForExt(true);
       if (arguments.size() == 4) {
         try {
-          useHighestProbMassForExt = static_cast<bool>(Belle2::convertString<int>(arguments[3]));
+          useHighestProbMassForExt = static_cast<bool>(convertString<int>(arguments[3]));
         } catch (std::invalid_argument& e) {
           B2ERROR("Fourth (optional) argument of minET2ETDist must be an integer flag.");
           return nullptr;
@@ -1095,7 +1095,7 @@ namespace Belle2 {
       std::string referenceListName = arguments[0];
       bool useHighestProbMassForExt;
       try {
-        useHighestProbMassForExt = static_cast<bool>(Belle2::convertString<int>(arguments[1]));
+        useHighestProbMassForExt = static_cast<bool>(convertString<int>(arguments[1]));
       } catch (std::invalid_argument& e) {
         B2ERROR("Second argument must be an integer flag.");
         return nullptr;
@@ -1149,7 +1149,7 @@ namespace Belle2 {
       std::string referenceListName = arguments[0];
       bool useHighestProbMassForExt;
       try {
-        useHighestProbMassForExt = static_cast<bool>(Belle2::convertString<int>(arguments[1]));
+        useHighestProbMassForExt = static_cast<bool>(convertString<int>(arguments[1]));
       } catch (std::invalid_argument& e) {
         B2ERROR("Second argument must be an integer flag.");
         return nullptr;

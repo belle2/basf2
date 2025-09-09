@@ -252,7 +252,6 @@ class data_production():
             )
             path.add_module(TrainDataSaver_module)
         b2.process(path, max_event=num_events)
-        print(b2.statistics)
 
     def merge_files(self):
         """

@@ -6,7 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <string>
+#include <vector>
+#include <Math/Vector3D.h>
 #include "trg/cdc/modules/ndFinder/CDCTriggerNDFinderModule.h"
+#include "trg/cdc/NDFinder.h"
 
 using namespace Belle2;
 
@@ -16,146 +20,103 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
 {
   setDescription("CDC Trigger NDFinder Module.\n"
                  "Implements a 3D Hough transformation for \n"
-                 "3D track finding in omega, phi, theta. \n"
+                 "3D track finding in omega, phi, cot. \n"
                  "Uses trained hit patterns for axial and \n"
                  "stereo TS and a density based clustering \n"
                  "algorithm.\n");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("TrackSegmentHitsName", m_TrackSegmentHitsName,
+  addParam("TrackSegmentHitsName", m_trackSegmentHitsName,
            "The name of the StoreArray of the CDCTriggerSegmentHits.",
            std::string("CDCTriggerSegmentHits"));
-  addParam("NDFinderTracksName", m_NDFinderTracksName,
+  addParam("NDFinderTracksName", m_ndFinderTracksName,
            "The name of the StoreArray where the tracks found by this NDFinder Module are stored.",
            std::string("CDCTrigger3DFinderTracks"));
   addParam("minSuperAxial", m_minSuperAxial,
            "Cluster pruning: Minimum number of axial super layer hits related to a cluster "
            "for the cluster to be considered as a track.",
-           4);
+           static_cast<unsigned short>(3));
   addParam("minSuperStereo", m_minSuperStereo,
            "Cluster pruning: Minimum number of stereo super layer hits related to a cluster "
            "for the cluster to be considered as a track.",
-           3);
-  addParam("minWeight", m_minWeight,
-           "Clustering: Minimum weight of a cell in Hough space "
-           "for the cell to be considered as a cluster member.",
-           24);
-  addParam("minPts", m_minPts,
-           "Clustering: Minimum number of neighbor cells with minWeight "
-           "for a cell to be considered a core cell.",
-           1);
-  addParam("thresh", m_thresh,
-           "Track estimation: Minimum weight of a cluster member cell "
-           "relative to the peak weight of the cluster "
-           "for the cell to enter in the weighted mean "
-           "track parameter value estimation.",
-           0.85);
-  addParam("diagonal", m_diagonal,
-           "Clustering: consider diagonal neighbors.",
-           true);
-  addParam("minCells", m_minCells,
-           "Clustering: minimum number of cells for a cluster.",
-           1);
-  addParam("dbscanning", m_dbscanning,
-           ".Clustering method: When true: dbscan, when false: fixed 3d volume.",
-           false);
-  addParam("minTotalWeight", m_minTotalWeight,
-           "Clustering: minimum total weight of all cells in the 3d volume.",
-           450);
-  addParam("minPeakWeight", m_minPeakWeight,
-           "Clustering: minimum peak cell weight of a cluster.",
-           32);
+           static_cast<unsigned short>(2));
   addParam("iterations", m_iterations,
-           "Clustering: Number of iterations for the cluster finding in one Hough space.",
-           5);
+           "Clustering: Number of iterations for the cluster finding in one Hough space quadrant.",
+           static_cast<unsigned short>(1));
   addParam("omegaTrim", m_omegaTrim,
            "Clustering: Number of deleted cells in each omega direction of the maximum.",
-           5);
+           static_cast<unsigned short>(5));
   addParam("phiTrim", m_phiTrim,
            "Clustering: Number of deleted cells in each phi direction of the maximum.",
-           4);
-  addParam("thetaTrim", m_thetaTrim,
-           "Clustering: Number of deleted cells in each theta direction of the maximum.",
-           4);
-  addParam("verbose", m_verbose,
-           "Print Hough planes and verbose output. ",
+           static_cast<unsigned short>(4));
+  addParam("storeAdditionalReadout", m_storeAdditionalReadout,
+           "Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class.",
            false);
   addParam("axialFile", m_axialFile,
-           "File name of the axial hit patterns. ",
-           std::string("data/trg/cdc/ndFinderAxialShallow.txt.gz"));
+           "File name of the axial hit representations.",
+           std::string("data/trg/cdc/ndFinderAxial40x384x9.txt.gz"));
   addParam("stereoFile", m_stereoFile,
-           "File name of the stereo hit patterns. ",
-           std::string("data/trg/cdc/ndFinderStereoShallow.txt.gz"));
-  addParam("NDFinderInfosName", m_NDFinderInfosName,
+           "File name of the stereo hit representations.",
+           std::string("data/trg/cdc/ndFinderStereo40x384x9.txt.gz"));
+  addParam("NDFinderInfosName", m_ndFinderInfosName,
            "The name of the StoreArray where the tracks clusters found by this NDFinder Module are stored.",
            std::string("CDCTriggerClusterInfos"));
 }
 
-CDCTriggerNDFinderModule::~CDCTriggerNDFinderModule()
-{
-}
+CDCTriggerNDFinderModule::~CDCTriggerNDFinderModule() {}
 
 void CDCTriggerNDFinderModule::initialize()
 {
-  B2DEBUG(25, "CDCTriggerNDFinderModule initialize, m_minWeight=" << m_minWeight <<
-          ", m_minPts=" << m_minPts << ", m_diagonal=" << m_diagonal <<
-          ", m_minSuperAxial=" << m_minSuperAxial << ", m_minSuperStereo=" << m_minSuperStereo <<
-          ", m_thresh= " << m_thresh <<
-          ", m_minCells=" << m_minCells <<
-          ", m_dbscanning=" << m_dbscanning <<
-          ", m_minTotalWeight=" << m_minTotalWeight <<
-          ", m_minPeakWeight=" << m_minPeakWeight <<
-          ", m_iterations=" << m_iterations <<
-          ", m_omegaTrim=" << m_omegaTrim <<
-          ", m_phiTrim=" << m_phiTrim <<
-          ", m_thetaTrim=" << m_thetaTrim <<
-          ", m_verbose= " << m_verbose);
-  m_TrackSegmentHits.isRequired(m_TrackSegmentHitsName);
-  m_NDFinderTracks.registerInDataStore(m_NDFinderTracksName);
-  m_NDFinderTracks.registerRelationTo(m_TrackSegmentHits);
-  m_NDFinderInfos.registerInDataStore(m_NDFinderInfosName);
-  m_NDFinderTracks.registerRelationTo(m_NDFinderInfos);
-  m_NDFinder.init(m_minWeight, m_minPts, m_diagonal, m_minSuperAxial, m_minSuperStereo,
-                  m_thresh, m_minCells, m_dbscanning, m_minTotalWeight, m_minPeakWeight, m_iterations,
-                  m_omegaTrim, m_phiTrim, m_thetaTrim, m_verbose,
-                  m_axialFile, m_stereoFile);
-  m_NDFinder.printParams();
+  m_trackSegmentHits.isRequired(m_trackSegmentHitsName);
+  m_ndFinderTracks.registerInDataStore(m_ndFinderTracksName);
+  m_ndFinderTracks.registerRelationTo(m_trackSegmentHits);
+  m_ndFinderInfos.registerInDataStore(m_ndFinderInfosName);
+  m_ndFinderTracks.registerRelationTo(m_ndFinderInfos);
+  NDFinderParameters ndFinderParameters = {
+    m_minSuperAxial, m_minSuperStereo,
+    m_iterations, m_omegaTrim, m_phiTrim,
+    m_storeAdditionalReadout,
+    m_axialFile, m_stereoFile
+  };
+  m_NDFinder.init(ndFinderParameters);
 }
 
-void CDCTriggerNDFinderModule::beginRun()
-{
-}
+void CDCTriggerNDFinderModule::beginRun() {}
 
 void CDCTriggerNDFinderModule::event()
 {
   m_NDFinder.reset();
-  for (CDCTriggerSegmentHit& hit : m_TrackSegmentHits) {
-    m_NDFinder.addHit(hit.getSegmentID(), hit.getISuperLayer(), hit.getPriorityPosition(), hit.priorityTime());
+
+  for (CDCTriggerSegmentHit& hit : m_trackSegmentHits) {
+    HitInfo hitInfo = {
+      hit.getSegmentID(),
+      hit.getISuperLayer(),
+      hit.getPriorityPosition(),
+      hit.priorityTime()
+    };
+    m_NDFinder.addHit(hitInfo);
   }
+
   m_NDFinder.findTracks();
 
   std::vector<NDFinderTrack>* resultTracks = m_NDFinder.getFinderTracks();
-  for (NDFinderTrack trackND : *resultTracks) {
-    const CDCTriggerTrack* NDFinderTrack =
-      m_NDFinderTracks.appendNew(trackND.getPhi0(), trackND.getOmega(),
-                                 0., 0., trackND.getCot(), 0.);
-    SimpleCluster Cluster = trackND.getCluster();
-    std::vector<ROOT::Math::XYZVector> houghspace = trackND.getHoughSpace();
-    std::vector<ROOT::Math::XYZVector> ndreadout = trackND.getNDReadout();
-    const CDCTrigger3DFinderInfo* NDFinderInfo =
-      m_NDFinderInfos.appendNew(houghspace, ndreadout);
-    NDFinderTrack->addRelationTo(NDFinderInfo);
-    std::vector<unsigned short> relHits = trackND.getRelHits();
-    for (ulong i = 0; i < relHits.size(); i++) {
-      NDFinderTrack->addRelationTo(m_TrackSegmentHits[relHits[i]]);
+  for (NDFinderTrack track : *resultTracks) {
+    const CDCTriggerTrack* ndFinderTrack =
+      m_ndFinderTracks.appendNew(track.getPhi0(), track.getOmega(), 0., 0., track.getCot(), 0.,
+                                 std::vector<bool>(6, false),
+                                 std::vector<bool>(9, false),
+                                 true);
+    std::vector<ROOT::Math::XYZVector> readoutHoughSpace = track.getHoughSpace();
+    std::vector<ROOT::Math::XYZVector> readoutCluster = track.getClusterReadout();
+    const CDCTrigger3DFinderInfo* ndFinderInfo =
+      m_ndFinderInfos.appendNew(readoutHoughSpace, readoutCluster);
+    ndFinderTrack->addRelationTo(ndFinderInfo);
+    std::vector<unsigned short> relatedHits = track.getRelatedHits();
+    for (unsigned short hitIdx = 0; hitIdx < relatedHits.size(); ++hitIdx) {
+      ndFinderTrack->addRelationTo(m_trackSegmentHits[relatedHits[hitIdx]]);
     }
   }
 }
 
-void CDCTriggerNDFinderModule::endRun()
-{
-}
+void CDCTriggerNDFinderModule::endRun() {}
 
-void CDCTriggerNDFinderModule::terminate()
-{
-  m_NDFinder.printParams();
-}
+void CDCTriggerNDFinderModule::terminate() {}

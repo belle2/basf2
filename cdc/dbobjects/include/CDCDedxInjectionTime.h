@@ -10,11 +10,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <cmath>
-#include <iostream>
 #include <TObject.h>
-#include <TCanvas.h>
-#include <TH1F.h>
 
 namespace Belle2 {
 

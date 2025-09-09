@@ -10,6 +10,8 @@
 
 
 import sys
+import torch
+import tempfile
 import basf2 as b2
 
 from ROOT import Belle2
@@ -27,7 +29,14 @@ if __name__ == "__main__":
     iov = Belle2.IntervalOfValidity.always()
 
     db = Belle2.Database.Instance()
-    db.addPayload('graFEIModelFile', model_file, iov)
     db.addPayload('graFEIConfigFile', config_file, iov)
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = torch.load(model_file, map_location=torch.device(device))
+
+    with tempfile.NamedTemporaryFile(suffix=".pt", delete=False) as temp_file:
+        temp_model_path = temp_file.name
+        torch.save({"model": model["model"]}, temp_model_path)
+        db.addPayload('graFEIModelFile', temp_model_path, iov)
 
     b2.process(main)

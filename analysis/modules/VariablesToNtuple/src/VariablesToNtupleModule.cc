@@ -9,8 +9,8 @@
 #include <analysis/modules/VariablesToNtuple/VariablesToNtupleModule.h>
 
 // analysis
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/StringWrapper.h>
 

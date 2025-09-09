@@ -14,14 +14,15 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 
-#include <analysis/ParticleCombiner/ParticleCombiner.h>
-
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+
+#include <analysis/VariableManager/Utility.h>
 
 #include <string>
 #include <vector>
 
 namespace Belle2 {
+  class ParticleGenerator;
 
   /**
    * particle combiner module

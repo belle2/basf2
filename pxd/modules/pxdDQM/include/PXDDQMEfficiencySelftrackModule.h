@@ -6,25 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
 #pragma once
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <pxd/dataobjects/PXDCluster.h>
-
 #include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
-
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/ROIid.h>
 
 #include "TH1F.h"
 #include "TH2F.h"
 
-
 namespace Belle2 {
+  class PXDCluster;
+  class RecoTrack;
+  class ROIid;
 
   /**
    * Creates the basic histograms for PXD Efficiency DQM

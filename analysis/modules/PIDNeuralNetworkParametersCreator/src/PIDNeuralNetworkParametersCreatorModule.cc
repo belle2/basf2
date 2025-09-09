@@ -119,7 +119,7 @@ void PIDNeuralNetworkParametersCreatorModule::initialize()
   if (!isValid)
     B2ERROR("The given neural-network parameters are invalid!");
 
-  Belle2::DBImportObjPtr<Belle2::PIDNeuralNetworkParameters> importer{m_neuralNetworkParametersName};
+  DBImportObjPtr<PIDNeuralNetworkParameters> importer{m_neuralNetworkParametersName};
   importer.construct(
     m_description,
     m_inputNames,
@@ -130,7 +130,7 @@ void PIDNeuralNetworkParametersCreatorModule::initialize()
     m_handleMissingInputs,
     m_inputsToCut
   );
-  importer.import(Belle2::IntervalOfValidity(m_experimentLow, m_runLow, m_experimentHigh, m_runHigh));
+  importer.import(IntervalOfValidity(m_experimentLow, m_runLow, m_experimentHigh, m_runHigh));
 }
 
 

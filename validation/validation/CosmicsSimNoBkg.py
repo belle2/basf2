@@ -19,7 +19,7 @@
 </header>
 """
 
-from basf2 import create_path, statistics, set_random_seed, process
+from basf2 import create_path, set_random_seed, process
 from simulation import add_simulation
 from validation import statistics_plots, event_timing_plot
 
@@ -46,10 +46,7 @@ main.add_module("Profile")
 main.add_module("RootOutput", outputFileName="../CosmicsSimNoBkg.root")
 
 main.add_module('Progress')
-process(main)
-
-# Print call statistics
-print(statistics)
+process(main, calculateStatistics=True)
 
 statistics_plots(
     "CosmicsSimNoBkg_statistics.root",

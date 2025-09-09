@@ -5,33 +5,28 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 import os
 import argparse
 import multiprocessing
 import tempfile
 
 import basf2
-
-from softwaretrigger import constants
+from softwaretrigger import constants, path_utils
+from geometry import check_components
+from pxd import add_pxd_percentframe
+from rawdata import add_unpackers
+from reconstruction import add_reconstruction, add_cosmics_reconstruction
 from tracking import add_roiFinder, add_roi_payload_assembler
 
-from reconstruction import add_reconstruction, add_cosmics_reconstruction
-from softwaretrigger import path_utils
-from geometry import check_components
-from rawdata import add_unpackers
 
-
-def setup_basf2_and_db(zmq=False):
+def setup_basf2_and_db(event_distribution_mode=constants.EventDistributionModes.ringbuffer):
     """
     Setup local database usage for HLT
     """
     parser = argparse.ArgumentParser(description='basf2 for online')
 
-    if zmq:
-        parser.add_argument("--input", required=True, type=str, help="ZMQ Address of the distributor process")
-        parser.add_argument("--output", required=True, type=str, help="ZMQ Address of the collector process")
-        parser.add_argument("--dqm", required=True, type=str, help="ZMQ Address of the histoserver process")
-    else:
+    if event_distribution_mode == constants.EventDistributionModes.ringbuffer:
         parser.add_argument('input_buffer_name', type=str,
                             help='Input Ring Buffer names')
         parser.add_argument('output_buffer_name', type=str,
@@ -50,6 +45,10 @@ def setup_basf2_and_db(zmq=False):
         parser.add_argument('--no-output',
                             help="Don't write any output files",
                             action="store_true", default=False)
+    else:
+        parser.add_argument("--input", required=True, type=str, help="ZMQ Address of the distributor process")
+        parser.add_argument("--output", required=True, type=str, help="ZMQ Address of the collector process")
+        parser.add_argument("--dqm", required=True, type=str, help="ZMQ Address of the histoserver process")
 
     parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count() - 5,
                         help='Number of parallel processes to use')
@@ -134,7 +133,7 @@ def start_path(args, location):
     return path
 
 
-def start_zmq_path(args, location):
+def start_zmq_path(args, location, event_distribution_mode):
     path = basf2.Path()
     reco_path = basf2.Path()
 
@@ -145,8 +144,15 @@ def start_zmq_path(args, location):
     else:
         basf2.B2FATAL(f"Does not know location {location}")
 
-    input_module.if_value("==0", reco_path, basf2.AfterConditionPath.CONTINUE)
-    reco_path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
+    # zmq needs to discard the first event from HLTZMQ2Ds level
+    if event_distribution_mode == constants.EventDistributionModes.zmq:
+        input_module.if_value("==0", reco_path, basf2.AfterConditionPath.CONTINUE)
+        reco_path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
+    # zmqbasf2 needs to pass the first event to the remaining path
+    elif event_distribution_mode == constants.EventDistributionModes.zmqbasf2:
+        path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
+    else:
+        basf2.B2FATAL(f"Does not know event_distribution_mode {event_distribution_mode}")
 
     return path, reco_path
 
@@ -272,6 +278,14 @@ def add_hlt_processing(path,
         # And in the end remove everything which should not be stored
         path_utils.add_store_only_rawdata_path(path)
     path.add_module('StatisticsSummary').set_name('Sum_Close_Event')
+
+
+def add_hlt_passthrough(path):
+    """
+    Add all modules for operating HLT machines in passthrough mode.
+    """
+    add_pxd_percentframe(path, fraction=0.1, random_position=True)
+    add_roi_payload_assembler(path, ignore_hlt_decision=True)
 
 
 def add_expressreco_processing(path,

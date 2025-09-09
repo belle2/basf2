@@ -179,6 +179,12 @@ namespace Belle2 {
     /** Return a short summary of this object's contents in HTML format. */
     std::string getInfoHTML() const;
 
+    /** Set print status of statistics. */
+    void setStatisticsPrintStatus(ModuleStatistics::EStatisticCounters type, bool printStatus) { m_statsPrintStatus[type] = printStatus; }
+
+    /** Get print status of statistics. */
+    bool getStatisticsPrintStatus(ModuleStatistics::EStatisticCounters type) { return m_statsPrintStatus[type]; }
+
   private:
     /** Hide copy constructor */
     ProcessStatistics(const ProcessStatistics&) = default;
@@ -204,6 +210,9 @@ namespace Belle2 {
     ModuleStatistics m_global; /**< Statistics object for global time and memory consumption */
     std::vector<Belle2::ModuleStatistics> m_stats; /**< module statistics */
 
+    /** array with print status of each statistics counter. */
+    std::array < bool, ModuleStatistics::EStatisticCounters::c_Total + 1 > m_statsPrintStatus{};
+
     /** transient, maps Module* to m_stats index. */
     std::map<const Module*, int> m_modulesToStatsIndex; //!
 
@@ -226,7 +235,7 @@ namespace Belle2 {
      * element so we keep it a plain double. */
     double m_suspendedMemory; //! (transient)
 
-    ClassDefOverride(ProcessStatistics, 2); /**< Class to collect call statistics for all modules. */
+    ClassDefOverride(ProcessStatistics, 3); /**< Class to collect call statistics for all modules. */
   };
 
 } //Belle2 namespace

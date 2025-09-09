@@ -14,9 +14,10 @@
 
 // decay descriptor
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
-
-// utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+
+// particle combiner
+#include <analysis/ParticleCombiner/ParticleCombiner.h>
 
 #include <Math/Vector4D.h>
 #include <TMath.h>

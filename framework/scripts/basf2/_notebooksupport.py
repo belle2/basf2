@@ -110,7 +110,7 @@ def _child_process(pipe, path, max_events):
     pipe.close()
 
 
-def process(path, max_event=0):
+def process(path, max_event=0, calculateStatistics=False):
     """
     Start processing events using the modules in the given `basf2.Path` object.
 
@@ -131,6 +131,7 @@ def process(path, max_event=0):
     Parameters:
         path: The path with which the processing starts
         max_event:  The maximal number of events which will be processed, 0 for no limit
+        calculateStatistics: Switch to turn on calculation of processing statistics
 
     Returns:
         None
@@ -141,6 +142,8 @@ def process(path, max_event=0):
         b2core.B2INFO("process() called in a Jupyter Notebook. See help(basf2.process) for caveats")
 
     datastore = Belle2.DataStore.Instance()
+    if calculateStatistics:
+        Belle2.Environment.Instance().setStats(True)
     ctx = multiprocessing.get_context("fork")
     nanny, child = ctx.Pipe()
     process = ctx.Process(target=_child_process, args=(child, path, max_event))

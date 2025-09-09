@@ -78,14 +78,14 @@ namespace Belle2 {
     //! TDirectory
     TDirectory* dirDQM = nullptr;
 
-    // number of skims
+    //! number of skims
     static const int nskim_topdqm = 11;
 
-    // number of histogram classes
+    //! number of histogram classes
     static const int nHistClasses = 3;
     int m_nHistClassesActual = 3;
 
-    // histogramming level
+    //! histogramming level
     int m_histLevel = 3;
 
     int start_skim_topdqm = 0;
@@ -283,7 +283,7 @@ namespace Belle2 {
     TH1I* h_grl_ncdctopslots_matched[nskim_topdqm] = {nullptr};
     TH2I* h_grl_topslots_vs_cdcslots_match[nskim_topdqm] = {nullptr};
 
-    //condition database for GDL unpacker
+    //! condition database for GDL unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_gdlUnpacker;
 
     int gdlLeafBitMap[320] = {0};
@@ -366,7 +366,7 @@ namespace Belle2 {
 
     bool m_requireCDC2DTrack;
 
-    // names of skims from hlt/softwaretrigger/scripts/softwaretrigger/db_access.py
+    //! names of skims from hlt/softwaretrigger/scripts/softwaretrigger/db_access.py
     std::string skim_menu[nskim_topdqm] = {
       "all",
       "software_trigger_cut&skim&accept_hadron",
@@ -381,7 +381,7 @@ namespace Belle2 {
       "software_trigger_cut&skim&accept_mumutight"
     };
 
-    // names of histograms
+    //! names of histograms
     std::string skim_smap[nskim_topdqm] = {
       "all",
       "hadron",

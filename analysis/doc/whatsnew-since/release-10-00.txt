@@ -1,0 +1,37 @@
+Changes in the analysis package in light-2509-fornax
+----------------------------------------------------
+
+TreeFitter
+++++++++++
+* Fixed a bug so that the pdg values and particle names that can be used to define which particles should be
+  mass-constrained are allowed to be negative or particle names with an associated negative pdg code like for most
+  anti-particles.
+
+Continuum Suppression
++++++++++++++++++++++
+* Added the module parameter ``performIPProfileFit``  to the `ContinuumSuppressionBuilder` module, which allows to
+  perform a vertex fit with IP profile constraint for the ROE tracks before they are used as input for the calculation
+  of the continuum suppression variables.
+* The wrapper function `buildContinuumSuppression` has the new argument ``ipprofile_fit`` to enable the vertex fit
+  described above.
+
+Changes in the analysis package in light-2507-europa
+----------------------------------------------------
+
+stdCharged
+++++++++++
+* Removed the selection on `nCDCHits` to match the recommendation for release-08 samples.
+
+FlavorTagger
+++++++++++++
+* Refactored flavor tagging scripts, which for analysts however only means that now the flavor tagging variables are
+  available via the collection ``flavor_tagging`` and not via ``flavorTagger.flavor_tagging``.
+
+Modular Analysis
+++++++++++++++++
+* Added options to `writePi0EtaVeto` to use the weight files trained using MC16rd: ``standardMC16rd`` and ``tightMC16rd``.
+
+Variables
++++++++++
+* The variables `pi0Prob(mode) <pi0Prob>` and `etaProb(mode) <etaProb>` are extended to MC16 version
+  and accept the modes ``standardMC16rd`` and ``tightMC16rd``.

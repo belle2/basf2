@@ -54,6 +54,20 @@ namespace Belle2 {
       m_sensorID = id;
     }
 
+    /** Fill the arrays with the values of the members of the class
+     * @param charge Pointer to the array entry to be filled with the charge member value.
+     * @param uCellID Pointer to the array entry to be filled with the uCellID member value.
+     * @param vCellID Pointer to the array entry to be filled with the vCellID member value.
+     * @param sensorID Pointer to the array entry to be filled with the sensorID member value.
+    */
+    void fillValues(unsigned short* charge, unsigned short* uCellID, unsigned short* vCellID, unsigned short* sensorID)
+    {
+      *charge = m_charge;
+      *uCellID = m_uCellID;
+      *vCellID = m_vCellID;
+      *sensorID = m_sensorID;
+    }
+
     /** Get the sensor ID.
      * @return ID of the sensor.
      */

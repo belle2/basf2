@@ -8,10 +8,8 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 
-#include <mdst/dataobjects/TrackFitResult.h>
 //std
 #include <string>
 
@@ -27,9 +25,8 @@
 // for intercepting rave output
 #include <framework/utilities/IOIntercept.h>
 
-#include <iostream>
-
 namespace Belle2 {
+  class Particle;
 
   namespace analysis {
     /**
@@ -46,7 +43,7 @@ namespace Belle2 {
       /** Destructor */
       ~RaveKinematicVertexFitter();
 
-      /** add a track (in the format of a Belle2::Particle) to set of tracks that should be fitted to a vertex */
+      /** add a track (in the format of a Particle) to set of tracks that should be fitted to a vertex */
       void addTrack(const Particle* aParticlePtr);
 
       /** All daughters of the argument of this function will be used as input for the vertex fit. Writes back the result directly to the mother particle */

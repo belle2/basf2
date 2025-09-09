@@ -158,20 +158,20 @@ namespace Belle2 {
                   ")\nPlease check how the input xml file list is being filled.");
         }
 
-        Belle2::MVA::Weightfile weightfile;
+        MVA::Weightfile weightfile;
         if (boost::ends_with(path, ".root")) {
-          weightfile = Belle2::MVA::Weightfile::loadFromROOTFile(path);
+          weightfile = MVA::Weightfile::loadFromROOTFile(path);
         } else  if (boost::ends_with(path, ".xml")) {
-          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(path);
+          weightfile = MVA::Weightfile::loadFromXMLFile(path);
         } else {
           B2WARNING("Unknown file extension for file: " << path << ", fallback to xml...");
-          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(path);
+          weightfile = MVA::Weightfile::loadFromXMLFile(path);
         }
 
         // Serialize the MVA::Weightfile object into a string for storage in the database,
         // otherwise there are issues w/ dictionary generation for the payload class...
         std::stringstream ss;
-        Belle2::MVA::Weightfile::saveToStream(weightfile, ss);
+        MVA::Weightfile::saveToStream(weightfile, ss);
         m_weightfiles[pdg].push_back(ss.str());
 
         ++idx;

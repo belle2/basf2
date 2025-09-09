@@ -7,10 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
 #include <gtest/gtest.h>
 
-#include "analysis/VertexFitting/TreeFitter/FitParams.h"
+#include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
 namespace {
 

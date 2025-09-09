@@ -32,6 +32,7 @@ ECL_PRESCALED = [
 # CDC Physics channels
 CDC_PHYSICS = [
     "filter ge3 looseB tracks inc 1 tightB not ee2leg",
+    "filter ge3 trackC not ee2leg",
     "filter 2 looseB tracks inc 1 tightB q==0 pstarmaxlt0.8 GeVc not eexx",
     "filter 2 looseB tracks 0.8ltpstarmaxlt4.5 GeVc not ee2leg ee1leg1trk eexx",
     "filter 2 looseB tracks pstarmaxgt4.5 GeVc not ee2leg ee1leg1trk ee1leg1e eeBremB muonPairVB"
@@ -42,7 +43,10 @@ CDC_PRESCALED = [
     "filter 2 loose tracks pstarmaxlt0.8 GeVc",
     "filter 2 loose tracks 0.8ltpstarmaxlt4.5 GeVc",
     "filter 2 loose tracks pstarmaxgt4.5 GeVc",
-    "filter ge1 tight track"
+    "filter ge1 tight track",
+    "filter 2 looseC tracks inc 1 tightB q==0 pstarmaxlt0.8 GeVc not eexx",
+    "filter 2 trackC 0.8ltpstarmaxlt4.5 GeVc not ee2leg ee1leg1trk eexx",
+    "filter 2 trackC pstarmaxgt4.5 GeVc not ee2leg ee1leg1trk ee1leg1e eeBremB muonPairVB"
 ]
 
 # Targeted Physics channels
@@ -76,6 +80,7 @@ QED = [
     "filter eexxHighP",
     "filter radiative BhabhaB",
     "filter selectmumu",
+    "filter selectmumuC",
     "filter single muon",
     "filter cosmic",
     "filter rad Bhabha 1trkB",

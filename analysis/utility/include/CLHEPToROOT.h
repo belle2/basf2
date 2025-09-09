@@ -14,6 +14,7 @@
 #include <CLHEP/Vector/LorentzVector.h>
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+#include <TMatrixDSym.h>
 #include <TMatrixFSym.h>
 
 namespace Belle2 {

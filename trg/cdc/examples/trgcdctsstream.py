@@ -97,7 +97,7 @@ main.add_module(tsstream)
 # main.add_module(out)
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

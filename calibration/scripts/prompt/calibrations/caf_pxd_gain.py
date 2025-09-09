@@ -22,7 +22,8 @@ from prompt.calibrations.caf_beamspot import settings as beamspot_calibration
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="PXD gain calibration",
-                               expert_username="takaham",
+                               expert_username="maiko.takahashi",
+                               subsystem="pxd",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["physics"],
@@ -45,7 +46,8 @@ settings = CalibrationSettings(name="PXD gain calibration",
                                    "max_files_per_run": 20,  # only valid when max_events/run = 0
                                    "payload_boundaries": []
                                },
-                               depends_on=[beamspot_calibration])
+                               depends_on=[beamspot_calibration],
+                               produced_payloads=["PXDGainMapPar"])
 
 
 def get_calibrations(input_data, **kwargs):

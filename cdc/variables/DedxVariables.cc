@@ -22,8 +22,6 @@
 
 #include <TString.h>
 
-#include <cmath>
-
 namespace Belle2 {
 
   /**

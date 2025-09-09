@@ -60,5 +60,5 @@ mdst.add_mdst_output(
     additionalBranches=["EventExtraInfo"]
 )
 
-b2.process(path=main)
+b2.process(path=main, calculateStatistics=True)
 print(b2.statistics)

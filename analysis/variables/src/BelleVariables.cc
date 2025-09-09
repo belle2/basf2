@@ -281,7 +281,7 @@ namespace Belle2 {
       double time = belleTrkExtra->getTof();
       double length = belleTrkExtra->getPathLength();
       double p = particle->getP(); //3-momentum
-      double tofbeta = length / time / Belle2::Const::speedOfLight;
+      double tofbeta = length / time / Const::speedOfLight;
       double tofmass = p * sqrt(1. / (tofbeta * tofbeta) - 1.); //(GeV)
 
       return tofmass;

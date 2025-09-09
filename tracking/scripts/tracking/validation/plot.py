@@ -24,6 +24,7 @@ from tracking.root_utils import root_cd, root_save_name
 from tracking.validation import statistics
 
 import logging
+# @cond internal_test
 
 
 def get_logger():
@@ -113,6 +114,41 @@ def compose_axis_label(quantity_name, unit=None):
     return axis_label
 
 
+def find_object_recursive(tFileOrTDirectory, name):
+    """
+    Recursively search for an object in a ROOT file by name.
+
+    - First searches the top-level directory.
+    - Then searches subdirectories recursively.
+    - Includes fallback using gDirectory in case ROOT key table is incomplete.
+
+        @param tFileOrTDirectory (ROOT.TDirectory or ROOT.TFile): The file or directory to search in.
+        @param name (str): The name of the object to find.
+
+        @return ROOT object or None if not found.
+    """
+
+    # Try top-level first
+    obj = tFileOrTDirectory.Get(name)
+    if obj:
+        return obj
+    # Fallback: sometimes objects are accessible only via gDirectory (rare ROOT quirk)
+    # ROOT.gDirectory.cd(tFileOrTDirectory.GetPath())
+    # obj = ROOT.gROOT.FindObject(name)
+    # if obj:
+    #    return obj
+
+    # If not found, check each key and recurse into subdirectories
+    for key in tFileOrTDirectory.GetListOfKeys():
+        if key.GetClassName() == 'TDirectoryFile':
+            subdir = tFileOrTDirectory.Get(key.GetName())
+            obj = find_object_recursive(subdir, name)
+            if obj:
+                return obj
+
+    return None
+
+
 def get1DBinningFromReference(name, refFileName):
     """ returns nbins, lowerbound, upperbound for TH1 / TProfile with name "name" found in the file "refFileName"
 
@@ -134,7 +170,7 @@ def get1DBinningFromReference(name, refFileName):
 
     tfile = ROOT.TFile(refFileName)
     if tfile.IsOpen():
-        objptr = tfile.Get(name)
+        objptr = find_object_recursive(tfile, name)
         if objptr and objptr.InheritsFrom("TH1"):
             nbins = objptr.GetNbinsX()
             x_min = objptr.GetXaxis().GetXmin()
@@ -2383,3 +2419,5 @@ def test():
 
 if __name__ == '__main__':
     test()
+
+# @endcond

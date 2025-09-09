@@ -16,10 +16,6 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <vxd/geometry/GeoCache.h>
-
-#include <string>
-#include <vector>
 
 namespace Belle2 {
   namespace vxdHoughTracking {

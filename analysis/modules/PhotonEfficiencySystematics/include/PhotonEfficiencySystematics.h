@@ -12,11 +12,11 @@
 #include <framework/core/Module.h>
 
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
-#include <framework/database/DBObjPtr.h>
-#include <analysis/dataobjects/Particle.h>
 #include <string>
 
 namespace Belle2 {
+  class Particle;
+  template<class T> class DBObjPtr;
 
   /**
   * Adds Photon Detection Efficiency Data/MC ratios To Particle List

@@ -89,11 +89,11 @@ varsToStore = [
 # ..store to ntuple
 outputName = "muPairAlignment.root"
 narg = len(sys.argv)
-if(narg == 2):
+if (narg == 2):
     outputName = sys.argv[1]
 mypath.add_module('VariablesToNtuple', particleList='mu-:highp', variables=varsToStore, fileName=outputName)
 
 
 # ..Process
-b2.process(mypath)
+b2.process(mypath, calculateStatistics=True)
 print(b2.statistics)

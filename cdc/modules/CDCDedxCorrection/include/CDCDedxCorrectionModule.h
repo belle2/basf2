@@ -8,9 +8,6 @@
 
 #pragma once
 
-#include <cmath>
-#include <algorithm>
-#include <TMath.h>
 #include <vector>
 
 #include <framework/core/Module.h>
@@ -18,7 +15,6 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <cdc/dataobjects/CDCDedxTrack.h>
-#include <reconstruction/dataobjects/DedxConstants.h>
 #include <cdc/dbobjects/CDCDedxScaleFactor.h>
 #include <cdc/dbobjects/CDCDedxMomentumCor.h>
 #include <cdc/dbobjects/CDCDedxWireGain.h>
@@ -33,11 +29,7 @@
 
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
-#include <cdc/geometry/CDCGeometryParConstants.h>
-#include <cdc/geometry/CDCGeometryPar.h>
-
 namespace Belle2 {
-  class CDCDedxTrack;
 
   /** This module may be used to apply the corrections to dE/dx per the
    * calibration constants. The interface with the calibration database

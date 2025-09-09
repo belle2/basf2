@@ -72,7 +72,7 @@ namespace Belle2 {
 
       int order = -1;
       try {
-        order = Belle2::convertString<int>(arguments[0]);
+        order = convertString<int>(arguments[0]);
       } catch (std::invalid_argument&) {
         B2FATAL("First argument of harmonicMoment must be an integer");
       }
@@ -107,7 +107,7 @@ namespace Belle2 {
 
       int order = -1;
       try {
-        order = Belle2::convertString<int>(arguments[0]);
+        order = convertString<int>(arguments[0]);
       } catch (std::invalid_argument&) {
         B2FATAL("Argument of cleoCone must be an integer");
       }

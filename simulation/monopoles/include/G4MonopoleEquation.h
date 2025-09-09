@@ -11,7 +11,8 @@
 #pragma once
 
 #include <G4EquationOfMotion.hh>
-#include <G4MagneticField.hh>
+
+class G4MagneticField;
 
 namespace Belle2 {
 

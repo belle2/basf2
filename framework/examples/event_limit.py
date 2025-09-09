@@ -46,5 +46,5 @@ b2.conditions.reset()
 b2.conditions.prepend_testing_payloads('localdb/database.txt')
 
 # Process data
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

@@ -438,8 +438,8 @@ add  p Particle  D_s1-                         -20433      2459.5e-3  1.0000033e
 add  p Particle  D'_s1+                         10433     2535.11e-3        0.92e-3           6e-3     3     2              0      10433
 add  p Particle  D'_s1-                        -10433     2535.11e-3        0.92e-3           6e-3    -3     2              0     -10433
 * D_s2*(2573)
-add  p Particle  D_s2*+                           435      2569.1e-3        16.9e-3          80e-3     3     4              0        435
-add  p Particle  D_s2*-                          -435      2569.1e-3        16.9e-3          80e-3    -3     4              0       -435
+add  p Particle  D_s2*+                           435      2569.1e-3        16.9e-3          60e-3     3     4              0        435
+add  p Particle  D_s2*-                          -435      2569.1e-3        16.9e-3          60e-3    -3     4              0       -435
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Bottom mesons.
 * Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).

@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef PRIMARYGENERATORACTION_H_
-#define PRIMARYGENERATORACTION_H_
+#pragma once
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 
@@ -56,6 +55,3 @@ namespace Belle2 {
   } //end of Simulation namespace
 
 } //end of Belle2 namespace
-
-
-#endif /* PRIMARYGENERATORACTION_H_ */

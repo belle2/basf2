@@ -91,6 +91,6 @@ main.add_module(trggdldqm)
 progress = b2.register_module('Progress')
 main.add_module(progress)
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 print(b2.statistics)

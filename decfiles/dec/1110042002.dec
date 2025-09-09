@@ -1,0 +1,35 @@
+# EventType: 1110042002
+# Descriptor: B0 -> [a_10 (-> rho0 pi0)] [rho0 -> pi+ pi-] 
+# NickName: B0_a10rho0
+# Documentation:  
+# Tested: Yes
+# PhysicsWG: BHadronic
+# Responsible: Shu-Ping Lin
+# Email: shuping.lin@pd.infn.it
+# Cuts: None
+# Date: 2025/07/01
+
+Alias rho0sig rho0
+Alias a_10sig  a_10
+
+Decay Upsilon(4S)
+1.0     B0sig   anti-B0sig  B0  anti-B0        VSS_BMIX dm;
+Enddecay
+
+
+Decay B0sig
+1.0     a_10sig  rho0sig   SVV_HELAMP 0.0 0.0 1.0 0.0 0.0 0.0; # longitudinal only
+Enddecay
+CDecay anti-B0sig
+
+
+Decay a_10sig
+1.0     rho0sig  pi0    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0; # S-wave only
+Enddecay
+
+
+Decay rho0sig
+1.0     pi+  pi-      VSS;
+Enddecay
+
+End

@@ -8,6 +8,14 @@
 
 #include <cdc/calibration/CDCdEdx/CDCDedxBadWireAlgorithm.h>
 
+#include <cdc/geometry/CDCGeometryPar.h>
+
+#include <TCanvas.h>
+#include <TLegend.h>
+#include <TLine.h>
+#include <TMath.h>
+#include <TStyle.h>
+
 using namespace Belle2;
 using namespace CDC;
 using namespace std;

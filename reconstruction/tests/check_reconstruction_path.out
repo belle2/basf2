@@ -1,0 +1,2267 @@
+[INFO] Steering file: reconstruction/tests/check_reconstruction_path.py
+[INFO] Modules and parameter settings in the path:
+  1. EventsOfDoomBuster
+
+      (? >=1[] ):
+  2. Sum_EventsofDoomBuster
+  3. ECLWaveformFit
+      Chi2Threshold25dof=57.1
+      Chi2Threshold27dof=60.0
+      CovarianceMatrix=True
+      EnergyThreshold=0.03
+      RegParam1=1.0
+  4. ECLDigitCalibrator
+      backgroundEnergyCut=0.007
+      backgroundTimingCut=110.0
+      fileBackgroundName=${BELLE2_SOFTWARE_DIR}/data/ecl/background_norm.root
+      simulatePure=False
+  5. ECLEventT0
+      T0bin=1.0
+      ethresh=0.06
+      maxDigitT=150.0
+      maxT0=135.0
+      primaryT0=0
+      sigmaScale=0.15
+  6. ECLCRFinder
+      energyCut0=0.02
+      energyCut1=0.02
+      energyCut2=0.0005
+      mapPar0=1.0
+      mapPar1=1.0
+      mapType0=N
+      mapType1=N
+      skipFailedTimeFitDigits=0
+      timeCut0=400.0
+      timeCut0maxEnergy=99.999
+      timeCut1=400.0
+      timeCut1maxEnergy=99.999
+      timeCut2=99999.0
+      timeCut2maxEnergy=0.0
+  7. ECLLocalMaximumFinder
+      cutOffset=2.5
+      cutRatioCorrection=0.0
+      cutSlope=0.5
+      energyCut=0.02
+      isTrainingMode=0
+      method=none
+      outfileName=ECLLocalMaximumFinderOutput.root
+      truthFraction=0.51
+  8. ECLSplitterN1
+      cutDigitEnergyForEnergy=0.0005
+      cutDigitTimeResidualForEnergy=5.0
+      expConstant=2.5
+      fullBkgdCount=182
+      liloParameterA=4.0
+      liloParameterB=0.0
+      liloParameterC=0.0
+      maxIterations=100
+      maxSplits=10
+      minimumSharedEnergy=2.5000000000000005e-05
+      positionMethod=lilo
+      removeShiftedLMs=0
+      sharingDistanceMolierMultiplier=50.0
+      shiftTolerance=0.1
+      threshold=0.0075
+      useOptimalNumberOfDigitsForEnergy=1
+  9. ECLSplitterN2
+      liloParameterA=4.0
+      liloParameterB=0.0
+      liloParameterC=0.0
+      positionMethod=lilo
+  10. ECLShowerCorrector
+  11. ECLShowerShape
+      avgCrystalDimension=5.0
+      zernike_MVAidentifier_BRL=ecl_showershape_zernike_mva_brl
+      zernike_MVAidentifier_BWD=ecl_showershape_zernike_mva_bwd
+      zernike_MVAidentifier_FWD=ecl_showershape_zernike_mva_fwd
+      zernike_n1_rho0=10.0
+      zernike_n2_rho0=20.0
+      zernike_useFarCrystals=True
+  12. ECLClusterPSD
+      CrystalHadronEnergyThreshold=0.003
+      CrystalHadronIntensityThreshold=0.005
+      MVAidentifier=eclClusterPSD_MVA
+  13. ECLCovarianceMatrix
+  14. Sum_Clustering
+  15. Geometry
+      additionalComponents=[]
+      assignRegions=False
+      components=[]
+      createPayloads=False
+      excludedComponents=[]
+      geometryPath=/Detector
+      geometryType=0
+      ignoreIfPresent=False
+      payloadIov=[0, 0, -1, -1]
+      useDB=True
+  16. SetupGenfitExtrapolation
+      MSCModel=Highland
+      energyLossBetheBloch=True
+      energyLossBrems=False
+      ignoreIfPresent=True
+      noEffects=False
+      noiseBetheBloch=True
+      noiseBrems=False
+      noiseCoulomb=True
+      useVXDAlignment=True
+      whichGeometry=Geant4
+  17. RegisterEventLevelTrackingInfo
+      EventLevelTrackingInfoName=EventLevelTrackingInfo
+  18. SVDClusterizer
+      AdjacentSN=3.0
+      ClusterSN=0.0
+      Clusters=
+      EventInfo=SVDEventInfo
+      MCParticles=
+      SVDTrueHits=
+      SeedSN=5.0
+      ShaperDigits=
+      chargeAlgorithm3Samples=not set
+      chargeAlgorithm6Samples=not set
+      positionAlgorithm3Samples=not set
+      positionAlgorithm6Samples=not set
+      returnClusterRawTime=False
+      shiftSVDClusterTime=True
+      stripChargeAlgorithm3Samples=not set
+      stripChargeAlgorithm6Samples=not set
+      stripTimeAlgorithm3Samples=not set
+      stripTimeAlgorithm6Samples=not set
+      timeAlgorithm3Samples=not set
+      timeAlgorithm6Samples=not set
+      useDB=True
+  19. SVDMissingAPVsClusterCreator
+      Clusters=
+      SNR=15.0
+      charge=20000.0
+      firstFrame=0
+      nFakeClusters=4
+      seedCharge=10000.0
+      size=128
+      time=0.0
+      timeError=10.0
+  20. SVDTrackingEventLevelMdstInfoFiller
+      EventLevelTrackingInfoName=EventLevelTrackingInfo
+      svdClustersName=
+  21. SVDTimeGrouping
+      SVDClusters=
+      SVDEventInfo=SVDEventInfo
+      acceptSigmaN=7.0
+      expectedSignalTimeCenter=0.0
+      expectedSignalTimeMax=50.0
+      expectedSignalTimeMin=-50.0
+      fillSigmaN=3.0
+      fitRangeHalfWidth=5.0
+      forceGroupingFromDB=True
+      fracThreshold=0.05000000074505806
+      includeOutOfRangeClusters=True
+      isEnabledIn3Samples=False
+      isEnabledIn6Samples=False
+      maxGroups=20
+      maxSigma=15.0
+      minSigma=1.0
+      rebinningFactor=2
+      removeSigmaN=7.0
+      signalLifetime=30.0
+      tRangeHigh=160.0
+      tRangeLow=-160.0
+      useParamFromDB=True
+      writeGroupInfo=True
+  22. SVDSpacePointCreator
+      EventLevelTrackingInfoName=EventLevelTrackingInfo
+      MinClusterTime=-20.0
+      NameOfInstance=SVDSpacePoints
+      OnlySingleClusterSpacePoints=False
+      SVDClusters=
+      SVDEventInfo=SVDEventInfo
+      SpacePoints=SVDSpacePoints
+      forceGroupingFromDB=True
+      formSingleSignalGroup=False
+      inputPDF=/data/svd/spacePointQICalibration.root
+      numMaxSpacePoints=70000
+      numberOfSignalGroups=1
+      useDBForSNRFraction=True
+      useLegacyNaming=True
+      useParamFromDB=True
+      useQualityEstimator=False
+      useSVDGroupInfoIn3Sample=False
+      useSVDGroupInfoIn6Sample=False
+      useSVDSpacePointSNRFractionFor3Samples=False
+      useSVDSpacePointSNRFractionFor6Samples=False
+  23. PXDClusterizer
+      ClusterCacheSize=0
+      ClusterSN=8.0
+      Clusters=
+      Digits=
+      ElectronicNoise=0.7
+      ErrorFromDB=True
+      HeadTailSize=3
+      MCParticles=
+      NoiseSN=3.0
+      PositionErrorUPayloadName=PXDClusterPositionErrorUPar
+      PositionErrorVPayloadName=PXDClusterPositionErrorVPar
+      SeedSN=5.0
+      TrueHits=
+      createPXDClustersForAbortedTrackingEvents=False
+  24. PXDTrackingEventLevelMdstInfoFiller
+  25. PXDSpacePointCreator
+      NameOfInstance=PXDSpacePoints
+      PXDClusters=
+      SpacePoints=PXDSpacePoints
+  26. TFCDC_WireHitPreparer
+      UseNLoops=inf
+      blockNegativeDriftLength=False
+      deviationFromMedianTDCinASIC=10.0
+      filter=mva
+      filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'}
+      flightTimeEstimation=outwards
+      ignoreLayers=[]
+      ignoreWireSag=False
+      maxDriftTimes=[-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0]
+      minimalHitNumberASIC=4
+      minimalNSignalASIC=4
+      noiseChargeDeposit=0.0
+      triggerPoint=(0.0, 0.0, 0.0)
+      useBadWires=False
+      useDegreeSector=(inf, inf)
+      useLayers=[]
+      useMCParticleIds=[]
+      useSecondHits=False
+      useSuperLayers=[]
+      wireHits=CDCWireHitVector
+      wirePosition=aligned
+  27. TFCDC_ClusterPreparer
+      ClusterFilter=all
+      ClusterFilterParameters={}
+      SuperClusterDegree=2
+      SuperClusterExpandOverApogeeGap=False
+      clusters=CDCWireHitClusterVector
+      inputWireHits=CDCWireHitVector
+      missingPrimaryNeighborThresholds={0: 2, 2: 2, 4: 2, 6: 2, 8: 2, 10: 2}
+      secondaryClusters=CDCWireHitSuperClusterVector
+  28. TFCDC_SegmentFinderFacetAutomaton
+      FacetFilter=chi2
+      FacetFilterParameters={}
+      FacetHardRLCut=True
+      FacetLeastSquareFit=False
+      FacetMissingPrimaryNeighborThresholds={0: 2, 2: 2, 4: 2, 6: 2, 8: 2, 10: 2}
+      FacetRelationFilter=chi2
+      FacetRelationFilterParameters={}
+      FacetRelationOnlyBest=0
+      FacetUpdateDriftLength=True
+      FacetsStoreObjName=CDCFacetVector
+      SegmentOrientation=curling
+      SegmentRelationDealiasLinked=False
+      SegmentRelationFilter=realistic
+      SegmentRelationFilterParameters={'DBPayloadName': 'trackfindingcdc_RealisticSegmentRelationFilterParameters'}
+      SegmentRelationOnlyBest=0
+      SegmentRelationOnlyLinked=False
+      SegmentRelationWholeSuperLayer=False
+      WriteFacets=False
+      allSingleAliases=False
+      fitPos=recoPos
+      fitVariance=proper
+      inputClusters=CDCWireHitClusterVector
+      investigateAlias=['cross', 'borders']
+      karimakiFit=False
+      reestimateDriftLength=True
+      reestimatePositions=False
+      relaxSingleLayerSearch=True
+      searchAlias=True
+      searchReversed=False
+      segments=CDCSegment2DVector
+      tofMassScale=nan
+      updateDriftLength=True
+      updateRecoPos=False
+      useAlphaInDriftLength=True
+  29. TFCDC_AxialTrackFinderLegendre
+      addDistance=0.25
+      dropDistance=0.2
+      inputWireHits=CDCWireHitVector
+      mergeMinFitProb=0.85
+      tracks=CDCTrackVector
+  30. TFCDC_TrackQualityAsserter
+      corrections=['B2B']
+      inputTracks=CDCTrackVector
+      onlyNotFittedTracks=False
+  31. TFCDC_StereoHitFinder
+      checkForB2BTracks=True
+      checkForInWireBoundsFactor=1.0
+      filter=all
+      filterParameters={}
+      inputTracks=CDCTrackVector
+      inputWireHits=CDCWireHitVector
+      level=7
+      minimumNumberOfHits=5
+      useOnlySingleBestCandidate=True
+      writeDebugInformation=False
+  32. TFCDC_SegmentTrackCombiner
+      hitSelectorUseOnlySingleBestCandidate=False
+      inputSegments=CDCSegment2DVector
+      inputTracks=CDCTrackVector
+      removeUnmatchedSegments=True
+      segmentTrackFilter=mva
+      segmentTrackFilterParameters={'DBPayloadName': 'trackfindingcdc_SegmentTrackFilterParameters'}
+      sharedHitsCutValue=1.0
+      trackDeleteRejected=True
+      trackFilter=mva
+      trackFilterParameters={'DBPayloadName': 'trackfindingcdc_TrackFilterParameters'}
+      useOnlySingleBestCandidate=False
+  33. TFCDC_TrackQualityAsserter
+      corrections=['LayerBreak', 'OneSuperlayer', 'Small']
+      inputTracks=CDCTrackVector
+      onlyNotFittedTracks=False
+  34. TFCDC_TrackQualityEstimator
+      deleteTracks=True
+      filter=mva
+      filterParameters={'DBPayloadName': 'trackfindingcdc_TrackQualityEstimatorParameters'}
+      inputTracks=CDCTrackVector
+      resetTakenFlag=True
+  35. TFCDC_TrackExporter
+      RecoTracksStoreArrayName=CDCRecoTracks
+      WriteRecoTracks=True
+      discardCovarianceMatrix=False
+      exportTracks=True
+      inputTracks=CDCTrackVector
+      monopoleMomSeed=0.0
+  36. IPTrackTimeEstimator
+      pdgCodeToUseForEstimation=211
+      readoutPosition=[0.0, 0.0, 0.0]
+      readoutPositionPropagationSpeed=29.9792458
+      recoTracksStoreArrayName=CDCRecoTracks
+      timeOffset=0.0
+      useFittedInformation=False
+      useReadoutPosition=False
+  37. CDCHitBasedT0Extraction
+      binCountTimeHistogram=50
+      fitWindow=100.0
+      inputWireHits=CDCWireHitVector
+      minHitCount=20
+      overwriteExistingEstimation=True
+      refitWindow=50.0
+      rejectByBackgroundFlag=False
+      rejectIfChiSquareLargerThan=3.4028234663852886e+38
+      rejectIfNotTakenFlag=True
+      rejectIfUncertaintyLargerThan=12.0
+      searchWindow=70.0
+      storeAllFits=False
+  38. CDCTrackingEventLevelMdstInfoFillerFromHits
+      inputWireHits=CDCWireHitVector
+  39. CDCTrackingEventLevelMdstInfoFillerFromSegments
+      inputSegments=CDCSegment2DVector
+  40. CDCToSVDSpacePointCKF_backward
+      advanceEqualFilter=all
+      advanceEqualFilterParameters={}
+      advanceEqualUseNStates=0
+      advanceHighFilter=advance
+      advanceHighFilterParameters={'direction': 'backward'}
+      advanceHighUseNStates=0
+      advanceLowFilter=all
+      advanceLowFilterParameters={}
+      advanceLowUseNStates=0
+      advanceToggleOnLayer=-99
+      enableOverlapResolving=True
+      endEarly=True
+      exportTracks=True
+      filter=mva
+      filterParameters={'DBPayloadName': 'ckf_CDCToSVDResultParameters'}
+      firstEqualFilter=all
+      firstEqualFilterParameters={}
+      firstEqualUseNStates=0
+      firstHighFilter=mva_with_direction_check
+      firstHighFilterParameters={'DBPayloadName': 'ckf_CDCSVDStateFilter_1_backward_Parameters', 'direction': 'backward'}
+      firstHighUseNStates=10
+      firstLowFilter=all
+      firstLowFilterParameters={}
+      firstLowUseNStates=0
+      firstToggleOnLayer=-99
+      hitFilter=sensor
+      hitFilterParameters={}
+      hitHitJumping=1
+      hitsSpacePointsStoreArrayName=SVDSpacePoints
+      ignoreTracksWithCDChits=False
+      inputRecoTrackStoreArrayName=CDCRecoTracks
+      markUsedSpacePoints=True
+      minimalHitRequirement=1
+      minimalPtRequirement=0.0
+      onlyCombineRelatedHitStates=False
+      onlyUseHitStatesRelatedToSeeds=False
+      outputRecoTrackStoreArrayName=SVDRecoTracks
+      outputRelationRecoTrackStoreArrayName=CDCRecoTracks
+      preHitFilter=loose
+      preHitFilterParameters={}
+      preSeedFilter=loose
+      preSeedFilterParameters={}
+      relatedRecoTrackStoreArrayName=SVDRecoTracks
+      relationCheckForDirection=backward
+      reverseSeed=False
+      secondEqualFilter=all
+      secondEqualFilterParameters={}
+      secondEqualUseNStates=0
+      secondHighFilter=mva
+      secondHighFilterParameters={'DBPayloadName': 'ckf_CDCSVDStateFilter_2_backward_Parameters'}
+      secondHighUseNStates=10
+      secondLowFilter=all
+      secondLowFilterParameters={}
+      secondLowUseNStates=0
+      secondToggleOnLayer=-99
+      seedFilter=all
+      seedFilterParameters={}
+      seedHitJumping=1
+      singleClusterLevel=True
+      thirdEqualFilter=all
+      thirdEqualFilterParameters={}
+      thirdEqualUseNStates=0
+      thirdHighFilter=mva
+      thirdHighFilterParameters={'DBPayloadName': 'ckf_CDCSVDStateFilter_3_backward_Parameters'}
+      thirdHighUseNStates=10
+      thirdLowFilter=all
+      thirdLowFilterParameters={}
+      thirdLowUseNStates=0
+      thirdToggleOnLayer=-99
+      trackFitType=2
+      updateEqualFilter=all
+      updateEqualFilterParameters={}
+      updateEqualUseNStates=0
+      updateHighFilter=fit
+      updateHighFilterParameters={}
+      updateHighUseNStates=0
+      updateLowFilter=all
+      updateLowFilterParameters={}
+      updateLowUseNStates=0
+      updateToggleOnLayer=-99
+      useAssignedHits=False
+      useBestNInSeed=5
+      writeOutDirection=backward
+  41. CDCToSVDSpacePointCKF_forward
+      advanceEqualFilter=all
+      advanceEqualFilterParameters={}
+      advanceEqualUseNStates=0
+      advanceHighFilter=advance
+      advanceHighFilterParameters={'direction': 'forward'}
+      advanceHighUseNStates=0
+      advanceLowFilter=all
+      advanceLowFilterParameters={}
+      advanceLowUseNStates=0
+      advanceToggleOnLayer=-99
+      enableOverlapResolving=True
+      endEarly=True
+      exportTracks=True
+      filter=mva
+      filterParameters={'DBPayloadName': 'ckf_CDCToSVDResultParameters'}
+      firstEqualFilter=all
+      firstEqualFilterParameters={}
+      firstEqualUseNStates=0
+      firstHighFilter=mva_with_direction_check
+      firstHighFilterParameters={'DBPayloadName': 'ckf_CDCSVDStateFilter_1_forward_Parameters', 'direction': 'forward'}
+      firstHighUseNStates=10
+      firstLowFilter=all
+      firstLowFilterParameters={}
+      firstLowUseNStates=0
+      firstToggleOnLayer=-99
+      hitFilter=sensor
+      hitFilterParameters={}
+      hitHitJumping=1
+      hitsSpacePointsStoreArrayName=SVDSpacePoints
+      ignoreTracksWithCDChits=False
+      inputRecoTrackStoreArrayName=CDCRecoTracks
+      markUsedSpacePoints=True
+      minimalHitRequirement=1
+      minimalPtRequirement=0.0
+      onlyCombineRelatedHitStates=False
+      onlyUseHitStatesRelatedToSeeds=False
+      outputRecoTrackStoreArrayName=SVDRecoTracks
+      outputRelationRecoTrackStoreArrayName=CDCRecoTracks
+      preHitFilter=loose
+      preHitFilterParameters={}
+      preSeedFilter=loose
+      preSeedFilterParameters={}
+      relatedRecoTrackStoreArrayName=SVDRecoTracks
+      relationCheckForDirection=forward
+      reverseSeed=True
+      secondEqualFilter=all
+      secondEqualFilterParameters={}
+      secondEqualUseNStates=0
+      secondHighFilter=mva
+      secondHighFilterParameters={'DBPayloadName': 'ckf_CDCSVDStateFilter_2_forward_Parameters'}
+      secondHighUseNStates=10
+      secondLowFilter=all
+      secondLowFilterParameters={}
+      secondLowUseNStates=0
+      secondToggleOnLayer=-99
+      seedFilter=all
+      seedFilterParameters={}
+      seedHitJumping=1
+      singleClusterLevel=True
+      thirdEqualFilter=all
+      thirdEqualFilterParameters={}
+      thirdEqualUseNStates=0
+      thirdHighFilter=mva
+      thirdHighFilterParameters={'DBPayloadName': 'ckf_CDCSVDStateFilter_3_forward_Parameters'}
+      thirdHighUseNStates=10
+      thirdLowFilter=all
+      thirdLowFilterParameters={}
+      thirdLowUseNStates=0
+      thirdToggleOnLayer=-99
+      trackFitType=2
+      updateEqualFilter=all
+      updateEqualFilterParameters={}
+      updateEqualUseNStates=0
+      updateHighFilter=fit
+      updateHighFilterParameters={}
+      updateHighUseNStates=0
+      updateLowFilter=all
+      updateLowFilterParameters={}
+      updateLowUseNStates=0
+      updateToggleOnLayer=-99
+      useAssignedHits=False
+      useBestNInSeed=5
+      writeOutDirection=forward
+  42. SectorMapBootstrap
+      ReadSecMapFromDB=True
+      ReadSectorMap=False
+      SectorMapsInputFile=SVDSectorMap_v000.root
+      SectorMapsOutputFile=SectorMaps.root
+      SetupToRead=SVDOnlyDefault
+      WriteSectorMap=False
+      threeHitFilterAdjustFunctions=[]
+      twoHitFilterAdjustFunctions=[]
+  43. SegmentNetworkProducer
+      EventLevelTrackingInfoName=EventLevelTrackingInfo
+      NetworkOutputName=SegmentNetwork
+      SpacePointsArrayNames=['SVDSpacePoints']
+      addVirtualIP=False
+      allFiltersOff=False
+      maxAddedConnections=300000
+      maxAddedHitConnections=200000
+      maxConnections=30000
+      maxHitConnections=8000
+      maxNetworkSize=40000
+      printNetworkToMathematica=False
+      printNetworks=False
+      sectorMapName=SVDOnlyDefault
+      virtualIPCoorindates=[0.0, 0.0, 0.0]
+      virtualIPErrors=[0.2, 0.2, 1.0]
+  44. TrackFinderVXDCellOMat
+      EventLevelTrackingInfoName=EventLevelTrackingInfo
+      NetworkName=SegmentNetwork
+      SpacePointTrackCandArrayName=SPTrackCands
+      maxFamilies=10000
+      maxPaths=400000
+      printNetworks=False
+      selectBestPerFamily=True
+      setFamilies=True
+      storeSubsets=False
+      strictSeeding=True
+      xBestPerFamily=30
+  45. AddVXDTrackCandidateSubSets
+      MinOriginalSpacePoints=4
+      NameSpacePointTrackCands=SPTrackCands
+  46. QualityEstimatorVXD
+      EstimationMethod=tripletFit
+      MCRecoTracksStoreArrayName=MCRecoTracks
+      MCStrictQualityEstimator=True
+      SpacePointTrackCandsStoreArrayName=SPTrackCands
+  47. BestVXDTrackCandidatesSelector
+      NameSpacePointTrackCands=SPTrackCands
+      NewNameSpacePointTrackCands=SPTrackCands
+      SubsetCreation=False
+      SubsetSize=1000
+  48. SPTCvirtualIPRemover
+      doCheckOnly=False
+      maxTCLengthForVIPKeeping=0
+      tcArrayName=SPTrackCands
+  49. SVDOverlapResolver
+      NameSVDClusters=
+      NameSpacePointTrackCands=SPTrackCands
+      ResolveMethod=greedy
+      minActivityState=0.699999988079071
+  50. SPTCmomentumSeedRetriever
+      tcArrayName=SPTrackCands
+  51. SPTC2RTConverter
+      pxdClustersName=
+      pxdHitsStoreArrayName=
+      recoHitInformationStoreArrayName=
+      recoTracksStoreArrayName=SVDRecoTracks
+      spacePointsTCsStoreArrayName=SPTrackCands
+      svdClustersName=
+      svdHitsStoreArrayName=
+  52. DAFRecoFitter CDCRecoTracks
+      bklmHitsStoreArrayName=
+      cdcHitsStoreArrayName=
+      correctSeedCharge=False
+      eklmHitsStoreArrayName=
+      initializeCDCTranslators=True
+      monopoleMagCharge=1.0
+      pdgCodesToUseForFitting=[211]
+      probCut=0.001
+      pxdHitsStoreArrayName=
+      recoTracksStoreArrayName=CDCRecoTracks
+      resortHits=False
+      svdHitsStoreArrayName=
+      trackFitType=2
+  53. CDCToSVDSeedCKF_backward
+      advanceEqualFilter=all
+      advanceEqualFilterParameters={}
+      advanceEqualUseNStates=0
+      advanceHighFilter=advance
+      advanceHighFilterParameters={'direction': 'backward'}
+      advanceHighUseNStates=0
+      advanceLowFilter=all
+      advanceLowFilterParameters={}
+      advanceLowUseNStates=0
+      advanceToggleOnLayer=-99
+      cdcTracksStoreArrayName=CDCRecoTracks
+      endEarly=False
+      filter=mva_with_relations
+      filterParameters={'DBPayloadName': 'ckf_SeededCDCToSVDResultParameters'}
+      firstEqualFilter=all
+      firstEqualFilterParameters={}
+      firstEqualUseNStates=0
+      firstHighFilter=non_ip_crossing
+      firstHighFilterParameters={'direction': 'backward'}
+      firstHighUseNStates=0
+      firstLowFilter=all
+      firstLowFilterParameters={}
+      firstLowUseNStates=0
+      firstToggleOnLayer=-99
+      fromRelationStoreArrayName=CDCRecoTracks
+      hitsSpacePointsStoreArrayName=SVDSpacePoints
+      ignoreTracksWithCDChits=False
+      inputRecoTrackStoreArrayName=CDCRecoTracks
+      minimalHitRequirement=2
+      minimalPtRequirement=0.0
+      relatedRecoTrackStoreArrayName=SVDRecoTracks
+      relationCheckForDirection=backward
+      reverseSeed=False
+      secondEqualFilter=all
+      secondEqualFilterParameters={}
+      secondEqualUseNStates=0
+      secondHighFilter=all
+      secondHighFilterParameters={}
+      secondHighUseNStates=0
+      secondLowFilter=all
+      secondLowFilterParameters={}
+      secondLowUseNStates=0
+      secondToggleOnLayer=-99
+      spacePointTrackCandidatesName=SPTrackCands
+      thirdEqualFilter=all
+      thirdEqualFilterParameters={}
+      thirdEqualUseNStates=0
+      thirdHighFilter=all
+      thirdHighFilterParameters={}
+      thirdHighUseNStates=0
+      thirdLowFilter=all
+      thirdLowFilterParameters={}
+      thirdLowUseNStates=0
+      thirdToggleOnLayer=-99
+      toRelationStoreArrayName=SVDRecoTracks
+      trackFitType=2
+      updateEqualFilter=all
+      updateEqualFilterParameters={}
+      updateEqualUseNStates=0
+      updateHighFilter=fit
+      updateHighFilterParameters={}
+      updateHighUseNStates=0
+      updateLowFilter=all
+      updateLowFilterParameters={}
+      updateLowUseNStates=0
+      updateToggleOnLayer=-99
+      useAssignedHits=True
+      vxdTracksStoreArrayName=SVDRecoTracks
+      writeOutDirection=backward
+  54. DAFRecoFitter CDCRecoTracks
+      bklmHitsStoreArrayName=
+      cdcHitsStoreArrayName=
+      correctSeedCharge=False
+      eklmHitsStoreArrayName=
+      initializeCDCTranslators=True
+      monopoleMagCharge=1.0
+      pdgCodesToUseForFitting=[211]
+      probCut=0.001
+      pxdHitsStoreArrayName=
+      recoTracksStoreArrayName=CDCRecoTracks
+      resortHits=False
+      svdHitsStoreArrayName=
+      trackFitType=2
+  55. CDCToSVDSeedCKF_forward
+      advanceEqualFilter=all
+      advanceEqualFilterParameters={}
+      advanceEqualUseNStates=0
+      advanceHighFilter=advance
+      advanceHighFilterParameters={'direction': 'forward'}
+      advanceHighUseNStates=0
+      advanceLowFilter=all
+      advanceLowFilterParameters={}
+      advanceLowUseNStates=0
+      advanceToggleOnLayer=-99
+      cdcTracksStoreArrayName=CDCRecoTracks
+      endEarly=False
+      filter=mva_with_relations
+      filterParameters={'DBPayloadName': 'ckf_SeededCDCToSVDResultParameters'}
+      firstEqualFilter=all
+      firstEqualFilterParameters={}
+      firstEqualUseNStates=0
+      firstHighFilter=non_ip_crossing
+      firstHighFilterParameters={'direction': 'forward'}
+      firstHighUseNStates=0
+      firstLowFilter=all
+      firstLowFilterParameters={}
+      firstLowUseNStates=0
+      firstToggleOnLayer=-99
+      fromRelationStoreArrayName=CDCRecoTracks
+      hitsSpacePointsStoreArrayName=SVDSpacePoints
+      ignoreTracksWithCDChits=False
+      inputRecoTrackStoreArrayName=CDCRecoTracks
+      minimalHitRequirement=2
+      minimalPtRequirement=0.0
+      relatedRecoTrackStoreArrayName=SVDRecoTracks
+      relationCheckForDirection=forward
+      reverseSeed=True
+      secondEqualFilter=all
+      secondEqualFilterParameters={}
+      secondEqualUseNStates=0
+      secondHighFilter=all
+      secondHighFilterParameters={}
+      secondHighUseNStates=0
+      secondLowFilter=all
+      secondLowFilterParameters={}
+      secondLowUseNStates=0
+      secondToggleOnLayer=-99
+      spacePointTrackCandidatesName=SPTrackCands
+      thirdEqualFilter=all
+      thirdEqualFilterParameters={}
+      thirdEqualUseNStates=0
+      thirdHighFilter=all
+      thirdHighFilterParameters={}
+      thirdHighUseNStates=0
+      thirdLowFilter=all
+      thirdLowFilterParameters={}
+      thirdLowUseNStates=0
+      thirdToggleOnLayer=-99
+      toRelationStoreArrayName=SVDRecoTracks
+      trackFitType=2
+      updateEqualFilter=all
+      updateEqualFilterParameters={}
+      updateEqualUseNStates=0
+      updateHighFilter=fit
+      updateHighFilterParameters={}
+      updateHighUseNStates=0
+      updateLowFilter=all
+      updateLowFilterParameters={}
+      updateLowUseNStates=0
+      updateToggleOnLayer=-99
+      useAssignedHits=True
+      vxdTracksStoreArrayName=SVDRecoTracks
+      writeOutDirection=forward
+  56. RelatedTracksCombiner
+      CDCRecoTracksStoreArrayName=CDCRecoTracks
+      VXDRecoTracksStoreArrayName=SVDRecoTracks
+      recoTracksStoreArrayName=SVDPlusCDCStandaloneRecoTracks
+  57. ToCDCCKF
+      exportAllTracks=False
+      exportTracks=True
+      filter=size
+      filterParameters={}
+      hitFindingDirection=forward
+      ignoreTracksWithCDChits=True
+      inputRecoTrackStoreArrayName=SVDPlusCDCStandaloneRecoTracks
+      inputWireHits=CDCWireHitVector
+      maximalDeltaPhi=0.39269908169872414
+      maximalLayerJump=4
+      maximalLayerJumpBackwardSeed=3
+      minimalPtRequirement=0.0
+      outputRecoTrackStoreArrayName=CKFCDCRecoTracks
+      outputRelationRecoTrackStoreArrayName=SVDPlusCDCStandaloneRecoTracks
+      pathFilter=arc_length
+      pathFilterParameters={}
+      pathMaximalCandidatesInFlight=3
+      relatedRecoTrackStoreArrayName=CKFCDCRecoTracks
+      relationCheckForDirection=backward
+      seedComponent=SVD
+      setTakenFlag=True
+      stateBasicFilter=rough
+      stateBasicFilterParameters={'maximalHitDistance': 0.15}
+      stateExtrapolationFilter=extrapolate_and_update
+      stateExtrapolationFilterParameters={}
+      stateFinalFilter=distance
+      stateFinalFilterParameters={}
+      stateMaximalHitCandidates=4
+      statePreFilter=all
+      statePreFilterParameters={}
+      trackFindingDirection=forward
+      trackFitType=0
+      writeOutDirection=backward
+  58. CDCCKFTracksCombiner
+      CDCRecoTracksStoreArrayName=CKFCDCRecoTracks
+      VXDRecoTracksStoreArrayName=SVDPlusCDCStandaloneRecoTracks
+      recoTracksStoreArrayName=SVDCDCRecoTracks
+  59. PruneRecoTracks SVDPlusCDCStandaloneRecoTracks
+      removeHits=False
+      storeArrayName=SVDPlusCDCStandaloneRecoTracks
+  60. PruneRecoTracks CKFCDCRecoTracks
+      removeHits=False
+      storeArrayName=CKFCDCRecoTracks
+  61. DAFRecoFitter SVDCDCRecoTracks
+      bklmHitsStoreArrayName=
+      cdcHitsStoreArrayName=
+      correctSeedCharge=False
+      eklmHitsStoreArrayName=
+      initializeCDCTranslators=True
+      monopoleMagCharge=1.0
+      pdgCodesToUseForFitting=[211]
+      probCut=0.001
+      pxdHitsStoreArrayName=
+      recoTracksStoreArrayName=SVDCDCRecoTracks
+      resortHits=False
+      svdHitsStoreArrayName=
+      trackFitType=0
+  62. ToPXDCKF_backward
+      advanceEqualFilter=all
+      advanceEqualFilterParameters={}
+      advanceEqualUseNStates=0
+      advanceHighFilter=advance
+      advanceHighFilterParameters={'direction': 'backward'}
+      advanceHighUseNStates=0
+      advanceLowFilter=all
+      advanceLowFilterParameters={}
+      advanceLowUseNStates=0
+      advanceToggleOnLayer=-99
+      enableOverlapResolving=True
+      endEarly=True
+      exportTracks=True
+      filter=mva
+      filterParameters={'DBPayloadName': 'ckf_PXDTrackCombinationParameters'}
+      firstEqualFilter=all
+      firstEqualFilterParameters={}
+      firstEqualUseNStates=0
+      firstHighFilter=mva_with_direction_check
+      firstHighFilterParameters={'DBPayloadName': 'ckf_ToPXDStateFilter_1Parameters', 'direction': 'backward'}
+      firstHighUseNStates=10
+      firstLowFilter=all
+      firstLowFilterParameters={}
+      firstLowUseNStates=0
+      firstToggleOnLayer=-99
+      hitFilter=sensor
+      hitFilterParameters={}
+      hitHitJumping=0
+      hitsSpacePointsStoreArrayName=PXDSpacePoints
+      ignoreTracksWithCDChits=False
+      inputRecoTrackStoreArrayName=SVDCDCRecoTracks
+      markUsedSpacePoints=True
+      minimalHitRequirement=1
+      minimalPtRequirement=0.0
+      onlyCombineRelatedHitStates=False
+      onlyUseHitStatesRelatedToSeeds=False
+      onlyUseTracksWithSVD=True
+      outputRecoTrackStoreArrayName=PXDRecoTracks
+      outputRelationRecoTrackStoreArrayName=SVDCDCRecoTracks
+      preHitFilter=loose
+      preHitFilterParameters={}
+      preSeedFilter=loose
+      preSeedFilterParameters={}
+      relatedRecoTrackStoreArrayName=PXDRecoTracks
+      relationCheckForDirection=backward
+      reverseSeed=False
+      reverseSeedState=False
+      secondEqualFilter=all
+      secondEqualFilterParameters={}
+      secondEqualUseNStates=0
+      secondHighFilter=mva
+      secondHighFilterParameters={'DBPayloadName': 'ckf_ToPXDStateFilter_2Parameters'}
+      secondHighUseNStates=10
+      secondLowFilter=all
+      secondLowFilterParameters={}
+      secondLowUseNStates=0
+      secondToggleOnLayer=-99
+      seedFilter=sensor
+      seedFilterParameters={}
+      seedHitJumping=-1
+      singleClusterLevel=True
+      thirdEqualFilter=all
+      thirdEqualFilterParameters={}
+      thirdEqualUseNStates=0
+      thirdHighFilter=mva
+      thirdHighFilterParameters={'DBPayloadName': 'ckf_ToPXDStateFilter_3Parameters'}
+      thirdHighUseNStates=10
+      thirdLowFilter=all
+      thirdLowFilterParameters={}
+      thirdLowUseNStates=0
+      thirdToggleOnLayer=-99
+      trackFitType=0
+      updateEqualFilter=all
+      updateEqualFilterParameters={}
+      updateEqualUseNStates=0
+      updateHighFilter=fit
+      updateHighFilterParameters={}
+      updateHighUseNStates=0
+      updateLowFilter=all
+      updateLowFilterParameters={}
+      updateLowUseNStates=0
+      updateToggleOnLayer=-99
+      useAssignedHits=False
+      useBestNInSeed=2
+      writeOutDirection=backward
+  63. DAFRecoFitter SVDCDCRecoTracks
+      bklmHitsStoreArrayName=
+      cdcHitsStoreArrayName=
+      correctSeedCharge=False
+      eklmHitsStoreArrayName=
+      initializeCDCTranslators=True
+      monopoleMagCharge=1.0
+      pdgCodesToUseForFitting=[211]
+      probCut=0.001
+      pxdHitsStoreArrayName=
+      recoTracksStoreArrayName=SVDCDCRecoTracks
+      resortHits=False
+      svdHitsStoreArrayName=
+      trackFitType=0
+  64. ToPXDCKF_forward
+      advanceEqualFilter=all
+      advanceEqualFilterParameters={}
+      advanceEqualUseNStates=0
+      advanceHighFilter=advance
+      advanceHighFilterParameters={'direction': 'forward'}
+      advanceHighUseNStates=0
+      advanceLowFilter=all
+      advanceLowFilterParameters={}
+      advanceLowUseNStates=0
+      advanceToggleOnLayer=-99
+      enableOverlapResolving=True
+      endEarly=True
+      exportTracks=True
+      filter=mva
+      filterParameters={'DBPayloadName': 'ckf_PXDTrackCombinationParameters'}
+      firstEqualFilter=all
+      firstEqualFilterParameters={}
+      firstEqualUseNStates=0
+      firstHighFilter=mva_with_direction_check
+      firstHighFilterParameters={'DBPayloadName': 'ckf_ToPXDStateFilter_1Parameters', 'direction': 'forward'}
+      firstHighUseNStates=10
+      firstLowFilter=all
+      firstLowFilterParameters={}
+      firstLowUseNStates=0
+      firstToggleOnLayer=-99
+      hitFilter=sensor
+      hitFilterParameters={}
+      hitHitJumping=0
+      hitsSpacePointsStoreArrayName=PXDSpacePoints
+      ignoreTracksWithCDChits=False
+      inputRecoTrackStoreArrayName=SVDCDCRecoTracks
+      markUsedSpacePoints=True
+      minimalHitRequirement=1
+      minimalPtRequirement=0.0
+      onlyCombineRelatedHitStates=False
+      onlyUseHitStatesRelatedToSeeds=False
+      onlyUseTracksWithSVD=True
+      outputRecoTrackStoreArrayName=PXDRecoTracks
+      outputRelationRecoTrackStoreArrayName=SVDCDCRecoTracks
+      preHitFilter=loose
+      preHitFilterParameters={}
+      preSeedFilter=loose
+      preSeedFilterParameters={}
+      relatedRecoTrackStoreArrayName=PXDRecoTracks
+      relationCheckForDirection=forward
+      reverseSeed=True
+      reverseSeedState=True
+      secondEqualFilter=all
+      secondEqualFilterParameters={}
+      secondEqualUseNStates=0
+      secondHighFilter=mva
+      secondHighFilterParameters={'DBPayloadName': 'ckf_ToPXDStateFilter_2Parameters'}
+      secondHighUseNStates=10
+      secondLowFilter=all
+      secondLowFilterParameters={}
+      secondLowUseNStates=0
+      secondToggleOnLayer=-99
+      seedFilter=sensor
+      seedFilterParameters={}
+      seedHitJumping=-1
+      singleClusterLevel=True
+      thirdEqualFilter=all
+      thirdEqualFilterParameters={}
+      thirdEqualUseNStates=0
+      thirdHighFilter=mva
+      thirdHighFilterParameters={'DBPayloadName': 'ckf_ToPXDStateFilter_3Parameters'}
+      thirdHighUseNStates=10
+      thirdLowFilter=all
+      thirdLowFilterParameters={}
+      thirdLowUseNStates=0
+      thirdToggleOnLayer=-99
+      trackFitType=0
+      updateEqualFilter=all
+      updateEqualFilterParameters={}
+      updateEqualUseNStates=0
+      updateHighFilter=fit
+      updateHighFilterParameters={}
+      updateHighUseNStates=0
+      updateLowFilter=all
+      updateLowFilterParameters={}
+      updateLowUseNStates=0
+      updateToggleOnLayer=-99
+      useAssignedHits=False
+      useBestNInSeed=2
+      writeOutDirection=forward
+  65. RelatedTracksCombiner
+      CDCRecoTracksStoreArrayName=SVDCDCRecoTracks
+      VXDRecoTracksStoreArrayName=PXDRecoTracks
+      recoTracksStoreArrayName=RecoTracks
+  66. PruneRecoTracks CDCRecoTracks
+      removeHits=False
+      storeArrayName=CDCRecoTracks
+  67. PruneRecoTracks SVDRecoTracks
+      removeHits=False
+      storeArrayName=SVDRecoTracks
+  68. PruneRecoTracks SVDCDCRecoTracks
+      removeHits=False
+      storeArrayName=SVDCDCRecoTracks
+  69. PruneRecoTracks PXDRecoTracks
+      removeHits=False
+      storeArrayName=PXDRecoTracks
+  70. SVDEventT0Estimator
+      EventT0=
+      RecoTracks=
+      absD0Selection=0.5
+      absPzMinSelection=0.0
+      absZ0Selection=2.0
+      ptMinSelection=0.25
+      selectTracksFromIP=True
+      useDB=True
+  71. FullGridChi2TrackTimeExtractor
+      GridAbortOnUnsuccessfulStep=True
+      GridGridSteps=8
+      GridIterations=1
+      GridMaximalT0Value=70.0
+      GridMinimalT0Value=-70.0
+      GridOverwriteExistingEstimation=True
+      RecoTracksStoreArrayName=
+      RefinerAbortOnUnsuccessfulStep=True
+      RefinerMaxIterations=10
+      RefinerMinIterations=1
+      RefinerMinimalDeltaT0=0.2
+      RefinerOverwriteExistingEstimation=True
+      RefinerUseLastEventT0=True
+      maximumNumberOfTracks=4
+      minNumberCDCHits=20
+      minimumTrackPt=0.35
+      skipIfSVDEventT0Present=True
+      subGridMaximalExtractedT0=100.0
+      subRefinerMaximalExtractedT0=100.0
+  72. IPTrackTimeEstimator
+      pdgCodeToUseForEstimation=211
+      readoutPosition=[0.0, 0.0, 0.0]
+      readoutPositionPropagationSpeed=29.9792458
+      recoTracksStoreArrayName=RecoTracks
+      timeOffset=0.0
+      useFittedInformation=False
+      useReadoutPosition=False
+  73. Combined_DAFRecoFitter
+      bklmHitsStoreArrayName=
+      cdcHitsStoreArrayName=
+      correctSeedCharge=False
+      eklmHitsStoreArrayName=
+      initializeCDCTranslators=True
+      monopoleMagCharge=1.0
+      pdgCodesToUseForFitting=[211]
+      probCut=0.001
+      pxdHitsStoreArrayName=
+      recoTracksStoreArrayName=RecoTracks
+      resortHits=False
+      svdHitsStoreArrayName=
+      trackFitType=0
+  74. TrackCreator
+      beamAxis=[0.0, 0.0, 1.0]
+      beamSpot=[0.0, 0.0, 0.0]
+      pdgCodes=[211, 321, 2212]
+      recoTrackColName=RecoTracks
+      trackColName=
+      trackFitResultColName=
+      useBFieldAtHit=False
+      useClosestHitToIP=False
+      useSeedForTrackFitMomentumRange=False
+  75. TrackTimeEstimator
+  76. Sum_Prefilter_Tracking
+  77. Ext
+      EnableVisualization=False
+      MaxStep=25.0
+      MinKE=0.002
+      MinPt=0.1
+      TrackingVerbosity=0
+      UICommands=[]
+      deltaChordInMagneticField=0.25
+      magneticCacheDistance=0.0
+      magneticFieldStepper=default
+      pdgCodes=[]
+  78. EventT0Combiner
+  79. ECLFinalizer
+      clusterEnergyCutMin=0.02
+      clusterLossyFraction=0.0001
+      clusterTimeCutMaxEnergy=0.05
+  80. MCMatcherECLClusters
+  81. KLMReconstructor
+      CheckSegmentIntersection=True
+      EventT0Correction=True
+      IfAlign=True
+      IgnoreHotChannels=True
+      IgnoreScintillators=False
+      TimeCableDelayCorrection=True
+  82. KLMClustersReconstructor
+      ClusterMode=AnyHit
+      ClusteringAngle=0.26
+      PositionMode=FirstLayer
+  83. KLMClusterAna
+  84. MCMatcherKLMClusters
+      Hit2dRelations=False
+  85. Muid
+      EnableVisualization=False
+      MaxDistSigma=3.5
+      MaxDt=10000.0
+      MaxECLTrackClusterDistance=100.0
+      MaxKLMTrackClusterDistance=150.0
+      MaxStep=25.0
+      MeanDt=0.0
+      MinKE=0.002
+      MinPt=0.1
+      TrackingVerbosity=0
+      UICommands=[]
+      addHitsToRecoTrack=False
+      deltaChordInMagneticField=0.25
+      magneticCacheDistance=0.0
+      magneticFieldStepper=default
+      pdgCodes=[]
+  86. ECLTrackClusterMatching
+      brlEdgeTheta=0.1
+      matchingConsistency=1e-06
+      matchingPTThreshold=0.3
+      minimalCDCHits=-1
+      skipZeroChargeTracks=False
+      useAngularDistanceMatching=True
+      useOptimizedMatchingConsistency=True
+  87. ECLClusterProperties
+      trackClusterRelationName=AngularDistance
+  88. Sum_Prefilter_PostTracking
+  89. SoftwareTrigger
+      baseIdentifier=filter
+      debugOutputFileName=software_trigger_debug.root
+      preScaleStoreDebugOutputToDataStore=0
+      resultStoreArrayName=
+      storeDebugOutputToROOTFile=False
+      useRandomNumbersForPreScale=True
+  90. Sum_HLT_Filter_Calculation
+  91. FlipQuality_1stMVA
+      identifier=TRKTrackFlipAndRefit_MVA1_weightfile
+      indexOfFlippingMVA=1
+      recoTracksStoreArrayName=RecoTracks
+  92. RecoTracksReverter
+      inputStoreArrayName=RecoTracks
+      outputStoreArrayName=RecoTracks_flipped
+  93. Combined_DAFRecoFitter_flipped
+      bklmHitsStoreArrayName=
+      cdcHitsStoreArrayName=
+      correctSeedCharge=False
+      eklmHitsStoreArrayName=
+      initializeCDCTranslators=True
+      monopoleMagCharge=1.0
+      pdgCodesToUseForFitting=[211]
+      probCut=0.001
+      pxdHitsStoreArrayName=
+      recoTracksStoreArrayName=RecoTracks_flipped
+      resortHits=False
+      svdHitsStoreArrayName=
+      trackFitType=0
+  94. IPTrackTimeEstimator
+      pdgCodeToUseForEstimation=211
+      readoutPosition=[0.0, 0.0, 0.0]
+      readoutPositionPropagationSpeed=29.9792458
+      recoTracksStoreArrayName=RecoTracks_flipped
+      timeOffset=0.0
+      useFittedInformation=False
+      useReadoutPosition=False
+  95. TrackCreator_flipped
+      beamAxis=[0.0, 0.0, 1.0]
+      beamSpot=[0.0, 0.0, 0.0]
+      pdgCodes=[211, 321, 2212]
+      recoTrackColName=RecoTracks_flipped
+      trackColName=Tracks_flipped
+      trackFitResultColName=TrackFitResults_flipped
+      useBFieldAtHit=False
+      useClosestHitToIP=False
+      useSeedForTrackFitMomentumRange=False
+  96. FlipQuality_2ndMVA
+      identifier=TRKTrackFlipAndRefit_MVA2_weightfile
+      indexOfFlippingMVA=2
+      recoTracksStoreArrayName=RecoTracks
+  97. FlippedRecoTracksMerger
+      bklmHitsStoreArrayName=
+      cdcHitsStoreArrayName=
+      eklmHitsStoreArrayName=
+      inputStoreArrayName=RecoTracks
+      inputStoreArrayNameFlipped=RecoTracks_flipped
+      pxdHitsStoreArrayName=
+      svdHitsStoreArrayName=
+  98. V0Finder
+      CopiedRecoTracks=CopiedRecoTracks
+      RecoTracks=RecoTracks
+      TrackFitResults=
+      Tracks=
+      V0ValidationVertices=
+      V0s=
+      Validation=False
+      beamPipeRadius=1.0
+      invMassRangeKshort=(0.425, 0.575)
+      invMassRangeLambda=(1.09, 1.14)
+      invMassRangePhoton=(0.0, 0.1)
+      massRangeKshort=(0.45, 0.512611)
+      massRangeLambda=(1.085683, 1.145683)
+      precutCosAlpha=0.9
+      precutRho=0.5
+      useNewV0Fitter=False
+      v0FitterMode=1
+      vertexChi2CutOutside=10000.0
+  99. KinkFinder
+      CopiedRecoTracks=RecoTracksKinkTmp
+      Kinks=
+      RecoTracks=RecoTracks
+      TrackFitResults=
+      Tracks=
+  100. TrackFinderMCTruthRecoTracks
+      AllowFirstCDCSuperLayerOnly=False
+      EnergyCut=0.0
+      MergeDecayInFlight=False
+      MinCDCAxialHits=0
+      MinCDCStereoHits=0
+      MinPXDHits=0
+      MinSVDHits=0
+      MinimalNDF=5
+      Neutrals=False
+      RecoTracksStoreArrayName=MCRecoTracks
+      SetTimeSeed=True
+      Smearing=-1.0
+      SmearingCov=[-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0]
+      SplitAfterDeltaT=-1.0
+      TrueHitMustExist=False
+      UseCDCHits=True
+      UseNLoops=inf
+      UseOnlyAxialCDCHits=False
+      UseOnlyBeforeTOP=False
+      UsePXDHits=True
+      UseReassignedHits=False
+      UseSVDHits=True
+      UseSecondCDCHits=False
+      WhichParticles=[]
+      discardAuxiliaryHits=False
+      ignoreCDCLayers=[]
+      onlyCheckDirectParentPdgCode=False
+      useCDCLayers=[]
+      useCDCSuperLayers=[]
+  101. MCRecoTracksMatcher
+      MinimalEfficiency=0.05
+      MinimalPurity=0.6666666666666666
+      TracksStoreArrayName=
+      UseCDCHits=True
+      UseOnlyAxialCDCHits=False
+      UsePXDHits=True
+      UseSVDHits=True
+      mcRecoTracksStoreArrayName=MCRecoTracks
+      prRecoTracksStoreArrayName=RecoTracks
+      useFittedTracks=True
+  102. TrackToMCParticleRelator
+      MCParticlesName=
+      RecoTracksName=
+      TracksName=
+  103. PruneRecoHits
+  104. PruneRecoTracks RecoTracks_flipped
+      removeHits=False
+      storeArrayName=RecoTracks_flipped
+  105. PruneRecoTracks CopiedRecoTracks
+      removeHits=False
+      storeArrayName=CopiedRecoTracks
+  106. PruneRecoTracks RecoTracksKinkTmp
+      removeHits=False
+      storeArrayName=RecoTracksKinkTmp
+  107. Sum_Postfilter_Tracking
+  108. CDCDedxHitSaver
+  109. CDCDedxPIDCreator
+      dedxTracksName=
+      enableDebugOutput=False
+      likelihoodsName=
+      removeHighest=0.25
+      removeLowest=0.05
+      trackLevel=True
+      useBackHalfCurlers=False
+  110. VXDDedxPID
+      onlyPrimaryParticles=False
+      useIndividualHits=False
+      usePXD=False
+      useSVD=True
+  111. TOPChannelMasker
+      maskUncalibratedChannelT0=True
+      maskUncalibratedTimebase=True
+  112. TOPBunchFinder
+      autoRange=False
+      bunchesPerSSTclk=24
+      correctDigits=True
+      maxD0=2.0
+      maxDERatio=2.5
+      maxPt=6.0
+      maxZ0=4.0
+      minDERatio=0.2
+      minNHitsCDC=20
+      minPt=0.3
+      minSBRatio=0.0
+      minSignal=8.0
+      nTrackLimit=3
+      numBins=200
+      saveHistograms=False
+      sigmaSmear=0.0
+      subtractRunningOffset=True
+      tau=100.0
+      timeRangeCoarse=100.0
+      timeRangeFine=10.0
+      useFillPattern=True
+      useMCTruth=False
+      usePIDLikelihoods=False
+      useTimeSeed=True
+  113. TOPReconstructor
+      PDGCode=-1
+      TOPDigitCollectionName=
+      TOPLikelihoodCollectionName=
+      TOPPullCollectionName=
+      deltaRayModeling=False
+      maxTime=0.0
+      minTime=0.0
+      pTCut=0.27
+  114. ARICHFillHits
+      MagFieldCorrection=0
+      bitMask=255
+      fillAll=0
+      maxApdHits=18
+      maxHapdHits=100
+  115. ARICHReconstructor
+      inputTrackType=0
+      storePhotons=1
+      trackAngleResolution=0.002
+      trackPositionResolution=0.1
+      useAlignment=True
+      useMirrorAlignment=True
+  116. OnlineEventT0Creator
+      executeThisModule=False
+  117. ECLFillCellIdMapping
+  118. ECLChargedPIDMVA
+      payloadName=ECLChargedPidMVAWeights
+  119. MdstPID
+      subtractMaximum=False
+  120. KLMMuonIDDNNExpert
+  121. KLMExpert
+      classifierPath=KLM_fBDT_10xbkg100k
+  122. ClusterMatcher
+      coneInRad=0.25999999046325684
+  123. ECLTrackBremFinder
+      clusterAcceptanceFactor=10.0
+      clusterDistanceCut=0.05000000074505806
+      eclClustersStoreArrayName=
+      recoTracksStoreArrayName=
+      tracksStoreArrayName=
+      virtualHitRadii=[]
+  124. PruneRecoTracks RecoTracks
+      removeHits=False
+      storeArrayName=RecoTracks
+  125. PruneGenfitTracks
+      pruneFlags=FL
+      storeArrayName=GF2Tracks
+  126. Sum_Postfilter_PostTracking
+  127. ParticleLoader_pi+:skim
+      addDaughters=False
+      decayStrings=['pi+:skim']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  128. PListCopy_pi+:skim
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['pi+:all']
+      outputListName=pi+:skim
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  129. ParticleSelector_applyCuts_pi+:skim
+      cut=pt>0.2 and abs(d0) < 2 and abs(z0) < 4
+      decayString=pi+:skim
+  130. ParticleLoader_pi+:hadb
+      addDaughters=False
+      decayStrings=['pi+:hadb']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  131. PListCopy_pi+:hadb
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['pi+:all']
+      outputListName=pi+:hadb
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  132. ParticleSelector_applyCuts_pi+:hadb
+      cut=p>0.1 and abs(d0) < 2 and abs(z0) < 4
+      decayString=pi+:hadb
+  133. ParticleLoader_pi+:tau
+      addDaughters=False
+      decayStrings=['pi+:tau']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  134. PListCopy_pi+:tau
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['pi+:all']
+      outputListName=pi+:tau
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  135. ParticleSelector_applyCuts_pi+:tau
+      cut=abs(d0) < 2 and abs(z0) < 8
+      decayString=pi+:tau
+  136. ParticleLoader_gamma:skim
+      addDaughters=False
+      decayStrings=['gamma:skim']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  137. PListCopy_gamma:skim
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['gamma:all']
+      outputListName=gamma:skim
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  138. ParticleSelector_applyCuts_gamma:skim
+      cut=E>0.1
+      decayString=gamma:skim
+  139. ParticleSelector_applyCuts_gamma:skim
+      cut=isFromECL
+      decayString=gamma:skim
+  140. ParticleLoader_K_S0:V0_ToFit -> pi+ pi-
+      addDaughters=False
+      decayStrings=['K_S0:V0_ToFit -> pi+ pi-']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  141. PListCopy_K_S0:V0_ToFit
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['K_S0:V0']
+      outputListName=K_S0:V0_ToFit
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  142. ParticleVertexFitter_K_S0:V0_ToFit
+      confidenceLevel=0.0
+      decayString=
+      fitType=vertex
+      listName=K_S0:V0_ToFit
+      massConstraintList=[]
+      recoilMass=0.0
+      smearing=0.0
+      updateDaughters=False
+      vertexFitter=KFit
+      withConstraint=
+  143. ParticleSelector_applyCuts_K_S0:V0_ToFit
+      cut=0.450 < M < 0.550
+      decayString=K_S0:V0_ToFit
+  144. ParticleLoader_pi+:all
+      addDaughters=False
+      decayStrings=['pi+:all']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  145. ParticleCombiner_K_S0:RD -> pi+:all pi-:all
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=0.3 < M < 0.7
+      decayMode=1
+      decayString=K_S0:RD -> pi+:all pi-:all
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  146. ParticleVertexFitter_K_S0:RD
+      confidenceLevel=0.0
+      decayString=
+      fitType=vertex
+      listName=K_S0:RD
+      massConstraintList=[]
+      recoilMass=0.0
+      smearing=0.0
+      updateDaughters=False
+      vertexFitter=KFit
+      withConstraint=
+  147. ParticleSelector_applyCuts_K_S0:RD
+      cut=0.450 < M < 0.550
+      decayString=K_S0:RD
+  148. PListMerger_K_S0:merged
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['K_S0:V0_ToFit', 'K_S0:RD']
+      outputListName=K_S0:merged
+      preferLowest=True
+      variable=particleSource
+      writeOut=False
+  149. PListCutAndCopy_K_S0:dstSkim
+      cut=goodBelleKshort == 1
+      ignoreMotherFlavor=False
+      inputListNames=['K_S0:merged']
+      outputListName=K_S0:dstSkim
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  150. ParticleLoader_Lambda0:V0_ToFit -> p+ pi-
+      addDaughters=False
+      decayStrings=['Lambda0:V0_ToFit -> p+ pi-']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  151. PListCopy_Lambda0:V0_ToFit
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['Lambda0:V0']
+      outputListName=Lambda0:V0_ToFit
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  152. TreeFitter_Lambda0:V0_ToFit
+      autoSetGeoConstraintAndMergeVertices=True
+      confidenceLevel=0.0
+      convergencePrecision=0.01
+      customOriginConstraint=False
+      customOriginCovariance=[0.0048, 0.0, 0.0, 0.0, 0.003567, 0.0, 0.0, 0.0, 0.04]
+      customOriginVertex=[0.001, 0.0, 0.0116]
+      expertBeamConstraintPDG=0
+      expertMassConstraintType=0
+      expertRemoveConstraintList=[]
+      geoConstraintList=[]
+      ignoreFromVertexFit=
+      inflationFactorCovZ=1
+      ipConstraint=False
+      massConstraintDecayString=
+      massConstraintList=[]
+      massConstraintMassValues=[]
+      originDimension=3
+      particleList=Lambda0:V0_ToFit
+      sharedVertexList=[]
+      treatAsInvisible=
+      updateAllDaughters=False
+  153. ParticleSelector_applyCuts_Lambda0:V0_ToFit
+      cut=1.10 < M < 1.13
+      decayString=Lambda0:V0_ToFit
+  154. DuplicateVertexMarker
+      extraInfoName=highQualityVertex
+      particleList=Lambda0:V0_ToFit
+      prioritiseV0=False
+  155. ParticleSelector_applyCuts_Lambda0:V0_ToFit
+      cut=extraInfo(highQualityVertex)
+      decayString=Lambda0:V0_ToFit
+  156. ParticleLoader_pi+:all
+      addDaughters=False
+      decayStrings=['pi+:all']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  157. ParticleLoader_p+:all
+      addDaughters=False
+      decayStrings=['p+:all']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  158. ParticleCombiner_Lambda0:RD -> p+:all pi-:all
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=0.9 < M < 1.3
+      decayMode=1
+      decayString=Lambda0:RD -> p+:all pi-:all
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  159. TreeFitter_Lambda0:RD
+      autoSetGeoConstraintAndMergeVertices=True
+      confidenceLevel=0.0
+      convergencePrecision=0.01
+      customOriginConstraint=False
+      customOriginCovariance=[0.0048, 0.0, 0.0, 0.0, 0.003567, 0.0, 0.0, 0.0, 0.04]
+      customOriginVertex=[0.001, 0.0, 0.0116]
+      expertBeamConstraintPDG=0
+      expertMassConstraintType=0
+      expertRemoveConstraintList=[]
+      geoConstraintList=[]
+      ignoreFromVertexFit=
+      inflationFactorCovZ=1
+      ipConstraint=False
+      massConstraintDecayString=
+      massConstraintList=[]
+      massConstraintMassValues=[]
+      originDimension=3
+      particleList=Lambda0:RD
+      sharedVertexList=[]
+      treatAsInvisible=
+      updateAllDaughters=False
+  160. ParticleSelector_applyCuts_Lambda0:RD
+      cut=1.10 < M < 1.13
+      decayString=Lambda0:RD
+  161. DuplicateVertexMarker
+      extraInfoName=highQualityVertex
+      particleList=Lambda0:RD
+      prioritiseV0=False
+  162. ParticleSelector_applyCuts_Lambda0:RD
+      cut=extraInfo(highQualityVertex)
+      decayString=Lambda0:RD
+  163. PListMerger_Lambda0:merged
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['Lambda0:V0_ToFit', 'Lambda0:RD']
+      outputListName=Lambda0:merged
+      preferLowest=True
+      variable=particleSource
+      writeOut=False
+  164. ParticleLoader_K+:dstSkim
+      addDaughters=False
+      decayStrings=['K+:dstSkim']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  165. PListCopy_K+:dstSkim
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['K+:all']
+      outputListName=K+:dstSkim
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  166. ParticleSelector_applyCuts_K+:dstSkim
+      cut=abs(d0) < 2 and abs(z0) < 4
+      decayString=K+:dstSkim
+  167. ParticleLoader_pi+:dstSkim
+      addDaughters=False
+      decayStrings=['pi+:dstSkim']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  168. PListCopy_pi+:dstSkim
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['pi+:all']
+      outputListName=pi+:dstSkim
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  169. ParticleSelector_applyCuts_pi+:dstSkim
+      cut=abs(d0) < 2 and abs(z0) < 4
+      decayString=pi+:dstSkim
+  170. ParticleLoader_gamma:loose
+      addDaughters=False
+      decayStrings=['gamma:loose']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  171. PListCopy_gamma:loose
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['gamma:all']
+      outputListName=gamma:loose
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  172. ParticleSelector_applyCuts_gamma:loose
+      cut=theta > 0.296706 and theta < 2.61799 and     [[clusterReg == 1 and E > 0.03] or [clusterReg == 2 and E > 0.02] or [clusterReg == 3 and E > 0.03]] and     [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1]
+      decayString=gamma:loose
+  173. ParticleSelector_applyCuts_gamma:loose
+      cut=isFromECL
+      decayString=gamma:loose
+  174. ParticleCombiner_pi0:loose -> gamma:loose gamma:loose
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=0.075 < M < 0.175
+      decayMode=1
+      decayString=pi0:loose -> gamma:loose gamma:loose
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  175. PListCutAndCopy_pi0:veryLooseFit
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['pi0:loose']
+      outputListName=pi0:veryLooseFit
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  176. ParticleVertexFitter_pi0:veryLooseFit
+      confidenceLevel=0.0
+      decayString=
+      fitType=mass
+      listName=pi0:veryLooseFit
+      massConstraintList=[]
+      recoilMass=0.0
+      smearing=0.0
+      updateDaughters=False
+      vertexFitter=KFit
+      withConstraint=
+  177. ParticleCombiner_D0:ch1 -> K-:dstSkim pi+:dstSkim
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=1.7 < M < 2.1
+      decayMode=1
+      decayString=D0:ch1 -> K-:dstSkim pi+:dstSkim
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  178. ParticleCombiner_D0:ch2 -> K-:dstSkim pi+:dstSkim pi0:veryLooseFit
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=1.7 < M < 2.1
+      decayMode=2
+      decayString=D0:ch2 -> K-:dstSkim pi+:dstSkim pi0:veryLooseFit
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  179. ParticleCombiner_D0:ch3 -> K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=1.7 < M < 2.1
+      decayMode=3
+      decayString=D0:ch3 -> K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  180. ParticleCombiner_D0:ch4 -> K_S0:dstSkim pi+:dstSkim pi-:dstSkim
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=1.7 < M < 2.1
+      decayMode=4
+      decayString=D0:ch4 -> K_S0:dstSkim pi+:dstSkim pi-:dstSkim
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  181. ParticleCombiner_D*+:ch1 -> D0:ch1 pi+:all
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=useCMSFrame(p) > 2.2 and massDifference(0) < 0.16
+      decayMode=1
+      decayString=D*+:ch1 -> D0:ch1 pi+:all
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  182. ParticleCombiner_D*+:ch2 -> D0:ch2 pi+:all
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=useCMSFrame(p) > 2.2 and massDifference(0) < 0.16
+      decayMode=2
+      decayString=D*+:ch2 -> D0:ch2 pi+:all
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  183. ParticleCombiner_D*+:ch3 -> D0:ch3 pi+:all
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=useCMSFrame(p) > 2.2 and massDifference(0) < 0.16
+      decayMode=3
+      decayString=D*+:ch3 -> D0:ch3 pi+:all
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  184. ParticleCombiner_D*+:ch4 -> D0:ch4 pi+:all
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=useCMSFrame(p) > 2.2 and massDifference(0) < 0.16
+      decayMode=4
+      decayString=D*+:ch4 -> D0:ch4 pi+:all
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  185. PListCopy_D*+:d0pi
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['D*+:ch1', 'D*+:ch2', 'D*+:ch3', 'D*+:ch4']
+      outputListName=D*+:d0pi
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  186. ParticleLoader_pi+:offip
+      addDaughters=False
+      decayStrings=['pi+:offip']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  187. PListCopy_pi+:offip
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['pi+:all']
+      outputListName=pi+:offip
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  188. ParticleSelector_applyCuts_pi+:offip
+      cut=[abs(z0) > 10] and [nSVDHits >=3 or nCDCHits >= 20]
+      decayString=pi+:offip
+  189. ParticleLoader_pi+:GoodTrackForHLT
+      addDaughters=False
+      decayStrings=['pi+:GoodTrackForHLT']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  190. PListCopy_pi+:GoodTrackForHLT
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['pi+:all']
+      outputListName=pi+:GoodTrackForHLT
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  191. ParticleSelector_applyCuts_pi+:GoodTrackForHLT
+      cut=abs(d0) < 2 and abs(z0) < 5
+      decayString=pi+:GoodTrackForHLT
+  192. ParticleLoader_K+:GoodTrackForHLT
+      addDaughters=False
+      decayStrings=['K+:GoodTrackForHLT']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=False
+  193. PListCopy_K+:GoodTrackForHLT
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['K+:all']
+      outputListName=K+:GoodTrackForHLT
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  194. ParticleSelector_applyCuts_K+:GoodTrackForHLT
+      cut=abs(d0) < 2 and abs(z0) < 5
+      decayString=K+:GoodTrackForHLT
+  195. ParticleLoader_gamma:GoodPi0ForHLT
+      addDaughters=False
+      decayStrings=['gamma:GoodPi0ForHLT']
+      dummyCovMatrix=10000.0
+      dummyMDSTIndex=0
+      dummyTreatAsInvisible=True
+      enforceFitHypothesis=False
+      loadChargedCluster=False
+      roeMaskName=all
+      skipInitial=True
+      skipNonPrimary=False
+      skipNonPrimaryDaughters=False
+      sourceParticleListName=
+      trackHypothesis=0
+      useDummy=False
+      useMCParticles=False
+      useMissing=False
+      useOnlyMostEnergeticECLCluster=True
+      useROEs=False
+      writeOut=True
+  196. PListCopy_gamma:GoodPi0ForHLT
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['gamma:all']
+      outputListName=gamma:GoodPi0ForHLT
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=True
+  197. ParticleSelector_applyCuts_gamma:GoodPi0ForHLT
+      cut=[clusterReg == 1 and E > 0.02250] or                                                 [clusterReg == 2 and E > 0.020] or                                                 [clusterReg == 3 and E > 0.020]
+      decayString=gamma:GoodPi0ForHLT
+  198. ParticleSelector_applyCuts_gamma:GoodPi0ForHLT
+      cut=isFromECL
+      decayString=gamma:GoodPi0ForHLT
+  199. ParticleCombiner_pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=0.105 < M < 0.150
+      decayMode=1
+      decayString=pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=True
+  200. MCMatch_pi0:GoodPi0ForHLT
+      listName=pi0:GoodPi0ForHLT
+      looseMCMatching=False
+  201. ParticleCombiner_D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=1.7 < M < 2.0
+      decayMode=0
+      decayString=D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  202. ParticleCombiner_D0:Kpipi0ForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi0:GoodPi0ForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=1.7 < M < 2.0
+      decayMode=0
+      decayString=D0:Kpipi0ForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi0:GoodPi0ForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  203. ParticleCombiner_D0:KpipipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT pi-:GoodTrackForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=1.7 < M < 2.0
+      decayMode=0
+      decayString=D0:KpipipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT pi-:GoodTrackForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  204. ParticleCombiner_D+:KpipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=1.8 < M < 1.9
+      decayMode=0
+      decayString=D+:KpipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  205. ParticleCombiner_D*+:D0_KpiForHLT -> D0:KpiForHLT pi+:GoodTrackForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=massDifference(0) < 0.16
+      decayMode=0
+      decayString=D*+:D0_KpiForHLT -> D0:KpiForHLT pi+:GoodTrackForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  206. ParticleCombiner_D*+:D0_Kpipi0ForHLT -> D0:Kpipi0ForHLT pi+:GoodTrackForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=massDifference(0) < 0.16
+      decayMode=0
+      decayString=D*+:D0_Kpipi0ForHLT -> D0:Kpipi0ForHLT pi+:GoodTrackForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  207. ParticleCombiner_D*+:D0_KpipipiForHLT -> D0:KpipipiForHLT pi+:GoodTrackForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=massDifference(0) < 0.16
+      decayMode=0
+      decayString=D*+:D0_KpipipiForHLT -> D0:KpipipiForHLT pi+:GoodTrackForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  208. ParticleCombiner_B+:BtoD0pi_KpiForHLT -> anti-D0:KpiForHLT pi+:GoodTrackForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=Mbc > 5.15 and abs(deltaE) < 0.5
+      decayMode=0
+      decayString=B+:BtoD0pi_KpiForHLT -> anti-D0:KpiForHLT pi+:GoodTrackForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  209. ParticleCombiner_B+:BtoD0pi_Kpipi0ForHLT -> anti-D0:Kpipi0ForHLT pi+:GoodTrackForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=Mbc > 5.15 and abs(deltaE) < 0.3
+      decayMode=0
+      decayString=B+:BtoD0pi_Kpipi0ForHLT -> anti-D0:Kpipi0ForHLT pi+:GoodTrackForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  210. ParticleCombiner_B+:BtoD0pi_KpipipiForHLT -> anti-D0:KpipipiForHLT pi+:GoodTrackForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=Mbc > 5.15 and abs(deltaE) < 0.3
+      decayMode=0
+      decayString=B+:BtoD0pi_KpipipiForHLT -> anti-D0:KpipipiForHLT pi+:GoodTrackForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  211. ParticleCombiner_B0:B0toDpi_KpipiForHLT -> D-:KpipiForHLT pi+:GoodTrackForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=5.15 < Mbc and abs(deltaE) < 0.3
+      decayMode=0
+      decayString=B0:B0toDpi_KpipiForHLT -> D-:KpipiForHLT pi+:GoodTrackForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  212. ParticleCombiner_B0:B0toDstarPi_D0pi_KpiForHLT -> D*-:D0_KpiForHLT pi+:GoodTrackForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=5.15 < Mbc and abs(deltaE) < 0.3
+      decayMode=0
+      decayString=B0:B0toDstarPi_D0pi_KpiForHLT -> D*-:D0_KpiForHLT pi+:GoodTrackForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  213. ParticleCombiner_B0:B0toDstarPi_D0pi_KpipipiForHLT -> D*-:D0_KpipipiForHLT pi+:GoodTrackForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=5.15 < Mbc and abs(deltaE) < 0.3
+      decayMode=0
+      decayString=B0:B0toDstarPi_D0pi_KpipipiForHLT -> D*-:D0_KpipipiForHLT pi+:GoodTrackForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  214. ParticleCombiner_B0:B0toDstarPi_D0pi_Kpipi0ForHLT -> D*-:D0_Kpipi0ForHLT pi+:GoodTrackForHLT
+      allowChargeViolation=False
+      chargeConjugation=True
+      cut=5.15 < Mbc and abs(deltaE) < 0.3
+      decayMode=0
+      decayString=B0:B0toDstarPi_D0pi_Kpipi0ForHLT -> D*-:D0_Kpipi0ForHLT pi+:GoodTrackForHLT
+      ignoreIfTooManyCandidates=True
+      maximumNumberOfCandidates=10000
+      recoilParticleType=0
+      writeOut=False
+  215. PListCopy_B+:BtoCharmForHLT
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['B+:BtoD0pi_KpiForHLT', 'B+:BtoD0pi_Kpipi0ForHLT', 'B+:BtoD0pi_KpipipiForHLT']
+      outputListName=B+:BtoCharmForHLT
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  216. PListCopy_B0:BtoCharmForHLT
+      cut=
+      ignoreMotherFlavor=False
+      inputListNames=['B0:B0toDpi_KpipiForHLT', 'B0:B0toDstarPi_D0pi_KpiForHLT', 'B0:B0toDstarPi_D0pi_KpipipiForHLT', 'B0:B0toDstarPi_D0pi_Kpipi0ForHLT']
+      outputListName=B0:BtoCharmForHLT
+      preferLowest=True
+      variable=mdstIndex
+      writeOut=False
+  217. SoftwareTrigger
+      baseIdentifier=skim
+      debugOutputFileName=software_trigger_debug.root
+      preScaleStoreDebugOutputToDataStore=0
+      resultStoreArrayName=
+      storeDebugOutputToROOTFile=False
+      useRandomNumbersForPreScale=True
+  218. Sum_HLT_Skim_Calculation

@@ -8,6 +8,12 @@
 
 #include <cdc/calibration/CDCdEdx/CDCDedxWireGainAlgorithm.h>
 
+#include <cdc/geometry/CDCGeometryPar.h>
+
+#include <TCanvas.h>
+#include <TLine.h>
+#include <TStyle.h>
+
 using namespace Belle2;
 using namespace CDC;
 using namespace std;

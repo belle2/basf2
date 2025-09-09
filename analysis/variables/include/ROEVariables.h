@@ -331,6 +331,8 @@ namespace Belle2 {
      * both: tight energy cut and clusterNHits cut are applied to soft photon
      * standardMC15rd: loose energy cut is applied to soft photon and the weight files are trained using MC15rd
      * tightMC15rd: tight energy cut is applied to soft photon and the weight files are trained using MC15rd
+     * standardMC16rd: loose energy cut is applied to soft photon and the weight files are trained using MC16rd
+     * tightMC16rd: tight energy cut is applied to soft photon and the weight files are trained using MC16rd
      * You can find more details in writePi0EtaVeto function in modularAnalysis.py.
      */
     Manager::FunctionPtr pi0Prob(const std::vector<std::string>& arguments);
@@ -344,6 +346,8 @@ namespace Belle2 {
      * both: tight energy cut and clusterNHits cut are applied to soft photon
      * standardMC15rd: loose energy cut is applied to soft photon and the weight files are trained using MC15rd
      * tightMC15rd: tight energy cut is applied to soft photon and the weight files are trained using MC15rd
+     * standardMC16rd: loose energy cut is applied to soft photon and the weight files are trained using MC16rd
+     * tightMC16rd: tight energy cut is applied to soft photon and the weight files are trained using MC16rd
      * You can find more details in writePi0EtaVeto function in modularAnalysis.py.
      */
     Manager::FunctionPtr etaProb(const std::vector<std::string>& arguments);

@@ -173,6 +173,8 @@ import tracking
 import tracking.root_utils as root_utils
 from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
 
+# @cond internal_test
+
 # wrap python modules that are used here but not in the externals into a try except block
 install_helpstring_formatter = ("\nCould not find {module} python module.Try installing it via\n"
                                 "  python3 -m pip install [--user] {module}\n")
@@ -895,7 +897,7 @@ class CDCQEDataCollectionTask(Basf2PathTask):
             filter_choice = "recording"
             # tracking.add_hit_preparation_modules(path)  # only needed for SVD and
             # PXD hit preparation. Does not change the CDC output.
-        tracking.add_cdc_track_finding(path, with_ca=False, add_mva_quality_indicator=True)
+        tracking.add_cdc_track_finding(path, with_cdc_cellular_automaton=False, add_mva_quality_indicator=True)
 
         basf2.set_module_parameters(
             path,
@@ -2829,3 +2831,5 @@ if __name__ == "__main__":
             basf2.conditions.prepend_globaltag(gt)
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MasterTask(), workers=workers)
+
+# @endcond

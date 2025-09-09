@@ -52,6 +52,3 @@ main.add_module(output)
 main.add_module('Progress')
 # Go!
 basf2.process(main)
-
-# Print call statistics
-print(basf2.statistics)

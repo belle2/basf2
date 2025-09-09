@@ -55,7 +55,7 @@ void TrackFitResultEstimatorModule::initialize()
 
   const int pdg = decaydescriptor.getMother()->getPDGCode();
   if (std::abs(TDatabasePDG::Instance()->GetParticle(pdg)->Charge()) > 3)
-    B2WARNING("The absolute value of charge of input ParticleList is grater than 1. Helix requires abs(charge) <= 1. "
+    B2WARNING("The absolute value of charge of input ParticleList is greater than 1. Helix requires abs(charge) <= 1. "
               "The sign of charge will be used instead.");
 
   m_inputparticleList.isRequired(m_inputListName);

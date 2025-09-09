@@ -39,4 +39,3 @@ add_reconstruction(main)  # reconstruction
 add_mdst_output(main, filename=OUTPUT_FILENAME)  # mdst output
 main.add_module('Progress')
 basf2.process(main)
-print(basf2.statistics)

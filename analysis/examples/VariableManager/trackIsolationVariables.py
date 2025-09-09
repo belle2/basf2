@@ -247,6 +247,4 @@ if __name__ == "__main__":
     # Process the data.
     b2.process(path)
 
-    print(b2.statistics)
-
 # @endcond

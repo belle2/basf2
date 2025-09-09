@@ -10,9 +10,13 @@
 #include <analysis/modules/TrackingSystematics/TrackingMomentumScaleFactors.h>
 
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
 
 #include <cmath>
 #include <map>

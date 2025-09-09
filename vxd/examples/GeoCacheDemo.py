@@ -134,7 +134,7 @@ main.add_module(pxdclust)
 main.add_module(printHits)
 
 # generate events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # show call statistics
 print(b2.statistics)

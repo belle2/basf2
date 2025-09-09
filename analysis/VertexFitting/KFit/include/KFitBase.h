@@ -16,7 +16,6 @@
 #include <CLHEP/Vector/LorentzVector.h>
 #include <CLHEP/Geometry/Point3D.h>
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/VertexFitting/KFit/KFitConst.h>
 #include <analysis/VertexFitting/KFit/KFitError.h>
 #include <analysis/VertexFitting/KFit/KFitTrack.h>
@@ -26,6 +25,7 @@ typedef HepGeom::Point3D<double> HepPoint3D;
 #endif
 
 namespace Belle2 {
+  class Particle;
   namespace analysis {
     /**
      * KFitBase is a base class for kinematical fitters.

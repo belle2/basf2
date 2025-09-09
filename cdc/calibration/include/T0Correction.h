@@ -7,8 +7,11 @@
  **************************************************************************/
 
 #pragma once
+
 #include <TH1F.h>
-#include "string"
+
+#include <string>
+
 namespace Belle2 {
   namespace CDC {
     /**

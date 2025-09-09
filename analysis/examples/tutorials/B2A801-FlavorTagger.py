@@ -175,7 +175,7 @@ bvars = vc.reco_stats + \
     vertex_vars
 
 # Attention: the collection of flavor tagging variables is defined in the flavorTagger
-bvars += ft.flavor_tagging
+bvars += ['flavor_tagging']
 
 # Create aliases to save information for different particles
 bvars = bvars + \
@@ -199,7 +199,4 @@ ma.summaryOfLists(particleLists=['J/psi:mumu', 'B0:sig'],
                   path=cp_val_path)
 
 # Process the events
-b2.process(cp_val_path)
-
-# print out the summary
-print(b2.statistics)
+b2.process(cp_val_path, calculateStatistics=True)

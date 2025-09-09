@@ -111,7 +111,7 @@ void MCMatcherParticlesModule::setLooseMCMatch(const Particle* particle)
     return;
 
   // get all FS daughters
-  vector<const Belle2::Particle*> fsDaughters = particle->getFinalStateDaughters();
+  vector<const Particle*> fsDaughters = particle->getFinalStateDaughters();
 
   // map for counting how many times given mcparticle is mother of daughters
   CounterMap motherCount;
@@ -143,7 +143,7 @@ void MCMatcherParticlesModule::setLooseMCMatch(const Particle* particle)
   // find first most common mother
   auto commonMother = std::max_element
                       (
-                        std::begin(motherCount), std::end(motherCount),
+                        motherCount.begin(), motherCount.end(),
   [](std::pair <unsigned int, unsigned int> p1, std::pair <unsigned int, unsigned int> p2) {
     bool returnValue = false;
     if (p1.second < p2.second)
@@ -156,7 +156,7 @@ void MCMatcherParticlesModule::setLooseMCMatch(const Particle* particle)
                       );
 
   // No common mother found, all daughters have no associated MC Particle
-  if (commonMother == std::end(motherCount)) {
+  if (commonMother == motherCount.end()) {
     Particle* thisParticle = m_particles[particle->getArrayIndex()];
     thisParticle->addExtraInfo("looseMCMotherPDG",   -1);
     thisParticle->addExtraInfo("looseMCMotherIndex", -1);

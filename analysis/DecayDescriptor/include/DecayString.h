@@ -15,7 +15,7 @@ namespace Belle2 {
   /** The DecayStringElement can be either a DecayStringDecay or a vector of mother particles.
 
   User documentation is located at analysis/doc/DecayDescriptor.rst
-  Please modify in accordingly to introduced changes.*/
+  Please modify it accordingly to introduced changes.*/
   typedef boost::variant< boost::recursive_wrapper<DecayStringDecay>, DecayStringParticle > DecayString;
 }
 

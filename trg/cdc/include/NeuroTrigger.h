@@ -309,13 +309,13 @@ namespace Belle2 {
     /** List of networks */
     std::vector<CDCTriggerMLP> m_MLPs = {};
     /** Radius of the CDC layers with priority wires (2 per super layer) */
-    double m_radius[9][5] = {};
+    double m_radius[9][5] = {{0}};
     /** Number of track segments up to super layer */
-    unsigned m_TSoffset[10] = {};
+    unsigned m_TSoffset[10] = {0};
     /** 2D phi position of current track scaled to number of wires */
-    double m_idRef[9][5] = {};
+    double m_idRef[9][5] = {{0}};
     /** 2D crossing angle of current track */
-    double m_alpha[9][5] = {};
+    double m_alpha[9][5] = {{0}};
     /** Event time of current event / track */
     int m_T0 = 0;
     /** Flag to show if stored event time is valid */

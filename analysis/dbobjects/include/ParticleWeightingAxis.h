@@ -9,9 +9,9 @@
 #pragma once
 #include <map>
 #include <string>
-#include <analysis/dbobjects/ParticleWeightingBinLimits.h>
 
 namespace Belle2 {
+  class ParticleWeightingBinLimits;
 
   /** Map of keys with bin limits */
   typedef std::map<int, ParticleWeightingBinLimits*> BinMap;

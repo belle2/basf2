@@ -15,10 +15,14 @@ Test for checking if b2conditionsdb-tag-merge behaves as expted:
 
 import subprocess
 
+import b2test_utils as b2tu
 import conditions_db as cdb
 
 
 if __name__ == '__main__':
+
+    if b2tu.is_cdb_down():
+        b2tu.skip_test('Test currently disabled due to CDB troubles')
 
     tags = ['main_tag_merge_test_1', 'main_tag_merge_test_2', 'main_tag_merge_test_3']
     final_tag = 'main_tag_merge_test_0'

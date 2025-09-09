@@ -169,22 +169,28 @@ except ModuleNotFoundError:
 
 
 class LSFTask(b2luigi.Task):
-    '''
+    """
     Simple task that defines the configuration of the LSF batch submission.
-    '''
+    """
+
+    #: batch system
     batch_system = 'lsf'
+    #: queue
     queue = 's'
 
     def __init__(self, *args, **kwargs):
-        '''Constructor.'''
+        """Constructor."""
         super().__init__(*args, **kwargs)
+        #: set the job name (inherited variable)
         self.job_name = self.task_id
 
 
 class LSFMemoryIntensiveTask(LSFTask):
-    '''
+    """
     Same as LSFTask, but for memory-intensive tasks.
-    '''
+    """
+
+    #: number of job slots
     job_slots = '4'
 
 

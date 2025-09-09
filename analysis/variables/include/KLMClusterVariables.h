@@ -142,6 +142,41 @@ namespace Belle2 {
      */
     double klmClusterTrackDistance(const Particle* particle);
 
+    /**
+     * Returns the angle between the direction at the IP and at the POCA to the KLMCluster associated to this Particle for the closest Track.
+     * This variable returns NaN if there is no Track-to-KLMCluster relationship.
+     * @param[in] particle Input particle.
+     */
+    double klmClusterTrackRotationAngle(const Particle* particle);
+
+    /**
+     * Returns the angle between the KLMCluster associated to this Particle and the closest Track.
+     * This variable returns NaN if there is no Track-to-KLMCluster relationship.
+     * @param[in] particle Input particle.
+     */
+    double klmClusterTrackSeparationAngle(const Particle* particle);
+
+    /**
+     * Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle.
+     * This variable returns NaN if this KLMCluster contains only one KLMHit2d cluster.
+     * @param[in] particle Input particle.
+     */
+    double klmClusterShapeStdDev1(const Particle* particle);
+
+    /**
+     * Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle.
+     * This variable returns NaN if this KLMCluster contains only one KLMHit2d cluster.
+     * @param[in] particle Input particle.
+     */
+    double klmClusterShapeStdDev2(const Particle* particle);
+
+    /**
+     * Returns the std deviation of the 3rd axis from a PCA of the KLMCluster associated to this Particle.
+     * This variable returns NaN if this KLMCluster contains only one KLMHit2d cluster.
+     * @param[in] particle Input particle.
+     */
+    double klmClusterShapeStdDev3(const Particle* particle);
+
   }
 } // Belle2 namespace
 

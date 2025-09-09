@@ -12,6 +12,8 @@ from tracking.run.tracked_event_generation import ReadOrGenerateTrackedEventsRun
 import trackfindingcdc.cdcdisplay as cdcdisplay
 import tempfile
 
+# @cond internal_test
+
 
 class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
     """Prepare and execute a basf2 job to read generated events or generate new events then display the CDC tracks"""
@@ -151,3 +153,5 @@ Note that some options are only relevant, if the cellular automaton finder in th
         main_path = super().create_path()
         main_path.add_module(self.cdc_display_module)
         return main_path
+
+# @endcond

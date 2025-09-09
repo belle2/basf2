@@ -22,6 +22,8 @@ if __name__ == "__main__":
 
     #: ignore strange backward compatibility warning
     ignorebackward = '_BACKWARD_BACKWARD_WARNING_H'
+    #: ignore false-positive warning from sphinx-argparse
+    ignoreprocessstatistics = 'ProcessStatistics.ModuleStatistics'
     #: ignore further warnings in light builds
     #: ignore online_book
     ignoreonlinebook = 'online_book'
@@ -47,6 +49,7 @@ if __name__ == "__main__":
         "b2code-sphinx-warnings", "sphinx", None,
         lambda x:
         re.findall(ignorebackward, x) or
+        re.findall(ignoreprocessstatistics, x) or
         re.findall(ignoreaddsimulation, x) or
         re.findall(ignoreaddtriggersimulation, x) or
         re.findall(ignoreaddreconstruction, x) or

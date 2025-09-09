@@ -14,19 +14,35 @@ be adapted when changing to the new release.
 
 .. important changes should go here. Especially things that break backwards compatibility
 
+Changes since release-10
+========================
+
+.. rubric:: Calculation and printing of processing statistics
+
+The calculation of the processing statistics is by default turned off. It can be enabled for debugging purposes, e.g.,
+to learn about the execution time of a steering file so that it can be provided to gbasf2 jobs, by setting the argument
+``calculateStatistics`` of the `basf2.process` function to ``True``. For the hlt scripts it remains enabled to monitor
+the execution time and memory consumption. It is not necessary to explicitly print the statistics since this is
+automatically done when switching the calculation on.
+
+.. include:: analysis/doc/whatsnew-since/release-10-00.txt
+
 Changes since release-09
 ========================
 
 .. admonition:: New and updated packages in externals
    :class: toggle
 
-   .. list-table:: New and updated packages in externals from v02-02-04 to v02-03-00
+   .. list-table:: New and updated packages in externals from v02-02-04 to v02-03-02
       :widths: 50 25 25
       :header-rows: 1
 
       * - package
         - old version
         - new version
+      * - boost
+        - 1.85.0
+        - 1.88.0
       * - doxygen
         - 1.9.6
         - 1.13.2
@@ -36,9 +52,12 @@ Changes since release-09
       * - gcc
         - 14.1.0
         - 14.2.0
+      * - ONNX Runtime
+        -
+        - 1.22.0
       * - ROOT
         - 6.26/14
-        - 6.32/00
+        - 6.32/14
       * - RooUnfold
         - 3.0.0
         - 3.0.2
@@ -72,18 +91,33 @@ Changes since release-09
       * - psutil
         - 5.9.8
         - 6.0.0
+      * - PySide6
+        -
+        - 6.9.1
+      * - PySide6-Addons
+        -
+        - 6.9.1
+      * - PySide6-Essentials
+        -
+        - 6.9.1
       * - PySocks
         -
         - 1.7.1
       * - selenium
         -
         - 4.32.0
+      * - shiboken6
+        -
+        - 6.9.1
       * - skl2onnx
         -
         - 1.18.0
       * - sortedcontainers
         -
         - 2.4.0
+      * - sphinx-argparse
+        - 0.2.0
+        - 0.5.2
       * - tensorboard
         - 2.16.2
         - 2.17.1
@@ -112,6 +146,9 @@ Changes since release-09
 .. include:: analysis/doc/whatsnew-since/release-09-00.txt
 .. include:: mva/doc/whatsnew-since/release-09-00.txt
 .. include:: b2bii/doc/whatsnew-since/release-09-00.txt
+
+.. include:: framework/doc/whatsnew-since/release-09-00.txt
+.. include:: tracking/doc/whatsnew-since/release-09-00.txt
 
 Changes since release-08
 ========================

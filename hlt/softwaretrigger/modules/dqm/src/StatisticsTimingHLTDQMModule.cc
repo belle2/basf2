@@ -193,8 +193,11 @@ void StatisticsTimingHLTDQMModule::initialize()
 
       pclose(pipe);
 
-      if (host.length() == 5) {
-        m_hlt_unit = atoi(host.substr(3, 2).c_str());
+      // Trim space and new line
+      host.erase(std::remove_if(host.begin(), host.end(), ::isspace), host.end());
+
+      if (host.rfind("hlt", 0) == 0 && host.length() == 5) {
+        m_hlt_unit = std::atoi(host.substr(3, 2).c_str());
       } else {
         B2WARNING("HLT unit number not found");
       }

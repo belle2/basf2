@@ -26,5 +26,5 @@ main.add_module('EventInfoSetter', evtNumList=[10], expList=[0], runList=[0])
 
 ge.add_evtgen_generator(path=main, finalstate='signal', signaldecfile=decfile)
 
-b2.process(path=main)
+b2.process(path=main, calculateStatistics=True)
 print(b2.statistics)

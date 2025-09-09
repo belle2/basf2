@@ -13,17 +13,14 @@
 #include <pxd/utilities/PXD2TrackEvent.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
-#include <pxd/dataobjects/PXDCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
-//#include <pxd/dbobjects/PXDClusterChargeMapPar.h>
 #include <pxd/dbobjects/PXDGainMapPar.h>
 
 #include <string>
 
 namespace Belle2 {
+  class EventMetaData;
+
   /**
    * Collector module for PXD gain calibration and PXD calibration validation
    *

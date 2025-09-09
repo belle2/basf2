@@ -10,22 +10,12 @@
 
 #include <map>
 #include <vector>
-#include <iostream>
-#include <fstream>
 
 #include <TH1D.h>
-#include <TH1I.h>
-#include <TF1.h>
-#include <TCanvas.h>
-#include <TLine.h>
-#include <TLegend.h>
 
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
 #include <cdc/dbobjects/CDCDedxInjectionTime.h>
-#include <cdc/utilities/CDCDedxMeanPred.h>
-#include <cdc/utilities/CDCDedxSigmaPred.h>
-#include <framework/gearbox/Const.h>
 
 // namespace constants
 namespace numdedx {

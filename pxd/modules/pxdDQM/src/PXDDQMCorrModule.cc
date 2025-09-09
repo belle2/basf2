@@ -6,19 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "pxd/modules/pxdDQM/PXDDQMCorrModule.h"
+#include <pxd/modules/pxdDQM/PXDDQMCorrModule.h>
+#include <pxd/dataobjects/PXDCluster.h>
 
 #include <framework/core/HistoModule.h>
 
-#include <vector>
-#include <boost/format.hpp>
-
-#include "TH1F.h"
-#include "TH2F.h"
 #include "TDirectory.h"
 
 using namespace std;
-using boost::format;
 using namespace Belle2;
 
 //-----------------------------------------------------------------

@@ -6,10 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef GEOVXDCOMPONENTS_H
-#define GEOVXDCOMPONENTS_H
-
-#include <vxd/geometry/SensorInfoBase.h>
+#pragma once
 
 #include <string>
 #include <vector>
@@ -17,6 +14,10 @@
 class G4LogicalVolume;
 
 namespace Belle2 {
+  namespace VXD {
+    class SensorInfoBase;
+  }
+
   /** Class holding all parameters to place a VXD geometry subcomponent */
   class VXDGeoPlacement {
   public:
@@ -225,5 +226,3 @@ namespace Belle2 {
   };
 
 } // namespace Belle2
-
-#endif /* GEOVXDCOMPONENTS_H */

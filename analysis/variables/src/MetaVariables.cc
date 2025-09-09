@@ -102,7 +102,7 @@ namespace Belle2 {
 
         int daughterIndexTagB = 0;
         try {
-          daughterIndexTagB = Belle2::convertString<int>(arguments[1]);
+          daughterIndexTagB = convertString<int>(arguments[1]);
         } catch (std::invalid_argument&) {
           B2FATAL("Second argument of useTagSideRecoilRestFrame meta function must be integer!");
         }
@@ -493,7 +493,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         int pdgCode = 0;
         try {
-          pdgCode = Belle2::convertString<int>(arguments[0]);
+          pdgCode = convertString<int>(arguments[0]);
         } catch (std::invalid_argument&) {
           B2FATAL("The first argument of varFor meta function must be a positive integer!");
         }
@@ -683,13 +683,13 @@ namespace Belle2 {
           int generation_flag = -1;
           try
           {
-            generation_flag = Belle2::convertString<int>(listNames.back());
+            generation_flag = convertString<int>(listNames.back());
           } catch (std::exception& e) {}
 
           for (auto& iListName : listNames)
           {
             try {
-              Belle2::convertString<int>(iListName);
+              convertString<int>(iListName);
               continue;
             } catch (std::exception& e) {}
 
@@ -746,7 +746,7 @@ namespace Belle2 {
           int generation_flag = -1;
           try
           {
-            generation_flag = Belle2::convertString<int>(listNames.back());
+            generation_flag = convertString<int>(listNames.back());
           } catch (std::exception& e) {}
 
           if (particle->getMCParticle() == nullptr)
@@ -1034,10 +1034,10 @@ namespace Belle2 {
     {
       if (arguments.size() == 5) {
         try {
-          Belle2::convertString<int>(arguments[0]);
-          Belle2::convertString<int>(arguments[1]);
-          Belle2::convertString<int>(arguments[2]);
-          Belle2::convertString<int>(arguments[3]);
+          convertString<int>(arguments[0]);
+          convertString<int>(arguments[1]);
+          convertString<int>(arguments[2]);
+          convertString<int>(arguments[3]);
         } catch (std::invalid_argument&) {
           B2FATAL("First four arguments of grandDaughterDiffOf meta function must be integers!");
         }
@@ -1144,7 +1144,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         int daughterNumber = 0;
         try {
-          daughterNumber = Belle2::convertString<int>(arguments[0]);
+          daughterNumber = convertString<int>(arguments[0]);
         } catch (std::invalid_argument&) {
           B2FATAL("First argument of daughterMotherDiffOf meta function must be integer!");
         }
@@ -1191,7 +1191,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         int daughterNumber = 0;
         try {
-          daughterNumber = Belle2::convertString<int>(arguments[0]);
+          daughterNumber = convertString<int>(arguments[0]);
         } catch (std::invalid_argument&) {
           B2FATAL("First argument of daughterMotherDiffOf meta function must be integer!");
         }
@@ -1492,7 +1492,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         int divideBy = 1;
         try {
-          divideBy = Belle2::convertString<int>(arguments[1]);
+          divideBy = convertString<int>(arguments[1]);
         } catch (std::invalid_argument&) {
           B2FATAL("Second argument of modulo meta function must be integer!");
         }
@@ -1533,7 +1533,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         double defaultOutput;
         try {
-          defaultOutput = Belle2::convertString<double>(arguments[1]);
+          defaultOutput = convertString<double>(arguments[1]);
         } catch (std::invalid_argument&) {
           B2FATAL("The second argument of ifNANgiveX meta function must be a number!");
         }
@@ -1570,7 +1570,7 @@ namespace Belle2 {
         int finalMask = 0;
         for (size_t i = 1; i < arguments.size(); ++i) {
           try {
-            finalMask |= Belle2::convertString<int>(arguments[i]);
+            finalMask |= convertString<int>(arguments[i]);
           } catch (std::invalid_argument&) {
             B2FATAL("The input flags to meta function unmask() should be integer!");
             return nullptr;
@@ -1988,7 +1988,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         int daughterNumber = 0;
         try {
-          daughterNumber = Belle2::convertString<int>(arguments[0]);
+          daughterNumber = convertString<int>(arguments[0]);
         } catch (std::invalid_argument&) {
           B2FATAL("First argument of daughter meta function must be integer!");
         }
@@ -2021,7 +2021,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         int daughterNumber = 0;
         try {
-          daughterNumber = Belle2::convertString<int>(arguments[0]);
+          daughterNumber = convertString<int>(arguments[0]);
         } catch (std::invalid_argument&) {
           B2FATAL("First argument of daughter meta function must be integer!");
         }
@@ -2061,7 +2061,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         int daughterNumber = 0;
         try {
-          daughterNumber = Belle2::convertString<int>(arguments[0]);
+          daughterNumber = convertString<int>(arguments[0]);
         } catch (std::invalid_argument&) {
           B2FATAL("First argument of mcDaughter meta function must be integer!");
         }
@@ -2131,7 +2131,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         int particleNumber = 0;
         try {
-          particleNumber = Belle2::convertString<int>(arguments[0]);
+          particleNumber = convertString<int>(arguments[0]);
         } catch (std::invalid_argument&) {
           B2FATAL("First argument of genParticle meta function must be integer!");
         }
@@ -2211,7 +2211,7 @@ namespace Belle2 {
         std::string extraInfoName = rankedVariableName + "_rank";
         int rank = 1;
         try {
-          rank = Belle2::convertString<int>(arguments[3]);
+          rank = convertString<int>(arguments[3]);
         } catch (std::invalid_argument&)  {
           B2ERROR("3rd argument of getVariableByRank meta function (Rank) must be an integer!");
           return nullptr;
@@ -2288,13 +2288,13 @@ namespace Belle2 {
           B2INFO("Use pdgCode of electron as default in meta variable veto, other arguments: " << roeListName << ", " << cutString);
         } else {
           try {
-            pdgCode = Belle2::convertString<int>(arguments[2]);;
+            pdgCode = convertString<int>(arguments[2]);;
           } catch (std::invalid_argument&) {
             B2FATAL("Third argument of veto meta function must be integer!");
           }
         }
 
-        auto flavourType = (Belle2::EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
+        auto flavourType = (EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
         auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> bool {
@@ -2807,7 +2807,7 @@ namespace Belle2 {
             auto tracks = cluster->getRelationsFrom<Track>();
 
             for (const auto& track : tracks) {
-              Particle trackParticle(&track, Belle2::Const::pion);
+              Particle trackParticle(&track, Const::pion);
 
               if (cut->check(&trackParticle))
                 return 1;
@@ -3318,7 +3318,7 @@ namespace Belle2 {
           // indexAndMass[0] is the daughter index as string. Try to convert it
           int dauIndex = 0;
           try {
-            dauIndex = Belle2::convertString<int>(indexAndMass[0]);
+            dauIndex = convertString<int>(indexAndMass[0]);
           } catch (std::invalid_argument&) {
             B2FATAL("Found the string " << indexAndMass[0] << "instead of a daughter index.");
           }
@@ -3431,7 +3431,7 @@ namespace Belle2 {
           pdg_code = std::abs(part->PdgCode());
         } else {
           try {
-            pdg_code = Belle2::convertString<int>(arg);
+            pdg_code = convertString<int>(arg);
           } catch (std::exception& e) {}
         }
 
@@ -3493,7 +3493,7 @@ namespace Belle2 {
         absPdg = std::abs(part->PdgCode());
       } else {
         try {
-          absPdg = Belle2::convertString<int>(arg);
+          absPdg = convertString<int>(arg);
         } catch (std::exception& e) {}
       }
 
@@ -3525,7 +3525,7 @@ namespace Belle2 {
     {
       if (arguments.size() == 2) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        int default_val = Belle2::convertString<int>(arguments[1]);
+        int default_val = convertString<int>(arguments[1]);
         auto func = [var, default_val](const Particle * particle) -> int {
           auto var_result = var->function(particle);
           if (std::holds_alternative<double>(var_result))

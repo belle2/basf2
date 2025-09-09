@@ -6,7 +6,7 @@ TBranch: __run__, 0
 TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
-TBranch: __ncandidates__, 5
+TBranch: __ncandidates__, 6
 TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: nTracks, 10

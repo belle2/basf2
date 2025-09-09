@@ -132,7 +132,7 @@ arich.arichVariablesToNtuple(decayString='K_S0:good',  # list of particles to fi
                              path=my_path)
 
 # Process the events
-b2.process(my_path)
+b2.process(my_path, calculateStatistics=True)
 
 # print out the summary
 print(b2.statistics)

@@ -16,6 +16,7 @@
 #include <mva/methods/Trivial.h>
 #include <mva/methods/Reweighter.h>
 #include <mva/methods/Combination.h>
+#include <mva/methods/ONNX.h>
 
 namespace Belle2 {
   namespace MVA {
@@ -52,6 +53,7 @@ namespace Belle2 {
       static Interface<CombinationOptions, CombinationTeacher, CombinationExpert> interface_Combination;
       static Interface<ReweighterOptions, ReweighterTeacher, ReweighterExpert> interface_Reweighter;
       static Interface<TrivialOptions, TrivialTeacher, TrivialExpert> interface_Trivial;
+      static Interface<ONNXOptions, ONNXTeacher, ONNXExpert> interface_ONNX;
     }
 
   }

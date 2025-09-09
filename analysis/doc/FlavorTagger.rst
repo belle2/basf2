@@ -191,7 +191,7 @@ Saving to nTuples
 The flavor tagger provides the output of the two combiners and the outputs
 of the 13 categories. It provides also the MC information relevant for the categories.
 To save this information you just have to add the predefined list
-``ft.flavor_tagging``
+``flavor_tagging``
 to the variables that you use as argument for the module :func:`modularAnalysis.variablesToNtuple`.
 
 The two available combiners provide two different flavor tags which can be

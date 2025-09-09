@@ -26,11 +26,13 @@
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCBadWires.h>
+#include <cdc/dbobjects/CDCBadBoards.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
 #include <cdc/dbobjects/CDCFudgeFactorsForSigma.h>
+#include <cdc/dbobjects/CDCAlphaScaleFactorForAsymmetry.h>
 #include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
@@ -285,6 +287,35 @@ void Belle2::CDCDatabaseImporter::importBadWire(std::string fileName)
                          m_lastExperiment, m_lastRun);
   bw.import(iov);
   B2INFO("BadWire table imported to database.");
+}
+
+void Belle2::CDCDatabaseImporter::importBadBoards(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCBadBoards> bb;
+  bb.construct();
+
+  uint iB(0);
+  double effi(0.);
+
+  while (true) {
+    stream >> iB >> effi;
+    if (stream.eof()) break;
+    bb->setBoard(iB, effi);
+  }
+  stream.close();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  bb.import(iov);
+  B2INFO("BadBoard table imported to database.");
 }
 
 
@@ -701,6 +732,54 @@ void Belle2::CDCDatabaseImporter::importFFactor(std::string fileName)
   B2INFO("Fudge factor table imported to database.");
 }
 
+void Belle2::CDCDatabaseImporter::importAlphaScaleFactors(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCAlphaScaleFactorForAsymmetry> asf;
+  asf.construct();
+
+  std::array<std::array<float, CDCAlphaScaleFactorForAsymmetry::c_nAlphaBins>, CDCAlphaScaleFactorForAsymmetry::c_nLayers>
+  alphaRatios;
+
+  std::string line;
+  unsigned short iLayer = 0;
+  while (std::getline(stream, line)) {
+    std::stringstream ss(line);
+    std::string value;
+    if (iLayer == CDCAlphaScaleFactorForAsymmetry::c_nLayers)
+      B2FATAL("The number of layers " << iLayer + 1 << " is more than expected " <<
+              CDCAlphaScaleFactorForAsymmetry::c_nLayers << " ! ");
+
+    int iElement = 0;
+    while (std::getline(ss, value, ',')) {
+      if (iElement == CDCAlphaScaleFactorForAsymmetry::c_nAlphaBins)
+        B2FATAL("The number of alpha scale factors is " << iElement + 1 << " for layer " << iLayer << ", not equal " <<
+                CDCAlphaScaleFactorForAsymmetry::c_nAlphaBins << " ! ");
+      alphaRatios[iLayer][iElement] = std::stof(value);
+      iElement++;
+    }
+    iLayer++;
+  }
+  asf->setScaleFactors(alphaRatios);
+
+  stream.close();
+
+  if (iLayer != CDCAlphaScaleFactorForAsymmetry::c_nLayers) B2FATAL("#lines read-in (=" << iLayer << ") is not equal #cdclayers (=" <<
+        CDCAlphaScaleFactorForAsymmetry::c_nLayers << ") !");
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  asf.import(iov);
+  B2INFO("Alpha scale factor table imported to database.");
+}
+
 
 void Belle2::CDCDatabaseImporter::importDisplacement(std::string fileName)
 {
@@ -878,6 +957,12 @@ void Belle2::CDCDatabaseImporter::printBadWire()
   bw->dump();
 }
 
+void Belle2::CDCDatabaseImporter::printBadBoards()
+{
+  DBObjPtr<CDCBadBoards> bb;
+  bb->dump();
+}
+
 void Belle2::CDCDatabaseImporter::printPropSpeed()
 {
   DBObjPtr<CDCPropSpeeds> ps;
@@ -906,6 +991,12 @@ void Belle2::CDCDatabaseImporter::printFFactor()
 {
   DBObjPtr<CDCFudgeFactorsForSigma> ff;
   ff->dump();
+}
+
+void Belle2::CDCDatabaseImporter::printAlphaScaleFactors()
+{
+  DBObjPtr<CDCAlphaScaleFactorForAsymmetry> asf;
+  asf->dump();
 }
 
 void Belle2::CDCDatabaseImporter::printDisplacement()

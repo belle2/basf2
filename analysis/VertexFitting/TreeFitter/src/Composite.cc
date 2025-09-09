@@ -10,6 +10,7 @@
 
 #include <analysis/VertexFitting/TreeFitter/Composite.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
+#include <analysis/VertexFitting/TreeFitter/Projection.h>
 
 #include <TMatrixFSym.h>
 #include <Math/Vector3D.h>

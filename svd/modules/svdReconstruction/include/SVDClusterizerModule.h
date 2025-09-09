@@ -29,6 +29,7 @@
 #include <svd/calibration/SVDMCClusterTimeFudgeFactor.h>
 #include <svd/dbobjects/SVDRecoConfiguration.h>
 #include <svd/dbobjects/SVDClusterTimeShifter.h>
+#include <svd/dbobjects/SVDAbsoluteClusterTimeShift.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <TMath.h>
@@ -147,6 +148,7 @@ namespace Belle2 {
       SVDMCClusterPositionFudgeFactor m_mcPositionFudgeFactor; /**<SVDMCClusterPositionFudgeFactor db object*/
       SVDMCClusterTimeFudgeFactor m_mcTimeFudgeFactor; /**<SVDMCClusterTimeFudgeFactor db object*/
       DBObjPtr<SVDClusterTimeShifter> m_svdClusterTimeShifter; /**< SVDCluster time shift*/
+      DBObjPtr<SVDAbsoluteClusterTimeShift> m_svdAbsTimeShift; /**< SVDCluster absolute time shift*/
 
       /**
        * returns the position of the cluster after

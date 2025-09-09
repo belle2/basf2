@@ -9,19 +9,16 @@
 // Own include
 #include <cdc/modules/cdcDQM/CDCDQMModule.h>
 
-// Dataobject classes
-#include <framework/database/DBObjPtr.h>
+#include <cdc/dataobjects/WireID.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
-#include <TF1.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
+
 #include <TMath.h>
 #include <TDirectory.h>
 
-#include <fstream>
-#include <math.h>
 #include <set>
-
-#include <cdc/dataobjects/WireID.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 
 using namespace std;
 using namespace Belle2;
@@ -58,8 +55,10 @@ void CDCDQMModule::defineHisto()
   m_hBit = new TH2F("hBit", "m_hBit", 7, 0, 7.0, 48, 0, 48.0);
   m_hBit->SetTitle("CDC:Removed Data Bit;CDCRawIndex;Channell Index");
   m_hOcc = new TH1F("hOcc", "hOccupancy", 150, 0, 1.5);
-  m_hADC = new TH2F("hADC", "hADC", 300, 0, 300, 200, 0, 1000);
-  m_hADC->SetTitle("ADC vs CDC-Boards;Board index;ADC");
+  m_hADCBoard = new TH2F("hADCBoard", "hADCBoard", 300, 0, 300, 200, 0, 1000);
+  m_hADCBoard->SetTitle("ADC vs CDC-Boards;Board index;ADC");
+  m_hADCLayer = new TH2F("hADCLayer", "hADCLayer", 56, 0, 56, 200, 0, 1000);
+  m_hADCLayer->SetTitle("ADC vs CDC-Layers;Layer index;ADC");
   m_hTDC = new TH2F("hTDC", "hTDC", 300, 0, 300, 1000, 4200, 5200);
   m_hTDC->SetTitle("TDC vs CDC-Boards;Board index;TDC");
   m_hHit = new TH2F("hHit", "hHit", 56, 0, 56, 400, 0, 400);
@@ -102,7 +101,8 @@ void CDCDQMModule::beginRun()
   m_hNEvents->Reset();
   m_hBit->Reset();
   m_hOcc->Reset();
-  m_hADC->Reset();
+  m_hADCBoard->Reset();
+  m_hADCLayer->Reset();
   m_hTDC->Reset();
   m_hHit->Reset();
   m_hPhi->Reset();
@@ -274,7 +274,8 @@ void CDCDQMModule::event()
       WireID wireid(lay, IWire);
       unsigned short bid = cdcgeo.getBoardID(wireid);
 
-      m_hADC->Fill(bid, adc);
+      m_hADCBoard->Fill(bid, adc);
+      m_hADCLayer->Fill(lay, adc);
       m_hTDC->Fill(bid, tdc);
       m_hPhiHit->Fill(phiDegree, lay);
     }

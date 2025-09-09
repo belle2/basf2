@@ -9,11 +9,6 @@
 #pragma once
 #include <framework/core/Module.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
-
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 #include <string>

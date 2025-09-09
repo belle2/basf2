@@ -61,6 +61,6 @@ else:
 
 mypath.add_module(moduleB)
 
-basf2.process(mypath)
+basf2.process(mypath, calculateStatistics=True)
 
 print(basf2.statistics)

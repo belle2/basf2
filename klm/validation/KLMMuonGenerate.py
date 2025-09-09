@@ -65,4 +65,3 @@ main_path.add_module('RootOutput',
 
 main_path.add_module('Progress')
 basf2.process(main_path)
-print(basf2.statistics)

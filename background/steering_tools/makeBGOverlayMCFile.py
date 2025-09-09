@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from basf2 import create_path, set_log_level, B2ERROR, B2INFO, LogLevel, process, statistics
+from basf2 import create_path, set_log_level, B2ERROR, B2INFO, LogLevel, process
 import os
 from svd import add_svd_simulation
 import glob
@@ -160,6 +160,3 @@ main.add_module('Progress')
 
 # Process events
 process(main)
-
-# Print call statistics
-print(statistics)

@@ -25,7 +25,6 @@ def run_continuum_generation(finalstate):
             path=main,
         )
         b2.process(main, n_events)
-        print(b2.statistics)
 
 
 def run_fragmentation_with_add_particles():
@@ -67,7 +66,6 @@ def run_fragmentation_with_add_particles():
             AdditionalPDGCodes=[9000005],
         )
         b2.process(main, n_events)
-        print(b2.statistics)
 
 
 for final_state in ["uubar", "ddbar", "ssbar", "ccbar"]:

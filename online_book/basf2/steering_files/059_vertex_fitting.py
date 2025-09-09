@@ -108,7 +108,7 @@ for roe_variable in roe_kinematics + roe_multiplicities:
     roe_variable_with_mask = roe_variable.replace("()", "(my_mask)")
     b_vars.append(roe_variable_with_mask)
 
-b_vars += ft.flavor_tagging
+b_vars += ['flavor_tagging']
 b_vars += vc.tag_vertex + vc.mc_tag_vertex
 
 # Variables for final states (electrons, positrons, pions)
@@ -156,6 +156,3 @@ ma.variablesToNtuple(
 
 # Start the event loop (actually start processing things)
 b2.process(main)
-
-# print out the summary
-print(b2.statistics)

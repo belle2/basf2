@@ -13,10 +13,7 @@
 #include <TH2F.h>
 #include <TFile.h>
 #include <TTree.h>
-#include <TStopwatch.h>
 
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
 
 //#include "getSigma68WithUncertainty.h"

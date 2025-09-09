@@ -10,12 +10,12 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDCluster.h>
 
 #include "TH1D.h"
 
 namespace Belle2 {
+  class PXDDigit;
+  class PXDCluster;
 
   /** PXD DQM Module */
   class PXDDQMExpressRecoModule : public HistoModule {  // <- derived from HistoModule class

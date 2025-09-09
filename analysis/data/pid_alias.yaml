@@ -1,0 +1,64 @@
+---
+Current: # pid vars to be used for the current MC processings
+
+  Common: # pid vars common for both belle and belle 2
+    eid_TOP: pidPairProbabilityExpert(11, 211, TOP)
+    eid_ARICH: pidPairProbabilityExpert(11, 211, ARICH)
+    eid_ECL: pidPairProbabilityExpert(11, 211, ECL)
+
+    muid_TOP: pidPairProbabilityExpert(13, 211, TOP)
+    muid_ARICH: pidPairProbabilityExpert(13, 211, ARICH)
+    muid_KLM: pidPairProbabilityExpert(13, 211, KLM)
+
+    piid_TOP: pidPairProbabilityExpert(211, 321, TOP)
+    piid_ARICH: pidPairProbabilityExpert(211, 321, ARICH)
+
+    Kid_TOP: pidPairProbabilityExpert(321, 211, TOP)
+    Kid_ARICH: pidPairProbabilityExpert(321, 211, ARICH)
+
+  Belle: # pid vars for belle
+    eid_dEdx: ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)
+    muid_dEdx: ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)
+    piid_dEdx: ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)
+    pi_vs_edEdxid: ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)
+    Kid_dEdx: ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)
+
+  Belle2: # pid vars for belle 2
+    eid_dEdx: pidPairProbabilityExpert(11, 211, CDC)
+    muid_dEdx: pidPairProbabilityExpert(13, 211, CDC)
+    piid_dEdx: pidPairProbabilityExpert(211, 321, CDC)
+    pi_vs_edEdxid: pidPairProbabilityExpert(211, 11, CDC)
+    Kid_dEdx: pidPairProbabilityExpert(321, 211, CDC)
+
+
+MC13:
+
+  Common: # pid vars common for both belle and belle 2
+    eid_TOP: ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)
+    eid_ARICH: ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)
+    eid_ECL: ifNANgiveX(pidPairProbabilityExpert(11, 211, ECL), 0.5)
+
+    muid_TOP: ifNANgiveX(pidPairProbabilityExpert(13, 211, TOP), 0.5)
+    muid_ARICH: ifNANgiveX(pidPairProbabilityExpert(13, 211, ARICH), 0.5)
+    muid_KLM: ifNANgiveX(pidPairProbabilityExpert(13, 211, KLM), 0.5)
+
+    piid_TOP: ifNANgiveX(pidPairProbabilityExpert(211, 321, TOP), 0.5)
+    piid_ARICH: ifNANgiveX(pidPairProbabilityExpert(211, 321, ARICH), 0.5)
+
+    Kid_TOP: ifNANgiveX(pidPairProbabilityExpert(321, 211, TOP), 0.5)
+    Kid_ARICH: ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)
+
+  Belle: # pid vars for belle
+    eid_dEdx: ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)
+    muid_dEdx: ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)
+    piid_dEdx: ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)
+    pi_vs_edEdxid: ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)
+    Kid_dEdx: ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)
+
+  Belle2: # pid vars for belle 2
+    eid_dEdx: ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC), 0.5)
+    muid_dEdx: ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC), 0.5)
+    piid_dEdx: ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC), 0.5)
+    pi_vs_edEdxid: ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC), 0.5)
+    Kid_dEdx: ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC), 0.5)
+

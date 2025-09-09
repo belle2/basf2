@@ -74,7 +74,7 @@ void setdeadch()
 {
   const static int MAX_N_LAYERS = 8;
 
-  const int N_config = 75;
+  const int N_config = 82;
 
   const int run[N_config][4] = { //itnitial exp, initial run, end exp, end run
     {0,    0,    7,  3585}, // 0
@@ -151,7 +151,14 @@ void setdeadch()
     {26,  905,   26, 1389}, // 71
     {26, 1390,   26, 1430}, // 72
     {26, 1431,   26, 1431}, // 73
-    {26, 1432,   -1,   -1}  // 74
+    {26, 1432,   30, 1569}, // 74
+    {30, 1570,   30, 1755}, // 75 2024/2/26
+    {30, 1756,   30, 1923}, // 76 2024/3/4
+    {30, 1924,   30, 2979}, // 77 2024/3/8
+    {30, 2980,   33,   85}, // 78 2024/4/11
+    {33,   86,   33, 1010}, // 79 2024/5/18
+    {33, 1011,   33, 1062}, // 80 2024/6/21
+    {33, 1063,   -1,   -1}  // 81 2024/6/23
   };
 
 
@@ -237,6 +244,13 @@ void setdeadch()
   //72 nomask
   mgr[73].push_back(1010); mgr[73].push_back(2000); mgr[73].push_back(2001);
   //74 nomask
+  mgr[75].push_back(3060); mgr[75].push_back(4050); mgr[75].push_back(4051);
+  mgr[76].push_back(6070);
+  mgr[77].push_back(4001); mgr[77].push_back(4011);
+  mgr[78].push_back(2051);
+  mgr[79].push_back(3051);
+  mgr[80].push_back(6070);
+  //81 no mask
 
 
   auto badch_map = new bool[N_config][9][8][384]; //sl layer ch

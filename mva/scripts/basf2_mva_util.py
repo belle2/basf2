@@ -192,6 +192,8 @@ class Method:
             self.specific_options = basf2_mva.ReweighterOptions()
         elif self.general_options.m_method == "Trivial":
             self.specific_options = basf2_mva.TrivialOptions()
+        elif self.general_options.m_method == "ONNX":
+            self.specific_options = basf2_mva.ONNXOptions()
         else:
             raise RuntimeError("Unknown method " + self.general_options.m_method)
 

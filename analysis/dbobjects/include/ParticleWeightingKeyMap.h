@@ -10,10 +10,10 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <analysis/dbobjects/ParticleWeightingAxis.h>
-
 
 namespace Belle2 {
+  class ParticleWeightingAxis;
+  class ParticleWeightingBinLimits;
 
   /**
    * Multidimensional bin: first element contains

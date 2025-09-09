@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDTrackClusterDQMModule.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <pxd/unpacking/PXDMappingLookup.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <TDirectory.h>

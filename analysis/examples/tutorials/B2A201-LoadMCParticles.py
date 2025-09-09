@@ -68,6 +68,3 @@ ma.printList(list_name='anti-p-:gen', full=False, path=my_path)
 
 # Process the events
 b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)

@@ -13,6 +13,7 @@
 #include <analysis/variables/ECLVariables.h>
 
 /* Basf2 headers. */
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mva/interface/Interface.h>
 
 /* Boost headers. */

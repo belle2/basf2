@@ -261,6 +261,29 @@ namespace Belle2 {
      */
     DigitBase::EAppendStatus addBGDigit(const DigitBase* bg) override;
 
+    /** Fill the arrays with the values of the members of the class
+     * @param eWire Pointer to the array entry to be filled with the eWire.
+     * @param tdcCount Pointer to the array entry to be filled with the tdcCount.
+     * @param adcCount Pointer to the array entry to be filled with the adcCount.
+     * @param status Pointer to the array entry to be filled with the status.
+     * @param tot Pointer to the array entry to be filled with tot.
+     * @param otherHitIndex Pointer to the array entry to be filled with otherHitIndex.
+     * @param adcCountAtLeadingEdge Pointer to the array entry to be filled with adcCountAtLeadingEdge.
+    */
+    void fillValues(unsigned short* eWire, unsigned short* tdcCount,
+                    unsigned short* adcCount, unsigned short* status,
+                    unsigned short* tot, signed short* otherHitIndex,
+                    unsigned short* adcCountAtLeadingEdge)
+    {
+      *eWire = m_eWire;
+      *tdcCount = m_tdcCount;
+      *adcCount = m_adcCount;
+      *status = m_status;
+      *tot = m_tot;
+      *otherHitIndex = m_otherHitIndex;
+      *adcCountAtLeadingEdge = m_adcCountAtLeadingEdge;
+    }
+
 
   protected:
 

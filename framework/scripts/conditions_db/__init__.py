@@ -232,7 +232,7 @@ class ConditionsDB:
     """Class to interface conditions db REST interface"""
 
     #: base url to the conditions db to be used if no custom url is given
-    BASE_URLS = [conditions.default_metadata_provider_url]
+    BASE_URLS = [conditions.default_metadata_provider_server]
 
     class RequestError(RuntimeError):
         """Class to be thrown by request() if there is any error"""
@@ -302,7 +302,7 @@ class ConditionsDB:
             #: base url to be prepended to all requests
             self._base_url = url.rstrip("/") + "/"
             try:
-                req = self._session.request("HEAD", self._base_url + "v2/globalTags")
+                req = self._session.request("HEAD", self._base_url + "v2/globalTagStatus")
                 req.raise_for_status()
             except requests.RequestException as e:
                 B2WARNING(f"Problem connecting to {url}:\n     {e}\n Trying next server ...")

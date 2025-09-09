@@ -8,6 +8,7 @@
 
 #include <framework/logging/LogConnectionConsole.h>
 #include <framework/logging/LogMessage.h>
+#include <Python.h>
 #include <boost/python.hpp>
 #include <boost/algorithm/string.hpp>
 #include <sstream>
@@ -34,7 +35,7 @@ LogConnectionConsole::~LogConnectionConsole()
 
 bool LogConnectionConsole::isConnected()
 {
-  return s_pythonLoggingEnabled || m_fd >= 0;
+  return (s_pythonLoggingEnabled and Py_IsInitialized()) || m_fd >= 0;
 }
 
 bool LogConnectionConsole::terminalSupportsColors(int fileDescriptor)
@@ -53,7 +54,7 @@ bool LogConnectionConsole::terminalSupportsColors(int fileDescriptor)
 
 void LogConnectionConsole::write(const std::string& message)
 {
-  if (s_pythonLoggingEnabled) {
+  if (s_pythonLoggingEnabled and Py_IsInitialized()) {
     auto pymessage = boost::python::import("sys").attr("stdout");
     pymessage.attr("write")(message);
     pymessage.attr("flush")();

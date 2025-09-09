@@ -184,7 +184,7 @@ namespace Belle2 {
       /**
        * Get variables belonging to the given keys
        */
-      std::vector<const Belle2::Variable::Manager::Var*> getVariables(const std::vector<std::string>& variables);
+      std::vector<const Variable::Manager::Var*> getVariables(const std::vector<std::string>& variables);
 
       /** Add alias
        * Return true if the alias was successfully added
@@ -222,7 +222,7 @@ namespace Belle2 {
       std::vector<std::string> resolveCollections(const std::vector<std::string>& variables);
 
       /** Return list of all variables (in order registered). */
-      std::vector<const Belle2::Variable::Manager::VarBase*> getVariables() const { return m_variablesInRegistrationOrder; }
+      std::vector<const Variable::Manager::VarBase*> getVariables() const { return m_variablesInRegistrationOrder; }
 
 
       /** All variables registered after VARIABLE_GROUP(groupName) will be added to this group. */
@@ -355,16 +355,16 @@ namespace Belle2 {
     }
 
     template<typename T>
-    Belle2::Variable::Manager::VariableDataType get_function_type(const std::string& name, T* t)
+    Variable::Manager::VariableDataType get_function_type(const std::string& name, T* t)
     {
       auto func =  std::function{t};
       using ReturnType = typename decltype(func)::result_type;
       if (std::is_same_v<ReturnType, double>) {
-        return Belle2::Variable::Manager::VariableDataType::c_double;
+        return Variable::Manager::VariableDataType::c_double;
       } else if (std::is_same_v<ReturnType, int>) {
-        return Belle2::Variable::Manager::VariableDataType::c_int;
+        return Variable::Manager::VariableDataType::c_int;
       } else if (std::is_same_v<ReturnType, bool>) {
-        return Belle2::Variable::Manager::VariableDataType::c_bool;
+        return Variable::Manager::VariableDataType::c_bool;
       } else {
         B2FATAL("Metavariables must be registered using the REGISTER_METAVARIABLE macro." << LogVar("Variablename", name));
       }
@@ -389,7 +389,7 @@ namespace Belle2 {
      * \sa Manager
      */
 #define REGISTER_VARIABLE_NO_UNIT(name, function, description) \
-  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description), Belle2::Variable::get_function_type(name,function));
+  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Variable::make_function(function), std::string(description), Variable::get_function_type(name,function));
 
     /** \def REGISTER_VARIABLE_WITH_UNIT(name, function, description, unit)
      *
@@ -397,7 +397,7 @@ namespace Belle2 {
      * \sa Manager
      */
 #define REGISTER_VARIABLE_WITH_UNIT(name, function, description, unit) \
-  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description), Belle2::Variable::get_function_type(name,function), std::string(unit));
+  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Variable::make_function(function), std::string(description), Variable::get_function_type(name,function), std::string(unit));
 
     /** \def PICK_FIFTH_ARG(arg1, arg2, arg3, arg4, arg5, ...)
      *
@@ -426,7 +426,7 @@ namespace Belle2 {
      * \sa Manager
      */
 #define REGISTER_METAVARIABLE(name, function, description, variabledatatype) \
-  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description), Belle2::Variable::Manager::VariableDataType(variabledatatype));
+  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Variable::make_function(function), std::string(description), Variable::Manager::VariableDataType(variabledatatype));
 
     /** \def VARIABLE_GROUP(groupName)
      *

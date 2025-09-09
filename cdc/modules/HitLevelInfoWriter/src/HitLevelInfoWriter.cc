@@ -7,11 +7,17 @@
  **************************************************************************/
 
 #include <cdc/modules/HitLevelInfoWriter/HitLevelInfoWriter.h>
+
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/utility/ReferenceFrame.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dbobjects/BeamSpot.h>
+
 #include <TMath.h>
 
 using namespace Belle2;
-using namespace Dedx;
 using namespace std;
 
 REG_MODULE(HitLevelInfoWriter);

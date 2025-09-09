@@ -110,7 +110,7 @@ namespace Belle2 {
      */
     const std::string& getSteering() const {return m_steering;}
 
-    /** Is it generated data?.
+    /** Is it generated data?
      */
     bool isMC() const {return m_isMC;}
 
@@ -283,7 +283,7 @@ namespace Belle2 {
 
     std::string m_steering; /**< The steering file content.  */
 
-    bool m_isMC; /**< Is it generated or real data?.  */
+    bool m_isMC; /**< Is it generated or real data?  */
 
     unsigned int m_mcEvents; /**< Number of generated events, 0 for real data.  */
 

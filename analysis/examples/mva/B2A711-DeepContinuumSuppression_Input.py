@@ -191,7 +191,6 @@ ma.variablesToNtuple('B0', variables + contVars, treename='tree', filename=outfi
 firstpath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 basf2.process(firstpath)
-print(basf2.statistics)
 
 # Shuffle Data. Use only if enough Ram is available
 try:

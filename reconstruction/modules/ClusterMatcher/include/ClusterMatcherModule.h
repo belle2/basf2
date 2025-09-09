@@ -11,12 +11,10 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Cluster.h>
-
-
 namespace Belle2 {
+  class KLMCluster;
+  class ECLCluster;
+  class Cluster;
 
   /**
   Match KLM Clusters to close ECL Clusters.

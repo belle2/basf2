@@ -1,0 +1,563 @@
+[INFO] Steering file: framework/tests/test-metadata-providers-and-cached-globaltags.py
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0.290583, 0, 6.99797, 7.004), 
+   LER=(0.166035, 0, -3.99855, 4.002), 
+   CMS=(0.456618, 0, 2.99942, 11.006), 
+   VTX=(-0.05, 0.017, -0.01), 
+   CovHER=diag(2.63169e-05, 0, 0)
+   CovLER=diag(5.64063e-06, 0, 0)
+   CovVTX=[(1.79873e-06, 0, -1.08724e-05), (0, 4e-08, 0), (-1.08724e-05, 0, 0.00108889)]
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltags (highest priority first) are user_depietro_cdb_test_1, ${default_globaltag}
+[INFO] BeamParameters: cms Energy=1.02 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0, 0, 0.51, 0.51), 
+   LER=(6.2457e-17, -0, -0.51, 0.51), 
+   CMS=(6.2457e-17, 0, 0, 1.02), 
+   VTX=(0, 0, 0), 
+   CovHER=diag(0, 0, 0)
+   CovLER=diag(0, 0, 0)
+   CovVTX=diag(0, 0, 0)
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_3
+	status = INVALID
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
+	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+	globaltag = 114
+	query = /v2/globalTag/114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_3
+	status = INVALID
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_3
+	status = INVALID
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
+	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+	globaltag = 114
+	query = /v2/globalTag/114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
+	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+	globaltag = 114
+	query = /v2/globalTag/114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
+	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+	globaltag = 114
+	query = /v2/globalTag/114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0.290583, 0, 6.99797, 7.004), 
+   LER=(0.166035, 0, -3.99855, 4.002), 
+   CMS=(0.456618, 0, 2.99942, 11.006), 
+   VTX=(-0.05, 0.017, -0.01), 
+   CovHER=diag(2.63169e-05, 0, 0)
+   CovLER=diag(5.64063e-06, 0, 0)
+   CovVTX=[(1.79873e-06, 0, -1.08724e-05), (0, 4e-08, 0), (-1.08724e-05, 0, 0.00108889)]
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltags (highest priority first) are user_depietro_cdb_test_1, ${default_globaltag}
+[INFO] BeamParameters: cms Energy=1.02 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0, 0, 0.51, 0.51), 
+   LER=(6.2457e-17, -0, -0.51, 0.51), 
+   CMS=(6.2457e-17, 0, 0, 1.02), 
+   VTX=(0, 0, 0), 
+   CovHER=diag(0, 0, 0)
+   CovLER=diag(0, 0, 0)
+   CovVTX=diag(0, 0, 0)
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_2
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_3
+	status = INVALID
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_3
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
+	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+	globaltag = 114
+	query = /v2/globalTag/114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = 114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_1
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_2
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_3
+	status = INVALID
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_1
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_3
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_3
+	status = INVALID
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_2
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_3
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
+	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+	globaltag = 114
+	query = /v2/globalTag/114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_1
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = 114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
+	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+	globaltag = 114
+	query = /v2/globalTag/114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_2
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = 114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
+	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+	globaltag = 114
+	query = /v2/globalTag/114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_1
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_2
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = 114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0.290583, 0, 6.99797, 7.004), 
+   LER=(0.166035, 0, -3.99855, 4.002), 
+   CMS=(0.456618, 0, 2.99942, 11.006), 
+   VTX=(-0.05, 0.017, -0.01), 
+   CovHER=diag(2.63169e-05, 0, 0)
+   CovLER=diag(5.64063e-06, 0, 0)
+   CovVTX=[(1.79873e-06, 0, -1.08724e-05), (0, 4e-08, 0), (-1.08724e-05, 0, 0.00108889)]
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_1
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltags (highest priority first) are user_depietro_cdb_test_1, ${default_globaltag}
+[INFO] BeamParameters: cms Energy=1.02 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0, 0, 0.51, 0.51), 
+   LER=(6.2457e-17, -0, -0.51, 0.51), 
+   CMS=(6.2457e-17, 0, 0, 1.02), 
+   VTX=(0, 0, 0), 
+   CovHER=diag(0, 0, 0)
+   CovLER=diag(0, 0, 0)
+   CovVTX=diag(0, 0, 0)
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_2
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_3
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_3
+	status = INVALID
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = 114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
+	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+	globaltag = 114
+	query = /v2/globalTag/114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_1
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_2
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_1
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_3
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_3
+	status = INVALID
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_2
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_3
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_3
+	status = INVALID
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_1
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = 114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
+	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+	globaltag = 114
+	query = /v2/globalTag/114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_2
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = 114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
+	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+	globaltag = 114
+	query = /v2/globalTag/114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_1
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_2
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = 114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[INFO] Conditions Database: found working metadata provider
+	provider = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = user_depietro_cdb_test_2
+	status = OPEN
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
+	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+	globaltag = 114
+	query = /v2/globalTag/114
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0.290583, 0, 6.99797, 7.004), 
+   LER=(0.166035, 0, -3.99855, 4.002), 
+   CMS=(0.456618, 0, 2.99942, 11.006), 
+   VTX=(-0.05, 0.017, -0.01), 
+   CovHER=diag(2.63169e-05, 0, 0)
+   CovLER=diag(5.64063e-06, 0, 0)
+   CovVTX=[(1.79873e-06, 0, -1.08724e-05), (0, 4e-08, 0), (-1.08724e-05, 0, 0.00108889)]
+[INFO] The random number seed is set to "114"
+[INFO] Starting event processing, random seed is set to '114'
+[INFO] Conditions Database: found working metadata provider
+	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
+[WARNING] Local Database: Global tag does not exist
+	database = /cvmfs/belle.cern.ch/conditions/database.sqlite
+	globaltag = user_depietro_cdb_test_1
+[WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
+[FATAL] Conditions data: No more metadata providers available

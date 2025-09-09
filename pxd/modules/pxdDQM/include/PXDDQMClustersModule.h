@@ -9,12 +9,12 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include "TH1D.h"
 #include "TH2D.h"
 
 namespace Belle2 {
+  class PXDDAQStatus;
 
   /** PXD DQM Module */
   class PXDDQMClustersModule : public HistoModule {  // <- derived from HistoModule class

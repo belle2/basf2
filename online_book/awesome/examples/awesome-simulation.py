@@ -69,6 +69,3 @@ main.add_module('RootOutput', outputFileName='awesome-simulation.root')
 
 # Now lets do the processing of the awesome events
 b2.process(main)
-
-# Print call statistics of our awesome event processing
-print(b2.statistics)

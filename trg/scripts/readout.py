@@ -172,8 +172,6 @@ if pickleIt:
     pickle.dump(meta, wfp, protocol=2)
     wfp.close()
 
-print(b2.statistics)
-
 if pickleIt:
     b2.B2INFO('Output pickle file ' + pica + ' saved.')
 else:

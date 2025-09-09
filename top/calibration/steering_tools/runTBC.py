@@ -85,7 +85,3 @@ main.add_module(progress)
 
 # Process events
 b2.process(main)
-
-# Print call statistics
-print(b2.statistics)
-print(b2.statistics(b2.statistics.TERM))

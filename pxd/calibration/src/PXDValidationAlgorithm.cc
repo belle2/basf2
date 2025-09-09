@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <pxd/calibration/PXDValidationAlgorithm.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include <string>
 #include <algorithm>

@@ -29,5 +29,5 @@ main.add_module('SVDChargeSharingAnalysis', outputDirName=str(dirOUT), outputRoo
                 useTrackInfo=True, is2017TBanalysis=False)
 main.add_module('Progress')
 b2.print_path(main)
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

@@ -238,9 +238,9 @@ steering file. In the very first line we have also added a
 that the steering file should be executed with a python interpreter.
 
 So far, the input file has been completely hard-coded. But as we've seen
-before the file names only differ by the final suffix. We can be a little bit
+before the file names only differ by the final suffix. We can add a little bit
 more flexibility by providing this integer as a command-line argument. Then, we
-can select a different input file when running the steering file, and without
+can select a different input file when running the steering file without
 having to change anything in the script itself.
 
 .. admonition:: Task
@@ -376,14 +376,12 @@ of the decay mode you are studying, it is recommended to use them for V0s
 .. admonition:: Task
     :class: exercise stacked
 
-    Extend your steering file by loading electrons, positrons, and :math:`K_S^0` candidates. At
-    the very end of your script you should also print a summary table of all the
-    modules added to your path using the function `statistics`.
+    Extend your steering file by loading electrons, positrons, and :math:`K_S^0` candidates.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    All you need is `fillParticleList`, `stdKshorts`, and `statistics`.
+    All you need is `fillParticleList` and `stdKshorts`.
     Remember that charge-conjugated particles are automatically created.
     You do not need a cut for the electrons, so you can use an empty string
     ``""``.
@@ -411,7 +409,6 @@ of the decay mode you are studying, it is recommended to use them for V0s
     Run your steering file and answer the following questions:
 
     * Which are the mass window boundaries set for the :math:`K_S^0`?
-    * Which module had the longest execution time?
 
 .. admonition:: Hint
     :class: xhint stacked toggle
@@ -428,10 +425,6 @@ of the decay mode you are studying, it is recommended to use them for V0s
 
     In the output there are ``INFO`` messages that the :math:`K_S^0` invariant mass has
     to be between 0.45 and 0.55 GeV/c :superscript:`2`.
-
-    The module ``TreeFitter_K_S0:RD`` takes the longest. It's a vertex fit of
-    the :math:`K_S^0` candidates. You will learn more about vertex fits in
-    :ref:`onlinebook_vertex_fitting`.
 
 In the previous task you should have learned how useful it is to carefully
 study the output. This is especially relevant if there are warning or error

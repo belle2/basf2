@@ -21,7 +21,7 @@
 </header>
 """
 
-from basf2 import set_random_seed, create_path, process, statistics
+from basf2 import set_random_seed, create_path, process
 from reconstruction import add_reconstruction
 from mdst import add_mdst_output
 from validation import statistics_plots, event_timing_plot
@@ -50,10 +50,7 @@ main.add_module("RootOutput", outputFileName="../EvtRec.root")
 add_mdst_output(main, True, "../EvtRec_mdst.root")
 
 main.add_module('Progress')
-process(main)
-
-# Print call statistics
-print(statistics)
+process(main, calculateStatistics=True)
 
 statistics_plots(
     "EvtRec_statistics.root",

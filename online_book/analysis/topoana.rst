@@ -592,7 +592,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
 .. admonition:: Solution
    :class: toggle solution stacked
 
-   Reivse your python steering script by adding ``import os`` to the end of its
+   Revise your python steering script by adding ``import os`` to the end of its
    preamble and appending ``os.system('topoana.exe topoana.card')`` at its end,
    and then run the script with ``basf2``.
 

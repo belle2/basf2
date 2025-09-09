@@ -36,4 +36,3 @@ main.add_module('Geometry', components=['SVD'], createPayloads=True)
 # main.add_module('Display', fullGeometry=True)
 
 b2.process(main)
-print(b2.statistics(b2.statistics.BEGIN_RUN))

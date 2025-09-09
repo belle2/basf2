@@ -22,8 +22,5 @@ variablesToNtuple('', mc_gen_topo(200), 'MCGenTopo', 'MCGenTopo.root', path=mypa
 # Process the events
 basf2.process(mypath)
 
-# Print out the summary
-print(basf2.statistics)
-
 # Invoke the TopoAna program
 os.system('topoana.exe topoana.card')  # Newly added statement 2!

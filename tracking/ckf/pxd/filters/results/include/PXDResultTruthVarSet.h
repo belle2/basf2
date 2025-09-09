@@ -11,13 +11,14 @@
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 #include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
 
-#include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 #include <tracking/ckf/pxd/utilities/PXDMCUtil.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 namespace Belle2 {
+  class CKFToPXDResult;
+  class EventMetaData;
+
   /// Names of the variables to be generated.
   constexpr
   static char const* const pxdResultTruthNames[] = {

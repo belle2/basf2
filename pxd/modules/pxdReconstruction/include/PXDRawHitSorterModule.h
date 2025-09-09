@@ -12,11 +12,12 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <pxd/dataobjects/PXDRawHit.h>
-#include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <string>
 
 namespace Belle2 {
+  class PXDDAQStatus;
+  class PXDDigit;
+
   namespace PXD {
 
     /** The PXDRawHitSorter module.

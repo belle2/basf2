@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <calibration/CalibrationCollectorModule.h>
 
 #include <mdst/dataobjects/Track.h>

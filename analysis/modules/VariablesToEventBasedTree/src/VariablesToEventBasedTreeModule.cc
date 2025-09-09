@@ -11,7 +11,6 @@
 // analysis
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/StringWrapper.h>
-#include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 
 // framework

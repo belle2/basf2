@@ -25,7 +25,8 @@ import os
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="Ecms Calibrations",
-    expert_username="zlebcr",
+    expert_username="zlebcik",
+    subsystem="beam",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["hadron4S", "mumu4S", "mumuOff"],
@@ -57,7 +58,8 @@ settings = CalibrationSettings(
         "eCMSmumuSpread": 5.2e-3,
         "eCMSmumuShift": 10e-3,
         "minPXDhits": 0},
-    depends_on=[boostvector])
+    depends_on=[boostvector],
+    produced_payloads=["CollisionInvariantMass"])
 
 ##############################
 

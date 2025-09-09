@@ -8,22 +8,20 @@
 
 // modified from GEANT4 G4Transportation class
 
-
-#ifndef G4LongLivedNeutralTransportation_hh
-#define G4LongLivedNeutralTransportation_hh 1
+#pragma once
 
 #include "G4VProcess.hh"
-#include "G4FieldManager.hh"
-
-#include "G4Navigator.hh"
 #include "G4TransportationManager.hh"
 #include "G4PropagatorInField.hh"
-#include "G4Track.hh"
-#include "G4Step.hh"
 #include "G4ParticleChangeForTransport.hh"
 
 class G4SafetyHelper;
 class G4CoupledTransportation;
+class G4FieldManager;
+class G4Navigator;
+class G4Track;
+class G4Step;
+
 namespace Belle2 {
 
   /**
@@ -265,5 +263,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif

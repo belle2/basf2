@@ -10,8 +10,8 @@
 #include <Eigen/Core>
 #include <gtest/gtest.h>
 
-#include "analysis/VertexFitting/TreeFitter/FitParams.h"
-#include "analysis/VertexFitting/TreeFitter/KalmanCalculator.h"
+#include <analysis/VertexFitting/TreeFitter/FitParams.h>
+#include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
 
 namespace {
 

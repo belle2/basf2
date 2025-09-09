@@ -31,7 +31,6 @@ settings = CalibrationSettings(
     expert_config={
         "C2_MinEnergyThreshold": 2.0,
         "nFilesCollector": 50,
-        "nParallelAlgos": 1,
         "parallelAlgosBatchSize": 10000
     },
     produced_payloads=["ECLWaveformTemplate"])
@@ -59,8 +58,6 @@ def get_calibrations(input_data, **kwargs):
     expert_config = kwargs.get("expert_config")
     C2_MinEnergyThreshold = expert_config["C2_MinEnergyThreshold"]
     nFilesCollector = expert_config["nFilesCollector"]
-    nParallelAlgos = expert_config["nParallelAlgos"]
-    parallelAlgosBatchSize = expert_config["parallelAlgosBatchSize"]
 
     # ..The calibration
     collector_C1 = basf2.register_module("eclWaveformTemplateCalibrationC1Collector")
@@ -86,18 +83,21 @@ def get_calibrations(input_data, **kwargs):
     algos_C3 = []
     collectors_C2 = []
 
-    batchsize = parallelAlgosBatchSize
-    nbatches = nParallelAlgos
+    batches = expert_config["nParallelAlgos"]
+    nCrystals = 8736
+    batchsize = int(nCrystals / batches)
+    if (batches * batchsize < nCrystals):
+        batchsize = batchsize + 1
 
     # keep option to run in parallel
-    for i in range(0, nbatches):
+    for i in range(0, batches):
 
         lowLimit = (batchsize*i)+1
 
         highLimit = (batchsize*(i+1))
 
-        if (highLimit > 8736):
-            highLimit = 8736
+        if (highLimit > nCrystals):
+            highLimit = nCrystals
 
         print("lowLimit,highLimit", lowLimit, highLimit)
 

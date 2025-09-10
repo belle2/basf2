@@ -31,7 +31,7 @@ settings = CalibrationSettings(
     expert_config={
         "C2_MinEnergyThreshold": 2.0,
         "nFilesCollector": 50,
-        "parallelAlgosBatchSize": 10000
+        "nParallelAlgos": 1
     },
     produced_payloads=["ECLWaveformTemplate"])
 

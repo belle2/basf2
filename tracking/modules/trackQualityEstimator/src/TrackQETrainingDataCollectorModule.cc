@@ -73,15 +73,15 @@ void TrackQETrainingDataCollectorModule::initialize()
   if (cdc_length == 0) {
     B2ERROR("The length of CDC backtrack chain is zero.");
   }
-  // The last item must be "RecoTrack"
-  else if (m_cdcRecoTracksStoreArrayBacktrackChain[cdc_length - 1] != "RecoTrack") {
-    B2ERROR("The last item of CDC backtrack chain is not \"RecoTrack\".");
+  // The last item must be "RecoTracks"
+  else if (m_cdcRecoTracksStoreArrayBacktrackChain[cdc_length - 1] != "RecoTracks") {
+    B2ERROR("The last item of CDC backtrack chain is not \"RecoTracks\".");
   }
   int svd_length = m_svdRecoTracksStoreArrayBacktrackChain.size();
   if (svd_length == 0) {
     B2ERROR("The length of SVD backtrack chain is zero.");
-  } else if (m_svdRecoTracksStoreArrayBacktrackChain[svd_length - 1] != "RecoTrack") {
-    B2ERROR("The last item of SVD backtrack chain is not \"RecoTrack\".");
+  } else if (m_svdRecoTracksStoreArrayBacktrackChain[svd_length - 1] != "RecoTracks") {
+    B2ERROR("The last item of SVD backtrack chain is not \"RecoTracks\".");
   }
 }
 
@@ -105,7 +105,7 @@ void TrackQETrainingDataCollectorModule::event()
     // CDC tracks from CDC-standalone tracking
     const RecoTrack* cdcRecoTrackPtr{&recoTrack};
     int length = m_cdcRecoTracksStoreArrayBacktrackChain.size();
-    // The last item is checked to be "RecoTrack", so begin with the second last item
+    // The last item is checked to be "RecoTracks", so begin with the second last item
     for (int i = length - 2; i >= 0; i--) {
       std::string& name = m_cdcRecoTracksStoreArrayBacktrackChain[i];
       cdcRecoTrackPtr = cdcRecoTrackPtr->getRelatedTo<RecoTrack>(name);
@@ -117,7 +117,7 @@ void TrackQETrainingDataCollectorModule::event()
     // SVD tracks from VXDTF2 (SVD-standalone) tracking
     const RecoTrack* svdRecoTrackPtr{&recoTrack};
     length = m_svdRecoTracksStoreArrayBacktrackChain.size();
-    // The last item is checked to be "RecoTrack", so begin with the second last item
+    // The last item is checked to be "RecoTracks", so begin with the second last item
     for (int i = length - 2; i >= 0; i--) {
       std::string& name = m_svdRecoTracksStoreArrayBacktrackChain[i];
       svdRecoTrackPtr = svdRecoTrackPtr->getRelatedTo<RecoTrack>(name);

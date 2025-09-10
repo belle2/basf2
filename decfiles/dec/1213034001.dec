@@ -34,7 +34,7 @@ Enddecay
 CDecay anti-D0sig
 
 Decay pi0sig
-1.000 gamma gamma PHSP
+1.000 gamma gamma PHSP;
 Enddecay
 
 

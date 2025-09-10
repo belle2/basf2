@@ -24,12 +24,12 @@ Enddecay
 CDecay B+sig
 
 Decay D*0sig
-1.000 D0sig pi0 PHOTOS VSS; 
+1.000 D0sig pi0sig PHOTOS VSS; 
 Enddecay
 CDecay anti-D*0sig
 
 Decay D0sig
-1.000 K- pi+ pi0 PHOTOS D_DALITZ;
+1.000 K- pi+ pi0sig PHOTOS D_DALITZ;
 Enddecay
 CDecay anti-D0sig
 

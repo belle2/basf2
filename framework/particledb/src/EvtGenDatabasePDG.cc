@@ -209,3 +209,32 @@ void EvtGenDatabasePDG::WriteEvtGenTable(const char* filename)
   }
   WriteEvtGenTable(out);
 }
+
+bool EvtGenDatabasePDG::testParticleData()
+{
+  if (!fParticleList)
+    return true;
+  bool testPassed = true;
+  for (TObject* object : *fParticleList) {
+    EvtGenParticlePDG* particle = dynamic_cast<EvtGenParticlePDG*>(object);
+    if (!particle) {
+      B2FATAL("EvtGenDatabasePDG::WriteEvtgenTable: Particle does not inherit from EventGenParticlePDG");
+    }
+    /*
+     * Check width and mass range. The mass range in EvtGen is
+     * [M - max_Dm, M + 15 * Gamma]. Thus, max_Dm values are required to
+     * be less than or equal to 15 * Gamma, except for zero width. Zero width
+     * and non-zero max_Dm is a valid case for some special particles like
+     * quark pairs.
+     */
+    if ((particle->MaxWidth() > 15.000000000001 * particle->Width()) &&
+        (particle->Width() != 0)) {
+      B2ERROR("Maximum Delta_M is greater than 15 widths for "
+              << particle->GetName()
+              << LogVar("Width", particle->Width())
+              << LogVar("max_Dm", particle->MaxWidth()));
+      testPassed = false;
+    }
+  }
+  return testPassed;
+}

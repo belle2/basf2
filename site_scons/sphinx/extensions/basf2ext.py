@@ -314,6 +314,7 @@ class VariableListDirective(Directive):
         all_nodes = []
         env = self.state.document.settings.env
         baseurl = env.app.config.basf2_doxygen_baseurl
+        anchor_map = getattr(env.app.env, "b2_anchor_map", {})
         for var in sorted(all_variables, key=lambda x: x.name):
 
             # for overloaded variables, we might have to flag noindex in the
@@ -332,10 +333,11 @@ class VariableListDirective(Directive):
             env.app.emit('autodoc-process-docstring', "b2:variable", var.name, var, None, docstring)
 
             description = [f".. b2:variable:: {var.name}"] + index + [""]
-            if "filename" in self.options:
-                filename = self.options["filename"]
-                page = doxygen_file_page(filename)
-                link = f"{baseurl}{page}"
+            qualifiedName = f"Belle2::Variable::{var.name}"
+            qualifiedFunctionName = f"Belle2::Variable::{var.functionName}"
+            key = qualifiedName if qualifiedName in anchor_map else qualifiedFunctionName
+            if key in anchor_map:
+                link = f"{baseurl}{anchor_map[key]}"
                 description.insert(1, f"   :source: {link}")
             description += ["   " + e for e in docstring]
             if "group" not in self.options:
@@ -450,4 +452,4 @@ def setup(app):
     StandardDomain.initial_data["labels"]["b2-varindex"] = ("b2-varindex", "", "basf2 Variable Index")
     StandardDomain.initial_data["anonlabels"]["b2-modindex"] = ("b2-modindex", "")
     StandardDomain.initial_data["anonlabels"]["b2-varindex"] = ("b2-varindex", "")
-    return {'version': 0.2}
+    return {'version': 0.3}

@@ -334,6 +334,13 @@ namespace Belle2 {
                  const std::vector<const char*>& outputNames,
                  std::vector<Ort::Value>& outputs);
 
+        /**
+         * @brief Get a reference to the raw Ort::Session object
+         *
+         * Can be used to call methods on it
+         */
+        const Ort::Session& getOrtSession() { return *m_session; }
+
       private:
         /**
          * Environment object for ONNX session
@@ -366,12 +373,12 @@ namespace Belle2 {
       /**
        * Load mechanism to load Options from a xml tree
        */
-      virtual void load(const boost::property_tree::ptree&) override {}
+      virtual void load(const boost::property_tree::ptree&) override;
 
       /**
        * Save mechanism to store Options in a xml tree
        */
-      virtual void save(boost::property_tree::ptree&) const override {}
+      virtual void save(boost::property_tree::ptree&) const override;
 
       /**
        * Returns a program options description for all available options
@@ -385,6 +392,15 @@ namespace Belle2 {
        * Return method name
        */
       virtual std::string getMethod() const override { return "ONNX"; }
+
+      /**
+       * @brief Name of the output Tensor that is used to make predictions.
+       *
+       * Only has to be provided if there are multiple outputs and none of them
+       * is called "output". In case of a single output, or if among multiple
+       * outputs there is one called "output", it will be used automatically.
+       */
+      std::string m_outputName;
     };
 
     /**
@@ -436,9 +452,30 @@ namespace Belle2 {
 
     private:
       /**
+       * Set up input and output names and perform consistency checks.
+       */
+      void configureInputOutputNames();
+
+      /**
        * The ONNX inference session wrapper
        */
       std::unique_ptr<ONNX::Session> m_session;
+
+      /**
+       * ONNX specific options loaded from weightfile
+       */
+      ONNXOptions m_specific_options;
+
+      /**
+       * Name of the input tensor (will be determined automatically)
+       */
+      std::string m_inputName;
+
+      /**
+       * Name of the output tensor
+       * (will either be determined automatically or loaded from specific options)
+       */
+      std::string m_outputName;
     };
   } // namespace MVA
 } // namespace Belle2

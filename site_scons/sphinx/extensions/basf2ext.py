@@ -42,6 +42,7 @@ from docutils.statemachine import StringList
 from basf2domain import Basf2Domain
 from basf2 import list_available_modules, register_module
 from sphinx.domains.std import StandardDomain
+import xml.etree.ElementTree as ET
 
 
 def parse_with_titles(state, content):
@@ -189,6 +190,86 @@ def doxygen_file_page(filename: str) -> str:
     if ext.startswith("."):
         ext = ext[1:]
     return f"{base}_8{ext}_source.html"
+
+
+def doxygen_source_link(location_elem):
+    """
+    Given a <location> element from Doxygen XML,
+    build html page name and anchor
+    """
+    file_path = location_elem.attrib['file']
+    line = int(location_elem.attrib['line'])
+
+    page = doxygen_file_page(file_path)
+    anchor = f"#l{line:05d}"
+
+    return page + anchor
+
+
+def build_doxygen_anchor_map(xml_dir):
+    """
+    Parse Doxygen XML files and build mapping:
+       qualifiedname -> "File_8ext_source.html#lNNNNN"
+    If no <location> element is available, fall back to anchorfile#anchor.
+    xml_dir: path to doxygen/xml (must contain index.xml)
+    Returns: dict { "VarName": "classFoo_1_1Bar.html#a1234abcd" }
+    """
+    anchors = {}
+
+    # parse index to know what compound XMLs to check
+    index_path = os.path.join(xml_dir, "index.xml")
+    tree = ET.parse(index_path)
+    root = tree.getroot()
+
+    for comp in root.findall("compound"):
+        refid = comp.attrib["refid"]
+        compound_file = os.path.join(xml_dir, f"{refid}.xml")
+        if not os.path.exists(compound_file):
+            continue
+
+        ctree = ET.parse(compound_file)
+        croot = ctree.getroot()
+
+        for member in croot.findall(".//memberdef"):
+            kind = member.attrib.get("kind")
+            if kind not in ("function", "variable"):  # limit to things we care about
+                continue
+
+            name = member.findtext("name")
+            qualified = member.findtext("qualifiedname")
+            if qualified and not qualified.startswith("Belle2::Variable::"):
+                continue
+            key = qualified or name
+
+            href = None
+            location = member.find("location")
+
+            # If a location exists, build "_source.html#lNNNNN" link
+            if location is not None and "file" in location.attrib and "line" in location.attrib:
+                href = doxygen_source_link(location)
+
+            # Otherwise fall back to anchorfile + anchor
+            if href is None:
+                anchor_file = member.findtext("anchorfile")
+                anchor_id = member.findtext("anchor")
+                if anchor_file and anchor_id:
+                    href = f"{anchor_file}#{anchor_id}"
+
+            # Skip members that don't look like real variables (avoid REGISTER_VARIABLE macro noise)
+            definition = member.findtext("definition") or ""
+            if definition.startswith("REGISTER_VARIABLE"):
+                continue
+
+            if href:
+                # Prefer header declarations/class members, but overwrite if key unseen
+                if key not in anchors:
+                    anchors[key] = href
+                else:
+                    # Heuristic: prefer .cc_source.html links over generic anchor ones
+                    if "_source.html" in href and "_source.html" not in anchors[key]:
+                        anchors[key] = href
+
+    return anchors
 
 
 #: \cond Doxygen_suppress
@@ -339,6 +420,11 @@ def sphinx_role(role, rawtext, text, lineno, inliner, options=None, content=None
     return [nodes.reference(rawsource=rawtext, text=display_text, refuri=url)], []
 
 
+def load_doxygen_anchors(app):
+    xml_dir = app.config.basf2_doxygen_xml_dir
+    app.env.b2_anchor_map = build_doxygen_anchor_map(xml_dir)
+
+
 def setup(app):
     import basf2
     basf2.logging.log_level = basf2.LogLevel.WARNING
@@ -347,6 +433,7 @@ def setup(app):
     app.add_config_value("basf2_commitid", "", True)
     app.add_config_value("basf2_issues", "", True)
     app.add_config_value("basf2_doxygen_baseurl", "", "env")
+    app.add_config_value("basf2_doxygen_xml_dir", None, "env")
     app.add_domain(Basf2Domain)
     app.add_directive("b2-modules", ModuleListDirective)
     app.add_directive("b2-variables", VariableListDirective)
@@ -355,6 +442,7 @@ def setup(app):
     app.add_role("doxygen", doxygen_role)
     app.add_role("sphinx", sphinx_role)
     app.connect('html-page-context', html_page_context)
+    app.connect("builder-inited", load_doxygen_anchors)
 
     # Sadly sphinx does not seem to add labels to custom indices ... :/
     StandardDomain.initial_data["labels"]["b2-modindex"] = ("b2-modindex", "", "basf2 Module Index")

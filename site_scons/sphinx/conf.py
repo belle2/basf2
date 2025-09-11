@@ -53,6 +53,8 @@ extensions = [
 codeautolink_warn_on_missing_inventory = False
 codeautolink_warn_on_failed_resolve = False
 
+basf2_doxygen_xml_dir = f"{os.environ.get('BELLE2_RELEASE_DIR', os.environ.get('BELLE2_LOCAL_DIR'))}/build/doxygen/xml"
+
 nbsphinx_allow_errors = True
 
 # autosummary_generate = True

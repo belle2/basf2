@@ -164,7 +164,7 @@ class ModuleListDirective(Directive):
         # modules found in a given library)
         if "library" in self.options:
             lib = self.options["library"].strip()
-            all_modules = [e for e in all_modules if os.path.basenam(e[1]) == lib]
+            all_modules = [e for e in all_modules if os.path.basename(e[1]) == lib]
 
         # see if we have to forward noindex
         self.noindex = ["    :noindex:"] if "noindex" in self.options else []

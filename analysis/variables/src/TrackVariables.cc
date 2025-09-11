@@ -917,8 +917,8 @@ always 0 or 1 with newer versions of ECL reconstruction.
 
 Returns NaN if called for something other than a track-based particle.
     )DOC");
-    REGISTER_VARIABLE("helixExtTheta(radius [cm], z fwd [cm], z bwd [cm], useHighestProbMass=0)", trackHelixExtTheta,
-                      R"DOC(Returns theta of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will
+    REGISTER_VARIABLE("helixExtTheta(radius [cm], z fwd [cm], z bwd [cm], useHighestProbMass=0)", trackHelixExtTheta, R"DOC(
+                      Returns theta of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will
                       use the track fit result for the mass hypothesis with the highest pValue.
 
                       )DOC", "rad");

@@ -151,4 +151,3 @@ Complete list of the eventShape variables:
 .. b2-variables::
     :group: EventShape
     :noindex:
-    :filename: EventShapeVariables.cc

@@ -37,7 +37,6 @@ which relates composite ``Particle`` (s) and ``MCParticle`` (s), is executed.
 .. b2-variables::
         :variables: mcPDG,mcErrors
         :noindex:
-        :filename: MCTruthVariables.cc
 
 ~~~~~~~~~~~~~~~
 Extra variables
@@ -50,7 +49,6 @@ Some extra variables are provided externally, for example :b2:var:`isCloneTrack`
 .. b2-variables::
         :variables: isSignal,isSignalAcceptWrongFSPs,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
         :noindex:
-        :filename: MCTruthVariables.cc
 
 
 .. _Error_flags:
@@ -297,26 +295,22 @@ The same number of :math:`B^-` decay modes have been implemented. They have nega
 
 .. b2-variables::
    :variables: BplusMode,BminusMode
-   :filename: MCParticleTag.cc
 
 The same general structure is used for the 1000 :math:`B^0` and :math:`\bar{B^0}` modes accessible via the variables
 
 .. b2-variables::
    :variables: B0Mode,Bbar0Mode
-   :filename: MCParticleTag.cc
 
 For :math:`B_s^0` and :math:`\bar{B_s^0}` a total of 264 decay have been defined.
 
 .. b2-variables::
    :variables: Bs0Mode,Bsbar0Mode
-   :filename: MCParticleTag.cc
 
 Besides the B meson decays three :math:`D^{*\pm}`, 84 :math:`D_s^\pm`, 84 :math:`D^\pm`, and 136 :math:`D^0` charm meson decays are implemented.
 For each category the tag number starts again at 1001.
 
 .. b2-variables::
    :variables: DstplusMode,DstminusMode,DsplusMode,DsminusMode,DplusMode,DminusMode,D0Mode,Dbar0Mode
-   :filename: MCParticleTag.cc
 
 The full list of all decay modes can be found in the technical Belle note `BELLE2-NOTE-TE-2021-002 <https://docs.belle2.org/record/2215/files/BELLE2-NOTE-TE-2021-002.pdf>`_.
 
@@ -335,7 +329,6 @@ A special case is the decay of generated tau lepton pairs. For their study, it i
 
 .. b2-variables::
         :variables: tauPlusMCMode,tauMinusMCMode,tauPlusMCProng,tauMinusMCProng
-        :filename: MCTruthVariables.cc
 
 Using MC information, `labelTauPairMC` identifies if the generated event is a tau pair decay.
 

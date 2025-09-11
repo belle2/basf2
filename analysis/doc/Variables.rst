@@ -135,14 +135,12 @@ Kinematics
 
 .. b2-variables::
    :group: Kinematics
-   :filename: Variables.cc
 
 Helicity
 ~~~~~~~~
 
 .. b2-variables::
       :group: Helicity variables
-      :filename: HelicityVariables.cc
 
 Tracking
 ~~~~~~~~
@@ -155,7 +153,6 @@ This notation follows the convention of the tracking paper.
 
 .. b2-variables::
    :group: Tracking
-   :filename: TrackingVariables.cc
 
 V0 Tracking
 ~~~~~~~~~~~
@@ -164,7 +161,6 @@ Here is a list of track variables for V0 daughters:
 
 .. b2-variables::
    :group: V0Daughter
-   :filename: V0DaughterTrackVariables.cc
 
 .. _kinkvariables:
 
@@ -175,7 +171,6 @@ Here is a list of variables for kinks, which are reconstructed since release-09:
 
 .. b2-variables::
    :group: Kink
-   :filename: KinkVariables.cc
 
 PID
 ~~~
@@ -198,14 +193,12 @@ Here is a list of particle identification variables:
 
 .. b2-variables::
    :group: PID
-   :filename: PIDVariables.cc
 
 Basic particle information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. b2-variables::
    :group: Basic particle information
-   :filename: BasicParticleInformation.cc
 
 PID for expert
 """"""""""""""
@@ -221,7 +214,6 @@ If a likelihood is not available from the selected detector list, **NaN** is ret
 
 .. b2-variables::
    :group: PID_expert
-   :filename: PIDVariables.cc
 
 ECL Cluster
 ~~~~~~~~~~~
@@ -247,13 +239,11 @@ All ECLCluster-based variables return NaN if no ECLCluster is found.
 
 .. b2-variables::
    :group: ECL Cluster related
-   :filename: ECLVariables.cc
 
 There are also some special variables related to the MC matching of ECL clusters (specifically).
 
 .. b2-variables::
    :group: MC Matching for ECLClusters
-   :filename: MCTruthVariables.cc
 
 Acceptance
 ~~~~~~~~~~
@@ -262,7 +252,6 @@ Here is a list of variables for acceptance cuts:
 
 .. b2-variables::
    :group: Acceptance
-   :filename: AcceptanceVariables.cc
 
 .. _variables_trigger:
 
@@ -273,7 +262,6 @@ Here is a list of trigger variables:
 
 .. b2-variables::
    :group: L1 Trigger
-   :filename: TriggerVariables.cc
 
 .. tip::
   Please see the :sphinx:`Trigger Bits section <trg/doc/index.html#trigger-bits>`
@@ -281,7 +269,6 @@ Here is a list of trigger variables:
   
 .. b2-variables::
    :group: Software Trigger
-   :filename: TriggerVariables.cc
 
 Event
 ~~~~~
@@ -290,7 +277,6 @@ Here is a list of event variables:
 
 .. b2-variables::
    :group: Event
-   :filename: EventVariables.cc
 
 Parameter Functions
 ~~~~~~~~~~~~~~~~~~~
@@ -299,7 +285,6 @@ Here is a list of variables that require a parameter:
 
 .. b2-variables::
    :group: ParameterFunctions
-   :filename: ParameterVariables.cc
 
 Meta Functions
 ~~~~~~~~~~~~~~
@@ -308,7 +293,6 @@ Here is a list of variables that returns extra info of a given particle:
 
 .. b2-variables::
    :group: MetaFunctions
-   :filename: MetaVariables.cc
 
 MC matching and MC truth
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -332,22 +316,18 @@ Variables will also work on generator-level particles:
 
 .. b2-variables::
    :group: MC matching and MC truth
-   :filename: MCTruthVariables.cc
 
 
 .. b2-variables::
    :group: MC particle seen in subdetectors
-   :filename: MCTruthVariables.cc
 
 .. b2-variables::
    :group: MCParticle tag variables
    :noindex:
-   :filename: MCParticleTag.cc
 
 .. b2-variables::
    :group: Generated tau decay information
    :noindex:
-   :filename: MCTruthVariables.cc
 
 Daughter info
 ~~~~~~~~~~~~~
@@ -356,7 +336,6 @@ Here is a list of variables getting info from particle's daughters:
 
 .. b2-variables::
    :group: DirectDaughterInfo
-   :filename: ParticleDaughterVariables.cc
 
 KLM Cluster and :math:`K_{L}^0` Identification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -373,7 +352,6 @@ Here is a list of KLM Cluster and :math:`K_{L}^0` identification variables:
 
 .. b2-variables::
    :group: KLM Cluster and KlongID
-   :filename: KLMClusterVariables.cc
 
 Time Dependent CPV Analysis Variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -382,7 +360,6 @@ To use most of the variables in this section on need to run `vertex.TagV` method
 
 .. b2-variables::
    :group: Time Dependent CPV Analysis Variables
-   :filename: TimeDependentVariables.cc
 
 Flavor Tagger
 ~~~~~~~~~~~~~
@@ -392,14 +369,12 @@ Analysis variables
 
 .. b2-variables::
    :group: Flavor Tagger Analysis Variables
-   :filename: FlavorTaggingVariables.cc
 
 Training and expert variables
 """""""""""""""""""""""""""""
 
 .. b2-variables::
    :group: Flavor Tagger Expert Variables
-   :filename: FlavorTaggingVariables.cc
 
 .. _restOfEventVariables:
 
@@ -408,7 +383,6 @@ Rest of Event
 
 .. b2-variables::
    :group: Rest Of Event
-   :filename: ROEVariables.cc
 
 Continuum Suppression
 ~~~~~~~~~~~~~~~~~~~~~
@@ -421,7 +395,6 @@ convenience functions.
 
 .. b2-variables::
     :group: Continuum Suppression
-    :filename: ContinuumSuppressionVariables.cc
 
 
 .. _eventShapeVariables:
@@ -435,7 +408,6 @@ For a detailed description of the event shape variables,  see `EventShape`
 
 .. b2-variables::
     :group: EventShape
-    :filename: EventShapeVariables.cc
 
 .. _eventKinematicsVariables:
 
@@ -448,7 +420,6 @@ The variable collection ``event_kinematics`` allows to add all of them comfortab
 
 .. b2-variables::
     :group: EventKinematics
-    :filename: EventVariables.cc
 
 .. _flight_information:
 
@@ -459,7 +430,6 @@ Here is a list of flight time and distance variables of a (grand)daughter partic
 
 .. b2-variables::
    :group: Flight Information
-   :filename: FlightInfoVariables.cc
 
 .. _vertex_information:
 
@@ -470,7 +440,6 @@ Here is a list of production and decay vertex variables:
 
 .. b2-variables::
    :group: Vertex Information
-   :filename: VertexVariables.cc
 
 KFit variables
 ~~~~~~~~~~~~~~
@@ -479,7 +448,6 @@ Here is a list of variables that indicate the quality of a :ref:`kfit_vertex_fit
 
 .. b2-variables::
    :group: KFit variables
-   :filename: KFitVariables.cc
 
 .. _orca_kin_fit_variables:
 
@@ -498,7 +466,6 @@ Orca Kinematic Fitter
 
 .. b2-variables::
    :group: OrcaKinFit
-   :filename: OrcaKinFitVariables.cc
 
 For fully-inclusive particles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -507,7 +474,6 @@ Here is a list of useful variables to work with fully-inclusive particles, which
 
 .. b2-variables::
    :group: For fully-inclusive particles
-   :filename: InclusiveVariables.cc
 
 Specific kinematic variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -516,7 +482,6 @@ This variables group is reserved for the variables for analyses of specific deca
 
 .. b2-variables::
    :group: Specific kinematic variables
-   :filename: SpecificKinematicVariables.cc
 
 
 Belle and ``b2bii`` variables
@@ -529,7 +494,6 @@ Several legacy Belle variables are provided.
 
 .. b2-variables::
    :group: Belle Variables
-   :filename: BelleVariables.cc
 
 PID for B2BII
 """""""""""""
@@ -539,7 +503,6 @@ PID for B2BII
 
 .. b2-variables::
    :group: Belle PID variables
-   :filename: PIDVariables.cc
 
 
 Miscellaneous
@@ -549,7 +512,6 @@ Other variable that can be handy in development:
 
 .. b2-variables::
    :group: Miscellaneous
-   :filename: Variables.cc
 
 FEI Variables
 ~~~~~~~~~~~~~
@@ -563,7 +525,6 @@ New variables seem to be found to address this problem.
 
 .. b2-variables::
    :group: FEIVariables
-   :filename: FEIVariables.cc
 
 Beam Background Overlay
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -575,7 +536,6 @@ events used for producing MC samples (both run-independent and run-dependent).
 
 .. b2-variables::
    :group: BeamBackgroundOverlay
-   :filename: BeamBackground.cc
 
 Calibration
 ~~~~~~~~~~~
@@ -588,13 +548,10 @@ They have a **[Calibration]** pretag.
 
 .. b2-variables::
    :group: Event (cDST only)
-   :filename: EventVariables.cc
 .. b2-variables::
    :group: ECL calibration
-   :filename: ECLCalibrationVariables.cc
 .. b2-variables::
    :group: ECL trigger calibration
-   :filename: ECLCalibrationVariables.cc
 
 Collections and Lists
 ---------------------

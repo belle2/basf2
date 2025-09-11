@@ -6,18 +6,21 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
-/* HLT headers. */
+
+/* HLT headers */
 #include <hlt/dbobjects/HLTprefilterParameters.h>
 #include <hlt/softwaretrigger/core/utilities.h>
 
-/* BASF2 header */
+/* BASF2 headers */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-/* C++ headers. */
+
+/* C++ headers */
 #include <cstdint>
+#include <map>
 
 namespace Belle2 {
 
@@ -30,12 +33,57 @@ namespace Belle2 {
   class ECLDigit;
 
   /**
+   * Helper for TimingCut mode
+   */
+  class TimingCutMode {
+  public:
+    /// Define thresholds for variables. By default, no events are skipped based upon these requirements.
+    /// Minimum threshold of timeSinceLastInjection for LER injection
+    double LERtimeSinceLastInjectionMin = 0.0;
+    /// Maximum threshold of timeSinceLastInjection for LER injection
+    double LERtimeSinceLastInjectionMax = 0.0;
+    /// Minimum threshold of timeSinceLastInjection for HER injection
+    double HERtimeSinceLastInjectionMin = 0.0;
+    /// Maximum threshold of timeSinceLastInjection for HER injection
+    double HERtimeSinceLastInjectionMax = 0.0;
+    /// Minimum threshold of timeInBeamCycle for LER injection
+    double LERtimeInBeamCycleMin        = 0.0;
+    /// Maximum threshold of timeInBeamCycle for LER injection
+    double LERtimeInBeamCycleMax        = 0.0;
+    /// Minimum threshold of timeInBeamCycle for HER injection
+    double HERtimeInBeamCycleMin        = 0.0;
+    /// Maximum threshold of timeInBeamCycle for LER injection
+    double HERtimeInBeamCycleMax        = 0.0;
+    /// Prescale for accepting HLTPrefilter lines, by default we randomly accept 1 out of every 1000 events
+    unsigned int prescale = 1000;
+
+    bool computeDecision(StoreObjPtr<EventLevelTriggerTimeInfo>* ttd,
+                         DBObjPtr<BunchStructure>* bunch,
+                         DBObjPtr<HardwareClockSettings>* clock) const;
+  };
+
+  /**
+   * Helper for CdcEclCut mode
+   */
+  class CdcEclCutMode {
+  public:
+    /// Define thresholds for variables. By default, no events are skipped based upon these requirements.
+    /// Maximum threshold for CDC Hits
+    double nCDCHitsMax   = 0.0;
+    /// Maximum threshold for ECL Digits
+    double nECLDigitsMax = 0.0;
+    /// Prescale for accepting HLTPrefilter lines, by default we randomly accept 1 out of every 1000 events
+    unsigned int prescale = 1000;
+
+    bool computeDecision() const;
+  };
+
+  /**
    * Prefilter module to suppress the injection background
    */
   class HLTprefilterModule final : public Module {
 
   public:
-
     /// Module constructor.
     HLTprefilterModule();
 
@@ -56,6 +104,18 @@ namespace Belle2 {
     void event() final;
 
   private:
+    // Mode selection
+    enum HLTPrefilterMode { TimingCut = 0, CdcEclCut = 1 };
+
+    // Helper instances
+    TimingCutMode m_timingPrefilter;
+    CdcEclCutMode m_cdceclPrefilter;
+
+    // Decision results
+    std::map<HLTPrefilterMode, bool> m_decisions;
+    HLTPrefilterMode m_HLTprefilterMode;
+
+    // BASF2 objects
     /// Event Meta Data Store ObjPtr
     StoreObjPtr<EventMetaData> m_eventInfo;
 
@@ -67,29 +127,9 @@ namespace Belle2 {
 
     /// Define object for BunchStructure class
     DBObjPtr<BunchStructure> m_bunchStructure; /**< bunch structure (fill pattern) */
+
     /// Define object for HardwareClockSettings class
     DBObjPtr<HardwareClockSettings> m_clockSettings; /**< hardware clock settings */
-
-    /// Define thresholds for variables. By default, no events are skipped based upon these requirements. (Set everything to zero by default)
-    /// Minimum threshold of timeSinceLastInjection for LER injection
-    double m_LERtimeSinceLastInjectionMin = 0;
-    /// Maximum threshold of timeSinceLastInjection for LER injection
-    double m_LERtimeSinceLastInjectionMax = 0;
-    /// Minimum threshold of timeSinceLastInjection for HER injection
-    double m_HERtimeSinceLastInjectionMin = 0;
-    /// Maximum threshold of timeSinceLastInjection for HER injection
-    double m_HERtimeSinceLastInjectionMax = 0;
-    /// Minimum threshold of timeInBeamCycle for LER injection
-    double m_LERtimeInBeamCycleMin = 0;
-    /// Maximum threshold of timeInBeamCycle for LER injection
-    double m_LERtimeInBeamCycleMax = 0;
-    /// Minimum threshold of timeInBeamCycle for HER injection
-    double m_HERtimeInBeamCycleMin = 0;
-    /// Maximum threshold of timeInBeamCycle for HER injection
-    double m_HERtimeInBeamCycleMax = 0;
-
-    /// HLTprefilter result with timing cuts
-    bool injection_strip; /** < HLT prefilter decision for injection strip */
 
     /// CDChits StoreArray
     StoreArray<CDCHit> m_cdcHits;
@@ -97,23 +137,8 @@ namespace Belle2 {
     /// ECLDigits StoreArray
     StoreArray<ECLDigit> m_eclDigits;
 
-    /// Define thresholds for variables. By default, no events are skipped based upon these requirements.
-    /// Maximum threshold for CDC Hits
-    double m_cdcHitsMax = 1e9;
-    /// Maximum threshold for ECL digits
-    double m_eclDigitsMax = 1e9;
-
-    /// HLTprefilter result with CDC-ECL cuts
-    bool cdcecl_threshold; /** < HLT prefilter decision using CDC-ECL cuts */
-
-    /// HLTprefilter mode
-    uint32_t m_HLTprefilterMode = 0; /** == 0 for timing cuts, == 1 for CDC-ECL cut */
-
     /// HLTprefilterParameters Database OjbPtr
     DBObjPtr<HLTprefilterParameters> m_hltPrefilterParameters; /**< HLT prefilter parameters */
-
-    // Prescale for accepting HLTprefilter lines, by default we randomly accept 1 out of every 1000 events
-    unsigned int m_HLTprefilterPrescale = 1000;
 
   };
 }

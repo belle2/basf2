@@ -9,19 +9,21 @@
 #include <mva/interface/Interface.h>
 #include <mva/methods/ONNX.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>
 
 using namespace Belle2::MVA;
 
 namespace {
+  Interface<ONNXOptions, ONNXTeacher, ONNXExpert> interface;
+
   /**
    * Test files ONNX.xml and ONNX_multiclass.xml have been created via
    * mva/methods/tests/test_write_onnx.py
    */
   TEST(ONNXTest, ONNXExpert)
   {
-    Interface<ONNXOptions, ONNXTeacher, ONNXExpert> interface;
     auto expert = interface.getExpert();
     auto weightfile = Weightfile::loadFromFile(Belle2::FileSystem::findFile("mva/methods/tests/ONNX.xml"));
     expert->load(weightfile);
@@ -45,7 +47,6 @@ namespace {
 
   TEST(ONNXTest, ONNXExpertMulticlass)
   {
-    Interface<ONNXOptions, ONNXTeacher, ONNXExpert> interface;
     auto expert = interface.getExpert();
     auto weightfile = Weightfile::loadFromFile(Belle2::FileSystem::findFile("mva/methods/tests/ONNX_multiclass.xml"));
     expert->load(weightfile);
@@ -71,7 +72,6 @@ namespace {
 
   TEST(ONNXTest, ONNXExpertMulticlassThreeClasses)
   {
-    Interface<ONNXOptions, ONNXTeacher, ONNXExpert> interface;
     auto expert = interface.getExpert();
     auto weightfile = Weightfile::loadFromFile(Belle2::FileSystem::findFile("mva/methods/tests/ONNX_multiclass_3.xml"));
     expert->load(weightfile);
@@ -95,5 +95,49 @@ namespace {
     EXPECT_NEAR(probabilities[1][0], -0.5089, 0.0001);
     EXPECT_NEAR(probabilities[1][1], 0.0060, 0.0001);
     EXPECT_NEAR(probabilities[1][2], 0.0132, 0.0001);
+  }
+
+  Weightfile getONNXWeightfile(std::string modelFilenameONNX, std::string outputName = "")
+  {
+    Weightfile weightfile;
+    GeneralOptions general_options;
+    ONNXOptions specific_options;
+    if (!outputName.empty()) {
+      specific_options.m_outputName = outputName;
+    }
+    general_options.m_method = specific_options.getMethod();
+    weightfile.addOptions(general_options);
+    weightfile.addOptions(specific_options);
+    weightfile.addFile("ONNX_Modelfile", modelFilenameONNX);
+    return weightfile;
+  }
+
+  TEST(ONNXTest, ONNXFatalMultipleInputs)
+  {
+    // The following modelfile has multiple inputs
+    // should fail when using with the ONNX MVA method
+    // (onnx file created with mva/examples/onnx/write_test_files.py)
+    auto weightfile = getONNXWeightfile(Belle2::FileSystem::findFile("mva/methods/tests/ModelABToAB.onnx"));
+    auto expert = interface.getExpert();
+    EXPECT_B2FATAL(expert->load(weightfile));
+  }
+
+  TEST(ONNXTest, ONNXFatalMultipleOutputs)
+  {
+    // The following modelfile has multiple outputs ("output_a", "output_twice_a"), so none of them named "output"
+    // should fail when using with the ONNX MVA method
+    // (onnx file created with mva/examples/onnx/write_test_files.py)
+    auto weightfile = getONNXWeightfile(Belle2::FileSystem::findFile("mva/methods/tests/ModelAToATwiceA.onnx"));
+    auto expert = interface.getExpert();
+    EXPECT_B2FATAL(expert->load(weightfile));
+  }
+
+  TEST(ONNXTest, ONNXMultipleOutputsOK)
+  {
+    // explicitly choosing to use "output_twice_a" should work
+    // (onnx file created with mva/examples/onnx/write_test_files.py)
+    auto weightfile = getONNXWeightfile(Belle2::FileSystem::findFile("mva/methods/tests/ModelAToATwiceA.onnx"), "output_twice_a");
+    auto expert = interface.getExpert();
+    expert->load(weightfile);
   }
 }

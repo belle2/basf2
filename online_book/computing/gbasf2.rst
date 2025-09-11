@@ -256,7 +256,7 @@ key word to list the available data collections.
 
      .. code-block:: bash
 
-         gb2_ds_search collection --list_all_collections /belle/collection/Data/* | grep Moriond2023*
+         gb2_ds_search collection --list_all_collections /belle/collection/Data/* | grep Moriond2023
 
 .. note::
 

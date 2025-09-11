@@ -288,7 +288,7 @@ class VariableListDirective(Directive):
     def run(self):
         from ROOT import Belle2
         manager = Belle2.Variable.Manager.Instance()
-        self.noindex = ["    :noindex:"] if "noindex" in self.options else []
+        self.noindex = ["   :noindex:"] if "noindex" in self.options else []
         all_variables = []
         explicit_list = None
         regex_filter = None
@@ -319,9 +319,10 @@ class VariableListDirective(Directive):
             # for overloaded variables, we might have to flag noindex in the
             # variable description so also check for that
             index = self.noindex
-            desc = var.description
+            desc = str(var.description)
+            desc = textwrap.dedent(desc).strip("\n")
             if ":noindex:" in var.description:
-                index = ["    :noindex:"]
+                index = ["   :noindex:"]
                 desc = desc.replace(":noindex:", "")
 
             docstring = desc.splitlines()
@@ -335,10 +336,10 @@ class VariableListDirective(Directive):
                 filename = self.options["filename"]
                 page = doxygen_file_page(filename)
                 link = f"{baseurl}{page}"
-                description.insert(1, f"    :source: {link}")
-            description += ["    " + e for e in docstring]
+                description.insert(1, f"   :source: {link}")
+            description += ["   " + e for e in docstring]
             if "group" not in self.options:
-                description += ["", f"    :Group: {var.group}"]
+                description += ["", f"   :Group: {var.group}"]
 
             all_nodes += parse_with_titles(self.state, description)
 

@@ -256,7 +256,13 @@ key word to list the available data collections.
 
      .. code-block:: bash
 
-         gb2_ds_search collection --list_all_collections /belle/collection/Data/Moriond2023*
+         gb2_ds_search collection --list_all_collections /belle/collection/Data/* | grep Moriond2023*
+
+.. note::
+
+   ``gb2_ds_search collection --list_all_collections`` expects input of the form ``/belle/collections/<type>/*``, where ``<type`` is ``Data`` or ``MC``. To filter
+   your search further, you can search for keywords by using ``grep``, as shown in the solution above.
+   
 
 You can also do things like list the datasets within a collection with ``gb2_ds_search collection --list_datasets <COLLECTION>`` 
 and get the metadata for the collection with ``gb2_ds_search collection --get_metadata <COLLECTION>``.

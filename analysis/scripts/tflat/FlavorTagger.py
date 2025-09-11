@@ -30,8 +30,13 @@ def get_variables(particle_list, ranked_variable, variables=None, particleNumber
     var_list = []
     for i_num in range(1, particleNumber + 1):
         for var in variables:
-            var_list.append('getVariableByRank(' + particle_list + ', ' + ranked_variable + ', ' + var + ', ' +
-                            str(i_num) + ')')
+            if var == "dz" or var == "dr":
+                var_list.append(
+                    'getVariableByRank(' + particle_list + ', ' + ranked_variable + ', ' + var + ', ' + str(i_num) + ')' +
+                    '-getVariableByRank(' + particle_list + ', ' + 0 + ', ' + var + ', ' + str(i_num) + ')')
+            else:
+                var_list.append('getVariableByRank(' + particle_list + ', ' + ranked_variable + ', ' + var + ', ' +
+                                str(i_num) + ')')
     return var_list
 
 

@@ -30,13 +30,7 @@ def get_variables(particle_list, ranked_variable, variables=None, particleNumber
     var_list = []
     for i_num in range(1, particleNumber + 1):
         for var in variables:
-            if var == "dz" or var == "dr":
-                var_list.append(
-                    'getVariableByRank(' + particle_list + ', ' + ranked_variable + ', ' + var + ', ' + str(i_num) + ')' +
-                    '-getVariableByRank(' + particle_list + ', ' + ranked_variable + ', ' + var + ', ' + str(1) + ')')
-            else:
-                var_list.append('getVariableByRank(' + particle_list + ', ' + ranked_variable + ', ' + var + ', ' +
-                                str(i_num) + ')')
+            var_list.append('getVariableByRank(' + particle_list + ', ' + ranked_variable + ', ' + var + ', ' + str(i_num) + ')')
     return var_list
 
 
@@ -103,8 +97,8 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             'nCDCHits/56',
             'nPXDHits/2',
             'nSVDHits/8',
-            'dz',
-            'dr',
+            'dzdiff',
+            'drdiff',
             'chiProb',
             'clusterEoP',
             'clusterLAT',
@@ -172,6 +166,11 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
         ma.rankByHighest('pi+:tflat', rank_variable, path=roe_path)
         ma.rankByHighest('gamma:tflat', rank_variable, path=roe_path)
 
+        vm.addAlias('refdr', 'getVariableByRank(pi+:tflat, p, dr, 1)')
+        vm.addAlias('drdiff', 'formula(dr-refdr)')
+        vm.addAlias('refdz', 'getVariableByRank(pi+:tflat, p, dz, 1)')
+        vm.addAlias('dzdiff', 'formula(dz-refdz)')
+
         # and add target
         all_variables = features + [target]
 
@@ -208,6 +207,11 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
 
         ma.rankByHighest('pi+:tflat', rank_variable, path=roe_path)
         ma.rankByHighest('gamma:tflat', rank_variable, path=roe_path)
+
+        vm.addAlias('refdr', 'getVariableByRank(pi+:tflat, p, dr, 1)')
+        vm.addAlias('drdiff', 'formula(dr-refdr)')
+        vm.addAlias('refdz', 'getVariableByRank(pi+:tflat, p, dz, 1)')
+        vm.addAlias('dzdiff', 'formula(dz-refdz)')
 
         expert_module = basf2.register_module('MVAExpert')
         expert_module.param('listNames', particle_lists)

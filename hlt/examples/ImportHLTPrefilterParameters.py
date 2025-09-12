@@ -11,9 +11,9 @@
 # Import HLTprefilterParameters payloads
 
 from ROOT import Belle2  # noqa: make Belle2 namespace available
-from ROOT.Belle2 import HLTprefilterParameters, Database, IntervalOfValidity
+from ROOT.Belle2 import HLTPrefilterParameters, Database, IntervalOfValidity
 
-parameters = HLTprefilterParameters()
+parameters = HLTPrefilterParameters()
 
 parameters.setLERtimeSinceLastInjectionMin(1000)
 parameters.setLERtimeSinceLastInjectionMax(20000)
@@ -27,9 +27,9 @@ parameters.setHERtimeInBeamCycleMax(2.33)
 parameters.setECLDigitsMax(3300)
 parameters.setCDCHitsMax(2500)
 
-parameters.setHLTprefilterMode(0)
+parameters.setHLTPrefilterMode(0)
 
-parameters.setHLTprefilterPrescale(1000)
+parameters.setHLTPrefilterPrescale(1000)
 
 database = Database.Instance()
 

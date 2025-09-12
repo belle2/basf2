@@ -25,7 +25,7 @@ class SoftwareTriggerModes(Enum):
     filter = "filter"
 
 
-class HLTprefilterModes(Enum):
+class HLTPrefilterModes(Enum):
     """Enum of possible HLT prefilter modes"""
     #: monitor (thank you documentation check)
     monitor = "monitor"

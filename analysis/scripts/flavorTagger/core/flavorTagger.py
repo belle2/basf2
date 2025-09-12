@@ -37,9 +37,9 @@ def flavorTagger(
     saveCategoriesInfo=True,
     useOnlyLocalWeightFiles=False,
     downloadFromDatabaseIfNotFound=False,
-    prefix='MC16rd_light-2501-betelgeuse',
+    prefix='MC15ri_light-2207-bengal_0',
     useGNN=True,
-    identifierGNN='GFlaT_MC16rd_light-2501-betelgeuse_tensorflow',
+    identifierGNN='GFlaT_MC15ri_light_2303_iriomote_0',
     usePIDNN=False,
     path=None,
 ):

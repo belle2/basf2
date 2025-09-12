@@ -394,16 +394,18 @@ tracking-level     analysis-level
 =================  ===============
 
 ---------------
-Photon matching
+ECL cluster matching
 ---------------
 
-To understand the method of photon matching, a basic introduction to the ECL objects used during the reconstruction of simulated data is required.
+To understand the method of ECL cluster matching, a basic introduction to the ECL objects used during the reconstruction of simulated data is required.
 
-Starting with ``ECLSimHits`` from the GEANT4 simulation, ``ECLDigits`` are created and then calibrated to make ``ECLCalDigit`` objects which store the energy and
-time of a single ECL crystal. The ``ECLCalDigits`` are then grouped to make ``ECLShower`` objects. The shower objects are corrected and calibrated, and used to
-calculate shower-shape quantities and certain particle likelihoods (these calculations are derived using information stored in subsets of the ``ECLCalDigits`` that form the
-shower). Following this, track matching is performed between reconstructed tracks and shower objects. The last step is the conversion of the ``ECLShower`` object into a mdst
-``ECLCluster`` object which is the highest level ECL reconstruction object.
+From the ``ECLSimHits`` taken from the GEANT4 simulation, ``ECLDigits`` are created and then calibrated to make ``ECLCalDigit`` objects which store the energy and
+time of a single ECL crystal. The ``ECLCalDigits`` are then grouped to make ``ECLShower`` objects. 
+This grouping is represented with weighted relations between an ``ECLShower`` and a subset of ``ECLCalDigits``.
+The shower objects are corrected and calibrated, and used to calculate shower-shape quantities and certain particle likelihoods 
+(these calculations are derived using information stored in subsets of the ``ECLCalDigits`` that form the shower). 
+Following this, track matching is performed between reconstructed tracks and shower objects. 
+The last step is the conversion of the ``ECLShower`` object into the mdst ``ECLCluster`` object which is the highest level ECL reconstruction object.
 
 Each ``ECLShower`` object (and by extension each ``ECLCluster`` object) holds weighted **relations** to a maximum of twenty-one ``ECLCalDigits``, with the weights
 calculated using the fraction of energy each ``ECLCalDigit`` contributes to each shower. In addition to this, the ``ECLCalDigit`` can itself have a weighted relation to none, one or many ``MCParticles``. This is calculated
@@ -419,15 +421,13 @@ using the total energy deposited by the ``MCParticle`` in each ``ECLCalDigit``. 
 
 The overall weight for the relation between an ``ECLCluster`` object and a ``MCParticle`` is then given by the product of the weight between the corresponding ``ECLShower`` and ``ECLCalDigit`` and the weight
 between the ``ECLCalDigit`` and ``MCParticle``. For example, the weight of the relation between the first ``ECLCluster`` in :numref:`photon_matching` and MCParticle :math:`\gamma_2` is given by :math:`1.0\times 0.8=0.8` GeV.
-
-An ``ECLCluster`` that is not matched to any track is reconstructed as a photon ``Particle``, and relations between the photon ``Particle`` and ``MCParticles`` are only set at the user-analysis level if the following conditions
-are met:
+When then a neutral ``Particle``is reconstructed from an ``ECLCluster`` (so there is no reconstruckted track matched to the cluster), it will be MCMatched if the following conditions are true:
 
 1) :math:`\mathrm{weight}/{E_\mathrm{rec}} > 0.2` GeV
 2) :math:`\mathrm{weight}/{E_\mathrm{true}} > 0.3` GeV
 
-where the *weight* here refers to the relation with the largest weight. This means that if multiple relations between a given ``Particle`` and ``MCParticles`` exist, only the relation with the largest weight will be used, and the
-corresponding ``MCParticle`` with this relation will be used to decide the photon matching.
+where the *weight* here refers to the relation with the largest weight. This means that if multiple relations between a given ``ECLCluster`` and ``MCParticles`` exist, only the relation with the largest weight will be used, and the
+corresponding ``MCParticle`` with this relation will be used to decide the MCMatching.
 
 A photon match is made if `mcErrors` == 0 and the ``MCParticle`` has a `mcPDG` == 22. If the chosen ``MCParticle`` does not correspond to a true photon, then the `mcErrors` :math:`\neq` 0 and no correct match will be made (even if
 another one of the smaller-weighted relations for the particle is correct).

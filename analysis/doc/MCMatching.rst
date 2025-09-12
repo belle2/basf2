@@ -424,12 +424,13 @@ Besides that, the MCMatching works in the same way.
 
 The overall weight for the relation between an ``ECLCluster`` object and a ``MCParticle`` is then given by the product of the weight between the corresponding ``ECLShower`` and ``ECLCalDigit`` and the weight
 between the ``ECLCalDigit`` and ``MCParticle``. For example, the weight of the relation between the first ``ECLCluster`` in :numref:`photon_matching` and MCParticle :math:`\gamma_2` is given by :math:`1.0\times 0.8=0.8` GeV.
-When then a neutral ``Particle``is reconstructed from an ``ECLCluster`` (so there is no reconstruckted track matched to the cluster), it will be MCMatched in the modular analysis if the following conditions are true:
+When then a neutral ``Particle`` is reconstructed from an ``ECLCluster`` (so there is no reconstruckted track matched to the cluster), it will be MCMatched in the modular analysis if the following conditions are true:
 
 1) :math:`\mathrm{weight}/{E_\mathrm{rec}} > 0.2`
 2) :math:`\mathrm{weight}/{E_\mathrm{true}} > 0.3`
 
-where the *weight* here refers to the relation with the largest weight, :math:`{E_\mathrm{rec}}` is the reconstructed Energy of the ``ECLCluster`` and :math:`{E_\mathrm{true}}` is the generated ``MCParticle`` energy. 
+where :math:`{E_\mathrm{rec}}` is the reconstructed Energy of the ``ECLCluster``, and :math:`{E_\mathrm{true}}` is the generated ``MCParticle`` energy. 
+The *weight* here refers to the relation with the largest weight.
 This means that if multiple relations between a given ``ECLCluster`` and ``MCParticles`` exist, only the relation with the largest weight will be used, and the
 corresponding ``MCParticle`` with this relation will be used to decide the MCMatching.
 

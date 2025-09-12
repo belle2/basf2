@@ -89,7 +89,7 @@ void ONNXExpert::configureInputOutputNames()
 
   // For single-output models we just take the name of that single output
   if (outputNames.size() == 1) {
-    if (m_outputName != outputNames[0]) {
+    if (!m_outputName.empty() && m_outputName != outputNames[0]) {
       B2INFO("Output name of the model is "
              << outputNames[0]
              << " - will use that despite the configured name being \""

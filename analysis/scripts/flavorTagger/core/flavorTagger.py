@@ -80,14 +80,16 @@ def flavorTagger(
       @param downloadFromDatabaseIfNotFound    [Expert] Weight files are downloaded from
                                                the conditions database if not available in workingDirectory.
       @param prefix                            Prefix of weight files.
-                                               ``MC16rd_light-2501-betelgeuse`` (default): Weight files trained for MC16rd samples.
-                                               ``MC15ri_light-2207-bengal_0``: Weight files trained for MC15ri samples.
+                                               ``MC15ri_light-2207-bengal_0`` (default): Weight files trained with MC15ri samples.
+                                               ``MC16rd_light-2501-betelgeuse``: Weight files trained with MC16rd samples.
                                                ``''``: Weight files trained for MC13 samples.
       @param useGNN                            Use GNN-based Flavor Tagger in addition with FastBDT-based one.
                                                Please specify the weight file with the option ``identifierGNN``.
                                                [Expert] In the sampler mode,
                                                training files for GNN-based Flavor Tagger are produced.
       @param identifierGNN                     The name of weight file of the GNN-based Flavor Tagger.
+                                               ``GFlaT_MC15ri_light_2303_iriomote_0`` (default): Trained with MC15ri samples
+                                               ``GFlaT_MC16rd_light-2501-betelgeuse_tensorflow``: Trained with MC16rd samples
                                                [Expert] Multiple identifiers can be given with list(str).
       @param usePIDNN                          If True, PID probabilities calculated from PID neural network are used
                                                (default is False). Prefix and identifierGNN must be set accordingly.

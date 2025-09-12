@@ -393,9 +393,9 @@ tracking-level     analysis-level
  ghost             fake
 =================  ===============
 
----------------
+--------------------
 ECL cluster matching
----------------
+--------------------
 
 To understand the method of ECL cluster matching, a basic introduction to the ECL objects used during the reconstruction of simulated data is required.
 
@@ -426,7 +426,7 @@ When then a neutral ``Particle``is reconstructed from an ``ECLCluster`` (so ther
 1) :math:`\mathrm{weight}/{E_\mathrm{rec}} > 0.2`
 2) :math:`\mathrm{weight}/{E_\mathrm{true}} > 0.3`
 
-where the *weight* here refers to the relation with the largest weight, :math: `E_\mathrm{rec}` is the reconstructed Energy of the ``ECLCluster`` and :math: `E_\mathrm{true}` is the energy the ``MCParticle`` was generated with. 
+where the *weight* here refers to the relation with the largest weight, :math:`E_\mathrm{rec}` is the reconstructed Energy of the ``ECLCluster`` and :math:`E_\mathrm{true}` is the energy the ``MCParticle`` was generated with. 
 This means that if multiple relations between a given ``ECLCluster`` and ``MCParticles`` exist, only the relation with the largest weight will be used, and the
 corresponding ``MCParticle`` with this relation will be used to decide the MCMatching.
 

@@ -426,7 +426,8 @@ When then a neutral ``Particle``is reconstructed from an ``ECLCluster`` (so ther
 1) :math:`\mathrm{weight}/{E_\mathrm{rec}} > 0.2`
 2) :math:`\mathrm{weight}/{E_\mathrm{true}} > 0.3`
 
-where the *weight* here refers to the relation with the largest weight. This means that if multiple relations between a given ``ECLCluster`` and ``MCParticles`` exist, only the relation with the largest weight will be used, and the
+where the *weight* here refers to the relation with the largest weight, :math: `E_\mathrm{rec}` is the reconstructed Energy of the ``ECLCluster`` and :math: `E_\mathrm{true}` is the energy the ``MCParticle`` was generated with. 
+This means that if multiple relations between a given ``ECLCluster`` and ``MCParticles`` exist, only the relation with the largest weight will be used, and the
 corresponding ``MCParticle`` with this relation will be used to decide the MCMatching.
 
 A photon match is made if `mcErrors` == 0 and the ``MCParticle`` has a `mcPDG` == 22. If the chosen ``MCParticle`` does not correspond to a true photon, then the `mcErrors` :math:`\neq` 0 and no correct match will be made (even if

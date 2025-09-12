@@ -19,14 +19,16 @@ namespace Belle2 {
   /**
    * DBObject containing parameters used in HLTprefilter module.
    */
-  class HLTprefilterParameters : public TObject {
+  class HLTPrefilterParameters : public TObject {
 
   public:
+    /// Enumeration for HLT prefilter mode
+    enum HLTPrefilterMode { TimingCut = 0, CdcEclCut = 1 };
 
     /**
      * Default constructor
      */
-    HLTprefilterParameters()
+    HLTPrefilterParameters()
     {
       m_LERtimeSinceLastInjectionMin = 0;
       m_LERtimeSinceLastInjectionMax = 0;
@@ -38,8 +40,8 @@ namespace Belle2 {
       m_HERtimeInBeamCycleMax = 0;
       m_cdcHitsMax = 1e9;
       m_eclDigitsMax = 1e9;
-      m_HLTprefilterMode = 0;
-      m_HLTprefilterPrescale = 1000;
+      m_HLTPrefilterMode = static_cast<HLTPrefilterMode>(0);
+      m_HLTPrefilterPrescale = 1000;
     }
 
     /**
@@ -55,9 +57,10 @@ namespace Belle2 {
      * @param[in] m_HLTprefilterMode               Mode of HLTprefilter
      * @param[in] m_HLTprefilterPrescale           Prescale for accepting events rejected by the HLTprefilter result
      */
-    HLTprefilterParameters(double LERtimeSinceLastInjectionMin, double LERtimeSinceLastInjectionMax, double LERtimeInBeamCycleMin,
+    HLTPrefilterParameters(double LERtimeSinceLastInjectionMin, double LERtimeSinceLastInjectionMax, double LERtimeInBeamCycleMin,
                            double LERtimeInBeamCycleMax, double HERtimeSinceLastInjectionMin, double HERtimeSinceLastInjectionMax,
-                           double HERtimeInBeamCycleMin, double HERtimeInBeamCycleMax, uint32_t HLTprefilterMode, unsigned int HLTprefilterPrescale)
+                           double HERtimeInBeamCycleMin, double HERtimeInBeamCycleMax, unsigned short Mode,
+                           unsigned int HLTPrefilterPrescale)
     {
       m_LERtimeSinceLastInjectionMin = LERtimeSinceLastInjectionMin;
       m_LERtimeSinceLastInjectionMax = LERtimeSinceLastInjectionMax;
@@ -67,8 +70,8 @@ namespace Belle2 {
       m_LERtimeInBeamCycleMax = LERtimeInBeamCycleMax;
       m_HERtimeInBeamCycleMin = HERtimeInBeamCycleMin;
       m_HERtimeInBeamCycleMax = HERtimeInBeamCycleMax;
-      m_HLTprefilterMode = HLTprefilterMode;
-      m_HLTprefilterPrescale = HLTprefilterPrescale;
+      m_HLTPrefilterMode = static_cast<HLTPrefilterMode>(Mode);
+      m_HLTPrefilterPrescale = HLTPrefilterPrescale;
     }
 
     /**
@@ -78,18 +81,18 @@ namespace Belle2 {
      * @param[in] m_HLTprefilterMode               Mode of HLTprefilter
      * @param[in] m_HLTprefilterPrescale           Prescale for accepting events rejected by the HLTprefilter result
      */
-    HLTprefilterParameters(double NcdcHitsMax, double NeclDigitsMax, uint32_t HLTprefilterMode, unsigned int HLTprefilterPrescale)
+    HLTPrefilterParameters(uint32_t NcdcHitsMax, uint32_t NeclDigitsMax, unsigned short Mode, unsigned int HLTPrefilterPrescale)
     {
       m_cdcHitsMax = NcdcHitsMax;
       m_eclDigitsMax = NeclDigitsMax;
-      m_HLTprefilterMode = HLTprefilterMode;
-      m_HLTprefilterPrescale = HLTprefilterPrescale;
+      m_HLTPrefilterMode = static_cast<HLTPrefilterMode>(Mode);
+      m_HLTPrefilterPrescale = HLTPrefilterPrescale;
     }
 
     /**
      * Destructor
      */
-    ~HLTprefilterParameters()
+    ~HLTPrefilterParameters()
     {
     }
 
@@ -170,7 +173,7 @@ namespace Belle2 {
     * Set the maximum threshold of CDCHits for an event.
     * @param[in] NcdcHitsMax for an event.
     */
-    void setCDCHitsMax(double NcdcHitsMax)
+    void setCDCHitsMax(uint32_t NcdcHitsMax)
     {
       m_cdcHitsMax = NcdcHitsMax;
     }
@@ -179,7 +182,7 @@ namespace Belle2 {
     * Set the maximum threshold of CDCHits for an event.
     * @param[in] NcdcHitsMax for an event.
     */
-    void setECLDigitsMax(double NeclDigitsMax)
+    void setECLDigitsMax(uint32_t NeclDigitsMax)
     {
       m_eclDigitsMax = NeclDigitsMax;
     }
@@ -252,7 +255,7 @@ namespace Belle2 {
     * Get the maximum threshold of CDCHits for an event.
     * @param[in] NcdcHitsMax for an event.
     */
-    double getCDCHitsMax() const
+    uint32_t getCDCHitsMax() const
     {
       return m_cdcHitsMax;
     }
@@ -261,46 +264,45 @@ namespace Belle2 {
     * Get the maximum threshold of CDCHits for an event.
     * @param[in] NeclDigitsMax for an event.
     */
-    double getECLDigitsMax() const
+    uint32_t getECLDigitsMax() const
     {
       return m_eclDigitsMax;
     }
 
     /**
-    * Set the HLTprefilter mode
-    * @param[in] HLTprefilterMode.
+    * Set the HLTPrefilter mode
+    * @param[in] HLTPrefilterMode.
     */
-    void setHLTprefilterMode(uint32_t HLTprefilterMode)
+    void setHLTPrefilterMode(unsigned short Mode)
     {
-      m_HLTprefilterMode = HLTprefilterMode;
+      m_HLTPrefilterMode = static_cast<HLTPrefilterMode>(Mode);
     }
 
     /**
-    * Get the HLTprefilter mode
-    * @param[in] HLTprefilterMode.
+    * Get the HLTPrefilter mode
+    * @param[in] HLTPrefilterMode.
     */
-    uint32_t getHLTprefilterMode() const
+    unsigned short getHLTPrefilterMode() const
     {
-      return m_HLTprefilterMode;
-    }
-
-
-    /**
-    * Set the prescale for HLTprefilter result
-    * @param[in] HLTprefilterPrescale.
-    */
-    void setHLTprefilterPrescale(unsigned int HLTprefilterPrescale)
-    {
-      m_HLTprefilterPrescale = HLTprefilterPrescale;
+      return static_cast<unsigned short>(m_HLTPrefilterMode);
     }
 
     /**
-    * Get the prescale for HLTprefilter result
-    * @param[in] HLTprefilterPrescale.
+    * Set the prescale for HLTPrefilter result
+    * @param[in] HLTPrefilterPrescale.
     */
-    unsigned int getHLTprefilterPrescale() const
+    void setHLTPrefilterPrescale(unsigned int HLTPrefilterPrescale)
     {
-      return m_HLTprefilterPrescale;
+      m_HLTPrefilterPrescale = HLTPrefilterPrescale;
+    }
+
+    /**
+    * Get the prescale for HLTPrefilter result
+    * @param[in] HLTPrefilterPrescale.
+    */
+    unsigned int getHLTPrefilterPrescale() const
+    {
+      return m_HLTPrefilterPrescale;
     }
 
   private:
@@ -340,24 +342,26 @@ namespace Belle2 {
     /**
      * Maximum threshold of CDCHits
      */
-    double m_cdcHitsMax;
+    uint32_t m_cdcHitsMax;
     /**
      * Maximum threshold of ECLDigits
      */
-    double m_eclDigitsMax;
+    uint32_t m_eclDigitsMax;
+
     /**
-     * HLTprefilter Mode
+     * HLTPrefilter Mode
      */
-    uint32_t m_HLTprefilterMode;
+    HLTPrefilterMode m_HLTPrefilterMode;
+
     /**
-     * HLTprefilter prescale
+     * HLTPrefilter prescale
      */
-    unsigned int m_HLTprefilterPrescale;
+    unsigned int m_HLTPrefilterPrescale;
 
     /**
      * Class version.
      */
-    ClassDef(HLTprefilterParameters, 1);
+    ClassDef(HLTPrefilterParameters, 1);
 
   };
 

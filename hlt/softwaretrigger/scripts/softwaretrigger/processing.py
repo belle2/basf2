@@ -209,11 +209,11 @@ def add_hlt_processing(path,
 
     # HLT prefilter
     # Only turn on the HLTprefilter if prefilter mode is True
-    if hlt_prefilter_mode == constants.HLTprefilterModes.filter:
+    if hlt_prefilter_mode == constants.HLTPrefilterModes.filter:
         # Abort reconstruction of events from injection background
-        hlt_prefilter_module = path.add_module('HLTprefilter')
-        path_utils.hlt_event_abort(hlt_prefilter_module, ">=1", ROOT.Belle2.EventMetaData.c_HLTprefilterDiscard)
-        path.add_module('StatisticsSummary').set_name('Sum_HLTprefilter')
+        hlt_prefilter_module = path.add_module('HLTPrefilter')
+        path_utils.hlt_event_abort(hlt_prefilter_module, ">=1", ROOT.Belle2.EventMetaData.c_HLTPrefilterDiscard)
+        path.add_module('StatisticsSummary').set_name('Sum_HLTPrefilter')
 
     # Build one path for all accepted events...
     accept_path = basf2.Path()

@@ -218,6 +218,8 @@ def build_doxygen_anchor_map(xml_dir):
 
     # parse index to know what compound XMLs to check
     index_path = os.path.join(xml_dir, "index.xml")
+    if not os.path.exists(index_path):
+        return anchors
     tree = ET.parse(index_path)
     root = tree.getroot()
 

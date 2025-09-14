@@ -13,6 +13,7 @@
 #include <globals.hh>
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
+#include <G4MagneticField.hh>
 
 using namespace std;
 using namespace Belle2;

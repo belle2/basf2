@@ -8,7 +8,6 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <vector>
 
 #include <TH1F.h>

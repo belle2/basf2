@@ -11,15 +11,14 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/ECLCluster.h>
-
 #include <TTree.h>
 #include <TFile.h>
 #include <string>
 
 namespace Belle2 {
+  class MCParticle;
+  class KLMCluster;
+  class ECLCluster;
 
   /** Module to write Ntuples for KlId BKG classifier training. Writes tuples for both ECL and KLM. You have to specify  an outputpath outPath.   */
   class DataWriterModule : public Module {

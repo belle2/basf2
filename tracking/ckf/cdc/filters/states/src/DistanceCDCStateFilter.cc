@@ -9,6 +9,7 @@
 
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 

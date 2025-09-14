@@ -7,16 +7,21 @@
  **************************************************************************/
 
 #pragma once
-#ifndef SIMULATION_MODULES_FULLSIM_FULLSIMTIMINGMODULE_H
-#define SIMULATION_MODULES_FULLSIM_FULLSIMTIMINGMODULE_H
 
 #include <framework/core/Module.h>
-#include <simulation/kernel/StepTiming.h>
 #include <map>
 
 class TProfile;
 
+class G4Track;
+class G4LogicalVolume;
+class G4Region;
+
 namespace Belle2 {
+  namespace Simulation {
+    class StepTiming;
+  }
+
   /**
    * \addtogroup modules
    * @{ FullSimTimingModule @}
@@ -79,5 +84,3 @@ namespace Belle2 {
     bool m_isInitialized {false};
   };
 }
-
-#endif // SIMULATION_MODULES_FULLSIM_FULLSIMTIMINGMODULE_H

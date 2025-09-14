@@ -7,6 +7,9 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdUnpacking/PXDReadRawBonnDAQMatched.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <rawdata/dataobjects/RawPXD.h>
+
 #include <boost/endian/arithmetic.hpp>
 #include <boost/crc.hpp>
 

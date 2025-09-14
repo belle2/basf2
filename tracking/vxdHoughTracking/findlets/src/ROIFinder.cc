@@ -6,6 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/vxdHoughTracking/findlets/ROIFinder.h>
+#include <tracking/dataobjects/ROIid.h>
+#include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/vxdHoughTracking/findlets/RawTrackCandCleaner.icc.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
@@ -14,7 +16,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParamList.h>
 #include <framework/geometry/BFieldManager.h>
-#include <framework/geometry/B2Vector3.h>
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <pxd/geometry/SensorInfo.h>

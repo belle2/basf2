@@ -8,7 +8,6 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/filters/pathFilters/BasePathFilter.h>
-#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 
 namespace Belle2 {

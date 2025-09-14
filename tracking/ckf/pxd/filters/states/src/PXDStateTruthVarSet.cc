@@ -9,6 +9,7 @@
 
 #include <framework/core/ModuleParamList.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <tracking/dataobjects/RecoTrack.h>

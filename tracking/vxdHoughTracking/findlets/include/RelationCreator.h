@@ -13,9 +13,6 @@
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
 
-#include <vector>
-#include <string>
-
 namespace Belle2 {
   namespace vxdHoughTracking {
 

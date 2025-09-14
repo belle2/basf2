@@ -29,21 +29,18 @@ using namespace CDC;
 using namespace std;
 
 // ==========  ap_fixed<Total, Int, AP_TRN, AP_SAT> ==========
-enum RoundingMode { TRN, RND };
-enum SaturationMode { NONE, SAT, WRAP, SAT_SYM };
-
 
 float sim_fixed(float val, int total_bits, int int_bits,
                 bool is_signed = true,
-                RoundingMode rounding = TRN,
-                SaturationMode saturation = SAT)
+                int rounding = 0,
+                int saturation = 1)
 {
   int frac_bits = total_bits - int_bits;
   float scale = std::pow(2.0f, frac_bits);
   float scaled_val = val * scale;
 
   int64_t fixed_val;
-  if (rounding == RND)
+  if (rounding == 1)
     fixed_val = static_cast<int64_t>(std::round(scaled_val));
   else
     fixed_val = static_cast<int64_t>(std::trunc(scaled_val));
@@ -61,10 +58,10 @@ float sim_fixed(float val, int total_bits, int int_bits,
   //  wrap
   if (fixed_val > max_val || fixed_val < min_val) {
     switch (saturation) {
-      case SAT:
+      case 1:
         fixed_val = std::min(std::max(fixed_val, min_val), max_val);
         break;
-      case WRAP:
+      case 2:
         if (is_signed) {
           int64_t mod = 1LL << total_bits;
           fixed_val = (fixed_val + mod) % mod;
@@ -74,13 +71,13 @@ float sim_fixed(float val, int total_bits, int int_bits,
           fixed_val = fixed_val % (1LL << total_bits);
         }
         break;
-      case SAT_SYM:
+      case 3:
         if (val >= 0)
           fixed_val = std::min(fixed_val, max_val);
         else
           fixed_val = std::max(fixed_val, min_val);
         break;
-      case NONE:
+      case 0:
       default:
         break;
     }
@@ -116,10 +113,10 @@ inline float sim_fix_dense_2_accum_t(float x)       { return sim_fixed(x, 19, 10
 inline float sim_fix_dense_2_weight_t(float x)      { return sim_fixed(x, 8, 1); }
 inline float sim_fix_dense_2_bias_t(float x)        { return sim_fixed(x, 1, 0, false); }
 
-// dense_2  result_t，RND + WRAP + UNSIGNED = false
+// dense_2  result_t，RND + 2 + UNSIGNED = false
 inline float sim_fix_result_t(float x)
 {
-  return sim_fixed(x, 15, 8, true, RND, WRAP);
+  return sim_fixed(x, 15, 8, true, 1, 2);
 }
 
 
@@ -376,7 +373,8 @@ std::vector<float> sim_dense_0_iq(const std::vector<float>& input)
   for (size_t i = 0; i < input.size(); ++i) {
     int total_bits = dense_0_iq_config[i].first;
     int int_bits = dense_0_iq_config[i].second;
-    output.push_back(sim_ap_fixed(input[i], total_bits, int_bits, RND, SAT_SYM));
+    output.push_back(sim_ap_fixed(input[i], total_bits, int_bits, true, true));
+
   }
   return output;
 }
@@ -576,8 +574,6 @@ bool GRLNeuro::load(unsigned isector, const string& weightfilename, const string
     }
   }
 }
-
-
 
 bool GRLNeuro::load(unsigned isector, std::vector<float> warray, std::vector<float> barray)
 {

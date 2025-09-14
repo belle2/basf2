@@ -8,6 +8,7 @@
 #include <tracking/vxdHoughTracking/filters/pathFilters/FourHitFilter.h>
 #include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/BFieldManager.h>
 

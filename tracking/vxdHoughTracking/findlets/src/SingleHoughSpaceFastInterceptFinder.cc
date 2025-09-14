@@ -13,7 +13,6 @@
 #include <tracking/trackingUtilities/utilities/Algorithms.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/core/ModuleParamList.h>
-#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackingUtilities;

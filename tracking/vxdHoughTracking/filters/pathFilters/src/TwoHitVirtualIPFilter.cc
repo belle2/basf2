@@ -6,8 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/vxdHoughTracking/filters/pathFilters/TwoHitVirtualIPFilter.h>
-#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/database/DBObjPtr.h>

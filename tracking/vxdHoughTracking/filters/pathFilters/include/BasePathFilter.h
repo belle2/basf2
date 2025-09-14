@@ -8,11 +8,11 @@
 #pragma once
 
 #include <tracking/trackingUtilities/filters/base/Filter.icc.h>
-#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 #include <tracking/trackingUtilities/numerics/WithWeight.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
+    class VXDHoughState;
     /// Base filter for hits stored in the VXDHoughState
     using BasePathFilter =
       TrackingUtilities::Filter<std::pair<const std::vector<TrackingUtilities::WithWeight<const VXDHoughState*>>, VXDHoughState*>>;

@@ -11,13 +11,14 @@
 #include <tracking/trackingUtilities/varsets/VarNames.h>
 #include <tracking/trackingUtilities/varsets/FixedSizeNamedFloatTuple.h>
 
-#include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 #include <tracking/ckf/svd/utilities/SVDMCUtil.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 namespace Belle2 {
+  class CKFToSVDResult;
+  class EventMetaData;
+
   /// Names of the variables to be generated.
   constexpr
   static char const* const svdResultTruthNames[] = {

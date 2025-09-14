@@ -7,14 +7,12 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdPerformance/PXDPerformanceModule.h>
-//#include <pxd/utilities/PXD2TrackEvent.h>
+#include <pxd/utilities/PXD2TrackEvent.h>
 
-//#include <framework/datastore/DataStore.h>
-//#include <framework/datastore/StoreObjPtr.h>
-//#include <framework/datastore/StoreArray.h>
-//#include <framework/datastore/RelationArray.h>
-
-//#include <framework/dataobjects/FileMetaData.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/PXDIntercept.h>
 
 using namespace std;
 using namespace Belle2;

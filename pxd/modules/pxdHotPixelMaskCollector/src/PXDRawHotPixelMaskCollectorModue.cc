@@ -8,6 +8,7 @@
 
 #include <pxd/modules/pxdHotPixelMaskCollector/PXDRawHotPixelMaskCollectorModule.h>
 #include <vxd/geometry/GeoCache.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
 
 #include <boost/format.hpp>
 

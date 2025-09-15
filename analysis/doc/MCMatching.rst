@@ -371,7 +371,7 @@ Track matching
 
 A reconstructed track can be:
 
-1) **matched**, the reconstructed track is matched to a true track and it is its best description.
+1) **matched**, the reconstructed track is matched to a true track, and it is its best description.
 2) **clone**, the reconstructed track is matched to a true track, but there is another reconstructed track that better describes the true track (this second reconstructed track will therefore be matched)
 3) **fake**, the reconstructed track is not matched to any true track. It can be a beam-background track or a track built out of noise hits in the detector, or a mixture of these two.
 
@@ -424,7 +424,7 @@ Besides that, the MCMatching works in the same way.
 
 The overall weight for the relation between an ``ECLCluster`` object and a ``MCParticle`` is then given by the product of the weight between the corresponding ``ECLShower`` and ``ECLCalDigit`` and the weight
 between the ``ECLCalDigit`` and ``MCParticle``. For example, the weight of the relation between the first ``ECLCluster`` in :numref:`photon_matching` and MCParticle :math:`\gamma_2` is given by :math:`1.0\times 0.8=0.8` GeV.
-When then a neutral ``Particle`` is reconstructed from an ``ECLCluster`` (so there is no reconstruckted track matched to the cluster), it will be MCMatched in the modular analysis if the following conditions are true:
+When then a neutral ``Particle`` is reconstructed from a ``ECLCluster`` (so there is no reconstructed track matched to the cluster), it will be MCMatched in the modular analysis if the following conditions are true:
 
 1) :math:`\mathrm{weight}/{E_\mathrm{rec}} > 0.2`
 2) :math:`\mathrm{weight}/{E_\mathrm{true}} > 0.3`

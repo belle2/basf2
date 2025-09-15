@@ -408,10 +408,10 @@ The shower objects are also used to calculate shower-shape quantities and certai
 Following this, track matching is performed between reconstructed tracks and shower objects. 
 The last step is the conversion of the ``ECLShower`` object into the mdst ``ECLCluster`` object which is the highest level ECL reconstruction object.
 
-Each ``ECLShower`` object with a photon hypothesis (and by extension each ``ECLCluster`` object) holds weighted **relations** to a maximum of twenty-one ``ECLCalDigits``, with the weights
+Each ``ECLShower`` object (and by extension each ``ECLCluster`` object) with a photon hypothesis holds weighted **relations** to a maximum of twenty-one ``ECLCalDigits``, with the weights
 calculated using the fraction of energy each ``ECLCalDigit`` contributes to each shower. In addition to this, the ``ECLCalDigit`` can itself have a weighted relation to none, one or many ``MCParticles``. This is calculated
 using the total energy deposited by the ``MCParticle`` in each ``ECLCalDigit``. A diagram that visualises these relations is given in :numref:`photon_matching`.
-Please note, that ``ECLShower`` with a neutral hadron hypothesis are can have more then twenty-one ``ECLCalDigits`` related to them and are not corrected and calibrated.
+Please note, that ``ECLShower`` with a neutral hadron hypothesis can have more than twenty-one ``ECLCalDigits`` related to them and are neither corrected nor calibrated.
 Besides that, the MCMatching works in the same way.
 
 .. _photon_matching:

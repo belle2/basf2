@@ -30,7 +30,7 @@ path.add_module("EventInfoSetter", evtNumList=[100], expList=[0], runList=[0])
 finalstate = "charged"
 gen.add_evtgen_generator(finalstate=finalstate, path=path)
 
-# Define skim (all 51 skims defined as of August 2025 work with the standard SmartBkg model)
+# Define skim
 skim = feiHadronic(
     analysisGlobaltag=ma.getAnalysisGlobaltag(),
     OutputFileName="test_smartbkg_fei.udst.root"

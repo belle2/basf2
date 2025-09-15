@@ -13,10 +13,14 @@
 #include <unordered_map>
 #include <vector>
 
-//TODO: write script to make payload
 
 namespace Belle2 {
 
+  /**
+   * Config class for the Smart Background module.
+   * Saves mappings of pdg numbers, skim codes and activation function paramters so they can be saved to
+   * and loaded from the conditions database.
+   */
   class SmartBackgroundConfig : public TObject {
 
   public:
@@ -74,6 +78,9 @@ namespace Belle2 {
      */
     std::unordered_map<int, std::vector<float>> m_paramMapping;
 
+    /**
+     * Classdef
+     */
     ClassDef(SmartBackgroundConfig, 1);
   };
 

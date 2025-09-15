@@ -17,5 +17,5 @@ python module and not manually add generator modules directly to the path.
 
    python_modules
    modules
-   background
+   smartbkg
    validation

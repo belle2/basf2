@@ -18,6 +18,11 @@
 
 namespace Belle2 {
 
+  /**
+   * Smart Background Module
+   * Predicts whether an event will pass a given skim directly after event generation using a neural network.
+   * Used to speed up directly skimmed MC campaigns.
+   */
   class SmartBackgroundModule : public Module {
 
   public:

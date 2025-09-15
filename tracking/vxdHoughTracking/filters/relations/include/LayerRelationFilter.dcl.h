@@ -8,12 +8,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
-#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 
 #include <array>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
+    class VXDHoughState;
 
     /// Relation filter the creation of relations
     template <class AFilter>

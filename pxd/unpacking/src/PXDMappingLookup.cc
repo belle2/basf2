@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <pxd/unpacking/PXDMappingLookup.h>
+#include <vxd/dataobjects/VxdID.h>
 #include <framework/logging/Logger.h>
 
 #include <stdio.h>

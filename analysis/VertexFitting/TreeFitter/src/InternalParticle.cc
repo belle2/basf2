@@ -7,11 +7,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <analysis/dataobjects/Particle.h>
-
 #include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
+
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
+#include <analysis/VertexFitting/TreeFitter/Projection.h>
+#include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
+
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/V0.h>
 
@@ -157,12 +160,10 @@ namespace TreeFitter {
           Belle2::Helix helix2 = dau2->particle()->getTrackFitResult()->getHelix();
 
           double flt1(0), flt2(0);
-          ROOT::Math::XYZVector v;
+          Eigen::Vector3d v;
           HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
 
-          fitparams.getStateVector()(posindex)     = v.X();
-          fitparams.getStateVector()(posindex + 1) = v.Y();
-          fitparams.getStateVector()(posindex + 2) = v.Z();
+          fitparams.getStateVector().segment<3>(posindex) = v;
 
           dau1->setFlightLength(flt1);
           dau2->setFlightLength(flt2);
@@ -193,9 +194,7 @@ namespace TreeFitter {
     int posindex = posIndex();
     if (hasPosition() &&
         mother() &&
-        fitparams.getStateVector()(posindex) == 0 &&
-        fitparams.getStateVector()(posindex + 1) == 0 && \
-        fitparams.getStateVector()(posindex + 2) == 0) {
+        fitparams.getStateVector().segment<3>(posindex).isZero()) {
       const int posindexmom = mother()->posIndex();
       const int dim = m_config->m_originDimension; //TODO access mother?
       fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmom, dim);

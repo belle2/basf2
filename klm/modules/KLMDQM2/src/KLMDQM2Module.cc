@@ -227,7 +227,8 @@ void KLMDQM2Module::findMatchingDigit(
           digit.getSection() == hitData->section &&
           digit.getLayer() == hitData->layer &&
           digit.getSector() == hitData->sector &&
-          digit.getPlane() == hitData->plane))
+          digit.getPlane() == hitData->plane) ||
+        !digit.isGood())
       continue;
 
     // Defining quantities for distance cut

@@ -10,6 +10,7 @@
 #include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
+#include <analysis/VertexFitting/TreeFitter/Projection.h>
 #include <framework/geometry/BFieldManager.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 

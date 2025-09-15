@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdHelper/PXDRawDumper.h>
+#include <rawdata/dataobjects/RawPXD.h>
 #include <boost/format.hpp>
 #include <boost/endian/arithmetic.hpp>
 

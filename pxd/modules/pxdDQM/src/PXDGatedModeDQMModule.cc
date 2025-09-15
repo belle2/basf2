@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDGatedModeDQMModule.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include "TDirectory.h"
 
 using namespace std;

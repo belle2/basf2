@@ -7,13 +7,17 @@
  **************************************************************************/
 #include <reconstruction/modules/KlId/KLMExpert/KLMExpertModule.h>
 #include <mdst/dataobjects/KlId.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
 
 #include <mva/interface/Interface.h>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
+#include <mva/interface/Weightfile.h>
+#include <mva/interface/Expert.h>
+
 #include <boost/algorithm/string/predicate.hpp>
 
 // here's where the functions are hidden

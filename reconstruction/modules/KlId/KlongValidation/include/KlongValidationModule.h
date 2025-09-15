@@ -11,15 +11,14 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/KLMCluster.h>
-
 #include <TFile.h>
 #include <string>
 #include <TH1F.h>
 #include <TGraph.h>
 
 namespace Belle2 {
+  class KLMCluster;
+  class MCParticle;
 
   /** Module used by the validation server to generate root files for the validation. Calculates fake rates and efficiencies.*/
   class KlongValidationModule : public Module {

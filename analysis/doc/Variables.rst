@@ -11,6 +11,12 @@ Probably the most obvious, and useful are: :b2:var:`p`, :b2:var:`E`, :b2:var:`Mb
 
 You can search the variables in an alphabetical :ref:`b2-varindex`, or browse :ref:`variablesByGroup`.
 
+.. warning::
+
+          Some variables return ``NaN`` instead of being converted to a numerical value. 
+          Before cutting on any variables, **please pay attention** to whether or not your variable returns ``NaN``. 
+          
+
 .. _analysis_variablemanager_class:
 
 VariableManager

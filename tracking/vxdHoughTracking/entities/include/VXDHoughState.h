@@ -12,7 +12,6 @@
 #include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
-  class SpacePoint;
   namespace vxdHoughTracking {
 
     /// Simple container for hit information to be used during intercept finding

@@ -9,6 +9,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
@@ -19,6 +20,8 @@
 #include <TBranch.h>
 
 namespace Belle2 {
+  class EventMetaData;
+
   /**
    * Module for the monitoring of the BeamSpot position and size
    */

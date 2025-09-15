@@ -12,14 +12,15 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <tracking/spacePointCreation/SpacePoint.h>
-#include <mdst/dataobjects/EventLevelTrackingInfo.h>
-
 #include <string>
 
 
 
 namespace Belle2 {
+  class PXDCluster;
+  class SpacePoint;
+  class EventLevelTrackingInfo;
+
   /**
    * Imports Clusters of the pxd detector and converts them to spacePoints.
    *

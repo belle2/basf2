@@ -11,29 +11,32 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
-#include <analysis/VertexFitting/TreeFitter/RecoPhoton.h>
+#include <analysis/VertexFitting/TreeFitter/RecoNeutral.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
+#include <analysis/VertexFitting/TreeFitter/Projection.h>
 
 #include <framework/gearbox/Const.h>
 
 namespace TreeFitter {
 
-  RecoPhoton::RecoPhoton(Belle2::Particle* particle, const ParticleBase* mother) : RecoParticle(particle, mother),
+  RecoNeutral::RecoNeutral(Belle2::Particle* particle, const ParticleBase* mother) : RecoParticle(particle, mother),
     m_dim(3),
     m_init(false),
-    m_useEnergy(useEnergy(*particle)),
     m_clusterPars(),
     m_covariance(),
-    m_momentumScalingFactor(particle->getEffectiveMomentumScale())
+    m_momentumScalingFactor(particle->getEffectiveMomentumScale()),
+    m_mass(particle->getPDGMass()),
+    m_particleSource(particle->getParticleSource())
   {
     initParams();
   }
 
-  ErrCode RecoPhoton::initParticleWithMother(FitParams& fitparams)
+  ErrCode RecoNeutral::initParticleWithMother(FitParams& fitparams)
   {
     const int posindexmother = mother()->posIndex();
 
@@ -44,34 +47,23 @@ namespace TreeFitter {
 
     const double distanceToMother = vertexToCluster.norm();
     const double energy = m_momentumScalingFactor * m_clusterPars(3); // apply scaling factor to correct energy bias
+    const double absMom = std::sqrt(energy * energy - m_mass * m_mass);
+
     const int momindex = momIndex();
 
     for (unsigned int i = 0; i < 3; ++i) {
-      // px = E dx/|dx|
-      fitparams.getStateVector()(momindex + i) = energy * vertexToCluster(i) / distanceToMother;
+      fitparams.getStateVector()(momindex + i) = absMom * vertexToCluster(i) / distanceToMother;
     }
 
     return ErrCode(ErrCode::Status::success);
   }
 
-  ErrCode RecoPhoton::initMotherlessParticle([[gnu::unused]] FitParams& fitparams)
+  ErrCode RecoNeutral::initMotherlessParticle([[gnu::unused]] FitParams& fitparams)
   {
     return ErrCode(ErrCode::Status::success);
   }
 
-  bool RecoPhoton::useEnergy(const Belle2::Particle& particle)
-  {
-    bool rc = true;
-    const int pdg = particle.getPDGCode();
-    if (pdg &&
-        Belle2::Const::ParticleType(pdg) != Belle2::Const::photon &&
-        Belle2::Const::ParticleType(pdg) != Belle2::Const::pi0) {
-      rc = false;
-    }
-    return rc;
-  }
-
-  ErrCode RecoPhoton::initCovariance(FitParams& fitparams) const
+  ErrCode RecoNeutral::initCovariance(FitParams& fitparams) const
   {
     const int momindex = momIndex();
     const int posindex = mother()->posIndex();
@@ -88,55 +80,77 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success);
   }
 
-  ErrCode RecoPhoton::initParams()
+  ErrCode RecoNeutral::initParams()
   {
-    const Belle2::ECLCluster* cluster = particle()->getECLCluster();
-    const Belle2::ECLCluster::EHypothesisBit clusterhypo = particle()->getECLClusterEHypothesisBit();
-    const ROOT::Math::XYZVector centroid = cluster->getClusterPosition();
-    const double energy = cluster->getEnergy(clusterhypo);
-
-    m_init = true;
+    ROOT::Math::XYZVector clusterCenter;
+    double energy = 0.;
     m_covariance = Eigen::Matrix<double, 4, 4>::Zero(4, 4);
-    Belle2::ClusterUtils C;
+    if (m_particleSource == Belle2::Particle::EParticleSourceObject::c_KLMCluster) {
+      const Belle2::KLMCluster* cluster = particle()->getKLMCluster();
+      clusterCenter = cluster->getClusterPosition();
+      const double momentum = cluster->getMomentumMag();
+      energy = sqrt(m_mass * m_mass + momentum * momentum);
 
-    TMatrixDSym cov_EPhiTheta = C.GetCovarianceMatrix3x3FromCluster(cluster);
-
-    Eigen::Matrix<double, 2, 2> covPhiTheta = Eigen::Matrix<double, 2, 2>::Zero(2, 2);
-
-    for (int row = 0; row < 2; ++row) {
-      // we go through all elements here instead of selfadjoint view later
-      for (int col = 0; col < 2; ++col) {
-        covPhiTheta(row, col) = cov_EPhiTheta[row + 1][col + 1];
+      TMatrixDSym cov7 = cluster->getError7x7();
+      for (int row = 0; row < 3; ++row) {
+        for (int col = 0; col < 3; ++col) {
+          m_covariance(row, col) = cov7[row + 4][col + 4] ;
+        }
       }
+
+      /** currently the energy in KLM is calculated as n2dHits in cluster times 0.214 GeV
+       *  at time of writing - 8.3.18 - the KLMCluster returns 0 for the E covariance
+       */
+      if (0 == m_covariance(3, 3)) { m_covariance(3, 3) = .214; }
+    } else if (m_particleSource == Belle2::Particle::EParticleSourceObject::c_ECLCluster) {
+      const Belle2::ECLCluster* cluster = particle()->getECLCluster();
+      clusterCenter = cluster->getClusterPosition();
+      const Belle2::ECLCluster::EHypothesisBit clusterhypo = particle()->getECLClusterEHypothesisBit();
+      energy = cluster->getEnergy(clusterhypo);
+
+      Belle2::ClusterUtils C;
+      TMatrixDSym cov_EPhiTheta = C.GetCovarianceMatrix3x3FromCluster(cluster);
+
+      Eigen::Matrix<double, 2, 2> covPhiTheta = Eigen::Matrix<double, 2, 2>::Zero(2, 2);
+
+      for (int row = 0; row < 2; ++row) {
+        // we go through all elements here instead of selfadjoint view later
+        for (int col = 0; col < 2; ++col) {
+          covPhiTheta(row, col) = cov_EPhiTheta[row + 1][col + 1];
+        }
+      }
+
+      // the in going x-E correlations are 0 so we don't fill them
+      const double R = cluster->getR();
+      const double theta = cluster->getPhi();
+      const double phi = cluster->getTheta();
+
+      const double st = std::sin(theta);
+      const double ct = std::cos(theta);
+      const double sp = std::sin(phi);
+      const double cp = std::cos(phi);
+
+      Eigen::Matrix<double, 2, 3> polarToCartesian = Eigen::Matrix<double, 2, 3>::Zero(2, 3);
+
+      // polarToCartesian({phi,theta} -> {x,y,z} )
+      polarToCartesian(0, 0) = -1. * R * st * sp; // dx/dphi
+      polarToCartesian(0, 1) = R * st * cp;       // dy/dphi
+      polarToCartesian(0, 2) = 0;                 // dz/dphi
+
+      polarToCartesian(1, 0) = R * ct * cp;  // dx/dtheta
+      polarToCartesian(1, 1) = R * ct * sp;  // dy/dtheta
+      polarToCartesian(1, 2) = -1. * R * st; // dz/dtheta
+
+      m_covariance.block<3, 3>(0, 0) = polarToCartesian.transpose() * covPhiTheta * polarToCartesian;
+
+      m_covariance(3, 3) = cov_EPhiTheta[0][0];
     }
 
-    // the in going x-E correlations are 0 so we don't fill them
-    const double R = cluster->getR();
-    const double theta = cluster->getPhi();
-    const double phi = cluster->getTheta();
+    m_init = true;
 
-    const double st = std::sin(theta);
-    const double ct = std::cos(theta);
-    const double sp = std::sin(phi);
-    const double cp = std::cos(phi);
-
-    Eigen::Matrix<double, 2, 3> polarToCartesian = Eigen::Matrix<double, 2, 3>::Zero(2, 3);
-
-    // polarToCartesian({phi,theta} -> {x,y,z} )
-    polarToCartesian(0, 0) = -1. * R * st * sp; // dx/dphi
-    polarToCartesian(0, 1) = R * st * cp;       // dy/dphi
-    polarToCartesian(0, 2) = 0;                 // dz/dphi
-
-    polarToCartesian(1, 0) = R * ct * cp;  // dx/dtheta
-    polarToCartesian(1, 1) = R * ct * sp;  // dy/dtheta
-    polarToCartesian(1, 2) = -1. * R * st; // dz/dtheta
-
-    m_covariance.block<3, 3>(0, 0) = polarToCartesian.transpose() * covPhiTheta * polarToCartesian;
-
-    m_covariance(3, 3) = cov_EPhiTheta[0][0];
-    m_clusterPars(0) = centroid.X();
-    m_clusterPars(1) = centroid.Y();
-    m_clusterPars(2) = centroid.Z();
+    m_clusterPars(0) = clusterCenter.X();
+    m_clusterPars(1) = clusterCenter.Y();
+    m_clusterPars(2) = clusterCenter.Z();
     m_clusterPars(3) = energy;
 
     auto p_vec = particle()->getMomentum();
@@ -154,7 +168,7 @@ namespace TreeFitter {
       m_i2 = 1;
       m_i3 = 0;
     } else {
-      B2ERROR("Could not estimate highest momentum for photon constraint. Aborting this fit.\n px: "
+      B2ERROR("Could not estimate highest momentum for neutral particle constraint. Aborting this fit.\n px: "
               << p_vec.X() << " py: " << p_vec.Y() << " pz: " << p_vec.Z() << " calculated from Ec: " << m_clusterPars(3));
       return ErrCode(ErrCode::Status::photondimerror);
     }
@@ -162,13 +176,13 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success);
   }
 
-  ErrCode RecoPhoton::projectRecoConstraint(const FitParams& fitparams, Projection& p) const
+  ErrCode RecoNeutral::projectRecoConstraint(const FitParams& fitparams, Projection& p) const
   {
     const int momindex = momIndex();
     const int posindex = mother()->posIndex();
     /**
      * m : decay vertex mother
-     * p : momentum photon
+     * p : momentum vector
      * c : position cluster
      * so:
      * m + p = c
@@ -179,25 +193,23 @@ namespace TreeFitter {
      * only downside is we have to figure out which dimension this is
      * the 4th equation is the energy which we keep as:
      * 0 = E - |p|
-     * just to be sure, essentially this is always zero because p is build from E
-     * */
+     */
 
     const Eigen::Matrix<double, 1, 3> x_vertex = fitparams.getStateVector().segment(posindex, 3);
     const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
 
-    if (0 == p_vec[m_i1]) {
-      return ErrCode(ErrCode::photondimerror);
-    }
+    if (0 == p_vec[m_i1]) { return ErrCode(ErrCode::photondimerror); }
 
     // p_vec[m_i1] must not be 0
     const double elim = (m_clusterPars[m_i1] - x_vertex[m_i1]) / p_vec[m_i1];
     const double mom = p_vec.norm();
+    const double energy = std::sqrt(mom * mom + m_mass * m_mass);
 
     // r'
     Eigen::Matrix<double, 3, 1> residual3 = Eigen::Matrix<double, 3, 1>::Zero(3, 1);
     residual3(0) = m_clusterPars[m_i2] - x_vertex[m_i2] - p_vec[m_i2] * elim;
     residual3(1) = m_clusterPars[m_i3] - x_vertex[m_i3] - p_vec[m_i3] * elim;
-    residual3(2) = m_momentumScalingFactor * m_clusterPars[3] - mom; // scale measured energy by scaling factor
+    residual3(2) = m_momentumScalingFactor * m_clusterPars[3] - energy; // scale measured energy by scaling factor
 
     // dr'/dm | m:={xc,yc,zc,Ec} the measured quantities
     Eigen::Matrix<double, 3, 4> P = Eigen::Matrix<double, 3, 4>::Zero(3, 4);
@@ -235,8 +247,6 @@ namespace TreeFitter {
     p.getH()(2, momindex + m_i1) = -1. * p_vec[m_i1] / mom;
     p.getH()(2, momindex + m_i2) = -1. * p_vec[m_i2] / mom;
     p.getH()(2, momindex + m_i3) = -1. * p_vec[m_i3] / mom;
-    // the photon does not store an energy in the state vector
-    // so no p.getH()(2, momindex + 3) here
 
     return ErrCode(ErrCode::Status::success);
   }

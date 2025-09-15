@@ -7,6 +7,10 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdUnpacking/PXDPostErrorCheckerModule.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDRawAdc.h>
+#include <pxd/dataobjects/PXDRawROIs.h>
 
 using namespace Belle2;
 using namespace Belle2::PXD;

@@ -17,7 +17,6 @@ namespace genfit {
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
-  class PXDRecoHit;
 
   /// Specialized CKF State for extrapolating into the PXD
   class CKFToPXDState : public CKFState<RecoTrack, SpacePoint> {

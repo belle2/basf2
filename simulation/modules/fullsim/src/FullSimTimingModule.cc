@@ -8,6 +8,7 @@
 
 #include <simulation/modules/fullsim/FullSimTimingModule.h>
 #include <simulation/kernel/RunManager.h>
+#include <simulation/kernel/StepTiming.h>
 #include <framework/gearbox/Unit.h>
 #include <G4EventManager.hh>
 #include <G4VSteppingVerbose.hh>

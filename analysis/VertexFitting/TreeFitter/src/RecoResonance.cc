@@ -9,6 +9,7 @@
 
 
 #include <analysis/VertexFitting/TreeFitter/RecoResonance.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
 namespace TreeFitter {

@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef NEUTRONPHYSICS_H
-#define NEUTRONPHYSICS_H
+#pragma once
 
 #include "G4VPhysicsConstructor.hh"
 
@@ -55,5 +54,3 @@ namespace Belle2 {
   } // end of namespace Simulation
 
 } // end of namespace Belle2
-
-#endif // NEUTRONPHYSICS_H

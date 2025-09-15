@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef VXD_SIMULATION_SENSITIVEDETECTOR_H
-#define VXD_SIMULATION_SENSITIVEDETECTOR_H
 
 #include <vxd/simulation/SensitiveDetectorBase.h>
 #include <framework/datastore/StoreArray.h>
@@ -191,5 +189,3 @@ namespace Belle2 {
 
   } //VXD Namespace
 } //Belle2 namespace
-
-#endif

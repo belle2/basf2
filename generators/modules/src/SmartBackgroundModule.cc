@@ -6,7 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// TODOs: write documentation, set payload name in python?
+// TODOs:
+// Undo debug, clarify bug
+// write documentation, set payload name in python?
 
 #include <generators/modules/SmartBackgroundModule.h>
 #include <generators/dbobjects/SmartBackgroundConfig.h>
@@ -41,7 +43,7 @@ SmartBackgroundModule::SmartBackgroundModule() : Module()
                  "Should be used only for directly skimmed MC productions. "
                  "Must be added to the path after the MC generator module but before simulation. "
                  "Given a specific skim the neural network predicts the probability of the event passing the skim. "
-                 "The module returns 0 with this probability or otherwise 1. "
+                 "The module returns 1 with this probability or otherwise 0. "
                  "Events are then weighted with their inverse probability "
                  "(weights are saved in the event meta data, by multiplying them to the generator weight). "
                  "Use case is the reduction of simulation time for directly skimmed MC productions.");
@@ -111,7 +113,7 @@ void SmartBackgroundModule::event()
 
   // Load store array of MC particles and the event extra info
   StoreArray<MCParticle> mcparticles;
-  const unsigned int numParticles = mcparticles.getEntries();
+  const int numParticles = mcparticles.getEntries();
 
   // Create input tensors for the five inputs of the SmartBKG model
   auto xTensor = MVA::ONNX::Tensor<float>::make_shared({1, 100, 8});
@@ -131,54 +133,91 @@ void SmartBackgroundModule::event()
   // Set event type input
   cTensor->at(0) = c_eventtypeMapping.at(m_eventType);
 
-  // Loop over particles and set particle wise inputs
-  for (unsigned int i = 0; i < 100; ++i) {
-    if (i < numParticles) {
+  // Loop over particles, preprocess their properties and set particle wise inputs
+  int particleIndex = -1;
+  unsigned int newIndex = 0;
+  std::unordered_map<int, int> qg_mother_mapping;
+  std::unordered_map<int, unsigned int> index_mapping;
+  float particle0Properties[4];
+
+  while (newIndex < 100u) {
+    if (particleIndex < numParticles - 1) {
+      ++particleIndex;
+
+      // Get particle and info necessary for preprocessing
+      const MCParticle& p = *mcparticles[particleIndex];
+      const ROOT::Math::XYZVector vertex = p.getVertex();
+      const int pdg = p.getPDG();
+      MCParticle* mother = p.getMother();
+      int motherIndex = 0;
+      if (mother) {
+        motherIndex = mother->getArrayIndex();
+      }
+
+      // Preprocessing
+      if (p.isInitial() || (vertex.X() >= 10) || (vertex.Y() >= 10) || (vertex.Z() >= 10)) {
+        // Skip initials and decays far outside
+        continue;
+      } else if (pdg == 21 || (std::abs(pdg) <= 5)) {
+        // Skip quarks and gluons, save index to reconstruct non quark-gluon mothers
+        qg_mother_mapping[particleIndex] = motherIndex;
+        continue;
+      }
+
+      // If particle is kept, save new index
+      index_mapping[particleIndex] = newIndex;
+
+      // If first particle, save vertex
+      const ROOT::Math::XYZVector momentum = p.getMomentum();
+      if (newIndex == 0u) {
+        particle0Properties[0] = p.getProductionTime();
+        particle0Properties[1] = vertex.X();
+        particle0Properties[2] = vertex.Y();
+        particle0Properties[3] = vertex.Z();
+      }
 
       // If particle exists set mask to 0
-      maskTensor->at({0, i}) = 0;
+      maskTensor->at({0, newIndex}) = 0;
 
-      const MCParticle& p = *mcparticles[i];
-
-      // Set momentum and vertex 4-vector inputs
-      const ROOT::Math::XYZVector momentum = p.getMomentum();
-      const ROOT::Math::XYZVector vertex = p.getVertex();
-      xTensor->at({0, i, 0}) = p.getProductionTime();
-      xTensor->at({0, i, 1}) = vertex.X();
-      xTensor->at({0, i, 2}) = vertex.Y();
-      xTensor->at({0, i, 3}) = vertex.Z();
-      xTensor->at({0, i, 4}) = p.getEnergy();
-      xTensor->at({0, i, 5}) = momentum.X();
-      xTensor->at({0, i, 6}) = momentum.Y();
-      xTensor->at({0, i, 7}) = momentum.Z();
+      // Set momentum and vertex 4-vector inputs relative to first particle
+      xTensor->at({0, newIndex, 0}) = p.getProductionTime() - particle0Properties[0];
+      xTensor->at({0, newIndex, 1}) = vertex.X() - particle0Properties[1];
+      xTensor->at({0, newIndex, 2}) = vertex.Y() - particle0Properties[2];
+      xTensor->at({0, newIndex, 3}) = vertex.Z() - particle0Properties[3];
+      xTensor->at({0, newIndex, 4}) = p.getEnergy();
+      xTensor->at({0, newIndex, 5}) = momentum.X();
+      xTensor->at({0, newIndex, 6}) = momentum.Y();
+      xTensor->at({0, newIndex, 7}) = momentum.Z();
 
       // Set mapped PDG code input
-      const int pdg = p.getPDG();
       int pdgMapped = m_pdgMapping[pdg];
       if (!pdgMapped) {
         B2WARNING("SmartBkg: Encountered particle with unknown pdg: " << pdg <<
                   ", assigning out-of-distribution value 0 as mapped pdg input.");
         pdgMapped = 0;
       }
-      pdgTensor->at({0, i}) = pdgMapped;
+      pdgTensor->at({0, newIndex}) = pdgMapped;
 
       // Set mother index input
-      MCParticle* mother = p.getMother();
-      int motherindex = -1;
-      if (mother) {
-        motherindex = mother->getArrayIndex();
+      while (motherIndex > 0 && (qg_mother_mapping.find(motherIndex) != qg_mother_mapping.end())) {
+        \
+        motherIndex = qg_mother_mapping[motherIndex];
       }
-      motherTensor->at({0, i}) = motherindex;
-
+      if (index_mapping.find(motherIndex) != index_mapping.end()) {
+        motherTensor->at({0, newIndex}) = index_mapping[motherIndex] + 1;
+      } else {
+        motherTensor->at({0, newIndex}) = -1;
+      }
     } else {
       // If particle does not exist, set mask to 1 and all inputs to 0
-      maskTensor->at({0, i}) = 1;
+      maskTensor->at({0, newIndex}) = 1;
       for (unsigned j = 0; j < 8; ++j) {
-        xTensor->at({0, i, j}) = 0;
+        xTensor->at({0, newIndex, j}) = 0;
       }
-      pdgTensor->at({0, i}) = 0;
-      motherTensor->at({0, i}) = 0;
+      pdgTensor->at({0, newIndex}) = 0;
+      motherTensor->at({0, newIndex}) = 0;
     }
+    ++newIndex;
   }
 
   // Perform inference

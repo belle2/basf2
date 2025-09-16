@@ -46,8 +46,8 @@ TRGGRLMatchModule::TRGGRLMatchModule() : Module()
   setDescription("match CDC trigger tracks and ECL trigger clusters");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("SimulationMode", m_simulationMode, "TRGGRL simulation switch", 1);
-  addParam("FastSimulationMode", m_fastSimulationMode, "TRGGRL fast simulation mode", m_fastSimulationMode);
-  addParam("FirmwareSimulationMode", m_firmwareSimulationMode, "TRGGRL firmware simulation mode", m_firmwareSimulationMode);
+  addParam("FastSimulationMode", m_fastSimulationMode, "TRGGRL fast simulation mode", 0);
+  addParam("FirmwareSimulationMode", m_firmwareSimulationMode, "TRGGRL firmware simulation mode", 0);
 
   addParam("DrMatch", m_dr_threshold, "the threshold of dr between track and cluster if they are matched successfully", 25.);
   addParam("DzMatch", m_dz_threshold, "the threshold of dz between track and cluster if they are matched successfully", 30.);

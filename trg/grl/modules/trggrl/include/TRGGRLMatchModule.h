@@ -120,10 +120,10 @@ namespace Belle2 {
 
     /// Switch for the fast simulation. 0:do everything, 1:stop after
     /// the track segment simulation. Default is 0.
-    int m_fastSimulationMode(0);
+    int m_fastSimulationMode;
 
     /// Switch for the firmware simulation. 0:do nothing, 1:do everything
-    int m_firmwareSimulationMode(0);
+    int m_firmwareSimulationMode;
 
     /**max value of dr to be identified as match*/
     double m_dr_threshold;

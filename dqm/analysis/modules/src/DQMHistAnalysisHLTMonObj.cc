@@ -72,27 +72,27 @@ void DQMHistAnalysisHLTMonObjModule::initialize()
   m_KsInvMass = new RooRealVar("m_KsInvMass", "M", 0.45, 0.55);
 
   //--- Signal double gaussian ---//
-  RooRealVar mean1("#mu_{1}", "MEAN of 1st gaussian", 0.498, 0.49, 0.51);
-  RooRealVar sigma1("#sigma_{1}", "Sigma of 1st gaussian", 0.002, 0.0001, 0.05);
-  RooGaussian gauss1("gauss1", "1st gaussian PDF", *m_KsInvMass, mean1, sigma1);
+  m_mean1 = new RooRealVar("#mu_{1}", "MEAN of 1st gaussian", 0.498, 0.49, 0.51);
+  m_sigma1 = new RooRealVar("#sigma_{1}", "Sigma of 1st gaussian", 0.002, 0.0001, 0.05);
+  m_gauss1 = new RooGaussian("gauss1", "1st gaussian PDF", *m_KsInvMass, *m_mean1, *m_sigma1);
 
-  RooRealVar sigma2("#sigma_{2}", "Sigma of 1st gaussian", 0.02, 0.0001, 0.05);
-  RooGaussian gauss2("gauss2", "2nd gaussian PDF", *m_KsInvMass, mean1, sigma2);
+  m_sigma2 = new RooRealVar("#sigma_{2}", "Sigma of 1st gaussian", 0.02, 0.0001, 0.05);
+  m_gauss2 = new RooGaussian("gauss2", "2nd gaussian PDF", *m_KsInvMass, *m_mean1, *m_sigma2);
 
-  RooRealVar frac("frac", "fraction", 0.6, 0.4, 0.8);
-  RooAddPdf double_gauss("double_gauss", "add two gaussian", RooArgList(gauss1, gauss2), RooArgSet(frac));
-
+  m_frac = new RooRealVar("frac", "fraction", 0.6, 0.4, 0.8);
+  m_double_gauss = new RooAddPdf("double_gauss", "add two gaussian", RooArgList(*m_gauss1, *m_gauss2), RooArgSet(*m_frac));
 
   //--- Chebychev background first order ---//
-  RooRealVar slope1("s_{1}", "Slope of Polynomial", 0.5, -2.0, 2.0);
-  RooChebychev chebpol("chebpol", "Chebshev Polynomial ", *m_KsInvMass, RooArgList(slope1));
+  m_slope = new RooRealVar("s", "Slope of Polynomial", 0.5, -2.0, 2.0);
+  m_chebpol = new RooChebychev("chebpol", "Chebshev Polynomial ", *m_KsInvMass, RooArgList(*m_slope));
 
   //--- Signal and Background yields ---//
   m_sig = new RooRealVar("N_{sig}", "SIGNAL EVENTS", 1000, 10, 5000000);
   m_bkg = new RooRealVar("N_{bkg}", "SIGNAL EVENTS", 2000, 100, 20000000);
 
   //--- Total fit pdf ---//
-  m_KsPdf = new RooAddPdf("m_KsPdf", "Two Gaussian + Pol1 background", RooArgList(double_gauss, chebpol), RooArgList(m_sig, m_bkg));
+  m_KsPdf = new RooAddPdf("m_KsPdf", "Two Gaussian + Pol1 background", RooArgList(*m_double_gauss, *m_chebpol), RooArgList(*m_sig,
+                          *m_bkg));
 
 }
 
@@ -364,9 +364,19 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
 
 void DQMHistAnalysisHLTMonObjModule::terminate()
 {
+  delete m_KsInvMass;
+  delete m_mean1;
+  delete m_sigma1;
+  delete m_gauss1;
+  delete m_mean2;
+  delete m_sigma2;
+  delete m_gauss2;
+  delete m_double_gauss;
+  delete m_slope;
+  delete m_chebpol;
   delete m_sig;
   delete m_bkg;
-  delete m_KsPdf;
-  delete m_KsInvMass;
+  delete  m_KsPdf;
+
   B2DEBUG(20, "terminate called");
 }

@@ -65,7 +65,8 @@ TRGGRLMatchModule::TRGGRLMatchModule() : Module()
   addParam("KLMmatchCollection", m_klmmatch_tracklist, "the 2d tracklist with associated KLM track",
            std::string("TRGKLMMatchTracks"));
   addParam("GRLphotonCollection", m_grlphotonlist, "the isolated cluster list", std::string("TRGGRLPhotons"));
-  addParam("hitCollectionName", m_hitCollectionName, "Name of the input StoreArray of CDCTriggerSegmentHits.", std::string(""));
+  addParam("hitCollectionName", m_hitCollectionName, "Name of the input StoreArray of CDCTriggerSegmentHits.",
+           std::string("hitCollectionName"));
   addParam("TrgGrlInformation", m_TrgGrlInformationName,
            "Name of the StoreArray holding the information of tracks and clusters from cdc ecl klm.",
            std::string("TRGGRLObjects"));

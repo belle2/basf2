@@ -166,7 +166,7 @@ def add_hlt_processing(path,
                        reco_components=None,
                        create_hlt_unit_histograms=True,
                        switch_off_slow_modules_for_online=True,
-                       hlt_prefilter_mode=constants.HLTprefilterModes.monitor,
+                       hlt_prefilter_mode=constants.HLTPrefilterModes.monitor,
                        **kwargs):
     """
     Add all modules for processing on HLT filter machines
@@ -208,12 +208,7 @@ def add_hlt_processing(path,
     path.add_module('StatisticsSummary').set_name('Sum_Unpackers')
 
     # HLT prefilter
-    # Only turn on the HLTprefilter if prefilter mode is True
-    if hlt_prefilter_mode == constants.HLTPrefilterModes.filter:
-        # Abort reconstruction of events from injection background
-        hlt_prefilter_module = path.add_module('HLTPrefilter')
-        path_utils.hlt_event_abort(hlt_prefilter_module, ">=1", ROOT.Belle2.EventMetaData.c_HLTPrefilterDiscard)
-        path.add_module('StatisticsSummary').set_name('Sum_HLTPrefilter')
+    path_utils.add_prefilter_module(mode=hlt_prefilter_mode)
 
     # Build one path for all accepted events...
     accept_path = basf2.Path()

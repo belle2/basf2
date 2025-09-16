@@ -29,6 +29,9 @@ def path_for_test(globaltags, providers):
 
 if __name__ == '__main__':
 
+    if b2tu.is_cdb_down():
+        b2tu.skip_test('Test currently disabled due to CDB troubles')
+
     b2tu.configure_logging_for_tests(replace_cdb_provider=False)
 
     local = '/cvmfs/belle.cern.ch/conditions/database.sqlite'

@@ -281,8 +281,12 @@ void HadronPrep::setPars(TFile*& outfile, std::map<int, std::vector<TH1F*>>& hde
       satbg = m_bgMin + 0.5 * bgstep + i * bgstep;
       satcosth = m_cosMin + 0.5 * cosstep + j * cosstep;
 
-      satbg_avg = m_sumbg[i][j] / m_sumsize[i][j];
-      satcosth_avg = m_sumcos[i][j] / m_sumsize[i][j];
+      if (m_sumsize[i][j] > 0) {
+        satbg_avg = m_sumbg[i][j] / m_sumsize[i][j];
+        satcosth_avg = m_sumcos[i][j] / m_sumsize[i][j];
+      } else {
+        satbg_avg = satcosth_avg = 0.0;
+      }
 
       //1. -------------------------
       // fit the dE/dx distribution in bins of beta-gamma and cosine

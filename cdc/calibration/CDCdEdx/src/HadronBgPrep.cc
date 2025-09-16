@@ -143,6 +143,11 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
     if (pdg == "proton")  if ((dedxnosat - 0.45) * abs(p) * abs(p) < m_cut)continue;
 
     int bgBin = (int)((bg - m_bgMin) / (m_bgMax - m_bgMin) * m_bgBins);
+    if (bgBin < 0 || bgBin >= m_bgBins) {
+      B2WARNING("bgBin out of range: " << bgBin
+                << " (valid range: 0-" << m_bgBins - 1 << ")");
+    }
+    bgBin = std::min(m_bgBins - 1, std::max(0, bgBin));
 
     double dedx_new = had.D2I(costh, had.I2D(costh, 1.0) * dedxnosat);
 
@@ -178,6 +183,10 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
 
     // make histograms of dE/dx vs. cos(theta) for validation
     int icos = (int)((costh + 1) / cosstep);
+    if (icos >= m_cosBins) {
+      B2WARNING("cosBin (icos) out of range: " << icos
+                << " (valid range: 0-" << (m_cosBins - 1) << ")");
+    }
     icos = std::min(m_cosBins - 1, icos);
 
     hchicos_allbg[chg][icos]->Fill(chi_new);
@@ -190,6 +199,11 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
     int wr = 0;
     if (isher > 0.5) wr = 1;
     int injBin = (int)((injtime - m_injMin) / tstep);
+    if (injBin >= m_injBins) {
+      B2WARNING("injBin out of range: " << injBin
+                << " (valid range: 0-" << (m_injBins - 1) << ")");
+    }
+    injBin = std::min(m_injBins - 1, std::max(0, injBin));
     hchi_inj[wr][injBin]->Fill(chi_new);
 
     m_suminj[injBin] += injtime;
@@ -454,7 +468,8 @@ void HadronBgPrep::setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>&
 
     for (int i = 0; i < m_injBins; ++i) {
 
-      inj_avg = m_suminj[i] / m_injsize[i];
+      inj_avg = (m_injsize[i] > 0) ? m_suminj[i] / m_injsize[i] : 0.0;
+
 
       // fit the dE/dx distribution in bins of injection time'
       gstatus injstat;

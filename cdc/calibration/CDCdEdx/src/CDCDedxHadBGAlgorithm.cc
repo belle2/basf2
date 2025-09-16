@@ -258,7 +258,7 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, cons
     // --------------------------------------------------
     // Fill the histograms to be fitted
 
-    for (Long64_t index = 0; index < hadron->GetEntries(); ++index) {
+    for (unsigned int index = 0; index < hadron->GetEntries(); ++index) {
 
       hadron->GetEntry(index);
       double bg = std::fabs(p) / mass;
@@ -288,7 +288,7 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, cons
       if (svar == "nhit") {
         double res_cor = sgpar.cosPrediction(costh) * sgpar.ionzPrediction(dedx_cur) * timereso;
         int nhitBin = static_cast<int>((std::fabs(nhits) - lower) / nstep);
-        // clamp
+
         if (nhitBin < 0) nhitBin = 0;
         else if (nhitBin >= nbins) nhitBin = nbins - 1;
 
@@ -302,7 +302,7 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, cons
       } else { // costh
         double denom = (upper - lower);
         int cosBin = static_cast<int>((costh - lower) / denom * nbins);
-        // clamp
+
         if (cosBin < 0) cosBin = 0;
         else if (cosBin >= nbins) cosBin = nbins - 1;
 

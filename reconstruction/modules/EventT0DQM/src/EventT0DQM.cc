@@ -7,7 +7,10 @@
  **************************************************************************/
 
 #include <reconstruction/modules/EventT0DQM/EventT0DQM.h>
-#include <framework/core/HistoModule.h>
+
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/TRGSummary.h>
+#include <framework/dataobjects/EventT0.h>
 
 using namespace Belle2;
 

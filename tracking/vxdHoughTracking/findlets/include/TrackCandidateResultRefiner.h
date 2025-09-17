@@ -8,16 +8,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 #include <tracking/vxdHoughTracking/findlets/TrackCandidateOverlapResolver.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-
-#include <string>
-#include <vector>
 
 namespace Belle2 {
   class SpacePointTrackCand;
   class ModuleParamList;
+  class QualityEstimatorBase;
 
   namespace vxdHoughTracking {
 

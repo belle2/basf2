@@ -9,6 +9,7 @@
 #include <simulation/kernel/TrackingAction.h>
 #include <simulation/kernel/UserInfo.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
+#include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 

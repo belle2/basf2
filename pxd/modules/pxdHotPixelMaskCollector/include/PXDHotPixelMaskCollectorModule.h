@@ -9,11 +9,12 @@
 #pragma once
 
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDDigit.h>
 #include <calibration/CalibrationCollectorModule.h>
 #include <string>
 
 namespace Belle2 {
+  class PXDDigit;
+
   /**
    * Calibration Collector Module for PXD hot pixel masking from PXDDigits
    *

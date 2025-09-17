@@ -10,6 +10,7 @@
 #include <pxd/dbobjects/PXDMaskedPixelPar.h>
 #include <pxd/dbobjects/PXDDeadPixelPar.h>
 #include <pxd/dbobjects/PXDOccupancyInfoPar.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include <boost/format.hpp>
 #include <string>

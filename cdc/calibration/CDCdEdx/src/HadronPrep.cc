@@ -116,10 +116,10 @@ void HadronPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, c
 
     if (pdg == "proton") if ((dedxnosat - 0.45) * abs(p) * abs(p) < m_cut)continue;
 
-    int bgBin = (int)((bg - m_bgMin) / (m_bgMax - m_bgMin) * m_bgBins);
+    int bgBin = static_cast<int>((bg - m_bgMin) / (m_bgMax - m_bgMin) * m_bgBins);
     bgBin  = std::max(0, std::min(bgBin, m_bgBins - 1));
 
-    int cosBin = (int)((costh - m_cosMin) / (m_cosMax - m_cosMin) * m_cosBins);
+    int cosBin = static_cast<int>((costh - m_cosMin) / (m_cosMax - m_cosMin) * m_cosBins);
     cosBin = std::max(0, std::min(cosBin, m_cosBins - 1));
 
     double dedx_new = dedxnosat;

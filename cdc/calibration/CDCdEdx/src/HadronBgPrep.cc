@@ -142,7 +142,7 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
 
     if (pdg == "proton")  if ((dedxnosat - 0.45) * abs(p) * abs(p) < m_cut)continue;
 
-    int bgBin = (int)((bg - m_bgMin) / (m_bgMax - m_bgMin) * m_bgBins);
+    int bgBin = static_cast<int>((bg - m_bgMin) / (m_bgMax - m_bgMin) * m_bgBins);
     if (bgBin < 0 || bgBin >= m_bgBins) {
       B2WARNING("bgBin out of range: " << bgBin
                 << " (valid range: 0-" << m_bgBins - 1 << ")");
@@ -182,7 +182,7 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
     m_sumsize[bgBin] += 1;
 
     // make histograms of dE/dx vs. cos(theta) for validation
-    int icos = (int)((costh + 1) / cosstep);
+    int icos = static_cast<int>((costh + 1) / cosstep);
     if (icos >= m_cosBins) {
       B2WARNING("cosBin (icos) out of range: " << icos
                 << " (valid range: 0-" << (m_cosBins - 1) << ")");
@@ -198,7 +198,7 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
     if (injtime > m_injMax) injtime = m_injMax - 10.0;
     int wr = 0;
     if (isher > 0.5) wr = 1;
-    int injBin = (int)((injtime - m_injMin) / tstep);
+    int injBin = static_cast<int>((injtime - m_injMin) / tstep);
     if (injBin >= m_injBins) {
       B2WARNING("injBin out of range: " << injBin
                 << " (valid range: 0-" << (m_injBins - 1) << ")");

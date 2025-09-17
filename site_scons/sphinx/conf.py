@@ -41,6 +41,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.autosectionlabel',
     'sphinx_codeautolink',
+    'sphinx_togglebutton',
     'sphinxarg.ext',
     'basf2ext',
     'nbsphinx',
@@ -61,6 +62,16 @@ nbsphinx_allow_errors = True
 # colon
 autosectionlabel_prefix_document = True
 suppress_warnings = ['autosectionlabel.*', 'codeautolink.*']
+
+# The text that appears on the toggle buttons (default is "Click to show")
+togglebutton_hint = "Click to reveal"
+
+# What CSS selectors get the toggle behaviour.
+# This is the magic: it looks for admonitions with 'dropdown' class
+togglebutton_selector = ".toggle, .admonition.dropdown"
+
+# Optional: add the little "▶/▼" icons
+togglebutton_hint_toggle = "▶▼"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_sphinxtemplates']

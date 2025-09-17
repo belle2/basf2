@@ -270,18 +270,19 @@ likelihoods.
 Alternatively, we can use the following predefined Belle-style PID variables to
 reproduce them:
 
-   +------------------------------+------------------+
-   | Separation                   | basf2            |
-   +==============================+==================+
-   | Kaon vs pion                 | atcPIDBelle(3,2) |
-   +------------------------------+------------------+
-   | electron vs hadron           | eIDBelle         |
-   +------------------------------+------------------+
-   | muon likelihood              | muIDBelle        |
-   +------------------------------+------------------+
-   | muon likelihood quality flag | muIDBelleQuality |
-   +------------------------------+------------------+
+.. list-table::
+   :header-rows: 1
 
+   * - Separation
+     - basf2
+   * - Kaon vs pion
+     - atcPIDBelle(3,2)
+   * - electron vs hadron
+     - eIDBelle
+   * - muon likelihood
+     - muIDBelle
+   * - muon likelihood quality flag
+     - muIDBelleQuality
 
 .. admonition:: Exercise
    :class: exercise stacked

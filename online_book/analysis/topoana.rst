@@ -585,12 +585,12 @@ setting items in the quick-start tutorial or the user guide we introduce in
    lines in one step. Could you figure out a way to do this?
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    Use the ``system`` function of the ``os`` module in your python steering script.
 
 .. admonition:: Solution
-   :class: toggle solution stacked
+   :class: dropdown solution
 
    Revise your python steering script by adding ``import os`` to the end of its
    preamble and appending ``os.system('topoana.exe topoana.card')`` at its end,
@@ -602,7 +602,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
       :language: python
 
 .. admonition:: Extension
-   :class: toggle xhint
+   :class: dropdown xhint
 
    Could you think of another way to do this? For example, with a shell script?
 
@@ -613,14 +613,14 @@ setting items in the quick-start tutorial or the user guide we introduce in
    branches of :math:`D^{*+}` in the input sample.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    * See Section 3 in the quick-start tutorial for the introduction of the
      setting item.
    * See Section 3.3 in the user guide for the description of the setting item.
 
 .. admonition:: Solution
-   :class: toggle solution stacked
+   :class: dropdown solution
 
    Add the following setting item to the card file, re-run the program, and
    check the changes of the output files.
@@ -634,7 +634,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
       }
 
 .. admonition:: Extension
-   :class: toggle xhint
+   :class: dropdown xhint
 
    * See Section 3 in the user guide for the description of other similar
      setting items.
@@ -647,14 +647,14 @@ setting items in the quick-start tutorial or the user guide we introduce in
    sample.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    * See Section 4 in the quick-start tutorial for the introduction of the setting
      item.
    * See Section 4.4 in the user guide for the description of the setting item.
 
 .. admonition:: Solution
-   :class: toggle solution stacked
+   :class: dropdown solution
 
    Add the following setting item to the card file, re-run the program, and check
    the changes of the output files.
@@ -668,7 +668,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
       }
 
 .. admonition:: Extension
-   :class: toggle xhint
+   :class: dropdown xhint
 
    * See Section 4 in the user guide for the description of other similar setting
      items.
@@ -682,14 +682,14 @@ setting items in the quick-start tutorial or the user guide we introduce in
    and decay trees together.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    * See Section 5 in the quick-start tutorial for the introduction of the setting
      item.
    * See Section 5.2.2 in the user guide for the description of the setting item.
 
 .. admonition:: Solution
-   :class: toggle solution stacked
+   :class: dropdown solution
 
    Add the following setting item to the card file, re-run the program, and check
    the changes of the output files.
@@ -702,7 +702,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
       }
 
 .. admonition:: Extension
-   :class: toggle xhint
+   :class: dropdown xhint
 
    * See Section 5.2 in the user guide for the description of other similar
      setting items.
@@ -714,13 +714,13 @@ setting items in the quick-start tutorial or the user guide we introduce in
    to select only the events with ``nMCGen>=20 && nMCGen<=40``.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    * See Section 5.1.1 in the user guide for the description of the setting
      item.
 
 .. admonition:: Solution
-   :class: toggle solution stacked
+   :class: dropdown solution
 
    Add the following setting item to the card file, re-run the program, and
    check the changes of the output files.
@@ -733,7 +733,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
       }
 
 .. admonition:: Extension
-   :class: toggle xhint
+   :class: dropdown xhint
 
    * See Section 5.1 in the user guide for the description of other similar
      setting items.
@@ -746,12 +746,12 @@ setting items in the quick-start tutorial or the user guide we introduce in
    the program terminates.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    * See Section 5.3.2 in the user guide for the description of the setting item.
 
 .. admonition:: Solution
-   :class: toggle solution stacked
+   :class: dropdown solution
 
    Add the following setting item to the card file, re-run the program, and check
    the changes of the output files.
@@ -764,7 +764,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
       }
 
 .. admonition:: Extension
-   :class: toggle xhint
+   :class: dropdown xhint
 
    * See Section 5.3 in the user guide for the description of other similar
      setting items.

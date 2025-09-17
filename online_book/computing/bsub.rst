@@ -88,7 +88,7 @@ and <...> indicates that the value should be filled in by you.
    Check your priorities on queue s.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. code-block:: bash
 
@@ -152,7 +152,7 @@ To check the job status
       Submit a `basf2` job to queue ``l``, and then check the status of your jobs.
 
 .. admonition:: Hint
-   :class: xhint stacked toggle
+   :class: xhint stacked dropdown
 
    A simple `basf2` job could be the following:
 
@@ -163,7 +163,7 @@ To check the job status
       printVars()
 
 .. admonition:: Solution
-   :class: toggle solution
+    :class: dropdown solution
 
       Submission:
 

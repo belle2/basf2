@@ -194,7 +194,7 @@ Now you have MDST files produced in the ``mcproduzh/gsim/mdst/`` directory.
    :math:`B^{+} \to \overline{D}^{0}(\to K^{+} \pi^{-}) \pi^{+}` events.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    Generation:
 
@@ -290,7 +290,7 @@ reproduce them:
    and another list of :math:`\pi^{+}` with :math:`\text{KID}<0.4`.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. code-block:: python
 
@@ -320,12 +320,12 @@ During the conversion, b2bii converter by default creates ``gamma:mdst`` and ``p
    between 1.7 to 2.0 GeV in a b2bii analysis.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    Always use premade particle lists for neutrals!
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. code-block:: python
 
@@ -357,12 +357,12 @@ In addition, the quality indicators for :math:`K_{S}^{0}` and
    Select ``good Kshort`` from ``K_S0:mdst`` list.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    Use `cutAndCopyList` to select candidates from an existing list.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. code-block:: python
 
@@ -399,7 +399,7 @@ The Klongs are stored in the default ``K_L0:mdst``.
       basf2.find_file('b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst', 'examples', False)
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    :ref:`onlinebook_first_steering_file` lesson is your best friend!
 
@@ -407,7 +407,7 @@ The Klongs are stored in the default ``K_L0:mdst``.
    Don't forget to use Belle-style PID for charged particles.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. literalinclude:: b2bii/b2bii_example.py
       :language: python        

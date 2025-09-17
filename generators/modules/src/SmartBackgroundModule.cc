@@ -115,122 +115,109 @@ void SmartBackgroundModule::event()
   StoreArray<MCParticle> mcparticles;
   const int numParticles = mcparticles.getEntries();
 
-  // Create input tensors for the five inputs of the SmartBKG model
-  auto xTensor = MVA::ONNX::Tensor<float>::make_shared({1, 100, 8});
-  auto pdgTensor = MVA::ONNX::Tensor<int32_t>::make_shared({1, 100});
-  auto motherTensor = MVA::ONNX::Tensor<int32_t>::make_shared({1, 100});
-  auto maskTensor = MVA::ONNX::Tensor<uint8_t>::make_shared({1, 100});
-  auto cTensor = MVA::ONNX::Tensor<int32_t>::make_shared({1});
+  // Define vectors to hold preprocessed input data
+  std::vector<float> xValues;
+  std::vector<int> pdgValues;
+  std::vector<int> motherValues;
 
-  // Create output tensor
-  auto outputTensor = MVA::ONNX::Tensor<float>::make_shared({1, 51});
-
-  // Warning about 100 particle truncation
-  if (numParticles > 100) {
-    B2DEBUG(20, "SmartBkg: More than 100 MC particles in event, cutting off excess particles");
-  }
-
-  // Set event type input
-  cTensor->at(0) = c_eventtypeMapping.at(m_eventType);
-
-  // Loop over particles, preprocess their properties and set particle wise inputs
-  int particleIndex = -1;
+  // New 0-based index of particles after preprocessing removes some particles
   unsigned int newIndex = 0;
+  // Some maps needed for preprocessing
   std::unordered_map<int, int> qg_mother_mapping;
   std::unordered_map<int, unsigned int> index_mapping;
   float particle0Properties[4];
 
-  while (newIndex < 100u) {
-    if (particleIndex < numParticles - 1) {
-      ++particleIndex;
+  // Loop over particles in event
+  for (int particleIndex = 0; particleIndex < numParticles; ++particleIndex) {
 
-      // Get particle and info necessary for preprocessing
-      const MCParticle& p = *mcparticles[particleIndex];
-      const ROOT::Math::XYZVector vertex = p.getVertex();
-      const int pdg = p.getPDG();
-      MCParticle* mother = p.getMother();
-      int motherIndex = 0;
-      if (mother) {
-        motherIndex = mother->getArrayIndex();
-      }
-
-      // Preprocessing
-      if (p.isInitial() || (vertex.X() >= 10) || (vertex.Y() >= 10) || (vertex.Z() >= 10)) {
-        // Skip initials and decays far outside
-        continue;
-      } else if (pdg == 21 || (std::abs(pdg) <= 5)) {
-        // Skip quarks and gluons, save index to reconstruct non quark-gluon mothers
-        qg_mother_mapping[particleIndex] = motherIndex;
-        continue;
-      }
-
-      // If particle is kept, save new index
-      index_mapping[particleIndex] = newIndex;
-
-      // If first particle, save vertex
-      const ROOT::Math::XYZVector momentum = p.getMomentum();
-      if (newIndex == 0u) {
-        particle0Properties[0] = p.getProductionTime();
-        particle0Properties[1] = vertex.X();
-        particle0Properties[2] = vertex.Y();
-        particle0Properties[3] = vertex.Z();
-      }
-
-      // If particle exists set mask to 0
-      maskTensor->at({0, newIndex}) = 0;
-
-      // Set momentum and vertex 4-vector inputs relative to first particle
-      xTensor->at({0, newIndex, 0}) = p.getProductionTime() - particle0Properties[0];
-      xTensor->at({0, newIndex, 1}) = vertex.X() - particle0Properties[1];
-      xTensor->at({0, newIndex, 2}) = vertex.Y() - particle0Properties[2];
-      xTensor->at({0, newIndex, 3}) = vertex.Z() - particle0Properties[3];
-      xTensor->at({0, newIndex, 4}) = p.getEnergy();
-      xTensor->at({0, newIndex, 5}) = momentum.X();
-      xTensor->at({0, newIndex, 6}) = momentum.Y();
-      xTensor->at({0, newIndex, 7}) = momentum.Z();
-
-      // Set mapped PDG code input
-      int pdgMapped = m_pdgMapping[pdg];
-      if (!pdgMapped) {
-        B2WARNING("SmartBkg: Encountered particle with unknown pdg: " << pdg <<
-                  ", assigning out-of-distribution value 0 as mapped pdg input.");
-        pdgMapped = 0;
-      }
-      pdgTensor->at({0, newIndex}) = pdgMapped;
-
-      // Set mother index input
-      while (motherIndex > 0 && (qg_mother_mapping.find(motherIndex) != qg_mother_mapping.end())) {
-        \
-        motherIndex = qg_mother_mapping[motherIndex];
-      }
-      if (index_mapping.find(motherIndex) != index_mapping.end()) {
-        motherTensor->at({0, newIndex}) = index_mapping[motherIndex] + 1;
-      } else {
-        motherTensor->at({0, newIndex}) = -1;
-      }
-    } else {
-      // If particle does not exist, set mask to 1 and all inputs to 0
-      maskTensor->at({0, newIndex}) = 1;
-      for (unsigned j = 0; j < 8; ++j) {
-        xTensor->at({0, newIndex, j}) = 0;
-      }
-      pdgTensor->at({0, newIndex}) = 0;
-      motherTensor->at({0, newIndex}) = 0;
+    // Get particle and info necessary for preprocessing
+    const MCParticle& p = *mcparticles[particleIndex];
+    const ROOT::Math::XYZVector vertex = p.getVertex();
+    const int pdg = p.getPDG();
+    MCParticle* mother = p.getMother();
+    int motherIndex = 0;
+    if (mother) {
+      motherIndex = mother->getArrayIndex();
     }
+
+    // Preprocessing
+    if (p.isInitial() || (vertex.X() >= 10) || (vertex.Y() >= 10) || (vertex.Z() >= 10)) {
+      // Skip initials and decays far outside
+      continue;
+    } else if (pdg == 21 || (std::abs(pdg) <= 5)) {
+      // Skip quarks and gluons, save index to reconstruct non quark-gluon mothers
+      qg_mother_mapping[particleIndex] = motherIndex;
+      continue;
+    }
+
+    // If particle is kept, save new index
+    index_mapping[particleIndex] = newIndex;
+
+    // If first particle, save vertex
+    if (newIndex == 0u) {
+      particle0Properties[0] = p.getProductionTime();
+      particle0Properties[1] = vertex.X();
+      particle0Properties[2] = vertex.Y();
+      particle0Properties[3] = vertex.Z();
+    }
+
+    // Set momentum and vertex 4-vector inputs relative to first particle
+    const ROOT::Math::XYZVector momentum = p.getMomentum();
+    xValues.push_back(p.getProductionTime() - particle0Properties[0]);
+    xValues.push_back(vertex.X() - particle0Properties[1]);
+    xValues.push_back(vertex.Y() - particle0Properties[2]);
+    xValues.push_back(vertex.Z() - particle0Properties[3]);
+    xValues.push_back(p.getEnergy());
+    xValues.push_back(momentum.X());
+    xValues.push_back(momentum.Y());
+    xValues.push_back(momentum.Z());
+
+    // Set mapped PDG code input
+    int pdgMapped = m_pdgMapping[pdg];
+    if (!pdgMapped) {
+      B2WARNING("SmartBkg: Encountered particle with unknown pdg: " << pdg <<
+                ", assigning out-of-distribution value 0 as mapped pdg input.");
+      pdgMapped = 0;
+    }
+    pdgValues.push_back(pdgMapped);
+
+    // Set mother index input
+    while (motherIndex > 0 && (qg_mother_mapping.find(motherIndex) != qg_mother_mapping.end())) {
+      motherIndex = qg_mother_mapping[motherIndex];
+    }
+    if (index_mapping.find(motherIndex) != index_mapping.end()) {
+      motherValues.push_back(index_mapping[motherIndex]);
+    } else {
+      motherValues.push_back(-1);
+    }
+
     ++newIndex;
   }
 
+  // Create input ONNX tensors from the input vectors
+  int numRemainingParticles = pdgValues.size();
+  auto xTensor = MVA::ONNX::Tensor<float>::make_shared(xValues, {numRemainingParticles, 8});
+  auto pdgTensor = MVA::ONNX::Tensor<int32_t>::make_shared(pdgValues, {numRemainingParticles});
+  auto motherTensor = MVA::ONNX::Tensor<int32_t>::make_shared(motherValues, {numRemainingParticles});
+
+  // Set event type input
+  auto cTensor = MVA::ONNX::Tensor<int32_t>::make_shared({});
+  cTensor->at(0) = c_eventtypeMapping.at(m_eventType);
+
+  // Create output tensor
+  auto outputTensor = MVA::ONNX::Tensor<float>::make_shared({static_cast<int64_t>(this->m_skimcodesMapping.size())});
+
   // Perform inference
-  m_session->run({{"x", xTensor}, {"pdg", pdgTensor}, {"mother", motherTensor}, {"mask", maskTensor}, {"c", cTensor}}, {{"output", outputTensor}});
+  m_session->run({{"x", xTensor}, {"pdg", pdgTensor}, {"mother", motherTensor}, {"c", cTensor}}, {{"output", outputTensor}});
 
   // Extract prediction for selected skim
   const uint16_t skimIndex = m_skimcodesMapping[m_skimCode];
   float prediction;
   if (m_activationOverride) {
-    prediction = this->activation(outputTensor->at({0, skimIndex}), m_activationOverrideParams[0], m_activationOverrideParams[1]);
+    prediction = this->activation(outputTensor->at({skimIndex}), m_activationOverrideParams[0], m_activationOverrideParams[1]);
   } else {
     std::vector<float> params = m_paramsMapping[m_skimCode];
-    prediction = this->activation(outputTensor->at({0, skimIndex}), params[0], params[1]);
+    prediction = this->activation(outputTensor->at({skimIndex}), params[0], params[1]);
   }
 
   // Save weight to event meta data / prediction to event extra info

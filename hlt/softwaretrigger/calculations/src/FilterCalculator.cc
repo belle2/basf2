@@ -182,9 +182,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["clusterEPosC"] = NAN; /**< clusterE lab of max p positively charged track GeV */
   calculationResult["dPhiCmsC"] = NAN; /**< delta phi cms of max p positive and negative tracks deg */
 
-  //..Filters lines for HLTprefilter decision
-  calculationResult["HLTprefilter_InjectionStrip"] = 0; /**< Events in the injection strip */
-  calculationResult["HLTprefilter_CDCECLthreshold"] = 0; /**< Events with high CDC-ECL occupancy */
+  //..Filters lines for HLTPrefilter decision
+  calculationResult["Prefilter_InjectionStrip"] = 0; /**< Events in the injection strip */
+  calculationResult["Prefilter_CDCECLthreshold"] = 0; /**< Events with high CDC-ECL occupancy */
 
   // Passed on L1 information
   if (m_l1Trigger.isValid()) {
@@ -1082,11 +1082,11 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   if (index == 1) {
 
     if (m_timingPrefilter.computeDecision()) {
-      calculationResult["HLTprefilter_InjectionStrip"] = 1;
+      calculationResult["Prefilter_InjectionStrip"] = 1;
     }
 
     if (m_cdceclPrefilter.computeDecision()) {
-      calculationResult["HLTprefilter_CDCECLthreshold"] = 1;
+      calculationResult["Prefilter_CDCECLthreshold"] = 1;
     }
   }
 

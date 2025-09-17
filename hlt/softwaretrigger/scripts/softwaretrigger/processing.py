@@ -208,7 +208,7 @@ def add_hlt_processing(path,
     path.add_module('StatisticsSummary').set_name('Sum_Unpackers')
 
     # HLT prefilter
-    path_utils.add_prefilter_module(mode=hlt_prefilter_mode)
+    path_utils.add_prefilter_module(path, condition=hlt_prefilter_mode)
 
     # Build one path for all accepted events...
     accept_path = basf2.Path()

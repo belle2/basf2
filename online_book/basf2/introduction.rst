@@ -227,14 +227,14 @@ We use the word "steering" since no real data **processing** is done in python.
 .. admonition:: Solution
    :class: dropdown solution
 
-     Generally speaking, the heavy data processing tasks are done in C++.
-     This is because of the performance.
-     Python is used as a user-friendly and readable language for configuration.
+   Generally speaking, the heavy data processing tasks are done in C++.
+   This is because of the performance.
+   Python is used as a user-friendly and readable language for configuration.
 
-     .. note::
+   .. note::
 
-         There are some exceptions, some modules are written in python for
-         instance, but they are not very common.
+       There are some exceptions, some modules are written in python for
+       instance, but they are not very common.
 
 Databases
 ~~~~~~~~~
@@ -491,12 +491,12 @@ It is also true that using the latest supported release makes you cool.
 .. admonition:: Solution
    :class: dropdown solution
 
-     1. Go to https://gitlab.desy.de/belle2/software/basf2
-     2. From the left column, click on "Repository" and then "Tags.
-     3. Search for the release tag using the filters.
+   1. Go to https://gitlab.desy.de/belle2/software/basf2
+   2. From the left column, click on "Repository" and then "Tags.
+   3. Search for the release tag using the filters.
 
-     .. image:: introduction/find_a_tag.png
-         :width: 300px
+   .. image:: introduction/find_a_tag.png
+      :width: 300px
 
 A useful command
 ~~~~~~~~~~~~~~~~

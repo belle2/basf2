@@ -230,11 +230,11 @@ results.
 You can now plot some relevant vertex variables. In general, the choice would
 depend on what you need for your analysis. A few examples would include:
 
-   * Vertex position in various coordinates, such as dz and dr.
-   * P-value of the fit.
-   * Resolution of the vertex fit (:math:`\sigma(x)/x`) where x is each of the
-     above variables.
-   * Pull (:math:`(x-x(MC)/\sigma(x)`).
+* Vertex position in various coordinates, such as dz and dr.
+* P-value of the fit.
+* Resolution of the vertex fit (:math:`\sigma(x)/x`) where x is each of the
+  above variables.
+* Pull (:math:`(x-x(MC)/\sigma(x)`).
 
 As an exercise we will focus on the first two.
 

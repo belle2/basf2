@@ -178,9 +178,9 @@ impatient you can also press ``Ctrl-D`` as a shortcut.
 .. seealso::
    :class: dropdown
 
-    One final thing about host keys: After you connected to a server, ssh
-    remembers the host key and will verify it on each connection. So you might
-    see something like this::
+   One final thing about host keys: After you connected to a server, ssh
+   remembers the host key and will verify it on each connection. So you might
+   see something like this::
 
         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
@@ -192,15 +192,15 @@ impatient you can also press ``Ctrl-D`` as a shortcut.
         SHA256:zyIMwlji8jqtD+UuSFuknQmevQPAUCiT39BfH/NrIbA.
         Please contact your system administrator.
 
-    This means the host presented a different key than it used to. This can
-    sometimes happen if the server you want to connect to was reinstalled. So if
-    **you know** that the server was reinstalled or upgraded you can tell ssh to
-    forget the previous host key. For example to forget the host key for
-    ``bastion.desy.de`` just use
+   This means the host presented a different key than it used to. This can
+   sometimes happen if the server you want to connect to was reinstalled. So if
+   **you know** that the server was reinstalled or upgraded you can tell ssh to
+   forget the previous host key. For example to forget the host key for
+   ``bastion.desy.de`` just use
 
-    .. code-block:: bash
+   .. code-block:: bash
 
-        ssh-keygen -R bastion.desy.de
+       ssh-keygen -R bastion.desy.de
 
 .. rubric:: Copying Files
 

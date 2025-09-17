@@ -98,11 +98,11 @@ in Python.
 
 As you should be aware by now, the key concepts of python include:
 
-  * importing libraries that you wish to use
-  * importing and/or storing data in different ways i.e. arrays, lists
-  * writing and using (sometimes pre-defined) functions
-  * writing conditions: if statements, for loops etc.
-  * understanding and using errors to debug
+* importing libraries that you wish to use
+* importing and/or storing data in different ways i.e. arrays, lists
+* writing and using (sometimes pre-defined) functions
+* writing conditions: if statements, for loops etc.
+* understanding and using errors to debug
 
 You should be aware that there are multiple ways of running
 python. Either interactively from your terminal:

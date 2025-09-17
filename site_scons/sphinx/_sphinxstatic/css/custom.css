@@ -21,28 +21,45 @@
 /* Styling specific admonitions */
 /* ---------------------------- */
 
-.xhint .admonition-title, .solution .admonition-title{
-    background: #ffecf3;
-    color: inherit;
-    font-weight: inherit;
+/* Unified styling for exercise/hint/solution boxes, using theme colors */
+.admonition.dropdown.task,
+.admonition.dropdown.exercise,
+.admonition.dropdown.xhint,
+.admonition.dropdown.solution {
+    border-left: 4px solid var(--pst-color-info);
 }
 
+.admonition.dropdown.task > summary.admonition-title,
+.admonition.dropdown.exercise > summary.admonition-title,
+.admonition.dropdown.xhint > summary.admonition-title,
+.admonition.dropdown.solution > summary.admonition-title {
+    background-color: var(--pst-color-info-bg);
+    color: var(--pst-color-info-text);
+    font-weight: 600;
+}
 
-.xhint .admonition-title:before {
-    content: "  ";
+.key-points .admonition-title {
+    background: #f7f0ff;
+}
+
+.key-points {
+    border-left-color: #9c9ff4;
+}
+
+.key-points .admonition-title:before {
+    content: "\f0d7";
     width: 15px;
-    color: #F085B2;
 }
 
-.solution .admonition-title:before {
-    content: "  ";
+.overview p, .overview ul, .overview blockquote {
+    margin-bottom: 5px;
+}
+
+.overview .admonition-title:before, .overview .sidebar-title:before {
+    content: "\f013";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     width: 15px;
-    color: #F085B2;
-}
-
-
-.exercise, .solution, .xhint{
-    border-left-color: #F085B2;
 }
 
 .exercise .admonition-title{

@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Import HLTprefilterParameters payloads
+# Import HLTPrefilterParameters payloads
 
 from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import HLTPrefilterParameters, Database, IntervalOfValidity
@@ -27,11 +27,11 @@ parameters.setHERtimeInBeamCycleMax(2.33)
 parameters.setECLDigitsMax(3300)
 parameters.setCDCHitsMax(2500)
 
-parameters.setHLTPrefilterMode(0)
+parameters.setHLTPrefilterMode(1)
 
 parameters.setHLTPrefilterPrescale(1000)
 
 database = Database.Instance()
 
 iov = IntervalOfValidity(0, 0, -1, -1)
-database.storeData('HLTprefilterParameters', parameters, iov)
+database.storeData('HLTPrefilterParameters', parameters, iov)

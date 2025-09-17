@@ -3,7 +3,7 @@
 A simple python module
 =======================
 
-. sidebar:: Overview
+.. sidebar:: Overview
     :class: overview
 
     **Length**: 30-45 min

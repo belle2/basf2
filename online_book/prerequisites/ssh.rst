@@ -237,7 +237,7 @@ directory on ``bastion.desy.de``.
 .. admonition:: Exercise
    :class: exercise
 
-   Copy a file from your home directory on ``bastion.desy.de`` to you local
+   Copy a file from your home directory on ``bastion.desy.de`` to your local
    directory
 
 

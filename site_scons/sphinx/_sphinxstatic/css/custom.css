@@ -62,21 +62,50 @@
     width: 15px;
 }
 
-.exercise .admonition-title{
-    background: #ffecf3;
+/* Admonition stacking for QA groups */
+/* --------------------------------- */
+
+/* QUESTION: start of the group, no margin below */
+.admonition.exercise.stacked,
+.admonition.hint.stacked {
+  margin-bottom: 0;
+  border-radius: 0; /* square when stacked inside a group */
 }
 
-
-.key-points .admonition-title{
-    background: #f7f0ff;
+/* HINT(S): appear in the middle, no top/bottom margin, square edges */
+.admonition.xhint {
+  margin-top: 0;
+  margin-bottom: 0;
+  border-radius: 0;
+  border-top: none;   /* merge into previous */
 }
 
-.key-points {
-    border-left-color: #9c9ff4;
+/* SOLUTION: bottom of the group, flush to hints/exercise */
+.admonition.solution {
+  margin-top: 0;
+  margin-bottom: 1rem;  /* gap after the whole block */
+  border-radius: 0;
+  border-top: none;
 }
 
-.overview p, .overview ul, .overview blockquote {
-    margin-bottom: 5px;
+/* Rounded corners:
+   - The very first Question gets top rounding
+   - The final Solution gets bottom rounding */
+.admonition.exercise.stacked:first-of-type,
+.admonition.hint.stacked:first-of-type {
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+}
+.admonition.solution {
+  border-bottom-left-radius: .25rem;
+  border-bottom-right-radius: .25rem;
+}
+
+/* Prevent double borders if multiple hints/solutions in a row */
+.admonition.xhint + .admonition.xhint,
+.admonition.xhint + .admonition.solution,
+.admonition.solution + .admonition.solution {
+  border-top: none;
 }
 
 /* Admonition toggle: support BOTH toggle systems
@@ -105,15 +134,21 @@
   padding-bottom: 0 !important;
 }
 
-/* Stacking boxes */
-/* -------------- */
+/* Stack consecutive standard hints */
+/* -------------------------------- */
 
-.stacked {
-    margin-bottom: -24px;
+/* When one stacked hint follows another, merge seamlessly */
+.admonition.hint.stacked + .admonition.hint.stacked {
+  margin-top: 0;        /* no extra space between them */
+  border-top: none;     /* remove double border */
 }
 
-.stacked .admonition {
-    margin-bottom: -24px;
+/* Rounded corners:
+   - First stacked hint gets rounded top corners
+   - Last stacked hint gets rounded bottom corners */
+.admonition.hint.stacked:last-of-type {
+  border-bottom-left-radius: .25rem;
+  border-bottom-right-radius: .25rem;
 }
 
 /* Textbox that looks like the ROOT TEve GUI */

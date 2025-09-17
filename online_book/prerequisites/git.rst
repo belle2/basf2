@@ -33,16 +33,22 @@ notes, documents, code over time.
 Sometimes the changes will be wrong and we need to fix these errors. Sometimes
 we might get feedback to a specific version of our paper but we might have
 changed this part already and we need to figure out what still applies. And
-sometimes we might get an email like this
+sometimes we might get an email like this:
 
-    Hi,
+.. raw:: html
 
-    2 years ago you presented This Thing™ at That Meeting™ and I'm trying to do
-    the same, could you send me the script you used back then?
+   <div class="clear"></div>
 
-    Best Regards,
+.. epigraph::
 
-    -- Poor Student
+   Hi,
+
+   2 years ago you presented This Thing™ at That Meeting™ and I'm trying to do
+   the same, could you send me the script you used back then?
+
+   Best Regards,
+
+   -- Poor Student
 
 Now one way to achieve this would maybe be to keep all old versions manually,
 either in the same file but commented out like this:

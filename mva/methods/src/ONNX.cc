@@ -59,12 +59,72 @@ void Session::run(const std::vector<const char*>& inputNames,
                  outputNames.data(), outputs.data(), outputs.size());
 }
 
+void ONNXOptions::load(const boost::property_tree::ptree& pt)
+{
+  m_outputName = pt.get<std::string>("ONNX_outputName", "output");
+}
+
+void ONNXOptions::save(boost::property_tree::ptree& pt) const
+{
+  pt.put("ONNX_outputName", m_outputName);
+}
+
+void ONNXExpert::configureInputOutputNames()
+{
+  const auto& inputNames = m_session->getOrtSession().GetInputNames();
+  const auto& outputNames = m_session->getOrtSession().GetOutputNames();
+
+  // Check if we have a single input model and set the input name to that
+  if (inputNames.size() != 1) {
+    std::stringstream msg;
+    msg << "Model has multiple inputs: ";
+    for (auto name : inputNames)
+      msg << "\"" << name << "\" ";
+    msg << "- only single-input models are supported.";
+    B2FATAL(msg.str());
+  }
+  m_inputName = inputNames[0];
+
+  m_outputName = m_specific_options.m_outputName;
+
+  // For single-output models we just take the name of that single output
+  if (outputNames.size() == 1) {
+    if (!m_outputName.empty() && m_outputName != outputNames[0]) {
+      B2INFO("Output name of the model is "
+             << outputNames[0]
+             << " - will use that despite the configured name being \""
+             << m_outputName << "\"");
+    }
+    m_outputName = outputNames[0];
+    return;
+  }
+
+  // Otherwise we have a multiple-output model and need to check if the
+  // configured output name, or the fallback value "output", exists
+  if (m_outputName.empty()) {
+    m_outputName = "output";
+  }
+  auto outputFound = std::find(outputNames.begin(), outputNames.end(),
+                               m_outputName) != outputNames.end();
+  if (!outputFound) {
+    std::stringstream msg;
+    msg << "No output named \"" << m_outputName << "\" found. Instead got ";
+    for (auto name : outputNames)
+      msg << "\"" << name << "\" ";
+    msg << "- either change your model to contain one named \"" << m_outputName
+        << "\" or set `m_outputName` in the specific options to one of the available names.";
+    B2FATAL(msg.str());
+  }
+}
+
 void ONNXExpert::load(Weightfile& weightfile)
 {
   std::string onnxModelFileName = weightfile.generateFileName();
   weightfile.getFile("ONNX_Modelfile", onnxModelFileName);
   weightfile.getOptions(m_general_options);
+  weightfile.getOptions(m_specific_options);
   m_session = std::make_unique<Session>(onnxModelFileName.c_str());
+  configureInputOutputNames();
 }
 
 std::vector<float> ONNXExpert::apply(Dataset& testData) const
@@ -78,7 +138,7 @@ std::vector<float> ONNXExpert::apply(Dataset& testData) const
   for (unsigned int iEvent = 0; iEvent < nEvents; ++iEvent) {
     testData.loadEvent(iEvent);
     input->setValues(testData.m_input);
-    m_session->run({{"input", input}}, {{"output", output}});
+    m_session->run({{m_inputName, input}}, {{m_outputName, output}});
     result.push_back(output->at(0));
   }
   return result;
@@ -95,7 +155,7 @@ std::vector<std::vector<float>> ONNXExpert::applyMulticlass(Dataset& testData) c
   for (unsigned int iEvent = 0; iEvent < nEvents; ++iEvent) {
     testData.loadEvent(iEvent);
     input->setValues(testData.m_input);
-    m_session->run({{"input", input}}, {{"output", output}});
+    m_session->run({{m_inputName, input}}, {{m_outputName, output}});
     for (unsigned int iClass = 0; iClass < nClasses; ++iClass) {
       result[iEvent][iClass] = output->at(iClass);
     }

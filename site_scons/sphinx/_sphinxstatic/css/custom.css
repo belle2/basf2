@@ -7,50 +7,6 @@
     margin-bottom: 0 !important;
 }
 
-/* Disable rounded borders for all boxes, because it doesn't look nice when
- * we stack them on top of each other */
-.admonition {
-    border-radius: 0px;
-}
-
-/* Getting things to toggle, e.g. for solution boxes */
-/* ------------------------------------------------- */
-
-.toggle {
-    padding: 12px;
-    line-height: 24px;
-    margin-bottom: 24px;
-}
-
-.toggle .admonition-title {
-    display: block;
-    clear: both;
-    cursor: pointer;
-}
-
-.toggle .admonition-title {
-    display: block;
-    clear: both;
-    /* Avoid that there is a bit of the box that will be expanded
-    later showing */
-    margin-bottom: -12px;
-}
-
-.toggle .admonition-title + * {
-    /* Since we set the admonition-title to have -12px margin, we need to
-    balance this for its first sibling here. */
-    margin-top: 24px;
-}
-
-.toggle .admonition-title:after {
-    content: " ▼";
-}
-
-.toggle .admonition-title.open:after {
-    content: " ▶";
-}
-
-
 /* Workaround for sidebar issues, especially together with toggle buttons:
    If we place toggle admonition next to a sidebar, the layout will be messed
    up. By adding this class to the admonition box (if it's an exercise-solution
@@ -106,22 +62,30 @@
     margin-bottom: 5px;
 }
 
+/* Admonition toggle: support BOTH toggle systems
+   (old sphinx-togglebutton + newer <details> markup)
+*/
 
-.overview .admonition-title:before, .overview .sidebar-title:before {
-    content: "  ";
-    font-family: FontAwesome;
-    width: 15px;
+/* --- Old sphinx-togglebutton system ---
+   Hide everything except the title when .toggle-hidden is active */
+.admonition.toggle.toggle-hidden > *:not(.admonition-title) {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.exercise .admonition-title:before {
-    content: "  ";
-    width: 15px;
-    color: #F085B2;
+/* --- New <details> / <summary> system ---
+   By default <summary> is visible, collapse body when [open] missing */
+.admonition.dropdown:not([open]) > .admonition-body {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.key-points .admonition-title:before {
-    content: " ";
-    width: 15px;
+/* Optional polish: remove bottom margin leakage from last child in closed state */
+.admonition.dropdown:not([open]) .admonition-body > *:last-child {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 /* Stacking boxes */

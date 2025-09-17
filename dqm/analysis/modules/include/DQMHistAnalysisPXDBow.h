@@ -11,9 +11,6 @@
 #include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <TH1F.h>
-#include <TCanvas.h>
-
 namespace Belle2 {
   /*! Module to monitor the PXD bowing*/
 

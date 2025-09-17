@@ -11,7 +11,6 @@
 #include <tracking/dbobjects/ROICalculationParameters.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <TString.h>
 using namespace Belle2;
 
 //-----------------------------------------------------------------

@@ -115,10 +115,10 @@ void SmartBackgroundModule::event()
   StoreArray<MCParticle> mcparticles;
   const int numParticles = mcparticles.getEntries();
 
-  // Define vectors to hold preprocessed input data
-  std::vector<float> xValues;
-  std::vector<int> pdgValues;
-  std::vector<int> motherValues;
+  // Clear vectors that hold preprocessed input data
+  m_xValues.resize(0);
+  m_pdgValues.resize(0);
+  m_motherValues.resize(0);
 
   // New 0-based index of particles after preprocessing removes some particles
   unsigned int newIndex = 0;
@@ -163,14 +163,14 @@ void SmartBackgroundModule::event()
 
     // Set momentum and vertex 4-vector inputs relative to first particle
     const ROOT::Math::XYZVector momentum = p.getMomentum();
-    xValues.push_back(p.getProductionTime() - particle0Properties[0]);
-    xValues.push_back(vertex.X() - particle0Properties[1]);
-    xValues.push_back(vertex.Y() - particle0Properties[2]);
-    xValues.push_back(vertex.Z() - particle0Properties[3]);
-    xValues.push_back(p.getEnergy());
-    xValues.push_back(momentum.X());
-    xValues.push_back(momentum.Y());
-    xValues.push_back(momentum.Z());
+    m_xValues.push_back(p.getProductionTime() - particle0Properties[0]);
+    m_xValues.push_back(vertex.X() - particle0Properties[1]);
+    m_xValues.push_back(vertex.Y() - particle0Properties[2]);
+    m_xValues.push_back(vertex.Z() - particle0Properties[3]);
+    m_xValues.push_back(p.getEnergy());
+    m_xValues.push_back(momentum.X());
+    m_xValues.push_back(momentum.Y());
+    m_xValues.push_back(momentum.Z());
 
     // Set mapped PDG code input
     int pdgMapped = m_pdgMapping[pdg];
@@ -179,26 +179,26 @@ void SmartBackgroundModule::event()
                 ", assigning out-of-distribution value 0 as mapped pdg input.");
       pdgMapped = 0;
     }
-    pdgValues.push_back(pdgMapped);
+    m_pdgValues.push_back(pdgMapped);
 
     // Set mother index input
     while (motherIndex > 0 && (qg_mother_mapping.find(motherIndex) != qg_mother_mapping.end())) {
       motherIndex = qg_mother_mapping[motherIndex];
     }
     if (index_mapping.find(motherIndex) != index_mapping.end()) {
-      motherValues.push_back(index_mapping[motherIndex]);
+      m_motherValues.push_back(index_mapping[motherIndex]);
     } else {
-      motherValues.push_back(-1);
+      m_motherValues.push_back(-1);
     }
 
     ++newIndex;
   }
 
   // Create input ONNX tensors from the input vectors
-  int numRemainingParticles = pdgValues.size();
-  auto xTensor = MVA::ONNX::Tensor<float>::make_shared(xValues, {numRemainingParticles, 8});
-  auto pdgTensor = MVA::ONNX::Tensor<int32_t>::make_shared(pdgValues, {numRemainingParticles});
-  auto motherTensor = MVA::ONNX::Tensor<int32_t>::make_shared(motherValues, {numRemainingParticles});
+  int numRemainingParticles = m_pdgValues.size();
+  auto xTensor = MVA::ONNX::Tensor<float>::make_shared(m_xValues, {numRemainingParticles, 8});
+  auto pdgTensor = MVA::ONNX::Tensor<int32_t>::make_shared(m_pdgValues, {numRemainingParticles});
+  auto motherTensor = MVA::ONNX::Tensor<int32_t>::make_shared(m_motherValues, {numRemainingParticles});
 
   // Set event type input
   auto cTensor = MVA::ONNX::Tensor<int32_t>::make_shared({});

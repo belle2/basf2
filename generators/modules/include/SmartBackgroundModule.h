@@ -87,6 +87,21 @@ namespace Belle2 {
     std::vector<float> m_activationOverrideParams;
 
     /**
+     * Vector to store x inputs of model.
+     */
+    std::vector<float> m_xValues;
+
+    /**
+     * Vector to store pdg inputs of model.
+     */
+    std::vector<int> m_pdgValues;
+
+    /**
+     * Vector to store mother index inputs of model.
+     */
+    std::vector<int> m_motherValues;
+
+    /**
      * Skim code (module parameter)
      */
     int m_skimCode;

@@ -917,8 +917,8 @@ always 0 or 1 with newer versions of ECL reconstruction.
 
 Returns NaN if called for something other than a track-based particle.
     )DOC");
-    REGISTER_VARIABLE("helixExtTheta(radius [cm], z fwd [cm], z bwd [cm], useHighestProbMass=0)", trackHelixExtTheta,
-                      R"DOC(Returns theta of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will
+    REGISTER_VARIABLE("helixExtTheta(radius [cm], z fwd [cm], z bwd [cm], useHighestProbMass=0)", trackHelixExtTheta, R"DOC(
+                      Returns theta of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will
                       use the track fit result for the mass hypothesis with the highest pValue.
 
                       )DOC", "rad");
@@ -926,21 +926,21 @@ Returns NaN if called for something other than a track-based particle.
                       "Returns phi of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.\n\n",
                       "rad");
 
-    REGISTER_METAVARIABLE("helixExtThetaOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtThetaOnDet,
-                          R"DOC(Returns theta of extrapolated helix parameters on the given detector surface. The unit of angle is ``rad``.
+    REGISTER_METAVARIABLE("helixExtThetaOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtThetaOnDet, R"DOC(
+                          Returns theta of extrapolated helix parameters on the given detector surface. The unit of angle is ``rad``.
                           If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.
                           The supported detector surface names are ``{'CDC', 'TOP', 'ARICH', 'ECL', 'KLM'}``.
                           Also, the detector name with number of meaningful-layer is supported, e.g. ``'CDC8'``: last superlayer of CDC, ``'ECL1'``: mid-point of ECL.
 
-                          ..note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
+                          .. note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
                           )DOC", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("helixExtPhiOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtPhiOnDet,
-                          R"DOC(Returns phi of extrapolated helix parameters on the given detector surface. The unit of angle is ``rad``.
+    REGISTER_METAVARIABLE("helixExtPhiOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtPhiOnDet, R"DOC(
+                          Returns phi of extrapolated helix parameters on the given detector surface. The unit of angle is ``rad``.
                           If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.
                           The supported detector surface names are ``{'CDC', 'TOP', 'ARICH', 'ECL', 'KLM'}``.
                           Also, the detector name with number of meaningful-layer is supported, e.g. ``'CDC8'``: last superlayer of CDC, ``'ECL1'``: mid-point of ECL.
 
-                          ..note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
+                          .. note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
                           )DOC", Manager::VariableDataType::c_double);
 
 

@@ -1166,9 +1166,8 @@ namespace Belle2 {
                       "proton identification probability defined as :math:`\\mathcal{L}_p/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
     REGISTER_VARIABLE("deuteronID", deuteronID,
                       "deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
-    REGISTER_METAVARIABLE("binaryPID(pdgCode1, pdgCode2)", binaryPID,
-                          "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("binaryPID(pdgCode1, pdgCode2)", binaryPID,
+                      "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components");
     REGISTER_METAVARIABLE("pidChargedBDTScore(pdgCodeHyp, detector)", pidChargedBDTScore,
                           "Returns the charged Pid BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses. The second argument specifies which BDT training to use: based on 'ALL' PID detectors (NB: 'SVD' is currently excluded), or 'ECL' only. The choice depends on the ChargedPidMVAMulticlassModule's configuration. **Note:** this PID score for electrons was not trained against protons for release 5 and 6.",
                           Manager::VariableDataType::c_double);
@@ -1199,26 +1198,22 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
                       "**(SPECIAL (TEMP) variable)** proton identification probability defined as :math:`\\mathcal{L}_p/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors *excluding the SVD*");
     REGISTER_VARIABLE("deuteronID_noSVD", deuteronID_noSVD,
                       "**(SPECIAL (TEMP) variable)** deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors *excluding the SVD*");
-    REGISTER_METAVARIABLE("binaryPID_noSVD(pdgCode1, pdgCode2)", binaryPID_noSVD,
-                          "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the SVD*.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("binaryPID_noSVD(pdgCode1, pdgCode2)", binaryPID_noSVD,
+                      "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the SVD*.");
     REGISTER_VARIABLE("electronID_noTOP", electronID_noTOP,
                       "**(SPECIAL (TEMP) variable)** electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors *excluding the TOP*. *NB:* this variable must be used in place of `electronID` when analysing data (MC) processed (simulated) in *release 6*");
-    REGISTER_METAVARIABLE("binaryElectronID_noTOP(pdgCodeTest)", binaryElectronID_noTOP,
-                          "**(SPECIAL (TEMP) variable)** Returns the binary probability for the electron mass hypothesis with respect to another mass hypothesis using all detector components, *excluding the TOP*. *NB:* this variable must be used in place of `binaryPID` (``pdgCode1=11``) when analysing data (MC) processed (simulated) in **release 6**",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("binaryElectronID_noTOP(pdgCodeTest)", binaryElectronID_noTOP,
+                      "**(SPECIAL (TEMP) variable)** Returns the binary probability for the electron mass hypothesis with respect to another mass hypothesis using all detector components, *excluding the TOP*. *NB:* this variable must be used in place of `binaryPID` (``pdgCode1=11``) when analysing data (MC) processed (simulated) in **release 6**");
     REGISTER_VARIABLE("electronID_noSVD_noTOP", electronID_noSVD_noTOP,
                       "**(SPECIAL (TEMP) variable)** electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors *excluding the SVD and the TOP*. *NB:* this variable must be used in place of `electronID` when analysing data (MC) processed (simulated) in *release 5*");
-    REGISTER_METAVARIABLE("binaryElectronID_noSVD_noTOP(pdgCodeTest)", binaryElectronID_noSVD_noTOP,
-                          "**(SPECIAL (TEMP) variable)** Returns the binary probability for the electron mass hypothesis with respect to another mass hypothesis using all detector components, *excluding the SVD and the TOP*. *NB:* this variable must be used in place of `binaryPID` (``pdgCode1=11``) when analysing data (MC) processed (simulated) in **release 5**",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("binaryElectronID_noSVD_noTOP(pdgCodeTest)", binaryElectronID_noSVD_noTOP,
+                      "**(SPECIAL (TEMP) variable)** Returns the binary probability for the electron mass hypothesis with respect to another mass hypothesis using all detector components, *excluding the SVD and the TOP*. *NB:* this variable must be used in place of `binaryPID` (``pdgCode1=11``) when analysing data (MC) processed (simulated) in **release 5**");
     REGISTER_VARIABLE("pionID_noARICHwoECL", pionID_noARICHwoECL,
                       "**(SPECIAL (TEMP) variable)** pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors but ARICH info excluded for tracks without associated ECL cluster");
     REGISTER_VARIABLE("kaonID_noARICHwoECL", kaonID_noARICHwoECL,
                       "**(SPECIAL (TEMP) variable)** kaon identification probability defined as :math:`\\mathcal{L}_K/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors but ARICH info excluded for tracks without associated ECL cluster");
-    REGISTER_METAVARIABLE("binaryPID_noARICHwoECL(pdgCode1, pdgCode2)", binaryPID_noARICHwoECL,
-                          "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, but ARICH info excluded for tracks without associated ECL cluster",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("binaryPID_noARICHwoECL(pdgCode1, pdgCode2)", binaryPID_noARICHwoECL,
+                      "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, but ARICH info excluded for tracks without associated ECL cluster");
 
 
     REGISTER_METAVARIABLE("weightedElectronID(weightMatrixName)", weightedElectronID,
@@ -1362,13 +1357,14 @@ following the order shown in the metavariable's declaration. Flat priors are ass
 
     // B2BII PID
     VARIABLE_GROUP("Belle PID variables");
-    REGISTER_METAVARIABLE("atcPIDBelle(i,j)", atcPIDBelle, R"DOC(
+    REGISTER_VARIABLE("atcPIDBelle(i,j)", atcPIDBelle, R"DOC(
 [Legacy] Returns Belle's PID atc variable: ``atc_pid(3,1,5,i,j).prob()``.
 Parameters i,j are signal and background hypothesis: (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)
 Returns 0.5 in case there is no likelihood found and a factor of 0.5 will appear in the product if any of the subdetectors don't report a likelihood (Belle behaviour).
 
 .. warning:: The behaviour is different from Belle II PID variables which typically return NaN in case of error.
-    )DOC", Manager::VariableDataType::c_double);
+
+    )DOC");
     REGISTER_VARIABLE("muIDBelle", muIDBelle, R"DOC(
 [Legacy] Returns Belle's PID ``Muon_likelihood()`` variable.
 Returns 0.5 in case there is no likelihood found and returns zero if the muon likelihood is not usable (Belle behaviour).

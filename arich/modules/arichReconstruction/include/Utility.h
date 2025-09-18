@@ -56,7 +56,7 @@ namespace Belle2 {
     //! Returns expected emission angle of Cherenkov photon, emitted by particle
     /*!
       \param p momentum of particle
-      \param m particles mass
+      \param mass particles mass
       \param refind medium refractive index
      */
     double  ExpectedCherenkovAngle(double p, double mass, double refind);

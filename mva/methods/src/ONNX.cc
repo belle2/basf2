@@ -149,12 +149,9 @@ void ONNXExpert::load(Weightfile& weightfile)
 
 std::vector<float> ONNXExpert::apply(Dataset& testData) const
 {
-  auto nFeatures = testData.getNumberOfFeatures();
-  auto nEvents = testData.getNumberOfEvents();
-  int nOutputs = 1;
-  if (m_outputValueIndex == 1) {
-    nOutputs = 2;
-  }
+  const auto nFeatures = testData.getNumberOfFeatures();
+  const auto nEvents = testData.getNumberOfEvents();
+  const int nOutputs = (m_outputValueIndex == 1) ? 2 : 1;
   auto input = Tensor<float>::make_shared({1, nFeatures});
   auto output = Tensor<float>::make_shared({1, nOutputs});
   std::vector<float> result;
@@ -170,9 +167,9 @@ std::vector<float> ONNXExpert::apply(Dataset& testData) const
 
 std::vector<std::vector<float>> ONNXExpert::applyMulticlass(Dataset& testData) const
 {
-  unsigned int nClasses = m_general_options.m_nClasses;
-  auto nFeatures = testData.getNumberOfFeatures();
-  auto nEvents = testData.getNumberOfEvents();
+  const unsigned int nClasses = m_general_options.m_nClasses;
+  const auto nFeatures = testData.getNumberOfFeatures();
+  const auto nEvents = testData.getNumberOfEvents();
   auto input = Tensor<float>::make_shared({1, nFeatures});
   auto output = Tensor<float>::make_shared({1, nClasses});
   std::vector<std::vector<float>> result(nEvents, std::vector<float>(nClasses));

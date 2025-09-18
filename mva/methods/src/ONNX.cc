@@ -117,6 +117,25 @@ void ONNXExpert::configureInputOutputNames()
   }
 }
 
+void ONNXExpert::configureOutputValueIndex()
+{
+  int tensorIndex = 0;
+  for (auto name : m_session->getOrtSession().GetOutputNames()) {
+    if (name == m_outputName)
+      break;
+    ++tensorIndex;
+  }
+  auto typeInfo = m_session->getOrtSession().GetOutputTypeInfo(tensorIndex);
+  auto shape = typeInfo.GetTensorTypeAndShapeInfo().GetShape();
+  if (shape.back() == 2) {
+    // We have 2 output values - configure to use index 1 in non-multiclass mode
+    m_outputValueIndex = 1;
+  } else {
+    // otherwise use the default of 0
+    m_outputValueIndex = 0;
+  }
+}
+
 void ONNXExpert::load(Weightfile& weightfile)
 {
   std::string onnxModelFileName = weightfile.generateFileName();
@@ -125,21 +144,26 @@ void ONNXExpert::load(Weightfile& weightfile)
   weightfile.getOptions(m_specific_options);
   m_session = std::make_unique<Session>(onnxModelFileName.c_str());
   configureInputOutputNames();
+  configureOutputValueIndex();
 }
 
 std::vector<float> ONNXExpert::apply(Dataset& testData) const
 {
   auto nFeatures = testData.getNumberOfFeatures();
   auto nEvents = testData.getNumberOfEvents();
+  int nOutputs = 1;
+  if (m_outputValueIndex == 1) {
+    nOutputs = 2;
+  }
   auto input = Tensor<float>::make_shared({1, nFeatures});
-  auto output = Tensor<float>::make_shared({1, 1});
+  auto output = Tensor<float>::make_shared({1, nOutputs});
   std::vector<float> result;
   result.reserve(nEvents);
   for (unsigned int iEvent = 0; iEvent < nEvents; ++iEvent) {
     testData.loadEvent(iEvent);
     input->setValues(testData.m_input);
     m_session->run({{m_inputName, input}}, {{m_outputName, output}});
-    result.push_back(output->at(0));
+    result.push_back(output->at(m_outputValueIndex));
   }
   return result;
 }

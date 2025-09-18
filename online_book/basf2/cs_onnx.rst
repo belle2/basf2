@@ -159,7 +159,6 @@ Now, to be able to run inference for this model within basf2 we have to convert 
     import skl2onnx
     from skl2onnx.common.data_types import FloatTensorType
 
-    options = {id(bdt): {'zipmap': False}}
     bdt_onnx = skl2onnx.convert_sklearn(
         bdt,
         initial_types=[("input", FloatTensorType([None, len(variables)]))],

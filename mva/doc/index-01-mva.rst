@@ -10,7 +10,8 @@ Overview
 
 .. _overview_mva_package:
 
-.. figure:: figs/overview_mva_package.png
+.. figure:: figs/overview_mva_package.svg
+  :scale: 200 %
 
 Main goals
 ^^^^^^^^^^
@@ -85,6 +86,21 @@ is the default method used in ``basf2``.
 It provides a good out-of-the-box performance, is robust against over-fitting and fast in training and application.
 It only supports classification and there are only a few parameters and features, hence it has less pitfalls than other methods and as a starting point this is a good choice.
 
+ONNX
+^^^^
+
+This interface **only supports inference** (and with that, also evaluation). Training schemes evolve fast and are highly dependent on the application, so it's best to run them in a standalone setup, typically in python using ML frameworks outside of basf2. For all major frameworks (e.g. scikit-learn, xgboost, lightgbm, torch, tensorflow, jax, ...) `converters exist <https://onnx.ai/onnx/intro/converters.html>`__. ONNX models represent the model as a graph of predefined operations. Within basf2 they will be executed using the c++ interface to onnxruntime. These models are backwards compatible via versioned opsets, so `should still run <https://onnxruntime.ai/docs/reference/compatibility.html>`__ if onnxruntime is upgraded in the future to a newer version. The ONNX MVA method is well suited for running inference using the MVAExpert module. See the :ref:`online_book_cs_onnx` for an example.
+
+The requirements for models executed in the ONNX mva method are:
+
+- there has to be a **single input tensor** of shape ``(?, n_variables)``
+- if there are multiple **output tensors**, one has to be called "output" or the name configured via ``m_outputName`` in the ``ONNXOptions``.
+- **binary classifiers** (and regression models) are supported for outputs of either shape ``(?, 1)`` or ``(?, 2)``. If there are 2 outputs, the second one (index 1) will be taken.
+- **multi-class classifiers** can have an arbitrary number of outputs (shape ``(?, nClasses)``) where ``m_nClasses`` has to be configured in the general options.
+- the dimension labelled ``?`` either has to be dynamic or 1
+
+If models need extra **pre- or postprocessing** steps they **have to be implemented within the ONNX model**. If either managing pre- or postprocessing within the ONNX model, or the application via the MVAExpert (using predefined variables) is not feasible in your application there is also a standalone c++ interface via :doxygen:`Belle2::MVA::ONNX::Session <classBelle2_1_1MVA_1_1ONNX_1_1Session>` which should be used in these cases for implementing a custom c++ module.
+
 TMVA
 ^^^^
 
@@ -110,7 +126,8 @@ However, NeuroBayes is a commercial product and is no longer supported by the co
 Python-based
 ^^^^^^^^^^^^
 
-All frameworks which provide a python interface are supported. XGBoost, LightGBM, SKLearn, Tensorflow, Keras and PyTorch are included in the externals and mva methods using these frameworks can be trained and applied without additional setup. For details on which version of these packages and which related packages (e.g. PyTorch Geometric) are available please refer to the documentation of the externals. It is possible to use alternate python-based frameworks locally by installing them using pip3. Mva methods which use a framework that is not included in the externals cannot be used on the grid. It is possible to include these other frameworks in the externals as well i.e. to ship them with ``basf2``, but you will have to give a good justification for this.
+The recommended way to apply inference in basf2 when using arbitrary python frameworks is ONNX. As an alternative there is the MVA python method that allows hooking into arbitrary python code from within basf2. The code for this is defined by steering files which are serialized into the weightfile. However, weightfiles created with this method are difficult to maintain as the python code in the serialized steering files may not be backwards compatible to future changes and is cumbersome to change later. Also the serialization formats for models in various python frameworks are often not stable (e.g. TensorFlow has changed this often in the past) and introduce further breaking of backwards compatibility. The python-based method is still supported, but for new projects and also when fixing broken payloads, consider moving to ONNX.
+
 
 Using the mva package
 ---------------------

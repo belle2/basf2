@@ -1,3 +1,5 @@
+.. _online_book_cs_onnx:
+
 ONNX MVA tutorial
 =================
 

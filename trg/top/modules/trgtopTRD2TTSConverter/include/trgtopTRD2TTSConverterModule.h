@@ -5,24 +5,23 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef TRGTOPTRD2TTSCONVERTER_H
-#define TRGTOPTRD2TTSCONVERTER_H
 
-//#pragma once
+#pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <string>
 
-#include "trg/top/dataobjects/TRGTOPTimeStampsSlot.h"
-#include "top/dataobjects/TOPDigit.h"
-#include "top/dataobjects/TOPRawDigit.h"
-
-#include <framework/datastore/StoreArray.h>
 
 #define NUMBER_OF_TOP_SLOTS 16
 #define MIN_NUMBER_OF_TIMESTAMPS 5
 
 namespace Belle2 {
+  class TOPDigit;
+  class TOPRawDigit;
+  class TRGTOPTimeStampsSlot;
+  class TRGTOPTimeStamp;
+
   /**
   * TRG TOP Raw Digits to TimeStamps Converter
   *
@@ -119,5 +118,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif

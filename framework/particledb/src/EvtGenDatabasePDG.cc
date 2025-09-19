@@ -182,10 +182,12 @@ void EvtGenDatabasePDG::WriteEvtGenTable(std::ostream& out)
 {
   const double c_mm_per_s = Const::speedOfLight / (Unit::mm / Unit::s);
   if (fParticleList) {
-    for (TObject* obj : *fParticleList) {
-      auto* part = dynamic_cast<EvtGenParticlePDG*>(obj);
+    for (TObject* object : *fParticleList) {
+      auto* part = dynamic_cast<EvtGenParticlePDG*>(object);
       if (!part) {
-        B2FATAL("EvtGenDatabasePDG::WriteEvtgenTable: Particle does not inherit from EventGenParticlePDG");
+        B2FATAL("EvtGenDatabasePDG::WriteEvtgenTable: Particle "
+                << object->GetName() <<
+                " does not inherit from EventGenParticlePDG");
       }
       out << "add p Particle " << part->GetName() << " " << part->PdgCode()
           << " " << std::scientific << std::setprecision(7) << part->Mass()
@@ -218,7 +220,9 @@ bool EvtGenDatabasePDG::testParticleData()
   for (TObject* object : *fParticleList) {
     EvtGenParticlePDG* particle = dynamic_cast<EvtGenParticlePDG*>(object);
     if (!particle) {
-      B2FATAL("EvtGenDatabasePDG::WriteEvtgenTable: Particle does not inherit from EventGenParticlePDG");
+      B2FATAL("EvtGenDatabasePDG::testParticleData: Particle"
+              << object->GetName() <<
+              " does not inherit from EventGenParticlePDG.");
     }
     /*
      * Check width and mass range. The mass range in EvtGen is

@@ -62,11 +62,28 @@ void Session::run(const std::vector<const char*>& inputNames,
 void ONNXOptions::load(const boost::property_tree::ptree& pt)
 {
   m_outputName = pt.get<std::string>("ONNX_outputName", "output");
+  m_modelFilename = pt.get<std::string>("ONNX_modelFilename", "model.onnx");
 }
 
 void ONNXOptions::save(boost::property_tree::ptree& pt) const
 {
   pt.put("ONNX_outputName", m_outputName);
+  pt.put("ONNX_modelFilename", m_modelFilename);
+}
+
+Weightfile ONNXTeacher::train(Dataset&) const
+{
+  B2WARNING("The ONNX interface does not perform any training - "
+            "the train method just stores an existing ONNX model into an MVA weightfile.");
+  if (m_specific_options.m_modelFilename.empty()) {
+    B2FATAL("You have to provide a path to an ONNX model "
+            "via `m_modelFilename` in the specific options");
+  }
+  Weightfile weightfile;
+  weightfile.addOptions(m_general_options);
+  weightfile.addOptions(m_specific_options);
+  weightfile.addFile("ONNX_Modelfile", m_specific_options.m_modelFilename);
+  return weightfile;
 }
 
 void ONNXExpert::configureInputOutputNames()

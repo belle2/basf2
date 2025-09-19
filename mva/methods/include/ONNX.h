@@ -401,30 +401,39 @@ namespace Belle2 {
        * outputs there is one called "output", it will be used automatically.
        */
       std::string m_outputName;
+
+      /**
+       * Filename of the model. Is used in ONNXTeacher::train as a path to the
+       * ONNX model to store in the weightfile.
+       */
+      std::string m_modelFilename;
     };
 
     /**
      * Teacher for the ONNX MVA method.
-     * Just there to satisfy the interface - doesn't do anything
+     * Just there to satisfy the interface - doesn't do any training
      */
     class ONNXTeacher : public Teacher {
 
     public:
       /**
-       * Constructs a new teacher using the GeneralOptions and specific options of
-       * this training
-       * @param general_options defining all shared options
+       * Constructs a new teacher using the GeneralOptions and specific options of this training
+       *
+       * @param generalOptions defining all shared options
+       * @param onnxOptions defining all method specific options
        */
-      ONNXTeacher(const GeneralOptions& general_options,
-                  const ONNXOptions&) : Teacher(general_options) {}
+      ONNXTeacher(const GeneralOptions& generalOptions, const ONNXOptions& onnxOptions) : Teacher(generalOptions),
+        m_specific_options(onnxOptions) {};
 
       /**
-       * Just returns a default-initialized weightfile
+       * Won't do any actual training, but will return a valid MVA Weightfile
+       *
+       * The Dataset parameter is required to adhere to the interface, but ignored.
        */
-      virtual Weightfile train(Dataset&) const override
-      {
-        return Weightfile();
-      }
+      virtual Weightfile train(Dataset&) const override;
+
+    private:
+      ONNXOptions m_specific_options; /**< Method specific options */
     };
 
     /**

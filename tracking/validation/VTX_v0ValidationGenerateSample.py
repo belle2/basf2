@@ -59,7 +59,7 @@ class V0Harvester(HarvestingModule):
         :return: dict with the variables of interest.
         """
         mc_vertex = mc.getDecayVertex()
-        mc_perp = mc_vertex.Perp()
+        mc_perp = mc_vertex.Rho()
         mc_theta = mc_vertex.Theta()
         mc_phi = mc_vertex.Phi()
         mc_m = mc.getMass()
@@ -69,7 +69,7 @@ class V0Harvester(HarvestingModule):
 
         if v0:
             v0_vertex = v0.getVertexPosition()
-            v0_perp = v0_vertex.Perp()
+            v0_perp = v0_vertex.Rho()
             v0_theta = v0_vertex.Theta()
             v0_phi = v0_vertex.Phi()
             v0_m = v0.getFittedInvariantMass()

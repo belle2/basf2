@@ -35,6 +35,7 @@ class TestWriteONNX(unittest.TestCase):
     mechanism, these serve the purpose of creating test files for other unit tests.
     """
 
+    #: show long diff in case of mismatching xml files
     maxDiff = None
 
     def create_and_save(self, n_outputs, filename, weights):

@@ -35,6 +35,13 @@ namespace Belle2 {
                                    Double_t charge, const char* ParticleClass, Int_t PDGcode, Int_t Anti, Int_t TrackingCode,
                                    Double_t Lifetime, Double_t Spin, Double_t maxWidth, Int_t pythiaID);
 
+    /**
+     * Test particle data.
+     *
+     * @return Whether test passed.
+     */
+    bool testParticleData();
+
   private:
     /** singleton. */
     EvtGenDatabasePDG() { }

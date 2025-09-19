@@ -128,8 +128,9 @@ void ONNXExpert::configureOutputValueIndex()
   auto typeInfo = m_session->getOrtSession().GetOutputTypeInfo(tensorIndex);
   auto shape = typeInfo.GetTensorTypeAndShapeInfo().GetShape();
   if (shape.back() == 2) {
-    // We have 2 output values - configure to use index 1 in non-multiclass mode
-    m_outputValueIndex = 1;
+    // We have 2 output values
+    // -> configure to use signal_class index (default 1) in non-multiclass mode
+    m_outputValueIndex = m_general_options.m_signal_class;
   } else {
     // otherwise use the default of 0
     m_outputValueIndex = 0;

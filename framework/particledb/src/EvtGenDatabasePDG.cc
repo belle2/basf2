@@ -26,9 +26,6 @@ EvtGenDatabasePDG* EvtGenDatabasePDG::Instance()
 {
   static bool instanceCreated = false;
   if (!instanceCreated) {
-    // problem with 6.14: ROOT cannot find includes this early. Fix promised for 6.16.
-    // (https://root-forum.cern.ch/t/problem-with-loadclassinfo-for-class-instantiated-very-early/30831)
-    gInterpreter->Declare("#include <framework/particledb/EvtGenParticlePDG.h>");
     //hope we are the first to create a TDatabasePDG instance (setting the instance pointer in the process)
     auto instance = new EvtGenDatabasePDG();
     //ok, now load the data

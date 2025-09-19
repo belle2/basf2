@@ -143,11 +143,12 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
     if (pdg == "proton")  if ((dedxnosat - 0.45) * abs(p) * abs(p) < m_cut)continue;
 
     int bgBin = static_cast<int>((bg - m_bgMin) / (m_bgMax - m_bgMin) * m_bgBins);
-    if (bgBin < 0 || bgBin >= m_bgBins) {
-      B2WARNING("bgBin out of range: " << bgBin
-                << " (valid range: 0-" << m_bgBins - 1 << ")");
-    }
     bgBin = std::min(m_bgBins - 1, std::max(0, bgBin));
+
+    if (bgBin >= m_bgBins) {
+      B2WARNING("bgBin out of range: " << bgBin
+                << " (valid range: 0-" << (m_bgBins - 1) << ")");
+    }
 
     double dedx_new = had.D2I(costh, had.I2D(costh, 1.0) * dedxnosat);
 

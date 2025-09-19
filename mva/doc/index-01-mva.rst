@@ -3,6 +3,15 @@
 MVA package
 ===========
 
+Multivariate Analysis (MVA) generally makes use of statistical methods that deal
+with multiple, potentially correlated variables. In particle physics the term is
+mostly used interchangably with machine learning (ML) techniques. One of the
+most popular applications are classifiers that distinguish a signal from some
+background. This is often implemented using Boosted Decision Trees (BDTs) or
+Neural Networks (NN).
+
+The MVA package helps to integrate these methods with ``basf2``.
+
 .. tip:: For a hands-on introductory lesson with the MVA package, see :ref:`online_book_cs_bdt`.
 
 Overview

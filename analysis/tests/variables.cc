@@ -4335,8 +4335,81 @@ namespace {
   }
 
 
+  class ParameterVariableTest : public ::testing::Test {
+  protected:
+    /** register Particle array + ParticleExtraInfoMap object. */
+    void SetUp() override
+    {
+      DataStore::Instance().setInitializeActive(true);
+      StoreArray<Particle>().registerInDataStore();
+      StoreArray<Particle> particles;
+      StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
+      DataStore::Instance().setInitializeActive(false);
 
+      PxPyPzEVector motherMomentum;
+      TMatrixFSym error(7);
+      error.Zero();
+      error(0, 0) = 0.05;
+      error(1, 1) = 0.2;
+      error(2, 2) = 0.4;
+      error(3, 3) = 0.01;
 
+      Particle pip(PxPyPzEVector(0.5, -0.774, 0, sqrt(.25 + 0.774 * 0.774 + Const::pionMass * Const::pionMass)),
+                   Const::pion.getPDGCode());
+      motherMomentum += pip.get4Vector();
+      pip.setMomentumVertexErrorMatrix(error);
+      Particle* newpip = particles.appendNew(pip);
+      Particle pim(PxPyPzEVector(-0.5, 0.774, 0, sqrt(.25 + 0.774 * 0.774 + Const::pionMass * Const::pionMass)),
+                   -Const::pion.getPDGCode());
+      motherMomentum += pim.get4Vector();
+      pim.setMomentumVertexErrorMatrix(error);
+      Particle* newpim = particles.appendNew(pim);
+
+      error(0, 0) = 0.02;
+      error(1, 1) = 0.1;
+      error(4, 4) = 0.04;
+      error(5, 5) = 0.00875;
+      error(6, 6) = 0.01;
+
+      Particle Dz(motherMomentum, 421, Particle::c_Flavored, Particle::c_Composite, 0);
+      Dz.appendDaughter(newpip);
+      Dz.appendDaughter(newpim);
+      Dz.setMomentumVertexErrorMatrix(error);
+      particles.appendNew(Dz);
+    }
+    /** clear datastore */
+    void TearDown() override
+    {
+      DataStore::Instance().reset();
+    }
+  };
+
+  TEST_F(ParameterVariableTest, MassDifference)
+  {
+    StoreArray<Particle> particles{};
+    const Particle* newDz = particles[2];
+
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("massDifference(0)")->function(newDz)), 1.72435668);
+    EXPECT_TRUE(std::isnan(std::get<double>(Manager::Instance().getVariable("massDifference(2)")->function(newDz))));
+  }
+
+  TEST_F(ParameterVariableTest, MassDifferenceError)
+  {
+    StoreArray<Particle> particles{};
+    const Particle* newDz = particles[2];
+
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("massDifferenceError(0)")->function(newDz)), 2.6692181);
+    EXPECT_TRUE(std::isnan(std::get<double>(Manager::Instance().getVariable("massDifferenceError(2)")->function(newDz))));
+  }
+
+  TEST_F(ParameterVariableTest, MassDifferenceSignificance)
+  {
+    StoreArray<Particle> particles{};
+    const Particle* newDz = particles[2];
+
+    EXPECT_NEAR(std::get<double>(Manager::Instance().getVariable("massDifferenceSignificance(0)")->function(newDz)), -0.000338, 5e-7);
+    EXPECT_TRUE(std::isnan(std::get<double>(Manager::Instance().getVariable("massDifferenceSignificance(2)")->function(newDz))));
+  }
 
   class PIDVariableTest : public ::testing::Test {
   protected:

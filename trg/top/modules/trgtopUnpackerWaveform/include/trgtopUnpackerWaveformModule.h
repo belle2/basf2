@@ -5,23 +5,22 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef TRGTOPUNPACKERWAVEFORM_H
-#define TRGTOPUNPACKERWAVEFORM_H
 
-#include <string>
-
-//#pragma once
-
-#include "rawdata/dataobjects/RawTRG.h"
-#include "trg/top/dataobjects/TRGTOPWaveFormTimeStampsSlot.h"
+#pragma once
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
+
+#include <string>
 
 
 #define NUMBER_OF_TOP_SLOTS 16
 
 namespace Belle2 {
+  class TRGTOPWaveFormTimeStampsSlot;
+  class TRGTOPWaveFormTimeStamp;
+  class RawTRG;
+
   /**
   * TRG TOP Unpacker for Timestamps
   *
@@ -89,5 +88,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif

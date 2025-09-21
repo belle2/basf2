@@ -163,3 +163,9 @@
     text-decoration: none;
     display: inline-block;
 }
+
+.var-source-link {
+    float: right;
+    font-size: 0.9em;
+    margin-left: 1em;
+}

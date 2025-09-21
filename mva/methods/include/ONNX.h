@@ -334,6 +334,13 @@ namespace Belle2 {
                  const std::vector<const char*>& outputNames,
                  std::vector<Ort::Value>& outputs);
 
+        /**
+         * @brief Get a reference to the raw Ort::Session object
+         *
+         * Can be used to call methods on it
+         */
+        const Ort::Session& getOrtSession() { return *m_session; }
+
       private:
         /**
          * Environment object for ONNX session
@@ -366,12 +373,12 @@ namespace Belle2 {
       /**
        * Load mechanism to load Options from a xml tree
        */
-      virtual void load(const boost::property_tree::ptree&) override {}
+      virtual void load(const boost::property_tree::ptree&) override;
 
       /**
        * Save mechanism to store Options in a xml tree
        */
-      virtual void save(boost::property_tree::ptree&) const override {}
+      virtual void save(boost::property_tree::ptree&) const override;
 
       /**
        * Returns a program options description for all available options
@@ -385,30 +392,48 @@ namespace Belle2 {
        * Return method name
        */
       virtual std::string getMethod() const override { return "ONNX"; }
+
+      /**
+       * @brief Name of the output Tensor that is used to make predictions.
+       *
+       * Only has to be provided if there are multiple outputs and none of them
+       * is called "output". In case of a single output, or if among multiple
+       * outputs there is one called "output", it will be used automatically.
+       */
+      std::string m_outputName;
+
+      /**
+       * Filename of the model. Is used in ONNXTeacher::train as a path to the
+       * ONNX model to store in the weightfile.
+       */
+      std::string m_modelFilename;
     };
 
     /**
      * Teacher for the ONNX MVA method.
-     * Just there to satisfy the interface - doesn't do anything
+     * Just there to satisfy the interface - doesn't do any training
      */
     class ONNXTeacher : public Teacher {
 
     public:
       /**
-       * Constructs a new teacher using the GeneralOptions and specific options of
-       * this training
-       * @param general_options defining all shared options
+       * Constructs a new teacher using the GeneralOptions and specific options of this training
+       *
+       * @param generalOptions defining all shared options
+       * @param onnxOptions defining all method specific options
        */
-      ONNXTeacher(const GeneralOptions& general_options,
-                  const ONNXOptions&) : Teacher(general_options) {}
+      ONNXTeacher(const GeneralOptions& generalOptions, const ONNXOptions& onnxOptions) : Teacher(generalOptions),
+        m_specific_options(onnxOptions) {};
 
       /**
-       * Just returns a default-initialized weightfile
+       * Won't do any actual training, but will return a valid MVA Weightfile
+       *
+       * The Dataset parameter is required to adhere to the interface, but ignored.
        */
-      virtual Weightfile train(Dataset&) const override
-      {
-        return Weightfile();
-      }
+      virtual Weightfile train(Dataset&) const override;
+
+    private:
+      ONNXOptions m_specific_options; /**< Method specific options */
     };
 
     /**
@@ -436,9 +461,44 @@ namespace Belle2 {
 
     private:
       /**
+       * Set up input and output names and perform consistency checks.
+       */
+      void configureInputOutputNames();
+
+      /**
+       * @brief Configure index of the value to be used for the configured output tensor
+       *
+       * Will be 0 in case of a single element (binary classifier with single output or regression)
+       * and 1 in case of 2 elements (binary classifier with 2 outputs).
+       * For more than 2 elements one has to call applyMultiClass.
+       */
+      void configureOutputValueIndex();
+
+      /**
        * The ONNX inference session wrapper
        */
       std::unique_ptr<ONNX::Session> m_session;
+
+      /**
+       * ONNX specific options loaded from weightfile
+       */
+      ONNXOptions m_specific_options;
+
+      /**
+       * Name of the input tensor (will be determined automatically)
+       */
+      std::string m_inputName;
+
+      /**
+       * Name of the output tensor
+       * (will either be determined automatically or loaded from specific options)
+       */
+      std::string m_outputName;
+
+      /**
+       * Index of the output value to pick in non-multiclass mode
+       */
+      int m_outputValueIndex;
     };
   } // namespace MVA
 } // namespace Belle2

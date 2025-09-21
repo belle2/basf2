@@ -290,3 +290,55 @@ class Method:
 
         return (d[str(self.identifier)] if self.general_options.m_nClasses <= 2 else np.array([d[x]
                 for x in output_names]).T), d[stripped_expert_target]
+
+
+def create_onnx_mva_weightfile(onnx_model_path, **kwargs):
+    """
+    Create an MVA Weightfile for ONNX
+
+    Parameters
+    ----------
+    kwargs :
+        keyword arguments to set the options in the weightfile. They are
+        directly mapped to member variable names of the option classes with "m_"
+        added automatically. First, GeneralOptions are tried and the remaining
+        arguments are passed to ONNXOptions.
+
+    Returns
+    -------
+    weightfile :
+        Weightfile object containing the ONNX model and options
+
+    Example:
+    --------
+    >>> weightfile = create_onnx_mva_weightfile(
+    ...    "model.onnx",
+    ...    outputName="probabilities",
+    ...    variables=["variable1", "variable2"],
+    ...    target_variable="isSignal"
+    ...)
+    >>> weightfile.save("model.root")
+    """
+    general_options = basf2_mva.GeneralOptions()
+    onnx_options = basf2_mva.ONNXOptions()
+    general_options.m_method = onnx_options.getMethod()
+
+    # fill everything that exists in general options from kwargs
+    for k, v in list(kwargs.items()):
+        m_k = f"m_{k}"
+        if hasattr(general_options, m_k):
+            setattr(general_options, m_k, v)
+            kwargs.pop(k)
+
+    # for the rest try to set members of specific options
+    for k, v in list(kwargs.items()):
+        m_k = f"m_{k}"
+        if not hasattr(onnx_options, m_k):
+            raise AttributeError(f"No member named {m_k} in ONNXOptions.")
+        setattr(onnx_options, m_k, v)
+
+    w = basf2_mva.Weightfile()
+    w.addOptions(general_options)
+    w.addOptions(onnx_options)
+    w.addFile("ONNX_Modelfile", str(onnx_model_path))
+    return w

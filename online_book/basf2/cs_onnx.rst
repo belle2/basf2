@@ -19,7 +19,8 @@ Creating an ntuple with training data
 We will start by creating an ntuple for training our ML model with the following steering file - it's identical to the one in :ref:`online_book_cs_bdt`, but we will process all events since we intend to split between train and test dataset in the custom ML part outside basf2.
 
 .. literalinclude:: steering_files/100_cs_onnx.py
-    :language: python
+    :caption: steering_file_ntuple.py (run in basf2 environment)
+
 
 Train a BDT classifier with scikit-learn
 ----------------------------------------
@@ -30,7 +31,8 @@ The following part of the tutorial is best followed by executing the code snippe
 
     uv venv
     source .venv/bin/activate
-    uv pip install scikit-learn matplotlib pandas uproot awkward-pandas skl2onnx onnxmltools onnx onnxruntime onnxscript netron jupyter
+    uv pip install scikit-learn matplotlib pandas uproot awkward-pandas \
+        skl2onnx onnxmltools onnx onnxruntime netron jupyter
 
     jupyter lab
 
@@ -178,54 +180,7 @@ Now, we can visuzualize the model graph using `netron <https://netron.app>`__. W
 
 .. image:: cs_onnx/bdt_v1.onnx.svg
 
-Now, looking at this graph we have a problem - the ONNX MVA method currently **supports only models that output a tensor of shape (?, 1)** when run in non-multiclass mode (which will be used in the MVAExpert module when we have a binary classifier). Our BDT classifier however outputs the predicted probailities in multi-class mode with one probability for class 0 and one for class 1 (shape ``(?, 2)``). So we have to modify this graph to pick out the probability of label 1. This is easiest to do by merging 2 onnx graphs, one that contains our BDT classifier and one that slices the output tensor to only keep the second one of the probabilties. We will use `onnxscript <https://microsoft.github.io/onnxscript>`__ to create a graph that only contains one node applying the `Slice <https://onnx.ai/onnx/operators/onnx__Slice.html>`__ operation
-
-.. code:: python
-
-    from onnxscript import script, FLOAT
-    from onnxscript import opset21 as op
-
-    @script()
-    def pick_class1(probabilities: FLOAT["N", 2]) -> FLOAT["N", 1]:
-        output =  op.Slice(probabilities, starts=[1], ends=[2], axes=[1])
-        return output
-
-The variable names in the decorated function will turn into intput and output names of the ONNX graph. Note the versioning of the opsets in the code above (using version 21). That version has to match the version used in the bdt model. We can query the opset versions used via
-
-.. code:: ipython3
-
-    [(opset.domain, opset.version) for opset in bdt_onnx.opset_import]
-
-
-.. parsed-literal::
-
-    [('ai.onnx.ml', 1), ('', 21), ('', 21)]
-
-The domain ``ai.onnx.ml`` corresponds to higher-level ML operations such as the TreeDecisionClassifier node we have seen above. The domain with name ``''`` is the default one for the standard operations.
-
-Now we can combine the models by connecting the outputs of the BDT model (``probabilites``) to the inputs of the ``pick_class1`` model (we also called them ``probabilities``):
-
-.. code:: python
-
-    from onnx import compose
-
-    bdt_1d = compose.merge_models(
-        bdt_onnx,
-        pick_class1.to_model_proto(),
-        io_map=[("probabilities", "probabilities")],
-        outputs=["output"],
-    )
-    onnx.save(bdt_1d, "bdt.onnx")
-
-We have also decided to only keep the single output tensor ``output`` of the ``pick_class1`` subgraph.
-
-So our graph now looks like this:
-
-.. code:: python
-
-    netron.widget(netron.start("bdt.onnx", browse=False))
-
-.. image:: cs_onnx/bdt_v2.onnx.svg
+The graph has 2 output tensors, named "probabities" and "label" - we will only use the "probabilities". That tensor has shape (?, 2) for which the MVA ONNX method will by default pick the second output (index 1) as the signal class when run in non-multiclass mode (which will be used in the MVAExpert module when we have a binary classifier). The index is also configurable via the `signal_class` option in the weightfile.
 
 Before we run this through basf2, let's quickly cross check if the outputs from the sklearn model and the ONNX model match reasonably close:
 
@@ -235,7 +190,7 @@ Before we run this through basf2, let's quickly cross check if the outputs from 
     import numpy as np
 
     session = ort.InferenceSession("bdt.onnx")
-    p_test_onnx = session.run(["output"], {"input": X_test.astype(np.float32)})[0]
+    p_test_onnx = session.run(["probabilities"], {"input": X_test.astype(np.float32)})[0][:, 1]
 
     np.allclose(p_test_onnx.ravel(), p_test, atol=1e-4)
 
@@ -253,26 +208,24 @@ We can now store the ONNX model in a MVA Weightfile:
 .. code:: python
 
     # this code has to run in a basf2 environment
-    from basf2_mva import Weightfile, ONNXOptions, GeneralOptions, vector
+    from basf2_mva_util import create_onnx_mva_weightfile
 
-    variables = [...] # copy this from above
+    # variables = [...] # copy this from above
 
-    onnx_options = ONNXOptions()
-    #onnx_options.m_outputName = "myOutputName" # -> set this in case your model has multiple outputs and none of them named "output"
-    general_options = GeneralOptions()
-    general_options.m_variables = vector(*variables)
-    general_options.m_target_variable = "isContinuumEvent"
-    general_options.m_method = onnx_options.getMethod() # don't forget this line!
-    weightfile = Weightfile()
-    weightfile.addOptions(general_options)
-    weightfile.addOptions(onnx_options)
-    weightfile.addFile("ONNX_Modelfile", "bdt.onnx")
+    weightfile = create_onnx_mva_weightfile(
+        "bdt.onnx",
+        outputName="probabilities",
+        variables=variables,
+        target_variable="isContinuumEvent",
+    )
     weightfile.save("MVA_ONNX_BDT.root")
+
 
 Now, we can run a steering file that applies our model and dumps a new ntuple with the model outputs included:
 
 .. literalinclude:: steering_files/101_cs_onnx.py
-   :emphasize-lines: 41-46
+   :emphasize-lines: 41-46,48,51
+   :caption: steering_file_apply_mva.py (run in basf2 environment)
 
 Again, we run over all events and for the purpose of this demonstration we only write out the inference results.
 

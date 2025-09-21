@@ -17,6 +17,23 @@ be adapted when changing to the new release.
 Changes since release-10
 ========================
 
+.. admonition:: New and updated packages in externals
+   :class: dropdown
+
+   .. list-table:: New and updated packages in externals from v02-03-02 to v02-03-03
+      :widths: 50 25 25
+      :header-rows: 1
+
+      * - package
+        - old version
+        - new version
+      * - FastBDT
+        - 5.2
+        - 5.3
+      * - sphinx-togglebutton
+        -
+        - 0.3.2
+
 .. rubric:: Calculation and printing of processing statistics
 
 The calculation of the processing statistics is by default turned off. It can be enabled for debugging purposes, e.g.,

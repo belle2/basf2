@@ -457,6 +457,15 @@ namespace Belle2 {
       void configureInputOutputNames();
 
       /**
+       * @brief Configure index of the value to be used for the configured output tensor
+       *
+       * Will be 0 in case of a single element (binary classifier with single output or regression)
+       * and 1 in case of 2 elements (binary classifier with 2 outputs).
+       * For more than 2 elements one has to call applyMultiClass.
+       */
+      void configureOutputValueIndex();
+
+      /**
        * The ONNX inference session wrapper
        */
       std::unique_ptr<ONNX::Session> m_session;
@@ -476,6 +485,11 @@ namespace Belle2 {
        * (will either be determined automatically or loaded from specific options)
        */
       std::string m_outputName;
+
+      /**
+       * Index of the output value to pick in non-multiclass mode
+       */
+      int m_outputValueIndex;
     };
   } // namespace MVA
 } // namespace Belle2

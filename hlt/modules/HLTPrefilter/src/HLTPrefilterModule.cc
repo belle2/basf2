@@ -24,7 +24,9 @@ This module filters the injection background based on predefined selections.
 * This is meant to be registered in the path *after* the unpacking, but *before* HLT processing.
 )DOC");
 
-    setPropertyFlags(c_ParallelProcessingCertified);
+  setPropertyFlags(c_ParallelProcessingCertified);
+
+  addParam("ConditionIdentifier", m_HLTPrefilterCondition, "HLTPrefilter condition identifier", std::string("TimingCut"));
 }
 
 HLTPrefilterModule::~HLTPrefilterModule() = default;
@@ -58,8 +60,6 @@ void HLTPrefilterModule::beginRun()
     // Get prescale for HLTprefilter
     m_cdceclPrefilter.prescale = m_hltPrefilterParameters->getHLTPrefilterPrescale();
 
-    // Get mode (timing/CDC-ECL occupancy) for operation
-    m_HLTPrefilterMode = static_cast<HLTPrefilterMode>(m_hltPrefilterParameters->getHLTPrefilterMode());
 }
 
 void HLTPrefilterModule::event()
@@ -76,30 +76,31 @@ void HLTPrefilterModule::event()
     if (index == 1) {
 
     /// Compute prefilter decision with timing cuts
-    m_decisions[TimingCut] = m_timingPrefilter.computeDecision();
+    m_decisions[HLTPrefilterCondition::TimingCut] = m_timingPrefilter.computeDecision();
 
     /// Compute prefilter decision with CDC-ECL occupancy
-    m_decisions[CdcEclCut] = m_cdceclPrefilter.computeDecision();
+    m_decisions[HLTPrefilterCondition::CDCECLCut] = m_cdceclPrefilter.computeDecision();
 
     }
 
     // Logging
-    if (m_decisions[TimingCut])
+    if (m_decisions[HLTPrefilterCondition::TimingCut])
         B2ERROR("Skip event --> HLTPrefilter tagged this event to be from injection strips" <<
                 LogVar("event", m_eventInfo->getEvent()) <<
                 LogVar("run", m_eventInfo->getRun()) <<
                 LogVar("exp", m_eventInfo->getExperiment()));
 
-    if (m_decisions[CdcEclCut])
+    if (m_decisions[HLTPrefilterCondition::CDCECLCut])
         B2ERROR("Skip event --> HLTPrefilter tagged this event with high CDC-ECL occupancy" <<
                 LogVar("event", m_eventInfo->getEvent()) <<
                 LogVar("run", m_eventInfo->getRun()) <<
                 LogVar("exp", m_eventInfo->getExperiment()));
 
     // Return only the selected mode
-    if (m_HLTPrefilterMode == TimingCut)
-        setReturnValue(m_decisions[TimingCut]);
+    HLTPrefilterCondition condition = fromString(m_HLTPrefilterCondition);
+    if (condition == HLTPrefilterCondition::TimingCut)
+        setReturnValue(m_decisions[HLTPrefilterCondition::TimingCut]);
     else
-        setReturnValue(m_decisions[CdcEclCut]);
+        setReturnValue(m_decisions[HLTPrefilterCondition::CDCECLCut]);
 }
 

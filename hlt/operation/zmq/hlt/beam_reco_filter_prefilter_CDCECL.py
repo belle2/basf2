@@ -21,7 +21,8 @@ add_hlt_processing(
     reco_path,
     run_type=constants.RunTypes.beam,
     softwaretrigger_mode=constants.SoftwareTriggerModes.filter,
-    hlt_prefilter_mode=constants.HLTPrefilterModes.filter)
+    hlt_prefilter_mode=constants.HLTPrefilterModes.filter,
+    hlt_prefilter_condition=constants.HLTPrefilterConditions.CDCECLCut.value)
 finalize_zmq_path(path, args, location=constants.Location.hlt)
 
 basf2.print_path(path)

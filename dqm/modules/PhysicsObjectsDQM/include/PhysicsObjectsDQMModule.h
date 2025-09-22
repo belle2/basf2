@@ -134,8 +134,8 @@ namespace Belle2 {
       "software_trigger_cut&filter&prefilter_CDCECLthreshold"; /** CDC-ECL occupancy cut for prefilter */
 
     /** Flags for HLTPriflter lines */
-    bool m_injStrip = false; /** Flag for timing cut on injection strip */
-    bool m_cdceclcut = false; /** Flag for CDC-ECL occupancy cut */
+    bool m_TimingCut = false; /** Flag for timing cut on injection strip */
+    bool m_CDCECLCut = false; /** Flag for CDC-ECL occupancy cut */
 
   };
 

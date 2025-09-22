@@ -5,6 +5,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::HLTPrefilterParameters+; // checksum=0xb9faa5d3, version=1
+#pragma link C++ class Belle2::HLTPrefilterParameters+; // checksum=0xa9d70495, version=1
 
 #endif

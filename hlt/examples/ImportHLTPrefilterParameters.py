@@ -27,8 +27,6 @@ parameters.setHERtimeInBeamCycleMax(2.33)
 parameters.setECLDigitsMax(3300)
 parameters.setCDCHitsMax(2500)
 
-parameters.setHLTPrefilterMode(1)
-
 parameters.setHLTPrefilterPrescale(1000)
 
 database = Database.Instance()

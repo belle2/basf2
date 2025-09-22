@@ -7,8 +7,8 @@
  **************************************************************************/
 
 // TODOs:
-// Undo debug, clarify bug
-// write documentation, set payload name in python?
+// multiple skims??
+// write documentation, set payload name in python!
 
 #include <generators/modules/SmartBackgroundModule.h>
 #include <generators/dbobjects/SmartBackgroundConfig.h>
@@ -49,6 +49,8 @@ SmartBackgroundModule::SmartBackgroundModule() : Module()
                  "Use case is the reduction of simulation time for directly skimmed MC productions.");
   addParam("skimCode", m_skimCode, "Skim LFN code");
   addParam("eventType", m_eventType, "Event type (charged, mixed, uubar, ccbar, ddbar, ssbar, taupair)");
+  addParam("payload", m_payload, "Name of payload storing neural network weights in ONNX format",
+           std::string("SmartBKGWeights.onnx"));
   addParam("debugMode", m_debugMode,
            "Debug mode execution (in debug mode, always returns 1 and NN predictions are saved to the event extra info "
            "as 'SmartBKG_Prediction')", false);
@@ -88,7 +90,7 @@ void SmartBackgroundModule::initialize()
   }
 
   // Load model from payload
-  auto accessor = DBAccessorBase(DBStoreEntry::c_RawFile, std::string("SmartBKGWeights.onnx"), true);
+  auto accessor = DBAccessorBase(DBStoreEntry::c_RawFile, m_payload, true);
   const std::string filename = accessor.getFilename();
 
   // initialize ONNX session

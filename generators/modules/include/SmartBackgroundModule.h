@@ -82,6 +82,11 @@ namespace Belle2 {
     std::string m_eventType;
 
     /**
+     * Payload name
+     */
+    std::string m_payload;
+
+    /**
      * Activation function override parameters (module parameter)
      */
     std::vector<float> m_activationOverrideParams;

@@ -11,9 +11,12 @@ an event and, if it is kept, weighting it with the inverse neural network output
 .. note:: Datasets produced using Smart Background are weighted and must be treated as such when analyzed! The weights 
   are stored as generator weights and are therefore automatically written to all produced ntuples.
 
+Usage
+^^^^^
+
 To employ this method, we recommend using the :py:func:`generators.add_smartbkg_filtering` convenience function 
 from the generators package. It should be placed after the event generator but before simulation and reconstruction. 
-As mandatory inputs it requires the LFN code of the skim you are running (available for all skims via skim.code), 
+As mandatory inputs it requires the LFN code of the skim you are running (available for all skims via ``skim.code``), 
 as well as the type of MC you are producing (uubar, ddbar, ssbar, ccbar, charged, mixed, taupair). A part of your 
 steering file might then look like this (for a full example see ``generators/examples/SmartBkg_NEW_ExampleSteering.py``):
 
@@ -26,7 +29,7 @@ steering file might then look like this (for a full example see ``generators/exa
   # Define skim
   skim = feiHadronic(
       analysisGlobaltag=ma.getAnalysisGlobaltag(),
-      OutputFileName="test_smartbkg_fei.udst.root"
+      OutputFileName="your_output_file_name.udst.root"
   )
 
   # Add SmartBkg filtering by providing the skim code and final state
@@ -43,7 +46,7 @@ steering file might then look like this (for a full example see ``generators/exa
   # Apply the skim
   skim(path)
 
-We currently provide a pre-trained model via the global tag ??? that is trained on 51 skims (for a full list see end of page). 
+We currently provide a pre-trained model via the global tag ??? that is trained on 51 skims (for a full list see below). 
 
 For studies you may want to disable filtering and look at the model output. This is possible by setting the ``debug_mode`` argument 
 of :py:func:`generators.add_smartbkg_filtering` to ``True``. This will disable filtering and reweighting, and instead the 
@@ -54,7 +57,13 @@ For greater customisability you may also use the :b2:mod:`SmartBackground` modul
 as the convenience function, and can also be put into debug mode. It performs the reweighting, but no filtering on its own (instead 
 it returns 1 as a return value if an event is sampled, otherwise 0). 
 
-Legacy:
+I should be noted here that there is an old implementation of the SmartBKG project in basf2 as a python module that
+uses an outdated neural network (with weights only available for the hadronic B0 FEI skim). 
+We do not recommend using it (unless you are very interested and
+want to do some studies), but for legacy purposes you can find the old documentation here:
+
+Deprecated implementation
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Using graph neural network with attention mechanism to predict whether a generated event will
 pass the skim after detector simulation and reconstruction. Selection and weighting methods are

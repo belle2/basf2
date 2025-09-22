@@ -90,6 +90,7 @@ def add_smartbkg_filtering(
         skim_code,
         event_type,
         path,
+        payload="SmartBKGWeights.onnx",
         empty_path=None,
         debug_mode=False,
         activation_override=False,
@@ -109,7 +110,8 @@ def add_smartbkg_filtering(
             event_type (str): type of events thar are generated, allowed values are
                               'charged', 'mixed', 'uubar', 'ddbar', 'ssbar', 'ccbar', 'taupair'
             path (basf2.Path): main path with generator modules, used for pass events
-            empty_path (basf2.Path or None): path rejected events are given to
+            payload (str): name of the payload storing neural network weights in ONNX format.
+            empty_path (basf2.Path or None): path rejected events are given to (new empty path if None)
             debug_mode (bool): enables debug mode (events are never rejected, instead the neural network prediction
                                is written to the event extra info as 'SmartBKG_Prediction')
             activation_override (bool): overrides activation function parameters (a, b) with custom values
@@ -160,6 +162,7 @@ def add_smartbkg_filtering(
     sbkg.param("skimCode", skim_code)
     sbkg.param("eventType", event_type)
     sbkg.param("debugMode", debug_mode)
+    sbkg.param("payload", payload)
     if activation_override:
         sbkg.param("activationOverride", activation_override)
         if len(activation_override_params) != 2:

@@ -34,7 +34,7 @@ namespace Belle2 {
   /**
    * Helper for TimingCut mode
    */
-  class TimingCutMode {
+  class TimingCutCondition {
   private:
 
     /// Store array object for injection time info.
@@ -104,7 +104,7 @@ namespace Belle2 {
   /**
    * Helper for CdcEclCut mode
    */
-  class CdcEclCutMode {
+  class CDCECLCutCondition {
   private:
 
     /// CDChits StoreArray
@@ -161,20 +161,41 @@ namespace Belle2 {
     void event() final;
 
   private:
-    // Mode selection
-    enum HLTPrefilterMode { TimingCut = 0, CdcEclCut = 1 };
+    // Prefilter condition selection
+    enum class HLTPrefilterCondition {
+      TimingCut,
+      CDCECLCut
+    };
+
+    // Helper instance to convert string to enum object
+    //inline std::string toString(HLTPrefilterCondition cond) {
+    //switch (cond) {
+    //    case HLTPrefilterCondition::TimingCut: return "TimingCut";
+    //    case HLTPrefilterCondition::CDCECLCut: return "CDCECLCut";
+    //}
+    //return "Unknown";
+    //}
+
+    // Helper instance to convert string to enum object
+    inline HLTPrefilterCondition fromString(const std::string& s)
+    {
+      if (s == "TimingCut") return HLTPrefilterCondition::TimingCut;
+      if (s == "CDCECLCut") return HLTPrefilterCondition::CDCECLCut;
+      throw std::invalid_argument("Unknown HLTPrefilterCondition: " + s);
+    }
+
 
     // Helper instance for timing based prefilter
-    TimingCutMode m_timingPrefilter;
+    TimingCutCondition m_timingPrefilter;
 
     // Helper instance for CDC-ECL occupancy based prefilter
-    CdcEclCutMode m_cdceclPrefilter;
+    CDCECLCutCondition m_cdceclPrefilter;
 
     // Decision results
-    std::map<HLTPrefilterMode, bool> m_decisions;
+    std::map<HLTPrefilterCondition, bool> m_decisions;
 
-    // Instance for prefilter mode
-    HLTPrefilterMode m_HLTPrefilterMode;
+    // Identifier string for prefilter condition
+    std::string m_HLTPrefilterCondition = "";
 
     // BASF2 objects
     /// Event Meta Data Store ObjPtr

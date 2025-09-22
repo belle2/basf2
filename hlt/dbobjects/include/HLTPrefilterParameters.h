@@ -22,9 +22,6 @@ namespace Belle2 {
   class HLTPrefilterParameters : public TObject {
 
   public:
-    /// Enumeration for HLT prefilter mode
-    enum HLTPrefilterMode { TimingCut = 0, CdcEclCut = 1 };
-
     /**
      * Default constructor
      */
@@ -40,7 +37,6 @@ namespace Belle2 {
       m_HERtimeInBeamCycleMax = 0;
       m_cdcHitsMax = 1e9;
       m_eclDigitsMax = 1e9;
-      m_HLTPrefilterMode = static_cast<HLTPrefilterMode>(0);
       m_HLTPrefilterPrescale = 1000;
     }
 
@@ -54,13 +50,11 @@ namespace Belle2 {
      * @param[in] m_LERtimeInBeamCycleMax          Maximum threshold of timeInBeamCycle for LER injection.
      * @param[in] m_HERtimeInBeamCycleMin          Minimum threshold of timeInBeamCycle for HER injection.
      * @param[in] m_HERtimeInBeamCycleMax          Maximum threshold of timeInBeamCycle for HER injection.
-     * @param[in] m_HLTprefilterMode               Mode of HLTprefilter
      * @param[in] m_HLTprefilterPrescale           Prescale for accepting events rejected by the HLTprefilter result
      */
     HLTPrefilterParameters(double LERtimeSinceLastInjectionMin, double LERtimeSinceLastInjectionMax, double LERtimeInBeamCycleMin,
                            double LERtimeInBeamCycleMax, double HERtimeSinceLastInjectionMin, double HERtimeSinceLastInjectionMax,
-                           double HERtimeInBeamCycleMin, double HERtimeInBeamCycleMax, unsigned short Mode,
-                           unsigned int HLTPrefilterPrescale)
+                           double HERtimeInBeamCycleMin, double HERtimeInBeamCycleMax, unsigned int HLTPrefilterPrescale)
     {
       m_LERtimeSinceLastInjectionMin = LERtimeSinceLastInjectionMin;
       m_LERtimeSinceLastInjectionMax = LERtimeSinceLastInjectionMax;
@@ -70,7 +64,6 @@ namespace Belle2 {
       m_LERtimeInBeamCycleMax = LERtimeInBeamCycleMax;
       m_HERtimeInBeamCycleMin = HERtimeInBeamCycleMin;
       m_HERtimeInBeamCycleMax = HERtimeInBeamCycleMax;
-      m_HLTPrefilterMode = static_cast<HLTPrefilterMode>(Mode);
       m_HLTPrefilterPrescale = HLTPrefilterPrescale;
     }
 
@@ -78,14 +71,12 @@ namespace Belle2 {
      * Constructor
      * @param[in] m_cdcHitsMax                     Maximum threshold of CDCHits
      * @param[in] m_eclDigitsMax                   Maximum threshold of ECLDigits
-     * @param[in] m_HLTprefilterMode               Mode of HLTprefilter
      * @param[in] m_HLTprefilterPrescale           Prescale for accepting events rejected by the HLTprefilter result
      */
-    HLTPrefilterParameters(uint32_t NcdcHitsMax, uint32_t NeclDigitsMax, unsigned short Mode, unsigned int HLTPrefilterPrescale)
+    HLTPrefilterParameters(uint32_t NcdcHitsMax, uint32_t NeclDigitsMax, unsigned int HLTPrefilterPrescale)
     {
       m_cdcHitsMax = NcdcHitsMax;
       m_eclDigitsMax = NeclDigitsMax;
-      m_HLTPrefilterMode = static_cast<HLTPrefilterMode>(Mode);
       m_HLTPrefilterPrescale = HLTPrefilterPrescale;
     }
 
@@ -270,24 +261,6 @@ namespace Belle2 {
     }
 
     /**
-    * Set the HLTPrefilter mode
-    * @param[in] HLTPrefilterMode.
-    */
-    void setHLTPrefilterMode(unsigned short Mode)
-    {
-      m_HLTPrefilterMode = static_cast<HLTPrefilterMode>(Mode);
-    }
-
-    /**
-    * Get the HLTPrefilter mode
-    * @param[in] HLTPrefilterMode.
-    */
-    unsigned short getHLTPrefilterMode() const
-    {
-      return static_cast<unsigned short>(m_HLTPrefilterMode);
-    }
-
-    /**
     * Set the prescale for HLTPrefilter result
     * @param[in] HLTPrefilterPrescale.
     */
@@ -347,11 +320,6 @@ namespace Belle2 {
      * Maximum threshold of ECLDigits
      */
     uint32_t m_eclDigitsMax;
-
-    /**
-     * HLTPrefilter Mode
-     */
-    HLTPrefilterMode m_HLTPrefilterMode;
 
     /**
      * HLTPrefilter prescale

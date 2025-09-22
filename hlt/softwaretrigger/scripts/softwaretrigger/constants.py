@@ -33,6 +33,14 @@ class HLTPrefilterModes(Enum):
     filter = "filter"
 
 
+class HLTPrefilterConditions(Enum):
+    """Enum of possible HLT prefilter filtering conditions"""
+    #: Filter out events using TimingCut (thank you documentation check)
+    TimingCut = "TimingCut"
+    #: Filter out events using CDCECLCut (thank you documentation check)
+    CDCECLCut = "CDCECLCut"
+
+
 class Location(Enum):
     """Enum of possible run locations"""
     #: hlt (thank you documentation check)

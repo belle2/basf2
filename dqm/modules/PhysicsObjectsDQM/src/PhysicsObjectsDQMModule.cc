@@ -167,10 +167,10 @@ void PhysicsObjectsDQMModule::event()
       }
 
       if (results.find(m_prefilter_Injection_Strip) != results.end()) {
-        m_injStrip = (result->getNonPrescaledResult(m_prefilter_Injection_Strip) == SoftwareTriggerCutResult::c_accept);
+        m_TimingCut = (result->getNonPrescaledResult(m_prefilter_Injection_Strip) == SoftwareTriggerCutResult::c_accept);
       }
       if (results.find(m_prefilter_CDCECL_Cut) != results.end()) {
-        m_cdceclcut = (result->getNonPrescaledResult(m_prefilter_CDCECL_Cut) == SoftwareTriggerCutResult::c_accept);
+        m_CDCECLCut = (result->getNonPrescaledResult(m_prefilter_CDCECL_Cut) == SoftwareTriggerCutResult::c_accept);
       }
 
       // Iterate over Ks particle list //
@@ -185,9 +185,9 @@ void PhysicsObjectsDQMModule::event()
             m_h_nKshortAllH->Fill(mergeKsCand->getMass());                   // Fill all Ks events
             if (index == 1) {
               m_h_nKshortActiveH->Fill(mergeKsCand->getMass());              // Fill Ks events from active veto
-              if (!m_injStrip)
+              if (!m_TimingCut)
                 m_h_nKshortActiveNotTimeH->Fill(mergeKsCand->getMass());       // Fill Ks events retained after timing cut of HLTprefilter
-              if (!m_cdceclcut)
+              if (!m_CDCECLCut)
                 m_h_nKshortActiveNotCDCECLH->Fill(mergeKsCand->getMass());   // Fill Ks events retained after CDC-ECL cut of HLTprefilter
             }
           }

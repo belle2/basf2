@@ -440,7 +440,7 @@ void ZMQEventProcessor::processCore(const PathPtr& startPath, const ModulePtrLis
   //Remember the previous event meta data, and identify end of data meta data
   m_previousEventMetaData.setEndOfData(); //invalid start state
 
-  const bool collectStats = !Environment::Instance().getNoStats();
+  const bool collectStats = Environment::Instance().getStats();
 
   //Loop over the events
   long currEvent = 0;
@@ -488,7 +488,7 @@ bool ZMQEventProcessor::processEvent(PathIterator moduleIter, bool skipMasterMod
     m_lastMetadataUpdate = time;
   }
 
-  const bool collectStats = !Environment::Instance().getNoStats();
+  const bool collectStats = Environment::Instance().getStats();
 
   while (!moduleIter.isDone()) {
     Module* module = moduleIter.get();

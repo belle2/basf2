@@ -11,7 +11,13 @@
 #include <reconstruction/persistenceManager/PersistenceManager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/pcore/RootMergeable.h>
+
+#include <TH1D.h>
+#include <TFile.h>
+
+namespace Belle2 {
+  template<class T> class RootMergeable;
+}
 
 namespace Belle2::VariablePersistenceManager {
 

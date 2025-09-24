@@ -11,6 +11,8 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
 using namespace Belle2;
 
 bool CDCStateBasicVarSet::extract(const BaseCDCStateFilter::Object* pair)

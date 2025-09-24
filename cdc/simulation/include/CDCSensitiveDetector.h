@@ -21,7 +21,7 @@
 
 
 namespace Belle2 {
-  class CDCSimHit;
+
   namespace CDC {
 
     class CDCGeometryPar;

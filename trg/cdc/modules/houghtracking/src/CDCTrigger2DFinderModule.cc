@@ -134,26 +134,6 @@ CDCTrigger2DFinderModule::initialize()
 
   if (m_storePlane > 0) m_houghPlane.registerInDataStore("HoughPlane");
 
-  const CDCGeometryPar& cdc = CDCGeometryPar::Instance();
-  int layerId = 3;
-  int nTS = 0;
-  for (int iSL = 0; iSL < 9; ++iSL) {
-    TSoffset[iSL] = nTS;
-    nTS += cdc.nWiresInLayer(layerId);
-    TSoffset[iSL + 1] = nTS;
-    if (!m_usehitpattern) {
-      for (int priority = 0; priority < 2; ++ priority) {
-        radius[iSL][priority] = cdc.senseWireR(layerId + priority);
-      }
-    } else {
-      for (int priority = 0; priority < 5; ++ priority) {
-        if (iSL == 0) radius[iSL][priority] = cdc.senseWireR(layerId + priority);
-        else       radius[iSL][priority] = cdc.senseWireR(layerId + priority - 2);
-      }
-    }
-    layerId += (iSL > 0 ? 6 : 7);
-  }
-
   if (m_testFilename != "") {
     testFile.open(m_testFilename);
   }
@@ -177,6 +157,26 @@ CDCTrigger2DFinderModule::beginRun()
       m_minHits = m_cdctrg2d_DB->gethitthreshold();
       m_minHitsShort = m_cdctrg2d_DB->gethitthreshold();
     }
+  }
+
+  const CDCGeometryPar& cdc = CDCGeometryPar::Instance();
+  int layerId = 3;
+  int nTS = 0;
+  for (int iSL = 0; iSL < 9; ++iSL) {
+    TSoffset[iSL] = nTS;
+    nTS += cdc.nWiresInLayer(layerId);
+    TSoffset[iSL + 1] = nTS;
+    if (!m_usehitpattern) {
+      for (int priority = 0; priority < 2; ++ priority) {
+        radius[iSL][priority] = cdc.senseWireR(layerId + priority);
+      }
+    } else {
+      for (int priority = 0; priority < 5; ++ priority) {
+        if (iSL == 0) radius[iSL][priority] = cdc.senseWireR(layerId + priority);
+        else       radius[iSL][priority] = cdc.senseWireR(layerId + priority - 2);
+      }
+    }
+    layerId += (iSL > 0 ? 6 : 7);
   }
 }
 

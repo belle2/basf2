@@ -96,7 +96,7 @@ main.add_module(progress)
 
 # main.add_module(output, branchNames=["TRGSummary"])
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 # process(main, max_event=200)
 
 print(b2.statistics)

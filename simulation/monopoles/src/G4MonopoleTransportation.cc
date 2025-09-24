@@ -11,6 +11,10 @@
 #include <simulation/monopoles/G4MonopoleTransportation.h>
 #include <simulation/monopoles/G4Monopole.h>
 
+#include <G4Navigator.hh>
+#include <G4PropagatorInField.hh>
+#include <G4Track.hh>
+#include <G4Step.hh>
 #include <G4ProductionCutsTable.hh>
 #include <G4ParticleTable.hh>
 #include <G4ChordFinder.hh>

@@ -58,6 +58,3 @@ ma.variablesToNtuple('Lambda0:standard',
                      path=my_path)
 
 b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)

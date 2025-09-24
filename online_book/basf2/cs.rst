@@ -42,12 +42,12 @@ when extracting a signal component.
     Do you still remember what continuum is?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Have a look back in :ref:`backgrounds` where this is introduced.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     When we talk about continuum, we mean events with the process e\ :sup:`+` e\ :sup:`-` → qq,
     i.e. directly to some lighter hadrons without creating a ϒ(4S) resonance.
@@ -71,13 +71,13 @@ detector.
         :align: center
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Think about the different masses of the Continuum hadrons compared to B mesons. How does this reflect in the
     momentum?
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     The continuum particles are strongly collimated due to the large available momentum for the decay to light hadrons.
     In contrast, the particles from the BB event are uniformly distributed.
@@ -144,12 +144,12 @@ has an extensive overview over these quantities.
     Can you find out which other variables are provided by ``basf2`` for continuum suppression?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Check the Continuum Suppression variable group in :ref:`analysis_variables`.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     In addition to the five variables
 
@@ -191,7 +191,7 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
     processing large amounts of continuum Monte Carlo.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/090_cs.py
         :language: python
@@ -211,12 +211,12 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
     to the function.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     You can use `modularAnalysis.appendROEMasks` to add the mask.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/090_cs.py
         :language: python
@@ -236,7 +236,7 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
     Then, process the path and run the steering file!
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/090_cs.py
         :language: python
@@ -257,13 +257,13 @@ Now that we have created our ntuple, we can look at the data and see how well th
 
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Use ``histtype='step'`` when plotting with matplotlib, this makes it easier to see the difference between the two
     distributions.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: cs/plotting_R2.py
         :language: python
@@ -285,7 +285,7 @@ Now that we have created our ntuple, we can look at the data and see how well th
     then try it! You can use the file ``ccbar_sample.root`` in the starterkit folder.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     The separation becomes worse as the charmed hadrons are heavier and have less momentum:
 
@@ -360,14 +360,14 @@ continuum events, simply add a cut on the continuum probability at the end.
     Use only the first half of the events for creating these Ntuples.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Use the code from the previous exercises. Add
     the new variables to the ``simpleCSVariables`` list. See the documentation on the
     variables in :ref:`analysis/doc/ContinuumSuppression:Continuum suppression`.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     The files *uubar_sample.root* and *B02ks0pi0_sample.root* consist of 2000
     and 30000 events respectively. You can choose half for each by using the
@@ -375,7 +375,7 @@ continuum events, simply add a cut on the continuum probability at the end.
     documentation at :ref:`mawrappers`.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/091_cs.py
        :language: python
@@ -393,14 +393,14 @@ continuum events, simply add a cut on the continuum probability at the end.
     to perform the training.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     The training script does not require creating a ``basf2`` path and hence has no
     ``basf2.process()`` at the end. The script is sufficient when the
     ``basf2_mva.teacher()`` is defined.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Use the general options example from the documentation. Make sure to set
     ``m_datafiles`` (the Ntuple we created), ``m_target_variable`` (what are we trying
@@ -409,13 +409,13 @@ continuum events, simply add a cut on the continuum probability at the end.
     values.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     We are trying to predict ``isContinuumEvent`` using all the variables from
     ``simpleCSVariables``.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/092_cs.py
                 :language: python
@@ -448,7 +448,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     Use the second half of the data from the datafiles.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Use the steering file from the previous exercises, just with the ``path.add_module("MVAExpert", ...)``
     added at the end. Don't forget to change ``path`` to ``main`` or
@@ -458,7 +458,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     ``extraInfo(ContinuumProbability)``.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     In case you've forgotten, the files ``B02ks0pi0_sample.root`` and ``uubar_sample.root``
     consist of 2000 and 30000 events respectively. You can choose half for each
@@ -466,7 +466,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     See the documentation at :ref:`mawrappers`.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/093_cs.py
         :language: python
@@ -479,7 +479,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     (similarly to what was done before with :b2:var:`R2`).
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Use the plotting script from the previous exercises,
     but with the `R2` being replaced with the continuum probability.
@@ -488,7 +488,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     always check ``print(<yourdataframename>.columns)``.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: cs/plotting.py
         :language: python
@@ -509,7 +509,7 @@ performance of your MVA. You can find its description at the :ref:`mva` page.
     Use the MVA evaluation function to create plots characterizing your MVA training.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     Run
 

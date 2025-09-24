@@ -12,9 +12,6 @@
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
 
-#include <vector>
-#include <string>
-
 namespace Belle2 {
   class ModuleParamList;
 

@@ -283,7 +283,7 @@ namespace Belle2 {
       double time = belleTrkExtra->getTof();
       double length = belleTrkExtra->getPathLength();
       double p = particle->getP(); //3-momentum
-      double tofbeta = length / time / Belle2::Const::speedOfLight;
+      double tofbeta = length / time / Const::speedOfLight;
       double tofmass = p * sqrt(1. / (tofbeta * tofbeta) - 1.); //(GeV)
 
       return tofmass;
@@ -739,6 +739,7 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
 
     REGISTER_VARIABLE("BelleTofMass", BelleTofMass, R"DOC(
 [Legacy] Returns the TOF mass calculated from the time of flight and path length. (Belle only).
+
 )DOC", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("BelledEdx", BelledEdx, R"DOC(

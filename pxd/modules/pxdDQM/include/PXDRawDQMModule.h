@@ -11,14 +11,17 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <pxd/dataobjects/PXDRawHit.h>
-#include <pxd/dataobjects/PXDRawAdc.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
-#include <rawdata/dataobjects/RawPXD.h>
+
+#include <vxd/dataobjects/VxdID.h>
+
 #include <string>
 #include <TH2.h>
 
 namespace Belle2 {
+  class RawPXD;
+  class PXDRawHit;
+  class PXDRawAdc;
+  class PXDDAQStatus;
 
   namespace PXD {
     /** The raw PXD DQM module.

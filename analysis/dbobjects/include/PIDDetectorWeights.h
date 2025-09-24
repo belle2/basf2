@@ -9,9 +9,7 @@
 #pragma once
 
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 
-#include <boost/algorithm/string.hpp>
 #include <set>
 
 #include <TObject.h>

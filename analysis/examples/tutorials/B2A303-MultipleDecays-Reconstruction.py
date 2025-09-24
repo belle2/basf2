@@ -117,7 +117,4 @@ ma.variablesToNtuple(decayString='B+:D0pi',
 
 
 # Process the events
-b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)
+b2.process(my_path, calculateStatistics=True)

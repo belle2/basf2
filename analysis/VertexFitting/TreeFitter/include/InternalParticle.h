@@ -9,9 +9,11 @@
 #pragma once
 
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
-#include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
 
 namespace TreeFitter {
+  class ConstraintConfiguration;
+  class FitParams;
+  class RecoTrack;
 
   /** another unnecessary layer of abstraction */
   class InternalParticle : public ParticleBase {

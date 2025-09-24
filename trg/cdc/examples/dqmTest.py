@@ -57,5 +57,5 @@ main.add_module('HistoManager',
 main.add_module('CDCTriggerDQM')
 main.add_module('Progress')
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

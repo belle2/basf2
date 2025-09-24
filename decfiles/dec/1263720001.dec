@@ -1,0 +1,23 @@
+# EventType: 1263720001
+# Descriptor: [B+ -> anti-Lambda_c- p+ ell+ nu]cc
+# NickName: Bu_Lambda_cpellnu
+# Documentation: SM B+ -> Lambda_c p ell nu signal MC with the Lambda_c decaying as it likes
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Raynette van Tonder
+# Email: raynette.vantonder@kit.edu
+# Cuts: None
+# Date: 20250630
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+#
+Decay B+sig
+0.5000       anti-Lambda_c-    p+    e+     nu_e       PHSP;
+0.5000       anti-Lambda_c-    p+    mu+    nu_mu      PHSP;
+Enddecay
+CDecay B-sig
+#
+End

@@ -7,7 +7,6 @@
  **************************************************************************/
 #include <tracking/vxdHoughTracking/findlets/TrackCandidateOverlapResolver.h>
 #include <framework/core/ModuleParamList.h>
-#include <framework/core/ModuleParamList.templateDetails.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapMatrixCreator.h>
@@ -15,6 +14,7 @@
 #include <tracking/trackFindingVXD/trackSetEvaluator/Scrooge.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapResolverNodeInfo.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <svd/dataobjects/SVDCluster.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

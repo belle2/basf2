@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
+#include <analysis/dataobjects/FlavorTaggerInfoMap.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <framework/logging/Logger.h>

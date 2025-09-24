@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef EXTCYLSURFACETARGET_H
-#define EXTCYLSURFACETARGET_H
+#pragma once
 
 #include <globals.hh>
 #include <G4ErrorSurfaceTarget.hh>
@@ -69,5 +68,3 @@ namespace Belle2 {
   } // end of namespace Simulation
 
 } // end of namespace Belle2
-
-#endif // EXTCYLSURFACETARGET_H

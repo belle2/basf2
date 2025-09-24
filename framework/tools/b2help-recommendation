@@ -245,7 +245,7 @@ class Tool:
         if tool and tool != "(no tool)":
             self.fields.append(Field('Tool', [tool], TableListDecorator(formatter)))
 
-        tags = data.pop('tags')
+        tags = [tag.lower() for tag in data.pop('tags')]
         for name, value in data.items():
             decorator = DefaultDecorator(formatter)
             if name == "snippet":
@@ -415,6 +415,7 @@ def main():
     Main method
     """
     args = get_argument_parser().parse_args()
+    tags = [tag.lower() for tag in args.tags]
     formatter = ColorRSTFormatterStrategy()
     if args.format == 'rst':
         formatter = RSTFormatterStrategy()
@@ -468,23 +469,23 @@ def main():
         tools = load_data(args.localfile, formatter, args.no_colors)
         args.mccampaign = "local"
 
-    if args.tags is None:
+    if tags is None:
         print_tags(tools, args.mccampaign, n_tag_columns=args.n_tag_columns)
         display_summary(tools, 'all')
         sys.exit(0)
 
-    tags_line = ' '.join(args.tags)
+    tags_line = ' '.join(tags)
     if args.summary:
         print(f'Showing tools for {args.mccampaign} and {tags_line} tags:')
-        display_summary(tools, args.tags)
+        display_summary(tools, tags)
         sys.exit(0)
 
     print(f'Recommendations for {args.mccampaign} and {tags_line} tags:')
     if args.no_pager:
-        display_tags(tools, args.tags)
+        display_tags(tools, tags)
     else:
         with terminal_utils.Pager(f'Recommendations for {args.mccampaign} and {tags_line} tags', True):
-            display_tags(tools, args.tags)
+            display_tags(tools, tags)
 
 if __name__ == "__main__":
     main()

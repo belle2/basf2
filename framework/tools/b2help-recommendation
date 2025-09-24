@@ -415,7 +415,7 @@ def main():
     Main method
     """
     args = get_argument_parser().parse_args()
-    tags = [tag.lower() for tag in args.tags]
+    tags = [tag.lower() for tag in args.tags] if args.tags else None
     formatter = ColorRSTFormatterStrategy()
     if args.format == 'rst':
         formatter = RSTFormatterStrategy()

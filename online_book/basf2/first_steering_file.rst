@@ -43,13 +43,13 @@ environment.
     version.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Go back to :ref:`onlinebook_basf2_introduction` to see the step-by-step
     instructions.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. code-block:: bash
 
@@ -72,12 +72,12 @@ Now let's get started with your steering file!
     Save the file as ``myanalysis.py``.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Have a look at `basf2` and `basf2.process`
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. code-block:: python
 
@@ -96,7 +96,7 @@ command-line.
     carefully!
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     The output should look like this:
 
@@ -132,14 +132,14 @@ former.
     Which value has to be set for the environment type?
 
 .. admonition:: Hint
-    :class: xhint stacked toggle
+    :class: xhint stacked dropdown
 
     Take a look at the signature of the function. It is highlighted in
     blue at the top. Some arguments take a default value, e.g. ``skipNEvents=0``
     and are therefore not required.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     Two parameters have no default value and are therefore required:
 
@@ -156,7 +156,7 @@ files of :math:`B^0 \to J/\Psi K_S^0`. They should be available in the
 other servers. The files' names start with the decfile number 1111540100.
 
 .. admonition:: If you're working from an institute server
-    :class: stacked toggle
+    :class: stacked dropdown
 
     Perhaps you are working on the server of your home institute and this folder
     is not available. In this case please talk to your administrators to make
@@ -165,7 +165,7 @@ other servers. The files' names start with the decfile number 1111540100.
     same level of support on other machines though.
 
 .. admonition:: If you're working on your own machine
-    :class: toggle
+    :class: dropdown
 
     In this case you might first need to copy the data files to your home
     directory on your local machine from kekcc or DESY via an SSH connection (cf.
@@ -181,12 +181,12 @@ other servers. The files' names start with the decfile number 1111540100.
     MC are provided?
 
 .. admonition:: Hint
-    :class: xhint toggle stacked
+    :class: xhint dropdown stacked
 
     Remember the ``ls`` (and ``cd``) bash command?
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. code-block:: bash
 
@@ -217,7 +217,7 @@ A helpful function to get common data files from the examples directory is
       finishing progress bar.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Don't forget to import `modularAnalysis` (this is the module that contains
     `inputMdstList`). It might be convenient to set an abbreviation, e.g.
@@ -225,7 +225,7 @@ A helpful function to get common data files from the examples directory is
     arguments of `inputMdstList`.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/010_first_steering_file.py
         :language: python        
@@ -250,7 +250,7 @@ having to change anything in the script itself.
     command-line argument which file is going to be processed.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     You should have learned about command-line arguments in `this
     <https://swcarpentry.github.io/python-novice-inflammation/12-cmdline/index.html>`_
@@ -260,7 +260,7 @@ having to change anything in the script itself.
     variable ``filenumber``, and extend the path string to include it.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     You can get the integer from the command line arguments using
 
@@ -272,14 +272,14 @@ having to change anything in the script itself.
         filenumber = sys.argv[1]
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Rather than concatenating strings with ``+`` (``"file_" + str(filenumber) + ".root"``),
     you can also use so-called f-strings: ``f"file_{filenumber}.root"``. They
     are great for both readability and performance.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/011_first_steering_file.py
         :language: python        
@@ -315,7 +315,7 @@ have to be transferred into Particle data objects. This is done via the
     Which six final state particles can be created from Tracks?
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     Electrons, muons, pions, kaons, protons, and deuterons.
 
@@ -362,12 +362,12 @@ of the decay mode you are studying, it is recommended to use them for V0s
     What is the name of the particle list generated by this function?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     The documentation is here: `stdV0s.stdKshorts`.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     It's ``K_S0:merged`` because it is a combination of :math:`K_S^0` candidates created
     directly from V0s found in the tracking and combinations of two charged
@@ -379,7 +379,7 @@ of the decay mode you are studying, it is recommended to use them for V0s
     Extend your steering file by loading electrons, positrons, and :math:`K_S^0` candidates.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     All you need is `fillParticleList` and `stdKshorts`.
     Remember that charge-conjugated particles are automatically created.
@@ -387,14 +387,14 @@ of the decay mode you are studying, it is recommended to use them for V0s
     ``""``.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Always keep in mind from which module your functions are taken.
     Since ``stdKshorts`` comes from the module ``stdV0s``, you need to import
     it first.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/012_first_steering_file.py
         :language: python        
@@ -411,13 +411,13 @@ of the decay mode you are studying, it is recommended to use them for V0s
     * Which are the mass window boundaries set for the :math:`K_S^0`?
 
 .. admonition:: Hint
-    :class: xhint stacked toggle
+    :class: xhint stacked dropdown
 
     Don't forget to include a number, e.g. ``1`` as a command line argument to
     specify the input file number!
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. code-block::
 
@@ -447,7 +447,7 @@ of the CDC (`thetaInCDCAcceptance`).
     range of the CDC acceptance (as implemented in the software)?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     The documentation of `dr` and `dz` should tell you all about the first
     question. The angular range is a bit trickier. You have to directly
@@ -456,7 +456,7 @@ of the CDC (`thetaInCDCAcceptance`).
     code in :ref:`onlinebook_basf2basics_gettingstarted`.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     The variable `dr` gives the transverse distance, while `dz` is the
     z-component of the point of closest approach (POCA) with respect to the
@@ -476,13 +476,13 @@ of the CDC (`thetaInCDCAcceptance`).
     inside the CDC acceptance.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Previously we were using an empty string ``""`` as argument to
     ``fillParticleList``. Now you need to change this.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :start-at: S10
@@ -491,7 +491,7 @@ of the CDC (`thetaInCDCAcceptance`).
 
 
 .. note:: Marker comments in the solution code
-    :class: toggle
+    :class: dropdown
 
     If you are wondering about comments like ``[S10]`` or ``[E10]`` in the code
     snippets that we include in our tutorials: You can completely ignore them.
@@ -534,14 +534,14 @@ particles themselves need to be written in the decay string.
     How do we have to type a :math:`J/\Psi`, and what is its nominal mass?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Make use of the tool ``b2help-particles``
     (:ref:`onlinebook_basf2basics_b2help_particles`). As a spin-1
     :math:`c\bar{c}` resonance the PDG code of the :math:`J/\Psi` is ``443``.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     The :math:`J/\Psi` has to be typed ``J/psi``. Whenever you misspell a
     particle name in a decay string, there will be an error message telling
@@ -559,12 +559,12 @@ particles themselves need to be written in the decay string.
     Include a ``abs(dM) < 0.11`` cut for the :math:`J/\Psi`.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     All you need is to call `reconstructDecay` twice.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     The :math:`J/\Psi` reconstruction looks like this:
 
@@ -574,7 +574,7 @@ particles themselves need to be written in the decay string.
         :language: python        
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :end-at: E30
@@ -594,12 +594,12 @@ contain one entry per candidate or one entry per event.
     How do you switch between the two ntuple modes?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Look at the documentation of `variablesToNtuple`.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     When providing an empty decay string, an event-wise ntuple will be created.
 
@@ -626,14 +626,14 @@ mass.
     Then, run your steering file.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     The variable for the beam-constrained :math:`B` mass is called `Mbc`. It has to be
     provided as an element of a list to the argument ``variables`` of the
     `variablesToNtuple` function.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :language: python
@@ -653,21 +653,21 @@ happen to fulfill all your selection criteria.
     Can you identify the signal and background components?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Read in the ntuple using ``uproot``. Use the
     histogram plotting routine of the dataframe.
     For instructions on the basic usage of ``uproot`` see the `Getting started guide <https://uproot.readthedocs.io/en/latest/basic.html>`_.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     You might take a look back at your python training. This is a good use case
     for a jupyter notebook. Make sure to include the ``%matplotlib inline``
     magic to see the plots.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. code-block:: python
 
@@ -711,12 +711,12 @@ definitely read it to understand at least the basics.
     the corresponding function?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Did you have a look at the documentation of :ref:`mcmatching`?
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     You need to run the `MCMatcherParticles` module, most conveniently
     available via the wrapper function `modularAnalysis.matchMCTruth`. If this is
@@ -733,18 +733,18 @@ definitely read it to understand at least the basics.
     ntuple. Run the steering file again.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Only one line of code is needed to call `matchMCTruth`.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Which variable is added by `matchMCTruth`? Remember to add it to the
     ntuple!
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/014_first_steering_file.py
         :language: python        
@@ -759,13 +759,13 @@ definitely read it to understand at least the basics.
     which is background.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Remember the ``by`` keyword for ``df.hist``? Alternatively you could also
     use ``df.query``. The necessary variable is called `isSignal`.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. code-block:: python
 
@@ -797,13 +797,13 @@ variable that can be used to cut away background is :math:`\Delta E` (`deltaE`).
     :math:`\text{M}_{\rm bc} > 5.2` and :math:`|\Delta E|<0.15`.
 
 .. admonition:: Hint
-    :class: xhint stacked toggle
+    :class: xhint stacked dropdown
 
     Take a look at the ``cut`` argument for `reconstructDecay`. You will also
     need the `abs` metafunction.
 
 .. admonition:: Solution
-    :class: solution toggle
+    :class: solution dropdown
 
     .. literalinclude:: steering_files/015_first_steering_file.py
         :start-at: S40
@@ -830,7 +830,7 @@ documentation.
     added to the ntuple so far.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     The collection ``deltae_mbc`` contains `Mbc` and `deltaE`. The `isSignal`
     variable along with many other truth match variables is in the collection
@@ -844,13 +844,13 @@ documentation.
     from the last exercise to replace the individual list.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     The variable collections ``kinematics``, ``mc_kinematics``,
     ``deltae_mbc``, and ``mc_truth`` make your life a lot easier.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/015_first_steering_file.py
         :language: python
@@ -881,7 +881,7 @@ recursively.
     What does ``daughter(0, daughter(0, E))`` denote?
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     It's the energy of the positive electron.
 
@@ -901,12 +901,12 @@ This can be done with `addAlias`.
     How can you replace ``daughter(0, daughter(0, E))`` with ``ep_E``?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Check the documentation of `addAlias` for the correct syntax.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. code-block:: python
 
@@ -931,14 +931,14 @@ or `matchedMC`.
     kinematics both in the lab and the CMS frame.
 
 .. admonition:: Hint: Where to look
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     You need the variable collections and alias functions mentioned above!
     Take it one step at a time, it's more lines of code than in the previous
     examples.
 
 .. admonition:: Hint: Partial solution for final state particles
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     This is how we add variables to the final state particles:
 
@@ -951,7 +951,7 @@ or `matchedMC`.
     fashion.
 
 .. admonition:: Hint: CMS variables
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     The bit about the CMS variables is tricky. First create a variable
     ``cmskinematics`` with the `create_aliases` function. Use "CMS" as the
@@ -961,7 +961,7 @@ or `matchedMC`.
     particles.
 
 .. admonition:: Hint: Partial solution for the CMS variables
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     This is the code for the first part of the last hint:
 
@@ -971,7 +971,7 @@ or `matchedMC`.
         :language: python        
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/019_first_steering_file.py
         :language: python        

@@ -47,11 +47,11 @@ class FormatterStrategy(ABC):
     @abstractmethod
     def format_code(self, code: str, language: str) -> str:
         pass
-    
+
     @abstractmethod
     def format_dict(self, name: str, content: str) -> str:
         pass
-    
+
     @abstractmethod
     def format_table_list(self, name: str, content: str) -> str:
         pass
@@ -84,7 +84,7 @@ class RSTFormatterStrategy(FormatterStrategy):
         Format a field with a name and value.
         """
         return f":{name}: {value}\n"
-    
+
     def format_dict(self, name: str, content: str) -> str:
         """
         Format a dictionary with a name and key-value pairs.
@@ -104,7 +104,7 @@ class RSTFormatterStrategy(FormatterStrategy):
         for tag in [title] + content:
             line += '-' * len(tag) + '+'
             body += tag + '|'
-        
+
         return f'\n{line}\n{body}\n{line}\n'
 
     def format_code(self, code: str, language: str) -> str:
@@ -137,7 +137,7 @@ class ColorRSTFormatterStrategy(RSTFormatterStrategy):
         result = f'.. code-block:: {language}\n\n'
         result += '\n'.join(highlighed_code)
         return result
-        
+
 
 class FieldDecorator(ABC):
     """
@@ -216,17 +216,35 @@ class Tool:
     """
     Represents a tool recommendation.
     """
-    def __init__(self, data: Dict[str, str], formatter: FormatterStrategy):
+
+    def __init__(self, data: Dict[str, str], formatter: FormatterStrategy, no_colors: bool = False):
+
+        # ANSI color codes to show readiness state
+        if no_colors:
+            GREEN = YELLOW = RESET = ''
+        else:
+            GREEN = '\033[32m'      # Green
+            YELLOW = '\033[33m'     # Yellow
+            RESET = '\033[0m'       # Reset
+
         self.fields = []
+        # determine whether tool has recommendation entry
+        self.has_recommendation = bool(data.get('recommendation', {}))
+
         title = '(no title)'
         if 'name' in data:
-            title = data.pop('name')
+            if self.has_recommendation:
+                title = f"{GREEN}{data.pop('name')}{RESET}"
+            else:
+                title = f"{YELLOW}{data.pop('name')}{RESET}"
         self.fields.append(Field('Title', title, SectionDecorator(formatter)))
+
         tool = '(no tool)'
         if 'tool' in data:
             tool = data.pop('tool')
         if tool and tool != "(no tool)":
             self.fields.append(Field('Tool', [tool], TableListDecorator(formatter)))
+
         tags = data.pop('tags')
         for name, value in data.items():
             decorator = DefaultDecorator(formatter)
@@ -256,13 +274,13 @@ class Tool:
         return "".join(field.format() for field in self.fields)
 
 
-def load_data(filename: str, formatter: FormatterStrategy):
+def load_data(filename: str, formatter: FormatterStrategy, no_colors: bool = False):
     """
     load a local json file.
     """
     with open(filename, 'r') as file:
         data = json.load(file)
-    return [Tool(entry, formatter) for entry in data]
+    return [Tool(entry, formatter, no_colors) for entry in data]
 
 
 def display_tool_info(tool: Tool):
@@ -320,6 +338,51 @@ def print_tags(tools: list, mccampaign:str, n_tag_columns: int = 2):
     print("\nTags can be combined to narrow down the search, e.g. use '-t pion PID' to get information only about pion PID, etc. ")
     print("You can check all information with the 'all' tag.")
 
+def display_summary(tools: list, tags: list):
+    """
+    Display a list of all available tools split based on existance of recommendations.
+    """
+
+    # filter tools by tags
+    filtered_tools = []
+    if "all" in tags:
+        filtered_tools = tools
+    else:
+        for tool in tools:
+            if all(tag in tool.get_field('tags') for tag in tags):
+                filtered_tools.append(tool)
+
+    if not filtered_tools:
+        print("No tools found matching the specified tags.")
+        return
+
+    # filter tools with and without recommendations
+    with_recommendations = []
+    without_recommendations = []
+
+    for tool in filtered_tools:
+        if tool.has_recommendation:
+            with_recommendations.append(tool)
+        else:
+            without_recommendations.append(tool)
+
+    if with_recommendations:
+        print("\nAVAILABLE TOOLS WITH RECOMMENDATIONS:")
+        print("-" * 40)
+        for i, tool in enumerate(with_recommendations, 1):
+            tags_str = ", ".join(tool.get_field('tags'))
+            print(f"{i:2}. {tool.get_field('title')}")
+            print(f"    Tags: {tags_str}")
+
+    if without_recommendations:
+        print("\nAVAILABLE TOOLS WITHOUT RECOMMENDATIONS:")
+        print("-" * 50)
+        for i, tool in enumerate(without_recommendations, 1):
+            tags_str = ", ".join(tool.get_field('tags'))
+            print(f"{i:2}. {tool.get_field('title')}")
+            print(f"    Tags: {tags_str}")
+            print(f"    Status: {tool.get_field('description')}")
+
 
 def get_argument_parser():
     """
@@ -340,6 +403,8 @@ def get_argument_parser():
                         default=None)
     parser.add_argument("--n_tag_columns", help="Number of columns for tag printing", type=int,
                         default=2)
+    parser.add_argument("--summary", help="Display a list of all available tools split based on existance of recommendations.", action='store_true')
+    parser.add_argument("--no-colors", help="Disable colors in output", action='store_true')
     parser.add_argument("--no-pager", help="Disable output scrolling, which is done by Pager", action='store_true')
     parser.add_argument("-c", "--convert", help="For developers. Convert the localfile to a payload.", action='store_true')
     return parser
@@ -376,7 +441,7 @@ def main():
         payload_name = args.payload
         if payload_name is None:
             payload_name = versioning.performance_recommendation_global_tag(args.mccampaign)['payload']
-            
+
         b2.conditions.prepend_globaltag(gt_name)
 
         # set a temporal EventMetaData to access database
@@ -397,16 +462,23 @@ def main():
             print("\nRecommendation information is not found!")
             sys.exit(1)
         else:
-            tools = load_data(payload, formatter)
+            tools = load_data(payload, formatter, args.no_colors)
 
     else:
-        tools = load_data(args.localfile, formatter)
+        tools = load_data(args.localfile, formatter, args.no_colors)
         args.mccampaign = "local"
 
     if args.tags is None:
         print_tags(tools, args.mccampaign, n_tag_columns=args.n_tag_columns)
+        display_summary(tools, 'all')
         sys.exit(0)
+
     tags_line = ' '.join(args.tags)
+    if args.summary:
+        print(f'Showing tools for {args.mccampaign} and {tags_line} tags:')
+        display_summary(tools, args.tags)
+        sys.exit(0)
+
     print(f'Recommendations for {args.mccampaign} and {tags_line} tags:')
     if args.no_pager:
         display_tags(tools, args.tags)

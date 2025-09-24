@@ -94,14 +94,19 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             'kaonID',
             'pionID',
             'protonID',
-            'nCDCHits/56',
+            # 'nCDCHits/56',
             'nPXDHits/2',
             'nSVDHits/8',
-            'dzdiff',
-            'drdiff',
-            'chiProb',
-            'clusterEoP',
-            'clusterLAT',
+            'dz',
+            'dr',
+            # 'chiProb',
+            # 'clusterEoP',
+            # 'clusterLAT',
+            'BtagToWBosonVariables(recoilMassSqrd,'+maskName+')/15',
+            'BtagToWBosonVariables(pMissCMS,'+maskName+')',
+            'BtagToWBosonVariables(cosThetaMissCMS,'+maskName+')',
+            'BtagToWBosonVariables(EW90,'+maskName+')',
+            'cosTPTO('+maskName+')',
         ]
 
         ecl_variable_list = [
@@ -135,7 +140,7 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
         TFLATDefaultMask = (
             'TFLATDefaultMask',
             'thetaInCDCAcceptance and p<infinity and p >= 0 and dr<1 and abs(dz)<3',
-            'thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.03 and clusterReg==2] or \
+            'thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.06 and clusterReg==2] or \
                             [E>0.06 and clusterReg==3]]')
         for name in particle_lists:
             ma.appendROEMasks(list_name=name, mask_tuples=[TFLATDefaultMask], path=path)
@@ -166,8 +171,10 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
         ma.rankByHighest('pi+:tflat', rank_variable, path=roe_path)
         ma.rankByHighest('gamma:tflat', rank_variable, path=roe_path)
 
-        vm.addAlias('refdr', 'getVariableByRank(pi+:tflat, p, dr, 1)')
-        vm.addAlias('drdiff', 'formula(dr-refdr)')
+        vm.addAlias('refdx', 'getVariableByRank(pi+:tflat, p, dx, 1)')
+        vm.addAlias('dxdiff', 'formula(dx-refdx)')
+        vm.addAlias('refdy', 'getVariableByRank(pi+:tflat, p, dy, 1)')
+        vm.addAlias('dydiff', 'formula(dy-refdy)')
         vm.addAlias('refdz', 'getVariableByRank(pi+:tflat, p, dz, 1)')
         vm.addAlias('dzdiff', 'formula(dz-refdz)')
 
@@ -208,8 +215,10 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
         ma.rankByHighest('pi+:tflat', rank_variable, path=roe_path)
         ma.rankByHighest('gamma:tflat', rank_variable, path=roe_path)
 
-        vm.addAlias('refdr', 'getVariableByRank(pi+:tflat, p, dr, 1)')
-        vm.addAlias('drdiff', 'formula(dr-refdr)')
+        vm.addAlias('refdx', 'getVariableByRank(pi+:tflat, p, dx, 1)')
+        vm.addAlias('dxdiff', 'formula(dx-refdx)')
+        vm.addAlias('refdy', 'getVariableByRank(pi+:tflat, p, dy, 1)')
+        vm.addAlias('dydiff', 'formula(dy-refdy)')
         vm.addAlias('refdz', 'getVariableByRank(pi+:tflat, p, dz, 1)')
         vm.addAlias('dzdiff', 'formula(dz-refdz)')
 

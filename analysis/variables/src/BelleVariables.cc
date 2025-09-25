@@ -457,7 +457,7 @@ namespace Belle2 {
         StoreObjPtr<ParticleList> photonList(photonListName);
         if (!(photonList.isValid()))
         {
-          B2FATAL("Invalid photon list name " << photonListName << " given to BellePi0Veto!");
+          B2FATAL("Invalid photon list name " << photonListName << " given to BelleEtaVeto!");
         }
 
         ROOT::Math::PxPyPzEVector particle4Vector = particle->get4Vector();

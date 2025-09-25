@@ -619,8 +619,18 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
 [Legacy] Returns the ACC quality flag. Original definition in the panther tables: if 0 normal, if 1 the track is out of ACC acceptance. (Belle only).
 )DOC");
 
-    REGISTER_METAVARIABLE("BellePi0Veto(photonlistname)", BellePi0Veto, "[Legacy] Pi0 prob for gamma", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("BelleEtaVeto(photonlistname)", BelleEtaVeto, "[Legacy] Eta prob for gamma", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("BellePi0Veto(photonlistname)", BellePi0Veto, R"DOC(
+[Legacy] Meta-variable that computes the maximum probability that a photon candidate is
+consistent with originating from a pi0 decay when combined with any other photons in a given list.
+Calculated within a the mass window of 0.11 - 0.15 GeV/c^2, based on mass, energy and ecl cluster region,
+using lookup tables derived in Belle. For more details, see Belle Note 665.
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("BelleEtaVeto(photonlistname)", BelleEtaVeto,  R"DOC(
+[Legacy] Meta-variable that computes the maximum probability that a photon candidate is
+consistent with originating from an eta decay when combined with any other photons in a given list.
+Calculated within a the mass window of 0.50 - 0.58 GeV/c^2, based on mass, energy and ecl cluster region,
+using lookup tables derived in Belle. For more details, see Belle Note 665.
+)DOC", Manager::VariableDataType::c_double);
 
 
     // this is defined in ECLVariables.{h,cc}

@@ -434,7 +434,11 @@ namespace Belle2 {
           double mass = Pi0.M();
           if (mass < 0.11 or mass > 0.15) continue;
 
-          double pi0_prob = Pi0_Prob(mass, photon->getEnergy(), thetaInECLAcceptance(photon));
+          double pi0_prob = Pi0_Prob(
+            mass,
+            photon->getEnergy(),
+            eclClusterDetectionRegion(photon)
+          );
           if (!temppi0 or pi0_prob > *temppi0) {
             temppi0 = pi0_prob;
           }
@@ -471,7 +475,11 @@ namespace Belle2 {
           double mass = Eta.M();
           if (mass < 0.5 or mass > 0.58) continue;
 
-          double eta_prob = Eta_Prob(mass, photon->getEnergy(), thetaInECLAcceptance(photon));
+          double eta_prob = Eta_Prob(
+            mass,
+            photon->getEnergy(),
+            eclClusterDetectionRegion(photon)
+          );
           if (!tempeta or eta_prob > *tempeta) {
             tempeta = eta_prob;
           }

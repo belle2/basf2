@@ -102,7 +102,7 @@ def add_smartbkg_filtering(
         Given a specific skim the neural network predicts the probability of the event passing the skim.
         The event is then kept in the given path with this probability or otherwise discarded to the empty path.
         Kept events are weighted with their inverse probability to ensure unbiased distributions
-        (weights are saved in the event meta data,  by multiplying them to the generator weight).
+        (weights are saved in the event meta data,  by multiplying them to the generated weight).
         Use case is the reduction of simulation time for directly skimmed MC productions.
 
         Parameters:
@@ -110,7 +110,7 @@ def add_smartbkg_filtering(
             event_type (str): type of events thar are generated, allowed values are
                               'charged', 'mixed', 'uubar', 'ddbar', 'ssbar', 'ccbar', 'taupair'
             path (basf2.Path): main path with generator modules, used for pass events
-            payload (str): name of the payload storing neural network weights in ONNX format.
+            payload (str): name of the payload storing neural network weights in ONNX format
             empty_path (basf2.Path or None): path rejected events are given to (new empty path if None)
             debug_mode (bool): enables debug mode (events are never rejected, instead the neural network prediction
                                is written to the event extra info as 'SmartBKG_Prediction')

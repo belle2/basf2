@@ -8,7 +8,7 @@
 
 // TODOs:
 // multiple skims??
-// write documentation, set payload name in python!
+// write documentation, tutorial for training new model/fine tuning?
 
 #include <generators/modules/SmartBackgroundModule.h>
 #include <generators/dbobjects/SmartBackgroundConfig.h>
@@ -45,7 +45,7 @@ SmartBackgroundModule::SmartBackgroundModule() : Module()
                  "Given a specific skim the neural network predicts the probability of the event passing the skim. "
                  "The module returns 1 with this probability or otherwise 0. "
                  "Events are then weighted with their inverse probability "
-                 "(weights are saved in the event meta data, by multiplying them to the generator weight). "
+                 "(weights are saved in the event meta data, by multiplying them to the generated weight). "
                  "Use case is the reduction of simulation time for directly skimmed MC productions.");
   addParam("skimCode", m_skimCode, "Skim LFN code");
   addParam("eventType", m_eventType, "Event type (charged, mixed, uubar, ccbar, ddbar, ssbar, taupair)");
@@ -122,7 +122,7 @@ void SmartBackgroundModule::event()
   m_pdgValues.resize(0);
   m_motherValues.resize(0);
 
-  // New 0-based index of particles after preprocessing removes some particles
+  // New 0-based index of particles after preprocessing
   unsigned int newIndex = 0;
   // Some maps needed for preprocessing
   std::unordered_map<int, int> qg_mother_mapping;

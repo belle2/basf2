@@ -10,6 +10,7 @@
 
 import json
 import os
+import glob
 import basf2_mva
 from basf2 import B2FATAL
 import basf2
@@ -52,11 +53,12 @@ def fill_particle_lists(maskName='TFLATDefaultMask', path=None):
     kFit('K_S0:inRoe', 0.01, path=path)
 
 
-def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier='standard_tflat',
+def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier='standard_tflat',
                  target='qrCombined', overwrite=False,
                  classifier_args=None,
                  train_valid_fraction=.92, mva_steering_file='analysis/scripts/tflat/tensorflow_tflat_interface.py',
                  maskName='TFLATDefaultMask',
+                 sampler_id=0,
                  path=None):
     """
     Interfacing for the Transformer FlavorTagger (TFlat). This function can be used for training (``Teacher``), preparation of
@@ -64,7 +66,7 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
 
     This function requires reconstructed B meson signal particle list and where an RestOfEvent is built.
 
-    :param particle_lists:  string or list[string], particle list(s) of the reconstructed signal B meson
+    :param particleLists:  string or list[string], particle list(s) of the reconstructed signal B meson
     :param mode: string, valid modes are ``Expert`` (default), ``Teacher``, ``Sampler``
     :param working_dir: string, working directory for the method
     :param uniqueIdentifier: string, database identifier for the method
@@ -73,12 +75,13 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
     :param classifier_args: dictionary, customized arguments for tflat
     :param train_valid_fraction: float, train-valid fraction (.92).
     :param maskName: get ROE particles from a specified ROE mask
+    :param sampler_id: identifier of sampled file for parallel sampling
     :param path: basf2 path obj
     :return: None
     """
 
-    if isinstance(particle_lists, str):
-        particle_lists = [particle_lists]
+    if isinstance(particleLists, str):
+        particleLists = [particleLists]
 
     if mode not in ['Expert', 'Teacher', 'Sampler']:
         B2FATAL(f'Invalid mode  {mode}')
@@ -130,8 +133,6 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
     else:
         assert isinstance(classifier_args, dict)
 
-    output_file_name = os.path.join(working_dir, uniqueIdentifier + '_training_data.root')
-
     tree_name = 'tflat_variables'
     rank_variable = 'p'
 
@@ -142,7 +143,7 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
             'thetaInCDCAcceptance and p<infinity and p >= 0 and dr<1 and abs(dz)<3',
             'thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.06 and clusterReg==2] or \
                             [E>0.06 and clusterReg==3]]')
-        for name in particle_lists:
+        for name in particleLists:
             ma.appendROEMasks(list_name=name, mask_tuples=[TFLATDefaultMask], path=path)
 
     # create tagging specific variables
@@ -156,12 +157,13 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
     dead_end_path = basf2.create_path()
 
     if mode == 'Sampler':
+        output_file_name = os.path.join(working_dir, uniqueIdentifier + f'_training_data{sampler_id}.root')
         if os.path.isfile(output_file_name) and not overwrite:
             B2FATAL(f'Outputfile {output_file_name} already exists. Aborting writeout.')
 
         # filter rest of events only for specific particle list
         ma.signalSideParticleListsFilter(
-            particle_lists,
+            particleLists,
             'nROE_Charged(' + maskName + ', 0) > 0 and abs(qrCombined) == 1',
             roe_path,
             dead_end_path)
@@ -184,25 +186,13 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
         # write to ntuples
         ma.variablesToNtuple('', all_variables, tree_name, output_file_name, roe_path)
 
-        # write the command line output for the extern teacher to a file
-        extern_command = f'basf2_mva_teacher --datafile {output_file_name} --treename {tree_name}' + \
-                         f' --identifier {uniqueIdentifier} ' + \
-                         '--variables "{}"  '.format('" "'.join(features)) + \
-                         f'--target_variable {target}' + \
-                         f' --method Python --training_fraction {train_valid_fraction}' + \
-                         f" --config '{json.dumps(classifier_args)}' --framework tensorflow" + \
-                         f' --steering_file {mva_steering_file}'
-
-        with open(os.path.join(working_dir, uniqueIdentifier + '_teacher_command'), 'w') as f:
-            f.write(extern_command)
-
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
     elif mode == 'Expert':
 
         # filter rest of events only for specific particle list
         ma.signalSideParticleListsFilter(
-            particle_lists,
+            particleLists,
             'nROE_Charged(' + maskName + ', 0) > 0',
             roe_path,
             dead_end_path)
@@ -223,7 +213,7 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
         vm.addAlias('dzdiff', 'formula(dz-refdz)')
 
         expert_module = basf2.register_module('MVAExpert')
-        expert_module.param('listNames', particle_lists)
+        expert_module.param('listNames', particleLists)
         expert_module.param('identifier', uniqueIdentifier)
         expert_module.param('extraInfoName', 'tflat_output')
 
@@ -239,10 +229,11 @@ def FlavorTagger(particle_lists, mode='Expert', working_dir='', uniqueIdentifier
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
     elif mode == 'Teacher':
-        if not os.path.isfile(output_file_name):
+        input_files = os.path.join(working_dir, uniqueIdentifier + '_training_data*.root')
+        if len(glob.glob(input_files)) == 0:
             B2FATAL('There is no training data file available. Run flavor tagger in Sampler mode first.')
         general_options = basf2_mva.GeneralOptions()
-        general_options.m_datafiles = basf2_mva.vector(output_file_name)
+        general_options.m_datafiles = basf2_mva.vector(input_files)
 
         general_options.m_treename = tree_name
         general_options.m_target_variable = target

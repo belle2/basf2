@@ -28,6 +28,7 @@
 #include <b2bii/dataobjects/BelleTrkExtra.h>
 
 #include <cmath>
+#include <optional>
 #include <TVectorF.h>
 
 namespace Belle2 {
@@ -569,7 +570,7 @@ namespace Belle2 {
 
         ROOT::Math::PxPyPzEVector particle4Vector = particle->get4Vector();
         unsigned int particleIndex = particle->getMdstArrayIndex();
-        double temppi0 = Const::doubleNaN;
+        std::optional<double> temppi0;
 
         for (unsigned int i = 0; i < photonList->getListSize(); i++)
         {
@@ -583,11 +584,11 @@ namespace Belle2 {
           if (mass < 0.11 or mass > 0.15) continue;
 
           double pi0_prob = Pi0_Prob(mass, photon->getEnergy(), thetaInECLAcceptance(photon));
-          if (temppi0 < pi0_prob) {
+          if (!temppi0 or pi0_prob > *temppi0) {
             temppi0 = pi0_prob;
           }
         }
-        return temppi0;
+        return temppi0.value_or(Const::doubleNaN);
       };
       return func;
     }
@@ -606,7 +607,7 @@ namespace Belle2 {
 
         ROOT::Math::PxPyPzEVector particle4Vector = particle->get4Vector();
         unsigned int particleIndex = particle->getMdstArrayIndex();
-        double tempeta = Const::doubleNaN;
+        std::optional<double> tempeta;
 
         for (unsigned int i = 0; i < photonList->getListSize(); i++)
         {
@@ -620,11 +621,11 @@ namespace Belle2 {
           if (mass < 0.5 or mass > 0.58) continue;
 
           double eta_prob = Eta_Prob(mass, photon->getEnergy(), thetaInECLAcceptance(photon));
-          if (tempeta < eta_prob) {
+          if (!tempeta or eta_prob > *tempeta) {
             tempeta = eta_prob;
           }
         }
-        return tempeta;
+        return tempeta.value_or(Const::doubleNaN);
       };
       return func;
     }

@@ -13,7 +13,7 @@
 namespace Belle2 {
 
   /**
-   * Class for handling the parameters for the neural-network PID.
+   * Class for handling the payloads with lookup tables for Belle pi0 and eta probabilities
    */
   class BellePi0EtaProbParameters: public TObject {
 
@@ -22,7 +22,7 @@ namespace Belle2 {
     BellePi0EtaProbParameters() {}
 
     /**
-     * Construct with individual neural-network parameters
+     * Construct with lookup tables for both hypotheses in three regions
      */
     BellePi0EtaProbParameters(const std::vector<double>& pi0ProbFWD,
                               const std::vector<double>& pi0ProbBRL,

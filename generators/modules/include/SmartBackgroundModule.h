@@ -121,6 +121,11 @@ namespace Belle2 {
      */
     bool m_activationOverride;
 
+    /**
+     * Whether to override automatically determined event type (module parameter)
+     */
+    bool m_overrideEventType;
+
   };
 
 }

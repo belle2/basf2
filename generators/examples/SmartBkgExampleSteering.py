@@ -28,7 +28,7 @@ path.add_module("EventInfoSetter", evtNumList=[100], expList=[0], runList=[0])
 # Add event generator (evtgen for charged events in this example)
 # Note that SmartBkg is only trained for charged, mixed, uubar, ddbar, ssbar, ccbar and taupair final states
 finalstate = "charged"
-gen.add_evtgen_generator(finalstate=finalstate, path=path)
+gen.add_evtgen_generator(finalstate=finalstate, path=path, eventType=finalstate)
 
 # Define skim
 skim = feiHadronic(
@@ -36,10 +36,9 @@ skim = feiHadronic(
     OutputFileName="test_smartbkg_fei.udst.root"
 )
 
-# Add SmartBkg filtering by providing the skim code and final state
+# Add SmartBkg filtering by providing the skim code
 gen.add_smartbkg_filtering(
     skim_code=skim.code,
-    event_type=finalstate,
     path=path
 )
 

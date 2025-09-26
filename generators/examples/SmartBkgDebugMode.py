@@ -30,7 +30,7 @@ path.add_module("EventInfoSetter", evtNumList=[100], expList=[0], runList=[0])
 # Add event generator (evtgen for charged events in this example)
 # Note that SmartBkg is only trained for charged, mixed, uubar, ddbar, ssbar, ccbar and taupair final states
 finalstate = "charged"
-gen.add_evtgen_generator(finalstate=finalstate, path=path)
+gen.add_evtgen_generator(finalstate=finalstate, path=path, eventType=finalstate)
 
 # Define skim (all 51 skims defined as of August 2025 work with the standard SmartBkg model)
 # Here we disable udst output because we only want the skim flags
@@ -39,12 +39,11 @@ skim = feiHadronic(
     udstOutput=False
 )
 
-# Add SmartBkg filtering by providing the skim code and final state
+# Add SmartBkg filtering by providing the skim code
 # Here we enable debug mode so that no events are rejected or weighted and instead the model prediction is saved
 # to the event extra info as 'SmartBKG_Prediction'
 gen.add_smartbkg_filtering(
     skim_code=skim.code,
-    event_type=finalstate,
     path=path,
     debug_mode=True
 )

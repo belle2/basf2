@@ -48,13 +48,16 @@ SmartBackgroundModule::SmartBackgroundModule() : Module()
                  "(weights are saved in the event meta data, by multiplying them to the generated weight). "
                  "Use case is the reduction of simulation time for directly skimmed MC productions.");
   addParam("skimCode", m_skimCode, "Skim LFN code");
-  addParam("eventType", m_eventType, "Event type (charged, mixed, uubar, ccbar, ddbar, ssbar, taupair)");
+  addParam("overrideEventType", m_overrideEventType,
+           "Override automatically determined event type", false);
+  addParam("eventType", m_eventType, "Event type (charged, mixed, uubar, ccbar, ddbar, ssbar, taupair)",
+           std::string("unset"));
   addParam("payload", m_payload, "Name of payload storing neural network weights in ONNX format",
            std::string("SmartBKGWeights.onnx"));
   addParam("debugMode", m_debugMode,
            "Debug mode execution (in debug mode, always returns 1 and NN predictions are saved to the event extra info "
            "as 'SmartBKG_Prediction')", false);
-  addParam("activationOverride", m_activationOverride, "Override parameters (a, b) of the activation function (clipped exponential)",
+  addParam("overrideActivation", m_activationOverride, "Override parameters (a, b) of the activation function (clipped exponential)",
            false);
   addParam("activationOverrideParams", m_activationOverrideParams,
            "Parameters (a, b) of the activation function (clipped exponential)", std::vector<float>({0.5, 0.0}));
@@ -74,10 +77,6 @@ void SmartBackgroundModule::initialize()
   if (m_skimcodesMapping.find(m_skimCode) == m_skimcodesMapping.end()) {
     B2FATAL("SmartBkg: Provided skim code " << m_skimCode << " is unknown. Check documentation for allowed skim codes.");
   }
-  if (c_eventtypeMapping.find(m_eventType) == c_eventtypeMapping.end()) {
-    B2FATAL("SmartBkg: Provided event type " << m_eventType <<
-            " is unknown. Allowed event types: charged, mixed, uubar, ddbar, ssbar, ccbar, taupair.");
-  }
   if (m_activationOverride) {
     if (m_activationOverrideParams.size() != 2) {
       B2FATAL("SmartBkg: activationOverrideParams must be a vector of size 2, got " << m_activationOverrideParams.size());
@@ -86,6 +85,16 @@ void SmartBackgroundModule::initialize()
             ", " << m_activationOverrideParams[1] << ")");
     if (m_activationOverrideParams[0] == 0.5 && m_activationOverrideParams[1] == 0.0) {
       B2WARNING("SmartBkg: Activation override parameters (a, b) are used but set to default values (0.5, 0.0), is this what you want?");
+    }
+  }
+  if (m_overrideEventType) {
+    if (m_eventType == "unset") {
+      B2FATAL("SmartBkg: overrideEventType is set to true but eventType is not set.");
+    } else if (c_eventtypeMapping.find(m_eventType) == c_eventtypeMapping.end()) {
+      B2FATAL("SmartBkg: Provided event type " << m_eventType <<
+              " is unknown. Allowed event types: charged, mixed, uubar, ddbar, ssbar, ccbar, taupair.");
+    } else {
+      B2DEBUG(20, "SmartBkg: Event type override is enabled, using event type " << m_eventType);
     }
   }
 
@@ -112,6 +121,31 @@ float SmartBackgroundModule::activation(float logit, float a, float b)
 
 void SmartBackgroundModule::event()
 {
+
+  // Set correct event type
+  StoreObjPtr<EventExtraInfo> eventExtraInfo;
+  std::string detectedEventType = eventExtraInfo->getEventType();
+  if (detectedEventType == "") {
+    if (!m_overrideEventType) {
+      B2FATAL("SmartBkg: Event type could not be automatically determined, please set override parameter.");
+    }
+  } else {
+    if (!m_overrideEventType) {
+      m_eventType = detectedEventType;
+      B2DEBUG(20, "SmartBkg: Automatically inferred event type as '" << m_eventType << "'");
+      if (c_eventtypeMapping.find(m_eventType) == c_eventtypeMapping.end()) {
+        B2FATAL("SmartBkg: Inferred event type '" << m_eventType <<
+                "' is unknown. Allowed event types: charged, mixed, uubar, ddbar, ssbar, ccbar, taupair.");
+      }
+    } else {
+      if (m_eventType != detectedEventType) {
+        B2WARNING("SmartBkg: Event type override disagrees with event type inferred from event extra info! \n"
+                  "                    Override: '" << m_eventType <<
+                  "'\n                    Extra info: '" << detectedEventType <<
+                  "'\n                    Are you sure this is what you want?");
+      }
+    }
+  }
 
   // Load store array of MC particles and the event extra info
   StoreArray<MCParticle> mcparticles;
@@ -227,7 +261,6 @@ void SmartBackgroundModule::event()
     StoreObjPtr<EventMetaData> eventMetaData;
     eventMetaData->setGeneratedWeight(eventMetaData->getGeneratedWeight() * (1.0 / prediction));
   } else {
-    StoreObjPtr<EventExtraInfo> eventExtraInfo;
     eventExtraInfo->addExtraInfo("SmartBKG_Prediction", prediction);
   }
 

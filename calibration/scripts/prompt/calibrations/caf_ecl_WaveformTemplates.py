@@ -33,7 +33,7 @@ settings = CalibrationSettings(
         "nFilesCollector": 50,
         "nParallelAlgos": 1
     },
-    produced_payloads=["eclWaveformTemplateCalibrationC1MaxResLimit"])
+    produced_payloads=["ECLDigitWaveformParameters"])
 
 
 # --------------------------------------------------------------

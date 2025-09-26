@@ -18,6 +18,7 @@ from variables import variables as vm
 import modularAnalysis as ma
 from stdPhotons import stdPhotons
 from vertex import kFit
+from tflat.config import config
 
 
 def get_variables(particle_list, ranked_variable, variables=None, particleNumber=1):
@@ -56,8 +57,7 @@ def fill_particle_lists(maskName='TFLATDefaultMask', path=None):
 def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier='standard_tflat',
                  target='qrCombined', overwrite=False,
                  classifier_args=None,
-                 train_valid_fraction=.92, mva_steering_file='analysis/scripts/tflat/tensorflow_tflat_interface.py',
-                 maskName='TFLATDefaultMask',
+                 mva_steering_file='analysis/scripts/tflat/tensorflow_tflat_interface.py',
                  sampler_id=0,
                  path=None):
     """
@@ -73,8 +73,6 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
     :param target: string, target variable
     :param overwrite: bool, overwrite already (locally!) existing training
     :param classifier_args: dictionary, customized arguments for tflat
-    :param train_valid_fraction: float, train-valid fraction (.92).
-    :param maskName: get ROE particles from a specified ROE mask
     :param sampler_id: identifier of sampled file for parallel sampling
     :param path: basf2 path obj
     :return: None
@@ -87,48 +85,11 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
         B2FATAL(f'Invalid mode  {mode}')
 
     if mode in ['Sampler', 'Teacher']:
-        trk_variable_list = [
-            'charge',
-            'useCMSFrame(p)',
-            'useCMSFrame(cosTheta)',
-            'useCMSFrame(phi)',
-            'electronID',
-            'muonID',
-            'kaonID',
-            'pionID',
-            'protonID',
-            # 'nCDCHits/56',
-            'nPXDHits/2',
-            'nSVDHits/8',
-            'dxdiff',
-            'dydiff',
-            'dzdiff',
-            # 'dr',
-            # 'chiProb',
-            # 'clusterEoP',
-            # 'clusterLAT',
-            'BtagToWBosonVariables(recoilMassSqrd,'+maskName+')/15',
-            'BtagToWBosonVariables(pMissCMS,'+maskName+')',
-            'BtagToWBosonVariables(cosThetaMissCMS,'+maskName+')',
-            'BtagToWBosonVariables(EW90,'+maskName+')',
-            'cosTPTO('+maskName+')',
-        ]
+        trk_variable_list = config['trk_variable_list']
 
-        ecl_variable_list = [
-            'useCMSFrame(p)',
-            'useCMSFrame(cosTheta)',
-            'useCMSFrame(phi)',
-            'clusterE1E9',
-            'clusterE9E21',
-            'clusterLAT',
-        ]
+        ecl_variable_list = config['ecl_variable_list']
 
-        roe_variable_list = [
-            'countInList(gamma:tflat)/8',
-            'countInList(pi+:tflat)/6',
-            'NumberOfKShortsInRoe',
-            'ptTracksRoe('+maskName+')',
-        ]
+        roe_variable_list = config['roe_variable_list']
 
     if classifier_args is None:
         classifier_args = {}
@@ -139,20 +100,16 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
     rank_variable = 'p'
 
     # create default ROE-mask
-    if maskName == 'TFLATDefaultMask':
-        TFLATDefaultMask = (
-            'TFLATDefaultMask',
-            'thetaInCDCAcceptance and p<infinity and p >= 0 and dr<1 and abs(dz)<3',
-            'thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.06 and clusterReg==2] or \
-                            [E>0.06 and clusterReg==3]]')
-        for name in particleLists:
-            ma.appendROEMasks(list_name=name, mask_tuples=[TFLATDefaultMask], path=path)
+    TFLAT_mask = config['TFLAT_Mask']
+    maskName = TFLAT_mask[0]
+    for name in particleLists:
+        ma.appendROEMasks(list_name=name, mask_tuples=[TFLAT_mask], path=path)
 
     # create tagging specific variables
     if mode != 'Expert':
-        features = get_variables('pi+:tflat', rank_variable, trk_variable_list, particleNumber=10)
-        features += get_variables('gamma:tflat', rank_variable, ecl_variable_list, particleNumber=20)
-        features += get_variables('pi+:tflat', rank_variable, roe_variable_list, particleNumber=1)
+        features = get_variables('pi+:tflat', rank_variable, trk_variable_list, particleNumber=config['parameters']['num_trk'])
+        features += get_variables('gamma:tflat', rank_variable, ecl_variable_list, particleNumber=config['parameters']['num_ecl'])
+        features += get_variables('pi+:tflat', rank_variable, roe_variable_list, particleNumber=config['parameters']['num_roe'])
 
     # create roe specific paths
     roe_path = basf2.create_path()
@@ -246,7 +203,7 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
         specific_options = basf2_mva.PythonOptions()
         specific_options.m_framework = 'tensorflow'
         specific_options.m_steering_file = mva_steering_file
-        specific_options.m_training_fraction = train_valid_fraction
+        specific_options.m_training_fraction = config['train_valid_fraction']
 
         specific_options.m_config = json.dumps(classifier_args)
 

@@ -15,6 +15,7 @@ import pathlib
 import numpy as np
 
 from basf2_mva_python_interface.tensorflow import State
+from tflat.config import config
 
 from keras.losses import binary_crossentropy
 import tensorflow as tf
@@ -33,48 +34,23 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     from tflat.tensorflow_tflat_model import get_tflat_model
 
-    # get all parameters, if they are not available, use default values
-    if parameters is None:
-        parameters = {}
-    else:
-        if not isinstance(parameters, dict):
-            raise TypeError('parameters must be a dictionary')
-
-    seed = parameters.get('seed', None)
+    parameters = config['parameters']
 
     # set random state
+    seed = config['parameters']['seed']
     if seed:
         tf.random.set_seed(seed)
 
-    parameters["clip_value"] = 4
-    parameters['mask_value'] = 0
-    parameters['num_trk'] = 10
-    parameters['num_trk_features'] = 19
-    parameters['num_ecl'] = 20
-    parameters['num_ecl_features'] = 6
-    parameters['num_roe'] = 1
-    parameters['num_roe_features'] = 4
-    parameters["num_transformer_blocks"] = 6
-    parameters["num_heads"] = 4
-    parameters["embedding_dims"] = 128
-    parameters["mlp_hidden_units_factors"] = [2, 1,]
-    parameters["dropout_rate"] = 0.1
-
     state = State(get_tflat_model(parameters, number_of_features))
 
-    weight_decay = 0.0001
-    initial_learning_rate = 1e-4
-    decay_steps = 2000000
-    alpha = 1e-1
-
     cosine_decay_scheduler = tf.keras.optimizers.schedules.CosineDecay(
-        initial_learning_rate=initial_learning_rate,
-        decay_steps=decay_steps,
-        alpha=alpha
+        initial_learning_rate=config['initial_learning_rate'],
+        decay_steps=config['decay_steps'],
+        alpha=config['alpha']
     )
 
     optimizer = tf.keras.optimizers.AdamW(
-        learning_rate=cosine_decay_scheduler, weight_decay=weight_decay
+        learning_rate=cosine_decay_scheduler, weight_decay=config['weight_decay']
     )
 
     state.model.compile(
@@ -156,7 +132,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     callbacks = [tf.keras.callbacks.EarlyStopping(
         monitor='val_loss',
         min_delta=0,
-        patience=10,
+        patience=config['patience'],
         verbose=1,
         mode='auto',
         baseline=None,
@@ -168,8 +144,8 @@ def partial_fit(state, X, S, y, w, epoch, batch):
         validation_data=(
             state.Xtest,
             state.ytest),
-        batch_size=256,
-        epochs=200,
+        batch_size=config['batch_size'],
+        epochs=config['epochs'],
         callbacks=callbacks,
         verbose=1)
 

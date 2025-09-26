@@ -422,7 +422,6 @@ namespace {
     virtual void SetUp()
     {
       // datastore things
-      DataStore::Instance().reset();
       DataStore::Instance().setInitializeActive(true);
 
       // needed to mock up
@@ -2482,7 +2481,6 @@ namespace {
   TEST_F(MetaVariableTest, sourceObjectIsInList)
   {
     // datastore things
-    DataStore::Instance().reset();
     DataStore::Instance().setInitializeActive(true);
 
     // needed to mock up
@@ -2547,7 +2545,6 @@ namespace {
   TEST_F(MetaVariableTest, mcParticleIsInMCList)
   {
     // datastore things
-    DataStore::Instance().reset();
     DataStore::Instance().setInitializeActive(true);
 
     // needed to mock up

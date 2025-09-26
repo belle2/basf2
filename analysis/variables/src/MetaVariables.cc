@@ -2414,7 +2414,7 @@ namespace Belle2 {
 
     }
 
-    void appendDaughtersRecursive(Particle* mother)
+    void appendDaughtersRecursive(Particle* mother, StoreArray<Particle>& container)
     {
 
       auto* mcmother = mother->getRelated<MCParticle>();
@@ -2422,38 +2422,35 @@ namespace Belle2 {
       if (!mcmother)
         return;
 
-      std::vector<MCParticle*> mcdaughters = mcmother->getDaughters();
-      StoreArray<Particle> particles;
-
-      for (auto& mcdaughter : mcdaughters) {
+      for (auto* mcdaughter : mcmother->getDaughters()) {
         if (!mcdaughter->hasStatus(MCParticle::c_PrimaryParticle)) continue;
         Particle tmp_daughter(mcdaughter);
-        Particle* new_daughter = particles.appendNew(tmp_daughter);
+        Particle* new_daughter = container.appendNew(tmp_daughter);
         new_daughter->addRelationTo(mcdaughter);
         mother->appendDaughter(new_daughter, false);
 
         if (mcdaughter->getNDaughters() > 0)
-          appendDaughtersRecursive(new_daughter);
+          appendDaughtersRecursive(new_daughter, container);
       }
-
     }
 
     Manager::FunctionPtr matchedMC(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        static StoreArray<Particle> tempParticles("tempParticles");
         auto func = [var](const Particle * particle) -> double {
           const MCParticle* mcp = particle->getMCParticle();
           if (!mcp)   // Has no MC match and is no MCParticle
           {
             return Const::doubleNaN;
           }
+          tempParticles.clear();
           Particle tmpPart(mcp);
-          StoreArray<Particle> particles;
-          Particle* newPart = particles.appendNew(tmpPart);
+          Particle* newPart = tempParticles.appendNew(tmpPart);
           newPart->addRelationTo(mcp);
 
-          appendDaughtersRecursive(newPart);
+          appendDaughtersRecursive(newPart, tempParticles);
 
           auto var_result = var->function(newPart);
           if (std::holds_alternative<double>(var_result))
@@ -2477,7 +2474,7 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-
+        static StoreArray<Particle> tempParticles("tempParticles");
         auto func = [var](const Particle * particle) -> double {
 
           const ECLCluster* cluster = particle->getECLCluster();
@@ -2497,12 +2494,12 @@ namespace Belle2 {
           // cppcheck-suppress containerOutOfBounds
           const MCParticle* mcp = mcps.object(weightsAndIndices[0].second);
 
+          tempParticles.clear();
           Particle tmpPart(mcp);
-          StoreArray<Particle> particles;
-          Particle* newPart = particles.appendNew(tmpPart);
+          Particle* newPart = tempParticles.appendNew(tmpPart);
           newPart->addRelationTo(mcp);
 
-          appendDaughtersRecursive(newPart);
+          appendDaughtersRecursive(newPart, tempParticles);
 
           auto var_result = var->function(newPart);
           if (std::holds_alternative<double>(var_result))
@@ -3439,6 +3436,7 @@ namespace Belle2 {
           B2FATAL("Ancestor " + arg + " is not recognised. Please provide valid PDG code or particle name.");
         }
 
+        static StoreArray<Particle> tempParticles("tempParticles");
         auto func = [pdg_code, var](const Particle * particle) -> double {
           const Particle* p = particle;
 
@@ -3455,12 +3453,12 @@ namespace Belle2 {
             i_p = i_p->getMother();
           }
 
+          tempParticles.clear();
           Particle m_p(i_p);
-          StoreArray<Particle> particles;
-          Particle* newPart = particles.appendNew(m_p);
+          Particle* newPart = tempParticles.appendNew(m_p);
           newPart->addRelationTo(i_p);
 
-          appendDaughtersRecursive(newPart);
+          appendDaughtersRecursive(newPart, tempParticles);
 
           auto var_result = var->function(newPart);
           if (std::holds_alternative<double>(var_result))

@@ -1611,6 +1611,8 @@ namespace {
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
     particles.registerRelationTo(mcParticles);
+    StoreArray<Particle>("tempParticles").registerInDataStore();
+    StoreArray<Particle>("tempParticles").registerRelationTo(mcParticles);
     DataStore::Instance().setInitializeActive(false);
 
     // Create MC graph for Upsilon(4S) -> (B^- -> electron + anti_electron_neutrino) + B^+
@@ -1704,6 +1706,8 @@ namespace {
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
     particles.registerRelationTo(mcParticles);
+    StoreArray<Particle>("tempParticles").registerInDataStore();
+    StoreArray<Particle>("tempParticles").registerRelationTo(mcParticles);
     DataStore::Instance().setInitializeActive(false);
 
     // Create MC graph for Upsilon(4S) -> (B^- -> electron + anti_electron_neutrino) + B^+
@@ -2338,6 +2342,8 @@ namespace {
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
     particles.registerRelationTo(mcParticles);
+    StoreArray<Particle>("tempParticles").registerInDataStore();
+    StoreArray<Particle>("tempParticles").registerRelationTo(mcParticles);
     DataStore::Instance().setInitializeActive(false);
 
     auto* mcParticle = mcParticles.appendNew();
@@ -3706,6 +3712,8 @@ namespace {
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
     particles.registerRelationTo(mcParticles);
+    StoreArray<Particle>("tempParticles").registerInDataStore();
+    StoreArray<Particle>("tempParticles").registerRelationTo(mcParticles);
     StoreObjPtr<ParticleList> DList("D0:vartest");
     DList.registerInDataStore();
     DList.create();

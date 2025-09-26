@@ -4,6 +4,7 @@ Changes in the analysis package in light-2509-fornax
 Variables
 +++++++++
 * Added pi0 and eta veto variables `BellePi0Veto` and `BelleEtaVeto` that were developed for Belle
+* Fixed memory leak in variables `matchedMC`, `clusterBestMatchedMCParticle`, and `varForFirstMCAncestorOfType`.
 
 TreeFitter
 ++++++++++

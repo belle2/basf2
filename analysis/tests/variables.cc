@@ -946,7 +946,6 @@ namespace {
   {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
     PCmsLabTransform T;
     PxPyPzEVector vec0 = {0.0, 0.0, 0.0, T.getCMSEnergy()};
@@ -985,8 +984,6 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<Particle> particles;
     StoreArray<MCParticle> mcparticles;
-    particles.registerInDataStore();
-    mcparticles.registerInDataStore();
     particles.registerRelationTo(mcparticles);
     MCParticleGraph mcGraph;
     // MC mother of the MC particle
@@ -1232,8 +1229,6 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
     StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
@@ -1453,8 +1448,6 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
     DataStore::Instance().setInitializeActive(false);
 
@@ -1540,8 +1533,6 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
     DataStore::Instance().setInitializeActive(false);
 
@@ -1619,8 +1610,6 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
     DataStore::Instance().setInitializeActive(false);
 
@@ -1714,8 +1703,6 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
     DataStore::Instance().setInitializeActive(false);
 
@@ -2500,7 +2487,6 @@ namespace {
     StoreObjPtr<ParticleList> gammalist("testGammaList");
 
     clusters.registerInDataStore();
-    particles.registerInDataStore();
     DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
     gammalist.registerInDataStore(flags);
 
@@ -2564,8 +2550,6 @@ namespace {
     StoreObjPtr<ParticleList> list("testList");
     StoreObjPtr<ParticleList> anotherlist("supplimentaryList");
 
-    mcparticles.registerInDataStore();
-    particles.registerInDataStore();
     particles.registerRelationTo(mcparticles);
     DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
     list.registerInDataStore(flags);
@@ -3721,8 +3705,6 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
     StoreObjPtr<ParticleList> DList("D0:vartest");
     DList.registerInDataStore();
@@ -4106,8 +4088,6 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
     StoreObjPtr<ParticleList> BList("B:vartest");
     BList.registerInDataStore();

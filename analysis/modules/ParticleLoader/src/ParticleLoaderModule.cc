@@ -119,10 +119,13 @@ void ParticleLoaderModule::initialize()
             << ", loadChargedCluster: " << m_loadChargedCluster);
 
   m_particles.registerInDataStore();
+  // regsiter temporary StoreArray of Particles needed for matchedMC variable
+  StoreArray<Particle>("tempParticles").registerInDataStore(DataStore::c_DontWriteOut);
   m_particleExtraInfoMap.registerInDataStore();
   //register relations if these things exists
   if (m_mcparticles.isOptional()) {
     m_particles.registerRelationTo(m_mcparticles);
+    StoreArray<Particle>("tempParticles").registerRelationTo(m_mcparticles);
   }
   if (m_pidlikelihoods.isOptional()) {
     m_particles.registerRelationTo(m_pidlikelihoods);

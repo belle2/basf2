@@ -59,13 +59,14 @@ def check_path(path):
 
 if __name__ == "__main__":
     all_good = True
-    for run_type, mode in itertools.product(constants.RunTypes, constants.SoftwareTriggerModes):
-        basf2.B2INFO(f"Checking processing path for {run_type} in {mode} mode")
+    for run_type, hlt_mode, prefilter_mode in itertools.product(
+            constants.RunTypes, constants.SoftwareTriggerModes, constants.HLTPrefilterModes):
+        basf2.B2INFO(f"Checking processing path for {run_type} in {hlt_mode} HLT mode and {prefilter_mode} HLTPrefilter mode")
         path = basf2.Path()
-        add_hlt_processing(path, run_type=run_type, softwaretrigger_mode=mode)
+        add_hlt_processing(path, run_type=run_type, softwaretrigger_mode=hlt_mode, hlt_prefilter_mode=prefilter_mode)
         basf2.print_path(path)
         if not check_path(path):
-            basf2.B2ERROR(f"Problems found for {run_type} in {mode} mode")
+            basf2.B2ERROR(f"Problems found for {run_type} in {hlt_mode} HLT mode and {prefilter_mode} HLTPrefilter mode")
             all_good = False
 
     sys.exit(0 if all_good else 1)

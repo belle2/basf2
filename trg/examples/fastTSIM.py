@@ -47,6 +47,6 @@ main.add_module(rootoutput)
 
 
 # main
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)
 # ===<END>

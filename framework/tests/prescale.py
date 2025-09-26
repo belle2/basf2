@@ -38,6 +38,4 @@ prescale_mod.if_true(success_path)
 
 basf2.process(main)
 
-print(basf2.statistics)
-
 assert success_count.num_events == expected_success_events

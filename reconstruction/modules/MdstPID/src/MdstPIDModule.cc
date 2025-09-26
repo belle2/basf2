@@ -8,6 +8,12 @@
 
 #include <reconstruction/modules/MdstPID/MdstPIDModule.h>
 #include <klm/muid/MuidElementNumbers.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+#include <top/dataobjects/TOPLikelihood.h>
+#include <arich/dataobjects/ARICHLikelihood.h>
+#include <cdc/dataobjects/CDCDedxLikelihood.h>
+#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 
 using namespace std;
 using namespace Belle2;

@@ -39,5 +39,5 @@ conditionpath = b2.Path()
 conditionpath.add_module('RootOutput', outputFileName='saved_from_display.root')
 display.if_true(conditionpath)
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

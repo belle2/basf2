@@ -13,18 +13,19 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-
-// MVA
-#include <mva/interface/Expert.h>
-#include <mva/interface/Dataset.h>
+#include <framework/gearbox/Const.h>
 
 // ANALYSIS
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dbobjects/ChargedPidMVAWeights.h>
 #include <analysis/VariableManager/Utility.h>
 
 
 namespace Belle2 {
+  class ChargedPidMVAWeights;
+  namespace MVA {
+    class Expert;
+    class SingleDataset;
+  }
 
   /**
    *

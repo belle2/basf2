@@ -94,7 +94,7 @@ defined by the skim will not be included.
      still smaller than the original size of the mDST?
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      Even though we are adding more information to each event by saving the
      reconstructed particle lists, only a fraction of events are kept by the
@@ -120,7 +120,7 @@ applied.
      the Sphinx documentation.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      Click the ``[Source]`` button on any of the skims in the :ref:`EWP
      <skim_physics_ewp>` section to be taken to source code for that skim.
@@ -194,7 +194,7 @@ or by using the ``-h`` flag.
      ``$BELLE2_VALIDATION_DATA_DIR/mdst16.root``.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      The command to run the ``XToD0_D0ToHpJm`` skim on this sample is:
 
@@ -212,13 +212,13 @@ or by using the ``-h`` flag.
      ``XToD0_D0ToHpJm`` skim on this sample?
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      You can use the tool ``b2file-metadata-show`` to print the number of events
      in an mDST or uDST file.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      .. code-block:: bash
 
@@ -279,13 +279,13 @@ in the documentation of `skim.registry.SkimRegistryClass`.
      skim from the MC skim campaign ``SkimM13ax1``.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Find the skim code for ``B0toDpi_Kspi`` on the :ref:`skim documentation on
      Sphinx <skim_physics>`.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      Visit the DIRAC webapp and navigate to the dataset searcher. The LFNs can
      be found by selecting ``MC`` and ``BGx1``, and passing ``SkimM13ax1`` in the

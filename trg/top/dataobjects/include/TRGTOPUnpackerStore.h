@@ -6,21 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef TRGTOPUNPACKERSTORE_H
-#define TRGTOPUNPACKERSTORE_H
+#pragma once
 
-//#include <TObject.h>
 #include <framework/datastore/RelationsObject.h>
+#include <trg/top/dataobjects/TRGTOPSlotTiming.h>
 
 #include <vector>
-
-#include <trg/top/dataobjects/TRGTOPSlotTiming.h>
 
 namespace Belle2 {
 
 
-  //! Example Detector
-  //  class TRGTOPUnpackerStore : public TObject {
+  //! TRGTOPUnpackerStore
   class TRGTOPUnpackerStore : public RelationsObject {
 
   public:
@@ -134,7 +130,6 @@ namespace Belle2 {
     int getLogLSum() const { return m_logLSum;}
     int getLogLVar() const { return m_logLVar;}
     int getTimingVar() const { return m_timingVar;}
-    //int get() const { return m_;}
 
     //Need namespace qualifier because ROOT CINT has troubles otherwise
     const std::vector<Belle2::TRGTOPSlotTiming> getSlotTimingDecisions() { return m_slotTimingDecisions; }
@@ -157,7 +152,6 @@ namespace Belle2 {
     void setLogLSum(int logLSum);
     void setLogLVar(int logLVar);
     void setTimingVar(int timingVar);
-    //void set(int );
 
     void setSlotTimingDecision(TRGTOPSlotTiming slotTiming);
 
@@ -209,6 +203,3 @@ namespace Belle2 {
   };
 
 } //end namespace Belle2
-
-#endif
-

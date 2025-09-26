@@ -13,6 +13,8 @@
 #include <framework/logging/Logger.h>
 
 // dataobjects
+#include <analysis/dataobjects/Particle.h>
+
 #include <analysis/VariableManager/Manager.h>
 
 using namespace std;

@@ -41,7 +41,7 @@ main.add_module("RootOutput", outputFileName="evtgen_upsilon1s.root")
 main.add_module("PrintMCParticles", logLevel=basf2.LogLevel.DEBUG, onlyPrimaries=False)
 
 # generate events
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # show call statistics
 print(basf2.statistics)

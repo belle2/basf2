@@ -43,7 +43,7 @@ main.add_module("HepMCOutput", OutputFilename='kkmc_tautau_bbb.hepmc', StoreVirt
 # main.add_module("PrintMCParticles", logLevel=LogLevel.INFO, onlyPrimaries=False)
 
 # generate events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # show call statistics
 print(b2.statistics)

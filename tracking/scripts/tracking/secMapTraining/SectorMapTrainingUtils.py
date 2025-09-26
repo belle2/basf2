@@ -438,4 +438,3 @@ def remove_timing_cuts_from_SectorMap(sectorMapFile, setupToRead="SVDOnlyDefault
     b2.print_path(main)
     # run path
     b2.process(main)
-    print(b2.statistics)

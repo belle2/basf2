@@ -5,24 +5,21 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef TRGTOPUNPACKER_H
-#define TRGTOPUNPACKER_H
 
-#include <string>
-#include <algorithm>
-
-#include "rawdata/dataobjects/RawTRG.h"
-//#include "trg/top/dataobjects/TRGTOPUnpackerStore.h"
-#include "trg/top/dataobjects/TRGTOPCombinedT0Decision.h"
-
-#include "trg/top/dataobjects/TRGTOPSlotTiming.h"
+#pragma once
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
 
+#include <string>
+
 #define NUMBER_OF_SLOTS 16
 
 namespace Belle2 {
+  class TRGTOPCombinedT0Decision;
+  class TRGTOPSlotTiming;
+  class RawTRG;
+
   /**
   * TRG TOP Unpacker
   *
@@ -85,13 +82,10 @@ namespace Belle2 {
   private:
 
     //! time period of revo strobe in "ns" (assuming the clock of "125MHz")
-    static constexpr int revoToNS = 1280 * 8;
+    static constexpr int s_revoToNS = 1280 * 8;
 
-    //    StoreArray<TRGTOPUnpackerStore>  m_TRGTOPCombinedTimingArray;
     StoreArray<TRGTOPCombinedT0Decision>  m_TRGTOPCombinedT0DecisionArray;
     StoreArray<TRGTOPSlotTiming>  m_TRGTOPSlotTimingArray;
 
   };
 }
-
-#endif

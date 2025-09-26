@@ -15,6 +15,7 @@
 #include <framework/logging/Logger.h>
 #include <genfit/MaterialEffects.h>
 #include <genfit/Exception.h>
+#include <genfit/MeasuredStateOnPlane.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

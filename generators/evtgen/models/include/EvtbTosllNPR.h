@@ -53,6 +53,12 @@ public:
    */
   void initProbMax() override;
 
+  /**
+   * The destructor to clean up objects created during the
+   * initialization
+   */
+  virtual ~EvtbTosllNPR();
+
 private:
   /** delta C_7eff -- addition to NNLO SM value */
   EvtComplex m_dc7;

@@ -10,6 +10,7 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>

@@ -773,7 +773,12 @@ void EvtbTosllNPR::init()
     }
     m_reso.push_back(std::make_pair(t, r));
   }
+}
 
+EvtbTosllNPR::~EvtbTosllNPR()
+{
+  for (BW_t* t : m_rs) delete t;
+  if (m_ls) delete m_ls;
 }
 
 static std::complex<double> hfun(double q2, double mq)

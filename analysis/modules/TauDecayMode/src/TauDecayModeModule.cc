@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #include <analysis/modules/TauDecayMode/TauDecayModeModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 #include <vector>

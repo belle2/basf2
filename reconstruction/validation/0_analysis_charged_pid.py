@@ -152,7 +152,6 @@ def run_b2analysis():
 
     main.add_module('Progress')
     basf2.process(main)
-    print(basf2.statistics)
 
 
 def add_global_plots():

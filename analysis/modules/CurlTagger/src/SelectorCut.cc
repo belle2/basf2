@@ -8,6 +8,8 @@
 
 #include <analysis/modules/CurlTagger/SelectorCut.h>
 
+#include <analysis/dataobjects/Particle.h>
+
 //Root includes
 #include "TMath.h"
 

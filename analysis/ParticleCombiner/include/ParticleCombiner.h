@@ -11,7 +11,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Utility.h>
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -37,6 +36,7 @@ namespace std {
 }
 
 namespace Belle2 {
+  class DecayDescriptor;
 
   /**
   * ParticleIndexGenerator is a generator for all the combinations of the particle indices stored in the particle lists.

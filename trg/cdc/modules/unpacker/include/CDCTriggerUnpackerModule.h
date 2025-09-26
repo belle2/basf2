@@ -374,7 +374,7 @@ namespace Belle2 {
     /** condition database for number of TS in 2D */
     DBObjPtr<CDCTrigger2DConfig> m_dbn2DTS;
     /** current neurotrigger config from database; used for unscaling network target */
-    DBObjPtr<CDCTriggerNeuroConfig>* m_cdctriggerneuroconfig;
+    std::unique_ptr<DBObjPtr<CDCTriggerNeuroConfig>> m_cdctriggerneuroconfig; /**< Pointer to the NeuroConfig in DB */
     /** output scale for the neural network output */
     std::vector<float> m_NNOutputScale;
     /** fake object to assign the user set scaling values to */

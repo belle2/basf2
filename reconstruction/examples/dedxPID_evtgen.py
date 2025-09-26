@@ -119,5 +119,5 @@ main.add_module(svddedx)
 main.add_module(output)
 
 # process events and print call statistics
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

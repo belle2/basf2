@@ -4,14 +4,13 @@
 # Documentation: SM B-> tau tau signal with SLL model, taus decay as they like
 # Tested: Yes
 # PhysicsWG: EWP
-# Responsible: Sam Cunliffe
-# Email: sam.cunliffe@desy.de
+# Responsible: Sam Cunliffe - Mattia MARFOLI
+# Email: sam.cunliffe@desy.de - marfoli@cppm.in2p3.fr
 # Cuts: None
-# Date: 20170614
+# Date: 20250731
 #
 Decay Upsilon(4S)
-0.5 		B0sig 		anti-B0 VSS;
-0.5 		anti-B0sig 	B0 	VSS;
+1.0     B0sig anti-B0sig B0 anti-B0           VSS_BMIX dm;
 Enddecay
 #
 Decay B0sig

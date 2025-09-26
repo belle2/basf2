@@ -109,13 +109,13 @@ A good place to look for Belle II-specific jargon is the **Belle II Glossary**.
      Find the Belle II Glossary (again).
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      You might need to revisit the tutorial pages about
      :ref:`onlinebook_collaborative_tools`.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      `Belle II Glossary <https://xwiki.desy.de/xwiki/rest/p/1e1f2>`_
 
@@ -157,12 +157,12 @@ It is a python object: `basf2.Path`.
      Find a diagram of a path with modules in this documentation.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      I have already given you a link to the relevant page.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      Take a look at the :ref:`general_modpath` page.
      The diagram is `here <framework_modpath_diagram>`.
@@ -189,14 +189,14 @@ You will meet this at the end of this lesson.
      Find the source code and find a list of all packages.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      You might need to revisit the tutorial pages about
      :ref:`onlinebook_collaborative_tools`.
 
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      The source code is online `here <https://gitlab.desy.de/belle2/software/basf2>`_.
      The list of **packages** is simply the list of directories in the software
@@ -225,16 +225,16 @@ We use the word "steering" since no real data **processing** is done in python.
      Why do we use both C++ and python?
 
 .. admonition:: Solution
-     :class: toggle solution
+   :class: dropdown solution
 
-     Generally speaking, the heavy data processing tasks are done in C++.
-     This is because of the performance.
-     Python is used as a user-friendly and readable language for configuration.
+   Generally speaking, the heavy data processing tasks are done in C++.
+   This is because of the performance.
+   Python is used as a user-friendly and readable language for configuration.
 
-     .. note::
+   .. note::
 
-         There are some exceptions, some modules are written in python for
-         instance, but they are not very common.
+       There are some exceptions, some modules are written in python for
+       instance, but they are not very common.
 
 Databases
 ~~~~~~~~~
@@ -386,13 +386,13 @@ It is also true that using the latest supported release makes you cool.
      between a full release and a light release and also a Belle II question.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      There is no hint.
      You've got this.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      It is described in the section :ref:`choosing_a_release`.
 
@@ -402,12 +402,12 @@ It is also true that using the latest supported release makes you cool.
      What is semantic versioning?
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      This is jargon but it is not specific to Belle II.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      A rule for version numbers.
      See the summary at https://semver.org
@@ -419,7 +419,7 @@ It is also true that using the latest supported release makes you cool.
      ``release-AA-01-00`` ?
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      **Yes**.
      There should not be anything that breaks backward compatibility between minor versions.
@@ -431,7 +431,7 @@ It is also true that using the latest supported release makes you cool.
      ``release-BB-00-00`` ?
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      **No, it is not guaranteed**.
      Unfortunately there is no guarantee of backward compatibility between major versions.
@@ -444,7 +444,7 @@ It is also true that using the latest supported release makes you cool.
      ``light-5602-reallyfarfuture`` ?
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      **No, it is not guaranteed**.
      Unfortunately there is no guarantee of backward compatibility between light releases.
@@ -459,14 +459,14 @@ It is also true that using the latest supported release makes you cool.
      What are they?
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      .. code-block:: bash
 
          b2help-releases # no arguments
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      It will be the current recommended full release and the one previous.
      So execute:
@@ -483,20 +483,20 @@ It is also true that using the latest supported release makes you cool.
      Find the source code for the recommended full release.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      We use git to tag releases.
      You might need to revisit the lesson on collaborative tools.
 
 .. admonition:: Solution
-     :class: toggle solution
+   :class: dropdown solution
 
-     1. Go to https://gitlab.desy.de/belle2/software/basf2
-     2. From the left column, click on "Repository" and then "Tags.
-     3. Search for the release tag using the filters.
+   1. Go to https://gitlab.desy.de/belle2/software/basf2
+   2. From the left column, click on "Repository" and then "Tags.
+   3. Search for the release tag using the filters.
 
-     .. image:: introduction/find_a_tag.png
-         :width: 300px
+   .. image:: introduction/find_a_tag.png
+      :width: 300px
 
 A useful command
 ~~~~~~~~~~~~~~~~
@@ -613,27 +613,27 @@ there is a tool ``b2help-particles``.
      What was the luminosity collected in experiment 8?
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      There is a command line tool for that.
      Try tabcompletion ``b2<tab>``.
 
 .. admonition:: Another hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      .. code-block:: bash
 
          $ b2info-<tab>
 
 .. admonition:: Are you sure you really need another hint?
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      .. code-block:: bash
 
           $ b2info-luminosity --help
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      .. code-block:: bash
 
@@ -762,12 +762,12 @@ post-reconstruction dataobjects.
      sections.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      There is no hint. You've got this.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      :ref:`analysis`
 
@@ -777,7 +777,7 @@ post-reconstruction dataobjects.
      Find a list of mdst dataobjects.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      There are (at least) two ways to do this.
 
@@ -818,7 +818,7 @@ backward-compatibility that is guaranteed in the software.
      will you be able to open it with ``release-BB-00-00``?
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      **Yes**.
      If BB is AA+1 (i.e. the next major release).
@@ -831,7 +831,7 @@ backward-compatibility that is guaranteed in the software.
      Will you be able to open it with the latest light release?
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      **Yes**.
      New light releases will always be able to open files from the current,
@@ -914,7 +914,7 @@ In pseudo-python you will see they are very often of the form:
      What does it do?
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      You can use either
 
@@ -925,7 +925,7 @@ In pseudo-python you will see they are very often of the form:
      or browse this online documentation.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      The :b2:mod:`ParticleCombiner` takes one or more **ParticleList** s
      and combines **Particle** s from the inputs to create *composite* particle
@@ -944,7 +944,7 @@ In pseudo-python you will see they are very often of the form:
      Read the function.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      You want the `modularAnalysis.reconstructDecay` function.
      You could either read the source code for that on GitLab,

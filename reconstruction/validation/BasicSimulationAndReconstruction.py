@@ -164,7 +164,6 @@ def run():
 
     print(path)
     basf2.process(path)
-    print(basf2.statistics)
 
 
 if __name__ == '__main__':

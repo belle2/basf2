@@ -130,5 +130,5 @@ if (args.DataOutput is True):
 
 main.add_module("Progress")
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

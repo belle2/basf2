@@ -31,6 +31,19 @@
 
 // KFit
 #include <analysis/VertexFitting/KFit/KFitConst.h>
+#include <analysis/VertexFitting/KFit/MassFitKFit.h>
+#include <analysis/VertexFitting/KFit/FourCFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassFourCFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassPointingVertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassVertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
+#include <analysis/VertexFitting/KFit/RecoilMassKFit.h>
+
+// Rave
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
+#include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
 #include <TVector.h>
 #include <TRotation.h>
@@ -118,7 +131,6 @@ void ParticleVertexFitterModule::event()
 
   m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
   m_beamSpotCov.ResizeTo(3, 3);
-  TMatrixDSym beamSpotCov(3);
   if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamSpotDB->getCovVertex();
   if (m_withConstraint == "iptube") {
     if (m_smearing > 0 && m_vertexFitter == "KFit") {
@@ -839,7 +851,7 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double a = -1 * Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
       double dx = kv.getVertex().x() - kv.getTrackPosition(iChild).x();
       double dy = kv.getVertex().y() - kv.getTrackPosition(iChild).y();
 
@@ -866,7 +878,7 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
       auto daughter = const_cast<Particle*>(fitChildren[iChild]);
 
-      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughter->getCharge();
+      double a = -1 * Const::speedOfLight * 1e-4 * m_Bfield * daughter->getCharge();
       double dx = kv.getVertex().x() - kv.getTrackPosition(iChild).x();
       double dy = kv.getVertex().y() - kv.getTrackPosition(iChild).y();
 
@@ -938,7 +950,7 @@ bool ParticleVertexFitterModule::makeKMassVertexMother(analysis::MassVertexFitKF
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double a = -1 * Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
       double dx = kmv.getVertex().x() - kmv.getTrackPosition(iChild).x();
       double dy = kmv.getVertex().y() - kmv.getTrackPosition(iChild).y();
 
@@ -978,7 +990,7 @@ bool ParticleVertexFitterModule::makeKMassPointingVertexMother(analysis::MassPoi
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double a = -1 * Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
       double dx = kmpv.getVertex().x() - kmpv.getTrackPosition(iChild).x();
       double dy = kmpv.getVertex().y() - kmpv.getTrackPosition(iChild).y();
 
@@ -1017,7 +1029,7 @@ bool ParticleVertexFitterModule::makeKMassMother(analysis::MassFitKFit& km,
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double a = -1 * Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
       double dx = km.getVertex().x() - km.getTrackPosition(iChild).x();
       double dy = km.getVertex().y() - km.getTrackPosition(iChild).y();
 
@@ -1182,7 +1194,7 @@ bool ParticleVertexFitterModule::makeKRecoilMassMother(analysis::RecoilMassKFit&
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double a = -1 * Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
       double dx = kf.getVertex().x() - kf.getTrackPosition(iChild).x();
       double dy = kf.getVertex().y() - kf.getTrackPosition(iChild).y();
 
@@ -1206,7 +1218,7 @@ bool ParticleVertexFitterModule::makeKRecoilMassMother(analysis::RecoilMassKFit&
 void ParticleVertexFitterModule::updateMapOfTrackAndDaughter(unsigned& l,  std::vector<std::vector<unsigned>>& pars,
     std::vector<unsigned>& parm, std::vector<Particle*>&  allparticles, const Particle* daughter)
 {
-  std::vector <Belle2::Particle*> daughters = daughter->getDaughters();
+  std::vector <Particle*> daughters = daughter->getDaughters();
   for (unsigned ichild = 0; ichild < daughter->getNDaughters(); ichild++) {
     const Particle* child = daughter->getDaughter(ichild);
     std::vector<unsigned> pard;

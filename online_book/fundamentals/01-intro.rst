@@ -59,7 +59,7 @@ background.
         :math:`\Upsilon(4S)` in the rest frame of the :math:`\Upsilon`?
 
     .. admonition:: Solution
-        :class: toggle solution
+        :class: dropdown solution
 
         Half of its rest mass: :math:`\sim 5.3\ \textrm{GeV}`
 
@@ -92,18 +92,18 @@ However this is not the most probable result in an :math:`e^+e^-` collision.
     :math:`B\bar B` hadronic events.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     You should be able to find this information on XWiki.
 
 .. admonition:: Another hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Probably you are looking for `this page
     <https://xwiki.desy.de/xwiki/rest/p/8f198>`_.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     At around 125 nb, the most probably process is :math:`e^+e^-\to e^+e^-`.
     The cross section for hadronic events is around 5.8 nb, the cross section

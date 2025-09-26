@@ -98,7 +98,6 @@ def run_collectors():
     main.add_path(collector_path)
     basf2.print_path(main)
     process(main)
-    print(basf2.statistics)
 
 
 def get_entry_sequences(root_input_module):

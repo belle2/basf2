@@ -9,7 +9,6 @@
 
 #include <tracking/vxdHoughTracking/filters/pathFilters/BasePathFilter.h>
 #include <tracking/vxdHoughTracking/filters/pathFilters/FourHitVariables.h>
-#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {

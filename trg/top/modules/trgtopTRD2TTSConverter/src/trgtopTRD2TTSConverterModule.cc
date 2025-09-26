@@ -8,6 +8,11 @@
 
 #include <trg/top/modules/trgtopTRD2TTSConverter/trgtopTRD2TTSConverterModule.h>
 
+#include <trg/top/dataobjects/TRGTOPTimeStampsSlot.h>
+#include <trg/top/dataobjects/TRGTOPTimeStamp.h>
+#include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRawDigit.h>
+
 /* --------------- WARNING ---------------------------------------------- *
 If you have more complex parameter types in your class then simple int,
 double or std::vector of those you might need to uncomment the following

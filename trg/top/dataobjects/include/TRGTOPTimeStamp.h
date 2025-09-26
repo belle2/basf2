@@ -6,21 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef TRGTOPTIMESTAMP_H
-#define TRGTOPTIMESTAMP_H
+#pragma once
 
-//#pragma once
-
-//#include <TObject.h>
 #include <framework/datastore/RelationsObject.h>
-
-#include <vector>
-#include <limits>
 
 namespace Belle2 {
 
-  //! Example Detector
-  //  class TRGTOPTimeStamp : public TObject {
+  //! TRGTOPTimeStamp
   class TRGTOPTimeStamp : public RelationsObject {
 
   public:
@@ -53,11 +45,9 @@ namespace Belle2 {
 
     int getTimeStamp()      const { return m_timeStamp;     }
     int getSlot()      const { return m_slot;     }
-    //int get() const { return m_;}
 
     void setTimeStamp(int timeStamp);
     void setSlot(int slot);
-    //void set(int );
 
   private:
 
@@ -71,5 +61,3 @@ namespace Belle2 {
   };
 
 } //end namespace Belle2
-
-#endif

@@ -8,7 +8,9 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# This example creates the file ModelForStandalone.onnx used in tests
+# This example creates the files
+# - ModelForStandalone.onnx used in test for the standalone ONNX interface
+# - ModelABToAB and ModelAToATwiceA to test the behaviour of the ONNX MVA interface for naming inputs/outputs
 
 import torch
 from torch import nn
@@ -18,6 +20,7 @@ class Model(nn.Module):
     """
     Example model with 2 different input tensors
     """
+
     def __init__(self):
         """
         Intialize with a single Linear layer
@@ -34,6 +37,27 @@ class Model(nn.Module):
         return self.linear(torch.cat([a, b.reshape(-1, 6).float()], axis=1))
 
 
+class TrivialModel(nn.Module):
+    """
+    Wrapper class to create simple non-parametric models with multiple inputs and outputs for ONNX tests
+    """
+
+    def __init__(self, forward_fn):
+        """
+        Initialize with forward pass function passed to the constructor
+        """
+        super().__init__()
+
+        #: forward pass function
+        self.forward_fn = forward_fn
+
+    def forward(self, *args):
+        """
+        Run the forward pass based on `forward_fn`
+        """
+        return self.forward_fn(*args)
+
+
 if __name__ == "__main__":
     model = Model()
     model.load_state_dict({
@@ -47,12 +71,26 @@ if __name__ == "__main__":
     b = torch.tensor([[[1, 0, 1], [1, -1, 0]]])
 
     torch.set_printoptions(precision=10)
-    print("Outputs to test against:", model(a, b))
-
-    torch.onnx.export(
-        model,
-        (a, b),
-        "ModelForStandalone.onnx",
-        input_names=["a", "b"],
-        output_names=["output"],
-    )
+    with torch.no_grad():
+        print("Outputs to test against for ModelForStandalone.onnx:", model(a, b))
+        torch.onnx.export(
+            model,
+            (a, b),
+            "ModelForStandalone.onnx",
+            input_names=["a", "b"],
+            output_names=["output"],
+        )
+        torch.onnx.export(
+            TrivialModel(lambda a, b: (a, b)),
+            (torch.zeros(4), torch.zeros(4)),
+            "ModelABToAB.onnx",
+            input_names=["input_a", "input_b"],
+            output_names=["output_a", "output_b"],
+        )
+        torch.onnx.export(
+            TrivialModel(lambda a: (a, 2*a)),
+            (torch.zeros(4)),
+            "ModelAToATwiceA.onnx",
+            input_names=["input_a"],
+            output_names=["output_a", "output_twice_a"],
+        )

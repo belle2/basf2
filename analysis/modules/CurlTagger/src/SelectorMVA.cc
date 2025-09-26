@@ -8,6 +8,8 @@
 
 #include <analysis/modules/CurlTagger/SelectorMVA.h>
 
+#include <analysis/dataobjects/Particle.h>
+
 #include <analysis/variables/TrackVariables.h>
 #include <analysis/variables/MCTruthVariables.h>
 #include <analysis/variables/Variables.h>

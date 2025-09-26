@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdUnpacking/PXDGatedInfoFillerModule.h>
+#include <pxd/dataobjects/PXDGatedModeInfo.h>
 
 using namespace Belle2;
 using namespace Belle2::PXD;

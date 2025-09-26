@@ -40,7 +40,7 @@ def main(script_name):
         execution.start(["hlt_mrb2rb"] + output_ring_buffer_list + [args.output_ring_buffer])
         for input_rb, output_rb, roi_message_queue in zip(input_ring_buffer_list, output_ring_buffer_list,
                                                           message_queue_list):
-            execution.start(["basf2", "--no-stats", script_name, "--", input_rb, output_rb, roi_message_queue])
+            execution.start(["basf2", script_name, "--", input_rb, output_rb, roi_message_queue])
         return_code = execution.wait()
     finally:
         execution.kill()

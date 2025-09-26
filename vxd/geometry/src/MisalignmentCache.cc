@@ -8,7 +8,7 @@
 
 
 #include <vxd/geometry/MisalignmentCache.h>
-#include <vxd/dataobjects/VxdID.h>
+#include <vxd/dataobjects/VXDTrueHit.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>

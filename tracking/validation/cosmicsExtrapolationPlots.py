@@ -351,8 +351,6 @@ def run():
     # Run.
     basf2.process(main)
 
-    print(basf2.statistics)
-
 
 if __name__ == '__main__':
     if ACTIVE:

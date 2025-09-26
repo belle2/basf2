@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef DETECTORCONSTRUCTION_H
-#define DETECTORCONSTRUCTION_H
+#pragma once
 
 #include <framework/logging/Logger.h>
 #include <geometry/GeometryManager.h>
@@ -34,4 +33,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif

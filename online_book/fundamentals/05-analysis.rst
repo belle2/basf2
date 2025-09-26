@@ -68,13 +68,13 @@ as sum of measured particles.
     Do they both reach the tracking system?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Go to https://pdglive.lbl.gov/Viewer.action and look up at the muon and :math:`D^+` lifetime.
     Remember that the beampipe radius is 1 cm.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     The average flight length of a particle of speed :math:`\beta` and lifetime
     :math:`\tau` is
@@ -91,13 +91,13 @@ as sum of measured particles.
     enough to reach the active volume of the detector and leave signal there?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Think about the truly stable and very long lived particles you know, but remember that not all
     neutral particles are well reconstructed by the ECL or KLM!
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
 
     Let's start from the **charged particles**.

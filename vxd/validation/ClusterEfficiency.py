@@ -208,4 +208,3 @@ main.add_module(clusterefficiency)
 main.add_module("Progress")
 
 b2.process(main)
-print(b2.statistics)

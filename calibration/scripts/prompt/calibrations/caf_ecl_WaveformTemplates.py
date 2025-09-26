@@ -30,7 +30,8 @@ settings = CalibrationSettings(
     depends_on=[],
     expert_config={
         "C2_MinEnergyThreshold": 2.0,
-        "nFilesCollector": 50
+        "nFilesCollector": 50,
+        "nParallelAlgos": 1
     },
     produced_payloads=["ECLWaveformTemplate"])
 
@@ -82,18 +83,21 @@ def get_calibrations(input_data, **kwargs):
     algos_C3 = []
     collectors_C2 = []
 
-    batchsize = 100
-    nbatches = 88
+    batches = expert_config["nParallelAlgos"]
+    nCrystals = 8736
+    batchsize = int(nCrystals / batches)
+    if (batches * batchsize < nCrystals):
+        batchsize = batchsize + 1
 
     # keep option to run in parallel
-    for i in range(0, nbatches):
+    for i in range(0, batches):
 
         lowLimit = (batchsize*i)+1
 
         highLimit = (batchsize*(i+1))
 
-        if (highLimit > 8736):
-            highLimit = 8736
+        if (highLimit > nCrystals):
+            highLimit = nCrystals
 
         print("lowLimit,highLimit", lowLimit, highLimit)
 

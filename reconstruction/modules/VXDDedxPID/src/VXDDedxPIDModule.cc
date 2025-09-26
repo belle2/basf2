@@ -12,6 +12,16 @@
 
 #include <vxd/geometry/GeoCache.h>
 
+#include <reconstruction/dataobjects/VXDDedxTrack.h>
+#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <svd/dbobjects/SVDdEdxPDFs.h>
+#include <pxd/dbobjects/PXDdEdxPDFs.h>
+
 #include <genfit/MaterialEffects.h>
 
 #include <Math/VectorUtil.h>

@@ -37,7 +37,7 @@ main.add_module("FullSim", StoreAllSecondaries=True, SecondariesEnergyCut=1.0)
 main.add_module("RootOutput", outputFileName="EvtGenSimNoBkgYesSecondaries.root")
 
 # run it
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

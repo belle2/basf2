@@ -9,11 +9,12 @@
 #pragma once
 
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDCluster.h>
 #include <calibration/CalibrationCollectorModule.h>
 #include <string>
 
 namespace Belle2 {
+  class PXDCluster;
+
   /**
    * Calibration collector module for PXD cluster position estimation
    *

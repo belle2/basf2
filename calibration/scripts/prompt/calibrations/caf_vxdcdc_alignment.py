@@ -259,6 +259,7 @@ def create_prompt(files, cfg):
         fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=False),
         commands=[
             "method diagonalization 3 0.1",
+            "threads 10 10",
             "scaleerrors 1. 1.",
             "entries 1000"],
         params=dict(minPValue=0.00001, externalIterations=0, granularity="run"),

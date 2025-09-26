@@ -21,7 +21,7 @@
 #include <regex>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "main_2025-07-22"
+#define CURRENT_DEFAULT_TAG "main_2025-09-08"
 
 namespace py = boost::python;
 

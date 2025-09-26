@@ -33,16 +33,22 @@ notes, documents, code over time.
 Sometimes the changes will be wrong and we need to fix these errors. Sometimes
 we might get feedback to a specific version of our paper but we might have
 changed this part already and we need to figure out what still applies. And
-sometimes we might get an email like this
+sometimes we might get an email like this:
 
-    Hi,
+.. raw:: html
 
-    2 years ago you presented This Thing™ at That Meeting™ and I'm trying to do
-    the same, could you send me the script you used back then?
+   <div class="clear"></div>
 
-    Best Regards,
+.. epigraph::
 
-    -- Poor Student
+   Hi,
+
+   2 years ago you presented This Thing™ at That Meeting™ and I'm trying to do
+   the same, could you send me the script you used back then?
+
+   Best Regards,
+
+   -- Poor Student
 
 Now one way to achieve this would maybe be to keep all old versions manually,
 either in the same file but commented out like this:
@@ -129,19 +135,19 @@ Let's test what you learned so far!
    with git. Find and clone them.
 
 .. admonition:: Hint
-   :class: xhint stacked toggle
+   :class: xhint stacked dropdown
 
    The project lives `here <https://gitlab.desy.de/belle2/software/training>`__.
 
 .. admonition:: Hint
-   :class: xhint stacked toggle
+   :class: xhint stacked dropdown
 
    The repositories live `here <https://gitlab.desy.de/belle2/software/training/b2-git-training-space>`__
    and `here <https://gitlab.desy.de/belle2/software/training/b2-git-training-space-2>`__.
    You can find the URL to clone by clicking a button in the sidebar on your left.
 
 .. admonition:: Solution
-   :class: solution toggle
+   :class: dropdown solution
 
    .. code-block:: bash
 
@@ -156,7 +162,7 @@ Now you should have both repositories on your local machine.
    Make a local change in ``b2-git-training-space``, commit and push.
 
 .. admonition:: Solution
-   :class: solution toggle
+   :class: dropdown solution
 
    .. code-block:: bash
 
@@ -229,18 +235,18 @@ Now you should be familiar with the commands ``git branch`` and ``git merge``.
    Go to the repository ``b2-git-training-space-2`` and commit some changes to a new branch.
 
 .. admonition:: Hint
-   :class: xhint stacked toggle
+   :class: xhint stacked dropdown
 
    You should have already cloned this repository in the last section.
    Run ``git pull`` to make sure you're up to date.
 
 .. admonition:: Hint
-   :class: xhint stacked toggle
+   :class: xhint stacked dropdown
 
    You will need the commands ``git branch``, ``git checkout``, ``git add`` and ``git commit``.
 
 .. admonition:: Solution
-   :class: solution toggle
+   :class: dropdown solution
 
    .. code-block:: bash
 
@@ -278,7 +284,7 @@ to open a MR. That's exactly what we want to do!
    Create a MR and add the StarterKit organizer as a reviewer.
 
 .. admonition:: Solution
-   :class: solution toggle
+   :class: dropdown solution
 
    Click on the link described above or paste it in the address bar of
    your browser. Follow the instructions.

@@ -8,6 +8,8 @@
 
 #include <pxd/modules/pxdHelper/PXDBadSensorTagModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <pxd/dataobjects/PXDRawHit.h>
 
 
 using namespace std;

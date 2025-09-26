@@ -14,9 +14,6 @@
 #include <tracking/vxdHoughTracking/filters/relations/ChooseableRelationFilter.h>
 #include <tracking/vxdHoughTracking/filters/pathFilters/ChooseablePathFilter.h>
 
-#include <string>
-#include <vector>
-
 namespace Belle2 {
   class ModuleParamList;
   class SpacePointTrackCand;

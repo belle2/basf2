@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef EXTSTEPLENGTHLIMITPROCESS_H_
-#define EXTSTEPLENGTHLIMITPROCESS_H_
+#pragma once
 
 #include <globals.hh>
 #include "G4VDiscreteProcess.hh"
@@ -67,5 +66,3 @@ namespace Belle2 {
   } //end namespace Simulation
 
 } //end Belle2 namespace
-
-#endif /* EXTSTEPLENGTHLIMITPROCESS_H_ */

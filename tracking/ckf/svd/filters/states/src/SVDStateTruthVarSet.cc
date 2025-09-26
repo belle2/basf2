@@ -8,6 +8,7 @@
 #include <tracking/ckf/svd/filters/states/SVDStateTruthVarSet.h>
 
 #include <framework/core/ModuleParamList.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/mcMatcher/TrackMatchLookUp.h>

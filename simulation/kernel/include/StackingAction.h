@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef STACKINGACTION_H_
-#define STACKINGACTION_H_
+#pragma once
 
 #include <globals.hh>
 #include <G4UserStackingAction.hh>
@@ -51,5 +50,3 @@ namespace Belle2 {
   } // Simulation namespace
 
 } // Belle2 namespace
-
-#endif /* STACKINGACTION_H_ */

@@ -8,7 +8,6 @@
 
 #include "trg/top/dataobjects/TRGTOPUnpackerStore.h"
 
-//using namespace std;
 using namespace Belle2;
 
 void TRGTOPUnpackerStore::setEventIdL1(int eventIdL1) { m_eventIdL1 = eventIdL1; }
@@ -29,12 +28,5 @@ void TRGTOPUnpackerStore::setNHitSum(int nHitSum) { m_nHitSum = nHitSum; }
 void TRGTOPUnpackerStore::setLogLSum(int logLSum) { m_logLSum = logLSum; }
 void TRGTOPUnpackerStore::setLogLVar(int logLVar) { m_logLVar = logLVar; }
 void TRGTOPUnpackerStore::setTimingVar(int timingVar) { m_timingVar = timingVar; }
-//void TRGTOPUnpackerStore::set(int ) { m_ = ; }
 
 void TRGTOPUnpackerStore::setSlotTimingDecision(TRGTOPSlotTiming slotTiming) { m_slotTimingDecisions.push_back(slotTiming); }
-
-// no longer needed (in ROOT v6)
-//ClassImp(TRGTOPUnpackerStore)
-
-
-

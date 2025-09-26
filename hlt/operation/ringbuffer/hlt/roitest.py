@@ -90,4 +90,4 @@ main.add_module(elapsed)
 
 # Process events
 b2.set_nprocesses(int(argvs[4]))
-b2.process(main)
+b2.process(main, calculateStatistics=True)

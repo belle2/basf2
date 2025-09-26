@@ -84,7 +84,6 @@ def run():
     path.add_module('Progress')
 
     b2.process(path)
-    print(b2.statistics)
 
 
 if __name__ == '__main__':

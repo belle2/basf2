@@ -37,5 +37,5 @@ add_raw_seqoutput(main, 'raw.sroot')
 add_raw_seqoutput(main, "raw.f%05d.sroot", fileNameIsPattern=True)
 
 # process events and print call statistics
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

@@ -36,9 +36,9 @@ extern "C" {
    * @param drvec array to store the random numbers
    * @param length size of the array
    */
-  void varran_(double* drvec, const int* lengt)
+  void varran_(double* drvec, const int* length)
   {
-    for (int i = 0; i < *lengt; ++i) {
+    for (int i = 0; i < *length; ++i) {
       do {
         //BHWide does not want 1 for some reason, at least they are rejected in
         //the original VARRAN subroutine so we do it here as well

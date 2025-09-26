@@ -7,14 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
 #include <gtest/gtest.h>
 
-#include <framework/gearbox/Const.h>
-
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
+#include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
-#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 
 namespace {
 

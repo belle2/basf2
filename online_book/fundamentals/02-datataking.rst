@@ -51,7 +51,7 @@ of the physics program.
     This doesn't seem to be a problem at SuperKEKB and Belle II. Why?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Start with the planned final instantaneous luminosity of SuperKEKB. How
     many bunch crossings will happen per second?
@@ -59,7 +59,7 @@ of the physics program.
     as discussed previously.
 
 .. admonition:: Another hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     The goal instantaneous luminosity of SuperKEKB is :math:`6\times 10^{35}\, \textrm
     {cm}^{-2} \textrm{s}^{-1}`. It takes a beam particle bunch roughly 10 μs to complete
@@ -67,7 +67,7 @@ of the physics program.
     in each ring.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     At a final design luminosity of :math:`6\times 10^{35}\, \textrm{cm}^{-2}\textrm{s}^
     {-1}` at 2376 bunches per ring, each taking about 10 μs to complete a revolution, the
@@ -189,12 +189,12 @@ VXD
     Why do we have both, a pixel and a strip detector?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Think about the differences that come from one 2D measurement vs. two 1D measurements
 
 .. admonition:: Answer
-    :class: toggle solution
+    :class: dropdown solution
 
     A strip detector measures the position of a particle by measuring vertical
     and horizontal position in the sensor. This means we get two measurements we
@@ -309,18 +309,18 @@ ARICH
     any particle identification in the backwards direction of the detector?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Think of the beam energies at Belle II
 
 .. admonition:: Another hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     The nominal beam energies are 7 GeV on 4 GeV. That means the center of mass
     is boosted in forward direction.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     The center of mass is boosted due to the asymmetric beam energies. As such,
     any particles generated in the collision are boosted in forward direction
@@ -344,19 +344,19 @@ ARICH
     different indices of refraction (:math:`n_1 =  1.045, n_2 =  1.055`)
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Consider the one layer case, where you have the width :math:`d` of the aerogel layer 
     and a distance :math:`L` from the aerogel layer to the detection plane. 
 
 .. admonition:: Another hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Along with the implied geometric optics exercise, one should to consider the
     light yield...
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     It is an optimization problem between light yield and resolution. 
 
@@ -426,7 +426,7 @@ KLM
 
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     As a minimally ionised particle, it is the only particle that would pass
     through multiple layers of iron (for :math:`E > 1` GeV) while leaving signals

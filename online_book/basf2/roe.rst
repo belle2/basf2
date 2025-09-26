@@ -38,12 +38,12 @@ lepton.
      and untagged analyses?
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      It's included in the "Advanced Topics" section of the analysis module.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      Documentation is here: `RestOfEvent`. There is quite a bit of content.
      For now, make sure to take a look at the Overview and the "Basic usage"
@@ -64,13 +64,13 @@ We now want to reconstruct the Rest of Event of the :math:`B^0`.
      Add the ``fillWithMostLikely=True`` option.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      You have already found the `RestOfEvent` chapter in the last exercise.
      Take a look at the basic usage example.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      .. literalinclude:: steering_files/029_roe.py
          :start-at: S10
@@ -94,13 +94,13 @@ In principle, one can already try to use some of the Rest of Event variables.
      Find documentation for the Rest Of Event variables.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Use the search feature in the ``basf2`` documentation, or use the offline help by typing ``b2help-variables``
      in your bash terminal (for example ``b2help-variables | grep -i roe``).
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      The Rest Of Event variables are in Rest Of Event section of `VariableManager` page,
      which starts from :b2:var:`bssMassDifference` variable.
@@ -166,13 +166,13 @@ because of different methods of measurement used to detect these particles.
      `appendROEMask` or `appendROEMasks` function.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      A mask is defined as a tuple with three values. Use `appendROEMasks` to
      "activate" it.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
 
      .. literalinclude:: steering_files/029_roe.py
@@ -202,7 +202,7 @@ loop to insert this argument.
      variables to the ``b_vars`` list.
 
 .. admonition:: Hint
-     :class: xhint stacked toggle
+     :class: xhint stacked dropdown
 
      The variables are nothing more than a string, which has a ``replace``
      method:
@@ -213,7 +213,7 @@ loop to insert this argument.
         'roeE(my_mask)'
 
 .. admonition:: Hint
-     :class: xhint stacked toggle
+     :class: xhint stacked dropdown
 
      Fill the missing bit of code:
 
@@ -225,7 +225,7 @@ loop to insert this argument.
 
 
 .. admonition:: Solution
-     :class: solution toggle
+     :class: dropdown solution
 
      .. literalinclude:: steering_files/029_roe.py
          :start-at: S50
@@ -246,7 +246,7 @@ loop to insert this argument.
      Your steering file is now complete. Run it!
 
 .. admonition:: Solution
-     :class: solution toggle
+     :class: dropdown solution
 
      Your steering file should look like this:
 
@@ -274,21 +274,21 @@ Quick plots
      +---------------------+-----------------------+-----------------------------------+
 
 .. admonition:: Hint: Plotting side by side
-    :class: xhint stacked toggle
+    :class: xhint stacked dropdown
 
     One can use ``matplotlib`` functions to plot several histograms on one figure side-by-side.
     Documentation is on  `this page <https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.subplots.html>`_, but you also saw some examples in your
     python training.
 
 .. admonition:: Hint: Outliers
-    :class: xhint stacked toggle
+    :class: xhint stacked dropdown
 
     Some of the distributions contain outliers, which need to be rejected in order to
     get meaningful plots (this means to manually set the plotting range).
     Proposed ranges: :b2:var:`roeM` from 0 to 10 and :b2:var:`nROE_Charged` from 0 to 15.
 
 .. admonition:: Hint: Styling
-    :class: xhint stacked toggle
+    :class: xhint stacked dropdown
 
     * Another hint is that comparison plots look better if they are a bit transparent, which
       can be achieved by supplying ``alpha=0.6`` argument to the plotting functions.
@@ -298,7 +298,7 @@ Quick plots
       `legends <https://matplotlib.org/tutorials/intermediate/legend_guide.html>`_ and axis titles are important
 
 .. admonition:: Hint: Fill in the blanks
-     :class: xhint stacked toggle
+     :class: xhint stacked dropdown
 
      .. code-block:: python
 
@@ -330,7 +330,7 @@ Quick plots
         fig.savefig('roe_mask_comparison.svg')
 
 .. admonition:: Solution
-     :class: solution toggle
+     :class: dropdown solution
 
      .. code-block:: python
 
@@ -380,7 +380,7 @@ Quick plots
 for ROE with mask ``my_mask`` case and ROE with no mask applied.
 
 .. admonition:: Strange variable names
-    :class: toggle
+    :class: dropdown
 
     You might wonder where these strange variable names came from. This is because
     it is tried to avoid branch names (columns of your output ROOT file) that contain
@@ -395,7 +395,7 @@ for ROE with mask ``my_mask`` case and ROE with no mask applied.
     Can you explain the differences between the masked and unmasked variables?
 
 .. admonition:: Solution
-    :class: solution toggle
+    :class: dropdown solution
 
     The invariant mass distribution for masked ROE is much narrower and its mean is a little bit below
     nominal :math:`B^0` mass, contrary to the unmasked ROE distribution.

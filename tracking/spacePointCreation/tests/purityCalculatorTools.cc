@@ -72,8 +72,11 @@ namespace PurityCalcTests {
 
   /**
    * create a SpacePoint on the given sensor.
+   * @param sensorId: Id of sensor
    * @param pxd indicates if the underlying Clusters should be pxd or svd
    * @param nClusters: only used for SVD! if 0 U & V set, if < 0 only V set, if > 0 only U set
+   * @param u: u position of SpacePoint
+   * @param v: v position of SpacePoint
    */
   SpacePoint createSpacePoint(VxdID sensorId, bool pxd, short nClusters = 0, double u = 0.1, double v = 0.2)
   {

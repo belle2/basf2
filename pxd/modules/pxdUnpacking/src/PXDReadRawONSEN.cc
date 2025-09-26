@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdUnpacking/PXDReadRawONSEN.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <rawdata/dataobjects/RawPXD.h>
 #include <pxd/unpacking/PXDRawDataDefinitions.h>
 
 #include <framework/datastore/StoreArray.h>

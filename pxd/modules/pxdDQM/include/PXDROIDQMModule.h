@@ -9,15 +9,14 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <vxd/geometry/GeoCache.h>
-//#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDRawROIs.h>
+#include <vxd/geometry/GeoCache.h>
 #include <TH2.h>
 #include <string>
 #include <map>
 
 namespace Belle2 {
+  class PXDRawROIs;
 
   namespace PXD {
     /** The raw PXD DQM module.

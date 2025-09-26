@@ -199,6 +199,3 @@ ma.variablesToNtuple(decayString='K_S0:merged',
 
 # Process the events
 b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)

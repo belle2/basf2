@@ -33,6 +33,3 @@ outputUdst('../MDSTtoUDST.udst.root', path=main)
 
 main.add_module('Progress')
 basf2.process(main)
-
-# Print call statistics
-print(basf2.statistics)

@@ -549,15 +549,7 @@ class Chi2Test(PvalueTest):
             print()
 
         if res_ndf < 1:
-            msg = (
-                "Comparison failed, no Chi^2 could be computed. For "
-                "debugging, you can use the CLI of "
-                "'validation/scripts/validationcomparison.py' on your root "
-                "file and the reference. Run 'validationcomparison.py "
-                "--help' for info. If problem persists, please open "
-                "GitLab issue (validation label)."
-            )
-            raise ComparisonFailed(msg)
+            raise TooFewBins("res_ndf (<1) is too few to perform the Chi2 test.")
 
         res_chi2ndf = res_chi2 / res_ndf
 

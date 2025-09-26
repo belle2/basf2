@@ -56,7 +56,7 @@ main.add_module('DQMHistAnalysisOutputFile',
                 SaveCanvases=True)
 
 # Process main path.
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # Print modules' statistics.
 print(basf2.statistics)

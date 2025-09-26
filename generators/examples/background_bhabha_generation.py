@@ -60,5 +60,5 @@ else:
 
 main.add_module("Progress")
 main.add_module("RootOutput", outputFileName="%s.root" % generator)
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 print(basf2.statistics)

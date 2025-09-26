@@ -17,7 +17,6 @@ namespace genfit {
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
-  class SVDRecoHit;
 
   /// Specialized CKF State for extrapolating into the SVD
   class CKFToSVDState : public CKFState<RecoTrack, SpacePoint> {

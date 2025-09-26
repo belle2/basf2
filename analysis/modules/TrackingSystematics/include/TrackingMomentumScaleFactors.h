@@ -9,12 +9,11 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
-#include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
-
-#include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
+  template<class T> class DBObjPtr;
+  class Particle;
+  class ParticleWeightingLookUpTable;
 
   /**
   * Tracking momentum systematics module: allows for the application of a corrective momentum scale factor which is read from a ParticleWeightingLookUpTable payload

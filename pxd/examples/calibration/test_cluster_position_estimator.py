@@ -356,5 +356,5 @@ if __name__ == "__main__":
     main.add_module(positionestimation)
     main.add_module("Progress")
 
-    b2.process(main)
+    b2.process(main, calculateStatistics=True)
     print(b2.statistics)

@@ -8,8 +8,13 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import os
-from tempfile import TemporaryDirectory
+"""
+Minimal example for:
+- creating and fitting a model in pytorch
+- converting the model to ONNX
+- creating an MVA weightfile with the ONNX model
+- running inference in basf2 directly via the MVA expert interface
+"""
 
 import basf2  # noqa
 import torch
@@ -77,47 +82,19 @@ def fit(model, filename, treename, variables, target_variable):
     print()
 
 
-def save_onnx_to_database(model, general_options, specific_options, identifier):
-    with TemporaryDirectory() as tempdir:
-        cwd = os.getcwd()
-        os.chdir(tempdir)
-        print("convert to onnx")
-        torch.onnx.export(
-            model,
-            (torch.randn(1, len(general_options.m_variables)),),
-            "model.onnx",
-            input_names=["input"],
-            output_names=["output"],
-        )
-        wf = ROOT.Belle2.MVA.Weightfile()
-        general_options.m_method = specific_options.getMethod()
-        wf.addOptions(general_options)
-        wf.addOptions(specific_options)
-        wf.addFile("ONNX_Modelfile", "model.onnx")
-        os.chdir(cwd)
-        print("save to database")
-        ROOT.Belle2.MVA.Weightfile.saveToDatabase(wf, identifier)
-
-
 if __name__ == "__main__":
     import time
 
-    import basf2_mva
-    import basf2_mva_util
-    from basf2 import conditions
+    from basf2_mva_util import (
+        create_onnx_mva_weightfile,
+        Method,
+        calculate_auc_efficiency_vs_background_retention,
+    )
     from basf2 import find_file
-
-    conditions.testing_payloads = [
-        'localdb/database.txt'
-    ]
 
     train_file = find_file("mva/train_D0toKpipi.root", "examples")
     test_file = find_file("mva/test_D0toKpipi.root", "examples")
 
-    general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector(train_file)
-    general_options.m_identifier = "Simple"
-    general_options.m_treename = "tree"
     variables = ['M', 'p', 'pt', 'pz',
                  'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)',
                  'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)',
@@ -128,26 +105,35 @@ if __name__ == "__main__":
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
                  'daughter(0, kaonID)', 'daughter(0, pionID)',
                  'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
-    general_options.m_variables = basf2_mva.vector(*variables)
-    general_options.m_target_variable = "isSignal"
-
-    specific_options = basf2_mva.ONNXOptions()
 
     model = Model(len(variables))
     fit(
         model,
         train_file,
-        general_options.m_treename,
+        "tree",
         variables,
-        general_options.m_target_variable,
+        "isSignal",
     )
-    save_onnx_to_database(model, general_options, specific_options, "ONNXTest")
 
-    method = basf2_mva_util.Method("ONNXTest")
+    torch.onnx.export(
+        model,
+        (torch.randn(1, len(variables)),),
+        "model.onnx",
+        input_names=["input"],
+        output_names=["output"],
+    )
+
+    weightfile = create_onnx_mva_weightfile(
+        "model.onnx",
+        variables=variables,
+        target_variable="isSignal",
+    )
+    weightfile.save("model_mva.xml")
+
+    method = Method("model_mva.xml")
     inference_start = time.time()
-    test_data = [test_file]
-    p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
+    p, t = method.apply_expert([test_file], "tree")
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
-    auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
+    auc = calculate_auc_efficiency_vs_background_retention(p, t)
     print("ONNX", inference_time, auc)

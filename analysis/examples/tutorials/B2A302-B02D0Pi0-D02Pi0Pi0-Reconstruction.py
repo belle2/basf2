@@ -88,7 +88,4 @@ ma.variablesToNtuple('pi0:eff40_May2020Fit', pi0_vars,
                      path=my_path)
 
 # Process the events
-b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)
+b2.process(my_path, calculateStatistics=True)

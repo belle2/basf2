@@ -33,6 +33,5 @@ ge.add_evtgen_generator(path=main, finalstate='mixed')
 main.add_module('RootOutput', outputFileName='../mixed.cdst.root')
 
 main.add_module('Progress')
-# process events and print call statistics
+# process events
 b2.process(path=main)
-print(b2.statistics)

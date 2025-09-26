@@ -16,9 +16,6 @@
 #include <tracking/vxdHoughTracking/findlets/RecoTrackStorer.h>
 #include <tracking/vxdHoughTracking/findlets/ROIFinder.h>
 
-#include <string>
-#include <vector>
-
 namespace Belle2 {
   class ModuleParamList;
   class SpacePoint;

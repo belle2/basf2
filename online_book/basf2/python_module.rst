@@ -3,7 +3,7 @@
 A simple python module
 =======================
 
-. sidebar:: Overview
+.. sidebar:: Overview
     :class: overview
 
     **Length**: 30-45 min
@@ -82,14 +82,14 @@ MCParticles, namely the PDG code. To have tracks available, we will use the
    track per event, but you can adjust this.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    You can find information on the Particle class in
    :doxygen:`doxygen <classBelle2_1_1MCParticle>`.
    The `ParticleGun` has the option `nTracks`.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. literalinclude:: steering_files/087_module.py
     :language: python        

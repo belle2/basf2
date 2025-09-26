@@ -21,6 +21,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 #include <framework/gearbox/Gearbox.h>
 
 using namespace std;

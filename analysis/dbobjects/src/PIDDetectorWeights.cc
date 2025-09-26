@@ -8,6 +8,8 @@
 
 #include <analysis/dbobjects/PIDDetectorWeights.h>
 
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 
 

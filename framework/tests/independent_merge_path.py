@@ -186,6 +186,4 @@ main.add_module(CheckData())
 basf2.print_path(main)
 basf2.process(main)
 
-print(basf2.statistics)
-
 # @endcond

@@ -14,16 +14,16 @@
 
 #include <G4VProcess.hh>
 #include <G4FieldManager.hh>
-#include <G4Navigator.hh>
 #include <G4TransportationManager.hh>
-#include <G4PropagatorInField.hh>
-#include <G4Track.hh>
-#include <G4Step.hh>
 #include <G4ParticleChangeForTransport.hh>
 
 #include <simulation/monopoles/G4MonopoleFieldSetup.h>
 
 class G4SafetyHelper;
+class G4Navigator;
+class G4PropagatorInField;
+class G4Track;
+class G4Step;
 
 namespace Belle2 {
 

@@ -165,5 +165,3 @@ b2conditions.prepend_globaltag("data_reprocessing_prompt")
 # b2.process(main, max_event=600000)  # reasonable stats for crystal calibs for proc10
 # b2.process(main, max_event=3000)    # reasonable stats and speed for a quick test
 b2.process(main)                   # process all events
-
-print(b2.statistics)

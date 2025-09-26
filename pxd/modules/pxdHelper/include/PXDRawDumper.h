@@ -11,9 +11,9 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <rawdata/dataobjects/RawPXD.h>
 
 namespace Belle2 {
+  class RawPXD;
 
   namespace PXD {
 

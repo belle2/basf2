@@ -34,7 +34,7 @@ namespace {
   }
   TEST(ONNXStandaloneTest, RunStandaloneModel)
   {
-    // Testfile created with mva/examples/onnx/write_test_file.py
+    // Testfile created with mva/examples/onnx/write_test_files.py
     Session session(Belle2::FileSystem::findFile("mva/methods/tests/ModelForStandalone.onnx"));
     auto input_a = Tensor<float>::make_shared({0.5309f, 0.4930f}, {1, 2});
     auto input_b = Tensor<int64_t>::make_shared({1, 0, 1, 1, -1, 0}, {1, 2, 3});

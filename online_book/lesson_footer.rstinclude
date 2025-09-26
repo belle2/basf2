@@ -1,7 +1,7 @@
 .. This is meant to be included below every lesson
 
 .. admonition:: Stuck? We can help!
-   :class: hint toggle stacked
+   :class: hint dropdown stacked
 
    If you get stuck or have any questions to the online book material, the
    `#starterkit-workshop channel <https://chat.belle2.org/channel/starterkit-workshop>`_
@@ -12,7 +12,7 @@
    own analysis.
 
 .. admonition:: Improving things!
-    :class: hint toggle stacked
+    :class: hint dropdown stacked
 
     If you know how to do it, we recommend you to report bugs and other requests
     with `GitLab <https://gitlab.desy.de/belle2/software/basf2/-/issues>`_.
@@ -34,6 +34,6 @@
     We'd be happy to have you on the team!
 
 .. admonition:: Quick feedback!
-    :class: hint toggle
+    :class: hint dropdown stacked
 
     Do you want to leave us some feedback? Open a `GitLab issue <https://gitlab.desy.de/belle2/software/basf2/-/issues>`_ and add the label ``online_book`` to it.

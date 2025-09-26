@@ -12,7 +12,7 @@
 
 namespace TreeFitter {
 
-  /** base for RecoPhoton RecoTrack */
+  /** base for RecoNeutral RecoTrack */
   class RecoParticle : public ParticleBase {
 
   public:
@@ -33,7 +33,7 @@ namespace TreeFitter {
     virtual std::string parname(int index) const override;
 
     /** this here sets the size in the state vector
-     * we are only interested in the momenta of photons and tracks
+     * we are only interested in the momenta of photons, neutral hadrons, and tracks
      * as the position were the track ends or the cluster is, is
      * not relevant for physics  */
     virtual int dim() const override { return 3; }

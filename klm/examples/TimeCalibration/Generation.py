@@ -133,7 +133,7 @@ main.add_module(phokhara)
 main.add_module(output)
 
 # generate events
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # show call statistics
 print(basf2.statistics)

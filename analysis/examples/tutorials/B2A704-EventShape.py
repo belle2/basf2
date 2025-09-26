@@ -77,6 +77,4 @@ ma.variablesToNtuple(
 # add the elements): ```[*[1, 2, 3], 4] == [1, 2, 3, 4])```
 
 # Process the events
-b2.process(my_path)
-# print out the summary
-print(b2.statistics)
+b2.process(my_path, calculateStatistics=True)

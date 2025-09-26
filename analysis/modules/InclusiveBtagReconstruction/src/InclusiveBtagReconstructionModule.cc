@@ -11,8 +11,6 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
 #include <unordered_set>
-#include <map>
-#include <vector>
 #include <Math/Vector4D.h>
 
 using namespace Belle2;

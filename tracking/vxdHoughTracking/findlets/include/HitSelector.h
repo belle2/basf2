@@ -11,9 +11,6 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <string>
-#include <vector>
-
 namespace Belle2 {
   class SpacePoint;
 

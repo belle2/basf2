@@ -1021,7 +1021,6 @@ class BtoK_ALP2Gamma(BaseSkim):
     **Physics channel**: :math:`B \\to K^{(*)}a(\\to \\gamma \\gamma)`
 
     **Cuts applied:**
-
     * Kaons:BtoK_ALP2Gamma -> ``kaonID > 0.1``, ``dr < 3.0``, ``abs(dz) < 4.0``
     * Pions:BtoK_ALP2Gamma-> ``pionID > 0.1``, ``dr < 3.0``, ``abs(dz) < 4.0``
     * Photons:BtoK_ALP2Gamma-> ``E > 0.05``
@@ -1109,3 +1108,91 @@ class BtoK_ALP2Gamma(BaseSkim):
             "B0:B2KS_ALP2Gamma",
             "B0:B2K0_ALP2Gamma"
         ]
+
+
+@fancy_skim_header
+class TopologicalDarkPion(BaseSkim):
+    """
+    **Physics channel**: :math:`e^{+}e^{-} \\to \\pi^{0}\\chi_{1} \\chi_{2}`
+
+    **Decay Modes**: :math:`\\pi^{0}\\to \\gamma \\gamma`
+
+    Cuts applied:
+
+    * ``2 std_all photon with thetaInCDCAcceptance and E > 0.04 GeV and -200 ns < clusterTiming < 200 ns``
+    * ``pi0 0.09 GeV/c^2 < InvM < 1 GeV/c^2``
+    * ``daughters opening angle in CMS frame < 80 degrees``
+    * ``daughter highest E and highest Ecms > 0.7 GeV``
+    * ``0 < nParticlesInList(pi0) < 4``
+    * ``no track [abs(dz) < 2 cm and pt > 0.3 GeV/c] or [abs(dz) < 2 cm and p > 0.4GeV/c]``
+    * ``no extra photon Ecms > 1 GeV``
+    * ``total energy of pi0 daughters in CMS frame < 7 GeV``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpipi0`, where the
+        :math:`\\overline{D}{}^{0}` channel is defined.
+    """
+    __authors__ = ["Guorui Liu"]
+    __description__ = (
+        "Single pi0 skim, needed for :math:`e^{+}e^{-} \\to \\gamma \\to \\pi^{0}\\chi_{1} \\chi_{2}` "
+        "and other searches."
+    )
+    __contact__ = __liaison__
+    __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
+
+    def build_lists(self, path):
+        skim_label = "ForTopologicalDarkPion"
+
+        # cut on daughter photon
+        daughter_acc_E = '[thetaInCDCAcceptance and E > 0.04]'
+        daughter_timing = '[-200 < clusterTiming < 200]'
+        daughter_cut = f'{daughter_acc_E} and {daughter_timing}'
+
+        # cut on InvM
+        pi0_invM = '[0.09 < InvM < 1]'
+        # cuts on opening angle between pi0 daughters
+
+        import ROOT
+        opening_angle_value = 80 * ROOT.TMath.DegToRad()
+
+        opening_angle = f'[useCMSFrame(daughterAngle(0,1)) < {opening_angle_value}]'
+        # cut on pi0 higher energy daughter
+        highE_daughter = '[[daughterHighest(useCMSFrame(E)) > 0.7] and [daughterHighest(E) > 0.7]]'
+
+        # Reconstruct pi0 candidate
+        ma.cutAndCopyList(f'gamma:photon{skim_label}', 'gamma:all', daughter_cut, path=path)
+        ma.reconstructDecay(f"pi0:pi0{skim_label} -> gamma:photon{skim_label} gamma:photon{skim_label}",
+                            cut=f"{pi0_invM} and {opening_angle} and {highE_daughter}", path=path)
+
+        # event cut on track and number of pi0
+        no_good_track = "[nCleanedTracks([abs(dz) < 2 and pt > 0.3] or [abs(dz) < 2 and p > 0.4]) ==0]"
+        one_three_pi0 = f"[ 0 < nParticlesInList(pi0:pi0{skim_label}) < 4]"
+
+        # event cut on extra photon
+        extra_CMSE = '[useCMSFrame(E) > 1]'
+        ma.cutAndCopyList(
+            f'gamma:exPhoton{skim_label}',
+            'gamma:all',
+            f'isDescendantOfList(pi0:pi0{skim_label}, 1)!=1',
+            path=path)
+        ma.applyCuts(f'gamma:exPhoton{skim_label}', extra_CMSE, path=path)
+        no_true_extra_photon = f"[nParticlesInList(gamma:exPhoton{skim_label})==0]"
+        # event cut on total CMS energy of daughter candidates
+        ma.cutAndCopyList(
+            f'gamma:daughter{skim_label}',
+            'gamma:all',
+            f'isDescendantOfList(pi0:pi0{skim_label}, 1)==1',
+            path=path)
+
+        total_daughter_Ecms = f'[useCMSFrame(totalEnergyOfParticlesInList(gamma:daughter{skim_label})) < 7]'
+
+        event_cuts = f'{no_good_track} and {one_three_pi0} and {no_true_extra_photon} and {total_daughter_Ecms}'
+
+        path = self.skim_event_cuts(event_cuts, path=path)
+
+        # And return the pi0 list
+        return [f'pi0:pi0{skim_label}']

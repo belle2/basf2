@@ -77,4 +77,3 @@ main.add_module(ecldataanalysis)
 
 main.add_module('Progress')
 b2.process(main)
-# print(statistics)

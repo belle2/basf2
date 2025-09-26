@@ -48,5 +48,3 @@ main.add_module(topdigi)
 main.add_module(topback)
 
 b2.process(main)
-
-print(b2.statistics)

@@ -419,7 +419,7 @@ namespace {
 
   class MCTruthVariablesTest : public ::testing::Test {
   protected:
-    virtual void SetUp()
+    void SetUp() override
     {
       // datastore things
       DataStore::Instance().setInitializeActive(true);
@@ -518,7 +518,7 @@ namespace {
       misid_photon->addRelationTo(true_electron); // assume MC matching caught this
     }
 
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }

@@ -2438,13 +2438,13 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        static StoreArray<Particle> tempParticles("tempParticles");
         auto func = [var](const Particle * particle) -> double {
           const MCParticle* mcp = particle->getMCParticle();
           if (!mcp)   // Has no MC match and is no MCParticle
           {
             return Const::doubleNaN;
           }
+          StoreArray<Particle> tempParticles("tempParticles");
           tempParticles.clear();
           Particle tmpPart(mcp);
           Particle* newPart = tempParticles.appendNew(tmpPart);
@@ -2474,7 +2474,7 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        static StoreArray<Particle> tempParticles("tempParticles");
+
         auto func = [var](const Particle * particle) -> double {
 
           const ECLCluster* cluster = particle->getECLCluster();
@@ -2494,6 +2494,7 @@ namespace Belle2 {
           // cppcheck-suppress containerOutOfBounds
           const MCParticle* mcp = mcps.object(weightsAndIndices[0].second);
 
+          StoreArray<Particle> tempParticles("tempParticles");
           tempParticles.clear();
           Particle tmpPart(mcp);
           Particle* newPart = tempParticles.appendNew(tmpPart);
@@ -3436,7 +3437,6 @@ namespace Belle2 {
           B2FATAL("Ancestor " + arg + " is not recognised. Please provide valid PDG code or particle name.");
         }
 
-        static StoreArray<Particle> tempParticles("tempParticles");
         auto func = [pdg_code, var](const Particle * particle) -> double {
           const Particle* p = particle;
 
@@ -3453,6 +3453,7 @@ namespace Belle2 {
             i_p = i_p->getMother();
           }
 
+          StoreArray<Particle> tempParticles("tempParticles");
           tempParticles.clear();
           Particle m_p(i_p);
           Particle* newPart = tempParticles.appendNew(m_p);

@@ -85,9 +85,9 @@ namespace Belle2::SoftwareTrigger {
     /// HLTprefilterParameters Database OjbPtr
     DBObjPtr<HLTPrefilterParameters> m_hltPrefilterParameters; /**< HLT prefilter parameters */
     /// Helper instance for timing based prefilter
-    TimingCutCondition m_timingPrefilter;
+    TimingCutState m_timingPrefilter;
     /// Helper instance for CDC-ECL occupancy based prefilter
-    CDCECLCutCondition m_cdceclPrefilter;
+    CDCECLCutState m_cdceclPrefilter;
 
   };
 }

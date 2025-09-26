@@ -32,9 +32,9 @@ namespace Belle2 {
   class TRGSummary;
 
   /**
-   * Helper for TimingCut mode
+   * Helper for TimingCut state
    */
-  class TimingCutCondition {
+  class TimingCutState {
   private:
 
     /// Store array object for injection time info.
@@ -102,9 +102,9 @@ namespace Belle2 {
   };
 
   /**
-   * Helper for CdcEclCut mode
+   * Helper for CDCECLCut state
    */
-  class CDCECLCutCondition {
+  class CDCECLCutState {
   private:
 
     /// CDChits StoreArray
@@ -161,41 +161,20 @@ namespace Belle2 {
     void event() final;
 
   private:
-    // Prefilter condition selection
-    enum class HLTPrefilterCondition {
-      TimingCut,
-      CDCECLCut
-    };
-
-    // Helper instance to convert string to enum object
-    //inline std::string toString(HLTPrefilterCondition cond) {
-    //switch (cond) {
-    //    case HLTPrefilterCondition::TimingCut: return "TimingCut";
-    //    case HLTPrefilterCondition::CDCECLCut: return "CDCECLCut";
-    //}
-    //return "Unknown";
-    //}
-
-    // Helper instance to convert string to enum object
-    inline HLTPrefilterCondition fromString(const std::string& s)
-    {
-      if (s == "TimingCut") return HLTPrefilterCondition::TimingCut;
-      if (s == "CDCECLCut") return HLTPrefilterCondition::CDCECLCut;
-      throw std::invalid_argument("Unknown HLTPrefilterCondition: " + s);
-    }
-
+    // enumeration for HLTPrefilter state
+    enum HLTPrefilterState { TimingCut = 0, CDCECLCut = 1 };
 
     // Helper instance for timing based prefilter
-    TimingCutCondition m_timingPrefilter;
+    TimingCutState m_timingPrefilter;
 
     // Helper instance for CDC-ECL occupancy based prefilter
-    CDCECLCutCondition m_cdceclPrefilter;
+    CDCECLCutState m_cdceclPrefilter;
 
     // Decision results
-    std::map<HLTPrefilterCondition, bool> m_decisions;
+    std::map<HLTPrefilterState, bool> m_decisions;
 
-    // Identifier string for prefilter condition
-    std::string m_HLTPrefilterCondition = "";
+    // Instance for prefilter cut state
+    HLTPrefilterState m_HLTPrefilterState;
 
     // BASF2 objects
     /// Event Meta Data Store ObjPtr

@@ -167,7 +167,6 @@ def add_hlt_processing(path,
                        create_hlt_unit_histograms=True,
                        switch_off_slow_modules_for_online=True,
                        hlt_prefilter_mode=constants.HLTPrefilterModes.monitor,
-                       hlt_prefilter_condition=constants.HLTPrefilterConditions.TimingCut.value,
                        **kwargs):
     """
     Add all modules for processing on HLT filter machines
@@ -209,7 +208,7 @@ def add_hlt_processing(path,
     path.add_module('StatisticsSummary').set_name('Sum_Unpackers')
 
     # HLT prefilter
-    path_utils.add_prefilter_module(path, mode=hlt_prefilter_mode, condition=hlt_prefilter_condition)
+    path_utils.add_prefilter_module(path, mode=hlt_prefilter_mode)
 
     # Build one path for all accepted events...
     accept_path = basf2.Path()

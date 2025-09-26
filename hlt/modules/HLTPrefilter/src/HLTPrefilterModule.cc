@@ -26,7 +26,6 @@ This module filters the injection background based on predefined selections.
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("ConditionIdentifier", m_HLTPrefilterCondition, "HLTPrefilter condition identifier", std::string("TimingCut"));
 }
 
 HLTPrefilterModule::~HLTPrefilterModule() = default;
@@ -42,7 +41,7 @@ void HLTPrefilterModule::beginRun()
     if (!m_hltPrefilterParameters.isValid())
         B2FATAL("HLTPrefilter parameters are not available.");
 
-    // Timing mode thresholds
+    // Parameters for HLTPrefilter in timing state
     m_timingPrefilter.LERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMin();
     m_timingPrefilter.LERtimeSinceLastInjectionMax = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMax();
     m_timingPrefilter.HERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getHERtimeSinceLastInjectionMin();
@@ -53,12 +52,13 @@ void HLTPrefilterModule::beginRun()
     m_timingPrefilter.HERtimeInBeamCycleMax        = m_hltPrefilterParameters->getHERtimeInBeamCycleMax();
     m_timingPrefilter.prescale = m_hltPrefilterParameters->getHLTPrefilterPrescale();
 
-    // CDC-ECL mode thresholds
+    // Parameters for HLTPrefilter in CDCECL state
     m_cdceclPrefilter.nCDCHitsMax = m_hltPrefilterParameters->getCDCHitsMax();
     m_cdceclPrefilter.nECLDigitsMax = m_hltPrefilterParameters->getECLDigitsMax();
-    
-    // Get prescale for HLTprefilter
     m_cdceclPrefilter.prescale = m_hltPrefilterParameters->getHLTPrefilterPrescale();
+
+    // Get prefilter state (cut on timing/CDC-ECL occupancy) for operation
+    m_HLTPrefilterState = static_cast<HLTPrefilterState>(m_hltPrefilterParameters->getHLTPrefilterState());
 
 }
 
@@ -76,31 +76,30 @@ void HLTPrefilterModule::event()
     if (index == 1) {
 
     /// Compute prefilter decision with timing cuts
-    m_decisions[HLTPrefilterCondition::TimingCut] = m_timingPrefilter.computeDecision();
+    m_decisions[TimingCut] = m_timingPrefilter.computeDecision();
 
     /// Compute prefilter decision with CDC-ECL occupancy
-    m_decisions[HLTPrefilterCondition::CDCECLCut] = m_cdceclPrefilter.computeDecision();
+    m_decisions[CDCECLCut] = m_cdceclPrefilter.computeDecision();
 
     }
 
     // Logging
-    if (m_decisions[HLTPrefilterCondition::TimingCut])
+    if (m_decisions[TimingCut])
         B2ERROR("Skip event --> HLTPrefilter tagged this event to be from injection strips" <<
                 LogVar("event", m_eventInfo->getEvent()) <<
                 LogVar("run", m_eventInfo->getRun()) <<
                 LogVar("exp", m_eventInfo->getExperiment()));
 
-    if (m_decisions[HLTPrefilterCondition::CDCECLCut])
+    if (m_decisions[CDCECLCut])
         B2ERROR("Skip event --> HLTPrefilter tagged this event with high CDC-ECL occupancy" <<
                 LogVar("event", m_eventInfo->getEvent()) <<
                 LogVar("run", m_eventInfo->getRun()) <<
                 LogVar("exp", m_eventInfo->getExperiment()));
 
-    // Return only the selected mode
-    HLTPrefilterCondition condition = fromString(m_HLTPrefilterCondition);
-    if (condition == HLTPrefilterCondition::TimingCut)
-        setReturnValue(m_decisions[HLTPrefilterCondition::TimingCut]);
+    // Return only the prefilter condition set by the parameter
+    if (m_HLTPrefilterState == TimingCut)
+        setReturnValue(m_decisions[TimingCut]);
     else
-        setReturnValue(m_decisions[HLTPrefilterCondition::CDCECLCut]);
+        setReturnValue(m_decisions[CDCECLCut]);
 }
 

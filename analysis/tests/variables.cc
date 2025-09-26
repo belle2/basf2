@@ -643,7 +643,7 @@ namespace {
 
   class EventVariableTest : public ::testing::Test {
   protected:
-    /** register Particle array + ParticleExtraInfoMap object. */
+    /** register Particle array. */
     void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
@@ -802,12 +802,10 @@ namespace {
 
   class MetaVariableTest : public ::testing::Test {
   protected:
-    /** register Particle array + ParticleExtraInfoMap object. */
+    /** register Particle array. */
     void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
-      StoreObjPtr<EventExtraInfo>().registerInDataStore();
       StoreArray<Particle>().registerInDataStore();
       StoreArray<MCParticle>().registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
@@ -1027,6 +1025,9 @@ namespace {
 
   TEST_F(MetaVariableTest, extraInfo)
   {
+    DataStore::Instance().setInitializeActive(true);
+    StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
     Particle p({ 0.1, -0.4, 0.8, 1.0 }, 11);
     p.addExtraInfo("pi", 3.14);
 
@@ -1040,7 +1041,10 @@ namespace {
 
   TEST_F(MetaVariableTest, eventExtraInfo)
   {
+    DataStore::Instance().setInitializeActive(true);
     StoreObjPtr<EventExtraInfo> eventExtraInfo;
+    eventExtraInfo.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
     if (not eventExtraInfo.isValid())
       eventExtraInfo.create();
     eventExtraInfo->addExtraInfo("pi", 3.14);
@@ -1051,10 +1055,13 @@ namespace {
 
   TEST_F(MetaVariableTest, eventCached)
   {
+    DataStore::Instance().setInitializeActive(true);
+    StoreObjPtr<EventExtraInfo> eventExtraInfo;
+    eventExtraInfo.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
     const Manager::Var* var = Manager::Instance().getVariable("eventCached(constant(3.14))");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(nullptr)), 3.14);
-    StoreObjPtr<EventExtraInfo> eventExtraInfo;
     EXPECT_TRUE(eventExtraInfo.isValid());
     EXPECT_TRUE(eventExtraInfo->hasExtraInfo("__constant__bo3__pt14__bc"));
     EXPECT_FLOAT_EQ(eventExtraInfo->getExtraInfo("__constant__bo3__pt14__bc"), 3.14);
@@ -1066,6 +1073,9 @@ namespace {
 
   TEST_F(MetaVariableTest, particleCached)
   {
+    DataStore::Instance().setInitializeActive(true);
+    StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
     Particle p({ 0.1, -0.4, 0.8, 2.0 }, 11);
     const Manager::Var* var = Manager::Instance().getVariable("particleCached(px)");
     ASSERT_NE(var, nullptr);
@@ -1225,6 +1235,7 @@ namespace {
     particles.registerInDataStore();
     mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
+    StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     // Create MC graph for B -> (muon -> electron + muon_neutrino) + anti_muon_neutrino
@@ -3459,6 +3470,9 @@ namespace {
 
   TEST_F(MetaVariableTest, useAlternativeDaughterHypothesis)
   {
+    DataStore::Instance().setInitializeActive(true);
+    StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
     const int nDaughters = 5;
     StoreArray<Particle> particles;
 
@@ -4337,17 +4351,15 @@ namespace {
 
   class PIDVariableTest : public ::testing::Test {
   protected:
-    /** register Particle array + ParticleExtraInfoMap object. */
+    /** register store arrays. */
     void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreObjPtr<ParticleExtraInfoMap> peim;
       StoreArray<TrackFitResult> tfrs;
       StoreArray<MCParticle> mcparticles;
       StoreArray<PIDLikelihood> likelihood;
       StoreArray<Particle> particles;
       StoreArray<Track> tracks;
-      peim.registerInDataStore();
       tfrs.registerInDataStore();
       mcparticles.registerInDataStore();
       likelihood.registerInDataStore();
@@ -5256,7 +5268,10 @@ namespace {
     const Particle* particle = myParticles.appendNew();
     const Manager::Var* var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTENT, 0, 1)");
     EXPECT_TRUE(std::isnan(std::get<double>(var->function(particle))));
+    DataStore::Instance().setInitializeActive(true);
     StoreObjPtr<EventExtraInfo> eventExtraInfo;
+    eventExtraInfo.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
     if (not eventExtraInfo.isValid())
       eventExtraInfo.create();
     var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTENT, 0, 1)");

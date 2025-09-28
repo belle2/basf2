@@ -2059,18 +2059,25 @@ namespace Belle2 {
     Manager::FunctionPtr mcDaughter(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        int daughterNumber = 0;
-        try {
-          daughterNumber = convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("First argument of mcDaughter meta function must be integer!");
-        }
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterNumber](const Particle * particle) -> double {
+        auto args = arguments;
+        auto func = [args](const Particle * particle) -> double {
+          const Variable::Manager::Var* var = Manager::Instance().getVariable(args[1]);
           if (particle == nullptr)
             return Const::doubleNaN;
           if (particle->getMCParticle()) // has MC match or is MCParticle
           {
+            int daughterNumber = 0;
+            try {
+              daughterNumber = convertString<int>(args[0]);
+            } catch (std::invalid_argument&) {
+              const Variable::Manager::Var* daughterNumber_var = Manager::Instance().getVariable(args[0]);
+              auto dn_var_result = daughterNumber_var->function(particle);
+              if (std::holds_alternative<int>(dn_var_result)) {
+                daughterNumber = std::get<int>(dn_var_result);
+              } else {
+                B2FATAL("First argument of mcDaughter meta function must be integer!");
+              }
+            }
             if (daughterNumber >= int(particle->getMCParticle()->getNDaughters())) {
               return Const::doubleNaN;
             }

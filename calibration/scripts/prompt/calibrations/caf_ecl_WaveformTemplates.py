@@ -32,7 +32,7 @@ settings = CalibrationSettings(
         "C2_MinEnergyThreshold": 2.0,
         "nFilesCollector": 50
     },
-    produced_payloads=["ECLWaveformTemplate"])
+    produced_payloads=["ECLDigitWaveformParameters"])
 
 
 # --------------------------------------------------------------

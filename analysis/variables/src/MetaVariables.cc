@@ -40,7 +40,6 @@
 
 #include <cmath>
 #include <stdexcept>
-#include <memory>
 #include <regex>
 
 #include <TDatabasePDG.h>

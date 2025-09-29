@@ -326,8 +326,9 @@ def TagV(
 ):
     """
     For each Particle in the given Breco ParticleList:
-      * perform the fit of tag side using the track list from the RestOfEvent dataobject
-      * save the MC Btag in case of signal MC
+
+    * perform the fit of tag side using the track list from the RestOfEvent dataobject
+    * save the MC Btag in case of signal MC
 
     Parameters:
 

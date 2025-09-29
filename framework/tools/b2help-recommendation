@@ -62,13 +62,18 @@ class RSTFormatterStrategy(FormatterStrategy):
     Format recommendations in reStructuredText format.
     """
 
-    def format_section(self, title: str, content: str) -> str:
+    def format_title(self, title: str, has_recommendation: bool) -> str:
         """
-        Format a section with a title and optional content.
+        Format a title.
         """
-        result = f"\n{title}\n{'=' * len(title)}\n"
-        if content:
-            result += "{content}\n"
+        return title
+
+    def format_section(self, title: str, has_recommendation: bool) -> str:
+        """
+        Format a section with a title.
+        """
+        result = f"\n{self.format_title(title, has_recommendation)}"
+        result += f"\n{'=' * len(title)}\n"
         return result
 
     def format_subsection(self, title: str, content: str) -> str:
@@ -124,6 +129,52 @@ class ColorRSTFormatterStrategy(RSTFormatterStrategy):
     Format recommendations in reStructuredText format with colored text in terminal.
     """
 
+    def __init__(self):
+        # ANSI color codes
+        self.RED = '\033[31m'
+        self.GREEN = '\033[32m'
+        self.YELLOW = '\033[33m'
+        self.BLUE = '\033[34m'
+        self.PURPLE = '\033[35m'
+        self.CYAN = '\033[1;36m'  # also bold
+        self.WHITE = '\033[37m'
+        self.BOLD = '\033[1m'
+        self.RESET = '\033[0m'
+
+    def format_title(self, title: str, has_recommendation: bool) -> str:
+        """
+        Format a title.
+        """
+        if has_recommendation:
+            result = f"{self.GREEN}{title}{self.RESET}"
+        else:
+            result = f"{self.YELLOW}{title}{self.RESET}"
+        return result
+
+    def format_subsection(self, title: str, content: str) -> str:
+        """
+        Format a subsection with a title and optional content.
+        """
+        if not content:
+            return ''
+        return f"\n{self.CYAN}{title}{self.RESET}\n{'-' * len(title)}\n{content}\n"
+
+    def format_dict(self, name: str, content: str) -> str:
+        """
+        Format a dictionary with a name and key-value pairs.
+        """
+        result = f"\n{self.CYAN}{name}{self.RESET}\n{'-' * len(name)}\n"
+        for key in content:
+            result += f'+ **{self.BOLD}{key}{self.RESET}** - {content[key]}\n'
+        return result
+
+    def format_table_list(self, name: str, content: str) -> str:
+        """
+        Format a table or list with a name and items.
+        """
+        lines = super().format_table_list(name, content).split('\n')
+        return '\n'.join([f'{self.PURPLE}{line}{self.RESET}' for line in lines])
+
     def format_code(self, code: str, language: str) -> str:
         """
         Format code with syntax highlighting.
@@ -171,12 +222,19 @@ class TableListDecorator(FieldDecorator):
     def decorate(self, name: str, value: str) -> str:
         return self.formatter.format_table_list(name, value)
 
+class TitleDecorator(FieldDecorator):
+    """
+    Decorator for the title only.
+    """
+    def decorate(self, name: str, value: bool) -> str:
+        return self.formatter.format_title(name, value)
+
 class SectionDecorator(FieldDecorator):
     """
-    Decorator for the section field.
+    Decorator for the section title.
     """
-    def decorate(self, name: str, value: str) -> str:
-        return self.formatter.format_section(value, "")
+    def decorate(self, name: str, value: bool) -> str:
+        return self.formatter.format_section(name, value)
 
 class SubsectionDecorator(FieldDecorator):
     """
@@ -203,7 +261,7 @@ class Field:
     """
     Represents a field in a recommendation.
     """
-    def __init__(self, name: str, value: str, decorator: FieldDecorator):
+    def __init__(self, name: str, value: str | bool, decorator: FieldDecorator):
         self.name = name
         self.value = value
         self.decorator = decorator
@@ -217,27 +275,17 @@ class Tool:
     Represents a tool recommendation.
     """
 
-    def __init__(self, data: Dict[str, str], formatter: FormatterStrategy, no_colors: bool = False):
-
-        # ANSI color codes to show readiness state
-        if no_colors:
-            GREEN = YELLOW = RESET = ''
-        else:
-            GREEN = '\033[32m'      # Green
-            YELLOW = '\033[33m'     # Yellow
-            RESET = '\033[0m'       # Reset
+    def __init__(self, data: Dict[str, str], formatter: FormatterStrategy):
 
         self.fields = []
         # determine whether tool has recommendation entry
         self.has_recommendation = bool(data.get('recommendation', {}))
 
-        title = '(no title)'
+        title_name = '(no title)'
         if 'name' in data:
-            if self.has_recommendation:
-                title = f"{GREEN}{data.pop('name')}{RESET}"
-            else:
-                title = f"{YELLOW}{data.pop('name')}{RESET}"
-        self.fields.append(Field('Title', title, SectionDecorator(formatter)))
+            title_name = data.pop('name')
+        self.title = Field(title_name, self.has_recommendation, TitleDecorator(formatter))
+        self.fields.append(Field(title_name, self.has_recommendation, SectionDecorator(formatter)))
 
         tool = '(no tool)'
         if 'tool' in data:
@@ -274,13 +322,13 @@ class Tool:
         return "".join(field.format() for field in self.fields)
 
 
-def load_data(filename: str, formatter: FormatterStrategy, no_colors: bool = False):
+def load_data(filename: str, formatter: FormatterStrategy):
     """
     load a local json file.
     """
     with open(filename, 'r') as file:
         data = json.load(file)
-    return [Tool(entry, formatter, no_colors) for entry in data]
+    return [Tool(entry, formatter) for entry in data]
 
 
 def display_tool_info(tool: Tool):
@@ -378,7 +426,7 @@ def display_summary(tools: list, tags: list):
         print("-" * 40)
         for i, tool in enumerate(with_recommendations, 1):
             tags_str = ", ".join(tool.get_field('tags'))
-            print(f"{i:2}. {tool.get_field('title')}")
+            print(f"{i:2}. {tool.title.format()}")
             print(f"    Tags: {tags_str}")
 
     if without_recommendations:
@@ -386,7 +434,7 @@ def display_summary(tools: list, tags: list):
         print("-" * 50)
         for i, tool in enumerate(without_recommendations, 1):
             tags_str = ", ".join(tool.get_field('tags'))
-            print(f"{i:2}. {tool.get_field('title')}")
+            print(f"{i:2}. {tool.title.format()}")
             print(f"    Tags: {tags_str}")
             print(f"    Status: {tool.get_field('description')}")
 
@@ -411,7 +459,6 @@ def get_argument_parser():
     parser.add_argument("--n_tag_columns", help="Number of columns for tag printing", type=int,
                         default=2)
     parser.add_argument("--summary", help="Display a list of all available tools split based on existance of recommendations.", action='store_true')
-    parser.add_argument("--no-colors", help="Disable colors in output", action='store_true')
     parser.add_argument("--no-pager", help="Disable output scrolling, which is done by Pager", action='store_true')
     parser.add_argument("-c", "--convert", help="For developers. Convert the localfile to a payload.", action='store_true')
     return parser
@@ -469,10 +516,10 @@ def main():
             print("\nRecommendation information is not found!")
             sys.exit(1)
         else:
-            tools = load_data(payload, formatter, args.no_colors)
+            tools = load_data(payload, formatter)
 
     else:
-        tools = load_data(args.localfile, formatter, args.no_colors)
+        tools = load_data(args.localfile, formatter)
         args.mccampaign = "local"
 
     if args.tags is None:
@@ -480,7 +527,7 @@ def main():
         display_summary(tools, 'all')
         sys.exit(0)
 
-    tags_line = ' '.join(args.tags)
+    tags_line = '[' + ', '.join(args.tags) + ']'
     if args.summary:
         print(f'Showing tools for {args.mccampaign} and {tags_line} tags:')
         display_summary(tools, args.tags)

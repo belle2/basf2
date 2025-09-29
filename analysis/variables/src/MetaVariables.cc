@@ -2070,15 +2070,13 @@ namespace Belle2 {
             try {
               daughterNumber = convertString<int>(daughterString);
             } catch (std::invalid_argument&) {
-              const Variable::Manager::Var* daughterVar = Manager::Instance().getVariable(daughterString);
+              const Variable::Manager::Var* daughterVar = Manager::Instance().getVariable("int(" + daughterString + ",-1)");
               auto daughterVarResult = daughterVar->function(particle);
-              if (std::holds_alternative<int>(daughterVarResult)) {
-                daughterNumber = std::get<int>(daughterVarResult);
-              } else {
-                B2FATAL("First argument of mcDaughter meta function must be integer!");
-              }
+              daughterNumber = std::get<int>(daughterVarResult);
             }
             if (daughterNumber >= int(particle->getMCParticle()->getNDaughters())) {
+              return Const::doubleNaN;
+            } else if (daughterNumber < 0) {
               return Const::doubleNaN;
             }
             Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));

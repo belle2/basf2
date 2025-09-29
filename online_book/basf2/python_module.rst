@@ -3,7 +3,13 @@
 A simple python module
 =======================
 
-This lesson will give you an idea about the structure and use of basf2 modules.
+.. sidebar:: Overview
+    :class: overview
+
+    **Length**: 30-45 min
+
+
+This lesson will give you an idea about the structure and use of ``basf2`` modules.
 Most of the modules in our software are implemented in C++ and are made
 available for analysis by `modularAnalysis`. This package consists of python
 wrapper functions around the C++ modules in order to use them in the python
@@ -11,7 +17,7 @@ steering file. You have already learned about this in
 :ref:`onlinebook_basf2_introduction`
 
 C++ is very strong and fast, but usually much more complicated to read and write
-than Python. For this reason the basf2 framework provides the possibility to
+than Python. For this reason the ``basf2`` framework provides the possibility to
 write modules also in Python. This can be very helpful if you want to
 investigate or test something.
 
@@ -23,7 +29,7 @@ Minimal example
 ---------------
 
 Let's begin with the following minimal example for a new python module. It is
-the "Hello World" of basf2 modules. The magic happens in the class
+the "Hello World" of ``basf2`` modules. The magic happens in the class
 ``MinModule(basf2.Module)``. In this basic example, the class only consists of
 one member function ``event`` that is called once for each event. We use the
 logging function ``basf2.B2INFO()`` to print our message. To execute the model,
@@ -59,9 +65,9 @@ Accessing Datastore Objects
 ---------------------------
 
 Datastore objects can be accessed via the
-`PyStoreArray <https://software.belle2.org/development/classBelle2_1_1PyStoreArray.html>`__
+:doxygen:`PyStoreArray <classBelle2_1_1PyStoreArray>`
 class and the
-`PyStoreObj <https://software.belle2.org/development/classBelle2_1_1PyStoreObj.html>`__ classes.
+:doxygen:`PyStoreObj <classBelle2_1_1PyStoreObj>` classes.
 Let's create a small module which will print the event number and information on
 MCParticles, namely the PDG code. To have tracks available, we will use the
 `ParticleGun` module, which generates very simple events.
@@ -76,14 +82,14 @@ MCParticles, namely the PDG code. To have tracks available, we will use the
    track per event, but you can adjust this.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    You can find information on the Particle class in
-   `doxygen <https://software.belle2.org/development/classBelle2_1_1MCParticle.html>`__.
+   :doxygen:`doxygen <classBelle2_1_1MCParticle>`.
    The `ParticleGun` has the option `nTracks`.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. literalinclude:: steering_files/087_module.py
     :language: python        
@@ -108,6 +114,12 @@ More advanced examples
 - :file:`reconstruction/examples/plot_LL_diff.py` - Gets PID log-likelihoods,
   uses relations to get corresponding MC truth and fills ROOT histograms
   accordingly
+- :file:`framework/examples/fill_array_example.py` - Shows example usage of
+  Python array-oriented interface to fill a PyStoreArray with digits without
+  having to explicitly instantiate the object, thus making the operation faster
+- :file:`framework/examples/read_array_example.py` - Simple example of how to
+  use the Python array-oriented interface mentioned above to read elements from
+  a PyStoreArray 
 
 .. include:: ../lesson_footer.rstinclude
 

@@ -23,7 +23,7 @@ namespace Belle2 {
 
     public:
       /**
-       *  Constructor taking in prefered variance quanity be taken from the various hit objects if present.
+       *  Constructor taking in preferred variance which is taken from the various hit objects if present.
        *
        *  @param fitVariance Variance information to be used
        *                     Currently only c_Unit and c_Proper are supported.

@@ -78,20 +78,19 @@ bool DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
   return false; // histogram didn't change
 }
 
-// void DQMHistAnalysisModule::addRef(const std::string& dirname, const std::string& histname, TH1* ref)
-// {
-//   std::string fullname;
-//   if (dirname.size() > 0) {
-//     fullname = dirname + "/" + histname;
-//   } else {
-//     fullname = histname;
-//   }
-//   auto it = s_refList.find(fullname);
-//   if (it == s_refList.end()) {
-//     B2DEBUG(1, "Did not find histogram " << fullname << "in s_refList, so inserting now.");
-//     s_refList.insert({fullname, ref});
-//   }
-// }
+void DQMHistAnalysisModule::addRefHist(const std::string& dirname, TH1* hist)
+{
+  string histname = hist->GetName();
+  std::string name = dirname + "/" + histname;
+  auto& n = s_refList[name];
+  n.m_orghist_name = name;
+  n.m_refhist_name = "ref/" + name;
+  hist->SetName((n.m_refhist_name).c_str());
+  hist->SetDirectory(0);
+  n.setRefHist(hist); // transfer ownership!
+  n.setRefCopy(nullptr);
+  n.setCanvas(nullptr);
+}
 
 void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::EDeltaType t, int p,
                                         unsigned int a)
@@ -180,7 +179,7 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   return findHist(histname, updated);
 }
 
-TH1* DQMHistAnalysisModule::scaleReference(int scaling, const TH1* hist, TH1* ref)
+TH1* DQMHistAnalysisModule::scaleReference(ERefScaling scaling, const TH1* hist, TH1* ref)
 {
   // if hist/ref is nullptr, nothing to do
   if (!hist || !ref)
@@ -188,14 +187,15 @@ TH1* DQMHistAnalysisModule::scaleReference(int scaling, const TH1* hist, TH1* re
 
   switch (scaling) {
     // default: do nothing
-    // case 0: do nothing
-    case 1: // Integral
+    case ERefScaling::c_RefScaleNone: //do nothing
+      break;
+    case ERefScaling::c_RefScaleEntries: // Integral
       // only if we have entries in reference
       if (hist->Integral() != 0 and ref->Integral() != 0) {
         ref->Scale(hist->Integral() / ref->Integral());
       }
       break;
-    case 2: // Maximum
+    case ERefScaling::c_RefScaleMax: // Maximum
       // only if we have entries in reference
       if (hist->GetMaximum() != 0 and ref->GetMaximum() != 0) {
         ref->Scale(hist->GetMaximum() / ref->GetMaximum());
@@ -205,7 +205,7 @@ TH1* DQMHistAnalysisModule::scaleReference(int scaling, const TH1* hist, TH1* re
   return ref;
 }
 
-TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, int scaling, const TH1* hist)
+TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, ERefScaling scaling, const TH1* hist)
 {
   if (s_refList.find(histname) != s_refList.end()) {
     // get a copy of the reference which we can modify
@@ -213,11 +213,11 @@ TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, int scaling
     // then do the scaling
     return scaleReference(scaling, hist, s_refList[histname].getReference());
   }
-  B2INFO("Ref Histogram " << histname << " not in list.");
   return nullptr;
 }
 
-TH1* DQMHistAnalysisModule::findRefHist(const std::string& dirname, const std::string& histname, int scaling, const TH1* hist)
+TH1* DQMHistAnalysisModule::findRefHist(const std::string& dirname, const std::string& histname, ERefScaling scaling,
+                                        const TH1* hist)
 {
   if (dirname.size() > 0) {
     return findRefHist(dirname + "/" + histname, scaling, hist);
@@ -287,7 +287,7 @@ MonitoringObject* DQMHistAnalysisModule::findMonitoringObject(const std::string&
     return &s_monObjList[objName];
   }
   B2INFO("MonitoringObject " << objName << " not in memfile.");
-  return NULL;
+  return nullptr;
 }
 
 double DQMHistAnalysisModule::getSigma68(TH1* h) const
@@ -373,7 +373,7 @@ void DQMHistAnalysisModule::ExtractRunType(std::vector <TH1*>& hs)
   B2ERROR("ExtractRunType: Histogram \"DQMInfo/rtype\" missing");
 }
 
-void DQMHistAnalysisModule::ExtractEvent(std::vector <TH1*>& hs)
+void DQMHistAnalysisModule::ExtractNEvent(std::vector <TH1*>& hs)
 {
   s_eventProcessed = 0;
   for (size_t i = 0; i < hs.size(); i++) {

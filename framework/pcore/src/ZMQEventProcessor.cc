@@ -21,7 +21,6 @@
 #include <framework/logging/LogSystem.h>
 
 #include <framework/database/DBStore.h>
-#include <framework/database/Database.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/MetadataService.h>
 #include <framework/gearbox/Unit.h>
@@ -32,7 +31,6 @@
 #include <sys/stat.h>
 
 #include <csignal>
-#include <fstream>
 
 using namespace std;
 using namespace Belle2;
@@ -159,8 +157,6 @@ void ZMQEventProcessor::process(const PathPtr& path, long maxEvent)
 
   // Run the initialization of the modules and the histogram manager
   initialize(moduleList, histogramManager);
-
-  //  pause();
 
   // The main part: fork into the different processes and run!
   const ModulePtrList& terminateGlobally = PathUtils::getTerminateGloballyModules(moduleList);
@@ -299,8 +295,6 @@ void ZMQEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inpu
 
   if (not GlobalProcHandler::startWorkerProcesses(numProcesses)) {
     // Make sure the worker process is running until we go on
-    //    m_processMonitor.waitForRunningWorker(60);
-    //    m_processMonitor.waitForRunningWorker(7200);
     m_processMonitor.waitForRunningWorker(Environment::Instance().getZMQMaximalWaitingTime());
     return;
   }
@@ -326,7 +320,6 @@ void ZMQEventProcessor::processPath(const PathPtr& localPath, const ModulePtrLis
   ModulePtrList localModules = localPath->buildModulePathList();
   maxEvent = getMaximumEventNumber(maxEvent);
   // we are not using the default signal handler, so the processCore can not throw any exception because if sigint...
-  //  processCore(localPath, localModules, maxEvent, GlobalProcHandler::isProcess(ProcType::c_Input));
   processCore(localPath, localModules, maxEvent, GlobalProcHandler::isProcess(ProcType::c_Input),
               GlobalProcHandler::isProcess(ProcType::c_Worker),
               GlobalProcHandler::isProcess(ProcType::c_Output));
@@ -441,15 +434,13 @@ void ZMQEventProcessor::cleanup()
 void ZMQEventProcessor::processCore(const PathPtr& startPath, const ModulePtrList& modulePathList, long maxEvent,
                                     bool isInputProcess, bool isWorkerProcess, bool isOutputProcess)
 {
-  //  bool firstRound = true;
-
   DataStore::Instance().setInitializeActive(false);
   m_moduleList = modulePathList;
 
   //Remember the previous event meta data, and identify end of data meta data
   m_previousEventMetaData.setEndOfData(); //invalid start state
 
-  const bool collectStats = !Environment::Instance().getNoStats();
+  const bool collectStats = Environment::Instance().getStats();
 
   //Loop over the events
   long currEvent = 0;
@@ -457,8 +448,6 @@ void ZMQEventProcessor::processCore(const PathPtr& startPath, const ModulePtrLis
   while (!endProcess) {
     if (collectStats)
       m_processStatisticsPtr->startGlobal();
-
-    //    B2INFO ( "processCore:: currEvent = " << currEvent );
 
     PathIterator moduleIter(startPath);
 
@@ -475,9 +464,6 @@ void ZMQEventProcessor::processCore(const PathPtr& startPath, const ModulePtrLis
       return;
     }
 
-    // Original code
-    //    endProcess = ZMQEventProcessor::processEvent(moduleIter, isInputProcess && currEvent == 0);
-
     //Delete event related data in DataStore
     DataStore::Instance().invalidateData(DataStore::c_Event);
 
@@ -485,11 +471,6 @@ void ZMQEventProcessor::processCore(const PathPtr& startPath, const ModulePtrLis
     if ((maxEvent > 0) && (currEvent >= maxEvent)) endProcess = true;
     if (collectStats)
       m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_Event);
-
-    //    firstRound = false;
-
-    //    B2INFO ( "processCore :: event processed" );
-
   } //end event loop
 
   //End last run
@@ -507,26 +488,20 @@ bool ZMQEventProcessor::processEvent(PathIterator moduleIter, bool skipMasterMod
     m_lastMetadataUpdate = time;
   }
 
-  const bool collectStats = !Environment::Instance().getNoStats();
+  const bool collectStats = Environment::Instance().getStats();
 
   while (!moduleIter.isDone()) {
     Module* module = moduleIter.get();
-    //    B2INFO ("Starting event of " << module->getName() );
 
     // run the module ... unless we don't want to
     if (module != m_master) {
       callEvent(module);
-      //      B2INFO ( "not master. callEvent" );
-      //      B2INFO ( "ZMQEventProcessor :: " <<module->getName() << " called. Not master" );
     } else if (!skipMasterModule) {
       callEvent(module);
-      //      B2INFO ( "master but not skipModule. callEvent");
-      //      B2INFO ( "ZMQEventProcessor :: " <<module->getName() << " called. Not skipMasterModule" );
     } else
       B2INFO("Skipping execution of module " << module->getName());
 
     if (!m_eventMetaDataPtr) {
-      //      B2INFO ( "No event metadata....." );
       return false;
     }
 
@@ -547,17 +522,13 @@ bool ZMQEventProcessor::processEvent(PathIterator moduleIter, bool skipMasterMod
       if (WorkerPath) {
         B2INFO("Worker Path and First Event!");
         if (Environment::Instance().isZMQDAQFirstEvent(m_eventMetaDataPtr->getExperiment(), m_eventMetaDataPtr->getRun())) {
-          //  if ( m_eventMetaDataPtr->getExperiment() == Environment::Instance().getZMQDAQFirstEventExp() &&
-          //       m_eventMetaDataPtr->getRun() == Environment::Instance().getZMQDAQFirstEventRun() ) {
           B2INFO("Worker path processing for ZMQDAQ first event.....Skip to the end of path");
           B2INFO("    --> exp = " << m_eventMetaDataPtr->getExperiment() << " run = " << m_eventMetaDataPtr->getRun());
           while (true) {
             module = moduleIter.get();
-            //    B2INFO ( "Module in the path = " << module->getName() );
             if (module->getName() == "ZMQTxWorker") break;
             moduleIter.next();
           }
-          //  B2INFO ( "ZMQTxWorker will be called" );
           continue;
         }
       }
@@ -580,32 +551,34 @@ bool ZMQEventProcessor::processEvent(PathIterator moduleIter, bool skipMasterMod
                  " isEndOfRun = " << m_previousEventMetaData.isEndOfRun());
           B2INFO("--> cur run = " << m_eventMetaDataPtr->getRun() << " <- prev run = " << m_previousEventMetaData.getRun());
           B2INFO("--> cur evt = " << m_eventMetaDataPtr->getEvent() << " <- prev evt = " << m_previousEventMetaData.getEvent());
-          processBeginRun();
-          m_previousEventMetaData = *m_eventMetaDataPtr;
+          // The run number should not be 0
+          if (m_eventMetaDataPtr->getRun() != 0) {
+            processBeginRun();
+            m_previousEventMetaData = *m_eventMetaDataPtr;
+          } else {
+            return false;
+          }
         }
 
-        //Check for a change of the run (should not come here)
-        else {
-          const bool runChanged = ((m_eventMetaDataPtr->getExperiment() != m_previousEventMetaData.getExperiment()) or
-                                   (m_eventMetaDataPtr->getRun() != m_previousEventMetaData.getRun()));
-          const bool runChangedWithoutNotice = runChanged and not m_previousEventMetaData.isEndOfData()
-                                               and not m_previousEventMetaData.isEndOfRun();
-          //  if (runChangedWithoutNotice && !g_first_round) {
-          if (runChangedWithoutNotice) {
-            if (collectStats)
-              m_processStatisticsPtr->suspendGlobal();
+        const bool runChanged = ((m_eventMetaDataPtr->getExperiment() != m_previousEventMetaData.getExperiment()) or
+                                 (m_eventMetaDataPtr->getRun() != m_previousEventMetaData.getRun()));
+        const bool runChangedWithoutNotice = runChanged and not m_previousEventMetaData.isEndOfData()
+                                             and not m_previousEventMetaData.isEndOfRun();
+        //  if (runChangedWithoutNotice && !g_first_round) {
+        if (runChangedWithoutNotice) {
+          if (collectStats)
+            m_processStatisticsPtr->suspendGlobal();
 
-            B2INFO("===> Run Change (possibly offline) : calling processEndRun() and processBeginRun()");
-            B2INFO("--> cur run = " << m_eventMetaDataPtr->getRun() << " <- prev run = " << m_previousEventMetaData.getRun());
-            B2INFO("--> cur evt = " << m_eventMetaDataPtr->getEvent() << " <- prev evt = " << m_previousEventMetaData.getEvent());
-            B2INFO("--> runChanged = " << runChanged << " runChangedWithoutNotice = " << runChangedWithoutNotice);
+          B2INFO("===> Run Change (possibly offline) : calling processEndRun() and processBeginRun()");
+          B2INFO("--> cur run = " << m_eventMetaDataPtr->getRun() << " <- prev run = " << m_previousEventMetaData.getRun());
+          B2INFO("--> cur evt = " << m_eventMetaDataPtr->getEvent() << " <- prev evt = " << m_previousEventMetaData.getEvent());
+          B2INFO("--> runChanged = " << runChanged << " runChangedWithoutNotice = " << runChangedWithoutNotice);
 
-            processEndRun();
-            processBeginRun();
+          processEndRun();
+          processBeginRun();
 
-            if (collectStats)
-              m_processStatisticsPtr->resumeGlobal();
-          }
+          if (collectStats)
+            m_processStatisticsPtr->resumeGlobal();
         }
         m_previousEventMetaData = *m_eventMetaDataPtr;
       } else
@@ -651,14 +624,13 @@ void ZMQEventProcessor::processBeginRun(bool skipDB)
   MetadataService::Instance().addBasf2Status("beginning run");
 
   m_inRun = true;
-  //  auto dbsession = Database::Instance().createScopedUpdateSession();
 
   LogSystem& logSystem = LogSystem::Instance();
   m_processStatisticsPtr->startGlobal();
 
   if (!skipDB) DBStore::Instance().update();
 
-  //initialize random generator for end run
+  // initialize random generator for end run
   RandomNumbers::initializeBeginRun();
 
   for (const ModulePtr& modPtr : m_moduleList) {
@@ -669,7 +641,6 @@ void ZMQEventProcessor::processBeginRun(bool skipDB)
 
     //Do beginRun() call
     m_processStatisticsPtr->startModule();
-    //    CALL_MODULE(module, beginRun);
     module->beginRun();
     m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_BeginRun);
 
@@ -693,7 +664,6 @@ void ZMQEventProcessor::processEndRun()
   m_processStatisticsPtr->startGlobal();
 
   const EventMetaData newEventMetaData = *m_eventMetaDataPtr;
-  //  *m_eventMetaDataPtr = m_previousEventMetaData;
 
   //initialize random generator for end run
   RandomNumbers::initializeEndRun();
@@ -706,7 +676,6 @@ void ZMQEventProcessor::processEndRun()
 
     //Do endRun() call
     m_processStatisticsPtr->startModule();
-    //    CALL_MODULE(module, endRun);
     module->endRun();
     m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_EndRun);
 

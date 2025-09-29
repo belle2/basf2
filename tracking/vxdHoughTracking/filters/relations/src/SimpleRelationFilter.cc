@@ -6,9 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/vxdHoughTracking/filters/relations/SimpleRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
+
+#include <cmath>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -31,7 +33,7 @@ SimpleRelationFilter::operator()(const std::pair<const VXDHoughState*, const VXD
   const VXDHoughState::DataCache& currentVXDHoughState = relation.first->getDataCache();
   const VXDHoughState::DataCache& nextVXDHoughState = relation.second->getDataCache();
 
-  const double absThetaDiff = abs(currentVXDHoughState.theta - nextVXDHoughState.theta);
+  const double absThetaDiff = std::abs(currentVXDHoughState.theta - nextVXDHoughState.theta);
 
   // if the connection is possible in u, it should also be possible in v, but as there could in principle be a chance that the hits
   // are on different sensors (X.X.1 -> X.(X+-1).2 or X.X.2 -> X.(X+-1).1) check for a similar theta value instead of v
@@ -45,7 +47,7 @@ SimpleRelationFilter::operator()(const std::pair<const VXDHoughState*, const VXD
     return 1.0;
   }
 
-  const ushort absLayerDiff = abs(currentVXDHoughState.layer - nextVXDHoughState.layer);
+  const ushort absLayerDiff = std::abs(currentVXDHoughState.layer - nextVXDHoughState.layer);
   if ((absLayerDiff == 1 and absThetaDiff < m_SimpleThetaCutDeltaL1) or
       (absLayerDiff == 2 and absThetaDiff < m_SimpleThetaCutDeltaL2)) {
     return 1.0;

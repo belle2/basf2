@@ -8,6 +8,7 @@
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
@@ -241,7 +242,7 @@ bool Variable::Manager::createVariable(const std::string& name)
       std::vector<double> arguments;
       for (auto& arg : functionArguments) {
         double number = 0;
-        number = Belle2::convertString<double>(arg);
+        number = convertString<double>(arg);
         arguments.push_back(number);
       }
       auto pfunc = parameterIter->second->function;
@@ -271,8 +272,8 @@ bool Variable::Manager::createVariable(const std::string& name)
       py::tuple expression_tuple = py::extract<boost::python::tuple>(b2parser_namespace.attr("parse_expression")(name));
       try {
         // Compile ExpressionNode
-        std::shared_ptr<const AbstractExpressionNode<Belle2::Variable::Manager>> expression_node =
-              NodeFactory::compile_expression_node<Belle2::Variable::Manager>(expression_tuple);
+        std::shared_ptr<const AbstractExpressionNode<Variable::Manager>> expression_node =
+              NodeFactory::compile_expression_node<Variable::Manager>(expression_tuple);
         // Create lambda capturing the ExpressionNode
         Variable::Manager::FunctionPtr func = [expression_node](const Particle * object) -> VarVariant {
           return expression_node->evaluate(object);
@@ -303,7 +304,7 @@ bool Variable::Manager::createVariable(const std::string& fullname, const std::s
     std::vector<double> arguments;
     for (auto& arg : functionArguments) {
       double number = 0;
-      number = Belle2::convertString<double>(arg);
+      number = convertString<double>(arg);
       arguments.push_back(number);
     }
     auto pfunc = parameterIter->second->function;
@@ -330,7 +331,7 @@ bool Variable::Manager::createVariable(const std::string& fullname, const std::s
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::FunctionPtr& f,
                                          const std::string& description, const Variable::Manager::VariableDataType& variabletype,
-                                         const std::string& unit)
+                                         const std::string& unit, const std::string& fName)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -341,7 +342,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
 
-    auto var = std::make_shared<Var>(name, f, description, m_currentGroup, variabletype);
+    auto var = std::make_shared<Var>(name, f, description, m_currentGroup, variabletype, fName);
     B2DEBUG(19, "Registered Variable " << name);
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
@@ -355,7 +356,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::ParameterFunctionPtr& f,
                                          const std::string& description, const Variable::Manager::VariableDataType& variabletype,
-                                         const std::string& unit)
+                                         const std::string& unit, const std::string& fName)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -363,7 +364,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 
   auto mapIter = m_parameter_variables.find(name);
   if (mapIter == m_parameter_variables.end()) {
-    auto var = std::make_shared<ParameterVar>(name, f, description, m_currentGroup, variabletype);
+    auto var = std::make_shared<ParameterVar>(name, f, description, m_currentGroup, variabletype, fName);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
     B2DEBUG(19, "Registered parameter Variable " << rawName);
@@ -378,7 +379,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 }
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::MetaFunctionPtr& f,
-                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype)
+                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype, const std::string& fName)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -386,7 +387,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 
   auto mapIter = m_meta_variables.find(name);
   if (mapIter == m_meta_variables.end()) {
-    auto var = std::make_shared<MetaVar>(name, f, description, m_currentGroup, variabletype);
+    auto var = std::make_shared<MetaVar>(name, f, description, m_currentGroup, variabletype, fName);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
     B2DEBUG(19, "Registered meta Variable " << rawName);
@@ -487,4 +488,16 @@ double Variable::Manager::evaluate(const std::string& varName, const Particle* p
   else if (var->variabletype == Variable::Manager::VariableDataType::c_bool)
     return (double)std::get<bool>(var->function(p));
   else return std::numeric_limits<double>::quiet_NaN();
+}
+
+std::vector<double> Variable::Manager::evaluateVariables(const std::vector<std::string>& varNames, const ParticleList* plist)
+{
+  std::vector<double> values;
+  values.reserve(varNames.size() * plist->getListSize());
+  for (size_t iPart = 0; iPart < plist->getListSize(); ++iPart) {
+    const Particle* p = plist->getParticle(iPart);
+    for (size_t iVar = 0; iVar < varNames.size(); ++iVar)
+      values.push_back(evaluate(varNames[iVar], p));
+  }
+  return values;
 }

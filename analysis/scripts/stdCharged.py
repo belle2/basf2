@@ -73,7 +73,7 @@ def stdCharged(particletype, listtype, path, writeOut=True):
     """
 
     # basic quality cut strings
-    trackQuality = 'thetaInCDCAcceptance and nCDCHits>20'
+    trackQuality = 'thetaInCDCAcceptance'
     ipCut = 'dr < 0.5 and abs(dz) < 2'
     goodTrack = trackQuality + ' and ' + ipCut
 
@@ -217,7 +217,7 @@ def stdLep(pdgId,
 
                               .. tip::
                                   Please refer to the
-                                  `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                                  `Charged PID XWiki page <https://xwiki.desy.de/xwiki/rest/p/fab3e>`_
                                   for info about the recommended global tags.
 
         release (Optional[int]): the major release number of the data and MC campaigns considered.
@@ -225,7 +225,7 @@ def stdLep(pdgId,
 
                                  .. tip::
                                      Please refer to the
-                                     `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                                     `Charged PID XWiki page <https://xwiki.desy.de/xwiki/rest/p/fab3e>`_
                                      for info about lepton identification variables and campaigns.
 
         channel_eff (Optional[str]): the channel used to derive the :math:`\\ell` ID efficiency corrections.
@@ -234,7 +234,7 @@ def stdLep(pdgId,
 
                                      .. tip::
                                          Please refer to the
-                                         `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                                         `Charged PID XWiki page <https://xwiki.desy.de/xwiki/rest/p/fab3e>`_
                                          for other possible choices (if any).
 
         channel_misid_pi (Optional[str]): the channel used to derive the :math:`\\pi` fake rate corrections.

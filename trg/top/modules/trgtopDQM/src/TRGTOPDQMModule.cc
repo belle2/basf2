@@ -23,9 +23,13 @@
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 
-#include "trg/top/dataobjects/TRGTOPUnpackerStore.h"
+#include <trg/ecl/dataobjects/TRGECLUnpackerStore.h>
+#include <trg/top/dataobjects/TRGTOPUnpackerStore.h>
+#include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
+#include <trg/grl/dataobjects/TRGGRLUnpackerStore.h>
+#include <trg/gdl/dataobjects/TRGGDLUnpackerStore.h>
+#include <trg/ecl/TrgEclMapping.h>
 
 #include <TDirectory.h>
 #include <TPostScript.h>
@@ -33,7 +37,6 @@
 #include <TStyle.h>
 #include <fstream>
 #include <framework/logging/Logger.h>
-#include <boost/algorithm/string.hpp>
 
 #include <iostream>
 
@@ -1341,7 +1344,7 @@ void TRGTOPDQMModule::event()
       sort(tcEclList.begin(), tcEclList.end(), largestEnergy());
 
       // Barrel TCID map:
-      // https://confluence.desy.de/display/BI/TRGECL+Meeting?preview=%2F43899281%2F58924075%2F170630yjkim.pdf
+      // https://xwiki.desy.de/xwiki/bin/download/BI/Belle%20II%20Internal/Detector%20WebHome/Trigger%20WebHome/Sub-Trigger%20Systems/ECL%20Trigger/ECL%20Trigger%20Meeting/TRGECL%20Meeting/WebHome/170630yjkim.pdf?rev=1.1
       if (tcEclList.size() >= 2) {
         vector<tcEcl>::const_iterator it = tcEclList.begin();
         const tcEcl& tc1 = *it;

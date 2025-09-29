@@ -8,10 +8,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <framework/datastore/StoreArray.h>
 
-#include <string>
-#include <vector>
+#include <bitset>
+#include <array>
+#include <map>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -51,7 +51,7 @@ namespace Belle2 {
         return (layercount >= 3 ? layercount : 0);
       }
 
-      /// find intercepts in the 2D Hough Space by recursively calling itself until no hits are assinged
+      /// find intercepts in the 2D Hough Space by recursively calling itself until no hits are assigned
       /// to a given Hough Space cell, or until the maximum number of recursions (m_maxRecursionLevel) is reached
       /// @param hits vector containing the hits that are used for track finding
       /// @param xmin minimum x-index of the sub-Hough Space in the current recursion step
@@ -76,7 +76,7 @@ namespace Belle2 {
       uint m_maxRecursionLevel = 9;
 
       /// number of sectors of the Hough Space on the horizontal axis
-      uint m_nAngleSectors = 256;
+      uint m_nAngleSectors = 512;
 
       /// number of sectors of the Hough Space on the vertical axis
       uint m_nVerticalSectors = 512;
@@ -92,11 +92,11 @@ namespace Belle2 {
       /// minimum cluster size of sectors belonging to intercepts in the Hough Space
       uint m_MinimumHSClusterSize = 1;
       /// maximum cluster size of sectors belonging to intercepts in the Hough Space
-      uint m_MaximumHSClusterSize = 10;
+      uint m_MaximumHSClusterSize = 12;
       /// maximum cluster size in x of sectors belonging to intercepts in the Hough Space
       uint m_MaximumHSClusterSizeX = 2;
       /// maximum cluster size in y of sectors belonging to intercepts in the Hough Space
-      uint m_MaximumHSClusterSizeY = 10;
+      uint m_MaximumHSClusterSizeY = 12;
 
       // class variables
       /// HS unit size in x

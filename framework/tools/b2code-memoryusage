@@ -16,7 +16,7 @@ processing mode and obtaining the process role from the output of basf2 if the
 log level of the framework is set to INFO.
 
 This program has three modes: in "record" mode memory consumption is recorded
-for all children of the specified progam while it is executed. After execution
+for all children of the specified program while it is executed. After execution
 is complete, the execution time (wall time) and maximum and average amount of
 memory used will be printed to stderr. Optionally, a memory consumption profile
 can be written to disk using the ``--profile`` argument. In "plot" mode, a
@@ -29,7 +29,7 @@ size which is (according to "man top") the "total amount of virtual memory used
 by the task. It includes all code, data and shared libraries plus pages that
 have been swapped out and pages that have been mapped but not used."
 Resident memory memory is the "non-swapped physical memory a task has
-used." but does not take into account sharing between differnet processes.
+used." but does not take into account sharing between different processes.
 Proportional memory is like Resident memory but takes sharing of pages between
 processes into account. Swap is the amount of memory swapped out.
 --examples--
@@ -115,7 +115,7 @@ def get_argument_parser():
                         "consistency. This only works well if no other programs "
                         "are allocating memory while profile is recorded")
     parser.add_argument("--annotations", default=r"memoryusage annotate:\s*(.*)$",
-                        help="regular expession which to apply against output of "
+                        help="regular expression which to apply against output of "
                         "program. If a match is found the contents of group 1 will "
                         "be added to the plots at the time the output was processed")
     parser.add_argument("--no-legend", dest="no_legend", default=False,
@@ -284,7 +284,7 @@ def get_color(i, n):
     if n <= 6:
         return "rgbcmy"[i]
     else:
-        cmap = mpl.cm.get_cmap("jet")
+        cmap = mpl.colormaps["jet"]
         return cmap(i / (n - 1.))
 
 
@@ -567,7 +567,7 @@ if __name__ == "__main__":
                 # add to pdf
                 pdf.savefig(f)
 
-    # finally, print values, first we get the values formated correctly in MB for
+    # finally, print values, first we get the values formatted correctly in MB for
     # max, mean and standard deviation and that for each memory type
     values = np.array([[f"{fct(m) / 1000:.2f}" for m in total_memory.T[1:]]
                       for fct in(np.max, np.mean, np.std)])

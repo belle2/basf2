@@ -18,7 +18,7 @@ path.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=10)
 # generate BBbar events
 path.add_module('EvtGenInput')
 
-# detector simulation, don't perfrom PXD data reduction
+# detector simulation, don't perform PXD data reduction
 add_simulation(path, bkgOverlay=False, forceSetPXDDataReduction=True, usePXDDataReduction=False, cleanupPXDDataReduction=False)
 
 # add tracking and track fitting, without MC matching
@@ -32,6 +32,6 @@ add_prefilter_tracking_reconstruction(path)
 # Add the Chi2-matcher module to the execution path
 path.add_module("Chi2MCTrackMatcher", CutOffs=[128024, 95, 173, 424, 90, 424], linalg=False)
 # process the path
-process(path)
+process(path, calculateStatistics=True)
 # show some module statistics
 print(statistics)

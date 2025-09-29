@@ -104,7 +104,7 @@ def run():
             nL2_ROI = 0
             for roi in rois:
                 sensor = roi.getSensorID()
-                if(sensor.getLayerNumber() == 1):
+                if (sensor.getLayerNumber() == 1):
                     nL1_ROI = nL1_ROI + 1
                 else:
                     nL2_ROI = nL2_ROI + 1
@@ -125,7 +125,7 @@ def run():
             inters = Belle2.PyStoreArray('PXDIntercepts')
             for inter in inters:
                 sensor = Belle2.VxdID(inter.getSensorID())
-                if(sensor.getLayerNumber() == 1):
+                if (sensor.getLayerNumber() == 1):
                     self.statU_L1.append(inter.getSigmaU())
                     self.statV_L1.append(inter.getSigmaV())
                 else:
@@ -177,8 +177,8 @@ def run():
             h_statU_L1.contact = contact
             h_statU_L1.check = 'average should be around 0.021 cm'
             h_statU_L1.description = 'Statistical Error of the Intercept on L1 planes, along U'
-            h_statU_L1.title = 'L1 Intercept Statistical Uncertainity along U'
-            h_statU_L1.xlabel = 'U stat uncertainity'
+            h_statU_L1.title = 'L1 Intercept Statistical Uncertainty along U'
+            h_statU_L1.xlabel = 'U stat uncertainty'
             h_statU_L1.ylabel = ''
             h_statU_L1.write(output_tfile)
 
@@ -187,8 +187,8 @@ def run():
             h_statV_L1.contact = contact
             h_statV_L1.check = 'average should be around 0.021 cm'
             h_statV_L1.description = 'Statistical Error of the Intercept on L1 planes, along V'
-            h_statV_L1.title = 'L1 Intercept Statistical Uncertainity along V'
-            h_statV_L1.xlabel = 'V stat uncertainity (cm)'
+            h_statV_L1.title = 'L1 Intercept Statistical Uncertainty along V'
+            h_statV_L1.xlabel = 'V stat uncertainty (cm)'
             h_statV_L1.ylabel = ''
             h_statV_L1.write(output_tfile)
 
@@ -197,8 +197,8 @@ def run():
             h_statU_L2.contact = contact
             h_statU_L2.check = 'average should be around  0.015 cm'
             h_statU_L2.description = 'Statistical Error of the Intercept on L2 planes, along U'
-            h_statU_L2.title = 'L2 Intercept Statistical Uncertainity along U'
-            h_statU_L2.xlabel = 'U stat uncertainity (cm)'
+            h_statU_L2.title = 'L2 Intercept Statistical Uncertainty along U'
+            h_statU_L2.xlabel = 'U stat uncertainty (cm)'
             h_statU_L2.ylabel = ''
             h_statU_L2.write(output_tfile)
 
@@ -207,8 +207,8 @@ def run():
             h_statV_L2.contact = contact
             h_statV_L2.check = 'average should be around 0.016 cm'
             h_statV_L2.description = 'Statistical Error of the Intercept on L2 planes, along V'
-            h_statV_L2.title = 'L2 Intercept Statistical Uncertainity along V'
-            h_statV_L2.xlabel = 'V stat uncertainity (cm)'
+            h_statV_L2.title = 'L2 Intercept Statistical Uncertainty along V'
+            h_statV_L2.xlabel = 'V stat uncertainty (cm)'
             h_statV_L2.ylabel = ''
             h_statV_L2.write(output_tfile)
 
@@ -261,7 +261,6 @@ def run():
 
     print(path)
     basf2.process(path)
-    print(basf2.statistics)
 
 
 if __name__ == '__main__':

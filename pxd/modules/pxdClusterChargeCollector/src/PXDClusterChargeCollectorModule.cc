@@ -10,9 +10,15 @@
 
 #include <framework/datastore/RelationArray.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/Track.h>
+
+#include <pxd/dataobjects/PXDCluster.h>
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
+
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <TTree.h>
 #include <TH2I.h>
@@ -208,7 +214,7 @@ void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
 
         // Compute variables from cluster needed for gain estimation
         m_signal = cluster.getCharge();
-        // Fill variabels into tree
+        // Fill variables into tree
         getObjectPtr<TTree>(treename)->Fill();
         // Increment the counter & store charge (optional)
         getObjectPtr<TH1I>("PXDClusterCounter")->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin);
@@ -261,7 +267,7 @@ void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
 
           // Compute variables from cluster needed for gain estimation
           m_signal = cluster.getCharge();
-          // Fill variabels into tree
+          // Fill variables into tree
           getObjectPtr<TTree>(treename)->Fill();
           // Increment the counter & store charge (optional)
           getObjectPtr<TH1I>("PXDClusterCounter")->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin);

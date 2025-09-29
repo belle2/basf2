@@ -8,18 +8,16 @@
 
 #include "pxd/modules/pxdDQM/PXDDQMClustersModule.h"
 
-#include <framework/core/HistoModule.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
+#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/geometry/SensorInfo.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoTools.h>
 #include <pxd/unpacking/PXDMappingLookup.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
@@ -47,7 +45,7 @@ PXDDQMClustersModule::PXDDQMClustersModule() : HistoModule()
 {
   //Set module properties
   setDescription("PXD DQM clusters module "
-                 "Recommended Number of events for monitorin is 40 kEvents or more to fill all histograms "
+                 "Recommended Number of events for monitoring is 40 kEvents or more to fill all histograms "
                 );
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing

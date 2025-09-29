@@ -9,7 +9,6 @@
 #include <dqm/analysis/modules/DQMHistReferenceModule.h>
 #include <TROOT.h>
 #include <TStyle.h>
-#include <TClass.h>
 #include <TKey.h>
 
 using namespace std;
@@ -68,60 +67,52 @@ void DQMHistReferenceModule::loadReferenceHistos()
 
   B2INFO("DQMHistReference: use reference file " << m_referenceFileName);
 
-  TIter nextkey(refFile->GetListOfKeys());
-  TKey* key;
-  while ((key = (TKey*)nextkey())) {
-    if (key->IsFolder() && string(key->GetName()) == string("ref")) {
-      TDirectory* refdir = (TDirectory*)key->ReadObj(); // ReadObj -> I own it
-      TIter nextDetDir(refdir->GetListOfKeys());
-      TKey* detDir;
+  TIter nextRefDirKey(refFile->GetListOfKeys());
+  TKey* refDirKey;
+  while ((refDirKey = (TKey*)nextRefDirKey())) {
+    if (refDirKey->IsFolder() && string(refDirKey->GetName()) == string("ref")) {
+      TDirectory* refDir = (TDirectory*)refDirKey->ReadObj(); // ReadObj -> I own it, delete later
+      TIter nextDetDirKey(refDir->GetListOfKeys());
+      TKey* detDirKey;
       // detector folders
-      while ((detDir = (TKey*)nextDetDir())) {
-        if (!detDir->IsFolder()) continue;
-        TIter nextTypeDir(((TDirectory*)detDir->ReadObj())->GetListOfKeys());
-        TKey* typeDir;
-        TDirectory* foundDir = NULL;
+      while ((detDirKey = (TKey*)nextDetDirKey())) {
+        if (!detDirKey->IsFolder()) continue;
+        TDirectory* detDir = ((TDirectory*)detDirKey->ReadObj());
+        TIter nextRunTypeDirKey(detDir->GetListOfKeys()); // ReadObj -> Now I own this, so delete later
+        TKey* runtypeDirKey;
+        TDirectory* runtypeDir = nullptr;
         // run type folders (get the run type corresponding folder or use default one)
-        while ((typeDir = (TKey*)nextTypeDir())) {
-          if (!typeDir->IsFolder()) continue;
-          if (string(typeDir->GetName()) == run_type) {
-            foundDir = (TDirectory*)typeDir->ReadObj(); // ReadObj -> I own it
-            break;
+        while ((runtypeDirKey = (TKey*)nextRunTypeDirKey())) {
+          if (!runtypeDirKey->IsFolder()) continue;
+          if (string(runtypeDirKey->GetName()) == run_type) {
+            if (runtypeDir) delete runtypeDir; // if default was loaded before
+            runtypeDir = (TDirectory*)runtypeDirKey->ReadObj(); // ReadObj -> I own it, delete later
+            break; // break directly, otherwise "default" could overwrite it
           }
-          if (string(typeDir->GetName()) == "default") foundDir = (TDirectory*)typeDir->ReadObj(); // ReadObj -> I own it
+          // else we would check if default, which we load as backup
+          if (string(runtypeDirKey->GetName()) == "default") runtypeDir = (TDirectory*)runtypeDirKey->ReadObj(); // ReadObj -> I own it
         }
-        string dirname = detDir->GetName();
-        if (!foundDir) {
-          B2INFO("No run type specific or default references available for " << dirname);
+        string detName = detDir->GetName();
+        // Attention, runtypeDir and runtypeDirKey could be zero here
+        if (!runtypeDir) {
+          B2INFO("No run type specific or default references available for " << detName);
         } else {
-          B2INFO("Reading reference histograms for " << dirname << " from run type folder: " << foundDir->GetName());
+          B2INFO("Reading reference histograms for " << detName << " from run type folder: " << runtypeDir->GetName());
 
-          TIter next(foundDir->GetListOfKeys());
-          TKey* hh;
-
-          while ((hh = (TKey*)next())) {
-            if (hh->IsFolder()) continue;
-            TObject* obj = hh->ReadObj(); // ReadObj -> I own it
-            if (obj->IsA()->InheritsFrom("TH1")) {
-              TH1* h = (TH1*)obj;
-              string histname = h->GetName();
-              std::string name = dirname + "/" + histname;
-              auto& n = getRefList()[name];
-              n.m_orghist_name = name;
-              n.m_refhist_name = "ref/" + name;
-              h->SetName((n.m_refhist_name).c_str());
-              h->SetDirectory(0);
-              n.setRefHist(h); // transfer ownership!
-              n.setRefCopy(nullptr);
-              n.setCanvas(nullptr);
-            } else {
-              delete obj;
+          TIter nextHistkey(runtypeDir->GetListOfKeys());
+          TKey* histKey;
+          // now read histograms
+          while ((histKey = (TKey*)nextHistkey())) {
+            if (histKey->IsFolder()) continue;
+            if (gROOT->GetClass(histKey->GetClassName())->InheritsFrom("TH1")) {
+              addRefHist(detName, (TH1*)histKey->ReadObj()); // ReadObj -> I own it, tranfer ownership to function
             }
           }
-          delete foundDir; // always non-zero
+          delete runtypeDir; // always non-zero as checked above ... runtype or "default"
         }
+        delete detDir; // always non-zero ... detector subdir name
       }
-      delete refdir; // always non-zero
+      delete refDir; // always non-zero ... "ref" folder
     }
   }
 
@@ -132,70 +123,7 @@ void DQMHistReferenceModule::loadReferenceHistos()
 
 void DQMHistReferenceModule::event()
 {
-  TH1::AddDirectory(false); // do not store any histograms
-  gStyle->SetOptStat(0);
-  gStyle->SetStatStyle(1);
-  gStyle->SetOptDate(22);// Date and Time in Bottom Right, does no work
-
-  char mbstr[100];
-
-  time_t now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-  B2INFO("[" << mbstr << "] before ref loop");
-
-  for (auto& it : getRefList()) {
-    TH1* ref = it.second.getRefHist();
-    if (!ref) continue; // No reference, continue
-    TCanvas* canvas = it.second.getCanvas();
-    TH1* hist1 = findHistInCanvas(it.second.m_orghist_name, &(canvas));
-
-    // if there is no histogram on canvas we plot the reference anyway.
-    if (!hist1) {
-      B2DEBUG(1, "Canvas is without histogram -> no display " << it.second.m_orghist_name);
-      // Display something could be confusing for shifters
-//       B2DEBUG(1, "Canvas is without histogram -> displaying only reference " << it.second.orghist_name);
-//       canvas->cd();
-//       hist2->Draw();
-//       canvas->Modified();
-//       canvas->Update();
-      continue;
-    }
-    if (!canvas) {
-      B2DEBUG(1, "No canvas found for reference histogram " << it.second.m_orghist_name);
-      continue;
-    }
-    if (hist1->Integral() == 0) continue; // empty histogram -> continue
-
-    /* consider adding coloring option....
-      double data = 0;
-      if (m_color) {
-      data = hist1->KolmogorovTest(hist2, ""); // returns p value (0 bad, 1 good), N - do not compare normalized
-      }
-    */
-
-    //TODO: Remove me when and move me to AutoCanvas (after debugging)
-    if (abs(ref->Integral()) > 0) { // only if we have entries in reference
-      auto refCopy = scaleReference(1, hist1, it.second.getReference());
-
-      //Adjust the y scale to cover the reference
-      if (refCopy->GetMaximum() > hist1->GetMaximum())
-        hist1->SetMaximum(1.1 * refCopy->GetMaximum());
-
-      canvas->cd();
-      refCopy->Draw("hist,same");
-
-      canvas->Modified();
-      canvas->Update();
-      B2DEBUG(2, "Adding ref: " << it.second.m_orghist_name << " " << ref->GetName() << " " << ref);
-      //addRef("", it.second.m_orghist_name, ref);
-    }
-
-
-  }
-
-  now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-  B2INFO("[" << mbstr << "] after ref loop");
+  B2DEBUG(1, "DQMHistReference: event called");
 }
 
 void DQMHistReferenceModule::endRun()

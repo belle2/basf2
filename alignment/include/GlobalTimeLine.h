@@ -22,7 +22,7 @@ namespace Belle2 {
 
       /// Pair to hold exp + run number
       typedef std::pair<int, int> ExpRun;
-      /// "Header" with actuall starting events (EventMetaData) assigned to each time interval
+      /// "Header" with actual starting events (EventMetaData) assigned to each time interval
       typedef std::vector<EventMetaData> EventHeader;
       /// "Header" with runs corresponding to events in EventHeader
       typedef std::vector<ExpRun> RunHeader;
@@ -34,7 +34,7 @@ namespace Belle2 {
       typedef std::tuple<EventHeader, RunHeader, TableData> TimeTable;
 
       /// The smallest unit is a run with event dependencies. For no event dependency, a run or run
-      /// range will contain vector of size 1 (the usuall case)
+      /// range will contain vector of size 1 (the usual case)
       /// The shared pointer host the generic accessor to DB objects exposing interface for Millepede
       typedef std::vector< std::pair<EventMetaData, std::shared_ptr<GlobalParamSetAccess>>> IntraIoVPayloads;
       /// The row is composed of IoVs and blocks with either single payload or and intra-run dependency
@@ -67,7 +67,7 @@ namespace Belle2 {
       /// @param vector GlobalParamVector initialized with DB object for which payloads should be generated
       PayloadsTable TimeIdsTable2PayloadsTable(TimeTable& timeTable, const GlobalParamVector& vector);
 
-      /// Create the initial TimeTable fromm the mapping of timedep parameters
+      /// Create the initial TimeTable from the mapping of timedep parameters
       /// in GlobalLabel
       /// @param events The vector of EventMetaData to interpret the indices of columns in TimeTable
       /// @param label This more for style - only static functions are called on this to read the mapping
@@ -89,7 +89,8 @@ namespace Belle2 {
       std::pair<EventMetaData, std::shared_ptr<GlobalParamSetAccess>> getPayloadByContinuousIndex(PayloadsTable& payloadsTable, int uid,
           long unsigned int index);;
 
-      /// Get cell (continous index of payload) at given row and column
+      /// Get cell (continuous index of payload) at given row and column
+      /// @param timeTable TimeTable
       /// @param uid of row
       /// @param timeid of column
       int getContinuousIndexByTimeID(const TimeTable& timeTable, int uid, int timeid);
@@ -136,7 +137,7 @@ namespace Belle2 {
         std::vector< std::tuple< std::vector< int >, std::vector< std::tuple< int, int, int > > > >& config);
 
       /// Convenient class to automatically create payloads from allowed time
-      /// depedence of parameter, load their value from database, update te constants one by one
+      /// dependence of parameter, load their value from database, update the constants one by one
       /// usually from Millepde result) and output the final payloads (including EventDependencies)
       /// such that one can store them (updated) in the database
       class GlobalParamTimeLine {
@@ -152,9 +153,9 @@ namespace Belle2 {
         /// Constructor
         /// @param events vector of events to interpret time ids from GlobalLabel
         /// @param label (only for style) - static functions called to read the mapping of parameters and time intervals
-        /// @param vector the global vector initialized with DB objects for which payloads shoudl be generated
+        /// @param vector the global vector initialized with DB objects for which payloads should be generated
         /// WARNING: do not construct() or loadFromDB() the vector - use it "raw" - the internal object handlers
-        /// are copied into the payloads table constructing the internal DB objects would result in copiyng them around, too
+        /// are copied into the payloads table constructing the internal DB objects would result in coping them around, too
         GlobalParamTimeLine(const std::vector<EventMetaData>& events, GlobalLabel& label, const GlobalParamVector& vector);
 
         /// Load every single payload with the content in database at its corresponding
@@ -165,7 +166,7 @@ namespace Belle2 {
 
         /// Add a correction to any payload's parameter in the timeline
         /// @param label the label any global parameter constructed from integer after Millepede calibration
-        /// The mapping of time intervals has to be loaded for the label to provide correct infortmation
+        /// The mapping of time intervals has to be loaded for the label to provide correct information
         /// about its validity in time intervals -> all payloads are updated until the end of validity of this
         /// parameter
         /// @param correction the value to be added to the given constant

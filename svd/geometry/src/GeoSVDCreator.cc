@@ -36,7 +36,6 @@
 #include <G4Region.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
   using namespace geometry;
@@ -731,11 +730,12 @@ namespace Belle2 {
           (boost::format("%1%.Layer%2%.CoolingPipe") % m_prefix % layer).str());
         geometry::setColor(*pipeVolume, "#ccc");
 
+#ifndef __clang_analyzer__
         G4Torus* bendSolid = new G4Torus("CoolingBend", innerRadius, outerRadius, sin(deltaPhi / 2.0)*radius, -M_PI / 2, M_PI);
         G4LogicalVolume* bendVolume = new G4LogicalVolume(
           bendSolid, geometry::Materials::get(material),
           (boost::format("%1%.Layer%2%.CoolingBend") % m_prefix % layer).str());
-
+#endif
         // Last pipe may be closer, thus we need additional bending
         if (pipes.getDeltaL() > 0) {
           double deltaL = pipes.getDeltaL() / Unit::mm;
@@ -779,10 +779,13 @@ namespace Belle2 {
             if (i % 2 > 0) {
               placement = placement * G4RotateZ3D(M_PI);
             }
+#ifndef __clang_analyzer__
             // And place the bend
             supportAssembly.add(bendVolume, placement);
+#endif
           }
         }
+
       }
 
       return supportAssembly;

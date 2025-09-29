@@ -6,15 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <pxd/modules/pxdUnpacking/PXDUnpackerOTModule.h>
 #include <pxd/unpacking/PXDRawDataDefinitions.h>
 #include <pxd/unpacking/PXDRawDataStructs.h>
 #include <pxd/unpacking/PXDMappingLookup.h>
-#include <pxd/modules/pxdUnpacking/PXDUnpackerOTModule.h>
-#include <framework/datastore/DataStore.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDRawAdc.h>
+#include <pxd/dataobjects/PXDRawROIs.h>
+#include <vxd/dataobjects/VxdID.h>
+#include <rawdata/dataobjects/RawPXD.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-#include <boost/endian/arithmetic.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -287,7 +289,7 @@ void PXDUnpackerOTModule::unpack_rawpxd(RawPXD& px, int inx)
 
     if (!m_continueOnError && (m_errorMaskPacket & PXDErrorFlags(m_errorSkipPacketMask)) != PXDErrorFlags(0)) {
       // skip full package on error, recovery to next DHC/DHE Start might be possible in some cases
-      // But thats to hard to implement
+      // But that's to hard to implement
       // Remark: PXD data for broken events is removed in next PXDPostChecker module, thus skipping the
       // unpacking is not strictly necessary here.
       break;
@@ -351,7 +353,7 @@ void PXDUnpackerOTModule::unpack_dhp_raw(void* data, unsigned int frame_len, uns
     return;
   }
 
-  /// Endian Swapping is done in Contructors of Raw Objects!
+  /// Endian Swapping is done in Constructors of Raw Objects!
   B2DEBUG(29, "Raw ADC Data");
   // size checked already above
   m_storeRawAdc.appendNew(vxd_id, data, frame_len);
@@ -641,7 +643,7 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
                   << " CM $" << hex << dhp_cm);
 
           if (dhp_adc == 0) {
-            // if !supress error flag
+            // if !suppress error flag
             B2WARNING("DHE Event truncation in DHE " << dhe_ID << " DHP " << dhp_dhp_id);
             // m_errorMask |= c_DHE_EVENT_TRUNC;
             daqpktstat.dhc_back().dhe_back().dhp_back().setTruncated();
@@ -737,7 +739,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
     }
   }
 
-  // What do we do with wrong checksum frames? As we do not know WHAT is wrong, we have to skip them alltogether.
+  // What do we do with wrong checksum frames? As we do not know WHAT is wrong, we have to skip them altogether.
   // As they might contain HEADER Info, we might better skip the processing of the full package, too.
   dhc.check_crc(m_errorMask, m_suppressErrorMask[c_nrDHE_CRC]);
   if (!m_continueOnError && m_errorMask[c_nrDHE_CRC]) {
@@ -845,7 +847,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
       break;
     };
     case EDHCFrameHeaderDataType::c_ONSEN_DHP:
-      // Set the counted size invalid if negativ, needs a large negative value because we are adding up to that
+      // Set the counted size invalid if negative, needs a large negative value because we are adding up to that
       cancheck_countedBytesInDHC = false;
       cancheck_countedBytesInDHE = false;
       [[fallthrough]];
@@ -889,7 +891,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
       break;
     };
     case EDHCFrameHeaderDataType::c_ONSEN_FCE:
-      // Set the counted size invalid if negativ, needs a large negative value because we are adding up to that
+      // Set the counted size invalid if negative, needs a large negative value because we are adding up to that
       cancheck_countedBytesInDHC = false;
       cancheck_countedBytesInDHE = false;
       [[fallthrough]];
@@ -1110,7 +1112,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
       }
       // calculate the VXDID for DHE and save them for DHP unpacking
       {
-        /// refering to BelleII Note Nr 0010, the numbers run from ... to
+        /// referring to BelleII Note Nr 0010, the numbers run from ... to
         ///   unsigned int layer, ladder, sensor;
         ///   layer= vxdid.getLayerNumber();/// 1 ... 2
         ///   ladder= vxdid.getLadderNumber();/// 1 ... 8 and 1 ... 12
@@ -1285,7 +1287,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
         }
       }
       m_errorMaskDHE = 0;
-      currentDHEID |= 0xFF000000;// differenciate from 0xFFFFFFFFF as initial value
+      currentDHEID |= 0xFF000000;// differentiate from 0xFFFFFFFFF as initial value
       currentVxdId = 0; /// invalid
       break;
     };
@@ -1305,7 +1307,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
           //}
           unsigned int l;
           l = (len - dhc.data_onsen_roi_frame->getMinSize()) / 8;
-          // Endian swapping is done in Contructor of RawRoi object
+          // Endian swapping is done in Constructor of RawRoi object
           m_storeROIs.appendNew(l, &((unsigned int*) data)[1]);
         }
       }
@@ -1456,7 +1458,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
   }
 
   if (frame_type != EDHCFrameHeaderDataType::c_ONSEN_ROI  && frame_type != EDHCFrameHeaderDataType::c_ONSEN_TRG) {
-    // actually, they should not be withing Start and End, but better be sure.
+    // actually, they should not be within Start and End, but better be sure.
     countedBytesInDHC += len;
     countedBytesInDHE += len;
   }

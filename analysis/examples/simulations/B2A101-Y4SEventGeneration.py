@@ -50,10 +50,7 @@ ge.add_evtgen_generator(path=my_path,
                             'analysis/examples/simulations/B2A101-Y4SEventGeneration.dec'))
 
 # dump generated events in DST format to the output ROOT file
-my_path.add_module('RootOutput', outputFileName='B2A101-Y4SEventGeneration-evtgen.root')
+my_path.add_module('RootOutput', outputFileName='B2A101-Y4SEventGeneration.root')
 
 # process all modules added to the path
-b2.process(path=my_path)
-
-# print out the summary
-print(b2.statistics)
+b2.process(path=my_path, calculateStatistics=True)

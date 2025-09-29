@@ -26,7 +26,9 @@ from prompt.utils import events_in_basf2_file
 # Will be used to construct the calibration in the automated system, as well as set up the submission web forms.
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
-from prompt.calibrations.vxdcdc_alignment import settings as vxdcdc_alignment
+from prompt.calibrations.caf_vxdcdc_alignment import settings as caf_vxdcdc_alignment
+from prompt.calibrations.caf_cdc import settings as caf_cdc
+from prompt.calibrations.caf_klm_channel_status import settings as caf_klm_channel_status
 
 #: Tells the automated system some details of this script
 # Expert configuration:
@@ -36,30 +38,42 @@ from prompt.calibrations.vxdcdc_alignment import settings as vxdcdc_alignment
 # "millepede_entries" : minimal number of Millepede entries.
 # Test with experiment 12 physics data:
 # ~350000 events correspond to ~1300000 Millepede entries.
-settings = CalibrationSettings(name="KLM alignmnent",
-                               expert_username="oskin",
-                               description=__doc__,
-                               input_data_formats=["raw"],
-                               input_data_names=["raw_physics", "raw_cosmic"],
-                               input_data_filters={
-                                   'raw_physics': [INPUT_DATA_FILTERS['Run Type']['physics'],
-                                                   INPUT_DATA_FILTERS['Data Tag']['mumu_tight_or_highm_calib'],
-                                                   INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']],
-                                   'raw_cosmic': [INPUT_DATA_FILTERS['Run Type']['physics'],
-                                                  INPUT_DATA_FILTERS['Data Tag']['cosmic_calib'],
-                                                  INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
-                               },
-                               depends_on=[vxdcdc_alignment],
-                               expert_config={
-                                   "required_events": 5000000,
-                                   "required_events_experiment": 500000,
-                                   "events_per_file": 1000,
-                                   "millepede_entries": 1000000,
-                                   "millepede_entries_exp7": 500000
-                               })
-
-
-##############################
+settings = CalibrationSettings(
+    name="KLM alignmnent",
+    expert_username="nbrenny",
+    subsystem="klm",
+    description=__doc__,
+    input_data_formats=["raw"],
+    input_data_names=[
+        "raw_physics",
+        "raw_cosmic"],
+    input_data_filters={
+            'raw_physics': [
+                INPUT_DATA_FILTERS['Run Type']['physics'],
+                INPUT_DATA_FILTERS['Data Tag']['mumu_tight_or_highm_calib'],
+                INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']],
+            'raw_cosmic': [
+                    INPUT_DATA_FILTERS['Run Type']['physics'],
+                    INPUT_DATA_FILTERS['Data Tag']['cosmic_calib'],
+                    INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]},
+    depends_on=[
+                        caf_vxdcdc_alignment,
+                        caf_cdc,
+                        caf_klm_channel_status],
+    expert_config={
+                            "required_events": 5000000,
+                            "required_events_experiment": 500000,
+                            "events_per_file": 1000,
+                            "millepede_entries": 1000000,
+                            "millepede_entries_exp7": 500000},
+    produced_payloads=["EKLMAlignment_CORRECTIONS",
+                       "BKLMAlignment_CORRECTIONS",
+                       "EKLMAlignment",
+                       "BKLMAlignment",
+                       "EKLMAlignment_ERRORS",
+                       "BKLMAlignment_ERRORS",
+                       "EKLMSegmentAlignment_ERRORS",
+                       "EKLMSegmentAlignment_CORRECTIONS"])
 
 
 def select_input_files(file_to_iov_physics, file_to_iov_cosmic,

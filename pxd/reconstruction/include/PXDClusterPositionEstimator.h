@@ -10,20 +10,21 @@
 
 #include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
 #include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
-#include <pxd/dataobjects/PXDCluster.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <framework/database/DBObjPtr.h>
 #include <set>
 #include <vector>
-#include <pxd/reconstruction/Pixel.h>
 #include <memory>
 
 namespace Belle2 {
+  class PXDCluster;
+  class VxdID;
 
   namespace PXD {
+    class Pixel;
+
     /**
     * Singleton class that estimates cluster positions taking into account the estimated track
-    * incidence angles into the sensor. The class also provides an interface to get the likelyhood
+    * incidence angles into the sensor. The class also provides an interface to get the likelihood
     * that a given cluster was created by a charged track with given incidence angles.
     */
     class PXDClusterPositionEstimator {
@@ -48,7 +49,7 @@ namespace Belle2 {
       /** Return pointer to cluster offsets, can be nullptr */
       const PXDClusterOffsetPar* getClusterOffset(const PXDCluster& cluster, double tu, double tv) const;
 
-      /** Return cluster shape likelyhood. */
+      /** Return cluster shape likelihood. */
       float getShapeLikelyhood(const PXDCluster& cluster, double tu, double tv) const;
 
       /** Main (and only) way to access the PXDClusterPositionEstimator. */
@@ -109,7 +110,7 @@ namespace Belle2 {
 
       /** Current valid PXDClusterShapeIndex*/
       PXDClusterShapeIndexPar m_shapeIndexPar;
-      /** Currrent valid PXDClusterPositionEstimatorPar*/
+      /** Current valid PXDClusterPositionEstimatorPar*/
       PXDClusterPositionEstimatorPar m_positionEstimatorPar;
     };
   }

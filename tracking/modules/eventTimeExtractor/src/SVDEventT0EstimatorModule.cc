@@ -29,7 +29,7 @@ REG_MODULE(SVDEventT0Estimator);
 
 SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
 {
-  setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks. The EventT0 is set to NaN if there are not RecoTracks or there are not SVD clusters associated to tracks or RecoTrack pt < ptMin OR RecoTrack pz < pzMin. The EventT0 estimated is added to the temporaryEventT0s to the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.");
+  setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks. The EventT0 is set to NaN if there are not RecoTracks or there are not SVD clusters associated to tracks or RecoTrack pt < ptMin OR RecoTrack pz < pzMin. The EventT0 estimated is added to the temporaryEventT0s to the StoreObjPtr as EventT0Component that contains: eventT0, eventT0_error, detector=SVD, algorithm, quality.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //* Definition of input parameters */

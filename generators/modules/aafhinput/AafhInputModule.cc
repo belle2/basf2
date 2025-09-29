@@ -55,12 +55,12 @@ AafhInputModule::AafhInputModule() : GeneratorBaseModule(), m_initial(BeamParame
   addParam("subgeneratorWeights", m_subgeneratorWeights,
            "relative weights of the subgenerators: this must be a list of four "
            "or eight values (first four are interpreted as WAP, rest as WBP) "
-           "which specify the relativ weights for each of the "
-           "four sub generators. The orginial code states that it the program "
+           "which specify the relative weights for each of the "
+           "four sub generators. The original code states that it the program "
            "run most efficient when the maximum weight is equal in all sub "
            "generators and that if one wants to be sure that all peaks in the "
            "differential cross section are accounted the chance to enter each "
-           "sub generator should be equal. Values which try to fullfill both "
+           "sub generator should be equal. Values which try to fulfill both "
            "conditions are printed at after generation when the output level "
            "is set to INFO",
            m_generator.getGeneratorWeights());

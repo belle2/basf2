@@ -7,12 +7,16 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDDQMEfficiencyModule.h>
+#include <pxd/dataobjects/PXDCluster.h>
 #include <tracking/dataobjects/ROIid.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/PXDIntercept.h>
 
 #include <pxd/reconstruction/PXDPixelMasker.h>
 #include <mdst/dataobjects/Track.h>
 #include <framework/gearbox/Const.h>
 
+#include <Math/Vector3D.h>
 #include "TDirectory.h"
 #include "TMatrixDSym.h"
 using namespace Belle2;
@@ -56,9 +60,9 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
   addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked pixel or sensor border is allowed", int(10));
   addParam("trackUFactorDistCut", m_uFactor, "Set a cut on u error of track (factor*err<dist), 0 disables", double(2.0));
   addParam("trackVFactorDistCut", m_vFactor, "Set a cut on v error of track (factor*err<dist), 0 disables", double(2.0));
-  addParam("z0minCut", m_z0minCut, "Set a cut z0 minimum in cm (large negativ value eg -9999 disables)", double(-1));
-  addParam("z0maxCut", m_z0maxCut, "Set a cut z0 maximum in cm (large positiv value eg 9999 disables)", double(1));
-  addParam("d0Cut", m_d0Cut, "Set a cut abs(d0) in cm (large positiv value eg 9999 disables)", double(0.5));
+  addParam("z0minCut", m_z0minCut, "Set a cut z0 minimum in cm (large negative value eg -9999 disables)", double(-1));
+  addParam("z0maxCut", m_z0maxCut, "Set a cut z0 maximum in cm (large positive value eg 9999 disables)", double(1));
+  addParam("d0Cut", m_d0Cut, "Set a cut abs(d0) in cm (large positive value eg 9999 disables)", double(0.5));
   addParam("verboseHistos", m_verboseHistos, "Add more verbose histograms for cuts (not for ereoc)", bool(false));
 }
 
@@ -302,7 +306,7 @@ PXDDQMEfficiencyModule::findClosestCluster(const VxdID& avxdid, ROOT::Math::XYZV
     double v = m_pxdclusters[iclus]->getV();
     ROOT::Math::XYZVector current(u, v, 0);
 
-    //2D dist sqared
+    //2D dist squared
     double dist = (intersection - current).R();
     if (dist < mindist) {
       closest = iclus;

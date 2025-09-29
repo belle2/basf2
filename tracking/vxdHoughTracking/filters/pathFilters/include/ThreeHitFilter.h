@@ -9,7 +9,6 @@
 
 #include <tracking/vxdHoughTracking/filters/pathFilters/BasePathFilter.h>
 #include <tracking/vxdHoughTracking/filters/pathFilters/ThreeHitVariables.h>
-#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
@@ -34,14 +33,14 @@ namespace Belle2 {
       void beginRun() override;
 
     private:
+      /// Construct empty ThreeHitVariables instance
+      ThreeHitVariables m_threeHitVariables;
+
       /// cut for cosine in RZ between the two vectors (oHit - cHit) and (cHit - iHit)
       double m_cosRZCut = 0.95;
       /// cut on the difference between circle radius and circle center position in the x-y plane
       /// to check if the track is compatible with passing through the IP
       double m_circleIPDistanceCut = 2.0;
-
-      /// Construct empty ThreeHitVariables instance
-      ThreeHitVariables m_threeHitVariables;
     };
 
   }

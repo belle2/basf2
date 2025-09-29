@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef VXD_DATAOBJECTS_VXDSIMHIT_H
-#define VXD_DATAOBJECTS_VXDSIMHIT_H
 
 #include <simulation/dataobjects/SimHitBase.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -26,7 +24,7 @@ namespace Belle2 {
   class VXDSimHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    VXDSimHit(): m_pdg(0), m_globalTime(0), m_posIn(), m_posOut(), m_sensorID(0) {}
+    VXDSimHit(): m_posIn(), m_posOut(), m_pdg(0), m_globalTime(0), m_sensorID(0) {}
 
     /** Standard constructor
      * @param sensorID ID of the sensor
@@ -91,7 +89,7 @@ namespace Belle2 {
 
     /** Get the electron deposition along constant stepsize.
      * The electron deposition will be sampled between posIn and posOut in
-     * equal steps with a specified length. The acutal sampling length might
+     * equal steps with a specified length. The actual sampling length might
      * differ slightly from the given parameter but will be equal and below the
      * given value for all steps. The returned vector will contain fractions
      * between posIn and posOut and the electrons deposited up to that point.It
@@ -119,19 +117,17 @@ namespace Belle2 {
   private:
     /** Energy depsoition profile encoded using the ElectronDeposit class */
     std::vector<unsigned int> m_electronProfile;
-    /** PDG Code of the particle producing the Hit */
-    int m_pdg;
-    /** Time of electron deposition */
-    float m_globalTime;
     /** Start point of electron deposition in local coordinates */
     float m_posIn[3];
     /** End point of electron deposition in local coordinates */
     float m_posOut[3];
+    /** PDG Code of the particle producing the Hit */
+    int m_pdg;
+    /** Time of electron deposition */
+    float m_globalTime;
     /** ID of the sensor the electron was deposited in */
     unsigned short m_sensorID;
 
-    ClassDefOverride(VXDSimHit, 1)
+    ClassDefOverride(VXDSimHit, 2)
   };
 } // end namespace Belle2
-
-#endif

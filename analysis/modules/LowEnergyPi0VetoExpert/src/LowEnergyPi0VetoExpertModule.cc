@@ -11,9 +11,9 @@
 
 /* Analysis headers. */
 #include <analysis/variables/ECLVariables.h>
-#include <analysis/variables/HelicityVariables.h>
 
 /* Basf2 headers. */
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mva/interface/Interface.h>
 
 /* Boost headers. */
@@ -149,8 +149,8 @@ float LowEnergyPi0VetoExpertModule::getMaximumVeto(const Particle* gamma1,
     gammaHighEnergyMomentum =
       ROOT::Math::VectorUtil::boost(gammaHighEnergyMomentum, boost);
     cosHelicityAngleMomentum =
-      fabs(ROOT::Math::VectorUtil::CosTheta(momentum.Vect(),
-                                            gammaHighEnergyMomentum.Vect()));
+      fabs(ROOT::Math::VectorUtil::CosTheta(momentum,
+                                            gammaHighEnergyMomentum));
     gammaLowEnergyE9E21 = Variable::eclClusterE9E21(gammaLowEnergy);
     gammaHighEnergyE9E21 = Variable::eclClusterE9E21(gammaHighEnergy);
     gammaLowEnergyClusterTheta = Variable::eclClusterTheta(gammaLowEnergy);

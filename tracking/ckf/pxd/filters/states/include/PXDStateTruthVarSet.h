@@ -10,13 +10,14 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <tracking/ckf/pxd/filters/states/BasePXDStateFilter.h>
 #include <tracking/ckf/pxd/utilities/PXDMCUtil.h>
 
 namespace Belle2 {
+  class EventMetaData;
+
   /// Names of the variables to be generated.
   constexpr
   static char const* const pxdStateTruthVarNames[] = {
@@ -56,11 +57,23 @@ namespace Belle2 {
     /// Generate and assign the variables from the object.
     virtual bool extract(const BasePXDStateFilter::Object* result) override;
 
+    /// Expose the parameters to the outside world
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
   private:
     /// Pointer to the object containing event number etc
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
     /// MC information used in the PXD CKF
     MCUtil m_mcUtil;
+
+    /// Only use a fraction of background events for recording for MVA training
+    bool m_UseFractionOfBackground = false;
+
+    /// Fraction of background to use in case m_UseFractionOfBackground is true
+    ///   The default value of 0.001 was chosen as it creates a roughly balanced training
+    ///   data set in case NO PXD data reduction is performed. With PXD data reduction the
+    ///   value must be larger to obtain a balanced data set.
+    double m_BackgroundFraction = 0.001;
   };
 }

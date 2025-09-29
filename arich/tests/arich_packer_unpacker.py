@@ -19,7 +19,7 @@ b2.set_random_seed(12345)
 class PackerUnpackerTest(b2.Module):
 
     """
-    module which ckecks if two collections of ARICHDigits are equal
+    module which checks if two collections of ARICHDigits are equal
     """
 
     def sortDigits(self, unsortedPyStoreArray):
@@ -31,7 +31,7 @@ class PackerUnpackerTest(b2.Module):
         # first convert to a python-list to be able to sort
         py_list = [x for x in unsortedPyStoreArray]
 
-        # sort via a hierachy of sort keys
+        # sort via a hierarchy of sort keys
         return sorted(
             py_list,
             key=lambda x: (
@@ -102,4 +102,3 @@ progress = b2.register_module('Progress')
 main.add_module(progress)
 
 b2.process(main)
-print(b2.statistics)

@@ -7,17 +7,13 @@
  **************************************************************************/
 
 #include <analysis/modules/TauDecayMode/TauDecayModeModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
-#include <iostream>
 #include <vector>
 #include <algorithm>
 #include <TParticlePDG.h>
 #include <map>
 #include <fstream>
-#include <set>
 #include <Math/LorentzRotation.h>
 #include <Math/Boost.h>
 using namespace std;
@@ -67,7 +63,7 @@ TauDecayModeModule::TauDecayModeModule() : Module(), m_taum_no(0), m_taup_no(0),
   m_isOmegaPimPipFromTauMinus(false), m_isOmegaPimPipFromTauPlus(false)
 {
   // Set module properties
-  setDescription("Module to identify generated tau pair decays, using MCParticle information."
+  setDescription("Module to identify generated tau pair decays, using MCParticle information.\n"
                  "By default, each tau decay is numbered as TauolaBelle2DecayMode [Ref: BELLE2-NOTE-PH-2020-055]");
   //Parameter definition
   addParam("printmode",  m_printmode, "Printout more information from each event", std::string("default"));
@@ -466,13 +462,13 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
         const vector<MCParticle*> daughters = mother->getDaughters();
         for (MCParticle* d : daughters) {
           if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
-          hasNeutrinoAsSister = find(begin(Neutrinos), end(Neutrinos), abs(d->getPDG())) != end(Neutrinos);
+          hasNeutrinoAsSister = find(Neutrinos.begin(), Neutrinos.end(), abs(d->getPDG())) != Neutrinos.end();
           if (hasNeutrinoAsSister) break;
         }
         if (!hasNeutrinoAsSister) {
           for (MCParticle* d : daughters) {
             if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
-            bool isChargedFinalState = find(begin(finalStatePDGs), end(finalStatePDGs), abs(d->getPDG())) != end(finalStatePDGs);
+            bool isChargedFinalState = find(finalStatePDGs.begin(), finalStatePDGs.end(), abs(d->getPDG())) != finalStatePDGs.end();
             if (isChargedFinalState) {
               numChargedSister++;
             } else if (d->getPDG() != Const::photon.getPDGCode()) {
@@ -715,7 +711,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 
   //make decay string for tau-
   m_tauminusdecaymode = "";
-  for (unsigned iorder = 0; iorder < 46; ++iorder) {
+  for (unsigned iorder = 0; iorder < OrderedList.size(); ++iorder) {
     int ii = OrderedList[iorder];
     //
     for (unsigned int i = 0; i < vec_dau_tauminus.size(); i++) {
@@ -737,7 +733,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 
   //make decay string for tau+
   m_tauplusdecaymode = "";
-  for (unsigned iorder = 0; iorder < 46; ++iorder) {
+  for (unsigned iorder = 0; iorder < OrderedList.size(); ++iorder) {
     int ii = OrderedList[iorder];
     //
     for (unsigned int i = 0; i < vec_dau_tauplus.size(); i++) {
@@ -853,9 +849,9 @@ int TauDecayModeModule::getProngOfDecay(const MCParticle& p)
   for (MCParticle* d : daughters) {
     if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
     // TODO: Improve how to identify a final state particle.
-    bool isChargedFinalState = find(begin(finalStatePDGs),
-                                    end(finalStatePDGs),
-                                    abs(d->getPDG())) != end(finalStatePDGs);
+    bool isChargedFinalState = find(finalStatePDGs.begin(),
+                                    finalStatePDGs.end(),
+                                    abs(d->getPDG())) != finalStatePDGs.end();
     if (isChargedFinalState) ret++;
     else ret += getProngOfDecay(*d);
   }

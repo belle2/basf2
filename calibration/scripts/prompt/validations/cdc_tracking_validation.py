@@ -22,8 +22,8 @@ settings = ValidationSettings(name='CDC Tracking',
                               expert_config={'file_extension': 'png',
                                              'algo_tz': 'tz2',
                                              'algo_tw': 'tw0',
-                                             'algo_sr': 'sr0',
-                                             'algo_xt': 'xt0'})
+                                             'algo_sr': 'sr_tz1',
+                                             'algo_xt': 'xt1'})
 
 
 def findLastIteration(job_path, algorithm):
@@ -165,7 +165,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
             if h:
                 j = j + 1
                 c2.cd(j)
-                h.GetXaxis().SetTitle("drift lenght  [cm]")
+                h.GetXaxis().SetTitle("drift length  [cm]")
                 h.GetYaxis().SetTitle("#sigma_{r}^{2} = #sigma_{u}.#sigma_{d}")
                 h.Draw("AP")
                 h.Draw()

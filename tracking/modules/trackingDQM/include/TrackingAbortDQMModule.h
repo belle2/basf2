@@ -26,7 +26,7 @@ namespace Belle2 {
   class SVDShaperDigit;
   class CDCHit;
 
-  /** SVD DQM Module for the Unpacker*/
+  /** Tracking DQM Module to monitor aborts & background conditions before the HLT filter*/
   class TrackingAbortDQMModule : public HistoModule {
 
   public:

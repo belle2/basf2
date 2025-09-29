@@ -33,19 +33,25 @@ import subprocess
 import pdg
 
 db = ROOT.TDatabasePDG.Instance()
+
+retcode = 0
+
+# Test particle data.
+if not pdg._get_instance().testParticleData():
+    retcode = 1
+
 # create particle which already exists, should print error
 db.AddParticle("e-", "electron", 0, False, 0, 0, "duplicate", 11, 0, 0, 0, 0, 0, 0)
 # create particle with whitespace in the name, should print error
 db.AddParticle("invalid name", "invalid name", 0, False, 0, 0, "custom", 2345, 0, 0, 0, 0, 0, 0)
 # and also create a particle with the python function: should give error due to
-# dublicate pdg code
+# duplicate pdg code
 pdg.add_particle("test2", 1, 5.28, 0.1, 0, 0.5)
 pdg.add_particle("foo\tbar", 10001, 0, 0, 0, 0)
 
 # default evt.pdl filename
 default_evtpdl = basf2.find_file(os.path.join("data", "framework", "particledb", "evt.pdl"))
 # create a temporary one and compare
-retcode = 0
 with NamedTemporaryFile() as tempfile:
     # write a evt.pdl from the EventGenDatabasePDG
     db.WriteEvtGenTable(tempfile.name)

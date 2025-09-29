@@ -101,7 +101,7 @@ namespace Belle2 {
        */
       int m_timeAlgorithm = 0;
       /** Name of the SVDEventInfo to be used instead of SVDEventInfo.
-       * The defauls is SVDEventInfoSim */
+       * The default is SVDEventInfoSim */
       std::string m_svdEventInfoSet;
       /** if true returns the calibrated time instead of the raw time for 3-sample time algorithms*/
       bool m_calibrate3SampleWithEventT0 = true;

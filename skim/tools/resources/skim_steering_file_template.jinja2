@@ -11,7 +11,7 @@ import modularAnalysis as ma
 # For backward compatibility, wrap skim imports in try-except block
 try:
     # release 6+ imports
-    {% if skims|length > 1 -%}
+    {% if skims|length > 0 -%}
     {{ "    " }}from skim import CombinedSkim
     {% endif -%}
     {% for module, ModuleSkims in modules.items() -%}
@@ -19,7 +19,7 @@ try:
     {% endfor -%}
 except (ImportError, ModuleNotFoundError):
     # release 5 imports
-    {% if skims|length > 1 -%}
+    {% if skims|length > 0 -%}
     {{ "    " }}from skimExpertFunctions import CombinedSkim
     {% endif -%}
     {% for module, ModuleSkims in modules.items() -%}
@@ -27,7 +27,7 @@ except (ImportError, ModuleNotFoundError):
     {% endfor -%}
 {% else %}
     {#- Just write release 6 imports. -#}
-    {% if skims|length > 1 -%}
+    {% if skims|length > 0 -%}
     from skim import CombinedSkim
     {% endif -%}
     {% for module, ModuleSkims in modules.items() -%}
@@ -50,6 +50,9 @@ path = b2.Path()
     {%- if analysis_globaltag -%}
     {{ " " }}analysisGlobaltag="{{ analysis_globaltag }}"
     {%- endif -%}
+    {%- if pid_globaltag -%}
+    {{ " " }}pidGlobaltag="{{ pid_globaltag }}"
+    {%- endif -%}
 ){%- if hints %}  # pass udstOutput=False to disable udstOutput{%- endif %}
 {% else -%}
     skim = CombinedSkim(
@@ -60,6 +63,9 @@ path = b2.Path()
     {{ "    " }}udstOutput=False,
     mdstOutput=True,
     mdst_kwargs=dict(),
+    {% endif -%}
+    {%- if CombinedSkimName -%}
+    {{ "    " }}CombinedSkimName="{{ CombinedSkimNameString}}",
     {% endif -%}
     {%- if not backward_compatibility -%}
     {%- if data -%}
@@ -73,6 +79,9 @@ path = b2.Path()
     {% endif -%}
     {%- if analysis_globaltag -%}
     {{ "    " }}analysisGlobaltag="{{ analysis_globaltag }}"
+    {% endif -%}
+    {%- if pid_globaltag -%}
+    {{ "    " }}pidGlobaltag="{{ pid_globaltag }}"
     {% endif -%}
     )
 {% endif %}
@@ -99,7 +108,9 @@ skim(path)
 #     ma.variablesToNtuple("", {% if skims|length == 1 %}[skim.flag]{% else %}skim.flags{% endif %}, path=path)
 {%- endif %}
 
-b2.process(path)
 {%- if stats %}
+b2.process(path, calculateStatistics=True)
 print(b2.statistics)
+{%- else %}
+b2.process(path)
 {%- endif %}

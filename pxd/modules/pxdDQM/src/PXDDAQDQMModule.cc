@@ -7,9 +7,11 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDDAQDQMModule.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <rawdata/dataobjects/RawSVD.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 #include <TDirectory.h>
-#include <TAxis.h>
 #include <boost/format.hpp>
 #include <string>
 
@@ -75,19 +77,19 @@ void PXDDAQDQMModule::defineHisto()
     //Only interested in PXD sensors
 
     TString buff = (std::string)avxdid;
-    TString bufful = buff;
-    buff.ReplaceAll(".", "_");
+    TString buffus = buff;
+    buffus.ReplaceAll(".", "_");
 
 //     string s = str(format("DHE %d:%d:%d (DHH ID %02Xh)") % num1 % num2 % num3 % i);
 //     string s2 = str(format("_%d.%d.%d") % num1 % num2 % num3);
 
-    hDAQDHETriggerGate[avxdid] = new TH1D("PXDDAQDHETriggerGate_" + bufful,
+    hDAQDHETriggerGate[avxdid] = new TH1D("PXDDAQDHETriggerGate_" + buffus,
                                           "TriggerGate DHE " + buff + "; Trigger Gate; Counts", 192, 0, 192);
-    hDAQDHEReduction[avxdid] = new TH1D("PXDDAQDHEDataReduction_" + bufful, "Data Reduction DHE " + buff + "; Raw/Red; Counts", 200, 0,
+    hDAQDHEReduction[avxdid] = new TH1D("PXDDAQDHEDataReduction_" + buffus, "Data Reduction DHE " + buff + "; Raw/Red; Counts", 200, 0,
                                         40);// If max changed, check overflow copy below
-    hDAQCM[avxdid] = new TH2D("PXDDAQCM_" + bufful, "Common Mode on DHE " + buff + "; Gate+Chip*192; Common Mode", 192 * 4, 0, 192 * 4,
+    hDAQCM[avxdid] = new TH2D("PXDDAQCM_" + buffus, "Common Mode on DHE " + buff + "; Gate+Chip*192; Common Mode", 192 * 4, 0, 192 * 4,
                               64, 0, 64);
-    hDAQCM2[avxdid] = new TH1D("PXDDAQCM2_" + bufful, "Common Mode on DHE " + buff + "; Common Mode", 64, 0, 64);
+    hDAQCM2[avxdid] = new TH1D("PXDDAQCM2_" + buffus, "Common Mode on DHE " + buff + "; Common Mode", 64, 0, 64);
   }
   for (int i = 0; i < 16; i++) {
     hDAQDHCReduction[i] = new TH1D(("PXDDAQDHCDataReduction_" + str(format("%d") % i)).c_str(),
@@ -244,7 +246,7 @@ void PXDDAQDQMModule::event()
         // TODO differentiate between link-lost and truncation
         for (int i = 0; i < 4 * 2; i++) {
           auto sm = (emask >> i * 4) & 0xF;
-          if (sm >= 8) sm = 7; // clip unknow to 7, as value >6 undefined for now
+          if (sm >= 8) sm = 7; // clip unknown to 7, as value >6 undefined for now
           if (sm > 0) hDAQEndErrorDHE->Fill(dhe.getDHEID(), i * 8 + sm); // we dont want to fill noerror=0
           missingFlag |= sm == 0x1; // missing
           timeoutFlag |= sm == 0x2; // timeout

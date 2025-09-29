@@ -12,20 +12,20 @@
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/database/DBObjPtr.h>
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <framework/datastore/StoreArray.h>
-
-// MVA
-#include <mva/interface/Expert.h>
-#include <mva/interface/Dataset.h>
+#include <framework/gearbox/Const.h>
 
 // ANALYSIS
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
-#include <analysis/dbobjects/ChargedPidMVAWeights.h>
 
 namespace Belle2 {
+  class ChargedPidMVAWeights;
+  namespace MVA {
+    class Expert;
+    class SingleDataset;
+  }
 
   /**
    *

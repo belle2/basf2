@@ -8,10 +8,15 @@
 
 #pragma once
 
-#include <pxd/reconstruction/ClusterCandidate.h>
+#include <map>
+#include <string>
 
 namespace Belle2 {
+  class VxdID;
+
   namespace PXD {
+
+    class ClusterCandidate;
 
     /** Type specifies cluster shape type */
     enum class pxdClusterShapeType {
@@ -41,7 +46,7 @@ namespace Belle2 {
     /** Class to correct estimation of cluster error and position base on its shape.
      * This class will set a shape ID of cluster in clusterization time.
      * ID is describe on list "pxdClusterShapeType".
-     * Function "pxdClusterShapeDescription" give more detail desription of shape.
+     * Function "pxdClusterShapeDescription" give more detail description of shape.
      *
      * Function "setClsShape" set shape ID for cluster.
      * Correction is apply for RecoHit if available direction of reco track

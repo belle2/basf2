@@ -6,29 +6,36 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
 
 #include <reconstruction/modules/KLMMuonIDDNNExpert/KLMMuonIDDNNExpertModule.h>
 
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
+#include <klm/dataobjects/KLMHit2d.h>
+#include <klm/dataobjects/KLMMuidLikelihood.h>
+
+#include <reconstruction/dataobjects/KLMMuonIDDNNInputVariable.h>
 
 #include <CLHEP/Units/SystemOfUnits.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Const.h>
 
 #include <tracking/dataobjects/ExtHit.h>
 
 #include <mdst/dataobjects/PIDLikelihood.h>
 
-#include <mva/interface/Interface.h>
+#include <mdst/dataobjects/Track.h>
 
-#include <boost/algorithm/string/predicate.hpp>
+#include <mva/interface/Interface.h>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
+#include <mva/interface/Expert.h>
+#include <mva/interface/Weightfile.h>
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 using namespace Belle2;
 

@@ -13,7 +13,7 @@ from basf2 import B2WARNING
 import basf2_mva
 
 
-def chain2dict(chain, tree_columns, dict_columns=None):
+def chain2dict(chain, tree_columns, dict_columns=None, max_entries=None):
     """
     Convert a ROOT.TChain into a dictionary of np.arrays
     @param chain the ROOT.TChain
@@ -27,6 +27,18 @@ def chain2dict(chain, tree_columns, dict_columns=None):
     try:
         from ROOT import RDataFrame
         rdf = RDataFrame(chain)
+        if max_entries is not None:
+            nEntries = rdf.Count().GetValue()
+            if nEntries > max_entries:
+                B2WARNING(
+                    "basf2_mva_util (chain2dict): Number of entries in the chain is larger than the maximum allowed entries: " +
+                    str(nEntries) +
+                    " > " +
+                    str(max_entries))
+                skip = nEntries // max_entries
+                rdf_subset = rdf.Filter("rdfentry_ % " + str(skip) + " == 0")
+                rdf = rdf_subset
+
         d = np.column_stack(list(rdf.AsNumpy(tree_columns).values()))
         d = np.core.records.fromarrays(d.transpose(), names=dict_columns)
     except ImportError:
@@ -180,6 +192,8 @@ class Method:
             self.specific_options = basf2_mva.ReweighterOptions()
         elif self.general_options.m_method == "Trivial":
             self.specific_options = basf2_mva.TrivialOptions()
+        elif self.general_options.m_method == "ONNX":
+            self.specific_options = basf2_mva.ONNXOptions()
         else:
             raise RuntimeError("Unknown method " + self.general_options.m_method)
 
@@ -274,5 +288,57 @@ class Method:
                 [*branch_names, ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(expert_target)],
                 [*output_names, stripped_expert_target])
 
-        return (d[self.identifier] if self.general_options.m_nClasses <= 2 else np.array([d[x]
+        return (d[str(self.identifier)] if self.general_options.m_nClasses <= 2 else np.array([d[x]
                 for x in output_names]).T), d[stripped_expert_target]
+
+
+def create_onnx_mva_weightfile(onnx_model_path, **kwargs):
+    """
+    Create an MVA Weightfile for ONNX
+
+    Parameters
+    ----------
+    kwargs :
+        keyword arguments to set the options in the weightfile. They are
+        directly mapped to member variable names of the option classes with "m_"
+        added automatically. First, GeneralOptions are tried and the remaining
+        arguments are passed to ONNXOptions.
+
+    Returns
+    -------
+    weightfile :
+        Weightfile object containing the ONNX model and options
+
+    Example:
+    --------
+    >>> weightfile = create_onnx_mva_weightfile(
+    ...    "model.onnx",
+    ...    outputName="probabilities",
+    ...    variables=["variable1", "variable2"],
+    ...    target_variable="isSignal"
+    ...)
+    >>> weightfile.save("model.root")
+    """
+    general_options = basf2_mva.GeneralOptions()
+    onnx_options = basf2_mva.ONNXOptions()
+    general_options.m_method = onnx_options.getMethod()
+
+    # fill everything that exists in general options from kwargs
+    for k, v in list(kwargs.items()):
+        m_k = f"m_{k}"
+        if hasattr(general_options, m_k):
+            setattr(general_options, m_k, v)
+            kwargs.pop(k)
+
+    # for the rest try to set members of specific options
+    for k, v in list(kwargs.items()):
+        m_k = f"m_{k}"
+        if not hasattr(onnx_options, m_k):
+            raise AttributeError(f"No member named {m_k} in ONNXOptions.")
+        setattr(onnx_options, m_k, v)
+
+    w = basf2_mva.Weightfile()
+    w.addOptions(general_options)
+    w.addOptions(onnx_options)
+    w.addFile("ONNX_Modelfile", str(onnx_model_path))
+    return w

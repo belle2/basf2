@@ -13,10 +13,7 @@
 #include <TH2F.h>
 #include <TFile.h>
 #include <TTree.h>
-#include <TStopwatch.h>
 
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
 
 //#include "getSigma68WithUncertainty.h"
@@ -27,9 +24,8 @@ using namespace CDC;
 
 FudgeFactorCalibrationAlgorithm::FudgeFactorCalibrationAlgorithm(): CalibrationAlgorithm("CDCFudgeFactorCalibrationCollector")
 {
-
   setDescription(
-    " -------------------------- T0 Calibration Algorithm -------------------------\n"
+    " -------------------------- CDC fudge factor Calibration Algorithm -------------------------\n"
   );
 }
 
@@ -41,7 +37,7 @@ CalibrationAlgorithm::EResult FudgeFactorCalibrationAlgorithm::calibrate()
   gErrorIgnoreLevel = 3001;
   // We are potentially using data from several runs at once during execution
   // (which may have different DBObject values). So in general you would need to
-  // average them, or aply them to the correct collector data.
+  // average them, or apply them to the correct collector data.
 
   // However since this is the geometry lets assume it is fixed for now.
   const auto exprun = getRunList()[0];
@@ -56,6 +52,7 @@ CalibrationAlgorithm::EResult FudgeFactorCalibrationAlgorithm::calibrate()
   //reading data from rootfile
   auto tree = getObjectPtr<TTree>("tree");
   auto hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
+  auto hExtraCDCHit =   getObjectPtr<TH1F>("hExtraCDCHit");
   auto hNDF_pos =   getObjectPtr<TH1F>("hNDF_pos");
   auto hNDF_neg =   getObjectPtr<TH1F>("hNDF_neg");
   auto hPval_pos =   getObjectPtr<TH1F>("hPval_pos");
@@ -81,6 +78,7 @@ CalibrationAlgorithm::EResult FudgeFactorCalibrationAlgorithm::calibrate()
   //  TDirectory* top = gDirectory;
   //  if(tree) tree->Write();
   if (hEvtT0) hEvtT0->Write();
+  if (hExtraCDCHit) hExtraCDCHit->Write();
 
   if (hPval_pos) hPval_pos->Write();
   if (hPval_neg) hPval_neg->Write();
@@ -99,10 +97,12 @@ CalibrationAlgorithm::EResult FudgeFactorCalibrationAlgorithm::calibrate()
   if (hdPtPt_cm) hdPtPt_cm->Write();
   if (hdPhi0_cm) hdPhi0_cm->Write();
   if (hdTheta_cm) hdTheta_cm->Write();
-  TTree* newtree = tree->CloneTree();
-  newtree->SetName("tree_dimuon");
-  newtree->Write();
+  TTree* newtree = (TTree*)tree->CloneTree();
+  newtree->SetName("dimuon");
+  newtree->Print();
+  //  tree->Write(0,TObject::kOverwrite);
+  //  tree->Write();
   fout->Write();
-  fout->Close();
+  delete fout;
   return c_OK;
 }

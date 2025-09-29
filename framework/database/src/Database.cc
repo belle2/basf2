@@ -22,7 +22,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/DBStore.h>
-#include <framework/database/PayloadFile.h>
 
 #include <framework/database/PayloadProvider.h>
 #include <framework/database/MetadataProvider.h>
@@ -184,9 +183,10 @@ namespace Belle2 {
                 << LogVar("provider", m_currentProvider) << LogVar("error", e.what()));
       return nextMetadataProvider();
     }
-    // and check the tags are useable
+    // and check the tags are usable: if not, fallback to the next metadata provider
     if (!m_metadataProvider->setTags(m_globalTags)) {
-      B2FATAL("Conditions data: Problems with globaltag configuration, cannot continue");
+      B2WARNING("Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...");
+      return nextMetadataProvider();
     }
   }
 
@@ -232,7 +232,7 @@ namespace Belle2 {
       }
       // we will actually use the globaltags so print them now
       if (!m_globalTags.empty()) {
-        // Globaltags are useable so print out the final list we're gonna use
+        // Globaltags are usable so print out the final list we're gonna use
         if (m_globalTags.size() == 1) {
           B2INFO("Conditions data: configured globaltag is " << m_globalTags[0]);
         } else {

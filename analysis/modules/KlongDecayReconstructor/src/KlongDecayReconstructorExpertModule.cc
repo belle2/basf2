@@ -14,13 +14,15 @@
 
 // decay descriptor
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
-
-// utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+
+// particle combiner
+#include <analysis/ParticleCombiner/ParticleCombiner.h>
 
 #include <Math/Vector4D.h>
 #include <TMath.h>
 
+#include <cmath>
 #include <memory>
 
 using namespace std;
@@ -55,7 +57,7 @@ K_L0 and kinematic constraints of the initial state.
            "Input DecayDescriptor string.");
   addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
   addParam("maximumNumberOfCandidates", m_maximumNumberOfCandidates,
-           "Don't reconstruct channel if more candidates than given are produced.", -1);
+           "Don't reconstruct channel if more candidates than given are produced.", 10000);
   addParam("decayMode", m_decayModeID, "User-specified decay mode identifier (saved in 'decayModeID' extra-info for each Particle)",
            0);
   addParam("writeOut", m_writeOut,
@@ -179,9 +181,9 @@ void KlongDecayReconstructorExpertModule::event()
 
     ROOT::Math::PxPyPzEVector mom = pDaughters + klDaughters;
     mom.SetE(TMath::Sqrt(mom.P2() + m_b * m_b));
-    if ((!isnan(mom.P())) && is_physical)
+    if ((!std::isnan(mom.P())) && is_physical)
       particle.set4Vector(mom);
-    if (isnan(mom.P()))
+    if (std::isnan(mom.P()))
       is_physical = false;
 
     if (!m_cut->check(&particle))

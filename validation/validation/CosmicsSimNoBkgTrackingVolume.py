@@ -20,7 +20,7 @@
 </header>
 """
 
-from basf2 import create_path, statistics, set_random_seed, process
+from basf2 import create_path, set_random_seed, process
 from simulation import add_simulation
 from validation import statistics_plots, event_timing_plot
 
@@ -34,7 +34,7 @@ main.add_module(
 )
 
 # Generate cosmic events. Note: with default settings the cosmics are
-# generated on a cylinder of 125cm (closely outside the tracking valume)!
+# generated on a cylinder of 125cm (closely outside the tracking volume)!
 main.add_module("Cosmics")
 
 # detector simulation
@@ -49,10 +49,7 @@ main.add_module(
 )
 
 main.add_module('Progress')
-process(main)
-
-# Print call statistics
-print(statistics)
+process(main, calculateStatistics=True)
 
 statistics_plots(
     "CosmicsSimNoBkgTrackingVolume_statistics.root",

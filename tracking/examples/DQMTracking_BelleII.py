@@ -32,7 +32,7 @@ if args.ExperimentType not in [1, 2]:
           f"or 2 (nominal phase 3, default), but you set {args.ExperimentType}. Exiting.")
     sys.exit(1)
 
-# number of events to generate, can be overriden with -n
+# number of events to generate, can be overridden with -n
 num_events = 100
 
 # create path
@@ -71,7 +71,7 @@ trackDQM = main.add_module('TrackDQM', debugLevel=250)
 # In case to see more details:
 # trackDQM.logging.log_level = LogLevel.DEBUG
 
-# output filename, can be overriden with -o
+# output filename, can be overridden with -o
 output_filename = ""
 if (args.ExperimentType == 1):
     output_filename = "RootOutput_Phase3Early.root"
@@ -82,5 +82,5 @@ main.add_module("RootOutput", outputFileName=output_filename)
 main.add_module('Progress')
 
 # process events and print call statistics
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

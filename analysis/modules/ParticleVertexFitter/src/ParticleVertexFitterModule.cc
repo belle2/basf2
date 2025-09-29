@@ -12,7 +12,6 @@
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/B2Vector3.h>
 #include <framework/logging/Logger.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 
@@ -32,6 +31,19 @@
 
 // KFit
 #include <analysis/VertexFitting/KFit/KFitConst.h>
+#include <analysis/VertexFitting/KFit/MassFitKFit.h>
+#include <analysis/VertexFitting/KFit/FourCFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassFourCFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassPointingVertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassVertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
+#include <analysis/VertexFitting/KFit/RecoilMassKFit.h>
+
+// Rave
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
+#include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
 #include <TVector.h>
 #include <TRotation.h>
@@ -77,8 +89,6 @@ ParticleVertexFitterModule::ParticleVertexFitterModule() : Module(),
   addParam("recoilMass", m_recoilMass, "recoil invariant mass (GeV)", 0.);
   addParam("massConstraintList", m_massConstraintList,
            "Type::[int]. List of daughter particles to mass constrain with int = pdg code. (only for MassFourCKFit)", {});
-  addParam("massConstraintListParticlename", m_massConstraintListParticlename,
-           "Type::[string]. List of daughter particles to mass constrain with string = particle name. (only for MassFourCKFit)", {});
 }
 
 void ParticleVertexFitterModule::initialize()
@@ -99,13 +109,6 @@ void ParticleVertexFitterModule::initialize()
   if (m_decayString != "")
     m_decaydescriptor.init(m_decayString);
 
-  if ((m_massConstraintList.size()) == 0 && (m_massConstraintListParticlename.size()) > 0) {
-    for (auto& containedParticle : m_massConstraintListParticlename) {
-      TParticlePDG* particletemp = TDatabasePDG::Instance()->GetParticle((containedParticle).c_str());
-      m_massConstraintList.push_back(particletemp->PdgCode());
-    }
-  }
-
   B2INFO("ParticleVertexFitter: Performing " << m_fitType << " fit on " << m_listName << " using " << m_vertexFitter);
   if (m_decayString != "")
     B2INFO("ParticleVertexFitter: Using specified decay string: " << m_decayString);
@@ -116,9 +119,9 @@ void ParticleVertexFitterModule::initialize()
 
 void ParticleVertexFitterModule::beginRun()
 {
-  //TODO: set magnetic field for each run
-  //m_Bfield = BFieldMap::Instance().getBField(B2Vector3D(0,0,0)).Z();
-  //TODO: set IP spot size for each run
+  // TODO: set magnetic field for each run
+  // m_Bfield = BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
+  // TODO: set IP spot size for each run
 }
 
 void ParticleVertexFitterModule::event()
@@ -128,7 +131,6 @@ void ParticleVertexFitterModule::event()
 
   m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
   m_beamSpotCov.ResizeTo(3, 3);
-  TMatrixDSym beamSpotCov(3);
   if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamSpotDB->getCovVertex();
   if (m_withConstraint == "iptube") {
     if (m_smearing > 0 && m_vertexFitter == "KFit") {
@@ -138,7 +140,7 @@ void ParticleVertexFitterModule::event()
     }
   }
   if (m_withConstraint == "iptubecut") {  // for development purpose only
-    m_BeamSpotCenter = B2Vector3D(0.001, 0., .013);
+    m_BeamSpotCenter = ROOT::Math::XYZVector(0.001, 0., .013);
     findConstraintBoost(0.03);
   }
   if ((m_vertexFitter == "Rave") && (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"
@@ -158,7 +160,7 @@ void ParticleVertexFitterModule::event()
     }
 
     if (m_withConstraint == "mother") {
-      m_BeamSpotCenter = B2Vector3D(particle->getVertex().x(), particle->getVertex().y(), particle->getVertex().z());
+      m_BeamSpotCenter = particle->getVertex();
       m_beamSpotCov = particle->getVertexErrorMatrix();
     }
 
@@ -507,10 +509,7 @@ bool ParticleVertexFitterModule::doKVertexFit(Particle* mother, bool ipProfileCo
   kv.setMagneticField(m_Bfield);
 
   if (mother->getV0()) {
-    HepPoint3D V0vertex_heppoint(mother->getV0()->getFittedVertexX(),
-                                 mother->getV0()->getFittedVertexY(),
-                                 mother->getV0()->getFittedVertexZ());
-    kv.setInitialVertex(V0vertex_heppoint);
+    kv.setInitialVertex(mother->getV0()->getFittedVertexPosition());
   }
 
   for (auto& child : fitChildren)
@@ -852,7 +851,7 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double a = -1 * Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
       double dx = kv.getVertex().x() - kv.getTrackPosition(iChild).x();
       double dy = kv.getVertex().y() - kv.getTrackPosition(iChild).y();
 
@@ -879,7 +878,7 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
       auto daughter = const_cast<Particle*>(fitChildren[iChild]);
 
-      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughter->getCharge();
+      double a = -1 * Const::speedOfLight * 1e-4 * m_Bfield * daughter->getCharge();
       double dx = kv.getVertex().x() - kv.getTrackPosition(iChild).x();
       double dy = kv.getVertex().y() - kv.getTrackPosition(iChild).y();
 
@@ -951,7 +950,7 @@ bool ParticleVertexFitterModule::makeKMassVertexMother(analysis::MassVertexFitKF
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double a = -1 * Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
       double dx = kmv.getVertex().x() - kmv.getTrackPosition(iChild).x();
       double dy = kmv.getVertex().y() - kmv.getTrackPosition(iChild).y();
 
@@ -991,7 +990,7 @@ bool ParticleVertexFitterModule::makeKMassPointingVertexMother(analysis::MassPoi
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double a = -1 * Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
       double dx = kmpv.getVertex().x() - kmpv.getTrackPosition(iChild).x();
       double dy = kmpv.getVertex().y() - kmpv.getTrackPosition(iChild).y();
 
@@ -1030,7 +1029,7 @@ bool ParticleVertexFitterModule::makeKMassMother(analysis::MassFitKFit& km,
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double a = -1 * Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
       double dx = km.getVertex().x() - km.getTrackPosition(iChild).x();
       double dy = km.getVertex().y() - km.getTrackPosition(iChild).y();
 
@@ -1195,7 +1194,7 @@ bool ParticleVertexFitterModule::makeKRecoilMassMother(analysis::RecoilMassKFit&
       return false;
 
     for (unsigned iChild = 0; iChild < track_count; iChild++) {
-      double a = -1 * Belle2::Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
+      double a = -1 * Const::speedOfLight * 1e-4 * m_Bfield * daughters[iChild]->getCharge();
       double dx = kf.getVertex().x() - kf.getTrackPosition(iChild).x();
       double dy = kf.getVertex().y() - kf.getTrackPosition(iChild).y();
 
@@ -1219,7 +1218,7 @@ bool ParticleVertexFitterModule::makeKRecoilMassMother(analysis::RecoilMassKFit&
 void ParticleVertexFitterModule::updateMapOfTrackAndDaughter(unsigned& l,  std::vector<std::vector<unsigned>>& pars,
     std::vector<unsigned>& parm, std::vector<Particle*>&  allparticles, const Particle* daughter)
 {
-  std::vector <Belle2::Particle*> childs = daughter->getDaughters();
+  std::vector <Particle*> daughters = daughter->getDaughters();
   for (unsigned ichild = 0; ichild < daughter->getNDaughters(); ichild++) {
     const Particle* child = daughter->getDaughter(ichild);
     std::vector<unsigned> pard;
@@ -1227,12 +1226,12 @@ void ParticleVertexFitterModule::updateMapOfTrackAndDaughter(unsigned& l,  std::
       updateMapOfTrackAndDaughter(l, pars, pard, allparticles, child);
       parm.insert(parm.end(), pard.begin(), pard.end());
       pars.push_back(pard);
-      allparticles.push_back(childs[ichild]);
+      allparticles.push_back(daughters[ichild]);
     } else  {
       pard.push_back(l);
       parm.push_back(l);
       pars.push_back(pard);
-      allparticles.push_back(childs[ichild]);
+      allparticles.push_back(daughters[ichild]);
       l++;
     }
   }
@@ -1350,7 +1349,7 @@ bool ParticleVertexFitterModule::doRaveFit(Particle* mother)
 
 
       if (mothSel && nTrk > 1) {
-        analysis::RaveSetup::getInstance()->setBeamSpot(B2Vector3D(pos.x(), pos.y(), pos.z()), RerrMatrix);
+        analysis::RaveSetup::getInstance()->setBeamSpot(pos, RerrMatrix);
         rf.addMother(mother);
         int nKfit = rf.fit();
         rf.updateMother();
@@ -1455,15 +1454,8 @@ bool ParticleVertexFitterModule::addChildofParticletoMassKFit(analysis::MassFour
 
 void ParticleVertexFitterModule::addIPProfileToKFit(analysis::VertexFitKFit& kv)
 {
-  HepPoint3D pos(0.0, 0.0, 0.0);
-  CLHEP::HepSymMatrix covMatrix(3, 0);
-
-  for (int i = 0; i < 3; i++) {
-    pos[i] = m_BeamSpotCenter(i);
-    for (int j = 0; j < 3; j++) {
-      covMatrix[i][j] = m_beamSpotCov(i, j);
-    }
-  }
+  HepPoint3D pos = ROOTToCLHEP::getPoint3D(m_BeamSpotCenter);
+  CLHEP::HepSymMatrix covMatrix = ROOTToCLHEP::getHepSymMatrix(m_beamSpotCov);
 
   kv.setIpProfile(pos, covMatrix);
 }
@@ -1483,7 +1475,7 @@ void ParticleVertexFitterModule::addIPTubeToKFit(analysis::VertexFitKFit& kv)
 
   kv.setIpTubeProfile(
     ROOTToCLHEP::getHepLorentzVector(iptube_mom),
-    ROOTToCLHEP::getPoint3DFromB2Vector(m_BeamSpotCenter),
+    ROOTToCLHEP::getPoint3D(m_BeamSpotCenter),
     err,
     0.);
 }
@@ -1492,8 +1484,7 @@ void ParticleVertexFitterModule::findConstraintBoost(double cut)
 {
   PCmsLabTransform T;
 
-  B2Vector3D boost = T.getBoostVector();
-  B2Vector3D boostDir = boost.Unit();
+  ROOT::Math::XYZVector boostDir = T.getBoostVector().Unit();
 
   TMatrixDSym beamSpotCov = m_beamSpotDB->getCovVertex();
   beamSpotCov(2, 2) = cut * cut;
@@ -1544,12 +1535,12 @@ double ParticleVertexFitterModule::getChi2TracksLBoost(const analysis::VertexFit
 
     TMatrixFSym err = CLHEPToROOT::getTMatrixFSym(trk_i.getError(analysis::KFitConst::kBeforeFit)); // px, py, pz, E, x, y, z
 
-    B2Vector3D x_before = CLHEPToROOT::getXYZVector(trk_i.getPosition(analysis::KFitConst::kBeforeFit));
-    B2Vector3D x_after = CLHEPToROOT::getXYZVector(trk_i.getPosition());
-    B2Vector3D dPos = x_after - x_before;
+    ROOT::Math::XYZVector x_before = CLHEPToROOT::getXYZVector(trk_i.getPosition(analysis::KFitConst::kBeforeFit));
+    ROOT::Math::XYZVector x_after = CLHEPToROOT::getXYZVector(trk_i.getPosition());
+    ROOT::Math::XYZVector dPos = x_after - x_before;
 
     PCmsLabTransform T;
-    B2Vector3D boost3 = T.getBoostVector().Unit();
+    ROOT::Math::XYZVector boost3 = T.getBoostVector().Unit();
     TVectorD boostD(0, 6, 0., 0., 0., 0., boost3.X(), boost3.Y(), boost3.Z(), "END");
 
     double dLBoost = dPos.Dot(boost3);

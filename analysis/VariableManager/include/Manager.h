@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <framework/logging/Logger.h>
 
 #include <string>
@@ -17,10 +16,10 @@
 #include <functional>
 #include <memory>
 #include <variant>
-#include <type_traits>
 
 namespace Belle2 {
   class Particle;
+  class ParticleList;
 
   namespace Variable {
     /** Global list of available variables.
@@ -127,9 +126,10 @@ namespace Belle2 {
         std::string description; /**< Description of what this function does. */
         std::string group; /**< Associated group. */
         VariableDataType variabletype; /**< data type of variable */
+        std::string functionName; /**< Name of underlying function. */
         /** ctor */
-        VarBase(const std::string& n, const std::string& d, const std::string& g, const VariableDataType& v)
-          : name(n), description(d), group(g), variabletype(v) { }
+        VarBase(const std::string& n, const std::string& d, const std::string& g, const VariableDataType& v, const std::string& fName = "")
+          : name(n), description(d), group(g), variabletype(v), functionName(fName.empty() ? n : fName) { }
 
         /** function to extend the description of the variable */
         void extendDescriptionString(const std::string& d)
@@ -143,8 +143,8 @@ namespace Belle2 {
         FunctionPtr function; /**< Pointer to function. */
         /** ctor */
         Var(const std::string& n, FunctionPtr f, const std::string& d, const std::string& g = "",
-            const VariableDataType& v = VariableDataType::c_double)
-          : VarBase(n, d, g, v), function(f) { }
+            const VariableDataType& v = VariableDataType::c_double, const std::string& fName = "")
+          : VarBase(n, d, g, v, fName), function(f) { }
       };
 
       /** A variable taking additional floating-point arguments to influence the behaviour. */
@@ -152,8 +152,8 @@ namespace Belle2 {
         ParameterFunctionPtr function; /**< Pointer to function. */
         /** ctor */
         ParameterVar(const std::string& n, ParameterFunctionPtr f, const std::string& d, const std::string& g = "",
-                     const VariableDataType& v = VariableDataType::c_double)
-          : VarBase(n, d, g, v), function(f) { }
+                     const VariableDataType& v = VariableDataType::c_double, const std::string& fName = "")
+          : VarBase(n, d, g, v, fName), function(f) { }
       };
 
       /** A variable taking string arguments returning a variable. */
@@ -161,8 +161,8 @@ namespace Belle2 {
         MetaFunctionPtr function; /**< Pointer to function. */
         /** ctor */
         explicit MetaVar(const std::string& n, MetaFunctionPtr f, const std::string& d, const std::string& g = "",
-                         const VariableDataType& v = VariableDataType::c_double)
-          : VarBase(n, d, g, v), function(f) { }
+                         const VariableDataType& v = VariableDataType::c_double, const std::string& fName = "")
+          : VarBase(n, d, g, v, fName), function(f) { }
       };
 
       /** get singleton instance. */
@@ -185,7 +185,7 @@ namespace Belle2 {
       /**
        * Get variables belonging to the given keys
        */
-      std::vector<const Belle2::Variable::Manager::Var*> getVariables(const std::vector<std::string>& variables);
+      std::vector<const Variable::Manager::Var*> getVariables(const std::vector<std::string>& variables);
 
       /** Add alias
        * Return true if the alias was successfully added
@@ -223,7 +223,7 @@ namespace Belle2 {
       std::vector<std::string> resolveCollections(const std::vector<std::string>& variables);
 
       /** Return list of all variables (in order registered). */
-      std::vector<const Belle2::Variable::Manager::VarBase*> getVariables() const { return m_variablesInRegistrationOrder; }
+      std::vector<const Variable::Manager::VarBase*> getVariables() const { return m_variablesInRegistrationOrder; }
 
 
       /** All variables registered after VARIABLE_GROUP(groupName) will be added to this group. */
@@ -231,13 +231,13 @@ namespace Belle2 {
 
       /** Register a variable. */
       void registerVariable(const std::string& name, const Manager::FunctionPtr& f, const std::string& description,
-                            const Manager::VariableDataType& v, const std::string& unit = "");
+                            const Manager::VariableDataType& v, const std::string& unit = "", const std::string& fName = "");
       /** Register a variable that takes floating-point arguments (see Variable::Manager::ParameterFunctionPtr). */
       void registerVariable(const std::string& name, const Manager::ParameterFunctionPtr& f, const std::string& description,
-                            const Manager::VariableDataType& v, const std::string& unit = "");
+                            const Manager::VariableDataType& v, const std::string& unit = "", const std::string& fName = "");
       /** Register a meta-variable that takes string arguments and returns a variable(see Variable::Manager::MetaFunctionPtr). */
       void registerVariable(const std::string& name, const Manager::MetaFunctionPtr& f, const std::string& description,
-                            const Manager::VariableDataType& v);
+                            const Manager::VariableDataType& v, const std::string& fName = "");
       /** Make a variable deprecated. */
       void deprecateVariable(const std::string& name, bool make_fatal, const std::string& version, const std::string& description);
 
@@ -248,13 +248,19 @@ namespace Belle2 {
        */
       void checkDeprecatedVariable(const std::string& name);
 
-      /** evaluate variable 'varName' on given Particle.
+      /** Evaluate variable 'varName' on given Particle.
        *
        * Mainly provided for the Python interface. For performance critical code, it is recommended to use getVariable() once and keep the Var* pointer around.
        *
        * Throws exception if variable isn't found. Assumes 'p' is != NULL.
        */
       double evaluate(const std::string& varName, const Particle* p);
+
+      /** Evaluate each variable in the vector 'varNames' on given ParticleList and return a flattened vector of values.
+       *
+       * Throws exception if one of the variables isn't found. Assumes 'plist' is != NULL.
+       */
+      std::vector<double> evaluateVariables(const std::vector<std::string>& varNames, const ParticleList* plist);
 
       /** Return list of all variable names (in order registered). */
       std::vector<std::string> getNames() const;
@@ -306,20 +312,21 @@ namespace Belle2 {
     public:
       /** constructor. */
       Proxy(const std::string& name, Manager::FunctionPtr f, const std::string& description, Manager::VariableDataType v,
-            const std::string& unit = "")
+            const std::string& unit = "", const std::string& fName = "")
       {
-        Manager::Instance().registerVariable(name, f, description, v, unit);
+        Manager::Instance().registerVariable(name, f, description, v, unit, fName);
       }
       /** constructor. */
       Proxy(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description, Manager::VariableDataType v,
-            const std::string& unit = "")
+            const std::string& unit = "", const std::string& fName = "")
       {
-        Manager::Instance().registerVariable(name, f, description, v, unit);
+        Manager::Instance().registerVariable(name, f, description, v, unit, fName);
       }
       /** constructor. */
-      Proxy(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description, Manager::VariableDataType v)
+      Proxy(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description, Manager::VariableDataType v,
+            const std::string& fName = "")
       {
-        Manager::Instance().registerVariable(name, f, description, v);
+        Manager::Instance().registerVariable(name, f, description, v, fName);
       }
     };
 
@@ -350,16 +357,16 @@ namespace Belle2 {
     }
 
     template<typename T>
-    Belle2::Variable::Manager::VariableDataType get_function_type(const std::string& name, T* t)
+    Variable::Manager::VariableDataType get_function_type(const std::string& name, T* t)
     {
       auto func =  std::function{t};
       using ReturnType = typename decltype(func)::result_type;
       if (std::is_same_v<ReturnType, double>) {
-        return Belle2::Variable::Manager::VariableDataType::c_double;
+        return Variable::Manager::VariableDataType::c_double;
       } else if (std::is_same_v<ReturnType, int>) {
-        return Belle2::Variable::Manager::VariableDataType::c_int;
+        return Variable::Manager::VariableDataType::c_int;
       } else if (std::is_same_v<ReturnType, bool>) {
-        return Belle2::Variable::Manager::VariableDataType::c_bool;
+        return Variable::Manager::VariableDataType::c_bool;
       } else {
         B2FATAL("Metavariables must be registered using the REGISTER_METAVARIABLE macro." << LogVar("Variablename", name));
       }
@@ -384,7 +391,9 @@ namespace Belle2 {
      * \sa Manager
      */
 #define REGISTER_VARIABLE_NO_UNIT(name, function, description) \
-  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description), Belle2::Variable::get_function_type(name,function));
+  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), \
+                                                      Variable::make_function(function), std::string(description), \
+                                                      Variable::get_function_type(name,function), std::string(""), std::string(#function));
 
     /** \def REGISTER_VARIABLE_WITH_UNIT(name, function, description, unit)
      *
@@ -392,7 +401,9 @@ namespace Belle2 {
      * \sa Manager
      */
 #define REGISTER_VARIABLE_WITH_UNIT(name, function, description, unit) \
-  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description), Belle2::Variable::get_function_type(name,function), std::string(unit));
+  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), \
+                                                      Variable::make_function(function), std::string(description), \
+                                                      Variable::get_function_type(name,function), std::string(unit), std::string(#function));
 
     /** \def PICK_FIFTH_ARG(arg1, arg2, arg3, arg4, arg5, ...)
      *
@@ -421,7 +432,9 @@ namespace Belle2 {
      * \sa Manager
      */
 #define REGISTER_METAVARIABLE(name, function, description, variabledatatype) \
-  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description), Belle2::Variable::Manager::VariableDataType(variabledatatype));
+  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), \
+                                                      Variable::make_function(function), std::string(description), \
+                                                      Variable::Manager::VariableDataType(variabledatatype), std::string(#function));
 
     /** \def VARIABLE_GROUP(groupName)
      *

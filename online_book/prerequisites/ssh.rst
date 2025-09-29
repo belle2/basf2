@@ -6,9 +6,7 @@ SSH - Secure Shell
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 1 h
-
-    **Exercises**: 15 min
+    **Length**: 1.5-3 hrs
 
     **Prerequisites**:
 
@@ -178,11 +176,11 @@ impatient you can also press ``Ctrl-D`` as a shortcut.
    ``hostname`` command and log out again.
 
 .. seealso::
-   :class: toggle
+   :class: dropdown
 
-    One final thing about host keys: After you connected to a server, ssh
-    remembers the host key and will verify it on each connection. So you might
-    see something like this::
+   One final thing about host keys: After you connected to a server, ssh
+   remembers the host key and will verify it on each connection. So you might
+   see something like this::
 
         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
@@ -194,15 +192,15 @@ impatient you can also press ``Ctrl-D`` as a shortcut.
         SHA256:zyIMwlji8jqtD+UuSFuknQmevQPAUCiT39BfH/NrIbA.
         Please contact your system administrator.
 
-    This means the host presented a different key than it used to. This can
-    sometimes happen if the server you want to connect to was reinstalled. So if
-    **you know** that the server was reinstalled or upgraded you can tell ssh to
-    forget the previous host key. For example to forget the host key for
-    ``bastion.desy.de`` just use
+   This means the host presented a different key than it used to. This can
+   sometimes happen if the server you want to connect to was reinstalled. So if
+   **you know** that the server was reinstalled or upgraded you can tell ssh to
+   forget the previous host key. For example to forget the host key for
+   ``bastion.desy.de`` just use
 
-    .. code-block:: bash
+   .. code-block:: bash
 
-        ssh-keygen -R bastion.desy.de
+       ssh-keygen -R bastion.desy.de
 
 .. rubric:: Copying Files
 
@@ -232,14 +230,14 @@ directory on ``bastion.desy.de``.
    ``bastion.desy.de``
 
 .. admonition:: Hint
-   :class: toggle xhint
+   :class: dropdown xhint
 
    You can use the ``touch`` command to create empty files
 
 .. admonition:: Exercise
    :class: exercise
 
-   Copy a file from your home directory on ``bastion.desy.de`` to you local
+   Copy a file from your home directory on ``bastion.desy.de`` to your local
    directory
 
 
@@ -249,12 +247,12 @@ directory on ``bastion.desy.de``.
    How can we copy full directories with all files at once?
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    Try ``man scp``
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    Supply ``-r`` to scp: ``scp -r desy:~/plots .`` will try to copy the full
    directory ``plots`` on the remote machine to your current directory
@@ -360,7 +358,7 @@ simply write the following in the file:
    :end-at: E10
 
 .. note:: Marker comments in the solution code
-    :class: toggle
+    :class: dropdown
 
     If you are wondering about comments like ``[S10]`` or ``[E10]`` in the code
     snippets that we include in our tutorials: You can completely ignore them.
@@ -402,7 +400,7 @@ login to KEKCC by just typing ``ssh kekcc`` and also copy files directly with
 connecting to the gateway server and then when connecting to the KEKCC machine.
 
 .. admonition:: In case of ``ProxyJump`` trouble
-    :class: toggle warning
+    :class: dropdown warning
 
     The ``ProxyJump`` directive was introduced in OpenSSH 7.3. If you get an
     error message ``Bad configuration option: proxyjump``, please check if
@@ -426,7 +424,7 @@ connecting to the gateway server and then when connecting to the KEKCC machine.
    you can login to kekcc by simply writing ``ssh kekcc``
 
 .. admonition:: Hint
-   :class: toggle xhint
+   :class: dropdown xhint
 
    Create the config file and take the above snippet. But make sure you replace
    your own usernames for both servers
@@ -452,7 +450,7 @@ usually safer and more convenient than using the password directly.
     Key based login doesn't work to all servers. Most notable exception for us
     is DESY as they have a different security system called kerberos which is
     incompatible with key based login. However for DESY one can obtain a
-    `kerberos token <https://confluence.desy.de/x/173UBw>`_ instead
+    `kerberos token <https://xwiki.desy.de/xwiki/rest/p/41a5f>`_ instead
     which will have almost the same effect.
 
 
@@ -497,12 +495,12 @@ you have created your very own SSH identity.
    Where is the public key stored?
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    Check the output of ``ssh-keygen``
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    In a file with the same name as the private key but ``.pub`` in the end.
 
@@ -513,12 +511,12 @@ you have created your very own SSH identity.
    The default key type is to use "rsa". What types are possible for a key?
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    Try ``man ssh-keygen`` or for more information google "ssh key types"
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    There should be `RSA <https://en.wikipedia.org/wiki/RSA_(cryptosystem)>`_,
    `DSA <https://en.wikipedia.org/wiki/Digital_Signature_Algorithm>`_, `ECDSA
@@ -678,12 +676,12 @@ and is usually free. But any number is fine.
    web browser?
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    Make sure to choose the correct port
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    We need to run ``ssh -L 8080:software.belle2.org:443 desy`` and then type
    ``https://localhost:8080`` in the browser.
@@ -705,7 +703,7 @@ nice python interface via web browser.
 .. note::
 
     DESY offers a direct `weblogin
-    <https://confluence.desy.de/x/rJetC>`_ to jupyter
+    <https://xwiki.desy.de/xwiki/rest/p/9fd53>`_ to jupyter
     notebooks so the following is not necessary for DESY
 
 Now you can tell jupyter notebooks which port to use but this time we run it on
@@ -818,7 +816,7 @@ local files. For example
   more information but this works similar in other desktop environments.
 * In addition many editors or development environments have their own support to
   work on a remote machine via ssh. There is a
-  `guide on confluence <https://confluence.desy.de/x/XGJ8Cg>`_
+  `guide on XWiki <https://xwiki.desy.de/xwiki/rest/p/da9b4>`_
   explaining the setup for some of them.
 
 .. rubric:: SSH multiplexing
@@ -948,7 +946,7 @@ also find keyboard shortcuts for most of them.
    is run and how do I do that?
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    Check out the output of the ``hostname`` command in a computing cluster like
    KEKCC. Why is it different from the hostname that you used to login (the
@@ -957,7 +955,7 @@ also find keyboard shortcuts for most of them.
    any commands? How can you change the specific host?
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    When you connect to a computing cluster like KEKCC via a login node, e.g.
    ``login.cc.kek.jp``, you are connected to a random host (also called "node",

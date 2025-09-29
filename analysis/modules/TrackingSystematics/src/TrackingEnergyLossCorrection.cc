@@ -10,13 +10,18 @@
 #include <analysis/modules/TrackingSystematics/TrackingEnergyLossCorrection.h>
 
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/ParticleList.h>
 
-#include <map>
-#include <TRandom.h>
+#include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
+
 #include <Math/Vector4D.h>
+
+#include <cmath>
+#include <map>
 
 using namespace Belle2;
 
@@ -34,6 +39,7 @@ TrackingEnergyLossCorrectionModule::TrackingEnergyLossCorrectionModule() : Modul
 The module modifies the input particleLists by subtracting the correction value to the track energy and rescaling the momenta
 		     
 		     )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("correction", m_correction, "correction value to be subtracted from the particle energy",
@@ -44,9 +50,9 @@ The module modifies the input particleLists by subtracting the correction value 
 
 void TrackingEnergyLossCorrectionModule::initialize()
 {
-  if (!isnan(m_correction) && !m_payloadName.empty()) {
+  if (!std::isnan(m_correction) && !m_payloadName.empty()) {
     B2FATAL("It's not allowed to provide both a valid value for the scale parameter and a non-empty table name. Please decide for one of the two options!");
-  } else if (isnan(m_correction) && m_payloadName.empty()) {
+  } else if (std::isnan(m_correction) && m_payloadName.empty()) {
     B2FATAL("Neither a valid value for the scale parameter nor a non-empty table name was provided. Please set (exactly) one of the two options!");
   } else if (!m_payloadName.empty()) {
     m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_payloadName);
@@ -131,7 +137,7 @@ void TrackingEnergyLossCorrectionModule::setEnergyLossCorrection(Particle* parti
     const ROOT::Math::PxPyPzEVector vec(px, py, pz, E);
     particle->set4Vector(vec);
   } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track) {
-    if (!isnan(m_correction)) {
+    if (!std::isnan(m_correction)) {
       particle->setEnergyLossCorrection(m_correction);
     } else if (!m_correctionName.empty()) {
       particle->setEnergyLossCorrection(getCorrectionValue(particle));

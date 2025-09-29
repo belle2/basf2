@@ -1,6 +1,12 @@
 ROOT
 ====
 
+.. sidebar:: Overview
+    :class: overview
+
+    **Length**: 30-60 min
+
+
 If you don't know about ROOT yet, check out the section :ref:`rootintro`.
 You can find the documentation for RDataFrames `here <https://root.cern/doc/master/classROOT_1_1RDataFrame.html>`_.
 
@@ -140,7 +146,7 @@ and filter it like this:
    df = df.Filter("B0_mbc>5.2", "B0_mbc cut")\
           .Filter("B0_deltae>-1", "B_deltae cut")
 
-Because of RDataFrame's lazyness, these operations return almost
+Because of RDataFrame's laziness, these operations return almost
 instantly. The computations are only “booked”.
 
 .. admonition:: Exercise
@@ -149,12 +155,12 @@ instantly. The computations are only “booked”.
   Create two RDataFrames, one for Signal and one for Background only.
 
 .. admonition:: Hint
-  :class: xhint stacked toggle
+  :class: xhint stacked dropdown
 
   Split between signal and background using the ``B0_isSignal`` column.
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: solution dropdown
 
   .. code:: ipython3
 

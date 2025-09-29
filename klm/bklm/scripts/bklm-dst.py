@@ -16,7 +16,7 @@
 #   Before running this script, type
 #     source /cvmfs/belle.cern.ch/tools/b2setup release-02-01-00 <or higher release>
 #   then verify that the corresponding proper global tag is used near the end of this script.
-#   (Global tags are tabulated at https://confluence.desy.de/display/BI/Global+Tag+%28GT%29+page)
+#   (Global tags are tabulated at https://xwiki.desy.de/xwiki/rest/p/88ebe)
 #   The external python script bklmDB.py must be in the same folder as this script.
 #
 # Usage:
@@ -186,4 +186,3 @@ main.add_module('KLMReconstructor')
 main.add_module(eventInspector)
 
 basf2.process(main, max_event=maxCount)
-print(basf2.statistics)

@@ -21,7 +21,8 @@ from math import ceil
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
-                               expert_username="takaham",
+                               expert_username="3978526368",
+                               subsystem="pxd",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["beamorphysics", "cosmic"],
@@ -43,7 +44,8 @@ settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
                                    "max_events_per_run": 400000,
                                    "max_files_per_run": 20,  # only valid when max_events/run <= 0
                                    },
-                               depends_on=[])
+                               depends_on=[],
+                               produced_payloads=["PXDDeadPixelPar", "PXDMaskedPixelPar"])
 
 
 def get_calibrations(input_data, **kwargs):

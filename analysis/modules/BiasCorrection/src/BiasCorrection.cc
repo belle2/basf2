@@ -8,12 +8,13 @@
 
 // Own header.
 #include <analysis/modules/BiasCorrection/BiasCorrection.h>
-#include <iostream>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/core/Environment.h>
-#include <analysis/VariableManager/Manager.h>
 
 #include <Math/Vector4D.h>
 
@@ -43,6 +44,7 @@ EnergyBiasCorrectionModule::EnergyBiasCorrectionModule() : Module()
 The module modifies the input particleLists by scaling energy as given by the scale in the LookUpTable
 		     
 		     )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("tableName", m_tableName, "ID of table used for reweighing");

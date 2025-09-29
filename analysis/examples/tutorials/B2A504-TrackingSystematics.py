@@ -23,7 +23,7 @@
 #                                                                          #
 # The latest recommendations for tracking systematic uncertainties can     #
 # be found here:                                                           #
-# https://confluence.desy.de/display/BI/Tracking+and+Vertexing+Performance #
+# https://xwiki.desy.de/xwiki/rest/p/d8c51                                 #
 #                                                                          #
 ############################################################################
 
@@ -81,6 +81,3 @@ ma.variablesToNtuple(decayString='J/psi:out',
 
 # process the events
 b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)

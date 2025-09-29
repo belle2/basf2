@@ -19,7 +19,11 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 /* C++ headers. */
+#include <algorithm>
 #include <map>
+#include <numeric>
+#include <utility>
+#include <vector>
 
 using namespace Belle2;
 
@@ -30,7 +34,7 @@ MCMatcherKLMClustersModule::MCMatcherKLMClustersModule() : Module()
   setDescription("Module for MC matching for KLM clusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("Hit2dRelations", m_Hit2dRelations,
-           "Add also relations for KLMHit2d and KLMHit2d.", false);
+           "Add also relations for KLMHit2d.", false);
 }
 
 MCMatcherKLMClustersModule::~MCMatcherKLMClustersModule()
@@ -54,6 +58,11 @@ void MCMatcherKLMClustersModule::initialize()
   }
 }
 
+bool compareByValue(const std::pair<MCParticle*, double>& a, const std::pair<MCParticle*, double>& b)
+{
+  return a.second > b.second;
+}
+
 void MCMatcherKLMClustersModule::event()
 {
   // Don't do anything if MCParticles aren't present
@@ -61,10 +70,10 @@ void MCMatcherKLMClustersModule::event()
     return;
   }
 
-  double weightSum;
   /* cppcheck-suppress variableScope */
   int i1, i2, i3, i4, i5, i6, n1, n2, n3, n4, n5, n6;
   std::map<MCParticle*, double> mcParticles, mcParticlesHit;
+  std::vector<std::pair<MCParticle*, double>> helperVector;
   std::map<MCParticle*, double>::iterator it;
   n1 = m_KLMClusters.getEntries();
   for (i1 = 0; i1 < n1; i1++) {
@@ -114,11 +123,12 @@ void MCMatcherKLMClustersModule::event()
         }
       }
       if (m_Hit2dRelations) {
-        weightSum = 0;
-        for (it = mcParticlesHit.begin(); it != mcParticlesHit.end(); ++it)
-          weightSum = weightSum + it->second;
-        for (it = mcParticlesHit.begin(); it != mcParticlesHit.end(); ++it)
-          bklmHit2ds[i2]->addRelationTo(it->first, it->second / weightSum);
+        helperVector.clear();
+        helperVector.insert(helperVector.end(), mcParticlesHit.begin(), mcParticlesHit.end());
+        std::sort(helperVector.begin(), helperVector.end(), compareByValue);
+        double weightSum = std::accumulate(helperVector.begin(), helperVector.end(), 0.0, [](double sum, const auto & pair) { return sum + pair.second; });
+        for (const auto& helperPair :  helperVector)
+          bklmHit2ds[i2]->addRelationTo(helperPair.first, helperPair.second / weightSum);
       }
     }
     RelationVector<KLMHit2d> eklmHit2ds =
@@ -161,17 +171,19 @@ void MCMatcherKLMClustersModule::event()
         }
       }
       if (m_Hit2dRelations) {
-        weightSum = 0;
-        for (it = mcParticlesHit.begin(); it != mcParticlesHit.end(); ++it)
-          weightSum = weightSum + it->second;
-        for (it = mcParticlesHit.begin(); it != mcParticlesHit.end(); ++it)
-          eklmHit2ds[i2]->addRelationTo(it->first, it->second / weightSum);
+        helperVector.clear();
+        helperVector.insert(helperVector.end(), mcParticlesHit.begin(), mcParticlesHit.end());
+        std::sort(helperVector.begin(), helperVector.end(), compareByValue);
+        double weightSum = std::accumulate(helperVector.begin(), helperVector.end(), 0.0, [](double sum, const auto & pair) { return sum + pair.second; });
+        for (const auto& helperPair :  helperVector)
+          eklmHit2ds[i2]->addRelationTo(helperPair.first, helperPair.second / weightSum);
       }
     }
-    weightSum = 0;
-    for (it = mcParticles.begin(); it != mcParticles.end(); ++it)
-      weightSum = weightSum + it->second;
-    for (it = mcParticles.begin(); it != mcParticles.end(); ++it)
-      m_KLMClusters[i1]->addRelationTo(it->first, it->second / weightSum);
+    helperVector.clear();
+    helperVector.insert(helperVector.end(), mcParticles.begin(), mcParticles.end());
+    std::sort(helperVector.begin(), helperVector.end(), compareByValue);
+    double weightSum = std::accumulate(helperVector.begin(), helperVector.end(), 0.0, [](double sum, const auto & pair) { return sum + pair.second; });
+    for (const auto& helperPair :  helperVector)
+      m_KLMClusters[i1]->addRelationTo(helperPair.first, helperPair.second / weightSum);
   }
 }

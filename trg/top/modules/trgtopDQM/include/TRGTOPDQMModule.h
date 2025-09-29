@@ -15,42 +15,26 @@
 //---------------------------------------------------------------
 // Description : DQM module for TRGTOP
 //---------------------------------------------------------------
-#ifndef TRGGRLDQMMODULE_h
-#define TRGGRLDQMMODULE_h
+#pragma once
 
 #include <framework/core/HistoModule.h>
-
-#include <trg/gdl/dataobjects/TRGGDLUnpackerStore.h>
-#include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
-#include <trg/gdl/TrgBit.h>
 #include <framework/database/DBObjPtr.h>
-#include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
-#include <mdst/dbobjects/TRGGDLDBInputBits.h>
-#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
-
-#include "trg/grl/dataobjects/TRGGRLUnpackerStore.h"
-
-#include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
-#include "trg/ecl/TrgEclMapping.h"
-
-#include "trg/top/dataobjects/TRGTOPUnpackerStore.h"
-#include "trg/top/dataobjects/TRGTOPSlotTiming.h"
+#include <framework/datastore/StoreArray.h>
 
 #include <string>
-#include <algorithm>
 
 #include <TH1I.h>
 #include <TH2I.h>
 #include <TH3I.h>
-#include <TH1F.h>
-#include <TH2F.h>
 
 namespace Belle2 {
+  class TRGECLUnpackerStore;
+  class TRGGDLDBUnpacker;
 
   class TRGTOPDQMModule : public HistoModule {
 
   public:
-    //! Costructor
+    //! Constructor
     TRGTOPDQMModule();
     //! Destructor
     virtual ~TRGTOPDQMModule() {}
@@ -78,14 +62,14 @@ namespace Belle2 {
     //! TDirectory
     TDirectory* dirDQM = nullptr;
 
-    // number of skims
+    //! number of skims
     static const int nskim_topdqm = 11;
 
-    // number of histogram classes
+    //! number of histogram classes
     static const int nHistClasses = 3;
     int m_nHistClassesActual = 3;
 
-    // histogramming level
+    //! histogramming level
     int m_histLevel = 3;
 
     int start_skim_topdqm = 0;
@@ -283,7 +267,7 @@ namespace Belle2 {
     TH1I* h_grl_ncdctopslots_matched[nskim_topdqm] = {nullptr};
     TH2I* h_grl_topslots_vs_cdcslots_match[nskim_topdqm] = {nullptr};
 
-    //condition database for GDL unpacker
+    //! condition database for GDL unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_gdlUnpacker;
 
     int gdlLeafBitMap[320] = {0};
@@ -366,7 +350,7 @@ namespace Belle2 {
 
     bool m_requireCDC2DTrack;
 
-    // names of skims from hlt/softwaretrigger/scripts/softwaretrigger/db_access.py
+    //! names of skims from hlt/softwaretrigger/scripts/softwaretrigger/db_access.py
     std::string skim_menu[nskim_topdqm] = {
       "all",
       "software_trigger_cut&skim&accept_hadron",
@@ -381,7 +365,7 @@ namespace Belle2 {
       "software_trigger_cut&skim&accept_mumutight"
     };
 
-    // names of histograms
+    //! names of histograms
     std::string skim_smap[nskim_topdqm] = {
       "all",
       "hadron",
@@ -399,5 +383,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif

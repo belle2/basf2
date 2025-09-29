@@ -11,8 +11,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
-#include <iostream>
-
 using namespace std;
 using namespace Belle2;
 
@@ -33,6 +31,7 @@ TauDecayMarkerModule::TauDecayMarkerModule() : Module(), tauPair(false), numOfTa
                  "is numbered following the order in the default KKMC decay table. Using this module, "
                  "the channel number will be stored in the variables `tauPlusMCMode`, and `tauMinusMCMode`. "
                  "Further details and usage can be found at `TauDecayMCModes`. ");
+  setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("printDecayInfo", m_printDecayInfo, "Print information of the tau pair decay from MC.", false);
 }
@@ -567,9 +566,9 @@ int TauDecayMarkerModule::getProngOfDecay(const MCParticle& p)
   for (MCParticle* d : daughters) {
     if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
     // TODO: Improve how to identify a final state particle.
-    bool isChargedFinalState = find(begin(finalStatePDGs),
-                                    end(finalStatePDGs),
-                                    abs(d->getPDG())) != end(finalStatePDGs);
+    bool isChargedFinalState = find(finalStatePDGs.begin(),
+                                    finalStatePDGs.end(),
+                                    abs(d->getPDG())) != finalStatePDGs.end();
     if (isChargedFinalState) ret++;
     else ret += getProngOfDecay(*d);
   }

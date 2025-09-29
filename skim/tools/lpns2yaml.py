@@ -219,15 +219,8 @@ def main():
 
                 # If beam energy is not 4S, then point it out in label
                 onres = beamEnergy == "4S"
-                scan = beamEnergy == "5S_scan"
                 if onres:
                     label = f"{campaign}_exp{expInteger}r{iGroup+1}"
-                elif scan:
-                    # more complicated process to retrieve the exact 5S_scan energy from output filename...
-                    pattern = r"_5Sscan_(\d+)"
-                    match = re.search(pattern, args.output)
-                    scanEnergy = match.group(1)
-                    label = f"{campaign}_{beamEnergy}_{scanEnergy}_exp{expInteger}r{iGroup+1}"
                 else:
                     label = f"{campaign}_{beamEnergy}_exp{expInteger}r{iGroup+1}"
 

@@ -9,8 +9,6 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <pxd/dataobjects/PXDCluster.h>
 
 // ROOT includes
 #include <TMatrixD.h>
@@ -18,9 +16,15 @@
 // GenFit includes
 #include <genfit/PlanarMeasurement.h>
 #include <genfit/HMatrixUV.h>
-#include <genfit/TrackCandHit.h>
+
+namespace genfit {
+  class TrackCandHit;
+}
 
 namespace Belle2 {
+  class PXDTrueHit;
+  class PXDCluster;
+
   /**
    * PXDRecoHit - an extended form of PXDCluster containing geometry information.
    *
@@ -119,7 +123,7 @@ namespace Belle2 {
     /** Get deposited energy error. */
     //float getEnergyDepError() const { return m_energyDepError; }
 
-    /** Get the likelyhood that cluster shape is likely to be created from track state. */
+    /** Get the likelihood that cluster shape is likely to be created from track state. */
     float getShapeLikelyhood(const genfit::StateOnPlane& state) const;
 
     /** Construct the hessian matrix */
@@ -129,13 +133,14 @@ namespace Belle2 {
 
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };
 
-    unsigned short m_sensorID; /**< Unique sensor identifier.*/
     /** Pointer to the TrueHit used when creating this object */
     const PXDTrueHit* m_trueHit; //! transient member (not written out during streaming)
     /** Pointer to the Cluster used when creating this object */
     const PXDCluster* m_cluster; //! transient member (not written out during streaming)
     float m_energyDep; /**< deposited energy.*/
     //float m_energyDepError; /**< error in dep. energy.*/
+    /** Unique sensor identifier.*/
+    unsigned short m_sensorID;
 
     /** Set up Detector plane information */
     void setDetectorPlane();
@@ -143,7 +148,7 @@ namespace Belle2 {
     /** Apply planar deformation of sensors*/
     TVectorD applyPlanarDeformation(TVectorD hitCoords, std::vector<double> planarParameters, const genfit::StateOnPlane& state) const;
 
-    ClassDefOverride(PXDRecoHit, 8)
+    ClassDefOverride(PXDRecoHit, 9)
   };
 
 } // namespace Belle2

@@ -12,21 +12,21 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <rawdata/dataobjects/RawPXD.h>
-#include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDInjectionBGTiming.h>
 
-#include <pxd/dbobjects/PXDDHHFirmwareVersionPar.h>
 #include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
+  class PXDDigit;
+  class RawPXD;
+  class PXDInjectionBGTiming;
+  class PXDDHHFirmwareVersionPar;
 
   namespace PXD {
 
     /** The PXDPacker module.
      *
      * This module is responsible for packing (simulated) Pixels back to
-     * Raw PXD data. This is usefull as input for ONSEN as well
+     * Raw PXD data. This is useful as input for ONSEN as well
      * as for rechecking the unpacking process with well defined data.
      * Not yet ready for MC Production, only lab use recommended.
      */
@@ -80,7 +80,7 @@ namespace Belle2 {
       /** DHE Trigger Gate for DHE headers */
       unsigned int m_trigger_dhe_gate{0};
 
-      /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
+      /** For one DHC event, we utilize one header (writing out, beware of endianness!) */
       std::vector <unsigned int> m_onsen_header;
 
       /** For one DHC event, we utilize one payload for all DHE/DHP frames */
@@ -104,7 +104,7 @@ namespace Belle2 {
       /** override firmware version from DB. */
       int m_overrideFirmwareVersion{0};
 
-      /** Pack one event (several DHC) stored in seperate RawPXD object.
+      /** Pack one event (several DHC) stored in separate RawPXD object.
        */
       void pack_event(void);
 

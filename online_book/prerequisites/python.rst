@@ -6,11 +6,9 @@ Python
 .. sidebar:: Overview
     :class: overview
 
-    **External Training**: about 7 hours.
+    **External Training**: 7 hrs
 
-    **Teaching**: 1 hour
-
-    **Exercises**: 30 min
+    **Length**: 1.5-3 hrs
 
     **Prerequisites**:
 
@@ -100,11 +98,11 @@ in Python.
 
 As you should be aware by now, the key concepts of python include:
 
-  * importing libraries that you wish to use
-  * importing and/or storing data in different ways i.e. arrays, lists
-  * writing and using (sometimes pre-defined) functions
-  * writing conditions: if statements, for loops etc.
-  * understanding and using errors to debug
+* importing libraries that you wish to use
+* importing and/or storing data in different ways i.e. arrays, lists
+* writing and using (sometimes pre-defined) functions
+* writing conditions: if statements, for loops etc.
+* understanding and using errors to debug
 
 You should be aware that there are multiple ways of running
 python. Either interactively from your terminal:
@@ -148,23 +146,23 @@ Let's create a python file from terminal and run it
   and print out the value of π.
 
 .. admonition:: Hint
-  :class: xhint stacked toggle
+  :class: xhint stacked dropdown
 
   To create a file you'll need to use your bash skills. The internet is your friend.
 
 .. admonition:: Hint
-  :class: xhint stacked toggle
+  :class: xhint stacked dropdown
 
   The specific bash commands you'll need are ``mkdir``, ``cd`` and ``touch``.
 
 .. admonition:: Hint
-  :class: xhint stacked toggle
+  :class: xhint stacked dropdown
 
   Add the ``import`` command inside your python file using your favorite
   editor. Previous tutorials introduced the ``nano`` editor to you.
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: dropdown solution
 
   .. code-block:: bash
 
@@ -193,7 +191,7 @@ Congratulations! You've now created your first python file. Now, run it!
   Run your new python file in your terminal.
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: dropdown solution
 
   .. code-block:: ipython3
 
@@ -230,7 +228,7 @@ operating system called a kernel that runs the code.
   exercise. Start your Jupyter notebook server. Open the jupyter page in your browser.
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: dropdown solution
 
   .. code-block:: bash
 
@@ -240,7 +238,7 @@ operating system called a kernel that runs the code.
   Connecting and starting a jupyter notebook is described in more detail here (:ref:`onlinebook_ssh`).
 
 .. admonition:: Running on other servers (optional)
-  :class: toggle
+  :class: dropdown
 
   In principle most of the content of this page will work from anywhere if
   you have installed the right packages.
@@ -271,7 +269,7 @@ Note that your script ``my_script.py`` from before is also shown.
   indeed create the second file and change the contents of the first.
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: dropdown solution
 
   .. code-block:: bash
 
@@ -348,6 +346,8 @@ For any python interpreter, one can also use:
 
   help(object)
 
+.. _pandatutorial_prereq:
+
 Pandas Tutorial and Python Data Analysis
 ----------------------------------------
 
@@ -394,7 +394,7 @@ tools for Python, see `here
   Start a new notebook and import ``uproot``.
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: dropdown solution
 
   .. code:: ipython3
 
@@ -469,7 +469,7 @@ the second option to load data from a tree is with the ``iterate`` method, discu
       df = tree.arrays(library="pd")
 
 .. admonition:: Note about speed
-  :class: toggle
+  :class: dropdown
 
   If you have a workflow that uses :py:func:`modularAnalysis.variablesToNtuple` to create NTuples and you observe very slow
   loading times when reading those NTuples with uproot, this is probably due to small basket sizes in the output NTuples.
@@ -527,12 +527,12 @@ A useful feature to quickly summarize your data is to use the ``describe`` metho
   What are the output rows of ``df.describe``?
 
 .. admonition:: Hint
-  :class: xhint stacked toggle
+  :class: xhint stacked dropdown
 
   No hint here!
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: dropdown solution
 
   ``df.describe`` has the great ability to summarize each of your columns/variables. When using it, a table is printed with rows of 'count', 'mean', 'std', 'min', '25%', '50%', '75%' and 'max'.
 
@@ -558,13 +558,13 @@ Finally, everyone who works with numpy and pandas will at some point try to use 
   What is the output of ``df.shape`` and what does it mean?
 
 .. admonition:: Hint
-  :class: xhint stacked toggle
+  :class: xhint stacked dropdown
 
   Try it out in your jupyter notebook. To understand the output, ``df.shape?`` (or ``pd.DataFrame.shape?``) is,
   once again, your friend.
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: dropdown solution
 
   The output comes in the form of a tuple (a finite ordered list (or sequence) of elements). For example, one output could be ``(15540523, 20)``, which is saying you have a dataframe of 15540523 rows, and 20 columns.
 
@@ -679,12 +679,12 @@ Finally, arguably the most useful function for your analyses is the ``query`` fu
   containing ``B0_mbc``, ``B0_M``, ``B0_isSignal`` and ``B0_deltae`` columns.
 
 .. admonition:: Hint
-  :class: xhint stacked toggle
+  :class: xhint stacked dropdown
 
   Split between signal and background using the ``B0_isSignal`` column.
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: dropdown solution
 
   .. code:: ipython3
 
@@ -787,7 +787,7 @@ Making your plots pretty
 
 Let's face it, physicists aren't well known for their amazing graphical
 representations, but here's our chance to shine! We can implement matplotlib
-functions to make our plots GREAT. You can even choose a `colourblind friendly colour scheme <https://confluence.desy.de/display/BI/Colo%28u%29r+Blind+Friendly+Plots+and+Displays>`_!
+functions to make our plots GREAT. You can even choose a `colourblind friendly colour scheme <https://xwiki.desy.de/xwiki/rest/p/a2fdc>`_!
 
 It is possible to display multiple plots at once using ``plt.subplots``. As you can see
 below, rather than simply having our histograms show up using ``plt``, we define a
@@ -828,13 +828,13 @@ These are the equivalent of our canvas where we paint our code art.
   the second axis.
 
 .. admonition:: Hint
-  :class: xhint stacked toggle
+  :class: xhint stacked dropdown
 
   ``ax[0]`` refers to the first axis, so all changes in the code snippet above will
   only change that axis.
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: dropdown solution
 
   This solution is a basic example, there are many fun style edits you can find online for
   yourself.
@@ -887,24 +887,24 @@ The implementation of 2D histograms are often very useful and are easily done:
   How could you solve this?
 
 .. admonition:: Hint
-  :class: xhint stacked toggle
+  :class: xhint stacked dropdown
 
   With a very large dataframe, ``query`` can take a lot of time (you need to look
   at every row of the dataframe, even if only few rows pass the selection)
 
 .. admonition:: Hint
-  :class: xhint stacked toggle
+  :class: xhint stacked dropdown
 
   So the issue is that you call ``df.query(cut)`` twice. How could you avoid this?
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: dropdown solution
 
   You could simply define ``df_cut = df.query(cut)`` and then use ``df_cut``
   in line 3.
 
 .. admonition:: Another way to use matplotlib with dataframes
-  :class: toggle
+  :class: dropdown
 
   Most matplotlib functions also support a ``data`` keyword which can take a
   dataframe. Afterwards you can specify columns by their string names.
@@ -947,7 +947,7 @@ Importing the style is as easy as "one, two, ...
   (different colors, labels or data).
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: dropdown solution
 
   You should be able to generate the picture simply by copy-pasting the code
   example given.
@@ -982,7 +982,7 @@ Here a few columns have been defined which are included in the following list:
   Load your dataframe as chunks of 100000 events.
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: dropdown solution
 
   .. code:: ipython3
 
@@ -1042,7 +1042,7 @@ However, your python journey has just begun and there's a lot to learn.
   Can you make sense of the output?
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: dropdown solution
 
   This "Zen of Python" collects 19 guiding principles for writing good python code.
   There's a `wikipedia page about it <https://en.wikipedia.org/wiki/Zen_of_Python>`_ and many
@@ -1050,7 +1050,7 @@ However, your python journey has just begun and there's a lot to learn.
 
 .. seealso::
 
-  We have started to compile a reading list for python `on confluence <https://confluence.desy.de/x/ARC3Cg>`_.
+  We have started to compile a reading list for python `on XWiki <https://xwiki.desy.de/xwiki/rest/p/9bd7e>`_.
   Please help us extend it!
 
 .. include:: ../lesson_footer.rstinclude

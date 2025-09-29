@@ -12,11 +12,11 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <rawdata/dataobjects/RawPXD.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <pxd/dataobjects/PXDErrorFlags.h>
 
 namespace Belle2 {
+  class PXDDAQStatus;
+  class RawPXD;
 
   namespace PXD {
 
@@ -164,7 +164,7 @@ namespace Belle2 {
       /** flag if we found one test failing */
       bool m_found_fatal {false};
 
-      /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
+      /** For one DHC event, we utilize one header (writing out, beware of endianness!) */
       std::vector <unsigned int> m_onsen_header;
 
       /** For one DHC event, we utilize one payload for all DHE/DHP frames */
@@ -179,7 +179,7 @@ namespace Belle2 {
       /** Output array for RawPxds */
       StoreObjPtr<PXDDAQStatus> m_daqStatus;
 
-      /** Pack one event (several DHC) stored in seperate RawPXD object.
+      /** Pack one event (several DHC) stored in separate RawPXD object.
        */
       void pack_event(void);
 
@@ -224,7 +224,7 @@ namespace Belle2 {
       bool CheckErrorMaskInEvent(unsigned int eventnr, PXDError::PXDErrorFlags mask);
 
       /// The pxd error flags
-      static std::vector <PXDErrorFlags> m_errors;
+      static std::vector <PXDError::PXDErrorFlags> m_errors;
 
     };//end class declaration
 

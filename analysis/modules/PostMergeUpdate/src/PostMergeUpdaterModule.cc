@@ -9,10 +9,11 @@
 #include <analysis/modules/PostMergeUpdate/PostMergeUpdaterModule.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <framework/logging/Logger.h>
-#include <analysis/utility/RotationTools.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <TDatabasePDG.h>
 #include <Math/Vector3D.h>
+
+#include <cmath>
 
 using namespace Belle2;
 
@@ -25,6 +26,7 @@ REG_MODULE(PostMergeUpdater);
 PostMergeUpdaterModule::PostMergeUpdaterModule() : Module()
 {
   setDescription("Synchronize parts of the events post merge/embedding. Used in the signal embedding pipeline. Uses kinematic information for the tag / simulated decay stored in eventExtraInfo.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("Mixing", m_mixing, "Mixing (true) or embedding (false) corrections", false);
   addParam("isCharged", m_isCharged, "Charged (true) or neutral (false) B mesons", true);
 }
@@ -39,10 +41,10 @@ void PostMergeUpdaterModule::initialize()
   m_eclclusters.isOptional();
 }
 
-TRotation PostMergeUpdaterModule::tag_vertex_rotation()
+ROOT::Math::Rotation3D PostMergeUpdaterModule::tag_vertex_rotation()
 {
   // Unit rotation:
-  TRotation rot;
+  ROOT::Math::Rotation3D rot;
 
   if (
     m_eventExtraInfo_orig->hasExtraInfo("PX")
@@ -53,15 +55,15 @@ TRotation PostMergeUpdaterModule::tag_vertex_rotation()
     and m_eventExtraInfo->hasExtraInfo("PZ")
   ) {
     // For embedding, we will rotate the simulated B in the direction of the reconstructed tag
-    B2Vector3D tag3v = B2Vector3D(m_eventExtraInfo_orig->getExtraInfo("PX"),
-                                  m_eventExtraInfo_orig->getExtraInfo("PY"),
-                                  m_eventExtraInfo_orig->getExtraInfo("PZ")
-                                 );
+    ROOT::Math::XYZVector tag3v = ROOT::Math::XYZVector(m_eventExtraInfo_orig->getExtraInfo("PX"),
+                                                        m_eventExtraInfo_orig->getExtraInfo("PY"),
+                                                        m_eventExtraInfo_orig->getExtraInfo("PZ")
+                                                       );
 
-    B2Vector3D sec3v = B2Vector3D(m_eventExtraInfo->getExtraInfo("PX"),
-                                  m_eventExtraInfo->getExtraInfo("PY"),
-                                  m_eventExtraInfo->getExtraInfo("PZ")
-                                 );
+    ROOT::Math::XYZVector sec3v = ROOT::Math::XYZVector(m_eventExtraInfo->getExtraInfo("PX"),
+                                                        m_eventExtraInfo->getExtraInfo("PY"),
+                                                        m_eventExtraInfo->getExtraInfo("PZ")
+                                                       );
 
     // For mixing, we want to get an opposite direction, the secondary ROE should point in the direction of the primary TAG
     if (m_mixing) {
@@ -82,18 +84,18 @@ TRotation PostMergeUpdaterModule::tag_vertex_rotation()
     }
 
 
-    B2Vector3D cros = tag3v.Unit().Cross(sec3v.Unit());
+    ROOT::Math::XYZVector cross = tag3v.Unit().Cross(sec3v.Unit());
     double  dot = tag3v.Unit().Dot(sec3v.Unit());
 
     // Rotation to make secondary B point as tag B
-    rot.Rotate(-acos(dot), cros);
+    rot = ROOT::Math::Rotation3D(ROOT::Math::AxisAngle(cross, -acos(dot)));
 
     // Closure test that rotation does what expected:
-    B2Vector3D test = rot * sec3v;
+    ROOT::Math::XYZVector test = rot * sec3v;
     double smallValue = 1e-12;
-    if ((abs(sin(test.Phi() - tag3v.Phi())) > smallValue) or (abs(test.Theta() - tag3v.Theta()) > smallValue)) {
-      B2ERROR("Loss of accuracy during rotation" << LogVar("Delta phi", abs(sin(test.Phi() - tag3v.Phi())))
-              << LogVar("Delta Theta", abs(test.Theta() - tag3v.Theta())));
+    if ((std::abs(sin(test.Phi() - tag3v.Phi())) > smallValue) or (std::abs(test.Theta() - tag3v.Theta()) > smallValue)) {
+      B2ERROR("Loss of accuracy during rotation" << LogVar("Delta phi", std::abs(sin(test.Phi() - tag3v.Phi())))
+              << LogVar("Delta Theta", std::abs(test.Theta() - tag3v.Theta())));
     }
   } else {
     B2ERROR("No momentum information provided for the tag/simulated particle list, can not update tracks");
@@ -111,13 +113,13 @@ void PostMergeUpdaterModule::event()
       double xv2 = m_eventExtraInfo->getExtraInfo("IPX");
       double yv2 = m_eventExtraInfo->getExtraInfo("IPY");
       double zv2 = m_eventExtraInfo->getExtraInfo("IPZ");
-      const B2Vector3D origSpot(xv2, yv2, zv2);
+      const ROOT::Math::XYZVector origSpot(xv2, yv2, zv2);
 
       // Now vertex from DB:
-      static DBObjPtr<Belle2::BeamSpot> beamSpotDB;
-      const B2Vector3D beamSpot = beamSpotDB->getIPPosition();
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      const ROOT::Math::XYZVector beamSpot = beamSpotDB->getIPPosition();
 
-      const TRotation rot = tag_vertex_rotation();
+      const ROOT::Math::Rotation3D rot = tag_vertex_rotation();
       const double bz = BFieldManager::getFieldInTesla(beamSpot).Z();
 
       // Loop over track fit results from the attached part of the event:
@@ -132,13 +134,10 @@ void PostMergeUpdaterModule::event()
           helixO.passiveMoveBy(origSpot - beamSpot);
 
           // Also Rotate:
-          B2Vector3D position = helixO.getPerigee();
-          B2Vector3D momentum = rot * B2Vector3D(helixO.getMomentum(bz));
+          ROOT::Math::XYZVector position = helixO.getPerigee();
+          ROOT::Math::XYZVector momentum = rot * helixO.getMomentum(bz);
 
-          // New helix
-          //            Helix helix(position, momentum, charge, bz);
-          Helix helix(ROOT::Math::XYZVector(position.X(), position.Y(), position.Z()),
-                      ROOT::Math::XYZVector(momentum.X(), momentum.Y(), momentum.Z()), charge, bz);
+          Helix helix(position, momentum, charge, bz);
 
           // Store back in the mdst:
           m_trackFits[t_idx]->m_tau[TrackFitResult::iD0]        = helix.getD0();
@@ -166,16 +165,16 @@ void PostMergeUpdaterModule::event()
       and m_eventExtraInfo->hasExtraInfo("Z")
     ) {
 
-      B2Vector3D vertexTag(m_eventExtraInfo_orig->getExtraInfo("X"),
-                           m_eventExtraInfo_orig->getExtraInfo("Y"),
-                           m_eventExtraInfo_orig->getExtraInfo("Z"));
+      ROOT::Math::XYZVector vertexTag(m_eventExtraInfo_orig->getExtraInfo("X"),
+                                      m_eventExtraInfo_orig->getExtraInfo("Y"),
+                                      m_eventExtraInfo_orig->getExtraInfo("Z"));
 
-      B2Vector3D vertexEmb(m_eventExtraInfo->getExtraInfo("X"),
-                           m_eventExtraInfo->getExtraInfo("Y"),
-                           m_eventExtraInfo->getExtraInfo("Z"));
+      ROOT::Math::XYZVector vertexEmb(m_eventExtraInfo->getExtraInfo("X"),
+                                      m_eventExtraInfo->getExtraInfo("Y"),
+                                      m_eventExtraInfo->getExtraInfo("Z"));
 
       const double bz = BFieldManager::getFieldInTesla(vertexTag).Z();
-      const TRotation rot = tag_vertex_rotation();
+      const ROOT::Math::Rotation3D rot = tag_vertex_rotation();
 
       // Loop over new tracks and corresponding track fit results
       for (int idxTr =  m_mergedArrayIndices->getExtraInfo("Tracks"); idxTr < m_tracks.getEntries(); idxTr++) {
@@ -186,11 +185,11 @@ void PostMergeUpdaterModule::event()
           auto helix = m_trackFits[t_idx]->getHelix();
           helix.passiveMoveBy(vertexEmb);
 
-          B2Vector3D mom    = m_trackFits[t_idx]->getMomentum();
+          ROOT::Math::XYZVector mom    = m_trackFits[t_idx]->getMomentum();
           short    charge = m_trackFits[t_idx]->getChargeSign();
 
           // Rotate (no boost for now)
-          B2Vector3D momTag = rot * mom;
+          ROOT::Math::XYZVector momTag = rot * mom;
 
           // Define new helix "h", based on tag vertex position and rotated track momentum. Note that the vertex position is usually well
           // reconstructed and smearing in the track position parameters (d0,z0) for the helix h is not sufficient. In addition,
@@ -218,12 +217,12 @@ void PostMergeUpdaterModule::event()
 }
 
 
-void PostMergeUpdaterModule::cluster_rotation(const TRotation& rot)
+void PostMergeUpdaterModule::cluster_rotation(const ROOT::Math::Rotation3D& rot)
 {
   // Loop over added clusters:
   for (int idxCl =  m_mergedArrayIndices->getExtraInfo("ECLClusters"); idxCl < m_eclclusters.getEntries(); idxCl++) {
-    B2Vector3D pos =   m_eclclusters[idxCl]->getClusterPosition();
-    B2Vector3D newPos = rot * pos;
+    ROOT::Math::XYZVector pos    = m_eclclusters[idxCl]->getClusterPosition();
+    ROOT::Math::XYZVector newPos = rot * pos;
     // Keep same R, update theta/phi:
     m_eclclusters[idxCl]->setTheta(newPos.Theta());
     m_eclclusters[idxCl]->setPhi(newPos.Phi());

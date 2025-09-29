@@ -13,8 +13,8 @@ combined_module_quality_estimator_teacher
 -----------------------------------------
 
 Information on the MVA Track Quality Indicator / Estimator can be found
-on `Confluence
-<https://confluence.desy.de/display/BI/MVA+Track+Quality+Indicator>`_.
+on `XWiki
+<https://xwiki.desy.de/xwiki/rest/p/0d3f4>`_.
 
 Purpose of this script
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -57,7 +57,7 @@ b2luigi: Understanding the steering file
 All trainings and validations are done in the correct order in this steering
 file. For the purpose of creating a dependency graph, the `b2luigi
 <https://b2luigi.readthedocs.io>`_ python package is used, which extends the
-`luigi <https://luigi.readthedocs.io>`_ packag developed by spotify.
+`luigi <https://luigi.readthedocs.io>`_ package developed by spotify.
 
 Each task that has to be done is represented by a special class, which defines
 which defines parameters, output files and which other tasks with which
@@ -172,6 +172,8 @@ import simulation
 import tracking
 import tracking.root_utils as root_utils
 from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
+
+# @cond internal_test
 
 # wrap python modules that are used here but not in the externals into a try except block
 install_helpstring_formatter = ("\nCould not find {module} python module.Try installing it via\n"
@@ -895,7 +897,7 @@ class CDCQEDataCollectionTask(Basf2PathTask):
             filter_choice = "recording"
             # tracking.add_hit_preparation_modules(path)  # only needed for SVD and
             # PXD hit preparation. Does not change the CDC output.
-        tracking.add_cdc_track_finding(path, with_ca=False, add_mva_quality_indicator=True)
+        tracking.add_cdc_track_finding(path, with_cdc_cellular_automaton=False, add_mva_quality_indicator=True)
 
         basf2.set_module_parameters(
             path,
@@ -1336,7 +1338,7 @@ class VXDQETeacherTask(TrackQETeacherBaseTask):
     tree_name = "tree"
     #: Random basf2 seed used to create the training data set.
     random_seed = "train_vxd"
-    #: Defines DataCollectionTask to require by tha base class to collect
+    #: Defines DataCollectionTask to require by the base class to collect
     # features for the MVA training.
     data_collection_task = VXDQEDataCollectionTask
 
@@ -1352,7 +1354,7 @@ class CDCQETeacherTask(TrackQETeacherBaseTask):
     tree_name = "records"
     #: Random basf2 seed used to create the training data set.
     random_seed = "train_cdc"
-    #: Defines DataCollectionTask to require by tha base class to collect
+    #: Defines DataCollectionTask to require by the base class to collect
     # features for the MVA training.
     data_collection_task = CDCQEDataCollectionTask
 
@@ -2386,7 +2388,7 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
         default="BBBAR"
         #: \endcond
     )
-    #: Feature/vaiable to use as truth label for the CDC track quality estimator.
+    #: Feature/variable to use as truth label for the CDC track quality estimator.
     cdc_training_target = b2luigi.Parameter()
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
     fast_bdt_option = b2luigi.ListParameter(
@@ -2829,3 +2831,5 @@ if __name__ == "__main__":
             basf2.conditions.prepend_globaltag(gt)
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MasterTask(), workers=workers)
+
+# @endcond

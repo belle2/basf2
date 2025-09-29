@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 /** helper struct for testing purposes providing the necessary coordinate accessors
- * NOTE: this is only temporaryly stored in a separate header!
+ * NOTE: this is only temporarily stored in a separate header!
  */
 #pragma once
 
@@ -14,15 +14,15 @@ namespace VXDTFFilterTest {
   /// Helper struct for SpacePoint Tests
   struct TestSpacePoint {
     /** Constructor
-     * @param x : x coordiante
-     * @param y : y coordiante
-     * @param z : z coordiante
+     * @param x : x coordinate
+     * @param y : y coordinate
+     * @param z : z coordinate
      */
     TestSpacePoint(double x, double y, double z) : x(x), y(y), z(z) { ; }
 
-    double x; /**< x coordiante of the SP */
-    double y; /**< y coordiante of the SP */
-    double z; /**< z coordiante of the SP */
+    double x; /**< x coordinate of the SP */
+    double y; /**< y coordinate of the SP */
+    double z; /**< z coordinate of the SP */
 
     /// Getter for x
     double X() const { return x; }

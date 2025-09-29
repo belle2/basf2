@@ -89,13 +89,13 @@ unpacker = main.add_module('SVDUnpackerDQM')
 main.add_module('SVDDQMExpressReco', offlineZSShaperDigits='SVDShaperDigitsZS5')
 
 # ** SVD Efficiency - available only with full reconstruction
-# -> it neeeds Tracks and relations
+# -> it needs Tracks and relations
 main.add_module('SetupGenfitExtrapolation')
 main.add_module('SVDROIFinder', recoTrackListName='RecoTracks', SVDInterceptListName='SVDIntercepts')
 main.add_module('SVDDQMEfficiency')
 
 # ** SVD Clusters On Track - available only with full reconstruction
-# -> it neeeds Tracks and relations
+# -> it needs Tracks and relations
 main.add_module('SVDDQMClustersOnTrack')
 
 # ** SVD Occupancy after Injection - need RawFTSW & Offline ZS
@@ -114,6 +114,6 @@ main.add_module('Progress')
 b2.print_path(main)
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 print(b2.statistics)

@@ -3,13 +3,19 @@
 Variables
 =========
 
-While ``basf2`` operates on `ParticleList <https://software.belle2.org/|release|/classBelle2_1_1ParticleList.html>`_ s, it is also important to calculate physics quantities associated with a given candidate or event.
+While ``basf2`` operates on :doxygen:`ParticleList <classBelle2_1_1ParticleList>` s, it is also important to calculate physics quantities associated with a given candidate or event.
 
 In ``basf2`` analysis, variables are handled by the `VariableManager`.
 There are many variables available for use in analysis.
 Probably the most obvious, and useful are: :b2:var:`p`, :b2:var:`E`, :b2:var:`Mbc`, and :b2:var:`deltaE`.
 
 You can search the variables in an alphabetical :ref:`b2-varindex`, or browse :ref:`variablesByGroup`.
+
+.. warning::
+
+          Some variables return ``NaN`` instead of being converted to a numerical value. 
+          Before cutting on any variables, **please pay attention** to whether or not your variable returns ``NaN``. 
+          
 
 .. _analysis_variablemanager_class:
 
@@ -20,7 +26,7 @@ The VariableManager handles all variables in ``basf2`` analysis.
 It is implemented as a `singleton <https://en.wikipedia.org/wiki/Singleton_pattern>`_
 C++ class with a python interface.
 
-The C++ documentation is `here <https://software.belle2.org/development/classBelle2_1_1Variable_1_1Manager.html>`_.
+The C++ documentation is :doxygen:`here <classBelle2_1_1Variable_1_1Manager>`.
 
 .. tip::
 
@@ -156,6 +162,16 @@ Here is a list of track variables for V0 daughters:
 .. b2-variables::
    :group: V0Daughter
 
+.. _kinkvariables:
+
+Kink
+~~~~
+
+Here is a list of variables for kinks, which are reconstructed since release-09:
+
+.. b2-variables::
+   :group: Kink
+
 PID
 ~~~
 
@@ -248,8 +264,7 @@ Here is a list of trigger variables:
    :group: L1 Trigger
 
 .. tip::
-  Please see the `Trigger Bits section
-  <https://software.belle2.org/development/sphinx/trg/doc/index.html#trigger-bits>`__
+  Please see the :sphinx:`Trigger Bits section <trg/doc/index.html#trigger-bits>`
   for further details.
   
 .. b2-variables::
@@ -521,7 +536,7 @@ events used for producing MC samples (both run-independent and run-dependent).
 
 .. b2-variables::
    :group: BeamBackgroundOverlay
-	     
+
 Calibration
 ~~~~~~~~~~~
 
@@ -537,7 +552,7 @@ They have a **[Calibration]** pretag.
    :group: ECL calibration
 .. b2-variables::
    :group: ECL trigger calibration
-	   
+
 Collections and Lists
 ---------------------
 
@@ -725,11 +740,7 @@ Step 3. Implement the function in the source file
     Boost boost2daughter(daughter4Vector.BoostToCM());
     particle4Vector = boost2daughter * particle4Vector;
     gDaughter4Vector = boost2daughter * gDaughter4Vector;
-    B2Vector3D particle3Vector = particle4Vector.Vect();
-    B2Vector3D gDaughter3Vector = gDaughter4Vector.Vect();
-    double numerator = gDaughter3Vector.Dot(particle3Vector);
-    double denominator = (gDaughter3Vector.Mag())*(particle3Vector.Mag());
-    return numerator/denominator;
+    return VectorUtil::CosTheta(particle4Vector, gDaughter4Vector);
   }
 
 Step 4. Register the new variable
@@ -811,4 +822,4 @@ with the -f option of ``gbasf2``:
 >>> gbasf2 ./steering.py -p project -i dataset -f myanalysis.so myanalysis.b2modmap
 
 .. warning:: This line implies that you already have working ``gbasf2`` installation and ``gbasf2`` syntax didn't
-  change since the moment of writing. Please refer gbasf2 `documentation <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ for more details.
+  change since the moment of writing. Please refer to the :doc:`gbasf2 documentation <gbasf2:index>` for more details.

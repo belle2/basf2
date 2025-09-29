@@ -11,7 +11,7 @@
 """
 Update the pythia decay mode ids from Pythia6 to Pythia8
 
-This does the same conversion that was ususally done by evtgen each time and
+This does the same conversion that was usually done by evtgen each time and
 writes out the modified file. It needs to be done for every decay file but
 only once.
 

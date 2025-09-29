@@ -5,33 +5,28 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 import os
 import argparse
 import multiprocessing
 import tempfile
 
 import basf2
-
-from softwaretrigger import constants
-from pxd import add_roi_payload_assembler, add_roi_finder
-
-from reconstruction import add_reconstruction, add_cosmics_reconstruction
-from softwaretrigger import path_utils
+from softwaretrigger import constants, path_utils
 from geometry import check_components
+from pxd import add_pxd_percentframe
 from rawdata import add_unpackers
+from reconstruction import add_reconstruction, add_cosmics_reconstruction
+from tracking import add_roiFinder, add_roi_payload_assembler
 
 
-def setup_basf2_and_db(zmq=False):
+def setup_basf2_and_db(event_distribution_mode=constants.EventDistributionModes.ringbuffer):
     """
     Setup local database usage for HLT
     """
     parser = argparse.ArgumentParser(description='basf2 for online')
 
-    if zmq:
-        parser.add_argument("--input", required=True, type=str, help="ZMQ Address of the distributor process")
-        parser.add_argument("--output", required=True, type=str, help="ZMQ Address of the collector process")
-        parser.add_argument("--dqm", required=True, type=str, help="ZMQ Address of the histoserver process")
-    else:
+    if event_distribution_mode == constants.EventDistributionModes.ringbuffer:
         parser.add_argument('input_buffer_name', type=str,
                             help='Input Ring Buffer names')
         parser.add_argument('output_buffer_name', type=str,
@@ -50,6 +45,10 @@ def setup_basf2_and_db(zmq=False):
         parser.add_argument('--no-output',
                             help="Don't write any output files",
                             action="store_true", default=False)
+    else:
+        parser.add_argument("--input", required=True, type=str, help="ZMQ Address of the distributor process")
+        parser.add_argument("--output", required=True, type=str, help="ZMQ Address of the collector process")
+        parser.add_argument("--dqm", required=True, type=str, help="ZMQ Address of the histoserver process")
 
     parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count() - 5,
                         help='Number of parallel processes to use')
@@ -134,7 +133,7 @@ def start_path(args, location):
     return path
 
 
-def start_zmq_path(args, location):
+def start_zmq_path(args, location, event_distribution_mode):
     path = basf2.Path()
     reco_path = basf2.Path()
 
@@ -145,8 +144,15 @@ def start_zmq_path(args, location):
     else:
         basf2.B2FATAL(f"Does not know location {location}")
 
-    input_module.if_value("==0", reco_path, basf2.AfterConditionPath.CONTINUE)
-    reco_path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
+    # zmq needs to discard the first event from HLTZMQ2Ds level
+    if event_distribution_mode == constants.EventDistributionModes.zmq:
+        input_module.if_value("==0", reco_path, basf2.AfterConditionPath.CONTINUE)
+        reco_path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
+    # zmqbasf2 needs to pass the first event to the remaining path
+    elif event_distribution_mode == constants.EventDistributionModes.zmqbasf2:
+        path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
+    else:
+        basf2.B2FATAL(f"Does not know event_distribution_mode {event_distribution_mode}")
 
     return path, reco_path
 
@@ -159,6 +165,7 @@ def add_hlt_processing(path,
                        unpacker_components=None,
                        reco_components=None,
                        create_hlt_unit_histograms=True,
+                       switch_off_slow_modules_for_online=True,
                        **kwargs):
     """
     Add all modules for processing on HLT filter machines
@@ -203,7 +210,13 @@ def add_hlt_processing(path,
     accept_path = basf2.Path()
 
     # Do the reconstruction needed for the HLT decision
-    path_utils.add_pre_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
+    path_utils.add_pre_filter_reconstruction(
+        path,
+        run_type=run_type,
+        components=reco_components,
+        switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
+        **kwargs
+    )
 
     # Perform HLT filter calculation
     path_utils.add_filter_software_trigger(path, store_array_debug_prescale=1)
@@ -229,10 +242,15 @@ def add_hlt_processing(path,
         basf2.B2FATAL(f"The software trigger mode {softwaretrigger_mode} is not supported.")
 
     # For accepted events we continue the reconstruction
-    path_utils.add_post_filter_reconstruction(accept_path, run_type=run_type, components=reco_components)
+    path_utils.add_post_filter_reconstruction(
+        accept_path,
+        run_type=run_type,
+        components=reco_components,
+        switch_off_slow_modules_for_online=switch_off_slow_modules_for_online
+    )
 
     # Only create the ROIs for accepted events
-    add_roi_finder(accept_path)
+    add_roiFinder(accept_path)
     accept_path.add_module('StatisticsSummary').set_name('Sum_ROI_Finder')
 
     # Add the HLT DQM modules only in case the event is accepted
@@ -252,7 +270,7 @@ def add_hlt_processing(path,
     add_roi_payload_assembler(path, ignore_hlt_decision=pxd_ignores_hlt_decision)
     path.add_module('StatisticsSummary').set_name('Sum_ROI_Payload_Assembler')
 
-    # Add the part of the dqm modules, which should run on all events, not only on the accepted onces
+    # Add the part of the dqm modules, which should run on all events, not only on the accepted ones
     path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events,
                            create_hlt_unit_histograms=create_hlt_unit_histograms)
 
@@ -260,6 +278,14 @@ def add_hlt_processing(path,
         # And in the end remove everything which should not be stored
         path_utils.add_store_only_rawdata_path(path)
     path.add_module('StatisticsSummary').set_name('Sum_Close_Event')
+
+
+def add_hlt_passthrough(path):
+    """
+    Add all modules for operating HLT machines in passthrough mode.
+    """
+    add_pxd_percentframe(path, fraction=0.1, random_position=True)
+    add_roi_payload_assembler(path, ignore_hlt_decision=True)
 
 
 def add_expressreco_processing(path,
@@ -270,6 +296,7 @@ def add_expressreco_processing(path,
                                unpacker_components=None,
                                reco_components=None,
                                do_reconstruction=True,
+                               switch_off_slow_modules_for_online=True,
                                **kwargs):
     """
     Add all modules for processing on the ExpressReco machines
@@ -312,8 +339,13 @@ def add_expressreco_processing(path,
 
     if do_reconstruction:
         if run_type == constants.RunTypes.beam:
-            add_reconstruction(path, components=reco_components, pruneTracks=False,
-                               skipGeometryAdding=True, add_trigger_calculation=False, **kwargs)
+            add_reconstruction(path,
+                               components=reco_components,
+                               pruneTracks=False,
+                               skipGeometryAdding=True,
+                               add_trigger_calculation=False,
+                               switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
+                               **kwargs)
         elif run_type == constants.RunTypes.cosmic:
             add_cosmics_reconstruction(path, components=reco_components, pruneTracks=False,
                                        skipGeometryAdding=True, **kwargs)

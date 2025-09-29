@@ -17,7 +17,6 @@
 # -----------------------------------------------------------------------------------
 
 import basf2
-import ROOT.Belle2
 
 import sys  # get argv
 argvs = sys.argv  # get arg
@@ -72,6 +71,8 @@ else:
 
 
 if __name__ == '__main__':
+    from ROOT import Belle2  # noqa: make Belle2 namespace available
+    import ROOT.Belle2
 
     basf2.use_central_database("development")
 #    Hot fix for CDCFudgeFactorFromSigma
@@ -114,5 +115,5 @@ if __name__ == '__main__':
     main.add_module('HistoManager', histoFileName=histname)
 
     # Process all events
-    basf2.process(main)
+    basf2.process(main, calculateStatistics=True)
     print(basf2.statistics)

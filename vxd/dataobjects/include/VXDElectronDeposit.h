@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef VXD_SIMULATION_ELECTRONDEPOSIT_H
-#define VXD_SIMULATION_ELECTRONDEPOSIT_H
 
 #include <algorithm>
 #include <cmath>
@@ -27,7 +25,7 @@ namespace Belle2 {
    */
   class VXDElectronDeposit {
   public:
-    /** Enum storing the bit informations for the packed information */
+    /** Enum storing the bit information for the packed information */
     enum EBits {
       /** Number of bits to encode the fraction along the path */
       c_FractionBits = 10,
@@ -77,4 +75,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif // VXD_SIMULATION_ELECTRONDEPOSIT_H

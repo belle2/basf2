@@ -7,10 +7,13 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDDQMEfficiencyNtupleSelftrackModule.h>
+
+#include <pxd/dataobjects/PXDCluster.h>
 #include <tracking/dataobjects/ROIid.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <pxd/reconstruction/PXDPixelMasker.h>
-#include <mdst/dataobjects/Track.h>
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/VectorUtil.h>
 
@@ -298,7 +301,7 @@ PXDDQMEfficiencyNtupleSelftrackModule::findClosestCluster(const VxdID& avxdid, R
     double v = m_pxdclusters[iclus]->getV();
     ROOT::Math::XYZVector current(u, v, 0);
 
-    //2D dist sqared
+    //2D dist squared
     double dist = (intersection - current).R();
     if (dist < mindist) {
       closest = iclus;

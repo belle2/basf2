@@ -7,30 +7,15 @@
  **************************************************************************/
 #include <gtest/gtest.h>
 
-#include <TMatrixFSym.h>
-#include <TRandom3.h>
-#include <TMath.h>
-
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/utility/ReferenceFrame.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/utilities/TestHelpers.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-
-#include <analysis/variables/Variables.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include "utilities/TestParticleFactory.h"
 using namespace std;

@@ -45,15 +45,15 @@ namespace Belle2 {
     SelectSubset<Track> m_selectedTracks; /**< selected tracks */
     SelectSubset<Track> m_notSelectedTracks; /**< not selected tracks*/
 
-    double m_minD0 = -100; /**< d0 miminum value*/
+    double m_minD0 = -100; /**< d0 minimum value*/
     double m_maxD0 = 100; /**< d0 maximum value*/
-    double m_minZ0 = -500; /**< z0 miminum value*/
+    double m_minZ0 = -500; /**< z0 minimum value*/
     double m_maxZ0 = 500; /**< z0 maximum value*/
-    int m_minNumHitsPXD = 0; /**< miminum value of PXD hits*/
-    int m_minNumHitsSVD = 0; /**< miminum value of SVD hits*/
-    int m_minNumHitsCDC = 0; /**< miminum value of CDC hits*/
-    double m_minPCM = 0; /**< miminum value of the center of mass momentum*/
-    double m_minPT = 0; /**< miminum value of the transverse momentum*/
-    double m_minPval = 0;  /**< miminum P-value of the track fit*/
+    int m_minNumHitsPXD = 0; /**< minimum value of PXD hits*/
+    int m_minNumHitsSVD = 0; /**< minimum value of SVD hits*/
+    int m_minNumHitsCDC = 0; /**< minimum value of CDC hits*/
+    double m_minPCM = 0; /**< minimum value of the center of mass momentum*/
+    double m_minPT = 0; /**< minimum value of the transverse momentum*/
+    double m_minPval = 0;  /**< minimum P-value of the track fit*/
   };
 }

@@ -6,7 +6,7 @@ Simulation: The Monte Carlo
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 20 min
+    **Length**: 15-30 min
 
     **Prerequisites**:
 
@@ -92,13 +92,13 @@ close to minutes per event due to the much higher energy.
     intend to collect for Belle II?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     You already know the cross section for :math:`B\bar{B}` events now you only
     need the planned total luminosity for Belle II.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     Multiplying 770 million by one gives us 770 million seconds which is around
     8912 days or roughly 24 years.
@@ -120,7 +120,7 @@ close to minutes per event due to the much higher energy.
     events in six months?
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     We need 55 billion seconds of CPU time, equivalent to 15.3 million hours. It
     would cost us roughly $382,000.
@@ -169,7 +169,7 @@ that the computing resources we have are not wasted.
 
 .. seealso::
 
-    You have already found the data production group confluence page.
+    You have already found the data production group XWiki page.
     If not, take another look at :ref:`the previous lesson <onlinebook_collaborative_tools>`.
     Now might be a good time to bookmark or "watch" some pages.
 

@@ -384,8 +384,8 @@ add  p Particle  D-                              -411     1869.65e-3            
 add  p Particle  D0                               421     1864.83e-3              0              0     0     0  1.2294489e-01        421
 add  p Particle  anti-D0                         -421     1864.83e-3              0              0     0     0  1.2294489e-01       -421
 * D*. The D*0 width upper limit is Gamma < 2.1 MeV (90% C. L.). The value from original EvtGen evt.pdl is used.
-add  p Particle  D*+                              413     2010.26e-3        83.4e-6         450e-3     3     2              0        413
-add  p Particle  D*-                             -413     2010.26e-3        83.4e-6         450e-3    -3     2              0       -413
+add  p Particle  D*+                              413     2010.26e-3        83.4e-6         450e-6     3     2              0        413
+add  p Particle  D*-                             -413     2010.26e-3        83.4e-6         450e-6    -3     2              0       -413
 add  p Particle  D*0                              423     2006.85e-3  6.5821023e-06          35e-6     0     2              0        423
 add  p Particle  anti-D*0                        -423     2006.85e-3  6.5821023e-06          35e-6     0     2              0       -423
 * D_0*(2300)
@@ -438,8 +438,8 @@ add  p Particle  D_s1-                         -20433      2459.5e-3  1.0000033e
 add  p Particle  D'_s1+                         10433     2535.11e-3        0.92e-3           6e-3     3     2              0      10433
 add  p Particle  D'_s1-                        -10433     2535.11e-3        0.92e-3           6e-3    -3     2              0     -10433
 * D_s2*(2573)
-add  p Particle  D_s2*+                           435      2569.1e-3        16.9e-3          80e-3     3     4              0        435
-add  p Particle  D_s2*-                          -435      2569.1e-3        16.9e-3          80e-3    -3     4              0       -435
+add  p Particle  D_s2*+                           435      2569.1e-3        16.9e-3          60e-3     3     4              0        435
+add  p Particle  D_s2*-                          -435      2569.1e-3        16.9e-3          60e-3    -3     4              0       -435
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Bottom mesons.
 * Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
@@ -452,10 +452,10 @@ add  p Particle  anti-B0                         -511     5279.65e-3            
 add  p Particle  B0H                              510     5279.65e-3              0              0     0     0  4.5538474e-01          0
 add  p Particle  B0L                              150     5279.65e-3              0              0     0     0  4.5538474e-01          0
 * B*. The B* width has not been measured; the value from original EvtGen evt.pdl is used.
-add  p Particle  B*+                              523     5324.70e-3  6.5819970e-06  1.0000000e-04     3     2              0        523
-add  p Particle  B*-                             -523     5324.70e-3  6.5819970e-06  1.0000000e-04    -3     2              0       -523
-add  p Particle  B*0                              513     5324.70e-3  6.5819970e-06  1.0000000e-04     0     2              0        513
-add  p Particle  anti-B*0                        -513     5324.70e-3  6.5819970e-06  1.0000000e-04     0     2              0       -513
+add  p Particle  B*+                              523     5324.70e-3  6.5819970e-06         6.6e-5     3     2              0        523
+add  p Particle  B*-                             -523     5324.70e-3  6.5819970e-06         6.6e-5    -3     2              0       -523
+add  p Particle  B*0                              513     5324.70e-3  6.5819970e-06         6.6e-5     0     2              0        513
+add  p Particle  anti-B*0                        -513     5324.70e-3  6.5819970e-06         6.6e-5     0     2              0       -513
 * B_1(5721) 
 add  p Particle  B_1+                           10523      5725.9e-3          31e-3  2.0000000e-01     3     2              0      10523
 add  p Particle  B_1-                          -10523      5725.9e-3          31e-3  2.0000000e-01    -3     2              0     -10523
@@ -485,8 +485,8 @@ add  p Particle  anti-B_s0                       -531     5366.88e-3            
 add  p Particle  B_s0H                            530     5366.88e-3              0              0     0     0  4.8566378e-01          0
 add  p Particle  B_s0L                            350     5366.88e-3              0              0     0     0  4.2660467e-01          0
 * The B_s*0 width is not measured. The value from original EvtGen evt.pdl is used.
-add  p Particle  B_s*0                            533      5415.4e-3  6.5821220e-06  1.0000000e-04     0     2              0        533
-add  p Particle  anti-B_s*0                      -533      5415.4e-3  6.5821220e-06  1.0000000e-04     0     2              0       -533
+add  p Particle  B_s*0                            533      5415.4e-3  6.5821220e-06         6.6e-5     0     2              0        533
+add  p Particle  anti-B_s*0                      -533      5415.4e-3  6.5821220e-06         6.6e-5     0     2              0       -533
 * The B_s0*0 is not observed. The values from original EvtGen evt.pdl are used.
 add  p Particle  B_s0*0                         10531  5.8410000e+00  1.4993444e-01  6.5000000e-02     0     0              0      10531
 add  p Particle  anti-B_s0*0                   -10531  5.8410000e+00  1.4993444e-01  6.5000000e-02     0     0              0     -10531
@@ -528,7 +528,7 @@ add  p Particle  psi(3770)                      30443      3773.7e-3        27.2
 * The chi_c1(3872) width upper limit is Gamma < 1.2 MeV (90% C. L.) in PDG 2020 data.
 * However, it was measured to be (1.39 +- 0.24 +- 0.10) MeV in arXiv:2005.13419 and
 * (0.96 +0.19 -0.18 +- 0.21) MeV in arXiv:2005.13422 (both preprints by the LHCb collaboration).
-* Although the data sets partially overlap (3 fb^{-1} from b-hadron decays and 9 fb^{-1} fron B+ -> J/psi pi+ pi- K+),
+* Although the data sets partially overlap (3 fb^{-1} from b-hadron decays and 9 fb^{-1} from B+ -> J/psi pi+ pi- K+),
 * an uncorrelated weighted average is used. It is equal to Gamma = (1.15 +- 0.19) MeV.
 add  p Particle  X_1(3872)                    9920443     3871.69e-3        1.15e-3           6e-3     0     2              0    9920443
 add  p Particle  X_2(3872)                    9910445     3871.69e-3        1.15e-3           6e-3     0     4              0    9910445
@@ -758,8 +758,8 @@ add  p Particle  Lambda_b0                       5122  5.6195000e+00            
 add  p Particle  anti-Lambda_b0                 -5122  5.6195000e+00              0              0     0     1  4.1371359e-01      -5122
 add  p Particle  Sigma_b+                        5222  5.8113000e+00  9.7000000e-03  1.0000000e-04     3     1              0       5222
 add  p Particle  anti-Sigma_b-                  -5222  5.8113000e+00  9.7000000e-03  1.0000000e-04    -3     1              0      -5222
-add  p Particle  Sigma_b0                        5212  5.8078000e+00  6.5821220e-06  1.0000000e-04     0     1              0       5212
-add  p Particle  anti-Sigma_b0                  -5212  5.8078000e+00  6.5821220e-06  1.0000000e-04     0     1              0      -5212
+add  p Particle  Sigma_b0                        5212  5.8078000e+00  6.5821220e-06         6.6e-5     0     1              0       5212
+add  p Particle  anti-Sigma_b0                  -5212  5.8078000e+00  6.5821220e-06         6.6e-5     0     1              0      -5212
 add  p Particle  Sigma_b-                        5112  5.8155000e+00  4.9000000e-03  1.0000000e-04    -3     1              0       5112
 add  p Particle  anti-Sigma_b+                  -5112  5.8155000e+00  4.9000000e-03  1.0000000e-04     3     1              0      -5112
 add  p Particle  Sigma_b*+                       5224  5.8321000e+00  1.1500000e-02              0     3     3              0       5224
@@ -772,10 +772,10 @@ add  p Particle  Xi_b0                           5232  5.7931000e+00            
 add  p Particle  anti-Xi_b0                     -5232  5.7931000e+00              0              0     0     1  4.2570529e-01      -5232
 add  p Particle  Xi_b-                           5132  5.7949000e+00              0              0    -3     1  4.2570529e-01       5132
 add  p Particle  anti-Xi_b+                     -5132  5.7949000e+00              0              0     3     1  4.2570529e-01      -5132
-add  p Particle  Xi'_b0                          5322  5.9600000e+00  6.5821220e-06  1.0000000e-04     0     1              0       5322
-add  p Particle  anti-Xi'_b0                    -5322  5.9600000e+00  6.5821220e-06  1.0000000e-04     0     1              0      -5322
-add  p Particle  Xi'_b-                          5312  5.9600000e+00  6.5821220e-06  1.0000000e-04    -3     1              0       5312
-add  p Particle  anti-Xi'_b+                    -5312  5.9600000e+00  6.5821220e-06  1.0000000e-04     3     1              0      -5312
+add  p Particle  Xi'_b0                          5322  5.9600000e+00  6.5821220e-06         6.6e-5     0     1              0       5322
+add  p Particle  anti-Xi'_b0                    -5322  5.9600000e+00  6.5821220e-06         6.6e-5     0     1              0      -5322
+add  p Particle  Xi'_b-                          5312  5.9600000e+00  6.5821220e-06         6.6e-5    -3     1              0       5312
+add  p Particle  anti-Xi'_b+                    -5312  5.9600000e+00  6.5821220e-06         6.6e-5     3     1              0      -5312
 add  p Particle  Xi_b*0                          5324  5.9700000e+00              0              0     0     3              0       5324
 add  p Particle  anti-Xi_b*0                    -5324  5.9700000e+00              0              0     0     3              0      -5324
 add  p Particle  Xi_b*-                          5314  5.9700000e+00              0              0    -3     3              0       5314

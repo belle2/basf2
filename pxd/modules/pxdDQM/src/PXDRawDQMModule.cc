@@ -7,8 +7,12 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDRawDQMModule.h>
-#include <vxd/geometry/GeoCache.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDRawAdc.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <rawdata/dataobjects/RawPXD.h>
 
+#include <vxd/geometry/GeoCache.h>
 #include <TDirectory.h>
 #include <boost/format.hpp>
 #include <string>
@@ -55,41 +59,34 @@ void PXDRawDQMModule::defineHisto()
   hrawPxdPacketSize = new TH1F("hrawPxdPacketSize", "Pxd Raw Packetsize;Words per packet", 1024, 0, 1024);
   hrawPxdHitMapAll = new TH2F("hrawPxdHitMapAll",
                               "Pxd Raw Hit Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 3700 / 50, 0, 3700, 3500 / 50, 0, 3500);
-  // ADC map not supported by DHC anymore ... deactive filling, later remove
+  // ADC map not supported by DHC anymore ... deactivate filling, later remove
   hrawPxdAdcMapAll =
     NULL;// new TH2F("hrawPxdAdcMapAll",                               "Pxd Raw Adc Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 370/*0*/, 0, 3700, 350/*0*/, 0, 3500);
 
   hrawPxdHitsCount = new TH1F("hrawPxdCount", "Pxd Raw Count ;Nr per Event", 8192, 0, 8192);
-  for (auto i = 0; i < 64; i++) {
-    auto layer = (((i >> 5) & 0x1) + 1);
-    auto ladder = ((i >> 1) & 0xF);
-    auto sensor = ((i & 0x1) + 1);
 
-    // Check if sensor exist
-    if (Belle2::VXD::GeoCache::getInstance().validSensorID(Belle2::VxdID(layer, ladder, sensor))) {
-      string s = str(format("Sensor %d:%d:%d (DHH ID %02Xh)") % layer % ladder % sensor % i);
-      string s2 = str(format("_%d.%d.%d") % layer % ladder % sensor);
+  VXD::GeoCache& vxdGeometry(GeoCache::getInstance());
+  std::vector<VxdID> sensors = vxdGeometry.getListOfSensors();
+  for (const VxdID& avxdid : sensors) {
+    const auto&  info = vxdGeometry.getSensorInfo(avxdid);
+    if (info.getType() != VXD::SensorInfoBase::PXD) continue;
+    //Only interested in PXD sensors
+    TString buff = (std::string)avxdid;
+    TString buffus = buff;
+    buffus.ReplaceAll(".", "_");
 
-      hrawPxdHitMap[i] = new TH2F(("hrawPxdHitMap" + s2).c_str(),
-                                  ("Pxd Raw Hit Map, " + s + ";column;row").c_str(), 250,
-                                  0, 250, 768, 0, 768);
-      hrawPxdChargeMap[i] = new TH2F(("hrawPxdChargeMap" + s2).c_str(),
-                                     ("Pxd Raw Charge Map, " + s + ";column;row").c_str(), 250, 0, 250, 768, 0, 768);
-      hrawPxdHitsCharge[i] = new TH1F(("hrawPxdHitsCharge" + s2).c_str(),
-                                      ("Pxd Raw Hit Charge, " + s + ";Charge").c_str(), 256, 0, 256);
-      hrawPxdHitTimeWindow[i] = new TH1F(("hrawPxdHitTimeWindow" + s2).c_str(),
-                                         ("Pxd Raw Hit Time Window (framenr*192-gate_of_hit), " + s + ";Time [a.u.]").c_str(), 2048, -256, 2048 - 256);
-      hrawPxdGateTimeWindow[i] = new TH1F(("hrawPxdGateTimeWindow" + s2).c_str(),
-                                          ("Pxd Raw Gate Time Window (framenr*192-triggergate_of_hit), " + s + ";Time [a.u.]").c_str(), 2048, -256, 2048 - 256);
-    } else {
-      hrawPxdHitMap[i] = NULL;
-      hrawPxdChargeMap[i] = NULL;
-      hrawPxdHitsCharge[i] =  NULL;
-      hrawPxdHitTimeWindow[i] = NULL;
-      hrawPxdGateTimeWindow[i] = NULL;
-    }
+    m_hrawPxdHitMap[avxdid] = new TH2F(("hrawPxdHitMap_" + buffus),
+                                       ("Pxd Raw Hit Map, " + buff + ";column;row"), 250,
+                                       0, 250, 768, 0, 768);
+    m_hrawPxdChargeMap[avxdid] = new TH2F(("hrawPxdChargeMap_" + buffus),
+                                          ("Pxd Raw Charge Map, " + buff + ";column;row"), 250, 0, 250, 768, 0, 768);
+    m_hrawPxdHitsCharge[avxdid] = new TH1F(("hrawPxdHitsCharge_" + buffus),
+                                           ("Pxd Raw Hit Charge, " + buff + ";Charge"), 256, 0, 256);
+    m_hrawPxdHitTimeWindow[avxdid] = new TH1F(("hrawPxdHitTimeWindow_" + buffus),
+                                              ("Pxd Raw Hit Time Window (framenr*192-gate_of_hit), " + buff + ";Time [a.u.]"), 2048, -256, 2048 - 256);
+    m_hrawPxdGateTimeWindow[avxdid] = new TH1F(("hrawPxdGateTimeWindow_" + buffus),
+                                               ("Pxd Raw Gate Time Window (framenr*192-triggergate_of_hit), " + buff + ";Time [a.u.]"), 2048, -256, 2048 - 256);
   }
-
   // cd back to root directory
   oldDir->cd();
 }
@@ -111,13 +108,12 @@ void PXDRawDQMModule::beginRun()
   if (hrawPxdHitsCount) hrawPxdHitsCount->Reset();
   if (hrawPxdHitMapAll) hrawPxdHitMapAll->Reset();
   if (hrawPxdAdcMapAll) hrawPxdAdcMapAll->Reset();
-  for (int i = 0; i < 64; i++) {
-    if (hrawPxdHitMap[i]) hrawPxdHitMap[i]->Reset();
-    if (hrawPxdChargeMap[i]) hrawPxdChargeMap[i]->Reset();
-    if (hrawPxdHitsCharge[i]) hrawPxdHitsCharge[i]->Reset();
-    if (hrawPxdHitTimeWindow[i]) hrawPxdHitTimeWindow[i]->Reset();
-    if (hrawPxdGateTimeWindow[i]) hrawPxdGateTimeWindow[i]->Reset();
-  }
+
+  for (auto& h : m_hrawPxdHitMap) if (h.second) h.second->Reset();
+  for (auto& h : m_hrawPxdChargeMap) if (h.second) h.second->Reset();
+  for (auto& h : m_hrawPxdHitsCharge) if (h.second) h.second->Reset();
+  for (auto& h : m_hrawPxdHitTimeWindow) if (h.second) h.second->Reset();
+  for (auto& h : m_hrawPxdGateTimeWindow) if (h.second) h.second->Reset();
 }
 
 void PXDRawDQMModule::event()
@@ -143,23 +139,18 @@ void PXDRawDQMModule::event()
       B2ERROR("No DHE found for SensorId: " << currentVxdId);
       continue;
     }
-
-    auto dhh_id = dhe->getDHEID();
     auto startGate = dhe->getTriggerGate();
 
-    if (dhh_id == 0 || dhh_id >= 64) {
-      B2ERROR("SensorId (DHH ID) out of range: " << dhh_id);
-      continue;
-    }
-    if (hrawPxdHitMap[dhh_id]) hrawPxdHitMap[dhh_id]->Fill(it.getColumn(), it.getRow());
     if (hrawPxdHitMapAll) hrawPxdHitMapAll->Fill(it.getColumn() + ladder * 300 - 200,
                                                    100 + it.getRow() + 850 * (layer + layer + sensor - 3));
-    if (hrawPxdChargeMap[dhh_id]) hrawPxdChargeMap[dhh_id]->Fill(it.getColumn(), it.getRow(), it.getCharge());
-    if (hrawPxdHitsCharge[dhh_id]) hrawPxdHitsCharge[dhh_id]->Fill(it.getCharge());
+
+    if (m_hrawPxdHitMap[currentVxdId]) m_hrawPxdHitMap[currentVxdId]->Fill(it.getColumn(), it.getRow());
+    if (m_hrawPxdChargeMap[currentVxdId]) m_hrawPxdChargeMap[currentVxdId]->Fill(it.getColumn(), it.getRow(), it.getCharge());
+    if (m_hrawPxdHitsCharge[currentVxdId]) m_hrawPxdHitsCharge[currentVxdId]->Fill(it.getCharge());
     // Is this histogram necessary? we are folding with occupancy of sensor hits here
     // Think about 1024*framenr-hit_row?
-    if (hrawPxdHitTimeWindow[dhh_id]) hrawPxdHitTimeWindow[dhh_id]->Fill(it.getFrameNr() * 192 - it.getRow() / 4);
-    if (hrawPxdGateTimeWindow[dhh_id]) hrawPxdGateTimeWindow[dhh_id]->Fill(it.getFrameNr() * 192 - startGate);
+    if (m_hrawPxdHitTimeWindow[currentVxdId]) m_hrawPxdHitTimeWindow[currentVxdId]->Fill(it.getFrameNr() * 192 - it.getRow() / 4);
+    if (m_hrawPxdGateTimeWindow[currentVxdId]) m_hrawPxdGateTimeWindow[currentVxdId]->Fill(it.getFrameNr() * 192 - startGate);
   }
 
   if (hrawPxdAdcMapAll) {

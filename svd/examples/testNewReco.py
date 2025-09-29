@@ -33,9 +33,11 @@ class SVDClustersQuickCheck(b2.Module):
     def initialize(self):
         '''define histograms'''
 
-        #: \cond Doxygen_suppress
+        #: list of test histograms
         self.test = []
+        #: another list of test histograms
         self.testNew = []
+        #: \cond Doxygen_suppress
         self.size = TH1F("cl_size", "Cluster Size", 20, 0, 20)
         self.sizeNew = TH1F("clNew_size", "New Cluster Size", 20, 0, 20)
         self.time = TH1F("cl_time", "Cluster Time", 300, -100, 200)
@@ -102,7 +104,7 @@ class SVDClustersQuickCheck(b2.Module):
         for d in clusterList:
             trueList = d.getRelationsTo('SVDTrueHits')  # SVDClustersToSVDTrueHits
             isU = 0
-            if(d.isUCluster()):
+            if (d.isUCluster()):
                 isU = 0.5
                 truePos = trueList[0].getU()
             else:
@@ -136,7 +138,7 @@ class SVDClustersQuickCheck(b2.Module):
 
             isU = 0
             trueListNew = d.getRelationsTo('SVDTrueHits')  # SVDClustersToSVDTrueHits
-            if(d.isUCluster()):
+            if (d.isUCluster()):
                 isU = 0.5
                 truePos = trueListNew[0].getU()
             else:
@@ -270,9 +272,11 @@ class SVDRecoDigitsQuickCheck(b2.Module):
     def initialize(self):
         '''define histograms'''
 
-        #: \cond Doxygen_suppress
+        #: list of test histograms
         self.test = []
+        #: another list of test histograms
         self.testNew = []
+        #: \cond Doxygen_suppress
         self.time = TH1F("rd_time", "RecoDigit Time", 300, -100, 200)
         self.timeNew = TH1F("rdNew_time", "New RecoDigit Time", 300, -100, 200)
         self.charge = TH1F("rd_charge", "RecoDigit Charge", 300, 0, 100000)
@@ -312,7 +316,7 @@ class SVDRecoDigitsQuickCheck(b2.Module):
             self.time.Fill(d.getTime())
             self.charge.Fill(d.getCharge())
             isU = 0
-            if(d.isUStrip()):
+            if (d.isUStrip()):
                 isU = 0.5
             self.test[d.getSensorID().getLayerNumber() - 3].Fill(d.getSensorID().getLadderNumber(),
                                                                  d.getSensorID().getSensorNumber() + isU)
@@ -321,7 +325,7 @@ class SVDRecoDigitsQuickCheck(b2.Module):
             self.timeNew.Fill(d.getTime())
             self.chargeNew.Fill(d.getCharge())
             isU = 0
-            if(d.isUStrip()):
+            if (d.isUStrip()):
                 isU = 0.5
             self.testNew[d.getSensorID().getLayerNumber() - 3].Fill(d.getSensorID().getLadderNumber(),
                                                                     d.getSensorID().getSensorNumber() + isU)
@@ -372,7 +376,7 @@ add_simulation(
 
 add_svd_reconstruction(main)
 for mod in main.modules():
-    if(mod.name() == "SVDSimpleClusterizer"):
+    if (mod.name() == "SVDSimpleClusterizer"):
         mod.param("timeAlgorithm", 0)
         mod.param("HeadTailSize", 3)
 
@@ -409,6 +413,6 @@ main.add_module('Progress')
 
 b2.print_path(main)
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 print(b2.statistics)

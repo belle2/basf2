@@ -72,7 +72,7 @@ else:
 add_reconstruction(main)
 
 # process events, print call statistics, and write statistics to a csv file
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)
 if args.csv is not None:
     b2.statistics.csv(args.csv)
@@ -140,6 +140,9 @@ for category in categories:
         if fraction >= 0:
             output.write(f' {fraction:.4f}')
         output.write('\n')
+
+if output is not None:
+    output.close()
 
 # fail if above limit
 sys.exit(0 if max_fraction <= 1 else 1)

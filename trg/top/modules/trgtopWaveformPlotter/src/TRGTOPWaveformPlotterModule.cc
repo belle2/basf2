@@ -20,25 +20,24 @@
 // Modeled after / heavily borrowing from GDL, GRL and ECL DQM modules
 //---------------------------------------------------------------
 #include <trg/top/modules/trgtopWaveformPlotter/TRGTOPWaveformPlotterModule.h>
-//#include <mdst/dataobjects/SoftwareTriggerResult.h>
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-#include "trg/top/dataobjects/TRGTOPTimeStampsSlot.h"
-#include "trg/top/dataobjects/TRGTOPTimeStamp.h"
+#include <trg/top/dataobjects/TRGTOPTimeStampsSlot.h>
+#include <trg/top/dataobjects/TRGTOPTimeStamp.h>
 
-#include "trg/top/dataobjects/TRGTOPWaveFormTimeStampsSlot.h"
-#include "trg/top/dataobjects/TRGTOPWaveFormTimeStamp.h"
+#include <trg/top/dataobjects/TRGTOPWaveFormTimeStampsSlot.h>
+#include <trg/top/dataobjects/TRGTOPWaveFormTimeStamp.h>
 
-#include "trg/top/dataobjects/TRGTOPSlotTiming.h"
+#include <trg/top/dataobjects/TRGTOPSlotTiming.h>
 
-#include "trg/top/dataobjects/TRGTOPTimingISimSlot.h"
+#include <trg/top/dataobjects/TRGTOPTimingISim.h>
+#include <trg/top/dataobjects/TRGTOPTimingISimSlot.h>
 
 #include <framework/datastore/RelationVector.h>
-
 #include <framework/logging/Logger.h>
-#include <boost/algorithm/string.hpp>
+
+#include <TAxis.h>
 
 #include <iostream>
 

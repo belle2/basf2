@@ -43,7 +43,7 @@ def main():
     # Create geometry
     geometry_module = path.add_module('Geometry')
 
-    # Adjust gemetry for the test beam #
+    # Adjust geometry for the test beam #
     # ################################ #
     cdc_top_geometry = False
     if cdc_top_geometry:
@@ -264,7 +264,7 @@ def main():
 
     path.add_module(harvest_cdc_cr)
 
-    # Create a harvesting module for the time of flight mc comparision
+    # Create a harvesting module for the time of flight mc comparison
     @save_pull_analysis(part_name="flight_time", groupby=[None, "incoming_arm"], outlier_z_score=5,)
     @save_tree(name="tree")
     @harvest(foreach="RecoTracks", show_results=True)
@@ -294,9 +294,6 @@ def main():
     # generate events
     basf2.print_path(path)
     basf2.process(path)
-
-    # show call statistics
-    print(basf2.statistics)
 
 
 # Helper functions #

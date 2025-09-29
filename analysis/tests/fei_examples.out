@@ -1,0 +1,141 @@
+[INFO] Steering file: analysis/tests/fei_examples.py
+TFile: B_converted_apply.root
+TTree: B0SL
+TBranch: __experiment__, 65
+TBranch: __run__, 58
+TBranch: __event__, 3
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 20
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: cosThetaBetweenParticleAndNominalB, -1.41
+TBranch: isSignalAcceptMissingNeutrino, 0
+TBranch: mcErrors, 378
+TBranch: extraInfo__bodecayModeID__bc, 4
+TBranch: extraInfo__bouniqueSignal__bc, 0
+TBranch: extraInfo__boSignalProbability__bc, 0.01637
+TTree: B0
+TBranch: __experiment__, 65
+TBranch: __run__, 58
+TBranch: __event__, 5
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 20
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: Mbc, 5.248
+TBranch: deltaE, 0.06644
+TBranch: isSignal, 0
+TBranch: mcErrors, 444
+TBranch: extraInfo__bodecayModeID__bc, 4
+TBranch: extraInfo__bouniqueSignal__bc, 0
+TBranch: extraInfo__boSignalProbability__bc, 2.052e-06
+TTree: BplusSL
+TBranch: __experiment__, 65
+TBranch: __run__, 58
+TBranch: __event__, 3
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 20
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: cosThetaBetweenParticleAndNominalB, -3.168
+TBranch: isSignalAcceptMissingNeutrino, 0
+TBranch: mcErrors, 378
+TBranch: extraInfo__bodecayModeID__bc, 2
+TBranch: extraInfo__bouniqueSignal__bc, 0
+TBranch: extraInfo__boSignalProbability__bc, 0.0187
+TTree: Bplus
+TBranch: __experiment__, 65
+TBranch: __run__, 58
+TBranch: __event__, 5
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 4
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: Mbc, 5.211
+TBranch: deltaE, -0.4393
+TBranch: isSignal, 0
+TBranch: mcErrors, 444
+TBranch: extraInfo__bodecayModeID__bc, 2
+TBranch: extraInfo__bouniqueSignal__bc, 0
+TBranch: extraInfo__boSignalProbability__bc, 2.558e-06
+TFile: B_generic_apply.root
+TTree: B0SL
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 20
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: cosThetaBetweenParticleAndNominalB, -1.363
+TBranch: isSignalAcceptMissingNeutrino, 0
+TBranch: mcErrors, 376
+TBranch: extraInfo__bodecayModeID__bc, 4
+TBranch: extraInfo__bouniqueSignal__bc, 0
+TBranch: extraInfo__boSignalProbability__bc, 0.006491
+TTree: B0
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: Mbc, 5.209
+TBranch: deltaE, -0.4692
+TBranch: isSignal, nan
+TBranch: mcErrors, 512
+TBranch: extraInfo__bodecayModeID__bc, 26
+TBranch: extraInfo__bouniqueSignal__bc, 0
+TBranch: extraInfo__boSignalProbability__bc, 9.795e-08
+TTree: BplusSL
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 20
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: cosThetaBetweenParticleAndNominalB, -1.439
+TBranch: isSignalAcceptMissingNeutrino, 0
+TBranch: mcErrors, 376
+TBranch: extraInfo__bodecayModeID__bc, 2
+TBranch: extraInfo__bouniqueSignal__bc, 0
+TBranch: extraInfo__boSignalProbability__bc, 0.002946
+TTree: Bplus
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 6
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: Mbc, 5.202
+TBranch: deltaE, -0.4281
+TBranch: isSignal, nan
+TBranch: mcErrors, 512
+TBranch: extraInfo__bodecayModeID__bc, 4
+TBranch: extraInfo__bouniqueSignal__bc, 0
+TBranch: extraInfo__boSignalProbability__bc, 1.473e-08
+TFile: B_specific_apply.root
+TTree: variables
+No entry found
+TBranch: __experiment__
+TBranch: __run__
+TBranch: __event__
+TBranch: __production__
+TBranch: __candidate__
+TBranch: __ncandidates__
+TBranch: __eventType__
+TBranch: __weight__
+TBranch: M
+TBranch: m2RecoilSignalSide
+TBranch: E

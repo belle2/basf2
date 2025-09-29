@@ -38,7 +38,7 @@ env = Belle2.Environment.Instance()
 
 # Setting just with steering file
 
-# For whether to execute the algorithm over each run invidually or to combine them together in a single plot
+# For whether to execute the algorithm over each run individually or to combine them together in a single plot
 #   often it is easier just to only pass a single file to the algorithm code instead of to use this feature
 combineRuns = True
 
@@ -55,12 +55,12 @@ for arg in sys.argv:
 
 fileNames = ['eclBhabhaTCollector.root']
 narg = len(sys.argv)
-if(narg >= 2):
+if (narg >= 2):
     fileNames = glob(sys.argv[1])
 algo.setInputFileNames(fileNames)
 
 basePath = ""
-if(narg >= 3):
+if (narg >= 3):
     basePath = sys.argv[2] + "/"
     print("basePath = ", basePath)
 
@@ -133,7 +133,7 @@ else:
 
 
 print("Summary of possible calibration completion status values:")
-print("      c_OK             = Finished successfuly             = 0 in Python")
+print("      c_OK             = Finished successfully            = 0 in Python")
 print("      c_Iterate,       = Needs iteration                  = 1 in Python")
 print("      c_NotEnoughData, = Needs more data                  = 2 in Python")
 print("      c_Failure,       = Failed                           = 3 in Python")

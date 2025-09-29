@@ -21,6 +21,8 @@ os.environ['PGUSER'] = 'g0db'
 # Add the necessary global tag
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
+b2.set_random_seed("B_converted_apply")
+
 # Create path
 path = b2.create_path()
 
@@ -46,7 +48,7 @@ particles = fei.get_default_channels()
 
 # Set up FEI configuration specifying the FEI prefix of the Belle legacy training
 configuration = fei.config.FeiConfiguration(prefix='FEI_B2BII_light-2012-minos',
-                                            training=False, monitor=False, cache=0)
+                                            training=False, monitor=False)
 
 # Get FEI path
 feistate = fei.get_path(particles, configuration)
@@ -60,47 +62,32 @@ path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatchin
 path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
 path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
 
+commonVariables = ['mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)']
+genericVariables = ['Mbc', 'deltaE', 'isSignal'] + commonVariables
+semiLeptonicVariables = ['cosThetaBetweenParticleAndNominalB', 'isSignalAcceptMissingNeutrino'] + commonVariables
+
 # Store tag-side variables of interest.
 ma.variablesToNtuple('B+:generic',
-                     ['Mbc',
-                      'deltaE',
-                      'mcErrors',
-                      'extraInfo(decayModeID)',
-                      'extraInfo(uniqueSignal)',
-                      'extraInfo(SignalProbability)',
-                      'isSignal'],
+                     genericVariables,
+                     treename='Bplus',
                      filename='B_charged_hadronic.root',
                      path=path)
 ma.variablesToNtuple('B+:semileptonic',
-                     ['cosThetaBetweenParticleAndNominalB',
-                      'mcErrors',
-                      'extraInfo(decayModeID)',
-                      'extraInfo(uniqueSignal)',
-                      'extraInfo(SignalProbability)',
-                      'isSignalAcceptMissingNeutrino'],
+                     semiLeptonicVariables,
+                     treename='BplusSL',
                      filename='B_charged_semileptonic.root',
                      path=path)
 
 ma.variablesToNtuple('B0:generic',
-                     ['Mbc',
-                      'deltaE',
-                      'mcErrors',
-                      'extraInfo(decayModeID)',
-                      'extraInfo(uniqueSignal)',
-                      'extraInfo(SignalProbability)',
-                      'isSignal'],
+                     genericVariables,
+                     treename='B0',
                      filename='B_mixed_hadronic.root',
                      path=path)
 ma.variablesToNtuple('B0:semileptonic',
-                     ['cosThetaBetweenParticleAndNominalB',
-                      'mcErrors',
-                      'extraInfo(decayModeID)',
-                      'extraInfo(uniqueSignal)',
-                      'extraInfo(SignalProbability)',
-                      'isSignalAcceptMissingNeutrino'],
+                     semiLeptonicVariables,
+                     treename='B0SL',
                      filename='B_mixed_semileptonic.root',
                      path=path)
 
 # Process 100 events
-b2.process(path, max_event=100)
-print(b2.statistics)
+b2.process(path, max_event=100, calculateStatistics=True)

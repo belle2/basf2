@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef USERINFO_H_
-#define USERINFO_H_
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -115,5 +114,3 @@ namespace Belle2 {
 
   } // end namespace Simulation
 } // end namespace Belle2
-
-#endif /* USERINFO_H_ */

@@ -7,10 +7,10 @@
  **************************************************************************/
 
 #include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
-#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 
 //root
 #include <Math/ProbFunc.h>
+#include <TMatrix.h>
 
 #include <rave/TransientTrackKinematicParticle.h>
 #include <rave/impl/RaveBase/Converters/interface/RaveStreamers.h>
@@ -20,8 +20,7 @@
 #include <rave/KinematicConstraintBuilder.h>
 #include <rave/VertexFactory.h>
 
-
-//#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/Particle.h>
 
 //c++ std lib
 using std::string;
@@ -136,7 +135,7 @@ int RaveKinematicVertexFitter::fit()
   }
   int nOfVertices = -100;
   if (m_useBeamSpot == true) {
-    const B2Vector3D& bsPos = RaveSetup::getRawInstance()->m_beamSpot;
+    const ROOT::Math::XYZVector& bsPos = RaveSetup::getRawInstance()->m_beamSpot;
     const TMatrixDSym& bsCov = RaveSetup::getRawInstance()->m_beamSpotCov;
     const rave::Covariance3D bsCovRave(bsCov(0, 0), bsCov(0, 1), bsCov(0, 2), bsCov(1, 1), bsCov(1, 2), bsCov(2, 2));
     RaveSetup::getRawInstance()->m_raveVertexFactory->setBeamSpot(rave::Ellipsoid3D(rave::Point3D(bsPos.X(), bsPos.Y(), bsPos.Z()),
@@ -331,7 +330,7 @@ void RaveKinematicVertexFitter::updateDaughters()
 
   m_fittedResult.topParticle();
   std::vector< rave::KinematicParticle > rDau = m_fittedResult.daughterParticles();
-  std::vector<Belle2::Particle*> bDau = m_belleDaughters;
+  std::vector<Particle*> bDau = m_belleDaughters;
   if (rDau.size() == bDau.size()) {
     for (unsigned ii = 0; ii < bDau.size(); ii++) {
       rave::Vector7D fittedState;

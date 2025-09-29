@@ -38,7 +38,7 @@ main.add_module("FullSim", StorePairConversions=True, PairConversionsEnergyCut=1
 main.add_module("RootOutput", outputFileName="EvtGenSimNoBkgYesPairConversions.root")
 
 # run it
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

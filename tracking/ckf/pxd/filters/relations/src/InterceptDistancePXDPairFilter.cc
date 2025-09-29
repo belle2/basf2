@@ -18,6 +18,8 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
+#include <cmath>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -32,15 +34,15 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
 
   B2ASSERT("You have filled the wrong states into this!", toStateCache.isHitState);
 
-  const unsigned int layerDiff = abs(fromStateCache.geoLayer - toStateCache.geoLayer);
+  const unsigned int layerDiff = std::abs(fromStateCache.geoLayer - toStateCache.geoLayer);
 
   float phiDiff = deltaPhi(fromStateCache.phi, toStateCache.phi);
   float etaDiff = deltaEtaFromTheta(fromStateCache.theta, toStateCache.theta);
 
   // fromState and toState on the same layer, i.e. hits in ladder overlap region
   if (layerDiff == 0) {
-    if (abs(phiDiff) < static_cast<float>(m_param_PhiOverlapHitHitCut) and
-        abs(etaDiff) < static_cast<float>(m_param_EtaOverlapHitHitCut)) {
+    if (std::abs(phiDiff) < static_cast<float>(m_param_PhiOverlapHitHitCut) and
+        std::abs(etaDiff) < static_cast<float>(m_param_EtaOverlapHitHitCut)) {
       return 1.0;
     }
     return NAN;
@@ -65,8 +67,8 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
         const auto& interceptGlobalPoint = sensorInfo.pointToGlobal({intercept.getCoorU(), intercept.getCoorV(), 0});
         phiDiff = deltaPhi(interceptGlobalPoint.Phi(), toStateCache.phi);
         etaDiff = deltaEtaFromTheta(interceptGlobalPoint.Theta(), toStateCache.theta);
-        if (abs(phiDiff) < static_cast<float>(m_param_PhiInterceptToHitCut)*float(layerDiff)*scaleInvPt and
-            abs(etaDiff) < static_cast<float>(m_param_EtaInterceptToHitCut)*float(layerDiff)*scaleInvPt) {
+        if (std::abs(phiDiff) < static_cast<float>(m_param_PhiInterceptToHitCut)*float(layerDiff)*scaleInvPt and
+            std::abs(etaDiff) < static_cast<float>(m_param_EtaInterceptToHitCut)*float(layerDiff)*scaleInvPt) {
           return 1.0;
         }
       }
@@ -79,8 +81,8 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
       const float dZ = fromStateCache.perp / tan(fromStateCache.theta) - toStateCache.perp / tan(toStateCache.theta);
       const float cosThetaSeedhit = dZ / sqrt(dR * dR + dZ * dZ);
       etaDiff = convertThetaToEta(cosThetaSeedhit) - convertThetaToEta(cos(fromStateCache.thetaSeed));
-      if (abs(phiDiff) < static_cast<float>(m_param_PhiRecoTrackToHitCut)*float(layerDiff)*scaleInvPt and
-          abs(etaDiff) < static_cast<float>(m_param_EtaRecoTrackToHitCut)*float(layerDiff)*scaleInvPt) {
+      if (std::abs(phiDiff) < static_cast<float>(m_param_PhiRecoTrackToHitCut)*float(layerDiff)*scaleInvPt and
+          std::abs(etaDiff) < static_cast<float>(m_param_EtaRecoTrackToHitCut)*float(layerDiff)*scaleInvPt) {
         return 1.0;
       }
       return NAN;
@@ -88,8 +90,8 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
   }
 
   // hit-hit relation from Layer-2 to Layer-1
-  if (abs(phiDiff) < static_cast<float>(m_param_PhiHitHitCut) and
-      abs(etaDiff) < static_cast<float>(m_param_EtaHitHitCut)) {
+  if (std::abs(phiDiff) < static_cast<float>(m_param_PhiHitHitCut) and
+      std::abs(etaDiff) < static_cast<float>(m_param_EtaHitHitCut)) {
     return 1.0;
   }
 
@@ -100,7 +102,7 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
 void InterceptDistancePXDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ptThresholdTrackToHitCut"), m_param_PtThresholdTrackToHitCut,
-                                "Treshold on pT to apply inverse pT scale on cut value.",
+                                "Threshold on pT to apply inverse pT scale on cut value.",
                                 m_param_PtThresholdTrackToHitCut);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiInterceptToHitCut"), m_param_PhiInterceptToHitCut,
                                 "Cut in phi for the difference between PXDIntercept from RecoTrack on the same layer and current hit-based state.",
@@ -141,7 +143,7 @@ float InterceptDistancePXDPairFilter::deltaEtaFromTheta(float theta1, float thet
 
 float InterceptDistancePXDPairFilter::convertThetaToEta(float cosTheta)
 {
-  if (abs(cosTheta) < 1) return -0.5 * log((1.0 - cosTheta) / (1.0 + cosTheta));
+  if (std::abs(cosTheta) < 1) return -0.5 * log((1.0 - cosTheta) / (1.0 + cosTheta));
   else {
     B2INFO("AngularDistancePXDPairFilter::cosTheta >=1 : " << cosTheta);
     return 0;

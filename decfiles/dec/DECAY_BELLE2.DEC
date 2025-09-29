@@ -7,7 +7,7 @@
 #   Light meson decays (rho, eta, phi, f'_0...) updated to PDG 2015
 #   New Dalitz modes for eta and eta'
 #
-# Updates listed below are tabulated on https://confluence.desy.de/display/BI/EvtGen+Generator+Task-Force
+# Updates listed below are tabulated on https://xwiki.desy.de/xwiki/rest/p/4d75f
 # See individual pull requests for details.
 #
 # December 2017, B. Oberhof (benjamin.oberhof@lnf.infn.it)
@@ -84,7 +84,7 @@
 #   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
 #
 # December 2021, V. Bertacchi (bertacchi@cppm.in2p3.fr)
-#   fixed a_1+ and a_10 BR decay table to restore isospin simmetry and reimplement the resonant contribution (KK*)
+#   fixed a_1+ and a_10 BR decay table to restore isospin symmetry and reimplement the resonant contribution (KK*)
 #   rescaled B->DKK* BR to take into account of resonant contribution B->D(a1->KK*), preserving the BR(NR+Res)= Belle measurement (https://doi.org/10.1016/S0370-2693(02)02373-0)
 #   https://gitlab.desy.de/belle2/software/basf2/-/merge_requests/581
 #
@@ -403,7 +403,7 @@ Decay B0
 0.000210000   D-  pi+  pi-  mu+  nu_mu                     PHSP;
 0.000140000   anti-D0  pi-  pi0  mu+  nu_mu                PHSP;
 0.000140000   D-  pi0  pi0  mu+  nu_mu                     PHSP;
-# B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+# B->D*pipilnu ; modes with pi0 are inferred assuming isospin symmetry
 0.001050000   D*-  pi+  pi-  mu+  nu_mu                    PHSP;
 0.000700000   anti-D*0  pi-  pi0  mu+  nu_mu               PHSP;
 0.000700000   D*-  pi0  pi0  mu+  nu_mu                    PHSP;
@@ -826,9 +826,9 @@ Decay B0
 
 # b -> u l nu
 #
-# pi: FF values from HFLAV 2016. [BF update PDG2023]
-0.000150000   pi-  e+  nu_e                                BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
-0.000150000   pi-  mu+  nu_mu                              BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
+# pi: FF values from HFLAV 2023. [BF update PDG2023]
+0.000150000   pi-  e+  nu_e                                BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[BCL update - AN 07/2025]
+0.000150000   pi-  mu+  nu_mu                              BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[BCL update - AN 07/2025]
 
 # rho, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
 # fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
@@ -842,8 +842,8 @@ Decay B0
 0.001701000   Xu-  e+  nu_e                                VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30  3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 0.001701000   Xu-  mu+  nu_mu                              VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000096150   pi-  tau+  nu_tau                            BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BCL model update - KMA 06/2022] #[BF update - AN 11/2023]
-0.000157290   rho-  tau+  nu_tau                           BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (arXiv:2104.05739). #[BCL model update - KMA 06/2022] #[BF update - AN 11/2023]
+0.000096150   pi-  tau+  nu_tau                            BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - AN 11/2023] #[BCL update - AN 07/2025]
+0.000157290   rho-  tau+  nu_tau                           BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (arXiv:2104.05739). #[BF update - AN 11/2023]
 0.000090000   a_1-  tau+  nu_tau                           ISGW2;
 0.000008000   b_1-  tau+  nu_tau                           ISGW2;
 0.000008000   a_0-  tau+  nu_tau                           ISGW2;
@@ -2213,7 +2213,7 @@ Decay anti-B0
 0.000210000   D+  pi+  pi-  mu-  anti-nu_mu                PHSP;
 0.000140000   D0  pi+  pi0  mu-  anti-nu_mu                PHSP;
 0.000140000   D+  pi0  pi0  mu-  anti-nu_mu                PHSP;
-# B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry.
+# B->D*pipilnu ; modes with pi0 are inferred assuming isospin symmetry.
 0.001050000   D*+  pi+  pi-  mu-  anti-nu_mu               PHSP;
 0.000700000   D*0  pi+  pi0  mu-  anti-nu_mu               PHSP;
 0.000700000   D*+  pi0  pi0  mu-  anti-nu_mu               PHSP;
@@ -2636,9 +2636,9 @@ Decay anti-B0
 
 # b -> u l nu
 #
-# pi: FF values from HFLAV 2016. [BF update PDG2023]
-0.000150000   pi+  e-  anti-nu_e                           BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
-0.000150000   pi+  mu-  anti-nu_mu                         BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
+# pi: FF values from HFLAV 2023. [BF update PDG2023]
+0.000150000   pi+  e-  anti-nu_e                           BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[BCL update - AN 07/2025]
+0.000150000   pi+  mu-  anti-nu_mu                         BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[BCL update - AN 07/2025]
 
 # rho, omega: FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288).
 # fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
@@ -2652,7 +2652,7 @@ Decay anti-B0
 0.001701000   Xu+  e-  anti-nu_e                           VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 0.001701000   Xu+  mu-  anti-nu_mu                         VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000096150   pi+  tau-  anti-nu_tau                       BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BCL model update - KMA 06/2022] # [BF update - AN 11/2023]
+0.000096150   pi+  tau-  anti-nu_tau                       BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - AN 11/2023] #[BCL update - AN 07/2025]
 0.000157290   rho+  tau-  anti-nu_tau                      BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (arXiv:2104.05739). #[BCL model update - KMA 06/2022]  # [BF update - AN 11/2023]
 0.000090000   a_1+  tau-  anti-nu_tau                      ISGW2;
 0.000008000   b_1+  tau-  anti-nu_tau                      ISGW2;
@@ -4362,9 +4362,9 @@ Decay B+
 
 # b -> u l nu
 #
-# pi0: FF values from HFLAV 2016.
-0.000078000   pi0  e+  nu_e                                BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
-0.000078000   pi0  mu+  nu_mu                              BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
+# pi0: FF values from HFLAV 2023.
+0.000078000   pi0  e+  nu_e                                BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[BCL update - AN 07/2025]
+0.000078000   pi0  mu+  nu_mu                              BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[BCL update - AN 07/2025]
 
 0.000035000   eta  e+  nu_e                                ISGW2; #[PDG2023]
 0.000035000   eta  mu+  nu_mu                              ISGW2; #[PDG2023]
@@ -4385,9 +4385,9 @@ Decay B+
 0.001724000   Xu0  e+  nu_e                                VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 0.001724000   Xu0  mu+  nu_mu                              VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
-0.000049998   pi0  tau+  nu_tau                            BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BCL model update - KMA 06/2022] #[BF update - AN 11/2023]
+0.000049998   pi0  tau+  nu_tau                            BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - AN 11/2023] #[BCL update - AN 07/2025]
 0.000084530   rho0  tau+  nu_tau                           BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (arXiv:2104.05739). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
-0.000064617   omega  tau+  nu_tau                          BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (arXiv:2104.05739). #[BCL model update - KMA 06/2022] #[BF update - AN 11/2023]
+0.000064617   omega  tau+  nu_tau                          BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (arXiv:2104.05739). #[BF update - AN 11/2023]
 0.000012000   eta  tau+  nu_tau                            ISGW2;
 0.000018000   eta'  tau+  nu_tau                           ISGW2;
 0.000046000   a_10  tau+  nu_tau                           ISGW2;
@@ -5907,9 +5907,9 @@ Decay B-
 
 # b -> u l nu
 #
-# pi: FF values from HFLAV 2016.
-0.000078000   pi0  e-  anti-nu_e                           BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
-0.000078000   pi0  mu-  anti-nu_mu                         BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
+# pi: FF values from HFLAV 2023.
+0.000078000   pi0  e-  anti-nu_e                           BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[BCL update - AN 07/2025]
+0.000078000   pi0  mu-  anti-nu_mu                         BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[BCL update - AN 07/2025]
 
 0.000035000   eta  e-  anti-nu_e                           ISGW2; #[PDG2023]
 0.000035000   eta  mu-  anti-nu_mu                         ISGW2; #[PDG2023]
@@ -5930,9 +5930,9 @@ Decay B-
 0.001724000   Xu0  e-  anti-nu_e                           VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 0.001724000   Xu0  mu-  anti-nu_mu                         VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
-0.000049998   pi0  tau-  anti-nu_tau                       BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BCL model update - KMA 06/2022] #[BF update - AN 11/2023]
+0.000049998   pi0  tau-  anti-nu_tau                       BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - AN 11/2023] #[BCL update - AN 07/2025]
 0.000084530   rho0  tau-  anti-nu_tau                      BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (arXiv:2104.05739). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
-0.000064617   omega  tau-  anti-nu_tau                     BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (arXiv:2104.05739). #[BCL model update - KMA 06/2022] #[BF update - AN 11/2023]
+0.000064617   omega  tau-  anti-nu_tau                     BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (arXiv:2104.05739). #[BF update - AN 11/2023]
 0.000012000   eta  tau-  anti-nu_tau                       ISGW2;
 0.000018000   eta'  tau-  anti-nu_tau                      ISGW2;
 0.000046000   a_10  tau-  anti-nu_tau                      ISGW2;
@@ -9809,7 +9809,30 @@ Decay K_S0
 0.000344328   pi-  e+  nu_e                                PHSP;
 Enddecay
 
-# K_L0 is decayed in GEANT
+Decay K_L0
+0.202464226   pi+  e-  nu_e                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.202464226   pi-  e+  nu_e                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.135033299   pi+  mu-  nu_mu                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.135033299   pi-  mu+  nu_mu                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000025738   pi0  pi+  e-  nu_e                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000025738   pi0  pi-  e+  nu_e                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000006205   pi+  e-  nu_e  e+  e-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000006205   pi-  e+  nu_e  e+  e-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.194795855   pi0  pi0  pi0                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.125231606   pi+  pi-  pi0                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.001880711   pi+  e-  nu_e  gamma                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.001880711   pi-  e+  nu_e  gamma                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000277023   pi+  mu-  nu_mu  gamma                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000277023   pi-  mu+  nu_mu  gamma                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000040995   pi+  pi-  gamma                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000001262   pi0  gamma  gamma                            PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000000016   pi0  gamma  e+  e-                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000545653   gamma  gamma                                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000009265   e+  e-  gamma                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000000355   mu+  mu-  gamma                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000000584   e+  e-  gamma  gamma                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000000007   mu+  mu-  gamma  gamma                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
+Enddecay
 
 # K0
 Decay K0
@@ -10107,7 +10130,7 @@ Decay eta' # Edited by U. Tamponi, October 2016
 0.293511000   rho0  gamma                                  SVP_HELAMP  1.0 0.0 1.0 0.0;
 0.027500000   omega  gamma                                 SVP_HELAMP  1.0 0.0 1.0 0.0;
 0.022200000   gamma  gamma                                 PHSP;
-0.001680000   pi0  pi0  pi0                                ETA_PI0DALITZ -0.5; # PDG reporst -0.61 +- 0.08, outside of the physical boudaries. Forced back to the closest maeningful value
+0.001680000   pi0  pi0  pi0                                ETA_PI0DALITZ -0.5; # PDG reporst -0.61 +- 0.08, outside of the physical boundaries. Forced back to the closest maeningful value
 0.000109000   gamma  mu-  mu+                              PHSP;
 0.003600000   pi+  pi-  pi0                                PHSP;
 0.002400000   pi+  pi-  e+  e-                             PHSP;
@@ -10181,7 +10204,7 @@ CDecay a_0-
 # a_1's
 #
 # - Without a dedicated dalitz, but given the known rho pi dominance, the decay si modeled with incoherent sum of
-#   paritial amplitudes. Interference effects are significant but neglected here
+#   partial amplitudes. Interference effects are significant but neglected here
 # - Partial amplitudes from CLEO, Phys.Rev. D61 (2000) 01200.
 
 Decay a_10 #  Edited by U. Tamponi (March 2016), and V. Bertacchi (December 2021)
@@ -10263,7 +10286,7 @@ Enddecay
 #  The most complete and coherent study seems to be Phys.Atom.Nucl. 65 (2002) 1545-1552, Yad.Fiz. 65 (2002) 1583-1590, whose
 #  results are used here.
 #  The dominant 4 pi decay has actually sizable contribution by 2-body intermediate states (sigma sigma, rho rho...), whose
-#  amplitudes are not well measured. Therefore, PHSP is used in lack of realiable alternative models
+#  amplitudes are not well measured. Therefore, PHSP is used in lack of reliable alternative models
 
 Decay f'_0 # Edited by U. Tamponi, October 2016
 0.135700000   pi+  pi-                                     PHSP;
@@ -10328,7 +10351,7 @@ Decay f_2
 Enddecay
 
 # The dominant 4 pi decay has actually sizable contribution by 2-body intermediate states (sigma sigma, rho rho...), whose
-# amplitudes are not well measured. Therefore, PHSP is used in lack of realiable alternative models
+# amplitudes are not well measured. Therefore, PHSP is used in lack of reliable alternative models
 # Checked by U. Tamponi, october 2016. No changes are needed
 
 Decay f_0(1500)
@@ -10426,7 +10449,7 @@ Decay phi(1680) # Edited by U. Tamponi October 2016
 0.015000000   K+  K-                                       VSS;
 Enddecay
 
-# Combining the informations from Phys.Rev. D73 (2006) 052003 and Z.Phys. C56 (1992) 15-20
+# Combining the information from Phys.Rev. D73 (2006) 052003 and Z.Phys. C56 (1992) 15-20
 # one can estimate the ratios  BF(rho pi) : BF(omega pi pi) : BF(eta pi) = 2:2:0.6
 Decay omega(1650) # Edited by U. Tamponi October 2016
 0.145000000   rho+  pi-                                    PHSP;
@@ -11790,7 +11813,7 @@ Decay Lambda_c+
 0.002430000   p+  pi+  pi+  pi-  pi-                       PHSP;  # [PDG2021]
 0.001690000   p+  pi+  pi-  pi0  pi0                       PHSP;  # [Isospin model]
 0.001160000   p+  pi0  pi0  pi0  pi0                       PHSP;  # [Isospin model]
-0.000530000   p+  K+  K-                                   PHSP;  # [PDG2021 in addtion to pphi mode]
+0.000530000   p+  K+  K-                                   PHSP;  # [PDG2021 in addition to pphi mode]
 0.004860000   n0  pi+  pi0                                 PHSP;  # [Isospin model]
 0.002430000   n0  pi+  pi0  pi+  pi-                       PHSP;  # [Isospin model]
 0.001690000   n0  pi+  pi0  pi0  pi0                       PHSP;  # [Isospin model]
@@ -13303,31 +13326,6 @@ Decay anti-Omega_cc*-
   0.25 anti-u   d   anti-s     anti-cs_1    PYTHIA 42;
   0.05 anti-u   s   anti-s     anti-cs_0    PYTHIA 42;
   0.03 anti-u   s   anti-s     anti-cs_1    PYTHIA 42;
-Enddecay
-
-Decay K_L0
-0.202464226   pi+  e-  nu_e                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.202464226   pi-  e+  nu_e                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.135033299   pi+  mu-  nu_mu                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.135033299   pi-  mu+  nu_mu                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000025738   pi0  pi+  e-  nu_e                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000025738   pi0  pi-  e+  nu_e                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000006205   pi+  e-  nu_e  e+  e-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000006205   pi-  e+  nu_e  e+  e-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.194795855   pi0  pi0  pi0                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.125231606   pi+  pi-  pi0                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001880711   pi+  e-  nu_e  gamma                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001880711   pi-  e+  nu_e  gamma                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000277023   pi+  mu-  nu_mu  gamma                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000277023   pi-  mu+  nu_mu  gamma                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000040995   pi+  pi-  gamma                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000001262   pi0  gamma  gamma                            PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000016   pi0  gamma  e+  e-                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000545653   gamma  gamma                                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000009265   e+  e-  gamma                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000355   mu+  mu-  gamma                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000584   e+  e-  gamma  gamma                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000007   mu+  mu-  gamma  gamma                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
 
 End

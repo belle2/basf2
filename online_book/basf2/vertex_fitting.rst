@@ -6,9 +6,7 @@ Vertex fitting
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 15 min
-
-    **Exercises**: 25 min
+    **Length**: 30-45 min
 
     **Prerequisites**:
 
@@ -69,12 +67,12 @@ observables. The fits we are going to perform are of two main types:
      Locate the documentation for vertex fitting functions and find KFit.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Use the search bar.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      You can find it here: `Vertex`.
 
@@ -95,13 +93,13 @@ study).
      vertex?
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      It can't be the :math:`B` itself: out of its daughters, neither the
      :math:`J/\Psi` nor the :math:`K_s` are charged tracks.
 
 .. admonition:: Answer
-     :class: toggle solution
+     :class: dropdown solution
 
      You must fit the :math:`J/\Psi \to e^+e^-` vertex. The :math:`J/\Psi` is
      short-lived and therefore its vertex is a good approximation of the
@@ -116,13 +114,13 @@ study).
      Include the true vertex position from MC for comparison.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Look up the variable collections for vertices. Don't forget to import the
      vertex module!
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      .. code-block:: python
 
@@ -171,7 +169,7 @@ ultimately excluding them from the fit.
      Locate the ``TagV`` documentation.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      It's in the same page as ``KFit``.
 
@@ -181,7 +179,7 @@ ultimately excluding them from the fit.
      By default, TagV only uses tracks with PXD hits. Why?
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      Those tracks provide the best resolution close to the interaction point. As
      a bonus, this selection rejects tracks from displaced vertices.
@@ -193,14 +191,14 @@ ultimately excluding them from the fit.
      Call the ``TagV`` module and save the output.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      In order to reinforce the fit, an IP constraint is applied to the TagV. If
      the signal is fully reconstructed, this condition can be relaxed along the
      signal :math:`B` flight direction.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      .. code-block:: python
 
@@ -222,7 +220,7 @@ results.
    Run the steering file.
 
 .. admonition:: Solution
-     :class: solution toggle
+     :class: dropdown solution
 
      Your steering file should look like this:
 
@@ -232,11 +230,11 @@ results.
 You can now plot some relevant vertex variables. In general, the choice would
 depend on what you need for your analysis. A few examples would include:
 
-   * Vertex position in various coordinates, such as dz and dr.
-   * P-value of the fit.
-   * Resolution of the vertex fit (:math:`\sigma(x)/x`) where x is each of the
-     above variables.
-   * Pull (:math:`(x-x(MC)/\sigma(x)`).
+* Vertex position in various coordinates, such as dz and dr.
+* P-value of the fit.
+* Resolution of the vertex fit (:math:`\sigma(x)/x`) where x is each of the
+  above variables.
+* Pull (:math:`(x-x(MC)/\sigma(x)`).
 
 As an exercise we will focus on the first two.
 
@@ -247,14 +245,14 @@ As an exercise we will focus on the first two.
      Plot the p-value distribution of the fit.
 
 .. admonition:: Hint: Variable names
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      You can either take another look at the variable collections that you
      included above, or you load your dataframe and then take a look at its
      columns ``print(list(df.columns))``.
 
 .. admonition:: Hint: Plot ranges
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Plotting was already discussed in :ref:`onlinebook_roe`. For the sake of this
      exercise, remember we already set the minimum p-value of our fits to 0, so
@@ -265,7 +263,7 @@ As an exercise we will focus on the first two.
 
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: vertex/vertex_plots.py
         :language: python        

@@ -28,5 +28,5 @@ add_reconstruction(main)
 
 main.add_module('AsyncDisplay', discardOldEvents=True)
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

@@ -51,10 +51,10 @@ namespace Belle2 {
 
   private:
 
-    /** Structure holiding sets of ingored strips for all sensors. */
+    /** Structure holiding sets of ignored strips for all sensors. */
     std::unordered_map<unsigned short, IgnoredStripsSet> m_Map;
 
-    /** Set of ingored strips for the most currently queried sensor */
+    /** Set of ignored strips for the most currently queried sensor */
     IgnoredStripsSet m_lastIgnored;
 
     /** The most currently queried sensor number */

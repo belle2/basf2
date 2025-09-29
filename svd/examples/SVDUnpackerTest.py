@@ -10,7 +10,7 @@
 
 ##############################################################################
 #
-# This is an example steering file to run the SVD Unpacke.
+# This is an example steering file to run the SVD Unpacker.
 # It decodes a RawSVD object (from COPPER) and produce a list of SVDDigit
 # according to the xml map of the sensors (currently missing)
 #
@@ -53,7 +53,7 @@ main.add_module(geometry)
 main.add_module(svdUnpacker)
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

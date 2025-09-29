@@ -53,7 +53,7 @@ main.add_module('ParticleGun',
                 xVertexParams=[0.0],
                 yVertexParams=[0.0],
                 zVertexParams=[0.0],
-                # and the same vertex vor all particles
+                # and the same vertex for all particles
                 independentVertices=False)
 
 # Simulate our awesome detector
@@ -69,6 +69,3 @@ main.add_module('RootOutput', outputFileName='awesome-simulation.root')
 
 # Now lets do the processing of the awesome events
 b2.process(main)
-
-# Print call statistics of our awesome event processing
-print(b2.statistics)

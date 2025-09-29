@@ -11,7 +11,7 @@
 """
 <header>
   <input>PartGunChargedStableGenSim.root</input>
-  <output>ChargedPID_Validation.root,Detector_ChargedPID_Validation.root</output>
+  <output>Global_ChargedPID_Validation.root,Detector_ChargedPID_Validation.root</output>
   <contact>Sviatoslav Bilokin (sviatoslav.bilokin@desy.de)</contact>
   <description>
   Check the PID efficiency and fake rates
@@ -87,6 +87,7 @@ def run_b2analysis():
     """
     Function to produce the validation ntuples via basf2.
     """
+    basf2.set_random_seed(1337)
     main = basf2.Path()
     inputMdst(INPUT_FILENAME, path=main)
     add_reconstruction(path=main)
@@ -151,7 +152,6 @@ def run_b2analysis():
 
     main.add_module('Progress')
     basf2.process(main)
-    print(basf2.statistics)
 
 
 def add_global_plots():

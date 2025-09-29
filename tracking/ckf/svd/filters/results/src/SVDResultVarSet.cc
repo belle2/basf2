@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/svd/filters/results/SVDResultVarSet.h>
+#include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -44,7 +45,7 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
   for (const SpacePoint* spacePoint : spacePoints) {
     layerUsed[spacePoint->getVxdID().getLayerNumber()] = true;
   }
-  // Counting the occurences of 'true' rather counts the number of layers used,
+  // Counting the occurrences of 'true' rather counts the number of layers used,
   // not the number of holes. But renaming this variable would break the MVA-based result filter.
   // Could be renamed if the weight file for the MVA result filter was retrained afterwards and
   // the new weight file was then uploaded to the DB and would replace the current one.

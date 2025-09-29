@@ -17,10 +17,9 @@
 #include <framework/logging/Logger.h>
 
 // dataobjects
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <mdst/dataobjects/MCParticle.h>
-
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;

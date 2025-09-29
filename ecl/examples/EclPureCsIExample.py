@@ -11,7 +11,7 @@
 """Pure CsI simulation for the ECL
 
 Input:
-    No file is reguired
+    No file is required
 
 Output:
     Mdst file named 'Ecl_Pure.mdst.root'
@@ -160,5 +160,5 @@ mainPath.add_module(outputFile)
 
 # Process the events and print call statistics
 mainPath.add_module('Progress')
-b2.process(mainPath)
+b2.process(mainPath, calculateStatistics=True)
 print(b2.statistics)

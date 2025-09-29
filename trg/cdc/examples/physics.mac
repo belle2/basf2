@@ -26,7 +26,7 @@
 #/process/inactivate eIoni
 #/process/inactivate eBrem
 
-#/porcess/inactivate ionIoni
+#/process/inactivate ionIoni
 #for every
 #/process/inactivate Decay
 #/process/inactivate Transportation

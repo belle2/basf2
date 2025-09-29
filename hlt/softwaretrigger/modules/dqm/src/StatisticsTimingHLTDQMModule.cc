@@ -17,6 +17,7 @@
 #include <TDirectory.h>
 
 #include <TH1F.h>
+#include <TH2F.h>
 
 #include <fstream>
 
@@ -111,6 +112,57 @@ void StatisticsTimingHLTDQMModule::defineHisto()
                                            HLTUnits::max_hlt_units + 1);
     m_processesPerUnitHistogram->SetXTitle("HLT unit number");
   }
+  m_processingTimePassiveVeto = new TH1F("processingTimePassiveVeto", "Processing Time of events passing passive veto [ms]",
+                                         m_processingTimeNBins, 0,
+                                         m_processingTimeMax);
+  m_processingTimePassiveVeto->StatOverflows(true);
+  m_processingTimeNotPassiveVeto = new TH1F("processingTimeNotPassiveVeto", "Processing Time of events not passing passive veto [ms]",
+                                            m_processingTimeNBins, 0,
+                                            m_processingTimeMax);
+  m_processingTimeNotPassiveVeto->StatOverflows(true);
+
+  m_procTimeVsnSVDShaperDigitsPassiveVeto = new TH2F("procTimeVsnSVDShaperDigitsPassiveVeto",
+                                                     "Processing time [ms] vs nSVDShaperDigits of events passing passive veto",
+                                                     m_nSVDShaperDigitsNBins, 0, m_nSVDShaperDigitsMax,
+                                                     m_processingTimeNBins, 0, m_processingTimeMax);
+  m_procTimeVsnSVDShaperDigitsPassiveVeto->StatOverflows(true);
+  m_procTimeVsnSVDShaperDigitsPassiveVeto->SetXTitle("nSVDShaperDigits");
+  m_procTimeVsnSVDShaperDigitsPassiveVeto->SetYTitle("Processing time [ms]");
+  m_procTimeVsnSVDShaperDigitsNotPassiveVeto = new TH2F("procTimeVsnSVDShaperDigitsNotPassiveVeto",
+                                                        "Processing time [ms] vs nSVDShaperDigits of events not passing passive veto",
+                                                        m_nSVDShaperDigitsNBins, 0, m_nSVDShaperDigitsMax,
+                                                        m_processingTimeNBins, 0, m_processingTimeMax);
+  m_procTimeVsnSVDShaperDigitsNotPassiveVeto->StatOverflows(true);
+  m_procTimeVsnSVDShaperDigitsNotPassiveVeto->SetXTitle("nSVDShaperDigits");
+  m_procTimeVsnSVDShaperDigitsNotPassiveVeto->SetYTitle("Processing time [ms]");
+  m_procTimeVsnCDCHitsPassiveVeto = new TH2F("procTimeVsnCDCHitsPassiveVeto",
+                                             "Processing time [ms] vs nCDCHits of events passing passive veto",
+                                             m_nCDCHitsNBins, 0, m_nCDCHitsMax,
+                                             m_processingTimeNBins, 0, m_processingTimeMax);
+  m_procTimeVsnCDCHitsPassiveVeto->StatOverflows(true);
+  m_procTimeVsnCDCHitsPassiveVeto->SetXTitle("nCDCHits");
+  m_procTimeVsnCDCHitsPassiveVeto->SetYTitle("Processing time [ms]");
+  m_procTimeVsnCDCHitsNotPassiveVeto = new TH2F("procTimeVsnCDCHitsNotPassiveVeto",
+                                                "Processing time [ms] vs nCDCHits of events not passing passive veto",
+                                                m_nCDCHitsNBins, 0, m_nCDCHitsMax,
+                                                m_processingTimeNBins, 0, m_processingTimeMax);
+  m_procTimeVsnCDCHitsNotPassiveVeto->StatOverflows(true);
+  m_procTimeVsnCDCHitsNotPassiveVeto->SetXTitle("nCDCHits");
+  m_procTimeVsnCDCHitsNotPassiveVeto->SetYTitle("Processing time [ms]");
+  m_procTimeVsnECLDigitsPassiveVeto = new TH2F("procTimeVsnECLDigitsPassiveVeto",
+                                               "Processing time [ms] vs nECLDigits of events passing passive veto",
+                                               m_nECLDigitsNBins, 0, m_nECLDigitsMax,
+                                               m_processingTimeNBins, 0, m_processingTimeMax);
+  m_procTimeVsnECLDigitsPassiveVeto->StatOverflows(true);
+  m_procTimeVsnECLDigitsPassiveVeto->SetXTitle("nECLDigits");
+  m_procTimeVsnECLDigitsPassiveVeto->SetYTitle("Processing time [ms]");
+  m_procTimeVsnECLDigitsNotPassiveVeto = new TH2F("procTimeVsnECLDigitsNotPassiveVeto",
+                                                  "Processing time [ms] vs nECLDigits of events not passing passive veto",
+                                                  m_nECLDigitsNBins, 0, m_nECLDigitsMax,
+                                                  m_processingTimeNBins, 0, m_processingTimeMax);
+  m_procTimeVsnECLDigitsNotPassiveVeto->StatOverflows(true);
+  m_procTimeVsnECLDigitsNotPassiveVeto->SetXTitle("nECLDigits");
+  m_procTimeVsnECLDigitsNotPassiveVeto->SetYTitle("Processing time [ms]");
 
   if (oldDirectory) {
     oldDirectory->cd();
@@ -120,17 +172,35 @@ void StatisticsTimingHLTDQMModule::defineHisto()
 
 void StatisticsTimingHLTDQMModule::initialize()
 {
+  m_trgSummary.isOptional();
+  m_svdShaperDigits.isOptional();
+  m_cdcHits.isOptional();
+  m_eclDigits.isOptional();
+
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
   if (m_param_create_hlt_unit_histograms) {
-    std::ifstream file;
-    file.open(HLTUnits::hlt_unit_file);
-    if (file.good()) {
-      std::string host;
-      getline(file, host);
-      m_hlt_unit = atoi(host.substr(3, 2).c_str());
-      file.close();
+    // Read the HLT unit's hostname straight from the HLT worker
+    FILE* pipe = popen("hostname -d", "r");
+    if (pipe) {
+      char buffer[128];
+      std::string host = "";
+
+      while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        host += buffer;
+      }
+
+      pclose(pipe);
+
+      // Trim space and new line
+      host.erase(std::remove_if(host.begin(), host.end(), ::isspace), host.end());
+
+      if (host.rfind("hlt", 0) == 0 && host.length() == 5) {
+        m_hlt_unit = std::atoi(host.substr(3, 2).c_str());
+      } else {
+        B2WARNING("HLT unit number not found");
+      }
     } else {
       B2WARNING("HLT unit number not found");
     }
@@ -191,7 +261,6 @@ void StatisticsTimingHLTDQMModule::event()
     processingTimeMean += moduleStatistics.getTimeMean(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
   }
   m_processingTimeHistogram->Fill(processingTimeSum - m_lastProcessingTimeSum);
-  m_lastProcessingTimeSum = processingTimeSum;
 
   const ModuleStatistics& fullStatistics = stats->getGlobal();
   const double fullTimeSum = fullStatistics.getTimeSum(ModuleStatistics::EStatisticCounters::c_Event) / Unit::ms;
@@ -216,6 +285,32 @@ void StatisticsTimingHLTDQMModule::event()
       m_fullMemoryPerUnitHistograms[m_hlt_unit]->Fill(fullMemorySum);
     }
   }
+
+  const uint32_t nCDCHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
+  const uint32_t nSVDShaperDigits = m_svdShaperDigits.isOptional() ? m_svdShaperDigits.getEntries() : 0;
+  const uint32_t nECLDigits = m_eclDigits.isOptional() ? m_eclDigits.getEntries() : 0;
+  if (!m_trgSummary.isValid()) {
+    return;
+  }
+  try {
+    if (m_trgSummary->testInput("passive_veto") == 0) { // These events would stay even with just passive veto
+      m_processingTimePassiveVeto->Fill(processingTimeSum - m_lastProcessingTimeSum);
+
+      m_procTimeVsnSVDShaperDigitsPassiveVeto->Fill(nSVDShaperDigits, processingTimeSum - m_lastProcessingTimeSum);
+      m_procTimeVsnCDCHitsPassiveVeto->Fill(nCDCHits, processingTimeSum - m_lastProcessingTimeSum);
+      m_procTimeVsnECLDigitsPassiveVeto->Fill(nECLDigits, processingTimeSum - m_lastProcessingTimeSum);
+    } else {
+      m_processingTimeNotPassiveVeto->Fill(processingTimeSum - m_lastProcessingTimeSum);
+
+      m_procTimeVsnSVDShaperDigitsNotPassiveVeto->Fill(nSVDShaperDigits, processingTimeSum - m_lastProcessingTimeSum);
+      m_procTimeVsnCDCHitsNotPassiveVeto->Fill(nCDCHits, processingTimeSum - m_lastProcessingTimeSum);
+      m_procTimeVsnECLDigitsNotPassiveVeto->Fill(nECLDigits, processingTimeSum - m_lastProcessingTimeSum);
+    }
+  } catch (const std::exception&) {
+    return;
+  }
+
+  m_lastProcessingTimeSum = processingTimeSum;
 }
 
 void StatisticsTimingHLTDQMModule::beginRun()
@@ -246,5 +341,14 @@ void StatisticsTimingHLTDQMModule::beginRun()
 
     m_processesPerUnitHistogram->Fill(m_hlt_unit);
   }
+  m_processingTimePassiveVeto->Reset();
+  m_processingTimeNotPassiveVeto->Reset();
+  m_procTimeVsnSVDShaperDigitsPassiveVeto->Reset();
+  m_procTimeVsnSVDShaperDigitsNotPassiveVeto->Reset();
+  m_procTimeVsnCDCHitsPassiveVeto->Reset();
+  m_procTimeVsnCDCHitsNotPassiveVeto->Reset();
+  m_procTimeVsnECLDigitsPassiveVeto->Reset();
+  m_procTimeVsnECLDigitsNotPassiveVeto->Reset();
+
 }
 

@@ -42,6 +42,7 @@ from docutils.statemachine import StringList
 from basf2domain import Basf2Domain
 from basf2 import list_available_modules, register_module
 from sphinx.domains.std import StandardDomain
+import xml.etree.ElementTree as ET
 
 
 def parse_with_titles(state, content):
@@ -106,6 +107,8 @@ class ModuleListDirective(Directive):
 
     def show_module(self, module, library):
         description = module.description().splitlines()
+        for i, line in enumerate(description):
+            description[i] = line.replace('|release|', self.state.document.settings.env.app.config.release)
         # pretend to be the autodoc extension to let other events process
         # the doc string. Enables Google/Numpy docstrings as well as a bit
         # of doxygen docstring conversion we have
@@ -130,9 +133,9 @@ class ModuleListDirective(Directive):
                 dest += [f"    * **{p.name}** *({p.type}{default})*"]
                 dest += param_desc
 
-            if(required_params):
+            if (required_params):
                 description += [":Required Parameters:", "    "] + required_params
-            if(optional_params):
+            if (optional_params):
                 description += [":Parameters:", "    "] + optional_params
 
         if "io-plots" in self.options:
@@ -161,7 +164,7 @@ class ModuleListDirective(Directive):
         # modules found in a given library)
         if "library" in self.options:
             lib = self.options["library"].strip()
-            all_modules = [e for e in all_modules if os.path.basenam(e[1]) == lib]
+            all_modules = [e for e in all_modules if os.path.basename(e[1]) == lib]
 
         # see if we have to forward noindex
         self.noindex = ["    :noindex:"] if "noindex" in self.options else []
@@ -182,6 +185,95 @@ class ModuleListDirective(Directive):
         return all_nodes
 
 
+def doxygen_file_page(filename: str) -> str:
+    base, ext = os.path.splitext(os.path.basename(filename))
+    if ext.startswith("."):
+        ext = ext[1:]
+    return f"{base}_8{ext}_source.html"
+
+
+def doxygen_source_link(location_elem):
+    """
+    Given a <location> element from Doxygen XML,
+    build html page name and anchor
+    """
+    file_path = location_elem.attrib['file']
+    line = int(location_elem.attrib['line'])
+
+    page = doxygen_file_page(file_path)
+    anchor = f"#l{line:05d}"
+
+    return page + anchor
+
+
+def build_doxygen_anchor_map(xml_dir):
+    """
+    Parse Doxygen XML files and build mapping:
+       qualifiedname -> "File_8ext_source.html#lNNNNN"
+    If no <location> element is available, fall back to anchorfile#anchor.
+    xml_dir: path to doxygen/xml (must contain index.xml)
+    Returns: dict { "VarName": "classFoo_1_1Bar.html#a1234abcd" }
+    """
+    anchors = {}
+
+    # parse index to know what compound XMLs to check
+    index_path = os.path.join(xml_dir, "index.xml")
+    if not os.path.exists(index_path):
+        return anchors
+    tree = ET.parse(index_path)
+    root = tree.getroot()
+
+    for comp in root.findall("compound"):
+        refid = comp.attrib["refid"]
+        compound_file = os.path.join(xml_dir, f"{refid}.xml")
+        if not os.path.exists(compound_file):
+            continue
+
+        ctree = ET.parse(compound_file)
+        croot = ctree.getroot()
+
+        for member in croot.findall(".//memberdef"):
+            kind = member.attrib.get("kind")
+            if kind not in ("function", "variable"):  # limit to things we care about
+                continue
+
+            name = member.findtext("name")
+            qualified = member.findtext("qualifiedname")
+            if qualified and not qualified.startswith("Belle2::Variable::"):
+                continue
+            key = qualified or name
+
+            href = None
+            location = member.find("location")
+
+            # If a location exists, build "_source.html#lNNNNN" link
+            if location is not None and "file" in location.attrib and "line" in location.attrib:
+                href = doxygen_source_link(location)
+
+            # Otherwise fall back to anchorfile + anchor
+            if href is None:
+                anchor_file = member.findtext("anchorfile")
+                anchor_id = member.findtext("anchor")
+                if anchor_file and anchor_id:
+                    href = f"{anchor_file}#{anchor_id}"
+
+            # Skip members that don't look like real variables (avoid REGISTER_VARIABLE macro noise)
+            definition = member.findtext("definition") or ""
+            if definition.startswith("REGISTER_VARIABLE"):
+                continue
+
+            if href:
+                # Prefer header declarations/class members, but overwrite if key unseen
+                if key not in anchors:
+                    anchors[key] = href
+                else:
+                    # Heuristic: prefer .cc_source.html links over generic anchor ones
+                    if "_source.html" in href and "_source.html" not in anchors[key]:
+                        anchors[key] = href
+
+    return anchors
+
+
 #: \cond Doxygen_suppress
 class VariableListDirective(Directive):
     has_content = False
@@ -191,13 +283,14 @@ class VariableListDirective(Directive):
         "regex-filter": directives.unchanged,
         "description-regex-filter": directives.unchanged,
         "noindex": directives.flag,
+        "filename": directives.unchanged,
     }
 #: \endcond
 
     def run(self):
         from ROOT import Belle2
         manager = Belle2.Variable.Manager.Instance()
-        self.noindex = ["    :noindex:"] if "noindex" in self.options else []
+        self.noindex = ["   :noindex:"] if "noindex" in self.options else []
         all_variables = []
         explicit_list = None
         regex_filter = None
@@ -216,31 +309,41 @@ class VariableListDirective(Directive):
                 continue
             if regex_filter and not regex_filter.match(var.name):
                 continue
-            if desc_regex_filter and not desc_regex_filter.match(var.description):
+            if desc_regex_filter and not desc_regex_filter.match(str(var.description)):
                 continue
             all_variables.append(var)
 
         all_nodes = []
         env = self.state.document.settings.env
+        baseurl = env.app.config.basf2_doxygen_baseurl
+        anchor_map = getattr(env.app.env, "b2_anchor_map", {})
         for var in sorted(all_variables, key=lambda x: x.name):
 
             # for overloaded variables, we might have to flag noindex in the
             # variable description so also check for that
             index = self.noindex
+            desc = str(var.description)
+            desc = textwrap.dedent(desc).strip("\n")
             if ":noindex:" in var.description:
-                index = ["    :noindex:"]
-                var.description = var.description.replace(":noindex:", "")
+                index = ["   :noindex:"]
+                desc = desc.replace(":noindex:", "")
 
-            docstring = var.description.splitlines()
+            docstring = desc.splitlines()
             # pretend to be the autodoc extension to let other events process
             # the doc string. Enables Google/Numpy docstrings as well as a bit
             # of doxygen docstring conversion we have
             env.app.emit('autodoc-process-docstring', "b2:variable", var.name, var, None, docstring)
 
             description = [f".. b2:variable:: {var.name}"] + index + [""]
-            description += ["    " + e for e in docstring]
+            qualifiedName = f"Belle2::Variable::{var.name}"
+            qualifiedFunctionName = f"Belle2::Variable::{var.functionName}"
+            key = qualifiedName if qualifiedName in anchor_map else qualifiedFunctionName
+            if key in anchor_map:
+                link = f"{baseurl}{anchor_map[key]}"
+                description.insert(1, f"   :source: {link}")
+            description += ["   " + e for e in docstring]
             if "group" not in self.options:
-                description += ["", f"    :Group: {var.group}"]
+                description += ["", f"   :Group: {var.group}"]
 
             all_nodes += parse_with_titles(self.state, description)
 
@@ -282,6 +385,51 @@ def gitlab_issue_role(role, rawtext, text, lineno, inliner, options=None, conten
     return [nodes.reference(rawtext, text=text, refuri=url)], []
 
 
+def doxygen_role(role, rawtext, text, lineno, inliner, options=None, content=None):
+    if content is None:
+        content = []
+    if options is None:
+        options = {}
+    release_version = inliner.document.settings.env.app.config.release
+    match = re.match(r'(.+?)<(.+?)>', text)
+    if match:
+        display_text, url_text = match.groups()
+    else:
+        display_text = text
+        url_text = text
+    if "html#" in url_text:
+        url = f"https://software.belle2.org/{release_version}/doxygen/{url_text}"
+    else:
+        url = f"https://software.belle2.org/{release_version}/doxygen/{url_text}.html"
+
+    return [nodes.reference(rawsource=rawtext, text=display_text, refuri=url)], []
+
+
+def sphinx_role(role, rawtext, text, lineno, inliner, options=None, content=None):
+    if content is None:
+        content = []
+    if options is None:
+        options = {}
+    release_version = inliner.document.settings.env.app.config.release
+    match = re.match(r'(.+?)<(.+?)>', text)
+    if match:
+        display_text, url_text = match.groups()
+    else:
+        display_text = text
+        url_text = text
+    if "html#" in url_text:
+        url = f"https://software.belle2.org/{release_version}/sphinx/{url_text}"
+    else:
+        url = f"https://software.belle2.org/{release_version}/sphinx/{url_text}.html"
+
+    return [nodes.reference(rawsource=rawtext, text=display_text, refuri=url)], []
+
+
+def load_doxygen_anchors(app):
+    xml_dir = app.config.basf2_doxygen_xml_dir
+    app.env.b2_anchor_map = build_doxygen_anchor_map(xml_dir)
+
+
 def setup(app):
     import basf2
     basf2.logging.log_level = basf2.LogLevel.WARNING
@@ -289,16 +437,21 @@ def setup(app):
     app.add_config_value("basf2_repository", "", True)
     app.add_config_value("basf2_commitid", "", True)
     app.add_config_value("basf2_issues", "", True)
+    app.add_config_value("basf2_doxygen_baseurl", "", "env")
+    app.add_config_value("basf2_doxygen_xml_dir", None, "env")
     app.add_domain(Basf2Domain)
     app.add_directive("b2-modules", ModuleListDirective)
     app.add_directive("b2-variables", VariableListDirective)
     app.add_directive("docstring", RenderDocstring)
     app.add_role("issue", gitlab_issue_role)
+    app.add_role("doxygen", doxygen_role)
+    app.add_role("sphinx", sphinx_role)
     app.connect('html-page-context', html_page_context)
+    app.connect("builder-inited", load_doxygen_anchors)
 
     # Sadly sphinx does not seem to add labels to custom indices ... :/
     StandardDomain.initial_data["labels"]["b2-modindex"] = ("b2-modindex", "", "basf2 Module Index")
     StandardDomain.initial_data["labels"]["b2-varindex"] = ("b2-varindex", "", "basf2 Variable Index")
     StandardDomain.initial_data["anonlabels"]["b2-modindex"] = ("b2-modindex", "")
     StandardDomain.initial_data["anonlabels"]["b2-varindex"] = ("b2-varindex", "")
-    return {'version': 0.2}
+    return {'version': 0.3}

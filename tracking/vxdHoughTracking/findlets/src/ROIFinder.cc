@@ -6,6 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/vxdHoughTracking/findlets/ROIFinder.h>
+#include <tracking/dataobjects/ROIid.h>
+#include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/vxdHoughTracking/findlets/RawTrackCandCleaner.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
@@ -14,7 +16,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParamList.h>
 #include <framework/geometry/BFieldManager.h>
-#include <framework/geometry/B2Vector3.h>
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -35,7 +36,7 @@ void ROIFinder::exposeParameters(ModuleParamList* moduleParamList, const std::st
   Super::exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "calculateROI"), m_calculateROI,
-                                "Calculate PXDIntercepts and ROIs in this findlet based on a simple circle extrapolation (r-phi) and straigh line extrapolation (z, theta)?",
+                                "Calculate PXDIntercepts and ROIs in this findlet based on a simple circle extrapolation (r-phi) and straight line extrapolation (z, theta)?",
                                 m_calculateROI);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storePXDInterceptsName"), m_storePXDInterceptsName,

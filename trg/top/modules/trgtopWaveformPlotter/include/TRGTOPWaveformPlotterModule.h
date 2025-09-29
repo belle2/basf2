@@ -15,32 +15,15 @@
 //---------------------------------------------------------------
 // Description : DQM module for TRGTOP
 //---------------------------------------------------------------
-#ifndef TRGTOPWAVEFORMPLOTTERMODULE_h
-#define TRGTOPWAVEFORMPLOTTERMODULE_h
+
+#pragma once
 
 #include <framework/core/Module.h>
-
-#include <vector>
-
-//#include <TFile.h>
-//#include <TDirectory.h>
 
 #include <TCanvas.h>
 #include <TGraph.h>
 #include <TMultiGraph.h>
-#include <TAxis.h>
-//#include <TLegend.h>
 #include <TPaveText.h>
-
-//#include <TTree.h>
-//#include <TH1I.h>
-//#include <TH2I.h>
-//#include <TH1D.h>
-
-//#include <framework/core/HistoModule.h>
-
-#include <string>
-#include <algorithm>
 
 #define NUMBER_OF_TOP_SLOTS 16
 #define MAX_NUMBER_OF_CLOCK_CYCLES 384
@@ -52,7 +35,7 @@ namespace Belle2 {
   class TRGTOPWaveformPlotterModule  : public Module {
 
   public:
-    //! Costructor
+    //! Constructor
     TRGTOPWaveformPlotterModule();
 
     //! Destructor
@@ -134,5 +117,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif

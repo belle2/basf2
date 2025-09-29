@@ -8,18 +8,15 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/PXDIntercept.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/geometry/B2Vector3.h>
-
-#include <string>
-#include <vector>
 
 namespace Belle2 {
   class ModuleParamList;
   class SpacePointTrackCand;
+  class ROIid;
+  class PXDIntercept;
+  class QualityEstimatorBase;
 
   namespace vxdHoughTracking {
 
@@ -34,7 +31,7 @@ namespace Belle2 {
       /// Constructor for adding the subfindlets
       ROIFinder();
 
-      /// Default desctructor
+      /// Default destructor
       ~ROIFinder();
 
       /// Expose the parameters of the sub findlets.
@@ -131,10 +128,10 @@ namespace Belle2 {
       //  Constants used during extrapolation to PXD and ROI calculation
       // ATTENTION: hard coded values taken and derived from pxd/data/PXD-Components.xml
       /// Shift of the center of the active area of each sensor in a ladder of layer 1
-      /// For use of mhp_z > (lengh/-2)+shiftZ &&  mhp_z < (lengh/2)+shiftZ
+      /// For use of mhp_z > (length/-2)+shiftZ &&  mhp_z < (length/2)+shiftZ
       const double c_centerZShiftLayer1[2] = {3.68255, -0.88255};
       /// Shift of the center of the active area of each sensor in a ladder of layer 2
-      /// For use of mhp_z > (lengh/-2)+shiftZ &&  mhp_z < (lengh/2)+shiftZ
+      /// For use of mhp_z > (length/-2)+shiftZ &&  mhp_z < (length/2)+shiftZ
       const double c_centerZShiftLayer2[2] = {5.01455, -1.21455};
       /// PXD is shifted to create the windmill structure.
       /// Minimum y coordinate if x-axis is perpendicular to the sensor:
@@ -158,9 +155,9 @@ namespace Belle2 {
       double m_bFieldZ = 1.5;
 
 
-      /// B2Vector3D actually contining the BeamSpot position. This will be used as the starting point of the extrapolation.
+      /// B2Vector3D actually containing the BeamSpot position. This will be used as the starting point of the extrapolation.
       B2Vector3D m_BeamSpotPosition;
-      /// B2Vector3D actually contining the BeamSpot position error.
+      /// B2Vector3D actually containing the BeamSpot position error.
       B2Vector3D m_BeamSpotPositionError;
 
     };

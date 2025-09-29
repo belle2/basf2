@@ -20,5 +20,6 @@
 #pragma link C++ class Belle2::MVA::PythonOptions-;
 #pragma link C++ class Belle2::MVA::TrivialOptions-;
 #pragma link C++ class Belle2::MVA::ReweighterOptions-;
+#pragma link C++ class Belle2::MVA::ONNXOptions-;
 
 #endif

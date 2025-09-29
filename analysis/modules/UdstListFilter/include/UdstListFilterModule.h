@@ -11,20 +11,18 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>
 
-
 // framework - DataStore
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // DataObjects
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/V0.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 namespace Belle2 {

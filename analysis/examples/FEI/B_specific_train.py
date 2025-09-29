@@ -10,7 +10,7 @@
 
 # Steering file to train the specific FEI on Belle II MC, but it can be also easily adapted for converted Belle MC.
 # This steering file is called several times (so-called stages) during the training process of the FEI.
-# For reference see Confluence and Thomas Keck's PhD thesis.
+# For reference see XWiki and Thomas Keck's PhD thesis.
 #
 # Please adapt for your signal channel. Note that a large amount of MC is needed to train the specific FEI.
 # I usually use 100 million of signal events for each final state, mixed and charged MC.
@@ -93,7 +93,7 @@ belle_particles = fei.get_default_channels(KLong=False,
                                            specific=True)
 
 # Get FEI path
-configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=True, monitor=False, cache=-1)
+configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=True, monitor=False)
 
 
 # Add FEI path to the path to be processed

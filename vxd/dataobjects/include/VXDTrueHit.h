@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef VXD_DATAOBJECTS_VXDTRUEHIT_H
-#define VXD_DATAOBJECTS_VXDTRUEHIT_H
 
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/RelationsObject.h>
@@ -33,9 +31,9 @@ namespace Belle2 {
 
   public:
     /** Default constructor for ROOT IO */
-    VXDTrueHit(): RelationsObject(), m_sensorID(0), m_positionEntry(),
+    VXDTrueHit(): RelationsObject(), m_positionEntry(),
       m_positionMidPoint(), m_positionExit(), m_momentumEntry(),
-      m_momentumMidPoint(), m_momentumExit(), m_energyDep(0), m_globalTime(0)
+      m_momentumMidPoint(), m_momentumExit(), m_energyDep(0), m_globalTime(0), m_sensorID(0)
     {}
 
     /** Constructor
@@ -52,7 +50,7 @@ namespace Belle2 {
     VXDTrueHit(
       VxdID sensorID, float* posEntry, float* posMidPoint, float* posExit,
       float* momEntry, float* momMidPoint, float* momExit, float energyDep, float globalTime):
-      RelationsObject(), m_sensorID(sensorID), m_energyDep(energyDep), m_globalTime(globalTime)
+      RelationsObject(), m_energyDep(energyDep), m_globalTime(globalTime), m_sensorID(sensorID)
     {
       std::copy_n(posEntry, 3, m_positionEntry);
       std::copy_n(posMidPoint, 3, m_positionMidPoint);
@@ -95,14 +93,12 @@ namespace Belle2 {
     /** Return momentum at the endpoint of the track.*/
     ROOT::Math::XYZVector getExitMomentum() const { return ROOT::Math::XYZVector(m_momentumExit[0], m_momentumExit[1], m_momentumExit[2]); }
 
-    /** Shift the TrueHit in time (for backgorund mixing)
+    /** Shift the TrueHit in time (for background mixing)
      * @param delta The value of the time shift.
      */
     virtual void shiftInTime(float delta) { m_globalTime += delta; }
 
   protected:
-    /** ID of the sensor */
-    int m_sensorID;
     /** local coordinates of the start of the track inside the volume */
     float m_positionEntry[3];
     /** local coordinates of the midpoint of the track inside the volume */
@@ -119,10 +115,10 @@ namespace Belle2 {
     float m_energyDep;
     /** time when the midpoint of the track was reached */
     float m_globalTime;
+    /** ID of the sensor */
+    int m_sensorID;
 
-    ClassDef(VXDTrueHit, 6)
+    ClassDef(VXDTrueHit, 7)
   };
 
 } // end namespace Belle2
-
-#endif

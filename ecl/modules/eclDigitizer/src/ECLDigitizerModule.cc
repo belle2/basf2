@@ -312,7 +312,7 @@ void ECLDigitizerModule::shapeSignals()
   if (m_inter) {
     // ionisation energy in Si is I = 3.6x10^-6 MeV for electron-hole pair
     // 5000 pairs in the diode per 1 MeV deposited in the crystal attached to the diode
-    // conversion factor to get equvalent energy deposition in the crystal to sum up it with deposition in crystal
+    // conversion factor to get equivalent energy deposition in the crystal to sum up it with deposition in crystal
     const double diodeEdep2crystalEdep = E2GeV * (1 / (5000 * 3.6e-6));
     for (const auto& hit : m_eclDiodeHits) {
       int cellId = hit.getCellId(); // 1 .. 8736
@@ -350,10 +350,10 @@ void ECLDigitizerModule::shapeSignals()
 void ECLDigitizerModule::makeElectronicNoiseAndPedestal(int J, int* FitA)
 {
   const EclConfiguration& ec = EclConfiguration::get();
-  float z[ec.m_nsmp], AdcNoise[ec.m_nsmp]; // buffers with electronic noise
+  std::vector<float> z(ec.m_nsmp), AdcNoise(ec.m_nsmp); // buffers with electronic noise
   // Noise generation
   for (int i = 0; i < ec.m_nsmp; i++) z[i] = gRandom->Gaus(0, 1);
-  m_noise[m_tbl[J].inoise].generateCorrelatedNoise(z, AdcNoise);
+  m_noise[m_tbl[J].inoise].generateCorrelatedNoise(z.data(), AdcNoise.data());
   for (int i = 0; i < ec.m_nsmp; i++) FitA[i] = 20 * AdcNoise[i] + 3000;
 }
 
@@ -366,16 +366,16 @@ void ECLDigitizerModule::makeWaveforms()
   if (comp == nullptr)
     B2FATAL("Unknown compression algorithm: " << m_compAlgo);
 
-  int FitA[ec.m_nsmp]; // buffer for the waveform fitter
+  std::vector<int> FitA(ec.m_nsmp); // buffer for the waveform fitter
   // loop over entire calorimeter
   for (int j = 0; j < ec.m_nch; j++) {
     adccounts_t& a = m_adc[j];
-    makeElectronicNoiseAndPedestal(j, FitA);
+    makeElectronicNoiseAndPedestal(j, FitA.data());
     for (int  i = 0; i < ec.m_nsmp; i++) {
       int A = 20000 * a.c[i] + FitA[i];
       FitA[i] = max(0, min(A, (1 << 18) - 1));
     }
-    comp->compress(out, FitA);
+    comp->compress(out, FitA.data());
   }
   out.resize();
 
@@ -411,7 +411,7 @@ void ECLDigitizerModule::event()
     comp = selectAlgo(compAlgo & 0x7f);
     if (comp == nullptr)
       B2FATAL("Unknown compression algorithm: " << compAlgo);
-    isTrigTime = compAlgo >> 7; // crate trigger times are stored and retrived
+    isTrigTime = compAlgo >> 7; // crate trigger times are stored and retrieved
     if (isTrigTime) {
       for (int i = 0; i < ECL::ECL_CRATES; i++) {
         unsigned char t = out.getNBits(7); // [0..72)
@@ -440,7 +440,7 @@ void ECLDigitizerModule::event()
   // dump to a disk, read from the disk to test before real data
   if (m_waveformMaker) { makeWaveforms(); return; }
 
-  int FitA[ec.m_nsmp]; // buffer for the waveform fitter
+  std::vector<int> FitA(ec.m_nsmp); // buffer for the waveform fitter
 
   // loop over entire calorimeter
   for (int j = 0; j < ec.m_nch; j++) {
@@ -456,11 +456,11 @@ void ECLDigitizerModule::event()
     // if background waveform is here there is no need to generate
     // electronic noise since it is already in the waveform
     if (isBGOverlay) {
-      comp->uncompress(out, FitA);
+      comp->uncompress(out, FitA.data());
     } else {
       // Signal amplitude should be above 100 keV
       if (a.total < 0.0001) continue;
-      makeElectronicNoiseAndPedestal(j, FitA);
+      makeElectronicNoiseAndPedestal(j, FitA.data());
     }
 
     for (int i = 0; i < ec.m_nsmp; i++) {
@@ -476,7 +476,7 @@ void ECLDigitizerModule::event()
     int id = m_eclMapper.getCrateID(j + 1) - 1; // 0 .. 51
     int ttrig = 2 * m_ttime[id];
 
-    shapeFitterWrapper(j, FitA, ttrig, energyFit, tFit, qualityFit, chi);
+    shapeFitterWrapper(j, FitA.data(), ttrig, energyFit, tFit, qualityFit, chi);
 
     if (energyFit > m_ADCThreshold) {
       int CellId = j + 1;
@@ -486,14 +486,14 @@ void ECLDigitizerModule::event()
         //only save waveforms above ADC threshold
         const auto eclDsp = m_eclDsps.appendNew();
         eclDsp->setCellId(CellId);
-        eclDsp->setDspA(FitA);
+        eclDsp->setDspA(FitA.data());
       }
 
       // only store extra MC info if requested and above threshold
       if (m_storeDspWithExtraMCInfo and  a.totalDep >= m_DspWithExtraMCInfoThreshold) {
         const auto eclDspWithExtraMCInfo = m_eclDspsWithExtraMCInfo.appendNew();
         eclDspWithExtraMCInfo->setCellId(CellId);
-        eclDspWithExtraMCInfo->setDspA(FitA);
+        eclDspWithExtraMCInfo->setDspA(FitA.data());
         eclDspWithExtraMCInfo->setEnergyDep(a.totalDep);
         eclDspWithExtraMCInfo->setHadronEnergyDep(a.totalHadronDep);
         eclDspWithExtraMCInfo->setFlightTime(a.flighttime);
@@ -611,7 +611,7 @@ void ECLDigitizerModule::readDSPDB()
     for (int i = 0; i < ncellId; ++i)
       eclWaveformDataTable[cellId[i] - 1] = j;
   }
-  B2DEBUG(150, "ECLDigitizer: " << tree->GetEntries() << " sets of wave form covariance matricies will be used.");
+  B2DEBUG(150, "ECLDigitizer: " << tree->GetEntries() << " sets of wave form covariance matrices will be used.");
 
   ECLWFAlgoParams* algo = new ECLWFAlgoParams;
   tree2->SetBranchAddress("Algopars", &algo);
@@ -651,7 +651,7 @@ void ECLDigitizerModule::readDSPDB()
     }
   }
   if (noise) delete noise;
-  B2DEBUG(150, "ECLDigitizer: " << eclWFAlgoParams.size() << " noise matricies were loaded.");
+  B2DEBUG(150, "ECLDigitizer: " << eclWFAlgoParams.size() << " noise matrices were loaded.");
 
   // repack fitting algorithm parameters
   m_idn.resize(eclWFAlgoParams.size());

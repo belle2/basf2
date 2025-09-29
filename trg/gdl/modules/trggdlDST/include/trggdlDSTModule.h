@@ -21,7 +21,7 @@ namespace Belle2 {
   class TRGGDLDSTModule : public Module {
 
   public:
-    //! Costructor
+    //! Constructor
     TRGGDLDSTModule();
     //! Destrunctor
     virtual ~TRGGDLDSTModule() {}
@@ -42,7 +42,7 @@ namespace Belle2 {
 
     StoreObjPtr<TRGGDLDST> GDLResult; /**< output for TRGDST */
 
-    //condition database for unpacer
+    //! condition database for unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
     int LeafBitMap[320] = {0};
     char LeafNames[320][100] = {{""}};

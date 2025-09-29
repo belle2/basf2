@@ -379,6 +379,37 @@ namespace Belle2 {
      * returns array index of B ancestor, or -1 if no B ancestor or no MC-matching is found.
      */
     int ancestorBIndex(const Particle*);
+
+    /**
+     * returns 1 if the eventParticle daughters were all caught in recParticles, 2 if partially and 0 if none.
+     * it is used to check if a signal particle is still left on the signal side of the event (what is not caught by the tag side).
+     */
+    int ccbarTagPartialHelper(const MCParticle* eventParticle, const std::vector<Particle*>& recParticles);
+
+    /**
+     * returns 1 if the eventParticle daughters were all caught in recParticles, 2 if partially and 0 if none.
+     * through an additional vector the function will also return the list of missed particles.
+     * it is used to check what particles are left in the event outside the tag.
+     */
+    int ccbarTagPartialHelper(const MCParticle* eventParticle, std::vector<Particle*>& recParticles,
+                              std::vector<const MCParticle*>& missedParticles);
+
+    /**
+     * returns Event status for ccbarTag, returns 100 if there is no signal particle in the event,
+     * 200 if it was partially absorbed by tag and 0 otherwise.
+     */
+    int ccbarTagEventStatus(const Particle* part);
+
+    /**
+     * returns 1 if ccbar tag quasi particle is 'correctly' reconstructed (SIGNAL) in a ccbar event,
+     * 0 and other values if there were errors in reconstruction (specific to the setup of ccbar-FEI).
+     */
+    int ccbarTagSignal(const Particle* part);
+
+    /**
+     * returns compact value of a simplified version of ccbarTagSignal without the information of ccbarTagEventStatus.
+     */
+    int ccbarTagSignalSimplified(const Particle* part);
   }
 }
 

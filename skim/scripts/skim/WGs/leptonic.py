@@ -28,13 +28,13 @@ class LeptonicUntagged(BaseSkim):
         * :math:`B^- \\to \\mu^-`
 
     Cuts applied
-        * :math:`p_{\\ell}^{*} > 2\\,\\text{GeV}` in CMS Frame
+        * :math:`p_{\\ell}^{*} > 1.8\\,\\text{GeV}` in CMS Frame
         * :math:`\\text{electronID} > 0.5`
         * :math:`\\text{muonID} > 0.5`
         * :math:`n_{\\text{tracks}} \\geq 3`
     """
 
-    __authors__ = ["Phillip Urquijo"]
+    __authors__ = ["Daniel Jacobi"]
     __contact__ = __liaison__
     __description__ = (
         "Skim for leptonic analyses, "
@@ -53,14 +53,14 @@ class LeptonicUntagged(BaseSkim):
         ma.cutAndCopyList(
             "e-:LeptonicUntagged",
             "e-:all",
-            "useCMSFrame(p) > 2.0 and electronID > 0.5",
+            "useCMSFrame(p) > 1.8 and electronID > 0.5",
             True,
             path=path,
         )
         ma.cutAndCopyList(
             "mu-:LeptonicUntagged",
             "mu-:all",
-            "useCMSFrame(p) > 2.0 and muonID > 0.5",
+            "useCMSFrame(p) > 1.8 and muonID > 0.5",
             True,
             path=path,
         )

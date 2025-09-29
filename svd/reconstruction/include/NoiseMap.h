@@ -32,7 +32,7 @@ namespace Belle2 {
 
       /** Set charge per ADC unit.
        * If signals are in ADC units, the default setting of 1 should be
-       * overriden.
+       * overridden.
        * @param eInADU charge in electrons corresponding to 1 ADU.
        */
       void setADU(double eInADU) { m_eInADU = eInADU; }

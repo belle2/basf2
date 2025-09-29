@@ -26,7 +26,6 @@
 // variables
 #include <analysis/variables/ECLVariables.h>
 
-#include <cmath>
 #include <algorithm>
 #include <TMatrixFSym.h>
 

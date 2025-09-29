@@ -8,10 +8,11 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/filters/pathFilters/BasePathFilter.h>
-#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
 
 namespace Belle2 {
+  class QualityEstimatorBase;
+
   namespace vxdHoughTracking {
 
     /// Filter for two hits plus a virtual IP using QualityEstimators.
@@ -37,10 +38,10 @@ namespace Belle2 {
       std::string m_EstimationMethod = "helixFit";
       /// sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method
       std::string m_MCRecoTracksStoreArrayName = "MCRecoTracks";
-      /// Only required for MCInfo method
-      bool m_MCStrictQualityEstimator = true;
       /// pointer to the selected QualityEstimator
       std::unique_ptr<QualityEstimatorBase> m_estimator;
+      /// Only required for MCInfo method
+      bool m_MCStrictQualityEstimator = true;
     };
 
   }

@@ -66,6 +66,9 @@ void DQMHistAnalysisARICHModule::initialize()
   m_c_apdHist = new TCanvas("ARICH/c_apdHist");
 
   addDeltaPar("ARICH", "bitsPerChannel", HistDelta::c_Events,
+              1000000, 1); // update each 1M events (from daq histogram)
+
+  addDeltaPar("ARICH", "theta", HistDelta::c_Events,
               100000, 1); // update each 100k events (from daq histogram)
 
   // addDeltaPar(m_histogramDirectoryName, m_histogramName, HistDelta::c_Entries, 10000, 1); // update each 10000 entries
@@ -228,6 +231,24 @@ void DQMHistAnalysisARICHModule::event()
     }
   }
   setEpicsPV("deadHAPDs", ndeadHapd);
+
+  auto h_theta =  getDelta("ARICH", "theta", 0, false); // change this to false
+  auto c_theta = findCanvas("ARICH/c_theta");
+  auto h_thetaInt = (TH1F*)findHist("ARICH/theta");
+  if (h_theta != NULL && c_theta != NULL && h_thetaInt != NULL) {
+    int binmax = h_theta->GetMaximumBin();
+    double x = h_theta->GetXaxis()->GetBinCenter(binmax);
+    EStatus status = c_StatusGood;
+    if (x < 0.3 || x > 0.35) status = c_StatusError;
+    c_theta->Clear();
+    c_theta->cd();
+    if (h_theta->GetEntries() > 0) h_theta->Scale(h_thetaInt->GetEntries() / double(h_theta->GetEntries()));
+    h_thetaInt->Draw();
+    h_theta->Draw("same");
+    if (m_enableAlert && h_theta->GetEntries() > 10000) colorizeCanvas(c_theta, status);
+    c_theta->Modified();
+  }
+
 
   if (avgOcc * 36. < 100.) {
     setEpicsPV("badAPDs", 0);

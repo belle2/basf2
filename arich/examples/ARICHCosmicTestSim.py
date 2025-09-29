@@ -111,7 +111,7 @@ main.add_module('ARICHDQM')
 # display.param('showARICHHits', True)
 # main.add_module(display)
 
-# store datastore objets into root file
+# store datastore objects into root file
 # output = register_module('RootOutput')
 # output.param('outputFileName', "rootOutput.root")
 # output.param('branchNames', ['ARICHAeroHits', 'ARICHSimHits', 'ARICHDigits', 'ARICHHits'])
@@ -121,7 +121,7 @@ main.add_module('ARICHDQM')
 main.add_module('Progress')
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

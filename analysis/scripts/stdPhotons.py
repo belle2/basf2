@@ -8,6 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+import b2bii
 import modularAnalysis as ma
 
 
@@ -33,7 +34,7 @@ def stdPhotons(
     - 'gamma:pi0' gamma list for pi0 list
     - 'gamma:pi0highE' gamma list for pi0 list, high energy selection
 
-    -  For latest pi0 recommendations see https://confluence.desy.de/display/BI/Neutrals+Performance
+    -  For latest pi0 recommendations see https://xwiki.desy.de/xwiki/rest/p/e23c8
 
     Parameters:
         listtype (str): name of standard list
@@ -42,21 +43,21 @@ def stdPhotons(
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              `Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
                               for information on the beam background MVA.
 
         fakePhotonMVAWeight (str): type of weight file for fake photon MVA; if empty, fake photon MVA will not be used
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              `Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
                               for information on the fake photon MVA.
 
         biasCorrectionTable (str): correction table for the photon energy bias correction (should only be applied to data)
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              `Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
                               for information on the names of available correction tables..
     """
 
@@ -171,16 +172,26 @@ def loadStdSkimPhoton(path):
         path)
 
 
-# Only used for Belle via b2bii
 def loadStdGoodBellePhoton(path):
     """
     Load the Belle goodBelle list. Creates a ParticleList named
     'gamma:goodBelle' with '0.5 < :b2:var:`goodBelleGamma` < 1.5'
 
-    Warning:
-        Should only be used for Belle analyses using `b2bii`.
-
     Parameters:
         path (basf2.Path): the path to load the modules
     """
-    ma.fillParticleList('gamma:goodBelle', '0.5 < goodBelleGamma < 1.5', True, path)
+    if b2bii.isB2BII():
+        ma.cutAndCopyList(
+            'gamma:goodBelle',
+            'gamma:mdst',
+            '0.5 < goodBelleGamma < 1.5',
+            writeOut=True,
+            path=path
+        )
+    else:
+        ma.fillParticleList(
+            'gamma:goodBelle',
+            '0.5 < goodBelleGamma < 1.5',
+            writeOut=True,
+            path=path
+        )

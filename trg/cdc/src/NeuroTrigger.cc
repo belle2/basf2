@@ -182,7 +182,9 @@ NeuroTrigger::initialize(const NeuroTriggerParameters& p)
   }
 
   if (!okay) return;
-
+  // Save flag from parameters
+  m_AdditionWireMode = p.AdditionWireMode;
+  m_AdditionInputPerSL = p.AdditionInputPerSL;
   // initialize MLPs
   m_MLPs.clear();
   for (unsigned iMLP = 0; iMLP < p.nMLP; ++iMLP) {
@@ -194,6 +196,8 @@ NeuroTrigger::initialize(const NeuroTriggerParameters& p)
     unsigned long SLpattern = p.SLpattern[indices[3]];
     unsigned long SLpatternMask = (p.SLpatternMask.size() == 1) ? p.SLpatternMask[0] : p.SLpatternMask[indices[3]];
     unsigned short nInput = 27 * maxHits;
+    if (p.AdditionWireMode != 0)
+      nInput = 9 * (3 + p.AdditionInputPerSL) * maxHits;
     vector<NNTParam<float>> nHidden = (p.nHidden.size() == 1) ? p.nHidden[0] : p.nHidden[iMLP];
     vector<unsigned short> nNodes = {nInput};
     for (unsigned iHid = 0; iHid < nHidden.size(); ++iHid) {
@@ -286,8 +290,9 @@ NeuroTrigger::setConstants()
     m_TSoffset[iSL] = nTS;
     nTS += cdc.nWiresInLayer(layerId);
     m_TSoffset[iSL + 1] = nTS;
-    for (int priority = 0; priority < 2; ++ priority) {
-      m_radius[iSL][priority] = cdc.senseWireR(layerId + priority);
+    for (int priority = 0; priority < 5; ++ priority) {
+      m_radius[iSL][priority] = (iSL == 0 ?  cdc.senseWireR(layerId + priority) : ((priority & 1) == 1 ? cdc.senseWireR(layerId + ceil(
+                                   priority / 2.0)) : cdc.senseWireR(layerId - ceil(priority / 2.0))));
     }
     layerId += (iSL > 0 ? 6 : 7);
   }
@@ -403,7 +408,7 @@ NeuroTrigger::updateTrack(const CDCTriggerTrack& track)
 {
   double omega = track.getOmega(); // signed track curvature
   for (int iSL = 0; iSL < 9; ++iSL) {
-    for (int priority = 0; priority < 2; ++priority) {
+    for (int priority = 0; priority < 5; ++priority) {
       m_alpha[iSL][priority] = (m_radius[iSL][priority] * abs(omega) < 2.) ?
                                asin(m_radius[iSL][priority] * omega / 2.) :
                                M_PI_2;
@@ -522,7 +527,7 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
   } else if (et_option == "etf_only") {
     bool hasT0 = (m_eventTime.isValid()) ? m_eventTime->hasBinnedEventT0(Const::CDC) : false;
     if (hasT0) {
-      m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
+      m_T0 = m_eventTime->getBinnedEventT0(Const::CDC) / 2;
       m_hasT0 = true;
     } else {
       B2ERROR("No ETF output, but forced to use ETF!");
@@ -532,7 +537,7 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
   } else if (et_option == "etf_or_fastestpriority") {
     bool hasT0 = (m_eventTime.isValid()) ? m_eventTime->hasBinnedEventT0(Const::CDC) : false;
     if (hasT0) {
-      m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
+      m_T0 = m_eventTime->getBinnedEventT0(Const::CDC) / 2;
       m_hasT0 = true;
     } else {
       getEventTime(isector, track, "fastestpriority", neuroinputmode);
@@ -553,7 +558,7 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
     bool hasT0 = (m_eventTime.isValid()) ? m_eventTime->hasBinnedEventT0(Const::CDC) : false;
     int T0_etf = 9999;
     if (hasT0) {
-      T0_etf = m_eventTime->getBinnedEventT0(Const::CDC);
+      T0_etf = m_eventTime->getBinnedEventT0(Const::CDC) / 2;
       m_hasT0 = true;
     }
     getEventTime(isector, track, "fastestpriority", neuroinputmode);
@@ -563,7 +568,7 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
   } else if (et_option == "etf_or_fastest2d") {
     bool hasT0 = (m_eventTime.isValid()) ? m_eventTime->hasBinnedEventT0(Const::CDC) : false;
     if (hasT0) {
-      m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
+      m_T0 = m_eventTime->getBinnedEventT0(Const::CDC) / 2;
       m_hasT0 = true;
     } else {
       getEventTime(isector, track, "fastest2d", neuroinputmode);
@@ -583,7 +588,7 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
   } else if (et_option == "etf_or_zero") {
     bool hasT0 = (m_eventTime.isValid()) ? m_eventTime->hasBinnedEventT0(Const::CDC) : false;
     if (hasT0) {
-      m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
+      m_T0 = m_eventTime->getBinnedEventT0(Const::CDC) / 2;
       m_hasT0 = true;
     } else {
       m_hasT0 = true;
@@ -738,13 +743,6 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track, co
     unsigned short iSL = axialHits[ihit]->getISuperLayer();
     // // skip stereo hits (should not be related to track, but check anyway)
     if ((!neurotrackinputmode) && (iSL % 2 == 1)) continue;
-    // get priority time
-    int t = (m_hasT0) ? axialHits[ihit]->priorityTime() - m_T0 : 0;
-    if (t < 0) {
-      t = 0;
-    } else if (t > expert.getTMax()) {
-      t = expert.getTMax();
-    }
     double relId = getRelId(*axialHits[ihit]);
 
     if (expert.isRelevant(relId, iSL)) {
@@ -763,13 +761,6 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track, co
       unsigned short iSL = m_segmentHits[ihit]->getISuperLayer();
       // skip axial hits
       if (iSL % 2 == 0) continue;
-      // get priority time
-      int t = (m_hasT0) ? m_segmentHits[ihit]->priorityTime() - m_T0 : 0;
-      if (t < 0) {
-        t = 0;
-      } else if (t > expert.getTMax()) {
-        t = expert.getTMax();
-      }
       double relId = getRelId(*m_segmentHits[ihit]);
       if (expert.isRelevant(relId, iSL)) {
         if (nHits[iSL] < expert.getMaxHitsPerSL()) {
@@ -1003,8 +994,229 @@ NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
   return selectedHitIds;
 }
 
+
+vector<float>
+NeuroTrigger::getInputVector_extrahit(unsigned isector, const vector<unsigned>& hitIds)
+{
+  const CDCTriggerMLP& expert = m_MLPs[isector];
+  // prepare empty input vector and vectors to keep best drift times
+  vector<float> inputVector;
+  inputVector.assign(expert.nNodesLayer(0), 0.);
+  // convert hits to input values
+  vector<unsigned> nHits;
+  nHits.assign(9, 0);
+  //Only for test
+  for (unsigned ii = 0; ii < hitIds.size(); ++ii) {
+    int ihit = hitIds[ii];
+    unsigned short iSL = m_segmentHits[ihit]->getISuperLayer();
+    unsigned short iRef = iSL + 9 * nHits[iSL];
+    ++nHits[iSL];
+    //Set cut for T_0 input
+    int priot = m_segmentHits[ihit]->priorityTime();
+    int t = (m_hasT0) ? priot - m_T0 : 0;
+    if (t < 0) {
+      t = 0;
+    } else if (t > expert.getTMax()) {
+      t = expert.getTMax();
+    }
+
+    //Get TS pattern
+    unsigned hitpattern = m_segmentHits[ihit]->gethitpattern();
+    vector<float> hitpatterntime = m_segmentHits[ihit]->gethittime();
+    vector<int> HitIDs;
+    HitIDs.assign(hitpatterntime.size(), -1);
+    vector<float> HitTimes;
+    HitTimes.assign(hitpatterntime.size(), -1);
+    int LR = m_segmentHits[ihit]->getLeftRight();
+    double relId = getRelId(*m_segmentHits[ihit]);
+    int priority = m_segmentHits[ihit]->getPriorityPosition();
+    // get scaled input values (scaling such that the absolute value of all inputs is < 1)
+
+    inputVector[(3 + m_AdditionInputPerSL) * iRef] = expert.scaleId(relId, iSL);
+    float scaleT = pow(2, floor(log2(1. / expert.getTMax())));
+    inputVector[(3 + m_AdditionInputPerSL) * iRef + 1] = (((LR >> 1) & 1) - (LR & 1)) * t * scaleT;
+    inputVector[(3 + m_AdditionInputPerSL) * iRef + 2] = m_alpha[iSL][int(priority < 3)] * 0.5;
+
+
+    //Loop over all hits in selected TS for selection
+    if (m_AdditionInputPerSL % 3 != 0)
+      B2ERROR("For extra wire case, please set m_AdditionInputPerSL to 3 * n, where n is the number of extra wire want to include ");
+    const int nwires = (int)m_AdditionInputPerSL / 3;
+    vector<int> LRV;
+    /** Full LR table do not show large difference, comment for now
+     * if want to include, please also add LUT which not include here
+    if(UseFullLR)
+    {
+      unsigned int lutpattern = hitpattern*2;
+      if(m_segmentHits[ihit]->getPriorityPosition()==2)
+        lutpattern +=1;
+      LRV = (iSL==0)?m_innerLUT[lutpattern]:m_outerLUT[lutpattern];
+    }
+    else
+    */
+    LRV.assign((int)hitpatterntime.size(), 2); // Set all extra drift time to positive
+
+    for (int j = 0; j < (int) hitpatterntime.size(); j++) {
+      HitTimes[j] = (((hitpattern >> j) % 2 == 1) ? ((m_hasT0) ? hitpatterntime[j] - m_T0 : 0) : 0);
+      //Try to set the one with small drift time contribute a lot
+      if (HitTimes[j] > expert.getTMax()) HitTimes[j] = expert.getTMax();
+      if (HitTimes[j] < m_TMin)LRV[j] = 3; //Always set low priority for unexpected low t_drift
+      if (HitTimes[j] < 0)HitTimes[j] = 0;
+      HitIDs[j] = j;
+      B2DEBUG(150, "wire Find hit:  " << j << "  " << hitpatterntime[j] << std::endl);
+    }
+    int priorID = (iSL == 0) ? (priority == 3 ? 0 : 0 + priority) : (priority == 3 ? 5 : 5 + priority);
+    std::vector<int> BestID(nwires, -1);
+    std::vector<int> BestLR(nwires, 3);
+    std::vector<double> BestDriftTime(nwires, expert.getTMax());
+
+
+    for (int i = 0; i < (int)hitpatterntime.size(); i++) {
+      bool tag0 = false;
+      int remove_id = -1;
+      for (int j = 0; j < nwires; j++) {
+        if ((hitpattern >> i) % 2 == 0 || i == priorID)
+          continue;
+        if (LRV[i] == 3 && (BestLR[j] != 3))
+          continue;
+        else if ((LRV[i] != 3 && BestLR[j] == 3) || (HitTimes[i] < BestDriftTime[j])) {
+          tag0 = true;
+          remove_id = j;
+          break;
+        }
+      }
+      if (!tag0)
+        continue;
+      for (int j = 0; j < nwires - remove_id - 1; j++) {
+        BestID[nwires - j - 1] = BestID[nwires - j - 2];
+        BestLR[nwires - j - 1] = BestLR[nwires - j - 2];
+        BestDriftTime[nwires - j - 1] = BestDriftTime[nwires - j - 2];
+      }
+      BestID[remove_id] = i;
+      BestLR[remove_id] = LRV[i];
+      BestDriftTime[remove_id] = HitTimes[i];
+    }
+    //Do not return input vector in case not enough hits find.
+    for (int j = 0; j < nwires; j++) {
+      if (BestID[j] == -1) {
+        vector<float> tmpvector = {};
+        return tmpvector;
+      }
+    }
+    for (int i = 0; i < nwires; i++) {
+      int prior = 0;
+      double deltaPhi = 0;
+      //Based on the sysmetry shape, build a table for alpha and id delta phi
+      //Following same method as previous, use delta phi instead of true id for other priority
+      const int outerpriorList[11] = {4, 4, 4, 2, 2, 0, 1, 1, 3, 3, 3};
+      const int innerpriorList[15] = {0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4};
+      const double outerdeltaPhiList[11] = {-1, 0, 1, -0.5, 0.5, 0, -0.5, 0.5, -1, 0, 1};
+      const double innerdeltaPhiList[15] = {-0.5, 0.5, -1, 0, 1, -1.5, -0.5, 0.5, 1.5, -2, -1, 0, 1, 2};
+      if (iSL != 0) {
+        prior = outerpriorList[BestID[i]];
+        deltaPhi = outerdeltaPhiList[BestID[i]];
+      }
+      if (iSL == 0) {
+        prior = innerpriorList[BestID[i]];
+        deltaPhi = innerdeltaPhiList[BestID[i]];
+      }
+      B2DEBUG(10, "BestID:" << BestID[i] << "Prior:" << prior << "DeltaPhi:" << deltaPhi << "Drift Time:" << BestDriftTime[i] <<
+              "Used Drift Time: " << BestDriftTime[i]*scaleT * (((BestLR[i] >> 1) & 1) - (BestLR[i] & 1)));
+      double relIdI = m_segmentHits[ihit]->getSegmentID() - m_TSoffset[iSL] - m_idRef[iSL][prior] + deltaPhi;
+      relIdI = remainder(relIdI, (m_TSoffset[iSL + 1] - m_TSoffset[iSL]));
+      inputVector[(3 + m_AdditionInputPerSL) * iRef + 3 + 4 * i ] = expert.scaleId(relIdI, iSL);
+      inputVector[(3 + m_AdditionInputPerSL) * iRef + 4 + 4 * i] = BestDriftTime[i] * scaleT * (((BestLR[i] >> 1) & 1) - (BestLR[i] & 1));
+      inputVector[(3 + m_AdditionInputPerSL) * iRef + 5 + 4 * i] = m_alpha[iSL][prior] * 0.5;
+      // Though radius should be different for those case, we did not see any difference after include. Comment first
+      //inputVector[(3 + m_AdditionInputPerSL) * iRef + 6 + 4 * i] = m_radius[iSL][prior]/120.;
+    }
+  }
+  return inputVector;
+}
+
+
+vector<float>
+NeuroTrigger::getInputVector_fullhit(unsigned isector, const vector<unsigned>& hitIds)
+{
+  const CDCTriggerMLP& expert = m_MLPs[isector];
+  // prepare empty input vector and vectors to keep best drift times
+  vector<float> inputVector;
+  inputVector.assign(expert.nNodesLayer(0), 0.);
+  // convert hits to input values
+  vector<unsigned> nHits;
+  nHits.assign(9, 0);
+  //Only for test
+  for (unsigned ii = 0; ii < hitIds.size(); ++ii) {
+    int ihit = hitIds[ii];
+    unsigned short iSL = m_segmentHits[ihit]->getISuperLayer();
+    unsigned short iRef = iSL + 9 * nHits[iSL];
+    ++nHits[iSL];
+    //Set cut for T_0 input
+    int priot = m_segmentHits[ihit]->priorityTime();
+    int t = (m_hasT0) ? priot - m_T0 : 0;
+    if (t < 0) {
+      t = 0;
+    } else if (t > expert.getTMax()) {
+      t = expert.getTMax();
+    }
+
+    //Get TS pattern
+    unsigned hitpattern = m_segmentHits[ihit]->gethitpattern();
+    vector<float> hitpatterntime = m_segmentHits[ihit]->gethittime();
+    vector<int> HitIDs;
+    HitIDs.assign(hitpatterntime.size(), -1);
+    vector<float> HitTimes;
+    HitTimes.assign(hitpatterntime.size(), -1);
+    int LR = m_segmentHits[ihit]->getLeftRight();
+    double relId = getRelId(*m_segmentHits[ihit]);
+    int priority = m_segmentHits[ihit]->getPriorityPosition();
+    // get scaled input values (scaling such that the absolute value of all inputs is < 1)
+
+    inputVector[(3 + m_AdditionInputPerSL) * iRef] = expert.scaleId(relId, iSL);
+    float scaleT = pow(2, floor(log2(1. / expert.getTMax())));
+    inputVector[(3 + m_AdditionInputPerSL) * iRef + 1] = (((LR >> 1) & 1) - (LR & 1)) * t * scaleT;
+    inputVector[(3 + m_AdditionInputPerSL) * iRef + 2] = m_alpha[iSL][int(priority < 3)] * 0.5;
+
+    //case 2: 0 drift time -> 0 and max drift time -> 1 and no event -> -1
+    if (m_AdditionInputPerSL != 11
+        && m_AdditionInputPerSL != 22)
+      B2ERROR("Not correct AdditionInputPerSL value for full wire case, please set 11 (TDC only) or 22 (TDC & ADC)");
+    for (int j = 0; j < (int) hitpatterntime.size(); j++) {
+      HitTimes[j] = ((hitpattern >> j) % 2 == 1) ? ((m_hasT0) ? hitpatterntime[j] - m_T0 : 0) : -expert.getTMax();
+      //Try to set the one with small drift time contribute a lot
+      if (HitTimes[j] > expert.getTMax()) HitTimes[j] = expert.getTMax();
+      if (HitTimes[j] < m_TMin)HitTimes[j] = -expert.getTMax();
+      if (HitTimes[j] < 0 && HitTimes[j] >= m_TMin)HitTimes[j] = 0;
+      //else HitTimes[j]=expert.getTMax()-HitTimes[j];
+      HitIDs[j] = j;
+    }
+    for (int j = 0; j < 11; j++) {
+      inputVector[(3 + m_AdditionInputPerSL) * iRef + 3 + j] = HitTimes[j] * scaleT;
+    }
+    if (m_AdditionInputPerSL == 22) {
+      std::vector<float> adc = m_segmentHits[ihit]->getadc();
+      for (int j = 0; j < 11; j++) {
+        inputVector[(3 + m_AdditionInputPerSL) * iRef + 14 + j] = adc[j];
+      }
+    }
+  }
+  return inputVector;
+}
 vector<float>
 NeuroTrigger::getInputVector(unsigned isector, const vector<unsigned>& hitIds)
+{
+  if (m_AdditionWireMode == 0)
+    return getInputVectorDefault(isector, hitIds);
+  if (m_AdditionWireMode == 1)
+    return getInputVector_fullhit(isector, hitIds);
+  if (m_AdditionWireMode == 2)
+    return getInputVector_extrahit(isector, hitIds);
+  else // to avoid zero return
+    return getInputVectorDefault(isector, hitIds);
+
+}
+vector<float>
+NeuroTrigger::getInputVectorDefault(unsigned isector, const vector<unsigned>& hitIds)
 {
   const CDCTriggerMLP& expert = m_MLPs[isector];
   // prepare empty input vector and vectors to keep best drift times

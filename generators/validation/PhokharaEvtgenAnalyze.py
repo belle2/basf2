@@ -121,5 +121,3 @@ main.add_module(phokhara_evtgen)
 main.add_module('Progress')
 # Run.
 b2.process(main)
-
-print(b2.statistics)

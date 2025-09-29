@@ -12,15 +12,15 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFResult.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 #include <string>
 #include <vector>
 
 namespace Belle2 {
+  class RecoTrack;
   class ModuleParamInfo;
 
-  /// Store resutling tracks and relations on the dataStore
+  /// Store resulting tracks and relations on the dataStore
   class CDCCKFResultStorer : public TrackFindingCDC::Findlet<const CDCCKFResult> {
     /// Parent class
     using Super = TrackFindingCDC::Findlet<const CDCCKFResult>;

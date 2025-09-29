@@ -205,12 +205,12 @@ def _process_graph(self, idx):
     # Get the LCA in the correct subset order
     # If we're not allowing secondaries this is all we need
     # If we are this will contain duplicates (since secondary locs are set to 0)
-    # We can't load the firs locs directly (i.e. y_item[locs, :]) because locs is (intentionally) unsorted
+    # We can't load the first locs directly (i.e. y_item[locs, :]) because locs is (intentionally) unsorted
     y_edge = y_item["LCA"][evt].reshape((n_LCA, n_LCA)).astype(int)
     # Get the true mcPDG pf FSPs
     y_mass = masses_to_classes(x_item["mc_pdg"][evt][x_rows])
 
-    # Get the specificed row/cols, this inserts dummy rows/cols for secondaries
+    # Get the specified row/cols, this inserts dummy rows/cols for secondaries
     y_edge = y_edge[locs, :][:, locs]
     # if self.allow_secondaries:
     # Set everything that's not primary (unmatched and secondaries) rows.cols to 0
@@ -343,4 +343,5 @@ class GraphDataSet(InMemoryDataset):
         data, slices = self.collate(data_list)
         torch.save((data, slices), self.processed_paths[0])
 
+        #: delete attributes
         del self.x, self.y, self.avail_samples, data_list, data, slices

@@ -8,49 +8,54 @@
 
 #pragma once
 
-/* Tracking headers. */
-#include <tracking/dataobjects/ExtHit.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/TrackClusterSeparation.h>
-
 /* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
-#include <ir/dbobjects/BeamPipeGeo.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
-#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
-#include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dataobjects/KLMHit2d.h>
-#include <klm/dbobjects/KLMChannelStatus.h>
-#include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/dbobjects/KLMLikelihoodParameters.h>
-#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
-#include <structure/dbobjects/COILGeometryPar.h>
+#include <tracking/dataobjects/ExtHit.h>
 
 /* Geant4 headers. */
 #include <G4ErrorTrajErr.hh>
 #include <G4ThreeVector.hh>
 #include <G4TouchableHandle.hh>
 
+/* ROOT headers. */
+#include <TMatrixDSym.h>
+
 /* C++ headers. */
 #include <map>
 #include <string>
 #include <vector>
 
-class G4ErrorSymMatrix;
-class G4VPhysicalVolume;
 class G4ErrorFreeTrajState;
+class G4ErrorSymMatrix;
 class G4StepPoint;
+class G4VPhysicalVolume;
+class TVector3;
 
 namespace Belle2 {
 
+  class BeamPipeGeo;
+  class COILGeometryPar;
   class ECLCluster;
+  class EKLMElementNumbers;
+  class KLMChannelStatus;
   class KLMCluster;
+  class KLMElementNumbers;
+  class KLMHit2d;
+  class KLMLikelihoodParameters;
   class KLMMuidHit;
   class KLMMuidLikelihood;
+  class KLMStripEfficiency;
   class MuidBuilder;
+  class RecoTrack;
   class Track;
+  class TrackClusterSeparation;
+
+  namespace EKLM {
+    class TransformDataGlobalAligned;
+  }
 
   namespace Simulation {
     class ExtCylSurfaceTarget;
@@ -239,6 +244,9 @@ namespace Belle2 {
     //! Swim a single track (EXT) until it stops or leaves the target cylinder
     void swim(ExtState&, G4ErrorFreeTrajState&);
 
+    //! Find the closest Track to each KLMCluster and fill the corresponding fields of KLMCluster objects
+    void findClosestTrackToKLMClusters();
+
     //! Register the list of geant4 physical volumes whose entry/exit
     //! points will be saved during extrapolation
     void registerVolumes();
@@ -259,7 +267,7 @@ namespace Belle2 {
     ExtState getStartPoint(const Track&, int, G4ErrorFreeTrajState&);
 
     //! Create another EXT extrapolation hit for a track candidate
-    void createExtHit(ExtHitStatus, const ExtState&, const G4ErrorFreeTrajState&, const G4StepPoint*, const G4TouchableHandle&);
+    void createExtHit(const ExtHitStatus, const ExtState&, const G4ErrorFreeTrajState&, const G4StepPoint*, const G4TouchableHandle&);
 
     //! Create another EXT ECL-crystal-crossing hit for a track candidate
     void createECLHit(const ExtState&, const G4ErrorFreeTrajState&, const G4StepPoint*, const G4StepPoint*, const G4TouchableHandle&,
@@ -461,7 +469,7 @@ namespace Belle2 {
     //! Tracks
     StoreArray<Track> m_tracks;
 
-    //! Track cluster sepration
+    //! Track cluster separation
     StoreArray<TrackClusterSeparation> m_trackClusterSeparations;
 
   };

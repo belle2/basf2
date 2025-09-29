@@ -16,8 +16,8 @@
 
 
 namespace Belle2 {
-  class klm_trig_linear_fit_t;
-  class klmtrg_layer_counter_t;
+  class klmtrgLinearFit;
+  class klmtrgLayerCounter;
 
   class KLMTriggerModule : public Module {
   public:
@@ -45,11 +45,11 @@ namespace Belle2 {
     std::shared_ptr<geometry_data>  m_geometry;
 
 
-    std::shared_ptr<klmtrg_layer_counter_t>  m_klmtrg_layer_counter;
+    std::shared_ptr<klmtrgLayerCounter>  m_klmtrg_layer_counter;
 
 
 
-    std::shared_ptr<klm_trig_linear_fit_t>  m_klm_trig_linear_fit;
+    std::shared_ptr<klmtrgLinearFit>  m_klm_trig_linear_fit;
 
     std::vector<int> m_layerUsed;
     std::string m_dummy_used_layers;
@@ -58,6 +58,8 @@ namespace Belle2 {
     int y_cutoff = 100;
     int m_intercept_cutoff = 500;
 
+    /** Name of the file for debugging output. */
+    std::string m_dump_Path;
 
   };
 } // namespace Belle2

@@ -117,6 +117,9 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
 
   addParam("useadc", m_useadc,
            "Switch to use ADC. Can be used with usehitpattern enabled. ", false);
+
+  addParam("useDB", m_useDB,
+           "Switch to use database to load run dependent parameters. ", true);
 }
 
 void
@@ -130,6 +133,31 @@ CDCTrigger2DFinderModule::initialize()
   m_tracks.registerRelationTo(m_clusters);
 
   if (m_storePlane > 0) m_houghPlane.registerInDataStore("HoughPlane");
+
+  if (m_testFilename != "") {
+    testFile.open(m_testFilename);
+  }
+
+  if (m_suppressClone) {
+    B2INFO("2D finder will exit with the first track candidate in time.");
+  }
+}
+
+void
+CDCTrigger2DFinderModule::beginRun()
+{
+  if (m_useDB) {
+    if (not m_cdctrg2d_DB.isValid()) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      B2FATAL("No database for CDCTRG 2D parameter. exp " << evtMetaData->getExperiment() << " run "
+              << evtMetaData->getRun());
+    } else {
+      m_usehitpattern = m_cdctrg2d_DB->getfullhit();
+      m_useadc = m_cdctrg2d_DB->getADC();
+      m_minHits = m_cdctrg2d_DB->gethitthreshold();
+      m_minHitsShort = m_cdctrg2d_DB->gethitthreshold();
+    }
+  }
 
   const CDCGeometryPar& cdc = CDCGeometryPar::Instance();
   int layerId = 3;
@@ -149,14 +177,6 @@ CDCTrigger2DFinderModule::initialize()
       }
     }
     layerId += (iSL > 0 ? 6 : 7);
-  }
-
-  if (m_testFilename != "") {
-    testFile.open(m_testFilename);
-  }
-
-  if (m_suppressClone) {
-    B2INFO("2D finder will exit with the first track candidate in time.");
   }
 }
 
@@ -192,7 +212,7 @@ CDCTrigger2DFinderModule::event()
 
     if (m_usehitpattern) {
       unsigned hitpattern;
-      if (m_useadc) hitpattern = m_segmentHits[iHit]->gethitpattern_adc();
+      if (m_useadc) hitpattern = m_segmentHits[iHit]->getadcpattern();
       else          hitpattern = m_segmentHits[iHit]->gethitpattern();
       int nhitpattern = 0;
       if (iSL == 0)nhitpattern = 15;

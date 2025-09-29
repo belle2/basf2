@@ -31,7 +31,7 @@ class NNFilterModule(b2.Module):
        model_file(str): Path to the saved model
        model_config(dict): Parameters to build the model
        preproc_config(dict): Parameters for preprocessing
-       threshold(float): Threshold for event selection using reweighting method, value *None* indicating sampling mehtod
+       threshold(float): Threshold for event selection using reweighting method, value *None* indicating sampling method
        extra_info_var(str): Name of eventExtraInfo to save model prediction to
        global_tag(str): Tag in ConditionDB where the well trained model was stored
        payload(str): Payload for the well trained model in global tag
@@ -62,7 +62,7 @@ class NNFilterModule(b2.Module):
         :param model_file: Path to the saved model file.
         :param model_config: Parameters for building the model.
         :param preproc_config: Parameters for preprocessing.
-        :param threshold: Threshold for event selection using reweighting method, value *None* indicating sampling mehtod.
+        :param threshold: Threshold for event selection using reweighting method, value *None* indicating sampling method.
         :param extra_info_var: Name of eventExtraInfo to save model prediction to.
         :param global_tag: Tag in ConditionDB where the well-trained model was stored.
         :param payload: Payload for the well-trained model in global tag.
@@ -100,8 +100,7 @@ class NNFilterModule(b2.Module):
 
         #: StoreArray to save weights to
         self.EventExtraInfo = Belle2.PyStoreObj('EventExtraInfo')
-        if not self.EventExtraInfo.isValid():
-            self.EventExtraInfo.registerInDataStore()
+        self.EventExtraInfo.isRequired()
         #: Initialise event metadata from data store
         self.EventInfo = Belle2.PyStoreObj('EventMetaData')
         #: node features
@@ -114,7 +113,8 @@ class NNFilterModule(b2.Module):
         Collect information from database, build graphs, make predictions and select through sampling or threshold
         """
         # Need to create the eventExtraInfo entry for each event
-        self.EventExtraInfo.create()
+        if not self.EventExtraInfo.isValid():
+            self.EventExtraInfo.create()
         df_dict = load_particle_list(mcplist=Belle2.PyStoreArray("MCParticles"), evtNum=self.EventInfo.getEvent(), label=True)
         single_input = preprocessed(df_dict, particle_selection=self.preproc_config['cuts'])
         graph = ArrayDataset(single_input, batch_size=1)[0][0]
@@ -124,7 +124,7 @@ class NNFilterModule(b2.Module):
         # Save the pass probability to EventExtraInfo
         self.EventExtraInfo.addExtraInfo(self.extra_info_var, pred)
 
-        # Module returns bool of whether prediciton passes threshold for use in basf2 path flow control
+        # Module returns bool of whether prediction passes threshold for use in basf2 path flow control
         if self.threshold:
             self.return_value(int(pred >= self.threshold))
         else:

@@ -48,7 +48,7 @@ def add_geometry(
         excluded_components += ['MagneticField']
         additonal_components += ['MagneticFieldConstant']
 
-    # Add gearbox, additonally override field value if set
+    # Add gearbox, additionally override field value if set
     if field_override is not None:
         path.add_module('Gearbox',
                         fileName=geometry_xml,
@@ -81,5 +81,5 @@ main.add_module('SVDChargeSharingAnalysis', outputDirName=str(dirOUT), outputRoo
 
 main.add_module('Progress')
 b2.print_path(main)
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

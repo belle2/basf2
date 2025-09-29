@@ -12,7 +12,7 @@
    module to dump ECL related quantities in an ntuple
    starting from dst root file.
 
-The user should provide input and output root filnames
+The user should provide input and output root filenames
 as first and second argument respectively.
 
 Usage:
@@ -135,5 +135,5 @@ mainPath.add_module(eclDataAnalysis)
 
 # Process the events and print call statistics
 mainPath.add_module('Progress')
-b2.process(mainPath)
+b2.process(mainPath, calculateStatistics=True)
 print(b2.statistics)

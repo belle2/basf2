@@ -13,6 +13,8 @@ import numpy as np
 from dataclasses import dataclass
 import matplotlib.pyplot as plt
 import pdg
+import warnings
+from pandas.errors import PerformanceWarning
 
 """
 A module that adds corrections to analysis dataframe.
@@ -35,6 +37,7 @@ class ReweighterParticle:
     """
     Class that stores the information of a particle.
     """
+    #: @var prefix
     #: Prefix of the particle in the ntuple
     prefix: str
 
@@ -44,12 +47,15 @@ class ReweighterParticle:
     #: Merged table of the weights
     merged_table: pd.DataFrame
 
+    #: @var pdg_binning
     #: Kinematic binning of the weight table per particle
     pdg_binning: dict
 
+    #: @var variable_aliases
     #: Variable aliases of the weight table
     variable_aliases: dict
 
+    #: @var weight_name
     #: Weight column name that will be added to the ntuple
     weight_name: str
 
@@ -449,10 +455,10 @@ class Reweighter:
         Checks if the tables are provided in a legacy format and converts them to the standard format.
         """
         result = None
+        str_to_pdg = {'B+': 521, 'B-': 521, 'B0': 511}
         if 'cal' in table.columns:
             result = pd.DataFrame(index=table.index)
             result['data_MC_ratio'] = table['cal']
-            str_to_pdg = {'B+': 521, 'B-': 521, 'B0': 511}
             result['PDG'] = table['Btag'].apply(lambda x: str_to_pdg.get(x))
             # Assume these are only efficiency tables
             result['mcPDG'] = result['PDG']
@@ -462,6 +468,18 @@ class Reweighter:
             result['data_MC_uncertainty_stat_up'] = table['cal_stat_error']
             result['data_MC_uncertainty_sys_dn'] = table['cal_sys_error']
             result['data_MC_uncertainty_sys_up'] = table['cal_sys_error']
+        elif 'cal factor' in table.columns:
+            result = pd.DataFrame(index=table.index)
+            result['data_MC_ratio'] = table['cal factor']
+            result['PDG'] = table['Btype'].apply(lambda x: str_to_pdg.get(x))
+            result['mcPDG'] = result['PDG']
+            result['threshold'] = table['sig prob cut']
+            # Assign the total error to the stat uncertainty and set syst. one to 0
+            result['data_MC_uncertainty_stat_dn'] = table['error']
+            result['data_MC_uncertainty_stat_up'] = table['error']
+            result['data_MC_uncertainty_sys_dn'] = 0
+            result['data_MC_uncertainty_sys_up'] = 0
+            result[_fei_mode_col] = table['mode']
         else:
             result = table
         result = result.query(f'threshold == {threshold}')
@@ -512,7 +530,8 @@ class Reweighter:
         """
         Adds weight columns according to the FEI calibration tables
         """
-        rest_str = 'Rest'
+        rest_str = 'rest'
+        particle.merged_table[_fei_mode_col]
         # Apply a weight value from the weight table to the ntuple, based on the binning
         binning_df = pd.DataFrame(index=ntuple_df.index)
         # Take absolute value of mcPDG for binning because we have charge already
@@ -525,7 +544,7 @@ class Reweighter:
         for reco_pdg, mc_pdg in particle.pdg_binning:
             plot_values[(reco_pdg, mc_pdg)] = {}
             binning_df.loc[binning_df['PDG'] == reco_pdg, _fei_mode_col] = particle.merged_table.query(
-                f'PDG == {reco_pdg} and {_fei_mode_col} == "{rest_str}"')[_fei_mode_col].values[0]
+                f'PDG == {reco_pdg} and {_fei_mode_col}.str.lower() == "{rest_str}"')[_fei_mode_col].values[0]
             for mode in particle.pdg_binning[(reco_pdg, mc_pdg)][_fei_mode_col]:
                 binning_df.loc[(binning_df['PDG'] == reco_pdg) & (binning_df['num_mode'] == int(mode[4:])), _fei_mode_col] = mode
             if self.evaluate_plots:
@@ -614,35 +633,38 @@ def add_weights_to_dataframe(prefix: str,
     n_variations = kw_args.get('n_variations', 100)
     weight_name = kw_args.get('weight_name', "Weight")
     fillna = kw_args.get('fillna', 1.0)
-    reweighter = Reweighter(n_variations=n_variations,
-                            weight_name=weight_name,
-                            fillna=fillna)
-    variable_aliases = kw_args.get('variable_aliases')
-    if systematic.lower() == 'custom_fei':
-        cov_matrix = kw_args.get('cov_matrix')
-        reweighter.add_fei_particle(prefix=prefix,
-                                    table=custom_tables,
-                                    threshold=custom_thresholds,
-                                    variable_aliases=variable_aliases,
-                                    cov=cov_matrix
-                                    )
-    elif systematic.lower() == 'custom_pid':
-        sys_seed = kw_args.get('sys_seed')
-        syscorr = kw_args.get('syscorr')
-        if syscorr is None:
-            syscorr = True
-        reweighter.add_pid_particle(prefix=prefix,
-                                    weights_dict=custom_tables,
-                                    pdg_pid_variable_dict=custom_thresholds,
-                                    variable_aliases=variable_aliases,
-                                    sys_seed=sys_seed,
-                                    syscorr=syscorr
-                                    )
-    else:
-        raise ValueError(f'Systematic {systematic} is not supported!')
+    # Catch performance warnings from pandas
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=PerformanceWarning)
+        reweighter = Reweighter(n_variations=n_variations,
+                                weight_name=weight_name,
+                                fillna=fillna)
+        variable_aliases = kw_args.get('variable_aliases')
+        if systematic.lower() == 'custom_fei':
+            cov_matrix = kw_args.get('cov_matrix')
+            reweighter.add_fei_particle(prefix=prefix,
+                                        table=custom_tables,
+                                        threshold=custom_thresholds,
+                                        variable_aliases=variable_aliases,
+                                        cov=cov_matrix
+                                        )
+        elif systematic.lower() == 'custom_pid':
+            sys_seed = kw_args.get('sys_seed')
+            syscorr = kw_args.get('syscorr')
+            if syscorr is None:
+                syscorr = True
+            reweighter.add_pid_particle(prefix=prefix,
+                                        weights_dict=custom_tables,
+                                        pdg_pid_variable_dict=custom_thresholds,
+                                        variable_aliases=variable_aliases,
+                                        sys_seed=sys_seed,
+                                        syscorr=syscorr
+                                        )
+        else:
+            raise ValueError(f'Systematic {systematic} is not supported!')
 
-    result = reweighter.reweight(df, generate_variations=generate_variations)
-    if kw_args.get('show_plots'):
-        reweighter.print_coverage()
-        reweighter.plot_coverage()
-    return result
+        result = reweighter.reweight(df, generate_variations=generate_variations)
+        if kw_args.get('show_plots'):
+            reweighter.print_coverage()
+            reweighter.plot_coverage()
+        return result

@@ -25,7 +25,7 @@ namespace Belle2 {
   /** This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks.
    *  The EventT0 is set to NaN if there are not RecoTracks or there are not SVD clusters associated to tracks or
    *  RecoTrack pt < m_pt OR RecoTrack pz < m_pz. The EventT0 estimated is added to the temporaryEventT0s to
-   *  the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.
+   *  the StoreObjPtr as EventT0Component that contains: eventT0, eventT0_error, detector=SVD, algorithm, quality.
    */
   class SVDEventT0EstimatorModule : public Module {
   public:

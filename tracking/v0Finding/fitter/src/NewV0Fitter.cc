@@ -166,7 +166,7 @@ int NewV0Fitter::vertexFit(const RecoTrack* recoTrackPlus, const RecoTrack* reco
                            int pdgTrackPlus, int pdgTrackMinus, const Const::ParticleType& v0Hypothesis)
 {
 
-  // get track representations for given PDG codes and check their existance
+  // get track representations for given PDG codes and check their existence
 
   const auto* plusRepresentation = getTrackRepresentation(recoTrackPlus, pdgTrackPlus);
   if (not plusRepresentation) return c_NoTrackRepresentation;

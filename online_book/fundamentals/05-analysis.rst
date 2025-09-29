@@ -6,7 +6,7 @@ Analysis
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 30 minutes
+    **Length**: 30-45 min
 
     **Prerequisites**:
 
@@ -68,13 +68,13 @@ as sum of measured particles.
     Do they both reach the tracking system?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Go to https://pdglive.lbl.gov/Viewer.action and look up at the muon and :math:`D^+` lifetime.
     Remember that the beampipe radius is 1 cm.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     The average flight length of a particle of speed :math:`\beta` and lifetime
     :math:`\tau` is
@@ -91,13 +91,13 @@ as sum of measured particles.
     enough to reach the active volume of the detector and leave signal there?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Think about the truly stable and very long lived particles you know, but remember that not all
     neutral particles are well reconstructed by the ECL or KLM!
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
 
     Let's start from the **charged particles**.
@@ -165,7 +165,7 @@ Combined particles
    long as all its decay products are measured. One can then proceed further and combine combined particles
    to move upwards in a decay tree, until the desired step is reached.
    The creation of combined particles is done at the analysis level by the final user, using the tools
-   provided by the basf2 analysis package.
+   provided by the `basf2` analysis package.
 
 V0
    Finally, there's a class of combined particle that require a special treatment, and are therefore provided

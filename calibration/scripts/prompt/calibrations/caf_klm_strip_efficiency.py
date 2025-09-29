@@ -26,6 +26,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 settings = CalibrationSettings(
     name='KLM strip efficiency',
     expert_username='nbrenny',
+    subsystem='klm',
     description=__doc__,
     input_data_formats=['cdst'],
     input_data_names=['hlt_mumu'],
@@ -34,9 +35,9 @@ settings = CalibrationSettings(
                      INPUT_DATA_FILTERS['Data Tag']['mumu_tight_or_highm_calib'],
                      INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
     },
-    depends_on=[])
+    depends_on=[],
+    produced_payloads=["KLMStripEfficiency"])
 
-##############################
 
 ##############################
 # REQUIRED FUNCTION #
@@ -104,7 +105,7 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Algorithm setup
-
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import KLMStripEfficiencyAlgorithm
 
     alg = KLMStripEfficiencyAlgorithm()

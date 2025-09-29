@@ -7,12 +7,11 @@
  **************************************************************************/
 
 #pragma once
-#ifndef SIMULATION_KERNEL_STEPTIMING_H
-#define SIMULATION_KERNEL_STEPTIMING_H
 
 #include <G4VSteppingVerbose.hh>
-#include <G4LogicalVolume.hh>
-#include <G4Track.hh>
+
+class G4LogicalVolume;
+class G4Track;
 
 namespace Belle2 {
   namespace Simulation {
@@ -70,4 +69,3 @@ namespace Belle2 {
 
   } //Simulation namespace
 } //Belle2 namespace
-#endif // SIMULATION_KERNEL_STEPTIMING_H

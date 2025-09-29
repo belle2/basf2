@@ -97,7 +97,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
   std::vector<double> PhotonWaveformArray(100000);
   mtree->Branch("PhotonArray", PhotonWaveformArray.data(), "PhotonWaveformArray[100000]/D");
 
-  /** Initalizing tree to read collector information  */
+  /** Initializing tree to read collector information  */
   auto tree = getObjectPtr<TTree>("tree");
   int CellID;
   tree->SetBranchAddress("CellID", &CellID);
@@ -117,13 +117,13 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
   ECLDigitWaveformParameters* PhotonParameters = new ECLDigitWaveformParameters();
 
   /** ParMin11t defined below represents typical fit parameters for barrel and endcaps.
-      Note these are only used as the inital guess for the fit.*/
+      Note these are only used as the initial guess for the fit.*/
   double ParMin11t[11];
 
   /** Computing photon templates for CellID range specified (recommend batches of 100) */
   for (int CellID_i = m_firstCellID; CellID_i <= m_lastCellID; CellID_i++) {
 
-    /** Typical parameters used for inital guess in fit. Note endcaps and barrel have different shapes */
+    /** Typical parameters used for initial guess in fit. Note endcaps and barrel have different shapes */
     if (CellID_i > 7776 || CellID_i < 1153) {
       ParMin11t[0] = 20.3216;
       ParMin11t[1] = -0.0206266;
@@ -177,11 +177,11 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
       std::vector<int> NtupleEntries;
 
       int counter = 0; // counts entry number in xValuesToFit
-      int counterWaveforms = 0; // counts numver of waveforms selected
+      int counterWaveforms = 0; // counts number of waveforms selected
 
       for (int i = 0; i < tree->GetEntries(); i++) {
 
-        /** skiping waveforms identified later in the calibration to potentially have pile-up noise outside baseline */
+        /** skipping waveforms identified later in the calibration to potentially have pile-up noise outside baseline */
         bool skipEvent = false;
         for (int k = 0; k < (int)EntriesToSkip.size(); k++) {
           if (EntriesToSkip[k] == i) skipEvent = true;
@@ -349,7 +349,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
           B2INFO("AttemptCounter reach limit: " << AttemptCounter << " counterWaveforms: " << counterWaveforms);
           B2INFO("Increasing m_ParamLimitFactor to " << m_ParamLimitFactor);
 
-          /** reseting for next round of fits with larger parameter limits  */
+          /** resetting for next round of fits with larger parameter limits  */
           EntriesToSkip.clear();
           AttemptCounter = 0;
 
@@ -371,7 +371,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
         limitResidualArray.push_back(resLimit);
         parLimitFactorArray.push_back(m_ParamLimitFactor);
 
-        /** reseting for next crystal  */
+        /** resetting for next crystal  */
         AttemptCounter = 0;
         m_ParamLimitFactor = m_BaseParamLimitFactor;
 

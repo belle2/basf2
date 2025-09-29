@@ -11,7 +11,7 @@
 #############################################################################
 #
 # This steering file expects a simulated data sample at innput and
-# perfoms the standard reconstruction. The MillepedeCollector
+# performs the standard reconstruction. The MillepedeCollector
 # is used to re-fit tracks with General Broken Lines
 #
 # Finally the display is run to demonstrate its capability to visualize tracks
@@ -43,5 +43,5 @@ main.add_module(
 
 main.add_module('Display', showRecoTracks=True)
 # main.add_module('RootOutput')
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

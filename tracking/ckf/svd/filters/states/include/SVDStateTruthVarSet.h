@@ -10,13 +10,14 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <tracking/ckf/svd/filters/states/BaseSVDStateFilter.h>
 #include <tracking/ckf/svd/utilities/SVDMCUtil.h>
 
 namespace Belle2 {
+  class EventMetaData;
+
   /// Names of the variables to be generated.
   constexpr
   static char const* const svdStateTruthVarNames[] = {
@@ -56,11 +57,21 @@ namespace Belle2 {
     /// Generate and assign the variables from the object.
     virtual bool extract(const BaseSVDStateFilter::Object* result) override;
 
+    /// Expose the parameters to the outside world
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
   private:
     /// Pointer to the object containing event number etc
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
     /// MC information used in the SVD CKF
     MCUtil m_mcUtil;
+
+    /// Only use a fraction of background events for recording for MVA training
+    bool m_UseFractionOfBackground = false;
+
+    /// Fraction of background to use in case m_UseFractionOfBackground is true
+    ///   The default value of 0.012 was chosen as it creates a roughly balanced training data set.
+    double m_BackgroundFraction = 0.012;
   };
 }

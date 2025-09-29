@@ -27,14 +27,14 @@ fnames = []
 patha = "/group/belle2/BGcampaigns/g4sim/" + folder
 
 pathb = patha + '/output/'
-pathc = patha + '/beast_hist/'
+patch = patha + '/beast_hist/'
 # takes 10 input files
 for i in range(num * 10, (num + 1) * 10):
     filenn = pathb + bgType + '_' + accRing + '_study-phase2-' + str(i) + '.root'
     print(filenn)
     fnames.append(filenn)
 
-histfile = pathc + bgType + '_' + accRing + '_' + str(num) + '.root'
+histfile = patch + bgType + '_' + accRing + '_' + str(num) + '.root'
 
 input_module = b2.register_module('RootInput')
 input_module.param('inputFileNames', fnames)
@@ -103,9 +103,6 @@ qcs_study = b2.register_module('QcsmonitorStudy')
 # main.add_module(qcs_study)
 
 b2.process(main)
-
-print('Event Statistics:')
-print(b2.statistics)
 
 d = datetime.datetime.today()
 print(d.strftime('job finish: %Y-%m-%d %H:%M:%S\n'))

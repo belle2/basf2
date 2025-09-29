@@ -15,12 +15,9 @@
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
 #include <map>
-#include <cmath>
 #include <algorithm>
 #include <iterator>
-#include <limits>
 
 namespace Belle2 {
   namespace Variable {
@@ -57,9 +54,9 @@ namespace Belle2 {
       while (i_mcpart) {
         auto* i_mcpart_mother = i_mcpart->getMother();
         if (i_mcpart_mother) {
-          std::vector<int> B_PDG = {511, 521};
-          auto result = std::find(std::begin(B_PDG), std::end(B_PDG), abs(i_mcpart_mother->getPDG()));
-          if (result != std::end(B_PDG)) {
+          constexpr std::array<int, 2> B_PDG = {511, 521};
+          auto result = std::find(B_PDG.begin(), B_PDG.end(), abs(i_mcpart_mother->getPDG()));
+          if (result != B_PDG.end()) {
             return i_mcpart_mother->getArrayIndex();
           }
           i_mcpart = i_mcpart_mother;

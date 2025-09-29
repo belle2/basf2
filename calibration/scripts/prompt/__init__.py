@@ -30,8 +30,7 @@ INPUT_DATA_FILTERS = {"Magnet": {"On": "On",
                                    "cosmic": "cosmic",
                                    "debug": "debug", "null": "null",
                                    "physics": "physics"},
-                      "Data Tag": {"hlt_skim": "hlt_skim",
-                                   "bhabha_all_calib": "bhabha_all_calib",
+                      "Data Tag": {"bhabha_all_calib": "bhabha_all_calib",
                                    "cosmic_calib": "cosmic_calib",
                                    "gamma_gamma_calib": "gamma_gamma_calib",
                                    "hadron_calib": "hadron_calib",
@@ -55,12 +54,14 @@ INPUT_DATA_FILTERS = {"Magnet": {"On": "On",
 class CalibrationSettings(namedtuple('CalSet_Factory',
                                      ["name",
                                       "expert_username",
+                                      "subsystem",
                                       "description",
                                       "input_data_formats",
                                       "input_data_names",
                                       "input_data_filters",
                                       "depends_on",
-                                      "expert_config"])):
+                                      "expert_config",
+                                      "produced_payloads"])):
     """
     Simple class to hold and display required information for a prompt calibration script (process).
 
@@ -70,6 +71,9 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
         expert_username (str): The GitLab username of the expert to contact about this script.
             This username will be used to assign the default responsible person for submitting and checking prompt
             calibration jobs.
+
+        subsystem (str): The name of the subsystem that this calibration is for.
+            e.g. "cdc", "ecl", "klm", "svd", "top", "beam", etc.
 
         description (str): Long form description of the calibration and what it does. Feel free to make this as long as you need.
 
@@ -89,7 +93,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
             To exclude specific filters, pre-append with *NOT* e.g.
             {"all_events": ["mumu_tight_or_highm_calib", "hadron_calib", "Good", "On"],
             "offres_photon_events": ["gamma_gamma_calib", "Good", "NOT On"]}.
-            Not selecting a specfic filters (e.g. Magnet) is equivalent to not having any requirements, e.g. (Either)
+            Not selecting a specific filters (e.g. Magnet) is equivalent to not having any requirements, e.g. (Either)
 
         depends_on (list(CalibrationSettings)): The settings variables of the other prompt calibrations that you want
             want to depend on. This will allow the external automatic system to understand the overall ordering of
@@ -103,6 +107,8 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
             input data between different IoV ranges. Or you might want to send if options like the maximum events per
             input file to process. The value in your settings object will be the *default*, but you can override the value via
             the caf_config.json sent into ``b2caf-prompt-run``.
+
+        produced_payloads (list(str)): The names of the payloads that this calibration script produces.
     """
 
     #: Allowed data file formats. You should use these values for `CalibrationSettings.input_data_formats`.
@@ -110,8 +116,9 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
     #  They are here for completeness.
     allowed_data_formats = frozenset({"raw", "cdst", "mdst", "udst"})
 
-    def __new__(cls, name, expert_username, description,
-                input_data_formats=None, input_data_names=None, input_data_filters=None, depends_on=None, expert_config=None):
+    def __new__(cls, name, expert_username, subsystem, description,
+                input_data_formats=None, input_data_names=None, input_data_filters=None,
+                depends_on=None, expert_config=None, produced_payloads=None):
         """
         The special method to create the tuple instance. Returning the instance
         calls the __init__ method
@@ -141,6 +148,12 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
         else:
             input_data_filters = {}
 
+        # Check that the subsystem is among the allowed ones
+        allowed_subsystems = {"pxd", "svd", "cdc", "ecl", "top", "arich",
+                              "klm", "trigger", "tracking", "alignment", "beam", "example"}
+        if subsystem not in allowed_subsystems:
+            raise ValueError(f"subsystem must be one of {allowed_subsystems}, but got '{subsystem}'")
+
         if expert_config:
             # Check that it's a dictionary and not some other valid JSON object
             if not isinstance(expert_config, dict):
@@ -162,8 +175,9 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
         else:
             depends_on = []
 
-        return super().__new__(cls, name, expert_username, description,
-                               input_data_formats, input_data_names, input_data_filters, depends_on, expert_config)
+        return super().__new__(cls, name, expert_username, subsystem, description,
+                               input_data_formats, input_data_names, input_data_filters,
+                               depends_on, expert_config, produced_payloads)
 
     def json_dumps(self):
         """
@@ -173,24 +187,28 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
         depends_on_names = [calibration_settings.name for calibration_settings in self.depends_on]
         return json.dumps({"name": self.name,
                            "expert_username": self.expert_username,
+                           "subsystem": self.subsystem,
                            "input_data_formats": list(self.input_data_formats),
                            "input_data_names": list(self.input_data_names),
                            "input_data_filters": self.input_data_filters,
                            "depends_on": list(depends_on_names),
                            "description": self.description,
-                           "expert_config": self.expert_config
+                           "expert_config": self.expert_config,
+                           "produced_payloads": self.produced_payloads
                            })
 
     def __str__(self):
         depends_on_names = [calibration_settings.name for calibration_settings in self.depends_on]
         output_str = str(self.__class__.__name__) + f"(name='{self.name}'):\n"
         output_str += f"  expert_username='{self.expert_username}'\n"
+        output_str += f"  subsystem='{self.subsystem}'\n"
         output_str += f"  input_data_formats={list(self.input_data_formats)}\n"
         output_str += f"  input_data_names={list(self.input_data_names)}\n"
         output_str += f"  input_data_filters={list(self.input_data_filters)}\n"
         output_str += f"  depends_on={list(depends_on_names)}\n"
         output_str += f"  description='{self.description}'\n"
-        output_str += f"  expert_config={self.expert_config}"
+        output_str += f"  expert_config={self.expert_config}\n"
+        output_str += f"  produced_payloads={self.produced_payloads}"
         return output_str
 
 

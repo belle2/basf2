@@ -42,7 +42,6 @@ def fitVertex(
         fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC/recoilmass)
         constraint (str):       add additional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
-            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         recoilMass (float):     invariant mass of recoil in GeV (valid only for recoilmass)
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
@@ -91,12 +90,13 @@ def _fitVertex(
         fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC/recoilmass)
         constraint (str):       add additional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
-            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         recoilMass (float):     invariant mass of recoil in GeV (valid only for recoilmass)
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
     """
+
+    from pdg import from_names
 
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + list_name)
@@ -110,10 +110,7 @@ def _fitVertex(
     pvfit.param('recoilMass', recoilMass)
     pvfit.param('smearing', smearing)
     if massConstraint:
-        if isinstance(massConstraint[0], str):
-            pvfit.param('massConstraintListParticlename', massConstraint)
-        else:
-            pvfit.param('massConstraintList', massConstraint)
+        pvfit.param('massConstraintList', from_names(massConstraint))
     path.add_module(pvfit)
 
 
@@ -147,7 +144,6 @@ def kFit(list_name,
 
         constraint (str):       add an additional constraint to the fit (valid options are ipprofile or iptube)
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
-            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         recoilMass (float):     invariant mass of recoil in GeV (valid only for recoilmass)
         daughtersUpdate (bool): make copy of the daughters and update them after the KFit
         decay_string (str):     select particles used for the KFit
@@ -229,6 +225,8 @@ def treeFit(
     massConstraint=[],
     ipConstraint=False,
     updateAllDaughters=False,
+    massConstraintDecayString='',
+    massConstraintMassValues=[],
     customOriginConstraint=False,
     customOriginVertex=[0.001, 0, 0.0116],
     customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
@@ -262,9 +260,18 @@ def treeFit(
         conf_level (float):  minimum value of the confidence level to accept the fit.
             Setting this parameter to -1 selects all particle candidates.
             The value of 0 rejects the particle candidates with failed fit.
-        massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
-            Please do not mix PDG id and particle names in massConstraint list.
+        massConstraint (list(int, str)): list of PDG ids (positive and negative values are allowed) or names of the
+            (anti-)particles which are mass-constrained
         ipConstraint (bool): constrain head production vertex to IP (x-y-z) constraint
+        updateAllDaughters (bool): if true the entire tree will be updated with the fitted values
+            for momenta and vertex position. Otherwise only the momenta of the head of the tree will be updated,
+            however for all daughters we also update the vertex position with the fit results as this would
+            otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
+        massConstraintDecayString (str): Decay string to select which particles' mass should be constrained
+        massConstraintMassValues (list(float, int, str)): list of invariant masses to be used for the mass constraints
+            of the particles selected via the decay string massConstraintDecayString. A floating point value is taken directly
+            while an integer or string is interpreted as defining the PDG id or name of a particle
+            and the corresponding PDG value is taken
         customOriginConstraint (bool): use a custom origin vertex as the production vertex of your particle.
             This is useful when fitting D*/D without wanting to fit a B but constraining the process to be B-decay-like.
             (think of semileptonic modes and stuff with a neutrino in the B decay).
@@ -272,23 +279,19 @@ def treeFit(
             Default numbers are taken for B-mesons
         customOriginCovariance (list(float)): 3x3 covariance matrix for the custom vertex (type: vector).
             Default numbers extracted from generator distribution width of B-mesons.
-        updateAllDaughters (bool): if true the entire tree will be updated with the fitted values
-            for momenta and vertex position. Otherwise only the momenta of the head of the tree will be updated,
-            however for all daughters we also update the vertex position with the fit results as this would
-            otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
         originDimension (int): If the origin or IP constraint (``customOriginVertex`` or ``ipConstraint``) are used,
             this specifies the dimension of the constraint (3D or 2D).
         treatAsInvisible (str): Decay string to select one particle that will be treated as invisible in the fit.
         ignoreFromVertexFit (str): Decay string to select particles that will be ignored to determine the vertex position.
         path (basf2.Path): modules are added to this path
     """
+
+    import pdg
+
     treeFitter = register_module("TreeFitter")
     treeFitter.set_name('TreeFitter_' + list_name)
     if massConstraint:
-        if isinstance(massConstraint[0], str):
-            treeFitter.param('massConstraintListParticlename', massConstraint)
-        else:
-            treeFitter.param('massConstraintList', massConstraint)
+        treeFitter.param('massConstraintList', pdg.from_names(massConstraint))
     treeFitter.param('particleList', list_name)
     treeFitter.param('confidenceLevel', conf_level)
     treeFitter.param('ipConstraint', ipConstraint)
@@ -299,6 +302,10 @@ def treeFit(
     treeFitter.param('originDimension', originDimension)
     treeFitter.param('treatAsInvisible', treatAsInvisible)
     treeFitter.param('ignoreFromVertexFit', ignoreFromVertexFit)
+    treeFitter.param('massConstraintDecayString', massConstraintDecayString)
+    if massConstraintMassValues:
+        treeFitter.param('massConstraintMassValues', [
+                pdg.get(item).Mass() if isinstance(item, (int, str)) else item for item in massConstraintMassValues])
     path.add_module(treeFitter)
 
 

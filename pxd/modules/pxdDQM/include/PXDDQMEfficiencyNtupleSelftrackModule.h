@@ -6,27 +6,22 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
 #pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <pxd/dataobjects/PXDCluster.h>
-
 #include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/ROIid.h>
-
 
 //root stuff
 #include "TFile.h"
 #include "TNtuple.h"
 
-
 namespace Belle2 {
+  class PXDCluster;
+  class Track;
+  class RecoTrack;
+  class ROIid;
 
   /**
    * Creates Ntuples for PXD Efficiency analysis
@@ -68,7 +63,7 @@ namespace Belle2 {
     /* returns the space point in local coordinates where the track hits the sensor:
       sensorInfo: info of the sensor under investigation
       aTrack: the track to be tested
-      isgood: flag which is false if some error occured (do not use the point if false)
+      isgood: flag which is false if some error occurred (do not use the point if false)
       du and dv are the uncertainties in u and v on the sensor plane of the fit (local coordinates)
      */
     ROOT::Math::XYZVector getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du,

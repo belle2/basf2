@@ -30,6 +30,7 @@ namespace Belle2 {
   class MCParticle;
   class PIDLikelihood;
   class V0;
+  class Kink;
 
   /**
    * Class to store reconstructed particles.
@@ -83,7 +84,8 @@ namespace Belle2 {
       c_V0            = 4,
       c_MCParticle    = 5,
       c_Composite     = 6,
-      c_NoMDSTSource  = 7
+      c_NoMDSTSource  = 7,
+      c_Kink          = 8
     };
 
     /** describes flavor type, see getFlavorType(). */
@@ -220,6 +222,15 @@ namespace Belle2 {
      */
     Particle(int trackArrayIndex, const TrackFitResult* trackFit,
              const Const::ChargedStable& chargedStable);
+
+    /**
+     * Constructor from a kink object
+     * @param kink pointer to Kink object
+     * @param chargedStable Type of charged particle
+     * @param trackFitResultIndex index of TrackFitResult to be associated with Particle
+     */
+    Particle(const Kink* kink, const Const::ChargedStable& chargedStable,
+             const unsigned trackFitResultIndex);
 
     /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
@@ -483,6 +494,15 @@ namespace Belle2 {
     unsigned getMdstArrayIndex(void) const
     {
       return m_mdstIndex;
+    }
+
+    /**
+     * Returns 0-based index of the TrackFitResult that should be associated with the Particle
+     * @return index of TrackFitResult
+     */
+    unsigned getTrackFitResultIndex(void) const
+    {
+      return m_trackFitResultIndex;
     }
 
     /**
@@ -766,21 +786,21 @@ namespace Belle2 {
      * Returns a vector of pointers to daughter particles
      * @return vector of pointers to daughter particles
      */
-    std::vector<Belle2::Particle*> getDaughters() const;
+    std::vector<Particle*> getDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
      * Returns a vector of pointers to Final State daughter particles
      * @return vector of pointers to final state daughter particles
      */
-    std::vector<const Belle2::Particle*> getFinalStateDaughters() const;
+    std::vector<const Particle*> getFinalStateDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
      * Returns a vector of pointers to all generations' daughter particles
      * @return vector of pointers to all generations' daughter particles
      */
-    std::vector<const Belle2::Particle*> getAllDaughters() const;
+    std::vector<const Particle*> getAllDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
@@ -842,6 +862,14 @@ namespace Belle2 {
      * @return const pointer to the V0
      */
     const V0* getV0() const;
+
+    /**
+     * Returns the pointer to the Kink object that was used to create this
+     * Particle (if ParticleType == c_Kink). NULL pointer is returned if the
+     * Particle was not made from a Kink.
+     * @return const pointer to the Kink
+     */
+    const Kink* getKink() const;
 
     /**
      * Returns the pointer to the PIDLikelihood object that is related to the Track, which
@@ -1033,7 +1061,7 @@ namespace Belle2 {
      * Function is called recursively
      * @param fspDaughters vector of daughter particles
      */
-    void fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const;
+    void fillFSPDaughters(std::vector<const Particle*>& fspDaughters) const;
 
     /**
      * Fill all generations' daughters into a vector
@@ -1041,7 +1069,7 @@ namespace Belle2 {
      * Function is called recursively
      * @param allDaughters vector of daughter particles
      */
-    void fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const;
+    void fillAllDaughters(std::vector<const Particle*>& allDaughters) const;
 
 
   private:
@@ -1067,6 +1095,7 @@ namespace Belle2 {
     EFlavorType m_flavorType;  /**< flavor type. */
     EParticleSourceObject m_particleSource;  /**< (mdst) source of particle */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
+    unsigned m_trackFitResultIndex; /**< 0-based index of related TrackFitResult, relevant for kinks */
     int m_properties; /**< particle property */
     std::vector<int> m_daughterProperties; /**< daughter particle properties */
 
@@ -1152,7 +1181,7 @@ namespace Belle2 {
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDefOverride(Particle, 17); /**< Class to store reconstructed particles. */
+    ClassDefOverride(Particle, 18); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
@@ -1163,6 +1192,7 @@ namespace Belle2 {
     // v15: added m_momentumScalingFactor and m_momentumSmearingFactor
     // v16: use double precision for private members
     // v17: added m_energyLossCorrection
+    // v18: added m_trackFitResultIndex
     friend class ParticleSubset;
   };
 

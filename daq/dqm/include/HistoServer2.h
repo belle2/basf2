@@ -46,9 +46,9 @@ namespace Belle2 {
 
     /** connection IP, state and last update time */
     std::map <std::string, std::pair<int, bool>> m_units_connected;
-    std::map <int, time_t> m_unit_last_conn_time;
-    std::map <int, time_t> m_unit_last_packet_time;
-    std::map <int, time_t> m_unit_last_content_time;
+    std::map <std::string, time_t> m_unit_last_conn_time;
+    std::map <std::string, time_t> m_unit_last_packet_time;
+    std::map <std::string, time_t> m_unit_last_content_time;
     time_t m_last_merge_time{};
   };
 }

@@ -56,7 +56,7 @@ ECLLocalMaximumFinderModule::ECLLocalMaximumFinderModule() : Module(),
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add module parameters.
-  addParam("energyCut", m_energyCut, "Seed energy cut [MeV], minimum is 5.0 MeV.", 10.0 * Belle2::Unit::MeV);
+  addParam("energyCut", m_energyCut, "Seed energy cut [MeV], minimum is 5.0 MeV.", 20.0 * Belle2::Unit::MeV);
   addParam("isTrainingMode", m_isTrainingMode,
            "Run in training mode (i.e. fill file with MVA input variables and determine MC truth of LM.).", 0);
   addParam("outfileName", m_outfileName, "Output file name for training file.", std::string("ECLLocalMaximumFinderOutput.root"));
@@ -187,7 +187,7 @@ void ECLLocalMaximumFinderModule::event()
       // Check seed energy cut.
       if (aECLCalDigit.getEnergy() >= m_energyCut) {
 
-        // Clean up for this candiate (MVA is trained per LM, regardless of CR)
+        // Clean up for this candidate (MVA is trained per LM, regardless of CR)
         std::fill_n(vNeighourEnergies.begin(), vNeighourEnergies.size(),
                     -999);   // -999 means later: this digit is just not available in this neighbour definition.
         resetTrainingVariables();

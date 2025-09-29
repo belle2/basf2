@@ -14,7 +14,6 @@
 
 #include <TVector3.h>
 
-#include <fstream>
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -67,7 +66,6 @@ namespace {
   {
     TVector3 v(1.0, 2.0, 3.0);
     std::string vStr = Stream::serializeAndEncode(&v);
-    //B2INFO(vStr);
 
     //restore
     TObject* obj = Stream::deserializeEncodedRawData(vStr);
@@ -79,15 +77,8 @@ namespace {
     RelationContainer* relCont = createObject();
 
     std::string relStr = Stream::serializeAndEncode(relCont);
-    //B2INFO(relStr);
     obj = Stream::deserializeEncodedRawData(relStr);
     checkObject(dynamic_cast<const RelationContainer*>(obj));
-
-    //creating file for next test..
-    /*
-    std::ofstream file("object_base64.xml");
-    file << Stream::escapeXML(relStr);
-    */
 
     // Given random input, TBase64 will most likely just crash, this specific truncation seems ok.
     // Note that the string length needs to be a multiple of 4 because

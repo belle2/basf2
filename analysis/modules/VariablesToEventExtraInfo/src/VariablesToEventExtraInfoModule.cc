@@ -11,6 +11,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/datastore/StoreArray.h>
+#include <analysis/dataobjects/Particle.h>
 
 using namespace std;
 using namespace Belle2;
@@ -39,6 +40,7 @@ void VariablesToEventExtraInfoModule::initialize()
 {
   StoreArray<Particle>().isRequired();
   m_inputList.isRequired(m_inputListName);
+  m_eventExtraInfo.isRequired();
 
   //collection function pointers
   for (const auto& pair : m_variables) {

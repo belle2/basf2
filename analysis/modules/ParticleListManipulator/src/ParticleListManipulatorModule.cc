@@ -19,6 +19,7 @@
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/ValueIndexPairSorting.h>
+#include <analysis/VariableManager/Utility.h>
 
 using namespace std;
 using namespace Belle2;
@@ -85,8 +86,9 @@ void ParticleListManipulatorModule::initialize()
   // If people apply cuts or merge particle lists, the resulting particle lists are not allowed to have these names.
   // Otherwise, very dangerous bugs could be introduced.
   string listLabel = mother->getLabel();
-  // For final state particles we protect the label "all".
-  if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(m_pdgCode))) and listLabel == "all") {
+  // For final state particles, except for neutrons, we protect the label "all".
+  if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(m_pdgCode))) and listLabel == "all" and
+      abs(m_pdgCode) != Const::neutron.getPDGCode()) {
     B2FATAL("You have tried to create the list " << m_outputListName <<
             " but the label 'all' is forbidden for user-defined lists of final-state particles." <<
             " It could introduce *very* dangerous bugs.");
@@ -228,12 +230,11 @@ void ParticleListManipulatorModule::event()
 
 void ParticleListManipulatorModule::fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence, bool ignoreMotherFlavor)
 {
-  if (ignoreMotherFlavor) idSequence.push_back(abs(p->getPDGCode()));
+  if (ignoreMotherFlavor or abs(p->getPDGCode()) == Const::neutron.getPDGCode()) idSequence.push_back(abs(p->getPDGCode()));
   else idSequence.push_back(p->getPDGCode());
 
   if (p->getNDaughters() == 0) {
-    idSequence.push_back(p->getParticleSource());
-    idSequence.push_back(p->getMdstArrayIndex());
+    idSequence.push_back(p->getMdstSource());
   } else {
     idSequence.push_back(p->getNDaughters());
     auto daughters = p->getDaughters();

@@ -8,6 +8,8 @@
 
 #include <reconstruction/modules/EventT0Validation/EventT0Validation.h>
 
+#include <framework/dataobjects/EventT0.h>
+
 #include <TEfficiency.h>
 
 using namespace Belle2;
@@ -50,10 +52,11 @@ void EventT0ValidationModule::initialize()
     setPlotMetaData(m_histCDCHitBasedEventT0, "Distribution of CDC hit based EventT0s.", "Should be centered around 0.", m_contact);
     m_histCDCChi2EventT0 = new TH1F("histCDCChi2EventT0", "CDC FullGrid #chi^{2} EventT0;EventT0 [ns];events / 0.5 ns",
                                     nBins, minT0, maxT0);
-    setPlotMetaData(m_histCDCChi2EventT0, "Distribution of CDC FullGrid #chi^{2} EventT0s.", "Should be centered around 0.", m_contact);
+    setPlotMetaData(m_histCDCChi2EventT0, "Distribution of CDC FullGrid #chi^{2} EventT0s.", "Should be centered around 0.",
+                    m_contact, "");
     m_histCDCGridEventT0 = new TH1F("histCDCGridEventT0", "CDC Grid search EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0,
                                     maxT0);
-    setPlotMetaData(m_histCDCGridEventT0, "Distribution of CDC Grid search EventT0s.", "Should be centered around 0.", m_contact);
+    setPlotMetaData(m_histCDCGridEventT0, "Distribution of CDC Grid search EventT0s.", "Should be centered around 0.", m_contact, "");
 
     m_histAlgorithmSourceCounts =
       new TH1D("histAlgorithmSourceCounts",

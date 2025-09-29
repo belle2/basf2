@@ -11,9 +11,9 @@
 
 /* Analysis headers. */
 #include <analysis/variables/ECLVariables.h>
-#include <analysis/variables/HelicityVariables.h>
 
 /* Basf2 headers. */
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mva/interface/Interface.h>
 
 /* Boost headers. */

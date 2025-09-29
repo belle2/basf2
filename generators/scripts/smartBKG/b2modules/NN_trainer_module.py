@@ -72,7 +72,7 @@ class TrainDataSaver(b2.Module):
     Arguments:
         output_file (str): Filename to save training data.
             Ending with ``parquet`` indicating fast mode, which will generate the final parquet file for training.
-            Ending with ``h5`` indicating advanced mode, which will produce a temperary h5 file for further preprocessing.
+            Ending with ``h5`` indicating advanced mode, which will produce a temporary h5 file for further preprocessing.
         flag_file (str): Filename of the flag file indicating passing events.
 
     Returns:
@@ -98,7 +98,7 @@ class TrainDataSaver(b2.Module):
         #: Whether use fast mode or advanced mode
         self.fast_mode = output_file.endswith(".parquet")
 
-        # delete output file if it already exists, since we will apend later
+        # delete output file if it already exists, since we will append later
         if os.path.exists(output_file):
             os.remove(output_file)
 
@@ -178,7 +178,7 @@ class data_production():
         #: Filename of the flag file indicating passing events
         self.flag = f'{in_dir}{flagName}{job_id}.parquet'
         if save_vars is not None:
-            #: Temperary directory to keep intermediate files for advanced mode
+            #: Temporary directory to keep intermediate files for advanced mode
             self.out_temp = f'{out_dir}_temp{job_id}/'
             os.makedirs(out_dir, exist_ok=True)
             os.makedirs(self.out_temp, exist_ok=True)
@@ -252,7 +252,6 @@ class data_production():
             )
             path.add_module(TrainDataSaver_module)
         b2.process(path, max_event=num_events)
-        print(b2.statistics)
 
     def merge_files(self):
         """

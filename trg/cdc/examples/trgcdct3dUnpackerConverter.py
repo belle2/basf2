@@ -17,6 +17,7 @@
 # -----------------------------------------------------------------------------------
 
 import basf2
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 import ROOT.Belle2
 
 
@@ -100,5 +101,5 @@ if __name__ == '__main__':
             'FirmTRGCDC2DFinderTracks',
             'FirmTRGCDC3DFitterTracks'])
     # Process all events
-    basf2.process(main)
+    basf2.process(main, calculateStatistics=True)
     print(basf2.statistics)

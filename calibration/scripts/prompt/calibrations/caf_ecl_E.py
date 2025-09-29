@@ -15,6 +15,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 settings = CalibrationSettings(
     name="ecl_energy",
     expert_username="hearty",
+    subsystem="ecl",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=[
@@ -41,7 +42,11 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],
-    expert_config={"ee5x5_min_entries": 100})
+    expert_config={"eCmsScale": 1.0,  # Ecms/10.58, typically 0.9943 for offpeak
+                   "ee5x5_min_entries": 100},
+    produced_payloads=["ECLCrystalEnergy", "ECLExpMuMuE", "ECLCrystalEnergyMuMu", "ECLExpGammaGammaE",
+                       "ECLCrystalEnergyGammaGamma", "ECLExpee5x5E", "ECLCrystalEnergyee5x5", "ECLeedPhiData",
+                       "ECLeedPhiMC"])
 
 # --------------------------------------------------------------
 # ..Raise clustering seed threshold in ECLCRFinder
@@ -129,6 +134,11 @@ def get_calibrations(input_data, **kwargs):
     eclee5x5_collector.param("useCalDigits", False)
     eclee5x5_collector.param("requireL1", False)
     eclee5x5_collector.param("granularity", "all")
+
+    # ..Adjust the expected energies for offpeak calibration
+    eCmsScale = expert_config["eCmsScale"]
+    eclee5x5_collector.param("expectedEnergyScale", eCmsScale)
+
     cal_ecl_ee5x5 = Calibration("ecl_ee5x5",
                                 collector=eclee5x5_collector,
                                 algorithms=[algo_ee5x5],
@@ -178,6 +188,10 @@ def get_calibrations(input_data, **kwargs):
     eclGammaGamma_collector.param("maxTime", 999.)
     eclGammaGamma_collector.param("measureTrueEnergy", False)
     eclGammaGamma_collector.param("requireL1", False)
+
+    # ..Adjust the expected energies for offpeak calibration
+    eclGammaGamma_collector.param("expectedEnergyScale", eCmsScale)
+
     cal_ecl_gamma_gamma = Calibration("ecl_gamma_gamma",
                                       collector=eclGammaGamma_collector,
                                       algorithms=[algo_gamma_gamma],

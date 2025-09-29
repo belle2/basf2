@@ -31,6 +31,7 @@ from prompt.calibrations.example_simple import settings as example_simple
 #: Tells the automated system some details of this script. The input_data_filters is only used for automated calibration (optional).
 settings = CalibrationSettings(name="Example Complex",
                                expert_username="ddossett",
+                               subsystem="example",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["physics", "cosmics", "Bcosmics"],
@@ -53,7 +54,8 @@ settings = CalibrationSettings(name="Example Complex",
                                    "max_events_per_file": 100,
                                    "max_files_per_run": 2,
                                    "payload_boundaries": []
-                               })
+                               },
+                               produced_payloads=[])
 
 # The values in expert_config above are the DEFAULT for this script. They will be overwritten by values in caf_config.json
 
@@ -98,6 +100,7 @@ def get_calibrations(input_data, **kwargs):
     # Set up config options
     import basf2
     from basf2 import register_module, create_path
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import TestCalibrationAlgorithm, TestBoundarySettingAlgorithm
     from caf.framework import Calibration, Collection
     from caf.strategies import SequentialBoundaries

@@ -8,6 +8,8 @@
 
 #include <reconstruction/modules/EventT0Combiner/EventT0Combiner.h>
 
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+
 #include <cmath>
 
 using namespace Belle2;
@@ -17,14 +19,22 @@ REG_MODULE(EventT0Combiner);
 EventT0CombinerModule::EventT0CombinerModule() : Module()
 {
   setDescription("Module to combine the EventT0 values from multiple sub-detectors");
-
   setPropertyFlags(c_ParallelProcessingCertified);
+}
+
+void EventT0CombinerModule::initialize()
+{
+  m_eventT0.isRequired();
+  m_eventLevelTriggerTimeInfo.isRequired();
 }
 
 void EventT0CombinerModule::event()
 {
   if (!m_eventT0.isValid()) {
     B2DEBUG(20, "EventT0 object not created, cannot do EventT0 combination");
+    // Unset all the EventT0 sources
+    if (m_eventLevelTriggerTimeInfo.isValid())
+      m_eventLevelTriggerTimeInfo->resetEventT0Sources();
     return;
   }
 
@@ -33,12 +43,34 @@ void EventT0CombinerModule::event()
   // But of course nothing can be done if no temporary EventT0s are present.
   if (m_eventT0->getTemporaryEventT0s().empty()) {
     B2DEBUG(20, "No temporary EventT0s available, can't chose the best one.");
+    // Unset all the EventT0 sources
+    if (m_eventLevelTriggerTimeInfo.isValid())
+      m_eventLevelTriggerTimeInfo->resetEventT0Sources();
     return;
   }
 
   // We have an SVD based EventT0 and it currently is set as *THE* EventT0 -> nothing to do
   if (m_eventT0->isSVDEventT0()) {
     B2DEBUG(20, "EventT0 already based on SVD information, nothing to do.");
+    // Set SVD as the EventT0 source
+    if (m_eventLevelTriggerTimeInfo.isValid()) {
+      m_eventLevelTriggerTimeInfo->resetEventT0Sources();
+      m_eventLevelTriggerTimeInfo->addEventT0SourceFromSVD();
+    }
+    return;
+  }
+
+  // We have an SVD based EventT0 but it currently is *NOT* set as *THE* EventT0 -> set it as *THE* EventT0
+  // This might happen e.g. during calibration if the CDCFullGridChi2 ("chi2", see below) is run after the SVD EventT0 algorithm
+  if (m_eventT0->hasTemporaryEventT0(Const::SVD)) {
+    const auto& bestSVDT0 = m_eventT0->getBestSVDTemporaryEventT0();
+    m_eventT0->setEventT0(*bestSVDT0);
+    B2DEBUG(20, "EventT0 is set to SVD EventT0.");
+    // Set SVD as the EventT0 source
+    if (m_eventLevelTriggerTimeInfo.isValid()) {
+      m_eventLevelTriggerTimeInfo->resetEventT0Sources();
+      m_eventLevelTriggerTimeInfo->addEventT0SourceFromSVD();
+    }
     return;
   }
 
@@ -50,6 +82,11 @@ void EventT0CombinerModule::event()
     const auto& bestCDCT0 = m_eventT0->getBestCDCTemporaryEventT0();
     if ((*bestCDCT0).algorithm == "chi2") {
       B2DEBUG(20, "Using CDC chi2 EventT0.");
+      // Set CDC as the EventT0 source
+      if (m_eventLevelTriggerTimeInfo.isValid()) {
+        m_eventLevelTriggerTimeInfo->resetEventT0Sources();
+        m_eventLevelTriggerTimeInfo->addEventT0SourceFromCDC();
+      }
       return;
     }
     B2DEBUG(20, "Current EventT0 is based on CDC, but it's not the chi2 value. Continue Search.");
@@ -72,14 +109,30 @@ void EventT0CombinerModule::event()
     B2DEBUG(20, "Combining ECL EventT0 and CDC hit based EventT0.");
     const auto combined = computeCombination({ *bestECLT0, *hitBasedCDCT0Candidate });
     m_eventT0->setEventT0(combined);
+    // Set ECL and CDC as the EventT0 sources
+    if (m_eventLevelTriggerTimeInfo.isValid()) {
+      m_eventLevelTriggerTimeInfo->resetEventT0Sources();
+      m_eventLevelTriggerTimeInfo->addEventT0SourceFromECL();
+      m_eventLevelTriggerTimeInfo->addEventT0SourceFromCDC();
+    }
     return;
   } else if (bestECLT0 and hitBasedCDCT0Candidate == cdcT0Candidates.end()) {
     B2DEBUG(20, "Using ECL EventT0, as CDC hit based EventT0 is not available.");
     m_eventT0->setEventT0(*bestECLT0);
+    // Set ECL as the EventT0 source
+    if (m_eventLevelTriggerTimeInfo.isValid()) {
+      m_eventLevelTriggerTimeInfo->resetEventT0Sources();
+      m_eventLevelTriggerTimeInfo->addEventT0SourceFromECL();
+    }
     return;
   } else if (hitBasedCDCT0Candidate != cdcT0Candidates.end() and not bestECLT0) {
     B2DEBUG(20, "Using CDC hit based EventT0, as ECL EventT0 is not available.");
     m_eventT0->setEventT0(*hitBasedCDCT0Candidate);
+    // Set CDC as the EventT0 source
+    if (m_eventLevelTriggerTimeInfo.isValid()) {
+      m_eventLevelTriggerTimeInfo->resetEventT0Sources();
+      m_eventLevelTriggerTimeInfo->addEventT0SourceFromCDC();
+    }
     return;
   } else {
     B2DEBUG(20, "There is no EventT0 from neither \n" \
@@ -88,9 +141,10 @@ void EventT0CombinerModule::event()
             " * the CDC based hit-based algorithm\n" \
             " * the ECL algorithm.\n" \
             "Thus, no EventT0 value can be calculated.");
+    // Unset all the EventT0 sources
+    if (m_eventLevelTriggerTimeInfo.isValid())
+      m_eventLevelTriggerTimeInfo->resetEventT0Sources();
   }
-
-
 }
 
 EventT0::EventT0Component EventT0CombinerModule::computeCombination(std::vector<EventT0::EventT0Component> measurements) const
@@ -116,5 +170,3 @@ EventT0::EventT0Component EventT0CombinerModule::computeCombination(std::vector<
 
   return EventT0::EventT0Component(eventT0, eventT0unc, usedDetectorSet);
 }
-
-

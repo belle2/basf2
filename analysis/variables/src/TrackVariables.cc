@@ -36,18 +36,13 @@
 namespace Belle2 {
   namespace Variable {
 
-    static const B2Vector3D vecNaN(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
+    static const ROOT::Math::XYZVector vecNaN(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
 
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
 
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the number of track hits.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
       if (det == Const::EDetector::CDC) {
         return trackFit->getHitPatternCDC().getNHits();
       } else if (det == Const::EDetector::SVD) {
@@ -97,11 +92,6 @@ namespace Belle2 {
     {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the real pattern and get the first SVD layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
       return trackFit->getHitPatternVXD().getFirstSVDLayer();
     }
 
@@ -109,11 +99,6 @@ namespace Belle2 {
     {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the real pattern and get the first PXD layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
       return trackFit->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
     }
 
@@ -121,11 +106,6 @@ namespace Belle2 {
     {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the real pattern and get the first CDC layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
       return trackFit->getHitPatternCDC().getFirstLayer();
     }
 
@@ -133,11 +113,6 @@ namespace Belle2 {
     {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the real pattern and get the last CDC layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
       return trackFit->getHitPatternCDC().getLastLayer();
     }
 
@@ -181,8 +156,10 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       auto helix = trackFit->getHelix();
-      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      helix.passiveMoveBy(beamSpotDB->getIPPosition());
       return helix.getD0();
     }
 
@@ -191,8 +168,10 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       auto helix = trackFit->getHelix();
-      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      helix.passiveMoveBy(beamSpotDB->getIPPosition());
       return helix.getZ0();
     }
 
@@ -201,8 +180,10 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       auto helix = trackFit->getHelix();
-      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      helix.passiveMoveBy(beamSpotDB->getIPPosition());
       return helix.getPhi0();
     }
 
@@ -210,7 +191,6 @@ namespace Belle2 {
     {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
-
       double errorSquared = trackFit->getCovariance5()[0][0];
       if (errorSquared <= 0) return Const::doubleNaN;
       return sqrt(errorSquared);
@@ -297,7 +277,7 @@ namespace Belle2 {
     }
 
     // used in trackHelixExtTheta and trackHelixExtPhi
-    B2Vector3D getPositionOnHelix(const TrackFitResult* trackFit, const std::vector<double>& pars)
+    ROOT::Math::XYZVector getPositionOnHelix(const TrackFitResult* trackFit, const std::vector<double>& pars)
     {
       const double r = pars[0];
       const double zfwd = pars[1];
@@ -324,7 +304,7 @@ namespace Belle2 {
       return h.getPositionAtArcLength2D(l);
     }
 
-    B2Vector3D getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
+    ROOT::Math::XYZVector getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
     {
       if (pars.size() == 4 and pars[3]) {
         const Track* track = part->getTrack();
@@ -333,10 +313,12 @@ namespace Belle2 {
 
         auto highestProbMass = part->getMostLikelyTrackFitResult().first;
         const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(highestProbMass);
-        return getPositionOnHelix(trackFit, pars);
+        if (!trackFit) return vecNaN;
+        else return getPositionOnHelix(trackFit, pars);
       } else {
         const TrackFitResult* trackFit = part->getTrackFitResult();
-        return getPositionOnHelix(trackFit, pars);
+        if (!trackFit) return vecNaN;
+        else return getPositionOnHelix(trackFit, pars);
       }
     }
 
@@ -348,7 +330,7 @@ namespace Belle2 {
         B2FATAL("Exactly three (+1 optional) parameters (r, zfwd, zbwd, [useHighestProbMass]) required for helixExtTheta.");
       }
 
-      B2Vector3D position = getPositionOnHelix(part, pars);
+      ROOT::Math::XYZVector position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return Const::doubleNaN;
       return position.Theta();
     }
@@ -361,7 +343,7 @@ namespace Belle2 {
         B2FATAL("Exactly three (+1 optional) parameters (r, zfwd, zbwd, [useHighestProbMass]) required for helixExtPhi.");
       }
 
-      B2Vector3D position = getPositionOnHelix(part, pars);
+      ROOT::Math::XYZVector position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return Const::doubleNaN;
       return position.Phi();
     }
@@ -389,7 +371,7 @@ namespace Belle2 {
 
       auto func = [parameters](const Particle * part) -> double {
 
-        B2Vector3D position = getPositionOnHelix(part, parameters);
+        ROOT::Math::XYZVector position = getPositionOnHelix(part, parameters);
         if (position == vecNaN) return Const::doubleNaN;
         return position.Theta();
       };
@@ -419,7 +401,7 @@ namespace Belle2 {
 
       auto func = [parameters](const Particle * part) -> double {
 
-        B2Vector3D position = getPositionOnHelix(part, parameters);
+        ROOT::Math::XYZVector position = getPositionOnHelix(part, parameters);
         if (position == vecNaN) return Const::doubleNaN;
         return position.Phi();
       };
@@ -514,13 +496,13 @@ namespace Belle2 {
     }
 
     // Build a Helix from a MCParticle's kinematics. Does NOT check for null pointer!!!
-    Belle2::Helix getMCHelix(const MCParticle* mcparticle)
+    Helix getMCHelix(const MCParticle* mcparticle)
     {
       const ROOT::Math::XYZVector mcProdVertex = mcparticle->getVertex();
       const ROOT::Math::XYZVector mcMomentum = mcparticle->getMomentum();
-      const double BzAtProdVertex = Belle2::BFieldManager::getFieldInTesla(mcProdVertex).Z();
+      const double BzAtProdVertex = BFieldManager::getFieldInTesla(mcProdVertex).Z();
       const double mcParticleCharge = mcparticle->getCharge();
-      return Belle2::Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
+      return Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
     }
 
     double getMCHelixParameterAtIndex(const Particle* particle, const int index)
@@ -530,7 +512,7 @@ namespace Belle2 {
       const MCParticle* mcparticle = particle->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
 
-      const Belle2::Helix mcHelix(getMCHelix(mcparticle));
+      const Helix mcHelix(getMCHelix(mcparticle));
       const std::vector<double> mcHelixPars{mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(), mcHelix.getZ0(), mcHelix.getTanLambda()};
       return mcHelixPars.at(index);
     }
@@ -542,12 +524,12 @@ namespace Belle2 {
       const MCParticle* mcparticle = particle->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
 
-      const Belle2::TrackFitResult* trackfit =  particle->getTrackFitResult();
+      const TrackFitResult* trackfit =  particle->getTrackFitResult();
       if (!trackfit) return Const::doubleNaN;
 
-      const Belle2::UncertainHelix measHelix = trackfit->getUncertainHelix();
+      const UncertainHelix measHelix = trackfit->getUncertainHelix();
       const TMatrixDSym& measCovariance = measHelix.getCovariance();
-      const Belle2::Helix mcHelix(getMCHelix(mcparticle));
+      const Helix mcHelix(getMCHelix(mcparticle));
 
       const std::vector<double> mcHelixPars   = {mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(), mcHelix.getZ0(), mcHelix.getTanLambda()};
       const std::vector<double> measHelixPars = {measHelix.getD0(), measHelix.getPhi0(), measHelix.getOmega(), measHelix.getZ0(), measHelix.getTanLambda()};
@@ -935,8 +917,8 @@ always 0 or 1 with newer versions of ECL reconstruction.
 
 Returns NaN if called for something other than a track-based particle.
     )DOC");
-    REGISTER_VARIABLE("helixExtTheta(radius [cm], z fwd [cm], z bwd [cm], useHighestProbMass=0)", trackHelixExtTheta,
-                      R"DOC(Returns theta of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will
+    REGISTER_VARIABLE("helixExtTheta(radius [cm], z fwd [cm], z bwd [cm], useHighestProbMass=0)", trackHelixExtTheta, R"DOC(
+                      Returns theta of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will
                       use the track fit result for the mass hypothesis with the highest pValue.
 
                       )DOC", "rad");
@@ -944,21 +926,21 @@ Returns NaN if called for something other than a track-based particle.
                       "Returns phi of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.\n\n",
                       "rad");
 
-    REGISTER_METAVARIABLE("helixExtThetaOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtThetaOnDet,
-                          R"DOC(Returns theta of extrapolated helix parameters on the given detector surface. The unit of angle is ``rad``.
+    REGISTER_METAVARIABLE("helixExtThetaOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtThetaOnDet, R"DOC(
+                          Returns theta of extrapolated helix parameters on the given detector surface. The unit of angle is ``rad``.
                           If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.
                           The supported detector surface names are ``{'CDC', 'TOP', 'ARICH', 'ECL', 'KLM'}``.
                           Also, the detector name with number of meaningful-layer is supported, e.g. ``'CDC8'``: last superlayer of CDC, ``'ECL1'``: mid-point of ECL.
 
-                          ..note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
+                          .. note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
                           )DOC", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("helixExtPhiOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtPhiOnDet,
-                          R"DOC(Returns phi of extrapolated helix parameters on the given detector surface. The unit of angle is ``rad``.
+    REGISTER_METAVARIABLE("helixExtPhiOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtPhiOnDet, R"DOC(
+                          Returns phi of extrapolated helix parameters on the given detector surface. The unit of angle is ``rad``.
                           If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.
                           The supported detector surface names are ``{'CDC', 'TOP', 'ARICH', 'ECL', 'KLM'}``.
                           Also, the detector name with number of meaningful-layer is supported, e.g. ``'CDC8'``: last superlayer of CDC, ``'ECL1'``: mid-point of ECL.
 
-                          ..note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
+                          .. note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
                           )DOC", Manager::VariableDataType::c_double);
 
 
@@ -1007,7 +989,7 @@ Returns NaN if there is no event-level tracking information available.
 
     REGISTER_VARIABLE("isTrackFlippedAndRefitted", isTrackFlippedAndRefitted, R"DOC(
 Returns 1 if the charged final state particle comes from a track that has been flipped and refitted
-at the end of the reconstruction chain, in particular after the outer detector reconstruction.
+at the end of the tracking chain, in particular before the outer detector reconstruction.
     )DOC");
 
     REGISTER_VARIABLE("trackTime", getTrackTime, R"DOC(

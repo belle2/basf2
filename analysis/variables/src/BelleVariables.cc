@@ -9,30 +9,28 @@
 // Own header.
 #include <analysis/variables/BelleVariables.h>
 
-// include VariableManager
-#include <analysis/VariableManager/Manager.h>
-
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dbobjects/BellePi0EtaProbParameters.h>
+#include <analysis/variables/AcceptanceVariables.h>
 #include <analysis/variables/Variables.h>
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/ECLVariables.h>
-#include <analysis/variables/TrackVariables.h>
 #include <analysis/variables/V0DaughterTrackVariables.h>
-#include <mdst/dataobjects/Track.h>
 #include <analysis/variables/VertexVariables.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
-
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
+#include <mdst/dataobjects/Track.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <b2bii/dataobjects/BelleTrkExtra.h>
 
+#include <cmath>
+#include <optional>
 #include <TVectorF.h>
-
-#include <limits>
 
 namespace Belle2 {
   namespace Variable {
@@ -49,7 +47,7 @@ namespace Belle2 {
         B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
         return false;
       }
-      if (abs(KS->getPDGCode()) != Const::Kshort.getPDGCode())
+      if (std::abs(KS->getPDGCode()) != Const::Kshort.getPDGCode())
         B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
 
       // If goodKs exists, return the value
@@ -63,19 +61,18 @@ namespace Belle2 {
       double dphi = acos(((particleDX(KS) * particlePx(KS)) + (particleDY(KS) * particlePy(KS))) / (fl * sqrt(particlePx(KS) * particlePx(
                            KS) + particlePy(KS) * particlePy(KS))));
       // particleDRho returns track d0 relative to IP for tracks
-      double dr = std::min(abs(particleDRho(d0)), abs(particleDRho(d1)));
+      double dr = std::min(std::abs(particleDRho(d0)), std::abs(particleDRho(d1)));
       double zdist = v0DaughterZ0Diff(KS);
 
-      bool low = p < 0.5 && abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;
-      bool mid = p < 1.5 && p > 0.5 && abs(zdist) < 1.8 && dr > 0.03 && dphi < 0.1 && fl > .08;
-      bool high = p > 1.5 && abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
+      bool low = p < 0.5 && std::abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;
+      bool mid = p < 1.5 && p > 0.5 && std::abs(zdist) < 1.8 && dr > 0.03 && dphi < 0.1 && fl > .08;
+      bool high = p > 1.5 && std::abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
 
       if (low || mid || high) {
         return true;
       } else
         return false;
     }
-
 
     double goodBelleLambda(const Particle* Lambda)
     {
@@ -89,7 +86,7 @@ namespace Belle2 {
         B2WARNING("goodBelleLambda is only defined for a particle with charged daughters");
         return 0.;
       }
-      if (abs(Lambda->getPDGCode()) != Const::Lambda.getPDGCode()) {
+      if (std::abs(Lambda->getPDGCode()) != Const::Lambda.getPDGCode()) {
         B2WARNING("goodBelleLambda is being applied to a candidate with PDG " << Lambda->getPDGCode());
       }
 
@@ -97,21 +94,21 @@ namespace Belle2 {
         return Lambda->getExtraInfo("goodLambda");
 
       double p = particleP(Lambda);
-      double dr = std::min(abs(particleDRho(d0)), abs(particleDRho(d1)));
+      double dr = std::min(std::abs(particleDRho(d0)), std::abs(particleDRho(d1)));
       double zdist = v0DaughterZ0Diff(Lambda);
       double dphi = acos(cosAngleBetweenMomentumAndVertexVectorInXYPlane(Lambda));
       // Flight distance of Lambda0 in xy plane
       double fl = particleDRho(Lambda);
 
       // goodBelleLambda == 1 (optimized for proton PID > 0.6)
-      bool high1 = p >= 1.5 && abs(zdist) < 12.9 && dr > 0.008 && dphi < 0.09 && fl > 0.22;
-      bool mid1 = p >= 0.5 && p < 1.5 && abs(zdist) < 9.8 && dr > 0.01 && dphi < 0.18 && fl > 0.16;
-      bool low1 = p < 0.5 && abs(zdist) < 2.4 && dr > 0.027 && dphi < 1.2 && fl > 0.11;
+      bool high1 = p >= 1.5 && std::abs(zdist) < 12.9 && dr > 0.008 && dphi < 0.09 && fl > 0.22;
+      bool mid1 = p >= 0.5 && p < 1.5 && std::abs(zdist) < 9.8 && dr > 0.01 && dphi < 0.18 && fl > 0.16;
+      bool low1 = p < 0.5 && std::abs(zdist) < 2.4 && dr > 0.027 && dphi < 1.2 && fl > 0.11;
 
       // goodBelleLambda == 2 (optimized without PID selection)
-      bool high2 = p >= 1.5 && abs(zdist) < 7.7 && dr > 0.018 && dphi < 0.07 && fl > 0.35;
-      bool mid2 = p >= 0.5 && p < 1.5 && abs(zdist) < 2.1 && dr > 0.033 && dphi < 0.10 && fl > 0.24;
-      bool low2 = p < 0.5 && abs(zdist) < 1.9 && dr > 0.059 && dphi < 0.6 && fl > 0.17;
+      bool high2 = p >= 1.5 && std::abs(zdist) < 7.7 && dr > 0.018 && dphi < 0.07 && fl > 0.35;
+      bool mid2 = p >= 0.5 && p < 1.5 && std::abs(zdist) < 2.1 && dr > 0.033 && dphi < 0.10 && fl > 0.24;
+      bool low2 = p < 0.5 && std::abs(zdist) < 1.9 && dr > 0.059 && dphi < 0.6 && fl > 0.17;
 
       if (low2 || mid2 || high2) {
         return 2.0;
@@ -288,7 +285,7 @@ namespace Belle2 {
       double time = belleTrkExtra->getTof();
       double length = belleTrkExtra->getPathLength();
       double p = particle->getP(); //3-momentum
-      double tofbeta = length / time / Belle2::Const::speedOfLight;
+      double tofbeta = length / time / Const::speedOfLight;
       double tofmass = p * sqrt(1. / (tofbeta * tofbeta) - 1.); //(GeV)
 
       return tofmass;
@@ -334,7 +331,163 @@ namespace Belle2 {
       return belleTrkExtra->getACCQuality();
     }
 
+    double Pi0_Prob(double mass, double energy, int eclRegion)
+    {
+      static const double massMin = 0.034976;
+      static const double massMax = 0.234976;
+      static const double logEnergyMin = 1.3;
+      static const double logEnergyMax = 3.7;
+      static const int p_bins = 24;
+      static const int m_bins = 50;
 
+      double logp = log(1000 * energy) / log(10.);
+      if ((logp < logEnergyMin) || (logp > logEnergyMax)) return 0;
+
+      double drow = p_bins * (logp - logEnergyMin) / (logEnergyMax - logEnergyMin);
+      int row = int(drow);
+      double dcol = m_bins * (mass - massMin) / (massMax - massMin);
+      int col = int(dcol);
+      if ((row < 0) || (row >= p_bins) || (col < 0) || (col >= m_bins)) {
+        B2ERROR("Fault in getting the coordinates of pi0 probability");
+        return Const::doubleNaN;
+      }
+      int pos = m_bins * row + col ;
+      if (pos > m_bins * p_bins) {
+        B2ERROR("Fault in getting the coordinates of pi0 probability");
+        return Const::doubleNaN;
+      }
+      static DBObjPtr<BellePi0EtaProbParameters> probs;
+      if (!probs.isValid()) {
+        return Const::doubleNaN;
+      }
+      if (eclRegion == 1) {
+        return probs->getBelleFWDPi0Probability(pos);
+      } else if (eclRegion == 2) {
+        return probs->getBelleBRLPi0Probability(pos);
+      } else if (eclRegion == 3) {
+        return probs->getBelleBWDPi0Probability(pos);
+      } else return Const::doubleNaN;
+    }
+
+    double Eta_Prob(double mass, double energy, int eclRegion)
+    {
+      static const double massMin = 0.4473;
+      static const double massMax = 0.6473;
+      static const double logEnergyMin = 1.3;
+      static const double logEnergyMax = 3.7;
+      static const int p_bins = 24;
+      static const int m_bins = 50;
+
+      double logp = log(1000 * energy) / log(10.);
+      if ((logp < logEnergyMin) || (logp > logEnergyMax)) return 0;
+
+      double drow = p_bins * (logp - logEnergyMin) / (logEnergyMax - logEnergyMin);
+      int row = int(drow);
+      double dcol = m_bins * (mass - massMin) / (massMax - massMin);
+      int col = int(dcol);
+      if ((row < 0) || (row >= p_bins) || (col < 0) || (col >= m_bins)) {
+        B2ERROR("Fault in getting the coordinates of eta probability");
+        return Const::doubleNaN;
+      }
+      int pos = m_bins * row + col ;
+      if (pos > m_bins * p_bins) {
+        B2ERROR("Fault in getting the coordinates of eta probability");
+        return Const::doubleNaN;
+      }
+
+      static DBObjPtr<BellePi0EtaProbParameters> probs;
+      if (!probs.isValid())
+        return Const::doubleNaN;
+      if (eclRegion == 1) {
+        return probs->getBelleFWDEtaProbability(pos);
+      } else if (eclRegion == 2) {
+        return probs->getBelleBRLEtaProbability(pos);
+      } else if (eclRegion == 3) {
+        return probs->getBelleBWDEtaProbability(pos);
+      } else return Const::doubleNaN;
+    }
+
+    Manager::FunctionPtr BellePi0Veto(const std::vector<std::string>& arguments)
+    {
+      std::string photonListName = "gamma:mdst";
+      if (arguments.size() == 1) photonListName = arguments[0];
+
+      auto func = [photonListName](const Particle * particle) -> double {
+        StoreObjPtr<ParticleList> photonList(photonListName);
+        if (!(photonList.isValid()))
+        {
+          B2FATAL("Invalid photon list name " << photonListName << " given to BellePi0Veto!");
+        }
+
+        ROOT::Math::PxPyPzEVector particle4Vector = particle->get4Vector();
+        unsigned int particleIndex = particle->getMdstArrayIndex();
+        std::optional<double> temppi0;
+
+        for (unsigned int i = 0; i < photonList->getListSize(); i++)
+        {
+          const Particle* photon = photonList->getParticle(i);
+
+          if (photon->getMdstArrayIndex() == particleIndex) continue;
+
+          ROOT::Math::PxPyPzEVector Pi0 = particle4Vector + photon->get4Vector();
+
+          double mass = Pi0.M();
+          if (mass < 0.11 or mass > 0.15) continue;
+
+          double pi0_prob = Pi0_Prob(
+            mass,
+            photon->getEnergy(),
+            eclClusterDetectionRegion(photon)
+          );
+          if (!temppi0 or pi0_prob > *temppi0) {
+            temppi0 = pi0_prob;
+          }
+        }
+        return temppi0.value_or(Const::doubleNaN);
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr BelleEtaVeto(const std::vector<std::string>& arguments)
+    {
+      std::string photonListName = "gamma:mdst";
+      if (arguments.size() == 1) photonListName = arguments[0];
+
+      auto func = [photonListName](const Particle * particle) -> double {
+        StoreObjPtr<ParticleList> photonList(photonListName);
+        if (!(photonList.isValid()))
+        {
+          B2FATAL("Invalid photon list name " << photonListName << " given to BelleEtaVeto!");
+        }
+
+        ROOT::Math::PxPyPzEVector particle4Vector = particle->get4Vector();
+        unsigned int particleIndex = particle->getMdstArrayIndex();
+        std::optional<double> tempeta;
+
+        for (unsigned int i = 0; i < photonList->getListSize(); i++)
+        {
+          const Particle* photon = photonList->getParticle(i);
+
+          if (photon->getMdstArrayIndex() == particleIndex) continue;
+
+          ROOT::Math::PxPyPzEVector Eta = particle4Vector + photon->get4Vector();
+
+          double mass = Eta.M();
+          if (mass < 0.5 or mass > 0.58) continue;
+
+          double eta_prob = Eta_Prob(
+            mass,
+            photon->getEnergy(),
+            eclClusterDetectionRegion(photon)
+          );
+          if (!tempeta or eta_prob > *tempeta) {
+            tempeta = eta_prob;
+          }
+        }
+        return tempeta.value_or(Const::doubleNaN);
+      };
+      return func;
+    }
 
     VARIABLE_GROUP("Belle Variables");
 
@@ -446,6 +599,7 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
 
     REGISTER_VARIABLE("BelleTofMass", BelleTofMass, R"DOC(
 [Legacy] Returns the TOF mass calculated from the time of flight and path length. (Belle only).
+
 )DOC", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("BelledEdx", BelledEdx, R"DOC(
@@ -464,6 +618,19 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
     REGISTER_VARIABLE("BelleACCQuality", BelleACCQuality, R"DOC(
 [Legacy] Returns the ACC quality flag. Original definition in the panther tables: if 0 normal, if 1 the track is out of ACC acceptance. (Belle only).
 )DOC");
+
+    REGISTER_METAVARIABLE("BellePi0Veto(photonlistname)", BellePi0Veto, R"DOC(
+[Legacy] Meta-variable that computes the maximum probability that a photon candidate is
+consistent with originating from a pi0 decay when combined with any other photon in a given list.
+Calculated within a mass window of 0.11 - 0.15 GeV/c^2, based on mass, energy, and ecl cluster region,
+using lookup tables derived in Belle. For more details, see Belle Note 665.
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("BelleEtaVeto(photonlistname)", BelleEtaVeto,  R"DOC(
+[Legacy] Meta-variable that computes the maximum probability that a photon candidate is
+consistent with originating from an eta decay when combined with any other photon in a given list.
+Calculated within a mass window of 0.50 - 0.58 GeV/c^2, based on mass, energy, and ecl cluster region,
+using lookup tables derived in Belle. For more details, see Belle Note 665.
+)DOC", Manager::VariableDataType::c_double);
 
 
     // this is defined in ECLVariables.{h,cc}

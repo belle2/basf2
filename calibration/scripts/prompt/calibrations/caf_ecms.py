@@ -12,9 +12,9 @@ Airflow script to perform eCMS calibration (combination of the had-B and mumu me
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_boostvector import settings as boostvector
-from reconstruction import add_pid_module, add_ecl_modules, prepare_cdst_analysis
 
 from basf2 import create_path, register_module, get_file_metadata, B2INFO, B2WARNING
+from reconstruction import prepare_cdst_analysis
 import modularAnalysis as ma
 import vertex
 import stdCharged
@@ -25,7 +25,8 @@ import os
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="Ecms Calibrations",
-    expert_username="zlebcr",
+    expert_username="zlebcik",
+    subsystem="beam",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["hadron4S", "mumu4S", "mumuOff"],
@@ -55,8 +56,10 @@ settings = CalibrationSettings(
         "innerLoss": "pow(0.000120e0*rawTime, 2) +  1./nEv",
         "runHadB": True,
         "eCMSmumuSpread": 5.2e-3,
-        "eCMSmumuShift": 10e-3},
-    depends_on=[boostvector])
+        "eCMSmumuShift": 10e-3,
+        "minPXDhits": 0},
+    depends_on=[boostvector],
+    produced_payloads=["CollisionInvariantMass"])
 
 ##############################
 
@@ -67,10 +70,7 @@ def get_hadB_path(isCDST):
     # module to be run prior the collector
     rec_path_1 = create_path()
     if isCDST:
-        prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
-
-    add_pid_module(rec_path_1)
-    add_ecl_modules(rec_path_1)
+        prepare_cdst_analysis(path=rec_path_1, components=['SVD', 'CDC', 'ECL', 'KLM'])
 
     stdCharged.stdPi(listtype='loose', path=rec_path_1)
     stdCharged.stdK(listtype='good', path=rec_path_1)
@@ -205,17 +205,18 @@ def get_hadB_path(isCDST):
     return rec_path_1
 
 
-def get_mumu_path(isCDST):
+def get_mumu_path(isCDST, kwargs):
     """ Selects the ee -> mumu events, function returns corresponding path  """
 
     # module to be run prior the collector
     rec_path_1 = create_path()
     if isCDST:
-        prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
+        prepare_cdst_analysis(path=rec_path_1, components=['SVD', 'CDC', 'ECL', 'KLM'])
 
+    minPXDhits = kwargs['expert_config']['minPXDhits']
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
-    muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
+    muSelection += f' and nPXDHits >= {minPXDhits} and nSVDHits >= 8 and nCDCHits >= 20'
 
     ma.fillParticleList('mu+:BV', muSelection, path=rec_path_1)
     ma.reconstructDecay('Upsilon(4S):BV -> mu+:BV mu-:BV', '9.5<M<11.5', path=rec_path_1)
@@ -293,6 +294,7 @@ def get_calibrations(input_data, **kwargs):
     from caf.framework import Calibration
     from caf.strategies import SingleIOV
 
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import InvariantMassAlgorithm
     from caf.framework import Collection
 
@@ -305,7 +307,7 @@ def get_calibrations(input_data, **kwargs):
     isCDST_mumu = is_cDST_file((input_files_MuMu4S + input_files_MuMuOff)[0])
 
     rec_path_HadB = get_hadB_path(isCDST_had)
-    rec_path_MuMu = get_mumu_path(isCDST_mumu)
+    rec_path_MuMu = get_mumu_path(isCDST_mumu, kwargs)
 
     collector_HadB = register_module('EcmsCollector')
     collector_MuMu = register_module('BoostVectorCollector', Y4SPListName='Upsilon(4S):BV')
@@ -318,8 +320,7 @@ def get_calibrations(input_data, **kwargs):
     algorithm_ecms.setMuMuEcmsSpread(kwargs['expert_config']['eCMSmumuSpread'])
     algorithm_ecms.setMuMuEcmsOffset(kwargs['expert_config']['eCMSmumuShift'])
 
-    calibration_ecms = Calibration('eCMS',
-                                   algorithms=algorithm_ecms)
+    calibration_ecms = Calibration('eCMS', algorithms=algorithm_ecms)
 
     collection_HadB = Collection(collector=collector_HadB,
                                  input_files=input_files_Had,
@@ -336,7 +337,6 @@ def get_calibrations(input_data, **kwargs):
     calibration_ecms.add_collection(name='hadB_4S', collection=collection_HadB)
 
     calibration_ecms.strategies = SingleIOV
-    # calibration_ecms.backend_args = {'extra_lines' : ["RequestRuntime = 6h"]}
 
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun

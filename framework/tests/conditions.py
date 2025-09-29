@@ -214,7 +214,7 @@ def dbprocess(host, path, lastChangeCallback=lambda: None, *, globaltag="localte
     # Run the path in a child process inside of a clean working directory
     with clean_working_directory():
         # make logging more reproducible by replacing some strings
-        configure_logging_for_tests()
+        configure_logging_for_tests(replace_cdb_provider=False)
         basf2.logging.log_level = basf2.LogLevel.DEBUG
         basf2.logging.debug_level = 30
         basf2.conditions.reset()
@@ -247,7 +247,7 @@ conn = multiprocessing.Pipe(False)
 mock_conditionsdb = multiprocessing.Process(target=run_mockdb, args=(conn[1],))
 mock_conditionsdb.daemon = True
 mock_conditionsdb.start()
-# mock db has started when we recieve the port number from the child, so wait for that
+# mock db has started when we receive the port number from the child, so wait for that
 mock_port = conn[0].recv()
 # if the port we got is None the server didn't start ... so bail
 if mock_port is None:
@@ -271,7 +271,7 @@ main = basf2.Path()
 evtinfo = main.add_module("EventInfoSetter")
 main.add_module("PrintBeamParameters")
 
-# run trough a set of experiments, each time we want to process two runs to make
+# run through a set of experiments, each time we want to process two runs to make
 # sure that it works correctly for more than one run
 for exp in range(len(SimpleConditionsDB.payloads) + 1):
     try:

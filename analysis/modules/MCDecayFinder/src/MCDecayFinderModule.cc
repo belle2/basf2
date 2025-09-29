@@ -11,6 +11,7 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/utility/MCMatching.h>
+#include <analysis/modules/MCDecayFinder/DecayTree.h>
 
 #include <string>
 #include <memory>
@@ -25,6 +26,7 @@ MCDecayFinderModule::MCDecayFinderModule() : Module(), m_isSelfConjugatedParticl
 {
   //Set module properties
   setDescription("Find decays in MCParticle list matching a given DecayString and create Particles from them.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("decayString", m_strDecay, "DecayDescriptor string.");
   addParam("listName", m_listName, "Name of the output particle list");

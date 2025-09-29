@@ -1009,14 +1009,14 @@ namespace Belle2 {
         }
 
         double connectedRegionID = eclClusterConnectedRegionID(particle);
-        unsigned mdstArrayIndex = particle->getMdstArrayIndex();
+        int mdstSource = particle->getMdstSource();
 
         for (unsigned int i = 0; i < photonlist->getListSize(); i++)
         {
           const Particle* part = photonlist->getParticle(i);
 
           // skip the particle itself
-          if (part->getMdstArrayIndex() == mdstArrayIndex) {
+          if (part->getMdstSource() == mdstSource) {
             continue;
           }
 
@@ -1398,6 +1398,10 @@ and :math:`\alpha_{i}` is the polar angle of the :math:`i`-th crystal in the per
 As a crystal can be related to more than one shower, :math:`w_{i}` is the fraction of the
 energy of the :math:`i`-th crystal associated with the shower.
 
+**Note:** this variable is sensitive to other nearby particles and so cluster isolation properties should always be checked; 
+for more information please see the 
+`ECL Cluster Recommendations <https://indico.belle2.org/event/13722/contributions/84645/attachments/31512/51585/ecl_recommendation.pdf>`_. 
+
 More details about the implementation can be found in `BELLE2-NOTE-TE-2017-001 <https://docs.belle2.org/record/454?ln=en>`_ .
 
 More details about Zernike polynomials can be found in `Wikipedia <https://en.wikipedia.org/wiki/Zernike_polynomials>`_ .
@@ -1496,10 +1500,12 @@ The MVA has been trained using MC and the features used are:
 - `clusterPulseShapeDiscriminationMVA`
 - `clusterE`
 - `clusterTheta`
-- `clusterZernikeMVA`
 
+The variable `clusterZernikeMVA` is also used but only for the MC15 training. 
 Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
-the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
+
+Please cite `this <https://inspirehep.net/literature/2785196>`_ if using this tool. 
 )DOC");
     REGISTER_VARIABLE("fakePhotonSuppression", fakePhotonSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from fake photon clusters (e.g. split-offs,
@@ -1509,15 +1515,17 @@ The MVA has been trained using MC and the features are:
 
 - `clusterPulseShapeDiscriminationMVA`
 - `minC2TDist`
-- `clusterZernikeMVA`
 - `clusterE`
 - `clusterTiming`
 - `clusterTheta`
 
-This MVA is the same as the one used for `hadronicSplitOffSuppression` but that variable should not be used as it is deprecated and does not use the new weights. 
-
+The variable `clusterZernikeMVA` is also used but only for the MC15 training. 
 Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
-the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
+
+Please cite `this <https://inspirehep.net/literature/2785196>`_ if using this tool. 
+
+(This MVA is the same as the one used for `hadronicSplitOffSuppression` but that variable should not be used as it is deprecated and does not use the new weights). 
 )DOC");
     REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.
@@ -1536,7 +1544,7 @@ The MVA has been trained using samples of signal photons and hadronic splitoff p
 - `clusterE1E9`
 - `clusterSecondMoment`
 )DOC");
-    MAKE_DEPRECATED("hadronicSplitOffSuppression", false, "light-2302-genetta", R"DOC(
+    MAKE_DEPRECATED("hadronicSplitOffSuppression", true, "light-2302-genetta", R"DOC(
                      Use the variable `fakePhotonSuppression` instead which is maintained and uses the latest weight files.
 )DOC");
     REGISTER_VARIABLE("clusterKlId", eclClusterKlId, R"DOC(
@@ -1550,6 +1558,8 @@ Returns MVA classifier that uses pulse shape discrimination to identify electrom
 
 - 1 for electromagnetic showers
 - 0 for hadronic showers
+
+For details, see the following `PSD arxiv paper <https://arxiv.org/pdf/2007.09642>`_  
 )DOC");
     REGISTER_VARIABLE("clusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits, R"DOC(
 Returns ECL cluster's number of hadron digits in cluster (pulse shape discrimination variable).

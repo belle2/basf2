@@ -31,10 +31,10 @@ TEST(BasicTrackVarSetCalculation, test_empty_track)
 
   // create an empty track containing no hits
   const CDCTrack emptyTrack;
-  // extract variables from emtpy track
+  // extract variables from empty track
   BasicTrackVarSet trackVarSet;
 
-  // returnvalue should be false
+  // return value should be false
   bool returnvalue = trackVarSet.extract(&emptyTrack);
   EXPECT_EQ(false, returnvalue);
 
@@ -92,14 +92,14 @@ TEST_F(TrackFindingCDCTestWithTopology, basicTrackVarSet_test_one_hit_track)
   EXPECT_EQ(driftLength, *trackVarSet.find("drift_length_sum"));
   EXPECT_EQ(driftLength, *trackVarSet.find("drift_length_min"));
   EXPECT_EQ(driftLength, *trackVarSet.find("drift_length_max"));
-  // variance not calculatable, define it to be -1
+  // variance not calculable, define it to be -1
   EXPECT_EQ(-1, *trackVarSet.find("drift_length_variance"));
 
   EXPECT_EQ(adcCount, *trackVarSet.find("adc_mean"));
   EXPECT_EQ(adcCount, *trackVarSet.find("adc_sum"));
   EXPECT_EQ(adcCount, *trackVarSet.find("adc_min"));
   EXPECT_EQ(adcCount, *trackVarSet.find("adc_max"));
-  // variance not calculatable, define it to be -1
+  // variance not calculable, define it to be -1
   EXPECT_EQ(-1, *trackVarSet.find("adc_variance"));
 
   // with only one arc length (s), there are no gaps in s, thus empty_s variables empty
@@ -108,7 +108,7 @@ TEST_F(TrackFindingCDCTestWithTopology, basicTrackVarSet_test_one_hit_track)
   EXPECT_EQ(0, *trackVarSet.find("empty_s_min"));
   EXPECT_EQ(0, *trackVarSet.find("empty_s_max"));
   EXPECT_EQ(0, *trackVarSet.find("s_range"));
-  // variance not calculatable, define it to be -1
+  // variance not calculable, define it to be -1
   EXPECT_EQ(-1, *trackVarSet.find("empty_s_variance"));
 }
 
@@ -168,7 +168,7 @@ TEST_F(TrackFindingCDCTestWithTopology, basicTrackVarSet_test_two_hit_track)
   EXPECT_EQ(only_empty_s, *trackVarSet.find("empty_s_min"));
   EXPECT_EQ(only_empty_s, *trackVarSet.find("empty_s_max"));
   EXPECT_EQ(only_empty_s, *trackVarSet.find("s_range"));
-  // variance not calculatable
+  // variance not calculable
   EXPECT_EQ(-1, *trackVarSet.find("empty_s_variance"));
 }
 

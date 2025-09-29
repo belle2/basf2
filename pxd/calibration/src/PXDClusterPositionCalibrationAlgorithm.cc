@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <pxd/calibration/PXDClusterPositionCalibrationAlgorithm.h>
+#include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
+#include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
 
 #include <string>
 #include <tuple>
@@ -271,7 +273,7 @@ void PXDClusterPositionCalibrationAlgorithm::createShapeClassifier(string treena
   tree->SetBranchAddress("SizeV", &m_sizeV);
 
   // Vector to enumerate all shapes by unique name and count their
-  // occurence in training data.
+  // occurrence in training data.
   vector< pair<string, float> > shapeList;
 
   for (int i = 0; i < nEntries; ++i) {

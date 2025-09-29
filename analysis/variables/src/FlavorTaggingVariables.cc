@@ -26,6 +26,7 @@
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
+#include <analysis/dataobjects/FlavorTaggerInfoMap.h>
 #include <analysis/ContinuumSuppression/Thrust.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -40,7 +41,7 @@
 
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
-#include <framework/geometry/B2Vector3.h>
+#include <Math/VectorUtil.h>
 
 #include <algorithm>
 #include <cmath>
@@ -109,7 +110,7 @@ namespace Belle2 {
           return 0;
       }
 
-      std::vector<ROOT::Math::XYZVector> p3_cms_roe;
+      std::vector<ROOT::Math::PxPyPzEVector> p_cms_roe;
       static const double P_MAX(3.2);
 
       // Charged tracks
@@ -120,7 +121,7 @@ namespace Belle2 {
         ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
         if (p_cms != p_cms) continue;
         if (p_cms.P() > P_MAX) continue;
-        p3_cms_roe.push_back(p_cms.Vect());
+        p_cms_roe.push_back(p_cms);
       }
 
       // ECLCluster->Gamma
@@ -133,7 +134,7 @@ namespace Belle2 {
           ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
           if (p_cms != p_cms) continue;
           if (p_cms.P() > P_MAX) continue;
-          p3_cms_roe.push_back(p_cms.Vect());
+          p_cms_roe.push_back(p_cms);
         }
       }
 
@@ -146,15 +147,15 @@ namespace Belle2 {
           ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
           if (p_cms != p_cms) continue;
           if (p_cms.P() > P_MAX) continue;
-          p3_cms_roe.push_back(p_cms.Vect());
+          p_cms_roe.push_back(p_cms);
         }
       }
 
-      const B2Vector3D thrustO = Thrust::calculateThrust(p3_cms_roe);
-      const B2Vector3D pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
+      const ROOT::Math::XYZVector thrustO = Thrust::calculateThrust(p_cms_roe);
+      const ROOT::Math::PxPyPzEVector pAxis = PCmsLabTransform::labToCms(part->get4Vector());
 
       double result = 0 ;
-      if (pAxis == pAxis) result = abs(cos(pAxis.Angle(thrustO)));
+      if (pAxis == pAxis) result = abs(ROOT::Math::VectorUtil::CosTheta(pAxis, thrustO));
 
       return result;
     }
@@ -182,7 +183,7 @@ namespace Belle2 {
             return 0;
         }
 
-        std::vector<ROOT::Math::XYZVector> p3_cms_roe;
+        std::vector<ROOT::Math::PxPyPzEVector> p_cms_roe;
         // static const double P_MAX(3.2);
 
         // Charged tracks
@@ -194,7 +195,7 @@ namespace Belle2 {
           ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
           if (p_cms != p_cms) continue;
           // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
-          p3_cms_roe.push_back(p_cms.Vect());
+          p_cms_roe.push_back(p_cms);
         }
 
         // ECLCluster->Gamma
@@ -208,7 +209,7 @@ namespace Belle2 {
             ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
             if (p_cms != p_cms) continue;
             // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
-            p3_cms_roe.push_back(p_cms.Vect());
+            p_cms_roe.push_back(p_cms);
           }
         }
 
@@ -223,16 +224,16 @@ namespace Belle2 {
             ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
             if (p_cms != p_cms) continue;
             // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
-            p3_cms_roe.push_back(p_cms.Vect());
+            p_cms_roe.push_back(p_cms);
           }
         }
 
-        const B2Vector3D thrustO  = Thrust::calculateThrust(p3_cms_roe);
-        const B2Vector3D pAxis = PCmsLabTransform::labToCms(particle->get4Vector()).Vect();
+        const ROOT::Math::XYZVector thrustO  = Thrust::calculateThrust(p_cms_roe);
+        const ROOT::Math::PxPyPzEVector pAxis = PCmsLabTransform::labToCms(particle->get4Vector());
 
         double result = 0 ;
         if (pAxis == pAxis)
-          result = abs(cos(pAxis.Angle(thrustO))); // abs??
+          result = abs(ROOT::Math::VectorUtil::CosTheta(pAxis, thrustO)); // abs??
 
         return result;
 
@@ -1021,13 +1022,13 @@ namespace Belle2 {
 //  Target Variables ----------------------------------------------------------------------------------------------
 
     // Lists used in target variables
-    static const std::vector<int> charmMesons = {
+    constexpr std::array<int, 18> charmMesons = {
       411 /*D+*/, 413 /*D*+*/, 415/*D_2*+*/, 421 /*D0*/, 423 /*D*0*/, 425/*D_2*0*/, 431/*D_s+*/, 433/*D_s*+*/, 435/*D_s2*+*/,
       10411 /*D_0*+*/, 10413 /*D_1+*/, 10421 /*D_0*0*/, 10423 /*D_10*/, 10431 /*D_s0*+*/, 10433/*D'_s1+*/,
       20413 /*D'_1+*/, 20423 /*D'_10*/, 20433/*D_s1+*/,
     };
 
-    static const std::vector<int> charmBaryons = {
+    constexpr std::array<int, 22> charmBaryons = {
       4112 /*Sigma_c0*/, 4114 /*Sigma_c*0*/, 4122 /*Lambda_c+*/, 4132 /*Xi_c0*/,
       4212 /*Sigma_c+*/, 4214 /*Sigma_c*+*/, 4222 /*Sigma_c++*/, 4224 /*sigma_c*++*/, 4232 /*Xi_c+*/,
       4312 /*Xi'_c0*/, 4314 /*Xi_c*0*/, 4322 /*Xi'_c+*/, 4324 /*Xi_c*+*/, 4332 /*Omega_c0*/, 4334 /*Omega_c*0*/,
@@ -1036,7 +1037,7 @@ namespace Belle2 {
       4444 /*Omega_ccc++ not in evt.pdl*/
     };
 
-    static const std::vector<int> qqbarMesons = {
+    constexpr std::array<int, 80> qqbarMesons = {
       // light qqbar
       111 /*pi0*/, 113 /*rho_0*/, 115 /*a_20*/, 117 /*rho(3)(1690)0*/, 119 /*a_4(1970)0*/,
       10111 /*pi(2S)0*/, 10113 /*b_10*/, 10115 /*pi(2)(1670)0*/,
@@ -1077,7 +1078,7 @@ namespace Belle2 {
       9000445 /*? not in evt.pdl*/,
     };
 
-    static const std::vector<int> flavorConservingMesons = {
+    constexpr std::array<int, 63> flavorConservingMesons = {
       // Excited light mesons that can decay into hadrons conserving flavor
       213 /*rho+*/, 215 /*a_2+*/, 217 /*rho(3)(1690)+*/, 219 /*a_4(1970)+*/,
       10211 /*a(0)(1450)+*/, 10213 /*b_1+*/, 10215 /*pi(2)(1670)+*/,
@@ -1930,7 +1931,7 @@ namespace Belle2 {
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
         if (!ListOfParticles.isValid()) return 0;
 
-        const auto mdstIndex = particle->getMdstArrayIndex();
+        const auto mdstSource = particle->getMdstSource();
 
         Particle* target = nullptr; //Particle selected as target
         for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
@@ -1939,7 +1940,7 @@ namespace Belle2 {
           if (!particlei)
             continue;
 
-          if (particlei->getMdstArrayIndex() == mdstIndex) {
+          if (particlei->getMdstSource() == mdstSource) {
             target = particlei;
             break;
           }

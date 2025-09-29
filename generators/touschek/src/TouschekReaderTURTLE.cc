@@ -79,6 +79,11 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph& graph)
       }
     }
 
+    if (index < 7) {
+      B2ERROR("TouschekReaderTURTLE: incomplete line at " << m_lineNum);
+      continue;
+    }
+
     //Convert the position of the particle from local Touschek plane space to global geant4 space.
     //Flip the sign for the y and z component to go from the accelerator to the detector coordinate system
     particlePosTouschek[0] = fields[2] * Unit::m;

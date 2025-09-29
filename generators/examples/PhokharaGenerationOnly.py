@@ -31,8 +31,8 @@ phokhara.set_log_level(basf2.LogLevel.INFO)
 # K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10)
 phokhara.param('FinalState', 0)
 
-# soft photon cutoff, final result is indepedent of the cut off as long as its small (<1e-3)
-# photon multiplicity (and exclusive cross sections depent on that parameter)
+# soft photon cutoff, final result is independent of the cut off as long as its small (<1e-3)
+# photon multiplicity (and exclusive cross sections depend on that parameter)
 # EXPERTS ONLY
 phokhara.param('Epsilon', 0.0001)
 
@@ -116,7 +116,7 @@ main.add_module(output)
 main.add_module("PrintMCParticles", logLevel=basf2.LogLevel.DEBUG, onlyPrimaries=False)
 
 # generate events
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # show call statistics
 print(basf2.statistics)

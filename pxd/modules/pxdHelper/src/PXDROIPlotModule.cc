@@ -7,6 +7,10 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdHelper/PXDROIPlotModule.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <tracking/dataobjects/ROIid.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+
 #include <TBox.h>
 #include <TCanvas.h>
 #include <TStyle.h>
@@ -43,7 +47,7 @@ void PXDROIPlotModule::initialize()
 {
   m_eventMetaData.isRequired();
   m_storeRawHits.isRequired(m_storeRawHitsName);
-  // all ROIs are optional, allowing to use always the same color for comparison even if one cathegory is not there
+  // all ROIs are optional, allowing to use always the same color for comparison even if one category is not there
   m_storeROIs.isOptional(m_ROIsName);
   m_storeDCROIs.isOptional(m_DCROIsName);
   m_storeHLTROIs.isOptional(m_HLTROIsName);

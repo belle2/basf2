@@ -57,6 +57,5 @@ vm.printAliases()
 variablesToNtuple("B+:DstENu", interesting_variables, path=mypath)
 
 basf2.process(mypath)
-print(basf2.statistics)
 
 # @endcond

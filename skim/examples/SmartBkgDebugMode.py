@@ -7,8 +7,8 @@
 ##########################################################################
 
 """
-This example demonstrates a simple steering file using SmartBkg filtering to speed up
-the production of feiHadronic skimmed charged B events.
+This example demonstrates how to output model predictions and skim flags for
+testing/validation of the SmartBkg filtering procedure.
 """
 
 import basf2 as b2
@@ -16,7 +16,10 @@ import generators as gen
 import simulation as sim
 import reconstruction as rec
 import modularAnalysis as ma
+import mdst
 from skim.WGs.fei import feiHadronic
+from skim import smartbkg as sbg
+from variables import variables as var
 
 # For this example, load SmartBkg model and config from local database
 b2.conditions.prepend_testing_payloads("localdb/database.txt")
@@ -30,24 +33,44 @@ path.add_module("EventInfoSetter", evtNumList=[100], expList=[0], runList=[0])
 finalstate = "charged"
 gen.add_evtgen_generator(finalstate=finalstate, path=path, eventType=finalstate)
 
-# Define skim
+# Define skim (all 51 skims defined as of August 2025 work with the standard SmartBkg model)
+# Here we disable udst output because we only want the skim flags
 skim = feiHadronic(
     analysisGlobaltag=ma.getAnalysisGlobaltag(),
-    OutputFileName="test_smartbkg_fei.udst.root"
+    udstOutput=False
 )
 
 # Add SmartBkg filtering by providing the skim code
-gen.add_smartbkg_filtering(
+# Here we enable debug mode so that no events are rejected or weighted and instead the model prediction is saved
+# to the event extra info as 'SmartBKG_Prediction'
+sbg.add_smartbkg_filtering(
     skim_code=skim.code,
-    path=path
+    path=path,
+    debug_mode=True
 )
 
 # Add simulation and reconstruction
 sim.add_simulation(path)
 rec.add_reconstruction(path)
 
+# Optionally add mdst output so you can look at the events again
+mdst.add_mdst_output(
+    filename="test_events.mdst.root",
+    path=path
+)
+
 # Apply the skim
 skim(path)
+
+# Write out skim flags and SmartBkg predictions as ntuple
+var.addAlias("smartBkgPrediction", "eventExtraInfo(SmartBKG_Prediction)")
+ma.variablesToNtuple(
+    "",
+    [skim.flag, "smartBkgPrediction"],
+    treename="predictions",
+    filename="test_flags_and_predictions.root",
+    path=path
+)
 
 # Start event processing
 b2.process(path)

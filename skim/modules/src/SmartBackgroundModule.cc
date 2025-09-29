@@ -10,8 +10,8 @@
 // multiple skims??
 // write documentation, tutorial for training new model/fine tuning?
 
-#include <generators/modules/SmartBackgroundModule.h>
-#include <generators/dbobjects/SmartBackgroundConfig.h>
+#include <skim/modules/SmartBackgroundModule.h>
+#include <skim/dbobjects/SmartBackgroundConfig.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

@@ -19,11 +19,14 @@ an event and, if it is kept, weighting it with the inverse neural network output
 .. note:: Datasets produced using Smart Background are weighted and must be treated as such when analyzed! The weights 
   are stored as generator weights and are therefore automatically written to all produced ntuples.
 
-To employ this method, we recommend using the :py:func:`generators.add_smartbkg_filtering` convenience function 
+Usage
+^^^^^
+
+To employ this method, we recommend using the :py:func:`skim.smartbkg.add_smartbkg_filtering` convenience function 
 from the generators package. It should be placed after the event generator but before simulation and reconstruction. 
 As mandatory inputs it requires the LFN code of the skim you are running (available for all skims via ``skim.code``), 
 as well as the type of MC you are producing (uubar, ddbar, ssbar, ccbar, charged, mixed, taupair). A part of your 
-steering file might then look like this (for a full example see ``generators/examples/SmartBkg_NEW_ExampleSteering.py``):
+steering file might then look like this (for a full example see ``skim/examples/SmartBkg_ExampleSteering.py``):
 
 .. code-block:: python
 
@@ -38,7 +41,7 @@ steering file might then look like this (for a full example see ``generators/exa
   )
 
   # Add SmartBkg filtering by providing the skim code and final state
-  gen.add_smartbkg_filtering(
+  skim.smartbkg.add_smartbkg_filtering(
       skim_code=skim.code,
       event_type=finalstate,
       path=path
@@ -60,9 +63,9 @@ We currently provide a pre-trained model via the global tag ??? that is trained 
 ``18530200``, ``18570600``, ``18570700``, ``19120100``, ``19130201``, ``19130300``.
 
 For studies you may want to disable filtering and look at the model output. This is possible by setting the ``debug_mode`` argument 
-of :py:func:`generators.add_smartbkg_filtering` to ``True``. This will disable filtering and reweighting, and instead the 
+of :py:func:`skim.smartbkg.add_smartbkg_filtering` to ``True``. This will disable filtering and reweighting, and instead the 
 model output will be saved to the event extra info as ``SmartBKG_Prediction``. An example of how to write out the model
-predictions as well as the skim flags is provided under ``generators/examples/SmartBkg_NEW_DebugMode.py``. 
+predictions as well as the skim flags is provided under ``skim/examples/SmartBkg_DebugMode.py``. 
 
 For greater customisability you may also use the :b2:mod:`SmartBackground` module directly. It has the same mandatory arguments 
 as the convenience function, and can also be put into debug mode. It performs the reweighting, but no filtering on its own (instead 
@@ -70,3 +73,11 @@ it returns 1 as a return value if an event is sampled, otherwise 0).
 
 The code for the entire Smart Background project including the model setup, training script and data preparation 
 can be found on `GitLab <https://gitlab.desy.de/belle2/analyses/smartbkg>`_.
+
+Module documentation
+^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: skim.smartbkg.add_smartbkg_filtering
+
+.. b2-modules::
+  :modules: SmartBackground

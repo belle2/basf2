@@ -61,7 +61,7 @@ class Local:
         The default constructor.
         - Initializes a list which holds a connection between Script-Objects
           and their respective processes.
-        - Initialized a logger which writes to validate_basf2.py's log.
+        - Initialized a logger which writes to b2validation's log.
 
         @param max_number_of_processes: The maximum number of processes
         """
@@ -70,11 +70,11 @@ class Local:
         #: objects) and the processes that were spawned for them
         self.jobs_processes: Dict[Script, subprocess.Popen] = {}
 
-        #: Contains a reference to the logger-object from validate_basf2
+        #: Contains a reference to the logger-object from b2validation
         #: Set up the logging functionality for the 'local execution'-Class,
-        #: so we can log to validate_basf2.py's log what is going on in
+        #: so we can log to b2validation's log what is going on in
         #: .execute and .is_finished
-        self.logger = logging.getLogger("validate_basf2")
+        self.logger = logging.getLogger("b2validation")
 
         # Parameter for maximal number of parallel processes, use system CPU
         # count if not specified use the default of 10 if the cpu_count call

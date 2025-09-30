@@ -12,7 +12,7 @@
 # Display of waveforms with feature extraction points superimposed
 # ---------------------------------------------------------------------------------------
 
-# avoid race conditions beetween pyroot and GUI thread
+# avoid race conditions between pyroot and GUI thread
 from ROOT import PyConfig
 PyConfig.StartGuiThread = False  # noqa
 from ROOT import gROOT

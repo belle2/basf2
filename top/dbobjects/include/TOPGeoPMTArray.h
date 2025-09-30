@@ -168,7 +168,7 @@ namespace Belle2 {
     double getFilterThickness() const {return m_filterThickness / s_unit;}
 
     /**
-     * Returns wavelenght filter material
+     * Returns wavelength filter material
      * @return material name
      */
     const std::string& getFilterMaterial() const {return m_filterMaterial;}

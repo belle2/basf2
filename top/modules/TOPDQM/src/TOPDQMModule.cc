@@ -482,7 +482,7 @@ namespace Belle2 {
         unsigned int nentries = m_digits.getEntries();
         double time_us = time_clk / 127.0; //  127MHz clock ticks to us, inexact rounding
         double time_ms = time_us / 1000;
-        double time_1280 = time_clk % 1280; // within beam cycle, experssed in system clock
+        double time_1280 = time_clk % 1280; // within beam cycle, expressed in system clock
         if (it.GetIsHER(0)) {
           m_TOPOccAfterInjHER->Fill(time_us, nentries);
           m_TOPEOccAfterInjHER->Fill(time_us);

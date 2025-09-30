@@ -13,7 +13,7 @@
 # Usage: basf2 showFEWaveforms.py -i <file_name.root>
 # ---------------------------------------------------------------------------------------
 
-# avoid race conditions beetween pyroot and GUI thread
+# avoid race conditions between pyroot and GUI thread
 from ROOT import PyConfig
 PyConfig.StartGuiThread = False  # noqa
 

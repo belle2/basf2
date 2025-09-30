@@ -15,6 +15,7 @@ import tempfile
 import os
 import time
 import requests
+import splinter
 import traceback
 
 # ours
@@ -125,17 +126,6 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
     """
     Checks for the expected content on the validation website
     """
-    try:
-        import splinter
-    except ImportError:
-        print(
-            "The splinter package is required to run this test. Run 'pip3 "
-            "install splinter' to install"
-        )
-        # don't give an error exit code here to not fail if splinter is not
-        # available
-        return True
-
     with splinter.Browser() as browser:
         # Visit URL
         url = validation_url + "static/validation.html"
@@ -189,21 +179,6 @@ def main():
     b2test_utils.skip_test("Not properly runnable yet")
     # noinspection PyUnreachableCode
 
-    # only run the test on dev machines with splinter installed. Also for the
-    # tests which don't use splinter, there are currently some connection
-    # problems to the test webserver on the central build system
-    try:
-        import splinter  # noqa
-
-        pass
-    except ImportError:
-        print(
-            "TEST SKIPPED: The splinter package is required to run this test."
-            + "Run 'pip3 install splinter' to install",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
     success = True
 
     revs_to_gen = ["stack_test_1", "stack_test_2", "stack_test_3"]
@@ -226,7 +201,7 @@ def main():
 
             # wait for one second for the server to start
             time.sleep(2)
-            # check the content of the webserver, will need splinter
+            # check the content of the webserver
             success = success and check_for_content(
                 revs_to_gen + ["reference"], 7, 7
             )

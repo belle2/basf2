@@ -13,7 +13,7 @@ import logging
 import os
 import subprocess
 import multiprocessing
-from typing import Optional
+from typing import Optional, Dict
 
 # ours
 import validationpath
@@ -33,7 +33,6 @@ class Local:
     @var logger: Reference to the logging object
     @var max_number_of_processes: The maximum number of parallel processes
     @var current_number_of_processes: The number of processes currently running
-    @type jobs_processes: Dict[Script, subprocess.Popen]
     """
 
     @staticmethod
@@ -69,7 +68,7 @@ class Local:
 
         #: A dict which holds the connections between the jobs (=Script
         #: objects) and the processes that were spawned for them
-        self.jobs_processes = {}
+        self.jobs_processes: Dict[Script, subprocess.Popen] = {}
 
         #: Contains a reference to the logger-object from validate_basf2
         #: Set up the logging functionality for the 'local execution'-Class,

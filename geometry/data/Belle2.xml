@@ -138,6 +138,11 @@
     <xi:include href="../ir/BeamPipe-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
 
+  <!-- early phase 3 cryostat -->
+  <DetectorComponent name="Cryostat-earlyPhase3" isDefault="false">
+    <xi:include href="../ir/Cryostat-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
   <!-- early phase 3 far beam line -->
   <DetectorComponent name="FarBeamLine-earlyPhase3" isDefault="false">
     <xi:include href="../ir/FarBeamLine-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />

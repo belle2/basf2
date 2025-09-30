@@ -59,10 +59,22 @@ early3 = basf2.Path()
 early3.add_module("EventInfoSetter")
 early3.add_module("Gearbox")
 early3.add_module(
-    "Geometry", createPayloads=True, payloadIov=[
-        1003, 0, 1003, -1], excludedComponents=[
-            'PXD', "ServiceGapsMaterial"], additionalComponents=[
-                'PXD-earlyPhase3', 'ServiceGapsMaterial-earlyPhase3', 'BeamPipe-earlyPhase3', 'FarBeamLine-earlyPhase3'])
+    "Geometry",
+    createPayloads=True,
+    payloadIov=[
+        1003,
+        0,
+        1003,
+        -1],
+    excludedComponents=[
+        'PXD',
+        'ServiceGapsMaterial'],
+    additionalComponents=[
+        'PXD-earlyPhase3',
+        'ServiceGapsMaterial-earlyPhase3',
+        'BeamPipe-earlyPhase3',
+        'Cryostat-earlyPhase3',
+        'FarBeamLine-earlyPhase3'])
 b2test_utils.safe_process(early3)
 
 # most of the components are identical so we avoid uploading two

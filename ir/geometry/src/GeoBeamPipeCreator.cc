@@ -122,6 +122,8 @@ namespace Belle2 {
 
 
 
+      cout << endl << "!!!  Creating a Beampipe copy..." << endl << endl;
+
       ////==========
       ////= IP pipe
 

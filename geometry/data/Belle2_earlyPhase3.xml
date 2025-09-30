@@ -59,7 +59,7 @@
   <xi:include href="../structure/STR.xml"/>
   <xi:include href="../structure/ServiceGaps-earlyPhase3.xml"/> 
   <xi:include href="../ir/BeamPipe-earlyPhase3.xml"/>
-  <xi:include href="../ir/Cryostat.xml"/>
+  <xi:include href="../ir/Cryostat-earlyPhase3.xml"/>
   <xi:include href="../ir/FarBeamLine-earlyPhase3.xml"/>
   <xi:include href="../vxd/HeavyMetalShield.xml"/>
   <xi:include href="../vxd/Service.xml"/>
@@ -87,7 +87,7 @@
   <DetectorComponent name="PINDIODE-phase2" isDefault="false">
     <xi:include href="../beast/pindiode/PINDIODE-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
-  <DetectorComponent name="BEAMABORT" isDefault="true">
+  <DetectorComponent name="BEAMABORT" isDefault="false">
     <xi:include href="../beast/beamabort/BEAMABORT.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
   <DetectorComponent name="HE3TUBE" isDefault="false">

@@ -259,7 +259,7 @@ namespace Belle2 {
     friend class G4CoupledTransportation;
     static G4bool fUseMagneticMoment; /**< Flag take into account magnetic moment*/
     static G4bool fUseGravity; /**< Flag take into account gravity*/
-    static G4bool fSilenceLooperWarnings;  /**< Flag to *Supress* all 'looper' warnings*/
+    static G4bool fSilenceLooperWarnings;  /**< Flag to *Suppress* all 'looper' warnings*/
 
   };
 }

@@ -123,7 +123,7 @@ namespace Belle2 {
     double m_deltaChordInMagneticField;    /**< The maximum miss-distance between the trajectory curve and its linear chord(s) approximation */
 
     int m_trajectoryStore;                 /**< If true, store the trajectories of all primary particles */
-    double m_trajectoryDistanceTolerance;  /**< Maximum distance to actuall trajectory when merging points */
+    double m_trajectoryDistanceTolerance;  /**< Maximum distance to actual trajectory when merging points */
     std::vector<float> m_absorbers;        /**< The absorbers defined at given radii where tracks across them will be destroyed.
                                                 This set is used in the PXD only simulation for PXD gain calibration.*/
 

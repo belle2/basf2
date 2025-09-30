@@ -367,7 +367,7 @@ void FullSimModule::initialize()
     }
   }
 
-  // Inactivate all secondary-generating processes for g4e particles. This comprises
+  // Deactivate all secondary-generating processes for g4e particles. This comprises
   // Cerenkov and Scintillation that were inserted by G4OpticalPhysics and the
   // CaptureAtRest process for g4e anti-deuteron.
   partIter->reset();
@@ -413,7 +413,7 @@ void FullSimModule::initialize()
     m_visManager->Initialize();
   }
 
-  //Apply the Geant4 UI commands at Idle state - after initilization
+  //Apply the Geant4 UI commands at Idle state - after initialization
   if (m_uiCommandsAtIdle.size() > 0) {
     G4UImanager* uiManager = G4UImanager::GetUIpointer();
     for (vector<string>::iterator iter = m_uiCommandsAtIdle.begin(); iter != m_uiCommandsAtIdle.end(); ++iter) {

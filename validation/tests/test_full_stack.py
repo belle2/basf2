@@ -19,7 +19,6 @@ import splinter
 import traceback
 
 # ours
-import b2test_utils
 import validationserver
 import validationpath
 from validationtestutil import check_execute
@@ -174,10 +173,6 @@ def main():
     """
     Runs two test validations, starts the web server and queries data
     """
-
-    # fixme: See if we can re-enable this test or at least run it locally
-    b2test_utils.skip_test("Not properly runnable yet")
-    # noinspection PyUnreachableCode
 
     success = True
 

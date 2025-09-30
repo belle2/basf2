@@ -537,6 +537,80 @@ class TauThrust(BaseSkim):
                 ('thrust', 50, 0.8, 1, '', self.__contact__, '', '')],
             path=path)
 
+
+@fancy_skim_header
+class TauToMuMuMu(BaseSkim):
+    """
+    **Channel**: :math:`\\tau \\to \\mu \\mu \\mu and \\tau \\to \\pi \\pi \\pi for control sample`
+
+    **Output particle lists**: ``mu+:taulfv, pi+:control``
+
+    **Criteria for 3mu states**: Number of good tracks < 7, :math:`1.4 < M < 2.0` GeV, :math:`-1.0 < \\Delta E < 0.5` GeV
+
+    **Criteria for 3pi states**: Number of good tracks < 7, :math:`0.5 < M < 2.0` GeV, :math:`-1.0 < \\Delta E < 0.5` GeV
+    """
+    __authors__ = ["Junewoo PARK"]
+    __description__ = "Skim for Tau 3mu decays."
+    __contact__ = __liaison__
+    __category__ = "physics, tau"
+
+    ApplyHLTHadronCut = False
+    produce_on_tau_samples = True  # retention is ~1.7% on taupair
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
+        stdPi("all", path=path)
+
+    def build_lists(self, path):
+        # particle selection
+        trackCuts = "[-3.0 < dz < 3.0] and [dr < 1.0]"
+        ma.cutAndCopyList("pi+:goodtrack", "pi+:all", trackCuts, path=path)
+        ma.cutAndCopyList("pi+:control", "pi+:all", trackCuts + ' and [pionID > 0.9]', path=path)
+
+        # reconstruct tau->mumumu
+        ma.reconstructDecay(
+            decayString="tau+:mumumu -> mu+:all mu+:all mu-:all",
+            cut="[nParticlesInList(pi+:goodtrack) < 7] and [1.4 < M < 2.0] and [-1.0 < deltaE < 0.5]",
+            dmID=0,
+            path=path)
+        Condition_one = '[[daughter(0, p)>daughter(1, p)] and [daughter(0, p)>daughter(2, p)] and [daughter(0, muonID) > 0.1]]'
+        Condition_two = '[[daughter(1, p)>daughter(0, p)] and [daughter(1, p)>daughter(2, p)] and [daughter(1, muonID) > 0.1]]'
+        Condition_three = '[[daughter(2, p)>daughter(0, p)] and [daughter(2, p)>daughter(1, p)] and [daughter(2, muonID) > 0.1]]'
+        ma.applyCuts('tau+:mumumu', Condition_one + ' or ' + Condition_two + ' or ' + Condition_three, path=path)
+
+        # reconstruct tau->pipipi
+        ma.reconstructDecay(
+            decayString="tau+:control -> pi+:control pi+:control pi-:control",
+            cut="[nParticlesInList(pi+:goodtrack) < 7] and [0.5 < M < 2.0] and [-1.0 < deltaE < 0.5]",
+            dmID=1,
+            path=path)
+
+        # combine list
+        ma.copyLists(outputListName="tau+:comb", inputListNames=["tau+:mumumu", "tau+:control"], path=path)
+
+        return ["tau+:comb"]
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        ma.copyLists('tau+:comb', self.SkimLists, path=path)
+
+        # add contact information to histogram
+        contact = "	junewoo@g.ecc.u-tokyo.ac.jp"
+
+        # the variables that are printed out are: M, deltaE
+        create_validation_histograms(
+            rootfile=f'{self}_Validation.root',
+            particlelist='tau+:comb',
+            variables_1d=[
+                ('M', 100, 1.00, 2.00, '', contact, '', ''),
+                ('deltaE', 120, -1.6, 0.6, '', contact, '', '')],
+            variables_2d=[('M', 50, 1.00, 2.00, 'deltaE', 60, -1.6, 0.6, '', contact, '', '')],
+            path=path)
+
 ############################################################
 
 

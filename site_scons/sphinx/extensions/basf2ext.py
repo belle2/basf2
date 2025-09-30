@@ -179,7 +179,7 @@ class ModuleListDirective(Directive):
             if "package" in self.options and module.package() != self.options["package"]:
                 continue
 
-            # everyting set, create documentation for our module
+            # everything set, create documentation for our module
             all_nodes += self.show_module(module, library)
 
         return all_nodes

@@ -186,7 +186,7 @@ def main():
         os.chdir(str(tmpdir))
 
         for r in revs_to_gen:
-            check_execute(f"b2validation --test --tag {r}")
+            check_execute(f"b2validation -p 4 --test --tag {r}")
 
         # make sure the webserver process is terminated in any case
         try:

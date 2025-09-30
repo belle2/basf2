@@ -191,13 +191,13 @@ def main():
         os.chdir(str(tmpdir))
 
         for r in revs_to_gen:
-            check_execute(f"validate_basf2 --test --tag {r}")
+            check_execute(f"b2validation --test --tag {r}")
 
         # make sure the webserver process is terminated in any case
         try:
             # start webserver to serve json output files, plots and
             # interactive website
-            server_process = subprocess.Popen(["run_validation_server"])
+            server_process = subprocess.Popen(["b2validation-server"])
 
             # wait for one second for the server to start
             time.sleep(2)

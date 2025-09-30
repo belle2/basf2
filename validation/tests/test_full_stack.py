@@ -112,7 +112,7 @@ def check_for_plotting(revs, tmp_folder):
     some_plot = os.path.join(
         comp_folder,
         "validation-test",
-        "validationTestPlotsB_gaus_histogram.pdf",
+        "validationTestPlots_gaus_histogram.pdf",
     )
     if not os.path.isfile(some_plot):
         print(f"Comparison plot {some_plot} does not exist")

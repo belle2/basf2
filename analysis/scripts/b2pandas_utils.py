@@ -285,7 +285,9 @@ class VariablesToTable(basf2.Module):
         """
         if self._format == "hdf5":
             """Create a new row in the hdf5 file with for each particle in the list"""
+            # \cond false positive doxygen warning
             self._table.append(self.buffer)
+            # \endcond
         else:
             table = {name: self.buffer[name] for name, _ in self._dtypes}
             pa_table = pa.table(table, schema=pa.schema(self._schema))
@@ -305,15 +307,19 @@ class VariablesToTable(basf2.Module):
         """
         self.append_buffer()
         self.fill_event_buffer()
+        # \cond false positive doxygen warning
         if self.buffer_full:
             self.write_buffer()
             self.clear_buffer()
+        # \endcond
 
     def terminate(self):
         """save and close the output"""
         import ROOT  # noqa
+        # \cond false positive doxygen warning
         if len(self.buffer) > 0:
             self.write_buffer()
+        # \endcond
 
         if self._format == "hdf5":
             self._table.flush()

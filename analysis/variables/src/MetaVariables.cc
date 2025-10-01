@@ -2055,29 +2055,60 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr convertToDaughterIndex(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string daughterString = arguments[0];
+        auto func = [daughterString](const Particle * particle) -> int {
+          int defaultValue = -1;
+          if (particle == nullptr)
+            return defaultValue;
+          int daughterNumber = 0;
+          try
+          {
+            daughterNumber = convertString<int>(daughterString);
+          } catch (std::invalid_argument&)
+          {
+            const Variable::Manager::Var* daughterVar = Manager::Instance().getVariable("int(" + daughterString + ", -1)");
+            auto daughterVarResult = daughterVar->function(particle);
+            daughterNumber = std::get<int>(daughterVarResult);
+          }
+          if (daughterNumber < 0)
+          {
+            return defaultValue;
+          }
+          if (particle->getMCParticle()) // has MC match or is MCParticle
+          {
+            if (daughterNumber >= int(particle->getMCParticle()->getNDaughters())) {
+              return defaultValue;
+            }
+          } else
+          {
+            if (daughterNumber >= int(particle->getNDaughters())) {
+              return defaultValue;
+            }
+          }
+          return daughterNumber;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function convertToDaughterIndex");
+      }
+    }
+
     Manager::FunctionPtr mcDaughter(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        std::string daughterString = arguments[0];
+        const Variable::Manager::Var* daughterVar = Manager::Instance().getVariable("convertToDaughterIndex(" + arguments[0] + ")");
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterString](const Particle * particle) -> double {
+        auto func = [var, daughterVar](const Particle * particle) -> double {
           if (particle == nullptr)
             return Const::doubleNaN;
           if (particle->getMCParticle()) // has MC match or is MCParticle
           {
-            int daughterNumber = 0;
-            try {
-              daughterNumber = convertString<int>(daughterString);
-            } catch (std::invalid_argument&) {
-              const Variable::Manager::Var* daughterVar = Manager::Instance().getVariable("int(" + daughterString + ",-1)");
-              auto daughterVarResult = daughterVar->function(particle);
-              daughterNumber = std::get<int>(daughterVarResult);
-            }
-            if (daughterNumber >= int(particle->getMCParticle()->getNDaughters())) {
+            int daughterNumber = std::get<int>(daughterVar->function(particle));
+            if (daughterNumber < 0)
               return Const::doubleNaN;
-            } else if (daughterNumber < 0) {
-              return Const::doubleNaN;
-            }
             Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
             auto var_result = var->function(&tempParticle);
             if (std::holds_alternative<double>(var_result)) {
@@ -2086,7 +2117,9 @@ namespace Belle2 {
               return std::get<int>(var_result);
             } else if (std::holds_alternative<bool>(var_result)) {
               return std::get<bool>(var_result);
-            } else return Const::doubleNaN;
+            } else {
+              return Const::doubleNaN;
+            }
           } else
           {
             return Const::doubleNaN;
@@ -4103,6 +4136,8 @@ Ancestor type can be set up by PDG code or by particle name (check evt.pdl for v
     REGISTER_METAVARIABLE("nTrackFitResults(particleType)", nTrackFitResults,
 			  "[Eventbased] Returns the total number of TrackFitResults for a given particleType. The argument can be the name of particle (e.g. pi+) or PDG code (e.g. 211).",
 			  Manager::VariableDataType::c_int);
+
+    REGISTER_METAVARIABLE("convertToDaughterIndex(variable)", convertToDaughterIndex, R"DOC(Converts the variable of the given particle into integer and returns it if it is a valid daughter index, else returns -1.)DOC", Manager::VariableDataType::c_int);
 
   }
 }

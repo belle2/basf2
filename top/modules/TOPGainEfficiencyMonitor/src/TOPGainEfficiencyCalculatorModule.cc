@@ -57,20 +57,20 @@ namespace Belle2 {
     addParam("threshold", m_threshold,
              "pulse height (or integrated charge) threshold in fitting its distribution and calculating efficiency", (float)100.);
     addParam("p0HeightIntegral", m_p0HeightIntegral,
-             "Parameter from p0 + x*p1 function fitting height-integral distribtion.", (float) - 50.0);
+             "Parameter from p0 + x*p1 function fitting height-integral distribution.", (float) - 50.0);
     addParam("p1HeightIntegral", m_p1HeightIntegral,
-             "Parameter from p0 + x*p1 function fitting height-integral distribtion.", (float)6.0);
+             "Parameter from p0 + x*p1 function fitting height-integral distribution.", (float)6.0);
     addParam("fracFit", m_fracFit, "fraction of events to be used in fitting. "
              "An upper limit of a fit range is given to cover this fraction of events. "
              "Set negative value to calculate the fraction to exclude only 10 events in tail.", (float)(-1)); //,(float)0.99);
     addParam("initialP0", m_initialP0, "initial value of the fit parameter p0 divided by histogram entries."
-             "Set negative value to calculate from histogram inforamtion automatically.", (float)(0.0001)); //,(float)1e-6);
+             "Set negative value to calculate from histogram information automatically.", (float)(0.0001)); //,(float)1e-6);
     addParam("initialP1", m_initialP1, "initial value of the fit parameter p1."
-             "Set negative value to calculate from histogram inforamtion automatically.", (float)(1.0)); //,(float)1.0);
+             "Set negative value to calculate from histogram information automatically.", (float)(1.0)); //,(float)1.0);
     addParam("initialP2", m_initialP2, "initial value of the fit parameter p2."
-             "Set negative value to calculate from histogram inforamtion automatically.", (float)(1.0)); //,(float)1.0);
+             "Set negative value to calculate from histogram information automatically.", (float)(1.0)); //,(float)1.0);
     addParam("initialX0", m_initialX0, "initial value of the fit parameter x0 divided by histogram bin width."
-             "Set negative value to calculate from histogram inforamtion automatically.", (float)(100)); //, (float)100.);
+             "Set negative value to calculate from histogram information automatically.", (float)(100)); //, (float)100.);
     addParam("pedestalSigma", m_pedestalSigma, "sigma of pedestal width", (float)10.);
     addParam("fitoption", m_fitoption, "fit option likelihood: default chisquare: R", std::string("L"));
 
@@ -588,7 +588,7 @@ namespace Belle2 {
           }
 
           if (nEntries > 1) {
-            B2WARNING("TOPGainEfficiencyCalculator : mutliple entries with the same channel ID ("
+            B2WARNING("TOPGainEfficiencyCalculator : multiple entries with the same channel ID ("
                       << m_pmtChId << ") in the output TTree");
           }
         }

@@ -23,7 +23,7 @@ namespace Belle2 {
     TOPTemplateFitResult();
 
     /**
-     *Usefull contructor for data from Zynqs
+     *Useful constructor for data from Zynqs
      *@param risingEdge template fit rising edge, lower 8 bit are fraction
      *@param backgroundOffset background offset
      *@param amplitude amplitude
@@ -33,7 +33,7 @@ namespace Belle2 {
                                   short amplitude, short chisquare);
 
     /**
-     *Usefull contructor for software implementation of template fit in basf2
+     *Useful constructor for software implementation of template fit in basf2
      *@param risingEdge template fit rising edge in samples
      *@param risingEdgeTime template fit rising edge in ns
      *@param backgroundOffset background offset

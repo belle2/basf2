@@ -44,7 +44,7 @@ args = sys.argv
 
 
 class Ntuple(b2.Module):
-    ''' t0const ntpule infomation '''
+    ''' t0const ntpule information '''
 
     global t0const
     #: t0 constant per channel per slot

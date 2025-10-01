@@ -124,8 +124,8 @@ namespace Belle2 {
     int m_lookBackWindows;     /**< number of "look back" windows */
 
     // datastore objects
-    StoreArray<TOPSimHit> m_simHits;        /**< collection of simuated hits */
-    StoreArray<TOPSimCalPulse> m_simCalPulses; /**< collection of simuated cal pulses */
+    StoreArray<TOPSimHit> m_simHits;        /**< collection of simulated hits */
+    StoreArray<TOPSimCalPulse> m_simCalPulses; /**< collection of simulated cal pulses */
     StoreArray<MCParticle> m_mcParticles;   /**< collection of MC particles */
     StoreObjPtr<SimClockState> m_simClockState; /**< generated hardware clock state */
     StoreArray<TOPRawWaveform> m_waveforms; /**< collection of waveforms */

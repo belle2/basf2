@@ -64,7 +64,7 @@ namespace Belle2 {
 
   private:
 
-    // module paramenets
+    // module parameters
     int m_targetMid; /**< target module to align. Must be 1 <= Mid <= 16 */
     int m_maxFails; /**< maximum allowed number of failed iterations */
     std::string m_sample; /**< sample type */

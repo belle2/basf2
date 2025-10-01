@@ -24,7 +24,7 @@ namespace Belle2 {
 
     public:
       /**
-       * Treatement of quartz geometry.
+       * Treatment of quartz geometry.
        */
       enum EGeometry {
         c_Unified = 0,   /**< single bar with average width and thickness */
@@ -32,7 +32,7 @@ namespace Belle2 {
       };
 
       /**
-       * Treatement of spherical mirror optics.
+       * Treatment of spherical mirror optics.
        */
       enum EOptics {
         c_SemiLinear = 0, /**< semi-linear approximation */
@@ -127,8 +127,8 @@ namespace Belle2 {
       /**
        * Constructor
        * @param moduleID slot ID
-       * @param geometry treatement of quartz geometry
-       * @param optics treatement of spherical mirror optics
+       * @param geometry treatment of quartz geometry
+       * @param optics treatment of spherical mirror optics
        */
       explicit RaytracerBase(int moduleID, EGeometry geometry = c_Unified, EOptics optics = c_SemiLinear);
 
@@ -139,13 +139,13 @@ namespace Belle2 {
       int getModuleID() const {return m_moduleID;}
 
       /**
-       * Returns quartz geometry treatement.
-       * @return quartz geometry treatement
+       * Returns quartz geometry treatment.
+       * @return quartz geometry treatment
        */
       EGeometry getGeometry() const {return m_geometry;}
 
       /**
-       * Returns treatement of spherical mirror optics.
+       * Returns treatment of spherical mirror optics.
        * @return spherical mirror optics
        */
       EOptics getOptics() const {return m_optics;}

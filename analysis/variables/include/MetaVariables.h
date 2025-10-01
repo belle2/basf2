@@ -548,7 +548,7 @@ namespace Belle2 {
      * Returns function which converts a variable of the given particle into an
      * integer and returns if it is a valid daughter index, else -1 is returned.
      */
-    Manager::FunctionPtr getDaughterIndex(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr convertToDaughterIndex(const std::vector<std::string>& arguments);
 
   }
 }

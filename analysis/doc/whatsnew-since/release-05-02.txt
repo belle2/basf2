@@ -34,7 +34,7 @@ Variables
 * A few binary PID variables have been added to the PID variable collection.
 * Added a new variable :b2:var:`nROE_Composites` to count V0 particles in ROE.
 * Added meta variables corresponding to existing variables that access the MC matched particles of given daughters
-  :b2:var:`mcDaughterDiffOf` , mcDaughterDiffOfPhi, mcDaughterDiffOfPhiCMS, :b2:var:`mcDaughterAngle`.
+  :b2:var:`mcDaughterDiffOf` , ``mcDaughterDiffOfPhi``, ``mcDaughterDiffOfPhiCMS``, :b2:var:`mcDaughterAngle`.
 * Added the new variable :b2:var:`mcCosThetaBetweenParticleAndNominalB`. This is an MC version of
   :b2:var:`cosThetaBetweenParticleAndNominalB` in which all descendant neutrino momenta are subtracted from the B momentum
   during the calculation.

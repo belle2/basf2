@@ -4,7 +4,9 @@ Changes in the analysis package in light-2509-fornax
 Variables
 +++++++++
 * Added pi0 and eta veto variables `BellePi0Veto` and `BelleEtaVeto` that were developed for Belle
-* Added a meta variable `convertToDaughterIndex` that converts a variable to integer and returns it  if it is a valid daughter index. Allow other meta variables like `mcDaughter` to be called with other variables to describe daughter index.
+* Added the meta variable `convertToDaughterIndex` that converts a variable to an integer and returns it as if it is a
+  valid daughter index. This allows other meta variables like `mcDaughter` to be called with other variables to describe
+  the daughter index.
 
 TreeFitter
 ++++++++++

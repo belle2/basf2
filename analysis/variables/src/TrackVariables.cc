@@ -476,6 +476,25 @@ namespace Belle2 {
       return out;
     }
 
+    //  The number of PXD hits not assigned to any track
+    double nExtraPXDHits(const Particle*)
+    {
+      StoreObjPtr<EventLevelTrackingInfo> elti;
+      if (!elti) return Const::doubleNaN;
+      double out = 0.0;
+      for (uint16_t ilayer = 1; ilayer < 3; ++ilayer)
+        out += elti->getNVXDClustersInLayer(ilayer);
+      return out;
+    }
+
+    //  Returns 1 if PXD ON, 0 otherwise.
+    bool isPXDOn(const Particle* particle)
+    {
+      StoreObjPtr<EventLevelTrackingInfo> elti;
+      if (!elti) return false;
+      return nExtraPXDHits(particle) > 0;
+    }
+
     // time of first SVD sample relative to event T0
     double svdFirstSampleTime(const Particle*)
     {
@@ -978,6 +997,8 @@ Returns NaN if there is no event-level tracking information available.
     //REGISTER_VARIABLE("nExtraVXDHitsInLayer(i)", nExtraVXDHitsInLayer,
     //"[Eventbased] The number VXD hits not assigned in the specified VXD layer");
     //REGISTER_VARIABLE("nExtraVXDHits", nExtraVXDHits, "[Eventbased] The number of VXD hits not assigned to any track");
+    REGISTER_VARIABLE("nExtraPXDHits", nExtraPXDHits, "[Eventbased] The number of PXD hits not assigned to any track");
+    REGISTER_VARIABLE("isPXDOn", isPXDOn, "[Eventbased] Returns True if PXD is ON and otherwise False");
     //REGISTER_VARIABLE("svdFirstSampleTime", svdFirstSampleTime, "[Eventbased] The time of first SVD sample relatvie to event T0");
     REGISTER_VARIABLE("trackFindingFailureFlag", trackFindingFailureFlag, R"DOC(
 [Eventbased] Returns a flag set by the tracking if there is reason to assume

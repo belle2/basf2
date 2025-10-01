@@ -1050,62 +1050,6 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("phi"));
-      return daughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr mcDaughterDiffOfPhi(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("phi"));
-      return mcDaughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr grandDaughterDiffOfPhi(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("phi"));
-      return grandDaughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("clusterPhi"));
-      return daughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr grandDaughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("clusterPhi"));
-      return grandDaughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr daughterDiffOfPhiCMS(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("useCMSFrame(phi)"));
-      return daughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr mcDaughterDiffOfPhiCMS(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("useCMSFrame(phi)"));
-      return mcDaughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr daughterDiffOfClusterPhiCMS(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("useCMSFrame(clusterPhi)"));
-      return daughterDiffOf(new_arguments);
-    }
-
     Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
@@ -3814,53 +3758,6 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     MAKE_DEPRECATED("grandDaughterDiffOf", false, "light-2402-ocicat", R"DOC(
                      The difference between any combination of (grand-)daughters can be calculated with the more general variable :b2:var:`daughterDiffOf`
                      by using generalized daughter indexes.)DOC");
-    REGISTER_METAVARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
-                      "Returns the difference in :math:`\\phi` between the two given daughters. The unit of the angle is ``rad``.\n"
-                      "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("daughterDiffOfPhi", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("mcDaughterDiffOfPhi(i, j)", mcDaughterDiffOfPhi,
-                      "MC matched version of the `daughterDiffOfPhi` function. The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("mcDaughterDiffOfPhi", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
-                      "Returns the difference in :math:`\\phi` between the first daughters of the two given daughters. The unit of the angle is ``rad``.\n"
-                      "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.\n", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("grandDaughterDiffOfPhi", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
-                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters. The unit of the angle is ``rad``.\n"
-                      "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("daughterDiffOfClusterPhi", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("grandDaughterDiffOfClusterPhi(i, j)", grandDaughterDiffOfClusterPhi,
-                      "Returns the difference in :math:`\\phi` between the ECLClusters of the daughters of the two given daughters. The unit of the angle is ``rad``.\n"
-                      "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("grandDaughterDiffOfClusterPhi", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
-                      "Returns the difference in :math:`\\phi` between the two given daughters in the CMS frame. The unit of the angle is ``rad``.\n"
-                      "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("daughterDiffOfPhiCMS", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("mcDaughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
-                      "MC matched version of the `daughterDiffOfPhiCMS` function. The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("mcDaughterDiffOfPhiCMS", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
-                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame. The unit of the angle is ``rad``.\n"
-                      "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i``.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("daughterDiffOfClusterPhiCMS", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
                       "E.g. ``daughterNormDiffOf(0, 1, p)`` returns the normalized momentum difference between first and second daughter in the lab frame.", Manager::VariableDataType::c_double);

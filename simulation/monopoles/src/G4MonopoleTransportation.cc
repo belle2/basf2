@@ -115,7 +115,7 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
   //    it will be necessary to add here (for all steps)
   // fCurrentTouchableHandle = aTrack->GetTouchableHandle();
 
-  // GPILSelection is set to defaule value of CandidateForSelection
+  // GPILSelection is set to default value of CandidateForSelection
   // It is a return value
   //
   *selection = CandidateForSelection ;

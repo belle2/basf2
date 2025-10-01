@@ -19,7 +19,7 @@ namespace Belle2 {
     RandomEngine(): CLHEP::HepRandomEngine() {}
     /** return a flat distributed double in (0,1), both excluded */
     double flat() override final { return dynamic_cast<RandomGenerator&>(*gRandom).random01(); }
-    /** fill an array of doubles with values in (0,1), both exluded
+    /** fill an array of doubles with values in (0,1), both excluded
      * @param size number of doubles to generate
      * @param vect pointer to buffer at least sizeof(double)*size bytes large
      */

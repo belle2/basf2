@@ -98,15 +98,12 @@ namespace Belle2 {
     {
       if (arguments.size() == 2) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        const Variable::Manager::Var* daughterVar = Manager::Instance().getVariable("convertToDaughterIndex(" + arguments[1] + ")");
+        auto func = [var, daughterVar](const Particle * particle) -> double {
+          int daughterIndexTagB = std::get<int>(daughterVar->function(particle));
+          if (daughterIndexTagB < 0)
+            return Const::doubleNaN;
 
-        int daughterIndexTagB = 0;
-        try {
-          daughterIndexTagB = convertString<int>(arguments[1]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("Second argument of useTagSideRecoilRestFrame meta function must be integer!");
-        }
-
-        auto func = [var, daughterIndexTagB](const Particle * particle) -> double {
           if (particle->getPDGCode() != 300553)
           {
             B2ERROR("Variable should only be used on a Upsilon(4S) Particle List!");
@@ -1085,43 +1082,38 @@ namespace Belle2 {
     Manager::FunctionPtr daughterMotherDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        int daughterNumber = 0;
-        try {
-          daughterNumber = convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("First argument of daughterMotherDiffOf meta function must be integer!");
-        }
-        auto variablename = arguments[1];
-        auto func = [variablename, daughterNumber](const Particle * particle) -> double {
-          if (particle == nullptr)
+        const Variable::Manager::Var* daughterVar = Manager::Instance().getVariable("convertToDaughterIndex(" + arguments[0] + ")");
+        std::string variableName = arguments[1];
+        auto func = [daughterVar, variableName](const Particle * particle) -> double {
+          int daughterNumber = std::get<int>(daughterVar->function(particle));
+          if (daughterNumber < 0)
             return Const::doubleNaN;
-          if (daughterNumber >= int(particle->getNDaughters()))
-            return Const::doubleNaN;
-          else
+          const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
+          auto result_mother = var->function(particle);
+          auto result_daughter = var->function(particle->getDaughter(daughterNumber));
+          double diff = Const::doubleNaN;
+          if (std::holds_alternative<double>(result_mother) && std::holds_alternative<double>(result_daughter))
           {
-            const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            auto result_mother = var->function(particle);
-            auto result_daughter = var->function(particle->getDaughter(daughterNumber));
-            double diff = Const::doubleNaN;
-            if (std::holds_alternative<double>(result_mother) && std::holds_alternative<double>(result_daughter)) {
-              diff = std::get<double>(result_mother) - std::get<double>(result_daughter);
-            } else if (std::holds_alternative<int>(result_mother) && std::holds_alternative<int>(result_daughter)) {
-              diff = std::get<int>(result_mother) - std::get<int>(result_daughter);
-            } else {
-              throw std::runtime_error("Bad variant access");
-            }
+            diff = std::get<double>(result_mother) - std::get<double>(result_daughter);
+          } else if (std::holds_alternative<int>(result_mother) && std::holds_alternative<int>(result_daughter))
+          {
+            diff = std::get<int>(result_mother) - std::get<int>(result_daughter);
+          } else
+          {
+            throw std::runtime_error("Bad variant access");
+          }
 
-            if (variablename == "phi" or variablename == "useCMSFrame(phi)") {
-              if (fabs(diff) > M_PI) {
-                if (diff > M_PI) {
-                  diff = diff - 2 * M_PI;
-                } else {
-                  diff = 2 * M_PI + diff;
-                }
+          if (variableName == "phi" or variableName == "useCMSFrame(phi)")
+          {
+            if (fabs(diff) > M_PI) {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
               }
             }
-            return diff;
           }
+          return diff;
         };
         return func;
       } else {
@@ -1132,30 +1124,23 @@ namespace Belle2 {
     Manager::FunctionPtr daughterMotherNormDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        int daughterNumber = 0;
-        try {
-          daughterNumber = convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("First argument of daughterMotherDiffOf meta function must be integer!");
-        }
+        const Variable::Manager::Var* daughterVar = Manager::Instance().getVariable("convertToDaughterIndex(" + arguments[0] + ")");
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterNumber](const Particle * particle) -> double {
-          if (particle == nullptr)
+        auto func = [var, daughterVar](const Particle * particle) -> double {
+          int daughterNumber = std::get<int>(daughterVar->function(particle));
+          if (daughterNumber < 0)
             return Const::doubleNaN;
-          if (daughterNumber >= int(particle->getNDaughters()))
-            return Const::doubleNaN;
-          else
+          double daughterValue = 0.0, motherValue = 0.0;
+          if (std::holds_alternative<double>(var->function(particle)))
           {
-            double daughterValue = 0.0, motherValue = 0.0;
-            if (std::holds_alternative<double>(var->function(particle))) {
-              daughterValue = std::get<double>(var->function(particle->getDaughter(daughterNumber)));
-              motherValue = std::get<double>(var->function(particle));
-            } else if (std::holds_alternative<int>(var->function(particle))) {
-              daughterValue = std::get<int>(var->function(particle->getDaughter(daughterNumber)));
-              motherValue = std::get<int>(var->function(particle));
-            }
-            return (motherValue - daughterValue) / (motherValue + daughterValue);
+            daughterValue = std::get<double>(var->function(particle->getDaughter(daughterNumber)));
+            motherValue = std::get<double>(var->function(particle));
+          } else if (std::holds_alternative<int>(var->function(particle)))
+          {
+            daughterValue = std::get<int>(var->function(particle->getDaughter(daughterNumber)));
+            motherValue = std::get<int>(var->function(particle));
           }
+          return (motherValue - daughterValue) / (motherValue + daughterValue);
         };
         return func;
       } else {
@@ -1929,29 +1914,23 @@ namespace Belle2 {
     Manager::FunctionPtr daughter(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        int daughterNumber = 0;
-        try {
-          daughterNumber = convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("First argument of daughter meta function must be integer!");
-        }
+        const Variable::Manager::Var* daughterVar = Manager::Instance().getVariable("convertToDaughterIndex(" + arguments[0] + ")");
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterNumber](const Particle * particle) -> double {
-          if (particle == nullptr)
+        auto func = [var, daughterVar](const Particle * particle) -> double {
+          int daughterNumber = std::get<int>(daughterVar->function(particle));
+          if (daughterNumber < 0)
             return Const::doubleNaN;
-          if (daughterNumber >= int(particle->getNDaughters()))
-            return Const::doubleNaN;
-          else
+          auto var_result = var->function(particle->getDaughter(daughterNumber));
+          if (std::holds_alternative<double>(var_result))
           {
-            auto var_result = var->function(particle->getDaughter(daughterNumber));
-            if (std::holds_alternative<double>(var_result)) {
-              return std::get<double>(var_result);
-            } else if (std::holds_alternative<int>(var_result)) {
-              return std::get<int>(var_result);
-            } else if (std::holds_alternative<bool>(var_result)) {
-              return std::get<bool>(var_result);
-            } else return Const::doubleNaN;
-          }
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else return Const::doubleNaN;
         };
         return func;
       } else {
@@ -1962,17 +1941,11 @@ namespace Belle2 {
     Manager::FunctionPtr originalDaughter(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        int daughterNumber = 0;
-        try {
-          daughterNumber = convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("First argument of daughter meta function must be integer!");
-        }
+        const Variable::Manager::Var* daughterVar = Manager::Instance().getVariable("convertToDaughterIndex(" + arguments[0] + ")");
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterNumber](const Particle * particle) -> double {
-          if (particle == nullptr)
-            return Const::doubleNaN;
-          if (daughterNumber >= int(particle->getNDaughters()))
+        auto func = [var, daughterVar](const Particle * particle) -> double {
+          int daughterNumber = std::get<int>(daughterVar->function(particle));
+          if (daughterNumber < 0)
             return Const::doubleNaN;
           else
           {

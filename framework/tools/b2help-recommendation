@@ -141,14 +141,20 @@ class ColorRSTFormatterStrategy(RSTFormatterStrategy):
         self.BOLD = '\033[1m'
         self.RESET = '\033[0m'
 
+    def colorize(self, text: str, color: str) -> str:
+        """
+        Wrap 'text' with the given ANSI 'color' and return it.
+        """
+        return f"{color}{text}{self.RESET}"
+
     def format_title(self, title: str, has_recommendation: bool) -> str:
         """
         Format a title.
         """
         if has_recommendation:
-            result = f"{self.GREEN}{title}{self.RESET}"
+            result = self.colorize(title, self.GREEN)
         else:
-            result = f"{self.YELLOW}{title}{self.RESET}"
+            result = self.colorize(title, self.YELLOW)
         return result
 
     def format_subsection(self, title: str, content: str) -> str:
@@ -157,15 +163,15 @@ class ColorRSTFormatterStrategy(RSTFormatterStrategy):
         """
         if not content:
             return ''
-        return f"\n{self.CYAN}{title}{self.RESET}\n{'-' * len(title)}\n{content}\n"
+        return f"\n{self.colorize(title, self.CYAN)}\n{'-' * len(title)}\n{content}\n"
 
     def format_dict(self, name: str, content: str) -> str:
         """
         Format a dictionary with a name and key-value pairs.
         """
-        result = f"\n{self.CYAN}{name}{self.RESET}\n{'-' * len(name)}\n"
+        result = f"\n{self.colorize(name, self.CYAN)}\n{'-' * len(name)}\n"
         for key in content:
-            result += f'+ **{self.BOLD}{key}{self.RESET}** - {content[key]}\n'
+            result += f'+ **{self.colorize(key, self.BOLD)}** - {content[key]}\n'
         return result
 
     def format_table_list(self, name: str, content: str) -> str:
@@ -173,7 +179,7 @@ class ColorRSTFormatterStrategy(RSTFormatterStrategy):
         Format a table or list with a name and items.
         """
         lines = super().format_table_list(name, content).split('\n')
-        return '\n'.join([f'{self.PURPLE}{line}{self.RESET}' for line in lines])
+        return '\n'.join([self.colorize(line, self.PURPLE) for line in lines])
 
     def format_code(self, code: str, language: str) -> str:
         """

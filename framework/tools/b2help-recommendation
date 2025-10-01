@@ -129,17 +129,16 @@ class ColorRSTFormatterStrategy(RSTFormatterStrategy):
     Format recommendations in reStructuredText format with colored text in terminal.
     """
 
-    def __init__(self):
-        # ANSI color codes
-        self.RED = '\033[31m'
-        self.GREEN = '\033[32m'
-        self.YELLOW = '\033[33m'
-        self.BLUE = '\033[34m'
-        self.PURPLE = '\033[35m'
-        self.CYAN = '\033[1;36m'  # also bold
-        self.WHITE = '\033[37m'
-        self.BOLD = '\033[1m'
-        self.RESET = '\033[0m'
+    # ANSI color codes
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    PURPLE = '\033[35m'
+    CYAN = '\033[1;36m'  # also bold
+    WHITE = '\033[37m'
+    BOLD = '\033[1m'
+    RESET = '\033[0m'
 
     def colorize(self, text: str, color: str) -> str:
         """

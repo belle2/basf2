@@ -17,7 +17,7 @@ As usual, please ask at https://questions.belle2.org if anything is unclear or y
 
 * Bug-fixes to L1 trigger information (prescales are now available in :b2:var:`L1PSNMBitPrescale`), and event level tracking information.
 
-* Special variables to return the :math:`\phi` angle difference between two daughters (:b2:var:`daughterDiffOfPhi` c.f. :b2:var:`daughterDiffOf`).
+* Special variables to return the :math:`\phi` angle difference between two daughters (daughterDiffOfPhi c.f. :b2:var:`daughterDiffOf`).
 
 * **Removal** of the PhysicsTriggerVariables (all of which were experimental and only intended for use in the study of triggers).
 

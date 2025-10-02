@@ -125,7 +125,7 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
     """
     Checks for the expected content on the validation website
     """
-    with splinter.Browser() as browser:
+    with splinter.Browser("firefox", headless=True) as browser:
         # Visit URL
         url = validation_url + "static/validation.html"
         print(f"Opening {url} to perform checks")

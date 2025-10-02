@@ -1985,9 +1985,8 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         std::string daughterString = arguments[0];
         auto func = [daughterString](const Particle * particle) -> int {
-          int defaultValue = -1;
           if (particle == nullptr)
-            return defaultValue;
+            return -1;
           int daughterNumber = 0;
           try
           {
@@ -1997,21 +1996,6 @@ namespace Belle2 {
             auto daughterFunction = convertToInt({daughterString, "-1"});
             auto daughterVarResult = daughterFunction(particle);
             daughterNumber = std::get<int>(daughterVarResult);
-          }
-          if (daughterNumber < 0)
-          {
-            return defaultValue;
-          }
-          if (particle->getMCParticle()) // has MC match or is MCParticle
-          {
-            if (daughterNumber >= int(particle->getMCParticle()->getNDaughters())) {
-              return defaultValue;
-            }
-          } else
-          {
-            if (daughterNumber >= int(particle->getNDaughters())) {
-              return defaultValue;
-            }
           }
           return daughterNumber;
         };

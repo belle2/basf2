@@ -52,14 +52,7 @@ class MetavariableDataTypeTest(unittest.TestCase):
         "isDaughterOfList": "bool",
         "isGrandDaughterOfList": "bool",
         "daughterDiffOf": "double",
-        "daughterDiffOfPhi": "double",
-        "daughterDiffOfClusterPhi": "double",
-        "mcDaughterDiffOfPhi": "double",
         "grandDaughterDiffOf": 'double',
-        "grandDaughterDiffOfPhi": "double",
-        "grandDaughterDiffOfClusterPhi": "double",
-        "daughterDiffOfPhiCMS": "double",
-        "daughterDiffOfClusterPhiCMS": "double",
     }
 
     # regular expressions

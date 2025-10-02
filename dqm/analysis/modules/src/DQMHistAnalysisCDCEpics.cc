@@ -333,9 +333,9 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_hist_crphi->SetTitle("cdc-track #phi (IP + hadrons);cdc-track #phi;norm entries");
     if (m_hist_crphi) {
       double maxnow = m_hist_crphi->Integral();
+      if (maxnow > 0)m_hist_crphi->Scale(1.0 / maxnow);
       if (maxnow < 10000) {
         isFew = true;
-        if (maxnow > 0)m_hist_crphi->Scale(1.0 / maxnow);
       } else {
         if (m_histref_phiindex) {
           m_hist_refphi = m_histref_phiindex->ProjectionX("histphi_ip_hadronsref", 7, 7, "");

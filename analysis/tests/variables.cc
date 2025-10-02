@@ -1509,6 +1509,10 @@ namespace {
     var = Manager::Instance().getVariable("mcDaughter(1, PDG)");
     EXPECT_FLOAT_EQ(std::get<double>(var->function(pGrandMother)), -14);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(pMother)), 14);
+    // Test last daughter
+    var = Manager::Instance().getVariable("mcDaughter(nMCDaughters-1, PDG)");
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(pGrandMother)), -14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(pMother)), 14);
     // Test for particle where mc daughter index is out of range of mc daughters
     var = Manager::Instance().getVariable("mcDaughter(2, PDG)");
     EXPECT_TRUE(std::isnan(std::get<double>(var->function(pGrandMother))));

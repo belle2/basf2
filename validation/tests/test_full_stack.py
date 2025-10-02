@@ -128,7 +128,7 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
     with splinter.Browser() as browser:
         # Visit URL
         url = validation_url + "static/validation.html"
-        print("Opening {} to perform checks", url)
+        print(f"Opening {url} to perform checks")
         browser.visit(url)
 
         if len(browser.title) == 0:
@@ -147,9 +147,7 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
 
         plot_objects = browser.find_by_css(".object")
 
-        print(
-            "Checking for a minimum number of {} plot objects", min_plot_objects
-        )
+        print(f"Checking for a minimum number of {min_plot_objects} plot objects")
         if len(plot_objects) < min_plot_objects:
             print(
                 f"Only {len(plot_objects)} plots found, while {min_plot_objects} are expected"
@@ -163,7 +161,7 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
         # found_matrix_plots = browser.find_by_css(".plot_matrix_item")
 
         # if len(found_matrix_plots) < min_matrix_plots:
-        #    print ("Only {} matrix plots found, while {} are expected".format(len(found_matrix_plots), min_matrix_plots))
+        #    print (f"Only {len(found_matrix_plots)} matrix plots found, while {min_matrix_plots} are expected")
         #    return False
 
     return True

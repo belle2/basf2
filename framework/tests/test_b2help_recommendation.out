@@ -6,7 +6,14 @@ Available tags for local:
 
 Tags can be combined to narrow down the search, e.g. use '-t pion PID' to get information only about pion PID, etc. 
 You can check all information with the 'all' tag.
-Recommendations for local and all tags:
+
+Available entries:
+------------------
+ 1. Track energy correction on Data
+    Tags: Data, Systematics, Tracking
+ 2. Photon energy correction on Data
+    Tags: Data, Systematics, Neutral, gamma
+Recommendations for local and [all] tags:
 
 Track energy correction on Data
 ===============================
@@ -71,7 +78,7 @@ Recommendation
 +-------+----+-----------+-------+-----+
 | Tags: |Data|Systematics|Neutral|gamma|
 +-------+----+-----------+-------+-----+
-Recommendations for local and gamma tags:
+Recommendations for local and [gamma] tags:
 
 Photon energy correction on Data
 ================================
@@ -108,7 +115,7 @@ Recommendation
 +-------+----+-----------+-------+-----+
 | Tags: |Data|Systematics|Neutral|gamma|
 +-------+----+-----------+-------+-----+
-Recommendations for local and Tracking tags:
+Recommendations for local and [Tracking] tags:
 
 Track energy correction on Data
 ===============================

@@ -7,16 +7,12 @@ Available tags for local:
 Tags can be combined to narrow down the search, e.g. use '-t pion PID' to get information only about pion PID, etc. 
 You can check all information with the 'all' tag.
 
-AVAILABLE TOOLS WITH RECOMMENDATIONS:
-----------------------------------------
+Available entries:
+------------------
  1. Track energy correction on Data
     Tags: Data, Systematics, Tracking
-
-AVAILABLE TOOLS WITHOUT RECOMMENDATIONS:
---------------------------------------------------
- 1. Photon energy correction on Data
+ 2. Photon energy correction on Data
     Tags: Data, Systematics, Neutral, gamma
-    Status: Correction of photon energy bias in data wrt MC15rd
 Recommendations for local and [all] tags:
 
 Track energy correction on Data

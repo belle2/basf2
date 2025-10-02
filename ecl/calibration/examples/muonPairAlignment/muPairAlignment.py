@@ -40,7 +40,7 @@ variables.addAlias('nhighE', 'nParticlesInList(mu-:highE)')
 applyEventCuts('[nhighE==0] and [nhighp==2]', mypath)
 
 # ..Combine two muons, requiring back to back and high invariant mass
-variables.addAlias('deltaPhiCMS', 'formula(57.2957795*abs(daughterDiffOfPhiCMS(0, 1)))')
+variables.addAlias('deltaPhiCMS', 'formula(57.2957795*abs(daughterDiffOf(0, 1, useCMSFrame(phi))))')
 variables.addAlias('sumThetaCMS', 'formula(57.2957795*(daughter(0, useCMSFrame(theta)) + daughter(1, useCMSFrame(theta))))')
 event_cut = '175 < sumThetaCMS < 185 and deltaPhiCMS > 175 and 9 < M < 11'
 reconstructDecay('vpho:0 -> mu-:highp mu+:highp', event_cut, path=mypath)

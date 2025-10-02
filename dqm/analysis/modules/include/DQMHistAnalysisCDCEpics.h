@@ -22,12 +22,19 @@
 #include <TEllipse.h>
 #include <numeric>
 #include <iostream>
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeometryParConstants.h>
 
 namespace Belle2 {
 
 
-  constexpr int kNumLayers = 56;   /**< number of CDC layers */
-  constexpr int kNumBoards = 300;  /**< number of CDC boards */
+  /**
+   * const CDC numbers for layers, boards and super layers
+   */
+  constexpr unsigned kNumLayers = c_maxNFieldLayers; /**< Total number of CDC layers. */
+  constexpr unsigned kNumBoards = c_nBoards;/**< Total number of CDC Boards. */
+  constexpr std::array<int, 9> slindex = { 8, 14, 20, 26, 32, 38, 44, 50, 56 }; /**< Index (layer number) of the 9 super-layers in the CDC. */
+
   /**
    * Make summary of data quality from reconstruction
    */
@@ -164,8 +171,7 @@ namespace Belle2 {
     double m_phistop;/**< stop thershold for phi differences */
     double m_phialarm;/**< alarm thershold for phi differences */
     double m_phiwarn;/**< warn thershold for phi differences */
-
-    std::vector<int> slindex = {8, 14, 20, 26, 32, 38, 44, 50, 56}; /**< CDC SL numbers */
+    std::vector<TLine*> m_lines;/**< number of CDC layer lines */
 
     TH1D* m_hists_lADC[kNumLayers]; /**< ADC histograms with track associated hits for each board (0-299) */
     TH1D* m_hists_bADC[kNumBoards]; /**< ADC histograms with track associated hits for each board (0-299) */

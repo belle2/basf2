@@ -27,10 +27,11 @@ def add_smartbkg_filtering(
         Adds event preselection based on the SmartBkg neural network.
         Should be used only for directly skimmed MC productions.
         Must be added to the path after the generator.add_abc_generator but before simulation.add_simulation modules.
-        Given a specific skim the neural network predicts the probability of the event passing the skim.
-        The event is then kept in the given path with this probability or otherwise discarded to the empty path.
-        Kept events are weighted with their inverse probability to ensure unbiased distributions
-        (weights are saved in the event meta data,  by multiplying them to the generated weight).
+        Given one or multiple skims, the model predicts the probability of each event passing each of the skims.
+        Events are then sampled for each skim according to this probability.
+        An event weight is stored for each skim in the event extra info as 'weight_<SkimName>',
+        either as the inverse probability if the event is sampled for that skim, or 0 otherwise.
+        If an event is sampled for none of the provided skims, it is rejected to the empty_path.
         Use case is the reduction of simulation time for directly skimmed MC productions.
 
         Parameters:
@@ -39,13 +40,13 @@ def add_smartbkg_filtering(
             payload (str): name of the payload storing neural network weights in ONNX format
             empty_path (basf2.Path or None): path rejected events are given to (new empty path if None)
             debug_mode (bool): enables debug mode (events are never rejected, instead the neural network prediction
-                               is written to the event extra info as 'SmartBKG_Prediction')
+                               is written to the event extra info as 'SmartBKG_Prediction_<SkimName>')
             event_type (str or None): type of events thar are generated, allowed values are
                                       'charged', 'mixed', 'uubar', 'ddbar', 'ssbar', 'ccbar', 'taupair';
                                       if None, automatially determined from the event extra info
             activation_params (tuple(float, float) or None): custom parameters (a, b) for the activation function
                                                              (useful for testing/validation);
-                                                             if None, prefitted values for the chosen skim are used
+                                                             if None, prefitted values for the chosen skims are used
     """
 
     sbkg = b2.register_module("SmartBackground")

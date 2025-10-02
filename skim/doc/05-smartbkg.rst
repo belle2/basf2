@@ -4,9 +4,10 @@ Smart Background Simulation
 The Smart Background project aims to reduce the production time and resources required for directly 
 skimmed background MC campaigns. To this end, a transformer based neural network is used to 
 predict the probability that an event will pass a given skim directly after event generation 
-before the costly simulation and reconstruction steps (see :numref:`smartbkg_workflow`). To ensure unbiased distributions 
-after filtering, importance sampling is employed, using the neural network output as a probability to sample 
-an event and, if it is kept, weighting it with the inverse neural network output. 
+before the costly simulation and reconstruction steps (see :numref:`smartbkg_workflow`) so that these can be 
+skipped for events that will be filtered out by the skim anyway. To ensure unbiased distributions 
+after neural network filtering, importance sampling is employed, using the neural network output as a probability to sample 
+an event and, if it is kept, weighting it with the inverse neural network output.
 
 .. _smartbkg_workflow:
 
@@ -17,22 +18,25 @@ an event and, if it is kept, weighting it with the inverse neural network output
     Schematic view of skimmed MC production using Smart Background.
 
 .. note:: Datasets produced using Smart Background are weighted and must be treated as such when analyzed! The weights 
-  are stored as generator weights and are therefore automatically written to all produced ntuples.
+  are stored in the event extra info as ``weight_<SkimName>``.
 
 Usage
 ^^^^^
 
 To employ this method, we recommend using the :py:func:`skim.smartbkg.add_smartbkg_filtering` convenience function 
-from the generators package. It should be placed after the event generator but before simulation and reconstruction. 
-As mandatory inputs it requires the LFN code of the skim you are running (available for all skims via ``skim.code``), 
-as well as the type of MC you are producing (uubar, ddbar, ssbar, ccbar, charged, mixed, taupair). A part of your 
-steering file might then look like this (for a full example see ``skim/examples/SmartBkg_ExampleSteering.py``):
+from ``skim.smartbkg``. It should be placed after the event generator but before simulation and reconstruction. 
+As mandatory input it requires the skim object you are running (works with any skim derived from :py:class:`skim.core.BaseSkim`,
+including :py:class:`skim.core.CombinedSkim` , as long as the used skims are known to the trained model, see below). 
+It also requires information about the background type produced (uubar, ddbar, ssbar, ccbar, charged, mixed, taupair). 
+If this cannot be inferred from the event extra info (e.g. by setting it in the event generator as below), 
+you can manually provide it via the ``event_type`` argument.
+A part of your steering file might then look like this (for a full example see ``skim/examples/SmartBkgExampleSteering.py``):
 
 .. code-block:: python
 
   # Add event generator (evtgen for charged events in this example)
   finalstate = "charged"
-  gen.add_evtgen_generator(finalstate=finalstate, path=path)
+  gen.add_evtgen_generator(finalstate=finalstate, path=path, eventType=finalstate)
 
   # Define skim
   skim = feiHadronic(
@@ -40,10 +44,9 @@ steering file might then look like this (for a full example see ``skim/examples/
       OutputFileName="your_output_file_name.udst.root"
   )
 
-  # Add SmartBkg filtering by providing the skim code and final state
+  # Add SmartBkg filtering by providing the skim
   skim.smartbkg.add_smartbkg_filtering(
-      skim_code=skim.code,
-      event_type=finalstate,
+      skim=skim,
       path=path
   )
 
@@ -53,6 +56,10 @@ steering file might then look like this (for a full example see ``skim/examples/
 
   # Apply the skim
   skim(path)
+
+The event weights for the skim (or for each skim separately if you use a :py:class:`skim.core.CombinedSkim`) are stored in the 
+event extra info as ``weight_<SkimName>``. If an event is not sampled for a particular skim, the corresponding 
+weight is set to 0. If an event is sampled for none of the provided skims, it is filtered out to an empty path.
 
 We currently provide a pre-trained model via the global tag ??? that is trained on 51 skims. The supported skim codes are 
 ``11180500``, ``11180600``, ``11640100``, ``12160100``, ``12160200``, ``12160300``, ``12160400``, ``13160200``, ``13160300``, 
@@ -64,12 +71,12 @@ We currently provide a pre-trained model via the global tag ??? that is trained 
 
 For studies you may want to disable filtering and look at the model output. This is possible by setting the ``debug_mode`` argument 
 of :py:func:`skim.smartbkg.add_smartbkg_filtering` to ``True``. This will disable filtering and reweighting, and instead the 
-model output will be saved to the event extra info as ``SmartBKG_Prediction``. An example of how to write out the model
-predictions as well as the skim flags is provided under ``skim/examples/SmartBkg_DebugMode.py``. 
+model outputs will be saved to the event extra info as ``SmartBKG_Prediction_<SkimName>``. An example of how to write out the model
+predictions as well as the skim flags is provided under ``skim/examples/SmartBkgDebugMode.py``. 
 
-For greater customisability you may also use the :b2:mod:`SmartBackground` module directly. It has the same mandatory arguments 
-as the convenience function, and can also be put into debug mode. It performs the reweighting, but no filtering on its own (instead 
-it returns 1 as a return value if an event is sampled, otherwise 0). 
+For greater customisability you may also use the :b2:mod:`SmartBackground` module directly. It requires as 
+mandatory input the skim LFN codes of all used skims, and can also be put into debug mode. It performs the reweighting, 
+but no filtering on its own (instead it returns 1 as a return value if an event is sampled for at least one skim, otherwise 0).
 
 The code for the entire Smart Background project including the model setup, training script and data preparation 
 can be found on `GitLab <https://gitlab.desy.de/belle2/analyses/smartbkg>`_.

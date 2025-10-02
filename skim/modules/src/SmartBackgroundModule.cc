@@ -42,10 +42,11 @@ SmartBackgroundModule::SmartBackgroundModule() : Module()
   setDescription("Event preselector based on the SmartBkg neural network. "
                  "Should be used only for directly skimmed MC productions. "
                  "Must be added to the path after the MC generator module but before simulation. "
-                 "Given a specific skim the neural network predicts the probability of the event passing the skim. "
-                 "The module returns 1 with this probability or otherwise 0. "
-                 "Events are then weighted with their inverse probability "
-                 "(weights are saved in the event meta data, by multiplying them to the generated weight). "
+                 "Given one or multiple skims, the model predicts the probability of each event passing each of the skims. "
+                 "Events are then sampled for each skim according to this probability. "
+                 "An event weight is stored for each skim in the event extra info as 'weight_<SkimName>', "
+                 "either as the inverse probability if the event is sampled for that skim, or 0 otherwise. "
+                 "If an event is sampled for none of the provided skims, the module returns 0, otherwise 1. "
                  "Use case is the reduction of simulation time for directly skimmed MC productions.");
   addParam("skimCodes", m_skimCodes, "Skim LFN codes");
   addParam("overrideEventType", m_overrideEventType,

@@ -1085,8 +1085,10 @@ namespace Belle2 {
         auto daughterFunction = convertToDaughterIndex({arguments[0]});
         std::string variableName = arguments[1];
         auto func = [daughterFunction, variableName](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return Const::doubleNaN;
           int daughterNumber = std::get<int>(daughterFunction(particle));
-          if (daughterNumber < 0)
+          if (daughterNumber >= int(particle->getNDaughters()) or daughterNumber < 0)
             return Const::doubleNaN;
           const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
           auto result_mother = var->function(particle);
@@ -1127,8 +1129,10 @@ namespace Belle2 {
         auto daughterFunction = convertToDaughterIndex({arguments[0]});
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, daughterFunction](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return Const::doubleNaN;
           int daughterNumber = std::get<int>(daughterFunction(particle));
-          if (daughterNumber < 0)
+          if (daughterNumber >= int(particle->getNDaughters()) or daughterNumber < 0)
             return Const::doubleNaN;
           double daughterValue = 0.0, motherValue = 0.0;
           if (std::holds_alternative<double>(var->function(particle)))
@@ -1917,8 +1921,10 @@ namespace Belle2 {
         auto daughterFunction = convertToDaughterIndex({arguments[0]});
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, daughterFunction](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return Const::doubleNaN;
           int daughterNumber = std::get<int>(daughterFunction(particle));
-          if (daughterNumber < 0)
+          if (daughterNumber >= int(particle->getNDaughters()) or daughterNumber < 0)
             return Const::doubleNaN;
           auto var_result = var->function(particle->getDaughter(daughterNumber));
           if (std::holds_alternative<double>(var_result))
@@ -1944,8 +1950,10 @@ namespace Belle2 {
         auto daughterFunction = convertToDaughterIndex({arguments[0]});
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, daughterFunction](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return Const::doubleNaN;
           int daughterNumber = std::get<int>(daughterFunction(particle));
-          if (daughterNumber < 0)
+          if (daughterNumber >= int(particle->getNDaughters()) or daughterNumber < 0)
             return Const::doubleNaN;
           else
           {
@@ -2024,7 +2032,7 @@ namespace Belle2 {
           if (particle->getMCParticle()) // has MC match or is MCParticle
           {
             int daughterNumber = std::get<int>(daughterFunction(particle));
-            if (daughterNumber < 0)
+            if (daughterNumber >= int(particle->getMCParticle()->getNDaughters()) or daughterNumber < 0)
               return Const::doubleNaN;
             Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
             auto var_result = var->function(&tempParticle);

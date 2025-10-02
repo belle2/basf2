@@ -87,6 +87,20 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
     }
   }
 
+  m_lines.clear();
+  m_lines.reserve(kNumLayers);
+  for (unsigned il = 0; il < kNumLayers; ++il) {
+    int bin = il + 1;
+    auto* line = new TLine(bin, 0, bin, 1.0);
+    line->SetLineStyle(2);
+    if (bin >= 8 && bin < 14)line->SetLineColor(kRed);  // U-type
+    else if (bin >= 20 && bin < 26)line->SetLineColor(kGreen);  // V-type
+    else if (bin >= 32 && bin < 38)line->SetLineColor(kRed);  // U-type
+    else if (bin >= 44 && bin < 50)line->SetLineColor(kGreen);  // v-type
+    else line->SetLineColor(kGray); // A-type
+    m_lines.push_back(line);
+  }
+
   c_hist_effphi = new TCanvas("CDC/c_hist_effphi", "c_hist_effphi", 500, 400);
   m_hist_effphi = new TH1D("CDC/hist_effphi", "m_hist_effphi", 360, -180.0, 180.0);
 
@@ -198,7 +212,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   auto m_delta_ladc = (TH2F*)getDelta(m_name_dir, m_hname_ladc, 0, true);
   if (m_delta_ladc) {
     m_histmd_ladc->Reset();
-    for (int il = 0; il < 56; ++il) {
+    for (unsigned il = 0; il < kNumLayers; ++il) {
       if (m_hists_lADC[il]) delete m_hists_lADC[il];
       m_hists_lADC[il] = m_delta_ladc->ProjectionY(Form("histmd_adc_layer%d", il + 1), il + 1, il + 1, "");
       m_hists_lADC[il]->SetTitle(Form("histmd_adc_layer%d", il));
@@ -214,19 +228,14 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_histmd_ladc->SetMinimum(0);
     m_histmd_ladc->SetMaximum(y_max * 1.20);
     m_histmd_ladc->Draw("hist");
-    for (int bin : slindex) {
-      TLine* line = new TLine(bin, 0, bin, y_max * 1.20);
-      if (bin == 14 || bin == 38)line->SetLineColor(kRed);// U-type
-      else if (bin == 26 || bin == 50)line->SetLineColor(kGreen);// V-type
-      else line->SetLineColor(kBlack);// A-type
-      line->SetLineStyle(2);
-      line->SetLineWidth(2);
-      line->SetBit(kCanDelete);
+    for (auto* line : m_lines) {
+      line->SetY2(y_max * 1.20);
       line->Draw("same");
     }
     c_histmd_ladc->Update();
     UpdateCanvas(c_histmd_ladc);
   }
+
   //2. get adc medians vs board ID
   auto m_delta_adc = (TH2F*)getDelta(m_name_dir, m_hname_badc, 0, true); //true=only if updated
   if (m_delta_adc) {
@@ -234,7 +243,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     int cadcgood = 0;
     int cadcbad = 0;
     double sumadcgood = 0;
-    for (int ic = 0; ic < 300; ++ic) {
+    for (unsigned ic = 0; ic < kNumBoards; ++ic) {
       if (ic == 0) continue; //299 boards only
       if (m_hists_bADC[ic]) delete m_hists_bADC[ic];
       m_hists_bADC[ic] = m_delta_adc->ProjectionY(Form("histmd_tdc_board%d", ic + 1), ic + 1, ic + 1, "");
@@ -268,7 +277,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     int ctdcgood = 0;
     int ctdcbad = 0;
     double sumtdcgood = 0;
-    for (int ic = 0; ic < 300; ++ic) {
+    for (unsigned ic = 0; ic < kNumBoards; ++ic) {
       if (ic == 0) continue; //299 boards only
       if (m_hists_bTDC[ic]) delete m_hists_bTDC[ic];
       m_hists_bTDC[ic] = m_delta_tdc->ProjectionY(Form("histmd_tdc_board%d", ic + 1), ic + 1, ic + 1, "");
@@ -279,7 +288,6 @@ void DQMHistAnalysisCDCEpicsModule::event()
         ctdcgood++;
         sumtdcgood = sumtdcgood + md_tdc;
       } else ctdcbad++;
-
     }
     double tdcfrac = ctdcgood / 2.99;
     setEpicsPV("tdcboards", tdcfrac);
@@ -325,34 +333,32 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_hist_crphi->SetTitle("cdc-track #phi (IP + hadrons);cdc-track #phi;norm entries");
     if (m_hist_crphi) {
       double maxnow = m_hist_crphi->Integral();
-      if (maxnow > 0) {
-        m_hist_crphi->Scale(1.0 / maxnow);
-        if (maxnow < 10000) {
-          isFew = true;
-        } else {
-          if (m_histref_phiindex) {
-            m_hist_refphi = m_histref_phiindex->ProjectionX("histphi_ip_hadronsref", 7, 7, "");
-            double nbinref = m_hist_refphi->GetNbinsX();
-            double nbinnow = m_hist_crphi->GetNbinsX();
-            if (nbinref == nbinnow) { //same bins
-              double maxref = m_hist_refphi->Integral();
-              if (maxref > 0) {
-                m_hist_refphi->Scale(1.0 / maxref);
-                double maxphidiff = 0;
-                double maxphidiff_angle = 0;
-                for (int iphi = 0; iphi < nbinnow; iphi++) {
-                  double icnow = m_hist_crphi->GetBinContent(iphi + 1);
-                  double icref = m_hist_refphi->GetBinContent(iphi + 1);
-                  double phidiff = fabs(icnow - icref);
-                  if (phidiff > m_phiwarn)isWarn = true;
-                  if (phidiff > m_phialarm)isAlarm = true;
-                  if (phidiff > maxphidiff) {
-                    maxphidiff = phidiff;
-                    maxphidiff_angle = m_hist_crphi->GetBinLowEdge(iphi + 1) + m_hist_crphi->GetBinWidth(iphi + 1);
-                  }
+      if (maxnow < 10000) {
+        isFew = true;
+        if (maxnow > 0)m_hist_crphi->Scale(1.0 / maxnow);
+      } else {
+        if (m_histref_phiindex) {
+          m_hist_refphi = m_histref_phiindex->ProjectionX("histphi_ip_hadronsref", 7, 7, "");
+          double nbinref = m_hist_refphi->GetNbinsX();
+          double nbinnow = m_hist_crphi->GetNbinsX();
+          if (nbinref == nbinnow) { //same bins
+            double maxref = m_hist_refphi->Integral();
+            if (maxref > 0) {
+              m_hist_refphi->Scale(1.0 / maxref);
+              double maxphidiff = 0;
+              double maxphidiff_angle = 0;
+              for (int iphi = 0; iphi < nbinnow; iphi++) {
+                double icnow = m_hist_crphi->GetBinContent(iphi + 1);
+                double icref = m_hist_refphi->GetBinContent(iphi + 1);
+                double phidiff = fabs(icnow - icref);
+                if (phidiff > m_phiwarn)isWarn = true;
+                if (phidiff > m_phialarm)isAlarm = true;
+                if (phidiff > maxphidiff) {
+                  maxphidiff = phidiff;
+                  maxphidiff_angle = m_hist_crphi->GetBinLowEdge(iphi + 1) + m_hist_crphi->GetBinWidth(iphi + 1);
                 }
-                m_hist_crphi->SetTitle(Form("%s (diff = %0.03f at %0.1f)", m_hist_crphi->GetTitle(), maxphidiff, maxphidiff_angle));
               }
+              m_hist_crphi->SetTitle(Form("%s (diff = %0.03f at %0.1f)", m_hist_crphi->GetTitle(), maxphidiff, maxphidiff_angle));
             }
           }
         }
@@ -497,8 +503,17 @@ void DQMHistAnalysisCDCEpicsModule::event()
 //------------------------------------
 void DQMHistAnalysisCDCEpicsModule::endRun()
 {
+  for (auto* line : m_lines) delete line;
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: end run");
 }
+
+
+//------------------------------------
+void DQMHistAnalysisCDCEpicsModule::terminate()
+{
+  B2DEBUG(20, "DQMHistAnalysisCDCEpics: terminate called");
+}
+
 
 //------------------------------------
 float DQMHistAnalysisCDCEpicsModule::getHistMedian(TH1D* h) const
@@ -517,11 +532,6 @@ float DQMHistAnalysisCDCEpicsModule::getHistMedian(TH1D* h) const
   return median;
 }
 
-//------------------------------------
-void DQMHistAnalysisCDCEpicsModule::terminate()
-{
-  B2DEBUG(20, "DQMHistAnalysisCDCEpics: terminate called");
-}
 
 void DQMHistAnalysisCDCEpicsModule::fillEffiTH2(TH2F* hist, TH2F* attached, TH2F* expected, TH2F* efficiency)
 {

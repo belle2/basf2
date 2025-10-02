@@ -12,10 +12,11 @@ and handle event selection/rejection.
 '''
 
 import basf2 as b2
+from skim.core import BaseSkim, CombinedSkim
 
 
 def add_smartbkg_filtering(
-        skim_code,
+        skim,
         path,
         payload="SmartBKGWeights.onnx",
         empty_path=None,
@@ -33,7 +34,7 @@ def add_smartbkg_filtering(
         Use case is the reduction of simulation time for directly skimmed MC productions.
 
         Parameters:
-            skim_code (int or str): LFN code of the used skim (available for all skims via skim.code)
+            skim (skim.core.BaseSkim or skim.core.CombinedSkim): instance of the used skim
             path (basf2.Path): main path with generator modules, used for pass events
             payload (str): name of the payload storing neural network weights in ONNX format
             empty_path (basf2.Path or None): path rejected events are given to (new empty path if None)
@@ -48,8 +49,14 @@ def add_smartbkg_filtering(
     """
 
     sbkg = b2.register_module("SmartBackground")
-    skim_code = int(skim_code)
-    sbkg.param("skimCode", skim_code)
+    if isinstance(skim, CombinedSkim):
+        skim_codes = [int(s.code) for s in skim.Skims]
+    elif isinstance(skim, BaseSkim):
+        skim_codes = [int(skim.code)]
+    else:
+        b2.B2FATAL("add_smartbkg_filtering: skim argument must be instance of either" +
+                   " CombinedSkim or BaseSkim, received " + str(type(skim)))
+    sbkg.param("skimCodes", skim_codes)
     sbkg.param("debugMode", debug_mode)
     sbkg.param("payload", payload)
     if event_type is not None:

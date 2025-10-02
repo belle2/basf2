@@ -37,9 +37,9 @@ skim = feiHadronic(
     OutputFileName="test_smartbkg_fei.udst.root"
 )
 
-# Add SmartBkg filtering by providing the skim code
+# Add SmartBkg filtering by providing the skim
 sbg.add_smartbkg_filtering(
-    skim_code=skim.code,
+    skim=skim,
     path=path
 )
 

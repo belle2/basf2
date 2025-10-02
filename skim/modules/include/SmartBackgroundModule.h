@@ -65,6 +65,11 @@ namespace Belle2 {
     std::unordered_map<int, uint16_t> m_skimcodesMapping;
 
     /**
+     * Mapping of skim codes to skim names
+     */
+    std::unordered_map<int, std::string> m_skimnamesMapping;
+
+    /**
      * Mapping of skimcodes to activation function parameters optimized for speedup
      */
     std::unordered_map<int, std::vector<float>> m_paramsMapping;
@@ -107,9 +112,9 @@ namespace Belle2 {
     std::vector<int> m_motherValues;
 
     /**
-     * Skim code (module parameter)
+     * Skim codes (module parameter)
      */
-    int m_skimCode;
+    std::vector<int> m_skimCodes;
 
     /**
      * Whether to execute in debug mode (module parameter)

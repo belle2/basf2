@@ -40,11 +40,11 @@ skim = feiHadronic(
     udstOutput=False
 )
 
-# Add SmartBkg filtering by providing the skim code
+# Add SmartBkg filtering by providing the skim
 # Here we enable debug mode so that no events are rejected or weighted and instead the model prediction is saved
-# to the event extra info as 'SmartBKG_Prediction'
+# to the event extra info as 'SmartBKG_Prediction_feiHadronic'
 sbg.add_smartbkg_filtering(
-    skim_code=skim.code,
+    skim=skim,
     path=path,
     debug_mode=True
 )
@@ -63,7 +63,7 @@ mdst.add_mdst_output(
 skim(path)
 
 # Write out skim flags and SmartBkg predictions as ntuple
-var.addAlias("smartBkgPrediction", "eventExtraInfo(SmartBKG_Prediction)")
+var.addAlias("smartBkgPrediction", "eventExtraInfo(SmartBKG_Prediction_feiHadronic)")
 ma.variablesToNtuple(
     "",
     [skim.flag, "smartBkgPrediction"],

@@ -33,9 +33,11 @@ namespace Belle2 {
     /**
      * Constructor setting all three maps
      */
-    SmartBackgroundConfig(const std::unordered_map<int, int>& pdgMapping, const std::unordered_map<int, uint16_t>& skimcodesMapping,
-                          const std::unordered_map<int, std::vector<float>>& paramMapping) : m_pdgMapping(pdgMapping), m_skimcodesMapping(skimcodesMapping),
-      m_paramMapping(paramMapping) { }
+    SmartBackgroundConfig(const std::unordered_map<int, int>& pdgMapping,
+                          const std::unordered_map<int, uint16_t>& skimcodesMapping,
+                          const std::unordered_map<int, std::vector<float>>& paramMapping,
+                          const std::unordered_map<int, std::string> skimnamesMapping) : m_pdgMapping(pdgMapping),
+      m_skimcodesMapping(skimcodesMapping), m_paramMapping(paramMapping), m_skimnamesMapping(skimnamesMapping) { }
 
     /**
      * Return pdg mapping.
@@ -61,6 +63,11 @@ namespace Belle2 {
       return m_paramMapping;
     }
 
+    std::unordered_map<int, std::string> getSkimnamesMapping() const
+    {
+      return m_skimnamesMapping;
+    }
+
   private:
 
     /**
@@ -77,6 +84,11 @@ namespace Belle2 {
      * Mapping of skimcodes to activation function parameters optimized for speedup
      */
     std::unordered_map<int, std::vector<float>> m_paramMapping;
+
+    /**
+     * Mapping of skimcodes to skim names
+     */
+    std::unordered_map<int, std::string> m_skimnamesMapping;
 
     /**
      * Classdef

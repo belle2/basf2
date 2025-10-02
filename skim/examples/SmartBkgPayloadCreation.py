@@ -91,6 +91,26 @@ SKIMCODES_MAPPING = {
     18530200: 45, 18570600: 46, 18570700: 47, 19120100: 48, 19130201: 49,
     19130300: 50}
 
+SKIMNAMES_MAPPING = {
+    10601300: 'SystematicsCombinedHadronic', 10601400: 'SystematicsCombinedLowMulti',
+    11640100: 'SystematicsPhiGamma', 11180500: 'feiHadronic', 11180600: 'feiSL', 13160200: 'TDCPV_ccs',
+    13160300: 'TDCPV_qqs', 18360100: 'TauLFV', 18570600: 'TauGeneric', 18570700: 'TauThrust', 19130201: 'BtoHadTracks',
+    19130300: 'BtoHad1Pi0', 19120100: 'BtoPi0Pi0', 14120300: 'BtoD0h_Kspi0', 14120600: 'B0toDpi_Kpipi',
+    14121100: 'B0toDrho_Kpipi', 14140100: 'BtoD0h_hh', 14140101: 'BtoD0h_Kpi', 14140102: 'BtoD0h_Kpipipi_Kpipi0',
+    14140200: 'BtoD0h_Kshh', 14141000: 'BtoD0rho_Kpi', 14141002: 'B0toDD_Kpipi_Kspi', 14141001: 'BtoD0rho_Kpipipi_Kpipi0',
+    14120400: 'BtoD0h_Kspipipi0', 14120601: 'B0toDpi_Kspi', 14120700: 'B0toDstarPi_D0pi_Kpi',
+    14120800: 'B0toDstarPi_D0pi_Kpipipi_Kpipi0', 14121101: 'B0toDrho_Kspi', 14121200: 'B0toDstarRho_D0pi_Kpi',
+    14121201: 'B0toDstarRho_D0pi_Kpipipi_Kpipi0', 14141003: 'B0toDstarD', 14121300: 'B0toD0Kpipi0_pi0',
+    18020100: 'SinglePhotonDark', 18520100: 'DimuonPlusMissingEnergy', 18520200: 'ElectronMuonPlusMissingEnergy',
+    18520400: 'LFVZpVisible', 18020400: 'EGammaControlDark', 18020200: 'GammaGammaControlKLMDark',
+    18000001: 'RadBhabhaV0Control', 18000000: 'InelasticDarkMatter', 18130100: 'BtoKplusLLP', 18520500: 'LowMassTwoTrack',
+    18530200: 'SingleTagPseudoScalar', 17241000: 'DstToDpPi0_DpToHpPi0', 17240600: 'DstToD0Pi_D0ToNeutrals',
+    17230200: 'XToD0_D0ToNeutrals', 17241200: 'DstToD0Pi_D0ToVGamma', 17240100: 'DstToD0Pi_D0ToHpJm',
+    17240300: 'DstToD0Pi_D0ToHpHmPi0', 17240700: 'DstToD0Pi_D0ToHpJmKs', 17230600: 'LambdacTopHpJm',
+    17230400: 'XToDp_DpToKsHp', 17230100: 'XToD0_D0ToHpJm', 17230500: 'XToDp_DpToHpHmJp', 15420100: 'BottomoniumEtabExclusive',
+    15440100: 'BottomoniumUpsilon', 16460200: 'CharmoniumPsi', 15410300: 'InclusiveLambda', 12160100: 'BToXgamma',
+    12160200: 'BtoXll', 12160300: 'BtoXll_LFV', 12160400: 'inclusiveBplusToKplusNuNu'}
+
 # Mapping of scim codes to lists of parameters for the activation function (clipped exponential) optimized for speedup
 PARAMETER_MAPPING = {
     11180500: [0.46, -0.25], 11180600: [0.49, -0.57], 11640100: [0.53, -1.69], 12160100: [0.48, -0.18],
@@ -108,7 +128,7 @@ PARAMETER_MAPPING = {
     19120100: [0.74, -4.12], 19130201: [0.47, -0.03], 19130300: [0.47, -0.2]}
 
 # Initialize config object and write new payload into local database under identifier 'SmartBackgroundConfig'
-config = Belle2.SmartBackgroundConfig(PDG_MAPPING, SKIMCODES_MAPPING, PARAMETER_MAPPING)
+config = Belle2.SmartBackgroundConfig(PDG_MAPPING, SKIMCODES_MAPPING, PARAMETER_MAPPING, SKIMNAMES_MAPPING)
 iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
 Belle2.Database.Instance().storeData("SmartBackgroundConfig", config, iov)
 
@@ -118,3 +138,4 @@ config = Belle2.Database.Instance().getData("SmartBackgroundConfig", 0, 0)
 print("PDG mapping:", {p.first: p.second for p in config.getPdgMapping()})
 print("Skimcodes mapping:", {p.first: p.second for p in config.getSkimcodesMapping()})
 print("Parameter mapping:", {p.first: list(p.second) for p in config.getParameterMapping()})
+print("Skimnames mapping:", {p.first: list(p.second) for p in config.getSkimnamesMapping()})

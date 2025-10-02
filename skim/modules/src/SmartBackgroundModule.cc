@@ -47,7 +47,7 @@ SmartBackgroundModule::SmartBackgroundModule() : Module()
                  "Events are then weighted with their inverse probability "
                  "(weights are saved in the event meta data, by multiplying them to the generated weight). "
                  "Use case is the reduction of simulation time for directly skimmed MC productions.");
-  addParam("skimCode", m_skimCode, "Skim LFN code");
+  addParam("skimCodes", m_skimCodes, "Skim LFN codes");
   addParam("overrideEventType", m_overrideEventType,
            "Override automatically determined event type", false);
   addParam("eventType", m_eventType, "Event type (charged, mixed, uubar, ccbar, ddbar, ssbar, taupair)",
@@ -72,10 +72,13 @@ void SmartBackgroundModule::initialize()
   m_pdgMapping = config->getPdgMapping();
   m_skimcodesMapping = config->getSkimcodesMapping();
   m_paramsMapping = config->getParameterMapping();
+  m_skimnamesMapping = config->getSkimnamesMapping();
 
   // Check parameters
-  if (m_skimcodesMapping.find(m_skimCode) == m_skimcodesMapping.end()) {
-    B2FATAL("SmartBkg: Provided skim code " << m_skimCode << " is unknown. Check documentation for allowed skim codes.");
+  for (int skimCode : m_skimCodes) {
+    if (m_skimcodesMapping.find(skimCode) == m_skimcodesMapping.end()) {
+      B2FATAL("SmartBkg: Provided skim code " << skimCode << " is unknown. Check documentation for allowed skim codes.");
+    }
   }
   if (m_activationOverride) {
     if (m_activationOverrideParams.size() != 2) {
@@ -246,36 +249,40 @@ void SmartBackgroundModule::event()
   // Perform inference
   m_session->run({{"x", xTensor}, {"pdg", pdgTensor}, {"mother", motherTensor}, {"c", cTensor}}, {{"output", outputTensor}});
 
-  // Extract prediction for selected skim
-  const uint16_t skimIndex = m_skimcodesMapping[m_skimCode];
-  float prediction;
-  if (m_activationOverride) {
-    prediction = this->activation(outputTensor->at({skimIndex}), m_activationOverrideParams[0], m_activationOverrideParams[1]);
-  } else {
-    std::vector<float> params = m_paramsMapping[m_skimCode];
-    prediction = this->activation(outputTensor->at({skimIndex}), params[0], params[1]);
-  }
-
-  // Save weight to event meta data / prediction to event extra info
-  if (!m_debugMode) {
-    StoreObjPtr<EventMetaData> eventMetaData;
-    eventMetaData->setGeneratedWeight(eventMetaData->getGeneratedWeight() * (1.0 / prediction));
-  } else {
-    eventExtraInfo->addExtraInfo("SmartBKG_Prediction", prediction);
-  }
-
-  // Importance sampling
-  if (!m_debugMode) {
-    const double randomNum = gRandom->Uniform(0, 1);
-    const bool returnValue = randomNum < prediction;
-    this->setReturnValue(returnValue);
-    if (returnValue) {
-      B2DEBUG(20, "SmartBkg prediction is " << prediction << "; event is kept and weight is set to " << 1 / prediction);
+  // Extract predictions for skims and perform importance sampling
+  // For each skim a seperate weight is saved to the event extra info (0 if event is not sampled for that skim)
+  // If event is sampled for no skim, return value is false
+  bool returnValue = false;
+  for (int skimCode : m_skimCodes) {
+    float prediction;
+    const uint16_t skimIndex = m_skimcodesMapping[skimCode];
+    const std::string skimName = m_skimnamesMapping[skimCode];
+    if (m_activationOverride) {
+      prediction = this->activation(outputTensor->at({skimIndex}), m_activationOverrideParams[0], m_activationOverrideParams[1]);
     } else {
-      B2DEBUG(20, "SmartBkg prediction is " << prediction << "; event is discarded");
+      std::vector<float> params = m_paramsMapping[skimCode];
+      prediction = this->activation(outputTensor->at({skimIndex}), params[0], params[1]);
     }
-  } else {
-    this->setReturnValue(true);
+    if (!m_debugMode) {
+      const double randomNum = gRandom->Uniform(0, 1);
+      if (randomNum < prediction) {
+        returnValue = true;
+        eventExtraInfo->addExtraInfo("weight_" + skimName, 1 / prediction);
+        B2DEBUG(20, "SmartBkg: Prediction for skim " << skimName << " is " << prediction << ", weight is set to " << 1 / prediction);
+      } else {
+        eventExtraInfo->addExtraInfo("weight_" + skimName, 0);
+        B2DEBUG(20, "SmartBkg: Prediction for skim " << skimName << " is " << prediction << ", weight is set to 0");
+      }
+    } else {
+      returnValue = true;
+      eventExtraInfo->addExtraInfo("SmartBKG_Prediction_" + skimName, prediction);
+    }
   }
+  if (returnValue) {
+    B2DEBUG(20, "SmartBkg: Event is kept");
+  } else {
+    B2DEBUG(20, "SmartBkg: Event is discarded");
+  }
+  this->setReturnValue(returnValue);
 
 }

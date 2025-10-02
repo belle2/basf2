@@ -426,22 +426,20 @@ def display_summary(tools: list, tags: list):
         else:
             without_recommendations.append(tool)
 
+    print("\nAvailable entries:")
+    print("-" * 18)
+
     if with_recommendations:
-        print("\nAVAILABLE TOOLS WITH RECOMMENDATIONS:")
-        print("-" * 40)
         for i, tool in enumerate(with_recommendations, 1):
             tags_str = ", ".join(tool.get_field('tags'))
             print(f"{i:2}. {tool.title.format()}")
             print(f"    Tags: {tags_str}")
 
     if without_recommendations:
-        print("\nAVAILABLE TOOLS WITHOUT RECOMMENDATIONS:")
-        print("-" * 50)
         for i, tool in enumerate(without_recommendations, 1):
             tags_str = ", ".join(tool.get_field('tags'))
-            print(f"{i:2}. {tool.title.format()}")
+            print(f"{len(with_recommendations) + i:2}. {tool.title.format()}")
             print(f"    Tags: {tags_str}")
-            print(f"    Status: {tool.get_field('description')}")
 
 
 def get_argument_parser():

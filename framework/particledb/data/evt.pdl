@@ -16,8 +16,8 @@ add  p Particle  c                                  4           1.27            
 add  p Particle  anti-c                            -4           1.27              0              0    -2     1              0         -4
 add  p Particle  b                                  5           4.18              0              0    -1     1              0          5
 add  p Particle  anti-b                            -5           4.18              0              0     1     1              0         -5
-add  p Particle  t                                  6          172.57          1.42           14.2     2     1              0          6
-add  p Particle  anti-t                            -6          172.57          1.42           14.2    -2     1              0         -6
+add  p Particle  t                                  6         172.57           1.42           14.2     2     1              0          6
+add  p Particle  anti-t                            -6         172.57           1.42           14.2    -2     1              0         -6
 * The b' mass lower limit is m > 1.53 TeV (95% C. L.) from single production in p anti-p collisions. The mass is set to 2 TeV.
 add  p Particle  b'                                 7            2e3              0              0    -1     1              0          7
 add  p Particle  anti-b'                           -7            2e3              0              0     1     1              0         -7
@@ -56,8 +56,8 @@ add  p Particle  gamma                             22              0            
 add  p Particle  vpho                           10022              0              0              0     0     2              0          0
 add  p Particle  Cerenkov                       20022              0              0              0     0     2              0          0
 add  p Particle  Z0                                23        91.1880         2.4955             10     0     2              0         23
-add  p Particle  W+                                24         80.3692         2.085             10     3     2              0         24
-add  p Particle  W-                               -24         80.3692         2.085             10    -3     2              0        -24
+add  p Particle  W+                                24        80.3692          2.085             10     3     2              0         24
+add  p Particle  W-                               -24        80.3692          2.085             10    -3     2              0        -24
 * The Higgs0 width upper limit is Gamma < 0.013 GeV at 95% C.L. It is approximately set to the SM prediction.
 add  p Particle  Higgs0                            25         125.20           3.7e-3              0     0     0              0         25
 * The following particles are hypothetical. The lower mass limits depend on model.
@@ -523,7 +523,7 @@ add  p Particle  chi_c1                         20443     3510.67e-3        0.84
 add  p Particle  h_c                            10443     3525.37e-3        0.78e-3           4e-3     0     2              0      10443
 add  p Particle  chi_c2                           445     3556.17e-3        1.98e-3          10e-3     0     4              0        445
 add  p Particle  eta_c(2S)                     100441      3637.7e-3        11.8e-3          60e-3     0     0              0     100441
-add  p Particle  psi(2S)                       100443     3686.097e-3        293e-6         1.6e-3     0     2              0     100443
+add  p Particle  psi(2S)                       100443    3686.097e-3         293e-6         1.6e-3     0     2              0     100443
 add  p Particle  psi(3770)                      30443      3773.7e-3        27.2e-3         140e-3     0     2              0      30443
 * The chi_c1(3872) width upper limit is Gamma < 1.2 MeV (90% C. L.) in PDG 2020 data.
 * However, it was measured to be (1.39 +- 0.24 +- 0.10) MeV in arXiv:2005.13419 and
@@ -756,18 +756,18 @@ add  p Particle  anti-Omega_cc*-                -4434     3824.66e-3            
 *---------------------------------------------------------------------------------------------------------------------------------------
 add  p Particle  Lambda_b0                       5122  5.6195000e+00              0              0     0     1  4.1371359e-01       5122
 add  p Particle  anti-Lambda_b0                 -5122  5.6195000e+00              0              0     0     1  4.1371359e-01      -5122
-add  p Particle  Sigma_b+                        5222  5810.56e-3            5.0e-3  1.0000000e-04     3     1              0       5222
-add  p Particle  anti-Sigma_b-                  -5222  5810.56e-3            5.0e-3  1.0000000e-04    -3     1              0      -5222
+add  p Particle  Sigma_b+                        5222     5810.56e-3         5.0e-3  1.0000000e-04     3     1              0       5222
+add  p Particle  anti-Sigma_b-                  -5222     5810.56e-3         5.0e-3  1.0000000e-04    -3     1              0      -5222
 add  p Particle  Sigma_b0                        5212  5.8078000e+00  6.5821220e-06         6.6e-5     0     1              0       5212
 add  p Particle  anti-Sigma_b0                  -5212  5.8078000e+00  6.5821220e-06         6.6e-5     0     1              0      -5212
-add  p Particle  Sigma_b-                        5112  5810.56e-3            5.0e-3  1.0000000e-04    -3     1              0       5112
-add  p Particle  anti-Sigma_b+                  -5112  5810.56e-3            5.0e-3  1.0000000e-04     3     1              0      -5112
-add  p Particle  Sigma_b*+                       5224  5830.32e-3            9.4e-3              0     3     3              0       5224
-add  p Particle  anti-Sigma_b*-                 -5224  5830.32e-3            9.4e-3              0    -3     3              0      -5224
+add  p Particle  Sigma_b-                        5112     5810.56e-3         5.0e-3  1.0000000e-04    -3     1              0       5112
+add  p Particle  anti-Sigma_b+                  -5112     5810.56e-3         5.0e-3  1.0000000e-04     3     1              0      -5112
+add  p Particle  Sigma_b*+                       5224     5830.32e-3         9.4e-3              0     3     3              0       5224
+add  p Particle  anti-Sigma_b*-                 -5224     5830.32e-3         9.4e-3              0    -3     3              0      -5224
 add  p Particle  Sigma_b*0                       5214  5.8290000e+00              0              0     0     3              0       5214
 add  p Particle  anti-Sigma_b*0                 -5214  5.8290000e+00              0              0     0     3              0      -5214
-add  p Particle  Sigma_b*-                       5114  5830.32e-3            9.4e-3              0    -3     3              0       5114
-add  p Particle  anti-Sigma_b*+                 -5114  5830.32e-3            9.4e-3              0     3     3              0      -5114
+add  p Particle  Sigma_b*-                       5114     5830.32e-3         9.4e-3              0    -3     3              0       5114
+add  p Particle  anti-Sigma_b*+                 -5114     5830.32e-3         9.4e-3              0     3     3              0      -5114
 add  p Particle  Xi_b0                           5232  5.7931000e+00              0              0     0     1  4.2570529e-01       5232
 add  p Particle  anti-Xi_b0                     -5232  5.7931000e+00              0              0     0     1  4.2570529e-01      -5232
 add  p Particle  Xi_b-                           5132  5.7949000e+00              0              0    -3     1  4.2570529e-01       5132

@@ -16,8 +16,8 @@ add  p Particle  c                                  4           1.27            
 add  p Particle  anti-c                            -4           1.27              0              0    -2     1              0         -4
 add  p Particle  b                                  5           4.18              0              0    -1     1              0          5
 add  p Particle  anti-b                            -5           4.18              0              0     1     1              0         -5
-add  p Particle  t                                  6          172.76          1.42           14.2     2     1              0          6
-add  p Particle  anti-t                            -6          172.76          1.42           14.2    -2     1              0         -6
+add  p Particle  t                                  6          172.57          1.42           14.2     2     1              0          6
+add  p Particle  anti-t                            -6          172.57          1.42           14.2    -2     1              0         -6
 * The b' mass lower limit is m > 1.53 TeV (95% C. L.) from single production in p anti-p collisions. The mass is set to 2 TeV.
 add  p Particle  b'                                 7            2e3              0              0    -1     1              0          7
 add  p Particle  anti-b'                           -7            2e3              0              0     1     1              0         -7
@@ -55,11 +55,11 @@ add  p Particle  g                                 21              0            
 add  p Particle  gamma                             22              0              0              0     0     2              0         22
 add  p Particle  vpho                           10022              0              0              0     0     2              0          0
 add  p Particle  Cerenkov                       20022              0              0              0     0     2              0          0
-add  p Particle  Z0                                23        91.1876         2.4952             10     0     2              0         23
-add  p Particle  W+                                24         80.379          2.085             10     3     2              0         24
-add  p Particle  W-                               -24         80.379          2.085             10    -3     2              0        -24
+add  p Particle  Z0                                23        91.1880         2.4955             10     0     2              0         23
+add  p Particle  W+                                24         80.3692         2.085             10     3     2              0         24
+add  p Particle  W-                               -24         80.3692         2.085             10    -3     2              0        -24
 * The Higgs0 width upper limit is Gamma < 0.013 GeV at 95% C.L. It is approximately set to the SM prediction.
-add  p Particle  Higgs0                            25         125.10           4e-3              0     0     0              0         25
+add  p Particle  Higgs0                            25         125.20           3.7e-3              0     0     0              0         25
 * The following particles are hypothetical. The lower mass limits depend on model.
 * Settings from original EvtGen evt.pdl file are used.
 add  p Particle  Z'0                               32            500              0              0     0     2              0         32
@@ -196,9 +196,9 @@ add  p Particle  sigma_0                      9000221         475e-3         550
 * rho(770)
 add  p Particle  rho+                             213      775.11e-3       149.1e-3         600e-3     3     2              0        213
 add  p Particle  rho-                            -213      775.11e-3       149.1e-3         600e-3    -3     2              0       -213
-add  p Particle  rho0                             113      775.26e-3       147.8e-3         600e-3     0     2              0        113
+add  p Particle  rho0                             113      775.26e-3       147.4e-3         600e-3     0     2              0        113
 * omega(782)
-add  p Particle  omega                            223      782.65e-3        8.49e-3          55e-3     0     2              0        223
+add  p Particle  omega                            223      782.66e-3        8.68e-3          55e-3     0     2              0        223
 * eta'(958)
 add  p Particle  eta'                             331      957.78e-3       0.188e-3           2e-3     0     0              0        331
 * f_0(980). The width is given by PDG as "10 to 100 MeV". It is set to 70 MeV here, as in the original EvtGen evt.pdl.
@@ -220,9 +220,9 @@ add  p Particle  a_1+                           20213        1230e-3         425
 add  p Particle  a_1-                          -20213        1230e-3         425e-3        1000e-3    -3     2              0     -20213
 add  p Particle  a_10                           20113        1230e-3         425e-3        1000e-3     0     2              0      20113
 * f_2(1270)
-add  p Particle  f_2                              225      1275.5e-3       186.7e-3         600e-3     0     4              0        225
+add  p Particle  f_2                              225      1275.4e-3       186.6e-3         600e-3     0     4              0        225
 * f_1(1285)
-add  p Particle  f_1                            20223      1281.9e-3        22.7e-3         120e-3     0     2              0      20223
+add  p Particle  f_1                            20223      1281.8e-3        23.0e-3         120e-3     0     2              0      20223
 * eta(1295)
 add  p Particle  eta(2S)                       100221        1294e-3          55e-3         250e-3     0     0              0          0
 * pi(1300). The width is given by PDG as "200 to 600 MeV".
@@ -231,9 +231,9 @@ add  p Particle  pi(2S)-                      -100211        1300e-3         400
 add  p Particle  pi(2S)0                       100111        1300e-3         400e-3        1000e-3     0     0              0          0
 * a_2(1320). The mass and width values in PDG are mode-dependent, the average width is not available.
 * The values from the 3 pi mode (the most precise one) are used here.
-add  p Particle  a_2+                             215      1318.6e-3         105e-3         500e-3     3     4              0        215
-add  p Particle  a_2-                            -215      1318.6e-3         105e-3         500e-3    -3     4              0       -215
-add  p Particle  a_20                             115      1318.6e-3         105e-3         500e-3     0     4              0        115
+add  p Particle  a_2+                             215      1318.2e-3         107e-3         500e-3     3     4              0        215
+add  p Particle  a_2-                            -215      1318.2e-3         107e-3         500e-3    -3     4              0       -215
+add  p Particle  a_20                             115      1318.2e-3         107e-3         500e-3     0     4              0        115
 * f_0(1370). The mass and width are given by PDG as "1200 to 1500 MeV" and "200 to 500 MeV", respectively.
 add  p Particle  f'_0                           30221        1350e-3         350e-3        1000e-3     0     0              0      10331
 * pi_1(1400)
@@ -241,31 +241,31 @@ add  p Particle  pi(1)(1400)+                 9000213        1354e-3         330
 add  p Particle  pi(1)(1400)-                -9000213        1354e-3         330e-3        1000e-3    -3     2              0          0
 add  p Particle  pi(1)(1400)0                 9000113        1354e-3         330e-3        1000e-3     0     2              0          0
 * eta(1405)
-add  p Particle  eta(1405)                    9020221      1408.8e-3        50.1e-3         250e-3     0     0              0          0
+add  p Particle  eta(1405)                    9020221      1408.7e-3        50.3e-3         250e-3     0     0              0          0
 * h_1(1415)
-add  p Particle  h'_1                           10333        1414e-3          90e-3         400e-3     0     2              0      10333
+add  p Particle  h'_1                           10333        1409e-3          78e-3         400e-3     0     2              0      10333
 * f_1(1420)
-add  p Particle  f'_1                           20333      1426.3e-3        54.5e-3         250e-3     0     2              0      20333
+add  p Particle  f'_1                           20333      1428.4e-3        56.7e-3         250e-3     0     2              0      20333
 * omega(1420). PDG reports possible ranges for the mass and width, their central values are chosen here.
 add  p Particle  omega(2S)                     100223        1410e-3         290e-3         900e-3     0     2              0          0
 * a_0(1450)
-add  p Particle  a(0)(1450)+                    10211        1474e-3         265e-3         800e-3     3     0              0          0
-add  p Particle  a(0)(1450)-                   -10211        1474e-3         265e-3         800e-3    -3     0              0          0
-add  p Particle  a(0)(1450)0                    10111        1474e-3         265e-3         800e-3     0     0              0          0
+add  p Particle  a(0)(1450)+                    10211        1439e-3         258e-3         800e-3     3     0              0          0
+add  p Particle  a(0)(1450)-                   -10211        1439e-3         258e-3         800e-3    -3     0              0          0
+add  p Particle  a(0)(1450)0                    10111        1439e-3         258e-3         800e-3     0     0              0          0
 * rho(1450)
 add  p Particle  rho(2S)+                      100213        1465e-3         400e-3        1000e-3     3     2              0          0
 add  p Particle  rho(2S)-                     -100213        1465e-3         400e-3        1000e-3    -3     2              0          0
 add  p Particle  rho(2S)0                      100113        1465e-3         400e-3        1000e-3     0     2              0          0
 * eta(1475)
-add  p Particle  eta(1475)                     100331        1475e-3          90e-3         400e-3     0     0              0          0
+add  p Particle  eta(1475)                     100331        1476e-3          96e-3         400e-3     0     0              0          0
 * f_0(1500)
-add  p Particle  f_0(1500)                    9030221        1506e-3         112e-3         500e-3     0     0              0          0
+add  p Particle  f_0(1500)                    9030221        1522e-3         108e-3         500e-3     0     0              0          0
 * f'_2(1525)
-add  p Particle  f'_2                             335      1517.4e-3          86e-3         350e-3     0     4              0        335
+add  p Particle  f'_2                             335      1517.3e-3          72e-3         350e-3     0     4              0        335
 * pi_1(1600)
-add  p Particle  pi(1)(1600)+                 9010213        1660e-3         257e-3         800e-3     3     2              0          0
-add  p Particle  pi(1)(1600)-                -9010213        1660e-3         257e-3         800e-3    -3     2              0          0
-add  p Particle  pi(1)(1600)0                 9010113        1660e-3         257e-3         800e-3     0     2              0          0
+add  p Particle  pi(1)(1600)+                 9010213        1645e-3         370e-3         800e-3     3     2              0          0
+add  p Particle  pi(1)(1600)-                -9010213        1645e-3         370e-3         800e-3    -3     2              0          0
+add  p Particle  pi(1)(1600)0                 9010113        1645e-3         370e-3         800e-3     0     2              0          0
 * eta_2(1645)
 add  p Particle  eta(2)(1645)                   10225        1617e-3         181e-3         600e-3     0     4              0          0
 * omega(1670)
@@ -287,7 +287,7 @@ add  p Particle  rho(3S)+                       30213        1720e-3         250
 add  p Particle  rho(3S)-                      -30213        1720e-3         250e-3         800e-3    -3     2              0          0
 add  p Particle  rho(3S)0                       30113        1720e-3         250e-3         800e-3     0     2              0          0
 * f_0(1710)
-add  p Particle  f(0)(1710)                     10331        1704e-3         123e-3         500e-3     0     0              0          0
+add  p Particle  f(0)(1710)                     10331        1733e-3         150e-3         500e-3     0     0              0          0
 * pi(1800)
 add  p Particle  pi(1800)+                    9010211        1810e-3         215e-3         700e-3     3     0              0          0
 add  p Particle  pi(1800)-                   -9010211        1810e-3         215e-3         700e-3    -3     0              0          0
@@ -301,13 +301,13 @@ add  p Particle  a_4(1970)+                       219        1967e-3         324
 add  p Particle  a_4(1970)-                      -219        1967e-3         324e-3        1000e-3    -3     8              0          0
 add  p Particle  a_4(1970)0                       119        1967e-3         324e-3        1000e-3     0     8              0          0
 * f_2(2010)
-add  p Particle  f(2)(2010)                   9060225        2011e-3         202e-3         700e-3     0     4              0          0
+add  p Particle  f(2)(2010)                   9060225        2010e-3         200e-3         700e-3     0     4              0          0
 * f_4(2050)
 add  p Particle  f(4)(2050)                       229        2018e-3         237e-3         800e-3     0     8              0          0
 * f_2(2300)
-add  p Particle  f(2)(2300)                   9080225        2297e-3         149e-3         600e-3     0     4              0          0
+add  p Particle  f(2)(2300)                   9080225        2297e-3         150e-3         600e-3     0     4              0          0
 * f_2(2340)
-add  p Particle  f(2)(2340)                   9090225        2345e-3         322e-3        1000e-3     0     4              0          0
+add  p Particle  f(2)(2340)                   9090225        2346e-3         331e-3        1000e-3     0     4              0          0
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Strange mesons
 * Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
@@ -320,8 +320,8 @@ add  p Particle  anti-K0                         -311     497.611e-3            
 add  p Particle  K_S0                             310     497.611e-3              0              0     0     0  2.6843417e+01        310
 add  p Particle  K_L0                             130     497.611e-3              0              0     0     0  1.5337382e+04        130
 * K*(892)
-add  p Particle  K*+                              323      891.66e-3        50.8e-3         250e-3     3     2              0        323
-add  p Particle  K*-                             -323      891.66e-3        50.8e-3         250e-3    -3     2              0       -323
+add  p Particle  K*+                              323      891.67e-3        51.4e-3         250e-3     3     2              0        323
+add  p Particle  K*-                             -323      891.67e-3        51.4e-3         250e-3    -3     2              0       -323
 add  p Particle  K*0                              313      895.55e-3        47.3e-3         250e-3     0     2              0        313
 add  p Particle  anti-K*0                        -313      895.55e-3        47.3e-3         250e-3     0     2              0       -313
 * K_1(1270)
@@ -350,20 +350,20 @@ add  p Particle  K_2*-                           -325      1427.3e-3       100.0
 add  p Particle  K_2*0                            315      1432.4e-3         109e-3         500e-3     0     4              0        315
 add  p Particle  anti-K_2*0                      -315      1432.4e-3         109e-3         500e-3     0     4              0       -315
 * K*(1680)
-add  p Particle  K''*+                          30323        1718e-3         322e-3        1000e-3     3     2              0          0
-add  p Particle  K''*-                         -30323        1718e-3         322e-3        1000e-3    -3     2              0          0
-add  p Particle  K''*0                          30313        1718e-3         322e-3        1000e-3     0     2              0          0
-add  p Particle  anti-K''*0                    -30313        1718e-3         322e-3        1000e-3     0     2              0          0
+add  p Particle  K''*+                          30323        1718e-3         320e-3        1000e-3     3     2              0          0
+add  p Particle  K''*-                         -30323        1718e-3         320e-3        1000e-3    -3     2              0          0
+add  p Particle  K''*0                          30313        1718e-3         320e-3        1000e-3     0     2              0          0
+add  p Particle  anti-K''*0                    -30313        1718e-3         320e-3        1000e-3     0     2              0          0
 * K_2(1770)
 add  p Particle  K(2)(1770)+                    10325        1773e-3         186e-3         600e-3     3     4              0          0
 add  p Particle  K(2)(1770)-                   -10325        1773e-3         186e-3         600e-3    -3     4              0          0
 add  p Particle  K(2)(1770)0                    10315        1773e-3         186e-3         600e-3     0     4              0          0
 add  p Particle  anti-K(2)(1770)0              -10315        1773e-3         186e-3         600e-3     0     4              0          0
 * K_3*(1780)
-add  p Particle  K_3*+                            327        1776e-3         159e-3         500e-3     3     6              0          0
-add  p Particle  K_3*-                           -327        1776e-3         159e-3         500e-3    -3     6              0          0
-add  p Particle  K_3*0                            317        1776e-3         159e-3         500e-3     0     6              0          0
-add  p Particle  anti-K_3*0                      -317        1776e-3         159e-3         500e-3     0     6              0          0
+add  p Particle  K_3*+                            327        1779e-3         161e-3         500e-3     3     6              0          0
+add  p Particle  K_3*-                           -327        1779e-3         161e-3         500e-3    -3     6              0          0
+add  p Particle  K_3*0                            317        1779e-3         161e-3         500e-3     0     6              0          0
+add  p Particle  anti-K_3*0                      -317        1779e-3         161e-3         500e-3     0     6              0          0
 * K_2(1820)
 add  p Particle  K(2)(1820)+                    20325        1819e-3         264e-3         800e-3     3     4              0          0
 add  p Particle  K(2)(1820)-                   -20325        1819e-3         264e-3         800e-3    -3     4              0          0
@@ -371,9 +371,9 @@ add  p Particle  K(2)(1820)0                    20315        1819e-3         264
 add  p Particle  anti-K(2)(1820)0              -20315        1819e-3         264e-3         800e-3     0     4              0          0
 * K_4*(2045)
 add  p Particle  K_4*+                            329        2048e-3         199e-3         600e-3     3     8              0          0
-add  p Particle  K_4*-                           -329        2048e-3         198e-3         600e-3    -3     8              0          0
+add  p Particle  K_4*-                           -329        2048e-3         199e-3         600e-3    -3     8              0          0
 add  p Particle  K_4*0                            319        2048e-3         199e-3         600e-3     0     8              0          0
-add  p Particle  anti-K_4*0                      -319        2048e-3         198e-3         600e-3     0     8              0          0
+add  p Particle  anti-K_4*0                      -319        2048e-3         199e-3         600e-3     0     8              0          0
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Charmed mesons
 * Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
@@ -389,25 +389,25 @@ add  p Particle  D*-                             -413     2010.26e-3        83.4
 add  p Particle  D*0                              423     2006.85e-3  6.5821023e-06          35e-6     0     2              0        423
 add  p Particle  anti-D*0                        -423     2006.85e-3  6.5821023e-06          35e-6     0     2              0       -423
 * D_0*(2300)
-add  p Particle  D_0*+                          10411        2349e-3         221e-3         700e-3     3     0              0      10411
-add  p Particle  D_0*-                         -10411        2349e-3         221e-3         700e-3    -3     0              0     -10411
-add  p Particle  D_0*0                          10421        2300e-3         274e-3         800e-3     0     0              0      10421
-add  p Particle  anti-D_0*0                    -10421        2300e-3         274e-3         800e-3     0     0              0     -10421
+add  p Particle  D_0*+                          10411        2343e-3         229e-3         700e-3     3     0              0      10411
+add  p Particle  D_0*-                         -10411        2343e-3         229e-3         700e-3    -3     0              0     -10411
+add  p Particle  D_0*0                          10421        2343e-3         229e-3         800e-3     0     0              0      10421
+add  p Particle  anti-D_0*0                    -10421        2343e-3         229e-3         800e-3     0     0              0     -10421
 * D_1(2420)
-add  p Particle  D_1+                           10413      2423.2e-3          25e-3         140e-3     3     2              0      10413
-add  p Particle  D_1-                          -10413      2423.2e-3          25e-3         140e-3    -3     2              0     -10413
-add  p Particle  D_10                           10423      2420.8e-3        31.7e-3         160e-3     0     2              0      10423
-add  p Particle  anti-D_10                     -10423      2420.8e-3        31.7e-3         160e-3     0     2              0     -10423
+add  p Particle  D_1+                           10413      2422.1e-3        31.3e-3         140e-3     3     2              0      10413
+add  p Particle  D_1-                          -10413      2422.1e-3        31.3e-3         140e-3    -3     2              0     -10413
+add  p Particle  D_10                           10423      2422.1e-3        31.3e-3         160e-3     0     2              0      10423
+add  p Particle  anti-D_10                     -10423      2422.1e-3        31.3e-3         160e-3     0     2              0     -10423
 * D_1(2430). The D_1(2430)+ has not been observed.
 add  p Particle  D'_1+                          20413        2427e-3         314e-3        1000e-3     3     2              0      20413
 add  p Particle  D'_1-                         -20413        2427e-3         314e-3        1000e-3    -3     2              0     -20413
-add  p Particle  D'_10                          20423        2427e-3         314e-3        1000e-3     0     2              0      20423
-add  p Particle  anti-D'_10                    -20423        2427e-3         314e-3        1000e-3     0     2              0     -20423
+add  p Particle  D'_10                          20423        2412e-3         314e-3        1000e-3     0     2              0      20423
+add  p Particle  anti-D'_10                    -20423        2412e-3         314e-3        1000e-3     0     2              0     -20423
 * D_2*(2460)
-add  p Particle  D_2*+                            415      2465.4e-3        46.7e-3         240e-3     3     4              0        415
-add  p Particle  D_2*-                           -415      2465.4e-3        46.7e-3         240e-3    -3     4              0       -415
-add  p Particle  D_2*0                            425      2460.7e-3        47.5e-3         240e-3     0     4              0        425
-add  p Particle  anti-D_2*0                      -425      2460.7e-3        47.5e-3         240e-3     0     4              0       -425
+add  p Particle  D_2*+                            415      2461.1e-3        47.3e-3         240e-3     3     4              0        415
+add  p Particle  D_2*-                           -415      2461.1e-3        47.3e-3         240e-3    -3     4              0       -415
+add  p Particle  D_2*0                            425      2461.1e-3        47.3e-3         240e-3     0     4              0        425
+add  p Particle  anti-D_2*0                      -425      2461.1e-3        47.3e-3         240e-3     0     4              0       -425
 * D(2550). The D(2550)+ has not neen observed.
 add  p Particle  D(2S)+                        100411        2564e-3         135e-3         500e-3     3     0              0          0
 add  p Particle  D(2S)-                       -100411        2564e-3         135e-3         500e-3    -3     0              0          0
@@ -472,10 +472,10 @@ add  p Particle  B'_1-                         -20523  5.7570000e+00  2.5027080e
 add  p Particle  B'_10                          20513  5.7570000e+00  2.5027080e-01  2.0000000e-01     0     2              0      20513
 add  p Particle  anti-B'_10                    -20513  5.7570000e+00  2.5027080e-01  2.0000000e-01     0     2              0     -20513
 * B_2*(5747)
-add  p Particle  B_2*+                            525      5737.2e-3          20e-3  2.0000000e-01     3     4              0        525
-add  p Particle  B_2*-                           -525      5737.2e-3          20e-3  2.0000000e-01    -3     4              0       -525
-add  p Particle  B_2*0                            515      5739.5e-3        24.2e-3  2.0000000e-01     0     4              0        515
-add  p Particle  anti-B_2*0                      -515      5739.5e-3        24.2e-3  2.0000000e-01     0     4              0       -515
+add  p Particle  B_2*+                            525      5737.3e-3          20e-3  2.0000000e-01     3     4              0        525
+add  p Particle  B_2*-                           -525      5737.3e-3          20e-3  2.0000000e-01    -3     4              0       -525
+add  p Particle  B_2*0                            515      5739.6e-3        24.2e-3  2.0000000e-01     0     4              0        515
+add  p Particle  anti-B_2*0                      -515      5739.6e-3        24.2e-3  2.0000000e-01     0     4              0       -515
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Bottom strange mesons
 * Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
@@ -492,8 +492,8 @@ add  p Particle  B_s0*0                         10531  5.8410000e+00  1.4993444e
 add  p Particle  anti-B_s0*0                   -10531  5.8410000e+00  1.4993444e-01  6.5000000e-02     0     0              0     -10531
 add  p Particle  B_s10                          10533     5828.70e-3         0.5e-3           3e-3     0     2              0      10533
 add  p Particle  anti-B_s10                    -10533     5828.70e-3         0.5e-3           3e-3     0     2              0     -10533
-add  p Particle  B_s2*0                           535     5839.86e-3        1.49e-3           8e-3     0     4              0        535
-add  p Particle  anti-B_s2*0                     -535     5839.86e-3        1.49e-3           8e-3     0     4              0       -535
+add  p Particle  B_s2*0                           535     5839.88e-3        1.49e-3           8e-3     0     4              0        535
+add  p Particle  anti-B_s2*0                     -535     5839.88e-3        1.49e-3           8e-3     0     4              0       -535
 * May be the B_sJ(5850). The values from original EvtGen evt.pdl are used.
 add  p Particle  B'_s10                         20533  5.8590000e+00  2.5027080e-01  2.0000000e-02     0     2              0      20533
 add  p Particle  anti-B'_s10                   -20533  5.8590000e+00  2.5027080e-01  2.0000000e-02     0     2              0     -20533
@@ -516,14 +516,14 @@ add  p Particle  B'_c1-                        -20543  7.4000000e+00            
 * Charmonium
 * Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
 *---------------------------------------------------------------------------------------------------------------------------------------
-add  p Particle  eta_c                            441      2983.9e-3        32.0e-3         160e-3     0     0              0        441
-add  p Particle  J/psi                            443    3096.900e-3        92.9e-6         500e-6     0     2              0        443
-add  p Particle  chi_c0                         10441     3414.71e-3        10.8e-3          60e-3     0     0              0      10441
+add  p Particle  eta_c                            441      2984.1e-3        30.5e-3         160e-3     0     0              0        441
+add  p Particle  J/psi                            443    3096.900e-3        92.6e-6         500e-6     0     2              0        443
+add  p Particle  chi_c0                         10441     3414.71e-3        10.7e-3          60e-3     0     0              0      10441
 add  p Particle  chi_c1                         20443     3510.67e-3        0.84e-3           6e-3     0     2              0      20443
-add  p Particle  h_c                            10443     3525.38e-3         0.7e-3           4e-3     0     2              0      10443
-add  p Particle  chi_c2                           445     3556.17e-3        1.97e-3          10e-3     0     4              0        445
-add  p Particle  eta_c(2S)                     100441      3637.5e-3        11.3e-3          60e-3     0     0              0     100441
-add  p Particle  psi(2S)                       100443     3686.10e-3         294e-6         1.6e-3     0     2              0     100443
+add  p Particle  h_c                            10443     3525.37e-3        0.78e-3           4e-3     0     2              0      10443
+add  p Particle  chi_c2                           445     3556.17e-3        1.98e-3          10e-3     0     4              0        445
+add  p Particle  eta_c(2S)                     100441      3637.7e-3        11.8e-3          60e-3     0     0              0     100441
+add  p Particle  psi(2S)                       100443     3686.097e-3        293e-6         1.6e-3     0     2              0     100443
 add  p Particle  psi(3770)                      30443      3773.7e-3        27.2e-3         140e-3     0     2              0      30443
 * The chi_c1(3872) width upper limit is Gamma < 1.2 MeV (90% C. L.) in PDG 2020 data.
 * However, it was measured to be (1.39 +- 0.24 +- 0.10) MeV in arXiv:2005.13419 and
@@ -532,9 +532,9 @@ add  p Particle  psi(3770)                      30443      3773.7e-3        27.2
 * an uncorrelated weighted average is used. It is equal to Gamma = (1.15 +- 0.19) MeV.
 add  p Particle  X_1(3872)                    9920443     3871.69e-3        1.15e-3           6e-3     0     2              0    9920443
 add  p Particle  X_2(3872)                    9910445     3871.69e-3        1.15e-3           6e-3     0     4              0    9910445
-add  p Particle  psi(4040)                    9000443        4039e-3          80e-3         350e-3     0     2              0          0
-add  p Particle  psi(4160)                    9010443        4191e-3          70e-3         300e-3     0     2              0          0
-add  p Particle  psi(4415)                    9020443        4421e-3          62e-3         250e-3     0     2              0          0
+add  p Particle  psi(4040)                    9000443        4040e-3          84e-3         350e-3     0     2              0          0
+add  p Particle  psi(4160)                    9010443        4191e-3          69e-3         300e-3     0     2              0          0
+add  p Particle  psi(4415)                    9020443        4415e-3          110e-3         250e-3     0     2              0          0
 * Z_c(4430)
 add  p Particle  Z(4430)+                     9042413        4478e-3         181e-3         600e-3     3     2              0    9042413
 add  p Particle  Z(4430)-                    -9042413        4478e-3         181e-3         600e-3    -3     2              0   -9042413
@@ -543,7 +543,7 @@ add  p Particle  Z(4430)-                    -9042413        4478e-3         181
 * Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
 *---------------------------------------------------------------------------------------------------------------------------------------
 add  p Particle  eta_b                            551      9398.7e-3          10e-3          50e-3     0     0              0        551
-add  p Particle  Upsilon                          553      9460.3e-3       54.02e-6         300e-6     0     2              0        553
+add  p Particle  Upsilon                          553      9460.40e-3      54.02e-6         300e-6     0     2              0        553
 * The chi_bJ, h_b, and Upsilon(1D) states are narrow, there are no width measurements for any of them. The widths are set to 0.
 add  p Particle  chi_b0                         10551     9859.44e-3              0              0     0     0              0      10551
 add  p Particle  chi_b1                         20553     9892.78e-3              0              0     0     2              0      20553
@@ -551,7 +551,7 @@ add  p Particle  h_b                            10553      9899.3e-3            
 add  p Particle  chi_b2                           555     9912.21e-3              0              0     0     4              0        555
 * The eta_b(2S) width upper limit is Gamma < 24 MeV (90% C. L.).
 add  p Particle  eta_b(2S)                     100551        9999e-3              0              0     0     0              0          0
-add  p Particle  Upsilon(2S)                   100553    10023.26e-3       31.98e-6         160e-6     0     2              0     100553
+add  p Particle  Upsilon(2S)                   100553     10023.4e-3       31.98e-6         160e-6     0     2              0     100553
 * The eta_b2(1D) has not been observed.
 add  p Particle  eta_b2(1D)                     10555  1.0157000e+01              0              0     0     4              0      10555
 * The Upsilon_1(1D) and Upsilon_3(1D) has not been observed (possible indications are seen in e.g. Phys. Rev. D82, 111102 (2010)).
@@ -567,7 +567,7 @@ add  p Particle  h_b(2P)                       110553     10259.8e-3            
 add  p Particle  chi_b2(2P)                    100555    10268.65e-3              0              0     0     4              0     100555
 * The eta_b(3S) has not been observed.
 add  p Particle  eta_b(3S)                     200551       10335e-3              0              0     0     0              0          0
-add  p Particle  Upsilon(3S)                   200553     10355.2e-3       20.32e-6         120e-6     0     2              0     200553
+add  p Particle  Upsilon(3S)                   200553     10355.1e-3       20.32e-6         120e-6     0     2              0     200553
 * The eta_b2(2D) and Upsilon_J(2D) have not been observed.
 add  p Particle  Upsilon_1(2D)                 130553     10434.9e-3              0              0     0     2              0     130553
 add  p Particle  Upsilon_2(2D)                 120555     10440.6e-3              0              0     0     4              0     120555
@@ -587,7 +587,7 @@ add  p Particle  Zb(10610)+                   9052513     10607.2e-3        18.4
 add  p Particle  Zb(10650)-                  -9152513     10652.2e-3        11.5e-3          60e-3    -3     2               0         0
 add  p Particle  Zb(10650)+                   9152513     10652.2e-3        11.5e-3          60e-3     3     2               0         0
 * Upsilon(6S): not in the original EvtGen evt.pdl; added for Belle II by B. Fulsom 01/10/2015.
-add  p Particle  Upsilon(6S)                  9010553  1.0992000e+01          24e-3         120e-3     0     2              0          0
+add  p Particle  Upsilon(6S)                  9010553       11000e-3          24e-3         120e-3     0     2              0          0
 *---------------------------------------------------------------------------------------------------------------------------------------
 * N baryons
 * Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
@@ -654,12 +654,12 @@ add  p Particle  Sigma0                          3212    1192.642e-3  8.8947562e
 add  p Particle  anti-Sigma0                    -3212    1192.642e-3  8.8947562e-06          60e-6     0     1              0      -3212
 add  p Particle  Sigma-                          3112    1197.449e-3              0              0    -3     1  4.4339305e+01       3112
 add  p Particle  anti-Sigma+                    -3112    1197.449e-3              0              0     3     1  4.4339305e+01      -3112
-add  p Particle  Sigma*+                         3224      1382.8e-3          36e-3         200e-3     3     3              0       3224
-add  p Particle  anti-Sigma*-                   -3224      1382.8e-3          36e-3         200e-3    -3     3              0      -3224
+add  p Particle  Sigma*+                         3224     1382.83e-3        36.2e-3         200e-3     3     3              0       3224
+add  p Particle  anti-Sigma*-                   -3224     1382.83e-3        36.2e-3         200e-3    -3     3              0      -3224
 add  p Particle  Sigma*0                         3214      1383.7e-3          36e-3         200e-3     0     3              0       3214
 add  p Particle  anti-Sigma*0                   -3214      1383.7e-3          36e-3         200e-3     0     3              0      -3214
-add  p Particle  Sigma*-                         3114      1387.2e-3        39.4e-3         200e-3    -3     3              0       3114
-add  p Particle  anti-Sigma*+                   -3114      1387.2e-3        39.4e-3         200e-3     3     3              0      -3114
+add  p Particle  Sigma*-                         3114     1382.83e-3        36.2e-3         200e-3    -3     3              0       3114
+add  p Particle  anti-Sigma*+                   -3114     1382.83e-3        36.2e-3         200e-3     3     3              0      -3114
 * Sigma(1660)0. Pole residues are used.
 add  p Particle  Sigma(1660)0                   13212        1660e-3         200e-3         600e-3     0     1              0          0
 add  p Particle  anti-Sigma(1660)0             -13212        1660e-3         200e-3         600e-3     0     1              0          0
@@ -680,10 +680,10 @@ add  p Particle  Xi0                             3322     1314.86e-3            
 add  p Particle  anti-Xi0                       -3322     1314.86e-3              0              0     0     1  8.6939813e+01      -3322
 add  p Particle  Xi-                             3312     1321.71e-3              0              0    -3     1  4.9135984e+01       3312
 add  p Particle  anti-Xi+                       -3312     1321.71e-3              0              0     3     1  4.9135984e+01      -3312
-add  p Particle  Xi*0                            3324      1531.8e-3         9.1e-3          50e-3     0     3              0       3324
-add  p Particle  anti-Xi*0                      -3324      1531.8e-3         9.1e-3          50e-3     0     3              0      -3324
-add  p Particle  Xi*-                            3314        1535e-3         9.9e-3          50e-3    -3     3              0       3314
-add  p Particle  anti-Xi*+                      -3314        1535e-3         9.9e-3          50e-3     3     3              0      -3314
+add  p Particle  Xi*0                            3324     1531.80e-3         9.1e-3          50e-3     0     3              0       3324
+add  p Particle  anti-Xi*0                      -3324     1531.80e-3         9.1e-3          50e-3     0     3              0      -3324
+add  p Particle  Xi*-                            3314      1535.0e-3         9.9e-3          50e-3    -3     3              0       3314
+add  p Particle  anti-Xi*+                      -3314      1535.0e-3         9.9e-3          50e-3     3     3              0      -3314
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Omega baryons
 * Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
@@ -705,16 +705,16 @@ add  p Particle  Sigma_c++                       4222     2453.97e-3        1.89
 add  p Particle  anti-Sigma_c--                 -4222     2453.97e-3        1.89e-3          10e-3    -6     1              0      -4222
 * The Sigma_c(2455)+ width limit is Gamma < 4.6 MeV (90% C. L.).
 * The width is set to the average of the Sigma_c(2455)++ and Sigma_c(2455)0 widths.
-add  p Particle  Sigma_c+                        4212      2452.9e-3        1.86e-3          10e-3     3     1              0       4212
-add  p Particle  anti-Sigma_c-                  -4212      2452.9e-3        1.86e-3          10e-3    -3     1              0      -4212
+add  p Particle  Sigma_c+                        4212     2452.65e-3         2.3e-3          10e-3     3     1              0       4212
+add  p Particle  anti-Sigma_c-                  -4212     2452.65e-3         2.3e-3          10e-3    -3     1              0      -4212
 add  p Particle  Sigma_c0                        4112     2453.75e-3        1.83e-3          10e-3     0     1              0       4112
 add  p Particle  anti-Sigma_c0                  -4112     2453.75e-3        1.83e-3          10e-3     0     1              0      -4112
 add  p Particle  Sigma_c*++                      4224     2518.41e-3       14.78e-3          80e-3     6     3              0       4224
 add  p Particle  anti-Sigma_c*--                -4224     2518.41e-3       14.78e-3          80e-3    -6     3              0      -4224
 * The Sigma_c(2455)+ width limit is Gamma < 17 MeV (90% C. L.).
 * The width is set to 15 MeV.
-add  p Particle  Sigma_c*+                       4214      2517.5e-3          15e-3          80e-3     3     3              0       4214
-add  p Particle  anti-Sigma_c*-                 -4214      2517.5e-3          15e-3          80e-3    -3     3              0      -4214
+add  p Particle  Sigma_c*+                       4214      2517.4e-3        17.2e-3          80e-3     3     3              0       4214
+add  p Particle  anti-Sigma_c*-                 -4214      2517.4e-3        17.2e-3          80e-3    -3     3              0      -4214
 add  p Particle  Sigma_c*0                       4114     2518.48e-3        15.3e-3          80e-3     0     3              0       4114
 add  p Particle  anti-Sigma_c*0                 -4114     2518.48e-3        15.3e-3          80e-3     0     3              0      -4114
 add  p Particle  Xi_c+                           4232     2467.94e-3              0              0     3     1  1.3670536e-01       4232
@@ -726,10 +726,10 @@ add  p Particle  Xi'_c+                          4322      2578.4e-3            
 add  p Particle  anti-Xi'_c-                    -4322      2578.4e-3              0              0    -3     1              0      -4322
 add  p Particle  Xi'_c0                          4312      2579.2e-3              0              0     0     1              0       4312
 add  p Particle  anti-Xi'_c0                    -4312      2579.2e-3              0              0     0     1              0      -4312
-add  p Particle  Xi_c*+                          4324     2645.56e-3        2.14e-3          12e-3     3     3              0       4324
-add  p Particle  anti-Xi_c*-                    -4324     2645.56e-3        2.14e-3          12e-3    -3     3              0      -4324
-add  p Particle  Xi_c*0                          4314     2646.38e-3        2.35e-3          12e-3     0     3              0       4314
-add  p Particle  anti-Xi_c*0                    -4314     2646.38e-3        2.35e-3          12e-3     0     3              0      -4314
+add  p Particle  Xi_c*+                          4324     2645.10e-3        2.14e-3          12e-3     3     3              0       4324
+add  p Particle  anti-Xi_c*-                    -4324     2645.10e-3        2.14e-3          12e-3    -3     3              0      -4324
+add  p Particle  Xi_c*0                          4314     2646.16e-3        2.35e-3          12e-3     0     3              0       4314
+add  p Particle  anti-Xi_c*0                    -4314     2646.16e-3        2.35e-3          12e-3     0     3              0      -4314
 add  p Particle  Omega_c0                        4332      2695.2e-3              0              0     0     1  8.0344379e-02       4332
 add  p Particle  anti-Omega_c0                  -4332      2695.2e-3              0              0     0     1  8.0344379e-02      -4332
 add  p Particle  Omega_c*0                       4334      2765.9e-3              0              0     0     3              0       4334
@@ -756,18 +756,18 @@ add  p Particle  anti-Omega_cc*-                -4434     3824.66e-3            
 *---------------------------------------------------------------------------------------------------------------------------------------
 add  p Particle  Lambda_b0                       5122  5.6195000e+00              0              0     0     1  4.1371359e-01       5122
 add  p Particle  anti-Lambda_b0                 -5122  5.6195000e+00              0              0     0     1  4.1371359e-01      -5122
-add  p Particle  Sigma_b+                        5222  5.8113000e+00  9.7000000e-03  1.0000000e-04     3     1              0       5222
-add  p Particle  anti-Sigma_b-                  -5222  5.8113000e+00  9.7000000e-03  1.0000000e-04    -3     1              0      -5222
+add  p Particle  Sigma_b+                        5222  5810.56e-3            5.0e-3  1.0000000e-04     3     1              0       5222
+add  p Particle  anti-Sigma_b-                  -5222  5810.56e-3            5.0e-3  1.0000000e-04    -3     1              0      -5222
 add  p Particle  Sigma_b0                        5212  5.8078000e+00  6.5821220e-06         6.6e-5     0     1              0       5212
 add  p Particle  anti-Sigma_b0                  -5212  5.8078000e+00  6.5821220e-06         6.6e-5     0     1              0      -5212
-add  p Particle  Sigma_b-                        5112  5.8155000e+00  4.9000000e-03  1.0000000e-04    -3     1              0       5112
-add  p Particle  anti-Sigma_b+                  -5112  5.8155000e+00  4.9000000e-03  1.0000000e-04     3     1              0      -5112
-add  p Particle  Sigma_b*+                       5224  5.8321000e+00  1.1500000e-02              0     3     3              0       5224
-add  p Particle  anti-Sigma_b*-                 -5224  5.8321000e+00  1.1500000e-02              0    -3     3              0      -5224
+add  p Particle  Sigma_b-                        5112  5810.56e-3            5.0e-3  1.0000000e-04    -3     1              0       5112
+add  p Particle  anti-Sigma_b+                  -5112  5810.56e-3            5.0e-3  1.0000000e-04     3     1              0      -5112
+add  p Particle  Sigma_b*+                       5224  5830.32e-3            9.4e-3              0     3     3              0       5224
+add  p Particle  anti-Sigma_b*-                 -5224  5830.32e-3            9.4e-3              0    -3     3              0      -5224
 add  p Particle  Sigma_b*0                       5214  5.8290000e+00              0              0     0     3              0       5214
 add  p Particle  anti-Sigma_b*0                 -5214  5.8290000e+00              0              0     0     3              0      -5214
-add  p Particle  Sigma_b*-                       5114  5.8351000e+00  7.5000000e-03              0    -3     3              0       5114
-add  p Particle  anti-Sigma_b*+                 -5114  5.8351000e+00  7.5000000e-03              0     3     3              0      -5114
+add  p Particle  Sigma_b*-                       5114  5830.32e-3            9.4e-3              0    -3     3              0       5114
+add  p Particle  anti-Sigma_b*+                 -5114  5830.32e-3            9.4e-3              0     3     3              0      -5114
 add  p Particle  Xi_b0                           5232  5.7931000e+00              0              0     0     1  4.2570529e-01       5232
 add  p Particle  anti-Xi_b0                     -5232  5.7931000e+00              0              0     0     1  4.2570529e-01      -5232
 add  p Particle  Xi_b-                           5132  5.7949000e+00              0              0    -3     1  4.2570529e-01       5132

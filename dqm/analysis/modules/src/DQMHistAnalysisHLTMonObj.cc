@@ -105,6 +105,10 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   TH1* h_skim = findHist("softwaretrigger/skim");
   TH1* h_budget = findHist("timing_statistics/fullTimeHistogram");
   TH1* h_processing = findHist("timing_statistics/processingTimeHistogram");
+  TH1* h_proc_passive = findHist("timing_statistics/processingTimePassiveVeto");
+  TH1* h_proc_active = findHist("timing_statistics/processingTimeNotPassiveVeto");
+  TH1* h_proc_prefilter_time = findHist("timing_statistics/processingTimeNotPassiveVetoTimingCut");
+  TH1* h_proc_prefilter_cdcecl = findHist("timing_statistics/processingTimeNotPassiveVetoCDCECLCut");
   TH1* h_meantime = findHist("timing_statistics/meanTimeHistogram");
   TH1* h_budg_unit = findHist("timing_statistics/fullTimeMeanPerUnitHistogram");
   TH1* h_proc_unit = findHist("timing_statistics/processingTimeMeanPerUnitHistogram");
@@ -281,6 +285,23 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   double procTime = 0.;
   if (h_processing) procTime = h_processing->GetMean();
   m_monObj->setVariable("processing_time", procTime);
+
+  double procTimePassive = 0.;
+  if (h_proc_passive) procTimePassive = h_proc_passive->GetMean();
+  m_monObj->setVariable("processing_time_passive", procTimePassive);
+
+  double procTimeActive = 0.;
+  if (h_proc_active) procTimeActive = h_proc_active->GetMean();
+  m_monObj->setVariable("processing_time_active", procTimeActive);
+
+  double procTimePrefilterTiming = 0.;
+  if (h_proc_prefilter_time) procTimePrefilterTiming = h_proc_prefilter_time->GetMean();
+  m_monObj->setVariable("processing_time_prefilter_time", procTimePrefilterTiming);
+
+  double procTimePrefilterCDCECL = 0.;
+  if (h_proc_prefilter_cdcecl) procTimePrefilterCDCECL = h_proc_prefilter_cdcecl->GetMean();
+  m_monObj->setVariable("processing_time_prefilter_CDCECL", procTimePrefilterCDCECL);
+
 
   double fullMemory = 0.;
   if (h_full_mem) fullMemory = h_full_mem->GetBinLowEdge(h_full_mem->FindLastBinAbove(0) + 1);

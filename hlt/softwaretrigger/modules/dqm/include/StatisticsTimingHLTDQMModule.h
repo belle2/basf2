@@ -95,7 +95,7 @@ namespace Belle2 {
       TH1F* m_processingTimeNotPassiveVetoTimingCut;
 
       /// Processing time distribution of events not passing passive injection veto and retained after HLTprefilter CDC-ECL cuts
-      TH1F* m_processingTimeNotPassiveVetoCdcEclCut;
+      TH1F* m_processingTimeNotPassiveVetoCDCECLCut;
 
       /// Processing time vs nSVDShaperDigits distribution of events passing passive injection veto
       TH2F* m_procTimeVsnSVDShaperDigitsPassiveVeto;

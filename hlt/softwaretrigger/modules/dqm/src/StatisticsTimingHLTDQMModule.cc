@@ -127,11 +127,11 @@ void StatisticsTimingHLTDQMModule::defineHisto()
                                                      m_processingTimeMax);
   m_processingTimeNotPassiveVetoTimingCut->StatOverflows(true);
 
-  m_processingTimeNotPassiveVetoCdcEclCut = new TH1F("processingTimeNotPassiveVetoCdcEclCut",
+  m_processingTimeNotPassiveVetoCDCECLCut = new TH1F("processingTimeNotPassiveVetoCDCECLCut",
                                                      "Processing Time of events in active veto retained by CDC-ECL cut of HLTprefilter [ms]",
                                                      m_processingTimeNBins, 0,
                                                      m_processingTimeMax);
-  m_processingTimeNotPassiveVetoCdcEclCut->StatOverflows(true);
+  m_processingTimeNotPassiveVetoCDCECLCut->StatOverflows(true);
 
   m_procTimeVsnSVDShaperDigitsPassiveVeto = new TH2F("procTimeVsnSVDShaperDigitsPassiveVeto",
                                                      "Processing time [ms] vs nSVDShaperDigits of events passing passive veto",
@@ -343,7 +343,7 @@ void StatisticsTimingHLTDQMModule::event()
         }
 
         if (!cdceclcut) {
-          m_processingTimeNotPassiveVetoCdcEclCut->Fill(processingTimeSum - m_lastProcessingTimeSum);
+          m_processingTimeNotPassiveVetoCDCECLCut->Fill(processingTimeSum - m_lastProcessingTimeSum);
         }
       }
 
@@ -402,7 +402,7 @@ void StatisticsTimingHLTDQMModule::beginRun()
   m_processingTimePassiveVeto->Reset();
   m_processingTimeNotPassiveVeto->Reset();
   m_processingTimeNotPassiveVetoTimingCut->Reset();
-  m_processingTimeNotPassiveVetoCdcEclCut->Reset();
+  m_processingTimeNotPassiveVetoCDCECLCut->Reset();
   m_procTimeVsnSVDShaperDigitsPassiveVeto->Reset();
   m_procTimeVsnSVDShaperDigitsNotPassiveVeto->Reset();
   m_procTimeVsnCDCHitsPassiveVeto->Reset();

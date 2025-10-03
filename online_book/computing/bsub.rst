@@ -6,22 +6,22 @@ Batch submission
 .. sidebar:: Overview
    :class: overview
 
-    **Length**: 15-30 min
+   **Length**: 15-30 min
 
-    **Prerequisites**:
+   **Prerequisites**:
 
-    * A `KEKCC account <https://belle.kek.jp/secured2/secretary/registration/comp_system.html>`_
+   * A `KEKCC account <https://belle.kek.jp/secured2/secretary/registration/comp_system.html>`_
 
-    **Questions**:
+   **Questions**:
 
-    * How to check batch queues for Belle II workgroup?
-    * How to submit a job to a specific queue?
-    * How to check the status of running jobs?
-    * How to cancel a batch job?
+   * How to check batch queues for Belle II workgroup?
+   * How to submit a job to a specific queue?
+   * How to check the status of running jobs?
+   * How to cancel a batch job?
 
-    **Objectives**:
+   **Objectives**:
 
-    * Submit computation intensive scripts to worker servers
+   * Submit computation intensive scripts to worker servers
 
 When a batch job is submitted from a work server at KEKCC, the job is scheduled by
 `LSF <https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_welcome/lsf_kc_using.html>`_
@@ -88,7 +88,7 @@ and <...> indicates that the value should be filled in by you.
    Check your priorities on queue s.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. code-block:: bash
 
@@ -149,10 +149,10 @@ To check the job status
 .. admonition:: Exercise
    :class: exercise stacked
 
-      Submit a `basf2` job to queue ``l``, and then check the status of your jobs.
+   Submit a `basf2` job to queue ``l``, and then check the status of your jobs.
 
 .. admonition:: Hint
-   :class: xhint stacked toggle
+   :class: xhint stacked dropdown
 
    A simple `basf2` job could be the following:
 
@@ -163,18 +163,18 @@ To check the job status
       printVars()
 
 .. admonition:: Solution
-   :class: toggle solution
+    :class: dropdown solution
 
-      Submission:
+    Submission:
 
-      .. code-block:: bash
+    .. code-block:: bash
 
-         $ bsub -q l "basf2 one_of_example.py"
-         Job <xxxxxxxx> is submitted to queue <l>.
+        $ bsub -q l "basf2 one_of_example.py"
+        Job <xxxxxxxx> is submitted to queue <l>.
 
-      To check the status, use one of the following:
+    To check the status, use one of the following:
 
-      ``bjobs -q l <xxxxxxxx>``, ``bjobs <xxxxxxxx>``, or just ``bjobs`` alone.
+    ``bjobs -q l <xxxxxxxx>``, ``bjobs <xxxxxxxx>``, or just ``bjobs`` alone.
 
 .. rubric:: Cancel a job
 

@@ -1806,10 +1806,11 @@ def reconstructRecoil(decayString,
     Creates new Particles that recoil against the input particles.
 
     For example the decay string M -> D1 D2 D3 will:
-     - create mother Particle M for each unique combination of D1, D2, D3 Particles
-     - Particles D1, D2, D3 will be appended as daughters to M
-     - the 4-momentum of the mother Particle M is given by
-         p(M) = p(HER) + p(LER) - Sum_i p(Di)
+
+    - create mother Particle M for each unique combination of D1, D2, D3 Particles
+    - Particles D1, D2, D3 will be appended as daughters to M
+    - the 4-momentum of the mother Particle M is given by
+      p(M) = p(HER) + p(LER) - Sum_i p(Di)
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
@@ -1852,10 +1853,11 @@ def reconstructRecoilDaughter(decayString,
     Creates new Particles that are daughters of the particle reconstructed in the recoil (always assumed to be the first daughter).
 
     For example the decay string M -> D1 D2 D3 will:
-     - create mother Particle M for each unique combination of D1, D2, D3 Particles
-     - Particles D1, D2, D3 will be appended as daughters to M
-     - the 4-momentum of the mother Particle M is given by
-         p(M) = p(D1) - Sum_i p(Di), where i>1
+
+    - create mother Particle M for each unique combination of D1, D2, D3 Particles
+    - Particles D1, D2, D3 will be appended as daughters to M
+    - the 4-momentum of the mother Particle M is given by
+      p(M) = p(D1) - Sum_i p(Di), where i>1
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
@@ -3884,7 +3886,7 @@ def tagCurlTracks(particleLists,
     Identifies curl tracks and tags them with extraInfo(isCurl=1) for later removal.
     For Belle data with a `b2bii` analysis the available cut based selection is described in `BN1079`_.
 
-      .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
+    .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
 
 
     The module loops over all particles in a given list with a transverse momentum below the pre-selection **ptCut**

@@ -279,17 +279,17 @@ A tool has been developed which analyzes the array of MC particles and determine
 
 A total of 825 :math:`B^+` decay modes have been defined:
 
-  * The first 80 numbers are semi-leptonic decays (:math:`B^+ \to h l^+ \nu_l`), e.g.
+* The first 80 numbers are semi-leptonic decays (:math:`B^+ \to h l^+ \nu_l`), e.g.
   
-     * 1001: :math:`B^+ \to \bar{D^{*0}} e^+ \nu_e`
-     * 1002: :math:`B^+ \to \bar{D^0} e^+ \nu_e`
-     * 1003: :math:`B^+ \to \bar{D_1^0} e^+ \nu_e`
-  * The numbers 1085 to 1092 are radiative decays.
-  * There are 17 :math:`B^+ \to X l^+ l^-` decay modes.
-  * The numbers 1113 to 1608 are hadronic charmless decays.
-  * Then there are 70 charmonium decays with :math:`J/\psi`, :math:`\Psi(2S)`, :math:`\eta_c`, etc.
-  * This is followed by decays involving two or one charm meson.
-  * The last 17 decay modes involve baryons.
+  * 1001: :math:`B^+ \to \bar{D^{*0}} e^+ \nu_e`
+  * 1002: :math:`B^+ \to \bar{D^0} e^+ \nu_e`
+  * 1003: :math:`B^+ \to \bar{D_1^0} e^+ \nu_e`
+* The numbers 1085 to 1092 are radiative decays.
+* There are 17 :math:`B^+ \to X l^+ l^-` decay modes.
+* The numbers 1113 to 1608 are hadronic charmless decays.
+* Then there are 70 charmonium decays with :math:`J/\psi`, :math:`\Psi(2S)`, :math:`\eta_c`, etc.
+* This is followed by decays involving two or one charm meson.
+* The last 17 decay modes involve baryons.
 
 The same number of :math:`B^-` decay modes have been implemented. They have negative tags.
 

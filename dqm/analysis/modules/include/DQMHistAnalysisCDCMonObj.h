@@ -104,6 +104,11 @@ namespace Belle2 {
     TH1D* m_hTDCs[300]; /**< TDC histograms with track associated hits for each board (0-299) */
     TH1D* m_hHits[56]; /**< hit histograms for each layer (0-55) */
 
+    std::string m_name_dir = ""; /**< dqm histogram dir*/
+    std::string m_hname_badc = ""; /**< Board ADC histogram name*/
+    std::string m_hname_btdc = ""; /**< Board TDC histogram name*/
+    std::string m_hname_hits = ""; /**< Hits histogram names*/
+
     TH2Poly* h2p = nullptr; /**< bad wires in xy view */
     TH2F* hBadChannel = nullptr; /**< bad channel map;wire;layer */
     TH2F* hBadChannelBC = nullptr; /**< bad channel map per board/channel;board;channel */

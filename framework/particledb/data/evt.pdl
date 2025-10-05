@@ -392,8 +392,8 @@ add  p Particle  D_1-                          -10413      2422.1e-3        31.3
 add  p Particle  D_10                           10423      2422.1e-3        31.3e-3         160e-3     0     2              0      10423
 add  p Particle  anti-D_10                     -10423      2422.1e-3        31.3e-3         160e-3     0     2              0     -10423
 * D_1(2430). The D_1(2430)+ has not been observed.
-add  p Particle  D'_1+                          20413        2427e-3         314e-3        1000e-3     3     2              0      20413
-add  p Particle  D'_1-                         -20413        2427e-3         314e-3        1000e-3    -3     2              0     -20413
+add  p Particle  D'_1+                          20413        2412e-3         314e-3        1000e-3     3     2              0      20413
+add  p Particle  D'_1-                         -20413        2412e-3         314e-3        1000e-3    -3     2              0     -20413
 add  p Particle  D'_10                          20423        2412e-3         314e-3        1000e-3     0     2              0      20423
 add  p Particle  anti-D'_10                    -20423        2412e-3         314e-3        1000e-3     0     2              0     -20423
 * D_2*(2460)

@@ -127,8 +127,10 @@ PARAMETER_MAPPING = {
     18520500: [0.48, -0.23], 18530200: [0.53, -1.23], 18570600: [0.49, -0.26], 18570700: [0.51, -0.77],
     19120100: [0.74, -4.12], 19130201: [0.47, -0.03], 19130300: [0.47, -0.2]}
 
+MAX_WEIGHT = 100.0
+
 # Initialize config object and write new payload into local database under identifier 'SmartBackgroundConfig'
-config = Belle2.SmartBackgroundConfig(PDG_MAPPING, SKIMCODES_MAPPING, PARAMETER_MAPPING, SKIMNAMES_MAPPING)
+config = Belle2.SmartBackgroundConfig(PDG_MAPPING, SKIMCODES_MAPPING, PARAMETER_MAPPING, SKIMNAMES_MAPPING, MAX_WEIGHT)
 iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
 Belle2.Database.Instance().storeData("SmartBackgroundConfig", config, iov)
 
@@ -138,4 +140,5 @@ config = Belle2.Database.Instance().getData("SmartBackgroundConfig", 0, 0)
 print("PDG mapping:", {p.first: p.second for p in config.getPdgMapping()})
 print("Skimcodes mapping:", {p.first: p.second for p in config.getSkimcodesMapping()})
 print("Parameter mapping:", {p.first: list(p.second) for p in config.getParameterMapping()})
-print("Skimnames mapping:", {p.first: list(p.second) for p in config.getSkimnamesMapping()})
+print("Skimnames mapping:", {p.first: p.second for p in config.getSkimnamesMapping()})
+print("Maximum weight:", config.getMaxWeight())

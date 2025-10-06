@@ -36,8 +36,10 @@ namespace Belle2 {
     SmartBackgroundConfig(const std::unordered_map<int, int>& pdgMapping,
                           const std::unordered_map<int, uint16_t>& skimcodesMapping,
                           const std::unordered_map<int, std::vector<float>>& paramMapping,
-                          const std::unordered_map<int, std::string> skimnamesMapping) : m_pdgMapping(pdgMapping),
-      m_skimcodesMapping(skimcodesMapping), m_paramMapping(paramMapping), m_skimnamesMapping(skimnamesMapping) { }
+                          const std::unordered_map<int, std::string>& skimnamesMapping,
+                          const float maxWeight) : m_pdgMapping(pdgMapping), m_skimcodesMapping(skimcodesMapping),
+      m_paramMapping(paramMapping), m_skimnamesMapping(skimnamesMapping),
+      m_maxWeight(maxWeight) { }
 
     /**
      * Return pdg mapping.
@@ -63,9 +65,20 @@ namespace Belle2 {
       return m_paramMapping;
     }
 
+    /**
+     * Return skim names mapping
+     */
     std::unordered_map<int, std::string> getSkimnamesMapping() const
     {
       return m_skimnamesMapping;
+    }
+
+    /**
+    * Return maximum possible weight
+    */
+    float getMaxWeight() const
+    {
+      return m_maxWeight;
     }
 
   private:
@@ -89,6 +102,11 @@ namespace Belle2 {
      * Mapping of skimcodes to skim names
      */
     std::unordered_map<int, std::string> m_skimnamesMapping;
+
+    /**
+     * Maximum possible event weight after importance sampling
+     */
+    float m_maxWeight;
 
     /**
      * Classdef

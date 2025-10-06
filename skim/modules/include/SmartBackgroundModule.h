@@ -117,6 +117,11 @@ namespace Belle2 {
     std::vector<int> m_skimCodes;
 
     /**
+     * Lower clip value for predicted probabilities (to limit maximum weight)
+     */
+    float m_minProb;
+
+    /**
      * Whether to execute in debug mode (module parameter)
      */
     bool m_debugMode;

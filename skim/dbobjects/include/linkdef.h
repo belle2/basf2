@@ -5,6 +5,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::SmartBackgroundConfig+; // checksum=0xc0dcbff3, version=1
+#pragma link C++ class Belle2::SmartBackgroundConfig+; // checksum=0xC36F7359, version=1
 
 #endif

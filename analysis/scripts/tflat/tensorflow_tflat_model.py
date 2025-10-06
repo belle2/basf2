@@ -152,8 +152,7 @@ def get_tflat_model(parameters, number_of_features):
     encoded_roe_features = keras.layers.Dropout(dropout_rate, name="Embedding_roe_dropout_2")(encoded_roe_features)
 
     # Concatenate all encoded features and their masks
-    # encoded_features = MyConcatenate()([encoded_trk_features, encoded_ecl_features, encoded_roe_features])
-    encoded_features = MyConcatenate()([encoded_trk_features])
+    encoded_features = MyConcatenate()([encoded_trk_features, encoded_ecl_features, encoded_roe_features])
 
     # Create multiple layers of the Transformer block.
     for block_idx in range(num_transformer_blocks):

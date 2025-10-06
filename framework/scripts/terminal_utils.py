@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# @cond dont_want_no_doxygen_warnings_this_is_sphinxed
-
 """
 terminal_utils - Helper functions for input from/output to a terminal
 ---------------------------------------------------------------------
@@ -62,6 +60,7 @@ class ANSIColors(enum.Enum):
     will be added to the output, for example when redirecting the output to a
     logfile.
     """
+    # \cond suppress doxygen warnings about undocumented colors
     BLACK = 0
     RED = 1
     GREEN = 2
@@ -70,6 +69,7 @@ class ANSIColors(enum.Enum):
     MAGENTA = 5
     CYAN = 6
     WHITE = 7
+    # \endcond
 
     @staticmethod
     def supported():
@@ -416,5 +416,3 @@ class InputEditor():
 
             else:
                 print(f"Editor '{self.editor_command_list[0]}' not found in $PATH.")
-
-# @endcond

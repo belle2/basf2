@@ -701,15 +701,18 @@ class CombinedSkim(BaseSkim):
         passes_flag = path.add_module("VariableToReturnValue", variable=variable)
         passes_flag.if_value(">0", passes_flag_path, b2.AfterConditionPath.CONTINUE)
 
-        # If the combinedSkim is not in the registry getting the code will throw a LookupError.
         # There is no requirement that a combinedSkim with single MDST output is
-        # registered so set the skimDecayMode to ``None`` if no code is defined.
-        try:
-            default_name = self.code
-            skim_code = self.code
-        except LookupError:
+        # registered so set the skimDecayMode to None and default file name to
+        # the skim name if not.
+        if self.name not in Registry.names:
+            b2.B2WARNING("Unrecognised skim name \"" + self.name + "\" in CombinedSkim with single " +
+                         "mdst output. Unless you are testing something privately, please add your skim " +
+                         "to the list in `skim/scripts/skim/registry.py`")
             default_name = self.name
             skim_code = None
+        else:
+            default_name = self.code
+            skim_code = self.code
 
         filename = kwargs.get("filename", kwargs.get("OutputFileName", default_name))
 
@@ -724,9 +727,9 @@ class CombinedSkim(BaseSkim):
         if "OutputFileName" in kwargs.keys():
             del kwargs["OutputFileName"]
 
-        kwargs.setdefault("dataDescription", {})
-
-        kwargs["dataDescription"].setdefault("skimDecayMode", skim_code)
+        if skim_code is not None:
+            kwargs.setdefault("dataDescription", {})
+            kwargs["dataDescription"].setdefault("skimDecayMode", skim_code)
 
         try:
             kwargs["additionalBranches"] += ["EventExtraInfo"]

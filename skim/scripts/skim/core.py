@@ -701,10 +701,20 @@ class CombinedSkim(BaseSkim):
         passes_flag = path.add_module("VariableToReturnValue", variable=variable)
         passes_flag.if_value(">0", passes_flag_path, b2.AfterConditionPath.CONTINUE)
 
-        filename = kwargs.get("filename", kwargs.get("OutputFileName", self.code))
+        # If the combinedSkim is not in the registry getting the code will throw a LookupError.
+        # There is no requirement that a combinedSkim with single MDST output is
+        # registered so set the skimDecayMode to ``None`` if no code is defined.
+        try:
+            default_name = self.code
+            skim_code = self.code
+        except LookupError:
+            default_name = self.name
+            skim_code = None
+
+        filename = kwargs.get("filename", kwargs.get("OutputFileName", default_name))
 
         if filename is None:
-            filename = self.code
+            filename = default_name
 
         if not filename.endswith(".mdst.root"):
             filename += ".mdst.root"
@@ -716,13 +726,6 @@ class CombinedSkim(BaseSkim):
 
         kwargs.setdefault("dataDescription", {})
 
-        # If the combinedSkim is not in the registry getting the code will throw a LookupError.
-        # There is no requirement that a combinedSkim with single MDST output is
-        # registered so set the skimDecayMode to ``None`` if no code is defined.
-        try:
-            skim_code = self.code
-        except LookupError:
-            skim_code = None
         kwargs["dataDescription"].setdefault("skimDecayMode", skim_code)
 
         try:

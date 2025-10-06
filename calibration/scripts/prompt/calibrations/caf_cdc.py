@@ -1,6 +1,3 @@
-# disable doxygen check for this file
-# @cond
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -492,6 +489,8 @@ class CDCCalibration(Calibration):
                  use_badWires=False,
                  collector_granularity='All',
                  backend_args=None):
+        """
+        """
         for algo in algorithms:
             algo.setHistFileName(name)
 
@@ -525,10 +524,9 @@ class CDCCalibration(Calibration):
 
             self.add_collection(name=skim_type, collection=collection)
 
+        #: set number of maximum iterations
         self.max_iterations = max_iterations
 
         if dependencies is not None:
             for dep in dependencies:
                 self.depends_on(dep)
-
-# @endcond

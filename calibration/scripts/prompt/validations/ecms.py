@@ -1,6 +1,3 @@
-# disable doxygen check for this file
-# @cond
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -111,7 +108,7 @@ def get_Ecms_values(path):
 
         f = ROOT.TFile.Open(fName)
         ecmsObj = f.Get("CollisionInvariantMass")
-        assert(ecmsObj.ClassName() == "Belle2::CollisionInvariantMass")
+        assert (ecmsObj.ClassName() == "Belle2::CollisionInvariantMass")
 
         eCMS = ecmsObj.getMass()
         eCMSe = ecmsObj.getMassError()
@@ -127,18 +124,20 @@ def get_Ecms_values(path):
 
 
 class Plotter():
+    """Plotting class"""
+
     def __init__(self, location):
         """
         Data are loaded from text files to pandas
         """
 
-        # read B-only calibration
+        #: read B-only calibration
         self.dfB = pd.read_csv(f'{location}/BonlyEcmsCalib.txt', delim_whitespace=True)
 
-        # read combined calibration
+        #: read combined calibration
         self.dfC = pd.read_csv(f'{location}/finalEcmsCalib.txt', delim_whitespace=True)
 
-        # read mumu calibration
+        #: read mumu calibration
         self.dfM = pd.read_csv(f'{location}/mumuEcalib.txt', delim_whitespace=True)
 
         # add the state
@@ -447,7 +446,7 @@ def create_hadB_fit_plots(outputDir, pdflatex):
             if int(round(arr[i0Temp][0][0], 0)) == t:
                 i0 = i0Temp
                 break
-        assert(i0 is not None)
+        assert (i0 is not None)
 
         frac = 1. / (items[t] + 0.2)
         if items[t] >= 6:
@@ -745,5 +744,3 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
 
 if __name__ == "__main__":
     run_validation(*sys.argv[1:])
-
-# @endcond

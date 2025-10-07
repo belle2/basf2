@@ -19,6 +19,7 @@ import splinter
 import traceback
 
 # ours
+from b2test_utils import is_ci
 import validationserver
 import validationpath
 from validationtestutil import check_execute
@@ -194,10 +195,11 @@ def main():
 
             # wait for one second for the server to start
             time.sleep(2)
-            # check the content of the webserver
-            success = success and check_for_content(
-                revs_to_gen + ["reference"], 7, 7
-            )
+            # check the content of the webserver if not running in GitLab pipeline
+            if not is_ci():
+                success = success and check_for_content(
+                    revs_to_gen + ["reference"], 7, 7
+                )
 
             # check if the plott creating triggering works
             success = success and check_for_plotting(

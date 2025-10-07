@@ -1018,7 +1018,7 @@ EXCLUDE                = externals \
                          bin \
                          include \
                          data \
-                         site_scons
+                         site_scons \
                          skim \
                          IMPORTED
 

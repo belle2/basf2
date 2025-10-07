@@ -158,11 +158,11 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
         checkbox_overview = browser.find_by_id("check_show_overview")
         # todo: does not work yet, checkbox is directly unchecked again
         checkbox_overview.check()
-        # found_matrix_plots = browser.find_by_css(".plot_matrix_item")
+        found_matrix_plots = browser.find_by_css(".plot_matrix_item")
 
-        # if len(found_matrix_plots) < min_matrix_plots:
-        #    print (f"Only {len(found_matrix_plots)} matrix plots found, while {min_matrix_plots} are expected")
-        #    return False
+        if len(found_matrix_plots) < min_matrix_plots:
+            print(f"Only {len(found_matrix_plots)} matrix plots found, while {min_matrix_plots} are expected")
+            return False
 
     return True
 

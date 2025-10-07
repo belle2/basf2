@@ -240,7 +240,6 @@ class SN(nn.Module):
         sv (list[Tensor]): Registered singular values (buffers).
         training (bool): Inherited from nn.Module. True if in training mode.
     """
-    # pylint: disable=no-member
 
     def __init__(self, num_svs, num_itrs, num_outputs, transpose=False, eps=1e-12):
         """constructor"""
@@ -442,14 +441,12 @@ class myBN(nn.Module):
 
     #: reset standing stats
     def reset_stats(self):
-        # pylint: disable=no-member
         self.stored_mean[:] = 0
         self.stored_var[:] = 0
         self.accumulation_counter[:] = 0
 
     #: forward
     def forward(self, x, gain, bias):
-        # pylint: disable=no-member
         if self.training:
             out, mean, var = manual_bn(
                 x, gain, bias, return_mean_var=True, eps=self.eps

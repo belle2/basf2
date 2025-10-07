@@ -8,9 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# this is a test executable, not a module so we don't need doxygen warnings
-# @cond SUPPRESS_DOXYGEN
-
 """
 test parsing of local database files
 """
@@ -76,5 +73,3 @@ with clean_working_directory():
         # and parse in C++
         storage = ROOT.Belle2.Conditions.TestingPayloadStorage(filename)
         run_in_subprocess(evt, payload, target=storage.get)
-
-# @endcond

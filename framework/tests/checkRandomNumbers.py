@@ -8,9 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# this is a test executable, not a module so we don't need doxygen warnings
-# @cond SUPPRESS_DOXYGEN
-
 """
 Check that random numbers don't change and are consistent.
 
@@ -92,5 +89,3 @@ logging_framework.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.Log
 basf2.set_random_seed("this is the seed")
 
 basf2.process(main)
-
-# @endcond

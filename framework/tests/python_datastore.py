@@ -12,8 +12,6 @@ import basf2
 from ROOT import Belle2
 import unittest
 
-# @cond internal_test
-
 
 class PythonDataStoreTests(unittest.TestCase):
 
@@ -141,5 +139,3 @@ if __name__ == "__main__":
     basf2.B2INFO("Following error messages are expected, please ignore.")
     unittest.main()
     basf2.B2INFO("Previous errors are expected, please ignore.")
-
-# @endcond

@@ -15,8 +15,6 @@ import subprocess
 import json
 import os
 
-# @cond internal_test
-
 
 class CreateDummyData(basf2.Module):
     """Create some random data to have event size not be too small"""
@@ -125,5 +123,3 @@ if __name__ == "__main__":
             path.add_module("RootOutput", outputFileName=name, outputSplitSize=1, updateFileCatalog=False)
             safe_process(path)
             assert os.listdir() == [result], "wrong output file name"
-
-# @endcond

@@ -11,8 +11,6 @@ from ROOT import Belle2
 import multiprocessing
 import unittest
 
-# @cond internal_test
-
 
 class DBInterface(unittest.TestCase):
     def assertDeath(self, function, *args, **kwargs):
@@ -118,5 +116,3 @@ class DBInterface(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-# @endcond

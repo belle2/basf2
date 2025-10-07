@@ -10,8 +10,6 @@ from hep_ipython_tools.calculation import Calculation
 from hep_ipython_tools.calculation_process import CalculationProcess
 from hep_ipython_tools.calculation_queue import CalculationQueue
 
-# @cond internal_test
-
 
 class TestCalculation(TestCase):
 
@@ -66,4 +64,3 @@ class TestCalculation(TestCase):
 
 if __name__ == "__main__":
     main()
-# @endcond

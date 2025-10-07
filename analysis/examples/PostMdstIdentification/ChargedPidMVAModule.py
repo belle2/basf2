@@ -23,9 +23,6 @@ Output: *_ntup_*.root
 
 """
 
-# Doxygen should skip this script
-# @cond
-
 import argparse
 import re
 from modularAnalysis import getAnalysisGlobaltag
@@ -251,5 +248,3 @@ if __name__ == '__main__':
 
     # Start processing of modules.
     basf2.process(path)
-
-# @endcond

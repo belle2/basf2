@@ -16,9 +16,6 @@ Execute script with:
   $> basf2 getConvertedPhotonVariables.py -i [input_ROOT_file]
 """
 
-# Doxygen should skip this script
-# @cond
-
 import basf2 as b2
 import modularAnalysis as ma
 from variables import variables as vm
@@ -81,6 +78,3 @@ ma.variablesToNtuple('gamma:conv', tuple_vars, filename='output.root', treename=
 progress = b2.register_module('Progress')
 path.add_module(progress)
 b2.process(path=path)
-
-
-# @endcond

@@ -12,9 +12,6 @@
 An example script to find a specific decay chain at MC level.
 """
 
-# Doxygen should skip this script
-# @cond
-
 import basf2
 from modularAnalysis import fillParticleListFromMC, inputMdst, reconstructMCDecay, variablesToNtuple
 from variables import variables as vm  # shorthand for the variable manager instance
@@ -57,5 +54,3 @@ vm.printAliases()
 variablesToNtuple("B+:DstENu", interesting_variables, path=mypath)
 
 basf2.process(mypath)
-
-# @endcond

@@ -243,6 +243,14 @@ To have 16GB of memory on the short job queue
    bsub -q s -n 4 "bash example.sh"
 
 
+.. rubric:: Viewing job output while running
+
+If you want to view the output of your LSF job while it is still running you can use
+
+.. code-block:: bash
+
+   bpeek <job_ID>
+
 .. rubric:: Saving job output
 
 Finally, it would probably be a good idea to have the output of your LSF jobs into a 

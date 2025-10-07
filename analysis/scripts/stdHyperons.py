@@ -28,7 +28,7 @@ def stdXi(fitter="TreeFit", addSuffix=False, path=None):
 
     Parameters:
         fitter (str): specify either ``KFit`` or ``TreeFit`` for the vertex reconstructions (default ``TreeFit``)
-        addSuffix (bool): whether to add a suffix of from ``_<fitter>`` to the ParticleList name
+        addSuffix (bool): whether to add a suffix of form ``_<fitter>`` to the ParticleList name
             depending on the chosen fitter
         path (basf2.Path): modules are added to this path building the ``Xi-:std`` list
     """
@@ -211,7 +211,7 @@ def stdOmega(fitter="TreeFit", addSuffix=False, path=None):
 
     Parameters:
         fitter (str): specify either ``KFit`` or ``TreeFit`` for the vertex reconstructions (default ``TreeFit``)
-        addSuffix (bool): whether to add a suffix of from ``_<fitter>`` to the ParticleList name
+        addSuffix (bool): whether to add a suffix of form ``_<fitter>`` to the ParticleList name
             depending on the chosen fitter
         path (basf2.Path): modules are added to this path building the ``Omega-:std`` list
     """

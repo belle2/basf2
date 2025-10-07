@@ -351,20 +351,16 @@ if __name__ == "__main__":
     # if called directly we will
     # 1. calculate the beamspot for the SuperKEKB preset and display it if possible
     # 2. calculate beam energies for Y1S - Y5S and offresonance
-    #: \cond Doxygen_suppress
     np.set_printoptions(precision=3)
-    #: \endcond
 
     # calculate beamspot for SuperKEKB for testing
     #: beamparameter defaults for SuperKEKB
     values = beamparameter_presets["SuperKEKB"][1]
-    #: \cond Doxygen_suppress
     beampos_spot, cov_spot = calculate_beamspot(
         [0, 0, 0], [0, 0, 0],
         values["bunchHER"], values["bunchLER"],
         values["angleXHER"], values["angleXLER"],
     )
-    #: \endcond
     print("Beamspot position:")
     print(beampos_spot)
     print("Beamspot covariance:")
@@ -385,11 +381,9 @@ if __name__ == "__main__":
         points_ler = np.random.multivariate_normal([0, 0, 0], cov_ler, 1000)
         #: random points according to calculated beamspot
         points_spot = np.random.multivariate_normal(beampos_spot, cov_spot, 1000)
-        #: \cond Doxygen_suppress
         pl.scatter(points_her[:, 2], points_her[:, 0], s=5, marker=".", c="b", edgecolors="None", label="HER")
         pl.scatter(points_ler[:, 2], points_ler[:, 0], s=5, marker=".", c="r", edgecolors="None", label="LER")
         pl.scatter(points_spot[:, 2], points_spot[:, 0], s=5, marker=".", c="g", edgecolors="None", label="spot")
-        #: \endcond
         pl.legend()
         pl.xlabel("z / cm")
         pl.ylabel("x / cm")

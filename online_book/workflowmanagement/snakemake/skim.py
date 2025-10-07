@@ -1,4 +1,3 @@
-# @cond
 import basf2 as b2
 import modularAnalysis as ma
 import vertex as vx
@@ -27,4 +26,3 @@ udst.add_skimmed_udst_output(
     mc=runningOnMC,
     outputFile=outputfile)
 b2.process(mypath)
-# @endcond

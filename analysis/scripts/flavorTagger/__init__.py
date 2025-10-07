@@ -19,7 +19,5 @@ from .core.flavorTagger import flavorTagger
 filepath = basf2.find_file('data/analysis/output_vars.yaml')
 flavor_tagging = utils.read_yaml(filepath)["output_vars"]
 
-# @cond internal
 # only public interfaces, to make package doc nicer. Also the only things imported by 'from flavorTagger import *'
 __all__ = ['utils', 'flavorTagger', 'flavor_tagging']
-# @endcond

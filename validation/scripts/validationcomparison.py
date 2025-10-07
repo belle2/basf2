@@ -25,10 +25,6 @@ import ROOT
 # ours
 from metaoptions import MetaOptionParser
 
-# Unfortunately doxygen has some trouble with inheritance of attributes, so
-# we disable it.
-# @cond SUPPRESS_DOXYGEN
-
 
 # ==============================================================================
 # Custom Exceptions
@@ -143,9 +139,9 @@ class ComparisonBase(ABC):
         #: store the second object to compare
         self.object_b = object_b
 
-        #: MetaOptionParser
         if mop is None:
             mop = MetaOptionParser()
+        #: MetaOptionParser
         self.mop = mop
 
         #: enable debug?
@@ -748,7 +744,9 @@ class TablePrinter:
 
     def print_divider(self, char="="):
         """ Print a divider made up from repeated chars """
+        # \cond false positive doxygen warning
         print(char * self.tot_width)
+        # \endcond
 
     def print(self, cols):
         """ Print one row """
@@ -888,6 +886,3 @@ def debug_cli():
 if __name__ == "__main__":
     # Run command line interface for testing purposes.
     debug_cli()
-
-# End suppression of doxygen checks
-# @endcond

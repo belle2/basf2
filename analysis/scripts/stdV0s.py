@@ -50,7 +50,7 @@ def stdKshorts(
                 provide their momenta direction at the point-of-closest-approach (POCA) to the beam axis.
 
         writeOut (bool): whether RootOutput module should save the created ParticleList
-        addSuffix (bool): whether to add a suffix of from ``_<fitter>`` to the ParticleList name
+        addSuffix (bool): whether to add a suffix of form ``_<fitter>`` to the ParticleList name
             depending on the chosen fitter
     """
     suffix = ""
@@ -192,7 +192,7 @@ def scaleErrorKshorts(
                                 defining z0 best resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**2.5))**2 }
     @param d0MomThr_RD          d0 best resolution is kept constant below this momentum
     @param z0MomThr_RD          z0 best resolution is kept constant below this momentum
-    @param addSuffix            Whether to add a suffix of from ``_<fitter>`` to the ParticleList name
+    @param addSuffix            Whether to add a suffix of form ``_<fitter>`` to the ParticleList name
                                 depending on the chosen fitter
 
     """
@@ -305,7 +305,7 @@ def stdLambdas(
                 beam axis.
 
         writeOut (bool): whether RootOutput module should save the created ParticleList
-        addSuffix (bool): whether to add a suffix of from ``_<fitter>`` to the ParticleList name
+        addSuffix (bool): whether to add a suffix of form ``_<fitter>`` to the ParticleList name
             depending on the chosen fitter
     """
     suffix = ""

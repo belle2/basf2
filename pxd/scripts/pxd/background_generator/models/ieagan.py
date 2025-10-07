@@ -319,11 +319,13 @@ class SNConv2d(nn.Conv2d, SN):
         return F.conv2d(
             x,
             self.W_(),
+            # \cond false positive doxygen warning
             self.bias,
             self.stride,
             self.padding,
             self.dilation,
             self.groups,
+            # \endcond
         )
 
 
@@ -347,7 +349,9 @@ class SNLinear(nn.Linear, SN):
 
     #: forward
     def forward(self, x):
+        # \cond false positive doxygen warning
         return F.linear(x, self.W_(), self.bias)
+        # \endcond
 
 
 def fused_bn(x, mean, var, gain=None, bias=None, eps=1e-5):
@@ -601,7 +605,9 @@ class ccbn(nn.Module):
     def extra_repr(self):
         s = "out: {output_size}, in: {input_size},"
         s += " cross_replica={cross_replica}"
+        # \cond false positive doxygen warning
         return s.format(**self.__dict__)
+        # \endcond
 
 
 class ILA(nn.Module):

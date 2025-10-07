@@ -1018,6 +1018,7 @@ EXCLUDE                = externals \
                          bin \
                          include \
                          data \
+                         site_scons
                          skim \
                          IMPORTED
 

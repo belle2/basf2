@@ -186,14 +186,14 @@ if option == 'debug':
     global_env.Append(FORTRANFLAGS='-g')
     global_env.Append(F90FLAGS='-g')
 elif option == 'opt':
-    global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3', '-flto'])
+    global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3'])
     global_env.Append(FORTRANFLAGS=['-O3'])
     global_env.Append(F90FLAGS=['-O3'])
     # Parallel LTO avoids sequential bottlenecks when large libraries are
     # linked, but causes oversubscription when linking libraries concurrently.
     # Performance and RAM usage measurements suggest that between these two
     # evils, oversubscription is the better choice.
-    global_env.Append(LINKFLAGS=f"-flto$(={int(GetOption('num_jobs'))}$)")
+    #global_env.Append(LINKFLAGS=f"-flto$(={int(GetOption('num_jobs'))}$)")
     # LTO requires some binutils wrappers that preserve the GCC IR
     global_env['AR'] = 'gcc-ar'
     global_env['RANLIB'] = 'gcc-ranlib'

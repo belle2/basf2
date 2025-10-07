@@ -18,64 +18,84 @@ from stdV0s import stdLambdas
 from stdPhotons import stdPhotons
 
 
-def stdXi(fitter='TreeFit', path=None):
+def stdXi(fitter="TreeFit", addSuffix=False, path=None):
     r"""
-    Reconstruct the standard :math:`\Xi^-` ``ParticleList`` named ``Xi-:std``.
+    Reconstruct the standard :math:`\Xi^-` ``ParticleList`` named ``Xi-:std`` by default.
+    If ``addSuffix`` is set to True, then a suffix of form ``_<fitter>`` is added
+    depending on the chosen fitter.
 
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
 
     Parameters:
         fitter (str): specify either ``KFit`` or ``TreeFit`` for the vertex reconstructions (default ``TreeFit``)
+        addSuffix (bool): whether to add a suffix of from ``_<fitter>`` to the ParticleList name
+            depending on the chosen fitter
         path (basf2.Path): modules are added to this path building the ``Xi-:std`` list
     """
 
+    suffix = ""
+    if addSuffix:
+        suffix = f"_{fitter}"
     if not isB2BII():
-        stdLambdas(path=path)
+        stdLambdas(path=path, addSuffix=addSuffix)
         # 3.5 MeV Range around the nominal mass
         cutAndCopyList(
-            'Lambda0:reco',
-            'Lambda0:merged',
-            '[ abs( dM ) < 0.0035 ] and \
+            f"Lambda0:reco{suffix}",
+            f"Lambda0:merged{suffix}",
+            "[ abs( dM ) < 0.0035 ] and \
             [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
             [ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.35 ] and \
             [ daughter(0,protonID) > 0.01 ] and \
-            [ chiProb > 0.0 ]',
-            True, path=path)
+            [ chiProb > 0.0 ]",
+            True,
+            path=path,
+        )
     else:
         stdPi('all', path=path)
         # Rough Lambda0 cuts from J. Yelton Observations of an Excited Omega- Baryon
         kFit('Lambda0:mdst', conf_level=0.0, path=path)  # Re-vertexing, recover vertex variables and error matrix
         cutAndCopyList(
-            'Lambda0:reco',
-            'Lambda0:mdst',
-            '[ abs( dM ) < 0.0035 ] and \
+            f"Lambda0:reco{suffix}",
+            "Lambda0:mdst",
+            "[ abs( dM ) < 0.0035 ] and \
             [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
             [ dr > 0.35 ] and \
             [ daughter(0,atcPIDBelle(4,3)) > 0.2 ] and \
             [ daughter(0,atcPIDBelle(4,2)) > 0.2 ] and \
-            [ chiProb > 0.0 ]',
-            True, path=path)
+            [ chiProb > 0.0 ]",
+            True,
+            path=path,
+        )
 
     # stdXi-
-    if fitter == 'KFit':
-        kFit('Lambda0:reco', 0.0, fit_type='massvertex', path=path)
-        reconstructDecay('Xi-:reco -> Lambda0:reco pi-:all', '1.295 < M < 1.35', path=path)
-        kFit('Xi-:reco', conf_level=0.0, path=path)
-    elif fitter == 'TreeFit':
-        reconstructDecay('Xi-:reco -> Lambda0:reco pi-:all', '1.295 < M < 1.35', path=path)
-        treeFit('Xi-:reco', conf_level=0.0, massConstraint=[3122], path=path)
+    if fitter == "KFit":
+        kFit(f"Lambda0:reco{suffix}", 0.0, fit_type="massvertex", path=path)
+        reconstructDecay(
+            f"Xi-:reco{suffix} -> Lambda0:reco{suffix} pi-:all",
+            "1.295 < M < 1.35",
+            path=path,
+        )
+        kFit(f"Xi-:reco{suffix}", conf_level=0.0, path=path)
+    elif fitter == "TreeFit":
+        reconstructDecay(
+            f"Xi-:reco{suffix} -> Lambda0:reco{suffix} pi-:all",
+            "1.295 < M < 1.35",
+            path=path,
+        )
+        treeFit(f"Xi-:reco{suffix}", conf_level=0.0, massConstraint=[3122], path=path)
     else:
         B2ERROR(f"stdXi: invalid fitter ({fitter}). Choose from KFit or TreeFit")
 
     cutAndCopyList(
-        'Xi-:std',
-        'Xi-:reco',
-        '[ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
+        f"Xi-:std{suffix}",
+        f"Xi-:reco{suffix}",
+        "[ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
         [ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0. and \
         formula([dr^2 + dz^2 ]^[0.5])<formula([daughter(0,dr)^2 + daughter(0,dz)^2]^[0.5])] and \
-        [ chiProb > 0.0 ]',
+        [ chiProb > 0.0 ]",
         True,
-        path=path)
+        path=path,
+    )
 
 
 def stdXi0(gammatype='eff40', beamBackgroundMVAWeight="", fakePhotonMVAWeight="", biasCorrectionTable="", path=None):
@@ -181,79 +201,96 @@ def stdXi0(gammatype='eff40', beamBackgroundMVAWeight="", fakePhotonMVAWeight=""
         path=path)
 
 
-def stdOmega(fitter='TreeFit', path=None):
+def stdOmega(fitter="TreeFit", addSuffix=False, path=None):
     r"""
     Reconstruct the standard :math:`\Omega^-` ``ParticleList`` named ``Omega-:std``.
+    If ``addSuffix`` is set to True, then a suffix of form ``_<fitter>`` is added
+    depending on the chosen fitter.
 
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
 
     Parameters:
         fitter (str): specify either ``KFit`` or ``TreeFit`` for the vertex reconstructions (default ``TreeFit``)
+        addSuffix (bool): whether to add a suffix of from ``_<fitter>`` to the ParticleList name
+            depending on the chosen fitter
         path (basf2.Path): modules are added to this path building the ``Omega-:std`` list
     """
 
+    suffix = ""
+    if addSuffix:
+        suffix = f"_{fitter}"
     if not isB2BII():
-        stdLambdas(path=path)
+        stdLambdas(path=path, addSuffix=addSuffix)
         # 3.5 MeV Range around the nominal mass
         cutAndCopyList(
-            'Lambda0:reco',
-            'Lambda0:merged',
-            '[ abs( dM ) < 0.0035 ] and \
+            f"Lambda0:reco{suffix}",
+            f"Lambda0:merged{suffix}",
+            "[ abs( dM ) < 0.0035 ] and \
             [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
             [ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.35 ] and \
             [ daughter(0,protonID) > 0.01 ] and \
-            [ chiProb > 0.0 ]',
-            True, path=path)
+            [ chiProb > 0.0 ]",
+            True,
+            path=path,
+        )
     else:
         stdPi('all', path=path)
         # Rough Lambda0 cuts from J. Yelton Observations of an Excited Omega- Baryon
         kFit('Lambda0:mdst', conf_level=0.0, path=path)  # Re-vertexing, recover vertex variables and error matrix
         cutAndCopyList(
-            'Lambda0:reco',
-            'Lambda0:mdst',
-            '[ abs( dM ) < 0.0035 ] and \
+            f"Lambda0:reco{suffix}",
+            "Lambda0:mdst",
+            "[ abs( dM ) < 0.0035 ] and \
             [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
             [ dr > 0.35 ] and \
             [ daughter(0,atcPIDBelle(4,3)) > 0.2 ] and \
             [ daughter(0,atcPIDBelle(4,2)) > 0.2 ] and \
-            [ chiProb > 0.0 ]',
-            True, path=path)
+            [ chiProb > 0.0 ]",
+            True,
+            path=path,
+        )
 
     stdK('all', path=path)
     # stdOmega-
-    if fitter == 'KFit':
-        kFit('Lambda0:reco', 0.0, fit_type='massvertex', path=path)
-        reconstructDecay('Omega-:reco -> Lambda0:reco K-:all', '1.622 < M < 1.722', path=path)
-        kFit('Omega-:reco', conf_level=0.0, path=path)
-    elif fitter == 'TreeFit':
-        reconstructDecay('Omega-:reco -> Lambda0:reco K-:all', '1.622 < M < 1.722', path=path)
-        treeFit('Omega-:reco', conf_level=0.0, massConstraint=[3122], path=path)
+    if fitter == "KFit":
+        kFit(f"Lambda0:reco{suffix}", 0.0, fit_type="massvertex", path=path)
+        reconstructDecay(
+            f"Omega-:reco{suffix} -> Lambda0:reco{suffix} K-:all", "1.622 < M < 1.722", path=path
+        )
+        kFit(f"Omega-:reco{suffix}", conf_level=0.0, path=path)
+    elif fitter == "TreeFit":
+        reconstructDecay(
+            f"Omega-:reco{suffix} -> Lambda0:reco{suffix} K-:all", "1.622 < M < 1.722", path=path
+        )
+        treeFit(f"Omega-:reco{suffix}", conf_level=0.0, massConstraint=[3122], path=path)
     else:
         B2ERROR(f"stdOmega: invalid fitter ({fitter}). Choose from KFit or TreeFit")
 
     if not isB2BII():
         cutAndCopyList(
-            'Omega-:std',
-            'Omega-:reco',
-            '[ cosAngleBetweenMomentumAndVertexVector > 0.0] and \
+            f"Omega-:std{suffix}",
+            f"Omega-:reco{suffix}",
+            "[ cosAngleBetweenMomentumAndVertexVector > 0.0] and \
             [ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0. and \
             formula([dr^2 + dz^2]^[0.5])<formula([daughter(0,dr)^2 + daughter(0,dz)^2]^[0.5])] and \
             [ chiProb > 0.0 ] and \
-            [ daughter(1,kaonID) > 0.01 ]',
+            [ daughter(1,kaonID) > 0.01 ]",
             True,
-            path=path)
+            path=path,
+        )
 
     else:
         cutAndCopyList(
-            'Omega-:std',
-            'Omega-:reco',
-            '[ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
+            f"Omega-:std{suffix}",
+            f"Omega-:reco{suffix}",
+            "[ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
             [ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0. and \
             formula([dr^2 + dz^2]^[0.5])<formula([daughter(0,dr)^2 + daughter(0,dz)^2 ]^[0.5])] and \
             [ chiProb > 0.0 ] and \
-            [ daughter(1,atcPIDBelle(3,4)) > 0.2 and daughter(1,atcPIDBelle(3,2)) > 0.2 ]',
+            [ daughter(1,atcPIDBelle(3,4)) > 0.2 and daughter(1,atcPIDBelle(3,2)) > 0.2 ]",
             True,
-            path=path)
+            path=path,
+        )
 
 
 def goodXi(xitype='loose', path=None):

@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-# disable doxygen check for this file
-# @cond
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -88,13 +85,14 @@ def monitor_jobs(args, jobs):
 
 
 class ArgumentsGenerator():
+    """
+    Simple little class to hold a generator (uninitialised) and the necessary args/kwargs to
+    initialise it. This lets us reuse a generator by setting it up again fresh. This is not
+    optimal for expensive calculations, but it is nice for making large sequences of
+    Job input arguments on the fly.
+    """
     def __init__(self, generator_function, *args, **kwargs):
         """
-        Simple little class to hold a generator (uninitialised) and the necessary args/kwargs to
-        initialise it. This lets us reuse a generator by setting it up again fresh. This is not
-        optimal for expensive calculations, but it is nice for making large sequences of
-        Job input arguments on the fly.
-
         Parameters:
             generator_function (py:function): A function (callable) that contains a ``yield`` statement. This generator
                 should *not* be initialised i.e. you haven't called it with ``generator_function(*args, **kwargs)``
@@ -204,11 +202,15 @@ class SubjobSplitter(ABC):
                "won't automatically have arguments assigned.")
 
     def __repr__(self):
+        """
+        """
         return f"{self.__class__.__name__}"
 
 
 class MaxFilesSplitter(SubjobSplitter):
+    """
 
+    """
     def __init__(self, *, arguments_generator=None, max_files_per_subjob=1):
         """
         Parameters:
@@ -237,7 +239,9 @@ class MaxFilesSplitter(SubjobSplitter):
 
 
 class MaxSubjobsSplitter(SubjobSplitter):
+    """
 
+    """
     def __init__(self, *, arguments_generator=None, max_subjobs=1000):
         """
         Parameters:
@@ -456,6 +460,8 @@ class Job:
         return self._status
 
     def _get_overall_status_from_subjobs(self):
+        """
+        """
         subjob_statuses = [subjob.status for subjob in self.subjobs.values()]
         status_level = min([self.statuses[status] for status in subjob_statuses])
         for status, level in self.statuses.items():
@@ -473,6 +479,8 @@ class Job:
         else:
             B2INFO(f"Setting {self.name} status to {status}")
         self._status = status
+
+    # \cond silence doxygen warnings
 
     @property
     def output_dir(self):
@@ -524,6 +532,8 @@ class Job:
         self.splitter = MaxFilesSplitter(max_files_per_subjob=value)
         B2DEBUG(29, f"Changed splitter to {self.splitter} for {self}.")
 
+    # \endcond
+
     def dump_to_json(self, file_path):
         """
         Dumps the Job object configuration to a JSON file so that it can be read in again later.
@@ -531,11 +541,15 @@ class Job:
         Parameters:
           file_path(`basf2.Path`): The filepath we'll dump to
         """
+        # \cond false positive doxygen warning about job_dict
         with open(file_path, mode="w") as job_file:
             json.dump(self.job_dict, job_file, indent=2)
+        # \endcond
 
     @classmethod
     def from_json(cls, file_path):
+        """
+        """
         with open(file_path) as job_file:
             job_dict = json.load(job_file)
         return cls(job_dict["name"], job_dict=job_dict)
@@ -946,6 +960,9 @@ class Local(Backend):
             self.result = result
 
         def _update_result_status(self):
+            """
+            Update result status
+            """
             if self.result.ready() and (self.job.status not in self.job.exit_statuses):
                 return_code = self.result.get()
                 if return_code:
@@ -1354,6 +1371,8 @@ class PBS(Batch):
     default_backend_args = {"queue": "short"}
 
     def __init__(self, *, backend_args=None):
+        """
+        """
         super().__init__(backend_args=backend_args)
 
     def _add_batch_directives(self, job, batch_file):
@@ -1478,6 +1497,9 @@ class PBS(Batch):
                 self.job.status = new_job_status
 
         def _get_status_from_output(self, output):
+            """
+            Get status from output
+            """
             for job_info in output["JOBS"]:
                 if job_info["Job_Id"] == self.job_id:
                     return job_info["job_state"]
@@ -1617,6 +1639,8 @@ class LSF(Batch):
     default_backend_args = {"queue": "s"}
 
     def __init__(self, *, backend_args=None):
+        """
+        """
         super().__init__(backend_args=backend_args)
 
     def _add_batch_directives(self, job, batch_file):
@@ -1730,6 +1754,9 @@ class LSF(Batch):
                 self.job.status = new_job_status
 
         def _get_status_from_output(self, output):
+            """
+            Get status from output
+            """
             if output["JOBS"] and "ERROR" in output["JOBS"][0]:
                 if output["JOBS"][0]["ERROR"] == f"Job <{self.job_id}> is not found":
                     raise KeyError(f"No job record in the 'output' argument had the 'JOBID'=={self.job_id}")
@@ -2279,5 +2306,3 @@ class SplitterError(Exception):
     """
     Base exception class for SubjobSplitter objects.
     """
-
-# @endcond

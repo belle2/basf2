@@ -253,8 +253,10 @@ If you want to view the output of your LSF job while it is still running you can
 
 .. rubric:: Saving job output
 
-Finally, it would probably be a good idea to have the output of your LSF jobs into a 
+Finally, it would probably be a good idea to save the output of your LSF jobs into a 
 log file. The relevant bsub option is -o (standard output) and -e (standard error).
+
+Replcing -o with -oo will overwrite the log file.
 
 To have 16GB of memory on the short job queue with a log file 
 

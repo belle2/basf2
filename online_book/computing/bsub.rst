@@ -147,7 +147,8 @@ To check the job status
    bjobs [-q <queue name>] [<job_ID>]
 
 .. warning::
-   Changing your script while the job is in PENDING state, will change your output accordingly.
+   Editing your script while the job is in PENDING state will change your output accordingly.
+   To avoid such behaviour, only edit your script once all the jobs are finished.
 
 .. admonition:: Exercise
    :class: exercise stacked

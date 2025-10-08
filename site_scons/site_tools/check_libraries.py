@@ -81,7 +81,7 @@ def check_libraries(target, source, env):
     libraries = []
     while stack:
         dirnode = stack.pop()
-        # loop over all nodes which are childrens of this directory
+        # loop over all nodes which are children of this directory
         for node in dirnode.all_children():
             if isinstance(node, Node.FS.Dir):
                 # and add directories to the list to investigate
@@ -131,7 +131,7 @@ def check_libraries(target, source, env):
         # will not contain libc.so but libc.so.6 and to make matters
         # worse libraries like CLHEP will end up as libCLHEP-$version.so
         # In theory we need to emulate the linker behaviour here to get
-        # a perfect matching. A resonable safe assumption would probably
+        # a perfect matching. A reasonable safe assumption would probably
         # be to require just the beginning to match.
 
         # But for now we just restrict ourselves to libraries in $LIBDIR
@@ -167,7 +167,7 @@ def run(env):
         check_action = Action(check_libraries, "*** Checking library dependencies...")
         env.Command(libcheck, None, check_action)
         env.AlwaysBuild(libcheck)
-        # which depends on all other build targets so depending on wether a list
+        # which depends on all other build targets so depending on whether a list
         # of build targets is defined ...
         if not BUILD_TARGETS:
             # we want to run this last so if no targets are specified make sure check is

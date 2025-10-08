@@ -8,47 +8,20 @@
 #ifndef TRGRAWDATAModule_h
 #define TRGRAWDATAModule_h
 
-#include <stdlib.h>
-#include <string>
 #include <iostream>
 #include <vector>
-#include <sys/uio.h>
 
-#include <rawdata/dataobjects/RawTRG.h>
-
-#include <framework/pcore/EvtMessage.h>
-
-#include <framework/datastore/StoreArray.h>
-// #include <framework/core/Module.h>
 #include <framework/core/HistoModule.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
-#include <mdst/dbobjects/TRGGDLDBBadrun.h>
-#include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
-
-#include <rawdata/dataobjects/RawDataBlock.h>
-#include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawTLU.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <sys/resource.h>
-
-#include <TDirectory.h>
-#include <TH2I.h>
-#include <TH1I.h>
-#include <TString.h>
+#include <TH2D.h>
 
 namespace Belle2 {
+  class EventMetaData;
+  class TRGGDLDBUnpacker;
 
   static const int intNaN = std::numeric_limits<int>::quiet_NaN();
 
-//class TRGRAWDATAModule : public Module {
   class TRGRAWDATAModule : public HistoModule {
 
   public:
@@ -95,18 +68,18 @@ namespace Belle2 {
       printf(" %3s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s |\n",
 //    printf(" %3s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s |\n",
              "",
-             "a)dataOk",  // cntr_nwn[i],        Data event that has no problem
-             "b)hdrOk",   // cntr_nw3[i],        Header event that has no problem (except cc check)
-             "c)ccOk",    // cntr_good_odr[i]);  Data event that has good cc
-             "d)hdrTag",  // cntr_nw3_badtrg[i]  Header event that has bad number
-             "e)hdrL1",  // cntr_nw3_badrvc[i]   Header event that has L1 timing
-             "f)hdrScl",  // cntr_nw3_badvet[i]  Header event that should not be header event
-             "g)dataTag", // cntr_nwn_badtrg[i]    Data event that has bad bad event number in data
-             "h)dataL1", // cntr_nwn_badrvc[i]     Data event that has bad L1 timing
-             "i)bbbb", // cntr_nwn_badbbb[i]     Data event from dummy buffer
-             "j)#wd",   // cntr_bad_nwd[i],       Data event that does not have expected #word
-             "k)ddsft", // cntr_bad_ddd[i],       Data event that does not have expected dddd in clock cycle
-             "l)ccodr"  // cntr_bad_odr[i],       Data event that has bad cc cycle
+             "a)dataOk",  // m_cntr_nwn[i],        Data event that has no problem
+             "b)hdrOk",   // m_cntr_nw3[i],        Header event that has no problem (except cc check)
+             "c)ccOk",    // m_cntr_good_odr[i]);  Data event that has good cc
+             "d)hdrTag",  // m_cntr_nw3_badtrg[i]  Header event that has bad number
+             "e)hdrL1",  // m_cntr_nw3_badrvc[i]   Header event that has L1 timing
+             "f)hdrScl",  // m_cntr_nw3_badvet[i]  Header event that should not be header event
+             "g)dataTag", // m_cntr_nwn_badtrg[i]    Data event that has bad bad event number in data
+             "h)dataL1", // m_cntr_nwn_badrvc[i]     Data event that has bad L1 timing
+             "i)bbbb", // m_cntr_nwn_badbbb[i]     Data event from dummy buffer
+             "j)#wd",   // m_cntr_bad_nwd[i],       Data event that does not have expected #word
+             "k)ddsft", // m_cntr_bad_ddd[i],       Data event that does not have expected dddd in clock cycle
+             "l)ccodr"  // m_cntr_bad_odr[i],       Data event that has bad cc cycle
             );
       printf("-%3s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s--\n",
              "---", "--------", "--------", "--------", "--------", "--------", "--------", "--------",
@@ -115,18 +88,18 @@ namespace Belle2 {
         if (m_ons[i]) {
           printf(" %3s | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d |\n",
                  moduleNames[i],
-                 cntr_nwn[i],
-                 cntr_nw3[i],
-                 cntr_good_odr[i],
-                 cntr_nw3_badtrg[i],
-                 cntr_nw3_badrvc[i],
-                 cntr_nw3_badvet[i],
-                 cntr_nwn_badtrg[i],
-                 cntr_nwn_badrvc[i],
-                 cntr_nwn_badbbb[i],
-                 cntr_bad_nwd[i],
-                 cntr_bad_ddd[i],
-                 cntr_bad_odr[i]
+                 m_cntr_nwn[i],
+                 m_cntr_nw3[i],
+                 m_cntr_good_odr[i],
+                 m_cntr_nw3_badtrg[i],
+                 m_cntr_nw3_badrvc[i],
+                 m_cntr_nw3_badvet[i],
+                 m_cntr_nwn_badtrg[i],
+                 m_cntr_nwn_badrvc[i],
+                 m_cntr_nwn_badbbb[i],
+                 m_cntr_bad_nwd[i],
+                 m_cntr_bad_ddd[i],
+                 m_cntr_bad_odr[i]
                 );
         }
       }
@@ -398,34 +371,31 @@ namespace Belle2 {
 
 
     //TODO is zero default value good for these arrays
-    int cntr_good_odr[50] = {};
-    int cntr_bad_odr[50] = {};
-    int cntr_bad_ddd[50] = {};
-    int cntr_bad_nwd[50] = {};
+    int m_cntr_good_odr[50] = {0};
+    int m_cntr_bad_odr[50] = {0};
+    int m_cntr_bad_ddd[50] = {0};
+    int m_cntr_bad_nwd[50] = {0};
 
-    int cntr_nw3[50] = {};
-    int cntr_nw3_badvet[50] = {};
-    int cntr_nw3_badtrg[50] = {};
-    int cntr_nw3_badrvc[50] = {};
+    int m_cntr_nw3[50] = {0};
+    int m_cntr_nw3_badvet[50] = {0};
+    int m_cntr_nw3_badtrg[50] = {0};
+    int m_cntr_nw3_badrvc[50] = {0};
 
-    int cntr_nwn[50] = {};
-    int cntr_nwn_badvet[50] = {};
-    int cntr_nwn_badtrg[50] = {};
-    int cntr_nwn_badrvc[50] = {};
+    int m_cntr_nwn[50] = {0};
+    int m_cntr_nwn_badvet[50] = {0};
+    int m_cntr_nwn_badtrg[50] = {0};
+    int m_cntr_nwn_badrvc[50] = {0};
 
-    int cntr_nwn_badbbb[50] = {};
-    int cntr_nwn_badddd[50] = {};
+    int m_cntr_nwn_badbbb[50] = {0};
+    int m_cntr_nwn_badddd[50] = {0};
 
-    int cntr_nwe_badnwd[50] = {};
+    int m_cntr_nwe_badnwd[50] = {0};
 
   protected :
     //! Event Meta Data
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
     std::vector<std::vector<int>> BitMap;
-    int LeafBitMap[320] = {};
-    char LeafNames[320][100] = {};
-
   };
 
 }

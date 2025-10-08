@@ -95,7 +95,7 @@ namespace Belle2 {
     cout << " bin width: " << getBinWidth() / Unit::ps << " ps" << endl;
     cout << " number of ASIC windows: " << getNumWindows() << endl;
     cout << " number of bits per sample: " << getSubBits() << endl;
-    cout << " synchonization time base: " << getSyncTimeBase() << " ns" << endl;
+    cout << " synchronization time base: " << getSyncTimeBase() << " ns" << endl;
     cout << " pile-up time: " << getPileupTime() << " ns" << endl;
     cout << " double hit resolution: " << getDoubleHitResolution() << " ns" << endl;
     cout << " r.m.s. of time jitter: " << getTimeJitter() / Unit::ps << " ps" << endl;

@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
-#include <ecl/dataobjects/ECLShower.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <string>
@@ -18,6 +17,7 @@
 
 namespace Belle2 {
   class RecoTrack;
+  class ECLShower;
 
   class ModuleParamList;
 

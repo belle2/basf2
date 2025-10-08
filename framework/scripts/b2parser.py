@@ -160,10 +160,12 @@ class B2Lexer(Lexer):
         Returns:
             sly.lex.Token
         """
+        # \cond false positive doxygen warning
         if "]" not in self.text[self.index:]:
             raise SyntaxError("Unmatched '[' in cut.")
         self.control_token_stack.append("BRACK")
         return t
+        # \endcond
 
     @_(r"\]")  # noqa: F821
     def RBRACK(self, t):
@@ -212,10 +214,12 @@ class B2Lexer(Lexer):
         Returns:
             sly.lex.Token
         """
+        # \cond false positive doxygen warning
         if ")" not in self.text[self.index:]:
             raise SyntaxError("Unmatched '('")
         self.control_token_stack.append("PAREN")
         return t
+        # \endcond
 
     @_(r"\)")  # noqa: F821
     def RPAREN(self, t):
@@ -334,6 +338,7 @@ class B2Lexer(Lexer):
         # Take care of special infinity and nan values.
         if t.type == "DOUBLE":
             t.value = float(t.value)
+        # \cond false positive doxygen warning
         if t.type == "IDENTIFIER":
             try:
                 if self.text[self.index] == "(":
@@ -345,6 +350,7 @@ class B2Lexer(Lexer):
             except IndexError:
                 pass
         return t
+        # \endcond
 
 
 def parser_class_decorator(cls, parser_type):

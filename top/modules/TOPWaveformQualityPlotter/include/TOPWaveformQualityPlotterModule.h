@@ -77,7 +77,7 @@ namespace Belle2 {
     TH1F* m_asic = 0;              /**< plot of ASIC number for debugging */
     TH1F* m_carrier = 0;           /**< plot of carrier IDs for debugging */
     TH1F* m_asic_ch = 0;           /**< plot of ASIC channel ID debugging */
-    TH1F* m_errorFlag = 0;         /**< plot of error flag (not impemented) */
+    TH1F* m_errorFlag = 0;         /**< plot of error flag (not implemented) */
     TH1F* m_asic_win = 0;          /**< plot of ASIC storage window */
     TH1F* m_entries = 0;           /**< plot of waveform size */
     TH1F* m_moduleID = 0;          /**< plot of module ID */

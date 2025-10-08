@@ -279,17 +279,17 @@ A tool has been developed which analyzes the array of MC particles and determine
 
 A total of 825 :math:`B^+` decay modes have been defined:
 
-  * The first 80 numbers are semi-leptonic decays (:math:`B^+ \to h l^+ \nu_l`), e.g.
+* The first 80 numbers are semi-leptonic decays (:math:`B^+ \to h l^+ \nu_l`), e.g.
   
-     * 1001: :math:`B^+ \to \bar{D^{*0}} e^+ \nu_e`
-     * 1002: :math:`B^+ \to \bar{D^0} e^+ \nu_e`
-     * 1003: :math:`B^+ \to \bar{D_1^0} e^+ \nu_e`
-  * The numbers 1085 to 1092 are radiative decays.
-  * There are 17 :math:`B^+ \to X l^+ l^-` decay modes.
-  * The numbers 1113 to 1608 are hadronic charmless decays.
-  * Then there are 70 charmonium decays with :math:`J/\psi`, :math:`\Psi(2S)`, :math:`\eta_c`, etc.
-  * This is followed by decays involving two or one charm meson.
-  * The last 17 decay modes involve baryons.
+  * 1001: :math:`B^+ \to \bar{D^{*0}} e^+ \nu_e`
+  * 1002: :math:`B^+ \to \bar{D^0} e^+ \nu_e`
+  * 1003: :math:`B^+ \to \bar{D_1^0} e^+ \nu_e`
+* The numbers 1085 to 1092 are radiative decays.
+* There are 17 :math:`B^+ \to X l^+ l^-` decay modes.
+* The numbers 1113 to 1608 are hadronic charmless decays.
+* Then there are 70 charmonium decays with :math:`J/\psi`, :math:`\Psi(2S)`, :math:`\eta_c`, etc.
+* This is followed by decays involving two or one charm meson.
+* The last 17 decay modes involve baryons.
 
 The same number of :math:`B^-` decay modes have been implemented. They have negative tags.
 
@@ -371,7 +371,7 @@ Track matching
 
 A reconstructed track can be:
 
-1) **matched**, the reconstructed track is matched to a true track and it is its best description.
+1) **matched**, the reconstructed track is matched to a true track, and it is its best description.
 2) **clone**, the reconstructed track is matched to a true track, but there is another reconstructed track that better describes the true track (this second reconstructed track will therefore be matched)
 3) **fake**, the reconstructed track is not matched to any true track. It can be a beam-background track or a track built out of noise hits in the detector, or a mixture of these two.
 
@@ -393,21 +393,26 @@ tracking-level     analysis-level
  ghost             fake
 =================  ===============
 
----------------
-Photon matching
----------------
+--------------------------
+MCMatching of ECL clusters
+--------------------------
 
-To understand the method of photon matching, a basic introduction to the ECL objects used during the reconstruction of simulated data is required.
+To understand the method of ECL cluster matching, a basic introduction to the ECL objects used during the reconstruction of simulated data is required.
 
-Starting with ``ECLSimHits`` from the GEANT4 simulation, ``ECLDigits`` are created and then calibrated to make ``ECLCalDigit`` objects which store the energy and
-time of a single ECL crystal. The ``ECLCalDigits`` are then grouped to make ``ECLShower`` objects. The shower objects are corrected and calibrated, and used to
-calculate shower-shape quantities and certain particle likelihoods (these calculations are derived using information stored in subsets of the ``ECLCalDigits`` that form the
-shower). Following this, track matching is performed between reconstructed tracks and shower objects. The last step is the conversion of the ``ECLShower`` object into a mdst
-``ECLCluster`` object which is the highest level ECL reconstruction object.
+From the ``ECLSimHits`` taken from the GEANT4 simulation, ``ECLDigits`` are created and then calibrated to make ``ECLCalDigit`` objects which store the energy and
+time of a single ECL crystal. The ``ECLCalDigits`` are then grouped to make ``ECLShower`` objects. 
+This grouping is represented with weighted relations between an ``ECLShower`` and a subset of ``ECLCalDigits``.
+The energies of the shower objects are corrected such that, for simulated photons, the peak of the reconstructed energy distribution coincides with the generated photon energy. 
+The shower objects are also used to calculate shower-shape quantities and certain particle likelihoods 
+(these calculations are derived using information stored in subsets of the ``ECLCalDigits`` that form the shower). 
+Following this, track matching is performed between reconstructed tracks and shower objects. 
+The last step is the conversion of the ``ECLShower`` object into the mdst ``ECLCluster`` object which is the highest level ECL reconstruction object.
 
-Each ``ECLShower`` object (and by extension each ``ECLCluster`` object) holds weighted **relations** to a maximum of twenty-one ``ECLCalDigits``, with the weights
+Each ``ECLShower`` object (and by extension each ``ECLCluster`` object) with a photon hypothesis holds weighted **relations** to a maximum of twenty-one ``ECLCalDigits``, with the weights
 calculated using the fraction of energy each ``ECLCalDigit`` contributes to each shower. In addition to this, the ``ECLCalDigit`` can itself have a weighted relation to none, one or many ``MCParticles``. This is calculated
 using the total energy deposited by the ``MCParticle`` in each ``ECLCalDigit``. A diagram that visualises these relations is given in :numref:`photon_matching`.
+Please note, that ``ECLShower`` with a neutral hadron hypothesis can have more than twenty-one ``ECLCalDigits`` related to them and are neither corrected nor calibrated.
+Besides that, the MCMatching works in the same way.
 
 .. _photon_matching:
 
@@ -419,15 +424,15 @@ using the total energy deposited by the ``MCParticle`` in each ``ECLCalDigit``. 
 
 The overall weight for the relation between an ``ECLCluster`` object and a ``MCParticle`` is then given by the product of the weight between the corresponding ``ECLShower`` and ``ECLCalDigit`` and the weight
 between the ``ECLCalDigit`` and ``MCParticle``. For example, the weight of the relation between the first ``ECLCluster`` in :numref:`photon_matching` and MCParticle :math:`\gamma_2` is given by :math:`1.0\times 0.8=0.8` GeV.
+When then a neutral ``Particle`` is reconstructed from a ``ECLCluster`` (so there is no reconstructed track matched to the cluster), it will be MCMatched in the modular analysis if the following conditions are true:
 
-An ``ECLCluster`` that is not matched to any track is reconstructed as a photon ``Particle``, and relations between the photon ``Particle`` and ``MCParticles`` are only set at the user-analysis level if the following conditions
-are met:
+1) :math:`\mathrm{weight}/{E_\mathrm{rec}} > 0.2`
+2) :math:`\mathrm{weight}/{E_\mathrm{true}} > 0.3`
 
-1) :math:`\mathrm{weight}/{E_\mathrm{rec}} > 0.2` GeV
-2) :math:`\mathrm{weight}/{E_\mathrm{true}} > 0.3` GeV
-
-where the *weight* here refers to the relation with the largest weight. This means that if multiple relations between a given ``Particle`` and ``MCParticles`` exist, only the relation with the largest weight will be used, and the
-corresponding ``MCParticle`` with this relation will be used to decide the photon matching.
+where :math:`{E_\mathrm{rec}}` is the reconstructed Energy of the ``ECLCluster``, and :math:`{E_\mathrm{true}}` is the generated ``MCParticle`` energy. 
+The *weight* here refers to the relation with the largest weight.
+This means that if multiple relations between a given ``ECLCluster`` and ``MCParticles`` exist, only the relation with the largest weight will be used, and the
+corresponding ``MCParticle`` with this relation will be used to decide the MCMatching.
 
 A photon match is made if `mcErrors` == 0 and the ``MCParticle`` has a `mcPDG` == 22. If the chosen ``MCParticle`` does not correspond to a true photon, then the `mcErrors` :math:`\neq` 0 and no correct match will be made (even if
 another one of the smaller-weighted relations for the particle is correct).

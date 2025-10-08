@@ -28,7 +28,7 @@ namespace Belle2 {
 
     /**
      * Full constructor
-     * @param lambdaFirst wavelenght of the first data point [nm]
+     * @param lambdaFirst wavelength of the first data point [nm]
      * @param lambdaStep wavelength step [nm]
      * @param CE collection efficiency
      * @param qe quantum efficiency data points
@@ -42,7 +42,7 @@ namespace Belle2 {
 
     /**
      * Sets the object
-     * @param lambdaFirst wavelenght of the first data point [nm]
+     * @param lambdaFirst wavelength of the first data point [nm]
      * @param lambdaStep wavelength step [nm]
      * @param CE collection efficiency
      * @param qe quantum efficiency data points
@@ -105,13 +105,13 @@ namespace Belle2 {
     double getEfficiency(double lambda) const {return getQE(lambda) * m_CE;}
 
     /**
-     * Returns wavelenght of the first data point
+     * Returns wavelength of the first data point
      * @return wavelength in [nm]
      */
     double getLambdaFirst() const {return m_lambdaFirst;}
 
     /**
-     * Returns wavelenght of the last data point
+     * Returns wavelength of the last data point
      * @return wavelength in [nm]
      */
     double getLambdaLast() const
@@ -120,7 +120,7 @@ namespace Belle2 {
     }
 
     /**
-     * Returns wavelenght step
+     * Returns wavelength step
      * @return wavelength step in [nm]
      */
     double getLambdaStep() const {return m_lambdaStep;}

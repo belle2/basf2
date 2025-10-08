@@ -111,7 +111,7 @@ namespace Belle2 {
       }
       ranges.push_back(m_times.end());
 
-      // loop over splitted regions
+      // loop over split regions
       for (unsigned k = 0; k < ranges.size() - 1; k++) {
 
         // temporary containers
@@ -238,7 +238,7 @@ namespace Belle2 {
         }
         for (const auto& x : relatedMCParticles) digit->addRelationTo(x.first, x.second);
 
-      } // end loop over splitted regions
+      } // end loop over split regions
     }
 
 

@@ -35,7 +35,7 @@ namespace Belle2 {
      * Useful constructor (new xml file version)
      * @param numWindows number of ASIC windows per waveform
      * @param subBits number of bits per sample
-     * @param syncTimeBase synchonization time base (time width of c_syncWindows)
+     * @param syncTimeBase synchronization time base (time width of c_syncWindows)
      * @param numofBunches number of bunches per syncTimeBase
      * @param offset time offset
      * @param pileupTime pile-up time
@@ -127,13 +127,13 @@ namespace Belle2 {
     unsigned getSubBits() const {return m_subBits;}
 
     /**
-     * Returns synchonization time base (time width of c_syncWindows)
-     * @return synchonization time base
+     * Returns synchronization time base (time width of c_syncWindows)
+     * @return synchronization time base
      */
     double getSyncTimeBase() const {return m_syncTimeBase;}
 
     /**
-     * Returns number of bunches in the synchonization time base
+     * Returns number of bunches in the synchronization time base
      * @return number of bunches
      */
     unsigned getNumofBunches() const {return m_numofBunches;}

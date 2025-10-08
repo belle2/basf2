@@ -9,8 +9,10 @@
 #include <tracking/ckf/cdc/findlets/CDCCKFResultStorer.h>
 
 #include <tracking/ckf/general/utilities/SearchDirection.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/dataobjects/RecoTrack.h>
+
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 #include <framework/core/ModuleParamList.h>
 

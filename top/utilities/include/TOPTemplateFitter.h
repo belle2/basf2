@@ -21,7 +21,7 @@ namespace Belle2 {
 
     /**
      * @brief Class to perform template fit on TOP waveform data
-     * Minimzation method is described here http://wwwa1.kph.uni-mainz.de/Vorlesungen/SS11/Statistik/
+     * Minimization method is described here http://wwwa1.kph.uni-mainz.de/Vorlesungen/SS11/Statistik/
      */
     class TOPTemplateFitter {
 
@@ -165,7 +165,7 @@ namespace Belle2 {
       static void setUseParabola(bool use) {s_useParabola = use;}
 
       /**
-       * @brief Intializes the template fit using default values
+       * @brief Initializes the template fit using default values
        */
       static void InitializeTemplateFit();
 

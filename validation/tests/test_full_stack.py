@@ -21,21 +21,11 @@ import traceback
 
 # ours
 from b2test_utils import is_ci
-import validationserver
 import validationpath
 from validationtestutil import check_execute
 
 # url of the local validation webserver
 validation_url = None  # will be set at runtime
-
-
-def start_webserver():
-    """
-    Start the validation server process, this will not
-    return. Therefore this function must be started within
-    a new subprocess
-    """
-    validationserver.run_server()
 
 
 def http_post(command, json_args, retries=10, delay=1.0):

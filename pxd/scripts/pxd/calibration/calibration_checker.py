@@ -58,10 +58,12 @@ class CalibrationCheckerBase(ABC):
             for objType in self.condition_checkers.keys():
                 if objType == checker.objType:
                     self.condition_checkers[objType] = checker
+        # \cond false positive doxygen warning
         if self.valid:
             checker.tfile.cd()
             print(f"root file path: {checker.tfile}")
             self.define_graphs()
+        # \endcond
 
     @property
     def valid(self):
@@ -96,16 +98,20 @@ class CalibrationCheckerBase(ABC):
         """
         function to be executed at the beginning of a run
         """
+        # \cond false positive doxygen warning
         if self.valid:
             self.fill_graphs()
+        # \endcond
 
     def terminate(self):
         """
         Execute when terminating a basf2 module.
         All required TGraphs should be ready at this stage.
         """
+        # \cond false positive doxygen warning
         if self.valid:
             self.draw_plots()
+        # \endcond
 
 
 class PXDHotPixelMaskCalibrationChecker(CalibrationCheckerBase):

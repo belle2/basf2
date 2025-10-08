@@ -701,23 +701,18 @@ class CombinedSkim(BaseSkim):
         passes_flag = path.add_module("VariableToReturnValue", variable=variable)
         passes_flag.if_value(">0", passes_flag_path, b2.AfterConditionPath.CONTINUE)
 
-        # There is no requirement that a combinedSkim with single MDST output is
-        # registered so set the skimDecayMode to None and default file name to
-        # the skim name if not.
+        # Check if CombinedSkimName is registered and throw error if not
         if self.name not in Registry.names:
-            b2.B2WARNING("Unrecognised skim name \"" + self.name + "\" in CombinedSkim with single " +
-                         "mdst output. Unless you are testing something privately, please add your skim " +
-                         "to the list in `skim/scripts/skim/registry.py`")
-            default_name = self.name
-            skim_code = None
-        else:
-            default_name = self.code
-            skim_code = self.code
+            b2.B2ERROR(f"Unrecognised skim name \"{self.name}\" in CombinedSkim with single "
+                       "mdst output. Please specify a valid name registered in `skim/scripts/skim/registry.py` "
+                       "by setting the CombinedSkimName argument of CombinedSkim, or use \"f_custom\" if you are "
+                       "running a custom skim combination.")
+            raise LookupError(self.name)
 
-        filename = kwargs.get("filename", kwargs.get("OutputFileName", default_name))
+        filename = kwargs.get("filename", kwargs.get("OutputFileName", self.code))
 
         if filename is None:
-            filename = default_name
+            filename = self.code
 
         if not filename.endswith(".mdst.root"):
             filename += ".mdst.root"
@@ -727,9 +722,8 @@ class CombinedSkim(BaseSkim):
         if "OutputFileName" in kwargs.keys():
             del kwargs["OutputFileName"]
 
-        if skim_code is not None:
-            kwargs.setdefault("dataDescription", {})
-            kwargs["dataDescription"].setdefault("skimDecayMode", skim_code)
+        kwargs.setdefault("dataDescription", {})
+        kwargs["dataDescription"].setdefault("skimDecayMode", self.code)
 
         try:
             kwargs["additionalBranches"] += ["EventExtraInfo"]

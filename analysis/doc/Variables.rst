@@ -760,7 +760,7 @@ How to use my variable at grid?
 
 * Prepare the environment with the ``b2analysis-create`` tool.
 
->>> b2analysis-create myanalysis <current central release, e.g. release-04-00-00>
+>>> b2analysis-create myanalysis <current central release, e.g. light-2509-fornax>
 >>> cd myanalysis
 >>> b2setup
 

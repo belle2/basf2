@@ -150,7 +150,9 @@ run-tests:
         done
       fi
     - echo "stage stop time -> $(date +%H:%M:%S)"
-    - apt-get install -y firefox-esr geckodriver
+    - add-apt-repository -y ppa:mozillateam/ppa
+    - apt-get update
+    - apt-get install -y firefox geckodriver
 
 build-clang:
   stage: build-clang

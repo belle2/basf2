@@ -74,14 +74,14 @@ def check_for_plotting(revs, tmp_folder):
     # will be used to check on the progress
     prog_key = res.json()["progress_key"]
 
-    done = False
-    wait_time = 0.1  # in seconds
-    max_wait_time = 3
-    summed_wait_time = 0
-
     # check the plot status with the webserver and only exit after a timeout
     # or if the plot combination has been created
-    while not done:
+
+    # 10 retries × 1 s delay per http_post -> 10 s worst‑case
+    wait_time = 1.0  # in seconds
+    max_wait_time = 15
+    start = time.time()
+    while True:
         res = http_post("check_comparison_status", {"input": prog_key})
         if not res:
             return False
@@ -92,10 +92,9 @@ def check_for_plotting(revs, tmp_folder):
                 break
 
         time.sleep(wait_time)
-        summed_wait_time += wait_time
-        if summed_wait_time > max_wait_time:
+        if time.time() - start > max_wait_time:
             print(
-                f"Waited for {summed_wait_time} seconds for the requested plots to complete and nothing happened"
+                f"Waited for {max_wait_time} seconds for the requested plots to complete and nothing happened"
             )
             return False
 

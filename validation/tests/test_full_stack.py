@@ -9,6 +9,7 @@
 ##########################################################################
 
 # standard
+import socket
 import sys
 import subprocess
 import tempfile
@@ -25,7 +26,7 @@ import validationpath
 from validationtestutil import check_execute
 
 # url of the local validation webserver
-validation_url = "http://localhost:8000/"
+validation_url = None  # will be set at runtime
 
 
 def start_webserver():
@@ -37,18 +38,33 @@ def start_webserver():
     validationserver.run_server()
 
 
-def http_post(command, json_args):
+def http_post(command, json_args, retries=10, delay=1.0):
     call_url = validation_url + command
     print(f"Posting {json_args} to {command}")
-    r = requests.post(call_url, json=json_args)
-    if not r.ok:
-        print(
-            f"REST call {call_url} with arguments {json_args} failed"
-        )
-        print(str(r))
-        return None
+    for i in range(retries):
+        try:
+            r = requests.post(call_url, json=json_args, timeout=5)
+            if r.ok:
+                return r
+        except requests.exceptions.ConnectionError:
+            print(f"Server not reachable yet (attempt {i+1}/{retries})")
+            time.sleep(delay)
+    print(f"Failed to reach server at {call_url}")
+    return None
 
-    return r
+
+def wait_for_port_any(port: int, timeout: float = 30.0):
+    """Wait until something listens on either 127.0.0.1 or ::1."""
+    start = time.time()
+    while time.time() - start < timeout:
+        for host in ("127.0.0.1", "::1"):
+            try:
+                with socket.create_connection((host, port), timeout=1):
+                    return host  # returns the one that worked
+            except OSError:
+                pass
+        time.sleep(0.1)
+    return None
 
 
 def check_for_plotting(revs, tmp_folder):
@@ -191,10 +207,26 @@ def main():
         try:
             # start webserver to serve json output files, plots and
             # interactive website
-            server_process = subprocess.Popen(["b2validation-server"])
+            # try IPv6 first; if that fails, fall back to IPv4.
+            try:
+                server_process = subprocess.Popen(["b2validation-server", "--ip", "::"])
+            except OSError:
+                server_process = subprocess.Popen(["b2validation-server", "--ip", "127.0.0.1"])
 
-            # wait for one second for the server to start
-            time.sleep(2)
+            # wait for up to 30 seconds for the server to start
+            active_host = wait_for_port_any(8000, timeout=30)
+            if not active_host:
+                print("Validation server did not start within 30 s")
+                server_process.terminate()
+                sys.exit(1)
+
+            # build URL from the address that really worked
+            global validation_url
+            if ":" in active_host:
+                validation_url = f"http://[{active_host}]:8000/"
+            else:
+                validation_url = f"http://{active_host}:8000/"
+
             # check the content of the webserver if not running in GitLab pipeline
             if not is_ci():
                 success = success and check_for_content(

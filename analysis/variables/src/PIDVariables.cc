@@ -1168,12 +1168,13 @@ namespace Belle2 {
                       "deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
     REGISTER_VARIABLE("binaryPID(pdgCode1, pdgCode2)", binaryPID,
                       "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components");
-    REGISTER_METAVARIABLE("pidChargedBDTScore(pdgCodeHyp, detector)", pidChargedBDTScore,
-                          "Returns the charged Pid BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses. The second argument specifies which BDT training to use: based on 'ALL' PID detectors (NB: 'SVD' is currently excluded), or 'ECL' only. The choice depends on the ChargedPidMVAMulticlassModule's configuration.
-                          .. warning:: Note that the multiclass training was done for four classes : electrons, muons, pions
-                          and kaons. As protons were not included in the training there can be large proton to electron misidentification rates. Please
-                          investigate if this is an issue in your analysis.",
-                            Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("pidChargedBDTScore(pdgCodeHyp, detector)", pidChargedBDTScore, R"DOC(
+Returns the charged Pid BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses. The second argument specifies which BDT training to use: based on 'ALL' PID detectors (NB: 'SVD' is currently excluded), or 'ECL' only. The choice depends on the ChargedPidMVAMulticlassModule's configuration.
+                          
+.. warning:: Note that the multiclass training was done for four classes: electrons, muons, pions and kaons.
+             As protons were not included in the training there can be large proton to electron misidentification rates.
+             Please investigate if this is an issue in your analysis.)DOC",
+                          Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pidPairChargedBDTScore(pdgCodeHyp, pdgCodeTest, detector)", pidPairChargedBDTScore,
                           "Returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis. The second argument specifies which BDT training to use: based on 'ALL' PID detectors (NB: 'SVD' is currently excluded), or 'ECL' only. The choice depends on the ChargedPidMVAModule's configuration.",
                           Manager::VariableDataType::c_double);

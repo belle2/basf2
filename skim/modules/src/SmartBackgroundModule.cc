@@ -75,6 +75,7 @@ void SmartBackgroundModule::initialize()
   m_paramsMapping = config->getParameterMapping();
   m_skimnamesMapping = config->getSkimnamesMapping();
   m_minProb = 1 / config->getMaxWeight();
+  m_minLogProb = TMath::Log(m_minProb);
 
   // Check parameters
   for (int skimCode : m_skimCodes) {
@@ -115,13 +116,13 @@ void SmartBackgroundModule::initialize()
 float SmartBackgroundModule::activation(float logit, float a, float b)
 {
   // Clipped exponential function
-  float e = TMath::Exp(a * (logit - b));
-  if (e > 1.0) {
-    e = 1.0;
-  } else if (e < m_minProb) {
-    e = m_minProb;
+  float e = a * (logit - b);
+  if (e > 0.0) {
+    return 1.0;
+  } else if (e < m_minLogProb) {
+    return m_minProb;
   }
-  return e;
+  return TMath::Exp(e);
 }
 
 void SmartBackgroundModule::event()

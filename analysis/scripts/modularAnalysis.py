@@ -3419,6 +3419,11 @@ def writePi0EtaVeto(
     if requireSoftPhotonIsInROE:
         Pi0SoftPhotonCut += ' and isInRestOfEvent==1'
 
+    # register beambackground MVA for MC16rd
+    if 'MC16rd' in mode:
+        import stdPhotons
+        stdPhotons.stdPhotons(listtype='all', beamBackgroundMVAWeight="MC16rd", fakePhotonMVAWeight="MC16rd", path=roe_path)
+
     # define the particleList name for soft photon
     pi0soft = f'gamma:Pi0Soft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     # fill the particleList for soft photon with energy, timing and clusterNHits cuts

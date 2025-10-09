@@ -150,6 +150,8 @@ run-tests:
         done
       fi
     - echo "stage stop time -> $(date +%H:%M:%S)"
+    - apt-get update
+    - apt-get install -y software-properties-common
     - add-apt-repository -y ppa:mozillateam/ppa
     - apt-get update
     - apt-get install -y firefox geckodriver

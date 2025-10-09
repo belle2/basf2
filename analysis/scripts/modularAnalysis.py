@@ -74,28 +74,6 @@ def inputMdst(filename, path, environmentType='default', skipNEvents=0, entrySeq
         parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
     """
 
-    # FIXME remove this check of "filename" at release-07
-    if filename == 'default':
-        B2FATAL("""
-We have simplified the arguments to inputMdst! If you are running on Belle II
-data or MC, you don't have to use "default" any more.
-Please replace:
-   inputMdst("default", "/your/input/file.root", path=mypath)
-With:
-   inputMdst("/your/input/file.root", path=mypath)
-                """)
-    elif filename == "Belle":
-        B2FATAL("""
-We have reordered the arguments to inputMdst! If you are running on Belle 1
-data or MC, you need to specify the 'environmentType'.
-Please replace:
-   inputMdst("Belle", "/your/input/file.root", path=mypath)
-With:
-   inputMdst("/your/input/file.root", path=mypath, environmentType='Belle')
-                """)
-    elif filename in [f"MC{i}" for i in range(5, 10)]:
-        B2FATAL(f"We no longer support the MC version {filename}. Sorry.")
-
     if entrySequence is not None:
         entrySequence = [entrySequence]
 
@@ -129,28 +107,6 @@ def inputMdstList(
         parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
         useB2BIIDBCache (bool): Loading of local KEKCC database (only to be deactivated in very special cases)
     """
-
-    # FIXME remove this check of "filename" at release-07
-    if filelist == 'default':
-        B2FATAL("""
-We have simplified the arguments to inputMdstList! If you are running on
-Belle II data or MC, you don't have to use "default" any more.
-Please replace:
-   inputMdstList("default", list_of_your_files, path=mypath)
-With:
-   inputMdstList(list_of_your_files, path=mypath)
-                """)
-    elif filelist == "Belle":
-        B2FATAL("""
-We have reordered the arguments to inputMdstList! If you are running on
-Belle 1 data or MC, you need to specify the 'environmentType'.
-Please replace:
-   inputMdstList("Belle", list_of_your_files, path=mypath)
-With:
-   inputMdstList(list_of_your_files, path=mypath, environmentType='Belle')
-                """)
-    elif filelist in [f"MC{i}" for i in range(5, 10)]:
-        B2FATAL(f"We no longer support the MC version {filelist}. Sorry.")
 
     roinput = register_module('RootInput')
     roinput.param('inputFileNames', filelist)

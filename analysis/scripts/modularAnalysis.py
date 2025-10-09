@@ -3421,12 +3421,12 @@ def writePi0EtaVeto(
 
     # define the particleList name for soft photon
     pi0soft = f'gamma:Pi0Soft{suffix}' + ListName + '_' + particleList.replace(':', '_')
+    # fill the particleList for soft photon with energy, timing and clusterNHits cuts
+    fillParticleList(pi0soft, Pi0SoftPhotonCut, path=roe_path)
     # register beambackground MVA for MC16rd
     if 'MC16rd' in mode:
         getBeamBackgroundProbability(pi0soft, weight="MC16rd", path=roe_path)
         getFakePhotonProbability(pi0soft, weight="MC16rd", path=roe_path)
-    # fill the particleList for soft photon with energy, timing and clusterNHits cuts
-    fillParticleList(pi0soft, Pi0SoftPhotonCut, path=roe_path)
     # reconstruct pi0
     reconstructDecay('pi0:Pi0Veto' + ListName + suffix + f' -> {hardParticle}:HardPhoton{suffix} ' + pi0soft, pi0Selection,
                      allowChargeViolation=True, path=roe_path)

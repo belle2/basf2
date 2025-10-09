@@ -104,7 +104,7 @@ The requirements for models executed in the ONNX mva method are:
 
 - there has to be a **single input tensor** of shape ``(?, n_variables)``
 - if there are multiple **output tensors**, one has to be called "output" or the name configured via ``m_outputName`` in the ``ONNXOptions``.
-- **binary classifiers** (and regression models) are supported for outputs of either shape ``(?, 1)`` or ``(?, 2)``. If there are 2 outputs, the second one (index 1) will be taken.
+- **binary classifiers** (and regression models) are supported for outputs of either shape ``(?, 1)`` or ``(?, 2)``. If there are 2 outputs, the second one (index 1) will be taken by default (can be configured via the `signal_class` general option).
 - **multi-class classifiers** can have an arbitrary number of outputs (shape ``(?, nClasses)``) where ``m_nClasses`` has to be configured in the general options.
 - the dimension labelled ``?`` either has to be dynamic or 1
 

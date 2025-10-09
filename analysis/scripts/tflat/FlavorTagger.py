@@ -19,21 +19,7 @@ import modularAnalysis as ma
 from stdPhotons import stdPhotons
 from vertex import kFit
 from tflat.config import config
-
-
-def get_variables(particle_list, ranked_variable, variables=None, particleNumber=1):
-    """ creates variable name pattern requested by the basf2 variable getVariableByRank()
-    :param particle_list:
-    :param ranked_variable:
-    :param variables:
-    :param particleNumber:
-    :return:
-    """
-    var_list = []
-    for i_num in range(1, particleNumber + 1):
-        for var in variables:
-            var_list.append('getVariableByRank(' + particle_list + ', ' + ranked_variable + ', ' + var + ', ' + str(i_num) + ')')
-    return var_list
+from tflat.utils import get_variables
 
 
 def fill_particle_lists(maskName='TFLATDefaultMask', path=None):

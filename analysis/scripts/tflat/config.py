@@ -14,7 +14,7 @@ config = {  # ROE Mask
         maskName,
         'thetaInCDCAcceptance and p<infinity and p >= 0 and dr<1 and abs(dz)<3',
         'thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.06 and clusterReg==2] or \
-                    [E>0.06 and clusterReg==3]]'),
+                    [E>0.06 and clusterReg==3]] and abs(clusterTiming) < 200'),
 }
 
 config.update({  # Input lists

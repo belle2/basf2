@@ -23,8 +23,8 @@ an event and, if it is kept, weighting it with the inverse neural network output
 Usage
 ^^^^^
 
-To employ this method, we recommend using the :py:func:`skim.smartbkg.add_smartbkg_filtering` convenience function 
-from ``skim.smartbkg``. It should be placed after the event generator but before simulation and reconstruction. 
+To employ this method, we recommend using the :py:func:`skim.smartbkg.add_smartbkg_filtering` convenience function. 
+It should be placed after the event generator but before simulation and reconstruction. 
 As mandatory input it requires the skim object you are running (works with any skim derived from :py:class:`skim.core.BaseSkim`,
 including :py:class:`skim.core.CombinedSkim` , as long as the used skims are known to the trained model, see below). 
 It also requires information about the background type produced (uubar, ddbar, ssbar, ccbar, charged, mixed, taupair). 
@@ -61,7 +61,7 @@ The event weights for the skim (or for each skim separately if you use a :py:cla
 event extra info as ``weight_<SkimName>``. If an event is not sampled for a particular skim, the corresponding 
 weight is set to 0. If an event is sampled for none of the provided skims, it is filtered out to an empty path.
 
-We currently provide a pre-trained model via the global tag ??? that is trained on 51 skims. The supported skim codes are 
+We currently provide a pre-trained model via the conditions database that is trained on 51 skims. The supported skim codes are 
 ``11180500``, ``11180600``, ``11640100``, ``12160100``, ``12160200``, ``12160300``, ``12160400``, ``13160200``, ``13160300``, 
 ``14120300``, ``14120600``, ``14121100``, ``14140100``, ``14140101``, ``14140102``, ``14140200``, ``14141000``, ``14141001``, 
 ``14141002``, ``15410300``, ``15420100``, ``15440100``, ``16460200``, ``17230100``, ``17230200``, ``17230400``, ``17230500``, 

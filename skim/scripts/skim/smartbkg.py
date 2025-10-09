@@ -18,9 +18,10 @@ from skim.core import BaseSkim, CombinedSkim
 def add_smartbkg_filtering(
         skim,
         path,
-        payload="SmartBKGWeights.onnx",
         empty_path=None,
         debug_mode=False,
+        payload_weights="SmartBackgroundWeights_default",
+        payload_config="SmartBackgroundConfig_default",
         event_type=None,
         activation_params=None):
     """
@@ -37,10 +38,11 @@ def add_smartbkg_filtering(
         Parameters:
             skim (skim.core.BaseSkim or skim.core.CombinedSkim): instance of the used skim
             path (basf2.Path): main path with generator modules, used for pass events
-            payload (str): name of the payload storing neural network weights in ONNX format
             empty_path (basf2.Path or None): path rejected events are given to (new empty path if None)
             debug_mode (bool): enables debug mode (events are never rejected, instead the neural network prediction
                                is written to the event extra info as 'SmartBKG_Prediction_<SkimName>')
+            payload_weights (str): name of the payload storing neural network weights in ONNX format
+            payload_config (str): name of the payload storing the SmartBackgroundConfig object
             event_type (str or None): type of events thar are generated, allowed values are
                                       'charged', 'mixed', 'uubar', 'ddbar', 'ssbar', 'ccbar', 'taupair';
                                       if None, automatially determined from the event extra info
@@ -59,7 +61,8 @@ def add_smartbkg_filtering(
                    " CombinedSkim or BaseSkim, received " + str(type(skim)))
     sbkg.param("skimCodes", skim_codes)
     sbkg.param("debugMode", debug_mode)
-    sbkg.param("payload", payload)
+    sbkg.param("payloadWeights", payload_weights)
+    sbkg.param("payloadConfig", payload_config)
     if event_type is not None:
         sbkg.param("overrideEventType", True)
         sbkg.param("eventType", event_type)

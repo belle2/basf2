@@ -87,9 +87,14 @@ namespace Belle2 {
     std::string m_eventType;
 
     /**
-     * Payload name
+     * Payload name (weights)
      */
-    std::string m_payload;
+    std::string m_payloadWeights;
+
+    /**
+     * Payload name (config)
+     */
+    std::string m_payloadConfig;
 
     /**
      * Activation function override parameters (module parameter)

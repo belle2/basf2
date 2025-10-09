@@ -51,13 +51,16 @@ SmartBackgroundModule::SmartBackgroundModule() : Module()
   addParam("skimCodes", m_skimCodes, "Skim LFN codes");
   addParam("overrideEventType", m_overrideEventType,
            "Override automatically determined event type", false);
-  addParam("eventType", m_eventType, "Event type (charged, mixed, uubar, ccbar, ddbar, ssbar, taupair)",
+  addParam("eventType", m_eventType,
+           "Event type (charged, mixed, uubar, ccbar, ddbar, ssbar, taupair; or 'unset' for automatic determination)",
            std::string("unset"));
-  addParam("payload", m_payload, "Name of payload storing neural network weights in ONNX format",
-           std::string("SmartBKGWeights.onnx"));
+  addParam("payloadWeights", m_payloadWeights, "Name of payload storing neural network weights in ONNX format",
+           std::string("SmartBackgroundWeights_default"));
+  addParam("payloadConfig", m_payloadConfig, "Name of payload storing SmartBackgroundConfig object",
+           std::string("SmartBackgroundConfig_default"));
   addParam("debugMode", m_debugMode,
-           "Debug mode execution (in debug mode, always returns 1 and NN predictions are saved to the event extra info "
-           "as 'SmartBKG_Prediction')", false);
+           "Debug mode execution (in debug mode, always returns 1 and neural network predictions are saved to the event extra info "
+           "as 'SmartBKG_Prediction_<SkimName>')", false);
   addParam("overrideActivation", m_activationOverride, "Override parameters (a, b) of the activation function (clipped exponential)",
            false);
   addParam("activationOverrideParams", m_activationOverrideParams,
@@ -68,8 +71,12 @@ SmartBackgroundModule::SmartBackgroundModule() : Module()
 void SmartBackgroundModule::initialize()
 {
 
-  //Load config from payload
-  DBObjPtr<SmartBackgroundConfig> config("SmartBackgroundConfig", true);
+  // Load config from payload
+  DBObjPtr<SmartBackgroundConfig> config(m_payloadConfig, true);
+  // Prevent segfault if config not found
+  if (!config.isValid()) {
+    B2FATAL("SmartBkg: Specified config payload '" << m_payloadConfig << "' is invalid.");
+  }
   m_pdgMapping = config->getPdgMapping();
   m_skimcodesMapping = config->getSkimcodesMapping();
   m_paramsMapping = config->getParameterMapping();
@@ -105,10 +112,10 @@ void SmartBackgroundModule::initialize()
   }
 
   // Load model from payload
-  auto accessor = DBAccessorBase(DBStoreEntry::c_RawFile, m_payload, true);
+  auto accessor = DBAccessorBase(DBStoreEntry::c_RawFile, m_payloadWeights, true);
   const std::string filename = accessor.getFilename();
 
-  // initialize ONNX session
+  // Initialize ONNX session
   m_session = std::make_unique<MVA::ONNX::Session>(filename.c_str());
 
 }

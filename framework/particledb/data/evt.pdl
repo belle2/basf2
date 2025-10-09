@@ -739,8 +739,8 @@ add  p Particle  Sigma_b+                        5222     5810.56e-3         5.0
 add  p Particle  anti-Sigma_b-                  -5222     5810.56e-3         5.0e-3  1.0000000e-04    -3     1              0      -5222
 add  p Particle  Sigma_b0                        5212  5.8078000e+00  6.5821220e-06         6.6e-5     0     1              0       5212
 add  p Particle  anti-Sigma_b0                  -5212  5.8078000e+00  6.5821220e-06         6.6e-5     0     1              0      -5212
-add  p Particle  Sigma_b-                        5112     5810.56e-3         5.0e-3  1.0000000e-04    -3     1              0       5112
-add  p Particle  anti-Sigma_b+                  -5112     5810.56e-3         5.0e-3  1.0000000e-04     3     1              0      -5112
+add  p Particle  Sigma_b-                        5112     5815.64e-3         5.3e-3  1.0000000e-04    -3     1              0       5112
+add  p Particle  anti-Sigma_b+                  -5112     5815.64e-3         5.3e-3  1.0000000e-04     3     1              0      -5112
 add  p Particle  Sigma_b*+                       5224     5830.32e-3         9.4e-3              0     3     3              0       5224
 add  p Particle  anti-Sigma_b*-                 -5224     5830.32e-3         9.4e-3              0    -3     3              0      -5224
 add  p Particle  Sigma_b*0                       5214  5.8290000e+00              0              0     0     3              0       5214

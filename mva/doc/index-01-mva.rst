@@ -102,6 +102,7 @@ This interface **only supports inference** (and with that, also evaluation). Tra
 
 The requirements for models executed in the ONNX mva method are:
 
+- the model has to be **stored in a single file**. For some converters this has to be configured, e.g. in ``torch.onnx.convert`` via ``external_data=False``.
 - there has to be a **single input tensor** of shape ``(?, n_variables)``
 - if there are multiple **output tensors**, one has to be called "output" or the name configured via ``m_outputName`` in the ``ONNXOptions``.
 - **binary classifiers** (and regression models) are supported for outputs of either shape ``(?, 1)`` or ``(?, 2)``. If there are 2 outputs, the second one (index 1) will be taken by default (can be configured via the `signal_class` general option).
@@ -513,6 +514,10 @@ Websites and papers for the frameworks which are supported by the mva package
 
   * `<https://github.com/thomaskeck/FastBDT>`_
   * Thomas Keck. "FastBDT: A speed-optimized and cache-friendly implementation of stochastic gradient-boosted decision trees for multivariate classification". `<http://arxiv.org/abs/1609.06119.>`_
+
+* ONNX
+
+  * Website `<https://onnx.ai>`__
 
 * TMVA
 

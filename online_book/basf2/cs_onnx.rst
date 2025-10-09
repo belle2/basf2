@@ -25,7 +25,7 @@ We will start by creating an ntuple for training our ML model with the following
 Train a BDT classifier with scikit-learn
 ----------------------------------------
 
-The following part of the tutorial is best followed by executing the code snippets in a **jupyter notebook**. We will need the following packages, best installed in a virtual environment. It works without any basf2 dependencies, so for simplicity we run it in an isolated environment, e.g. using `uv <https://docs.astral.sh/uv>`__:
+It works without any basf2 dependencies, so for simplicity we run it in an isolated environment, e.g. using `uv <https://docs.astral.sh/uv>`__:
 
 .. code-block:: bash
 
@@ -180,7 +180,7 @@ Now, we can visuzualize the model graph using `netron <https://netron.app>`__. W
 
 .. image:: cs_onnx/bdt_v1.onnx.svg
 
-The graph has 2 output tensors, named "probabities" and "label" - we will only use the "probabilities". That tensor has shape (?, 2) for which the MVA ONNX method will by default pick the second output (index 1) as the signal class when run in non-multiclass mode (which will be used in the MVAExpert module when we have a binary classifier). The index is also configurable via the `signal_class` option in the weightfile.
+The graph has 2 output tensors, named "probabities" and "label" - we will only use the "probabilities". That tensor has shape (?, 2) for which the MVA ONNX method will by default pick the second output (index 1) as the signal class when run in non-multiclass mode (which will be used in the MVAExpert module when we have a binary classifier). The index is also configurable via the ``signal_class`` option in the weightfile.
 
 Before we run this through basf2, let's quickly cross check if the outputs from the sklearn model and the ONNX model match reasonably close:
 

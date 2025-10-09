@@ -296,28 +296,26 @@ def create_onnx_mva_weightfile(onnx_model_path, **kwargs):
     """
     Create an MVA Weightfile for ONNX
 
-    Parameters
-    ----------
-    kwargs :
-        keyword arguments to set the options in the weightfile. They are
-        directly mapped to member variable names of the option classes with "m_"
+    Parameters:
+      kwargs: keyword arguments to set the options in the weightfile. They are
+        directly mapped to member variable names of the option classes with ``m_``
         added automatically. First, GeneralOptions are tried and the remaining
         arguments are passed to ONNXOptions.
 
-    Returns
-    -------
-    weightfile :
-        Weightfile object containing the ONNX model and options
+    Returns:
+      Weightfile object containing the ONNX model and options
 
     Example:
-    --------
-    >>> weightfile = create_onnx_mva_weightfile(
-    ...    "model.onnx",
-    ...    outputName="probabilities",
-    ...    variables=["variable1", "variable2"],
-    ...    target_variable="isSignal"
-    ...)
-    >>> weightfile.save("model.root")
+      .. code-block:: python
+
+        >>> weightfile = create_onnx_mva_weightfile(
+        ...    "model.onnx",
+        ...    outputName="probabilities",
+        ...    variables=["variable1", "variable2"],
+        ...    target_variable="isSignal"
+        ...)
+        >>> weightfile.save("model.root")
+
     """
     general_options = basf2_mva.GeneralOptions()
     onnx_options = basf2_mva.ONNXOptions()

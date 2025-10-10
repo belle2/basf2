@@ -199,7 +199,7 @@ namespace Belle2 {
         int index = -1;
 
         // all possible names
-        std::vector<std::string> names = {"mm2",   "et",
+        std::vector<std::string> names = {"mm2",   "pt_sum",
                                           "hso00", "hso01", "hso02", "hso03", "hso04",
                                           "hso10", "hso12", "hso14",
                                           "hso20", "hso22", "hso24",
@@ -480,7 +480,7 @@ Returns cosine of angle between thrust axis of the signal B and z-axis.
 :noindex:
 )DOC");
     REGISTER_METAVARIABLE("KSFWVariables(variable[, string, string])", KSFWVariables,  R"DOC(
-Returns variable et in ``GeV/c``, mm2 in (GeV/c^2)^2, or one of the 16 KSFW moments.
+Returns variable pt_sum in ``GeV/c``, mm2 in (GeV/c^2)^2, or one of the 16 KSFW moments.
 The second and third arguments are optional unless you have created multiple instances of the ContinuumSuppression with different ROE masks.
 In that case the desired ROE mask name must be provided as well.
 If the second argument is set to 'FS1', the KSFW moment is calculated from the B final state daughters.
@@ -488,11 +488,13 @@ Otherwise, the KSFW moment is calculated from the B primary daughters.
 The ROE mask name is then either the second or the third argument and must not be called 'FS1'.
 Allowed input values for ``variable`` argument are the following:
 
-* mm2,   et
+* mm2,   pt_sum
 * hso00, hso01, hso02, hso03, hso04
 * hso10, hso12, hso14
 * hso20, hso22, hso24
 * hoo0,  hoo1,  hoo2,  hoo3,  hoo4.
+
+.. attention:: The `et` variable is now called `pt_sum` to better reflect the original definition.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.

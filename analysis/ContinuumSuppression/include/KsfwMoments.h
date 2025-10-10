@@ -45,7 +45,7 @@ namespace Belle2 {
           m_Hoo[i][j] = 0.0;
 
       for (int i = 0; i < 2; i++) {
-        m_et[i] = 0.0;
+        m_pt_sum[i] = 0.0;
         m_mm2[i] = 0.0;
       }
     };
@@ -59,7 +59,7 @@ namespace Belle2 {
                 std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_roe,
                 const ROOT::Math::PxPyPzEVector& p_cms_missA,
                 const ROOT::Math::PxPyPzEVector& p_cms_missB,
-                const double et[2]
+                const double pt_sum[2]
                );
 
     /**
@@ -85,7 +85,7 @@ namespace Belle2 {
     /**
      * Returns calculated transverse energy
      */
-    double et(int uf = -1) const { return m_et[uf < 0 ? m_uf : uf]; }
+    double pt_sum(int uf = -1) const { return m_pt_sum[uf < 0 ? m_uf : uf]; }
 
     /**
      * Returns calculated KSFW Moments
@@ -105,7 +105,7 @@ namespace Belle2 {
     double var(int i)
     {
       if (i < 0)  return 0;
-      if (i < 1)  return et();
+      if (i < 1)  return pt_sum();
       if (i < 4)  return Hso(i - 1, 0);
       if (i < 5)  return Hso(0,   1);
       if (i < 8)  return Hso(i - 5, 2);
@@ -119,7 +119,7 @@ namespace Belle2 {
     int m_uf;              /**< Flag that specifiies we are using the final state for signal */
     double m_Hso[2][3][5]; /**< KSFW moments */
     double m_Hoo[2][5];    /**< KSFW moments */
-    double m_et[2];        /**< Transverse energy */
+    double m_pt_sum[2];        /**< Transverse energy */
     double m_mm2[2];       /**< Missing mass squared */
   };
 

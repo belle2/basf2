@@ -47,14 +47,14 @@ namespace Belle2 {
                            std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_roe,
                            const ROOT::Math::PxPyPzEVector& p_cms_missA,
                            const ROOT::Math::PxPyPzEVector& p_cms_missB,
-                           const double et[2]
+                           const double pt_sum[2]
                           )
   {
     // Private member needs to be initialized. Here it is initialized to -1 (illegal value).
     m_uf = -1;
 
-    m_et[0] = et[0];
-    m_et[1] = et[1];
+    m_pt_sum[0] = pt_sum[0];
+    m_pt_sum[1] = pt_sum[1];
 
     m_mm2[0] = p_cms_missA.E() > 0
                ? p_cms_missA.mag2()

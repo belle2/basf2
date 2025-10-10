@@ -99,6 +99,14 @@ namespace Belle2 {
 
       /** Fits the laser light on one channel*/
       void fitChannel(short slot, short channel, TH1* h);
+
+      /** Fit the laser spectrum of a single channel with extra controls for amplitude-bin fits.
+       *  slot    0-based slot index (0..15).
+       *  channel 0-based channel index (0..511).
+       *  h       Input time profile histogram.
+       *  inBins  If true, fix the light-path fraction parameter.
+       *  frac    Fraction value used when inBins is true.
+       */
       void fitChannel(short slot, short channel, TH1* h, bool inBins, double frac);
 
       /** Fits the two pulsers */
@@ -135,22 +143,25 @@ namespace Belle2 {
         nullptr; /**< Output of the fitter.
         The tree containing the fit results to be used to study timewalk and asymptotic time resolution. */
 
-      // Crosstalk detection toggle (default false)
-      bool m_detectCrosstalk = false;
+      bool m_detectCrosstalk = false; /**< Enables the crosstalk detection algorithm */
 
-      // Output trees (created only if m_detectCrosstalk == true)
-      TTree* m_crosstalkTree   = nullptr;
-      TTree* m_fitTree_noXtalk = nullptr;
+      TTree* m_crosstalkTree   = nullptr; /**< Output tree for crosstalk candidates */
+      TTree* m_fitTree_noXtalk = nullptr; /**< Output tree for non-crosstalk candidates */
 
-      // Per-candidate variables (types must match your Branch<T> calls)
-      short m_sl0 = -1, m_sl1 = -1;   // slots
-      short m_ch0 = -1, m_ch1 = -1;   // channels
-
-      float m_ht0 = NAN, m_ht1 = NAN; // hit times
-      float m_a0  = NAN, m_a1  = NAN; // amplitudes
-      float m_w0  = NAN, m_w1  = NAN; // widths
-      float m_q0  = NAN, m_q1  = NAN; // integrated charges
-      float m_f_q0 = NAN;             // fraction of charge on ch0
+      // Per-candidate (crosstalk) variables
+      short m_sl0 = -1; /**< Slot ID (1-16) */
+      short m_sl1 = -1; /**< Slot ID (1-16) */
+      short m_ch0 = -1; /**< Channel number (0-511) */
+      short m_ch1 = -1; /**< Channel number (0-511) */
+      float m_ht0  = NAN; /**< Hit time for channel 0 in pair */
+      float m_ht1  = NAN; /**< Hit time for channel 1 in pair */
+      float m_a0   = NAN; /**< Amplitude for channel 0 in pair */
+      float m_a1   = NAN; /**< Amplitude for channel 1 in pair */
+      float m_w0   = NAN; /**< Width for channel 0 in pair */
+      float m_w1   = NAN; /**< Width for channel 1 in pair */
+      float m_q0   = NAN; /**< Integrated charge for channel 0 in pair */
+      float m_q1   = NAN; /**< Integrated charge for channel 1 in pair */
+      float m_f_q0 = NAN; /**< Fraction of charge on channel 0 in pair */
 
       // Variables for the TTS parametrization tree
       float m_mean2 = 0;  /**< Position of the second gaussian of the TTS parametrization with respect to the first one*/
@@ -233,21 +244,25 @@ namespace Belle2 {
       double m_amplitude = 0; /**< Pulse height. For each pixel, it is calculated as the mean over each hit.*/
 
       // Row/Col per (slot, channel). Slots are 0..15, channels 0..511 (0-based inside code).
-      std::array<std::array<short, 512>, 16> m_rowOf{};
-      std::array<std::array<short, 512>, 16> m_colOf{};
-      bool m_hasChannelMaps{false};
+      std::array<std::array<short, 512>, 16> m_rowOf{}; /**< Row index for (slot,channel), or -1 if out of bounds. */
+      std::array<std::array<short, 512>, 16> m_colOf{}; /**< Column index for (slot,channel), or -1 if out of bounds. */
+      bool m_hasChannelMaps{false}; /**< Flag indicating if channel->(row,col) maps have been built. True after m_rowOf/m_colOf have been built. */
 
-      // Fast, bounds-checked accessors
+      /** Row index for (slot,channel), or -1 if out of bounds. */
       inline short rowOf(short slot, short ch) const noexcept
       {
         return (slot >= 0 && slot < 16 && ch >= 0 && ch < 512) ? m_rowOf[slot][ch] : short(-1);
       }
+      /** Column index for (slot,channel), or -1 if out of bounds. */
       inline short colOf(short slot, short ch) const noexcept
       {
         return (slot >= 0 && slot < 16 && ch >= 0 && ch < 512) ? m_colOf[slot][ch] : short(-1);
       }
 
-      // Neighbor test in row/col space (Chebyshev distance ≤ 1 by default)
+      /**
+       * Return true if channels a and b are neighbors on the same slot in row/col space.
+       * Uses |Delta_row| ≤ drMax and |Delta_col| ≤ dcMax (default 1). Returns false for identical channels.
+       */
       inline bool areNeighbors(short slot, short a, short b, int drMax = 1, int dcMax = 1) const noexcept
       {
         const int dr = std::abs(rowOf(slot, a) - rowOf(slot, b));
@@ -255,7 +270,7 @@ namespace Belle2 {
         return (dr + dc > 0) && (dr <= drMax) && (dc <= dcMax);
       }
 
-      // Build lookups once after opening the TTS tree
+      /** Build (row,col) lookup tables from the TTS tree; call after opening m_treeTTS. */
       void buildChannelMaps();
 
     };

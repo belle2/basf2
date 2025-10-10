@@ -1,14 +1,17 @@
 /**************************************************************************
- * basf2 (Belle II Analysis Software Framework)                           *
- * Author: The Belle II Collaboration                                     *
- *                                                                        *
- * See git log for contributors and copyright holders.                    *
- * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
- **************************************************************************/
+* basf2 (Belle II Analysis Software Framework)                           *
+* Author: The Belle II Collaboration                                     *
+*                                                                        *
+* See git log for contributors and copyright holders.                    *
+* This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+**************************************************************************/
 
 #pragma once
-#include <top/calibration/TOPLocalCalFitter.h>
+#include <array>
+#include <string>
 #include <calibration/CalibrationAlgorithm.h>
+
+class TH1;
 
 namespace Belle2 {
   namespace TOP {
@@ -27,7 +30,7 @@ namespace Belle2 {
       TOPLocalCalFitter();
 
       /** Destructor */
-      virtual ~TOPLocalCalFitter() {}
+      ~TOPLocalCalFitter() override;
 
       /** Sets the minimum number of entries to perform the calibration in one channel */
       void setMinEntries(int minEntries)
@@ -83,7 +86,6 @@ namespace Belle2 {
         m_isFitInAmplitudeBins = isFitInAmplitudeBins;
       }
 
-
     protected:
 
       /** prepares the output tree */
@@ -96,7 +98,8 @@ namespace Belle2 {
       void determineFitStatus();
 
       /** Fits the laser light on one channel*/
-      void fitChannel(short, short, TH1*);
+      void fitChannel(short slot, short channel, TH1* h);
+      void fitChannel(short slot, short channel, TH1* h, bool inBins, double frac);
 
       /** Fits the two pulsers */
       void fitPulser(TH1*, TH1*);
@@ -104,34 +107,50 @@ namespace Belle2 {
       /** Calculates the commonT0 calibration after the fits have been done.
        *  It also saves the constants in a localDB and in the output tree
        */
-      void calculateChennelT0();
+      void calculateChannelT0();
 
       /** Runs the algorithm on events. Currently, it always returns c_OK despite of the actual result of the fitting procedure.
        *  This is not an issue since this moduleis not intended to be used in the automatic calibration. */
-      virtual EResult calibrate() override;
+      EResult calibrate() override;
 
     private:
 
       int m_minEntries = 50; /**<  Minimum number of entries to perform the fit. Currently not used*/
       std::string m_output = "laserFitResult.root"; /**< Name of the output file */
       std::string m_fitConstraints =
-        "/group/belle2/group/detector/TOP/calibration/MCreferences/LaserMCParameters.root"; /**< File with the TTS parametrization*/
+        "/group/belle2/group/detector/TOP/calibration/MCreferences/LaserMCParameters.root"; /**< File with the Fit constraints*/
       std::string m_TTSData =
-        "/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrization.root"; /**< File with the Fit constraints and MC info */
+        "/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrization.root"; /**< File with the TTS parametrization*/
       std::string m_fitterMode = "calibration";/**< Fit mode. Can be 'calibration', 'monitoring' or 'MC' */
       bool m_isFitInAmplitudeBins = false; /**< Enables the fit in amplitude bins */
-      std::vector<float> m_binEdges = {50, 100, 130, 160, 190, 220, 250, 280, 310, 340, 370, 400, 430, 460, 490, 520, 550, 580, 610, 640, 670, 700, 800, 900, 1000, 1200, 1500, 2000}; /**< Amplitude bins */
+      std::vector<float> m_binEdges = {50, 100, 150, 200, 250, 300, 350, 400, 500, 600, 800, 1000, 1500, 2000}; /**< Amplitude bins */
       TFile* m_inputTTS = nullptr; /**< File containing m_treeTTS */
       TFile* m_inputConstraints = nullptr; /**< File containing m_treeConstraints */
-
       TTree* m_treeTTS = nullptr; /**< Input to the fitter. A tree containing the TTS parametrization for each channel */
       TTree* m_treeConstraints =
         nullptr; /**< Input to the fitter. A tree containing the laser MC corrections and all the parameters to be fixed in the fit*/
       TFile* m_histFile = nullptr; /**< Output of the fitter. The file containing the output trees and histograms*/
       TTree* m_fitTree = nullptr; /**< Output of the fitter. The tree containing the fit results. */
       TTree* m_timewalkTree =
-        nullptr; /**< Output of the fitter. The tree containing the fit results to be used to study timewalk and asymptotic time resolution. */
+        nullptr; /**< Output of the fitter.
+        The tree containing the fit results to be used to study timewalk and asymptotic time resolution. */
 
+      // Crosstalk detection toggle (default false)
+      bool m_detectCrosstalk = false;
+
+      // Output trees (created only if m_detectCrosstalk == true)
+      TTree* m_crosstalkTree   = nullptr;
+      TTree* m_fitTree_noXtalk = nullptr;
+
+      // Per-candidate variables (types must match your Branch<T> calls)
+      short m_sl0 = -1, m_sl1 = -1;   // slots
+      short m_ch0 = -1, m_ch1 = -1;   // channels
+
+      float m_ht0 = NAN, m_ht1 = NAN; // hit times
+      float m_a0  = NAN, m_a1  = NAN; // amplitudes
+      float m_w0  = NAN, m_w1  = NAN; // widths
+      float m_q0  = NAN, m_q1  = NAN; // integrated charges
+      float m_f_q0 = NAN;             // fraction of charge on ch0
 
       // Variables for the TTS parametrization tree
       float m_mean2 = 0;  /**< Position of the second gaussian of the TTS parametrization with respect to the first one*/
@@ -188,13 +207,17 @@ namespace Belle2 {
       float m_fractionMC = 0.; /**< Fraction of events in the secondary peak form the MC simulation */
       float m_deltaTMC = 0.; /**< Time difference between the main peak and the secondary peak in the MC simulation*/
       float m_peakTimeMC =
-        0.; /**< Time of the main peak in the MC simulation, i.e. time of propagation of the light in the prism. This factor is used to get the channelT0 calibration */
+        0.; /**< Time of the main peak in the MC simulation, i.e. time of propagation of the light in the prism.
+        This factor is used to get the channelT0 calibration */
 
       float m_chi2 = 0; /**< Reduced chi2 of the fit*/
       float m_rms = 0; /**< RMS of the histogram used for the fit*/
 
       float m_channelT0 =
-        0.; /**< Raw, channelT0 calibration, defined as peakTime-peakTimeMC. This constant is not yet normalized to the average constant in the slot, since that part is currently done by the DB importer. When the DB import functionalities will be added to this module, it will be set to the proper channeT0*/
+        0.; /**< Raw, channelT0 calibration, defined as peakTime-peakTimeMC.
+        This constant is not yet normalized to the average constant in the slot,
+        since that part is currently done by the DB importer. When the DB import functionalities will be added to this module,
+        it will be set to the proper channeT0*/
       float m_channelT0Err = 0.; /**< Statistical error on channelT0*/
 
       float m_firstPulserTime = 0.; /**< Average time of the first electronic pulse respect to the reference pulse, from a Gaussian fit*/
@@ -205,8 +228,36 @@ namespace Belle2 {
       float m_secondPulserSigma = 0.;  /**< Time resolution from the fit of the first electronic pulse, from a Gaussian fit*/
 
       short m_fitStatus = 1; /**< Fit quality flag, propagated to the constants. 1 if fit did not converge, 0 if it is fine. */
+
+      double m_width = 0; /**< Pulse width. For each pixel, it is calculated as the mean over each hit.*/
+      double m_amplitude = 0; /**< Pulse height. For each pixel, it is calculated as the mean over each hit.*/
+
+      // Row/Col per (slot, channel). Slots are 0..15, channels 0..511 (0-based inside code).
+      std::array<std::array<short, 512>, 16> m_rowOf{};
+      std::array<std::array<short, 512>, 16> m_colOf{};
+      bool m_hasChannelMaps{false};
+
+      // Fast, bounds-checked accessors
+      inline short rowOf(short slot, short ch) const noexcept
+      {
+        return (slot >= 0 && slot < 16 && ch >= 0 && ch < 512) ? m_rowOf[slot][ch] : short(-1);
+      }
+      inline short colOf(short slot, short ch) const noexcept
+      {
+        return (slot >= 0 && slot < 16 && ch >= 0 && ch < 512) ? m_colOf[slot][ch] : short(-1);
+      }
+
+      // Neighbor test in row/col space (Chebyshev distance ≤ 1 by default)
+      inline bool areNeighbors(short slot, short a, short b, int drMax = 1, int dcMax = 1) const noexcept
+      {
+        const int dr = std::abs(rowOf(slot, a) - rowOf(slot, b));
+        const int dc = std::abs(colOf(slot, a) - colOf(slot, b));
+        return (dr + dc > 0) && (dr <= drMax) && (dc <= dcMax);
+      }
+
+      // Build lookups once after opening the TTS tree
+      void buildChannelMaps();
+
     };
-  }
+  } // namespace TOP
 } // namespace Belle2
-
-

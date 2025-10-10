@@ -6,10 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// TODOs:
-// multiple skims??
-// write documentation, tutorial for training new model/fine tuning?
-
 #include <skim/modules/SmartBackgroundModule.h>
 #include <skim/dbobjects/SmartBackgroundConfig.h>
 

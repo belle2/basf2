@@ -9,6 +9,7 @@
 ##########################################################################
 
 import os
+import ROOT
 
 os.environ["KERAS_BACKEND"] = "torch"
 
@@ -57,4 +58,5 @@ if __name__ == "__main__":
         variables=variables,
         target_variable="qrCombined",
     )
-    weightfile.save("model_mva.xml")
+
+    ROOT.Belle2.MVA.Weightfile.saveToDatabase(weightfile, "standard_tflat")

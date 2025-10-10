@@ -673,7 +673,7 @@ class ValidationRoot:
 
         #: Git version
         self.version = validationfunctions.get_compact_git_hash(
-            os.environ["BELLE2_LOCAL_DIR"]
+            os.environ.get("BELLE2_LOCAL_DIR", os.environ.get("BELLE2_RELEASE_DIR", None))
         )
 
         #: Gitlab object
@@ -900,7 +900,7 @@ class ValidationRoot:
             + time.tzname[1],
             "version_restart": self.version,
             "version_current": validationfunctions.get_compact_git_hash(
-                os.environ["BELLE2_LOCAL_DIR"]
+                os.environ.get("BELLE2_LOCAL_DIR", os.environ.get("BELLE2_RELEASE_DIR", None))
             ),
         }
 

@@ -37,8 +37,9 @@ namespace Belle2 {
                           const std::unordered_map<int, uint16_t>& skimcodesMapping,
                           const std::unordered_map<int, std::vector<float>>& paramMapping,
                           const std::unordered_map<int, std::string>& skimnamesMapping,
+                          const std::unordered_map<std::string, int32_t>& eventtypeMapping,
                           const float maxWeight) : m_pdgMapping(pdgMapping), m_skimcodesMapping(skimcodesMapping),
-      m_paramMapping(paramMapping), m_skimnamesMapping(skimnamesMapping),
+      m_paramMapping(paramMapping), m_skimnamesMapping(skimnamesMapping), m_eventtypeMapping(eventtypeMapping),
       m_maxWeight(maxWeight) { }
 
     /**
@@ -74,6 +75,14 @@ namespace Belle2 {
     }
 
     /**
+     * Return event type mapping
+     */
+    std::unordered_map<std::string, int32_t> getEventtypeMapping() const
+    {
+      return m_eventtypeMapping;
+    }
+
+    /**
     * Return maximum possible weight
     */
     float getMaxWeight() const
@@ -102,6 +111,11 @@ namespace Belle2 {
      * Mapping of skimcodes to skim names
      */
     std::unordered_map<int, std::string> m_skimnamesMapping;
+
+    /**
+     * Mapping of event type names to integers
+     */
+    std::unordered_map<std::string, int32_t> m_eventtypeMapping;
 
     /**
      * Maximum possible event weight after importance sampling

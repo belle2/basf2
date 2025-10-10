@@ -127,10 +127,13 @@ PARAMETER_MAPPING = {
     18520500: [0.473, 2.572], 18530200: [0.482, 2.768], 18570600: [0.46, 1.569], 18570700: [0.469, 2.326],
     19120100: [0.55, 3.665], 19130201: [0.45, 2.361], 19130300: [0.458, 2.187]}
 
+EVENTTYPE_MAPPING = {"ccbar": 0, "charged": 1, "ddbar": 2, "mixed": 3, "ssbar": 4, "taupair": 5, "uubar": 6}
+
 MAX_WEIGHT = 100.0
 
 # Initialize config object and write new payload into local database under identifier 'SmartBackgroundConfig'
-config = Belle2.SmartBackgroundConfig(PDG_MAPPING, SKIMCODES_MAPPING, PARAMETER_MAPPING, SKIMNAMES_MAPPING, MAX_WEIGHT)
+config = Belle2.SmartBackgroundConfig(PDG_MAPPING, SKIMCODES_MAPPING, PARAMETER_MAPPING, SKIMNAMES_MAPPING,
+                                      EVENTTYPE_MAPPING, MAX_WEIGHT)
 iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
 Belle2.Database.Instance().storeData("SmartBackgroundConfig_custom", config, iov)
 

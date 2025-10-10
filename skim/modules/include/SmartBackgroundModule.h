@@ -77,9 +77,7 @@ namespace Belle2 {
     /**
      * Mapping of event type names to integers
      */
-    const std::unordered_map<std::string, int32_t> c_eventtypeMapping = {
-      {"ccbar", 0}, {"charged", 1}, {"ddbar", 2}, {"mixed", 3}, {"ssbar", 4}, {"taupair", 5}, {"uubar", 6}
-    };
+    std::unordered_map<std::string, int32_t> m_eventtypeMapping;
 
     /**
      * Event type (module parameter)

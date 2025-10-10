@@ -81,6 +81,7 @@ void SmartBackgroundModule::initialize()
   m_skimcodesMapping = config->getSkimcodesMapping();
   m_paramsMapping = config->getParameterMapping();
   m_skimnamesMapping = config->getSkimnamesMapping();
+  m_eventtypeMapping = config->getEventtypeMapping();
   m_minProb = 1 / config->getMaxWeight();
   m_minLogProb = TMath::Log(m_minProb);
 
@@ -103,7 +104,7 @@ void SmartBackgroundModule::initialize()
   if (m_overrideEventType) {
     if (m_eventType == "unset") {
       B2FATAL("SmartBkg: overrideEventType is set to true but eventType is not set.");
-    } else if (c_eventtypeMapping.find(m_eventType) == c_eventtypeMapping.end()) {
+    } else if (m_eventtypeMapping.find(m_eventType) == m_eventtypeMapping.end()) {
       B2FATAL("SmartBkg: Provided event type " << m_eventType <<
               " is unknown. Allowed event types: charged, mixed, uubar, ddbar, ssbar, ccbar, taupair.");
     } else {
@@ -146,7 +147,7 @@ void SmartBackgroundModule::event()
     if (!m_overrideEventType) {
       m_eventType = detectedEventType;
       B2DEBUG(20, "SmartBkg: Automatically inferred event type as '" << m_eventType << "'");
-      if (c_eventtypeMapping.find(m_eventType) == c_eventtypeMapping.end()) {
+      if (m_eventtypeMapping.find(m_eventType) == m_eventtypeMapping.end()) {
         B2FATAL("SmartBkg: Inferred event type '" << m_eventType <<
                 "' is unknown. Allowed event types: charged, mixed, uubar, ddbar, ssbar, ccbar, taupair.");
       }
@@ -251,7 +252,7 @@ void SmartBackgroundModule::event()
 
   // Set event type input
   auto cTensor = MVA::ONNX::Tensor<int32_t>::make_shared({});
-  cTensor->at(0) = c_eventtypeMapping.at(m_eventType);
+  cTensor->at(0) = m_eventtypeMapping.at(m_eventType);
 
   // Create output tensor
   auto outputTensor = MVA::ONNX::Tensor<float>::make_shared({static_cast<int64_t>(this->m_skimcodesMapping.size())});

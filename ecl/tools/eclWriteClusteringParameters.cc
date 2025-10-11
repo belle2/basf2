@@ -7,16 +7,7 @@
  **************************************************************************/
 
 #include <ecl/dbobjects/ECLClusteringParameters.h>
-
-#include <framework/database/Configuration.h>
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/DBStore.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/LogSystem.h>
-
 #include <iostream>
 
 

@@ -427,7 +427,7 @@ class TestInformation:
                                     type=failure_type.upper())
 
             if self.output:
-                failure.text = re.sub(r'\033\[[0-9;]*m', '', self.output)
+                failure.text = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\uD800-\uDFFF]', '', re.sub(r'\033\[[0-9;]*m', '', self.output))
 
         return test_el
 

@@ -147,7 +147,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
         batch_size=config['batch_size'],
         epochs=config['epochs'],
         callbacks=callbacks,
-        verbose=1)
+        verbose=2)
 
     return False
 

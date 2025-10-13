@@ -8,10 +8,11 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/filters/pathFilters/BasePathFilter.h>
-#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
 
 namespace Belle2 {
+  class QualityEstimatorBase;
+
   namespace vxdHoughTracking {
 
     /// Filter for two hits plus a virtual IP using QualityEstimators.

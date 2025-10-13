@@ -14,6 +14,7 @@
 #include <framework/core/Environment.h>
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/RootFileCreationManager.h>
+#include <framework/pcore/RootMergeable.h>
 
 namespace Belle2::VariablePersistenceManager {
   ConcreteVariablesToHistogramPersistenceManager::ConcreteVariablesToHistogramPersistenceManager() {}

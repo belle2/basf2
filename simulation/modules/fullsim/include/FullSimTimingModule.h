@@ -7,23 +7,28 @@
  **************************************************************************/
 
 #pragma once
-#ifndef SIMULATION_MODULES_FULLSIM_FULLSIMTIMINGMODULE_H
-#define SIMULATION_MODULES_FULLSIM_FULLSIMTIMINGMODULE_H
 
 #include <framework/core/Module.h>
-#include <simulation/kernel/StepTiming.h>
 #include <map>
 
 class TProfile;
 
+class G4Track;
+class G4LogicalVolume;
+class G4Region;
+
 namespace Belle2 {
+  namespace Simulation {
+    class StepTiming;
+  }
+
   /**
    * \addtogroup modules
    * @{ FullSimTimingModule @}
    */
 
   /**
-   * Provide more detailled timing info for FullSim module
+   * Provide more detailed timing info for FullSim module
    *
    * This module extends the FullSim to provide more detailed timing showing
    * how much time was spent in which sub detector.
@@ -75,9 +80,7 @@ namespace Belle2 {
     double m_eventTime {0};
     /** number of events with m_eventTime>0 */
     unsigned int m_eventCount {0};
-    /** remember whether we aleady initialized everything */
+    /** remember whether we already initialized everything */
     bool m_isInitialized {false};
   };
 }
-
-#endif // SIMULATION_MODULES_FULLSIM_FULLSIMTIMINGMODULE_H

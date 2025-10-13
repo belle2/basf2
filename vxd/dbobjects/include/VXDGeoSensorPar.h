@@ -10,14 +10,11 @@
 #include <string>
 #include <vector>
 
-
-#include <vxd/dbobjects/VXDSensorInfoBasePar.h>
 #include <vxd/dbobjects/VXDGeoComponentPar.h>
 #include <vxd/dbobjects/VXDGeoPlacementPar.h>
 
 namespace Belle2 {
-
-
+  class VXDSensorInfoBasePar;
 
   /**
   * The Class for VXD Sensor payload

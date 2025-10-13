@@ -261,6 +261,14 @@ namespace Belle2 {
       double daughterMass = particle->getDaughter(daughter)->getMass();
 
       TVectorF    jacobian(2 * Particle::c_DimMomentum);
+      /* Formulas to understand derivatives:
+       *
+       * Delta M = m(mother) - m(daughter) = (m(daughter) + m(other)) - m(daughter) // Here it is important not to combine the terms
+       *         =   sqrt((E(d) + E(o))^2 - (px(d) + px(o))^2 - (py(d) + py(o))^2 - (pz(d) + pz(o))^2)
+       *           - sqrt(E(d)^2 - px(d)^2 - py(d)^2 - pz(d)^2)
+       *
+       * jacobian[0) = del (Delta M) / del px(d) with del E(d) / del px(d) = 0
+       */
       jacobian[0] =  thisDaughterMomentum.Px() / daughterMass - particle->getPx() / motherMass;
       jacobian[1] =  thisDaughterMomentum.Py() / daughterMass - particle->getPy() / motherMass;
       jacobian[2] =  thisDaughterMomentum.Pz() / daughterMass - particle->getPz() / motherMass;

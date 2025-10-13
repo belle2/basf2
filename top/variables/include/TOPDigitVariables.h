@@ -244,7 +244,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods and ExtHits.
        * Variable name: topTOFExpert(pdg)
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @param vector of size = 1 containing PDG code
+       * @param vars vector of size = 1 containing PDG code
        * @return time-of-flight (NaN if N/A)
        */
       double getTOFExpert(const Particle* particle, const std::vector<double>& vars);
@@ -667,7 +667,7 @@ namespace Belle2 {
        * Requires TOPDigits.
        * Variable name: topRawPhotonsInSlot(id)
        * @param particle unused
-       * @param vars vector of size = 1 containig the slot ID
+       * @param vars vector of size = 1 containing the slot ID
        * @return number of all hits
        */
       double TOPRawPhotonsInSlot([[maybe_unused]] const Particle* particle, const std::vector<double>& vars);
@@ -677,7 +677,7 @@ namespace Belle2 {
        * Requires TOPDigits.
        * Variable name: topGoodPhotonsInSlot(id)
        * @param particle unused
-       * @param vars vector of size = 1 containig the slot ID
+       * @param vars vector of size = 1 containing the slot ID
        * @return number of good hits
        */
       double TOPGoodPhotonsInSlot([[maybe_unused]] const Particle* particle, const std::vector<double>& vars);

@@ -132,7 +132,7 @@ namespace Belle2 {
     h3->SetYTitle("time [ns]");
     registerObject<TH2F>("timeHits", h3);
 
-    // this one is needed primarely to pass bunch time separation to the algorithm,
+    // this one is needed primarily to pass bunch time separation to the algorithm,
     // since DB interface doesn't work there
     auto h4 = new TH1F("offset", "current offset from input files; offset [ns]",
                        200, -m_bunchTimeSep / 2, m_bunchTimeSep / 2);

@@ -16,7 +16,7 @@ namespace Belle2 {
   namespace TOP {
 
     /**
-     * single Crystal Ball fuction
+     * single Crystal Ball function
      * (under development)
      * @param x  random variable in Crystal Ball pdf
      * @param par  parameters in Crystal Ball pdf
@@ -24,7 +24,7 @@ namespace Belle2 {
     double fcnCB(double* x, double* par);
 
     /**
-     * double Crystal Ball fuction
+     * double Crystal Ball function
      * (under development)
      * @param x  random variable in Crystal Ball pdf
      * @param par  parameters in Crystal Ball pdf
@@ -98,17 +98,17 @@ namespace Belle2 {
       std::string getFitMethod() const {return m_fitMethod;}
 
       /**
-       * get the center positon of hist max bin
+       * get the center position of hist max bin
        */
       std::vector<double> getMaxPos()  {return m_maxpos;}
 
       /**
-       * get mean positon after fit
+       * get mean position after fit
        */
       double getFitT()  {return m_fitT;}
 
       /**
-       * returns the error mean positon after fit
+       * returns the error mean position after fit
        */
       double getFitTErr() {return m_fitTErr;}
 
@@ -122,13 +122,13 @@ namespace Belle2 {
       TF1* makeGFit(unsigned channel);
 
       /**
-       * Fit process using single Crystal Ball fuction
+       * Fit process using single Crystal Ball function
        * @param channel channel number
        */
       TF1* makeCBFit(unsigned channel);
 
       /**
-       * Fit process using double Crystal Ball fuction
+       * Fit process using double Crystal Ball function
        * @param channel  refers to a typical time separation of two main peaks
        * @param minOut  minimum printing
        * need more studies
@@ -136,8 +136,8 @@ namespace Belle2 {
       TF1* makeCB2Fit(unsigned channel, bool minOut);
 
       unsigned m_moduleID = 0; /**< one moduleID/slot */
-      std::vector<double> m_maxpos; /**< center positon of hist max bin */
-      std::vector<double> m_maxpos_error; /**< error on the center positon of hist max bin */
+      std::vector<double> m_maxpos; /**< center position of hist max bin */
+      std::vector<double> m_maxpos_error; /**< error on the center position of hist max bin */
       double m_xmin = 0; /**< fitting low-edge */
       double m_xmax = 0; /**< fitting upper-edge */
       double m_fitT = 0; /**< mean position after fit */

@@ -64,7 +64,7 @@ namespace Belle2 {
     {}
 
     /**
-     * Usefull constructor
+     * Useful constructor
      * @param moduleID  module ID (1-based)
      * @param pixelID   pixel ID (1-based)
      * @param rawTime   raw time expressed in samples (TDC bins)

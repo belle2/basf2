@@ -37,6 +37,13 @@ class KLMStripEfficiency(AlgorithmStrategy):
     #: Just here for documentation reasons.
     usable_params = {'iov_coverage': IoV}
 
+    #: \copydoc AlgorithmStrategy.ignored_runs
+    ignored_runs: list[int]
+    #: \copydoc AlgorithmStrategy.COMPLETED
+    COMPLETED = AlgorithmStrategy.COMPLETED
+    #: \copydoc AlgorithmStrategy.FAILED
+    FAILED = AlgorithmStrategy.FAILED
+
     def __init__(self, algorithm):
         """
         """

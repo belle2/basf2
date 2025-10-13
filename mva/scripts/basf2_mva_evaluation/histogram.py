@@ -63,10 +63,10 @@ class Histograms:
         Creates a common binning of the given column of the given pandas.Dataframe,
         and stores for each given mask the histogram of the column
         @param data pandas.DataFrame  like object containing column and weight_column
-        @param column string identifiying the column in the pandas.DataFrame which is binned.
+        @param column string identifying the column in the pandas.DataFrame which is binned.
         @param masks dictionary of names and boolean arrays, which select the data
                      used for the creation of histograms with these names
-        @param weight_column identifiying the column in the pandas.DataFrame which is used as weight
+        @param weight_column identifying the column in the pandas.DataFrame which is used as weight
         @param bins use given bins instead of default 100
         @param equal_frequency perform an equal_frequency binning
         @param range_in_std show only the data in a windows around +- range_in_std * standard_deviation around the mean

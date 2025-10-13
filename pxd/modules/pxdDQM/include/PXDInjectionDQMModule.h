@@ -11,9 +11,6 @@
 #include <framework/core/HistoModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDRawHit.h>
-#include <pxd/dataobjects/PXDCluster.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 #include <TH1.h>
 #include <TH2.h>
@@ -21,6 +18,9 @@
 #include <map>
 
 namespace Belle2 {
+  class EventLevelTriggerTimeInfo;
+  class PXDRawHit;
+  class PXDCluster;
 
   namespace PXD {
     /** The PXD Occupancy after Injection DQM module.

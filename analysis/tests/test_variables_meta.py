@@ -52,14 +52,7 @@ class MetavariableDataTypeTest(unittest.TestCase):
         "isDaughterOfList": "bool",
         "isGrandDaughterOfList": "bool",
         "daughterDiffOf": "double",
-        "daughterDiffOfPhi": "double",
-        "daughterDiffOfClusterPhi": "double",
-        "mcDaughterDiffOfPhi": "double",
         "grandDaughterDiffOf": 'double',
-        "grandDaughterDiffOfPhi": "double",
-        "grandDaughterDiffOfClusterPhi": "double",
-        "daughterDiffOfPhiCMS": "double",
-        "daughterDiffOfClusterPhiCMS": "double",
     }
 
     # regular expressions
@@ -224,16 +217,16 @@ class MetavariableDataTypeTest(unittest.TestCase):
         num_files = len(files)
         print(f"Number of files including meta-variables is {num_files}")
 
-        # There should be at least 14 files
-        self.assertGreaterEqual(num_files, 14)
+        # There should be at least 15 files
+        self.assertGreaterEqual(num_files, 15)
         # We track the number of metavariables to make sure we don't miss some
         num_metavariables = 0
         for filepath in files:
             num_metavariables += self.process_file(filepath)
 
-        # We should get at least 244 registering statements
+        # We should get at least 243 registering statements
         print(f"Number of meta-variables is {num_metavariables}")
-        self.assertGreaterEqual(num_metavariables, 244)
+        self.assertGreaterEqual(num_metavariables, 238)
 
 
 if __name__ == "__main__":

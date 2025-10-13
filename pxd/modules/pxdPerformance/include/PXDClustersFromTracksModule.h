@@ -10,12 +10,10 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>
-
 #include <pxd/dataobjects/PXDCluster.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/Track.h>
 
 namespace Belle2 {
+
   /**
    * The PXDClustersFromTracks module
    *

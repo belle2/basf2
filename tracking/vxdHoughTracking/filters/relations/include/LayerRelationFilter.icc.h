@@ -8,6 +8,7 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/filters/relations/LayerRelationFilter.dcl.h>
+#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 #include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/spacePointCreation/SpacePoint.h>

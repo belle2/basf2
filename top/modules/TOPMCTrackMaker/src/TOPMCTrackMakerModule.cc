@@ -101,7 +101,7 @@ namespace Belle2 {
       const auto* barHit = mcParticle.getRelated<TOPBarHit>();
       if (!barHit) continue;
 
-      TMatrixDSym cov(6); // infinite precission
+      TMatrixDSym cov(6); // infinite precision
       fitResults.appendNew(mcParticle.getVertex(),
                            mcParticle.getMomentum(),
                            cov,

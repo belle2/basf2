@@ -12,11 +12,11 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <rawdata/dataobjects/RawPXD.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <pxd/dataobjects/PXDErrorFlags.h>
 
 namespace Belle2 {
+  class PXDDAQStatus;
+  class RawPXD;
 
   namespace PXD {
 
@@ -224,7 +224,7 @@ namespace Belle2 {
       bool CheckErrorMaskInEvent(unsigned int eventnr, PXDError::PXDErrorFlags mask);
 
       /// The pxd error flags
-      static std::vector <PXDErrorFlags> m_errors;
+      static std::vector <PXDError::PXDErrorFlags> m_errors;
 
     };//end class declaration
 

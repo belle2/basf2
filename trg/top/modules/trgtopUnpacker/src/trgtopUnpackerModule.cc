@@ -7,6 +7,9 @@
  **************************************************************************/
 
 #include <trg/top/modules/trgtopUnpacker/trgtopUnpackerModule.h>
+#include <trg/top/dataobjects/TRGTOPCombinedT0Decision.h>
+#include <trg/top/dataobjects/TRGTOPSlotTiming.h>
+#include <rawdata/dataobjects/RawTRG.h>
 
 #include <iostream>
 
@@ -545,9 +548,9 @@ void TRGTOPUnpackerModule::unpackT0Decisions(int* rdat, int channel)
               combinedT0RVC2GDL != combinedT0RVC2GDLLast
              ) {
 
-            //      int toptrgT0_revoToNS = combinedT0%revoToNS;
+            //      int toptrgT0_revoToNS = combinedT0%s_revoToNS;
             //      int rvcL1_NS = rvcL1 * 8;
-            //      int deltaT0 = rvcL1_NS >= toptrgT0_revoToNS ? rvcL1_NS - toptrgT0_revoToNS : rvcL1_NS - toptrgT0_revoToNS + revoToNS;
+            //      int deltaT0 = rvcL1_NS >= toptrgT0_revoToNS ? rvcL1_NS - toptrgT0_revoToNS : rvcL1_NS - toptrgT0_revoToNS + s_revoToNS;
             //      int latencyL12TOPTRG = revoClockNow >= rvcL1 ? revoClockNow - rvcL1 : revoClockNow - rvcL1 + 1280;
 
             TRGTOPCombinedT0Decision combinedT0Decision(combinedT0,

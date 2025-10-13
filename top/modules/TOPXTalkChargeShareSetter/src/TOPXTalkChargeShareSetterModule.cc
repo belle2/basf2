@@ -44,7 +44,7 @@ TOPXTalkChargeShareSetterModule::TOPXTalkChargeShareSetterModule() : Module()
   addParam("timeCut", m_timeCut,
            "cut range of hittiming for chargeshare flag [ns]", (float) 1);
   addParam("preValleyDepthLoose", m_preValleyDepthLoose,
-           "loose threshold for depth of pre valley [ADC counts], for corss talk identification", 20);
+           "loose threshold for depth of pre valley [ADC counts], for cross talk identification", 20);
   addParam("preValleyDepthTight", m_preValleyDepthTight,
            "tight threshold for depth of pre valley [ADC counts], identified as cross talk with loose threshold for the second peak amplitude",
            50);
@@ -95,7 +95,7 @@ void TOPXTalkChargeShareSetterModule::event()
     if (waveform and isCrossTalk(waveform->getWaveform(), TMath::FloorNint(digit.getRawTime()), digit.getPulseHeight()))
       digit.setHitQuality(TOPDigit::c_CrossTalk);
     else {
-      //identify a ringing which follows a cross talk hit in the same channle as cross talk
+      //identify a ringing which follows a cross talk hit in the same channel as cross talk
       int slotId = digit.getModuleID();
       unsigned int channelId = digit.getChannel();
       double rawTime = digit.getRawTime();

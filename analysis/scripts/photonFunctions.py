@@ -72,6 +72,6 @@ def writeClosestParticleExtraClusterInfo(
     # modify this function since it's not possible outside the roe_path
     ma.variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterClusterAngleInBetween(0, 1))': 'openingAngle'}, path=roe_path)
     ma.variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, clusterTheta))': 'deltaTheta'}, path=roe_path)
-    ma.variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOfClusterPhi(0, 1))': 'deltaPhi'}, path=roe_path)
+    ma.variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, clusterPhi))': 'deltaPhi'}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

@@ -10,9 +10,15 @@
 
 #include <framework/datastore/RelationArray.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/Track.h>
+
+#include <pxd/dataobjects/PXDCluster.h>
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
+
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <TTree.h>
 #include <TH2I.h>

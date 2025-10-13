@@ -11,6 +11,12 @@ Probably the most obvious, and useful are: :b2:var:`p`, :b2:var:`E`, :b2:var:`Mb
 
 You can search the variables in an alphabetical :ref:`b2-varindex`, or browse :ref:`variablesByGroup`.
 
+.. warning::
+
+          Some variables return ``NaN`` instead of being converted to a numerical value. 
+          Before cutting on any variables, **please pay attention** to whether or not your variable returns ``NaN``. 
+          
+
 .. _analysis_variablemanager_class:
 
 VariableManager
@@ -170,20 +176,6 @@ PID
 ~~~
 
 Here is a list of particle identification variables:
-
-.. warning ::
-  The **definitions** of the default PID variables have changed between
-  release-01 and release-02.
-
-  Prior to release-02-00-00 (i.e. in release-01-XX-YY) each ID was calculated
-  against the pion likelihood alone, or the kaon in the case of the pion itself.
-  Namely the pair probability (also known as the binary probability) was returned:
-
-  * for all particles: :math:`\text{<Part>ID}=\mathcal{L}_{\text{<Part>}}/\mathcal{L}_\pi`, where :math:`\text{<Part>}\in[e,\mu,K,p,d]`.
-  * for pions: :math:`\text{PionID}=\mathcal{L}_\pi/\mathcal{L}_K`.
-
-  In other words, pionID was sensitive only to the pion-kaon mis-id, and not to
-  the pion-proton or pion-muon mis-identification.
 
 .. b2-variables::
    :group: PID
@@ -768,7 +760,7 @@ How to use my variable at grid?
 
 * Prepare the environment with the ``b2analysis-create`` tool.
 
->>> b2analysis-create myanalysis <current central release, e.g. release-04-00-00>
+>>> b2analysis-create myanalysis <current central release, e.g. light-2509-fornax>
 >>> cd myanalysis
 >>> b2setup
 

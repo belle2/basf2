@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-# disable doxygen check for this file
-# @cond
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -173,9 +170,11 @@ class AlgorithmStrategy(ABC):
             return False
 
     def send_result(self, result):
+        """send result"""
         self.queue.put({"type": "result", "value": result})
 
     def send_final_state(self, state):
+        """send final state"""
         self.queue.put({"type": "final_state", "value": state})
 
 
@@ -296,6 +295,7 @@ class SequentialRunByRun(AlgorithmStrategy):
         self.machine = AlgorithmMachine(self.algorithm)
         if "step_size" not in self.algorithm.params:
             self.algorithm.params["step_size"] = 1
+        #: boolean storing whether this is the first time the algorithm is executed
         self.first_execution = True
 
     def apply_experiment_settings(self, algorithm, experiment):
@@ -391,6 +391,7 @@ class SequentialRunByRun(AlgorithmStrategy):
             self.send_final_state(self.COMPLETED)
 
     def execute_over_run_list(self, iteration, run_list, lowest_exprun, highest_exprun):
+        """Execute runs given in list"""
         # The runs (data) we have left to execute from this run list
         remaining_runs = run_list[:]
         # The previous execution's runs
@@ -691,6 +692,7 @@ class SequentialBoundaries(AlgorithmStrategy):
         #: :py:class:`caf.state_machines.AlgorithmMachine` used to help set up and execute CalibrationAlgorithm
         #: It gets setup properly in :py:func:`run`
         self.machine = AlgorithmMachine(self.algorithm)
+        #: boolean storing whether this is the first time the algorithm is executed
         self.first_execution = True
 
     def run(self, iov, iteration, queue):
@@ -1041,6 +1043,7 @@ class SequentialBoundaries(AlgorithmStrategy):
                     return False
 
     def execute_runs(self, runs, iteration, iov):
+        """Execute runs"""
         # Already set up earlier the first time, so we shouldn't do it again
         if not self.first_execution:
             self.machine.setup_algorithm()
@@ -1052,6 +1055,7 @@ class SequentialBoundaries(AlgorithmStrategy):
         B2INFO(f"Finished execution with result code {self.machine.result.result}.")
 
     def alg_success(self):
+        """Check whether algorithm was successful"""
         return ((self.machine.result.result == AlgResult.ok.value) or (self.machine.result.result == AlgResult.iterate.value))
 
 
@@ -1059,5 +1063,3 @@ class StrategyError(Exception):
     """
     Basic Exception for this type of class.
     """
-
-# @endcond

@@ -20,8 +20,6 @@
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 #include <framework/gearbox/Gearbox.h>
 
 using namespace std;
@@ -32,27 +30,22 @@ using namespace ROOT::Math;
 namespace {
   class ROETest : public ::testing::Test {
   protected:
-    /** register Particle array + ParticleExtraInfoMap object. */
+    /** register Particle and ROE arrays. */
     void SetUp() override
     {
 
       DataStore::Instance().setInitializeActive(true);
       StoreArray<ECLCluster> myECLClusters;
-      StoreArray<KLMCluster> myKLMClusters;
       StoreArray<TrackFitResult> myTFRs;
       StoreArray<Track> myTracks;
       StoreArray<Particle> myParticles;
       StoreArray<RestOfEvent> myROEs;
-      StoreArray<PIDLikelihood> myPIDLikelihoods;
       myECLClusters.registerInDataStore();
-      myKLMClusters.registerInDataStore();
       myTFRs.registerInDataStore();
       myTracks.registerInDataStore();
       myParticles.registerInDataStore();
       myROEs.registerInDataStore();
-      myPIDLikelihoods.registerInDataStore();
       myParticles.registerRelationTo(myROEs);
-      myTracks.registerRelationTo(myPIDLikelihoods);
       DataStore::Instance().setInitializeActive(false);
 
       TestUtilities::TestParticleFactory factory;

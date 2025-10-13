@@ -33,6 +33,10 @@ DQMHistAnalysisCDCMonObjModule::DQMHistAnalysisCDCMonObjModule()
   : DQMHistAnalysisModule()
 {
   // set module description (e.g. insert text)
+  addParam("HistDirectory", m_name_dir, "CDC Dir of DQM Histogram", std::string("CDC"));
+  addParam("HistBoardADC", m_hname_badc, "Board ADC Histogram Name", std::string("hADCBoard"));
+  addParam("HistBoardTDC", m_hname_btdc, "Board TDC Histogram Name", std::string("hTDC"));
+  addParam("HistHitsPhi", m_hname_hits, "Phi Hits Histogram Name", std::string("hHit"));
   setDescription("Modify and analyze the data quality histograms of CDCMonObj");
   setPropertyFlags(c_ParallelProcessingCertified);
   for (int i = 0; i < 300; i++) {
@@ -58,8 +62,6 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
   if (m_cdcGeo == nullptr) {
     B2FATAL("CDCGeometryp is not valid");
   }
-
-
 
   m_monObj = getMonitoringObject("cdc");
 
@@ -167,6 +169,7 @@ float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1D* h) const
   TH1D* hist = (TH1D*)h->Clone();
   hist->SetBinContent(1, 0.0); // Exclude 0-th bin
   float m = hist->GetMean();
+  delete hist;
   return m;
 }
 
@@ -179,6 +182,7 @@ float DQMHistAnalysisCDCMonObjModule::getHistMedian(TH1D* h) const
   double probSums[1] = {0.5}; // Median definition
   hist->GetQuantiles(1, quantiles, probSums);
   float median = quantiles[0];
+  delete hist;
   return median;
 }
 
@@ -198,9 +202,10 @@ std::pair<int, int> DQMHistAnalysisCDCMonObjModule::getBoardChannel(unsigned sho
 void DQMHistAnalysisCDCMonObjModule::endRun()
 {
   B2DEBUG(20, "end run");
-  m_hADC = (TH2F*)findHist("CDC/hADC");
-  m_hTDC = (TH2F*)findHist("CDC/hTDC");
-  m_hHit = (TH2F*)findHist("CDC/hHit");
+
+  m_hADC = (TH2F*)findHist(m_name_dir + "/" + m_hname_badc);
+  m_hTDC = (TH2F*)findHist(m_name_dir + "/" + m_hname_btdc);
+  m_hHit = (TH2F*)findHist(m_name_dir + "/" + m_hname_hits);
 
   if (m_hADC == nullptr) {
     m_monObj->setVariable("comment", "No ADC histograms of CDC in file");

@@ -71,7 +71,7 @@ namespace Belle2 {
     unsigned getBucketNumber() const {return m_bucketNumber;}
 
     /**
-     * Returs beam revolution count since last revo9 marker.
+     * Returns beam revolution count since last revo9 marker.
      * @return beam revolution count
      */
     unsigned getBeamCycleNumber() const {return m_beamCycle;}

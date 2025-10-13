@@ -5295,7 +5295,7 @@ namespace {
     EXPECT_TRUE(std::isnan(std::get<double>(var->function(particle_with_no_cs))));
 
     // check that FS1 set as third argument, throws a B2ERROR
-    EXPECT_B2ERROR(Manager::Instance().getVariable("KSFWVariables(et, mask, FS1)"));
+    EXPECT_B2ERROR(Manager::Instance().getVariable("KSFWVariables(pt_sum, mask, FS1)"));
   }
 
   TEST_F(MetaVariableTest, CleoConeCS)

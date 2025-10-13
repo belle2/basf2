@@ -494,7 +494,7 @@ Allowed input values for ``variable`` argument are the following:
 * hso20, hso22, hso24
 * hoo0,  hoo1,  hoo2,  hoo3,  hoo4.
 
-.. attention:: The ``et`` variable is now called ``pt_sum`` to better reflect the original definition.
+.. attention:: The et variable is now called pt_sum to better reflect the original definition.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.

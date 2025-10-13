@@ -13,8 +13,6 @@ import uproot
 import numpy as np
 import ROOT
 
-from sklearn.model_selection import train_test_split
-
 
 def fit(model, filename, treename, variables, target_variable, config):
 
@@ -33,9 +31,12 @@ def fit(model, filename, treename, variables, target_variable, config):
     # assert binary labels
     assert len(np.unique(y)) == 2
 
-    # do train test split with shuffling
-    train_size = config['train_valid_fraction']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=train_size, random_state=42)
+    # in-place shuffling of training data
+    # note: must be done with same random seed
+    rng = np.random.default_rng(42)
+    rng.shuffle(X)
+    rng = np.random.default_rng(42)
+    rng.shuffle(y)
 
     # configure the optimizer
     cosine_decay_scheduler = keras.optimizers.schedules.CosineDecay(
@@ -69,14 +70,12 @@ def fit(model, filename, treename, variables, target_variable, config):
         restore_best_weights=True)]
 
     model.fit(
-        X_train,
-        y_train,
-        validation_data=(
-            X_test,
-            y_test),
+        X,
+        y,
+        validation_split=config['train_valid_fraction'],
         batch_size=config['batch_size'],
         epochs=config['epochs'],
         callbacks=callbacks,
-        verbose=1)
+        verbose=2)
 
     print()

@@ -24,7 +24,7 @@ if __name__ == "__main__":
     from tflat.utils import get_variables
     from basf2_mva_util import create_onnx_mva_weightfile
 
-    train_file = "/home/benjamin/dft/tflat_tools/workdir/standard_tflat_training_data24.root"
+    train_file = "/home/benjamin/dft/tflat_tools/merged.root"
 
     parameters = config['parameters']
     rank_variable = 'p'

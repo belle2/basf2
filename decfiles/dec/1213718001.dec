@@ -1,0 +1,38 @@
+# EventType:  1213718001
+# Descriptor:  [B- -> D_2*0 l- nu, D_2*0 -> D0 eta]cc
+# NickName: Bu_D2lnu_Deta
+# Documentation: b->c l nu process, D_2* mode (LLSW model)
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Philipp Horak
+# Email: phorak@uvic.ca
+# Cuts: None
+# Date: 20251013
+#
+
+ 
+Alias D_2*0sig D_2*0
+Alias anti-D_2*0sig anti-D_2*0
+ChargeConj D_2*0sig anti-D_2*0sig
+ 
+Decay Upsilon(4S)
+0.500 B-sig B+  VSS;
+0.500 B- B+sig  VSS;
+Enddecay
+
+ 
+Decay B-sig
+0.500 D_2*0sig  e-  anti-nu_e  PHOTOS LLSW 0.68 -0.2 0.3;
+0.500 D_2*0sig  mu- anti-nu_mu PHOTOS LLSW 0.68 -0.2 0.3;
+Enddecay
+CDecay B+sig
+ 
+Decay  D_2*0sig
+1.0    D0 eta                     TSS;
+Enddecay
+CDecay  anti-D_2*0sig
+ 
+End
+
+
+

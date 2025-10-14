@@ -15,7 +15,7 @@ TBranch: thrustBm
 TBranch: thrustOm
 TBranch: cosTBTO
 TBranch: cosTBz
-TBranch: KSFWVariables__boet__bc
+TBranch: KSFWVariables__bopt_sum__bc
 TBranch: KSFWVariables__bomm2__bc
 TBranch: KSFWVariables__bohso00__bc
 TBranch: KSFWVariables__bohso01__bc
@@ -58,7 +58,7 @@ TBranch: thrustBm, 0.9919
 TBranch: thrustOm, 0.679
 TBranch: cosTBTO, 0.4734
 TBranch: cosTBz, 0.4902
-TBranch: KSFWVariables__boet__bc, 10.33
+TBranch: KSFWVariables__bopt_sum__bc, 10.33
 TBranch: KSFWVariables__bomm2__bc, -2.208
 TBranch: KSFWVariables__bohso00__bc, 0.8699
 TBranch: KSFWVariables__bohso01__bc, 0

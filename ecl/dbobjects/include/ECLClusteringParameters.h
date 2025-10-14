@@ -8,8 +8,8 @@
 
 #pragma once
 
-/* ROOT headers. */
 #include <TObject.h>
+#include <array>
 
 namespace Belle2 {
 
@@ -36,13 +36,13 @@ namespace Belle2 {
     double getLMEnergyCut() const {return m_LM_energyCut;}
 
     /** Get the three energy thresholds for ECLCRFinder [MeV]*/
-    const std::vector<double>& getCRFEnergyCut() const {return m_CRF_energyCut;}
+    const std::array<double, 3>& getCRFEnergyCut() const {return m_CRF_energyCut;}
 
     /** Get the three time cuts for ECLCRFinder [ns]*/
-    const std::vector<double>& getCRFTimeCut() const {return m_CRF_timeCut;}
+    const std::array<double, 3>& getCRFTimeCut() const {return m_CRF_timeCut;}
 
     /** Get the three max energies for time cuts for ECLCRFinder [MeV]*/
-    const std::vector<double>& getCRFTimeCutMaxEnergy() const {return m_CRF_timeCutMaxEnergy;}
+    const std::array<double, 3>& getCRFTimeCutMaxEnergy() const {return m_CRF_timeCutMaxEnergy;}
 
 
     //---------------------------------------------------
@@ -52,21 +52,21 @@ namespace Belle2 {
     void setLMEnergyCut(const double LM_energy_cut) {m_LM_energyCut = LM_energy_cut;}
 
     /** Set the three energy thresholds in ECLCRFinder [MeV]*/
-    void setCRFEnergyCut(std::vector<double>& CRF_energy_cut) {m_CRF_energyCut = CRF_energy_cut;}
+    void setCRFEnergyCut(std::array<double, 3>& CRF_energy_cut) {m_CRF_energyCut = CRF_energy_cut;}
 
     /** Set the three time cuts in ECLCRFinder [ns]*/
-    void setCRFTimeCut(std::vector<double>& CRF_time_cut) {m_CRF_timeCut = CRF_time_cut;}
+    void setCRFTimeCut(std::array<double, 3>& CRF_time_cut) {m_CRF_timeCut = CRF_time_cut;}
 
     /** Set the three time cuts in ECLCRFinder [ns]*/
-    void setCRFTimeCutMaxEnergy(std::vector<double>& CRF_timeCutMaxEnergy) {m_CRF_timeCutMaxEnergy = CRF_timeCutMaxEnergy;}
+    void setCRFTimeCutMaxEnergy(std::array<double, 3>& CRF_timeCutMaxEnergy) {m_CRF_timeCutMaxEnergy = CRF_timeCutMaxEnergy;}
 
 
     //---------------------------------------------------
   private:
     double m_LM_energyCut; /**< energy cut for ECLLocalMaximumFinder seed [MeV] */
-    std::vector<double>  m_CRF_energyCut; /**< energy cuts for ECLCRFinder [MeV] */
-    std::vector<double>  m_CRF_timeCut; /**< time cuts for ECLCRFinder [ns] */
-    std::vector<double> m_CRF_timeCutMaxEnergy; /**< time cuts are only applied below these energies [MeV] */
+    std::array<double, 3> m_CRF_energyCut; /**< energy cuts for ECLCRFinder [MeV] */
+    std::array<double, 3> m_CRF_timeCut; /**< time cuts for ECLCRFinder [ns] */
+    std::array<double, 3> m_CRF_timeCutMaxEnergy; /**< time cuts are only applied below these energies [MeV] */
 
     ClassDef(ECLClusteringParameters, 1); /**< ClassDef */
   };

@@ -9,7 +9,7 @@
 # Cuts: None
 # Date: 20251010
 # to be added in the steering file, to to run several mass hypotheses 
-# pdg.add_particle('Xinv', 900000, mass=1.0, width=0, charge=0, spin=0)
+# pdg.add_particle('Xinv', 999999, mass=1.0, width=0, charge=0, spin=0)
 
 # Set the Upsilon(4S) to decay entirely into our signal B's 
 Decay Upsilon(4S)

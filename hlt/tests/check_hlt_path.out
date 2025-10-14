@@ -1523,9 +1523,9 @@
   173. ParticleSelector_applyCuts_gamma:skim
       cut=isFromECL
       decayString=gamma:skim
-  174. ParticleLoader_K_S0:V0_ToFit -> pi+ pi-
+  174. ParticleLoader_K_S0:V0_ToFit_KFit -> pi+ pi-
       addDaughters=False
-      decayStrings=['K_S0:V0_ToFit -> pi+ pi-']
+      decayStrings=['K_S0:V0_ToFit_KFit -> pi+ pi-']
       dummyCovMatrix=10000.0
       dummyMDSTIndex=0
       dummyTreatAsInvisible=True
@@ -1543,28 +1543,28 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  175. PListCopy_K_S0:V0_ToFit
+  175. PListCopy_K_S0:V0_ToFit_KFit
       cut=
       ignoreMotherFlavor=False
       inputListNames=['K_S0:V0']
-      outputListName=K_S0:V0_ToFit
+      outputListName=K_S0:V0_ToFit_KFit
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  176. ParticleVertexFitter_K_S0:V0_ToFit
+  176. ParticleVertexFitter_K_S0:V0_ToFit_KFit
       confidenceLevel=0.0
       decayString=
       fitType=vertex
-      listName=K_S0:V0_ToFit
+      listName=K_S0:V0_ToFit_KFit
       massConstraintList=[]
       recoilMass=0.0
       smearing=0.0
       updateDaughters=False
       vertexFitter=KFit
       withConstraint=
-  177. ParticleSelector_applyCuts_K_S0:V0_ToFit
+  177. ParticleSelector_applyCuts_K_S0:V0_ToFit_KFit
       cut=0.450 < M < 0.550
-      decayString=K_S0:V0_ToFit
+      decayString=K_S0:V0_ToFit_KFit
   178. ParticleLoader_pi+:all
       addDaughters=False
       decayStrings=['pi+:all']
@@ -1585,42 +1585,42 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  179. ParticleCombiner_K_S0:RD -> pi+:all pi-:all
+  179. ParticleCombiner_K_S0:RD_KFit -> pi+:all pi-:all
       allowChargeViolation=False
       chargeConjugation=True
       cut=0.3 < M < 0.7
       decayMode=1
-      decayString=K_S0:RD -> pi+:all pi-:all
+      decayString=K_S0:RD_KFit -> pi+:all pi-:all
       ignoreIfTooManyCandidates=True
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  180. ParticleVertexFitter_K_S0:RD
+  180. ParticleVertexFitter_K_S0:RD_KFit
       confidenceLevel=0.0
       decayString=
       fitType=vertex
-      listName=K_S0:RD
+      listName=K_S0:RD_KFit
       massConstraintList=[]
       recoilMass=0.0
       smearing=0.0
       updateDaughters=False
       vertexFitter=KFit
       withConstraint=
-  181. ParticleSelector_applyCuts_K_S0:RD
+  181. ParticleSelector_applyCuts_K_S0:RD_KFit
       cut=0.450 < M < 0.550
-      decayString=K_S0:RD
-  182. PListMerger_K_S0:merged
+      decayString=K_S0:RD_KFit
+  182. PListMerger_K_S0:merged_KFit
       cut=
       ignoreMotherFlavor=False
-      inputListNames=['K_S0:V0_ToFit', 'K_S0:RD']
-      outputListName=K_S0:merged
+      inputListNames=['K_S0:V0_ToFit_KFit', 'K_S0:RD_KFit']
+      outputListName=K_S0:merged_KFit
       preferLowest=True
       variable=particleSource
       writeOut=False
   183. PListCutAndCopy_K_S0:dstSkim
       cut=goodBelleKshort == 1
       ignoreMotherFlavor=False
-      inputListNames=['K_S0:merged']
+      inputListNames=['K_S0:merged_KFit']
       outputListName=K_S0:dstSkim
       preferLowest=True
       variable=mdstIndex
@@ -2541,9 +2541,9 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=True
-  287. ParticleLoader_K_S0:V0_ToFit -> pi+ pi-
+  287. ParticleLoader_K_S0:V0_ToFit_TreeFit -> pi+ pi-
       addDaughters=False
-      decayStrings=['K_S0:V0_ToFit -> pi+ pi-']
+      decayStrings=['K_S0:V0_ToFit_TreeFit -> pi+ pi-']
       dummyCovMatrix=10000.0
       dummyMDSTIndex=0
       dummyTreatAsInvisible=True
@@ -2561,15 +2561,15 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=True
-  288. PListCopy_K_S0:V0_ToFit
+  288. PListCopy_K_S0:V0_ToFit_TreeFit
       cut=
       ignoreMotherFlavor=False
       inputListNames=['K_S0:V0']
-      outputListName=K_S0:V0_ToFit
+      outputListName=K_S0:V0_ToFit_TreeFit
       preferLowest=True
       variable=mdstIndex
       writeOut=True
-  289. TreeFitter_K_S0:V0_ToFit
+  289. TreeFitter_K_S0:V0_ToFit_TreeFit
       autoSetGeoConstraintAndMergeVertices=True
       confidenceLevel=0.0
       convergencePrecision=0.01
@@ -2587,13 +2587,13 @@
       massConstraintList=[]
       massConstraintMassValues=[]
       originDimension=3
-      particleList=K_S0:V0_ToFit
+      particleList=K_S0:V0_ToFit_TreeFit
       sharedVertexList=[]
       treatAsInvisible=
       updateAllDaughters=True
-  290. ParticleSelector_applyCuts_K_S0:V0_ToFit
+  290. ParticleSelector_applyCuts_K_S0:V0_ToFit_TreeFit
       cut=0.450 < M < 0.550
-      decayString=K_S0:V0_ToFit
+      decayString=K_S0:V0_ToFit_TreeFit
   291. ParticleLoader_pi+:all
       addDaughters=False
       decayStrings=['pi+:all']
@@ -2614,17 +2614,17 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=True
-  292. ParticleCombiner_K_S0:RD -> pi+:all pi-:all
+  292. ParticleCombiner_K_S0:RD_TreeFit -> pi+:all pi-:all
       allowChargeViolation=False
       chargeConjugation=True
       cut=0.3 < M < 0.7
       decayMode=1
-      decayString=K_S0:RD -> pi+:all pi-:all
+      decayString=K_S0:RD_TreeFit -> pi+:all pi-:all
       ignoreIfTooManyCandidates=True
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=True
-  293. TreeFitter_K_S0:RD
+  293. TreeFitter_K_S0:RD_TreeFit
       autoSetGeoConstraintAndMergeVertices=True
       confidenceLevel=0.0
       convergencePrecision=0.01
@@ -2642,18 +2642,18 @@
       massConstraintList=[]
       massConstraintMassValues=[]
       originDimension=3
-      particleList=K_S0:RD
+      particleList=K_S0:RD_TreeFit
       sharedVertexList=[]
       treatAsInvisible=
       updateAllDaughters=True
-  294. ParticleSelector_applyCuts_K_S0:RD
+  294. ParticleSelector_applyCuts_K_S0:RD_TreeFit
       cut=0.450 < M < 0.550
-      decayString=K_S0:RD
-  295. PListMerger_K_S0:merged
+      decayString=K_S0:RD_TreeFit
+  295. PListMerger_K_S0:merged_TreeFit
       cut=
       ignoreMotherFlavor=False
-      inputListNames=['K_S0:V0_ToFit', 'K_S0:RD']
-      outputListName=K_S0:merged
+      inputListNames=['K_S0:V0_ToFit_TreeFit', 'K_S0:RD_TreeFit']
+      outputListName=K_S0:merged_TreeFit
       preferLowest=True
       variable=particleSource
       writeOut=False
@@ -2810,7 +2810,7 @@
       enableThrust=False
       particleListNames=['pi+:evtshape', 'gamma:evtshape']
   310. PhysicsObjectsDQM
-      KS0PListName=K_S0:merged
+      KS0PListName=K_S0:merged_TreeFit
       PI0PListName=pi0:physDQM
       TriggerIdentifier=software_trigger_cut&skim&accept_hadron
       TriggerIdentifierBhabha=software_trigger_cut&skim&accept_bhabha_all
@@ -4166,7 +4166,7 @@
             matchEntries=['EventMetaData', 'RawFTSWs', 'ROIpayload', 'SoftwareTriggerResult', 'SoftwareTriggerVariables', 'TRGSummary']
         3. Sum_HLT_Discard
 
-      (? ==1[V0Finder -> TrackFinderMCTruthRecoTracks -> MCRecoTracksMatcher -> TrackToMCParticleRelator -> PruneRecoHits -> PruneRecoTracks CopiedRecoTracks -> Sum_Postfilter_Tracking -> CDCDedxHitSaver -> CDCDedxPIDCreator -> VXDDedxPID -> TOPChannelMasker -> TOPBunchFinder -> TOPReconstructor -> ARICHFillHits -> ARICHReconstructor -> OnlineEventT0Creator -> ECLChargedPID -> MdstPID -> KLMExpert -> ClusterMatcher -> ECLTrackBremFinder -> Sum_Postfilter_PostTracking -> ParticleLoader_pi+:skim -> PListCopy_pi+:skim -> ParticleSelector_applyCuts_pi+:skim -> ParticleLoader_pi+:hadb -> PListCopy_pi+:hadb -> ParticleSelector_applyCuts_pi+:hadb -> ParticleLoader_pi+:tau -> PListCopy_pi+:tau -> ParticleSelector_applyCuts_pi+:tau -> ParticleLoader_gamma:skim -> PListCopy_gamma:skim -> ParticleSelector_applyCuts_gamma:skim -> ParticleSelector_applyCuts_gamma:skim -> ParticleLoader_K_S0:V0_ToFit -> pi+ pi- -> PListCopy_K_S0:V0_ToFit -> ParticleVertexFitter_K_S0:V0_ToFit -> ParticleSelector_applyCuts_K_S0:V0_ToFit -> ParticleLoader_pi+:all -> ParticleCombiner_K_S0:RD -> pi+:all pi-:all -> ParticleVertexFitter_K_S0:RD -> ParticleSelector_applyCuts_K_S0:RD -> PListMerger_K_S0:merged -> PListCutAndCopy_K_S0:dstSkim -> ParticleLoader_Lambda0:V0_ToFit -> p+ pi- -> PListCopy_Lambda0:V0_ToFit -> TreeFitter_Lambda0:V0_ToFit -> ParticleSelector_applyCuts_Lambda0:V0_ToFit -> DuplicateVertexMarker -> ParticleSelector_applyCuts_Lambda0:V0_ToFit -> ParticleLoader_pi+:all -> ParticleLoader_p+:all -> ParticleCombiner_Lambda0:RD -> p+:all pi-:all -> TreeFitter_Lambda0:RD -> ParticleSelector_applyCuts_Lambda0:RD -> DuplicateVertexMarker -> ParticleSelector_applyCuts_Lambda0:RD -> PListMerger_Lambda0:merged -> ParticleLoader_K+:dstSkim -> PListCopy_K+:dstSkim -> ParticleSelector_applyCuts_K+:dstSkim -> ParticleLoader_pi+:dstSkim -> PListCopy_pi+:dstSkim -> ParticleSelector_applyCuts_pi+:dstSkim -> ParticleLoader_gamma:loose -> PListCopy_gamma:loose -> ParticleSelector_applyCuts_gamma:loose -> ParticleSelector_applyCuts_gamma:loose -> ParticleCombiner_pi0:loose -> gamma:loose gamma:loose -> PListCutAndCopy_pi0:veryLooseFit -> ParticleVertexFitter_pi0:veryLooseFit -> ParticleCombiner_D0:ch1 -> K-:dstSkim pi+:dstSkim -> ParticleCombiner_D0:ch2 -> K-:dstSkim pi+:dstSkim pi0:veryLooseFit -> ParticleCombiner_D0:ch3 -> K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim -> ParticleCombiner_D0:ch4 -> K_S0:dstSkim pi+:dstSkim pi-:dstSkim -> ParticleCombiner_D*+:ch1 -> D0:ch1 pi+:all -> ParticleCombiner_D*+:ch2 -> D0:ch2 pi+:all -> ParticleCombiner_D*+:ch3 -> D0:ch3 pi+:all -> ParticleCombiner_D*+:ch4 -> D0:ch4 pi+:all -> PListCopy_D*+:d0pi -> ParticleLoader_pi+:offip -> PListCopy_pi+:offip -> ParticleSelector_applyCuts_pi+:offip -> ParticleLoader_pi+:GoodTrackForHLT -> PListCopy_pi+:GoodTrackForHLT -> ParticleSelector_applyCuts_pi+:GoodTrackForHLT -> ParticleLoader_K+:GoodTrackForHLT -> PListCopy_K+:GoodTrackForHLT -> ParticleSelector_applyCuts_K+:GoodTrackForHLT -> ParticleLoader_gamma:GoodPi0ForHLT -> PListCopy_gamma:GoodPi0ForHLT -> ParticleSelector_applyCuts_gamma:GoodPi0ForHLT -> ParticleSelector_applyCuts_gamma:GoodPi0ForHLT -> ParticleCombiner_pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT -> MCMatch_pi0:GoodPi0ForHLT -> ParticleCombiner_D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D0:Kpipi0ForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi0:GoodPi0ForHLT -> ParticleCombiner_D0:KpipipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT pi-:GoodTrackForHLT -> ParticleCombiner_D+:KpipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D*+:D0_KpiForHLT -> D0:KpiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D*+:D0_Kpipi0ForHLT -> D0:Kpipi0ForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D*+:D0_KpipipiForHLT -> D0:KpipipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B+:BtoD0pi_KpiForHLT -> anti-D0:KpiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B+:BtoD0pi_Kpipi0ForHLT -> anti-D0:Kpipi0ForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B+:BtoD0pi_KpipipiForHLT -> anti-D0:KpipipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDpi_KpipiForHLT -> D-:KpipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDstarPi_D0pi_KpiForHLT -> D*-:D0_KpiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDstarPi_D0pi_KpipipiForHLT -> D*-:D0_KpipipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDstarPi_D0pi_Kpipi0ForHLT -> D*-:D0_Kpipi0ForHLT pi+:GoodTrackForHLT -> PListCopy_B+:BtoCharmForHLT -> PListCopy_B0:BtoCharmForHLT -> SoftwareTrigger -> Sum_HLT_Skim_Calculation -> PXDROIFinder -> Sum_ROI_Finder -> SoftwareTriggerHLTDQM -> StatisticsTimingHLTDQM_after_filter -> TrackingAbortDQM -> DetectorOccupanciesDQM -> SoftwareTriggerHLTDQM_skim_nobhabha -> SVDUnpackerDQM -> cdcDQM7 -> CDCDedxDQM -> ECLDQM -> ECLDQMEXTENDED -> ECLDQMOutOfTimeDigits -> ECLDQMConnectedRegions -> TOPDQM -> KLMDQM -> TRGGDLDQM -> TRGEFFDQM -> TrackingHLTDQM -> ARICHDQM -> ParticleLoader_mu+:KLMDQM -> PListCopy_mu+:KLMDQM -> ParticleSelector_applyCuts_mu+:KLMDQM -> ParticleLoader_mu+:KLMDQM2 -> PListCopy_mu+:KLMDQM2 -> ParticleSelector_applyCuts_mu+:KLMDQM2 -> ParticleLoader_gamma:physDQM -> PListCopy_gamma:physDQM -> ParticleSelector_applyCuts_gamma:physDQM -> ParticleSelector_applyCuts_gamma:physDQM -> ParticleLoader_mu+:physDQM -> PListCopy_mu+:physDQM -> ParticleSelector_applyCuts_mu+:physDQM -> ParticleCombiner_pi0:physDQM -> gamma:physDQM gamma:physDQM -> ParticleLoader_K_S0:V0_ToFit -> pi+ pi- -> PListCopy_K_S0:V0_ToFit -> TreeFitter_K_S0:V0_ToFit -> ParticleSelector_applyCuts_K_S0:V0_ToFit -> ParticleLoader_pi+:all -> ParticleCombiner_K_S0:RD -> pi+:all pi-:all -> TreeFitter_K_S0:RD -> ParticleSelector_applyCuts_K_S0:RD -> PListMerger_K_S0:merged -> ParticleCombiner_Upsilon:physDQM -> mu-:physDQM mu+:physDQM -> ParticleLoader_e+:physDQM -> PListCopy_e+:physDQM -> ParticleSelector_applyCuts_e+:physDQM -> ParticleCombiner_Upsilon:ephysDQM -> e-:physDQM e+:physDQM -> ParticleLoader_pi+:hadbphysDQM -> PListCopy_pi+:hadbphysDQM -> ParticleSelector_applyCuts_pi+:hadbphysDQM -> ParticleLoader_pi+:evtshape -> PListCopy_pi+:evtshape -> ParticleLoader_gamma:evtshape -> PListCopy_gamma:evtshape -> ParticleSelector_applyCuts_gamma:evtshape -> EventShape -> PhysicsObjectsDQM -> ParticleLoader_mu+:DQM_HLT -> PListCopy_mu+:DQM_HLT -> ParticleSelector_applyCuts_mu+:DQM_HLT -> ParticleCombiner_Upsilon(4S):IPDQM_HLT -> mu+:DQM_HLT mu-:DQM_HLT -> ParticleVertexFitter_Upsilon(4S):IPDQM_HLT -> IPDQM -> KLMDQM2 -> Sum_HLT_DQM_filtered] ):
+      (? ==1[V0Finder -> TrackFinderMCTruthRecoTracks -> MCRecoTracksMatcher -> TrackToMCParticleRelator -> PruneRecoHits -> PruneRecoTracks CopiedRecoTracks -> Sum_Postfilter_Tracking -> CDCDedxHitSaver -> CDCDedxPIDCreator -> VXDDedxPID -> TOPChannelMasker -> TOPBunchFinder -> TOPReconstructor -> ARICHFillHits -> ARICHReconstructor -> OnlineEventT0Creator -> ECLChargedPID -> MdstPID -> KLMExpert -> ClusterMatcher -> ECLTrackBremFinder -> Sum_Postfilter_PostTracking -> ParticleLoader_pi+:skim -> PListCopy_pi+:skim -> ParticleSelector_applyCuts_pi+:skim -> ParticleLoader_pi+:hadb -> PListCopy_pi+:hadb -> ParticleSelector_applyCuts_pi+:hadb -> ParticleLoader_pi+:tau -> PListCopy_pi+:tau -> ParticleSelector_applyCuts_pi+:tau -> ParticleLoader_gamma:skim -> PListCopy_gamma:skim -> ParticleSelector_applyCuts_gamma:skim -> ParticleSelector_applyCuts_gamma:skim -> ParticleLoader_K_S0:V0_ToFit_KFit -> pi+ pi- -> PListCopy_K_S0:V0_ToFit_KFit -> ParticleVertexFitter_K_S0:V0_ToFit_KFit -> ParticleSelector_applyCuts_K_S0:V0_ToFit_KFit -> ParticleLoader_pi+:all -> ParticleCombiner_K_S0:RD_KFit -> pi+:all pi-:all -> ParticleVertexFitter_K_S0:RD_KFit -> ParticleSelector_applyCuts_K_S0:RD_KFit -> PListMerger_K_S0:merged_KFit -> PListCutAndCopy_K_S0:dstSkim -> ParticleLoader_Lambda0:V0_ToFit -> p+ pi- -> PListCopy_Lambda0:V0_ToFit -> TreeFitter_Lambda0:V0_ToFit -> ParticleSelector_applyCuts_Lambda0:V0_ToFit -> DuplicateVertexMarker -> ParticleSelector_applyCuts_Lambda0:V0_ToFit -> ParticleLoader_pi+:all -> ParticleLoader_p+:all -> ParticleCombiner_Lambda0:RD -> p+:all pi-:all -> TreeFitter_Lambda0:RD -> ParticleSelector_applyCuts_Lambda0:RD -> DuplicateVertexMarker -> ParticleSelector_applyCuts_Lambda0:RD -> PListMerger_Lambda0:merged -> ParticleLoader_K+:dstSkim -> PListCopy_K+:dstSkim -> ParticleSelector_applyCuts_K+:dstSkim -> ParticleLoader_pi+:dstSkim -> PListCopy_pi+:dstSkim -> ParticleSelector_applyCuts_pi+:dstSkim -> ParticleLoader_gamma:loose -> PListCopy_gamma:loose -> ParticleSelector_applyCuts_gamma:loose -> ParticleSelector_applyCuts_gamma:loose -> ParticleCombiner_pi0:loose -> gamma:loose gamma:loose -> PListCutAndCopy_pi0:veryLooseFit -> ParticleVertexFitter_pi0:veryLooseFit -> ParticleCombiner_D0:ch1 -> K-:dstSkim pi+:dstSkim -> ParticleCombiner_D0:ch2 -> K-:dstSkim pi+:dstSkim pi0:veryLooseFit -> ParticleCombiner_D0:ch3 -> K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim -> ParticleCombiner_D0:ch4 -> K_S0:dstSkim pi+:dstSkim pi-:dstSkim -> ParticleCombiner_D*+:ch1 -> D0:ch1 pi+:all -> ParticleCombiner_D*+:ch2 -> D0:ch2 pi+:all -> ParticleCombiner_D*+:ch3 -> D0:ch3 pi+:all -> ParticleCombiner_D*+:ch4 -> D0:ch4 pi+:all -> PListCopy_D*+:d0pi -> ParticleLoader_pi+:offip -> PListCopy_pi+:offip -> ParticleSelector_applyCuts_pi+:offip -> ParticleLoader_pi+:GoodTrackForHLT -> PListCopy_pi+:GoodTrackForHLT -> ParticleSelector_applyCuts_pi+:GoodTrackForHLT -> ParticleLoader_K+:GoodTrackForHLT -> PListCopy_K+:GoodTrackForHLT -> ParticleSelector_applyCuts_K+:GoodTrackForHLT -> ParticleLoader_gamma:GoodPi0ForHLT -> PListCopy_gamma:GoodPi0ForHLT -> ParticleSelector_applyCuts_gamma:GoodPi0ForHLT -> ParticleSelector_applyCuts_gamma:GoodPi0ForHLT -> ParticleCombiner_pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT -> MCMatch_pi0:GoodPi0ForHLT -> ParticleCombiner_D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D0:Kpipi0ForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi0:GoodPi0ForHLT -> ParticleCombiner_D0:KpipipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT pi-:GoodTrackForHLT -> ParticleCombiner_D+:KpipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D*+:D0_KpiForHLT -> D0:KpiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D*+:D0_Kpipi0ForHLT -> D0:Kpipi0ForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D*+:D0_KpipipiForHLT -> D0:KpipipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B+:BtoD0pi_KpiForHLT -> anti-D0:KpiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B+:BtoD0pi_Kpipi0ForHLT -> anti-D0:Kpipi0ForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B+:BtoD0pi_KpipipiForHLT -> anti-D0:KpipipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDpi_KpipiForHLT -> D-:KpipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDstarPi_D0pi_KpiForHLT -> D*-:D0_KpiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDstarPi_D0pi_KpipipiForHLT -> D*-:D0_KpipipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDstarPi_D0pi_Kpipi0ForHLT -> D*-:D0_Kpipi0ForHLT pi+:GoodTrackForHLT -> PListCopy_B+:BtoCharmForHLT -> PListCopy_B0:BtoCharmForHLT -> SoftwareTrigger -> Sum_HLT_Skim_Calculation -> PXDROIFinder -> Sum_ROI_Finder -> SoftwareTriggerHLTDQM -> StatisticsTimingHLTDQM_after_filter -> TrackingAbortDQM -> DetectorOccupanciesDQM -> SoftwareTriggerHLTDQM_skim_nobhabha -> SVDUnpackerDQM -> cdcDQM7 -> CDCDedxDQM -> ECLDQM -> ECLDQMEXTENDED -> ECLDQMOutOfTimeDigits -> ECLDQMConnectedRegions -> TOPDQM -> KLMDQM -> TRGGDLDQM -> TRGEFFDQM -> TrackingHLTDQM -> ARICHDQM -> ParticleLoader_mu+:KLMDQM -> PListCopy_mu+:KLMDQM -> ParticleSelector_applyCuts_mu+:KLMDQM -> ParticleLoader_mu+:KLMDQM2 -> PListCopy_mu+:KLMDQM2 -> ParticleSelector_applyCuts_mu+:KLMDQM2 -> ParticleLoader_gamma:physDQM -> PListCopy_gamma:physDQM -> ParticleSelector_applyCuts_gamma:physDQM -> ParticleSelector_applyCuts_gamma:physDQM -> ParticleLoader_mu+:physDQM -> PListCopy_mu+:physDQM -> ParticleSelector_applyCuts_mu+:physDQM -> ParticleCombiner_pi0:physDQM -> gamma:physDQM gamma:physDQM -> ParticleLoader_K_S0:V0_ToFit_TreeFit -> pi+ pi- -> PListCopy_K_S0:V0_ToFit_TreeFit -> TreeFitter_K_S0:V0_ToFit_TreeFit -> ParticleSelector_applyCuts_K_S0:V0_ToFit_TreeFit -> ParticleLoader_pi+:all -> ParticleCombiner_K_S0:RD_TreeFit -> pi+:all pi-:all -> TreeFitter_K_S0:RD_TreeFit -> ParticleSelector_applyCuts_K_S0:RD_TreeFit -> PListMerger_K_S0:merged_TreeFit -> ParticleCombiner_Upsilon:physDQM -> mu-:physDQM mu+:physDQM -> ParticleLoader_e+:physDQM -> PListCopy_e+:physDQM -> ParticleSelector_applyCuts_e+:physDQM -> ParticleCombiner_Upsilon:ephysDQM -> e-:physDQM e+:physDQM -> ParticleLoader_pi+:hadbphysDQM -> PListCopy_pi+:hadbphysDQM -> ParticleSelector_applyCuts_pi+:hadbphysDQM -> ParticleLoader_pi+:evtshape -> PListCopy_pi+:evtshape -> ParticleLoader_gamma:evtshape -> PListCopy_gamma:evtshape -> ParticleSelector_applyCuts_gamma:evtshape -> EventShape -> PhysicsObjectsDQM -> ParticleLoader_mu+:DQM_HLT -> PListCopy_mu+:DQM_HLT -> ParticleSelector_applyCuts_mu+:DQM_HLT -> ParticleCombiner_Upsilon(4S):IPDQM_HLT -> mu+:DQM_HLT mu-:DQM_HLT -> ParticleVertexFitter_Upsilon(4S):IPDQM_HLT -> IPDQM -> KLMDQM2 -> Sum_HLT_DQM_filtered] ):
         1. V0Finder
             CopiedRecoTracks=CopiedRecoTracks
             RecoTracks=RecoTracks
@@ -4445,9 +4445,9 @@
         35. ParticleSelector_applyCuts_gamma:skim
             cut=isFromECL
             decayString=gamma:skim
-        36. ParticleLoader_K_S0:V0_ToFit -> pi+ pi-
+        36. ParticleLoader_K_S0:V0_ToFit_KFit -> pi+ pi-
             addDaughters=False
-            decayStrings=['K_S0:V0_ToFit -> pi+ pi-']
+            decayStrings=['K_S0:V0_ToFit_KFit -> pi+ pi-']
             dummyCovMatrix=10000.0
             dummyMDSTIndex=0
             dummyTreatAsInvisible=True
@@ -4465,28 +4465,28 @@
             useOnlyMostEnergeticECLCluster=True
             useROEs=False
             writeOut=False
-        37. PListCopy_K_S0:V0_ToFit
+        37. PListCopy_K_S0:V0_ToFit_KFit
             cut=
             ignoreMotherFlavor=False
             inputListNames=['K_S0:V0']
-            outputListName=K_S0:V0_ToFit
+            outputListName=K_S0:V0_ToFit_KFit
             preferLowest=True
             variable=mdstIndex
             writeOut=False
-        38. ParticleVertexFitter_K_S0:V0_ToFit
+        38. ParticleVertexFitter_K_S0:V0_ToFit_KFit
             confidenceLevel=0.0
             decayString=
             fitType=vertex
-            listName=K_S0:V0_ToFit
+            listName=K_S0:V0_ToFit_KFit
             massConstraintList=[]
             recoilMass=0.0
             smearing=0.0
             updateDaughters=False
             vertexFitter=KFit
             withConstraint=
-        39. ParticleSelector_applyCuts_K_S0:V0_ToFit
+        39. ParticleSelector_applyCuts_K_S0:V0_ToFit_KFit
             cut=0.450 < M < 0.550
-            decayString=K_S0:V0_ToFit
+            decayString=K_S0:V0_ToFit_KFit
         40. ParticleLoader_pi+:all
             addDaughters=False
             decayStrings=['pi+:all']
@@ -4507,42 +4507,42 @@
             useOnlyMostEnergeticECLCluster=True
             useROEs=False
             writeOut=False
-        41. ParticleCombiner_K_S0:RD -> pi+:all pi-:all
+        41. ParticleCombiner_K_S0:RD_KFit -> pi+:all pi-:all
             allowChargeViolation=False
             chargeConjugation=True
             cut=0.3 < M < 0.7
             decayMode=1
-            decayString=K_S0:RD -> pi+:all pi-:all
+            decayString=K_S0:RD_KFit -> pi+:all pi-:all
             ignoreIfTooManyCandidates=True
             maximumNumberOfCandidates=10000
             recoilParticleType=0
             writeOut=False
-        42. ParticleVertexFitter_K_S0:RD
+        42. ParticleVertexFitter_K_S0:RD_KFit
             confidenceLevel=0.0
             decayString=
             fitType=vertex
-            listName=K_S0:RD
+            listName=K_S0:RD_KFit
             massConstraintList=[]
             recoilMass=0.0
             smearing=0.0
             updateDaughters=False
             vertexFitter=KFit
             withConstraint=
-        43. ParticleSelector_applyCuts_K_S0:RD
+        43. ParticleSelector_applyCuts_K_S0:RD_KFit
             cut=0.450 < M < 0.550
-            decayString=K_S0:RD
-        44. PListMerger_K_S0:merged
+            decayString=K_S0:RD_KFit
+        44. PListMerger_K_S0:merged_KFit
             cut=
             ignoreMotherFlavor=False
-            inputListNames=['K_S0:V0_ToFit', 'K_S0:RD']
-            outputListName=K_S0:merged
+            inputListNames=['K_S0:V0_ToFit_KFit', 'K_S0:RD_KFit']
+            outputListName=K_S0:merged_KFit
             preferLowest=True
             variable=particleSource
             writeOut=False
         45. PListCutAndCopy_K_S0:dstSkim
             cut=goodBelleKshort == 1
             ignoreMotherFlavor=False
-            inputListNames=['K_S0:merged']
+            inputListNames=['K_S0:merged_KFit']
             outputListName=K_S0:dstSkim
             preferLowest=True
             variable=mdstIndex
@@ -5463,9 +5463,9 @@
             maximumNumberOfCandidates=10000
             recoilParticleType=0
             writeOut=True
-        149. ParticleLoader_K_S0:V0_ToFit -> pi+ pi-
+        149. ParticleLoader_K_S0:V0_ToFit_TreeFit -> pi+ pi-
             addDaughters=False
-            decayStrings=['K_S0:V0_ToFit -> pi+ pi-']
+            decayStrings=['K_S0:V0_ToFit_TreeFit -> pi+ pi-']
             dummyCovMatrix=10000.0
             dummyMDSTIndex=0
             dummyTreatAsInvisible=True
@@ -5483,15 +5483,15 @@
             useOnlyMostEnergeticECLCluster=True
             useROEs=False
             writeOut=True
-        150. PListCopy_K_S0:V0_ToFit
+        150. PListCopy_K_S0:V0_ToFit_TreeFit
             cut=
             ignoreMotherFlavor=False
             inputListNames=['K_S0:V0']
-            outputListName=K_S0:V0_ToFit
+            outputListName=K_S0:V0_ToFit_TreeFit
             preferLowest=True
             variable=mdstIndex
             writeOut=True
-        151. TreeFitter_K_S0:V0_ToFit
+        151. TreeFitter_K_S0:V0_ToFit_TreeFit
             autoSetGeoConstraintAndMergeVertices=True
             confidenceLevel=0.0
             convergencePrecision=0.01
@@ -5509,13 +5509,13 @@
             massConstraintList=[]
             massConstraintMassValues=[]
             originDimension=3
-            particleList=K_S0:V0_ToFit
+            particleList=K_S0:V0_ToFit_TreeFit
             sharedVertexList=[]
             treatAsInvisible=
             updateAllDaughters=True
-        152. ParticleSelector_applyCuts_K_S0:V0_ToFit
+        152. ParticleSelector_applyCuts_K_S0:V0_ToFit_TreeFit
             cut=0.450 < M < 0.550
-            decayString=K_S0:V0_ToFit
+            decayString=K_S0:V0_ToFit_TreeFit
         153. ParticleLoader_pi+:all
             addDaughters=False
             decayStrings=['pi+:all']
@@ -5536,17 +5536,17 @@
             useOnlyMostEnergeticECLCluster=True
             useROEs=False
             writeOut=True
-        154. ParticleCombiner_K_S0:RD -> pi+:all pi-:all
+        154. ParticleCombiner_K_S0:RD_TreeFit -> pi+:all pi-:all
             allowChargeViolation=False
             chargeConjugation=True
             cut=0.3 < M < 0.7
             decayMode=1
-            decayString=K_S0:RD -> pi+:all pi-:all
+            decayString=K_S0:RD_TreeFit -> pi+:all pi-:all
             ignoreIfTooManyCandidates=True
             maximumNumberOfCandidates=10000
             recoilParticleType=0
             writeOut=True
-        155. TreeFitter_K_S0:RD
+        155. TreeFitter_K_S0:RD_TreeFit
             autoSetGeoConstraintAndMergeVertices=True
             confidenceLevel=0.0
             convergencePrecision=0.01
@@ -5564,18 +5564,18 @@
             massConstraintList=[]
             massConstraintMassValues=[]
             originDimension=3
-            particleList=K_S0:RD
+            particleList=K_S0:RD_TreeFit
             sharedVertexList=[]
             treatAsInvisible=
             updateAllDaughters=True
-        156. ParticleSelector_applyCuts_K_S0:RD
+        156. ParticleSelector_applyCuts_K_S0:RD_TreeFit
             cut=0.450 < M < 0.550
-            decayString=K_S0:RD
-        157. PListMerger_K_S0:merged
+            decayString=K_S0:RD_TreeFit
+        157. PListMerger_K_S0:merged_TreeFit
             cut=
             ignoreMotherFlavor=False
-            inputListNames=['K_S0:V0_ToFit', 'K_S0:RD']
-            outputListName=K_S0:merged
+            inputListNames=['K_S0:V0_ToFit_TreeFit', 'K_S0:RD_TreeFit']
+            outputListName=K_S0:merged_TreeFit
             preferLowest=True
             variable=particleSource
             writeOut=False
@@ -5732,7 +5732,7 @@
             enableThrust=False
             particleListNames=['pi+:evtshape', 'gamma:evtshape']
         172. PhysicsObjectsDQM
-            KS0PListName=K_S0:merged
+            KS0PListName=K_S0:merged_TreeFit
             PI0PListName=pi0:physDQM
             TriggerIdentifier=software_trigger_cut&skim&accept_hadron
             TriggerIdentifierBhabha=software_trigger_cut&skim&accept_bhabha_all

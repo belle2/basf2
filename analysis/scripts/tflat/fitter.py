@@ -72,7 +72,7 @@ def fit(model, filename, treename, variables, target_variable, config):
     model.fit(
         X,
         y,
-        validation_split=config['train_valid_fraction'],
+        validation_split=1-config['train_valid_fraction'],
         batch_size=config['batch_size'],
         epochs=config['epochs'],
         callbacks=callbacks,

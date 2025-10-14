@@ -136,7 +136,7 @@ This is done inside the FEI steering script.
 
 Note that when running on Belle converted data or MC you will need to use the ``B2BII`` and ``B2BII_MC`` database tags, respectively.
 
-If you have trouble finding the correct analysis tag, please ask a question at `B2Questions <https://questions.belle2.org>`_ and/or send a mail to frank.meier@belle2.org,
+If you have trouble finding the correct analysis tag, please ask a question at `B2Questions <https://questions.belle2.org>`_ and/or send a mail to vidya.sagar.vobbilisetti@belle2.org,
 
 Sphinx documentation
 ####################

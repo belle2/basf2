@@ -1,5 +1,5 @@
 # EventType: 1210010010
-# Descriptor: [B+ -> K+ S ]cc
+# Descriptor: [B+ -> K+ Xinv ]cc
 # NickName: Bu_KXinv
 # Documentation: b->s Xinv 
 # Tested: Yes
@@ -9,7 +9,7 @@
 # Cuts: None
 # Date: 20251010
 # to be added in the steering file, to to run several mass hypotheses 
-# pdg.add_particle(’S’, 54, mass=1.0, width=0, charge=0, spin=0)
+# pdg.add_particle(’Xinv’, 54, mass=1.0, width=0, charge=0, spin=0)
 
 # Set the Upsilon(4S) to decay entirely into our signal B's 
 Decay Upsilon(4S)
@@ -19,7 +19,7 @@ Enddecay
 
 # Set the signal side B decay, need the other side to decay generically for tagging
 Decay B+sig
-1.0 K+ S PHOTOS PHSP;
+1.0 K+ Xinv PHOTOS PHSP;
 Enddecay
 CDecay B-sig
 

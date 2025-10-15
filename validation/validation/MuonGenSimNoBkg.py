@@ -22,7 +22,6 @@ from basf2 import (
     set_random_seed,
     create_path,
     process,
-    statistics,
     register_module,
 )
 from simulation import add_simulation
@@ -64,10 +63,7 @@ output.param("outputFileName", "../MuonGenSimNoBkg.root")
 main.add_module(output)
 
 main.add_module('Progress')
-process(main)
-
-# Print call statistics
-print(statistics)
+process(main, calculateStatistics=True)
 
 statistics_plots(
     "MuonGenSimNoBkg_statistics.root",

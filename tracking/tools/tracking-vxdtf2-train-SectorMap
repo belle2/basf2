@@ -122,4 +122,3 @@ if __name__ == "__main__":
 
     b2.print_path(path)
     b2.process(path)
-    print(b2.statistics)

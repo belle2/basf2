@@ -81,7 +81,7 @@ def define_ups_aliases():
     alias_dict['nTNEUTRINO'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(16))'
     alias_dict['nPHOTON'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(22))'
     alias_dict['GenUp4S_nTracks'] = 'genUpsilon4S(nTracks)'
-    return(alias_dict)
+    return (alias_dict)
 
 
 def define_split_aliases():
@@ -107,7 +107,7 @@ def define_split_aliases():
     alias_dict['gen_antiK0_Bm'] = 'eventExtraInfo(nGen_-311_Bm)'
     alias_dict['gen_antiK0_B0'] = 'eventExtraInfo(nGen_-311_B0)'
     alias_dict['gen_antiK0_antiB0'] = 'eventExtraInfo(nGen_-311_antiB0)'
-    return(alias_dict)
+    return (alias_dict)
 
 
 def add_aliases(alias_dict={}):
@@ -171,4 +171,3 @@ ma.variablesToNtuple(
 progress = ma.register_module('Progress')
 path.add_module(progress)
 b2.process(path)
-print(b2.statistics)

@@ -18,9 +18,9 @@ import basf2 as b2
 def addSource(x, angle, slotID, path):
     '''
     Adds a laser source to the path
-    @param x local x coordinate of teh source in the bar frame
+    @param x local x coordinate of the source in the bar frame
     @param angle vertical tilt of the source
-    @param slotID 1-16, slot number. If it's 0, then all the coorinates are in the BelleII frame
+    @param slotID 1-16, slot number. If it's 0, then all the coordinates are in the BelleII frame
     '''
     path.add_module('OpticalGun',
                     minAlpha=0.0,  # not used if angulardistribution == 'Gaussian'
@@ -82,7 +82,7 @@ main.add_module('RootOutput',
 main.add_module('Progress')
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

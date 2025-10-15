@@ -48,7 +48,7 @@ that is, consult this page again: :ref:`conditionsdb_overview`).
     `modularAnalysis.getAnalysisGlobaltag`.
 
 .. admonition:: Solution
-    :class: solution toggle
+    :class: dropdown solution
 
     Simply add this to the top of your steering file:
 
@@ -67,7 +67,7 @@ start right away!
     path and your particle list).
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     Remember to import the module:
 
@@ -86,12 +86,12 @@ start right away!
 .. admonition:: Exercise
     :class: stacked exercise
 
-    Add the the
-    ``flavorTagger.flavor_tagging`` variable collection to your output
+    Add the
+    ``flavor_tagging`` variable collection to your output
     variables
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S43
@@ -104,7 +104,7 @@ start right away!
     Run your steering file!
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     This is the full steering file at this point:
 
@@ -115,18 +115,13 @@ Good!
 Now let's talk about the output of the flavor tagger. This is the value
 :math:`q\cdot r`, where :math:`q=-1` corresponds to a :math:`\bar B^0` and
 :math:`q=+1` to :math:`B^0`. :math:`r` is called the dilution factor. It's 0
-if the algorighm can't decide between both options for :math:`q` and 1 if the
-algorithm is certain about it's decision.
+if the algorithm can't decide between both options for :math:`q` and 1 if the
+algorithm is certain about its decision.
 
 The variable ``FBDT_qrCombined`` is the :math:`q\cdot r` result of one of the
 models of the `FlavorTagger` (a *fast boosted decision tree*).
 It can also be ``NaN`` to signal that not a single charged
 track in the ROE was found, so that the algorithm can't work.
-
-.. note::
-
-    In releases before release-05, a value of :math:`\pm 2` was used instead of
-    ``NaN``.
 
 Part of the variables you just added was also ``qrMC`` for the "true" (MC level) flavor of the :math:`B_\text{tag}`.
 It can take the numbers
@@ -148,14 +143,14 @@ it to ``FBDT_qrCombined``!
     Compare the output of ``qrMC`` to that of ``FBDT_qrCombined``.
 
 .. admonition:: Hint
-    :class: xhint stacked toggle
+    :class: xhint stacked dropdown
 
     For clearly defined MC flavor tag, you only have to distinguish between
     ``qrMC == 0`` and ``qrMC == 1``. For these two cases you can then plot
     the distribution of ``FBDT_qrCombined``.
 
 .. admonition:: Solution
-    :class: solution toggle
+    :class: dropdown solution
 
     .. literalinclude:: flavor_tagging/plot_flavor_tags.py
         :language: python        

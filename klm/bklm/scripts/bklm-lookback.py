@@ -129,4 +129,3 @@ main.add_module('KLMReconstructor')
 main.add_module(eventInspector)
 
 basf2.process(main)
-print(basf2.statistics)

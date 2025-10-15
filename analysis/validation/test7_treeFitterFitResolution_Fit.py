@@ -11,7 +11,7 @@
 """
 <header>
   <output>../TreeFitted_B0ToJPsiKs.root</output>
-  <contact>Frank Meier; frank.meier@duke.edu</contact>
+  <contact>Paul Feichtinger; paul.feichtinger@ijs.si</contact>
   <interval>nightly</interval>
 </header>
 """
@@ -19,7 +19,7 @@
 # Reconstruct B0 to J/PsiKs using the TreeFitter. Use the ..._Plot.py
 # to plot the resolutions.
 
-from basf2 import create_path, process, statistics, set_random_seed
+from basf2 import create_path, process, set_random_seed
 
 from modularAnalysis import inputMdst, reconstructDecay, fillParticleList, matchMCTruth
 import os
@@ -84,5 +84,3 @@ path.add_module('VariablesToNtuple',
 
 path.add_module('Progress')
 process(path)
-
-print(statistics)

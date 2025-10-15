@@ -26,7 +26,7 @@ REG_MODULE(MVAMultipleExperts);
 
 MVAMultipleExpertsModule::MVAMultipleExpertsModule() : Module()
 {
-  setDescription("Adds ExtraInfos to the Particle objects in given ParticleLists which is calcuated by multiple experts defined by the given weightfiles.");
+  setDescription("Adds ExtraInfos to the Particle objects in given ParticleLists which is calculated by multiple experts defined by the given weightfiles.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   std::vector<std::string> empty;

@@ -16,14 +16,22 @@
 #include <framework/geometry/BFieldManager.h>
 #include <framework/logging/Logger.h>
 #include <genfit/Exception.h>
+#include <ir/dbobjects/BeamPipeGeo.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMStatus.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
+#include <klm/dataobjects/KLMHit2d.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/KLMMuidHit.h>
 #include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/KLMStripEfficiency.h>
+#include <klm/dbobjects/KLMLikelihoodParameters.h>
+#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 #include <klm/muid/MuidBuilder.h>
 #include <klm/muid/MuidElementNumbers.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -31,6 +39,9 @@
 #include <mdst/dataobjects/Track.h>
 #include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <simulation/kernel/ExtManager.h>
+#include <structure/dbobjects/COILGeometryPar.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/TrackClusterSeparation.h>
 
 /* CLHEP headers. */
 #include <CLHEP/Matrix/Vector.h>
@@ -48,12 +59,14 @@
 #include <G4StateManager.hh>
 #include <G4Step.hh>
 #include <G4StepPoint.hh>
-#include <G4ThreeVector.hh>
-#include <G4TouchableHandle.hh>
 #include <G4Track.hh>
 #include <G4UImanager.hh>
 #include <G4VPhysicalVolume.hh>
 #include <G4VTouchable.hh>
+#include <G4ErrorSymMatrix.hh>
+
+/* ROOT headers. */
+#include <TVector3.h>
 
 /* C++ headers. */
 #include <algorithm>
@@ -408,6 +421,9 @@ void TrackExtrapolateG4e::event(bool byMuid)
     } // Ext track loop
   } // byMuid
 
+  if (byMuid) {
+    findClosestTrackToKLMClusters();
+  }
 }
 
 void TrackExtrapolateG4e::endRun(bool)
@@ -683,20 +699,11 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
         continue;
       }
       TrackClusterSeparation* h = m_trackClusterSeparations.appendNew(klmHit[c]);
-      // Add the following three quantities to the KLMCluster data members and store some relations
-      // To be safe, add them only if h is a valid object
       if (h != nullptr) {
         (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackClusterSeparation
-        (*klmClusterInfo)[c].first->setClusterTrackSeparation(h->getDistance() / CLHEP::cm);
-        (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(h->getTrackClusterSeparationAngle());
-        (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(h->getTrackRotationAngle());
         if (extState.track != nullptr) {
           extState.track->addRelationTo(h); // relation Track to TrackClusterSeparation
         }
-      } else {
-        (*klmClusterInfo)[c].first->setClusterTrackSeparation(Const::doubleNaN);
-        (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(Const::doubleNaN);
-        (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(Const::doubleNaN);
       }
       if (klmHit[c].getDistance() < minDistance) {
         closestCluster = c;
@@ -710,6 +717,33 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
         extState.track->addRelationTo((*klmClusterInfo)[closestCluster].first, 1. / (minDistance / CLHEP::cm));
       }
     }
+  }
+}
+
+void TrackExtrapolateG4e::findClosestTrackToKLMClusters()
+{
+  for (auto& klmCluster : m_klmClusters) {
+    const auto& trackClusterSeparations = klmCluster.getRelationsWith<TrackClusterSeparation>();
+
+    // If there are no TrackClusterSeparation objects related to this cluster, set NaN
+    if (trackClusterSeparations.size() == 0) {
+      klmCluster.setClusterTrackSeparation(Const::doubleNaN);
+      klmCluster.setClusterTrackSeparationAngle(Const::doubleNaN);
+      klmCluster.setClusterTrackRotationAngle(Const::doubleNaN);
+      continue;
+    }
+
+    // Look for the closest track by comparing the TrackClusterSeparation objects
+    const auto closestSeparationIterator = std::min_element(trackClusterSeparations.begin(), trackClusterSeparations.end(),
+    [](const auto & a, const auto & b) {
+      return a.getDistance() < b.getDistance();
+    });
+
+    // We found the closest track, let's set the cluster properties accordingly
+    const auto& closestSeparation = *closestSeparationIterator;
+    klmCluster.setClusterTrackSeparation(closestSeparation.getDistance() / CLHEP::cm);
+    klmCluster.setClusterTrackSeparationAngle(closestSeparation.getTrackClusterSeparationAngle());
+    klmCluster.setClusterTrackRotationAngle(closestSeparation.getTrackRotationAngle());
   }
 }
 
@@ -1189,7 +1223,7 @@ void TrackExtrapolateG4e::fromPhasespaceToG4e(const G4ThreeVector& momentum, con
 }
 
 // write another volume-entry or volume-exit point on extrapolated track
-void TrackExtrapolateG4e::createExtHit(ExtHitStatus status, const ExtState& extState,
+void TrackExtrapolateG4e::createExtHit(const ExtHitStatus status, const ExtState& extState,
                                        const G4ErrorFreeTrajState& g4eState,
                                        const G4StepPoint* stepPoint, const G4TouchableHandle& touch)
 {

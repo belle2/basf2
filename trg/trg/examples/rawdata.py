@@ -97,5 +97,5 @@ if gen_hist:
     histo.param("histoFileName", f"rawdatahist/raw.{basename}.root")
     main.add_module(histo)
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

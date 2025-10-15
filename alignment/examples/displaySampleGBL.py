@@ -43,5 +43,5 @@ main.add_module(
 
 main.add_module('Display', showRecoTracks=True)
 # main.add_module('RootOutput')
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

@@ -6,20 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef TRGTOPTIMINGISIM_H
-#define TRGTOPTIMINGISIM_H
+#pragma once
 
-//#include <TObject.h>
 #include <framework/datastore/RelationsObject.h>
-
-#include <vector>
-#include <limits>
 
 
 namespace Belle2 {
 
-  //! Example Detector
-  //  class TRGTOPTimingISim : public TObject {
+  //! TRGTOPTimingISim
   class TRGTOPTimingISim : public RelationsObject {
 
   public:
@@ -73,7 +67,6 @@ namespace Belle2 {
     int getSlotNHits()   const { return m_slotNHits;  }
     int getSlotLogL()    const { return m_slotLogL;   }
     int getSlotDecisionClockCycle() const { return m_slotDecisionClockCycle;}
-    //int get() const { return m_;}
 
     void setSlotId(int slotId);
     void setSlotTiming(int slotTiming);
@@ -81,7 +74,6 @@ namespace Belle2 {
     void setSlotNHits(int slotNHits);
     void setSlotLogL(int slotLogL);
     void setSlotDecisionClockCycle(int slotDecisionClockCycle);
-    //void set(int );
 
   private:
 
@@ -104,5 +96,3 @@ namespace Belle2 {
   };
 
 } //end namespace Belle2
-
-#endif

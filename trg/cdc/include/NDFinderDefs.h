@@ -14,20 +14,22 @@
 
 namespace Belle2 {
 
-  // TS-ID to 1/32 phi-sector mapping is stored in a 2D array
+  /** TS-ID to 1/32 phi-sector mapping is stored in a 2D array */
   typedef boost::multi_array<unsigned short, 2> c2array;
-  typedef c2array::index c2index;
+  typedef c2array::index c2index; /**< index of TS-ID to 1/32 phi-sector mapping 2D array */
 
-  // The Hough space is a 3D array
-  // (omega, phi, cot)
+  /** The Hough space is a 3D array
+   * (omega, phi, cot)
+   */
   typedef boost::multi_array<unsigned short, 3> c3array;
-  typedef c3array::index c3index;
+  typedef c3array::index c3index; /**< index of Hough space 3D array */
 
-  // Store hit patterns in a 5D array
-  // (hitid, prio, omega, phi, cot)
+  /** Store hit patterns in a 5D array
+   * (hitid, prio, omega, phi, cot)
+   */
   typedef boost::multi_array<unsigned short, 5> c5array;
-  typedef c5array::index c5index;
+  typedef c5array::index c5index; /**< index of store hit pattern 5D array */
 
-  // The cell index of one Hough space bin
+  /** The cell index of one Hough space bin */
   typedef std::array<c3index, 3> cell_index;
 }

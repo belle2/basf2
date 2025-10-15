@@ -12,7 +12,7 @@
 <header>
   <input>../1110021010.dst.root</input>
   <output>1110021010_Validation.root</output>
-  <contact>Frank Meier; frank.meier@duke.edu</contact>
+  <contact>Paul Feichtinger; paul.feichtinger@ijs.si</contact>
 </header>
 """
 # Runs a simple analysis on signal [B0 -> rho0 gamma] events. Saves histograms
@@ -47,7 +47,7 @@ create_validation_histograms(
         (
             "Mbc", 180, 5.2, 5.29,
             "Beam-constrained mass of #it{B^{0} #rightarrow #rho^{0}#gamma} candidates",
-            "Frank Meier <frank.meier@duke.edu>",
+            "Paul Feichtinger <paul.feichtinger@ijs.si>",
             r"The beam-constrained mass distribution of $B^0\to\rho^0\gamma$ decays",
             "Distribution should be peaking at the nominal $B^0$ mass. Tail towards low mass.",
             "M_{bc} [GeV/c^{2}]", "Candidates"
@@ -55,7 +55,7 @@ create_validation_histograms(
         (
             "useRestFrame(daughter(1, E))", 50, 1.5, 4.0,
             "The photon energy distribution for #it{B^{0} #rightarrow #rho^{0}#gamma} decays",
-            "Frank Meier <frank.meier@duke.edu>; Torben Ferber <torben.ferber@desy.de>",
+            "Paul Feichtinger <paul.feichtinger@ijs.si>; Torben Ferber <torben.ferber@desy.de>",
             r"Photon energy distribution of $B^0\to\rho^0\gamma$ decays",
             "Sharp distribution at 2.5 GeV. Look for differences in "
             "the absolute scale. This could be an indication of a loss of photon efficiency.",
@@ -66,4 +66,3 @@ create_validation_histograms(
 
 main.add_module('Progress')
 basf2.process(main)
-print(basf2.statistics)

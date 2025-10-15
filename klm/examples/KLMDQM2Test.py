@@ -57,5 +57,5 @@ b2.print_path(main)
 
 
 # Process all events
-b2.process(main, max_event=1000)
+b2.process(main, max_event=1000, calculateStatistics=True)
 print(b2.statistics)

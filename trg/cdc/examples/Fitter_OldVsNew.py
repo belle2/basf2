@@ -158,7 +158,7 @@ class TestModule(basf2.Module):
 main.add_module(TestModule(), logLevel=basf2.LogLevel.INFO)
 
 # Process events
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(basf2.statistics)

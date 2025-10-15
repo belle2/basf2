@@ -133,7 +133,9 @@ class ConditionCheckerBase(ABC):
         """
         if self.rundir:
             self.tfile.cd(self.rundir)
+            # \cond false positive doxygen warning
             self.hists.update(get_sensor_maps(name, title, ztitle, self.run, **kwargs))
+            # \endcond
 
     @abstractmethod
     def get_db_content(self):
@@ -207,7 +209,9 @@ class ConditionCheckerBase(ABC):
         if values_dict != pre_values_dict:
             for sensorID in sensorID_list:
                 gr = self.graphs[sensorID.getID()]
+                # \cond false positive doxygen warning
                 gr.SetPoint(gr.GetN(), self.run, values_dict[sensorID.getID()])
+                # \endcond
 
     def draw_plots(self, canvas=None, cname="", ymin=0., ymax=None, logy=False):
         """

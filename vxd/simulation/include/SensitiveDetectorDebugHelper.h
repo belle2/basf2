@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef VXD_SIMULATION_SENSITIVEDETECTORDEBUGHELPER_H
-#define VXD_SIMULATION_SENSITIVEDETECTORDEBUGHELPER_H
 
 #include <vxd/simulation/SensorTraversal.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -122,4 +120,3 @@ namespace Belle2 {
     };
   }
 } //Belle2 namespace
-#endif // VXD_SIMULATION_DEBUGFILE_H

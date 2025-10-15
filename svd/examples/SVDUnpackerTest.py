@@ -53,7 +53,7 @@ main.add_module(geometry)
 main.add_module(svdUnpacker)
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

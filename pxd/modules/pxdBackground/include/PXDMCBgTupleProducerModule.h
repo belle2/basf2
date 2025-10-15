@@ -11,7 +11,6 @@
 #include <framework/core/Module.h>
 #include <framework/gearbox/Unit.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/SensorInfoBase.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <string>

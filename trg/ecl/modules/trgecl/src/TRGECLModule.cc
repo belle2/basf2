@@ -41,10 +41,7 @@ namespace Belle2 {
   //
   //
   TRGECLModule::TRGECLModule():
-    Module::Module(), m_debugLevel(0), m_Bhabha(0),
-    m_Clustering(1), m_ClusterLimit(6), m_EventTiming(1),
-    m_TimeWindow(250.0), m_OverlapWindow(125.0), m_NofTopTC(3),
-    m_SelectEvent(1), m_ConditionDB(true)
+    Module::Module()
   {
 
     string desc = "TRGECLModule(" + version() + ")";
@@ -55,10 +52,6 @@ namespace Belle2 {
              m_debugLevel,
              "TRGECL debug level",
              m_debugLevel);
-    addParam("Bhabha",
-             m_Bhabha,
-             "TRGECL Bhabha method  0 : Belle I, 1 :belle II(default)",
-             m_Bhabha);
     addParam("Clustering",
              m_Clustering,
              "TRGECL Clustering method  0 : use only ICN, 1 : ICN + Energy(Default)",
@@ -69,7 +62,7 @@ namespace Belle2 {
              m_ClusterLimit);
     addParam("EventTiming",
              m_EventTiming,
-             "TRGECL EventTiming method  0 : Belle I, 1 : Energetic TC, 2 : Energy Weighted timing (default)",
+             "TRGECL EventTiming method  0 : Belle I, 1 : Energetic TC (default), 2 : Energy Weighted timing",
              m_EventTiming);
     addParam("NofTopTC",
              m_NofTopTC,
@@ -89,7 +82,7 @@ namespace Belle2 {
              m_SelectEvent);
     addParam("ConditionDB",
              m_ConditionDB,
-             "Flag to use Condition Database (0:=not use, 1:=use(default))",
+             "Flag to use Condition Database (0:=not use, 1:=use (default))",
              m_ConditionDB);
     //-----------------------------------------------
     addParam("ADCtoEnergy",
@@ -614,7 +607,6 @@ namespace Belle2 {
     etm->initialize();
     etm->setClusterMethod(m_Clustering);
     etm->setClusterLimit(m_ClusterLimit);
-    etm->setBhabhaMethod(m_Bhabha);
     etm->setEventTimingMethod(m_EventTiming);
     etm->setTimeWindow(m_TimeWindow);
     etm->setOverlapWindow(m_OverlapWindow);

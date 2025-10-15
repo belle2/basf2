@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef BELLE2PHYSICSLIST_H
-#define BELLE2PHYSICSLIST_H
+#pragma once
 
 #include "G4VModularPhysicsList.hh"
 
@@ -71,7 +70,7 @@ namespace Belle2 {
       void UseLongLivedNeutralParticles();
 
     private:
-      /** Set the produciton cuts to the given value for a list of regions belonging to a sub detector
+      /** Set the production cuts to the given value for a list of regions belonging to a sub detector
        * @param name name of the sub detector to print in messages
        * @param regions list of region names to set the cut value
        * @param cutValue production cut in cm, if 0 the global cut value will be used
@@ -97,5 +96,3 @@ namespace Belle2 {
   } // end of namespace Simulation
 
 } // end of namespace Belle2
-
-#endif // BELLE2PHYSICSLIST_H

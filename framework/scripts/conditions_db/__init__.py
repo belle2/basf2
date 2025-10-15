@@ -232,7 +232,7 @@ class ConditionsDB:
     """Class to interface conditions db REST interface"""
 
     #: base url to the conditions db to be used if no custom url is given
-    BASE_URLS = [conditions.default_metadata_provider_url]
+    BASE_URLS = [conditions.default_metadata_provider_server]
 
     class RequestError(RuntimeError):
         """Class to be thrown by request() if there is any error"""
@@ -827,10 +827,12 @@ class ConditionsDB:
                     existing_payloads.update(payloads.result())
                     B2INFO(f"Found {len(existing_payloads)} existing payloads")
 
+                # \cond false positive doxygen warning
                 create_future(self.get_iovs, global_tag, update_iovs)
                 # checking existing payloads should not be done with too many at once
                 for chunk in chunks(payloads.keys(), 1000):
                     create_future(self.check_payloads, chunk, update_payloads)
+                # \endcond
 
                 futures_wait(futures)
 

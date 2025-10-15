@@ -232,7 +232,6 @@ def main():
 
     MaxInputEvents = args.MaxInputEvents or 0
     b2.process(path, max_event=MaxInputEvents)
-    print(b2.statistics())
 
 
 if __name__ == "__main__":

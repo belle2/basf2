@@ -132,5 +132,5 @@ trackDQM = main.add_module('TrackDQM')
 # main.add_module("RootOutput", outputFileName=output_filename)
 
 # process events and print call statistics
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

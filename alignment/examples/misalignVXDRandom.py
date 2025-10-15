@@ -36,5 +36,5 @@ main.add_module('Geometry', components=['PXD', 'SVD'])
 main.add_module('AlignmentGenerator', payloadIov=[0, 0, -1, -1], payloadName="", data=alignment.get_data(), createPayload=True)
 main.add_module('Progress')
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

@@ -64,43 +64,43 @@ class TOPTBCResolution(b2.Module):
         'dVdtFallingDifference', ' difference between the falling edge dV/dt of the first and the second pulse', 1000, -500, 500)
 
     #: DeltaT rising-rising
-    h_DeltaT_RR = TH1F('DeltaT_RR', ' DeltaT bewteen the rising edges', 4000, 10, 30)
+    h_DeltaT_RR = TH1F('DeltaT_RR', ' DeltaT between the rising edges', 4000, 10, 30)
     #: DeltaT falling-falling
-    h_DeltaT_FF = TH1F('DeltaT_FF', ' DeltaT bewteen the falling edges', 4000, 10, 30)
+    h_DeltaT_FF = TH1F('DeltaT_FF', ' DeltaT between the falling edges', 4000, 10, 30)
     #: DeltaT falling-rising
-    h_DeltaT_FR = TH1F('DeltaT_FR', ' DeltaT bewteen falling and rising edges', 4000, 10, 30)
+    h_DeltaT_FR = TH1F('DeltaT_FR', ' DeltaT between falling and rising edges', 4000, 10, 30)
     #: DeltaT rising-falling
-    h_DeltaT_RF = TH1F('DeltaT_RF', ' DeltaT bewteen rising and falling edges', 4000, 10, 30)
+    h_DeltaT_RF = TH1F('DeltaT_RF', ' DeltaT between rising and falling edges', 4000, 10, 30)
 
     #: DeltaT rising-rising VS channel
     h_DeltaTVSChannel_RR = TH2F(
         'DeltaTVSChannel_RR',
-        ' DeltaT bewteen the rising edges, as function of the channel number',
+        ' DeltaT between the rising edges, as function of the channel number',
         512 * 16, 0, 512 * 16, 4000, 10., 30.)
     #: DeltaT falling-falling VS channel
     h_DeltaTVSChannel_FF = TH2F(
         'DeltaTVSChannel_FF',
-        ' DeltaT bewteen the falling edges, as function of the channel number',
+        ' DeltaT between the falling edges, as function of the channel number',
         512 * 16, 0, 512 * 16, 4000, 10., 30.)
     #: DeltaT falling-rising VS channel
     h_DeltaTVSChannel_FR = TH2F(
         'DeltaTVSChannel_FR',
-        ' DeltaT bewteen falling (pulse 1) and rising (pulse 2) edge, as function of the channel number',
+        ' DeltaT between falling (pulse 1) and rising (pulse 2) edge, as function of the channel number',
         512 * 16, 0, 512 * 16, 4000, 10., 30.)
     #: DeltaT rising-falling VS channel
     h_DeltaTVSChannel_RF = TH2F(
         'DeltaTVSChannel_RF',
-        ' DeltaT bewteen rising (pulse 1) and falling (pulse 2) edge, as function of the channel number',
+        ' DeltaT between rising (pulse 1) and falling (pulse 2) edge, as function of the channel number',
         512 * 16, 0, 512 * 16, 4000, 10., 30.)
     #: DeltaT rising-rising VS average of dV/dt on the first and second pulse
     h_DeltaTVSdVdt_RR = TH2F(
         'DeltaTVSdVdt_RR',
-        'DeltaT bewteen the rising edges VS average of dV/dt on the first and second pulser',
+        'DeltaT between the rising edges VS average of dV/dt on the first and second pulser',
         1000, 0., 1000., 4000, 10., 30.)
     #: DeltaT falling-falling VS average of dV/dt on the first and second pulse
     h_DeltaTVSdVdt_FF = TH2F(
         'DeltaTVSdVdt_FF',
-        'DeltaT bewteen the rising edges VS average of dV/dt on the first and second pulser',
+        'DeltaT between the rising edges VS average of dV/dt on the first and second pulser',
         1000, 0., 1000., 4000, 10., 30.)
 
     #: DeltaT resolution VS average of dV/dt (falling-falling)
@@ -118,7 +118,7 @@ class TOPTBCResolution(b2.Module):
     m_calpulseMaxAmp = 700.
     #: minimum amplitude to  flag a calpulse candidate
     m_calpulseMinAmp = 250.
-    #: ignores the hits wthout calibration
+    #: ignores the hits without calibration
     m_ignoreNotCalibrated = True
 
     def setOutputName(self, outputname):
@@ -147,7 +147,7 @@ class TOPTBCResolution(b2.Module):
         self.m_calpulseMinAmp = minAmp
 
     def ignoreNotCalibrated(self, ignoreNotCal):
-        ''' Sets the flag to ingore the hits without calibration '''
+        ''' Sets the flag to ignore the hits without calibration '''
         #: output name
         self.m_ignoreNotCalibrated = ignoreNotCal
 
@@ -157,7 +157,7 @@ class TOPTBCResolution(b2.Module):
         digits = Belle2.PyStoreArray('TOPDigits')
 
         for ipulse1, digit1 in enumerate(digits):
-            if(self.ignoreNotCalibrated and not digit1.isTimeBaseCalibrated()):
+            if (self.ignoreNotCalibrated and not digit1.isTimeBaseCalibrated()):
                 continue
             if (digit1.getHitQuality() != 0 and
                 digit1.getPulseHeight() > self.m_calpulseMinAmp and
@@ -168,7 +168,7 @@ class TOPTBCResolution(b2.Module):
                 slotID = digit1.getModuleID()
                 hwchan = digit1.getChannel()
                 for ipulse2, digit2 in enumerate(digits, start=ipulse1 + 1):
-                    if(self.ignoreNotCalibrated and not digit2.isTimeBaseCalibrated()):
+                    if (self.ignoreNotCalibrated and not digit2.isTimeBaseCalibrated()):
                         continue
 
                     if (digit2.getHitQuality() != 0 and
@@ -339,7 +339,7 @@ else:
 # Suppress messages and warnings during processing
 b2.set_log_level(b2.LogLevel.ERROR)
 
-# Define a global tag (note: the one given bellow can be out-dated!)
+# Define a global tag (note: the one given below can be out-dated!)
 b2.conditions.override_globaltags()
 b2.conditions.append_globaltag('online')
 
@@ -406,7 +406,3 @@ main.add_module(progress)
 
 # Process events
 b2.process(main)
-
-# Print call statistics
-print(b2.statistics)
-print(b2.statistics(b2.statistics.TERM))

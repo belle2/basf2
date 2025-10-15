@@ -42,7 +42,7 @@ def get_argument_parser() -> argparse.ArgumentParser:
                               default is to create a temporary directory.""")
     parser.add_argument('-l', '--localdb', dest='localdb', type=str, action='append', nargs='+', required=False,
                         help="""path or list of paths to local database(s) containing the mvas of interest.
-                                The testing payloads are preprended and take precedence over payloads in global tags.""")
+                                The testing payloads are prepended and take precedence over payloads in global tags.""")
     parser.add_argument('-g', '--globaltag', dest='globaltag', type=str, action='append', nargs='+', required=False,
                         help='globaltag or list of globaltags containing the mvas of interest. The globaltags are prepended.')
     parser.add_argument('-n', '--fillnan', dest='fillnan', action='store_true',

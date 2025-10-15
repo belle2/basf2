@@ -29,7 +29,7 @@ def apply(state, X):
     """
     Test apply function
     """
-    # with the limited nomber of events we use for the test, we can only loosely check the
+    # with the limited number of events we use for the test, we can only loosely check the
     # normalization. Check that on average we get means near 0 and stddevs near 1.0.
     # For individual variables these can still be quite different.
     assert abs(np.mean(X.mean(axis=0))) < 0.10, 'Normalization appears to have failed'

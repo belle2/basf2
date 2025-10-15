@@ -54,17 +54,20 @@ def _stdChargedEffCuts(particletype, listtype):
 def stdCharged(particletype, listtype, path, writeOut=True):
     """
     Function to prepare one of several standardized types of charged particle lists:
-      - 'all' with no cuts on track
-      - 'good' high purity lists for data studies
-      - 'loosepid' loose selections for skimming, PID cut only
-      - 'loose' loose selections for skimming
-      - 'higheff' high efficiency list with loose global ID cut for data studies
-      - 'mostlikely' list with the highest PID likelihood
+
+    - 'all' with no cuts on track
+    - 'good' high purity lists for data studies
+    - 'loosepid' loose selections for skimming, PID cut only
+    - 'loose' loose selections for skimming
+    - 'higheff' high efficiency list with loose global ID cut for data studies
+    - 'mostlikely' list with the highest PID likelihood
+
     Also the following lists, which may or may not be available depending on the release
-      - '99eff' with 99% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
-      - '95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
-      - '90eff' with 90% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
-      - '85eff' with 85% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+
+    - '99eff' with 99% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+    - '95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+    - '90eff' with 90% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+    - '85eff' with 85% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
 
     @param particletype type of charged particle to make a list of
     @param listtype     name of standard list
@@ -73,7 +76,7 @@ def stdCharged(particletype, listtype, path, writeOut=True):
     """
 
     # basic quality cut strings
-    trackQuality = 'thetaInCDCAcceptance and nCDCHits>20'
+    trackQuality = 'thetaInCDCAcceptance'
     ipCut = 'dr < 0.5 and abs(dz) < 2'
     goodTrack = trackQuality + ' and ' + ipCut
 

@@ -20,6 +20,8 @@
 import basf2
 from reconstruction import add_reconstruction
 
+basf2.set_random_seed(1337)
+
 main = basf2.create_path()
 
 # Read input.
@@ -49,4 +51,3 @@ main.add_module(output)
 main.add_module("ProgressBar")
 
 basf2.process(main)
-print(basf2.statistics)

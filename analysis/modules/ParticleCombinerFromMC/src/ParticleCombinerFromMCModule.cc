@@ -14,9 +14,11 @@
 
 // decay descriptor
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
+#include <analysis/DecayDescriptor/ParticleListName.h>
+
+#include <analysis/ParticleCombiner/ParticleCombiner.h>
 
 // utilities
-#include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/MCMatching.h>
 
 #include <memory>

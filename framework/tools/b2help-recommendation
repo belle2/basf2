@@ -47,11 +47,11 @@ class FormatterStrategy(ABC):
     @abstractmethod
     def format_code(self, code: str, language: str) -> str:
         pass
-    
+
     @abstractmethod
     def format_dict(self, name: str, content: str) -> str:
         pass
-    
+
     @abstractmethod
     def format_table_list(self, name: str, content: str) -> str:
         pass
@@ -62,13 +62,18 @@ class RSTFormatterStrategy(FormatterStrategy):
     Format recommendations in reStructuredText format.
     """
 
-    def format_section(self, title: str, content: str) -> str:
+    def format_title(self, title: str, has_recommendation: bool) -> str:
         """
-        Format a section with a title and optional content.
+        Format a title.
         """
-        result = f"\n{title}\n{'=' * len(title)}\n"
-        if content:
-            result += "{content}\n"
+        return title
+
+    def format_section(self, title: str, has_recommendation: bool) -> str:
+        """
+        Format a section with a title.
+        """
+        result = f"\n{self.format_title(title, has_recommendation)}"
+        result += f"\n{'=' * len(title)}\n"
         return result
 
     def format_subsection(self, title: str, content: str) -> str:
@@ -84,7 +89,7 @@ class RSTFormatterStrategy(FormatterStrategy):
         Format a field with a name and value.
         """
         return f":{name}: {value}\n"
-    
+
     def format_dict(self, name: str, content: str) -> str:
         """
         Format a dictionary with a name and key-value pairs.
@@ -104,7 +109,7 @@ class RSTFormatterStrategy(FormatterStrategy):
         for tag in [title] + content:
             line += '-' * len(tag) + '+'
             body += tag + '|'
-        
+
         return f'\n{line}\n{body}\n{line}\n'
 
     def format_code(self, code: str, language: str) -> str:
@@ -124,6 +129,57 @@ class ColorRSTFormatterStrategy(RSTFormatterStrategy):
     Format recommendations in reStructuredText format with colored text in terminal.
     """
 
+    # ANSI color codes
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    PURPLE = '\033[35m'
+    CYAN = '\033[1;36m'  # also bold
+    WHITE = '\033[37m'
+    BOLD = '\033[1m'
+    RESET = '\033[0m'
+
+    def colorize(self, text: str, color: str) -> str:
+        """
+        Wrap 'text' with the given ANSI 'color' and return it.
+        """
+        return f"{color}{text}{self.RESET}"
+
+    def format_title(self, title: str, has_recommendation: bool) -> str:
+        """
+        Format a title.
+        """
+        if has_recommendation:
+            result = self.colorize(title, self.GREEN)
+        else:
+            result = self.colorize(title, self.YELLOW)
+        return result
+
+    def format_subsection(self, title: str, content: str) -> str:
+        """
+        Format a subsection with a title and optional content.
+        """
+        if not content:
+            return ''
+        return f"\n{self.colorize(title, self.CYAN)}\n{'-' * len(title)}\n{content}\n"
+
+    def format_dict(self, name: str, content: str) -> str:
+        """
+        Format a dictionary with a name and key-value pairs.
+        """
+        result = f"\n{self.colorize(name, self.CYAN)}\n{'-' * len(name)}\n"
+        for key in content:
+            result += f'+ **{self.colorize(key, self.BOLD)}** - {content[key]}\n'
+        return result
+
+    def format_table_list(self, name: str, content: str) -> str:
+        """
+        Format a table or list with a name and items.
+        """
+        lines = super().format_table_list(name, content).split('\n')
+        return '\n'.join([self.colorize(line, self.PURPLE) for line in lines])
+
     def format_code(self, code: str, language: str) -> str:
         """
         Format code with syntax highlighting.
@@ -137,7 +193,7 @@ class ColorRSTFormatterStrategy(RSTFormatterStrategy):
         result = f'.. code-block:: {language}\n\n'
         result += '\n'.join(highlighed_code)
         return result
-        
+
 
 class FieldDecorator(ABC):
     """
@@ -171,12 +227,19 @@ class TableListDecorator(FieldDecorator):
     def decorate(self, name: str, value: str) -> str:
         return self.formatter.format_table_list(name, value)
 
+class TitleDecorator(FieldDecorator):
+    """
+    Decorator for the title only.
+    """
+    def decorate(self, name: str, value: bool) -> str:
+        return self.formatter.format_title(name, value)
+
 class SectionDecorator(FieldDecorator):
     """
-    Decorator for the section field.
+    Decorator for the section title.
     """
-    def decorate(self, name: str, value: str) -> str:
-        return self.formatter.format_section(value, "")
+    def decorate(self, name: str, value: bool) -> str:
+        return self.formatter.format_section(name, value)
 
 class SubsectionDecorator(FieldDecorator):
     """
@@ -203,7 +266,7 @@ class Field:
     """
     Represents a field in a recommendation.
     """
-    def __init__(self, name: str, value: str, decorator: FieldDecorator):
+    def __init__(self, name: str, value: str | bool, decorator: FieldDecorator):
         self.name = name
         self.value = value
         self.decorator = decorator
@@ -216,17 +279,25 @@ class Tool:
     """
     Represents a tool recommendation.
     """
+
     def __init__(self, data: Dict[str, str], formatter: FormatterStrategy):
+
         self.fields = []
-        title = '(no title)'
+        # determine whether tool has recommendation entry
+        self.has_recommendation = bool(data.get('recommendation', {}))
+
+        title_name = '(no title)'
         if 'name' in data:
-            title = data.pop('name')
-        self.fields.append(Field('Title', title, SectionDecorator(formatter)))
+            title_name = data.pop('name')
+        self.title = Field(title_name, self.has_recommendation, TitleDecorator(formatter))
+        self.fields.append(Field(title_name, self.has_recommendation, SectionDecorator(formatter)))
+
         tool = '(no tool)'
         if 'tool' in data:
             tool = data.pop('tool')
         if tool and tool != "(no tool)":
             self.fields.append(Field('Tool', [tool], TableListDecorator(formatter)))
+
         tags = data.pop('tags')
         for name, value in data.items():
             decorator = DefaultDecorator(formatter)
@@ -271,6 +342,13 @@ def display_tool_info(tool: Tool):
     """
     print(tool.format())
 
+def contains_tags(tags: list, ref_tags: list):
+    """
+    Returns true if all tags are contained in ref_tags.
+    """
+    ref_tags = [tag.lower() for tag in ref_tags]
+    return all(tag.lower() in ref_tags for tag in tags)
+
 def display_tags(tools: list, tags: list):
     """
     Display tools with specific tags.
@@ -280,7 +358,7 @@ def display_tags(tools: list, tags: list):
             display_tool_info(tool)
     else:
         for tool in tools:
-            if all(tag in tool.get_field('tags') for tag in tags):
+            if contains_tags(tags, tool.get_field('tags')):
                 display_tool_info(tool)
 
 def get_available_tags(tools: list):
@@ -320,6 +398,49 @@ def print_tags(tools: list, mccampaign:str, n_tag_columns: int = 2):
     print("\nTags can be combined to narrow down the search, e.g. use '-t pion PID' to get information only about pion PID, etc. ")
     print("You can check all information with the 'all' tag.")
 
+def display_summary(tools: list, tags: list):
+    """
+    Display a list of all available tools split based on existance of recommendations.
+    """
+
+    # filter tools by tags
+    filtered_tools = []
+    if "all" in tags:
+        filtered_tools = tools
+    else:
+        for tool in tools:
+            if contains_tags(tags, tool.get_field('tags')):
+                filtered_tools.append(tool)
+
+    if not filtered_tools:
+        print("No tools found matching the specified tags.")
+        return
+
+    # filter tools with and without recommendations
+    with_recommendations = []
+    without_recommendations = []
+
+    for tool in filtered_tools:
+        if tool.has_recommendation:
+            with_recommendations.append(tool)
+        else:
+            without_recommendations.append(tool)
+
+    print("\nAvailable entries:")
+    print("-" * 18)
+
+    if with_recommendations:
+        for i, tool in enumerate(with_recommendations, 1):
+            tags_str = ", ".join(tool.get_field('tags'))
+            print(f"{i:2}. {tool.title.format()}")
+            print(f"    Tags: {tags_str}")
+
+    if without_recommendations:
+        for i, tool in enumerate(without_recommendations, 1):
+            tags_str = ", ".join(tool.get_field('tags'))
+            print(f"{len(with_recommendations) + i:2}. {tool.title.format()}")
+            print(f"    Tags: {tags_str}")
+
 
 def get_argument_parser():
     """
@@ -340,6 +461,7 @@ def get_argument_parser():
                         default=None)
     parser.add_argument("--n_tag_columns", help="Number of columns for tag printing", type=int,
                         default=2)
+    parser.add_argument("--summary", help="Display a list of all available tools split based on existance of recommendations.", action='store_true')
     parser.add_argument("--no-pager", help="Disable output scrolling, which is done by Pager", action='store_true')
     parser.add_argument("-c", "--convert", help="For developers. Convert the localfile to a payload.", action='store_true')
     return parser
@@ -376,7 +498,7 @@ def main():
         payload_name = args.payload
         if payload_name is None:
             payload_name = versioning.performance_recommendation_global_tag(args.mccampaign)['payload']
-            
+
         b2.conditions.prepend_globaltag(gt_name)
 
         # set a temporal EventMetaData to access database
@@ -405,8 +527,15 @@ def main():
 
     if args.tags is None:
         print_tags(tools, args.mccampaign, n_tag_columns=args.n_tag_columns)
+        display_summary(tools, 'all')
         sys.exit(0)
-    tags_line = ' '.join(args.tags)
+
+    tags_line = '[' + ', '.join(args.tags) + ']'
+    if args.summary:
+        print(f'Showing tools for {args.mccampaign} and {tags_line} tags:')
+        display_summary(tools, args.tags)
+        sys.exit(0)
+
     print(f'Recommendations for {args.mccampaign} and {tags_line} tags:')
     if args.no_pager:
         display_tags(tools, args.tags)

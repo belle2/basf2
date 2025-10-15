@@ -52,13 +52,13 @@ namespace Belle2 {
     void setLMEnergyCut(const double LM_energy_cut) {m_LM_energyCut = LM_energy_cut;}
 
     /** Set the three energy thresholds in ECLCRFinder [MeV]*/
-    void setCRFEnergyCut(std::array<double, 3>& CRF_energy_cut) {m_CRF_energyCut = CRF_energy_cut;}
+    void setCRFEnergyCut(const std::array<double, 3>& CRF_energy_cut) {m_CRF_energyCut = CRF_energy_cut;}
 
     /** Set the three time cuts in ECLCRFinder [ns]*/
-    void setCRFTimeCut(std::array<double, 3>& CRF_time_cut) {m_CRF_timeCut = CRF_time_cut;}
+    void setCRFTimeCut(const std::array<double, 3>& CRF_time_cut) {m_CRF_timeCut = CRF_time_cut;}
 
     /** Set the three time cuts in ECLCRFinder [ns]*/
-    void setCRFTimeCutMaxEnergy(std::array<double, 3>& CRF_timeCutMaxEnergy) {m_CRF_timeCutMaxEnergy = CRF_timeCutMaxEnergy;}
+    void setCRFTimeCutMaxEnergy(const std::array<double, 3>& CRF_timeCutMaxEnergy) {m_CRF_timeCutMaxEnergy = CRF_timeCutMaxEnergy;}
 
 
     //---------------------------------------------------

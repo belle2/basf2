@@ -54,7 +54,7 @@ settings = CalibrationSettings(name="CDC Tracking",
                                    "calibration_procedure": {"tz0": 1, "xt0": 0, "sr_tz0": 0, "tz2": 0},
                                    "payload_boundaries": [],
                                    "backend_args": {"request_memory": "4 GB"}},
-                               produced_payloads=["CDCTimeZeros", "CDCTimeWalk", "CDCXtRelations", "CDCSpaceResols"])
+                               produced_payloads=["CDCTimeZeros", "CDCTimeWalks", "CDCXtRelations", "CDCSpaceResols"])
 
 
 def select_files(all_input_files, min_events, max_events, max_processed_events_per_file, max_job=800, min_events_per_file=500):

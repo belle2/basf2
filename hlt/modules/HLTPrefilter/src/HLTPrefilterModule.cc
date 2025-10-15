@@ -25,7 +25,6 @@ This module filters the injection background based on predefined selections.
 )DOC");
 
   setPropertyFlags(c_ParallelProcessingCertified);
-
 }
 
 HLTPrefilterModule::~HLTPrefilterModule() = default;

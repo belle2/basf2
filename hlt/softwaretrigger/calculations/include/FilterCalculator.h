@@ -10,7 +10,7 @@
 #include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
 #include <hlt/dbobjects/HLTPrefilterParameters.h>
-#include <hlt/modules/HLTPrefilter/HLTPrefilterModule.h>
+#include <hlt/utilities/HLTPrefilter.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -85,9 +85,9 @@ namespace Belle2::SoftwareTrigger {
     /// HLTprefilterParameters Database OjbPtr
     DBObjPtr<HLTPrefilterParameters> m_hltPrefilterParameters; /**< HLT prefilter parameters */
     /// Helper instance for timing based prefilter
-    TimingCutState m_timingPrefilter;
+    HLTPrefilter::TimingCutState m_timingPrefilter;
     /// Helper instance for CDC-ECL occupancy based prefilter
-    CDCECLCutState m_cdceclPrefilter;
+    HLTPrefilter::CDCECLCutState m_cdceclPrefilter;
 
   };
 }

@@ -15,14 +15,7 @@
 /* BASF2 headers */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dbobjects/BunchStructure.h>
-#include <framework/dbobjects/HardwareClockSettings.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <ecl/dataobjects/ECLDigit.h>
 
 /* C++ headers */
 #include <cstdint>

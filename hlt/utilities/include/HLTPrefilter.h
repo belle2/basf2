@@ -8,28 +8,22 @@
 #pragma once
 
 /* HLT headers */
-#include <hlt/dbobjects/HLTPrefilterParameters.h>
 #include <hlt/softwaretrigger/core/utilities.h>
 
 /* basf2 headers */
-#include <framework/core/Module.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <ecl/dataobjects/ECLDigit.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dbobjects/BunchStructure.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <ecl/dataobjects/ECLDigit.h>
 
 /* C++ headers */
 #include <cstdint>
-#include <map>
 
 namespace Belle2::HLTPrefilter {
-
-  class TRGSummary;
 
   /**
    * Helper for TimingCut state

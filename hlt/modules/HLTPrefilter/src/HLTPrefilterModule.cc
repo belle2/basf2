@@ -7,8 +7,10 @@
  **************************************************************************/
 
 #include <hlt/modules/HLTPrefilter/HLTPrefilterModule.h>
+
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
-#include <iostream>
+#include <hlt/dbobjects/HLTPrefilterParameters.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
 using namespace Belle2;
@@ -101,4 +103,3 @@ void HLTPrefilterModule::event()
     else
         setReturnValue(m_decisions[CDCECLCut]);
 }
-

@@ -22,8 +22,18 @@
 #include <TEllipse.h>
 #include <numeric>
 #include <iostream>
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeometryParConstants.h>
 
 namespace Belle2 {
+
+
+  /**
+   * const CDC numbers for layers, boards and super layers
+   */
+  constexpr unsigned kNumLayers = c_maxNFieldLayers; /**< Total number of CDC layers. */
+  constexpr unsigned kNumBoards = c_nBoards;/**< Total number of CDC Boards. */
+  constexpr std::array<int, 9> slindex = { 8, 14, 20, 26, 32, 38, 44, 50, 56 }; /**< Index (layer number) of the 9 super-layers in the CDC. */
 
   /**
    * Make summary of data quality from reconstruction
@@ -98,10 +108,12 @@ namespace Belle2 {
      */
     void fillEffiTH2(TH2F* hist, TH2F* attached, TH2F* expected, TH2F* efficiency) ;
 
-
   protected:
 
     //Canvas for DQM analysis IR plots
+    TCanvas* c_histmd_ladc = nullptr; /**< canvas for adc layer median */
+    TH1F* m_histmd_ladc = nullptr; /**< for above*/
+
     TCanvas* c_hist_adc = nullptr; /**< canvas for adc board median */
     TH1F* m_hist_adc = nullptr; /**< for above*/
 
@@ -123,24 +135,25 @@ namespace Belle2 {
     TH2F* m_hist_attach_eff[3] = {nullptr}; /**< for above*/
     TH2Poly* m_hist_attach_eff_Poly[3] = {nullptr}; /**< for above*/
     TH1F* m_hist_wire_attach_eff_1d = nullptr; /**< for above*/
-    double lbinEdges[56] = {0.0}; /**< vector for radius edge 56*/
+    double lbinEdges[kNumLayers] = {0.0}; /**< vector for radius edge 56*/
 
     TLine* m_line_ladc  = nullptr; /**< line for lower ADC window */
     TLine* m_line_hadc  = nullptr; /**< line for higher ADC window */
     TLine* m_line_ltdc  = nullptr; /**< line for lower TDC window */
     TLine* m_line_htdc  = nullptr; /**< line for higher TDC window */
 
-    std::string m_histoDir = ""; /**< histogram dir of CDC DQMs */
-    std::string m_histoADC = ""; /**< ADC histogram names of CDC DQMs */
-    std::string m_histoTDC = ""; /**< TDC histogram names of CDC DQMs */
-    std::string m_histoPhiIndex = ""; /**< Phi Inedx histogram names of CDC DQMs */
-    std::string m_histoPhiEff = ""; /**< Phi Eff histogram names of CDC DQMs */
-    std::string m_histoHitsPhi = ""; /**< Phi Hits histogram names of CDC DQMs */
-    std::string m_histoTrackingWireEff = ""; /**< Wire Eff histogram names of CDC DQMs */
-    bool        m_doTH2PolyTrackingWireEff = false; /**< If true, creates TH2Poly instead of TH2F for TrackingWireEff Histos */
-    std::string m_pvPrefix = ""; /**< Prefix of PVs */
-    std::string m_refDir = ""; /**< reference histogram dir of CDC DQMs */
-    std::string m_refNamePhi = ""; /**< reference histogram of phi */
+    std::string m_name_dir = ""; /**< histogram dir*/
+    std::string m_name_refdir = ""; /**< reference histogram dir*/
+    std::string m_name_pvpfx = ""; /**< Prefix of PVs */
+    std::string m_fname_refphi = ""; /**< reference file of phi histogram */
+    std::string m_hname_ladc = ""; /**< Layer ADC histogram names*/
+    std::string m_hname_badc = ""; /**< Board ADC histogram names*/
+    std::string m_hname_btdc = ""; /**< Board TDC histogram names*/
+    std::string m_hname_idxphi = ""; /**< Phi Inedx histogram names*/
+    std::string m_hname_effphi = ""; /**< Phi Eff histogram names*/
+    std::string m_hname_hitsphi = ""; /**< Phi Hits histogram names*/
+    std::string m_histoTrackingWireEff = ""; /**< Wire Eff histogram names*/
+    bool  m_doTH2PolyTrackingWireEff = false; /**< If true, creates TH2Poly instead of TH2F for TrackingWireEff Histos */
     double m_firstEffBoundary = 0.08; /**< The first boundary of the efficiency range */
     double m_secondEffBoundary = 0.72; /**< The second boundary of the efficiency range */
 
@@ -156,10 +169,12 @@ namespace Belle2 {
     double m_mintdc;/**< min tdc median thershold accepted */
     double m_maxtdc;/**< max tdc median thershold accepted */
     double m_phistop;/**< stop thershold for phi differences */
-    double m_phialarm;/**< alram thershold for phi differences */
+    double m_phialarm;/**< alarm thershold for phi differences */
     double m_phiwarn;/**< warn thershold for phi differences */
+    std::vector<TLine*> m_lines;/**< number of CDC layer lines */
 
-    TH1D* m_hADCs[300]; /**< ADC histograms with track associated hits for each board (0-299) */
-    TH1D* m_hTDCs[300]; /**< TDC histograms with track associated hits for each board (0-299) */
+    TH1D* m_hists_lADC[kNumLayers]; /**< ADC histograms with track associated hits for each board (0-299) */
+    TH1D* m_hists_bADC[kNumBoards]; /**< ADC histograms with track associated hits for each board (0-299) */
+    TH1D* m_hists_bTDC[kNumBoards]; /**< TDC histograms with track associated hits for each board (0-299) */
   };
 } // Belle2 namespace

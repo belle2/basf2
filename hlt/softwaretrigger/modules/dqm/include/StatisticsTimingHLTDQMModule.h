@@ -10,10 +10,15 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/BunchStructure.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <mdst/dataobjects/TRGSummary.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <vector>
 #include <string>
 
@@ -86,6 +91,12 @@ namespace Belle2 {
       /// Processing time distribution of events not passing passive injection veto
       TH1F* m_processingTimeNotPassiveVeto;
 
+      /// Processing time distribution of events not passing passive injection veto and retained after HLTprefilter timing cuts
+      TH1F* m_processingTimeNotPassiveVetoTimingCut;
+
+      /// Processing time distribution of events not passing passive injection veto and retained after HLTprefilter CDC-ECL cuts
+      TH1F* m_processingTimeNotPassiveVetoCDCECLCut;
+
       /// Processing time vs nSVDShaperDigits distribution of events passing passive injection veto
       TH2F* m_procTimeVsnSVDShaperDigitsPassiveVeto;
 
@@ -103,6 +114,9 @@ namespace Belle2 {
 
       /// Processing time vs nECLDigits distribution of events not passing passive injection veto
       TH2F* m_procTimeVsnECLDigitsNotPassiveVeto;
+
+      /// Histogram to monitor injection strip
+      TH2F* m_TimeSinceLastInjectionVsTimeInBeamCycle;
 
       /// Storage for the last full time sum
       double m_lastFullTimeSum = 0;
@@ -170,6 +184,9 @@ namespace Belle2 {
       /// Number of bins for the histograms of nECLDigits
       const double m_nECLDigitsNBins = 100;
 
+      /// TRG result
+      StoreObjPtr<SoftwareTriggerResult> m_triggerResult;
+
       /// TRG Summary
       StoreObjPtr<TRGSummary> m_trgSummary;
 
@@ -181,6 +198,17 @@ namespace Belle2 {
 
       /// ECL Digits
       StoreArray<ECLDigit> m_eclDigits;
+
+      /// Store array object for injection time info.
+      StoreObjPtr<EventLevelTriggerTimeInfo> m_TTDInfo;
+
+      /// Define object for BunchStructure class
+      DBObjPtr<BunchStructure> m_bunchStructure; /**< bunch structure (fill pattern) */
+
+      /// Define object for HardwareClockSettings class
+      DBObjPtr<HardwareClockSettings> m_clockSettings; /**< hardware clock settings */
+
+
     };
 
   }

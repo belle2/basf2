@@ -159,12 +159,12 @@ void PhysicsObjectsDQMModule::event()
     const bool HLT_accept = (result->getResult(m_triggerIdentifierHLT) == SoftwareTriggerCutResult::c_accept);
     if (HLT_accept != false) {
 
-      //find out if events are in the passive veto (i=0) or in the active veto window (i=1)
-      int index = 0; //events accepted in the passive veto window but not in the active
+      //find out if events are in the passive veto (false) or in the active veto window (true)
+      bool inActiveInjectionVeto = false; //events accepted in the passive veto window but not in the active
       try {
-        if (m_l1Trigger->testInput("passive_veto") == 1 &&  m_l1Trigger->testInput("cdcecl_veto") == 0) index = 1; //events in active veto
-      } catch (const std::exception&) {
-      }
+        if (m_l1Trigger->testInput("passive_veto") == 1 &&  m_l1Trigger->testInput("cdcecl_veto") == 0)
+          inActiveInjectionVeto = true; //events in active veto
+      } catch (const std::exception&) {}
 
       if (results.find(m_prefilter_Injection_Strip) != results.end()) {
         m_TimingCut = (result->getNonPrescaledResult(m_prefilter_Injection_Strip) == SoftwareTriggerCutResult::c_accept);
@@ -183,10 +183,10 @@ void PhysicsObjectsDQMModule::event()
 
           if (isKsCandGood) {
             m_h_nKshortAllH->Fill(mergeKsCand->getMass());                   // Fill all Ks events
-            if (index == 1) {
+            if (inActiveInjectionVeto) {
               m_h_nKshortActiveH->Fill(mergeKsCand->getMass());              // Fill Ks events from active veto
               if (!m_TimingCut)
-                m_h_nKshortActiveNotTimeH->Fill(mergeKsCand->getMass());       // Fill Ks events retained after timing cut of HLTprefilter
+                m_h_nKshortActiveNotTimeH->Fill(mergeKsCand->getMass());     // Fill Ks events retained after timing cut of HLTprefilter
               if (!m_CDCECLCut)
                 m_h_nKshortActiveNotCDCECLH->Fill(mergeKsCand->getMass());   // Fill Ks events retained after CDC-ECL cut of HLTprefilter
             }

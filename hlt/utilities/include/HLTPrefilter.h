@@ -65,27 +65,26 @@ namespace Belle2::HLTPrefilter {
     {
       if (m_TTDInfo.isValid()) {
         /// Calculate revolution time of beam
-        double c_revolutionTime = m_bunchStructure->getRFBucketsPerRevolution() * 1e-3 /
-                                  m_clockSettings->getAcceleratorRF(); // [microsecond]
+        const double revolutionTime = m_bunchStructure->getRFBucketsPerRevolution() * 1e-3 /
+                                      m_clockSettings->getAcceleratorRF(); // [microsecond]
         /// Fetch global clock
-        double c_globalClock = m_clockSettings->getGlobalClockFrequency() * 1e3; // [microsecond]
+        const double globalClock = m_clockSettings->getGlobalClockFrequency() * 1e3; // [microsecond]
         // Calculate time since last injection
-        double timeSinceLastInj = m_TTDInfo->getTimeSinceLastInjection() / c_globalClock; // [microsecond]
+        const double timeSinceLastInj = m_TTDInfo->getTimeSinceLastInjection() / globalClock; // [microsecond]
         // Calculate time in beam cycle
-        double timeInBeamCycle = timeSinceLastInj - (int)(timeSinceLastInj / c_revolutionTime) * c_revolutionTime; // [microsecond]
-
+        const double timeInBeamCycle = timeSinceLastInj - (int)(timeSinceLastInj / revolutionTime) * revolutionTime; // [microsecond]
 
         // Check if events are in injection strip of LER
-        bool LER_strip = (LERtimeSinceLastInjectionMin < timeSinceLastInj &&
-                          timeSinceLastInj < LERtimeSinceLastInjectionMax &&
-                          LERtimeInBeamCycleMin < timeInBeamCycle &&
-                          timeInBeamCycle < LERtimeInBeamCycleMax);
+        const bool LER_strip = (LERtimeSinceLastInjectionMin < timeSinceLastInj &&
+                                timeSinceLastInj < LERtimeSinceLastInjectionMax &&
+                                LERtimeInBeamCycleMin < timeInBeamCycle &&
+                                timeInBeamCycle < LERtimeInBeamCycleMax);
 
         // Check if events are in injection strip of HER
-        bool HER_strip = (HERtimeSinceLastInjectionMin < timeSinceLastInj &&
-                          timeSinceLastInj < HERtimeSinceLastInjectionMax &&
-                          HERtimeInBeamCycleMin < timeInBeamCycle &&
-                          timeInBeamCycle < HERtimeInBeamCycleMax);
+        const bool HER_strip = (HERtimeSinceLastInjectionMin < timeSinceLastInj &&
+                                timeSinceLastInj < HERtimeSinceLastInjectionMax &&
+                                HERtimeInBeamCycleMin < timeInBeamCycle &&
+                                timeInBeamCycle < HERtimeInBeamCycleMax);
 
         // Tag events inside injection strip with a prescale
         return (LER_strip || HER_strip) && !SoftwareTrigger::makePreScale(prescale);
@@ -118,11 +117,12 @@ namespace Belle2::HLTPrefilter {
     bool computeDecision()
     {
       /// Get NCDCHits for the event
-      const uint32_t c_NcdcHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
+      const uint32_t nCDCHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
       /// Get NECLDigits for the event
-      const uint32_t c_NeclDigits = m_eclDigits.isOptional() ? m_eclDigits.getEntries() : 0;
+      const uint32_t nECLDigits = m_eclDigits.isOptional() ? m_eclDigits.getEntries() : 0;
 
-      return (c_NcdcHits > nCDCHitsMax && c_NeclDigits > nECLDigitsMax) && !SoftwareTrigger::makePreScale(prescale);
+      // Tag events having a large CDC and ECL occupancy with a prescale
+      return (nCDCHits > nCDCHitsMax && nECLDigits > nECLDigitsMax) && !SoftwareTrigger::makePreScale(prescale);
     }
 
   };

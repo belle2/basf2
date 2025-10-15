@@ -64,16 +64,15 @@ void HLTPrefilterModule::beginRun()
 
 void HLTPrefilterModule::event()
 {
-  int index = 0;
+  bool inActiveInjectionVeto = false;
   try {
-    if (m_trgSummary->testInput("passive_veto") == 1 &&
-	m_trgSummary->testInput("cdcecl_veto") == 0)
-      index = 1;
+    if (m_trgSummary->testInput("passive_veto") == 1 && m_trgSummary->testInput("cdcecl_veto") == 0)
+      inActiveInjectionVeto = true;
   } catch (const std::exception&) {}
 
   m_decisions.clear();
 
-  if (index == 1) {
+  if (inActiveInjectionVeto) {
 
     /// Compute prefilter decision with timing cuts
     m_decisions[TimingCut] = m_timingPrefilter.computeDecision();
@@ -99,6 +98,6 @@ void HLTPrefilterModule::event()
   // Return only the prefilter condition set by the parameter
   if (m_HLTPrefilterState == TimingCut)
     setReturnValue(m_decisions[TimingCut]);
-  else
+  else if (m_HLTPrefilterState == CDCECLCut)
     setReturnValue(m_decisions[CDCECLCut]);
 }

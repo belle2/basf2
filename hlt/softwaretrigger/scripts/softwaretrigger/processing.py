@@ -304,6 +304,7 @@ def add_expressreco_processing(path,
                                reco_components=None,
                                do_reconstruction=True,
                                switch_off_slow_modules_for_online=True,
+                               dqm_run_type=None,
                                **kwargs):
     """
     Add all modules for processing on the ExpressReco machines
@@ -316,6 +317,9 @@ def add_expressreco_processing(path,
     # Check if the run is beam and set the Environment accordingly
     if run_type == constants.RunTypes.beam:
         basf2.declare_beam()
+
+    if dqm_run_type is None:
+        dqm_run_type = run_type
 
     if unpacker_components is None:
         unpacker_components = constants.DEFAULT_EXPRESSRECO_COMPONENTS
@@ -362,7 +366,7 @@ def add_expressreco_processing(path,
         basf2.set_module_parameters(path, "SVDTimeGrouping", forceGroupingFromDB=False,
                                     isEnabledIn6Samples=True, isEnabledIn3Samples=True)
 
-    path_utils.add_expressreco_dqm(path, run_type, components=reco_components)
+    path_utils.add_expressreco_dqm(path, dqm_run_type, components=reco_components)
 
     if prune_output:
         path.add_module("PruneDataStore", matchEntries=constants.ALWAYS_SAVE_OBJECTS + constants.RAWDATA_OBJECTS +

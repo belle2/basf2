@@ -121,6 +121,18 @@ void StatisticsTimingHLTDQMModule::defineHisto()
                                             m_processingTimeMax);
   m_processingTimeNotPassiveVeto->StatOverflows(true);
 
+  m_processingTimeNotPassiveVetoTimingCut = new TH1F("processingTimeNotPassiveVetoTimingCut",
+                                                     "Processing Time of events in active veto retained by timing cut of HLTprefilter [ms]",
+                                                     m_processingTimeNBins, 0,
+                                                     m_processingTimeMax);
+  m_processingTimeNotPassiveVetoTimingCut->StatOverflows(true);
+
+  m_processingTimeNotPassiveVetoCDCECLCut = new TH1F("processingTimeNotPassiveVetoCDCECLCut",
+                                                     "Processing Time of events in active veto retained by CDC-ECL cut of HLTprefilter [ms]",
+                                                     m_processingTimeNBins, 0,
+                                                     m_processingTimeMax);
+  m_processingTimeNotPassiveVetoCDCECLCut->StatOverflows(true);
+
   m_procTimeVsnSVDShaperDigitsPassiveVeto = new TH2F("procTimeVsnSVDShaperDigitsPassiveVeto",
                                                      "Processing time [ms] vs nSVDShaperDigits of events passing passive veto",
                                                      m_nSVDShaperDigitsNBins, 0, m_nSVDShaperDigitsMax,
@@ -164,6 +176,14 @@ void StatisticsTimingHLTDQMModule::defineHisto()
   m_procTimeVsnECLDigitsNotPassiveVeto->SetXTitle("nECLDigits");
   m_procTimeVsnECLDigitsNotPassiveVeto->SetYTitle("Processing time [ms]");
 
+  m_TimeSinceLastInjectionVsTimeInBeamCycle = new TH2F("TimeSinceLastInjectionVsTimeInBeamCycle",
+                                                       "Time since last injection [ms] vs Time in beam cycle [ms] vs",
+                                                       100, 0, 30000,
+                                                       100, 0, 10);
+  m_TimeSinceLastInjectionVsTimeInBeamCycle->StatOverflows(true);
+  m_TimeSinceLastInjectionVsTimeInBeamCycle->SetXTitle("Time since last injection [ms]");
+  m_TimeSinceLastInjectionVsTimeInBeamCycle->SetYTitle("Time in beam cycle [ms]");
+
   if (oldDirectory) {
     oldDirectory->cd();
   }
@@ -176,6 +196,7 @@ void StatisticsTimingHLTDQMModule::initialize()
   m_svdShaperDigits.isOptional();
   m_cdcHits.isOptional();
   m_eclDigits.isOptional();
+  m_TTDInfo.isOptional();
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -302,6 +323,30 @@ void StatisticsTimingHLTDQMModule::event()
     } else {
       m_processingTimeNotPassiveVeto->Fill(processingTimeSum - m_lastProcessingTimeSum);
 
+      if (m_triggerResult.isValid()) {
+        const auto results = m_triggerResult->getResults();
+
+        std::string HLTprefilter_Injection_Strip = "software_trigger_cut&filter&prefilter_InjectionStrip";
+        std::string HLTprefilter_CDCECL_Cut = "software_trigger_cut&filter&prefilter_CDCECLthreshold";
+        bool injStrip = false;
+        bool cdceclcut = false;
+
+        if (results.find(HLTprefilter_Injection_Strip) != results.end()) {
+          injStrip = (m_triggerResult->getResult(HLTprefilter_Injection_Strip) == SoftwareTriggerCutResult::c_accept);
+        }
+        if (results.find(HLTprefilter_CDCECL_Cut) != results.end()) {
+          cdceclcut = (m_triggerResult->getResult(HLTprefilter_CDCECL_Cut) == SoftwareTriggerCutResult::c_accept);
+        }
+
+        if (!injStrip) {
+          m_processingTimeNotPassiveVetoTimingCut->Fill(processingTimeSum - m_lastProcessingTimeSum);
+        }
+
+        if (!cdceclcut) {
+          m_processingTimeNotPassiveVetoCDCECLCut->Fill(processingTimeSum - m_lastProcessingTimeSum);
+        }
+      }
+
       m_procTimeVsnSVDShaperDigitsNotPassiveVeto->Fill(nSVDShaperDigits, processingTimeSum - m_lastProcessingTimeSum);
       m_procTimeVsnCDCHitsNotPassiveVeto->Fill(nCDCHits, processingTimeSum - m_lastProcessingTimeSum);
       m_procTimeVsnECLDigitsNotPassiveVeto->Fill(nECLDigits, processingTimeSum - m_lastProcessingTimeSum);
@@ -311,6 +356,19 @@ void StatisticsTimingHLTDQMModule::event()
   }
 
   m_lastProcessingTimeSum = processingTimeSum;
+
+  if (m_TTDInfo.isValid()) {
+
+    double c_revolutionTime = m_bunchStructure->getRFBucketsPerRevolution() / (m_clockSettings->getAcceleratorRF() *
+                              1e3); // [microsceonds]
+    double c_globalClock = m_clockSettings->getGlobalClockFrequency() * 1e3; // [microseconds]
+
+    double timeSinceLastInj = m_TTDInfo->getTimeSinceLastInjection() / c_globalClock;
+    double timeInBeamCycle = timeSinceLastInj - (int)(timeSinceLastInj / c_revolutionTime) * c_revolutionTime;
+
+    m_TimeSinceLastInjectionVsTimeInBeamCycle->Fill(timeSinceLastInj, timeInBeamCycle);
+  }
+
 }
 
 void StatisticsTimingHLTDQMModule::beginRun()
@@ -343,12 +401,15 @@ void StatisticsTimingHLTDQMModule::beginRun()
   }
   m_processingTimePassiveVeto->Reset();
   m_processingTimeNotPassiveVeto->Reset();
+  m_processingTimeNotPassiveVetoTimingCut->Reset();
+  m_processingTimeNotPassiveVetoCDCECLCut->Reset();
   m_procTimeVsnSVDShaperDigitsPassiveVeto->Reset();
   m_procTimeVsnSVDShaperDigitsNotPassiveVeto->Reset();
   m_procTimeVsnCDCHitsPassiveVeto->Reset();
   m_procTimeVsnCDCHitsNotPassiveVeto->Reset();
   m_procTimeVsnECLDigitsPassiveVeto->Reset();
   m_procTimeVsnECLDigitsNotPassiveVeto->Reset();
+  m_TimeSinceLastInjectionVsTimeInBeamCycle->Reset();
 
 }
 

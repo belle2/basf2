@@ -9,17 +9,15 @@
 ##########################################################################
 import basf2
 from softwaretrigger import constants
-from softwaretrigger.processing import setup_basf2_and_db, start_zmq_path, finalize_zmq_path, add_hlt_processing
+from softwaretrigger.processing import setup_basf2_and_db, start_path, finalize_path, add_hlt_processing
 
+args = setup_basf2_and_db()
 
-args = setup_basf2_and_db(event_distribution_mode=constants.EventDistributionModes.zmqbasf2)
-
-path, _ = start_zmq_path(args, location=constants.Location.hlt,
-                         event_distribution_mode=constants.EventDistributionModes.zmqbasf2)
+path = start_path(args, location=constants.Location.hlt)
 add_hlt_processing(path, run_type=constants.RunTypes.beam,
                    softwaretrigger_mode=constants.SoftwareTriggerModes.filter,
-                   hlt_prefilter_mode=constants.HLTPrefilterModes.monitor)
-finalize_zmq_path(path, args, location=constants.Location.hlt)
+                   hlt_prefilter_mode=constants.HLTPrefilterModes.filter)
+finalize_path(path, args, location=constants.Location.hlt)
 
 basf2.print_path(path)
 basf2.process(path, calculateStatistics=True)

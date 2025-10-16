@@ -53,26 +53,25 @@ namespace Belle2 {
     void event() final;
 
   private:
-    // enumeration for HLTPrefilter state
+    /// enumeration for HLTPrefilter state
     enum HLTPrefilterState { TimingCut = 0, CDCECLCut = 1 };
 
-    // Helper instance for timing based prefilter
+    /// Helper instance for timing based prefilter
     HLTPrefilter::TimingCutState m_timingPrefilter;
 
-    // Helper instance for CDC-ECL occupancy based prefilter
+    /// Helper instance for CDC-ECL occupancy based prefilter
     HLTPrefilter::CDCECLCutState m_cdceclPrefilter;
 
-    // Decision results
+    /// Decision results
     std::map<HLTPrefilterState, bool> m_decisions;
 
-    // Instance for prefilter cut state
+    /// Instance for prefilter cut state
     HLTPrefilterState m_HLTPrefilterState;
 
-    // BASF2 objects
     /// Event Meta Data Store ObjPtr
     StoreObjPtr<EventMetaData> m_eventInfo;
 
-    /// Trigger summary
+    /// Trigger summary Store ObjPtr
     StoreObjPtr<TRGSummary> m_trgSummary;
 
     /// HLTprefilterParameters Database OjbPtr

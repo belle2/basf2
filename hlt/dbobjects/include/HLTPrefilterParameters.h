@@ -46,16 +46,16 @@ namespace Belle2 {
 
     /**
      * Constructor
-     * @param[in] m_LERtimeSinceLastInjectionMin   Minimum threshold of timeSinceLastInjection for LER injection.
-     * @param[in] m_LERtimeSinceLastInjectionMax   Maximum threshold of timeSinceLastInjection for LER injection.
-     * @param[in] m_HERtimeSinceLastInjectionMin   Minimum threshold of timeSinceLastInjection for HER injection.
-     * @param[in] m_HERtimeSinceLastInjectionMax   Maximum threshold of timeSinceLastInjection for HER injection.
-     * @param[in] m_LERtimeInBeamCycleMin          Minimum threshold of timeInBeamCycle for LER injection.
-     * @param[in] m_LERtimeInBeamCycleMax          Maximum threshold of timeInBeamCycle for LER injection.
-     * @param[in] m_HERtimeInBeamCycleMin          Minimum threshold of timeInBeamCycle for HER injection.
-     * @param[in] m_HERtimeInBeamCycleMax          Maximum threshold of timeInBeamCycle for HER injection.
-     * @param[in] m_HLTprefilterState              State of HLTprefilter
-     * @param[in] m_HLTprefilterPrescale           Prescale for accepting events rejected by the HLTprefilter result
+     * @param[in] LERtimeSinceLastInjectionMin   Minimum threshold of timeSinceLastInjection for LER injection.
+     * @param[in] LERtimeSinceLastInjectionMax   Maximum threshold of timeSinceLastInjection for LER injection.
+     * @param[in] HERtimeSinceLastInjectionMin   Minimum threshold of timeSinceLastInjection for HER injection.
+     * @param[in] HERtimeSinceLastInjectionMax   Maximum threshold of timeSinceLastInjection for HER injection.
+     * @param[in] LERtimeInBeamCycleMin          Minimum threshold of timeInBeamCycle for LER injection.
+     * @param[in] LERtimeInBeamCycleMax          Maximum threshold of timeInBeamCycle for LER injection.
+     * @param[in] HERtimeInBeamCycleMin          Minimum threshold of timeInBeamCycle for HER injection.
+     * @param[in] HERtimeInBeamCycleMax          Maximum threshold of timeInBeamCycle for HER injection.
+     * @param[in] State                          State of HLTprefilter
+     * @param[in] HLTPrefilterPrescale           Prescale for accepting events rejected by the HLTprefilter result
      */
     HLTPrefilterParameters(double LERtimeSinceLastInjectionMin, double LERtimeSinceLastInjectionMax, double LERtimeInBeamCycleMin,
                            double LERtimeInBeamCycleMax, double HERtimeSinceLastInjectionMin, double HERtimeSinceLastInjectionMax,
@@ -76,15 +76,15 @@ namespace Belle2 {
 
     /**
      * Constructor
-     * @param[in] m_cdcHitsMax                     Maximum threshold of CDCHits
-     * @param[in] m_eclDigitsMax                   Maximum threshold of ECLDigits
-     * @param[in] m_HLTprefilterState              State of HLTprefilter
-     * @param[in] m_HLTprefilterPrescale           Prescale for accepting events rejected by the HLTprefilter result
+     * @param[in] cdcHitsMax                     Maximum threshold of CDCHits
+     * @param[in] eclDigitsMax                   Maximum threshold of ECLDigits
+     * @param[in] State                          State of HLTprefilter
+     * @param[in] HLTPrefilterPrescale           Prescale for accepting events rejected by the HLTprefilter result
      */
-    HLTPrefilterParameters(uint32_t NcdcHitsMax, uint32_t NeclDigitsMax, unsigned short State, unsigned int HLTPrefilterPrescale)
+    HLTPrefilterParameters(uint32_t cdcHitsMax, uint32_t eclDigitsMax, unsigned short State, unsigned int HLTPrefilterPrescale)
     {
-      m_cdcHitsMax = NcdcHitsMax;
-      m_eclDigitsMax = NeclDigitsMax;
+      m_cdcHitsMax = cdcHitsMax;
+      m_eclDigitsMax = eclDigitsMax;
       m_HLTPrefilterState = static_cast<HLTPrefilterState>(State);
       m_HLTPrefilterPrescale = HLTPrefilterPrescale;
     }
@@ -98,93 +98,111 @@ namespace Belle2 {
 
     /**
     * Set the minimum threshold of timeSinceLastInjection for LER injection for an event.
-    * @param[in] nLERtimeSinceLastInjectionMin for an event.
+    * @param[in] LERtimeSinceLastInjectionMin for an event.
     */
-    void setLERtimeSinceLastInjectionMin(double nLERtimeSinceLastInjectionMin)
+    void setLERtimeSinceLastInjectionMin(double LERtimeSinceLastInjectionMin)
     {
-      m_LERtimeSinceLastInjectionMin = nLERtimeSinceLastInjectionMin;
+      m_LERtimeSinceLastInjectionMin = LERtimeSinceLastInjectionMin;
     }
 
     /**
     * Set the maximum threshold of timeSinceLastInjection for LER injection for an event.
-    * @param[in] nLERtimeSinceLastInjectionMax for an event.
+    * @param[in] LERtimeSinceLastInjectionMax for an event.
     */
-    void setLERtimeSinceLastInjectionMax(double nLERtimeSinceLastInjectionMax)
+    void setLERtimeSinceLastInjectionMax(double LERtimeSinceLastInjectionMax)
     {
-      m_LERtimeSinceLastInjectionMax = nLERtimeSinceLastInjectionMax;
+      m_LERtimeSinceLastInjectionMax = LERtimeSinceLastInjectionMax;
     }
 
     /**
     * Set the minimum threshold of timeSinceLastInjection for HER injection for an event.
-    * @param[in] nHERtimeSinceLastInjectionMin for an event.
+    * @param[in] HERtimeSinceLastInjectionMin for an event.
     */
-    void setHERtimeSinceLastInjectionMin(double nHERtimeSinceLastInjectionMin)
+    void setHERtimeSinceLastInjectionMin(double HERtimeSinceLastInjectionMin)
     {
-      m_HERtimeSinceLastInjectionMin = nHERtimeSinceLastInjectionMin;
+      m_HERtimeSinceLastInjectionMin = HERtimeSinceLastInjectionMin;
     }
 
     /**
     * Set the maximum threshold of timeSinceLastInjection for HER injection for an event.
-    * @param[in] nHERtimeSinceLastInjectionMax for an event.
+    * @param[in] HERtimeSinceLastInjectionMax for an event.
     */
-    void setHERtimeSinceLastInjectionMax(double nHERtimeSinceLastInjectionMax)
+    void setHERtimeSinceLastInjectionMax(double HERtimeSinceLastInjectionMax)
     {
-      m_HERtimeSinceLastInjectionMax = nHERtimeSinceLastInjectionMax;
+      m_HERtimeSinceLastInjectionMax = HERtimeSinceLastInjectionMax;
     }
 
 
     /**
     * Set the minimum threshold of timeInBeamCycle for LER injection for an event.
-    * @param[in] nLERtimeInBeamCycleMin for an event.
+    * @param[in] LERtimeInBeamCycleMin for an event.
     */
-    void setLERtimeInBeamCycleMin(double nLERtimeInBeamCycleMin)
+    void setLERtimeInBeamCycleMin(double LERtimeInBeamCycleMin)
     {
-      m_LERtimeInBeamCycleMin = nLERtimeInBeamCycleMin;
+      m_LERtimeInBeamCycleMin = LERtimeInBeamCycleMin;
     }
 
     /**
     * Set the maximum threshold of timeInBeamCycle for LER injection for an event.
-    * @param[in] ntimeInBeamCycleMax for an event.
+    * @param[in] LERtimeInBeamCycleMax for an event.
     */
-    void setLERtimeInBeamCycleMax(double nLERtimeInBeamCycleMax)
+    void setLERtimeInBeamCycleMax(double LERtimeInBeamCycleMax)
     {
-      m_LERtimeInBeamCycleMax = nLERtimeInBeamCycleMax;
+      m_LERtimeInBeamCycleMax = LERtimeInBeamCycleMax;
     }
 
     /**
     * Set the minimum threshold of timeInBeamCycle for HER injection for an event.
-    * @param[in] nHERtimeInBeamCycleMin for an event.
+    * @param[in] HERtimeInBeamCycleMin for an event.
     */
-    void setHERtimeInBeamCycleMin(double nHERtimeInBeamCycleMin)
+    void setHERtimeInBeamCycleMin(double HERtimeInBeamCycleMin)
     {
-      m_HERtimeInBeamCycleMin = nHERtimeInBeamCycleMin;
+      m_HERtimeInBeamCycleMin = HERtimeInBeamCycleMin;
     }
 
     /**
     * Set the maximum threshold of timeInBeamCycle for HER injection for an event.
-    * @param[in] ntimeInBeamCycleMax for an event.
+    * @param[in] HERtimeInBeamCycleMax for an event.
     */
-    void setHERtimeInBeamCycleMax(double nHERtimeInBeamCycleMax)
+    void setHERtimeInBeamCycleMax(double HERtimeInBeamCycleMax)
     {
-      m_HERtimeInBeamCycleMax = nHERtimeInBeamCycleMax;
+      m_HERtimeInBeamCycleMax = HERtimeInBeamCycleMax;
     }
 
     /**
     * Set the maximum threshold of CDCHits for an event.
-    * @param[in] NcdcHitsMax for an event.
+    * @param[in] cdcHitsMax for an event.
     */
-    void setCDCHitsMax(uint32_t NcdcHitsMax)
+    void setCDCHitsMax(uint32_t cdcHitsMax)
     {
-      m_cdcHitsMax = NcdcHitsMax;
+      m_cdcHitsMax = cdcHitsMax;
     }
 
     /**
     * Set the maximum threshold of CDCHits for an event.
-    * @param[in] NcdcHitsMax for an event.
+    * @param[in] eclDigitsMax for an event.
     */
-    void setECLDigitsMax(uint32_t NeclDigitsMax)
+    void setECLDigitsMax(uint32_t eclDigitsMax)
     {
-      m_eclDigitsMax = NeclDigitsMax;
+      m_eclDigitsMax = eclDigitsMax;
+    }
+
+    /**
+    * Set the HLTPrefilter state
+    * @param[in] State
+    */
+    void setHLTPrefilterState(unsigned short State)
+    {
+      m_HLTPrefilterState = static_cast<HLTPrefilterState>(State);
+    }
+
+    /**
+    * Set the prescale for HLTPrefilter result
+    * @param[in] HLTPrefilterPrescale
+    */
+    void setHLTPrefilterPrescale(unsigned int HLTPrefilterPrescale)
+    {
+      m_HLTPrefilterPrescale = HLTPrefilterPrescale;
     }
 
     /**
@@ -253,7 +271,6 @@ namespace Belle2 {
 
     /**
     * Get the maximum threshold of CDCHits for an event.
-    * @param[in] NcdcHitsMax for an event.
     */
     uint32_t getCDCHitsMax() const
     {
@@ -262,7 +279,6 @@ namespace Belle2 {
 
     /**
     * Get the maximum threshold of CDCHits for an event.
-    * @param[in] NeclDigitsMax for an event.
     */
     uint32_t getECLDigitsMax() const
     {
@@ -270,17 +286,7 @@ namespace Belle2 {
     }
 
     /**
-    * Set the HLTPrefilter state
-    * @param[in] HLTPrefilterState.
-    */
-    void setHLTPrefilterState(unsigned short State)
-    {
-      m_HLTPrefilterState = static_cast<HLTPrefilterState>(State);
-    }
-
-    /**
     * Get the HLTPrefilter state
-    * @param[in] HLTPrefilterState.
     */
     unsigned short getHLTPrefilterState() const
     {
@@ -288,17 +294,7 @@ namespace Belle2 {
     }
 
     /**
-    * Set the prescale for HLTPrefilter result
-    * @param[in] HLTPrefilterPrescale.
-    */
-    void setHLTPrefilterPrescale(unsigned int HLTPrefilterPrescale)
-    {
-      m_HLTPrefilterPrescale = HLTPrefilterPrescale;
-    }
-
-    /**
     * Get the prescale for HLTPrefilter result
-    * @param[in] HLTPrefilterPrescale.
     */
     unsigned int getHLTPrefilterPrescale() const
     {
@@ -366,4 +362,3 @@ namespace Belle2 {
   };
 
 }
-

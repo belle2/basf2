@@ -59,7 +59,7 @@ namespace Belle2 {
        *  The mode affects the number of parameters that are fixed.
        *  Use calibration if you are fitting a large sample (1 M  events or more) to derive  a set of channelT0 calibrations.
        *  Use monitoring if you are fitting a smaller sample. The light path fractions and the tail parameters
-       *  will be constrained according to the constraint file you passed to the fitter (usually teh result fo a high-statistics fit).
+       *  will be constrained according to the constraint file you passed to the fitter (usually the result of a high-statistics fit).
        *  Use MC to fit the MC sample and calculate a new set of prism corrections. No parameter is fixed, but the
        *  tail components are removed form the fit.
        */
@@ -126,11 +126,11 @@ namespace Belle2 {
 
       TTree* m_treeTTS = nullptr; /**< Input to the fitter. A tree containing the TTS parametrization for each channel */
       TTree* m_treeConstraints =
-        nullptr; /**< Input to the fitter. A tree containing the laser MC corrections and all the paraeters to be fixed in the fit*/
+        nullptr; /**< Input to the fitter. A tree containing the laser MC corrections and all the parameters to be fixed in the fit*/
       TFile* m_histFile = nullptr; /**< Output of the fitter. The file containing the output trees and histograms*/
-      TTree* m_fitTree = nullptr; /**< Output of the fitter. The tree containg the fit results. */
+      TTree* m_fitTree = nullptr; /**< Output of the fitter. The tree containing the fit results. */
       TTree* m_timewalkTree =
-        nullptr; /**< Output of the fitter. The tree containg the fit results to be used to study timewalk and asymptotic time resolution. */
+        nullptr; /**< Output of the fitter. The tree containing the fit results to be used to study timewalk and asymptotic time resolution. */
 
 
       // Variables for the TTS parametrization tree
@@ -146,8 +146,8 @@ namespace Belle2 {
       float m_peakTimeConstraints = 0; /**< Time of the main laser peak in the MC simulation (aka MC correction)  */
       float m_deltaTConstraints = 0; /**< Distance between the main and the secondary laser peak */
       float m_fractionConstraints = 0; /**< Fraction of the main peak*/
-      float m_timeExtraConstraints = 0; /**< Position of the guassian used to describe the extra peak on the timing distribution tail */
-      float m_sigmaExtraConstraints = 0; /**< Width of the guassian used to describe the extra peak on the timing distribution tail */
+      float m_timeExtraConstraints = 0; /**< Position of the gaussian used to describe the extra peak on the timing distribution tail */
+      float m_sigmaExtraConstraints = 0; /**< Width of the gaussian used to describe the extra peak on the timing distribution tail */
       float m_alphaExtraConstraints = 0.; /**< alpha parameter of the tail of the extra peak. */
       float m_nExtraConstraints = 0.; /**< parameter n of the tail of the extra peak */
       float m_timeBackgroundConstraints = 0.; /**< Position of the gaussian used to describe the background, w/ respect to peakTime */
@@ -188,7 +188,7 @@ namespace Belle2 {
       float m_fractionMC = 0.; /**< Fraction of events in the secondary peak form the MC simulation */
       float m_deltaTMC = 0.; /**< Time difference between the main peak and the secondary peak in the MC simulation*/
       float m_peakTimeMC =
-        0.; /**< Time of the main peak in teh MC simulation, i.e. time of propagation of the light in the prism. This factor is used to get the channelT0 calibration */
+        0.; /**< Time of the main peak in the MC simulation, i.e. time of propagation of the light in the prism. This factor is used to get the channelT0 calibration */
 
       float m_chi2 = 0; /**< Reduced chi2 of the fit*/
       float m_rms = 0; /**< RMS of the histogram used for the fit*/

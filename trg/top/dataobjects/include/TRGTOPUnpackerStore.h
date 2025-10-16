@@ -198,7 +198,7 @@ namespace Belle2 {
     std::vector<TRGTOPSlotTiming> m_slotTimingDecisions; /**<  a vector of slot-level TOP timing decisions */
 
     /** the class title*/
-    ClassDef(TRGTOPUnpackerStore, 2);
+    ClassDef(TRGTOPUnpackerStore, 3);
 
   };
 

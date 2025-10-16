@@ -11,6 +11,8 @@
 #include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoTools.h>
+#include <svd/dbobjects/SVDDQMPlotsConfiguration.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <vector>
 
@@ -53,6 +55,8 @@ namespace Belle2 {
       nullptr; /**< average number of the APV sample which corresponds to the maximum amplitude for clusters on track */
     TCanvas* m_c_MeanSVDEventT0 = nullptr; /**< Mean Event T0 from SVD */
 
+    DBObjPtr<SVDDQMPlotsConfiguration> m_svdPlotsConfig; /**< SVD DQM plots configuration */
+
     /** Monitoring Object to be produced by this module, which contain defined canvases and monitoring variables */
     MonitoringObject* m_monObj = nullptr;
 
@@ -61,6 +65,9 @@ namespace Belle2 {
 
     //! geometrical tool pointer
     const VXD::GeoTools* m_gTools = nullptr;
+
+    /** list of sensor  to monitor (Charge, SNR, time; U/V)  taken from DB (payload)*/
+    std::vector<std::string> m_listOfSensorsToMonitor;
 
     /**
      * Calculate avg offline occupancy for one specific sensor, especially

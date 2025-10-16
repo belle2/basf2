@@ -118,9 +118,9 @@ Tutorial files are available in the
 
 There are two big differences when using the DCS instead of the Continuum Suppression:
 
-  1. Writing out of new variables, which describe single tracks and clusters instead of the whole shape of the event.
+1. Writing out of new variables, which describe single tracks and clusters instead of the whole shape of the event.
 
-  2. Using Deep Neural Networks as MVA methods to increase performance and to deal with the large number of new variables.
+2. Using Deep Neural Networks as MVA methods to increase performance and to deal with the large number of new variables.
 
 This following section provides additional information about the DCS, which supplements the information in the tutorials.
 

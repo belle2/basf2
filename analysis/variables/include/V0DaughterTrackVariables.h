@@ -19,104 +19,9 @@ namespace Belle2 {
   namespace Variable {
 
     /**
-     * returns the number of CDC hits associated to this track
-     */
-    double v0DaughterTrackNCDCHits(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the number of SVD hits associated to this track
-     */
-    double v0DaughterTrackNSVDHits(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the number of PXD hits associated to this track
-     */
-    double v0DaughterTrackNPXDHits(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the number of PXD and SVD hits associated to this track
-     */
-    double v0DaughterTrackNVXDHits(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
      * returns the number of track hits removed in V0Finder
      */
     double v0DaughterTrackNRemovedHits(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the first activated SVD layer associated to the track
-     */
-    double v0DaughterTrackFirstSVDLayer(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the first activated PXD layer associated to the track
-     */
-    double v0DaughterTrackFirstPXDLayer(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the first activated CDC layer associated to the track
-     */
-    double v0DaughterTrackFirstCDCLayer(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the last CDC layer associated to the track
-     */
-    double v0DaughterTrackLastCDCLayer(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the fit P-value of the track
-     */
-    double v0DaughterTrackPValue(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the D0 impact parameter of the V0 daughter track
-     */
-    double v0DaughterTrackD0(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the transverse momentum angle of the V0 daughter track
-     */
-    double v0DaughterTrackPhi0(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the curvature of the V0 daughter track
-     */
-    double v0DaughterTrackOmega(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the Z0 impact parameter of the V0 daughter track
-     */
-    double v0DaughterTrackZ0(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the slope of the V0 daughter track
-     */
-    double v0DaughterTrackTanLambda(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the d0 error of the track
-     */
-    double v0DaughterTrackD0Error(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the phi0 error of the track
-     */
-    double v0DaughterTrackPhi0Error(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the omega error of the track
-     */
-    double v0DaughterTrackOmegaError(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the z0 error of the track
-     */
-    double v0DaughterTrackZ0Error(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the tan(lambda) error of the track
-     */
-    double v0DaughterTrackTanLambdaError(const Particle* part, const std::vector<double>& daughterID);
 
     /**
      * return the d0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track
@@ -162,31 +67,6 @@ namespace Belle2 {
      * returns the pull of the helix parameter tan(lambda) with the true V0 vertex as the track pivot.
      */
     double v0DaughterHelixWithTrueVertexAsPivotTanLambdaPull(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the pull of the helix parameter d0 with the origin as the track pivot.
-     */
-    double v0DaughterHelixWithOriginAsPivotD0Pull(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the pull of the helix parameter phi0 with the origin as the track pivot.
-     */
-    double v0DaughterHelixWithOriginAsPivotPhi0Pull(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the pull of the helix parameter omega with the origin as the track pivot.
-     */
-    double v0DaughterHelixWithOriginAsPivotOmegaPull(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the pull of the helix parameter z0 with the origin as the track pivot.
-     */
-    double v0DaughterHelixWithOriginAsPivotZ0Pull(const Particle* part, const std::vector<double>& daughterID);
-
-    /**
-     * returns the pull of the helix parameter tan(lambda) with the origin as the track pivot.
-     */
-    double v0DaughterHelixWithOriginAsPivotTanLambdaPull(const Particle* part, const std::vector<double>& daughterID);
 
     /**
      * returns the track parameter Tau  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda

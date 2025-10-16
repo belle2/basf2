@@ -12,7 +12,7 @@
 <header>
   <input>../GenericB_GENSIMRECtoDST.dst.root</input>
   <output>../DSTtoMDST.mdst.root</output>
-  <contact>Frank Meier; frank.meier@duke.edu</contact>
+  <contact>Paul Feichtinger; paul.feichtinger@ijs.si</contact>
 </header>
 """
 

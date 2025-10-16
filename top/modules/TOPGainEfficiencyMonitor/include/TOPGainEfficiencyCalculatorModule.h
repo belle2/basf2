@@ -22,7 +22,7 @@ namespace Belle2 {
 
   /**
    * Module for channel-by-channel gain/efficiency analysis.
-   * 2D histograms of hit timing and charge (integral or pulse height), crated by TOPLaserHitSelectorModule,
+   * 2D histograms of hit timing and charge (integral or pulse height), created by TOPLaserHitSelectorModule,
    *
    */
   class TOPGainEfficiencyCalculatorModule : public HistoModule {
@@ -57,7 +57,7 @@ namespace Belle2 {
     virtual ~TOPGainEfficiencyCalculatorModule();
 
     /**
-     * Load time vs charge 2D histogram from a given input file (paramter "inputFile")
+     * Load time vs charge 2D histogram from a given input file (parameter "inputFile")
      * and prepare hit timing and pulse charge distribution for each channel.
      */
     virtual void initialize() override;
@@ -114,7 +114,7 @@ namespace Belle2 {
     void DrawResult(const std::string& histotype, EHistogramType LoadHisto);
 
     /**
-     * Fit function of pulse charge (or charnge) distribution for channel(pixel)-by-channel gain extraction, given by
+     * Fit function of pulse charge (or charge) distribution for channel(pixel)-by-channel gain extraction, given by
      * "[0]*pow(x-[4],[1])*exp(-pow(x-[4],[2])/[3])"
      * smeared by Gaussian with a constant sigma to consider baseline fluctuation
      */

@@ -1,9 +1,20 @@
+Changes in the analysis package in light-2511-g
+-----------------------------------------------
+
+stdV0s and stdHyperons
+++++++++++++++++++++++
+* Added argument ``addSuffix`` to add a suffix of the form ``_<fitter>`` to the output ParticleList name, depending on the chosen fitter.
+
 Changes in the analysis package in light-2509-fornax
 ----------------------------------------------------
 
 Variables
 +++++++++
 * Added pi0 and eta veto variables `BellePi0Veto` and `BelleEtaVeto` that were developed for Belle
+* Fixed memory leak in variables `matchedMC`, `clusterBestMatchedMCParticle`, and `varForFirstMCAncestorOfType`.
+* Added the meta variable `convertToDaughterIndex` that converts a variable to an integer and returns it as if it is a
+  valid daughter index. This allows other meta variables like `mcDaughter` to be called with other variables to describe
+  the daughter index.
 
 TreeFitter
 ++++++++++

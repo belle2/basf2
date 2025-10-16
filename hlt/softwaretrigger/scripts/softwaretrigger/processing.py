@@ -167,6 +167,7 @@ def add_hlt_processing(path,
                        create_hlt_unit_histograms=True,
                        switch_off_slow_modules_for_online=True,
                        hlt_prefilter_mode=constants.HLTPrefilterModes.monitor,
+                       dqm_run_type=None,
                        **kwargs):
     """
     Add all modules for processing on HLT filter machines
@@ -179,6 +180,9 @@ def add_hlt_processing(path,
     # Check if the run is beam and set the Environment accordingly
     if run_type == constants.RunTypes.beam:
         basf2.declare_beam()
+
+    if dqm_run_type is None:
+        dqm_run_type = run_type
 
     # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
@@ -226,7 +230,7 @@ def add_hlt_processing(path,
     path_utils.add_filter_software_trigger(path, store_array_debug_prescale=1)
 
     # Add the part of the dqm modules, which should run after every reconstruction
-    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter,
+    path_utils.add_hlt_dqm(path, run_type=dqm_run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter,
                            create_hlt_unit_histograms=create_hlt_unit_histograms)
 
     # Only turn on the filtering (by branching the path) if filtering is turned on
@@ -260,7 +264,7 @@ def add_hlt_processing(path,
     # Add the HLT DQM modules only in case the event is accepted
     path_utils.add_hlt_dqm(
         accept_path,
-        run_type=run_type,
+        run_type=dqm_run_type,
         components=reco_components,
         dqm_mode=constants.DQMModes.filtered,
         create_hlt_unit_histograms=create_hlt_unit_histograms)
@@ -275,7 +279,7 @@ def add_hlt_processing(path,
     path.add_module('StatisticsSummary').set_name('Sum_ROI_Payload_Assembler')
 
     # Add the part of the dqm modules, which should run on all events, not only on the accepted ones
-    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events,
+    path_utils.add_hlt_dqm(path, run_type=dqm_run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events,
                            create_hlt_unit_histograms=create_hlt_unit_histograms)
 
     if prune_output:

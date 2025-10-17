@@ -18,6 +18,7 @@ from tabulate import tabulate
 
 _RegisteredSkims = [
     # --- Flagged skims ---
+    ("70000000", "flagged", "f_custom"),  # flag for running custom skim combinations
     ("71000100", "flagged", "f_SLME_p1"),
     ("71000200", "flagged", "f_SLME_p2"),
     ("71000300", "flagged", "f_SLME_p3"),

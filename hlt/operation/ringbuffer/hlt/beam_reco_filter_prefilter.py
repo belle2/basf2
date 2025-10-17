@@ -20,4 +20,4 @@ add_hlt_processing(path, run_type=constants.RunTypes.beam,
 finalize_path(path, args, location=constants.Location.hlt)
 
 basf2.print_path(path)
-basf2.process(path, calculateStatistics=True)
+basf2.process(path)

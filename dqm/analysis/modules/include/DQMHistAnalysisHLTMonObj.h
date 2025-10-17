@@ -12,10 +12,10 @@
 #include <dqm/core/DQMHistAnalysis.h>
 
 // RooFit forward declarations
-class RooRealVar;
-class RooGaussian;
-class RooChebychev;
 class RooAddPdf;
+class RooChebychev;
+class RooGaussian;
+class RooRealVar;
 
 namespace Belle2 {
 

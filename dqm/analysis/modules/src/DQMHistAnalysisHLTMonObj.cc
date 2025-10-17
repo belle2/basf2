@@ -22,6 +22,7 @@
 #include <RooChebychev.h>
 #include <RooMsgService.h>
 #include <RooFit.h>
+#include <RooDataHist.h>
 
 // C++ headers
 #include <regex>

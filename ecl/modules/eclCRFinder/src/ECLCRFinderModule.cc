@@ -22,6 +22,7 @@
 /* C++ headers. */
 #include <algorithm>
 #include <iostream>
+#include <array>
 
 // NAMESPACE(S)
 using namespace Belle2;
@@ -64,6 +65,7 @@ ECLCRFinderModule::ECLCRFinderModule() : Module(), m_eclCalDigits(eclCalDigitArr
   addParam("mapPar1", m_mapPar[1],
            "Map parameter for growth crystals (radius (type=R), integer (for type=N) or fraction (for type=MC)).", 1.0);
   addParam("skipFailedTimeFitDigits", m_skipFailedTimeFitDigits, "Digits with failed fits are skipped when checking timing cuts.", 0);
+  addParam("useParametersFromDatabase", m_useParametersFromDatabase, "get energy and time cuts from payload", true);
 
 }
 
@@ -84,19 +86,6 @@ void ECLCRFinderModule::initialize()
   // Register relations.
   m_eclConnectedRegions.registerRelationTo(m_eclCalDigits);
 
-  // Check user inputs: [2]: digit, [1]: growth, [0]: seed
-  // overall energy thresholds
-  if (std::isless(m_energyCut[0], m_energyCut[1])) B2FATAL("ECLCRFinderModule::initialize(): m_energyCut[0]=" << m_energyCut[0] <<
-                                                             " must be larger or equal than m_energyCut[1]=" << m_energyCut[1]);
-  if (std::isless(m_energyCut[1], m_energyCut[2])) B2FATAL("ECLCRFinderModule::initialize(): m_energyCut[1]=" << m_energyCut[1] <<
-                                                             " must be larger or equal than m_energyCut[2]=" << m_energyCut[2]);
-
-  // timing threshold (can depend on energy, but we make the check here even stronger by checking that the timing is looser without checking the timing energy range)
-  if (std::isgreater(m_timeCut[0], m_timeCut[1]))
-    B2FATAL("ECLCRFinderModule::initialize(): m_timeCut[0] must be less or equal than m_timeCut[1].");
-  if (std::isgreater(m_timeCut[1], m_timeCut[2]))
-    B2FATAL("ECLCRFinderModule::initialize(): m_timeCut[1] must be less or equal than m_timeCut[2].");
-
   // Initialize neighbour maps.
   m_neighbourMaps.resize(2);
   m_neighbourMaps[0] = new ECL::ECLNeighbours(m_mapType[0], m_mapPar[0]);
@@ -112,10 +101,43 @@ void ECLCRFinderModule::initialize()
 
 }
 
+//-----------------------------------------------------------------
+//..By default, get the energy and time thresholds from the
+//  eclClusteringParameters dbOject
 void ECLCRFinderModule::beginRun()
 {
+  if (m_useParametersFromDatabase and m_eclClusteringParameters.hasChanged()) {
+    std::array<double, 3> CRF_energyCut = m_eclClusteringParameters->getCRFEnergyCut();
+    m_energyCut[0] = CRF_energyCut[0];
+    m_energyCut[1] = CRF_energyCut[1];
+    m_energyCut[2] = CRF_energyCut[2];
 
+    std::array<double, 3> CRF_timeCut = m_eclClusteringParameters->getCRFTimeCut();
+    m_timeCut[0] = CRF_timeCut[0];
+    m_timeCut[1] = CRF_timeCut[1];
+    m_timeCut[2] = CRF_timeCut[2];
+
+    std::array<double, 3> CRF_timeCutMaxEnergy = m_eclClusteringParameters->getCRFTimeCutMaxEnergy();
+    m_timeCut_maxEnergy[0] = CRF_timeCutMaxEnergy[0];
+    m_timeCut_maxEnergy[1] = CRF_timeCutMaxEnergy[1];
+    m_timeCut_maxEnergy[2] = CRF_timeCutMaxEnergy[2];
+  }
+
+  // Check user inputs: [2]: digit, [1]: growth, [0]: seed
+  // overall energy thresholds
+  if (std::isless(m_energyCut[0], m_energyCut[1])) B2FATAL("ECLCRFinderModule::beginRun(): m_energyCut[0]=" << m_energyCut[0] <<
+                                                             " must be larger or equal than m_energyCut[1]=" << m_energyCut[1]);
+  if (std::isless(m_energyCut[1], m_energyCut[2])) B2FATAL("ECLCRFinderModule::beginRun(): m_energyCut[1]=" << m_energyCut[1] <<
+                                                             " must be larger or equal than m_energyCut[2]=" << m_energyCut[2]);
+  // timing threshold (can depend on energy, but we make the check here even stronger by checking that the timing is looser without checking the timing energy range)
+  if (std::isgreater(m_timeCut[0], m_timeCut[1]))
+    B2FATAL("ECLCRFinderModule::beginRun(): m_timeCut[0] must be less or equal than m_timeCut[1].");
+  if (std::isgreater(m_timeCut[1], m_timeCut[2]))
+    B2FATAL("ECLCRFinderModule::beginRun(): m_timeCut[1] must be less or equal than m_timeCut[2].");
 }
+
+
+//-----------------------------------------------------------------
 
 void ECLCRFinderModule::event()
 {

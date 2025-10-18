@@ -12,6 +12,10 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+
+// ECL
+#include <ecl/dbobjects/ECLClusteringParameters.h>
 
 // C++
 #include <set>
@@ -80,6 +84,10 @@ namespace Belle2 {
     std::string m_mapType[2]; /**< Neighbour map types.*/
     double m_mapPar[2]; /**< Parameters for neighbour maps.*/
     int m_skipFailedTimeFitDigits; /**< Handling of digits with failed time fits.*/
+    bool m_useParametersFromDatabase; /**< get energy and time cuts from payload */
+
+    /** ECLClusteringParameters payload for parameters */
+    DBObjPtr<ECLClusteringParameters> m_eclClusteringParameters;
 
     /** Digit vectors. */
     std::vector <int>  m_cellIdToCheckVec; /**< cellid -> check digit. */

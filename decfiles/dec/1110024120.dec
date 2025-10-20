@@ -1,0 +1,46 @@
+# EventType: 1110024120
+# Descriptor: [B0 -> K*0 [-> K_S0 pi0] pi0; K_S0 -> pi+ pi-; pi0 [-> gamma gamma] pi0 [-> gamma gamma]]
+# NickName: Bd_Kst0pi0_KS0pi0_pi+pi-4gamma_CPV
+# Documentation: TDCPV mode
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: Fanli Zeng
+# Email: fanli.zeng@ipmu.jp
+# Cuts: None
+# Date: 20251017
+
+Alias MyB0    B0
+Alias MyB0B   anti-B0
+Alias Mypi0   pi0
+Alias MyK_S0  K_S0
+Alias MyKst0  K*0
+Alias MyKst0B anti-K*0
+ChargeConj MyKst0 MyKst0B
+ChargeConj MyB0 MyB0B
+
+Decay Upsilon(4S)
+  1.00000    B0 anti-B0 MyB0 MyB0B    VSS_BMIX dm;
+Enddecay
+
+# -------- K*0 π0 --------
+Decay MyB0
+  1.000  MyKst0  Mypi0   SSD_CP   dm   0.0   1.0   minusTwoBeta   1.0   0.0   1.0   0.0;
+Enddecay
+
+CDecay MyB0B
+
+# -------- K*0(892) → K_S0 π0 --------
+Decay MyKst0
+  1.0000     MyK_S0  Mypi0             VSS;
+Enddecay
+
+# -------- KS, π0 decays --------
+Decay MyK_S0
+  1.0000     pi+     pi-               PHSP;
+Enddecay
+
+Decay Mypi0
+  1.0000     gamma   gamma             PHSP;
+Enddecay
+
+End

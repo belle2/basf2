@@ -1,0 +1,45 @@
+
+# EventType: 1110024110
+# Descriptor: [B0 -> KS [ -> pi+ -> pi-] pi0 [ -> gamma gamma] pi0 [ -> gamma gamma]]
+# NickName: Bd_KSpi0pi0_pi+pi-4gamma_CPV
+# Documentation: TDCPV mode
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: Fanli Zeng 
+# Email: fanli.zeng@ipmu.jp
+# Cuts: None
+# Date: 20251017
+
+Alias MyB0    B0
+Alias MyB0B   anti-B0
+Alias Mypi0   pi0
+Alias MyK_S0  K_S0
+
+ChargeConj MyB0 MyB0B
+
+# If global DEC doesn't define dm, you may uncomment one of the lines below:
+# Define dm   0.5065
+# Define dm   0.507e12   # only if your environment expects 1/s
+
+Decay Upsilon(4S)
+ 1.00000   B0 anti-B0  MyB0  MyB0B    VSS_BMIX dm;
+Enddecay
+
+# PHSP_CP args: angle  dm  etaCP  |A|  argA  |Abar|  argAbar
+# Here argA=0 and argAbar=0; |A|,|Abar| are derived from C (C = -A_model)
+
+Decay MyB0
+ 1.000  MyK_S0  Mypi0  Mypi0   PHSP_CP  -0.401901159467  dm  1   1.26388393352  0.0   1  0.0;
+Enddecay
+
+CDecay MyB0B
+
+Decay MyK_S0
+ 1.000  pi+  pi-   PHSP;
+Enddecay
+
+Decay Mypi0
+ 1.000  gamma  gamma   PHSP;
+Enddecay
+
+End

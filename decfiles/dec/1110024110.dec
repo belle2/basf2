@@ -29,7 +29,7 @@ Enddecay
 # Here argA=0 and argAbar=0; |A|,|Abar| are derived from C (C = -A_model)
 
 Decay MyB0
- 1.000  MyK_S0  Mypi0  Mypi0   PHSP_CP  -0.401901159467  dm  1   1.26388393352  0.0   1  0.0;
+ 1.000  MyK_S0  Mypi0  Mypi0   PHSP_CP  -0.404791796782  dm  1   1  0.0   1.03563452053  0.0;
 Enddecay
 
 CDecay MyB0B

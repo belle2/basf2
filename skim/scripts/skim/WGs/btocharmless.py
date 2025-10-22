@@ -401,7 +401,8 @@ class BtoEtapRhop(BaseSkim):
     """
     Reconstructed decay mode:
 
-    * :math:`B^{+}\\to \\eta^{prime} \\rho^+`
+    * :math:`B^{+}\\to \\eta^{prime} (\\to \\pi^{+} \\pi^{-} \\eta (\\to \\gamma \\gamma) ) \\rho^{+} (\\pi^{+} \\pi^{0}) `
+    * :math:`B^{+}\\to \\eta^{prime} (\\to \\rho^{0} (\\to \\pi^{+} \\pi^{-}) \\gamma ) \\rho^{+} (\\pi^{+} \\pi^{0}) `
 
     Cuts applied:
 
@@ -430,12 +431,15 @@ class BtoEtapRhop(BaseSkim):
     def build_lists(self, path):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
         BsigList = []
-        ma.reconstructDecay("eta:gamgam -> gamma:tight gamma:tight", '0.4 < M < 0.6', path=path)
-        ma.reconstructDecay('rho0:Eff -> pi-:SkimHighEff pi+:SkimHighEff', '0.47 < M < 1.15', path=path)
-        ma.reconstructDecay("eta\':loose1 -> pi+:SkimHighEff pi-:SkimHighEff eta:gamgam", '0.8 < M < 1.1', 1, path=path)
-        ma.reconstructDecay("eta\':loose2 -> rho0:Eff gamma:tight", '0.8 < M < 1.1', 2, path=path)
-        ma.copyLists("eta\':loose", ["eta\':loose1", "eta\':loose2"], path=path)
-        ma.reconstructDecay('rho+:loose -> pi+:SkimHighEff pi0:eff40_May2020', '0.47 < M < 1.15', path=path)
-        ma.reconstructDecay("B+:Charmless_b2etaprhop -> eta\':loose rho+:loose", Bcuts, path=path)
+        ma.reconstructDecay("eta:b2etaprhop_gamgam -> gamma:tight gamma:tight", '0.4 < M < 0.6', path=path)
+        ma.reconstructDecay('rho0:b2etaprhop_pipi -> pi+:SkimHighEff pi-:SkimHighEff',
+                            '0.47 < M < 1.15', path=path)
+        ma.reconstructDecay("eta\':b2etaprhop_loose1 -> pi+:SkimHighEff pi-:SkimHighEff eta:b2etaprhop_gamgam",
+                            '0.8 < M < 1.1', 1, path=path)
+        ma.reconstructDecay("eta\':b2etaprhop_loose2 -> rho0:b2etaprhop_pipi gamma:tight",
+                            '0.8 < M < 1.1', 2, path=path)
+        ma.copyLists("eta\':b2etaprhop_loose", ["eta\':b2etaprhop_loose1", "eta\':b2etaprhop_loose2"], path=path)
+        ma.reconstructDecay('rho+:b2etaprhop_loose -> pi+:SkimHighEff pi0:eff40_May2020', '0.47 < M < 1.15', path=path)
+        ma.reconstructDecay("B+:Charmless_b2etaprhop -> eta\':b2etaprhop_loose rho+:b2etaprhop_loose", Bcuts, path=path)
         BsigList.append("B+:Charmless_b2etaprhop")
         return BsigList

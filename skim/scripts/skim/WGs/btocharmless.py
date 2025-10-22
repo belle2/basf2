@@ -400,7 +400,8 @@ class BtoEtaRhop(BaseSkim):
     """
     Reconstructed decay mode:
 
-    * :math:`B^{+}\\to \\eta \\rho^{+}`
+    * :math:`B^{+}\\to \\eta (\\to \\gamma \\gamma) \\rho^{+} (\\to \\pi{+} \\pi^{0})`
+    * :math:`B^{+}\\to \\eta (\\to \\pi^{+} \\pi^{-} \\pi^{0}) \\rho^{+} (\\to \\pi{+} \\pi^{0})`
 
     Cuts applied:
 
@@ -429,7 +430,7 @@ class BtoEtaRhop(BaseSkim):
         rhocut = '0.47 < M < 1.15'
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
         BsigList = []
-        ma.reconstructDecay("rho+:pipiz -> pi+:SkimHighEff pi0:eff40_May2020", rhocut, path=path)
-        ma.reconstructDecay("B+:Charmless_b2etarho -> eta:SkimHighEff rho+:pipiz", Bcuts, path=path)
+        ma.reconstructDecay("rho+:b2etarho_pipiz -> pi+:SkimHighEff pi0:eff40_May2020", rhocut, path=path)
+        ma.reconstructDecay("B+:Charmless_b2etarho -> eta:SkimHighEff rho+:b2etarho_pipiz", Bcuts, path=path)
         BsigList.append('B+:Charmless_b2etarho')
         return BsigList

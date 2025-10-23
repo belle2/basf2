@@ -869,14 +869,18 @@ namespace Belle2 {
             << ", evtPhase = " << evtPhase
             << ", numWordsCore = " << evtNumWordsCore);
 
-    word = array.getWord(); // word 2, skipHit(1)/reserved(4)/ctime LSBs(11)/revo9counter(16)
-    bool         evtSkipHit = word >> 29;
+    word = array.getWord(); // word 2, skipHit(1)/injVetoFlag(1)/PSBypass(3)/ctime LSBs(11)/revo9counter(16)
+    bool         evtSkipHit = word >> 31;
+    bool         injVetoFlag = (word >> 30) & 0x1;
+    unsigned int PSBypass = (word >> 27) & 0x7;
     unsigned int evtCtime = (word >> 16) & 0x7FF;
     unsigned int evtRevo9Counter = word & 0xFFFF;
 
     B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
             << "\tevtSkipHit = " << evtSkipHit
+            << ", injVetoFlag = " << injVetoFlag
+            << ", PSBypass = " << PSBypass
             << ", evtCtime = " << evtCtime
             << ", evtRevo9Counter = " << evtRevo9Counter);
 
@@ -895,6 +899,8 @@ namespace Belle2 {
                                       evtVersion,
                                       evtScrodID,
                                       evtSkipHit,
+                                      injVetoFlag,
+                                      PSBypass,
                                       evtCtime,
                                       evtPhase,
                                       evtAsicMask,

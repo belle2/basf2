@@ -13,7 +13,7 @@
 #pragma link C++ class Belle2::TOPLikelihood+; // checksum=0xa9894130, version=3
 #pragma link C++ class Belle2::TOPRecBunch+; // checksum=0x28cd770d, version=7
 #pragma link C++ class Belle2::TOPRawWaveform+; // checksum=0x581d60d9, version=9
-#pragma link C++ class Belle2::TOPProductionEventDebug+; // checksum=0xfbeb4b5d, version=1
+#pragma link C++ class Belle2::TOPProductionEventDebug+; // checksum=0x876d035a, version=2
 #pragma link C++ class Belle2::TOPProductionHitDebug+; // checksum=0x32688835, version=1
 #pragma link C++ class Belle2::TOPTimeZero+; // checksum=0xf7afaec4, version=4
 #pragma link C++ class Belle2::TOPRawDigit+; // checksum=0xd13d975f, version=6

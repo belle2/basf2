@@ -400,7 +400,8 @@ class BtoEtaOmega(BaseSkim):
     """
     Reconstructed decay mode:
 
-    * :math:`B^{0}\\to \\eta \\omega`
+    * :math:`B^{0}\\to \\eta(\\to \\gamma \\gamma) \\omega(\\to \\pi^+ \\pi^- \\pi^0)`,
+    * :math:`B^{0}\\to \\eta(\\to \\pi^+ \\pi^- \\pi^0) \\omega(\\to \\pi^+ \\pi^- \\pi^0)`
 
     Cuts applied:
 
@@ -430,12 +431,20 @@ class BtoEtaOmega(BaseSkim):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
         BsigList = []
 
-        ma.reconstructDecay('omega:loose -> pi0:eff40_May2020 pi-:SkimVeryLoose pi+:SkimVeryLoose', '0.73 < M < 0.83', 1, path=path)
-        ma.reconstructDecay('eta:loose1 -> gamma:loose gamma:loose', '0.4 < M < 0.6', 1, path=path)
-        ma.reconstructDecay('eta:loose2 -> pi0:eff40_May2020 pi-:SkimVeryLoose pi+:SkimVeryLoose', '0.4 < M < 0.6', 2, path=path)
-        ma.copyLists('eta:loose', ['eta:loose1', 'eta:loose2'], path=path)
+        ma.reconstructDecay(
+            'omega:b2etaomega_loose -> pi0:eff40_May2020 pi-:SkimVeryLoose pi+:SkimVeryLoose',
+            '0.73 < M < 0.83',
+            1,
+            path=path)
+        ma.reconstructDecay('eta:b2etaomega_loose1 -> gamma:loose gamma:loose', '0.4 < M < 0.6', 1, path=path)
+        ma.reconstructDecay(
+            'eta:b2etaomega_loose2 -> pi0:eff40_May2020 pi-:SkimVeryLoose pi+:SkimVeryLoose',
+            '0.4 < M < 0.6',
+            2,
+            path=path)
+        ma.copyLists('eta:b2etaomega_loose', ['eta:b2etaomega_loose1', 'eta:b2etaomega_loose2'], path=path)
 
-        ma.reconstructDecay("B0:Charmless_b2etaomega -> eta:loose omega:loose", Bcuts, path=path)
+        ma.reconstructDecay("B0:Charmless_b2etaomega -> eta:b2etaomega_loose omega:b2etaomega_loose", Bcuts, path=path)
 
         BsigList.append('B0:Charmless_b2etaomega')
         return BsigList

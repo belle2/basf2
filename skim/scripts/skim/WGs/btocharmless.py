@@ -26,8 +26,7 @@ from skim.standardlists.charmless import (
 from skim.standardlists.lightmesons import (
     loadStdSkimHighEffTracks,
     loadStdSkimHighEffEtaPrime,
-    loadStdSkimHighEffEta,
-    )
+    loadStdSkimHighEffEta)
 from stdPi0s import stdPi0s
 from stdPhotons import stdPhotons
 

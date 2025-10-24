@@ -100,7 +100,7 @@ class BaseFEISkim(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, Full Event Interpretation"
 
-    FEIPrefix = "FEIv4_2022_MC15_light-2205-abys"
+    FEIPrefix = "FEIv1_2025_MC16ri_aldebaran_200"
     """Prefix label for the FEI training used in the FEI skims."""
 
     FEIChannelArgs = {}
@@ -113,7 +113,7 @@ class BaseFEISkim(BaseSkim):
     NoisyModules = ["ParticleCombiner"]
 
     ApplyHLTHadronCut = True
-    produce_on_tau_samples = False  # retention is very close to zero on taupair
+    produce_on_tau_samples = True  # Note retention is very close to zero on taupair
 
     @staticmethod
     @lru_cache()
@@ -708,8 +708,8 @@ class feiHadronic(BaseFEISkim):
 
     * :math:`M_{\\text{bc}} > 5.2~{\\rm GeV}`
     * :math:`|\\Delta E| < 0.3~{\\rm GeV}`
-    * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23 for
-      :math:`B^+`, and decay mode 25 for :math:`B^0`)
+    * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 25 for
+      :math:`B^+`, and decay mode 23 for :math:`B^0`)
 
     All available FEI :math:`B^0` and :math:`B^+` hadronic tags are reconstructed. From
     `Thomas Keck's thesis
@@ -749,8 +749,8 @@ class feiHadronic_DstEllNu(BaseFEISkim):
 
     * :math:`M_{\\text{bc}} > 5.27~{\\rm GeV}`
     * :math:`-0.150 < \\Delta E < 0.100~{\\rm GeV}`
-    * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23 for
-      :math:`B^+`, and decay mode 25 for :math:`B^0`)
+    * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 25 for
+      :math:`B^+`, and decay mode 23 for :math:`B^0`)
     * :math:`\\cos{TBTO} < 0.9`
     * Selects only the two best candidates that survive based on the signalProbability
 

@@ -177,6 +177,15 @@ def get_argument_parser():
         help="yaml containing the default release and the GTs",
     )
 
+    parser.add_argument(
+        "--samples",
+        "-samples",
+        type=str,
+        default='',
+        help="the yaml file (with full path) to be used in ``b2skim-stats-submit``.\
+        If not provided, ``b2skim-stats-submit`` defaults to the samples of the current campaign\
+        i.e. ``/group/belle2/dataprod/mc/skimtraining/samplelists/testfiles.yaml`` on KEKCC.")
+
     return parser
 
 
@@ -588,13 +597,12 @@ def getDirs(data, base_dir):
     return json_dir, yaml_dir, lpn_dir, stats_dir
 
 
-def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=False):
+def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=False, samples=False):
     for skim in skims:
         print(f'Submitting combined skim {skim} for stats')
         if skim == 'FEI':
             # Include analysis globaltag for FEI
             print(f'Skimming FEI. Using --analysis-globaltag {info["fei_gt"]}')
-            print(f'b2skim-stats-submit -c {stats_dir}{inputYaml.split("/")[-1]} {skim} --analysis-globaltag {info["fei_gt"]}')
             # This is the {inputYaml} in '/MC/skim/stats' folder
             command = [
                 'b2skim-stats-submit',
@@ -603,14 +611,22 @@ def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=F
                 skim,
                 '--analysis-globaltag',
                 info["fei_gt"]]
+            if samples:
+                command.append(f"--sample-yaml {samples}")
+            print(" ".join(command))
             result = subprocess.run(command, capture_output=True, text=True)
             if result.returncode != 0:
                 print(f"Error submitting stats for {skim}: {result.stderr}")
         if skim == 'SystematicsCombinedHadronic' or skim == 'SystematicsCombinedLowMulti':
             # Systematic skims get submitted as single skims (not combined)
-            print(f'b2skim-stats-submit -s {skim}')
             command = ['b2skim-stats-submit', '-s', skim]
+
+            if samples:
+                command.append(f"--sample-yaml {samples}")
+
+            print(" ".join(command))
             result = subprocess.run(command, capture_output=True, text=True)
+
             if result.returncode != 0:
                 print(f"Error submitting stats for {skim}: {result.stderr}")
         else:
@@ -624,6 +640,8 @@ def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=F
                 command += f' --pid-globaltag {info["pid_gt"]}'
             if flagged:
                 command += ' --flagged'
+            if samples:
+                command += f" --sample-yaml {samples}"
             print(command)
             result = subprocess.run(command.split(), capture_output=True, text=True)
             if result.returncode != 0:
@@ -676,7 +694,8 @@ def main():
             gt=args.analysis_GT,
             pidgt=args.PID_GT,
             flagged=args.flagged,
-            inputYaml=args.inputYaml)
+            inputYaml=args.inputYaml,
+            samples=args.samples)
 
     elif args.stats_print:
         printStats(args.skims, stats_dir, args.flagged)

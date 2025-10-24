@@ -180,6 +180,4 @@ if __name__ == '__main__':
     main = prepare_path(fileIn, list1, icharge, not signal, fileOut)
     basf2.process(main)
 
-    print(basf2.statistics)
-
 # @endcond

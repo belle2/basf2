@@ -41,7 +41,7 @@ add_cdst_output(main, filename=sys.argv[2])
 main.add_module('Progress')
 
 # generate events
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # show call statistics
 print(basf2.statistics)

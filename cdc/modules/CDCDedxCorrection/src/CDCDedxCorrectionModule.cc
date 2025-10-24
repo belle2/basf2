@@ -8,9 +8,12 @@
 
 #include <cdc/modules/CDCDedxCorrection/CDCDedxCorrectionModule.h>
 
+#include <cdc/geometry/CDCGeometryPar.h>
+
+#include <TMath.h>
+
 using namespace Belle2;
 using namespace CDC;
-using namespace Dedx;
 
 REG_MODULE(CDCDedxCorrection);
 

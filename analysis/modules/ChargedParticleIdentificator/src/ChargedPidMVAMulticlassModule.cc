@@ -10,6 +10,7 @@
 
 //ANALYSIS
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dbobjects/ChargedPidMVAWeights.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/variables/ECLVariables.h>
 

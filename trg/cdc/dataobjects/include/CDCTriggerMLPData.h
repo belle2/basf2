@@ -84,10 +84,11 @@ namespace Belle2 {
     /** Struct to keep one set of training data for either training, validation or testing.
      * Having this struct makes it easier to save the data to an output filestream.
      */
-    template <const unsigned inLen, const unsigned outLen>
+    //template <const unsigned intype>  -- no longer need template for vector
     struct NeuroSet {
-      float input[inLen];
-      float target[outLen];
+      //To make it suitable for any input, change it to vector
+      std::vector<float> input;
+      std::vector<float> target;
       int exp;
       int run;
       int subrun;
@@ -102,27 +103,29 @@ namespace Belle2 {
       float intheta;
       unsigned expert;
       float ininvpt;
+      float pt; // Add to check pt dependence
       std::string headline;
-      NeuroSet()
+      NeuroSet(int inlen = 27)
       {
         headline = "Experiment\tRun\tSubrun\tEvent\tTrack\tnTracks\tExpert\tiNodes\toNodes\t";
-        for (unsigned i = 0; i < inLen / 3; ++i) {
+        unsigned InputPerSL = inlen / 9; // Suppose always use 9 SL
+        for (unsigned i = 0; i < inlen / InputPerSL; ++i) {
           headline += "SL" + std::to_string(i) + "-relID\t";
           headline += "SL" + std::to_string(i) + "-driftT\t";
           headline += "SL" + std::to_string(i) + "-alpha\t";
+          for (unsigned j = 0; j < InputPerSL - 3; ++j) {
+            headline += "SL" + std::to_string(i) + "-extra_input" + std::to_string(j) + "\t";
+          }
         }
-        headline += "RecoZ\tRecoTheta\tScaleZ\tRawZ\tScaleTheta\tRawTheta\t2DPhi\t3DTheta\t2DinvPt\n";
+        headline += "RecoZ\tRecoTheta\tScaleZ\tRawZ\tScaleTheta\tRawTheta\t2DPhi\t3DTheta\t2DinvPt\t2DPt\n";
       }
 
-      NeuroSet(float xin[inLen], float xout[outLen],  int xexp, int xrun, int xsubrun, int xevt, int xtrack, unsigned xexpert,
-               int xntracks, int xnnrawz, int xnnrawtheta, float xnnscalez, float xnnscaletheta, float xinphi, float xintheta, float xininvpt)
+      NeuroSet(std::vector<float> xin, std::vector<float> xout,  int xexp, int xrun, int xsubrun, int xevt, int xtrack, unsigned xexpert,
+               int xntracks, int xnnrawz, int xnnrawtheta, float xnnscalez, float xnnscaletheta, float xinphi, float xintheta, float xininvpt,
+               float xinpt)
       {
-        for (unsigned i = 0; i < inLen; ++i) {
-          input[i] = xin[i];
-        }
-        for (unsigned i = 0; i < outLen; ++i) {
-          target[i] = xout[i];
-        }
+        input = xin;
+        target  = xout;
         exp = xexp;
         run = xrun;
         subrun = xsubrun;
@@ -138,24 +141,30 @@ namespace Belle2 {
         inphi = xinphi;
         intheta = xintheta;
         ininvpt = xininvpt;
+        pt = xinpt;
         headline = "Experiment\tRun\tSubrun\tEvent\tTrack\tnTracks\tExpert\tiNodes\toNodes\t";
-        for (unsigned i = 0; i < inLen / 3; ++i) {
+        unsigned inlen = input.size();
+        unsigned InputPerSL = inlen / 9; // Suppose always use 9 SL
+        for (unsigned i = 0; i < inlen / InputPerSL; ++i) {
           headline += "SL" + std::to_string(i) + "-relID\t";
           headline += "SL" + std::to_string(i) + "-driftT\t";
           headline += "SL" + std::to_string(i) + "-alpha\t";
+          for (unsigned j = 0; j < InputPerSL - 3; ++j) {
+            headline += "SL" + std::to_string(i) + "-extra_input" + std::to_string(j) + "\t";
+          }
         }
-        headline += "RecoZ\tRecoTheta\tScaleZ\tRawZ\tScaleTheta\tRawTheta\t2DPhi\t3DTheta\t2DinvPt\n";
+        headline += "RecoZ\tRecoTheta\tScaleZ\tRawZ\tScaleTheta\tRawTheta\t2DPhi\t3DTheta\t2DinvPt\t2DPt\n";
 
       }
       friend std::ostream& operator << (std::ostream& out, const NeuroSet& dset)
       {
         out << dset.exp << '\t' << dset.run << '\t' << dset.subrun << '\t' << dset.evt << '\t' << dset.track << '\t' << dset.ntracks << '\t'
             << dset.expert << '\t'
-            << inLen << '\t' << outLen << '\t';
+            << dset.input.size() << '\t' << dset.target.size() << '\t';
         for (auto indata : dset.input) {out << indata << '\t';}
         for (auto outdata : dset.target) {out << outdata << '\t';}
         out << dset.nnscalez << '\t' << dset.nnrawz << '\t' << dset.nnscaletheta << '\t' << dset.nnrawtheta << '\t' << dset.inphi << '\t' <<
-            dset.intheta << '\t' << dset.ininvpt << '\t';
+            dset.intheta << '\t' << dset.ininvpt << '\t' << dset.pt;
         return out;
       }
       friend std::istream& operator >> (std::istream& in, NeuroSet& dset)
@@ -187,14 +196,20 @@ namespace Belle2 {
         std::string insize = "";
         std::string outsize = "";
         std::getline(in, insize, '\t');
+        dset.input.assign(std::stoul(insize), -1);
+        /*
         if (std::stoul(insize) != inLen) {
           B2ERROR("Input and output format of neurotrigger training data does not  match!");
         }
+        */
         std::getline(in, outsize, '\t');
+        dset.target.assign(std::stoul(outsize), -1);
+        /*
         if (std::stoul(outsize) != outLen) {
           B2ERROR("Input and output format of neurotrigger training data does not  match!");
         }
-        for (unsigned i = 0; i < inLen; ++i) {
+        */
+        for (unsigned i = 0; i < std::stoul(insize); ++i) {
           help = "";
           std::getline(in, help, '\t');
           try {
@@ -204,7 +219,7 @@ namespace Belle2 {
             dset.input[i] = 0.;
           }
         }
-        for (unsigned i = 0; i < outLen; ++i) {
+        for (unsigned i = 0; i < std::stoul(outsize); ++i) {
           help = "";
           std::getline(in, help, '\t');
           try {
@@ -258,13 +273,14 @@ namespace Belle2 {
     void addHit(unsigned iSL, int iTS);
     /** increase track counter */
     void countTrack() { ++m_trackCounter; }
-    template<unsigned inLen, unsigned outLen>
-    void addSample(const NeuroSet<inLen, outLen>& dsample)
+    //template<unsigned inLen, unsigned outLen>
+    //void addSample(const NeuroSet<inLen, outLen>& dsample)
+    void addSample(const NeuroSet& dsample)
     {
-      std::vector<float> in(dsample.input, dsample.input + sizeof dsample.input / sizeof dsample.input[0]);
-      m_inputSamples.push_back(in);
-      std::vector<float> out(dsample.target, dsample.target + sizeof dsample.target / sizeof dsample.target[0]);
-      m_targetSamples.push_back(out);
+      //std::vector<float> in(dsample.input, dsample.input + sizeof dsample.input / sizeof dsample.input[0]);
+      m_inputSamples.push_back(dsample.input);
+      //std::vector<float> out(dsample.target, dsample.target + sizeof dsample.target / sizeof dsample.target[0]);
+      m_targetSamples.push_back(dsample.target);
       m_expList.push_back(dsample.exp);
       m_runList.push_back(dsample.run);
       m_subRunList.push_back(dsample.subrun);
@@ -324,7 +340,7 @@ namespace Belle2 {
     std::vector<int> m_trackList;
 
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerMLPData, 3);
+    ClassDef(CDCTriggerMLPData, 5);
   };
 }
 #endif

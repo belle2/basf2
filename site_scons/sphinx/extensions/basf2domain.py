@@ -6,6 +6,8 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+from docutils import nodes
+from docutils.parsers.rst import directives
 from sphinx import addnodes
 from sphinx.roles import XRefRole
 from sphinx.directives import ObjectDescription
@@ -118,6 +120,26 @@ class Basf2VariableIndex(Index):
     #: \endcond
 
 
+class Basf2VariableObject(Basf2Object):
+    # extend the option spec to accept a source: URL
+    option_spec = Basf2Object.option_spec.copy() if hasattr(Basf2Object, "option_spec") else {}
+    option_spec.update({
+        "source": directives.uri,   # support :source: option
+    })
+
+    def handle_signature(self, sig, signode):
+        # Call parent to parse the signature and add the variable name
+        name = super().handle_signature(sig, signode)
+
+        # If :source: option is given, add a [source] link inline
+        if "source" in self.options:
+            uri = self.options["source"]
+            linknode = nodes.reference('', '[source]', refuri=uri, classes=['var-source-link'])
+            signode += linknode
+
+        return name
+
+
 class Basf2Domain(Domain):
     """basf2 Software Domain"""
     #: \cond Doxygen_suppress
@@ -130,7 +152,7 @@ class Basf2Domain(Domain):
 
     directives = {
         "module": Basf2Object,
-        "variable": Basf2Object,
+        "variable": Basf2VariableObject,
     }
     roles = {
         "mod": XRefRole(),
@@ -160,7 +182,7 @@ class Basf2Domain(Domain):
     def get_objects(self):
         for i, type in enumerate(["modules", "variables"]):
             for name, (docname, target) in self.data[type].items():
-                yield(name, name, type, docname, target, i)
+                yield (name, name, type, docname, target, i)
 
     def get_type_name(self, type, primary=False):
         # never prepend "Default"

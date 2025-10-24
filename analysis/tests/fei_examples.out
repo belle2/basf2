@@ -77,23 +77,23 @@ TBranch: isSignalAcceptMissingNeutrino, 0
 TBranch: mcErrors, 376
 TBranch: extraInfo__bodecayModeID__bc, 4
 TBranch: extraInfo__bouniqueSignal__bc, 0
-TBranch: extraInfo__boSignalProbability__bc, 0.02344
+TBranch: extraInfo__boSignalProbability__bc, 0.006491
 TTree: B0
 TBranch: __experiment__, 1003
 TBranch: __run__, 0
 TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
-TBranch: __ncandidates__, 4
+TBranch: __ncandidates__, 1
 TBranch: __eventType__, 
 TBranch: __weight__, 1
-TBranch: Mbc, 5.136
-TBranch: deltaE, -0.06938
+TBranch: Mbc, 5.209
+TBranch: deltaE, -0.4692
 TBranch: isSignal, nan
 TBranch: mcErrors, 512
-TBranch: extraInfo__bodecayModeID__bc, 28
+TBranch: extraInfo__bodecayModeID__bc, 26
 TBranch: extraInfo__bouniqueSignal__bc, 0
-TBranch: extraInfo__boSignalProbability__bc, 5.43e-07
+TBranch: extraInfo__boSignalProbability__bc, 9.795e-08
 TTree: BplusSL
 TBranch: __experiment__, 1003
 TBranch: __run__, 0
@@ -103,28 +103,28 @@ TBranch: __candidate__, 0
 TBranch: __ncandidates__, 20
 TBranch: __eventType__, 
 TBranch: __weight__, 1
-TBranch: cosThetaBetweenParticleAndNominalB, -0.7587
+TBranch: cosThetaBetweenParticleAndNominalB, -1.439
 TBranch: isSignalAcceptMissingNeutrino, 0
 TBranch: mcErrors, 376
-TBranch: extraInfo__bodecayModeID__bc, 1
+TBranch: extraInfo__bodecayModeID__bc, 2
 TBranch: extraInfo__bouniqueSignal__bc, 0
-TBranch: extraInfo__boSignalProbability__bc, 0.0005818
+TBranch: extraInfo__boSignalProbability__bc, 0.002946
 TTree: Bplus
 TBranch: __experiment__, 1003
 TBranch: __run__, 0
 TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
-TBranch: __ncandidates__, 13
+TBranch: __ncandidates__, 6
 TBranch: __eventType__, 
 TBranch: __weight__, 1
-TBranch: Mbc, 5.215
-TBranch: deltaE, -0.5671
+TBranch: Mbc, 5.202
+TBranch: deltaE, -0.4281
 TBranch: isSignal, nan
 TBranch: mcErrors, 512
-TBranch: extraInfo__bodecayModeID__bc, 31
+TBranch: extraInfo__bodecayModeID__bc, 4
 TBranch: extraInfo__bouniqueSignal__bc, 0
-TBranch: extraInfo__boSignalProbability__bc, 4.755e-07
+TBranch: extraInfo__boSignalProbability__bc, 1.473e-08
 TFile: B_specific_apply.root
 TTree: variables
 No entry found

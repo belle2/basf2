@@ -1398,6 +1398,10 @@ and :math:`\alpha_{i}` is the polar angle of the :math:`i`-th crystal in the per
 As a crystal can be related to more than one shower, :math:`w_{i}` is the fraction of the
 energy of the :math:`i`-th crystal associated with the shower.
 
+**Note:** this variable is sensitive to other nearby particles and so cluster isolation properties should always be checked; 
+for more information please see the 
+`ECL Cluster Recommendations <https://indico.belle2.org/event/13722/contributions/84645/attachments/31512/51585/ecl_recommendation.pdf>`_. 
+
 More details about the implementation can be found in `BELLE2-NOTE-TE-2017-001 <https://docs.belle2.org/record/454?ln=en>`_ .
 
 More details about Zernike polynomials can be found in `Wikipedia <https://en.wikipedia.org/wiki/Zernike_polynomials>`_ .
@@ -1554,6 +1558,8 @@ Returns MVA classifier that uses pulse shape discrimination to identify electrom
 
 - 1 for electromagnetic showers
 - 0 for hadronic showers
+
+For details, see the following `PSD arxiv paper <https://arxiv.org/pdf/2007.09642>`_  
 )DOC");
     REGISTER_VARIABLE("clusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits, R"DOC(
 Returns ECL cluster's number of hadron digits in cluster (pulse shape discrimination variable).

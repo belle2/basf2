@@ -22,8 +22,6 @@
 #include <analysis/variables/ECLVariables.h>
 #include <analysis/variables/FlightInfoVariables.h>
 
-#include <framework/geometry/B2Vector3.h>
-
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -34,6 +32,9 @@
 #include <cdc/dataobjects/CDCDedxTrack.h>
 
 #include <TDatabasePDG.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
 
 #include <cmath>
 #include <numeric>
@@ -198,11 +199,11 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         continue;
       ROOT::Math::PxPyPzEVector V4g2 = C.Get4MomentumFromCluster(eclClusters[j], ECLCluster::EHypothesisBit::c_nPhotons);
       double Eg2 = V4g2.E();
-      const B2Vector3D V3g1 = (PCmsLabTransform::labToCms(V4g1)).Vect();
-      const B2Vector3D V3g2 = (PCmsLabTransform::labToCms(V4g2)).Vect();
-      double Thetag1 = (PCmsLabTransform::labToCms(V4g1)).Theta() * TMath::RadToDeg();
-      double Thetag2 = (PCmsLabTransform::labToCms(V4g2)).Theta() * TMath::RadToDeg();
-      double deltphi = std::abs(V3g1.DeltaPhi(V3g2) * TMath::RadToDeg());
+      const ROOT::Math::PxPyPzEVector V4g1CMS = PCmsLabTransform::labToCms(V4g1);
+      const ROOT::Math::PxPyPzEVector V4g2CMS = PCmsLabTransform::labToCms(V4g2);
+      double Thetag1 = V4g1CMS.Theta() * TMath::RadToDeg();
+      double Thetag2 = V4g2CMS.Theta() * TMath::RadToDeg();
+      double deltphi = std::abs(ROOT::Math::VectorUtil::DeltaPhi(V4g1CMS, V4g2CMS) * TMath::RadToDeg());
       double Tsum = Thetag1 + Thetag2;
       if (deltphi > 170. && (Eg1 > 0.25 && Eg2 > 0.25)) nb2bcc_PhiHigh++;
       if (deltphi > 170. && (Eg1 < 0.25 || Eg2 < 0.25)) nb2bcc_PhiLow++;
@@ -218,15 +219,15 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   // AngleGTLE
   double angleGTLE = -10.;
   if (gammaWithMaximumRho) {
-    const B2Vector3D& V3g1 = gammaWithMaximumRho->getMomentum();
+    const ROOT::Math::XYZVector& V3g1 = gammaWithMaximumRho->getMomentum();
     if (trackWithMaximumRho) {
-      const B2Vector3D& V3p1 = trackWithMaximumRho->getMomentum();
-      const double theta1 = V3g1.Angle(V3p1);
+      const ROOT::Math::XYZVector& V3p1 = trackWithMaximumRho->getMomentum();
+      const double theta1 = ROOT::Math::VectorUtil::Angle(V3g1, V3p1);
       if (angleGTLE < theta1) angleGTLE = theta1;
     }
     if (trackWithSecondMaximumRho) {
-      const B2Vector3D& V3p2 = trackWithSecondMaximumRho->getMomentum();
-      const double theta2 = V3g1.Angle(V3p2);
+      const ROOT::Math::XYZVector& V3p2 = trackWithSecondMaximumRho->getMomentum();
+      const double theta2 = ROOT::Math::VectorUtil::Angle(V3g1, V3p2);
       if (angleGTLE < theta2) angleGTLE = theta2;
     }
   }
@@ -236,12 +237,10 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   // AngleG1G2LE
   double angleG1G2CMSLE = -10.;
   if (gammaWithMaximumRho) {
-    const ROOT::Math::PxPyPzEVector& V4p1 = gammaWithMaximumRho->get4Vector();
+    const ROOT::Math::PxPyPzEVector& V4p1 = PCmsLabTransform::labToCms(gammaWithMaximumRho->get4Vector());
     if (gammaWithSecondMaximumRho) {
-      const ROOT::Math::PxPyPzEVector& V4p2 = gammaWithSecondMaximumRho->get4Vector();
-      const B2Vector3D V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
-      const B2Vector3D V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
-      angleG1G2CMSLE = V3p1.Angle(V3p2);
+      const ROOT::Math::PxPyPzEVector& V4p2 = PCmsLabTransform::labToCms(gammaWithSecondMaximumRho->get4Vector());
+      angleG1G2CMSLE = ROOT::Math::VectorUtil::Angle(V4p1, V4p2);
     }
   }
 
@@ -264,9 +263,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         const double mSum = V4pSum.M();
         const double JpsidM = mSum - TDatabasePDG::Instance()->GetParticle(443)->Mass();
         if (std::abs(JpsidM) < jPsiMasswindow && chSum == 0)  nJpsi++;
-        const B2Vector3D V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
-        const B2Vector3D V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
-        const double temp = V3p1.Angle(V3p2);
+        const ROOT::Math::PxPyPzEVector V4p1CMS = PCmsLabTransform::labToCms(V4p1);
+        const ROOT::Math::PxPyPzEVector V4p2CMS = PCmsLabTransform::labToCms(V4p2);
+        const double temp = ROOT::Math::VectorUtil::Angle(V4p1CMS, V4p2CMS);
         if (maxAngleTTLE < temp) maxAngleTTLE = temp;
       }
     }
@@ -284,11 +283,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       Particle* par1 = m_gammaParticles->getParticle(i);
       for (unsigned int j = i + 1; j < m_gammaParticles->getListSize(); j++) {
         Particle* par2 = m_gammaParticles->getParticle(j);
-        ROOT::Math::PxPyPzEVector V4p1 = par1->get4Vector();
-        ROOT::Math::PxPyPzEVector V4p2 = par2->get4Vector();
-        const B2Vector3D V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
-        const B2Vector3D V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
-        const double temp = V3p1.Angle(V3p2);
+        ROOT::Math::PxPyPzEVector V4p1 = PCmsLabTransform::labToCms(par1->get4Vector());
+        ROOT::Math::PxPyPzEVector V4p2 = PCmsLabTransform::labToCms(par2->get4Vector());
+        const double temp = ROOT::Math::VectorUtil::Angle(V4p1, V4p2);
         if (maxAngleGGLE < temp) maxAngleGGLE = temp;
       }
     }
@@ -411,11 +408,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       ROOT::Math::PxPyPzEVector V4g2 = PCmsLabTransform::labToCms(Cls.Get4MomentumFromCluster(eclClusters[j],
                                                                   ECLCluster::EHypothesisBit::c_nPhotons));
       double Eg2ob = V4g2.E() / (2 * BeamEnergyCMS());
-      const B2Vector3D V3g1 = V4g1.Vect();
-      const B2Vector3D V3g2 = V4g2.Vect();
       double Thetag1 = V4g1.Theta() * TMath::RadToDeg();
       double Thetag2 = V4g2.Theta() * TMath::RadToDeg();
-      double deltphi = std::abs(V3g1.DeltaPhi(V3g2) * TMath::RadToDeg());
+      double deltphi = std::abs(ROOT::Math::VectorUtil::DeltaPhi(V4g1, V4g2) * TMath::RadToDeg());
       double Tsum = Thetag1 + Thetag2;
       if ((deltphi > 165. && deltphi < 178.5) && (Eg1ob > 0.4 && Eg2ob > 0.4 && (Eg1ob > 0.45 || Eg2ob > 0.45)) && (Tsum > 178.
           && Tsum < 182.)) BhabhaECL = 1;
@@ -537,7 +532,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       if (!trackFit1) continue;
 
       const ROOT::Math::PxPyPzEVector V4p1 = trackFit1->get4Momentum();
-      const B2Vector3D V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+      const ROOT::Math::PxPyPzEVector V4p1CMS = PCmsLabTransform::labToCms(V4p1);
 
       const double p1MomLab = V4p1.P();
       double highestP = p1MomLab;
@@ -548,9 +543,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       const double p1isInCDC = Variable::inCDCAcceptance(part1);
       const double p1clusPhi = Variable::eclClusterPhi(part1);
 
-      const double Pp1 = V3p1.Mag();
-      const double Thetap1 = (V3p1).Theta() * TMath::RadToDeg();
-      const double Phip1 = (V3p1).Phi() * TMath::RadToDeg();
+      const double Pp1 = V4p1CMS.R();
+      const double Thetap1 = V4p1CMS.Theta() * TMath::RadToDeg();
+      const double Phip1 = V4p1CMS.Phi() * TMath::RadToDeg();
 
       const double enECLTrack1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
@@ -577,7 +572,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         if (!trackFit2) continue;
 
         const ROOT::Math::PxPyPzEVector V4p2 = trackFit2->get4Momentum();
-        const B2Vector3D V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+        const ROOT::Math::PxPyPzEVector V4p2CMS = PCmsLabTransform::labToCms(V4p2);
 
         const double p2MomLab = V4p2.P();
         double lowestP = p2MomLab;
@@ -588,9 +583,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         const double p2isInCDC = Variable::inCDCAcceptance(part2);
         const double p2clusPhi = Variable::eclClusterPhi(part2);
 
-        const double Pp2 = V3p2.Mag();
-        const double Thetap2 = (V3p2).Theta() * TMath::RadToDeg();
-        const double Phip2 = (V3p2).Phi() * TMath::RadToDeg();
+        const double Pp2 = V4p2CMS.R();
+        const double Thetap2 = V4p2CMS.Theta() * TMath::RadToDeg();
+        const double Phip2 = V4p2CMS.Phi() * TMath::RadToDeg();
 
         const double acopPhi = std::abs(180 - std::abs(Phip1 - Phip2));
         const double acopTheta = std::abs(std::abs(Thetap1 + Thetap2) - 180);
@@ -624,8 +619,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
         const double recoilP = fr.getMomentum(pIN - V4p1 - V4p2).P();
 
-        const bool radmumu_tag = nTracks < 4 && goodTrk1 == 1 && goodTrk2 == 1 && highestP > 1 && lowestP < 3 && (p1hasKLMid == 1
-                                 || p2hasKLMid == 1) && abs(diffPhi) >= 0.5 * M_PI && recoilP > 0.1 && (enECLTrack1 <= 0.25 || enECLTrack2 <= 0.25);
+        const bool radmumu_tag = nTracks < 4 && goodTrk1 == 1 && goodTrk2 == 1 && highestP > 1 && lowestP < 3
+                                 && (p1hasKLMid == 1 || p2hasKLMid == 1) && std::abs(diffPhi) >= 0.5 * M_PI && recoilP > 0.1
+                                 && (enECLTrack1 <= 0.25 || enECLTrack2 <= 0.25);
 
         if (radmumu_tag) radmumu = 1;
 

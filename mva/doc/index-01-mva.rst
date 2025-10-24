@@ -208,7 +208,6 @@ You can create the necessary data files to execute the examples (if you have som
     :func: get_argument_parser
     :prog: basf2_mva_merge_mc
     :nodefault:
-    :nogroupsections:
 
 
 Inference / How to apply a trained mva method onto data
@@ -259,7 +258,6 @@ You can create a zip file with a LaTeX report and evaluation plots using the ``b
     :func: get_argument_parser
     :prog: basf2_mva_evaluate
     :nodefault:
-    :nogroupsections:
 
 
 The LaTeX file can be compiled directly to PDF by passing the ``-c`` command line argument.

@@ -6,7 +6,7 @@
 #pragma link C++ nestedclasses;
 
 
-#pragma link C++ class Belle2::BeamSpot+; // checksum=0x6f933bf2, version=2
+#pragma link C++ class Belle2::BeamSpot+; // checksum=0xb0557959, version=3
 #pragma link C++ class Belle2::CollisionBoostVector+; // checksum=0x1721913a, version=1
 #pragma link C++ class Belle2::CollisionAxisCMS+; // checksum=0x3be09269, version=1
 #pragma link C++ class Belle2::CollisionInvariantMass+; // checksum=0xeb4ae2fa, version=1
@@ -51,3 +51,9 @@ m_IPPositionCovMatrix = onfile.m_positionError;	\
 m_sizeCovMatrix = onfile.m_size;	\
 }"
 
+#pragma read sourceClass="Belle2::BeamSpot" version="[2]" \
+  source="TVector3 m_IPPosition" \
+  targetClass="Belle2::BeamSpot" target="m_IPPosition" \
+  code="{ \
+m_IPPosition = ROOT::Math::XYZVector(onfile.m_IPPosition.X(), onfile.m_IPPosition.Y(), onfile.m_IPPosition.Z());  \
+}"

@@ -18,6 +18,7 @@
 #include <top/dbobjects/TOPNominalQE.h>
 #include <top/dbobjects/TOPCalChannelRQE.h>
 #include <top/dbobjects/TOPCalChannelThresholdEff.h>
+#include <top/dbobjects/TOPCalChannelPulseHeight.h>
 #include <string>
 #include <map>
 
@@ -118,6 +119,12 @@ namespace Belle2 {
       double getRelativePixelEfficiency(int moduleID, int pixelID) const;
 
       /**
+       * Returns relative PDE on MC (including CE, tuning factor and threshold efficiency)
+       * @return pixel efficiency on MC relative to nominal photocathode
+       */
+      double getRelativePDEonMC(int moduleID, int pixelID) const;
+
+      /**
        * Returns PMT type at a given position
        * @param moduleID slot ID
        * @param pmtID PMT ID
@@ -162,9 +169,9 @@ namespace Belle2 {
       double getGroupIndexDerivative(double energy) const;
 
       /**
-       * Returns bulk absorption lenght of quartz at given photon energy
+       * Returns bulk absorption length of quartz at given photon energy
        * @param energy photon energy [eV]
-       * @return bulk absorption lenght
+       * @return bulk absorption length
        */
       double getAbsorptionLength(double energy) const;
 
@@ -242,9 +249,14 @@ namespace Belle2 {
       void mapPmtTypeToPositions() const;
 
       /**
-       * Prepares a map of relative pixel efficiencies
+       * Prepares a map of relative pixel quantum times collection efficiencies (relative to nominal one)
        */
       void prepareRelEfficiencies() const;
+
+      /**
+       * Prepares a map of relative pixel photon detection efficiencies on MC
+       */
+      void prepareRelPDEonMC() const;
 
       /**
        * Returns unique PMT ID within the detector
@@ -272,7 +284,7 @@ namespace Belle2 {
        * Returns integral of quantum efficiency over photon energies
        * @param qe quantum efficiency data points
        * @param ce collection efficiency data points
-       * @param lambdaFirst wavelenght of the first data point [nm]
+       * @param lambdaFirst wavelength of the first data point [nm]
        * @param lambdaStep wavelength step [nm]
        * @return integral [eV]
        */
@@ -308,11 +320,13 @@ namespace Belle2 {
       OptionalDBArray<TOPPmtQE> m_pmtQEData; /**< quantum efficiencies */
       DBObjPtr<TOPCalChannelRQE> m_channelRQE; /**< channel relative quantum effi. */
       DBObjPtr<TOPCalChannelThresholdEff> m_thresholdEff; /**< channel threshold effi. */
+      DBObjPtr<TOPCalChannelPulseHeight> m_pulseHeights; /**< channel pulse height parametrizations */
 
       // cache
       mutable TOPNominalQE m_envelopeQE;  /**< envelope quantum efficiency */
       mutable std::map<int, const TOPPmtQE*> m_pmts; /**< QE data mapped to positions */
       mutable std::map<int, double> m_relEfficiencies; /**< pixel relative QE */
+      mutable std::map<int, double> m_relPDEonMC; /**< pixel relative photon detection efficiencies on MC */
       mutable std::map<int, unsigned> m_pmtTypes; /**< PMT types mapped to positions */
 
       // Other
@@ -336,7 +350,7 @@ namespace Belle2 {
     inline double TOPGeometryPar::getAbsorptionLength(double energy) const
     {
       double lambda = c_hc / energy;
-      return 15100 * pow(lambda / 405, 4); // Alan Schwartz, 2013 (private comunication)
+      return 15100 * pow(lambda / 405, 4); // Alan Schwartz, 2013 (private communication)
     }
 
   } // end of namespace TOP

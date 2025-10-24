@@ -135,7 +135,7 @@ def main():
     path.add_module(SillyGeneratorModule())
     path.add_module(ParticleStatisticsModule())
 
-    basf2.process(path)
+    basf2.process(path, calculateStatistics=True)
 
     # Print call statistics
     print(basf2.statistics)

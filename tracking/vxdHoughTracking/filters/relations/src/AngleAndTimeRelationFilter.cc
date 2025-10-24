@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/vxdHoughTracking/filters/relations/AngleAndTimeRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
@@ -59,9 +59,9 @@ AngleAndTimeRelationFilter::operator()(const std::pair<const VXDHoughState*, con
       (absLayerDiff == 2 and absThetaDiff < m_ThetaCutDeltaL2)) {
 
     if (not m_useDeltaTCuts or
-        (m_useDeltaTCuts and
-         abs(currentHitData.uTime - nextHitData.uTime) < m_DeltaTU and
-         abs(currentHitData.vTime - nextHitData.vTime) < m_DeltaTV)) {
+        (m_useDeltaTCuts
+         and std::abs(currentHitData.uTime - nextHitData.uTime) < m_DeltaTU
+         and std::abs(currentHitData.vTime - nextHitData.vTime) < m_DeltaTV)) {
       return 1.0;
     }
 

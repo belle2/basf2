@@ -51,7 +51,9 @@ class TestStdPhotons(unittest.TestCase):
 
     def test_nonsense_list(self):
         """Check that the builder function raises a ValueError for a non-existing list name."""
+        # \cond false positive doxygen warning
         self.assertRaises(ValueError, self._check_list, "flibble")
+        # \endcond
 
     def test_default_list_exists(self):
         """

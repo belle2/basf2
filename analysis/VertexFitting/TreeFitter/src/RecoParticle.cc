@@ -30,8 +30,7 @@ namespace TreeFitter {
     ErrCode status ;
     switch (type) {
       case Constraint::track :
-      case Constraint::photon :
-      case Constraint::klong :
+      case Constraint::neutralHadron :
         status |= projectRecoConstraint(fitparams, p);
         break ;
       default:

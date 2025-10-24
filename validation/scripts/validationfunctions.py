@@ -262,6 +262,8 @@ def get_validation_folders(
 
     @param location: The location where we want to search for validation
         folders (either 'local' or 'central')
+    @param basepaths: The dictionary with base paths of local and release directory
+    @param log: The logging dictionary
     """
 
     # Make sure we only look in existing locations:

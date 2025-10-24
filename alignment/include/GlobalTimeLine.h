@@ -90,6 +90,7 @@ namespace Belle2 {
           long unsigned int index);;
 
       /// Get cell (continuous index of payload) at given row and column
+      /// @param timeTable TimeTable
       /// @param uid of row
       /// @param timeid of column
       int getContinuousIndexByTimeID(const TimeTable& timeTable, int uid, int timeid);

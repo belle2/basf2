@@ -15,9 +15,6 @@
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-/* ROOT headers. */
-#include <TVector3.h>
-
 using namespace Belle2;
 
 REG_MODULE(SmearPrimaryVertex);

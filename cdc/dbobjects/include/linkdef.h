@@ -8,6 +8,7 @@
 #pragma link C++ class Belle2::CDCChannelMap+; // checksum=0xadcbec5a, version=2
 #pragma link C++ class Belle2::CDCTimeZeros+; // checksum=0x1d1c902a, version=2
 #pragma link C++ class Belle2::CDCBadWires+; // checksum=0xa5fc544e, version=2
+#pragma link C++ class Belle2::CDCBadBoards+; // checksum=0xbb6957ec, version=1
 #pragma link C++ class Belle2::CDCPropSpeeds+; // checksum=0x24873426, version=1
 #pragma link C++ class Belle2::CDCTimeWalks+; // checksum=0xa0bbe541, version=2
 #pragma link C++ class Belle2::CDCXtRelations+; // checksum=0x4c48166, version=2
@@ -41,6 +42,7 @@
 #pragma link C++ class Belle2::CDCCrossTalkLibrary+; // checksum=0x4ace6024, version=2
 #pragma link C++ class Belle2::CDCCorrToThresholds+; // checksum=0xbea4131b, version=2
 #pragma link C++ class Belle2::CDCFudgeFactorsForSigma+; // checksum=0x37bcdd67, version=1
+#pragma link C++ class Belle2::CDCAlphaScaleFactorForAsymmetry+; // checksum=0x7de3b39b, version=1
 #pragma link C++ class Belle2::CDCdEdxPDFs+; // checksum=0xc074ee36, version=1
 
 #pragma link C++ class Belle2::CDCDedxBadWires+; // checksum=0xa97f8b15, version=1

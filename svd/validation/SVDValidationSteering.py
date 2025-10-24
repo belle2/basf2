@@ -78,6 +78,3 @@ main.add_module(svdvalidationcluster)
 
 main.add_module('Progress')
 b2.process(main)
-
-# Print call statistics
-print(b2.statistics)

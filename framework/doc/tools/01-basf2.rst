@@ -29,6 +29,11 @@ The main command line tool for the Belle II Software is ``basf2``::
                           ``packageName:LOGLEVEL`` (e.g. ``cdc:ERROR`` or
                           ``klm:DEBUG:20``). Does not take precedence over
                           ``package.set_log_level()`` in steering file.
+--module_log_level MODULELOGLEVEL
+                          Set a module log level (one of ``DEBUG``, ``INFO``,
+                          ``RESULT``, ``WARNING``, or ``ERROR``). Syntax:
+                          ``packageName:LOGLEVEL`` (e.g. ``cdc:ERROR`` or
+                          ``klm:DEBUG:20``).
 --random-seed SEED        Set the default initial seed for the random number
                           generator. This does not take precedence over calls to
                           ``set_random_seed()`` in the steering file, but just
@@ -80,9 +85,9 @@ The main command line tool for the Belle II Software is ``basf2``::
                         out.ps``.
 --visualize-dataflow    Generate data flow diagram (``dataflow.dot``) for the
                         executed steering file.
---no-stats              Disable collection of statistics during event
-                        processing. Useful for very high-rate applications,
-                        but produces empty table with ``print(statistics)``.
+--stats                 Enable collection of statistics during event
+                        processing. Slows down execution time, but otherwise
+                        ``print(statistics)`` won't print a table with meaningful values.
 --dry-run               Read steering file, but do not start any event
                         processing when process(path) is called. Prints
                         information on input/output files that would be used

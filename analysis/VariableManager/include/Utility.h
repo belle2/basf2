@@ -35,7 +35,7 @@ namespace Belle2 {
      *   }
      *
      */
-    using Cut = GeneralCut<Belle2::Variable::Manager>;
+    using Cut = GeneralCut<Manager>;
     /**
      * A check if this variable string is a counter type variable to be handled
      * by the VariablesTo* output modules directly.

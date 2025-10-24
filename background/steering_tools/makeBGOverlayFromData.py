@@ -100,6 +100,3 @@ main.add_module(output)
 
 # Process events
 basf2.process(main)
-
-# Print call statistics
-print(basf2.statistics)

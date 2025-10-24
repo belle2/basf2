@@ -54,6 +54,5 @@ vm.printAliases()
 variablesToNtuple("B0:inclusive", interesting_variables, path=mypath)
 
 basf2.process(mypath)
-print(basf2.statistics)
 
 # @endcond

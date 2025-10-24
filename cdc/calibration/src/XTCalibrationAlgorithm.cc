@@ -18,7 +18,6 @@
 #include <TFile.h>
 #include <TTree.h>
 
-#include <iostream>
 #include <memory>
 
 #include <framework/database/DBObjPtr.h>

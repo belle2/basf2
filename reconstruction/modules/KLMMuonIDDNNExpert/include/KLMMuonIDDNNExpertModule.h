@@ -10,24 +10,27 @@
 
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <klm/dataobjects/KLMHit2d.h>
-#include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
-#include <mdst/dataobjects/Track.h>
-
-#include <reconstruction/dataobjects/KLMMuonIDDNNInputVariable.h>
-
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-#include <mva/interface/Expert.h>
-#include <mva/interface/Weightfile.h>
 
 #include <string>
 
 namespace Belle2 {
+  class DatabaseRepresentationOfWeightfile;
+  class KLMHit2d;
+  class KLMMuidLikelihood;
+  class KLMMuonIDDNNInputVariable;
+  class Track;
+
+  namespace MVA {
+    class Weightfile;
+    class Expert;
+    class SingleDataset;
+  }
   /**
    * KLMMuonIDDNNExpert for calculating Neural Network based muonID.
    */

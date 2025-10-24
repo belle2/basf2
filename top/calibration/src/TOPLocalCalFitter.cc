@@ -476,7 +476,7 @@ void TOPLocalCalFitter::calculateChennelT0()
 {
   int nEntries = m_fitTree->GetEntries();
   if (nEntries != 8192) {
-    B2ERROR("fitTree does not contain an entry wit a fit result for each channel. Found " << nEntries <<
+    B2ERROR("fitTree does not contain an entry with a fit result for each channel. Found " << nEntries <<
             " instead of 8192. Perhaps you tried to run the commonT0 calculation before finishing the fitting?");
     return;
   }

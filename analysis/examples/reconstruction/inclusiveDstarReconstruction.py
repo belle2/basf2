@@ -149,6 +149,5 @@ for list_tree_tuple in list_tree_tuples:
     )
 
 basf2.process(main_path)
-print(basf2.statistics)
 
 # @endcond

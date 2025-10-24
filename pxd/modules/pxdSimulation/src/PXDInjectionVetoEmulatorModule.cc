@@ -9,6 +9,7 @@
 #include <pxd/modules/pxdSimulation/PXDInjectionVetoEmulatorModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/GeoTools.h>
+#include <pxd/dataobjects/PXDInjectionBGTiming.h>
 
 #include <vector>
 

@@ -191,7 +191,7 @@ Saving to nTuples
 The flavor tagger provides the output of the two combiners and the outputs
 of the 13 categories. It provides also the MC information relevant for the categories.
 To save this information you just have to add the predefined list
-``ft.flavor_tagging``
+``flavor_tagging``
 to the variables that you use as argument for the module :func:`modularAnalysis.variablesToNtuple`.
 
 The two available combiners provide two different flavor tags which can be
@@ -225,24 +225,24 @@ But technically this is not trivial at all. The variable calculation performs th
 
 The variable has several output values. The meaning  are the following:
 
-  * *-2 (+2)* At least one MC particle that is related to a ROE track is found to be a descendant of MC :math:`B^0_{\rm sig}`:
-    *-2 (+2)* means MC :math:`B^0_{\rm sig}` is a :math:`B^0 (\overline{B}^0)`.
+* *-2 (+2)* At least one MC particle that is related to a ROE track is found to be a descendant of MC :math:`B^0_{\rm sig}`:
+  *-2 (+2)* means MC :math:`B^0_{\rm sig}` is a :math:`B^0 (\overline{B}^0)`.
 
-  * *-1 (+1)* Everything is correctly matched. All MC particles related to ROE tracks are not descendant of MC :math:`B^0_{\rm sig}`:
-    *-1 (+1)* means that the MC neutral :math:`B` on the tag side is a :math:`B^0 (\overline{B}^0)`.
+* *-1 (+1)* Everything is correctly matched. All MC particles related to ROE tracks are not descendant of MC :math:`B^0_{\rm sig}`:
+  *-1 (+1)* means that the MC neutral :math:`B` on the tag side is a :math:`B^0 (\overline{B}^0)`.
 
-  * *0* Wrongly matched :math:`B^0_{\rm sig}`, or correctly matched but no neutral :math:`B` found on the tag side.
-    It means, either there are no tracks in ROE, or among the MC particles
-    (and also their ancestors) that are related to the
-    ROE tracks no neutral :math:`B` particle was found. So, ``B0_isSignal==1`` and ``B0_qrMC==0`` is
-    possible, e.g. for :math:`B\to` final state with only photons, :math:`B\to` invisible, :math:`B\to`
-    photons and few tracks but the tracks outside of the acceptance (or not
-    reconstructed), etc. Very rare things could also happen like there is no
-    related MC particle for the tracks in the ROE. This means that one should use
-    ``abs(B0_qrMC) == 1``, if one wants to filter out good events for evaluation. But
-    one should be very careful, e.g. for some signal channels the MC matching does
-    not work well at all and one could think for an instant that the flavor tagger
-    is under or overestimating the dilution.
+* *0* Wrongly matched :math:`B^0_{\rm sig}`, or correctly matched but no neutral :math:`B` found on the tag side.
+  It means, either there are no tracks in ROE, or among the MC particles
+  (and also their ancestors) that are related to the
+  ROE tracks no neutral :math:`B` particle was found. So, ``B0_isSignal==1`` and ``B0_qrMC==0`` is
+  possible, e.g. for :math:`B\to` final state with only photons, :math:`B\to` invisible, :math:`B\to`
+  photons and few tracks but the tracks outside of the acceptance (or not
+  reconstructed), etc. Very rare things could also happen like there is no
+  related MC particle for the tracks in the ROE. This means that one should use
+  ``abs(B0_qrMC) == 1``, if one wants to filter out good events for evaluation. But
+  one should be very careful, e.g. for some signal channels the MC matching does
+  not work well at all and one could think for an instant that the flavor tagger
+  is under or overestimating the dilution.
 
 The flavor tagger also saves the variable ``mcFlavorOfOtherB`` which returns the flavor of the
 accompanying tag-side :math:`B` meson (positive or negative) if the given particle is a correctly MC-matched
@@ -285,12 +285,12 @@ or not (with exceptions for kaons).
 Efficiency Calculation and Validation Plots
 -------------------------------------------
 
-If you want to calculate the efficiency of the FlavorTagger on your own File and produce qr plots, use the script
-analysis/release-validation/CPVTools/flavorTaggerEfficiency.py giving your file and the ntuple tree name as arguments:
+If you want to calculate the efficiency of the FlavorTagger on your own file and produce qr plots, use the script
+`flavorTaggerEfficiency.py <https://gitlab.desy.de/belle2/performance/releasevalidation/-/blob/main/CPVTools/flavorTaggerEfficiency.py>`_ giving your file and the ntuple tree name as arguments:
 
 ::
 
-  basf2 flavorTaggerEfficiency.py 'YourFiles*WithWildcards??.root' Youtreename
+  basf2 flavorTaggerEfficiency.py 'YourFiles*WithWildcards??.root' YourTreeName
 
 Tutorials
 ---------
@@ -306,31 +306,6 @@ at `GitLab <https://gitlab.desy.de/belle2/software/training/handsonexercises>`_.
 
 Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://gitlab.desy.de/belle2/software/training/b2-starterkit/-/blob/main/B2T_Advanced_3_FlavorTagger.ipynb>`_
 (Jupyter notebook) under the latest `b2-starter-kit <https://gitlab.desy.de/belle2/software/training/b2-starterkit>`_ tutorials.
-
-As further examples you can have a look on the scripts used to generate the weight files at kekcc once a release is tagged.
-You find them under:
-
-::
-
-  analysis/release-validation/CPVTools/
-
-You can train and test the flavor tagger, and evaluate its performance by yourself running:
-
-::
-
-  sh CPVToolsValidatorInParalell.sh Belle2 nunubar nunubar BGx1 yourPathForWeightFiles yourPathForAnalyzedMdst
-
-Note:
-
-The convention is BGx0 for no machine background and BGx1 for MC with machine background. The process is defined in:
-
-::
-
-  flavorTaggerVertexingValidation.py
-
-
-If you are interested in the validation of the flavor tagger, have a look at the `flavortaggingvalidation <https://gitlab.desy.de/belle2/data-production/validation/flavortaggingvalidation>`_ repository.
-
 
 Functions
 ---------

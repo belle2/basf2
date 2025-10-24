@@ -27,5 +27,4 @@ udst.add_skimmed_udst_output(
     mc=runningOnMC,
     outputFile=outputfile)
 b2.process(mypath)
-print(b2.statistics)
 # @endcond

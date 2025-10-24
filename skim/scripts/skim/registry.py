@@ -18,6 +18,7 @@ from tabulate import tabulate
 
 _RegisteredSkims = [
     # --- Flagged skims ---
+    ("70000000", "flagged", "f_custom"),  # flag for running custom skim combinations
     ("71000100", "flagged", "f_SLME_p1"),
     ("71000200", "flagged", "f_SLME_p2"),
     ("71000300", "flagged", "f_SLME_p3"),
@@ -111,6 +112,7 @@ _RegisteredSkims = [
     # Add when skim script is ready
     ("14161400", "btocharm", "BtoDstarpipipi0_D0pi_Kpi"),
     ("14120600", "btocharm", "B0toDpi_Kpipi"),
+    ("14120602", "btocharm", "B0toDpi_KpipiLooseDelE"),
     ("14120601", "btocharm", "B0toDpi_Kspi"),   # B0 -> D-(Ks pi-)pi+
     # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k+ pi-
     ("14120700", "btocharm", "B0toDstarPi_D0pi_Kpi"),
@@ -145,7 +147,6 @@ _RegisteredSkims = [
     ("14121403", "btocharm", "BtoDsDsst_Kpi_KK"),
     ("14123300", "btocharm", "antiB0toDpipi0_Kpipi"),
     ("14163400", "btocharm", "antiB0toDsDsst_Kpi0"),
-
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),
     ("15420100", "quarkonium", "BottomoniumEtabExclusive"),
@@ -224,6 +225,8 @@ _RegisteredSkims = [
     ("18022400", "dark", "DimuonRecoilMassSquared"),
     ("18530600", "lowMulti", "LowMassOneTrack"),
     ("18022500", "dark", "DarkShower"),
+    ("18020800", "dark", "BtoK_ALP2Gamma"),
+    ("18020900", "dark", "TopologicalDarkPion"),
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),

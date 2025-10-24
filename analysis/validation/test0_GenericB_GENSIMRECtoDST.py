@@ -11,7 +11,7 @@
 """
 <header>
   <output>../GenericB_GENSIMRECtoDST.dst.root</output>
-  <contact>Frank Meier; frank.meier@duke.edu</contact>
+  <contact>Paul Feichtinger; paul.feichtinger@ijs.si</contact>
 </header>
 """
 
@@ -52,6 +52,3 @@ main.add_module(output)
 main.add_module('Progress')
 # Go!
 basf2.process(main)
-
-# Print call statistics
-print(basf2.statistics)

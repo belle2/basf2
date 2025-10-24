@@ -202,7 +202,7 @@ finder_modules_by_short_name = {
     'TrackFinder': add_standard_finder,
     'CosmicsTrackFinder': add_cosmics_finder,
     'TrackFinderVXD': tracking.path_utils.add_vxd_track_finding_vxdtf2,
-    'TFCDC': lambda path: tracking.path_utils.add_cdc_track_finding(path, with_ca=True),
+    'TFCDC': lambda path: tracking.path_utils.add_cdc_track_finding(path, with_cdc_cellular_automaton=True),
     'TFCDC_Cosmics': lambda path: tracking.add_cdc_cr_track_finding(path),
     'TFCDC_Global': tracking.path_utils.add_cdc_track_finding,
     'TFCDC_Ca': lambda path: (path.add_module('TFCDC_WireHitPreparer',

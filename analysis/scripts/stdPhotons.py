@@ -8,6 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+import b2bii
 import modularAnalysis as ma
 
 
@@ -171,16 +172,26 @@ def loadStdSkimPhoton(path):
         path)
 
 
-# Only used for Belle via b2bii
 def loadStdGoodBellePhoton(path):
     """
     Load the Belle goodBelle list. Creates a ParticleList named
     'gamma:goodBelle' with '0.5 < :b2:var:`goodBelleGamma` < 1.5'
 
-    Warning:
-        Should only be used for Belle analyses using `b2bii`.
-
     Parameters:
         path (basf2.Path): the path to load the modules
     """
-    ma.fillParticleList('gamma:goodBelle', '0.5 < goodBelleGamma < 1.5', True, path)
+    if b2bii.isB2BII():
+        ma.cutAndCopyList(
+            'gamma:goodBelle',
+            'gamma:mdst',
+            '0.5 < goodBelleGamma < 1.5',
+            writeOut=True,
+            path=path
+        )
+    else:
+        ma.fillParticleList(
+            'gamma:goodBelle',
+            '0.5 < goodBelleGamma < 1.5',
+            writeOut=True,
+            path=path
+        )

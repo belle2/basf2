@@ -155,7 +155,7 @@ def add_simulation(
 
     path.add_module('StatisticsSummary').set_name('Sum_PreSimulation')
 
-    # Check compoments.
+    # Check components.
     check_components(components)
 
     # background mixing or overlay input before process forking
@@ -173,7 +173,7 @@ def add_simulation(
             path.add_module(bkgmixer)
             if usePXDGatedMode:
                 if components is None or 'PXD' in components:
-                    # PXD is sensitive to hits in intervall -20us to +20us
+                    # PXD is sensitive to hits in interval -20us to +20us
                     bkgmixer.param('minTimePXD', -20000.0)
                     bkgmixer.param('maxTimePXD', 20000.0)
                     # Emulate injection vetos for PXD
@@ -247,6 +247,11 @@ def add_simulation(
         m.set_name('BGOverlayExecutor_CDC...KLM')
 
     if components is None or 'TRG' in components:
+        if bkgfiles is not None and bkgOverlay:
+            # BG Overlay for CDCTRG. That for KLMTRG is already covered by BG Overlay
+            # for KLM. ECL and ECLTRG are already covered independently.
+            m = path.add_module('BGOverlayExecutor', components=['CDC'], CDCHitsName='CDCHits4Trg')
+            m.set_name('BGOverlayExecutor_TRGCDC')
         add_trigger_simulation(path, simulateT0jitter=simulateT0jitter, FilterEvents=FilterEvents)
 
     # SVD digitization, BG Overlay, sorting and zero suppression

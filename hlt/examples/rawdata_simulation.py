@@ -38,6 +38,6 @@ main_path.add_module("SeqRootOutput",
                      saveObjs=["EventMetaData"] + constants.RAWDATA_OBJECTS)
 
 basf2.print_path(main_path)
-basf2.process(main_path)
+basf2.process(main_path, calculateStatistics=True)
 
 print(basf2.statistics)

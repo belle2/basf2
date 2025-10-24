@@ -44,6 +44,3 @@ main.add_module('Progress')
 
 # Generate events.
 basf2.process(main)
-
-# Show call statistics.
-print(basf2.statistics)

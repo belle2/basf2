@@ -47,8 +47,6 @@ def run():
 
     b2.process(path)
 
-    print(b2.statistics)
-
 
 if __name__ == '__main__':
     if ACTIVE:

@@ -56,7 +56,7 @@ ECLLocalMaximumFinderModule::ECLLocalMaximumFinderModule() : Module(),
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add module parameters.
-  addParam("energyCut", m_energyCut, "Seed energy cut [MeV], minimum is 5.0 MeV.", 10.0 * Belle2::Unit::MeV);
+  addParam("energyCut", m_energyCut, "Seed energy cut [MeV], minimum is 5.0 MeV.", 20.0 * Belle2::Unit::MeV);
   addParam("isTrainingMode", m_isTrainingMode,
            "Run in training mode (i.e. fill file with MVA input variables and determine MC truth of LM.).", 0);
   addParam("outfileName", m_outfileName, "Output file name for training file.", std::string("ECLLocalMaximumFinderOutput.root"));

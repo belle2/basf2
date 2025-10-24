@@ -54,6 +54,10 @@ Using ``eIDBelle>0.9`` as an example:
    reweighter.param('particleList', 'e+:all')
    my_path.add_module(reweighter)
 
+.. note::
+   The lepton ID efficiency correction tables with eIDBelle > 0.01 are only
+   available for experiments 31-65. The corrections for other five selections
+   on eIDBelle are available for all experiments, from 7 to 73.
 
 .. note::
    The lepton ID fake-rate tables (lepton ID efficiency for pions and kaons) are not

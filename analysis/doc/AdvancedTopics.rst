@@ -9,6 +9,8 @@ Advanced Topics
 
 .. toctree:: DeepFlavorTagger
 
+.. toctree:: CharmFlavorTagger
+
 .. toctree:: FullEventInterpretation
 
 .. toctree:: GraFEI

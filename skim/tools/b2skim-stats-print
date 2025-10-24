@@ -934,10 +934,13 @@ def fillSkimStatsDict(
             for statName, statSpec in statSpecifier.items():
                 statFunction = statSpec["Calculate"]
 
+                if statName in ["cpuTime","averageCandidateMultiplicity","memoryAverage","memoryMaximum"]:
+                    statFunctionArgs=[skim, sample, TestingCombined]
+                else:
+                    statFunctionArgs=[skim, sample, TestingCombined, flagged]
+
                 try:
-                    allSkimStats[skim][statName][sample.encodeable_name] = statFunction(
-                        skim, sample, TestingCombined, flagged
-                    )
+                    allSkimStats[skim][statName][sample.encodeable_name] = statFunction(*statFunctionArgs)
 
                 except (TypeError, ZeroDivisionError, KeyError):
                     allSkimStats[skim][statName][sample.encodeable_name] = None

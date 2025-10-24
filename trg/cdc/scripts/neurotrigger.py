@@ -339,6 +339,54 @@ def add_neuro_2d_unpackers(path, debug_level=4, debugout=False, **kwargs):
     unpacker.param('decodeNeuro', True)
     path.add_module(unpacker)
 
+    if (('unpackDNN' in kwargs) and (kwargs['unpackDNN'])):
+        # DNN unpacker, using same module
+        DNN_unpacker = basf2.register_module('CDCTriggerUnpacker')
+        if debugout:
+            DNN_unpacker.logging.log_level = basf2.LogLevel.DEBUG
+            DNN_unpacker.logging.debug_level = debug_level
+            DNN_unpacker.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
+
+        # size (number of words) of the Belle2Link header
+        DNN_unpacker.param('headerSize', 3)
+        # always use DB for DNNT
+        DNN_unpacker.param('useDB', True)
+        # sim 13 bit drift time if required
+        if 'sim13dt' in kwargs:
+            DNN_unpacker.param('sim13dt', kwargs['sim13dt'])
+        else:
+            DNN_unpacker.param('sim13dt', False)
+        # DNN board ID
+        DNN_unpacker.param('NeuroNodeId_pcie40', [
+            # UT4 3D
+            [0x10000001, 4],
+            [0x10000001, 5],
+            [0x10000001, 6],
+            [0x10000001, 7]])
+        # unpack DNN track, decodeing and related 2D track
+        DNN_unpacker.param('unpackNeuro', True)
+        DNN_unpacker.param('decodeNeuro', True)
+        DNN_unpacker.param('unpackMerger', True)
+        DNN_unpacker.param('unpackTracker2D', True)
+        DNN_unpacker.param('decode2DFinderTrack', True)
+        # DNN track default name
+        DNN_unpacker.param("NNTrackName", "CDCTriggerDNNTracks")
+        # DNN relate TS default name
+        DNN_unpacker.param("NNInStereoTS", "CDCTriggerDNNInputAllStereoSegmentHits")
+        # DNN select TS default name
+        DNN_unpacker.param("NNInSelectTS", "CDCTriggerDNNInputSegmentHits")
+        # DNN 2D input
+        DNN_unpacker.param("NNIn2DTrack", "CDCTriggerDNNInput2DFinderTracks")
+        # DNN ETF input
+        DNN_unpacker.param("NNInETFT0", "CDCTriggerDNNETFT0")
+        # DNN scaled input
+        DNN_unpacker.param("NNScaledInput", "CDCTriggerDNNTracksInput")
+        # DNNT bit map
+        DNN_unpacker.param("configName", "DNNT_Config")
+        # flag to use DNN unpacker
+        DNN_unpacker.param("isDNN", True)
+        path.add_module(DNN_unpacker)
+
 
 def add_neurotrigger_sim(path, nntweightfile=None, debug_level=4, debugout=False, **kwargs):
     nnt = basf2.register_module('CDCTriggerNeuro')

@@ -24,6 +24,11 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
+/* ROOT headers. */
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
+
 using namespace std;
 
 namespace Belle2::Variable {
@@ -48,11 +53,11 @@ namespace Belle2::Variable {
     if (!cluster) {
       return 0;
     }
-    const B2Vector3D& pos = cluster->getClusterPosition();
+    const ROOT::Math::XYZVector& pos = cluster->getClusterPosition();
     StoreArray<TrackFitResult> tracks;
     for (const TrackFitResult& track : tracks) {
-      const B2Vector3D& trackPos = track.getPosition();
-      if (trackPos.Angle(pos) < angle) {
+      const ROOT::Math::XYZVector& trackPos = track.getPosition();
+      if (ROOT::Math::VectorUtil::Angle(trackPos, pos) < angle) {
         return 1;
       }
     }
@@ -66,11 +71,11 @@ namespace Belle2::Variable {
     if (!klmCluster) {
       return 0;
     }
-    const B2Vector3D& klmClusterPos = klmCluster->getClusterPosition();
+    const ROOT::Math::XYZVector& klmClusterPos = klmCluster->getClusterPosition();
     StoreArray<ECLCluster> eclClusters;
     for (const ECLCluster& eclCluster : eclClusters) {
-      const B2Vector3D& eclClusterPos = eclCluster.getClusterPosition();
-      if (eclClusterPos.Angle(klmClusterPos) < angle) {
+      const ROOT::Math::XYZVector& eclClusterPos = eclCluster.getClusterPosition();
+      if (ROOT::Math::VectorUtil::Angle(eclClusterPos, klmClusterPos) < angle) {
         return 1;
       }
     }
@@ -232,13 +237,13 @@ namespace Belle2::Variable {
 
     // get the input particle's vector momentum in the CMS frame
     PCmsLabTransform T;
-    const B2Vector3D pCms = (T.rotateLabToCms() * particle->get4Vector()).Vect();
+    const ROOT::Math::PxPyPzEVector pCms = T.rotateLabToCms() * particle->get4Vector();
 
     // find the KLM cluster with the largest angle
     double maxAngle = 0.0;
     for (int iKLM = 0; iKLM < clusters.getEntries(); iKLM++) {
-      const B2Vector3D clusterMomentumCms = (T.rotateLabToCms() * clusters[iKLM]->getMomentum()).Vect();
-      double angle = pCms.Angle(clusterMomentumCms);
+      const ROOT::Math::PxPyPzEVector clusterMomentumCms = T.rotateLabToCms() * clusters[iKLM]->getMomentum();
+      double angle = ROOT::Math::VectorUtil::Angle(pCms, clusterMomentumCms);
       if (angle > maxAngle) maxAngle = angle;
     }
     return maxAngle;
@@ -255,7 +260,7 @@ namespace Belle2::Variable {
 
   double nMatchedKLMClusters(const Particle* particle)
   {
-    Belle2::Particle::EParticleSourceObject particleSource = particle->getParticleSource();
+    Particle::EParticleSourceObject particleSource = particle->getParticleSource();
     if (particleSource == Particle::EParticleSourceObject::c_Track) {
       return particle->getTrack()->getRelationsTo<KLMCluster>().size();
     } else if (particleSource == Particle::EParticleSourceObject::c_ECLCluster) {
@@ -279,10 +284,47 @@ namespace Belle2::Variable {
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster)
       return Const::doubleNaN;
-    auto trackWithWeight = cluster->getRelatedFromWithWeight<Track>();
-    if (!trackWithWeight.first)
+    return cluster->getClusterTrackSeparation();
+  }
+
+  double klmClusterTrackSeparationAngle(const Particle* particle)
+  {
+    const KLMCluster* cluster = particle->getKLMCluster();
+    if (!cluster)
       return Const::doubleNaN;
-    return 1. / trackWithWeight.second;
+    return cluster->getClusterTrackSeparationAngle();
+  }
+
+  double klmClusterTrackRotationAngle(const Particle* particle)
+  {
+    const KLMCluster* cluster = particle->getKLMCluster();
+    if (!cluster)
+      return Const::doubleNaN;
+    return cluster->getClusterTrackRotationAngle();
+  }
+
+  double klmClusterShapeStdDev1(const Particle* particle)
+  {
+    const KLMCluster* cluster = particle->getKLMCluster();
+    if (!cluster)
+      return Const::doubleNaN;
+    return cluster->getShapeStdDev1();
+  }
+
+  double klmClusterShapeStdDev2(const Particle* particle)
+  {
+    const KLMCluster* cluster = particle->getKLMCluster();
+    if (!cluster)
+      return Const::doubleNaN;
+    return cluster->getShapeStdDev2();
+  }
+
+  double klmClusterShapeStdDev3(const Particle* particle)
+  {
+    const KLMCluster* cluster = particle->getKLMCluster();
+    if (!cluster)
+      return Const::doubleNaN;
+    return cluster->getShapeStdDev3();
   }
 
   VARIABLE_GROUP("KLM Cluster and KlongID");
@@ -361,7 +403,22 @@ Returns the number of Tracks matched to the KLMCluster associated to this Partic
                      Returns the number of ECLClusters matched to the KLMCluster associated to this Particle.
               )DOC");
   REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
-                    "Returns the distance between the Track and the KLMCluster associated to this Particle. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
+                    "Returns the distance between KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
                     "cm");
+  REGISTER_VARIABLE("klmClusterTrackRotationAngle", klmClusterTrackRotationAngle,
+                    "Returns the angle between the direction at the IP and at the POCA to the KLMCluster associated to this Particle for the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
+                    "rad");
+  REGISTER_VARIABLE("klmClusterTrackSeparationAngle", klmClusterTrackSeparationAngle,
+                    "Returns the angle between the KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
+                    "rad");
 
+  REGISTER_VARIABLE("klmClusterShapeStdDev1", klmClusterShapeStdDev1,
+                    "Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
+                    "cm");
+  REGISTER_VARIABLE("klmClusterShapeStdDev2", klmClusterShapeStdDev2,
+                    "Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
+                    "cm");
+  REGISTER_VARIABLE("klmClusterShapeStdDev3", klmClusterShapeStdDev3,
+                    "Returns the std deviation of the 3rd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
+                    "cm");
 }

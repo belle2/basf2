@@ -26,7 +26,8 @@ LambdaSelector.V0Selector_Training(
     train_data=b2.find_file('LambdaSelector_train_V0Selector.root', 'examples', False),
     tree_name="tree",
     mva_identifier="MVA_LGBM_V0Selector.root",
-    target_variable="isSignal"
+    target_variable="isSignal",
+    options={'max_events': 1000}  # number of training events manually reduced to speed up test, set to 0 for full statistics
 )
 
 # Train weight file for V0 Selection.
@@ -35,7 +36,8 @@ LambdaSelector.KsVeto_Training(
     train_data=b2.find_file('LambdaSelector_train_KsVeto.root', 'examples', False),
     tree_name="tree",
     mva_identifier="MVA_LGBM_KsVeto.root",
-    target_variable="isSignal"
+    target_variable="isSignal",
+    options={'max_events': 1000}  # number of training events manually reduced to speed up test, set to 0 for full statistics
 )
 
 # apply mva to the training data

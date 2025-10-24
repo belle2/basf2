@@ -252,7 +252,4 @@ if __name__ == '__main__':
     # Start processing of modules.
     basf2.process(path)
 
-    # Print basf2 call statistics.
-    print(basf2.statistics)
-
 # @endcond

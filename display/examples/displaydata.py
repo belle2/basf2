@@ -91,5 +91,5 @@ display = b2.register_module('Display')
 display.param('showAllPrimaries', True)
 main.add_module(display)
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

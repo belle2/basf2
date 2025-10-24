@@ -10,7 +10,8 @@
 
 /* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
-#include <framework/geometry/B2Vector3.h>
+
+#include <Math/Vector3D.h>
 
 /**
  * Nota bene: the dataobjects must be declared under the Belle2 namespace only,
@@ -45,7 +46,7 @@ namespace Belle2 {
      * @param position  Vector for position in cm.
      * @param time      Time in ns.
      */
-    AWESOMESimHit(float energyDep, B2Vector3<float> position, float time) :
+    AWESOMESimHit(float energyDep, ROOT::Math::XYZVector position, float time) :
       m_energyDep{energyDep},
       m_position{position},
       m_time{time}
@@ -73,7 +74,7 @@ namespace Belle2 {
      * Get the vector for position.
      * @return vector for position in cm.
      */
-    B2Vector3<float> getPosition() const
+    ROOT::Math::XYZVector getPosition() const
     {
       return m_position;
     }
@@ -82,7 +83,7 @@ namespace Belle2 {
      * Set the vector for position.
      * @param position Vector for position in cm.
      */
-    void setPosition(B2Vector3<float> position)
+    void setPosition(ROOT::Math::XYZVector position)
     {
       m_position = position;
     }
@@ -111,13 +112,13 @@ namespace Belle2 {
     float m_energyDep;
 
     /** Vector for position in cm. */
-    B2Vector3<float> m_position;
+    ROOT::Math::XYZVector m_position;
 
     /** Time in ns. */
     float m_time;
 
     /** Class versions, required by the ROOT streamer. */
-    ClassDef(AWESOMESimHit, 1)
+    ClassDef(AWESOMESimHit, 2)
 
   };
 

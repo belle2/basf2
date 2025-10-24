@@ -7,6 +7,9 @@
  **************************************************************************/
 
 #include <trg/top/modules/trgtopUnpackerWaveform/trgtopUnpackerWaveformModule.h>
+#include <trg/top/dataobjects/TRGTOPWaveFormTimeStampsSlot.h>
+#include <trg/top/dataobjects/TRGTOPWaveFormTimeStamp.h>
+#include <rawdata/dataobjects/RawTRG.h>
 
 /* --------------- WARNING ---------------------------------------------- *
 If you have more complex parameter types in your class then simple int,

@@ -420,8 +420,8 @@ namespace Belle2 {
 
     DataArray array(buffer, bufferSize, m_swapBytes);
 
-    map<unsigned short, int> evtNumCounter; //counts the occurence of carrier-generated event numbers.
-    std::vector<unsigned short> channelCounter(128, 0); //counts occurence of carrier/asic/channel combinations
+    map<unsigned short, int> evtNumCounter; //counts the occurrence of carrier-generated event numbers.
+    std::vector<unsigned short> channelCounter(128, 0); //counts occurrence of carrier/asic/channel combinations
 
     unsigned word = array.getWord(); // header word 0
     unsigned short scrodID = word & 0x0FFF;
@@ -792,7 +792,7 @@ namespace Belle2 {
 
       if (it != 1) {
         channelOutputString += "carrier: " + std::to_string(carrier) + " asic: " + std::to_string(asic) + " chn: " + std::to_string(
-                                 chn) + " occurence: " + std::to_string(it) + "\n";
+                                 chn) + " occurrence: " + std::to_string(it) + "\n";
         B2WARNING("TOPUnpacker: interim FE - ASIC channel seen more than once"
                   << LogVar("ScrodID", scrodID)
                   << LogVar("carrier", carrier)

@@ -11,8 +11,6 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <framework/geometry/B2Vector3.h>
-
 #include <framework/logging/LogConnectionConsole.h>
 
 #include <boost/format.hpp>
@@ -219,9 +217,9 @@ void PrintMCParticlesModule::printTree(const std::vector<MCParticle*>& particles
       if (not mc->hasStatus(MCParticle::c_LeftDetector)) m_output << boost::format(" lifetime=%.3g") % mc->getLifetime();
     }
     if (m_showMomenta) {
-      const B2Vector3F& p = mc->getMomentum();
+      const ROOT::Math::XYZVector& p = mc->getMomentum();
       m_output << propIndent;
-      m_output << boost::format("p=(%.3g, %.3g, %.3g) |p|=%.3g") % p.X() % p.Y() % p.Z() % p.Mag();
+      m_output << boost::format("p=(%.3g, %.3g, %.3g) |p|=%.3g") % p.X() % p.Y() % p.Z() % p.R();
     }
     if (m_showVertices) {
       const ROOT::Math::XYZVector& v = mc->getVertex();

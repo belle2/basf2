@@ -6,7 +6,7 @@ The computing system
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 20 min
+    **Length**: 15-30 min
 
     **Prerequisites**:
 

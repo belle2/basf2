@@ -115,8 +115,7 @@ ROOT::Math::XYZVector CMSFrame::getVertex(const ROOT::Math::XYZVector& vector) c
   // 2. Subtract movement of vertex end due to the time difference between
   //    the former simultaneous measured vertex points (see derivation of Lorentz contraction)
   ROOT::Math::PxPyPzEVector a = m_transform.rotateLabToCms() * ROOT::Math::PxPyPzEVector(vector.X(), vector.Y(), vector.Z(), 0);
-  return a.Vect() - ROOT::Math::XYZVector(m_transform.getBoostVector().X(), m_transform.getBoostVector().Y(),
-                                          m_transform.getBoostVector().Z()) * a.T();
+  return a.Vect() - m_transform.getBoostVector() * a.T();
 }
 
 ROOT::Math::PxPyPzEVector CMSFrame::getMomentum(const ROOT::Math::PxPyPzEVector& vector) const
@@ -154,9 +153,9 @@ TMatrixFSym CMSFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
   timeshift(0, 0) = 1;
   timeshift(1, 1) = 1;
   timeshift(2, 2) = 1;
-  timeshift(0, 3) = boost_vector(0);
-  timeshift(1, 3) = boost_vector(1);
-  timeshift(2, 3) = boost_vector(2);
+  timeshift(0, 3) = boost_vector.X();
+  timeshift(1, 3) = boost_vector.Y();
+  timeshift(2, 3) = boost_vector.Z();
 
   return rotated_error_matrix.Similarity(timeshift);
 }

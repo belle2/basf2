@@ -12,7 +12,6 @@ SVD Tools
    :func: arg_parser
    :prog: b2svd-run-simul-recon
    :nodefault:
-   :nogroupsections:
 
 ``b2svd-create-time-calib-sample``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -22,7 +21,6 @@ SVD Tools
    :func: arg_parser
    :prog: b2svd-create-time-calib-sample
    :nodefault:
-   :nogroupsections:
 
 
 ``b2svd-import-CoGOnlyPositionError``
@@ -33,7 +31,6 @@ SVD Tools
    :func: arg_parser
    :prog: b2svd-import-CoGOnlyPositionError
    :nodefault:
-   :nogroupsections:
 
 ``b2svd-create-posErrScaleFactors``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -43,4 +40,3 @@ SVD Tools
    :func: arg_parser
    :prog: b2svd-create-posErrScaleFactors
    :nodefault:
-   :nogroupsections:

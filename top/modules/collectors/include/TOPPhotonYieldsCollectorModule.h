@@ -55,7 +55,6 @@ namespace Belle2 {
     double m_deltaEcms; /**< c.m.s energy window */
     double m_dr; /**< cut on POCA in r */
     double m_dz; /**< cut on POCA in z */
-    double m_minThresholdEffi; /**< minimal threshold efficiency */
 
     // cuts (do not change the values)
     const double m_minZ = -130.0; /**< minimal local z of extrapolated track */
@@ -72,6 +71,7 @@ namespace Belle2 {
     std::vector<std::string> m_alphaHighNames; /**< histogram names for counting hits w/ high impact angle on photo cathode */
     std::vector<std::string> m_pulseHeightNames; /**< histogram names for pulse heights */
     std::vector<std::string> m_muonZNames; /**< histogram names for track z-distribution */
+    std::vector<std::string> m_effectiveSignalNames; /**< histogram names for effective signal hits in pixels */
 
     // collections
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< event meta data object */
@@ -84,7 +84,6 @@ namespace Belle2 {
 
     // database
     DBObjPtr<TOPCalChannelMask> m_channelMask; /**< masked channels */
-    DBObjPtr<TOPCalChannelThresholdEff> m_thresholdEff; /**< threshold efficiencies */
 
   };
 

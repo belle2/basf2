@@ -36,7 +36,7 @@ def fitLaserResolution(
     Two files containing the containing the hit timing VS channels distribution must be provided:
 
     * The first file is used to estimate the light propagation correction (aka MC correction),
-      the number of peaks and the separation bewteen these peaks.
+      the number of peaks and the separation between these peaks.
       Since the correction is the same for all the slots, the corresponding TH2F can have only 512 bins on the x-axis.
       A default file is available, where the hit time is taken from
       the TOPSimHits, and the laser jitter has been set to zero in the simulation.
@@ -49,7 +49,7 @@ def fitLaserResolution(
        Used to calculate the MC corrections
       dataFile (str): File with the TH2F containing the TOPDigit time distribution on which the resolutions
        must be evaluated
-      outputFile (str): rootFile containing the outupt trees and plots
+      outputFile (str): rootFile containing the output trees and plots
       pdfType (str): PDF used in the data fit: cb for a CrystalBall, gaus for a Gaussian or
        gausExpo for an exponentially modified Gaussian
       maxPeaks (int): maximum number of peaks that can be used in the data fit. Note that the
@@ -78,11 +78,11 @@ def fitLaserResolution(
     # First loops over the MC file to get the time propagation corrections
     # Only the two highest peaks are stored
 
-    # List with the position fo the MC peaks (2 per channel). This is where the
+    # List with the position of the MC peaks (2 per channel). This is where the
     # MC peak positions are stored to be used later to correct the data
     mcPeaks = [[-1. for second in range(2)] for first in range(512)]
 
-    # Opens the file containg the MC distribution and loads it
+    # Opens the file containing the MC distribution and loads it
     tFileMC = TFile(mcCorrectionsFile)
     histoMC = tFileMC.Get('LaserTimingVSChannelOneSlot')
 
@@ -93,7 +93,7 @@ def fitLaserResolution(
         timeProjectionMC.GetXaxis().SetRangeUser(0., 1.)
         # Initializes TSpectrum
         spectrum = TSpectrum()
-        # By default dentifies a peak only if it is 1-sigma apart from another peak
+        # By default identifies a peak only if it is 1-sigma apart from another peak
         # and has an aplitud of at least 10% of the largest peak.
         numPeaks = spectrum.Search(timeProjectionMC, 1., 'nobackground', 0.1)
         # This is a bit ugl way to store the peak locations and amplitudes
@@ -125,7 +125,7 @@ def fitLaserResolution(
 
     # Slot ID (1-based)
     slotID = array('i', [0])
-    # Hardware channle number (0-based)
+    # Hardware channel number (0-based)
     hwChannel = array('i', [0])
     # Number of peaks used in the fit
     nPeaks = array('i', [0])
@@ -137,7 +137,7 @@ def fitLaserResolution(
     sigma = array('f', [0.])
     # Statistical error on sigma
     errSigma = array('f', [0.])
-    # Time of the primary peak (maximum of the fit fuction)
+    # Time of the primary peak (maximum of the fit function)
     peakTime = array('f', [0.])
     # Statistical error on manPeak
     errPeakTime = array('f', [0.])
@@ -219,7 +219,7 @@ def fitLaserResolution(
     outTree.Branch('earlyPeak', earlyPeak, 'earlyPeak/F')
 
     # Main loop_: takes the histogram, slices it and fits each slide according to the number of peaks found in the MC and the
-    # pdf chosen by te user
+    # pdf chosen by the user
     for iSlot in range(0, 16):
         print('Fitting slot ' + str(iSlot))
         for k in range(0, 512):
@@ -234,7 +234,7 @@ def fitLaserResolution(
             hwChannel[0] = k
 
             # Saves the MC information in the tree variables
-            if(mcPeaks[k][1] > 0):
+            if (mcPeaks[k][1] > 0):
                 # By convention the first component of the PDF represents the later peak,
                 # which in the MC appears to be also the main one. However this may change with
                 # different MC simulations, therefore we have to check which one is
@@ -286,7 +286,7 @@ def fitLaserResolution(
                     cb.FixParameter(8, 1.)  # delay of the spurious peak (~ 1 ns)
                     cb.FixParameter(9, 1.5)  # scale factro for sigma of the spurious peak (~2)
 
-                if(mcPeaks[k][1] > 0 and not useSinglePDF):
+                if (mcPeaks[k][1] > 0 and not useSinglePDF):
                     cb.SetParameter(1, 0.3)  # norm 2
                     cb.SetParLimits(1, 0., 100.)  # norm 1
                     if useMCPeaks:
@@ -362,7 +362,7 @@ def fitLaserResolution(
                     gausExpo.FixParameter(7, 1.)  # delay of the spurious peak (~ 1 ns)
                     gausExpo.FixParameter(8, 1.5)  # scale factor for sigma of the spurious peak (~2)
 
-                if(mcPeaks[k][1] > 0 and not useSinglePDF):
+                if (mcPeaks[k][1] > 0 and not useSinglePDF):
                     gausExpo.SetParameter(1, 0.3)  # norm 2
                     gausExpo.SetParLimits(1, 0., 100.)  # norm 1
                     if useMCPeaks:
@@ -433,7 +433,7 @@ def fitLaserResolution(
                     gaussian.FixParameter(6, 1.)  # delay of the spurious peak (~ 1 ns)
                     gaussian.FixParameter(7, 1.5)  # scale factro for sigma of the spurious peak (~2)
 
-                if(mcPeaks[k][1] > 0 and not useSinglePDF):
+                if (mcPeaks[k][1] > 0 and not useSinglePDF):
                     gaussian.SetParameter(1, 0.3)  # norm 2
                     gaussian.SetParLimits(1, 0., 100.)  # norm 1
                     if useMCPeaks:
@@ -488,7 +488,7 @@ def fitLaserResolution(
 
 def plotLaserResolution(fitResultsFile='laserResolutionResults.root'):
     """
-    Function that creates some standard plots from the tree containg the flaset fit results
+    Function that creates some standard plots from the tree containing the flaset fit results
     """
 
     # Opens the file with the data and loads the timing histogram
@@ -549,8 +549,8 @@ def plotLaserResolution(fitResultsFile='laserResolutionResults.root'):
 
     # loops over the MC distributions for shift the according to the time offset of each slot
     for iSlot in range(16):
-        laserTime = histoData.GetBinContent(iSlot * 512 + 1)  # channle 0 of the slot
-        mcTime = h_latePeakVSChannel.GetBinContent(iSlot * 512 + 1)  # channle 0 of the slot
+        laserTime = histoData.GetBinContent(iSlot * 512 + 1)  # channel 0 of the slot
+        mcTime = h_latePeakVSChannel.GetBinContent(iSlot * 512 + 1)  # channel 0 of the slot
         timeShift = laserTime - mcTime
         for iBin in range(512):
             lateTime = h_latePeakVSChannel.GetBinContent(iBin + iSlot * 512 + 1) + timeShift

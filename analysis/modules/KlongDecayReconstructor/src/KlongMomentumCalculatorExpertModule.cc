@@ -12,11 +12,16 @@
 // framework aux
 #include <framework/logging/Logger.h>
 
+#include <framework/datastore/StoreArray.h>
+
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 
 // decay descriptor
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
+
+// particle combiner
+#include <analysis/ParticleCombiner/ParticleCombiner.h>
 
 // utilities
 #include <analysis/utility/ParticleCopy.h>

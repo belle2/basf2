@@ -16,11 +16,13 @@ CDCTriggerSegmentHit::CDCTriggerSegmentHit(unsigned short segmentID,
                                            short fastestTime,
                                            short foundTime,
                                            short quadrant,
+                                           std::vector<float> hittime,
                                            unsigned int hitpattern,
-                                           unsigned int hitpattern_adc):
+                                           std::vector<float> adcinfo,
+                                           unsigned int adcpattern):
   m_segmentID(segmentID), m_priorityPosition(priorityPosition), m_leftRight(leftRight),
   m_priorityTime(priorityTime), m_fastestTime(fastestTime), m_foundTime(foundTime), m_quadrant(quadrant), m_hitpattern(hitpattern),
-  m_hitpattern_adc(hitpattern_adc)
+  m_hittime(hittime), m_adcpattern(adcpattern), m_adcinfo(adcinfo)
 {
   // find super layer and local wire id
   std::array<int, 9> nWiresInSuperLayer = {
@@ -53,11 +55,14 @@ CDCTriggerSegmentHit::CDCTriggerSegmentHit(unsigned short iSL,
                                            short fastestTime,
                                            short foundTime,
                                            short quadrant,
+                                           std::vector<float> hittime,
                                            unsigned int hitpattern,
-                                           unsigned int hitpattern_adc):
+                                           std::vector<float> adcinfo,
+                                           unsigned int adcpattern):
+
   m_priorityPosition(priorityPosition), m_leftRight(leftRight),
   m_priorityTime(priorityTime), m_fastestTime(fastestTime), m_foundTime(foundTime), m_quadrant(quadrant), m_hitpattern(hitpattern),
-  m_hitpattern_adc(hitpattern_adc)
+  m_hittime(hittime), m_adcpattern(adcpattern), m_adcinfo(adcinfo)
 {
   // calculate continuous segment ID
   std::array<int, 9> nWiresInSuperLayer = {
@@ -80,20 +85,24 @@ CDCTriggerSegmentHit::CDCTriggerSegmentHit(unsigned short iSL,
   m_eWire = WireID(iSL, iLayer, iWire).getEWire();
 }
 
-CDCTriggerSegmentHit::CDCTriggerSegmentHit(const CDCHit& priorityHit,
-                                           unsigned short segmentID,
-                                           unsigned short priorityPosition,
-                                           unsigned short leftRight,
-                                           short priorityTime,
-                                           short fastestTime,
-                                           short foundTime,
-                                           short quadrant,
-                                           unsigned int hitpattern,
-                                           unsigned int hitpattern_adc):
+CDCTriggerSegmentHit:: CDCTriggerSegmentHit(const CDCHit& priorityHit,
+                                            unsigned short segmentID,
+                                            unsigned short priorityPosition,
+                                            unsigned short leftRight,
+                                            short priorityTime,
+                                            short fastestTime,
+                                            short foundTime,
+                                            short quadrant,
+                                            std::vector<float> hittime,
+                                            unsigned int hitpattern,
+                                            std::vector<float> adcinfo,
+                                            unsigned int adcpattern):
   m_segmentID(segmentID), m_priorityPosition(priorityPosition), m_leftRight(leftRight),
   m_priorityTime(priorityTime), m_fastestTime(fastestTime), m_foundTime(foundTime),
-  m_eWire(priorityHit.getID()), m_quadrant(quadrant), m_hitpattern(hitpattern), m_hitpattern_adc(hitpattern_adc)
+  m_eWire(priorityHit.getID()), m_quadrant(quadrant), m_hitpattern(hitpattern), m_hittime(hittime), m_adcpattern(adcpattern),
+  m_adcinfo(adcinfo)
 {}
+
 
 unsigned short
 CDCTriggerSegmentHit::getIWireCenter() const

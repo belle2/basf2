@@ -87,8 +87,8 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
   double invariantMass = pBeam.M();
   double massChi2 = pow((invariantMass - s_InvariantMass) /
                         s_InvariantMassError, 2);
-  double angleHER = ROOT::Math::VectorUtil::Angle(pHER.Vect(), s_DirectionHER);
-  double angleLER = ROOT::Math::VectorUtil::Angle(pLER.Vect(), s_DirectionLER);
+  double angleHER = ROOT::Math::VectorUtil::Angle(pHER, s_DirectionHER);
+  double angleLER = ROOT::Math::VectorUtil::Angle(pLER, s_DirectionLER);
   double angleChi2 = pow(angleHER / s_AngleError, 2) +
                      pow(angleLER / s_AngleError, 2);
   fval = boostChi2 + massChi2 + angleChi2;

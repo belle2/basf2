@@ -11,6 +11,7 @@
 import fei
 import basf2 as b2
 import modularAnalysis as ma
+import pickle
 
 # create path
 path = b2.create_path()
@@ -24,7 +25,7 @@ ma.inputMdst(filename=b2.find_file('mdst16.root', 'validation', False),
 particles = fei.get_default_channels()
 
 # Set up FEI configuration specifying the FEI prefix
-configuration = fei.config.FeiConfiguration(prefix='FEI_TEST', training=True, cache=-1)
+configuration = fei.config.FeiConfiguration(prefix='FEI_TEST', training=True)
 
 # Get FEI path
 feistate = fei.get_path(particles, configuration)
@@ -33,7 +34,11 @@ feistate = fei.get_path(particles, configuration)
 path.add_path(feistate.path)
 
 # Add RootOutput to save particles reconstructing during the training stage
-path.add_module('RootOutput')
+output = b2.register_module('RootOutput')
+if pickle.load(open('Summary.pickle', 'rb'))[1].roundMode == 3:  # this is necessary for the retraining mode
+    output.param('excludeBranchNames', feistate.excludelists)
+path.add_module(output)
+
 
 # Process 100 events
 b2.process(path, max_event=100)

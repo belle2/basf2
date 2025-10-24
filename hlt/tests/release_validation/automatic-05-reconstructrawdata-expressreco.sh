@@ -26,7 +26,7 @@ b2file-mix -n 1000 --keep-eventinfo -o ${INPUT_FILE} ${VALIDATION_RAWDATA}
 
 # Run the ExpressReco script
 ${PARENT} basf2 ${PROCESSES} \
-    ${BELLE2_RELEASE_DIR}/hlt/operation/phase3/global/expressreco/evp_scripts/beam_reco.py -- \
+    ${BELLE2_RELEASE_DIR}/hlt/operation/ringbuffer/expressreco/beam_reco.py -- \
     UNUSED UNUSED 6666 \
     --input-file ${INPUT_FILE} \
     --output-file ${OUTPUT_ROOT_DIR}/beam_reco_monitor-expressreco-out.root \

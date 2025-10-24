@@ -30,20 +30,14 @@
 using namespace std;
 using namespace Belle2;
 using namespace TRGCDCT3DCONVERTERSPACE;
-//! Register Module
-REG_MODULE(TRGCDCT3DConverter);
 
-string TRGCDCT3DConverterModule::version() const
-{
-  return string("1.00");
-}
+REG_MODULE(TRGCDCT3DConverter);
 
 TRGCDCT3DConverterModule::TRGCDCT3DConverterModule()
   : Module::Module()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
-  string desc = "TRGCDCT3DConverterModule(" + version() + ")";
-  setDescription(desc);
+  setDescription("TRGCDCT3DConverter module");
   addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
            string("CDCTriggerSegmentHits0"));
@@ -77,7 +71,6 @@ TRGCDCT3DConverterModule::TRGCDCT3DConverterModule()
   addParam("isVerbose", m_isVerbose,
            "If not zero, prints detail information.",
            unsigned(0));
-  B2INFO("TRGCDCT3DConverter: Constructor done.");
 }
 
 TRGCDCT3DConverterModule::~TRGCDCT3DConverterModule()

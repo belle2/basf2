@@ -23,6 +23,7 @@
 
 #include <Math/Boost.h>
 #include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
 #include <TVectorF.h>
 
 #include <cmath>
@@ -260,6 +261,14 @@ namespace Belle2 {
       double daughterMass = particle->getDaughter(daughter)->getMass();
 
       TVectorF    jacobian(2 * Particle::c_DimMomentum);
+      /* Formulas to understand derivatives:
+       *
+       * Delta M = m(mother) - m(daughter) = (m(daughter) + m(other)) - m(daughter) // Here it is important not to combine the terms
+       *         =   sqrt((E(d) + E(o))^2 - (px(d) + px(o))^2 - (py(d) + py(o))^2 - (pz(d) + pz(o))^2)
+       *           - sqrt(E(d)^2 - px(d)^2 - py(d)^2 - pz(d)^2)
+       *
+       * jacobian[0) = del (Delta M) / del px(d) with del E(d) / del px(d) = 0
+       */
       jacobian[0] =  thisDaughterMomentum.Px() / daughterMass - particle->getPx() / motherMass;
       jacobian[1] =  thisDaughterMomentum.Py() / daughterMass - particle->getPy() / motherMass;
       jacobian[2] =  thisDaughterMomentum.Pz() / daughterMass - particle->getPz() / motherMass;
@@ -304,7 +313,7 @@ namespace Belle2 {
       ROOT::Math::PxPyPzEVector m = - T.getBeamFourMomentum();
 
       ROOT::Math::PxPyPzEVector motherMomentum = particle->get4Vector();
-      B2Vector3D                motherBoost    = motherMomentum.BoostToCM();
+      ROOT::Math::XYZVector     motherBoost    = motherMomentum.BoostToCM();
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
@@ -315,7 +324,7 @@ namespace Belle2 {
 
       m = ROOT::Math::Boost(motherBoost) * m;
 
-      return B2Vector3D(daugMomentum.Vect()).Angle(B2Vector3D(m.Vect()));
+      return ROOT::Math::VectorUtil::Angle(daugMomentum, m);
     }
 
     double pointingAngle(const Particle* particle, const std::vector<double>& daughters)
@@ -330,15 +339,15 @@ namespace Belle2 {
       if (particle->getDaughter(daughter)->getNDaughters() < 2)
         return Const::doubleNaN;
 
-      B2Vector3D productionVertex = particle->getVertex();
-      B2Vector3D decayVertex = particle->getDaughter(daughter)->getVertex();
+      ROOT::Math::XYZVector productionVertex = particle->getVertex();
+      ROOT::Math::XYZVector decayVertex = particle->getDaughter(daughter)->getVertex();
 
-      B2Vector3D vertexDiffVector = decayVertex - productionVertex;
+      ROOT::Math::XYZVector vertexDiffVector = decayVertex - productionVertex;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      B2Vector3D daughterMomentumVector = frame.getMomentum(particle->getDaughter(daughter)).Vect();
+      ROOT::Math::PxPyPzEVector daughterMomentumVector = frame.getMomentum(particle->getDaughter(daughter));
 
-      return daughterMomentumVector.Angle(vertexDiffVector);
+      return ROOT::Math::VectorUtil::Angle(daughterMomentumVector, vertexDiffVector);
     }
 
     double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double>& daughters)

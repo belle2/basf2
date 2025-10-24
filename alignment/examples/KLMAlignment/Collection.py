@@ -57,7 +57,7 @@ main.add_module('MillepedeCollector',
 main.add_module('Progress')
 
 # Processing.
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # Print call statistics.
 print(basf2.statistics)

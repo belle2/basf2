@@ -79,7 +79,7 @@ main.add_module(progress)
 main.add_module(rootoutput)
 
 # Start the event processing
-process(main)
+process(main, calculateStatistics=True)
 
 # Print some basic event statistics
 print('Event Statistics:')

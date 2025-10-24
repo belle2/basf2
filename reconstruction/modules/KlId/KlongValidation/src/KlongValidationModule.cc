@@ -13,6 +13,9 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/KLMCluster.h>
+
 // here's where the functions are hidden
 #include <reconstruction/modules/KlId/KLMExpert/KlId.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>

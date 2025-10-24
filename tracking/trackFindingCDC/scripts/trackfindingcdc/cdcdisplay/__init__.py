@@ -19,6 +19,7 @@ from ROOT import Belle2  # make Belle2 namespace available
 import basf2
 
 from ROOT import gSystem
+# @cond internal_test
 gSystem.Load('libframework')  # for PyStoreArray
 gSystem.Load('libcdc')  # for CDCSimHit
 gSystem.Load('libtracking')  # for CDCHit and so on
@@ -1077,3 +1078,5 @@ class CDCSVGDisplayModule(basf2.Module):
         """
 
         return os.path.join(self.output_folder, self.new_output_basename())
+
+# @endcond

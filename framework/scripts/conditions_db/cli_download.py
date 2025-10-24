@@ -144,7 +144,7 @@ def command_legacydownload(args, db=None):
     One can filter the payloads to be downloaded by payload name using the
     --filter, --exclude and --regex options.
 
-    .. versionadded:: release-04-00-00
+    .. note:: Version added: release-04-00-00
 
        This has been renamed from ``download`` and is kept for compatibility
 
@@ -271,7 +271,7 @@ def command_download(args, db=None):
     using the ``-o`` argument but the payloads will always be saved in sub
     directories in the same directory as the sqlite file.
 
-    .. versionchanged:: release-04-00-00
+    .. note:: Version changed: release-04-00-00
 
        Previously this command was primarily intended to download payloads for
        one globaltag and optionally create a text file with payload information

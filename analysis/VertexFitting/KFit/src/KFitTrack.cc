@@ -7,10 +7,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <analysis/VertexFitting/KFit/KFitTrack.h>
 
 #include <cstdio>
-
-#include <analysis/VertexFitting/KFit/KFitTrack.h>
 
 using namespace CLHEP;
 using namespace std;

@@ -87,6 +87,8 @@ namespace Belle2 {
      * The number sequences (e.g. 23:42,101) defining the entries which are processed for each inputFileName.
      */
     std::vector<std::string> m_entrySequences;
+    /** Flag to switch on only evtgen processing */
+    bool m_evtgenProcessing;
 
     //! PantherFile
     Belle::Panther_FileIO* m_fd{nullptr};

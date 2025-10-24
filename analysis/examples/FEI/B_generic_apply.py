@@ -24,10 +24,10 @@ b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # Get FEI default channels.
 # Utilise the arguments to toggle on and off certain channels
-particles = fei.get_default_channels()
+particles = fei.get_default_channels(removeSLD=True)
 
 # Set up FEI configuration specifying the FEI prefix
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2021_MC14_release_05_01_12', training=False, monitor=False, cache=0)
+configuration = fei.config.FeiConfiguration(prefix='FEIv1_2025_MC16ri_aldebaran_200', training=False, monitor=False)
 
 # Get FEI path
 feistate = fei.get_path(particles, configuration)
@@ -69,5 +69,4 @@ ma.variablesToNtuple('B0:semileptonic',
                      path=path)
 
 # Process 100 events
-b2.process(path, max_event=100)
-print(b2.statistics)
+b2.process(path, max_event=100, calculateStatistics=True)

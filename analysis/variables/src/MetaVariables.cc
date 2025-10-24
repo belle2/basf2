@@ -13,6 +13,7 @@
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/EventKinematics.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
@@ -39,11 +40,11 @@
 
 #include <cmath>
 #include <stdexcept>
-#include <memory>
 #include <regex>
 
 #include <TDatabasePDG.h>
 #include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
 
 namespace Belle2 {
   namespace Variable {
@@ -97,15 +98,12 @@ namespace Belle2 {
     {
       if (arguments.size() == 2) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto daughterFunction = convertToDaughterIndex({arguments[1]});
+        auto func = [var, daughterFunction](const Particle * particle) -> double {
+          int daughterIndexTagB = std::get<int>(daughterFunction(particle));
+          if (daughterIndexTagB < 0)
+            return Const::doubleNaN;
 
-        int daughterIndexTagB = 0;
-        try {
-          daughterIndexTagB = Belle2::convertString<int>(arguments[1]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("Second argument of useTagSideRecoilRestFrame meta function must be integer!");
-        }
-
-        auto func = [var, daughterIndexTagB](const Particle * particle) -> double {
           if (particle->getPDGCode() != 300553)
           {
             B2ERROR("Variable should only be used on a Upsilon(4S) Particle List!");
@@ -208,6 +206,38 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function useDaughterRestFrame.");
+      }
+    }
+
+    Manager::FunctionPtr useDaughterRecoilRestFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() >= 2) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var, arguments](const Particle * particle) -> double {
+
+          // Sum of the 4-momenta of all the selected daughters
+          ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
+
+          for (unsigned int i = 1; i < arguments.size(); i++)
+          {
+            auto generalizedIndex = arguments[i];
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            if (dauPart)
+              pSum +=  dauPart->get4Vector();
+            else
+              return Const::doubleNaN;
+          }
+          PCmsLabTransform T;
+          ROOT::Math::PxPyPzEVector recoil = T.getBeamFourMomentum() - pSum;
+          /* Let's use 0 as PDG code to avoid wrong assumptions. */
+          Particle pRecoil(recoil, 0);
+          UseReferenceFrame<RestFrame> frame(&pRecoil);
+          double result = std::get<double>(var->function(particle));
+          return result;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function useDaughterRecoilRestFrame.");
       }
     }
 
@@ -459,7 +489,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         int pdgCode = 0;
         try {
-          pdgCode = Belle2::convertString<int>(arguments[0]);
+          pdgCode = convertString<int>(arguments[0]);
         } catch (std::invalid_argument&) {
           B2FATAL("The first argument of varFor meta function must be a positive integer!");
         }
@@ -649,13 +679,13 @@ namespace Belle2 {
           int generation_flag = -1;
           try
           {
-            generation_flag = Belle2::convertString<int>(listNames.back());
+            generation_flag = convertString<int>(listNames.back());
           } catch (std::exception& e) {}
 
           for (auto& iListName : listNames)
           {
             try {
-              Belle2::convertString<int>(iListName);
+              convertString<int>(iListName);
               continue;
             } catch (std::exception& e) {}
 
@@ -712,7 +742,7 @@ namespace Belle2 {
           int generation_flag = -1;
           try
           {
-            generation_flag = Belle2::convertString<int>(listNames.back());
+            generation_flag = convertString<int>(listNames.back());
           } catch (std::exception& e) {}
 
           if (particle->getMCParticle() == nullptr)
@@ -1000,10 +1030,10 @@ namespace Belle2 {
     {
       if (arguments.size() == 5) {
         try {
-          Belle2::convertString<int>(arguments[0]);
-          Belle2::convertString<int>(arguments[1]);
-          Belle2::convertString<int>(arguments[2]);
-          Belle2::convertString<int>(arguments[3]);
+          convertString<int>(arguments[0]);
+          convertString<int>(arguments[1]);
+          convertString<int>(arguments[2]);
+          convertString<int>(arguments[3]);
         } catch (std::invalid_argument&) {
           B2FATAL("First four arguments of grandDaughterDiffOf meta function must be integers!");
         }
@@ -1015,62 +1045,6 @@ namespace Belle2 {
       } else {
         B2FATAL("Wrong number of arguments for meta function grandDaughterDiffOf");
       }
-    }
-
-    Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("phi"));
-      return daughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr mcDaughterDiffOfPhi(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("phi"));
-      return mcDaughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr grandDaughterDiffOfPhi(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("phi"));
-      return grandDaughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("clusterPhi"));
-      return daughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr grandDaughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("clusterPhi"));
-      return grandDaughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr daughterDiffOfPhiCMS(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("useCMSFrame(phi)"));
-      return daughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr mcDaughterDiffOfPhiCMS(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("useCMSFrame(phi)"));
-      return mcDaughterDiffOf(new_arguments);
-    }
-
-    Manager::FunctionPtr daughterDiffOfClusterPhiCMS(const std::vector<std::string>& arguments)
-    {
-      std::vector<std::string> new_arguments = arguments;
-      new_arguments.push_back(std::string("useCMSFrame(clusterPhi)"));
-      return daughterDiffOf(new_arguments);
     }
 
     Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
@@ -1108,43 +1082,40 @@ namespace Belle2 {
     Manager::FunctionPtr daughterMotherDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        int daughterNumber = 0;
-        try {
-          daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("First argument of daughterMotherDiffOf meta function must be integer!");
-        }
-        auto variablename = arguments[1];
-        auto func = [variablename, daughterNumber](const Particle * particle) -> double {
+        auto daughterFunction = convertToDaughterIndex({arguments[0]});
+        std::string variableName = arguments[1];
+        auto func = [daughterFunction, variableName](const Particle * particle) -> double {
           if (particle == nullptr)
             return Const::doubleNaN;
-          if (daughterNumber >= int(particle->getNDaughters()))
+          int daughterNumber = std::get<int>(daughterFunction(particle));
+          if (daughterNumber >= int(particle->getNDaughters()) or daughterNumber < 0)
             return Const::doubleNaN;
-          else
+          const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
+          auto result_mother = var->function(particle);
+          auto result_daughter = var->function(particle->getDaughter(daughterNumber));
+          double diff = Const::doubleNaN;
+          if (std::holds_alternative<double>(result_mother) && std::holds_alternative<double>(result_daughter))
           {
-            const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            auto result_mother = var->function(particle);
-            auto result_daughter = var->function(particle->getDaughter(daughterNumber));
-            double diff = Const::doubleNaN;
-            if (std::holds_alternative<double>(result_mother) && std::holds_alternative<double>(result_daughter)) {
-              diff = std::get<double>(result_mother) - std::get<double>(result_daughter);
-            } else if (std::holds_alternative<int>(result_mother) && std::holds_alternative<int>(result_daughter)) {
-              diff = std::get<int>(result_mother) - std::get<int>(result_daughter);
-            } else {
-              throw std::runtime_error("Bad variant access");
-            }
+            diff = std::get<double>(result_mother) - std::get<double>(result_daughter);
+          } else if (std::holds_alternative<int>(result_mother) && std::holds_alternative<int>(result_daughter))
+          {
+            diff = std::get<int>(result_mother) - std::get<int>(result_daughter);
+          } else
+          {
+            throw std::runtime_error("Bad variant access");
+          }
 
-            if (variablename == "phi" or variablename == "useCMSFrame(phi)") {
-              if (fabs(diff) > M_PI) {
-                if (diff > M_PI) {
-                  diff = diff - 2 * M_PI;
-                } else {
-                  diff = 2 * M_PI + diff;
-                }
+          if (variableName == "phi" or variableName == "useCMSFrame(phi)")
+          {
+            if (fabs(diff) > M_PI) {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
               }
             }
-            return diff;
           }
+          return diff;
         };
         return func;
       } else {
@@ -1155,34 +1126,105 @@ namespace Belle2 {
     Manager::FunctionPtr daughterMotherNormDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        int daughterNumber = 0;
-        try {
-          daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("First argument of daughterMotherDiffOf meta function must be integer!");
-        }
+        auto daughterFunction = convertToDaughterIndex({arguments[0]});
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterNumber](const Particle * particle) -> double {
+        auto func = [var, daughterFunction](const Particle * particle) -> double {
           if (particle == nullptr)
             return Const::doubleNaN;
-          if (daughterNumber >= int(particle->getNDaughters()))
+          int daughterNumber = std::get<int>(daughterFunction(particle));
+          if (daughterNumber >= int(particle->getNDaughters()) or daughterNumber < 0)
             return Const::doubleNaN;
-          else
+          double daughterValue = 0.0, motherValue = 0.0;
+          if (std::holds_alternative<double>(var->function(particle)))
           {
-            double daughterValue = 0.0, motherValue = 0.0;
-            if (std::holds_alternative<double>(var->function(particle))) {
-              daughterValue = std::get<double>(var->function(particle->getDaughter(daughterNumber)));
-              motherValue = std::get<double>(var->function(particle));
-            } else if (std::holds_alternative<int>(var->function(particle))) {
-              daughterValue = std::get<int>(var->function(particle->getDaughter(daughterNumber)));
-              motherValue = std::get<int>(var->function(particle));
-            }
-            return (motherValue - daughterValue) / (motherValue + daughterValue);
+            daughterValue = std::get<double>(var->function(particle->getDaughter(daughterNumber)));
+            motherValue = std::get<double>(var->function(particle));
+          } else if (std::holds_alternative<int>(var->function(particle)))
+          {
+            daughterValue = std::get<int>(var->function(particle->getDaughter(daughterNumber)));
+            motherValue = std::get<int>(var->function(particle));
           }
+          return (motherValue - daughterValue) / (motherValue + daughterValue);
         };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function daughterMotherNormDiffOf");
+      }
+    }
+
+    Manager::FunctionPtr angleBetweenDaughterAndRecoil(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() >= 1) {
+
+        auto func = [arguments](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return Const::doubleNaN;
+
+          const auto& frame = ReferenceFrame::GetCurrent();
+
+          ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
+          for (auto& generalizedIndex : arguments)
+          {
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            if (dauPart) pSum += frame.getMomentum(dauPart);
+            else {
+              B2WARNING("Trying to access a daughter that does not exist. Index = " << generalizedIndex);
+              return Const::doubleNaN;
+            }
+          }
+
+          PCmsLabTransform T;
+          ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum(); // Initial state (e+e- momentum in LAB)
+          ROOT::Math::PxPyPzEVector pRecoil = frame.getMomentum(pIN - particle->get4Vector());
+
+          return ROOT::Math::VectorUtil::Angle(pRecoil, pSum);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function angleBetweenDaughterAndRecoil");
+      }
+    }
+
+    Manager::FunctionPtr angleBetweenDaughterAndMissingMomentum(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() >= 1) {
+        auto func = [arguments](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return Const::doubleNaN;
+
+          StoreObjPtr<EventKinematics> evtShape;
+          if (!evtShape)
+          {
+            B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
+            return Const::doubleNaN;
+          }
+          ROOT::Math::XYZVector missingMomentumCMS = evtShape->getMissingMomentumCMS();
+          ROOT::Math::PxPyPzEVector missingTotalMomentumCMS(missingMomentumCMS.X(),
+                                                            missingMomentumCMS.Y(),
+                                                            missingMomentumCMS.Z(),
+                                                            evtShape->getMissingEnergyCMS());
+          PCmsLabTransform T;
+          ROOT::Math::PxPyPzEVector missingTotalMomentumLab = T.rotateCmsToLab() * missingTotalMomentumCMS;
+
+          const auto& frame = ReferenceFrame::GetCurrent();
+          ROOT::Math::PxPyPzEVector pMiss = frame.getMomentum(missingTotalMomentumLab); // transform from lab to reference frame
+
+          ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
+          for (auto& generalizedIndex : arguments)
+          {
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            if (dauPart) pSum += frame.getMomentum(dauPart);
+            else {
+              B2WARNING("Trying to access a daughter that does not exist. Index = " << generalizedIndex);
+              return Const::doubleNaN;
+            }
+          }
+
+          return ROOT::Math::VectorUtil::Angle(pMiss, pSum);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function angleBetweenDaughterAndMissingMomentum");
       }
     }
 
@@ -1211,9 +1253,9 @@ namespace Belle2 {
 
           // Calculates the angle between the selected particles
           if (pDaus.size() == 2)
-            return B2Vector3D(pDaus[0].Vect()).Angle(B2Vector3D(pDaus[1].Vect()));
+            return ROOT::Math::VectorUtil::Angle(pDaus[0], pDaus[1]);
           else
-            return B2Vector3D(pDaus[2].Vect()).Angle(B2Vector3D(pDaus[0].Vect() + pDaus[1].Vect()));
+            return ROOT::Math::VectorUtil::Angle(pDaus[2], pDaus[0] + pDaus[1]);
         };
         return func;
       } else {
@@ -1237,7 +1279,7 @@ namespace Belle2 {
         if (grandDaughterIndex >= int(dau->getNDaughters()))
           return Const::doubleNaN;
 
-        B2Vector3D  boost = dau->get4Vector().BoostToCM();
+        ROOT::Math::XYZVector boost = dau->get4Vector().BoostToCM();
 
         ROOT::Math::PxPyPzEVector motherMomentum = - particle->get4Vector();
         motherMomentum = ROOT::Math::Boost(boost) * motherMomentum;
@@ -1245,7 +1287,7 @@ namespace Belle2 {
         ROOT::Math::PxPyPzEVector grandDaughterMomentum = dau->getDaughter(grandDaughterIndex)->get4Vector();
         grandDaughterMomentum = ROOT::Math::Boost(boost) * grandDaughterMomentum;
 
-        return B2Vector3D(motherMomentum.Vect()).Angle(B2Vector3D(grandDaughterMomentum.Vect()));
+        return ROOT::Math::VectorUtil::Angle(motherMomentum, grandDaughterMomentum);
 
       } else {
         B2FATAL("The variable grandDaughterDecayAngle needs exactly two integers as arguments!");
@@ -1293,9 +1335,9 @@ namespace Belle2 {
 
           // Calculates the angle between the selected particles
           if (pDaus.size() == 2)
-            return B2Vector3D(pDaus[0].Vect()).Angle(B2Vector3D(pDaus[1].Vect()));
+            return ROOT::Math::VectorUtil::Angle(pDaus[0], pDaus[1]);
           else
-            return B2Vector3D(pDaus[2].Vect()).Angle(B2Vector3D(pDaus[0].Vect() + pDaus[1].Vect()));
+            return ROOT::Math::VectorUtil::Angle(pDaus[2], pDaus[0] + pDaus[1]);
         };
         return func;
       } else {
@@ -1318,9 +1360,9 @@ namespace Belle2 {
             const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndexi))->getECLClusterEHypothesisBit();
             const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndexj))->getECLClusterEHypothesisBit();
             ClusterUtils clusutils;
-            B2Vector3D pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
-            B2Vector3D pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
-            return pi.Angle(pj);
+            ROOT::Math::PxPyPzEVector pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit));
+            ROOT::Math::PxPyPzEVector pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit));
+            return ROOT::Math::VectorUtil::Angle(pi, pj);
           }
           return Const::doubleNaN;
         }
@@ -1340,10 +1382,10 @@ namespace Belle2 {
             const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndices[1]))->getECLClusterEHypothesisBit();
             const ECLCluster::EHypothesisBit clusterkBit = (particle->getDaughter(daughterIndices[2]))->getECLClusterEHypothesisBit();
             ClusterUtils clusutils;
-            B2Vector3D pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
-            B2Vector3D pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
-            B2Vector3D pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk, clusterkBit)).Vect();
-            return pk.Angle(pi + pj);
+            ROOT::Math::PxPyPzEVector pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit));
+            ROOT::Math::PxPyPzEVector pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit));
+            ROOT::Math::PxPyPzEVector pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk, clusterkBit));
+            return ROOT::Math::VectorUtil::Angle(pk, pi + pj);
           }
           return Const::doubleNaN;
         }
@@ -1382,7 +1424,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         int divideBy = 1;
         try {
-          divideBy = Belle2::convertString<int>(arguments[1]);
+          divideBy = convertString<int>(arguments[1]);
         } catch (std::invalid_argument&) {
           B2FATAL("Second argument of modulo meta function must be integer!");
         }
@@ -1423,7 +1465,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         double defaultOutput;
         try {
-          defaultOutput = Belle2::convertString<double>(arguments[1]);
+          defaultOutput = convertString<double>(arguments[1]);
         } catch (std::invalid_argument&) {
           B2FATAL("The second argument of ifNANgiveX meta function must be a number!");
         }
@@ -1460,7 +1502,7 @@ namespace Belle2 {
         int finalMask = 0;
         for (size_t i = 1; i < arguments.size(); ++i) {
           try {
-            finalMask |= Belle2::convertString<int>(arguments[i]);
+            finalMask |= convertString<int>(arguments[i]);
           } catch (std::invalid_argument&) {
             B2FATAL("The input flags to meta function unmask() should be integer!");
             return nullptr;
@@ -1566,6 +1608,39 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function pValueCombination");
+      }
+    }
+
+    Manager::FunctionPtr pValueCombinationOfDaughters(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          double pValueProduct = 1.;
+          if (particle->getNDaughters() == 0)
+          {
+            return Const::doubleNaN;
+          }
+
+          for (unsigned j = 0; j < particle->getNDaughters(); ++j)
+          {
+            double pValue = std::get<double>(var->function(particle->getDaughter(j)));
+            if (pValue < 0) return -1;
+            else pValueProduct *= pValue;
+          }
+
+          double pValueSum = 1.;
+          double factorial = 1.;
+          for (unsigned int i = 1; i < particle->getNDaughters(); ++i)
+          {
+            factorial *= i;
+            pValueSum += pow(-std::log(pValueProduct), i) / factorial;
+          }
+          return pValueProduct * pValueSum;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function pValueCombinationOfDaughters");
       }
     }
 
@@ -1843,29 +1918,25 @@ namespace Belle2 {
     Manager::FunctionPtr daughter(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        int daughterNumber = 0;
-        try {
-          daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("First argument of daughter meta function must be integer!");
-        }
+        auto daughterFunction = convertToDaughterIndex({arguments[0]});
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterNumber](const Particle * particle) -> double {
+        auto func = [var, daughterFunction](const Particle * particle) -> double {
           if (particle == nullptr)
             return Const::doubleNaN;
-          if (daughterNumber >= int(particle->getNDaughters()))
+          int daughterNumber = std::get<int>(daughterFunction(particle));
+          if (daughterNumber >= int(particle->getNDaughters()) or daughterNumber < 0)
             return Const::doubleNaN;
-          else
+          auto var_result = var->function(particle->getDaughter(daughterNumber));
+          if (std::holds_alternative<double>(var_result))
           {
-            auto var_result = var->function(particle->getDaughter(daughterNumber));
-            if (std::holds_alternative<double>(var_result)) {
-              return std::get<double>(var_result);
-            } else if (std::holds_alternative<int>(var_result)) {
-              return std::get<int>(var_result);
-            } else if (std::holds_alternative<bool>(var_result)) {
-              return std::get<bool>(var_result);
-            } else return Const::doubleNaN;
-          }
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else return Const::doubleNaN;
         };
         return func;
       } else {
@@ -1876,17 +1947,13 @@ namespace Belle2 {
     Manager::FunctionPtr originalDaughter(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        int daughterNumber = 0;
-        try {
-          daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("First argument of daughter meta function must be integer!");
-        }
+        auto daughterFunction = convertToDaughterIndex({arguments[0]});
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterNumber](const Particle * particle) -> double {
+        auto func = [var, daughterFunction](const Particle * particle) -> double {
           if (particle == nullptr)
             return Const::doubleNaN;
-          if (daughterNumber >= int(particle->getNDaughters()))
+          int daughterNumber = std::get<int>(daughterFunction(particle));
+          if (daughterNumber >= int(particle->getNDaughters()) or daughterNumber < 0)
             return Const::doubleNaN;
           else
           {
@@ -1913,24 +1980,44 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr convertToDaughterIndex(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string daughterString = arguments[0];
+        auto func = [daughterString](const Particle * particle) -> int {
+          if (particle == nullptr)
+            return -1;
+          int daughterNumber = 0;
+          try
+          {
+            daughterNumber = convertString<int>(daughterString);
+          } catch (std::invalid_argument&)
+          {
+            auto daughterFunction = convertToInt({daughterString, "-1"});
+            auto daughterVarResult = daughterFunction(particle);
+            daughterNumber = std::get<int>(daughterVarResult);
+          }
+          return daughterNumber;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function convertToDaughterIndex");
+      }
+    }
+
     Manager::FunctionPtr mcDaughter(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        int daughterNumber = 0;
-        try {
-          daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("First argument of mcDaughter meta function must be integer!");
-        }
+        auto daughterFunction = convertToDaughterIndex({arguments[0]});
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterNumber](const Particle * particle) -> double {
+        auto func = [var, daughterFunction](const Particle * particle) -> double {
           if (particle == nullptr)
             return Const::doubleNaN;
           if (particle->getMCParticle()) // has MC match or is MCParticle
           {
-            if (daughterNumber >= int(particle->getMCParticle()->getNDaughters())) {
+            int daughterNumber = std::get<int>(daughterFunction(particle));
+            if (daughterNumber >= int(particle->getMCParticle()->getNDaughters()) or daughterNumber < 0)
               return Const::doubleNaN;
-            }
             Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
             auto var_result = var->function(&tempParticle);
             if (std::holds_alternative<double>(var_result)) {
@@ -1939,7 +2026,9 @@ namespace Belle2 {
               return std::get<int>(var_result);
             } else if (std::holds_alternative<bool>(var_result)) {
               return std::get<bool>(var_result);
-            } else return Const::doubleNaN;
+            } else {
+              return Const::doubleNaN;
+            }
           } else
           {
             return Const::doubleNaN;
@@ -1988,7 +2077,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         int particleNumber = 0;
         try {
-          particleNumber = Belle2::convertString<int>(arguments[0]);
+          particleNumber = convertString<int>(arguments[0]);
         } catch (std::invalid_argument&) {
           B2FATAL("First argument of genParticle meta function must be integer!");
         }
@@ -2068,7 +2157,7 @@ namespace Belle2 {
         std::string extraInfoName = rankedVariableName + "_rank";
         int rank = 1;
         try {
-          rank = Belle2::convertString<int>(arguments[3]);
+          rank = convertString<int>(arguments[3]);
         } catch (std::invalid_argument&)  {
           B2ERROR("3rd argument of getVariableByRank meta function (Rank) must be an integer!");
           return nullptr;
@@ -2145,13 +2234,13 @@ namespace Belle2 {
           B2INFO("Use pdgCode of electron as default in meta variable veto, other arguments: " << roeListName << ", " << cutString);
         } else {
           try {
-            pdgCode = Belle2::convertString<int>(arguments[2]);;
+            pdgCode = convertString<int>(arguments[2]);;
           } catch (std::invalid_argument&) {
             B2FATAL("Third argument of veto meta function must be integer!");
           }
         }
 
-        auto flavourType = (Belle2::EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
+        auto flavourType = (EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
         auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> bool {
@@ -2271,7 +2360,7 @@ namespace Belle2 {
 
     }
 
-    void appendDaughtersRecursive(Particle* mother)
+    void appendDaughtersRecursive(Particle* mother, StoreArray<Particle>& container)
     {
 
       auto* mcmother = mother->getRelated<MCParticle>();
@@ -2279,20 +2368,16 @@ namespace Belle2 {
       if (!mcmother)
         return;
 
-      std::vector<MCParticle*> mcdaughters = mcmother->getDaughters();
-      StoreArray<Particle> particles;
-
-      for (auto& mcdaughter : mcdaughters) {
+      for (auto* mcdaughter : mcmother->getDaughters()) {
         if (!mcdaughter->hasStatus(MCParticle::c_PrimaryParticle)) continue;
         Particle tmp_daughter(mcdaughter);
-        Particle* new_daughter = particles.appendNew(tmp_daughter);
+        Particle* new_daughter = container.appendNew(tmp_daughter);
         new_daughter->addRelationTo(mcdaughter);
         mother->appendDaughter(new_daughter, false);
 
         if (mcdaughter->getNDaughters() > 0)
-          appendDaughtersRecursive(new_daughter);
+          appendDaughtersRecursive(new_daughter, container);
       }
-
     }
 
     Manager::FunctionPtr matchedMC(const std::vector<std::string>& arguments)
@@ -2305,12 +2390,13 @@ namespace Belle2 {
           {
             return Const::doubleNaN;
           }
+          StoreArray<Particle> tempParticles("tempParticles");
+          tempParticles.clear();
           Particle tmpPart(mcp);
-          StoreArray<Particle> particles;
-          Particle* newPart = particles.appendNew(tmpPart);
+          Particle* newPart = tempParticles.appendNew(tmpPart);
           newPart->addRelationTo(mcp);
 
-          appendDaughtersRecursive(newPart);
+          appendDaughtersRecursive(newPart, tempParticles);
 
           auto var_result = var->function(newPart);
           if (std::holds_alternative<double>(var_result))
@@ -2354,12 +2440,13 @@ namespace Belle2 {
           // cppcheck-suppress containerOutOfBounds
           const MCParticle* mcp = mcps.object(weightsAndIndices[0].second);
 
+          StoreArray<Particle> tempParticles("tempParticles");
+          tempParticles.clear();
           Particle tmpPart(mcp);
-          StoreArray<Particle> particles;
-          Particle* newPart = particles.appendNew(tmpPart);
+          Particle* newPart = tempParticles.appendNew(tmpPart);
           newPart->addRelationTo(mcp);
 
-          appendDaughtersRecursive(newPart);
+          appendDaughtersRecursive(newPart, tempParticles);
 
           auto var_result = var->function(newPart);
           if (std::holds_alternative<double>(var_result))
@@ -2664,7 +2751,7 @@ namespace Belle2 {
             auto tracks = cluster->getRelationsFrom<Track>();
 
             for (const auto& track : tracks) {
-              Particle trackParticle(&track, Belle2::Const::pion);
+              Particle trackParticle(&track, Const::pion);
 
               if (cut->check(&trackParticle))
                 return 1;
@@ -2846,15 +2933,15 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
+        const auto p_this = frame.getMomentum(particle);
 
         // find the particle index with the smallest opening angle
         double minAngle = 2 * M_PI;
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
-          double angle = p_compare.Angle(p_this);
+          const auto p_compare = frame.getMomentum(compareme);
+          double angle = ROOT::Math::VectorUtil::Angle(p_compare, p_this);
           if (minAngle > angle) minAngle = angle;
         }
         return minAngle;
@@ -2881,7 +2968,7 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
+        const auto p_this = frame.getMomentum(particle);
 
         // find the particle index with the smallest opening angle
         double minAngle = 2 * M_PI;
@@ -2889,8 +2976,8 @@ namespace Belle2 {
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
-          double angle = p_compare.Angle(p_this);
+          const auto p_compare = frame.getMomentum(compareme);
+          double angle = ROOT::Math::VectorUtil::Angle(p_compare, p_this);
           if (minAngle > angle) {
             minAngle = angle;
             iClosest = i;
@@ -2934,7 +3021,7 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
+        const auto p_this = frame.getMomentum(particle);
 
         // find the most back-to-back (the largest opening angle before they
         // start getting smaller again!)
@@ -2942,8 +3029,8 @@ namespace Belle2 {
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
-          double angle = p_compare.Angle(p_this);
+          const auto p_compare = frame.getMomentum(compareme);
+          double angle = ROOT::Math::VectorUtil::Angle(p_compare, p_this);
           if (maxAngle < angle) maxAngle = angle;
         }
         return maxAngle;
@@ -3007,7 +3094,7 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
+        const auto p_this = frame.getMomentum(particle);
 
         // find the most back-to-back (the largest opening angle before they
         // start getting smaller again!)
@@ -3016,8 +3103,8 @@ namespace Belle2 {
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
-          double angle = p_compare.Angle(p_this);
+          const auto p_compare = frame.getMomentum(compareme);
+          double angle = ROOT::Math::VectorUtil::Angle(p_compare, p_this);
           if (maxAngle < angle) {
             maxAngle = angle;
             iMostB2B = i;
@@ -3057,10 +3144,10 @@ namespace Belle2 {
           double maxOpeningAngle = -1;
           for (int i = 0; i < nParticles; i++)
           {
-            B2Vector3D v1 = frame.getMomentum(listOfParticles->getParticle(i)).Vect();
+            ROOT::Math::PxPyPzEVector v1 = frame.getMomentum(listOfParticles->getParticle(i));
             for (int j = i + 1; j < nParticles; j++) {
-              B2Vector3D v2 = frame.getMomentum(listOfParticles->getParticle(j)).Vect();
-              const double angle = v1.Angle(v2);
+              ROOT::Math::PxPyPzEVector v2 = frame.getMomentum(listOfParticles->getParticle(j));
+              const double angle = ROOT::Math::VectorUtil::Angle(v1, v2);
               if (angle > maxOpeningAngle) maxOpeningAngle = angle;
             }
           }
@@ -3175,7 +3262,7 @@ namespace Belle2 {
           // indexAndMass[0] is the daughter index as string. Try to convert it
           int dauIndex = 0;
           try {
-            dauIndex = Belle2::convertString<int>(indexAndMass[0]);
+            dauIndex = convertString<int>(indexAndMass[0]);
           } catch (std::invalid_argument&) {
             B2FATAL("Found the string " << indexAndMass[0] << "instead of a daughter index.");
           }
@@ -3288,7 +3375,7 @@ namespace Belle2 {
           pdg_code = std::abs(part->PdgCode());
         } else {
           try {
-            pdg_code = Belle2::convertString<int>(arg);
+            pdg_code = convertString<int>(arg);
           } catch (std::exception& e) {}
         }
 
@@ -3312,12 +3399,13 @@ namespace Belle2 {
             i_p = i_p->getMother();
           }
 
+          StoreArray<Particle> tempParticles("tempParticles");
+          tempParticles.clear();
           Particle m_p(i_p);
-          StoreArray<Particle> particles;
-          Particle* newPart = particles.appendNew(m_p);
+          Particle* newPart = tempParticles.appendNew(m_p);
           newPart->addRelationTo(i_p);
 
-          appendDaughtersRecursive(newPart);
+          appendDaughtersRecursive(newPart, tempParticles);
 
           auto var_result = var->function(newPart);
           if (std::holds_alternative<double>(var_result))
@@ -3350,7 +3438,7 @@ namespace Belle2 {
         absPdg = std::abs(part->PdgCode());
       } else {
         try {
-          absPdg = Belle2::convertString<int>(arg);
+          absPdg = convertString<int>(arg);
         } catch (std::exception& e) {}
       }
 
@@ -3382,7 +3470,7 @@ namespace Belle2 {
     {
       if (arguments.size() == 2) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        int default_val = Belle2::convertString<int>(arguments[1]);
+        int default_val = convertString<int>(arguments[1]);
         auto func = [var, default_val](const Particle * particle) -> int {
           auto var_result = var->function(particle);
           if (std::holds_alternative<double>(var_result))
@@ -3466,6 +3554,12 @@ Specifying the lab frame is useful in some corner-cases. For example:
 		      "of the first daughter (0). If the daughter index is invalid, it returns NaN.\n"
 		      "If two or more indices are given, the rest frame of the sum of the daughters is used.",
 		      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useDaughterRecoilRestFrame(variable, daughterIndex_1, [daughterIndex_2, ... daughterIndex_3])", useDaughterRecoilRestFrame,
+                      "Returns the value of the variable in the rest frame of the recoil of the selected daughter particle.\n"
+          "The daughter is identified via generalized daughter index, e.g. ``0:1`` identifies the second daughter (1) "
+          "of the first daughter (0). If the daughter index is invalid, it returns NaN.\n"
+          "If two or more indices are given, the rest frame of the sum of the daughters is used.",
+          Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("useMCancestorBRestFrame(variable)", useMCancestorBRestFrame,
                       "Returns the value of the variable in the rest frame of the ancestor B MC particle.\n"
                       "If no B or no MC-matching is found, it returns NaN.", Manager::VariableDataType::c_double);
@@ -3628,53 +3722,6 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     MAKE_DEPRECATED("grandDaughterDiffOf", false, "light-2402-ocicat", R"DOC(
                      The difference between any combination of (grand-)daughters can be calculated with the more general variable :b2:var:`daughterDiffOf`
                      by using generalized daughter indexes.)DOC");
-    REGISTER_METAVARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
-                      "Returns the difference in :math:`\\phi` between the two given daughters. The unit of the angle is ``rad``.\n"
-                      "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("daughterDiffOfPhi", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("mcDaughterDiffOfPhi(i, j)", mcDaughterDiffOfPhi,
-                      "MC matched version of the `daughterDiffOfPhi` function. The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("mcDaughterDiffOfPhi", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
-                      "Returns the difference in :math:`\\phi` between the first daughters of the two given daughters. The unit of the angle is ``rad``.\n"
-                      "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.\n", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("grandDaughterDiffOfPhi", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
-                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters. The unit of the angle is ``rad``.\n"
-                      "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("daughterDiffOfClusterPhi", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("grandDaughterDiffOfClusterPhi(i, j)", grandDaughterDiffOfClusterPhi,
-                      "Returns the difference in :math:`\\phi` between the ECLClusters of the daughters of the two given daughters. The unit of the angle is ``rad``.\n"
-                      "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("grandDaughterDiffOfClusterPhi", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
-                      "Returns the difference in :math:`\\phi` between the two given daughters in the CMS frame. The unit of the angle is ``rad``.\n"
-                      "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("daughterDiffOfPhiCMS", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("mcDaughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
-                      "MC matched version of the `daughterDiffOfPhiCMS` function. The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("mcDaughterDiffOfPhiCMS", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
-    REGISTER_METAVARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
-                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame. The unit of the angle is ``rad``.\n"
-                      "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i``.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.", Manager::VariableDataType::c_double);
-    MAKE_DEPRECATED("daughterDiffOfClusterPhiCMS", true, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
                       "E.g. ``daughterNormDiffOf(0, 1, p)`` returns the normalized momentum difference between first and second daughter in the lab frame.", Manager::VariableDataType::c_double);
@@ -3684,6 +3731,42 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
                       "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
                       "E.g. ``daughterMotherNormDiffOf(1, p)`` returns the normalized momentum difference between the given particle and its second daughter in the lab frame.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("angleBetweenDaughterAndRecoil(daughterIndex_1, daughterIndex_2, ... )", angleBetweenDaughterAndRecoil, R"DOC(
+                       Returns the angle between the momentum recoiling against the particle and the sum of the momenta of the given daughters.
+                       The unit of the angle is ``rad``.
+
+                       The particles are identified via generalized daughter indexes, which are simply colon-separated lists of
+                       daughter indexes, ordered starting from the root particle. For example, ``0:1:3``  identifies the fourth
+                       daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply
+                       identifies the second daughter of the root particle.
+
+                       At least one generalized index has to be given to ``angleBetweenDaughterAndRecoil``. 
+
+                       .. tip::
+                           ``angleBetweenDaughterAndRecoil(0)`` will return the angle between pRecoil and the momentum of the first daughter.
+
+                           ``angleBetweenDaughterAndRecoil(0, 1)`` will return the angle between pRecoil and the sum of the momenta of the first and second daughter.
+
+                           ``angleBetweenDaughterAndRecoil(0:0, 3:0)`` will return the angle between pRecoil and the sum of the momenta of the: first daughter of the first daughter, and
+                           the first daughter of the fourth daughter.)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("angleBetweenDaughterAndMissingMomentum(daughterIndex_1, daughterIndex_2, ... )", angleBetweenDaughterAndMissingMomentum, R"DOC(
+                      Returns the angle between the missing momentum in the event and the sum of the momenta of the given daughters.
+                      The unit of the angle is ``rad``. EventKinematics module has to be called to use this.
+
+                      The particles are identified via generalized daughter indexes, which are simply colon-separated lists of
+                      daughter indexes, ordered starting from the root particle. For example, ``0:1:3``  identifies the fourth
+                      daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply
+                      identifies the second daughter of the root particle.
+
+                      At least one generalized index has to be given to ``angleBetweenDaughterAndMissingMomentum``. 
+
+                      .. tip::
+                          ``angleBetweenDaughterAndMissingMomentum(0)`` will return the angle between missMom and the momentum of the first daughter.
+
+                          ``angleBetweenDaughterAndMissingMomentum(0, 1)`` will return the angle between missMom and the sum of the momenta of the first and second daughter.
+
+                          ``angleBetweenDaughterAndMissingMomentum(0:0, 3:0)`` will return the angle between missMom and the sum of the momenta of the: first daughter of the first daughter, and
+                          the first daughter of the fourth daughter.)DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("daughterAngle(daughterIndex_1, daughterIndex_2[, daughterIndex_3])", daughterAngle, R"DOC(
                        Returns the angle in between any pair of particles belonging to the same decay tree.
                        The unit of the angle is ``rad``.
@@ -3789,6 +3872,9 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "The first variable is returned if the particle passes the cut, and the second variable is returned otherwise.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pValueCombination(p1, p2, ...)", pValueCombination,
                       "Returns the combined p-value of the provided p-values according to the formula given in `Nucl. Instr. and Meth. A 411 (1998) 449 <https://doi.org/10.1016/S0168-9002(98)00293-9>`_ .\n"
+                      "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("pValueCombinationOfDaughters(variable)", pValueCombinationOfDaughters,
+                      "Returns the combined p-value of the daughter p-values according to the formula given in `Nucl. Instr. and Meth. A 411 (1998) 449 <https://doi.org/10.1016/S0168-9002(98)00293-9>`_ .\n"
                       "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
@@ -3911,6 +3997,8 @@ Ancestor type can be set up by PDG code or by particle name (check evt.pdl for v
     REGISTER_METAVARIABLE("nTrackFitResults(particleType)", nTrackFitResults,
 			  "[Eventbased] Returns the total number of TrackFitResults for a given particleType. The argument can be the name of particle (e.g. pi+) or PDG code (e.g. 211).",
 			  Manager::VariableDataType::c_int);
+
+    REGISTER_METAVARIABLE("convertToDaughterIndex(variable)", convertToDaughterIndex, R"DOC(Converts the variable of the given particle into integer and returns it if it is a valid daughter index, else returns -1.)DOC", Manager::VariableDataType::c_int);
 
   }
 }

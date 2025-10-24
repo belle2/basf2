@@ -245,7 +245,6 @@ void ECLPackerModule::event()
       nShapers = m_eclMapper.getNShapersInCrate(iCrate);
       if (!nShapers) B2ERROR("Ecl packer:: Wrong shapers number " << nShapers);
 
-      if (!shaperMaskArray[iCrate - 1]) continue;
       B2DEBUG(200, "Pack data for iCrate = " << iCrate << " nShapers = " << nShapers);
 
       // write EclCollector header to the buffer

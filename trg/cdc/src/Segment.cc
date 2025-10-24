@@ -538,6 +538,19 @@ namespace Belle2 {
     }
     return ptn;
   }
+  vector<float>
+  TRGCDCSegment::hitPatternTime() const
+  {
+    vector<float> timeptn;
+    for (unsigned i = 0; i < _wires.size(); i++) {
+      const TRGSignal& s = _wires[i]->signal();
+      if (s.active())
+        timeptn.push_back(s[0]->time());
+      else
+        timeptn.push_back(-1);
+    }
+    return timeptn;
+  }
 
   unsigned
   TRGCDCSegment::hitPattern_adc() const

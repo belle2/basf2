@@ -401,8 +401,10 @@ class BtoEtapRhop(BaseSkim):
     """
     Reconstructed decay mode:
 
-    * :math:`B^{+}\\to \\eta^{prime} (\\to \\pi^{+} \\pi^{-} \\eta (\\to \\gamma \\gamma) ) \\rho^{+} (\\pi^{+} \\pi^{0}) `
-    * :math:`B^{+}\\to \\eta^{prime} (\\to \\rho^{0} (\\to \\pi^{+} \\pi^{-}) \\gamma ) \\rho^{+} (\\pi^{+} \\pi^{0}) `
+    * :math:`B^{+}\\to \\eta^{'} (\\to \\pi^{+} \\pi^{-}
+      \\eta (\\to \\gamma \\gamma) ) \\rho^{+} (\\pi^{+} \\pi^{0})`
+    * :math:`B^{+}\\to \\eta^{'} (\\to \\rho^{0} (\\to \\pi^{+}
+      \\pi^{-}) \\gamma ) \\rho^{+} (\\pi^{+} \\pi^{0})`
 
     Cuts applied:
 
@@ -438,8 +440,11 @@ class BtoEtapRhop(BaseSkim):
                             '0.8 < M < 1.1', 1, path=path)
         ma.reconstructDecay("eta\':b2etaprhop_loose2 -> rho0:b2etaprhop_pipi gamma:tight",
                             '0.8 < M < 1.1', 2, path=path)
-        ma.copyLists("eta\':b2etaprhop_loose", ["eta\':b2etaprhop_loose1", "eta\':b2etaprhop_loose2"], path=path)
-        ma.reconstructDecay('rho+:b2etaprhop_loose -> pi+:SkimHighEff pi0:eff40_May2020', '0.47 < M < 1.15', path=path)
-        ma.reconstructDecay("B+:Charmless_b2etaprhop -> eta\':b2etaprhop_loose rho+:b2etaprhop_loose", Bcuts, path=path)
+        ma.copyLists("eta\':b2etaprhop_loose", ["eta\':b2etaprhop_loose1", "eta\':b2etaprhop_loose2"],
+                     path=path)
+        ma.reconstructDecay('rho+:b2etaprhop_loose -> pi+:SkimHighEff pi0:eff40_May2020', '0.47 < M < 1.15',
+                            path=path)
+        ma.reconstructDecay("B+:Charmless_b2etaprhop -> eta\':b2etaprhop_loose rho+:b2etaprhop_loose",
+                            Bcuts, path=path)
         BsigList.append("B+:Charmless_b2etaprhop")
         return BsigList

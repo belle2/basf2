@@ -112,14 +112,18 @@ void DQMHistAnalysisSVDUnpackerModule::event()
     Int_t nYbins = h->GetYaxis()->GetNbins();
 
     //test ERROR:
-    // h->SetBinContent(10, 20, 10000000);
+//     h->SetBinContent(10, 20, 1000000);
+//     h->SetBinContent(10, 40, 10000000);
 
-    Float_t counts = 0;
+    Float_t maxCnts = 0;
     bool hasError = false;
     for (int i = 0; i < nXbins - 1; ++i) { // exclude SEU recovery
       for (int j = 0; j < nYbins; ++j) {
-        counts += h->GetBinContent(i + 1, j + 1);
-        if (h->GetBinContent(i + 1, j + 1) / nEvents > m_unpackError) {
+        Float_t counts = h->GetBinContent(i + 1, j + 1);
+        if (counts > maxCnts)
+          maxCnts = counts;
+
+        if (counts / nEvents > m_unpackError) {
           hasError = true;
         }
       }
@@ -137,7 +141,7 @@ void DQMHistAnalysisSVDUnpackerModule::event()
       setStatusOfCanvas(error, m_cUnpacker, true);
     }
     if (nEvents > 0)
-      setEpicsPV("UnpackError", counts / nEvents);
+      setEpicsPV("UnpackError", maxCnts / nEvents);
   } else {
     B2INFO("Histogram SVDUnpacker/DQMUnpackerHisto from SVDUnpackerDQM not found!");
     m_cUnpacker->cd();

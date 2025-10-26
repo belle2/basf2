@@ -103,7 +103,7 @@ void DQMHistAnalysisSVDUnpackerModule::event()
   Float_t nEvents = hnEvnts->GetEntries();
 
   //check DATA FORMAT
-  TH2* h = (TH2*)findHist("SVDUnpacker/DQMUnpackerHisto");
+  auto h = findHist("SVDUnpacker/DQMUnpackerHisto");
 
   if (h != NULL) {
     h->SetTitle(Form("SVD Data Format Monitor %s", runID.Data()));

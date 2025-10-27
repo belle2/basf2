@@ -11,6 +11,7 @@
 import keras
 
 
+@keras.saving.register_keras_serializable(package="MyLayers")
 class MyConcatenate(keras.layers.Layer):
     """Concatenate the 3D input tensors and their 2D masks along the axis=1 dimension."""
 

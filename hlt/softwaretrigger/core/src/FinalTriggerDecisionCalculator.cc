@@ -109,3 +109,4 @@ SoftwareTriggerCutResult FinalTriggerDecisionCalculator::getModuleResult(const S
     }
   }
 }
+

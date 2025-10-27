@@ -15,7 +15,8 @@ args = setup_basf2_and_db()
 
 path = start_path(args, location=constants.Location.hlt)
 add_hlt_processing(path, run_type=constants.RunTypes.beam,
-                   softwaretrigger_mode=constants.SoftwareTriggerModes.filter)
+                   softwaretrigger_mode=constants.SoftwareTriggerModes.filter,
+                   hlt_prefilter_mode=constants.HLTPrefilterModes.monitor)
 finalize_path(path, args, location=constants.Location.hlt)
 
 basf2.print_path(path)

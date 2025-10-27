@@ -15,7 +15,15 @@
 #include <string>
 #include "TH1F.h"
 
+#include <framework/datastore/StoreObjPtr.h>
+
 namespace Belle2 {
+
+// Forward declarations
+//template <class T> class StoreObjPtr;
+  class SoftwareTriggerResult;
+  class TRGSummary;
+  class ParticleList;
 
   /**
    * Physics objects DQM module.
@@ -104,6 +112,30 @@ namespace Belle2 {
 
     /** Name of the pi hadron particle list */
     std::string m_hadbphysDQM = "";
+
+    /** Objects relevant to HLTprefilter monitoring */
+
+    /**  Store Object with the trigger result */
+    StoreObjPtr<TRGSummary> m_l1Trigger;
+
+    /** Trigger identifier string used to select events for HLTprefilter histograms */
+    std::string m_triggerIdentifierHLT = "";
+
+    /** Histograms for Ks */
+    TH1F* m_h_nKshortAllH = nullptr; /** Histogram for Ks events */
+    TH1F* m_h_nKshortActiveH = nullptr; /** Histogram for Ks events : active veto */
+    TH1F* m_h_nKshortActiveNotTimeH = nullptr; /** Histogram for Ks events : && active veto && !timing cut */
+    TH1F* m_h_nKshortActiveNotCDCECLH = nullptr; /* Histogram for Ks events : && active veto && !cdcecl cut */
+
+    /** HLTPriflter lines */
+    std::string m_prefilter_Injection_Strip = "software_trigger_cut&filter&prefilter_InjectionStrip"; /** Timing cut for prefilter */
+    std::string m_prefilter_CDCECL_Cut =
+      "software_trigger_cut&filter&prefilter_CDCECLthreshold"; /** CDC-ECL occupancy cut for prefilter */
+
+    /** Flags for HLTPriflter lines */
+    bool m_TimingCut = false; /** Flag for timing cut on injection strip */
+    bool m_CDCECLCut = false; /** Flag for CDC-ECL occupancy cut */
+
   };
 
 } // end namespace Belle2

@@ -11,6 +11,12 @@
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
 
+// RooFit forward declarations
+class RooRealVar;
+class RooGaussian;
+class RooChebychev;
+class RooAddPdf;
+
 namespace Belle2 {
 
   /**
@@ -56,6 +62,20 @@ namespace Belle2 {
 
     MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
 
+    RooRealVar* m_KsInvMass = nullptr; /**<Invariant mass of KS for HLTPrefilter monitoring*/
+    RooRealVar* m_mean1 = nullptr; /**<*Mean of first gaussian*/
+    RooRealVar* m_sigma1 = nullptr; /**<*Sigma of second gaussian*/
+    RooGaussian* m_gauss1 = nullptr; /**<First gaussian*/
+    RooRealVar* m_mean2 = nullptr; /**<Mean of first gaussian*/
+    RooRealVar* m_sigma2 = nullptr; /**<*Sigma of second gaussian*/
+    RooGaussian* m_gauss2 = nullptr; /**<Second gaussian*/
+    RooRealVar* m_frac = nullptr; /**<*Fraction of first gaussian in double gaussian*/
+    RooAddPdf* m_double_gauss = nullptr; /**<Sum of two gaussian*/
+    RooRealVar* m_slope = nullptr; /**<Slope for first order polynomial*/
+    RooChebychev* m_chebpol = nullptr; /**<First order polynomial*/
+    RooRealVar* m_sig = nullptr; /**<Number of Ks events from fit*/
+    RooRealVar* m_bkg = nullptr; /**<Number of background from fit*/
+    RooAddPdf*  m_KsPdf = nullptr; /**<Fit PDF for Ks invariant mass*/
   };
 
 } // Belle2 namespace

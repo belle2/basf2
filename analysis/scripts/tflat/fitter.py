@@ -14,7 +14,7 @@ import numpy as np
 import ROOT
 
 
-def fit(model, filename, treename, variables, target_variable, config):
+def fit(model, filename, treename, variables, target_variable, config, checkpoint_filepath):
 
     # read training data from file
     with uproot.open({filename: treename}) as tree:
@@ -38,28 +38,7 @@ def fit(model, filename, treename, variables, target_variable, config):
     rng = np.random.default_rng(42)
     rng.shuffle(y)
 
-    # configure the optimizer
-    cosine_decay_scheduler = keras.optimizers.schedules.CosineDecay(
-        initial_learning_rate=config['initial_learning_rate'],
-        decay_steps=config['decay_steps'],
-        alpha=config['alpha']
-    )
-
-    optimizer = keras.optimizers.AdamW(
-        learning_rate=cosine_decay_scheduler, weight_decay=config['weight_decay']
-    )
-
-    # compile the model
-    model.compile(
-        optimizer=optimizer,
-        loss=keras.losses.binary_crossentropy,
-        metrics=[
-            'accuracy',
-            keras.metrics.AUC()])
-
-    model.summary()
-
-    # perform fit() with early stopping callback
+    # configure early stopping callback
     callbacks = [keras.callbacks.EarlyStopping(
         monitor='val_loss',
         min_delta=0,
@@ -69,6 +48,15 @@ def fit(model, filename, treename, variables, target_variable, config):
         baseline=None,
         restore_best_weights=True)]
 
+    # configure checkpointing callback
+    model_checkpoint_callback = keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_filepath,
+        monitor='val_loss',
+        mode='min',
+        save_best_only=True)
+    callbacks.append(model_checkpoint_callback)
+
+    # perform fit() with callbacks
     model.fit(
         X,
         y,

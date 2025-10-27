@@ -10,6 +10,7 @@
 
 import os
 import ROOT
+import argparse
 
 os.environ["KERAS_BACKEND"] = "torch"
 
@@ -17,14 +18,42 @@ os.environ["KERAS_BACKEND"] = "torch"
 if __name__ == "__main__":
 
     import torch
-
+    import keras
     from tflat.tensorflow_tflat_model import get_tflat_model
     from tflat.fitter import fit
     from tflat.config import config
     from tflat.utils import get_variables
     from basf2_mva_util import create_onnx_mva_weightfile
 
-    train_file = "/home/benjamin/dft/tflat_tools/merged.root"
+    # parse cli arguments
+    parser = argparse.ArgumentParser(description='Train TFlat')
+    parser.add_argument(  # input parser
+        '--input',
+        metavar='input',
+        dest='input',
+        type=str,
+        default="dummyin.root",
+        help='Path to training root file'
+    )
+    parser.add_argument(  # checkpoint parser
+        '--checkpoint',
+        metavar='checkpoint',
+        dest='checkpoint',
+        type=str,
+        nargs='+',
+        default="./ckpt/checkpoint.model.keras",
+        help='Path to checkpoints'
+    )
+    parser.add_argument(
+        '--warmstart',
+        help='Start from checkpoint',
+        action=argparse.BooleanOptionalAction
+    )
+    args = parser.parse_args()
+
+    train_file = args.input
+    checkpoint_filepath = args.checkpoint
+    warmstart = args.warmstart
 
     parameters = config['parameters']
     rank_variable = 'p'
@@ -35,14 +64,43 @@ if __name__ == "__main__":
     variables += get_variables('gamma:tflat', rank_variable, ecl_variable_list, particleNumber=parameters['num_ecl'])
     variables += get_variables('pi+:tflat', rank_variable, roe_variable_list, particleNumber=parameters['num_roe'])
 
-    model = get_tflat_model(parameters=parameters, number_of_features=len(variables))
+    if not warmstart:
+        if os.path.isfile(checkpoint_filepath):
+            os.remove(checkpoint_filepath)
+
+        model = get_tflat_model(parameters=parameters, number_of_features=len(variables))
+
+        # configure the optimizer
+        cosine_decay_scheduler = keras.optimizers.schedules.CosineDecay(
+            initial_learning_rate=config['initial_learning_rate'],
+            decay_steps=config['decay_steps'],
+            alpha=config['alpha']
+        )
+
+        optimizer = keras.optimizers.AdamW(
+            learning_rate=cosine_decay_scheduler, weight_decay=config['weight_decay']
+        )
+
+        # compile the model
+        model.compile(
+            optimizer=optimizer,
+            loss=keras.losses.binary_crossentropy,
+            metrics=[
+                'accuracy',
+                keras.metrics.AUC()])
+    else:
+        model = keras.models.load_model(checkpoint_filepath)
+
+    model.summary()
+
     fit(
         model,
         train_file,
         "tflat_variables",
         variables,
         "qrCombined",
-        config
+        config,
+        checkpoint_filepath
     )
 
     torch.onnx.export(

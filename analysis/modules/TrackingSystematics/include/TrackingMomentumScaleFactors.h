@@ -31,6 +31,11 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
+    * Function to be executed at each beginning of a run
+    */
+    virtual void beginRun() override;
+
+    /**
     * Function to be executed at each event
     */
     virtual void event() override;
@@ -50,6 +55,7 @@ namespace Belle2 {
 
     /** input particle lists */
     std::vector<std::string> m_ParticleLists;
+
     /** input momentum scale modifier */
     double m_scale;
 

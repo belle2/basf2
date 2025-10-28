@@ -11,6 +11,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
 #include <analysis/VariableManager/Manager.h>
@@ -56,14 +57,26 @@ void TrackingEnergyLossCorrectionModule::initialize()
     B2FATAL("Neither a valid value for the scale parameter nor a non-empty table name was provided. Please set (exactly) one of the two options!");
   } else if (!m_payloadName.empty()) {
     m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_payloadName);
+  }
+}
 
-    std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
-                                            *m_ParticleWeightingLookUpTable.get())->getAxesNames());
-    for (const auto& i_variable : variables) {
-      const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
-      if (!var) {
-        B2FATAL("Variable '" << i_variable << "' is not available in Variable::Manager!");
-      }
+void TrackingEnergyLossCorrectionModule::beginRun()
+{
+  if (not(m_ParticleWeightingLookUpTable.get())->isValid()) {
+    StoreObjPtr<EventMetaData> evt;
+    B2FATAL("There is not valid payload for this run!"
+            << LogVar("payload", m_payloadName)
+            << LogVar("experiment", evt->getExperiment())
+            << LogVar("run", evt->getRun())
+           );
+  }
+
+  std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
+                                          *m_ParticleWeightingLookUpTable.get())->getAxesNames());
+  for (const auto& i_variable : variables) {
+    const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
+    if (!var) {
+      B2FATAL("Variable '" << i_variable << "' is not available in Variable::Manager!");
     }
   }
 }

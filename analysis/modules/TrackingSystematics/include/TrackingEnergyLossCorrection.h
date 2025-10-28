@@ -31,6 +31,11 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
+    * Function to be executed at each beginning of a run
+    */
+    virtual void beginRun() override;
+
+    /**
     * Function to be executed at each event
     */
     virtual void event() override;

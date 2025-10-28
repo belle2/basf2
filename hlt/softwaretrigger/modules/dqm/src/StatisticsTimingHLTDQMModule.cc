@@ -332,10 +332,10 @@ void StatisticsTimingHLTDQMModule::event()
         bool cdceclcut = false;
 
         if (results.find(HLTprefilter_Injection_Strip) != results.end()) {
-          injStrip = (m_triggerResult->getResult(HLTprefilter_Injection_Strip) == SoftwareTriggerCutResult::c_accept);
+          injStrip = (m_triggerResult->getNonPrescaledResult(HLTprefilter_Injection_Strip) == SoftwareTriggerCutResult::c_accept);
         }
         if (results.find(HLTprefilter_CDCECL_Cut) != results.end()) {
-          cdceclcut = (m_triggerResult->getResult(HLTprefilter_CDCECL_Cut) == SoftwareTriggerCutResult::c_accept);
+          cdceclcut = (m_triggerResult->getNonPrescaledResult(HLTprefilter_CDCECL_Cut) == SoftwareTriggerCutResult::c_accept);
         }
 
         if (!injStrip) {

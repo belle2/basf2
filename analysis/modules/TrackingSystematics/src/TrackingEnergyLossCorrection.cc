@@ -13,6 +13,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/logging/Logger.h>
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>

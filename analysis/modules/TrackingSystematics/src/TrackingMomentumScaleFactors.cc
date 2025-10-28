@@ -13,16 +13,18 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/logging/Logger.h>
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
 
-#include <cmath>
-#include <map>
 #include <TRandom.h>
 #include <Math/Vector4D.h>
+
+#include <cmath>
+#include <map>
 
 using namespace Belle2;
 

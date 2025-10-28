@@ -19,11 +19,11 @@ Decay Upsilon(4S)
 Enddecay
 
 # -------- f0 KS --------
-Decay MyB0
+Decay B0sig
   1         f_0sig    K_S0sig             SSD_CP   dm   0.0   1.0   minusTwoBeta   1.0   0.0   1.0   0.0;
 Enddecay
 
-CDecay MyB0B
+CDecay anti-B0sig
 
 # -------- f0(980) → π0 π0  --------
 Decay f_0sig

@@ -11,4 +11,4 @@
 from hlt.hlt_execution import main
 
 if __name__ == '__main__':
-    exit(main("beam_reco_cosmic_dqm.py"))
+    exit(main("beam_reco_cosmicdqm.py"))

@@ -92,6 +92,7 @@ namespace Belle2 {
     m_productionEventDebugs.registerInDataStore(DataStore::c_DontWriteOut);
     m_productionHitDebugs.registerInDataStore(DataStore::c_DontWriteOut);
     m_templateFitResults.registerInDataStore(m_templateFitResultName, DataStore::c_DontWriteOut);
+    m_injectionVeto.registerInDataStore();
 
     m_rawDigits.registerRelationTo(m_waveforms, DataStore::c_Event, DataStore::c_DontWriteOut);
     m_rawDigits.registerRelationTo(m_templateFitResults, DataStore::c_Event, DataStore::c_DontWriteOut);
@@ -130,6 +131,9 @@ namespace Belle2 {
     m_templateFitResults.clear();
     m_slowData.clear();
     m_interimFEInfos.clear();
+
+    // create injection veto object
+    m_injectionVeto.create();
 
     StoreObjPtr<EventMetaData> evtMetaData;
     for (auto& raw : m_rawData) {
@@ -184,10 +188,10 @@ namespace Belle2 {
             unpackProductionDraft(buffer, bufferSize);
             break;
           case static_cast<int>(TOP::RawDataType::c_ProductionDebug01):
-            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug01, true);
+            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug01, true, evtMetaData->getExperiment());
             break;
           case static_cast<int>(TOP::RawDataType::c_ProductionDebug02):
-            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug02, true);
+            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug02, true, evtMetaData->getExperiment());
             break;
 
           default:
@@ -815,7 +819,7 @@ namespace Belle2 {
 
 
   int TOPUnpackerModule::unpackProdDebug(const int* buffer, int bufferSize, TOP::RawDataType dataFormat,
-                                         bool pedestalSubtracted)
+                                         bool pedestalSubtracted, int expNo)
   {
 
     B2DEBUG(22, "Unpacking Production firmware debug data format to TOPRawDigits "
@@ -875,6 +879,8 @@ namespace Belle2 {
     unsigned int PSBypass = (word >> 27) & 0x7;
     unsigned int evtCtime = (word >> 16) & 0x7FF;
     unsigned int evtRevo9Counter = word & 0xFFFF;
+
+    if (expNo > 36) m_injectionVeto->set(injVetoFlag); // before this experiment the bit field is not used and may not be correctly set
 
     B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec

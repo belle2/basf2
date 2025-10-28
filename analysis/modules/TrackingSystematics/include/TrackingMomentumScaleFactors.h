@@ -10,6 +10,10 @@
 
 #include <framework/core/Module.h>
 
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace Belle2 {
   template<class T> class DBObjPtr;
   class Particle;
@@ -18,7 +22,7 @@ namespace Belle2 {
   /**
   * Tracking momentum systematics module: allows for the application of a corrective momentum scale factor which is read from a ParticleWeightingLookUpTable payload
   */
-  class TrackingMomentumScaleFactorsModule : public Module {
+  class TrackingMomentumScaleFactorsModule final : public Module {
   public:
     /**
     * Constructor: Sets the description, the properties and the parameters of the module.
@@ -28,17 +32,17 @@ namespace Belle2 {
     /**
     * Initializes the modules and checks the validity of the input parameters
     */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
     * Function to be executed at each beginning of a run
     */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
     * Function to be executed at each event
     */
-    virtual void event() override;
+    void event() override;
 
   private:
     /**

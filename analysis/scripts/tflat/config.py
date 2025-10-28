@@ -54,7 +54,7 @@ config.update({  # Input lists
         'countInList(gamma:tflat)/8',
         'countInList(pi+:tflat)/6',
         'NumberOfKShortsInRoe',
-        'isPXDOn',
+        # 'isPXDOn',
         'ptTracksRoe('+maskName+')',
     ],
 })

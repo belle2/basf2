@@ -27,7 +27,7 @@ Enddecay
 CDecay anti-B0sig
 
 # -------- K*0(892) → K_S0 π0 --------
-Decay MyKst0
+Decay K*0sig
   1.0000     K_S0sig  pi0sig             VSS;
 Enddecay
 

@@ -31,7 +31,7 @@
 #include <RooCategory.h>
 #include <RooArgSet.h>
 #include <RooConstVar.h>
-
+#include <RooDataHist.h>
 
 using namespace std;
 using namespace Belle2;

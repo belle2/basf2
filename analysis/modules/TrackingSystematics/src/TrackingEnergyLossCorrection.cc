@@ -65,7 +65,7 @@ void TrackingEnergyLossCorrectionModule::beginRun()
 {
   if (not(m_ParticleWeightingLookUpTable.get())->isValid()) {
     StoreObjPtr<EventMetaData> evt;
-    B2FATAL("There is not valid payload for this run!"
+    B2FATAL("There is no valid payload for this run!"
             << LogVar("payload", m_payloadName)
             << LogVar("experiment", evt->getExperiment())
             << LogVar("run", evt->getRun())

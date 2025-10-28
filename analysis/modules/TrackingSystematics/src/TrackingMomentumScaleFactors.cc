@@ -66,21 +66,23 @@ void TrackingMomentumScaleFactorsModule::initialize()
 
 void TrackingMomentumScaleFactorsModule::beginRun()
 {
-  if (not(m_ParticleWeightingLookUpTable.get())->isValid()) {
-    StoreObjPtr<EventMetaData> evt;
-    B2FATAL("There is no valid payload for this run!"
-            << LogVar("payload", m_payloadName)
-            << LogVar("experiment", evt->getExperiment())
-            << LogVar("run", evt->getRun())
-           );
-  }
+  if (m_ParticleWeightingLookUpTable != nullptr) {
+    if (not(*m_ParticleWeightingLookUpTable.get()).isValid()) {
+      StoreObjPtr<EventMetaData> evt;
+      B2FATAL("There is no valid payload for this run!"
+              << LogVar("payload", m_payloadName)
+              << LogVar("experiment", evt->getExperiment())
+              << LogVar("run", evt->getRun())
+             );
+    }
 
-  std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
-                                          *m_ParticleWeightingLookUpTable.get())->getAxesNames());
-  for (const auto& i_variable : variables) {
-    const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
-    if (!var) {
-      B2FATAL("Variable '" << i_variable << "' is not available in Variable::Manager!");
+    std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
+                                            *m_ParticleWeightingLookUpTable.get())->getAxesNames());
+    for (const auto& i_variable : variables) {
+      const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
+      if (!var) {
+        B2FATAL("Variable '" << i_variable << "' is not available in Variable::Manager!");
+      }
     }
   }
 }
@@ -177,6 +179,4 @@ void TrackingMomentumScaleFactorsModule::setMomentumScalingFactor(Particle* part
       particle->setMomentumSmearingFactor(getSmearingFactor(particle));
     }
   }
-
-
 }

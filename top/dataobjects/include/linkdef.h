@@ -28,6 +28,7 @@
 #pragma link C++ class Belle2::TOPAsicMask+; // checksum=0xacc40676, version=1
 #pragma link C++ class Belle2::TOPAssociatedPDF+; // checksum=0xc79734f7, version=2
 #pragma link C++ class Belle2::TOPLikelihoodScanResult+; // checksum=0x2835bf5d, version=1
+#pragma link C++ class Belle2::TOPInjectionVeto+; // checksum=0xda247f4e, version=1
 
 // schema evolution rules to allow reading of old class versions
 

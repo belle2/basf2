@@ -38,9 +38,9 @@ namespace Belle2 {
 
     /**
      * Returns the veto flag.
-     * @return TOP injection veto flag
+     * @return true, if TOP injection veto flag is set
      */
-    bool get() const {return m_flag;}
+    bool isSet() const {return m_flag;}
 
   private:
 

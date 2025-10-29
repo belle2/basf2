@@ -253,7 +253,7 @@ bool BGOverlayInputModule::registerBranches()
 
   // StoreObjPointers have to be included explicitly
   const std::set<std::string> objPtrNames = {"Belle2::ECLWaveforms", "Belle2::PXDInjectionBGTiming", "Belle2::EventLevelTriggerTimeInfo",
-                                             "Belle2::TRGSummary"
+                                             "Belle2::TRGSummary", "Belle2::TOPInjectionVeto"
                                             };
 
   const TObjArray* branches = m_tree->GetListOfBranches();

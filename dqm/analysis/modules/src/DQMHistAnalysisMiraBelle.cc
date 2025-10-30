@@ -114,6 +114,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   auto* hist_klmTotalBarrelHits = findHist("PhysicsObjectsMiraBelle/hist_klmTotalBarrelHits");
   auto* hist_klmTotalEndcapHits = findHist("PhysicsObjectsMiraBelle/hist_klmTotalEndcapHits");
   auto* hist_dPhicms = findHist("PhysicsObjectsMiraBelle/hist_dPhicms");
+  auto* hist_hltEff = findHist("PhysicsObjectsMiraBelle/hist_hltEff");
 
   if (hist_npxd == nullptr) {
     B2ERROR("Can not find the hist_npxd histogram!");
@@ -215,6 +216,11 @@ void DQMHistAnalysisMiraBelleModule::endRun()
     B2ERROR("Can not find the hist_dPhicms histogram!");
     return;
   }
+  if (hist_hltEff == nullptr) {
+    B2ERROR("Can not find the hist_dPhicms histogram!");
+    return;
+  }
+
 
   // Make TCanvases
   // --- Mumu_Main
@@ -323,6 +329,10 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   double pull_mumumass = (fit_mumumass - m_reference_mumu) / fit_mumumass_error;
   double fit_sigma_mumu = f_mumuInvM->GetParameter(2);
 
+  // Variables needed for selectmumu efficiency in HLT
+  double Nmumu_ECLMuonPair = hist_hltEff->GetBinContent(2);
+  double Nmumu_ECLMuonPairSelectmumu = hist_hltEff->GetBinContent(3);
+
   // set values
   mon_mumu->setVariable("mean_npxd", mean_npxd);
   mon_mumu->setVariable("mean_nsvd", mean_nsvd);
@@ -362,6 +372,8 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_mumu->setVariable("fit_mumumass_error", fit_mumumass_error);
   mon_mumu->setVariable("pull_mumumass", pull_mumumass);
   mon_mumu->setVariable("sigma_mumumass", fit_sigma_mumu);
+  mon_mumu->setVariable("Nmumu_ECLMuonPair", Nmumu_ECLMuonPair);
+  mon_mumu->setVariable("Nmumu_ECLMuonPairSelectmumu", Nmumu_ECLMuonPairSelectmumu);
 
   // ========== D*
   // get existing histograms produced by DQM modules

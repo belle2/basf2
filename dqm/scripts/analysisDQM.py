@@ -80,6 +80,7 @@ def add_mirabelle_dqm(path):
     """
     # Software Trigger to divert the path
     MiraBelleMumu_path = b2.create_path()
+    MiraBelleZ0_path = b2.create_path()
     MiraBelleDst1_path = b2.create_path()
     MiraBelleNotDst1_path = b2.create_path()
     MiraBelleDst2_path = b2.create_path()
@@ -93,6 +94,13 @@ def add_mirabelle_dqm(path):
         resultOnMissing=0,
     )
     trigger_skim_mumutight.if_value("==1", MiraBelleMumu_path, b2.AfterConditionPath.CONTINUE)
+
+    trigger_skim_singlemuon = path.add_module(
+        "TriggerSkim",
+        triggerLines=["software_trigger_cut&filter&single_muon"],
+        resultOnMissing=0,
+    )
+    trigger_skim_singlemuon.if_value("==1", MiraBelleZ0_path, b2.AfterConditionPath.CONTINUE)
 
     trigger_skim_dstar_1 = path.add_module(
         "TriggerSkim",
@@ -135,6 +143,13 @@ def add_mirabelle_dqm(path):
     MiraBelleMumu.param('MuPListName', 'mu+:physMiraBelle')
     MiraBelleMumu.param('MuMuPListName', 'Upsilon:physMiraBelle')
     MiraBelleMumu_path.add_module(MiraBelleMumu)
+
+    # MiraBelle Z0 path
+    ma.fillParticleList('mu+:physMiraBelleZ0', 'abs(dr) < 2 and abs(dz) < 5', path=MiraBelleZ0_path)
+    ma.reconstructDecay('Z0:physMiraBelle -> mu+:physMiraBelleZ0 mu-:physMiraBelleZ0',
+                        'nCleanedTracks(abs(dr) < 2 and abs(dz) < 5) and M < 12', path=MiraBelleZ0_path)
+    MiraBelleMumu.param('Z0PListName', 'Z0:physMiraBelle')
+    MiraBelleZ0_path.add_module(MiraBelleMumu)
 
     # MiraBelle D* (followed by D0 -> K pi) path
     ma.fillParticleList('pi+:MiraBelleDst1', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst1_path)

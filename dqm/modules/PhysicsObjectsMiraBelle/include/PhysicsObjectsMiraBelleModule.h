@@ -97,6 +97,7 @@ namespace Belle2 {
     TH1F* m_h_Mom = nullptr;/**< histogram for Momentum of muon track */
     TH1F* m_h_dPhicms = nullptr;/**< histogram for phi difference between mu+ and mu- in CMS */
     TH1F* m_h_dThetacms = nullptr;/**< histogram for theta difference between mu+ and mu- in CMS */
+    TH1F* m_h_hltEff = nullptr;/**< histogram for efficiency of selectmumu filter line */
 
     /** Trigger identifier string used to select events for the histograms */
     std::string m_triggerIdentifier = "";
@@ -106,6 +107,10 @@ namespace Belle2 {
 
     /** Name of the mu+mu- (Upsilon) particle list */
     std::string m_mumuPListName = "";
+
+    /** Name of the mu+mu- (Z0) particle list */
+    std::string m_Z0PListName = "";
+
 
   };
 }

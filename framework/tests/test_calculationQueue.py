@@ -11,8 +11,6 @@ from hep_ipython_tools.calculation_queue import CalculationQueue, CalculationQue
 from hep_ipython_tools.tests.fixtures import MockQueue
 
 
-# @cond internal_test
-
 class A:
     pass
 
@@ -70,4 +68,3 @@ class TestCalculationQueue(TestCase):
 
 if __name__ == "__main__":
     main()
-# @endcond

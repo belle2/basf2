@@ -13,9 +13,11 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-#include <map>
 #include <TRandom.h>
 #include <Math/Vector4D.h>
+
+#include <map>
+#include <utility>
 
 using namespace Belle2;
 
@@ -63,7 +65,7 @@ void TrackingEfficiencyModule::event()
       auto particle = particleList->getParticle(iPart);
       unsigned mdstSource = particle->getMdstSource();
       bool remove;
-      if (sourceToRemove.find(mdstSource) !=  sourceToRemove.end()) {
+      if (sourceToRemove.find(mdstSource) != sourceToRemove.end()) {
         // found, use entry
         remove = sourceToRemove.at(mdstSource);
       } else {

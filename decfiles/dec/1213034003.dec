@@ -1,0 +1,46 @@
+# EventType: 1213034003 
+# Descriptor: B+ -> anti-D*0 [-> anti-D0 (-> K+ pi-) pi0] rho+ (-> pi+ pi0)
+# NickName: B0_Dsrho_D0pi0_Kpi
+# Documentation:  
+# Tested: Yes
+# PhysicsWG: BHadronic
+# Responsible: Xiang Zhao
+# Email: xiangzhao@mail.nankai.edu.cn
+# Cuts: None
+# Date: 2025/09/08
+
+Alias pi0sig pi0 
+Alias rho-sig rho- 
+Alias rho+sig rho+ 
+ChargeConj rho+sig rho-sig 
+
+Decay Upsilon(4S) 
+0.5 B+sig B- PHOTOS VSS; 
+0.5 B+ B-sig PHOTOS VSS; 
+Enddecay 
+
+Decay B-sig 
+1.00 D*0sig rho-sig PHOTOS SVV_HELAMP 0.228 0.95 0.932 0 0.283 1.13; 
+Enddecay 
+CDecay B+sig 
+
+Decay D*0sig 
+1.00 D0sig pi0sig PHOTOS VSS; 
+Enddecay 
+CDecay anti-D*0sig 
+
+Decay rho-sig 
+1.00 pi- pi0sig PHOTOS VSS; 
+Enddecay 
+CDecay rho+sig 
+
+Decay D0sig 
+0.03947 K- pi+ PHOTOS PHSP; 
+Enddecay 
+CDecay anti-D0sig 
+
+Decay pi0sig 
+1.000 gamma gamma PHSP; 
+Enddecay 
+
+End

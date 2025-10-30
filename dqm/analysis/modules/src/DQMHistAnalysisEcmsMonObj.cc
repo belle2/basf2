@@ -153,9 +153,9 @@ TCanvas*  DQMHistAnalysisEcmsMonObjModule::plotArgusFit(RooDataHist* dataE, RooA
   l->SetLineWidth(3);
   l->Draw();
 
+  gROOT->SetBatch(isBatch);
 
   return c1;
-  gROOT->SetBatch(isBatch);
 }
 
 

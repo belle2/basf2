@@ -804,7 +804,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("logLScanMassLowerInterval", TOPVariable::getLogLScanMassLowerInterval,
                       "Lower edge of the mass interval determined by the LL scan. Requires TOPLLScanner in the processing path.");
     REGISTER_VARIABLE("logLScanThreshold", TOPVariable::getLogLScanThreshold,
-                      "Cherenkov threshold determind by the LL scan. Requires TOPLLScanner in the processing path.");
+                      "Cherenkov threshold determined by the LL scan. Requires TOPLLScanner in the processing path.");
     REGISTER_VARIABLE("logLScanExpectedSignalPhotons", TOPVariable::getLogLScanExpectedSignalPhotons,
                       "Expected signal photon yield at the LL maximum. Requires TOPLLScanner in the processing path.");
 

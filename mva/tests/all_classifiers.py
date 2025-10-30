@@ -8,6 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+import base64
 import basf2_mva
 import basf2
 from subprocess import PIPE, run
@@ -16,6 +17,17 @@ import b2test_utils
 variables = ['p', 'pz', 'daughter(0, p)', 'daughter(0, pz)', 'daughter(1, p)', 'daughter(1, pz)',
              'chiProb', 'dr', 'dz', 'daughter(0, dr)', 'daughter(1, dr)', 'daughter(0, chiProb)', 'daughter(1, chiProb)',
              'daughter(0, kaonID)', 'daughter(0, pionID)', 'daughterAngle(0, 1)']
+
+# base64-encoded ONNX model in mva/methods/tests/ONNX.xml
+# created from mva/methods/tests/test_write_onnx.py
+onnx_model_b64 = (
+    b'CAgSB3B5dG9yY2gaBTIuMi4yOv8BCloKBWlucHV0CgZ3ZWlnaHQKBGJpYXMSBm9'
+    b'1dHB1dBoFL0dlbW0iBEdlbW0qDwoFYWxwaGEVAACAP6ABASoOCgRiZXRhFQAAgD'
+    b'+gAQEqDQoGdHJhbnNCGAGgAQISCm1haW5fZ3JhcGgqUAgBCBAQAUIGd2VpZ2h0S'
+    b'kC4r0M+4XpUPo4GcL16Nms+93VgvTtwTj3ZPfm9vVIWPoqwYT42zTu+5INePlux'
+    b'Pz3/IT0+utoKPbTI9j28lhC9KhAIARABQgRiaWFzSgQmU0U+WhcKBWlucHV0Eg4'
+    b'KDAgBEggKAggBCgIIEGIYCgZvdXRwdXQSDgoMCAESCAoCCAEKAggBQgIQEQ=='
+)
 
 if __name__ == "__main__":
 
@@ -42,6 +54,7 @@ if __name__ == "__main__":
         ('Python_xgb.xml', basf2_mva.PythonOptions(), 'xgboost'),
         ('Python_tensorflow.xml', basf2_mva.PythonOptions(), 'tensorflow'),
         ('Python_torch.xml', basf2_mva.PythonOptions(), 'torch'),
+        ('ONNX.xml', basf2_mva.ONNXOptions(), None),
     ]
 
     # we create payloads so let's switch to an empty, temporary directory
@@ -50,6 +63,11 @@ if __name__ == "__main__":
             general_options.m_identifier = identifier
             if framework is not None:
                 specific_options.m_framework = framework
+            if isinstance(specific_options, type(basf2_mva.ONNXOptions())):
+                # ONNX doesn't do training, so we need to provide a model
+                specific_options.m_modelFilename = "model.onnx"
+                with open("model.onnx", "wb") as f:
+                    f.write(base64.b64decode(onnx_model_b64))
             basf2_mva.teacher(general_options, specific_options)
 
         basf2_mva.expert(basf2_mva.vector(*[i for i, _, _ in methods]),

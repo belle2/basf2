@@ -42,6 +42,7 @@ namespace Belle2 {
       c_HLTCrash = 0x4, /**< The HLT reconstruction crashed in this event or the event before. */
       c_ReconstructionAbort = 0x8,  /**< The event was not reconstructed, e.g. because of too high occupancy. */
       c_HLTDiscard = 0x10,  /**< The HLT discarded the event and only metadata is kept. */
+      c_HLTPrefilterDiscard = 0x20, /**< The HLTPrefilter tagged the event as noisy due to injection background. */
     };
 
     /** Event Setter.

@@ -10,9 +10,9 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <pxd/dataobjects/PXDInjectionBGTiming.h>
 
 namespace Belle2 {
+  class PXDInjectionBGTiming;
 
   /**
    * The module produces a StoreObjPtr of PXDInjectionBGTiming containing PXD timing

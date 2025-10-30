@@ -11,7 +11,7 @@
 """
 <header>
   <output>../1110021010.dst.root</output>
-  <contact>Frank Meier; frank.meier@duke.edu</contact>
+  <contact>Paul Feichtinger; paul.feichtinger@ijs.si</contact>
 </header>
 """
 # Generates and reconstructs 1000 [B0 -> rho0 gamma] decay events for nightly

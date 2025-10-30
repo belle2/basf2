@@ -49,25 +49,6 @@ def chain2dict(chain, tree_columns, dict_columns=None, max_entries=None):
     return d
 
 
-def calculate_roc_auc(p, t):
-    """
-    Deprecated name of ``calculate_auc_efficiency_vs_purity``
-
-    @param p np.array filled with the probability output of a classifier
-    @param t np.array filled with the target (0 or 1)
-    """
-    B2WARNING(
-        "\033[93mcalculate_roc_auc\033[00m has been deprecated and will be removed in future.\n"
-        "This change has been made as calculate_roc_auc returned the area under the efficiency-purity curve\n"
-        "not the efficiency-background retention curve as expected by users.\n"
-        "Please replace calculate_roc_auc with:\n\n"
-        "\033[96mcalculate_auc_efficiency_vs_purity(probability, target[, weight])\033[00m:"
-        " the current definition of calculate_roc_auc\n"
-        "\033[96mcalculate_auc_efficiency_vs_background_retention(probability, target[, weight])\033[00m:"
-        " what is commonly known as roc auc\n")
-    return calculate_auc_efficiency_vs_purity(p, t)
-
-
 def calculate_auc_efficiency_vs_purity(p, t, w=None):
     """
     Calculates the area under the efficiency-purity curve
@@ -290,3 +271,55 @@ class Method:
 
         return (d[str(self.identifier)] if self.general_options.m_nClasses <= 2 else np.array([d[x]
                 for x in output_names]).T), d[stripped_expert_target]
+
+
+def create_onnx_mva_weightfile(onnx_model_path, **kwargs):
+    """
+    Create an MVA Weightfile for ONNX
+
+    Parameters
+    ----------
+    kwargs :
+        keyword arguments to set the options in the weightfile. They are
+        directly mapped to member variable names of the option classes with "m_"
+        added automatically. First, GeneralOptions are tried and the remaining
+        arguments are passed to ONNXOptions.
+
+    Returns
+    -------
+    weightfile :
+        Weightfile object containing the ONNX model and options
+
+    Example:
+    --------
+    >>> weightfile = create_onnx_mva_weightfile(
+    ...    "model.onnx",
+    ...    outputName="probabilities",
+    ...    variables=["variable1", "variable2"],
+    ...    target_variable="isSignal"
+    ...)
+    >>> weightfile.save("model.root")
+    """
+    general_options = basf2_mva.GeneralOptions()
+    onnx_options = basf2_mva.ONNXOptions()
+    general_options.m_method = onnx_options.getMethod()
+
+    # fill everything that exists in general options from kwargs
+    for k, v in list(kwargs.items()):
+        m_k = f"m_{k}"
+        if hasattr(general_options, m_k):
+            setattr(general_options, m_k, v)
+            kwargs.pop(k)
+
+    # for the rest try to set members of specific options
+    for k, v in list(kwargs.items()):
+        m_k = f"m_{k}"
+        if not hasattr(onnx_options, m_k):
+            raise AttributeError(f"No member named {m_k} in ONNXOptions.")
+        setattr(onnx_options, m_k, v)
+
+    w = basf2_mva.Weightfile()
+    w.addOptions(general_options)
+    w.addOptions(onnx_options)
+    w.addFile("ONNX_Modelfile", str(onnx_model_path))
+    return w

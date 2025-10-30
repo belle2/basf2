@@ -207,12 +207,12 @@ in each dataset.
      ``/belle/Data/release-06-01-11/DB00002058/proc13/prod00029825/e0018/4S_offres/r02559/hadron/14120601/udst``
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Remember to set your gbasf2 environment first, otherwise the tool will not be found.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      Executing ``gb2_ds_list /belle/Data/release-06-01-11/DB00002058/proc13/prod00029825/e0018/4S_offres/r02559/hadron/14120601/udst``
      will show you that the dataset contains 1 datablock, ``sub00``.
@@ -245,18 +245,24 @@ key word to list the available data collections.
       `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>`.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Use ``--help`` and ``--usage`` to get all the available options
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      The execution and result from the command line are as follows:
 
      .. code-block:: bash
 
-         gb2_ds_search collection --list_all_collections /belle/collection/Data/Moriond2023*
+         gb2_ds_search collection --list_all_collections /belle/collection/Data/* | grep Moriond2023
+
+.. note::
+
+   ``gb2_ds_search collection --list_all_collections`` expects input of the form ``/belle/collections/<type>/*``, where ``<type`` is ``Data`` or ``MC``. To filter
+   your search further, you can search for keywords by using ``grep``, as shown in the solution above.
+   
 
 You can also do things like list the datasets within a collection with ``gb2_ds_search collection --list_datasets <COLLECTION>`` 
 and get the metadata for the collection with ``gb2_ds_search collection --get_metadata <COLLECTION>``.
@@ -326,19 +332,19 @@ Also, if you want to search uDST skim samples - which are what we will be using 
      uDST skim sample for the decay mode ``B0 -> [D- -> K_S0 pi-]pi+``, with beam background (BGx1) in the simulation.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Search the `basf2`
      `skim registry <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/skim/scripts/skim/registry.py>`_ and look
      at the skim codes and names.
 
 .. admonition:: Another hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      The skim code is ``14120601``.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      The first LFN shown with an ``MC Event type`` of ``mixed`` for skim code ``14120601`` is
      ``/belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013006/e1003/4S/r00000/mixed/14120601/udst``.
@@ -359,12 +365,12 @@ Another way to interact with the dataset searcher is using the command line tool
      level BGx1 using `gb2_ds_search  <BelleDIRAC.Client.gb2_scripts.gb2_ds_search>`.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Use ``--help`` and ``--usage`` to get all the available options
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      The execution and result from the command line are as follows:
 
@@ -482,7 +488,7 @@ After verifying that everything is correct, you can confirm the submission.
      What is the the `basf2` release in the example above?
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      The `basf2` light release is ``light-2311-nebelung``.
 
@@ -519,12 +525,12 @@ After verifying that everything is correct, you can confirm the submission.
      * Submit using gbasf2.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Use the Dataset Searcher to locate MC15rd_b datasets of MC Event Types ``charged``.
 
 .. admonition:: Additional hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      The input dataset may be obtained using
 
@@ -538,7 +544,7 @@ After verifying that everything is correct, you can confirm the submission.
      at the end of the dataset LPN.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      .. code-block:: bash
 
@@ -623,12 +629,12 @@ You should see something like this:
      Monitor the jobs that you have submitted in the previous exercise. Wait until they finish successfully.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Do you see failed jobs? Go to the last section "Dealing with issues".
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      Use the DIRAC web portal and open the Job Monitor. Jobs in green are in 'Done' status, while the failed ones are in red.
 
@@ -680,12 +686,12 @@ To actually download the files, use `gb2_ds_get <BelleDIRAC.Client.gb2_scripts.g
      Download the output of your jobs submitted in a previous exercise. Verify that they are readable using ROOT.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      First check that all your jobs finished successfully. Issues? Go to the next section.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      Just use ``gb2_ds_get <your project name>`` (Easy, right?).
 
@@ -788,12 +794,12 @@ It is also possible to retrieve the log files directly from the command line usi
      Download the output sandbox of one of your jobs. Check what is inside.
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      One of the logs inside may look very familiar.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      The file ``basf2helper.py.log`` contains the actual output of your `basf2` steering file executed on the grid site.
 

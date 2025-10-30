@@ -53,7 +53,7 @@ settings = CalibrationSettings(
                    "maxNumberEvents": 50000000,
                    "payload_boundaries": [],
                    "t0_bhabhaToHadron_correction": 0},
-    produced_payloads=["ECLCrateTimeOffset", "ECLCrystalTimeOffset"])
+    produced_payloads=["ECLCrateTimeOffset", "ECLCrystalTimeOffset", "ECLCrystalTimeOffsetBhabha"])
 
 
 ##############################

@@ -300,7 +300,7 @@ namespace Belle2 {
     StoreArray<TOPRawDigit> m_rawDigits;   /**< collection of raw digits */
     StoreArray<TOPSlowData> m_slowData;   /**< collection of slow data */
     StoreArray<TOPRawWaveform> m_waveforms;   /**< collection of waveforms */
-    StoreArray<TOPInterimFEInfo> m_interimFEInfos;   /**< collection of interim informations */
+    StoreArray<TOPInterimFEInfo> m_interimFEInfos;   /**< collection of interim information */
     StoreArray<TOPProductionEventDebug> m_productionEventDebugs;   /**< collection of event debug data */
     StoreArray<TOPProductionHitDebug> m_productionHitDebugs;   /**< collection of hit debug data */
     StoreArray<TOPTemplateFitResult> m_templateFitResults;   /**< collection of template fit results */

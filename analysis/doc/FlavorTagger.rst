@@ -225,24 +225,24 @@ But technically this is not trivial at all. The variable calculation performs th
 
 The variable has several output values. The meaning  are the following:
 
-  * *-2 (+2)* At least one MC particle that is related to a ROE track is found to be a descendant of MC :math:`B^0_{\rm sig}`:
-    *-2 (+2)* means MC :math:`B^0_{\rm sig}` is a :math:`B^0 (\overline{B}^0)`.
+* *-2 (+2)* At least one MC particle that is related to a ROE track is found to be a descendant of MC :math:`B^0_{\rm sig}`:
+  *-2 (+2)* means MC :math:`B^0_{\rm sig}` is a :math:`B^0 (\overline{B}^0)`.
 
-  * *-1 (+1)* Everything is correctly matched. All MC particles related to ROE tracks are not descendant of MC :math:`B^0_{\rm sig}`:
-    *-1 (+1)* means that the MC neutral :math:`B` on the tag side is a :math:`B^0 (\overline{B}^0)`.
+* *-1 (+1)* Everything is correctly matched. All MC particles related to ROE tracks are not descendant of MC :math:`B^0_{\rm sig}`:
+  *-1 (+1)* means that the MC neutral :math:`B` on the tag side is a :math:`B^0 (\overline{B}^0)`.
 
-  * *0* Wrongly matched :math:`B^0_{\rm sig}`, or correctly matched but no neutral :math:`B` found on the tag side.
-    It means, either there are no tracks in ROE, or among the MC particles
-    (and also their ancestors) that are related to the
-    ROE tracks no neutral :math:`B` particle was found. So, ``B0_isSignal==1`` and ``B0_qrMC==0`` is
-    possible, e.g. for :math:`B\to` final state with only photons, :math:`B\to` invisible, :math:`B\to`
-    photons and few tracks but the tracks outside of the acceptance (or not
-    reconstructed), etc. Very rare things could also happen like there is no
-    related MC particle for the tracks in the ROE. This means that one should use
-    ``abs(B0_qrMC) == 1``, if one wants to filter out good events for evaluation. But
-    one should be very careful, e.g. for some signal channels the MC matching does
-    not work well at all and one could think for an instant that the flavor tagger
-    is under or overestimating the dilution.
+* *0* Wrongly matched :math:`B^0_{\rm sig}`, or correctly matched but no neutral :math:`B` found on the tag side.
+  It means, either there are no tracks in ROE, or among the MC particles
+  (and also their ancestors) that are related to the
+  ROE tracks no neutral :math:`B` particle was found. So, ``B0_isSignal==1`` and ``B0_qrMC==0`` is
+  possible, e.g. for :math:`B\to` final state with only photons, :math:`B\to` invisible, :math:`B\to`
+  photons and few tracks but the tracks outside of the acceptance (or not
+  reconstructed), etc. Very rare things could also happen like there is no
+  related MC particle for the tracks in the ROE. This means that one should use
+  ``abs(B0_qrMC) == 1``, if one wants to filter out good events for evaluation. But
+  one should be very careful, e.g. for some signal channels the MC matching does
+  not work well at all and one could think for an instant that the flavor tagger
+  is under or overestimating the dilution.
 
 The flavor tagger also saves the variable ``mcFlavorOfOtherB`` which returns the flavor of the
 accompanying tag-side :math:`B` meson (positive or negative) if the given particle is a correctly MC-matched

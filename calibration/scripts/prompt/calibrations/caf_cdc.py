@@ -1,6 +1,3 @@
-# disable doxygen check for this file
-# @cond
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -54,7 +51,7 @@ settings = CalibrationSettings(name="CDC Tracking",
                                    "calibration_procedure": {"tz0": 1, "xt0": 0, "sr_tz0": 0, "tz2": 0},
                                    "payload_boundaries": [],
                                    "backend_args": {"request_memory": "4 GB"}},
-                               produced_payloads=["CDCTimeZeros", "CDCTimeWalk", "CDCXtRelations", "CDCSpaceResols"])
+                               produced_payloads=["CDCTimeZeros", "CDCTimeWalks", "CDCXtRelations", "CDCSpaceResols"])
 
 
 def select_files(all_input_files, min_events, max_events, max_processed_events_per_file, max_job=800, min_events_per_file=500):
@@ -492,6 +489,8 @@ class CDCCalibration(Calibration):
                  use_badWires=False,
                  collector_granularity='All',
                  backend_args=None):
+        """
+        """
         for algo in algorithms:
             algo.setHistFileName(name)
 
@@ -525,10 +524,9 @@ class CDCCalibration(Calibration):
 
             self.add_collection(name=skim_type, collection=collection)
 
+        #: set number of maximum iterations
         self.max_iterations = max_iterations
 
         if dependencies is not None:
             for dep in dependencies:
                 self.depends_on(dep)
-
-# @endcond

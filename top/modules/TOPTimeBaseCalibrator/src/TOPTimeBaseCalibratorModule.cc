@@ -76,7 +76,7 @@ namespace Belle2 {
     addParam("dtMax", m_dt_max,
              "maximum Delta T of raw calpulse in iTBC",  24.0);
     addParam("xStep", m_xstep,
-             "unit for an interation of delta(X_s)",  0.020);
+             "unit for an interaction of delta(X_s)",  0.020);
     addParam("devStep", m_dev_step,
              "a step size to calculate the value of d(chisq)/dxval",  0.001);
     addParam("chgStep", m_change_xstep,
@@ -110,7 +110,7 @@ namespace Belle2 {
     if (!geo->isModuleIDValid(m_moduleID))
       B2ERROR("Invalid module ID: " << m_moduleID);
 
-    // check for existance and mkdir if not
+    // check for existence and mkdir if not
     if (m_directoryName.empty()) m_directoryName = "./";
     if (m_directoryName != "./") gSystem->mkdir(m_directoryName.c_str(), kTRUE);
 
@@ -260,7 +260,7 @@ namespace Belle2 {
                  c_NumScrodChannels, 0, c_NumScrodChannels);
       Hchan.SetXTitle("channel number");
       Hchan.SetYTitle("double cal pulse counts");
-      TH1F Hsuccess("success", "successfuly fitted channels",
+      TH1F Hsuccess("success", "successfully fitted channels",
                     c_NumScrodChannels, 0, c_NumScrodChannels);
       Hsuccess.SetXTitle("channel number");
       TH1F Hchi2("chi2", "normalized chi2",

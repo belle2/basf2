@@ -292,7 +292,7 @@ namespace Belle2 {
        * underlying `std::vector<bool>` does not support getting a pointer to an
        * array. If you have a model with boolean inputs, either convert it to
        * accept a different type (e.g. uint8_t) or use the `Session::run`
-       * overload thet works directl with `Ort::Value` instances.
+       * overload that works directly with `Ort::Value` instances.
        */
       class Session {
       public:
@@ -401,30 +401,39 @@ namespace Belle2 {
        * outputs there is one called "output", it will be used automatically.
        */
       std::string m_outputName;
+
+      /**
+       * Filename of the model. Is used in ONNXTeacher::train as a path to the
+       * ONNX model to store in the weightfile.
+       */
+      std::string m_modelFilename;
     };
 
     /**
      * Teacher for the ONNX MVA method.
-     * Just there to satisfy the interface - doesn't do anything
+     * Just there to satisfy the interface - doesn't do any training
      */
     class ONNXTeacher : public Teacher {
 
     public:
       /**
-       * Constructs a new teacher using the GeneralOptions and specific options of
-       * this training
-       * @param general_options defining all shared options
+       * Constructs a new teacher using the GeneralOptions and specific options of this training
+       *
+       * @param generalOptions defining all shared options
+       * @param onnxOptions defining all method specific options
        */
-      ONNXTeacher(const GeneralOptions& general_options,
-                  const ONNXOptions&) : Teacher(general_options) {}
+      ONNXTeacher(const GeneralOptions& generalOptions, const ONNXOptions& onnxOptions) : Teacher(generalOptions),
+        m_specific_options(onnxOptions) {};
 
       /**
-       * Just returns a default-initialized weightfile
+       * Won't do any actual training, but will return a valid MVA Weightfile
+       *
+       * The Dataset parameter is required to adhere to the interface, but ignored.
        */
-      virtual Weightfile train(Dataset&) const override
-      {
-        return Weightfile();
-      }
+      virtual Weightfile train(Dataset&) const override;
+
+    private:
+      ONNXOptions m_specific_options; /**< Method specific options */
     };
 
     /**
@@ -457,6 +466,15 @@ namespace Belle2 {
       void configureInputOutputNames();
 
       /**
+       * @brief Configure index of the value to be used for the configured output tensor
+       *
+       * Will be 0 in case of a single element (binary classifier with single output or regression)
+       * and 1 in case of 2 elements (binary classifier with 2 outputs).
+       * For more than 2 elements one has to call applyMultiClass.
+       */
+      void configureOutputValueIndex();
+
+      /**
        * The ONNX inference session wrapper
        */
       std::unique_ptr<ONNX::Session> m_session;
@@ -476,6 +494,11 @@ namespace Belle2 {
        * (will either be determined automatically or loaded from specific options)
        */
       std::string m_outputName;
+
+      /**
+       * Index of the output value to pick in non-multiclass mode
+       */
+      int m_outputValueIndex;
     };
   } // namespace MVA
 } // namespace Belle2

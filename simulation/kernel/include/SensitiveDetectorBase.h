@@ -41,7 +41,7 @@ namespace Belle2 {
        * possible to use the Geant4 Navigator for non-simulation purposes. Only
        * during simulation the sensitive detectors will be enabled to record
        * hits
-       * @param activeStatus bool to indicate wether hits should be recorded
+       * @param activeStatus bool to indicate whether hits should be recorded
        */
       static void setActive(bool activeStatus) { s_active = activeStatus; }
       /** Register an relation involving MCParticles.
@@ -55,7 +55,7 @@ namespace Belle2 {
       static void registerMCParticleRelation(const std::string& name,
                                              RelationArray::EConsolidationAction ignoreAction = RelationArray::c_negativeWeight);
 
-      /** Overload to make it easer to register MCParticle relations
+      /** Overload to make it easier to register MCParticle relations
        * @param relation RelationArray to register
        * @param ignoreAction
        */
@@ -81,7 +81,7 @@ namespace Belle2 {
       virtual bool ProcessHits(G4Step* aStep, G4TouchableHistory* aROhist);
       /** Static set holding all relations which have to be updated at the end of the Event */
       static std::map<std::string, RelationArray::EConsolidationAction> s_mcRelations;
-      /** Static bool which indicates wether recording of hits is enabled */
+      /** Static bool which indicates whether recording of hits is enabled */
       static bool s_active;
       /** Subdetector the class belongs to */
       Const::EDetector m_subdetector;

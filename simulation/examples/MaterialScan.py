@@ -99,7 +99,7 @@ materialscan.param({
     'planar.minV': -16,
     # Maximum value for the second axis
     'planar.maxV': 16,
-    # Split output by Material names insted of by Region
+    # Split output by Material names instead of by Region
     'planar.splitByMaterials': True,
     # Specify the names of Materials to ignore in the scan.
     # Default is Air and Vacuum

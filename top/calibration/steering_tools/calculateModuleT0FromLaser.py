@@ -9,7 +9,7 @@
 ##########################################################################
 
 # ---------------------------------------------------------------------------------------
-# Script to exctract an approximate ModuleT0 constant using the laser data.
+# Script to extract an approximate ModuleT0 constant using the laser data.
 # The input of the file is the root file containing the tree with all the
 # localT0 constants produced by  the TOPLaserCalibratorModule
 # Usage: basf2 checkCalibrationOnCalpulseRun.py  <reference slot (1-16)>
@@ -49,7 +49,7 @@ outTree.Branch('moduleT0LaserConst', moduleT0LaserConst, ' moduleT0LaserConst/F'
 outTree.Branch('moduleT0LaserErr', moduleT0LaserErr, ' moduleT0LaserErr/F')
 
 print('------------------------------------------------------------------')
-print('Results of TOP module-by-module sychronization using the Laser data')
+print('Results of TOP module-by-module synchronization using the Laser data')
 print('                                                                  ')
 for iSlot in range(0, 16):
     moduleT0LaserConst = 0.

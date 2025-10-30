@@ -23,7 +23,7 @@ namespace Belle2 {
      * Calibration status of a constant
      *
      * Notes:
-     * - TOPDigits are alowed to be calibrated only if status = c_Calibrated
+     * - TOPDigits are allowed to be calibrated only if status = c_Calibrated
      * - value for status = c_roughlyCalibrated is used only to set initial value of
      *   bunch offset running average in bunch finder
      */
@@ -54,7 +54,7 @@ namespace Belle2 {
     void setUnusable() {m_status = c_Unusable;}
 
     /**
-     * Switches calibration status to roughly calibrated (usefull at HLT/express reco)
+     * Switches calibration status to roughly calibrated (useful at HLT/express reco)
       */
     void setRoughlyCalibrated() {m_status = c_roughlyCalibrated;}
 

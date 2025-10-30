@@ -199,15 +199,12 @@ void PhysicsObjectsMiraBelleModule::event()
 
     //get the di-muons for HLT skim efficiency
     StoreObjPtr<ParticleList> Z0Particles(m_Z0PListName);
-    if (Z0Particles.isValid()) {
-      for (unsigned int i = 0; i < Z0Particles->getListSize(); i++) {
-
-        // Count number of events in different categories
-        if (eclmuonpair_tag && singleMuon_tag && (L1_mu_b2b || L1_mu_eb2b)) {
-          m_h_hltEff->Fill(1);
-          if (selectmumu_tag)
-            m_h_hltEff->Fill(2);
-        }
+    if (Z0Particles.isValid() && Z0Particles->getListSize() > 0) {
+      // Count number of events in different categories
+      if (eclmuonpair_tag && singleMuon_tag && (L1_mu_b2b || L1_mu_eb2b)) {
+        m_h_hltEff->Fill(1);
+        if (selectmumu_tag)
+          m_h_hltEff->Fill(2);
       }
     }
   }

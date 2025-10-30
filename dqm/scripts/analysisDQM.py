@@ -147,7 +147,7 @@ def add_mirabelle_dqm(path):
     # MiraBelle Z0 path
     ma.fillParticleList('mu+:physMiraBelleZ0', 'abs(dr) < 2 and abs(dz) < 5', path=MiraBelleZ0_path)
     ma.reconstructDecay('Z0:physMiraBelle -> mu+:physMiraBelleZ0 mu-:physMiraBelleZ0',
-                        'nCleanedTracks(abs(dr) < 2 and abs(dz) < 5) and M < 12', path=MiraBelleZ0_path)
+                        'nCleanedTracks(abs(dr) < 2 and abs(dz) < 5) and 9 < M and M < 12', path=MiraBelleZ0_path)
     MiraBelleMumu.param('Z0PListName', 'Z0:physMiraBelle')
     MiraBelleZ0_path.add_module(MiraBelleMumu)
 

@@ -197,7 +197,7 @@ void PhysicsObjectsMiraBelleModule::event()
       }
     }
 
-    //get the di-muons for HLT skim efficiency
+    //get the di-muons for selectmumu filter efficiency
     StoreObjPtr<ParticleList> Z0Particles(m_Z0PListName);
     if (Z0Particles.isValid() && Z0Particles->getListSize() > 0) {
       // Count number of events in different categories

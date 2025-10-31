@@ -116,7 +116,7 @@ void SVDUnpackerDQMModule::defineHisto()
   m_DQMtrgQuality->GetXaxis()->SetTitle("TRG Quality");
   m_DQMtrgQuality->GetYaxis()->SetTitle("number of APV samples");
 
-  TString Xlabels[nBins] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "errSYNC", "EVTmatch", "missHead", "missTrail", "badMapping", "EmptyEvts(SEUrecovery"};
+  TString Xlabels[nBins] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "errSYNC", "EVTmatch", "missHead", "missTrail", "badMapping", "EmptyEvts(SEURecovery)"};
 
   TString Ysamples[2] = {"3", "6"};
   TString Xsamples[3] = {"3 samples", "6 samples", "3/6 mixed"};
@@ -139,8 +139,8 @@ void SVDUnpackerDQMModule::defineHisto()
 
   m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(1, "No Errors");
   m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(2, "Any Error");
-  m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(3, "SEU Event");
-  m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(4, "Empty Event(SEUrecovery");
+  m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(3, "Evts(SEURecovery)");
+  m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(4, "EmptyEvts(SEURecovery)");
 
   m_DQMSeuRecoveryFADCsEventHisto->GetXaxis()->SetTitle("number of affected FADCs");
 

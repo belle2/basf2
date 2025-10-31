@@ -8,8 +8,17 @@
 
 #pragma once
 
+#include <unordered_map>
+#include <string>
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
+#include <TCanvas.h>
+#include <TH1D.h>
+#include <RooDataHist.h>
+#include <RooAddPdf.h>
+#include <RooArgusBG.h>
+#include <RooGaussian.h>
+#include <RooRealVar.h>
 
 namespace Belle2 {
 
@@ -59,11 +68,26 @@ namespace Belle2 {
      */
     void terminate() override final;
 
+
+    /**
+     * Plot the fit and return TCanvas with the plot
+     */
+    TCanvas* plotArgusFit(RooDataHist* dataE0, RooAddPdf&  sumB0, RooArgusBG& argus,
+                          RooGaussian& gauss, RooRealVar& eNow, TString nTag = "");
+
+    /**
+     * Fit the histograms and return the fitted parameters
+     */
+    std::unordered_map<std::string, double>  fitEcmsBB(TH1D* hB0, TH1D* hBp);
+
   protected:
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
+    TCanvas* m_canvas = nullptr; /**< Canvas to keep plots of the fit */
 
   };
 
 } // Belle2 namespace
+
+
 
 

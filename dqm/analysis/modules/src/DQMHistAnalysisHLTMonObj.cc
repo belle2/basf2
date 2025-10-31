@@ -12,16 +12,17 @@
 // Basf2 headers.
 #include <hlt/utilities/Units.h>
 
-// Roofit header
-#include <RooFitResult.h>
-#include <RooRealVar.h>
-#include <RooGaussian.h>
+// Roofit headers
 #include <RooAddPdf.h>
 #include <RooArgList.h>
 #include <RooArgSet.h>
 #include <RooChebychev.h>
-#include <RooMsgService.h>
+#include <RooDataHist.h>
 #include <RooFit.h>
+#include <RooFitResult.h>
+#include <RooGaussian.h>
+#include <RooMsgService.h>
+#include <RooRealVar.h>
 
 // C++ headers
 #include <regex>

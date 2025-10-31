@@ -116,7 +116,7 @@ void SVDUnpackerDQMModule::defineHisto()
   m_DQMtrgQuality->GetXaxis()->SetTitle("TRG Quality");
   m_DQMtrgQuality->GetYaxis()->SetTitle("number of APV samples");
 
-  TString Xlabels[nBins] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "errSYNC", "EVTmatch", "missHead", "missTrail", "badMapping", "SEURecovery"};
+  TString Xlabels[nBins] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "errSYNC", "EVTmatch", "missHead", "missTrail", "badMapping", "EmptyEvts(SEUrecovery"};
 
   TString Ysamples[2] = {"3", "6"};
   TString Xsamples[3] = {"3 samples", "6 samples", "3/6 mixed"};
@@ -140,7 +140,7 @@ void SVDUnpackerDQMModule::defineHisto()
   m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(1, "No Errors");
   m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(2, "Any Error");
   m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(3, "SEU Event");
-  m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(4, "Empty Event (Recovery)");
+  m_DQMErrorEventsHisto->GetXaxis()->SetBinLabel(4, "Empty Event(SEUrecovery");
 
   m_DQMSeuRecoveryFADCsEventHisto->GetXaxis()->SetTitle("number of affected FADCs");
 
@@ -400,7 +400,8 @@ void SVDUnpackerDQMModule::event()
   m_errorFraction = 100 * float(m_nBadEvents) / float(m_nEvents);
 
   if (m_DQMErrorEventsHisto != nullptr) {
-    TString histoErrorTitle = TString::Format("SVD Events with errors,  Exp %d Run %d", m_expNumber, m_runNumber);
+    TString runID = TString::Format(" ~ Exp %d Run %d", m_expNumber, m_runNumber);
+    TString histoErrorTitle = TString::Format("SVD Events with errors %s # Error Fraction: %6.4e %%", runID.Data(), m_errorFraction);
     m_DQMErrorEventsHisto->SetTitle(histoErrorTitle.Data());
     if (!m_badEvent) m_DQMErrorEventsHisto->Fill(0);
     else m_DQMErrorEventsHisto->Fill(1);
@@ -409,9 +410,6 @@ void SVDUnpackerDQMModule::event()
   }
 
   if (m_DQMSeuRecoveryFADCsEventHisto != nullptr) {
-    TString histoSEURecoFADCsTitle = TString::Format("Number of FADCs with Empty Data (SEURecovery) per Event,  Exp %d Run %d",
-                                                     m_expNumber, m_runNumber);
-    m_DQMSeuRecoveryFADCsEventHisto->SetTitle(histoSEURecoFADCsTitle.Data());
     if (m_seuFADCs.size() > 0) {
       m_DQMSeuRecoveryFADCsEventHisto->SetMaximum(-1111);
       m_DQMSeuRecoveryFADCsEventHisto->Fill(m_seuFADCs.size());

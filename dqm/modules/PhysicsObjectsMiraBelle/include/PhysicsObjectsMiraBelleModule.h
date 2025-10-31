@@ -111,6 +111,20 @@ namespace Belle2 {
     /** Name of the mu+mu- (Z0) particle list */
     std::string m_Z0PListName = "";
 
+    /** Trigger identifier string used to select events for selectmumu efficiency monitor */
+    std::string m_triggerIdentifierHLT = "";
+
+    /** Trigger identifier string to get filter lines for selectmumu efficiency monitor */
+    std::string m_filter_singlemuon = "software_trigger_cut&filter&single_muon"; /** Tag filter line */
+    std::string m_filter_selectmumu = "software_trigger_cut&filter&selectmumu"; /** Target filter line */
+    std::string m_filter_eclmuonpair = "software_trigger_cut&filter&ECLMuonPair"; /** Reference filter line */
+
+    /** Flags for selectmumu efficiency monitor */
+    bool m_singlemuon_tag = false; /** Flag tagging dimuons */
+    bool m_selectmumu_tag = false; /** Flag for target filter line */
+    bool m_eclmuonpair_tag = false; /** Flag for reference filter line */
+
+
 
   };
 }

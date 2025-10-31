@@ -37,6 +37,9 @@ PhysicsObjectsMiraBelleModule::PhysicsObjectsMiraBelleModule() : HistoModule()
   setDescription("Monitor Physics Objects Quality");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("TriggerIdentifierHLT", m_triggerIdentifierHLT,
+           "Trigger identifier string used to select events for the selectmumu efficiency histograms",
+           std::string("software_trigger_cut&filter&total_result"));
   addParam("TriggerIdentifier", m_triggerIdentifier,
            "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_mumutight"));
   addParam("MuPListName", m_muPListName, "Name of the muon particle list", std::string("mu+:physMiraBelle"));
@@ -163,21 +166,28 @@ void PhysicsObjectsMiraBelleModule::event()
     return;
   }
 
-  // selectmumu filter efficiency with dimuons
-  // check if events pass HLT cut //
-  const bool HLT_accept = result->getResult("software_trigger_cut&filter&total_result") == SoftwareTriggerCutResult::c_accept;
-  if (HLT_accept) {
+  const std::map<std::string, int>& results = result->getResults();
 
-    // Target filter
-    const bool selectmumu_tag = (result->getNonPrescaledResult("software_trigger_cut&filter&selectmumu") ==
-                                 SoftwareTriggerCutResult::c_accept);
+  //--- Monitor efficiency of selectmumu filter line with dimuons ---//
+  if (results.find(m_triggerIdentifierHLT) == results.end()) {
+    //Cannot find the m_triggerIdentifierHLT
+    B2WARNING("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifierHLT);
+  } else {
 
-    // Reference filter
-    const bool eclmuonpair_tag = (result->getNonPrescaledResult("software_trigger_cut&filter&ECLMuonPair") ==
-                                  SoftwareTriggerCutResult::c_accept);
-    // Single muon Tag
-    const bool singleMuon_tag = (result->getNonPrescaledResult("software_trigger_cut&filter&single_muon") ==
-                                 SoftwareTriggerCutResult::c_accept);
+    // Tag filter line
+    if (results.find(m_filter_singlemuon) != results.end()) {
+      m_singlemuon_tag = (result->getNonPrescaledResult(m_filter_singlemuon) == SoftwareTriggerCutResult::c_accept);
+    }
+
+    // Reference filter line
+    if (results.find(m_filter_selectmumu) != results.end()) {
+      m_selectmumu_tag = (result->getNonPrescaledResult(m_filter_selectmumu) == SoftwareTriggerCutResult::c_accept);
+    }
+
+    // Target filter line
+    if (results.find(m_filter_eclmuonpair) != results.end()) {
+      m_eclmuonpair_tag = (result->getNonPrescaledResult(m_filter_eclmuonpair) == SoftwareTriggerCutResult::c_accept);
+    }
 
     // L1 lines for back-to-back activity in KLM
     bool L1_mu_b2b = false;
@@ -201,16 +211,14 @@ void PhysicsObjectsMiraBelleModule::event()
     StoreObjPtr<ParticleList> Z0Particles(m_Z0PListName);
     if (Z0Particles.isValid() && Z0Particles->getListSize() > 0) {
       // Count number of events in different categories
-      if (eclmuonpair_tag && singleMuon_tag && (L1_mu_b2b || L1_mu_eb2b)) {
+      if (m_eclmuonpair_tag && m_singlemuon_tag && (L1_mu_b2b || L1_mu_eb2b)) {
         m_h_hltEff->Fill(1);
-        if (selectmumu_tag)
+        if (m_selectmumu_tag)
           m_h_hltEff->Fill(2);
       }
     }
   }
 
-
-  const std::map<std::string, int>& results = result->getResults();
   if (results.find(m_triggerIdentifier) == results.end()) {
     B2WARNING("PhysicsObjectsMiraBelle: Can't find trigger identifier: " << m_triggerIdentifier);
     return;

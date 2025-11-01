@@ -94,6 +94,7 @@ namespace Belle2 {
     TH1F* m_h_Mom = nullptr;/**< histogram for Momentum of muon track */
     TH1F* m_h_dPhicms = nullptr;/**< histogram for phi difference between mu+ and mu- in CMS */
     TH1F* m_h_dThetacms = nullptr;/**< histogram for theta difference between mu+ and mu- in CMS */
+    TH1F* m_h_hltEff = nullptr;/**< histogram for efficiency of selectmumu filter line */
 
     /** Trigger identifier string used to select events for the histograms */
     std::string m_triggerIdentifier = "";
@@ -103,6 +104,24 @@ namespace Belle2 {
 
     /** Name of the mu+mu- (Upsilon) particle list */
     std::string m_mumuPListName = "";
+
+    /** Name of the mu+mu- (Z0) particle list */
+    std::string m_Z0PListName = "";
+
+    /** Trigger identifier string used to select events for selectmumu efficiency monitor */
+    std::string m_triggerIdentifierHLT = "";
+
+    /** Trigger identifier string to get filter lines for selectmumu efficiency monitor */
+    std::string m_filter_singlemuon = "software_trigger_cut&filter&single_muon"; /** Tag filter line */
+    std::string m_filter_selectmumu = "software_trigger_cut&filter&selectmumu"; /** Target filter line */
+    std::string m_filter_eclmuonpair = "software_trigger_cut&filter&ECLMuonPair"; /** Reference filter line */
+
+    /** Flags for selectmumu efficiency monitor */
+    bool m_singlemuon_tag = false; /** Flag tagging dimuons */
+    bool m_selectmumu_tag = false; /** Flag for target filter line */
+    bool m_eclmuonpair_tag = false; /** Flag for reference filter line */
+
+
 
   };
 }

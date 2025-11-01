@@ -20,6 +20,7 @@
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/TRGSummary.h>
 #include <top/variables/TOPDigitVariables.h>
 #include <arich/modules/arichDQM/ARICHDQMModule.h>
 #include <arich/dataobjects/ARICHLikelihood.h>
@@ -38,10 +39,15 @@ PhysicsObjectsMiraBelleModule::PhysicsObjectsMiraBelleModule() : HistoModule()
   setDescription("Monitor Physics Objects Quality");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("TriggerIdentifierHLT", m_triggerIdentifierHLT,
+           "Trigger identifier string used to select events for the selectmumu efficiency histograms",
+           std::string("software_trigger_cut&filter&total_result"));
   addParam("TriggerIdentifier", m_triggerIdentifier,
            "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_mumutight"));
   addParam("MuPListName", m_muPListName, "Name of the muon particle list", std::string("mu+:physMiraBelle"));
   addParam("MuMuPListName", m_mumuPListName, "Name of the di-muon particle list", std::string("Upsilon:physMiraBelle"));
+  addParam("Z0PListName", m_Z0PListName, "Name of the di-muon particle list for HLT efficiency", std::string("Z0:physMiraBelle"));
+
 }
 
 void PhysicsObjectsMiraBelleModule::defineHisto()
@@ -104,6 +110,10 @@ void PhysicsObjectsMiraBelleModule::defineHisto()
   m_h_dPhicms->SetXTitle("hist_dPhicms");
   m_h_dThetacms = new TH1F("hist_dThetacms", "hist_dThetacms: |#theta_{1} + #theta_{2}| - 180#circ", 100, -10, 10);
   m_h_dThetacms->SetXTitle("hist_dThetacms");
+  m_h_hltEff = new TH1F("hist_hltEff", "hist_hltEff", 10, 0, 10);
+  m_h_hltEff->SetXTitle("hist_hltEff");
+  m_h_hltEff->GetXaxis()->SetBinLabel(2, "dimuon_ECLMuonPair");
+  m_h_hltEff->GetXaxis()->SetBinLabel(3, "dimuon_ECLMuonPairSelectmumu");
 
   oldDir->cd();
 }
@@ -146,6 +156,7 @@ void PhysicsObjectsMiraBelleModule::beginRun()
   m_h_klmTotalEndcapHits->Reset();
   m_h_dPhicms->Reset();
   m_h_dThetacms->Reset();
+  m_h_hltEff->Reset();
 }
 
 void PhysicsObjectsMiraBelleModule::event()
@@ -158,6 +169,58 @@ void PhysicsObjectsMiraBelleModule::event()
   }
 
   const std::map<std::string, int>& results = result->getResults();
+
+  //--- Monitor efficiency of selectmumu filter line with dimuons ---//
+  if (results.find(m_triggerIdentifierHLT) == results.end()) {
+    //Cannot find the m_triggerIdentifierHLT
+    B2WARNING("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifierHLT);
+  } else {
+
+    // Tag filter line
+    if (results.find(m_filter_singlemuon) != results.end()) {
+      m_singlemuon_tag = (result->getNonPrescaledResult(m_filter_singlemuon) == SoftwareTriggerCutResult::c_accept);
+    }
+
+    // Reference filter line
+    if (results.find(m_filter_selectmumu) != results.end()) {
+      m_selectmumu_tag = (result->getNonPrescaledResult(m_filter_selectmumu) == SoftwareTriggerCutResult::c_accept);
+    }
+
+    // Target filter line
+    if (results.find(m_filter_eclmuonpair) != results.end()) {
+      m_eclmuonpair_tag = (result->getNonPrescaledResult(m_filter_eclmuonpair) == SoftwareTriggerCutResult::c_accept);
+    }
+
+    // L1 lines for back-to-back activity in KLM
+    bool L1_mu_b2b = false;
+    bool L1_mu_eb2b = false;
+
+    StoreObjPtr<TRGSummary> m_trgSummary;
+    if (m_trgSummary.isValid()) {
+      try {
+        L1_mu_b2b = m_trgSummary->testFtdl("mu_b2b");
+      } catch (const std::exception&) {
+        L1_mu_b2b = false;
+      }
+      try {
+        L1_mu_eb2b = m_trgSummary->testFtdl("mu_eb2b");
+      } catch (const std::exception&) {
+        L1_mu_eb2b = false;
+      }
+    }
+
+    //get the di-muons for selectmumu filter efficiency
+    StoreObjPtr<ParticleList> Z0Particles(m_Z0PListName);
+    if (Z0Particles.isValid() && Z0Particles->getListSize() > 0) {
+      // Count number of events in different categories
+      if (m_eclmuonpair_tag && m_singlemuon_tag && (L1_mu_b2b || L1_mu_eb2b)) {
+        m_h_hltEff->Fill(1);
+        if (m_selectmumu_tag)
+          m_h_hltEff->Fill(2);
+      }
+    }
+  }
+
   if (results.find(m_triggerIdentifier) == results.end()) {
     B2WARNING("PhysicsObjectsMiraBelle: Can't find trigger identifier: " << m_triggerIdentifier);
     return;

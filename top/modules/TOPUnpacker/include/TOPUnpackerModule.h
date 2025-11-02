@@ -21,6 +21,7 @@
 #include <top/dataobjects/TOPTemplateFitResult.h>
 #include <top/dataobjects/TOPProductionEventDebug.h>
 #include <top/dataobjects/TOPProductionHitDebug.h>
+#include <top/dataobjects/TOPInjectionVeto.h>
 #include <string>
 
 namespace Belle2 {
@@ -277,9 +278,10 @@ namespace Belle2 {
      * @param bufferSize buffer size
      * @param dataFormat data format
      * @param pedestalSubtracted true, if pedestal is subtracted in waveforms
+     * @param expNo experiment number
      * @return number of words remaining in data buffer
      */
-    int unpackProdDebug(const int* buffer, int bufferSize, TOP::RawDataType dataFormat, bool pedestalSubtracted);
+    int unpackProdDebug(const int* buffer, int bufferSize, TOP::RawDataType dataFormat, bool pedestalSubtracted, int expNo);
 
     // module steering parameters
 
@@ -304,6 +306,7 @@ namespace Belle2 {
     StoreArray<TOPProductionEventDebug> m_productionEventDebugs;   /**< collection of event debug data */
     StoreArray<TOPProductionHitDebug> m_productionHitDebugs;   /**< collection of hit debug data */
     StoreArray<TOPTemplateFitResult> m_templateFitResults;   /**< collection of template fit results */
+    StoreObjPtr<TOPInjectionVeto> m_injectionVeto; /**< injection veto flag */
 
     // other
 

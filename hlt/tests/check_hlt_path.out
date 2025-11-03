@@ -1,4 +1,9 @@
 [INFO] Steering file: hlt/tests/check_hlt_path.py
+
+RooFit v3.60 -- Developed by Wouter Verkerke and David Kirkby
+                Copyright (C) 2000-2013 NIKHEF, University of California & Stanford University
+                All rights reserved, please read http://roofit.sourceforge.net/license.txt
+
 [INFO] basf2 path for beam_reco_monitor:
 [INFO] TRGCDCT3DConverter: Constructor done.
  ... message repeated 3 times

@@ -1068,17 +1068,19 @@ bool ParticleVertexFitterModule::makeKFourCMother(analysis::FourCFitKFit& kf, Pa
     const unsigned nd = daughters.size();
     unsigned l = 0;
     std::vector<std::vector<unsigned>> pars;
+    pars.reserve(nd);
     std::vector<Particle*> allparticles;
+    allparticles.reserve(nd);
     for (unsigned ichild = 0; ichild < nd; ichild++) {
       const Particle* daughter = mother->getDaughter(ichild);
       std::vector<unsigned> pard;
       if (daughter->getNDaughters() > 0) {
         updateMapOfTrackAndDaughter(l, pars, pard, allparticles, daughter);
-        pars.push_back(pard);
+        pars.push_back(std::move(pard));
         allparticles.push_back(daughters[ichild]);
       } else {
         pard.push_back(l);
-        pars.push_back(pard);
+        pars.push_back(std::move(pard));
         allparticles.push_back(daughters[ichild]);
         l++;
       }
@@ -1129,18 +1131,22 @@ bool ParticleVertexFitterModule::makeMassKFourCMother(analysis::MassFourCFitKFit
 
     const unsigned nd = daughters.size();
     unsigned l = 0;
+
     std::vector<std::vector<unsigned>> pars;
+    pars.reserve(nd);
     std::vector<Particle*> allparticles;
+    allparticles.reserve(nd);
+
     for (unsigned ichild = 0; ichild < nd; ichild++) {
       const Particle* daughter = mother->getDaughter(ichild);
       std::vector<unsigned> pard;
       if (daughter->getNDaughters() > 0) {
         updateMapOfTrackAndDaughter(l, pars, pard, allparticles, daughter);
-        pars.push_back(pard);
+        pars.push_back(std::move(pard));
         allparticles.push_back(daughters[ichild]);
       } else {
         pard.push_back(l);
-        pars.push_back(pard);
+        pars.push_back(std::move(pard));
         allparticles.push_back(daughters[ichild]);
         l++;
       }

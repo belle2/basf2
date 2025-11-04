@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# @cond SUPPRESS_DOXYGEN
-
 """
  The Full Event Interpretation Algorithm
 
@@ -1157,5 +1155,3 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
 
     # Finally we return the path, the stage and the used lists to the user.
     return FeiState(path, stage+1, plists=used_lists, fsplists=fsps_of_all_stages, excludelists=excludelists)
-
-# @endcond

@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# @cond no_doxygen
-
 """
 Create a full set of consistent geometry payloads for nominal geometry, phase 2
 geometry, and early phase 3 geometry from XML files.
@@ -119,5 +117,3 @@ for filename in os.scandir('localdb/'):
     else:
         print(f"Normalizing {filename.name} as '{match.group(1)}'")
         subprocess.call(["b2file-normalize", "-i", "-n", match.group(1), filename.path])
-
-# @endcond

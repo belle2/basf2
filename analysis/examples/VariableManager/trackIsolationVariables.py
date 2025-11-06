@@ -8,9 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Doxygen should skip this script
-# @cond
-
 """
 Example script to calculate isolation variables per particle.
 
@@ -246,5 +243,3 @@ if __name__ == "__main__":
 
     # Process the data.
     b2.process(path)
-
-# @endcond

@@ -490,3 +490,44 @@ class BtoEtaOmega(BaseSkim):
         ma.reconstructDecay("B0:Charmless_b2omegaeta -> eta:all omega:all", Bcuts, path=path)
         BsigList.append('B0:Charmless_b2omegaeta')
         return BsigList
+
+
+@fancy_skim_header
+class BtoEtaRhop(BaseSkim):
+    """
+    Reconstructed decay mode:
+
+    * :math:`B^{+}\\to \\eta (\\to \\gamma \\gamma) \\rho^{+} (\\to \\pi{+} \\pi^{0})`
+    * :math:`B^{+}\\to \\eta (\\to \\pi^{+} \\pi^{-} \\pi^{0}) \\rho^{+} (\\to \\pi{+} \\pi^{0})`
+
+    Cuts applied:
+
+    * ``5.20 < Mbc < 5.29``
+    * ``abs(deltaE) < 0.5``
+    * ``0.4 < M_{eta} < 0.6``
+    * ``0.47 < M_{rho+} < 1.15``
+
+    """
+
+    __authors__ = ["Kuan-Ying Wu"]
+    __description__ = "Skim list for B+ to eta rho+."
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charmless"
+
+    ApplyHLTHadronCut = True
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
+    def load_standard_lists(self, path):
+        stdPhotons('tight', path=path)
+        stdPi0s("eff40_May2020", path=path)
+        loadStdSkimHighEffTracks('pi', path=path)
+        loadStdSkimHighEffEta(path=path)
+
+    def build_lists(self, path):
+        rhocut = '0.47 < M < 1.15'
+        Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        BsigList = []
+        ma.reconstructDecay("rho+:b2etarho_pipiz -> pi+:SkimHighEff pi0:eff40_May2020", rhocut, path=path)
+        ma.reconstructDecay("B+:Charmless_b2etarho -> eta:SkimHighEff rho+:b2etarho_pipiz", Bcuts, path=path)
+        BsigList.append('B+:Charmless_b2etarho')
+        return BsigList

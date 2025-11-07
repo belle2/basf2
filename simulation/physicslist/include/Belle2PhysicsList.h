@@ -70,7 +70,7 @@ namespace Belle2 {
       void UseLongLivedNeutralParticles();
 
     private:
-      /** Set the produciton cuts to the given value for a list of regions belonging to a sub detector
+      /** Set the production cuts to the given value for a list of regions belonging to a sub detector
        * @param name name of the sub detector to print in messages
        * @param regions list of region names to set the cut value
        * @param cutValue production cut in cm, if 0 the global cut value will be used

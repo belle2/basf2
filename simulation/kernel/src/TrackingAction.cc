@@ -166,7 +166,7 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
 
           // Optical photons
           if (m_ignoreOpticalPhotons) daughterParticle.setIgnore();
-          // to apply quantum efficiency only once, if optical photon is a daugher of optical photon
+          // to apply quantum efficiency only once, if optical photon is a daughter of optical photon
           if (track->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
             TrackInfo* currInfo = dynamic_cast<TrackInfo*>(track->GetUserInformation());
             TrackInfo* daughterInfo = dynamic_cast<TrackInfo*>(daughterTrack->GetUserInformation());

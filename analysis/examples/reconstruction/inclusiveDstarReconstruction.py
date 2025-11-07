@@ -11,9 +11,6 @@ An example script showing how to reconstruct D* mesons inclusively from slow
 pions.
 """
 
-# Doxygen should skip this script
-# @cond
-
 import basf2
 import modularAnalysis as mA
 import stdPi0s
@@ -149,5 +146,3 @@ for list_tree_tuple in list_tree_tuples:
     )
 
 basf2.process(main_path)
-
-# @endcond

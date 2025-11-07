@@ -22,12 +22,12 @@ For example if you want to examine some commits related to tracking, you can use
 
     b2validation-revisions 5e066d31b391bb240cb2b381e67c5488681a8ec6 05d5bf078a45f6af8022bf06b398213d0bc2409d \
       --check-quantity ~/basf2/tracking/validation/results/current/TrackingValidation.root:hEfficiency \
-      --script "validate_basf2 -s *_trackingEfficiency_*.py"
+      --script "b2validation -s *_trackingEfficiency_*.py"
 
 which will run through all commits from
 ``5e066d31b391bb240cb2b381e67c5488681a8ec6`` to
 ``05d5bf078a45f6af8022bf06b398213d0bc2409d``
-and execute ``validate_basf2 -s *_trackingEfficiency_*.py`` for each of them.
+and execute ``b2validation -s *_trackingEfficiency_*.py`` for each of them.
 Then it will extract the ``meanX``, the ``meanY`` and
 the ``zeroSupressedMeanY`` of the ``TNtuple hEfficiency`` in the file
 ``~/basf2/tracking/validation/results/current/tracking/TrackingValidation.root``.

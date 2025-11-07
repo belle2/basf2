@@ -9,45 +9,52 @@
 ##########################################################################
 
 # standard
+import socket
 import sys
 import subprocess
 import tempfile
 import os
 import time
 import requests
+import splinter
 import traceback
 
 # ours
-import b2test_utils
-import validationserver
+from b2test_utils import is_ci
 import validationpath
 from validationtestutil import check_execute
 
 # url of the local validation webserver
-validation_url = "http://localhost:8000/"
+validation_url = None  # will be set at runtime
 
 
-def start_webserver():
-    """
-    Start the validation server process, this will not
-    return. Therefore this function must be started within
-    a new subprocess
-    """
-    validationserver.run_server()
-
-
-def http_post(command, json_args):
+def http_post(command, json_args, retries=10, delay=1.0):
     call_url = validation_url + command
     print(f"Posting {json_args} to {command}")
-    r = requests.post(call_url, json=json_args)
-    if not r.ok:
-        print(
-            f"REST call {call_url} with arguments {json_args} failed"
-        )
-        print(str(r))
-        return None
+    for i in range(retries):
+        try:
+            r = requests.post(call_url, json=json_args, timeout=5)
+            if r.ok:
+                return r
+        except requests.exceptions.ConnectionError:
+            print(f"Server not reachable yet (attempt {i+1}/{retries})")
+            time.sleep(delay)
+    print(f"Failed to reach server at {call_url}")
+    return None
 
-    return r
+
+def wait_for_port_any(port: int, timeout: float = 30.0):
+    """Wait until something listens on either 127.0.0.1 or ::1."""
+    start = time.time()
+    while time.time() - start < timeout:
+        for host in ("127.0.0.1", "::1"):
+            try:
+                with socket.create_connection((host, port), timeout=1):
+                    return host  # returns the one that worked
+            except OSError:
+                pass
+        time.sleep(0.1)
+    return None
 
 
 def check_for_plotting(revs, tmp_folder):
@@ -67,14 +74,14 @@ def check_for_plotting(revs, tmp_folder):
     # will be used to check on the progress
     prog_key = res.json()["progress_key"]
 
-    done = False
-    wait_time = 0.1  # in seconds
-    max_wait_time = 3
-    summed_wait_time = 0
-
     # check the plot status with the webserver and only exit after a timeout
     # or if the plot combination has been created
-    while not done:
+
+    # 10 retries × 1 s delay per http_post -> 10 s worst‑case
+    wait_time = 1.0  # in seconds
+    max_wait_time = 15
+    start = time.time()
+    while True:
         res = http_post("check_comparison_status", {"input": prog_key})
         if not res:
             return False
@@ -85,10 +92,9 @@ def check_for_plotting(revs, tmp_folder):
                 break
 
         time.sleep(wait_time)
-        summed_wait_time += wait_time
-        if summed_wait_time > max_wait_time:
+        if time.time() - start > max_wait_time:
             print(
-                f"Waited for {summed_wait_time} seconds for the requested plots to complete and nothing happened"
+                f"Waited for {max_wait_time} seconds for the requested plots to complete and nothing happened"
             )
             return False
 
@@ -111,7 +117,7 @@ def check_for_plotting(revs, tmp_folder):
     some_plot = os.path.join(
         comp_folder,
         "validation-test",
-        "validationTestPlotsB_gaus_histogram.pdf",
+        "validationTestPlots_gaus_histogram.pdf",
     )
     if not os.path.isfile(some_plot):
         print(f"Comparison plot {some_plot} does not exist")
@@ -125,21 +131,10 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
     """
     Checks for the expected content on the validation website
     """
-    try:
-        import splinter
-    except ImportError:
-        print(
-            "The splinter package is required to run this test. Run 'pip3 "
-            "install splinter' to install"
-        )
-        # don't give an error exit code here to not fail if splinter is not
-        # available
-        return True
-
-    with splinter.Browser() as browser:
+    with splinter.Browser("firefox", headless=True) as browser:
         # Visit URL
         url = validation_url + "static/validation.html"
-        print("Opening {} to perform checks", url)
+        print(f"Opening {url} to perform checks")
         browser.visit(url)
 
         if len(browser.title) == 0:
@@ -158,9 +153,7 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
 
         plot_objects = browser.find_by_css(".object")
 
-        print(
-            "Checking for a minimum number of {} plot objects", min_plot_objects
-        )
+        print(f"Checking for a minimum number of {min_plot_objects} plot objects")
         if len(plot_objects) < min_plot_objects:
             print(
                 f"Only {len(plot_objects)} plots found, while {min_plot_objects} are expected"
@@ -171,11 +164,11 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
         checkbox_overview = browser.find_by_id("check_show_overview")
         # todo: does not work yet, checkbox is directly unchecked again
         checkbox_overview.check()
-        # found_matrix_plots = browser.find_by_css(".plot_matrix_item")
+        found_matrix_plots = browser.find_by_css(".plot_matrix_item")
 
-        # if len(found_matrix_plots) < min_matrix_plots:
-        #    print ("Only {} matrix plots found, while {} are expected".format(len(found_matrix_plots), min_matrix_plots))
-        #    return False
+        if len(found_matrix_plots) < min_matrix_plots:
+            print(f"Only {len(found_matrix_plots)} matrix plots found, while {min_matrix_plots} are expected")
+            return False
 
     return True
 
@@ -184,25 +177,6 @@ def main():
     """
     Runs two test validations, starts the web server and queries data
     """
-
-    # fixme: See if we can re-enable this test or at least run it locally
-    b2test_utils.skip_test("Not properly runnable yet")
-    # noinspection PyUnreachableCode
-
-    # only run the test on dev machines with splinter installed. Also for the
-    # tests which don't use splinter, there are currently some connection
-    # problems to the test webserver on the central build system
-    try:
-        import splinter  # noqa
-
-        pass
-    except ImportError:
-        print(
-            "TEST SKIPPED: The splinter package is required to run this test."
-            + "Run 'pip3 install splinter' to install",
-            file=sys.stderr,
-        )
-        sys.exit(1)
 
     success = True
 
@@ -216,20 +190,37 @@ def main():
         os.chdir(str(tmpdir))
 
         for r in revs_to_gen:
-            check_execute(f"validate_basf2 --test --tag {r}")
+            check_execute(f"b2validation -p 4 --test --tag {r}")
 
         # make sure the webserver process is terminated in any case
         try:
             # start webserver to serve json output files, plots and
             # interactive website
-            server_process = subprocess.Popen(["run_validation_server"])
+            # try IPv6 first; if that fails, fall back to IPv4.
+            try:
+                server_process = subprocess.Popen(["b2validation-server", "--ip", "::"])
+            except OSError:
+                server_process = subprocess.Popen(["b2validation-server", "--ip", "127.0.0.1"])
 
-            # wait for one second for the server to start
-            time.sleep(2)
-            # check the content of the webserver, will need splinter
-            success = success and check_for_content(
-                revs_to_gen + ["reference"], 7, 7
-            )
+            # wait for up to 30 seconds for the server to start
+            active_host = wait_for_port_any(8000, timeout=30)
+            if not active_host:
+                print("Validation server did not start within 30 s")
+                server_process.terminate()
+                sys.exit(1)
+
+            # build URL from the address that really worked
+            global validation_url
+            if ":" in active_host:
+                validation_url = f"http://[{active_host}]:8000/"
+            else:
+                validation_url = f"http://{active_host}:8000/"
+
+            # check the content of the webserver if not running in GitLab pipeline
+            if not is_ci():
+                success = success and check_for_content(
+                    revs_to_gen + ["reference"], 7, 7
+                )
 
             # check if the plott creating triggering works
             success = success and check_for_plotting(

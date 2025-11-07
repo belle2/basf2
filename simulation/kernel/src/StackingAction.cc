@@ -53,7 +53,7 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* aTrac
   TrackInfo* info = dynamic_cast<TrackInfo*>(aTrack->GetUserInformation());
   if (!info) return fUrgent;
 
-  // chech if prescaling already done
+  // check if prescaling already done
   if (info->getStatus() != 0) return fUrgent;
 
   // if not, do it

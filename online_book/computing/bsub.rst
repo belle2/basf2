@@ -146,6 +146,10 @@ To check the job status
 
    bjobs [-q <queue name>] [<job_ID>]
 
+.. warning::
+   Editing your script while the job is in PENDING state will change your output accordingly.
+   To avoid such behaviour, only edit your script once all the jobs are finished.
+
 .. admonition:: Exercise
    :class: exercise stacked
 
@@ -240,10 +244,20 @@ To have 16GB of memory on the short job queue
    bsub -q s -n 4 "bash example.sh"
 
 
+.. rubric:: Viewing job output while running
+
+If you want to view the output of your LSF job while it is still running you can use
+
+.. code-block:: bash
+
+   bpeek <job_ID>
+
 .. rubric:: Saving job output
 
-Finally, it would probably be a good idea to have the output of your LSF jobs into a 
-log file. The relevant bsub option is -o (standard output) and -e (standard error).
+Finally, it would probably be a good idea to save the output of your LSF jobs into a 
+log file. The relevant bsub option is ``-o`` (standard output) and ``-e`` (standard error).
+
+Replacing ``-o`` with ``-oo``, or ``-e`` with ``-eo`` will overwrite the corresponding file.
 
 To have 16GB of memory on the short job queue with a log file 
 

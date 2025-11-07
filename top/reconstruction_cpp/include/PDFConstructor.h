@@ -330,7 +330,7 @@ namespace Belle2 {
       {return getPixelLogLs(t0, m_minTime, m_maxTime, sigt);}
 
       /**
-       * Returns extended log likelihoods in pixels for PDF shifted in time and using diferent time window
+       * Returns extended log likelihoods in pixels for PDF shifted in time and using different time window
        * @param t0 time shift
        * @param minTime time window lower edge
        * @param maxTime time window upper edge

@@ -42,6 +42,11 @@ using namespace Belle2;
  *
  * */
 
+template class StoreArray<SVDCluster>;
+template class StoreArray<PXDCluster>;
+template class StoreArray<MCParticle>;
+template class StoreArray<SpacePoint>;
+
 namespace VXDTFObserversTest {
 
 
@@ -158,8 +163,6 @@ namespace VXDTFObserversTest {
       B2INFO("ObserversTest:SetUP: created " << mcParticleData.getEntries() << "/" << pxdClusterData.getEntries() << "/" <<
              svdClusterData.getEntries() << "/" << spacePointData.getEntries() << " mcParticles/pxdClusters/svdClusters/SpacePoints");
     }
-
-
 
     /** clear datastore */
     virtual void TearDown()
@@ -764,6 +767,7 @@ namespace VXDTFObserversTest {
 
     for (SpacePoint& aSP : spacePointData) {
       unsigned nullptrTrap = 0;
+
       RelationVector<PXDCluster> pxDClusters = aSP.getRelationsTo<PXDCluster>();
       for (PXDCluster& aCluster : pxDClusters) {
         MCParticle* aParticle = aCluster.getRelatedTo<MCParticle>();

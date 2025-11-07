@@ -49,7 +49,7 @@ namespace Belle2 {
       static std::map<std::string, AbstractInterface*> getSupportedInterfaces() { return s_supported_interfaces; }
 
       /**
-       * Static function which initliazes all supported interfaces,
+       * Static function which initializes all supported interfaces,
        * has to be called once before getSupportedInterfaces can be used.
        * It is save to call it multiple times
        */

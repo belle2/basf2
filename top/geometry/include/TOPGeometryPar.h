@@ -169,9 +169,9 @@ namespace Belle2 {
       double getGroupIndexDerivative(double energy) const;
 
       /**
-       * Returns bulk absorption lenght of quartz at given photon energy
+       * Returns bulk absorption length of quartz at given photon energy
        * @param energy photon energy [eV]
-       * @return bulk absorption lenght
+       * @return bulk absorption length
        */
       double getAbsorptionLength(double energy) const;
 
@@ -284,7 +284,7 @@ namespace Belle2 {
        * Returns integral of quantum efficiency over photon energies
        * @param qe quantum efficiency data points
        * @param ce collection efficiency data points
-       * @param lambdaFirst wavelenght of the first data point [nm]
+       * @param lambdaFirst wavelength of the first data point [nm]
        * @param lambdaStep wavelength step [nm]
        * @return integral [eV]
        */
@@ -350,7 +350,7 @@ namespace Belle2 {
     inline double TOPGeometryPar::getAbsorptionLength(double energy) const
     {
       double lambda = c_hc / energy;
-      return 15100 * pow(lambda / 405, 4); // Alan Schwartz, 2013 (private comunication)
+      return 15100 * pow(lambda / 405, 4); // Alan Schwartz, 2013 (private communication)
     }
 
   } // end of namespace TOP

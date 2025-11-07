@@ -1131,12 +1131,10 @@ bool ParticleVertexFitterModule::makeMassKFourCMother(analysis::MassFourCFitKFit
 
     const unsigned nd = daughters.size();
     unsigned l = 0;
-
     std::vector<std::vector<unsigned>> pars;
     pars.reserve(nd);
     std::vector<Particle*> allparticles;
     allparticles.reserve(nd);
-
     for (unsigned ichild = 0; ichild < nd; ichild++) {
       const Particle* daughter = mother->getDaughter(ichild);
       std::vector<unsigned> pard;

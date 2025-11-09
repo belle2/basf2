@@ -66,12 +66,10 @@ class RenderDocstring(Directive):
     want to write the example in Google Docstring and keep that synchronous
     with a reStructuredText version
     """
-    #: \cond Doxygen_suppress
     has_content = True
     option_spec = {
         "lines": directives.unchanged
     }
-    #: \endcond
 
     def run(self):
         """Just pass on the content to the autodoc-process-docstring event and
@@ -91,7 +89,6 @@ class RenderDocstring(Directive):
         return parse_with_titles(self.state, content)
 
 
-#: \cond Doxygen_suppress
 class ModuleListDirective(Directive):
     has_content = False
     option_spec = {
@@ -103,7 +100,6 @@ class ModuleListDirective(Directive):
         "regex-filter": directives.unchanged,
         "io-plots": directives.flag,
     }
-#: \endcond
 
     def show_module(self, module, library):
         description = module.description().splitlines()
@@ -274,7 +270,6 @@ def build_doxygen_anchor_map(xml_dir):
     return anchors
 
 
-#: \cond Doxygen_suppress
 class VariableListDirective(Directive):
     has_content = False
     option_spec = {
@@ -285,7 +280,6 @@ class VariableListDirective(Directive):
         "noindex": directives.flag,
         "filename": directives.unchanged,
     }
-#: \endcond
 
     def run(self):
         from ROOT import Belle2

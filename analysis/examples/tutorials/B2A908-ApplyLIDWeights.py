@@ -13,9 +13,6 @@ Example to create lepton particle list and apply LeptonID corrections to a MC sa
 by retrieving lookup tables from the conditions DB.
 """
 
-# Doxygen should skip this script
-# @cond
-
 import argparse
 
 
@@ -231,5 +228,3 @@ def main():
 if __name__ == "__main__":
 
     main()
-
-# @endcond

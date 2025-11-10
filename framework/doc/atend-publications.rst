@@ -3,6 +3,9 @@ Software publications
 
 Here you can find a list of Belle II software publications covering different topics, either as papers or as conference proceedings.
 
+.. important::
+    You **must** cite all relevant papers, proceedings or articles in your own publications, articles or theses.   
+
 Papers
 ++++++
 

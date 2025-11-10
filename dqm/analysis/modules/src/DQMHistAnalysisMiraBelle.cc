@@ -217,7 +217,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
     return;
   }
   if (hist_hltEff == nullptr) {
-    B2ERROR("Can not find the hist_dPhicms histogram!");
+    B2ERROR("Can not find the hist_hltEff histogram!");
     return;
   }
 

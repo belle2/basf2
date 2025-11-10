@@ -15,8 +15,6 @@ from contextlib import redirect_stdout
 import io
 import json
 
-# @cond internal_test
-
 
 class PythonLogInterface(unittest.TestCase):
     def assertDeath(self, function, *args, **kwargs):
@@ -232,5 +230,3 @@ class PythonLogJSON(unittest.TestCase):
 if __name__ == "__main__":
     with clean_working_directory():
         unittest.main(verbosity=0)
-
-# @endcond

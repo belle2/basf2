@@ -10,7 +10,8 @@
 
 #include <analysis/VariableManager/Manager.h>
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/B2Vector3.h>
+
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   class Particle;
@@ -262,7 +263,7 @@ namespace Belle2 {
     double getHelixTanLambdaPull(const Particle* part);
 
     /** helper function to get the position on the Helix */
-    B2Vector3D getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
+    ROOT::Math::XYZVector getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
 
     /** 1 if the track that has been flipped and refitted in the refining step */
     double isTrackFlippedAndRefitted(const Particle* part);

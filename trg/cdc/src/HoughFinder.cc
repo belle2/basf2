@@ -140,7 +140,7 @@ namespace Belle2 {
     H0->move(1260, 0);
 #endif
 
-    //...Old mapping (trasan methode)...
+    //...Old mapping (trasan method)...
     if (_doit == 0 || _doit == 1) {
 
       //...Create patterns...
@@ -171,7 +171,7 @@ namespace Belle2 {
       }
     }
 
-    //...Kaiyu's methode...
+    //...Kaiyu's method...
     else {
       mappingByFile(mappingFilePlus, mappingFileMinus);
     }
@@ -1139,7 +1139,7 @@ namespace Belle2 {
     c.append(links);
 
     if (TRGDebug::level()) {
-      cout << TRGDebug::tab() << "attched segments below" << endl;
+      cout << TRGDebug::tab() << "attached segments below" << endl;
       cout << TRGDebug::tab(4);
       for (unsigned j = 0; j < segments.size(); j++) {
         cout << segments[j]->name();

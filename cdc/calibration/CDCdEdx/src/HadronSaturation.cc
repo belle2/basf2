@@ -166,7 +166,7 @@ HadronSaturation::fitSaturation()
   double arg[10];
 
   double strategy(2.);
-  minimizer->ExecuteCommand("SET STRAT", &strategy, 1);
+  minimizer->ExecuteCommand("SET START", &strategy, 1);
 
   double up(1.);
   minimizer->ExecuteCommand("SET ERR", &up, 1);

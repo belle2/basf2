@@ -17,7 +17,7 @@ namespace Belle2 {
   class TRGArea2D {
 
   public:
-    /// Contructor.
+    /// Constructor.
     TRGArea2D(const TRGPoint2D& leftBottom,
               const TRGPoint2D& rightUpper);
 

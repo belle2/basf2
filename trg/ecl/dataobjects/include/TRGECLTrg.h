@@ -151,14 +151,14 @@ namespace Belle2 {
     void setLowMultiBit(int LowMultiBit) { m_LowMultiBit = LowMultiBit; }
     //! Set LowMultiBit
     void setmumuBit(int mumuBit) { m_mumuBit = mumuBit; }
-    // Set trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
-    // are in CDCTRG region in theta (="InTrack") or not
-    // Default "InTrack" is set to be TC ThetaID=3-15
+    /** Set trigger bit of flag(1bit) whether two clusters satisfy 3D Bhabha veto
+     *  are in CDCTRG region in theta (="InTrack") or not
+     * Default "InTrack" is set to be TC ThetaID=3-15 */
     void set3DBhabhaVetoInTrackFlag(int v3DBhabhaVetoInTrackFlag)
     {
       m_3DBhabhaVetoInTrackFlag = v3DBhabhaVetoInTrackFlag;
     }
-    // Set each TCID(most energetic TC in a cluster) of two clusters of 3D Bhabha veto
+    /// Set each TCID(most energetic TC in a cluster) of two clusters of 3D Bhabha veto
     void set3DBhabhaVetoClusterTCId(int v3DBhabhaVetoClusterTCId, int idx)
     {
       if (idx == 0) {
@@ -167,7 +167,7 @@ namespace Belle2 {
         m_3DBhabhaVetoClusterTCId2 = v3DBhabhaVetoClusterTCId;
       }
     }
-    // Set each cluster energy of two clusters of 3D Bhabha veto (GeV)
+    /// Set each cluster energy of two clusters of 3D Bhabha veto (GeV)
     void set3DBhabhaVetoClusterEnergy(double v3DBhabhaVetoClusterEnergy, int idx)
     {
       if (idx == 0) {
@@ -176,7 +176,7 @@ namespace Belle2 {
         m_3DBhabhaVetoClusterEnergy2 = v3DBhabhaVetoClusterEnergy;
       }
     }
-    // Set each cluster timing of two clusters of 3D Bhabha veto (ns)
+    /// Set each cluster timing of two clusters of 3D Bhabha veto (ns)
     void set3DBhabhaVetoClusterTiming(double v3DBhabhaVetoClusterTiming, int idx)
     {
       if (idx == 0) {
@@ -185,8 +185,8 @@ namespace Belle2 {
         m_3DBhabhaVetoClusterTiming2 = v3DBhabhaVetoClusterTiming;
       }
     }
-    // Set each TC theta ID(most energetic TC in a cluster) of
-    // two clusters of 3D Bhabha veto
+    /** Set each TC theta ID(most energetic TC in a cluster) of
+     *  two clusters of 3D Bhabha veto */
     void set3DBhabhaVetoClusterThetaId(int v3DBhabhaVetoClusterThetaId, int idx)
     {
       if (idx == 0) {
@@ -195,19 +195,20 @@ namespace Belle2 {
         m_3DBhabhaVetoClusterThetaId2 = v3DBhabhaVetoClusterThetaId;
       }
     }
-    // Set trigger bit(2bits) of flag which shows theta position of clusters
-    // of 3DBhabha Selection.
-    // flag=0 : one of clusters goes to ThetaID=1
-    // flag=1 : one of clusters goes to ThetaID=2
-    // flag=2 : one of clusters goes to ThetaID=3
-    // flag=3 : none of clusters fly to ThetaID=1-3
-    // Based on this flag, pre-scale is applied on GDL to have flat entry of
-    // Bhabha event in theta for calibration purpose
+    /** Set trigger bit(2bits) of flag which shows theta position of clusters
+     *  of 3DBhabha Selection.
+     *  flag=0 : one of clusters goes to ThetaID=1
+     *  flag=1 : one of clusters goes to ThetaID=2
+     *  flag=2 : one of clusters goes to ThetaID=3
+     *  flag=3 : none of clusters fly to ThetaID=1-3
+     *  Based on this flag, pre-scale is applied on GDL to have flat entry of
+     *  Bhabha event in theta for calibration purpose
+     */
     void set3DBhabhaSelectionThetaFlag(int v3DBhabhaSelectionThetaFlag)
     {
       m_3DBhabhaSelectionThetaFlag = v3DBhabhaSelectionThetaFlag;
     }
-    // Set each TCID(most energetic TC in a cluster) of two clusters of 3D Bhabha selection
+    /// Set each TCID(most energetic TC in a cluster) of two clusters of 3D Bhabha selection
     void set3DBhabhaSelectionClusterTCId(int v3DBhabhaSelectionClusterTCId, int idx)
     {
       if (idx == 0) {
@@ -216,8 +217,9 @@ namespace Belle2 {
         m_3DBhabhaSelectionClusterTCId2 = v3DBhabhaSelectionClusterTCId;
       }
     }
-    // Set each TC theta ID(most energetic TC in a cluster) of
-    // two clusters of 3D Bhabha selection
+    /** Set each TC theta ID(most energetic TC in a cluster) of
+     *  two clusters of 3D Bhabha selection
+     */
     void set3DBhabhaSelectionClusterThetaId(int v3DBhabhaSelectionClusterThetaId, int idx)
     {
       if (idx == 0) {
@@ -226,7 +228,7 @@ namespace Belle2 {
         m_3DBhabhaSelectionClusterThetaId2 = v3DBhabhaSelectionClusterThetaId;
       }
     }
-    // Set each cluster energy of two clusters of 3D Bhabha selection (GeV)
+    /// Set each cluster energy of two clusters of 3D Bhabha selection (GeV)
     void set3DBhabhaSelectionClusterEnergy(double v3DBhabhaSelectionClusterEnergy, int idx)
     {
       if (idx == 0) {
@@ -235,7 +237,7 @@ namespace Belle2 {
         m_3DBhabhaSelectionClusterEnergy2 = v3DBhabhaSelectionClusterEnergy;
       }
     }
-    // Set each cluster timing of two clusters of 3D Bhabha selection (ns)
+    /// Set each cluster timing of two clusters of 3D Bhabha selection (ns)
     void set3DBhabhaSelectionClusterTiming(double v3DBhabhaSelectionClusterTiming, int idx)
     {
       if (idx == 0) {
@@ -244,28 +246,29 @@ namespace Belle2 {
         m_3DBhabhaSelectionClusterTiming2 = v3DBhabhaSelectionClusterTiming;
       }
     }
-    // Set trigger bit(2 bits) of event timing quality flag for SVD DAQ
-    // The timing quality is determined by resolution of event timing
-    // based on energy of most energetic TC in an event
-    // flag=0 : no event timing
-    // flag=1 : event timing with poor timing resolution
-    // flag=2 : fine timing
-    // flag=3 : super-fine timing
+    /** Set trigger bit(2 bits) of event timing quality flag for SVD DAQ
+     *  The timing quality is determined by resolution of event timing
+     *  based on energy of most energetic TC in an event
+     *  flag=0 : no event timing
+     *  flag=1 : event timing with poor timing resolution
+     *  flag=2 : fine timing
+     *  flag=3 : super-fine timing
+     */
     void setEventTimingQualityFlag(int vEventTimingQualityFlag)
     {
       m_EventTimingQualityFlag = vEventTimingQualityFlag;
     }
-    // Set TCId used to determine event timming
+    /// Set TCId used to determine event timing
     void setEventTimingTCId(int vEventTimingTCId)
     {
       m_EventTimingTCId = vEventTimingTCId;
     }
-    // Set ThetaID of TC used to determine event timming
+    /// Set ThetaID of TC used to determine event timing
     void setEventTimingTCThetaId(int vEventTimingTCThetaId)
     {
       m_EventTimingTCThetaId = vEventTimingTCThetaId;
     }
-    // Set energy of TC used to determine event timming (GeV)
+    /// Set energy of TC used to determine event timing (GeV)
     void setEventTimingTCEnergy(double vEventTimingTCEnergy)
     {
       m_EventTimingTCEnergy = vEventTimingTCEnergy;
@@ -282,7 +285,7 @@ namespace Belle2 {
     void setTaub2bClusterEFlag(int taub2bClusterEFlag) { m_taub2bClusterEFlag = taub2bClusterEFlag; }
     //! set the number of cluster in all theta region (thetaID=1-17)
     void setNofCluster1to17(int NofCluster1to17) { m_NofCluster1to17 = NofCluster1to17; }
-    // Set data clock start timing (ns)
+    //! Set data clock start timing (ns)
     void setDataClockWindowStartTime(double vDataClockWindowStartTime)
     {
       m_DataClockWindowStartTime = vDataClockWindowStartTime;
@@ -437,56 +440,64 @@ namespace Belle2 {
     int m_LowMultiBit;
     //! mumu bit
     int m_mumuBit;
-    // trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
-    // are in CDCTRG region in theta (="InTrack") or not
+    /** trigger bit of flag(1bit) whether two clusters satisfy 3D Bhabha veto
+     *  are in CDCTRG region in theta (="InTrack") or not */
     int    m_3DBhabhaVetoInTrackFlag;
-    // TCIDs of two clusters of 3D Bhabha veto
+    //! TCID of first cluster of 3D Bhabha veto
     int    m_3DBhabhaVetoClusterTCId1;
+    //! TCID of second cluster of 3D Bhabha veto
     int    m_3DBhabhaVetoClusterTCId2;
-    // ThetaIds of two clusters of 3D Bhabha veto
+    //! ThetaId of first cluster of 3D Bhabha veto
     int    m_3DBhabhaVetoClusterThetaId1;
+    //! ThetaId of second cluster of 3D Bhabha veto
     int    m_3DBhabhaVetoClusterThetaId2;
-    // Energies of two clusters of 3D Bhabha veto (GeV)
+    //! Energy of first cluster of 3D Bhabha veto (GeV)
     double m_3DBhabhaVetoClusterEnergy1;
+    //! Energy of second cluster of 3D Bhabha veto (GeV)
     double m_3DBhabhaVetoClusterEnergy2;
-    // Timings of two clusters of 3D Bhabha veto (ns)
+    //! Timing of first cluster of 3D Bhabha veto (ns)
     double m_3DBhabhaVetoClusterTiming1;
+    //! Timing of second cluster of 3D Bhabha veto (ns)
     double m_3DBhabhaVetoClusterTiming2;
-    // flag which shows theta position of clusters of 3DBhabha Selection.
+    //! flag which shows theta position of clusters of 3DBhabha Selection.
     int    m_3DBhabhaSelectionThetaFlag;
-    // TCIDs of two clusters of 3D Bhabha selection
+    //! TCID of first cluster of 3D Bhabha selection
     int    m_3DBhabhaSelectionClusterTCId1;
+    //! TCID of second cluster of 3D Bhabha selection
     int    m_3DBhabhaSelectionClusterTCId2;
-    // ThetaIDs of two clusters used for 3D Bhabha selection
+    //! ThetaID of first cluster used for 3D Bhabha selection
     int    m_3DBhabhaSelectionClusterThetaId1;
+    //! ThetaID of second cluster used for 3D Bhabha selection
     int    m_3DBhabhaSelectionClusterThetaId2;
-    // Energies of two clusters used for 3D Bhabha selection (GeV)
+    //! Energy of first cluster used for 3D Bhabha selection (GeV)
     double m_3DBhabhaSelectionClusterEnergy1;
+    //! Energy of second cluster used for 3D Bhabha selection (GeV)
     double m_3DBhabhaSelectionClusterEnergy2;
-    // Timings of two clusters used for 3D Bhabha selection (ns)
+    //! Timing of first cluster used for 3D Bhabha selection (ns)
     double m_3DBhabhaSelectionClusterTiming1;
+    //! Timing of second cluster used for 3D Bhabha selection (ns)
     double m_3DBhabhaSelectionClusterTiming2;
-    // event timing quality flag for SVD DAQ
+    //! event timing quality flag for SVD DAQ
     int m_EventTimingQualityFlag;
-    // TCID of event timing
+    //! TCID of event timing
     int m_EventTimingTCId;
-    // TC theta ID of event timing
+    //! TC theta ID of event timing
     int m_EventTimingTCThetaId;
-    // Energy of TC of event timing (GeV)
+    //! Energy of TC of event timing (GeV)
     double m_EventTimingTCEnergy;
-    // Total Energy (total energy in ThetaID 1-17)
+    //! Total Energy (total energy in ThetaID 1-17)
     double m_etot1to17;
-    // taub2b trigger flag
+    //! taub2b trigger flag
     int m_taub2bFlag = 0;
-    // taub2b angle cut flag
+    //! taub2b angle cut flag
     int m_taub2bAngleFlag = 0;
-    // taub2b total enrgy cut flag
+    //! taub2b total enrgy cut flag
     int m_taub2bEtotFlag = 0;
-    // taub2b cluster energy cut flag
+    //! taub2b cluster energy cut flag
     int m_taub2bClusterEFlag = 0;
-    // the number of cluster in all thata region (theta ID=1-17)
+    //! the number of cluster in all thata region (theta ID=1-17)
     int m_NofCluster1to17 = 0;
-    // Start timing of data clock (ns)
+    //! Start timing of data clock (ns)
     double m_DataClockWindowStartTime;
 
   public:

@@ -241,7 +241,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
     add_svd_SPcreation(path, isROIsimulation)
 
 
-def add_svd_simulation(path, useConfigFromDB=False, daqMode=2, relativeShift=9):
+def add_svd_simulation(path, useConfigFromDB=True, daqMode=2, relativeShift=9):
     """
     Adds the SVD simulation to the path.
 

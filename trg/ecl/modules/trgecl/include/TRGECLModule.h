@@ -12,11 +12,14 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
 
 #include "trg/ecl/dataobjects/TRGECLHit.h"
 #include "trg/ecl/dataobjects/TRGECLTrg.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include "trg/ecl/dbobjects/TRGECLETMPara.h"
+
+#include <map>
 
 namespace Belle2 {
 
@@ -32,7 +35,7 @@ namespace Belle2 {
     /** Destructor  */
     virtual ~TRGECLModule();
 
-    /** Initilizes TRGECLModule.*/
+    /** Initializes TRGECLModule.*/
     virtual void initialize() override;
 
     /** Called when new run started.*/
@@ -55,15 +58,16 @@ namespace Belle2 {
   private: //! Parameters
 
     /** Debug level.*/
-    int _debugLevel;
+    int m_debugLevel = 0;
 
     /** Config. file name.*/
-    std::string _configFilename;
+    std::string m_configFilename;
 
-    //! A pointer to a TRGECL
-    //!    TrgEcl* _ecl; */
+    //! get payload from conditionDB
+    double getDBparmap(const std::map<std::string, double>, std::string, double);
 
   protected:
+
     //! Input array name.
     std::string m_inColName;
     //! Output array name for Xtal
@@ -84,89 +88,95 @@ namespace Belle2 {
     int m_nRun = 0;
     //!  Event number
     int m_nEvent = 0;
-    //! Bhabha option
-    int _Bhabha;
     //! Clustering option
-    int _Clustering;
+    int m_Clustering = 1;
     //! Cluster Limit
-    int _ClusterLimit;
+    int m_ClusterLimit = 6;
     //! Eventtiming option
-    int _EventTiming;
+    int m_EventTiming = 1;
     //! Trigger decision time window
-    double _TimeWindow;
-    //! Trigger decision overlap window in oder to avoid boundary effect
-    double _OverlapWindow;
+    double m_TimeWindow = 250.0;
+    //! Trigger decision overlap window in order to avoid boundary effect
+    double m_OverlapWindow = 125.0;
     //! # of considered TC in energy weighted Timing method
-    int _NofTopTC;
+    int m_NofTopTC = 3;
     //! Event selection
-    int _SelectEvent;
+    int m_SelectEvent = 1;
     //! Flag to use Condition DB
-    int _ConditionDB;
+    bool m_ConditionDB = true;
+    //! conversion factor of ADC to Energy in GeV
+    double m_ADCtoEnergy = 0.0;
+    //! Total Energy Threshold (low, high, lum) in Lab in GeV
+    std::vector<double> m_TotalEnergy;
     //! 2D Bhabha Energy Threshold
-    std::vector<double> _2DBhabhaThresholdFWD;
+    std::vector<double> m_2DBhabhaThresholdFWD;
     //! 2D Bhabha Energy Threshold
-    std::vector<double> _2DBhabhaThresholdBWD;
-    //! 3D Selection Bhabha Energy Threshold
-    std::vector<double> _3DBhabhaSelectionThreshold;
+    std::vector<double> m_2DBhabhaThresholdBWD;
     //! 3D Veto Bhabha Energy Threshold
-    std::vector<double> _3DBhabhaVetoThreshold;
-    //! 3D Selection Bhabha Energy Angle
-    std::vector<double> _3DBhabhaSelectionAngle;
+    std::vector<double> m_3DBhabhaVetoThreshold;
     //! 3D Veto Bhabha Energy Angle
-    std::vector<double> _3DBhabhaVetoAngle;
+    std::vector<int> m_3DBhabhaVetoAngle;
+    //! 3D Selection Bhabha Energy Threshold
+    std::vector<double> m_3DBhabhaSelectionThreshold;
+    //! 3D Selection Bhabha Energy Angle
+    std::vector<int> m_3DBhabhaSelectionAngle;
+    //! 3D Selection Bhabha preselection
+    std::vector<int> m_3DBhabhaSelectionPreScale;
     //! mumu bit Energy Threshold
-    double _mumuThreshold;
+    double m_mumuThreshold = 0.0;
     //! mumu bit  Angle
-    std::vector<double> _mumuAngle;
-    //! Angle selection of additional Bhabha veto in CM frame
-    std::vector<double> m_3DBhabhaAddAngleCut;
-    //! The number of Cluster exceeding 300 MeV
-    int _n300MeVCluster;
+    std::vector<int> m_mumuAngle;
+    //! Low Multiplicity cluster E cut in Lab in GeV
+    std::vector<double> m_lmlCLELabCut;
+    //! Low Multiplicity cluster E cut in CMS in GeV
+    std::vector<double> m_lmlCLECMSCut;
+    //! lml0 the number of cluster for minimum energy
+    int m_lml00NCLforMinE = 0;
+    //! lml12 the number of cluster for minimum energy
+    int m_lml12NCLforMinE = 0;
+    //! lml13 cluster ThetaID selection
+    int m_lml13ThetaIdSelection = 0;
     //!ECL Burst Bit Threshold
-    double _ECLBurstThreshold;
-    //! Total Energy Theshold (low, high, lum)
-    std::vector<double> _TotalEnergy;
-    //! Low Multiplicity Threshold
-    std::vector<double> _LowMultiThreshold;
+    double m_ECLBurstThreshold = 0.0;
+    //! Energy threshold(low, high) of event timing quality flag (GeV)
+    std::vector<double> m_EventTimingQualityThreshold;
     //! Theta region (low, high) of 3D Bhabha Veto InTrack
     std::vector<int> m_3DBhabhaVetoInTrackThetaRegion;
-    //! Energy threshold(low, high) of event timing quality flag (GeV)
-    std::vector<double> m_EventTimingQualityThresholds;
     //! taub2b 2 cluster angle cut (degree)
     //! (dphi low, dphi high, theta_sum low, theta_sum high)
     std::vector<int> m_taub2bAngleCut;
     //! taub2b total energy (TC theta ID =1-17) (GeV)
-    double m_taub2bEtotCut;
-    //! taub2b Cluster energy selection (GeV)
-    double m_taub2bClusterECut1;
-    //! taub2b Cluster energy selection (GeV)
-    double m_taub2bClusterECut2;
-    //! taub2b2 total energy cut (GeV)
-    double m_taub2b2EtotCut;
+    double m_taub2bEtotCut = 0.0;
+    //! taub2b Cluster energy selection in Lab (GeV)
+    double m_taub2bCLELabCut = 0.0;
+    //! (hie1 and hie2) 2 cluster angle cut in CMS in degree for Bhabha veto in hie1 and hie2
+    std::vector<int> m_hie12BhabhaVetoAngle;
+    //! taub2b2 total energy cut in Lab (GeV)
+    double m_taub2b2EtotCut = 0.0;
     //! taub2b2 two Cluster angle cut (degree)
     std::vector<int> m_taub2b2AngleCut;
-    //! taub2b2 cluster energy cut for endcap cluster (GeV)
-    double m_taub2b2CLEEndcapCut;
-    //! taub2b2 cluster energy cut (GeV)
-    double m_taub2b2CLECut;
+    //! taub2b2 cluster energy cut(low, high) (GeV) in lab
+    std::vector<double> m_taub2b2CLELabCut;
     //! taub2b3 total energy cut in lab (GeV)
-    double m_taub2b3EtotCut;
+    double m_taub2b3EtotCut = 0.0;
     //! taub2b3 two Cluster angle cut in cms (degree)
     std::vector<int> m_taub2b3AngleCut;
     //! taub2b3 cluster energy cut in lab for one of b2b clusters (GeV)
-    double m_taub2b3CLEb2bCut;
-    //! taub2b3 cluster energy low cut in lab for all clusters (GeV)
-    double m_taub2b3CLELowCut;
-    //! taub2b3 cluster energy high cut in lab for all clusters (GeV)
-    double m_taub2b3CLEHighCut;
+    double m_taub2b3CLEb2bLabCut = 0.0;
+    //! taub2b3 cluster energy cut(low and high) in lab for all clusters (GeV)
+    std::vector<double> m_taub2b3CLELabCut;
+    //! (hie4) CL E cut for minimum energy cluster
+    double m_hie4LowCLELabCut = 0.0;
+
+    //! ETM (ecl trigger master) to generate all trigger bits of ecl trigger
+    TrgEclMaster* etm;
+
     /** output for TRGECLHit */
     StoreArray<TRGECLHit> m_TRGECLHit;
     /** output for TRGECLTrg */
     StoreArray<TRGECLTrg> m_TRGECLTrg;
     /** output for TRGECLCluster */
     StoreArray<TRGECLCluster> m_TRGECLCluster;
-    /** ETN Parameters */
-    DBArray<TRGECLETMPara> m_ETMPara;
 
   };
 

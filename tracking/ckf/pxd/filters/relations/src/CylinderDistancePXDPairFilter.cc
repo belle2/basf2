@@ -17,6 +17,8 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
+#include <cmath>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -54,8 +56,8 @@ CylinderDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, 
       while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
       while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
       const float thetaDiff = positionOnCylinder.Theta() - toStateCache.theta;
-      if (abs(phiDiff) < static_cast<float>(m_param_CylinderExtrapolationToHitPhiCut) and
-          abs(thetaDiff) < static_cast<float>(m_param_CylinderExtrapolationToHitThetaCut)) {
+      if (std::abs(phiDiff) < static_cast<float>(m_param_CylinderExtrapolationToHitPhiCut) and
+          std::abs(thetaDiff) < static_cast<float>(m_param_CylinderExtrapolationToHitThetaCut)) {
         return 1.0;
       } else {
         return NAN;
@@ -66,8 +68,8 @@ CylinderDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, 
       while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
       while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
       const float thetaDiff = fromStateCache.theta - toStateCache.theta;
-      if (abs(phiDiff) < static_cast<float>(m_param_RecoTrackToHitPhiCut) and
-          abs(thetaDiff) < static_cast<float>(m_param_RecoTrackToHitThetaCut)) {
+      if (std::abs(phiDiff) < static_cast<float>(m_param_RecoTrackToHitPhiCut) and
+          std::abs(thetaDiff) < static_cast<float>(m_param_RecoTrackToHitThetaCut)) {
         return 1.0;
       }
       return NAN;
@@ -88,8 +90,8 @@ CylinderDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, 
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
   const float thetaDiff = fromStateCache.theta - toStateCache.theta;
 
-  if (abs(phiDiff) < static_cast<float>(m_param_HitHitPhiCut) and
-      abs(thetaDiff) < static_cast<float>(m_param_HitHitThetaCut)) {
+  if (std::abs(phiDiff) < static_cast<float>(m_param_HitHitPhiCut) and
+      std::abs(thetaDiff) < static_cast<float>(m_param_HitHitThetaCut)) {
     return 1.0;
   }
 

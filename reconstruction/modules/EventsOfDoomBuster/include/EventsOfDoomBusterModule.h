@@ -7,22 +7,21 @@
  **************************************************************************/
 #pragma once
 
-/* Reconstruction headers. */
-#include <reconstruction/dbobjects/EventsOfDoomParameters.h>
-
 /* Basf2 headers. */
-#include <cdc/dataobjects/CDCHit.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
 
 /* C++ headers. */
 #include <cstdint>
 
 namespace Belle2 {
+  class EventMetaData;
+  class CDCHit;
+  class SVDShaperDigit;
+  class EventsOfDoomParameters;
+
   /**
    * Module that flags an event destined for doom at reconstruction,
    * based on the size of selected hits/digits containers after the unpacking.

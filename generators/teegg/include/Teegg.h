@@ -219,7 +219,7 @@ namespace Belle2 {
     double m_t;  /**< T=-Q2 */
     double m_w2;  /**< W2 */
     double m_weight;  /**< weight per event */
-    double m_vp2;  /**< vacuum polarization squared (multiply with this to correcty for VP) */
+    double m_vp2;  /**< vacuum polarization squared (multiply with this to correctly for VP) */
 
     /** Apply the settings to the internal Fortran generator. */
     void applySettings();
@@ -228,7 +228,7 @@ namespace Belle2 {
      * @param mcGraph Reference to the MonteCarlo graph into which the particle should be stored.
      * @param mom The 3-momentum of the particle in [GeV].
      * @param pdg The PDG code of the particle.
-     * @param vertex Produciton vertex.
+     * @param vertex Production vertex.
      * @param boost Lorentz boost vector.
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
      * @param isInitial If the particle is a initial particle for ISR, set this to true.

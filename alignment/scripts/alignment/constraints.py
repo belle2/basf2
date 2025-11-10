@@ -430,6 +430,7 @@ class CDCWireConstraints(Constraints):
         #: List of layers for whose wires to generate the constraints. None = all layers
         if layers is None:
             layers = list(range(0, 56))
+        #: set list of layers
         self.layers = layers
         #: 6 x 56 (6/layer) constraints. Sum(dX_B/dY_B/drot_B/dX_FB/dY_FB/drot_FB)=0 for all wires in each layer
         #  -> removes the basic unconstrained DoF when aligning wires and layers simultaneously.
@@ -440,6 +441,7 @@ class CDCWireConstraints(Constraints):
         #  same by this constraint (1 per layer)
         if layer_radius is None:
             layer_radius = []
+        #: set list of layer radii
         self.layer_radius = layer_radius
         #: 2 Constraints: Sum(dr)=0 for all wires in CDC at each end-plate -> "average CDC radius" kept same
         #  by this constraint (1 per CDC)
@@ -447,6 +449,7 @@ class CDCWireConstraints(Constraints):
         #: list of layer subject to hemisphere constraints
         if hemisphere is None:
             hemisphere = []
+        #: set list of layers
         self.hemisphere = hemisphere
 
     def configure_collector(self, collector):

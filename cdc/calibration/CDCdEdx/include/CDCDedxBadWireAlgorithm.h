@@ -8,23 +8,12 @@
 
 #pragma once
 
-#include <algorithm>
 #include <string>
-#include <iostream>
-#include <fstream>
 
-#include <TCanvas.h>
 #include <TH2F.h>
-#include <TH1I.h>
-#include <TMath.h>
-#include <TLine.h>
-#include <TStyle.h>
 #include <TPaveText.h>
-#include <TText.h>
-#include <TLegend.h>
 
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
 
 #include <cdc/dbobjects/CDCDedxBadWires.h>
 #include <cdc/dbobjects/CDCDedxWireGain.h>
@@ -32,8 +21,6 @@
 #include <calibration/CalibrationAlgorithm.h>
 
 #include <cdc/dbobjects/CDCGeometry.h>
-#include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/geometry/CDCGeometryParConstants.h>
 
 
 namespace Belle2 {

@@ -18,7 +18,7 @@ namespace Belle2 {
    */
   template <class T>
   class NNTParam {
-    /** this is a typewrapper class for the parameters for the neurotrigger. for every parameter, it can also store the information wether the parameter was aleady set or if it is locked.
+    /** this is a typewrapper class for the parameters for the neurotrigger. for every parameter, it can also store the information whether the parameter was already set or if it is locked.
      * */
   public:
     NNTParam() {}
@@ -57,7 +57,7 @@ namespace Belle2 {
   private:
     /** holding the value */
     T m_value;
-    /* saves the "set" state */
+    /** saves the "set" state */
     bool m_set = false;
     /** saves the "locked" state */
     bool m_locked = false;
@@ -165,7 +165,7 @@ namespace Belle2 {
     NNTParam<unsigned> tMax;
     /** flag to allow for target tracks lying out of the output range to be rescaled during training. */
     NNTParam<bool> rescaleTarget;
-    /** only used in the idhist module. it defines wether to use a cutsum or not */
+    /** only used in the idhist module. it defines whether to use a cutsum or not */
     NNTParam<bool> cutSum;
     /** only used in the idhist module. it defines the how much of the idrange is cut off after making the histogram */
     NNTParam<double> relevantCut;
@@ -183,7 +183,10 @@ namespace Belle2 {
      *min_etfcc_fastestpriority
      */
     NNTParam<unsigned> ETOption;
-
+    /** Flag for the addtional wire input usage: 0 for default, 1 selected additional wire, 2 for full wire input*/
+    NNTParam<unsigned> AdditionWireMode;
+    /** Number for the addtional wire input per SL*/
+    NNTParam<unsigned> AdditionInputPerSL;
     /** Phi region for which MLP is used in degree for all networks. */
     std::vector<std::vector<NNTParam<float>>> phiRangeUse;
     /** Theta region for which MLP is used in degree for all networks. */

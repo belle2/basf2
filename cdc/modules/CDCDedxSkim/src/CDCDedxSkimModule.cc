@@ -54,7 +54,7 @@ CDCDedxSkimModule::~CDCDedxSkimModule() {}
 void CDCDedxSkimModule::initialize()
 {
 
-  // requred inputs
+  // required inputs
   m_tracks.isRequired();
 }
 

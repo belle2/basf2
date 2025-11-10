@@ -126,7 +126,7 @@ void TRGGDLSummaryModule::event()
   StoreArray<TRGGDLUnpackerStore> entAry;
   if (!entAry || !entAry.getEntries()) return;
 
-  //prepare entAry adress
+  //prepare entAry address
   int clk_map = 0;
   for (int i = 0; i < 320; i++) {
     if (strcmp(entAry[0]->m_unpackername[i], "clk") == 0) clk_map = i;

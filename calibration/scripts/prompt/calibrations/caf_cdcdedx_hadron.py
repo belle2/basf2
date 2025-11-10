@@ -17,7 +17,8 @@ from caf.framework import Calibration, Collection
 from caf.strategies import SequentialBoundaries
 from ROOT.Belle2 import CDCDedxHadSatAlgorithm, CDCDedxHadBGAlgorithm
 from basf2 import create_path, register_module
-from clean_samples import make_pion_kaon_collection, make_proton_collection, make_muon_collection, make_electron_collection
+from cdcdedx_calibration_utils import make_pion_kaon_collection, make_proton_collection
+from cdcdedx_calibration_utils import make_muon_collection, make_electron_collection
 
 from prompt.calibrations.caf_cdcdedx_electron import settings as cdc_dedx_electron
 from prompt.calibrations.caf_top import settings as top
@@ -35,7 +36,8 @@ collection = ["pion_kaon", "electron", "muon", "proton"]
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="CDC dedx Hadron Calibrations",
-    expert_username="renu",
+    expert_username="renu92garg",
+    subsystem="cdc",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["hadron_calib", "bhabha_all_calib", "radmumu_calib"],
@@ -52,7 +54,8 @@ settings = CalibrationSettings(
                    "bgpar": {"muon": [12, 2.85, 28.85], "proton": [20, 0.33, 0.85]},
                    "cosbins": {"muon": 24, "proton": 20},
                    },
-    depends_on=[cdc_dedx_electron, top])
+    depends_on=[cdc_dedx_electron, top],
+    produced_payloads=["CDCDedxHadronCor", "CDCDedxMeanPars", "CDCDedxSigmaPars"])
 
 ##############################
 

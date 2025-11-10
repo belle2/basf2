@@ -297,10 +297,16 @@ TBranch: klmClusterIsForwardEKLM, 0
 TBranch: klmClusterIsBackwardEKLM, 0
 TBranch: klmClusterTheta, 1.47
 TBranch: klmClusterPhi, 2.371
+TBranch: klmClusterTrackDistance, nan
+TBranch: klmClusterTrackSeparationAngle, nan
+TBranch: klmClusterTrackRotationAngle, nan
+TBranch: klmClusterShapeStdDev1, 0
+TBranch: klmClusterShapeStdDev2, 0
+TBranch: klmClusterShapeStdDev3, 0
 TBranch: nKLMClusterTrackMatches, 1
 TBranch: nMatchedKLMClusters, nan
-TBranch: isFromECL, 0
-TBranch: isFromKLM, 1
+TBranch: isFromECL, False
+TBranch: isFromKLM, True
 TTree: klong
 TBranch: __experiment__, 0
 TBranch: __run__, 0
@@ -338,6 +344,12 @@ TBranch: klmClusterIsForwardEKLM, 0
 TBranch: klmClusterIsBackwardEKLM, 0
 TBranch: klmClusterTheta, 1.47
 TBranch: klmClusterPhi, 2.371
+TBranch: klmClusterTrackDistance, nan
+TBranch: klmClusterTrackSeparationAngle, nan
+TBranch: klmClusterTrackRotationAngle, nan
+TBranch: klmClusterShapeStdDev1, 0
+TBranch: klmClusterShapeStdDev2, 0
+TBranch: klmClusterShapeStdDev3, 0
 TBranch: nKLMClusterTrackMatches, 1
 TBranch: nMatchedKLMClusters, nan
 TTree: phot
@@ -397,7 +409,7 @@ TBranch: clusterSecondMoment, 0.4688
 TBranch: clusterTheta, 0.6785
 TBranch: clusterTiming, -0.9766
 TBranch: clusterTrackMatch, 0
-TBranch: goodBelleGamma, 1
+TBranch: goodBelleGamma, True
 TTree: muon
 TBranch: __experiment__, 0
 TBranch: __run__, 0

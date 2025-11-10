@@ -17,8 +17,9 @@
 #include <TDirectory.h>
 #include <TH1D.h>
 
-using namespace Belle2;
+#include <cmath>
 
+using namespace Belle2;
 
 
 //-----------------------------------------------------------------
@@ -111,16 +112,17 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
     const Particle* D    = nullptr;
     double dmDstar = std::numeric_limits<double>::quiet_NaN();
 
-    static const int c_PdgD0    = abs(EvtGenDatabasePDG::Instance()->GetParticle("D0")->PdgCode());
-    static const int c_PdgDplus = abs(EvtGenDatabasePDG::Instance()->GetParticle("D+")->PdgCode());
+    static const int c_PdgD0    = std::abs(EvtGenDatabasePDG::Instance()->GetParticle("D0")->PdgCode());
+    static const int c_PdgDplus = std::abs(EvtGenDatabasePDG::Instance()->GetParticle("D+")->PdgCode());
 
-    static const int c_PdgDstar0    = abs(EvtGenDatabasePDG::Instance()->GetParticle("D*0")->PdgCode());
-    static const int c_PdgDstarPlus = abs(EvtGenDatabasePDG::Instance()->GetParticle("D*+")->PdgCode());
+    static const int c_PdgDstar0    = std::abs(EvtGenDatabasePDG::Instance()->GetParticle("D*0")->PdgCode());
+    static const int c_PdgDstarPlus = std::abs(EvtGenDatabasePDG::Instance()->GetParticle("D*+")->PdgCode());
 
     //if D0 or D+ meson
-    if (abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgD0 || abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgDplus) {
+    if (std::abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgD0 || std::abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgDplus) {
       D = Bpart->getDaughter(0);
-    } else if (abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgDstar0 || abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgDstarPlus) {
+    } else if (std::abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgDstar0
+               || std::abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgDstarPlus) {
       const Particle* Dstar = Bpart->getDaughter(0);
       D = Dstar->getDaughter(0);
       dmDstar    = Dstar->getMass() - D->getMass();
@@ -136,16 +138,16 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
     double R2        = Variable::R2(Bpart);
 
     //get mass of B+- or B0
-    double mB = EvtGenDatabasePDG::Instance()->GetParticle(abs(pdg))->Mass();
+    double mB = EvtGenDatabasePDG::Instance()->GetParticle(std::abs(pdg))->Mass();
 
 
     // Filling the histograms
     if (c_mDmin < mD && mD < c_mDmax)
-      if (abs(mInv - mB) < c_mBwindow)
+      if (std::abs(mInv - mB) < c_mBwindow)
         if (R2 < c_R2max)
           if (std::isnan(dmDstar) || (c_dmDstarMin < dmDstar && dmDstar < c_dmDstarMax)) {
             double eBC = sqrt(pBcms * pBcms + mB * mB); // beam constrained energy
-            if (abs(pdg) == 511) {
+            if (std::abs(pdg) == 511) {
               m_hB0->Fill(eBC);
             } else {
               m_hBp->Fill(eBC);

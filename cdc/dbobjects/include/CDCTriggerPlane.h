@@ -24,7 +24,7 @@ namespace Belle2 {
     CDCTriggerPlane() {}
 
     /**
-     * Getter for the center posotion of the trigger plane.
+     * Getter for the center position of the trigger plane.
      */
     const ROOT::Math::XYZVector& getTriggerPosition() const
     {

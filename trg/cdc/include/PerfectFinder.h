@@ -30,7 +30,7 @@ namespace Belle2 {
 
   public:
 
-    /// Contructor.
+    /// Constructor.
     TRGCDCPerfectFinder(const std::string& name,
                         const TRGCDC&);
 

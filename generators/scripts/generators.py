@@ -658,10 +658,14 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
         ).set_name('PHOKHARA_n0n0barISR')
 
     elif finalstate == 'Lambda0Lambda0bar':
+        b2.B2WARNING(
+            "The Lambda pair production and decays are implemented at the leading order only,"
+            " but as the expected number of events is modest, the accuracy of the code is"
+            " sufficient for the description of this process.")
         path.add_module(
             'PhokharaInput',
             FinalState=9,        # Lambda0Lambda0bar
-            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            LO=0, NLO=0, QED=0,  # use only one loop corrections
             MinInvMassHadrons=0.,
             eventType=eventType,
         ).set_name('PHOKHARA_Lambda0Lambda0barISR')
@@ -858,7 +862,7 @@ with
 
   path.add_module('CRYInput')
 
-in your steering file (the module parameter "acceptance" has to be set, see the module docummentation).''')
+in your steering file (the module parameter "acceptance" has to be set, see the module documentation).''')
 
     import cdc.cr as cosmics_setup
 

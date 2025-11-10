@@ -33,7 +33,7 @@ namespace Belle2 {
     //! Destructor
     virtual ~RawFTSW();
 
-    //! set buffer ( delete_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
+    //! set buffer ( delete_flag : m_buffer is freed( = 0 )/ not freed( = 1 ) in Destructor )
     /* cppcheck-suppress missingOverride */
     void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes) OVERRIDE_CPP17;
 
@@ -144,7 +144,7 @@ namespace Belle2 {
       return m_access->GetSubRunNo(n);
     }
 
-    //! get a word cotaining run # and subrun #
+    //! get a word containing run # and subrun #
     int GetRunNoSubRunNo(int n)
     {
       CheckVersionSetBuffer();

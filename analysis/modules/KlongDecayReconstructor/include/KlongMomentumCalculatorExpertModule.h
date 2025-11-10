@@ -10,12 +10,15 @@
 
 #include <framework/core/Module.h>
 
+#include <framework/datastore/StoreObjPtr.h>
+
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <analysis/ParticleCombiner/ParticleCombiner.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 #include <string>
 
 namespace Belle2 {
+  class ParticleGenerator;
 
   /**
    * reco missing module

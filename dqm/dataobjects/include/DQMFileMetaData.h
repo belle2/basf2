@@ -47,7 +47,7 @@ namespace Belle2 {
     /** Run type getter */
     const std::string& getRunType() const {return m_rtype;}
 
-    /** Is it generated data?.
+    /** Is it generated data?
      */
     bool isMC() const {return m_isMC;}
 
@@ -132,7 +132,7 @@ namespace Belle2 {
 
     std::string m_rtype; /**< run type (physics, cosmics, etc.) */
 
-    bool m_isMC; /**< Is it generated or real data?.  */
+    bool m_isMC; /**< Is it generated or real data?  */
 
     std::string m_databaseGlobalTag; /**< Global tag in the database used for production of this file */
 

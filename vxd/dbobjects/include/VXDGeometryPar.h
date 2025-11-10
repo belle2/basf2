@@ -50,7 +50,7 @@ namespace Belle2 {
     const VXDGeoRadiationSensorsPar& getRadiationSensors() const {return m_radiationsensors;}
     /** set radiation sensor parameters */
     void setRadiationSensors(const VXDGeoRadiationSensorsPar& diamonds) {m_radiationsensors = diamonds;}
-    /** get alignmant map*/
+    /** get alignment map*/
     std::map<std::string, VXDAlignmentPar>& getAlignmentMap() {return m_alignment;}
     /** get alignment parameters for component name */
     VXDAlignmentPar getAlignment(std::string name) const;

@@ -23,10 +23,11 @@ class TH2;
 
 namespace Belle2 {
 
+  //! module of ecl trigger DQM
   class TRGECLDQMModule : public HistoModule {
 
   public:
-    //! Costructor
+    //! Constructor
     TRGECLDQMModule();
     //! Destrunctor
     virtual ~TRGECLDQMModule();
@@ -115,29 +116,29 @@ namespace Belle2 {
     TH2* h_nTChit_part_injtime_clkgrp[3] = {nullptr};
 
     //! Hit TCId
-    std::vector<int> TCId;
+    std::vector<int> m_TCId;
     //! Hit TCHitWin
-    std::vector<int> TCHitWin;
+    std::vector<int> m_TCHitWin;
     //! Hit TC Energy
-    std::vector<double> TCEnergy;
+    std::vector<double> m_TCEnergy;
     //! Hit TC Timing
-    std::vector<double> TCTiming;
+    std::vector<double> m_TCTiming;
     //! FAM Revolution Clk
-    std::vector<double> RevoFAM;
+    std::vector<double> m_RevoFAM;
     //! Event Timing
-    std::vector<double> FineTiming;
+    std::vector<double> m_FineTiming;
     //! GDL Revolution Clk
-    std::vector<double> RevoTrg;
+    std::vector<double> m_RevoTrg;
 
 
     //! Trg ECL Unpakcer TC output
-    StoreArray<TRGECLUnpackerStore> trgeclHitArray;
+    StoreArray<TRGECLUnpackerStore> m_trgeclHitArray;
     //! Trg ECL Unpakcer Event output
-    StoreArray<TRGECLUnpackerEvtStore> trgeclEvtArray;
+    StoreArray<TRGECLUnpackerEvtStore> m_trgeclEvtArray;
     //! Trg Ecl Unpacker Summary output
-    StoreArray<TRGECLUnpackerSumStore> trgeclSumArray;
+    StoreArray<TRGECLUnpackerSumStore> m_trgeclSumArray;
     //! Trg ECL Cluster output
-    StoreArray<TRGECLCluster> trgeclCluster;
+    StoreArray<TRGECLCluster> m_trgeclCluster;
     //! Array to access the FTSW information
     StoreObjPtr<EventLevelTriggerTimeInfo> m_trgTime;
 

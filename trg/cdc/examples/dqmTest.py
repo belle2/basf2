@@ -13,7 +13,7 @@ def add_neuro_2d_unpackers(path, debug_level=4, debugout=True):
     unpacker = b2.register_module('CDCTriggerUnpacker')
     if debugout:
         unpacker.logging.log_level = b2.LogLevel.DEBUG
-        # increase this value to get debug mesages in more detail
+        # increase this value to get debug messages in more detail
         unpacker.logging.debug_level = debug_level
         unpacker.logging.set_info(b2.LogLevel.DEBUG, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
     # size (number of words) of the Belle2Link header
@@ -57,5 +57,5 @@ main.add_module('HistoManager',
 main.add_module('CDCTriggerDQM')
 main.add_module('Progress')
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

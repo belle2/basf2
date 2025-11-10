@@ -82,11 +82,11 @@ namespace Belle2 {
     double TCRawEnergy[100];
     /** TC raw timing */
     double TCRawTiming[100];
-    /** Signal Contibution in a TC*/
+    /** Signal Contribution in a TC*/
     double SignalContribution[100];
-    /** Backgroun Contribution in a TC  */
+    /** Background Contribution in a TC  */
     double BKGContribution[100];
-    /** Energy of maximum contribtion particle  */
+    /** Energy of maximum contribution particle  */
     double maxEnergy[100][3] ;
     /**  particles contribution  */
     double contribution[100][3];
@@ -151,9 +151,9 @@ namespace Belle2 {
     int gggmotherHit[100][3] ;
     /** Raw Energy of particle    */
     double MCEnergyHit[100][3];
-    /** Signal Contibution in a TC*/
+    /** Signal Contribution in a TC*/
     double SignalContributionHit[100];
-    /** Backgroun Contribution in a TC  */
+    /** Background Contribution in a TC  */
     double BKGContributionHit[100];
     /**  particles contribution  */
     double contributionHit[100][3];

@@ -28,6 +28,7 @@
 //#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 #include <cdc/dbobjects/CDCCrossTalkLibrary.h>
 #include <cdc/dbobjects/CDCCorrToThresholds.h>
+#include <cdc/dbobjects/CDCAlphaScaleFactorForAsymmetry.h>
 
 //C++/C standard lib elements.
 #include <string>
@@ -234,6 +235,10 @@ namespace Belle2 {
     float m_semiTotalGain[c_maxNSenseLayers][c_maxNDriftCells] = {{}}; /**< total gain per wire */
     double m_overallGainFactor = 1.;  /**< Overall gain factor. */
     double m_degOfSPEOnThreshold = 0; /**< Degree of space charge effect on timing threshold */
+    //--- Parameters for alpha correction -------------------------------------------------------------------------------------
+    bool m_alphaCorrection; /**< Switch for alpha correction */
+    OptionalDBObjPtr<CDCAlphaScaleFactorForAsymmetry>
+    m_alphaScaleFactorsFromDB; /**< the ratio of data to MC, for eff(alpha<0)/eff(alpha>0). */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
     bool m_addTimeWalk; /**< A switch used to control adding time-walk delay into the total drift time or not */

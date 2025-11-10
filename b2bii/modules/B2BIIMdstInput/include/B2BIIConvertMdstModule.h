@@ -144,6 +144,8 @@ namespace Belle2 {
     //! C matching mode.
     MCMatchingMode m_mcMatchingMode;
 
+    bool m_evtgenProcessing; /**< Flag to switch on only evtgen processing */
+
     bool m_convertEvtcls; /**< Flag to switch on conversion of Evtcls table */
 
     bool m_nisEnable; /**< Flag to switch on conversion of nisKsFinder info */

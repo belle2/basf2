@@ -7,11 +7,17 @@
  **************************************************************************/
 
 #include <cdc/modules/HitLevelInfoWriter/HitLevelInfoWriter.h>
+
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/utility/ReferenceFrame.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dbobjects/BeamSpot.h>
+
 #include <TMath.h>
 
 using namespace Belle2;
-using namespace Dedx;
 using namespace std;
 
 REG_MODULE(HitLevelInfoWriter);
@@ -470,7 +476,7 @@ void HitLevelInfoWriterModule::recalculateDedx(CDCDedxTrack* dedxTrack, map<int,
       correction *= GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, m_cosTheta, m_injring, m_injtime);
       if (!m_DBWireGains && dedxTrack->getWireGain(ihit) == 0) correction = 0;
     } else {
-      //get modifed adc + abs correction factor
+      //get modified adc + abs correction factor
       correction = GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, m_cosTheta, m_injring, m_injtime);
     }
 

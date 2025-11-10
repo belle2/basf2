@@ -97,7 +97,7 @@ in the following way:
 
 .. note::
 
-  if new variables added in the MVA, make sure the ``/tracking/trackFitting/trackQualityEstimator/variableExtractors/include/FlipRecoTrackExtractor.h`` is also updated.
+  If new variables are added to the MVA, make sure to also update the corresponding ``/tracking/modules/flipAndRefit/utilities/include/FlipRecoTrackExtractor.h`` or ``/tracking/modules/flipAndRefit/utilities/include/Flip2ndRecoTrackExtractor.h``.
 
 
 

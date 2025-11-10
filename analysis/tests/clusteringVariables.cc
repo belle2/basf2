@@ -823,8 +823,10 @@ namespace {
     // so here we test that getKLMCluster() returns the first cluster
     // stored in the RelationVector
     float distance1 = 11.1;
+    klm1->setClusterTrackSeparation(distance1);
     muonTrack->addRelationTo(klm1, 1. / distance1);
     float distance2 = 2.2;
+    klm2->setClusterTrackSeparation(distance2);
     muonTrack->addRelationTo(klm2, 1. / distance2);
 
     // add a Particle

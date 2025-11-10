@@ -6,7 +6,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from basf2 import Path, process, B2INFO, statistics, find_file
+from basf2 import Path, process, find_file
 from stdCharged import stdK, stdPi, stdPr
 import modularAnalysis as ma
 
@@ -31,4 +31,3 @@ ma.variablesToNtuple('B0:sig', ['deltaE', 'M', 'daughter(2,p)', 'daughter(2,clus
 ma.variablesToNtuple('anti-n0:good', ['p'], treename='nbar', filename=fname, path=mypath)
 
 process(mypath)
-B2INFO(statistics)

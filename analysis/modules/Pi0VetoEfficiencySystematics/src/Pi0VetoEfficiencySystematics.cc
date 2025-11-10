@@ -8,9 +8,11 @@
 
 #include <analysis/modules/Pi0VetoEfficiencySystematics/Pi0VetoEfficiencySystematics.h>
 
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <map>

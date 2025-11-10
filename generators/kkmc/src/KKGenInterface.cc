@@ -253,7 +253,7 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
     } else {
       // FSR from leptonic tau decay added by Tauola
       // FSR from hadronic tau decay added by PHOTOS, but electromagnetic decay of hadrons by Tauola
-      // No interference with radiation from CEEX because tau decay vertices are separted due to lifetime
+      // No interference with radiation from CEEX because tau decay vertices are separated due to lifetime
       int moth = hepevt_.jmohep[index - 1][0];
       int mothid = hepevt_.idhep[moth - 1];
       int gmoth = hepevt_.jmohep[moth - 1][0];

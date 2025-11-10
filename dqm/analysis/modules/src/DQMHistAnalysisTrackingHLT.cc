@@ -88,8 +88,9 @@ void DQMHistAnalysisTrackingHLTModule::event()
   TH2F* hAbortHER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/TrkAbortVsTimeHER"));
   TH2F* hAllHER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/allEvtsVsTimeHER"));
   if (hAbortHER != nullptr && hAllHER != nullptr) {
-
-    TH2F* hAbortRateHER = new TH2F(*hAbortHER);
+    static TH2F* hAbortRateHER{nullptr};
+    if (hAbortRateHER) delete hAbortRateHER;
+    hAbortRateHER = new TH2F(*hAbortHER);
 
     for (int i = 0; i < hAbortRateHER->GetXaxis()->GetNbins(); i++)
       for (int j = 0; j < hAbortRateHER->GetYaxis()->GetNbins(); j++) {
@@ -119,8 +120,9 @@ void DQMHistAnalysisTrackingHLTModule::event()
   TH2F* hAllLER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/allEvtsVsTimeLER"));
 
   if (hAbortLER != nullptr && hAllLER != nullptr) {
-
-    TH2F* hAbortRateLER = new TH2F(*hAbortLER);
+    static TH2F* hAbortRateLER{nullptr};
+    if (hAbortRateLER) delete hAbortRateLER;
+    hAbortRateLER = new TH2F(*hAbortLER);
 
     for (int i = 0; i < hAbortRateLER->GetXaxis()->GetNbins(); i++)
       for (int j = 0; j < hAbortRateLER->GetYaxis()->GetNbins(); j++) {

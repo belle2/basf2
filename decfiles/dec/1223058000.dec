@@ -1,0 +1,56 @@
+# EventType: 1223058000 
+# Descriptor: B+ -> anti-D0 a0+
+# NickName: Bu_D0a0
+# Documentation: B -> D(*) eta pi studies
+# Responsible: Vismaya Vs
+# Email: ph20resch11010@iith.ac.in
+# Tested: yes
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 2025/04/30
+
+Alias etasig eta
+Alias a0+sig a_0+
+Alias a0-sig a_0-
+ChargeConj a0+sig a0-sig
+
+#
+# Y(4S) -> B0 anti-B0 
+#
+
+Decay Upsilon(4S)
+0.5 B-sig   B+ VSS;
+0.5 B+sig   B- VSS;
+Enddecay
+
+Decay B+sig
+1.0000 anti-D0sig a0+sig PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+Decay anti-D0sig
+0.078000000   a_1-  K+                                     SVS;
+0.015800000   K*0  rho0                                    SVV_HELAMP 1.0 0.0 1.0 0.0 1.0 0.0;
+0.011000000   K*0  omega                                   SVV_HELAMP 1.0 0.0 1.0 0.0 1.0 0.0;
+0.016000000   K_1+  pi-                                    SVS;
+0.024000000   K*0  pi+  pi-                                PHSP;
+0.005328000   K+  rho0  pi-                                PHSP;
+0.019000000   K+  omega  pi-                               PHSP;
+0.008800000   K+  pi-  pi+  pi-                            PHSP;
+Enddecay
+CDecay D0sig
+
+Decay a0+sig
+1.0000 etasig pi+ PHOTOS PHSP;
+Enddecay
+CDecay a0-sig
+
+#
+# eta -> gamma gamma
+#
+
+Decay etasig
+1.0000 gamma gamma PHSP;
+Enddecay
+
+End

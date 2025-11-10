@@ -1,6 +1,12 @@
 ROOT
 ====
 
+.. sidebar:: Overview
+    :class: overview
+
+    **Length**: 30-60 min
+
+
 If you don't know about ROOT yet, check out the section :ref:`rootintro`.
 You can find the documentation for RDataFrames `here <https://root.cern/doc/master/classROOT_1_1RDataFrame.html>`_.
 
@@ -149,12 +155,12 @@ instantly. The computations are only “booked”.
   Create two RDataFrames, one for Signal and one for Background only.
 
 .. admonition:: Hint
-  :class: xhint stacked toggle
+  :class: xhint stacked dropdown
 
   Split between signal and background using the ``B0_isSignal`` column.
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: solution dropdown
 
   .. code:: ipython3
 

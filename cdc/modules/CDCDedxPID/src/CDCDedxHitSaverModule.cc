@@ -115,7 +115,7 @@ namespace Belle2 {
                                        weights[211], weights[321], weights[2212]);
           track.addRelationTo(hit);
         } catch (genfit::Exception&) {
-          B2WARNING("Track: " << track.getArrayIndex() << ": genfit::MeasuredStateOnPlane exception occured");
+          B2WARNING("Track: " << track.getArrayIndex() << ": genfit::MeasuredStateOnPlane exception occurred");
           continue;
         }
 

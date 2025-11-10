@@ -27,7 +27,7 @@ namespace Belle2 {
 
 
       /**
-       * Constructor of the class fo the "2 hits" event.
+       * Constructor of the class of the "2 hits" event.
        */
 
       inline CDCChannelData(int board, int ch, int len, int tot,
@@ -44,7 +44,7 @@ namespace Belle2 {
       }
 
       /**
-       * Constructor of the class fo the "1 hit" event.
+       * Constructor of the class of the "1 hit" event.
        */
       inline CDCChannelData(int board, int ch, int len, int tot,
                             int adc, int tdc)

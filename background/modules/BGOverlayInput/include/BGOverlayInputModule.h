@@ -95,7 +95,7 @@ namespace Belle2 {
     TChain* m_tree = 0;            /**< tree pointer */
     unsigned m_numEvents = 0;      /**< number of events (tree entries) in the sample */
     unsigned m_eventCount = 0;     /**< current event (tree entry) */
-    unsigned m_firstEvent = 0;     /**< randomly choosen first event (tree entry) */
+    unsigned m_firstEvent = 0;     /**< randomly chosen first event (tree entry) */
     bool m_start = true;           /**< flag denoting first call of event function (of each run if overlay is run-dependent) */
     std::vector<DataStore::StoreEntry*> m_storeEntries;  /**< store entries of registered branches */
     std::vector<std::string> m_branchNames; /**< names of registered branches */

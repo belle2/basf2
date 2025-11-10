@@ -79,7 +79,7 @@ namespace Belle2 {
       createGeometry(config, topVolume, type);
     }
 
-    //Create config obgects and store in database
+    //Create config objects and store in database
     void GeoCOILCreator::createPayloads(const GearDir& content, const IntervalOfValidity& iov)
     {
       DBImportObjPtr<COILGeometryPar> importObj;

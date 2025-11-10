@@ -20,7 +20,6 @@
 #include <boost/format.hpp>
 
 #include <G4Material.hh>
-#include <G4ProductionCuts.hh>
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Torus.hh>
@@ -60,7 +59,7 @@ namespace Belle2 {
 
     GeoCDCCreatorReducedCDC::GeoCDCCreatorReducedCDC()
     {
-      // Set job control params. before sensitivedetector and gometry construction
+      // Set job control params. before sensitivedetector and geometry construction
       CDCSimControlPar::getInstance();
       CDCGeoControlPar::getInstance();
 
@@ -794,7 +793,7 @@ namespace Belle2 {
 
         //G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,
         //                                                logicalName, 0, 0, 0);
-        // ID depndent material definition, Aluminum is default
+        // ID dependent material definition, Aluminum is default
         G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum, logicalName, 0, 0, 0);
         if (id > 39 && id < 78) // Cu
           logicalV = new G4LogicalVolume(boxShape, medCopper, logicalName, 0, 0, 0);
@@ -1317,7 +1316,8 @@ namespace Belle2 {
           logicalV = new G4LogicalVolume(tubeShape, medCopper,  logicalName, 0, 0, 0);
         if (ribID > 109 && ribID < 126) // H2O tube (rmin = 0)
           logicalV = new G4LogicalVolume(tubeShape, medH2O,  logicalName, 0, 0, 0);
-        if (ribID > 127 && ribID < 132) // HV bundle
+        [[clang::suppress]]
+        if (ribID > 127 && ribID < 132)  // cppcheck-suppress syntaxError // HV bundle
           logicalV = new G4LogicalVolume(boxShape, medHV,  logicalName, 0, 0, 0);
         /*if( ribID > 145 && ribID < 149 )// Fiber box
           logicalV = new G4LogicalVolume(boxShape, medFiber,  logicalName, 0, 0, 0);
@@ -1386,6 +1386,7 @@ namespace Belle2 {
         if (rib2ID > 0)
           logicalV = new G4LogicalVolume(trdShape, medCopper,  logicalName, 0, 0, 0);
 
+        [[clang::suppress]]
         logicalV->SetVisAttributes(m_VisAttributes.back());
 
         const double phi = 360.0 / number;

@@ -9,7 +9,7 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
-#include <dqm/analysis/RefHistObject.h>
+#include <dqm/core/RefHistObject.h>
 #include <TH1.h>
 #include <TCanvas.h>
 #include <TFile.h>

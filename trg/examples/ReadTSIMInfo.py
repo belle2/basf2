@@ -84,7 +84,7 @@ def Vec_Cluster(cluster):
     v_mom = e * ROOT.Math.PxPyPzEVector(x / vec.Mag(), y / vec.Mag(), z / vec.Mag(), 1)
     new_theta = v_mom.Theta() * RadToDeg
     new_phi = v_mom.Phi() * RadToDeg
-    if(new_phi < 0):
+    if (new_phi < 0):
         new_phi += 2 * math.pi
     new_e = v_mom.E()
     NVC = [new_e, new_theta, new_phi]
@@ -192,7 +192,7 @@ def eclBhabhaVeto(eclclusters):
         vec1 = ROOT.TVector3(x1, y1, z1)
         theta1 = vec1.Theta()
         phi1 = vec1.Phi()
-        if(phi1 < 0):
+        if (phi1 < 0):
             phi1 += 2 * math.pi
         for j, cluster2 in enumerate(eclclusters):
             e2 = cluster2.getEnergyDep()
@@ -230,7 +230,7 @@ def Max_DeltPhi_cluster(eclclusters):
         z1 = cluster1.getPositionZ()
         vec1 = ROOT.TVector3(x1, y1, z1)
         phi1 = vec1.Phi()
-        if(phi1 < 0):
+        if (phi1 < 0):
             phi1 += 2 * math.pi
         for j, cluster2 in enumerate(eclclusters):
             e2 = cluster2.getEnergyDep()
@@ -351,7 +351,7 @@ def PrintBranchDef():
     print('eclbhabha:        eclbhabha veto logic, 1: bhabha, 0: non bhabha')
     print('bhabha_var[5]:    variables used in bhabha logic, [Delt_theta, Delt_phi, E1, E2, E1+E2]')
     print('                  For two tracks: Delt_theta: theta1+theta2-180, Delt_phi: |phi1-phi2|-180')
-    print('                  E1, E2 are the ecl clusters energy accociated with the two tracks')
+    print('                  E1, E2 are the ecl clusters energy associated with the two tracks')
     print('eclbhabha_var[5]: variables used in eclbhabha logic, [Delt_theta, Delt_phi, E1, E2, E1+E2]')
     print('                  For two eclclusers: Delt_theta: theta1+theta2-180, Delt_phi: |phi1-phi2|-180')
     print('                  E1, E2 are the ecl clusters energy')

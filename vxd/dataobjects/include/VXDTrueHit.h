@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef VXD_DATAOBJECTS_VXDTRUEHIT_H
-#define VXD_DATAOBJECTS_VXDTRUEHIT_H
 
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/RelationsObject.h>
@@ -95,7 +93,7 @@ namespace Belle2 {
     /** Return momentum at the endpoint of the track.*/
     ROOT::Math::XYZVector getExitMomentum() const { return ROOT::Math::XYZVector(m_momentumExit[0], m_momentumExit[1], m_momentumExit[2]); }
 
-    /** Shift the TrueHit in time (for backgorund mixing)
+    /** Shift the TrueHit in time (for background mixing)
      * @param delta The value of the time shift.
      */
     virtual void shiftInTime(float delta) { m_globalTime += delta; }
@@ -124,5 +122,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

@@ -146,7 +146,7 @@ class Ana(b2.Module):
     """analyze the difference between 2D with and without clone suppression"""
 
     def initialize(self):
-        """Initilization of Ana"""
+        """Initialization of Ana"""
         #: EventMetaData
         self.event_info = Belle2.PyStoreObj('EventMetaData')
         #: MCParticles
@@ -225,7 +225,7 @@ main.add_module('RootOutput', outputFileName='cdctrigger.root')
 
 # input('paused')
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

@@ -7,6 +7,14 @@
  **************************************************************************/
 
 #include <cdc/calibration/CDCdEdx/CDCDedx1DCellAlgorithm.h>
+
+#include <TCanvas.h>
+#include <TLegend.h>
+#include <TMath.h>
+#include <TPad.h>
+#include <TRandom.h>
+#include <TStyle.h>
+
 #include <cmath>
 
 using namespace Belle2;
@@ -251,9 +259,9 @@ void CDCDedx1DCellAlgorithm::CreateBinMapping()
   std::map<int, std::vector<int>> steps;
 
   const std::array<int, 2> nDev{8, 4};
-  bounds[0] = {0, 108, 123, 133, 158, 183, 193, 208, 316}; //il boundries
+  bounds[0] = {0, 108, 123, 133, 158, 183, 193, 208, 316}; //il boundaries
   steps[0] = {9, 3, 2, 1, 1, 2, 3, 9};  //il steps
-  bounds[1] = {0, 38, 158, 278, 316}; //OL boundries
+  bounds[1] = {0, 38, 158, 278, 316}; //OL boundaries
   steps[1] = {2, 1, 1, 2};  //OL steps
 
   for (int il = 0; il < 2; il++) {
@@ -378,6 +386,7 @@ void CDCDedx1DCellAlgorithm::createPayload()
   B2INFO("dE/dx one cell calibration: Generating payloads");
 
   for (unsigned int il = 0; il < 2; il++) {
+
     if (isMerge) {
       unsigned int nbins = m_DBOneDCell->getNBins(il);
 
@@ -387,8 +396,45 @@ void CDCDedx1DCellAlgorithm::createPayload()
       for (unsigned int iea = 0; iea < nbins; iea++) {
         double prev = m_DBOneDCell->getMean(8 * il + 1, iea);
         m_onedcors[il][iea] *= prev;
-        // m_onedcors[il][iea] /= 0.98;
       }
+    }
+
+    double binsize = TMath::Pi() / m_onedcors[il].size();
+
+    auto computeAverages = [&](double angLow, double angHigh, const std::string & label) {
+      unsigned int binLow = std::floor((angLow + TMath::Pi() / 2.0) / binsize);
+      unsigned int binHigh = std::floor((angHigh + TMath::Pi() / 2.0) / binsize);
+      double sum_new = 0.0, sum_prev = 0.0;
+      int count = 0;
+
+      for (unsigned int iea = binLow; iea < binHigh; ++iea) {
+        sum_new += m_onedcors[il][iea];
+        sum_prev += m_DBOneDCell->getMean(8 * il + 1, iea);
+        ++count;
+      }
+
+      double avg_new = (count > 0) ? sum_new / count : 1.0;
+      double avg_prev = (count > 0) ? sum_prev / count : 1.0;
+      return std::make_pair(avg_new, avg_prev);
+    };
+
+    double negLow = -0.75, negHigh = -0.25;
+    double posLow = 0.25, posHigh = 0.75;
+
+    if (il == 0) {
+      negLow = -0.5; negHigh = -0.2;
+      posLow = 0.2; posHigh = 0.5;
+    }
+
+    auto [avgNewNeg, avgPrevNeg] = computeAverages(negLow, negHigh, "Negative");
+    auto [avgNewPos, avgPrevPos] = computeAverages(posLow, posHigh, "Positive");
+
+    double avgNew = (avgNewNeg + avgNewPos) / 2.0;
+    double avgPrev = (avgPrevNeg + avgPrevPos) / 2.0;
+    double scaleFactor = avgPrev / avgNew;
+
+    for (unsigned int iea = 0; iea < m_eaBin; iea++) {
+      m_onedcors[il][iea] *= scaleFactor;
     }
 
     if (m_chargeType > 0)
@@ -604,7 +650,7 @@ void CDCDedx1DCellAlgorithm::plotConstants()
     max[il] = hnewconst[il]->GetMaximum();
   }
 
-  //Ploting final constants
+  //Plotting final constants
   if (max[1] < max[0])max[1] = max[0];
   if (min[1] > min[0])min[1] = min[0];
 

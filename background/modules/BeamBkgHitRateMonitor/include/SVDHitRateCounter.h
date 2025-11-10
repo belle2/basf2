@@ -143,14 +143,14 @@ namespace Belle2 {
 
       /**
        * Returns the (active) mass of the given sensor in Kg.
-       * @param layer tha layer number (starting from 0, not 3)
+       * @param layer the layer number (starting from 0, not 3)
        * @param ladder the ladder number (starting from 0, not 1)
        * @param sensor the sensor number (starting from 0, not 1)
        */
       double massOfSensor(int layer, int ladder, int sensor);
 
       /**
-       * Returns wether a strips is active (neither hot nor masked),
+       * Returns whether a strips is active (neither hot nor masked),
        * taking into account the ignoreHotStrips and ignoreMaskedStrips
        * settings.
        * @param sensorID The VxdID of the sensor

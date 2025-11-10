@@ -14,7 +14,7 @@
 #include <geometry/dbobjects/GeoMaterialComponent.h>
 
 namespace Belle2 {
-  /** Class to represent a material informaion in the Database */
+  /** Class to represent a material information in the Database */
   class GeoMaterial: public TObject {
   public:
     /** default constructor */

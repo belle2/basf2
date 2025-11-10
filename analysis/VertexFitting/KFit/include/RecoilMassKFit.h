@@ -7,9 +7,11 @@
  **************************************************************************/
 
 #pragma once
+
 #include <analysis/VertexFitting/KFit/KFitConst.h>
 #include <analysis/VertexFitting/KFit/KFitError.h>
 #include <analysis/VertexFitting/KFit/KFitBase.h>
+
 #include <Math/Vector4D.h>
 
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY

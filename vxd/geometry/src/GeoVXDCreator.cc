@@ -9,6 +9,7 @@
 #include <vxd/geometry/GeoVXDCreator.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/simulation/SensitiveDetector.h>
+#include <vxd/simulation/SensitiveDetectorBase.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 
 #include <geometry/CreatorFactory.h>
@@ -103,7 +104,7 @@ namespace Belle2 {
           component.getHeight() = sub.getHeight() + p.getWOffset();
         }
 
-        //Check if compoent will fit inside width,length. If we can resize do it if needed, otherwise bail
+        //Check if component will fit inside width,length. If we can resize do it if needed, otherwise bail
         double minWidth =  max(abs(p.getU() + sub.getWidth() / 2.0), abs(p.getU() - sub.getWidth() / 2.0));
         double minLength = max(abs(p.getV() + sub.getLength() / 2.0), abs(p.getV() - sub.getLength() / 2.0));
         if (minWidth > component.getWidth() + component.getWidth() * numeric_limits<double>::epsilon()) {
@@ -282,7 +283,7 @@ namespace Belle2 {
 
       G4Translate3D ladderPos(m_ladder.getRadius(), m_ladder.getShift(), 0);
       G4Transform3D ladderPlacement = placement * G4RotateZ3D(phi) * ladderPos * getAlignment(parameters.getAlignment(ladder));
-      // The actuall coordinate system of ladder (w still points to Z, there is only phi rotation + move to correct radius + shift)
+      // The actual coordinate system of ladder (w still points to Z, there is only phi rotation + move to correct radius + shift)
       VXD::GeoCache::getInstance().addLadderPlacement(m_halfShellVxdIDs[m_currentHalfShell], ladder, ladderPlacement);
 
 

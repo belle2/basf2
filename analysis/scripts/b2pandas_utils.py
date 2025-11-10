@@ -72,8 +72,9 @@ class VariablesToTable(basf2.Module):
         self._listname = listname
         #: List of variables
         self._variables = list(set(variables))
-        #: Output format
+        #: File type
         file_type = self._filename.split(".")[-1]
+        #: Output format
         if file_type in ["csv"]:
             self._format = "csv"
         elif file_type in ["parquet", "pq"]:
@@ -284,7 +285,9 @@ class VariablesToTable(basf2.Module):
         """
         if self._format == "hdf5":
             """Create a new row in the hdf5 file with for each particle in the list"""
+            # \cond false positive doxygen warning
             self._table.append(self.buffer)
+            # \endcond
         else:
             table = {name: self.buffer[name] for name, _ in self._dtypes}
             pa_table = pa.table(table, schema=pa.schema(self._schema))
@@ -304,15 +307,19 @@ class VariablesToTable(basf2.Module):
         """
         self.append_buffer()
         self.fill_event_buffer()
+        # \cond false positive doxygen warning
         if self.buffer_full:
             self.write_buffer()
             self.clear_buffer()
+        # \endcond
 
     def terminate(self):
         """save and close the output"""
         import ROOT  # noqa
+        # \cond false positive doxygen warning
         if len(self.buffer) > 0:
             self.write_buffer()
+        # \endcond
 
         if self._format == "hdf5":
             self._table.flush()
@@ -331,7 +338,10 @@ class VariablesToHDF5(VariablesToTable):
     Legacy class to not break existing code
     """
 
-    def __init__(self, listname, variables, filename, hdf_table_name: Optional[str] = None,):
+    def __init__(self, listname, variables, filename, hdf_table_name: Optional[str] = None):
+        """
+        Constructor for the legacy HDF5 writer.
+        """
         super().__init__(listname, variables, filename, hdf_table_name)
         assert self._filename.split(".")[-1] in ["h5", "hdf", "hdf5"], (
             "Filename must end with .h5, .hdf or .hdf5 for HDF5 output. "

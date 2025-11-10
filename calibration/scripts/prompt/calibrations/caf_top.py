@@ -27,7 +27,8 @@ from prompt.utils import filter_by_max_files_per_run
 #: Required variable - tells the automated system some details of this script
 settings = CalibrationSettings(
     name="TOP post-tracking calibration",
-    expert_username="skohani",
+    expert_username="kohani",
+    subsystem="top",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["mumu_tight_or_highm_calib"],
@@ -41,7 +42,8 @@ settings = CalibrationSettings(
         "max_files_per_run": 20,
         "payload_boundaries": None,
         "request_memory": "8 GB"
-    })
+    },
+    produced_payloads=["TOPCalModuleT0", "TOPCalCommonT0", "TOPCalEventT0Offset"])
 
 
 # Required function
@@ -82,9 +84,10 @@ def get_calibrations(input_data, **kwargs):
                moduleT0_calibration_LL(inputFiles, sample),  # this cal cannot span across experiments
                commonT0_calibration_BF(inputFiles),  # this is run-dep
                offset_calibration(inputFiles),  # this is run-dep
+               photonYields_calibration(inputFiles, sample),  # this cal cannot span across experiments
                calibration_validation(inputFiles, sample)]  # this is run-dep
         cal[1].save_payloads = False  # don't save the rough moduleT0 result
-        cal[5].save_payloads = False  # in fact it does not make any payloads, but produces histograms for validation
+        cal[6].save_payloads = False  # in fact it does not make any payloads, but produces histograms for validation
 
     for c in cal:
         # If it's a SequentialBoundary calibration, check if there is any boundary in the config file

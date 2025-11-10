@@ -69,7 +69,7 @@ void TeeggInputModule::initialize()
   //Initialize initial particle for beam parameters.
   m_initial.initialize();
 
-  // Initialize ExtraInfo (holds vaccum polarization corrections)
+  // Initialize ExtraInfo (holds vacuum polarization corrections)
   m_generator.initExtraInfo();
 
 }

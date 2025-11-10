@@ -35,7 +35,7 @@ namespace Belle2 {
     /// Destructor
     virtual ~TRGCDCModule();
 
-    /// Initilizes TRGCDCModule.
+    /// Initializes TRGCDCModule.
     virtual void initialize() override;
 
     /// Called when new run started.

@@ -37,6 +37,7 @@ class ReweighterParticle:
     """
     Class that stores the information of a particle.
     """
+    #: @var prefix
     #: Prefix of the particle in the ntuple
     prefix: str
 
@@ -46,12 +47,15 @@ class ReweighterParticle:
     #: Merged table of the weights
     merged_table: pd.DataFrame
 
+    #: @var pdg_binning
     #: Kinematic binning of the weight table per particle
     pdg_binning: dict
 
+    #: @var variable_aliases
     #: Variable aliases of the weight table
     variable_aliases: dict
 
+    #: @var weight_name
     #: Weight column name that will be added to the ntuple
     weight_name: str
 

@@ -41,7 +41,7 @@ namespace Belle2 {
     /**
      * Add the metadata of a root output file
      */
-    void addRootOutputFile(const std::string& fileName, const FileMetaData* metaData = nullptr);
+    void addRootOutputFile(const std::string& fileName, const FileMetaData* metaData = nullptr, const char* type = "RootOutput");
 
     /**
      * Add the metadata of any ntuple file

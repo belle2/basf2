@@ -118,6 +118,6 @@ void BGOverlayExecutorModule::event()
   if (m_addCDC) addBGDigits<CDCHit>(m_CDCHitsName);
   if (m_addTOP) addBGDigits<TOPDigit>(m_TOPDigitsName);
   if (m_addARICH) addBGDigits<ARICHDigit>(m_ARICHDigitsName);
-  //Compressed waveforms are loaded to the datastore by BGOverlayInputModule and unpacked and overlayed in ECLDigitizerModule
+  //Compressed waveforms are loaded to the datastore by BGOverlayInputModule and unpacked and overlaid in ECLDigitizerModule
   if (m_addKLM) addBGDigits<KLMDigit>(m_KLMDigitsName);
 }

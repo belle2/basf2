@@ -503,7 +503,7 @@ void HadronBgPrep::fitGaussianWRange(TH1F*& temphist, gstatus& status, double si
       return;
     } else {
       temphist->GetXaxis()->SetRangeUser(mean - 5.0 * width, mean + 5.0 * width);
-      B2INFO(Form("\tFit for hist (%s) sucessfull (status = %d)", temphist->GetName(), fs));
+      B2INFO(Form("\tFit for hist (%s) successful (status = %d)", temphist->GetName(), fs));
       status = OK;
     }
   }

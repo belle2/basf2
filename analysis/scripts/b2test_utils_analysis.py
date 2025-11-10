@@ -11,10 +11,11 @@
 import os
 import sys
 import subprocess
+from contextlib import nullcontext
 import unittest
 import glob
 from basf2 import find_file
-from b2test_utils import configure_logging_for_tests
+from b2test_utils import configure_logging_for_tests, clean_working_directory
 
 
 class ExamplesTest(unittest.TestCase):
@@ -24,7 +25,7 @@ class ExamplesTest(unittest.TestCase):
                      "$BELLE2_EXAMPLES_DATA_DIR not found.")
     @unittest.skipIf(not os.getenv('BELLE2_VALIDATION_DATA_DIR'),
                      "$BELLE2_VALIDATION_DATA_DIR not found.")
-    def _test_examples_dir(self, path_to_glob, broken=None, filepattern="", nevents=10):
+    def _test_examples_dir(self, path_to_glob, broken=None, filepattern="", nevents=10, cleanup=False):
         """
         Internal function to test a directory full of example scripts with an optional list of broken scripts to be skipped.
 
@@ -37,21 +38,22 @@ class ExamplesTest(unittest.TestCase):
         configure_logging_for_tests()
         all_egs = sorted(glob.glob(find_file(path_to_glob) + f"/{filepattern}*.py"))
         for eg in all_egs:
-            filename = os.path.basename(eg)
-            if filename not in broken:
-                with self.subTest(msg=filename):
-                    outputfilename = filename.replace('.py', '.root')
-                    result = subprocess.run(['basf2', '-n', f'{nevents}', eg, '-o',
-                                            outputfilename], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                    if result.returncode != 0:
-                        # failure running example so let's print the output
-                        # on stderr so it's not split from output of unittest
-                        # done like this since we don't want to decode/encode utf8
-                        sys.stdout.buffer.write(result.stdout)
-                    self.assertEqual(result.returncode, 0)
+            with (clean_working_directory() if cleanup else nullcontext()):
+                filename = os.path.basename(eg)
+                if filename not in broken:
+                    with self.subTest(msg=filename):
+                        outputfilename = filename.replace('.py', '.root')
+                        result = subprocess.run(['basf2', '-n', f'{nevents}', eg, '-o',
+                                                outputfilename], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                        if result.returncode != 0:
+                            # failure running example so let's print the output
+                            # on stderr so it's not split from output of unittest
+                            # done like this since we don't want to decode/encode utf8
+                            sys.stdout.buffer.write(result.stdout)
+                        self.assertEqual(result.returncode, 0)
 
-                    if os.path.exists(outputfilename) and isNtuple(outputfilename):
-                        scanTTree(outputfilename)
+                        if os.path.exists(outputfilename) and isNtuple(outputfilename):
+                            scanTTree(outputfilename)
 
 
 def scanTTree(filename):

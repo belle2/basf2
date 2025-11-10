@@ -41,6 +41,8 @@ def run_copylists():
     ma.fillParticleList("K+", "", path=pa)
     stdPi0s('all', path=pa)
     stdKshorts(path=pa)
+    ma.fillParticleList("n0", "", path=pa)
+    ma.fillParticleList("anti-n0:2nd", "", path=pa)
 
     # first test: check that merging two lists with
     # identical daughters removes duplicates
@@ -58,7 +60,7 @@ def run_copylists():
 
     # third test: check that two lists with the same daughters in different
     # orders don't double count
-    # (they are different Belle2::Particles but we should match them)
+    # (they are different Particles but we should match them)
     ma.reconstructDecay("vpho:e -> K+ pi-", "", path=pa)
     ma.reconstructDecay("vpho:f -> pi- K+", "", path=pa)
     ma.copyLists("vpho:ef", ["vpho:e", "vpho:f"], path=pa)
@@ -105,6 +107,11 @@ def run_copylists():
     ma.variablesToNtuple("D0:ignore", ['isSignal', 'PDG'], treename="ignore", path=pa)
     ma.variablesToNtuple("D0:flavor", ['isSignal', 'PDG'], treename="flavor", path=pa)
 
+    ma.reconstructDecay("vpho:n0 -> n0", "", path=pa)
+    ma.reconstructDecay("vpho:nbar -> anti-n0:2nd", "", path=pa)
+    ma.copyLists("vpho:allneutrons", ["vpho:n0", "vpho:nbar"], path=pa)
+    dump_3_v2nts(["n0", "nbar", "allneutrons"], path=pa)
+
     b2tu.safe_process(pa, 1)
 
 
@@ -149,6 +156,11 @@ class TestCopyLists(unittest.TestCase):
         individual list. Otherwise, it's the sum of the two."""
         self.assertEqual(self._count("D0"), self._count("ignore"))
         self.assertEqual(self._count("D0") + self._count("anti"), self._count("flavor"))
+
+    def test_neutrons(self):
+        """Merging a neutron and anti-neutron list should keep only the candidates of the first list"""
+        self.assertEqual(self._count("n0"), self._count("nbar"))
+        self.assertEqual(self._count("n0"), self._count("allneutrons"))
 
 
 if __name__ == "__main__":

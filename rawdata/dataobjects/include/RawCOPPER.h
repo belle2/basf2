@@ -59,7 +59,7 @@ namespace Belle2 {
     // Get position of or pointer to data
     //
 
-    //! set buffer ( delete_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
+    //! set buffer ( delete_flag : m_buffer is freed( = 0 )/ not freed( = 1 ) in Destructor )
     /* cppcheck-suppress missingOverride */
     void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes) OVERRIDE_CPP17;
 
@@ -98,7 +98,7 @@ namespace Belle2 {
     int* Get4thDetectorBuffer(int n);
     ///////////////////////////////////////////////////////////////////////////////////////
 
-    //! get posistion of COPPER block in unit of word
+    //! get position of COPPER block in unit of word
     /* cppcheck-suppress missingOverride */
     virtual int GetBufferPos(int n) OVERRIDE_CPP17;
 

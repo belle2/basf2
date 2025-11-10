@@ -17,9 +17,6 @@
 
 #include <genfit/MaterialEffects.h>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-
 #include <cmath>
 #include <stdlib.h>
 #include <time.h>
@@ -67,7 +64,7 @@ void CDCDedxScanModule::event()
 
   srand(time(NULL));
 
-  boost::shared_ptr<CDCDedxTrack> dedxTrack = boost::make_shared<CDCDedxTrack>();
+  CDCDedxTrack dedxTrack;
 
   for (int i = 0; i < 56; ++i) {
     int nWires = cdcgeo.nWiresInLayer(i);
@@ -110,11 +107,11 @@ void CDCDedxScanModule::event()
         double celldx = c.dx(doca, entAng);
         if (!c.isValid()) continue;
 
-        dedxTrack->addHit(0, 0, i, doca, docaRS, entAng, entAngRS, 0, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0,
-                          1.0, 0, 0.0, 0.0, 0.0);
+        dedxTrack.addHit(0, 0, i, doca, docaRS, entAng, entAngRS, 0, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0,
+                         1.0, 0, 0.0, 0.0, 0.0);
       }
     }
-    m_dedxArray.appendNew(*dedxTrack);
+    m_dedxArray.appendNew(dedxTrack);
   }
 }
 

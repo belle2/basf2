@@ -10,8 +10,6 @@
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/datcon/findlets/DATCONFPGAFindlet.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
-
 namespace Belle2 {
   /**
    * DATCON module which implementation is close to the one actually used on the FPGA.

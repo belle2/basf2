@@ -48,7 +48,7 @@ particles = fei.get_default_channels()
 
 # Set up FEI configuration specifying the FEI prefix of the Belle legacy training
 configuration = fei.config.FeiConfiguration(prefix='FEI_B2BII_light-2012-minos',
-                                            training=False, monitor=False, cache=0)
+                                            training=False, monitor=False)
 
 # Get FEI path
 feistate = fei.get_path(particles, configuration)
@@ -90,5 +90,4 @@ ma.variablesToNtuple('B0:semileptonic',
                      path=path)
 
 # Process 100 events
-b2.process(path, max_event=100)
-print(b2.statistics)
+b2.process(path, max_event=100, calculateStatistics=True)

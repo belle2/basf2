@@ -15,8 +15,6 @@
 namespace TreeFitter {
 
   class FitParams ;
-  class ParticleBase ;
-  class ConstraintConfiguration;
   /** this class does a lot of stuff:
   Build decaytree structure allowing to index particles and handle the filtering of constraints across the tree
   */

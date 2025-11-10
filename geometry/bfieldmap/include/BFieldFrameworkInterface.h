@@ -20,7 +20,7 @@ namespace Belle2 {
     BFieldFrameworkInterface(): MagneticFieldComponent(true) {}
     /** everything is inside this component */
     virtual bool inside(const ROOT::Math::XYZVector&) const final override { return true; }
-    /** and we return the values from the exsiting BFieldMap */
+    /** and we return the values from the existing BFieldMap */
     virtual ROOT::Math::XYZVector getField(const ROOT::Math::XYZVector& position) const final override
     {
       return BFieldMap::Instance().getBField(position) * Unit::T;

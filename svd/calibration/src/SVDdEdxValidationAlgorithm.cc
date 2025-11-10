@@ -215,35 +215,35 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
     hSignalKaonLLDistributionGood->Scale(1. / hSignalKaonLLDistributionGood->Integral());
     hSignalProtonLLDistributionGood->Scale(1. / hSignalProtonLLDistributionGood->Integral());
 
-    hSignalElectronLLDistribution->GetXaxis()->SetTitle(PIDVarName + "ElectronLLSVDonly");
+    hSignalElectronLLDistribution->GetXaxis()->SetTitle("ElectronLL (SVD only) for " + SignalVarNameFull);
     hSignalElectronLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalElectronLLDistribution->SetMaximum(1.35 * hSignalElectronLLDistribution->GetMaximum());
 
-    hSignalPionLLDistribution->GetXaxis()->SetTitle(PIDVarName + "PionLLSVDonly");
+    hSignalPionLLDistribution->GetXaxis()->SetTitle("PionLL (SVD only) for " + SignalVarNameFull);
     hSignalPionLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalPionLLDistribution->SetMaximum(1.35 * hSignalPionLLDistribution->GetMaximum());
 
-    hSignalKaonLLDistribution->GetXaxis()->SetTitle(PIDVarName + "KaonLLSVDonly");
+    hSignalKaonLLDistribution->GetXaxis()->SetTitle("KaonLL (SVD only) for " + SignalVarNameFull);
     hSignalKaonLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalKaonLLDistribution->SetMaximum(1.35 * hSignalKaonLLDistribution->GetMaximum());
 
-    hSignalProtonLLDistribution->GetXaxis()->SetTitle(PIDVarName + "ProtonLLSVDonly");
+    hSignalProtonLLDistribution->GetXaxis()->SetTitle("ProtonLL (SVD only) for " + SignalVarNameFull);
     hSignalProtonLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalProtonLLDistribution->SetMaximum(1.35 * hSignalProtonLLDistribution->GetMaximum());
 
-    hSignalElectronLLDistributionGood->GetXaxis()->SetTitle(PIDVarName + "ElectronLLSVDonly");
+    hSignalElectronLLDistributionGood->GetXaxis()->SetTitle("ElectronLL (SVD only) for " + SignalVarNameFull);
     hSignalElectronLLDistributionGood->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalElectronLLDistributionGood->SetMaximum(1.35 * hSignalElectronLLDistributionGood->GetMaximum());
 
-    hSignalPionLLDistributionGood->GetXaxis()->SetTitle(PIDVarName + "PionLLSVDonly");
+    hSignalPionLLDistributionGood->GetXaxis()->SetTitle("PionLL (SVD only) for " + SignalVarNameFull);
     hSignalPionLLDistributionGood->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalPionLLDistributionGood->SetMaximum(1.35 * hSignalPionLLDistributionGood->GetMaximum());
 
-    hSignalKaonLLDistributionGood->GetXaxis()->SetTitle(PIDVarName + "KaonLLSVDonly");
+    hSignalKaonLLDistributionGood->GetXaxis()->SetTitle("KaonLL (SVD only) for " + SignalVarNameFull);
     hSignalKaonLLDistributionGood->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalKaonLLDistributionGood->SetMaximum(1.35 * hSignalKaonLLDistributionGood->GetMaximum());
 
-    hSignalProtonLLDistributionGood->GetXaxis()->SetTitle(PIDVarName + "ProtonLLSVDonly");
+    hSignalProtonLLDistributionGood->GetXaxis()->SetTitle("ProtonLL (SVD only) for " + SignalVarNameFull);
     hSignalProtonLLDistributionGood->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalProtonLLDistributionGood->SetMaximum(1.35 * hSignalProtonLLDistributionGood->GetMaximum());
 
@@ -801,7 +801,7 @@ TTree* SVDdEdxValidationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTr
   variables->add(ProtonBinaryElectronProtonIDSVDonly);
   variables->add(ProtonBinaryElectronProtonIDnoSVD);
 
-  RooDataSet* LambdaDataset = new RooDataSet("LambdaDataset", "LambdaDataset", preselTree.get(), *variables);
+  RooDataSet* LambdaDataset = new RooDataSet("LambdaDataset", "LambdaDataset", *variables, Import(*preselTree));
 
   if (LambdaDataset->sumEntries() == 0) {
     B2FATAL("The Lambda dataset is empty, stopping here");
@@ -1152,7 +1152,7 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
   variables->add(SlowPionBinaryElectronPionIDSVDonly);
   variables->add(SlowPionBinaryElectronPionIDnoSVD);
 
-  RooDataSet* DstarDataset = new RooDataSet("DstarDataset", "DstarDataset", preselTree.get(), *variables);
+  RooDataSet* DstarDataset = new RooDataSet("DstarDataset", "DstarDataset", *variables, Import(*preselTree));
 
   if (DstarDataset->sumEntries() == 0) {
     B2FATAL("The Dstar dataset is empty, stopping here");

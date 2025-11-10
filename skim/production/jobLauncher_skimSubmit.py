@@ -57,7 +57,14 @@ parser.add_argument('-rel',
                     '--release',
                     type=str,
                     default='',
-                    help=" basf2 release to be used. If not provide the one in infoSkim.yaml will be used")
+                    help="basf2 release to be used. If not provide the one in infoSkim.yaml will be used")
+parser.add_argument('-samples',
+                    '--samples',
+                    type=str,
+                    default='',
+                    help="the yaml file (with full path) to be used in ``b2skim-stats-submit``.\
+                    If not provided, ``b2skim-stats-submit`` defaults to the samples of the current campaign\
+                    i.e. ``/group/belle2/dataprod/MC/SkimTraining/SampleLists/TestFiles.yaml`` on KEKCC.")
 
 # configuration argument, used for debugging only
 parser.add_argument('-flagged',   '--flagged',          type=int, default=True,        help="set to 0 to disable Flagged skim")
@@ -157,6 +164,10 @@ if args.stats_submit:  # step3 - basf2, loop on skim, common for data and MC
                 GTstring += ' --PID_GT 1 '
         command = f'python3 skimSubmit.py --stats_submit --skims {skim} {flaggedString} {GTstring} ' \
                   f' --base_dir {args.base_dir} --inputYaml {args.skim} --infoYaml {args.info}'
+
+        if args.samples:
+            command += f" --samples {args.samples}"
+
         print(colored(f'>>>> Executed command: {command}', 'green'))
         if not args.dry:
             subprocess.run(command.split(), text=True)

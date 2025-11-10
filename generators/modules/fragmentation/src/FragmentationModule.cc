@@ -240,7 +240,7 @@ void FragmentationModule::event()
     m_PythiaEvent->list();
     listLogCapture.finish();
 
-    setReturnValue(-1); //return value becomes -1 if trials were not successfull
+    setReturnValue(-1); //return value becomes -1 if trials were not successful
   } else {
     nGood = nGood + 1;
   }

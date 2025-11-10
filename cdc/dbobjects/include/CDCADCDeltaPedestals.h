@@ -95,7 +95,7 @@ namespace Belle2 {
     {
       std::cout << " " << std::endl;
       std::cout << "ADC pedestal list" << std::endl;
-      std::cout << "samle" << m_samplingWindow <<  std::endl;
+      std::cout << "sample" << m_samplingWindow <<  std::endl;
       std::cout << "# of entries= " << m_pedestals.size() << std::endl;
       std::cout << "in order of board#, ch#, pedestal" << std::endl;
       for (auto const& ent : m_pedestals) {

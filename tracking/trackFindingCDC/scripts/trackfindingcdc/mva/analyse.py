@@ -19,6 +19,7 @@ from tracking.run.event_generation import ReadOrGenerateEventsRun
 from tracking.validation.run import TrackingValidationRun
 
 from ROOT import Belle2
+# @cond internal_test
 
 
 class PDF:
@@ -310,3 +311,4 @@ class MVATeacherAndAnalyser:
                          stderr=STDOUT)
         except CalledProcessError as e:
             raise RuntimeError(e.output)
+# @endcond

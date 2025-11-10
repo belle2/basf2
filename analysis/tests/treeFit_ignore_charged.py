@@ -70,7 +70,7 @@ class TestTreeFits(unittest.TestCase):
         print(f"True fit survivors: {truePositives} out of {allSig} true candidates")
         print(f"False fit survivors: {falsePositives} out of {allBkg} false candidates")
 
-        self.assertTrue(falsePositives < 8837, "Background rejection too small.")
+        self.assertTrue(falsePositives < 8833, "Background rejection too small.")
 
         self.assertTrue(truePositives > 212, "Signal rejection too high")
         self.assertFalse(mustBeZero, f"We should have dropped all candidates with confidence level less than {conf}.")

@@ -265,12 +265,12 @@ bool DQMHistAnalysisEventT0EfficiencyModule::FillEfficiencyHistogram(const std::
   // the bin content of the -1 bin of h which is used for bin counting, and at the same time set the corresponding bin label.
   const auto totalEntries = h->GetBinContent(-1);
   const auto nBins = h->GetNbinsX();
-  TH1D* totalHist = new TH1D("total", "total;Algorithm;Fraction #epsilon", nBins, 0, nBins);
+  TH1D totalHist("total", "total;Algorithm;Fraction #epsilon", nBins, 0, nBins);
   for (int i = 0; i < nBins; i++) {
-    totalHist->SetBinContent(i + 1, totalEntries);
+    totalHist.SetBinContent(i + 1, totalEntries);
   }
   eff->SetPassedHistogram(*h, "f");
-  eff->SetTotalHistogram(*totalHist, "f");
+  eff->SetTotalHistogram(totalHist, "f"); // Clones thus no need to keep afterwards
 
   eff->Paint("AP");
 

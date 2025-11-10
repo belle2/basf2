@@ -36,3 +36,13 @@ std::string ParticleListName::antiParticleListName(const std::string& listName)
     return EvtPDLUtil::antiParticleListName(pdgCode, mother->getLabel());
 }
 
+std::vector<std::string> ParticleListName::addAntiParticleLists(const std::vector<std::string>& inputList)
+{
+  std::vector<std::string> outputList = inputList;
+  for (const auto& branchName : inputList) {
+    std::string antiParticleBranchName = ParticleListName::antiParticleListName(branchName);
+    if (antiParticleBranchName != branchName)
+      outputList.push_back(antiParticleBranchName);
+  }
+  return outputList;
+}

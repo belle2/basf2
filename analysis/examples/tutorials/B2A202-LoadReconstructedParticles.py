@@ -97,7 +97,7 @@ ma.printList('anti-p-:good', False, path=my_path)
 ma.printList('K_S0:merged', False, path=my_path)
 ma.printList('pi0:eff40_May2020Fit', False, path=my_path)
 ma.printList('K_L0:allklm', False, path=my_path)
-ma.printList('n0:all', False, path=my_path)
+ma.printList('anti-n0:all', False, path=my_path)
 
 
 # Select variables that we want to store to ntuple
@@ -172,7 +172,7 @@ ma.variablesToNtuple(decayString='K_L0:allklm',
                      treename='klong',
                      filename=output_file,
                      path=my_path)
-ma.variablesToNtuple(decayString='n0:all',
+ma.variablesToNtuple(decayString='anti-n0:all',
                      variables=n0_variables,
                      treename='neutron',
                      filename=output_file,
@@ -199,6 +199,3 @@ ma.variablesToNtuple(decayString='K_S0:merged',
 
 # Process the events
 b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)

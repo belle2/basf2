@@ -849,7 +849,8 @@ def make_request_dict(
         "LPNPrefix": LPNPrefix,
         "DataStructureByRun": "False",
         "VolumeDependentMerge": "True",
-        "DataDescription": make_data_description_block(individualSkims, sampleInfo, skimName, args.flagged)
+        "DataDescription": make_data_description_block(individualSkims, sampleInfo, skimName, args.flagged),
+        "ResourceTag": "EL9", # needed from light-2503-ceres onwards, may not be needed if made default on the grid in the future
     }
 
     # We only want the MCEventType to include the beam background level if the sample is BGx0

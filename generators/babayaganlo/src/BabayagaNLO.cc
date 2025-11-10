@@ -86,7 +86,7 @@ extern "C" {
   /** Add this because it's undefined in babayaga otherwise */
   double babayaganlo_getrandomcmsenergy_()
   {
-    B2FATAL("babayaganlo_getrandomcmsenergy() is not implmented");
+    B2FATAL("babayaganlo_getrandomcmsenergy() is not implemented");
   }
 
   /** FORTRAN routine based on main.f */

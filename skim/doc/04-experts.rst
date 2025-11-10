@@ -204,7 +204,7 @@ Skim flags can also be used in combined skims, with the individual flags being a
 
 .. seealso::
 
-   Skim flags are implemented using two basf2 modules, which are documented in `skim-utils-flags`_.
+   Skim flags are implemented using two ``basf2`` modules, which are documented in `skim-utils-flags`_.
 
 .. _skim-running:
 
@@ -220,7 +220,7 @@ In the skim package, there are command-line tools available for running skims, d
 
 .. tip::
    This tool completely supplants the ``<SkimName>_Skim_Standalone.py`` steering files from
-   previous versions of basf2. The ``standalone/`` and ``combined/`` directories no longer exist in
+   previous versions of ``basf2``. The ``standalone/`` and ``combined/`` directories no longer exist in
    the skim package from version-05-00-00 onwards.
 
 .. argparse::
@@ -228,7 +228,6 @@ In the skim package, there are command-line tools available for running skims, d
    :func: get_argument_parser
    :prog: b2skim-run
    :nodefaultconst:
-   :nogroupsections:
 
 .. _b2skim-generate:
 
@@ -246,7 +245,6 @@ In the skim package, there are command-line tools available for running skims, d
    :func: get_argument_parser
    :prog: b2skim-generate
    :nodefaultconst:
-   :nogroupsections:
 
 .. _b2skim-generate-validation:
 
@@ -258,7 +256,6 @@ In the skim package, there are command-line tools available for running skims, d
    :func: get_argument_parser
    :prog: b2skim-generate-validation
    :nodefaultconst:
-   :nogroupsections:
 
 .. _skim-registry:
 
@@ -320,7 +317,6 @@ This will read the output files of the test jobs, and produce tables of statisti
    :func: getArgumentParser
    :prog: b2skim-stats-submit
    :nodefaultconst:
-   :nogroupsections:
 
    .. note::
       Please run these skim tests on KEKCC, so that the estimates for CPU time are directly
@@ -337,7 +333,6 @@ This will read the output files of the test jobs, and produce tables of statisti
    :func: getArgumentParser
    :prog: b2skim-stats-print
    :nodefaultconst:
-   :nogroupsections:
 
 
 .. _b2skim-stats-custom-samples:
@@ -441,7 +436,6 @@ Miscellaneous utility functions
    :func: get_argument_parser
    :prog: b2skim-prod
    :nodefaultconst:
-   :nogroupsections:
 
 
 .. _b2skim-stats-total:
@@ -454,7 +448,6 @@ Miscellaneous utility functions
    :func: get_argument_parser
    :prog: b2skim-stats-total
    :nodefaultconst:
-   :nogroupsections:
 
 
 .. _lpns2yaml:
@@ -467,4 +460,3 @@ Miscellaneous utility functions
    :func: get_argument_parser
    :prog: lpns2yaml.py
    :nodefaultconst:
-   :nogroupsections:

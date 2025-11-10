@@ -31,9 +31,9 @@ print("                 ExperimentType: ", args.ExperimentType)
 # bg = glob.glob('./BG/*.root')
 bg = None
 
-# number of events to generate, can be overriden with -n
+# number of events to generate, can be overridden with -n
 num_events = 100
-# output filename, can be overriden with -o
+# output filename, can be overridden with -o
 output_filename = "RootOutput.root"
 if (args.ExperimentType == 1):
     output_filename = "RootOutput_Phase2.root"
@@ -132,5 +132,5 @@ trackDQM = main.add_module('TrackDQM')
 # main.add_module("RootOutput", outputFileName=output_filename)
 
 # process events and print call statistics
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

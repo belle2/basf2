@@ -104,7 +104,7 @@ if __name__ == "__main__":
         type=__parse_iov,
         default=[0, 0, -1, -1],
         help="Interval of validity. Needs to be a list of four "
-        "numbers separated by comma specifing the initial "
+        "numbers separated by comma specifying the initial "
         "experiment, initial run, final experiment and final run "
         "for which this payload should be valid. If no iov is "
         "given the payload will be valid for everything. "
@@ -185,7 +185,7 @@ if __name__ == "__main__":
 
     # do we want to estimate uncertainties from smearing?
     if arguments.tries > 0:
-        # then we need the intial particle generator
+        # then we need the initial particle generator
         ROOT.gInterpreter.Declare(
             "#include <generators/utilities/InitialParticleGeneration.h>"
         )
@@ -236,7 +236,7 @@ if __name__ == "__main__":
             pos_cov[i][j] = 1e-6 * vtx_cov[i][j]
 
     vertex = beamparams.getVertex()
-    beamspot.setIP(ROOT.TVector3(vertex.X(), vertex.Y(), vertex.Z()), pos_cov)
+    beamspot.setIP(vertex, pos_cov)
     beamspot.setSizeCovMatrix(vtx_cov)
 
     #: Collision invariant mass.

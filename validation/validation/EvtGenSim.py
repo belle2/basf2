@@ -18,7 +18,7 @@
 </header>
 """
 
-from basf2 import set_random_seed, create_path, process, statistics
+from basf2 import set_random_seed, create_path, process
 from simulation import add_simulation
 from validation import statistics_plots, event_timing_plot
 from background import get_background_files
@@ -43,10 +43,7 @@ main.add_module("Profile")
 main.add_module("RootOutput", outputFileName="../EvtGenSim.root")
 
 main.add_module('Progress')
-process(main)
-
-# Print call statistics
-print(statistics)
+process(main, calculateStatistics=True)
 
 statistics_plots(
     "EvtGenSim_statistics.root",

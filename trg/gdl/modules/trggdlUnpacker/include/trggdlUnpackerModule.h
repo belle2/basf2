@@ -61,7 +61,7 @@ namespace Belle2 {
       /** Destructor */
       virtual ~TRGGDLUnpackerModule() {}
 
-      /** Initilizes TRGGDLUnpackerModuel.*/
+      /** Initializes TRGGDLUnpackerModuel.*/
       virtual void initialize() override;
 
       /** Called event by event.*/
@@ -91,9 +91,9 @@ namespace Belle2 {
 
       StoreArray<TRGGDLUnpackerStore> store;
 
-      //condition database for unpacer
+      /// condition database for unpacker
       DBObjPtr<TRGGDLDBUnpacker> m_dbunpacker;
-      //condition database for badrun
+      /// condition database for badrun
       DBObjPtr<TRGGDLDBBadrun> m_dbbadrun;
 
       //variables to store database

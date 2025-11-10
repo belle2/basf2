@@ -14,7 +14,7 @@ import modularAnalysis as ma
 import math
 
 
-def charmFlavorTagger(particle_list, uniqueIdentifier='CFT_ragdoll',
+def charmFlavorTagger(particle_list, uniqueIdentifier='CFT_ceres',
                       path=None):
     """
     Interfacing for the Charm Flavor Tagger.
@@ -56,7 +56,7 @@ def charmFlavorTagger(particle_list, uniqueIdentifier='CFT_ragdoll',
     va.variables.addAlias("PID_diff", "formula(pionID-kaonID)")
 
     # split tracks by charge, rank them (keep only the three highest ranking) and write CFT input to extraInfo of signal particle
-    var_list = ['mRecoil', 'PID_diff', 'deltaR']
+    var_list = ['mRecoil', 'PID_diff', 'pionID', 'kaonID', 'muonID', 'electronID', 'protonID', 'deltaR', 'dr', 'dz']
     cft_particle_dict = {'pi+:pos_charge': ['charge > 0 and p < infinity', 'p'],
                          'pi+:neg_charge': ['charge < 0 and p < infinity', 'n']}
 
@@ -85,7 +85,7 @@ def charmFlavorTagger(particle_list, uniqueIdentifier='CFT_ragdoll',
     # The CFT output probability should be 0.5 when no track is reconstructed in the ROE
     va.variables.addAlias(
         'CFT_prob',
-        'conditionalVariableSelector(isNAN(pi_1_p_deltaR) and isNAN(pi_1_n_deltaR),0.5,formula(1-extraInfo(CFT_out)))')
+        'conditionalVariableSelector(isNAN(pi_1_p_deltaR) and isNAN(pi_1_n_deltaR),0.5,extraInfo(CFT_out))')
     va.variables.addAlias('CFT_qr', 'formula(2*CFT_prob-1)')
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

@@ -77,5 +77,5 @@ add_reconstruction(main, components)
 # default parameters
 display = main.add_module('Display')
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

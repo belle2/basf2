@@ -45,7 +45,7 @@ add_reconstruction(main)
 main.add_module("RootOutput", outputFileName="EvtGenSimRecYesBrems.root")
 
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

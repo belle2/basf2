@@ -9,9 +9,7 @@
 #pragma once
 
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 
-#include <boost/algorithm/string.hpp>
 #include <set>
 
 #include <TObject.h>
@@ -83,7 +81,7 @@ namespace Belle2 {
     */
     PIDDetectorWeights(const std::string& weightsCSVFileName)
     {
-      m_weightsRDataFrame = ROOT::RDF::MakeCsvDataFrame(weightsCSVFileName);
+      m_weightsRDataFrame = ROOT::RDF::FromCSV(weightsCSVFileName);
       fillWeightsTablePerHypoFromRDF();
     };
 

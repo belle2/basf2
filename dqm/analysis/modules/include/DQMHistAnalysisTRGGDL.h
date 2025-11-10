@@ -191,6 +191,9 @@ namespace Belle2 {
     /** Run type flag for physics runs. */
     bool m_IsPhysicsRun;
 
+    //mirabelle
+    Belle2::MonitoringObject* m_mon_h_eff_shifter_fast = nullptr; /**< Mirabelle, MonitoringObject for m_h_eff_shifter_fast */
+
 #ifdef _BELLE2_EPICS
     chid mychid[n_eff_shifter];// hard limit max 10 parameters
     chid mychid_entry[nskim_gdldqm];

@@ -12,12 +12,10 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcGeoScan/ScanCDCGeoModule.h>
-#include <geometry/GeometryManager.h>
-#include <framework/gearbox/GearDir.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include "TH1F.h"
-#include "TCanvas.h"
-#include "TVectorF.h"
+
+#include <TH1F.h>
+#include <TVectorF.h>
 
 using namespace std;
 using namespace Belle2;

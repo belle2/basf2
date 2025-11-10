@@ -43,7 +43,7 @@ def generate_test_data(filename):
     main.add_module("RootOutput", outputFileName=filename)
     main.add_module("Progress")
 
-    basf2.process(main)
+    basf2.process(main, calculateStatistics=True)
     print(basf2.statistics)
     return os.path.abspath(filename)
 

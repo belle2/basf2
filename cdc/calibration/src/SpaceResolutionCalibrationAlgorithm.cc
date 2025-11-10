@@ -5,20 +5,19 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <iostream>
+
 #include <cdc/calibration/SpaceResolutionCalibrationAlgorithm.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 
-#include "TF1.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TROOT.h"
-#include "TError.h"
-#include "TMinuit.h"
+#include <TError.h>
+#include <TF1.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TMinuit.h>
+#include <TROOT.h>
 #include <TStopwatch.h>
 
 using namespace std;
@@ -529,7 +528,7 @@ void SpaceResolutionCalibrationAlgorithm::write()
   saveCalibration(dbSigma, "CDCSpaceResols");
 
   B2RESULT("Number of histogram: " << 56 * 2 * m_nAlphaBins * m_nThetaBins);
-  B2RESULT("Histos succesfully fitted: " << nfitted);
+  B2RESULT("Histos successfully fitted: " << nfitted);
   B2RESULT("Histos fit failure: " << nfailure);
 
 

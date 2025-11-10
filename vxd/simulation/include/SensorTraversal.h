@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef VXD_SIMULATION_SENSORTRAVERSAL_H
-#define VXD_SIMULATION_SENSORTRAVERSAL_H
 
 #include <G4ThreeVector.hh>
 #include <vector>
@@ -23,7 +21,7 @@ namespace Belle2 {
      * @param stepPosition step position
      * @param stepMomentum step momentum
      * @param stepElectrons number of created electrons
-     * @param stepTime global time the step occured
+     * @param stepTime global time the step occurred
      * @param stepLength step length
      */
     StepInformation(const G4ThreeVector& stepPosition, const G4ThreeVector& stepMomentum, double stepElectrons, double stepTime,
@@ -81,7 +79,7 @@ namespace Belle2 {
     /** return whether the track belongs to a primary particle */
     bool isPrimary() const { return m_primary; }
 
-    /** indicate that the track originated outisde the current volume */
+    /** indicate that the track originated outside the current volume */
     void hasEntered() { m_contained = false; }
     /** indicate that the track left the current volume */
     void hasLeft() { m_contained = false; }
@@ -115,11 +113,10 @@ namespace Belle2 {
     double m_electrons {0};
     /** length of the sensor traversal */
     double m_length {0};
-    /** Indication wether the track is completely contained inside the volume */
+    /** Indication whether the track is completely contained inside the volume */
     bool m_contained {true};
     /** Indication whether track is from a primary particle */
     bool m_primary {false};
   };
 
 } //Belle2 namespace
-#endif // VXD_SIMULATION_SENSORTRAVERSAL_H

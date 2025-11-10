@@ -121,7 +121,7 @@ namespace {
 
 
   /** Test vertex smearing: we generate a set of events and check whether the
-   * generated vertex distribution is in accordance with te mean and covariance
+   * generated vertex distribution is in accordance with the mean and covariance
    * matrix actually put in */
   TEST_F(InitialParticleGenerationTests, TestVertexSmear)
   {
@@ -160,7 +160,7 @@ namespace {
       // set the flag and overwrite dbstore
       beamparams.setGenerationFlags(flag);
       DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
-      // rememeber last event and set it to the settings for initialization
+      // remember last event and set it to the settings for initialization
       MCInitialParticles last = beamparams;
       // no generate a few events and check everything
       for (int i = 0; i < 5; ++i) {

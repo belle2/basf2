@@ -9,13 +9,13 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <pxd/dataobjects/PXDRawHit.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
 
 namespace Belle2 {
+  class PXDDAQStatus;
+  class PXDRawHit;
+  class VxdID;
 
   namespace PXD {
 

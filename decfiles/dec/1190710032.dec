@@ -11,7 +11,7 @@
 # Date: 20231907
 #
 
-PythiaBothParam StringFlav:probStoUD=0.390
+PythiaAliasParam StringFlav:probStoUD=0.390
 
 Decay Upsilon(4S)
 1.0     B0sig anti-B0sig B0 anti-B0                   VSS_BMIX dm;

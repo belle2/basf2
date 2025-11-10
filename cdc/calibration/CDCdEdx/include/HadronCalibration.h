@@ -90,7 +90,7 @@ namespace Belle2 {
                         const std::string& sx, const std::string& sy);
 
     /**
-    * function to set grpah cosmetics
+    * function to set graph cosmetics
     */
     void setGraphStyle(TGraphErrors& gr, const int ic)
     {

@@ -27,7 +27,7 @@ namespace Belle2 {
     class CreatorBase;
 
     /**
-     * Flag indiciating the type of geometry to be used
+     * Flag indicating the type of geometry to be used
      */
     enum GeometryTypes {
       FullGeometry,     /**< Full geometry for simulation */
@@ -110,7 +110,7 @@ namespace Belle2 {
       }
 
       /**
-       * Set the names of addtional components to be added to the default set.
+       * Set the names of additional components to be added to the default set.
        * This member allows to set a list of component names. When creating the
        * the geometry, components matching names in the list will be added if
        * they are not disabled by default. If a list of components is already

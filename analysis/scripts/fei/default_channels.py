@@ -28,6 +28,7 @@
 import b2bii
 from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
 from basf2 import B2FATAL, B2INFO
+from variables import variables
 
 
 def get_default_channels(
@@ -40,6 +41,7 @@ def get_default_channels(
         neutralB=True,
         specific=False,
         removeSLD=False,
+        usePIDNN=False,
         strangeB=False):
     """
     returns list of Particle objects with all default channels for running
@@ -54,6 +56,7 @@ def get_default_channels(
     @param neutralB whether to recombine neutral B mesons (default is True)
     @param specific if True, this adds isInRestOfEvent cut to all FSP
     @param removeSLD if True, removes semileptonic D modes from semileptonic B lists (default is False)
+    @param usePIDNN if True, PID probabilities calculated from PID neural network are used (default is False)
     @param strangeB if True, reconstruct B_s mesons in Upsilon5S decays (default is False)
     """
     if strangeB is True:
@@ -69,6 +72,8 @@ def get_default_channels(
     convertedFromBelle = b2bii.isB2BII()
 
     if convertedFromBelle:
+        if usePIDNN:
+            B2FATAL("The PIDNN variables do not exist for b2bii.")
         # Using Belle specific Variables for e-ID, mu-ID and K-ID
         # atcPIDBelle(3,2) is used as K-ID
         # atcPIDBelle(4,2) and atcPIDBelle(4,3) are used as pr-ID
@@ -76,11 +81,15 @@ def get_default_channels(
         chargedVariables = ['eIDBelle',
                             'atcPIDBelle(3,2)',
                             'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)',
-                            'muIDBelle',
-                            'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
+                            'muIDBelle'
+                            ]
     else:
-        chargedVariables = ['electronID', 'kaonID', 'protonID', 'muonID',
-                            'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
+        if usePIDNN:
+            chargedVariables = ['electronIDNN', 'kaonIDNN', 'protonIDNN', 'muonIDNN']
+        else:
+            chargedVariables = ['electronID', 'kaonID', 'protonID', 'muonID']
+
+    chargedVariables += ['p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
 
     if specific:
         charged_user_cut = '[dr < 2] and [abs(dz) < 4] and isInRestOfEvent > 0.5'
@@ -92,7 +101,8 @@ def get_default_channels(
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='pionID' if not convertedFromBelle else 'atcPIDBelle(2,3)',
+                                        bestCandidateVariable="atcPIDBelle(2,3)" if convertedFromBelle
+                                        else ("pionIDNN" if usePIDNN else "pionID"),
                                         bestCandidateCut=20),
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     pion.addChannel(['pi+:FSP'])
@@ -102,7 +112,8 @@ def get_default_channels(
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='kaonID' if not convertedFromBelle else 'atcPIDBelle(3,2)',
+                                        bestCandidateVariable="atcPIDBelle(3,2)" if convertedFromBelle
+                                        else ("kaonIDNN" if usePIDNN else "kaonID"),
                                         bestCandidateCut=20),
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     kaon.addChannel(['K+:FSP'])
@@ -112,7 +123,8 @@ def get_default_channels(
                                        target='isPrimarySignal'),
                       PreCutConfiguration(userCut=charged_user_cut,
                                           bestCandidateMode='highest',
-                                          bestCandidateVariable='protonID' if not convertedFromBelle else 'atcPIDBelle(4,3)',
+                                          bestCandidateVariable="atcPIDBelle(4,3)" if convertedFromBelle
+                                          else ("protonIDNN" if usePIDNN else "protonID"),
                                           bestCandidateCut=20),
                       PostCutConfiguration(bestCandidateCut=10, value=0.01))
     proton.addChannel(['p+:FSP'])
@@ -122,7 +134,8 @@ def get_default_channels(
                                          target='isPrimarySignal'),
                         PreCutConfiguration(userCut=charged_user_cut,
                                             bestCandidateMode='highest',
-                                            bestCandidateVariable='electronID' if not convertedFromBelle else 'eIDBelle',
+                                            bestCandidateVariable="eIDBelle" if convertedFromBelle
+                                            else ("electronIDNN" if usePIDNN else "electronID"),
                                             bestCandidateCut=10),
                         PostCutConfiguration(bestCandidateCut=5, value=0.01))
     electron.addChannel(['e+:FSP'])
@@ -132,7 +145,8 @@ def get_default_channels(
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='muonID' if not convertedFromBelle else 'muIDBelle',
+                                        bestCandidateVariable="muIDBelle" if convertedFromBelle
+                                        else ("muonIDNN" if usePIDNN else "muonID"),
                                         bestCandidateCut=10),
                     PostCutConfiguration(bestCandidateCut=5, value=0.01))
     muon.addChannel(['mu+:FSP'])
@@ -604,6 +618,7 @@ def get_default_channels(
 
     BP = Particle('B+',
                   MVAConfiguration(variables=B_vars,
+                                   spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                    target='isSignal'),
                   PreCutConfiguration(userCut=hadronic_user_cut,
                                       bestCandidateMode='highest',
@@ -662,6 +677,7 @@ def get_default_channels(
 
     BP_SL = Particle('B+:semileptonic',
                      MVAConfiguration(variables=B_SL_vars,
+                                      spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                       target='isSignalAcceptMissingNeutrino'),
                      PreCutConfiguration(userCut=semileptonic_user_cut,
                                          bestCandidateMode='highest',
@@ -716,6 +732,7 @@ def get_default_channels(
     if KLong:
         BP_KL = Particle('B+:KL',
                          MVAConfiguration(variables=B_vars,
+                                          spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                           target='isSignal'),
                          PreCutConfiguration(userCut=semileptonic_user_cut,
                                              bestCandidateMode='highest',
@@ -767,6 +784,7 @@ def get_default_channels(
 
     B0 = Particle('B0',
                   MVAConfiguration(variables=B_vars,
+                                   spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                    target='isSignal'),
                   PreCutConfiguration(userCut=hadronic_user_cut,
                                       bestCandidateMode='highest',
@@ -809,6 +827,7 @@ def get_default_channels(
 
     B0_SL = Particle('B0:semileptonic',
                      MVAConfiguration(variables=B_SL_vars,
+                                      spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                       target='isSignalAcceptMissingNeutrino'),
                      PreCutConfiguration(userCut=semileptonic_user_cut,
                                          bestCandidateMode='highest',
@@ -860,6 +879,7 @@ def get_default_channels(
     if KLong:
         B0_KL = Particle('B0:KL',
                          MVAConfiguration(variables=B_vars,
+                                          spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                           target='isSignal'),
                          PreCutConfiguration(userCut=semileptonic_user_cut,
                                              bestCandidateMode='highest',
@@ -917,6 +937,7 @@ def get_default_channels(
 
     BS = Particle('B_s0',
                   MVAConfiguration(variables=Bs_vars,
+                                   spectators={'Mbc': (5.23, None)},
                                    target='isSignal'),
                   PreCutConfiguration(userCut=hadronic_bs_user_cut,
                                       bestCandidateMode='highest',
@@ -1046,6 +1067,665 @@ def get_default_channels(
 
     if strangeB:
         particles.append(BS)
+
+    return particles
+
+
+def get_ccbarLambdaC_channels(
+        specific=False,
+        addPi0=False,
+        addCharged=False,
+        addStrangness=False,
+        usePIDNN=False):
+    """
+    returns list of Particle objects with all default channels for running
+    FEI on ccbar to tag Lambda_c+ decays
+    These channel list has not been optimized yet and currently serves
+    only as an example for FEI application on ccbar events.
+    @param specific if True, this adds isInRestOfEvent cut to all FSP
+    @param addPi0 if True, this adds pi0 to all channels
+    @param addCharged if True, this adds charged pairs to all channels
+    @param addStrangness if True, this adds strange particles to all channels
+    @param usePIDNN if True, PID probabilities calculated from PID neural network are used (default is False)
+    """
+
+    convertedFromBelle = b2bii.isB2BII()
+
+    if convertedFromBelle:
+        if usePIDNN:
+            B2FATAL("The PIDNN variables do not exist for b2bii.")
+        # Using Belle specific Variables for e-ID, mu-ID and K-ID
+        # atcPIDBelle(3,2) is used as K-ID
+        # atcPIDBelle(4,2) and atcPIDBelle(4,3) are used as pr-ID
+
+        chargedVariables = ['eIDBelle',
+                            'atcPIDBelle(3,2)',
+                            'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)',
+                            'muIDBelle'
+                            ]
+    else:
+        if usePIDNN:
+            chargedVariables = ['electronIDNN', 'kaonIDNN', 'protonIDNN', 'muonIDNN']
+        else:
+            chargedVariables = ['electronID', 'kaonID', 'protonID', 'muonID']
+
+    chargedVariables += ['p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
+
+    if specific:
+        charged_user_cut = '[dr < 2] and [abs(dz) < 4] and isInRestOfEvent > 0.5'
+    else:
+        charged_user_cut = '[dr < 2] and [abs(dz) < 4]'
+
+    # region 1st stage
+    pion = Particle('pi+',
+                    MVAConfiguration(variables=chargedVariables,
+                                     target='isPrimarySignal'),
+                    PreCutConfiguration(userCut=charged_user_cut,
+                                        bestCandidateMode='highest',
+                                        bestCandidateVariable="atcPIDBelle(2,3)" if convertedFromBelle
+                                        else ("pionIDNN" if usePIDNN else "pionID"),
+                                        bestCandidateCut=20),
+                    PostCutConfiguration(bestCandidateCut=10, value=0.01))
+    pion.addChannel(['pi+:FSP'])
+
+    kaon = Particle('K+',
+                    MVAConfiguration(variables=chargedVariables,
+                                     target='isPrimarySignal'),
+                    PreCutConfiguration(userCut=charged_user_cut,
+                                        bestCandidateMode='highest',
+                                        bestCandidateVariable="atcPIDBelle(3,2)" if convertedFromBelle
+                                        else ("kaonIDNN" if usePIDNN else "kaonID"),
+                                        bestCandidateCut=20),
+                    PostCutConfiguration(bestCandidateCut=10, value=0.01))
+    kaon.addChannel(['K+:FSP'])
+
+    proton = Particle('p+',
+                      MVAConfiguration(variables=chargedVariables,
+                                       target='isPrimarySignal'),
+                      PreCutConfiguration(userCut=charged_user_cut,
+                                          bestCandidateMode='highest',
+                                          bestCandidateVariable="atcPIDBelle(4,3)" if convertedFromBelle
+                                          else ("protonIDNN" if usePIDNN else "protonID"),
+                                          bestCandidateCut=20),
+                      PostCutConfiguration(bestCandidateCut=10, value=0.01))
+    proton.addChannel(['p+:FSP'])
+
+    electron = Particle('e+',
+                        MVAConfiguration(variables=chargedVariables,
+                                         target='isPrimarySignal'),
+                        PreCutConfiguration(userCut=charged_user_cut,
+                                            bestCandidateMode='highest',
+                                            bestCandidateVariable="eIDBelle" if convertedFromBelle
+                                            else ("electronIDNN" if usePIDNN else "electronID"),
+                                            bestCandidateCut=10),
+                        PostCutConfiguration(bestCandidateCut=5, value=0.01))
+    electron.addChannel(['e+:FSP'])
+
+    muon = Particle('mu+',
+                    MVAConfiguration(variables=chargedVariables,
+                                     target='isPrimarySignal'),
+                    PreCutConfiguration(userCut=charged_user_cut,
+                                        bestCandidateMode='highest',
+                                        bestCandidateVariable="muIDBelle" if convertedFromBelle
+                                        else ("muonIDNN" if usePIDNN else "muonID"),
+                                        bestCandidateCut=10),
+                    PostCutConfiguration(bestCandidateCut=5, value=0.01))
+    muon.addChannel(['mu+:FSP'])
+
+    if convertedFromBelle:
+        gamma_cut = 'goodBelleGamma == 1 and clusterBelleQuality == 0'
+    else:
+        # Same as goodBelleGamma == 1
+        gamma_cut = '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.05] or [clusterReg == 3 and E > 0.15]]'
+    if specific:
+        gamma_cut += ' and isInRestOfEvent > 0.5'
+
+    gamma = Particle('gamma',
+                     MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming', 'extraInfo(preCut_rank)',
+                                                 'clusterE9E25', 'pt', 'E', 'pz'],
+                                      target='isPrimarySignal'),
+                     PreCutConfiguration(userCut=gamma_cut,
+                                         bestCandidateMode='highest',
+                                         bestCandidateVariable='E',
+                                         bestCandidateCut=40),
+                     PostCutConfiguration(bestCandidateCut=20, value=0.01))
+    gamma.addChannel(['gamma:FSP'])
+    gamma.addChannel(['gamma:V0'],
+                     MVAConfiguration(variables=['pt', 'E', 'pz', 'extraInfo(preCut_rank)'],
+                                      target='isPrimarySignal'),
+                     PreCutConfiguration(userCut='',
+                                         bestCandidateMode='highest',
+                                         bestCandidateVariable='E',
+                                         bestCandidateCut=40))
+
+    kl0_cut = ''
+    if specific:
+        kl0_cut += 'isInRestOfEvent > 0.5'
+
+    KL0 = Particle('K_L0',
+                   MVAConfiguration(variables=['E', 'klmClusterTiming'],
+                                    target='isSignal'),
+                   PreCutConfiguration(userCut=kl0_cut,
+                                       bestCandidateVariable='abs(dM)',
+                                       bestCandidateCut=20),
+                   PostCutConfiguration(bestCandidateCut=10, value=0.01))
+    KL0.addChannel(['K_L0:FSP'])
+    # endregion 1st stage
+
+    # region 2nd stage
+    variables.addAlias('eneAsy', 'formula((daughter(0,E)-daughter(1,E))/(daughter(0,E)+daughter(1,E)))')
+    if convertedFromBelle:
+        pi0_cut = '0.08 < InvM < 0.18'
+        if specific:
+            pi0_cut += ' and isInRestOfEvent > 0.5'
+
+        pi0 = Particle('pi0',
+                       MVAConfiguration(variables=['InvM', 'extraInfo(preCut_rank)', 'chiProb', 'abs(BellePi0SigM)',
+                                                   'daughterAngle(0,1)', 'pt', 'pz', 'E',
+                                                   'daughter({},E)', 'daughter({},clusterReg)'],
+                                        target='isSignal'),
+                       PreCutConfiguration(userCut=pi0_cut,
+                                           bestCandidateVariable='abs(BellePi0SigM)',
+                                           bestCandidateCut=20),
+                       PostCutConfiguration(bestCandidateCut=10, value=0.01))
+        pi0.addChannel(['pi0:FSP'])
+
+        Lam_cut = '0.9 < M < 1.3'
+        if specific:
+            Lam_cut += ' and isInRestOfEvent > 0.5'
+        L0 = Particle(
+            'Lambda0',
+            MVAConfiguration(
+                variables=[
+                    'dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
+                    'useCMSFrame(E)', 'daughterAngle(0,1)',
+                    'cosAngleBetweenMomentumAndVertexVector',
+                    'extraInfo(preCut_rank)', 'extraInfo(goodLambda)', 'extraInfo(ksnbVLike)',
+                    'extraInfo(ksnbNoLam)'],
+                target='isSignal'),
+            PreCutConfiguration(
+                userCut=Lam_cut,
+                bestCandidateVariable='abs(dM)',
+                bestCandidateCut=20),
+            PostCutConfiguration(
+                bestCandidateCut=10,
+                value=0.01)
+        )
+        L0.addChannel(['Lambda0:V0'])
+    else:
+        pi0 = Particle('pi0',
+                       MVAConfiguration(variables=['M', 'daughter({},extraInfo(SignalProbability))', 'extraInfo(preCut_rank)',
+                                                   'daughterAngle(0,1)', 'pt', 'pz', 'E', 'abs(dM)',
+                                                   'daughter({},E)', 'daughter({},clusterReg)', 'eneAsy'],
+                                        target='isSignal'),
+                       PreCutConfiguration(userCut='0.08 < M < 0.18',
+                                           bestCandidateVariable='abs(dM)',
+                                           bestCandidateCut=20),
+                       PostCutConfiguration(bestCandidateCut=10, value=0.01))
+        pi0.addChannel(['gamma', 'gamma'])
+
+        L0 = Particle(
+            'Lambda0',
+            MVAConfiguration(
+                variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
+                           'useCMSFrame(E)', 'daughterAngle(0,1)',
+                           'daughter({},extraInfo(SignalProbability))',
+                           'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
+                           'daughter({}, dz)', 'daughter({}, dr)', 'extraInfo(preCut_rank)'],
+                target='isSignal'),
+            PreCutConfiguration(
+                userCut='0.9 < M < 1.3',
+                bestCandidateVariable='abs(dM)',
+                bestCandidateCut=20),
+            PostCutConfiguration(
+                bestCandidateCut=10,
+                value=0.01)
+        )
+        L0.addChannel(['p+', 'pi-'])
+
+        Lam_cut = '0.9 < M < 1.3'
+        if specific:
+            Lam_cut += ' and isInRestOfEvent > 0.5'
+
+        L0.addChannel(
+            ['Lambda0:V0'],
+            MVAConfiguration(
+                variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M',
+                           'useCMSFrame(E)', 'daughterAngle(0,1)', 'extraInfo(preCut_rank)', 'abs(dM)',
+                           'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
+                           'daughter({}, dz)', 'daughter({}, dr)'],
+                target='isSignal'),
+            PreCutConfiguration(
+                userCut=Lam_cut,
+                bestCandidateVariable='abs(dM)',
+                bestCandidateCut=20))
+    # endregion 2nd stage
+
+    # region 3rd stage
+    if convertedFromBelle:
+        ks0_cut = '0.4 < M < 0.6'
+        if specific:
+            ks0_cut += ' and isInRestOfEvent > 0.5'
+
+        KS0 = Particle(
+            'K_S0',
+            MVAConfiguration(
+                variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
+                           'useCMSFrame(E)', 'daughterAngle(0,1)',
+                           'cosAngleBetweenMomentumAndVertexVector',
+                           'extraInfo(preCut_rank)', 'extraInfo(goodKs)', 'extraInfo(ksnbVLike)',
+                           'extraInfo(ksnbNoLam)', 'extraInfo(ksnbStandard)'],
+                target='isSignal'),
+            PreCutConfiguration(
+                userCut=ks0_cut,
+                bestCandidateVariable='abs(dM)',
+                bestCandidateCut=20),
+            PostCutConfiguration(
+                bestCandidateCut=10,
+                value=0.01)
+        )
+        KS0.addChannel(['K_S0:V0'])
+    else:
+        KS0 = Particle(
+            'K_S0',
+            MVAConfiguration(
+                variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
+                           'useCMSFrame(E)', 'daughterAngle(0,1)',
+                           'useRestFrame(daughterAngle(0,1))',
+                           'daughter({},extraInfo(SignalProbability))',
+                           'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
+                           'daughter({}, dz)', 'daughter({}, dr)', 'extraInfo(preCut_rank)', 'eneAsy'],
+                target='isSignal'),
+            PreCutConfiguration(
+                userCut='0.4 < M < 0.6',
+                bestCandidateVariable='abs(dM)',
+                bestCandidateCut=20),
+            PostCutConfiguration(
+                bestCandidateCut=10,
+                value=0.01)
+        )
+        KS0.addChannel(['pi+', 'pi-'])
+        KS0.addChannel(['pi0', 'pi0'])
+
+        ks0_cut = '0.4 < M < 0.6'
+        if specific:
+            ks0_cut += ' and isInRestOfEvent > 0.5'
+
+        KS0.addChannel(
+            ['K_S0:V0'],
+            MVAConfiguration(
+                variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M',
+                           'useCMSFrame(E)', 'daughterAngle(0,1)', 'extraInfo(preCut_rank)', 'abs(dM)',
+                           'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
+                           'daughter({}, dz)', 'daughter({}, dr)'],
+                target='isSignal'),
+            PreCutConfiguration(
+                userCut=ks0_cut,
+                bestCandidateVariable='abs(dM)',
+                bestCandidateCut=20))
+
+    SigmaP = Particle(
+        'Sigma+',
+        MVAConfiguration(
+            variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
+                       'useCMSFrame(E)', 'daughterAngle(0,1)',
+                       'daughter({},extraInfo(SignalProbability))',
+                       'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
+                       'daughter({}, dz)', 'daughter({}, dr)', 'extraInfo(preCut_rank)'],
+            target='isSignal'),
+        PreCutConfiguration(
+            userCut='1.0 < M < 1.4',
+            bestCandidateVariable='abs(dM)',
+            bestCandidateCut=20),
+        PostCutConfiguration(
+            bestCandidateCut=10,
+            value=0.01)
+    )
+    SigmaP.addChannel(['p+', 'pi0'])
+    # endregion 3rd stage
+
+    # region 4th stage
+    pi0vetovars = ['extraInfo(pi0vetoMass)', 'extraInfo(pi0vetoEneAsy)']
+
+    # variables for D mesons
+    variables.addAlias('significanceOfFlightDistance', 'formula(flightDistance/flightDistanceErr)')
+    Dtag_vars = [
+        'pValueCombinationOfDaughters(extraInfo(SignalProbability))',
+        'daughter({},extraInfo(SignalProbability))',
+        'chiProb',
+        'daughter({}, chiProb)',
+        'extraInfo(preCut_rank)',
+        'abs(dM)', 'Q',
+        'useRestFrame(daughter({}, p))',
+        'useRestFrame(daughter({}, distance))',
+        'useCMSFrame(p)',
+        'decayAngle({1..})',
+        'daughterAngle({},{})',
+        'daughterInvM({},{})',
+        'daughterInvM({},{},{})',
+        'daughterInvM({},{},{},{})',
+        'daughterInvM({},{},{},{},{})',
+        'daughter({},extraInfo(decayModeID))',
+        'cosAngleBetweenMomentumAndVertexVector',
+        'cosAngleBetweenMomentumAndVertexVectorInXYPlane',
+        'vertexDistance',
+        'vertexDistanceSignificance',
+        'vertexDistanceOfDaughter({})',
+        'vertexDistanceOfDaughterSignificance({})',
+        'significanceOfFlightDistance'
+    ]
+
+    D0 = Particle('D0',
+                  MVAConfiguration(variables=Dtag_vars,
+                                   target='isSignal'),
+                  PreCutConfiguration(userCut='1.7 < M < 1.95',
+                                      bestCandidateVariable='abs(dM)',
+                                      bestCandidateCut=20),
+                  PostCutConfiguration(bestCandidateCut=10, value=0.001))
+    D0.addChannel(['K-', 'pi+'])
+    D0.addChannel(['K-', 'pi+', 'pi0'])
+    D0.addChannel(['K-', 'pi+', 'pi+', 'pi-'])
+    D0.addChannel(['K-', 'pi+', 'pi+', 'pi-', 'pi0'])
+    D0.addChannel(['K_S0', 'pi+', 'pi-'])
+    D0.addChannel(['K_S0', 'pi+', 'pi-', 'pi0'])
+
+    D0.addChannel(['K-', 'pi+', 'pi0', 'pi0'])
+    D0.addChannel(['pi-', 'pi+'])
+    D0.addChannel(['pi-', 'pi+', 'pi+', 'pi-'])
+    D0.addChannel(['pi-', 'pi+', 'pi0'])
+    D0.addChannel(['pi-', 'pi+', 'pi0', 'pi0'])
+    D0.addChannel(['K-', 'K+'])
+    D0.addChannel(['K-', 'K+', 'pi0'])
+    D0.addChannel(['K-', 'K+', 'K_S0'])
+    D0.addChannel(['K_S0', 'pi0'])
+
+    DP = Particle('D+',
+                  MVAConfiguration(variables=Dtag_vars,
+                                   target='isSignal'),
+                  PreCutConfiguration(userCut='1.7 < M < 1.95',
+                                      bestCandidateVariable='abs(dM)',
+                                      bestCandidateCut=20),
+                  PostCutConfiguration(bestCandidateCut=10, value=0.001))
+    DP.addChannel(['K-', 'pi+', 'pi+'])
+    DP.addChannel(['K-', 'pi+', 'pi+', 'pi0'])
+    DP.addChannel(['K_S0', 'pi+'])
+    DP.addChannel(['K_S0', 'pi+', 'pi0'])
+    DP.addChannel(['K_S0', 'pi+', 'pi+', 'pi-'])
+    DP.addChannel(['K-', 'K+', 'pi+'])
+
+    DP.addChannel(['K-', 'K+', 'pi+', 'pi0'])
+    DP.addChannel(['pi+', 'pi0'])
+    DP.addChannel(['pi+', 'pi+', 'pi-'])
+    DP.addChannel(['pi+', 'pi+', 'pi-', 'pi0'])
+    DP.addChannel(['K+', 'K_S0', 'K_S0'])
+
+    DS = Particle('D_s+',
+                  MVAConfiguration(variables=Dtag_vars,
+                                   target='isSignal'),
+                  PreCutConfiguration(userCut='1.68 < M < 2.1',
+                                      bestCandidateVariable='abs(dM)',
+                                      bestCandidateCut=20),
+                  PostCutConfiguration(bestCandidateCut=10, value=0.001))
+    DS.addChannel(['K+', 'pi+', 'pi-'])
+    DS.addChannel(['K_S0', 'K+'])
+    DS.addChannel(['K_S0', 'K_S0', 'pi+'])
+    DS.addChannel(['K+', 'K-', 'pi+', 'pi0'])
+    DS.addChannel(['K-', 'K_S0', 'pi+', 'pi+'])
+
+    DS.addChannel(['K+', 'K-', 'pi+'])
+    DS.addChannel(['K+', 'K_S0', 'pi+', 'pi-'])
+    DS.addChannel(['K+', 'K-', 'pi+', 'pi+', 'pi-'])
+    DS.addChannel(['pi+', 'pi+', 'pi-'])
+    DS.addChannel(['K_S0', 'pi+'])
+    DS.addChannel(['K_S0', 'pi+', 'pi0'])
+
+    LC = Particle('Lambda_c+',
+                  MVAConfiguration(variables=Dtag_vars,
+                                   target='isSignal'),
+                  PreCutConfiguration(userCut='2.2 < M < 2.4',
+                                      bestCandidateVariable='abs(dM)',
+                                      bestCandidateCut=20),
+                  PostCutConfiguration(bestCandidateCut=10, value=0.001))
+    LC.addChannel(['p+', 'K-', 'pi+'])
+    LC.addChannel(['p+', 'K-', 'pi+', 'pi0'])
+    LC.addChannel(['p+', 'K_S0'])
+    LC.addChannel(['Lambda0', 'pi+'])
+    LC.addChannel(['Lambda0', 'pi+', 'pi0'])
+    LC.addChannel(['Lambda0', 'pi+', 'pi+', 'pi-'])
+
+    LC.addChannel(['p+', 'pi-', 'pi+'])
+    LC.addChannel(['p+', 'K-', 'K+'])
+    LC.addChannel(['p+', 'K-', 'pi+', 'pi0', 'pi0'])
+    LC.addChannel(['p+', 'pi+', 'pi+', 'pi-', 'pi-'])
+    LC.addChannel(['p+', 'K_S0', 'pi0'])
+    LC.addChannel(['p+', 'K_S0', 'pi+', 'pi-'])
+    LC.addChannel(['Lambda0', 'pi+', 'gamma'],
+                  MVAConfiguration(variables=Dtag_vars+pi0vetovars, target='isSignal'),
+                  pi0veto=True)
+    LC.addChannel(['Lambda0', 'pi+', 'pi0', 'gamma'],
+                  MVAConfiguration(variables=Dtag_vars+pi0vetovars, target='isSignal'),
+                  pi0veto=True)
+    LC.addChannel(['Lambda0', 'pi+', 'pi-', 'pi+', 'gamma'],
+                  MVAConfiguration(variables=Dtag_vars+pi0vetovars, target='isSignal'),
+                  pi0veto=True)
+    LC.addChannel(['Sigma+', 'pi+', 'pi-'])
+    LC.addChannel(['Sigma+', 'pi+', 'pi-', 'pi0'])
+    LC.addChannel(['Sigma+', 'pi0'])
+    # endregion 4th stage
+
+    # region 5th stage
+    Dstar_vars = Dtag_vars + ['pointingAngle(0)', 'massDifference(0)']
+    DSP = Particle('D*+',
+                   MVAConfiguration(variables=Dstar_vars,
+                                    target='isSignal'),
+                   PreCutConfiguration(userCut='0 < Q < 0.3',
+                                       bestCandidateVariable='abs(dQ)',
+                                       bestCandidateCut=20),
+                   PostCutConfiguration(bestCandidateCut=10, value=0.001))
+    DSP.addChannel(['D0', 'pi+'])
+    DSP.addChannel(['D+', 'pi0'])
+    DSP.addChannel(['D+', 'gamma'],
+                   MVAConfiguration(variables=Dstar_vars+pi0vetovars, target='isSignal'),
+                   pi0veto=True)
+
+    DS0 = Particle('D*0',
+                   MVAConfiguration(variables=Dstar_vars,
+                                    target='isSignal'),
+                   PreCutConfiguration(userCut='0 < Q < 0.3',
+                                       bestCandidateVariable='abs(dQ)',
+                                       bestCandidateCut=20),
+                   PostCutConfiguration(bestCandidateCut=10, value=0.001))
+    DS0.addChannel(['D0', 'pi0'])
+    DS0.addChannel(['D0', 'gamma'],
+                   MVAConfiguration(variables=Dstar_vars+pi0vetovars, target='isSignal'),
+                   pi0veto=True)
+
+    DSS = Particle('D_s*+',
+                   MVAConfiguration(variables=Dstar_vars,
+                                    target='isSignal'),
+                   PreCutConfiguration(userCut='0.0 < Q < 0.3',
+                                       bestCandidateVariable='abs(dQ)',
+                                       bestCandidateCut=20),
+                   PostCutConfiguration(bestCandidateCut=10, value=0.001))
+    DSS.addChannel(['D_s+', 'gamma'],
+                   MVAConfiguration(variables=Dstar_vars+pi0vetovars, target='isSignal'),
+                   pi0veto=True)
+    DSS.addChannel(['D_s+', 'pi0'])
+    # endregion 5th stage
+
+    CharmTag_vars = [
+        'pValueCombinationOfDaughters(extraInfo(SignalProbability))',
+        'daughter({},extraInfo(SignalProbability))',
+        'chiProb',
+        'daughter({}, chiProb)',
+        'extraInfo(preCut_rank)',
+        'useCMSFrame(daughter({1..}, p))',
+        'useCMSFrame(daughter({}, distance))',
+        'decayAngle({1..})',
+        'useCMSFrame(daughterAngle(0,{1..}))',
+        'cosAngleBetweenMomentumAndVertexVector',
+        'cosAngleBetweenMomentumAndVertexVectorInXYPlane',
+        'dr', 'dz', 'dx', 'dy', 'distance', 'significanceOfDistance',
+        'daughter({},extraInfo(decayModeID))',
+        'useCMSFrame(p)',
+        'useCMSFrame(angleBetweenDaughterAndRecoil(0))',
+        'vertexDistance',
+        'vertexDistanceSignificance',
+        'vertexDistanceOfDaughter({})',
+        'vertexDistanceOfDaughterSignificance({})',
+        'massDiffRecoil({2..})',
+        'significanceOfFlightDistance',
+    ]
+
+    ccbarTag_user_cut = '1.8 < mRecoil < 2.6'
+    variables.addAlias('ccbarTagSignalBinary', 'conditionalVariableSelector(ccbarTagSignal==1,1,0)')
+
+    # region 6th stage
+    LambdaCTag = Particle(
+        'Lambda_c+:ccbarTag',
+        MVAConfiguration(
+            config='--nTrees 400 --nCutLevels 10 --nLevels 3 --shrinkage 0.1 --randRatio 0.5',  # --flatnessLoss 1.0',
+            variables=CharmTag_vars,
+            spectators={'mRecoil': (1.8, 2.6)},
+            target='ccbarTagSignalBinary'),
+        PreCutConfiguration(
+            userCut=ccbarTag_user_cut,
+            bestCandidateMode='highest',
+            bestCandidateVariable='pValueCombinationOfDaughters(extraInfo(SignalProbability))',
+            noSignalSampling=True,
+            bkgSamplingFactor=0.01,
+            bestCandidateCut=20),
+        PostCutConfiguration(bestCandidateCut=20))
+    LambdaCTag.addChannel(['D0', 'p+'])
+    LambdaCTag.addChannel(['D*0', 'p+'])
+    LambdaCTag.addChannel(['D+', 'p+', 'pi-'])
+    LambdaCTag.addChannel(['D*+', 'p+', 'pi-'])
+    LambdaCTag.addChannel(['D_s+', 'p+', 'K-'])
+    LambdaCTag.addChannel(['D_s*+', 'p+', 'K-'])
+
+    if addCharged:
+        LambdaCTagCharged = Particle(
+            'Lambda_c+:ccbarTagCharged',
+            MVAConfiguration(
+                config='--nTrees 400 --nCutLevels 10 --nLevels 3 --shrinkage 0.1 --randRatio 0.5',  # --flatnessLoss 1.0',
+                variables=CharmTag_vars,
+                spectators={'mRecoil': (1.8, 2.6)},
+                target='ccbarTagSignalBinary'),
+            PreCutConfiguration(
+                userCut=ccbarTag_user_cut,
+                bestCandidateMode='highest',
+                bestCandidateVariable='pValueCombinationOfDaughters(extraInfo(SignalProbability))',
+                noSignalSampling=True,
+                bkgSamplingFactor=0.1,
+                bestCandidateCut=20),
+            PostCutConfiguration(bestCandidateCut=20))
+        LambdaCTagCharged.addChannel(['D0', 'p+', 'pi+', 'pi-'])
+        LambdaCTagCharged.addChannel(['D*0', 'p+', 'pi+', 'pi-'])
+        LambdaCTagCharged.addChannel(['D+', 'p+', 'pi-', 'pi+', 'pi-'])
+        LambdaCTagCharged.addChannel(['D*+', 'p+', 'pi-', 'pi+', 'pi-'])
+        LambdaCTagCharged.addChannel(['D_s+', 'p+', 'K-', 'pi+', 'pi-'])
+        LambdaCTagCharged.addChannel(['D_s*+', 'p+', 'K-', 'pi+', 'pi-'])
+        LambdaCTagCharged.addChannel(['D0', 'p+', 'K+', 'K-'])
+        LambdaCTagCharged.addChannel(['D*0', 'p+', 'K+', 'K-'])
+        LambdaCTagCharged.addChannel(['D+', 'p+', 'pi-', 'K+', 'K-'])
+        LambdaCTagCharged.addChannel(['D*+', 'p+', 'pi-', 'K+', 'K-'])
+
+        LambdaCTagCharged.addChannel(['D0', 'p+', 'p+', 'anti-p-'])
+        LambdaCTagCharged.addChannel(['D*0', 'p+', 'p+', 'anti-p-'])
+
+    if addPi0:
+        LambdaCTagPi0 = Particle(
+            'Lambda_c+:ccbarTagPi0',
+            MVAConfiguration(
+                config='--nTrees 400 --nCutLevels 10 --nLevels 3 --shrinkage 0.1 --randRatio 0.5',  # --flatnessLoss 1.0',
+                variables=CharmTag_vars,
+                spectators={'mRecoil': (1.8, 2.6)},
+                target='ccbarTagSignalBinary'),
+            PreCutConfiguration(
+                userCut=ccbarTag_user_cut,
+                bestCandidateMode='highest',
+                bestCandidateVariable='pValueCombinationOfDaughters(extraInfo(SignalProbability))',
+                noSignalSampling=True,
+                bkgSamplingFactor=0.05,
+                bestCandidateCut=20),
+            PostCutConfiguration(bestCandidateCut=20))
+        LambdaCTagPi0.addChannel(['D0', 'p+', 'pi0'])
+        LambdaCTagPi0.addChannel(['D*0', 'p+', 'pi0'])
+        LambdaCTagPi0.addChannel(['D+', 'p+', 'pi-', 'pi0'])
+        LambdaCTagPi0.addChannel(['D*+', 'p+', 'pi-', 'pi0'])
+        LambdaCTagPi0.addChannel(['D_s+', 'p+', 'K-', 'pi0'])
+        LambdaCTagPi0.addChannel(['D_s*+', 'p+', 'K-', 'pi0'])
+
+    if addStrangness:
+        LambdaCTagStrange = Particle(
+            'Lambda_c+:ccbarTagStrange',
+            MVAConfiguration(
+                config='--nTrees 400 --nCutLevels 10 --nLevels 3 --shrinkage 0.1 --randRatio 0.5',  # --flatnessLoss 1.0',
+                variables=CharmTag_vars,
+                spectators={'mRecoil': (1.8, 2.6)},
+                target='ccbarTagSignalBinary'),
+            PreCutConfiguration(
+                userCut=ccbarTag_user_cut,
+                bestCandidateMode='highest',
+                bestCandidateVariable='pValueCombinationOfDaughters(extraInfo(SignalProbability))',
+                noSignalSampling=True,
+                bkgSamplingFactor=0.05,
+                bestCandidateCut=20),
+            PostCutConfiguration(bestCandidateCut=20))
+        LambdaCTagStrange.addChannel(['D0', 'Lambda0', 'K+'])
+        LambdaCTagStrange.addChannel(['D*0', 'Lambda0', 'K+'])
+        LambdaCTagStrange.addChannel(['D*+', 'Lambda0', 'K_S0'])
+        LambdaCTagStrange.addChannel(['D_s+', 'Lambda0'])
+        LambdaCTagStrange.addChannel(['D_s*+', 'Lambda0'])
+        LambdaCTagStrange.addChannel(['D*+', 'p+', 'K_S0', 'K-'])
+        LambdaCTagStrange.addChannel(['D_s+', 'p+', 'K_S0', 'pi-'])
+        LambdaCTagStrange.addChannel(['D_s*+', 'p+', 'K_S0', 'pi-'])
+        LambdaCTagStrange.addChannel(['D0', 'Lambda0', 'K_S0', 'pi+'])
+        LambdaCTagStrange.addChannel(['D+', 'Lambda0', 'K+', 'pi-'])
+        LambdaCTagStrange.addChannel(['D*+', 'Lambda0', 'K+', 'pi-'])
+
+        LambdaCTagStrange.addChannel(['D0', 'Lambda0', 'K+', 'pi0'])
+
+        LambdaCTagStrange.addChannel(['D0', 'Lambda0', 'K+', 'pi+', 'pi-'])
+        LambdaCTagStrange.addChannel(['D*0', 'Lambda0', 'K+', 'pi+', 'pi-'])
+        LambdaCTagStrange.addChannel(['D_s+', 'Lambda0', 'pi+', 'pi-'])
+        LambdaCTagStrange.addChannel(['D_s*+', 'Lambda0', 'pi+', 'pi-'])
+
+        LambdaCTagStrange.addChannel(['D0', 'Lambda0', 'K+', 'pi+', 'pi-', 'pi0'])
+        LambdaCTagStrange.addChannel(['D_s+', 'Lambda0', 'pi+', 'pi-', 'pi0'])
+        LambdaCTagStrange.addChannel(['D_s*+', 'Lambda0', 'pi+', 'pi-', 'pi0'])
+
+    # endregion 6th stage
+
+    particles = []
+    particles.append(pion)
+    particles.append(kaon)
+    particles.append(proton)
+    particles.append(muon)
+    particles.append(electron)
+    particles.append(gamma)
+
+    particles.append(pi0)
+    particles.append(KS0)
+    particles.append(SigmaP)
+    particles.append(L0)
+
+    particles.append(D0)
+    particles.append(DP)
+    particles.append(DS)
+    particles.append(LC)
+
+    particles.append(DS0)
+    particles.append(DSP)
+    particles.append(DSS)
+
+    particles.append(LambdaCTag)
+    if addCharged:
+        particles.append(LambdaCTagCharged)
+    if addPi0:
+        particles.append(LambdaCTagPi0)
+    if addStrangness:
+        particles.append(LambdaCTagStrange)
 
     return particles
 
@@ -1401,6 +2081,7 @@ def get_fr_channels(convertedFromBelle=False):
 
     BP = Particle('B+',
                   MVAConfiguration(variables=B_vars,
+                                   spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                    target='isSignal'),
                   PreCutConfiguration(userCut=hadronic_user_cut,
                                       bestCandidateMode='highest',
@@ -1428,6 +2109,7 @@ def get_fr_channels(convertedFromBelle=False):
 
     B0 = Particle('B0',
                   MVAConfiguration(variables=B_vars,
+                                   spectators={'Mbc': (5.23, None), 'cosThetaBetweenParticleAndNominalB': (-10, 10)},
                                    target='isSignal'),
                   PreCutConfiguration(userCut=hadronic_user_cut,
                                       bestCandidateMode='highest',

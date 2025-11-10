@@ -62,7 +62,7 @@ class Histogrammer(b2.Module):
         self.hist2.append(TH1F('CDCOuterHitRate', 'CDC Hit Rate per wire for the Outer layers', 100, 0, 1000))
         self.hist2.append(TH1F('CDCHitRate', 'CDC Hit Rate per wire', 100, 0, 1000))
         self.hist2.append(TH1F("TOPHitTime", "TOP Hit Time Distribution; time [ns]", 300, -150, 150))
-        #: numnber of events
+        #: number of events
         self.nTOPev = 0
         #: min TOP hit time
         self.minTOPTime = None
@@ -293,6 +293,3 @@ main.add_module('Progress')
 
 # Process events
 b2.process(main)
-
-# Print call statistics
-print(b2.statistics)

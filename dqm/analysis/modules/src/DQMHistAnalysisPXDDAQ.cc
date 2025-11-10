@@ -100,24 +100,27 @@ void DQMHistAnalysisPXDDAQModule::beginRun()
   m_cMissingDHC->Clear();
   m_cStatistic->Clear();
   m_cStatisticUpd->Clear();
+
+  m_hMissingDHE->Reset();
+  m_hMissingDHC->Reset();
+  if (m_hMissingDHP) m_hMissingDHP->Reset();
+  if (m_hDAQError) m_hDAQError->Reset();
+  if (m_hStatistic) m_hStatistic->Reset();
 }
 
 void DQMHistAnalysisPXDDAQModule::event()
 {
-//   double data = 0.0;
   if (m_cMissingDHP == nullptr || m_cMissingDHE == nullptr || m_cMissingDHC == nullptr
       || m_cStatistic == nullptr) return; // we could assume this
 
   {
-    std::string name = "PXDDAQError";
-
-//    if (m_hDAQError) { delete m_hDAQError; m_hDAQError = nullptr;}
-
-    auto hh1 = findHist(m_histogramDirectoryName, name, true);
+    // Overall PXD DAQ Error
+    auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQError", true);
     if (hh1) {
       m_cDAQError->Clear();
       m_cDAQError->cd();
-      m_hDAQError = (TH1D*)hh1->DrawClone("text");
+      if (m_hDAQError) delete m_hDAQError;
+      m_hDAQError = (TH1D*)hh1->DrawClone("text");// or just Clone here and Draw below?
       m_hDAQError->SetName("hPXDDAQError");
       m_hDAQError->SetTitle("PXD Fraction of DAQ Errors");
       if (m_hDAQError->GetBinContent(0)) {
@@ -129,9 +132,7 @@ void DQMHistAnalysisPXDDAQModule::event()
   }
   {
     // DHC histogram
-    std::string name = "PXDDAQDHCError";
-
-    auto hh1 = findHist(m_histogramDirectoryName, name, true);
+    auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQDHCError", true);
     if (hh1) {
       auto events = hh1->GetBinContent(hh1->GetBin(-1, -1));
       m_cMissingDHC->Clear();
@@ -152,9 +153,7 @@ void DQMHistAnalysisPXDDAQModule::event()
 
   {
     // DHE histogram
-    std::string name = "PXDDAQDHEError";
-
-    auto hh1 = findHist(m_histogramDirectoryName, name, true);
+    auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQDHEError", true);
     if (hh1) {
       auto events = hh1->GetBinContent(hh1->GetBin(-1, -1));
       // first, we have to relate the per-DHE overflow (DHE object count) to the overall overflow (event count)
@@ -175,15 +174,11 @@ void DQMHistAnalysisPXDDAQModule::event()
 
   {
     // DHP histogram
-    //if (m_hMissingDHP) { delete m_hMissingDHP; m_hMissingDHP = nullptr;}
-
-    std::string name = "PXDDAQDHPDataMissing";
-
-    auto hh1 = findHist(m_histogramDirectoryName, name, true);
+    auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQDHPDataMissing", true);
     if (hh1) {
       m_cMissingDHP->Clear();
-
       m_cMissingDHP->cd();
+      if (m_hMissingDHP) delete m_hMissingDHP;
       m_hMissingDHP = (TH1F*)hh1->DrawClone("text");
       if (m_hMissingDHP->GetBinContent(0)) {
         m_hMissingDHP->Scale(1.0 / m_hMissingDHP->GetBinContent(0));
@@ -204,8 +199,9 @@ void DQMHistAnalysisPXDDAQModule::event()
   auto* statsum = findHist(m_histogramDirectoryName, name, true);
   if (statsum) {
     // Stat histogram
-    //if (m_hStatistic) { delete m_hStatistic; m_hStatistic = nullptr;}
+    m_cStatistic->Clear();
     m_cStatistic->cd();
+    if (m_hStatistic) delete m_hStatistic;
     m_hStatistic = (TH1D*)statsum->DrawClone("text");
     if (m_hStatistic->GetBinContent(0)) {
       m_hStatistic->Scale(1.0 / m_hStatistic->GetBinContent(0));
@@ -333,4 +329,7 @@ void DQMHistAnalysisPXDDAQModule::terminate()
 
   if (m_hMissingDHC) delete m_hMissingDHC;
   if (m_hMissingDHE) delete m_hMissingDHE;
+  if (m_hDAQError) delete m_hDAQError;
+  if (m_hMissingDHP) delete m_hMissingDHP;
+  if (m_hStatistic) delete m_hStatistic;
 }

@@ -80,7 +80,7 @@ namespace Belle2 {
 
   public:
 
-    /** A line is definied either by a point and a slope, or by endpoints.
+    /** A line is defined either by a point and a slope, or by endpoints.
      * If a single point is given, both endpoints are given by the same
      * point (length = 0). */
 

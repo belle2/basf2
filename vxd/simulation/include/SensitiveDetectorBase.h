@@ -6,12 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef VXD_SENSITIVEDETECTORBASE_H
-#define VXD_SENSITIVEDETECTORBASE_H
-
-//If this is defined, we create a root file with all information necessary to
-//check functionality of the implementation
-//#define VXD_SENSITIVEDETECTOR_DEBUG
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <vxd/simulation/SensorTraversal.h>
@@ -22,6 +17,8 @@
 namespace Belle2 {
   /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD */
   namespace VXD {
+    class SensorInfoBase;
+
     /** Base class for Sensitive Detector implementation of PXD and SVD.
      *
      * This base class provides common access to sensor information (like
@@ -147,7 +144,7 @@ namespace Belle2 {
       /** Determine which SimHits to create.
        * A SimHit is a linear approximation of the particle trajectory. As such
        * we try to combine as many Geant4 steps as possible by defining a
-       * distance tolerance and using the Douglas-Peucker algortihm to
+       * distance tolerance and using the Douglas-Peucker algorithm to
        * determine the required number of SimHits to keep the maximum distance
        * of all Geant4 steps below that tolerance.
        *
@@ -176,4 +173,3 @@ namespace Belle2 {
     };
   }
 } //Belle2 namespace
-#endif

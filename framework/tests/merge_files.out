@@ -55,7 +55,7 @@ running check_11_branches: Check that merging fails if the branches in the event
 check_11_branches passed
 running check_12_hadded: Check that merging fails if the file has more then one entry in the persistent tree
 hadd Target file: test11.root
-hadd compression setting for all output: 1
+hadd compression setting for all output: 101
 hadd Source file 1: test1.root
 hadd Source file 2: test1.root
 hadd Target path: test11.root:/
@@ -137,6 +137,13 @@ running check_27_ntuple_trees: Check that ntuple merge fails if the tree names a
 [INFO] Steering file: steering-ntuple.py
 [ERROR] Trees in "ntuple2.root" differ from "ntuple1.root"
 check_27_ntuple_trees passed
+running check_28_streaming: Check if we can merge streamed input files
+check_28_streaming passed
+running check_29_parent_release: Check that merging files does not modify the release version in the metadata.
+[WARNING] File "test1.root" is empty.
+[WARNING] File "test2.root" is empty.
+[WARNING] All Files were empty
+check_29_parent_release passed
 running check_XX_filemetaversion: Check that the Version of the FileMetaData hasn't changed.
     If this check fails please check that the changes to FileMetaData don't
     affect b2file-merge and adapt the correct version number here.

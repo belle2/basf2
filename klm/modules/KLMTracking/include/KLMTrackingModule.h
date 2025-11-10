@@ -130,9 +130,9 @@ namespace Belle2 {
     TH2F* m_totalYZ;
 
     ////////////////////////////////////////////
-    //EKLM Efficiency Plots
+    //EKLM Efficiency Plots - TODO
     ////////////////////////////////////////////
-
+    /*
     //! Denominator of each layer
     TH1F* m_totalE[2][8];
 
@@ -161,6 +161,7 @@ namespace Belle2 {
 
     //! total event at global position Y vs Z
     TH2F* m_totalYZE;
+    */
 
     //! KLMTrack StoreArray
     StoreArray<KLMTrack> m_storeTracks;

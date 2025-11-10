@@ -110,7 +110,7 @@ global_env = Environment(
     # for now, add the include folder here, as the path set via
     # CPPPATH below seems to be ignored for C file compiles
     CCFLAGS=['-Wall', '-isystem$EXTINCDIR', '-Iinclude/'],
-    CXXFLAGS=['-std=c++17'],
+    CXXFLAGS=['-std=c++20'],
     FORTRANFLAGS=['-std=legacy'],
     FORTRANMODDIR=os.path.join('$INCDIR', 'fortran_modules'),
     # disable warnings when compiling dictionaries, too much root problems
@@ -186,21 +186,17 @@ if option == 'debug':
     global_env.Append(FORTRANFLAGS='-g')
     global_env.Append(F90FLAGS='-g')
 elif option == 'opt':
-    global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3', '-flto'])
+    global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3'])
     global_env.Append(FORTRANFLAGS=['-O3'])
     global_env.Append(F90FLAGS=['-O3'])
-    # Parallel LTO avoids sequential bottlenecks when large libraries are
-    # linked, but causes oversubscription when linking libraries concurrently.
-    # Performance and RAM usage measurements suggest that between these two
-    # evils, oversubscription is the better choice.
-    global_env.Append(LINKFLAGS=f"-flto$(={int(GetOption('num_jobs'))}$)")
-    # LTO requires some binutils wrappers that preserve the GCC IR
+    # LTO has been disabled with no visible impact on performance
+    # See https://gitlab.desy.de/belle2/software/basf2/-/issues/11298 for further information
     global_env['AR'] = 'gcc-ar'
     global_env['RANLIB'] = 'gcc-ranlib'
 elif option == 'intel':
     intel_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):
-        if os.path.isfile(os.path.join(dir, 'icpc')):
+        if os.path.isfile(os.path.join(dir, 'icx')):
             intel_dir = dir
             break
     if not intel_dir:
@@ -214,11 +210,11 @@ elif option == 'intel':
     global_env['CC'] = 'icx'
     global_env['CXX'] = 'icpx'
     global_env['FC'] = 'ifort'
-    global_env['AR'] = 'xiar'
-    global_env['LD'] = 'xild'
+    global_env['AR'] = 'ar'
+    global_env['LD'] = 'ld'
     global_env['LINK'] = 'icpx'
     global_env['SHLINK'] = 'icpx'
-    global_env.Append(CCFLAGS=['-fp-model=precise', '-O2', '-Wshadow'])
+    global_env.Append(CCFLAGS=['-fp-model=precise', '-O2', '-Wshadow', '-Wall'])
 elif option == 'clang':
     clang_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):

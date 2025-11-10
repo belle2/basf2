@@ -6,9 +6,7 @@ Collaborative Tools.
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 10 minutes
-
-    **Exercises**: 10 minutes
+    **Length**: 15-30 minutes
 
     **Prerequisites**:
 
@@ -96,7 +94,7 @@ This means that there is non-Belle II-specific help on the internet.
      Where is the project's homepage?
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    It's at `www.sphinx-doc.org <https://www.sphinx-doc.org>`_.
    There is also an English-language wikipedia page
@@ -108,7 +106,7 @@ This means that there is non-Belle II-specific help on the internet.
      Where is the documentation for **XWiki** and **gitlab**?
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    At `xwiki.org/xwiki/bin/view/Documentation <https://www.xwiki.org/xwiki/bin/view/Documentation/>`_
    and `docs.gitlab.com <https://docs.gitlab.com/>`_!
@@ -119,7 +117,7 @@ This means that there is non-Belle II-specific help on the internet.
      What markup language does sphinx use?
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    **reStructured text** (more on this later).
 
@@ -302,7 +300,7 @@ It's not reliable for software documentation.
     What is on-going?
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     It's on XWiki:
     `Data Production Status
@@ -314,7 +312,7 @@ It's not reliable for software documentation.
     Find the run plan for the next (or current) data-taking period.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     It's on XWiki:
     `Run Plan <https://xwiki.desy.de/xwiki/rest/p/cad68>`_
@@ -331,13 +329,13 @@ It's not reliable for software documentation.
     * BCS
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     There is a glossary.
     You should be able to find it.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     Take a look at the `Main Glossary
     <https://xwiki.desy.de/xwiki/rest/p/1e1f2>`_
@@ -396,12 +394,12 @@ take time on presentation.
     What is an MWE?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     This is jargon but it is not specific to Belle II.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     It stands for minimal working example.
 
@@ -488,12 +486,12 @@ A bit more about working with GitLab
      Go to https://gitlab.desy.de
 
      * What's displayed at the dashboard/home screen?
-     * Find the main Belle II basf2 repository.
+     * Find the main Belle II `basf2` repository.
      * Look at the commits.
 
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    Some of that is just browsing.
    We trust that you did it.
@@ -555,12 +553,12 @@ The page you are now reading is written in sphinx.
      Find the source file for this page.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Scroll to the top and you should see a helpful looking link.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    It's `here <../../_sources/online_book/welcome/collaborative_tools.rst.txt>`__.
 

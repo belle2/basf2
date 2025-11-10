@@ -8,9 +8,12 @@
 
 #include <cdc/modules/CDCDedxCorrection/CDCDedxCorrectionModule.h>
 
+#include <cdc/geometry/CDCGeometryPar.h>
+
+#include <TMath.h>
+
 using namespace Belle2;
 using namespace CDC;
-using namespace Dedx;
 
 REG_MODULE(CDCDedxCorrection);
 
@@ -135,7 +138,7 @@ void CDCDedxCorrectionModule::event()
 
       //pay attention to deadwire or gain uses
       //getADCount is already corrected w/ non linear ADC payload
-      //getADCbasecount is now uncorrect ADC
+      //getADCbasecount is now incorrect ADC
       int jadcbase = dedxTrack.getADCBaseCount(i);
       double jLayer = dedxTrack.getHitLayer(i);
       double jWire = dedxTrack.getWire(i);
@@ -152,7 +155,7 @@ void CDCDedxCorrectionModule::event()
       StandardCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, jPath, costh, injring, injtime, newhitdedx);
       dedxTrack.setDedx(i, newhitdedx);
 
-      // do track level dedx and modifiy after loop over hits
+      // do track level dedx and modify after loop over hits
       // rel const -> upto 6 from calibrated GT and 2 are direct from dedx track (no rel cal for them now)
       // abs const -> upto 6 from calibrated GT and 2 are direct from default GT
       if (m_relative) {
@@ -161,11 +164,11 @@ void CDCDedxCorrectionModule::event()
         correction *= GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh, injring, injtime);
         if (!m_DBWireGains && dedxTrack.getWireGain(i) == 0)correction = 0;
       } else {
-        //get modifed adc + abs correction factor
+        //get modified adc + abs correction factor
         correction = GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh, injring, injtime);
       }
 
-      // combine hits accross layers
+      // combine hits across layers
       if (correction != 0) {
         newLayerDe += jadcbase / correction;
         newLayerDx += jPath;

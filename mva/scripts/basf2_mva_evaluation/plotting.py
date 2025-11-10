@@ -74,17 +74,19 @@ class Plotter:
     #: Main axis which is used to draw
     axis = None
 
-    def __init__(self, figure=None, axis=None):
+    def __init__(self, figure=None, axis=None, dpi=None):
         """
         Creates a new figure and axis if None is given, sets the default plot parameters
         @param figure default draw figure which is used
         @param axis default draw axis which is used
+        @param dpi dpi for the matplotlib figure, if None default is used
         """
         b2.B2INFO("Create new figure for class " + str(type(self)))
+        #: set default dpi
+        self.dpi = dpi
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
-            self.figure.set_tight_layout(True)
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=dpi)
         else:
             self.figure = figure
 
@@ -144,7 +146,7 @@ class Plotter:
         b2.B2INFO("Save figure for class " + str(type(self)))
         from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
         canvas = FigureCanvas(self.figure)
-        canvas.print_figure(filename, dpi=50)
+        canvas.print_figure(filename, dpi=self.dpi, bbox_inches='tight')
         return self
 
     def set_plot_options(self, plot_kwargs={'linestyle': ''}):
@@ -219,6 +221,8 @@ class Plotter:
             # TODO: remove in release 8.
             if not isinstance(xerr, (numpy.ndarray, list)):
                 xerr = xerr*numpy.ones(len(x))
+            if not isinstance(yerr, (numpy.ndarray, list)):
+                yerr = yerr*numpy.ones(len(y))
             mask = numpy.logical_and.reduce([numpy.isfinite(v) for v in [x, y, xerr, yerr]])
 
             e = axis.errorbar(
@@ -256,6 +260,18 @@ class Plotter:
         """
         return NotImplemented
 
+    def setAxisLimits(self, factor=0.0):
+        """
+        Sets the limits of the axis with an optional expansion factor.
+
+        Parameters:
+            factor (float): Fraction by which to expand the axis limits beyond the data range.
+        """
+        dx = self.xmax - self.xmin
+        dy = self.ymax - self.ymin
+        self.axis.set_xlim((self.xmin - factor*dx, self.xmax + factor*dx))
+        self.axis.set_ylim((self.ymin - factor*dy, self.ymax + factor*dy))
+
     def finish(self, *args, **kwargs):
         """
         Finish plotting and set labels, legends and stuff
@@ -290,6 +306,7 @@ class PurityAndEfficiencyOverCut(Plotter):
         @param signal_mask boolean numpy.array defining which events are signal events
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
+        @param normed boolean if True, the efficiency and purity are normalized to 1
         """
 
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
@@ -301,12 +318,25 @@ class PurityAndEfficiencyOverCut(Plotter):
             efficiency, efficiency_error = hists.get_true_positives(['Signal'])
             purity, purity_error = hists.get_false_positives(['Background'])
 
+        if isinstance(efficiency, int) and not isinstance(purity, int):
+            efficiency = numpy.array([efficiency] * len(purity))
+        elif isinstance(purity, int) and not isinstance(efficiency, int):
+            purity = numpy.array([purity] * len(efficiency))
+        elif isinstance(purity, int) and isinstance(efficiency, int):
+            efficiency = numpy.array([efficiency])
+            purity = numpy.array([purity])
         cuts = hists.bin_centers
 
-        self.xmin, self.xmax = numpy.nanmin([numpy.nanmin(cuts), self.xmin]), numpy.nanmax([numpy.nanmax(cuts), self.xmax])
-        self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(efficiency), numpy.nanmin(purity), self.ymin]), \
-            numpy.nanmax([numpy.nanmax(efficiency), numpy.nanmax(purity), self.ymax])
+        self.xmin, self.xmax = numpy.nanmin(numpy.append(cuts, self.xmin)), numpy.nanmax(numpy.append(cuts, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(
+            numpy.concatenate(
+                (efficiency, purity, [
+                    self.ymin]))), numpy.nanmax(
+                numpy.concatenate(
+                    (efficiency, purity, [
+                        self.ymax])))
 
+        self.set_errorbar_options({'fmt': '-o'})
         self.plots.append(self._plot_datapoints(self.axis, cuts, efficiency, xerr=0, yerr=efficiency_error))
 
         if normed:
@@ -314,6 +344,7 @@ class PurityAndEfficiencyOverCut(Plotter):
         else:
             self.labels.append("True positive")
 
+        self.set_errorbar_options({'fmt': '-o'})
         self.plots.append(self._plot_datapoints(self.axis, cuts, purity, xerr=0, yerr=purity_error))
 
         if normed:
@@ -321,15 +352,15 @@ class PurityAndEfficiencyOverCut(Plotter):
         else:
             self.labels.append("False positive")
 
+        self.axis.set_title("Classification Plot")
+
         return self
 
     def finish(self):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
-        self.axis.set_title("Classification Plot")
+        self.setAxisLimits(factor=0.01)
         self.axis.get_xaxis().set_label_text('Cut Value')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
@@ -344,7 +375,7 @@ class SignalToNoiseOverCut(Plotter):
     #: @var ymax
     #: Maximum y value
 
-    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, normed=True):
+    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
         """
         Add a new curve to the plot
         @param data pandas.DataFrame containing all data
@@ -352,30 +383,52 @@ class SignalToNoiseOverCut(Plotter):
         @param signal_mask boolean numpy.array defining which events are signal events
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
         """
-
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
-
         signal2noise, signal2noise_error = hists.get_signal_to_noise(['Signal'], ['Background'])
-
         cuts = hists.bin_centers
 
-        self.xmin, self.xmax = numpy.nanmin([numpy.nanmin(cuts), self.xmin]), numpy.nanmax([numpy.nanmax(cuts), self.xmax])
-        self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(signal2noise), self.ymin]), \
-            numpy.nanmax([numpy.nanmax(signal2noise), self.ymax])
+        valid = numpy.isfinite(signal2noise)
+        signal2noise = signal2noise[valid]
+        signal2noise_error = signal2noise_error[valid]
+        cuts = cuts[valid]
 
-        self.plots.append(self._plot_datapoints(self.axis, cuts, signal2noise, xerr=0, yerr=signal2noise_error))
+        # Determine "best" cut by maximizing Signal to Noise
+        if len(signal2noise) == 0 or numpy.all(numpy.isnan(signal2noise)):
+            best_idx = None
+        else:
+            best_idx = numpy.nanargmax(signal2noise)
+            best_cut = cuts[best_idx]
+            best_signal2noise = signal2noise[best_idx]
 
-        self.labels.append(column)
+        self.xmin, self.xmax = numpy.nanmin(numpy.append(cuts, self.xmin)), numpy.nanmax(numpy.append(cuts, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(
+            numpy.append(
+                signal2noise, self.ymin)), numpy.nanmax(
+            numpy.append(
+                signal2noise, self.ymax))
 
+        self.set_errorbar_options({'fmt': '-o'})
+        p = self._plot_datapoints(self.axis, cuts, signal2noise, xerr=0, yerr=signal2noise_error)
+        self.plots.append(p)
+
+        # Plot best cut point
+        if best_idx is not None:
+            self.axis.plot(best_cut, best_signal2noise, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
+            self.axis.axvline(best_cut, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+            self.axis.axhline(best_signal2noise, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+
+            # Add label with best cut info
+            cut_label = f"{label[:10] if label else column[:10]} (Best cut: {best_cut:.3f}, S/N: {best_signal2noise:.2f})"
+            self.labels.append(cut_label)
         return self
 
     def finish(self):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
+        self.setAxisLimits(factor=0.05)
         self.axis.set_title("Signal to Noise Plot")
         self.axis.get_xaxis().set_label_text('Cut Value')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
@@ -399,28 +452,62 @@ class PurityOverEfficiency(Plotter):
         @param signal_mask boolean numpy.array defining which events are signal events
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
         """
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
         purity, purity_error = hists.get_purity(['Signal'], ['Background'])
+        if isinstance(efficiency, int) and not isinstance(purity, int):
+            efficiency = numpy.array([efficiency] * len(purity))
+        elif isinstance(purity, int) and not isinstance(efficiency, int):
+            purity = numpy.array([purity] * len(efficiency))
+        elif isinstance(purity, int) and isinstance(efficiency, int):
+            efficiency = numpy.array([efficiency])
+            purity = numpy.array([purity])
+        cuts = hists.bin_centers
 
-        self.xmin, self.xmax = numpy.nanmin([efficiency.min(), self.xmin]), numpy.nanmax([efficiency.max(), self.xmax])
-        self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(purity), self.ymin]), numpy.nanmax([numpy.nanmax(purity), self.ymax])
+        valid = numpy.isfinite(purity) & numpy.isfinite(efficiency)
+        efficiency = efficiency[valid]
+        purity = purity[valid]
+        cuts = cuts[valid]
+        if not isinstance(efficiency_error, int):
+            efficiency_error = efficiency_error[valid]
+        if not isinstance(purity_error, int):
+            purity_error = purity_error[valid]
 
+        # Determine "best" cut (closest to point (1,1))
+        distance = numpy.sqrt(numpy.square(1 - purity) + numpy.square(1 - efficiency))
+        if len(distance) == 0 or numpy.all(numpy.isnan(distance)):
+            best_idx = None
+        else:
+            best_idx = numpy.nanargmin(distance)
+            best_cut = cuts[best_idx]
+            best_efficiency = efficiency[best_idx]
+            best_purity = purity[best_idx]
+
+        self.xmin, self.xmax = numpy.nanmin(numpy.append(efficiency, self.xmin)), numpy.nanmax(numpy.append(efficiency, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(purity, self.ymin)), numpy.nanmax(numpy.append(purity, self.ymax))
+
+        self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, efficiency, purity, xerr=efficiency_error, yerr=purity_error)
         self.plots.append(p)
-        if label is not None:
-            self.labels.append(label)
-        else:
-            self.labels.append(column)
+
+        if best_idx is not None:
+            # Plot best cut point
+            self.axis.plot(best_efficiency, best_purity, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
+            self.axis.axhline(best_purity, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+            self.axis.axvline(best_efficiency, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+
+            # Add label with best cut info
+            cut_label = f"{label[:10] if label else column[:10]} (Best cut: {best_cut:.3f})"
+            self.labels.append(cut_label)
         return self
 
     def finish(self):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
+        self.setAxisLimits(factor=0.01)
         self.axis.set_title("ROC Purity Plot")
         self.axis.get_xaxis().set_label_text('Efficiency')
         self.axis.get_yaxis().set_label_text('Purity')
@@ -445,6 +532,7 @@ class RejectionOverEfficiency(Plotter):
         @param signal_mask boolean numpy.array defining which events are signal events
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
         """
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
@@ -457,29 +545,227 @@ class RejectionOverEfficiency(Plotter):
         elif isinstance(rejection, int) and isinstance(efficiency, int):
             efficiency = numpy.array([efficiency])
             rejection = numpy.array([rejection])
+        cuts = hists.bin_centers
 
-        self.xmin, self.xmax = numpy.nanmin([efficiency.min(), self.xmin]), numpy.nanmax([efficiency.max(), self.xmax])
-        self.ymin, self.ymax = numpy.nanmin([rejection.min(), self.ymin]), numpy.nanmax([rejection.max(), self.ymax])
+        valid = numpy.isfinite(rejection) & numpy.isfinite(efficiency)
+        efficiency = efficiency[valid]
+        rejection = rejection[valid]
+        cuts = cuts[valid]
+        if not isinstance(efficiency_error, int):
+            efficiency_error = efficiency_error[valid]
+        if not isinstance(rejection_error, int):
+            rejection_error = rejection_error[valid]
+
+        # Determine "best" cut by maximizing Rejection / Efficiency
+        distance = numpy.sqrt(numpy.square(1 - rejection) + numpy.square(1 - efficiency))
+        if len(distance) == 0 or numpy.all(numpy.isnan(distance)):
+            best_idx = None
+        else:
+            best_idx = numpy.nanargmin(distance)
+            best_cut = cuts[best_idx]
+            best_rejection = rejection[best_idx]
+            best_efficiency = efficiency[best_idx]
+
+        self.xmin, self.xmax = numpy.nanmin(numpy.append(efficiency, self.xmin)), numpy.nanmax(numpy.append(efficiency, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(rejection, self.ymin)), numpy.nanmax(numpy.append(rejection, self.ymax))
 
         auc = numpy.abs(numpy.trapz(rejection, efficiency))
 
+        self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, efficiency, rejection, xerr=efficiency_error, yerr=rejection_error)
         self.plots.append(p)
-        if label is not None:
-            self.labels.append(label[:10] + f" ({auc:.2f})")
-        else:
-            self.labels.append(column[:10] + f" ({auc:.2f})")
+
+        if best_idx is not None:
+            # Plot best cut point
+            self.axis.plot(best_efficiency, best_rejection, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
+            self.axis.axhline(best_rejection, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+            self.axis.axvline(best_efficiency, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+
+            # Add label with best cut info
+            cut_label = f"{label[:10] if label else column[:10]} (AUC: {auc:.2f}, Best cut: {best_cut:.3f})"
+            self.labels.append(cut_label)
         return self
 
     def finish(self):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
+        self.setAxisLimits(factor=0.01)
         self.axis.set_title("ROC Rejection Plot")
-        self.axis.get_xaxis().set_label_text('Signal Efficiency')
         self.axis.get_yaxis().set_label_text('Background Rejection')
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
+
+        self.axis.get_xaxis().set_label_text('Signal Efficiency')
+        return self
+
+
+class TrueVsFalsePositiveRate(Plotter):
+    """
+    Plots the true ROC curve: True Positive Rate (TPR) vs False Positive Rate (FPR),
+    and marks the cut that gives the point closest to the ideal (0,1).
+    """
+    #: @var xmax
+    #: Maximum x value
+    #: @var ymax
+    #: Maximum y value
+
+    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
+        """
+        Add a new curve to the ROC plot
+        @param data pandas.DataFrame containing all data
+        @param column which is used to calculate efficiency and purity for different cuts
+        @param signal_mask boolean numpy.array defining which events are signal events
+        @param bckgrd_mask boolean numpy.array defining which events are background events
+        @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
+        """
+        hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask},
+                                     weight_column=weight_column)
+
+        tpr, tpr_error = hists.get_efficiency(['Signal'])       # True Positive Rate (TPR)
+        fpr, fpr_error = hists.get_efficiency(['Background'])   # False Positive Rate (FPR)
+        if isinstance(tpr, int) and not isinstance(fpr, int):
+            tpr = numpy.array([tpr] * len(fpr))
+        elif isinstance(fpr, int) and not isinstance(tpr, int):
+            fpr = numpy.array([fpr] * len(tpr))
+        elif isinstance(fpr, int) and isinstance(tpr, int):
+            tpr = numpy.array([tpr])
+            fpr = numpy.array([fpr])
+        cuts = hists.bin_centers                                 # Cut values for each bin
+
+        valid = numpy.isfinite(tpr) & numpy.isfinite(fpr)
+        tpr = tpr[valid]
+        fpr = fpr[valid]
+        cuts = cuts[valid]
+        if not isinstance(tpr_error, int):
+            tpr_error = tpr_error[valid]
+        if not isinstance(fpr_error, int):
+            fpr_error = fpr_error[valid]
+
+        # Determine "best" cut (closest to top-left corner (0,1))
+        distance = numpy.sqrt(numpy.square(fpr) + numpy.square(1 - tpr))
+        if len(distance) == 0 or numpy.all(numpy.isnan(distance)):
+            best_idx = None
+        else:
+            best_idx = numpy.nanargmin(distance)
+            best_cut = cuts[best_idx]
+            best_tpr = tpr[best_idx]
+            best_fpr = fpr[best_idx]
+
+        # Update plot range
+        self.xmin, self.xmax = numpy.nanmin(numpy.append(fpr, self.xmin)), numpy.nanmax(numpy.append(fpr, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(tpr, self.ymin)), numpy.nanmax(numpy.append(tpr, self.ymax))
+
+        auc = numpy.abs(numpy.trapz(tpr, fpr))
+
+        self.set_errorbar_options({'fmt': '-o'})
+        p = self._plot_datapoints(self.axis, fpr, tpr, xerr=fpr_error, yerr=tpr_error)
+        self.plots.append(p)
+
+        if best_idx is not None:
+            # Plot best cut point
+            self.axis.plot(best_fpr, best_tpr, 'x', color=p[1].get_color(), markersize=8)
+            self.axis.axhline(best_tpr, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+            self.axis.axvline(best_fpr, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+
+            # Add label with best cut info
+            cut_label = f"{label[:10] if label else column[:10]} (AUC: {auc:.2f}, Cut: {best_cut:.3f})"
+            self.labels.append(cut_label)
+        return self
+
+    def finish(self):
+        """
+        Sets limits, title, axis-labels and legend of the plot
+        """
+        self.setAxisLimits(factor=0.01)
+        self.axis.set_title("True ROC Curve")
+        self.axis.get_xaxis().set_label_text('False Positive Rate (Background Efficiency)')
+        self.axis.get_yaxis().set_label_text('True Positive Rate (Signal Efficiency)')
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
+        return self
+
+
+class PrecisionRecallCurve(Plotter):
+    """
+    Plots the Precision vs Recall curve and marks the cut that gives the point closest to the ideal (1,1).
+    """
+    #: @var xmax
+    #: Maximum x value
+    #: @var ymax
+    #: Maximum y value
+
+    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
+        """
+        Add a new curve to the Precision-Recall plot
+        @param data pandas.DataFrame containing all data
+        @param column which is used to calculate efficiency and purity for different cuts
+        @param signal_mask boolean numpy.array defining which events are signal events
+        @param bckgrd_mask boolean numpy.array defining which events are background events
+        @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
+        """
+        hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask},
+                                     weight_column=weight_column)
+
+        recall, recall_error = hists.get_efficiency(['Signal'])  # Recall = TPR
+        precision, precision_error = hists.get_purity(['Signal'], ['Background'])
+        if isinstance(recall, int) and not isinstance(precision, int):
+            recall = numpy.array([recall] * len(precision))
+        elif isinstance(precision, int) and not isinstance(recall, int):
+            precision = numpy.array([precision] * len(recall))
+        elif isinstance(precision, int) and isinstance(recall, int):
+            recall = numpy.array([recall])
+            precision = numpy.array([precision])
+        cuts = hists.bin_centers
+
+        valid = numpy.isfinite(precision) & numpy.isfinite(recall)
+        precision = precision[valid]
+        recall = recall[valid]
+        cuts = cuts[valid]
+        if not isinstance(recall_error, int):
+            recall_error = recall_error[valid]
+        if not isinstance(precision_error, int):
+            precision_error = precision_error[valid]
+
+        # Determine "best" cut (closest to point (1,1))
+        distance = numpy.sqrt(numpy.square(1 - precision) + numpy.square(1 - recall))
+        if len(distance) == 0 or numpy.all(numpy.isnan(distance)):
+            best_idx = None
+        else:
+            best_idx = numpy.nanargmin(distance)
+            best_cut = cuts[best_idx]
+            best_recall = recall[best_idx]
+            best_precision = precision[best_idx]
+
+        # Update plot range
+        self.xmin, self.xmax = numpy.nanmin(numpy.append(recall, self.xmin)), numpy.nanmax(numpy.append(recall, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(precision, self.ymin)), numpy.nanmax(numpy.append(precision, self.ymax))
+
+        auc = numpy.abs(numpy.trapz(precision, recall))
+
+        self.set_errorbar_options({'fmt': '-o'})
+        p = self._plot_datapoints(self.axis, recall, precision, xerr=recall_error, yerr=precision_error)
+        self.plots.append(p)
+
+        if best_idx is not None:
+            # Plot best cut point
+            self.axis.plot(best_recall, best_precision, 'x', color=p[1].get_color(), markersize=8, label='Best cut')
+            self.axis.axhline(best_precision, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+            self.axis.axvline(best_recall, color=p[1].get_color(), linestyle='dashed', linewidth=1)
+
+            # Add label with best cut info
+            cut_label = f"{label[:10] if label else column[:10]} (AUC: {auc:.2f}, Cut: {best_cut:.3f})"
+            self.labels.append(cut_label)
+        return self
+
+    def finish(self):
+        """
+        Sets limits, title, axis-labels and legend of the plot
+        """
+        self.setAxisLimits(factor=0.01)
+        self.axis.set_title("Precision-Recall Curve")
+        self.axis.get_xaxis().set_label_text('Recall (Signal Efficiency)')
+        self.axis.get_yaxis().set_label_text('Precision (Purity)')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
 
@@ -493,29 +779,41 @@ class Multiplot(Plotter):
     #: Main axis
     axis = None
 
-    def __init__(self, cls, number_of_plots, figure=None):
+    def __init__(self, cls, number_of_plots, figure=None, dpi=None):
         """
         Creates a new figure if None is given, sets the default plot parameters
+        @param cls class of the plot
+        @param number_of_plots number of plots which should be displayed
         @param figure default draw figure which is used
+        @param dpi dpi for the matplotlib figure, if None default is used
         """
+        if number_of_plots == 1:
+            gsTuple = (1, 1)
+        elif number_of_plots == 2:
+            gsTuple = (1, 2)
+        elif number_of_plots == 3:
+            gsTuple = (1, 3)
+        elif number_of_plots == 4:
+            gsTuple = (2, 2)
+        elif number_of_plots == 6:
+            gsTuple = (2, 3)
+        else:
+            gsTuple = (int(numpy.ceil(number_of_plots / 3)), 3)
+
+        #: set default dpi
+        self.dpi = dpi
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
-            self.figure.set_tight_layout(True)
+            self.figure = matplotlib.figure.Figure(figsize=(12*gsTuple[1], 8*gsTuple[0]), dpi=dpi)
         else:
             self.figure = figure
 
-        if number_of_plots == 1:
-            gs = matplotlib.gridspec.GridSpec(1, 1)
-        elif number_of_plots == 2:
-            gs = matplotlib.gridspec.GridSpec(1, 2)
-        elif number_of_plots == 3:
-            gs = matplotlib.gridspec.GridSpec(1, 3)
-        else:
-            gs = matplotlib.gridspec.GridSpec(int(numpy.ceil(number_of_plots / 3)), 3)
-
+        gs = matplotlib.gridspec.GridSpec(gsTuple[0], gsTuple[1])
+        #: get grid list of tuples of grid positions
+        grid_list = list(itertools.product(range(gs.nrows), range(gs.ncols)))
         #: the subplots which are displayed in the grid
-        self.sub_plots = [cls(self.figure, self.figure.add_subplot(gs[i // 3, i % 3])) for i in range(number_of_plots)]
+        self.sub_plots = [cls(self.figure, self.figure.add_subplot(gs[grid_list[i][0], grid_list[i][1]]))
+                          for i in range(number_of_plots)]
         #: the axis of the first subplot
         self.axis = self.sub_plots[0].axis
         super().__init__(self.figure, self.axis)
@@ -545,7 +843,7 @@ class Diagonal(Plotter):
     #: @var ymax
     #: Maximum y value
 
-    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None):
+    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
         """
         Add a new curve to the Diagonal plot
         @param data pandas.DataFrame containing all data
@@ -553,17 +851,25 @@ class Diagonal(Plotter):
         @param signal_mask boolean numpy.array defining which events are signal events
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
         """
         hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         purity, purity_error = hists.get_purity_per_bin(['Signal'], ['Background'])
 
-        self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
-        # self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(purity), self.ymin]), numpy.nanmax([numpy.nanmax(purity), self.ymax])
-        self.ymin, self.ymax = 0, 1
+        self.xmin, self.xmax = numpy.nanmin(
+            numpy.append(
+                hists.bin_centers, self.xmin)), numpy.nanmax(
+            numpy.append(
+                hists.bin_centers, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(purity, self.ymin)), numpy.nanmax(numpy.append(purity, self.ymax))
 
+        self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, hists.bin_centers, purity, xerr=hists.bin_widths / 2.0, yerr=purity_error)
         self.plots.append(p)
-        self.labels.append(column)
+        if label is None:
+            self.labels.append(column)
+        else:
+            self.labels.append(label)
         return self
 
     def finish(self):
@@ -572,8 +878,7 @@ class Diagonal(Plotter):
         """
         self.scale_limits()
         self.axis.plot((0.0, 1.0), (0.0, 1.0), color='black')
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
+        self.setAxisLimits(factor=0.01)
         self.axis.set_title("Diagonal Plot")
         self.axis.get_xaxis().set_label_text('Classifier Output')
         self.axis.get_yaxis().set_label_text('Purity Per Bin')
@@ -626,6 +931,7 @@ class Distribution(Plotter):
         @param column which is used to calculate distribution histogram
         @param mask boolean numpy.array defining which events are used for the histogram
         @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
         """
         if mask is None:
             mask = numpy.ones(len(data)).astype('bool')
@@ -641,17 +947,21 @@ class Distribution(Plotter):
 
         if self.normed_to_all_entries:
             normalization = float(numpy.sum(hist))
-            hist = hist / normalization
-            hist_error = hist_error / normalization
+            hist = hist / normalization if normalization > 0 else hist
+            hist_error = hist_error / normalization if normalization > 0 else hist_error
 
         if self.normed_to_bin_width:
-            hist = hist / hists.bin_widths
-            hist_error = hist_error / hists.bin_widths
+            hist = hist / hists.bin_widths if normalization > 0 else hist
+            hist_error = hist_error / hists.bin_widths if normalization > 0 else hist_error
 
-        self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
-        self.ymin = numpy.nanmin([hist.min(), self.ymin])
-        self.ymax = numpy.nanmax([(hist + hist_error).max(), self.ymax])
+        self.xmin, self.xmax = numpy.nanmin(
+            numpy.append(
+                hists.bin_centers, self.xmin)), numpy.nanmax(
+            numpy.append(
+                hists.bin_centers, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(hist, self.ymin)), numpy.nanmax(numpy.append(hist + hist_error, self.ymax))
 
+        self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, hists.bin_centers, hist, xerr=hists.bin_widths / 2, yerr=hist_error)
         self.plots.append(p)
         self.x_axis_label = column
@@ -682,9 +992,7 @@ class Distribution(Plotter):
             return self
 
         self.scale_limits()
-
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
+        self.setAxisLimits(factor=0.01)
 
         if self.normed_to_all_entries and self.normed_to_bin_width:
             self.axis.get_yaxis().set_label_text('# Entries per Bin / (# Entries * Bin Width)')
@@ -827,10 +1135,15 @@ class Difference(Plotter):
         if self.shift_to_zero:
             difference = difference - numpy.mean(difference)
 
-        self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
-        self.ymin = min((difference - difference_error).min(), self.ymin)
-        self.ymax = max((difference + difference_error).max(), self.ymax)
+        self.xmin, self.xmax = numpy.nanmin(
+            numpy.append(
+                hists.bin_centers, self.xmin)), numpy.nanmax(
+            numpy.append(
+                hists.bin_centers, self.xmax))
+        self.ymin, self.ymax = numpy.nanmin(numpy.append(difference - difference_error, self.ymin)
+                                            ), numpy.nanmax(numpy.append(difference + difference_error, self.ymax))
 
+        self.set_errorbar_options({'fmt': '-o'})
         p = self._plot_datapoints(self.axis, hists.bin_centers, difference, xerr=hists.bin_widths / 2, yerr=difference_error)
         self.plots.append(p)
         if label is None:
@@ -846,8 +1159,7 @@ class Difference(Plotter):
         """
         self.axis.plot((self.xmin, self.xmax), (0, 0), color=line_color, linewidth=4, rasterized=True)
         self.scale_limits()
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
+        self.setAxisLimits(factor=0.01)
         self.axis.set_title("Difference Plot")
         self.axis.get_yaxis().set_major_locator(matplotlib.ticker.MaxNLocator(5))
         self.axis.get_xaxis().set_label_text(self.x_axis_label)
@@ -870,15 +1182,17 @@ class Overtraining(Plotter):
     #: Axis which shows the difference between training and test background
     axis_d2 = None
 
-    def __init__(self, figure=None):
+    def __init__(self, figure=None, dpi=None):
         """
         Creates a new figure if None is given, sets the default plot parameters
         @param figure default draw figure which is used
+        @param dpi dpi for the matplotlib figure, if None default is used
         """
+        #: set default dpi
+        self.dpi = dpi
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
-            self.figure.set_tight_layout(True)
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=self.dpi)
         else:
             self.figure = figure
 
@@ -905,6 +1219,7 @@ class Overtraining(Plotter):
         @param weight_column column in data containing the weights for each event
         """
         distribution = Distribution(self.figure, self.axis, normed_to_all_entries=True)
+        self.axis.set_yscale('log')
 
         distribution.set_plot_options(self.plot_kwargs)
         distribution.set_errorbar_options(self.errorbar_kwargs)
@@ -1022,6 +1337,7 @@ class VerboseDistribution(Plotter):
         @param column which is used to calculate distribution histogram
         @param mask boolean numpy.array defining which events are used for the distribution histogram
         @param weight_column column in data containing the weights for each event
+        @param label label for the plot legend
         """
         self.distribution.set_plot_options(self.plot_kwargs)
         self.distribution.set_errorbar_options(self.errorbar_kwargs)
@@ -1077,15 +1393,17 @@ class Correlation(Plotter):
     #: Axis which shows shape of background
     axis_d2 = None
 
-    def __init__(self, figure=None):
+    def __init__(self, figure=None, dpi=None):
         """
         Creates a new figure if None is given, sets the default plot parameters
         @param figure default draw figure which is used
+        @param dpi dpi for the matplotlib figure, if None default is used
         """
+        #: set default dpi
+        self.dpi = dpi
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
-            self.figure.set_tight_layout(True)
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=self.dpi)
         else:
             self.figure = figure
 
@@ -1115,13 +1433,18 @@ class Correlation(Plotter):
         axes = [self.axis, self.axis_d1, self.axis_d2]
 
         for i, (l, m) in enumerate([('.', signal_mask | bckgrd_mask), ('S', signal_mask), ('B', bckgrd_mask)]):
-
             if weight_column is not None:
                 weights = numpy.array(data[weight_column][m])
             else:
                 weights = numpy.ones(len(data[column][m]))
 
             xrange = numpy.percentile(data[column][m], [5, 95])
+            isfinite = numpy.isfinite(data[column][m])
+            if not numpy.all(isfinite):
+                xrange = numpy.percentile(data[column][m][isfinite], [5, 95])
+            elif numpy.all(numpy.isnan(data[column][m])):
+                b2.B2WARNING("All data is NaN, cannot calculate range and ignore Correlation.")
+                return self
 
             colormap = plt.get_cmap('coolwarm')
             tmp, x = numpy.histogram(data[column][m], bins=100,
@@ -1195,7 +1518,6 @@ class Importance(Plotter):
         @param data pandas.DataFrame containing all data
         @param columns which are used to calculate the correlations
         """
-        self.figure.set_tight_layout(True)
 
         def norm(x):
             width = (numpy.max(x) - numpy.min(x))
@@ -1204,34 +1526,51 @@ class Importance(Plotter):
             return (x - numpy.min(x)) / width * 100
 
         importance_matrix = numpy.vstack([norm(data[column]) for column in columns]).T
-        importance_heatmap = self.axis.pcolor(importance_matrix, cmap=plt.cm.RdBu, vmin=0.0, vmax=100,
-                                              rasterized=True)
+        im = self.axis.imshow(
+            importance_matrix[::-1],  # <- reverse rows
+            cmap=plt.cm.RdBu,
+            vmin=0.0,
+            vmax=100.0,
+            aspect='equal',
+            interpolation='nearest',
+            origin='upper'
+        )
 
-        # put the major ticks at the middle of each cell
-        self.axis.set_yticks(numpy.arange(importance_matrix.shape[0]) + 0.5, minor=False)
-        self.axis.set_xticks(numpy.arange(importance_matrix.shape[1]) + 0.5, minor=False)
+        num_y, num_x = importance_matrix.shape
 
-        self.axis.set_xticklabels(columns, minor=False, rotation=90)
-        self.axis.set_yticklabels(variables, minor=False)
+        # Adjust font size based on matrix size
+        base_font_size = 14
+        font_size = max(6, base_font_size * min(1.0, 25 / max(num_x, num_y)))
 
-        self.axis.xaxis.tick_top()
+        # Tick positions and labels
+        self.axis.set_xticks(numpy.arange(num_x))
+        self.axis.set_yticks(numpy.arange(num_y))
 
-        for y in range(importance_matrix.shape[0]):
-            for x in range(importance_matrix.shape[1]):
-                txt = self.axis.text(x + 0.5, y + 0.5, f'{importance_matrix[y, x]:.0f}',
-                                     size=14,
-                                     horizontalalignment='center',
-                                     verticalalignment='center',
-                                     color='w')
-                txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='k')])
+        self.axis.set_xticklabels(columns, rotation=90, fontsize=font_size)
+        self.axis.set_yticklabels(reversed(variables), fontsize=font_size)
 
-        cb = self.figure.colorbar(importance_heatmap, ticks=[0.0, 100], orientation='vertical')
+        self.axis.tick_params(top=True, bottom=False, labeltop=True, labelbottom=False)
+
+        # Add text annotations
+        for y in range(num_y):
+            for x in range(num_x):
+                value = importance_matrix[-1-y, x]  # Reverse y-axis for correct annotation
+                txt = self.axis.text(
+                    x, y, f'{value:.0f}',
+                    ha='center', va='center',
+                    fontsize=font_size,
+                    color='white'
+                )
+                txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='black')])
+
+        # Colorbar
+        cb = self.figure.colorbar(im, ax=self.axis, ticks=[0.0, 100.0], orientation='vertical')
         cb.ax.set_yticklabels(['low', 'high'])
+        cb.solids.set_rasterized(True)
 
-        # remove whitespace
-        self.axis.set_ylim(0, importance_matrix.shape[0])
-
-        self.axis.set_aspect('equal')
+        # Layout tightening
+        self.axis.set_xlim(-0.5, num_x - 0.5)
+        self.axis.set_ylim(num_y - 0.5, -0.5)  # origin='upper' flips y
 
         return self
 
@@ -1253,15 +1592,17 @@ class CorrelationMatrix(Plotter):
     #: Axis which shows the correlation of the background samples
     bckgrd_axis = None
 
-    def __init__(self, figure=None):
+    def __init__(self, figure=None, dpi=None):
         """
         Creates a new figure if None is given, sets the default plot parameters
         @param figure default draw figure which is used
+        @param dpi dpi for the matplotlib figure, if None default is used
         """
+        #: set default dpi
+        self.dpi = dpi
         if figure is None:
             #: create figure
-            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=120)
-            self.figure.set_tight_layout(True)
+            self.figure = matplotlib.figure.Figure(figsize=(12, 8), dpi=self.dpi)
         else:
             self.figure = figure
 
@@ -1283,61 +1624,70 @@ class CorrelationMatrix(Plotter):
         @param data pandas.DataFrame containing all data
         @param columns which are used to calculate the correlations
         """
+        num_vars = len(columns)
+        font_size = max(4, min(14, 200 // num_vars))  # Scale font size
+
         signal_corr = numpy.corrcoef(numpy.vstack([data[column][signal_mask] for column in columns])) * 100
         bckgrd_corr = numpy.corrcoef(numpy.vstack([data[column][bckgrd_mask] for column in columns])) * 100
 
-        signal_heatmap = self.signal_axis.pcolor(signal_corr, cmap=plt.cm.RdBu, vmin=-100.0, vmax=100.0)
-        self.bckgrd_axis.pcolor(bckgrd_corr, cmap=plt.cm.RdBu, vmin=-100.0, vmax=100.0)
+        signal_heatmap = self.signal_axis.imshow(
+            signal_corr[::-1, ::-1],  # <- reverse rows and columns
+            cmap=plt.cm.RdBu,
+            vmin=-100.0,
+            vmax=100.0,
+            origin='upper',
+            aspect='auto',
+            interpolation='nearest')
+        self.bckgrd_axis.imshow(
+            bckgrd_corr[::-1, ::-1],  # <- reverse rows and columns
+            cmap=plt.cm.RdBu,
+            vmin=-100.0,
+            vmax=100.0,
+            origin='upper',
+            aspect='auto',
+            interpolation='nearest')
 
-        self.signal_axis.invert_yaxis()
+        # Tick positions
+        tick_positions = numpy.arange(num_vars)
+
+        # Signal ticks
+        self.signal_axis.set_xlabel('Signal')
+        self.signal_axis.set_xticks(tick_positions)
+        self.signal_axis.set_yticks(tick_positions)
+        self.signal_axis.set_xticklabels(reversed(columns), rotation=90, fontsize=font_size)
+        self.signal_axis.set_yticklabels(reversed(columns), fontsize=font_size)
         self.signal_axis.xaxis.tick_top()
-        self.bckgrd_axis.invert_yaxis()
+        self.signal_axis.invert_yaxis()
+
+        # Background ticks
+        self.bckgrd_axis.set_xlabel('Background')
+        self.bckgrd_axis.set_xticks(tick_positions)
+        self.bckgrd_axis.set_yticks(tick_positions)
+        self.bckgrd_axis.set_xticklabels(reversed(columns), rotation=90, fontsize=font_size)
+        self.bckgrd_axis.set_yticklabels(reversed(columns), fontsize=font_size)
         self.bckgrd_axis.xaxis.tick_top()
+        self.bckgrd_axis.invert_yaxis()
 
-        # put the major ticks at the middle of each cell
-        self.signal_axis.set_xticks(numpy.arange(signal_corr.shape[0]) + 0.5, minor=False)
-        self.signal_axis.set_yticks(numpy.arange(signal_corr.shape[1]) + 0.5, minor=False)
-
-        self.signal_axis.set_xticklabels(columns, minor=False, rotation=90)
-        self.signal_axis.set_yticklabels(columns, minor=False)
-
-        # put the major ticks at the middle of each cell
-        self.bckgrd_axis.set_xticks(numpy.arange(bckgrd_corr.shape[0]) + 0.5, minor=False)
-        self.bckgrd_axis.set_yticks(numpy.arange(bckgrd_corr.shape[1]) + 0.5, minor=False)
-
-        self.bckgrd_axis.set_xticklabels(columns, minor=False, rotation=90)
-        self.bckgrd_axis.set_yticklabels(columns, minor=False)
-
-        for y in range(signal_corr.shape[0]):
-            for x in range(signal_corr.shape[1]):
-                txt = self.signal_axis.text(x + 0.5, y + 0.5, f'{signal_corr[y, x]:.0f}',
-                                            size=14,
-                                            horizontalalignment='center',
-                                            verticalalignment='center',
-                                            color='w')
+        # Add annotation text
+        for y in range(num_vars):
+            for x in range(num_vars):
+                txt = self.signal_axis.text(x, y, f'{signal_corr[-1-y, -1-x]:.0f}',
+                                            ha='center', va='center',
+                                            fontsize=font_size,
+                                            color='white')
+                txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='k')])
+                txt = self.bckgrd_axis.text(x, y, f'{bckgrd_corr[-1-y, -1-x]:.0f}',
+                                            ha='center', va='center',
+                                            fontsize=font_size,
+                                            color='white')
                 txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='k')])
 
-        for y in range(bckgrd_corr.shape[0]):
-            for x in range(bckgrd_corr.shape[1]):
-                txt = self.bckgrd_axis.text(x + 0.5, y + 0.5, f'{bckgrd_corr[y, x]:.0f}',
-                                            size=14,
-                                            horizontalalignment='center',
-                                            verticalalignment='center',
-                                            color='w')
-                txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='k')])
-
-        cb = self.figure.colorbar(signal_heatmap, cax=self.colorbar_axis, ticks=[-100, 0, 100], orientation='horizontal')
+        # Colorbar
+        cb = self.figure.colorbar(signal_heatmap, cax=self.colorbar_axis,
+                                  ticks=[-100, 0, 100], orientation='horizontal')
         cb.solids.set_rasterized(True)
         cb.ax.set_xticklabels(['negative', 'uncorrelated', 'positive'])
 
-        self.signal_axis.text(0.5, -1.0, "Signal", horizontalalignment='center')
-        self.bckgrd_axis.text(0.5, -1.0, "Background", horizontalalignment='center')
-
-        # remove whitespace
-        self.signal_axis.set_xlim(0, signal_corr.shape[0])
-        self.signal_axis.set_ylim(0, signal_corr.shape[1])
-        self.bckgrd_axis.set_xlim(0, bckgrd_corr.shape[0])
-        self.bckgrd_axis.set_ylim(0, bckgrd_corr.shape[1])
         return self
 
     def finish(self):

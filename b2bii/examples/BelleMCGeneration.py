@@ -37,7 +37,7 @@ main.add_module('BelleMCOutput', outputFileName='charged.dat')
 main.add_module('Progress')
 
 # Generate events.
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # Statistics.
 print(basf2.statistics)

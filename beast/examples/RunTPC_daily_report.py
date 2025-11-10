@@ -70,7 +70,7 @@ daily.param('inputReportDate', int(date))
 main.add_module(daily)
 
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 print('Event Statistics:')
 print(b2.statistics)

@@ -303,16 +303,16 @@ namespace Belle2 {
       //      TF1* xtCheb5 = new TF1("xtCheb5", Cheb5pol1, 0.0, 700, 8); /**< 5th order Cheb. polynomial function*/
 
       int m_mode = c_Chebyshev; /**< XT mode,  0 is for 5th order polynomial, 1 is Chebshev polynomial.*/
-      bool m_debug = true;  /**< Print debug durring fitting or not*/
+      bool m_debug = true;  /**< Print debug during fitting or not*/
       bool m_draw = false;  /**< Draw and store png plot of each histo or not*/
       bool m_bField = true; /**< With magnetic field or not*/
       int m_minRequiredEntry = 800; /**< Minimum entry required for each histo. */
-      double m_XTParam[8] = {};     /**< Parameter fo xt*/
+      double m_XTParam[8] = {};     /**< Parameter of xt*/
       double m_FittedXTParams[8] = {}; /**< Fitted parameters */
 
       /**
        *   Fit Flag
-       * =-1: low statitic
+       * =-1: low statistic
        * =1: good
        * =0: Fit failure
        * =2: Error Outer

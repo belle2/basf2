@@ -35,7 +35,7 @@ namespace Belle2 {
 
     /** Destructor */
     virtual ~TRGECLFAMModule();
-    /** Initilizes TRGECLFAMModule. */
+    /** Initializes TRGECLFAMModule. */
     virtual void initialize() override;
     /** Called when new run started.*/
     virtual void beginRun() override;
@@ -52,56 +52,58 @@ namespace Belle2 {
     std::string version(void) const;
 
   private: /** Parameters*/
+
     /** Debug level.*/
-    int _debugLevel;
+    int m_debugLevel;
     /** fam Method*/
-    int _famMethod;
+    int m_famMethod;
     /** Time interval */
-    int _binTimeInterval;
+    int m_binTimeInterval;
     /** Waveform */
-    int _waveform;
+    int m_SaveTCWaveForm;
     /** save Beam background tag in TRGECLHit table */
-    int _beambkgtag;
+    int m_beambkgtag;
     /** save FAM ana table */
-    int _famana;
+    int m_famana;
     /** Threshold input*/
-    int _threshold;
+    int m_SetTCEThreshold;
     /** Set Shaping Function */
-    int _FADC;
+    int m_FADC;
     /** Use Condition DB*/
-    int _ConditionDB;
+    bool m_ConditionDB;
     /** Set source of TC data (1:=ECLHit or 2:=ECLSimHit or 3:=ECLHit+TRGECLBGTCHit) */
     /** ("1:=ECLHit" is used for signal w/o bkg, and real time background monitor) */
     int m_SourceOfTC;
 
     /** Config. file name. */
-    std::string _configFilename;
+    std::string m_configFilename;
 
 
   protected:
 
 
   private:
-    /**  Run number */
-    int    m_nRun;
-    /**  Event number */
-    int    m_nEvent;
-    /** Digitized TC E [GeV] */
-    std::vector<std::vector<double>> TCDigiE;
-    /** Digitized TC T [ns] */
-    std::vector<std::vector<double>> TCDigiT;
-    /** Fit TC E [GeV] */
-    std::vector<std::vector<double>> TCFitE;
-    /** Fit TC T [ns] */
-    std::vector<std::vector<double>> TCFitT;
-    /** Threshold */
-    std::vector<int> Threshold;
 
-    StoreArray<TRGECLDigi0> m_TRGECLDigi0; /**< output for TRGECLDigi0 */
+    /**  Run number */
+    int m_nRun;
+    /**  Event number */
+    int m_nEvent;
+    /** Digitized TC E [GeV] */
+    std::vector<std::vector<double>> m_TCDigiE;
+    /** Digitized TC T [ns] */
+    std::vector<std::vector<double>> m_TCDigiT;
+    /** Fit TC E [GeV] */
+    std::vector<std::vector<double>> m_TCFitE;
+    /** Fit TC T [ns] */
+    std::vector<std::vector<double>> m_TCFitT;
+    /** Threshold */
+    std::vector<int> m_TCEThreshold;
+
+    StoreArray<TRGECLDigi0>    m_TRGECLDigi0; /**< output for TRGECLDigi0 */
     StoreArray<TRGECLWaveform> m_TRGECLWaveform; /**< output for TRGECLWaveform */
-    StoreArray<TRGECLHit> m_TRGECLHit; /**< output for TRGECLHit */
-    StoreArray<TRGECLFAMAna> m_TRGECLFAMAna; /**< output for TRGECLFAMAna */
-    DBArray<TRGECLFAMPara> m_FAMPara; /**< FAM Parameters */
+    StoreArray<TRGECLHit>      m_TRGECLHit; /**< output for TRGECLHit */
+    StoreArray<TRGECLFAMAna>   m_TRGECLFAMAna; /**< output for TRGECLFAMAna */
+    DBArray<TRGECLFAMPara>     m_FAMPara; /**< FAM Parameters */
 
     /** EventLevelClusteringInfo. */
     StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;

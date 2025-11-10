@@ -20,6 +20,9 @@
 #include <Math/VectorUtil.h>
 #include <TMath.h>
 
+/* C++ headers. */
+#include <cmath>
+
 using namespace Belle2;
 using namespace ECL;
 
@@ -160,7 +163,7 @@ void ECLNeighbours::initializeF(double frac)
 
       for (short int inner = 0; inner < m_crystalsPerRing[tidinner]; ++inner) {
         const double f = (inner + 0.5) / m_crystalsPerRing[tidinner];
-        const double dist = fabs(fracPos - f);
+        const double dist = std::abs(fracPos - f);
         if (dist < dist1) {
           dist2 = dist1;
           dist1 = dist;
@@ -194,7 +197,7 @@ void ECLNeighbours::initializeF(double frac)
 
       for (short int outer = 0; outer < m_crystalsPerRing[tidouter]; ++outer) {
         const double f = (outer + 0.5) / m_crystalsPerRing[tidouter];
-        const double dist = fabs(fracPos - f);
+        const double dist = std::abs(fracPos - f);
         if (dist < disto1) {
           disto2 = disto1;
           disto1 = dist;
@@ -287,7 +290,7 @@ void ECLNeighbours::initializeN(const int n, const bool sorted)
         // examples: left.phiid = 0, right.phiid=143 -> returns true (0 ">" 143)
         // examples: left.phiid = 0, right.phiid=1 -> returns false (1 ">" 0)
         // examples: left.phiid = 1, right.phiid=0 -> returns true (1 ">" 0)
-        if (fabs(left.phiid - right.phiid) > (2 * left.neighbourn + 1)) {
+        if (std::abs(left.phiid - right.phiid) > (2 * left.neighbourn + 1)) {
           return right.phiid > left.phiid;
         } else {
           return left.phiid > right.phiid;
@@ -327,7 +330,7 @@ void ECLNeighbours::initializeNC(const int n)
       geom->Mapping(nbr - 1);
       const int thetaid = geom->GetThetaID();
 
-      if (abs(thetaid - centerthetaid) == n) {
+      if (std::abs(thetaid - centerthetaid) == n) {
         const short int phiInc = increasePhiId(geom->GetPhiID(), geom->GetThetaID(), 1);
         const short int phiDec = decreasePhiId(geom->GetPhiID(), geom->GetThetaID(), 1);
         const int cid1 = geom->GetCellID(thetaid, phiInc) + 1;

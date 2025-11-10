@@ -25,7 +25,7 @@ namespace Belle2 {
   class TRGGDLSummaryModule : public Module {
 
   public:
-    //! Costructor
+    //! Constructor
     TRGGDLSummaryModule();
     //! Destrunctor
     virtual ~TRGGDLSummaryModule() {}
@@ -46,9 +46,9 @@ namespace Belle2 {
 
     StoreObjPtr<TRGSummary> GDLResult; /**< output for TRGSummary */
 
-    //condition database for unpacer
+    /// condition database for unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
-    //condition database for prescales
+    /// condition database for prescales
     DBObjPtr<TRGGDLDBPrescales> m_prescales;
     int LeafBitMap[320] = {0};
     char LeafNames[320][100] = {{""}};

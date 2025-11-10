@@ -431,7 +431,7 @@ void Hough3DFinder::runFinderVersion1(const vector<double>& trackVariables, cons
     }  // End of layer loop.
   } // End of cot vote loop.
 
-  // Filling HoughMesh. Combines the seperate HoughMeshLayers.
+  // Filling HoughMesh. Combines the separate HoughMeshLayers.
   for (int houghCot = 0; houghCot < m_nCotSteps; houghCot++) {
     for (int houghZ0 = 0; houghZ0 < m_nZ0Steps; houghZ0++) {
       //Change back tempHoughZ0 if minus, currently unused so commented out
@@ -504,7 +504,7 @@ void Hough3DFinder::runFinderVersion1(const vector<double>& trackVariables, cons
   }
   //cout<<"JB FoundPhiSt[0]: "<<m_foundPhiSt[0]<<" FoundPhiSt[1]: "<<m_foundPhiSt[1]<<" FoundPhiSt[2]: "<<m_foundPhiSt[2]<<" FoundPhiSt[3]: "<<m_foundPhiSt[3]<<endl;
 
-  // Find closest phi out of canidates
+  // Find closest phi out of candidates
   double minDiff[4] = {999, 999, 999, 999};
   for (unsigned iLayer = 0; iLayer < 4; iLayer++) {
     for (unsigned iTS = 0; iTS < stTSs[iLayer].size(); iTS++) {

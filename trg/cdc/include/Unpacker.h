@@ -737,7 +737,7 @@ namespace Belle2 {
       //}
 // !hit is always true.
 //      if (!hit) {
-      hit = tsHits->appendNew(iSL, iTS, ts[3], ts[2], ts[1], 0, foundTime, iTracker, 0, 0);
+      hit = tsHits->appendNew(iSL, iTS, ts[3], ts[2], ts[1], 0, foundTime, iTracker, 0, 0); // rel09 only
       B2DEBUG(15, "make hit at SL " << iSL << " ID " << iTS << " clock " << foundTime << " iTracker " << iTracker);
 //      }
       return hit;

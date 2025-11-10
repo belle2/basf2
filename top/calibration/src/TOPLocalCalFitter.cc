@@ -628,10 +628,6 @@ void Belle2::TOP::TOPLocalCalFitter::calculateChannelT0()
     channelT0ErrBranch->Fill();
   }
 
-  // Free memory
-  delete channelT0;
-  channelT0 = nullptr;
-
   return;
 
 }
@@ -1081,31 +1077,6 @@ Belle2::CalibrationAlgorithm::EResult Belle2::TOP::TOPLocalCalFitter::calibrate(
   }
 
   m_histFile->Close();
-
-  // Free per-run histograms
-  delete h_hitTime;
-  delete h_amplitude2D;
-  delete h_width2D;
-
-  delete h_hitTime_noXtalk;
-  delete h_amplitude2D_noXtalk;
-  delete h_width2D_noXtalk;
-
-  // Free the vector of per-amplitude-bin histograms
-  for (TH2F* h : h_hitTimeLaserHistos) delete h;
-  h_hitTimeLaserHistos.clear();
-
-  // Delete trees after writing (if you don’t want to rely on the destructor)
-  if (m_fitTree)          { delete m_fitTree;          m_fitTree = nullptr; }
-  if (m_timewalkTree)     { delete m_timewalkTree;     m_timewalkTree = nullptr; }
-  if (m_crosstalkTree)    { delete m_crosstalkTree;    m_crosstalkTree = nullptr; }
-  if (m_fitTree_noXtalk)  { delete m_fitTree_noXtalk;  m_fitTree_noXtalk = nullptr; }
-
-  // Close & delete files (redundant with dtor, but explicit here is fine)
-  if (m_histFile)         { m_histFile->Close(); delete m_histFile; m_histFile = nullptr; }
-  if (m_inputTTS)         { m_inputTTS->Close(); delete m_inputTTS; m_inputTTS = nullptr; }
-  if (m_inputConstraints) { m_inputConstraints->Close(); delete m_inputConstraints; m_inputConstraints = nullptr; }
-
 
   return c_OK;
 }

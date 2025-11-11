@@ -391,3 +391,42 @@ class InclusiveUpsilon(BaseSkim):
 
         # return the list
         return InclusiveUpsilon
+
+
+@fancy_skim_header
+class InclusiveUpsilonLoose(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * Upsilon(1S,2S,3S) -> mu^+ mu^- with no requirement on the rest of the event
+
+    Selection criteria:
+
+    * 2 charged tracks
+      dr < 1 and -3 < dz < 3 and muonID > 0.6 for the muon tracks
+      M(mu+mu-) > 8.5
+    """
+
+    __authors__ = ["Federico Testa"]
+    __description__ = "Inclusive Upsilon(1S,2S,3S) skim  with no requirement on the rest of event"
+    __contact__ = __liaison__
+    __category__ = "physics, quarkonium"
+
+    ApplyHLTHadronCut = False
+
+    def build_lists(self, path):
+
+        muon_cuts = "[dr < 1] and [dz > -3] and [dz < 3] and [muonID > 0.6]"
+
+        # create and fill e/mu/pi/photon ParticleLists
+        ma.fillParticleList("mu+:InclusiveUpsilonLoose", "", path=path)
+        ma.applyCuts("mu+:InclusiveUpsilonLoose", muon_cuts, path=path)
+
+        # Y(1S,2S) are reconstructed with e^+ e^- or mu^+ mu^-
+        ma.reconstructDecay(
+            "Upsilon:InclusiveUpsilonLoose -> mu+:InclusiveUpsilonLoose mu-:InclusiveUpsilonLoose",
+            "M > 8.5",
+            path=path)
+
+        # return the list
+        return ["Upsilon:InclusiveUpsilonLoose"]

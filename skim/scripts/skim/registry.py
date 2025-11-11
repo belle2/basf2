@@ -152,6 +152,7 @@ _RegisteredSkims = [
     ("15420100", "quarkonium", "BottomoniumEtabExclusive"),
     ("15440100", "quarkonium", "BottomoniumUpsilon"),
     ("15460400", "quarkonium", "InclusiveUpsilon"),
+    ("15460600", "quarkonium", "InclusiveUpsilonLoose"),
     # ("16460100", "quarkonium", "ISRpipicc"), Subset of 16460200, deleted.
     ("16460200", "quarkonium", "CharmoniumPsi"),
 

@@ -196,9 +196,8 @@ namespace Belle2 {
 
           default:
             if (printTheError()) {
-              auto frontEndName = getFrontEndName(raw, finesse);
-              B2ERROR("TOPUnpacker: unknown data format from " << frontEndName
-                      << LogVar("frontend name", frontEndName)
+              B2ERROR("TOPUnpacker: unknown data format."
+                      << LogVar("frontend name", getFrontEndName(raw, finesse))
                       << LogVar("Type", (dataFormat >> 8))
                       << LogVar("Version", (dataFormat & 0xFF)));
             }
@@ -207,9 +206,8 @@ namespace Belle2 {
 
         if (err != 0) {
           if (printTheError()) {
-            auto frontEndName = getFrontEndName(raw, finesse);
-            B2ERROR("TOPUnpacker: error in unpacking data from " << frontEndName
-                    << LogVar("frontend name", frontEndName)
+            B2ERROR("TOPUnpacker: error in unpacking data."
+                    << LogVar("frontend name", getFrontEndName(raw, finesse))
                     << LogVar("words unused", err));
           }
         }

@@ -198,6 +198,11 @@ namespace Belle2 {
     const std::string getSerialisedWeight() const {return m_weight;}
 
     /**
+     * Setter for serialised weightfile.
+     */
+    void setSerialisedWeight(std::string weight) { m_weight = weight; }
+
+    /**
      * Getter for the MVA transform mode.
      */
     MVAResponseTransformMode getTransformMode() const {return m_mvaResponseTransformMode;}

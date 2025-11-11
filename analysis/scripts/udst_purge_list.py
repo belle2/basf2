@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# @cond
-
 import basf2
 from mdst import add_mdst_output
 import modularAnalysis as ma
@@ -179,5 +177,3 @@ if __name__ == '__main__':
 
     main = prepare_path(fileIn, list1, icharge, not signal, fileOut)
     basf2.process(main)
-
-# @endcond

@@ -10,7 +10,7 @@
 
 #include <analysis/VertexFitting/TreeFitter/RecoParticle.h>
 
-#include <analysis/dataobjects/Particle.h>
+#include <Eigen/Core>
 
 namespace TreeFitter {
 
@@ -81,7 +81,7 @@ namespace TreeFitter {
     Eigen::Matrix<double, 1, 5> m_params;
 
     /** only lower triangle filled! */
-    Eigen::Matrix<double, 5, 5>m_covariance;
+    Eigen::Matrix<double, 5, 5> m_covariance;
 
     /** scale the momenta by this correction factor */
     const float m_momentumScalingFactor;

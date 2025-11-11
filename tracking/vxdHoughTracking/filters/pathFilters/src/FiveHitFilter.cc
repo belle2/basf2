@@ -6,10 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/vxdHoughTracking/filters/pathFilters/FiveHitFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
-#include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

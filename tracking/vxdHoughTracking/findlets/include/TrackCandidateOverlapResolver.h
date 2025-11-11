@@ -9,14 +9,11 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
-#include <svd/dataobjects/SVDCluster.h>
-
-#include <string>
-#include <vector>
 
 namespace Belle2 {
   class ModuleParamList;
   class SpacePointTrackCand;
+  class SVDCluster;
 
   namespace vxdHoughTracking {
 

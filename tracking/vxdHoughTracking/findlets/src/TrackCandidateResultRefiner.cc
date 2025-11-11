@@ -7,7 +7,6 @@
  **************************************************************************/
 #include <tracking/vxdHoughTracking/findlets/TrackCandidateResultRefiner.h>
 #include <framework/core/ModuleParamList.h>
-#include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/BFieldManager.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>

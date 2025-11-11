@@ -11,7 +11,7 @@
 """
 <header>
   <output>../TreeFitted_B0ToJPsiKs.root</output>
-  <contact>Frank Meier; frank.meier@duke.edu</contact>
+  <contact>Paul Feichtinger; paul.feichtinger@ijs.si</contact>
   <interval>nightly</interval>
 </header>
 """

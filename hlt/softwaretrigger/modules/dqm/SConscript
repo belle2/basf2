@@ -12,7 +12,8 @@ env['LIBS'] = [
     'klm_dataobjects',
     'ecl_dataobjects',
     'cdc_dataobjects',
-    'svd_dataobjects'
+    'svd_dataobjects',
+    'rawdata_dataobjects'
     ]
 
 Return('env')

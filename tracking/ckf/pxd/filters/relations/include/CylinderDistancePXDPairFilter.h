@@ -8,7 +8,6 @@
 #pragma once
 
 #include <tracking/ckf/pxd/filters/relations/BasePXDPairFilter.h>
-#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 
 namespace Belle2 {
   /// Base filter for CKF PXD states

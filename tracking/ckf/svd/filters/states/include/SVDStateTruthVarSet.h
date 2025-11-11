@@ -10,13 +10,14 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <tracking/ckf/svd/filters/states/BaseSVDStateFilter.h>
 #include <tracking/ckf/svd/utilities/SVDMCUtil.h>
 
 namespace Belle2 {
+  class EventMetaData;
+
   /// Names of the variables to be generated.
   constexpr
   static char const* const svdStateTruthVarNames[] = {

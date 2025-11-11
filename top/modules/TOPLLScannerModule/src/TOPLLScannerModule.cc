@@ -168,7 +168,7 @@ void TOPLLScannerModule::event()
       mass += step;
     }
 
-    // find the maximum and the confidence interval usin the fine-grained scan
+    // find the maximum and the confidence interval using the fine-grained scan
     scanLikelihood(massPointsFineScan, logLfineScan, 0.5, maxLL, massMax, minMassRange, maxMassRange);
 
 

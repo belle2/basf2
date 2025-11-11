@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <pxd/calibration/PXDClusterPositionCalibrationAlgorithm.h>
+#include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
+#include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
 
 #include <string>
 #include <tuple>

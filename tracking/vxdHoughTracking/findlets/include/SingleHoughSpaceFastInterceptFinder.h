@@ -8,10 +8,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <framework/datastore/StoreArray.h>
 
-#include <string>
-#include <vector>
+#include <bitset>
+#include <array>
+#include <map>
 
 namespace Belle2 {
   class ModuleParamList;

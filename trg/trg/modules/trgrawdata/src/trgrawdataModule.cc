@@ -6,30 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 #include <trg/trg/modules/trgrawdata/trgrawdataModule.h>
-
-#include <rawdata/modules/PrintDataTemplate.h>
-#include <framework/datastore/StoreObjPtr.h>
+#include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dbobjects/RunInfo.h>
-#include <framework/datastore/DataStore.h>
+#include <rawdata/dataobjects/RawTRG.h>
 
 #include <string.h>
-#include <unistd.h>
-
-#include <TPostScript.h>
-#include <TCanvas.h>
-#include <TStyle.h>
 
 using namespace std;
 using namespace Belle2;
-using namespace GDL;
 
 
 REG_MODULE(TRGRAWDATA);
 
-// TRGRAWDATAModule::TRGRAWDATAModule() : Module()
 TRGRAWDATAModule::TRGRAWDATAModule() : HistoModule()
 {
 
@@ -226,8 +216,8 @@ void TRGRAWDATAModule::initialize()
       aBitMap_extra[i][2] = m_unpacker->getBitMap_extra(i, 2);
     }
 
+    char LeafNames[200][100] = {{0}};
     for (int i = 0; i < 200; i++) {
-      LeafBitMap[i] = m_unpacker->getLeafMap(i);
       std::cout << "LeafBitMap[" << i << "] = " << m_unpacker->getLeafMap(i) << std::endl;
       strcpy(LeafNames[i], m_unpacker->getLeafnames(i));
       std::cout << "LeafNames[" << i << "] = " << m_unpacker->getLeafnames(i) << std::endl;
@@ -261,27 +251,6 @@ void TRGRAWDATAModule::initialize()
                   << " bit length)" << std::endl;
       }
     }
-
-  }
-  for (int i = 0; i < 50; i++) {
-    cntr_bad_odr[i] = 0;
-    cntr_bad_ddd[i] = 0;
-    cntr_bad_nwd[i] = 0;
-
-    cntr_nw3[i] = 0;
-    cntr_nw3_badvet[i] = 0;
-    cntr_nw3_badtrg[i] = 0;
-    cntr_nw3_badrvc[i] = 0;
-
-    cntr_nwn[i] = 0;
-    cntr_nwn_badvet[i] = 0;
-    cntr_nwn_badtrg[i] = 0;
-    cntr_nwn_badrvc[i] = 0;
-
-    cntr_nwn_badbbb[i] = 0;
-    cntr_nwn_badddd[i] = 0;
-
-    cntr_nwe_badnwd[i] = 0;
 
   }
 
@@ -347,7 +316,7 @@ void TRGRAWDATAModule::event()
           //unsigned buf2rvc12    = (buf2 & 0xfff);
 
           if (nword < 3) {
-            cntr_nwe_badnwd[e_gdl]++;
+            m_cntr_nwe_badnwd[e_gdl]++;
             printf("ab:GDL(0x%x%c) exp(%d), run(%d), eve(%u), eve(0x%x), nword(%d), ",
                    cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
             printf("buf0(0x%x), buf1(0x%x), buf2(0x%x)\n", buf0, buf1, buf2);
@@ -357,7 +326,7 @@ void TRGRAWDATAModule::event()
           if (nword < 8) {
             printf("ad:GDL(0x%x%c) exp(%d), run(%d), eve(%u), eve(0x%x), nword(%d)\n",
                    cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
-            cntr_nwe_badnwd[e_gdl]++;
+            m_cntr_nwe_badnwd[e_gdl]++;
           } else {
             unsigned buf5 = (unsigned)buf[m_hdr_nwd_gdl - 1];
             // 626 = 646 -
@@ -398,9 +367,9 @@ void TRGRAWDATAModule::event()
                      cprid, 'a' + hslb, _exp, _run, _eve, _eve, gdlhdrcnttrg20, gdlhdrcnttrg20,
                      cnttrg_data_16, cnttrg_data_16, gdlrvc12, last_rvc, gdlrvc12 - last_rvc, nword, diag); //TODO can the difference be negative?
               printf("\n");
-              cntr_nwn_badtrg[e_gdl]++;
+              m_cntr_nwn_badtrg[e_gdl]++;
             } else {
-              cntr_nwn[e_gdl]++;
+              m_cntr_nwn[e_gdl]++;
             }
           }
         }
@@ -481,7 +450,7 @@ void TRGRAWDATAModule::event()
 
         if (nword < 3) {
           // err
-          cntr_nwe_badnwd[e_mdl]++;
+          m_cntr_nwe_badnwd[e_mdl]++;
           printf("ah:%s(0x%x%c) exp(%d), run(%d), eve(%u), eve(0x%x), nword(%u), ",
                  moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
           printf("buf0(0x%x), buf1(0x%x), buf2(0x%x)\n", buf0, buf1, buf2);
@@ -491,22 +460,22 @@ void TRGRAWDATAModule::event()
           if (gdlrvc12 != buf2rvc12) {
             printf("ai:%s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%u), gdlrvc12(0x%x), buf2rvc12(0x%x)\n",
                    moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, gdlrvc12, buf2rvc12);
-            cntr_nw3_badrvc[e_mdl]++;
+            m_cntr_nw3_badrvc[e_mdl]++;
           } else if (eve20 != buf2cnttrg20) {
             printf("aj:%s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%u), cnttrg20(0x%x)\n",
                    moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20);
-            cntr_nw3_badtrg[e_mdl]++;
+            m_cntr_nw3_badtrg[e_mdl]++;
           } else if ((_eve % _scale) == 0) {
-            cntr_nw3_badvet[e_mdl]++;
+            m_cntr_nw3_badvet[e_mdl]++;
           } else {
-            cntr_nw3[e_mdl]++;
+            m_cntr_nw3[e_mdl]++;
           }
           continue;
         } else if (nword != _nwd) {
           // err
           printf("bo:wrong nword: %s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%u), buf0(0x%x), buf2(0x%x)\n",
                  moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf0, buf2);
-          cntr_nwe_badnwd[e_mdl]++;
+          m_cntr_nwe_badnwd[e_mdl]++;
           continue;
         }
 
@@ -542,10 +511,10 @@ void TRGRAWDATAModule::event()
             (0x11000009 == cprid && hslb == 1)    // SL5
            ) {
           /* SL1 SL3 SL5 4096x48
-             data_b2l_r(4095 downto 4048) <= x"dddd" & "00000" & revoclk & cntr125M(15 downto 0);--i=0..5
+             data_b2l_r(4095 downto 4048) <= x"dddd" & "00000" & revoclk & m_cntr125M(15 downto 0);--i=0..5
              data_b2l_r(4031 downto 4000) <= cnttrg;--i=6..9
              buf[3] = dddd * revoclk
-             buf[4] = cntr125M & x"0000"
+             buf[4] = m_cntr125M & x"0000"
              buf[5] = cnttrg
           */
           datacnttrg32 = buf5;
@@ -555,7 +524,7 @@ void TRGRAWDATAModule::event()
                    (0x1100000a == cprid && hslb == 0)    // SL6
                   ) {
           /* SL0 SL4 SL6 2048*48
-             data_b2l_r(2047 downto 2000) <= x"dddd" &"00000"& revoclk & cntr125M(15 downto 0);
+             data_b2l_r(2047 downto 2000) <= x"dddd" &"00000"& revoclk & m_cntr125M(15 downto 0);
              data_b2l_r(1999 downto 1968) <= cnttrg;
 
              data_b2l(2047, 2016) <= buf[3]
@@ -588,7 +557,7 @@ void TRGRAWDATAModule::event()
             3D3D3D: 2048 bit x 48 clock = 64 word x 48 clock
           */
 
-          // data_b2l_r(2623 downto 2576) <= x"dddd" &"00000"& revoclk & cntr125M(15 downto 0);
+          // data_b2l_r(2623 downto 2576) <= x"dddd" &"00000"& revoclk & m_cntr125M(15 downto 0);
           // data_b2l_r(2575 downto 2544) <= cnttrg;
           // [3] (2623, 2592)
           // [4] (2591, 2560)
@@ -636,17 +605,17 @@ void TRGRAWDATAModule::event()
         if (gdlrvc12 != buf2rvc12) {
           printf("ba:%s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%u), gdlrvc12(0x%x), buf2rvc12(0x%x)\n",
                  moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, gdlrvc12, buf2rvc12);
-          cntr_nwn_badrvc[e_mdl]++;
+          m_cntr_nwn_badrvc[e_mdl]++;
           something_bad = true;
         }
         if (buf3dddd == 0xbbbb) {
-          cntr_nwn_badbbb[e_mdl]++;
+          m_cntr_nwn_badbbb[e_mdl]++;
           printf("bv:%s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%u), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
                  moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20, buf3dddd, datacnttrg32);
           something_bad = true;
         }
         if (buf3dddd != 0xdddd) {
-          cntr_nwn_badddd[e_mdl]++;
+          m_cntr_nwn_badddd[e_mdl]++;
           printf("bb:%s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%u), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
                  moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20, buf3dddd, datacnttrg32);
           something_bad = true;
@@ -659,11 +628,11 @@ void TRGRAWDATAModule::event()
              ) {
             printf("bc:%s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%u), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
                    moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20, buf3dddd, datacnttrg32);
-            cntr_nwn_badtrg[e_mdl]++;
+            m_cntr_nwn_badtrg[e_mdl]++;
             something_bad = true;
           }
         }
-        if (! something_bad) cntr_nwn[e_mdl]++;
+        if (! something_bad) m_cntr_nwn[e_mdl]++;
 
       } // for hslb
     }
@@ -771,7 +740,7 @@ void TRGRAWDATAModule::event()
                 printf("bq:data truncation. eve(%u), %s(0x%x%c), nword(%u)\n",
                        _eveRaw, moduleNames[e_mdl], cprid, 'a' + hslb, nword);
               break_this_module = true;
-              cntr_bad_nwd[e_mdl]++;
+              m_cntr_bad_nwd[e_mdl]++;
               break;
             }
             unsigned ddddcc = buf[ibuf];
@@ -809,7 +778,7 @@ void TRGRAWDATAModule::event()
                   printf("br:dddd not found. eve(%u), %s(0x%x%c), nword(%u)\n",
                          _eveRaw, moduleNames[e_mdl], cprid, 'a' + hslb, nword);
                 break_this_module = true;
-                cntr_bad_ddd[e_mdl]++;
+                m_cntr_bad_ddd[e_mdl]++;
                 break;
               }
             } else if (dddd != 0xdddd) {
@@ -817,7 +786,7 @@ void TRGRAWDATAModule::event()
                 printf("bs:dddd not found. eve(%u), %s(0x%x%c), nword(%u)\n",
                        _eveRaw, moduleNames[e_mdl], cprid, 'a' + hslb, nword);
               break_this_module = true;
-              cntr_bad_ddd[e_mdl]++;
+              m_cntr_bad_ddd[e_mdl]++;
               break;
             }
             // 0x500 == 1280
@@ -830,13 +799,13 @@ void TRGRAWDATAModule::event()
           } // clk
           if (break_this_module) continue; // bad dddd
           if (cc_disorder) {
-            cntr_bad_odr[e_mdl]++;
+            m_cntr_bad_odr[e_mdl]++;
             if (m_print_cc) {
               printf("bt:ccdisorder: eve(%u), %s(0x%x%c), nword(%u), %s\n",
                      _eveRaw, moduleNames[e_mdl], cprid, 'a' + hslb, nword, ccs.c_str());
             }
           } else {
-            cntr_good_odr[e_mdl]++;
+            m_cntr_good_odr[e_mdl]++;
           }
         } // hslb
       } // j < raw_trgarray[i]->GetNumEntries()

@@ -1523,9 +1523,9 @@
   173. ParticleSelector_applyCuts_gamma:skim
       cut=isFromECL
       decayString=gamma:skim
-  174. ParticleLoader_K_S0:V0_ToFit -> pi+ pi-
+  174. ParticleLoader_K_S0:V0_ToFit_KFit -> pi+ pi-
       addDaughters=False
-      decayStrings=['K_S0:V0_ToFit -> pi+ pi-']
+      decayStrings=['K_S0:V0_ToFit_KFit -> pi+ pi-']
       dummyCovMatrix=10000.0
       dummyMDSTIndex=0
       dummyTreatAsInvisible=True
@@ -1543,28 +1543,28 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  175. PListCopy_K_S0:V0_ToFit
+  175. PListCopy_K_S0:V0_ToFit_KFit
       cut=
       ignoreMotherFlavor=False
       inputListNames=['K_S0:V0']
-      outputListName=K_S0:V0_ToFit
+      outputListName=K_S0:V0_ToFit_KFit
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  176. ParticleVertexFitter_K_S0:V0_ToFit
+  176. ParticleVertexFitter_K_S0:V0_ToFit_KFit
       confidenceLevel=0.0
       decayString=
       fitType=vertex
-      listName=K_S0:V0_ToFit
+      listName=K_S0:V0_ToFit_KFit
       massConstraintList=[]
       recoilMass=0.0
       smearing=0.0
       updateDaughters=False
       vertexFitter=KFit
       withConstraint=
-  177. ParticleSelector_applyCuts_K_S0:V0_ToFit
+  177. ParticleSelector_applyCuts_K_S0:V0_ToFit_KFit
       cut=0.450 < M < 0.550
-      decayString=K_S0:V0_ToFit
+      decayString=K_S0:V0_ToFit_KFit
   178. ParticleLoader_pi+:all
       addDaughters=False
       decayStrings=['pi+:all']
@@ -1585,42 +1585,42 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  179. ParticleCombiner_K_S0:RD -> pi+:all pi-:all
+  179. ParticleCombiner_K_S0:RD_KFit -> pi+:all pi-:all
       allowChargeViolation=False
       chargeConjugation=True
       cut=0.3 < M < 0.7
       decayMode=1
-      decayString=K_S0:RD -> pi+:all pi-:all
+      decayString=K_S0:RD_KFit -> pi+:all pi-:all
       ignoreIfTooManyCandidates=True
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  180. ParticleVertexFitter_K_S0:RD
+  180. ParticleVertexFitter_K_S0:RD_KFit
       confidenceLevel=0.0
       decayString=
       fitType=vertex
-      listName=K_S0:RD
+      listName=K_S0:RD_KFit
       massConstraintList=[]
       recoilMass=0.0
       smearing=0.0
       updateDaughters=False
       vertexFitter=KFit
       withConstraint=
-  181. ParticleSelector_applyCuts_K_S0:RD
+  181. ParticleSelector_applyCuts_K_S0:RD_KFit
       cut=0.450 < M < 0.550
-      decayString=K_S0:RD
-  182. PListMerger_K_S0:merged
+      decayString=K_S0:RD_KFit
+  182. PListMerger_K_S0:merged_KFit
       cut=
       ignoreMotherFlavor=False
-      inputListNames=['K_S0:V0_ToFit', 'K_S0:RD']
-      outputListName=K_S0:merged
+      inputListNames=['K_S0:V0_ToFit_KFit', 'K_S0:RD_KFit']
+      outputListName=K_S0:merged_KFit
       preferLowest=True
       variable=particleSource
       writeOut=False
   183. PListCutAndCopy_K_S0:dstSkim
       cut=goodBelleKshort == 1
       ignoreMotherFlavor=False
-      inputListNames=['K_S0:merged']
+      inputListNames=['K_S0:merged_KFit']
       outputListName=K_S0:dstSkim
       preferLowest=True
       variable=mdstIndex
@@ -2313,7 +2313,7 @@
       createExpRunEventHistograms=True
       createHLTUnitHistograms=True
       createTotalResultHistograms=True
-      cutResultIdentifiers={'CDC_PHYSICS': {'filter': ['ge3_looseB_tracks_inc_1_tightB_not_ee2leg', 'ge3_trackC_not_ee2leg', '2_looseB_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_looseB_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_looseB_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB']}, 'CDC_PRESCALED': {'filter': ['2_loose_tracks_pstarmaxlt0.8_GeVc', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc', '2_loose_tracks_pstarmaxgt4.5_GeVc', 'ge1_tight_track', '2_looseC_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_trackC_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_trackC_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB']}, 'Calibration': {'skim': ['accept_bhabha_all', 'accept_gamma_gamma', 'accept_hadron', 'accept_mumutight', 'accept_mumu_highmass', 'accept_mumu_tight_or_highm', 'accept_offip', 'accept_radmumu']}, 'ECL_PHYSICS': {'filter': ['Elab_gt_0.3_plus_3_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBremB', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBremB']}, 'ECL_PRESCALED': {'filter': ['0.3ltEstar_max_clustlt2_GeV_plus_2_others_gt_0.2_GeV', '1_electron_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_electron_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_not_low_not_45115_no_other_clust_Estargt0.3_GeV', 'gg2clst', 'ge1_Estargt2_GeV_chrg_clst_22145_not_gg2clst_ee2clst_ee1leg', 'ggEndcapLoose', 'n2GeVPhotonBarrelge1', 'n2GeVPhotonEndcapge1', 'Estargt2_GeV_cluster', 'ECLMuonPair']}, 'LEVEL1': {'filter': ['L1_trigger', 'passthrough_l1_trigger_delayed_bhabha', 'passthrough_l1_trigger_random', 'passthrough_l1_trigger_poisson', 'L1_Bhabha_veto', 'L1_Bhabha_select', 'L1_trigger_nn_info', 'passthrough_l1_trigger_f', 'dummy']}, 'OBSOLETE': {'filter': ['ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBrem', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBrem', 'ge3_loose_tracks_inc_1_tight_not_ee2leg', '2_loose_tracks_inc_1_tight_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_loose_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBrem_muonPairV', 'singleTagLowMass', 'singleTagHighMass', 'eexxSelect', 'radiative_Bhabha', 'rad_Bhabha_1trk', 'eeBrem', 'muonPairV']}, 'Others': {'skim': ['accept_1_track1_cluster', 'accept_2_tracks', 'accept_b2bcluster_3D', 'accept_b2bclusterhigh_phi', 'accept_b2bclusterlow_phi', 'accept_bhabha', 'accept_bhabhaecl', 'accept_mumu_1trk', 'accept_mumu_2trk', 'accept_l1_nn_info', 'accept_radee', 'accept_single_photon_1GeV', 'accept_single_photon_2GeV_barrel', 'accept_single_photon_2GeV_endcap', 'accept_tau_tau']}, 'PHYSICS': {'filter': ['1_photon_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt0.5_GeV_clust_in_4498_and_no_other_clust_Estargt0.3_GeV', 'ggBarrelLoose', 'singleTagLowMassB', 'singleTagHighMassB', 'b2b_phi_photons', 'displaced_vertex', 'single_diPhoton']}, 'Physics': {'skim': ['accept_dstar_1', 'accept_dstar_2', 'accept_dstar_3', 'accept_dstar_4', 'accept_hadronb', 'accept_hadronb1', 'accept_hadronb2', 'accept_jpsi', 'accept_kshort', 'accept_lambda', 'accept_fourlep', 'accept_tau_2trk', 'accept_tau_Ntrk', 'accept_b_charged', 'accept_b_neutral']}, 'QED': {'filter': ['ee_flat_0_19', 'ee_flat_19_22', 'ee_flat_22_25', 'ee_flat_25_30', 'ee_flat_30_35', 'ee_flat_35_45', 'ee_flat_45_60', 'ee_flat_60_90', 'ee_flat_90_180', 'selectee', 'selee1leg1clst', 'selee1leg1trk', 'eexxSelectB', 'eexxHighP', 'radiative_BhabhaB', 'selectmumu', 'selectmumuC', 'single_muon', 'cosmic', 'rad_Bhabha_1trkB', 'Bhabha_one_cluster']}, 'VETOES': {'filter': ['ee1leg', 'ee1leg1clst', 'ee1leg1e', 'ee1leg1trk', 'ee2clst', 'ee2leg', 'eeBremB', 'eexx', 'muonPairVB']}, 'filter': {'filter': ['ge3_looseB_tracks_inc_1_tightB_not_ee2leg', 'ge3_trackC_not_ee2leg', '2_looseB_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_looseB_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_looseB_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB', '2_loose_tracks_pstarmaxlt0.8_GeVc', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc', '2_loose_tracks_pstarmaxgt4.5_GeVc', 'ge1_tight_track', '2_looseC_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_trackC_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_trackC_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB', 'Elab_gt_0.3_plus_3_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBremB', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBremB', '0.3ltEstar_max_clustlt2_GeV_plus_2_others_gt_0.2_GeV', '1_electron_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_electron_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_not_low_not_45115_no_other_clust_Estargt0.3_GeV', 'gg2clst', 'ge1_Estargt2_GeV_chrg_clst_22145_not_gg2clst_ee2clst_ee1leg', 'ggEndcapLoose', 'n2GeVPhotonBarrelge1', 'n2GeVPhotonEndcapge1', 'Estargt2_GeV_cluster', 'ECLMuonPair', 'L1_trigger', 'passthrough_l1_trigger_delayed_bhabha', 'passthrough_l1_trigger_random', 'passthrough_l1_trigger_poisson', 'L1_Bhabha_veto', 'L1_Bhabha_select', 'L1_trigger_nn_info', 'passthrough_l1_trigger_f', 'dummy', 'ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBrem', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBrem', 'ge3_loose_tracks_inc_1_tight_not_ee2leg', '2_loose_tracks_inc_1_tight_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_loose_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBrem_muonPairV', 'singleTagLowMass', 'singleTagHighMass', 'eexxSelect', 'radiative_Bhabha', 'rad_Bhabha_1trk', 'eeBrem', 'muonPairV', '1_photon_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt0.5_GeV_clust_in_4498_and_no_other_clust_Estargt0.3_GeV', 'ggBarrelLoose', 'singleTagLowMassB', 'singleTagHighMassB', 'b2b_phi_photons', 'displaced_vertex', 'single_diPhoton', 'ee_flat_0_19', 'ee_flat_19_22', 'ee_flat_22_25', 'ee_flat_25_30', 'ee_flat_30_35', 'ee_flat_35_45', 'ee_flat_45_60', 'ee_flat_60_90', 'ee_flat_90_180', 'selectee', 'selee1leg1clst', 'selee1leg1trk', 'eexxSelectB', 'eexxHighP', 'radiative_BhabhaB', 'selectmumu', 'selectmumuC', 'single_muon', 'cosmic', 'rad_Bhabha_1trkB', 'Bhabha_one_cluster', 'ee1leg', 'ee1leg1clst', 'ee1leg1e', 'ee1leg1trk', 'ee2clst', 'ee2leg', 'eeBremB', 'eexx', 'muonPairVB']}, 'skim': {'skim': ['accept_bhabha_all', 'accept_gamma_gamma', 'accept_hadron', 'accept_mumutight', 'accept_mumu_highmass', 'accept_mumu_tight_or_highm', 'accept_offip', 'accept_radmumu', 'accept_1_track1_cluster', 'accept_2_tracks', 'accept_b2bcluster_3D', 'accept_b2bclusterhigh_phi', 'accept_b2bclusterlow_phi', 'accept_bhabha', 'accept_bhabhaecl', 'accept_mumu_1trk', 'accept_mumu_2trk', 'accept_l1_nn_info', 'accept_radee', 'accept_single_photon_1GeV', 'accept_single_photon_2GeV_barrel', 'accept_single_photon_2GeV_endcap', 'accept_tau_tau', 'accept_dstar_1', 'accept_dstar_2', 'accept_dstar_3', 'accept_dstar_4', 'accept_hadronb', 'accept_hadronb1', 'accept_hadronb2', 'accept_jpsi', 'accept_kshort', 'accept_lambda', 'accept_fourlep', 'accept_tau_2trk', 'accept_tau_Ntrk', 'accept_b_charged', 'accept_b_neutral']}}
+      cutResultIdentifiers={'CDC_PHYSICS': {'filter': ['ge3_looseB_tracks_inc_1_tightB_not_ee2leg', 'ge3_trackC_not_ee2leg', '2_looseB_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_looseB_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_looseB_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB']}, 'CDC_PRESCALED': {'filter': ['2_loose_tracks_pstarmaxlt0.8_GeVc', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc', '2_loose_tracks_pstarmaxgt4.5_GeVc', 'ge1_tight_track', '2_looseC_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_trackC_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_trackC_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB']}, 'Calibration': {'skim': ['accept_bhabha_all', 'accept_gamma_gamma', 'accept_hadron', 'accept_mumutight', 'accept_mumu_highmass', 'accept_mumu_tight_or_highm', 'accept_offip', 'accept_radmumu']}, 'ECL_PHYSICS': {'filter': ['Elab_gt_0.3_plus_3_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBremB', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBremB']}, 'ECL_PRESCALED': {'filter': ['0.3ltEstar_max_clustlt2_GeV_plus_2_others_gt_0.2_GeV', '1_electron_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_electron_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_not_low_not_45115_no_other_clust_Estargt0.3_GeV', 'gg2clst', 'ge1_Estargt2_GeV_chrg_clst_22145_not_gg2clst_ee2clst_ee1leg', 'ggEndcapLoose', 'n2GeVPhotonBarrelge1', 'n2GeVPhotonEndcapge1', 'Estargt2_GeV_cluster', 'ECLMuonPair']}, 'HLT_PREFILTER': {'filter': ['prefilter_InjectionStrip', 'prefilter_CDCECLthreshold']}, 'LEVEL1': {'filter': ['L1_trigger', 'passthrough_l1_trigger_delayed_bhabha', 'passthrough_l1_trigger_random', 'passthrough_l1_trigger_poisson', 'L1_Bhabha_veto', 'L1_Bhabha_select', 'L1_trigger_nn_info', 'passthrough_l1_trigger_f', 'dummy']}, 'OBSOLETE': {'filter': ['ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBrem', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBrem', 'ge3_loose_tracks_inc_1_tight_not_ee2leg', '2_loose_tracks_inc_1_tight_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_loose_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBrem_muonPairV', 'singleTagLowMass', 'singleTagHighMass', 'eexxSelect', 'radiative_Bhabha', 'rad_Bhabha_1trk', 'eeBrem', 'muonPairV']}, 'Others': {'skim': ['accept_1_track1_cluster', 'accept_2_tracks', 'accept_b2bcluster_3D', 'accept_b2bclusterhigh_phi', 'accept_b2bclusterlow_phi', 'accept_bhabha', 'accept_bhabhaecl', 'accept_mumu_1trk', 'accept_mumu_2trk', 'accept_l1_nn_info', 'accept_radee', 'accept_single_photon_1GeV', 'accept_single_photon_2GeV_barrel', 'accept_single_photon_2GeV_endcap', 'accept_tau_tau']}, 'PHYSICS': {'filter': ['1_photon_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt0.5_GeV_clust_in_4498_and_no_other_clust_Estargt0.3_GeV', 'ggBarrelLoose', 'singleTagLowMassB', 'singleTagHighMassB', 'b2b_phi_photons', 'displaced_vertex', 'single_diPhoton']}, 'Physics': {'skim': ['accept_dstar_1', 'accept_dstar_2', 'accept_dstar_3', 'accept_dstar_4', 'accept_hadronb', 'accept_hadronb1', 'accept_hadronb2', 'accept_jpsi', 'accept_kshort', 'accept_lambda', 'accept_fourlep', 'accept_tau_2trk', 'accept_tau_Ntrk', 'accept_b_charged', 'accept_b_neutral']}, 'QED': {'filter': ['ee_flat_0_19', 'ee_flat_19_22', 'ee_flat_22_25', 'ee_flat_25_30', 'ee_flat_30_35', 'ee_flat_35_45', 'ee_flat_45_60', 'ee_flat_60_90', 'ee_flat_90_180', 'selectee', 'selee1leg1clst', 'selee1leg1trk', 'eexxSelectB', 'eexxHighP', 'radiative_BhabhaB', 'selectmumu', 'selectmumuC', 'single_muon', 'cosmic', 'rad_Bhabha_1trkB', 'Bhabha_one_cluster']}, 'VETOES': {'filter': ['ee1leg', 'ee1leg1clst', 'ee1leg1e', 'ee1leg1trk', 'ee2clst', 'ee2leg', 'eeBremB', 'eexx', 'muonPairVB']}, 'filter': {'filter': ['ge3_looseB_tracks_inc_1_tightB_not_ee2leg', 'ge3_trackC_not_ee2leg', '2_looseB_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_looseB_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_looseB_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB', '2_loose_tracks_pstarmaxlt0.8_GeVc', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc', '2_loose_tracks_pstarmaxgt4.5_GeVc', 'ge1_tight_track', '2_looseC_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_trackC_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_trackC_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB', 'Elab_gt_0.3_plus_3_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBremB', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBremB', '0.3ltEstar_max_clustlt2_GeV_plus_2_others_gt_0.2_GeV', '1_electron_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_electron_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_not_low_not_45115_no_other_clust_Estargt0.3_GeV', 'gg2clst', 'ge1_Estargt2_GeV_chrg_clst_22145_not_gg2clst_ee2clst_ee1leg', 'ggEndcapLoose', 'n2GeVPhotonBarrelge1', 'n2GeVPhotonEndcapge1', 'Estargt2_GeV_cluster', 'ECLMuonPair', 'prefilter_InjectionStrip', 'prefilter_CDCECLthreshold', 'L1_trigger', 'passthrough_l1_trigger_delayed_bhabha', 'passthrough_l1_trigger_random', 'passthrough_l1_trigger_poisson', 'L1_Bhabha_veto', 'L1_Bhabha_select', 'L1_trigger_nn_info', 'passthrough_l1_trigger_f', 'dummy', 'ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBrem', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBrem', 'ge3_loose_tracks_inc_1_tight_not_ee2leg', '2_loose_tracks_inc_1_tight_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_loose_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBrem_muonPairV', 'singleTagLowMass', 'singleTagHighMass', 'eexxSelect', 'radiative_Bhabha', 'rad_Bhabha_1trk', 'eeBrem', 'muonPairV', '1_photon_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt0.5_GeV_clust_in_4498_and_no_other_clust_Estargt0.3_GeV', 'ggBarrelLoose', 'singleTagLowMassB', 'singleTagHighMassB', 'b2b_phi_photons', 'displaced_vertex', 'single_diPhoton', 'ee_flat_0_19', 'ee_flat_19_22', 'ee_flat_22_25', 'ee_flat_25_30', 'ee_flat_30_35', 'ee_flat_35_45', 'ee_flat_45_60', 'ee_flat_60_90', 'ee_flat_90_180', 'selectee', 'selee1leg1clst', 'selee1leg1trk', 'eexxSelectB', 'eexxHighP', 'radiative_BhabhaB', 'selectmumu', 'selectmumuC', 'single_muon', 'cosmic', 'rad_Bhabha_1trkB', 'Bhabha_one_cluster', 'ee1leg', 'ee1leg1clst', 'ee1leg1e', 'ee1leg1trk', 'ee2clst', 'ee2leg', 'eeBremB', 'eexx', 'muonPairVB']}, 'skim': {'skim': ['accept_bhabha_all', 'accept_gamma_gamma', 'accept_hadron', 'accept_mumutight', 'accept_mumu_highmass', 'accept_mumu_tight_or_highm', 'accept_offip', 'accept_radmumu', 'accept_1_track1_cluster', 'accept_2_tracks', 'accept_b2bcluster_3D', 'accept_b2bclusterhigh_phi', 'accept_b2bclusterlow_phi', 'accept_bhabha', 'accept_bhabhaecl', 'accept_mumu_1trk', 'accept_mumu_2trk', 'accept_l1_nn_info', 'accept_radee', 'accept_single_photon_1GeV', 'accept_single_photon_2GeV_barrel', 'accept_single_photon_2GeV_endcap', 'accept_tau_tau', 'accept_dstar_1', 'accept_dstar_2', 'accept_dstar_3', 'accept_dstar_4', 'accept_hadronb', 'accept_hadronb1', 'accept_hadronb2', 'accept_jpsi', 'accept_kshort', 'accept_lambda', 'accept_fourlep', 'accept_tau_2trk', 'accept_tau_Ntrk', 'accept_b_charged', 'accept_b_neutral']}}
       cutResultIdentifiersIgnored={}
       cutResultIdentifiersPerUnit=['ge3_loose_tracks_inc_1_tight_not_ee2leg', 'Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'selectee', 'Estargt2_GeV_cluster']
       histogramDirectoryName=softwaretrigger
@@ -2541,9 +2541,9 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=True
-  287. ParticleLoader_K_S0:V0_ToFit -> pi+ pi-
+  287. ParticleLoader_K_S0:V0_ToFit_TreeFit -> pi+ pi-
       addDaughters=False
-      decayStrings=['K_S0:V0_ToFit -> pi+ pi-']
+      decayStrings=['K_S0:V0_ToFit_TreeFit -> pi+ pi-']
       dummyCovMatrix=10000.0
       dummyMDSTIndex=0
       dummyTreatAsInvisible=True
@@ -2561,15 +2561,15 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=True
-  288. PListCopy_K_S0:V0_ToFit
+  288. PListCopy_K_S0:V0_ToFit_TreeFit
       cut=
       ignoreMotherFlavor=False
       inputListNames=['K_S0:V0']
-      outputListName=K_S0:V0_ToFit
+      outputListName=K_S0:V0_ToFit_TreeFit
       preferLowest=True
       variable=mdstIndex
       writeOut=True
-  289. TreeFitter_K_S0:V0_ToFit
+  289. TreeFitter_K_S0:V0_ToFit_TreeFit
       autoSetGeoConstraintAndMergeVertices=True
       confidenceLevel=0.0
       convergencePrecision=0.01
@@ -2587,13 +2587,13 @@
       massConstraintList=[]
       massConstraintMassValues=[]
       originDimension=3
-      particleList=K_S0:V0_ToFit
+      particleList=K_S0:V0_ToFit_TreeFit
       sharedVertexList=[]
       treatAsInvisible=
       updateAllDaughters=True
-  290. ParticleSelector_applyCuts_K_S0:V0_ToFit
+  290. ParticleSelector_applyCuts_K_S0:V0_ToFit_TreeFit
       cut=0.450 < M < 0.550
-      decayString=K_S0:V0_ToFit
+      decayString=K_S0:V0_ToFit_TreeFit
   291. ParticleLoader_pi+:all
       addDaughters=False
       decayStrings=['pi+:all']
@@ -2614,17 +2614,17 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=True
-  292. ParticleCombiner_K_S0:RD -> pi+:all pi-:all
+  292. ParticleCombiner_K_S0:RD_TreeFit -> pi+:all pi-:all
       allowChargeViolation=False
       chargeConjugation=True
       cut=0.3 < M < 0.7
       decayMode=1
-      decayString=K_S0:RD -> pi+:all pi-:all
+      decayString=K_S0:RD_TreeFit -> pi+:all pi-:all
       ignoreIfTooManyCandidates=True
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=True
-  293. TreeFitter_K_S0:RD
+  293. TreeFitter_K_S0:RD_TreeFit
       autoSetGeoConstraintAndMergeVertices=True
       confidenceLevel=0.0
       convergencePrecision=0.01
@@ -2642,18 +2642,18 @@
       massConstraintList=[]
       massConstraintMassValues=[]
       originDimension=3
-      particleList=K_S0:RD
+      particleList=K_S0:RD_TreeFit
       sharedVertexList=[]
       treatAsInvisible=
       updateAllDaughters=True
-  294. ParticleSelector_applyCuts_K_S0:RD
+  294. ParticleSelector_applyCuts_K_S0:RD_TreeFit
       cut=0.450 < M < 0.550
-      decayString=K_S0:RD
-  295. PListMerger_K_S0:merged
+      decayString=K_S0:RD_TreeFit
+  295. PListMerger_K_S0:merged_TreeFit
       cut=
       ignoreMotherFlavor=False
-      inputListNames=['K_S0:V0_ToFit', 'K_S0:RD']
-      outputListName=K_S0:merged
+      inputListNames=['K_S0:V0_ToFit_TreeFit', 'K_S0:RD_TreeFit']
+      outputListName=K_S0:merged_TreeFit
       preferLowest=True
       variable=particleSource
       writeOut=False
@@ -2810,10 +2810,11 @@
       enableThrust=False
       particleListNames=['pi+:evtshape', 'gamma:evtshape']
   310. PhysicsObjectsDQM
-      KS0PListName=K_S0:merged
+      KS0PListName=K_S0:merged_TreeFit
       PI0PListName=pi0:physDQM
       TriggerIdentifier=software_trigger_cut&skim&accept_hadron
       TriggerIdentifierBhabha=software_trigger_cut&skim&accept_bhabha_all
+      TriggerIdentifierHLT=software_trigger_cut&filter&total_result
       TriggerIdentifierHadronb2=software_trigger_cut&skim&accept_hadronb2
       TriggerIdentifierMuMu=software_trigger_cut&skim&accept_mumutight
       UpsBhabhaPListName=Upsilon:ephysDQM
@@ -2878,7 +2879,7 @@
       AllowedDistance1D=8.0
       IgnoreBackwardPropagation=False
       MinimalMatchingDigits=14
-      MinimalMatchingDigitsOuterLayers=0
+      MinimalMatchingDigitsOuterLayers=4
       MinimalMomentumNoOuterLayers=4.0
       MuonListName=mu+:KLMDQM2
       RemoveUnusedMuons=False
@@ -4166,7 +4167,7 @@
             matchEntries=['EventMetaData', 'RawFTSWs', 'ROIpayload', 'SoftwareTriggerResult', 'SoftwareTriggerVariables', 'TRGSummary']
         3. Sum_HLT_Discard
 
-      (? ==1[V0Finder -> TrackFinderMCTruthRecoTracks -> MCRecoTracksMatcher -> TrackToMCParticleRelator -> PruneRecoHits -> PruneRecoTracks CopiedRecoTracks -> Sum_Postfilter_Tracking -> CDCDedxHitSaver -> CDCDedxPIDCreator -> VXDDedxPID -> TOPChannelMasker -> TOPBunchFinder -> TOPReconstructor -> ARICHFillHits -> ARICHReconstructor -> OnlineEventT0Creator -> ECLChargedPID -> MdstPID -> KLMExpert -> ClusterMatcher -> ECLTrackBremFinder -> Sum_Postfilter_PostTracking -> ParticleLoader_pi+:skim -> PListCopy_pi+:skim -> ParticleSelector_applyCuts_pi+:skim -> ParticleLoader_pi+:hadb -> PListCopy_pi+:hadb -> ParticleSelector_applyCuts_pi+:hadb -> ParticleLoader_pi+:tau -> PListCopy_pi+:tau -> ParticleSelector_applyCuts_pi+:tau -> ParticleLoader_gamma:skim -> PListCopy_gamma:skim -> ParticleSelector_applyCuts_gamma:skim -> ParticleSelector_applyCuts_gamma:skim -> ParticleLoader_K_S0:V0_ToFit -> pi+ pi- -> PListCopy_K_S0:V0_ToFit -> ParticleVertexFitter_K_S0:V0_ToFit -> ParticleSelector_applyCuts_K_S0:V0_ToFit -> ParticleLoader_pi+:all -> ParticleCombiner_K_S0:RD -> pi+:all pi-:all -> ParticleVertexFitter_K_S0:RD -> ParticleSelector_applyCuts_K_S0:RD -> PListMerger_K_S0:merged -> PListCutAndCopy_K_S0:dstSkim -> ParticleLoader_Lambda0:V0_ToFit -> p+ pi- -> PListCopy_Lambda0:V0_ToFit -> TreeFitter_Lambda0:V0_ToFit -> ParticleSelector_applyCuts_Lambda0:V0_ToFit -> DuplicateVertexMarker -> ParticleSelector_applyCuts_Lambda0:V0_ToFit -> ParticleLoader_pi+:all -> ParticleLoader_p+:all -> ParticleCombiner_Lambda0:RD -> p+:all pi-:all -> TreeFitter_Lambda0:RD -> ParticleSelector_applyCuts_Lambda0:RD -> DuplicateVertexMarker -> ParticleSelector_applyCuts_Lambda0:RD -> PListMerger_Lambda0:merged -> ParticleLoader_K+:dstSkim -> PListCopy_K+:dstSkim -> ParticleSelector_applyCuts_K+:dstSkim -> ParticleLoader_pi+:dstSkim -> PListCopy_pi+:dstSkim -> ParticleSelector_applyCuts_pi+:dstSkim -> ParticleLoader_gamma:loose -> PListCopy_gamma:loose -> ParticleSelector_applyCuts_gamma:loose -> ParticleSelector_applyCuts_gamma:loose -> ParticleCombiner_pi0:loose -> gamma:loose gamma:loose -> PListCutAndCopy_pi0:veryLooseFit -> ParticleVertexFitter_pi0:veryLooseFit -> ParticleCombiner_D0:ch1 -> K-:dstSkim pi+:dstSkim -> ParticleCombiner_D0:ch2 -> K-:dstSkim pi+:dstSkim pi0:veryLooseFit -> ParticleCombiner_D0:ch3 -> K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim -> ParticleCombiner_D0:ch4 -> K_S0:dstSkim pi+:dstSkim pi-:dstSkim -> ParticleCombiner_D*+:ch1 -> D0:ch1 pi+:all -> ParticleCombiner_D*+:ch2 -> D0:ch2 pi+:all -> ParticleCombiner_D*+:ch3 -> D0:ch3 pi+:all -> ParticleCombiner_D*+:ch4 -> D0:ch4 pi+:all -> PListCopy_D*+:d0pi -> ParticleLoader_pi+:offip -> PListCopy_pi+:offip -> ParticleSelector_applyCuts_pi+:offip -> ParticleLoader_pi+:GoodTrackForHLT -> PListCopy_pi+:GoodTrackForHLT -> ParticleSelector_applyCuts_pi+:GoodTrackForHLT -> ParticleLoader_K+:GoodTrackForHLT -> PListCopy_K+:GoodTrackForHLT -> ParticleSelector_applyCuts_K+:GoodTrackForHLT -> ParticleLoader_gamma:GoodPi0ForHLT -> PListCopy_gamma:GoodPi0ForHLT -> ParticleSelector_applyCuts_gamma:GoodPi0ForHLT -> ParticleSelector_applyCuts_gamma:GoodPi0ForHLT -> ParticleCombiner_pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT -> MCMatch_pi0:GoodPi0ForHLT -> ParticleCombiner_D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D0:Kpipi0ForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi0:GoodPi0ForHLT -> ParticleCombiner_D0:KpipipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT pi-:GoodTrackForHLT -> ParticleCombiner_D+:KpipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D*+:D0_KpiForHLT -> D0:KpiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D*+:D0_Kpipi0ForHLT -> D0:Kpipi0ForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D*+:D0_KpipipiForHLT -> D0:KpipipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B+:BtoD0pi_KpiForHLT -> anti-D0:KpiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B+:BtoD0pi_Kpipi0ForHLT -> anti-D0:Kpipi0ForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B+:BtoD0pi_KpipipiForHLT -> anti-D0:KpipipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDpi_KpipiForHLT -> D-:KpipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDstarPi_D0pi_KpiForHLT -> D*-:D0_KpiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDstarPi_D0pi_KpipipiForHLT -> D*-:D0_KpipipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDstarPi_D0pi_Kpipi0ForHLT -> D*-:D0_Kpipi0ForHLT pi+:GoodTrackForHLT -> PListCopy_B+:BtoCharmForHLT -> PListCopy_B0:BtoCharmForHLT -> SoftwareTrigger -> Sum_HLT_Skim_Calculation -> PXDROIFinder -> Sum_ROI_Finder -> SoftwareTriggerHLTDQM -> StatisticsTimingHLTDQM_after_filter -> TrackingAbortDQM -> DetectorOccupanciesDQM -> SoftwareTriggerHLTDQM_skim_nobhabha -> SVDUnpackerDQM -> cdcDQM7 -> CDCDedxDQM -> ECLDQM -> ECLDQMEXTENDED -> ECLDQMOutOfTimeDigits -> ECLDQMConnectedRegions -> TOPDQM -> KLMDQM -> TRGGDLDQM -> TRGEFFDQM -> TrackingHLTDQM -> ARICHDQM -> ParticleLoader_mu+:KLMDQM -> PListCopy_mu+:KLMDQM -> ParticleSelector_applyCuts_mu+:KLMDQM -> ParticleLoader_mu+:KLMDQM2 -> PListCopy_mu+:KLMDQM2 -> ParticleSelector_applyCuts_mu+:KLMDQM2 -> ParticleLoader_gamma:physDQM -> PListCopy_gamma:physDQM -> ParticleSelector_applyCuts_gamma:physDQM -> ParticleSelector_applyCuts_gamma:physDQM -> ParticleLoader_mu+:physDQM -> PListCopy_mu+:physDQM -> ParticleSelector_applyCuts_mu+:physDQM -> ParticleCombiner_pi0:physDQM -> gamma:physDQM gamma:physDQM -> ParticleLoader_K_S0:V0_ToFit -> pi+ pi- -> PListCopy_K_S0:V0_ToFit -> TreeFitter_K_S0:V0_ToFit -> ParticleSelector_applyCuts_K_S0:V0_ToFit -> ParticleLoader_pi+:all -> ParticleCombiner_K_S0:RD -> pi+:all pi-:all -> TreeFitter_K_S0:RD -> ParticleSelector_applyCuts_K_S0:RD -> PListMerger_K_S0:merged -> ParticleCombiner_Upsilon:physDQM -> mu-:physDQM mu+:physDQM -> ParticleLoader_e+:physDQM -> PListCopy_e+:physDQM -> ParticleSelector_applyCuts_e+:physDQM -> ParticleCombiner_Upsilon:ephysDQM -> e-:physDQM e+:physDQM -> ParticleLoader_pi+:hadbphysDQM -> PListCopy_pi+:hadbphysDQM -> ParticleSelector_applyCuts_pi+:hadbphysDQM -> ParticleLoader_pi+:evtshape -> PListCopy_pi+:evtshape -> ParticleLoader_gamma:evtshape -> PListCopy_gamma:evtshape -> ParticleSelector_applyCuts_gamma:evtshape -> EventShape -> PhysicsObjectsDQM -> ParticleLoader_mu+:DQM_HLT -> PListCopy_mu+:DQM_HLT -> ParticleSelector_applyCuts_mu+:DQM_HLT -> ParticleCombiner_Upsilon(4S):IPDQM_HLT -> mu+:DQM_HLT mu-:DQM_HLT -> ParticleVertexFitter_Upsilon(4S):IPDQM_HLT -> IPDQM -> KLMDQM2 -> Sum_HLT_DQM_filtered] ):
+      (? ==1[V0Finder -> TrackFinderMCTruthRecoTracks -> MCRecoTracksMatcher -> TrackToMCParticleRelator -> PruneRecoHits -> PruneRecoTracks CopiedRecoTracks -> Sum_Postfilter_Tracking -> CDCDedxHitSaver -> CDCDedxPIDCreator -> VXDDedxPID -> TOPChannelMasker -> TOPBunchFinder -> TOPReconstructor -> ARICHFillHits -> ARICHReconstructor -> OnlineEventT0Creator -> ECLChargedPID -> MdstPID -> KLMExpert -> ClusterMatcher -> ECLTrackBremFinder -> Sum_Postfilter_PostTracking -> ParticleLoader_pi+:skim -> PListCopy_pi+:skim -> ParticleSelector_applyCuts_pi+:skim -> ParticleLoader_pi+:hadb -> PListCopy_pi+:hadb -> ParticleSelector_applyCuts_pi+:hadb -> ParticleLoader_pi+:tau -> PListCopy_pi+:tau -> ParticleSelector_applyCuts_pi+:tau -> ParticleLoader_gamma:skim -> PListCopy_gamma:skim -> ParticleSelector_applyCuts_gamma:skim -> ParticleSelector_applyCuts_gamma:skim -> ParticleLoader_K_S0:V0_ToFit_KFit -> pi+ pi- -> PListCopy_K_S0:V0_ToFit_KFit -> ParticleVertexFitter_K_S0:V0_ToFit_KFit -> ParticleSelector_applyCuts_K_S0:V0_ToFit_KFit -> ParticleLoader_pi+:all -> ParticleCombiner_K_S0:RD_KFit -> pi+:all pi-:all -> ParticleVertexFitter_K_S0:RD_KFit -> ParticleSelector_applyCuts_K_S0:RD_KFit -> PListMerger_K_S0:merged_KFit -> PListCutAndCopy_K_S0:dstSkim -> ParticleLoader_Lambda0:V0_ToFit -> p+ pi- -> PListCopy_Lambda0:V0_ToFit -> TreeFitter_Lambda0:V0_ToFit -> ParticleSelector_applyCuts_Lambda0:V0_ToFit -> DuplicateVertexMarker -> ParticleSelector_applyCuts_Lambda0:V0_ToFit -> ParticleLoader_pi+:all -> ParticleLoader_p+:all -> ParticleCombiner_Lambda0:RD -> p+:all pi-:all -> TreeFitter_Lambda0:RD -> ParticleSelector_applyCuts_Lambda0:RD -> DuplicateVertexMarker -> ParticleSelector_applyCuts_Lambda0:RD -> PListMerger_Lambda0:merged -> ParticleLoader_K+:dstSkim -> PListCopy_K+:dstSkim -> ParticleSelector_applyCuts_K+:dstSkim -> ParticleLoader_pi+:dstSkim -> PListCopy_pi+:dstSkim -> ParticleSelector_applyCuts_pi+:dstSkim -> ParticleLoader_gamma:loose -> PListCopy_gamma:loose -> ParticleSelector_applyCuts_gamma:loose -> ParticleSelector_applyCuts_gamma:loose -> ParticleCombiner_pi0:loose -> gamma:loose gamma:loose -> PListCutAndCopy_pi0:veryLooseFit -> ParticleVertexFitter_pi0:veryLooseFit -> ParticleCombiner_D0:ch1 -> K-:dstSkim pi+:dstSkim -> ParticleCombiner_D0:ch2 -> K-:dstSkim pi+:dstSkim pi0:veryLooseFit -> ParticleCombiner_D0:ch3 -> K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim -> ParticleCombiner_D0:ch4 -> K_S0:dstSkim pi+:dstSkim pi-:dstSkim -> ParticleCombiner_D*+:ch1 -> D0:ch1 pi+:all -> ParticleCombiner_D*+:ch2 -> D0:ch2 pi+:all -> ParticleCombiner_D*+:ch3 -> D0:ch3 pi+:all -> ParticleCombiner_D*+:ch4 -> D0:ch4 pi+:all -> PListCopy_D*+:d0pi -> ParticleLoader_pi+:offip -> PListCopy_pi+:offip -> ParticleSelector_applyCuts_pi+:offip -> ParticleLoader_pi+:GoodTrackForHLT -> PListCopy_pi+:GoodTrackForHLT -> ParticleSelector_applyCuts_pi+:GoodTrackForHLT -> ParticleLoader_K+:GoodTrackForHLT -> PListCopy_K+:GoodTrackForHLT -> ParticleSelector_applyCuts_K+:GoodTrackForHLT -> ParticleLoader_gamma:GoodPi0ForHLT -> PListCopy_gamma:GoodPi0ForHLT -> ParticleSelector_applyCuts_gamma:GoodPi0ForHLT -> ParticleSelector_applyCuts_gamma:GoodPi0ForHLT -> ParticleCombiner_pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT -> MCMatch_pi0:GoodPi0ForHLT -> ParticleCombiner_D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D0:Kpipi0ForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi0:GoodPi0ForHLT -> ParticleCombiner_D0:KpipipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT pi-:GoodTrackForHLT -> ParticleCombiner_D+:KpipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D*+:D0_KpiForHLT -> D0:KpiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D*+:D0_Kpipi0ForHLT -> D0:Kpipi0ForHLT pi+:GoodTrackForHLT -> ParticleCombiner_D*+:D0_KpipipiForHLT -> D0:KpipipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B+:BtoD0pi_KpiForHLT -> anti-D0:KpiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B+:BtoD0pi_Kpipi0ForHLT -> anti-D0:Kpipi0ForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B+:BtoD0pi_KpipipiForHLT -> anti-D0:KpipipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDpi_KpipiForHLT -> D-:KpipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDstarPi_D0pi_KpiForHLT -> D*-:D0_KpiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDstarPi_D0pi_KpipipiForHLT -> D*-:D0_KpipipiForHLT pi+:GoodTrackForHLT -> ParticleCombiner_B0:B0toDstarPi_D0pi_Kpipi0ForHLT -> D*-:D0_Kpipi0ForHLT pi+:GoodTrackForHLT -> PListCopy_B+:BtoCharmForHLT -> PListCopy_B0:BtoCharmForHLT -> SoftwareTrigger -> Sum_HLT_Skim_Calculation -> PXDROIFinder -> Sum_ROI_Finder -> SoftwareTriggerHLTDQM -> StatisticsTimingHLTDQM_after_filter -> TrackingAbortDQM -> DetectorOccupanciesDQM -> SoftwareTriggerHLTDQM_skim_nobhabha -> SVDUnpackerDQM -> cdcDQM7 -> CDCDedxDQM -> ECLDQM -> ECLDQMEXTENDED -> ECLDQMOutOfTimeDigits -> ECLDQMConnectedRegions -> TOPDQM -> KLMDQM -> TRGGDLDQM -> TRGEFFDQM -> TrackingHLTDQM -> ARICHDQM -> ParticleLoader_mu+:KLMDQM -> PListCopy_mu+:KLMDQM -> ParticleSelector_applyCuts_mu+:KLMDQM -> ParticleLoader_mu+:KLMDQM2 -> PListCopy_mu+:KLMDQM2 -> ParticleSelector_applyCuts_mu+:KLMDQM2 -> ParticleLoader_gamma:physDQM -> PListCopy_gamma:physDQM -> ParticleSelector_applyCuts_gamma:physDQM -> ParticleSelector_applyCuts_gamma:physDQM -> ParticleLoader_mu+:physDQM -> PListCopy_mu+:physDQM -> ParticleSelector_applyCuts_mu+:physDQM -> ParticleCombiner_pi0:physDQM -> gamma:physDQM gamma:physDQM -> ParticleLoader_K_S0:V0_ToFit_TreeFit -> pi+ pi- -> PListCopy_K_S0:V0_ToFit_TreeFit -> TreeFitter_K_S0:V0_ToFit_TreeFit -> ParticleSelector_applyCuts_K_S0:V0_ToFit_TreeFit -> ParticleLoader_pi+:all -> ParticleCombiner_K_S0:RD_TreeFit -> pi+:all pi-:all -> TreeFitter_K_S0:RD_TreeFit -> ParticleSelector_applyCuts_K_S0:RD_TreeFit -> PListMerger_K_S0:merged_TreeFit -> ParticleCombiner_Upsilon:physDQM -> mu-:physDQM mu+:physDQM -> ParticleLoader_e+:physDQM -> PListCopy_e+:physDQM -> ParticleSelector_applyCuts_e+:physDQM -> ParticleCombiner_Upsilon:ephysDQM -> e-:physDQM e+:physDQM -> ParticleLoader_pi+:hadbphysDQM -> PListCopy_pi+:hadbphysDQM -> ParticleSelector_applyCuts_pi+:hadbphysDQM -> ParticleLoader_pi+:evtshape -> PListCopy_pi+:evtshape -> ParticleLoader_gamma:evtshape -> PListCopy_gamma:evtshape -> ParticleSelector_applyCuts_gamma:evtshape -> EventShape -> PhysicsObjectsDQM -> ParticleLoader_mu+:DQM_HLT -> PListCopy_mu+:DQM_HLT -> ParticleSelector_applyCuts_mu+:DQM_HLT -> ParticleCombiner_Upsilon(4S):IPDQM_HLT -> mu+:DQM_HLT mu-:DQM_HLT -> ParticleVertexFitter_Upsilon(4S):IPDQM_HLT -> IPDQM -> KLMDQM2 -> Sum_HLT_DQM_filtered] ):
         1. V0Finder
             CopiedRecoTracks=CopiedRecoTracks
             RecoTracks=RecoTracks
@@ -4445,9 +4446,9 @@
         35. ParticleSelector_applyCuts_gamma:skim
             cut=isFromECL
             decayString=gamma:skim
-        36. ParticleLoader_K_S0:V0_ToFit -> pi+ pi-
+        36. ParticleLoader_K_S0:V0_ToFit_KFit -> pi+ pi-
             addDaughters=False
-            decayStrings=['K_S0:V0_ToFit -> pi+ pi-']
+            decayStrings=['K_S0:V0_ToFit_KFit -> pi+ pi-']
             dummyCovMatrix=10000.0
             dummyMDSTIndex=0
             dummyTreatAsInvisible=True
@@ -4465,28 +4466,28 @@
             useOnlyMostEnergeticECLCluster=True
             useROEs=False
             writeOut=False
-        37. PListCopy_K_S0:V0_ToFit
+        37. PListCopy_K_S0:V0_ToFit_KFit
             cut=
             ignoreMotherFlavor=False
             inputListNames=['K_S0:V0']
-            outputListName=K_S0:V0_ToFit
+            outputListName=K_S0:V0_ToFit_KFit
             preferLowest=True
             variable=mdstIndex
             writeOut=False
-        38. ParticleVertexFitter_K_S0:V0_ToFit
+        38. ParticleVertexFitter_K_S0:V0_ToFit_KFit
             confidenceLevel=0.0
             decayString=
             fitType=vertex
-            listName=K_S0:V0_ToFit
+            listName=K_S0:V0_ToFit_KFit
             massConstraintList=[]
             recoilMass=0.0
             smearing=0.0
             updateDaughters=False
             vertexFitter=KFit
             withConstraint=
-        39. ParticleSelector_applyCuts_K_S0:V0_ToFit
+        39. ParticleSelector_applyCuts_K_S0:V0_ToFit_KFit
             cut=0.450 < M < 0.550
-            decayString=K_S0:V0_ToFit
+            decayString=K_S0:V0_ToFit_KFit
         40. ParticleLoader_pi+:all
             addDaughters=False
             decayStrings=['pi+:all']
@@ -4507,42 +4508,42 @@
             useOnlyMostEnergeticECLCluster=True
             useROEs=False
             writeOut=False
-        41. ParticleCombiner_K_S0:RD -> pi+:all pi-:all
+        41. ParticleCombiner_K_S0:RD_KFit -> pi+:all pi-:all
             allowChargeViolation=False
             chargeConjugation=True
             cut=0.3 < M < 0.7
             decayMode=1
-            decayString=K_S0:RD -> pi+:all pi-:all
+            decayString=K_S0:RD_KFit -> pi+:all pi-:all
             ignoreIfTooManyCandidates=True
             maximumNumberOfCandidates=10000
             recoilParticleType=0
             writeOut=False
-        42. ParticleVertexFitter_K_S0:RD
+        42. ParticleVertexFitter_K_S0:RD_KFit
             confidenceLevel=0.0
             decayString=
             fitType=vertex
-            listName=K_S0:RD
+            listName=K_S0:RD_KFit
             massConstraintList=[]
             recoilMass=0.0
             smearing=0.0
             updateDaughters=False
             vertexFitter=KFit
             withConstraint=
-        43. ParticleSelector_applyCuts_K_S0:RD
+        43. ParticleSelector_applyCuts_K_S0:RD_KFit
             cut=0.450 < M < 0.550
-            decayString=K_S0:RD
-        44. PListMerger_K_S0:merged
+            decayString=K_S0:RD_KFit
+        44. PListMerger_K_S0:merged_KFit
             cut=
             ignoreMotherFlavor=False
-            inputListNames=['K_S0:V0_ToFit', 'K_S0:RD']
-            outputListName=K_S0:merged
+            inputListNames=['K_S0:V0_ToFit_KFit', 'K_S0:RD_KFit']
+            outputListName=K_S0:merged_KFit
             preferLowest=True
             variable=particleSource
             writeOut=False
         45. PListCutAndCopy_K_S0:dstSkim
             cut=goodBelleKshort == 1
             ignoreMotherFlavor=False
-            inputListNames=['K_S0:merged']
+            inputListNames=['K_S0:merged_KFit']
             outputListName=K_S0:dstSkim
             preferLowest=True
             variable=mdstIndex
@@ -5235,7 +5236,7 @@
             createExpRunEventHistograms=True
             createHLTUnitHistograms=True
             createTotalResultHistograms=True
-            cutResultIdentifiers={'CDC_PHYSICS': {'filter': ['ge3_looseB_tracks_inc_1_tightB_not_ee2leg', 'ge3_trackC_not_ee2leg', '2_looseB_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_looseB_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_looseB_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB']}, 'CDC_PRESCALED': {'filter': ['2_loose_tracks_pstarmaxlt0.8_GeVc', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc', '2_loose_tracks_pstarmaxgt4.5_GeVc', 'ge1_tight_track', '2_looseC_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_trackC_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_trackC_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB']}, 'Calibration': {'skim': ['accept_bhabha_all', 'accept_gamma_gamma', 'accept_hadron', 'accept_mumutight', 'accept_mumu_highmass', 'accept_mumu_tight_or_highm', 'accept_offip', 'accept_radmumu']}, 'ECL_PHYSICS': {'filter': ['Elab_gt_0.3_plus_3_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBremB', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBremB']}, 'ECL_PRESCALED': {'filter': ['0.3ltEstar_max_clustlt2_GeV_plus_2_others_gt_0.2_GeV', '1_electron_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_electron_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_not_low_not_45115_no_other_clust_Estargt0.3_GeV', 'gg2clst', 'ge1_Estargt2_GeV_chrg_clst_22145_not_gg2clst_ee2clst_ee1leg', 'ggEndcapLoose', 'n2GeVPhotonBarrelge1', 'n2GeVPhotonEndcapge1', 'Estargt2_GeV_cluster', 'ECLMuonPair']}, 'LEVEL1': {'filter': ['L1_trigger', 'passthrough_l1_trigger_delayed_bhabha', 'passthrough_l1_trigger_random', 'passthrough_l1_trigger_poisson', 'L1_Bhabha_veto', 'L1_Bhabha_select', 'L1_trigger_nn_info', 'passthrough_l1_trigger_f', 'dummy']}, 'OBSOLETE': {'filter': ['ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBrem', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBrem', 'ge3_loose_tracks_inc_1_tight_not_ee2leg', '2_loose_tracks_inc_1_tight_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_loose_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBrem_muonPairV', 'singleTagLowMass', 'singleTagHighMass', 'eexxSelect', 'radiative_Bhabha', 'rad_Bhabha_1trk', 'eeBrem', 'muonPairV']}, 'Others': {'skim': ['accept_1_track1_cluster', 'accept_2_tracks', 'accept_b2bcluster_3D', 'accept_b2bclusterhigh_phi', 'accept_b2bclusterlow_phi', 'accept_bhabha', 'accept_bhabhaecl', 'accept_mumu_1trk', 'accept_mumu_2trk', 'accept_l1_nn_info', 'accept_radee', 'accept_single_photon_1GeV', 'accept_single_photon_2GeV_barrel', 'accept_single_photon_2GeV_endcap', 'accept_tau_tau']}, 'PHYSICS': {'filter': ['1_photon_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt0.5_GeV_clust_in_4498_and_no_other_clust_Estargt0.3_GeV', 'ggBarrelLoose', 'singleTagLowMassB', 'singleTagHighMassB', 'b2b_phi_photons', 'displaced_vertex', 'single_diPhoton']}, 'Physics': {'skim': ['accept_dstar_1', 'accept_dstar_2', 'accept_dstar_3', 'accept_dstar_4', 'accept_hadronb', 'accept_hadronb1', 'accept_hadronb2', 'accept_jpsi', 'accept_kshort', 'accept_lambda', 'accept_fourlep', 'accept_tau_2trk', 'accept_tau_Ntrk', 'accept_b_charged', 'accept_b_neutral']}, 'QED': {'filter': ['ee_flat_0_19', 'ee_flat_19_22', 'ee_flat_22_25', 'ee_flat_25_30', 'ee_flat_30_35', 'ee_flat_35_45', 'ee_flat_45_60', 'ee_flat_60_90', 'ee_flat_90_180', 'selectee', 'selee1leg1clst', 'selee1leg1trk', 'eexxSelectB', 'eexxHighP', 'radiative_BhabhaB', 'selectmumu', 'selectmumuC', 'single_muon', 'cosmic', 'rad_Bhabha_1trkB', 'Bhabha_one_cluster']}, 'VETOES': {'filter': ['ee1leg', 'ee1leg1clst', 'ee1leg1e', 'ee1leg1trk', 'ee2clst', 'ee2leg', 'eeBremB', 'eexx', 'muonPairVB']}, 'filter': {'filter': ['ge3_looseB_tracks_inc_1_tightB_not_ee2leg', 'ge3_trackC_not_ee2leg', '2_looseB_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_looseB_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_looseB_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB', '2_loose_tracks_pstarmaxlt0.8_GeVc', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc', '2_loose_tracks_pstarmaxgt4.5_GeVc', 'ge1_tight_track', '2_looseC_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_trackC_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_trackC_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB', 'Elab_gt_0.3_plus_3_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBremB', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBremB', '0.3ltEstar_max_clustlt2_GeV_plus_2_others_gt_0.2_GeV', '1_electron_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_electron_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_not_low_not_45115_no_other_clust_Estargt0.3_GeV', 'gg2clst', 'ge1_Estargt2_GeV_chrg_clst_22145_not_gg2clst_ee2clst_ee1leg', 'ggEndcapLoose', 'n2GeVPhotonBarrelge1', 'n2GeVPhotonEndcapge1', 'Estargt2_GeV_cluster', 'ECLMuonPair', 'L1_trigger', 'passthrough_l1_trigger_delayed_bhabha', 'passthrough_l1_trigger_random', 'passthrough_l1_trigger_poisson', 'L1_Bhabha_veto', 'L1_Bhabha_select', 'L1_trigger_nn_info', 'passthrough_l1_trigger_f', 'dummy', 'ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBrem', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBrem', 'ge3_loose_tracks_inc_1_tight_not_ee2leg', '2_loose_tracks_inc_1_tight_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_loose_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBrem_muonPairV', 'singleTagLowMass', 'singleTagHighMass', 'eexxSelect', 'radiative_Bhabha', 'rad_Bhabha_1trk', 'eeBrem', 'muonPairV', '1_photon_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt0.5_GeV_clust_in_4498_and_no_other_clust_Estargt0.3_GeV', 'ggBarrelLoose', 'singleTagLowMassB', 'singleTagHighMassB', 'b2b_phi_photons', 'displaced_vertex', 'single_diPhoton', 'ee_flat_0_19', 'ee_flat_19_22', 'ee_flat_22_25', 'ee_flat_25_30', 'ee_flat_30_35', 'ee_flat_35_45', 'ee_flat_45_60', 'ee_flat_60_90', 'ee_flat_90_180', 'selectee', 'selee1leg1clst', 'selee1leg1trk', 'eexxSelectB', 'eexxHighP', 'radiative_BhabhaB', 'selectmumu', 'selectmumuC', 'single_muon', 'cosmic', 'rad_Bhabha_1trkB', 'Bhabha_one_cluster', 'ee1leg', 'ee1leg1clst', 'ee1leg1e', 'ee1leg1trk', 'ee2clst', 'ee2leg', 'eeBremB', 'eexx', 'muonPairVB']}, 'skim': {'skim': ['accept_bhabha_all', 'accept_gamma_gamma', 'accept_hadron', 'accept_mumutight', 'accept_mumu_highmass', 'accept_mumu_tight_or_highm', 'accept_offip', 'accept_radmumu', 'accept_1_track1_cluster', 'accept_2_tracks', 'accept_b2bcluster_3D', 'accept_b2bclusterhigh_phi', 'accept_b2bclusterlow_phi', 'accept_bhabha', 'accept_bhabhaecl', 'accept_mumu_1trk', 'accept_mumu_2trk', 'accept_l1_nn_info', 'accept_radee', 'accept_single_photon_1GeV', 'accept_single_photon_2GeV_barrel', 'accept_single_photon_2GeV_endcap', 'accept_tau_tau', 'accept_dstar_1', 'accept_dstar_2', 'accept_dstar_3', 'accept_dstar_4', 'accept_hadronb', 'accept_hadronb1', 'accept_hadronb2', 'accept_jpsi', 'accept_kshort', 'accept_lambda', 'accept_fourlep', 'accept_tau_2trk', 'accept_tau_Ntrk', 'accept_b_charged', 'accept_b_neutral']}}
+            cutResultIdentifiers={'CDC_PHYSICS': {'filter': ['ge3_looseB_tracks_inc_1_tightB_not_ee2leg', 'ge3_trackC_not_ee2leg', '2_looseB_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_looseB_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_looseB_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB']}, 'CDC_PRESCALED': {'filter': ['2_loose_tracks_pstarmaxlt0.8_GeVc', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc', '2_loose_tracks_pstarmaxgt4.5_GeVc', 'ge1_tight_track', '2_looseC_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_trackC_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_trackC_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB']}, 'Calibration': {'skim': ['accept_bhabha_all', 'accept_gamma_gamma', 'accept_hadron', 'accept_mumutight', 'accept_mumu_highmass', 'accept_mumu_tight_or_highm', 'accept_offip', 'accept_radmumu']}, 'ECL_PHYSICS': {'filter': ['Elab_gt_0.3_plus_3_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBremB', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBremB']}, 'ECL_PRESCALED': {'filter': ['0.3ltEstar_max_clustlt2_GeV_plus_2_others_gt_0.2_GeV', '1_electron_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_electron_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_not_low_not_45115_no_other_clust_Estargt0.3_GeV', 'gg2clst', 'ge1_Estargt2_GeV_chrg_clst_22145_not_gg2clst_ee2clst_ee1leg', 'ggEndcapLoose', 'n2GeVPhotonBarrelge1', 'n2GeVPhotonEndcapge1', 'Estargt2_GeV_cluster', 'ECLMuonPair']}, 'HLT_PREFILTER': {'filter': ['prefilter_InjectionStrip', 'prefilter_CDCECLthreshold']}, 'LEVEL1': {'filter': ['L1_trigger', 'passthrough_l1_trigger_delayed_bhabha', 'passthrough_l1_trigger_random', 'passthrough_l1_trigger_poisson', 'L1_Bhabha_veto', 'L1_Bhabha_select', 'L1_trigger_nn_info', 'passthrough_l1_trigger_f', 'dummy']}, 'OBSOLETE': {'filter': ['ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBrem', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBrem', 'ge3_loose_tracks_inc_1_tight_not_ee2leg', '2_loose_tracks_inc_1_tight_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_loose_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBrem_muonPairV', 'singleTagLowMass', 'singleTagHighMass', 'eexxSelect', 'radiative_Bhabha', 'rad_Bhabha_1trk', 'eeBrem', 'muonPairV']}, 'Others': {'skim': ['accept_1_track1_cluster', 'accept_2_tracks', 'accept_b2bcluster_3D', 'accept_b2bclusterhigh_phi', 'accept_b2bclusterlow_phi', 'accept_bhabha', 'accept_bhabhaecl', 'accept_mumu_1trk', 'accept_mumu_2trk', 'accept_l1_nn_info', 'accept_radee', 'accept_single_photon_1GeV', 'accept_single_photon_2GeV_barrel', 'accept_single_photon_2GeV_endcap', 'accept_tau_tau']}, 'PHYSICS': {'filter': ['1_photon_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt0.5_GeV_clust_in_4498_and_no_other_clust_Estargt0.3_GeV', 'ggBarrelLoose', 'singleTagLowMassB', 'singleTagHighMassB', 'b2b_phi_photons', 'displaced_vertex', 'single_diPhoton']}, 'Physics': {'skim': ['accept_dstar_1', 'accept_dstar_2', 'accept_dstar_3', 'accept_dstar_4', 'accept_hadronb', 'accept_hadronb1', 'accept_hadronb2', 'accept_jpsi', 'accept_kshort', 'accept_lambda', 'accept_fourlep', 'accept_tau_2trk', 'accept_tau_Ntrk', 'accept_b_charged', 'accept_b_neutral']}, 'QED': {'filter': ['ee_flat_0_19', 'ee_flat_19_22', 'ee_flat_22_25', 'ee_flat_25_30', 'ee_flat_30_35', 'ee_flat_35_45', 'ee_flat_45_60', 'ee_flat_60_90', 'ee_flat_90_180', 'selectee', 'selee1leg1clst', 'selee1leg1trk', 'eexxSelectB', 'eexxHighP', 'radiative_BhabhaB', 'selectmumu', 'selectmumuC', 'single_muon', 'cosmic', 'rad_Bhabha_1trkB', 'Bhabha_one_cluster']}, 'VETOES': {'filter': ['ee1leg', 'ee1leg1clst', 'ee1leg1e', 'ee1leg1trk', 'ee2clst', 'ee2leg', 'eeBremB', 'eexx', 'muonPairVB']}, 'filter': {'filter': ['ge3_looseB_tracks_inc_1_tightB_not_ee2leg', 'ge3_trackC_not_ee2leg', '2_looseB_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_looseB_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_looseB_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB', '2_loose_tracks_pstarmaxlt0.8_GeVc', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc', '2_loose_tracks_pstarmaxgt4.5_GeVc', 'ge1_tight_track', '2_looseC_tracks_inc_1_tightB_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_trackC_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_trackC_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBremB_muonPairVB', 'Elab_gt_0.3_plus_3_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBremB', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBremB', '0.3ltEstar_max_clustlt2_GeV_plus_2_others_gt_0.2_GeV', '1_electron_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_electron_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_not_low_not_45115_no_other_clust_Estargt0.3_GeV', 'gg2clst', 'ge1_Estargt2_GeV_chrg_clst_22145_not_gg2clst_ee2clst_ee1leg', 'ggEndcapLoose', 'n2GeVPhotonBarrelge1', 'n2GeVPhotonEndcapge1', 'Estargt2_GeV_cluster', 'ECLMuonPair', 'prefilter_InjectionStrip', 'prefilter_CDCECLthreshold', 'L1_trigger', 'passthrough_l1_trigger_delayed_bhabha', 'passthrough_l1_trigger_random', 'passthrough_l1_trigger_poisson', 'L1_Bhabha_veto', 'L1_Bhabha_select', 'L1_trigger_nn_info', 'passthrough_l1_trigger_f', 'dummy', 'ge1_Estargt2_GeV_neutral_clst_2232_or_130145_not_gg2clst_ee2clst_ee1leg_eeBrem', 'ge1_Estargt2_GeV_neutral_clst_32130_not_gg2clst_ee1leg1clst_ee1leg1trk_eeBrem', 'ge3_loose_tracks_inc_1_tight_not_ee2leg', '2_loose_tracks_inc_1_tight_q==0_pstarmaxlt0.8_GeVc_not_eexx', '2_loose_tracks_0.8ltpstarmaxlt4.5_GeVc_not_ee2leg_ee1leg1trk_eexx', '2_loose_tracks_pstarmaxgt4.5_GeVc_not_ee2leg_ee1leg1trk_ee1leg1e_eeBrem_muonPairV', 'singleTagLowMass', 'singleTagHighMass', 'eexxSelect', 'radiative_Bhabha', 'rad_Bhabha_1trk', 'eeBrem', 'muonPairV', '1_photon_Estargt1_GeV_clust_in_45115_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt1_GeV_clust_in_32130_and_no_other_clust_Estargt0.3_GeV', '1_photon_Estargt0.5_GeV_clust_in_4498_and_no_other_clust_Estargt0.3_GeV', 'ggBarrelLoose', 'singleTagLowMassB', 'singleTagHighMassB', 'b2b_phi_photons', 'displaced_vertex', 'single_diPhoton', 'ee_flat_0_19', 'ee_flat_19_22', 'ee_flat_22_25', 'ee_flat_25_30', 'ee_flat_30_35', 'ee_flat_35_45', 'ee_flat_45_60', 'ee_flat_60_90', 'ee_flat_90_180', 'selectee', 'selee1leg1clst', 'selee1leg1trk', 'eexxSelectB', 'eexxHighP', 'radiative_BhabhaB', 'selectmumu', 'selectmumuC', 'single_muon', 'cosmic', 'rad_Bhabha_1trkB', 'Bhabha_one_cluster', 'ee1leg', 'ee1leg1clst', 'ee1leg1e', 'ee1leg1trk', 'ee2clst', 'ee2leg', 'eeBremB', 'eexx', 'muonPairVB']}, 'skim': {'skim': ['accept_bhabha_all', 'accept_gamma_gamma', 'accept_hadron', 'accept_mumutight', 'accept_mumu_highmass', 'accept_mumu_tight_or_highm', 'accept_offip', 'accept_radmumu', 'accept_1_track1_cluster', 'accept_2_tracks', 'accept_b2bcluster_3D', 'accept_b2bclusterhigh_phi', 'accept_b2bclusterlow_phi', 'accept_bhabha', 'accept_bhabhaecl', 'accept_mumu_1trk', 'accept_mumu_2trk', 'accept_l1_nn_info', 'accept_radee', 'accept_single_photon_1GeV', 'accept_single_photon_2GeV_barrel', 'accept_single_photon_2GeV_endcap', 'accept_tau_tau', 'accept_dstar_1', 'accept_dstar_2', 'accept_dstar_3', 'accept_dstar_4', 'accept_hadronb', 'accept_hadronb1', 'accept_hadronb2', 'accept_jpsi', 'accept_kshort', 'accept_lambda', 'accept_fourlep', 'accept_tau_2trk', 'accept_tau_Ntrk', 'accept_b_charged', 'accept_b_neutral']}}
             cutResultIdentifiersIgnored={}
             cutResultIdentifiersPerUnit=['ge3_loose_tracks_inc_1_tight_not_ee2leg', 'Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0', 'selectee', 'Estargt2_GeV_cluster']
             histogramDirectoryName=softwaretrigger
@@ -5463,9 +5464,9 @@
             maximumNumberOfCandidates=10000
             recoilParticleType=0
             writeOut=True
-        149. ParticleLoader_K_S0:V0_ToFit -> pi+ pi-
+        149. ParticleLoader_K_S0:V0_ToFit_TreeFit -> pi+ pi-
             addDaughters=False
-            decayStrings=['K_S0:V0_ToFit -> pi+ pi-']
+            decayStrings=['K_S0:V0_ToFit_TreeFit -> pi+ pi-']
             dummyCovMatrix=10000.0
             dummyMDSTIndex=0
             dummyTreatAsInvisible=True
@@ -5483,15 +5484,15 @@
             useOnlyMostEnergeticECLCluster=True
             useROEs=False
             writeOut=True
-        150. PListCopy_K_S0:V0_ToFit
+        150. PListCopy_K_S0:V0_ToFit_TreeFit
             cut=
             ignoreMotherFlavor=False
             inputListNames=['K_S0:V0']
-            outputListName=K_S0:V0_ToFit
+            outputListName=K_S0:V0_ToFit_TreeFit
             preferLowest=True
             variable=mdstIndex
             writeOut=True
-        151. TreeFitter_K_S0:V0_ToFit
+        151. TreeFitter_K_S0:V0_ToFit_TreeFit
             autoSetGeoConstraintAndMergeVertices=True
             confidenceLevel=0.0
             convergencePrecision=0.01
@@ -5509,13 +5510,13 @@
             massConstraintList=[]
             massConstraintMassValues=[]
             originDimension=3
-            particleList=K_S0:V0_ToFit
+            particleList=K_S0:V0_ToFit_TreeFit
             sharedVertexList=[]
             treatAsInvisible=
             updateAllDaughters=True
-        152. ParticleSelector_applyCuts_K_S0:V0_ToFit
+        152. ParticleSelector_applyCuts_K_S0:V0_ToFit_TreeFit
             cut=0.450 < M < 0.550
-            decayString=K_S0:V0_ToFit
+            decayString=K_S0:V0_ToFit_TreeFit
         153. ParticleLoader_pi+:all
             addDaughters=False
             decayStrings=['pi+:all']
@@ -5536,17 +5537,17 @@
             useOnlyMostEnergeticECLCluster=True
             useROEs=False
             writeOut=True
-        154. ParticleCombiner_K_S0:RD -> pi+:all pi-:all
+        154. ParticleCombiner_K_S0:RD_TreeFit -> pi+:all pi-:all
             allowChargeViolation=False
             chargeConjugation=True
             cut=0.3 < M < 0.7
             decayMode=1
-            decayString=K_S0:RD -> pi+:all pi-:all
+            decayString=K_S0:RD_TreeFit -> pi+:all pi-:all
             ignoreIfTooManyCandidates=True
             maximumNumberOfCandidates=10000
             recoilParticleType=0
             writeOut=True
-        155. TreeFitter_K_S0:RD
+        155. TreeFitter_K_S0:RD_TreeFit
             autoSetGeoConstraintAndMergeVertices=True
             confidenceLevel=0.0
             convergencePrecision=0.01
@@ -5564,18 +5565,18 @@
             massConstraintList=[]
             massConstraintMassValues=[]
             originDimension=3
-            particleList=K_S0:RD
+            particleList=K_S0:RD_TreeFit
             sharedVertexList=[]
             treatAsInvisible=
             updateAllDaughters=True
-        156. ParticleSelector_applyCuts_K_S0:RD
+        156. ParticleSelector_applyCuts_K_S0:RD_TreeFit
             cut=0.450 < M < 0.550
-            decayString=K_S0:RD
-        157. PListMerger_K_S0:merged
+            decayString=K_S0:RD_TreeFit
+        157. PListMerger_K_S0:merged_TreeFit
             cut=
             ignoreMotherFlavor=False
-            inputListNames=['K_S0:V0_ToFit', 'K_S0:RD']
-            outputListName=K_S0:merged
+            inputListNames=['K_S0:V0_ToFit_TreeFit', 'K_S0:RD_TreeFit']
+            outputListName=K_S0:merged_TreeFit
             preferLowest=True
             variable=particleSource
             writeOut=False
@@ -5732,10 +5733,11 @@
             enableThrust=False
             particleListNames=['pi+:evtshape', 'gamma:evtshape']
         172. PhysicsObjectsDQM
-            KS0PListName=K_S0:merged
+            KS0PListName=K_S0:merged_TreeFit
             PI0PListName=pi0:physDQM
             TriggerIdentifier=software_trigger_cut&skim&accept_hadron
             TriggerIdentifierBhabha=software_trigger_cut&skim&accept_bhabha_all
+            TriggerIdentifierHLT=software_trigger_cut&filter&total_result
             TriggerIdentifierHadronb2=software_trigger_cut&skim&accept_hadronb2
             TriggerIdentifierMuMu=software_trigger_cut&skim&accept_mumutight
             UpsBhabhaPListName=Upsilon:ephysDQM
@@ -5800,7 +5802,7 @@
             AllowedDistance1D=8.0
             IgnoreBackwardPropagation=False
             MinimalMatchingDigits=14
-            MinimalMatchingDigitsOuterLayers=0
+            MinimalMatchingDigitsOuterLayers=4
             MinimalMomentumNoOuterLayers=4.0
             MuonListName=mu+:KLMDQM2
             RemoveUnusedMuons=False

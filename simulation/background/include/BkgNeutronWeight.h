@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef BKGNEUTRONWEIGHT_H
-#define BKGNEUTRONWEIGHT_H
+#pragma once
 
 #include <vector>
 
@@ -61,5 +60,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif // BKGNEUTRONWEIGHT_H

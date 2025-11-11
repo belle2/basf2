@@ -16,6 +16,10 @@
 #include "G4SystemOfUnits.hh"
 #include "G4ProductionCutsTable.hh"
 #include "G4PrimaryParticle.hh"
+#include "G4FieldManager.hh"
+#include "G4Navigator.hh"
+#include "G4Track.hh"
+#include "G4Step.hh"
 
 #include "G4FieldManagerStore.hh"
 #include <simulation/longlivedneutral/G4LongLivedNeutralTransportation.h>

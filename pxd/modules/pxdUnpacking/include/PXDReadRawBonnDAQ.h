@@ -12,9 +12,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <framework/dataobjects/EventMetaData.h>
-#include <rawdata/dataobjects/RawPXD.h>
-
 #include <pxd/unpacking/PXDLocalDAQFile.h>
 
 #include <string>
@@ -22,6 +19,8 @@
 
 
 namespace Belle2 {
+  class EventMetaData;
+  class RawPXD;
 
   namespace PXD {
     //! Module to Load Raw PXD Data from DHH network-dump file and store it as RawPXD in Data Store

@@ -9,10 +9,6 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/vxdHoughTracking/findlets/HitSelector.h>
-#include <framework/datastore/StoreArray.h>
-
-#include <string>
-#include <vector>
 
 namespace Belle2 {
   class ModuleParamList;

@@ -6,11 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef RUNMANAGER_H_
-#define RUNMANAGER_H_
+#pragma once
 
 #include <G4RunManager.hh>
-#include <G4AssemblyVolume.hh>
+
+class G4AssemblyVolume;
 
 namespace Belle2 {
 
@@ -102,5 +102,3 @@ namespace Belle2 {
   } //end namespace Simulation
 
 } //end of namespace Belle2
-
-#endif /* RUNMANAGER_H_ */

@@ -7,10 +7,12 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdSpacePointCreator/PXDSpacePointCreatorModule.h>
+#include <pxd/dataobjects/PXDCluster.h>
+
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 #include <framework/logging/Logger.h>
-
-
 
 
 using namespace std;

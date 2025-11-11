@@ -103,18 +103,31 @@ void DQMHistAnalysisSVDUnpackerModule::event()
   Float_t nEvents = hnEvnts->GetEntries();
 
   //check DATA FORMAT
-  TH1* h = findHist("SVDUnpacker/DQMUnpackerHisto");
-
-  //test ERROR:
-  //  h->SetBinContent(100,0.01);
+  auto h = findHist("SVDUnpacker/DQMUnpackerHisto");
 
   if (h != NULL) {
     h->SetTitle(Form("SVD Data Format Monitor %s", runID.Data()));
     //check if number of errors is above the allowed limit
+    Int_t nXbins = h->GetXaxis()->GetNbins();
+    Int_t nYbins = h->GetYaxis()->GetNbins();
+
+    //test ERROR:
+//     h->SetBinContent(10, 20, 1000000);
+//     h->SetBinContent(10, 40, 10000000);
+
+    Float_t maxCnts = 0;
     bool hasError = false;
-    for (int un = 0; un < h->GetNcells(); un++)
-      if (h->GetBinContent(un) / nEvents > m_unpackError)
-        hasError = true;
+    for (int i = 0; i < nXbins - 1; ++i) { // exclude SEU recovery
+      for (int j = 0; j < nYbins; ++j) {
+        Float_t counts = h->GetBinContent(i + 1, j + 1);
+        if (counts > maxCnts)
+          maxCnts = counts;
+
+        if (counts / nEvents > m_unpackError) {
+          hasError = true;
+        }
+      }
+    }
 
     if (!hasError) {
       m_cUnpacker->cd();
@@ -128,7 +141,7 @@ void DQMHistAnalysisSVDUnpackerModule::event()
       setStatusOfCanvas(error, m_cUnpacker, true);
     }
     if (nEvents > 0)
-      setEpicsPV("UnpackError", h->GetEntries() / nEvents);
+      setEpicsPV("UnpackError", maxCnts / nEvents);
   } else {
     B2INFO("Histogram SVDUnpacker/DQMUnpackerHisto from SVDUnpackerDQM not found!");
     m_cUnpacker->cd();

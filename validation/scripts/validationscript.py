@@ -69,7 +69,6 @@ class Script:
     @var status: The current status, e.g. 'running' or 'finished'
     @var control: Execute locally or on the cluster?
     @var returncode: The returncode of the steering file
-    @type returncode: Optional[int]
     @var _object: Pointer to the object itself. Is this even necessary?
     """
 
@@ -128,7 +127,7 @@ class Script:
         self.control = None
 
         # The returncode of the script. Should be 0 if all went well.
-        self.returncode = None
+        self.returncode: Optional[int] = None
 
         #: Id of job for job submission. This is set by some of the
         #: cluster controls in order to terminate the job if it exceeds the
@@ -397,7 +396,7 @@ def find_creator(
     """!
     This function receives the name of a file and tries to find the file
     in the given package which produces this file, i.e. find the file in
-    whose header 'outputfile' is listed under <output></output>.
+    whose header 'outputfile' is listed under ``<output>`` ... ``</output>``.
     It then returns a list of all Scripts who claim to be creating 'outputfile'
 
     @param outputfile: The file of which we want to know by which script is

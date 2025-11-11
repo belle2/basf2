@@ -59,7 +59,7 @@ def add_collision_dqm(path, components=None, dqm_environment="expressreco", dqm_
         if (components is None or 'KLM' in components):
             path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM2',
                             MinimalMatchingDigits=14,
-                            MinimalMatchingDigitsOuterLayers=0,
+                            MinimalMatchingDigitsOuterLayers=4,
                             MinimalMomentumNoOuterLayers=4.0)
 
     # the following makes only sense in collisions

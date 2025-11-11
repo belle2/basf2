@@ -21,7 +21,7 @@ namespace Belle2 {
    * 1) Input format
    * The input constants are given in the histogram format provided by the TOPTimeCalibrator module. According to the current (2017)
    * TBC production standards, all the root files belonging to the same calibration set must be locaded in one single directory, with no more than one level of subdirectories.
-   * An example of a valid directory stucture for the input is:
+   * An example of a valid directory structure for the input is:
    *
    * CalibrationSetRootFolder/tbc_ch0/
    *                          tbc_ch1/
@@ -60,7 +60,7 @@ namespace Belle2 {
    *
    * 4) How to add a new comparison histogram
    * - Create an histogram array (hQuantity) that saves the quantity you want calset-by-calset, and fill it in analyzeCalFile()
-   * - Create an histogram to save the comparson (hQuantityCom), and fill it in the makeComparisons() usig the hQuantity histograms. You can use the calculateHistoRatio() utility to do that.
+   * - Create an histogram to save the comparson (hQuantityCom), and fill it in the makeComparisons() using the hQuantity histograms. You can use the calculateHistoRatio() utility to do that.
    */
   class TOPTBCComparatorModule : public HistoModule {
   public:
@@ -174,19 +174,19 @@ namespace Belle2 {
 
     // Delta T plots, slot-by-slot
     std::vector<TH1F*>
-    m_slotAverageDeltaT[16]; /**< Average of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number*/
+    m_slotAverageDeltaT[16]; /**< Average of the DeltaT (time difference petween the calibration pulses) distribution, as function of the channel number*/
     std::vector<TH1F*>
-    m_slotSigmaDeltaT[16]; /**< Standard deviation of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number*/
+    m_slotSigmaDeltaT[16]; /**< Standard deviation of the DeltaT (time difference petween the calibration pulses) distribution, as function of the channel number*/
     std::vector<TH2F*>
-    m_slotAverageDeltaTMap[16]; /**< Map of the average of the  DeltaT (time difference petween the calibraiton pulses) distribution */
+    m_slotAverageDeltaTMap[16]; /**< Map of the average of the  DeltaT (time difference petween the calibration pulses) distribution */
     std::vector<TH2F*>
-    m_slotSigmaDeltaTMap[16]; /**< Map of the Standard deviation of the  DeltaT (time difference petween the calibraiton pulses) distribution */
+    m_slotSigmaDeltaTMap[16]; /**< Map of the Standard deviation of the  DeltaT (time difference petween the calibration pulses) distribution */
 
     // Average timing plots, all the detector at once
     std::vector<TH1F*>
-    m_topAverageDeltaT; /**< Average of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number on the whole detector*/
+    m_topAverageDeltaT; /**< Average of the DeltaT (time difference petween the calibration pulses) distribution, as function of the channel number on the whole detector*/
     std::vector<TH1F*>
-    m_topSigmaDeltaT; /**< Standard deviation of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number  on the whole detector*/
+    m_topSigmaDeltaT; /**< Standard deviation of the DeltaT (time difference petween the calibration pulses) distribution, as function of the channel number  on the whole detector*/
 
 
     // Occupancy plots, slot-by-slot
@@ -206,20 +206,20 @@ namespace Belle2 {
 
     // Delta T ratio plots, slot-by-slot
     std::vector<TH1F*>
-    m_slotAverageDeltaTComparison[16]; /**< Ratio of the average of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number*/
+    m_slotAverageDeltaTComparison[16]; /**< Ratio of the average of the DeltaT (time difference petween the calibration pulses) distribution, as function of the channel number*/
     std::vector<TH1F*>
-    m_slotSigmaDeltaTComparison[16]; /**< Ratio of the Standard deviation of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number*/
+    m_slotSigmaDeltaTComparison[16]; /**< Ratio of the Standard deviation of the DeltaT (time difference petween the calibration pulses) distribution, as function of the channel number*/
     std::vector<TH2F*>
-    m_slotAverageDeltaTMapComparison[16]; /**< Map of the Ratio of the  average  DeltaT (time difference petween the calibraiton pulses) */
+    m_slotAverageDeltaTMapComparison[16]; /**< Map of the Ratio of the  average  DeltaT (time difference petween the calibration pulses) */
     std::vector<TH2F*>
-    m_slotSigmaDeltaTMapComparison[16]; /**< Map of Ratio of the Standard deviation on  DeltaT (time difference petween the calibraiton pulses) */
+    m_slotSigmaDeltaTMapComparison[16]; /**< Map of Ratio of the Standard deviation on  DeltaT (time difference petween the calibration pulses) */
 
 
     // Delta T ratio plots, whole detector
     std::vector<TH1F*>
-    m_topAverageDeltaTComparison; /**< Average of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number on the whole detector*/
+    m_topAverageDeltaTComparison; /**< Average of the DeltaT (time difference petween the calibration pulses) distribution, as function of the channel number on the whole detector*/
     std::vector<TH1F*>
-    m_topSigmaDeltaTComparison; /**< Standard deviation of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number  on the whole detector*/
+    m_topSigmaDeltaTComparison; /**< Standard deviation of the DeltaT (time difference petween the calibration pulses) distribution, as function of the channel number  on the whole detector*/
     std::vector<TH1F*>
     m_topSampleOccupancyComparison; /**< Ratios of the average sample occupancy on the whole detector */
 

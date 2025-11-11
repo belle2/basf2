@@ -11,10 +11,11 @@
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 #include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
 
-#include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 #include <tracking/ckf/pxd/utilities/PXDAdvancer.h>
 
 namespace Belle2 {
+  class CKFToPXDResult;
+
   /// Names of the variables to be generated.
   constexpr
   static char const* const pxdResultVarNames[] = {

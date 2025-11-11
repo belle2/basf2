@@ -15,6 +15,10 @@
 #include <tracking/dataobjects/TrackClusterSeparation.h>
 
 #include <mva/interface/Interface.h>
+#include <mva/interface/Weightfile.h>
+#include <mva/interface/Expert.h>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
+
 #include <boost/algorithm/string/predicate.hpp>
 
 // here's where the functions are hidden

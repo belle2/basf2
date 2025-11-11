@@ -6,7 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "pxd/modules/pxdDQM/PXDDQMExpressRecoModule.h"
+#include <pxd/modules/pxdDQM/PXDDQMExpressRecoModule.h>
+#include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDCluster.h>
 
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>

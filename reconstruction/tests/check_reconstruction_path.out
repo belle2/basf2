@@ -1496,9 +1496,9 @@
   139. ParticleSelector_applyCuts_gamma:skim
       cut=isFromECL
       decayString=gamma:skim
-  140. ParticleLoader_K_S0:V0_ToFit -> pi+ pi-
+  140. ParticleLoader_K_S0:V0_ToFit_KFit -> pi+ pi-
       addDaughters=False
-      decayStrings=['K_S0:V0_ToFit -> pi+ pi-']
+      decayStrings=['K_S0:V0_ToFit_KFit -> pi+ pi-']
       dummyCovMatrix=10000.0
       dummyMDSTIndex=0
       dummyTreatAsInvisible=True
@@ -1516,28 +1516,28 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  141. PListCopy_K_S0:V0_ToFit
+  141. PListCopy_K_S0:V0_ToFit_KFit
       cut=
       ignoreMotherFlavor=False
       inputListNames=['K_S0:V0']
-      outputListName=K_S0:V0_ToFit
+      outputListName=K_S0:V0_ToFit_KFit
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  142. ParticleVertexFitter_K_S0:V0_ToFit
+  142. ParticleVertexFitter_K_S0:V0_ToFit_KFit
       confidenceLevel=0.0
       decayString=
       fitType=vertex
-      listName=K_S0:V0_ToFit
+      listName=K_S0:V0_ToFit_KFit
       massConstraintList=[]
       recoilMass=0.0
       smearing=0.0
       updateDaughters=False
       vertexFitter=KFit
       withConstraint=
-  143. ParticleSelector_applyCuts_K_S0:V0_ToFit
+  143. ParticleSelector_applyCuts_K_S0:V0_ToFit_KFit
       cut=0.450 < M < 0.550
-      decayString=K_S0:V0_ToFit
+      decayString=K_S0:V0_ToFit_KFit
   144. ParticleLoader_pi+:all
       addDaughters=False
       decayStrings=['pi+:all']
@@ -1558,42 +1558,42 @@
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
       writeOut=False
-  145. ParticleCombiner_K_S0:RD -> pi+:all pi-:all
+  145. ParticleCombiner_K_S0:RD_KFit -> pi+:all pi-:all
       allowChargeViolation=False
       chargeConjugation=True
       cut=0.3 < M < 0.7
       decayMode=1
-      decayString=K_S0:RD -> pi+:all pi-:all
+      decayString=K_S0:RD_KFit -> pi+:all pi-:all
       ignoreIfTooManyCandidates=True
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  146. ParticleVertexFitter_K_S0:RD
+  146. ParticleVertexFitter_K_S0:RD_KFit
       confidenceLevel=0.0
       decayString=
       fitType=vertex
-      listName=K_S0:RD
+      listName=K_S0:RD_KFit
       massConstraintList=[]
       recoilMass=0.0
       smearing=0.0
       updateDaughters=False
       vertexFitter=KFit
       withConstraint=
-  147. ParticleSelector_applyCuts_K_S0:RD
+  147. ParticleSelector_applyCuts_K_S0:RD_KFit
       cut=0.450 < M < 0.550
-      decayString=K_S0:RD
-  148. PListMerger_K_S0:merged
+      decayString=K_S0:RD_KFit
+  148. PListMerger_K_S0:merged_KFit
       cut=
       ignoreMotherFlavor=False
-      inputListNames=['K_S0:V0_ToFit', 'K_S0:RD']
-      outputListName=K_S0:merged
+      inputListNames=['K_S0:V0_ToFit_KFit', 'K_S0:RD_KFit']
+      outputListName=K_S0:merged_KFit
       preferLowest=True
       variable=particleSource
       writeOut=False
   149. PListCutAndCopy_K_S0:dstSkim
       cut=goodBelleKshort == 1
       ignoreMotherFlavor=False
-      inputListNames=['K_S0:merged']
+      inputListNames=['K_S0:merged_KFit']
       outputListName=K_S0:dstSkim
       preferLowest=True
       variable=mdstIndex

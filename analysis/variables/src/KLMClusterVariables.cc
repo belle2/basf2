@@ -403,22 +403,22 @@ Returns the number of Tracks matched to the KLMCluster associated to this Partic
                      Returns the number of ECLClusters matched to the KLMCluster associated to this Particle.
               )DOC");
   REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
-                    "Returns the distance between KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.",
+                    "Returns the distance between KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
                     "cm");
   REGISTER_VARIABLE("klmClusterTrackRotationAngle", klmClusterTrackRotationAngle,
                     "Returns the angle between the direction at the IP and at the POCA to the KLMCluster associated to this Particle for the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
                     "rad");
   REGISTER_VARIABLE("klmClusterTrackSeparationAngle", klmClusterTrackSeparationAngle,
-                    "Returns the angle between the KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship"
+                    "Returns the angle between the KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
                     "rad");
 
   REGISTER_VARIABLE("klmClusterShapeStdDev1", klmClusterShapeStdDev1,
-                    "Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster."
+                    "Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
                     "cm");
   REGISTER_VARIABLE("klmClusterShapeStdDev2", klmClusterShapeStdDev2,
-                    "Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster."
+                    "Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
                     "cm");
   REGISTER_VARIABLE("klmClusterShapeStdDev3", klmClusterShapeStdDev3,
-                    "Returns the std deviation of the 3rd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster."
+                    "Returns the std deviation of the 3rd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
                     "cm");
 }

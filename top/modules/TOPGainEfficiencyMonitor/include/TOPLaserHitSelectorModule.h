@@ -83,11 +83,11 @@ namespace Belle2 {
 
   private:
 
-    TH2F* m_TimeHeightHistogramForFit[c_NPixelPerModule *
+    TH2F* m_TimeHeightHistogramForFit[c_NPixelPerModule*
                                       c_NModule] = {0}; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for gain*/
-    TH2F* m_TimeHeightHistogramForHitRate[c_NPixelPerModule *
+    TH2F* m_TimeHeightHistogramForHitRate[c_NPixelPerModule*
                                           c_NModule] = {0}; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for efficiency */
-    TH2F* m_TimeIntegralHistogramForFit[c_NPixelPerModule *
+    TH2F* m_TimeIntegralHistogramForFit[c_NPixelPerModule*
                                         c_NModule] = {0}; /**< array of histogram pointer to 2D histogram of hit timing vs integral distribution for each pixel (all 8,192 pixels) for gain*/
     TH1F* m_nCalPulseHistogram =
       0; /**< histogram to store the number of events with calibration pulse(s) identified for each asic (1,024 in total),
@@ -102,7 +102,7 @@ namespace Belle2 {
     float m_calibrationPulseThreshold1 =
       300; /**< minimum pulse height for the first calibration pulse to be qualified as calibration signals */
     float m_calibrationPulseThreshold2 =
-      100; /**< minimum pulse height for the secon calibration pulse to be qualified as calibration signals */
+      100; /**< minimum pulse height for the second calibration pulse to be qualified as calibration signals */
     float m_calibrationPulseInterval = 25.5; /**< nominal DeltaT value (time interval of two calibration signals) in a unit of ns */
     float m_calibrationPulseIntervalRange = 2; /**< tolerable shift of DeltaT from its nominal before calibration in a unit of ns */
     int m_windowSelect = 0; /**< select window number is [All=0, Odd=2, Even=1]*/

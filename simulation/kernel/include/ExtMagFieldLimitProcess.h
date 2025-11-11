@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef EXTMAGFIELDLIMITPROCESS_H_
-#define EXTMAGFIELDLIMITPROCESS_H_
+#pragma once
 
 #include <globals.hh>
 #include "G4VDiscreteProcess.hh"
@@ -58,5 +57,3 @@ namespace Belle2 {
   } //end namespace Simulation
 
 } //end Belle2 namespace
-
-#endif /* EXTMAGFIELDLIMITPROCESS_H_ */

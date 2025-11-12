@@ -103,8 +103,8 @@ void CDCDedxValidationAlgorithm::getExpRunInfo()
 
   updateDBObjPtrs(1, rstart, estart);
 
-  if (m_suffix.length() > 0) m_suffix = Form("%s_e%d_r%d", m_suffix.data(), estart, rstart);
-  else  m_suffix = Form("e%d_r%d", estart, rstart);
+  if (m_suffix.length() > 0) m_suffix = Form("%s_e%d", m_suffix.data(), estart);
+  else  m_suffix = Form("e%d", estart);
 }
 
 

@@ -152,7 +152,7 @@ void RootInputModule::initialize()
   // Event metadata from all files, keep it around for sanity checks and globaltag replay
   std::vector<FileMetaData> fileMetaData;
   // and if so, what is the sum
-  std::result_of<decltype(&FileMetaData::getMcEvents)(FileMetaData)>::type sumInputMCEvents{0};
+  std::invoke_result_t<decltype(&FileMetaData::getMcEvents), FileMetaData> sumInputMCEvents{0};
 
   // scope for local variables
   {

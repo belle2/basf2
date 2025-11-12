@@ -543,7 +543,7 @@ class TauToMuMuMu(BaseSkim):
     """
     **Channel**: :math:`\\tau \\to \\mu \\mu \\mu and \\tau \\to \\pi \\pi \\pi for control sample`
 
-    **Output particle lists**: ``mu+:goodtrack, pi+:control``
+    **Output particle lists**: ``mu+:tau_3mu_goodtrack, pi+:tau_3mu_control``
 
     **Criteria for 3mu states**: Number of good tracks < 7, :math:`1.4 < M < 2.0` GeV, :math:`-1.0 < \\Delta E < 0.5` GeV
 
@@ -565,14 +565,14 @@ class TauToMuMuMu(BaseSkim):
     def build_lists(self, path):
         # particle selection
         trackCuts = "[-3.0 < dz < 3.0] and [dr < 1.0]"
-        ma.cutAndCopyList("pi+:goodtrack", "pi+:all", trackCuts, path=path)
-        ma.cutAndCopyList("pi+:control", "pi+:all", trackCuts + ' and [pionID > 0.9]', path=path)
-        ma.cutAndCopyList("mu+:goodtrack", "mu+:all", trackCuts, path=path)
+        ma.cutAndCopyList("pi+:tau_3mu_goodtrack", "pi+:all", trackCuts, path=path)
+        ma.cutAndCopyList("pi+:tau_3mu_control", "pi+:all", trackCuts + ' and [pionID > 0.9]', path=path)
+        ma.cutAndCopyList("mu+:tau_3mu_goodtrack", "mu+:all", trackCuts, path=path)
 
         # reconstruct tau->mumumu
         ma.reconstructDecay(
-            decayString="tau+:mumumu -> mu+:goodtrack mu+:all mu-:all",
-            cut="[nParticlesInList(pi+:goodtrack) < 7] and [1.4 < M < 2.0] and [-1.0 < deltaE < 0.5]",
+            decayString="tau+:mumumu -> mu+:tau_3mu_goodtrack mu+:all mu-:all",
+            cut="[nParticlesInList(pi+:tau_3mu_goodtrack) < 7] and [1.4 < M < 2.0] and [-1.0 < deltaE < 0.5]",
             dmID=0,
             path=path)
         Condition_one = '[[daughter(0, p)>daughter(1, p)] and [daughter(0, p)>daughter(2, p)] and [daughter(0, muonID) > 0.1]]'
@@ -582,15 +582,15 @@ class TauToMuMuMu(BaseSkim):
 
         # reconstruct tau->pipipi
         ma.reconstructDecay(
-            decayString="tau+:control -> pi+:control pi+:control pi-:control",
-            cut="[nParticlesInList(pi+:goodtrack) < 7] and [0.5 < M < 2.0] and [-1.0 < deltaE < 0.5]",
+            decayString="tau+:tau_3mu_control -> pi+:tau_3mu_control pi+:tau_3mu_control pi-:tau_3mu_control",
+            cut="[nParticlesInList(pi+:tau_3mu_goodtrack) < 7] and [0.5 < M < 2.0] and [-1.0 < deltaE < 0.5]",
             dmID=1,
             path=path)
 
         # combine list
-        ma.copyLists(outputListName="tau+:comb", inputListNames=["tau+:mumumu", "tau+:control"], path=path)
+        ma.copyLists(outputListName="tau+:tau_3mu_comb", inputListNames=["tau+:mumumu", "tau+:tau_3mu_control"], path=path)
 
-        return ["tau+:comb"]
+        return ["tau+:tau_3mu_comb"]
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import

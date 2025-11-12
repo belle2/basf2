@@ -2205,6 +2205,6 @@ class LambdacToGeneric(BaseSkim):
             f"Z0:inc1{suffix}", cut=f"daughter(0,useCMSFrame(p)) > {p_cms}", path=path
         )
 
-        DList = [f"Z0:inc1{suffix}", ]
+        DList = [f"Z0:inc1{suffix}",]
 
         return DList

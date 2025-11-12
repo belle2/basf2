@@ -509,37 +509,6 @@ void KLMTimeAlgorithm::createHistograms()
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h2c_timeFSLP[iF][iS][iL][iP] = new TH2F(hn.Data(), ht.Data(), 54, 0, 54, nBin_scint, m_LowerTimeBoundaryCalibratedScintillatorsBKLM,
                                                   m_UpperTimeBoundaryCalibratedScintillatorsBKLM);
-
-          int nchannel_max = BKLMElementNumbers::getNStrips(iF, iS + 1, iL + 1, iP);
-          for (int iC = 0; iC < nchannel_max; ++iC) {
-            // hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_tc", iF, iS, iL, iP, iC);
-            // ht = Form("time distribution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
-            //           iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-            // h_timeFSLPC_tc[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintillatorsBKLM,
-            //                                               m_UpperTimeBoundaryScintillatorsBKLM);
-
-            // hn = Form("h_timeF%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
-            // ht = Form("time distribution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
-            //           iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-            // h_timeFSLPC[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintillatorsBKLM,
-            //                                            m_UpperTimeBoundaryScintillatorsBKLM);
-
-            // hn = Form("hc_timeF%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
-            // ht = Form("Calibrated time distribution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
-            //           iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-            // hc_timeFSLPC[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryCalibratedScintillatorsBKLM,
-            //                                             m_UpperTimeBoundaryCalibratedScintillatorsBKLM);
-            // hn = Form("time_length_bklm_F%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
-            // double stripLength = 200;
-            // m_HistTimeLengthBKLM[iF][iS][iL][iP][iC] =
-            //   new TH2F(hn.Data(),
-            //            "Time versus propagation length; "
-            //            "propagation distance[cm]; "
-            //            "T_rec-T_0-T_fly-'T_calibration'[ns]",
-            //            200, 0.0, stripLength,
-            //            400, m_LowerTimeBoundaryCalibratedScintillatorsBKLM,
-            //            m_UpperTimeBoundaryCalibratedScintillatorsBKLM);
-          }
         }
       }
 
@@ -575,25 +544,6 @@ void KLMTimeAlgorithm::createHistograms()
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h2c_timeFSLP[iF][iS][iL][iP] = new TH2F(hn.Data(), ht.Data(), 48, 0, 48, nBin, m_LowerTimeBoundaryCalibratedRPC,
                                                   m_UpperTimeBoundaryCalibratedRPC);
-
-          int nchannel_max = BKLMElementNumbers::getNStrips(iF, iS + 1, iL + 1, iP);
-          for (int iC = 0; iC < nchannel_max; ++iC) {
-            // hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_tc", iF, iS, iL, iP, iC);
-            // ht = Form("Time distribution for RPC of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
-            //           iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-            // h_timeFSLPC_tc[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
-
-            // hn = Form("h_timeF%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
-            // ht = Form("Time distribution for RPC of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
-            //           iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-            // h_timeFSLPC[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
-
-            // hn = Form("hc_timeF%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
-            // ht = Form("Calibrated time distribution for RPC of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
-            //           iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-            // hc_timeFSLPC[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin, m_LowerTimeBoundaryCalibratedRPC,
-            //                                             m_UpperTimeBoundaryCalibratedRPC);
-          }
         }
       }
     }
@@ -658,36 +608,6 @@ void KLMTimeAlgorithm::createHistograms()
           h2c_timeFSLP_end[iF][iS][iL][iP] = new TH2F(hn.Data(), ht.Data(), 75, 0, 75, nBin_scint,
                                                       m_LowerTimeBoundaryCalibratedScintillatorsEKLM,
                                                       m_UpperTimeBoundaryCalibratedScintillatorsEKLM);
-
-          for (int iC = 0; iC < 75; ++iC) {
-            // hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_tc_end", iF, iS, iL, iP, iC);
-            // ht = Form("Time distribution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
-            //           iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-            // h_timeFSLPC_tc_end[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintillatorsEKLM,
-            //                                                   m_UpperTimeBoundaryScintillatorsEKLM);
-
-            // hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_end", iF, iS, iL, iP, iC);
-            // ht = Form("Time distribution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
-            //           iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-            // h_timeFSLPC_end[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintillatorsEKLM,
-            //                                                m_UpperTimeBoundaryScintillatorsEKLM);
-            // hn = Form("hc_timeF%d_S%d_L%d_P%d_C%d_end", iF, iS, iL, iP, iC);
-            // ht = Form("Calibrated time distribution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
-            //           iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-            // hc_timeFSLPC_end[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryCalibratedScintillatorsEKLM,
-            //                                                 m_UpperTimeBoundaryCalibratedScintillatorsEKLM);
-            // hn = Form("time_length_eklm_F%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
-            // double stripLength = m_EKLMGeometry->getStripLength(iC + 1) /
-            //                      CLHEP::cm * Unit::cm;
-            // m_HistTimeLengthEKLM[iF][iS][iL][iP][iC] =
-            //   new TH2F(hn.Data(),
-            //            "Time versus propagation length; "
-            //            "propagation distance[cm]; "
-            //            "T_rec-T_0-T_fly-'T_calibration'[ns]",
-            //            200, 0.0, stripLength,
-            //            400, m_LowerTimeBoundaryCalibratedScintillatorsEKLM,
-            //            m_UpperTimeBoundaryCalibratedScintillatorsEKLM);
-          }
         }
       }
     }
@@ -1988,14 +1908,6 @@ void KLMTimeAlgorithm::saveHist()
           dir_time_FSLP[iF][iS][iL][iP] = dir_time_FSL[iF][iS][iL]->mkdir(dirname, "", true);
           dir_time_FSLP[iF][iS][iL][iP]->cd();
 
-          // int nchannel_max = BKLMElementNumbers::getNStrips(iF, iS + 1, iL + 1, iP);
-          // for (int iC = 0; iC < nchannel_max; ++iC) {
-          //   if (iL < 2)
-          //     m_HistTimeLengthBKLM[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP[iF][iS][iL][iP]);
-          //   h_timeFSLPC[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP[iF][iS][iL][iP]);
-          //   hc_timeFSLPC[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP[iF][iS][iL][iP]);
-          //   delete h_timeFSLPC_tc[iF][iS][iL][iP][iC];
-          // }
         }
       }
     }
@@ -2031,12 +1943,6 @@ void KLMTimeAlgorithm::saveHist()
           dir_time_FSLP_end[iF][iS][iL][iP] = dir_time_FSL_end[iF][iS][iL]->mkdir(dirname, "", true);
           dir_time_FSLP_end[iF][iS][iL][iP]->cd();
 
-          // for (int iC = 0; iC < 75; ++iC) {
-          //   h_timeFSLPC_end[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP_end[iF][iS][iL][iP]);
-          //   hc_timeFSLPC_end[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP_end[iF][iS][iL][iP]);
-          //   m_HistTimeLengthEKLM[iF][iS][iL][iP][iC]->SetDirectory(dir_time_FSLP_end[iF][iS][iL][iP]);
-          //   delete h_timeFSLPC_tc_end[iF][iS][iL][iP][iC];
-          // }
         }
       }
     }

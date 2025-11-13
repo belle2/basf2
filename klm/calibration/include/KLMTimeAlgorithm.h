@@ -806,7 +806,8 @@ namespace Belle2 {
     /** Output file. */
     TFile* m_outFile = nullptr;
 
-    bool m_saveAllPlots = false; // default minimal unless you set true in your header script
+    /** Default minimal unless you set true in your header script */
+    bool m_saveAllPlots = false;
 
     /** Write per-channel temporary histograms (_tc/raw/hc_) in minimal mode. */
     bool m_saveChannelHists = false;

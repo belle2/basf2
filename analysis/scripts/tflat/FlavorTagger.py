@@ -32,7 +32,18 @@ def fill_particle_lists(maskName='TFLATDefaultMask', path=None):
     ma.fillParticleList('pi+:tflat', trk_cut, path=path)
 
     # create particle list with gammas
+
+    # load MVA's for all gamma
+    ma.fillParticleList(
+        "gamma:all",
+        "",
+        path=path,
+    )
+    ma.getBeamBackgroundProbability("gamma:all", "MC15ri", path=path)
+    ma.getFakePhotonProbability("gamma:all", "MC15ri", path=path)
+
     stdPhotons(listtype='tight',  path=path)
+
     gamma_cut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5'
     ma.cutAndCopyList('gamma:tflat', 'gamma:tight', gamma_cut, path=path)
 

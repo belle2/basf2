@@ -59,6 +59,18 @@ config.update({  # Input lists
         'clusterE1E9',
         'clusterE9E21',
         'clusterLAT',
+        # temp new variables
+        'beamBackgroundSuppression',
+        'fakePhotonSuppression',
+        'clusterZernikeMVA',
+        'clusterAbsZernikeMoment40',
+        'clusterAbsZernikeMoment51',
+        'clusterDeltaLTemp',
+        'clusterKlId',
+        'clusterSecondMoment',
+        'clusterPulseShapeDiscriminationMVA',
+        'clusterTrackMatch',
+        'minC2TDist',
     ],
 
     'roe_variable_list': [

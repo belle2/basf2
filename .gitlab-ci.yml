@@ -121,6 +121,7 @@ run-tests:
     expose_as: 'sphinx documentation'
     paths:
         - build_doc/html/
+    expire_in: 30 days
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
     - mkdir -p input_tests_reports output_tests_reports

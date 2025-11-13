@@ -398,13 +398,16 @@ class InclusiveUpsilonLoose(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * Upsilon(1S,2S,3S) -> mu^+ mu^- with no requirement on the rest of the event
+    * :math:`\\Upsilon(1S,2S,3S) \\to \\mu^+ \\mu^-` with no requirement on the rest of the event
 
-    Selection criteria:
+    Reconstructed decays
+        * :math:`\\Upsilon \\to \\mu^+ \\mu^-`
 
-    * 2 charged tracks
-      dr < 1 and -3 < dz < 3 and muonID > 0.6 for the muon tracks
-      M(mu+mu-) > 8.5
+    Cuts applied
+        * :math:`dr < 1 \\text{cm}, |dz| < 3 \\text{cm}`
+        * :math:` muonID > 0.6`
+        * :math:`M(\\mu^+\\mu^-) > 8.5 \\text{GeV}/c^2`
+
     """
 
     __authors__ = ["Federico Testa"]

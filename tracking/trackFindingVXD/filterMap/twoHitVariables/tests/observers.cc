@@ -42,10 +42,10 @@ using namespace Belle2;
  *
  * */
 
-template class StoreArray<SVDCluster>;
-template class StoreArray<PXDCluster>;
-template class StoreArray<MCParticle>;
-template class StoreArray<SpacePoint>;
+template class Belle2::StoreArray<Belle2::SVDCluster>;
+template class Belle2::StoreArray<Belle2::PXDCluster>;
+template class Belle2::StoreArray<Belle2::MCParticle>;
+template class Belle2::StoreArray<Belle2::SpacePoint>;
 
 namespace VXDTFObserversTest {
 

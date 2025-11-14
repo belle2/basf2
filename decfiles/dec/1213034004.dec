@@ -1,14 +1,15 @@
-# EventType: 1213034003 
-# Descriptor: B+ -> anti-D*0 [-> anti-D0 (-> K+ pi-) pi0] rho+ (-> pi+ pi0)
-# NickName: B_Dsrho_D0pi0_Kpi
-# Documentation:  
+# EventType: 1213034004 
+# Descriptor: B+ -> anti-D*0 rho+ long.
+# NickName: B_Dsrho_D0pi0_Kpi_long
+# Documentation: B+ -> anti-D*0 rho+ longitudinal polarisation 
 # Tested: Yes
 # PhysicsWG: BHadronic
 # Responsible: Xiang Zhao
 # Email: xiangzhao@mail.nankai.edu.cn
 # Cuts: None
-# Date: 2025/09/08
+# Date: 2025/10/16
 
+# B_Dsrho_Kpi 
 Alias pi0sig pi0 
 Alias rho-sig rho- 
 Alias rho+sig rho+ 
@@ -20,7 +21,7 @@ Decay Upsilon(4S)
 Enddecay 
 
 Decay B-sig 
-1.00 D*0sig rho-sig PHOTOS SVV_HELAMP 0.228 0.95 0.932 0 0.283 1.13; 
+1.00 D*0sig rho-sig PHOTOS SVV_HELAMP 0 0.95 0.932 0 0 1.13; 
 Enddecay 
 CDecay B+sig 
 

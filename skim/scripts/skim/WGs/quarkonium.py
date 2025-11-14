@@ -405,7 +405,7 @@ class InclusiveUpsilonLoose(BaseSkim):
 
     Cuts applied
         * :math:`dr < 1 \\text{cm}, |dz| < 3 \\text{cm}`
-        * :math:` muonID > 0.6`
+        * :math:`muonID > 0.6`
         * :math:`M(\\mu^+\\mu^-) > 8.5 \\text{GeV}/c^2`
 
     """
@@ -421,11 +421,11 @@ class InclusiveUpsilonLoose(BaseSkim):
 
         muon_cuts = "[dr < 1] and [dz > -3] and [dz < 3] and [muonID > 0.6]"
 
-        # create and fill e/mu/pi/photon ParticleLists
+        # create and fill mu ParticleLists
         ma.fillParticleList("mu+:InclusiveUpsilonLoose", "", path=path)
         ma.applyCuts("mu+:InclusiveUpsilonLoose", muon_cuts, path=path)
 
-        # Y(1S,2S) are reconstructed with e^+ e^- or mu^+ mu^-
+        # Ys are reconstructed with or mu^+ mu^-
         ma.reconstructDecay(
             "Upsilon:InclusiveUpsilonLoose -> mu+:InclusiveUpsilonLoose mu-:InclusiveUpsilonLoose",
             "M > 8.5",

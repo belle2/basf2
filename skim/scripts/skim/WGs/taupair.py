@@ -571,14 +571,14 @@ class TauToMuMuMu(BaseSkim):
 
         # reconstruct tau->mumumu
         ma.reconstructDecay(
-            decayString="tau+:mumumu -> mu+:tau_3mu_goodtrack mu+:all mu-:all",
+            decayString="tau+:tau_3mu_mumumu -> mu+:tau_3mu_goodtrack mu+:all mu-:all",
             cut="[nParticlesInList(pi+:tau_3mu_goodtrack) < 7] and [1.4 < M < 2.0] and [-1.0 < deltaE < 0.5]",
             dmID=0,
             path=path)
         Condition_one = '[[daughter(0, p)>daughter(1, p)] and [daughter(0, p)>daughter(2, p)] and [daughter(0, muonID) > 0.1]]'
         Condition_two = '[[daughter(1, p)>daughter(0, p)] and [daughter(1, p)>daughter(2, p)] and [daughter(1, muonID) > 0.1]]'
         Condition_three = '[[daughter(2, p)>daughter(0, p)] and [daughter(2, p)>daughter(1, p)] and [daughter(2, muonID) > 0.1]]'
-        ma.applyCuts('tau+:mumumu', Condition_one + ' or ' + Condition_two + ' or ' + Condition_three, path=path)
+        ma.applyCuts('tau+:tau_3mu_mumumu', Condition_one + ' or ' + Condition_two + ' or ' + Condition_three, path=path)
 
         # reconstruct tau->pipipi
         ma.reconstructDecay(
@@ -588,7 +588,7 @@ class TauToMuMuMu(BaseSkim):
             path=path)
 
         # combine list
-        ma.copyLists(outputListName="tau+:tau_3mu_comb", inputListNames=["tau+:mumumu", "tau+:tau_3mu_control"], path=path)
+        ma.copyLists(outputListName="tau+:tau_3mu_comb", inputListNames=["tau+:tau_3mu_mumumu", "tau+:tau_3mu_control"], path=path)
 
         return ["tau+:tau_3mu_comb"]
 

@@ -29,6 +29,15 @@
 #include <TH2F.h>
 #include <TProfile.h>
 
+/* C++ STL headers. */
+#include <functional>
+#include <map>     // For std::map in readCalibrationDataCounts
+#include <utility> // For std::pair in readCalibrationDataFor2DFit
+#include <vector>  // For std::vector in readCalibrationDataFor2DFit
+#include <functional>  // ADD THIS - needed for std::function in readCalibrationDataBatch
+
+class TFile;  // forward declaration
+
 namespace Belle2 {
 
   /**
@@ -160,6 +169,25 @@ namespace Belle2 {
     }
 
     /**
+     * Save every preallocated debug histogram family (sectors/layers/planes/2D maps).
+     * Default is false (minimal mode).
+     */
+    void setSaveAllPlots(bool on)
+    {
+      m_saveAllPlots = on;
+    }
+
+    /**
+     * When running in minimal mode, also write the per-channel temporary histograms
+     * (the vital _tc, raw, hc_ 1D’s created on-the-fly) before deleting them.
+     * Default is false.
+     */
+    void setSaveChannelHists(bool on)
+    {
+      m_saveChannelHists = on;
+    }
+
+    /**
      * Save histograms to file.
      */
     void saveHist();
@@ -224,9 +252,39 @@ namespace Belle2 {
     CalibrationAlgorithm::EResult readCalibrationData();
 
     /**
+     * Count events per channel (lightweight scan without loading full data).
+     * @param[out] eventCounts Map from channel number to event count.
+     */
+    void readCalibrationDataCounts(std::map<KLMChannelNumber, unsigned int>& eventCounts);
+
+    /**
+     * Load calibration data only for channels needed for 2D fit.
+     * @param[in] channelsBKLM BKLM channels sorted by event count.
+     * @param[in] channelsEKLM EKLM channels sorted by event count.
+     */
+    void readCalibrationDataFor2DFit(
+      const std::vector<std::pair<KLMChannelNumber, unsigned int>>& channelsBKLM,
+      const std::vector<std::pair<KLMChannelNumber, unsigned int>>& channelsEKLM);
+
+    /**
+     * Load calibration data for a specific batch of channels.
+     * @param[in] channelFilter Function that returns true for channels in the batch.
+     */
+    void readCalibrationDataBatch(std::function<bool(const KLMChannelIndex&)> channelFilter);
+
+    /**
      * Create histograms.
      */
     void createHistograms();
+
+    /**
+     * Optionally write a histogram, then delete it to free memory.
+     * Used for on-the-fly per-channel hists in minimal mode.
+     */
+    void writeThenDelete_(TH1* h, bool write);
+
+    /** Same as above, but for 2D histograms. */
+    void writeThenDelete_(TH2* h, bool write);
 
     /**
      * Fill profiles of time versus distance.
@@ -748,7 +806,12 @@ namespace Belle2 {
     /** Output file. */
     TFile* m_outFile = nullptr;
 
+    /** Default minimal unless you set true in your header script */
+    bool m_saveAllPlots = false;
+
+    /** Write per-channel temporary histograms (_tc/raw/hc_) in minimal mode. */
+    bool m_saveChannelHists = false;
+
   };
 
 }
-

@@ -2473,6 +2473,42 @@ def looseMCTruth(list_name, path):
     path.add_module(mcMatch)
 
 
+def matchTagTruth(list_name, path):
+    """
+    Performs tag matching for all particles in the specified ParticleList.
+    The difference between tag and normal mc matching algorithm is that
+    a (ccbar) tag (usually defined by ccbarFEI) does not correspond to an actual MC particle.
+    Instead the tag is meant to capture everything except the signal particle.
+    Requires that normal MC matching has already been performed and set relations.
+    Also note that low energy photons with energy < 0.1 GeV and ISR are ignored.
+    The results of (ccbar) tag matching algorithm are stored to the following extraInfo items:
+    - ccbarTagSignal: 1st digit is status of signal particle, 2nd digit is Nleft-1, 3rd digit is NextraFSP.
+    - ccbarTagMCpdg: PDG code of (charm) hadron outside tag (signal side).
+    - ccbarTagNleft: number of particles (composites have priority) left outisde tag.
+    - ccbarTagNextraFSP: number of extra FSP particles attached to the tag.
+    - ccbarTagSignalStatus: status of the targeted signal side particle.
+    - ccbarTagNwoMC: number of daughters without MC match.
+    - ccbarTagNwoMCMother: number of daughters without MC mother.
+    - ccbarTagNnoAllMother: number of daughters without common allmother.
+    - ccbarTagNmissGamma: number of daughters with missing gamma mc error.
+    - ccbarTagNmissNeutrino: number of daughters with missing neutrino mc error.
+    - ccbarTagNdecayInFlight: number of daughters with decay in flight mc error.
+    - ccbarTagNsevereMCError: number of daughters with severe mc error.
+    - ccbarTagNmissRecoDaughters: number of daughters with any mc error.
+    - ccbarTagNleft2ndPDG: PDG of one particle left additionally to the signal particle.
+    - ccbarTagAllMotherPDG: PDG code of the allmother (Z0 or virtual photon).
+
+    @param list_name name of the input ParticleList
+    @param path      modules are added to this path
+    """
+
+    mcMatch = register_module('MCMatcherParticles')
+    mcMatch.set_name('ccbarTagMatch_' + list_name)
+    mcMatch.param('listName', list_name)
+    mcMatch.param('ccbarTagMatching', True)
+    path.add_module(mcMatch)
+
+
 def buildRestOfEvent(target_list_name, inputParticlelists=None,
                      fillWithMostLikely=True,
                      chargedPIDPriors=None, path=None):

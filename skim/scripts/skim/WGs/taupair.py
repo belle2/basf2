@@ -541,7 +541,7 @@ class TauThrust(BaseSkim):
 @fancy_skim_header
 class TauToMuMuMu(BaseSkim):
     """
-    **Channel**: :math:`\\tau \\to \\mu \\mu \\mu and \\tau \\to \\pi \\pi \\pi for control sample`
+    **Channel**: :math:`\\tau \\to \\mu \\mu \\mu` and `\\tau \\to \\pi \\pi \\pi` for control sample
 
     **Output particle lists**: ``mu+:tau_3mu_goodtrack, pi+:tau_3mu_control``
 

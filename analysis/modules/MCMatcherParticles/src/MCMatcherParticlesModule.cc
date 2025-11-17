@@ -58,6 +58,7 @@ MCMatcherParticlesModule::MCMatcherParticlesModule() : Module()
                  "items:\n\n"
                  "- ccbarTagSignal: 1st digit is status of signal particle, 2nd digit is Nleft-1, 3rd digit is NextraFSP.\n"
                  "- ccbarTagMCpdg: PDG code of (charm) hadron outside tag (signal side).\n"
+                 "- ccbarTagMCpdgMother: PDG code of the mother of the (charm) hadron outside tag (signal side).\n"
                  "- ccbarTagNleft: number of particles (composites have priority) left outisde tag.\n"
                  "- ccbarTagNextraFSP: number of extra FSP particles attached to the tag.\n"
                  "- ccbarTagSignalStatus: status of the targeted signal side particle.\n"
@@ -366,17 +367,19 @@ void MCMatcherParticlesModule::setCCbarTagMatch(const Particle* particle)
     if ((pdg > 400 && pdg < 500) || (pdg > 4000 && pdg < 5000) || (pdg > 10400 && pdg < 10500) || (pdg > 20400 && pdg < 20500)) {
       foundCharm = true;
       thisParticle->addExtraInfo("ccbarTagMCpdg", mcpart->getPDG());
+      thisParticle->addExtraInfo("ccbarTagMCpdgMother", mcpart->getMother()->getPDG());
       break;
     }
   }
   if (!foundCharm) {
     thisParticle->addExtraInfo("ccbarTagMCpdg", 0);
+    thisParticle->addExtraInfo("ccbarTagMCpdgMother", 0);
   }
-  thisParticle->addExtraInfo("ccbarTagNleft", missedParticles.size());
-  ccbarTagSignal += 10 * (missedParticles.size() - 1);
   thisParticle->addExtraInfo("ccbarTagNextraFSP", fspDaughters.size());
-  ccbarTagSignal += 100 * fspDaughters.size();
-  thisParticle->addExtraInfo("ccbarTagSignal", fspDaughters.size());
+  ccbarTagSignal += 10 * fspDaughters.size();
+  thisParticle->addExtraInfo("ccbarTagNleft", missedParticles.size());
+  ccbarTagSignal += 100 * (missedParticles.size() - 1);
+  thisParticle->addExtraInfo("ccbarTagSignal", ccbarTagSignal);
 
   // debugging purposes only, to be removed, probably
   int secondLeftParticle = 0;

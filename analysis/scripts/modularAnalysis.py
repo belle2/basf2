@@ -2484,6 +2484,7 @@ def matchTagTruth(list_name, path):
     The results of (ccbar) tag matching algorithm are stored to the following extraInfo items:
     - ccbarTagSignal: 1st digit is status of signal particle, 2nd digit is Nleft-1, 3rd digit is NextraFSP.
     - ccbarTagMCpdg: PDG code of (charm) hadron outside tag (signal side).
+    - ccbarTagMCpdgMother: PDG code of the mother of the (charm) hadron outside tag (signal side).
     - ccbarTagNleft: number of particles (composites have priority) left outisde tag.
     - ccbarTagNextraFSP: number of extra FSP particles attached to the tag.
     - ccbarTagSignalStatus: status of the targeted signal side particle.

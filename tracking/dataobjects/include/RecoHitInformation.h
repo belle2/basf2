@@ -338,6 +338,6 @@ namespace Belle2 {
       addRelationTo(hit);
     }
 
-    ClassDef(RecoHitInformation, 7); /**< This class implements additional information for hits */
+    ClassDef(RecoHitInformation, 6); /**< This class implements additional information for hits */
   };
 }

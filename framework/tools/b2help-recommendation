@@ -446,7 +446,7 @@ def get_argument_parser():
     """
     Get the argument parser.
     """
-    parser = argparse.ArgumentParser(description="Outputs recommendation for data/MC corrections and systematics, use tags to navigate.")
+    parser = argparse.ArgumentParser(description="Outputs recommendation for data/MC corrections and systematics, use tags to navigate. Can also be accessed via web version: https://belle2.pages.desy.de/performance/recommendations/")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-mc", "--mccampaign", help="Show recommendations for this MC campaign and the corresponding data processing",
                         choices=MC_CAMPAIGN)

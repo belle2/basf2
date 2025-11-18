@@ -1707,7 +1707,8 @@ def add_simple_vtx_tracking_reconstruction(path, components=['VTX', 'CDC'], prun
     path.add_module("RelatedTracksCombiner",
                     CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
                     VXDRecoTracksStoreArrayName="RecoTracksVTX",
-                    recoTracksStoreArrayName="RecoTracks")
+                    recoTracksStoreArrayName="RecoTracks",
+                    allowMultipleRelations=True)
 
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")
 

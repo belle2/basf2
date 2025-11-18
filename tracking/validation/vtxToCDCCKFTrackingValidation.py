@@ -70,7 +70,8 @@ class vtxToCDCCKF(TrackingValidationRun):
         path.add_module("RelatedTracksCombiner",
                         CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
                         VXDRecoTracksStoreArrayName="RecoTracksVTX",
-                        recoTracksStoreArrayName="RecoTracks")
+                        recoTracksStoreArrayName="RecoTracks",
+                        allowMultipleRelations=True)
 
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")
 

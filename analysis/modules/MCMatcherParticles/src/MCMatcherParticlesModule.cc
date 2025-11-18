@@ -49,8 +49,8 @@ MCMatcherParticlesModule::MCMatcherParticlesModule() : Module()
                  "  common mother\n"
                  "- looseMCWrongDaughterPDG: PDG code of the daughter that doesn't originate from\n"
                  "  the most common mother (only if looseMCWrongDaughterN = 1)\n"
-                 "- looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background\n"
-                 "  Particle"
+                 "- looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background Particle\n"
+                 "\n"
                  "Can also perform tag matching for (ccbar) tags. Requires that normal MC\n"
                  "matching has already been performed and set relations.\n"
                  "Low energy photons with energy < 0.1 GeV and ISR are ignored.\n"
@@ -328,7 +328,6 @@ void MCMatcherParticlesModule::setCCbarTagMatch(const Particle* particle)
   const MCParticle* allMother = nullptr;
   for (int i = 0; i < mcparticles.getEntries(); i++) {
     if (abs(mcparticles[i]->getPDG()) == 23 ||
-        abs(mcparticles[i]->getPDG()) == 10022 ||
         abs(mcparticles[i]->getPDG()) == 553 ||
         abs(mcparticles[i]->getPDG()) == 100553 ||
         abs(mcparticles[i]->getPDG()) == 200553 ||

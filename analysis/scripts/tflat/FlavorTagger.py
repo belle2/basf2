@@ -44,7 +44,8 @@ def fill_particle_lists(maskName='TFLATDefaultMask', path=None):
 
     stdPhotons(listtype='tight',  path=path)
 
-    gamma_cut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5'
+    gamma_cut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + \
+        ') > 0.5 and beamBackgroundSuppression > 0.4 and fakePhotonSuppression > 0.3'
     ma.cutAndCopyList('gamma:tflat', 'gamma:tight', gamma_cut, path=path)
 
     ma.reconstructDecay('K_S0:inRoe -> pi+:tflat pi-:tflat', '0.40<=M<=0.60', False, path=path)

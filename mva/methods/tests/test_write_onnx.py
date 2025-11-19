@@ -5,12 +5,12 @@ import unittest
 
 import basf2
 import b2test_utils
-import basf2_mva
+from basf2_mva_util import create_onnx_mva_weightfile
 import torch
 from torch import nn
 
 
-def save_onnx(model, general_options, specific_options, identifier):
+def save_onnx(model, filename, variables, **kwargs):
     """
     Export a torch model to onnx and write it into a MVA weightfile
     """
@@ -19,18 +19,14 @@ def save_onnx(model, general_options, specific_options, identifier):
     print("convert to onnx")
     torch.onnx.export(
         model,
-        (torch.zeros(1, len(general_options.m_variables)),),
+        (torch.zeros(1, len(variables)),),
         "model.onnx",
         input_names=["input"],
         output_names=["output"],
     )
-    wf = ROOT.Belle2.MVA.Weightfile()
-    general_options.m_method = specific_options.getMethod()
-    wf.addOptions(general_options)
-    wf.addOptions(specific_options)
-    wf.addFile("ONNX_Modelfile", "model.onnx")
-    print(f"save to {identifier}")
-    ROOT.Belle2.MVA.Weightfile.save(wf, identifier)
+    weightfile = create_onnx_mva_weightfile("model.onnx", variables=variables, **kwargs)
+    print(f"save to {filename}")
+    weightfile.save(filename)
 
 
 class TestWriteONNX(unittest.TestCase):
@@ -38,6 +34,9 @@ class TestWriteONNX(unittest.TestCase):
     Tests for writing ONNX MVA weightfiles. In addition to testing the writing
     mechanism, these serve the purpose of creating test files for other unit tests.
     """
+
+    #: show long diff in case of mismatching xml files
+    maxDiff = None
 
     def create_and_save(self, n_outputs, filename, weights):
         """
@@ -65,16 +64,20 @@ class TestWriteONNX(unittest.TestCase):
         ]
         model = nn.Linear(len(variables), n_outputs)
         model.load_state_dict(weights)
-        general_options = basf2_mva.GeneralOptions()
-        general_options.m_datafiles = basf2_mva.vector("dummy")
-        general_options.m_identifier = "Simple"
-        general_options.m_treename = "tree"
-        general_options.m_variables = basf2_mva.vector(*variables)
         if n_outputs > 1:
-            general_options.m_nClasses = n_outputs
-        specific_options = basf2_mva.ONNXOptions()
+            nClasses = n_outputs
+        else:
+            nClasses = 2
         with b2test_utils.clean_working_directory():
-            save_onnx(model, general_options, specific_options, filename)
+            save_onnx(
+                model,
+                filename,
+                variables=variables,
+                datafiles=["dummy"],
+                identifier="Simple",
+                treename="tree",
+                nClasses=nClasses,
+            )
             with open(filename) as f:
                 xml_new = f.read()
         ref_path = Path(basf2.find_file("mva/methods/tests")) / filename
@@ -83,6 +86,10 @@ class TestWriteONNX(unittest.TestCase):
                 xml_ref = f.read()
         except FileNotFoundError:
             # if the file does not exist, recreate it, but still fail the test
+            #
+            # This has to be done when new options are added to ONNXOptions and
+            # therefore the xml changes. In this case, just delete the xmls and
+            # rerun the test to generate new reference files.
             with open(ref_path, "w") as f:
                 f.write(xml_new)
             raise Exception(f"Wrote new reference file {str(ref_path)}")

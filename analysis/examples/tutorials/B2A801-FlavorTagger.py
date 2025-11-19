@@ -96,7 +96,7 @@ b2.conditions.append_globaltag(ma.getAnalysisGlobaltag())
 #
 # NEVER set uploadToDatabaseAfterTraining to True if you are not a librarian!!!
 #
-# BGx1 stays for MC generated with machine Background.
+# BGx1 stands for MC generated with machine Background.
 # The official weight files are trained using B0-> nu_tau anti-nu_tau as signal channel (no CP violation)
 # to avoid that the flavor tagger learns asymmetries on the tag side.
 # Only this kind of weight files are supported since release-03-01-00.

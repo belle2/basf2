@@ -41,7 +41,7 @@ namespace Belle2 {
     virtual int getNRays() const = 0;
 
     /**
-     * Belle2::MaterialScanBase::createNext() implemention
+     * Belle2::MaterialScanBase::createNext() implementation
      * Get the origin and direction for the next scan particle.
      * @param origin Origin of the next scan particle
      * @param direction Direction of the next scan particle
@@ -101,7 +101,7 @@ namespace Belle2 {
 
     /** Constructor
      * @param rootFile Pointer to the ROOTFile where the histograms will be stored.
-     * @param name Prefix to preprend to all Histograms
+     * @param name Prefix to prepend to all Histograms
      * @param axisLabel Labels for the histogram axes, separated by semicolon
      * @param params Parameters for the scan
      */
@@ -188,7 +188,7 @@ namespace Belle2 {
     bool m_doCosTheta;
   };
 
-  /** Specific implementaion of MaterialScan to scan parallel to a given plane.
+  /** Specific implementation of MaterialScan to scan parallel to a given plane.
    *
    * Particles will be created in a grid on the given plane and will be traced
    * perpendicluar to that plane The plane is defined by one origin and the
@@ -355,9 +355,9 @@ namespace Belle2 {
     double m_rayMaxDepth{1000};
     /** Number of rays to shoot (if opening angle is >0) */
     unsigned int m_rayCount{0};
-    /** Wether or not to do a spherical scan */
+    /** Whether or not to do a spherical scan */
     bool m_doSpherical;
-    /** Wether or not to do a planar scan */
+    /** Whether or not to do a planar scan */
     bool m_doPlanar;
     /** Perform the spherical scan uniform in cos(theta) instead of theta */
     bool m_doCosTheta;

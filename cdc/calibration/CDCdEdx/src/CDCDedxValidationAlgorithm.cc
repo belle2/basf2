@@ -103,8 +103,8 @@ void CDCDedxValidationAlgorithm::getExpRunInfo()
 
   updateDBObjPtrs(1, rstart, estart);
 
-  if (m_suffix.length() > 0) m_suffix = Form("%s_e%d_r%d", m_suffix.data(), estart, rstart);
-  else  m_suffix = Form("e%d_r%d", estart, rstart);
+  if (m_suffix.length() > 0) m_suffix = Form("%s_e%d", m_suffix.data(), estart);
+  else  m_suffix = Form("e%d", estart);
 }
 
 
@@ -342,8 +342,8 @@ void CDCDedxValidationAlgorithm::bhabhaValidation()
 //------------------------------------
 void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, std::string var, std::string stype)
 {
-  int xbins;
-  double xmin, xmax;
+  int xbins = 0;
+  double xmin = 0.0, xmax = 0.0;
   double binWidth = 0.0;
 
   if (var == "mom") {
@@ -474,8 +474,8 @@ void CDCDedxValidationAlgorithm::printCanvasdEdx(std::array<std::vector<TH1D*>, 
 
 void CDCDedxValidationAlgorithm::printCanvas(std::vector<TH1D*>& htemp, std::string namesfx, std::string svar)
 {
-  int xbins;
-  double xmin, xmax;
+  int xbins = 0;
+  double xmin = 0.0, xmax = 0.0;
 
   if (svar == "mom") {
     xbins = m_momBins; xmin = m_momMin; xmax = m_momMax;
@@ -838,6 +838,7 @@ void CDCDedxValidationAlgorithm::DatabaseIN(int experiment, int run)
   }
 
   auto& dbConfiguration = Conditions::Configuration::getInstance();
+  dbConfiguration.overrideGlobalTags();
   dbConfiguration.setGlobalTags({"online"});
   if (!m_testingPayloadName.empty() && m_GlobalTagName.empty()) {
     dbConfiguration.prependTestingPayloadLocation(m_testingPayloadName);

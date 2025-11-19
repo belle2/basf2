@@ -169,11 +169,13 @@ class CleanBasf2Execution:
         """
         Set the signal handlers for SIGINT and SIGTERM to out own one.
         """
+        # \cond false positive doxygen warning
         signal.signal(signal.SIGINT, self.signal_handler)
         signal.signal(signal.SIGTERM, self.signal_handler)
         # Just for safety, also register an exit handler
         atexit.unregister(self.signal_handler)
         atexit.register(self.signal_handler, signal.SIGTERM, None)
+        # \endcond
 
     @staticmethod
     def has_process_ended(process):

@@ -34,7 +34,7 @@ namespace Belle2 {
       /** Function that is called at each event when "urgent" stack is empty. */
       virtual void NewStage();
 
-      /** Function called at begining of event. */
+      /** Function called at beginning of event. */
       virtual void PrepareNewEvent();
 
       /** Set fraction of Cerenkov photons that are actually propagated. */

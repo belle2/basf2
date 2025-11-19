@@ -52,13 +52,13 @@ involving neutrinos, referred to as B\ :sub:`sig`.
      What is the difference between both analysis strategies? What are advantages and disadvantages?
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      The documentation can be found in the :ref:`analysis/doc/AdvancedTopics:Advanced Topics` section of the analysis module.
      The definitions can be found in the section titled ``Hadronic, Semileptonic and Inclusive Tagging``.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      The documentation is here: `FullEventInterpretation`
 
@@ -93,7 +93,7 @@ In addition to the usual python packages (``basf2`` and `modularAnalysis`) we al
     You can again use mdst files from ``${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021``.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
@@ -117,18 +117,18 @@ There is also a convenience function for that!
     prepend it to the list using a function documented at :ref:`conditionsdb_overview`.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     You can get the recommended tag using `modularAnalysis.getAnalysisGlobaltag`
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     The function to prepend to the list of global tags is `conditions.prepend_globaltag <ConditionsConfiguration.prepend_globaltag>`.
     Now combine this with the last hint!
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     Include it in the steering file like this:
 
@@ -161,7 +161,7 @@ default and can be controlled with the argument ``baryonic``.
     Configure `fei.get_default_channels` as described above and assign it to a variable.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
@@ -182,7 +182,7 @@ in a single Global Tag and is ``prefix=FEIv1_2025_MC16ri_aldebaran_200`` for the
     Configure `fei.FeiConfiguration` as described above and assign it to a variable.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
@@ -202,12 +202,12 @@ to the main path with the `basf2.Path.add_path` method.
     method to add it to your main path.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     The syntax is ``mainpath.add_path(feipath)``.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
@@ -242,7 +242,7 @@ You should already be familiar with these topics from the previous exercises.
     Finally, start the event loop with a call to `basf2.process`.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Go back to :ref:`onlinebook_first_steering_file` to see the step-by-step instructions on how to add MC matching,
     write the ntuple and start the event loop.
@@ -250,7 +250,7 @@ You should already be familiar with these topics from the previous exercises.
     Aliases are introduced in :ref:`onlinebook_various_additions`, check there if you are unsure how to use them.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     MC matching:
 
@@ -282,7 +282,7 @@ candidate.
     nTuple.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     You should already be familiar with Best Candidate Selection from the :ref:`onlinebook_various_additions` lesson.
     The documentation on ``rankByHighest`` can be found here: `modularAnalysis.rankByHighest`.
@@ -291,7 +291,7 @@ candidate.
     the alias should be created for ``extraInfo(FEIProbabilityRank)``.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
@@ -307,7 +307,7 @@ lists all modules and their statistics in the event loop.
 Execute your steering file which should look somewhat like this:
 
 .. admonition:: Final steering file
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
@@ -337,7 +337,7 @@ indicator for the quality of the B mesons we have reconstructed.
     classification as they are almost always incorrect.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. code-block:: python
 
@@ -366,7 +366,7 @@ indicator for the quality of the B mesons we have reconstructed.
     The distribution of `Mbc` you have just plotted doesn't peak at the B meson mass of 5.28 GeV. Can you explain this?
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     We haven't really used the classifier output of the FEI yet. The up to 20 candidates in each event are selected by
     FEI Signal Probability but many still have low absolute classifier values and by definition almost all of them are
@@ -391,7 +391,7 @@ indicator for the quality of the B mesons we have reconstructed.
 
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. code-block:: python
 
@@ -465,12 +465,12 @@ Lets get started with the usual steps. Nothing here should be new to you.
     ``dr < 0.5 and abs(dz) < 2 and nCDCHits > 20 and thetaInCDCAcceptance``
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     You should already be familiar with this from :ref:`onlinebook_first_steering_file`.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
@@ -500,7 +500,7 @@ Just add this flag to the end of the decay string in `modularAnalysis.reconstruc
     Add the ``?nu`` flag as described above.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
@@ -528,7 +528,7 @@ B\ :sub:`sig` we have just created.
     Have we forgotten something?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Think of special properties of B\ :sup:`0` mesons compared to B\ :sup:`+` mesons.
 
@@ -536,7 +536,7 @@ B\ :sub:`sig` we have just created.
     to create the second particle list and the `modularAnalysis.copyLists` function to combine both lists.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     To account for B\ :sup:`0` meson mixing, you should also combine same-sign B\ :sup:`0` mesons as the
     anti-B\ :sup:`0` can oscillate to a B\ :sup:`0`.
@@ -563,7 +563,7 @@ value of `dz` (``abs(dz)``) to below 4. The two other cuts (on `pt` and `thetaIn
     chapter :ref:`onlinebook_roe` and the additional track cuts mentioned above.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     The track cuts should be ``thetaInCDCAcceptance and pt > 0.075 and dr < 2 and abs(dz) < 4`` and the ecl cuts
     ``thetaInCDCAcceptance and E > 0.05``.
@@ -571,7 +571,7 @@ value of `dz` (``abs(dz)``) to below 4. The two other cuts (on `pt` and `thetaIn
     To append the ROE mask, use `modularAnalysis.appendROEMasks`.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
@@ -620,7 +620,7 @@ This variable is called `nROE_Charged` in ``basf2``. It needs the ROE mask name 
     Finally, don't forget to process the path!
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     If you have forgotten how to use aliases: This is introduced in :ref:`onlinebook_various_additions`.
 
@@ -628,7 +628,7 @@ This variable is called `nROE_Charged` in ``basf2``. It needs the ROE mask name 
     will be ``nROE_Charged(my_mask)``.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
@@ -638,7 +638,7 @@ This variable is called `nROE_Charged` in ``basf2``. It needs the ROE mask name 
 You can now execute your steering file which should look somewhat like this:
 
 .. admonition:: Final steering file
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
@@ -668,7 +668,7 @@ an MC sample with only four decay channels.
 
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. code-block:: python
 

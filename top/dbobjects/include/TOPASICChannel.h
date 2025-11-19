@@ -16,7 +16,7 @@
 namespace Belle2 {
 
   /**
-   * Calibration constants of a singe ASIC channel: pedestals, gains and time axis
+   * Calibration constants of a single ASIC channel: pedestals, gains and time axis
    */
   class TOPASICChannel: public TObject {
   public:

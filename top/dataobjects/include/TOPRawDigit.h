@@ -57,7 +57,7 @@ namespace Belle2 {
     {}
 
     /**
-     * Usefull constructor
+     * Useful constructor
      * @param scrodID SCROD ID
      * @param dataType data type
      */

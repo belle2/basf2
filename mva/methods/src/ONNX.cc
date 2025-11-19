@@ -62,11 +62,28 @@ void Session::run(const std::vector<const char*>& inputNames,
 void ONNXOptions::load(const boost::property_tree::ptree& pt)
 {
   m_outputName = pt.get<std::string>("ONNX_outputName", "output");
+  m_modelFilename = pt.get<std::string>("ONNX_modelFilename", "model.onnx");
 }
 
 void ONNXOptions::save(boost::property_tree::ptree& pt) const
 {
   pt.put("ONNX_outputName", m_outputName);
+  pt.put("ONNX_modelFilename", m_modelFilename);
+}
+
+Weightfile ONNXTeacher::train(Dataset&) const
+{
+  B2WARNING("The ONNX interface does not perform any training - "
+            "the train method just stores an existing ONNX model into an MVA weightfile.");
+  if (m_specific_options.m_modelFilename.empty()) {
+    B2FATAL("You have to provide a path to an ONNX model "
+            "via `m_modelFilename` in the specific options");
+  }
+  Weightfile weightfile;
+  weightfile.addOptions(m_general_options);
+  weightfile.addOptions(m_specific_options);
+  weightfile.addFile("ONNX_Modelfile", m_specific_options.m_modelFilename);
+  return weightfile;
 }
 
 void ONNXExpert::configureInputOutputNames()
@@ -117,6 +134,26 @@ void ONNXExpert::configureInputOutputNames()
   }
 }
 
+void ONNXExpert::configureOutputValueIndex()
+{
+  int tensorIndex = 0;
+  for (auto name : m_session->getOrtSession().GetOutputNames()) {
+    if (name == m_outputName)
+      break;
+    ++tensorIndex;
+  }
+  auto typeInfo = m_session->getOrtSession().GetOutputTypeInfo(tensorIndex);
+  auto shape = typeInfo.GetTensorTypeAndShapeInfo().GetShape();
+  if (shape.back() == 2) {
+    // We have 2 output values
+    // -> configure to use signal_class index (default 1) in non-multiclass mode
+    m_outputValueIndex = m_general_options.m_signal_class;
+  } else {
+    // otherwise use the default of 0
+    m_outputValueIndex = 0;
+  }
+}
+
 void ONNXExpert::load(Weightfile& weightfile)
 {
   std::string onnxModelFileName = weightfile.generateFileName();
@@ -125,30 +162,32 @@ void ONNXExpert::load(Weightfile& weightfile)
   weightfile.getOptions(m_specific_options);
   m_session = std::make_unique<Session>(onnxModelFileName.c_str());
   configureInputOutputNames();
+  configureOutputValueIndex();
 }
 
 std::vector<float> ONNXExpert::apply(Dataset& testData) const
 {
-  auto nFeatures = testData.getNumberOfFeatures();
-  auto nEvents = testData.getNumberOfEvents();
+  const auto nFeatures = testData.getNumberOfFeatures();
+  const auto nEvents = testData.getNumberOfEvents();
+  const int nOutputs = (m_outputValueIndex == 1) ? 2 : 1;
   auto input = Tensor<float>::make_shared({1, nFeatures});
-  auto output = Tensor<float>::make_shared({1, 1});
+  auto output = Tensor<float>::make_shared({1, nOutputs});
   std::vector<float> result;
   result.reserve(nEvents);
   for (unsigned int iEvent = 0; iEvent < nEvents; ++iEvent) {
     testData.loadEvent(iEvent);
     input->setValues(testData.m_input);
     m_session->run({{m_inputName, input}}, {{m_outputName, output}});
-    result.push_back(output->at(0));
+    result.push_back(output->at(m_outputValueIndex));
   }
   return result;
 }
 
 std::vector<std::vector<float>> ONNXExpert::applyMulticlass(Dataset& testData) const
 {
-  unsigned int nClasses = m_general_options.m_nClasses;
-  auto nFeatures = testData.getNumberOfFeatures();
-  auto nEvents = testData.getNumberOfEvents();
+  const unsigned int nClasses = m_general_options.m_nClasses;
+  const auto nFeatures = testData.getNumberOfFeatures();
+  const auto nEvents = testData.getNumberOfEvents();
   auto input = Tensor<float>::make_shared({1, nFeatures});
   auto output = Tensor<float>::make_shared({1, nClasses});
   std::vector<std::vector<float>> result(nEvents, std::vector<float>(nClasses));

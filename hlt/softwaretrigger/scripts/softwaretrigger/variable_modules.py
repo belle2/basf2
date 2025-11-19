@@ -56,8 +56,10 @@ class PickleHarvestingModule(HarvestingModule):
 
     def refine(self, crops):
         """Receive the gathered crops and saves them into a ROOT file."""
+        # \cond false positive doxygen warning
         with open(self.output_file_name, "wb") as f:
             pickle.dump(crops, f)
+        # \endcond
 
 
 class SummarizeTriggerResults(PickleHarvestingModule):

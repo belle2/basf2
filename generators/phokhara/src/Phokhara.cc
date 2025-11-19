@@ -46,9 +46,9 @@ extern "C" {
    * @param drvec array to store the random numbers
    * @param length size of the array
    */
-  void phokhara_rndmarray(double* drvec, const int* lengt)
+  void phokhara_rndmarray(double* drvec, const int* length)
   {
-    for (int i = 0; i < *lengt; ++i) {
+    for (int i = 0; i < *length; ++i) {
       drvec[i] = gRandom->Rndm();
     }
   }

@@ -292,13 +292,12 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, cons
         if (nhitBin < 0) nhitBin = 0;
         else if (nhitBin >= nbins) nhitBin = nbins - 1;
 
-        if (res_cor != 0 && nhitBin >= 0 && nhitBin < (int)hdedx_var.size())
+        if (res_cor != 0)
           hdedx_var[nhitBin]->Fill((dedx_new - dedx_cur) / res_cor);
 
-        if (nhitBin >= 0 && nhitBin < nbins) {
-          sumvar[nhitBin] += nhits;
-          sumsize[nhitBin] += 1;
-        }
+        sumvar[nhitBin] += nhits;
+        sumsize[nhitBin] += 1;
+
       } else { // costh
         double denom = (upper - lower);
         int cosBin = static_cast<int>((costh - lower) / denom * nbins);
@@ -306,12 +305,10 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, cons
         if (cosBin < 0) cosBin = 0;
         else if (cosBin >= nbins) cosBin = nbins - 1;
 
-        if (cosBin >= 0 && cosBin < (int)hdedx_var.size()) {
-          double res_cor = sgpar.nhitPrediction(nhits) * sgpar.ionzPrediction(dedx_cur) * timereso;
-          if (res_cor != 0) hdedx_var[cosBin]->Fill((dedx_new - dedx_cur) / res_cor);
-          sumvar[cosBin] += costh;
-          sumsize[cosBin] += 1;
-        }
+        double res_cor = sgpar.nhitPrediction(nhits) * sgpar.ionzPrediction(dedx_cur) * timereso;
+        if (res_cor != 0) hdedx_var[cosBin]->Fill((dedx_new - dedx_cur) / res_cor);
+        sumvar[cosBin] += costh;
+        sumsize[cosBin] += 1;
       }
     }
 

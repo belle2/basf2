@@ -543,7 +543,7 @@ class TauToMuMuMu(BaseSkim):
     """
     **Channel**: :math:`\\tau \\to \\mu \\mu \\mu, \\tau \\to \\pi \\pi \\pi`
 
-    **Output particle lists**: ``mu+:tau_3mu_goodtrack, pi+:tau_3mu_control``
+    **Output particle lists**: ``mu+:tau_3mu_goodtrack, pi+:tau_3mu_goodtrack``
 
     **Criteria for 3mu states**: Number of good tracks < 7, :math:`1.4 < M < 2.0` GeV, :math:`-1.0 < \\Delta E < 0.5` GeV
 
@@ -566,7 +566,6 @@ class TauToMuMuMu(BaseSkim):
         # particle selection
         trackCuts = "[-3.0 < dz < 3.0] and [dr < 1.0]"
         ma.cutAndCopyList("pi+:tau_3mu_goodtrack", "pi+:all", trackCuts, path=path)
-        ma.cutAndCopyList("pi+:tau_3mu_control", "pi+:all", trackCuts + ' and [pionID > 0.9]', path=path)
         ma.cutAndCopyList("mu+:tau_3mu_goodtrack", "mu+:all", trackCuts, path=path)
 
         # reconstruct tau->mumumu
@@ -575,14 +574,10 @@ class TauToMuMuMu(BaseSkim):
             cut="[nParticlesInList(pi+:tau_3mu_goodtrack) < 7] and [1.4 < M < 2.0] and [-1.0 < deltaE < 0.5]",
             dmID=0,
             path=path)
-        Condition_one = '[[daughter(0, p)>daughter(1, p)] and [daughter(0, p)>daughter(2, p)] and [daughter(0, muonID) > 0.1]]'
-        Condition_two = '[[daughter(1, p)>daughter(0, p)] and [daughter(1, p)>daughter(2, p)] and [daughter(1, muonID) > 0.1]]'
-        Condition_three = '[[daughter(2, p)>daughter(0, p)] and [daughter(2, p)>daughter(1, p)] and [daughter(2, muonID) > 0.1]]'
-        ma.applyCuts('tau+:tau_3mu_mumumu', Condition_one + ' or ' + Condition_two + ' or ' + Condition_three, path=path)
 
         # reconstruct tau->pipipi
         ma.reconstructDecay(
-            decayString="tau+:tau_3mu_control -> pi+:tau_3mu_control pi+:tau_3mu_control pi-:tau_3mu_control",
+            decayString="tau+:tau_3mu_control -> pi+:tau_3mu_goodtrack pi+:all pi-:all",
             cut="[nParticlesInList(pi+:tau_3mu_goodtrack) < 7] and [0.5 < M < 2.0] and [-1.0 < deltaE < 0.5]",
             dmID=1,
             path=path)

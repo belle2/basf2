@@ -655,12 +655,12 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
     if (total_events >= dead_alarm.required_statistics) {
       double min_occupancy;
       const std::string run_type = getRunType();
-      if (run_type == "null" || run_type == "debug" || run_type == "cosmic") {
-        // For null runs, occupancy should be higher than 0.0001%
-        min_occupancy = 1e-6;
-      } else if (run_type == "physics") {
+      if (run_type == "physics") {
         // For physics runs, occupancy should be higher than 0.01%
         min_occupancy = 1e-4;
+      } else {
+        // For every other run type, occupancy should be higher than 0.0001%
+        min_occupancy = 1e-6;
       }
       if (not_normalized) {
         // The histogram is not normalized, multiply the threshold by evt count

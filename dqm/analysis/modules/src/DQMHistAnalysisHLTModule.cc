@@ -358,7 +358,7 @@ void DQMHistAnalysisHLTModule::event()
     }
   }
 
-  if (m_hMeanTime.second) delete m_hMeanTime.secon;
+  if (m_hMeanTime.second) delete m_hMeanTime.second;
   m_hMeanTime.second = (TH1F*) meanTimeHistogram->Clone("MeanTime");
   m_hMeanTime.second->Scale(1 / numberOfProcesses);
 

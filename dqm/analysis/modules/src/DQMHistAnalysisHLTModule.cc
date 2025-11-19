@@ -358,23 +358,29 @@ void DQMHistAnalysisHLTModule::event()
     }
   }
 
+  if (m_hMeanTime.second) delete m_hMeanTime.secon;
   m_hMeanTime.second = (TH1F*) meanTimeHistogram->Clone("MeanTime");
   m_hMeanTime.second->Scale(1 / numberOfProcesses);
 
+  if (m_hMeanMemory.second) delete m_hMeanMemory.second;
   m_hMeanMemory.second = (TH1F*) meanMemoryHistogram->Clone("MeanMemoryChange");
   m_hMeanMemory.second->Scale(1 / numberOfProcesses);
 
+  if (m_hErrorFlagFraction.second) delete m_hErrorFlagFraction.second;
   m_hErrorFlagFraction.second = (TH1D*) errorFlagHistogram->Clone("ErrorFlagFraction");
   m_hErrorFlagFraction.second->Scale(1 / numberOfAllEvents);
   m_hErrorFlagFraction.second->SetTitle("Fraction of events with error flags");
 
+  if (m_hFilteredFractionPerUnit.second) delete m_hFilteredFractionPerUnit.second;
   m_hFilteredFractionPerUnit.second = (TH1D*) hltUnitNumberHistogram_filtered->Clone("FilteredFractionPerUnit");
   m_hFilteredFractionPerUnit.second->Divide(hltUnitNumberHistogram_filtered, hltUnitNumberHistogram);
   m_hFilteredFractionPerUnit.second->SetTitle("Fraction of events filtered per unit");
 
+  if (m_hMeanBudgetTimePerUnit.second) delete m_hMeanBudgetTimePerUnit.second;
   m_hMeanBudgetTimePerUnit.second = (TH1F*) fullTimeMeanPerUnitHistogram->Clone("MeanBudgetTimePerUnit");
   m_hMeanBudgetTimePerUnit.second->Divide(fullTimeMeanPerUnitHistogram, processesPerUnitHistogram);
 
+  if (m_hMeanProcessingTimePerUnit.second) delete m_hMeanProcessingTimePerUnit.second;
   m_hMeanProcessingTimePerUnit.second = (TH1F*) processingTimeMeanPerUnitHistogram->Clone("MeanProcessingTimePerUnit");
   m_hMeanProcessingTimePerUnit.second->Divide(processingTimeMeanPerUnitHistogram, processesPerUnitHistogram);
 

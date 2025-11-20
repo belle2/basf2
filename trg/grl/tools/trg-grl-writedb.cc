@@ -25,7 +25,7 @@ void setgrlconfig()
   };
 
   float ecltaunn_threshold[N_config] = {
-    -1
+    -1.5
     };
   unsigned ecltaunn_nMLP[N_config] = {
     1
@@ -34,7 +34,7 @@ void setgrlconfig()
     false
   };
   std::vector<std::vector<float>> ecltaunn_nHidden[N_config];
-  std::vector<float> eclaunn_nHidden_0 = {24, 48, 24};
+  std::vector<float> eclaunn_nHidden_0 = {24, 24, 24};
   ecltaunn_nHidden[0].push_back(eclaunn_nHidden_0);
   unsigned ecltaunn_n_cdc_sector[N_config] = {
     0
@@ -49,7 +49,7 @@ void setgrlconfig()
   ecltaunn_i_ecl_sector[0].push_back(1 * 6 * 4);
 
   char wfilename[N_config][10][1000] = {{{
-        "/home/t2k/taichiro/public/grl_20250828/weights.dat"
+        "/group/belle/users/zhaoxy/hls1112/neuralGRL/hls4ml_Latency/firmware/weights/all_weights.txt"
       }
     }
   };
@@ -71,7 +71,7 @@ void setgrlconfig()
   }
 
   char bfilename[N_config][10][1000] = {{{
-        "/home/t2k/taichiro/public/grl_20250828/bias.dat"
+        "/group/belle/users/zhaoxy/hls1112/neuralGRL/hls4ml_Latency/firmware/weights/all_bias.txt"
       }
     }
   };
@@ -93,26 +93,27 @@ void setgrlconfig()
   }
 
   std::vector<std::vector<int>> total_bit_bias[N_config] = {
-    {{ 8, 10, 6, 2 }}
+    {{ 5, 7, 6, 2 }}   // total bits
   };
   std::vector<std::vector<int>> int_bit_bias[N_config] {
-    {{ 4, 5, 2, 1 }}
+    {{ 5, 5, 3, 32 }}   // integer bits
   };
   std::vector<std::vector<bool>> is_signed_bias[N_config] {
     {{ true, true, true, false }}
   };
   std::vector<std::vector<int>> rounding_bias[N_config] {
-    {{ 0, 0, 0, 0 }}
+    {{ 0, 0, 0, 0 }}   // 0 = truncate
   };
   std::vector<std::vector<int>> saturation_bias[N_config] {
-    {{ 2, 2, 2, 2 }}
+    {{ 2, 2, 2, 2 }}   // 2 = saturate
   };
 
+////////////////////////////////////////////////////////////////////////////
   std::vector<std::vector<int>> total_bit_accum[N_config] {
-    {{27, 28, 24, 23 }}
+    {{29, 29, 24, 25 }}
   };
   std::vector<std::vector<int>> int_bit_accum[N_config] {
-    {{17, 16, 14, 9 }}
+    {{15, 14, 12, 9 }}
   };
   std::vector<std::vector<bool>> is_signed_accum[N_config] {
     {{ true, true, true, true }}
@@ -123,81 +124,90 @@ void setgrlconfig()
   std::vector<std::vector<int>> saturation_accum[N_config] {
     {{ 2, 2, 2, 2 }}
   };
-
-  std::vector<std::vector<int>> total_bit_weight[N_config] {
-    {{13, 15, 13, 10}}
-  };
-  std::vector<std::vector<int>> int_bit_weight[N_config] {
-    {{ 3, 5, 4, 1}}
-  };
-  std::vector<std::vector<bool>> is_signed_weight[N_config] {
-    {{ true, true, true, true}}
-  };
-  std::vector<std::vector<int>> rounding_weight[N_config] {
-    {{ 0, 0, 0, 0}}
-  };
-  std::vector<std::vector<int>> saturation_weight[N_config] {
-    {{ 2, 2, 2, 2}}
+////////////////////////////////////////////////////////////////////
+  std::vector<std::vector<int>> total_bit_weight[N_config] = {
+    {{ 17, 17, 13, 12 }}
   };
 
-  std::vector<std::vector<int>> total_bit_relu[N_config] {
-    {{16, 14, 15}}
-  };
-  std::vector<std::vector<int>> int_bit_relu[N_config] {
-    {{13, 11, 9}}
-  };
-  std::vector<std::vector<bool>> is_signed_relu[N_config] {
-    {{ false, false, false}}
-  };
-  std::vector<std::vector<int>> rounding_relu[N_config] {
-    {{ 0, 0, 0}}
-  };
-  std::vector<std::vector<int>> saturation_relu[N_config] {
-    {{ 2, 2, 2}}
+  std::vector<std::vector<int>> int_bit_weight[N_config] = {
+    {{ 3, 5, 3, 1 }}
   };
 
+  std::vector<std::vector<bool>> is_signed_weight[N_config] = {
+    {{ true, true, true, true }}  //
+  };
+
+  std::vector<std::vector<int>> rounding_weight[N_config] = {
+    {{ 0, 0, 0, 0 }}      // 0 = truncate
+  };
+
+  std::vector<std::vector<int>> saturation_weight[N_config] = {
+    {{ 2, 2, 2, 2 }}      // 2 = saturate
+  };
+
+///////////////////////////////////////////////////////////////////////////////////////
+  std::vector<std::vector<int>> total_bit_relu[N_config] = {
+    {{ 15, 15, 15 }}  //
+  };
+
+  std::vector<std::vector<int>> int_bit_relu[N_config] = {
+    {{ 10, 9, 8 }}  //
+  };
+
+  std::vector<std::vector<bool>> is_signed_relu[N_config] = {
+    {{ false, false, false }}  //
+  };
+
+  std::vector<std::vector<int>> rounding_relu[N_config] = {
+    {{ 0, 0, 0 }}       // 0 = truncate
+  };
+
+  std::vector<std::vector<int>> saturation_relu[N_config] = {
+    {{ 2, 2, 2 }}       // 2 = saturate
+  };
+
+//////////////////////////////////////////////////////////////////////////////////////
   std::vector<std::vector<int>> total_bit[N_config] {
-    {{20, 19, 20}}
+    {{20, 20, 19}}
   };
   std::vector<std::vector<int>> int_bit[N_config] {
-    {{17, 16, 14}}
+    {{15, 14, 12}}
   };
   std::vector<std::vector<bool>> is_signed[N_config] {
-    {{ true, true, true}}
+    {{true, true, true}}
   };
   std::vector<std::vector<int>> rounding[N_config] {
-    {{ 0, 0, 0}}
+    {{0, 0, 0}}
   };
   std::vector<std::vector<int>> saturation[N_config] {
-    {{ 2, 2, 2}}
+    {{2, 2, 2}}
   };
 
+
   std::vector<std::vector<std::vector<int>>> W_input[N_config] {
-    {{
-        { 7, 14, 0, 8, 11, 0, 10, 13, 12, 6, 0, 0, 8, 0, 0, 14, 11, 0, 10, 0, 0, 5, 0, 9},
-        {
-          7, 9, 11, 6, 11, 12, 0, 9, 0, 9, 5, 8, 4, 7, 12, 7, 5, 6, 9, 8, 11, 0, 6, 4,
-          8, 0, 5, 8, 11, 4, 8, 7, 0, 7, 9, 8, 7, 7, 7, 10, 8, 9, 12, 9, 6, 10, 0, 12
-        },
-        {10, 9, 10, 0, 0, 0, 7, 8, 11, 0, 0, 4, 0, 12, 13, 0, 13, 0, 1, 13, 5, 0, 11, 0}
+    {
+      {
+        { 9, 10, 9, 8, 12, 11, 9, 7, 8, 9, 9, 9, 11, 9, 11, 13, 11, 12, 11, 12, 12, 11, 13, 10 }
+        ,
+        { 6, 0, 9, 10, 9, 7, 9, 10, 9, 9, 0, 9, 7, 12, 8, 9, 9, 8, 0, 10, 7, 8, 8, 11 }
+        ,
+        { 11, 8, 0, 8, 11, 12, 11, 11, 12, 9, 12, 11, 10, 10, 12, 12, 0, 12, 12, 9, 12, 10, 8, 11 }
+
       }
     }
   };
   std::vector<std::vector<std::vector<int>>> I_input[N_config] {
-    {{
-        { 8, 13, 0, 7, 10, 0, 9, 11, 11, 10, 0, 0, 10, 0, 0, 12, 9, 0, 9, 0, 0, 10, 0, 9},
-        {
-          7, 9, 10, 7, 9, 11, 0, 8, 0, 8, 9, 7, 5, 7, 10, 7, 9, 7, 8, 8, 10, 0, 6, 5,
-          9, 0, 6, 7, 10, 7, 9, 7, 0, 7, 7, 7, 7, 7, 8, 9, 7, 8, 11, 7, 7, 10, 0, 10
-        },
-        { 6, 7, 6, 0, 0, 0, 3, 5, 7, 0, 0, 7, 0, 8, 9, 0, 8, 0, 4, 9, 2, 0, 7, 0}
+    {
+      {
+        { 7, 9, 7, 7, 8, 8, 7, 6, 6, 7, 8, 8, 9, 7, 8, 9, 10, 10, 9, 9, 9, 9, 10, 8 }
+        ,
+        { 5, 0, 7, 7, 6, 6, 7, 8, 7, 6, 0, 6, 6, 9, 6, 6, 6, 6, 0, 7, 6, 6, 5, 6 }
+        ,
+        { 6, 7, 0, 5, 7, 7, 7, 6, 7, 6, 7, 6, 6, 4, 7, 7, 0, 7, 8, 6, 8, 6, 6, 6 }
+
       }
     }
   };
-
-
-
-
 
 
   DBImportObjPtr<TRGGRLConfig> db_grlconfig;
@@ -242,6 +252,7 @@ void setgrlconfig()
       db_grlconfig->set_ecltaunn_saturation(saturation[i]);
       db_grlconfig->set_ecltaunn_W_input(W_input[i]);
       db_grlconfig->set_ecltaunn_I_input(I_input[i]);
+
       db_grlconfig.import(iov);
     }
   } else if (ONLINE == 1) {
@@ -284,6 +295,7 @@ void setgrlconfig()
       db_grlconfig->set_ecltaunn_saturation(saturation[i]);
       db_grlconfig->set_ecltaunn_W_input(W_input[i]);
       db_grlconfig->set_ecltaunn_I_input(I_input[i]);
+
       db_grlconfig.import(iov);
     }
   }

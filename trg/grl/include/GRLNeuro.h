@@ -13,8 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
-//#include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
-//#include <framework/dataobjects/BinnedEventT0.h>
+
 
 namespace Belle2 {
 

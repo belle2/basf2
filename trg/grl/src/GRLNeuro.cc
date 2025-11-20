@@ -23,90 +23,230 @@
 #include <iomanip>
 #include <iostream>
 #include <vector>
-
+#include <array>
+#include <cstdint>
+#include <utility>
 using namespace Belle2;
 using namespace CDC;
 using namespace std;
 
-float sim_ap_ufixed(float val, int W, int I)
+
+
+// ========== ap_(u)fixed  ========
+
+/**
+ * Simulates Xilinx ap_fixed/ap_ufixed behavior with configurable quantization and overflow modes.
+ *
+ * Key Features:
+ * - Supports all Vivado HLS quantization/overflow modes
+ * - Handles cases where total_bits < int_bits (effective bit truncation)
+ * - Optimized with bit shifts and lookup tables
+ * - Explicit integer/fractional bit separation
+ *
+ * @param val            Input floating-point value
+ * @param total_bits     Total bit width (W)
+ * @param int_bits       Integer bits (I)
+ * @param is_signed      true=ap_fixed (signed), false=ap_ufixed (unsigned)
+ * @param quant_mode     Quantization mode:
+ *                       0=AP_TRN (truncate), 1=AP_RND (round),
+ *                       2=AP_RND_ZERO, 3=AP_RND_MIN_INF, 4=AP_RND_INF, 5=AP_RND_CONV
+ * @param overflow_mode  Overflow mode:
+ *                       0=AP_SAT (saturate), 1=AP_SAT_ZERO,
+ *                       2=AP_WRAP (wrap), 3=AP_WRAP_SM (sign-magnitude wrap),4=AP_SAT_SYM
+ * @param saturation_bits Saturation bit width (0=use total_bits)
+ * @return               Simulated fixed-point value
+ */
+inline float sim_ap_fixed(float val, int total_bits, int int_bits,
+                          bool is_signed = true,
+                          int quant_mode = 0,
+                          int overflow_mode = 0,
+                          int saturation_bits = 0)
 {
-  if (W == 0) {
-    return 0.0f;
+  //for normal ap_types
+  if (total_bits >= int_bits) {
+
+    // Effective bits (handle saturation_bits and total_bits < int_bits cases)
+    int effective_total = (saturation_bits > 0) ?
+                          std::min(saturation_bits, total_bits) : total_bits;
+    int effective_I = std::min(int_bits, effective_total);
+    int F = effective_total - effective_I;  // Fractional bits ≥ 0
+    if (int_bits == 0 && is_signed == true) {
+      F = total_bits ;
+      effective_I = total_bits + 1;
+    }
+
+    // --- 2. Fast Scale Calculation (2^F) ---
+    const float scale = [F]() {
+      if (F <= 0) {return 1.0f;}  // No fractional bits
+      else {
+        // Bit-shift is faster than std::pow(2, F)
+        const uint32_t scale_int = 1U << F;
+        return 1.0f / static_cast<float>(scale_int);
+      }
+    }();
+
+    // --- 3. Quantization (Mode-Specific Rounding) ---
+    const auto quantize = [](float scaled_val, int mode) -> int64_t {
+      using QuantizerFuncPtr = int64_t(*)(float);
+      static constexpr QuantizerFuncPtr quantizers[] = {
+        [](float x) -> int64_t { return static_cast<int64_t>(std::trunc(x)); },
+        [](float x) -> int64_t { return static_cast<int64_t>(std::round(x)); },
+        [](float x) -> int64_t {
+          return (x >= 0) ? static_cast<int64_t>(std::floor(x))
+          : static_cast<int64_t>(std::ceil(x));
+        },
+        [](float x) -> int64_t { return static_cast<int64_t>(std::floor(x)); },
+        [](float x) -> int64_t { return static_cast<int64_t>(std::ceil(x)); },
+        [](float x) -> int64_t { return llrint(x); }
+      };
+      const int clamped_mode = std::clamp(mode, 0, static_cast<int>(sizeof(quantizers) / sizeof(quantizers[0]) - 1));
+      return quantizers[clamped_mode](scaled_val);
+    };
+
+    int64_t fixed_val = quantize(val / scale, quant_mode);
+
+    // --- 4. Dynamic Range Calculation ---
+    const auto [min_val, max_val] = [ = ]() -> std::pair<int64_t, int64_t> {
+      if (is_signed)
+      {
+        const int64_t int_max = (1LL << (effective_I - 1)) - 1;
+        const int64_t int_min = -(1LL << (effective_I - 1));
+        const int64_t frac_mask = (F > 0) ? ((1LL << F) - 1) : 0;
+        return {int_min << F, (int_max << F) | frac_mask};
+      } else
+      {
+        const int64_t int_max = (1LL << effective_I) - 1;
+        const int64_t frac_mask = (F > 0) ? ((1LL << F) - 1) : 0;
+        return {0, (int_max << F) | frac_mask};
+      }
+    }();
+
+
+    // --- 5. Overflow Handling ---
+    const auto handle_overflow = [&]() {
+      const int64_t bit_mask = (1LL << effective_total) - 1;
+      const int64_t sign_bit = 1LL << (effective_total - 1);
+
+      switch (overflow_mode) {
+        case 0:  // AP_SAT: Clamp to [min_val, max_val]
+          fixed_val = std::clamp(fixed_val, min_val, max_val);
+          break;
+
+        case 1:  // AP_SAT_ZERO: Set to 0 on overflow
+          if (fixed_val > max_val || fixed_val < min_val) fixed_val = 0;
+          break;
+
+        case 2:  // AP_WRAP: Modular wrap-around
+          if (is_signed) {
+            fixed_val = (fixed_val & bit_mask);
+            if (fixed_val & sign_bit) {
+              fixed_val -= (1LL << effective_total);
+            }
+          } else {
+            fixed_val &= bit_mask;
+          }
+          break;
+
+        case 3:  // AP_WRAP_SM: Sign-magnitude wrap
+          if (is_signed) {
+            const int64_t magnitude_mask = (1LL << (effective_total - 1)) - 1;
+            const bool is_negative = (fixed_val < 0);
+            fixed_val = std::abs(fixed_val) & magnitude_mask;
+            if (is_negative) fixed_val = -fixed_val;
+          } else {
+            fixed_val &= bit_mask;
+          }
+          break;
+
+        case 4:  // AP_SAT_SYM: Symmetric saturation
+          if (is_signed) {
+            const int64_t sym_limit = std::min(max_val, -min_val);
+            fixed_val = std::clamp(fixed_val, -sym_limit, sym_limit);
+          } else {
+            fixed_val = std::min(fixed_val, max_val);
+          }
+          break;
+
+        default:  // Default to AP_WRAP
+          fixed_val &= bit_mask;
+          if (is_signed && (fixed_val & sign_bit)) {
+            fixed_val -= (1LL << effective_total);
+          }
+      }
+    };
+    handle_overflow();
+
+    // --- 6. Final Conversion ---
+    return static_cast<float>(fixed_val) * scale;
+  }
+  //for sperical case with total_bits < int-bits (only used to this code, need modify for generic using)
+  else {
+    // 1. calculate the bits
+    const int zero_bits = std::max(int_bits - total_bits, 0);//So called negative fraction bits
+    const int useful_bits = total_bits - 1;
+
+    // 2. value collections
+    std::vector<float> legal_values;
+    for (int64_t i = 0; i < (1LL << useful_bits); ++i) {
+      int64_t value = i << zero_bits;
+      legal_values.push_back(static_cast<float>(value));
+      legal_values.push_back(static_cast<float>(-1 * value)); //need confirm
+    }
+    std::sort(legal_values.begin(), legal_values.end());
+
+    // 3. find the closest values in legal_values
+    auto closest = std::min_element(legal_values.begin(), legal_values.end(),
+    [val](float a, float b) {
+      float dist_a = std::abs(a - val);
+      float dist_b = std::abs(b - val);
+
+      if (std::abs(dist_a - dist_b) < 1e-6f) {
+        return a > b;
+      }
+      return dist_a < dist_b;
+    });
+
+    return *closest;
   }
 
-  int F = W - I;
-  float scale = std::pow(2.0f, F);
-
-  int64_t fixed_val = static_cast<int64_t>(std::round(val * scale));
-
-  int64_t max_val = (1LL << W) - 1;
-
-  fixed_val = fixed_val % (max_val + 1);
-  if (fixed_val < 0) fixed_val += (max_val + 1);
-
-  return static_cast<float>(fixed_val) / scale;
 }
 
+// ---  Wrappers for this code---
 
+//=== for input layer ===//
+inline float sim_input_layer_t(float val)
+{
+  return sim_ap_fixed(val, 13, 12, false, 0, 4, 0); // AP_TRN,AP_SAT
+}
 
-// ========== ap_fixed  ====== trunc + wrap ==========
-inline float sim_fixed(float val, int total_bits, int int_bits,
-                       bool is_signed = true,
+inline float sim_dense_0_iq_t(float val)
+{
+  return sim_ap_fixed(val, 12, 12, false, 1, 2, 0); // AP_RND,AP_WAP
+}
+
+inline float sim_ap_dense_0_iq(float val, int w, int i)
+{
+  return sim_ap_fixed(val, w, i, false, 1, 4, 0);  // AP_RND, AP_SAT_SYM
+}
+
+// === for weights, bias and hiden layers ===
+inline float sim_fixed(float val, int total_bits, int int_bits,  bool is_signed = true,
                        int rounding = 0,     // 0: trunc, 1: round
                        int saturation = 2)   // 2: wrap
 {
-  int frac_bits = total_bits - int_bits;
-  float scale = std::pow(2.0f, frac_bits);
+  return sim_ap_fixed(val, total_bits, int_bits, is_signed, rounding, saturation, 0);  // AP_TRN, AP_SAT_SYM
+}
 
-
-  float scaled_val = val * scale;
-  int64_t fixed_val;
-  if (rounding == 1) {
-    fixed_val = static_cast<int64_t>(std::round(scaled_val));
-  } else {
-    fixed_val = static_cast<int64_t>(std::trunc(scaled_val));
-  }
-
-
-  int64_t max_val, min_val;
-  if (is_signed) {
-    max_val = (1LL << (total_bits - 1)) - 1;
-    min_val = -(1LL << (total_bits - 1));
-  } else {
-    max_val = (1LL << total_bits) - 1;
-    min_val = 0;
-  }
-
-  switch (saturation) {
-    case 2: // wrap
-      if (is_signed) {
-        int64_t mod = 1LL << total_bits;
-        fixed_val = (fixed_val + mod) % mod;
-        if (fixed_val >= (1LL << (total_bits - 1))) {
-          fixed_val -= mod;
-        }
-      } else {
-        fixed_val = fixed_val % (1LL << total_bits);
-      }
-      break;
-    case 1: // saturate
-      fixed_val = std::min(std::max(fixed_val, min_val), max_val);
-      break;
-    case 3: // saturate by sign
-      fixed_val = (val >= 0) ? std::min(fixed_val, max_val)
-                  : std::max(fixed_val, min_val);
-      break;
-    case 0:
-    default: // none
-      break;
-  }
-
-  return static_cast<float>(fixed_val) / scale;
+// === unsign for result ===
+inline float sim_result_t(float val)
+{
+  return sim_ap_fixed(val, 25, 9, true, 0, 2, 0);  // AP_RND, AP_SAT_SYM
 }
 
 void
 GRLNeuro::initialize(const Parameters& p)
 {
+
   // check parameters
   bool okay = true;
   // ensure that length of lists matches number of sectors
@@ -182,37 +322,9 @@ GRLNeuro::initialize(const Parameters& p)
   }
 }
 
-// ==================== input_layer_t ====================
-// HLS: ap_ufixed<12,12,AP_RND,AP_WRAP,0>
-inline float sim_fix_input_layer_t(float val)
-{
-  const int W = 12;
-  const int I = 12;   // int
-  const int F = W - I; // float
-  //const bool is_signed = false; // ap_ufixed //not used
-
-  double scaled = val * std::pow(2.0, F); //
-  long long q = llrint(scaled); // round-to-even (C99)
-
-  // wrap
-  //unsigned long long max_val = (1ULL << W) - 1; // 2^12 - 1 = 4095 //not used
-  if (q < 0) {
-
-    q = (q % (1ULL << W) + (1ULL << W)) % (1ULL << W);
-  } else {
-    q = q % (1ULL << W);
-  }
-
-  return (float)q / std::pow(2.0, F); //
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
 float
 GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
 {
-
-
   const GRLMLP& expert = m_MLPs[isector];
   vector<float> weights = expert.getWeights();
   vector<float> bias = expert.getBias();
@@ -244,15 +356,26 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
   vector<vector<int>> W_input = expert.get_W_input();
   vector<vector<int>> I_input = expert.get_I_input();
 
+
   //input layer
   vector<float> layerinput = input;
+
+  // quantizer the inputs
   for (size_t i = 0; i < layerinput.size(); ++i) {
-    layerinput[i] = sim_fix_input_layer_t(layerinput[i]);
+
+    int W_arr[24] = { 12, 12, 11, 11, 8, 8, 7, 7, 5, 6, 6, 6, 8, 8, 6, 5, 4, 5, 7, 7, 6, 4, 5, 5 };
+    int I_arr[24] = { 12, 12, 11, 11, 10, 9, 7, 7, 7, 7, 7, 7, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };
+    if (i != 23) {
+      layerinput[i] = sim_input_layer_t(layerinput[i]);
+      layerinput[i] = sim_ap_dense_0_iq(layerinput[i], W_arr[i], I_arr[i]);
+
+    } else layerinput[i] = 0;
   }
 
   //hidden layer and output layer
   vector<float> layeroutput = {};
   unsigned num_layers = expert.getNumberOfLayers();
+
   unsigned num_total_neurons = 0;
   unsigned iw = 0;
   for (unsigned i_layer = 0; i_layer < num_layers - 1; i_layer++) {
@@ -261,6 +384,7 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
     layeroutput.clear();
     layeroutput.assign(num_neurons, 0.);
     layeroutput.shrink_to_fit();
+
     for (unsigned io = 0; io < num_neurons; ++io) {
       float bias_raw = bias[io + num_total_neurons];
       float bias_fixed   = sim_fixed(bias_raw, total_bit_bias[i_layer], int_bit_bias[i_layer], is_signed_bias[i_layer],
@@ -268,6 +392,7 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
       float bias_contrib = sim_fixed(bias_fixed, total_bit_accum[i_layer], int_bit_accum[i_layer], is_signed_accum[i_layer],
                                      rounding_accum[i_layer], saturation_accum[i_layer]);
       layeroutput[io] = bias_contrib;
+
     }
     num_total_neurons += num_neurons;
 
@@ -286,7 +411,7 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
         ++iw;
       }
     }
-
+    //     input*weight done
     if (i_layer < num_layers - 2) {
       //relu
       for (unsigned io = 0; io < num_neurons; ++io) {
@@ -297,15 +422,38 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
                                     rounding_relu[i_layer], saturation_relu[i_layer]);
       }
 
+
       //input to next layer
       layerinput.clear();
       layerinput.assign(num_neurons, 0);
       layerinput.shrink_to_fit();
+
       for (unsigned i = 0; i < num_neurons; ++i) {
-        layerinput[i] = sim_ap_ufixed(layeroutput[i], W_input[i_layer][i], I_input[i_layer][i]);
+
+        layerinput[i] = sim_ap_fixed(layeroutput[i], W_input[i_layer][i], I_input[i_layer][i], false, 1, 4, 0);
+
       }
+      if (i_layer == 0) {}
+      else if (i_layer == 1) {
+
+        layerinput[1] = 0;
+        layerinput[10] = 0;
+        layerinput[18] = 0;
+
+      } else if (i_layer == 2) {
+        layerinput[2] = 0;
+        layerinput[16] = 0;
+
+      }
+
+
     } else {
-      return layeroutput[0];
+
+
+      // ===  HLS result_t: ap_fixed<19,5,AP_RND,AP_SAT_SYM,0> ===
+      float final_fixed = sim_result_t(layeroutput[0]);
+
+      return final_fixed;
     }
   }
   return 0;

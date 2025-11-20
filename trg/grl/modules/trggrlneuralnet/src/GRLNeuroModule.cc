@@ -6,6 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <unordered_map>
+#include <cstdlib>
+#include <iomanip>
+#include <cmath>
+#include <TFile.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -21,9 +29,6 @@
 #include "trg/grl/dataobjects/TRGGRLUnpackerStore.h"
 #include "trg/grl/modules/trggrlneuralnet/GRLNeuroModule.h"
 
-#include <fstream>
-#include <cmath>
-#include <TFile.h>
 
 using namespace Belle2;
 using namespace std;
@@ -70,7 +75,7 @@ GRLNeuroModule::GRLNeuroModule() : Module()
            "Number of nodes in each hidden layer for all networks "
            "or factor to multiply with number of inputs (1 list or nMLP lists). "
            "The number of layers is derived from the shape.",
-  {{64, 64}});
+  {{24, 24, 24}});
   addParam("multiplyHidden", m_parameters.multiplyHidden,
            "If true, multiply nHidden with number of input nodes.", false);
   addParam("outputScale", m_parameters.outputScale,
@@ -79,20 +84,13 @@ GRLNeuroModule::GRLNeuroModule() : Module()
            "to [outputScale[2*i], outputScale[2*i+1]]. "
            "(units: z[cm] / theta[degree])",
   {{ -1., 1.}});
-  addParam("weightFiles", m_weightFileNames,
-           "Name of the file where the weights of MLPs are saved. "
-           "the default file is $BELLE2_LOCAL_DIR/data/trg/grl/weights.dat",
-  {FileSystem::findFile("/data/trg/grl/weights.dat", true)});
-  addParam("biasFiles", m_biasFileNames,
-           "Name of the file where the biases of MLPs are saved. "
-           "the default file is $BELLE2_LOCAL_DIR/data/trg/grl/bias.dat",
-  {FileSystem::findFile("/data/trg/grl/bias.dat", true)});
+
   addParam("TRGECLClusters", m_TrgECLClusterName,
            "Name of the StoreArray holding the information of trigger ecl clusters ",
            string("TRGECLClusters"));
   addParam("MVACut", m_nn_thres,
            "Cut value applied to the MLP output",
-  {-1});
+  {0});
   addParam("useDB", m_useDB,
            "Flag to use database to set config", true);
 }
@@ -102,32 +100,65 @@ void
 GRLNeuroModule::initialize()
 {
 
-  TrgEclMapping* trgecl_obj = new TrgEclMapping();
-  for (int tc = 1; tc <= 576; tc++) {
-    TCThetaID.push_back(trgecl_obj->getTCThetaIdFromTCId(tc));
+  std::unordered_map<int, double> phiMap;
+
+  const std::string csvPath = "/home/belle2/zhaoxy/basf2/trg/grl/modules/trggrlneuralnet/src/tcid_correct_theta_phi.csv";
+  std::ifstream infile(csvPath);
+  if (!infile.is_open()) {
+    B2ERROR(("Failed to open " + csvPath).c_str());
+    return;
   }
 
-  //-----------------------------------------------------------------------------------------
-  //..ECL look up tables
-  PCmsLabTransform boostrotate;
-  for (int tc = 1; tc <= 576; tc++) {
+  std::string line;
+  bool isFirstLine = true;
+  while (std::getline(infile, line)) {
+    if (isFirstLine) {
+      isFirstLine = false;
+      continue;
+    }
 
-    //..Four vector of a 1 GeV lab photon at this TC
-    ROOT::Math::XYZVector CellPosition = trgecl_obj->getTCPosition(tc);
-    ROOT::Math::PxPyPzEVector CellLab;
-    CellLab.SetPx(CellPosition.Unit().X());
-    CellLab.SetPy(CellPosition.Unit().Y());
-    CellLab.SetPz(CellPosition.Unit().Z());
-    CellLab.SetE(1.);
+    std::stringstream ss(line);
+    std::string tc_str, theta_str, phi_str;
+    std::getline(ss, tc_str, ',');
+    std::getline(ss, theta_str, ',');
+    std::getline(ss, phi_str, ',');
 
-    TCThetaLab.push_back(CellLab.Theta()*TMath::RadToDeg());
-    TCPhiLab.push_back(CellLab.Phi()*TMath::RadToDeg() + 180.0);
+    if (tc_str.empty() || theta_str.empty() || phi_str.empty()) continue;
 
+    int tc = std::stoi(tc_str);
+    if (tc == 0) continue;
+    double theta = std::stod(theta_str) * TMath::RadToDeg();
+    double phi   = std::stod(phi_str)   * TMath::RadToDeg();
+
+    thetaMap[tc] = theta;
+    phiMap[tc]   = phi;
   }
 
-  delete trgecl_obj;
+  infile.close();
+
+  TCThetaLab.clear();
+  TCPhiLab.clear();
+  TCThetaLab.reserve(576);
+  TCPhiLab.reserve(576);
+
+  for (int tc = 1; tc <= 576; ++tc) {
+    if (thetaMap.count(tc)) {
+      TCThetaLab.push_back(thetaMap[tc]);
+      TCPhiLab.push_back(phiMap[tc]);
+    } else {
+
+      TCThetaLab.push_back(0.0);
+      TCPhiLab.push_back(0.0);
+    }
+  }
+
+
+  B2INFO("Loaded TC geometry (theta/phi) from tcid_correct_theta_phi.csv");
+  B2INFO(Form("Example: TC 1 => theta = %.3f deg, phi = %.3f deg", TCThetaLab[0], TCPhiLab[0]));
+
 
 }
+
 
 void
 GRLNeuroModule::beginRun()
@@ -174,6 +205,12 @@ GRLNeuroModule::beginRun()
       m_parameters.W_input = m_db_trggrlconfig->get_ecltaunn_W_input();
       m_parameters.I_input = m_db_trggrlconfig->get_ecltaunn_I_input();
 
+      B2INFO("DB GRLConfig: nMLP=" << m_db_trggrlconfig->get_ecltaunn_nMLP()
+             << " weight=" << m_db_trggrlconfig->get_ecltaunn_weight().size()
+             << " bias=" << m_db_trggrlconfig->get_ecltaunn_bias().size()
+             << " total_bit_bias=" << m_db_trggrlconfig->get_ecltaunn_total_bit_bias().size());
+
+
       m_GRLNeuro.initialize(m_parameters);
 
       for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {
@@ -187,83 +224,87 @@ GRLNeuroModule::beginRun()
   if (m_saveHist) {
     for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {
       h_target.push_back(new TH1D(("h_target_" + to_string(isector)).c_str(),
-                                  ("h_target_" + to_string(isector)).c_str(),  100, 0.0, 1.0));
+                                  ("h_target_" + to_string(isector)).c_str(),  100, -40.0, 40.0));
     }
   }
 }
 
-void
-GRLNeuroModule::event()
+void GRLNeuroModule::event()
 {
 
-  //ECL input
-  //..Use only clusters within 100 ns of event timing (from ECL).
   //StoreArray<TRGECLTrg> trgArray;
-  StoreArray<TRGECLCluster> eclTrgClusterArray(m_TrgECLClusterName);
   StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  std::vector<std::tuple<float, float, float, float>> eclClusters;
-///
-  int necl = eclTrgClusterArray.getEntries();
-  for (int ic = 0; ic < necl; ic++) {
-    int TC = eclTrgClusterArray[ic]->getMaxTCId();
-    float energy = eclTrgClusterArray[ic]->getEnergyDep() * 1000.0;
-    float theta = TCThetaLab[TC - 1];
-    float phi = TCPhiLab[TC - 1];
-    float time = eclTrgClusterArray[ic]->getTimeAve();
-    eclClusters.emplace_back(energy, theta, phi, time);
+  if (!trgInfo.isValid()) {
+    std::cout << "[WARNING] TRGGRLObjects not found in this event!" << std::endl;
+    return;
   }
+
+  StoreArray<TRGECLCluster> eclTrgClusterArray(m_TrgECLClusterName);
+  int necl = eclTrgClusterArray.getEntries();
+
+  std::vector<std::tuple<float, float, float, float, int>> eclClusters; //  TC id
+  eclClusters.reserve(necl);
+
+  for (int ic = 0; ic < necl; ic++) {
+    auto* eclCluster = eclTrgClusterArray[ic];
+    int TC = eclCluster->getMaxTCId();
+
+    //float energy = eclCluster->getEnergyDep() ;  // data
+    float energy = eclTrgClusterArray[ic]->getEnergyDep() * 1000.0;//MC
+    float time   = eclCluster->getTimeAve();
+    float theta = TCThetaLab[TC - 1 ];
+    float phi   = TCPhiLab[TC - 1  ] + 180;
+    float thetaComp = theta;
+
+    eclClusters.emplace_back(energy, thetaComp, phi, time, TC);
+
+  }
+
 
   std::sort(eclClusters.begin(), eclClusters.end(),
-            [](const std::tuple<float, float, float, float>& a,
-  const std::tuple<float, float, float, float>& b) {
+            [](const std::tuple<float, float, float, float, int>& a,
+  const std::tuple<float, float, float, float, int>& b) {
     return std::get<0>(a) > std::get<0>(b);
   });
-
-  // MLPinput
-  std::vector<float> MLPinput;
-  MLPinput.clear();
-  MLPinput.assign(24, 0);
-
-  for (size_t i = 0; i < std::min(eclClusters.size(), size_t(6)); i++) {
-    MLPinput[i]  = std::get<0>(eclClusters[i]); // E
-    MLPinput[6 + i]  = std::get<1>(eclClusters[i]); // Theta
-    MLPinput[12 + i] = std::get<2>(eclClusters[i]); // Phi
-    MLPinput[18 + i]  = std::get<3>(eclClusters[i]); // time
+  // ====quantization
+  std::vector<float> MLPinput(24, 0.0f);
+  for (size_t i = 0; i < eclClusters.size() && i < 6; i++) {
+    float energy, theta, phi, time;
+    int TC;
+    std::tie(energy, theta, phi, time, TC) = eclClusters[i];
+    MLPinput[i]      = energy;
+    MLPinput[i + 6]  = theta;
+    MLPinput[i + 12] = phi;
+    MLPinput[i + 18] = time;
   }
 
 
+  float LSB_ADC   = 1 / 5.25;
+  float LSB_angle = 1 / 1.40625;
+  std::for_each(MLPinput.begin() + 0,  MLPinput.begin() + 6,  [LSB_ADC](float & x)   { x = std::ceil(x * LSB_ADC); });
+  std::for_each(MLPinput.begin() + 6,  MLPinput.begin() + 12, [LSB_angle](float & x) { x = std::ceil(x * LSB_angle); });
+  std::for_each(MLPinput.begin() + 12, MLPinput.begin() + 18, [LSB_angle](float & x) { x = std::ceil(x * LSB_angle); });
 
-  // //////////////////////////////////////////////////////////////////////////////////////////////////////////
+  for (size_t i = 0; i < eclClusters.size() && i < 6; i++) {
+    float energy, theta, phi, time;
+    int TC;
+    std::tie(energy, theta, phi, time, TC) = eclClusters[i];
 
-  //Energy, theta and phi data are the quantized.
-  //Energy: LSB = ADC count (5.5MeV)
-  //theta : 0 ~ 180∘, LSB = 1.6025∘
-  //phi : 0 ~ 360∘, LSB = 1.6025∘
-  float LSB_ADC   = 1 / 5.5;
-  float LSB_angle = 1 / 1.6025;
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  std::for_each(MLPinput.begin() + 0, MLPinput.begin() + 6, [LSB_ADC](float & x) { x = std::ceil(x * LSB_ADC); });
-  std::for_each(MLPinput.begin() + 6,  MLPinput.begin() + 12,  [LSB_angle](float & x) { x = std::ceil(x * LSB_angle);});
-  std::for_each(MLPinput.begin() + 12,  MLPinput.begin() + 18, [LSB_angle](float & x) { x = std::ceil(x * LSB_angle); });
+  }
 
-//new add
-//  float LSB_time = 1.0f;
-//  std::for_each(MLPinput.begin() + 18, MLPinput.begin() + 24, [](float &x) {
-//      x = std::ceil(x);
-//      x = std::min(x, 255.0f);
-//     x = std::max(x, 0.0f);
-//  });
-
+  // Run MLP
   float target = m_GRLNeuro.runMLP(0, MLPinput);
   if (m_saveHist) {
     h_target[0]->Fill(target);
   }
   if (target > m_nn_thres[0]) {
     trgInfo->setTauNN(true);
-  } else trgInfo->setTauNN(false);
-
+  } else {
+    trgInfo->setTauNN(false);
+  }
 }
+
+
 
 void
 GRLNeuroModule::terminate()

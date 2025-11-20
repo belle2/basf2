@@ -174,6 +174,7 @@ namespace Belle2 {
       return m_ecltaunn_I_input;
     }
 
+
     /** Setter functions*/
     void set_ecltaunn_threshold(float i)
     {
@@ -325,6 +326,7 @@ namespace Belle2 {
     };
 
 
+
   private:
 
     /** MVA Threshold of ecltaunn bit */
@@ -385,6 +387,7 @@ namespace Belle2 {
     std::vector<std::vector<int>> m_ecltaunn_saturation;
     std::vector<std::vector<std::vector<int>>> m_ecltaunn_W_input;
     std::vector<std::vector<std::vector<int>>> m_ecltaunn_I_input;
+
 
     ClassDef(TRGGRLConfig, 6);  /**< ClassDef, must be the last term before the closing {}*/
   };

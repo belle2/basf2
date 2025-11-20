@@ -16,7 +16,7 @@ Enddecay
 Alias MyD0 D0
 Alias MyKS0 K_S0
 
-Decay D*+sig
+Decay D*+
 1.000 MyD0 pi+        VSS;
 Enddecay
 
@@ -29,6 +29,4 @@ Decay MyKS0
 Enddecay
 
 End
-
-
 

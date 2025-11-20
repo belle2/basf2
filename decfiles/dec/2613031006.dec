@@ -16,7 +16,7 @@ Enddecay
 Alias anti-MyD0 anti-D0
 Alias MyK*0 K*0
 
-Decay D*-sig
+Decay D*-
 1.000 anti-MyD0 pi-        VSS;
 Enddecay
 

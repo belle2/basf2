@@ -15,7 +15,7 @@ Enddecay
 
 Alias Myrho0 rho0
 
-Decay D0sig
+Decay D0
 1.000 Myrho0  gamma       SVP_HELAMP 1.0 0.0 1.0 0.0;
 Enddecay
 

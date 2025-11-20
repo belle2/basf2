@@ -30,19 +30,19 @@ namespace Belle2 {
 
   namespace CDC {
 
-    //!  The GeoCDCCreatorReducedCDC class.
+    //!  The GeoCDCCreatorReducedCDCNoSL0 class.
     /*!
        The creator for the CDC geometry of the Belle II detector.
     */
-    class GeoCDCCreatorReducedCDC : public geometry::CreatorBase {
+    class GeoCDCCreatorReducedCDCNoSL0 : public geometry::CreatorBase {
 
     public:
 
-      //! Constructor of the GeoCDCCreatorReducedCDC class.
-      GeoCDCCreatorReducedCDC();
+      //! Constructor of the GeoCDCCreatorReducedCDCNoSL0 class.
+      GeoCDCCreatorReducedCDCNoSL0();
 
-      //! The destructor of the GeoCDCCreatorReducedCDC class.
-      ~GeoCDCCreatorReducedCDC();
+      //! The destructor of the GeoCDCCreatorReducedCDCNoSL0 class.
+      ~GeoCDCCreatorReducedCDCNoSL0();
 
       //! Creates the ROOT Objects for the CDC geometry.
       /*!

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <DetectorComponent name="CDC" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <Creator library="cdc">CDCCreatorReducedCDC</Creator>
+  <Creator library="cdc">CDCCreatorReducedCDCNoSL0</Creator>
   <Content>
     <xi:include href="CDCReducedNoSL0-Covers.xml"/>
     <xi:include href="CDC-NeutronShields.xml"/>

@@ -592,10 +592,8 @@ class TauToMuMuMu(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        ma.copyLists('tau+:tau_3mu_comb', self.SkimLists, path=path)
-
         # add contact information to histogram
-        contact = "	junewoo@g.ecc.u-tokyo.ac.jp"
+        contact = "junewoo@g.ecc.u-tokyo.ac.jp"
 
         # the variables that are printed out are: M, deltaE
         create_validation_histograms(

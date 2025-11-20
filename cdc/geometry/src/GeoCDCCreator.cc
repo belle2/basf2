@@ -237,9 +237,9 @@ namespace Belle2 {
       //
       // Construct sensitive layers.
       //
-      const int nSLayer = geo.getNSenseLayers();
+      const uint nSLayer = geo.getNSenseLayers();
       const double length_feedthrough  = geo.getFeedthroughLength();
-      for (int iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {
+      for (uint iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {
         const auto& endplate = geo.getEndPlate(iSLayer);
         const int nEPLayer = endplate.getNEndPlateLayers();
         // Get parameters for sensitive layer: left, middle and right.

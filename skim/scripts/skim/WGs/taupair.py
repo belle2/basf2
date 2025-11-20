@@ -600,7 +600,7 @@ class TauToMuMuMu(BaseSkim):
         # the variables that are printed out are: M, deltaE
         create_validation_histograms(
             rootfile=f'{self}_Validation.root',
-            particlelist='tau+:comb',
+            particlelist='tau+:tau_3mu_comb',
             variables_1d=[
                 ('M', 100, 1.00, 2.00, '', contact, '', ''),
                 ('deltaE', 120, -1.6, 0.6, '', contact, '', '')],

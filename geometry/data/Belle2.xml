@@ -128,6 +128,10 @@
   <DetectorComponent name="CDCReducedNoSL0" isDefault="false">
     <xi:include href="../cdc/CDCReducedNoSL0.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
+  <!-- CDC without SL0 and SL1 -->
+  <DetectorComponent name="CDCReducedNoSL0SL1" isDefault="false">
+    <xi:include href="../cdc/CDCReducedNoSL0SL1.xml" xpointer="xpointer(/DetectorComponent/*)"/>
+  </DetectorComponent>
   <!-- MUID muon identification -->
   <Muid>
     <xi:include href="../klm/MuidParameters.xml"/>

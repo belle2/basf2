@@ -2,7 +2,7 @@
 <DetectorComponent name="CDC" xmlns:xi="http://www.w3.org/2001/XInclude">
   <Creator library="cdc">CDCCreatorReducedCDC</Creator>
   <Content>
-    <xi:include href="CDCReduced-Covers.xml"/>
+    <xi:include href="CDCReducedNoSL0-Covers.xml"/>
     <xi:include href="CDC-NeutronShields.xml"/>
     <GlobalPhiRotation desc="Global rotation in phi; valid only for sense wires now." unit="deg">0.0</GlobalPhiRotation>
     <ClockFrequencyForTDC desc="Frequency (GHz) of the clock used for TDC, where 1.017774 GHz is 2 x (accelerator's RF).">1.017774</ClockFrequencyForTDC>
@@ -55,7 +55,6 @@
         <Rmax unit="mm">1140.0</Rmax>
       </ZBound>
       <ZBound id="5">
-<!--         <Z unit="mm">830</Z> -->
         <Z unit="mm">871.2</Z>
         <Rmin unit="mm">240.0</Rmin>
         <Rmax unit="mm">1140.0</Rmax>
@@ -3285,7 +3284,7 @@
         <InnerR desc="Inner radius" unit="mm">1120.6</InnerR>
         <OuterR desc="Outer radius" unit="mm">1126.065</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">-703</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">1569.41</ForwardZ>-->
+        <ForwardZ desc="z position at forward endplate" unit="mm">1569.41</ForwardZ>
       </OuterWall>
       <OuterWall id="2">
         <Name>InnerBackwardWall</Name>

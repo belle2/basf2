@@ -30,7 +30,7 @@ reducedCDCpath = basf2.create_path()
 reducedCDCpath.add_module("EventInfoSetter")
 reducedCDCpath.add_module("Gearbox")
 reducedCDCpath.add_module("Geometry", createPayloads=True, payloadIov=[0, 0, 0, -1],
-                          excludedComponents=['CDC'], additionalComponents=['CDCReduced'])
+                          excludedComponents=['CDC'], additionalComponents=['CDCReducedNoSL0'])
 basf2.process(reducedCDCpath)
 
 # most of the components are identical so we avoid uploading two revisions

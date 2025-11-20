@@ -29,6 +29,15 @@
 #include <TH2F.h>
 #include <TProfile.h>
 
+/* C++ STL headers. */
+#include <functional>
+#include <map>     // For std::map in readCalibrationDataCounts
+#include <utility> // For std::pair in readCalibrationDataFor2DFit
+#include <vector>  // For std::vector in readCalibrationDataFor2DFit
+#include <functional>  // ADD THIS - needed for std::function in readCalibrationDataBatch
+
+class TFile;  // forward declaration
+
 namespace Belle2 {
 
   /**
@@ -82,7 +91,7 @@ namespace Belle2 {
       /**
        * Get propagation time + cableDelay time.
        */
-      double time()
+      double time() const
       {
         return recTime - flyTime;
       }
@@ -150,13 +159,32 @@ namespace Belle2 {
     }
 
     /**
-     * Set the lower number of hits collected on one sigle strip. If the hit
+     * Set the lower number of hits collected on one single strip. If the hit
      * number is lower than the limit, the strip will not be calibrated and
      * set the average value of the calibration constant.
      */
     void setLowerLimit(int counts)
     {
       m_lower_limit_counts = counts;
+    }
+
+    /**
+     * Save every preallocated debug histogram family (sectors/layers/planes/2D maps).
+     * Default is false (minimal mode).
+     */
+    void setSaveAllPlots(bool on)
+    {
+      m_saveAllPlots = on;
+    }
+
+    /**
+     * When running in minimal mode, also write the per-channel temporary histograms
+     * (the vital _tc, raw, hc_ 1D’s created on-the-fly) before deleting them.
+     * Default is false.
+     */
+    void setSaveChannelHists(bool on)
+    {
+      m_saveChannelHists = on;
     }
 
     /**
@@ -171,13 +199,13 @@ namespace Belle2 {
     double esti_timeShift(const KLMChannelIndex& klmChannel);
 
     /**
-     * Tracing avaiable channels with increasing strip number.
+     * Tracing available channels with increasing strip number.
      * @param[in] klmChannel KLM channel index.
      */
     std::pair<int, double> tS_upperStrip(const KLMChannelIndex& klmChannel);
 
     /**
-     * Tracing avaiable channels with decreasing strip number.
+     * Tracing available channels with decreasing strip number.
      * @param[in] klmChannel KLM channel index.
      */
     std::pair<int, double> tS_lowerStrip(const KLMChannelIndex& klmChannel);
@@ -189,13 +217,13 @@ namespace Belle2 {
     double esti_timeRes(const KLMChannelIndex& klmChannel);
 
     /**
-     * Tracing avaiable channels with increasing strip number.
+     * Tracing available channels with increasing strip number.
      * @param[in] klmChannel KLM channel index.
      */
     std::pair<int, double> tR_upperStrip(const KLMChannelIndex& klmChannel);
 
     /**
-     * Tracing avaiable channels with decreasing strip number.
+     * Tracing available channels with decreasing strip number.
      * @param[in] klmChannel KLM channel index.
      */
     std::pair<int, double> tR_lowerStrip(const KLMChannelIndex& klmChannel);
@@ -224,9 +252,39 @@ namespace Belle2 {
     CalibrationAlgorithm::EResult readCalibrationData();
 
     /**
+     * Count events per channel (lightweight scan without loading full data).
+     * @param[out] eventCounts Map from channel number to event count.
+     */
+    void readCalibrationDataCounts(std::map<KLMChannelNumber, unsigned int>& eventCounts);
+
+    /**
+     * Load calibration data only for channels needed for 2D fit.
+     * @param[in] channelsBKLM BKLM channels sorted by event count.
+     * @param[in] channelsEKLM EKLM channels sorted by event count.
+     */
+    void readCalibrationDataFor2DFit(
+      const std::vector<std::pair<KLMChannelNumber, unsigned int>>& channelsBKLM,
+      const std::vector<std::pair<KLMChannelNumber, unsigned int>>& channelsEKLM);
+
+    /**
+     * Load calibration data for a specific batch of channels.
+     * @param[in] channelFilter Function that returns true for channels in the batch.
+     */
+    void readCalibrationDataBatch(std::function<bool(const KLMChannelIndex&)> channelFilter);
+
+    /**
      * Create histograms.
      */
     void createHistograms();
+
+    /**
+     * Optionally write a histogram, then delete it to free memory.
+     * Used for on-the-fly per-channel hists in minimal mode.
+     */
+    void writeThenDelete_(TH1* h, bool write);
+
+    /** Same as above, but for 2D histograms. */
+    void writeThenDelete_(TH2* h, bool write);
 
     /**
      * Fill profiles of time versus distance.
@@ -305,16 +363,16 @@ namespace Belle2 {
     double m_UpperTimeBoundaryRPC = 10.0;
 
     /** Lower time boundary for BKLM scintillators. */
-    double m_LowerTimeBoundaryScintilltorsBKLM = 20.0;
+    double m_LowerTimeBoundaryScintillatorsBKLM = 20.0;
 
     /** Upper time boundary for BKLM scintillators. */
-    double m_UpperTimeBoundaryScintilltorsBKLM = 70.0;
+    double m_UpperTimeBoundaryScintillatorsBKLM = 70.0;
 
     /** Lower time boundary for EKLM scintillators. */
-    double m_LowerTimeBoundaryScintilltorsEKLM = 20.0;
+    double m_LowerTimeBoundaryScintillatorsEKLM = 20.0;
 
     /** Upper time boundary for BKLM scintillators. */
-    double m_UpperTimeBoundaryScintilltorsEKLM = 70.0;
+    double m_UpperTimeBoundaryScintillatorsEKLM = 70.0;
 
     /** Lower time boundary for RPC (calibrated data). */
     double m_LowerTimeBoundaryCalibratedRPC = -40.0;
@@ -323,16 +381,16 @@ namespace Belle2 {
     double m_UpperTimeBoundaryCalibratedRPC = 40.0;
 
     /** Lower time boundary for BKLM scintillators (calibrated data). */
-    double m_LowerTimeBoundaryCalibratedScintilltorsBKLM = -40.0;
+    double m_LowerTimeBoundaryCalibratedScintillatorsBKLM = -40.0;
 
     /** Upper time boundary for BKLM scintillators (calibrated data). */
-    double m_UpperTimeBoundaryCalibratedScintilltorsBKLM = 40.0;
+    double m_UpperTimeBoundaryCalibratedScintillatorsBKLM = 40.0;
 
     /** Lower time boundary for EKLM scintillators (calibrated data). */
-    double m_LowerTimeBoundaryCalibratedScintilltorsEKLM = -40.0;
+    double m_LowerTimeBoundaryCalibratedScintillatorsEKLM = -40.0;
 
     /** Upper time boundary for BKLM scintillators (calibrated data). */
-    double m_UpperTimeBoundaryCalibratedScintilltorsEKLM = 40.0;
+    double m_UpperTimeBoundaryCalibratedScintillatorsEKLM = 40.0;
 
     /** Central value of the global time distribution (BKLM RPC part). */
     double m_time_channelAvg_rpc = 0.0;
@@ -703,34 +761,6 @@ namespace Belle2 {
     /** EKLM part. */
     TH2F* h2c_timeFSLP_end[2][4][14][2] = {{{{nullptr}}}};
 
-    /* Histograms of time distribution of each channel before calibration. */
-
-    /** BKLM part, used for effective light speed estimation. */
-    TH1F* h_timeFSLPC_tc[2][8][15][2][54] = {{{{{nullptr}}}}};
-
-    /** BKLM part. */
-    TH1F* h_timeFSLPC[2][8][15][2][54] = {{{{{nullptr}}}}};
-
-    /** Two-dimensional distributions of time versus propagation length. */
-    TH2F* m_HistTimeLengthBKLM[2][8][15][2][54] = {{{{{nullptr}}}}};
-
-    /** EKLM part, used for effective light speed estimation. */
-    TH1F* h_timeFSLPC_tc_end[2][4][14][2][75] = {{{{{nullptr}}}}};
-
-    /** EKLM part. */
-    TH1F* h_timeFSLPC_end[2][4][14][2][75] = {{{{{nullptr}}}}};
-
-    /** Two-dimensional distributions of time versus propagation length. */
-    TH2F* m_HistTimeLengthEKLM[2][4][14][2][75] = {{{{{nullptr}}}}};
-
-    /* Histograms of time distribution of each channel after calibration. */
-
-    /** BKLM part. */
-    TH1F* hc_timeFSLPC[2][8][15][2][54] = {{{{{nullptr}}}}};
-
-    /** EKLM part. */
-    TH1F* hc_timeFSLPC_end[2][4][14][2][75] = {{{{{nullptr}}}}};
-
     /* Formulas used for fitting. */
 
     /** Pol1 function. Effective light speed fitting. */
@@ -739,16 +769,21 @@ namespace Belle2 {
     /** Const function. Global time distribution fitting. */
     TF1* fcn_const = nullptr;
 
-    /** Gaussian function. Scitillator time ditribution fitting. */
+    /** Gaussian function. Scitillator time distribution fitting. */
     TF1* fcn_gaus = nullptr;
 
-    /** Landau function. RPC time ditribution fitting. */
+    /** Landau function. RPC time distribution fitting. */
     TF1* fcn_land = nullptr;
 
     /** Output file. */
     TFile* m_outFile = nullptr;
 
+    /** Default minimal unless you set true in your header script */
+    bool m_saveAllPlots = false;
+
+    /** Write per-channel temporary histograms (_tc/raw/hc_) in minimal mode. */
+    bool m_saveChannelHists = false;
+
   };
 
 }
-

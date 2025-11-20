@@ -339,6 +339,7 @@ void MCMatcherParticlesModule::setCCbarTagMatch(const Particle* particle)
       break;
     }
   }
+  if (!allMother) B2FATAL("MCMatcherParticlesModule; tag matching - event has no AllMother?");
   thisParticle->addExtraInfo("ccbarTagAllMotherPDG", allMother->getPDG());
 
   int sigPDGCode = particle->getPDGCode() * (-1); // get info about signal particles
@@ -366,7 +367,10 @@ void MCMatcherParticlesModule::setCCbarTagMatch(const Particle* particle)
     if ((pdg > 400 && pdg < 500) || (pdg > 4000 && pdg < 5000) || (pdg > 10400 && pdg < 10500) || (pdg > 20400 && pdg < 20500)) {
       foundCharm = true;
       thisParticle->addExtraInfo("ccbarTagMCpdg", mcpart->getPDG());
-      thisParticle->addExtraInfo("ccbarTagMCpdgMother", mcpart->getMother()->getPDG());
+      const MCParticle* mcpartMother = mcpart->getMother();
+      int mcpartMotherPDG = 0;
+      if (mcpartMother) mcpartMotherPDG = mcpartMother->getPDG();
+      thisParticle->addExtraInfo("ccbarTagMCpdgMother", mcpartMotherPDG);
       break;
     }
   }

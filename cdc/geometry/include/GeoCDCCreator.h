@@ -176,6 +176,19 @@ namespace Belle2 {
        * @param[in] geo: the CDCGeometry
        * @param[in] iSLayer: number of the sense layer
        *
+       * @param[inout] rMinLeft: minimum radius of sensitive layer left
+       * @param[inout] rMaxLeft: maximum radius of sensitive layer left
+       * @param[inout] zBackLeft: backward z value of sensitive layer left
+       * @param[inout] zForLeft: forward z value of sensitive layer left
+       * @param[inout] rMinMiddle: minimum radius of sensitive layer middle
+       * @param[inout] rMaxMiddle: maximum radius of sensitive layer middle
+       * @param[inout] zBackMiddle: backward z value of sensitive layer middle
+       * @param[inout] zForMiddle: forward z value of sensitive layer middle
+       * @param[inout] rMinRight: minimum radius of sensitive layer right
+       * @param[inout] rMaxRight: maximum radius of sensitive layer right
+       * @param[inout] zBackRight: backward z value of sensitive layer right
+       * @param[inout] zForRight: forward z value of sensitive layer right
+       *
        * @returns: true on success, false otherwise (only for unknown value of iSLayer)
        */
       virtual bool getEndplateInformation(const CDCGeometry& geo, const uint iSLayer,

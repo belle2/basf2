@@ -1870,7 +1870,7 @@ namespace Belle2 {
         const auto& epLayerFwdIn = endplate.getEndPlateLayer(nEPLayer / 2);
         const auto& epLayerFwdOut = endplate.getEndPlateLayer(nEPLayer - 1);
         const auto& senseLayer = geo.getSenseLayer(iSLayer);
-        //    const auto& fieldLayerIn = geo.getFieldLayer(iSLayer - 1);
+
         int iSLayerMinus1 = iSLayer - 1; //avoid cpp-check warning
         const auto& fieldLayerIn = geo.getFieldLayer(iSLayerMinus1); //avoid cpp-check warning
         rMinLeft = epLayerBwdIn.getRmax();
@@ -1893,7 +1893,6 @@ namespace Belle2 {
         return false;
       }
       return true;
-
     }
   }
 }

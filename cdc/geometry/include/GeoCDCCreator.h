@@ -170,6 +170,19 @@ namespace Belle2 {
        */
       void createMapper(G4LogicalVolume& topVolume);
 
+      /**
+       *  Get endplate information
+       *
+       * @param[in] geo: the CDCGeometry
+       * @param[in] iSLayer: number of the sense layer
+       *
+       * @returns: true on success, false otherwise (only for unknown value of iSLayer)
+       */
+      virtual bool getEndplateInformation(const CDCGeometry& geo, const uint iSLayer,
+                                          double& rMinLeft, double& rMaxLeft, double& zBackLeft, double& zForLeft,
+                                          double& rMinMiddle, double& rMaxMiddle, double& zBackMiddle, double& zForMiddle,
+                                          double& rMinRight, double& rMaxRight, double& zBackRight, double& zForRight) const;
+
       //! CDC G4 logical volume.
       G4LogicalVolume* m_logicalCDC;
 

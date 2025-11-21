@@ -240,8 +240,6 @@ namespace Belle2 {
       const uint nSLayer = geo.getNSenseLayers();
       const double length_feedthrough  = geo.getFeedthroughLength();
       for (uint iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {
-        const auto& endplate = geo.getEndPlate(iSLayer);
-        const int nEPLayer = endplate.getNEndPlateLayers();
         // Get parameters for sensitive layer: left, middle and right.
         double rmin_sensitive_left, rmax_sensitive_left;
         double rmin_sensitive_middle, rmax_sensitive_middle;
@@ -250,120 +248,12 @@ namespace Belle2 {
         double zback_sensitive_middle, zfor_sensitive_middle;
         double zback_sensitive_right, zfor_sensitive_right;
 
-        if (iSLayer == 0) {
-          const auto& epLayerBwd = endplate.getEndPlateLayer(0);
-          const auto& epLayerFwd = endplate.getEndPlateLayer(nEPLayer / 2);
-          const auto& senseLayer = geo.getSenseLayer(iSLayer);
-          const auto& fieldLayer = geo.getFieldLayer(iSLayer);
-
-          rmin_sensitive_left = epLayerBwd.getRmax();
-          rmax_sensitive_left = fieldLayer.getR();
-          zback_sensitive_left = senseLayer.getZbwd();
-          zfor_sensitive_left = epLayerBwd.getZfwd();
-
-          rmin_sensitive_middle = (geo.getInnerWall(0)).getRmax();
-          rmax_sensitive_middle = fieldLayer.getR();
-          zback_sensitive_middle = epLayerBwd.getZfwd();
-          zfor_sensitive_middle = epLayerFwd.getZbwd();
-
-          rmin_sensitive_right = epLayerFwd.getRmax();
-          rmax_sensitive_right = fieldLayer.getR();
-          zback_sensitive_right = epLayerFwd.getZbwd();
-          zfor_sensitive_right = senseLayer.getZfwd();
-        } else if (iSLayer >= 1 && iSLayer <= 14) {
-          const auto& epLayerBwd = endplate.getEndPlateLayer(1);
-          const auto& epLayerFwd = endplate.getEndPlateLayer((nEPLayer / 2) + 1);
-          const auto& senseLayer = geo.getSenseLayer(iSLayer);
-          const auto& fieldLayerIn = geo.getFieldLayer(iSLayer - 1);
-          const auto& fieldLayerOut = geo.getFieldLayer(iSLayer);
-
-          rmin_sensitive_left = epLayerBwd.getRmax();
-          rmax_sensitive_left = fieldLayerOut.getR();
-          zback_sensitive_left = senseLayer.getZbwd();
-          zfor_sensitive_left = epLayerBwd.getZfwd();
-
-          rmin_sensitive_middle = fieldLayerIn.getR();
-          rmax_sensitive_middle = fieldLayerOut.getR();
-          zback_sensitive_middle = epLayerBwd.getZfwd();
-          zfor_sensitive_middle = epLayerFwd.getZbwd();
-
-          rmin_sensitive_right = epLayerFwd.getRmax();
-          rmax_sensitive_right = fieldLayerOut.getR();
-          zback_sensitive_right = epLayerFwd.getZbwd();
-          zfor_sensitive_right = senseLayer.getZfwd();
-        } else if (iSLayer >= 15 && iSLayer <= 18) {
-          const auto& epLayerBwd = endplate.getEndPlateLayer(1);
-          const auto& epLayerFwd = endplate.getEndPlateLayer(nEPLayer / 2);
-          const auto& senseLayer = geo.getSenseLayer(iSLayer);
-          const auto& fieldLayerIn = geo.getFieldLayer(iSLayer - 1);
-          const auto& fieldLayerOut = geo.getFieldLayer(iSLayer);
-
-          rmin_sensitive_left = epLayerBwd.getRmax();
-          rmax_sensitive_left = fieldLayerOut.getR();
-          zback_sensitive_left = senseLayer.getZbwd();
-          zfor_sensitive_left = epLayerBwd.getZfwd();
-
-          rmin_sensitive_middle = fieldLayerIn.getR();
-          rmax_sensitive_middle = fieldLayerOut.getR();
-          zback_sensitive_middle = epLayerBwd.getZfwd();
-          zfor_sensitive_middle = epLayerFwd.getZbwd();
-
-          rmin_sensitive_right = epLayerFwd.getRmax();
-          rmax_sensitive_right = fieldLayerOut.getR();
-          zback_sensitive_right = epLayerFwd.getZbwd();
-          zfor_sensitive_right = senseLayer.getZfwd();
-        } else if (iSLayer >= 19 && iSLayer < 55) {
-          const auto& epLayerBwd = endplate.getEndPlateLayer(0);
-          const auto& epLayerFwd = endplate.getEndPlateLayer(nEPLayer / 2);
-          const auto& senseLayer = geo.getSenseLayer(iSLayer);
-          const auto& fieldLayerIn = geo.getFieldLayer(iSLayer - 1);
-          const auto& fieldLayerOut = geo.getFieldLayer(iSLayer);
-
-          rmin_sensitive_left = epLayerBwd.getRmax();
-          rmax_sensitive_left = fieldLayerOut.getR();
-          zback_sensitive_left = senseLayer.getZbwd();
-          zfor_sensitive_left = epLayerBwd.getZfwd();
-
-          rmin_sensitive_middle = fieldLayerIn.getR();
-          rmax_sensitive_middle = fieldLayerOut.getR();
-          zback_sensitive_middle = epLayerBwd.getZfwd();
-          zfor_sensitive_middle = epLayerFwd.getZbwd();
-
-          rmin_sensitive_right = epLayerFwd.getRmax();
-          rmax_sensitive_right = fieldLayerOut.getR();
-          zback_sensitive_right = epLayerFwd.getZbwd();
-          zfor_sensitive_right = senseLayer.getZfwd();
-
-        } else if (iSLayer == 55) {
-
-          const auto& epLayerBwdIn = endplate.getEndPlateLayer(0);
-          const auto& epLayerBwdOut = endplate.getEndPlateLayer((nEPLayer / 2) - 1);
-          const auto& epLayerFwdIn = endplate.getEndPlateLayer(nEPLayer / 2);
-          const auto& epLayerFwdOut = endplate.getEndPlateLayer(nEPLayer - 1);
-          const auto& senseLayer = geo.getSenseLayer(iSLayer);
-          //    const auto& fieldLayerIn = geo.getFieldLayer(iSLayer - 1);
-          int iSLayerMinus1 = iSLayer - 1; //avoid cpp-check warning
-          const auto& fieldLayerIn = geo.getFieldLayer(iSLayerMinus1); //avoid cpp-check warning
-          rmin_sensitive_left = epLayerBwdIn.getRmax();
-          rmax_sensitive_left = epLayerBwdOut.getRmax();
-          zback_sensitive_left = senseLayer.getZbwd();
-          zfor_sensitive_left = epLayerBwdIn.getZfwd();
-
-          rmin_sensitive_middle = fieldLayerIn.getR();
-          rmax_sensitive_middle = (geo.getOuterWall(0)).getRmin();
-          zback_sensitive_middle = epLayerBwdIn.getZfwd();
-          zfor_sensitive_middle = epLayerFwdIn.getZbwd();
-
-          rmin_sensitive_right = epLayerFwdIn.getRmax();
-          rmax_sensitive_right = epLayerFwdOut.getRmax();
-          zback_sensitive_right = epLayerFwdIn.getZbwd();
-          zfor_sensitive_right = senseLayer.getZfwd();
-
-        } else {
-          B2ERROR("Undefined sensitive layer : " << iSLayer);
+        if (not getEndplateInformation(geo, iSLayer,
+                                       rmin_sensitive_left, rmax_sensitive_left, zback_sensitive_left, zfor_sensitive_left,
+                                       rmin_sensitive_middle, rmax_sensitive_middle, zback_sensitive_middle, zfor_sensitive_middle,
+                                       rmin_sensitive_right, rmax_sensitive_right, zback_sensitive_right, zfor_sensitive_right)) {
           continue;
         }
-
 
         // Check if build left sensitive tube
         if ((zfor_sensitive_left - zback_sensitive_left) > length_feedthrough) {
@@ -1879,6 +1769,131 @@ namespace Belle2 {
       logical2->SetVisAttributes(m_VisAttributes.back());
       z = 48.5 * CLHEP::cm + 0.5 * fwdEndPlateThick;
       new G4PVPlacement(0, G4ThreeVector(xc, yc, z), logical2, "physical" + name, &topVolume, false, pID);
+    }
+
+    bool GeoCDCCreator::getEndplateInformation(const CDCGeometry& geo, const uint iSLayer,
+                                               double& rMinLeft, double& rMaxLeft, double& zBackLeft, double& zForLeft,
+                                               double& rMinMiddle, double& rMaxMiddle, double& zBackMiddle, double& zForMiddle,
+                                               double& rMinRight, double& rMaxRight, double& zBackRight, double& zForRight) const
+    {
+      const auto& endplate = geo.getEndPlate(iSLayer);
+      const int nEPLayer = endplate.getNEndPlateLayers();
+
+      if (iSLayer == 0) {
+        const auto& epLayerBwd = endplate.getEndPlateLayer(0);
+        const auto& epLayerFwd = endplate.getEndPlateLayer(nEPLayer / 2);
+        const auto& senseLayer = geo.getSenseLayer(iSLayer);
+        const auto& fieldLayer = geo.getFieldLayer(iSLayer);
+
+        rMinLeft = epLayerBwd.getRmax();
+        rMaxLeft = fieldLayer.getR();
+        zBackLeft = senseLayer.getZbwd();
+        zForLeft = epLayerBwd.getZfwd();
+
+        rMinMiddle = (geo.getInnerWall(0)).getRmax();
+        rMaxMiddle = fieldLayer.getR();
+        zBackMiddle = epLayerBwd.getZfwd();
+        zForMiddle = epLayerFwd.getZbwd();
+
+        rMinRight = epLayerFwd.getRmax();
+        rMaxRight = fieldLayer.getR();
+        zBackRight = epLayerFwd.getZbwd();
+        zForRight = senseLayer.getZfwd();
+      } else if (iSLayer >= 1 && iSLayer <= 14) {
+        const auto& epLayerBwd = endplate.getEndPlateLayer(1);
+        const auto& epLayerFwd = endplate.getEndPlateLayer((nEPLayer / 2) + 1);
+        const auto& senseLayer = geo.getSenseLayer(iSLayer);
+        const auto& fieldLayerIn = geo.getFieldLayer(iSLayer - 1);
+        const auto& fieldLayerOut = geo.getFieldLayer(iSLayer);
+
+        rMinLeft = epLayerBwd.getRmax();
+        rMaxLeft = fieldLayerOut.getR();
+        zBackLeft = senseLayer.getZbwd();
+        zForLeft = epLayerBwd.getZfwd();
+
+        rMinMiddle = fieldLayerIn.getR();
+        rMaxMiddle = fieldLayerOut.getR();
+        zBackMiddle = epLayerBwd.getZfwd();
+        zForMiddle = epLayerFwd.getZbwd();
+
+        rMinRight = epLayerFwd.getRmax();
+        rMaxRight = fieldLayerOut.getR();
+        zBackRight = epLayerFwd.getZbwd();
+        zForRight = senseLayer.getZfwd();
+      } else if (iSLayer >= 15 && iSLayer <= 18) {
+        const auto& epLayerBwd = endplate.getEndPlateLayer(1);
+        const auto& epLayerFwd = endplate.getEndPlateLayer(nEPLayer / 2);
+        const auto& senseLayer = geo.getSenseLayer(iSLayer);
+        const auto& fieldLayerIn = geo.getFieldLayer(iSLayer - 1);
+        const auto& fieldLayerOut = geo.getFieldLayer(iSLayer);
+
+        rMinLeft = epLayerBwd.getRmax();
+        rMaxLeft = fieldLayerOut.getR();
+        zBackLeft = senseLayer.getZbwd();
+        zForLeft = epLayerBwd.getZfwd();
+
+        rMinMiddle = fieldLayerIn.getR();
+        rMaxMiddle = fieldLayerOut.getR();
+        zBackMiddle = epLayerBwd.getZfwd();
+        zForMiddle = epLayerFwd.getZbwd();
+
+        rMinRight = epLayerFwd.getRmax();
+        rMaxRight = fieldLayerOut.getR();
+        zBackRight = epLayerFwd.getZbwd();
+        zForRight = senseLayer.getZfwd();
+      } else if (iSLayer >= 19 && iSLayer < 55) {
+        const auto& epLayerBwd = endplate.getEndPlateLayer(0);
+        const auto& epLayerFwd = endplate.getEndPlateLayer(nEPLayer / 2);
+        const auto& senseLayer = geo.getSenseLayer(iSLayer);
+        const auto& fieldLayerIn = geo.getFieldLayer(iSLayer - 1);
+        const auto& fieldLayerOut = geo.getFieldLayer(iSLayer);
+
+        rMinLeft = epLayerBwd.getRmax();
+        rMaxLeft = fieldLayerOut.getR();
+        zBackLeft = senseLayer.getZbwd();
+        zForLeft = epLayerBwd.getZfwd();
+
+        rMinMiddle = fieldLayerIn.getR();
+        rMaxMiddle = fieldLayerOut.getR();
+        zBackMiddle = epLayerBwd.getZfwd();
+        zForMiddle = epLayerFwd.getZbwd();
+
+        rMinRight = epLayerFwd.getRmax();
+        rMaxRight = fieldLayerOut.getR();
+        zBackRight = epLayerFwd.getZbwd();
+        zForRight = senseLayer.getZfwd();
+
+      } else if (iSLayer == 55) {
+
+        const auto& epLayerBwdIn = endplate.getEndPlateLayer(0);
+        const auto& epLayerBwdOut = endplate.getEndPlateLayer((nEPLayer / 2) - 1);
+        const auto& epLayerFwdIn = endplate.getEndPlateLayer(nEPLayer / 2);
+        const auto& epLayerFwdOut = endplate.getEndPlateLayer(nEPLayer - 1);
+        const auto& senseLayer = geo.getSenseLayer(iSLayer);
+        //    const auto& fieldLayerIn = geo.getFieldLayer(iSLayer - 1);
+        int iSLayerMinus1 = iSLayer - 1; //avoid cpp-check warning
+        const auto& fieldLayerIn = geo.getFieldLayer(iSLayerMinus1); //avoid cpp-check warning
+        rMinLeft = epLayerBwdIn.getRmax();
+        rMaxLeft = epLayerBwdOut.getRmax();
+        zBackLeft = senseLayer.getZbwd();
+        zForLeft = epLayerBwdIn.getZfwd();
+
+        rMinMiddle = fieldLayerIn.getR();
+        rMaxMiddle = (geo.getOuterWall(0)).getRmin();
+        zBackMiddle = epLayerBwdIn.getZfwd();
+        zForMiddle = epLayerFwdIn.getZbwd();
+
+        rMinRight = epLayerFwdIn.getRmax();
+        rMaxRight = epLayerFwdOut.getRmax();
+        zBackRight = epLayerFwdIn.getZbwd();
+        zForRight = senseLayer.getZfwd();
+
+      } else {
+        B2ERROR("Undefined sensitive layer : " << iSLayer);
+        return false;
+      }
+      return true;
+
     }
   }
 }

@@ -124,7 +124,6 @@
   <DetectorComponent name="CLAWS" isDefault="false">
     <xi:include href="../beast/claws/CLAWS3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
-  </DetectorComponent>
   <!-- CDC without SL0 and SL1 -->
   <DetectorComponent name="CDCReducedNoSL0SL1" isDefault="false">
     <xi:include href="../cdc/CDCReducedNoSL0SL1.xml" xpointer="xpointer(/DetectorComponent/*)"/>

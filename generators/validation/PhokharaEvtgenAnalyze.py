@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 <header>
     <input>PhokharaEvtgenData.root</input>
@@ -100,8 +108,6 @@ class PhokharaEvtgenAnalysisModule(b2.Module):
         self.output_file.Close()
 
 
-#: \cond Doxygen_suppress
-
 # Input.
 root_input = b2.register_module('RootInput')
 root_input.param('inputFileName', 'PhokharaEvtgenData.root')
@@ -111,8 +117,6 @@ phokhara_evtgen = PhokharaEvtgenAnalysisModule()
 
 # Create main path.
 main = b2.create_path()
-
-#: \endcond
 
 # Add modules to main path
 main.add_module(root_input)

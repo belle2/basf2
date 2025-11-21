@@ -2881,7 +2881,7 @@
       AllowedDistance1D=8.0
       IgnoreBackwardPropagation=False
       MinimalMatchingDigits=14
-      MinimalMatchingDigitsOuterLayers=0
+      MinimalMatchingDigitsOuterLayers=4
       MinimalMomentumNoOuterLayers=4.0
       MuonListName=mu+:KLMDQM2
       RemoveUnusedMuons=False
@@ -5806,7 +5806,7 @@
             AllowedDistance1D=8.0
             IgnoreBackwardPropagation=False
             MinimalMatchingDigits=14
-            MinimalMatchingDigitsOuterLayers=0
+            MinimalMatchingDigitsOuterLayers=4
             MinimalMomentumNoOuterLayers=4.0
             MuonListName=mu+:KLMDQM2
             RemoveUnusedMuons=False

@@ -8,8 +8,6 @@
 from unittest import TestCase, main
 from hep_ipython_tools.calculation_list import create_every_parameter_combination, create_all_calculations
 
-# @cond internal_test
-
 
 class TestCalculationList(TestCase):
 
@@ -122,4 +120,3 @@ class TestCalculationList(TestCase):
 
 if __name__ == "__main__":
     main()
-# @endcond

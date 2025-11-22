@@ -9,7 +9,6 @@
 #include <tracking/trackFindingCDC/findlets/complete/CDCHitsRemover.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -35,19 +34,12 @@ std::string CDCHitsRemover::getDescription()
 
 void CDCHitsRemover::apply(const std::vector<CDCWireHit>& wireHits)
 {
-  unsigned int counter = 0;
-  std::unordered_set<unsigned> indicesToRemove;
-  for (const TrackFindingCDC::CDCWireHit& wireHit : wireHits) {
-    counter += 1;
-    if (wireHit->hasBackgroundFlag()) {
-      indicesToRemove.insert(counter);
-    };
-  };
 
   // Selector
-  auto selector = [indicesToRemove, this](const RelationsObject * p) -> bool {
+  auto selector = [wireHits](const RelationsObject * p) -> bool {
     int idx = p->getArrayIndex();
-    return (indicesToRemove.count(idx) == 0);
+    bool bg = wireHits[idx]->hasBackgroundFlag();
+    return not bg;
   };
 
   m_cdc_selector.select(selector);

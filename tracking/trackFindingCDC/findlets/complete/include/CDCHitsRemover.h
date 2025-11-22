@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <unordered_set>
 #include <framework/datastore/SelectSubset.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 

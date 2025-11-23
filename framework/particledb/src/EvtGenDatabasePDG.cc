@@ -26,15 +26,17 @@ EvtGenDatabasePDG* EvtGenDatabasePDG::Instance()
 {
   static bool instanceCreated = false;
   if (!instanceCreated) {
-    //hope we are the first to create a TDatabasePDG instance (setting the instance pointer in the process)
+    // Necessary to avoid "Error in <TClass::LoadClassInfo>: no interpreter information for class..."
+    gInterpreter->Declare("#include <framework/particledb/EvtGenParticlePDG.h>");
+    // hope we are the first to create a TDatabasePDG instance (setting the instance pointer in the process)
     auto instance = new EvtGenDatabasePDG();
-    //ok, now load the data
+    // ok, now load the data
     instance->ReadEvtGenTable();
     instanceCreated = true;
     if (instance != TDatabasePDG::Instance())
       B2FATAL("EvtGenDatabasePDG created too late!");
   }
-  //this cast should be safe as we stop execution above if we couldn't create the first instance ourselves
+  // this cast should be safe as we stop execution above if we couldn't create the first instance ourselves
   return static_cast<EvtGenDatabasePDG*>(TDatabasePDG::Instance());
 }
 

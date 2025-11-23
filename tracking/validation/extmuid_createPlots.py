@@ -40,6 +40,8 @@ from optparse import OptionParser
 CONTACT_PERSON = {'Name': 'Leo Piilonen',
                   'Email': 'piilonen@vt.edu'}
 
+ACTIVE = True
+
 
 def main():
     """Create validation plots for Ext and Muid"""
@@ -65,10 +67,10 @@ def main():
     try:
         number_entries = file_chain.GetEntries()
     except AttributeError:
-        print('Could not load input file(s) %s.' % options.input_file)
+        print(f'Could not load input file(s) {options.input_file}.')
 
     if number_entries == 0:
-        print('Data tree is empty or does not exist in file(s) %s. Exit.' % options.input_file)
+        print(f'Data tree is empty or does not exist in file(s) {options.input_file}. Exit.')
         sys.exit(0)
 
     # open the output root file
@@ -288,20 +290,29 @@ def draw_likelihoods(file_chain):
     fakerate_phi = TH1F('FakeRate-phi', 'Pion fake rate vs phi', phiBins2, phiMin, phiMax)
     fakerate_phi_denom = TH1F('FakeRate-phi-denom', 'Pion fake rate vs phi', phiBins2, phiMin, phiMax)
 
-    for entry in file_chain:
-        mcps = entry.MCParticles
-        momentum = mcps[0].getMomentum()
-        muids = entry.KLMMuidLikelihoods
-        for i in range(muids.GetEntriesFast()):
-            outcome.Fill(muids[i].getOutcome())
-            if muids[i].getOutcome() > 0:
-                llMu = muids[i].getLogL_mu()
-                llPi = muids[i].getLogL_pi()
-                blayer = muids[i].getBarrelHitLayer()
-                elayer = muids[i].getEndcapHitLayer()
-                diffLayer = muids[i].getExtLayer() - muids[i].getHitLayer()
-                ndof = muids[i].getDegreesOfFreedom()
-                chisq = muids[i].getChiSquared()
+    for chainIndex in range(0, file_chain.GetEntries()):
+        file_chain.GetEntry(chainIndex)
+        if file_chain.GetBranch('MCParticles').GetNdata() == 0:
+            continue
+        # only first (ParticleGun) entry
+        px = file_chain.GetLeaf('MCParticles.m_momentum_x').GetValue(0)
+        py = file_chain.GetLeaf('MCParticles.m_momentum_y').GetValue(0)
+        pz = file_chain.GetLeaf('MCParticles.m_momentum_z').GetValue(0)
+        momentum = ROOT.Math.XYZVector(px, py, pz)
+        isMuon = 'muon' in file_chain.GetFile().GetName()
+        for i in range(0, file_chain.GetBranch('KLMMuidLikelihoods').GetNdata()):
+            o = file_chain.GetLeaf('KLMMuidLikelihoods.m_Outcome').GetValue(i)
+            outcome.Fill(o)
+            if o > 0:
+                # ChargedStable indices: 0=electron, 1=muon, 2=pion, 3=kaon, 4=proton, 5=deuteron
+                llMu = file_chain.GetLeaf('KLMMuidLikelihoods.m_LogL').GetValue(6*i+1)
+                llPi = file_chain.GetLeaf('KLMMuidLikelihoods.m_LogL').GetValue(6*i+2)
+                blayer = file_chain.GetLeaf('KLMMuidLikelihoods.m_BarrelHitLayer').GetValue(i)
+                elayer = file_chain.GetLeaf('KLMMuidLikelihoods.m_EndcapHitLayer').GetValue(i)
+                diffLayer = file_chain.GetLeaf('KLMMuidLikelihoods.m_ExtLayer').GetValue(i) - \
+                    file_chain.GetLeaf('KLMMuidLikelihoods.m_HitLayer').GetValue(i)
+                ndof = file_chain.GetLeaf('KLMMuidLikelihoods.m_DegreesOfFreedom').GetValue(i)
+                chisq = file_chain.GetLeaf('KLMMuidLikelihoods.m_ChiSquared').GetValue(i)
                 rchisq = -1.0
                 if ndof > 0:
                     rchisq = chisq / ndof
@@ -310,7 +321,7 @@ def draw_likelihoods(file_chain):
                 phi = momentum.Phi() * 180.0 / np.pi
                 if phi < 0.0:
                     phi = phi + 360.0
-                if 'muon' in file_chain.GetCurrentFile().GetName():
+                if isMuon:
                     llMu_mu.Fill(llMu)
                     llPi_mu.Fill(llPi)
                     llDiff_mu.Fill(llMu - llPi)
@@ -530,4 +541,9 @@ def draw_likelihoods(file_chain):
 # Entry point of this script: call the main() function             #
 ####################################################################
 if __name__ == '__main__':
-    main()
+    if ACTIVE:
+        main()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

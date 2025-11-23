@@ -59,7 +59,7 @@ namespace Belle2 {
 /**
  * \def B2METHOD()
  * scoped logging for entering/leaving methods.
- * Use this in a code block (curly braces) to get a B2INFO mesage
+ * Use this in a code block (curly braces) to get a B2INFO message
  * at the point where B2METHOD is used, and again when execution
  * leaves the current block.
  */

@@ -15,25 +15,28 @@
 #include <arich/dbobjects/ARICHModuleTest.h>
 
 namespace Belle2 {
+
   /**
-  *   Sensor Module Information
-  */
+   * Sensor-module information.
+   */
   class ARICHSensorModuleInfo: public TObject {
+
   public:
+
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHSensorModuleInfo(): m_id(0), m_FEBserial(0), m_FEB(NULL), m_HAPDserial(""), m_HAPD(NULL), m_module(NULL), m_HVboard(0),
       m_timeStamp(), m_comment("") {};
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHSensorModuleInfo(int id, ARICHFEBoardInfo* FEB, ARICHHapdInfo* HAPD, TTimeStamp timeStamp): m_id(id), m_FEBserial(0),
       m_FEB(FEB), m_HAPDserial(""), m_HAPD(HAPD), m_module(NULL), m_HVboard(0), m_timeStamp(timeStamp), m_comment("") {};
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHSensorModuleInfo(int id, ARICHFEBoardInfo* FEB, ARICHHapdInfo* HAPD, TTimeStamp timeStamp,
                           const std::string& comment): m_id(id),
@@ -41,97 +44,115 @@ namespace Belle2 {
       m_comment(comment) {};
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ARICHSensorModuleInfo() {};
 
-    /** Get Sensor Module Identifier
-     * @return Sensor Module Identifier
+    /**
+     * Get sensor-module identifier.
+     * @return Sensor-module identifier.
      */
     int getSensorModuleID() const {return m_id; }
 
-    /** Set Sensor Module Identifier
-     * @param Sensor Module Identifier
+    /**
+     * Set Sensor-module identifier.
+     * @param[in] id Sensor-module identifier.
      */
     void setSensorModuleID(int id) {m_id = id; }
 
-    /** Get FEB serial number
-     * @return FEB serial number
+    /**
+     * Get FEB serial number.
+     * @return FEB serial number.
      */
     int getFEBserial() const {return m_FEBserial; }
 
-    /** Set FEB serial number
-     * @param FEB serial number
+    /**
+     * Set FEB serial number.
+     * @param[in] FEBserial FEB serial number.
      */
     void setFEBserial(int FEBserial) {m_FEBserial = FEBserial; }
 
-    /** Get FEBoard Identifier
-     * @return FEBoard Identifier
+    /**
+     * Get FEBoard identifier.
+     * @return FEBoard identifier.
      */
     ARICHFEBoardInfo* getFEBoardID() const {return m_FEB; }
 
-    /** Set FEBoard Identifier
-     * @param FEBoard Identifier
+    /**
+     * Set FEBoard identifier.
+     * @param[in] FEB FEBoard identifier.
      */
     void setFEBoardID(ARICHFEBoardInfo* FEB) {m_FEB = FEB; }
 
-    /** Get HAPD serial number
-     * @return HAPD serial number
+    /**
+     * Get HAPD serial number.
+     * @return HAPD serial number.
      */
     std::string getHAPDserial() const {return m_HAPDserial; }
 
-    /** Set HAPD serial number
-     * @param HAPD serial number
+    /**
+     * Set HAPD serial number.
+     * @param[in] HAPDserial HAPD serial number.
      */
     void setHAPDserial(const std::string& HAPDserial) {m_HAPDserial = HAPDserial; }
 
-    /** Get HAPD Identifier
-     * @return HAPD Identifier
+    /**
+     * Get HAPD Identifier.
+     * @return HAPD Identifier.
      */
     ARICHHapdInfo* getHapdID() const {return m_HAPD; }
 
-    /** Set HAPD Identifier
-     * @param HAPD Identifier
+    /**
+     * Set HAPD Identifier.
+     * @param[in] HAPD HAPD Identifier.
      */
     void setHapdID(ARICHHapdInfo* HAPD) {m_HAPD = HAPD; }
 
-    /** Get module test Identifier
-     * @return module test Identifier
+    /**
+     * Get module test identifier.
+     * @return Module test identifier.
      */
     ARICHModuleTest* getModuleTest() const {return m_module; }
 
-    /** Set module test Identifier
-     * @param module test Identifier
+    /**
+     * Set module test identifier.
+     * @param[in] module Module test Identifier.
      */
     void setModuleTest(ARICHModuleTest* module) {m_module = module; }
 
-    /** Get HV board Identifier
-     * @return HV board Identifier
+    /**
+     * Get HV board identifier.
+     * @return HV board identifier.
      */
     int getHVboardID() const {return m_HVboard; }
 
-    /** Set HV board Identifier
-     * @param HV board Identifier
+    /**
+     * Set HV board identifier.
+     * @param[in] hv HV board identifier.
      */
     void setHVboardID(int hv) {m_HVboard = hv; }
 
-    /** Get Production date
+    /**
+     * Get production date.
      * @return Production date
      */
     TTimeStamp getTimeStamp() const {return m_timeStamp; }
 
-    /** Set Production date
-     * @param Production date
+    /**
+     * Set production date.
+     * @param[in] timeStamp Production date.
      */
     void setTimeStamp(TTimeStamp timeStamp) {m_timeStamp = timeStamp; }
 
-    /** Get comment
-     * @return comment
+    /**
+     * Get comment.
+     * @return comment.
      */
     std::string getSensorModuleComment() const {return m_comment; }
 
-    /** Set comment
-     * @param comment
+    /**
+     * Set comment.
+     * @param[in] comment Comment.
      */
     void setSensorModuleComment(const std::string& comment) {m_comment = comment; }
 

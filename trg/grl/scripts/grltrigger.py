@@ -1,5 +1,4 @@
 # !/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -22,18 +21,18 @@ def add_grl_trigger(path, SimulationMode=1):
     match.param('SimulationMode', SimulationMode)
     path.add_module(match)
 
-    grl = b2.register_module('GRLNeuro')
-    grl.param('nMLP', 1)
-    grl.param('multiplyHidden', False)
-    grl.param('nHidden', [[20, 20]])
-    grl.param('n_cdc_sector', 0)
-    grl.param('n_ecl_sector', 1)
-    grl.param('i_cdc_sector', [0*35*3])
-    grl.param('i_ecl_sector', [1*6*3+1])
-    grl.param('weightFiles', [b2.find_file("data/trg/grl/weights.dat")])
-    grl.param('biasFiles', [b2.find_file("data/trg/grl/bias.dat")])
-    path.add_module(grl)
+    grlnn = b2.register_module('GRLNeuro')
+    path.add_module(grlnn)
 
-    objects = b2.register_module('TRGGRLProjects')
-    objects.param('SimulationMode', SimulationMode)
-    path.add_module(objects)
+    _TRGGRLInfo = 'TRGGRLObjects'
+
+    path.add_module(
+        'TRGGRLProjects',
+        SimulationMode=SimulationMode,
+        TrgGrlInformation=_TRGGRLInfo
+    )
+
+    path.add_module(
+        'TRGGRLInjectionVetoFromOverlay',
+        TRGGRLInfoName=_TRGGRLInfo
+    )

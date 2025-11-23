@@ -24,7 +24,7 @@ namespace Belle2 {
     /**
      * Constructor for setting parameters
      */
-    BremFindingMatchCompute(float clusterAcceptanceFactor, ECLCluster const& cluster,
+    BremFindingMatchCompute(float clusterAcceptanceFactor, const ECLCluster* cluster,
                             genfit::MeasuredStateOnPlane const& measuredStateOnPlane) :
       m_clusterAcceptanceFactor(clusterAcceptanceFactor),
       m_eclCluster(cluster),
@@ -54,7 +54,7 @@ namespace Belle2 {
     /**
      * Bremsstrahlung cluster candidate gets stored here
      */
-    ECLCluster const& m_eclCluster;
+    const ECLCluster* m_eclCluster;
 
     /**
      * VXD hit

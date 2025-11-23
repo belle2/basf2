@@ -65,7 +65,7 @@ class MatScanConfig(basf2.Module):
             # name of the sensor
             vxdid_str = "%d.%d.%d" % sensor
             # get the sensor information
-            info = Belle2.VXD.GeoCache.get(vxdid)
+            info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(vxdid)
             # and from that the origin and direction of our scan in local
             # coordinates
             local_origin = ROOT.TVector3(0, 0, -self.depth/2)

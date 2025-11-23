@@ -23,7 +23,7 @@ unsigned short HopfieldNetwork::doHopfield(
   //Start value for neurons if they are compatible.
   //Each compatible connection activates a node with this value.
   //As the sum of all the activations shall be less than one, we divide the
-  //activiation by the total number of Nodes.
+  //activation by the total number of Nodes.
   //Incompatible Nodes get later minus one, which counteracts all activation,
   //if the incompatible Node is active.
   if (overlapResolverNodeInfos.size() < 2) {

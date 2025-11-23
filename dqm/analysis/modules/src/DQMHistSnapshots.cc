@@ -73,7 +73,7 @@ void DQMHistSnapshotsModule::event()
     m_last_check = cur_time;
   }
 
-  for (auto it : getHistList()) {
+  for (auto& it : getHistList()) {
     auto name = it.first;
 
     SSNODE* n = find_snapshot(name);

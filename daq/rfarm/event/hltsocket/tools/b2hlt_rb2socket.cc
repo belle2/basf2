@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   unsigned int port;
   std::string shmName;
   unsigned int shmID;
-  bool raw;
+  bool raw = false;
   std::string sourceHost;
 
   po::options_description desc("b2hlt_rb2socket RING-BUFFER-NAME PORT SHM-NAME SHM-ID");

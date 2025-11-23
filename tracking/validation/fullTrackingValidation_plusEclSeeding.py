@@ -18,15 +18,13 @@
 """
 
 from tracking.validation.run import TrackingValidationRun
-import tracking
+from tracking import add_tracking_reconstruction
 import logging
 import reconstruction
 import basf2
 VALIDATION_OUTPUT_FILE = 'fullTrackingValidation_plusECL.root'
-N_EVENTS = 10000
-ACTIVE = True
-
-basf2.set_random_seed(1337)
+N_EVENTS = 1000
+ACTIVE = False
 
 
 class fullTrackingValidation_plusECL(TrackingValidationRun):
@@ -46,8 +44,8 @@ class fullTrackingValidation_plusECL(TrackingValidationRun):
 
         reconstruction.add_prefilter_pretracking_reconstruction(path, components=components)
 
-        tracking.add_tracking_reconstruction(path, components=components,
-                                             use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=True)
+        add_tracking_reconstruction(path, components=components,
+                                    use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=True)
 
     #: Define the user parameters for the track-finding module
     tracking_coverage = {
@@ -76,6 +74,7 @@ class fullTrackingValidation_plusECL(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = fullTrackingValidation_plusECL()
     validation_run.configure_and_execute_from_commandline()
 
@@ -85,3 +84,7 @@ if __name__ == '__main__':
 
     if ACTIVE:
         main()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

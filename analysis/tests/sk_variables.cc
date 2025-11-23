@@ -12,14 +12,11 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/datastore/StoreArray.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
 #include <analysis/variables/SpecificKinematicVariables.h>
 #include <analysis/variables/Variables.h>
-
-#include <analysis/VariableManager/Manager.h>
 
 using namespace std;
 using namespace Belle2;

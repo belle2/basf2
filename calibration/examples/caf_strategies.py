@@ -15,7 +15,6 @@ import basf2 as b2
 import os
 import sys
 
-from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 
 b2.set_log_level(b2.LogLevel.INFO)
@@ -41,6 +40,9 @@ def main(argv):
 
     ###################################################
     # Test Calibration Setup
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
+    from ROOT.Belle2 import TestCalibrationAlgorithm
+
     alg_test = TestCalibrationAlgorithm()  # Getting a calibration algorithm instance
     alg_test.setMinEntries(15000)  # This algorithm provides a setting to change when c_NotEnoughData is returned
 
@@ -77,7 +79,7 @@ def main(argv):
     # If there wasn't enough data in a run to give a success, it tries to
     # merge with the next time period's data and re-execute.
     # You should only use granularity='run' for the collector when using this strategy.
-    # The run Boundaries can be either passed directy in the parameter dictionary
+    # The run Boundaries can be either passed directly in the parameter dictionary
     # of the algorithm (key `payload_boundaries`) or calculated by the algorithm itself
     # in the function `isBoundaryRequired`.
 

@@ -24,7 +24,7 @@ main.add_module("RootOutput", outputFileName='root_output_test.root', updateFile
 # Process events
 process(main)
 
-# check wether output file contains correct number of events
+# check whether output file contains correct number of events
 tfile = TFile('root_output_test.root')
 tree = tfile.Get('tree')
 if tree.GetEntries() != 200:

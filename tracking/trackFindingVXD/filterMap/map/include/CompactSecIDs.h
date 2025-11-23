@@ -339,7 +339,7 @@ namespace Belle2 {
     int nOfSensors(int layer, int ladder) const
     {
       if (ladder < 0 || ladder >= nOfLadders(layer))
-        return 0; // Note: the check on the layer is implicitely made
+        return 0; // Note: the check on the layer is implicitly made
 
       return m_compactSectorsIDMap[layer][ladder].size();
     }
@@ -369,7 +369,7 @@ namespace Belle2 {
 
     /// The hidden private method that recursively manage the size of everything.
     /// It returns the number of added sectors.
-    /// It returns 0 in case of errors (memory exausted, or sector redefinition.)
+    /// It returns 0 in case of errors (memory exhausted, or sector redefinition.)
     template<  class TContainer,
                class ... Indexes >
     int privateAddSectors(TContainer& container,

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,7 +12,7 @@
 <header>
   <output>EvtGenSimRec.root</output>
   <cacheable/>
-  <contact>Software team b2soft@mail.desy.de</contact>
+  <contact>arul.prakash@physik.uni-muenchen.de</contact>
   <description>This steering file produces 1000 generic BBbar events with EvtGen,
   runs the detector simulation with mixed in background, and performs the standard reconstruction.</description>
 </header>
@@ -28,7 +27,7 @@ from background import get_background_files
 
 set_random_seed(12345)
 
-# set one parallel process to excercise the basf2 parallel code
+# set one parallel process to exercise the basf2 parallel code
 # set_nprocesses(1)
 
 main = create_path()
@@ -67,14 +66,14 @@ print(statistics)
 
 statistics_plots(
     "EvtGenSimRec_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation and reconstruction job with generic EvtGen events",
     prefix="EvtGenSimRec",
 )
 event_timing_plot(
     "../EvtGenSimRec.root",
     "EvtGenSimRec_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation and reconstruction job with generic EvtGen events",
     prefix="EvtGenSimRec",
 )

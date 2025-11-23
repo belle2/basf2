@@ -84,7 +84,7 @@ namespace Belle2 {
     double getwatt()  const { return m_inputSAD_watt; }
     /** Return ring HER = 1 or LER = 2 */
     int getring()  const { return m_inputSAD_ring; }
-    /** Return section of ring where the scattering occures */
+    /** Return section of ring where the scattering occurs */
     int getring_section()  const { return m_inputSAD_ring_section; }
 
   private:
@@ -127,7 +127,7 @@ namespace Belle2 {
     double m_inputSAD_watt;
     /** Return ring HER = 1 or LER = 2 */
     int m_inputSAD_ring;
-    /** Return section of ring where the scattering occures */
+    /** Return section of ring where the scattering occurs */
     int m_inputSAD_ring_section;
 
     ClassDef(SADMetaHit, 2)

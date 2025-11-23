@@ -11,13 +11,9 @@
 
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -32,7 +28,6 @@
 #include <G4VisAttributes.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -90,7 +85,7 @@ namespace Belle2 {
         thetaZ.push_back(ThetaZ);
       }
 
-      if (thetaZ.size() != dimz) { B2ERROR("Diamond data not consistent (i.e. not same number of all position parmeters)"); return;}
+      if (thetaZ.size() != dimz) { B2ERROR("Diamond data not consistent (i.e. not same number of all position parameters)"); return;}
 
       if (phase == 2 || phase == 3) {
 
@@ -109,7 +104,7 @@ namespace Belle2 {
         for (double addAngle : m_config.getParArray(prep + "addAngle", {0})) {
           svdAngle.push_back(addAngle);
         }
-        if (phi.size() != dimz || r.size() != dimz || deltaX.size() != dimz || svdAngle.size() != dimz) { B2ERROR("Diamond data not consistent (i.e. not same number of all position parmeters)"); return;}
+        if (phi.size() != dimz || r.size() != dimz || deltaX.size() != dimz || svdAngle.size() != dimz) { B2ERROR("Diamond data not consistent (i.e. not same number of all position parameters)"); return;}
       }
       if (phase == 1) {
         for (double x : m_config.getParArray(prep + "x", {0})) {
@@ -127,7 +122,7 @@ namespace Belle2 {
         for (double ThetaY : m_config.getParArray(prep + "ThetaY", {0})) {
           thetaY.push_back(ThetaY);
         }
-        if (x_pos.size() != dimz || y_pos.size() != dimz || thetaX.size() != dimz || thetaY.size() != dimz) { B2ERROR("Diamond data not consistent (i.e. not same number of all position parmeters)"); return;}
+        if (x_pos.size() != dimz || y_pos.size() != dimz || thetaX.size() != dimz || thetaY.size() != dimz) { B2ERROR("Diamond data not consistent (i.e. not same number of all position parameters)"); return;}
       }
 
       //create beamabort package

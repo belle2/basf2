@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -26,7 +25,7 @@ class dump_clusters(b2.Module):
     def __init__(self, filename='dump_clusters.txt', collection='SVDClusters'):
         """Initialize the module"""
 
-        super(dump_clusters, self).__init__()
+        super().__init__()
         #: Input file object.
         self.file = open(filename, 'w')
 #: name of the StoreArraw SVDClusters
@@ -65,27 +64,13 @@ class dump_clusters(b2.Module):
 
             uSide = cluster.isUCluster()
 
-            # Sesnor identification
+            # Sensor identification
             [layer, ladder, sensor] = self.decode(sensorID)
             side_str = 'u' if uSide else 'v'
 
-            s = '{event} {layer} {ladder} {sensor} {side} {strip} {bg} {etime}'.format(
-                event=eventNo,
-                layer=layer,
-                ladder=ladder,
-                sensor=sensor,
-                side=side_str,
-                strip=cluster.getPosition(),
-                bg=bg_label,
-                etime=triggerTime
-            )
+            s = f'{eventNo} {layer} {ladder} {sensor} {side_str} {cluster.getPosition()} {bg_label} {triggerTime}'
             # Cluster information
-            s += ' {clstime} {clscharge} {clssize} {clschi}\n'.format(
-                clstime=cluster.getClsTime(),
-                clscharge=cluster.getCharge(),
-                clssize=cluster.getSize(),
-                clschi=cluster.getChi2()
-            )
+            s += f' {cluster.getClsTime()} {cluster.getCharge()} {cluster.getSize()} {cluster.getChi2()}\n'
             self.file.write(s)
 
     def terminate(self):

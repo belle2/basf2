@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -44,12 +43,12 @@ from ROOT import EventDataRecoDigit  # noqa
 
 
 class SVDValidationTTreeRecoDigit(b2.Module):
-    '''class to create reco digitis ttree'''
+    '''class to create reco digits ttree'''
 
     def __init__(self):
         """Initialize the module"""
 
-        super(SVDValidationTTreeRecoDigit, self).__init__()
+        super().__init__()
         #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeRecoDigit.root', 'recreate')
         #: ttree

@@ -97,8 +97,10 @@ namespace Belle2 {
       void setBFieldZ(const double bfieldZ = 1.5) { m_BFieldZ = bfieldZ; }
 
     private:
-      /// BField along z to estimate pT
-      double m_BFieldZ = 1.5;
+      /// ThreeHitVariables getter for the outer three hits
+      ThreeHitVariables m_outerThreeHitVariables;
+      /// ThreeHitVariables getter for the inner three hits
+      ThreeHitVariables m_innerThreeHitVariables;
       /// outermost hit position
       B2Vector3D m_oHit;
       /// second-to-outer hit position
@@ -107,10 +109,8 @@ namespace Belle2 {
       B2Vector3D m_icHit;
       /// innermost hit position
       B2Vector3D m_iHit;
-      /// ThreeHitVariables getter for the outer three hits
-      ThreeHitVariables m_outerThreeHitVariables;
-      /// ThreeHitVariables getter for the inner three hits
-      ThreeHitVariables m_innerThreeHitVariables;
+      /// BField along z to estimate pT
+      double m_BFieldZ = 1.5;
 
     };
 

@@ -7,11 +7,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <TMath.h>
 #include <TMatrixFSym.h>
 
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 #include <analysis/VertexFitting/KFit/MassVertexFitKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
+#include <analysis/utility/ROOTToCLHEP.h>
 #include <framework/gearbox/Const.h>
 
 using namespace std;
@@ -42,9 +44,9 @@ MassVertexFitKFit::setInitialVertex(const HepPoint3D& v) {
   return m_ErrorCode = KFitError::kNoError;
 }
 
-enum KFitError::ECode MassVertexFitKFit::setInitialVertex(const B2Vector3D& v)
+enum KFitError::ECode MassVertexFitKFit::setInitialVertex(const ROOT::Math::XYZVector& v)
 {
-  m_BeforeVertex = HepPoint3D(v.X(), v.Y(), v.Z());
+  m_BeforeVertex = ROOTToCLHEP::getPoint3D(v);
   m_ErrorCode = KFitError::kNoError;
   return m_ErrorCode;
 }

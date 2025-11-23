@@ -21,7 +21,7 @@ namespace Belle2 {
      *
      * CreatorFactory<Classname> Classname_factory("CreatorName");
      *
-     * or similiar to the source file to automatically provide the needed
+     * or similar to the source file to automatically provide the needed
      * factory function and register the creator with the CreatorManager
      */
     template<class T> struct CreatorFactory {

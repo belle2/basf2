@@ -1,0 +1,29 @@
+# EventType: 1210018000
+# Descriptor: [B+ -> eta K+ ]cc
+# NickName: B+_etaK+
+# Documentation: Study of Acp in B0 -> eta K+
+# Responsible: Wen-Yi Chen
+# Email: r09222054@ntu.edu.tw
+# Tested: yes
+# PhysicsWG: Bhadronic
+# Cuts: None
+# Date: 29/03/2024
+#
+#
+Alias etasig eta
+
+Decay Upsilon(4S)
+0.5   B+sig   B-      VSS;
+0.5   B+      B-sig   VSS;
+Enddecay
+
+Decay B+sig
+1.0   etasig K+ PHSP;
+Enddecay
+CDecay B-sig
+
+Decay etasig
+1.0 gamma gamma PHSP;
+Enddecay
+
+End

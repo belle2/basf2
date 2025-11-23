@@ -40,7 +40,7 @@ namespace Belle2 {
       ~TrackFinderVXDAnalizerModule() {}
 
 
-      /** inizialize function */
+      /** initialize function */
       void initialize() override;
 
 
@@ -219,7 +219,7 @@ namespace Belle2 {
       /** counts number of times, where assigned caTC guessed wrong sign of charge. */
       unsigned int m_wrongChargeSignCounter = 0;
 
-      /** another counter of mcTCs, consideres size of datastores containing mcTCs. */
+      /** another counter of mcTCs, considers size of datastores containing mcTCs. */
       unsigned int m_mcTrackVectorCounter = 0;
 
       /** counts total number of pxdHits added by mcTF. */

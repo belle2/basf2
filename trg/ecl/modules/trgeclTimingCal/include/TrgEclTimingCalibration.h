@@ -93,7 +93,7 @@ namespace Belle2 {
     int fInclude_BR;
     //! Flag include backward endcap 0 : exclude BWD  1 : include BWD
     int fInclude_BWD;
-    //! Flag iteration  0 : first calbiration  1 : iteration
+    //! Flag iteration  0 : first calibration  1 : iteration
     int fIteration;
 
     //! TC energy cut upper limit
@@ -132,7 +132,7 @@ namespace Belle2 {
     std::vector<ROOT::Math::XYZVector> TCPosition;
 
     //! Matrix
-    //! Marix component
+    //! Matrix component
     TMatrixDSym _Matrix;
     //! chisq component1
     std::vector<std::vector<double>> Chisq1;
@@ -141,7 +141,7 @@ namespace Belle2 {
     //! chisq component3
     std::vector<std::vector<double>> Chisq3;
 
-    //! The number of uesed TC hit (TC by TC)
+    //! The number of used TC hit (TC by TC)
     std::vector<int> Nevent_TC;
     //! Chisq values based on time offset obtained from "Solve_Matrix" function
     std::vector<double> chisq_result;

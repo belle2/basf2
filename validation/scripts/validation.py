@@ -97,11 +97,9 @@ def statistics_plots(
     h_global_timing.GetListOfFunctions().Add(
         ROOT.TNamed(
             "Description",
-            """The (average) time of the different basf2 execution phases
-            for {}. The error bars show the rms of the time
-            distributions.""".format(
-                job_desc
-            ),
+            f"""The (average) time of the different basf2 execution phases
+            for {job_desc}. The error bars show the rms of the time
+            distributions.""",
         )
     )
     h_global_timing.GetListOfFunctions().Add(
@@ -158,14 +156,13 @@ def statistics_plots(
             ROOT.TNamed("Contact", contact)
         )
     for method in timing_methods:
-        h_module_timing.SetTitle("Module %s Timing" % method_name[method])
+        h_module_timing.SetTitle(f"Module {method_name[method]} Timing")
         h_module_timing.GetListOfFunctions().Add(
             ROOT.TNamed(
                 "Description",
-                """The (average) execution time of the %s method of modules
-                for %s. The error bars show the rms of the time
-                distributions."""
-                % (method_name[method], job_desc),
+                f"""The (average) execution time of the {method_name[method]} method of modules
+                for {job_desc}. The error bars show the rms of the time
+                distributions.""",
             )
         )
         index = 1
@@ -178,7 +175,7 @@ def statistics_plots(
             )
             h_module_timing.GetXaxis().SetBinLabel(index, modstat.name)
             index += 1
-        h_module_timing.Write("{}{}Timing".format(prefix, method_name[method]))
+        h_module_timing.Write(f"{prefix}{method_name[method]}Timing")
         h_module_timing.GetListOfFunctions().RemoveLast()
 
     # Memory usage profile
@@ -263,7 +260,7 @@ def statistics_plots(
             ROOT.TNamed("Contact", contact)
         )
     for method in memory_methds:
-        h_module_memory.SetTitle("Module %s Memory" % method_name[method])
+        h_module_memory.SetTitle(f"Module {method_name[method]} Memory")
         index = 1
         for modstat in modules:
             h_module_memory.SetBinContent(index, modstat.memory_mean(method))
@@ -272,7 +269,7 @@ def statistics_plots(
             )
             h_module_memory.GetXaxis().SetBinLabel(index, modstat.name)
             index += 1
-        h_module_memory.Write("{}{}Memory".format(prefix, method_name[method]))
+        h_module_memory.Write(f"{prefix}{method_name[method]}Memory")
         h_module_memory.GetListOfFunctions().RemoveLast()
 
     if plot_file:
@@ -305,7 +302,7 @@ def event_timing_plot(
     tree = data.Get("tree")
     entries = tree.GetEntries()
     tree.Draw(
-        "Entry$>>hEventTime(%d,-0.5,%d.5)" % (entries, entries - 1),
+        f"Entry$>>hEventTime({int(entries)},-0.5,{int(entries - 1)}.5)",
         "ProfileInfo.m_timeInSec",
         "goff",
     )
@@ -364,10 +361,10 @@ def draw_progress_bar(delete_lines: int, scripts: List[Script], barlength=50):
 
     @param delete_lines: The amount of lines which need to be deleted before
         we can redraw the progress bar
-    @param scripts: List of all Script obejcts
-    @param barlength: The length of the progess bar (in characters)
+    @param scripts: List of all Script objects
+    @param barlength: The length of the progress bar (in characters)
     @return: The number of lines that were printed by this function call.
-        Usefule if this function is called repeatedly.
+        Useful if this function is called repeatedly.
     """
 
     # Get statistics: Number of finished scripts + number of scripts in total
@@ -421,7 +418,7 @@ def draw_progress_bar(delete_lines: int, scripts: List[Script], barlength=50):
 
     print(f"Running: {running[0]}")
     for __ in running[1:]:
-        print("{} {}".format(len("Running:") * " ", __))
+        print(f"{len('Running:') * ' '} {__}")
 
     return len(running) + 2
 
@@ -560,7 +557,7 @@ class Validation:
     @staticmethod
     def get_available_job_control():
         """
-        insert the possible backend controls, they will be checed via their
+        insert the possible backend controls, they will be checked via their
         is_supported method if they actually can be executed in the current
         environment
         """
@@ -737,7 +734,7 @@ class Validation:
                 ):
                     self.scripts.append(script)
 
-        # Thats it, now there is a complete list of all steering files on
+        # That's it, now there is a complete list of all steering files on
         # which we are going to perform the validation in self.scripts
 
     def get_log_folder(self):
@@ -818,9 +815,7 @@ class Validation:
         self.log.note("")
         if skipped_scripts:
             self.log.note(
-                "{}/{} scripts were skipped".format(
-                    len(skipped_scripts), len(self.scripts)
-                )
+                f"{len(skipped_scripts)}/{len(self.scripts)} scripts were skipped"
             )
             for s in skipped_scripts:
                 self.log.note(f"* {s}")
@@ -831,9 +826,7 @@ class Validation:
 
         if failed_scripts:
             self.log.note(
-                "{}/{} scripts failed".format(
-                    len(failed_scripts), len(self.scripts)
-                )
+                f"{len(failed_scripts)}/{len(self.scripts)} scripts failed"
             )
             for s in failed_scripts:
                 self.log.note(f"* {s}")
@@ -918,8 +911,7 @@ class Validation:
         packages_not_found = list(set(selected_packages) - packages)
         if packages_not_found:
             msg = (
-                "You asked to select the package(s) {}, but they were not "
-                "found.".format(", ".join(packages_not_found))
+                f"You asked to select the package(s) {', '.join(packages_not_found)}, but they were not found."
             )
             self.log.note(msg)
             self.log.warning(msg)
@@ -930,7 +922,7 @@ class Validation:
         """!
         This method will take the validation file name ( e.g.
         "FullTrackingValidation.py" ), determine all the script it depends on
-        and set the status of theses scripts to "waiting", The status of all
+        and set the status of these scripts to "waiting", The status of all
         other scripts will be set to "skipped", which means they will not be
         executed in the validation run.  If ignore_dependencies is True,
         dependencies will also be set to "skipped".
@@ -979,8 +971,7 @@ class Validation:
         scripts_not_found = set(script_selection) - script_names
         if scripts_not_found:
             msg = (
-                "You requested script(s) {}, but they seem to not have "
-                "been found.".format(", ".join(scripts_not_found))
+                f"You requested script(s) {', '.join(scripts_not_found)}, but they seem to not have been found."
             )
             self.log.note(msg)
             self.log.warning(msg)
@@ -1049,7 +1040,7 @@ class Validation:
 
     def add_script(self, script: Script):
         """!
-        Explictly add a script object. In normal operation, scripts are
+        Explicitly add a script object. In normal operation, scripts are
         auto-discovered but this method is useful for testing
         """
 
@@ -1066,6 +1057,13 @@ class Validation:
         script_list.sort(
             key=lambda x: x.runtime or x.package == "validation", reverse=True
         )
+
+    def set_tag(self, tag):
+        """
+        Update the validation tag to enable utils to fetch revision-wise files
+        from the same validation instance.
+        """
+        self.tag = tag
 
     # todo: if you have to indent by 9 tabs, you know that it's time to refactor /klieret
     def run_validation(self):
@@ -1097,9 +1095,7 @@ class Validation:
         selected_control = selected_controls[0]
 
         self.log.note(
-            "Controller: {} ({})".format(
-                selected_control.name(), selected_control.description()
-            )
+            f"Controller: {selected_control.name()} ({selected_control.description()})"
         )
 
         if not selected_control.is_supported():
@@ -1179,10 +1175,9 @@ class Validation:
                 # Skip all dependent scripts
                 self.skip_script(
                     script_obj,
-                    reason="Script '{}' failed and we set it's status to "
-                    "skipped so that all dependencies are "
-                    "also skipped.".format(script_object.path),
-                )
+                    reason=f"Script '{script_object.path}' failed and we set it's status to skipped so that all dependencies " +
+                    "are also skipped.",
+                    )
 
             else:
                 # Remove this script from the dependencies of dependent
@@ -1204,12 +1199,7 @@ class Validation:
                     if script.status == ScriptStatus.running
                 ]
                 print(
-                    "Finished [{},{}]: {} -> {}".format(
-                        len(waiting),
-                        len(running),
-                        script_obj.path,
-                        script_obj.status,
-                    )
+                    f"Finished [{len(waiting)},{len(running)}]: {script_obj.path} -> {script_obj.status}"
                 )
 
         def handle_unfinished_script(script_obj: Script):
@@ -1217,10 +1207,7 @@ class Validation:
                 time.time() - script_obj.last_report_time
             ) / 60.0 > self.running_script_reporting_interval:
                 print(
-                    "Script {} running since {} seconds".format(
-                        script_obj.name_not_sanitized,
-                        time.time() - script_obj.start_time,
-                    )
+                    f"Script {script_obj.name_not_sanitized} running since {time.time() - script_obj.start_time} seconds"
                 )
                 # explicit flush so this will show up in log file right away
                 sys.stdout.flush()
@@ -1296,9 +1283,7 @@ class Validation:
                         if _.status == ScriptStatus.running
                     ]
                     print(
-                        "Started [{},{}]: {}".format(
-                            len(waiting), len(running), script_obj.path
-                        )
+                        f"Started [{len(waiting)},{len(running)}]: {script_obj.path}"
                     )
 
         # While there are scripts that have not yet been executed...
@@ -1437,8 +1422,8 @@ def execute(tag=None, is_test=None):
     ):
         sys.exit("Error: No basf2 release set up!")
 
-    # Otherwise we can start the execution. The mainpart is wrapped in a
-    # try/except-contruct to fetch keyboard interrupts
+    # Otherwise we can start the execution. The main part is wrapped in a
+    # try/except-construct to fetch keyboard interrupts
     # fixme: except instructions make only sense after Validation obj is
     #   initialized ==> Pull everything until there out of try statement
     try:
@@ -1465,9 +1450,7 @@ def execute(tag=None, is_test=None):
             f'Results will stored in a folder named "{validation.tag}"...'
         )
         validation.log.note(
-            "The (full) log file(s) can be found at {}".format(
-                ", ".join(get_log_file_paths(validation.log))
-            )
+            f"The (full) log file(s) can be found at {', '.join(get_log_file_paths(validation.log))}"
         )
         validation.log.note(
             "Please check these logs when encountering "
@@ -1500,17 +1483,17 @@ def execute(tag=None, is_test=None):
             )
             validation.dry = True
 
-        # If running in test mode, only execute scripts in validation packgase
+        # If running in test mode, only execute scripts in validation package
         if cmd_arguments.test:
             validation.log.note("Running in test mode")
             validation.ignored_packages = []
             cmd_arguments.packages = ["validation-test"]
 
         validation.log.note(
-            "Release Folder: {}".format(validation.basepaths["central"])
+            f"Release Folder: {validation.basepaths['central']}"
         )
         validation.log.note(
-            "Local Folder: {}".format(validation.basepaths["local"])
+            f"Local Folder: {validation.basepaths['local']}"
         )
 
         # Now collect the steering files which will be used in this validation.
@@ -1586,37 +1569,34 @@ def execute(tag=None, is_test=None):
             validation.log.note("Start creating plots...")
             validation.create_plots()
             validation.log.note("Plots have been created...")
-            # send mails
-            if cmd_arguments.send_mails:
-                mails = mail_log.Mails(validation)
-                validation.log.note("Start sending mails...")
-                # send mails to all users with failed scripts/comparison
-                if cmd_arguments.send_mails_mode == "incremental":
-                    incremental = True
-                elif cmd_arguments.send_mails_mode == "full":
-                    incremental = False
-                else:
-                    incremental = None
-                mails.send_all_mails(incremental=incremental)
-                validation.log.note(
-                    "Save mail data to {}".format(validation.get_log_folder())
-                )
-                # save json with data about outgoing mails
-                mails.write_log()
         else:
             validation.log.note(
-                "Skipping plot creation and mailing " "(dry run)..."
+                "Skipping plot creation " "(dry run)..."
             )
-
+        # send mails
+        if cmd_arguments.send_mails:
+            mails = mail_log.Mails(validation)
+            validation.log.note("Start sending mails...")
+            # send mails to all users with failed scripts/comparison
+            if cmd_arguments.send_mails_mode == "incremental":
+                incremental = True
+            elif cmd_arguments.send_mails_mode == "full":
+                incremental = False
+            else:
+                incremental = None
+            mails.send_all_mails(incremental=incremental)
+            validation.log.note(
+                f"Save mail data to {validation.get_log_folder()}"
+            )
+            # save json with data about outgoing mails
+            mails.write_log()
         validation.report_on_scripts()
 
         validation.save_metadata()
 
         # Log that everything is finished
         validation.log.note(
-            "Validation finished! Total runtime: {}s".format(
-                int(timeit.default_timer() - get_start_time())
-            )
+            f"Validation finished! Total runtime: {int(timeit.default_timer() - get_start_time())}s"
         )
 
         if cmd_arguments.view:

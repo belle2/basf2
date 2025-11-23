@@ -20,7 +20,6 @@
 
 #include <framework/core/Environment.h>
 
-#include <iostream>
 #include <string>
 #include <map>
 #include <utility>
@@ -86,6 +85,11 @@ int LogPythonInterface::getLogInfo(LogConfig::ELogLevel level)
 LogConfig& LogPythonInterface::getPackageLogConfig(const std::string& package)
 {
   return LogSystem::Instance().getPackageLogConfig(package);
+}
+
+LogConfig& LogPythonInterface::getModuleLogConfig(const std::string& module)
+{
+  return LogSystem::Instance().getModuleLogConfig(module);
 }
 
 unsigned LogPythonInterface::getMaxMessageRepetitions() const
@@ -395,6 +399,12 @@ these will be suppressed after the given amount of repetitions.
   >>> logging.package('svd').debug_level = 10
   >>> logging.package('svd').set_info(LogLevel.INFO, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.FILE)
       )")
+  .def("module", &LogPythonInterface::getModuleLogConfig, return_value_policy<reference_existing_object>(), args("module"),
+       R"(Get the `LogConfig` for given package to set detailed logging pararameters for this module.
+
+  >>> logging.package('svd').debug_level = 10
+  >>> logging.package('svd').set_info(LogLevel.INFO, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.FILE)
+      )")
   .def("set_info", &LogPythonInterface::setLogInfo, args("log_level", "log_info"),
        R"DOCSTRING(Set info to print for given log level. Should be an OR combination of `basf2.LogInfo` constants.
 As an example, to show only the level and text for all debug messages one could use
@@ -514,7 +524,7 @@ to the log message. All keyword arguments are added to the function as
   def("B2FATAL", logFatal);
   setattr(logFatal, "__doc__", "B2FATAL(message, *args, **kwargs)\n\n"
           "Print a `FATAL <basf2.LogLevel.FATAL>` message. " + common_doc +
-          "\n\n.. note:: This also exits the programm with an error and is "
+          "\n\n.. note:: This also exits the program with an error and is "
           "guaranteed to not return.");
 }
 

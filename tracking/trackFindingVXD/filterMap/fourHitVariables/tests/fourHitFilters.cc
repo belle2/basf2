@@ -118,8 +118,8 @@ namespace VXDTFfourHitFilterTest {
     SpacePoint innerCenterSP = provideSpacePointDummy(0, 2, 0.);
     SpacePoint innerSP = provideSpacePointDummy(2, 0, 0.);
 
-    B2Vector3<double> centerO_OC_IC = CircleCenterXY<SpacePoint>::value(outerSP, outerCenterSP, innerCenterSP);
-    B2Vector3<double> centerOC_IC_I = CircleCenterXY<SpacePoint>::value(outerCenterSP, innerCenterSP, innerSP);
+    B2Vector3D centerO_OC_IC = CircleCenterXY<SpacePoint>::value(outerSP, outerCenterSP, innerCenterSP);
+    B2Vector3D centerOC_IC_I = CircleCenterXY<SpacePoint>::value(outerCenterSP, innerCenterSP, innerSP);
     EXPECT_FLOAT_EQ(-1., centerO_OC_IC[0]);
     EXPECT_FLOAT_EQ(1., centerO_OC_IC[1]);
     EXPECT_FLOAT_EQ(0., centerOC_IC_I[0]);

@@ -103,7 +103,7 @@ namespace Belle2 {
 
     /**
      * Get background PDF function (with phi correction)
-     * @return background PDF function - flat with phi dependance
+     * @return background PDF function - flat with phi dependence
      */
     const TF2* getBackgroundPhiPDF() const
     {
@@ -143,17 +143,17 @@ namespace Belle2 {
     * Get expected number of background hits for pad at given theta
     * @param th_cer pad theta angle
     * @param pars vector of parameters for PDF (beta, track hits HAPD window (1 or 0))
-    * @return expected number of backgrond hits on pad
+    * @return expected number of background hits on pad
     */
     double getBackgroundPerPad(double th_cer, const std::vector<double>& pars) const;
 
     /**
     * Get expected number of background hits for pad at given theta at given phi_Cer_trk
     * (flat background in Cherenkov s)pace
-    * @param th_cer pad theta angle
+    * @param fi_cer_trk pad phi angle
     * @param th_cer pad theta angle
     * @param pars vector of parameters for PDF (beta, track hits HAPD window (1 or 0))
-    * @return expected number of backgrond hits on pad
+    * @return expected number of background hits on pad
     */
     double getPhiCorrectedBackgroundPerPad(double fi_cer_trk, double th_cer, const std::vector<double>& pars) const;
 
@@ -162,14 +162,14 @@ namespace Belle2 {
      * Get number of expected background hits in ring (0.1<theta<0.5rad by default)
      * @param pars vector of parameters for PDF (beta, track hits HAPD window (1 or 0))
      * @param minThc inner theta angle of ring
-     * @param maxThc outter theta angle of ring
-     * @return expected number of backgrond hits in ring
+     * @param maxThc outer theta angle of ring
+     * @return expected number of background hits in ring
      */
     double getExpectedBackgroundHits(const std::vector<double>& pars, double minThc = 0.1, double maxThc = 0.5) const;
 
     /**
      * Get average number of pads in ring
-     * @param maxThc outter theta angle of ring
+     * @param maxThc outer theta angle of ring
      * @param minThc inner theta angle of ring
      * @param trackTh theta angle of track (global coordinates, z axis theta = 0)
      * @return average number of pads in ring

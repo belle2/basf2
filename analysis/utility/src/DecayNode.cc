@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #include <analysis/utility/DecayNode.h>
-#include <iostream>
 #include <sstream>
 
 namespace Belle2 {

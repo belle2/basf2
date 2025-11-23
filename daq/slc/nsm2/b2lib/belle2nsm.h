@@ -14,13 +14,10 @@
 #ifndef __belle2nsm_h__
 #define __belle2nsm_h__
 
-#include "nsm2.h"
+#include "nsm2/nsm2.h"
 
 #if defined(__cplusplus)
 extern "C" {
-#endif
-#if defined(__dummy_close_bracket_to_cheat_emacs_auto_indent)
-}
 #endif
 
 void* b2nsm_getwrapptr();
@@ -60,9 +57,6 @@ int b2nsm_term();
 void nsmlib_log(const char* fmt, ...);
 #define b2nsm_printf nsmlib_log
 
-#if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
-__dummy_open_bracket_to_cheat_emacs_auto_indent {
-#endif
 #if defined(__cplusplus)
 }
 #endif

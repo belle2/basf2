@@ -156,7 +156,7 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
   // hapd x,y positions
   double origins[420][2];
 
-  // intialize
+  // initialize
   for (int j = 0; j < 8; j++) {
     for (int i = 0; i < 420; i++) {
       edep_board[i][j] = 0;
@@ -259,7 +259,7 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
         double ee = sqrt(pp * pp + mass * mass) - mass;
         double lee = log10(ee);
 
-        // contibution to neutron flux
+        // contribution to neutron flux
         if (type == 0) {
           phnw /= sourceTime[source];
           nflux_board[modID - 1][sourceType[source]] += phnw * trlen / 0.2; // trlen/0.2, this is kind of cos(theta) correction to the flux.
@@ -293,7 +293,7 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
 
   const double nhapd[7] = {42., 48., 54., 60., 66., 72., 78.}; // 7 rings
 
-  // This is important. nflux_board holds total flux of neutrons wighted by 1MeV equiv. factor in a given
+  // This is important. nflux_board holds total flux of neutrons weighted by 1MeV equiv. factor in a given
   // time "time". Here this is transformed in flux/cm^2/year.
 
   TH1F*  ndist = new TH1F("ndist", "nflux distribution;1MeV equiv. neutrons / cm^2 / year; # of HAPDs", 1000, 0, 8);

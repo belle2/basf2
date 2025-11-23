@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -47,7 +46,7 @@ class WrapperModule(basf2.Module):
     def __init__(self, module):
         """Create a new wrapper module around the given module. This base implementation does not change anything,
            so there is no reason to use this base implementation alone."""
-        super(WrapperModule, self).__init__()
+        super().__init__()
         name = self.compose_wrapped_module_name(module)
 
         #: The wrapped module
@@ -77,13 +76,12 @@ class WrapperModule(basf2.Module):
 
     @property
     def available_params(self):
-        """Forwards the avaiilable parameters"""
+        """Forwards the available parameters"""
         return self.module.available_params
 
     def compose_wrapped_module_name(self, module):
         """Compose a name that indicates the wrapped module."""
-        return "{wrapper_name}({module_name})".format(module_name=module.name(),
-                                                      wrapper_name=self.wrapper_name)
+        return f"{self.wrapper_name}({module.name()})"
 
     def get_name(self):
         """Forwards the name()."""
@@ -119,7 +117,7 @@ class PyProfilingModule(WrapperModule):
     Attributes:
       module (basf2.Module): The wrapped module that should be profiled.
         Should be a module written in Python, since the profile interacts
-        with the interpretor for the measurements, but cannot look into c++ implementations.
+        with the interpreter for the measurements, but cannot look into c++ implementations.
 
       output_file_name (str, optional): Path to the file where the profiling information
         shall be stored. Defaults to profile.txt.
@@ -133,7 +131,7 @@ class PyProfilingModule(WrapperModule):
     def __init__(self, module, output_file_name=None):
         """Create a new PyProfilingModule wrapped around the given module
            which outputs its results to the output_file_name of given (if not, to profile.txt)."""
-        super(PyProfilingModule, self).__init__(module)
+        super().__init__(module)
 
         #: The output file name the results will be written into.
         self.output_file_name = self.default_output_file_name
@@ -145,18 +143,18 @@ class PyProfilingModule(WrapperModule):
         """Initialize method of the module"""
         #: The used profiler instance.
         self.profiler = cProfile.Profile()
-        super(PyProfilingModule, self).initialize()
+        super().initialize()
 
     def event(self):
         """Event method of the module"""
         profiler = self.profiler
         profiler.enable()
-        super(PyProfilingModule, self).event()
+        super().event()
         profiler.disable()
 
     def terminate(self):
         """Terminate method of the module"""
-        super(PyProfilingModule, self).terminate()
+        super().terminate()
         sortby = 'cumulative'
         with open(self.output_file_name, 'w') as profile_output_file:
             profile_stats = pstats.Stats(self.profiler, stream=profile_output_file)
@@ -169,7 +167,7 @@ class IfModule(WrapperModule):
     """Wrapper module to conditionally execute module and continue with the normal path afterwards.
 
     There are two ways to specify the condition.
-    One way is to override the condtion(self) method in a subclass.
+    One way is to override the condition(self) method in a subclass.
     The second way is to give a function as the second argument to the module constructor,
     which is called each event.
 
@@ -192,7 +190,7 @@ class IfModule(WrapperModule):
             If None call the condition method instead, which can be overridden by subclasses.
         """
 
-        super(IfModule, self).__init__(module)
+        super().__init__(module)
         if condition is not None:
             #: Condition function called at each event to determine
             # if wrapped module should be executed
@@ -219,7 +217,7 @@ class IfModule(WrapperModule):
         """
 
         if self.condition():
-            super(IfModule, self).event()
+            super().event()
 
 
 def is_storearray_present(storearray_name,
@@ -255,7 +253,7 @@ class IfStoreArrayPresentModule(IfModule):
           storearray_durability (int, optional): The durability of the StoreArray. Default 0.
         """
 
-        super(IfStoreArrayPresentModule, self).__init__(module)
+        super().__init__(module)
 
         #: Name of the StoreArray to be checked (str).
         self.storearray_name = storearray_name
@@ -267,7 +265,7 @@ class IfStoreArrayPresentModule(IfModule):
         self.storearray_is_present = None
 
     def initialize(self):
-        """Initialize the contianed module (only of the condition is true)."""
+        """Initialize the contained module (only if the condition is true)."""
         if self.condition():
             super().initialize()
 
@@ -304,7 +302,7 @@ class IfMCParticlesPresentModule(IfStoreArrayPresentModule):
         Args:
           module (basf2.Module): The module executed, if the condition is met.
         """
-        super(IfMCParticlesPresentModule, self).__init__(module, "MCParticles")
+        super().__init__(module, "MCParticles")
 
 
 class PathModule(basf2.Module):
@@ -333,7 +331,7 @@ class PathModule(basf2.Module):
           modules (iterable of basf2.Module): Module to be added to the path.
         """
 
-        super(PathModule, self).__init__()
+        super().__init__()
 
         if path is None:
             path = basf2.create_path()
@@ -352,8 +350,7 @@ class PathModule(basf2.Module):
             itemCount = 0
         else:
             itemCount = len(modules)
-        self.set_name("{path_module} ({items} modules):".format(path_module=self.__class__.__name__,
-                                                                items=itemCount))
+        self.set_name(f"{self.__class__.__name__} ({itemCount} modules):")
 
     def event(self):
         """Event method of the module

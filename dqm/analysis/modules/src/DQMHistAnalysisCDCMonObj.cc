@@ -70,7 +70,7 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
   gStyle->SetPadBottomMargin(0.1);
   gStyle->SetPadLeftMargin(0.15);
 
-  m_cMain = new TCanvas("cdc_main", "cdc_main", 1500, 1000);
+  m_cMain = new TCanvas("cdc_main", "cdc_main", 1500, 1200);
   m_monObj->addCanvas(m_cMain);
 
   m_cADC = new TCanvas("cdc_adc", "cdc_adc", 2000, 10000);
@@ -276,16 +276,16 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       fitFunc[i]->SetParameters(init_p0, 100, 0.01, 4700, 4900, 2, 0.01);
       fitFunc[i]->SetParameter(6, 0.02);
       fitFunc[i]->SetParLimits(0, init_p0 - 200, init_p0 + 200);
-      int xxx = -1;
+      int TDCfitstatus = -1;
       if (i < 28) {
-        xxx = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4850, 5000);
+        TDCfitstatus = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4850, 5000);
       } else {
-        xxx = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4800, 5000);
+        TDCfitstatus = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4800, 5000);
       }
       float p4 = fitFunc[i]->GetParameter(4);
       float p5 = fitFunc[i]->GetParameter(5);
 
-      if (xxx != -1 && 4850 < p4 && p4 < 5000) {
+      if (TDCfitstatus != -1 && 4850 < p4 && p4 < 5000) {
         hTDCEdge->SetBinContent(i + 1, p4);
         hTDCEdge->SetBinError(i + 1, 0);
         hTDCSlope->SetBinContent(i + 1, p5);
@@ -300,8 +300,13 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   // Hit related
   B2DEBUG(20, "hit related");
   TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
+  TH1F* hHitRatePerWire = new TH1F("hHitRatePerWire", "hit rate (kHz)/Wire;layer", 56, 0, 56);
   int nHits = 0;
   for (int i = 0; i < 56; ++i) {
+    int tdcwindow;
+    double tdcclock = 0.98255764; //unit: ns
+    if (i < 8) tdcwindow = 416;
+    else tdcwindow = 768;
     m_hHits[i] = m_hHit->ProjectionY(Form("hHit%d", i), i + 1, i + 1);
     m_hHits[i]->SetTitle(Form("hHit%d", i));
     if (m_hHits[i]->GetEntries() > 0 && m_hHits[i] != nullptr) {
@@ -311,9 +316,14 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
         nhitSumL += m_hHits[i]->GetBinContent(j + 1);
       }
       if (neve > 0) {
-        hHitPerLayer->SetBinContent(i + 1, static_cast<float>(1.0 * nhitSumL / neve));
-      } else hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL));
+        hHitPerLayer->SetBinContent(i + 1, 1.0 * nhitSumL / neve);
+        hHitRatePerWire->SetBinContent(i + 1, (1.0 * nhitSumL / neve) / (1.0 * nBins * tdcwindow * tdcclock * 1e-6));
+      } else {
+        hHitPerLayer->SetBinContent(i + 1, nhitSumL);
+        hHitRatePerWire->SetBinContent(i + 1, (1.0 * nhitSumL) / (1.0 * nBins * tdcwindow * tdcclock * 1e-6));
+      }
       hHitPerLayer->SetBinError(i + 1, 0);
+      hHitRatePerWire->SetBinError(i + 1, 0);
       nHits += nhitSumL;
     }
   }
@@ -356,7 +366,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   }
 
   B2DEBUG(20, "writing");
-  m_cMain->Divide(3, 3);
+  m_cMain->Divide(4, 3);
 
   m_cMain->cd(1);
   hADCMean->SetMinimum(0);
@@ -372,17 +382,24 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   hTDCSlope->SetMinimum(0);
   hTDCSlope->SetMaximum(50);
   hTDCSlope->DrawCopy();
+
   m_cMain->cd(4);
   hBadChannel->DrawCopy("col");
 
   m_cMain->cd(5);
   hBadChannelBC->DrawCopy("col");
-  m_cMain->cd(9);
-  hHitPerLayer->DrawCopy();
+
   m_cMain->cd(7);
   hADC1000->DrawCopy();
+
   m_cMain->cd(8);
   hADC0->DrawCopy();
+
+  m_cMain->cd(9);
+  hHitPerLayer->DrawCopy();
+
+  m_cMain->cd(10);
+  hHitRatePerWire->DrawCopy();
 
   m_cHit->Divide(4, 14);
   for (int i = 0; i < 56; i++) {
@@ -444,6 +461,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   delete hTDCEdge;
   delete hTDCSlope;
   delete hHitPerLayer;
+  delete hHitRatePerWire;
 
 }
 

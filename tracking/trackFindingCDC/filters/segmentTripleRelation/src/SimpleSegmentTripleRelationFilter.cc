@@ -17,7 +17,7 @@ Weight SimpleSegmentTripleRelationFilter::operator()(const CDCSegmentTriple& fro
                                                      __attribute__((unused)),
                                                      const CDCSegmentTriple& toSegmentTriple)
 {
-  // Just let all found neighors pass since we have the same start -> end segment
+  // Just let all found neighbors pass since we have the same start -> end segment
   // and let the cellular automaton figure auto which is longest
 
   // can of course be adjusted by comparing the z components between

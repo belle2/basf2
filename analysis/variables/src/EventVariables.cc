@@ -388,18 +388,24 @@ namespace Belle2 {
     double getIPX(const Particle*)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       return (beamSpotDB->getIPPosition()).X();
     }
 
     double getIPY(const Particle*)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       return (beamSpotDB->getIPPosition()).Y();
     }
 
     double getIPZ(const Particle*)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       return (beamSpotDB->getIPPosition()).Z();
     }
 
@@ -421,6 +427,8 @@ namespace Belle2 {
       if (isOutOfRange) return Const::doubleNaN;
 
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       return beamSpotDB->getCovVertex()(elementI, elementJ);
     }
 
@@ -901,6 +909,33 @@ namespace Belle2 {
       }
     }
 
+    bool eventT0CalculatedWithSVDInfo(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> triggerTimeInfo;
+      if (!triggerTimeInfo.isValid()) {
+        return false;
+      }
+      return triggerTimeInfo->hasEventT0SourceFromSVD();
+    }
+
+    bool eventT0CalculatedWithCDCInfo(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> triggerTimeInfo;
+      if (!triggerTimeInfo.isValid()) {
+        return false;
+      }
+      return triggerTimeInfo->hasEventT0SourceFromCDC();
+    }
+
+    bool eventT0CalculatedWithECLInfo(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> triggerTimeInfo;
+      if (!triggerTimeInfo.isValid()) {
+        return false;
+      }
+      return triggerTimeInfo->hasEventT0SourceFromECL();
+    }
+
 
     VARIABLE_GROUP("Event");
 
@@ -990,19 +1025,19 @@ In such cases the event numbers are sequential *only within a production*, so ex
     REGISTER_VARIABLE("totalEnergyMC", getTotalEnergyMC, "[Eventbased] Truth value of sum of energies of all the generated particles\n\n", "GeV");
 
 
-    REGISTER_VARIABLE("PxHER", getPxHER, "[Eventbased] Returns truth value of the x component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("PyHER", getPyHER, "[Eventbased] Returns truth value of the y component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("PzHER", getPzHER, "[Eventbased] Returns truth value of the z component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("PxLER", getPxLER, "[Eventbased] Returns truth value of the x component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("PyLER", getPyLER, "[Eventbased] Returns truth value of the y component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("PzLER", getPzLER, "[Eventbased] Returns truth value of the z component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PxHER", getPxHER, "[Eventbased] Returns x component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PyHER", getPyHER, "[Eventbased] Returns y component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PzHER", getPzHER, "[Eventbased] Returns z component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PxLER", getPxLER, "[Eventbased] Returns x component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PyLER", getPyLER, "[Eventbased] Returns y component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("PzLER", getPzLER, "[Eventbased] Returns z component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
 
-    REGISTER_VARIABLE("mcPxHER", getMcPxHER, "[Eventbased] Returns x component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("mcPyHER", getMcPyHER, "[Eventbased] Returns y component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("mcPzHER", getMcPzHER, "[Eventbased] Returns z component of the electron beam momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("mcPxLER", getMcPxLER, "[Eventbased] Returns x component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("mcPyLER", getMcPyLER, "[Eventbased] Returns y component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
-    REGISTER_VARIABLE("mcPzLER", getMcPzLER, "[Eventbased] Returns z component of the positron beam momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPxHER", getMcPxHER, "[Eventbased] Returns truth value of the x component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPyHER", getMcPyHER, "[Eventbased] Returns truth value of the y component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPzHER", getMcPzHER, "[Eventbased] Returns truth value of the z component of the incoming electron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPxLER", getMcPxLER, "[Eventbased] Returns truth value of the x component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPyLER", getMcPyLER, "[Eventbased] Returns truth value of the y component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
+    REGISTER_VARIABLE("mcPzLER", getMcPzLER, "[Eventbased] Returns truth value of the z component of the incoming positron momentum in the laboratory frame.\n\n","GeV/c");
 
 
 
@@ -1180,7 +1215,19 @@ Returns NaN for data.
 [Eventbased] The energy in laboratory frame of all the photons. from generator.
 
 )DOC","GeV");
-
+    REGISTER_VARIABLE("eventT0CalculatedWithSVDInfo", eventT0CalculatedWithSVDInfo, R"DOC(
+[Eventbased] It returns true if the SVD subdetector contributed in the calculation of the EventT0.
+Please note that other subdetectors may also have contributed, so store the variables for these as well.
+)DOC");
+    REGISTER_VARIABLE("eventT0CalculatedWithCDCInfo", eventT0CalculatedWithCDCInfo, R"DOC(
+[Eventbased] It returns true if the CDC subdetector contributed in the calculation of the EventT0.
+Please note that other subdetectors may also have contributed, so store the variables for these as well.
+)DOC");
+    REGISTER_VARIABLE("eventT0CalculatedWithECLInfo", eventT0CalculatedWithECLInfo, R"DOC(
+[Eventbased] It returns true if the ECL subdetector contributed in the calculation of the EventT0.
+Please note that other subdetectors may also have contributed, so store the variables for these as well.
+)DOC");
+    
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0, R"DOC(
 [Eventbased][Calibration] The Event t0, is the time of the event relative to the trigger time.

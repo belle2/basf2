@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -27,7 +27,10 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],
-    expert_config={})
+    expert_config={
+        "C2_MinEnergyThreshold": 2.0,
+        "nFilesCollector": 50
+    })
 
 
 # --------------------------------------------------------------
@@ -49,15 +52,20 @@ def get_calibrations(input_data, **kwargs):
     # ..Algorithm
     algo_C1 = Belle2.ECL.eclWaveformTemplateCalibrationC1Algorithm()
 
+    expert_config = kwargs.get("expert_config")
+    C2_MinEnergyThreshold = expert_config["C2_MinEnergyThreshold"]
+    nFilesCollector = expert_config["nFilesCollector"]
+
     # ..The calibration
     collector_C1 = basf2.register_module("eclWaveformTemplateCalibrationC1Collector")
+    collector_C1.param('MinEnergyThreshold', C2_MinEnergyThreshold)
 
     cal_ecl_Wave_C1 = Calibration(
         "ecl_Wave_C1",
         collector=collector_C1,
         algorithms=[algo_C1],
         input_files=input_files,
-        max_files_per_collector_job=4)
+        max_files_per_collector_job=nFilesCollector)
 
     # ..Add prepare_cdst_analysis to pre_collector_path
     gamma_gamma_pre_path = basf2.create_path()
@@ -82,7 +90,7 @@ def get_calibrations(input_data, **kwargs):
 
         highLimit = (batchsize*(i+1))
 
-        if(highLimit > 8736):
+        if (highLimit > 8736):
             highLimit = 8736
 
         print("lowLimit,highLimit", lowLimit, highLimit)
@@ -100,6 +108,7 @@ def get_calibrations(input_data, **kwargs):
         collectors_C2[-1].pre_collector_path = gamma_gamma_pre_path
         collectors_C2[-1].param('MinCellID', lowLimit)
         collectors_C2[-1].param('MaxCellID', highLimit)
+        collectors_C2[-1].param('MinEnergyThreshold', C2_MinEnergyThreshold)
 
         # ..The calibration
         calibrations_C2.append(Calibration("ecl_Wave_C2_"+str(lowLimit)+"_"+str(highLimit),
@@ -107,13 +116,13 @@ def get_calibrations(input_data, **kwargs):
                                            algorithms=[algos_C2[-1],
                                                        algos_C3[-1]],
                                            input_files=input_files,
-                                           max_files_per_collector_job=4))
+                                           max_files_per_collector_job=nFilesCollector))
         calibrations_C2[-1].pre_collector_path = gamma_gamma_pre_path
         calibrations_C2[-1].depends_on(cal_ecl_Wave_C1)
 
     # ..Algorithm
     algo_C4 = Belle2.ECL.eclWaveformTemplateCalibrationC4Algorithm()
-    algo_C4.setFirstCellID(0)
+    algo_C4.setFirstCellID(1)
     algo_C4.setLastCellID(8736)
 
     # ..The calibration

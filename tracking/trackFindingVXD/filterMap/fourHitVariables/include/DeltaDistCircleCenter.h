@@ -32,9 +32,9 @@ namespace Belle2 {
                         const PointType& innerHit)
     {
 
-      B2Vector3<double> outerCircleCenter = CircleCenterXY<PointType>::value(outerHit, outerCenterHit, innerCenterHit);
+      B2Vector3D outerCircleCenter = CircleCenterXY<PointType>::value(outerHit, outerCenterHit, innerCenterHit);
 
-      B2Vector3<double> innerCircleCenter = CircleCenterXY<PointType>::value(outerCenterHit, innerCenterHit, innerHit);
+      B2Vector3D innerCircleCenter = CircleCenterXY<PointType>::value(outerCenterHit, innerCenterHit, innerHit);
 
       return fabs(outerCircleCenter.Perp() - innerCircleCenter.Perp());
     } // return unit: GeV/c

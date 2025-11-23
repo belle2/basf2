@@ -1342,7 +1342,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
         Generate list of output files that the task should produce.
         The task is considered finished if and only if the outputs all exist.
         """
-        yield self.add_to_output(self.output_pdf_file_basename)
+        yield self.add_to_output(self.output_pdf_file_basename())
 
     @b2luigi.on_temporary_files
     def process(self):

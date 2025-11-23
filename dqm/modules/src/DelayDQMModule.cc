@@ -83,7 +83,7 @@ void DelayDQMModule::initialize()
   if (m_useMeta) {
     m_eventMetaData.isRequired();
   } else {
-    m_rawFTSW.isOptional(); // actuall it would be Required(); but this prevents HLT/ERECO test from working
+    m_rawFTSW.isOptional(); // actually it would be Required(); but this prevents HLT/ERECO test from working
   }
 
   // Register histograms (calls back defineHisto)
@@ -109,7 +109,7 @@ void DelayDQMModule::event()
   nanoseconds event_time{};
   if (m_useMeta) {
     // We get the time from EventMetaData, which gets the time from TTD (FTSW)
-    // BUT, this time is inaccurate for longer runs, the difference is larger than teh effect we
+    // BUT, this time is inaccurate for longer runs, the difference is larger than the effect we
     // monitor in the histograms!
     event_time = static_cast<nanoseconds>(m_eventMetaData->getTime());
   } else {

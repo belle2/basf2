@@ -60,9 +60,9 @@ std::map<std::string, std::string> PXDResultFilterFactory::getValidFilterNamesAn
     {"all", "all combination are valid"},
     {"recording", "record variables to a TTree"},
     {"mva", "filter based on the trained MVA method"},
-    {"size", "ordering accoring to size"},
-    {"truth", "monte carlo truth"},
-    {"truth_teacher", "monte carlo truth returning the result of the teacher"},
+    {"size", "ordering according to size"},
+    {"truth", "Monte Carlo truth"},
+    {"truth_teacher", "Monte Carlo truth returning the result of the teacher"},
   };
 }
 

@@ -20,7 +20,7 @@
 
 namespace Belle2 {
   /**
-   * Combinatorical Kalman Filter used for extrapolating CDC tracks into SVD and create merged tracks.
+   * Combinatorial Kalman Filter used for extrapolating CDC tracks into SVD and create merged tracks.
    * All implementation is done in the corresponding findlet.
    */
   class CDCToSVDSpacePointCKFModule : public TrackFindingCDC::FindletModule<CKFToSVDFindlet> {
@@ -29,13 +29,13 @@ namespace Belle2 {
     /// Set description
     CDCToSVDSpacePointCKFModule()
     {
-      setDescription("Combinatorical Kalman Filter used for extrapolating CDC tracks into "
+      setDescription("Combinatorial Kalman Filter used for extrapolating CDC tracks into "
                      "SVD and create merged tracks.");
     }
   };
 
   /**
-   * Seed-finding combinatorical Kalman Filter that combines every RecoTrack with every
+   * Seed-finding combinatorial Kalman Filter that combines every RecoTrack with every
    * SVD track, then filters the combinations.
    * All implementation is done in the corresponding findlet.
    */
@@ -45,12 +45,12 @@ namespace Belle2 {
     /// Set description
     CDCToSVDSeedCKFModule()
     {
-      setDescription("Combinatorical Kalman Filter used for merging existing CDC tracks and SVD tracks.");
+      setDescription("Combinatorial Kalman Filter used for merging existing CDC tracks and SVD tracks.");
     }
   };
 
   /**
-   * Combinatorical Kalman Filter that extrapolates every RecoTrack into the VTX
+   * Combinatorial Kalman Filter that extrapolates every RecoTrack into the VTX
    * and collects space points.
    * All implementation is done in the corresponding findlet.
    */
@@ -60,13 +60,13 @@ namespace Belle2 {
     /// Set description
     CDCToVTXSpacePointCKFModule()
     {
-      setDescription("Combinatorical Kalman Filter used for extrapolating CDC tracks into "
+      setDescription("Combinatorial Kalman Filter used for extrapolating CDC tracks into "
                      "VTX, adding VTX hits, and create merged tracks.");
     }
   };
 
   /**
-   * Seed-finding combinatorical Kalman Filter that combines every RecoTrack with every
+   * Seed-finding combinatorial Kalman Filter that combines every RecoTrack with every
    * VTX track, then filters the combinations.
    * All implementation is done in the corresponding findlet.
    */
@@ -76,13 +76,13 @@ namespace Belle2 {
     /// Set description
     CDCToVTXSeedCKFModule()
     {
-      setDescription("Combinatorical Kalman Filter used for extrapolating CDC tracks into "
+      setDescription("Combinatorial Kalman Filter used for extrapolating CDC tracks into "
                      "VTX and create merged tracks.");
     }
   };
 
   /**
-   * Combinatorical Kalman Filter that extrapolates every RecoTrack into the PXD
+   * Combinatorial Kalman Filter that extrapolates every RecoTrack into the PXD
    * and collects space points.
    * All implementation is done in the corresponding findlet.
    */
@@ -92,13 +92,13 @@ namespace Belle2 {
     /// Set description
     ToPXDCKFModule()
     {
-      setDescription("Combinatorical Kalman Filter used for extrapolating SVD/CDC tracks into "
+      setDescription("Combinatorial Kalman Filter used for extrapolating SVD/CDC tracks into "
                      "PXD and create merged tracks.");
     }
   };
 
   /**
-   * Combinatorical Kalman Filter that extrapolates every RecoTrack into the CDC
+   * Combinatorial Kalman Filter that extrapolates every RecoTrack into the CDC
    * and collects wire hits.
    * All implementation is done in the corresponding findlet.
    */
@@ -108,13 +108,13 @@ namespace Belle2 {
     /// Set description
     ToCDCCKFModule() : TrackFindingCDC::FindletModule<CKFToCDCFindlet>({"CDCWireHitVector"})
     {
-      setDescription("Combinatorical Kalman Filter used for extrapolating SVD tracks into "
+      setDescription("Combinatorial Kalman Filter used for extrapolating SVD tracks into "
                      "CDC and create merged tracks.");
     }
   };
 
   /**
-   * Combinatorical Kalman Filter that extrapolates every ECLShower into the CDC
+   * Combinatorial Kalman Filter that extrapolates every ECLShower into the CDC
    * and collects wire hits.
    * All implementation is done in the corresponding findlet.
    */
@@ -124,7 +124,7 @@ namespace Belle2 {
     /// Set description
     ToCDCFromEclCKFModule() : TrackFindingCDC::FindletModule<CKFToCDCFromEclFindlet>({"CDCWireHitVector"})
     {
-      setDescription("Combinatorical Kalman Filter used for extrapolating ECL showers into "
+      setDescription("Combinatorial Kalman Filter used for extrapolating ECL showers into "
                      "CDC and create merged tracks.");
     }
   };

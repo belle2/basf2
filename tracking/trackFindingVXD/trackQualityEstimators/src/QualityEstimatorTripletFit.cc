@@ -41,7 +41,7 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
   // looping over all triplets
   for (int i = 0; i < nTriplets; i++) {
 
-    // Three hits relevant for curent triplet
+    // Three hits relevant for current triplet
     const B2Vector3D& hit0 = measurements.at(i)->getPosition();
     const B2Vector3D& hit1 = measurements.at(i + 1)->getPosition();
     const B2Vector3D& hit2 = measurements.at(i + 2)->getPosition();
@@ -102,7 +102,7 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
     int detID = measurements.at(i + 1)->getType();
 
     if (sensorID != 0) {
-      const VXD::SensorInfoBase& sensor = VXD::GeoCache::get(sensorID);
+      const VXD::SensorInfoBase& sensor = VXD::GeoCache::getInstance().getSensorInfo(sensorID);
       const B2Vector3D& sensorOrigin  = sensor.pointToGlobal(B2Vector3D(0, 0, 0), true);
       const B2Vector3D& sensoru  = sensor.pointToGlobal(B2Vector3D(1, 0, 0), true);
       const B2Vector3D& sensorv  = sensor.pointToGlobal(B2Vector3D(0, 1, 0), true);

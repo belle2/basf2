@@ -11,7 +11,6 @@
 #include <string>
 
 #include <framework/dataobjects/Helix.h>
-#include <framework/geometry/B2Vector3.h>
 #include <Eigen/Core>
 namespace TreeFitter {
 
@@ -84,16 +83,16 @@ namespace TreeFitter {
     static std::string vertexParName(int i) ;
 
     /** Print the vertex parameters */
-    static void printVertexPar(const Belle2::B2Vector3D& position, const Belle2::B2Vector3D& momentum, int charge) ;
+    static void printVertexPar(const ROOT::Math::XYZVector& position, const ROOT::Math::XYZVector& momentum, int charge) ;
 
     /** POCA between two tracks */
     static double helixPoca(const Belle2::Helix& helix1,
                             const Belle2::Helix& helix2,
                             double& flt1, double& flt2,
-                            Belle2::B2Vector3D& vertex, bool parallel = false) ;
+                            ROOT::Math::XYZVector& vertex, bool parallel = false) ;
 
     /** POCA between a track and a point */
-    static double helixPoca(const Belle2::Helix& helix, const Belle2::B2Vector3D& point,
+    static double helixPoca(const Belle2::Helix& helix, const ROOT::Math::XYZVector& point,
                             double& flt) ;
 
     /** the domain of phi */

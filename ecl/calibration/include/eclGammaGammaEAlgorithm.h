@@ -10,7 +10,6 @@
 
 /* ECL headers. */
 #include <ecl/dataobjects/ECLElementNumbers.h>
-#include <ecl/calibration/eclGammaGammaEAlgorithm.h>
 
 /* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
@@ -139,7 +138,7 @@ namespace Belle2 {
 
       /** Characterize fit status */
       int fitOK = 16; /**< fit is OK */
-      int iterations = 8; /**< fit reached max number of iterations, but is useable */
+      int iterations = 8; /**< fit reached max number of iterations, but is usable */
       int atLimit = 4; /**< a parameter is at the limit; upper edge is found from histogram, not fit */
       int poorFit = 3; /**< low chi square; upper edge is found from histogram, not fit */
       int noPeak = 2; /**< Novosibirsk component of fit is negligible; upper edge is found from histogram, not fit */

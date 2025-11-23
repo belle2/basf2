@@ -69,7 +69,7 @@ namespace {
 
   /// Namespace to hide the contained enum constants
   namespace NParabolicParameterIndices {
-    /// Helper indices for meaningfull matrix access to the observations matrices
+    /// Helper indices for meaningful matrix access to the observations matrices
     enum EParabolicIndices {
       iW = 0,
       iX = 1,
@@ -170,7 +170,7 @@ namespace {
     }
   }
 
-  /// Variant without drift circles and seperating the offset before the matrix solving
+  /// Variant without drift circles and separating the offset before the matrix solving
   PerigeeCircle fitSeperateOffset(Eigen::Matrix< double, 4, 1 > means,
                                   Eigen::Matrix< double, 4, 4 > c,
                                   bool lineConstrained = false)
@@ -322,7 +322,7 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
     chi2 = calcChi2(resultCircle, s);
   } else {
     if (not isOriginConstrained()) {
-      // Alternative implementation for comparision
+      // Alternative implementation for comparison
 
       // Matrix of averages
       Eigen::Matrix< double, 4, 4> aNoL = sNoL / sNoL(iW);

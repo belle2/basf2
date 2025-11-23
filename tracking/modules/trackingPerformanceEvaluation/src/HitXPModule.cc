@@ -24,7 +24,7 @@ REG_MODULE(HitXP);
 
 HitXPModule::HitXPModule() : Module()
 {
-  setDescription("This module builds a ttree with true hit informations (momentum, position, PDGID, and track parameters hit per hit) running over simulated and reconstructed events.");
+  setDescription("This module builds a TTree with true hit information (momentum, position, PDGID, and track parameters hit per hit) running over simulated and reconstructed events.");
 
   /** write validation plots */
   addParam("additionalTree", c_addTree,
@@ -43,7 +43,7 @@ HitXPModule::~HitXPModule()
 void HitXPModule::initialize()
 {
 
-  /** iniziialize store array and relations */
+  /** initialize store array and relations */
   m_MCParticles.isRequired();
   StoreArray<RecoTrack> storeRecoTracks("");
   StoreArray<SVDCluster> storeClusters("");
@@ -57,10 +57,10 @@ void HitXPModule::initialize()
   RelationArray recoTracksToMCParticles(storeRecoTracks, m_MCParticles);
 
 
-  /** inizialize output TFile (ttree, with own-class (hitXP) branch)
-  * nb: is not possibile to completely access to entries of this tree using
-  * external (out of basf2) scripts beacuse are used, as branches of the tree,
-  * some basf2 internal classes (more specifically, some memeber of the hitXP
+  /** initialize output TFile (ttree, with own-class (hitXP) branch)
+  * nb: is not possible to completely access to entries of this tree using
+  * external (out of basf2) scripts because are used, as branches of the tree,
+  * some basf2 internal classes (more specifically, some members of the hitXP
   * branch, see tracking/dataobjects/hitXP for more details)
   * Only the "external tree" is completely accessible, but the information is
   * reduced.
@@ -104,7 +104,7 @@ void HitXPModule::initialize()
 //------------------------------------External Tree creation--------------------------------------//
 //-------------------------------------------------------------------------------------------------//
 
-  /** output tree for complete external use (same datas, but using only root default classes) */
+  /** output tree for complete external use (same data, but using only root default classes) */
   m_outputFileExt = new TFile("TFile_hitXP_ext.root", "RECREATE");
   m_treeExt = new TTree("TTree_hitXP_ext", "TTree_hitXP_ext");
 
@@ -330,7 +330,7 @@ void HitXPModule::event()
     //-------------------------------------------------------------------------------------------------//
     //------------------------------------Tight Selected Tree creation--------------------------------------//
     //-------------------------------------------------------------------------------------------------//
-    /** this selecation take tracks that has exaclty one hit on each layer, so cut away overlap from selected tree */
+    /** this selection takes tracks that have exactly one hit on each layer, so cut away overlap from selected tree */
     if (m_numberHitPerTrack == 4 && m_hitXP[0].m_sensorLayer == 3 && m_hitXP[1].m_sensorLayer == 4
         && m_hitXP[2].m_sensorLayer == 5 && m_hitXP[3].m_sensorLayer == 6) {
       int h = 0;

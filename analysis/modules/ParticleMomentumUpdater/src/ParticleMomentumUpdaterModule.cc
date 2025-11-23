@@ -6,8 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <iostream>
-
 #include <analysis/modules/ParticleMomentumUpdater/ParticleMomentumUpdaterModule.h>
 #include <analysis/dataobjects/ParticleList.h>
 
@@ -16,8 +14,6 @@
 
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
-
-#include <algorithm>
 
 using namespace std;
 using namespace Belle2;

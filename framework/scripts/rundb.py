@@ -28,7 +28,7 @@ class RunDB:
     Parameters:
         apikey (str): RunDB API key (see
           `this question <https://questions.belle2.org/question/11145/obtaining-an-access-token-for-rundb-api-2021-version/>`_
-          or `this Confluence page <https://confluence.desy.de/x/DZ8CCg>`_ how to get one)
+          or `this XWiki page <https://xwiki.desy.de/xwiki/rest/p/8dc10>`_ how to get one)
         username (str): DESY username
     """
 

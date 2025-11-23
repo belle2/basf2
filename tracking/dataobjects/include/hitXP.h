@@ -14,10 +14,10 @@
 namespace Belle2 {
   /**  This class collects some information of a TrueHit, using
   *  SVDCLuster and MCParticle information too.
-  *  These informations are: position in local and global coordinates
+  *  This information is: position in local and global coordinates
   *  at entry/middle/exit position of the sensor, momentum, analytical
-  *  track parameters (evaluated from posion and momentum), geometrical
-  *  infomations (layed,ladder,sensor) and time.
+  *  track parameters (evaluated from position and momentum), geometrical
+  *  information (layer,ladder,sensor) and time.
   *
   *  The purpose of this class is to obtain a single "hit-like object"
   *  with all the useful information for a track-parameters study.
@@ -40,96 +40,96 @@ namespace Belle2 {
     ROOT::Math::XYZVector m_momentumLocalMid; /**< momentum of hit at midpoint of layer, local coordinate */
     ROOT::Math::XYZVector m_momentumLocalEntry; /**< momentum of hit at entrypoint of layer, local coordinate */
     ROOT::Math::XYZVector m_momentumLocalExit; /**< momentum of hit at exitpoint of layer, local coordinate */
-    int m_PDGID = 0; /**< PDGID */
-    ROOT::Math::XYZVector m_position0; /**< position at IP */
     ROOT::Math::XYZVector m_momentum0; /**< momentum at IP */
+    ROOT::Math::XYZVector m_position0; /**< position at IP */
     double m_time = 0; /**< time of the hit */
-    int m_sensorSensor = 0; /**< sensor of the hit */
-    int m_sensorLayer = 0; /**< layer of the hit */
-    int m_sensorLadder = 0; /**< ladder of the hit */
     double m_info_d0 = 0; /**< d0 from MCParticle info evaluation. DO NOT USE, use the get */
     double m_info_z0 = 0; /**< z0 from MCParticle info evaluation. DO NOT USE, use the get */
     double m_info_phi0 = 0; /**< phi0 from MCParticle info evaluation. DO NOT USE, use the get */
     double m_info_tanlambda = 0; /**< tanlambda from MCParticle info evaluation. DO NOT USE, use the get */
     double m_info_omega = 0; /**< omega from MCParticle info evaluation. DO NOT USE, use the get */
+    double m_charge = 0; /**< charge of the track */
+    int m_PDGID = 0; /**< PDGID */
+    int m_sensorSensor = 0; /**< sensor of the hit */
+    int m_sensorLayer = 0; /**< layer of the hit */
+    int m_sensorLadder = 0; /**< ladder of the hit */
     int m_clusterU = 0; /**< flag for u cluster */
     int m_clusterV = 0; /**< flag for v cluster */
     bool m_reconstructed = 0; /**< flag for reconstructed track */
-    double m_charge = 0; /**< charge of the track */
 
     /** empty constructor of the class */
     hitXP() {}
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getPositionMid() const { return m_positionMid; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getPositionEntry() const { return m_positionEntry; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getPositionExit() const { return m_positionExit; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getMomentumMid() const { return m_momentumMid; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getMomentumEntry() const { return m_momentumEntry; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getMomentumExit() const { return m_momentumExit; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getPositionLocalMid() const { return m_positionLocalMid; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getPositionLocalEntry() const { return m_positionLocalEntry; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getPositionLocalExit() const { return m_positionLocalExit; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getMomentumLocalMid() const { return m_momentumLocalMid; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getMomentumLocalEntry() const { return m_momentumLocalEntry; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getMomentumLocalExit() const { return m_momentumLocalExit; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     int getPDGID() const { return m_PDGID; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getPosition0() const { return m_position0; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     ROOT::Math::XYZVector getMomentum0() const { return m_momentum0; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     double getTime() const { return m_time; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     int getSensorSensor() const { return m_sensorSensor; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     int getSensorLadder() const { return m_sensorLadder; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     int getSensorLayer() const { return m_sensorLayer; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     int getClusterU() const { return m_clusterU; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     int getClusterV() const { return m_clusterV; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     bool isReconstructed() const { return m_reconstructed; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     double getCharge() const { return m_charge; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setPositionMid(ROOT::Math::XYZVector position)
     {
       m_positionMid.SetX(position.X());
@@ -137,7 +137,7 @@ namespace Belle2 {
       m_positionMid.SetZ(position.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setPositionEntry(ROOT::Math::XYZVector position)
     {
       m_positionEntry.SetX(position.X());
@@ -145,7 +145,7 @@ namespace Belle2 {
       m_positionEntry.SetZ(position.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setPositionExit(ROOT::Math::XYZVector position)
     {
       m_positionExit.SetX(position.X());
@@ -153,7 +153,7 @@ namespace Belle2 {
       m_positionExit.SetZ(position.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setMomentumMid(ROOT::Math::XYZVector momentum)
     {
       m_momentumMid.SetX(momentum.X());
@@ -161,7 +161,7 @@ namespace Belle2 {
       m_momentumMid.SetZ(momentum.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setMomentumEntry(ROOT::Math::XYZVector momentum)
     {
       m_momentumEntry.SetX(momentum.X());
@@ -169,7 +169,7 @@ namespace Belle2 {
       m_momentumEntry.SetZ(momentum.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setMomentumExit(ROOT::Math::XYZVector momentum)
     {
       m_momentumExit.SetX(momentum.X());
@@ -177,7 +177,7 @@ namespace Belle2 {
       m_momentumExit.SetZ(momentum.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setPositionLocalMid(ROOT::Math::XYZVector position)
     {
       m_positionLocalMid.SetX(position.X());
@@ -185,7 +185,7 @@ namespace Belle2 {
       m_positionLocalMid.SetZ(position.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setPositionLocalEntry(ROOT::Math::XYZVector position)
     {
       m_positionLocalEntry.SetX(position.X());
@@ -193,7 +193,7 @@ namespace Belle2 {
       m_positionLocalEntry.SetZ(position.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setPositionLocalExit(ROOT::Math::XYZVector position)
     {
       m_positionLocalExit.SetX(position.X());
@@ -201,7 +201,7 @@ namespace Belle2 {
       m_positionLocalExit.SetZ(position.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setMomentumLocalMid(ROOT::Math::XYZVector momentum)
     {
       m_momentumLocalMid.SetX(momentum.X());
@@ -209,7 +209,7 @@ namespace Belle2 {
       m_momentumLocalMid.SetZ(momentum.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setMomentumLocalEntry(ROOT::Math::XYZVector momentum)
     {
       m_momentumLocalEntry.SetX(momentum.X());
@@ -217,7 +217,7 @@ namespace Belle2 {
       m_momentumLocalEntry.SetZ(momentum.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setMomentumLocalExit(ROOT::Math::XYZVector momentum)
     {
       m_momentumLocalExit.SetX(momentum.X());
@@ -225,10 +225,10 @@ namespace Belle2 {
       m_momentumLocalExit.SetZ(momentum.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setPDGID(int pdgid) { m_PDGID = pdgid; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setPosition0(ROOT::Math::XYZVector position)
     {
       m_position0.SetX(position.X());
@@ -236,7 +236,7 @@ namespace Belle2 {
       m_position0.SetZ(position.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setMomentum0(ROOT::Math::XYZVector momentum)
     {
       m_momentum0.SetX(momentum.X());
@@ -244,39 +244,39 @@ namespace Belle2 {
       m_momentum0.SetZ(momentum.Z());
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setTime(double Time) { m_time = Time; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setSensorSensor(int sensor) { m_sensorSensor = sensor; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setSensorLayer(int layer) { m_sensorLayer = layer; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setSensorLadder(int ladder) { m_sensorLadder = ladder; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setClusterU(int cluster)
     {
       m_clusterU = cluster;
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setClusterV(int cluster)
     {
       m_clusterV = cluster;
     }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setReconstructed(bool isReconstructed) { m_reconstructed = isReconstructed; }
 
-    /** get the relative memeber */
+    /** get the relative member */
     void setCharge(double charge) { m_charge = charge; }
 
     /** evaluates the parameter omega (1/curvature radius) of a helicoidal track
     * starting from position and momentum of the hit
-    * input(hit postion, hit momentum, hit charge)
+    * input(hit position, hit momentum, hit charge)
     * output(omega value)
     */
     double omega(ROOT::Math::XYZVector xx, ROOT::Math::XYZVector p, double charge) const;
@@ -284,7 +284,7 @@ namespace Belle2 {
 
     /** evaluates the parameter tanLambda (pz/pt) of a helicoidal track
     * starting from position and momentum of the hit
-    * input(hit postion, hit momentum)
+    * input(hit position, hit momentum)
     * output(tanlambda value)
     */
     double tanLambda(ROOT::Math::XYZVector xx, ROOT::Math::XYZVector p) const;
@@ -292,7 +292,7 @@ namespace Belle2 {
 
     /** evaluates the parameter d0 (impact parameter) of a helicoidal track
     * starting from position and momentum of the hit
-    * input(hit postion, hit momentum, hit charge)
+    * input(hit position, hit momentum, hit charge)
     * output(d0 value)
     */
     double d0(ROOT::Math::XYZVector xx, ROOT::Math::XYZVector p, double charge) const;
@@ -300,7 +300,7 @@ namespace Belle2 {
 
     /** evaluates the parameter phi0 (angle between pT and x) of a helicoidal track
     * starting from position and momentum of the hit
-    * input(hit postion, hit momentum, hit charge)
+    * input(hit position, hit momentum, hit charge)
     * output(phi0 value)
     */
     double phi0(const ROOT::Math::XYZVector& xx, ROOT::Math::XYZVector p, double charge) const;
@@ -308,7 +308,7 @@ namespace Belle2 {
 
     /** evaluates the parameter z0 (distance transverse plane-POCA) of a helicoidal track
     * starting from position and momentum of the hit
-    * input(hit postion, hit momentum, hit charge)
+    * input(hit position, hit momentum, hit charge)
     * output(z0 value)
     */
     double z0(ROOT::Math::XYZVector xx, ROOT::Math::XYZVector p, double charge) const;
@@ -386,6 +386,6 @@ namespace Belle2 {
     };
 
     //! needed by root
-    ClassDef(hitXP, 2);
+    ClassDef(hitXP, 3);
   };
 } /** end namespace Belle2 */

@@ -20,7 +20,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Type of tree for paritioning the hough space
+    /// Type of tree for partitioning the hough space
     template<class T, class ADomain, class ADomainDivsion>
     class  WeightedParititioningDynTree :
       public DynTree<  WithWeightedItems<ADomain, T>, ADomainDivsion> {
@@ -29,7 +29,7 @@ namespace Belle2 {
       using Super = DynTree<  WithWeightedItems<ADomain, T>, ADomainDivsion>;
 
     public:
-      /// Constructor attaching a vector of the weigthed items to the top most node domain.
+      /// Constructor attaching a vector of the weighted items to the top most node domain.
       WeightedParititioningDynTree(ADomain topDomain, ADomainDivsion domainDivsion) :
         Super(WithWeightedItems<ADomain, T>(std::move(topDomain)), std::move(domainDivsion))
       {}
@@ -38,7 +38,7 @@ namespace Belle2 {
     /** Dynamic tree structure with weighted items in each node which are markable through out the tree.
      *  Used to build fast hough type algorithms, where objects are allowed to carry weights relative to
      *  the hough space part (here called a ADomain) they are contained in.
-     *  The shared marks allow for interrative extraction of hough peaks such that other areas of the
+     *  The shared marks allow for iterative extraction of hough peaks such that other areas of the
      *  hough space notice that certain element have already been consumed.
      */
     template<class T, class ADomain, class ADomainDivsion>
@@ -63,7 +63,7 @@ namespace Belle2 {
       {
         this->fell();
         Node& topNode = this->getTopNode();
-        for (auto && item : items) {
+        for (auto&& item : items) {
           m_marks.push_back(false);
           bool& markOfItem = m_marks.back();
           Weight weight = DBL_MAX;
@@ -244,7 +244,7 @@ namespace Belle2 {
           }
 
           // Node is not a leaf.
-          // Check if it has childen.
+          // Check if it has children.
           // If children have not been created, create and fill them.
           typename Node::Children* children = node->getChildren();
           if (not children) {
@@ -292,7 +292,7 @@ namespace Belle2 {
         Super::fell();
       }
 
-      /// Like fell but also releases all memory the tree has aquired during long executions.
+      /// Like fell but also releases all memory the tree has acquired during long executions.
       void raze()
       {
         this->fell();

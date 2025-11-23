@@ -71,3 +71,7 @@ def inverse_squared(x, a, b, c, d):
 
 def inverse_sqrt(x, a, b, c, d):
     return a / (np.sqrt(x - b)) + c + d * x
+
+
+if __name__ == "__main__":
+    pass

@@ -315,7 +315,7 @@ void FitADC(Int_t iLayer, Int_t kDraw)
 
   if(hADCfit[iLayer]->GetEntries() ==0){
     printf("No entries for Layer %d\n", iLayer);
-    return 0;
+    return;
   }
 
   Char_t cOP[10]="0";
@@ -484,7 +484,8 @@ void FillHisto()
 
     hHitPatternSL[iSL]->GetListOfFunctions()->Add(new TNamed("Description", Title));
     hHitPatternSL[iSL]->GetListOfFunctions()->Add(new TNamed("Check", "Flat distribution within statistics."));
-
+    hHitPatternSL[iSL]->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
+    hHitPatternSL[iSL]->GetListOfFunctions()->Add(new TNamed("Contact","cdc-software@belle2.org")); 
 
     hHitPatternSL[iSL]->SetAxisRange(0, RangeADC);
     hHitPatternSL[iSL]->GetXaxis()->SetTitle("Cell");
@@ -502,6 +503,8 @@ void FillHisto()
     } else {
       hADCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Check", "Landau peak is around 100 ADC count."));
     }
+    hADCSL[iSL]->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
+    hADCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Contact","cdc-software@belle2.org")); 
 
     hADCSL[iSL]->SetAxisRange(0, RangeADC);
     hADCSL[iSL]->GetXaxis()->SetTitle("ADC count");
@@ -521,6 +524,8 @@ void FillHisto()
     } else {
       hTDCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Check", "Width of TDC count is around 200 nsec."));
     }
+    hTDCSL[iSL]->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
+    hTDCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Contact","cdc-software@belle2.org")); 
 
 
     // ADC-TDC corr.
@@ -554,10 +559,17 @@ void FillHisto()
   // Mean and Sigma of ADC dist.
   hmeanADC = new TH1D("hmeanADC", "Mean of Landau peak", MAXLAYER, -0.5, MAXLAYER-0.5);
   hsigmaADC =new TH1D("hsigmaADC", "Sigma of Landau peak", MAXLAYER, -0.5, MAXLAYER-0.5);
+  
   hmeanADC->GetListOfFunctions()->Add(new TNamed("Description", "Mean of Landau peak")); 
   hmeanADC->GetListOfFunctions()->Add(new TNamed("Check", "Small cell part (inner 8 layers) : 50 ADC count. Normal cell part (layer8 - 55) : 100-140 ADC count.")); 
+  hmeanADC->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
+  hmeanADC->GetListOfFunctions()->Add(new TNamed("Contact","cdc-software@belle2.org")); 
+  
   hsigmaADC->GetListOfFunctions()->Add(new TNamed("Description", "Sigma of Landau peak")); 
   hsigmaADC->GetListOfFunctions()->Add(new TNamed("Check", "Small cell part (inner 8 layers) : ~16 ADC count. Normal cell part (layer8 - 55) : 20 - 30 ADC count.")); 
+  hmeanADC->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
+  hmeanADC->GetListOfFunctions()->Add(new TNamed("Contact","cdc-software@belle2.org"));
+  
   for(iLayer = 0; iLayer < MAXLAYER; iLayer++){
     hmeanADC->Fill(Layer[iLayer], meanADC[iLayer]);
     hsigmaADC->Fill(Layer[iLayer], sigmaADC[iLayer]);

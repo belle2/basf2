@@ -6,9 +6,7 @@ First steering file
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 30 min
-
-    **Exercises**: 90 min
+    **Length**: 1.5-3 hrs
 
     **Prerequisites**:
 
@@ -24,13 +22,13 @@ First steering file
 
     **Objectives**:
 
-    * Reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to \pi^+\pi^+)`
+    * Reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to \pi^+\pi^-)`
 
 In this hands-on tutorial you'll be writing your first steering file. Our
 ultimate goal is to reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to
 \pi^+\pi^+)`. You'll be learning step-by-step what is necessary to achieve
 this, and in the end you will produce a plot of the :math:`B` meson candidates. As you
-have already learned in the previous sections, basf2 provides a large variety
+have already learned in the previous sections, ``basf2`` provides a large variety
 of functionality. While the final steering file of this lesson will be working
 and producing some reasonable output, there are many possible extensions that
 you will learn all about in the succeeding lessons.
@@ -41,7 +39,7 @@ environment.
 .. admonition:: Task
     :class: exercise stacked clear
 
-    Set up the basf2 environment using the currently recommended software
+    Set up the ``basf2`` environment using the currently recommended software
     version.
 
 .. admonition:: Hint
@@ -438,7 +436,7 @@ of the decay mode you are studying, it is recommended to use them for V0s
 In the previous task you should have learned how useful it is to carefully
 study the output. This is especially relevant if there are warning or error
 messages. Remember to never ignore them as they usually point to some serious
-issue, either in the way you have written your steering file or in the basf2
+issue, either in the way you have written your steering file or in the ``basf2``
 software itself. In the latter case you are encouraged to report the problem
 so that it can be fixed by some experts (maybe you yourself will become this expert one day).
 
@@ -488,7 +486,7 @@ of the CDC (`thetaInCDCAcceptance`).
     :class: toggle xhint stacked
 
     Previously we were using an empty string ``""`` as argument to
-    ``fileParticleList``. Now you need to change this.
+    ``fillParticleList``. Now you need to change this.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -827,7 +825,7 @@ their shapes, we need to use other variables to achieve the same on collision
 data. Initially, it makes sense to look at many different variables and try to
 find those with discriminating power between signal and background. The most
 basic information are the kinematic properties like the energy and the
-momentum (and its components). In basf2, collections of variables for several
+momentum (and its components). In ``basf2``, collections of variables for several
 topics are pre-prepared. You can find the information in the
 :ref:`analysis/doc/Variables:Collections and Lists` section of the
 documentation.

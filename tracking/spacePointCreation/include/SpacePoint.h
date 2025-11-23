@@ -67,7 +67,7 @@ namespace Belle2 {
     SpacePoint() :
       m_positionError(1., 1., 1.), //TODO: Describe Design Decision for not using the default (0.,0.,0.)
       m_UClusterTime(0.), m_VClusterTime(0.),
-      m_vxdID(0), m_sensorType(VXD::SensorInfoBase::SensorType::VXD) // type is set to generic VXD
+      m_sensorType(VXD::SensorInfoBase::SensorType::VXD), m_vxdID(0) // type is set to generic VXD
     {}
 
     /** Constructor for debugging or other special purposes.
@@ -81,14 +81,14 @@ namespace Belle2 {
      *  @param UClusterTime       Time in ns of the cluster on the U side
      *  @param VClusterTime       Time in ns of the cluster on the V side
      */
-    SpacePoint(const B2Vector3<double>& pos, const B2Vector3<double>& posError, std::pair<double, double> normalizedLocal,
+    SpacePoint(const B2Vector3D& pos, const B2Vector3D& posError, std::pair<double, double> normalizedLocal,
                std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID,
                double UClusterTime = 0., double VClusterTime = 0.) :
       m_position(pos), m_positionError(posError),
       m_normalizedLocal(normalizedLocal),
       m_UClusterTime(UClusterTime), m_VClusterTime(VClusterTime),
-      m_clustersAssigned(clustersAssigned),
-      m_vxdID(sensorID), m_sensorType(detID)
+      m_sensorType(detID), m_vxdID(sensorID),
+      m_clustersAssigned(clustersAssigned)
     {}
 
     /** Currently SpacePoint is used as base class for test beam related TBSpacePoint. */
@@ -139,10 +139,10 @@ namespace Belle2 {
     double TimeV() const { return m_VClusterTime; }
 
     /** return the position vector in global coordinates */
-    const B2Vector3<double>& getPosition() const { return m_position; }
+    const B2Vector3D& getPosition() const { return m_position; }
 
     /** return the hitErrors in sigma of the global position */
-    const B2Vector3<double>& getPositionError() const { return m_positionError; }
+    const B2Vector3D& getPositionError() const { return m_positionError; }
 
     //---- Sensor Level Information Getters ---------------------------------------------------------------------------
     /** Return SensorType (PXD, SVD, ...) on which the SpacePoint lives.*/
@@ -227,8 +227,8 @@ namespace Belle2 {
     *
     * ATTENTION: this function assumes, that for wedged sensors, the uCoordinate is already adapted to the vCoordinate!
      */
-    static B2Vector3<double> getGlobalCoordinates(const std::pair<double, double>& hitLocal, VxdID vxdID,
-                                                  const VXD::SensorInfoBase* aSensorInfo = nullptr);
+    static B2Vector3D getGlobalCoordinates(const std::pair<double, double>& hitLocal, VxdID vxdID,
+                                           const VXD::SensorInfoBase* aSensorInfo = nullptr);
 
 
     /** converts a local hit into sensor-independent relative coordinates.
@@ -301,7 +301,7 @@ namespace Belle2 {
                                 VxdID vxdID = VxdID())
     {
       // Times to times there are normalized coordinates that are out of the boundaries.
-      // We do apply a smal sloppyness here
+      // We do apply a small sloppiness here
 
       double sloppyTerm = 1e-3;
       if (value < lower - sloppyTerm) {
@@ -337,13 +337,13 @@ namespace Belle2 {
      *
      *  [0]: x, [1] : y, [2] : z
      */
-    B2Vector3<double> m_position;
+    B2Vector3D m_position;
 
     /** Global position error vector in sigma.
      *
      *  [0]: x-uncertainty, [1] : y-uncertainty, [2] : z-uncertainty
      */
-    B2Vector3<double> m_positionError;
+    B2Vector3D m_positionError;
 
 
     /** Local position vector normalized to sensor size (0 <= x <= 1).
@@ -360,24 +360,6 @@ namespace Belle2 {
      */
     double m_VClusterTime;
 
-
-    /** The bool value is true, when correct information of the coordinate exists.
-     *
-     *  .first is true, if this SpacePoint has a UCluster (only relevant for SVD, PXD always true),
-     * .second is true, if this SpacePoint has a VCluster (only relevant for SVD, PXD always true),
-     */
-    std::pair<bool, bool> m_clustersAssigned {false, false};
-
-    /** Stores the VxdID. */
-    VxdID::baseType m_vxdID;
-
-    /** Stores the SensorType using the scheme of SensorInfoBase.
-     *
-     *  Currently there are the following types possible:<br>
-     *  PXD, SVD, TEL, VXD
-     */
-    VXD::SensorInfoBase::SensorType m_sensorType;
-
     /** Stores a quality indicator.
      *
      *  The value shall be between 0. and 1., where 1. means "good" and 0. means "bad".
@@ -391,6 +373,23 @@ namespace Belle2 {
      */
     float m_qualityIndicatorError {0.5};
 
+    /** Stores the SensorType using the scheme of SensorInfoBase.
+     *
+     *  Currently there are the following types possible:<br>
+     *  PXD, SVD, TEL, VXD
+     */
+    VXD::SensorInfoBase::SensorType m_sensorType;
+
+    /** Stores the VxdID. */
+    VxdID::baseType m_vxdID;
+
+    /** The bool value is true, when correct information of the coordinate exists.
+     *
+     *  .first is true, if this SpacePoint has a UCluster (only relevant for SVD, PXD always true),
+     * .second is true, if this SpacePoint has a VCluster (only relevant for SVD, PXD always true),
+     */
+    std::pair<bool, bool> m_clustersAssigned {false, false};
+
     /** Stores whether this SpacePoint is connected to a track.
      *
      *  We assume, that const for SpacePoint means, things like position et cetera remain constant.
@@ -399,6 +398,6 @@ namespace Belle2 {
      */
     mutable bool m_isAssigned {false};
 
-    ClassDefOverride(SpacePoint, 13)
+    ClassDefOverride(SpacePoint, 14)
   };
 }

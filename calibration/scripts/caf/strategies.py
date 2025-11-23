@@ -47,7 +47,7 @@ class AlgorithmStrategy(ABC):
     in the required way defined by the options you have selected/attributes set.
     """
     #: Required attributes that must exist before the strategy can run properly.
-    #: Some are allowed be values that return False whe tested e.g. "" or []
+    #: Some are allowed be values that return False when tested e.g. "" or []
     required_attrs = ["algorithm",
                       "database_chain",
                       "dependent_databases",
@@ -81,7 +81,7 @@ class AlgorithmStrategy(ABC):
         """
         #: Algorithm() class that we're running
         self.algorithm = algorithm
-        #: Collector output files, will contain all files retured by the output patterns
+        #: Collector output files, will contain all files returned by the output patterns
         self.input_files = []
         #: The algorithm output directory which is mostly used to store the stdout file
         self.output_dir = ""
@@ -271,7 +271,7 @@ class SequentialRunByRun(AlgorithmStrategy):
     are merged with the previous successful execution's runs and a final execution is performed on all remaining runs.
 
     Additionally this strategy will automatically make sure that IoV gaps in your input data are covered by a payload.
-    This means that there shouldn't be any IoVs that don't get a new payload by the  end of runnning an iteration.
+    This means that there shouldn't be any IoVs that don't get a new payload by the  end of running an iteration.
 
     This uses a `caf.state_machines.AlgorithmMachine` to actually execute the various steps rather than operating on
     a CalibrationAlgorithm C++ class directly.
@@ -430,7 +430,7 @@ class SequentialRunByRun(AlgorithmStrategy):
                 if not remaining_runs:
                     B2INFO("Detected that there are no more runs to execute in this experiment after this next execution.")
                     apply_iov = IoV(*current_runs[0], *highest_exprun)
-                # Othewise, it's just a normal IoV in the middle.
+                # Otherwise, it's just a normal IoV in the middle.
                 else:
                     B2INFO("Detected that there are more runs to execute in this experiment after this next execution.")
                     apply_iov = IoV(*current_runs[0], remaining_runs[0].exp, remaining_runs[0].run - 1)
@@ -449,7 +449,7 @@ class SequentialRunByRun(AlgorithmStrategy):
                     # Save the payloads and result
                     new_successful_payloads = self.machine.algorithm.algorithm.getPayloadValues()
                     new_successful_result = self.machine.result
-                    B2INFO("We just succeded in execution of the Algorithm."
+                    B2INFO("We just succeeded in execution of the Algorithm."
                            f" Will now commit payloads from the previous success for {last_successful_result.iov}.")
                     self.machine.algorithm.algorithm.commit(last_successful_payloads)
                     self.results.append(last_successful_result)
@@ -556,7 +556,7 @@ class SimpleRunByRun(AlgorithmStrategy):
     .. warning:: Since this strategy doesn't try to merge data from runs, if *any* run in your input data doesn't contain
                  enough data to complete the algorithm successfully, you won't be able to get a successful calibration.
                  The CAF then won't allow you to iterate this calibration, or pass the constants onward to another calibration.
-                 However, you will still have the database created that covers all the successfull runs.
+                 However, you will still have the database created that covers all the successful runs.
 
     This uses a `caf.state_machines.AlgorithmMachine` to actually execute the various steps rather than operating on
     a CalibrationAlgorithm C++ class directly.
@@ -665,7 +665,7 @@ class SequentialBoundaries(AlgorithmStrategy):
     Notice that boundaries cannot span multiple experiments.
 
     By default the algorithm will get the payload boundaries directly from the algorithm that need to
-    have inplemented the function ``isBoundaryRequired``. If the desired boundaries are already known it
+    have implemented the function ``isBoundaryRequired``. If the desired boundaries are already known it
     is possible to pass them directly setting the algorithm parameter ``payload_boundaries`` and avoid
     the need to define the  ``isBoundaryRequired`` function.
 
@@ -770,7 +770,7 @@ class SequentialBoundaries(AlgorithmStrategy):
             # Override the normal value for the highest ExpRun (from data) if iov_coverage was set
             if iov_coverage and i_exp == number_of_experiments:
                 highest_exprun = ExpRun(iov_coverage.exp_high, iov_coverage.run_high)
-            # If we have more experiments to execute then we wil be setting the final payload IoV in this experiment
+            # If we have more experiments to execute then we will be setting the final payload IoV in this experiment
             # to be unbounded
             elif i_exp < number_of_experiments:
                 highest_exprun = ExpRun(current_experiment, -1)

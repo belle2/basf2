@@ -16,7 +16,6 @@
 #include <G4Track.hh>
 #include <G4Step.hh>
 
-#include <iostream>
 #define _USE_MATH_DEFINES
 #include <cmath>
 using namespace std;

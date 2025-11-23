@@ -31,9 +31,9 @@ std::string TrackExporter::getDescription()
 void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   moduleParamList->addParameter(prefixed(prefix, "RecoTracksStoreArrayName"),
-                                m_param_exportTracksInto,
-                                "Alias for exportTracksInto",
-                                m_param_exportTracksInto);
+                                m_param_RecoTracksName,
+                                "Name of the output StoreArray of RecoTracks.",
+                                m_param_RecoTracksName);
 
   moduleParamList->addParameter(prefixed(prefix, "WriteRecoTracks"),
                                 m_param_exportTracks,
@@ -44,11 +44,6 @@ void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 m_param_exportTracks,
                                 "Switch for the creation of reco tracks for each cdc track.",
                                 m_param_exportTracks);
-
-  moduleParamList->addParameter(prefixed(prefix, "exportTracksInto"),
-                                m_param_exportTracksInto,
-                                "Name of the output StoreArray of RecoTracks.",
-                                m_param_exportTracksInto);
 
   moduleParamList->addParameter(prefixed(prefix, "discardCovarianceMatrix"),
                                 m_param_discardCovarianceMatrix,
@@ -64,7 +59,7 @@ void TrackExporter::initialize()
 {
   // Output StoreArray
   if (m_param_exportTracks) {
-    StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
+    StoreArray<RecoTrack> storedRecoTracks(m_param_RecoTracksName);
     storedRecoTracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
     RecoTrack::registerRequiredRelations(storedRecoTracks);
   }
@@ -83,7 +78,7 @@ void TrackExporter::apply(std::vector<CDCTrack>& tracks)
 
   // Put code to generate gf track cands here if requested.
   if (m_param_exportTracks) {
-    StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
+    StoreArray<RecoTrack> storedRecoTracks(m_param_RecoTracksName);
     for (const CDCTrack& track : tracks) {
       RecoTrack* newRecoTrack;
       if (m_param_monopoleMomSeed != 0.0)

@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+#############################################################
+# Steering file for official Checking TauolaBelle2 files MC #
+# production of signal samples                              #
+#############################################################
+
+
+import basf2 as b2
+import generators as ge
+import modularAnalysis as ma
+from basf2 import logging
+import sys
+
+# Decay file
+decfile = sys.argv[1]
+
+# Create path
+main = b2.create_path()
+
+#set log level
+b2.set_log_level(b2.LogLevel.INFO)
+
+# Add EventInfoSetter module and If you modify the evtNumList parameter to contain different values, 
+# ensure to update the corresponding conditions within the test_changed_tauolabelle2.py file.
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=5)
+
+# Add KKMC generator module
+ge.add_kkmc_generator(path=main, finalstate='tau-tau+', signalconfigfile=decfile)
+
+# Add Progress module
+main.add_module("Progress")
+
+# Add TauPairMC module
+ma.labelTauPairMC(path=main, printDecayInfo=True)
+
+# Process events and print call statistics
+b2.process(main)
+# show number of log_messages for INFO
+for (level, num) in logging.log_stats.items():
+    if level.name == 'INFO':
+        print(level.name, num)

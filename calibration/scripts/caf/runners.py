@@ -174,7 +174,7 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
 
             # Exit early and don't continue strategies as this one failed
             if final_state == AlgorithmStrategy.FAILED:
-                B2ERROR(f"AlgorithmStrategy for {strategy.algorithm.name} failed. We wil not proceed with any more algorithms")
+                B2ERROR(f"AlgorithmStrategy for {strategy.algorithm.name} failed. We will not proceed with any more algorithms")
                 self.final_state = self.FAILED
                 break
 

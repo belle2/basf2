@@ -29,7 +29,7 @@ namespace Belle2 {
        *  create the underlying TTree and add let the given function setup branches.
        *
        *  @param setBranches    Function invoked with the underlying TTree as argument
-       *                        which is supposed create Branches and provide the value adresses.
+       *                        which is supposed create Branches and provide the value addresses.
        *  @param rootFileName   Name of ROOT file to which should be written.
        *  @param treeName       Name of the TTree in the ROOT file.
        */
@@ -60,7 +60,7 @@ namespace Belle2 {
       void capture();
 
     private:
-      /// Forward declartion of implementation.
+      /// Forward declaration of implementation.
       class Impl;
 
       /// Pointer to implementation hiding the details.

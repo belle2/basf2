@@ -43,7 +43,7 @@ namespace Belle2 {
      */
     TObject* object;
 
-    /** The pointer to the returned object, either equal to 'object' or null, depending on wether the object was created in the current event **/
+    /** The pointer to the returned object, either equal to 'object' or null, depending on whether the object was created in the current event **/
     TObject* ptr;
 
     std::string name; /**< Name of the entry. Equal to the key in the map. **/

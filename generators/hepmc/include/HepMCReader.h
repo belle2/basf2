@@ -77,7 +77,7 @@ namespace Belle2 {
      * Reads the next event and stores the result in the given MCParticle graph.
      * @param graph Reference to the graph which should be filled with the information from the Hepevt file.
      * @param weight Reference to the event weight which can be filled from the file.
-     * @return event numer if the event could be read and the number was provided in the file.
+     * @return event number if the event could be read and the number was provided in the file.
      */
     int getEvent(MCParticleGraph& graph, double& weight);
 

@@ -9,7 +9,6 @@
 #pragma once
 
 /* ECL headers. */
-#include <ecl/calibration/eclWaveformTemplateCalibrationC3Algorithm.h>
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
 
 /* Basf2 headers. */

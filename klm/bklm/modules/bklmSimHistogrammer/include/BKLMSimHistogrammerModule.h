@@ -123,7 +123,7 @@ namespace Belle2 {
     TFile* m_file;
     //! filename for the root file
     std::string m_filename;
-    //! time this simulation corrsponds to
+    //! time this simulation corresponds to
     float m_realTime;
     //! weight for each event (inverse of the realTime)
     float m_weight;

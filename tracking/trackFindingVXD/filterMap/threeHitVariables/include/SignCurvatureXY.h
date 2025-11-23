@@ -34,8 +34,8 @@ namespace Belle2 {
     static int value(const PointType& a, const PointType& b, const PointType& c)
     {
       using boost::math::sign;
-      B2Vector3<double> ba(a.X() - b.X(), a.Y() - b.Y(), 0.0);
-      B2Vector3<double> bc(b.X() - c.X(), b.Y() - c.Y(), 0.0);
+      B2Vector3D ba(a.X() - b.X(), a.Y() - b.Y(), 0.0);
+      B2Vector3D bc(b.X() - c.X(), b.Y() - c.Y(), 0.0);
       return sign(bc.Orthogonal() * ba); //normal vector of m_vecBC times segment of ba
     }
   };

@@ -16,7 +16,7 @@ class Test_Prompt(TestCase):
 
     def test_check(self):
         """
-        Uses b2caf-prompt-check to make sure that cripts can all be imported and duplicate names
+        Uses b2caf-prompt-check to make sure that scripts can all be imported and duplicate names
         for calibrations don't exist.
         """
         tool_name = "b2caf-prompt-check"

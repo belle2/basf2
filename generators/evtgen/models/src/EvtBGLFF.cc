@@ -101,7 +101,7 @@ void EvtBGLFF::getvectorff(EvtId parent, EvtId, double t, double mass, double* a
   double w = ((mb * mb) + (mass * mass) - t) / (2. * mb * mass);
 
   // Form factors have a general form, with parameters passed in
-  // from the arguements.
+  // from the arguments.
 
   const double r = mass / mb;
   double z = (sqrt(w + 1.) - sqrt(2.)) / (sqrt(w + 1) + sqrt(2.));

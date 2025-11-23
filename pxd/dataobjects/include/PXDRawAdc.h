@@ -29,7 +29,7 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDRawAdc():
-      m_sensorID(0), m_dhp_header(0), m_adcs() {};
+      m_adcs(), m_sensorID(0), m_dhp_header(0) {};
 
 
     /**
@@ -64,11 +64,11 @@ namespace Belle2 {
     }
 
   private:
+    std::vector <uint8_t> m_adcs; /**< Raw ADC data as it is memory dumped by the DHP */
     unsigned short m_sensorID; /**< Compressed sensor identifier. actually a VxdID object */
     unsigned short m_dhp_header; /**< needed for Chip id */
-    std::vector <uint8_t> m_adcs; /**< Raw ADC data as it is memory dumped by the DHP */
 
-    ClassDef(PXDRawAdc, 3)
+    ClassDef(PXDRawAdc, 4)
   };
 
 

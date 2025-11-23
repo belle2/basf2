@@ -75,7 +75,7 @@ class TrackingValidationResult:
                 c in enumerate(calculations)]
 
     def get_figure_of_merits(self):
-        """Return the figures of merit from the file. Mosty used for internal seeting of the properties."""
+        """Return the figures of merit from the file. Mostly used for internal setting of the properties."""
         if self.finding_efficiency is None:
             overview = uproot.open(
                 self.filename)["ExpertMCSideTrackingValidationModule_overview_figures_of_merit"].arrays(
@@ -101,17 +101,17 @@ class TrackingValidationResult:
         latex_string = r'\begin{table}' + "\n"
         latex_string += r'  \begin{tabular}{cc} \toprule' + "\n"
         latex_string += r'    & \\ \midrule' + "\n"
-        latex_string += r'    Finding Efficiency & ' + "%.2f" % (100 * results["finding_efficiency"]) + r' \% \\' + "\n"
-        latex_string += r'    Hit Efficiency & ' + "%.2f" % (100 * results["hit_efficiency"]) + r' \% \\' + "\n"
-        latex_string += r'    Fake Rate & ' + "%.2f" % (100 * results["fake_rate"]) + r' \% \\' + "\n"
-        latex_string += r'    Clone Rate & ' + "%.2f" % (100 * results["clone_rate"]) + r' \% \\ \bottomrule' + "\n"
+        latex_string += r'    Finding Efficiency & ' + f"{100 * results['finding_efficiency']:.2f}" + r' \% \\' + "\n"
+        latex_string += r'    Hit Efficiency & ' + f"{100 * results['hit_efficiency']:.2f}" + r' \% \\' + "\n"
+        latex_string += r'    Fake Rate & ' + f"{100 * results['fake_rate']:.2f}" + r' \% \\' + "\n"
+        latex_string += r'    Clone Rate & ' + f"{100 * results['clone_rate']:.2f}" + r' \% \\ \bottomrule' + "\n"
         latex_string += r'  \end{tabular}' + "\n"
         latex_string += r'\end{table}'
 
         return latex_string
 
     def plot_efficiency_point(self):
-        """Plot a oint in the finding-efficiency/hit-efficiency plane."""
+        """Plot a point in the finding-efficiency/hit-efficiency plane."""
         import matplotlib.pyplot as plt
         self.plot(100 * self.finding_efficiency, 100 * self.hit_efficiency, loc=3)
         plt.xlabel("finding efficiency")

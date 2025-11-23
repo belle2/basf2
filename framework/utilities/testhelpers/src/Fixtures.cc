@@ -24,7 +24,7 @@ namespace Belle2::TestHelpers {
       explicit LogInterceptor(std::vector<Belle2::LogMessage>& messages): m_messages(messages) {}
       /** always connected */
       bool isConnected() override { return true; }
-      /** and always sucessful in storing into buffer */
+      /** and always successful in storing into buffer */
       bool sendMessage(Belle2::LogMessage const& message) override {m_messages.push_back(message); return false; }
     };
   }

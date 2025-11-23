@@ -8,6 +8,7 @@
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
@@ -487,4 +488,16 @@ double Variable::Manager::evaluate(const std::string& varName, const Particle* p
   else if (var->variabletype == Variable::Manager::VariableDataType::c_bool)
     return (double)std::get<bool>(var->function(p));
   else return std::numeric_limits<double>::quiet_NaN();
+}
+
+std::vector<double> Variable::Manager::evaluateVariables(const std::vector<std::string>& varNames, const ParticleList* plist)
+{
+  std::vector<double> values;
+  values.reserve(varNames.size() * plist->getListSize());
+  for (size_t iPart = 0; iPart < plist->getListSize(); ++iPart) {
+    const Particle* p = plist->getParticle(iPart);
+    for (size_t iVar = 0; iVar < varNames.size(); ++iVar)
+      values.push_back(evaluate(varNames[iVar], p));
+  }
+  return values;
 }

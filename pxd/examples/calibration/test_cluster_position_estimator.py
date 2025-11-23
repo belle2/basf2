@@ -12,7 +12,7 @@
 # This steering file steers fills cluster position residuals and pulls with truehits to
 # test the cluster position estimator payloads from CAF.
 #
-# Execute as: basf2 test_cluster_position_estimator.py
+# Execute as: basf2 test_cluster_position_estimator.py -- --dbfile=./localdb/database.txt
 
 import math
 import basf2 as b2
@@ -111,7 +111,7 @@ class PXDPositionEstimation(b2.Module):
 
         for truehit in truehits:
             if isinstance(truehit, Belle2.PXDTrueHit):
-                sensor_info = Belle2.VXD.GeoCache.get(truehit.getSensorID())
+                sensor_info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(truehit.getSensorID())
                 clusters = truehit.getRelationsFrom("PXDClusters")
 
                 # now check if we find a cluster
@@ -122,15 +122,11 @@ class PXDPositionEstimation(b2.Module):
                         continue
 
                     mom = truehit.getMomentum()
-                    tu = mom[0] / mom[2]
-                    tv = mom[1] / mom[2]
+                    abs_momentum = mom.R()
+                    tu = mom.X() / mom.Z()
+                    tv = mom.Y() / mom.Z()
                     thetaU = math.atan(tu) * 180 / math.pi
                     thetaV = math.atan(tv) * 180 / math.pi
-
-                    # Only look at primary particles -> check if the following is needed
-                    # for mcp in truehit.getRelationsFrom("MCParticles"):
-                    #    if not mcp.hasStatus(1):
-                    #        reject = True
 
                     # Get instance of position estimator
                     PositionEstimator = Belle2.PXD.PXDClusterPositionEstimator.getInstance()
@@ -139,18 +135,18 @@ class PXDPositionEstimation(b2.Module):
                     # Clusterkinds 0,1,2,3 refer to all cases which can currently
                     # be corrected. Cases where a cluster pixel touches a sensor
                     # edge or contains pixel with varying vPitch are excluded here.
-                    if clusterkind <= 3 and mom.Mag() > 0.02:
+                    if clusterkind <= 3 and abs_momentum > 0.02:
 
                         self.nclusters += 1
 
                         # Fill momentum and angles for clusterkind
-                        self.hist_map_momentum[clusterkind].Fill(mom.Mag())
+                        self.hist_map_momentum[clusterkind].Fill(abs_momentum)
                         self.hist_map_theta_u[clusterkind].Fill(thetaU)
                         self.hist_map_theta_v[clusterkind].Fill(thetaV)
                         self.hist_map_clustercharge[clusterkind].Fill(cls.getCharge())
 
                         # Fill clusterkind=4 for all PXD sensors
-                        self.hist_map_momentum[4].Fill(mom.Mag())
+                        self.hist_map_momentum[4].Fill(abs_momentum)
                         self.hist_map_theta_u[4].Fill(thetaU)
                         self.hist_map_theta_v[4].Fill(thetaV)
                         self.hist_map_clustercharge[4].Fill(cls.getCharge())
@@ -178,10 +174,10 @@ class PXDPositionEstimation(b2.Module):
 
                         offset = PositionEstimator.getClusterOffset(cls, tu, tv)
                         if offset:
-                            # Now, we can safely querry the correction
+                            # Now, we can safely query the correction
                             self.nfound_offset += 1
 
-                            # We need to explicitely add a shift to the offsets
+                            # We need to explicitly add a shift to the offsets
                             # This is not needed when working with PXDRecoHits
                             shiftU = sensor_info.getUCellPosition(cls.getUStart())
                             shiftV = sensor_info.getVCellPosition(cls.getVStart())
@@ -305,7 +301,6 @@ if __name__ == "__main__":
 
     import argparse
     import glob
-    import sys
 
     parser = argparse.ArgumentParser(description="Test cluster shape corrections on generic BBbar events")
     parser.add_argument(
@@ -315,13 +310,18 @@ if __name__ == "__main__":
         type=str,
         help='Location of bg overlay files')
     parser.add_argument('--bkgOverlay', dest='bkgOverlay', action="store_true", help='Perform background overlay')
+    parser.add_argument('--dbfile', default="./localdb/database.txt", type=str,
+                        help='Path to database.txt file for testing payloads')
     args = parser.parse_args()
+
+    # for quick testing before upload to condDB
+    b2.conditions.append_testing_payloads(args.dbfile)
 
     # Find background overlay files
     bkgfiles = glob.glob(args.bglocation + '/*.root')
     if len(bkgfiles) == 0:
         print('No BG overlay files found')
-        sys.exit()
+        bkgfiles = None
 
     # Now let's create a path to simulate our events.
     main = b2.create_path()

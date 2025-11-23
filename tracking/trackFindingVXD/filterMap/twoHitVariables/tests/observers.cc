@@ -360,9 +360,9 @@ namespace VXDTFObserversTest {
   class counterMC {
   public:
     static CountContainer
-    pdGacceptedRejected; /** map for pdgCodes (key: vector of pdgCodes found for given hits, sorted) storing how often it was accepted/rejected  value.first/value.second */
+    pdGacceptedRejected; /**< map for pdgCodes (key: vector of pdgCodes found for given hits, sorted) storing how often it was accepted/rejected  value.first/value.second */
     static CountContainer
-    mcIDacceptedRejected; /** map for mcParticleIDs (key, vector of mcParticleIDs (pair: first: true, if combination was from the same particle which was primary, found for given hits, sorted), storing how often it was accepted/rejected value.first/value.second */
+    mcIDacceptedRejected; /**< map for mcParticleIDs (key, vector of mcParticleIDs (pair: first: true, if combination was from the same particle which was primary, found for given hits, sorted), storing how often it was accepted/rejected value.first/value.second */
     counterMC() {};  /**< constructor. */
     ~counterMC() {};  /**< destructor. */
     static void resetCounter()
@@ -382,9 +382,9 @@ namespace VXDTFObserversTest {
   template<class T> unsigned int counter<T>::wasNan(0);
 
   template<class T> CountContainer counterMC< T >::pdGacceptedRejected =
-    CountContainer(); /**< counts nCases accepted/rejected for each pdgCode-combination occured */
+    CountContainer(); /**< counts nCases accepted/rejected for each pdgCode-combination occurred */
   template<class T> CountContainer counterMC< T >::mcIDacceptedRejected =
-    CountContainer(); /**< counts nCases accepted/rejected for each particleID-combination occured */
+    CountContainer(); /**< counts nCases accepted/rejected for each particleID-combination occurred */
 
 
 
@@ -576,7 +576,7 @@ namespace VXDTFObserversTest {
       }
     }
 
-    /** for two hits given, a key for the CountContainer is returned. if usePDG == true, PDGcode will be used as identifyer, if false, the ParticleID will be used */
+    /** for two hits given, a key for the CountContainer is returned. if usePDG == true, PDGcode will be used as identifier, if false, the ParticleID will be used */
     template <class hitType>
     static CountContainer::Key createKey(const hitType& hitA, const hitType& hitB, bool usePDG)
     {

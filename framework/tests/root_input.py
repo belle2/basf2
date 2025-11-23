@@ -30,7 +30,7 @@ with clean_working_directory():
         os.symlink(basf2.find_file(f'framework/tests/{filename}'), filename)
 
     main = basf2.Path()
-    # not used for anything, just checking wether the master module
+    # not used for anything, just checking whether the master module
     # can be found if it's not the first module in the path.
     main.add_module(NoopModule())
     # load all branches, minus PXDClusters (relations with PXDClusters are automatically excluded)
@@ -53,7 +53,7 @@ with clean_working_directory():
     # Test starting directly with a given event. There will be a fatal error if the
     # event is not found in the file so let's call process() in a child process to
     # not be aborted
-    for evtNo in range(1, 6):
+    for evtNo in range(1, 7):
         main = basf2.Path()
         main.add_module("RootInput", inputFileName='root_input.root',
                         branchNames=["EventMetaData"], skipToEvent=[0, 1, evtNo], logLevel=basf2.LogLevel.WARNING)
@@ -65,7 +65,7 @@ with clean_working_directory():
     input_module = main.add_module('RootInput', inputFileNames=['chaintest_1.root', 'chaintest_2.root'],
                                    logLevel=basf2.LogLevel.WARNING)
     # The first file contains the following event numbers (in this order)
-    # 2, 6, 5, 9, 10, 11, 8, 12, 0, 13, 15, 16
+    # 2, 6, 5, 9, 10, 11, 8, 12, 1, 13, 15, 16
     # We select more event than the file contains, to check if it works anyway
     # The second file contains the following event numbers (in this order)
     # 7, 6, 3, 8, 9, 12, 4, 11, 10, 16, 13, 17, 18, 14, 15
@@ -118,13 +118,13 @@ with clean_working_directory():
     input_module = main.add_module('RootInput', inputFileNames=['chaintest_1.root', 'chaintest_2.root'],
                                    logLevel=basf2.LogLevel.WARNING)
     # The first file contains the following event numbers (in this order)
-    # 2, 6, 5, 9, 10, 11, 8, 12, 0, 13, 15, 16
+    # 2, 6, 5, 9, 10, 11, 8, 12, 1, 13, 15, 16
     # We select the complete first file.
     # The second file contains the following event numbers (in this order)
     # 7, 6, 3, 8, 9, 12, 4, 11, 10, 16, 13, 17, 18, 14, 15
     input_module.param('entrySequences', [':', '1:2,4,12:13'])
 
-    expected_event_numbers = [2, 6, 5, 9, 10, 11, 8, 12, 0, 13, 15, 16, 6, 3, 9, 18, 14]
+    expected_event_numbers = [2, 6, 5, 9, 10, 11, 8, 12, 1, 13, 15, 16, 6, 3, 9, 18, 14]
     main.add_module(TestingModule(expected_event_numbers))
 
     assert safe_process(main) == 0

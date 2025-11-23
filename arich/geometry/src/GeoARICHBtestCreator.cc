@@ -7,9 +7,6 @@
  **************************************************************************/
 #include <sstream>
 #include <string.h>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 
 //#include <geant4/G4LogicalVolume.hh>
 
@@ -43,7 +40,6 @@
 #include <arich/simulation/SensitiveAero.h>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -110,7 +106,7 @@ namespace Belle2 {
       char nodestr[100];
       sprintf(nodestr, "run[runno=%d]", run);
       if (Type == "beamtest") {
-        BOOST_FOREACH(const GearDir & runparam, content.getNodes(nodestr)) {
+        for (const GearDir& runparam : content.getNodes(nodestr)) {
           m_runno       = runparam.getInt("runno", -1);
           m_author      = runparam.getString("author", "");
           m_neve        = runparam.getInt("neve", -1);
@@ -149,7 +145,7 @@ namespace Belle2 {
 
         GearDir runparam(content, nodestr);
         B2INFO("id    : " << runparam.getString("@id", ""));
-        BOOST_FOREACH(const GearDir & aeroparam, runparam.getNodes("aerogel")) {
+        for (const GearDir& aeroparam : runparam.getNodes("aerogel")) {
           aerogelname       = aeroparam.getString(".", "");
           string stype       = aeroparam.getString("@type", "");
           B2INFO(stype << " aerogelname    : " << aerogelname);
@@ -183,7 +179,7 @@ namespace Belle2 {
         B2INFO("nodestr    : " << nodestr);
         B2INFO("aerogelsupport    : " << m_aerosupport);
         GearDir hapdparam(content, nodestr);
-        //BOOST_FOREACH(const GearDir & runparam, content.getNodes(nodestr)) {
+        //for (const GearDir& runparam : content.getNodes(nodestr)) {
         m_aerogeldx     =  hapdparam.getLength("aerogeldx", 0);
         m_framedx       =  hapdparam.getLength("framedx", 0) * CLHEP::mm / Unit::mm ;
         m_rotation1     =  hapdparam.getDouble("rotation", 0);
@@ -254,7 +250,7 @@ namespace Belle2 {
 
       // build and place module wall
       G4Box* tempBox = new G4Box("tempBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick,
-                                 modZsize / 2. + 0.1); // Dont't care about "+0.1", needs to be there.
+                                 modZsize / 2. + 0.1); // Don't care about "+0.1", needs to be there.
       G4SubtractionSolid* moduleWall = new G4SubtractionSolid("Box-tempBox", moduleBox, tempBox);
       G4LogicalVolume* lmoduleWall = new G4LogicalVolume(moduleWall, wallMaterial, "moduleWall");
       setColor(*lmoduleWall, "rgb(1.0,0.0,0.0,1.0)");
@@ -369,8 +365,8 @@ namespace Belle2 {
       double zoffset = boxParams.getLength("beamcenter/z")  * CLHEP::mm  / Unit::mm - zBox / 2.;
       G4ThreeVector roffset(xoffset, yoffset, zoffset);
 
-      TVector3 sh(boxParams.getLength("beamcenter/x"), boxParams.getLength("beamcenter/y"),
-                  boxParams.getLength("beamcenter/z") - boxParams.getLength("zSize") / 2.);
+      ROOT::Math::XYZVector sh(boxParams.getLength("beamcenter/x"), boxParams.getLength("beamcenter/y"),
+                               boxParams.getLength("beamcenter/z") - boxParams.getLength("zSize") / 2.);
       m_arichbtgp->setOffset(sh);
 
       string boxMat = boxParams.getString("material");
@@ -380,22 +376,22 @@ namespace Belle2 {
       new G4PVPlacement(G4Transform3D(), topVolume, "ARICH.experimentalbox", &topWorld, false, 1);
       setVisibility(*topVolume, false);
 
-      TVector3 trackingshift(content.getLength("tracking/shift/x"),
-                             content.getLength("tracking/shift/y"),
-                             content.getLength("tracking/shift/z"));
+      ROOT::Math::XYZVector trackingshift(content.getLength("tracking/shift/x"),
+                                          content.getLength("tracking/shift/y"),
+                                          content.getLength("tracking/shift/z"));
 
       char mnodestr[256];
       sprintf(mnodestr, "tracking/shift/run[@id=\"%d\"]", m_runno);
       if (content.exists(mnodestr)) {
         GearDir runtrackingshift(content, mnodestr);
-        trackingshift[0] = runtrackingshift.getLength("x");
-        trackingshift[1] = runtrackingshift.getLength("y");
-        trackingshift[2] = runtrackingshift.getLength("z");
+        trackingshift.SetXYZ(runtrackingshift.getLength("x"),
+                             runtrackingshift.getLength("y"),
+                             runtrackingshift.getLength("z"));
       }
       m_arichbtgp->setTrackingShift(trackingshift);
       ARICHTracking* m_mwpc = new ARICHTracking[4];
       m_arichbtgp->setMwpc(m_mwpc);
-      BOOST_FOREACH(const GearDir & mwpc, content.getNodes("tracking/mwpc")) {
+      for (const GearDir& mwpc : content.getNodes("tracking/mwpc")) {
         double x = mwpc.getLength("size/x")  * CLHEP::mm / Unit::mm;
         double y = mwpc.getLength("size/y")  * CLHEP::mm / Unit::mm;
         double z = mwpc.getLength("size/z")  * CLHEP::mm / Unit::mm;
@@ -475,8 +471,9 @@ namespace Belle2 {
       new G4PVPlacement(frameTransformation, lenvBox, "ARICH.frame", topVolume, false, 1);
       //setVisibility(*lenvBox, false);
 
-      TVector3 rotationCenter =  TVector3(frameOrigin0.x() *  Unit::mm / CLHEP::mm, frameOrigin0.y() *  Unit::mm / CLHEP::mm,
-                                          frameOrigin0.z() *  Unit::mm / CLHEP::mm);
+      ROOT::Math::XYZVector rotationCenter(frameOrigin0.x() *  Unit::mm / CLHEP::mm,
+                                           frameOrigin0.y() *  Unit::mm / CLHEP::mm,
+                                           frameOrigin0.z() *  Unit::mm / CLHEP::mm);
       m_arichbtgp->setFrameRotation(m_rotation1 * CLHEP::degree);
       m_arichbtgp->setRotationCenter(rotationCenter);
 
@@ -518,7 +515,7 @@ namespace Belle2 {
       }
       // mask hot channels
       int npx       = m_arichgp->getDetectorXPadNumber();
-      BOOST_FOREACH(const double & ch, hapdcontent.getArray("HotChannels")) {
+      for (const double& ch : hapdcontent.getArray("HotChannels")) {
         int channelID = (int) ch;
         int moduleID  = (npx) ? channelID / (npx * npx) : 0;
         channelID    %= (npx * npx);
@@ -526,7 +523,7 @@ namespace Belle2 {
         B2INFO("HotChannel " << ch << " : Module " << moduleID << "channelID " << channelID << " disabled");
       }
       // mask dead channels
-      BOOST_FOREACH(const double & ch, hapdcontent.getArray("DeadChannels")) {
+      for (const double& ch : hapdcontent.getArray("DeadChannels")) {
         int channelID = (int) ch;
         int moduleID  = (npx) ? channelID / (npx * npx) : 0;
         channelID    %= (npx * npx);
@@ -604,7 +601,7 @@ namespace Belle2 {
       G4OpticalSurface* optSurf = materials.createOpticalSurface(surface);
       new G4LogicalSkinSurface("mirrorsSurface", lmirror, optSurf);
       int iMirror = 0;
-      BOOST_FOREACH(const GearDir & mirror, mirrorsParam.getNodes("Mirror")) {
+      for (const GearDir& mirror : mirrorsParam.getNodes("Mirror")) {
         double xpos = mirror.getLength("xPos") * CLHEP::mm / Unit::mm;
         double ypos = mirror.getLength("yPos") * CLHEP::mm / Unit::mm;
         double zpos = mirror.getLength("zPos") * CLHEP::mm / Unit::mm;

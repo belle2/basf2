@@ -30,7 +30,6 @@ void DQMHistAnalysisECLConnectedRegionsModule::initialize()
   for (auto& pv_name : {"largest_cr_avg_crystals_num", "largest_cr_localmax_num"}) {
     registerEpicsPV(m_pvPrefix + pv_name, pv_name);
   }
-  updateEpicsPVs(5.0);
 
   m_monObj = getMonitoringObject("ecl");
 
@@ -57,7 +56,6 @@ void DQMHistAnalysisECLConnectedRegionsModule::event()
   //== Set EPICS PVs
   setEpicsPV("largest_cr_avg_crystals_num", m_largestCRAvgCrystalsNum);
   setEpicsPV("largest_cr_localmax_num", m_largestCRLocalMaxNum);
-  updateEpicsPVs(5.0);
 }
 
 void DQMHistAnalysisECLConnectedRegionsModule::endRun()

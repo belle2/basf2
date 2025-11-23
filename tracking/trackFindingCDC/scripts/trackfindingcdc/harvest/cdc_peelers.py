@@ -100,3 +100,7 @@ def peel_segment_pair(segment_pair, key="{part_name}"):
     crops.update(trajectory3d_crops)
 
     return crops
+
+
+if __name__ == "__main__":
+    pass

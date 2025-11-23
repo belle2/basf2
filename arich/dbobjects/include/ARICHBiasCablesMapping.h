@@ -68,7 +68,7 @@ namespace Belle2 {
     void addMapping(int moduleID, int sectorID, int cableID, int innerID);
 
     /**
-     * Pring mapping
+     * Print mapping
      */
     void print() const;
 

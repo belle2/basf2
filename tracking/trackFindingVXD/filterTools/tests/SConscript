@@ -1,5 +1,3 @@
-#vim: syntax=python
-
 Import('env')
 
 env['LIBS'] = [

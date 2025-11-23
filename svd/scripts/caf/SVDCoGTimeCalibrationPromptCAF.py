@@ -11,8 +11,6 @@ import basf2 as b2
 import sys
 import datetime
 
-from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
-
 from caf.framework import Calibration
 from prompt import CalibrationSettings
 from caf import strategies
@@ -34,6 +32,9 @@ settings = CalibrationSettings(name="SVDCoGTimeCalibrationPrompt",
 
 
 def get_calibrations(input_data, **kwargs):
+    # avoid top level ROOT imports
+    from ROOT import Belle2  # noqa: make Belle2 namespace available
+    from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
 
     # Set-up re-processing path
     path = b2.create_path()

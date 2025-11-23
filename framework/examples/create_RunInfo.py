@@ -106,6 +106,6 @@ if __name__ == "__main__":
 
     B2INFO(f"Imported {imported} RunInfo objects")
     if errors > 0:
-        B2FATAL(f"{errors} errors occured")
+        B2FATAL(f"{errors} errors occurred")
 
 # @endcond

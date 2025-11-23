@@ -31,7 +31,16 @@ namespace TreeFitter {
     virtual ~RecoResonance() {};
 
     /** dimension of the vector */
-    virtual int dim() const override { return hasEnergy() ? 4 : 3;} // (px,py,pz,(E))
+    virtual int dim() const override
+    {
+      if (particle()->hasExtraInfo("treeFitterTreatMeAsInvisible")
+          && particle()->getExtraInfo("treeFitterTreatMeAsInvisible") == 1) {
+        // invisible particle shouldn't contribute degrees of freedom to fit
+        // set dimension to "measurement" dimension to cancel them out
+        return dimM() ;
+      }
+      return hasEnergy() ? 4 : 3; // (px,py,pz,(E))
+    }
 
     /** project the constraint */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const override;

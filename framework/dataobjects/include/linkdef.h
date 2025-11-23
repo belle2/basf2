@@ -13,7 +13,7 @@
 #pragma link C++ class Belle2::MCInitialParticles+; // checksum=0x77c00ada, version=5
 #pragma link C++ class Belle2::DigitBase+; // checksum=0xd2fac950, version=2
 #pragma link C++ class Belle2::MergedEventConsistency+; // checksum=0x39886d50, version=1
-#pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x965ad50b, version=2
+#pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x6e52097a, version=3
 
 #pragma link C++ class Belle2::Helix+; // checksum=0xc11c13b7, version=2
 #pragma link C++ class Belle2::UncertainHelix+; // checksum=0xe2ab4508, version=2
@@ -23,7 +23,7 @@
 #pragma link C++ class Belle2::TestChunkData+; // checksum=0x25c3db4e, version=1
 
 #pragma link C++ class Belle2::BackgroundMetaData+; // checksum=0x60d78a20, version=4
-#pragma link C++ class Belle2::BackgroundInfo+; // checksum=0x6eb1ad8, version=4
+#pragma link C++ class Belle2::BackgroundInfo+; // checksum=0x6eb1ad8, version=5
 
 #pragma read sourceClass="Belle2::FileMetaData" version="[-3]" \
   source="unsigned int m_randomSeed" \
@@ -35,11 +35,7 @@
   code="{m_nEvents = onfile.m_events;}"
 
 #pragma link C++ class Belle2::DisplayData+; // checksum=0x8b755e12, version=5
-#pragma link C++ class std::vector<TVector3>+; // checksum=0x907dc885, version=6
-#pragma link C++ class std::map<string, vector<TVector3>>+; // checksum=0xd74970c5, version=6
 #pragma link C++ class std::map<string, vector<ROOT::Math::XYZVector>>+; // checksum=0x91d6f4ec, version=6
-#pragma link C++ class std::pair<string, TVector3>+; // checksum=0x4d496280, version=-1
-#pragma link C++ class std::vector<std::pair<std::string, TVector3>>+; // checksum=0x1998b952, version=6
 #pragma link C++ class std::vector<std::pair<std::string, ROOT::Math::XYZVector>>+; // checksum=0xa2b6087d, version=6
 #pragma link C++ class std::vector<TH1*>+; // checksum=0x1c8a598, version=6
 #pragma link C++ class Belle2::DisplayData::Arrow+; // checksum=0xaf5e21d6, version=-1

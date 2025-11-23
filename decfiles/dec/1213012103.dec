@@ -8,6 +8,9 @@
 # Email: otittel@mpp.mpg.de
 # Cuts: None
 # Date: 31/08/2023
+# Changes: specify the decay of K_S0; date: 20231129; author: Xiaodong Shi
+
+Alias      K_S0sig  K_S0
 
 Decay Upsilon(4S)
 0.5 B+sig B- VSS;
@@ -20,9 +23,13 @@ Enddecay
 CDecay B-sig
 
 Decay D+sig
-1.0 pi+    K_S0   PHOTOS PHSP;
+1.0 pi+    K_S0sig   PHOTOS PHSP;
 Enddecay
 CDecay D-sig
+
+Decay K_S0sig
+1.0 pi+ pi- PHSP;
+Enddecay
 
 End
 

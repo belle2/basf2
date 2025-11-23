@@ -322,18 +322,18 @@ void TrackFinderVXDAnalizerModule::event()
    */
   std::vector<std::pair<AnalizerTCInfo*, AnalizerTCInfo*> > pairedTCs;
   for (AnalizerTCInfo& testTC : testTCVector) {
-    int testID = testTC.assignedID.getParticleID();
+    int testID = testTC.m_assignedID.getParticleID();
 
     for (AnalizerTCInfo& referenceTC : referenceTCVector) {
-      int refID = referenceTC.assignedID.getParticleID();
+      int refID = referenceTC.m_assignedID.getParticleID();
       B2DEBUG(29, "test TC with assigned ID " << testID << " was matched with refID " << refID);
       if (refID != testID) continue;
 
-      testTC.tcType = AnalizerTCInfo::classifyTC(referenceTC, testTC, m_PARAMpurityThreshold, m_PARAMminNDFThreshold);
+      testTC.m_tcType = AnalizerTCInfo::classifyTC(referenceTC, testTC, m_PARAMpurityThreshold, m_PARAMminNDFThreshold);
 
       B2DEBUG(29, "test TC with assigned ID " << testID <<
-              " was classified for the corresponding with type for testTC/refTC: " << TCType::getTypeName(testTC.tcType) <<
-              "/" << TCType::getTypeName(referenceTC.tcType) << " and will now paired up");
+              " was classified for the corresponding with type for testTC/refTC: " << TCType::getTypeName(testTC.m_tcType) <<
+              "/" << TCType::getTypeName(referenceTC.m_tcType) << " and will now paired up");
 
       referenceTC.pairUp(&testTC);
 
@@ -359,10 +359,10 @@ void TrackFinderVXDAnalizerModule::event()
   unsigned int refPXDClusters = 0, refSVDClusters = 0, testPXDClusters = 0, testSVDClusters = 0;
 
   for (AnalizerTCInfo& aTC : testTCVector) {
-    testPXDClusters += aTC.assignedID.getNPXDClustersTotal();
-    testSVDClusters += aTC.assignedID.getNSVDUClustersTotal() + aTC.assignedID.getNSVDVClustersTotal();
+    testPXDClusters += aTC.m_assignedID.getNPXDClustersTotal();
+    testSVDClusters += aTC.m_assignedID.getNSVDUClustersTotal() + aTC.m_assignedID.getNSVDVClustersTotal();
 
-    switch (aTC.tcType) {
+    switch (aTC.m_tcType) {
       case TCType::Perfect: { nPerfectTCs++; nFound++; break; }
       case TCType::Clean: { nCleanTCs++; nFound++; break; }
       case TCType::Contaminated: { nContaminatedTCs++; nFound ++; break; }
@@ -372,23 +372,23 @@ void TrackFinderVXDAnalizerModule::event()
       case TCType::Lost: { nLostTestTCs++; break; }
       default: {
         nBadCases++;
-        B2WARNING("TrackFinderVXDAnalizer::event(): test TC got type " << TCType::getTypeName(aTC.tcType) <<
+        B2WARNING("TrackFinderVXDAnalizer::event(): test TC got type " << TCType::getTypeName(aTC.m_tcType) <<
                   " which is not counted for efficiency-calculation");
       }
     }
   }
 
   for (AnalizerTCInfo& aTC : referenceTCVector) {
-    refPXDClusters += aTC.assignedID.getNPXDClustersTotal();
-    refSVDClusters += aTC.assignedID.getNSVDUClustersTotal() + aTC.assignedID.getNSVDVClustersTotal();
+    refPXDClusters += aTC.m_assignedID.getNPXDClustersTotal();
+    refSVDClusters += aTC.m_assignedID.getNSVDUClustersTotal() + aTC.m_assignedID.getNSVDVClustersTotal();
 
-    switch (aTC.tcType) {
+    switch (aTC.m_tcType) {
       case TCType::Reference: { break; }
       case TCType::Clone: { nRefClones++; break; }
       case TCType::Lost: { nLostRefTCs++; break; }
       default: {
         nBadCases++;
-        B2WARNING("TrackFinderVXDAnalizer::event(): reference TC got type " << TCType::getTypeName(aTC.tcType) <<
+        B2WARNING("TrackFinderVXDAnalizer::event(): reference TC got type " << TCType::getTypeName(aTC.m_tcType) <<
                   " which is not counted for efficiency-calculation");
       }
     }

@@ -32,7 +32,7 @@ namespace Belle2 {
 
       /** Set charge per ADC unit.
        * If signals are in ADC units, the default setting of 1 should be
-       * overriden.
+       * overridden.
        * @param eInADU charge in electrons corresponding to 1 ADU.
        */
       void setADU(double eInADU) { m_eInADU = eInADU; }
@@ -43,7 +43,7 @@ namespace Belle2 {
       /** Set the sensorID currently used */
       virtual void setSensorID(VxdID sensorID, bool side)
       {
-        const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+        const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
         m_sensorID = sensorID;
         if (side)
           m_noiseLevel = info.getElectronicNoiseU() / m_eInADU;

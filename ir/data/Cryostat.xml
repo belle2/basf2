@@ -50,7 +50,7 @@
          <sec name="r3" unit="cm">65</sec>
       </TubeL>
       <A1spc1>
-         <N desc="Number of planes">37</N>
+         <N desc="Number of planes">36</N>
          <sec name="Z0" unit="cm">62.05</sec>
          <sec name="Z1" unit="cm">67.50</sec>
          <sec name="Z2" unit="cm">67.50</sec>
@@ -76,18 +76,17 @@
          <sec name="Z22" unit="cm">227.29</sec>
          <sec name="Z23" unit="cm">227.29</sec>
          <sec name="Z24" unit="cm">261.30</sec>
-         <sec name="Z25" unit="cm">261.30</sec>
+         <sec name="Z25" unit="cm">262.70</sec>
          <sec name="Z26" unit="cm">262.70</sec>
-         <sec name="Z27" unit="cm">262.70</sec>
+         <sec name="Z27" unit="cm">264.10</sec>
          <sec name="Z28" unit="cm">264.10</sec>
-         <sec name="Z29" unit="cm">264.10</sec>
+         <sec name="Z29" unit="cm">336.12</sec>
          <sec name="Z30" unit="cm">336.12</sec>
-         <sec name="Z31" unit="cm">336.12</sec>
+         <sec name="Z31" unit="cm">337.30</sec>
          <sec name="Z32" unit="cm">337.30</sec>
-         <sec name="Z33" unit="cm">337.30</sec>
+         <sec name="Z33" unit="cm">337.98</sec>
          <sec name="Z34" unit="cm">337.98</sec>
-         <sec name="Z35" unit="cm">337.98</sec>
-         <sec name="Z36" unit="cm">394.81</sec>
+         <sec name="Z35" unit="cm">394.81</sec>
          <sec name="R0" unit="cm">1.45</sec>
          <sec name="R1" unit="cm">1.45</sec>
          <sec name="R2" unit="cm">2.1</sec>
@@ -114,17 +113,16 @@
          <sec name="R23" unit="cm">3.9</sec>
          <sec name="R24" unit="cm">5.4</sec>
          <sec name="R25" unit="cm">5.4</sec>
-         <sec name="R26" unit="cm">5.4</sec>
+         <sec name="R26" unit="cm">7.5</sec>
          <sec name="R27" unit="cm">7.5</sec>
-         <sec name="R28" unit="cm">7.5</sec>
+         <sec name="R28" unit="cm">10.85</sec>
          <sec name="R29" unit="cm">10.85</sec>
-         <sec name="R30" unit="cm">10.85</sec>
+         <sec name="R30" unit="cm">5.83</sec>
          <sec name="R31" unit="cm">5.83</sec>
-         <sec name="R32" unit="cm">5.83</sec>
+         <sec name="R32" unit="cm">5.4</sec>
          <sec name="R33" unit="cm">5.4</sec>
-         <sec name="R34" unit="cm">5.4</sec>
+         <sec name="R34" unit="cm">4.4</sec>
          <sec name="R35" unit="cm">4.4</sec>
-         <sec name="R36" unit="cm">4.4</sec>
          <Material>Vacuum</Material>
          <Desc>Right HER Beam pipe space 1</Desc>
       </A1spc1>
@@ -271,7 +269,7 @@
          <Intersect>A1spc1</Intersect>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>Cryo_G-10</Material>
-	 <Desc>Magnet 2 part 1 (QC1RE)</Desc>
+         <Desc>Magnet 2 part 1 (QC1RE)</Desc>
       </Straight>
       <Straight name="A4mag2p2">
          <N desc="Number of planes">4</N>
@@ -378,7 +376,7 @@
          <sec name="r1" unit="cm">5.4</sec>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>Cryo_G-10</Material>
-	 <Desc>Magnet 4 part 2  (QC2RE)</Desc>
+         <Desc>Magnet 4 part 2  (QC2RE)</Desc>
       </Straight>
       <Straight name="A4mag4p3">
          <N desc="Number of planes">2</N>
@@ -477,7 +475,7 @@
          <Desc>Magnet 4 part 9 (QC2RE)</Desc>
       </Straight>
       <B1spc1>
-         <N desc="Number of planes">28</N>
+         <N desc="Number of planes">27</N>
          <sec name="Z0" unit="cm">62.05</sec>
          <sec name="Z1" unit="cm">67.50</sec>
          <sec name="Z2" unit="cm">67.50</sec>
@@ -498,14 +496,13 @@
          <sec name="Z17" unit="cm">227.30</sec>
          <sec name="Z18" unit="cm">227.30</sec>
          <sec name="Z19" unit="cm">261.39</sec>
-         <sec name="Z20" unit="cm">261.39</sec>
+         <sec name="Z20" unit="cm">264.10</sec>
          <sec name="Z21" unit="cm">264.10</sec>
-         <sec name="Z22" unit="cm">264.10</sec>
+         <sec name="Z22" unit="cm">336.12</sec>
          <sec name="Z23" unit="cm">336.12</sec>
-         <sec name="Z24" unit="cm">336.12</sec>
+         <sec name="Z24" unit="cm">337.90</sec>
          <sec name="Z25" unit="cm">337.90</sec>
-         <sec name="Z26" unit="cm">337.90</sec>
-         <sec name="Z27" unit="cm">393.81</sec>
+         <sec name="Z26" unit="cm">393.81</sec>
          <sec name="R0" unit="cm">1.45</sec>
          <sec name="R1" unit="cm">1.45</sec>
          <sec name="R2" unit="cm">2.1</sec>
@@ -527,13 +524,12 @@
          <sec name="R18" unit="cm">3.9</sec>
          <sec name="R19" unit="cm">7.5</sec>
          <sec name="R20" unit="cm">7.5</sec>
-         <sec name="R21" unit="cm">7.5</sec>
+         <sec name="R21" unit="cm">10.85</sec>
          <sec name="R22" unit="cm">10.85</sec>
-         <sec name="R23" unit="cm">10.85</sec>
+         <sec name="R23" unit="cm">7.5</sec>
          <sec name="R24" unit="cm">7.5</sec>
-         <sec name="R25" unit="cm">7.5</sec>
+         <sec name="R25" unit="cm">4.4</sec>
          <sec name="R26" unit="cm">4.4</sec>
-         <sec name="R27" unit="cm">4.4</sec>
          <Material>Vacuum</Material>
          <Desc>Right LER Beam pipe space 1</Desc>
       </B1spc1>
@@ -648,7 +644,7 @@
          <sec name="r1" unit="cm">2.1</sec>
          <MotherVolume>B1spc1</MotherVolume>
          <Material>Cryo_G-10</Material>
-	 <Desc>Magnet 1 part 1 (QC1RP)</Desc>
+         <Desc>Magnet 1 part 1 (QC1RP)</Desc>
       </Straight>
       <Straight name="B4mag1p2">
          <N desc="Number of planes">6</N>
@@ -733,8 +729,8 @@
          <sec name="r0" unit="cm">4.85</sec>
          <sec name="r1" unit="cm">4.85</sec>
          <MotherVolume>B1spc1</MotherVolume>
-	 <Material>Cryo_G-10</Material>
-	 <Desc>Magnet 3 part 2 (QC2RP)</Desc>
+         <Material>Cryo_G-10</Material>
+         <Desc>Magnet 3 part 2 (QC2RP)</Desc>
       </Straight>
       <Straight name="B4mag3p3">
          <N desc="Number of planes">2</N>
@@ -1045,55 +1041,55 @@
       </Straight>
       <!--Straight name="C3wal3">
 
-		<N desc="Number of planes">2</N>
+        	<N desc="Number of planes">2</N>
 
       <sec name="Z0" unit="cm">360.836</sec>
       <sec name="Z1" unit="cm">363.336</sec>
       <sec name="R0" unit="cm">38.0</sec>
       <sec name="R1" unit="cm">38.0</sec>
-		<Intersect>C1wal1</Intersect>
+        	<Intersect>C1wal1</Intersect>
 
-		<MotherVolume>C2spc2</MotherVolume>
+        	<MotherVolume>C2spc2</MotherVolume>
 
-		<Material>SUS316L</Material>
+        	<Material>SUS316L</Material>
 
-		<Desc>Vacuum vessel</Desc>
+        	<Desc>Vacuum vessel</Desc>
 
-	</Straight-->
+        </Straight-->
       <!--Straight name="C3wal4">
 
-		<N desc="Number of planes">2</N>
+        	<N desc="Number of planes">2</N>
 
       <sec name="Z0" unit="cm">233.50</sec>
       <sec name="Z1" unit="cm">234.00</sec>
       <sec name="R0" unit="cm">26.024</sec>
       <sec name="R1" unit="cm">26.024</sec>
-		<Intersect>C1wal1</Intersect>
+        	<Intersect>C1wal1</Intersect>
 
-		<MotherVolume>C2spc2</MotherVolume>
+        	<MotherVolume>C2spc2</MotherVolume>
 
-		<Material>SUS316L</Material>
+        	<Material>SUS316L</Material>
 
-		<Desc>Cold shield</Desc>
+        	<Desc>Cold shield</Desc>
 
-	</Straight-->
+        </Straight-->
       <!--Straight name="C3wal5">
 
-		<N desc="Number of planes">2</N>
+        	<N desc="Number of planes">2</N>
 
       <sec name="Z0" unit="cm">389.99</sec>
       <sec name="Z1" unit="cm">391.49</sec>
       <sec name="R0" unit="cm">47.30</sec>
       <sec name="R1" unit="cm">48.79</sec>
-		<Intersect>C1wal1</Intersect>
+        	<Intersect>C1wal1</Intersect>
 
-		<MotherVolume>C2spc2</MotherVolume>
+        	<MotherVolume>C2spc2</MotherVolume>
 
-		<Material>SUS316L</Material>
+        	<Material>SUS316L</Material>
 
-		<Desc>Cold shield</Desc>
+        	<Desc>Cold shield</Desc>
 
-	</Straight-->
+        </Straight-->
       <Straight name="C4spc1">
          <N desc="Number of planes">7</N>
          <sec name="Z0" unit="cm">66.05</sec>
@@ -1169,7 +1165,7 @@
       </Straight>-->
       <!--Straight name="C5wal4">
 
-		<N desc="Number of planes">2</N>
+        	<N desc="Number of planes">2</N>
 
       <sec name="Z0" unit="cm">239</sec>
       <sec name="Z1" unit="cm">254</sec>
@@ -1177,15 +1173,15 @@
       <sec name="R1" unit="cm">29.4</sec>
       <sec name="r0" unit="cm">27.30</sec>
       <sec name="r1" unit="cm">27.30</sec>
-		<Intersect>C1wal1</Intersect>
+        	<Intersect>C1wal1</Intersect>
 
-		<MotherVolume>C2spc2</MotherVolume>
+        	<MotherVolume>C2spc2</MotherVolume>
 
-		<Material>W</Material>
+        	<Material>W</Material>
 
-		<Desc>Tungsten shield in front of QCS2</Desc>
+        	<Desc>Tungsten shield in front of QCS2</Desc>
 
-	</Straight-->
+        </Straight-->
       <Straight name="C6spc1">
          <N desc="Number of planes">5</N>
          <sec name="Z0" unit="cm">68.59</sec>
@@ -1326,7 +1322,8 @@
          <Desc>Tungsten shield 1</Desc>
       </Straight>
       <Straight name="C7lyr2">
-         <N desc="Number of planes">54</N>
+         <N0 desc="Number of planes">54</N0>
+         <N desc="Number of planes">50</N>
          <sec name="Z0" unit="cm">73.594</sec>
          <sec name="Z1" unit="cm">75.314</sec>
          <sec name="Z2" unit="cm">75.314</sec>
@@ -1377,10 +1374,10 @@
          <sec name="Z47" unit="cm">197.523</sec>
          <sec name="Z48" unit="cm">197.523</sec>
          <sec name="Z49" unit="cm">220.500</sec>
-         <sec name="Z50" unit="cm">220.500</sec>
+         <!--sec name="Z50" unit="cm">220.500</sec>
          <sec name="Z51" unit="cm">220.659</sec>
          <sec name="Z52" unit="cm">220.659</sec>
-         <sec name="Z53" unit="cm">225.156</sec>
+         <sec name="Z53" unit="cm">225.156</sec-->
          <sec name="r0" unit="cm">10.069</sec>
          <sec name="r1" unit="cm">10.069</sec>
          <sec name="r2" unit="cm">10.302</sec>
@@ -1431,10 +1428,10 @@
          <sec name="r47" unit="cm">18.903</sec>
          <sec name="r48" unit="cm">19.510</sec>
          <sec name="r49" unit="cm">19.510</sec>
-         <sec name="r50" unit="cm">19.510</sec>
+         <!--sec name="r50" unit="cm">19.510</sec>
          <sec name="r51" unit="cm">19.510</sec>
          <sec name="r52" unit="cm">19.949</sec>
-         <sec name="r53" unit="cm">19.949</sec>
+         <sec name="r53" unit="cm">19.949</sec-->
          <sec name="R0" unit="cm">10.567</sec>
          <sec name="R1" unit="cm">10.567</sec>
          <sec name="R2" unit="cm">10.567</sec>
@@ -1485,17 +1482,18 @@
          <sec name="R47" unit="cm">19.741</sec>
          <sec name="R48" unit="cm">19.741</sec>
          <sec name="R49" unit="cm">19.741</sec>
-         <sec name="R50" unit="cm">20.149</sec>
+         <!--sec name="R50" unit="cm">20.149</sec>
          <sec name="R51" unit="cm">20.149</sec>
          <sec name="R52" unit="cm">20.149</sec>
-         <sec name="R53" unit="cm">20.149</sec>
+         <sec name="R53" unit="cm">20.149</sec-->
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
          <Material>Cryo_Epoxy</Material>
          <Desc>Epoxy</Desc>
       </Straight>
       <Straight name="C7lyr3">
-         <N desc="Number of planes">58</N>
+         <N0 desc="Number of planes">58</N0>
+         <N desc="Number of planes">50</N>
          <sec name="Z0" unit="cm">69.011</sec>
          <sec name="Z1" unit="cm">71.290</sec>
          <sec name="Z2" unit="cm">71.290</sec>
@@ -1546,14 +1544,14 @@
          <sec name="Z47" unit="cm">176.187</sec>
          <sec name="Z48" unit="cm">176.187</sec>
          <sec name="Z49" unit="cm">197.523</sec>
-         <sec name="Z50" unit="cm">197.523</sec>
+         <!--sec name="Z50" unit="cm">197.523</sec>
          <sec name="Z51" unit="cm">197.822</sec>
          <sec name="Z52" unit="cm">197.822</sec>
          <sec name="Z53" unit="cm">220.659</sec>
          <sec name="Z54" unit="cm">220.659</sec>
          <sec name="Z55" unit="cm">220.959</sec>
          <sec name="Z56" unit="cm">220.959</sec>
-         <sec name="Z57" unit="cm">225.156</sec>
+         <sec name="Z57" unit="cm">225.156</sec-->
          <sec name="r0" unit="cm">7.022</sec>
          <sec name="r1" unit="cm">7.022</sec>
          <sec name="r2" unit="cm">7.022</sec>
@@ -1604,14 +1602,14 @@
          <sec name="r47" unit="cm">17.717</sec>
          <sec name="r48" unit="cm">18.475</sec>
          <sec name="r49" unit="cm">18.475</sec>
-         <sec name="r50" unit="cm">18.475</sec>
+         <!--sec name="r50" unit="cm">18.475</sec>
          <sec name="r51" unit="cm">18.475</sec>
          <sec name="r52" unit="cm">18.976</sec>
          <sec name="r53" unit="cm">18.976</sec>
          <sec name="r54" unit="cm">18.976</sec>
          <sec name="r55" unit="cm">18.976</sec>
          <sec name="r56" unit="cm">18.886</sec>
-         <sec name="r57" unit="cm">18.886</sec>
+         <sec name="r57" unit="cm">18.886</sec-->
          <sec name="R0" unit="cm">9.252</sec>
          <sec name="R1" unit="cm">9.252</sec>
          <sec name="R2" unit="cm">9.661</sec>
@@ -1662,21 +1660,22 @@
          <sec name="R47" unit="cm">18.903</sec>
          <sec name="R48" unit="cm">18.903</sec>
          <sec name="R49" unit="cm">18.903</sec>
-         <sec name="R50" unit="cm">19.510</sec>
+         <!--sec name="R50" unit="cm">19.510</sec>
          <sec name="R51" unit="cm">19.510</sec>
          <sec name="R52" unit="cm">19.510</sec>
          <sec name="R53" unit="cm">19.510</sec>
          <sec name="R54" unit="cm">19.949</sec>
          <sec name="R55" unit="cm">19.949</sec>
          <sec name="R56" unit="cm">19.949</sec>
-         <sec name="R57" unit="cm">19.949</sec>
+         <sec name="R57" unit="cm">19.949</sec-->
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi</Desc>
       </Straight>
       <Straight name="C7lyr4">
-         <N desc="Number of planes">58</N>
+         <N0 desc="Number of planes">58</N0>
+         <N desc="Number of planes">50</N>
          <sec name="Z0" unit="cm">68.59</sec>
          <sec name="Z1" unit="cm">69.011</sec>
          <sec name="Z2" unit="cm">69.011</sec>
@@ -1727,14 +1726,14 @@
          <sec name="Z47" unit="cm">176.187</sec>
          <sec name="Z48" unit="cm">176.187</sec>
          <sec name="Z49" unit="cm">176.609</sec>
-         <sec name="Z50" unit="cm">176.609</sec>
+         <!--sec name="Z50" unit="cm">176.609</sec>
          <sec name="Z51" unit="cm">197.822</sec>
          <sec name="Z52" unit="cm">197.822</sec>
          <sec name="Z53" unit="cm">198.317</sec>
          <sec name="Z54" unit="cm">198.317</sec>
          <sec name="Z55" unit="cm">220.959</sec>
          <sec name="Z56" unit="cm">220.959</sec>
-         <sec name="Z57" unit="cm">225.548</sec>
+         <sec name="Z57" unit="cm">225.548</sec-->
          <sec name="r0" unit="cm">6.48</sec>
          <sec name="r1" unit="cm">6.48</sec>
          <sec name="r2" unit="cm">6.48</sec>
@@ -1785,14 +1784,14 @@
          <sec name="r47" unit="cm">16.892</sec>
          <sec name="r48" unit="cm">16.892</sec>
          <sec name="r49" unit="cm">16.892</sec>
-         <sec name="r50" unit="cm">17.651</sec>
+         <!--sec name="r50" unit="cm">17.651</sec>
          <sec name="r51" unit="cm">17.651</sec>
          <sec name="r52" unit="cm">17.651</sec>
          <sec name="r53" unit="cm">17.651</sec>
          <sec name="r54" unit="cm">18.443</sec>
          <sec name="r55" unit="cm">18.443</sec>
          <sec name="r56" unit="cm">18.443</sec>
-         <sec name="r57" unit="cm">18.443</sec>
+         <sec name="r57" unit="cm">18.443</sec-->
          <sec name="R0" unit="cm">9.208</sec>
          <sec name="R1" unit="cm">9.208</sec>
          <sec name="R2" unit="cm">6.946</sec>
@@ -1843,21 +1842,21 @@
          <sec name="R47" unit="cm">17.522</sec>
          <sec name="R48" unit="cm">18.399</sec>
          <sec name="R49" unit="cm">18.399</sec>
-         <sec name="R50" unit="cm">18.399</sec>
+         <!--sec name="R50" unit="cm">18.399</sec>
          <sec name="R51" unit="cm">18.399</sec>
          <sec name="R52" unit="cm">18.899</sec>
          <sec name="R53" unit="cm">18.899</sec>
          <sec name="R54" unit="cm">18.899</sec>
          <sec name="R55" unit="cm">18.899</sec>
          <sec name="R56" unit="cm">18.809</sec>
-         <sec name="R57" unit="cm">18.809</sec>
+         <sec name="R57" unit="cm">18.809</sec-->
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
          <Material>SUS316L</Material>
          <Desc>Support structure</Desc>
       </Straight>
       <Straight name="C7lyr5">
-         <N desc="Number of planes">28</N>
+         <N desc="Number of planes">25</N>
          <sec name="Z0" unit="cm">72.046</sec>
          <sec name="Z1" unit="cm">76.048</sec>
          <sec name="Z2" unit="cm">76.048</sec>
@@ -1870,22 +1869,19 @@
          <sec name="Z9" unit="cm">110.6</sec>
          <sec name="Z10" unit="cm">110.6</sec>
          <sec name="Z11" unit="cm">111.092</sec>
-         <sec name="Z12" unit="cm">111.092</sec>
-         <sec name="Z13" unit="cm">115.078</sec>
-         <sec name="Z14" unit="cm">115.078</sec>
-         <sec name="Z15" unit="cm">117.741</sec>
-         <sec name="Z16" unit="cm">117.741</sec>
-         <sec name="Z17" unit="cm">118.492</sec>
-         <sec name="Z18" unit="cm">118.492</sec>
-         <sec name="Z19" unit="cm">122.197</sec>
-         <sec name="Z20" unit="cm">122.197</sec>
-         <sec name="Z21" unit="cm">131.61</sec>
-         <sec name="Z22" unit="cm">131.61</sec>
-         <sec name="Z23" unit="cm">139.553</sec>
-         <sec name="Z24" unit="cm">139.553</sec>
-         <sec name="Z25" unit="cm">149.032</sec>
-         <sec name="Z26" unit="cm">149.032</sec>
-         <sec name="Z27" unit="cm">162.49</sec>
+         <sec name="Z12" unit="cm">115.078</sec>
+         <sec name="Z13" unit="cm">117.741</sec>
+         <sec name="Z14" unit="cm">118.492</sec>
+         <sec name="Z15" unit="cm">118.492</sec>
+         <sec name="Z16" unit="cm">122.197</sec>
+         <sec name="Z17" unit="cm">122.197</sec>
+         <sec name="Z18" unit="cm">131.61</sec>
+         <sec name="Z19" unit="cm">131.61</sec>
+         <sec name="Z20" unit="cm">139.553</sec>
+         <sec name="Z21" unit="cm">139.553</sec>
+         <sec name="Z22" unit="cm">149.032</sec>
+         <sec name="Z23" unit="cm">149.032</sec>
+         <sec name="Z24" unit="cm">162.49</sec>
          <sec name="r0" unit="cm">6.654</sec>
          <sec name="r1" unit="cm">6.734</sec>
          <sec name="r2" unit="cm">6.734</sec>
@@ -1898,22 +1894,19 @@
          <sec name="r9" unit="cm">9.302</sec>
          <sec name="r10" unit="cm">9.302</sec>
          <sec name="r11" unit="cm">9.471</sec>
-         <sec name="r12" unit="cm">9.471</sec>
-         <sec name="r13" unit="cm">10.816</sec>
-         <sec name="r14" unit="cm">10.816</sec>
-         <sec name="r15" unit="cm">11.955</sec>
-         <sec name="r16" unit="cm">11.955</sec>
-         <sec name="r17" unit="cm">12.005</sec>
-         <sec name="r18" unit="cm">12.005</sec>
-         <sec name="r19" unit="cm">12.117</sec>
-         <sec name="r20" unit="cm">12.117</sec>
-         <sec name="r21" unit="cm">12.395</sec>
-         <sec name="r22" unit="cm">12.395</sec>
-         <sec name="r23" unit="cm">12.602</sec>
-         <sec name="r24" unit="cm">12.602</sec>
-         <sec name="r25" unit="cm">13.236</sec>
-         <sec name="r26" unit="cm">13.708</sec>
-         <sec name="r27" unit="cm">13.815</sec>
+         <sec name="r12" unit="cm">10.816</sec>
+         <sec name="r13" unit="cm">11.955</sec>
+         <sec name="r14" unit="cm">12.005</sec>
+         <sec name="r15" unit="cm">12.005</sec>
+         <sec name="r16" unit="cm">12.117</sec>
+         <sec name="r17" unit="cm">12.117</sec>
+         <sec name="r18" unit="cm">12.395</sec>
+         <sec name="r19" unit="cm">12.395</sec>
+         <sec name="r20" unit="cm">12.602</sec>
+         <sec name="r21" unit="cm">12.602</sec>
+         <sec name="r22" unit="cm">13.236</sec>
+         <sec name="r23" unit="cm">13.708</sec>
+         <sec name="r24" unit="cm">13.815</sec>
          <sec name="R0" unit="cm">7.243</sec>
          <sec name="R1" unit="cm">7.243</sec>
          <sec name="R2" unit="cm">8.374</sec>
@@ -1929,19 +1922,16 @@
          <sec name="R12" unit="cm">12.362</sec>
          <sec name="R13" unit="cm">12.362</sec>
          <sec name="R14" unit="cm">12.362</sec>
-         <sec name="R15" unit="cm">12.362</sec>
-         <sec name="R16" unit="cm">12.362</sec>
-         <sec name="R17" unit="cm">12.362</sec>
-         <sec name="R18" unit="cm">13.06</sec>
-         <sec name="R19" unit="cm">13.06</sec>
-         <sec name="R20" unit="cm">14.356</sec>
-         <sec name="R21" unit="cm">14.356</sec>
-         <sec name="R22" unit="cm">15.153</sec>
-         <sec name="R23" unit="cm">15.153</sec>
+         <sec name="R15" unit="cm">13.06</sec>
+         <sec name="R16" unit="cm">13.06</sec>
+         <sec name="R17" unit="cm">14.356</sec>
+         <sec name="R18" unit="cm">14.356</sec>
+         <sec name="R19" unit="cm">15.153</sec>
+         <sec name="R20" unit="cm">15.153</sec>
+         <sec name="R21" unit="cm">15.652</sec>
+         <sec name="R22" unit="cm">15.652</sec>
+         <sec name="R23" unit="cm">15.652</sec>
          <sec name="R24" unit="cm">15.652</sec>
-         <sec name="R25" unit="cm">15.652</sec>
-         <sec name="R26" unit="cm">15.652</sec>
-         <sec name="R27" unit="cm">15.652</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
          <Material>W</Material>
@@ -2167,7 +2157,7 @@
          <Intersect>D1spc1</Intersect>
          <MotherVolume>D1spc1</MotherVolume>
          <Material>Cryo_G-10</Material>
-	 <Desc>Magnet 2 part 1 (QC1LE)</Desc>
+         <Desc>Magnet 2 part 1 (QC1LE)</Desc>
       </Straight>
       <Straight name="D4mag2p2">
          <N desc="Number of planes">2</N>
@@ -2483,7 +2473,7 @@
          <sec name="r1" unit="cm">2.1</sec>
          <MotherVolume>E1spc1</MotherVolume>
          <Material>Cryo_G-10</Material>
-	 <Desc>Magnet 1 part 1 (QC1LP)</Desc>
+         <Desc>Magnet 1 part 1 (QC1LP)</Desc>
       </Straight>
       <Straight name="E4mag1p2">
          <N desc="Number of planes">6</N>
@@ -2583,7 +2573,7 @@
          <sec name="r1" unit="cm">4.85</sec>
          <MotherVolume>E1spc1</MotherVolume>
          <Material>Cryo_G-10</Material>
-	 <Desc>Magnet 3 part 3 (QC2LP)</Desc>
+         <Desc>Magnet 3 part 3 (QC2LP)</Desc>
       </Straight>
       <Straight name="E4mag3p4">
          <N desc="Number of planes">6</N>
@@ -2909,7 +2899,7 @@
          <Desc>Tungsten shield</Desc>
       </Straight>
       <Straight name="F7lyr2">
-         <N desc="Number of planes">32</N>
+         <N desc="Number of planes">31</N>
          <sec name="Z0" unit="cm">-67.964</sec>
          <sec name="Z1" unit="cm">-68.888</sec>
          <sec name="Z2" unit="cm">-68.888</sec>
@@ -2938,10 +2928,9 @@
          <sec name="Z25" unit="cm">-124.455</sec>
          <sec name="Z26" unit="cm">-124.455</sec>
          <sec name="Z27" unit="cm">-134.398</sec>
-         <sec name="Z28" unit="cm">-134.398</sec>
-         <sec name="Z29" unit="cm">-148.355</sec>
-         <sec name="Z30" unit="cm">-148.356</sec>
-         <sec name="Z31" unit="cm">-157.427</sec>
+         <sec name="Z28" unit="cm">-148.355</sec>
+         <sec name="Z29" unit="cm">-148.356</sec>
+         <sec name="Z30" unit="cm">-157.427</sec>
          <sec name="R0" unit="cm">10.765</sec>
          <sec name="R1" unit="cm">11.016</sec>
          <sec name="R2" unit="cm">11.016</sec>
@@ -2971,9 +2960,8 @@
          <sec name="R26" unit="cm">15.303</sec>
          <sec name="R27" unit="cm">15.303</sec>
          <sec name="R28" unit="cm">15.303</sec>
-         <sec name="R29" unit="cm">15.303</sec>
+         <sec name="R29" unit="cm">15.287</sec>
          <sec name="R30" unit="cm">15.287</sec>
-         <sec name="R31" unit="cm">15.287</sec>
          <sec name="r0" unit="cm">10.436</sec>
          <sec name="r1" unit="cm">10.767</sec>
          <sec name="r2" unit="cm">10.966</sec>
@@ -3003,16 +2991,15 @@
          <sec name="r26" unit="cm">15.287</sec>
          <sec name="r27" unit="cm">15.287</sec>
          <sec name="r28" unit="cm">15.287</sec>
-         <sec name="r29" unit="cm">15.287</sec>
+         <sec name="r29" unit="cm">15.193</sec>
          <sec name="r30" unit="cm">15.193</sec>
-         <sec name="r31" unit="cm">15.193</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
          <Material>Cryo_Epoxy</Material>
          <Desc>Epoxy</Desc>
       </Straight>
       <Straight name="F7lyr3">
-         <N desc="Number of planes">34</N>
+         <N desc="Number of planes">32</N>
          <sec name="Z0" unit="cm">-68.888</sec>
          <sec name="Z1" unit="cm">-74.269</sec>
          <sec name="Z2" unit="cm">-74.269</sec>
@@ -3042,11 +3029,9 @@
          <sec name="Z26" unit="cm">-124.455</sec>
          <sec name="Z27" unit="cm">-124.791</sec>
          <sec name="Z28" unit="cm">-124.791</sec>
-         <sec name="Z29" unit="cm">-134.398</sec>
-         <sec name="Z30" unit="cm">-134.398</sec>
-         <sec name="Z31" unit="cm">-148.355</sec>
-         <sec name="Z32" unit="cm">-148.355</sec>
-         <sec name="Z33" unit="cm">-157.427</sec>
+         <sec name="Z29" unit="cm">-148.355</sec>
+         <sec name="Z30" unit="cm">-148.355</sec>
+         <sec name="Z31" unit="cm">-157.427</sec>
          <sec name="R0" unit="cm">10.966</sec>
          <sec name="R1" unit="cm">10.966</sec>
          <sec name="R2" unit="cm">10.966</sec>
@@ -3077,10 +3062,8 @@
          <sec name="R27" unit="cm">15.287</sec>
          <sec name="R28" unit="cm">15.287</sec>
          <sec name="R29" unit="cm">15.287</sec>
-         <sec name="R30" unit="cm">15.287</sec>
-         <sec name="R31" unit="cm">15.287</sec>
-         <sec name="R32" unit="cm">15.193</sec>
-         <sec name="R33" unit="cm">15.193</sec>
+         <sec name="R30" unit="cm">15.193</sec>
+         <sec name="R31" unit="cm">15.193</sec>
          <sec name="r0" unit="cm">7.577</sec>
          <sec name="r1" unit="cm">7.577</sec>
          <sec name="r2" unit="cm">8.873</sec>
@@ -3113,8 +3096,6 @@
          <sec name="r29" unit="cm">14.356</sec>
          <sec name="r30" unit="cm">14.356</sec>
          <sec name="r31" unit="cm">14.356</sec>
-         <sec name="r32" unit="cm">14.356</sec>
-         <sec name="r33" unit="cm">14.356</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
          <Material>Cryo_NbTi</Material>
@@ -3304,30 +3285,89 @@
          <sec name="trdX0" unit="mm">0</sec>
          <sec name="trdY0" unit="mm">442</sec>
          <sec name="trdZ0" unit="mm">-3400</sec>
-         <sec name="holeW" unit="mm">1400</sec>
-         <sec name="holeH" unit="mm">905</sec>
-         <sec name="holeL" unit="mm">3810</sec>
-         <sec name="holeDX" unit="mm">0</sec>
-         <sec name="holeDY" unit="mm">50</sec>
-         <sec name="holeDZ" unit="mm">-100</sec>
-         <sec name="trdHoleW" unit="mm">300</sec>
-         <sec name="trdHoleH" unit="mm">460</sec>
-         <sec name="trdHoleL" unit="mm">110</sec>
-         <sec name="trdHoleDX" unit="mm">0</sec>
-         <sec name="trdHoleDY" unit="mm">679.5</sec>
-         <sec name="trdHoleDZ" unit="mm">1855</sec>
-         <sec name="r" unit="mm">370</sec>
-         <sec name="t" unit="mm">110</sec>
-         <sec name="diskDX" unit="mm">0</sec>
-         <sec name="diskDY" unit="mm">237.5</sec>
-         <sec name="diskDZ" unit="mm">1855</sec>
-         <sec name="cutW" unit="mm">80</sec>
-         <sec name="cutH" unit="mm">2460</sec>
-         <sec name="cutL" unit="mm">810</sec>
-         <sec name="cutDX" unit="mm">-735</sec>
-         <sec name="cutDY" unit="mm">404</sec>
-         <sec name="cutDZ" unit="mm">-896</sec>
-         <sec name="cutPHI" unit="rad">1.2153</sec>
+
+         <N desc="Number of cuts">8</N>
+
+         <!--cut 0 box-->
+         <sec name="cutType0" unit="mm">0</sec>
+         <sec name="cutL0" unit="mm">3810.0</sec>
+         <sec name="cutW0" unit="mm">1400.0</sec>
+         <sec name="cutH0" unit="mm">905.0</sec>
+         <sec name="cutDX0" unit="mm">0.0</sec>
+         <sec name="cutDY0" unit="mm">50.0</sec>
+         <sec name="cutDZ0" unit="mm">-100.0</sec>
+
+         <!--cut 1 box-->
+         <sec name="cutType1" unit="mm">0</sec>
+         <sec name="cutW1" unit="mm">300</sec>
+         <sec name="cutH1" unit="mm">460</sec>
+         <sec name="cutL1" unit="mm">110</sec>
+         <sec name="cutDX1" unit="mm">0</sec>
+         <sec name="cutDY1" unit="mm">679.5</sec>
+         <sec name="cutDZ1" unit="mm">1855</sec>
+
+         <!--cut 2 tubs-->
+         <sec name="cutType2" unit="mm">1</sec>
+         <sec name="cutR2" unit="mm">370</sec>
+         <sec name="cutL2" unit="mm">110</sec>
+         <sec name="cutDX2" unit="mm">0</sec>
+         <sec name="cutDY2" unit="mm">237.5</sec>
+         <sec name="cutDZ2" unit="mm">1855</sec>
+
+         <!--cut 3 box-->
+         <sec name="cutType3" unit="mm">0</sec>
+         <sec name="cutW3" unit="mm">80</sec>
+         <sec name="cutH3" unit="mm">2460</sec>
+         <sec name="cutL3" unit="mm">810</sec>
+         <sec name="cutDX3" unit="mm">-735</sec>
+         <sec name="cutDY3" unit="mm">404</sec>
+         <sec name="cutDZ3" unit="mm">-896</sec>
+         <sec name="cutPHI3" unit="rad">1.2153</sec>
+
+         <!--cut 4 box-->
+         <sec name="cutType4" unit="mm">0</sec>
+
+         <sec name="cutW4" unit="mm">280.0</sec>
+         <sec name="cutH4" unit="mm">280.0</sec>
+         <sec name="cutL4" unit="mm">180.0</sec>
+         <sec name="cutDX4" unit="mm">770.0</sec>
+         <sec name="cutDY4" unit="mm">-452.5</sec>
+         <sec name="cutDZ4" unit="mm">1905.0</sec>
+         <sec name="cutTH4" unit="rad">0.7854</sec>
+
+         <!--cut 5 box-->
+         <sec name="cutType5" unit="mm">0</sec>
+
+         <sec name="cutW5" unit="mm">280.0</sec>
+         <sec name="cutH5" unit="mm">280.0</sec>
+         <sec name="cutL5" unit="mm">180.0</sec>
+         <sec name="cutDX5" unit="mm">-770.0</sec>
+         <sec name="cutDY5" unit="mm">-452.5</sec>
+         <sec name="cutDZ5" unit="mm">1905.0</sec>
+         <sec name="cutTH5" unit="rad">0.7854</sec>
+
+         <!--cut 6 box-->
+         <sec name="cutType6" unit="mm">0</sec>
+
+         <sec name="cutW6" unit="mm">140.0</sec>
+         <sec name="cutH6" unit="mm">140.0</sec>
+         <sec name="cutL6" unit="mm">360.0</sec>
+         <sec name="cutDX6" unit="mm">770.0</sec>
+         <sec name="cutDY6" unit="mm">-452.5</sec>
+         <sec name="cutDZ6" unit="mm">1905.0</sec>
+         <sec name="cutTH6" unit="rad">0.7854</sec>
+
+         <!--cut 7 box-->
+         <sec name="cutType7" unit="mm">0</sec>
+
+         <sec name="cutW7" unit="mm">140.0</sec>
+         <sec name="cutH7" unit="mm">140.0</sec>
+         <sec name="cutL7" unit="mm">360.0</sec>
+         <sec name="cutDX7" unit="mm">-770.0</sec>
+         <sec name="cutDY7" unit="mm">-452.5</sec>
+         <sec name="cutDZ7" unit="mm">1905.0</sec>
+         <sec name="cutTH7" unit="rad">0.7854</sec>
+
          <Material>SUS316L</Material>
          <Desc>Left cryostat support</Desc>
       </Support>
@@ -3347,30 +3387,71 @@
          <sec name="trdX0" unit="mm">0</sec>
          <sec name="trdY0" unit="mm">434.5</sec>
          <sec name="trdZ0" unit="mm">3965</sec>
-         <sec name="holeW" unit="mm">1400</sec>
-         <sec name="holeH" unit="mm">945</sec>
-         <sec name="holeL" unit="mm">3810</sec>
-         <sec name="holeDX" unit="mm">0</sec>
-         <sec name="holeDY" unit="mm">45</sec>
-         <sec name="holeDZ" unit="mm">110</sec>
-         <sec name="trdHoleW" unit="mm">300</sec>
-         <sec name="trdHoleH" unit="mm">360</sec>
-         <sec name="trdHoleL" unit="mm">120</sec>
-         <sec name="trdHoleDX" unit="mm">0</sec>
-         <sec name="trdHoleDY" unit="mm">647</sec>
-         <sec name="trdHoleDZ" unit="mm">-1850</sec>
-         <sec name="r" unit="mm">480</sec>
-         <sec name="t" unit="mm">120</sec>
-         <sec name="diskDX" unit="mm">0</sec>
-         <sec name="diskDY" unit="mm">212.5</sec>
-         <sec name="diskDZ" unit="mm">-1850</sec>
-         <sec name="cutW" unit="mm">80</sec>
-         <sec name="cutH" unit="mm">2176</sec>
-         <sec name="cutL" unit="mm">800</sec>
-         <sec name="cutDX" unit="mm">-735</sec>
-         <sec name="cutDY" unit="mm">412.5</sec>
-         <sec name="cutDZ" unit="mm">1062</sec>
-         <sec name="cutPHI" unit="rad">-1.1668</sec>
+
+         <N desc="Number of cuts">6</N>
+
+         <!--cut 0 box-->
+         <sec name="cutType0" unit="mm">0</sec>
+
+         <sec name="cutW0" unit="mm">1400</sec>
+         <sec name="cutH0" unit="mm">945</sec>
+         <sec name="cutL0" unit="mm">3810</sec>
+         <sec name="cutDX0" unit="mm">0</sec>
+         <sec name="cutDY0" unit="mm">45</sec>
+         <sec name="cutDZ0" unit="mm">110</sec>
+
+         <!--cut 1 box-->
+         <sec name="cutType1" unit="mm">0</sec>
+
+         <sec name="cutW1" unit="mm">300</sec>
+         <sec name="cutH1" unit="mm">360</sec>
+         <sec name="cutL1" unit="mm">120</sec>
+         <sec name="cutDX1" unit="mm">0</sec>
+         <sec name="cutDY1" unit="mm">647</sec>
+         <sec name="cutDZ1" unit="mm">-1850</sec>
+
+         <!--cut 2 tubs-->
+         <sec name="cutType2" unit="mm">1</sec>
+
+         <sec name="cutR2" unit="mm">480</sec>
+         <sec name="cutL2" unit="mm">120</sec>
+         <sec name="cutDX2" unit="mm">0</sec>
+         <sec name="cutDY2" unit="mm">212.5</sec>
+         <sec name="cutDZ2" unit="mm">-1850</sec>
+
+         <!--cut 3 box-->
+         <sec name="cutType3" unit="mm">0</sec>
+
+         <sec name="cutW3" unit="mm">80</sec>
+         <sec name="cutH3" unit="mm">2176</sec>
+         <sec name="cutL3" unit="mm">800</sec>
+         <sec name="cutDX3" unit="mm">-735</sec>
+         <sec name="cutDY3" unit="mm">412.5</sec>
+         <sec name="cutDZ3" unit="mm">1062</sec>
+         <sec name="cutPHI3" unit="rad">-1.1668</sec>
+
+         <!--cut 4 box-->
+         <sec name="cutType4" unit="mm">0</sec>
+
+         <sec name="cutW4" unit="mm">540.0</sec>
+         <sec name="cutH4" unit="mm">540.0</sec>
+         <sec name="cutL4" unit="mm">1080.0</sec>
+         <sec name="cutDX4" unit="mm">770.0</sec>
+         <sec name="cutDY4" unit="mm">-472.5</sec>
+         <sec name="cutDZ4" unit="mm">-1905.0</sec>
+         <sec name="cutTH4" unit="rad">0.7854</sec>
+
+         <!--cut 5 box-->
+         <sec name="cutType5" unit="mm">0</sec>
+
+         <sec name="cutW5" unit="mm">540.0</sec>
+         <sec name="cutH5" unit="mm">540.0</sec>
+         <sec name="cutL5" unit="mm">1080.0</sec>
+         <sec name="cutDX5" unit="mm">-770.0</sec>
+         <sec name="cutDY5" unit="mm">-472.5</sec>
+         <sec name="cutDZ5" unit="mm">-1905.0</sec>
+         <sec name="cutTH5" unit="rad">0.7854</sec>
+
          <Material>SUS316L</Material>
          <Desc>Right cryostat support</Desc>
       </Support>

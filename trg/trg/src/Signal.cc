@@ -450,7 +450,7 @@ namespace Belle2 {
     const unsigned n = _history.size();
     if (n % 2) {
       cout << "TRGSignal::consistencyCheck !!! "
-           << "history has odd number entires : n=" << n << endl;
+           << "history has odd number entries : n=" << n << endl;
       dump("detail", "!!! ");
     }
 

@@ -93,7 +93,7 @@ namespace Belle2 {
 
     // modification parameters
     std::string m_nameOfInstance =
-      ""; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
+      ""; /**< allows the user to set an identifier for this module. Useful if one wants to use several instances of that module */
 
     bool m_onlySingleClusterSpacePoints =
       false; /**< standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more. Does not affect pixel-type Clusters */
@@ -106,9 +106,9 @@ namespace Belle2 {
 
     bool m_useQualityEstimator = false; /**< Standard is true. Can be turned off in case accessing pdf root file is causing errors */
     //counters for testing
-    unsigned int m_TESTERSVDClusterCtr = 0; /**< counts total number of SVDCluster occured */
+    unsigned int m_TESTERSVDClusterCtr = 0; /**< counts total number of SVDCluster occurred */
 
-    unsigned int m_TESTERSpacePointCtr = 0; /**< counts total number of SpacePoints occured */
+    unsigned int m_TESTERSpacePointCtr = 0; /**< counts total number of SpacePoints occurred */
 
     unsigned int m_numMaxSpacePoints = 7e4; /**< do not crete SPs if their number exceeds m_numMaxSpacePoints, tuned with BG19*/
 

@@ -1,0 +1,39 @@
+# EventType: 1120930020
+# Descriptor: [B0 -> rho tau ell]cc
+# NickName: Bd_rhotauell
+# Documentation: LFV b->dll' process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Isaac Consigny
+# Email: consigny@in2p3.cppm.fr
+# Cuts: None
+# Date:20240129
+# Comments: 
+#
+#
+# Aliases
+Alias rhosig rho0
+#
+#Y(4S) -> B0 B0bar
+# One B decays to signal mode, while the other to generic decay modes
+#
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+0.250 rhosig tau+ e-  PHSP;
+0.250 rhosig tau- e+  PHSP;
+0.250 rhosig tau+ mu-  PHSP;
+0.250 rhosig tau- mu+  PHSP;
+
+Enddecay
+#
+# rho-> pi+ pi-
+Decay rhosig
+1.000 pi+ pi- VSS;
+Enddecay
+CDecay anti-B0sig
+
+#
+End

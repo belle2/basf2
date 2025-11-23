@@ -520,7 +520,7 @@ genfit::AbsTrackRep* RecoTrack::getTrackRepresentationForPDG(int pdgCode) const
     // Check if the track representation is a RKTrackRep.
     const genfit::RKTrackRep* rkTrackRepresenation = dynamic_cast<const genfit::RKTrackRep*>(trackRepresentation);
     if (rkTrackRepresenation != nullptr) {
-      // take the aboslute value of the PDG code as the TrackRep holds the PDG code including the charge (so -13 or 13)
+      // take the absolute value of the PDG code as the TrackRep holds the PDG code including the charge (so -13 or 13)
       if (std::abs(rkTrackRepresenation->getPDG()) == pdgCode) {
         return trackRepresentation;
       }

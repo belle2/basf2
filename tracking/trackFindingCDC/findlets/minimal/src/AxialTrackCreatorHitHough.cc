@@ -199,11 +199,11 @@ std::vector<float> AxialTrackCreatorHitHough::getDefaultCurvBounds(std::array<fl
       const float subBinWidth = std::fabs(binSpan[1] - binSpan[0]) / 2;
       const float middle = binSpan[0] + (binSpan[1] - binSpan[0]) / 2.0;
 
-      // Expaning bins somewhat to have a overlap
+      // Expanding bins somewhat to have a overlap
       // Assuming granularity level = 12
       // For level 6 to 7 only expand 1 / 4, for higher levels expand  1 / 8.
       // Never expand for curvatures lower than 0.005
-      // (copied from the legendre method. Works well, but some experimentation
+      // (copied from the Legendre method. Works well, but some experimentation
       //  needs to be made to know why)
       const float extension = [&]() {
         if ((level + 7 <= granularityLevel)

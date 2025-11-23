@@ -160,7 +160,7 @@ def cosmicTracks(name="cosmicTracks",
     path = tmp
 
     path.add_module('SetRecoTrackMomentum', automatic=True)
-    path.add_module('DAFRecoFitter', resortHits=True, pdgCodesToUseForFitting=[13])
+    path.add_module('DAFRecoFitter', resortHits=False, pdgCodesToUseForFitting=[13])
 
     if cut is not None:
         ana.fillParticleList('mu+:good_cosmics', cut, path=path)

@@ -13,6 +13,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/pcore/RootMergeable.h>
 
 #include <TFile.h>
@@ -101,5 +102,11 @@ namespace Belle2 {
 
     std::string m_MCDecayString; /**< MC decay string to be filled */
     StoreObjPtr<StringWrapper> m_stringWrapper; /**< string wrapper storing the MCDecayString */
+
+    bool m_storeEventType;  /**< If true, the branch __eventType__ is added */
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< pointer to EventExtraInfo  */
+    std::string m_eventType; /**< EventType to be filled */
+
+    bool m_ignoreCommandLineOverride; /**< if true, ignore override of filename */
   };
 } // end namespace Belle2

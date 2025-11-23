@@ -118,7 +118,7 @@ void VTXClusterPositionCollectorModule::collect() // Do your event() stuff here
       grid->Fill(thetaU, thetaV);
 
       VxdID sensorID = truehit.getSensorID();
-      const VTX::SensorInfo& Info = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      const VTX::SensorInfo& Info = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
 
       // Sort all pixels related to the cluster
       set<VTX::Pixel> pixels;

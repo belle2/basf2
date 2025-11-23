@@ -22,10 +22,12 @@ namespace Belle2 {
     /**
      * Gaussian distribution parameters
      */
-    struct Gauss {
+    struct Gauss final {
       float fraction = 0; /**< area normalization */
       float position = 0; /**< peak position [ns] */
       float sigma = 0;    /**< peak width [ns] */
+
+      ClassDef(Gauss, 1); /**< ClassDef */
     };
 
     /**

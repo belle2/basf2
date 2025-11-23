@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -14,7 +13,7 @@
 # Test script to produce SVD DQM plots
 #
 # Usage: basf2 executionTime.py [tag-string]
-#        tag-string is a tring to identify the output file
+#        tag-string is a string to identify the output file
 #
 #############################################################
 
@@ -35,7 +34,7 @@ main = b2.create_path()
 
 b2.set_random_seed(1)
 
-# set the exp/run event informations
+# set the exp/run event information
 eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])

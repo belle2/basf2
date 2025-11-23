@@ -17,7 +17,7 @@ namespace Belle2 {
   /** This class contains **/
   template <class Variable>
   class VariableTBranch {
-    /// The value to be stored in tha branch
+    /// The value to be stored in the branch
     typename Variable::variableType m_storedValue;
     /// Member for the pointer to the TBranch
     TBranch* m_branch;

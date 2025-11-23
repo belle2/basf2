@@ -65,13 +65,13 @@ void WireHitMCMultiLoopBlocker::apply(std::vector<CDCWireHit>& wireHits)
   double nLoops = m_param_useNLoops;
   auto isWithinMCLoops = [&mcHitLookUp, nLoops](const CDCWireHit & wireHit) {
 
-    // Reject hits with no assoziated CDCSimHit.
+    // Reject hits with no associated CDCSimHit.
     const CDCSimHit* simHit = mcHitLookUp.getClosestPrimarySimHit(wireHit.getHit());
     if (not simHit) return false;
 
     const double tof = simHit->getFlightTime();
 
-    // Accept hits with no assoziated MCParticle (e.g. beam background.)
+    // Accept hits with no associated MCParticle (e.g. beam background.)
     const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
     if (not mcParticle) return true;
 

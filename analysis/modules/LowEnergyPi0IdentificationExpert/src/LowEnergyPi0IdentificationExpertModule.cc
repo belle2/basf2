@@ -11,7 +11,6 @@
 
 /* Analysis headers. */
 #include <analysis/variables/ECLVariables.h>
-#include <analysis/variables/HelicityVariables.h>
 
 /* Basf2 headers. */
 #include <mva/interface/Interface.h>

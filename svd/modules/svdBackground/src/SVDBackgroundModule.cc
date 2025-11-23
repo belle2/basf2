@@ -256,6 +256,10 @@ void SVDBackgroundModule::event()
           }
         }
       }
+      if (!simhit) {
+        B2WARNING("No related SVDSimHit found");
+        continue; //skip this true hit if the simhit is null
+      }
       // FIXME: Is there a difference between positrons and electrons wrt. NIEL?
       // We fill neutronFluxBars with summary NIEL deposit for all kinds of particles by layer and component.
       // Fluency plots are by component and are deposition histograms for a particular type of particle and compoonent.
@@ -329,7 +333,7 @@ void SVDBackgroundModule::event()
     std::map<VxdID, std::multiset<unsigned short> > firedStrips;
     for (const SVDShaperDigit& digit : storeDigits) {
       // Filter out digits with signals below zero-suppression threshold
-      // ARE THRE SUCH DIGITS?
+      // ARE THERE SUCH DIGITS?
       VxdID sensorID = digit.getSensorID();
       if (sensorID != currentSensorID) {
         currentSensorID = sensorID;

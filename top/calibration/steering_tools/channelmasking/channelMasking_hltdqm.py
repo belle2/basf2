@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -109,7 +108,7 @@ def makeChannelMasks(file, outFileName):
 
 
 experiment = 10
-experimentstring = "{:04d}".format(experiment)
+experimentstring = f"{experiment:04d}"
 outdir = 'masks'
 if not os.path.exists(outdir):
     os.makedirs(outdir)

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -11,7 +10,7 @@
 
 #############################################################################
 #
-# This steering file creates the Belle II detector geometry, and perfoms the
+# This steering file creates the Belle II detector geometry, and performs the
 # simulation and MC based track finding and fitting.
 #
 # EventInfoSetter and EventInfoPrinter generates and shows event meta data (see example

@@ -15,12 +15,12 @@ namespace Belle2 {
   /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD */
 
 
-  /** Data containter to carry Sensor Information for PXD and SVD to/from the database..
+  /** Data container to carry Sensor Information for PXD and SVD to/from the database..
    * The data are sensor type, sensor id, width/length/thickness, number of cells.
    */
   class VXDSensorInfoBasePar : public TObject {
   public:
-    /** Enum specifing the type of sensor the SensorInfo represents */
+    /** Enum specifying the type of sensor the SensorInfo represents */
     // FIXME: This is repeated, would be good to have only one instance.
     enum SensorType {
       PXD = 0,  /**< PXD Sensor */
@@ -36,7 +36,7 @@ namespace Belle2 {
     /** Constructor for a SensorInfo instance
      *
      * this class holds all the information to calculate pixel/strip
-     * positions and ids. it can accomodate rectangular and trapezoidal
+     * positions and ids. it can accommodate rectangular and trapezoidal
      * shapes and also has the possibility to segment the strip/pixelsize
      * once in v, thus having two different pixel sizes in one sensor: vcells
      * pixels from start to splitLength and vcells2 pixels from splitLength

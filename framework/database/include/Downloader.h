@@ -12,6 +12,7 @@
 
 #include <iosfwd>
 #include <memory>
+#include <random>
 
 namespace Belle2::Conditions {
   /** Forward declare internal curl session pointer to limit exposure to curl headers */
@@ -20,8 +21,7 @@ namespace Belle2::Conditions {
   /** Simple class to encapsulate libcurl as used by the ConditionsDatabase */
   class Downloader final {
   public:
-    /** Create a new payload downloader
-     */
+    /** Create a new payload downloader */
     Downloader() = default;
     /** Destructor */
     ~Downloader();
@@ -62,7 +62,6 @@ namespace Belle2::Conditions {
     void setMaxRetries(unsigned int retries) { m_maxRetries = retries; }
     /** Set the backoff factor for retries in seconds. Minimum is 1 and 0 will be silently converted to 1 */
     void setBackoffFactor(unsigned int factor) { m_backoffFactor = std::max(1u, factor); }
-
     /** get an url and save the content to stream
      * This function raises exceptions when there are any problems
      * @warning any contents in the stream will be overwritten
@@ -86,6 +85,7 @@ namespace Belle2::Conditions {
     std::string joinWithSlash(const std::string& base, const std::string& second);
 
   private:
+
     /** calculate the digest/checksum on a given string.
      * @param input input stream containing the data
      * @returns the hex digest of the checksum
@@ -100,9 +100,26 @@ namespace Belle2::Conditions {
     unsigned int m_connectionTimeout{60};
     /** Timeout to wait for stalled connections (<10KB/s) */
     unsigned int m_stalledTimeout{60};
-    /** Number of retries to perform when downloading fails with HTTP response code >=500 */
+    /** Number of retries to perform when downloading fails with HTTP response code >=300 */
     unsigned int m_maxRetries{5};
     /** Backoff factor for retries in seconds */
-    unsigned int m_backoffFactor{5};
+    unsigned int m_backoffFactor{3};
+
+    /**
+     * Initialize the seed of the internal random number generator. Do nothing if the seed is already set
+     * (e.g. this method has been already called before).
+     * The hash of the basf2 seed is used as seed for `m_rnd`.
+     */
+    void initializeRandomGeneratorSeed();
+    /**
+     * This is a special exception in basf2 where an instance of gRandom is NOT used:
+     * since this class interacts with the Conditions Database, it might alter the state of the random
+     * number generator in case of connection troubles, losing our capability to fully reproduce the results.
+     */
+    std::unique_ptr<std::mt19937> m_rnd{std::make_unique<std::mt19937>()};
+    /** A uniform real distribution for extracting random numbers. See the docstring for `m_rnd` as well. */
+    std::unique_ptr<std::uniform_real_distribution<double>> m_rndDistribution{std::make_unique<std::uniform_real_distribution<double>>()};
+    /** Flag for keeping track if the internal random generator is correctly initialized or not. */
+    bool m_rndIsInitialized{false};
   };
 } // namespace Belle2::Conditions

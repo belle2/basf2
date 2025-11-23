@@ -32,6 +32,7 @@
 #include <root/TRandom.h>
 
 using namespace std;
+using namespace std::placeholders;
 using namespace Belle2;
 using namespace Belle2::SVD;
 
@@ -383,7 +384,7 @@ void SVDDigitizerModule::event()
     VxdID sensorID = m_currentHit->getSensorID();
     if (!m_currentSensorInfo || sensorID != m_currentSensorInfo->getID()) {
       m_currentSensorInfo =
-        dynamic_cast<const SensorInfo*>(&VXD::GeoCache::get(sensorID));
+        dynamic_cast<const SensorInfo*>(&VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       if (!m_currentSensorInfo)
         B2FATAL(
           "Sensor Information for Sensor " << sensorID << " not found, make sure that the geometry is set up correctly");
@@ -747,7 +748,7 @@ void SVDDigitizerModule::saveDigits()
       auto rawThreshold = m_SNAdjacent * elNoise * gain;
       if (m_roundZS) rawThreshold = round(rawThreshold);
       auto n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
-                                  std::bind2nd(std::greater<double>(), rawThreshold)
+                                  std::bind(std::greater<double>(), _1, rawThreshold)
                                  );
       if (n_over < m_nSamplesOverZS) continue;
 
@@ -767,7 +768,7 @@ void SVDDigitizerModule::saveDigits()
         rawSamples[5] = 0.;
         //2.d.2 check if still over threshold
         n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
-                               std::bind2nd(std::greater<double>(), rawThreshold)
+                               std::bind(std::greater<double>(), _1, rawThreshold)
                               );
         if (n_over < m_nSamplesOverZS) continue;
 
@@ -825,7 +826,7 @@ void SVDDigitizerModule::saveDigits()
       auto rawThreshold = m_SNAdjacent * elNoise * gain;
       if (m_roundZS) rawThreshold = round(rawThreshold);
       auto n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
-                                  std::bind2nd(std::greater<double>(), rawThreshold)
+                                  std::bind(std::greater<double>(), _1, rawThreshold)
                                  );
       if (n_over < m_nSamplesOverZS) continue;
 
@@ -845,7 +846,7 @@ void SVDDigitizerModule::saveDigits()
         rawSamples[5] = 0.;
         //2.d.2 check if still over threshold
         n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
-                               std::bind2nd(std::greater<double>(), rawThreshold)
+                               std::bind(std::greater<double>(), _1, rawThreshold)
                               );
         if (n_over < m_nSamplesOverZS) continue;
       }
@@ -871,7 +872,7 @@ void SVDDigitizerModule::saveWaveforms()
   for (Waveforms::value_type& sensorWaveforms : m_waveforms) {
     tree_vxdID = sensorWaveforms.first;
     const SensorInfo& info =
-      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorWaveforms.first));
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorWaveforms.first));
     // u-side digits:
     tree_uv = 1;
     double thresholdU = 3.0 * info.getElectronicNoiseU();
@@ -914,7 +915,7 @@ void SVDDigitizerModule::saveSignals()
   for (Waveforms::value_type& sensorWaveforms : m_waveforms) {
     VxdID sensorID(sensorWaveforms.first);
     const SensorInfo& info =
-      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorWaveforms.first));
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorWaveforms.first));
     // u-side digits:
     size_t isU = 1;
     double thresholdU = 3.0 * info.getElectronicNoiseU();

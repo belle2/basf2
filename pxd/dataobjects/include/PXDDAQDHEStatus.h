@@ -24,7 +24,7 @@ namespace Belle2 {
    * The PXD DAQ DHE Status class
    *
    * This is a small class that records information about PXD DAQ DHE status
-   * It will record if the data of this sensor (readout by this DHE) is useable.
+   * It will record if the data of this sensor (readout by this DHE) is usable.
    *
    */
   class PXDDAQDHEStatus final {
@@ -51,7 +51,7 @@ namespace Belle2 {
     virtual ~PXDDAQDHEStatus() {};
 
     /** Return Usability of data
-     * @return conclusion if data is useable
+     * @return conclusion if data is usable
      */
     bool isUsable() const { return m_usable; }
 
@@ -174,7 +174,7 @@ namespace Belle2 {
   private:
     PXDErrorFlags m_errorMask; /**< errors found in this DHE/sensor */
     PXDErrorFlags m_critErrorMask; /**< critical error mask */
-    bool m_usable; /**< data is useable.*/
+    bool m_usable; /**< data is usable.*/
 
     unsigned short m_sensorID;/**< Sensor ID.*/
     unsigned short m_dheID;/**< DHE ID as delivered by DAQ.*/
@@ -185,10 +185,10 @@ namespace Belle2 {
     uint32_t m_redCount; /**< reduced byte count for monitoring */
     uint32_t m_errorinfo; /**< erroinfo from the DHE END **/
 
-    /** Vector of DHP informations belonging to this event */
+    /** Vector of DHP information belonging to this event */
     std::vector< PXDDAQDHPStatus> m_pxdDHP;
 
-    /** Vector of Common Mode informations belonging to this event */
+    /** Vector of Common Mode information belonging to this event */
     std::vector < PXDDAQDHPComMode> m_commode;
 
     /** necessary for ROOT */

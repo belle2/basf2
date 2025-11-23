@@ -8,7 +8,6 @@
 
 #include "cdc/modules/cdcRecoTrackFilter/CDCRecoTrackFilterModule.h"
 #include <tracking/dataobjects/RecoHitInformation.h>
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -44,7 +43,7 @@ void CDCRecoTrackFilterModule::event()
   int nTr = m_RecoTracks.getEntries();
   for (int i = 0; i < nTr; ++i) {
     const RecoTrack* track = m_RecoTracks[i];
-    BOOST_FOREACH(const RecoHitInformation::UsedCDCHit * cdchit, track->getCDCHitList()) {
+    for (const RecoHitInformation::UsedCDCHit* cdchit : track->getCDCHitList()) {
       WireID wireid(cdchit->getID());
       unsigned short slay = wireid.getISuperLayer();
       unsigned short iclay = wireid.getICLayer();
@@ -60,7 +59,7 @@ void CDCRecoTrackFilterModule::event()
         }
       }
 
-    }//end of track (Boost_foreach)
+    }//end of track
   }//end RecoTrack array
 }//End Event
 void CDCRecoTrackFilterModule::endRun()

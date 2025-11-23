@@ -21,8 +21,8 @@
 
 namespace Belle2 {
 
-  /** This class defines the wrapper to retrieve the the list
-   *  of the hot strips flgged offline.
+  /** This class defines the wrapper to retrieve the list
+   *  of the hot strips flagged offline.
    *
    */
   class SVDHotStripsCalibrations {
@@ -42,7 +42,7 @@ namespace Belle2 {
 
     /** This is the method for getting the offline list of bad strips to be masked.
      * Input:
-     * @param sensorID: identitiy of the sensor for which the calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p (u) side, false for n (v) side
      * @param strip: strip number
      *

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -14,8 +13,8 @@ combined_module_quality_estimator_teacher
 -----------------------------------------
 
 Information on the MVA Track Quality Indicator / Estimator can be found
-on `Confluence
-<https://confluence.desy.de/display/BI/MVA+Track+Quality+Indicator>`_.
+on `XWiki
+<https://xwiki.desy.de/xwiki/rest/p/0d3f4>`_.
 
 Purpose of this script
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -58,7 +57,7 @@ b2luigi: Understanding the steering file
 All trainings and validations are done in the correct order in this steering
 file. For the purpose of creating a dependency graph, the `b2luigi
 <https://b2luigi.readthedocs.io>`_ python package is used, which extends the
-`luigi <https://luigi.readthedocs.io>`_ packag developed by spotify.
+`luigi <https://luigi.readthedocs.io>`_ package developed by spotify.
 
 Each task that has to be done is represented by a special class, which defines
 which defines parameters, output files and which other tasks with which
@@ -173,6 +172,8 @@ import simulation
 import tracking
 import tracking.root_utils as root_utils
 from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
+
+# @cond internal_test
 
 # wrap python modules that are used here but not in the externals into a try except block
 install_helpstring_formatter = ("\nCould not find {module} python module.Try installing it via\n"
@@ -530,11 +531,13 @@ class GenerateSimTask(Basf2PathTask):
         # path.add_module("ActivatePXDPixelMasker")
         # path.add_module("ActivatePXDGainCalibrator")
         bkg_files = background.get_background_files(self.bkgfiles_dir)
+        # \cond suppress doxygen warning
         if self.experiment_number == 1002:
             # remove KLM because of bug in background files with release 4
             components = ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'TRG']
         else:
             components = None
+        # \endcond
         simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, components=components)  # , usePXDDataReduction=False)
 
         path.add_module(
@@ -894,7 +897,7 @@ class CDCQEDataCollectionTask(Basf2PathTask):
             filter_choice = "recording"
             # tracking.add_hit_preparation_modules(path)  # only needed for SVD and
             # PXD hit preparation. Does not change the CDC output.
-        tracking.add_cdc_track_finding(path, with_ca=False, add_mva_quality_indicator=True)
+        tracking.add_cdc_track_finding(path, with_cdc_cellular_automaton=False, add_mva_quality_indicator=True)
 
         basf2.set_module_parameters(
             path,
@@ -1335,7 +1338,7 @@ class VXDQETeacherTask(TrackQETeacherBaseTask):
     tree_name = "tree"
     #: Random basf2 seed used to create the training data set.
     random_seed = "train_vxd"
-    #: Defines DataCollectionTask to require by tha base class to collect
+    #: Defines DataCollectionTask to require by the base class to collect
     # features for the MVA training.
     data_collection_task = VXDQEDataCollectionTask
 
@@ -1351,7 +1354,7 @@ class CDCQETeacherTask(TrackQETeacherBaseTask):
     tree_name = "records"
     #: Random basf2 seed used to create the training data set.
     random_seed = "train_cdc"
-    #: Defines DataCollectionTask to require by tha base class to collect
+    #: Defines DataCollectionTask to require by the base class to collect
     # features for the MVA training.
     data_collection_task = CDCQEDataCollectionTask
 
@@ -1918,7 +1921,7 @@ class TrackQEEvaluationBaseTask(Task):
         stderr_log_file_path = log_file_dir + "stderr"
         stdout_log_file_path = log_file_dir + "stdout"
         with open(stdout_log_file_path, "w") as stdout_file:
-            stdout_file.write("stdout output of the command:\n{}\n\n".format(" ".join(cmd)))
+            stdout_file.write(f'stdout output of the command:\n{" ".join(cmd)}\n\n')
         if os.path.exists(stderr_log_file_path):
             # remove stderr file if it already exists b/c in the following it will be opened in appending mode
             os.remove(stderr_log_file_path)
@@ -2385,7 +2388,7 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
         default="BBBAR"
         #: \endcond
     )
-    #: Feature/vaiable to use as truth label for the CDC track quality estimator.
+    #: Feature/variable to use as truth label for the CDC track quality estimator.
     cdc_training_target = b2luigi.Parameter()
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
     fast_bdt_option = b2luigi.ListParameter(
@@ -2828,3 +2831,5 @@ if __name__ == "__main__":
             basf2.conditions.prepend_globaltag(gt)
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MasterTask(), workers=workers)
+
+# @endcond

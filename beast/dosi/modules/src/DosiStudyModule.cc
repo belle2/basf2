@@ -19,12 +19,9 @@
 //c++
 #include <cmath>
 #include <string>
-#include <fstream>
 
 // ROOT
 #include <TString.h>
-#include <TH1.h>
-#include <TH2.h>
 
 #include <generators/SAD/dataobjects/SADMetaHit.h>
 

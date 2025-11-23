@@ -23,7 +23,6 @@
 /* Basf2 headers. */
 #include <framework/geometry/B2Vector3.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 /* C++ headers. */
@@ -71,6 +70,9 @@ ECLSplitterN1Module::ECLSplitterN1Module() : Module(),
            "Minimum digit energy to be included in the shower energy calculation. (NOT USED)", 0.5 * Belle2::Unit::MeV);
   addParam("cutDigitTimeResidualForEnergy", m_cutDigitTimeResidualForEnergy,
            "Maximum time residual to be included in the shower energy calculation. (NOT USED)", 5.0);
+  addParam("removeShiftedLMs", m_removeShiftedLMs, "Remove LMs if they shifted too much during energy sharing.", 0);
+  addParam("sharingDistanceMolierMultiplier", m_sharingDistanceMolierMultiplier,
+           "Maximum distance d to use when sharing energy d = m_sharingDistanceMolierMultiplier*c_molierRadius.", 50.);
 
   // Neighbour definitions
   addParam("useOptimalNumberOfDigitsForEnergy", m_useOptimalNumberOfDigitsForEnergy,
@@ -104,10 +106,10 @@ void ECLSplitterN1Module::initialize()
   m_liloParameters.at(2) = m_liloParameterC;
 
   // ECL dataobjects.
-  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
-  m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
+  m_eclCalDigits.isRequired(eclCalDigitArrayName());
+  m_eclConnectedRegions.isRequired(eclConnectedRegionArrayName());
+  m_eclLocalMaximums.isRequired(eclLocalMaximumArrayName());
   m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eclLocalMaximums.registerInDataStore(eclLocalMaximumArrayName());
 
   // mDST dataobjects.
   m_eventLevelClusteringInfo.isRequired(eventLevelClusteringInfoName());
@@ -117,6 +119,8 @@ void ECLSplitterN1Module::initialize()
   m_eclShowers.registerRelationTo(m_eclCalDigits);
   m_eclShowers.registerRelationTo(m_eclLocalMaximums);
   m_eclLocalMaximums.registerRelationTo(m_eclCalDigits);
+  m_eclConnectedRegions.requireRelationTo(m_eclLocalMaximums);
+  m_eclConnectedRegions.requireRelationTo(m_eclCalDigits);
 
   // Initialize neighbour maps (we will optimize the endcaps later, there is more than just a certain energy containment to be considered)
   m_NeighbourMap9 = new ECLNeighbours("N", 1); // N: 3x3 = 9
@@ -214,6 +218,13 @@ void ECLSplitterN1Module::terminate()
 
 void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 {
+
+  //calculate the maximum distance for later weighting
+  double maxDistance = m_sharingDistanceMolierMultiplier * c_molierRadius;
+  if (maxDistance < 0.0) {
+    maxDistance = 9999999.;
+  }
+
 
   // Get the event background level
   const int bkgdcount = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
@@ -488,7 +499,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
             double distance          = 0.0;
             double distanceEnergySum = 0.0;
 
-            // Loop over all centroids
+            // Loop over all centroids to get the normalization for the weight
             for (const auto& centroidpoint : centroidPoints) {
 
               // cell id and position of this centroid
@@ -509,19 +520,22 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
               const int thispos = m_StoreArrPosition[centroidcellid];
               const double thisenergy = m_eclCalDigits[thispos]->getEnergy();
 
+              // get distance of the current local maximum (its centroid position) to this caldigit
               // Not  the most efficienct way to get this information, but not worth the thinking yet:
-              if (locmaxcellid == centroidcellid) {
+              if ((locmaxcellid == centroidcellid) and (thisdistance < maxDistance)) {
                 distance = thisdistance;
                 energy = thisenergy;
               }
 
-              // Get the product of distance and energy.
-              const double expfactor = exp(-m_expConstant * thisdistance / c_molierRadius);
-              distanceEnergySum += (thisenergy * expfactor);
+              // Get the product of distance and energy
+              if (thisdistance < maxDistance) {
+                const double expfactor = exp(-m_expConstant * thisdistance / c_molierRadius);
+                distanceEnergySum += (thisenergy * expfactor);
+              }
 
             } // end centroidPoints
 
-            // Calculate the weight for this digits for this local maximum.
+            // Calculate the weight for this digit for this local maximum.
             if (distanceEnergySum > 0.0) {
               const double expfactor = exp(-m_expConstant * distance / c_molierRadius);
               weight = energy * expfactor / distanceEnergySum;
@@ -605,7 +619,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         const int pos = m_StoreArrPosition[locmaxcellid];
 
         B2DEBUG(175, "locmaxcellid: " << locmaxcellid);
-        const double lmenergy = m_eclCalDigits[pos]->getEnergy();
+        const double LMEnergy = m_eclCalDigits[pos]->getEnergy();
         B2DEBUG(175, "ok: ");
 
         // Get the weight vector.
@@ -614,19 +628,20 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         for (unsigned int i = 0; i < digitVector.size(); ++i) {
 
           const ECLCalDigit dig = digitVector[i];
-          const double weight = myWeights[i];
+          const double weightInShower = myWeights[i];
           const int cellid = dig.getCellId();
           const double energy = dig.getEnergy();
 
           // two ways to fail:
-          // 1) another cell has more energy: energy*weight > lmenergy and cellid != locmaxcellid
+          // 1) another cell in this shower has more energy: energy*weight > LMEnergy and cellid != locmaxcellid
           // 2) local maximum has cell has less than threshold energy left: energy*weight < m_threshold and cellid == locmaxcellid
-          if ((energy * weight > lmenergy and cellid != locmaxcellid) or (energy * weight < m_threshold and cellid == locmaxcellid)) {
+          if ((energy * weightInShower > LMEnergy and cellid != locmaxcellid and m_removeShiftedLMs > 0) or
+              (energy * weightInShower < m_threshold and cellid == locmaxcellid)) {
             markfordeletion.push_back(locmaxcellid);
             iterateclusters = true;
             continue;
-          }
-        }
+          } // end check deletion for this digit
+        }// end digit loop
       }
 
       // delete LMs
@@ -713,7 +728,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       delete oldshowerposition;
 
       // New position (with reduced number of neighbours)
-      // There are some cases where high backgrounds fake local maxima and the splitted centroid position is far
+      // There are some cases where high backgrounds fake local maxima and the split centroid position is far
       // away from the original LM cell... this will throw a (non fatal) error, and create a cluster with zero energy now).
       B2Vector3D* showerposition = new B2Vector3D(Belle2::ECL::computePositionLiLo(newdigits, newweights, m_liloParameters));
       aECLShower->setTheta(showerposition->Theta());

@@ -47,11 +47,20 @@ C switch to initialize that all modes are represented equally.
       INTEGER IFEQUALBR
       DATA    IFEQUALBR /0/ 
       COMMON /IFEQUALBR/ IFEQUALBR
+      INTEGER IUSER
+      INTEGER USERACTIVE
+      COMMON /USERACTIVE/ USERACTIVE(100)
 C switch to generate charge conjugate taupair decays for alternate events
       INTEGER CHCONJUGATE
       DATA    CHCONJUGATE /0/
       COMMON /CHCONJUGATE/ CHCONJUGATE
-      
+C switch to generate tau decays to electron or muon for alternate events [randomized]
+      INTEGER TauToElOrMu
+      DATA    TauToElOrMu /0/
+      COMMON /TauToElOrMu/ TauToElOrMu
+      INTEGER JAK1SV,JAK2SV
+      COMMON /JAKSV/ JAK1SV, JAK2SV
+
 C     FF2PIRHO ! switch for the two pion form factor
 C     = 0 CLEO parametrization
 C     = 1 RChL parametrization (is same as = 0 in this implementation)
@@ -96,14 +105,21 @@ C     IFCURR4PI = 3  CLEO initialization
       DATA    IFCURR4PI /0/
       COMMON /IFCURR4PI/ IFCURR4PI
 
-      REAL    AMINVI            ! mass
-      DATA    AMINVI /0/
-      INTEGER ISPNVI            ! spin
-      DATA    ISPNVI /0/
-      REAL    VCINVI,ACINVI     ! coupling co-efficients in (A+ gamma5 B) term or (A + gamma_5 B) gamma-mu terms for Spin0/Spin1
-      DATA    VCINVI /0.0/      ! suggested value: 0.5
-      DATA    ACINVI /0.0/      ! suggested value: 0.5
-      COMMON /AMINVI/ AMINVI,ISPNVI,VCINVI,ACINVI
+      REAL    AMALFA            ! mass
+      DATA    AMALFA /0/
+      INTEGER ISALFA            ! spin
+      DATA    ISALFA /0/
+      REAL    VCALFA,ACALFA     ! coupling co-efficients in (A+ gamma5 B) term or (A + gamma_5 B) gamma-mu terms for Spin0/Spin1
+      DATA    VCALFA /0.0/      ! suggested value: 0.5
+      DATA    ACALFA /0.0/      ! suggested value: 0.5
+      INTEGER DMALFA
+      DATA    DMALFA /0/        ! decay mode = 0:invi, 1:gammagamma, 2:e+e-, 3:mu+mu-, 4:pi+pi-, 5:pi0pi0, 6:pi0eta, 7:etaeta, 8:K+K-, 9:KS0KS0, 10:pi+K-, 11:pi-K+
+      REAL    GMALFA            ! width
+      DATA    GMALFA /0.0/
+      COMMON /AMALFA/ AMALFA,ISALFA,VCALFA,ACALFA,DMALFA,GMALFA
+      DOUBLE PRECISION  CTALFA  ! lifetime (mm)
+      DATA              CTALFA/0.0D0/
+      COMMON /CTALFA/   CTALFA
 C
 C     DarkPhoton parameters: epsilon (kinematic mixing), mass and width
 C     
@@ -131,6 +147,8 @@ C radiative correction switch in tau --> e (mu) decays !
 C switches of tau+ tau- decay modes !!
       Jak1            = xpar(ITAUXPAR+1) ! Decay Mask for first tau
       Jak2            = xpar(ITAUXPAR+2) ! Decay Mask for second tau
+      JAK1SV          = Jak1
+      JAK2SV          = Jak2
 C output file number for TAUOLA
       IOUT    = xpar(4)
 C  KeyA1 is used for formfactors actually not in use
@@ -153,19 +171,32 @@ C  KeyA1 is used for formfactors actually not in use
       IFCURR4PI = XPAR(ITAUXPAR+905)
       LAMDEC    = XPAR(ITAUXPAR+906)
       CHCONJUGATE= XPAR(ITAUXPAR+909)
+      TauToElOrMu= XPAR(ITAUXPAR+910)
+C
+      DO IUSER = 1,100
+         USERACTIVE(IUSER) = 0
+      ENDDO
+      IF (IFEQUALBR.LT.0) THEN
+         DO IUSER = 1, -IFEQUALBR
+            USERACTIVE(IUSER) = XPAR(ITAUXPAR+1000+IUSER)
+         ENDDO
+      ENDIF
       
 C     Print functional flags
-      WRITE(iout,*) 'FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI, CHCONJUGATE = ',
-     $               FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI, CHCONJUGATE
+      WRITE(iout,*) 'FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI, CHCONJUGATE, TauToElOrMu = ',
+     $               FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI, CHCONJUGATE, TauToElOrMu
 
-      AMINVI    = XPAR(ITAUXPAR+911)
-      ISPNVI    = INT(XPAR(ITAUXPAR+912))
-      VCINVI    = XPAR(ITAUXPAR+913)
-      ACINVI    = XPAR(ITAUXPAR+914)
-C     Print flags for invisible particle
-      IF (VCINVI.NE.0.0.OR.ACINVI.NE.0.0)
-     $   WRITE(iout,*) 'AMINVI, ISPNVI, VCINVI, ACINVI = ',
-     $                  AMINVI, ISPNVI, VCINVI, ACINVI
+      AMALFA    = XPAR(ITAUXPAR+911)
+      ISALFA    = INT(XPAR(ITAUXPAR+912))
+      VCALFA    = XPAR(ITAUXPAR+913)
+      ACALFA    = XPAR(ITAUXPAR+914)
+      DMALFA    = XPAR(ITAUXPAR+920) ! 915 to 919 are already in use
+      GMALFA    = XPAR(ITAUXPAR+921) ! width
+      CTALFA    = XPAR(ITAUXPAR+922) ! lifetime
+C     Print flags for exotic particle
+      IF (VCALFA.NE.0.0.OR.ACALFA.NE.0.0)
+     $   WRITE(iout,*) 'AMALFA, ISALFA, VCALFA, ACALFA, DMALFA, GMALFA, CTALFA = ',
+     $                  AMALFA, ISALFA, VCALFA, ACALFA, DMALFA, GMALFA, CTALFA
       
 C     Print optional flags 
       WRITE(iout,*) 'IFEQUALBR, LAMDEC = ',
@@ -683,10 +714,12 @@ C
       REAL              XRANGE,XRANGE1,XRANGE15,XRANGE2,XRANGE25,XRANGE3
       REAL              QQBRWG
       EXTERNAL          QQBRWG
-      REAL              AMINVI            ! mass
-      INTEGER           ISPNVI            ! spin
-      REAL              VCINVI,ACINVI     ! coupling co-efficients in (A+ gamma5 B) term or (A + gamma_5 B) gamma-mu terms for Spin0/Spin1
-      COMMON /AMINVI/   AMINVI,ISPNVI,VCINVI,ACINVI
+      REAL              AMALFA            ! mass
+      INTEGER           ISALFA            ! spin
+      REAL              VCALFA,ACALFA ! coupling co-efficients in (A+ gamma5 B) term or (A + gamma_5 B) gamma-mu terms for Spin0/Spin1
+      INTEGER           DMALFA
+      REAL              GMALFA
+      COMMON /AMALFA/   AMALFA,ISALFA,VCALFA,ACALFA,DMALFA,GMALFA
 C
       XRANGE=IRANGE
       XRANGE1=XRANGE
@@ -781,7 +814,7 @@ C
       ELSEIF  (ABS(IDENT).EQ.9010221) THEN
          APKMAS=QQBRWG(0.9856,0.0342,XRANGE)    ! f00(980)
       ELSEIF  (ABS(IDENT).EQ.94144) THEN
-         APKMAS=AMINVI                          ! invi   
+         APKMAS=QQBRWG(AMALFA,GMALFA,XRANGE)    ! alfa
       ELSEIF  (ABS(IDENT).EQ.0) THEN 
          APKMAS=0
       ELSE
@@ -893,7 +926,7 @@ C
       ELSEIF  (ABS(IDENT).EQ.9010221) THEN
          IPKDEF=ABS(IDENT)! f00(980)
       ELSEIF  (ABS(IDENT).EQ.94144) THEN
-         IPKDEF=ABS(IDENT)! invi
+         IPKDEF=ABS(IDENT)! alfa
       ELSEIF  (ABS(IDENT).EQ.53) THEN
          IPKDEF=ABS(IDENT)! hl
       ELSEIF  (ABS(IDENT).EQ.26) THEN

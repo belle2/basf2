@@ -1928,7 +1928,7 @@ void Fitter3DUtility::findImpactPosition(ROOT::Math::XYZVector* mcPosition, ROOT
   // Input:   production vertex (mcx, mcy, mcz),
   //          momentum at production vertex (px, py, pz)
   //          charge of particle.
-  // Output:  helix center's coordiante (hcx, hcy)
+  // Output:  helix center's coordinate (hcx, hcy)
   //          impact position (impactX, impactY, impactZ)
 
   double rho = sqrt(pow(mcMomentum->X(), 2) + pow(mcMomentum->Y(), 2)) / 0.3 / 1.5 * 100;

@@ -16,15 +16,15 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
-#include <framework/core/RandomNumbers.h>
 
 // DataStore classes
 #include <framework/io/RootIOUtilities.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <TMath.h>
-#include <TH1F.h>
-#include <TH2F.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TRandom.h>
 #include <TString.h>
 
 using namespace std;
@@ -155,7 +155,7 @@ void NtuplePhase1_v6Module::initialize()
     m_tree->AddFile(fileName.c_str());
   }
   m_numEvents = m_tree->GetEntries();
-  if (m_numEvents == 0) B2ERROR(c_treeNames[DataStore::c_Event] << " has no entires");
+  if (m_numEvents == 0) B2ERROR(c_treeNames[DataStore::c_Event] << " has no entries");
   m_eventCount = 0;
 
   m_tree->SetBranchAddress("ts", &(m_beast.ts));
@@ -1383,9 +1383,7 @@ void NtuplePhase1_v6Module::event()
     m_beast.SAD_LER_RLR_av.push_back(BG + To);
     m_beast.SAD_LER_lifetime_av.push_back(Nb_LER / (BG + To) * 1e-9 / 60. * bunch_nb_LER);
     BG = 0;
-    LBG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0;
       if (m_input_LB_SAD_RLR.size() > 0) {
         LBG = m_input_LB_SAD_RLR[j] * Zeff_LB + m_input_LC_SAD_RLR[j] * Zeff_LC;
         BG += LBG * ScaleFacBG_LER[j];
@@ -1435,9 +1433,8 @@ void NtuplePhase1_v6Module::event()
     //if (TMath::IsNaN(To)) To = 0;
     //if (TMath::IsNaN(BG)) BG = 0;
     m_beast.DIA_dose_av.push_back(BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_DIA_dose[j].size() > 0) {
         //LBG = m_input_LB_DIA_dose[j][i] + m_input_LC_DIA_dose[j][i];
         HBG = m_input_HB_DIA_dose[j][i] + m_input_HC_DIA_dose[j][i];
@@ -1462,9 +1459,8 @@ void NtuplePhase1_v6Module::event()
     //if (TMath::IsNaN(To)) To = 0;
     //if (TMath::IsNaN(BG)) BG = 0;
     m_beast.PIN_dose_av.push_back(BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_PIN_dose[j].size() > 0) {
         //LBG = m_input_LB_PIN_dose[j][i] + m_input_LC_PIN_dose[j][i];
         HBG = m_input_HB_PIN_dose[j][i] + m_input_HC_PIN_dose[j][i];
@@ -1489,9 +1485,8 @@ void NtuplePhase1_v6Module::event()
     //if (TMath::IsNaN(To)) To = 0;
     //if (TMath::IsNaN(BG)) BG = 0;
     m_beast.DOSI_av.push_back(BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_DOSI[j].size() > 0) {
         //LBG = m_input_LB_DOSI[j][i] + m_input_LC_DOSI[j][i];
         HBG = m_input_HB_DOSI[j][i] + m_input_HC_DOSI[j][i];
@@ -1513,9 +1508,8 @@ void NtuplePhase1_v6Module::event()
     //if (TMath::IsNaN(To)) To = 0;
     //if (TMath::IsNaN(BG)) BG = 0;
     m_beast.BGO_energy_av.push_back(BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_BGO_dose[j].size() > 0) {
         //LBG = m_input_LB_BGO_dose[j][i] + m_input_LC_BGO_dose[j][i];
         HBG = m_input_HB_BGO_dose[j][i] + m_input_HC_BGO_dose[j][i];
@@ -1548,9 +1542,8 @@ void NtuplePhase1_v6Module::event()
     //if (TMath::IsNaN(To)) To = 0;
     //if (TMath::IsNaN(BG)) BG = 0;
     m_beast.HE3_rate_av.push_back(BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_HE3_rate[j].size() > 0) {
         //LBG = m_input_LB_HE3_rate[j][he3order[i]] + m_input_LC_HE3_rate[j][he3order[i]];
         HBG = m_input_HB_HE3_rate[j][he3order[i]] + m_input_HC_HE3_rate[j][he3order[i]];
@@ -1572,9 +1565,8 @@ void NtuplePhase1_v6Module::event()
     int tpc_ch = (int)(i / 5);
     int n_type = i - 5 * tpc_ch;
     m_beast.TPC_rate_av[tpc_ch][n_type] = (BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_TPC_rate[j].size() > 0) {
         //LBG = m_input_LB_TPC_rate[j][i] + m_input_LC_TPC_rate[j][i];
         HBG = m_input_HB_TPC_rate[j][i] + m_input_HC_TPC_rate[j][i];
@@ -1596,9 +1588,8 @@ void NtuplePhase1_v6Module::event()
     //int n_type = i - 5 * tpc_ch;
     //m_beast.TPC_dose_av[tpc_ch][n_type] = (BG + To);
     m_beast.TPC_dose_av.push_back(BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_TPC_dose[j].size() > 0) {
         //LBG = m_input_LB_TPC_dose[j][i] + m_input_LC_TPC_dose[j][i];
         HBG = m_input_HB_TPC_dose[j][i] + m_input_HC_TPC_dose[j][i];
@@ -1620,9 +1611,8 @@ void NtuplePhase1_v6Module::event()
     int i_theta = (int)(angle / 18);
     int i_phi = angle - 9 * i_theta;
     m_beast.TPC_angular_rate_av[tpc_ch][i_theta][i_phi] = (BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_TPC_angular_rate[j].size() > 0) {
         //LBG = m_input_LB_TPC_angular_rate[j][i] + m_input_LC_TPC_angular_rate[j][i];
         HBG = m_input_HB_TPC_angular_rate[j][i] + m_input_HC_TPC_angular_rate[j][i];
@@ -1644,9 +1634,8 @@ void NtuplePhase1_v6Module::event()
     int i_theta = (int)(angle / 18);
     int i_phi = angle - 9 * i_theta;
     m_beast.TPC_angular_dose_av[tpc_ch][i_theta][i_phi] = (BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_TPC_angular_dose[j].size() > 0) {
         //LBG = m_input_LB_TPC_angular_dose[j][i] + m_input_LC_TPC_angular_dose[j][i];
         HBG = m_input_HB_TPC_angular_dose[j][i] + m_input_HC_TPC_angular_dose[j][i];
@@ -1667,9 +1656,8 @@ void NtuplePhase1_v6Module::event()
     //if (TMath::IsNaN(To)) To = 0;
     //if (TMath::IsNaN(BG)) BG = 0;
     m_beast.CLAWS_rate_av.push_back(BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_CLAWS_rate[j].size() > 0) {
         //LBG = m_input_LB_CLAWS_rate[j][i] + m_input_LC_CLAWS_rate[j][i];
         HBG = m_input_HB_CLAWS_rate[j][i] + m_input_HC_CLAWS_rate[j][i];
@@ -1691,9 +1679,8 @@ void NtuplePhase1_v6Module::event()
     //if (TMath::IsNaN(To)) To = 0;
     //if (TMath::IsNaN(BG)) BG = 0;
     m_beast.QCSS_rate_av.push_back(BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_QCSS_rate[j].size() > 0) {
         //LBG = m_input_LB_QCSS_rate[j][i] + m_input_LC_QCSS_rate[j][i];
         HBG = m_input_HB_QCSS_rate[j][i] + m_input_HC_QCSS_rate[j][i];
@@ -1715,9 +1702,8 @@ void NtuplePhase1_v6Module::event()
     //if (TMath::IsNaN(To)) To = 0;
     //if (TMath::IsNaN(BG)) BG = 0;
     m_beast.CSI_sumE_av.push_back(BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_CSI_dose[j].size() > 0) {
         //LBG = m_input_LB_CSI_dose[j][i] + m_input_LC_CSI_dose[j][i];
         HBG = m_input_HB_CSI_dose[j][i] + m_input_HC_CSI_dose[j][i];
@@ -1737,9 +1723,8 @@ void NtuplePhase1_v6Module::event()
     //if (TMath::IsNaN(To)) To = 0;
     //if (TMath::IsNaN(BG)) BG = 0;
     m_beast.CSI_Ebin_av.push_back(BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_CSI_dose_binE[j].size() > 0) {
         //LBG = m_input_LB_CSI_dose_binE[j][i] + m_input_LC_CSI_dose_binE[j][i];
         HBG = m_input_HB_CSI_dose_binE[j][i] + m_input_HC_CSI_dose_binE[j][i];
@@ -1759,9 +1744,8 @@ void NtuplePhase1_v6Module::event()
     //if (TMath::IsNaN(To)) To = 0;
     //if (TMath::IsNaN(BG)) BG = 0;
     m_beast.CSI_hitRate_av.push_back(BG + To);
-    BG = 0; LBG = 0; HBG = 0;
+    BG = 0;
     for (int j = 0; j < 12; j++) {
-      LBG = 0; HBG = 0;
       if (m_input_LB_CSI_rate[j].size() > 0) {
         //LBG = m_input_LB_CSI_rate[j][i] + m_input_LC_CSI_rate[j][i];
         HBG = m_input_HB_CSI_rate[j][i] + m_input_HC_CSI_rate[j][i];

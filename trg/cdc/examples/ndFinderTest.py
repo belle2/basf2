@@ -78,6 +78,8 @@ def add_cdc_finders(path):
                     verbose=args.verbose
                     )
 
+#: \cond Doxygen_suppress
+
 
 class QuickCheck(basf2.Module):
     def initialize(self):
@@ -132,7 +134,7 @@ class QuickCheck(basf2.Module):
 
     def terminate(self):
         def mystr(val):
-            return '%3s' % ('%d' % val)
+            return f"{f'{val:d}':>3s}"
         headline0 = [' ' for i in range(6)]
         headline0.insert(4, 'TrackType')
         headline1 = ['  NTrack', '__|'] + ['___' for i in range(5)]
@@ -157,6 +159,7 @@ class QuickCheck(basf2.Module):
                          mystr(events2d),
                          mystr(events3d)]
             print(uline(entryline))
+#: \endcond
 
 
 def addTrgOutput(main, args):

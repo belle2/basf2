@@ -19,7 +19,7 @@ namespace Belle2 {
 
   /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees.
    *
-   * calculating with double precission no matter the resolution of the output.
+   * calculating with double precision no matter the resolution of the output.
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
   template <typename PointType >

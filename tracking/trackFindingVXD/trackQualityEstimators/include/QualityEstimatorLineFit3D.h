@@ -22,7 +22,7 @@ namespace Belle2 {
    *
    * beam parallel to x. Measurement errors in y & z (v&u)
    * With these conditions, the following approach using 2 independent 2D line fits is acceptable (if rotation is the same for all sensors):
-   * Modells:
+   * Models:
    * Y_i = a*X_i + b        Z_i = c*X_i + d
    * */
   class QualityEstimatorLineFit3D : public QualityEstimatorBase {

@@ -89,7 +89,7 @@ void BKLMDigitAnalyzerModule::beginRun()
   int hour = -1;
   int min = -1;
   int sec = -1;
-  m_extraInfo = new TTree("extraInfo", "Extra informations");
+  m_extraInfo = new TTree("extraInfo", "Extra information");
   m_extraInfo->Branch("exp", &exp, "exp/I");
   m_extraInfo->Branch("run", &run, "run/I");
   m_extraInfo->Branch("year", &year, "year/I");
@@ -204,7 +204,7 @@ void BKLMDigitAnalyzerModule::event()
       m_histoStrip[1 - digit.getSection()][digit.getSector() - 1][digit.isPhiReadout()]->Fill(digit.getLayer() - 1,
           digit.getStrip() - 1);
 
-      // getTime() retruns the TDC
+      // getTime() returns the TDC
       m_histoTdc[1 - digit.getSection()][digit.getSector() - 1][digit.inRPC()]->Fill(digit.getTime());
 
       m_histoCTimeDiff[1 - digit.getSection()][digit.getSector() - 1][digit.inRPC()]->Fill(digit.getCTime() -

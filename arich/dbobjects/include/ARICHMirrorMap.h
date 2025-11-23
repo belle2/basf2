@@ -48,7 +48,7 @@ namespace Belle2 {
     ARICHMirrorInfo* getMirrorID() const {return m_mirror; }
 
     /** Set Mirror Identifier
-     * @param Mirror Identifier
+     * @param mirror Mirror Identifier
      */
     void setMirrorID(ARICHMirrorInfo* mirror) {m_mirror = mirror; }
 
@@ -58,7 +58,7 @@ namespace Belle2 {
     int getMirrorPosition() const {return m_column; }
 
     /** Set Position on the detector
-     * @param Position on the detector
+     * @param column Position on the detector
      */
     void setMirrorPosition(int column) {m_column = column; }
 
@@ -68,7 +68,7 @@ namespace Belle2 {
     TTimeStamp getMirrorTimeStamp() const {return m_timeStamp; }
 
     /** Set Installation date
-     * @param Installation date
+     * @param timeStamp Installation date
      */
     void setMirrorTimeStamp(TTimeStamp timeStamp) {m_timeStamp = timeStamp; }
 

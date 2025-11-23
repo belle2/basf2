@@ -32,7 +32,7 @@ class RawRootFile:
         self.rootfile = open(filename, 'rb')
         root = self.rootfile.read(4)
         if root != b'root':
-            raise Exception("%s is not a root file" % filename)
+            raise Exception(f"{filename} is not a root file")
         #: root/file format version
         self.version = int.from_bytes(self.rootfile.read(4), byteorder)
         #: are file location pointers 4 or 8 bits?

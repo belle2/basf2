@@ -33,12 +33,12 @@ namespace Belle2 {
     {
       typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3<double> outerCircleCenter =
+      B2Vector3D outerCircleCenter =
         CircleCenterXY<PointType>::value(outerHit, outerCenterHit, innerCenterHit);
       double outerCircleRadius =
         CircleRadius<PointType>::calcAvgDistanceXY(outerHit, outerCenterHit, innerCenterHit, outerCircleCenter);
 
-      B2Vector3<double> innerCircleCenter =
+      B2Vector3D innerCircleCenter =
         CircleCenterXY<PointType>::value(outerCenterHit, innerCenterHit, innerHit);
       double innerCircleRadius =
         CircleRadius<PointType>::calcAvgDistanceXY(outerCenterHit, innerCenterHit, innerHit, innerCircleCenter);

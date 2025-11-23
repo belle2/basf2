@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,7 +23,7 @@ class CheckMCParticles(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(CheckMCParticles, self).__init__()
+        super().__init__()
         #: Number of secondaries that generated a PXDTrueHit
         self.nSecondariesPXD = 0
         #: Number of secondaries that generated an SVD TrueHit
@@ -65,13 +64,9 @@ class CheckMCParticles(b2.Module):
 
     def terminate(self):
         """ Write results """
-        b2.B2INFO('Found {nu} secondary MC Particles out of total {n}.'
-                  .format(nu=self.nSecondaries, n=self.nMCParticles))
-        b2.B2INFO('Of these, found {n1} secondaries in PXD and {n2} in SVD.'
-                  .format(n1=self.nSecondariesPXD, n2=self.nSecondariesSVD))
-        b2.B2INFO('Secondary processes for PXD: {list1}; for SVD: {list2}'
-                  .format(list1=str(self.processesPXD),
-                          list2=str(self.processesSVD)))
+        b2.B2INFO(f'Found {self.nSecondaries} secondary MC Particles out of total {self.nMCParticles}.')
+        b2.B2INFO(f'Of these, found {self.nSecondariesPXD} secondaries in PXD and {self.nSecondariesSVD} in SVD.')
+        b2.B2INFO(f'Secondary processes for PXD: {str(self.processesPXD)}; for SVD: {str(self.processesSVD)}')
 
 
 # Particle gun module

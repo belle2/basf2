@@ -34,12 +34,17 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
   try {
     confile.open(filename, std::ifstream::in);
   } catch (int e) {
-    B2ERROR("ERROR! While opening file: " + filename + "    Error code: " + e);
+    saveconfigtxt("neuroconfig_example.conf");
+    B2ERROR("Configuration file " + filename + " could not be loaded! Make sure to give the configuration file as a parameter. \
+              An example file neuroconfig_example.conf has been saved.");
+
     exit(EXIT_FAILURE);
   }
   std::string line_all;
   if (!confile.is_open()) {
-    B2ERROR("ERROR! While opening file: " + filename);
+    saveconfigtxt("neuroconfig_example.conf");
+    B2ERROR("Configuration file " + filename + " could not be loaded! Make sure to give the configuration file as a parameter. \
+              An example file neuroconfig_example.conf has been saved.");
     exit(EXIT_FAILURE);
   }
   while (std::getline(confile, line_all)) {
@@ -51,7 +56,7 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
     std::string skip;
     if (line.length() < 3) {
       continue;
-      // check, if line wasnt a pure comment line
+      // check, if line wasn't a pure comment line
     }
     bool locked = false; //check, if "==" was used and the variable should be registered as locked
     if (line.find('=') == std::string::npos) {
@@ -64,7 +69,7 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
     if (l  == "=") {
       locked = true;
     }
-    // now find the value that should be asigned to the "par"
+    // now find the value that should be assigned to the "par"
     key = (locked) ? line.substr((line.find('=') + 2), line.length() - line.find('=') - 2) : line.substr((line.find('=') + 1),
           line.length() - line.find('=') - 1);
     if (par == "nInput")         {
@@ -126,6 +131,10 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
       SLpatternMask = read1dArray<unsigned long>(key, locked);
     } else if (par == "precision")    {
       precision = read1dArray<unsigned>(key, locked);
+    } else if (par == "AdditionWireMode") {
+      AdditionWireMode =  std::stoul(key);
+    } else if (par == "AdditionInputPerSL") {
+      AdditionInputPerSL =  std::stoul(key);
     }
   }
 }
@@ -148,8 +157,8 @@ bool NeuroTriggerParameters::checkarr(std::vector<NNTParam<X>> vec)
 
 void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
 {
-  // save all the configuration otions in a file, which can later be used to initialize a new parameter set.
-  // only paramters, that already have been set are saved. parameters which are locked, are written wit a "==".
+  // save all the configuration options in a file, which can later be used to initialize a new parameter set.
+  // only parameters, that already have been set are saved. parameters which are locked, are written with a "==".
   std::ofstream savestream;
   savestream.open(filename);
   savestream << "########################################################" << std::endl;
@@ -307,6 +316,21 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
     savestream << print1dArray<unsigned>("precision", precision);
     savestream  << std::endl;
   } else {savestream << "precision = [12, 8, 8, 12, 10, 10]" << std::endl;}
+  savestream << "# Set Addition Wire output mode, 0 for default mode, 1 for full hits case and 2 for selected hits case" <<
+             std::endl;
+  if (AdditionWireMode.isSet()) {
+    savestream << "AdditionWireMode " << (AdditionWireMode.isLocked() ? "== " : "= ") << AdditionWireMode << std::endl;
+    savestream  << std::endl;
+  } else {savestream << "AdditionWireMode = 0" << std::endl;}
+  savestream <<
+             "# Only used when AdditionWireMode != 0, if mode ==1 , InputPerSL can be 11 (only drift time) and 22 (drift time + ADC ); if mode ==2, InputPerSL can be 3 * n , n equal to the number of wire selected "
+             <<
+             std::endl;
+  if (AdditionInputPerSL.isSet()) {
+    savestream << "AdditionInputPerSL " << (AdditionInputPerSL.isLocked() ? "== " : "= ") << AdditionInputPerSL << std::endl;
+    savestream  << std::endl;
+  } else {savestream << "AdditionInputPerSL = 0" << std::endl;}
+
   savestream.close();
 }
 
@@ -355,7 +379,7 @@ std::vector<std::vector<NNTParam<X>>> NeuroTriggerParameters::read2dArray(std::s
   // parse the brackets here to fill the vector: [[1,2], 3,4]]
   key = key.substr(key.find("[") + 1, std::string::npos); // without outer brackets: [1,2], [3,4]
   for (std::size_t ipos = 0; ipos != std::string::npos; ipos = key.find("[", ipos + 1)) {
-    std::string pairstr = key.substr(ipos + 1, key.find("]", ipos + 1) - ipos - 1); // this shopuld be 1,2 now
+    std::string pairstr = key.substr(ipos + 1, key.find("]", ipos + 1) - ipos - 1); // this should be 1,2 now
     std::vector<NNTParam<X>> newpair;
     std::size_t jpos;
     for (jpos = 0; jpos != std::string::npos; jpos = pairstr.find(",", jpos)) {
@@ -373,7 +397,7 @@ std::vector<NNTParam<X>> NeuroTriggerParameters::read1dArray(std::string keyx, b
 {
   std::string key = keyx;
   // parse the brackets here to fill the vector: [[1,2], 3,4]]
-  std::string pairstr = key.substr(1, key.find("]", 1) - 1); // this shopuld be 1,2 now
+  std::string pairstr = key.substr(1, key.find("]", 1) - 1); // this should be 1,2 now
   std::vector<NNTParam<X>> newpair;
   std::size_t jpos;
   for (jpos = 0; jpos != std::string::npos; jpos = pairstr.find(",", jpos)) {

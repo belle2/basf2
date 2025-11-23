@@ -45,7 +45,7 @@ double NoKickCuts::getCut(int layer1, int layer2, EParameters par, EMinMax m, EC
       cutVector = m_cutBkg;
       break;
   }
-  /** numeration order inside vector<vector<vector<vetor<double>>>> cut:
+  /** numeration order inside vector<vector<vector<vector<double>>>> cut:
   * <EMinMax<EParameters<layer_int<layer_ext>>>>
   * EMinMax: 0=min,1=max
   * EParameters: 0=omega, 1=d0, 2=phi0, 3=z0, 4=tanLmabda

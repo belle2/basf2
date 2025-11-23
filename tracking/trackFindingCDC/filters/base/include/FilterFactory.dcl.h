@@ -16,7 +16,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Factory that can create apropriate filter instances from a name
+    /// Factory that can create appropriate filter instances from a name
     template<class AFilter>
     class FilterFactory {
 

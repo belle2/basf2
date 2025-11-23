@@ -6,7 +6,7 @@ Tree Fitter
 
 The TreeFitter is a global fitting tool to simultaneously fit an entire decay chain. It tries to find the best decay vertex positions and momenta for the given decay hypothesis. Final state particles will be constrained to their masses, meaning no energy is extracted from the fit but pdg-mass and momentum measurement are used to determine it (same as track fitting procedure). The fit extracts the 4-momenta (->including energy) and decay vertex positions of intermediate particles. If an intermediate particle has a flight length less than :math:`1~\mu m` - for example a strongly decaying hadronic resonance - its decay and production vertex will be merged. The production vertex is the decay vertex of the mother particle. Note that the other fitters do not do this.
 
-The fit tries to find the solutions to a system of equations or at least the solution closest to the measurement given the measurement uncertainty and noise. The distance between (linearised) hypothesis and measurement is calculated using :math:`\chi^2 = \sum \frac{h-m}{\sigma}` the final goodness of the fit then can be evaluated using the p-value defined as the incomplete (lower = 1 - upper) gamma function of the :math:`\chi^2` and degrees of freedom :math:`r` divided by two:
+The fit tries to find the solutions to a system of equations or at least the solution closest to the measurement given the measurement uncertainty and noise. The distance between (linearised) hypothesis and measurement is calculated using :math:`\chi^2 = \sum \frac{\left(h-m\right)^2}{\sigma^2}` the final goodness of the fit then can be evaluated using the p-value defined as the incomplete (lower = 1 - upper) gamma function of the :math:`\chi^2` and degrees of freedom :math:`r` divided by two:
 :math:`1 -\int^{ \frac{\chi^2}{2} }_{0} t^{r/2-1} e^{-t} dt~/~\Gamma(\frac{r}{2}).`
 
 This quantity denotes the probability the observed :math:`\chi^2` exceeds the expectations for a correct model by chance (see ROOT documentation ``TMath::Prob(Double_t chi2,Int_t ndf)``).
@@ -29,7 +29,7 @@ So for example for :math:`J/\psi \rightarrow l^+ l^-` the calculation is the fol
 :math:`r = 5 (track) + 5 (track) + 4 (kinematic) \\- 3 (track) - 3 (track) \\- 7 (J/\psi:~px, py, pz, E, x, y, z) = 1.`
 
 While for :math:`B \rightarrow D(K \pi \pi^0)\pi`:
-:math:`r = 3\dot 5 (track) + 2 \cdot 3 (gamma) \\+ 3 \cdot 4 (kinematic) + 3 (D:geometric) \\- 6 (B:~x,y,z,px,py,pz) - 7 (D:~x,y,z,tau,px,py,pz) \\- 3 (\pi^0:~px,py,pz) - 3 \cdot 3 (track) \\- 2 \cdot 3 (gamma) = 5.`
+:math:`r = 3 \cdot 5 (track) + 2 \cdot 3 (gamma) \\+ 3 \cdot 4 (kinematic) + 3 (D:geometric) \\- 6 (B:~x,y,z,px,py,pz) - 7 (D:~x,y,z,tau,px,py,pz) \\- 3 (\pi^0:~px,py,pz) - 3 \cdot 3 (track) \\- 2 \cdot 3 (gamma) = 5.`
 
 Citation
 ########

@@ -12,7 +12,7 @@
 
 """
 Create a full set of consistent geometry payloads for nominal geometry, phase 2
-geometry, and early phase 3 gometry from XML files.
+geometry, and early phase 3 geometry from XML files.
 
 Optionally one can give a list of payload names to keep only a subset of payloads
 """

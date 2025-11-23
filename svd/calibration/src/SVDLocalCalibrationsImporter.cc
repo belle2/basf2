@@ -39,11 +39,10 @@
 
 #include <sstream>
 
-using namespace std;
 using namespace Belle2;
 using boost::property_tree::ptree;
 
-void SVDLocalCalibrationsImporter::importSVDChannelMapping(const std::string& fileName)
+void Belle2::SVDLocalCalibrationsImporter::importSVDChannelMapping(const std::string& fileName)
 {
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun, m_lastExperiment, m_lastRun);
@@ -58,7 +57,7 @@ void SVDLocalCalibrationsImporter::importSVDChannelMapping(const std::string& fi
 }
 
 
-void SVDLocalCalibrationsImporter::importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+void Belle2::SVDLocalCalibrationsImporter::importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
   // We do initialize the noise to a negative value so that
   // the SNR for not properly initialized channels is negative
@@ -72,21 +71,22 @@ void SVDLocalCalibrationsImporter::importSVDNoiseCalibrationsFromXML(const std::
       -1.0, errorTollerant);
 }
 
-void SVDLocalCalibrationsImporter::importSVDPedestalCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+void Belle2::SVDLocalCalibrationsImporter::importSVDPedestalCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
   importSVDCalibrationsFromXML< SVDPedestalCalibrations::t_payload  >(SVDPedestalCalibrations::name,
       xmlFileName, "pedestals",
       -1.0, errorTollerant);
 }
 
-void SVDLocalCalibrationsImporter::importSVDHotStripsCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+void Belle2::SVDLocalCalibrationsImporter::importSVDHotStripsCalibrationsFromXML(const std::string& xmlFileName,
+    bool errorTollerant)
 {
   importSVDCalibrationsFromXML< SVDHotStripsCalibrations::t_payload  >(SVDHotStripsCalibrations::name,
       xmlFileName, "hot_strips",
       false, errorTollerant);
 }
 
-void SVDLocalCalibrationsImporter::importSVDFADCMaskedStripsFromXML(const std::string& xmlFileName, bool errorTollerant)
+void Belle2::SVDLocalCalibrationsImporter::importSVDFADCMaskedStripsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
   importSVDCalibrationsFromXML< SVDFADCMaskedStrips::t_payload  >(SVDFADCMaskedStrips::name,
       xmlFileName, "masks",
@@ -97,7 +97,7 @@ void SVDLocalCalibrationsImporter::importSVDFADCMaskedStripsFromXML(const std::s
 
 
 template< class SVDcalibration >
-void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::string& condDbname,
+void Belle2::SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::string& condDbname,
     const std::string& xmlFileName,
     const std::string& xmlTag,
     typename SVDcalibration::t_perSideContainer::calibrationType defaultValue,
@@ -109,8 +109,8 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
 
   OnlineToOfflineMapFileName.hasChanged();
 
-  unique_ptr<SVDOnlineToOfflineMap> map =
-    make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
+  std::unique_ptr<SVDOnlineToOfflineMap> map =
+    std::make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
 
   payload.construct(defaultValue, xmlFileName);
 
@@ -126,8 +126,8 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
 
     if (backEndLayoutChild.first == "fadc") {
       int FADCid(0);
-      string FADCidString = backEndLayoutChild.second.get<string>("<xmlattr>.id");
-      stringstream ss;
+      std::string FADCidString = backEndLayoutChild.second.get<std::string>("<xmlattr>.id");
+      std::stringstream ss;
       ss << std::hex << FADCidString;
       ss >> FADCid;
 
@@ -151,11 +151,11 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
           for (ptree::value_type const& apvChild : fadcChild.second.get_child("")) {
             if (apvChild.first == "apv25") {
               int apv25ADCid = apvChild.second.get<int>("<xmlattr>.id");
-              string valuesString = apvChild.second.get<string>(xmlTag) ;
+              std::string valuesString = apvChild.second.get<std::string>(xmlTag) ;
               B2DEBUG(10, xmlTag << " APV25ID" << apv25ADCid << " "
                       << valuesString << "\n~~~~~~~~\n");
 
-              stringstream ssn;
+              std::stringstream ssn;
               ssn << valuesString;
               double value;
               for (int apvChannel  = 0 ; apvChannel < 128; apvChannel ++) {
@@ -209,7 +209,7 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
 /****
  * HERE!
  */
-void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+void Belle2::SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
 
   DBImportObjPtr< typename SVDPulseShapeCalibrations::t_calAmp_payload > pulseShapes(SVDPulseShapeCalibrations::calAmp_name);
@@ -218,8 +218,8 @@ void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std:
 
   OnlineToOfflineMapFileName.hasChanged();
 
-  unique_ptr<SVDOnlineToOfflineMap> map =
-    make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
+  std::unique_ptr<SVDOnlineToOfflineMap> map =
+    std::make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
 
   pulseShapes.construct(SVDStripCalAmp(), xmlFileName);
 
@@ -235,8 +235,8 @@ void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std:
 
     if (backEndLayoutChild.first == "fadc") {
       int FADCid(0);
-      string FADCidString = backEndLayoutChild.second.get<string>("<xmlattr>.id");
-      stringstream ss;
+      std::string FADCidString = backEndLayoutChild.second.get<std::string>("<xmlattr>.id");
+      std::stringstream ss;
       ss << std::hex << FADCidString;
       ss >> FADCid;
 
@@ -259,17 +259,17 @@ void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std:
           for (ptree::value_type const& apvChild : fadcChild.second.get_child("")) {
             if (apvChild.first == "apv25") {
               int apv25ADCid = apvChild.second.get<int>("<xmlattr>.id");
-              string ampString = apvChild.second.get<string>("cal_peaks") ;
-              string widthString = apvChild.second.get<string>("cal_width") ;
-              string peakTimeString = apvChild.second.get<string>("cal_peak_time") ;
+              std::string ampString = apvChild.second.get<std::string>("cal_peaks") ;
+              std::string widthString = apvChild.second.get<std::string>("cal_width") ;
+              std::string peakTimeString = apvChild.second.get<std::string>("cal_peak_time") ;
 
-              stringstream ssAmp;
+              std::stringstream ssAmp;
               ssAmp << ampString;
 
-              stringstream ssWidth;
+              std::stringstream ssWidth;
               ssWidth << widthString;
 
-              stringstream ssPeak;
+              std::stringstream ssPeak;
               ssPeak << peakTimeString;
 
               double amp, width, peakTime;

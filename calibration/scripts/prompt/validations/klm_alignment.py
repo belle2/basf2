@@ -9,14 +9,13 @@
 # KLM alignment validation
 
 from prompt import ValidationSettings
-import sys
 import os
 import basf2
-from ROOT.Belle2 import KLMCalibrationChecker
 import uproot
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+import glob
 
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='KLM alignment',
@@ -26,6 +25,9 @@ settings = ValidationSettings(name='KLM alignment',
 
 
 def get_result(job_path, tmp_dir):
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
+    from ROOT.Belle2 import KLMCalibrationChecker
+
     database_file = f'{job_path}/outputdb/database.txt'
     exp_run_list = []
     with open(database_file) as f:
@@ -305,7 +307,7 @@ def draw_BKLM_pics(BKLM_values, BKLM_errors, BKLM_chi2, pdfPages):
     plt.close('all')
 
 
-def run_validation(job_path, job_path_prev, arg3, arg4, arg5):
+def run_validation(calibration_results_dir, input_data_path=None, **kwargs):
     '''
     Run the validation.
     The script compares the most recent alignment result with the previous results by calculating the residuals.
@@ -317,17 +319,26 @@ def run_validation(job_path, job_path_prev, arg3, arg4, arg5):
     if not os.path.exists(tmp_plot_dir):
         os.makedirs(tmp_plot_dir)
 
+    # Find the latest iterations' directories
+    iterations = [d for d in glob.glob(f'{calibration_results_dir}/KLMAlignment/?')]
+    iterations = sorted(iterations, key=lambda x: int(x.split('/')[-1]), reverse=True)[:2]
+    if len(iterations) < 2:
+        raise ValueError("Not enough KLMAlignment iterations found.")
+
+    job_path = f'{iterations[0]}/algorithm_output'
+    job_path_prev = f'{iterations[1]}/algorithm_output'
+
     # Create alignment results tree the recent and previous calibration and get IoVs
     exp_run_list = get_result(job_path, tmp_work_dir)
     exp_run_list_prev = get_result(job_path_prev, tmp_work_dir)
     # Sort IoV from earliest to latest
     sorted_exp_run_list = sorted(exp_run_list + exp_run_list_prev)
     # Calculate the residuals for each adjacent pair of IoVs and saves the results of the comparison in a .pdf file
-    for i in range(0, len(sorted_exp_run_list)-1):
-        exp_prev = sorted_exp_run_list[i][0]
-        run_prev = sorted_exp_run_list[i][1]
-        exp = sorted_exp_run_list[i+1][0]
-        run = sorted_exp_run_list[i+1][1]
+    for i in range(0, len(sorted_exp_run_list)//2):
+        exp_prev = sorted_exp_run_list[2*i][0]
+        run_prev = sorted_exp_run_list[2*i][1]
+        exp = sorted_exp_run_list[2*i+1][0]
+        run = sorted_exp_run_list[2*i+1][1]
         data_path = tmp_work_dir+f'/alignment_{exp_prev}_{run_prev}.root'
         data_path_prev = tmp_work_dir+f'/alignment_{exp}_{run}.root'
         EKLM_values, EKLM_errors, EKLM_chi2, BKLM_values, BKLM_errors, BKLM_chi2 = get_residuals(data_path, data_path_prev)
@@ -338,4 +349,21 @@ def run_validation(job_path, job_path_prev, arg3, arg4, arg5):
 
 
 if __name__ == "__main__":
-    run_validation(*sys.argv[1:])
+
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawTextHelpFormatter)
+
+    # b2val-prompt-run wants to pass to the script also input_data_path
+    # and requested_iov. As they are not required by this validation I just accept
+    # them together with calibration_results_dir and then ignore them
+    parser.add_argument('calibration_results_dir',
+                        help='The directory that contains the collector outputs',
+                        nargs='+')
+
+    parser.add_argument('-o', '--output_dir',
+                        help='The directory where all the output will be saved',
+                        default='KLMAlignmentValidation_output')
+    args = parser.parse_args()
+
+    run_validation(args.calibration_results_dir[0])

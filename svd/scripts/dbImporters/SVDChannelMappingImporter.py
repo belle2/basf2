@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,7 +14,6 @@ Script to Import SVD Channel Mapping into a local DB
 """
 
 import basf2 as b2
-from ROOT.Belle2 import SVDLocalCalibrationsImporter
 import sys
 import argparse
 from termcolor import colored
@@ -28,7 +26,7 @@ parser.add_argument('--mapXML', metavar='channel map xml', dest='mapp', type=str
 
 print('')
 
-if(str(sys.argv[1]) == "help"):
+if (str(sys.argv[1]) == "help"):
     parser.print_help()
     exit(1)
 
@@ -87,6 +85,9 @@ class dbImporterModule(b2.Module):
 
     def beginRun(self):
         '''begin run'''
+        # avoid top level ROOT imports
+        from ROOT import Belle2  # noqa: make Belle2 namespace available
+        from ROOT.Belle2 import SVDLocalCalibrationsImporter
 
         # call the importer class
         dbImporter = SVDLocalCalibrationsImporter(experiment, run, experiment, -1)
@@ -100,4 +101,4 @@ main.add_module(dbImporterModule())
 
 b2.process(main)
 
-print("IMPORT COMPLETED, check the localDB folder and then proceeed with the upload to the central DB")
+print("IMPORT COMPLETED, check the localDB folder and then proceed with the upload to the central DB")

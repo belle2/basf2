@@ -43,12 +43,12 @@ namespace Belle2 {
       void beginRun() final;
 
     private:
-      /// Parameter: Make it possible to jump over N layers.
-      int m_hitJumping = 1;
       /// Filter for rejecting the states
       AFilter m_filter;
       /// Cached number of ladders per layer
       std::array<ushort, 7> m_maximalLadderCache;
+      /// Parameter: Make it possible to jump over N layers.
+      int m_hitJumping = 1;
     };
 
   }

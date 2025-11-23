@@ -11,8 +11,6 @@
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <boost/foreach.hpp>
-
 using namespace std;
 using namespace Belle2;
 
@@ -178,7 +176,7 @@ void SVDB4CommissioningPlotsModule::event()
     m_nTracks->Fill(m_Tracks.getEntries());
     m_ntracks += m_Tracks.getEntries();
   }
-  BOOST_FOREACH(Track & track, m_Tracks) {
+  for (Track& track : m_Tracks) {
 
     const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
     if (tfr) {

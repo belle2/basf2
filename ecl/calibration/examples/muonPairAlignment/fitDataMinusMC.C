@@ -280,7 +280,7 @@ void fitDataMinusMC () {
     
     //---------------------------------------------------------------------
     //..difference after fit for three ECL regions separately
-    const TString regName[5] = {"foward", "forgap", "barrel", "backgap", "backward"};
+    const TString regName[5] = {"forward", "forgap", "barrel", "backgap", "backward"};
     TH1F *differencesAfterReg[5];
     for(int iecl = 0; iecl<5; iecl++) {
         TString name = "differencesAfterReg_";

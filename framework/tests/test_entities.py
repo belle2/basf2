@@ -17,8 +17,8 @@ class TestStoreContent(TestCase):
     def test_init(self):
         store_content = StoreContent("Name", 42)
 
-        self.assertEquals(store_content.name, "Name")
-        self.assertEquals(store_content.number, 42)
+        self.assertEqual(store_content.name, "Name")
+        self.assertEqual(store_content.number, 42)
 
 
 class TestStoreContentList(TestCase):

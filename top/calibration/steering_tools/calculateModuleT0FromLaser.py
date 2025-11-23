@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -66,8 +65,8 @@ for iSlot in range(0, 16):
             0.055 +
             0.025 *
             0.025)
-    print('Slot ' + "%02d" % (iSlot + 1) + ':  constant = ' + "%+06.3f" % (round(moduleT0LaserConst, 3)) +
-          ' ns;  Error = ' + "%05.3f" % (round(moduleT0LaserErr, 3)) + ' ns')
+    print('Slot ' + f"{int(iSlot + 1):02}" + ':  constant = ' + f"{round(moduleT0LaserConst, 3):06.3f}" +
+          ' ns;  Error = ' + f"{round(moduleT0LaserErr, 3):05.3f}" + ' ns')
     outTree.Fill()
 print('                                                                  ')
 print('------------------------------------------------------------------')

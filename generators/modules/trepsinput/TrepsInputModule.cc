@@ -10,7 +10,6 @@
 #include <framework/geometry/B2Vector3.h>
 #include <string.h>
 #include <string>
-#include <boost/filesystem.hpp>
 #include <TFile.h>
 #include <TRandom.h>
 
@@ -27,7 +26,7 @@ REG_MODULE(TrepsInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-TrepsInputModule::TrepsInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
+TrepsInputModule::TrepsInputModule() : GeneratorBaseModule(), m_initial(BeamParameters::c_smearVertex)
 {
   // Set module properties
   setDescription("Input from TREPS generator (No-tag), Input from TREPS generator for ee->ee hadrons");
@@ -62,13 +61,13 @@ TrepsInputModule::TrepsInputModule() : Module(), m_initial(BeamParameters::c_sme
 
 }
 
-void TrepsInputModule::initialize()
+void TrepsInputModule::generatorInitialize()
 {
   m_initial.initialize();
   m_mcparticles.registerInDataStore();
 }
 
-void TrepsInputModule::event()
+void TrepsInputModule::generatorEvent()
 {
   /*
    * Check if the BeamParameters have changed (if they do, abort the job;

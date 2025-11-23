@@ -12,7 +12,7 @@
 # Create payload taking information from the RunDB.
 # Usage: basf2 DBBunchStructureImporter.py <minexp> <minrun> <maxexp> <maxrun>
 #
-# if minexp is 0 the designed filling patter will be created. Meaning 10101010...
+# if minexp is 0 the designed filling pattern will be created. Meaning 10101010...
 # if minexp is 1003 the early phase 3 pattern will be created. Take the most used filling pattern.
 
 
@@ -31,24 +31,24 @@ def getCollidingPatternFromFiles(herFilePath, lerFilePath):
     the second is 1.0000 or .0000 depending on whether the bunch is filled or not. The third column is extra.
     """
 
-    herFile = open(herFilePath, 'r')
+    herFile = open(herFilePath)
     herLines = herFile.readlines()
 
-    lerFile = open(lerFilePath, 'r')
+    lerFile = open(lerFilePath)
     lerLines = lerFile.readlines()
 
     pattern = []
 
     for lineHer, lineLer in zip(herLines, lerLines):
-        if(lineHer[0] == "#"):
+        if (lineHer[0] == "#"):
             continue
 
-        if(lineHer.split()[1] == '1.0000' and lineLer.split()[1] == '1.0000'):
+        if (lineHer.split()[1] == '1.0000' and lineLer.split()[1] == '1.0000'):
             pattern.append(1)
         else:
             pattern.append(0)
 
-    return(pattern)
+    return (pattern)
 
 
 def getCollidingPattern(herFPHex, lerFPHex):
@@ -73,7 +73,7 @@ def fill(fillPattern, firstExp, firstRun, lastExp, lastRun):
 
     if fillPattern != "":
         for num, bucket in enumerate(fillPattern):
-            if(bucket):
+            if (bucket):
                 bunches.setBucket(num)
 
     iov = Belle2.IntervalOfValidity(firstExp, firstRun, lastExp, lastRun)
@@ -132,10 +132,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if(args.minExp == 0):
+    if (args.minExp == 0):
         bunches = Belle2.BunchStructure()
 
-        if(args.patternFromFiles):
+        if (args.patternFromFiles):
             basf2.B2INFO("Using external files")
             pattern = getCollidingPatternFromFiles(args.patternFromFiles[0], args.patternFromFiles[1])
             fill(pattern, 0, 0, 0, -1)
@@ -145,7 +145,7 @@ if __name__ == "__main__":
             for b in range(0, 5120, 2):
 
                 # Shift of 1 bunch every 300 bunches to simulate bunch trains
-                if((b % 300 == 0) & (b != 0)):
+                if ((b % 300 == 0) & (b != 0)):
                     extraStep += 1
 
                 bunches.setBucket(b + extraStep)
@@ -155,9 +155,9 @@ if __name__ == "__main__":
             db = Belle2.Database.Instance()
             db.storeData("BunchStructure", bunches, iov)
 
-    elif(args.minExp == 1003):
+    elif (args.minExp == 1003):
 
-        if(args.patternFromFiles):
+        if (args.patternFromFiles):
             basf2.B2INFO("Using external files")
             pattern = getCollidingPatternFromFiles(args.patternFromFiles[0], args.patternFromFiles[1])
 
@@ -181,7 +181,7 @@ if __name__ == "__main__":
 
         fill(pattern, 1003, 0, 1003, -1)
 
-    elif(args.patternFromFiles):
+    elif (args.patternFromFiles):
         basf2.B2INFO("Using external files")
         pattern = getCollidingPatternFromFiles(args.patternFromFiles[0], args.patternFromFiles[1])
         fill(pattern, args.minExp, args.minRun, args.maxExp, args.maxRun)
@@ -220,7 +220,7 @@ if __name__ == "__main__":
         for it in runInfo:
             exprun = it['experiment'], it['run']
 
-            if(it['her']['fill_pattern'] == "" or it['ler']['fill_pattern'] == ""):
+            if (it['her']['fill_pattern'] == "" or it['ler']['fill_pattern'] == ""):
                 basf2.B2WARNING(f"Filling pattern for Exp {exprun[0]} Run {exprun[1]} is empty. \
                 Previous filling pattern will be used instead.")
                 continue
@@ -230,7 +230,7 @@ if __name__ == "__main__":
             # pattern different to previous one or first run
             if pattern != current_pattern:
 
-                if(args.dontFillGaps is False and current_start[0] is not None
+                if (args.dontFillGaps is False and current_start[0] is not None
                    and current_start[1] != lastEnd[1] + 1 and current_start[1] != lastEnd[1]):
                     fill("", lastEnd[0], lastEnd[1] + 1, current_start[0], current_start[1] - 1)
 
@@ -245,7 +245,7 @@ if __name__ == "__main__":
                 # Create dictionary keys using the filling pattern itself
                 keyFP = ''.join(str(i) for i in pattern)
 
-                if(keyFP in lumiDic):
+                if (keyFP in lumiDic):
                     lumiDic[keyFP]["lumi"] += it['statistics']['lumi_recorded']
 
                 else:
@@ -272,14 +272,14 @@ if __name__ == "__main__":
                 lumiDic[''.join(str(i) for i in current_pattern)]["lumi"] += it['statistics']['lumi_recorded']
 
         # close the last iov if any
-        if(args.dontFillGaps is False and current_start[0] is not None and current_start[1] != lastEnd[1] + 1):
+        if (args.dontFillGaps is False and current_start[0] is not None and current_start[1] != lastEnd[1] + 1):
             fill("", lastEnd[0], lastEnd[1] + 1, current_start[0], current_start[1] - 1)
 
         fill(current_pattern, *current_start, *current_end)
         basf2.B2INFO(f"Corresponding to {lumi/1000.:.2f} pb-1\n")
         lumiDic[''.join(str(i) for i in current_pattern)]["iovs"].append([*current_start, *current_end])
 
-        if(args.dontFillGaps is False and current_end[1] != maxrun):
+        if (args.dontFillGaps is False and current_end[1] != maxrun):
             fill("", current_end[0], current_end[1] + 1, maxexp, maxrun)
 
         # last open iov with default filling pattern

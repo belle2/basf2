@@ -108,7 +108,7 @@ ECLChargedPIDDataAnalysisModule::ECLChargedPIDDataAnalysisModule() :
   // Set module properties
   setDescription("This module produces an ntuple with ECL-related quantities starting from mdst");
   addParam("writeToRoot", m_writeToRoot,
-           "set true if you want to save the informations in a root file named by parameter 'rootFileName'",
+           "set true if you want to save the information in a root file named by parameter 'rootFileName'",
            bool(true));
   addParam("rootFileName", m_rootFileName,
            "fileName used for root file where info are saved. Will be ignored if parameter 'writeToRoot' is false (standard)",

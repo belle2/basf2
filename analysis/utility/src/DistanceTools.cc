@@ -22,19 +22,21 @@ ROOT::Math::XYZVector DistanceTools::poca(ROOT::Math::XYZVector const& trackPos,
   return trackPos + r.Dot(trackDir) * trackDir;
 }
 
-B2Vector3D DistanceTools::trackToVtxVec(B2Vector3D const& trackPos, B2Vector3D const& trackP, B2Vector3D const& vtxPos)
+ROOT::Math::XYZVector DistanceTools::trackToVtxVec(ROOT::Math::XYZVector const& trackPos, ROOT::Math::XYZVector const& trackP,
+                                                   ROOT::Math::XYZVector const& vtxPos)
 {
-  B2Vector3D trackDir(trackP.Unit());
-  B2Vector3D r(vtxPos - trackPos);
+  ROOT::Math::XYZVector trackDir(trackP.Unit());
+  ROOT::Math::XYZVector r(vtxPos - trackPos);
   return r - (r.Dot(trackDir)) * trackDir;
 }
 
-double DistanceTools::trackToVtxDist(B2Vector3D const& trackPos, B2Vector3D const& trackP, B2Vector3D const& vtxPos)
+double DistanceTools::trackToVtxDist(ROOT::Math::XYZVector const& trackPos, ROOT::Math::XYZVector const& trackP,
+                                     ROOT::Math::XYZVector const& vtxPos)
 {
-  return trackToVtxVec(trackPos, trackP, vtxPos).Mag();
+  return trackToVtxVec(trackPos, trackP, vtxPos).R();
 }
 
-TMatrixDSym DistanceTools::trackToVtxCovmat(B2Vector3D const& trackP,
+TMatrixDSym DistanceTools::trackToVtxCovmat(ROOT::Math::XYZVector const& trackP,
                                             TMatrixDSym const& trackPosCovMat, TMatrixDSym const& vtxPosCovMat)
 {
   if (trackPosCovMat.GetNcols() != 3 || vtxPosCovMat.GetNcols() != 3) {
@@ -43,16 +45,20 @@ TMatrixDSym DistanceTools::trackToVtxCovmat(B2Vector3D const& trackP,
   }
 
   TMatrixDSym rCovMat(trackPosCovMat + vtxPosCovMat);
-  B2Vector3D trackDir(trackP.Unit());
+  ROOT::Math::XYZVector trackDir(trackP.Unit());
   //d_j = r_j - v_j * v_k r_k
   //Jij = del_i d_j = delta_ij - v_i * v_j
   //Since the vector of closest approach is a linear function of r, its
   //propagation of errors is exact
   TMatrixDSym Jacobian(3);
   // Jacobian_ij = delta_ij -v(i)v(j)
-  for (int i(0); i < 3; ++i)
-    for (int j(0); j < 3; ++j)
-      Jacobian(i, j) = -trackDir(i) * trackDir(j);
+  for (int i(0); i < 3; ++i) {
+    for (int j(0); j < 3; ++j) {
+      double trackDir_i = (i == 0) ? trackDir.X() : (i == 1) ? trackDir.Y() : trackDir.Z();
+      double trackDir_j = (j == 0) ? trackDir.X() : (j == 1) ? trackDir.Y() : trackDir.Z();
+      Jacobian(i, j) = -trackDir_i * trackDir_j;
+    }
+  }
   for (int i(0); i < 3; ++i)
     Jacobian(i, i) += 1;
 
@@ -60,33 +66,38 @@ TMatrixDSym DistanceTools::trackToVtxCovmat(B2Vector3D const& trackP,
 
 }
 
-double DistanceTools::trackToVtxDistErr(B2Vector3D const& trackPos, B2Vector3D const& trackP, B2Vector3D const& vtxPos,
+double DistanceTools::trackToVtxDistErr(ROOT::Math::XYZVector const& trackPos, ROOT::Math::XYZVector const& trackP,
+                                        ROOT::Math::XYZVector const& vtxPos,
                                         TMatrixDSym const& trackPosCovMat, TMatrixDSym const& vtxPosCovMat)
 {
   TMatrixDSym covMat(trackToVtxCovmat(trackP, trackPosCovMat, vtxPosCovMat));
-  B2Vector3D dVec(trackToVtxVec(trackPos, trackP, vtxPos));
+  ROOT::Math::XYZVector dVec(trackToVtxVec(trackPos, trackP, vtxPos));
   // n is the normalise vector in the direction of the POCA between the track and the vtx
-  B2Vector3D n((1. / dVec.Mag()) * dVec);
+  ROOT::Math::XYZVector n((1. / dVec.R()) * dVec);
 
   double ret(0);
 
   //error on the distance computed as d^T * covMat * d
-  for (int i(0); i < 3; ++i)
-    for (int j(0); j < 3; ++j)
-      ret += n(i) * covMat(i, j) * n(j);
+  for (int i(0); i < 3; ++i) {
+    for (int j(0); j < 3; ++j) {
+      double n_i = (i == 0) ? n.X() : (i == 1) ? n.Y() : n.Z();
+      double n_j = (j == 0) ? n.X() : (j == 1) ? n.Y() : n.Z();
+      ret += n_i * covMat(i, j) * n_j;
+    }
+  }
 
   return TMath::Sqrt(ret);
 }
 
 
-B2Vector3D DistanceTools::vtxToVtxVec(B2Vector3D const& vtx1Pos, B2Vector3D const& vtx2Pos)
+ROOT::Math::XYZVector DistanceTools::vtxToVtxVec(ROOT::Math::XYZVector const& vtx1Pos, ROOT::Math::XYZVector const& vtx2Pos)
 {
   return vtx2Pos - vtx1Pos;
 }
 
-double DistanceTools::vtxToVtxDist(B2Vector3D const& vtx1Pos, B2Vector3D const& vtx2Pos)
+double DistanceTools::vtxToVtxDist(ROOT::Math::XYZVector const& vtx1Pos, ROOT::Math::XYZVector const& vtx2Pos)
 {
-  return vtxToVtxVec(vtx1Pos, vtx2Pos).Mag();
+  return vtxToVtxVec(vtx1Pos, vtx2Pos).R();
 }
 
 TMatrixDSym DistanceTools::vtxToVtxCovMat(TMatrixDSym const& vtx1CovMat, TMatrixDSym const& vtx2CovMat)
@@ -99,19 +110,23 @@ TMatrixDSym DistanceTools::vtxToVtxCovMat(TMatrixDSym const& vtx1CovMat, TMatrix
   return vtx1CovMat + vtx2CovMat;
 }
 
-double DistanceTools::vtxToVtxDistErr(B2Vector3D const& vtx1Pos, B2Vector3D const& vtx2Pos,
+double DistanceTools::vtxToVtxDistErr(ROOT::Math::XYZVector const& vtx1Pos, ROOT::Math::XYZVector const& vtx2Pos,
                                       TMatrixDSym const& vtx1CovMat, TMatrixDSym const& vtx2CovMat)
 {
   TMatrixDSym covMat(vtxToVtxCovMat(vtx1CovMat, vtx2CovMat));
-  B2Vector3D dVec(vtxToVtxVec(vtx1Pos, vtx2Pos));
-  B2Vector3D n((1. / dVec.Mag()) * dVec);
+  ROOT::Math::XYZVector dVec(vtxToVtxVec(vtx1Pos, vtx2Pos));
+  ROOT::Math::XYZVector n((1. / dVec.R()) * dVec);
 
   double ret(0);
 
   //error on the distance computed as d^T * covMat * d
-  for (int i(0); i < 3; ++i)
-    for (int j(0); j < 3; ++j)
-      ret += n(i) * covMat(i, j) * n(j);
+  for (int i(0); i < 3; ++i) {
+    for (int j(0); j < 3; ++j) {
+      double n_i = (i == 0) ? n.X() : (i == 1) ? n.Y() : n.Z();
+      double n_j = (j == 0) ? n.X() : (j == 1) ? n.Y() : n.Z();
+      ret += n_i * covMat(i, j) * n_j;
+    }
+  }
 
   return TMath::Sqrt(ret);
 }

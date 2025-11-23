@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 """
 <header>
@@ -11,14 +18,12 @@
 </header>
 """
 
-from vtx import get_upgrade_globaltag, get_upgrade_background_files, get_upgrade_background_mixer_files
+from vtx import get_upgrade_globaltag, get_upgrade_background_files
 from basf2 import set_random_seed, create_path, process, statistics, conditions
 from simulation import add_simulation
 from validation import statistics_plots, event_timing_plot
-from background import get_background_files
 
 set_random_seed(12345)
-
 
 # Need to use default global tag prepended with upgrade GT
 conditions.disable_globaltag_replay()

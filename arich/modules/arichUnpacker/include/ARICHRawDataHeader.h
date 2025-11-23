@@ -13,20 +13,29 @@
 
 namespace Belle2 {
 
-#define ARICHFEB_HEADER_SIZE 10 // FEB header size in bytes
-#define ARICHRAW_HEADER_SIZE 12 // Raw header size in bytes
+  /** FEB header size in bytes. */
+#define ARICHFEB_HEADER_SIZE 10
 
+  /** Raw header size in bytes. */
+#define ARICHRAW_HEADER_SIZE 12
+
+  /**
+   * ARICH raw-data header.
+   */
   struct ARICHRawHeader {
-    uint8_t type = 0;
-    uint8_t version = 0;
-    uint8_t mergerID = 0;
-    uint8_t FEBSlot = 0;
-    uint32_t length = 0;
-    uint32_t trigger = 0;
-    std::vector<bool> SEU_FEB = std::vector<bool>(6, false);
-    bool thscan_mode = false;
-    unsigned vth = 0;
+    uint8_t type = 0; /**< type */
+    uint8_t version = 0; /**< version */
+    uint8_t mergerID = 0; /**< merger-board identifier */
+    uint8_t FEBSlot = 0; /**< FEB slot */
+    uint32_t length = 0; /**< data length */
+    uint32_t trigger = 0; /**< trigger number */
+    std::vector<bool> SEU_FEB = std::vector<bool>(6, false);  /**< vector of SEU FEBs */
+    bool thscan_mode = false; /**< thscan mode */
+    unsigned vth = 0; /**< vth */
 
+    /**
+     * Print information about ARICHRawHeader.
+     */
     void print()
     {
       std::cout << "Type: " << unsigned(type) << " version: " <<  unsigned(version) << std::endl;

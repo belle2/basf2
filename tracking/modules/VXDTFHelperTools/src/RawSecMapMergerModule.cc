@@ -311,34 +311,6 @@ void RawSecMapMergerModule::printVXDTFFilters(const VXDTFFilters<SpacePoint>& fi
 }
 
 
-///// removed and replaced by a version that gets all sensor ids from the geometry
-///// TODO: remove
-//std::vector<VxdID> RawSecMapMergerModule::getCompatibleVxdIDs(const SectorMapConfig& config)
-//{
-//
-//  // TODO: remove that part and use the version in the bootstrap module
-//
-//  // TODO WARNING hardcoded values!
-//  std::vector<unsigned> layers  = { 0, 1, 2, 3, 4, 5, 6};
-//  std::vector<unsigned> ladders = { 0, 8, 12, 7, 10, 12, 16};
-//  std::vector<unsigned> sensors = { 0, 2, 2, 2, 3, 4, 5};
-//
-//  std::vector<VxdID> vxdIDs;
-//
-//  for (unsigned layerID : config.allowedLayers) {
-//    for (unsigned ladderID = 0; ladderID <= ladders.at(layerID); ladderID++) {
-//      if (ladderID == 0 and layerID != 0) continue; // only virtual IP (layer 0) has ladder 0
-//      for (unsigned sensorID = 0; sensorID <= sensors.at(layerID); sensorID++) {
-//        if (sensorID == 0 and layerID != 0) continue; // only virtual IP (layer 0) has sensor 0
-//        vxdIDs.push_back(VxdID(layerID, ladderID, sensorID));
-//      }
-//    }
-//  }
-//  return vxdIDs;
-//}
-
-
-
 template <class FilterType> unsigned RawSecMapMergerModule::updateFilterSubLayerIDs(SectorGraph<FilterType>& mainGraph,
     VXDTFFilters<SpacePoint>& segFilters)
 {
@@ -347,13 +319,13 @@ template <class FilterType> unsigned RawSecMapMergerModule::updateFilterSubLayer
   std::vector<VxdID> vxdIDs = VXD::GeoCache::getInstance().getListOfSensors();
 
 
-  // collect all secIDs occured in training and use them to update the sectors in the SectorID in the VXDTFFilter
+  // collect all secIDs occurred in training and use them to update the sectors in the SectorID in the VXDTFFilter
   // in particular the sublayerID which is determined from the graph
   for (VxdID sensor : vxdIDs) {
 
     std::vector< FullSecID> allTrainedSecIDsOfSensor = mainGraph.getAllFullSecIDsOfSensor(sensor);
 
-    // this removes all FullSecIDs which occured more than once
+    // this removes all FullSecIDs which occurred more than once
     std::sort(allTrainedSecIDsOfSensor.begin(), allTrainedSecIDsOfSensor.end());
     allTrainedSecIDsOfSensor.erase(
       std::unique(

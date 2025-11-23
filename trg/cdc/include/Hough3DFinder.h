@@ -30,7 +30,7 @@ namespace Belle2 {
   /// class of TRGCDCHough3DFinder
   class TRGCDCHough3DFinder {
   public:
-    /// Contructor.
+    /// Constructor.
     TRGCDCHough3DFinder(const TRGCDC&, bool makeRootFile, int finderMode);
     /// Destructor
     ~TRGCDCHough3DFinder();

@@ -11,6 +11,7 @@ import os
 import subprocess
 
 import basf2 as b2
+import beamparameters as bp
 import pdg
 
 
@@ -20,7 +21,7 @@ basf2_dir = os.environ.get('BELLE2_LOCAL_DIR', os.environ.get('BELLE2_RELEASE_DI
 # Generation parameters
 mg_steeringtemplate = f'{basf2_dir}/generators/madgraph/examples/run_darkphoton.steeringtemplate'
 mg_nevents = '1000'
-mg_beamenergy = '10.579558/2.'
+mg_beamenergy = str(bp.get_collisions_invariant_mass(experiment=0, run=0, verbose=True) / 2.)
 b2_seed = b2.get_random_seed().encode('utf-8')
 mg_seed = f'{int(hashlib.sha256(b2_seed).hexdigest(), 16) % 10**8}'
 
@@ -65,7 +66,7 @@ mydict = {
     'MGPARAMETER_gDM': mg_parameter_gDM,
     'MGPARAMETER_kappa': mg_parameter_kappa,
 }
-with open(mg_steeringtemplate, 'r') as template:
+with open(mg_steeringtemplate) as template:
     data = template.read()
     for (key, value) in mydict.items():
         data = data.replace(key, value)
@@ -88,7 +89,7 @@ main.add_module('LHEInput',
                 expNum=0,
                 runNum=0,
                 inputFileList=b2.find_file(f'{mg_output}/Events/run_01/unweighted_events.lhe'),
-                makeMaster=True,
+                createEventMetaData=True,
                 useWeights=False,
                 nInitialParticles=2,
                 nVirtualParticles=1,

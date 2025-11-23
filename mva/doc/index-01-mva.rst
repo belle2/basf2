@@ -17,7 +17,7 @@ Main goals
 
 The mva package was introduced to provide:
 
-- Tools to integrate mva methods in basf2
+- Tools to integrate mva methods in ``basf2``
 - Collection of examples for basic and advanced mva usages
 - Backend independent evaluation and validation tools
 
@@ -81,7 +81,7 @@ Supported frameworks/backends
 FastBDT
 ^^^^^^^
 
-is the default method used in basf2.
+is the default method used in ``basf2``.
 It provides a good out-of-the-box performance, is robust against over-fitting and fast in training and application.
 It only supports classification and there are only a few parameters and features, hence it has less pitfalls than other methods and as a starting point this is a good choice.
 
@@ -102,18 +102,15 @@ It is used in the Flavor Tagger and by the HLT people.
 NeuroBayes
 ^^^^^^^^^^
 
-was the default method in Belle I and widely used for a lot of analyses.
+was the default method in Belle and widely used for a lot of analyses.
 It provides a smart feature preprocessing, converges a lot faster and more robust than other neural network implementations.
 In addition, it provides an analysis-pdf output which describes the importance of each feature.
-However, NeuroBayes is a commercial product and is no longer supported by the company, only some minimal legacy support is available, no bug fixes, new features, ... Use it for comparison with Belle I results.
+However, NeuroBayes is a commercial product and is no longer supported by the company, only some minimal legacy support is available, no bug fixes, new features, ... Use it for comparison with Belle results.
 
 Python-based
 ^^^^^^^^^^^^
 
-All frameworks which provide a python interface are supported e.g. XGBoost, SKLearn, Tensorflow, Theano.
-However, only TensorFlow and Theano are installed by default, the others you can only use in your local installation by installing them using pip3.
-It is possible to include these other methods in the externals as well i.e. to ship them with basf2, but you will have to give a good justification for this.
-In general, these options mainly provide a playground to test new technologies e.g. deep-learning frameworks like Tensorflow and Theano.
+All frameworks which provide a python interface are supported. XGBoost, LightGBM, SKLearn, Tensorflow, Keras and PyTorch are included in the externals and mva methods using these frameworks can be trained and applied without additional setup. For details on which version of these packages and which related packages (e.g. PyTorch Geometric) are available please refer to the documentation of the externals. It is possible to use alternate python-based frameworks locally by installing them using pip3. Mva methods which use a framework that is not included in the externals cannot be used on the grid. It is possible to include these other frameworks in the externals as well i.e. to ship them with ``basf2``, but you will have to give a good justification for this.
 
 Using the mva package
 ---------------------
@@ -211,14 +208,13 @@ You can create the necessary data files to execute the examples (if you have som
     :func: get_argument_parser
     :prog: basf2_mva_merge_mc
     :nodefault:
-    :nogroupsections:
 
 
 Inference / How to apply a trained mva method onto data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Depending on your use-case there are different possibilities.
-Most often you want to apply the training online (inside basf2) like it is done by the FEI or the FlavourTagger: You can use the MVAExpert module if your training is based on Particle objects of the analysis package:
+Most often you want to apply the training online (inside ``basf2``) like it is done by the FEI or the FlavourTagger: You can use the MVAExpert module if your training is based on Particle objects of the analysis package:
 
 .. code-block:: python
 
@@ -227,7 +223,7 @@ Most often you want to apply the training online (inside basf2) like it is done 
                     extraInfoName='Test',
                     identifier='DatabaseIdentifier')
 
-If you use the mva method in another context (like tracking), you have to write your own C++ or Python module to apply the training, because the MVA package cannot know how to extract the necessary features from the basf2 DataStore (in the above case based on Particle objects the VariableManager can be used for this task).
+If you use the mva method in another context (like tracking), you have to write your own C++ or Python module to apply the training, because the MVA package cannot know how to extract the necessary features from the ``basf2`` DataStore (in the above case based on Particle objects the VariableManager can be used for this task).
 
 It is recommended to look at the MVAPrototype Module code to learn how to correctly implement the usage of an mva classifier.
 This module can be directly be used as a template for your own classifier.
@@ -262,7 +258,6 @@ You can create a zip file with a LaTeX report and evaluation plots using the ``b
     :func: get_argument_parser
     :prog: basf2_mva_evaluate
     :nodefault:
-    :nogroupsections:
 
 
 The LaTeX file can be compiled directly to PDF by passing the ``-c`` command line argument.
@@ -318,10 +313,14 @@ There are different sub-directories:
 - ``mva/examples/orthogonal_discriminators`` – create orthongonal discriminators with ugBoost or adversary networks
 - ``mva/examples/<backend>`` – backend specific examples e.g. for tmva and tensorflow
 
+For an example on how to apply these multivariate methods within a physics analysis context, the 
+:sphinx:`Continuum Suppression using Boosted Decision Trees <online_book/basf2/cs.html#continuum-suppression-using-boosted-decision-trees>` 
+walkthrough is a particularly helpful resource. 
+
 Contributions
 -------------
 
-The `MVA/ML subgroup <https://confluence.desy.de/pages/viewpage.action?pageId=104035532>`_ is the place to go for getting involved in MVA-related projects.
+The `MVA/ML subgroup <https://xwiki.desy.de/xwiki/rest/p/ab2a9>`_ is the place to go for getting involved in MVA-related projects.
 If you want to contribute your are welcome to do so by creating a merge request or initiating your own project.
 
 You can add examples if you have interesting applications of MVA, or you can add plots to the ``basf2_mva_evaluation.py`` script.
@@ -346,7 +345,7 @@ During the inference-phase:
 
 the user-defined Python file is loaded into the Python interpreter and the serialized object is passed to load returning the state-object, which represents the statistical model of the method in memory;
 the state-object and a dataset is passed to apply returning the response of the statistical model, usually either the signal-probability (classification) or an estimated value (regression).
-It should also be noted, that your full steering file you pass to the Python backend of the mva package will be included in the weightfile, and injected into the basf2 python environment during the creation of the MVA::Expert. So if you rely on external classes or functions you can include them in your file.
+It should also be noted, that your full steering file you pass to the Python backend of the mva package will be included in the weightfile, and injected into the ``basf2`` python environment during the creation of the MVA::Expert. So if you rely on external classes or functions you can include them in your file.
 
 
 

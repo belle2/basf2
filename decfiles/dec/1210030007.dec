@@ -1,0 +1,24 @@
+# EventType: 1210030007
+# Descriptor: [B+ -> pi+ p+ anti-p]
+# NickName: b_to_pippbar
+# Cuts: None
+# Documentation: B+ -> pi+ p+ anti-p- decay
+# PhysicsWG: BtoCharmless
+# Tested: Yes
+# Responsible: Kristina Gudkova
+# Email: k.s.gudkova@inp.nsk.su
+# Date: 20240627
+
+Decay Upsilon(4S)
+0.5	  B-sig B+                VSS;
+0.5       B+sig B-                VSS;
+Enddecay
+
+Decay B-sig
+1.        pi- p+ anti-p-          PHOTOS PHSP;
+Enddecay
+
+CDecay B+sig
+
+End
+

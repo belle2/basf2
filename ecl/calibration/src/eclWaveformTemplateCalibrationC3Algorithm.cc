@@ -15,11 +15,10 @@
 
 /* ROOT headers. */
 #include <TFile.h>
-#include <TGraph.h>
 #include <TTree.h>
-#include <TF1.h>
 
-#include <stdlib.h>
+/* C++ headers. */
+#include <cstdlib>
 
 using namespace std;
 using namespace Belle2;

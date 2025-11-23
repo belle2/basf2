@@ -29,12 +29,22 @@ namespace Belle2 {
     /**
      * Initialize the Module.
      */
-    void initialize() override final;
+    void initialize(void) override final;
 
     /**
      * Event action.
      */
-    void event() override final;
+    void event(void) override final;
+
+    /**
+     * End run action.
+     */
+    void beginRun(void) override final;
+
+    /**
+     * End run action.
+     */
+    void endRun(void) override final;
 
   protected:
 

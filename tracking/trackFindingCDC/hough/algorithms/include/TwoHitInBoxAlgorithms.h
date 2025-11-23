@@ -21,7 +21,7 @@ namespace Belle2 {
     template<class AHitInBoxAlgorithm, class AnotherHitInBoxAlgorithm>
     class TwoHitInBoxAlgorithm {
     public:
-      /// The type of the underlaying HoughBox (copied from the first underlying hit algorithm)
+      /// The type of the underlying HoughBox (copied from the first underlying hit algorithm)
       using HoughBox = typename AHitInBoxAlgorithm::HoughBox;
 
       /**

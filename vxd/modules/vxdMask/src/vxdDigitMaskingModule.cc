@@ -43,7 +43,7 @@ REG_MODULE(vxdDigitMasking);
 vxdDigitMaskingModule::vxdDigitMaskingModule() : HistoModule()
 {
   //Set module properties
-  setDescription("vxdDigitMasking of pixels and strips in PXD and SVD base on their fireing");
+  setDescription("vxdDigitMasking of pixels and strips in PXD and SVD base on their firing");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
@@ -88,10 +88,10 @@ void vxdDigitMaskingModule::defineHisto()
     return;
   }
   if (gTools->getNumberOfPXDLayers() == 0) {
-    B2WARNING("Missing geometry for PXD, PXD-masking is skiped.");
+    B2WARNING("Missing geometry for PXD, PXD-masking is skipped.");
   }
   if (gTools->getNumberOfSVDLayers() == 0) {
-    B2WARNING("Missing geometry for SVD, SVD-masking is skiped.");
+    B2WARNING("Missing geometry for SVD, SVD-masking is skipped.");
   }
 
   // Create a separate histogram directories and cd into it.
@@ -112,7 +112,7 @@ void vxdDigitMaskingModule::defineHisto()
       int iLadder = id.getLadderNumber();
       int iSensor = id.getSensorNumber();
       VxdID sensorID(iLayer, iLadder, iSensor);
-      PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
 
       int nPixelsU = SensorInfo.getUCells();
@@ -152,7 +152,7 @@ void vxdDigitMaskingModule::defineHisto()
       int iLadder = id.getLadderNumber();
       int iSensor = id.getSensorNumber();
       VxdID sensorID(iLayer, iLadder, iSensor);
-      SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
 
       int nStripsU = SensorInfo.getUCells();
@@ -335,7 +335,7 @@ void vxdDigitMaskingModule::endRun()
   float SVDUCut = m_SVDuCut;
   float SVDVCut = m_SVDvCut;
 
-  // correction for unmerged events and different No. of proces events:
+  // correction for unmerged events and different No. of process events:
   PXDCut *= m_nEventsProcessFraction * m_nEventsProcess / 1000.0;
   SVDUCut *= m_nEventsProcessFraction * m_nEventsProcess / 1000.0;
   SVDVCut *= m_nEventsProcessFraction * m_nEventsProcess / 1000.0;

@@ -23,7 +23,7 @@ namespace Belle2 {
     //! The Hitted TC id
     int m_tcid;
 
-    //! The Total Timing of hitted TC
+    //! The Total Timing of hit TC
     int m_time;
 
     //! The Timing of TRG Timing
@@ -35,7 +35,7 @@ namespace Belle2 {
     //! The revo clk of FAM
     int m_revo_fam;
 
-    //! The Energy of hitted TC
+    //! The Energy of hit TC
     int m_energy;
 
     //! The checksum flag

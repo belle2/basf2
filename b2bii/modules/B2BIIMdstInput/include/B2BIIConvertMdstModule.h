@@ -37,6 +37,7 @@
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
+#include <mdst/dbobjects/CollisionAxisCMS.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
@@ -142,6 +143,8 @@ namespace Belle2 {
 
     //! C matching mode.
     MCMatchingMode m_mcMatchingMode;
+
+    bool m_evtgenProcessing; /**< Flag to switch on only evtgen processing */
 
     bool m_convertEvtcls; /**< Flag to switch on conversion of Evtcls table */
 
@@ -413,6 +416,10 @@ namespace Belle2 {
     /** CollisionInvariantMass for Invariant Mass of Beam*/
     OptionalDBObjPtr<CollisionInvariantMass> m_collisionInvMDB;
     CollisionInvariantMass m_collisionInvM; /**< CollisionInvariantMass for the invariant mass of the beam */
+
+    /** CollisionAxisCMS */
+    OptionalDBObjPtr<CollisionAxisCMS> m_collisionAxisCMSDB;
+    CollisionAxisCMS m_collisionAxisCMS; /**< CollisionAxisCMS of the beam */
 
     /** CONVERSION OF TRACK ERROR MATRIX ELEMENTS */
     /** Belle error matrix elements are in the following order

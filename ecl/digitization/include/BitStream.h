@@ -19,14 +19,14 @@ namespace Belle2::ECL {
   class BitStream {
   public:
     /** Default constructor for ROOT.
-     *  Current position is at begining of the storage.
+     *  Current position is at beginning of the storage.
      */
     BitStream(): m_pos(0), m_store(1, 0) {}
 
     /** Constructor with the reserved and cleared storage prepared for
      *  incoming bits. Be sure the size is enough for incoming data
      *  since the class does not check bounds.  Current position is at
-     *  begining of the storage.
+     *  beginning of the storage.
      */
     explicit BitStream(int n): m_pos(0), m_store(n, 0) {}
 

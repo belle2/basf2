@@ -16,12 +16,7 @@
 #include <framework/gearbox/Const.h>
 #include <cmath>
 
-#include <fstream>
 #include <string>
-
-// ROOT
-#include <TH1.h>
-#include <TH2.h>
 
 int eventNum = 0;
 
@@ -126,7 +121,7 @@ void QcsmonitorStudyModule::initialize()
 
   REG_HISTOGRAM
 
-  //get QCSMONITORS paramters ie energy threshold
+  //get QCSMONITORS parameters ie energy threshold
   getXMLData();
 }
 

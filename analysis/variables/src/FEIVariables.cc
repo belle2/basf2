@@ -15,12 +15,9 @@
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
 #include <map>
-#include <cmath>
 #include <algorithm>
 #include <iterator>
-#include <limits>
 
 namespace Belle2 {
   namespace Variable {

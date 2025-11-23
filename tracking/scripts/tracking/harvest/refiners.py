@@ -31,7 +31,7 @@ def get_logger():
 formatter = TolerateMissingKeyFormatter()
 
 
-class Refiner(object):
+class Refiner:
     """Python module to refine a peeled dictionary"""
 
     def __init__(self, refiner_function=None):
@@ -105,7 +105,7 @@ class SaveFiguresOfMeritRefiner(Refiner):
                  ):
         """Constructor for this refiner"""
 
-        super(SaveFiguresOfMeritRefiner, self).__init__()
+        super().__init__()
 
         #: cached name of the figure of merit
         self.name = name
@@ -206,7 +206,7 @@ class SaveHistogramsRefiner(Refiner):
                  fit_z_score=None):
         """Constructor for this refiner"""
 
-        super(SaveHistogramsRefiner, self).__init__()
+        super().__init__()
 
         #: cached user-defined name for this histogram
         self.name = name
@@ -826,7 +826,7 @@ class SaveTreeRefiner(Refiner):
                  name=None,
                  title=None):
         """Constructor for this refiner"""
-        super(SaveTreeRefiner, self).__init__()
+        super().__init__()
 
         #: cached name for this TTree
         self.name = name
@@ -868,7 +868,7 @@ class SaveTreeRefiner(Refiner):
         """Add a TBranch to the TTree"""
         input_value = np.zeros(1, dtype=float)
 
-        branch_type_spec = '%s/D' % part_name
+        branch_type_spec = f'{part_name}/D'
         tbranch = output_ttree.Branch(part_name, input_value, branch_type_spec)
 
         if output_ttree.GetNbranches() == 1:
@@ -989,7 +989,7 @@ class GroupByRefiner(Refiner):
                 part_name = groupby_spec
                 groupby_parts = crops[part_name]
                 unique_values, index_of_values = np.unique(groupby_parts, return_inverse=True)
-                groupby_values = [" = {value}]".format(value=value) for value in unique_values]
+                groupby_values = [f" = {value}]" for value in unique_values]
 
             elif isinstance(groupby_spec, tuple):
                 part_name = groupby_spec[0]
@@ -1003,22 +1003,21 @@ class GroupByRefiner(Refiner):
                     digitization_cuts.append(np.inf)
                 index_of_values = np.digitize(groupby_parts, digitization_cuts, right=True)
 
-                groupby_values = ["below {upper_bound}".format(upper_bound=digitization_cuts[0])]
+                groupby_values = [f"below {digitization_cuts[0]}"]
                 bin_bounds = list(zip(digitization_cuts[0:], digitization_cuts[1:]))
                 for lower_bound, upper_bound in bin_bounds:
                     if lower_bound == upper_bound:
                         # degenerated bin case
-                        groupby_values.append("= {lower_bound}".format(lower_bound=lower_bound))
+                        groupby_values.append(f"= {lower_bound}")
                     elif upper_bound == np.inf:
-                        groupby_values.append("above {lower_bound}".format(lower_bound=lower_bound))
+                        groupby_values.append(f"above {lower_bound}")
                     else:
-                        groupby_values.append("between {lower_bound} and {upper_bound}".format(lower_bound=lower_bound,
-                                                                                               upper_bound=upper_bound))
+                        groupby_values.append(f"between {lower_bound} and {upper_bound}")
                 groupby_values.append("is nan")
                 assert len(groupby_values) == len(digitization_cuts) + 1
 
             else:
-                raise ValueError("Unknown groupby specification %s" % groupby_spec)
+                raise ValueError(f"Unknown groupby specification {groupby_spec}")
 
             # Exclude the groupby variable if desired
             selected_crops = select_crop_parts(crops, exclude=part_name if self.exclude_by else None)
@@ -1284,7 +1283,7 @@ def select_crop_parts(crops, select=None, exclude=None):
     if isinstance(exclude, str):
         exclude = [exclude, ]
 
-    if isinstance(crops, collections.MutableMapping):
+    if isinstance(crops, collections.abc.MutableMapping):
         part_names = list(crops.keys())
 
         if not select and not exclude:
@@ -1295,7 +1294,7 @@ def select_crop_parts(crops, select=None, exclude=None):
 
             # if the selection item is a callable function do not count it as not selectable yet
             select_not_in_part_names = [name for name in select
-                                        if not isinstance(name, collections.Callable) and name not in part_names]
+                                        if not isinstance(name, collections.abc.Callable) and name not in part_names]
             if select_not_in_part_names:
                 get_logger().warning("Cannot select %s, because they are not in crop part names %s",
                                      select_not_in_part_names, sorted(part_names))
@@ -1314,10 +1313,10 @@ def select_crop_parts(crops, select=None, exclude=None):
         for part_name in set(excluded_part_names):
             del selected_crops[part_name]
 
-        if isinstance(select, collections.Mapping):
+        if isinstance(select, collections.abc.Mapping):
             # select is a rename mapping
             for part_name, new_part_name in list(select.items()):
-                if isinstance(part_name, collections.Callable):
+                if isinstance(part_name, collections.abc.Callable):
                     selected_crops[new_part_name] = part_name(**crops)
                 elif part_name in selected_crops:
                     parts = selected_crops[part_name]
@@ -1327,7 +1326,7 @@ def select_crop_parts(crops, select=None, exclude=None):
         return selected_crops
 
     else:
-        raise ValueError("Unrecognised crop %s of type %s" % (crops, type(crops)))
+        raise ValueError(f"Unrecognised crop {crops} of type {type(crops)}")
 
 
 def filter_crops(crops, filter_function, part_name=None):
@@ -1340,7 +1339,7 @@ def filter_crops(crops, filter_function, part_name=None):
     if isinstance(crops, np.ndarray):
         return crops[filter_indices]
 
-    elif isinstance(crops, collections.MutableMapping):
+    elif isinstance(crops, collections.abc.MutableMapping):
         # Make a shallow copy
         filtered_crops = copy.copy(crops)
         for part_name, parts in list(crops.items()):
@@ -1348,7 +1347,7 @@ def filter_crops(crops, filter_function, part_name=None):
         return filtered_crops
 
     else:
-        raise ValueError("Unrecognised crop %s of type %s" % (crops, type(crops)))
+        raise ValueError(f"Unrecognised crop {crops} of type {type(crops)}")
 
 
 def iter_items_sorted_for_key(crops):

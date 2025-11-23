@@ -11,7 +11,7 @@
 """
 <header>
   <output>../TreeFitted_B0ToJPsiKs.root</output>
-  <contact>Yo Sato; yosato@post.kek.jp</contact>
+  <contact>Frank Meier; frank.meier@duke.edu</contact>
   <interval>nightly</interval>
 </header>
 """

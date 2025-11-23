@@ -37,11 +37,11 @@ namespace Belle2 {
      *@param ffR21 HQET form factor parameter R_2(1) obtained by D*lnu decay data.
      *@param AS1 a parameter to take into account the theoretical error of the scalar form factor for Dtaunu decay.
      *@param AR3 a parameter to take into account the theoretical error of the scalar form factor for D*taunu decay.
-     *@param CV1 Wilson coeffcient of the left handed vector type NP contribution.
-     *@param CV2 Wilson coeffcient of the right handed vector type NP contribution.
-     *@param CS1 Wilson coeffcient of the scalar (S+P) type NP contribution.
-     *@param CS2 Wilson coeffcient of the scalar (S-P) type NP contribution.
-     *@param CT  Wilson coeffcient of the tensor type NP contribution.
+     *@param CV1 Wilson coefficient of the left handed vector type NP contribution.
+     *@param CV2 Wilson coefficient of the right handed vector type NP contribution.
+     *@param CS1 Wilson coefficient of the scalar (S+P) type NP contribution.
+     *@param CS2 Wilson coefficient of the scalar (S-P) type NP contribution.
+     *@param CT  Wilson coefficient of the tensor type NP contribution.
      *@param parentMass mass of the parent (B) meson.
      *@param DMass mass of the scalar type daughter (D) meson.
      *@param DstarMass mass of the vector type daughter (D*) meson.
@@ -72,11 +72,11 @@ namespace Belle2 {
   public:
 
     /** The function calculates helicity amplitudes with given Wilson coefficients.
-     *@param CV1 Wilson coeffcient of the left handed vector type NP contribution.
-     *@param CV2 Wilson coeffcient of the right handed vector type NP contribution.
-     *@param CS1 Wilson coeffcient of the scalar (S+P) type NP contribution.
-     *@param CS2 Wilson coeffcient of the scalar (S-P) type NP contribution.
-     *@param CT  Wilson coeffcient of the tensor type NP contribution.
+     *@param CV1 Wilson coefficient of the left handed vector type NP contribution.
+     *@param CV2 Wilson coefficient of the right handed vector type NP contribution.
+     *@param CS1 Wilson coefficient of the scalar (S+P) type NP contribution.
+     *@param CS2 Wilson coefficient of the scalar (S-P) type NP contribution.
+     *@param CT  Wilson coefficient of the tensor type NP contribution.
      *@param mtau  daughter lepton mass.
      *@param tauhel helicity of the lepton in the (l+nu) rest frame {+1,-1}.
      *@param Dhel   helicity of the D(*) meson in the rest frame of the parent meson {+1,0,-1} for D* and 2 for D.
@@ -165,7 +165,7 @@ namespace Belle2 {
      *@param w      velocity transfer variable.
      *@param costau    cosine of the angle between D(*) meson and the lepton in the (l+nu) rest frame.
      * Overall factor GF/sqrt(2) Vcb omitted.
-     * Wilson coefficients CXX ommited.
+     * Wilson coefficients CXX omitted.
      */
     double helampSM(double mtau, int tauhel, int Dhel, double w, double costau) const; // SM
 
@@ -177,7 +177,7 @@ namespace Belle2 {
      *@param costau    cosine of the angle between D(*) meson and the lepton in the (l+nu) rest frame.
      *@return calculated amplitude value.
      * Overall factor GF/sqrt(2) Vcb omitted.
-     * Wilson coefficients CXX ommited.
+     * Wilson coefficients CXX omitted.
      */
     double helampV1(double mtau, int tauhel, int Dhel, double w, double costau) const; // V-A
 
@@ -189,7 +189,7 @@ namespace Belle2 {
      *@param costau    cosine of the angle between D(*) meson and the lepton in the (l+nu) rest frame.
      *@return calculated amplitude value.
      * Overall factor GF/sqrt(2) Vcb omitted.
-     * Wilson coefficients CXX ommited.
+     * Wilson coefficients CXX omitted.
      */
     double helampV2(double mtau, int tauhel, int Dhel, double w, double costau) const; // V+A
 
@@ -201,7 +201,7 @@ namespace Belle2 {
      *@param costau    cosine of the angle between D(*) meson and the lepton in the (l+nu) rest frame.
      *@return calculated amplitude value.
      * Overall factor GF/sqrt(2) Vcb omitted.
-     * Wilson coefficients CXX ommited.
+     * Wilson coefficients CXX omitted.
      */
     double helampS1(double mtau, int tauhel, int Dhel, double w, double costau) const; // S+P
 
@@ -213,7 +213,7 @@ namespace Belle2 {
      *@param costau    cosine of the angle between D(*) meson and the lepton in the (l+nu) rest frame.
      *@return calculated amplitude value.
      * Overall factor GF/sqrt(2) Vcb omitted.
-     * Wilson coefficients CXX ommited.
+     * Wilson coefficients CXX omitted.
      */
     double helampS2(double mtau, int tauhel, int Dhel, double w, double costau) const; // S-P
 
@@ -225,7 +225,7 @@ namespace Belle2 {
      *@param costau    cosine of the angle between D(*) meson and the lepton in the (l+nu) rest frame.
      *@return calculated amplitude value.
      * Overall factor GF/sqrt(2) Vcb omitted.
-     * Wilson coefficients CXX ommited.
+     * Wilson coefficients CXX omitted.
      */
     double helampT(double mtau, int tauhel, int Dhel, double w, double costau) const;  // Tensor
 
@@ -398,20 +398,20 @@ namespace Belle2 {
 
     /** Minimum value of the q^2.
      *@param mtau daughter lepton mass.
-     *@return calcualted q^2 minimum.
+     *@return calculated q^2 minimum.
      */
     double q2min(double mtau) const {return mtau * mtau;}
 
     /** Maximum value of the q^2.
      *@param Dhel helicity of the D(*) meson in the rest frame of the parent meson {+1,0,-1} for D* and 2 for D.
-     *@return calcualted q^2 maximum.
+     *@return calculated q^2 maximum.
      */
     double q2max(int Dhel) const {return (m_mB - mD(Dhel)) * (m_mB - mD(Dhel));}
 
     /** Calculate the velocity transfer variable w.
      *@param Dhel helicity of the D(*) meson in the rest frame of the parent meson {+1,0,-1} for D* and 2 for D.
      *@param q2   q^2 of the decay (square of l+nu invariant mass).
-     *@return calcualted w.
+     *@return calculated w.
      */
     double wfunc(int Dhel, double q2) const {return (1. + r(Dhel) * r(Dhel) - q2 / m_mB / m_mB) / 2. / r(Dhel);}
 
@@ -462,19 +462,19 @@ namespace Belle2 {
     /** Returns the charm quark mass */
     double getMCharm() const {return m_mCharm;}
 
-    /** Returns the Wilson coeffcient CV1.   */
+    /** Returns the Wilson coefficient CV1.   */
     EvtComplex getCV1() const {return m_CV1;}
 
-    /** Returns the Wilson coeffcient CV2.   */
+    /** Returns the Wilson coefficient CV2.   */
     EvtComplex getCV2() const {return m_CV2;}
 
-    /** Returns the Wilson coeffcient CS1.   */
+    /** Returns the Wilson coefficient CS1.   */
     EvtComplex getCS1() const {return m_CS1;}
 
-    /** Returns the Wilson coeffcient CS2.   */
+    /** Returns the Wilson coefficient CS2.   */
     EvtComplex getCS2() const {return m_CS2;}
 
-    /** Returns the Wilson coeffcient CT.   */
+    /** Returns the Wilson coefficient CT.   */
     EvtComplex getCT() const {return m_CT;}
 
     /** Sets the form factor parameter rho_1^2.   */
@@ -510,19 +510,19 @@ namespace Belle2 {
     /** Returns the charm quark mass */
     void setMCharm(double m) {m_mCharm = m;}
 
-    /** Sets the Wilson coeffcient CV1.   */
+    /** Sets the Wilson coefficient CV1.   */
     void setCV1(const EvtComplex& v) {m_CV1 = v;}
 
-    /** Sets the Wilson coeffcient CV2.   */
+    /** Sets the Wilson coefficient CV2.   */
     void setCV2(const EvtComplex& v) {m_CV2 = v;}
 
-    /** Sets the Wilson coeffcient CS1.   */
+    /** Sets the Wilson coefficient CS1.   */
     void setCS1(const EvtComplex& v) {m_CS1 = v;}
 
-    /** Sets the Wilson coeffcient CS2.   */
+    /** Sets the Wilson coefficient CS2.   */
     void setCS2(const EvtComplex& v) {m_CS2 = v;}
 
-    /** Sets the Wilson coeffcient CT.   */
+    /** Sets the Wilson coefficient CT.   */
     void setCT(const EvtComplex& v) {m_CT = v;}
 
   private:
@@ -545,10 +545,10 @@ namespace Belle2 {
     /** Form factor parameter R_2(1).   */
     double m_ffR21;
 
-    /** 1/mQ correcion factor a_S1.   */
+    /** 1/mQ correction factor a_S1.   */
     double m_aS1;
 
-    /** 1/mQ correcion factor a_R3.   */
+    /** 1/mQ correction factor a_R3.   */
     double m_aR3;
 
     /** parent (B) meson mass.   */

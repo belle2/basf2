@@ -140,7 +140,7 @@ bool RCCallback::perform(NSMCommunicator& com)
         std::string runtype = (msg.getLength() > 0 ? msg.getData() : "");
         if (runtype.size() == 0) {
           get("runtype", runtype);
-        } else if (runtype.size() > 0) {
+        } else {
           set("runtype", runtype);
         }
         get(m_obj);
@@ -245,8 +245,8 @@ void RCCallback::dump(bool isstart)
   obj.print();
   std::string table = m_table + "record";
   if (getDB()) {
-    DBInterface& db(*getDB());
     try {
+      DBInterface& db(*getDB());
       DBObjectLoader::createDB(db, table, obj);
     } catch (const IOException& e) {
       throw (DBHandlerException("Failed to connect to database error : %s ", e.what()));

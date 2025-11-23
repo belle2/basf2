@@ -6,23 +6,34 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef CLUSTERIZEND_H
-#define CLUSTERIZEND_H
+#pragma once
 
 #include <cmath>
-
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
-  struct clusterer_params  {
+  struct clustererParams  {
     /** minimum weight for a cluster cell */
-    unsigned short minweight      =    24;
+    unsigned short minWeight      =    24;
     /** minimum number of neighbours for a cluster core cell */
-    unsigned short minpts         =    1;
+    unsigned char minPts         =    1;
     /** Consider diagonal adjacent cells as neighbors */
     bool diagonal                 =    true;
+    /** Cut on the total weight of all cells in the 3d volume */
+    unsigned short minTotalWeight  =    450;
+    /** Cut on the peak cell weight */
+    unsigned short minPeakWeight   =    32;
+    /** Number of iterations of the cluster searching for each Hough space */
+    unsigned char iterations      =    5;
+    /** Number of deleted cells in omega in each direction of the maximum */
+    unsigned char omegaTrim                =    5;
+    /** Number of deleted cells in phi in each direction of the maximum */
+    unsigned char phiTrim                  =    4;
+    /** Number of deleted cells in theta in each direction of the maximum */
+    unsigned char thetaTrim                =    4;
     /** Ordering of track parameters and position of cyclic variable (phi) */
-    std::vector<bool> var_cyclic = {false, true, false};
-    std::vector<std::string> var_labels = {"omega", "phi", "theta"};
+    std::vector<bool> varCyclic = {false, true, false};
+    std::vector<std::string> varLabels = {"omega", "phi", "theta"};
   };
 
 
@@ -44,8 +55,8 @@ namespace Belle2 {
     void initClCellsNew()
     {
       unsigned short init_ClSize = 0;
-      unsigned short default_value = 0;
-      cell_index cell(m_dim, default_value);
+      unsigned short defaultValue = 0;
+      cell_index cell(m_dim, defaultValue);
       std::vector<cell_index> C(init_ClSize, cell);
       m_C = C;
     }
@@ -60,34 +71,34 @@ namespace Belle2 {
       return m_C;
     }
     /** Add a track-space cell to the cluster */
-    void append(cell_index next_entry)
+    void append(cell_index nextEntry)
     {
-      m_C.push_back(next_entry);
+      m_C.push_back(nextEntry);
     }
     /** Relate a hit to the cluster */
-    void add_hit(unsigned short hit, unsigned short weight, unsigned short orient)
+    void addHit(unsigned short hit, unsigned short weight, unsigned short orient)
     {
       m_hits.push_back(hit);
       m_hitWeights.push_back(weight);
       m_orientSum += orient; /** orient == 1: axial, orient == 0: stereo */
     }
     /** Get number related axial hits */
-    unsigned long get_naxial()
+    unsigned long getNAxial()
     {
       return m_orientSum;
     }
     /** Get number related stereo hits */
-    unsigned long get_nstereo()
+    unsigned long getNStereo()
     {
       return m_hits.size() - m_orientSum;
     }
     /** Get ids of related hits (indices of the TS StoreArray) */
-    std::vector<unsigned short> get_hits()
+    std::vector<unsigned short> getHits()
     {
       return m_hits;
     }
     /** Get weight contribution of each related hit to the cluster */
-    std::vector<unsigned short> get_weights()
+    std::vector<unsigned short> getWeights()
     {
       return m_hitWeights;
     }
@@ -113,31 +124,31 @@ namespace Belle2 {
     {
     }
     virtual ~Clusterizend() {}
-    explicit Clusterizend(const clusterer_params& params): m_params(params)
+    explicit Clusterizend(const clustererParams& params): m_params(params)
     {
     }
 
-    clusterer_params getParams()
+    clustererParams getParams()
     {
       return m_params;
     }
 
     void setPlaneShape(std::vector<ushort> planeShape)
     {
-      m_dimsize = planeShape.size();
+      m_dimSize = planeShape.size();
       m_planeShape = planeShape;
-      m_valmax = std::vector<ushort>(m_planeShape);
-      for (ushort idim = 0; idim < m_dimsize; idim++) {
-        m_valmax[idim] -= 1;
+      m_valMax = std::vector<ushort>(m_planeShape);
+      for (ushort idim = 0; idim < m_dimSize; idim++) {
+        m_valMax[idim] -= 1;
       }
-      m_valmax.push_back(1);
+      m_valMax.push_back(1);
 
     }
     /** Next event initialization:
      * set a new hough space for clustering and track finding */
-    void setNewPlane(c3array& houghmap_plain)
+    void setNewPlane(c3array& houghmapPlain)
     {
-      m_houghVals = &houghmap_plain;
+      m_houghVals = &houghmapPlain;
       m_houghVisit = c3array(m_c3shape);
     }
 
@@ -145,11 +156,11 @@ namespace Belle2 {
 
     /** Get neighboring cells before and after a cell in track space
      * before and after is defined along the track parameter axes given by dim. */
-    bool has_before(cell_index entry, ushort dim);
+    bool hasBefore(cell_index entry, ushort dim);
 
     cell_index before(cell_index entry, ushort dim);
 
-    bool has_after(cell_index entry, ushort dim);
+    bool hasAfter(cell_index entry, ushort dim);
 
     cell_index after(cell_index entry, ushort dim);
 
@@ -163,6 +174,15 @@ namespace Belle2 {
 
     std::vector<cell_index> getCandidates();
 
+    std::pair<cell_index, unsigned long> getGlobalMax();
+
+    void deleteMax(cell_index maxIndex);
+
+    std::vector<SimpleCluster> makeClusters();
+
+    std::pair<SimpleCluster, unsigned long> createCluster(cell_index maxIndex);
+
+    unsigned long checkSurroundings(cell_index maxIndex);
 
     template<class T>
     std::string printVector(std::vector<T> vecX)
@@ -185,14 +205,12 @@ namespace Belle2 {
     }
     /** Clusterizend */
   private:
-    clusterer_params m_params;
+    clustererParams m_params;
     std::vector<ushort> m_planeShape;
-    std::vector<ushort> m_valmax;
-    ushort m_dimsize;
+    std::vector<ushort> m_valMax;
+    ushort m_dimSize;
     boost::array<c3index, 3> m_c3shape =  {{ 40, 384, 9 }};
     c3array* m_houghVals{0};
     c3array m_houghVisit = c3array(m_c3shape);
   };
 }
-
-#endif

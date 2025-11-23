@@ -42,7 +42,7 @@ class CheckEventNumbers(basf2.Module):
         for evtNr in all_numbers:
             c = seen.count(evtNr)
             if not (evtNr in should and c == 1):
-                basf2.B2ERROR("event number %d seen %d times" % (evtNr, c))
+                basf2.B2ERROR(f"event number {evtNr} seen {c} times")
                 all_ok = False
         if not all_ok:
             basf2.B2FATAL("Missing/extra events")
@@ -64,7 +64,7 @@ main.add_module("RootOutput", outputFileName='parallel_processing_test.root')
 main.add_module("Progress")
 main.add_module(CheckEventNumbers(5))
 
-# test wether flags are what we expect
+# test whether flags are what we expect
 if particlegun.has_properties(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
     basf2.B2FATAL("ParticleGun has pp flag?")
 if not simulation.has_properties(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
@@ -82,7 +82,7 @@ with clean_working_directory():
     # +1 because of extra call to master module
     assert basf2.statistics.get_global().calls(basf2.statistics.EVENT) == 6
 
-    # check wether output file contains correct number of events
+    # check whether output file contains correct number of events
     file = TFile('parallel_processing_test.root')
     tree = file.Get('tree')
     if tree.GetEntries() != 5:

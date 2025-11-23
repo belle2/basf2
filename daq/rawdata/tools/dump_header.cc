@@ -35,7 +35,7 @@ int main()
 {
   vector<unsigned int> buf(400000);
   int infn = fileno(stdin);
-  printf("infn = %u\n", infn);
+  printf("infn = %d\n", infn);
 
   int nrec = 0;
   for (;;) {
@@ -51,7 +51,7 @@ int main()
     int run = (buf[ POS_EXP_RUN_NUM ] & RUNNO_MASK) >> RUNNO_SHIFT;
     int evt = buf[ POS_EVE_NUM ];
 
-    printf("Nrec:%d ; Nw:%d ; Exp:%d, Run:%d, Evt:%d\n",
+    printf("Nrec:%d ; Nw:%u ; Exp:%d, Run:%d, Evt:%d\n",
            nrec, buf[0], exp, run, evt);
     nrec++;
   }

@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
+#include <tracking/dbobjects/DAFConfiguration.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -46,6 +47,10 @@ than a given distance.)DOC");
            "Only tracks with an absolute value of d0 below (exclusive) this parameter (cm) are considered", m_maximumAbsD0);
   addParam("MaximumAbsZ0", m_maximumAbsZ0,
            "Only tracks with an absolute value of z0 below (exclusive) this parameter (cm) are considered", m_maximumAbsZ0);
+  addParam("trackFitType", m_trackFitType,
+           "Type of track fit algorithm to use the corresponding DAFParameter, the list is defined in DAFConfiguration class.",
+           m_trackFitType);
+
 }
 
 
@@ -69,7 +74,7 @@ void ReattachCDCWireHitsToRecoTracksModule::event()
 void ReattachCDCWireHitsToRecoTracksModule::findHits()
 {
 
-  TrackFitter trackFitter;
+  TrackFitter trackFitter((DAFConfiguration::ETrackFitType)m_trackFitType);
 
   for (RecoTrack& recoTrack : m_inputRecoTracks) {
     // only fit tracks coming from the IP (d0 and z0 from Helix)
@@ -195,8 +200,8 @@ void ReattachCDCWireHitsToRecoTracksModule::addHits()
                     << "ADC of the background hit: " << hitToAdd.getHit()->getADCCount() << std::endl
                     << "TOT of the background hit: " << hitToAdd.getHit()->getTOT() << std::endl
                     << "Distance from track to hit: " << results.distanceToTrack << std::endl
-                    << "Previous arc lenght of the hit: " << previousArcLength[&hitToAdd] << std::endl
-                    << "Current arc lenght of the hit: " << currentArcLength[&hitToAdd] << std::endl);
+                    << "Previous arc length of the hit: " << previousArcLength[&hitToAdd] << std::endl
+                    << "Current arc length of the hit: " << currentArcLength[&hitToAdd] << std::endl);
 
             if ((previousArcLength[&hitToAdd] > 0) and (currentArcLength[&hitToAdd] < 0)) { // Hit needs to be added here.
 

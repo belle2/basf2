@@ -31,8 +31,8 @@ namespace Belle2 {
     static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
 
-      B2Vector3<double> outerVector(outerHit.X() - centerHit.X(), outerHit.Y() - centerHit.Y(), outerHit.Z() - centerHit.Z());
-      B2Vector3<double> innerVector(centerHit.X() - innerHit.X(), centerHit.Y() - innerHit.Y(), centerHit.Z() - innerHit.Z());
+      B2Vector3D outerVector(outerHit.X() - centerHit.X(), outerHit.Y() - centerHit.Y(), outerHit.Z() - centerHit.Z());
+      B2Vector3D innerVector(centerHit.X() - innerHit.X(), centerHit.Y() - innerHit.Y(), centerHit.Z() - innerHit.Z());
 
       // fullCalc would be acos(m_vecAB.Dot(m_vecBC) / m_vecAB.Mag()*m_vecBC.Mag()), but here time-consuming parts have been neglected
       double result = outerVector.Dot(innerVector) / (outerVector.Mag2() * innerVector.Mag2());

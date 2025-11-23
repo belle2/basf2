@@ -1167,7 +1167,7 @@ class Generator(nn.Module):
         **kwargs
     ):
         super(Generator, self).__init__()
-        #: Channel width mulitplier
+        #: Channel width multiplier
         self.ch = G_ch
         #: Number of resblocks per stage
         self.G_depth = G_depth

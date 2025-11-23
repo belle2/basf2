@@ -34,7 +34,7 @@ if arguments.belle1:
         basf2.find_file('analysis/mdstBelle1_exp65_charged.root', 'validation'),
         path=analysis_path)
 else:
-    ma.inputMdst(filename=basf2.find_file("mdst14.root", "validation"),
+    ma.inputMdst(filename=basf2.find_file("mdst16.root", "validation"),
                  path=analysis_path)
 
 # Reconstruction of photons.

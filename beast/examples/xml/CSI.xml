@@ -227,7 +227,7 @@
 	<CrystalInSlot id="3">3</CrystalInSlot>
       </Enclosure>
 
-      <!-- This enclosure was not intalled -->
+      <!-- This enclosure was not installed -->
       <!--
       <Enclosure id="4">
      
@@ -320,7 +320,7 @@
       </Enclosure>
 
 
-      <!-- This enclosure was not intalled -->
+      <!-- This enclosure was not installed -->
       <!--
       <Enclosure id="8">
         <PosZ unit="cm">-116.6897</PosZ>

@@ -1,4 +1,4 @@
-# EventType: 3310028000.dec
+# EventType: 3310028000
 # Descriptor: e+ e- -> [phi [-> K+ K-] eta [-> gamma gamma]]
 # NickName: ee_phietaISR
 # Documentation: to be used with add_phokhara_evtgen_combination()

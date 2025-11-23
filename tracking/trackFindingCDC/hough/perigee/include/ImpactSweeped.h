@@ -26,7 +26,7 @@ namespace Belle2 {
       using T::T;
 
     public:
-      /// The box to which this object correspondes.
+      /// The box to which this object corresponds.
       using HoughBox = SweepBox<AImpact, typename T::HoughBox>;
 
       /// The hough box without the sweep in d0

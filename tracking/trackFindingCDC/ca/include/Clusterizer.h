@@ -21,13 +21,13 @@ namespace Belle2 {
 
     /**
      *  Implementation of the clustering
-     *  Clusters elements of a given collection using the relations presented by a neighorhood.
+     *  Clusters elements of a given collection using the relations presented by a neighborhood.
      *  A cluster is essentially a connected subset of all cells
      *  that can reach each other by one more relations in a neighborhood.
      *  The algorithm is essentially an iterative expansion of the neighborhood relations keeping
      *  track of the already used cells by using the CellState of the AutomatonCell.
      *
-     *  * ACellHolder must therefore provide an AutomatonCell accessable by a getAutomatonCell() method.
+     *  * ACellHolder must therefore provide an AutomatonCell accessible by a getAutomatonCell() method.
      *    In case the objects you what to cluster do not contain an automaton cell already you may adopt it
      *    by using the WithAutomatonCell mixin.
      *  * ACluster can be anything that is default constructable and supports .insert(end(), ACellHolder*).
@@ -39,7 +39,7 @@ namespace Belle2 {
     public:
       /**
        *  Creates the clusters.
-       *  Repeatly expands a neighborhood of referenced objects that have an AutomatonCell.
+       *  Repeatedly expands a neighborhood of referenced objects that have an AutomatonCell.
        *  The CellState after the clusterization is the index of the generated cluster.
        *  The CellWeight is set to the total number of neighbors of each cell.
        *
@@ -85,14 +85,14 @@ namespace Belle2 {
       }
 
     private:
-      /// Helper function. Starting a new cluster and iterativelly expands it.
+      /// Helper function. Starting a new cluster and iteratively expands it.
       void expandCluster(std::vector<WeightedRelation<ACellHolder>> const& cellHolderRelations,
                          std::vector<ACellHolder*>& cluster) const
       {
         ACellHolder* seedCellHolder = cluster.front();
         int iCluster = getCellState(seedCellHolder);
 
-        // Grow the cluster iterativelly
+        // Grow the cluster iteratively
         std::vector<ACellHolder*> checkNow;
         std::vector<ACellHolder*> checkNext;
 

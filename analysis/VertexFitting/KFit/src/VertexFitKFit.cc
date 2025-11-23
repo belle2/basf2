@@ -11,11 +11,13 @@
 #include <algorithm>
 #include <cstdio>
 
+#include <TMath.h>
 #include <TMatrixFSym.h>
 
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 #include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
+#include <analysis/utility/ROOTToCLHEP.h>
 #include <framework/gearbox/Const.h>
 
 using namespace std;
@@ -53,9 +55,9 @@ VertexFitKFit::setInitialVertex(const HepPoint3D& v) {
   return m_ErrorCode = KFitError::kNoError;
 }
 
-enum KFitError::ECode VertexFitKFit::setInitialVertex(const B2Vector3D& v)
+enum KFitError::ECode VertexFitKFit::setInitialVertex(const ROOT::Math::XYZVector& v)
 {
-  m_BeforeVertex = HepPoint3D(v.X(), v.Y(), v.Z());
+  m_BeforeVertex = ROOTToCLHEP::getPoint3D(v);
   m_ErrorCode = KFitError::kNoError;
   return m_ErrorCode;
 }
@@ -511,7 +513,7 @@ VertexFitKFit::doFit4() {
   m_V_al_1 = m_V_al_0 - m_V_al_0 * (m_D.T()) * m_V_Dt * m_D * m_V_al_0;
   m_Cov_v_al_1 = -m_BeamError * (m_E.T()) * m_V_Dt * m_D * m_V_al_0;
   // m_V_v is m_V_E
-  // --> need to replace m_V_E for my implimentaion.
+  // --> need to replace m_V_E for my implementation.
   m_V_E = m_BeamError - m_BeamError * (m_E.T()) * m_V_Dt * m_E * m_BeamError;
 
   if (prepareOutputMatrix() != KFitError::kNoError) return m_ErrorCode;

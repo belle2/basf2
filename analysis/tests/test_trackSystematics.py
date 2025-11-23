@@ -17,7 +17,7 @@ path = b2.create_path()
 b2test_utils.configure_logging_for_tests()
 b2.set_random_seed("1103")
 
-ma.inputMdstList(filelist=[b2test_utils.require_file("mdst14.root", "validation")],
+ma.inputMdstList(filelist=[b2test_utils.require_file("mdst16.root", "validation")],
                  entrySequences=["0:5"],
                  path=path)
 

@@ -75,7 +75,7 @@ def get_argument_parser():
                         help="Maximum mass for all particles to print")
     parser.add_argument("--include-width", type=float, default=0, metavar="N",
                         help="When searching for particles by mass this argument "
-                        "can be given to include all particles which fullfill the "
+                        "can be given to include all particles which fulfill the "
                         "mass search within (mass +- N*width)")
     parser.add_argument("--regex", action="store_true", default=False,
                         help="If given the name will be interpreted as a python "
@@ -111,10 +111,10 @@ if __name__ == "__main__":
     for p in particles:
         if args.pdg and not p.PdgCode() in args.pdg:
             continue
-        outputlist.append([p.PdgCode(), p.GetName(), "%7.5g" % p.Mass(), p.Width(), "%.6g" % p.Lifetime(),
-                           "%.2f" % (p.Charge()/3.), "%.1f" % (p.Spin())])
+        outputlist.append([p.PdgCode(), p.GetName(), f"{p.Mass():7.5g}", p.Width(), f"{p.Lifetime():.6g}",
+                           f"{p.Charge() / 3.0:.2f}", f"{p.Spin():.1f}"])
 
-    # Align float columns. For colum 0 we have ints so don't append .0
+    # Align float columns. For column 0 we have ints so don't append .0
     for column in [0, 2, 3, 4, 5]:
         _align_dots(outputlist, column, column != 0)
 

@@ -19,7 +19,7 @@ namespace {
     B2DEBUG(30, "Closing ROOT file");
     if (file->IsOpen()) {
       file->Close();
-      Belle2::MetadataService::Instance().addRootNtupleFile(file->GetName());
+      Belle2::MetadataService::Instance().addNtuple(file->GetName());
     }
     delete file;
   }

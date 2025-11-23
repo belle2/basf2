@@ -12,7 +12,7 @@
 #include <generators/koralw/KoralW.h>
 
 /* Basf2 headers. */
-#include <framework/core/Module.h>
+#include <generators/modules/GeneratorBaseModule.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
@@ -25,7 +25,7 @@ namespace Belle2 {
    * The KoralW Generator module.
    * Generates four fermion final state events using the KoralW FORTRAN generator.
    */
-  class KoralWInputModule : public Module {
+  class KoralWInputModule : public GeneratorBaseModule {
 
   public:
 
@@ -39,10 +39,10 @@ namespace Belle2 {
     virtual ~KoralWInputModule();
 
     /** Initializes the module. */
-    void initialize() override;
+    void generatorInitialize() override;
 
     /** Method is called for each event. */
-    void event() override;
+    void generatorEvent() override;
 
     /** Method is called at the end of the event processing. */
     void terminate() override;

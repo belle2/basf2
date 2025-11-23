@@ -101,8 +101,22 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            false);
   addParam("ADC_cut_threshold",
            m_adccut,
-           "Threshold for the adc cut.  Default: -1",
+           "Threshold for the adc cut for all wires used for TSF.  Default: -1",
            -1);
+  addParam("SaveADC",
+           m_saveadc,
+           "Flag to save ADC for other trg module or not, Default: false",
+           false);
+  addParam("ADCflag_low",
+           m_adcflag_low,
+           "Assign ADC based flag for full hit tracker. Lower threshold of ADC.",
+           10);
+  addParam("ADCflag_high",
+           m_adcflag_high,
+           "Assign ADC based flag for full hit tracker. Higher threshold of ADC.",
+           10000);
+  addParam("useDB", m_useDB,
+           "Switch to use database to load run dependent parameters. ", true);
 }
 
 void
@@ -119,6 +133,7 @@ CDCTriggerTSFModule::initialize()
   }
   if (m_makeRecoLRTable) {
     m_recoTracks.isRequired("RecoTracks");
+    m_cdcHits.isRequired();
     innerRecoLRTable.assign(pow(2, 16), vector<unsigned>(5, 0));
     outerRecoLRTable.assign(pow(2, 12), vector<unsigned>(5, 0));
   }
@@ -345,6 +360,19 @@ CDCTriggerTSFModule::beginRun()
       }
     }
   }
+
+  if (m_useDB) {
+    if (not m_cdctrgtsf_DB.isValid()) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      B2FATAL("No database for CDCTRG TSF parameter. exp " << evtMetaData->getExperiment() << " run "
+              << evtMetaData->getRun());
+    } else {
+      m_adcflag = m_cdctrgtsf_DB->getuseADC();
+      m_adccut = m_cdctrgtsf_DB->getADC_threshold();
+      m_adcflag_low = m_cdctrgtsf_DB->getADC_threshold();
+      m_crosstalk_tdcfilter = m_cdctrgtsf_DB->getuseTDCfilter();
+    }
+  }
 }
 
 void
@@ -376,7 +404,7 @@ CDCTriggerTSFModule::event()
         id_ncdchit_asic[boardid][asicid].push_back(i);
       }
     }
-    //check 16ns time coinsidence if >=4 hits are found in the same asic
+    //check 16ns time coincidence if >=4 hits are found in the same asic
     for (int i = 0; i < 500; i++) {
       for (int j = 0; j < 6; j++) {
         if (ncdchit_asic[i][j] >= 4) {
@@ -418,6 +446,8 @@ CDCTriggerTSFModule::event()
     }
     // skim crosstalk hit
     if (filtered_hit[i] == 1)continue;
+    // select fixed timing window
+    if (h.getTDCCount() < 4450 || h.getTDCCount() > 4950)continue;
 
     // remove hits with low ADC
     if (m_adcflag) {
@@ -436,6 +466,10 @@ CDCTriggerTSFModule::event()
     TRGSignal signal = rise & fall;
     w.addSignal(signal);
 
+    if (h.getADCCount() > m_adcflag_low && h.getADCCount() < m_adcflag_high) {
+      w.addSignal_adc(signal);
+    }
+
     if (w.hit()) continue;
     // make a trigger wire hit (needed for relations)
     // all unneeded variables are set to 0 (TODO: remove them completely?)
@@ -446,7 +480,7 @@ CDCTriggerTSFModule::event()
 
 
 
-  // neibor supression
+  // neighbor suppression
   unsigned neibor_hit[10][1000] = {};
   for (unsigned isl = 0; isl < tsLayers.size(); ++isl) {
     for (unsigned its = 0; its < tsLayers[isl]->nCells(); ++its) {
@@ -474,11 +508,25 @@ CDCTriggerTSFModule::event()
       // TODO: move it to simulate also for simulateWithoutClock?
       if (!m_clockSimulation && s.signal().active()) {
 
-        //neibor supression
+        //neighbor suppression
         if (s.priorityPosition() != 3 && (neibor_hit[isl][(its - 1) % tsLayers[isl]->nCells()] == 1
                                           || neibor_hit[isl][(its + 1) % tsLayers[isl]->nCells()] == 1))continue;
 
         const CDCHit* priorityHit = m_cdcHits[s.priority().hit()->iCDCHit()];
+
+        /* generate ADC Pattern for NN*/
+        std::vector<float> fullADC = {};
+        if (m_saveadc) {
+          int nwires = (isl == 0) ? 15 : 11;
+          for (int iwire = 0; iwire < nwires; iwire++) {
+            if (!s[iwire] || !(s[iwire]->hit())) { //Make sure the wire do exist
+              fullADC.push_back(-1);
+              continue;
+            }
+            const CDCHit* cdchit0 = m_cdcHits[s[iwire]->hit()->iCDCHit()];
+            fullADC.push_back(cdchit0->getADCCount());
+          }
+        }
         const CDCTriggerSegmentHit* tsHit =
           m_segmentHits.appendNew(*priorityHit,
                                   s.id(),
@@ -486,7 +534,12 @@ CDCTriggerTSFModule::event()
                                   s.LUT()->getValue(s.lutPattern()),
                                   s.priorityTime(),
                                   s.fastestTime(),
-                                  s.foundTime());
+                                  s.foundTime(),
+                                  -1,
+                                  s.hitPatternTime(),
+                                  s.hitPattern(),
+                                  fullADC,
+                                  s.hitPattern_adc());
         unsigned short adcSum = 0;
         // relation to all CDCHits in segment
         for (unsigned iw = 0; iw < s.wires().size(); ++iw) {
@@ -537,7 +590,7 @@ CDCTriggerTSFModule::event()
 
         if (m_makeRecoLRTable) {
           // for the recotable, we have no simhits and w can have more than one recotrack per event
-          // so wee need to loop over them:
+          // so we need to loop over them:
           unsigned lrflag = 2; // see explanation below
           for (int ireco = 0; ireco < m_recoTracks.getEntries(); ++ireco) {
             //        std::cout << "recotrack " << ireco << " of " << m_recoTracks.getEntries());
@@ -547,7 +600,7 @@ CDCTriggerTSFModule::event()
             // in the recotrack. now we can loop over them and compare them with the id from the priorityhit:
             // /
             // Before looping over the recotracks, we set the rl information to 'bkg hit'. Then, we loop over all
-            // recotracks and determine if there is a relation and wether it passed left or right. If this is set for
+            // recotracks and determine if there is a relation and whether it passed left or right. If this is set for
             // one recotrack, we set the rl information to the corresponding value. if it is set for another recotrack,
             // we will also use this information for the recolrtable and set the corresponding value again.
             // Just in the case, where after the loop over all recotracks it wasn't related to any of them, we will set
@@ -557,8 +610,8 @@ CDCTriggerTSFModule::event()
             for (unsigned iHit = 0; iHit < cdcHits.size(); ++iHit) {
 //std::cout << "now looping over cdchits... " << iHit << "/" << cdcHits.size() << std::endl;
               if (tsHit->getID() == cdcHits[iHit]->getID()) {
-                // check, wether recotrack is already related to ts, skip in this case.
-                // this is necessary because sometimes two wires are related to the same ts // dont get it, should be uneccessary
+                // check, whether recotrack is already related to ts, skip in this case.
+                // this is necessary because sometimes two wires are related to the same ts // dont get it, should be unnecessary
                 if (related == false) related = true;
                 else continue;
 //              std::cout << "ts " << tsHit->getID() << " :  creating relation to recotrack " << ireco;

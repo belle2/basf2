@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -39,7 +38,7 @@ class SaveModuleT0(b2.Module):
         #: payload
         self.db = Belle2.PyDBObj('TOPCalModuleT0')
 
-        file_name = 'moduleT0_DB-' + 'e' + '{:0=4d}'.format(expNo) + '-r' + '{:0=5d}'.format(runNo) + '.root'
+        file_name = 'moduleT0_DB-' + 'e' + f'{expNo:04d}' + '-r' + f'{runNo:05d}' + '.root'
         #: output file name
         self.file = TFile.Open(file_name, 'recreate')
         #: histogram

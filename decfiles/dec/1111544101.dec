@@ -1,11 +1,11 @@
 # EventType: 1111544101
 # Descriptor: [B0 -> psi(2S) [-> e+ e-] pi0 [-> gamma gamma] pi0 [-> gamma gamma] K_S0 [-> pi+ pi-]]
-# NickName: Bu_psi2spipiKS_ee
+# NickName: Bu_psi2spi0pi0KS_ee
 # Documentation: B -> charmonium decays.
 # Tested: Yes
-# PhysicsWG: Charmonium
+# PhysicsWG: Quarkonium
 # Responsible: Kirill Chilikin
-# Email: chilikin@lebedev.ru
+# Email: K.A.Chilikin@inp.nsk.su
 # Cuts: None
 # Date: 20220601
 #

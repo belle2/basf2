@@ -7,7 +7,7 @@
 
          Following data is defined to Geant4 coordinates (z axis = Belle Solenoid), not for GxGy coordinates.
 
-         Therefore we do not need to rotate all beamline gemetry.   
+         Therefore we do not need to rotate all beamline geometry.   
 
           For example:
 
@@ -2795,10 +2795,10 @@
          <sec name="X0" unit="m">1.67</sec>
          <sec name="Y0" unit="m">1.28</sec>
          <sec name="Z0" unit="m">-15.22</sec>
-         <sec name="holeW" unit="m">5.45</sec>
-         <sec name="holeH" unit="m">5.5</sec>
+         <sec name="holeW" unit="m">5.8</sec>
+         <sec name="holeH" unit="m">5.47</sec>
 	 <sec name="holeL" unit="m">2</sec>
-         <sec name="holeDX" unit="m">-1.42</sec>
+         <sec name="holeDX" unit="m">-1.445</sec>
          <sec name="holeDY" unit="m">-1.415</sec>
          <sec name="holeDZ" unit="m">0</sec>
          <sec name="PHI" unit="rad">-0.0085</sec>
@@ -2812,10 +2812,10 @@
          <sec name="X0" unit="m">1.39</sec>
          <sec name="Y0" unit="m">1.28</sec>
          <sec name="Z0" unit="m">16.79</sec>
-         <sec name="holeW" unit="m">5.45</sec>
-         <sec name="holeH" unit="m">5.5</sec>
+         <sec name="holeW" unit="m">5.8</sec>
+         <sec name="holeH" unit="m">5.47</sec>
          <sec name="holeL" unit="m">2</sec>
-         <sec name="holeDX" unit="m">-1.44</sec>
+         <sec name="holeDX" unit="m">-1.445</sec>
          <sec name="holeDY" unit="m">-1.415</sec>
          <sec name="holeDZ" unit="m">0</sec>
          <sec name="PHI" unit="rad">-0.0085</sec>

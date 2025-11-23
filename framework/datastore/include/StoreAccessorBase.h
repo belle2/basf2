@@ -151,7 +151,7 @@ namespace Belle2 {
     bool notWrittenOut() const;
 
 
-    /** Convert this acessor into a readable string (for messages).
+    /** Convert this accessor into a readable string (for messages).
      *
      * e.g. "object EventMetaData (durability: event)"
      */

@@ -36,7 +36,7 @@ namespace Belle2 {
     {}
 
   private:
-    ClassDef(SVDSimHit, 3)
+    ClassDef(SVDSimHit, 4)
   };
 } // end namespace Belle2
 

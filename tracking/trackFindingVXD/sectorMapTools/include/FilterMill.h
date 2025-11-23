@@ -48,7 +48,7 @@ namespace Belle2 {
     std::vector<std::pair<std::string, FourHitFunction> > m_4Hitfilters;
 
 
-    /** Simple saveguard for not changin any filters after preparing phase. */
+    /** Simple safeguard for not changing any filters after preparing phase. */
     bool m_locked = false;
 
 

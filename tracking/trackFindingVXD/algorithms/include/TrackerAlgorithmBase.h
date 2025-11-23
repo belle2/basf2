@@ -30,7 +30,7 @@ namespace Belle2 {
     /// allows to set some condition for validating the algorithm
     virtual void setValidator(ValidatorType& aValidator) { m_validator = aValidator; }
 
-    /// applies actual algorithm on parameter passed, returns some debuging results
+    /// applies actual algorithm on parameter passed, returns some debugging results
     virtual int apply(ContainerType&) { return 0; }
 
     /// searches for seeds among the entries of parameter passed (bool sets strictnes for finding seeds),

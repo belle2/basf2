@@ -103,7 +103,7 @@ void ECLDigitizerPureCsIModule::beginRun()
 
 void ECLDigitizerPureCsIModule::event()
 {
-  /* add trigger resolution defined in a module paramer
+  /* add trigger resolution defined in a module parameter
      shifting the waveform starting time by a random deltaT,
      assuming that t0=0 adc channel is determined by the trigger */
   double deltaT = m_sigmaTrigger == 0 ? 0 : gRandom->Gaus(0, m_sigmaTrigger);

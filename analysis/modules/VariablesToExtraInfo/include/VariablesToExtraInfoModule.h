@@ -24,7 +24,6 @@
 #include <vector>
 
 namespace Belle2 {
-  class Particle;
 
   /**
    *  For each particle in the input list the selected variables are saved in an extra-info field with the given name,

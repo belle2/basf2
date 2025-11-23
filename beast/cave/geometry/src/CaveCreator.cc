@@ -13,10 +13,6 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
-
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
 
@@ -25,7 +21,6 @@
 #include <G4UserLimits.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -56,7 +51,6 @@ namespace Belle2 {
       G4int Z;
 
       G4String name, symbol;
-      G4double fractionmass;
 
       A = 1.01 * CLHEP::g / CLHEP::mole;
       G4Element* elH  = new G4Element(name = "Hydrogen", symbol = "H", Z = 1, A);
@@ -90,16 +84,16 @@ namespace Belle2 {
 
       density = 2.03 * CLHEP::g / CLHEP::cm3;
       G4Material* Concrete = new G4Material("Concrete", density, 10);
-      Concrete->AddElement(elH, fractionmass = 0.01);
-      Concrete->AddElement(elO, fractionmass = 0.529);
-      Concrete->AddElement(elNa, fractionmass = 0.016);
-      Concrete->AddElement(elHg, fractionmass = 0.002);
-      Concrete->AddElement(elAl, fractionmass = 0.034);
-      Concrete->AddElement(elSi, fractionmass = 0.337);
-      Concrete->AddElement(elK, fractionmass = 0.013);
-      Concrete->AddElement(elCa, fractionmass = 0.044);
-      Concrete->AddElement(elFe, fractionmass = 0.014);
-      Concrete->AddElement(elC, fractionmass = 0.001);
+      Concrete->AddElementByMassFraction(elH, 0.01);
+      Concrete->AddElementByMassFraction(elO, 0.529);
+      Concrete->AddElementByMassFraction(elNa, 0.016);
+      Concrete->AddElementByMassFraction(elHg, 0.002);
+      Concrete->AddElementByMassFraction(elAl, 0.034);
+      Concrete->AddElementByMassFraction(elSi, 0.337);
+      Concrete->AddElementByMassFraction(elK, 0.013);
+      Concrete->AddElementByMassFraction(elCa, 0.044);
+      Concrete->AddElementByMassFraction(elFe, 0.014);
+      Concrete->AddElementByMassFraction(elC, 0.001);
 
 
       //lets get the stepsize parameter with a default value of 5 µm
@@ -109,12 +103,12 @@ namespace Belle2 {
       //values will be automatically converted
       vector<double> bar = content.getArray("bar");
       B2INFO("Contents of bar: ");
-      BOOST_FOREACH(double value, bar) {
+      for (double value : bar) {
         B2INFO("value: " << value);
       }
       int detID = 0;
       //Lets loop over all the Active nodes
-      BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+      for (const GearDir& activeParams : content.getNodes("Active")) {
 
         //create cave volume
         G4Box* s_CAVE = new G4Box("s_CAVE",

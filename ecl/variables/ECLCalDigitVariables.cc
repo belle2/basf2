@@ -16,7 +16,6 @@
 /* Basf2 headers. */
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
-#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/geometry/B2Vector3.h>

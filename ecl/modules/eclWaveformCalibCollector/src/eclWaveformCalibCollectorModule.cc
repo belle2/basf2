@@ -15,9 +15,8 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
 /* Basf2 headers. */
-#include <framework/gearbox/Const.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationVector.h>
+#include <framework/database/DBObjPtr.h>
 
 /* ROOT headers. */
 #include <TTree.h>

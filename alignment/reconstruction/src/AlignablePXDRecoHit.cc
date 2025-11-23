@@ -35,7 +35,7 @@ std::pair<std::vector<int>, TMatrixD> AlignablePXDRecoHit::globalDerivatives(con
     globals.add(lorentz);
   }
 
-  const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(getSensorID()));
+  const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(getSensorID()));
 
   // Legendre parametrization of deformation
   auto L1 = [](double x) {return x;};

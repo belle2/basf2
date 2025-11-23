@@ -82,7 +82,7 @@ namespace Belle2 {
     int t_region = 0; /**< region of photon 0=forward 1=barrel 2=backward*/
     int t_thetaBin = -1; /**< binned location in theta relative to crystal edge */
     int t_phiBin =
-      -1; /**< binned location in phi relative to crystal edge. Starts from edge with mechnical structure, or else lower edge */
+      -1; /**< binned location in phi relative to crystal edge. Starts from edge with mechanical structure, or else lower edge */
     int t_phiMech = -1; /**< 0: mechanical structure next to phi edge; 1: no mech structure */
     int t_energyBin = -1; /**< generated energy point */
     int t_nCrys = -1; /**< number of crystals used to calculate energy */

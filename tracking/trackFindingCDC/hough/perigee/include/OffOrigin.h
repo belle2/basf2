@@ -13,7 +13,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /** Takes a basic object and passivelly moves it to any origin
+    /** Takes a basic object and passively moves it to any origin
      *  All subordinary coordinates have to be interpreted relative to this origin.
      */
     template<class T>
@@ -27,7 +27,7 @@ namespace Belle2 {
       using T::T;
 
     public:
-      /// The houghBox to which this object correspondes.
+      /// The houghBox to which this object corresponds.
       using HoughBox = typename T::HoughBox;
 
     public:

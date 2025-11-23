@@ -6,7 +6,7 @@ The computing system
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 20 min
+    **Length**: 15-30 min
 
     **Prerequisites**:
 
@@ -25,7 +25,7 @@ The computing system
 
     * Understand the basic notions of the distributed computing system.
     * Learn about the data flow and the processing scheme.
-    * Locate the relevant information for analysis on the Confluence pages.
+    * Locate the relevant information for analysis on the XWiki pages.
 
 
 The distributed computing system
@@ -69,7 +69,7 @@ has been written for specific needs of the collaboration.
 The client tools that communicate with DIRAC and BelleDIRAC
 have been organized in a set of tools named **gbasf2**. As an analyst, datasets are
 available for running analysis directly on the grid, download the output and perform the
-:ref:`onlinebook_offline_analysis` on local resources. One convenient feature of gbasf2 is it uses the same basf2
+:ref:`onlinebook_offline_analysis` on local resources. One convenient feature of gbasf2 is it uses the same `basf2`
 steering files used offline as input.
 
 .. admonition:: Key points
@@ -123,9 +123,9 @@ Monte Carlo samples
 ^^^^^^^^^^^^^^^^^^^
 
 In parallel, Monte Carlo (MC) samples are centrally produced in campaigns labeled as MCXX, being 'XX' a sequential
-number (MC10, MC11, etc). Usually, every time a major basf2 release is available, a new campaign is launched.
+number (MC10, MC11, etc). Usually, every time a major `basf2` release is available, a new campaign is launched.
 Details about the produced samples are usually available at
-the `Data Production Confluence pages <https://confluence.desy.de/display/BI/Data+production+WebHome>`_.
+the `Data Production XWiki pages <https://xwiki.desy.de/xwiki/rest/p/df1b0>`_.
 
 .. note::
 
@@ -135,7 +135,7 @@ the `Data Production Confluence pages <https://confluence.desy.de/display/BI/Dat
 .. tip::
 
     Look at the
-    `Data Production web home <https://confluence.desy.de/display/BI/Data+production+WebHome>`_ to know who is the
+    `Data Production web home <https://xwiki.desy.de/xwiki/rest/p/df1b0>`_ to know who is the
     DP liaison of your group. You will have to talk with him/her about your requirements every new campaign.
 
 .. seealso::
@@ -157,7 +157,7 @@ The list of skims available can be found in the :ref:`skim` documentation.
 
     It is strongly recommended that analysts use the skimmed uDST files rather than the original MDST files.
 
-.. seealso:: https://confluence.desy.de/display/BI/Skimming+Homepage
+.. seealso:: https://xwiki.desy.de/xwiki/rest/p/7e4fa
 
 
 We need your help!
@@ -169,10 +169,10 @@ Computers are not so smart. Sometimes, they fail.
 * The computing system need 24 hour x 7 day care.
 
 Please join us as a **Data Production Shifter**. You can book at `shift.belle2.org <https://shift.belle2.org/>`_
-(a `very nice manual <https://confluence.desy.de/display/BI/Computing+ShiftManual>`_ is already prepared).
+(a `very nice manual <https://xwiki.desy.de/xwiki/rest/p/c7cf3>`_ is already prepared).
 
 If you have some experience as data production shifter, please become an **expert shifter**.
-The `Expert Shifter training course <https://confluence.desy.de/display/BI/DC+Operations+Experts+Manual#DCOperationsExpertsManual-RoadtoanExpertShifter>`_ is open.
+The `Expert Shifter training course <https://xwiki.desy.de/xwiki/rest/p/7e2d9/#HRoadtoanExpertShifter>`_ is open.
 
 You will learn a lot about the computing system, and it is a very important service to the collaboration.
 

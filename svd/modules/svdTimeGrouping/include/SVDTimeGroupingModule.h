@@ -117,7 +117,7 @@ namespace Belle2 {
      * 1. Highest peak is found
      * 2. It is fitted in a given range
      * 3. Fit parameters are stored
-     * 4. Gaus peak is removed from histogram
+     * 4. Gauss peak is removed from histogram
      * 5. Process is repeated until a few criteria are met.
      */
     void searchGausPeaksInHistogram(TH1D& hist, std::vector<GroupInfo>& groupInfoVector);
@@ -156,7 +156,7 @@ namespace Belle2 {
 
 
 
-  /*! Gaus function to be used in the fit. */
+  /*! Gauss function to be used in the fit. */
   inline double myGaus(const double* x, const double* par)
   {
     return par[0] * TMath::Gaus(x[0], par[1], par[2], true);

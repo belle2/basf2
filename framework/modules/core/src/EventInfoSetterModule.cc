@@ -28,8 +28,9 @@ REG_MODULE(EventInfoSetter);
 
 EventInfoSetterModule::EventInfoSetterModule() : Module()
 {
-  if (getenv("BELLE2_PRODUCTION"))
-    m_production = stoi(getenv("BELLE2_PRODUCTION"));
+  const char* production = getenv("BELLE2_PRODUCTION");
+  if (production)
+    m_production = stoi(production);
 
   //Set module properties
   setDescription(

@@ -32,11 +32,22 @@ void FullGridChi2TrackTimeExtractor::exposeParameters(ModuleParamList* modulePar
 
   moduleParamList->getParameter<unsigned int>("GridIterations").setDefaultValue(1);
   moduleParamList->getParameter<bool>("RefinerUseLastEventT0").setDefaultValue(true);
+
+  moduleParamList->addParameter(prefixed(prefix, "skipIfSVDEventT0Present"),
+                                m_skipIfSVDEventT0Present,
+                                "Skip execution of the time consuming FullGridChi2 algorithm if a valid SVD based EventT0 estimate is present. " \
+                                "If set to true, this module is only used to get an CDC based EventT0 in the few events where no sufficient SVD information is available to estimate EventT0.",
+                                m_skipIfSVDEventT0Present);
 }
 
 /// Timing extraction for this findlet
 void FullGridChi2TrackTimeExtractor::apply(std::vector<RecoTrack*>& recoTracks)
 {
+  // Don't execute this time consuming algorithm if a valid SVD based EventT0 estimate is present
+  if (m_skipIfSVDEventT0Present and m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD)) {
+    return;
+  }
+
   const auto& temporaryT0Extractions = m_eventT0->getTemporaryEventT0s(Const::CDC);
   B2ASSERT("There should only be a single or none extraction at this stage!", temporaryT0Extractions.size() <= 1);
 

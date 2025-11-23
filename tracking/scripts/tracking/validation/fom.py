@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -17,7 +16,7 @@ from tracking.root_utils import root_cd, root_save_name
 from tracking.validation.matplotting import get_logger
 
 
-class ValidationFiguresOfMerit(collections.MutableMapping):
+class ValidationFiguresOfMerit(collections.abc.MutableMapping):
     """Create and write an TNtuple of the validation figures of merit"""
 
     def __init__(
@@ -48,7 +47,7 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         """Informal string output listing the assigned figures of merit."""
 
         figures_by_name = self.figures_by_name
-        return '\n'.join('%s : %s' % (key, figures_by_name[key])
+        return '\n'.join(f'{key} : {figures_by_name[key]}'
                          for key in
                          figures_by_name.keys())
 
@@ -64,7 +63,7 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         name = self.name
 
         if not self.figures_by_name:
-            get_logger().warning('Do not create Ntuple for empty ValidationFiguresOfMerit %s' % name)
+            get_logger().warning(f'Do not create Ntuple for empty ValidationFiguresOfMerit {name}')
             return
 
         title = self.title or name
@@ -117,7 +116,7 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
             tntuple.Write("", write_option)
 
     def __setitem__(self, figure_name, value):
-        """Braketed item assignement for figures of merit"""
+        """Braketed item assignment for figures of merit"""
 
         self.figures_by_name[figure_name] = value
 

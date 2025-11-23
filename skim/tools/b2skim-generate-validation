@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -26,6 +25,7 @@ from termcolor import cprint
 
 import basf2 as b2
 from skim.registry import Registry
+import modularAnalysis as ma
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):
@@ -116,7 +116,7 @@ def check_has_validation_method(skim):
         raise ValueError(f"No validation_histograms method defined for {skim}.")
 
 
-def get_output_validation_files(skim):
+def get_output_validation_files(skim, analysisGlobaltag):
     """
     Create a dummy path using the ``validation_histograms`` method of the passed skim
     and search through that path to find the output ROOT file names.
@@ -128,7 +128,7 @@ def get_output_validation_files(skim):
     with suppress_stdout(), TemporaryDirectory():
         path = b2.Path()
         SkimFunction = Registry.get_skim_function(skim)
-        SkimObject = SkimFunction(validation=True, udstOutput=False)
+        SkimObject = SkimFunction(validation=True, udstOutput=False, analysisGlobaltag=analysisGlobaltag)
         SkimObject.build_lists(path)
         SkimObject.validation_histograms(path)
 
@@ -197,6 +197,10 @@ def main():
         for script in scripts:
             script.unlink()
 
+    analysisGlobaltag = None
+    if args.add_analysis_globaltag:
+        analysisGlobaltag = ma.getAnalysisGlobaltag()
+
     skims = args.skims or Registry.names
     for skim in skims:
         try:
@@ -210,7 +214,7 @@ def main():
             skim=skim,
             module=Registry.get_skim_module(skim),
             contact=get_contact(skim),
-            output=get_output_validation_files(skim),
+            output=get_output_validation_files(skim, analysisGlobaltag),
             add_analysis_globaltag=args.add_analysis_globaltag
         )
 

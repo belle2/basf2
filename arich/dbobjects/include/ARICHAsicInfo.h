@@ -14,20 +14,22 @@
 #include <TH3F.h>
 
 namespace Belle2 {
-  /**
-  *   Tested ASIC chips
-  */
 
+  /**
+   * Tested ASIC chips.
+   */
   class ARICHAsicInfo: public TObject {
+
   public:
+
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHAsicInfo(): m_id(""), m_timeFinishGain(), m_timeFinishOffset(), m_deadChannel(),
       m_badConnChannel(), m_badOffsetChannel(), m_badLinChannel(), m_numProblematicChannels(0), m_gain(), m_offset(), m_comment("") {};
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHAsicInfo(const std::string& id, TTimeStamp timeFinishGain, TTimeStamp timeFinishOffset, std::vector<int>& deadChannel,
                   std::vector<int>& badConnChannel, std::vector<int>& badOffsetChannel, std::vector<int>& badLinChannel, int numProbCh,
@@ -37,180 +39,192 @@ namespace Belle2 {
       m_offset(offset), m_comment(comment) {};
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ARICHAsicInfo() {};
 
-    /** Return Asic Identifier
-     * @return Asic Identifier
+    /**
+     * Get ASIC identifier.
+     * @return ASIC identifier.
      */
     std::string getAsicID() const {return m_id; }
 
-    /** Set Asic Identifier
-     * @param Asic Identifier
+    /**
+     * Set ASIC identifier.
+     * @param[in] id ASIC identifier.
      */
     void setAsicID(const std::string& id) {m_id = id; }
 
-    /** Return Test date gain - finish
-     * @return Test date gain - finish
+    /**
+     * Get test date gain - finish.
+     * @return Test date gain - finish.
      */
     TTimeStamp getTimeFinishGain() const {return m_timeFinishGain; }
 
-    /** Set Test date gain - finish
-     * @param Test date gain - finish
+    /**
+     * Set test date gain - finish.
+     * @param[in] timeFinishGain Test date gain - finish.
      */
     void setTimeFinishGain(TTimeStamp timeFinishGain) {m_timeFinishGain = timeFinishGain; }
 
-    /** Return Test date offset - finish
-     * @return Test date offset - finish
+    /**
+     * Get test date offset - finish.
+     * @return Test date offset - finish.
      */
     TTimeStamp getTimeFinishOffset() const {return m_timeFinishOffset; }
 
-    /** Set Test date offset - finish
-     * @param Test date offset - finish
+    /**
+     * Set Test date offset - finish.
+     * @param[in] timeFinishOffset Test date offset - finish.
      */
     void setTimeFinishOffset(TTimeStamp timeFinishOffset) {m_timeFinishOffset = timeFinishOffset; }
 
     /**
-     * Return a channel number from the list of dead channels
-     * @param i index of the element in the list
-     * @return channel id
+     * Get a channel number from the list of dead channels.
+     * @param[in] i Index of the element in the list.
+     * @return Channel id.
      */
     int getDeadChannel(unsigned int i) const;
 
     /**
-     * Add a channel number to the list of dead channels
-     * @param channel ASIC channel id
+     * Add a channel number to the list of dead channels.
+     * @param[in] channel ASIC channel id
      */
     void appendDeadChannel(int channel) {m_deadChannel.push_back(channel); }
 
     /**
-     * Set vector of dead channel numbers
-     * @param channel ASIC channel id
+     * Set vector of dead channel numbers.
+     * @param[in] deadChannels ASIC channel id.
      */
     void setDeadChannels(const std::vector<int>& deadChannels) {m_deadChannel = deadChannels; }
 
     /**
-     * Return size of the list of dead channels
-     * @return size
+     * Get size of the list of dead channels.
+     * @return Size.
      */
     int getDeadChannelsSize() const {return m_deadChannel.size();}
 
     /**
-     * Return a channel number from the list of channels with bad connections
-     * @param i index of the element in the list
-     * @return channel id
+     * Get a channel number from the list of channels with bad connections.
+     * @param[in] i Index of the element in the list.
+     * @return Channel id.
      */
     int getBadConnChannel(unsigned int i) const;
 
     /**
-     * Add a channel number to the list of channels with bad connections
-     * @param channel ASIC channel id
+     * Add a channel number to the list of channels with bad connections.
+     * @param[in] channel ASIC channel id.
      */
-    void appendBadConnChannel(int ichannel) { m_badConnChannel.push_back(ichannel); }
+    void appendBadConnChannel(int channel) { m_badConnChannel.push_back(channel); }
 
     /**
-     * Return size of the list of channels with bad connections
-     * @return size
-     */
-    int getBadConnChannelsSize() const {return m_badConnChannel.size();}
-
-    /**
-     * Set vector of bad connection channel numbers
-     * @param channel ASIC channel id
+     * Set vector of bad connection channel numbers.
+     * @param[in] badConnChannels ASIC channel id.
      */
     void setBadConnChannels(const std::vector<int>& badConnChannels) {m_badConnChannel = badConnChannels; }
 
     /**
-     * Return a channel number from the list of channels with bad offset adjustment
-     * @param i index of the element in the list
-     * @return channel id
+     * Get size of the list of channels with bad connections.
+     * @return Size.
+     */
+    int getBadConnChannelsSize() const {return m_badConnChannel.size();}
+
+    /**
+     * Get a channel number from the list of channels with bad
+     * offset adjustment.
+     * @param[in] i Index of the element in the list.
+     * @return Channel id.
      */
     int getBadOffsetChannel(unsigned int i) const;
 
     /**
-     * Add a channel number to the list of channels with bad offset adjustment
-     * @param channel ASIC channel id
+     * Add a channel number to the list of channels with bad offset adjustment.
+     * @param[in] channel ASIC channel id.
      */
-    void appendBadOffsetChannel(int ichannel) { m_badOffsetChannel.push_back(ichannel); }
+    void appendBadOffsetChannel(int channel) { m_badOffsetChannel.push_back(channel); }
 
     /**
-     * Return size of the list of channels with bad offset adjustment
-     * @return size
+     * Set vector of bad offset channel numbers.
+     * @param[in] badOffsetChannels ASIC channel id.
+     */
+    void setBadOffsetChannels(const std::vector<int>& badOffsetChannels) {m_badOffsetChannel = badOffsetChannels; }
+
+    /**
+     * Get size of the list of channels with bad offset adjustment.
+     * @return Size.
      */
     int getBadOffsetChannelsSize() const {return m_badOffsetChannel.size();}
 
     /**
-     * Set vector of bad offset channel numbers
-     * @param channel ASIC channel id
-     */
-    void setBadOffsetChannels(const std::vector<int>&  badOffsetChannels) {m_badOffsetChannel = badOffsetChannels; }
-
-    /**
-     * Return a channel number from the list of channels with bad linearity
-     * @param i index of the element in the list
+     * Get a channel number from the list of channels with bad linearity.
+     * @param[in] i Index of the element in the list.
      * @return channel id
      */
     int getBadLinChannel(unsigned int i) const;
 
     /**
-     * Add a channel number to the list of channels with bad linearity
-     * @param channel ASIC channel id
+     * Add a channel number to the list of channels with bad linearity.
+     * @param[in] channel ASIC channel id.
      */
-    void appendBadLinChannel(int ichannel) { m_badLinChannel.push_back(ichannel); }
+    void appendBadLinChannel(int channel) { m_badLinChannel.push_back(channel); }
 
     /**
-     * Return size of the list of channels with bad linearity
-     * @return size
+     * Set vector of bad linearity channel numbers.
+     * @param[in] badLinChannels ASIC channel id.
+     */
+    void setBadLinChannels(const std::vector<int>& badLinChannels) {m_badLinChannel = badLinChannels; }
+
+    /**
+     * Get size of the list of channels with bad linearity.
+     * @return Size.
      */
     int getBadLinChannelsSize() const {return m_badLinChannel.size();}
 
     /**
-     * Set vector of bad linearity channel numbers
-     * @param channel ASIC channel id
-     */
-    void setBadLinChannels(const std::vector<int>& badLinChannels) {m_badLinChannel = badLinChannels; }
-
-    /** Return number of problematic channels
-     * @return number of problematic channels
+     * Get number of problematic channels.
+     * @return Number of problematic channels.
      */
     float getNumOfProblematicChannels() const {return m_numProblematicChannels; }
 
-    /** Set number of problematic channels
-     * @param number of problematic channels
+    /**
+     * Set number of problematic channels.
+     * @param[in] numProbCh Number of problematic channels.
      */
     void setNumOfProblematicChannels(int numProbCh) {m_numProblematicChannels = numProbCh; }
 
     /**
-     * Return Measurements with different gain settings
-     * @return Measurements with different gain settings
+     * Get measurements with different gain settings.
+     * @return Measurements with different gain settings.
      */
     TH3F* getGainMeasurement(unsigned int i) const;
 
     /**
-     * set Measurements with different gain settings
-     * @param Measurements with different gain settings
+     * Set measurements with different gain settings.
+     * @param[in] gain Measurements with different gain settings.
      */
     void setGainMeasurement(std::vector<TH3F*> gain);
+
     /**
-     * Return Measurements with different offset settings
-     * @return Measurements with different offset settings
+     * Get measurements with different offset settings.
+     * @return Measurements with different offset settings.
      */
     TH3F* getOffsetMeasurement(unsigned int i) const;
 
     /**
-     * set Measurements with different offset settings
-     * @param Measurements with different offset settings
+     * Set measurements with different offset settings.
+     * @param[in] offset Measurements with different offset settings.
      */
     void setOffsetMeasurement(std::vector<TH3F*> offset);
 
-    /** Return Commment
-     * @return Commment
+    /**
+     * Get comment.
+     * @return Comment.
      */
     std::string getComment() const {return m_comment; }
 
-    /** Set comment
-     * @param comment
+    /**
+     * Set comment.
+     * @param[in] comment Comment.
      */
     void setComment(const std::string& comment) {m_comment = comment; }
 

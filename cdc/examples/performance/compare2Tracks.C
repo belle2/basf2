@@ -28,7 +28,7 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   // Input file names:
   std::vector<std::string> input_filenames = {"cosmic/rootfile/twotracks*"};
 
-  // Run analysis for positve (pos) or negative (neg) or both (all)
+  // Run analysis for positive (pos) or negative (neg) or both (all)
   TString sCharge = "all";
 
   // Root file contain histograms for comparing with this results.
@@ -48,7 +48,7 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   // Belle CDC only: = 0.28Pt oplus 0.35/beta %
   double Param_belle_CDC[2] = {0.28, 0.35};
 
-  // mininum number of degree freedom
+  // minimum number of degree freedom
   int ndfmin = 25;
 
   //selection for track parameter resolutio as a function of Pt.
@@ -70,7 +70,7 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   //starting to read data and draw
   loadStyle();
 
-  //limits for ploting
+  //limits for plotting
   double max_dD0 = 0.1;
   double max_dZ0 = 1;
   double max_dPhi0 = 0.4;
@@ -440,7 +440,7 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   c2->cd(6); hdPt->Draw(); fit(hdPt);
   c2->Print("cdc_performance_with_cr.pdf", "Title:Pars_diff");
 
-  //TanL dependece of D0, Z0
+  //TanL dependence of D0, Z0
   TCanvas* c3 = new TCanvas("c3", "", 1200, 800);
   c3->Divide(3, 2);
 
@@ -500,7 +500,7 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   }
   c3->Print("cdc_performance_with_cr.pdf", "Title:tanL_dependence");
 
-  //Phi Depdendence
+  //Phi Dependence
   c3->Clear("D");
   c3->cd(1); hdD0Phi0->Draw("colz");
   hdD0Phi0->FitSlicesY(0, 0, -1, 20);

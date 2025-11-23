@@ -442,7 +442,7 @@ Information regarding these weights can be accessed on a user-analysis level usi
 .. note::
         These weight variables can be used to help isolate photons that originate from **beam background processes**. Such photons typically have a very low total weight.
 
-This information has been extracted from `this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_.
+This information has been extracted from `this talk <https://xwiki.desy.de/xwiki/bin/download/BI/Belle%20II%20Internal/Detector%20WebHome/ECL%20WebHome/ECL%20Software/Photon%20and%20ECL%20variables/WebHome/2017_12_mcmatching_ferber.pdf?rev=1.1>`_.
 More details about MC matching for photons can be found there and from the references therein.
 
 .. _TopologyAnalysis:

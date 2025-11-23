@@ -15,7 +15,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Strategy to construct discrete curv points from discrete overlap specifications.
+    /// Strategy to construct discrete curve points from discrete overlap specifications.
     class CurvBinsSpec {
     public:
       /**
@@ -32,30 +32,30 @@ namespace Belle2 {
        */
       CurvBinsSpec(double lowerBound, double upperBound, long nBins, int nOverlap, int nWidth);
 
-      /// Constuct the array of discrete curv positions
+      /// Construct the array of discrete curve positions
       DiscreteCurv::Array constructArray() const
       { return constructLinearArray(); }
 
-      /// Constuct the array of discrete curv positions such that the inverse curvatures are distributed equally
+      /// Construct the array of discrete curve positions such that the inverse curvatures are distributed equally
       DiscreteCurv::Array constructInvLinearArray() const;
 
-      /// Constuct the array of discrete curv positions such that the curvatures are distributed equally
+      /// Construct the array of discrete curve positions such that the curvatures are distributed equally
       DiscreteCurv::Array constructLinearArray() const;
 
-      /// Constuct the array of discrete curv positions including cache for the two dimensional arc length
+      /// Construct the array of discrete curve positions including cache for the two dimensional arc length
       DiscreteCurvWithArcLength2DCache::Array constructCacheArray() const;
 
       /// Getter for the number of bounds
       long getNPositions() const;
 
       /**
-       *  Getter for the bin width in real curv to investigate the value
+       *  Getter for the bin width in real curve to investigate the value
        *  that results from the discrete overlap specification.
        */
       double getBinWidth() const;
 
       /**
-       *  Getter for the overlap in real curv to investigate the value
+       *  Getter for the overlap in real curve to investigate the value
        *  that results from the discrete overlap specification
        */
       double getOverlap() const;
@@ -73,13 +73,13 @@ namespace Belle2 {
       /// Upper bound of the binning range
       double m_upperBound;
 
-      /// Number of accessable bins
+      /// Number of accessible bins
       long m_nBins;
 
-      /// Overlap of the leaves in curv counted in number of discrete values.
+      /// Overlap of the leaves in curve counted in number of discrete values.
       int m_nOverlap = 1;
 
-      /// Width of the leaves at the maximal level in curv counted in number of discrete values.
+      /// Width of the leaves at the maximal level in curve counted in number of discrete values.
       int m_nWidth = 3;
     };
 

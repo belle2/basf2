@@ -45,6 +45,11 @@ namespace Belle2 {
      */
     void event(void) override final;
 
+    /**
+     * This method is called at the end of the event processing.
+     */
+    void terminate(void) override final;
+
   private:
 
     // Data members

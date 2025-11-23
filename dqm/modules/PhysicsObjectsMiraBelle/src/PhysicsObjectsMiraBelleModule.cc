@@ -8,7 +8,6 @@
 
 #include <dqm/modules/PhysicsObjectsMiraBelle/PhysicsObjectsMiraBelleModule.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/variables/ContinuumSuppressionVariables.h>
 #include <analysis/variables/TrackVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -16,17 +15,16 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dataobjects/HitPatternVXD.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <top/variables/TOPDigitVariables.h>
-#include <arich/modules/arichDQM/ARICHDQMModule.h>
 #include <arich/dataobjects/ARICHLikelihood.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <TDirectory.h>
 #include <TMath.h>
+
+#include <cmath>
 #include <map>
 
 using namespace Belle2;
@@ -47,7 +45,8 @@ PhysicsObjectsMiraBelleModule::PhysicsObjectsMiraBelleModule() : HistoModule()
 void PhysicsObjectsMiraBelleModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("PhysicsObjectsMiraBelle")->cd();
+  oldDir->mkdir("PhysicsObjectsMiraBelle");
+  oldDir->cd("PhysicsObjectsMiraBelle");
 
   m_h_npxd = new TH1F("hist_npxd", "hist_npxd", 100, 0, 5);
   m_h_npxd->SetXTitle("hist_npxd");
@@ -250,8 +249,8 @@ void PhysicsObjectsMiraBelleModule::event()
   m_h_dD0->Fill((d0[0] + d0[1]) / sqrt(2));
   m_h_dZ0->Fill((z0[0] - z0[1]) / sqrt(2));
   m_h_dPtcms->Fill((ptcms[0] - ptcms[1]) / sqrt(2));
-  m_h_dPhicms->Fill(180 - abs(phicms[0] - phicms[1]));
-  m_h_dThetacms->Fill(abs(thetacms[0] + thetacms[1]) - 180);
+  m_h_dPhicms->Fill(180 - std::abs(phicms[0] - phicms[1]));
+  m_h_dThetacms->Fill(std::abs(thetacms[0] + thetacms[1]) - 180);
   // Event level information
   StoreObjPtr<EventLevelTrackingInfo> elti;
   if (elti) {

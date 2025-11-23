@@ -9,11 +9,11 @@
 #pragma link C++ class Belle2::ARICHAeroHit+; // checksum=0x26572235, version=1
 #pragma link C++ class Belle2::ARICHDigit+; // checksum=0x3f0da20d, version=3
 #pragma link C++ class Belle2::ARICHLikelihood+; // checksum=0x1b86e8b5, version=3
-#pragma link C++ class Belle2::ARICHTrack+; // checksum=0xe97461b5, version=2
+#pragma link C++ class Belle2::ARICHTrack+; // checksum=0xa0de41fd, version=3
 #pragma link C++ class Belle2::ARICHHit+; // checksum=0xbd5a7d82, version=1
 #pragma link C++ class Belle2::ARICHPhoton+; // checksum=0xf6217c88, version=5
 #pragma link C++ class Belle2::ARICHRawDigit+; // checksum=0xbb397841, version=2
-#pragma link C++ class Belle2::ARICHThParam+; // checksum=0x3db70df8, version=1
+#pragma link C++ class Belle2::ARICHThParam+; // checksum=0x8f5562d0, version=2
 #pragma link C++ class Belle2::ARICHInfo+; // checksum=0x862f1d7c, version=4
 
 #endif

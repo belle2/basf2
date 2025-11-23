@@ -98,6 +98,12 @@ namespace Belle2 {
       return (*m_filter)(object);
     }
 
+    template <class AFilter>
+    std::vector<float> Chooseable<AFilter>::operator()(const std::vector <Object*>& objs)
+    {
+      return (*m_filter)(objs);
+    }
+
     template <class AFilterFactory>
     ChooseableFilter<AFilterFactory>::ChooseableFilter()
       : Super(std::make_unique<AFilterFactory>())

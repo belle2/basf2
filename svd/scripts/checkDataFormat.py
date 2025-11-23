@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,7 +23,7 @@ from basf2 import conditions as b2conditions
 
 print('***')
 print('*** this is the data format check script used:')
-with open(sys.argv[0], 'r') as fin:
+with open(sys.argv[0]) as fin:
     print(fin.read(), end="")
 print('*** end of the script')
 print('***')

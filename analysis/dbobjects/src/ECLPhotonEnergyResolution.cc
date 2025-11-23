@@ -69,3 +69,58 @@ double ECLPhotonEnergyResolution::getRelativeEnergyResolution(double energy, dou
 
   return energyResolutionInfo.at("RelativeEnergyResolution");
 }
+
+void ECLPhotonEnergyResolution::addThetaPhiResolution(std::vector<double> thetaResolution, std::vector<double> phiResolution,
+                                                      Binning binning)
+{
+  /**
+   * Build energy resolution with uncertainties as info map
+   */
+  WeightInfo resolutionInfo = {
+    {"ThetaResolution", thetaResolution.at(0)},
+    {"ThetaResolutionUncertUp", thetaResolution.at(1)},
+    {"ThetaResolutionUncertDown", thetaResolution.at(2)},
+    {"PhiResolution", phiResolution.at(0)},
+    {"PhiResolutionUncertUp", phiResolution.at(1)},
+    {"PhiResolutionUncertDown", phiResolution.at(2)}
+  };
+
+  /**
+   * Extract energy, theta and phi bin values
+   */
+  ParticleWeightingBinLimits* energyBinValues = new ParticleWeightingBinLimits(binning.at(0).first, binning.at(0).second);
+  ParticleWeightingBinLimits* thetaBinValues = new ParticleWeightingBinLimits(binning.at(1).first, binning.at(1).second);
+  ParticleWeightingBinLimits* phiBinValues = new ParticleWeightingBinLimits(binning.at(2).first, binning.at(2).second);
+
+  NDBin energyBinning = {{"Energy", energyBinValues}, {"Theta", thetaBinValues}, {"Phi", phiBinValues}};
+
+  /**
+   * Add resolution value to binning table
+   */
+  m_resolutionBinningTable.addEntry(resolutionInfo, energyBinning);
+}
+
+double ECLPhotonEnergyResolution::getThetaPhiResolution(double energy, double theta, double phi, bool thetaOrPhi) const
+{
+  /**
+   * Construct energy, theta, phi map corresponding to binning structure
+   */
+  std::map<std::string, double> binning = {{"Energy", energy}, {"Theta", theta}, {"Phi", phi}};
+
+  /**
+   * Extract resolution information
+   */
+  WeightInfo resolutionInfo = m_resolutionBinningTable.getInfo(binning);
+
+  if (thetaOrPhi) {
+    if (resolutionInfo.at("PhiResolution") == -1.) {
+      B2DEBUG(20, "Phi resolution was returned as -1 since provided energy was not within theta resolution binning.");
+    }
+    return resolutionInfo.at("PhiResolution");
+  } else {
+    if (resolutionInfo.at("ThetaResolution") == -1.) {
+      B2DEBUG(20, "Theta resolution was returned as -1 since provided energy was not within theta resolution binning.");
+    }
+    return resolutionInfo.at("ThetaResolution");
+  }
+}

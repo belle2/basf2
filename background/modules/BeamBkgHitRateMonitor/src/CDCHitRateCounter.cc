@@ -10,8 +10,6 @@
 #include <background/modules/BeamBkgHitRateMonitor/CDCHitRateCounter.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>

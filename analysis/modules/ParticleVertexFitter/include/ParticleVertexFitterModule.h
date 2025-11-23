@@ -11,12 +11,11 @@
 #include <framework/core/Module.h>
 #include <string>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <Math/Vector3D.h>
 
 // framework - DataStore
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreObjPtr.h>
-
-#include <framework/geometry/B2Vector3.h>
 
 // DataObjects
 #include <analysis/dataobjects/ParticleList.h>
@@ -83,13 +82,12 @@ namespace Belle2 {
     bool m_updateDaughters;       /**< flag for daughters update */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
     bool m_hasCovMatrix = false;      /**< flag for mother covariance matrix (PseudoFitter)*/
-    B2Vector3D m_BeamSpotCenter;    /**< Beam spot position */
+    ROOT::Math::XYZVector m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
     double m_smearing;            /**< smearing width applied to IP tube */
     double m_recoilMass;            /**< recoil mass for constraint*/
     std::vector<int> m_massConstraintList; /**< PDG codes of the particles to be mass constraint (massfourC)*/
-    std::vector<std::string> m_massConstraintListParticlename; /**< Name of the particles to be mass constraint (massfourC)*/
 
     /**
      * Main steering routine

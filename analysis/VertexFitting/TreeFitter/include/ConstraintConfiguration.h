@@ -12,7 +12,7 @@
 
 namespace TreeFitter {
 
-  /** constainer */
+  /** constraint configuration class */
   class ConstraintConfiguration {
   public:
 

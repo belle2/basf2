@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <framework/utilities/Utils.h>
-
 namespace Belle2 {
   namespace ECL {
 

@@ -118,7 +118,7 @@ namespace Belle2 {
         const unsigned int maximumLadderNumber = numberOfLaddersForLayer[currentLayer - 1];
 
         // the reason for this strange formula is the numbering scheme in the VXD.
-        // we first substract 1 from the ladder number to have a ladder counting from 0 to N - 1,
+        // we first subtract 1 from the ladder number to have a ladder counting from 0 to N - 1,
         // then we add (PXD)/subtract(PXD) one to get to the next (overlapping) ladder and do a % N to also cope for the
         // highest number. Then we add 1 again, to go from the counting from 0 .. N-1 to 1 .. N.
         // The + maximumLadderNumber in between makes sure, we are not ending with negative numbers

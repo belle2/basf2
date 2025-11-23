@@ -141,7 +141,7 @@ namespace Belle2 {
 
     //! Set Energy and Timing
     void setRawEnergy(double raw_energy) { m_raw_energy = raw_energy; }
-    //! set Signal Contribtion
+    //! set Signal Contribution
     void setSignalContribution(double signal_contribution) { m_signal_contribution =  signal_contribution; }
     //! set beambackground contribution
     void setBKGContribution(double bkg_contribution) { m_bkg_contribution =  bkg_contribution; }

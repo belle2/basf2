@@ -58,7 +58,7 @@ namespace Belle2 {
       dataMatrix.col(i) = Eigen::Map<const DVector>(inputData[i].data(), inputData[i].size());
     }
 
-    // define a matrix where each row holds the mean vector to be able to substract the mean value from each column directly
+    // define a matrix where each row holds the mean vector to be able to subtract the mean value from each column directly
     DMatrix meanMatrix(nSamples, Ndims);
     for (size_t i = 0; i < Ndims; ++i) {
       meanMatrix.col(i) = DVector::Ones(nSamples) * meanVector(i);

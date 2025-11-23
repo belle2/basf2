@@ -221,5 +221,5 @@ elif ie == 'export':
 # simple example that shows how to read data from database and use it
 # dbImporter.getBiasVoltagesForHapdChip("KA0167")
 
-# simple example that shows how to extract aerogel recontruction data from database
+# simple example that shows how to extract aerogel reconstruction data from database
 # dbImporter.getMyParams("A165")

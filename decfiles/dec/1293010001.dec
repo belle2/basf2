@@ -1,0 +1,24 @@
+# EventType: 1293010001
+# Descriptor: [B+ -> anti-D*0 pi+]
+# NickName: Bu_Dst0pi
+# Documentation: for X3872 study
+# Tested:yes
+# PhysicsWG: Hadronic BtoCharm WG
+# Responsible: Jianshe Zhou
+# Email: jszhou20@fudan.edu.cn
+# Cuts: None
+# Date: 20231201
+
+# Upsilon(4S) decay
+Decay Upsilon(4S)
+0.5 B+sig B-   VSS;
+0.5 B+   B-sig VSS;
+Enddecay
+
+Decay B+sig
+1 anti-D*0 pi+ PHSP;
+Enddecay
+
+CDecay B-sig
+
+End

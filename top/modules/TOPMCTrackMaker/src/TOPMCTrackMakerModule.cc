@@ -120,12 +120,12 @@ namespace Belle2 {
       double mass = chargedStable.getMass();
       double beta = pmom / sqrt(pmom * pmom + mass * mass);
       double tof = barHit->getLength() / beta / Const::speedOfLight;
-      auto* extHit = extHits.appendNew(chargedStable.getPDGCode(),
+      auto* extHit = extHits.appendNew(tof,
+                                       chargedStable.getPDGCode(),
                                        Const::TOP,
                                        barHit->getModuleID(),
                                        EXT_ENTER,
                                        false,
-                                       tof,
                                        barHit->getPosition(),
                                        barHit->getMomentum(),
                                        cov);

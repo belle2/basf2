@@ -315,18 +315,18 @@ def convert_bytes(bytes):
     bytes = float(bytes)
     if bytes >= 1099511627776:
         terabytes = bytes / 1099511627776
-        size = '\033[35m%.2fT' % terabytes
+        size = f'\x1b[35m{terabytes:.2f}T'
     elif bytes >= 1073741824:
         gigabytes = bytes / 1073741824
-        size = '\033[31m%.2fG' % gigabytes
+        size = f'\x1b[31m{gigabytes:.2f}G'
     elif bytes >= 1048576:
         megabytes = bytes / 1048576
-        size = '\033[33m%.2fM' % megabytes
+        size = f'\x1b[33m{megabytes:.2f}M'
     elif bytes >= 1024:
         kilobytes = bytes / 1024
-        size = '\033[32m%.2fK' % kilobytes
+        size = f'\x1b[32m{kilobytes:.2f}K'
     else:
-        size = '%.2fb' % bytes
+        size = f'{bytes:.2f}b'
     return size + '\033[39m'
 
 
@@ -337,15 +337,15 @@ def print_tree(tree, filename):
     tot = tree.GetTotBytes()
     totzip = tree.GetZipBytes()
     nentries = tree.GetEntries()
-    print("'%s' contains %d entries." % (filename, nentries))
-    print("\t{:>30}\t{:>7}\t{:>7}".format("Total", convert_bytes(tot), convert_bytes(totzip)))
-    print("\t{:>30}\t{:>7}\t{:>7}".format("Per entry", convert_bytes(tot / nentries), convert_bytes(totzip / nentries)))
-    print("{}:\t{:>30}\t{:>7}\t{:>7}".format("#", "Branch Name", "Size", "Compressed Size"))
+    print(f"'{filename}' contains {int(nentries)} entries.")
+    print(f"\t{'Total':>30}\t{convert_bytes(tot):>7}\t{convert_bytes(totzip):>7}")
+    print(f"\t{'Per entry':>30}\t{convert_bytes(tot / nentries):>7}\t{convert_bytes(totzip / nentries):>7}")
+    print(f"#:\t{'Branch Name':>30}\t{'Size':>7}\t{'Compressed Size':>7}")
     print("--------------------------------------------------------------------")
     for index, branch in enumerate(branchesList):
         size = convert_bytes(branch.GetTotBytes('*'))
         comp_size = convert_bytes(branch.GetZipBytes('*'))
-        print("%i:\t%30s\t%7s\t%7s" % (index + 1, branch.GetName(), size, comp_size))
+        print(f"{int(index + 1)}:\t{branch.GetName():30}\t{size:7}\t{comp_size:7}")
     print("====================================================================")
 
 

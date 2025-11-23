@@ -11,7 +11,6 @@
 
 #include <framework/gearbox/Gearbox.h>
 
-#include <TVector3.h>
 #include <filesystem>
 
 #include <boost/math/special_functions/sign.hpp>
@@ -45,14 +44,17 @@ void TestWithGearbox::TearDownTestCase()
 TempDirCreator::TempDirCreator():
   m_oldpwd(current_path().string())
 {
-  char temporaryDirName[] = "/tmp/basf2_XXXXXX";
-  if (mkdtemp(temporaryDirName) == nullptr) {
+  char* temporaryDirName = strdup((temp_directory_path() / "basf2_XXXXXX").c_str());
+  auto directory = mkdtemp(temporaryDirName);
+  if (!directory) {
     B2ERROR("Cannot create temporary directory: " << strerror(errno));
+    free(temporaryDirName);
     return;
   }
-  path tmpdir = temporaryDirName;
+  path tmpdir = directory;
   current_path(tmpdir);
   m_tmpdir = tmpdir.string();
+  free(temporaryDirName);
 }
 
 TempDirCreator::~TempDirCreator()
@@ -101,11 +103,11 @@ bool Belle2::TestHelpers::allNear<ROOT::Math::XYZVector>(const ROOT::Math::XYZVe
   return xNear and yNear and zNear;
 }
 
-void Belle2::TestHelpers::PrintTo(const TVector3& tVector3, ::std::ostream& output)
+void Belle2::TestHelpers::PrintTo(const ROOT::Math::XYZVector& vector3, ::std::ostream& output)
 {
   output
-      << "TVector3("
-      << tVector3.X() << ", "
-      << tVector3.Y() << ", "
-      << tVector3.Z() << ")";
+      << "ROOT::Math::XYZVector("
+      << vector3.X() << ", "
+      << vector3.Y() << ", "
+      << vector3.Z() << ")";
 }

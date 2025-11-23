@@ -29,20 +29,20 @@ variables.addAlias('cosPlanarAngle', 'cosAcoplanarityAngle(0, 0)')
 
 path = basf2.Path()
 path.add_module('EventInfoSetter', evtNumList=[10000])
-add_evtgen_generator(path, 'signal', basf2.find_file('decfiles/dec/Bu_rho0rho+.dec'))
+add_evtgen_generator(path, 'signal', basf2.find_file('decfiles/dec/1210032011.dec'))
 findMCDecay('B+:sig', 'B+ -> [rho0 -> pi+ pi-] [rho+ -> pi0 pi+]', path=path)
 create_validation_histograms(
     path, 'Validate_B2VV.root', 'B+:sig',
     [
         ('cosThetaRhoZ', 60, -1.2, 1.2, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
          r'B2VV helicity angle of the $\rho^0 \to \pi^+ \pi^-$ in $B^+ \to \rho^0 \rho^+$ (truth values)',
-         'should follow the reference', 'cos#theta_{helicity}(V1)'),
+         'should follow the reference', 'cos#theta_{helicity}(V1)', '', 'shifter'),
         ('cosThetaRhoP', 60, -1.2, 1.2, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
          r'B2VV helicity angle of the $\rho^+ \to \pi^0 \pi^+$ in $B^+ \to \rho^0 \rho^+$ (truth values)',
-         'should follow the reference', 'cos#theta_{helicity}(V1)'),
+         'should follow the reference', 'cos#theta_{helicity}(V1)', '', 'shifter'),
         ('cosPlanarAngle', 60, -1.2, 1.2, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
          r'Cosine of B2VV planar angle of the $B^+ \to \rho^0 \rho^+$ (truth values)',
-         'should follow the reference', 'cos#chi (planar angle)'),
+         'should follow the reference', 'cos#chi (planar angle)', '', 'shifter'),
     ],
     description='B2VV Validation to check generator level distributions',
 )

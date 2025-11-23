@@ -90,6 +90,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   // Collect other plots just for reference - combines all the runs for these plots.
   auto cutflow = getObjectPtr<TH1F>("cutflow");
+  auto svdEventT0 = getObjectPtr<TH1D>("svdEventT0");
 
 
   // Define new plots to make
@@ -416,6 +417,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   TimevsCrateNoCrateCalibPrevCrystCalib  ->Write();
 
   cutflow->Write();
+  svdEventT0->Write();
 
 
   if (debugOutput) {
@@ -1078,7 +1080,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     histfile->WriteTObject(tcrateNew_MINUS_tcrateOld__crateID.get(), "tcrateNew_MINUS_tcrateOld__crateID");
     histfile->WriteTObject(tcrateNew_MINUS_tcrateOld.get(), "tcrateNew_MINUS_tcrateOld");
 
-    // Save the histograms ot the crate iterations file
+    // Save the histograms to the crate iterations file
     histExtraCrateInfofile->WriteTObject(tcrateNew_MINUS_tcrateOld_allRuns.get(), "tcrateNew_MINUS_tcrateOld_allRuns");
     histExtraCrateInfofile->WriteTObject(tcrateNew_MINUS_tcrateOld_allRuns_allCrates.get(),
                                          "tcrateNew_MINUS_tcrateOld_allRuns_allCrates");

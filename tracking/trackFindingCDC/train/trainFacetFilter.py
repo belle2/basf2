@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -11,7 +10,7 @@
 
 # This is for training a mva classifier for hit triplets
 # It performs a tip better than the current default chi2 filter
-# However run time is quite a bit slower which is why it wont be used in the standard chain.
+# However run time is quite a bit slower which is why it won't be used in the standard chain.
 # Nevertheless this script can be used to generate variables to consider
 # for improvements or cross checks with --task explore
 

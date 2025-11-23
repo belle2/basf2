@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,7 +11,7 @@
 """
 <header>
   <output>MuonGenSimNoBkg.root</output>
-  <contact>Software team b2soft@mail.desy.de</contact>
+  <contact>arul.prakash@physik.uni-muenchen.de</contact>
   <cacheable/>
   <description>This steering file produces 10000 events with one Muon each
   and runs the detector simulation without mixing in background.</description>
@@ -72,14 +71,14 @@ print(statistics)
 
 statistics_plots(
     "MuonGenSimNoBkg_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation job with generic MuonGenSimNoBkg events",
     prefix="MuonGenSimNoBkg",
 )
 event_timing_plot(
     "../MuonGenSimNoBkg.root",
     "MuonGenSimNoBkg_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation job with Muon events",
     prefix="MuonGenSimNoBkg",
 )

@@ -7,7 +7,9 @@
  **************************************************************************/
 
 #include <simulation/kernel/EventAction.h>
+#include <framework/core/Environment.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/logging/Logger.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
@@ -26,17 +28,36 @@ EventAction::EventAction(const std::string& mcCollectionName, MCParticleGraph& m
     BeginOfEventAction(event);
     EndOfEventAction(event);
   }
+  m_writeSimSteps = Environment::Instance().getWriteSimSteps();
+  if (m_writeSimSteps)
+    m_VREventStream = new std::ofstream;
 }
 
 EventAction::~EventAction()
 {
-
+  if (m_writeSimSteps) {
+    // Just in case the file is still opened...
+    if (m_VREventStream->is_open())
+      m_VREventStream->close();
+    delete m_VREventStream;
+  }
 }
 
 void EventAction::BeginOfEventAction(const G4Event*)
 {
   //Enable recording of Hits
   SensitiveDetectorBase::setActive(true);
+  if (m_writeSimSteps) {
+    // Open a new output file for the VR event-history steps
+    if (m_VREventStream->is_open())
+      m_VREventStream->close();
+    if (not m_evtMetaData.isValid())
+      B2FATAL("EventMetaData is not valid.");
+    int eventNumber = m_evtMetaData->getEvent();
+    std::string filename = boost::str(boost::format("event%1%.csv") % eventNumber);
+    m_VREventStream->open(filename);
+    B2INFO("Opened VR event-history file " << filename);
+  }
 }
 
 
@@ -64,5 +85,11 @@ void EventAction::EndOfEventAction(const G4Event*)
        ++it) {
     RelationArray mcPartRelation(it->first);
     if (mcPartRelation) mcPartRelation.consolidate(indexReplacement, RelationArray::Identity(), it->second);
+  }
+
+  if (m_writeSimSteps) {
+    // Close the VR event-history file
+    if (m_VREventStream->is_open())
+      m_VREventStream->close();
   }
 }

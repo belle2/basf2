@@ -18,7 +18,7 @@
 namespace Belle2 {
 
   /**
-   * structure containing the relevant informations
+   * structure containing the relevant information
    * of SVDTimeGrouping module
    */
   struct SVDTimeGroupingParameters: public TObject {
@@ -32,7 +32,7 @@ namespace Belle2 {
     Float_t limitSigma[2];
     /** Half width of the range in which the fit for the peak-search is performed [ns]. */
     Float_t fitRangeHalfWidth;
-    /** Remove upto this sigma of fitted gaus from histogram. */
+    /** Remove upto this sigma of fitted gauss from histogram. */
     Float_t removeSigmaN;
     /** Minimum fraction of candidates in a peak (wrt to the highest peak) considered for fitting in the peak-search. */
     Float_t fracThreshold;
@@ -178,7 +178,7 @@ namespace Belle2 {
 
     /** unique identifier of the payload */
     TString m_uniqueID;
-    /** short descrition of the payload */
+    /** short description of the payload */
     std::vector<TString> m_description;
 
     /** parameters for CoG6 time-algorithm in 6-sample DAQ mode */

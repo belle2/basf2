@@ -17,8 +17,6 @@ import os
 import sys
 import multiprocessing
 
-from ROOT.Belle2 import SVDOccupancyCalibrationsAlgorithm
-
 from caf.framework import CAF, Calibration, CentralDatabase
 from caf import backends
 from caf import strategies
@@ -36,6 +34,9 @@ b2.set_log_level(b2.LogLevel.INFO)
 
 
 def SVDOccupancyCalibrations(files, tags):
+    # avoid top level ROOT imports
+    from ROOT import Belle2  # noqa: make Belle2 namespace available
+    from ROOT.Belle2 import SVDOccupancyCalibrationsAlgorithm
 
     # Set-up re-processing path
     path = b2.create_path()

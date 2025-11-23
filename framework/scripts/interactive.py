@@ -49,3 +49,9 @@ def basf2_shell_config():
     c = Config()
     c.TerminalInteractiveShell.prompts_class = Basf2IPythonPrompt
     return c
+
+
+if __name__ == '__main__':
+    from basf2 import basf2label
+    from basf2 import *  # noqa
+    embed(config=basf2_shell_config(), header=f"Welcome to {basf2label}")

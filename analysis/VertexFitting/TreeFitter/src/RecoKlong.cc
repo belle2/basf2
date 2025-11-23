@@ -8,7 +8,6 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/geometry/B2Vector3.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -80,7 +79,7 @@ namespace TreeFitter {
   {
     const Belle2::KLMCluster* cluster = particle()->getKLMCluster();
 
-    const Belle2::B2Vector3D cluster_pos = cluster->getClusterPosition();
+    const ROOT::Math::XYZVector cluster_pos = cluster->getClusterPosition();
 
     m_init = true;
     m_covariance =  Eigen::Matrix<double, 4, 4>::Zero(4, 4);

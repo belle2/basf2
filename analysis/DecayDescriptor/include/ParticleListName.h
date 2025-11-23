@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace Belle2 {
   /** Helper to deal with ParticleList names. Own namespace because of CINT. */
@@ -25,5 +26,10 @@ namespace Belle2 {
      */
     std::string antiParticleListName(const std::string& listName);
 
+    /**
+     * Returns the input list with appended anti-particle list names of the particle list names in the input list.
+     * This appending is done only for list names which correspond to a particle list that has an anti-particle.
+     */
+    std::vector<std::string> addAntiParticleLists(const std::vector<std::string>& inputList);
   }
 }

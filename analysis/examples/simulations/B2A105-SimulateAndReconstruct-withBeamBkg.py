@@ -39,7 +39,7 @@ import os
 my_path = b2.create_path()
 
 # load input ROOT file
-inputMdst(filename=b2.find_file('B2A101-Y4SEventGeneration-evtgen.root'), path=my_path)
+inputMdst(filename=b2.find_file('B2A101-Y4SEventGeneration.root'), path=my_path)
 
 # background files
 # location of the files is obtained from a shell variable - check first if it is set
@@ -47,7 +47,7 @@ if 'BELLE2_BACKGROUND_DIR' not in os.environ:
     b2.B2FATAL(
         'BELLE2_BACKGROUND_DIR variable is not set. \n'
         'Please export (setenv) the variable to the location of BG overlay sample. \n'
-        'Check https://confluence.desy.de/display/BI/Beam+background+samples to find them')
+        'Check https://xwiki.desy.de/xwiki/rest/p/90869 to find them')
 # get list of files and check the list length
 bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 if len(bg) == 0:

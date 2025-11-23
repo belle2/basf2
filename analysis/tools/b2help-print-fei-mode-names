@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+
+import argparse
+from fei import get_mode_names
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser(description="""
+This command returns a ordered list of available FEI channels.
+
+- To display all available channels for B+ hadronic,
+    ``b2help-print-fei-mode-names B+ -had``
+
+- To display all available channels for B0 hadronic,
+    ``b2help-print-fei-mode-names B0 -had``
+                                     
+- To display all available channels for B+ semileptonic,
+    ``b2help-print-fei-mode-names B+ -sl``
+
+- To display all available channels for B0 semileptonic,
+    ``b2help-print-fei-mode-names B0 -sl``
+                                     
+It works for daughter particles as well, such as D0, D+, etc.
+""")
+    parser.add_argument('particle',  help='Particle name')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--hadronic', '-had', action='store_true', default=False,
+                        help='Use only hadronic mode names')
+    group.add_argument('--semileptonic', '-sl', action='store_true', default=False,
+                        help='Use only semileptonic mode names')
+    parser.add_argument('--no-enum', action='store_true',
+                        help='Do not print numbers of the modes')
+    return parser
+if __name__ == "__main__":
+    args = get_argument_parser().parse_args()
+    names = get_mode_names(args.particle, hadronic=args.hadronic, semileptonic=args.semileptonic)
+    for i, name in enumerate(names):
+        if args.no_enum:
+            print(name)
+        else:
+            print(f"{i}: {name}")

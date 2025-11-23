@@ -1,0 +1,4 @@
+Changes in the mva package since release-09-00
+----------------------------------------------
+
+* Improved layout of plots in the ``basf2_mva_evaluate.py`` script.

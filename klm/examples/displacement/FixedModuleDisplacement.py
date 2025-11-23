@@ -11,6 +11,7 @@
 # Generates EKLM displacement data with fixed module displacement.
 
 import basf2
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import KLMDatabaseImporter, BKLMAlignment, EKLMAlignment, \
                         EKLMSegmentAlignment, KLMAlignmentData, \
                         KLMChannelIndex, KLMDisplacementGenerator

@@ -30,7 +30,7 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
   addParam("RecoTracksName", m_RecoTracksName, "Name of container of RecoTracks", std::string(""));
 
   // required for conversion
-  addParam("SVDClusters", m_SVDClusterName, "SVDCluster collection name", std::make_optional<std::string>("SVDClusters"));
+  addParam("SVDClusters", m_SVDClusterName, "SVDCluster collection name", std::string(""));
 
   addParam("SVDSpacePointStoreArrayName", m_svdSpacePointsStoreArrayName, "Name of the collection for SVD.",
            std::make_optional<std::string>("SVDSpacePoints"));
@@ -91,11 +91,11 @@ void RT2SPTCConverterModule::initialize()
   initializeCounters();
 
   // check if all required StoreArrays are here
-  if (m_pxdSpacePointsStoreArrayName) {
+  if (not m_ignorePXDHits and m_pxdSpacePointsStoreArrayName) {
     m_PXDSpacePoints.isRequired(*m_pxdSpacePointsStoreArrayName);
   }
   if (m_svdSpacePointsStoreArrayName) {
-    m_SVDClusters.isRequired(*m_SVDClusterName);
+    m_SVDClusters.isRequired(m_SVDClusterName);
     m_SVDSpacePoints.isRequired(*m_svdSpacePointsStoreArrayName);
   }
   if (m_vtxSpacePointsStoreArrayName) {
@@ -148,7 +148,7 @@ void RT2SPTCConverterModule::event()
     }
     std::pair<std::vector<const SpacePoint*>, ConversionState> spacePointStatePair;
 
-    // the hit informations from the recotrack, the option "true" will result in a sorted vector
+    // the hit information from the recotrack, the option "true" will result in a sorted vector
     std::vector<RecoHitInformation*> hitInfos = recoTrack.getRecoHitInformations(true);
 
     // if requested remove the PXD hits
@@ -194,8 +194,13 @@ void RT2SPTCConverterModule::event()
     SpacePointTrackCand spacePointTC;
     if (m_mcParticlesPresent) {
       MCParticle* mcParticle = recoTrack.getRelatedTo<MCParticle>();
-      spacePointTC = SpacePointTrackCand(spacePointStatePair.first, mcParticle->getPDG(), mcParticle->getCharge(),
-                                         recoTrack.getArrayIndex());
+      if (mcParticle) {
+        spacePointTC = SpacePointTrackCand(spacePointStatePair.first, mcParticle->getPDG(), mcParticle->getCharge(),
+                                           recoTrack.getArrayIndex());
+      } else {
+        spacePointTC = SpacePointTrackCand(spacePointStatePair.first, 0, 0, recoTrack.getArrayIndex());
+      }
+
     } else {
       spacePointTC = SpacePointTrackCand(spacePointStatePair.first, 0, 0, recoTrack.getArrayIndex());
     }

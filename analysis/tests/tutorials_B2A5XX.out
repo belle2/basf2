@@ -7,6 +7,7 @@ TBranch: __event__, 660002
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: M, 3.097
 TBranch: p, 2.04
@@ -27,6 +28,7 @@ TBranch: __event__, 660003
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 2
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: M, 0.7012
 TBranch: p, 1.691
@@ -47,6 +49,7 @@ TBranch: __event__, 660003
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 2
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: M, 0.7012
 TBranch: p, 1.691
@@ -67,6 +70,7 @@ TBranch: __event__, 660002
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: p, 1.638
 TBranch: px, 0.5252
@@ -97,6 +101,7 @@ TBranch: __event__, 660002
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: p, 1.638
 TBranch: px, 0.5252
@@ -128,6 +133,7 @@ TBranch: __event__, 660003
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 2
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: M, 0.7012
 TBranch: p, 1.691
@@ -145,6 +151,7 @@ TBranch: __event__, 660003
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 2
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: M, 0.7005
 TBranch: p, 1.689

@@ -100,7 +100,7 @@ namespace Belle2 {
     double alpha_kskpnr;      /**< Variable member alpha_kskpnr */
     double alpha_kskmnr;      /**< Variable member alpha_kskmnr */
 
-    std::ofstream debugfile_; /**< debuging stream */
+    std::ofstream debugfile_; /**< debugging stream */
   }; //! end of EvtDecayAmp
 
 } // Belle 2 Namespace

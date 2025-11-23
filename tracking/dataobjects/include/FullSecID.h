@@ -97,7 +97,7 @@ namespace Belle2 {
     explicit FullSecID(VxdID vxdID, bool subLayerID = false, unsigned int sectorNumber = 0);
 
 
-    /** Another contstructor which does not need a VxdID nor another coded valid FullSecID
+    /** Another constructor which does not need a VxdID nor another coded valid FullSecID
     * @param layerID  set here the layer number as an ID...
     * @param subLayerID   0 if not in overlapping area of sensor, 1 if within overlap.
     * @param sensorID  an ID representing the sensorID (e.g. uniID/vxdID).

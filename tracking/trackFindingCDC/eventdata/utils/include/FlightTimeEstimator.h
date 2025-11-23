@@ -78,11 +78,11 @@ namespace Belle2 {
       }
 
     private:
-      /// Trigger point of the cosmic ray setup
-      Vector3D m_triggerPoint;
-
       /// Lookup table for the sinc function
       LookupTable<float> m_halfPeriodAlphaFlightTimeFactor;
+
+      /// Trigger point of the cosmic ray setup
+      Vector3D m_triggerPoint;
     };
 
   }

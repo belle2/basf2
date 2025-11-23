@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -25,7 +24,7 @@ from ROOT.Belle2 import ECLDatabaseImporter
 
 
 if len(sys.argv) != 3:
-    print('Usage: basf2 {} inputFile outputFile'.format(sys.argv[0]))
+    print(f'Usage: basf2 {sys.argv[0]} inputFile outputFile')
     sys.exit(1)
 
 inputFile = sys.argv[1]

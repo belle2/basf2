@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import argparse
+import os
+import basf2
+from tracking.secMapTraining.SectorMapTrainingUtils import remove_timing_cuts_from_SectorMap
+
+# maybe make it configurable??
+outputDir = "localSectorMapDB"
+
+if __name__ == "__main__":
+  parser = argparse.ArgumentParser(description='Script that takes the final steps to prepare an already trained \
+        SectorMap to be uploaded to the DB. These steps are as follows: \
+        1.) Create a copy of the original SectorMap from which all timing information is removed. \
+        2.) Prepare a local database which can be used for uploading. This local DB will be already in \
+          in the correct format so that it can be used by the VXDTF2 in basf2 (or directly uploaded to the DB). \
+          The only step which has to be done by hand is to adjust the IOVs in the \"database.txt\" file. \
+          For this a folder in your current directory will be created which is named ' + outputDir)
+  parser.add_argument(
+      '--inputSectorMap',
+      dest='inputSectorMap',
+      default=None,
+      help='Name (including path) of the SectorMap to be prepared..')
+
+  args = parser.parse_args()
+
+  if args.inputSectorMap is None:
+      basf2.B2FATAL("You need to provide the name of the input SectorMap!")
+
+  if not args.inputSectorMap.endswith(".root"):
+      basf2.B2FATAL("SectorMaps are supposed to be root files. The file provided does not end with \".root\". Will abort.")
+
+  # check if the output directory exists 
+  if os.path.isdir(outputDir):
+      basf2.B2FATAL('Output directory already exists: ' + outputDir + '. Will abort!')
+
+  # removes timing cuts from initial SectorMap and stores new SectorMap
+  remove_timing_cuts_from_SectorMap(args.inputSectorMap)
+
+  # Name of the output SectorMap (maybe there is a more elegant way to do that)
+  outputMapFile = args.inputSectorMap[:-5] + '_timingRemoved.root'
+
+  # create the directory for the local DB
+  os.system('mkdir ' + outputDir)  
+
+  # create symbolic links 
+  os.system('ln -s ../' + args.inputSectorMap + ' ' + outputDir + '/dbstore_SVDSectorMap_v000.root_rev_1.root')
+  os.system('ln -s ../' + outputMapFile + ' ' + outputDir + '/dbstore_SVDSectorMap_v000.root_rev_2.root')
+  
+  # create corresponding DB file
+  # NOTE: IOVs have been set to dummy values on purpose to prevent accidental upload. These have to be adapted by the user!
+  with open(outputDir + '/database.txt', 'a') as the_file:
+      the_file.write('dbstore/SVDSectorMap_v000.root 1 999,999,999,999\n')
+      the_file.write('dbstore/SVDSectorMap_v000.root 2 999,999,999,999\n')
+

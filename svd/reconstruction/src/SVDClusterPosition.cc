@@ -77,10 +77,10 @@ namespace Belle2 {
       //take the strips in the rawCluster
       std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
-      //informations about the head strip
+      //information about the head strip
       int headStripCellID = strips.at(strips.size() - 1).cellID;
       double headStripCharge = strips.at(strips.size() - 1).charge;
-      //informations about the tail strip
+      //information about the tail strip
       int tailStripCellID = strips.at(0).cellID;
       double tailStripCharge = strips.at(0).charge;
 

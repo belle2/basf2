@@ -6,7 +6,7 @@
 #pragma link C++ class Belle2::TrackFindingCDC::CDCAxialSegmentPair+; // checksum=0x13923a15, version=-1
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegmentPair+; // checksum=0x28533850, version=-1
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegmentTriple+; // checksum=0x8ef36f8a, version=-1
-#pragma link C++ class Belle2::TrackFindingCDC::CDCTrack+; // checksum=0xc5454a6e, version=-1
+#pragma link C++ class Belle2::TrackFindingCDC::CDCTrack+; // checksum=0x35a5e7f6, version=-1
 
 /// Some dictionaries for vectors and pairs that will be needed
 #pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCAxialSegmentPair>+; // checksum=0x6c87abbb, version=6

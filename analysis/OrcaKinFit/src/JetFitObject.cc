@@ -133,7 +133,7 @@ namespace Belle2 {
         double e  = pp[iE];
 
         if (e < 0) {
-          B2INFO("JetFitObject::updateParams: mirrored E!\n");
+          B2DEBUG(19, "JetFitObject::updateParams: mirrored E!\n");
           e  = -e;
           mirrored_e = true;
         }
@@ -227,7 +227,7 @@ namespace Belle2 {
     double JetFitObject::getError(int ilocal) const
     {
       assert(ilocal >= 0 && ilocal < NPAR);
-      B2INFO("JetFitObject::getError (ilocal = " << ilocal << ") = " <<  std::sqrt(cov[ilocal][ilocal]));
+      B2DEBUG(19, "JetFitObject::getError (ilocal = " << ilocal << ") = " <<  std::sqrt(cov[ilocal][ilocal]));
       return std::sqrt(cov[ilocal][ilocal]);
     }
 
@@ -388,7 +388,7 @@ namespace Belle2 {
       bool result = false;
 
       if (E < 0) {
-        B2INFO("JetFitObject::adjustEThetaPhi: mirrored E!\n");
+        B2DEBUG(19, "JetFitObject::adjustEThetaPhi: mirrored E!\n");
         E  = -E;
         theta = M_PI - theta;
         phi = M_PI + phi;
@@ -405,12 +405,12 @@ namespace Belle2 {
       }
 
       if (theta < 0) {
-        B2INFO("JetFitObject::adjustEThetaPhi: mirrored theta!\n");
+        B2DEBUG(19, "JetFitObject::adjustEThetaPhi: mirrored theta!\n");
         theta = -theta;
         phi = phi > 0 ? phi - M_PI : phi + M_PI;
         result = true;
       } else if (theta > M_PI) {
-        B2INFO("JetFitObject::adjustEThetaPhi: mirrored theta!\n");
+        B2DEBUG(19, "JetFitObject::adjustEThetaPhi: mirrored theta!\n");
         theta = 2 * M_PI - theta;
         phi = phi > 0 ? phi - M_PI : phi + M_PI;
         result = true;

@@ -11,6 +11,7 @@
 import sys
 import ROOT
 import os
+import argparse
 
 def printUsage():
     print(f'Usage: {os.path.basename(__file__)} OUTPUT_FILE INPUT_FILE1 [INPUT_FILE2 ...]')
@@ -51,36 +52,163 @@ def is_training_ntuple_file(tfile):
         return False
 
 def doMerge(outFile, inFiles):
-    out = ROOT.TFile.Open(outFile, 'NEW')
-    if not out:
-        print(f'Error: output file "{outFile}" already exists!')
-        sys.exit(1)
+    if os.path.exists(outFile):
+        print(f'Merging into existing file "{outFile}".')
+        out = ROOT.TFile.Open(outFile, 'UPDATE')
+        outTree = out.Get('persistent')
+        if not outTree:
+            print(f'Error: "persistent" tree not found in existing file.')
+            sys.exit(1)
 
+        outTree.GetEntry(0)
+        stats = outTree.ProcessStatistics.Clone()
+    else:
+        print(f'Creating new output file "{outFile}".')
+        out = ROOT.TFile.Open(outFile, 'NEW')
+        if not out:
+            print(f'Error: could not create output file "{outFile}"!')
+            sys.exit(1)
+
+        stats = None
+
+    # Load new input files
     inTree = ROOT.TChain('persistent')
     for f in inFiles:
-        # AddFile() does not perform wildcard expansion (iirc)
         inTree.AddFile(f)
-    inTree.GetEntry(0)
-    # Clone() needed so we actually own the object
-    stats = inTree.ProcessStatistics.Clone()
 
-    # merge statistics from all persistent trees into 'stats'
     numEntries = inTree.GetEntries()
-    print(f"Merging {int(numEntries)} files into {outFile}...")
-    for i in range(1, numEntries):
-        inTree.GetEntry(i)
-        stats.merge(inTree.ProcessStatistics)
-    print("done, saving.")
+    print(f"Merging {int(numEntries)} entries from input files...")
 
-    #print stats.getStatisticsString()
+    for i in range(numEntries):
+        inTree.GetEntry(i)
+        if stats is None:
+            stats = inTree.ProcessStatistics.Clone()
+        else:
+            stats.merge(inTree.ProcessStatistics)
+
+    print("Done, saving.")
+
+    # Save into tree
     out.cd()
+
+    # Replace existing tree
+    if out.Get('persistent'):
+        out.Delete('persistent;*')
+
     outTree = ROOT.TTree('persistent', 'persistent')
     outTree.Branch('ProcessStatistics', stats)
     outTree.Fill()
     outTree.Write()
     out.Close()
 
+def deleteExistingKeys(delete_file, read_file):
+    """
+    Delete objects from the second ROOT file that are present in the first ROOT file.
+    This is useful for merging ROOT files while avoiding duplicates.
+    Args:
+        delete_file (str): Path to the second ROOT file from which objects will be deleted.
+        read_file (str): Path to the first ROOT file whose objects will be used for comparison.
+    """
+    print(f"analysis-fei-mergefiles: Deleting objects from the second file '{delete_file}' that are present in the first file '{read_file}'...")
+    file_1 = ROOT.TFile.Open(read_file, "READ")
+    file_2 = ROOT.TFile.Open(delete_file, "UPDATE")
+
+    keyNames1 = set([key.GetName() for key in file_1.GetListOfKeys()])
+    keyNames2 = set([key.GetName() for key in file_2.GetListOfKeys()])
+    print(f"Objects in the first file: {keyNames1}")
+    print(f"Objects in the second file: {keyNames2}")
+
+    for key1 in file_1.GetListOfKeys():
+        if 'persistent' in key1.GetName():
+            continue
+        tree_name = key1.GetName()
+        if file_2.Get(tree_name):
+            file_2.Delete(f'{tree_name};*')
+            print(f"Deleted object '{tree_name}' from the file '{file_2}'")
+
+    file_1.Close()
+    file_2.Write("", ROOT.TObject.kOverwrite)
+    file_2.Close()
+
+def split_tree(tree, file1, file2, factor=0.8):
+    """
+    Splits a ROOT tree into two trees based on a given factor.
+    The first tree will contain a fraction of the entries specified by the factor,
+    while the second tree will contain the remaining entries.
+    Args:
+        tree (ROOT.TTree): The input ROOT tree to be split.
+        file1 (ROOT.TFile): The output file for the first tree.
+        file2 (ROOT.TFile): The output file for the second tree.
+        factor (float): The fraction of entries to be included in the first tree (0 < factor < 1).
+    Returns:
+        int: 0 if successful, 1 if an error occurred.
+    """
+    nentries = tree.GetEntries()
+    indices = list(range(nentries))
+    split_index = int(nentries * factor)
+    idx_file1 = set(indices[:split_index])
+
+    # Clone the structure
+    file1.cd()
+    tree1 = tree.CloneTree(0)
+    file2.cd()
+    tree2 = tree.CloneTree(0)
+
+    for i in range(nentries):
+        tree.GetEntry(i)
+        if i in idx_file1:
+            tree1.Fill()
+        else:
+            tree2.Fill()
+
+    file1.cd()
+    tree1.Write("", ROOT.TObject.kOverwrite)
+    file2.cd()
+    tree2.Write("", ROOT.TObject.kOverwrite)
+    return 0
+
+def split_root_file(input_file_path, output_file1_path, output_file2_path, factor=0.8):
+    """
+    Splits a ROOT file into two separate files based on a given factor.
+    The first file will contain a fraction of the entries specified by the factor,
+    while the second file will contain the remaining entries.
+    Args:
+        input_file_path (str): Path to the input ROOT file.
+        output_file1_path (str): Path to the output file for the first tree.
+        output_file2_path (str): Path to the output file for the second tree.
+        factor (float): The fraction of entries to be included in the first tree (0 < factor < 1).
+    Returns:
+        int: 0 if successful, 1 if an error occurred.
+    """
+    if not os.path.exists(input_file_path):
+        print(f"File not found: {input_file_path}")
+        return 1
+
+    input_file = ROOT.TFile.Open(input_file_path, "READ")
+    output_file1 = ROOT.TFile(output_file1_path, "RECREATE")
+    output_file2 = ROOT.TFile(output_file2_path, "RECREATE")
+
+    for key in input_file.GetListOfKeys():
+        obj = key.ReadObj()
+        if isinstance(obj, ROOT.TTree):
+            tree_name = obj.GetName()
+            print(f"Splitting tree: {tree_name}")
+            input_file.cd()
+            tree = input_file.Get(tree_name)
+
+            output_file1.cd()
+            ret = split_tree(tree, output_file1, output_file2, factor)
+            if ret != 0:
+                return ret
+
+    output_file1.Close()
+    output_file2.Close()
+    input_file.Close()
+    print("Splitting complete.")
+    return 0
+
 def doMergeNtuple(outFile, inFiles):
+    # is it redundant?
     first_input = ROOT.TFile.Open(inFiles[0],'read')
     tchains = [ROOT.TChain(k.GetName()) for k in first_input.GetListOfKeys()]
 
@@ -93,39 +221,80 @@ def doMergeNtuple(outFile, inFiles):
 
     output.Close()
 
-if len(sys.argv) < 3:
-    printUsage()
-    sys.exit(1)
+# =======================================================================
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-o', '--output', dest='output', type=str, required=True,
+                        help='Output file name')
+    parser.add_argument('-i', '--inputs', dest='inputs', type=str, help='List of input files', nargs='+', required=True)
+    parser.add_argument('-s', '--split', dest='split', type=float, default=0)
+    args = parser.parse_args()
+    
+    outFile = args.output
+    inFiles = args.inputs
 
-outFile = sys.argv[1]
+    ROOT.gSystem.Load('libdataobjects')
 
-if os.path.isfile(outFile) and not is_training_ntuple_file(ROOT.TFile.Open(outFile, 'read')):
-    os.remove(outFile)
-
-inFiles = sys.argv[2:]
-
-ROOT.gSystem.Load('libdataobjects')
-
-# pick first input file to check what we want to do
-filename = inFiles[0]
-tfile = ROOT.TFile.Open(filename, 'read')
-print(f'Preparing merging for {outFile}')
-if is_statistics_file(tfile):
-    print('Is a statistics file')
-    doMerge(outFile, inFiles)
-elif is_monitor_ntuple_file(tfile):
-    print('Is a monitor ntuple file')
-    doMergeNtuple(outFile, inFiles)
-elif is_training_ntuple_file(tfile):
-    print('Is a training ntuple file')
-    import subprocess
-    if os.path.exists(outFile):
-        print(f'\t{outFile} exists already! Appending...')
-        ret = subprocess.call(['hadd', '-a', outFile] + inFiles)
+    # pick first input file to check what we want to do
+    filename = inFiles[0]
+    tfile = ROOT.TFile.Open(filename, 'read')
+    print(f'analysis-fei-mergefiles: Preparing merging for {outFile}')
+    if is_statistics_file(tfile):
+        print(f'analysis-fei-mergefiles: Is a statistics file')
+        tfile.Close()
+        doMerge(outFile, inFiles)
     else:
-        ret = subprocess.call(['hadd', outFile] + inFiles)
-else:
-    print('Is a histogram file')
-    import subprocess
-    ret = subprocess.call(['hadd', outFile] + inFiles)
-    sys.exit(ret)
+        isTrainingFile = is_training_ntuple_file(tfile)
+        if isTrainingFile:
+            print(f'analysis-fei-mergefiles: Is a training ntuple file')
+        elif is_monitor_ntuple_file(tfile):
+            print(f'analysis-fei-mergefiles: Is a monitor ntuple file')
+        else:
+            print(f'analysis-fei-mergefiles: Is a histogram file')
+        tfile.Close()
+
+        import subprocess
+        ret = subprocess.call(f'hadd {outFile.replace(".root", "_tmp.root")} ' + ' '.join(inFiles), shell=True)
+        if ret != 0:
+            sys.exit(ret)
+
+        if isTrainingFile and args.split > 0:
+            result = split_root_file(
+                outFile.replace('.root', '_tmp.root'),
+                outFile.replace('.root', '_tmp2.root'),
+                outFile.replace('training_input', 'validation_input').replace('.root', '_tmp.root'),
+                args.split
+            )
+            if result != 0:
+                print(f"Error splitting the file: {result}")
+                sys.exit(result)
+            os.rename(outFile.replace('.root', '_tmp2.root'), outFile.replace('.root', '_tmp.root'))
+
+        if os.path.exists(outFile):
+            print(f'analysis-fei-mergefiles: \t{outFile} exists already! Two step merge ...')
+            if isTrainingFile and args.split > 0:
+                validFileName = outFile.replace('training_input', 'validation_input')
+                deleteExistingKeys(
+                    validFileName,
+                    validFileName.replace('.root', '_tmp.root') 
+                )
+                os.rename(validFileName, validFileName.replace('.root', '_tmp2.root'))
+                ret = subprocess.call(f'hadd {validFileName} {validFileName.replace(".root", "_tmp2.root")} {validFileName.replace(".root", "_tmp.root")}', shell=True)
+                if ret != 0:
+                    sys.exit(ret)
+                os.remove(validFileName.replace('.root', '_tmp.root'))
+                os.remove(validFileName.replace('.root', '_tmp2.root'))
+
+            deleteExistingKeys(outFile, outFile.replace('.root', '_tmp.root'))
+            os.rename(outFile, outFile.replace('.root', '_tmp2.root'))
+            ret = subprocess.call(f'hadd {outFile} {outFile.replace(".root", "_tmp2.root")} {outFile.replace(".root", "_tmp.root")}', shell=True)
+
+            if ret == 0:
+                os.remove(outFile.replace('.root', '_tmp.root'))
+                os.remove(outFile.replace('.root', '_tmp2.root'))
+        else:
+            if isTrainingFile and args.split > 0:
+                validFileName = outFile.replace('training_input', 'validation_input')
+                os.rename(validFileName.replace('.root', '_tmp.root'), validFileName)
+            os.rename(outFile.replace('.root', '_tmp.root'), outFile)
+        sys.exit(ret)

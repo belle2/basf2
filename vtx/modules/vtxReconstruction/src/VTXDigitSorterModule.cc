@@ -100,7 +100,7 @@ void VTXDigitSorterModule::event()
       continue;
     }
 
-    const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(
+    const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(
                                                                sensorID));
 
     // TODO Apply masking of bad channels

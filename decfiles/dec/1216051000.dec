@@ -1,0 +1,49 @@
+# EventType: 1216051000
+# Descriptor: B+ -> D_s*+ [-> D_s+ (-> K+ K- pi+ ) gamma] anti-D0 [-> K+ pi-]
+# NickName: Bu_DsstD0
+# Documentation: Bu -> Ds* anti-D0
+# Tested: yes
+# PhysicsWG: BHadronic WG
+# Responsible: Neha Sharma
+# Email: nehas@physics.iitm.ac.in
+# Cuts: None
+# Date: 2024/11/18
+
+
+Alias D_s*+sig D_s*+
+Alias D_s*-sig D_s*-
+ChargeConj D_s*+sig D_s*-sig
+
+
+Decay Upsilon(4S)
+0.5000 B+sig B-              VSS;
+0.5000 B+ B-sig              VSS;
+Enddecay
+
+
+# B+ -> D_s*+ anti-D0
+Decay B+sig   
+1.0 D_s*+sig  anti-D0sig     SVS;
+Enddecay
+CDecay B-sig
+
+# anti-D0 -> K+ pi-
+Decay anti-D0sig
+1.0 K+ pi-                   PHSP;
+Enddecay
+CDecay D0sig
+
+# D_s*+ -> D_s+ gamma
+Decay D_s*+sig
+1.0 D_s+ gamma               VSP_PWAVE;
+Enddecay
+CDecay D_s*-sig
+
+# D_s+ -> K- K+ pi+
+Decay D_s+sig
+1.0  K-  K+  pi+             D_DALITZ;
+Enddecay
+CDecay D_s-sig
+
+
+End

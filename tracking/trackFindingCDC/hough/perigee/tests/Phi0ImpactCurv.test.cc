@@ -142,7 +142,7 @@ namespace {
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
-      // Exclude the timing of the resource release for comparision with the legendre test.
+      // Exclude the timing of the resource release for comparison with the Legendre test.
       houghTree.fell();
 
       houghTree.seed(m_mcAxialSegment2Ds);
@@ -214,7 +214,7 @@ namespace {
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(1, true, [&]() {
-      // Exclude the timing of the resource release for comparision with the legendre test.
+      // Exclude the timing of the resource release for comparison with the Legendre test.
       houghTree.fell();
       houghTree.seed(m_mcAxialSegment2Ds);
 

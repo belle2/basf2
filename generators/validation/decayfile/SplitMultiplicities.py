@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,7 +11,7 @@
 #############################################################
 # Python basf2 module to determine the multiplicities of a particle of a certain pdg code
 # (antiparticles not included) on generator level. We loop over the number of mcParticles and
-# count the number of particles of a certain pdg code. In addition, the mutiplicities are split
+# count the number of particles of a certain pdg code. In addition, the multiplicities are split
 # into categories depending on whether they originate from a B+/B-/B0/antiB0.
 # We need to write the information as extraInfo to reconstructed particles, hence the need for
 # a reco particle list as input.
@@ -78,13 +77,14 @@ class SplitMultiplicities(basf2.Module):
                         mcMother = mcMother.getMother()
 
         # create the extra info names and save the corresponding multiplicities
-        extraInfoName = 'nGen_{}'.format(self.pdgcode)
-        extraInfoName_Bp = 'nGen_{}_Bp'.format(self.pdgcode)
-        extraInfoName_Bm = 'nGen_{}_Bm'.format(self.pdgcode)
-        extraInfoName_B0 = 'nGen_{}_B0'.format(self.pdgcode)
-        extraInfoName_antiB0 = 'nGen_{}_antiB0'.format(self.pdgcode)
+        extraInfoName = f'nGen_{self.pdgcode}'
+        extraInfoName_Bp = f'nGen_{self.pdgcode}_Bp'
+        extraInfoName_Bm = f'nGen_{self.pdgcode}_Bm'
+        extraInfoName_B0 = f'nGen_{self.pdgcode}_B0'
+        extraInfoName_antiB0 = f'nGen_{self.pdgcode}_antiB0'
 
-        self.eventExtraInfo.create()
+        if not self.eventExtraInfo.isValid():
+            self.eventExtraInfo.create()
         self.eventExtraInfo.setExtraInfo(extraInfoName, gen_counter)
         self.eventExtraInfo.setExtraInfo(extraInfoName_Bp, Bp_counter)
         self.eventExtraInfo.setExtraInfo(extraInfoName_Bm, Bm_counter)

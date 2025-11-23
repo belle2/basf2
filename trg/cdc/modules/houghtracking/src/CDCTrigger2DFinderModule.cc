@@ -111,6 +111,15 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
   addParam("suppressClone", m_suppressClone,
            "Switch to send only the first found track and suppress the "
            "subsequent clones.", false);
+
+  addParam("usehitpattern", m_usehitpattern,
+           "Switch to use hit pattern inside TSF ", false);
+
+  addParam("useadc", m_useadc,
+           "Switch to use ADC. Can be used with usehitpattern enabled. ", false);
+
+  addParam("useDB", m_useDB,
+           "Switch to use database to load run dependent parameters. ", true);
 }
 
 void
@@ -132,8 +141,15 @@ CDCTrigger2DFinderModule::initialize()
     TSoffset[iSL] = nTS;
     nTS += cdc.nWiresInLayer(layerId);
     TSoffset[iSL + 1] = nTS;
-    for (int priority = 0; priority < 2; ++ priority) {
-      radius[iSL][priority] = cdc.senseWireR(layerId + priority);
+    if (!m_usehitpattern) {
+      for (int priority = 0; priority < 2; ++ priority) {
+        radius[iSL][priority] = cdc.senseWireR(layerId + priority);
+      }
+    } else {
+      for (int priority = 0; priority < 5; ++ priority) {
+        if (iSL == 0) radius[iSL][priority] = cdc.senseWireR(layerId + priority);
+        else       radius[iSL][priority] = cdc.senseWireR(layerId + priority - 2);
+      }
     }
     layerId += (iSL > 0 ? 6 : 7);
   }
@@ -144,6 +160,23 @@ CDCTrigger2DFinderModule::initialize()
 
   if (m_suppressClone) {
     B2INFO("2D finder will exit with the first track candidate in time.");
+  }
+}
+
+void
+CDCTrigger2DFinderModule::beginRun()
+{
+  if (m_useDB) {
+    if (not m_cdctrg2d_DB.isValid()) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      B2FATAL("No database for CDCTRG 2D parameter. exp " << evtMetaData->getExperiment() << " run "
+              << evtMetaData->getRun());
+    } else {
+      m_usehitpattern = m_cdctrg2d_DB->getfullhit();
+      m_useadc = m_cdctrg2d_DB->getADC();
+      m_minHits = m_cdctrg2d_DB->gethitthreshold();
+      m_minHitsShort = m_cdctrg2d_DB->gethitthreshold();
+    }
   }
 }
 
@@ -176,16 +209,89 @@ CDCTrigger2DFinderModule::event()
     }
     if (iSL % 2) continue;
     if (m_ignore2nd && m_segmentHits[iHit]->getPriorityPosition() < 3) continue;
-    double phi = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
-    if (m_usePriority) {
-      phi += 0.5 * (((m_segmentHits[iHit]->getPriorityPosition() >> 1) & 1)
-                    - (m_segmentHits[iHit]->getPriorityPosition() & 1));
+
+    if (m_usehitpattern) {
+      unsigned hitpattern;
+      if (m_useadc) hitpattern = m_segmentHits[iHit]->getadcpattern();
+      else          hitpattern = m_segmentHits[iHit]->gethitpattern();
+      int nhitpattern = 0;
+      if (iSL == 0)nhitpattern = 15;
+      else         nhitpattern = 11;
+      for (int i = 0; i < nhitpattern; i++) {
+        if ((hitpattern & (1 << i)) != 0) {
+          double phi = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
+          if (iSL != 0 && i == 0)  phi = phi - 1;
+          else if (iSL != 0 && i == 1)  phi = phi + 0;
+          else if (iSL != 0 && i == 2)  phi = phi + 1;
+          else if (iSL != 0 && i == 3)  phi = phi - 0.5;
+          else if (iSL != 0 && i == 4)  phi = phi + 0.5;
+          else if (iSL != 0 && i == 5)  phi = phi + 0;
+          else if (iSL != 0 && i == 6)  phi = phi - 0.5;
+          else if (iSL != 0 && i == 7)  phi = phi + 0.5;
+          else if (iSL != 0 && i == 8)  phi = phi - 1;
+          else if (iSL != 0 && i == 9)  phi = phi + 0;
+          else if (iSL != 0 && i == 10) phi = phi + 1;
+          else if (iSL == 0 && i == 0)  phi = phi + 0;
+          else if (iSL == 0 && i == 1)  phi = phi - 0.5;
+          else if (iSL == 0 && i == 2)  phi = phi + 0.5;
+          else if (iSL == 0 && i == 3)  phi = phi - 1;
+          else if (iSL == 0 && i == 4)  phi = phi + 0;
+          else if (iSL == 0 && i == 5)  phi = phi + 1;
+          else if (iSL == 0 && i == 6)  phi = phi - 1.5;
+          else if (iSL == 0 && i == 7)  phi = phi - 0.5;
+          else if (iSL == 0 && i == 8)  phi = phi + 0.5;
+          else if (iSL == 0 && i == 9)  phi = phi + 1.5;
+          else if (iSL == 0 && i == 10) phi = phi - 2;
+          else if (iSL == 0 && i == 11) phi = phi - 1;
+          else if (iSL == 0 && i == 12) phi = phi + 0;
+          else if (iSL == 0 && i == 13) phi = phi + 1;
+          else if (iSL == 0 && i == 14) phi = phi + 2;
+          phi = phi * 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
+          int iLayer = 0;
+          if (iSL != 0 && i == 0)   iLayer = 0;
+          else if (iSL != 0 && i == 1)   iLayer = 0;
+          else if (iSL != 0 && i == 2)   iLayer = 0;
+          else if (iSL != 0 && i == 3)   iLayer = 1;
+          else if (iSL != 0 && i == 4)   iLayer = 1;
+          else if (iSL != 0 && i == 5)   iLayer = 2;
+          else if (iSL != 0 && i == 6)   iLayer = 3;
+          else if (iSL != 0 && i == 7)   iLayer = 3;
+          else if (iSL != 0 && i == 8)   iLayer = 4;
+          else if (iSL != 0 && i == 9)   iLayer = 4;
+          else if (iSL != 0 && i == 10)  iLayer = 4;
+          else if (iSL == 0 && i == 0)   iLayer = 0;
+          else if (iSL == 0 && i == 1)   iLayer = 1;
+          else if (iSL == 0 && i == 2)   iLayer = 1;
+          else if (iSL == 0 && i == 3)   iLayer = 2;
+          else if (iSL == 0 && i == 4)   iLayer = 2;
+          else if (iSL == 0 && i == 5)   iLayer = 2;
+          else if (iSL == 0 && i == 6)   iLayer = 3;
+          else if (iSL == 0 && i == 7)   iLayer = 3;
+          else if (iSL == 0 && i == 8)   iLayer = 3;
+          else if (iSL == 0 && i == 9)   iLayer = 3;
+          else if (iSL == 0 && i == 10)  iLayer = 4;
+          else if (iSL == 0 && i == 11)  iLayer = 4;
+          else if (iSL == 0 && i == 12)  iLayer = 4;
+          else if (iSL == 0 && i == 13)  iLayer = 4;
+          else if (iSL == 0 && i == 14)  iLayer = 4;
+
+          double r = radius[iSL][iLayer];
+          ROOT::Math::XYVector pos(cos(phi) / r, sin(phi) / r);
+          hitMap.insert(std::make_pair(iHit * 15 + i, std::make_pair(iSL * 5 + iLayer, pos)));
+        }
+      }
+    } else {
+      double phi = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
+      if (m_usePriority) {
+        phi += 0.5 * (((m_segmentHits[iHit]->getPriorityPosition() >> 1) & 1)
+                      - (m_segmentHits[iHit]->getPriorityPosition() & 1));
+      }
+      phi = phi * 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
+      double r = radius[iSL][int(m_usePriority &&
+                                 m_segmentHits[iHit]->getPriorityPosition() < 3)];
+      ROOT::Math::XYVector pos(cos(phi) / r, sin(phi) / r);
+      hitMap.insert(std::make_pair(iHit, std::make_pair(iSL, pos)));
     }
-    phi = phi * 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
-    double r = radius[iSL][int(m_usePriority &&
-                               m_segmentHits[iHit]->getPriorityPosition() < 3)];
-    ROOT::Math::XYVector pos(cos(phi) / r, sin(phi) / r);
-    hitMap.insert(std::make_pair(iHit, std::make_pair(iSL, pos)));
   }
 
   /* Extent the Hough plane such that the cell number is a power of 2 (same for x and y).

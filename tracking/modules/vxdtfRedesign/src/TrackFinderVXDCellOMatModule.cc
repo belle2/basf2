@@ -135,7 +135,7 @@ void TrackFinderVXDCellOMatModule::event()
   if (m_PARAMsetFamilies) {
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
     if (nFamilies > m_PARAMmaxFamilies)  {
-      B2WARNING("Maximal number of track canidates per event was exceeded: Number of Families = " << nFamilies);
+      B2WARNING("Maximal number of track candidates per event was exceeded: Number of Families = " << nFamilies);
       m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
       return;
     }

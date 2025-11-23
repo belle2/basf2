@@ -57,7 +57,7 @@ void ProgressBarModule::event()
 
   double clockSec = Utils::getClock() / 1e9;
 
-  // To not count intialization time we only print output starting one second
+  // To not count initialization time we only print output starting one second
   // after the first event is processed
   if (m_startTime == 0) {
     // first call, let's start here

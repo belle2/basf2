@@ -12,7 +12,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <mva/interface/Interface.h>
 
@@ -55,10 +54,10 @@ void MVAMultipleExpertsModule::initialize()
 
   if (m_listNames.empty()) {
     StoreObjPtr<EventExtraInfo> extraInfo("", DataStore::c_Event);
-    extraInfo.registerInDataStore();
+    extraInfo.isRequired();
   } else {
     StoreObjPtr<ParticleExtraInfoMap> extraInfo("", DataStore::c_Event);
-    extraInfo.registerInDataStore();
+    extraInfo.isRequired();
   }
 
   if (m_extraInfoNames.size() != m_identifiers.size()) {

@@ -37,6 +37,7 @@
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 #include <Math/Point3D.h>
+#include <Math/VectorUtil.h>
 
 #include <limits>
 #include <algorithm>
@@ -174,6 +175,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("mcMatchingMode", m_mcMatchingModeString,
            "MC matching mode: 'Direct', or 'GeneratorLevel'",
            std::string("Direct"));
+  addParam("evtgenProcessing", m_evtgenProcessing, "Flag to switch on only evtgen processing", false);
   addParam("matchType2E9oE25Threshold", m_matchType2E9oE25Threshold,
            "clusters with a E9/E25 value above this threshold are classified as neutral even if tracks are matched to their connected region (matchType == 2)",
            -1.1);
@@ -224,7 +226,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
 
-  if (m_convertEvtcls || m_convertRecTrg) m_evtInfo.registerInDataStore();
+  if (m_convertEvtcls || m_convertRecTrg) m_evtInfo.isRequired();
 
   if (m_convertTrkExtra) m_belleTrkExtra.registerInDataStore();
 
@@ -269,6 +271,9 @@ void B2BIIConvertMdstModule::beginRun()
 {
   B2DEBUG(99, "B2BIIConvertMdst: beginRun called.");
 
+  if (m_evtgenProcessing)
+    return;
+
   if (m_convertBeamParameters) {
     //BeamEnergy class updated by fixmdst module in beginRun()
     Belle::BeamEnergy::begin_run();
@@ -296,26 +301,35 @@ void B2BIIConvertMdstModule::event()
   if (m_convertBeamParameters) {
     // Are we running on MC or DATA?
     Belle::Belle_event_Manager& evman = Belle::Belle_event_Manager::get_manager();
-    Belle::Belle_event& evt = evman[0];
+    if (evman.count() == 0) {
+      if (m_evtgenProcessing)
+        m_realData = false; // <- this is MC sample
+      else
+        B2FATAL("No event found in the event manager, the input mdst file might be corrupted. "
+                "If you are running on evtgen's output, please set the evtgenProcessing flag to true.");
+    } else {
+      Belle::Belle_event& evt = evman[0];
 
-    if (evt.ExpMC() == 2)
-      m_realData = false; // <- this is MC sample
-    else
-      m_realData = true;  // <- this is real data sample
+      if (evt.ExpMC() == 2)
+        m_realData = false; // <- this is MC sample
+      else
+        m_realData = true;  // <- this is real data sample
+    }
 
     // 0. Convert IPProfile to BeamSpot
     convertIPProfile();
 
     // Make sure beam parameters are correct: if they are not found in the
     // database or different from the ones in the database we need to override them
-    if (!m_beamSpotDB || !(m_beamSpot == *m_beamSpotDB) ||
-        !m_collisionBoostVectorDB || !m_collisionInvMDB) {
-      if ((!m_beamSpotDB || !m_collisionBoostVectorDB || !m_collisionInvMDB) && !m_realData) {
+    if ((!m_beamSpotDB || !(m_beamSpot == *m_beamSpotDB) ||
+         !m_collisionBoostVectorDB || !m_collisionInvMDB || !m_collisionAxisCMSDB) && !m_evtgenProcessing) {
+      if ((!m_beamSpotDB || !m_collisionBoostVectorDB || !m_collisionInvMDB || !m_collisionAxisCMSDB) && !m_realData) {
         B2INFO("No database entry for this run yet, create one");
         StoreObjPtr<EventMetaData> event;
         IntervalOfValidity iov(event->getExperiment(), event->getRun(), event->getExperiment(), event->getRun());
         Database::Instance().storeData("CollisionBoostVector", &m_collisionBoostVector, iov);
         Database::Instance().storeData("CollisionInvariantMass", &m_collisionInvM, iov);
+        Database::Instance().storeData("CollisionAxisCMS", &m_collisionAxisCMS, iov);
         Database::Instance().storeData("BeamSpot", &m_beamSpot, iov);
       }
       if (m_realData) {
@@ -331,12 +345,18 @@ void B2BIIConvertMdstModule::event()
       }
       DBStore::Instance().addConstantOverride("CollisionBoostVector", new CollisionBoostVector(m_collisionBoostVector), true);
       DBStore::Instance().addConstantOverride("CollisionInvariantMass", new CollisionInvariantMass(m_collisionInvM), true);
+      DBStore::Instance().addConstantOverride("CollisionAxisCMS", new CollisionAxisCMS(m_collisionAxisCMS), true);
       DBStore::Instance().addConstantOverride("BeamSpot", new BeamSpot(m_beamSpot), true);
     }
   }
 
   // 1. Convert MC information
   convertGenHepEvtTable();
+
+  if (m_evtgenProcessing) {
+    B2DEBUG(99, "B2BIIConvertMdst: evtgenProcessing is true, skipping conversion of all reconstruction information");
+    return;
+  }
 
   // 2. Convert Tracking information
   convertMdstChargedTable();
@@ -388,7 +408,7 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
   const double angleLer = M_PI; //parallel to negative z axis (different from Belle II!)
   const double angleHer = crossingAngle; //in positive z and x direction, verified to be consistent with Upsilon(4S) momentum
   const double mass_e = Const::electronMass;    //mass of electron: 0.0 in basf, 0.000510998902 in basf2;
-  TMatrixDSym covariance(0);    //0 entries = no error
+  TMatrixDSym covariance(3);    //0 entries = no error
   HepLorentzVector p_beam = Belle::BeamEnergy::p_beam(); // Testing only
 
   // Get four momentum of LER and HER
@@ -402,12 +422,20 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
   // Get four momentum of beam
   ROOT::Math::PxPyPzEVector P_beam = P_her + P_ler;
 
+  ROOT::Math::PxPyPzEVector momentumHER = P_her;
+  ROOT::Math::VectorUtil::boost(momentumHER, -P_beam.BoostToCM());
+  double angleXZ = std::atan(momentumHER.X() / momentumHER.Z());
+  double angleYZ = std::atan(momentumHER.Y() / momentumHER.Z());
+
   m_collisionBoostVector.setBoost(B2Vector3D(-P_beam.BoostToCM()), covariance);
   m_collisionInvM.setMass(P_beam.M(), 0.0, 0.0);
+  m_collisionAxisCMS.setAngles(angleXZ, angleYZ, TMatrixTSym<double>(2));
+  m_collisionAxisCMS.setSpread(TMatrixTSym<double>(2), 0, 0, 0);
 
   B2DEBUG(99, "Beam Energy: E_HER = " << Eher << "; E_LER = " << Eler << "; angle = " << crossingAngle);
   B2DEBUG(99, "Beam Momentum (pre-convert) : P_X = " << p_beam.px() << "; P_Y = " << p_beam.py() << "; P_Z = " << p_beam.pz());
   B2DEBUG(99, "Beam Momentum (post-convert) : P_X = " << P_beam.Px() << "; P_Y = " << P_beam.Py() << "; P_Z = " << P_beam.Pz());
+  B2DEBUG(99, "CollisionAxisCMS: angleXZ = " << m_collisionAxisCMS.getAngleXZ() << "; angleYZ = " << m_collisionAxisCMS.getAngleYZ());
 }
 
 void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
@@ -417,10 +445,10 @@ void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
     if (beginRun) {
       // no IPProfile, set vertex to NaN without errors for the full run
       m_beamSpot.setIP(
-        TVector3(std::numeric_limits<double>::quiet_NaN(),
-                 std::numeric_limits<double>::quiet_NaN(),
-                 std::numeric_limits<double>::quiet_NaN()
-                ), TMatrixTSym<double>()
+        ROOT::Math::XYZVector(std::numeric_limits<double>::quiet_NaN(),
+                              std::numeric_limits<double>::quiet_NaN(),
+                              std::numeric_limits<double>::quiet_NaN()
+                             ), TMatrixTSym<double>()
       );
     }
     return;
@@ -449,7 +477,7 @@ void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
       cov(i, j) = ipErr(i + 1, j + 1);
     }
   }
-  m_beamSpot.setIP(TVector3(ip.x(), ip.y(), ip.z()), cov);
+  m_beamSpot.setIP(ROOT::Math::XYZVector(ip.x(), ip.y(), ip.z()), cov);
 }
 
 void B2BIIConvertMdstModule::convertMdstChargedTable()
@@ -461,6 +489,17 @@ void B2BIIConvertMdstModule::convertMdstChargedTable()
   Belle::Mdst_charged_Manager& m = Belle::Mdst_charged_Manager::get_manager();
   for (Belle::Mdst_charged_Manager::iterator chargedIterator = m.begin(); chargedIterator != m.end(); ++chargedIterator) {
     Belle::Mdst_charged belleTrack = *chargedIterator;
+
+    Belle::Mdst_trk& trk = belleTrack.trk();
+    bool foundValidTrackFitResult = false;
+    for (int mhyp = 0 ; mhyp < c_nHyp; ++mhyp) {
+      Belle::Mdst_trk_fit& trk_fit = trk.mhyp(mhyp);
+
+      double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
+      if (std::isnan(pValue)) continue;
+      foundValidTrackFitResult = true;
+    }
+    if (not foundValidTrackFitResult) continue;
 
     auto track = m_tracks.appendNew();
 
@@ -586,6 +625,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       if (nTrack == 2)
         break;
     }
+    if (std::max(trackID[0], trackID[1]) > m_tracks.getEntries()) continue;
 
     HepPoint3D dauPivot(belleV0.vx(), belleV0.vy(), belleV0.vz());
     int trackFitPIndex = -1;
@@ -611,7 +651,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         belleVeeDaughterToCartesian(belleV0, 1, pTypeP, momentumP, positionP, error7x7P);
         TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumP, positionP, error7x7P, 1, pTypeP, 0.5, -1, -1, 0));
-        // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
+        // TrackFitResult internally stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
 
         for (unsigned i = 0; i < 7; i++)
@@ -626,6 +666,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       } else {
         Belle::Mdst_trk_fit& trk_fit = charged_mag[trackID[0] - 1].trk().mhyp(belleHypP);
         double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
+        if (std::isnan(pValue)) continue;
 
         std::vector<float> helixParam(5);
         std::vector<float> helixError(15);
@@ -667,7 +708,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         belleVeeDaughterToCartesian(belleV0, -1, pTypeM, momentumM, positionM, error7x7M);
         TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumM, positionM, error7x7M, -1, pTypeM, 0.5, -1, -1, 0));
-        // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
+        // TrackFitResult internally stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
         for (unsigned i = 0; i < 7; i++)
           for (unsigned j = 0; j < 7; j++)
@@ -681,6 +722,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       } else {
         Belle::Mdst_trk_fit& trk_fit = charged_mag[trackID[1] - 1].trk().mhyp(belleHypM);
         double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
+        if (std::isnan(pValue)) continue;
 
         std::vector<float> helixParam(5);
         std::vector<float> helixError(15);
@@ -1671,10 +1713,13 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
   Belle::Mdst_trk& trk = belleTrack.trk();
 
   for (int mhyp = 0 ; mhyp < c_nHyp; ++mhyp) {
+    Belle::Mdst_trk_fit& trk_fit = trk.mhyp(mhyp);
+
+    double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
+    if (std::isnan(pValue)) continue;
+
     const Const::ChargedStable& pType = c_belleHyp_to_chargedStable[mhyp];
     double thisMass = pType.getMass();
-
-    Belle::Mdst_trk_fit& trk_fit = trk.mhyp(mhyp);
 
     // Converted helix parameters
     std::vector<float> helixParam(5);
@@ -1697,8 +1742,6 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     for (unsigned int i = 0; i < size; i++)
       for (unsigned int j = i; j < size; j++)
         helixError[counter++] = error5x5[i][j];
-
-    double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
 
     // Create an empty cdc hitpattern and set the number of total hits
     // use hits from 0: axial-wire, 1:stereo-wire, 2:cathode
@@ -2006,7 +2049,7 @@ void B2BIIConvertMdstModule::setTracksToECLClustersRelations()
 
       // the numbering in mdst_charged
       // not necessarily the same as in mdst_trk
-      // therfore have to find corresponding mdst_charged
+      // therefore have to find corresponding mdst_charged
       for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); ++chgIterator) {
         Belle::Mdst_charged mChar = *chgIterator;
         Belle::Mdst_trk mTRK_in_charged = mChar.trk();

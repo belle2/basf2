@@ -11,6 +11,7 @@
 
 //root
 #include <Math/ProbFunc.h>
+#include <TMatrix.h>
 
 #include <rave/TransientTrackKinematicParticle.h>
 #include <rave/impl/RaveBase/Converters/interface/RaveStreamers.h>
@@ -136,7 +137,7 @@ int RaveKinematicVertexFitter::fit()
   }
   int nOfVertices = -100;
   if (m_useBeamSpot == true) {
-    const B2Vector3D& bsPos = RaveSetup::getRawInstance()->m_beamSpot;
+    const ROOT::Math::XYZVector& bsPos = RaveSetup::getRawInstance()->m_beamSpot;
     const TMatrixDSym& bsCov = RaveSetup::getRawInstance()->m_beamSpotCov;
     const rave::Covariance3D bsCovRave(bsCov(0, 0), bsCov(0, 1), bsCov(0, 2), bsCov(1, 1), bsCov(1, 2), bsCov(2, 2));
     RaveSetup::getRawInstance()->m_raveVertexFactory->setBeamSpot(rave::Ellipsoid3D(rave::Point3D(bsPos.X(), bsPos.Y(), bsPos.Z()),

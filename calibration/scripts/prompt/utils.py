@@ -155,7 +155,7 @@ def filter_by_select_max_events_from_files(input_file_list, select_max_events_fr
         select_max_events_from_files (int): The threshold we want to reach but stop adding files if we reach it.
 
     Returns:
-        list: The sorted list of random files or empty list of not enought found
+        list: The sorted list of random files or empty list of not enough found
     """
 
     total = 0

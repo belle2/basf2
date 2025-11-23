@@ -39,7 +39,7 @@ namespace Belle2 {
 
   /// functions to search in the sorted list of tuples
   struct adc_search {
-    /// Order accroding to channel/ADC value
+    /// Order according to channel/ADC value
     bool operator()(const adcAsicTuple& lhs, const adcAsicTuple& rhs)
     {
       if (lhs.Channel == rhs.Channel) {
@@ -49,7 +49,7 @@ namespace Belle2 {
       }
     }
 
-    /// Order accroding to channel/ADC value
+    /// Order according to channel/ADC value
     bool operator()(const adcChannelPair& lhs, const adcAsicTuple& rhs)
     {
       if (lhs.Channel == rhs.Channel) {
@@ -59,7 +59,7 @@ namespace Belle2 {
       }
     }
 
-    /// Order accroding to channel/ADC value
+    /// Order according to channel/ADC value
     bool operator()(const adcAsicTuple& lhs, const adcChannelPair& rhs)
     {
       if (lhs.Channel == rhs.Channel) {

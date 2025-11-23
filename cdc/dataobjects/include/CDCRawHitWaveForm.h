@@ -100,16 +100,39 @@ namespace Belle2 {
       return m_finess;
     }
 
+    /**
+     * Getter for ADC.
+     */
+    inline unsigned short getADC(void) const
+    {
+      return m_adc;
+    }
+
+    /**
+     * Getter for TDC.
+     */
+    inline unsigned short getTDC(void) const
+    {
+      return m_tdc;
+    }
+
+    /**
+     * Getter for samplint point.
+     */
+    inline unsigned short getSample(void) const
+    {
+      return m_sample;
+    }
 
   private:
-    /**
-     * Status of data block.
-     */
-    unsigned short m_status;
     /**
      * Trigger number.
      */
     int m_triggerNumber;
+    /**
+     * Status of data block.
+     */
+    unsigned short m_status;
     /**
      * Copper node ID.
      */
@@ -144,7 +167,7 @@ namespace Belle2 {
     unsigned short m_tdc;
 
     /// To derive from TObject
-    ClassDef(CDCRawHitWaveForm, 1);
+    ClassDef(CDCRawHitWaveForm, 2);
 
 
   };

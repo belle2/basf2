@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <vector>
 #include <Math/Vector3D.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>

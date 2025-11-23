@@ -23,7 +23,7 @@
 #                                                                          #
 # The latest recommendations for tracking systematic uncertainties can     #
 # be found here:                                                           #
-# https://confluence.desy.de/display/BI/Tracking+and+Vertexing+Performance #
+# https://xwiki.desy.de/xwiki/rest/p/d8c51                                 #
 #                                                                          #
 ############################################################################
 

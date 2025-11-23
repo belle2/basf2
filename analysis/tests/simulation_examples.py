@@ -20,7 +20,7 @@ class ExamplesTest(b2tua.ExamplesTest):
         """
         Test supported simulation examples.
         """
-        b2tu.skip_test_if_light(self)  # simulation doesn't work in light releaes
+        b2tu.skip_test_if_light(self)  # simulation doesn't work in light releases
 
         # list of broken examples (to be removed when they are individually fixed)
         broken_sim_egs = ['B2A105-SimulateAndReconstruct-withBeamBkg.py']  # no beam background files on GitLab runner

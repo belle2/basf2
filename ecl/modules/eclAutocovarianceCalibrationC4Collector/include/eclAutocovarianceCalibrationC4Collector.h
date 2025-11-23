@@ -1,4 +1,5 @@
 /**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
  *                                                                        *
  * See git log for contributors and copyright holders.                    *
@@ -54,8 +55,6 @@ namespace Belle2 {
 
     DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC1Threshold;  /**< thresholds obtained from C1 stage */
     std::vector<float> m_PeakToPeakThresholds; /**< vector of thresholds obtained from DB object */
-    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC2Baseline; /**< baselines obtained from C2 stage */
-    std::vector<float> m_Baselines; /**< vector of thresholds obtained from DB object */
     DBObjPtr<ECLAutoCovariance> m_ECLAutocovarianceCalibrationC3Autocovariances; /**< Autocovariances obtained from C3 stage */
 
     TH2F* Chi2VsCrysID; /**< Store fit chi2 vs. crystal ID for validation */

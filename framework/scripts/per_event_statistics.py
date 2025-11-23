@@ -34,7 +34,7 @@ class PerEventStatisticsGetterModule(basf2.Module):
         self.event_number = np.zeros(3, dtype=float)
         #: The columns for the statistics TTree (they will be filled in the event function).
         self.ttree_inputs = None
-        #: Last recored sum of event calls for all modules
+        #: Last recorded sum of event calls for all modules
         self.last_time_sum = None
 
         #: A flag to indicate that we have already added the Branches to the TTree (which we will do in the first event)
@@ -107,7 +107,7 @@ class PerEventStatisticsGetterModule(basf2.Module):
             for i, stat in enumerate(module_stats):
                 # escape the module names in ROOT-safe manner. Otherwise weird stuff happens like
                 # sub-branches get created or the branch cannot be opened in the TBrowser
-                module_name = "{name}_{i}".format(name=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(stat.name), i=i)
+                module_name = f"{ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(stat.name)}_{i}"
                 # Create the branch. See initialize() for why it's [i:] and not [i]
                 ttree.Branch(module_name, self.ttree_inputs[i:], f"{module_name}/D")
 

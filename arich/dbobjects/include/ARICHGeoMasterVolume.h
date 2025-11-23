@@ -10,8 +10,11 @@
 
 #include <arich/dbobjects/ARICHGeoBase.h>
 #include <string>
-#include <TVector3.h>
-#include <TRotation.h>
+#include <Math/Vector3D.h>
+#include <Math/Rotation3D.h>
+#include <Math/RotationX.h>
+#include <Math/RotationY.h>
+#include <Math/RotationZ.h>
 
 namespace Belle2 {
 
@@ -78,16 +81,19 @@ namespace Belle2 {
      * Get position of ARICH master volume center point in global Belle II coordinates
      * @return center point of ARICH volume
      */
-    TVector3 getPosition() const {return TVector3(m_x / s_unit, m_y / s_unit, m_z / s_unit);}
+    ROOT::Math::XYZVector getPosition() const {return ROOT::Math::XYZVector(m_x / s_unit, m_y / s_unit, m_z / s_unit);}
 
     /**
      * Get rotation matrix of ARICH master volume in global Belle II coordinates
      * @return rotation matrix of ARICH master volume
      */
-    TRotation getRotation() const
+    ROOT::Math::Rotation3D getRotation() const
     {
-      TRotation rot;
-      rot.RotateX(m_rx).RotateY(m_ry).RotateZ(m_rz);
+      ROOT::Math::Rotation3D rot;
+      ROOT::Math::RotationX rotX(m_rx);
+      ROOT::Math::RotationY rotY(m_ry);
+      ROOT::Math::RotationZ rotZ(m_rz);
+      rot *= rotZ * rotY * rotX;
       return rot;
     }
 
@@ -133,10 +139,33 @@ namespace Belle2 {
      */
     const std::string& getMaterial() const {return m_material;}
 
-    TVector3 pointToGlobal(const TVector3& point) const;
-    TVector3 momentumToGlobal(const TVector3& momentum) const;
-    TVector3 pointToLocal(const TVector3& point) const;
-    TVector3 momentumToLocal(const TVector3& momentum) const;
+    /**
+     * Transform local point into global Belle II coordinate system via rotation and translation
+     * @param point point to be transformed
+     * @return transformed point
+     */
+    ROOT::Math::XYZVector pointToGlobal(const ROOT::Math::XYZVector& point) const;
+
+    /**
+     * Rotate local momentum into global Belle II coordinate system
+     * @param momentum momentum vector to be rotated
+     * @return rotated momentum vector
+     */
+    ROOT::Math::XYZVector momentumToGlobal(const ROOT::Math::XYZVector& momentum) const;
+
+    /**
+     * Transform global point into ARICH reference system via inverse rotation and translation
+     * @param point point to be transformed
+     * @return transformed point
+     */
+    ROOT::Math::XYZVector pointToLocal(const ROOT::Math::XYZVector& point) const;
+
+    /**
+     * Rotate global point into ARICH reference system via inverse rotation
+     * @param momentum momentum vector to be rotated
+     * @return rotated momentum vector
+     */
+    ROOT::Math::XYZVector momentumToLocal(const ROOT::Math::XYZVector& momentum) const;
 
 
   private:
@@ -154,13 +183,13 @@ namespace Belle2 {
     double m_outerR = 0; /**< tube outer radius */
     double m_length = 0; /**< tube length */
 
-    std::string m_material;
+    std::string m_material; /**< material of ARICH master volume */
 
-    mutable  TRotation* m_rotation = 0 ;
-    mutable TRotation* m_rotationInverse = 0;
-    mutable TVector3*  m_translation = 0;
+    mutable ROOT::Math::Rotation3D* m_rotation = nullptr ; /**< rotation matrix of ARICH master volume */
+    mutable ROOT::Math::Rotation3D* m_rotationInverse = nullptr; /**< inverse rotation matrix of ARICH master volume */
+    mutable ROOT::Math::XYZVector*  m_translation = nullptr; /**< position of ARICH master volume center point */
 
-    ClassDefOverride(ARICHGeoMasterVolume, 1); /**< ClassDef */
+    ClassDefOverride(ARICHGeoMasterVolume, 2); /**< ClassDef */
 
   };
 

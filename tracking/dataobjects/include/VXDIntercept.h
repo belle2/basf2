@@ -22,18 +22,12 @@ namespace Belle2 {
 
     /** Default constructor for I/O.
      */
-    VXDIntercept(): m_coorU(0), m_coorV(0), m_sigmaU(0), m_sigmaV(0),
-      m_sigmaUprime(0), m_sigmaVprime(0), m_lambda(0), m_sensorID() {}
+    VXDIntercept() {}
 
     /** Explicit constructor providing coordinates and sensorID */
     VXDIntercept(double coorU, double coorV, VxdID sensorid) :
       m_coorU(coorU),
       m_coorV(coorV),
-      m_sigmaU(0),
-      m_sigmaV(0),
-      m_sigmaUprime(0),
-      m_sigmaVprime(0),
-      m_lambda(0),
       m_sensorID(sensorid) {}
 
     /** Explicit constructor providing all values */
@@ -59,6 +53,8 @@ namespace Belle2 {
     double getSigmaUprime() const { return m_sigmaUprime; } /**< return the statistical error of the extrapolation of U prime */
     double getSigmaVprime() const { return m_sigmaVprime; } /**< return the statistical error of the extrapolation of V prime */
     double getLambda() const { return m_lambda; } /**< return the length of the track*/
+    double getUprime() const { return m_Uprime; } /**< return the U direction tangent of the track extrapolated to the sensor */
+    double getVprime() const { return m_Vprime; } /**< return the V direction tangent of the track extrapolated to the sensor */
     VxdID::baseType getSensorID() const { return m_sensorID; } /**< return the sensor ID */
 
     void setCoorU(double user_coorU) { m_coorU = user_coorU; } /**< set the U coordinate of the intercept */
@@ -69,20 +65,24 @@ namespace Belle2 {
     void setSigmaVprime(double user_sigmaVprime) { m_sigmaVprime = user_sigmaVprime; } /**< set the statistical error of the extrapolation of V prime */
     void setLambda(double user_lambda) { m_lambda = user_lambda; }  /**< set the length of the track*/
     void setVxdID(VxdID::baseType user_vxdID) { m_sensorID = user_vxdID; } /**< set the sensor ID */
+    void setUprime(double user_Uprime) { m_Uprime = user_Uprime; } /**< set the U direction tangent of the track extrapolated to the sensor */
+    void setVprime(double user_Vprime) { m_Vprime = user_Vprime; } /**< set the V direction tangent of the track extrapolated to the sensor */
 
   private:
 
-    double m_coorU; /**< u coordinate of the intercept */
-    double m_coorV; /**< v coordinate of the intercept */
-    double m_sigmaU; /**< statistical error of the extrapolation along the u coordinate */
-    double m_sigmaV; /**< statistical error of the extrapolation along the v coordinate */
-    double m_sigmaUprime; /**< statistical error of the extrapolation of U prime */
-    double m_sigmaVprime; /**< statistical error of the extrapolation of V prime */
-    double m_lambda; /**< length of the track*/
+    double m_coorU = 0; /**< u coordinate of the intercept */
+    double m_coorV = 0; /**< v coordinate of the intercept */
+    double m_sigmaU = 0; /**< statistical error of the extrapolation along the u coordinate */
+    double m_sigmaV = 0; /**< statistical error of the extrapolation along the v coordinate */
+    double m_sigmaUprime = 0; /**< statistical error of the extrapolation of U prime */
+    double m_sigmaVprime = 0; /**< statistical error of the extrapolation of V prime */
+    double m_lambda = 0; /**< length of the track*/
+    double m_Uprime = 0; /**< U direction tangent of the track extrapolated to the sensor */
+    double m_Vprime = 0; /**< V direction tangent of the track extrapolated to the sensor */
 
-    VxdID::baseType m_sensorID; /**< sensor ID */
+    VxdID::baseType m_sensorID = 0; /**< sensor ID */
 
     //! Needed to make the ROOT object storable
-    ClassDef(VXDIntercept, 1);
+    ClassDef(VXDIntercept, 2);
   };
 }

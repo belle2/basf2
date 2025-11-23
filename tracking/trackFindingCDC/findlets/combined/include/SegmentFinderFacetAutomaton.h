@@ -68,10 +68,10 @@ namespace Belle2 {
       /// Resolves ambiguous right left information alias segments and hits
       SegmentAliasResolver m_segmentAliasResolver;
 
-      /// Adjustes the orientation of the generated segments to a prefered direction of flight
+      /// Adjusts the orientation of the generated segments to a preferred direction of flight
       SegmentOrienter m_segmentOrienter;
 
-      /// Link segments with closeby segments of the same super cluster
+      /// Link segments with close by segments of the same super cluster
       SegmentLinker m_segmentLinker;
 
       /// Puts the internal facets on the DataStore

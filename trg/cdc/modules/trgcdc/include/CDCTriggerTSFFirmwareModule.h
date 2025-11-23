@@ -161,7 +161,7 @@ namespace Belle2 {
 
     /// extension of lib
     std::string lib_extension = ".so";
-    /// current diretory
+    /// current directory
     std::string cwd = getcurrentdir();
     /** path to the simulation snapshot */
     std::string design_libname_pre = cwd + "/xsim.dir/tsf";
@@ -311,7 +311,7 @@ namespace Belle2 {
     /** map from cell ID to related edge ID */
     std::array<edgeList, 2> m_edge;
 
-    /** ID of the earlist CDC hit in an event */
+    /** ID of the earliest CDC hit in an event */
     int m_iFirstHit = std::numeric_limits<int>::quiet_NaN();
 
     /**
@@ -400,7 +400,7 @@ namespace Belle2 {
      *
      *  @param number  total number of the output units in a merger unit
      *
-     *  @param output  merger output data structre
+     *  @param output  merger output data structure
      */
     template<CDCTrigger::MergerOut field, size_t width>
     void pack(inputVector::reverse_iterator& rInput,

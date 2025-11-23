@@ -57,7 +57,7 @@ namespace Belle2 {
       // increment event counter
       rates.numEvents++;
 
-      // count and weight hits accoring to channel efficiecny
+      // count and weight hits according to channel efficiecny
       for (const auto& hit : m_hits) {
         if (hit.getModule() < 1 || hit.getModule() > 420) continue;
         auto effi = m_modulesInfo->getChannelQE(hit.getModule(), hit.getChannel());

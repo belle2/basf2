@@ -19,7 +19,7 @@ namespace Belle2 {
   class RecoTrackCreatorModule : public Module {
 
   public:
-    /** Initilialize the module parameters. */
+    /** Initialize the module parameters. */
     RecoTrackCreatorModule();
 
     /** Initialize the needed StoreArrays and ensure they are created properly. */

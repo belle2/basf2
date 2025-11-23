@@ -39,7 +39,7 @@ namespace Belle2 {
       /// Returns the aliased version of this oriented wire hit pair
       CDCRLWireHitPair getAlias() const;
 
-      /// Equality comparision based the two oriented wire hits.
+      /// Equality comparison based the two oriented wire hits.
       bool operator==(const CDCRLWireHitPair& other) const
       {
         return getFromRLWireHit() == other.getFromRLWireHit() and

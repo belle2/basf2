@@ -89,7 +89,7 @@ namespace Belle2 {
       /// Add lambda times derivatives of chi squared to global derivative vector
       virtual void addToGlobalChi2DerVector(double* y,    ///< Vector of chi2 derivatives
                                             int idim,    ///< Vector size
-                                            double lambda //< The lambda value
+                                            double lambda ///< The lambda value
                                            ) const;
       /// Calculate directional derivative
       virtual double dirDer(double* p,                    ///< Vector of direction

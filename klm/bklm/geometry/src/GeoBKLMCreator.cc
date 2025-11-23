@@ -987,11 +987,13 @@ G4LogicalVolume* GeoBKLMCreator::getScintLogical(double dx, double dy, double dz
 {
 
   int newLvol = 1;
-  for (std::vector<G4LogicalVolume*>::iterator iLvol = m_ScintLogicals.begin(); iLvol != m_ScintLogicals.end(); ++iLvol) {
-    G4Box* box = (G4Box*)((*iLvol)->GetSolid());
+  for (G4LogicalVolume* logicalVolume : m_ScintLogicals) {
+    G4Box* box = (G4Box*)(logicalVolume->GetSolid());
     if ((std::fabs(box->GetXHalfLength() - dx) < 1.0E-4 * CLHEP::cm) &&
         (std::fabs(box->GetYHalfLength() - dy) < 1.0E-4 * CLHEP::cm) &&
-        (std::fabs(box->GetZHalfLength() - dz - dzMPPC) < 1.0E-4 * CLHEP::cm)) { return *iLvol; }
+        (std::fabs(box->GetZHalfLength() - dz - dzMPPC) < 1.0E-4 * CLHEP::cm)) {
+      return logicalVolume;
+    }
     newLvol++;
   }
   char name[80] = "";

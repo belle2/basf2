@@ -34,7 +34,7 @@ from mdst import add_mdst_output
 my_path = b2.create_path()
 
 # load input ROOT file
-inputMdst(filename=b2.find_file('B2A101-Y4SEventGeneration-evtgen.root'), path=my_path)
+inputMdst(filename=b2.find_file('B2A101-Y4SEventGeneration.root'), path=my_path)
 
 # simulation
 add_simulation(path=my_path)

@@ -71,7 +71,7 @@ namespace Belle2 {
      * SpacePointTrackCand in the StoreArray but no genfit::TrackCand related from it, this counter will be increased) */
     int m_failedNoGFTC;
 
-    int m_failedOther; /**< Counter for failed conversions for which none of the other stated coudl be assigned */
+    int m_failedOther; /**< Counter for failed conversions for which none of the other stated could be assigned */
 
     /** Counter for failed conversions for which the genfit::TrackCandidates do not contain the same TrackCandHits */
     int m_failedNotSameHits;

@@ -165,7 +165,7 @@ This script will be copied into subjob directories as part of the input sandbox.
         Using this allows you to add a central database to the head of the global tag database chain for this collection.
         The default database chain is just the central one from
         `basf2.conditions.default_globaltags <ConditionsConfiguration.default_globaltags>`.
-        The input file global tag will always be overrided and never used unless explicitly set.
+        The input file global tag will always be overridden and never used unless explicitly set.
 
         To turn off central database completely or use a custom tag as the base, you should call `Calibration.reset_database`
         and start adding databases with `Calibration.use_local_database` and `Calibration.use_central_database`.
@@ -311,7 +311,7 @@ class CalibrationBase(ABC, Thread):
         name (str): Name of this calibration object. Should be unique if you are going to run it.
 
     Keyword Arguments:
-        input_files (list[str]): Input files for this calibration. May contain wildcard expressions useable by `glob.glob`.
+        input_files (list[str]): Input files for this calibration. May contain wildcard expressions usable by `glob.glob`.
     """
     #: The name of the successful completion state.
     #: The :py:class:`CAF` will use this as the state to decide when the Calibration is completed.
@@ -381,7 +381,7 @@ class CalibrationBase(ABC, Thread):
         the `CAF` not to add a circular/cyclic dependency. If you do the sort will return an
         empty order and the `CAF` processing  will fail.
 
-        This function appens to the `CalibrationBase.dependencies` and `CalibrationBase.future_dependencies` attributes of this
+        This function appends to the `CalibrationBase.dependencies` and `CalibrationBase.future_dependencies` attributes of this
         `CalibrationBase` and the input one respectively. This prevents us having to do too much recalculation later on.
         """
         # Check that we don't have two calibration names that are the same
@@ -438,7 +438,7 @@ class Calibration(CalibrationBase):
     Keyword Arguments:
         collector (str, `basf2.Module`): Should be set to a CalibrationCollectorModule() or a string with the module name.
         algorithms (list, ``ROOT.Belle2.CalibrationAlgorithm``): The algorithm(s) to use for this `Calibration`.
-        input_files (str, list[str]): Input files for use by this Calibration. May contain wildcards useable by `glob.glob`
+        input_files (str, list[str]): Input files for use by this Calibration. May contain wildcards usable by `glob.glob`
 
     A Calibration won't be valid in the `CAF` until it has all of these four attributes set. For example:
 
@@ -549,14 +549,14 @@ class Calibration(CalibrationBase):
 
         super().__init__(name, input_files)
         if algorithms:
-            #: `Algorithm` classes that wil be run by this `Calibration`. You should set this attribute to either a single
+            #: `Algorithm` classes that will be run by this `Calibration`. You should set this attribute to either a single
             #: CalibrationAlgorithm C++ class, or a `list` of them if you want to run multiple CalibrationAlgorithms using one
             #: CalibrationCollectorModule.
             self.algorithms = algorithms
         #: Output results of algorithms for each iteration
         self.results = {}
         #: Variable to define the maximum number of iterations for this calibration specifically.
-        #: It overrides tha CAF calibration_defaults value if set.
+        #: It overrides the CAF calibration_defaults value if set.
         self.max_iterations = None
         #: List of ExpRun that will be ignored by this Calibration. This runs will not have Collector jobs run on
         #: them (if possible). And the algorithm execution will exclude them from a ExpRun list. However, the
@@ -886,6 +886,7 @@ class Calibration(CalibrationBase):
     def algorithms(self, value):
         """
         """
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
         from ROOT.Belle2 import CalibrationAlgorithm
         if isinstance(value, CalibrationAlgorithm):
             self._algorithms = [Algorithm(value)]
@@ -899,6 +900,7 @@ class Calibration(CalibrationBase):
         """
         Alternate algorithms setter for lists and tuples of CalibrationAlgorithms.
         """
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
         from ROOT.Belle2 import CalibrationAlgorithm
         if value:
             self._algorithms = []
@@ -988,9 +990,7 @@ class Calibration(CalibrationBase):
         with CAFDB(self._db_path, read_only=True) as db:
             initial_state = db.get_calibration_value(self.name, "checkpoint")
             initial_iteration = db.get_calibration_value(self.name, "iteration")
-        B2INFO("Initial status of {} found to be state={}, iteration={}".format(self.name,
-                                                                                initial_state,
-                                                                                initial_iteration))
+        B2INFO(f"Initial status of {self.name} found to be state={initial_state}, iteration={initial_iteration}")
         self.machine = CalibrationMachine(self,
                                           iov_to_calibrate=self.iov,
                                           initial_state=initial_state,
@@ -1042,7 +1042,7 @@ class Calibration(CalibrationBase):
         while self.state == "running_collector":
             try:
                 self.machine.complete()
-            # ConditionError is thrown when the condtions for the transition have returned false, it's not serious.
+            # ConditionError is thrown when the conditions for the transition have returned false, it's not serious.
             except ConditionError:
                 try:
                     B2DEBUG(29, f"Checking if collector jobs for calibration {self.name} have failed.")
@@ -1098,8 +1098,8 @@ class Algorithm():
     Parameters:
         algorithm: The CalibrationAlgorithm instance that we want to execute.
     Keyword Arguments:
-        data_input (types.FunctionType): An optional function that sets the input files of the algorithm.
-        pre_algorithm (types.FunctionType): An optional function that runs just prior to execution of the algorithm.
+        data_input : An optional function that sets the input files of the algorithm.
+        pre_algorithm : An optional function that runs just prior to execution of the algorithm.
             Useful for set up e.g. module initialisation
 
     This is a simple wrapper class around the C++ CalibrationAlgorithm class.
@@ -1224,7 +1224,7 @@ class CAF():
             else:
                 B2WARNING(f"Tried to add a calibration with the name {calibration.name} twice.")
         else:
-            B2WARNING(f"Tried to add incomplete/invalid calibration ({calibration.name}) to the framwork."
+            B2WARNING(f"Tried to add incomplete/invalid calibration ({calibration.name}) to the framework."
                       "It was not added and will not be part of the final process.")
 
     def _remove_missing_dependencies(self):
@@ -1256,9 +1256,9 @@ class CAF():
 
     def _order_calibrations(self):
         """
-        - Uses dependency atrributes of calibrations to create a dependency dictionary and passes it
+        - Uses dependency attributes of calibrations to create a dependency dictionary and passes it
         to a sorting algorithm.
-        - Returns valid OrderedDict if sort was succesful, empty one if it failed (most likely a cyclic dependency)
+        - Returns valid OrderedDict if sort was successful, empty one if it failed (most likely a cyclic dependency)
         """
         # First remove any dependencies on calibrations not added to the CAF
         self._remove_missing_dependencies()

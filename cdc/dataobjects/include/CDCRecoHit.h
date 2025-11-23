@@ -133,23 +133,23 @@ namespace Belle2 {
 
 #endif
 
-    /** TDC Count as out of CDCHit. */
-    unsigned short m_tdcCount;
-
-    /** ADC Count as out of CDCHit. */
-    unsigned short m_adcCount;
-
     /** Wire Identifier. */
     WireID m_wireID;
 
     /** Pointer to the CDCHit used to created this CDCRecoHit */
     const CDCHit* m_cdcHit;  //!
 
+    /** TDC Count as out of CDCHit. */
+    unsigned short m_tdcCount;
+
+    /** ADC Count as out of CDCHit. */
+    unsigned short m_adcCount;
+
     /** Flag showing left/right passage */
     signed char m_leftRight;
 
     /** ROOT Macro.*/
-    ClassDefOverride(CDCRecoHit, 10);
+    ClassDefOverride(CDCRecoHit, 11);
     // Version history:
     // ver 10: ICalibrationParametersDerivatives interface moved to derived class.
     //         ClassDef -> ClassDefOverride + consistent override keyword usage.
@@ -158,5 +158,6 @@ namespace Belle2 {
     //        alignment/calibration interface
     // ver 8: Rewrite to deal with realistic translators.  No longer
     //        derives from genfit::WireMeasurement.
+    // ver 11: Reordering data members for memory efficiency
   };
 }

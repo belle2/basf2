@@ -30,6 +30,7 @@ InclusiveBtagReconstructionModule::InclusiveBtagReconstructionModule() : Module(
 {
   // Set module properties
   setDescription("Inclusive Btag reconstruction");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("upsilonListName", m_upsilonListName, "Name of the ParticleList to be filled with Upsilon(4S) -> B:sig anti-B:tag",

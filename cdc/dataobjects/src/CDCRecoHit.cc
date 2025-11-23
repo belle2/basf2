@@ -46,7 +46,7 @@ void CDCRecoHit::setTranslators(ADCCountTranslatorBase*    const adcCountTransla
 
 CDCRecoHit::CDCRecoHit()
   : genfit::AbsMeasurement(1),
-    m_tdcCount(0), m_adcCount(0), m_wireID(WireID()), m_cdcHit(nullptr), m_leftRight(0)
+    m_wireID(WireID()), m_cdcHit(nullptr), m_tdcCount(0), m_adcCount(0), m_leftRight(0)
 {
 }
 
@@ -148,7 +148,7 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
 //  double alpha = CDCGeometryPar::Instance().getAlpha(state.getPlane()->getO(), p);
 //  double theta = CDCGeometryPar::Instance().getTheta(p);
 
-//N.B. The folowing 8 lines are tentative to avoid the circular dependence mentioned above ! The definitions of alpha and theta should be identical to those defined in CDCGeometryPar.
+//N.B. The following 8 lines are tentative to avoid the circular dependence mentioned above ! The definitions of alpha and theta should be identical to those defined in CDCGeometryPar.
   const double wx = state.getPlane()->getO().X();
   const double wy = state.getPlane()->getO().Y();
   const double px = p.X();
@@ -269,7 +269,7 @@ std::vector<double> CDCRecoHit::timeDerivativesMeasurementsOnPlane(const genfit:
 //  double alpha = CDCGeometryPar::Instance().getAlpha(state.getPlane()->getO(), p);
 //  double theta = CDCGeometryPar::Instance().getTheta(p);
 
-//N.B. The folowing 8 lines are tentative to avoid the circular dependence mentioned above ! The definitions of alpha and theta should be identical to those defined in CDCGeometryPar.
+//N.B. The following 8 lines are tentative to avoid the circular dependence mentioned above ! The definitions of alpha and theta should be identical to those defined in CDCGeometryPar.
   const double wx = state.getPlane()->getO().X();
   const double wy = state.getPlane()->getO().Y();
   const double px = p.X();

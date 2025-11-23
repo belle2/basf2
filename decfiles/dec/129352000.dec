@@ -1,0 +1,23 @@
+# EventType: 129352000
+# Descriptor: [B+ B- -> [Dst+ ->  D+ e+e-] + anything]
+# Documentation:  MC15rd signal sample
+# PhysicsWG: Charm
+# Tested: Yes
+# Responsible: Federico Testa
+# Email: fe.testa@unito.it
+# Date: 20240308
+
+Decay Upsilon(4S)
+1.0 B+ B-   VSS;
+Enddecay
+
+Decay D*+
+1.000   D+sig e+ e-                                    PHSP;
+Enddecay
+
+Decay D+sig
+0.56  K- pi+ pi+                                    D_DALITZ;
+0.44  K_S0 pi+ pi0                                  D_DALITZ;
+Enddecay
+
+End

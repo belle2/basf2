@@ -18,6 +18,7 @@ MDST_OBJECTS = (
     'EventLevelTrackingInfo',
     'EventLevelTriggerTimeInfo',
     'KLMClusters',
+    'Kinks',
     'KlIds',
     'PIDLikelihoods',
     'SoftwareTriggerResult',
@@ -63,7 +64,7 @@ def add_mdst_output(
                            branchNamesPersistent=persistentBranches, additionalDataDescription=dataDescription)
 
 
-def add_mdst_dump(path, print_untested=False):
+def add_mdst_dump(path, print_untested=False, print_mutable=True):
     """
     Add a PrintObjectsModule to a path for printing the mDST content.
 
@@ -71,9 +72,12 @@ def add_mdst_dump(path, print_untested=False):
         path (basf2.Path): Path to add module to
         print_untested (bool): If True print the names of all methods which are not
             explicitly printed to make sure we don't miss addition of new members
+        print_mutable (bool): If False do not print mutable content that may differ
+            during the execution of two basf2 jobs, e.g. EventMetaData::getTime
     """
 
     # Always avoid the top-level 'import ROOT'.
+    from ROOT import Belle2  # noqa: make Belle2 namespace available
     from ROOT.Belle2 import Const  # noqa
 
     # prepare a list of PID detector sets and charged stable particles
@@ -91,10 +95,10 @@ def add_mdst_dump(path, print_untested=False):
     mdst_dataobjects = [
         DataStorePrinter("EventMetaData", [
             "getErrorFlag", "getEvent", "getRun", "getSubrun", "getExperiment",
-            "getProduction", "getTime", "getParentLfn", "getGeneratedWeight",
-            "isEndOfRun"
-        ], array=False),
-
+            "getProduction", "getParentLfn", "getGeneratedWeight", "isEndOfRun"] +
+            (["getTime"] if print_mutable else []),
+            array=False
+        ),
         DataStorePrinter("Track", [
             "getNumberOfFittedHypotheses", "getQualityIndicator", "isFlippedAndRefitted",
             "getTrackTime", "wasRefined"
@@ -109,6 +113,11 @@ def add_mdst_dump(path, print_untested=False):
             ], {
             "getRelationsWith": ["MCParticles"],
         }),
+        DataStorePrinter("Kinks", [
+            "getMotherTrackIndex", "getDaughterTrackIndex", "getTrackFitResultIndexMotherStart",
+            "getTrackFitResultIndexMotherEnd", "getTrackFitResultIndexDaughter",
+            "getFittedVertexX", "getFittedVertexY", "getFittedVertexZ", "getFilterFlag"
+            ]),
         DataStorePrinter("TrackFitResult", [
             "getPosition", "getMomentum", "get4Momentum", "getEnergy", "getTransverseMomentum",
             "getCovariance6", "getParticleType", "getChargeSign", "getPValue", "getD0", "getPhi0",
@@ -123,11 +132,16 @@ def add_mdst_dump(path, print_untested=False):
             "hasCDCLayer": range(56),
             "getNVTXClustersInLayer": range(1, 8)
         }, array=False),
-        DataStorePrinter("PIDLikelihood", ["getMostLikely"], {
-            "isAvailable": pid_detectors,
-            "getLogL": charged_stables,
-            "getProbability": charged_stables,
-        }),
+        DataStorePrinter("PIDLikelihood", ["getMostLikely", "isAvailable", "areAllAvailable"],
+                         (
+                             {
+                                 "isAvailable": pid_detectors,
+                                 "areAllAvailable": pid_detectors,
+                                 "getLogL": charged_stables,
+                                 "getProbability": charged_stables,
+                                 "getLogarithmicProbability": charged_stables,
+                             } if print_mutable else {}
+        )),
         DataStorePrinter("ECLCluster", [
             "isTrack", "isNeutral", "getStatus", "getConnectedRegionId",
             "getClusterId", "getUniqueClusterId", "getMinTrkDistance", "getDeltaL",
@@ -164,6 +178,9 @@ def add_mdst_dump(path, print_untested=False):
             "getClusterPosition", "getPosition", "getMomentumMag", "getEnergy",
             "getMomentum", "getError4x4", "getError7x7",
             "getAssociatedEclClusterFlag", "getAssociatedTrackFlag",
+            "getClusterTrackRotationAngle", "getClusterTrackSeparationAngle",
+            "getClusterTrackSeparation",
+            "getShapeStdDev1", "getShapeStdDev2", "getShapeStdDev3"
         ], {
             "getRelationsWith": ["KlIds", "MCParticles"],
         }),
@@ -193,7 +210,9 @@ def add_mdst_dump(path, print_untested=False):
             "isValid", "hasInjection", "isHER", "isRevo2",
             "getTimeSinceLastInjection", "getTimeSincePrevTrigger", "getBunchNumber",
             "getTimeSinceLastInjectionInMicroSeconds", "getTimeSincePrevTriggerInMicroSeconds",
-            "getTimeSinceInjectedBunch", "getTimeSinceInjectedBunchInMicroSeconds", "getTriggeredBunchNumberGlobal"
-        ], array=False),
+            "getTimeSinceInjectedBunch", "getTimeSinceInjectedBunchInMicroSeconds", "getTriggeredBunchNumberGlobal",
+            "hasEventT0SourceFromSVD", "hasEventT0SourceFromCDC", "hasEventT0SourceFromECL", "hasAnyEventT0Sources",
+            "getEventT0Sources"
+            ], array=False),
     ]
     path.add_module(PrintObjectsModule(mdst_dataobjects, print_untested))

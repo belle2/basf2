@@ -119,8 +119,8 @@ class VTXOutputDumper(b2.Module):
             for truehit in truehits:
                 # Now let's store some data
                 # Get sensor geometry information
-                sensor_info = Belle2.VXD.GeoCache.get(cluster.getSensorID())
-                # sensor_info_truehit = Belle2.VXD.GeoCache.get(truehit.getSensorID())
+                sensor_info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(cluster.getSensorID())
+                # sensor_info_truehit = Belle2.VXD.GeoCache.getInstance().getSensorInfo(truehit.getSensorID())
 
                 thickness = sensor_info.getThickness()
                 mom = truehit.getMomentum()
@@ -175,7 +175,7 @@ class VTXOutputDumper(b2.Module):
             truehits = mcparticle.getRelationsTo('VTXTrueHits')
 
             for truehit in truehits:
-                sensor_info = Belle2.VXD.GeoCache.get(truehit.getSensorID())
+                sensor_info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(truehit.getSensorID())
 
                 thickness = sensor_info.getThickness()
 

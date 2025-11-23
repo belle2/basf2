@@ -32,7 +32,7 @@ CDCTriggerNeuroDQMModule::CDCTriggerNeuroDQMModule() : HistoModule()
   setDescription("CDC Trigger DQM module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("limitedoutput", m_limitedoutput,
-           "Switch to supress output for online dqm purposes. ",
+           "Switch to suppress output for online dqm purposes. ",
            true);
   addParam("unpackedSegmentHitsName", m_unpackedSegmentHitsName,
            "The name of the StoreArray of the unpacked CDCTriggerSegmentHits",
@@ -1047,7 +1047,7 @@ void CDCTriggerNeuroDQMModule::defineHisto()
                            "number of TS selected in both, unpacked and TSIM tracks",
                            20, 0, 20);
     m_simDiffTS = new TH1F("NeuroSimDiffTS",
-                           "number of TS selcted in TSIM but not in unpacker",
+                           "number of TS selected in TSIM but not in unpacker",
                            20, 0, 20);
   }
 
@@ -1794,7 +1794,7 @@ void CDCTriggerNeuroDQMModule::beginRun()
 
 void CDCTriggerNeuroDQMModule::event()
 {
-  double phinorm ; /* intermediate name for phi to transfrom zo 0->360 */
+  double phinorm ; /* intermediate name for phi to transform zo 0->360 */
   if (m_skipWithoutHWTS and m_unpackedNeuroInputSegments.getEntries() == 0) {
     //if (m_unpackedNeuroInputSegments.getEntries() == 0) {
     B2DEBUG(150, "No unpacked TS found, skipping event.");
@@ -2040,7 +2040,7 @@ void CDCTriggerNeuroDQMModule::event()
         m_neuroSWTSSW2DSelTSCount->Fill(sl);
         float neuroTime = neuroswTrack.getTime();
 
-        // find first occurence of hit (used to debug the selcted TS field)
+        // find first occurrence of hit (used to debug the selected TS field)
         CDCTriggerSegmentHit firstHit = hit;
         for (CDCTriggerSegmentHit compare : m_simSegmentHits) {
           if (compare.getISuperLayer()       == hit.getISuperLayer()      &&
@@ -2173,7 +2173,7 @@ void CDCTriggerNeuroDQMModule::event()
         m_neuroSWSelTSCount->Fill(sl);
         float neuroTime = neuroswTrack.getTime();
 
-        // find first occurence of hit (used to debug the selcted TS field)
+        // find first occurrence of hit (used to debug the selected TS field)
         CDCTriggerSegmentHit firstHit = hit;
         for (CDCTriggerSegmentHit compare : m_simSegmentHits) {
           if (compare.getISuperLayer()       == hit.getISuperLayer()      &&
@@ -2360,7 +2360,7 @@ void CDCTriggerNeuroDQMModule::event()
         unsigned int sl = hit.getISuperLayer();
         m_neuroHWSelTSCount->Fill(sl);
         float neuroTime = neuroTrack.getTime();
-        // find first occurence of hit (used to debug the selcted TS field)
+        // find first occurrence of hit (used to debug the selected TS field)
         CDCTriggerSegmentHit firstHit = hit;
         for (CDCTriggerSegmentHit compare : m_unpackedNeuroInputSegments) {
           if (compare.getISuperLayer()       == hit.getISuperLayer()      &&
@@ -3015,7 +3015,11 @@ void CDCTriggerNeuroDQMModule::event()
       std::string infostr2 = "     std. ETF vld:";
       infostr2 += std::to_string(m_eventTime.isValid());
       infostr2 += ", ETFT0: ";
-      infostr2 += std::to_string(m_eventTime->getBinnedEventT0(Const::CDC));
+      if (m_eventTime.isValid()) {
+        infostr2 += std::to_string(m_eventTime->getBinnedEventT0(Const::CDC));
+      } else {
+        infostr2 += "  ";
+      }
       infostr2 += ", ETF in CC: ";
       infostr2 += std::to_string(ltrack.getETF_unpacked());
       infostr2 += ", ETF recalculated: ";

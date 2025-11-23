@@ -77,7 +77,7 @@ void PXDMCBgTupleProducerModule::initialize()
   //Pointer to GeoTools instance
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfPXDLayers() == 0) {
-    B2WARNING("Missing geometry for PXD, PXD-masking is skiped.");
+    B2WARNING("Missing geometry for PXD, PXD-masking is skipped.");
   }
   int nPXDSensors = gTools->getNumberOfPXDSensors();
 

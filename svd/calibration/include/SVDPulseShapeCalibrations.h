@@ -75,7 +75,7 @@ namespace Belle2 {
      * required as input argument
      *
      * Output: an integer number representing the ADC pulse height
-     * for the correponding input charge, on the given strip.
+     * for the corresponding input charge, on the given strip.
      * The output is capped at 255.
      */
     inline long int getADCFromCharge(
@@ -98,7 +98,7 @@ namespace Belle2 {
      * required as input argument
      *
      * Output: an integer number representing the ADC pulse height
-     * for the correponding input charge, on the given strip.
+     * for the corresponding input charge, on the given strip.
      * The output is capped at 255.
      */
 

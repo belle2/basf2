@@ -121,12 +121,16 @@ namespace Belle2 {
     struct stateCache {
       /// getPtOfSeed (if seed state)
       float ptSeed = 0.;
+      /// getThetaOfSeed (if seed state)
+      float thetaSeed = 0.;
       /// Phi of the sensor this state is based on, only set if based on SpacePoint
       float sensorCenterPhi = std::numeric_limits<float>::quiet_NaN();
       /// Phi if this state (from SpacePoint or RecoTrack)
       float phi = std::numeric_limits<float>::quiet_NaN();
       /// Theta if this state (from SpacePoint or RecoTrack)
       float theta = std::numeric_limits<float>::quiet_NaN();
+      /// Perp of this state (from SpacePoint or RecoTrack)
+      float perp = std::numeric_limits<float>::quiet_NaN();
       /// Local normalized uCoordinate of this state, only set if based on SpacePoint
       float localNormalizedu = std::numeric_limits<float>::quiet_NaN();
       /// Local normalized vCoordinate of this state, only set if based on SpacePoint

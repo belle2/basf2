@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -20,10 +20,10 @@ settings = CalibrationSettings(
     expert_username="longos",
     description=__doc__,
     input_data_formats=["raw"],
-    input_data_names=["delayedbhabha"],
+    input_data_names=["delayedbhabha_calib"],
     input_data_filters={
-        "delayedbhabha": [
-            INPUT_DATA_FILTERS["Data Tag"]["delayedbhabha"],
+        "delayedbhabha_calib": [
+            INPUT_DATA_FILTERS["Data Tag"]["delayedbhabha_calib"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
@@ -48,7 +48,7 @@ def get_calibrations(input_data, **kwargs):
     # ..delayed Bhabha
 
     # ..Input data
-    file_to_iov_delayed_Bhabha = input_data["delayedbhabha"]
+    file_to_iov_delayed_Bhabha = input_data["delayedbhabha_calib"]
     input_files = list(file_to_iov_delayed_Bhabha.keys())
 
     # ..Algorithm
@@ -74,22 +74,6 @@ def get_calibrations(input_data, **kwargs):
     cal_ecl_Auto_C1.pre_collector_path = delayed_Bhabha_pre_path
 
     # ..Algorithm
-    algo_C2 = Belle2.ECL.eclAutocovarianceCalibrationC2Algorithm()
-
-    # ..The calibration
-    collector_C2 = basf2.register_module("eclAutocovarianceCalibrationC2Collector")
-
-    cal_ecl_Auto_C2 = Calibration("ecl_Auto_C2",
-                                  collector=collector_C2,
-                                  algorithms=[algo_C2],
-                                  input_files=input_files, max_files_per_collector_job=4)
-    cal_ecl_Auto_C2.strategies = strategies.SequentialRunByRun
-
-    cal_ecl_Auto_C2.pre_collector_path = delayed_Bhabha_pre_path
-
-    cal_ecl_Auto_C2.depends_on(cal_ecl_Auto_C1)
-
-    # ..Algorithm
     algo_C3 = Belle2.ECL.eclAutocovarianceCalibrationC3Algorithm()
 
     # ..The calibration
@@ -103,7 +87,7 @@ def get_calibrations(input_data, **kwargs):
 
     cal_ecl_Auto_C3.pre_collector_path = delayed_Bhabha_pre_path
 
-    cal_ecl_Auto_C3.depends_on(cal_ecl_Auto_C2)
+    cal_ecl_Auto_C3.depends_on(cal_ecl_Auto_C1)
 
     # ..Algorithm
     algo_C4 = Belle2.ECL.eclAutocovarianceCalibrationC4Algorithm()
@@ -115,7 +99,6 @@ def get_calibrations(input_data, **kwargs):
                                   collector=collector_C4,
                                   algorithms=[algo_C4],
                                   input_files=input_files, max_files_per_collector_job=4)
-    cal_ecl_Auto_C4.strategies = strategies.SequentialRunByRun
 
     cal_ecl_Auto_C4.pre_collector_path = delayed_Bhabha_pre_path
 
@@ -127,8 +110,6 @@ def get_calibrations(input_data, **kwargs):
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
     for algorithm in cal_ecl_Auto_C1.algorithms:
         algorithm.params = {"apply_iov": output_iov}
-    for algorithm in cal_ecl_Auto_C2.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
     for algorithm in cal_ecl_Auto_C3.algorithms:
         algorithm.params = {"apply_iov": output_iov}
     for algorithm in cal_ecl_Auto_C4.algorithms:
@@ -136,4 +117,4 @@ def get_calibrations(input_data, **kwargs):
 
     # --------------------------------------------------------------
     # ..Return the calibrations
-    return [cal_ecl_Auto_C1, cal_ecl_Auto_C2, cal_ecl_Auto_C3, cal_ecl_Auto_C4]
+    return [cal_ecl_Auto_C1, cal_ecl_Auto_C3, cal_ecl_Auto_C4]

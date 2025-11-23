@@ -38,7 +38,7 @@ const Belle::Gen_hepevt& gen_level(const Belle::Gen_hepevt& gen)
     const Belle::Gen_hepevt& level2(gen_level_step2(gen));
     // If "gen" is made by Ks(which is made by generator) daughter, returns daughter
     if (level2.idhep() == 310 || abs(level2.idhep()) == 3122) return level1;
-    // Otherwize, trace back to generator level
+    // Otherwise, trace back to generator level
     else return level2;
   }
   return level1;

@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <framework/pcore/zmq/utils/ZMQLogger.h>
 #include <boost/property_tree/json_parser.hpp>
-#include <ostream>
+#include <sstream>
 #include <stdexcept>
 
 using namespace Belle2;

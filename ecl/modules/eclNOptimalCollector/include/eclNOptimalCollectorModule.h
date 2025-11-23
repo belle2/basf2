@@ -71,6 +71,7 @@ namespace Belle2 {
     int iGroupOfCrystal[ECLElementNumbers::c_NCrystals]; /**< group number of each crystal */
 
     ECL::ECLNeighbours* neighbours{nullptr}; /**< neighbours to crystal */
+    std::vector<int> thetaIDofCrysID; /**< thetaID of each crystal */
 
     bool storeParameters = true; /**< store parameters first event */
 

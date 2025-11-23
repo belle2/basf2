@@ -6,7 +6,7 @@ Simulation: The Monte Carlo
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 20 min
+    **Length**: 15-30 min
 
     **Prerequisites**:
 
@@ -169,7 +169,7 @@ that the computing resources we have are not wasted.
 
 .. seealso::
 
-    You have already found the data production group confluence page.
+    You have already found the data production group XWiki page.
     If not, take another look at :ref:`the previous lesson <onlinebook_collaborative_tools>`.
     Now might be a good time to bookmark or "watch" some pages.
 

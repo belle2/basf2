@@ -117,12 +117,14 @@ namespace TreeFitter {
     return rc ;
   }
 
-  void HelixUtils::printVertexPar(const Belle2::B2Vector3D& position, const Belle2::B2Vector3D& momentum, int charge)
+  void HelixUtils::printVertexPar(const ROOT::Math::XYZVector& position, const ROOT::Math::XYZVector& momentum, int charge)
   {
-    for (int i = 0; i < 3; ++i)
-      B2INFO(vertexParName(i + 1).c_str() << position[i]);
-    for (int i = 0; i < 3; ++i)
-      B2INFO(vertexParName(i + 4).c_str() << momentum[i]);
+    B2INFO(vertexParName(1).c_str() << position.X());
+    B2INFO(vertexParName(2).c_str() << position.Y());
+    B2INFO(vertexParName(3).c_str() << position.Z());
+    B2INFO(vertexParName(4).c_str() << momentum.X());
+    B2INFO(vertexParName(5).c_str() << momentum.Y());
+    B2INFO(vertexParName(6).c_str() << momentum.Z());
     B2INFO("charge:    " << charge);
 
   }
@@ -214,7 +216,7 @@ namespace TreeFitter {
   double HelixUtils::helixPoca(const Belle2::Helix& helix1,
                                const Belle2::Helix& helix2,
                                double& flt1, double& flt2,
-                               Belle2::B2Vector3D& vertex, bool parallel)
+                               ROOT::Math::XYZVector& vertex, bool parallel)
   {
 
     const double d0_1     = helix1.getD0();
@@ -358,12 +360,12 @@ namespace TreeFitter {
     vertex.SetY(0.5 * (y1[ibest] + y2[ibest]));
     vertex.SetZ(0.5 * (z1 + z2));
 
-    return hypot(x2[ibest] - x1[ibest], y2[ibest] - y1[ibest], z2 - z1);
+    return std::hypot(x2[ibest] - x1[ibest], y2[ibest] - y1[ibest], z2 - z1);
   }
 
   //POCA between a track and a point
   double HelixUtils::helixPoca(const Belle2::Helix& helix,
-                               const Belle2::B2Vector3D& point,
+                               const ROOT::Math::XYZVector& point,
                                double& flt)
   {
     const double d0     = helix.getD0();

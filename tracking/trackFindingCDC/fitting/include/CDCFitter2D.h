@@ -75,24 +75,24 @@ namespace Belle2 {
       void update(CDCTrajectory2D& trajectory2D, const CDCAxialSegmentPair& axialSegmentPair) const;
 
     private:
-      /// Fits a collection of hit typs which are convertable to observation circles.
+      /// Fits a collection of hit typs which are convertible to observation circles.
       template<class AHits>
       CDCTrajectory2D fitGeneric(const AHits& hits) const;
 
-      /// Fits together two collections of hit types which are convertable to observation circles.
+      /// Fits together two collections of hit types which are convertible to observation circles.
       template<class AStartHits, class AEndHits>
       CDCTrajectory2D fitGeneric(const AStartHits& startHits, const AEndHits& endHits) const;
 
       /**
        *  Updates a given trajectory with a fit to a collection of hits types,
-       * which are convertable to observation circles.
+       * which are convertible to observation circles.
        */
       template <class AHits>
       void updateGeneric(CDCTrajectory2D& trajectory2D, const AHits& hits) const;
 
       /**
        *  Updates a given trajectory with a fit to two collection of hit types,
-       *  which are convertable to observation circles.
+       *  which are convertible to observation circles.
        */
       template <class AStartHits, class AEndHits>
       void updateGeneric(CDCTrajectory2D& trajectory2D,

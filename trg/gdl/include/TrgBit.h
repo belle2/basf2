@@ -12,6 +12,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <trg/gdl/TrgBitInput.h>
+#include <trg/gdl/TrgBitOutput.h>
 
 const int N_INPUT_ARRAY = 5;
 const int N_OUTPUT_ARRAY = 5;
@@ -30,10 +31,6 @@ namespace Belle2 {
 
     /// Destructor
     virtual ~TrgBit();
-
-  public:
-
-#include <trg/gdl/TrgBitOutput.h>
 
   public:
     /// Input bit pattern class.

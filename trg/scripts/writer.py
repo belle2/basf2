@@ -24,13 +24,12 @@
 This module provides :class:`VCDWriter` for writing VCD files.
 
 """
-from __future__ import print_function
-from collections import OrderedDict, Sequence
+from collections import OrderedDict
+from collections.abc import Sequence
 from numbers import Number
 import datetime
 
-import six
-from six.moves import zip, zip_longest
+from itertools import zip_longest
 
 
 class VCDPhaseError(Exception):
@@ -42,7 +41,7 @@ class VCDPhaseError(Exception):
     """
 
 
-class VCDWriter(object):
+class VCDWriter:
     """Value Change Dump writer.
 
     A VCD file captures time-ordered changes to the value of variables.
@@ -91,8 +90,7 @@ class VCDWriter(object):
             '$version': version,
         }
         if default_scope_type not in self.SCOPE_TYPES:
-            raise ValueError('Invalid default scope type ({})'.format(
-                default_scope_type))
+            raise ValueError(f'Invalid default scope type ({default_scope_type})')
         #: set default_scope_type
         self._default_scope_type = default_scope_type
         #: set scope_sep
@@ -131,7 +129,7 @@ class VCDWriter(object):
 
         """
         if scope_type is not None and scope_type not in self.SCOPE_TYPES:
-            raise ValueError('Invalid scope_type "{}"'.format(scope_type))
+            raise ValueError(f'Invalid scope_type "{scope_type}"')
         scope_tuple = self._get_scope_tuple(scope)
         self._scope_types[scope_tuple] = scope_type
 
@@ -177,13 +175,13 @@ class VCDWriter(object):
         elif not self._registering:
             raise VCDPhaseError('Cannot register after time 0.')
         elif var_type not in self.VAR_TYPES:
-            raise ValueError('Invalid var_type "{}"'.format(var_type))
+            raise ValueError(f'Invalid var_type "{var_type}"')
 
         scope_tuple = self._get_scope_tuple(scope)
 
         scope_names = self._scope_var_names.setdefault(scope_tuple, [])
         if name in scope_names:
-            raise KeyError('Duplicate var {} in scope {}'.format(name, scope))
+            raise KeyError(f'Duplicate var {name} in scope {scope}')
 
         if ident is None:
             ident = format(self._next_var_id, 'x')
@@ -195,7 +193,7 @@ class VCDWriter(object):
                 size = 1
             else:
                 raise ValueError(
-                    'Must supply size for {} var_type'.format(var_type))
+                    f'Must supply size for {var_type} var_type')
 
         if isinstance(size, Sequence):
             size = tuple(size)
@@ -203,8 +201,7 @@ class VCDWriter(object):
         else:
             var_size = size
 
-        var_str = '$var {var_type} {size} {ident} {name} $end'.format(
-            var_type=var_type, size=var_size, ident=ident, name=name)
+        var_str = f'$var {var_type} {var_size} {ident} {name} $end'
 
         if init is None:
             if var_type == 'real':
@@ -242,7 +239,7 @@ class VCDWriter(object):
         """Stop dumping to VCD file."""
         print('#' + str(int(timestamp)), file=self._ofile)
         print('$dumpoff', file=self._ofile)
-        for ident, val_str in six.iteritems(self._ident_values):
+        for ident, val_str in self._ident_values.items():
             if val_str[0] == 'b':
                 print('bx', ident, file=self._ofile)
             elif val_str[0] == 'r':
@@ -263,7 +260,7 @@ class VCDWriter(object):
         """Dump values to VCD file."""
         print(keyword, file=self._ofile)
         # TODO: events should be excluded
-        print(*six.itervalues(self._ident_values),
+        print(*self._ident_values.values(),
               sep='\n', file=self._ofile)
         print('$end', file=self._ofile)
 
@@ -296,7 +293,7 @@ class VCDWriter(object):
 
         """
         if timestamp < self._timestamp:
-            raise VCDPhaseError('Out of order value change ({})'.format(var))
+            raise VCDPhaseError(f'Out of order value change ({var})')
         elif self._closed:
             raise VCDPhaseError('Cannot change value after close()')
 
@@ -317,12 +314,12 @@ class VCDWriter(object):
 
     def _get_scope_tuple(self, scope):
         """get scope tuple function of the VCDWrite"""
-        if isinstance(scope, six.string_types):
+        if isinstance(scope, str):
             return tuple(scope.split(self._scope_sep))
         if isinstance(scope, (list, tuple)):
             return tuple(scope)
         else:
-            raise TypeError('Invalid scope {}'.format(scope))
+            raise TypeError(f'Invalid scope {scope}')
 
     @classmethod
     def _check_timescale(cls, timescale):
@@ -334,11 +331,11 @@ class VCDWriter(object):
             elif len(timescale) == 2:
                 num, unit = timescale
                 if num not in cls.TIMESCALE_NUMS:
-                    raise ValueError('Invalid timescale num {}'.format(num))
+                    raise ValueError(f'Invalid timescale num {num}')
                 num_str = str(num)
             else:
-                raise ValueError('Invalid timescale {}'.format(timescale))
-        elif isinstance(timescale, six.string_types):
+                raise ValueError(f'Invalid timescale {timescale}')
+        elif isinstance(timescale, str):
             if timescale in cls.TIMESCALE_UNITS:
                 num_str = '1'
                 unit = timescale
@@ -350,12 +347,11 @@ class VCDWriter(object):
                         break
                 else:
                     raise ValueError(
-                        'Invalid timescale num {}'.format(timescale))
+                        f'Invalid timescale num {timescale}')
         else:
-            raise TypeError('Invalid timescale type {}'
-                            .format(type(timescale).__name__))
+            raise TypeError(f'Invalid timescale type {type(timescale).__name__}')
         if unit not in cls.TIMESCALE_UNITS:
-            raise ValueError('Invalid timescale unit "{}"'.format(unit))
+            raise ValueError(f'Invalid timescale unit "{unit}"')
         return ' '.join([num_str, unit])
 
     def __enter__(self):
@@ -407,12 +403,12 @@ class VCDWriter(object):
 
     def _gen_header(self):
         """generate header for VCDWriter"""
-        for kwname, kwvalue in sorted(six.iteritems(self._header_keywords)):
+        for kwname, kwvalue in sorted(self._header_keywords.items()):
             if not kwvalue:
                 continue
             lines = kwvalue.split('\n')
             if len(lines) == 1:
-                yield '{} {} $end'.format(kwname, lines[0])
+                yield f'{kwname} {lines[0]} $end'
             else:
                 yield kwname
                 for line in lines:
@@ -431,13 +427,12 @@ class VCDWriter(object):
                     for j, name in enumerate(scope[i:]):
                         scope_type = self._scope_types.get(
                             scope[:i + j + 1], self._default_scope_type)
-                        yield '$scope {} {} $end'.format(scope_type, name)
+                        yield f'$scope {scope_type} {name} $end'
                     break
             else:
                 assert scope != prev_scope  # pragma no cover
 
-            for var_str in var_strs:
-                yield var_str
+            yield from var_strs
 
             prev_scope = scope
 
@@ -463,7 +458,7 @@ class VCDWriter(object):
         self._scope_var_names.clear()
 
 
-class Variable(object):
+class Variable:
     """VCD variable details needed to call :meth:`VCDWriter.change()`."""
 
     #: variables
@@ -502,9 +497,9 @@ class ScalarVariable(Variable):
         :returns: string representing value change for use in a VCD stream.
 
         """
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             if check and (len(value) != 1 or value not in '01xzXZ'):
-                raise ValueError('Invalid scalar value ({})'.format(value))
+                raise ValueError(f'Invalid scalar value ({value})')
             return value + self.ident
         elif value is None:
             return 'z' + self.ident
@@ -534,9 +529,9 @@ class RealVariable(Variable):
 
         """
         if not check or isinstance(value, Number):
-            return 'r{:.16g} {}'.format(value, self.ident)
+            return f'r{value:.16g} {self.ident}'
         else:
-            raise ValueError('Invalid real value ({})'.format(value))
+            raise ValueError(f'Invalid real value ({value})')
 
 
 class VectorVariable(Variable):
@@ -594,23 +589,22 @@ class VectorVariable(Variable):
             value_str = ''.join(vstr_list)
         else:
             value_str = self._format_value(value, self.size, check)
-        return 'b{} {}'.format(value_str, self.ident)
+        return f'b{value_str} {self.ident}'
 
     def _format_value(self, value, size, check):
         """format value function of VCDWriter"""
-        if isinstance(value, six.integer_types):
+        if isinstance(value, int):
             max_val = 1 << size
             if check and (-value > (max_val >> 1) or value >= max_val):
-                raise ValueError('Value ({}) not representable in {} bits'
-                                 .format(value, size))
+                raise ValueError(f'Value ({value}) not representable in {size} bits')
             if value < 0:
                 value += max_val
             return format(value, 'b')
         elif value is None:
             return 'z'
         else:
-            if check and (not isinstance(value, six.string_types) or
+            if check and (not isinstance(value, str) or
                           len(value) > size or
                           any(c not in '01xzXZ-' for c in value)):
-                raise ValueError('Invalid vector value ({})'.format(value))
+                raise ValueError(f'Invalid vector value ({value})')
             return value

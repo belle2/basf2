@@ -28,7 +28,7 @@ namespace Belle2 {
        */
       ImpactBinsSpec(double lowerBound, double upperBound, long nBins, int nOverlap, int nWidth);
 
-      /// Constuct the array of discrete impact positions
+      /// Construct the array of discrete impact positions
       DiscreteImpact::Array constructArray() const;
 
       /// Getter for the number of bounds
@@ -59,7 +59,7 @@ namespace Belle2 {
       /// Upper bound of the binning range
       double m_upperBound;
 
-      /// Number of accessable bins
+      /// Number of accessible bins
       long m_nBins;
 
       /// Overlap of the leaves in impact counted in number of discrete values.

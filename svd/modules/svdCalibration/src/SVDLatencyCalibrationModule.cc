@@ -23,7 +23,7 @@ REG_MODULE(SVDLatencyCalibration);
 SVDLatencyCalibrationModule::SVDLatencyCalibrationModule() : Module()
 {
   // Set module properties
-  setDescription("this module perfoms an analysis to find the APV25 latency");
+  setDescription("this module performs an analysis to find the APV25 latency");
 
   // Parameter definitions
   addParam("ShaperDigitsName", m_shapersListName, "SVDShaperDigits list name", std::string(""));

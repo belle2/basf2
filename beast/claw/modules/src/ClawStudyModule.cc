@@ -16,12 +16,7 @@
 #include <framework/logging/Logger.h>
 #include <cmath>
 
-#include <fstream>
 #include <string>
-
-// ROOT
-#include <TH1.h>
-#include <TH2.h>
 
 int eventNum = 0;
 
@@ -124,7 +119,7 @@ void ClawStudyModule::initialize()
 
   REG_HISTOGRAM
 
-  //get CLAWS paramters ie energy threshold
+  //get CLAWS parameters ie energy threshold
   getXMLData();
 }
 

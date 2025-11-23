@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -23,7 +22,7 @@ from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKe
 formatter = TolerateMissingKeyFormatter()
 
 
-class ClassificationAnalysis(object):
+class ClassificationAnalysis:
     """Perform truth-classification analysis"""
 
     def __init__(
@@ -177,15 +176,11 @@ class ClassificationAnalysis(object):
         # Figures of merit
         if cut_value is not None:
             fom_name = formatter.format(plot_name, subplot_name="classification_figures_of_merits")
-            fom_description = "Efficiency, purity and background rejection of the classifiction with {quantity_name}".format(
-                quantity_name=quantity_name
-            )
+            fom_description = f"Efficiency, purity and background rejection of the classification with {quantity_name}"
 
-            fom_check = "Check that the classifcation quality stays stable."
+            fom_check = "Check that the classification quality stays stable."
 
-            fom_title = "Summary of the classification quality with {quantity_name}".format(
-                quantity_name=quantity_name
-            )
+            fom_title = f"Summary of the classification quality with {quantity_name}"
 
             classification_fom = ValidationFiguresOfMerit(
                 name=fom_name,
@@ -498,7 +493,7 @@ class ClassificationAnalysis(object):
             self.fom.write(tdirectory)
 
 
-class CutClassifier(object):
+class CutClassifier:
 
     """Simple classifier cutting on a single variable"""
 
@@ -571,7 +566,7 @@ class CutAtBackgroundRejectionClassifier(CutClassifier):
 
     def __init__(self, background_rejection=0.5, cut_direction=1):
         """Constructor"""
-        super(CutAtBackgroundRejectionClassifier, self).__init__(cut_direction=cut_direction, cut_value=np.nan)
+        super().__init__(cut_direction=cut_direction, cut_value=np.nan)
         #: cachec copy of the background-rejection threshold
         self.background_rejection = background_rejection
 

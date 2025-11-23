@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -43,24 +42,24 @@ class CompareTransformationsModule(b2.Module):
         # We check the trafos for EACH sensor
         for sensor in cache.getListOfSensors():
             # Nominal trafo stored by findVolumes() after geometry is created
-            nominal = cache.get(sensor).getTransformation(False)
+            nominal = cache.getSensorInfo(sensor).getTransformation(False)
             # Trafo computed by the stored matrix chain in hierarchy (includes alignment,
             # but as we use exp=0, run=0 we should always get zero alignment. Therefore
             # we know both matrices have to be the same. Let's compare them element by element
-            reco = cache.get(sensor).getTransformation(True)
+            reco = cache.getSensorInfo(sensor).getTransformation(True)
 
             # First rotation component
             for i in range(0, 9):
-                assert(abs(nominal.GetRotationMatrix()[i] - reco.GetRotationMatrix()[i]) < 1.e-14)
+                assert (abs(nominal.GetRotationMatrix()[i] - reco.GetRotationMatrix()[i]) < 1.e-14)
             # Then translations
             for i in range(0, 3):
-                assert(abs(nominal.GetTranslation()[i] - reco.GetTranslation()[i]) < 1.e-14)
+                assert (abs(nominal.GetTranslation()[i] - reco.GetTranslation()[i]) < 1.e-14)
 
     def event(self):
         """ test that moving a ladder moves the sensor in the event processing """
         cache = Belle2.VXD.GeoCache.getInstance()
 
-        original_global_sensor_z = cache.get(Belle2.VxdID("1.1.1")).pointToGlobal(ROOT.Math.XYZVector(0, 0, 0), True).Z()
+        original_global_sensor_z = cache.getSensorInfo(Belle2.VxdID("1.1.1")).pointToGlobal(ROOT.Math.XYZVector(0, 0, 0), True).Z()
 
         # Now move ladder... we need a copy of the current alignment
         alignment = Belle2.PyDBObj("VXDAlignment").obj().Clone()
@@ -69,11 +68,11 @@ class CompareTransformationsModule(b2.Module):
         # and add the object to the database store. This will run the callback
         Belle2.DBStore.Instance().addConstantOverride("VXDAlignment", alignment)
 
-        new_global_sensor_z = cache.get(Belle2.VxdID("1.1.1")).pointToGlobal(ROOT.Math.XYZVector(0, 0, 0), True).Z()
+        new_global_sensor_z = cache.getSensorInfo(Belle2.VxdID("1.1.1")).pointToGlobal(ROOT.Math.XYZVector(0, 0, 0), True).Z()
 
         # expect that sensor moved with the ladder
         print("Now testing that moving a ladder moves a sensor correspondingly...")
-        assert(abs(new_global_sensor_z - original_global_sensor_z - self.test_shift_z) < 1.e-14)
+        assert (abs(new_global_sensor_z - original_global_sensor_z - self.test_shift_z) < 1.e-14)
 
 
 main = b2.create_path()

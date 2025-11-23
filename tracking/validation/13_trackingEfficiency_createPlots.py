@@ -41,6 +41,8 @@ import numpy as np
 from optparse import OptionParser
 from tracking.validation.tracking_efficiency_helpers import get_generated_pt_values
 
+ACTIVE = True
+
 DELTA_PT = 0.0001
 
 PT_VALUES = get_generated_pt_values()
@@ -720,4 +722,9 @@ def fit_function_sigma_pt_over_pt(x, a, b):
 
 
 if __name__ == '__main__':
-    main()
+    if ACTIVE:
+        main()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

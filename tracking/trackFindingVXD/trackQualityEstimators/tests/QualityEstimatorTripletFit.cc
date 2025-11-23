@@ -28,10 +28,10 @@ namespace QualityEstimatorTests {
     qualityEstimator.setMagneticFieldStrength(1.5);
 
     // Some hitpoints that are exactly on a circle in x,y with radius 1 and m=(1,0,0)
-    auto position1 = B2Vector3<double>(0., 0., 0.);
-    auto position2 = B2Vector3<double>(1., 1., 0.);
-    auto position3 = B2Vector3<double>(2., 0., 0.);
-    B2Vector3<double> sigma;
+    auto position1 = B2Vector3D(0., 0., 0.);
+    auto position2 = B2Vector3D(1., 1., 0.);
+    auto position3 = B2Vector3D(2., 0., 0.);
+    B2Vector3D sigma;
 
     auto spacePoint1 = SpacePoint(position1, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
     auto spacePoint2 = SpacePoint(position2, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
@@ -50,9 +50,9 @@ namespace QualityEstimatorTests {
     ASSERT_NEAR(*(result.chiSquared), 0., allowed_chi2_deviation) << "1st perfect circle";
 
     // Some hitpoints that are exactly on a circle in rotated 2D-plane with radius 1
-    position1 = B2Vector3<double>(0., 0., 0.);
-    position2 = B2Vector3<double>(1., 1., 1.);
-    position3 = B2Vector3<double>(2., 0., 2.);
+    position1 = B2Vector3D(0., 0., 0.);
+    position2 = B2Vector3D(1., 1., 1.);
+    position3 = B2Vector3D(2., 0., 2.);
 
     spacePoint1 = SpacePoint(position1, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
     spacePoint2 = SpacePoint(position2, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
@@ -70,7 +70,7 @@ namespace QualityEstimatorTests {
     ASSERT_NEAR(*(result.chiSquared), 0., allowed_chi2_deviation) << "2nd perfect circle";
 
     // Move one hit away from circle
-    position3 = B2Vector3<double>(2., 0., 2. + 1e-6);
+    position3 = B2Vector3D(2., 0., 2. + 1e-6);
     spacePoint3 = SpacePoint(position3, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
 
     hitlist.clear();
@@ -83,7 +83,7 @@ namespace QualityEstimatorTests {
     ASSERT_TRUE(*(result.chiSquared) > allowed_chi2_deviation) << "1st imperfect circle";
 
     // Move one hit away from circle
-    position3 = B2Vector3<double>(2. + 1e-6, 0., 2.);
+    position3 = B2Vector3D(2. + 1e-6, 0., 2.);
     spacePoint3 = SpacePoint(position3, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
 
     hitlist.clear();
@@ -104,11 +104,11 @@ namespace QualityEstimatorTests {
     qualityEstimator.setMagneticFieldStrength(1.5);
 
     // Some hitpoints that are exactly on a circle in x,y with radius 1 and m=(1,0,0)
-    auto position1 = B2Vector3<double>(0., 0., 0.);
-    auto position2 = B2Vector3<double>(1., 1., 0.);
-    auto position3 = B2Vector3<double>(2., 0., 0.);
-    auto position4 = B2Vector3<double>(1., -1., 0.);
-    B2Vector3<double> sigma;
+    auto position1 = B2Vector3D(0., 0., 0.);
+    auto position2 = B2Vector3D(1., 1., 0.);
+    auto position3 = B2Vector3D(2., 0., 0.);
+    auto position4 = B2Vector3D(1., -1., 0.);
+    B2Vector3D sigma;
 
     auto spacePoint1 = SpacePoint(position1, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
     auto spacePoint2 = SpacePoint(position2, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
@@ -128,7 +128,7 @@ namespace QualityEstimatorTests {
     ASSERT_NEAR(*(result.chiSquared), 0., allowed_chi2_deviation) << "1st perfect combined circle";
 
     // Combine two triplets with different radii;
-    position4 = B2Vector3<double>(1., -2., 0.);
+    position4 = B2Vector3D(1., -2., 0.);
     spacePoint4 = SpacePoint(position4, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
 
     hitlist.clear();
@@ -151,10 +151,10 @@ namespace QualityEstimatorTests {
     qualityEstimator.setMagneticFieldStrength(1.5);
 
     // Some hitpoints
-    auto position1 = B2Vector3<double>(0., 0., 0.);
-    auto position2 = B2Vector3<double>(1., 1., 0.);
-    auto position3 = B2Vector3<double>(2., 0., 0.);
-    B2Vector3<double> sigma;
+    auto position1 = B2Vector3D(0., 0., 0.);
+    auto position2 = B2Vector3D(1., 1., 0.);
+    auto position3 = B2Vector3D(2., 0., 0.);
+    B2Vector3D sigma;
     auto spacePoint1 = SpacePoint(position1, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
     auto spacePoint2 = SpacePoint(position2, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
     auto spacePoint3 = SpacePoint(position3, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -18,7 +17,7 @@ from VXDTF.setup_modules import (setup_sim,
                                  setup_realClusters,
                                  setup_mcTF)
 
-# 0 means really random. Set to different seed to have reproducable simulation.
+# 0 means really random. Set to different seed to have reproducible simulation.
 b2.set_random_seed(0)
 
 # Extremely "non-verbose". Should be OK, as this are well tested modules...
@@ -108,7 +107,7 @@ else:                    # Use simple clusterizer, that takes TrueHits.
 # Setting up the MC based track finder is necessary to collect information etc.
 setup_mcTF(path=main, nameOutput='mcTracks', usePXD=False, logLevel=b2.LogLevel.INFO)
 
-# Module to write the DataStore into a Root file. Name of output file can be overriden with "-o NAME" flag.
+# Module to write the DataStore into a Root file. Name of output file can be overridden with "-o NAME" flag.
 rootOutput = b2.register_module('RootOutput')
 rootOutput.param('outputFileName', "MyRootFile.root")
 main.add_module(rootOutput)

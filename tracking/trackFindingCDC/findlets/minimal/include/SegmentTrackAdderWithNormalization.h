@@ -50,7 +50,7 @@ namespace Belle2 {
 
     private:
       // Parameters
-      /// Parameter : Swtich to remove hits in segments that have no matching track from all tracks
+      /// Parameter : Switch to remove hits in segments that have no matching track from all tracks
       bool m_param_removeUnmatchedSegments = true;
 
       // Findlets

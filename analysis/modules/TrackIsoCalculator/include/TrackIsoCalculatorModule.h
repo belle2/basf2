@@ -11,15 +11,12 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/logging/LogConfig.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/database/DBObjPtr.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/dbobjects/PIDDetectorWeights.h>
 
@@ -220,7 +217,7 @@ namespace Belle2 {
     double getWeightedSumInvDists(const Particle* iParticle, const std::string& detName, const float detWeight) const;
 
     /**
-     * Get the threshold value per detctor layer for the distance to closest ext. helix
+     * Get the threshold value per detector layer for the distance to closest ext. helix
      * that is used to define locally isolated particles at that layer.
      * @param det the input PID detector.
      * @param layer the input detector layer.

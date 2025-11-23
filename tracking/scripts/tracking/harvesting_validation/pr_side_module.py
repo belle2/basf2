@@ -785,7 +785,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         description="""
                     The distribution of p values from the Genfit track fit.
                     If all errors are propagated correctly the distribution should be flat.
-                    Generally some peaking behvaiour towards zero is too be expected if the errors are underestimated.
+                    Generally some peaking behavior towards zero is too be expected if the errors are underestimated.
                     """,
         check="The distribution should be flat."
         #: \endcond

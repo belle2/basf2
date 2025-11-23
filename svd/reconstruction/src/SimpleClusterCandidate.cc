@@ -25,12 +25,13 @@ namespace Belle2 {
 
     SimpleClusterCandidate::SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent,
                                                    double cutCluster, int timeAlgorithm)
-      : m_vxdID(vxdID)
-      , m_isUside(isUside)
-      , m_sizeHeadTail(sizeHeadTail)
+      : m_storeShaperDigitsName("SVDShaperDigits")
+      , m_storeRecoDigitsName("SVDRecoDigits")
+      , m_strips(4)
       , m_cutSeed(cutSeed)
       , m_cutAdjacent(cutAdjacent)
       , m_cutCluster(cutCluster)
+      , m_sizeHeadTail(sizeHeadTail)
       , m_timeAlgorithm(timeAlgorithm)
       , m_charge(0)
       , m_chargeError(0)
@@ -42,19 +43,19 @@ namespace Belle2 {
       , m_SNR(0)
       , m_seedSNR(0)
       , m_seedIndex(-1)
-      , m_strips(4)
-      , m_storeShaperDigitsName("SVDShaperDigits")
-      , m_storeRecoDigitsName("SVDRecoDigits")
+      , m_vxdID(vxdID)
+      , m_isUside(isUside)
     {m_strips.clear();};
 
     SimpleClusterCandidate::SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent,
                                                    double cutCluster, int timeAlgorithm, const std::string& storeShaperDigitsName, const std::string& storeRecoDigitsName)
-      : m_vxdID(vxdID)
-      , m_isUside(isUside)
-      , m_sizeHeadTail(sizeHeadTail)
+      : m_storeShaperDigitsName(storeShaperDigitsName)
+      , m_storeRecoDigitsName(storeRecoDigitsName)
+      , m_strips(4)
       , m_cutSeed(cutSeed)
       , m_cutAdjacent(cutAdjacent)
       , m_cutCluster(cutCluster)
+      , m_sizeHeadTail(sizeHeadTail)
       , m_timeAlgorithm(timeAlgorithm)
       , m_charge(0)
       , m_chargeError(0)
@@ -66,9 +67,8 @@ namespace Belle2 {
       , m_SNR(0)
       , m_seedSNR(0)
       , m_seedIndex(-1)
-      , m_strips(4)
-      , m_storeShaperDigitsName(storeShaperDigitsName)
-      , m_storeRecoDigitsName(storeRecoDigitsName)
+      , m_vxdID(vxdID)
+      , m_isUside(isUside)
     {m_strips.clear();};
 
     bool SimpleClusterCandidate::add(VxdID vxdID, bool isUside, struct  stripInCluster& aStrip)
@@ -193,7 +193,7 @@ namespace Belle2 {
 
       //Lorentz shift correction - PATCHED
       //NOTE: layer 3 is upside down with respect to L4,5,6 in the real data (real SVD), but _not_ in the simulation. We need to change the sign of the Lorentz correction on L3 only if reconstructing data, i.e. if Environment::Instance().isMC() is FALSE.
-      const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(m_vxdID));
+      const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_vxdID));
 
       bool isMC = Environment::Instance().isMC();
 
@@ -309,7 +309,7 @@ namespace Belle2 {
     {
 
       if (m_strips.size() == 0)
-        B2ERROR(" you are asking fo the cluster samples for a cluster candidate with no strips, it make no sense to ask for the cluster time!");
+        B2ERROR(" you are asking for the cluster samples for a cluster candidate with no strips, it make no sense to ask for the cluster time!");
 
       //steps:
       //1.loop on m_strips

@@ -1,0 +1,27 @@
+# EventType: 1213050006
+# Descriptor: [B- -> D+ (-> K- pi+ pi+) pi- pi-]  
+# NickName: Bu_Dpipi_DtoKpipi
+# Documentation: B- to D+ pi- pi-
+# Responsible: Agrim Aggarwal
+# Email: s6agagga@uni-bonn.de 
+# Tested: Yes 
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 2025/02/03
+
+Decay Upsilon(4S)
+0.5  B-sig  B+  VSS;
+0.5  B-  B+sig  VSS;
+Enddecay
+
+Decay B-sig
+1.00  D+sig  pi-  pi-         PHSP;
+Enddecay
+CDecay B+sig
+
+Decay D+sig
+1.00   K-  pi+  pi+          D_DALITZ;
+Enddecay
+CDecay D-sig
+
+End

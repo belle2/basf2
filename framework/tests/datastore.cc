@@ -445,8 +445,8 @@ namespace {
     EXPECT_EQ(i, 0);
     //iteration over non-existing array
     i = 0;
-    StoreArray<EventMetaData> nonExistant("doesntexist");
-    for (const EventMetaData& emd : nonExistant) {
+    StoreArray<EventMetaData> nonexistent("doesntexist");
+    for (const EventMetaData& emd : nonexistent) {
       (void)emd;
       i++;
     }
@@ -514,7 +514,7 @@ namespace {
     StoreObjPtr<ProfileInfo> profile;
     StoreArray<EventMetaData> eventsMetaDatas2;
 
-    //inialize(), use names from module paramateres
+    //initialize(), use names from module paramateres
     DataStore::Instance().setInitializeActive(true);
     {
       EXPECT_TRUE(events.registerInDataStore("ThisBeInterestingNameForEvents"));

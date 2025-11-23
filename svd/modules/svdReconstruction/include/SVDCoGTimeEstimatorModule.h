@@ -29,7 +29,7 @@ namespace Belle2 {
   /** This module builds the SVDRecoDigits (calibrated and fitted strips)
    * from the SVDShaperDigits.
    * The time of the hit is estimated as the weighted average of the
-   * samples' time substracted by an offset sensor-depending;
+   * samples' time subtracted by an offset sensor-depending;
    * the charge of the strips is estimated as the charge
    * of the highest sample
    */

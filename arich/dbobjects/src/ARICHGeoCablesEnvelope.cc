@@ -11,9 +11,6 @@
 #include <framework/logging/Logger.h>
 #include <iostream>
 
-//root
-#include <TVector3.h>
-
 using namespace std;
 using namespace Belle2;
 
@@ -35,8 +32,8 @@ void ARICHGeoCablesEnvelope::print(const std::string& title) const
 void ARICHGeoCablesEnvelope::checkCablesEnvelopDataConsistency() const
 {
 
-  B2ASSERT("Data of the ARICH cables envelop is inconsisten : getEnvelopeThickness() > 0 ", getEnvelopeThickness() > 0);
-  B2ASSERT("Data of the ARICH cables envelop is inconsisten : getEnvelopeOuterRadius() > getEnvelopeInnerRadius() ",
+  B2ASSERT("Data of the ARICH cables envelop is inconsistent : getEnvelopeThickness() > 0 ", getEnvelopeThickness() > 0);
+  B2ASSERT("Data of the ARICH cables envelop is inconsistent : getEnvelopeOuterRadius() > getEnvelopeInnerRadius() ",
            getEnvelopeOuterRadius() > getEnvelopeInnerRadius());
 
 }

@@ -262,6 +262,12 @@ namespace Belle2 {
     double recoilMassSquared(const Particle* particle);
 
     /**
+     * return mass difference between invariant mass of the system recoiling against given Particle
+     * and the system recoiling against given Particle without an indicated daughter
+     */
+    double recoilMassDiff(const Particle* particle, const std::vector<double>& daughters);
+
+    /**
      * Returns the decay type of recoil particle (meant for B mesons)
      * No related mcparticle = -1
      * Hadronic = 0

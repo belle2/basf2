@@ -21,14 +21,13 @@
 from tracking.validation.run import TrackingValidationRun
 from tracking.path_utils import add_hit_preparation_modules, add_vtx_track_finding_vxdtf2
 import logging
-from basf2 import set_log_level, LogLevel
 import basf2
 VALIDATION_OUTPUT_FILE = 'vtxToCDCCKFTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
 basf2.set_random_seed(1337)
-basf2.set_log_level(LogLevel.ERROR)
+basf2.set_log_level(basf2.LogLevel.ERROR)
 
 
 class vtxToCDCCKF(TrackingValidationRun):
@@ -71,7 +70,8 @@ class vtxToCDCCKF(TrackingValidationRun):
         path.add_module("RelatedTracksCombiner",
                         CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
                         VXDRecoTracksStoreArrayName="RecoTracksVTX",
-                        recoTracksStoreArrayName="RecoTracks")
+                        recoTracksStoreArrayName="RecoTracks",
+                        allowMultipleRelations=True)
 
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")
 

@@ -16,7 +16,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCWire;
 
-    /// A segment consisting of two dimensional reconsturcted hits
+    /// A segment consisting of two dimensional reconstructed hits
     class CDCRLWireHitSegment :  public CDCSegment<CDCRLWireHit> {
     public:
       /// Default constructor for ROOT compatibility.

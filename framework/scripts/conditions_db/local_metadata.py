@@ -9,7 +9,7 @@
 ##########################################################################
 
 """
-Module containing all functionality necessary to mange local metadata and payload
+Module containing all functionality necessary to manage local metadata and payload
 information.
 """
 

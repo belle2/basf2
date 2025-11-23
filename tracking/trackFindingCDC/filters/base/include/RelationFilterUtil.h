@@ -82,7 +82,7 @@ namespace Belle2 {
                 } else if (std::is_base_of<AObject, CKFToSVDState>::value) {
                   m_eventLevelTrackingInfo->setSVDCKFAbortionFlag();
                 } else if (std::is_base_of<AObject, vxdHoughTracking::VXDHoughState>::value) {
-                  B2INFO("Skipping processing DATCON track candidate, not setting AbortionFlag.");
+                  B2INFO("Skipping processing VXDHoughTracking track candidate, not setting AbortionFlag.");
                 } else {
                   B2WARNING("Undefined class used for CKFStates. Could not set AbortionFlag.");
                 }

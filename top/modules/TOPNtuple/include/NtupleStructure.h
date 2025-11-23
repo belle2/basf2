@@ -17,18 +17,12 @@ namespace Belle2 {
      * Structure for TOPLikelihood members
      */
     struct Likelihoods {
-      Float_t e;   /**< for electron */
-      Float_t mu;  /**< for muon */
-      Float_t pi;  /**< for pion */
-      Float_t K;   /**< for kaon */
-      Float_t p;   /**< for proton */
-      Float_t d;   /**< for deuteron */
-
-      /**
-       * Default constructor
-       */
-      Likelihoods(): e(0), mu(0), pi(0), K(0), p(0), d(0)
-      {}
+      Float_t e = 0;   /**< for electron */
+      Float_t mu = 0;  /**< for muon */
+      Float_t pi = 0;  /**< for pion */
+      Float_t K = 0;   /**< for kaon */
+      Float_t p = 0;   /**< for proton */
+      Float_t d = 0;   /**< for deuteron */
 
       /**
        * Clear the structure: set elements to zero
@@ -76,40 +70,35 @@ namespace Belle2 {
      * Structure of a flat ntuple
      */
     struct TOPTree {
-      Int_t evt; /**< event number */
-      Int_t run; /**< run number */
+      Int_t evt = 0; /**< event number */
+      Int_t run = 0; /**< run number */
 
-      Float_t p;      /**< momentum magnitude of Track */
-      Float_t cth;    /**< cosine of polar angle of Track */
-      Float_t phi;    /**< azimuthal angle of Track */
-      Float_t pValue; /**< p-value of Track fit */
+      Float_t p = 0;      /**< momentum magnitude of Track */
+      Float_t cth = 0;    /**< cosine of polar angle of Track */
+      Float_t phi = 0;    /**< azimuthal angle of Track */
+      Float_t pValue = 0; /**< p-value of Track fit */
 
-      Int_t PDG;       /**< PDG code of related MCParticle */
-      Int_t motherPDG; /**< PDG code of related mother MCParticle */
-      Short_t primary; /**< is a primary particle (from related MCParticle) */
-      Short_t seen;    /**< is seen in TOP (from related MCParticle) */
-      Float_t rhoProd; /**< production vertex (cylindrical coordinate r) of MCParticle */
-      Float_t zProd;   /**< production vertex (cylindrical coordinate z) of MCParticle */
-      Float_t phiProd; /**< production vertex (cylindrical coordinate phi) of MCParticle */
-      Float_t rhoDec;  /**< decay vertex (cylindrical coordinate r) of MCParticle */
-      Float_t zDec;    /**< decay vertex (cylindrical coordinate z) of MCParticle */
-      Float_t phiDec;  /**< decay vertex (cylindrical coordinate phi) of MCParticle */
+      Int_t PDG = 0;       /**< PDG code of related MCParticle */
+      Int_t motherPDG = 0; /**< PDG code of related mother MCParticle */
+      Short_t primary = 0; /**< is a primary particle (from related MCParticle) */
+      Short_t seen = 0;    /**< is seen in TOP (from related MCParticle) */
+      Float_t rhoProd = 0; /**< production vertex (cylindrical coordinate r) of MCParticle */
+      Float_t zProd = 0;   /**< production vertex (cylindrical coordinate z) of MCParticle */
+      Float_t phiProd = 0; /**< production vertex (cylindrical coordinate phi) of MCParticle */
+      Float_t rhoDec = 0;  /**< decay vertex (cylindrical coordinate r) of MCParticle */
+      Float_t zDec = 0;    /**< decay vertex (cylindrical coordinate z) of MCParticle */
+      Float_t phiDec = 0;  /**< decay vertex (cylindrical coordinate phi) of MCParticle */
+      Int_t yieldMC = 0;   /**< signal yield MC truth */
 
-      Int_t numPhot;      /**< number of detected photons */
-      Float_t numBkg;     /**< number of expected background photons */
-      Likelihoods phot;   /**< number of expected photons (signal + bkg)*/
+      Int_t numPhot = 0;      /**< number of detected photons */
+      Float_t numBkg = 0;     /**< number of expected background photons */
+      Int_t moduleID = 0;     /**< module ID from TOPLikelihoods */
+      Likelihoods phot;   /**< number of expected photons (signal + bkg) */
+      Likelihoods yield;   /**< effective signal yields by sPlot */
       Likelihoods logL;   /**< log likelihoods */
 
       TrackHit extHit;  /**< extrapolated Track hit (in local module frame) */
       TrackHit barHit;  /**< related MC particle hit (in local module frame) */
-
-      /**
-       * Default constructor
-       */
-      TOPTree(): evt(0), run(0), p(0), cth(0), phi(0), pValue(0), PDG(0), motherPDG(0),
-        primary(0), seen(0), rhoProd(0), zProd(0), phiProd(0), rhoDec(0), zDec(0),
-        phiDec(0), numPhot(0), numBkg(0)
-      {}
 
       /**
        * Clear the structure: set elements to zero
@@ -134,10 +123,13 @@ namespace Belle2 {
         rhoDec = 0;
         zDec = 0;
         phiDec = 0;
+        yieldMC = 0;
 
         numPhot = 0;
         numBkg = 0;
+        moduleID = 0;
         phot.clear();
+        yield.clear();
         logL.clear();
 
         extHit.clear();

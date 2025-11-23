@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -9,53 +6,33 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-"""Test skims by running them all as a single combined steering file."""
+'''
+Simple launcher for skims/tests/test_skims.py_noexec.
+This tests whether:
+- all the skims are working;
+- there is a name clash among ParticlesLists from different skims.
+'''
 
-from glob import glob
-
-from b2test_utils import clean_working_directory, require_file
 import basf2 as b2
-import modularAnalysis as ma
-from skim import CombinedSkim
-from skim.WGs.fei import BaseFEISkim
-from skim.registry import Registry
-
-# NOTE: Another way this test could have been written is to run the standalone steering
-# file for every skim:
-#
-#     for SkimName in Registry.names:
-#         b2.b2test_utils.check_error_free(
-#             "b2skim-run", f"Skim {SkimName}", "skim", toolopts=[SkimName, "-n", "10"]
-#         )
-#
-# I think what is written below is preferable, as it makes the overall running time of
-# this test smaller.
+import b2test_utils as b2tu
+import subprocess
 
 
-def is_fei_skim(skim):
-    return isinstance(skim, BaseFEISkim)
+if __name__ == '__main__':
 
+    b2tu.configure_logging_for_tests()
 
-def is_combined_or_fei_skim(skim):
-    return isinstance(skim, CombinedSkim) or is_fei_skim(skim)
+    test_skims = b2.find_file('skim/tests/test_skims.py_noexec')
 
+    # Here we test if the skims are working
+    test_result = subprocess.run(['basf2', test_skims], check=True, capture_output=True, universal_newlines=True)
 
-def main():
-    path = b2.Path()
-    mdst_files = glob(f'{b2.find_file("mdst/tests")}/mdst-v*.root')
-    mdst_files.sort(reverse=True)
-    ma.inputMdstList(require_file(mdst_files[0]), path=path)
+    # And here we test if there is a name clash among different skims
+    offending_error = ('[ERROR] An object ', 'was already created in the DataStore.')
+    found_errors = set([e for e in test_result.stdout.split('\n') if offending_error[0] in e and offending_error[1] in e])
+    if len(found_errors) > 0:
 
-    analysisGlobaltag = ma.getAnalysisGlobaltag()
-    SkimObjects = [Registry.get_skim_function(skim)(analysisGlobaltag=analysisGlobaltag) for skim in Registry.names]
-    skims = CombinedSkim(*[skim for skim in SkimObjects if not is_combined_or_fei_skim(skim)])
-    skims(path)
-    feiSkims = CombinedSkim(*[skim for skim in SkimObjects if is_fei_skim(skim)])
-    feiSkims(path)
-
-    b2.process(path, max_event=10)
-
-
-if __name__ == "__main__":
-    with clean_working_directory():
-        main()
+        b2.B2FATAL(
+            'There is one or more name clashes among ParticleLists from different skims, plese fix:\n',
+            '\n'.join(found_errors)
+        )

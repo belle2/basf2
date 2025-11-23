@@ -19,7 +19,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegmentTriple;
 
-    /// Filter for the constuction of segment triples based on monte carlo information
+    /// Filter for the construction of segment triples based on Monte Carlo information
     class MCSegmentTripleFilter  : public MCSymmetric<BaseSegmentTripleFilter> {
 
     private:

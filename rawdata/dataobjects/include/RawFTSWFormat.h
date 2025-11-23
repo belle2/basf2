@@ -82,7 +82,7 @@ namespace Belle2 {
     //! Get subrun #
     virtual int GetSubRunNo(int n) = 0;
 
-    //! get a word cotaining run # and subrun #
+    //! get a word containing run # and subrun #
     virtual int GetRunNoSubRunNo(int n) = 0;
 
     //! Get Exp #

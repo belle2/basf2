@@ -33,11 +33,11 @@ namespace Belle2 {
 
     /**
      *  Class representing a three dimensional reconstructed hit.
-     *  A recohit represents a likely point where the particle went through. It is always assoziated with a
-     *  wire hit it seeks to reconstruct. The reconstructed point is stored as an absolut position from the
+     *  A recohit represents a likely point where the particle went through. It is always associated with a
+     *  wire hit it seeks to reconstruct. The reconstructed point is stored as an absolute position from the
      *  origin / interaction point. In addition the reconstructed hit takes a right left passage information
      *  which indicates if the hit wire lies to the right or to the left of the particle trajectory causing the hit.
-     *  The later readily indicates a flight direction from the reconstructed hit, if a tangential approch of
+     *  The later readily indicates a flight direction from the reconstructed hit, if a tangential approach of
      *  the trajectory to the drift circle is assumed.
      *
      *  Finally we want to estimate the travel distance to z coordinate relation of the particle trajectory.
@@ -54,7 +54,7 @@ namespace Belle2 {
       CDCRecoHit3D(const CDCRLWireHit& rlWireHit, const Vector3D& recoPos3D, double arcLength2D = 0);
 
       /**
-       *  Constructs a three dimensional reconstructed hit from a sim hit and the assoziated wirehit.
+       *  Constructs a three dimensional reconstructed hit from a sim hit and the associated wirehit.
        *  This translates the sim hit to a reconstructed hit mainly to be able to compare the
        *  reconstructed values from the algorithm with the Monte Carlo information.
        *  It merely takes the position from the sim hit and calculates the right left passage information.
@@ -66,13 +66,13 @@ namespace Belle2 {
       /**
        *  Reconstructs the three dimensional hit from the two dimensional and the two dimensional trajectory.
        *  For two dimensional reconstructed hits on axial wires this reconstructs
-       *  the xy position and the transvers travel distance. The z coordinate cannot
+       *  the xy position and the transverse travel distance. The z coordinate cannot
        *  be determined since the projection can not show any information about it. It
        *  is always set to NAN for axial hits.
        *
        *  For two dimensional reconstructed hits on stereo wires however the deviation of the xy position
-       *  can be used to get z information. The reconstucted hit lies exactly on the fitted trajectory
-       *  as seen from the xy plane. Hence also xy position and transvers travel distance are available.
+       *  can be used to get z information. The reconstructed hit lies exactly on the fitted trajectory
+       *  as seen from the xy plane. Hence also xy position and transverse travel distance are available.
        *  Only the stereo hits have then the full information to go head and make the sz trajectory.
        */
       static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit2D,
@@ -118,13 +118,13 @@ namespace Belle2 {
        *  the two dimensional trajectory and sz trajectory.
        *  For two dimensional reconstructed hits on axial wires this reconstructs
        *
-       *  the xy position and the transvers travel distance. The z coordinate is then determined
+       *  the xy position and the transverse travel distance. The z coordinate is then determined
        *  by evaluating the sz trajectory at the just calculated travel distance. Note that it is important
        *  that both circle trajectory and sz trajectory share a common reference point.
        *
-       *  For two dimensional reconstructed hits on stereo wires the transerse travel distance is obtained
-       *  as in the reconstuct() method before. However the z coordinate is set to the value of the sz trajectory
-       *  at just calculated the transvers travel distance, since the trajectory should be more exact than the shifting
+       *  For two dimensional reconstructed hits on stereo wires the transverse travel distance is obtained
+       *  as in the reconstruct() method before. However the z coordinate is set to the value of the sz trajectory
+       *  at just calculated the transverse travel distance, since the trajectory should be more exact than the shifting
        *  along the wire.
        */
       static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit2D,
@@ -135,7 +135,7 @@ namespace Belle2 {
       /**
        *  Constructs the average of two reconstructed hit positions.
        *  Averages the hit positions and the travel distance. The function averages only reconstructed hits
-       *  assoziated with the same wire hit. If not all recostructed hits are on the same wire hit, the first hit
+       *  associated with the same wire hit. If not all reconstructed hits are on the same wire hit, the first hit
        *  is returned unchanged. Also averages the right left passage information with averageInfo().
        */
       static CDCRecoHit3D average(const CDCRecoHit3D& first,
@@ -157,7 +157,7 @@ namespace Belle2 {
         return static_cast<const CDCHit*>(getRLWireHit());
       }
 
-      /// Equality comparision based on wire hit, right left passage information and reconstructed position.
+      /// Equality comparison based on wire hit, right left passage information and reconstructed position.
       bool operator==(const CDCRecoHit3D& other) const
       {
         return getRLWireHit() == other.getRLWireHit() and
@@ -224,7 +224,7 @@ namespace Belle2 {
         return getRLWireHit().getWire();
       }
 
-      /// Checks if the reconstructed hit is assoziated with the give wire.
+      /// Checks if the reconstructed hit is associated with the give wire.
       bool isOnWire(const CDCWire& wire) const
       {
         return getRLWireHit().isOnWire(wire);
@@ -236,7 +236,7 @@ namespace Belle2 {
         return getRLWireHit().getWireHit();
       }
 
-      /// Checks if the reconstructed hit is assoziated with the give wire hit.
+      /// Checks if the reconstructed hit is associated with the give wire hit.
       bool hasWireHit(const CDCWireHit& wireHit) const
       {
         return getRLWireHit().hasWireHit(wireHit);
@@ -248,7 +248,7 @@ namespace Belle2 {
         return m_rlWireHit;
       }
 
-      /// Setter for the oriented wire hit assoziated with the reconstructed hit.
+      /// Setter for the oriented wire hit associated with the reconstructed hit.
       void setRLWireHit(const CDCRLWireHit& rlWireHit)
       {
         m_rlWireHit = rlWireHit;
@@ -319,20 +319,20 @@ namespace Belle2 {
 
       /**
        *  Constructs a two dimensional reconstructed hit by
-       *  carrying out the stereo ! projection to the wire reference postion.
+       *  carrying out the stereo ! projection to the wire reference position.
        */
       CDCRecoHit2D getRecoHit2D() const;
 
       /**
        *  Constructs a two dimensional reconstructed hit by
-       *  carrying out the stereo ! projection to the wire reference postion.
+       *  carrying out the stereo ! projection to the wire reference position.
        */
       CDCRecoHit2D stereoProjectToRef() const;
 
       /// Returns the position of the wire in the xy plain the reconstructed position is located in.
       Vector2D getRecoWirePos2D() const;
 
-      /// Scales the displacement vector in place to lie on the dirft circle.
+      /// Scales the displacement vector in place to lie on the drift circle.
       void snapToDriftCircle(bool switchSide = false);
 
       /**

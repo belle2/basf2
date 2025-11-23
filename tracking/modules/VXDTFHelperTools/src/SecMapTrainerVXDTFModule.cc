@@ -74,7 +74,7 @@ SecMapTrainerVXDTFModule::SecMapTrainerVXDTFModule() :
   VXDTFFilters<SpacePoint>* filters = new VXDTFFilters<SpacePoint>();
   filters->setConfig(testData1);
 
-  // the filtesrsContainer taked ownership of the filters!
+  // the filtesrsContainer took ownership of the filters!
   FiltersContainer<SpacePoint>& filtersContainer = Belle2::FiltersContainer<SpacePoint>::getInstance();
   filtersContainer.assignFilters(setupName, filters);
 

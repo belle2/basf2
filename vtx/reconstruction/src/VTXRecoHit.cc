@@ -41,7 +41,7 @@ VTXRecoHit::VTXRecoHit(const VTXTrueHit* hit, const genfit::TrackCandHit*, float
 
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
   if (sigmaU < 0 || sigmaV < 0) {
-    const VTX::SensorInfo& geometry = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+    const VTX::SensorInfo& geometry = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
     sigmaU = geometry.getUPitch(hit->getV()) / sqrt(12);
     sigmaV = geometry.getVPitch(hit->getV()) / sqrt(12);
   }
@@ -75,7 +75,7 @@ VTXRecoHit::VTXRecoHit(const VTXCluster* hit, float sigmaU, float sigmaV, float 
   rawHitCov_(1, 0) = covUV;
   rawHitCov_(1, 1) = sigmaV * sigmaV;
   // Set physical parameters
-  //const VTX::SensorInfo& SensorInfo = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  //const VTX::SensorInfo& SensorInfo = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
   // FIXME For the moment the conversion factors are unclear
   auto ADUToEnergy = 1.0;
   m_energyDep = hit->getCharge() * ADUToEnergy;
@@ -100,7 +100,7 @@ VTXRecoHit::VTXRecoHit(const VTXCluster* hit, const genfit::TrackCandHit*):
   rawHitCov_(1, 0) = hit->getRho() * hit->getUSigma() * hit->getVSigma();
   rawHitCov_(1, 1) = hit->getVSigma() * hit->getVSigma();
   // Set physical parameters
-  //const VTX::SensorInfo& SensorInfo = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  //const VTX::SensorInfo& SensorInfo = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
   // FIXME For the moment the conversion factors are unclear
   auto ADUToEnergy = 1.0;
   m_energyDep = hit->getCharge() * ADUToEnergy;
@@ -118,7 +118,7 @@ genfit::AbsMeasurement* VTXRecoHit::clone() const
 void VTXRecoHit::setDetectorPlane()
 {
   // Construct a finite detector plane and set it.
-  const VTX::SensorInfo& geometry = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  const VTX::SensorInfo& geometry = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
 
   // Construct vectors o, u, v
   ROOT::Math::XYZVector uLocal(1, 0, 0);
@@ -156,7 +156,7 @@ TVectorD VTXRecoHit::applyPlanarDeformation(TVectorD hitCoords, std::vector<doub
   auto L3 = [](double x) {return (5 * x * x * x - 3 * x) / 2;};
   auto L4 = [](double x) {return (35 * x * x * x * x - 30 * x * x + 3) / 8;};
 
-  const VTX::SensorInfo& geometry = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  const VTX::SensorInfo& geometry = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(m_sensorID));
 
   double u = hitCoords[0];
   double v = hitCoords[1];
@@ -201,7 +201,8 @@ std::vector<genfit::MeasurementOnPlane*> VTXRecoHit::constructMeasurementsOnPlan
     if (offset != nullptr) {
       // Found a valid offset, lets apply it
       const Belle2::VxdID& sensorID = (*this->getCluster()).getSensorID();
-      const Belle2::VTX::SensorInfo& Info = dynamic_cast<const Belle2::VTX::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      const Belle2::VTX::SensorInfo& Info = dynamic_cast<const Belle2::VTX::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(
+                                              sensorID));
       double posU = Info.getUCellPosition((*this->getCluster()).getUStart());
       double posV = Info.getVCellPosition((*this->getCluster()).getVStart());
 
@@ -215,7 +216,8 @@ std::vector<genfit::MeasurementOnPlane*> VTXRecoHit::constructMeasurementsOnPlan
       hitCov(1, 1) = offset->getVSigma2();
 
       // Apply planar deformation
-      TVectorD pos = applyPlanarDeformation(hitCoords, VXD::GeoCache::get(m_sensorID).getSurfaceParameters(), state);
+      TVectorD pos = applyPlanarDeformation(hitCoords, VXD::GeoCache::getInstance().getSensorInfo(m_sensorID).getSurfaceParameters(),
+                                            state);
 
       return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(
                                                         pos, hitCov, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())
@@ -224,7 +226,8 @@ std::vector<genfit::MeasurementOnPlane*> VTXRecoHit::constructMeasurementsOnPlan
   }
 
   // Apply planar deformation
-  TVectorD pos = applyPlanarDeformation(rawHitCoords_, VXD::GeoCache::get(m_sensorID).getSurfaceParameters(), state);
+  TVectorD pos = applyPlanarDeformation(rawHitCoords_, VXD::GeoCache::getInstance().getSensorInfo(m_sensorID).getSurfaceParameters(),
+                                        state);
 
   // If we reach here, we can do no better than what we have
   return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(

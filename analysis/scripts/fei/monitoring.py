@@ -30,6 +30,7 @@ import math
 import os
 import numpy as np
 import pdg
+import fei
 
 
 def removeJPsiSlash(string):
@@ -61,52 +62,67 @@ class Statistic:
         @param nBg the number of reconstructed background candidates
         """
         #: the number of true signal particles
-        self.nTrueSig = nTrueSig
+        self._nTrueSig = nTrueSig
         #: the number of reconstructed signal candidates
-        self.nSig = nSig
+        self._nSig = nSig
         #: the number of reconstructed background candidates
-        self.nBg = nBg
+        self._nBg = nBg
+
+    @property
+    def nSig(self):
+        """ Returns the number of reconstructed signal candidates. """
+        return self._nSig
+
+    @property
+    def nTrueSig(self):
+        """ Returns the number of reconstructed true signal candidates. """
+        return self._nTrueSig
+
+    @property
+    def nBg(self):
+        """ Returns the number of reconstructed background candidates. """
+        return self._nBg
 
     @property
     def nTotal(self):
         """ Returns total number of reconstructed candidates. """
-        return self.nSig + self.nBg
+        return self._nSig + self._nBg
 
     @property
     def purity(self):
         """ Returns the purity of the reconstructed candidates. """
-        if self.nSig == 0:
+        if self._nSig == 0:
             return 0.0
         if self.nTotal == 0:
             return 0.0
-        return self.nSig / float(self.nTotal)
+        return self._nSig / float(self.nTotal)
 
     @property
     def efficiency(self):
         """ Returns the efficiency of the reconstructed signal candidates with respect to the number of true signal particles. """
-        if self.nSig == 0:
+        if self._nSig == 0:
             return 0.0
-        if self.nTrueSig == 0:
+        if self._nTrueSig == 0:
             return float('inf')
-        return self.nSig / float(self.nTrueSig)
+        return self._nSig / float(self._nTrueSig)
 
     @property
     def purityError(self):
         """ Returns the uncertainty of the purity. """
         if self.nTotal == 0:
             return 0.0
-        return self.calcStandardDeviation(self.nSig, self.nTotal)
+        return self.calcStandardDeviation(self._nSig, self.nTotal)
 
     @property
     def efficiencyError(self):
         """
         Returns the uncertainty of the efficiency.
-        For an efficiency eps = self.nSig/self.nTrueSig, this function calculates the
+        For an efficiency eps = self._nSig/self._nTrueSig, this function calculates the
         standard deviation according to http://arxiv.org/abs/physics/0701199 .
         """
-        if self.nTrueSig == 0:
+        if self._nTrueSig == 0:
             return float('inf')
-        return self.calcStandardDeviation(self.nSig, self.nTrueSig)
+        return self.calcStandardDeviation(self._nSig, self._nTrueSig)
 
     def calcStandardDeviation(self, k, n):
         """ Helper method to calculate the standard deviation for efficiencies. """
@@ -155,6 +171,8 @@ class MonitoringHist:
         self.values = {}
         #: Dictionary of bin-centers for each histogram
         self.centers = {}
+        #: Dictionary of 2D mode for each histogram
+        self.two_dimensional = {}
         #: Dictionary of number of bins for each histogram
         self.nbins = {}
         #: Indicates if the histograms were successfully read
@@ -172,12 +190,12 @@ class MonitoringHist:
             if not (isinstance(hist, ROOT.TH1D) or isinstance(hist, ROOT.TH1F) or
                     isinstance(hist, ROOT.TH2D) or isinstance(hist, ROOT.TH2F)):
                 continue
-            two_dimensional = isinstance(hist, ROOT.TH2D) or isinstance(hist, ROOT.TH2F)
-            if two_dimensional:
+            self.two_dimensional[name] = isinstance(hist, ROOT.TH2D) or isinstance(hist, ROOT.TH2F)
+            if self.two_dimensional[name]:
                 nbins = (hist.GetNbinsX(), hist.GetNbinsY())
-                self.centers[name] = np.array([[hist.GetXaxis().GetBinCenter(i) for i in range(nbins[0] + 2)],
-                                               [hist.GetYaxis().GetBinCenter(i) for i in range(nbins[1] + 2)]])
-                self.values[name] = np.array([[hist.GetBinContent(i, j) for i in range(nbins[0] + 2)] for j in range(nbins[1] + 2)])
+                self.centers[name] = [[hist.GetXaxis().GetBinCenter(i) for i in range(nbins[0] + 2)],
+                                      [hist.GetYaxis().GetBinCenter(i) for i in range(nbins[1] + 2)]]
+                self.values[name] = [[hist.GetBinContent(i, j) for i in range(nbins[0] + 2)] for j in range(nbins[1] + 2)]
                 self.nbins[name] = nbins
             else:
                 nbins = hist.GetNbinsX()
@@ -192,6 +210,12 @@ class MonitoringHist:
         """
         if name not in self.centers:
             return np.nan
+        if self.two_dimensional[name]:
+            tempsum = 0
+            for i in range(len(self.values[name])):
+                for j in range(len(self.values[name][i])):
+                    tempsum += self.values[name][i][j]
+            return tempsum
         return np.sum(self.values[name])
 
     def mean(self, name):
@@ -201,6 +225,12 @@ class MonitoringHist:
         """
         if name not in self.centers:
             return np.nan
+        if self.two_dimensional[name]:
+            tempsum = 0
+            for i in range(len(self.values[name])):
+                for j in range(len(self.values[name][i])):
+                    tempsum += self.centers[name][i][j] * self.values[name][i][j]
+            return tempsum / self.sum(name)
         return np.average(self.centers[name], weights=self.values[name])
 
     def std(self, name):
@@ -210,6 +240,13 @@ class MonitoringHist:
         """
         if name not in self.centers:
             return np.nan
+        if self.two_dimensional[name]:
+            avg = self.mean(name)
+            tempsum = 0
+            for i in range(len(self.values[name])):
+                for j in range(len(self.values[name][i])):
+                    tempsum += self.values[name][i][j] * (self.centers[name][i][j] - avg)**2
+            return np.sqrt(tempsum / self.sum(name))
         avg = np.average(self.centers[name], weights=self.values[name])
         return np.sqrt(np.average((self.centers[name] - avg)**2, weights=self.values[name]))
 
@@ -220,6 +257,13 @@ class MonitoringHist:
         """
         if name not in self.centers:
             return np.nan
+        if self.two_dimensional[name]:
+            tempmin = np.inf
+            for i in range(len(self.values[name])):
+                for j in range(len(self.values[name][i])):
+                    if self.values[name][i][j] < tempmin:
+                        tempmin = self.centers[name][i][j]
+            return tempmin
         nonzero = np.nonzero(self.values[name])[0]
         if len(nonzero) == 0:
             return np.nan
@@ -232,6 +276,13 @@ class MonitoringHist:
         """
         if name not in self.centers:
             return np.nan
+        if self.two_dimensional[name]:
+            tempmax = -np.inf
+            for i in range(len(self.values[name])):
+                for j in range(len(self.values[name][i])):
+                    if self.values[name][i][j] > tempmax:
+                        tempmax = self.centers[name][i][j]
+            return tempmax
         nonzero = np.nonzero(self.values[name])[0]
         if len(nonzero) == 0:
             return np.nan
@@ -252,12 +303,16 @@ class MonitoringNTuple:
         import ROOT  # noqa
         #: Indicates if the ntuple were successfully read
         self.valid = os.path.isfile(filename)
+        print(f'FEI-monitoring: Looking for {filename}')
         if not self.valid:
+            raise RuntimeError(f"Could not find {filename}: current dir is {os.getcwd()}")
             return
         #: Reference to the ROOT file, so it isn't closed
         self.f = ROOT.TFile.Open(filename, 'read')
+        print(f'FEI-monitoring: Found {filename}')
         #: Reference to the tree named variables inside the ROOT file
-        self.tree = self.f.Get(f'{treenameprefix} variables')
+        self.tree = self.f.Get(ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(f'{treenameprefix} variables'))
+        print(f'FEI-monitoring: Found {treenameprefix} variables')
         #: Filename so we can use it later
         self.filename = filename
 
@@ -309,7 +364,7 @@ class MonitoringModuleStatistics:
                                                                'VariablesToHistogram': 0.0,
                                                                'VariablesToNtuple': 0.0}
             for key, time in statistic.items():
-                if(channel.decayString in key or channel.name in key):
+                if (channel.decayString in key or channel.name in key):
                     self.channel_time[channel.label] += time
                     for k in self.channel_time_per_module[channel.label]:
                         if k in key:
@@ -322,43 +377,47 @@ class MonitoringModuleStatistics:
                 self.particle_time += time
 
 
-def MonitorCosBDLPlot(particle, filename):
-    """ Creates a CosBDL plot using ROOT. """
+def MonitorSigProbPlot(particle, filename):
+    """ Creates a Signal probability plot using ROOT. """
     if not particle.final_ntuple.valid:
         return
-    df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
-                                  ['extraInfo__bouniqueSignal__bc', 'cosThetaBetweenParticleAndNominalB',
-                                   'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
-                                  ['unique', 'cosThetaBDl', 'probability', 'signal'])
-    for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
-        p = plotting.VerboseDistribution(range_in_std=5.0)
-        common = (np.abs(df['cosThetaBDl']) < 10) & (df['probability'] >= cut)
-        df = df[common]
-        p.add(df, 'cosThetaBDl', (df['signal'] == 1), label="Signal")
-        p.add(df, 'cosThetaBDl', (df['signal'] == 0), label="Background")
-        p.finish()
-        p.axis.set_title(f"Cosine of Theta between B and Dl system for signal probability >= {cut:.2f}")
-        p.axis.set_xlabel("CosThetaBDl")
-        p.save(f'{filename}_{i}.png')
+    df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
+                                   ['extraInfo__bouniqueSignal__bc',
+                                    'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                   ['unique', 'probability', 'signal'], max_entries=int(1e8))
+
+    p = plotting.VerboseDistribution(range_in_std=5.0)
+    common = (df['probability'] >= 0) & (df['probability'] <= 1)
+    df = df[common]
+    p.add(df, 'probability', (df['signal'] == 1), label="Signal")
+    p.add(df, 'probability', (df['signal'] == 0), label="Background")
+    p.finish()
+    p.axis.set_title("Signal probability")
+    p.axis.set_xlabel("Probability")
+    p.save(filename + '.png')
 
 
-def MonitorMbcPlot(particle, filename):
-    """ Creates a Mbc plot using ROOT. """
+def MonitorSpectatorPlot(particle, spectator, filename, range=(None, None)):
+    """ Creates a spectator plot using ROOT. """
     if not particle.final_ntuple.valid:
         return
-    df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
-                                  ['extraInfo__bouniqueSignal__bc', 'Mbc',
-                                   'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
-                                  ['unique', 'Mbc', 'probability', 'signal'])
+    df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
+                                   ['extraInfo__bouniqueSignal__bc', spectator,
+                                    'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                   ['unique', spectator, 'probability', 'signal'], max_entries=int(1e8))
     for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
         p = plotting.VerboseDistribution(range_in_std=5.0)
-        common = (df['Mbc'] > 5.23) & (df['probability'] >= cut)
+        common = (df['probability'] >= cut)
+        if range[0] is not None:
+            common &= (df[spectator] >= range[0])
+        if range[1] is not None:
+            common &= (df[spectator] <= range[1])
         df = df[common]
-        p.add(df, 'Mbc', (df['signal'] == 1), label="Signal")
-        p.add(df, 'Mbc', (df['signal'] == 0), label="Background")
+        p.add(df, spectator, (df['signal'] == 1), label="Signal")
+        p.add(df, spectator, (df['signal'] == 0), label="Background")
         p.finish()
-        p.axis.set_title(f"Beam constrained mass for signal probability >= {cut:.2f}")
-        p.axis.set_xlabel("Mbc")
+        p.axis.set_title(f"{spectator} for signal probability >= {cut:.2f}")
+        p.axis.set_xlabel(spectator)
         p.save(f'{filename}_{i}.png')
 
 
@@ -366,10 +425,10 @@ def MonitorROCPlot(particle, filename):
     """ Creates a ROC plot using ROOT. """
     if not particle.final_ntuple.valid:
         return
-    df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
-                                  ['extraInfo__bouniqueSignal__bc',
-                                   'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
-                                  ['unique', 'probability', 'signal'])
+    df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
+                                   ['extraInfo__bouniqueSignal__bc',
+                                    'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                   ['unique', 'probability', 'signal'], max_entries=int(1e8))
     p = plotting.RejectionOverEfficiency()
     p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0, label='All')
     p.finish()
@@ -380,10 +439,10 @@ def MonitorDiagPlot(particle, filename):
     """ Creates a Diagonal plot using ROOT. """
     if not particle.final_ntuple.valid:
         return
-    df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
-                                  ['extraInfo__bouniqueSignal__bc',
-                                   'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
-                                  ['unique', 'probability', 'signal'])
+    df = basf2_mva_util.chain2dict(particle.final_ntuple.tree,
+                                   ['extraInfo__bouniqueSignal__bc',
+                                    'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                   ['unique', 'probability', 'signal'], max_entries=int(1e8))
     p = plotting.Diagonal()
     p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0)
     p.finish()
@@ -556,6 +615,16 @@ class MonitoringParticle:
         """
         #: Particle containing its configuration
         self.particle = particle
+        particlesInStages = fei.core.get_stages_from_particles([particle])
+        stage = 0
+        for i in range(len(particlesInStages)):
+            for iparticle in particlesInStages[i]:
+                if iparticle.identifier == self.particle.identifier:
+                    stage = i+1
+                    break
+        if stage == 0:
+            raise RuntimeError(f"Could not find particle {self.particle.identifier} in the list of stages.")
+
         #: Dictionary with 'sum', 'std', 'mean', 'min' and 'max' of the MC counts
         self.mc_count = MonitoringMCCount(particle)
         #: Module statistics
@@ -621,10 +690,10 @@ class MonitoringParticle:
         self.after_ranking_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
         #: Statistic object before unique tagging of signals
         self.before_tag = self.calculateStatistic(hist, self.particle.mvaConfig.target)
-        #: Statistic object after unique tagging of signals
-        self.after_tag = self.calculateUniqueStatistic(hist)
         #: Reference to the final ntuple
         self.final_ntuple = MonitoringNTuple('Monitor_Final.root', f'{plist}')
+        #: Statistic object after unique tagging of signals
+        self.after_tag = self.calculateUniqueStatistic(self.final_ntuple.tree)
 
     def calculateStatistic(self, hist, target):
         """
@@ -639,17 +708,20 @@ class MonitoringParticle:
         nBg = hist.values[target][bckgrd_bins].sum()
         return Statistic(nTrueSig, nSig, nBg)
 
-    def calculateUniqueStatistic(self, hist):
+    def calculateUniqueStatistic(self, tree):
         """
         Calculate Static object where only unique signal candidates are considered signal
         """
         nTrueSig = self.mc_count['sum']
-        if not hist.valid:
+        if not tree:
             return Statistic(nTrueSig, 0, 0)
-        signal_bins = hist.centers['extraInfo(uniqueSignal)'] > 0.5
-        bckgrd_bins = hist.centers['extraInfo(uniqueSignal)'] <= 0.5
-        nSig = hist.values['extraInfo(uniqueSignal)'][signal_bins].sum()
-        nBg = hist.values['extraInfo(uniqueSignal)'][bckgrd_bins].sum()
+
+        nSig, nBg = 0, 0
+        for entry in tree:
+            if getattr(entry, "extraInfo__bouniqueSignal__bc") == 1:
+                nSig += 1
+            else:
+                nBg += 1
         return Statistic(nTrueSig, nSig, nBg)
 
 # @endcond

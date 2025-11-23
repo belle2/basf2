@@ -21,7 +21,7 @@ namespace Belle2 {
    * The PXD DAQ DHC Status class
    *
    * This is a small class that records information about PXD DAQ DHC status
-   * It will record if the data of sensors (readout by this DHC) is useable.
+   * It will record if the data of sensors (readout by this DHC) is usable.
    *
    */
   class PXDDAQDHCStatus final {
@@ -41,7 +41,7 @@ namespace Belle2 {
     virtual ~PXDDAQDHCStatus() {};
 
     /** Return Usability of data
-     * @return conclusion if data is useable
+     * @return conclusion if data is usable
      */
     bool isUsable() const { return m_usable; }
 
@@ -134,7 +134,7 @@ namespace Belle2 {
   private:
     PXDErrorFlags m_errorMask; /**< errors found in this DHC/sensor */
     PXDErrorFlags m_critErrorMask; /**< critical error mask */
-    bool m_usable; /**< data is useable.*/
+    bool m_usable; /**< data is usable.*/
 
     unsigned short m_dhcID;/**< DHC ID as delivered by DAQ.*/
     uint32_t m_rawCount; /**< raw byte count for monitoring */
@@ -143,7 +143,7 @@ namespace Belle2 {
     bool m_gated_mode{false}; /**< gated info from the DHC START */
     bool m_gated_her{false}; /**< gated info from the DHC START - true HER, 0 LER*/
 
-    /** Vector of DHE informations belonging to this event */
+    /** Vector of DHE information belonging to this event */
     std::vector <PXDDAQDHEStatus> m_pxdDHE;
 
     /** necessary for ROOT */

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -194,6 +193,9 @@ def main():
         )
 
     df.rename(columns=columns, inplace=True)
+    if args.data:
+        if 'generalSkimName' not in df.columns:
+            df['generalSkimName'] = ""
     verify_dataframe(df, args.mcri)
 
     if args.mcri or args.mcrd:
@@ -224,6 +226,8 @@ def main():
 
                 if "generalSkimName" in df.columns:
                     generalSkim = list(group["generalSkimName"])[0]
+                    if generalSkim == '':
+                        generalSkim = 'hadron'
                 else:
                     generalSkim = "all"
 
@@ -269,9 +273,9 @@ def main():
                 # If beam energy is not 4S, then point it out in label
                 onres = beamEnergy == "4S"
                 if onres:
-                    label = f"{campaign}_exp{expInteger}r{iGroup+1}"
+                    label = f"{campaign}_exp{expInteger}_{MCEventType}_{prodNumber}r{iGroup+1}"
                 else:
-                    label = f"{campaign}_{beamEnergy}_exp{expInteger}r{iGroup+1}"
+                    label = f"{campaign}_{beamEnergy}_exp{expInteger}_{MCEventType}_{prodNumber}r{iGroup+1}"
 
                 # Add everything to our mega dict
                 DataBlocks[label] = {

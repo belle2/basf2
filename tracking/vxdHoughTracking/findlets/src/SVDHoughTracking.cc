@@ -35,8 +35,8 @@ void SVDHoughTracking::exposeParameters(ModuleParamList* moduleParamList, const 
   Super::exposeParameters(moduleParamList, prefix);
 
   m_spacePointLoaderAndPreparer.exposeParameters(moduleParamList, prefix);
-  m_multiHouthSpaceInterceptFinder.exposeParameters(moduleParamList, prefix);
-  m_singleHouthSpaceInterceptFinder.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "simple"));
+  m_multiHouthSpaceInterceptFinder.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "multi"));
+  m_singleHouthSpaceInterceptFinder.exposeParameters(moduleParamList, prefix);
   m_rawTCCleaner.exposeParameters(moduleParamList, prefix);
   m_overlapResolver.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "finalOverlapResolver"));
   m_recoTrackStorer.exposeParameters(moduleParamList, prefix);

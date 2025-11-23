@@ -69,7 +69,7 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
 
   time_t now = time(0);
   char mbstr[100];
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
 
   auto& clist = getCanvasUpdatedList();
   int sent_canvases = 0;
@@ -108,7 +108,7 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
     }
   }
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after sending " << sent_canvases << " of " << seq->GetEntries() << " objects.");
 }
 

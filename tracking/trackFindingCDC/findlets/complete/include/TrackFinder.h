@@ -68,7 +68,7 @@ namespace Belle2 {
       /// Improve the quality of the axial tracks
       TrackQualityAsserter m_trackQualityAsserter;
 
-      /// Assoziate the stereo hits that best match to the axial tracks
+      /// Associate the stereo hits that best match to the axial tracks
       StereoHitFinder m_stereoHitFinder;
 
       /// Join the matching segments into the tracks

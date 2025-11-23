@@ -238,7 +238,6 @@ void SVDPackerModule::event()
       m_APVHeader.frameErr = 0;
       m_APVHeader.detectErr = 0;
       m_APVHeader.apvErr = 0;
-
       m_APVHeader.pipelineAddr = 0;
       m_APVHeader.APVnum = iAPV;
       m_APVHeader.check = 2;
@@ -279,7 +278,10 @@ void SVDPackerModule::event()
 
     // here goes FADC trailer
     m_FADCTrailer.FTBFlags = 0;
-    m_FADCTrailer.dataSizeCut = 0;
+    m_FADCTrailer.APVdataSizeCut = 0;
+    m_FADCTrailer.FADCdataSizeCut = 0;
+    m_FADCTrailer.DummyAPVHeader = 0;
+    m_FADCTrailer.PiplAddrMismatch = 0;
     m_FADCTrailer.nullDigits = 0;
     m_FADCTrailer.fifoErrOR = 0;
     m_FADCTrailer.frameErrOR = 0;
@@ -293,14 +295,15 @@ void SVDPackerModule::event()
     // crc16 calculation
     //first swap all 32-bits word -> big endian
     unsigned short nCRC = data_words.size();
-    uint32_t tmpBuffer[nCRC];
+    std::vector<uint32_t> tmpBuffer;
+    tmpBuffer.reserve(nCRC);
 
     for (unsigned short i = 0; i < nCRC; i++)
-      tmpBuffer[i] = htonl(data_words[i]);
+      tmpBuffer.push_back(htonl(data_words[i]));
 
     //compute crc16
     boost::crc_basic<16> bcrc(0x8005, 0xffff, 0, false, false);
-    bcrc.process_block(tmpBuffer, tmpBuffer + nCRC);
+    bcrc.process_bytes(tmpBuffer.data(), tmpBuffer.size() * sizeof(uint32_t));
     unsigned int crc = bcrc.checksum();
 
 

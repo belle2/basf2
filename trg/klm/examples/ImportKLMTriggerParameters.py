@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,6 +12,7 @@
 # Usage: basf2 ImportKLMTriggerParameters.py [mc]
 
 import sys
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import KLMTriggerParameters, Database, IntervalOfValidity
 
 mc = False

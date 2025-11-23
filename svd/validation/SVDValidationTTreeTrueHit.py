@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -22,7 +21,7 @@ import basf2 as b2
 
 # Some ROOT tools
 import ROOT
-from ROOT import Belle2  # make Belle2 namespace available
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT import gROOT, addressof
 
 # Define a ROOT struct to hold output data in the TTree
@@ -45,7 +44,7 @@ class SVDValidationTTreeTrueHit(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(SVDValidationTTreeTrueHit, self).__init__()
+        super().__init__()
         #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeTrueHit.root', 'recreate')
         #: output ttree

@@ -25,7 +25,7 @@ namespace Belle2 {
      * Index 0 for the V side, index 1 for the U side
      * Please, please, pleaseeeee use SVDCalibrationBase<...>::UIndex
      * and SVDCalibrationBase<...>::VIndex instead of  1 and 0 for better
-     * code readibility
+     * code readability
      */
     typedef std::vector< typename T::payloadContainerType > SVDSensor;
 

@@ -13,7 +13,7 @@ block. This is the default option (note : The life of each secondary particle is
 If needed, users/software coders are allowed to store the information in the
 ``MCParticle`` block for individual secondary particle by flipping the ignore flag assigned to the particle.
 Note that it is subdetector group's responsibility to make sure the ``MCParticle``
-relation of a hit originated from a secondary partcle is assigned in the correct way.
+relation of a hit originated from a secondary particle is assigned in the correct way.
 Otherwise, the MC track finder routines do not work properly.
 
 The Ignore Flag
@@ -23,7 +23,7 @@ In general, after a new ``MCParticle`` (or ``MCParticleGraph``, the internal var
 entry is added, its ignore flag is set to true. The generator level information is blocked
 from being written in the output file. The exceptions are the following cases. The ignore
 flag is set to false or should be flipped to false, making their generator level information
-avaliable in the output file.
+available in the output file.
 
 1. Virtual particles. For example, Upsilon(4S).
 2. Primary particles with a simulated Geant4 track.
@@ -82,7 +82,7 @@ If You Want to Save All (or Most of) the Secondary Particle Information in the M
 -------------------------------------------------------------------------------------------------
 
 From time to time, you may want to save all the secondary particle information in the output ``MCParticle``
-block for the detector response studies such as shower shape anlaysis, etc. Here is the way to do as you want.
+block for the detector response studies such as shower shape analysis, etc. Here is the way to do as you want.
 A certain ``FullSim`` parameters should be modified to steer the writing process for the secondary particles
 in the correct way. In the python steering file for your ``basf2`` job script, use the following lines in place
 of the corresponding ``add_simulation`` lines or the equivalent:
@@ -96,9 +96,9 @@ of the corresponding ``add_simulation`` lines or the equivalent:
 
 Since there could be too many very low energy secondaries which may blow up the size of the MCParticles block
 into an uncontrollable number, we have an additional parameter called ``SecondaryEnergyCut``. The default value
-is 1.0 MeV. If the energy of a secondary particle is below this threshhold, the particle information will not be
+is 1.0 MeV. If the energy of a secondary particle is below this threshold, the particle information will not be
 saved in the MCParticles block, even though the ``StoreAllSecondaries`` parameter is set to True. Otherwise,
-if you do not mind the size of the MCParticles block being too large, you can set this threshhold parameter as 0.
+if you do not mind the size of the MCParticles block being too large, you can set this threshold parameter as 0.
 
 Physics Process
 ----------------

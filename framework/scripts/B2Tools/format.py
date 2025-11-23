@@ -102,7 +102,7 @@ def decayDescriptor(decay_string):
     tex_string = decay_string
     for (key, value) in substitutes:
         tex_string = tex_string.replace(key, value)
-    return '\\texorpdfstring{{{}}}{{{}}}'.format(tex_string, string(decay_string))
+    return f'\\texorpdfstring{{{tex_string}}}{{{string(decay_string)}}}'
 
 
 def duration(seconds):
@@ -119,15 +119,15 @@ def duration(seconds):
     seconds = int(seconds % 60)
     string = ''
     if hours != 0:
-        string += "%dh" % (hours)
+        string += f"{hours}h"
     if minutes != 0:
-        string += "%dm" % (minutes)
+        string += f"{minutes}m"
     if seconds != 0 and hours == 0:
-        string += "%ds" % (seconds)
+        string += f"{seconds}s"
     if ms != 0 and hours == 0 and minutes == 0 and seconds == 0:
-        string += "%dms" % (ms)
+        string += f"{ms}ms"
     if us != 0 and hours == 0 and minutes == 0 and seconds == 0 and ms == 0:
-        string += r"%d$\mu$s" % (us)
+        string += f"{us}$\\mu$s"
 
     if hours == 0 and minutes == 0 and seconds == 0 and ms == 0 and us == 0:
         string += r'$<1\mu$s'
@@ -144,7 +144,7 @@ class AttrDict:
         self.__content = content
 
     def __getattr__(self, key):
-        """Return any dictionay element as attribute"""
+        """Return any dictionary element as attribute"""
         return self.__content[key]
 
 

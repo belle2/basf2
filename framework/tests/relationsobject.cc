@@ -80,7 +80,7 @@ namespace {
     (relObjData)[0]->addRelationTo(static_cast<TObject*>(nullptr));
     (relObjData)[0]->addRelationTo(static_cast<ProfileInfo*>(nullptr));
 
-    //if we cannot create a relation to an actual object given, this is obivously wrong
+    //if we cannot create a relation to an actual object given, this is obviously wrong
     ProfileInfo notInArray;
     EXPECT_B2FATAL((relObjData)[0]->addRelationTo(&notInArray));
   }
@@ -133,7 +133,7 @@ namespace {
     DataStore::Instance().addRelationFromTo((evtData)[0], (relObjData)[1], 2.0);
 
     //since the relation wasn't consolidated, these should still show up as
-    //seperate things
+    //separate things
     RelationVector<EventMetaData> rels1 = (relObjData)[1]->getRelationsFrom<EventMetaData>();
     EXPECT_EQ(2u, rels1.size());
 
@@ -262,7 +262,7 @@ namespace {
     (relObjData)[0]->addRelationTo(static_cast<TObject*>(nullptr), 1.0, relationName);
     (relObjData)[0]->addRelationTo(static_cast<ProfileInfo*>(nullptr), 1.0, relationName);
 
-    //if we cannot create a relation to an actual object given, this is obivously wrong
+    //if we cannot create a relation to an actual object given, this is obviously wrong
     ProfileInfo notInArray;
     EXPECT_B2FATAL((relObjData)[0]->addRelationTo(&notInArray, 1.0, relationName));
   }

@@ -4,11 +4,11 @@
 # NickName: ISR_pi+pi-J/psi
 # Test : Yes
 # Documentation: MC16rd signal request
-# PhysicsWG: Quarkonium
+# PhysicsWG: Charmonium
 # Responsible: Yijia Chen
 # Email: chenyj24@m.fudan.edu.cn
 # Cuts: None
-# Date: 2025/11/22
+# Date: 2025/11/23
 #
 # Decay table to generate
 # vpho -> J/psi pi+ pi- gamma
@@ -19,10 +19,10 @@
 ###############################################################
 
 Decay vpho
-1.0 pi+ pi- J/psisig PHOTOS VVPIPI;
+1.0 J/psi pi+ pi- PHOTOS VVPIPI;
 Enddecay
 
-Decay J/psisig
+Decay J/psi
 0.5 e+ e- PHOTOS VLL;
 0.5 mu+ mu- PHOTOS VLL;
 Enddecay

@@ -924,15 +924,16 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                         get_individual_skims(skimName, CombinedSkimDefinitions)
                     )
             ):
+                print(f"Warning!: taupair production will not proceed for {get_individual_skims(skimName,CombinedSkimDefinitions)} as `produce_on_tau_samples=False`")
                 continue
 
             if args.mcrd:
                 pattern = r'r\d+$'
                 key = re.sub(pattern, '', sampleLabel)
-                print(key)  # MC15rd_b_4S_offres_exp18_ssbar_29600
+                print(key)  # Ex: MC15rd_b_4S_offres_exp18_ssbar_29600
             else:
                 if '5S_scan' in sampleLabel:
-                    # HOTFIX: 5S_scan samples in sampleReigstry 
+                    # HOTFIX: 5S_scan samples in sample registry 
                     # is no longer separated by energy, may need to be restored
                     # if further 5S_scan runs take place
                     #match = re.match(r"(\w+\d+)_5S_scan_(\d+)_exp(\d+)", sampleLabel)

@@ -406,7 +406,7 @@ class InclusiveUpsilonLoose(BaseSkim):
     Cuts applied
         * :math:`dr < 1 \\text{cm}, |dz| < 3 \\text{cm}`
         * :math:`muonID > 0.6`
-        * :math:`M(\\mu^+\\mu^-) > 8.5 \\text{GeV}/c^2`
+        * :math:`8 < M(\\mu^+\\mu^-) < 10.48 \\text{GeV}/c^2`
 
     """
 
@@ -428,7 +428,7 @@ class InclusiveUpsilonLoose(BaseSkim):
         # Ys are reconstructed with or mu^+ mu^-
         ma.reconstructDecay(
             "Upsilon:InclusiveUpsilonLoose -> mu+:InclusiveUpsilonLoose mu-:InclusiveUpsilonLoose",
-            "M > 8.5",
+            "[M > 8] and [M < 10.48]",
             path=path)
 
         # return the list

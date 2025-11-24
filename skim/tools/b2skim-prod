@@ -932,7 +932,11 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                 print(key)  # MC15rd_b_4S_offres_exp18_ssbar_29600
             else:
                 if '5S_scan' in sampleLabel:
-                    match = re.match(r"(\w+\d+)_5S_scan_(\d+)_exp(\d+)", sampleLabel)
+                    # HOTFIX: 5S_scan samples in sampleReigstry 
+                    # is no longer separated by energy, may need to be restored
+                    # if further 5S_scan runs take place
+                    #match = re.match(r"(\w+\d+)_5S_scan_(\d+)_exp(\d+)", sampleLabel)
+                    match = re.match(r"(\w+\d+)_5S_scan_exp(\d+)", sampleLabel)
                 elif '4S_offres' in sampleLabel:
                     match = re.match(r"(\w+\d+)_4S_offres_exp(\d+)", sampleLabel)
                 else:
@@ -940,8 +944,11 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                 if match:
                     # Create a unique key for each campaign and experiment number combination
                     if '5S_scan' in sampleLabel:
-                        campaign, scan_energy, exp_number = match.groups()
-                        key = f"{campaign}_5S_scan_{scan_energy}_exp{exp_number}"
+                        # HOTFIX: See HOTFIX above 
+                        #campaign, scan_energy, exp_number = match.groups()
+                        #key = f"{campaign}_5S_scan_{scan_energy}_exp{exp_number}"
+                        campaign, exp_number = match.groups()
+                        key = f"{campaign}_5S_scan_exp{exp_number}"
                     elif '4S_offres' in sampleLabel:
                         campaign, exp_number = match.groups()
                         key = f"{campaign}_4S_offres_exp{exp_number}"

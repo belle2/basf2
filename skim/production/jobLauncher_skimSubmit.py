@@ -62,7 +62,7 @@ parser.add_argument('-samples',
                     '--samples',
                     type=str,
                     default='',
-                    help="the yaml file (with full path) to be used in ``b2skim-stats-submit``.\
+                    help="The yaml file (with full path) to be used in ``b2skim-stats-submit``.\
                     If not provided, ``b2skim-stats-submit`` defaults to the samples of the current campaign\
                     i.e. ``/group/belle2/dataprod/MC/SkimTraining/SampleLists/TestFiles.yaml`` on KEKCC.")
 

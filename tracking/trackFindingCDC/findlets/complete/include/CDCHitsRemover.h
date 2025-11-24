@@ -49,8 +49,11 @@ namespace Belle2 {
        */
       void apply(const std::vector<CDCWireHit>& wireHits) override;
     private:
-      StoreArray<CDCHit>     m_cdcHits;     /* CDC hits */
-      SelectSubset<CDCHit>   m_cdc_selector; /* Selector of CDC hits */
+      /// CDC hits
+      StoreArray<CDCHit>     m_cdcHits;
+
+      /// Selector for CDC hits
+      SelectSubset<CDCHit>   m_cdc_selector;
     };
   };
 }

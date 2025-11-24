@@ -303,6 +303,22 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   if (h_proc_prefilter_cdcecl) procTimePrefilterCDCECL = h_proc_prefilter_cdcecl->GetMean();
   m_monObj->setVariable("processing_time_prefilter_CDCECL", procTimePrefilterCDCECL);
 
+  double nEventsPassive = 0.;
+  if (h_proc_passive) nEventsPassive = h_proc_passive->GetEntries();
+  m_monObj->setVariable("N_events_passive", nEventsPassive);
+
+  double nEventsActive = 0.;
+  if (h_proc_active) nEventsActive = h_proc_active->GetEntries();
+  m_monObj->setVariable("N_events_active", nEventsActive);
+
+  double nEventsPrefilterTiming = 0.;
+  if (h_proc_prefilter_time) nEventsPrefilterTiming = h_proc_prefilter_time->GetEntries();
+  m_monObj->setVariable("N_events_prefilter_time", nEventsPrefilterTiming);
+
+  double nEventsPrefilterCDCECL = 0.;
+  if (h_proc_prefilter_cdcecl) nEventsPrefilterCDCECL = h_proc_prefilter_cdcecl->GetEntries();
+  m_monObj->setVariable("N_events_prefilter_CDCECL", nEventsPrefilterCDCECL);
+
 
   double fullMemory = 0.;
   if (h_full_mem) fullMemory = h_full_mem->GetBinLowEdge(h_full_mem->FindLastBinAbove(0) + 1);

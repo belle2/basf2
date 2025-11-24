@@ -277,9 +277,15 @@ def main():
                 else:
                     label = f"{campaign}_{beamEnergy}_exp{expInteger}_{MCEventType}_{prodNumber}r{iGroup+1}"
 
+                # HOTFIX to differentiate between Whizard and default generator of lowmult MC
+                if "Whizard" in args.input or "whizard" in args.input:
+                    sampleLabel = (f"MC-{campaign}-{beamEnergy}-{MCEventType}-whizard-{args.bg}")
+                else:
+                    sampleLabel = (f"MC-{campaign}-{beamEnergy}-{MCEventType}-default-{args.bg}")
+
                 # Add everything to our mega dict
                 DataBlocks[label] = {
-                    "sampleLabel": (f"MC-{campaign}-{beamEnergy}-{MCEventType}-{args.bg}"),
+                    "sampleLabel": sampleLabel,
                     "LPNPrefix": prefix,
                     "inputReleaseNumber": release,
                     "mcCampaign": campaign,

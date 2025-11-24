@@ -9,17 +9,16 @@
 #pragma once
 
 #include <string>
+
 #include "framework/core/Module.h"
 #include "framework/datastore/StoreArray.h"
-#include "trg/cdc/dataobjects/CDCTriggerTrack.h"
-#include "trg/cdc/dataobjects/CDCTrigger3DFinderInfo.h"
+#include "trg/cdc/dataobjects/CDCTrigger3DHTrack.h"
 #include "trg/cdc/dataobjects/CDCTriggerSegmentHit.h"
 #include "trg/cdc/NDFinder.h"
-#include "trg/cdc/Clusterizend.h"
 
 namespace Belle2 {
 
-  /// CDC Trigger NDFinder Module
+  // CDC Trigger NDFinder Module
   class CDCTriggerNDFinderModule : public Module {
   public:
     // Constructor
@@ -35,39 +34,39 @@ namespace Belle2 {
     virtual void terminate() override;
 
   private:
-    /// Name for TS hits
+    // Sets the CDC quadrant according to the phi prediction
+    short getNDFinderQuadrant(const CDCTrigger3DHTrack& ndFinderTrack);
+    // Calculates the 3DHough total momentum estimate
+    double getNDFinderTotalMomentum(const CDCTrigger3DHTrack& ndFinderTrack);
+    // Name for TS hits
     std::string m_trackSegmentHitsName;
-    /// Name for NDFinder tracks
+    // Name for NDFinder tracks
     std::string m_ndFinderTracksName;
-    /// Name for NDFinder Track To Hit Array
+    // Name for NDFinder Track To Hit Array
     std::string m_ndFinderTrackToHitArrayName;
-    /// Name for the NDFinder Cluster Data
-    std::string m_ndFinderInfosName;
 
-    /// StoreArray for TS hits
+    // StoreArray for TS hits
     StoreArray<CDCTriggerSegmentHit> m_trackSegmentHits;
-    /// StoreArray for 2D finder tracks from unpacker
-    StoreArray<CDCTriggerTrack> m_ndFinderTracks;
-    /// StoreArray for NDFinder Cluster Data
-    StoreArray<CDCTrigger3DFinderInfo> m_ndFinderInfos;
+    // StoreArray for NDFinder tracks
+    StoreArray<CDCTrigger3DHTrack> m_ndFinderTracks;
 
-    /// Instance of the 3D Track Finder
+    // Instance of the 3DHough Track Finder (NDFinder/3DFinder)
     NDFinder m_NDFinder;
-    /// Minimum number of axial super layers for the cluster to be considered as a track
+    // Minimum number of axial super layers for the peak to be considered as a track
     unsigned short m_minSuperAxial;
-    /// Minimum number of stereo super layers for the cluster to be considered as a track
+    // Minimum number of stereo super layers for the peak to be considered as a track
     unsigned short m_minSuperStereo;
-    /// Clustering with 3d volume: Number of global maximum searches per Hough space quadrant
+    // Peak finding: Number of global maximum searches per Hough space section
     unsigned short m_iterations;
-    /// Clustering with 3d volume: Max deletion in omega (number of cells in each direction from max)
+    // Peak finding: Max deletion in omega (number of cells in each direction from max)
     unsigned short m_omegaTrim;
-    /// Clustering with 3d volume: Max deletion in phi (number of cells in each direction from max)
+    // Peak finding: Max deletion in phi (number of cells in each direction from max)
     unsigned short m_phiTrim;
-    /// Switch for writing the full Hough space and the cluster information to the 3DFinderInfo class
-    bool m_storeAdditionalReadout;
-    /// File name of the axial hit patterns
+    // Switch for saving the full Hough space
+    bool m_storeHoughSpace;
+    // File name of the axial hit patterns
     std::string m_axialFile;
-    /// File name of the stereo hit patterns
+    // File name of the stereo hit patterns
     std::string m_stereoFile;
   };
 }

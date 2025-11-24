@@ -339,7 +339,10 @@ void MCMatcherParticlesModule::setCCbarTagMatch(const Particle* particle)
       break;
     }
   }
-  if (!allMother) B2FATAL("MCMatcherParticlesModule; tag matching - event has no AllMother?");
+  if (!allMother) {
+    B2WARNING("MCMatcherParticlesModule; tag matching - event has no AllMother?");
+    return;
+  }
   thisParticle->addExtraInfo("ccbarTagAllMotherPDG", allMother->getPDG());
 
   int sigPDGCode = particle->getPDGCode() * (-1); // get info about signal particles

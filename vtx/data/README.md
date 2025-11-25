@@ -1,19 +1,25 @@
 # Available geometries for VTX
 
-Currently, the recommended ones are:
-- VTX-CMOS5-staggered-L3mod.xml
-- VTX-CMOS6-staggered-L3mod.xml
-These contain the latest dimensions of the sensor, individual sensors are implemented with proper gap between them and the oVTX layers are in staggered structure.
+Currently the following geometries are available:
 
-Modifications being explored:
-- VTX-CMOS6-staggered-L3mod-2xL12.xml
-- VTX-CMOS6-staggered-L3mod-3xL12.xml
-These are modified version of the recommended geometries. nxL12 represents that the material budget of the the Layers 1 and 2 is modified to be 0.n% X0 instead of the standard 0.1% X0.
+- VTX-CMOS-5layer-staggered-L3mod
+- VTX-CMOS-6layer-staggered-L3mod
+- VTX-CMOS-6layer-staggered-L3mod-2xL12
+- VTX-CMOS-6layer-staggered-L3mod-3xL12
+- VTX-CMOS-6layer-staggered-L3mod-3xL12-1_5xL3456
+- VTX-CMOS-6layer-staggered-L3mod-3xL12-2xL3456
 
+These contain the latest dimensions of the sensor, individual sensors are implemented with proper gap between them and the layers 4 to 6 have a staggered structure.
 
-Old and depriciated geometries:
-- VTX-CMOS5.xml
-- VTX-CMOS5-L3mod.xml
+Here, L3mod represents layer 3 placed at 69 mm radius instead of 39 mm.
+nxL12 represents that the material budgets of the the Layers 1 and 2 are modified to be n times their standard 0.1% X0.
+nxL3456 represents that the material budgets of the the Layers 3 to 6 are modified to be n times their standard 0.4% X0.
+
+The *VTX-CMOS-6layer-staggered-L3mod-3xL12-2xL3456* is considered as the current baseline geometry.
+
+Old and deprecated geometries:
+- VTX-CMOS-5layer
+- VTX-CMOS-5layer-L3mod
 These were used for the results shown in CDR, but not considered realistic anymore.
 
 Not fully validated:

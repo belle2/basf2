@@ -14,8 +14,7 @@ def save_onnx(model, general_options, specific_options, identifier):
     """
     Export a torch model to onnx and write it into a MVA weightfile
     """
-    import basf2  # noqa
-    import ROOT
+    import ROOT  # noqa
 
     print("convert to onnx")
     torch.onnx.export(
@@ -39,6 +38,7 @@ class TestWriteONNX(unittest.TestCase):
     Tests for writing ONNX MVA weightfiles. In addition to testing the writing
     mechanism, these serve the purpose of creating test files for other unit tests.
     """
+
     def create_and_save(self, n_outputs, filename, weights):
         """
         Setup some example options for an ONNX MVA weightfile, save it and compare to reference
@@ -70,6 +70,8 @@ class TestWriteONNX(unittest.TestCase):
         general_options.m_identifier = "Simple"
         general_options.m_treename = "tree"
         general_options.m_variables = basf2_mva.vector(*variables)
+        if n_outputs > 1:
+            general_options.m_nClasses = n_outputs
         specific_options = basf2_mva.ONNXOptions()
         with b2test_utils.clean_working_directory():
             save_onnx(model, general_options, specific_options, filename)
@@ -117,6 +119,26 @@ class TestWriteONNX(unittest.TestCase):
                       -0.1973, -0.1153, -0.0706, -0.1503,  0.0236, -0.2469,  0.2258, -0.2124]]
                 ),
                 "bias": torch.tensor([0.1930, 0.0416])
+            }
+        )
+
+    def test_multiclass_3(self):
+        """
+        Write example for 3-class outputs
+        """
+        self.create_and_save(
+            3,
+            "ONNX_multiclass_3.xml",
+            {
+                "weight": torch.tensor(
+                    [[-0.1648,  0.2103,  0.0204, -0.1267, -0.0719, -0.2464, -0.1342, -0.0418,
+                      -0.0362, -0.0801,  0.0587, -0.1121, -0.1560, -0.1602,  0.1597,  0.1568],
+                     [-0.2297, -0.1780, -0.0301, -0.2094, -0.1600,  0.1508,  0.1964,  0.1261,
+                      -0.0792,  0.0605, -0.0064,  0.0450,  0.0671, -0.2036,  0.0768,  0.0442],
+                     [-0.1490, -0.2286,  0.2232, -0.1404,  0.2207, -0.0696, -0.2392,  0.1917,
+                      0.0795, -0.1850,  0.0989, -0.0802,  0.0483,  0.0772,  0.1347, -0.1316]]
+                ),
+                "bias": torch.tensor([-0.1484,  0.1209, -0.0164])
             }
         )
 

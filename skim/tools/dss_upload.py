@@ -27,12 +27,12 @@ Example usage:
 import argparse as ap
 import subprocess
 import sys
+import re
 
 problematic_prods = []
 
 
 def get_argument_parser():
-
     parser = ap.ArgumentParser(
         formatter_class=ap.RawDescriptionHelpFormatter)
 
@@ -54,8 +54,50 @@ def get_argument_parser():
     return parser
 
 
-def update_dataset(meta_fn, execute):
+def expand_prod_tokens(tokens):
+    """
+    Expand a list of tokens (numbers and ranges) into an ordered, de-duplicated list of ints.
+    Supported range separators: '-', ':', '..'.
+    Commas inside tokens are allowed (e.g. '52610,52612..52615').
+    """
+    if not tokens:
+        return []
 
+    expanded = []
+    for tok in tokens:
+        # allow commas within a single token
+        for part in re.split(r",", tok):
+            part = part.strip()
+            if not part:
+                continue
+
+            # Try range: start-end | start:end | start..end
+            m = re.fullmatch(r"\s*(\d+)\s*(?:-|:|\.\.)\s*(\d+)\s*", part)
+            if m:
+                start = int(m.group(1))
+                end = int(m.group(2))
+                step = 1 if start <= end else -1
+                expanded.extend(range(start, end + step, step))
+                continue
+
+            # Try single integer
+            if part.isdigit():
+                expanded.append(int(part))
+                continue
+
+            raise ap.ArgumentTypeError(f"Invalid prod ID or range: '{part}'")
+
+    # de-dup while preserving order
+    seen = set()
+    ordered = []
+    for pid in expanded:
+        if pid not in seen:
+            ordered.append(pid)
+            seen.add(pid)
+    return ordered
+
+
+def update_dataset(meta_fn, execute):
     with open(meta_fn, "r", newline="") as f:
         lines = [line.rstrip() for line in f if "/belle/Data" in line]
 
@@ -68,8 +110,6 @@ def update_dataset(meta_fn, execute):
         print(cmd)
         if execute:
             subprocess.call(cmd, shell=True)
-
-    print()
 
 
 def retrieve_info_combinedSkim(skims):  # , prod_fn, meta_fn, failed_meta_fn):

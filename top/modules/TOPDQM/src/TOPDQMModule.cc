@@ -280,6 +280,29 @@ namespace Belle2 {
       m_pulseHeights.push_back(prof);
     }
 
+    m_skipProcFlag = new TH2F("skipProcFlag", "Skip processing flag; slot number; flag value", 64, 0.5, 16.5, 2, -0.5, 1.5);
+    m_skipProcFlag->GetXaxis()->SetNdivisions(16);
+    m_skipProcFlag->GetYaxis()->SetNdivisions(2);
+    m_skipProcFlag->SetMinimum(0);
+
+    m_injVetoFlag = new TH2F("injVetoFlag", "Injection veto flag; slot number; flag value", 64, 0.5, 16.5, 2, -0.5, 1.5);
+    m_injVetoFlag->GetXaxis()->SetNdivisions(16);
+    m_injVetoFlag->GetYaxis()->SetNdivisions(2);
+    m_injVetoFlag->SetMinimum(0);
+
+    m_injVetoFlagDiff = new TH1F("injVetoFlagDiff", "Injection veto flags check; ; fraction of events", 2, -0.5, 1.5);
+    m_injVetoFlagDiff->GetXaxis()->SetNdivisions(2);
+    m_injVetoFlagDiff->GetXaxis()->SetBinLabel(1, "flags the same");
+    m_injVetoFlagDiff->GetXaxis()->SetBinLabel(2, "flags differ");
+    m_injVetoFlagDiff->GetXaxis()->SetLabelSize(0.05);
+    m_injVetoFlagDiff->GetXaxis()->SetAlphanumeric();
+    m_injVetoFlagDiff->SetMinimum(0);
+
+    m_PSBypassMode = new TH2F("PSBypassMode", "PS-bypass mode; slot number; mode", 64, 0.5, 16.5, 8, -0.5, 7.5);
+    m_PSBypassMode->GetXaxis()->SetNdivisions(16);
+    m_PSBypassMode->GetYaxis()->SetNdivisions(8);
+    m_PSBypassMode->SetMinimum(0);
+
     // cd back to root directory
     oldDir->cd();
   }
@@ -293,11 +316,11 @@ namespace Belle2 {
     // register dataobjects
 
     m_rawFTSWs.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
+    m_productionEventDebugs.isOptional(); // not in sim
     m_digits.isRequired();
     m_recBunch.isOptional();
     m_timeZeros.isOptional();
     m_tracks.isOptional();
-
   }
 
   void TOPDQMModule::beginRun()
@@ -342,6 +365,11 @@ namespace Belle2 {
       m_badChannelHits[i]->Reset();
       m_pulseHeights[i]->Reset();
     }
+
+    m_skipProcFlag->Reset();
+    m_injVetoFlag->Reset();
+    m_injVetoFlagDiff->Reset();
+    m_PSBypassMode->Reset();
   }
 
   void TOPDQMModule::event()
@@ -504,6 +532,27 @@ namespace Belle2 {
         }
       }
     }
+
+    // fill raw data header histograms
+
+    const auto& feMapper = TOPGeometryPar::Instance()->getFrontEndMapper();
+    double differ = 0;
+    for (const auto& dbg : m_productionEventDebugs) {
+      auto scrodID = dbg.getScrodID();
+      const auto* femap = feMapper.getMap(scrodID);
+      if (not femap) {
+        B2ERROR("No front-end map available for scrodID " << scrodID);
+        continue;
+      }
+      auto slot = femap->getModuleID();
+      auto bs = femap->getBoardstackNumber();
+      double x = slot + bs / 4. - 0.5;
+      m_skipProcFlag->Fill(x, dbg.getSkipProcessingFlag());
+      m_injVetoFlag->Fill(x, dbg.getInjectionVetoFlag());
+      m_PSBypassMode->Fill(x, dbg.getPSBypassMode());
+      if (dbg.getInjectionVetoFlag() != m_productionEventDebugs[0]->getInjectionVetoFlag()) differ = 1;
+    }
+    m_injVetoFlagDiff->Fill(differ);
 
   }
 

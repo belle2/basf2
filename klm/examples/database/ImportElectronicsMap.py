@@ -95,7 +95,7 @@ else:
     importer.setIOV(4, 0, 9, -1)
     importer.importElectronicsMap()
 
-    # Experiment 10 and later.
+    # Experiment 10 -  Experiment 37 Run 974.
     clear_electronics_map()
     load_bklm_electronics_map(2, False)
     load_eklm_electronics_map(2, False)
@@ -106,8 +106,8 @@ else:
     clear_electronics_map()
     load_bklm_electronics_map(2, False)
     load_eklm_electronics_map(2, False)
-    # Switch lanes for real-data map for 2025c data. Date: 2025-11-25
-    # The fibres of layer 7 and layer 10 are switched in EB2
+    # Switch lanes for real-data map for 2025c data.
+    # The fibers of layer 7 and layer 10 are switched in EB2
     importer.setLane(KLMElementNumbers.c_EKLM,
                      EKLMElementNumbers.c_BackwardSection,
                      3, 10, 6)

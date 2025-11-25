@@ -12,4 +12,4 @@
 Transformer FlavorTagger (TFlat) scripts for Belle II
 """
 
-__all__ = ['FlavorTagger', 'tensorflow_tflat_model', 'utils', 'config']
+__all__ = ['FlavorTagger', 'model', 'utils', 'config']

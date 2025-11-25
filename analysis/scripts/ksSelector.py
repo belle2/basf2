@@ -221,13 +221,13 @@ def LambdaVeto_Training(
 
 def ksSelector(
     particleListName,
-    identifier_Ks="Ks_LGBM_V0Selector",
-    identifier_vLambda="Ks_LGBM_LambdaVeto",
+    identifier_Ks="Ks_LGBM_V0Selector_MC16",
+    identifier_vLambda="Ks_LGBM_LambdaVeto_MC16",
     output_label_name='',
     extraInfoName_V0Selector='KsSelector_V0Selector',
     extraInfoName_LambdaVeto='KsSelector_LambdaVeto',
     useCustomThreshold=False,
-    threshold_V0Selector=0.90,
+    threshold_V0Selector=0.92,
     threshold_LambdaVeto=0.11,
     path=None
 ):
@@ -287,15 +287,14 @@ def ksSelector(
             Lambda_thr = 0
             if output_label_name == 'standard':
                 B2INFO('KsSelector: Standard Cut is applied on '+outputListName+'.')
-                V0_thr = 0.91
-                Lambda_thr = 0.19
+                V0_thr = 0.921
             elif output_label_name == 'tight':
                 B2INFO('KsSelector: Tight Cut is applied on '+outputListName+'.')
-                V0_thr = 0.97
-                Lambda_thr = 0.45
+                V0_thr = 0.98
+                Lambda_thr = 0.31
             elif output_label_name == 'loose':
                 B2INFO('KsSelector: Loose Cut is applied on '+outputListName+'.')
-                V0_thr = 0.51
+                V0_thr = 0.43
                 Lambda_thr = 0.02
             B2INFO('KsSelector: Threshold is (' + str(V0_thr) + ', ' + str(Lambda_thr) + ')')
             cut_string = 'extraInfo('+extraInfoName_V0Selector+')>'+str(V0_thr) + \

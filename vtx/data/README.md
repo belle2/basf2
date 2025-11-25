@@ -17,6 +17,8 @@ nxL3456 represents that the material budgets of the the Layers 3 to 6 are modifi
 
 The *VTX-CMOS-6layer-staggered-L3mod-3xL12-2xL3456* is considered as the current baseline geometry.
 
+For more information on which GTs and basf2 branches to use for different geometries see [online documentation](https://vtxupgrade.pages.desy.de/vtxdvpmt/wg1-performance/geometries-list/).
+
 Old and deprecated geometries:
 - VTX-CMOS-5layer
 - VTX-CMOS-5layer-L3mod

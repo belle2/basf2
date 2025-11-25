@@ -222,7 +222,7 @@ if args.json:  # step5 - basf2, loop on skim, one command for data and one for M
         HLTstring = info_dict[skim]['HLT']
         MCTypeString = info_dict[skim]['MCType']
 
-        command = f'python3 skimSubmit.py --json --skims {skim} {flaggedString}  ' \
+        command = f'python3 skimSubmit.py --json --skims {skim} {flaggedString} ' \
             f'--infoYaml {args.info} --base_dir {args.base_dir} --release {args.release}'
 
         if args.data:

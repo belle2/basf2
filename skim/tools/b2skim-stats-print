@@ -186,8 +186,12 @@ def getArgumentParser():
 
 def get_metadata(*, TestingCombined=False):
     LogDirectory = Path("log") / ("combined" if TestingCombined else "single")
-    with open(LogDirectory / "metadata.json") as MetadataFile:
-        metadata = json.load(MetadataFile)
+    try:
+        with open(LogDirectory / "metadata.json") as MetadataFile:
+            metadata = json.load(MetadataFile)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"{LogDirectory} / metadata.json has not been found.\
+        This is created when `b2skim-stats-submit` is called, which is required for `b2skim-stats-print` to work ")
     return metadata
 
 
@@ -934,10 +938,10 @@ def fillSkimStatsDict(
             for statName, statSpec in statSpecifier.items():
                 statFunction = statSpec["Calculate"]
 
-                if statName in ["cpuTime","averageCandidateMultiplicity","memoryAverage","memoryMaximum"]:
-                    statFunctionArgs=[skim, sample, TestingCombined]
+                if statName in ["cpuTime", "averageCandidateMultiplicity", "memoryAverage", "memoryMaximum"]:
+                    statFunctionArgs = [skim, sample, TestingCombined]
                 else:
-                    statFunctionArgs=[skim, sample, TestingCombined, flagged]
+                    statFunctionArgs = [skim, sample, TestingCombined, flagged]
 
                 try:
                     allSkimStats[skim][statName][sample.encodeable_name] = statFunction(*statFunctionArgs)

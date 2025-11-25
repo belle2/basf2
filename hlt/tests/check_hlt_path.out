@@ -1317,7 +1317,7 @@
   146. CDCDedxHitSaver
   147. CDCDedxPIDCreator
       dedxTracksName=
-      enableDebugOutput=False
+      enableDebugOutput=True
       likelihoodsName=
       removeHighest=0.25
       removeLowest=0.05
@@ -4237,7 +4237,7 @@
         8. CDCDedxHitSaver
         9. CDCDedxPIDCreator
             dedxTracksName=
-            enableDebugOutput=False
+            enableDebugOutput=True
             likelihoodsName=
             removeHighest=0.25
             removeLowest=0.05

@@ -99,7 +99,7 @@ else:
     clear_electronics_map()
     load_bklm_electronics_map(2, False)
     load_eklm_electronics_map(2, False)
-    importer.setIOV(10, -1, 37, 974)
+    importer.setIOV(10, 0, 37, 974)
     importer.importElectronicsMap()
 
     # Experiment 37 and Run 975 later

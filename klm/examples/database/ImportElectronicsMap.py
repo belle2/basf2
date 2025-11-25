@@ -13,7 +13,7 @@
 import sys
 import basf2
 from ROOT import Belle2  # noqa: make the Belle2 namespace available
-from ROOT.Belle2 import KLMElectronicsMapImporter, KLMElementNumbers, BKLMElementNumbers
+from ROOT.Belle2 import KLMElectronicsMapImporter, KLMElementNumbers, BKLMElementNumbers, EKLMElementNumbers
 
 basf2.set_log_level(basf2.LogLevel.INFO)
 
@@ -99,5 +99,20 @@ else:
     clear_electronics_map()
     load_bklm_electronics_map(2, False)
     load_eklm_electronics_map(2, False)
-    importer.setIOV(10, 0, -1, -1)
+    importer.setIOV(10, -1, 37, 974)
+    importer.importElectronicsMap()
+
+    # Experiment 37 and Run 975 later
+    clear_electronics_map()
+    load_bklm_electronics_map(2, False)
+    load_eklm_electronics_map(2, False)
+    # Switch lanes for real-data map for 2025c data. Date: 2025-11-25
+    # The fibres of layer 7 and layer 10 are switched in EB2
+    importer.setLane(KLMElementNumbers.c_EKLM,
+                     EKLMElementNumbers.c_BackwardSection,
+                     3, 10, 6)
+    importer.setLane(KLMElementNumbers.c_EKLM,
+                     EKLMElementNumbers.c_BackwardSection,
+                     3, 7, 3)
+    importer.setIOV(37, 975, -1, -1)
     importer.importElectronicsMap()

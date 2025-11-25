@@ -94,7 +94,7 @@ config.update({  # Training parameters
     'initial_learning_rate': 1e-4,
     'decay_steps': 2000000,
     'alpha': 1e-1,
-    'patience': 10,
+    'patience': 20,
     'batch_size': 256,
     'epochs': 200,
     'train_valid_fraction': .92,

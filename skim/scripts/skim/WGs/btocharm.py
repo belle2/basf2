@@ -1831,7 +1831,7 @@ class antiB0toDstpipi0_Kpi(BaseSkim):
 
     Cuts applied:
 
-    * ``5.22 < Mbc``
+    * ``Mbc > 5.22 ``
     * ``-0.3 < deltaE < 0.2``
 
     """

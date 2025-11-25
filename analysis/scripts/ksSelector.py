@@ -287,7 +287,8 @@ def ksSelector(
             Lambda_thr = 0
             if output_label_name == 'standard':
                 B2INFO('KsSelector: Standard Cut is applied on '+outputListName+'.')
-                V0_thr = 0.921
+                V0_thr = 0.92
+                Lambda_thr = 0.11
             elif output_label_name == 'tight':
                 B2INFO('KsSelector: Tight Cut is applied on '+outputListName+'.')
                 V0_thr = 0.98

@@ -25,14 +25,14 @@ namespace Belle2 {
   /** contains all relevant stuff needed for dealing with a subGraph. ~ 404 bytes per subGraph. */
   template<class FilterType> class SubGraph {
   protected:
-    SubGraphID m_id; /**< contains the IDs in the correct order (from outer to inner) as a unique identifier for this graph. */
-
     /// contains all min- and max-values found so far for all filters relevant for this Graph. */
     std::unordered_map<FilterType, MinMax> m_minMaxValues;
 
-    unsigned m_found; /**< counts number of times this subgraph was found. */
+    SubGraphID m_id; /**< contains the IDs in the correct order (from outer to inner) as a unique identifier for this graph. */
 
-    std::unordered_map<FilterType, RawDataCollectedMinMax>* m_rawDataCollected; /**< takes care of collecting the raw data. */
+    std::unordered_map<FilterType, RawDataCollectedMinMax>* m_rawDataCollected = nullptr; /**< takes care of collecting the raw data. */
+
+    unsigned m_found = 1; /**< counts number of times this subgraph was found. */
 
     /** set newID for this subgraph. */
     void updateID(const SubGraphID& newID)
@@ -47,7 +47,7 @@ namespace Belle2 {
     using Iterator = typename std::unordered_map<FilterType, MinMax>::iterator;
 
     /** constructor, mandatory iDChain musst at least contain one iD. */
-    SubGraph(SubGraphID& id, const std::vector<FilterType>& fIDs) : m_id(id), m_found(1), m_rawDataCollected(nullptr)
+    SubGraph(SubGraphID& id, const std::vector<FilterType>& fIDs) : m_id(id)
     {
       for (auto& iD : fIDs) {
         m_minMaxValues.insert({iD, MinMax()});

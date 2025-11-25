@@ -71,7 +71,7 @@ namespace Belle2 {
         std::vector<CDCTrajectory3D> trajectories;
         trajectories.reserve(helices.size());
         for (const Helix& helix : helices) {
-          // had to make the implicit convesion to an explicit conversion. Maybe there is a more elegant way to do it
+          // had to make the implicit conversion to an explicit conversion. Maybe there is a more elegant way to do it
           trajectories.emplace_back(UncertainHelix(helix));
         }
         simulate(trajectories);

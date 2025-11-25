@@ -208,7 +208,7 @@ namespace Belle2 {
     /** Event ExtraInfo. */
     StoreObjPtr<EventExtraInfo> m_eventExtraInfo;
 
-    bool good_event(); /**< Check if event correspondes to the period when Belle detector not in good condition */
+    bool good_event(); /**< Check if event corresponds to the period when Belle detector not in good condition */
 
     int get_reprocess_version(); /**< Get reprocess version of input mdst */
 

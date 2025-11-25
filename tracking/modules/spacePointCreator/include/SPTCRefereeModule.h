@@ -24,7 +24,7 @@ namespace Belle2 {
    * If set by the parameters the module does:
    * + check if a SPTC is curling (at the moment done by the CurlingTrackCandSplitter) and split into sub tracks if necessary
    * + check if two subsequent SpacePoints of a SPTC are on the same sensor
-   * + check if two subsequent SpacePoints of a SPTC are seperated at least by a user defined distance (needed for some filters)
+   * + check if two subsequent SpacePoints of a SPTC are separated at least by a user defined distance (needed for some filters)
    * + all this checks either by using MC information (where necessary) or with information that can be obtained from the SpacePoint
    *
    * WARNING: Besides of setting different flags, splitting curling SPTCs and removing problematic SpacePoints (if set)
@@ -90,13 +90,13 @@ namespace Belle2 {
      * NOTE: by storing the SpacePointTrackCands in a new StoreArray all previously registered relations are lost!) */
     bool m_PARAMstoreNewArray = true;
 
-    /** minimal distance two subsequent SpacePoints have to be seperated */
+    /** minimal distance two subsequent SpacePoints have to be separated */
     double m_PARAMminDistance = 0.;
 
     /** assumed interaction point from which the SpacePointTrackCands emerge. Needed to determine the direction of flight */
     std::vector<double> m_PARAMsetOrigin = { 0., 0., 0. };
 
-    // ======================================================= INTERNALY USED MEMBERS =============================================
+    // ======================================================= INTERNALLY USED MEMBERS =============================================
 
     /** origin used internally. Gets assigned to the values of m_PARAMsetOrigin, after some sanity checks have been done on it */
     B2Vector3F m_origin;
@@ -150,7 +150,7 @@ namespace Belle2 {
      */
     const std::vector<int> checkSameSensor(Belle2::SpacePointTrackCand* trackCand);
 
-    /** Check if two subsequent SpacePoints are seperated by at least the provided minDistance.
+    /** Check if two subsequent SpacePoints are separated by at least the provided minDistance.
      * @returns empty vector if all SpacePoints are far enough apart, indices of SpacePoints that are not elsewise
      */
     const std::vector<int> checkMinDistance(Belle2::SpacePointTrackCand* trackCand, double minDistance);
@@ -189,7 +189,7 @@ namespace Belle2 {
     bool getDirOfFlightTrueHit(const Belle2::SpacePoint* spacePoint, B2Vector3F origin);
 
     /** get the directions of flight for a vector of SpacePoints using only information from SpacePoints (i.e. no MC information)
-     * NOTE: as the momentum is no property that can be infered from one SpacePoint. the difference of positions between two consecutive SpacePoints is assumed to be the direction of the momentum (i.e. linear approximation)
+     * NOTE: as the momentum is no property that can be inferred from one SpacePoint. the difference of positions between two consecutive SpacePoints is assumed to be the direction of the momentum (i.e. linear approximation)
      * WARNING: using this it is assumed, that the SpacePointTrackCand emerges from the origin (origin is used to calculate the estimate for the momentum of the first SpacePoint)
      */
     std::vector<bool> getDirsOfFlightSpacePoints(const std::vector<const Belle2::SpacePoint*>& spacePoints, B2Vector3F origin);
@@ -200,7 +200,7 @@ namespace Belle2 {
     bool getDirOfFlightPosMom(B2Vector3F position, B2Vector3F momentum, B2Vector3F origin);
 
     /** copy the SpacePointTrackCand to a new StoreArray and register a relation to the original trackCand
-     * @param trackCand pointer to the original SPTC (which is not in newStoreArray befor this call!)
+     * @param trackCand pointer to the original SPTC (which is not in newStoreArray before this call!)
      * @param newStoreArray StoreArray where a copy of trackCand will be stored with a relation to the trackCand in its original StoreArray
      */
     void
@@ -215,7 +215,7 @@ namespace Belle2 {
                          const Belle2::SpacePointTrackCand* origTrackCand);
 
     /** get the checked referee status of a SPTC (i.e. only which checks have been performed, but not the results)
-     * at the moment returns the status of trackCand with c_removedHits, c_hitsOnSameSensor and c_hitsLowDistance resetted!
+     * at the moment returns the status of trackCand with c_removedHits, c_hitsOnSameSensor and c_hitsLowDistance reset!
      */
     unsigned short int getCheckStatus(const Belle2::SpacePointTrackCand* trackCand);
 

@@ -412,7 +412,7 @@ int MCMatching::getFlagsOfBremsPhotonDaughter(const Particle* daughter, const MC
   //At first, call getMCErrors as usual
   int daughterStatus = getMCErrors(daughter);
 
-  //Check if the daugther has an MC particle related
+  //Check if the daughter has an MC particle related
   const MCParticle* mcDaughter = daughter->getRelatedTo<MCParticle>();
   //If it hasn't, add the c_BremsPhotonAdded flag to the mother and stop the propagation of c_InternalError
   if (!mcDaughter) {

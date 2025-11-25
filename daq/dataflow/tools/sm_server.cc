@@ -39,7 +39,7 @@ int main(int argc, char** argv)
     } else if (is == 1) {
       int datbuf;
       vector<int>& socklist = sockman.connected_socket_list();
-      printf("no. of connected sockets = %lu\n", socklist.size());
+      printf("no. of connected sockets = %zu\n", socklist.size());
       for (vector<int>::iterator it = socklist.begin(); it != socklist.end(); ++it) {
         int fd = *it;
         int isNow = read(fd, &datbuf, 4);

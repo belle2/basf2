@@ -19,8 +19,7 @@
 
 from simulation import add_simulation
 from L1trigger import add_tsim
-from reconstruction import add_reconstruction, add_cdst_output, add_mc_reconstruction
-from mdst import add_mdst_output
+from reconstruction import add_mc_reconstruction
 import ROOT
 from ROOT import Belle2
 
@@ -74,7 +73,7 @@ class VTXOccupancy(b2.Module):
             for ladder in geo.getLadders(layer):
                 for sensorID in geo.getSensors(ladder):
                     self.layers[layer.getLayerNumber()].append(getID(sensorID))
-                    info = Belle2.VXD.GeoCache.get(sensorID)
+                    info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(sensorID)
                     self.shape[getID(sensorID)] = float(info.getUCells()*info.getVCells())
                     name = self.histo_name.format(id=getID(sensorID))
                     title = self.histo_title.format(id=getID(sensorID))

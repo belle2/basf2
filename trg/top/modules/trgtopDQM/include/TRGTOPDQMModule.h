@@ -50,7 +50,7 @@ namespace Belle2 {
   class TRGTOPDQMModule : public HistoModule {
 
   public:
-    //! Costructor
+    //! Constructor
     TRGTOPDQMModule();
     //! Destructor
     virtual ~TRGTOPDQMModule() {}

@@ -154,7 +154,7 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set Cluster Phi
+    //! The method to set Cluster Phi
     void setCLPhi(int cl_phi[6])
     {
       for (int i = 0; i < 6; i++) {
@@ -162,7 +162,7 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set Cluster time
+    //! The method to set Cluster time
     void setCLTime(int cl_time[6])
     {
       for (int i = 0; i < 6; i++) {
@@ -170,7 +170,7 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set Cluster energy
+    //! The method to set Cluster energy
     void setCLEnergy(int cl_energy[6])
     {
       for (int i = 0; i < 6; i++) {
@@ -178,7 +178,7 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set 1GeV Flag
+    //! The method to set 1GeV Flag
     void setCLF1GeV(int cl_1gev[6])
     {
       for (int i = 0; i < 6; i++) {
@@ -186,7 +186,7 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set 2GeV Flag
+    //! The method to set 2GeV Flag
     void setCLF2GeV(int cl_2gev[6])
     {
       for (int i = 0; i < 6; i++) {
@@ -194,7 +194,7 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set Bha Flag
+    //! The method to set Bha Flag
     void setCLFBha(int cl_bha[6])
     {
       for (int i = 0; i < 6; i++) {
@@ -202,10 +202,10 @@ namespace Belle2 {
       }
     }
 
-    //! The mothod to set Number of Cluster
+    //! The method to set Number of Cluster
     void setNCL(int ncl) {e_ncl = ncl;}
 
-    //! The mothod to set Lowmilti bit
+    //! The method to set Lowmilti bit
     void setLowMulti(int low_multi) {e_low_multi = low_multi;}
 
     //! The method to set 3D Bhabha veto bit
@@ -220,31 +220,31 @@ namespace Belle2 {
     //! The method to set prescale bit
     void setPrescale(int prescale) {e_prescale = prescale;}
 
-    //! The mothod to set ICN
+    //! The method to set ICN
     void setICN(int icn) {e_icn = icn;}
 
-    //! The mothod to set ICN overflow bit
+    //! The method to set ICN overflow bit
     void setICNOver(int icn_over) {e_icn_over = icn_over;}
 
-    //! The mothod to set Total Energy Type
+    //! The method to set Total Energy Type
     void setEtotType(int etot_type) {e_etot_type = etot_type;}
 
     //! The method to set Total Energy
     void setEtot(int etot) {e_etot = etot;}
 
-    //! The mothod to set Total Energy more than 20 gev
+    //! The method to set Total Energy more than 20 gev
     void setECLBST(int eclbst) {e_ecl_bst = eclbst;}
 
     //! The method to set 2D Bhabha bit
     void set2DBhabha(int b1bhabha) {e_b1bhabha = b1bhabha;}
 
-    //! The mothod to set 2D Bhabha Type
+    //! The method to set 2D Bhabha Type
     void setBhabhaType(int b1_type) {e_b1_type = b1_type;}
 
     //! The method to set Physics bit
     void setPhysics(int physics) {e_physics = physics;}
 
-    //! The mothod to set Timing Type
+    //! The method to set Timing Type
     void setTimeType(int time_type) {e_time_type = time_type;}
 
     //! The method to set checksum flag
@@ -292,28 +292,28 @@ namespace Belle2 {
     //! The method to get Cluster Theta
     const int* getCLTheta() const {return e_cl_theta;}
 
-    //! The mothod to get Cluster Phi
+    //! The method to get Cluster Phi
     const int* getCLPhi() const {return e_cl_phi;}
 
-    //! The mothod to get Cluster time
+    //! The method to get Cluster time
     const int* getCLTime() const {return e_cl_time;}
 
-    //! The mothod to get Cluster energy
+    //! The method to get Cluster energy
     const int* getCLEnergy() const {return e_cl_energy;}
 
-    //! The mothod to get 1GeV Flag
+    //! The method to get 1GeV Flag
     const int* getCL1GeV() const {return e_cl_1gev;}
 
-    //! The mothod to get 2GeV Flag
+    //! The method to get 2GeV Flag
     const int* getCL2GeV() const {return e_cl_2gev;}
 
-    //! The mothod to get Bhabha Flag
+    //! The method to get Bhabha Flag
     const int* getCLBha() const {return e_cl_bha;}
 
-    //! The mothod to get Number of Cluster
+    //! The method to get Number of Cluster
     int getNCL() const {return e_ncl;}
 
-    //! The mothod to get Lowmilti bit
+    //! The method to get Lowmilti bit
     int getLowMulti() const {return e_low_multi;}
 
     //! The method to get 3D Bhabha veto bit
@@ -328,25 +328,25 @@ namespace Belle2 {
     //! The method to get prescale bit
     int getPrescale() const {return e_prescale;}
 
-    //! The mothod to get ICN
+    //! The method to get ICN
     int getICN() const {return e_icn;}
 
-    //! The mothod to get ICN overflow bit
+    //! The method to get ICN overflow bit
     int getICNOver() const {return e_icn_over;}
 
-    //! The mothod to get Total Energy Type
+    //! The method to get Total Energy Type
     int getEtotType() const {return e_etot_type;}
 
     //! The method to get Total Energy
     int getEtot() const {return e_etot;}
 
-    //! The mothod to get Total Energy more than 20GeV
+    //! The method to get Total Energy more than 20GeV
     int getECLBST() const {return e_ecl_bst;}
 
     //! The method to get 2D Bhabha bit
     int get2DBhabha() const {return e_b1bhabha;}
 
-    //! The mothod to get 2D Bhabha Type
+    //! The method to get 2D Bhabha Type
     int getBhabhaType() const {return e_b1_type;}
 
     //! The method to get Physics bit
@@ -361,19 +361,19 @@ namespace Belle2 {
     //! The method to get TRG Type
     int getTRGTYPE() const {return e_trgtype;}
 
-    //! The mothod to get Timing Type
+    //! The method to get Timing Type
     int getTimeType() const {return e_time_type;}
 
-    //! The mothod to get ETOT all
+    //! The method to get ETOT all
     int getEtotAll() const {return e_etot_all;}
 
-    //! The mothod to get Evt Timing Min
+    //! The method to get Evt Timing Min
     int getEvtTimeMin() const {return e_evt_time_min;}
 
-    //! The mothod to get Evt Timing Max
+    //! The method to get Evt Timing Max
     int getEvtTimeMax() const {return e_evt_time_max;}
 
-    //! The mothod to get Evt Timing Win
+    //! The method to get Evt Timing Win
     int getEvtTimeWin() const {return e_evt_time_win;}
 
     TRGECLUnpackerEvtStore()

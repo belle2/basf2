@@ -9,10 +9,6 @@
 #include <framework/core/MergeDataStoreModule.h>
 #include <framework/datastore/DataStore.h>
 
-#include <framework/core/Environment.h>
-#include <framework/core/InputController.h>
-
-
 using namespace Belle2;
 
 //REG_MODLUE needed for --execute-path functionality

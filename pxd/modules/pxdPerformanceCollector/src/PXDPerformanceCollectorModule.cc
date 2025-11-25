@@ -66,8 +66,8 @@ PXDPerformanceCollectorModule::PXDPerformanceCollectorModule() : CalibrationColl
   addParam("maxAbsVz", m_maxAbsVz, "Minimum abs(Vz) cut in cm for efficiency validation", float(0.155));
 
   addParam("minPt4Res", m_minPt4Res, "Minimum pt cut for resolution validation", float(1.0));
-  addParam("minSVDHits", m_minSVDHits, "Minimum number of SVD hits foor resolution validation", int(8));
-  addParam("minCDCHits", m_minCDCHits, "Minimum number of CDC hits foor resolution validation", int(21));
+  addParam("minSVDHits", m_minSVDHits, "Minimum number of SVD hits for resolution validation", int(8));
+  addParam("minCDCHits", m_minCDCHits, "Minimum number of CDC hits for resolution validation", int(21));
   addParam("maxAbsLambda", m_maxAbsLambda, "Maximum absolute dip angle (lambda)", float(0.5));
   addParam("minPBetaSinTheta3o2", m_minPBetaSinTheta3o2, "Minimum p*Beta*sin(theta_0)^{3/2}", float(2));
   addParam("maxAbsZ0", m_maxAbsZ0, "Maximum abs(z0)", float(1));
@@ -328,7 +328,7 @@ void PXDPerformanceCollectorModule::collectFromTrack(const PXD2TrackEvent::baseT
       m_estimated = intersection.chargeMPV;
 
       VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
-      const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       auto uID = Info.getUCellID(cluster.posU);
       auto vID = Info.getVCellID(cluster.posV);
       auto iSensor = gTools->getPXDSensorIndex(sensorID);
@@ -343,7 +343,7 @@ void PXDPerformanceCollectorModule::collectFromTrack(const PXD2TrackEvent::baseT
       // Increment the counter
       getObjectPtr<TH1I>("PXDClusterCounter")->Fill(binID);
 
-      // Fill variabels into tree
+      // Fill variables into tree
       if (m_fillChargeTree) {
         string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
         getObjectPtr<TTree>(treename)->Fill();
@@ -359,7 +359,7 @@ void PXDPerformanceCollectorModule::collectFromTrack(const PXD2TrackEvent::baseT
       }
     }
 
-    // Fill effciency
+    // Fill efficiency
     if (m_selectedEff && selected4Eff) {
       auto x = intersection.x;
       auto y = intersection.y;
@@ -368,7 +368,7 @@ void PXDPerformanceCollectorModule::collectFromTrack(const PXD2TrackEvent::baseT
 
       // Get uBin and vBin from a global point.
       VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
-      const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       auto localPoint = Info.pointToLocal(ROOT::Math::XYZVector(x, y, z));
       auto uID = Info.getUCellID(localPoint.X());
       auto vID = Info.getVCellID(localPoint.Y());

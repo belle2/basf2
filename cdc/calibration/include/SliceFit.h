@@ -32,7 +32,7 @@ namespace Belle2 {
       double lb = h2->GetYaxis()->GetXmin();
       B2DEBUG(199, "Axis: " << lb << "  " << ub);
       if ((h2->GetEntries() / h2->GetNbinsX()) < 30) {
-        B2WARNING("Low statictic: " << h2->GetEntries() << " Hits");
+        B2WARNING("Low statistic: " << h2->GetEntries() << " Hits");
         h2->Rebin2D(2, 2, hist_name);
       }
 

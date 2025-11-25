@@ -31,7 +31,7 @@ namespace Belle2 {
      *     Must be constructable from std::vector<const AState*>
      * - AStateRejecter:
      *     Should be roughly of type Findlet<const AState* const, AState*>
-     *     with an apply methode like:
+     *     with an apply method like:
      *
      *     apply(const std::vector<const AState*>& currentPath,
      *           std::vector<AState*>& nextStates);

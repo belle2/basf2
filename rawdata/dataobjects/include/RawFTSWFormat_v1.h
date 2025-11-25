@@ -93,7 +93,7 @@ namespace Belle2 {
     /* cppcheck-suppress missingOverride */
     int GetSubRunNo(int n) OVERRIDE_CPP17;
 
-    //! get a word cotaining run # and subrun #
+    //! get a word containing run # and subrun #
     /* cppcheck-suppress missingOverride */
     int GetRunNoSubRunNo(int n) OVERRIDE_CPP17;
 

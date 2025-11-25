@@ -36,14 +36,13 @@ void LogListener::run()
 {
   File fd(m_pipe[0]);
   PipeReader preader(fd);
-  char c;
   std::stringstream ss;
   std::string s;
   LogFile::Priority priority = LogFile::UNKNOWN;
   int count = 0;
   try {
     while (true) {
-      c = preader.readChar(); //read next character from pipe
+      int c = preader.readChar(); //read next character from pipe
 
       if (c != '\n' && iscntrl(c)) continue; //character is unprintable, skip
 

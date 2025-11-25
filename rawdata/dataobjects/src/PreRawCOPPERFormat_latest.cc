@@ -262,7 +262,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
 
   if (err_flag == 1) {
     printf("%s", err_buf); fflush(stdout);
-    printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
+    printf("[DEBUG] ========== dump a data block : block # %d==========\n", n);
     PrintData(GetBuffer(n), GetBlockNwords(n));
     for (int i = 0; i < MAX_PCIE40_CH; i++) {
       printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);

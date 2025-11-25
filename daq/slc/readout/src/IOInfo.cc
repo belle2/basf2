@@ -49,7 +49,7 @@ int IOInfo::checkTCP(std::vector<IOInfo>& info)
     int rport = strtoul(rem_address.substr(9).c_str(), NULL, 16);
     for (size_t i = 0; i < info.size(); i++) {
       if (info[i].getState() > 0) continue;
-      int sti = strtoul(st.substr(0).c_str(), NULL, 16);
+      int sti = strtoul(st.c_str(), NULL, 16);
       if (//addr == info[i].getLocalAddress() &&
         port == info[i].getLocalPort() && sti == 1) {
         info[i].setRemoteAddress(raddr);

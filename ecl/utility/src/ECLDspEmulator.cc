@@ -134,7 +134,7 @@ namespace Belle2 {
       // Pedestal, used to calculate chi^2
       long long C1 = 0;
 
-      // Quality flag (https://confluence.desy.de/display/BI/ECL+Quality+flag)
+      // Quality flag (https://xwiki.desy.de/xwiki/rest/p/ca7f6)
       int validity_code = c_GoodQuality;
       bool skip_fit = false;
       // Set to true if amplitude is less than SKIP_THR
@@ -188,7 +188,7 @@ namespace Belle2 {
       }
 
       //== Check if amplitude is less than LA_THR
-      //   (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+      //   (https://xwiki.desy.de/xwiki/rest/p/545bc)
 
       bool low_ampl = false;
       if (A2 < la_thr) low_ampl = true;
@@ -198,7 +198,7 @@ namespace Belle2 {
       //== Main part of the algorithm, estimate amplitude, time and pedestal
 
       // Time estimation in ADC ticks.
-      // (See TDC time in https://confluence.desy.de/display/BI/ECL+Technical+Notes)
+      // (See TDC time in https://xwiki.desy.de/xwiki/rest/p/4630a)
       int T = 0;
 
       if (!skip_fit && !low_ampl) {
@@ -246,7 +246,7 @@ namespace Belle2 {
           }
 
           //== Check if amplitude is less than LA_THR
-          //   (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+          //   (https://xwiki.desy.de/xwiki/rest/p/545bc)
 
           if (A1 < la_thr) {
             it = it0;
@@ -255,7 +255,7 @@ namespace Belle2 {
           }
 
           //== Check if amplitude is less than SKIP_THR
-          //   (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+          //   (https://xwiki.desy.de/xwiki/rest/p/545bc)
 
           if (A1 < skip_thr) {
             skip_thr_flag = true;
@@ -388,7 +388,7 @@ namespace Belle2 {
       /***      ***/
 
       //== Compare signal peak to HIT_THR
-      //   (See https://confluence.desy.de/display/BI/Electronics+Thresholds)
+      //   (See https://xwiki.desy.de/xwiki/rest/p/545bc)
 
       int hit_val = y[20] + y[21] - (y[12] + y[13] + y[14] + y[15]) / 2;
       if (hit_val <= hit_thr) {
@@ -396,7 +396,7 @@ namespace Belle2 {
       }
 
       //== Compare amplitude to SKIP_THR
-      //   (See https://confluence.desy.de/display/BI/Electronics+Thresholds)
+      //   (See https://xwiki.desy.de/xwiki/rest/p/545bc)
 
       if (A1 < skip_thr && validity_code != c_InternalError) {
         skip_thr_flag = true;

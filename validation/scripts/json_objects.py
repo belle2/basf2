@@ -127,9 +127,9 @@ class Script(JsonBase):
         #: output files produced by the script as declared in
         #  the header
         self.output = output
-        #: linked issues
         if not issues:
             issues = []
+        #: linked issues
         self.issues = issues
 
 
@@ -162,7 +162,7 @@ class PlotFile(JsonBase):
 class Plot(JsonBase):
 
     """
-    Wrapper for one specfic plot.
+    Wrapper for one specific plot.
     """
 
     def __init__(
@@ -191,9 +191,9 @@ class Plot(JsonBase):
         self.width = width
         #: height of the plot in pixels
         self.height = height
-        #: linked issues
         if not issue:
             issue = []
+        #: linked issues
         self.issue = issue
 
 
@@ -285,7 +285,7 @@ class ComparisonState(enum.Enum):
     #: The two distributions did not comply with the allowed
     #  differences
     FailureStastical = "statistical_failure"
-    #: The two distrubtions were equal in the envelope given by the
+    #: The two distributions were equal in the envelope given by the
     #  comparison configuration of this plot
     Equal = "equal"
 
@@ -441,9 +441,9 @@ class ComparisonPlot(Plot):
         #: directory; has to end with trailing '/'!)
         self.plot_path = plot_path
 
-        #: Warnings ("no contact" person etc.)
         if warnings is None:
             warnings = []
+        #: Warnings ("no contact" person etc.)
         self.warnings = warnings
 
 

@@ -286,8 +286,8 @@ void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
 
   m_PhiD0 = factory.xAxis(phi).yAxis(D0_2d).CreateTH2F("Helix2dPhiD0",
                                                        "d0 vs Phi0, the signed distance of the perigee in the r-phi plane vs. momentum azymuthal angle at the perigee");
-  m_D0Z0 =  factory.xAxis(D0_2d).yAxis(Z0_2d).CreateTH2F("Helix2dD0Z0",
-                                                         "z0 vs d0, z0 of the perigee vs the signed distance of the perigee in r-phi");
+  m_D0Z0 =  factory.xAxis(Z0_2d).yAxis(D0_2d).CreateTH2F("Helix2dD0Z0",
+                                                         "d0 vs z0, the signed distance of the perigee in r-phi vs. z0 of the perigee");
 
 }
 
@@ -391,7 +391,7 @@ void DQMHistoModuleBase::DefineTRClusters()
 
     int layerIndex = gTools->getLayerIndex(layerNumber);
 
-    /** Track related clusters - neighbor corelations in Phi */
+    /** Track related clusters - neighbor correlations in Phi */
     std::string name = str(format("CorrelationsPhiLayers_%1%_%2%") % layerNumber % (layerNumber + 1));
     std::string title = str(format("Correlations in Phi for Layers %1% %2%") % layerNumber % (layerNumber + 1));
     std::string xTitle = str(format("angle layer %1% [deg]") % layerNumber);
@@ -399,7 +399,7 @@ void DQMHistoModuleBase::DefineTRClusters()
     m_TRClusterCorrelationsPhi[layerIndex] = Create(name, title, nbins, -range, range, nbins, -range, range,
                                                     xTitle, yTitle, "counts");
 
-    /** Track related clusters - neighbor corelations in Theta */
+    /** Track related clusters - neighbor correlations in Theta */
     name = str(format("CorrelationsThetaLayers_%1%_%2%") % layerNumber % (layerNumber + 1));
     title = str(format("Correlations in Theta for Layers %1% %2%") % layerNumber % (layerNumber + 1));
     m_TRClusterCorrelationsTheta[layerIndex] = Create(name, title, nbins / 2, .0, range, nbins / 2, .0, range,

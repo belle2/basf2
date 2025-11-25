@@ -57,7 +57,7 @@ namespace Belle2 {
 
     /** Quality estimation providing additional quantities
      * Calculates quality indicator in range [0,1]
-     * Optionally returns chi2 and additional informations. Eg. momentum estimation.
+     * Optionally returns chi2 and additional extra information. Eg. momentum estimation.
      *
      * measurements - std::vector<SpacePoint const*> ordered from innermost to outermost measurement
      */

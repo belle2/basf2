@@ -108,3 +108,43 @@ expected_event_numbers = [2, 1, 6]
 processed_event_numbers = []
 b2.process(main)
 assert expected_event_numbers == processed_event_numbers
+
+# Test the case where the input file is a .gen file
+main = b2.create_path()
+
+input = b2.register_module('B2BIIMdstInput')
+input.param('inputFileNames', [
+    b2.find_file('b2bii/tests/evtgen_BtoJpsiK_Jpsitoll.gen')
+])
+input.param('evtgenProcessing', True)
+main.add_module(input)
+
+convert = b2.register_module('B2BIIConvertMdst')
+convert.param('convertBeamParameters', False)
+convert.param('evtgenProcessing', True)
+main.add_module(convert)
+
+expected_MCParticles_len = [18, 28, 18, 24, 23, 35, 26, 29, 20, 26, 39, 28, 32, 32, 20, 19, 30,
+                            26, 27, 18, 34, 27, 33, 39, 25, 20, 23, 17, 17, 18, 24, 31, 31, 23,
+                            31, 18, 31, 29, 32, 23, 15, 28, 17, 27, 26, 27, 39]
+processed_MCParticles_len = []
+
+
+class MCParticlesTestingModule(b2.Module):
+    """
+    Test module which writes out the length of the MCParticles' storearray
+    into the global processed_MCParticles_len list
+    """
+
+    def event(self):
+        """
+        Called for each event
+        """
+        global processed_MCParticles_len
+        emd = Belle2.PyStoreArray('MCParticles')
+        processed_MCParticles_len.append(emd.getEntries())
+
+
+main.add_module(MCParticlesTestingModule())
+b2.process(main)
+assert expected_MCParticles_len == processed_MCParticles_len

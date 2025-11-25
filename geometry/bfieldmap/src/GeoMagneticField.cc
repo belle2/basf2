@@ -31,7 +31,6 @@
 #include <boost/bind/bind.hpp>
 
 using namespace std;
-using namespace boost;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -108,9 +107,9 @@ void GeoMagneticField::add3dBField(const GearDir& component, MagneticField& fiel
   std::vector<ROOT::Math::XYZVector> bmap;
   bmap.reserve(mapSizeR * mapSizeZ * mapSizePhi);
   // Load B-field map file
-  iostreams::filtering_istream fieldMapFile;
-  fieldMapFile.push(iostreams::gzip_decompressor());
-  fieldMapFile.push(iostreams::file_source(fullPath));
+  boost::iostreams::filtering_istream fieldMapFile;
+  fieldMapFile.push(boost::iostreams::gzip_decompressor());
+  fieldMapFile.push(boost::iostreams::file_source(fullPath));
 
   char tmp[256];
   for (int k = 0; k < mapSizeZ; k++) { // z

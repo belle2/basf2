@@ -15,7 +15,6 @@ import basf2 as b2
 import os
 import sys
 
-from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 
 b2.set_log_level(b2.LogLevel.INFO)
@@ -38,6 +37,8 @@ def main(argv):
 
     ###################################################
     # Test Calibration Setup
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
+    from ROOT.Belle2 import TestCalibrationAlgorithm
     alg_test = TestCalibrationAlgorithm()  # Getting a calibration algorithm instance
 
     # Create a single calibration from a collector module name + algorithm + input files

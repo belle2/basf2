@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,7 +29,7 @@ algo.setMinimumNDF(20)
 # algo.setMinimumPval(0.00001)
 # algo.enableTextOutput(True)
 
-# Ture, f you set IOV for whole exp and runs.
+# True, f you set IOV for whole exp and runs.
 # iov = Belle2.IntervalOfValidity.always()
 # print("Result of calibration =", algo.execute([], 0, iov))
 print("Result of calibration =", algo.execute())

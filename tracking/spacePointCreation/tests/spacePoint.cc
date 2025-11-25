@@ -569,7 +569,7 @@ namespace Belle2 {
 //  B2INFO("testGenfitCompatibility: create new PXDCluster, fill it in storeArray, link it with newly created spacePoint")
 //  // create new PXDCluster, fill it in storeArray, link it with newly created spacePoint
 //  PXDCluster aCluster = PXDCluster(aVxdIDL1, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
-//  unsigned int indexOfPxdCluster = pxdCL.getEntries(); // getting the index before adding, singe its minus one
+//  unsigned int indexOfPxdCluster = pxdCL.getEntries(); // getting the index before adding, since its minus one
 //  B2INFO("indexOfPxdCluster: " << indexOfPxdCluster)
 //  pxdCL.appendNew(aCluster);
 //

@@ -347,7 +347,7 @@ CDCTrajectorySZ CDCTrajectory3D::getTrajectorySZ() const
 
 PerigeeCircle CDCTrajectory3D::getGlobalCircle() const
 {
-  // Down cast since we do not necessarily wont the covariance matrix transformed as well
+  // Down cast since we do not necessarily won't the covariance matrix transformed as well
   PerigeeCircle result(getLocalHelix()->circleXY());
   result.passiveMoveBy(-getLocalOrigin().xy());
   return result;

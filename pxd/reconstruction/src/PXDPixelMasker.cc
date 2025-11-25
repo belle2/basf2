@@ -41,7 +41,7 @@ Belle2::PXD::PXDPixelMasker& Belle2::PXD::PXDPixelMasker::getInstance()
 
 void Belle2::PXD::PXDPixelMasker::maskSinglePixel(Belle2::VxdID id, unsigned int uid, unsigned int vid)
 {
-  auto vCells = Belle2::VXD::GeoCache::getInstance().get(id).getVCells();
+  auto vCells = Belle2::VXD::GeoCache::getInstance().getSensorInfo(id).getVCells();
   m_maskedPixels.maskSinglePixel(id.getID(), uid * vCells + vid);
 }
 
@@ -49,7 +49,7 @@ void Belle2::PXD::PXDPixelMasker::maskSinglePixel(Belle2::VxdID id, unsigned int
 
 bool Belle2::PXD::PXDPixelMasker::pixelOK(Belle2::VxdID id, unsigned int uid, unsigned int vid) const
 {
-  auto vCells = Belle2::VXD::GeoCache::getInstance().get(id).getVCells();
+  auto vCells = Belle2::VXD::GeoCache::getInstance().getSensorInfo(id).getVCells();
   return m_maskedPixels.pixelOK(id.getID(), uid * vCells + vid);
 }
 
@@ -65,7 +65,7 @@ bool Belle2::PXD::PXDPixelMasker::pixelDead(Belle2::VxdID id, unsigned int uid, 
   if (m_deadPixels.isDeadDrain(sensorID, uid * 4 + vid % 4))
     return true;
 
-  auto vCells = Belle2::VXD::GeoCache::getInstance().get(id).getVCells();
+  auto vCells = Belle2::VXD::GeoCache::getInstance().getSensorInfo(id).getVCells();
   if (m_deadPixels.isDeadSinglePixel(sensorID, uid * vCells + vid))
     return true;
 

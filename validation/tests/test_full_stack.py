@@ -18,6 +18,7 @@ import requests
 import traceback
 
 # ours
+import b2test_utils
 import validationserver
 import validationpath
 from validationtestutil import check_execute
@@ -41,7 +42,7 @@ def http_post(command, json_args):
     r = requests.post(call_url, json=json_args)
     if not r.ok:
         print(
-            "REST call {} with arguments {} failed".format(call_url, json_args)
+            f"REST call {call_url} with arguments {json_args} failed"
         )
         print(str(r))
         return None
@@ -87,8 +88,7 @@ def check_for_plotting(revs, tmp_folder):
         summed_wait_time += wait_time
         if summed_wait_time > max_wait_time:
             print(
-                "Waited for {} seconds for the requested plots to complete "
-                "and nothing happened".format(summed_wait_time)
+                f"Waited for {summed_wait_time} seconds for the requested plots to complete and nothing happened"
             )
             return False
 
@@ -152,8 +152,7 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
             rr = [web_r for web_r in found_revs if web_r.value == r]
             if len(rr) == 0:
                 print(
-                    "Revsion {} was not found on validation website. It "
-                    "should be there.".format(r)
+                    f"Revision {r} was not found on validation website. It should be there."
                 )
                 return False
 
@@ -164,9 +163,7 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
         )
         if len(plot_objects) < min_plot_objects:
             print(
-                "Only {} plots found, while {} are expected".format(
-                    len(plot_objects), min_plot_objects
-                )
+                f"Only {len(plot_objects)} plots found, while {min_plot_objects} are expected"
             )
             return False
 
@@ -188,9 +185,8 @@ def main():
     Runs two test validations, starts the web server and queries data
     """
 
-    # fixme: See if we can reenable this test or at least run it locally
-    print("TEST SKIPPED: Not properly runnable on build bot", file=sys.stderr)
-    sys.exit(1)
+    # fixme: See if we can re-enable this test or at least run it locally
+    b2test_utils.skip_test("Not properly runnable yet")
     # noinspection PyUnreachableCode
 
     # only run the test on dev machines with splinter installed. Also for the

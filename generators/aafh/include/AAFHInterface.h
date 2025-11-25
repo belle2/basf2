@@ -16,9 +16,9 @@
 
 namespace Belle2 {
 
-  /** Class to inferface AAFH/DIAG36 Generator written in Fortran.
+  /** Class to interface AAFH/DIAG36 Generator written in Fortran.
    * Almost all parameters can be set using this class. First all parameters
-   * should be set, then call initialize(), an arbitary number of
+   * should be set, then call initialize(), an arbitrary number of
    * generateEvent() and then finish(). After finish(), the total cross section
    * can be obained using getTotalCrossSection()
    */

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,6 +14,7 @@ Simple example to import CDCWireHitRequirements to the database.
 """
 
 import basf2
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import FileSystem
 from ROOT.Belle2 import CDCDatabaseImporter
 

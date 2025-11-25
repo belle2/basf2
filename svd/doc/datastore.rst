@@ -12,7 +12,7 @@ Here we briefly describe the SVD objects that populate the DataStore.
 
 .. cpp:class:: SVDEventInfo
 
-	       StoreObjPtr created by :b2:mod:`SVDUnpacker` / :b2:mod:`SVDEventInfoSetter` and storing the following event-wise informations:
+	       StoreObjPtr created by :b2:mod:`SVDUnpacker` / :b2:mod:`SVDEventInfoSetter` and storing the following event-wise information:
 
 	       #. the DAQ mode (3-sample, 6-sample, 3-mixed-6 sample) of the run
 	       #. the number of APV samples (3 or 6) in the acquired event
@@ -22,7 +22,7 @@ Here we briefly describe the SVD objects that populate the DataStore.
 
 .. cpp:class:: SVDShaperDigit
 
-	       StoreArray created by :b2:mod:`SVDUnpacker` / :b2:mod:`SVDDigitizer` and storing the raw strip informations:
+	       StoreArray created by :b2:mod:`SVDUnpacker` / :b2:mod:`SVDDigitizer` and storing the raw strip information:
 
 	       #. layer, ladder, sensor (VxdID), side
 	       #. cellID
@@ -32,7 +32,7 @@ Here we briefly describe the SVD objects that populate the DataStore.
 
 .. cpp:class:: SVDRecoDigit
 
-	       StoreArray created by :b2:mod:`SVDRecoDigitCreator` (not in default reconstruction) and storing the calibrated strip informations:
+	       StoreArray created by :b2:mod:`SVDRecoDigitCreator` (not in default reconstruction) and storing the calibrated strip information:
 
 	       #. layer, ladder, sensor (VxdID), side
 	       #. cellID
@@ -42,7 +42,7 @@ Here we briefly describe the SVD objects that populate the DataStore.
 
 .. cpp:class:: SVDCluster
 
-	       StoreArray created by :b2:mod:`SVDClusterizer` and storing the 1-D hit informations:
+	       StoreArray created by :b2:mod:`SVDClusterizer` and storing the 1-D hit information:
 
 	       #. layer, ladder, sensor (VxdID), side
 	       #. size, i.e. number of strips in the cluster
@@ -53,4 +53,4 @@ Here we briefly describe the SVD objects that populate the DataStore.
 
 .. cpp:class:: SVDSpacePoint
 
-	       StoreArray created by the :b2:mod:`SVDSpacePointCreator` and storing the 3-d  hit informations
+	       StoreArray created by the :b2:mod:`SVDSpacePointCreator` and storing the 3-d  hit information

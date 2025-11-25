@@ -20,7 +20,7 @@ namespace Belle2 {
    * The PXD DAQ Packet Status class
    *
    * This is a small class that records information about PXD DAQ packet status
-   * It will record if the data of DHC/DHE/sensors (readout by this packet) is useable.
+   * It will record if the data of DHC/DHE/sensors (readout by this packet) is usable.
    *
    */
   class PXDDAQPacketStatus final {
@@ -38,7 +38,7 @@ namespace Belle2 {
     virtual ~PXDDAQPacketStatus() {};
 
     /** Return Usability of data
-     * @return conclusion if data is useable
+     * @return conclusion if data is usable
      */
     bool isUsable() const { return m_usable; }
 
@@ -113,11 +113,11 @@ namespace Belle2 {
   private:
     PXDErrorFlags m_errorMask; /**< errors found in this packets sensors */
     PXDErrorFlags m_critErrorMask; /**< critical error mask */
-    bool m_usable; /**< data is useable.*/
+    bool m_usable; /**< data is usable.*/
 
     unsigned short m_index;/**< Packet index as delivered by DAQ.*/
 
-    /** Vector of DHC informations beloning to this event */
+    /** Vector of DHC information belonging to this event */
     std::vector <PXDDAQDHCStatus> m_pxdDHC;
 
     /** necessary for ROOT */

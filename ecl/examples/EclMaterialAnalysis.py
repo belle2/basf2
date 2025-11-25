@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,7 +12,7 @@
    module to dump ECL related quantities in an ntuple
    starting from dst root file.
 
-The user should provide input and output root filnames
+The user should provide input and output root filenames
 as first and second argument respectively.
 
 Usage:

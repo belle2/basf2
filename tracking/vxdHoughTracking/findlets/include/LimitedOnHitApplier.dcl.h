@@ -50,11 +50,11 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override ;
 
     private:
-      /// Parameter how many objects should pass maximal
-      int m_useNHits = 0;
-
       /// Filter to decide on the hits
       AFilter m_filter;
+
+      /// Parameter how many objects should pass maximal
+      int m_useNHits = 0;
     };
 
   }

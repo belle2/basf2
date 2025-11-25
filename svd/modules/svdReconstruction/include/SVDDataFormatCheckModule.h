@@ -83,11 +83,11 @@ namespace Belle2 {
 
     /** if true shut up warnings */
     bool m_shutUpWarnings = false;
-    /** couter of events */
+    /** counter of events */
     int m_evtsCounter = 0;
-    /** couter of events with at least one strip */
+    /** counter of events with at least one strip */
     int m_stripEvtsCounter = 0;
-    /** couter of events with at least one strip with a warning*/
+    /** counter of events with at least one strip with a warning*/
     int m_problematicEvtsCounter = 0;
     /** max number of events with at least one strip with a warning*/
     int m_maxProblematicEvts = 10;

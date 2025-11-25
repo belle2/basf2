@@ -246,10 +246,16 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
     groupNumberOfEachCellID->SetBinError(ic, 0.);
   }
 
+  //..Couple of diagnostic histograms
+  auto entriesPerThetaIdEnergy = getObjectPtr<TH2F>("entriesPerThetaIdEnergy");
+  auto mcEnergyDiff = getObjectPtr<TH2F>("mcEnergyDiff");
+
   //..Write these to disk.
   TFile* histFile = new TFile("eclNOptimalAlgorithm.root", "recreate");
   inputParameters->Write();
   groupNumberOfEachCellID->Write();
+  entriesPerThetaIdEnergy->Write();
+  mcEnergyDiff->Write();
 
   //-----------------------------------------------------------------------------------
   //..Parameters from the inputParameters histogram
@@ -442,7 +448,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
       std::string name = "eSum_" + std::to_string(ig) + "_" + std::to_string(ie);
       auto eSum = getObjectPtr<TH2F>(name);
 
-      //..Also the corresponding bias histgram
+      //..Also the corresponding bias histogram
       std::string biasName = "biasSum_" + std::to_string(ig) + "_" + std::to_string(ie);
       auto biasSum = getObjectPtr<TH2F>(biasName);
 
@@ -479,7 +485,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
         //..Check stats, and rebin as required
         const double minESumEntries = 800.;
         if (hEnergy->GetEntries() < minESumEntries) {
-          B2INFO("Insuffient entries in eSum: " << hEnergy->GetEntries() << " for group " << ig << " energy point " << ie);
+          B2INFO("Insufficient entries in eSum: " << hEnergy->GetEntries() << " for group " << ig << " energy point " << ie);
           histFile->Close();
           B2INFO("closed histFile; quitting");
           return c_NotEnoughData;
@@ -579,6 +585,9 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
 
         //------------------------------------------------------------------------------
         //..Logic to decide what to do next
+
+        //..keep checking different N until resolution is this much worse than best value
+        const double resTolerance = 1.05;
         if (nCrysSumToFit == initialnCrysSumToFit) {
 
           //..After testing the previous nOptimal, try one fewer if possible
@@ -591,7 +600,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
 
           //..Trying fewer crystals. If this is the best so far, try one
           //  fewer, if possible. Otherwise, try more crystals.
-          if (nCrysSumToFit == nOpt and nCrysSumToFit > 1) {
+          if (fractionalResolution < resTolerance* bestFractionalResolution and nCrysSumToFit > 1) {
             nCrysSumToFit--;
           } else if (initialnCrysSumToFit != nCrysMax) {
             nCrysSumToFit = initialnCrysSumToFit + 1;
@@ -602,7 +611,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
 
           //..Trying more crystals. If this is the best, try one more, if
           //  possible. Otherwise, do the current reconstruction case (nCrysSumToFit = nCrysBins)
-          if (nCrysSumToFit == nOpt and nCrysSumToFit < nCrysMax) {
+          if (fractionalResolution < resTolerance * bestFractionalResolution and nCrysSumToFit < nCrysMax) {
             nCrysSumToFit++;
           } else {
             nCrysSumToFit = nCrysBins;

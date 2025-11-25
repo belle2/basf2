@@ -1,5 +1,4 @@
 # !/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -302,14 +301,14 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
         self.RMSFitVTB.GetXaxis().SetTitle("fit sigma (ns)")
         self.RMSFitVTB.GetYaxis().SetTitle("trigger bin")
 
-        #: gaus function used for fitting distributions
+        #: gauss function used for fitting distributions
         self.gaus = TF1("gaus", 'gaus(0)', -150, 100)
 
         self.NTOT = 0
 
     def event(self):
         """
-        Function that allows to cicle on the events
+        Function that allows to cycle on the events
         """
         svd_evt_info = Belle2.PyStoreObj('SVDEventInfo')
         mode_byte = svd_evt_info.getModeByte()
@@ -332,7 +331,7 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
 
     def terminate(self):
         """
-        Terminates te class and produces the output rootfile
+        Terminates the class and produces the output rootfile
         """
 
         tfile = TFile(self.outputFileName, 'recreate')

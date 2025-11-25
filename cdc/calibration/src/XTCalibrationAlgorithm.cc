@@ -411,7 +411,7 @@ void XTCalibrationAlgorithm::write()
             }
 
           } else {
-            if (par[1] < 0) { // if negative c1, privious xt is kept.
+            if (par[1] < 0) { // if negative c1, previous xt is kept.
               for (int i = 0; i < 8; ++i) {
                 par[i] = m_xtPrior[l][lr][al][th][i];
               }

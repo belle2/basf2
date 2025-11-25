@@ -24,7 +24,7 @@ namespace Belle2 {
       {}
 
     public:
-      /// The box to which this object correspondes.
+      /// The box to which this object corresponds.
       using HoughBox = Box<DiscretePhi0, ContinuousTanL>;
 
     public:

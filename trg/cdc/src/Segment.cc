@@ -150,7 +150,7 @@ namespace Belle2 {
   TRGCDCSegment::simulate(bool clockSimulation, bool logicLUTFlag,
                           const std::string& cdcCollectionName, const std::string& tsCollectionName)
   {
-    //...Get wire informtion for speed-up...
+    //...Get wire information for speed-up...
     unsigned nHits = 0;
     for (unsigned i = 0, n = _wires.size(); i < n; i++) {
       if (_wires[i]->signal().active())
@@ -173,7 +173,7 @@ namespace Belle2 {
   {
     TRGDebug::enterStage("TS sim");
 
-    //...Get wire informtion...
+    //...Get wire information...
     const unsigned n = _wires.size();
     unsigned nHits = 0;
     vector<TRGSignal> signals;
@@ -533,6 +533,31 @@ namespace Belle2 {
     unsigned ptn = 0;
     for (unsigned i = 0; i < _wires.size(); i++) {
       const TRGSignal& s = _wires[i]->signal();
+      if (s.active())
+        ptn |= (1 << i);
+    }
+    return ptn;
+  }
+  vector<float>
+  TRGCDCSegment::hitPatternTime() const
+  {
+    vector<float> timeptn;
+    for (unsigned i = 0; i < _wires.size(); i++) {
+      const TRGSignal& s = _wires[i]->signal();
+      if (s.active())
+        timeptn.push_back(s[0]->time());
+      else
+        timeptn.push_back(-1);
+    }
+    return timeptn;
+  }
+
+  unsigned
+  TRGCDCSegment::hitPattern_adc() const
+  {
+    unsigned ptn = 0;
+    for (unsigned i = 0; i < _wires.size(); i++) {
+      const TRGSignal& s = _wires[i]->signal_adc();
       if (s.active())
         ptn |= (1 << i);
     }

@@ -16,12 +16,12 @@ namespace Belle2 {
     class Phi0BinsSpec {
     public:
       /**
-       *  Constructor from fixed number of accessable bins and overlap specification
+       *  Constructor from fixed number of accessible bins and overlap specification
        *  in discrete number of positions
        */
       Phi0BinsSpec(long nBins, int nOverlap, int nWidth);
 
-      /// Constuct the array of discrete phi0 positions
+      /// Construct the array of discrete phi0 positions
       DiscretePhi0::Array constructArray() const;
 
       /// Getter for the number of bounds
@@ -46,7 +46,7 @@ namespace Belle2 {
       }
 
     private:
-      ///  Number of accessable bins
+      ///  Number of accessible bins
       long m_nBins;
 
       /// Overlap of the leaves in phi0 counted in number of discrete values.

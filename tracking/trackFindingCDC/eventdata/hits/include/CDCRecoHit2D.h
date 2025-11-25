@@ -33,7 +33,7 @@ namespace Belle2 {
      *  Class representing a two dimensional reconstructed hit in the central drift chamber.
      *  A recohit represents a likely point where the particle went through. It is always associated with a
      *  wire hit it seeks to reconstruct. The reconstructed point is stored as a displacement from the
-     *  wire reference position assoziated with the hit. The displacement generally is as long as the drift length
+     *  wire reference position associated with the hit. The displacement generally is as long as the drift length
      *  but must not.\n
      *  In addition the reconstructed hit takes a right left passage information which indicates if
      *  the hit wire lies to the right or to the left of the particle trajectory causing the hit. The later readily
@@ -60,28 +60,28 @@ namespace Belle2 {
        *  Constructs the average of two reconstructed hit positions and snaps it to the drift circle.
        *  Averages the hit positions first. But the result will not lie on the circle, so we scale the
        *  displacement to snap onto the drift circle again. The function averages only reconstructed hits
-       *  assoziated with the same right left oriented wire hit.\n
-       *  If not all recostructed hits are on the same wire hit, the first hit is used.
+       *  associated with the same right left oriented wire hit.\n
+       *  If not all reconstructed hits are on the same wire hit, the first hit is used.
        */
       static CDCRecoHit2D average(const CDCRecoHit2D& recoHit1,
                                   const CDCRecoHit2D& recoHit2);
 
       /**
        *  Constructs the average of three reconstructed hit positions and snaps it to the drift circle.
-       *  Averages the hit positions first. But the result will not lie on the circle, so we scale the
+       *  Averages the hit positions first. But the result will not lie on the circle, so we scale
        *  the displacement to snap onto the drift circle again. The function averages only reconstructed hits
-       *  assoziated with the same wire hit.\n
-       *  If not all recostructed hits are on the same wire, the first hit is used.
+       *  associated with the same wire hit.\n
+       *  If not all reconstructed hits are on the same wire, the first hit is used.
        */
       static CDCRecoHit2D average(const CDCRecoHit2D& recoHit1,
-                                  const CDCRecoHit2D& recoHit2 ,
+                                  const CDCRecoHit2D& recoHit2,
                                   const CDCRecoHit2D& recoHit3);
 
       /**
        *  Constructs a two dimensional reconstructed hit from an absolute position.
        *
-       *  @param rlWireHit the oriented wire hit the reconstructed hit is assoziated to
-       *  @param recoPos2D the absolut position of the wire
+       *  @param rlWireHit the oriented wire hit the reconstructed hit is associated to
+       *  @param recoPos2D the absolute position of the wire
        *  @param snap      optional indicator if the displacement shall be shrank to the drift circle (default true)
        */
       static CDCRecoHit2D
@@ -101,7 +101,7 @@ namespace Belle2 {
       CDCRecoHit2D getAlias() const;
 
       /**
-       *  Constructs a two dimensional reconstructed hit from a sim hit and the assoziated wirehit.
+       *  Constructs a two dimensional reconstructed hit from a sim hit and the associated wirehit.
        *  This translates the sim hit to a reconstructed hit mainly to be able to compare the
        *  reconstructed values from the algorithm with the Monte Carlo information.
        *  It merely takes the displacement from the wire, projects it to the reference plane and
@@ -115,7 +115,7 @@ namespace Belle2 {
       { return static_cast<const CDCHit*>(getRLWireHit()); }
 
 
-      /// Equality comparision based on the oriented wire hit and displacement.
+      /// Equality comparison based on the oriented wire hit and displacement.
       bool operator==(const CDCRecoHit2D& other) const
       {
         return getRLWireHit() == other.getRLWireHit() and
@@ -167,7 +167,7 @@ namespace Belle2 {
         return getRLWireHit().getISuperLayer();
       }
 
-      /// Getter for the wire the reconstructed hit assoziated to.
+      /// Getter for the wire the reconstructed hit associated to.
       const CDCWire& getWire() const
       {
         return getRLWireHit().getWire();
@@ -179,19 +179,19 @@ namespace Belle2 {
         return getRLWireHit().getRefPos2D();
       }
 
-      /// Checks if the reconstructed hit is assoziated with the give wire.
+      /// Checks if the reconstructed hit is associated with the give wire.
       bool isOnWire(const CDCWire& wire) const
       {
         return getRLWireHit().isOnWire(wire);
       }
 
-      /// Getter for the wire hit assoziated with the reconstructed hit.
+      /// Getter for the wire hit associated with the reconstructed hit.
       const CDCWireHit& getWireHit() const
       {
         return getRLWireHit().getWireHit();
       }
 
-      /// Checks if the reconstructed hit is assoziated with the give wire hit.
+      /// Checks if the reconstructed hit is associated with the give wire hit.
       bool hasWireHit(const CDCWireHit& wireHit) const
       {
         return getRLWireHit().hasWireHit(wireHit);
@@ -261,35 +261,35 @@ namespace Belle2 {
         return getRecoPos2D().angleWith(getFlightDirection2D());
       }
 
-      /// Scales the displacement vector in place to lie on the dirft circle.
+      /// Scales the displacement vector in place to lie on the drift circle.
       void snapToDriftCircle(bool switchSide = false);
 
       /**
        *  Reconstruct the three dimensional position (especially of stereo hits)
-       *  by determinating the z coordinate such that the reconstucted position lies on the
+       *  by determining the z coordinate such that the reconstructed position lies on the
        *  given two dimensional trajectory as the reference reconstructed position is
        *  moved parallel to the stereo wire.
        *  For axial hits the point of closest approach on the trajectory is returned.
        */
       Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, const double z = 0) const;
 
-      /// Getter for the oriented wire hit assoziated with the reconstructed hit.
+      /// Getter for the oriented wire hit associated with the reconstructed hit.
       const CDCRLWireHit& getRLWireHit() const
       {
         return m_rlWireHit;
       }
 
-      /// Setter for the oriented wire hit assoziated with the reconstructed hit.
+      /// Setter for the oriented wire hit associated with the reconstructed hit.
       void setRLWireHit(const CDCRLWireHit& rlWireHit)
       {
         m_rlWireHit = rlWireHit;
       }
 
     private:
-      /// Memory for the reference to the assiziated wire hit.
+      /// Memory for the reference to the associated wire hit.
       CDCRLWireHit m_rlWireHit;
 
-      /// Memory for the displacement fo the assoziated wire reference position.
+      /// Memory for the displacement of the associated wire reference position.
       Vector2D m_recoDisp2D;
     };
 

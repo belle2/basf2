@@ -199,7 +199,7 @@ void VTXDigitizerModule::event()
     VxdID sensorID = m_currentHit->getSensorID();
     if (!m_currentSensorInfo || sensorID != m_currentSensorInfo->getID()) {
       m_currentSensorInfo =
-        dynamic_cast<const SensorInfo*>(&VXD::GeoCache::get(
+        dynamic_cast<const SensorInfo*>(&VXD::GeoCache::getInstance().getSensorInfo(
                                           sensorID));
       if (!m_currentSensorInfo)
         B2FATAL(
@@ -364,7 +364,7 @@ void VTXDigitizerModule::addNoiseDigits()
 
     //Calculate the number of pixels on an empty sensor which will exceed the noise cut
     const SensorInfo& info =
-      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensor.first));
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensor.first));
 
     if (!info.getApplyElectronicEffects()) {return;}
 
@@ -399,7 +399,7 @@ void VTXDigitizerModule::saveDigits()
   for (Sensors::value_type& sensor : m_sensors) {
     auto sensorID = sensor.first;
     const SensorInfo& info =
-      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     double m_chargeThreshold = info.getChargeThreshold();
     for (Sensor::value_type& digitAndValue : sensor.second) {
       const Digit& d = digitAndValue.first;

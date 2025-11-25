@@ -41,7 +41,7 @@ FastBDTClassifierTrainingModule::FastBDTClassifierTrainingModule() : Module()
   addParam("shrinkage", m_PARAMshrinkage, "Shrinkage parameter used in the FastBDT", 0.15);
   addParam("randRatio", m_PARAMrandRatio, "ratio of randomly chosen samples for training of one tree", 0.5);
   addParam("storeSamples", m_PARAMstoreSamples, "store the collected samples into a file", false);
-  addParam("samplesFileName", m_PARAMsamplesFileName, "the file name into which/from whicht the collected samples are stored/read",
+  addParam("samplesFileName", m_PARAMsamplesFileName, "the file name into which (from which) the collected samples are stored (read)",
            std::string("FBDTClassifier_samples.dat"));
   addParam("useSamples", m_PARAMuseSamples,
            "use samples for training that have been collected previously and bypass the collection of samples", false);

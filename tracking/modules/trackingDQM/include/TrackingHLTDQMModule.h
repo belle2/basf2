@@ -44,7 +44,7 @@ namespace Belle2 {
     /** Input array for DAQ Status. */
     StoreArray<RawFTSW> m_rawTTD;
 
-    /** Acccess to the EventLevelTrackingInfo object in the datastore. */
+    /** Access to the EventLevelTrackingInfo object in the datastore. */
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
 
     /** Monitors the Error flags set by the tracking code. As of the time of implementation there only were two flags:

@@ -27,7 +27,7 @@ namespace Belle2 {
 
   public:
 
-    /// Contructor.
+    /// Constructor.
     TRGCDCHoughPlane(const std::string& name,
                      const TRGCDCHoughTransformation& transformation,
                      unsigned nX,
@@ -40,7 +40,7 @@ namespace Belle2 {
     /// Destructor
     virtual ~TRGCDCHoughPlane();
 
-    /// Copy construtor, deleted
+    /// Copy constructor, deleted
     TRGCDCHoughPlane(TRGCDCHoughPlane&) = delete;
 
     /// Assignment operator, deleted
@@ -69,7 +69,7 @@ namespace Belle2 {
     // cppcheck-suppress virtualCallInConstructor
     void clear(void) override;
 
-    /// Clears entires only.
+    /// Clears entries only.
     void clearCells(void);
 
     /// Registers a pattern on a Hough plane with (r, phi=0).

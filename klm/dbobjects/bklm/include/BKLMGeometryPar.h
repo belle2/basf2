@@ -1168,7 +1168,7 @@ namespace Belle2 {
     //! Nominal height of a layer's structural iron
     double m_IronNominalHeight;
 
-    //! Actual height of a layer's stuctural iron
+    //! Actual height of a layer's structural iron
     double m_IronActualHeight;
 
     //! Nominal height of the innermost gap

@@ -407,7 +407,7 @@ void CalibrationAlgorithm::updateDBObjPtrs(const unsigned int event = 1, const i
   EventMetaData emd(event, run, experiment);
   // Explicitly update while avoiding registering a Datastore object
   DBStore::Instance().update(emd);
-  // Also update the intra-run objects to the event at the same time (maybe unnessary...)
+  // Also update the intra-run objects to the event at the same time (maybe unnecessary...)
   DBStore::Instance().updateEvent(event);
 }
 

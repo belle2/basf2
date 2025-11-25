@@ -10,54 +10,62 @@
 #include <TObject.h>
 
 namespace Belle2 {
+
   /**
-  *   List of Belle2Link Boards
-  */
+   * List of Belle2Link boards.
+   */
   class ARICHB2LinkInfo: public TObject {
+
   public:
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHB2LinkInfo(): m_id(0), m_address(0), m_port(0) {};
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHB2LinkInfo(int id, int address, int port): m_id(id), m_address(address), m_port(port) {};
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ARICHB2LinkInfo() {};
 
-    /** Return Belle2 Link Identifier
-     * @return B2Link Identifier
+    /**
+     * Get Belle2Link identifier.
+     * @return B2Link identifier.
      */
     int getB2LinkID() const {return m_id; }
 
-    /** Set Belle2 Link Identifier
-     * @param B2Link Identifier
+    /**
+     * Set Belle2Link identifier.
+     * @param[in] id B2Link identifier.
      */
     void setB2LinkID(int id) {m_id = id; }
 
-    /** Return Belle2 Link Address
-     * @return B2Link Address
+    /**
+     * Get Belle2Link address.
+     * @return B2Link address.
      */
     int getB2LinkAddress() const {return m_address; }
 
-    /** Set Belle2 Link Address
-     * @param B2Link Address
+    /**
+     * Set Belle2Link address.
+     * @param[in] address B2Link address.
      */
     void setB2LinkAddress(int address) {m_address = address; }
 
-    /** Return Belle2 Link port
-     * @return B2Link port
+    /**
+     * Get Belle2Link port.
+     * @return B2Link port.
      */
     int getB2LinkPort() const {return m_port; }
 
-    /** Set Belle2 Link port
-     * @param B2Link port
+    /**
+     * Set Belle2Link port.
+     * @param[in] port B2Link port.
      */
     void setB2LinkPort(int port) {m_port = port; }
 

@@ -198,7 +198,6 @@ try:
     with uproot.open(outfile) as outf:
         df = outf['tree'].arrays(library='pd')
     df = df.sample(frac=1)
-    with uproot.recreate(outfile) as outf:
-        outf['tree'] = df
+    df.to_csv(outfile+'.shuffled.csv')
 except OSError as e:
     print(e)

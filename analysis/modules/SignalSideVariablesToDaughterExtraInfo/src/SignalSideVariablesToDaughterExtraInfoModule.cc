@@ -31,6 +31,7 @@ SignalSideVariablesToDaughterExtraInfoModule::SignalSideVariablesToDaughterExtra
   setDescription("The module writes properties (values of specified variables) of the particle related to the current ROE\n"
                  "as an ExtraInfo to the single particle in the input ParticleList.\n"
                  "This module is intended to be executed only in for_each ROE path.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   std::map<std::string, std::string> emptymap;

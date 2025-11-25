@@ -46,10 +46,10 @@ namespace Belle2 {
     /** terminate */
     virtual void terminate() override;
 
-    /** exeption should be thrown when the unexpected      */
+    /** exception should be thrown when the unexpected      */
     BELLE2_DEFINE_EXCEPTION(Unexpected_end_of_FINESSE_buffer,
                             "Unexpected end of the FINESSE buffer is reached while reading ShpaerDSP data");
-    /** exeption should be thrown when the Shaepr DSP header is corrupted    */
+    /** exception should be thrown when the Shaepr DSP header is corrupted    */
 
     BELLE2_DEFINE_EXCEPTION(Bad_ShaperDSP_header, "Corrupted Shaper DSP header");
 

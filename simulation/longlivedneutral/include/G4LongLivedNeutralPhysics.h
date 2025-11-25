@@ -25,8 +25,6 @@ namespace Belle2 {
 
     /**
      * Constructor.
-     * @param pdg
-     * @param mass
      */
     explicit G4LongLivedNeutralPhysics();
 

@@ -28,7 +28,7 @@ namespace Belle2 {
 
   /** This module takes the MCParticles, the Tracks, the RecoTrack,
    *  and the MCRecoTracks input and produce a root file containing various histograms
-   *  showing the performance of the tracking package: fitter, pattern recongnition algorithms.
+   *  showing the performance of the tracking package: fitter, pattern recognition algorithms.
    */
   class TrackingPerformanceEvaluationModule : public Module, PerformanceEvaluationBaseClass {
 

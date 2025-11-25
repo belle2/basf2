@@ -25,7 +25,6 @@
 
 
 namespace Belle2 {
-  class Particle;
 
   /**
    * Brem recovery module (used in past belle analyses)

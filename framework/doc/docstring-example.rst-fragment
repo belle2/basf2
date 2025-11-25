@@ -28,7 +28,7 @@
       .. note:: there is an underscore at the end of links
 
       4. math is supported either inline :math:`f(x) = \sum_{x=i}^N x^i` or as
-         display verssion:
+         display version:
 
          .. math::
 
@@ -36,7 +36,7 @@
 
          .. seealso:: `Math support in Sphinx <http://www.sphinx-doc.org/en/stable/ext/math.html>`_
       5. The easiest way for code example is the "doctest" syntax: Start a new
-         paragaph after an empty line with ``>>>`` followed by the python
+         paragraph after an empty line with ``>>>`` followed by the python
          statements and (optionally) the expected output of these statements.
 
          >>> dummy_function_example("some name", foo="bar")

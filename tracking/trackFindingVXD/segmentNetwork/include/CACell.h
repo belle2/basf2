@@ -17,11 +17,7 @@ namespace Belle2 {
   public:
     /** ************************* CONSTRUCTORS ************************* */
     /** Default constructor for the ROOT IO. */
-    CACell():
-      m_state(0),
-      m_activated(true),
-      m_stateUpgrade(false),
-      m_seed(false) {}
+    CACell() {}
 
 
     /** ************************* OPERATORS ************************* */
@@ -66,15 +62,15 @@ namespace Belle2 {
   protected:
     /** ************************* DATA MEMBERS ************************* */
     /** state of CACell during CA process, begins with 0 */
-    unsigned int m_state;
+    unsigned int m_state = 0;
 
     /** activation state. Living CACells (active) are allowed to evolve in the CA, dead ones (inactive) are not allowed */
-    bool m_activated;
+    bool m_activated = true;
 
     /** sets flag whether Segment is allowed to increase state during update step within CA */
-    bool m_stateUpgrade;
+    bool m_stateUpgrade = false;
 
     /** sets flag whether Segment is allowed to be the seed of a new track candidate or not */
-    bool m_seed;
+    bool m_seed = false;
   };
 }

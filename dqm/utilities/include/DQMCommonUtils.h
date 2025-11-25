@@ -27,7 +27,7 @@ namespace Belle2 {
       * Flag values:
       * -3: nonexisting Type
       * -2: histogram is missing or masked
-      * -1: less than 100 samles, skip comparition
+      * -1: less than 100 samples, skip comparison
       *  0: good much with reference
       *  1: warning level = diff > 6 * sigma and < error level
       *  2: error level = diff > 10 * sigma
@@ -46,14 +46,14 @@ namespace Belle2 {
       * @param hist Histogram of sources.
       * @param refhist Reference histogram.
       * @param flaghist Histogram of flags.
-      * @return Indication of succes of realizing of condition, 1: OK.
+      * @return Indication of success of realizing of condition, 1: OK.
       */
     static int SetFlag(int Type, int bin, const double* pars, double ratio, TH1F* hist, TH1F* refhist, TH1I* flaghist);
     /** Function return flag histogram filled based on condition from TH1I source.
       * Flag values:
       * -3: nonexisting Type
       * -2: histogram is missing or masked
-      * -1: less than 100 samles, skip comparition
+      * -1: less than 100 samples, skip comparison
       *  0: good much with reference
       *  1: warning level = diff > 6 * sigma and < error level
       *  2: error level = diff > 10 * sigma
@@ -72,7 +72,7 @@ namespace Belle2 {
       * @param hist Histogram of sources.
       * @param refhist Reference histogram.
       * @param flaghist Histogram of flags.
-      * @return Indication of succes of realizing of condition, 1: OK.
+      * @return Indication of success of realizing of condition, 1: OK.
       */
     static int SetFlag(int Type, int bin, const double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist);
 
@@ -98,25 +98,25 @@ namespace Belle2 {
 
     /** Function for loading of TH1F histogram from database.
       * @param HistoBD Histogram for DB.
-      * @return Indication of succes of realizing of condition, 1: OK.
+      * @return Indication of success of realizing of condition, 1: OK.
       */
     static int LoadDBHisto(TH1F* HistoBD);
     /** Function for loading of TH1I histogram from database.
       * @param HistoBD Histogram for DB.
-      * @return Indication of succes of realizing of condition, 1: OK.
+      * @return Indication of success of realizing of condition, 1: OK.
       */
     static int LoadDBHisto(TH1I* HistoBD);
 
     /** Function for loading of group of TH1F histogram from database.
       * @param HistoBD Histogram for DB.
       * @param number Number of histograms to extract from DB.
-      * @return Indication of succes of realizing of condition, 1: OK.
+      * @return Indication of success of realizing of condition, 1: OK.
       */
     static int LoadDBHistoGroup(TH1F** HistoBD, int number);
     /** Function for loading of group of TH1I histogram from database.
       * @param HistoBD Histogram for DB.
       * @param number Number of histograms to extract from DB.
-      * @return Indication of succes of realizing of condition, 1: OK.
+      * @return Indication of success of realizing of condition, 1: OK.
       */
     static int LoadDBHistoGroup(TH1I** HistoBD, int number);
 

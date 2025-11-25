@@ -34,7 +34,6 @@ REG_MODULE(eclAutocovarianceCalibrationC4Collector);
 // constructor
 eclAutocovarianceCalibrationC4CollectorModule::eclAutocovarianceCalibrationC4CollectorModule() : CalibrationCollectorModule(),
   m_ECLAutocovarianceCalibrationC1Threshold("ECLAutocovarianceCalibrationC1Threshold"),
-  m_ECLAutocovarianceCalibrationC2Baseline("ECLAutocovarianceCalibrationC2Baseline"),
   m_ECLAutocovarianceCalibrationC3Autocovariances("ECLAutoCovariance")
 {
   // Set module properties
@@ -62,7 +61,6 @@ void eclAutocovarianceCalibrationC4CollectorModule::startRun()
          m_evtMetaData->getRun());
 
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();
-  m_Baselines = m_ECLAutocovarianceCalibrationC2Baseline->getCalibVector();
 
   std::vector<double> buf(m_numberofADCPoints);
 
@@ -80,7 +78,10 @@ void eclAutocovarianceCalibrationC4CollectorModule::startRun()
     bool InvertStatus = dc.Invert(m_NoiseMatrix[id]);
 
     if (InvertStatus == 0) {
+      //Final Check.  Fail should never occur as is checked in eclAutocovarianceCalibrationC3 algo
       B2INFO("Invert Failed for " << id);
+      for (int i = 0; i < m_numberofADCPoints; i++) B2INFO("buf[" << i << "] = " << buf[i]);
+      B2FATAL("Invert Failed for " << id);
     }
 
   }

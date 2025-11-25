@@ -40,21 +40,15 @@ int main(int argc, const char* argv[])
   for (unsigned expert = 0; expert < m_nnt.nSectors(); expert++) {
 
     std::vector<float> weights;
-    int numnode = 0;
-    for (auto node : nets["expert_" + std::to_string(expert)]["weights"]["model.net.0.weight"]) {
-      for (float w : node) {
-        weights.push_back(w);
+    for (unsigned i = 0; i < nets["expert_" + std::to_string(expert)]["shapes"].size(); i = i + 2) {
+      int numnode = 0;
+      for (auto node : nets["expert_" + std::to_string(expert)]["weights"]["model.net." + std::to_string(i) + ".weight"]) {
+        for (float w : node) {
+          weights.push_back(w);
+        }
+        weights.push_back(nets["expert_" + std::to_string(expert)]["weights"]["model.net." + std::to_string(i) + ".bias"][numnode]);
+        ++numnode;
       }
-      weights.push_back(nets["expert_" + std::to_string(expert)]["weights"]["model.net.0.bias"][numnode]);
-      ++numnode;
-    }
-    numnode = 0;
-    for (auto node : nets["expert_" + std::to_string(expert)]["weights"]["model.net.2.weight"]) {
-      for (float w : node) {
-        weights.push_back(w);
-      }
-      weights.push_back(nets["expert_" + std::to_string(expert)]["weights"]["model.net.2.bias"][numnode]);
-      ++numnode;
     }
     std::cout << " writing " << weights.size() << " weights for expert " << expert << std::endl;
     m_nnt[expert].setWeights(weights);

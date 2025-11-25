@@ -40,6 +40,11 @@ namespace Belle2 {
     virtual void prepare() final;
 
     /**
+     * Replacement for beginRun(). Do anything you would normally do in beginRun here
+     */
+    virtual void startRun() final;
+
+    /**
      * Replacement for event(). Fill your calibration data objects here
      */
     virtual void collect() final;
@@ -53,7 +58,6 @@ namespace Belle2 {
 
     // other
     std::map<Const::EDetector, std::string> m_names; /**< histogram names */
-    bool m_firstEvent = true; /**< flag */
 
   };
 

@@ -81,10 +81,10 @@ void ECLDQMInjectionModule::defineHisto()
                               "Time since last injection in #mus;Time within beam cycle in #mus", 500, 0, 30000, 100, 0,
                               m_revolutionTime);
   hOccAfterInjLER = new TH2F("ECLOccAfterInjLER",
-                             "ECL Occupancy after LER injection (E > 1 MeV);Time since last injection in #mus;Occupancy (Nhits/ECLElementNumbers::c_NCrystals) [%]",
+                             "ECL Occupancy after LER injection (E > 1 MeV);Time since last injection in #mus;Occupancy (Nhits/8736) [%]",
                              100, 0, 20000, 98, 2, 100);
   hOccAfterInjHER = new TH2F("ECLOccAfterInjHER",
-                             "ECL Occupancy after HER injection (E > 1 MeV);Time since last injection in #mus;Occupancy (Nhits/ECLElementNumbers::c_NCrystals) [%]",
+                             "ECL Occupancy after HER injection (E > 1 MeV);Time since last injection in #mus;Occupancy (Nhits/8736) [%]",
                              100, 0, 20000, 98, 2, 100);
 
   hInjkickTimeShift[0] = new TH2F("ECLInjkickTimeShiftLER",
@@ -141,7 +141,7 @@ void ECLDQMInjectionModule::defineHisto()
 void ECLDQMInjectionModule::initialize()
 {
   REG_HISTOGRAM
-  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failin
+  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
   m_storeHits.isRequired(m_ECLDigitsName);
   m_ECLTrigs.isOptional();
   m_ECLDsps.isOptional();
@@ -155,7 +155,7 @@ void ECLDQMInjectionModule::initialize()
 
 void ECLDQMInjectionModule::beginRun()
 {
-  // Assume that everthing is non-yero ;-)
+  // Assume that everything is non-yero ;-)
   hHitsAfterInjLER->Reset();
   hHitsAfterInjHER->Reset();
   hEHitsAfterInjLER->Reset();
@@ -237,7 +237,7 @@ void ECLDQMInjectionModule::event()
     // Time within beam revolution (in microseconds)
     double time_in_cycle_us = time_within_cycle / 127.;
     // Time within beam revolution (in ADC ticks)
-    // https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=ECL+Technical+Notes
+    // https://xwiki.desy.de/xwiki/rest/p/4630a
     int time_within_cycle_adc_ticks = (1280 - time_within_cycle) / 72;
 
     int is_her = it.GetIsHER(0);
@@ -250,14 +250,14 @@ void ECLDQMInjectionModule::event()
       hBurstsAfterInjHER->Fill(diff2, discarded_wfs);
       hEBurstsAfterInjHER->Fill(diff2);
       hVetoAfterInjHER->Fill(diff2, time_in_cycle_us, ECLDigitsAboveThr);
-      if (all > 0) hOccAfterInjHER->Fill(diff2, ECLDigitsAboveThr1MeV / ECLElementNumbers::c_NCrystals * 100.);
+      if (all > 0) hOccAfterInjHER->Fill(diff2, ECLDigitsAboveThr1MeV * 100.0 / ECLElementNumbers::c_NCrystals);
     } else {
       hHitsAfterInjLER->Fill(diff2, all);
       hEHitsAfterInjLER->Fill(diff2);
       hBurstsAfterInjLER->Fill(diff2, discarded_wfs);
       hEBurstsAfterInjLER->Fill(diff2);
       hVetoAfterInjLER->Fill(diff2, time_in_cycle_us, ECLDigitsAboveThr);
-      if (all > 0) hOccAfterInjLER->Fill(diff2, ECLDigitsAboveThr1MeV / ECLElementNumbers::c_NCrystals * 100.);
+      if (all > 0) hOccAfterInjLER->Fill(diff2, ECLDigitsAboveThr1MeV * 100.0 / ECLElementNumbers::c_NCrystals);
     }
 
     //== Filling h_ped_peak histograms

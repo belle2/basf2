@@ -53,16 +53,16 @@ namespace Belle2 {
 
   private:
 
+    /** Start times for gating */
+    std::vector<float> m_gatingStartTimes;
+
     /** PXD triggergate */
     int m_triggerGate;
 
     /** Gated mode flag */
     bool m_gated;
 
-    /** Start times for gating */
-    std::vector<float> m_gatingStartTimes;
-
-    ClassDef(PXDInjectionBGTiming, 1)
+    ClassDef(PXDInjectionBGTiming, 2)
 
   }; // class PXDInjectionBGTiming
 

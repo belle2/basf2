@@ -1,80 +1,93 @@
 ``basf2``: The Main Belle2 Software Executable
 ++++++++++++++++++++++++++++++++++++++++++++++
 
-The main command line tool for the Belle2 Software is ``basf2``::
+The main command line tool for the Belle II Software is ``basf2``::
 
     usage: basf2 [OPTIONS] [STEERING_FILE] [-- STEERING_FILE_OPTIONS...]
 
 .. rubric:: Generic Options (to be used instead of steering file)
 
 -h, --help
-                       print all available options
--v, --version          print the version of the Belle2 Software
---info                 print information about basf2 and the environment
+                       Print all available options.
+--info                 Print information about ``basf2`` and the environment.
 -m ARG, --modules ARG  Without argument this will print a list of all available
                        `Modules <basf2.Module>`. With an extra argument the list can be limited
                        to one package or one specific module.
+-v, --version          Print a verbose string with the ``basf2`` version.
+--version-short        Print a compact string with the ``basf2`` version.
+--license              Print a short version of the ``basf2`` license.
 
 .. rubric:: Configuration
 
 -l LOGLEVEL, --log_level LOGLEVEL
-                          Set global log level (one of DEBUG, INFO, RESULT,
-                          WARNING, or ERROR). Takes precedence over
-                          set_log_level() in steering file.
+                          Set global log level (one of ``DEBUG``, ``INFO``,
+                          ``RESULT``, ``WARNING``, or ``ERROR``). Takes
+                          precedence over ``set_log_level()`` in steering file.
+--package_log_level PACKAGELOGLEVEL
+                          Set a package log level (one of ``DEBUG``, ``INFO``,
+                          ``RESULT``, ``WARNING``, or ``ERROR``). Syntax:
+                          ``packageName:LOGLEVEL`` (e.g. ``cdc:ERROR`` or
+                          ``klm:DEBUG:20``). Does not take precedence over
+                          ``package.set_log_level()`` in steering file.
+--module_log_level MODULELOGLEVEL
+                          Set a module log level (one of ``DEBUG``, ``INFO``,
+                          ``RESULT``, ``WARNING``, or ``ERROR``). Syntax:
+                          ``packageName:LOGLEVEL`` (e.g. ``cdc:ERROR`` or
+                          ``klm:DEBUG:20``).
 --random-seed SEED        Set the default initial seed for the random number
                           generator. This does not take precedence over calls to
-                          set_random_seed() in the steering file, but just
+                          ``set_random_seed()`` in the steering file, but just
                           changes the default. If no seed is set via either of
                           these mechanisms, the initial seed will be taken from
                           the system's entropy pool.
 -d DEBUGLEVEL, --debug_level DEBUGLEVEL
-                          Set the default debug level and also enable DEBUG as
-                          the default log level. This does not override
+                          Set the default debug level and also enable ``DEBUG``
+                          as the default log level. This does not override
                           any settings in the steering file but just changes
                           the defaults. If you want to force debug level please
-                          use ``-l DEBUG``
--n N, --events N          Override number of events to be processed, either when
+                          use ``-l DEBUG``.
+-n N, --events N          Override number of events to be processed for either when
                           reading files or when generating events.
---run RUNNUMBER           Override run for EventInfoSetter, must be used with
-                          -n and --experiment
---experiment EXPNUMBER    Override experiment for EventInfoSetter, must be used
-                          with -n and --run
+--run RUNNUMBER           Override run for ``EventInfoSetter``, must be used with
+                          ``-n`` and ``--experiment``.
+--experiment EXPNUMBER    Override experiment for ``EventInfoSetter``, must be used
+                          with ``-n`` and ``--run``.
 --skip-events SKIPNEVENTS
-                          Override skipNEvents for EventInfoSetter and
-                          RootInput. Skips this many events before starting.
+                          Override ``skipNEvents`` for ``EventInfoSetter`` and
+                          ``RootInput``. Skips this many events before starting.
 -i FILENAME, --input FILENAME
-                          Override name of input file for (Seq)RootInput. Can
-                          be specified multiple times to use more than one
-                          file. For RootInput, wildcards (as in ``*.root`` or
+                          Override name of input file for (``Seq``) ``RootInput``.
+                          Can be specified multiple times to use more than one
+                          file. For ``RootInput``, wildcards (as in ``*.root`` or
                           ``[1-3].root``) can be used, but need to be escaped with
                           ``\`` or by quoting the argument to avoid expansion by
                           the shell.
 -S ARG, --sequence ARG    Override the number sequence (e.g. ``23:42,101``)
                           defining the entries (starting from 0) which are
-                          processed by RootInput.Must be specified exactly once
-                          for each file to be opened.This means one sequence
+                          processed by ``RootInput``. Must be specified exactly once
+                          for each file to be opened. This means one sequence
                           per input file AFTER wildcard expansion. This are not
                           event numbers but the entry numbers in the input
                           files and the first entry always has number 0.
 -o FILENAME, --output FILENAME
-                          Override name of output file for (Seq)RootOutput. In
-                          case multiple modules are present in the path, only
-                          the first will be affected.
+                          Override name of output file for (``Seq``) ``RootOutput``
+                          or ``VariablesToNtuple``. In case multiple modules are
+                          present in the path, only the first will be affected.
 -p NWORKER, --processes NWORKER
                           Override number of worker processes (>=1 enables, 0
-                          disables parallel processing)
+                          disables parallel processing).
 
 .. rubric:: Advanced Options
 
 --module-io MODULENAME  Create diagram of inputs and outputs for a single
                         module, saved as ModuleName.dot. To create a
-                        PostScript file, use e.g. 'dot ModuleName.dot -Tps -o
-                        out.ps'.
---visualize-dataflow    Generate data flow diagram (dataflow.dot) for the
+                        PostScript file, use e.g. ``dot ModuleName.dot -Tps -o
+                        out.ps``.
+--visualize-dataflow    Generate data flow diagram (``dataflow.dot``) for the
                         executed steering file.
 --no-stats              Disable collection of statistics during event
                         processing. Useful for very high-rate applications,
-                        but produces empty table with 'print(statistics)'.
+                        but produces empty table with ``print(statistics)``.
 --dry-run               Read steering file, but do not start any event
                         processing when process(path) is called. Prints
                         information on input/output files that would be used
@@ -87,13 +100,23 @@ The main command line tool for the Belle2 Software is ``basf2``::
                         Do not read any provided steering file, instead
                         execute the pickled (serialized) path from the given
                         file.
+--job-information arg   Create json file with metadata of output files and
+                        ``basf2`` execution status.
+--realm arg             Set the realm of the ``basf2`` execution (``online`` or
+                        ``production``).
+--secondary-input arg   Override name of input file for the secondary
+                        ``RootInput`` module used for the event embedding. Can
+                        be specified multiple times to use more than one
+                        file. Wildcards (as in ``*.root`` or ``[1-3].root``)
+                        can be used, but need to be escaped with ``\`` or by
+                        quoting the argument to avoid expansion by the shell.
 --profile MODULENAME    Name of a module to profile using callgrind. If more
                         than one module of that name is registered only the
                         first one will be profiled.
 
 .. rubric:: Examples
 
-The most simple invocation is to just run basf2 with the name of a python
+The most simple invocation is to just run ``basf2`` with the name of a python
 steering file to execute::
 
     $ basf2 steeringfile.py
@@ -104,9 +127,10 @@ Additional arguments can be given to the steering file which will be available i
 
 To make sure that the arguments are actually passed to the steering file and
 not consumed by ``basf2`` one should use to dashes ``--`` to separate the
-arguments which should be passed to the steering file. This allows the steering
-file to handle options like ``-o`` which would otherwise be handled by basf2
-and not available in the steering file::
+arguments which should be passed to the steering file (useful if, for example,
+a custom argument parser is used). This allows the steering file to handle
+options like ``-o`` which would otherwise be handled by ``basf2`` and not
+available in the steering file::
 
     $ basf2 steeringfile.py -- argument1 -o argument3
 

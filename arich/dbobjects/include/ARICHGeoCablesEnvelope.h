@@ -12,7 +12,7 @@
 #include <string>
 
 //root
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -86,10 +86,10 @@ namespace Belle2 {
     double getEnvelopeThickness() const {return m_envelopeThickness;}
 
     /**
-     * Returns position vector (TVector3) of cables envelop
-     * @return position vector (TVector3) of cables envelop
+     * Returns position vector (ROOT::Math::XYZVector) of cables envelop
+     * @return position vector (ROOT::Math::XYZVector) of cables envelop
      */
-    TVector3 getEnvelopeCenterPosition() const {return TVector3(m_envelopeX0, m_envelopeY0, m_envelopeZ0);}
+    ROOT::Math::XYZVector getEnvelopeCenterPosition() const {return ROOT::Math::XYZVector(m_envelopeX0, m_envelopeY0, m_envelopeZ0);}
 
     /**
      * Print the content of the class

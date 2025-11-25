@@ -22,7 +22,7 @@ import sys
 # This example generates BBbar events using EvtGenInput module,
 # runs full simulation and digitization,
 # then adds measured BG to simulated data using BGOverlayExecutor module,
-# runs full reconstruction and finaly writes the results to mdst file.
+# runs full reconstruction and finally writes the results to mdst file.
 # ----------------------------------------------------------------------------------
 
 b2.set_log_level(b2.LogLevel.ERROR)

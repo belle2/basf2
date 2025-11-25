@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -23,7 +22,7 @@ class SVDChargeSharing(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(SVDChargeSharing, self).__init__()
+        super().__init__()
         #: Input file object.
         self.file = open('SVDChargeSharingData.txt', 'w')
 
@@ -56,7 +55,7 @@ class SVDChargeSharing(b2.Module):
 
             # Now let's store some data
             s = ''
-            # Sesnor identification
+            # Sensor identification
             sensorID = Belle2.VxdID(truehit.getRawSensorID())
             info = geoCache.get(sensorID)
             layer = sensorID.getLayerNumber()
@@ -67,14 +66,7 @@ class SVDChargeSharing(b2.Module):
                 continue
 
             sensorType = 'barrel' if layer > 3 else 'layer3'
-            s += '{sID} {layer} {ladder} {sensor} {indexT:4d} {indexC:4d} '.format(
-                sID=sensorType,
-                layer=layer,
-                ladder=ladder,
-                sensor=sensor,
-                indexT=truehit.getArrayIndex(),
-                indexC=cluster_index
-            )
+            s += f'{sensorType} {layer} {ladder} {sensor} {truehit.getArrayIndex():4d} {cluster_index:4d} '
             # TrueHit information
             truehit_u = truehit.getU()
             truehit_v = truehit.getV()
@@ -86,25 +78,13 @@ class SVDChargeSharing(b2.Module):
                                 info.getThickness())
             thetaV = math.atan2(truehit.getExitV() - truehit.getEntryV(),
                                 info.getThickness())
-            s += '{uTH:10.5f} {uTHeta:10.5f} {vTH:10.5f} {vTHeta:10.5f} {eTH:10.7f} '.format(
-                uTH=truehit_u, uTHeta=truehit_eta_u,
-                vTH=truehit_v, vTHeta=truehit_eta_v,
-                eTH=1.0e6 * truehit.getEnergyDep()
-            ) + '{thetaU:6.3f} {thetaV:6.3f} '.format(
-                thetaU=thetaU, thetaV=thetaV
-            )
+            s += f'{truehit_u:10.5f} {truehit_eta_u:10.5f} {truehit_v:10.5f} {truehit_eta_v:10.5f} ' + \
+                f'{1.0e6 * truehit.getEnergyDep():10.7f} {thetaU:6.3f} {thetaV:6.3f} '
             # Cluster information
             cluster_pitch = (pitch_u if cluster.isUCluster() else pitch_v)
             cluster_eta = (cluster.getPosition() / cluster_pitch) % 1
-            s += '{isU} {uvC:10.5f} {uvCeta:10.5f} {eC:10.1f} '.format(
-                isU=cluster.isUCluster(),
-                uvC=cluster.getPosition(),
-                uvCeta=cluster_eta,
-                eC=cluster.getCharge()
-            ) + '{eSeed:10.1f} {size:5d}'.format(
-                eSeed=cluster.getSeedCharge(),
-                size=cluster.getSize())
-
+            s += f'{cluster.isUCluster()} {cluster.getPosition():10.5f} {cluster_eta:10.5f} {cluster.getCharge():10.1f} ' + \
+                f'{cluster.getSeedCharge():10.1f} {cluster.getSize():5d}'
             s += '\n'
             self.file.write(s)
 

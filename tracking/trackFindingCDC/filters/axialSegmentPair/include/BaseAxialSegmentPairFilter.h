@@ -16,7 +16,7 @@ namespace Belle2 {
     // Guard to prevent repeated instantiations
     extern template class Filter<CDCAxialSegmentPair>;
 
-    /// Base class for filter for the constuction of axial to axial segment pairs.
+    /// Base class for filter for the construction of axial to axial segment pairs.
     using BaseAxialSegmentPairFilter = Filter<CDCAxialSegmentPair>;
   }
 }

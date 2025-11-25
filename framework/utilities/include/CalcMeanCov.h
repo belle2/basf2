@@ -108,7 +108,7 @@ namespace Belle2 {
     }
 
     /** @name Getters
-     * No range check if performed on indicies i and j
+     * No range check if performed on indices i and j
      */
     /**@{*/
 
@@ -129,7 +129,7 @@ namespace Belle2 {
       if (m_entries == 0.0) return 0.0;
       return getCovariance(i, j) / (getStddev(i) * getStddev(j));
     }
-    /** Return the variance for paramter i */
+    /** Return the variance for parameter i */
     value_type getVariance(int i) const { return getCovariance(i, i); }
     /** Return the standard deviation for parameter i */
     value_type getStddev(int i) const { return std::sqrt(getVariance(i)); }
@@ -165,7 +165,7 @@ namespace Belle2 {
       if (m_entries == 0.0) return 0.0;
       return getCovariance<i, j>() / (getStddev<i>() * getStddev<j>());
     }
-    /** Return the variance for paramter i */
+    /** Return the variance for parameter i */
     template <int i = 0> value_type getVariance() const
     {
       return getCovariance<i, i>();
@@ -251,7 +251,7 @@ namespace Belle2 {
     /** Access element in triangular matrix including diagonal elements.
      * This function returns the storage index of an element (i,j) in a
      * symmetric matrix including diagonal elements if the elements are
-     * stored in a continous array of size n(n+1)/2
+     * stored in a continuous array of size n(n+1)/2
      */
     constexpr int getIndex(unsigned int i, unsigned int j) const
     {
@@ -264,7 +264,7 @@ namespace Belle2 {
     /** Store the mean values for all parameters */
     value_type m_mean[N];
     /** Store the triangular covariance matrix for all parameters in
-     * continous memory. Actual covariance is m_covariance[getIndex(i,j)]/m_entries */
+     * continuous memory. Actual covariance is m_covariance[getIndex(i,j)]/m_entries */
     value_type m_covariance[N * (N + 1) / 2];
   };
 

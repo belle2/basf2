@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -20,9 +19,9 @@ from reconstruction import add_reconstruction
 # bg = /group/belle2/BGFile/OfficialBKG/15thCampaign/phase3/set*/*.root
 bg = None
 
-# number of events to generate, can be overriden with -n
+# number of events to generate, can be overridden with -n
 num_events = 100
-# output filename, can be overriden with -o
+# output filename, can be overridden with -o
 output_filename = "RootOutput_Phase2.root"
 
 # create path

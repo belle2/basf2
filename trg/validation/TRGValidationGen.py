@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,24 +12,26 @@
 <header>
 <output>TRGValidationGen.root</output>
 <contact>Yun-Tsung Lai, ytlai@post.kek.jp</contact>
-<description>This steering file generates 1000 e+/e- mu+/mu- particle guns to validate the trg package.</description>
+<description>This steering file generates 5000 e+/e- mu+/mu- particle guns to validate the trg package.</description>
 </header>
 """
 
 import basf2 as b2
 from simulation import add_simulation
+import reconstruction as re
+import mdst
 
 
 main = b2.create_path()
 eventinfosetter = b2.register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [5000], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [11, -11, 13, -13])
 particlegun.param('nTracks', 1)
 particlegun.param('momentumGeneration', 'uniformPt')
-particlegun.param('momentumParams', [0.2, 5.0])
+particlegun.param('momentumParams', [0.5, 3.0])
 particlegun.param('thetaParams', [35, 127])
 particlegun.param('phiGeneration', 'uniform')
 particlegun.param('phiParams', [0, 360])
@@ -44,12 +45,15 @@ main.add_module(particlegun)
 # trigger simulation is included in latest basf2
 add_simulation(main)
 
+
+re.add_reconstruction(main)
+
 # output
-rootoutput = b2.register_module('RootOutput')
-rootoutput.param('outputFileName', "../TRGValidationGen.root")
-main.add_module(
-    rootoutput,
-    branchNames=[
+mdst.add_mdst_output(
+    path=main,
+    mc=True,
+    filename='../TRGValidationGen.root',
+    additionalBranches=[
         "TRGKLMHits",
         "TRGKLMTracks",
         "KLMTrgSummary",
@@ -58,7 +62,8 @@ main.add_module(
         "TRGCDCNeuroTracks",
         "TRGECLClusters",
         "TRGSummary",
-        "MCParticles"])
+        "MCInitialParticles"])
+
 
 main.add_module('Progress')
 # main

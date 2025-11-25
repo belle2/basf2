@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -11,7 +10,7 @@
 
 ##############################################################################
 #
-# This is an example steering file to run the SVD Unpacke.
+# This is an example steering file to run the SVD Unpacker.
 # It decodes a RawSVD object (from COPPER) and produce a list of SVDDigit
 # according to the xml map of the sensors (currently missing)
 #

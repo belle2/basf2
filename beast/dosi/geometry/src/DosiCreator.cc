@@ -14,9 +14,6 @@
 #include <framework/gearbox/GearDir.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -29,7 +26,6 @@
 #include <G4VisAttributes.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -68,7 +64,7 @@ namespace Belle2 {
       coppercolor->SetForceAuxEdgeVisible(true);
 
       //Lets loop over all the Active nodes
-      BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+      for (const GearDir& activeParams : content.getNodes("Active")) {
         G4double dx_dosi = activeParams.getLength("dx_dosi") / 2.*CLHEP::cm;
         G4double dy_dosi = activeParams.getLength("dy_dosi") / 2.*CLHEP::cm;
         G4double dz_dosi = activeParams.getLength("dz_dosi") / 2.*CLHEP::cm;

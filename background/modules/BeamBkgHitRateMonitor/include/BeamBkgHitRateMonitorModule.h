@@ -108,6 +108,7 @@ namespace Belle2 {
     bool m_cdcEnableBadWireTreatment;       /**< CDC: flag to enable the bad wire treatment */
     bool m_cdcEnableBackgroundHitFilter;    /**< CDC: flag to enable the CDC background hit (crosstakl, noise) filter */
     bool m_cdcEnableMarkBackgroundHit;      /**< CDC: flag to enable to mark background flag on CDCHit (set 0x100 bit for CDCHit::m_status). default: false */
+    std::vector<std::string> m_detectors; /**< detectors to be included in the output tree */
 
     // collections
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< event meta data object */

@@ -129,7 +129,7 @@ void BKLMAnaModule::initialize()
   float mommax = 15;
   int mNbin = 30;
 
-  m_hdistance = new TH1F("m_hdistance", " distance between mathced extHit and bklmHit2d ", 100, 0, 30);
+  m_hdistance = new TH1F("m_hdistance", " distance between matched extHit and bklmHit2d ", 100, 0, 30);
 
   m_totalMom = new TH1F("m_totalMom", " denominator vs. p",  mNbin, mommin, mommax);
   m_passMom = new TH1F("m_passMom", " numerator vs. p",  mNbin, mommin, mommax);

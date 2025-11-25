@@ -81,7 +81,7 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
   int startToMiddleInTrackDistance =  middleInTrackId - startInTrackId;
   int middleToEndInTrackDistance =  endInTrackId - middleInTrackId;
 
-  // Now check the alignement in track
+  // Now check the alignment in track
   bool distanceInTrackIsSufficientlyLow =
     0 < startToMiddleInTrackDistance and startToMiddleInTrackDistance <= maxInTrackHitIdDifference and
     0 < middleToEndInTrackDistance and middleToEndInTrackDistance <= maxInTrackHitIdDifference;

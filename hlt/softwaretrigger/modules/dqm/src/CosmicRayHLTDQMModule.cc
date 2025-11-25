@@ -43,7 +43,7 @@ CosmicRayHLTDQMModule::CosmicRayHLTDQMModule() : HistoModule()
 {
   //Set module properties
 
-  setDescription("Monitor recontruction of cosmic ray on HLT");
+  setDescription("Monitor reconstruction of cosmic ray on HLT");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("histogramDirectoryName", m_param_histogramDirectoryName,

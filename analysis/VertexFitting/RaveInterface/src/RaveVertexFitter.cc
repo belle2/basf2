@@ -61,9 +61,9 @@ rave::Track RaveVertexFitter::TrackFitResultToRaveTrack(const TrackFitResult* co
 {
   const int id = m_raveTracks.size();
 
-  B2Vector3D pos = aTrackPtr->getPosition();
-  B2Vector3D mom = aTrackPtr->getMomentum();
-  TMatrixF cov(aTrackPtr->getCovariance6());
+  ROOT::Math::XYZVector pos = aTrackPtr->getPosition();
+  ROOT::Math::XYZVector mom = aTrackPtr->getMomentum();
+  TMatrixDSym cov(aTrackPtr->getCovariance6());
 
 
   // state
@@ -138,7 +138,7 @@ int RaveVertexFitter::fit(string options)
   int nOfVertices = -100;
 
   if (m_useBeamSpot == true) {
-    const B2Vector3D& bsPos = RaveSetup::getRawInstance()->m_beamSpot;
+    const ROOT::Math::XYZVector& bsPos = RaveSetup::getRawInstance()->m_beamSpot;
     const TMatrixDSym& bsCov = RaveSetup::getRawInstance()->m_beamSpotCov;
     const rave::Covariance3D bsCovRave(bsCov(0, 0), bsCov(0, 1), bsCov(0, 2), bsCov(1, 1), bsCov(1, 2), bsCov(2, 2));
     RaveSetup::getRawInstance()->m_raveVertexFactory->setBeamSpot(rave::Ellipsoid3D(rave::Point3D(bsPos.X(), bsPos.Y(), bsPos.Z()),
@@ -166,12 +166,12 @@ void RaveVertexFitter::isVertexIdValid(const VecSize vertexId) const
 
 }
 
-B2Vector3D RaveVertexFitter::getPos(VecSize vertexId) const
+ROOT::Math::XYZVector RaveVertexFitter::getPos(VecSize vertexId) const
 {
   isVertexIdValid(vertexId);
 
-  return B2Vector3D(m_raveVertices[vertexId].position().x(), m_raveVertices[vertexId].position().y(),
-                    m_raveVertices[vertexId].position().z());
+  return ROOT::Math::XYZVector(m_raveVertices[vertexId].position().x(), m_raveVertices[vertexId].position().y(),
+                               m_raveVertices[vertexId].position().z());
 
 }
 

@@ -357,7 +357,7 @@ static void getDetailDxDy(HepGeom::Point3D<double>* points, int nPoints,
     /*
      * Check whether intersection occurs between the translated points
      * (x1 + kx * t, y1 + ky * t) and (x2 + kx * t, y2 + ky * t).
-     * (find solition of the orginal equation relatively to u for that).
+     * (find solition of the original equation relatively to u for that).
      */
     u = -((x2 - x1) * (x1 + kx * t) + (y2 - y1) * (y2 + ky * t)) / b;
     if (u < 0 || u > 1)

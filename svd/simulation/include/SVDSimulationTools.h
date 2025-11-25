@@ -44,7 +44,7 @@ namespace Belle2 {
 
     /** WaveformShape type.
      * This is the type for a naked waveform function, giving a single value for a
-     * properly scaled arguemnt.
+     * properly scaled argument.
      * The functions are scaled to 1.0 at mode, location (shift) 0.0, and scale 1.0.
      */
     typedef std::function<double(double)> WaveformShape;
@@ -177,7 +177,7 @@ namespace Belle2 {
     template<typename T>
     inline void zeroSuppress(T& a, double thr)
     {
-      std::replace_if(a.begin(), a.end(), std::bind2nd(std::less<double>(), thr), 0.0);
+      std::replace_if(a.begin(), a.end(), std::bind(std::less<double>(), std::placeholders::_1, thr), 0.0);
     }
 
 // ==============================================================================

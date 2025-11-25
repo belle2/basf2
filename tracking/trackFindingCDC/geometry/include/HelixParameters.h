@@ -77,7 +77,7 @@ namespace Belle2 {
       /// Matrix type for the ambiguity to the perigee parameters, e.g. under the stereo projection.
       using PerigeeAmbiguity = TrackFindingCDC::JacobianMatrix<3, 5>;
 
-      /// Initialse a default covariance matrix to zero.
+      /// Initialise a default covariance matrix to zero.
       static PerigeeAmbiguity defaultPerigeeAmbiguity();
 
       /**

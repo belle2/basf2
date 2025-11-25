@@ -48,10 +48,7 @@ class PickleHarvestingModule(HarvestingModule):
                 pass
 
         else:
-            msg = "Unrecognised crop {} of type {}".format(
-                crop,
-                type(crop)
-            )
+            msg = f"Unrecognised crop {crop} of type {type(crop)}"
             raise ValueError(msg)
 
         #: The gathered crops until now

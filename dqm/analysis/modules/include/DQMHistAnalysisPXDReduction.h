@@ -62,15 +62,17 @@ namespace Belle2 {
     //! name of histogram directory
     std::string m_histogramDirectoryName;
     //! low warn limit for alarm
-    double m_lowarnlimit{NAN};
+    double m_meanLowerWarn{NAN};
     //! low error limit for alarm
-    double m_loerrorlimit{NAN};
+    double m_meanLowerAlarm{NAN};
     //! high warn limit for alarm
-    double m_hiwarnlimit{NAN};
+    double m_meanUpperWarn{NAN};
     //! high error limit for alarm
-    double m_hierrorlimit{NAN};
-    /** Update entry intervall */
+    double m_meanUpperAlarm{NAN};
+    /** Update entry interval */
     int m_minEntries = 1000;
+    /** Indizes of excluded PXD Modules */
+    std::vector<int> m_excluded;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -81,7 +83,15 @@ namespace Belle2 {
     TCanvas* m_cReduction = nullptr;
 
     //! Line in the Canvas to guide the eye
-    TLine* m_line1 = nullptr;
+    TLine* m_meanLine = nullptr;
+    //! Line in the Canvas to indicate limits
+    TLine* m_meanLowerWarnLine = nullptr;
+    //! Line in the Canvas to indicate limits
+    TLine* m_meanUpperWarnLine = nullptr;
+    //! Line in the Canvas to indicate limits
+    TLine* m_meanLowerAlarmLine = nullptr;
+    //! Line in the Canvas to indicate limits
+    TLine* m_meanUpperAlarmLine = nullptr;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

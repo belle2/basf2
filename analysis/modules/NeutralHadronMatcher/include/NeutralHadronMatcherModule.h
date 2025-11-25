@@ -9,10 +9,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
+
 namespace Belle2 {
   /**
    *  Module to geometrically match neutral hadrons (KL, neutrons) to ECL clusters
@@ -34,7 +31,7 @@ namespace Belle2 {
     double m_effcorr;
     /** 3d matching parameter */
     double m_distance;
-    /** ingore clusters that are matched with the following PDG codes */
+    /** ignore clusters that are matched with the following PDG codes */
     std::vector<int> m_PDGignore;
     /** extra info variable for distance */
     std::string m_infoName;

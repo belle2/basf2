@@ -27,7 +27,7 @@ namespace Belle2 {
      *  if the track enters at the edge of a drift cell. The biggest effect observed in the CDC simulation
      *  was observed when the track is along the 2, 4, 8 and 10 o'clock direction since in this case
      *  *two* neighboring hits can be lost due to this time cut off.
-     *  In an attempt to detect if this occured the primary wire hit neighborhood
+     *  In an attempt to detect if this occurred the primary wire hit neighborhood
      *  is slightly extended to bridge to the secondary neighborhood in the critical directions.
      *
      *  The criterion can be lowered such that fewer missing hits trigger the inclusion of the
@@ -54,7 +54,7 @@ namespace Belle2 {
 
       /**
        *  Returns a vector containing the neighboring wire hits of the given wire hit out of the
-       *  sorted range given by the two iterator other argumets.
+       *  sorted range given by the two iterator other arguments.
        */
       std::vector<CDCWireHit*> getPossibleTos(CDCWireHit* from,
                                               const std::vector<CDCWireHit*>& wireHits) const final;

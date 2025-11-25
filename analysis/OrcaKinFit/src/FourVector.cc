@@ -28,8 +28,6 @@
 namespace Belle2 {
   namespace OrcaKinFit {
 
-    static TRandom* rnd = 0;
-
     FourVector& FourVector::boost(const FourVector& P)
     {
       // See CERNLIB U101 for a description
@@ -58,9 +56,7 @@ namespace Belle2 {
       double m2 = d2.getM();
 
       double randoms[2];
-      if (rnd == 0) rnd = new TRandom3();
-      rnd->RndmArray(2, randoms);
-
+      gRandom->RndmArray(2, randoms);
 
       assert(m1 + m2 <= M);
 

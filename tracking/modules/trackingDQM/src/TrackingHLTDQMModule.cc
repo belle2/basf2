@@ -129,33 +129,33 @@ void TrackingHLTDQMModule::DefineAbortFlagsHistograms()
 {
   // only monitor if any flag was set so only 2 bins needed
   const char* flagTitle =
-    "Tracking error summary. Mean = errors/event (should be 0 or very close to 0); Error occured yes or no; Number of events";
+    "Tracking error summary. Mean = errors/event (should be 0 or very close to 0); Error occurred yes or no; Number of events";
 
   m_trackingErrorFlags = Create("NumberTrackingErrorFlags", flagTitle, 2, -0.5, 1.5, "", "");
 
   m_trackingErrorFlags->GetXaxis()->SetBinLabel(1, "No Error");
-  m_trackingErrorFlags->GetXaxis()->SetBinLabel(2, "Error occured");
+  m_trackingErrorFlags->GetXaxis()->SetBinLabel(2, "Error occurred");
 
   //tracking abort VS time after HER/LER injection and time within a beam cycle
   m_abortVStimeHER = new TH2F(
     "TrkAbortVsTimeHER",
-    "Tracking Abort vs HER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
+    "Number of Events with Tracking Aborts vs HER injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
     100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
   m_abortVStimeLER = new TH2F(
     "TrkAbortVsTimeLER",
-    "Tracking Abort vs LER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
+    "Number of Events with Tracking Aborts vs LER injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
     100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
   //tracking all VS time after HER/LER injection and time within a beam cycle
   m_allVStimeHER = new TH2F(
     "allEvtsVsTimeHER",
-    "Number Of Events vs HER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
+    "Number Of Events vs HER injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
     100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
   m_allVStimeLER = new TH2F(
     "allEvtsVsTimeLER",
-    "Number of Events vs LER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
+    "Number of Events vs LER injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
     100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
 }

@@ -39,9 +39,9 @@ namespace Belle2 {
     void close();
     /// Get the list of all created files
     const std::vector<std::string>& getFiles() const { return m_files; }
-    /// Copy by assignment (if some file on LHS is opened, it is closed during this operation; file pointers not transfered - new file to be opened)
+    /// Copy by assignment (if some file on LHS is opened, it is closed during this operation; file pointers not transferred - new file to be opened)
     MilleData& operator=(const MilleData& other);
-    /// Construct from other object (pointer to binary file is not transfered - new file has to be opened by new object)
+    /// Construct from other object (pointer to binary file is not transferred - new file has to be opened by new object)
     MilleData(const MilleData& other) : MergeableNamed(other), m_doublePrecision(other.m_doublePrecision),
       m_absFilePaths(other.m_absFilePaths), m_files(other.m_files),
       m_binary(nullptr),
@@ -66,7 +66,7 @@ namespace Belle2 {
     bool m_doublePrecision{false};
     /// Use absolute file paths to binary files
     /// Default is False - so you have to move the binaries to working dir of the algorithm
-    /// If True, the original location of binaries is remebered in datastore and Millepede will
+    /// If True, the original location of binaries is remembered in datastore and Millepede will
     /// take them from there
     bool m_absFilePaths{false};
     std::vector<std::string> m_files{}; /**< List of already created file names */

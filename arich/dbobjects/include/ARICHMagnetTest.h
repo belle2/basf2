@@ -49,13 +49,13 @@ namespace Belle2 {
 
     /**
      * Add a dead time fraction
-     * @param dead time fraction
+     * @param deadtime dead time fraction
      */
     void appendDeadTime(float deadtime) {m_deadTime.push_back(deadtime); }
 
     /**
      * Set results of all measurements
-     * @param fraction of dead time
+     * @param deadTime fraction of dead time
      */
     void setDeadTime(const std::vector<float>& deadTime) {m_deadTime = deadTime;}
 
@@ -73,7 +73,7 @@ namespace Belle2 {
 
     /**
      * Set result of 10V lower voltage at chip A
-     * @param fraction of dead time
+     * @param dead_lowerA fraction of dead time
      */
     void setDeadTimeLowerA(float dead_lowerA) {m_dead_lowerA = dead_lowerA;}
 
@@ -85,7 +85,7 @@ namespace Belle2 {
 
     /**
      * Set result of 10V lower voltage at chip B
-     * @param fraction of dead time
+     * @param dead_lowerB fraction of dead time
      */
     void setDeadTimeLowerB(float dead_lowerB) {m_dead_lowerB = dead_lowerB;}
 
@@ -97,7 +97,7 @@ namespace Belle2 {
 
     /**
      * Set result of 10V lower voltage at chip C
-     * @param fraction of dead time
+     * @param dead_lowerC fraction of dead time
      */
     void setDeadTimeLowerC(float dead_lowerC) {m_dead_lowerC = dead_lowerC;}
 
@@ -109,7 +109,7 @@ namespace Belle2 {
 
     /**
      * Set result of 10V lower voltage at chip D
-     * @param fraction of dead time
+     * @param dead_lowerD fraction of dead time
      */
     void setDeadTimeLowerD(float dead_lowerD) {m_dead_lowerD = dead_lowerD;}
 

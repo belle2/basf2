@@ -15,7 +15,7 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    /// A filter that accepts every <sloppinessFactor>th candidate on average (random selection)
+    /// A filter that accepts every "sloppinessFactor"th candidate on average (random selection)
     template<class AFilter>
     class Sloppy : public AFilter {
 

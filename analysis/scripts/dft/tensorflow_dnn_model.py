@@ -225,7 +225,7 @@ class DefaultModel(tf.Module):
         :param lr_dec_rate: learning rate decay factor
         :param stop_epochs: number of epochs without improvement required for early termination
         :param min_epochs: minimum number of epochs for training
-        :param max_epochs: maximum number of epochs for traning
+        :param max_epochs: maximum number of epochs for training
         :param wd_coeffs: weight decay coefficients. If not None must have one per mlp layer.
         :param change_optimizer:
         :param staircaise:
@@ -278,7 +278,7 @@ class DefaultModel(tf.Module):
         #: define multiple optimizers
         self.optimizers = []
         # list with epochs in which optimizers will be changed, if None is given, only the default optimizer will be
-        #: used opimizers
+        #: used optimizers
         self.optimizer_change_epochs = change_optimizer
         if change_optimizer is not None:
             self.optimizer_change_epochs.insert(0, 0)
@@ -315,7 +315,7 @@ class DefaultModel(tf.Module):
 
     def initialize(self, data_set):
         """
-        Finalises intitialization based of data_set specific information (number of batches per epoch)
+        Finalises initialization based of data_set specific information (number of batches per epoch)
         """
         if self.is_initialized:
             raise RuntimeError

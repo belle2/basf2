@@ -67,7 +67,7 @@ example:
 calibration validation utils
 ----------------------------
 
-pleas check ``svd/scripts/svd/validation_utils.py``
+please check ``svd/scripts/svd/validation_utils.py``
 
 background overlay utils
 ------------------------

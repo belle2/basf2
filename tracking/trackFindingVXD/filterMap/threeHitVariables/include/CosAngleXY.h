@@ -33,8 +33,8 @@ namespace Belle2 {
     static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
 
-      B2Vector3<double> outerVector(outerHit.X() - centerHit.X(), outerHit.Y() - centerHit.Y(), 0.);
-      B2Vector3<double> innerVector(centerHit.X() - innerHit.X(), centerHit.Y() - innerHit.Y(), 0.);
+      B2Vector3D outerVector(outerHit.X() - centerHit.X(), outerHit.Y() - centerHit.Y(), 0.);
+      B2Vector3D innerVector(centerHit.X() - innerHit.X(), centerHit.Y() - innerHit.Y(), 0.);
 
       double result = (outerVector.X() * innerVector.X() + outerVector.Y() * innerVector.Y()) / (outerVector.Perp() *
                       innerVector.Perp());

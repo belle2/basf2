@@ -13,13 +13,11 @@
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/Conversion.h>
 
 #include <TMatrixFSym.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
 
@@ -58,11 +56,13 @@ namespace Belle2 {
       return mcparticle->getDecayVertex().Rho();
     }
 
-    B2Vector3D getMcDecayVertexFromIP(const MCParticle* mcparticle)
+    ROOT::Math::XYZVector getMcDecayVertexFromIP(const MCParticle* mcparticle)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return ROOT::Math::XYZVector{Const::doubleNaN, Const::doubleNaN, Const::doubleNaN};
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(mcparticle->getDecayVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition());
     }
 
     double mcDecayVertexFromIPX(const Particle* part)
@@ -90,14 +90,14 @@ namespace Belle2 {
     {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
-      return getMcDecayVertexFromIP(mcparticle).Perp();
+      return getMcDecayVertexFromIP(mcparticle).Rho();
     }
 
     double mcDecayVertexFromIPDistance(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
-      return getMcDecayVertexFromIP(mcparticle).Mag();
+      return getMcDecayVertexFromIP(mcparticle).R();
     }
 
     double mcProductionVertexX(const Particle* part)
@@ -121,11 +121,13 @@ namespace Belle2 {
       return mcparticle->getProductionVertex().Z();
     }
 
-    B2Vector3D getMcProductionVertexFromIP(const MCParticle* mcparticle)
+    ROOT::Math::XYZVector getMcProductionVertexFromIP(const MCParticle* mcparticle)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return ROOT::Math::XYZVector{Const::doubleNaN, Const::doubleNaN, Const::doubleNaN};
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(mcparticle->getProductionVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      return frame.getVertex(mcparticle->getProductionVertex() - beamSpotDB->getIPPosition());
     }
 
     double mcProductionVertexFromIPX(const Particle* part)
@@ -149,7 +151,7 @@ namespace Belle2 {
       return getMcProductionVertexFromIP(mcparticle).Z();
     }
 
-    // vertex or POCA in respect to origin ------------------------------
+    // vertex or POCA with respect to origin ------------------------------
 
     double particleX(const Particle* part)
     {
@@ -197,18 +199,21 @@ namespace Belle2 {
     }
 
     //----------------------------------------------------------------------------------
-    // vertex or POCA in respect to measured IP
+    // vertex or POCA with respect to measured IP
 
-    B2Vector3D getVertexD(const Particle* part)
+    ROOT::Math::XYZVector getVertexD(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return ROOT::Math::XYZVector{Const::doubleNaN, Const::doubleNaN, Const::doubleNaN};
+
       const auto& frame = ReferenceFrame::GetCurrent();
       auto trackFit = part->getTrackFitResult();
       if (!trackFit)
-        return frame.getVertex(part->getVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition());
 
       UncertainHelix helix = trackFit->getUncertainHelix();
-      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      helix.passiveMoveBy(beamSpotDB->getIPPosition());
       return frame.getVertex(helix.getPerigee());
     }
 
@@ -230,7 +235,7 @@ namespace Belle2 {
 
     double particleDRho(const Particle* part)
     {
-      return getVertexD(part).Perp();
+      return getVertexD(part).Rho();
     }
 
     double particleDPhi(const Particle* part)
@@ -240,12 +245,12 @@ namespace Belle2 {
 
     double particleDCosTheta(const Particle* part)
     {
-      return getVertexD(part).CosTheta();
+      return std::cos(getVertexD(part).Theta());
     }
 
     double particleDistance(const Particle* part)
     {
-      return getVertexD(part).Mag();
+      return getVertexD(part).R();
     }
 
     double particleDistanceSignificance(const Particle* part)
@@ -257,11 +262,17 @@ namespace Belle2 {
       // r &= \sqrt{\vec{x}*\vec{x}}
       // and V_{ij} is the covariance matrix
       static DBObjPtr<BeamSpot> beamSpotDB;
+      if (!beamSpotDB.isValid())
+        return Const::doubleNaN;
       const auto& frame = ReferenceFrame::GetCurrent();
-      const B2Vector3D& vertex = frame.getVertex(part->getVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      const ROOT::Math::XYZVector& vertex = frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition());
       const TMatrixFSym& vertexErr = frame.getVertexErrorMatrix(static_cast<TMatrixDSym>(part->getVertexErrorMatrix()) +
                                                                 beamSpotDB->getCovVertex());
-      const double denominator = vertex * B2Vector3D(vertexErr * vertex);
+      ROOT::Math::XYZVector mv;
+      mv.SetX(vertexErr(0, 0) * vertex.X() + vertexErr(0, 1) * vertex.Y() + vertexErr(0, 2) * vertex.Z());
+      mv.SetY(vertexErr(1, 0) * vertex.X() + vertexErr(1, 1) * vertex.Y() + vertexErr(1, 2) * vertex.Z());
+      mv.SetZ(vertexErr(2, 0) * vertex.X() + vertexErr(2, 1) * vertex.Y() + vertexErr(2, 2) * vertex.Z());
+      const double denominator = vertex.Dot(mv);;
       if (denominator <= 0) return Const::doubleNaN;
 
       return vertex.Mag2() / std::sqrt(denominator);
@@ -271,20 +282,23 @@ namespace Belle2 {
 
     double particleProductionX(const Particle* part)
     {
-      if (!part->hasExtraInfo("prodVertX")) return Const::doubleNaN;
-      return part->getExtraInfo("prodVertX");
+      if (part->hasExtraInfo("prodVertX")) return part->getExtraInfo("prodVertX");
+      else if (part->hasExtraInfo("prodVertexX")) return part->getExtraInfo("prodVertexX");
+      else return Const::doubleNaN;
     }
 
     double particleProductionY(const Particle* part)
     {
-      if (!part->hasExtraInfo("prodVertY")) return Const::doubleNaN;
-      return part->getExtraInfo("prodVertY");
+      if (part->hasExtraInfo("prodVertY")) return part->getExtraInfo("prodVertY");
+      else if (part->hasExtraInfo("prodVertexY")) return part->getExtraInfo("prodVertexY");
+      else return Const::doubleNaN;
     }
 
     double particleProductionZ(const Particle* part)
     {
-      if (!part->hasExtraInfo("prodVertZ")) return Const::doubleNaN;
-      return part->getExtraInfo("prodVertZ");
+      if (part->hasExtraInfo("prodVertZ")) return part->getExtraInfo("prodVertZ");
+      else if (part->hasExtraInfo("prodVertexZ")) return part->getExtraInfo("prodVertexZ");
+      else return Const::doubleNaN;
     }
 
     // Production vertex covariance matrix
@@ -386,9 +400,9 @@ If the particle is created from a KLM cluster, the distance is calculated betwee
 
     REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance,
                       "significance of distance from vertex or POCA to interaction point(-1 in case of numerical problems)");
-    REGISTER_VARIABLE("dx", particleDX, "vertex or POCA in case of tracks x in respect to IP\n\n", "cm");
-    REGISTER_VARIABLE("dy", particleDY, "vertex or POCA in case of tracks y in respect to IP\n\n", "cm");
-    REGISTER_VARIABLE("dz", particleDZ, "vertex or POCA in case of tracks z in respect to IP\n\n", "cm");
+    REGISTER_VARIABLE("dx", particleDX, "vertex or POCA in case of tracks x with respect to IP\n\n", "cm");
+    REGISTER_VARIABLE("dy", particleDY, "vertex or POCA in case of tracks y with respect to IP\n\n", "cm");
+    REGISTER_VARIABLE("dz", particleDZ, "vertex or POCA in case of tracks z with respect to IP\n\n", "cm");
     REGISTER_VARIABLE("x", particleX,
                       "x coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track\n\n", "cm");
     REGISTER_VARIABLE("y", particleY,
@@ -398,10 +412,10 @@ If the particle is created from a KLM cluster, the distance is calculated betwee
     REGISTER_VARIABLE("x_uncertainty", particleDXUncertainty, "uncertainty on x (measured with respect to the origin)\n\n", "cm");
     REGISTER_VARIABLE("y_uncertainty", particleDYUncertainty, "uncertainty on y (measured with respect to the origin)\n\n", "cm");
     REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z (measured with respect to the origin)\n\n", "cm");
-    REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP for a vertex; track d0 relative to IP for a track.\n\n",
+    REGISTER_VARIABLE("dr", particleDRho, "transverse distance with respect to IP for a vertex; track abs(d0) relative to IP for a track.\n\n",
                       "cm");
-    REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle of the vertex or POCA in degrees in respect to IP\n\n", "rad");
-    REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex or POCA polar angle in respect to IP");
+    REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle of the vertex or POCA in degrees with respect to IP\n\n", "rad");
+    REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex or POCA polar angle with respect to IP");
     // Production vertex position
     REGISTER_VARIABLE("prodVertexX", particleProductionX,
                       "Returns the x position of particle production vertex. Returns NaN if particle has no production vertex.\n\n", "cm");

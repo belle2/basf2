@@ -12,13 +12,11 @@
 /* ECL headers. */
 #include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
-#include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -28,12 +26,8 @@
 /* ROOT headers. */
 #include <TF1.h>
 #include <TFile.h>
-#include <TGaxis.h>
 #include <TGraphAsymmErrors.h>
-#include <TGraphErrors.h>
 #include <TH2F.h>
-#include <TLegend.h>
-#include <TMultiGraph.h>
 #include <TROOT.h>
 #include <TString.h>
 
@@ -107,6 +101,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   auto clusterTimeClusterE = getObjectPtr<TH2F>("clusterTimeClusterE");
   auto dt99_clusterE = getObjectPtr<TH2F>("dt99_clusterE");
   auto eventT0 = getObjectPtr<TH1F>("eventT0");
+  auto eventT0Detector = getObjectPtr<TH1F>("eventT0Detector");
   auto clusterTimeE0E1diff = getObjectPtr<TH1F>("clusterTimeE0E1diff");
 
   // Collect other plots just for reference - combines all the runs for these plots.
@@ -258,6 +253,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   clusterTimeClusterE ->Write();
   dt99_clusterE       ->Write();
   eventT0             ->Write();
+  eventT0Detector             ->Write();
   clusterTimeE0E1diff ->Write();
 
   cutflow->Write();

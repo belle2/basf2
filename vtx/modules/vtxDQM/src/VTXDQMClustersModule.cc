@@ -149,7 +149,7 @@ void VTXDQMClustersModule::defineHisto()
     int iLadder = id.getLadderNumber();
     int iSensor = id.getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
-    VTX::SensorInfo SensorInfo = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::get(sensorID));
+    VTX::SensorInfo SensorInfo = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     //----------------------------------------------------------------
     // Number of fired pixels per frame
@@ -391,7 +391,7 @@ void VTXDQMClustersModule::event()
     int iSensor = digit2.getSensorID().getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getVTXSensorIndex(sensorID);
-    VTX::SensorInfo SensorInfo = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::get(sensorID));
+    VTX::SensorInfo SensorInfo = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     Pixels[index]++;
     if (m_pixelSignal[index] != nullptr) m_pixelSignal[index]->Fill(digit2.getCharge());
     if (digit2.getCharge() < m_CutVTXCharge) continue;
@@ -414,7 +414,7 @@ void VTXDQMClustersModule::event()
     int iSensor = cluster.getSensorID().getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getVTXSensorIndex(sensorID);
-    VTX::SensorInfo SensorInfo = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::get(sensorID));
+    VTX::SensorInfo SensorInfo = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     counts[index]++;
     if (m_hitMapClCounts != nullptr) m_hitMapClCounts->Fill(index);
     if (m_clusterCharge[index] != nullptr) m_clusterCharge[index]->Fill(cluster.getCharge());

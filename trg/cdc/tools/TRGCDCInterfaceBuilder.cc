@@ -426,7 +426,7 @@ void
 Functions(const string& name, unsigned arraySize)
 {
 
-  //...Conersion function : ToLogicVector...
+  //...Conversion function : ToLogicVector...
   Ofs0 << Tab << "-- " << name << endl;
   Ofs0 << Tab << "function ToLogicVector (a : in " << name
        << ") return std_logic_vector;" << endl;
@@ -448,8 +448,8 @@ Functions(const string& name, unsigned arraySize)
   Ofs1 << Tab << "end ToLogicVector;" << endl;
   Ofs1 << endl;
 
-  //...Conersion function : to name...
-  Ofs0 << Tab << "functino To" << name
+  //...Conversion function : to name...
+  Ofs0 << Tab << "function To" << name
        << " (a : in std_logic_vector) return " << name << ";" << endl;
   Ofs0 << endl;
 

@@ -13,6 +13,7 @@
 #include <genfit/FieldManager.h>
 
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
+#include <tracking/dbobjects/DAFConfiguration.h>
 
 #include <simulation/monopoles/MonopoleConstants.h>
 
@@ -78,8 +79,9 @@ void BaseRecoFitterModule::initialize()
 void BaseRecoFitterModule::event()
 {
   // The used fitting algorithm class.
-  TrackFitter fitter(m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_cdcHitsStoreArrayName,
-                     m_param_vtxHitsStoreArrayName, m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName);
+  TrackFitter fitter(DAFConfiguration::c_Default, m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName,
+                     m_param_cdcHitsStoreArrayName, m_param_vtxHitsStoreArrayName,
+                     m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName);
 
   const std::shared_ptr<genfit::AbsFitter>& genfitFitter = createFitter();
   if (genfitFitter) {
@@ -115,7 +117,9 @@ void BaseRecoFitterModule::event()
       if (pdgCodeToUseForFitting != Monopoles::c_monopolePDGCode) {
         Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
         B2DEBUG(29, "PDG: " << pdgCodeToUseForFitting);
-        wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
+        B2DEBUG(29, "resortHits: " << m_param_resortHits);
+
+        wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting, m_param_resortHits);
 
         // only flip if the current fit was the cardinal rep. and seed charge differs from fitted charge
         if (m_correctSeedCharge && wasFitSuccessful
@@ -130,10 +134,9 @@ void BaseRecoFitterModule::event()
           }
 
         }  // end of charge flipping
-
       } else {
         // Different call signature for monopoles in order not to change Const::ChargedStable types
-        wasFitSuccessful = fitter.fit(recoTrack, pdgCodeToUseForFitting);
+        wasFitSuccessful = fitter.fit(recoTrack, pdgCodeToUseForFitting, m_param_resortHits);
       }
       const genfit::AbsTrackRep* trackRep = recoTrack.getTrackRepresentationForPDG(pdgCodeToUseForFitting);
 

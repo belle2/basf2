@@ -7,8 +7,10 @@
  **************************************************************************/
 #include <tracking/ckf/pxd/filters/relations/PXDPairFilterFactory.h>
 #include <tracking/ckf/pxd/filters/relations/SensorPXDPairFilter.h>
-#include <tracking/ckf/pxd/filters/relations/DistancePXDPairFilter.h>
+#include <tracking/ckf/pxd/filters/relations/AngularDistancePXDPairFilter.h>
 #include <tracking/ckf/pxd/filters/relations/LoosePXDPairFilter.h>
+#include <tracking/ckf/pxd/filters/relations/InterceptDistancePXDPairFilter.h>
+#include <tracking/ckf/pxd/filters/relations/CylinderDistancePXDPairFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
@@ -42,8 +44,10 @@ std::map<std::string, std::string> PXDPairFilterFactory::getValidFilterNamesAndD
     {"all", "all combinations are valid"},
     {"none", "no combination is valid"},
     {"sensor", "use sensor/ladder information"},
-    {"distance", "based on the position distance"},
+    {"angulardistance", "based on the angular distance of the hit positions"},
     {"loose", "loose prefilter"},
+    {"intercept", "intercept filter"},
+    {"cylinderextrapolation", "filter based selection using an extrapolation to a cylinder with radius of the ToState"},
   };
 }
 
@@ -64,12 +68,20 @@ PXDPairFilterFactory::create(const std::string& filterName) const
     return std::make_unique<SensorPXDPairFilter>();
   }
 
-  if (filterName == "distance") {
-    return std::make_unique<DistancePXDPairFilter>();
+  if (filterName == "angulardistance") {
+    return std::make_unique<AngularDistancePXDPairFilter>();
   }
 
   if (filterName == "loose") {
     return std::make_unique<LoosePXDPairFilter>();
+  }
+
+  if (filterName == "intercept") {
+    return std::make_unique<InterceptDistancePXDPairFilter>();
+  }
+
+  if (filterName == "cylinderextrapolation") {
+    return std::make_unique<CylinderDistancePXDPairFilter>();
   }
 
   return Super::create(filterName);

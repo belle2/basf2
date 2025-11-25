@@ -21,7 +21,7 @@
 
 namespace Belle2 {
   /**
-  * "Takes a list of PDG values and lifetime paramters to displaces the vertex of MCParticles with matching PDG value and their subsequent daughters corresponding to the given lifetime parameter(s). Can be used between the generator and the detector simulation. Lifetime options are "flat", "fixed" and "exponential" where the lifetime(s) should be passed as c*tau in units of [cm]. Furthermore, a "fixedLength" option can be used where the lifetime parameter takes the desired fixed decaylength in units of [cm].
+  * "Takes a list of PDG values and lifetime parameters to displaces the vertex of MCParticles with matching PDG value and their subsequent daughters corresponding to the given lifetime parameter(s). Can be used between the generator and the detector simulation. Lifetime options are "flat", "fixed" and "exponential" where the lifetime(s) should be passed as c*tau in units of [cm]. Furthermore, a "fixedLength" option can be used where the lifetime parameter takes the desired fixed decaylength in units of [cm].
   *
   *
   */

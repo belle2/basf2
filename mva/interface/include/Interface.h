@@ -95,8 +95,7 @@ namespace Belle2 {
     class Interface : public AbstractInterface {
     public:
       /**
-       * Constructs a new interface with the given name
-       * @param name of the interface
+       * Constructs a new interface
        */
       Interface() : AbstractInterface(TemplateOptions().getMethod()) { }
 

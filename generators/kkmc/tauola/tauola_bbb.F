@@ -77,7 +77,7 @@ C
       ELSE
          ICOUNT=ICOUNT+1
          JAK=ACTIVE(MOD(ICOUNT-1,KSUM)+1)
-C        PRINT *, 'ICOUNT, JAK, KSUM = ',ICOUNT, JAK, KSUM
+C        WRITE(6,'(''ICOUNT, JAK, KSUM = '',3I6)') ICOUNT, JAK, KSUM
          ANSWER=JAK
       ENDIF
       RETURN
@@ -105,6 +105,12 @@ C JAK=0 INCLUSIVE:  JAK=1,2,3,4,5,6,7,8,...
       REAL  H(4)
       REAL*8 HX(4)
       COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
+      INTEGER IFEQUALBR
+      COMMON /IFEQUALBR/ IFEQUALBR
+      INTEGER TauToElOrMu
+      COMMON /TauToElOrMu/ TauToElOrMu
+      INTEGER JAK1SV,JAK2SV
+      COMMON /JAKSV/ JAK1SV, JAK2SV
 
       COMMON / IDFC  / IDF
 
@@ -148,6 +154,15 @@ C DECAY OF TAU+ IN THE TAU REST FRAME
         NEVTOT=NEVTOT+1
         IF(IWARM.EQ.0) GOTO 902
         ISGN= IDF/IABS(IDF)
+
+C RESTORE SAVED MASKS        
+        JAK1=JAK1SV
+        JAK2=JAK2SV
+
+C USER SELECTED LIST OF DECAYS
+        IF (IFEQUALBR.LT.0) THEN
+           CALL JAKEREQ(-1,JAK1)
+        ENDIF
 
 C AJWMOD to change BRs depending on sign:
         CALL TAURDF(KTO)
@@ -269,7 +284,11 @@ C THIS ROUTINE  SIMULATES TAU+  DECAY
       REAL  PDUM(4)
       INTEGER IFEQUALBR
       COMMON /IFEQUALBR/ IFEQUALBR
+      INTEGER JAK
+      SAVE    JAK
+      INTEGER NEV,NPRIN
       DATA NEV,NPRIN/0,0/
+      SAVE NEV,NPRIN
       KTO=1
       IF(JAK1.EQ.-1) RETURN
       IMD=IMOD
@@ -278,6 +297,7 @@ C     =================
       JAK=JAK1
       IF(JAK1.EQ.0) CALL JAKER(JAK)
       IF (IFEQUALBR.GT.0) CALL JAKEREQ(1,JAK)
+
       IF(JAK.EQ.1) THEN
          IF (NEV.LT.NPRIN.OR.NPRIN.EQ.-1)
      C   PRINT *, 'DEKAY1(0): tau- JAK = ', JAK,
@@ -349,7 +369,11 @@ C THIS ROUTINE  SIMULATES TAU-  DECAY
       REAL  PDUM(4)
       INTEGER IFEQUALBR
       COMMON /IFEQUALBR/ IFEQUALBR
+      INTEGER JAK
+      SAVE    JAK
+      INTEGER NEV,NPRIN
       DATA NEV,NPRIN/0,0/
+      SAVE NEV,NPRIN
       KTO=2
       IF(JAK2.EQ.-1) RETURN
       IMD=IMOD
@@ -3469,6 +3493,13 @@ C
       DATA NPRIN/0/
       INTEGER LAMDEC
       COMMON /LAMDEC/ LAMDEC
+C
+      REAL    AMALFA            ! mass
+      INTEGER ISALFA            ! spin
+      REAL    VCALFA,ACALFA     ! coupling co-efficients in (A+ gamma5 B) term or (A + gamma_5 B) gamma-mu terms for Spin0/Spin1
+      INTEGER DMALFA            ! decay mode = 0:invi, 1:gammagamma, 2:e+e-, 3:mu+mu-, 4:pi+pi-, 5:pi0pi0, 6:pi0eta, 7:etaeta, 8:K+K-, 9:KS0KS0, 10:pi+K-, 11:pi-K+
+      REAL    GMALFA            ! width
+      COMMON /AMALFA/ AMALFA,ISALFA,VCALFA,ACALFA,DMALFA,GMALFA
 C     
       JNPI=MODE-NLT
 C position of decaying particle
@@ -3553,6 +3584,7 @@ C       PRINT *, 'DWLNEW: I, JNPI, -ISGN, KFPI = ',I,JNPI,-ISGN,KFPI
         IF ((ABS(KFPI).EQ.3122).AND.(MODE.GE.329.AND.MODE.LE.332).AND.(LAMDEC.EQ.1)) IDECAY=1 ! Lambda(bar)
         IF ((ABS(KFPI).EQ.9010221).AND.(MODE.GE.339.AND.MODE.LE.340)) IDECAY=1 ! f0
         IF ((ABS(KFPI).EQ.9000111).AND.(MODE.GE.364.AND.MODE.LE.371)) IDECAY=1 ! a0
+        IF ((ABS(KFPI).EQ.94144).AND.(DMALFA.GT.0).AND.(MODE.EQ.372.OR.MODE.EQ.373)) IDECAY=1
 C     
 C for charged conjugate case, change charged pions only
 C        IF(KFPI.NE.111)KFPI=KFPI*ISGN
@@ -3591,9 +3623,19 @@ C
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
+C
+      REAL    AMALFA            ! mass
+      INTEGER ISALFA            ! spin
+      REAL    VCALFA,ACALFA     ! coupling co-efficients in (A+ gamma5 B) term or (A + gamma_5 B) gamma-mu terms for Spin0/Spin1
+      INTEGER DMALFA            ! decay mode = 0:invi, 1:gammagamma, 2:e+e-, 3:mu+mu-, 4:pi+pi-, 5:pi0pi0, 6:pi0eta, 7:etaeta, 8:K+K-, 9:KS0KS0, 10:pi+K-, 11:pi-K+
+      REAL    GMALFA            ! width
+      COMMON /AMALFA/ AMALFA,ISALFA,VCALFA,ACALFA,DMALFA,GMALFA
+C
       REAL     DCDMAS
       EXTERNAL DCDMAS
+      INTEGER  IS
 C
+      IS=0
       ISIGN = KFPI/ABS(KFPI)
       IF (MODE.EQ.37.OR.
      c     MODE.EQ.41.OR.
@@ -3732,6 +3774,52 @@ C
          ID1=111
          ID2=221
          ID3=0
+      ELSE IF (MODE.EQ.372.OR.MODE.EQ.373) THEN ! decay mode = 0:invi, 1:gammagamma, 2:e+e-, 3:mu+mu-, 4:pi+pi-, 5:pi0pi0, 6:pi0eta, 7:etaeta, 8:K+K-, 9:KS0KS0, 10:pi+K-, 11:pi-K+
+         IF (DMALFA.EQ.1) THEN
+            ID1=22
+            ID2=22
+         ELSE IF (DMALFA.EQ.2) THEN
+            ID1=-11
+            ID2=11
+            IF (ISALFA.EQ.1) IS=2
+         ELSE IF (DMALFA.EQ.3) THEN
+            ID1=-13
+            ID2=13
+            IF (ISALFA.EQ.1) IS=2
+         ELSE IF (DMALFA.EQ.4) THEN
+            ID1=211
+            ID2=-211
+            IF (ISALFA.EQ.1) IS=1
+         ELSE IF (DMALFA.EQ.5) THEN
+            ID1=111
+            ID2=111
+            IF (ISALFA.EQ.1) IS=1
+         ELSE IF (DMALFA.EQ.6) THEN
+            ID1=111
+            ID2=221
+            IF (ISALFA.EQ.1) IS=1
+         ELSE IF (DMALFA.EQ.7) THEN
+            ID1=221
+            ID2=221
+            IF (ISALFA.EQ.1) IS=1
+         ELSE IF (DMALFA.EQ.8) THEN
+            ID1=321
+            ID2=-321
+            IF (ISALFA.EQ.1) IS=1
+         ELSE IF (DMALFA.EQ.9) THEN
+            ID1=310
+            ID2=310
+            IF (ISALFA.EQ.1) IS=1
+         ELSE IF (DMALFA.EQ.10) THEN
+            ID1=211
+            ID2=-321
+            IF (ISALFA.EQ.1) IS=1
+         ELSE IF (DMALFA.EQ.11) THEN
+            ID1=-211
+            ID2=321
+            IF (ISALFA.EQ.1) IS=1
+         ENDIF
+         ID3=0
       ENDIF
 C
       XM1=DCDMAS(ID1,4)         ! masses
@@ -3739,7 +3827,7 @@ C
       XM3=DCDMAS(ID3,4)
 C
       IF (ID3.EQ.0) THEN ! 2 body channels
-         CALL TWODECAY(PINPUT,XM1,XM2,PDAU1,PDAU2)
+         CALL TWODECAY(PINPUT,XM1,XM2,PDAU1,PDAU2,IS)
 C     to hepevt
          IDECAY2=0
          IF ((ID2.EQ.-9000211).OR. ! a0- -> pi-eta
@@ -3798,7 +3886,7 @@ C           CALL TDECAY(ID2,-MODE,PDAU2,NDAU) ! Alas: Fortran 77 does not have r
             XM2_2=DCDMAS(ID2_2,4)
             XM2_3=DCDMAS(ID2_3,4)
             IF (ID2_3.EQ.0) THEN
-               CALL TWODECAY(PDAU2,XM2_1,XM2_2,PDAU2_1,PDAU2_2)
+               CALL TWODECAY(PDAU2,XM2_1,XM2_2,PDAU2_1,PDAU2_2,0)
                IDECAY22=0
                IF (ID2_2.EQ.221.AND.
      $              ((MODE.GE.253.AND.MODE.LE.256).OR.
@@ -3842,7 +3930,7 @@ C                 CALL TDECAY(ID2_2,-MODE,PDAU2_2,NDAU) ! Alas: Fortran 77 does 
                      XM22_3=DCDMAS(ID22_3,4)
                   ENDIF
                   IF (ID22_3.EQ.0) THEN ! 2 body channels of eta
-                     CALL TWODECAY(PDAU2_2,XM22_1,XM22_2,PDAU22_1,PDAU22_2)
+                     CALL TWODECAY(PDAU2_2,XM22_1,XM22_2,PDAU22_1,PDAU22_2,0)
                      NDAU=NDAU+2
                      CALL FILHEP(0,1,ID22_1,-1,-1,0,0,PDAU22_1,XM22_1,.TRUE.)
                      CALL FILHEP(0,1,ID22_2,-2,-2,0,0,PDAU22_2,XM22_2,.TRUE.)
@@ -3882,7 +3970,7 @@ C           CALL TDECAY(ID3,-MODE,PDAU3,NDAU) ! Alas: Fortran 77 does not have r
             ID3_2=-211
             XM3_1=DCDMAS(ID3_1,4)
             XM3_2=DCDMAS(ID3_2,4)
-            CALL TWODECAY(PDAU3,XM3_1,XM3_2,PDAU3_1,PDAU3_2)
+            CALL TWODECAY(PDAU3,XM3_1,XM3_2,PDAU3_1,PDAU3_2,0)
             NDAU=NDAU+2
             CALL FILHEP(0,1,ID3_1,-1,-1,0,0,PDAU3_1,XM3_1,.TRUE.)
             CALL FILHEP(0,1,ID3_2,-2,-2,0,0,PDAU3_2,XM3_2,.TRUE.)
@@ -3890,9 +3978,9 @@ C           CALL TDECAY(ID3,-MODE,PDAU3,NDAU) ! Alas: Fortran 77 does not have r
       ENDIF
 C
       END
-      SUBROUTINE TWODECAY(PINPUT,XM1,XM2,PDAU1,PDAU2)
-      INTEGER I
-      REAL PINPUT(4),XM1,XM2,PDAU1(4),PDAU2(4)
+      SUBROUTINE TWODECAY(PINPUT,XM1,XM2,PDAU1,PDAU2,IS)
+      INTEGER I,IS ! IS=0:uniform, 1:1-costheta^2 for V/A->PP, 2:1+costheta^2 for V/A->ffbar
+      REAL PINPUT(4),XM1,XM2,PDAU1(4),PDAU2(4),COSTHE,WT,RRR(1)
       DOUBLE PRECISION PIN(4),X(4),Y(4),YM1,YM2,R,RU
       DOUBLE PRECISION XLAM,a,b,c
       XLAM(a,b,c)=SQRT(ABS((a-b-c)**2-4.0*b*c))
@@ -3903,9 +3991,18 @@ C
       YM2=XM2
       R=SQRT(PIN(4)**2-PIN(3)**2-PIN(2)**2-PIN(1)**2)
       RU=XLAM(R**2,YM1**2,YM2**2)/R/2 ! momenta of the two products
+ 22   CONTINUE
       CALL SPHERD(RU,X)         !     random 3 vector on the sphere   
       X(4)=SQRT(RU**2+YM1**2)
       Y(4)=SQRT(RU**2+YM2**2)
+!     Angle with respect to pin direction
+      IF(IS.GT.0) THEN
+       COSTHE =(X(1)*PIN(1)+X(2)*PIN(2)+X(3)*PIN(3))/SQRT(X(1)**2+X(2)**2+X(3)**2)/SQRT(PIN(1)**2+PIN(2)**2+PIN(3)**2)
+       IF (IS.EQ.1) WT=1-COSTHE**2
+       IF (IS.EQ.2) WT=1+COSTHE**2
+       CALL KKMC_RANMAR(RRR,1)
+       IF (RRR(1).GT.WT) GOTO 22
+      ENDIF
 C      
       Y(1)=-X(1)
       Y(2)=-X(2)
@@ -4052,6 +4149,7 @@ c
         IF (PRNTNU.EQ.1.AND.ABS(IDHEP(I)).eq.16)
      +   WRITE (6,'(''Mass(P4(nutau)) = '',F14.7,'' MeV'')') MS*1000.0
         CALL PYNAME(IDHEP(I),CHAP)
+        IF (IDHEP(I).EQ.94144) CHAP = 'alpha'
         IF (IDHEP(I).EQ.53) CHAP = 'hl'
         IF (IDHEP(I).EQ.26) CHAP = 'zp'
         IF (IFL.EQ.0) THEN
@@ -4170,10 +4268,12 @@ C
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
 C
-      REAL    AMINVI            ! mass
-      INTEGER ISPNVI            ! spin
-      REAL    VCINVI,ACINVI     ! coupling co-efficients in (A+ gamma5 B) term or (A + gamma_5 B) gamma-mu terms for Spin0/Spin1
-      COMMON /AMINVI/ AMINVI,ISPNVI,VCINVI,ACINVI
+      REAL    AMALFA            ! mass
+      INTEGER ISALFA            ! spin
+      REAL    VCALFA,ACALFA     ! coupling co-efficients in (A+ gamma5 B) term or (A + gamma_5 B) gamma-mu terms for Spin0/Spin1
+      INTEGER DMALFA            ! decay mode = 0:invi, 1:gammagamma, 2:e+e-, 3:mu+mu-, 4:pi+pi-, 5:pi0pi0, 6:pi0eta, 7:etaeta, 8:K+K-, 9:KS0KS0, 10:pi+K-, 11:pi-K+
+      REAL    GMALFA
+      COMMON /AMALFA/ AMALFA,ISALFA,VCALFA,ACALFA,DMALFA,GMALFA
 C
       REAL  QN
 C
@@ -4184,20 +4284,30 @@ C
 
 !     Following is written for covariant vectors HV(k) (namely h_i, likewise 3.25 Comp. Phys. Commun. 64 (1991) 275).
 !     It is assumed that HV(4) corresponds to h_0
+!     Note convention for m1,p1(tau) -> m2,p2(lep) + m3,k(exotic): p1.p2=AMTAU*PNU(4) k.p1=AMTAU*PKK(4) k.p2=QN m3=AMF1
 
-      IF (ISPNVI.EQ.0) THEN     ! scalar case
-         OMEGA = 2 * (VCINVI**2 + ACINVI**2) * AMTAU * PNU(4)
-     $         + 2 * (VCINVI**2 - ACINVI**2) * AMF0 * AMTAU
+      IF (ISALFA.EQ.0) THEN     ! scalar case
+         OMEGA = 2 * (VCALFA**2 + ACALFA**2) * AMTAU * PNU(4)
+     $         + 2 * (VCALFA**2 - ACALFA**2) * AMF0 * AMTAU
          DO K=1,3
-            HV(K)= 4 * VCINVI * ACINVI * AMTAU * PNU(K)/OMEGA
+            HV(K)= 4 * VCALFA * ACALFA * AMTAU * PNU(K)/OMEGA
          ENDDO
          HV(4)=1
-      ELSEIF (ISPNVI.EQ.1) THEN ! vector case
-         OMEGA = 2 * (2 * (VCINVI**2 + ACINVI**2) * AMTAU * PNU(4)
-     $              - 2 * (VCINVI**2 - ACINVI**2) * AMF0 * AMTAU )
-         DO K=1,3
-            HV(K)= 8 * VCINVI * ACINVI * AMTAU * PNU(K)/OMEGA
-         ENDDO
+      ELSEIF (ISALFA.EQ.1) THEN ! vector case
+         IF (AMALFA.GT.0.0) THEN ! 3 polarization states
+            OMEGA = 2 * ((VCALFA**2 + ACALFA**2) *
+     $                   (AMTAU*PNU(4) + 2*AMTAU*PKK(4)*QN/AMF1**2))
+     $            - 6 * (VCALFA**2 - ACALFA**2) * AMF0 * AMTAU
+            DO K=1,3
+               HV(K)= 4 * VCALFA * ACALFA * AMTAU * PNU(K)*(1-2*QN/AMF1**2)/OMEGA
+            ENDDO
+         ELSE ! 2 polarization states
+            OMEGA = 2 * (2 * (VCALFA**2 + ACALFA**2) * AMTAU * PNU(4)
+     $            - 2 * (VCALFA**2 - ACALFA**2) * AMF0 * AMTAU )
+            DO K=1,3
+               HV(K)= 8 * VCALFA * ACALFA * AMTAU * PNU(K)/OMEGA
+            ENDDO
+         ENDIF
          HV(4)=1
       ENDIF
       RETURN

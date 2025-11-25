@@ -152,7 +152,7 @@ namespace Belle2 {
  *
  *  The macro sets up for the following EXCEPTS and ASSERTS, hence it must be placed before the tests.
  *
- *  The message can be composed in a B2INFO style manner with addtional << between
+ *  The message can be composed in a B2INFO style manner with additional << between
  *  individual strings and values to be concatenated.
  *
  *  \code TEST_CONTEXT("for my value set to "  << myValue); \endcode
@@ -166,7 +166,7 @@ namespace Belle2 {
 #define EXPECT_ANGLE_NEAR(expected, actual, tolerance) EXPECT_PRED3(::Belle2::TestHelpers::angleNear, expected, actual, tolerance)
 
 /** \def ASSERT_ANGLE_NEAR(expected, actual, tolerance)
- *  Assertation macro for angle values that should not care for a multiple of 2 * PI difference between the values
+ *  Assertion macro for angle values that should not care for a multiple of 2 * PI difference between the values
  */
 #define ASSERT_ANGLE_NEAR(expected, actual, tolerance) ASSERT_PRED3(::Belle2::TestHelpers::angleNear, expected, actual, tolerance)
 
@@ -176,7 +176,7 @@ namespace Belle2 {
 #define EXPECT_SAME_SIGN(expected, actual) EXPECT_PRED2(::Belle2::TestHelpers::sameSign, expected, actual)
 
 /** \def ASSERT_SAME_SIGN(expected, actual)
- * Assertation macro that two values carry the same sign.
+ * Assertion macro that two values carry the same sign.
  */
 #define ASSERT_SAME_SIGN(expected, actual) ASSERT_PRED2(::Belle2::TestHelpers::sameSign, expected, actual)
 
@@ -187,7 +187,7 @@ namespace Belle2 {
 #define EXPECT_POSITIVE(expected) EXPECT_PRED1(::Belle2::TestHelpers::isPositive, expected)
 
 /** \def ASSERT_POSITIVE(expected, actual)
- *  Assertation macro that a value is bigger than zero.
+ *  Assertion macro that a value is bigger than zero.
  */
 #define ASSERT_POSITIVE(expected) ASSERT_PRED1(::Belle2::TestHelpers::isPositive, expected)
 
@@ -197,21 +197,21 @@ namespace Belle2 {
 #define EXPECT_NEGATIVE(expected) EXPECT_PRED1(::Belle2::TestHelpers::isNegative, expected)
 
 /** \def ASSERT_NEGATIVE(expected, actual)
- *  Assertation macro that a value is smaller than zero.
+ *  Assertion macro that a value is smaller than zero.
  */
 #define ASSERT_NEGATIVE(expected) ASSERT_PRED1(::Belle2::TestHelpers::isNegative, expected)
 
 /**
- * Expectation macro for combound structures containing floating point values like TVector3, etc. to be close to each other.
+ * Expectation macro for combound structures containing floating point values like ROOT::Math::XYZVector, etc. to be close to each other.
  *
  * Generally it compares each contained floating point value to be no less than the tolerance apart.
  *
  * The macro uses the templated predicate template<class T> allNear(const T& expected, const T& actual, double tolerance)
  * to compute whether the two structures are close to each other.
  *
- * Currently it has been specialised for TVector3.
+ * Currently it has been specialised for ROOT::Math::XYZVector.
  *
- * You may specialise the template for other combound types like has been done for TVector3 below or
+ * You may specialise the template for other combound types like has been done for ROOT::Math::XYZVector below or
  * in framework/tests/Helix.cc to compare two helices.
  *
  * Note for the google test framework to properly print your type either a operator<< or PrintTo(const T& expected, std::ostream* out)
@@ -220,16 +220,16 @@ namespace Belle2 {
 #define EXPECT_ALL_NEAR(expected, actual, tolerance) EXPECT_PRED3(::Belle2::TestHelpers::allNear<decltype(expected)>, expected, actual, tolerance)
 
 /**
- * Assertation macro for combound structures containing floating point values like TVector3, etc. to be close to each other.
+ * Assertion macro for combound structures containing floating point values like ROOT::Math::XYZVector, etc. to be close to each other.
  *
  * Generally it compares each contained floating point value to be no less than the tolerance apart.
  *
  * The macro uses the templated predicate template<class T> allNear(const T& expected, const T& actual, double tolerance)
  * to compute whether the two structures are close to each other.
  *
- * Currently it has been specialised for TVector3.
+ * Currently it has been specialised for ROOT::Math::XYZVector.
  *
- * You may specialise the template for other combound types like has been done for TVector3 below or
+ * You may specialise the template for other combound types like has been done for ROOT::Math::XYZVector below or
  * in framework/tests/Helix.cc to compare two helices.
  *
  * Note for the google test framework to properly print your type either a operator<< or PrintTo(const T& expected, std::ostream* out)
@@ -237,7 +237,6 @@ namespace Belle2 {
  */
 #define ASSERT_ALL_NEAR(expected, actual, tolerance) ASSERT_PRED3(::Belle2::TestHelpers::allNear<decltype(expected)>, expected, actual, tolerance)
 
-class TVector3;
 namespace Belle2 {
   namespace  TestHelpers {
     /** Predicate checking that two angular values are close to each other modulus a 2 * PI difference. */
@@ -266,8 +265,8 @@ namespace Belle2 {
     template<>
     bool allNear<ROOT::Math::XYZVector>(const ROOT::Math::XYZVector& expected, const ROOT::Math::XYZVector& actual, double tolerance);
 
-    /** Print function for the google test framework to print a TVector3 to an output stream */
-    void PrintTo(const TVector3& tVector3, ::std::ostream& output);
+    /** Print function for the google test framework to print a ROOT::Math::XYZVector to an output stream */
+    void PrintTo(const ROOT::Math::XYZVector& vector3, ::std::ostream& output);
   }
 }
 

@@ -8,7 +8,6 @@
 #pragma once
 
 #include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLShower.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/KLMCluster.h>

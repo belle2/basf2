@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,6 +14,8 @@
 
 import re
 import basf2
+# make Belle2 namespace available
+from ROOT import Belle2  # noqa
 from ROOT.Belle2 import EvtGenDatabasePDG
 from terminal_utils import ANSIColors as ac
 
@@ -38,8 +39,8 @@ for i in range(len(decfile_lines)):
         if match is not None:
             in_decay = False
         else:
-            if(decfile_lines[i] != '\n'):
-                if(decfile_lines[i].lstrip()[0] != '#'):
+            if (decfile_lines[i] != '\n'):
+                if (decfile_lines[i].lstrip()[0] != '#'):
                     decays[particle].append(decfile_lines[i])
     else:
         match = re_decay.match(decfile_lines[i])
@@ -100,14 +101,14 @@ for particle in database.ParticleList():
                 exit(1)
             # This should be done for each particle, not only B mesons, but the
             # other particle's decays have not yet been fixed
-            if((abs(code) == 511 or abs(code) == 521) and bfsum > 0 and abs(1.0 - bfsum) > 1e-7):
+            if ((abs(code) == 511 or abs(code) == 521) and bfsum > 0 and abs(1.0 - bfsum) > 1e-7):
                 print('Sum of decay mode branching fractions '
                       f'for {name} is not compatible with 1 ({bfsum}).\n'
                       f'Did you remember to run "{ac.color("red")}b2dec-correct-pythiaBFs{ac.reset()}"?')
                 exit(1)
             # This should be done for each particle, not only B mesons, but the
             # other particle's decays have not yet been fixed
-            if((abs(code) == 511 or abs(code) == 521) and antibfsum > 0 and abs(1.0 - antibfsum) > 1e-7):
+            if ((abs(code) == 511 or abs(code) == 521) and antibfsum > 0 and abs(1.0 - antibfsum) > 1e-7):
                 print('Sum of decay mode branching fractions '
                       f'for {antiname} is not compatible with 1 ({antibfsum}).\n'
                       f'Did you remember to run "{ac.color("red")}b2dec-correct-pythiaBFs{ac.reset()}"?')

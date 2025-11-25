@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -59,7 +58,7 @@ main = b2.create_path()
 
 b2.set_random_seed(1)
 
-# set the exp/run event informations
+# set the exp/run event information
 eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])

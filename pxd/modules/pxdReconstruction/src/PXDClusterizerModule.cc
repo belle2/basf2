@@ -16,6 +16,7 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
@@ -70,6 +71,9 @@ PXDClusterizerModule::PXDClusterizerModule() : Module()
            string("PXDClusterPositionErrorUPar"));
   addParam("PositionErrorVPayloadName", m_positionErrorVName, "Payload name for cluster position error in V",
            string("PXDClusterPositionErrorVPar"));
+  addParam("createPXDClustersForAbortedTrackingEvents", m_createPXDClustersForAbortedTrackingEvents,
+           "Create PXDClusters for events where either the SVDSpacePointCreator abort flag or the VXDTF2 and SVDCKF abort flags are set.",
+           m_createPXDClustersForAbortedTrackingEvents);
 
 }
 
@@ -145,7 +149,7 @@ void PXDClusterizerModule::initialize()
   // Cluster position error from DB
   if (m_errorFromDB) {
     if (!m_positionErrorUName.size() || !m_positionErrorVName.size()) {
-      B2WARNING("You chose to use cluster position erros from DB but did not provide PositionErrorUPayloadName ("
+      B2WARNING("You chose to use cluster position errors from DB but did not provide PositionErrorUPayloadName ("
                 << m_positionErrorUName << ") and/or PositionErrorVPayloadName (" << m_positionErrorVName
                 << "). Disabling DB option.");
       m_errorFromDB = false;
@@ -156,6 +160,8 @@ void PXDClusterizerModule::initialize()
       B2FATAL("DB objects for ClusterPositionError not valid");
     }
   }
+
+  m_eventLevelTrackingInfo.isOptional();
 
 }
 
@@ -169,6 +175,17 @@ void PXDClusterizerModule::beginRun()
 
 void PXDClusterizerModule::event()
 {
+  // Abort in case SVDSpacePointCreator was aborted (high occupancy events) or if both VXDTF2 and SVDCKF were aborted
+  // as we do not add PXD hits to CDC standalone tracks, so we don't need to run the PXDClusterizer.
+  // This veto can be overwritten by setting m_createPXDClustersForAbortedTrackingEvents to true to create them regardless.
+  if (m_eventLevelTrackingInfo.isValid()) {
+    if (not m_createPXDClustersForAbortedTrackingEvents and
+        (m_eventLevelTrackingInfo->hasSVDSpacePointCreatorAbortionFlag() or
+         (m_eventLevelTrackingInfo->hasSVDCKFAbortionFlag() and m_eventLevelTrackingInfo->hasVXDTF2AbortionFlag()))) {
+      return;
+    }
+  }
+
   const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   const StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   const StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
@@ -300,7 +317,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
                                   m_relClusterTrueHitName);
 
   //Get Geometry information
-  const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(
+  const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(
                                                              sensorID));
 
   map<unsigned int, float> mc_relations;
@@ -381,7 +398,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     // FIXME: I am not 100% sure if cls.pixels() are sorted
     set<Pixel> pixelSet(cls.pixels().begin(), cls.pixels().end());
 
-    // Compute classifier variables needed for later retrival of position correction in PXD CKF
+    // Compute classifier variables needed for later retrieval of position correction in PXD CKF
     vector<float> sectorEtaValues = {0, 0, 0, 0};
     sectorEtaValues[0] = PXDClusterPositionEstimator::getInstance().computeEta(pixelSet, projV.getMinCell(), projV.getSize(), +1.0,
                          +1.0);
@@ -454,7 +471,7 @@ void PXDClusterizerModule::assignPositionErrorFromDB(ClusterProjection& primary,
   // Get error from DB [in units of pix]
   double error = errorPar.getContent(sensorID.getID(), uBin, vBin, primary.getSize());
   double sf = 1.;
-  // Apply additional factor if at sensor edges or adjacent to daed rows/colums
+  // Apply additional factor if at sensor edges or adjacent to dead rows/columns
   if (isAtUEdge)      sf *= errorPar.getSensorUEdgeFactor(sensorID.getID(), uBin, vBin, primary.getSize());
   if (isAtVEdge)      sf *= errorPar.getSensorVEdgeFactor(sensorID.getID(), uBin, vBin, primary.getSize());
   if (isAdjacentDead) sf *= errorPar.getDeadNeighbourFactor(sensorID.getID(), uBin, vBin, primary.getSize());

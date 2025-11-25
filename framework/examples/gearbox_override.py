@@ -52,7 +52,7 @@ gearbox.param({
 })
 
 # If we would want to modify many parameters of one subdetector we could set
-# the override prefix to have more convinient access. Beware, the override
+# the override prefix to have more convenient access. Beware, the override
 # prefix is the same for all overrides so this would interfere with the
 # examples above
 

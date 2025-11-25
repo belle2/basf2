@@ -14,7 +14,7 @@ namespace Belle2 {
 
   /**
    * A parsed cut-string naturally has a tree shape which incorporates
-   * the infomation of operator precedence and evaluation order
+   * the information of operator precedence and evaluation order
    * of the statements.
    * For this application it is sufficient to derive a syntax directed translation
    * of the abstract syntax tree.

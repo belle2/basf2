@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -11,7 +10,7 @@
 
 """
 <header>
-  <contact>Software team b2soft@mail.desy.de</contact>
+  <contact>arul.prakash@physik.uni-muenchen.de</contact>
   <output>EvtGenSimRecLarge.root</output>
   <description>
     This steering file produces 10000 generic BBbar events with
@@ -24,38 +23,25 @@
 </header>
 """
 
-from basf2 import (
-    set_random_seed,
-    create_path,
-    process,
-    statistics,
-    register_module,
-)
+from basf2 import set_random_seed, create_path, process, statistics
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from beamparameters import add_beamparameters
-from background import get_background_files
 from validation import statistics_plots, event_timing_plot
+from background import get_background_files
 
 set_random_seed(12345)
 
 main = create_path()
 
 # specify number of events to be generated
-eventinfosetter = register_module("EventInfoSetter")
-# will roughly run for 10 hours
-eventinfosetter.param("evtNumList", [40000])
-eventinfosetter.param("runList", [1])
-eventinfosetter.param("expList", [0])
-main.add_module(eventinfosetter)
+main.add_module("EventInfoSetter", evtNumList=[10000], runList=[1], expList=[0])
 
 # beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
-# beamparameters.param("smearVertex", False)
+add_beamparameters(main, "Y4S")
 
 # generate BBbar events
-evtgeninput = register_module("EvtGenInput")
-main.add_module(evtgeninput)
+main.add_module("EvtGenInput")
 
 # detector and L1 trigger simulation
 add_simulation(main, bkgfiles=get_background_files())
@@ -63,11 +49,15 @@ add_simulation(main, bkgfiles=get_background_files())
 # reconstruction
 add_reconstruction(main)
 
-# memory profile
-main.add_module(register_module("Profile"))
-
 main.add_module('Progress')
-# do not output to save storage space
+# memory profile
+main.add_module("Profile")
+
+# output
+main.add_module("RootOutput",
+                outputFileName="../EvtGenSimRecLarge.root",
+                branchNames=["ProfileInfo"])
+
 process(main)
 
 # Print call statistics
@@ -75,7 +65,7 @@ print(statistics)
 
 statistics_plots(
     "EvtGenSimRecLarge_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation and reconstruction job with generic "
     "EvtGen events",
     prefix="EvtGenSimRecLarge",
@@ -83,7 +73,7 @@ statistics_plots(
 event_timing_plot(
     "../EvtGenSimRecLarge.root",
     "EvtGenSimRecLarge_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation and reconstruction job with generic "
     "EvtGen events",
     prefix="EvtGenSimRecLarge",

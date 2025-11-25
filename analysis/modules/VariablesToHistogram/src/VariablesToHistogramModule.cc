@@ -54,6 +54,8 @@ VariablesToHistogramModule::VariablesToHistogramModule() :
            "particlelists in the same file without conflicts", m_directory);
   addParam("fileNameSuffix", m_fileNameSuffix, "The suffix of the output ROOT file to be appended before ``.root``.",
            string(""));
+  addParam("ignoreCommandLineOverride", m_ignoreCommandLineOverride,
+           "Ignore override of file name via command line argument -o. Useful if you have multiple output modules in one path.", false);
 
   m_file = nullptr;
 }
@@ -64,9 +66,11 @@ void VariablesToHistogramModule::initialize()
     StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   // override the output file name with what's been provided with the -o option
-  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
-  if (!outputFileArgument.empty())
-    m_fileName = outputFileArgument;
+  if (!m_ignoreCommandLineOverride) {
+    const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
+    if (!outputFileArgument.empty())
+      m_fileName = outputFileArgument;
+  }
 
   if (!m_fileNameSuffix.empty())
     m_fileName = m_fileName.insert(m_fileName.rfind(".root"), m_fileNameSuffix);

@@ -254,7 +254,7 @@ void KLM::ScintillatorSimulator::addRandomSiPMNoise()
   int i;
   for (i = 0; i < m_DigPar->getNDigitizations(); i++)
     m_amplitude[i] = m_amplitude[i] +
-                     gRandom->Poisson(m_DigPar->getMeanSiPMNoise());
+                     gRandom->PoissonD(m_DigPar->getMeanSiPMNoise());
 }
 
 int* KLM::ScintillatorSimulator::sortPhotoelectrons(int nPhotoelectrons)
@@ -400,7 +400,7 @@ void KLM::ScintillatorSimulator::generatePhotoelectrons(
  * I = \sum_{hits before this bin} B2 * exp(tau_j / t0) +
  *     \sum_{hits in this bin} t0 - B1 * exp(tau_j / t0),
  *
- * where tau_j is the time of j-th hit. The bin-dependent expresions B1 and B2
+ * where tau_j is the time of j-th hit. The bin-dependent expressions B1 and B2
  * are the same for all hits:
  *
  * I = B2 * \sum_{hits before this bin} exp(tau_j / t0) +

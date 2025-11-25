@@ -16,7 +16,7 @@ namespace Belle2 {
     /**
      * Enum for the desired output direction of flight of tracks / segments.
      *
-     * Depending on the finder algorithm tracks / segmetns can be generated forward or backward to
+     * Depending on the finder algorithm tracks / segments can be generated forward or backward to
      * the direction of travel at random. This enum presents the options for
      * some simple heuristics which direction of travel is preferred by
      * by the user for a predictable outcome.
@@ -28,7 +28,7 @@ namespace Belle2 {
       c_Outwards,
       /// Flip the tracks to be downward going as in cosmic events (note that upwards is generally not reasonable)
       c_Downwards,
-      /// Make two copies of the of each track where one is reversed to the other to let a following algorithm examine both possibilites.
+      /// Make two copies of the of each track where one is reversed to the other to let a following algorithm examine both possibilities.
       c_Symmetric,
       /// Make two copies of the of tracks that are likely curling fix others to outwards.
       c_Curling,

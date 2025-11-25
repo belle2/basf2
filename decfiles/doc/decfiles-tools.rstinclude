@@ -8,4 +8,14 @@
     :func: get_argument_parser
     :prog: b2help-eventtype
     :nodefault:
-    :nogroupsections:
+
+.. _b2help-decay:
+
+``b2help-decay``: Tool to find decays in decay files
+----------------------------------------------------
+
+.. argparse::
+    :filename: decfiles/tools/b2help-decay
+    :func: get_argparse
+    :prog: b2help-decay
+    :nodefault:

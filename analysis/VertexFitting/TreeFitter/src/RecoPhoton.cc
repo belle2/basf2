@@ -19,7 +19,6 @@
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
 
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/B2Vector3.h>
 
 namespace TreeFitter {
 
@@ -93,7 +92,7 @@ namespace TreeFitter {
   {
     const Belle2::ECLCluster* cluster = particle()->getECLCluster();
     const Belle2::ECLCluster::EHypothesisBit clusterhypo = particle()->getECLClusterEHypothesisBit();
-    const Belle2::B2Vector3D centroid = cluster->getClusterPosition();
+    const ROOT::Math::XYZVector centroid = cluster->getClusterPosition();
     const double energy = cluster->getEnergy(clusterhypo);
 
     m_init = true;

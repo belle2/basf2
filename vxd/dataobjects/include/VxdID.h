@@ -22,7 +22,7 @@ namespace Belle2 {
    * - Segment ID was used for PXD to encode frame number but no longer. Currently no use.
    *
    * Internal use of a union gets rid of all the bit shifting which would be
-   * neccessary to represent the id as one baseType and get all the
+   * necessary to represent the id as one baseType and get all the
    * components out of it. Disadvantage is that it is not guaranteed to be
    * portable, but neither is bit shifting
    */

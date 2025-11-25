@@ -16,6 +16,8 @@
 #include <Math/Vector3D.h>
 #include <TMatrixDSym.h>
 
+#include <cmath>
+
 namespace Belle2 {
   /// class to extract results from qualityEstimation
   class SubRecoTrackExtractor : public VariableExtractor {
@@ -48,14 +50,14 @@ namespace Belle2 {
     {
       if (PXDRecoTrack) {
         const float pxdQI = PXDRecoTrack->getQualityIndicator();
-        m_variables.at("PXD_QI") = isnan(pxdQI) ? 0. : pxdQI;
+        m_variables.at("PXD_QI") = std::isnan(pxdQI) ? 0. : pxdQI;
       } else {
         m_variables.at("PXD_QI") = -1.;
       }
 
       if (CDCRecoTrack) {
         const float cdcQI = CDCRecoTrack->getQualityIndicator();
-        m_variables.at("CDC_QI") = isnan(cdcQI) ? 0. : cdcQI;
+        m_variables.at("CDC_QI") = std::isnan(cdcQI) ? 0. : cdcQI;
         m_variables.at("CDC_FitSuccessful") = (float)CDCRecoTrack->wasFitSuccessful();
       } else {
         m_variables.at("CDC_QI") = -1.;

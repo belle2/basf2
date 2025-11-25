@@ -43,7 +43,7 @@ bool CDCPathBasicVarSet::extract(const BaseCDCPathFilter::Object* path)
     hitDistances.push_back(state.getHitDistance());
 
 
-    // check how many times genfit changed the charge and where it occured
+    // check how many times genfit changed the charge and where it occurred
     genfit::MeasuredStateOnPlane trackState = state.getTrackState();
     int stateCharge = trackState.getCharge();
     if (lastCharge != stateCharge) {

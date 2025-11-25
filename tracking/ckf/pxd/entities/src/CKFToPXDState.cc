@@ -24,8 +24,10 @@ CKFToPXDState::CKFToPXDState(const RecoTrack* seed, bool reversed) : CKFState(se
   }
   m_stateCache.isHitState = false;
   m_stateCache.ptSeed = this->getMeasuredStateOnPlane().getMom().Pt();
+  m_stateCache.thetaSeed = this->getMeasuredStateOnPlane().getMom().Theta();
   m_stateCache.phi = this->getMeasuredStateOnPlane().getPos().Phi();
   m_stateCache.theta = this->getMeasuredStateOnPlane().getPos().Theta();
+  m_stateCache.perp = this->getMeasuredStateOnPlane().getPos().Perp();
   m_stateCache.geoLayer = this->getGeometricalLayer();
 }
 
@@ -71,6 +73,7 @@ CKFToPXDState::CKFToPXDState(const SpacePoint* hit) : CKFState<RecoTrack, SpaceP
   m_stateCache.sensorCenterPhi = sensorInfo.pointToGlobal(ROOT::Math::XYZVector(0., 0., 0.), true).Phi();
   m_stateCache.phi = hit->getPosition().Phi();
   m_stateCache.theta = hit->getPosition().Theta();
+  m_stateCache.perp = hit->getPosition().Perp();
   m_stateCache.localNormalizedu = hit->getNormalizedLocalU();
   m_stateCache.localNormalizedv = hit->getNormalizedLocalV();
 }

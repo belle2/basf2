@@ -16,12 +16,12 @@
 from basf2_mva_python_interface.keras import State
 
 
-from tensorflow.keras.layers import Dense, GlobalAveragePooling1D, Input, Reshape
-from tensorflow.keras.models import Model
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.losses import binary_crossentropy
-from tensorflow.keras.activations import sigmoid, tanh
-from tensorflow.keras.callbacks import Callback, EarlyStopping
+from keras.layers import Dense, GlobalAveragePooling1D, Input, Reshape
+from keras.models import Model
+from keras.optimizers import Adam
+from keras.losses import binary_crossentropy
+from keras.activations import sigmoid, tanh
+from keras.callbacks import Callback, EarlyStopping
 import numpy as np
 
 from basf2_mva_extensions.keras_relational import Relations
@@ -48,7 +48,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     state = State(Model(input, output), custom_objects={'Relations': Relations})
 
-    state.model.compile(optimizer=Adam(lr=0.001), loss=binary_crossentropy, metrics=['accuracy'])
+    state.model.compile(optimizer=Adam(learning_rate=0.001), loss=binary_crossentropy, metrics=['accuracy'])
     state.model.summary()
 
     return state
@@ -137,7 +137,7 @@ if __name__ == "__main__":
             print('Building ' + filename)
             # Use random numbers to build all training and spectator variables.
             data = np.random.normal(size=[number_of_events, number_total_lines * 6])
-            target = np.zeros([number_of_events], dtype=np.bool)
+            target = np.zeros([number_of_events], dtype=bool)
 
             # Overwrite for half of the variables some lines so that they are hitting each other.
             # Write them also at the end for the spectators.

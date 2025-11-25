@@ -63,12 +63,15 @@ namespace Belle2 {
 
   private:
     // Data members
+
     //! name of histogram directory
     std::string m_histogramDirectoryName;
     //! fit range lo edge for landau
     double m_rangeLow;
     //! fit range hi edge for landau
     double m_rangeHigh;
+    /** Indizes of excluded PXD Modules */
+    std::vector<int> m_excluded;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;

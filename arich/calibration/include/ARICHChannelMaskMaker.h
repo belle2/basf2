@@ -50,7 +50,7 @@ namespace Belle2 {
     double m_minFrac = 0.3;
     /// Minimal signal/(signal+noise) for channel (for hot channels)
     double m_minS2N = 0.1;
-    /// Minimal number of hits in the channel in the outter HAPD ring, collect more data if not satisfied
+    /// Minimal number of hits in the channel in the outer HAPD ring, collect more data if not satisfied
     double m_minHitPerChn = 30;
 
   };

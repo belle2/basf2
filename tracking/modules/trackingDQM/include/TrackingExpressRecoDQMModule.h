@@ -42,7 +42,7 @@ namespace Belle2 {
     /** Defines the histograms for the tracking abort flags. */
     virtual void DefineAbortFlagsHistograms();
 
-    /** Acccess to the EventLevelTrackingInfo object in the datastore. */
+    /** Access to the EventLevelTrackingInfo object in the datastore. */
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
 
     /** Monitors the Error flags set by the tracking code.
@@ -58,6 +58,8 @@ namespace Belle2 {
     bool m_produce1Dres = true;
     /** if True, the module produces the 2D Track Residual plot for each VXD sensor*/
     bool m_produce2Dres = false;
+    /** if True, the module produces the 2D Track-Related Cluster plots*/
+    bool m_produceTRCluster = true;
     /** Name of the directory for the histograms. */
     std::string m_histogramDirectoryName = "TrackingERDQM";
     /** Optional suffix for the histogram's title. */

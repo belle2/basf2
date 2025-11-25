@@ -77,7 +77,7 @@ namespace Belle2 {
        * Get the parameter path as string and also return the unit it was defined with.
        *
        * If no unit was defined, an empty string will be returned for the unit.
-       * No parsing of the unit is performed, this funtion is primarily used by
+       * No parsing of the unit is performed, this function is primarily used by
        * getWithUnit.
        *
        * @exception gearbox::PathEmptyError if path is empty or does not exist
@@ -170,7 +170,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted
        *
        * @exception gearbox::PathEmptyError if path is empty or does not exist
@@ -185,7 +185,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * If the parameter is empty or does not exist, the defaultValue will be
@@ -206,7 +206,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * @exception gearbox::PathEmptyError if path is empty or does not exist
@@ -225,7 +225,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * If the parameter is empty or does not exist, the defaultValue will be
@@ -244,7 +244,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * @exception gearbox::PathEmptyError if path is empty or does not exist
@@ -262,7 +262,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * If the parameter is empty or does not exist, the defaultValue will be
@@ -284,7 +284,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * @exception gearbox::PathEmptyError if path is empty or does not exist
@@ -302,7 +302,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * If the parameter is empty or does not exist, the defaultValue will be
@@ -324,7 +324,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * @exception gearbox::PathEmptyError if path is empty or does not exist
@@ -342,7 +342,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * If the parameter is empty or does not exist, the defaultValue will be
@@ -364,7 +364,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * @exception gearbox::PathEmptyError if path is empty or does not exist
@@ -382,7 +382,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * If the parameter is empty or does not exist, the defaultValue will be
@@ -404,7 +404,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * @exception gearbox::PathEmptyError if path is empty or does not exist
@@ -422,7 +422,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * If the parameter is empty or does not exist, the defaultValue will be
@@ -444,7 +444,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * @exception gearbox::PathEmptyError if path is empty or does not exist
@@ -462,7 +462,7 @@ namespace Belle2 {
        *
        * Gearbox will try to determine the unit with which the parameter was
        * saved and convert it to the default system. If no unit can be
-       * determinded, it will be assumed that the parameter does not need to be
+       * determined, it will be assumed that the parameter does not need to be
        * converted.
        *
        * If the parameter is empty or does not exist, the defaultValue will be
@@ -483,11 +483,11 @@ namespace Belle2 {
 
       /** make sure the path really corresponds to an XPath node expression by removing trailing slashes */
       std::string ensureNode(const std::string& path) const ;
-      /** make sure the path really corresponds to a path by appending a trailing slash if neccessary */
+      /** make sure the path really corresponds to a path by appending a trailing slash if necessary */
       std::string ensurePath(const std::string& path) const;
       /** add [index] to the path (after stripping trailing slashes) */
       std::string addIndex(const std::string& path, int index) const;
-      /** joind to paths, inserting a slash if neccessary */
+      /** joind to paths, inserting a slash if necessary */
       std::string joinPath(const std::string& path, const std::string& subpath) const;
 
       /** path of the current interface */

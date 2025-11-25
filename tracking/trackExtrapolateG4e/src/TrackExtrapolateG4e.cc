@@ -504,8 +504,8 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   std::vector<ExtHit> eclHit1, eclHit2, eclHit3;
   if (eclClusterInfo != nullptr) {
     eclClusterDistance.resize(eclClusterInfo->size(), 1.0E10); // "positive infinity"
-    ExtHit tempExtHit(extState.pdgCode, Const::EDetector::ECL, 0, EXT_FIRST,
-                      extState.isCosmic, 0.0,
+    ExtHit tempExtHit(.0, extState.pdgCode, Const::EDetector::ECL, 0, EXT_FIRST,
+                      extState.isCosmic,
                       G4ThreeVector(), G4ThreeVector(), G4ErrorSymMatrix(6));
     eclHit1.resize(eclClusterInfo->size(), tempExtHit);
     eclHit2.resize(eclClusterInfo->size(), tempExtHit);
@@ -683,9 +683,20 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
         continue;
       }
       TrackClusterSeparation* h = m_trackClusterSeparations.appendNew(klmHit[c]);
-      (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackSep
-      if (extState.track != nullptr) {
-        extState.track->addRelationTo(h); // relation Track to TrackSep
+      // Add the following three quantities to the KLMCluster data members and store some relations
+      // To be safe, add them only if h is a valid object
+      if (h != nullptr) {
+        (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackClusterSeparation
+        (*klmClusterInfo)[c].first->setClusterTrackSeparation(h->getDistance() / CLHEP::cm);
+        (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(h->getTrackClusterSeparationAngle());
+        (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(h->getTrackRotationAngle());
+        if (extState.track != nullptr) {
+          extState.track->addRelationTo(h); // relation Track to TrackClusterSeparation
+        }
+      } else {
+        (*klmClusterInfo)[c].first->setClusterTrackSeparation(Const::doubleNaN);
+        (*klmClusterInfo)[c].first->setClusterTrackSeparationAngle(Const::doubleNaN);
+        (*klmClusterInfo)[c].first->setClusterTrackRotationAngle(Const::doubleNaN);
       }
       if (klmHit[c].getDistance() < minDistance) {
         closestCluster = c;
@@ -700,7 +711,6 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
       }
     }
   }
-
 }
 
 // Swim one track for EXT until it stops or leaves the ECL-bounding  cylinder
@@ -1192,8 +1202,8 @@ void TrackExtrapolateG4e::createExtHit(ExtHitStatus status, const ExtState& extS
     mom = -mom;
   G4ErrorSymMatrix covariance(6, 0);
   fromG4eToPhasespace(g4eState, covariance);
-  ExtHit* extHit = m_extHits.appendNew(extState.pdgCode, detID, copyID, status,
-                                       extState.isCosmic, extState.tof,
+  ExtHit* extHit = m_extHits.appendNew(extState.tof, extState.pdgCode, detID, copyID, status,
+                                       extState.isCosmic,
                                        pos, mom, covariance);
   // If called standalone, there will be no associated track
   if (extState.track != nullptr)
@@ -1561,7 +1571,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       intersection.hit = bestHit;
       hit->isOnTrack(true);
       if (track != nullptr) {
-        track->addRelationTo(hit);
+        track->addRelationTo(hit, intersection.chi2);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
         if (m_addHitsToRecoTrack) {
           recoTrack->addBKLMHit(hit, recoTrack->getNumberOfTotalHits() + 1);
@@ -1622,7 +1632,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
       // DIVOT no such function for EKLM!
       // hit->isOnTrack(true);
       if (track != nullptr) {
-        track->addRelationTo(hit);
+        track->addRelationTo(hit, intersection.chi2);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
         if (m_addHitsToRecoTrack) {
           for (const EKLMAlignmentHit& alignmentHit : hit->getRelationsFrom<EKLMAlignmentHit>()) {
@@ -1728,7 +1738,7 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
   correction.invert(fail);
   if (fail != 0)
     return;
-  // Matrix inversion succeeeded and is reasonable.
+  // Matrix inversion succeeded and is reasonable.
   // Evaluate chi-squared increment assuming that the Kalman filter
   // won't be able to adjust the extrapolated track's position (fall-back).
   intersection.chi2 = (correction.similarityT(residual))[0][0];

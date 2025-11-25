@@ -1,0 +1,51 @@
+# EventType: 1121848001
+# Descriptor: [B0 -> (J/psi(1S) -> e+ e- or mu+ mu-) (eta- -> pi+ pi- eta or rho0 gamma)]
+# NickName: Bd_to_jpsi_etaprime_etaprime_to_pippimetaprime_or_rho0gamma
+# Documentation: B0 decay to J/psi eta', and eta' to pi+ pi- eta, rho0 gamma
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: Kuanying Wu
+# Cuts: None
+# Date: 20240521
+#
+#
+Alias      etasig     eta
+ChargeConj etasig     etasig
+
+Alias      eta'sig     eta'
+ChargeConj eta'sig     eta'sig
+
+Alias      rho0sig     rho0
+ChargeConj rho0sig     rho0sig
+
+Define beta 0.3814
+#
+Decay Upsilon(4S)
+1.000   B0sig  anti-B0sig  B0  anti-B0               VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.000   J/psisig  eta'sig                            SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+Enddecay
+CDecay anti-B0sig
+#
+Decay J/psisig
+0.500   e+  e-                                       VLL;
+0.500   mu+  mu-                                     VLL;
+Enddecay
+#
+Decay eta'sig 
+0.600   pi+  pi-  etasig                             ETAPRIME_DALITZ  -0.047  -0.069  0.0    0.073; # New dalitz mode
+0.400   rho0sig  gamma                               SVP_HELAMP  1.0 0.0 1.0 0.0;
+Enddecay
+#
+Decay etasig
+1.000   gamma  gamma                                 PHSP;
+Enddecay
+#
+Decay rho0sig
+1.000   pi+  pi-                                     VSS;
+Enddecay
+#
+
+End

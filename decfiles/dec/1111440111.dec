@@ -18,7 +18,7 @@ Decay B0sig
 0.04576   J/psisig  K_L0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  
 0.02219   J/psisig  K*S                                   SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #J/psisig K*0 is Gamma_200 PDGLive = 1.27e-3. #[Comment - PG 09/2020] #[w/CPV - BO 09/2017]
 0.02219   J/psisig  K*L                                   SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
-0.08876   J/psisig  anti-K*0T                             SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
+0.08876   J/psisig  K*0T                                  SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
 0.03180   J/psisig  K-  pi+                               PHSP; #Gamma_199 PDGLive => 1.15e-3 includes K*0. Subtract K* component: BF(J/psisig K+ pi-) = 0.00115 - 2/3 * 0.00127. #[BF update - PG 09/2020]
 0.01590   J/psisig  K0  pi0                               PHSP; #No PDGLive value. Assume BF(J/psisig K0 pi0) = BF(J/psisig K+ pi-) / 2. #[BF update - PG 09/2020]
 0.00174   J/psisig  pi0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;                #[BF update - PG 09/2020]

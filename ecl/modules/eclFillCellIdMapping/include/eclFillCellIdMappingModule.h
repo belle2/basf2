@@ -24,7 +24,7 @@ namespace Belle2 {
 
 
   /**
-  * Fills a dataobject that provides maping between cell id and ECLCalDigit store array
+  * Fills a dataobject that provides mapping between cell id and ECLCalDigit store array
   *
   */
   class ECLFillCellIdMappingModule : public Module {

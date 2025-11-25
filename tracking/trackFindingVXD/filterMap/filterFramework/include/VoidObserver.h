@@ -13,10 +13,10 @@ namespace Belle2 {
 
   /** The most CPU efficient Observer for the VXDTF filter tools (even if useless).
    *
-   * The VoidObserver is ment to be the simplest (and most useless) Observer
+   * The VoidObserver is meant to be the simplest (and most useless) Observer
    * for the VXDTF filter tools.
-   * It is notified of relevant informations by the
-   * observed object via the the notify method. This particular
+   * It is notified of relevant information by the
+   * observed object via the notify method. This particular
    * observer does not take any action to record the messages, hence
    * the compiler will simply skip the call (in optimized compilation mode).
    * More evolved and useful observers can derive from this one (even if not

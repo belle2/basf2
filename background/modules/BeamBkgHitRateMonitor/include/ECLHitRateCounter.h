@@ -93,7 +93,7 @@ namespace Belle2 {
        * Segment 1 contains crystals with 135deg < phi < 225deg,
        * Segment 2 contains crystals with 225deg < phi < 315deg,
        * Segment 3 contains crystals with phi < 45deg or phi > 315deg,
-       * With the same angular patter continuing for barrel and BWD encap segments
+       * With the same angular pattern continuing for barrel and BWD encap segments
        */
       void segmentECL();
 
@@ -128,7 +128,7 @@ namespace Belle2 {
       // other
       Belle2::ECL::ECLGeometryPar* m_geometry{nullptr}; /**< pointer to ECLGeometryPar */
       std::map<int, int> m_segmentMap; /**< map with keys containing ECL CellID and values containing segment number */
-      int m_crystalsInSegment[16] = {0}; /**< array cotaining the number of crystals in given segment */
+      int m_crystalsInSegment[16] = {0}; /**< array containing the number of crystals in given segment */
     };
   }
 }

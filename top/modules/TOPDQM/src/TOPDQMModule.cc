@@ -15,6 +15,7 @@
 #include "TDirectory.h"
 #include <boost/format.hpp>
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
 using boost::format;
@@ -62,7 +63,7 @@ namespace Belle2 {
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_numModules = geo->getNumModules();
-    double bunchTimeSep = geo->getNominalTDC().getSyncTimeBase() / 24;
+    m_bunchTimeSep = geo->getNominalTDC().getSyncTimeBase() / 24;
 
     // Histograms
 
@@ -82,10 +83,10 @@ namespace Belle2 {
     m_window_vs_slot->GetXaxis()->SetNdivisions(16);
 
     int nbinsT0 = 75;
-    double rangeT0 = nbinsT0 * bunchTimeSep;
+    double rangeT0 = nbinsT0 * m_bunchTimeSep;
     m_eventT0 = new TH1F("eventT0", "Event T0; event T0 [ns]; events per bin", nbinsT0, -rangeT0 / 2, rangeT0 / 2);
 
-    m_bunchOffset = new TH1F("bunchOffset", "Bunch offset", 100, -bunchTimeSep / 2, bunchTimeSep / 2);
+    m_bunchOffset = new TH1F("bunchOffset", "Bunch offset", 100, -m_bunchTimeSep / 2, m_bunchTimeSep / 2);
     m_bunchOffset->SetXTitle("offset [ns]");
     m_bunchOffset->SetYTitle("events per bin");
     m_bunchOffset->SetMinimum(0);
@@ -109,6 +110,10 @@ namespace Belle2 {
     m_backgroundHits->SetYTitle("hits per track");
     m_backgroundHits->SetMinimum(0);
     m_backgroundHits->GetXaxis()->SetNdivisions(16);
+
+    m_trackHits = new TH2F("trackHits", "Number of events w/ and w/o track in the slot", 16, 0.5, 16.5, 2, 0, 2);
+    m_trackHits->SetXTitle("slot number");
+    m_trackHits->SetYTitle("numTracks > 0");
 
     int nbinsHits = 1000;
     double xmaxHits = 10000;
@@ -135,6 +140,39 @@ namespace Belle2 {
     m_TOPOccAfterInjHER  = new TH1F("TOPOccInjHER", "TOPOccInjHER/Time;Time in #mus;Nhits/Time (#mus bins)", 4000, 0, 20000);
     m_TOPEOccAfterInjLER  = new TH1F("TOPEOccInjLER", "TOPEOccInjLER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
     m_TOPEOccAfterInjHER  = new TH1F("TOPEOccInjHER", "TOPEOccInjHER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
+
+    m_nhitInjLER = new TProfile2D("nhitInjLER",
+                                  "LER: average Nhits; "
+                                  "time since injection [msec]; time within beam cycle [syst. clk]; Nhits average",
+                                  160, 0, 80, 256, 0, 1280, 0, 100000);
+    m_nhitInjHER = new TProfile2D("nhitInjHER",
+                                  "HER: average Nhits; "
+                                  "time since injection [msec]; time within beam cycle [syst. clk]; Nhits average",
+                                  160, 0, 80, 256, 0, 1280, 0, 100000);
+    m_nhitInjLERcut = new TProfile2D("nhitInjLERcut",
+                                     "LER: average Nhits (Nhits>1000); "
+                                     "time since injection [msec]; time within beam cycle [syst. clk]; Nhits average",
+                                     160, 0, 80, 256, 0, 1280, 0, 100000);
+    m_nhitInjHERcut = new TProfile2D("nhitInjHERcut",
+                                     "HER: average Nhits (Nhits>1000); "
+                                     "time since injection [msec]; time within beam cycle [syst. clk]; Nhits average",
+                                     160, 0, 80, 256, 0, 1280, 0, 100000);
+    m_eventInjLER = new TH2F("eventInjLER",
+                             "LER: event distribution; "
+                             "time since injection [msec]; time within beam cycle [syst. clk]; events per bin",
+                             160, 0, 80, 256, 0, 1280);
+    m_eventInjHER = new TH2F("eventInjHER",
+                             "HER: event distribution; "
+                             "time since injection [msec]; time within beam cycle [syst. clk]; events per bin",
+                             160, 0, 80, 256, 0, 1280);
+    m_eventInjLERcut = new TH2F("eventInjLERcut",
+                                "LER: event distribution (Nhits>1000); "
+                                "time since injection [msec]; time within beam cycle [syst. clk]; events per bin",
+                                160, 0, 80, 256, 0, 1280);
+    m_eventInjHERcut = new TH2F("eventInjHERcut",
+                                "HER: event distribution (Nhits>1000); "
+                                "time since injection [msec]; time within beam cycle [syst. clk]; events per bin",
+                                160, 0, 80, 256, 0, 1280);
 
     for (int i = 0; i < m_numModules; i++) {
       int module = i + 1;
@@ -254,7 +292,7 @@ namespace Belle2 {
 
     // register dataobjects
 
-    m_rawFTSW.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
+    m_rawFTSWs.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
     m_digits.isRequired();
     m_recBunch.isOptional();
     m_timeZeros.isOptional();
@@ -272,6 +310,7 @@ namespace Belle2 {
     m_timeBG->Reset();
     m_signalHits->Reset();
     m_backgroundHits->Reset();
+    m_trackHits->Reset();
     m_goodTDCAll->Reset();
     m_badTDCAll->Reset();
     m_goodHitsPerEventAll->Reset();
@@ -280,6 +319,14 @@ namespace Belle2 {
     m_TOPOccAfterInjHER->Reset();
     m_TOPEOccAfterInjLER->Reset();
     m_TOPEOccAfterInjHER->Reset();
+    m_nhitInjLER->Reset();
+    m_nhitInjHER->Reset();
+    m_nhitInjLERcut->Reset();
+    m_nhitInjHERcut->Reset();
+    m_eventInjLER->Reset();
+    m_eventInjHER->Reset();
+    m_eventInjLERcut->Reset();
+    m_eventInjHERcut->Reset();
 
     for (int i = 0; i < m_numModules; i++) {
       m_window_vs_asic[i]->Reset();
@@ -315,7 +362,9 @@ namespace Belle2 {
 
     if (recBunchValid) {
       double t0 = m_commonT0->isRoughlyCalibrated() ? m_commonT0->getT0() : 0;
-      m_bunchOffset->Fill(m_recBunch->getCurrentOffset() - t0);
+      double offset = m_recBunch->getCurrentOffset() - t0;
+      offset -= m_bunchTimeSep * lround(offset / m_bunchTimeSep); // wrap around
+      m_bunchOffset->Fill(offset);
       m_eventT0->Fill(m_recBunch->getTime());
     }
 
@@ -339,6 +388,15 @@ namespace Belle2 {
       if (slot == 0) continue;
       numTracks[slot - 1]++;
       trackMomenta[slot - 1] = std::max(trackMomenta[slot - 1], fitResult->getMomentum().R());
+    }
+
+    // count events w/ and w/o track in the slot
+
+    if (recBunchValid or cosmics) {
+      for (size_t i = 0; i < numTracks.size(); i++) {
+        bool hit = numTracks[i] > 0;
+        m_trackHits->Fill(i + 1, hit);
+      }
     }
 
     // select modules for counting hits in signal and background time windows
@@ -415,20 +473,34 @@ namespace Belle2 {
 
     // fill injection histograms
 
-    for (auto& it : m_rawFTSW) {
+    for (auto& it : m_rawFTSWs) {
       B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
               (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
               it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
-      auto difference = it.GetTimeSinceLastInjection(0);
-      if (difference != 0x7FFFFFFF) {
+      auto time_clk = it.GetTimeSinceLastInjection(0);  // expressed in system clock
+      if (time_clk != 0x7FFFFFFF) {
         unsigned int nentries = m_digits.getEntries();
-        float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+        double time_us = time_clk / 127.0; //  127MHz clock ticks to us, inexact rounding
+        double time_ms = time_us / 1000;
+        double time_1280 = time_clk % 1280; // within beam cycle, experssed in system clock
         if (it.GetIsHER(0)) {
-          m_TOPOccAfterInjHER->Fill(diff2, nentries);
-          m_TOPEOccAfterInjHER->Fill(diff2);
+          m_TOPOccAfterInjHER->Fill(time_us, nentries);
+          m_TOPEOccAfterInjHER->Fill(time_us);
+          m_nhitInjHER->Fill(time_ms, time_1280, nHits_good);
+          m_eventInjHER->Fill(time_ms, time_1280);
+          if (nHits_good > 1000) {
+            m_nhitInjHERcut->Fill(time_ms, time_1280, nHits_good);
+            m_eventInjHERcut->Fill(time_ms, time_1280);
+          }
         } else {
-          m_TOPOccAfterInjLER->Fill(diff2, nentries);
-          m_TOPEOccAfterInjLER->Fill(diff2);
+          m_TOPOccAfterInjLER->Fill(time_us, nentries);
+          m_TOPEOccAfterInjLER->Fill(time_us);
+          m_nhitInjLER->Fill(time_ms, time_1280, nHits_good);
+          m_eventInjLER->Fill(time_ms, time_1280);
+          if (nHits_good > 1000) {
+            m_nhitInjLERcut->Fill(time_ms, time_1280, nHits_good);
+            m_eventInjLERcut->Fill(time_ms, time_1280);
+          }
         }
       }
     }

@@ -21,7 +21,7 @@ namespace Belle2 {
     std::pair<double, double> m_minMax; /**< .first is min, .second is .max. */
   public:
 
-    /** construtor, starts with max for min and min for max (will later be replaced by valid entries). */
+    /** constructor, starts with max for min and min for max (will later be replaced by valid entries). */
     MinMax() :
       m_minMax({std::numeric_limits< double >::max(), -std::numeric_limits< double >::max()}) {}
 

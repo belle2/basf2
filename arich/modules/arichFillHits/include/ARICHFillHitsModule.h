@@ -14,6 +14,8 @@
 
 #include <framework/database/DBObjPtr.h>
 
+#include <Math/Vector3D.h>
+
 
 #include <framework/core/Module.h>
 
@@ -48,9 +50,9 @@ namespace Belle2 {
     virtual void event() override;
 
     /**
-     * Corrects hit position for distorsion due to non-perpendicular magnetic field component
+     * Corrects hit position for distortion due to non-perpendicular magnetic field component
      */
-    void magFieldCorrection(TVector3& hitpos);
+    void magFieldCorrection(ROOT::Math::XYZVector& hitpos);
 
   private:
 
@@ -61,7 +63,7 @@ namespace Belle2 {
     uint8_t m_maxApdHits; /**< reject hits with more than number of hits in Apd */
     uint8_t m_maxHapdHits; /**< reject hits with more than number of hits in Hapd */
     int m_bcorrect = 0; /**< apply hit position correction for the non-perp. magnetic field component*/
-    int m_fillall = 0; /**< make hit for all active channels (usefull for likelihood PDF studies) */
+    int m_fillall = 0; /**< make hit for all active channels (useful for likelihood PDF studies) */
   };
 
 } // Belle2 namespace

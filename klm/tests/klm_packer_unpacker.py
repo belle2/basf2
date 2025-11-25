@@ -32,7 +32,7 @@ class PackerUnpackerTest(basf2.Module):
         # first convert to a python-list to be able to sort
         py_list = [x for x in unsortedPyStoreArray]
 
-        # sort via a hierachy of sort keys
+        # sort via a hierarchy of sort keys
         return sorted(
             py_list,
             key=lambda x: (

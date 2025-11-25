@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,9 +29,6 @@ import logging
 
 def get_logger():
     return logging.getLogger(__name__)
-
-
-CONTACT = "oliver.frost@desy.de"
 
 
 class SegmentFitValidationRun(HarvestingRun):

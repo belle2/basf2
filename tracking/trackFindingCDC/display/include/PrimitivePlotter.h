@@ -56,7 +56,7 @@ namespace Belle2 {
        *  @param startY        y coordinate where the line starts.
        *  @param endX          x coordinate where the line ends.
        *  @param endY          y coordinate where the line ends.
-       *  @param attributeMap  A map of sting keys and values that describe the drawing properties
+       *  @param attributeMap  A map of string keys and values that describe the drawing properties
        * of the line.
        */
       virtual void drawLine(float startX,
@@ -74,7 +74,7 @@ namespace Belle2 {
        *  @param startY        y coordinate where the arrow starts.
        *  @param endX          x coordinate where the arrow ends.
        *  @param endY          y coordinate where the arrow ends.
-       *  @param attributeMap  A map of sting keys and values that describe the drawing properties
+       *  @param attributeMap  A map of string keys and values that describe the drawing properties
        * of the line.
        */
       virtual void drawArrow(float startX,
@@ -91,7 +91,7 @@ namespace Belle2 {
        *  @param centerX        x coordinate of the circle center.
        *  @param centerY        y coordinate of the circle center.
        *  @param radius         radius of the circle
-       *  @param attributeMap  A map of sting keys and values that describe the drawing properties
+       *  @param attributeMap  A map of string keys and values that describe the drawing properties
        * of the line.
        */
       virtual void drawCircle(float centerX,
@@ -113,7 +113,7 @@ namespace Belle2 {
        *                       one point to the other.
        *  @param sweepFlag     Boolean indicator related to the curvature perceived one the circle
        *                       arc. False means negative curvature. True mean positive curvature.
-       *  @param attributeMap  A map of sting keys and values that describe the drawing properties
+       *  @param attributeMap  A map of string keys and values that describe the drawing properties
        *                       of the line.
        */
       virtual void drawCircleArc(float startX,
@@ -132,7 +132,7 @@ namespace Belle2 {
        *
        *  @param points        X,Y points on the curve
        *  @param tangents      Tangent vector at each point. Length of tangents does not matter.
-       *  @param attributeMap  A map of sting keys and values that describe the drawing properties
+       *  @param attributeMap  A map of string keys and values that describe the drawing properties
        *                       of the line.
        */
       virtual void drawCurve(const std::vector<std::array<float, 2>>& points,
@@ -160,19 +160,19 @@ namespace Belle2 {
       /**
        *  Saves the current plot state to a file.
        *
-       *  Deriving instances may should implement the approriate thing here and
+       *  Deriving instances may should implement the appropriate thing here and
        *  may return a modified string indicating the file name to which the plot as been written.
-       *  It is allowed to append or change the file extension if the concret implementation decides
+       *  It is allowed to append or change the file extension if the concrete implementation decides
        *  to do so.
        *
        *  @param fileName       File name where the plot shall be saved
-       *  @return               Potentially modifed file name where the file has actually been
+       *  @return               Potentially modified file name where the file has actually been
        *                        written to.
        */
       virtual const std::string save(const std::string& fileName);
 
       /**
-       *  Clears all drawed elements from the plotter.
+       *  Clears all drawn elements from the plotter.
        *
        *  Base implementation only updates the bounding box.
        */
@@ -181,13 +181,13 @@ namespace Belle2 {
       /// Clears the current bounding box. Only following draw calls contribute to the bounding box
       void clearBoundingBox();
 
-      /// Getter for the bounding box of all drawed objects.
+      /// Getter for the bounding box of all drawn objects.
       const BoundingBox& getBoundingBox() const
       {
         return m_boundingBox;
       }
 
-      /// Setter for the bounding box of all drawed objects.
+      /// Setter for the bounding box of all drawn objects.
       void setBoundingBox(const BoundingBox& boundingBox)
       {
         m_boundingBox = boundingBox;
@@ -209,7 +209,7 @@ namespace Belle2 {
       /**
        *  Setter for the canvas width in pixels.
        *  The canvas height denotes the size of the image being produced.
-       *  The coordinates space that is visible in the picture is a seperate concept
+       *  The coordinates space that is visible in the picture is a separate concept
        *  which is stored in the bounding box (getBoundingBox()).
        */
       void setCanvasWidth(float width)
@@ -220,7 +220,7 @@ namespace Belle2 {
       /**
        *  Setter for the canvas height in pixels
        *  The canvas height denotes the size of the image being produced.
-       *  The coordinates space that is visible in the picture is a seperate concept
+       *  The coordinates space that is visible in the picture is a separate concept
        *  which is stored in the bounding box (getBoundingBox()).
        */
       void setCanvasHeight(float height)

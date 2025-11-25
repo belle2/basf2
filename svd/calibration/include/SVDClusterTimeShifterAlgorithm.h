@@ -45,18 +45,18 @@ namespace Belle2 {
 
     std::string m_id = ""; /**< Parameter given to set the UniqueID of the payload*/
     float m_maximumAllowedShift = 15; /**< Allowed deviation of clsOnTracks histo wrt EventT0 histo */
-    int m_minEntries = 1000; /**< Set the minimun number of entries required in the histograms*/
+    int m_minEntries = 1000; /**< Set the minimum number of entries required in the histograms*/
     std::vector<TString> m_timeAlgorithms = {"CoG3", "ELS3", "CoG6"}; /**< List of time algorithms to calibrate */
   };
 
-  /** Single gaus function, where
+  /** Single gauss function, where
    * N is a normalization constant,
-   * a is the mean of the Gaus distribution,
-   * b is the standard deviation of the Gaus distribution,
+   * a is the mean of the Gauss distribution,
+   * b is the standard deviation of the Gauss distribution,
    * e is a constant.
-   * @param x indipendent variable of the function
+   * @param x independent variable of the function
    * @param par parameters of the function
-   * @return value of single gaus distribution
+   * @return value of single gauss distribution
    */
   inline double singleGaus(const double* x, const double* par)
   {
@@ -67,17 +67,17 @@ namespace Belle2 {
     return N * TMath::Gaus(x[0], a, b, true) + e;
   };
 
-  /** Double gaus function, where
+  /** Double gauss function, where
    * N is a normalization constant,
-   * f is the fractional contribution of the first gaus distribution,
-   * a is the mean of the first gaus distribution,
-   * b is the standard deviation of the first gaus distribution,
-   * c is the mean of the second gaus distribution,
-   * d is the standard deviation of the second gaus distribution,
+   * f is the fractional contribution of the first gauss distribution,
+   * a is the mean of the first gauss distribution,
+   * b is the standard deviation of the first gauss distribution,
+   * c is the mean of the second gauss distribution,
+   * d is the standard deviation of the second gauss distribution,
    * e is a constant.
-   * @param x indipendent variable of the function
+   * @param x independent variable of the function
    * @param par parameters of the function
-   * @return value of double gaus distribution
+   * @return value of double gauss distribution
    */
   inline double doubleGaus(const double* x, const double* par)
   {

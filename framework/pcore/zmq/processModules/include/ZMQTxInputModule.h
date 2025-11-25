@@ -24,7 +24,7 @@ namespace Belle2 {
    */
   class ZMQTxInputModule : public Module {
   public:
-    /// Constructor setting the moudle paramters
+    /// Constructor setting the module parameters
     ZMQTxInputModule();
     /// Pack the datastore and send it. Also handle ready or hello messages of workers.
     void event() override;
@@ -32,8 +32,6 @@ namespace Belle2 {
     void terminate() override;
     /// Initialize the RandomSeedGenerator
     void initialize() override;
-    /// BeginRun processing
-    //    void beginRun() override;
     /// EndRun processing
     void endRun() override;
 

@@ -155,7 +155,7 @@ GRLNeuroTrainerModule::initialize()
     B2WARNING("nTrainMin set to " << m_nTrainMin << " (was larger than nTrainMax)");
   }
 
-  //initializa histograms
+  //initialize histograms
   for (int isector = 0; isector < n_sector; isector++) {
     h_cdc2d_phi_sig  .push_back(new TH1D(("h_cdc2d_phi_sig_" + to_string(isector)).c_str(),
                                          ("h_cdc2d_phi_sig_" + to_string(isector)).c_str(),     64, -3.2, 3.2));

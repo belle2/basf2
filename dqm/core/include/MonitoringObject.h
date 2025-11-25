@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <TObject.h>
 #include <TNamed.h>
 #include <TCanvas.h>
 

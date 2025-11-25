@@ -26,7 +26,7 @@ namespace Belle2 {
 
     /// pair of the global unique id from object with constants and element representing some rigid body in hierarchy
     typedef std::pair<unsigned short, unsigned short> DetectorLevelElement;
-    /// pair with global labels and matrix with coresponding global derivatives
+    /// pair with global labels and matrix with corresponding global derivatives
     typedef std::pair<std::vector<int>, TMatrixD> GlobalDerivativeSet;
     /// A (null) constraint, vector of pairs of global label and its factor in the constraint
     typedef std::vector<std::pair<int, double>> Constraint;
@@ -49,7 +49,7 @@ namespace Belle2 {
 
       /// Template function to add relation between two elements (possibly in different objects with constants)
       /// First object is the child object, second its hierarchy parent
-      /// @param child is the lement numeric id in child obj
+      /// @param child is the element's numeric id in child obj
       /// @param mother is the parent object
       /// @param childToMotherParamTransform is the transformation matrix (placement from geometry of the detector)
       template<class ChildDBObjectType, class MotherDBObjectType>
@@ -83,7 +83,7 @@ namespace Belle2 {
       virtual std::vector<int> getElementLabels(DetectorLevelElement element) = 0;
 
       /// Get the global unique ids of DB objects used to construct hierarchy
-      /// Usefull to update hierarchy only when those changed
+      /// Useful to update hierarchy only when those changed
       const std::set<unsigned short>& getUsedDBObjUniqueIDs() {return m_usedUniqueIDs;}
 
     private:
@@ -106,7 +106,7 @@ namespace Belle2 {
       /// Constructor
       LorentShiftHierarchy() : GlobalDerivativesHierarchy() {};
 
-      /// Label for lorentz shift parameter
+      /// Label for Lorentz shift parameter
       std::vector<int> getElementLabels(DetectorLevelElement element) final;
 
       /// Template function to get globals for given db object and its element (and the rest of hierarchy)
@@ -126,7 +126,7 @@ namespace Belle2 {
       /// Derivatives for Lorentz shift in sensor plane
       TMatrixD getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, B2Vector3D bField);
 
-      /// Template function to insert hierarchy relation bewteen two DB objects and their elements
+      /// Template function to insert hierarchy relation between two DB objects and their elements
       template<class ChildDBObjectType, class MotherDBObjectType>
       void insertRelation(unsigned short child, unsigned short mother)
       {

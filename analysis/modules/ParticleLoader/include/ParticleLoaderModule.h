@@ -18,6 +18,7 @@
 
 // dataobjects
 #include <mdst/dataobjects/V0.h>
+#include <mdst/dataobjects/Kink.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -26,14 +27,11 @@
 
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <vector>
 #include <tuple>
 #include <string>
-#include <memory>
 
 namespace Belle2 {
 
@@ -53,6 +51,9 @@ namespace Belle2 {
    *   - gamma                            (input MDST type = ECLCluster with 'n photons' ECLCluster::Hypothesis::c_nPhotons)
    *   - K_S0, Lambda0, converted photons (input MDST type = V0)
    *   - K_L0, n0                         (input MDST type = KLMCluster, or ECLCluster with neutral hadron hypothesis)
+   *
+   * o) decayed charged final state particles (input MDST type = Kinks)
+   *   - mu+, pi+, K+ (and charge conjugated particles)
    *
    * The following basf2 relations are set by the ParticleLoader:
    *
@@ -149,6 +150,11 @@ namespace Belle2 {
     void v0sToParticles();
 
     /**
+     * Loads Kink object as Particle of specified type to StoreArray<Particle> and adds it to the ParticleList
+     */
+    void kinksToParticles();
+
+    /**
      * Loads ROE object as Particle of specified type to StoreArray<Particle> and adds it to the ParticleList
      */
     void roeToParticles();
@@ -180,10 +186,10 @@ namespace Belle2 {
     StoreArray<PIDLikelihood> m_pidlikelihoods; /**< StoreArray of PIDLikelihoods */
     StoreArray<Track> m_tracks; /**< StoreArray of Tracks */
     StoreArray<TrackFitResult> m_trackfitresults; /**< StoreArray of TrackFitResults */
-    StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< object pointer to event extra info */
     StoreObjPtr<ParticleExtraInfoMap> m_particleExtraInfoMap; /**< object pointer to extra info map */
     StoreArray<RestOfEvent> m_roes; /**< StoreArray of ROEs */
     StoreArray<V0> m_v0s; /**< StoreArray of V0s */
+    StoreArray<Kink> m_kinks; /**< StoreArray of Kinks */
 
     bool m_useMCParticles;  /**< Load MCParticle as Particle instead of the corresponding MDST dataobject */
 
@@ -202,6 +208,7 @@ namespace Belle2 {
     std::vector<PList> m_MCParticles2Plists; /**< Collection of PLists that will collect Particles created from MCParticles */
     std::vector<PList> m_Tracks2Plists; /**< Collection of PLists that will collect Particles created from Tracks */
     std::vector<PList> m_V02Plists; /**< Collection of PLists that will collect Particles created from V0 */
+    std::vector<PList> m_Kink2Plists; /**< Collection of PLists that will collect Particles created from Kink */
     std::vector<PList> m_ROE2Plists; /**< Collection of PLists that will collect Particles created from V0 */
     std::vector<PList>
     m_ECLKLMClusters2Plists; /**< Collection of PLists that will collect Particles created from ECLClusters and KLMClusters */

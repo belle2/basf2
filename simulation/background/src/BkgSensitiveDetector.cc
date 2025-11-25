@@ -17,7 +17,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-// #include <TVector3.h>
 
 using namespace std;
 

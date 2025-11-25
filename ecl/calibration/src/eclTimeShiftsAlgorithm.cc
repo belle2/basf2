@@ -304,7 +304,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
   //------------------------------------------------------------------------
   //------------------------------------------------------------------------
   /* Extract out the time offset information from the database directly.
-     This method loops over all run numbers so it can more easiy pick up
+     This method loops over all run numbers so it can more easily pick up
      old payloads.  It is not the preferred method to use if the payloads
      have iov gaps.*/
 

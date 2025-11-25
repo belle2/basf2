@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,8 +23,8 @@ from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKe
 formatter = TolerateMissingKeyFormatter()
 
 
-class PullAnalysis(object):
-    """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
+class PullAnalysis:
+    """Performs a comparison of an estimated quantity to their truths by generating standardized validation plots."""
     #: default outlier z score
     default_outlier_z_score = 5.0
     #: default plot name
@@ -60,16 +59,16 @@ class PullAnalysis(object):
         contact='',
         plot_name=None,
         plot_title=None,
-        plot_name_prefix='',  # depricated use plot_name instead
-        plot_name_postfix='',  # depricated use plot_name instead
-        plot_title_postfix='',  # depricated use plot_title instead
+        plot_name_prefix='',  # deprecated use plot_name instead
+        plot_name_postfix='',  # deprecated use plot_name instead
+        plot_title_postfix='',  # deprecated use plot_title instead
         referenceFileName=None  # if set binnings of plots will be read from corresponding histograms
     ):
-        """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
+        """Performs a comparison of an estimated quantity to their truths by generating standardized validation plots."""
 
         #: name of the quantity the analysis is performed on
         self.quantity_name = quantity_name
-        #: unit the quanitity is given in
+        #: unit the quantity is given in
         self.unit = unit or get_unit(quantity_name)
 
         #: the outlier score defines in terms of how many std deviations a data point is considered as an outlier
@@ -241,7 +240,7 @@ class PullAnalysis(object):
                                                 gaus_z_score=4,
                                                 is_expert=is_expert)
 
-            # Correct with TF1 - only works because the gaus fit is active.
+            # Correct with TF1 - only works because the Gaussian fit is active.
             hist = estimates_by_truths_profile.histograms[0]
             GetBinContent = hist.GetBinContent
             GetBinCenter = hist.GetBinCenter
@@ -328,7 +327,7 @@ class PullAnalysis(object):
             if "aux_residual_hist2d" in which_plots or "aux" in which_plots:
                 # Distribution of the residuals over auxiliary variable
                 aux_residuals_hist2d_name = formatter.format(plot_name,
-                                                             subplot_name="residuals over {}".format(aux_name))
+                                                             subplot_name=f"residuals over {aux_name}")
                 aux_residuals_hist2d = ValidationPlot(aux_residuals_hist2d_name, self.referenceFileName)
                 aux_residuals_hist2d.hist2d(aux_values,
                                             residuals,
@@ -338,14 +337,14 @@ class PullAnalysis(object):
                 aux_residuals_hist2d.xlabel = compose_axis_label(aux_name)
                 aux_residuals_hist2d.ylabel = compose_axis_label("#Delta " + quantity_name + " (estimate - truth)", self.unit)
                 aux_residuals_hist2d.title = formatter.format(plot_title,
-                                                              subplot_title='Residual distribution over {}'.format(aux_name))
+                                                              subplot_title=f'Residual distribution over {aux_name}')
 
                 self.plots['aux_residuals_hist2d_' + aux_name] = aux_residuals_hist2d
 
             if "aux_residual_profile" in which_plots or "aux" in which_plots:
                 # Distribution of the residuals over auxiliary variable
                 aux_residuals_profile_name = formatter.format(plot_name,
-                                                              subplot_name="residuals profile over {}".format(aux_name))
+                                                              subplot_name=f"residuals profile over {aux_name}")
                 aux_residuals_profile = ValidationPlot(aux_residuals_profile_name, self.referenceFileName)
                 aux_residuals_profile.profile(aux_values,
                                               residuals,
@@ -357,14 +356,14 @@ class PullAnalysis(object):
                 aux_residuals_profile.xlabel = compose_axis_label(aux_name)
                 aux_residuals_profile.ylabel = compose_axis_label("#Delta " + quantity_name + " (estimate - truth)", self.unit)
                 aux_residuals_profile.title = formatter.format(plot_title,
-                                                               subplot_title='Residual profile over {}'.format(aux_name))
+                                                               subplot_title=f'Residual profile over {aux_name}')
 
                 self.plots['aux_residuals_profile_' + aux_name] = aux_residuals_profile
 
             if variances is not None and ("aux_pull_hist2d" in which_plots or "aux" in which_plots):
                 # Distribution of the pulls over auxiliary variable
                 aux_pulls_hist2d_name = formatter.format(plot_name,
-                                                         subplot_name="pulls over {}".format(aux_name))
+                                                         subplot_name=f"pulls over {aux_name}")
                 aux_pulls_hist2d = ValidationPlot(aux_pulls_hist2d_name, self.referenceFileName)
                 aux_pulls_hist2d.hist2d(aux_values,
                                         pulls,
@@ -374,14 +373,14 @@ class PullAnalysis(object):
                 aux_pulls_hist2d.xlabel = compose_axis_label(aux_name)
                 aux_pulls_hist2d.ylabel = "pull (" + quantity_name + ")"
                 aux_pulls_hist2d.title = formatter.format(plot_title,
-                                                          subplot_title='Pull scatter over {}'.format(aux_name))
+                                                          subplot_title=f'Pull scatter over {aux_name}')
 
                 self.plots['aux_pulls_hist2d_' + aux_name] = aux_pulls_hist2d
 
             if variances is not None and ("aux_pull_profile" in which_plots or "aux" in which_plots):
                 # Distribution of the pulls over auxiliary variable
                 aux_pulls_profile_name = formatter.format(plot_name,
-                                                          subplot_name="pull profile over {}".format(aux_name))
+                                                          subplot_name=f"pull profile over {aux_name}")
                 aux_pulls_profile = ValidationPlot(aux_pulls_profile_name, self.referenceFileName)
                 aux_pulls_profile.profile(aux_values,
                                           pulls,
@@ -392,7 +391,7 @@ class PullAnalysis(object):
                 aux_pulls_profile.xlabel = compose_axis_label(aux_name)
                 aux_pulls_profile.ylabel = "pull (" + quantity_name + ")"
                 aux_pulls_profile.title = formatter.format(plot_title,
-                                                           subplot_title='Pull profile over {}'.format(aux_name))
+                                                           subplot_title=f'Pull profile over {aux_name}')
 
                 self.plots['aux_pulls_profile_' + aux_name] = aux_pulls_profile
 

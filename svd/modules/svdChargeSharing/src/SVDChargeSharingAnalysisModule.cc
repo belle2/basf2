@@ -14,8 +14,6 @@
 #include <vxd/geometry/GeoCache.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
-#include <boost/foreach.hpp>
-
 #include <TCanvas.h>
 #include <TSystem.h>
 #include <TLegend.h>
@@ -177,7 +175,7 @@ void SVDChargeSharingAnalysisModule::event()
     return;
   }
 
-  BOOST_FOREACH(Track & track, m_Tracks) {
+  for (Track& track : m_Tracks) {
 
     h_nTracks->Fill(m_Tracks.getEntries());
     // Obtaining track momentum, P value & SVD hits, track hypothesis made for pions(or electrons in case of TB)
@@ -208,7 +206,7 @@ void SVDChargeSharingAnalysisModule::event()
       unsigned short clSize = svdClustersTrack[cl]->getSize();
       unsigned short clSizeIndex;
       unsigned short sensTypeIndex;
-      VXD::SensorInfoBase info = VXD::GeoCache::get(cl_VxdID);
+      VXD::SensorInfoBase info = VXD::GeoCache::getInstance().getSensorInfo(cl_VxdID);
       // double sensThickness = info.getThickness();
       // double pathLength = VXDdedxTr[0]->getDx(cl); // path length in the silicon, for a given sensor
       // double incAngle = 180. / M_PI * acos(sensThickness / pathLength);

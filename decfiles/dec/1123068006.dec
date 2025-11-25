@@ -1,0 +1,53 @@
+# EventType: 1123068006
+# Descriptor: B0 -> D*(2S)- pi+
+# NickName: Bd_D2Sstpi
+# Documentation: B -> D(*) eta pi studies
+# Responsible: Vismaya Vs
+# Email: ph20resch11010@iith.ac.in
+# Tested: yes
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 2025/04/30
+
+Alias D*2s+sig D*(2S)+
+Alias D*2s-sig D*(2S)-
+ChargeConj D*2s+sig D*2s-sig
+
+Alias etasig eta
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0    VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0000 D*2s-sig pi+ PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+
+Decay D*2s-sig
+1.0000 D*-sig etasig PHOTOS VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+CDecay D*2s+sig
+
+Decay D*-sig
+1.0000 anti-D0sig pi- PHOTOS VSS;
+Enddecay
+CDecay D*+sig
+
+Decay anti-D0sig
+0.078000000   a_1-  K+                                     SVS;
+0.015800000   K*0  rho0                                    SVV_HELAMP 1.0 0.0 1.0 0.0 1.0 0.0;
+0.011000000   K*0  omega                                   SVV_HELAMP 1.0 0.0 1.0 0.0 1.0 0.0;
+0.016000000   K_1+  pi-                                    SVS;
+0.024000000   K*0  pi+  pi-                                PHSP;
+0.005328000   K+  rho0  pi-                                PHSP;
+0.019000000   K+  omega  pi-                               PHSP;
+0.008800000   K+  pi-  pi+  pi-                            PHSP;
+Enddecay
+CDecay D0sig
+
+Decay etasig
+1.0000 gamma gamma PHSP;
+Enddecay
+
+End

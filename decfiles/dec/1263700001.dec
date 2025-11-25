@@ -20,7 +20,7 @@ Enddecay
 
 Decay B+sig
 0.5   anti-D*0    e+ nu_e        PHOTOS        HQET3 0.912 1.205 1.15 1.404 0.854; #18.09.2018: updated to main DECAY_BELLE2.DEC
-0.5   anti-D*0    mu+ nu_mu        PHOTOS         PHOTOS  HQET3 0.912 1.205 1.15 1.404 0.854; #18.09.2018: updated to main DECAY_BELLE2.DEC
+0.5   anti-D*0    mu+ nu_mu      PHOTOS        HQET3 0.912 1.205 1.15 1.404 0.854; #18.09.2018: updated to main DECAY_BELLE2.DEC
 Enddecay
 CDecay B-sig
 

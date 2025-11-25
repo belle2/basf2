@@ -193,9 +193,9 @@ namespace Belle2 {
     _gdl->accumulatePsn(h_psn);
 
     //StoreObjPtr<TRGSummary> m_TRGSummary; /**< output for TRGSummary */
-    int result_summary = 0;
+    bool result_summary = false;
     if (m_TRGSummary) {
-      result_summary = m_TRGSummary->getTRGSummary(0);
+      result_summary = m_TRGSummary->test();
     } else {
       B2WARNING("TRGGDLModule.cc: TRGSummary not found. Check it!!!!");
     }

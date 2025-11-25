@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,7 +11,7 @@
 """
 <header>
   <output>KLongGenSimNoBkg.root</output>
-  <contact>Software team b2soft@mail.desy.de</contact>
+  <contact>arul.prakash@physik.uni-muenchen.de</contact>
   <cacheable/>
   <description>This steering file produces 1000 events with one KLong each
   and runs the detector simulation without mixing in background.</description>
@@ -77,14 +76,14 @@ print(statistics)
 
 statistics_plots(
     "KLongGenSimNoBkg_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation job with generic KLongGenSimNoBkg events",
     prefix="KLongGenSimNoBkg",
 )
 event_timing_plot(
     "../KLongGenSimNoBkg.root",
     "KLongGenSimNoBkg_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation job with Klong events",
     prefix="KLongGenSimNoBkg",
 )

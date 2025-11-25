@@ -7,13 +7,14 @@
  **************************************************************************/
 
 #include <analysis/modules/InclusiveDstarReconstruction/InclusiveDstarReconstructionModule.h>
-#include <analysis/utility/PCmsLabTransform.h>
 
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
 #include <framework/gearbox/Const.h>
 
 #include <TDatabasePDG.h>
+
+#include <cmath>
 
 using namespace Belle2;
 
@@ -29,6 +30,7 @@ InclusiveDstarReconstructionModule::InclusiveDstarReconstructionModule() : Modul
 {
   // Set module properties
   setDescription("Inclusive Dstar reconstruction by estimating the four vector using slow pions");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("decayString", m_decayString, "Input DecayDescriptor string", std::string(""));
@@ -112,7 +114,7 @@ void InclusiveDstarReconstructionModule::event()
 
     ROOT::Math::PxPyPzEVector dstar_four_vector = estimateDstarFourMomentum(pion);
 
-    if (isnan(dstar_four_vector.P())) continue;
+    if (std::isnan(dstar_four_vector.P())) continue;
 
     /*
     decay 1:

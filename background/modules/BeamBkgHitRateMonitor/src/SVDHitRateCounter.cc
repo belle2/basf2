@@ -162,7 +162,7 @@ namespace Belle2 {
 
         // accumulate hits
         for (const auto& digit : m_digits) {
-          // select digits to count (usualy only good ones)
+          // select digits to count (usually only good ones)
           VxdID sensorID = digit.getSensorID();
           int layer = sensorID.getLayerNumber() - 3;
           int ladder = sensorID.getLadderNumber() - 1;

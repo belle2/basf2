@@ -1,0 +1,65 @@
+# EventType: 1116048000
+# Description: [B0 -> (D*- -> (anti-D0 -> K+ pi-) pi-) (D_s+ -> (eta -> gamma gamma) pi+)]
+# NickName: Bd_Dst-Ds+_D0pi_Kpi_etapi
+# Documentation: MC15rd signal request 
+# Tested: Yes
+# Physics WG: BHadronic 
+# Responsible: Vismaya
+# Cuts: None
+# Date: 20240207
+#
+#
+Alias etasig eta
+
+#
+# Y(4S) -> B0 anti-B0 
+#
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0    VSS_BMIX dm;
+Enddecay
+
+#
+# B0 -> D*- eta pi+
+#
+
+Decay B0sig
+1.0000 D*-sig D_s+sig PHOTOS SVS;
+Enddecay
+CDecay anti-B0sig
+
+#
+# D*- -> anti-D0 pi-
+#
+
+Decay D*-sig
+1.0000 anti-D0sig pi- PHOTOS VSS;
+Enddecay
+CDecay D*+sig
+
+#
+# anti-D0 -> K+ pi-
+#
+
+Decay anti-D0sig
+1.0000 K+ pi- PHOTOS PHSP;
+Enddecay
+CDecay D0sig
+
+#
+## Ds+ -> eta pi+
+##
+#
+Decay D_s+sig
+1.0000 etasig pi+ PHOTOS PHSP;
+Enddecay
+CDecay D_s-sig
+#
+# eta -> gamma gamma
+#
+
+Decay etasig
+1.0000 gamma gamma PHSP;
+Enddecay
+
+End

@@ -105,7 +105,7 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Algorithm setup
-
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import TestCalibrationAlgorithm
 
     alg_test = TestCalibrationAlgorithm()

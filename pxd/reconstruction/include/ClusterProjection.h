@@ -22,9 +22,9 @@ namespace Belle2 {
     class ClusterProjection {
     public:
       /** Constructor */
-      ClusterProjection(): m_pos(0), m_min(-1), m_max(0), m_minCharge(0),
+      ClusterProjection(): m_pos(0), m_minCharge(0),
         m_maxCharge(0), m_minPos(0), m_maxPos(0), m_error(0), m_charge(0),
-        m_size(0) {}
+        m_min(-1), m_max(0), m_size(0) {}
 
       /** Add Pixel information to the projection.
        * This will adjust the minimal and maximal coordinates and the
@@ -74,10 +74,6 @@ namespace Belle2 {
 
       /** Center of gravity of the cluster */
       double m_pos;
-      /** Minimum row or column of the cluster */
-      unsigned int m_min;
-      /** Maximum row or column of the cluster */
-      unsigned int m_max;
       /** Charge collected in the minimum row/column */
       double m_minCharge;
       /** Charge collected in the maximum row/column */
@@ -90,6 +86,10 @@ namespace Belle2 {
       double m_error;
       /** Charge of the full cluster */
       double m_charge;
+      /** Minimum row or column of the cluster */
+      unsigned int m_min;
+      /** Maximum row or column of the cluster */
+      unsigned int m_max;
       /** Projected size of the cluster */
       unsigned int m_size;
     };

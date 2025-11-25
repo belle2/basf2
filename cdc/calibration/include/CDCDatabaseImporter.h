@@ -112,7 +112,15 @@ namespace Belle2 {
      * print it.
      */
     void printBadWire();
-
+    /**
+     * Import badboards table to the data base.
+     */
+    void importBadBoards(std::string fileName);
+    /**
+     * Get the badboard table from the database and
+     * print it.
+     */
+    void printBadBoards();
     /**
      * Import propspeed table to the database.
      */
@@ -162,6 +170,17 @@ namespace Belle2 {
      * print it.
      */
     void printFFactor();
+
+    /**
+     * Import alpha scale factors table to the database.
+     */
+    void importAlphaScaleFactors(std::string fileName);
+    /**
+     * Get the fudge factor table from the database and
+     * print it.
+     */
+    void printAlphaScaleFactors();
+
 
     /**
      * Import displacement of wire position to the database.

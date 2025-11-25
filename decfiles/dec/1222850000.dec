@@ -1,0 +1,32 @@
+# EventType: 1222850000
+# Descriptor: [B+ -> K+ pi0 X_1(3872) [-> pi+ pi- J/psi [-> l+ l-]]]
+# NickName: Bu_Kppi0X_1(3872)_pipiJpsi_ll
+# Documentation:
+# Tested: Yes
+# Physics WG: Quarkonium WG
+# Responsible: Yang Li
+# Email: y_li21@m.fudan.edu.cn
+# Cuts: None
+# Date: 20241116
+# Comments:
+
+Decay Upsilon(4S) 
+0.5   B+sig B-             VSS; 
+0.5   B-sig B+             VSS; 
+Enddecay
+
+Decay B+sig
+1.0   K+ pi0 X_1(3872)sig     PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+Decay X_1(3872)sig
+1.0   J/psisig pi+ pi-        VVPIPI;
+Enddecay
+
+Decay J/psisig
+0.5   e+ e-                   PHOTOS VLL;
+0.5   mu+ mu-                 PHOTOS VLL;
+Enddecay
+
+End

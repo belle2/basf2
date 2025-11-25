@@ -15,7 +15,7 @@
 #include <root/TMatrix.h>
 
 /* defines */
-#define CDC_SUPER_LAYERS 9
+#define CDC_SUPER_LAYERS 45
 
 using namespace std;
 using namespace Belle2;
@@ -118,6 +118,7 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
         iSL = hp.first;
         m = hp.second.X();
         a = hp.second.Y();
+
         // calculate Hough curve with slightly enlarged limits to avoid errors due to rounding
         y1 = m * sin(x1_d - 1e-10) - a * cos(x1_d - 1e-10);
         y2 = m * sin(x2_d + 1e-10) - a * cos(x2_d + 1e-10);
@@ -135,6 +136,10 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
               << " layerHit " << int(layerHit[0]) << int(layerHit[2])
               << int(layerHit[4]) << int(layerHit[6]) << int(layerHit[8])
               << " nSL " << nSL);
+      //std::cout << indent << "i " << i << " j " << j
+      //        << " layerHit " << int(layerHit[0]) << int(layerHit[2])
+      //        << int(layerHit[4]) << int(layerHit[6]) << int(layerHit[8])
+      //        << " nSL " << nSL << std::endl;
       if (nSL >= m_minHits || shortTrack(layerHit)) {
         if (iterations != maxIterations) {
           fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);

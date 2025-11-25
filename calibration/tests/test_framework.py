@@ -13,8 +13,6 @@ import os
 import shutil
 import glob
 
-from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
-
 from caf.framework import Calibration, CAF
 
 import unittest
@@ -34,6 +32,8 @@ class TestCalibrationClass_Configure(TestCase):
         """
         Create useful objects for each test
         """
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
+        from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
         #: Calibration algorithm for use in unittests
         self.alg1 = TestAlgo()
         #: Calibration algorithm attribute for use in unittests
@@ -112,6 +112,9 @@ class TestCalibrationClass_Args(TestCase):
         """
         Create useful objects for each test
         """
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
+        from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
+
         #: Calibration algorithm for use in unittests
         self.alg1 = TestAlgo()
         #: Calibration algorithm for use in unittests
@@ -170,6 +173,9 @@ class TestCAF(TestCase):
         """
         Create useful objects for each test and the teardown
         """
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
+        from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
+
         #: Calibration name for use in unittests
         self.name1 = 'TestCalibration1'
         #: Calibration name for use in unittests

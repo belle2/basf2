@@ -104,7 +104,7 @@ namespace Belle2 {
     /** Remove inner hits from RecoTrack at once.
      * Hits are removed from the minus-end of the momentum direction.
      * For SVD hits, remove U- and V- hit pair at once.
-     * Input RecoTrack is fitted in the funcion.
+     * Input RecoTrack is fitted in the function.
      * If track fit fails, return false.
      * @param prevRecoTrack original RecoTrack
      * @param recoTrack input RecoTrack, updated in this function

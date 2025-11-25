@@ -19,18 +19,18 @@ namespace Belle2 {
   /**
    * The Class for ARICH Aerogel Parameters.
    */
-
   class ARICHAerogelInfo: public TObject {
+
   public:
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHAerogelInfo(): m_version(0.0), m_serial(""), m_id(""), m_refractiveIndex(0.0), m_transmissionLength(0), m_thickness(0.0),
       m_lambda(), m_transmittance(), m_comment("") {};
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHAerogelInfo(float version, const std::string& serial, const std::string& id, float index, float trlen, float thickness,
                      std::vector<int>& lambda, std::vector<float>& transmittance): m_version(version), m_serial(serial), m_id(id),
@@ -38,114 +38,128 @@ namespace Belle2 {
       m_comment("") {};
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ARICHAerogelInfo() {};
 
-    /** Return Aerogel Version
-     * @return Aerogel Version
+    /**
+     * Get aerogel version.
+     * @return aerogel version.
      */
-
     float getAerogelVersion() const {return m_version; }
 
-    /** Set Aerogel Version
-     * @param Aerogel Version
+    /**
+     * Set aerogel version.
+     * @param[in] version Aerogel version.
      */
     void setAerogelVersion(float version) {m_version = version; }
 
-    /** Return Aerogel Serial number
-     * @return Aerogel Serial number
+    /**
+     * Get aerogel serial number.
+     * @return Aerogel serial number.
      */
     std::string getAerogelSN() const {return m_serial; };
 
-    /** Set Aerogel Serial number
-     * @param Aerogel Serial number
+    /**
+     * Set aerogel serial number.
+     * @param[in] serial Aerogel serial number.
      */
     void setAerogelSN(const std::string& serial) {m_serial = serial; }
 
-    /** Return Aerogel Identifier
-     * @return Aerogel Identifier
+    /**
+     * Get aerogel identifier.
+     * @return Aerogel identifier.
      */
     std::string getAerogelID() const {return m_id; };
 
-    /** Set Aerogel Identifier
-     * @param Aerogel Identifier
+    /**
+     * Set aerogel identifier.
+     * @param[in] agelid Aerogel identifier.
      */
     void setAerogelID(const std::string& agelid) {m_id = agelid; }
 
-    /** Return Refractive Index of Aerogel
-     * @return Refractive Index of Aerogel
+    /**
+     * Get refractive index of aerogel.
+     * @return Refractive index of aerogel.
      */
-
     float getAerogelRefractiveIndex() const {return m_refractiveIndex; }
 
-    /** Set Aerogel Refractive Index
-     * @param Aerogel Refractive Index
+    /**
+     * Set aerogel refractive index.
+     * @param[in] index Aerogel refractive index.
      */
     void setAerogelRefractiveIndex(float index) {m_refractiveIndex = index; }
 
-    /** Return Transmission Length at 400 nm
-     * @return Transmission Length at 400 nm
+    /**
+     * Get transmission length at 400 nm.
+     * @return Transmission length at 400 nm.
      */
     float getAerogelTransmissionLength() const {return m_transmissionLength; }
 
-    /** Set Transmission Length at 400 nm
-     * @param Transmission Length at 400 nm
+    /**
+     * Set transmission length at 400 nm.
+     * @param[in] translength Transmission Length at 400 nm.
      */
     void setAerogelTransmissionLength(float translength) {m_transmissionLength = translength; }
 
-    /** Return Aerogel Thickness
-     * @return Aerogel Thickness
+    /**
+     * Get aerogel thickness.
+     * @return Aerogel thickness.
      */
     float getAerogelThickness() const {return m_thickness; }
 
-    /** Set Aerogel Thickness
-     * @param Aerogel Thickness
+    /**
+     * Set aerogel thickness.
+     * @param[in] thickness Aerogel thickness.
      */
     void setAerogelThickness(float thickness) {m_thickness = thickness; }
 
     /**
-     * Return Aerogel Transmittance at lambda
-     * @return Aerogel transmittance at lambda
+     * Get aerogel transmittance at lambda.
+     * @return Aerogel transmittance at lambda.
      */
     float getAerogelTransmittanceElement(int lambda) const;
 
     /**
-     * Set Aerogel Transmittance at lambda
-     * @param lambda
-     * @param transmittance
+     * Set aerogel transmittance at lambda.
+     * @param[in] lambda
+     * @param[in] transmittance Aerogel transmittance at lambda.
      */
     void setAerogelTransmittanceElement(int lambda, float transmittance);
+
     /**
-     * Return Aerogel Transmittance
-     * @return Aerogel transmittance
+     * Get aerogel transmittance
+     * @return Aerogel transmittance.
      */
     float getAerogelTransmittance(unsigned int i) const { if (i < m_transmittance.size()) return m_transmittance[i]; else return -1;}
 
     /**
-     * Set Aerogel Transmittance
-     * @param transmittance
+     * Set aerogel transmittance.
+     * @param[in] transmittance Aerogel transmittance.
      */
     void setAerogelTransmittance(std::vector<float> transmittance);
 
     /**
-     * Return Lambda for Aerogel Transmittance
-     * @return Lambda for Aerogel transmittance
+     * Get lambda for aerogel transmittance.
+     * @return Lambda for aerogel transmittance.
      */
     int getAerogelTransmittanceLambda(unsigned int i) const { if (i < m_lambda.size()) return m_lambda[i]; else return -1;}
 
     /**
-     * Set Lambda for Aerogel Transmittance
-     * @param Lambda for transmittance
+     * Set lambda for aerogel transmittance.
+     * @param[in] lambda Lambda for aerogel transmittance.
      */
     void setAerogelTransmittanceLambda(std::vector<float> lambda);
-    /** Return comment
-     * @return comment
+
+    /**
+     * Get comment.
+     * @return Comment.
      */
     std::string getAerogelComment() const {return m_comment; }
 
-    /** Set comment
-     * @param comment
+    /**
+     * Set comment.
+     * @param[in] comment Comment.
      */
     void setAerogelComment(const std::string& comment) {m_comment = comment; }
 

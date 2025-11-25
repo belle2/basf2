@@ -55,10 +55,10 @@ namespace {
 }
 
 CosmicRayFlightTimeEstimator::CosmicRayFlightTimeEstimator(Vector3D triggerPoint)
-  : m_triggerPoint(triggerPoint)
-  , m_halfPeriodAlphaFlightTimeFactor(getHalfPeriodAlphaFlightTime,
+  : m_halfPeriodAlphaFlightTimeFactor(getHalfPeriodAlphaFlightTime,
                                       512,
                                       0,
                                       std::nextafter(M_PI, INFINITY))
+  , m_triggerPoint(triggerPoint)
 {
 }

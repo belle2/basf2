@@ -3,7 +3,7 @@
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:MC (gamma:MC)
+[INFO]  o) creating ParticleList with name: gamma:MC
 [INFO]    -> MDST source: MCParticles
 [INFO]  o) creating (anti-)ParticleList with name: e+:MC (e-:MC)
 [INFO]    -> MDST source: MCParticles
@@ -15,7 +15,7 @@
 [INFO]    -> MDST source: MCParticles
 [INFO]  o) creating (anti-)ParticleList with name: p+:MC (anti-p-:MC)
 [INFO]    -> MDST source: MCParticles
-[INFO]  o) creating (anti-)ParticleList with name: K_S0:MC (K_S0:MC)
+[INFO]  o) creating ParticleList with name: K_S0:MC
 [INFO]    -> MDST source: MCParticles
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0:MC (anti-Lambda0:MC)
 [INFO]    -> MDST source: MCParticles

@@ -73,7 +73,7 @@ namespace Belle2 {
 
     /** operator for sorting.
       *
-      * will be compared using overal purity
+      * will be compared using overall purity
       * NOTE: only the purity will be compared (i.e. .second), the iD is not used!
       * */
     inline bool operator > (const MCVXDPurityInfo& b) const
@@ -84,7 +84,7 @@ namespace Belle2 {
 
     /** operator for sorting.
      *
-     * will be compared using overal purity
+     * will be compared using overall purity
      * NOTE: only the purity will be compared (i.e. .second), the iD is not used!
      * */
     inline bool operator < (const MCVXDPurityInfo& b) const
@@ -93,7 +93,7 @@ namespace Belle2 {
     }
 
 
-    /** getter - returns overal purity (.second) for this particleID (.first).
+    /** getter - returns overall purity (.second) for this particleID (.first).
     *
     * since PXD-Clusters are counting as two measurements, they count twice.
     */

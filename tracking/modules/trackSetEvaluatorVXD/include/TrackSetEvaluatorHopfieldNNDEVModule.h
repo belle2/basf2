@@ -19,7 +19,7 @@
 
 namespace Belle2 {
 
-  /** The Hopfield algoritm Trackset Evaluator.
+  /** The Hopfield algorithm Trackset Evaluator.
    *
    *  This module expects a container of SpacePointTrackCandidates (TCs) and selects a subset of non-overlapping
    *  TCs determined using a neural network of Hopfield type.

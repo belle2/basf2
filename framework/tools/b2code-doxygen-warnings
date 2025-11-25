@@ -46,6 +46,9 @@ FILES=${@:-$BELLE2_LOCAL_DIR}
 TMPFILE=`mktemp`
 trap "rm -f $TMPFILE" EXIT
 
+# exclude imported code
+IMPORTED=$(find . -name .imported -printf "%h " | sed "s;\./;;g")
+
 # call doxygen on the files from the command line arguments
-sed "s;INPUT                  =;INPUT                  = ${FILES};" ${BELLE2_LOCAL_DIR}/site_scons/doxygen/Doxyfile | doxygen - 2>&1 >/dev/null | grep "${GREP_STR}" | tee $TMPFILE
+sed "s;INPUT                  =;INPUT                  = ${FILES};" ${BELLE2_LOCAL_DIR}/site_scons/doxygen/Doxyfile | sed "s;IMPORTED;${IMPORTED};" | doxygen - 2>&1 >/dev/null | grep "${GREP_STR}" | tee $TMPFILE
 grep " not documented" $TMPFILE > /dev/null && exit 1 || exit 0

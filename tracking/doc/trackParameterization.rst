@@ -16,7 +16,7 @@ In empty space, the trajectory of a charged particle in an homogeneous electroma
 
     The projection of the helix on the transverse plane, :math:`xy`.
 
-A helix is described by 5 parameters, computed at the point of closest approach (POCA) of the track to the origin of the coordinate system:
+A helix is described by 5 parameters, computed at the point of closest approach (POCA - the smallest distance to the z-axis and with the smallest absolute z value) of the track to the origin of the coordinate system:
 
 * :math:`d_0 \in [-\infty, +\infty]`: the signed distance of the POCA on the transverse plane. The sign is the same of the :math:`z` component of the angular momentum with respect to the origin;
 * :math:`z_0 \in [-\infty, +\infty]`: the z coordinate of the POCA;

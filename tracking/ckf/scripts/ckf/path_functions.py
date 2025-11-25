@@ -7,6 +7,8 @@
 ##########################################################################
 
 from vtx import add_vtx_SPcreation
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
+from ROOT.Belle2 import DAFConfiguration
 
 
 def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, direction="backward"):
@@ -19,7 +21,8 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
     :param direction: where to extrapolate to. Valid options are forward and backward
     """
     # The CDC tracks need to be fitted
-    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
+    path.add_module("DAFRecoFitter", trackFitType=DAFConfiguration.c_CDConly,
+                    recoTracksStoreArrayName=cdc_reco_tracks).set_name(f"DAFRecoFitter {cdc_reco_tracks}")
 
     if use_mc_truth:
         # MC CKF needs MC matching information
@@ -56,7 +59,9 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
                     reverseSeed=reverse_seed,
 
                     filter=result_filter,
-                    filterParameters=result_filter_parameters
+                    filterParameters=result_filter_parameters,
+
+                    trackFitType=DAFConfiguration.c_CDConly
                     ).set_name(f"CDCToSVDSeedCKF_{direction}")
 
 
@@ -81,7 +86,7 @@ def add_pxd_ckf(
     if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
         path.add_module("PXDSpacePointCreator")
 
-    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks).set_name(f"DAFRecoFitter {svd_cdc_reco_tracks}")
 
     if direction == "forward":
         reverse_seed = True
@@ -89,10 +94,6 @@ def add_pxd_ckf(
         reverse_seed = False
 
     if use_mc_truth:
-        path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
-                        mcRecoTracksStoreArrayName="MCRecoTracks",
-                        prRecoTracksStoreArrayName=svd_cdc_reco_tracks)
-
         module_parameters = dict(
             firstHighFilter="truth",
             secondHighFilter="all",
@@ -202,6 +203,8 @@ def add_svd_ckf(
                     seedHitJumping=1,
                     hitHitJumping=1,
 
+                    trackFitType=DAFConfiguration.c_CDConly,
+
                     **module_parameters).set_name(f"CDCToSVDSpacePointCKF_{direction}")
 
 
@@ -297,7 +300,7 @@ def add_cosmics_pxd_ckf(
     if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
         path.add_module("PXDSpacePointCreator")
 
-    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks).set_name(f"DAFRecoFitter {svd_cdc_reco_tracks}")
 
     if direction == "forward":
         reverse_seed = True

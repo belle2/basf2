@@ -91,7 +91,7 @@ namespace Belle2 {
      *
      *  Returns only after user presses prev/next, or closes the window.
      *
-     *  @returns wether to reprocess the current event, e.g. when visualisation options changed
+     *  @returns whether to reprocess the current event, e.g. when visualisation options changed
      */
     bool startDisplay();
 

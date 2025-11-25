@@ -61,7 +61,7 @@ namespace Belle2 {
 
   protected:
 
-    //! option for efficieny study mode, in this mode, the layer under study should not be used in tracking
+    //! option for efficiency study mode, in this mode, the layer under study should not be used in tracking
     bool m_studyEffi;
 
     //! whether match BKLMTrack to RecoTrack
@@ -93,7 +93,7 @@ namespace Belle2 {
     //! bklm GeometryPar
     bklm::GeometryPar* m_GeoPar = nullptr;
 
-    //! TFile that store efficieny plots
+    //! TFile that store efficiency plots
     TFile* m_file = nullptr;
 
     //! Denominator of each layer
@@ -102,14 +102,14 @@ namespace Belle2 {
     //! Numerator of each layer
     TH1F* m_pass[2][8];
 
-    //! Efficieny of each layer
+    //! Efficiency of each layer
     TEfficiency* m_effiVsLayer[2][8];
 
-    //! Efficieny at global position Y vs X
+    //! Efficiency at global position Y vs X
     //TEfficiency* m_effiYX;
     TH2F* m_effiYX;
 
-    //! Efficieny at global position Y vs Z
+    //! Efficiency at global position Y vs Z
     //TEfficiency* m_effiYZ;
     TH2F* m_effiYZ;
 

@@ -17,6 +17,9 @@
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
+// for std::ignore
+#include <utility>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -65,8 +68,7 @@ void TrackCreatorSegmentPairAutomaton::apply(
       return false;
     };
     // return value is not needed here
-    // cppcheck-suppress ignoredReturnValue
-    std::adjacent_find(segmentPairPath.begin(), segmentPairPath.end(), saverStereoApogeePositions);
+    std::ignore = std::adjacent_find(segmentPairPath.begin(), segmentPairPath.end(), saverStereoApogeePositions);
 
     // Compute the average recohits with the preliminary fits
     outputTracks.push_back(CDCTrack::condense(segmentPairPath));

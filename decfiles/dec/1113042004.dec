@@ -1,0 +1,26 @@
+# EventType: 1113042004
+# Descriptor: [anti-B0 -> D+ (-> K- pi+ pi+) pi- pi0]  
+# NickName: Bd_Dpipi0_DtoKpipi
+# Documentation: anti-B0 to D+ pi- pi0
+# Responsible: Agrim Aggarwal
+# Email: s6agagga@uni-bonn.de 
+# Tested: Yes 
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 2025/02/03
+
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0     VSS_BMIX dm;
+Enddecay
+
+Decay anti-B0sig
+1.00  D+sig  pi-  pi0         PHSP;
+Enddecay
+CDecay B0sig
+
+Decay D+sig
+1.00   K-  pi+  pi+          D_DALITZ;
+Enddecay
+CDecay D-sig
+
+End

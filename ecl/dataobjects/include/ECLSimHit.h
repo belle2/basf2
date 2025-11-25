@@ -25,8 +25,8 @@ namespace Belle2 {
   class ECLSimHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    ECLSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum{0}, m_Position{0},
-      m_HadronEdep{0} {;}
+    ECLSimHit(): SimHitBase(), m_Momentum{0}, m_Position{0}, m_FlightTime(0), m_Edep(0),
+      m_HadronEdep{0}, m_CellId(0), m_TrackId(0), m_Pdg(0) {;}
 
     //! Useful Constructor
     ECLSimHit(
@@ -38,7 +38,7 @@ namespace Belle2 {
       G4ThreeVector Momentum,     /**< Momentum */
       G4ThreeVector Position,       /**< Position */
       double Hadronedep              /**< Hadron edep */
-    ): SimHitBase(), m_CellId(CellId), m_TrackId(TrackId), m_Pdg(Pdg), m_FlightTime(FlightTime), m_Edep(Edep), m_HadronEdep(Hadronedep)
+    ): SimHitBase(), m_FlightTime(FlightTime), m_Edep(Edep), m_HadronEdep(Hadronedep), m_CellId(CellId), m_TrackId(TrackId), m_Pdg(Pdg)
     {
       m_Position[0] = Position.x(); m_Position[1] = Position.y(), m_Position[2] = Position.z();
       m_Momentum[0] = Momentum.x(); m_Momentum[1] = Momentum.y(), m_Momentum[2] = Momentum.z();
@@ -128,17 +128,17 @@ namespace Belle2 {
 
 
   private:
-    int m_CellId;            /**< Cell ID */
-    int m_TrackId;           /**< Track ID */
-    int m_Pdg;               /**< Particle PDG (can be one of secondaries) */
+    double m_Momentum[3];     /**< Momentum */
+    double m_Position[3];     /**< Position */
     double m_FlightTime;      /**< Flight time from IP */
     double m_Edep;            /**< Deposit energy */
-    double m_Momentum[3];     /**< Momentum */
-    double m_Position[3];        /**< Position */
     double m_HadronEdep;      /**< Hadron Energy Deposit */
+    int m_CellId;             /**< Cell ID */
+    int m_TrackId;            /**< Track ID */
+    int m_Pdg;                /**< Particle PDG (can be one of secondaries) */
 
-
-    ClassDefOverride(ECLSimHit, 6);/**< the class title */
+    // 7: Slightly reorder data members to improve memory layout (CW)
+    ClassDefOverride(ECLSimHit, 7);/**< the class title */
 
   };
 } // end namespace Belle2

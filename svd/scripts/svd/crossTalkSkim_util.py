@@ -1,5 +1,4 @@
 # !/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -29,7 +28,7 @@ from ROOT import Belle2
 
 class skimCrossTalkEventsModule(basf2.Module):
     """
-    a basf2 pythin module to skim SVD xTalk events
+    a basf2 python module to skim SVD xTalk events
     """
 
     def event(self):

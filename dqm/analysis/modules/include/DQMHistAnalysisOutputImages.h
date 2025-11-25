@@ -13,6 +13,9 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 
 namespace Belle2 {
   /*! Class definition for the output to image module */
@@ -27,6 +30,10 @@ namespace Belle2 {
      */
     DQMHistAnalysisOutputImagesModule();
 
+    /**
+     * Initializer.
+     */
+    void initialize(void) override final;
 
     /**
      * This method is called for each event.
@@ -35,7 +42,10 @@ namespace Belle2 {
 
     // Data members
   private:
-    /** Save untagged canvase by default */
+    /** The metadata for each event. */
+    StoreObjPtr<EventMetaData> m_evtMetaDataPtr;
+
+    /** Save untagged canvas by default */
     bool m_canvasSaveDefault{true};
 
     /** Output path for saving images in sub-folders */
@@ -51,6 +61,8 @@ namespace Belle2 {
     bool m_asROOT{false};
     /** flag: save as json file */
     bool m_asJSON{false};
+    /** use and exp/run/ prefix */
+    bool m_useExpRun{false};
   };
 } // end namespace Belle2
 

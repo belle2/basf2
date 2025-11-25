@@ -62,7 +62,7 @@ void KarimakisMethod::update(CDCTrajectory2D& trajectory2D,
 
 
 namespace {
-  /// Helper indices for meaningfull matrix access to the observations matrices
+  /// Helper indices for meaningful matrix access to the observations matrices
   constexpr size_t iW = 0;
   constexpr size_t iX = 1;
   constexpr size_t iY = 2;

@@ -70,7 +70,7 @@ namespace Belle2 {
 
   private:
 
-    //// Memebers.
+    //// Members.
     /// Holds the VHDL output filename.
     std::string m_vhdlOutputFile;
     /// Holds VHDL entry code.
@@ -86,9 +86,9 @@ namespace Belle2 {
     /// Statis if VHDL is printed to file.
     bool m_printedToFile;
     /// vector<int> is {type, bitwidth, buffer}
-    /// Holds all the requried VHDL buffers.
+    /// Holds all the required VHDL buffers.
     std::map<std::string, std::vector<int> > m_buffers;
-    /// Holds all the requried VHDL signals.
+    /// Holds all the required VHDL signals.
     std::map<std::string, std::vector<int> > m_signals;
     /// Holds all the required VHDL types.
     std::map<std::string, bool > m_arrayType;

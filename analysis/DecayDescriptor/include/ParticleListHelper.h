@@ -16,7 +16,6 @@
 #include <optional>
 
 namespace Belle2 {
-  class Particle;
   class DecayDescriptor;
 
   /** Class to help managing creation and adding to ParticleLists.

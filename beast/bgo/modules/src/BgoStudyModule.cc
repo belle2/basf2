@@ -14,12 +14,7 @@
 #include <framework/gearbox/Const.h>
 #include <cmath>
 
-#include <fstream>
 #include <string>
-
-// ROOT
-#include <TH1.h>
-#include <TH2.h>
 
 #include <generators/SAD/dataobjects/SADMetaHit.h>
 

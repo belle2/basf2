@@ -29,6 +29,11 @@ extern "C" {
     int bnhad;            /**< Number of hadrons/muons. */
   } belle2_phokhara_particles;
 
+  /** struct that holds the error flag*/
+  extern struct {
+    int error_flag;
+  } belle2_error_flag_;
+
   /** Replace internal random generator with the framework random generator */
   double phokhara_rndm()
   {
@@ -39,7 +44,7 @@ extern "C" {
   /** Wrap Phokhara random number generator and use ROOT.
    * This method returns an array of random numbers in the range ]0,1[
    * @param drvec array to store the random numbers
-   * @param lenght size of the array
+   * @param length size of the array
    */
   void phokhara_rndmarray(double* drvec, const int* lengt)
   {
@@ -160,7 +165,7 @@ void Phokhara::setDefaultSettings()
 
 void Phokhara::init(const std::string& paramFile)
 {
-  B2INFO("Phokhara::init, using paramater file: " << paramFile);
+  B2INFO("Phokhara::init, using parameter file: " << paramFile);
 
   if (paramFile.empty()) B2FATAL("Phokhara: The specified param file is empty!");
   phokhara_set_parameter_file(paramFile.c_str());
@@ -194,6 +199,10 @@ double Phokhara::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector v
   } else
     phokhara(&mode, m_xpar, m_npar);
 
+  // Check error flag increment during phokhara execution
+  if (belle2_error_flag_.error_flag != 0) {
+    B2FATAL("Phokhara returned a non-zero exit code. Check the output of phokara.");
+  }
   //Store the initial particles as virtual particles into the MCParticleGraph
   double eMom[4] = {belle2_phokhara_particles.bp1[1], belle2_phokhara_particles.bp1[2], belle2_phokhara_particles.bp1[3], belle2_phokhara_particles.bp1[0]};
   double pMom[4] = {belle2_phokhara_particles.bq1[1], belle2_phokhara_particles.bq1[2], belle2_phokhara_particles.bq1[3], belle2_phokhara_particles.bq1[0]};
@@ -297,8 +306,8 @@ void Phokhara::applySettings()
   m_npar[33]  = m_IFSNLO;
   m_npar[34]  = m_alpha;
   m_npar[35]  = m_pionff;
-  m_npar[36]  = m_pionstructure;
-  m_npar[37]  = m_kaonff;
+  m_npar[36]  = m_kaonff;
+  m_npar[37]  = m_pionstructure;
   m_npar[38]  = m_narres;
   m_npar[39]  = m_protonff;
   m_npar[40]  = m_fullNLO;
@@ -326,6 +335,9 @@ void Phokhara::applySettings()
 
   int mode = -1; //use mode to control init/generation/finalize in FORTRAN code
   phokhara(&mode, m_xpar, m_npar);
+  if (belle2_error_flag_.error_flag != 0) {
+    B2FATAL("Phokhara returned a non-zero exit code. Check the output of phokara.");
+  }
 }
 
 

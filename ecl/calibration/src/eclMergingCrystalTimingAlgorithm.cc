@@ -243,7 +243,7 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
   for (int ic = 0; ic < m_numCrystals; ic++) {
     /* Define a good bhabha calibration value.  This is the
        uncertainty on the calibration constant (e.g. fit mean),
-       not the guassian width of the timing distribution for
+       not the gaussian width of the timing distribution for
        that crystal (i.e. resolution).
 
        Uncertainty stored as ticks so converted to ns for
@@ -344,7 +344,7 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
   //------------------------------------------------------------------------
   /** Calculate the new ECLCrystalTimeOffset from existing payloads.  Use
       the bhabha calibrations as the default but then resort to the
-      radiative bhabha calibrations if the bhabha calibraitons are not
+      radiative bhabha calibrations if the bhabha calibrations are not
       good enough (most likely to be when the electrons are outside
       the CDC acceptance).  If the radiative bhabha calibrations are not
       good or unavailable then use the cosmic calibration values, shifted
@@ -532,7 +532,7 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
 
 
   /* Re-save the new bhabha calibrations to a payload.  The bhabha calibrations have NOT
-     been changed; however, the best way of controling which payloads get get uploaded to
+     been changed; however, the best way of controlling which payloads get get uploaded to
      the GT as part of the prommp calibrations is to save a second copy in this calibration
      directory since we don't want to save all the payloads from the previous directory.
      See the "<calibration>.save_payloads = <True/False>" code in the airflow steering file.*/

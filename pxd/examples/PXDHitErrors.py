@@ -73,7 +73,7 @@ class PXDHitErrors(b2.Module):
                 truehit = truehits[truehit_index]
                 # Now let's store some data
                 s = ''
-                # Sesnor identification
+                # Sensor identification
                 sensorID = truehit.getRawSensorID()
                 [layer, ladder, sensor] = self.decode(sensorID)
 

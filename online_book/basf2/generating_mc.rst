@@ -6,9 +6,7 @@ Generating Monte Carlo
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 30 min
-
-    **Exercises**: 30 min
+    **Length**: 1-1.5 hrs
 
     **Prerequisites**:
 
@@ -41,7 +39,7 @@ this is one of the duty of the Data Production group.
 Each physics Working Group has a dedicated person (the `Data Production liaison`_) to assist the analysers
 and to collect their requests concerning the MC production.
 
-.. _Data production liaison: https://confluence.desy.de/display/BI/Data+production+WebHome
+.. _Data production liaison: https://xwiki.desy.de/xwiki/rest/p/df1b0
 
 There are several reasons for discouraging the self-production of very large MC samples:
 
@@ -239,7 +237,7 @@ How to write a decay file and to generate a signal Monte Carlo sample
 
 In the last exercise we learnt how to generate a generic :math:`B^0 \bar{B}^0` event. Probably you are wondering
 where the decay channels of the :math:`B^0` / :math:`\bar{B}^0` and the respective branching fractions are defined,
-or if it possible to specify one or few specific decay channels for the generated particles.
+or if it is possible to specify one or a few specific decay channels for the generated particles.
 
 All the known decay channels of the generated :math:`B^0` and :math:`\bar{B}^0` mesons are defined in our
 `main decay file`_. This file is automatically loaded by the function :py:func:`generators.add_evtgen_generator` and

@@ -12,6 +12,7 @@
 
 import sys
 import basf2
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import KLMElectronicsMapImporter, KLMElementNumbers, BKLMElementNumbers
 
 basf2.set_log_level(basf2.LogLevel.INFO)

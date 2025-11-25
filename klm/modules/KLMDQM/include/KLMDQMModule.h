@@ -79,7 +79,7 @@ namespace Belle2 {
 
   private:
 
-    /** Bins for the trigger bits historgrams. */
+    /** Bins for the trigger bits histograms. */
     enum TriggerBitsBin {
 
       /** 0x8. */
@@ -101,6 +101,24 @@ namespace Belle2 {
 
     /** Number of channel hit histograms per sector for EKLM. */
     const int m_ChannelHitHistogramsEKLM = 3;
+
+    /** Min time for RPC */
+    double m_RPCTimeMin;
+
+    /** Max time for RPC */
+    double m_RPCTimeMax;
+
+    /** Min time for BKLM Scint */
+    double m_BKLMScintTimeMin;
+
+    /** Max time for BKLM Scint */
+    double m_BKLMScintTimeMax;
+
+    /** Min time for EKLM Scint */
+    double m_EKLMScintTimeMin;
+
+    /** Max time for EKLM Scint */
+    double m_EKLMScintTimeMax;
 
     /** Directory for KLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryName;
@@ -172,6 +190,18 @@ namespace Belle2 {
 
     /** Spatial distribution of EKLM 2d hits per layer. */
     TH2F** m_Spatial2DHitsEKLM[EKLMElementNumbers::getMaximalSectionNumber()] = {nullptr};
+
+    /** Standard Readout status for BKLM Scintillator*/
+    TH1F* m_FE_BKLM_Layer_0;
+
+    /** feature extraction status for BKLM Scintillator*/
+    TH1F* m_FE_BKLM_Layer_1;
+
+    /** Standard Readout status for EKLM*/
+    TH1F* m_FE_EKLM_Plane_0;
+
+    /** feature extraction status for EKLM*/
+    TH1F* m_FE_EKLM_Plane_1;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;

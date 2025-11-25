@@ -17,19 +17,14 @@ namespace Belle2 {
      * Structure for the output of PID log likelihoods to a flat ntuple
      */
     struct LogLikelihoods {
-      Float_t le;   /**< log likelihood for electron */
-      Float_t lmu;  /**< log likelihood for muon */
-      Float_t lpi;  /**< log likelihood for pion */
-      Float_t lk;   /**< log likelihood for kaon */
-      Float_t lp;   /**< log likelihood for proton */
-      Short_t flag; /**< flag: information is available (1) or not (0) */
-      Short_t seen; /**< is seen in this component (from related MCParticle) */
-
-      /**
-       * Default constructor
-       */
-      LogLikelihoods(): le(0), lmu(0), lpi(0), lk(0), lp(0), flag(0), seen(0)
-      {}
+      Float_t le = 0;   /**< log likelihood for electron */
+      Float_t lmu = 0;  /**< log likelihood for muon */
+      Float_t lpi = 0;  /**< log likelihood for pion */
+      Float_t lk = 0;   /**< log likelihood for kaon */
+      Float_t lp = 0;   /**< log likelihood for proton */
+      Float_t ld = 0;   /**< log likelihood for deuteron */
+      Short_t flag = 0; /**< flag: information is available (1) or not (0) */
+      Short_t seen = 0; /**< is seen in this component (from related MCParticle) */
 
       /**
        * Clear the structure: set elements to zero
@@ -41,6 +36,7 @@ namespace Belle2 {
         lpi = 0;
         lk = 0;
         lp = 0;
+        ld = 0;
         flag = 0;
         seen = 0;
       }

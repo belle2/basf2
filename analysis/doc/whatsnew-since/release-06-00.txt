@@ -91,7 +91,7 @@ Variables
 
 Modules
 +++++++
-* The :b2:mod:`TrackingMomentum` module can now also smear track momenta based on phase-space dependent smearing factors which are
+* The :b2:mod:`TrackingMomentumScaleFactors` module can now also smear track momenta based on phase-space dependent smearing factors which are
   read from payloads according to parameters ``payloadName`` and ``smearingFactorName``. The corresponding wrapper function
   `smearTrackMomenta` has been added. The argument ``tableName`` has been renamed as ``payloadName`` in `scaleTrackMomenta`.
 * Added an option ``skipNonPrimary`` to ``fillParticleListFromMC`` and ``fillParticleListsFromMC``.
@@ -179,7 +179,7 @@ Variables
 
 Modules
 +++++++
-* The :b2:mod:`TrackingMomentum` module has been extended. Now the module can scale track momenta based on phase-space dependent
+* The :b2:mod:`TrackingMomentumScaleFactors` module has been extended. Now the module can scale track momenta based on phase-space dependent
   scaling factors given which are read from payloads according to parameters ``tableName`` and ``scalingFactorName``. The
   corresponding wrapper function `scaleTrackMomenta` has also been extended accordingly.
 * The :b2:mod:`HelixErrorScaler` has been extended to K_S0 that are reconstructed from V0. A new python function

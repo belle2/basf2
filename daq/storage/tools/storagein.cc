@@ -116,11 +116,12 @@ int main(int argc, char** argv)
           }
           count = 0;
         }
-        if (count < 1000000 && (count < 10 || (count > 10 && count < 100 && count % 10 == 0) ||
-                                (count > 100 && count < 1000 && count % 100 == 0) ||
-                                (count > 1000 && count < 10000 && count % 1000 == 0) ||
-                                (count > 10000 && count < 100000 && count % 10000 == 0) ||
-                                (count > 100000 && count < 1000000 && count % 100000 == 0))) {
+        if (count < 1000000 && (count < 10 ||
+                                (count > 10     && count < 100    && count % 10     == 0) ||
+                                (count > 100    && count < 1000   && count % 100    == 0) ||
+                                (count > 1000   && count < 10000  && count % 1000   == 0) ||
+                                (count > 10000  && count < 100000 && count % 10000  == 0) ||
+                                (count > 100000 &&                   count % 100000 == 0))) {
           std::cout << "[DEBUG] Event count = " << count << " nword = " << nword << std::endl;
         }
         count++;

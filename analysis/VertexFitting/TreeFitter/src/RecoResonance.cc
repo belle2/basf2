@@ -21,7 +21,8 @@ namespace TreeFitter {
     m_massconstraint(false)
   {
     m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
-                                 std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end();
+                                 std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end()
+                       or m_particle->hasExtraInfo("treeFitterMassConstraint");
   }
 
   ErrCode RecoResonance::initParticleWithMother([[gnu::unused]] FitParams& fitparams)

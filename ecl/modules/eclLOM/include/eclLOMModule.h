@@ -67,8 +67,8 @@ namespace Belle2 {
 
       /** Transforms waveforms into discriminators output.
         * Calculates running sums (energy deposition in two consecutive sectors) for endcaps.
-        * Unit output is emmited for &DiscrTime [ns] when signal exceeds given threshold.
-        * Also calculates and substracts pedestals,
+        * Unit output is emitted for &DiscrTime [ns] when signal exceeds given threshold.
+        * Also calculates and subtracts pedestals,
         * and linearly interpolates waveforms from 100ns sampling interval to 10ns.
       */
       void calculate_discr_output();
@@ -127,10 +127,10 @@ namespace Belle2 {
       double m_FESum_Amplitude[16]; /**< Calculated amplitudes in running sums of Forward Endcap.*/
       double m_BE_Pedal[16]; /**< Calculated pedestal values for Backward Endcap.*/
       double m_FE_Pedal[16]; /**< Calculated pedestal values for Forward Endcap.*/
-      double m_FESum_MaxAmp; /**< Maximum runing sum amplitude in an event for Forward endcap.*/
-      double m_BESum_MaxAmp; /**< Maximum runing sum amplitude in an event for Backward endcap.*/
-      int m_FESum_MaxId; /**< Id of a sector with maximum aplitude in Forward endcap.*/
-      int m_BESum_MaxId; /**< Id of a sector with maximum aplitude in Backward endcap.*/
+      double m_FESum_MaxAmp; /**< Maximum running sum amplitude in an event for Forward endcap.*/
+      double m_BESum_MaxAmp; /**< Maximum running sum amplitude in an event for Backward endcap.*/
+      int m_FESum_MaxId; /**< Id of a sector with maximum amplitude in Forward endcap.*/
+      int m_BESum_MaxId; /**< Id of a sector with maximum amplitude in Backward endcap.*/
 
       //validation output
       TH2D* m_h2Coin; /**< Store number of coincedencies for i:j sectors (Forward:Backward) over all events.*/
@@ -155,9 +155,9 @@ namespace Belle2 {
       bool m_isBhabhaPatternFE; /**< Quality signal for Forward endcap.*/
       bool m_isBhabhaPatternBE; /**< Quality signal for Backward endcap.*/
       int m_CoincidenceMatrix[16][16]; /**< Stores current coincidence duration [in samples] between waveforms exceeding threshold in i:j sectors (Forward:Backward).*/
-      int m_SumCoincidenceMatrix[16][16]; /**< Stores current coincidence duration [in samples] between runnig sums discriminators in i:j sectors (Forward:Backward).*/
+      int m_SumCoincidenceMatrix[16][16]; /**< Stores current coincidence duration [in samples] between running sums discriminators in i:j sectors (Forward:Backward).*/
       int m_CoincidenceCounterMatrix[16][16]; /**< Stores number of concidences between waveforms exceeding threshold in i:j sectors (Forward:Backward).*/
-      int m_SumCoincidenceCounterMatrix[16][16]; /**< Stores number of concidences between runnig sums discriminators in i:j sectors (Forward:Backward).*/
+      int m_SumCoincidenceCounterMatrix[16][16]; /**< Stores number of concidences between running sums discriminators in i:j sectors (Forward:Backward).*/
     };
   }//namespace ECL
 }//namespace Belle2

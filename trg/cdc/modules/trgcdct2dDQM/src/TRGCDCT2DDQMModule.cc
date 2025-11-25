@@ -33,7 +33,6 @@
 #include <iostream>
 #include <fstream>
 #include <framework/logging/Logger.h>
-#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace Belle2;

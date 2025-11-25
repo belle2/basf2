@@ -32,6 +32,23 @@ def add_hint(errorstring: str):
         return errorstring
 
 
+def decfile_uses_generic_dalitz(decfile_path) -> bool:
+    """
+    Decay files using the GENERIC_DALITZ model need an additional XML
+    file specifying the resonances. The XML's path is given in the
+    decfile as a path relative to the working directory. Therefore, in
+    order to test decfiles using GENERIC_DALITZ, basf2 must be run from
+    the directory containing the decfile, otherwise EvtGen will be
+    unable to find the XML. This function returns True if the decfile
+    uses GENERIC_DALITZ.
+    """
+    with open(decfile_path) as decfile:
+        for ln in decfile:
+            if not ln.startswith('#') and 'GENERIC_DALITZ' in ln:
+                return True
+    return False
+
+
 if __name__ == '__main__':
 
     b2test_utils.configure_logging_for_tests()
@@ -53,6 +70,11 @@ if __name__ == '__main__':
                                   if (Path(new_file.a_path).suffix == '.dec')
                                   and (Path('decfiles/dec') in Path(new_file.a_path).parents)]
 
+    # in case some decfiles are removed, they end up in the list of modified files:
+    # let's keep only the decfiles that are actually found by basf2.find_file
+    added_or_modified_decfiles = [decfile for decfile in added_or_modified_decfiles
+                                  if basf2.find_file(decfile.as_posix(), silent=True)]
+
     steering_file = basf2.find_file('decfiles/tests/test_changed_decfiles.py_noexec')
     custom_evtpdl = basf2.find_file("decfiles/tests/test_changed_decfiles.pdl")
     default_evtpdl = basf2.find_file('data/framework/particledb/evt.pdl')
@@ -65,13 +87,14 @@ if __name__ == '__main__':
         with NamedTemporaryFile(mode='w', suffix='.pdl') as tempfile:
 
             for fname in [custom_evtpdl, default_evtpdl]:
-                with open(fname, 'r') as infile:
+                with open(fname) as infile:
                     tempfile.write(infile.read())
 
             for decfile in added_or_modified_decfiles:
+                cwd = decfile.parent if decfile_uses_generic_dalitz(decfile) else None
                 with b2test_utils.clean_working_directory():
                     run_results.append(subprocess.run(['basf2', steering_file, str(decfile), tempfile.name],
-                                                      capture_output=True))
+                                                      capture_output=True, cwd=cwd))
 
     files_and_errors = [f'Decfile {added_or_modified_decfiles[i]} failed with output \n'
                         f'{ret.stdout.decode()} \n and error \n {add_hint(ret.stderr.decode())}'

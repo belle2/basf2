@@ -78,7 +78,7 @@ namespace Belle2 {
      *
      *  This constructor is needed for testing the class.
      *  @param tau           Helix parameters of the track; @sa m_tau .
-     *  @param cov5          Covariance matrix of the helix paramters of the track; @sa m_cov5
+     *  @param cov5          Covariance matrix of the helix parameters of the track; @sa m_cov5
      *  @param particleType  Particle Type used for the mass hypothesis of the fit.
      *  @param pValue        p-value of the corresponding track fit.
      *  @param hitPatternCDCInitializer  bits for initializing CDC hit pattern.
@@ -251,12 +251,6 @@ namespace Belle2 {
   private:
 
     //---------------------------------------------------------------------------------------------------------------------------
-    /** PDG Code for hypothesis with which the corresponding fit was performed. */
-    unsigned int m_pdg;
-
-    /** Chi2 Probability of the fit. */
-    Double32_t m_pValue;
-
     /** \name TFRStorageSizes
      *  Constants for Storage sizes */
     /**@{
@@ -266,24 +260,14 @@ namespace Belle2 {
     static const unsigned int c_NCovEntries = 5 * 6 / 2; ///< Number of covariance entries
     /**@}*/
 
-    /** \name TFRParName
-     *  Names for the parameter indices into m_tau.  */
-    /**@{ */
-    static const unsigned int iD0 = 0;        ///< Index for d0
-    static const unsigned int iPhi0 = 1;      ///< Index for phi0
-    static const unsigned int iOmega = 2;     ///< Index for omega
-    static const unsigned int iZ0 = 3;        ///< Index for z0
-    static const unsigned int iTanLambda = 4; ///< Index tan lambda
-    /**@}*/
-
-    /** perigee helix parameters; tau = d0, phi0, omega, z0, tanLambda. */
-    Double32_t m_tau[c_NPars];
-
     /** The 15 = 5*(5+1)/2 covariance matrix elements.
      *
      *  (0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...
      */
     Double32_t m_cov5[c_NCovEntries];
+
+    /** perigee helix parameters; tau = d0, phi0, omega, z0, tanLambda. */
+    Double32_t m_tau[c_NPars];
 
     /** Member for initializing the information about hits in the CDC.
      *
@@ -296,6 +280,22 @@ namespace Belle2 {
      */
     uint32_t m_hitPatternVXDInitializer;
 
+    /** PDG Code for hypothesis with which the corresponding fit was performed. */
+    unsigned int m_pdg;
+
+    /** Chi2 Probability of the fit. */
+    Double32_t m_pValue;
+
+    /** \name TFRParName
+     *  Names for the parameter indices into m_tau.  */
+    /**@{ */
+    static const unsigned int iD0 = 0;        ///< Index for d0
+    static const unsigned int iPhi0 = 1;      ///< Index for phi0
+    static const unsigned int iOmega = 2;     ///< Index for omega
+    static const unsigned int iZ0 = 3;        ///< Index for z0
+    static const unsigned int iTanLambda = 4; ///< Index tan lambda
+    /**@}*/
+
     /** backward compatibility initialisation for NDF */
     static const uint16_t c_NDFFlag = 0xFFFF;
 
@@ -304,8 +304,9 @@ namespace Belle2 {
      **/
     uint16_t m_NDF100;
 
-    ClassDefOverride(TrackFitResult, 10); /**< Values of the result of a track fit with a given particle hypothesis. */
+    ClassDefOverride(TrackFitResult, 11); /**< Values of the result of a track fit with a given particle hypothesis. */
     /* Version history:
+       ver 11: Reorder data members to improve memory layout
        ver 10: m_NDF -> m_NDF100, we store NDFx100, to have a 2-digit number inside an integer
        ver 9: change m_pValue, m_pdg, m_hitPatternVXDInitializer to a non-const value
        ver 8: add NDF

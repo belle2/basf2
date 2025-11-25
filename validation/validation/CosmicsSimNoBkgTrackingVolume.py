@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,7 +11,7 @@
 """
 <header>
   <output>CosmicsSimNoBkgTrackingVolume.root</output>
-  <contact>Software team b2soft@mail.desy.de</contact>
+  <contact>arul.prakash@physik.uni-muenchen.de</contact>
   <cacheable/>
   <description>
     This steering file produces 10000 cosmic ray events without background, for the early_phase3 geometry.
@@ -35,7 +34,7 @@ main.add_module(
 )
 
 # Generate cosmic events. Note: with default settings the cosmics are
-# generated on a cylinder of 125cm (closely outside the tracking valume)!
+# generated on a cylinder of 125cm (closely outside the tracking volume)!
 main.add_module("Cosmics")
 
 # detector simulation
@@ -57,14 +56,14 @@ print(statistics)
 
 statistics_plots(
     "CosmicsSimNoBkgTrackingVolume_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation job with Cosmics events",
     prefix="CosmicsSimNoBkgTrackingVolume",
 )
 event_timing_plot(
     "../CosmicsSimNoBkgTrackingVolume.root",
     "CosmicsSimNoBkgTrackingVolume_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation job with Cosmics events",
     prefix="CosmicsSimNoBkgTrackingVolume",
 )

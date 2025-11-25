@@ -16,6 +16,8 @@
 #include <cmath>
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
+#include <vector>
 
 using namespace std;
 using namespace Belle2;
@@ -41,13 +43,33 @@ void PIDLikelihood::setLogLikelihood(Const::EDetector det,
   }
   if (logl != logl or logl == INFINITY) {
     B2ERROR("PIDLikelihood::setLogLikelihood: log-likelihood for detector " << det << " is " << logl <<
-            " (i.e. +inf or NaN)! Ignoring this value. (" << Const::CDC << "=CDC, " << Const::TOP << "=TOP, " << Const::ARICH << "=ARICH, " <<
-            Const::ECL << "=ECL)");
+            " (i.e. +inf or NaN)! Ignoring this value. ("
+            << Const::SVD << "=SVD, " << Const::CDC << "=CDC, " << Const::TOP << "=TOP, "
+            << Const::ARICH << "=ARICH, " << Const::ECL << "=ECL, " << Const::KLM << "=KLM)");
 
     return;
   }
   m_detectors += det;
   m_logl[index][part.getIndex()] = logl;
+}
+
+
+void PIDLikelihood::subtractMaximum()
+{
+  for (auto& detectorLLs : m_logl) {
+    auto maxLL = detectorLLs[0];
+    for (auto LL : detectorLLs) maxLL = std::max(maxLL, LL);
+    for (auto& LL : detectorLLs) LL -= maxLL;
+  }
+}
+
+
+bool PIDLikelihood::isAvailable(Const::PIDDetectorSet set) const
+{
+  for (const auto& detector : set) {
+    if (m_detectors.contains(detector)) return true;
+  }
+  return false;
 }
 
 
@@ -76,33 +98,61 @@ double PIDLikelihood::getProbability(const Const::ChargedStable& p1,
   if (ratio == 0) return 0;
 
   double dlogl = getLogL(p2, set) - getLogL(p1, set);
-  double res;
+  double result = 0;
   if (dlogl < 0) {
     double elogl = exp(dlogl);
-    res = ratio / (ratio + elogl);
+    result = ratio / (ratio + elogl);
   } else {
     double elogl = exp(-dlogl) * ratio; // to prevent overflow for very large dlogl
-    res = elogl / (1.0 + elogl);
+    result = elogl / (1.0 + elogl);
   }
-  //TODO: only necessary if one wants to use mcprod1405 MC sample. Remove when there's a good replacement.
-  if (std::isfinite(res))
-    return res;
-  return 0;
+
+  return result;
 }
+
 
 double PIDLikelihood::getProbability(const Const::ChargedStable& part,
                                      const double* fractions,
                                      Const::PIDDetectorSet detSet) const
 {
-  double prob[Const::ChargedStable::c_SetSize];
-  probability(prob, fractions, detSet);
+  return 1 / (1 + exp(-getLogarithmicProbability(part, fractions, detSet)));
+}
+
+
+double PIDLikelihood::getLogarithmicProbability(const Const::ChargedStable& part,
+                                                const double* fractions,
+                                                Const::PIDDetectorSet detSet) const
+{
+  // Defined as log(p / (1 - p)) where p is global PID probability.
+  // In order to save the range of return values it must be implemented as below.
 
   int k = part.getIndex();
-  if (k < 0) return 0;
+  if (k < 0) return -INFINITY; // p = 0
 
-  return prob[k];
+  if (fractions and fractions[k] <= 0) return -INFINITY; // p = 0
 
+  double logL_part = getLogL(part, detSet);
+  std::vector<double> logLs; // all other log likelihoods with priors > 0
+  std::vector<double> priorRatios;
+  for (int i = 0; i < static_cast<int>(Const::ChargedStable::c_SetSize); i++) {
+    if (i == k) continue;
+    double ratio = fractions ? fractions[i] / fractions[k] : 1;
+    if (ratio <= 0) continue;
+    priorRatios.push_back(ratio);
+    logLs.push_back(getLogL(Const::chargedStableSet.at(i), detSet));
+  }
+  if (logLs.empty()) return +INFINITY; // p = 1
+
+  double logL_max = logLs[0]; // maximal log likelihood of the others
+  for (auto logl : logLs) logL_max = std::max(logl, logL_max);
+
+  double sum = 0;
+  for (size_t i = 0; i < logLs.size(); i++) sum += priorRatios[i] * exp(logLs[i] - logL_max);
+  if (sum == 0) return +INFINITY; // to suppress cppckeck warning although this can never happen (see prev. return)
+
+  return logL_part - logL_max - log(sum);
 }
+
 
 Const::ChargedStable PIDLikelihood::getMostLikely(const double* fractions,
                                                   Const::PIDDetectorSet detSet) const
@@ -274,6 +324,20 @@ std::string PIDLikelihood::getInfoHTML() const
   stream << "<br>";
 
   return stream.str();
+}
+
+void PIDLikelihood::addPreOfficialLikelihood(const std::string& preOfficialIdentifier, const double preOfficialLikelihood)
+{
+  m_preOfficialLikelihoods[preOfficialIdentifier] = preOfficialLikelihood;
+}
+
+double PIDLikelihood::getPreOfficialLikelihood(const std::string& preOfficialIdentifier) const
+{
+  if (m_preOfficialLikelihoods.count(preOfficialIdentifier) == 0) {
+    B2WARNING("PIDLikelihood::getPreOfficialLikelihood: preOfficialIdentifier " << preOfficialIdentifier << " does not exist. ");
+    return -1.0;
+  }
+  return m_preOfficialLikelihoods.at(preOfficialIdentifier);
 }
 
 

@@ -17,7 +17,7 @@ namespace {
   /** Access element in triangular matrix including diagonal elements.
    * This function returns the storage index of an element (i,j) in a
    * symmetric matrix including diagonal elements if the elements are
-   * stored in a continous array of size n(n+1)/2
+   * stored in a continuous array of size n(n+1)/2
    */
   constexpr int getIndex(unsigned int i, unsigned int j)
   {
@@ -26,27 +26,27 @@ namespace {
   }
 }
 
-void BeamParameters::setLER(double energy, double angleX, double angleY, const std::vector<double>& cov)
+void Belle2::BeamParameters::setLER(double energy, double angleX, double angleY, const std::vector<double>& cov)
 {
   ROOT::Math::PxPyPzEVector vec = getFourVector(energy, angleX, angleY, false);
   setLER(vec);
   setCovMatrix(m_covLER, cov, false);
 }
 
-void BeamParameters::setHER(double energy, double angleX, double angleY, const std::vector<double>& cov)
+void Belle2::BeamParameters::setHER(double energy, double angleX, double angleY, const std::vector<double>& cov)
 {
   ROOT::Math::PxPyPzEVector vec = getFourVector(energy, angleX, angleY, true);
   setHER(vec);
   setCovMatrix(m_covHER, cov, false);
 }
 
-void BeamParameters::setVertex(const ROOT::Math::XYZVector& vertex, const std::vector<double>& cov)
+void Belle2::BeamParameters::setVertex(const ROOT::Math::XYZVector& vertex, const std::vector<double>& cov)
 {
   setVertex(vertex);
   setCovMatrix(m_covVertex, cov, true);
 }
 
-ROOT::Math::PxPyPzEVector BeamParameters::getFourVector(double energy, double angleX, double angleY, bool isHER)
+ROOT::Math::PxPyPzEVector Belle2::BeamParameters::getFourVector(double energy, double angleX, double angleY, bool isHER)
 {
   double p   = sqrt(pow(energy, 2) - pow(Const::electronMass, 2));
   double dir = isHER ? 1 : -1;
@@ -56,7 +56,7 @@ ROOT::Math::PxPyPzEVector BeamParameters::getFourVector(double energy, double an
   return ROOT::Math::PxPyPzEVector(pz * tan(angleX), pz * tan(angleY), pz, energy);
 }
 
-TMatrixDSym BeamParameters::getCovMatrix(const Double32_t* member)
+TMatrixDSym Belle2::BeamParameters::getCovMatrix(const Double32_t* member)
 {
   TMatrixDSym matrix(3);
   for (int iRow = 0; iRow < 3; ++iRow) {
@@ -67,7 +67,7 @@ TMatrixDSym BeamParameters::getCovMatrix(const Double32_t* member)
   return matrix;
 }
 
-void BeamParameters::setCovMatrix(Double32_t* matrix, const TMatrixDSym& cov)
+void Belle2::BeamParameters::setCovMatrix(Double32_t* matrix, const TMatrixDSym& cov)
 {
   for (int iRow = 0; iRow < 3; ++iRow) {
     for (int iCol = iRow; iCol < 3; ++iCol) {
@@ -76,7 +76,7 @@ void BeamParameters::setCovMatrix(Double32_t* matrix, const TMatrixDSym& cov)
   }
 }
 
-void BeamParameters::setCovMatrix(Double32_t* matrix, const std::vector<double>& cov, bool common)
+void Belle2::BeamParameters::setCovMatrix(Double32_t* matrix, const std::vector<double>& cov, bool common)
 {
   std::fill_n(matrix, 6, 0);
   // so let's see how many elements we got
@@ -92,7 +92,7 @@ void BeamParameters::setCovMatrix(Double32_t* matrix, const std::vector<double>&
       [[fallthrough]];
     case 3: // diagonal form.
       // we can do both at once by using cov[i % cov.size()] which will either
-      // loop trough 0, 1, 2 if size is 3 or will always be 0
+      // loop through 0, 1, 2 if size is 3 or will always be 0
       for (int i = 0; i < 3; ++i) {
         matrix[getIndex(i, i)] = cov[i % cov.size()];
       }

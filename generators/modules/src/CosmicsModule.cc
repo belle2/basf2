@@ -8,11 +8,9 @@
 
 #include <generators/modules/CosmicsModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <boost/assign/std/vector.hpp>
 
 using namespace std;
 using namespace Belle2;
-using namespace boost::assign;
 
 //-----------------------------------------------------------------
 //                 Register the Module

@@ -88,14 +88,14 @@ namespace Belle2 {
       /// StoreArray name of the input Track Store Array
       std::string m_SVDSpacePointStoreArrayName = "SVDSpacePoints";
 
-      /// Use all SVDSpacePoints for track finding or only unassigned ones
-      bool m_useAllSpacePoints = false;
-
       /// Input SpacePoints Store Array
       StoreArray<SpacePoint> m_storeSpacePoints;
 
-      /// B2Vector3D actually contining the BeamSpot position. This will be passed on to the VXDHoughState for the conformal transformation
+      /// B2Vector3D actually containing the BeamSpot position. This will be passed on to the VXDHoughState for the conformal transformation
       B2Vector3D m_BeamSpotPosition;
+
+      /// Use all SVDSpacePoints for track finding or only unassigned ones
+      bool m_useAllSpacePoints = false;
     };
 
   }

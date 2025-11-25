@@ -14,8 +14,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
-#include <iostream>
-
 using namespace std;
 using namespace Belle2;
 

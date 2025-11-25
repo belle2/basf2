@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/ckf/vtx/entities/CKFToVTXResult.h>
 
 namespace Belle2 {

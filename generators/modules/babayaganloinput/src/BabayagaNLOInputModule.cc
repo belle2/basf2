@@ -36,7 +36,7 @@ extern "C" {
 // BabayagaNLOInputModule::BabayagaNLOInputModule() : Module(), s_initial(BeamParameters::c_smearALL)
 InitialParticleGeneration BabayagaNLOInputModule::s_initial{BeamParameters::c_smearALL};
 
-BabayagaNLOInputModule::BabayagaNLOInputModule() : Module()
+BabayagaNLOInputModule::BabayagaNLOInputModule() : GeneratorBaseModule()
 {
   //Set module properties
   setDescription("Generates radiative Bhabha scattering and exclusive two-photon events with the high precision QED generator called BabaYaga@NLO.");
@@ -82,13 +82,14 @@ BabayagaNLOInputModule::BabayagaNLOInputModule() : Module()
   //initialize member variables
   m_fileExtraInfo = 0;
   m_th1dSDif = 0;
+
 }
 
 BabayagaNLOInputModule::~BabayagaNLOInputModule()
 {
 }
 
-void BabayagaNLOInputModule::initialize()
+void BabayagaNLOInputModule::generatorInitialize()
 {
   //Initialize MCParticle collection
   StoreArray<MCParticle> mcparticle;
@@ -108,7 +109,7 @@ void BabayagaNLOInputModule::initialize()
   m_generator.initExtraInfo();
 }
 
-void BabayagaNLOInputModule::event()
+void BabayagaNLOInputModule::generatorEvent()
 {
   // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)
   if (m_beamParams.hasChanged()) {
@@ -168,7 +169,7 @@ void BabayagaNLOInputModule::initializeGenerator()
   m_generator.setUserMode(m_userMode);
   m_generator.setMaxPrescale(m_maxprescale);
 
-  // set a nominal value for some intialization inside the generator
+  // set a nominal value for some initialization inside the generator
   const BeamParameters& nominal = s_initial.getBeamParameters();
   double ecmnominal = nominal.getMass();
   m_generator.setCmsEnergyNominal(ecmnominal);

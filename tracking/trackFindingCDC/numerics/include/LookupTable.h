@@ -56,10 +56,10 @@ namespace Belle2 {
                   std::size_t nBins,
                   double lowerBound,
                   double upperBound)
-        : m_lowerBound(lowerBound)
+        : m_values(linspace(lowerBound, upperBound, nBins + 1, map))
+        , m_lowerBound(lowerBound)
         , m_upperBound(upperBound)
         , m_binWidth((m_upperBound - m_lowerBound) / nBins)
-        , m_values(linspace(lowerBound, upperBound, nBins + 1, map))
       {
         // Add a sentinel at the back.
         m_values.push_back(map(NAN));
@@ -107,6 +107,9 @@ namespace Belle2 {
       }
 
     private:
+      /// Precomputed value
+      std::vector<T> m_values;
+
       /// Lower bound of the precomputed range
       double m_lowerBound;
 
@@ -115,9 +118,6 @@ namespace Belle2 {
 
       /// Distance between two precomputed positions
       double m_binWidth;
-
-      /// Precomputed value
-      std::vector<T> m_values;
     };
   }
 }

@@ -100,18 +100,20 @@ void PXDDigitSorterModule::event()
       continue;
     }
 
-    if (PXDPixelMasker::getInstance().pixelOK(storeDigit->getSensorID(), storeDigit->getUCellID(), storeDigit->getVCellID())) {
-      // Trim digits
-      if (!m_trimDigits || goodDigit(storeDigit)) {
-        Pixel px(storeDigit, i);
-        sensors[sensorID].insert(px);
-      } else {
-        B2DEBUG(20, "Encountered a malformed digit in PXDDigit sorter: " << endl
-                << "VxdID: " << sensorID.getLayerNumber() << "/"
-                << sensorID.getLadderNumber() << "/"
-                << sensorID.getSensorNumber() << " u = " << storeDigit->getUCellID() << "v = " << storeDigit->getVCellID()
-                << " DISCARDED.");
-      }
+    if (PXDPixelMasker::getInstance().pixelDead(storeDigit->getSensorID(), storeDigit->getUCellID(), storeDigit->getVCellID())
+        || !PXDPixelMasker::getInstance().pixelOK(storeDigit->getSensorID(), storeDigit->getUCellID(), storeDigit->getVCellID())) {
+      continue;
+    }
+    // Trim digits
+    if (!m_trimDigits || goodDigit(storeDigit)) {
+      Pixel px(storeDigit, i);
+      sensors[sensorID].insert(px);
+    } else {
+      B2DEBUG(20, "Encountered a malformed digit in PXDDigit sorter: " << endl
+              << "VxdID: " << sensorID.getLayerNumber() << "/"
+              << sensorID.getLadderNumber() << "/"
+              << sensorID.getSensorNumber() << " u = " << storeDigit->getUCellID() << "v = " << storeDigit->getVCellID()
+              << " DISCARDED.");
     }
   }
 
@@ -154,7 +156,7 @@ void PXDDigitSorterModule::event()
   storeDigits.getPtr()->ExpandCreate(index);
 
   // Finally we just need to reorder the RelationArrays and delete elements
-  // referencing pixels which were ignored because that adress was set more
+  // referencing pixels which were ignored because that address was set more
   // than once
   RelationArray::ReplaceVec<> from(relationIndices);
   RelationArray::Identity to;

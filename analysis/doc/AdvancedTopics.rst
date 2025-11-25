@@ -9,7 +9,11 @@ Advanced Topics
 
 .. toctree:: DeepFlavorTagger
 
+.. toctree:: CharmFlavorTagger
+
 .. toctree:: FullEventInterpretation
+
+.. toctree:: GraFEI
 
 .. toctree:: EventShape
 
@@ -24,3 +28,5 @@ Advanced Topics
 .. toctree:: PIDCalibrationWeights
 
 .. toctree:: embedding
+
+.. toctree:: OfflineReweighting

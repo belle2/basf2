@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -69,7 +68,7 @@ rmaterial_file = root.TFile("MaterialRay.root")
 
 def plot_hist(region, **argk):
     """Get the histogram for a given region from the file and plot it. Return the histogram data and edges"""
-    h = rmaterial_file.Get("Ray/%s_x0" % region)
+    h = rmaterial_file.Get(f"Ray/{region}_x0")
     if not h:
         return None
     data, edges = hist2array(h, return_edges=True)
@@ -92,7 +91,7 @@ for region in ["BeamPipe", "PXD", "SVD", "CDC", "ARICH", "TOP", "ECL", "EKLM", "
 pl.ylim(ymin=0)
 pl.xlim(xmin=mat_edges[0], xmax=mat_edges[-1] + 1)
 pl.xlabel("Flight length [cm]")
-pl.ylabel("Radiation length [$X_0 / %.3g$ cm]" % (mat_edges[1] - mat_edges[0]))
+pl.ylabel(f"Radiation length [$X_0 / {mat_edges[1] - mat_edges[0]:.3g}$ cm]")
 pl.legend(loc="best")
 pl.tight_layout()
 pl.savefig("MaterialRay.pdf")

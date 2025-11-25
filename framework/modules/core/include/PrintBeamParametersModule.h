@@ -14,7 +14,7 @@
 
 namespace Belle2 {
   /**
-   * Print the BeamParameters everytime they change
+   * Print the BeamParameters every time they change
    *
    *    *
    */

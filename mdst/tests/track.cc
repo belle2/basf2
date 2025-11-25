@@ -28,12 +28,12 @@ namespace Belle2 {
   /**
    * Utility function to create dummy TrackFitResults
    */
-  TrackFitResult const* addDummyTrack(StoreArray<TrackFitResult>& trackFitResults, Const::ChargedStable particeType)
+  TrackFitResult const* addDummyTrack(StoreArray<TrackFitResult>& trackFitResults, Const::ChargedStable particeType,
+                                      float pValue = 1.)
   {
     const ROOT::Math::XYZVector dummyVector3;
     const TMatrixDSym dummyMatrix(6);
     const int charge = 1;
-    const float pValue = 1.;
     const float bField = 1.5;
 
     const auto newFitRes = trackFitResults.appendNew(dummyVector3, dummyVector3, dummyMatrix, charge, particeType, pValue,
@@ -110,7 +110,7 @@ namespace Belle2 {
     EXPECT_EQ(trackQITest1.getQualityIndicator(), 0.5);
   }
 
-  /** Test simple Setters and Getters.
+  /** Test getTrackFitResultWithClosestMass.
    */
   TEST_F(TrackTest, getTrackFitResultWithClosestMass)
   {
@@ -149,6 +149,34 @@ namespace Belle2 {
     const auto wantProtonButHaveKaonFit = mytrack1.getTrackFitResultWithClosestMass(Const::proton);
     EXPECT_EQ(Const::kaon.getPDGCode(), wantProtonButHaveKaonFit->getParticleType().getPDGCode());
     EXPECT_EQ(mytrack1.getTrackFitResult(Const::kaon)->getArrayIndex(), wantProtonButHaveKaonFit->getArrayIndex());
+  }
 
+  /** Test getTrackFitResultWithBestPValue
+   */
+  TEST_F(TrackTest, getTrackFitResultWithBestPValue)
+  {
+    // Create some TrackFitResults in the the DataStore.
+    // PDGCode of the TrackFitResult will be used in the test to identify the TFR.
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<TrackFitResult> myResults;
+    myResults.registerInDataStore();
+
+    // add four fit results with different p values
+    const auto myMuon = addDummyTrack(myResults, Const::muon, Const::floatNaN);
+    const auto myPion = addDummyTrack(myResults, Const::pion, 0.75);
+    const auto myKaon = addDummyTrack(myResults, Const::kaon, 0.4);
+    const auto myProton = addDummyTrack(myResults, Const::proton, Const::floatNaN);
+
+    Track mytrack;
+    mytrack.setTrackFitResultIndex(Const::muon, myMuon->getArrayIndex());
+    mytrack.setTrackFitResultIndex(Const::pion, myPion->getArrayIndex());
+    mytrack.setTrackFitResultIndex(Const::kaon, myKaon->getArrayIndex());
+    mytrack.setTrackFitResultIndex(Const::proton, myProton->getArrayIndex());
+
+    // check that fit hypothesis with best p value (here pion) is returned
+    const auto bestFit = mytrack.getTrackFitResultWithBestPValue();
+    EXPECT_EQ(Const::pion.getPDGCode(), bestFit->getParticleType().getPDGCode());
+    EXPECT_EQ(mytrack.getTrackFitResult(Const::pion)->getArrayIndex(), bestFit->getArrayIndex());
+    EXPECT_EQ(bestFit->getPValue(), 0.75);
   }
 }  // namespace

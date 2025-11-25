@@ -9,7 +9,7 @@
 ##########################################################################
 
 # Steering file to apply the specific FEI on Belle II MC, but it can be also easily adapted for converted Belle MC.
-# For reference see Confluence and Thomas Keck's PhD thesis.
+# For reference see XWiki and Thomas Keck's PhD thesis.
 #
 # Please adapt for your signal channel.
 # This example is for hadronic tagging.
@@ -23,7 +23,7 @@ import modularAnalysis as ma
 path = b2.create_path()
 
 # Load input ROOT file
-ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False),
+ma.inputMdst(filename=b2.find_file('mdst16.root', 'validation', False),
              path=path)
 
 # Max 12 tracks per event - this avoids much computing time.
@@ -76,7 +76,7 @@ path.add_module(skimfilter)
 # fei_tag = 'my_specFEI'
 
 # Here we use a prefix of an existing FEI training
-fei_tag = 'FEIv4_2021_MC14_release_05_01_12'
+fei_tag = 'FEIv1_2025_MC16ri_aldebaran_200'
 
 # Add the necessary database
 # b2.conditions.prepend_globaltag('name of database containing the specific training')
@@ -91,7 +91,7 @@ belle_particles = fei.get_default_channels(KLong=False,
                                            B_extra_cut='nRemainingTracksInEvent <= 3',
                                            specific=True)
 
-configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=False, monitor=False, cache=0)
+configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=False, monitor=False)
 feistate = fei.get_path(belle_particles, configuration)
 
 

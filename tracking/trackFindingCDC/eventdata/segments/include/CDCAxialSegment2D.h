@@ -11,7 +11,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegment2D;
 
-    /// Typedef to indicate that an axial segment is expeected.
+    /// Typedef to indicate that an axial segment is expected.
     using CDCAxialSegment2D = CDCSegment2D;
   }
 }

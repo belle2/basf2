@@ -71,7 +71,7 @@ void SVDDQMInjectionModule::initialize()
 
 void SVDDQMInjectionModule::beginRun()
 {
-  // Assume that everthing is non-zero ;-)
+  // Assume that everything is non-zero ;-)
   m_hOccAfterInjLER->Reset();
   m_hOccAfterInjHER->Reset();
   m_hTrgOccAfterInjLER->Reset();

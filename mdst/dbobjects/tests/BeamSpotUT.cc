@@ -40,13 +40,13 @@ namespace Belle2 {
         positionError(i, j) = positionError(j, i) = errorElement(i, j);
       }
 
-    TVector3 position;
+    ROOT::Math::XYZVector position;
     position.SetXYZ(1., 2., 3.);
 
     bs.setSizeCovMatrix(size);
     bs.setIP(position, positionError);
 
-    TVector3 testPosition = bs.getIPPosition();
+    ROOT::Math::XYZVector testPosition = bs.getIPPosition();
     EXPECT_EQ(testPosition.X(), 1.);
     EXPECT_EQ(testPosition.Y(), 2.);
     EXPECT_EQ(testPosition.Z(), 3.);

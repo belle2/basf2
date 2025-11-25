@@ -149,7 +149,7 @@ done
 #submit jobs to get the last result
 bash runCollector4Calib.sh
 
-#sumary 
+#summary 
 time_end=`date`
 echo =============================================================
 echo =---------------------- Finish -----------------------------+

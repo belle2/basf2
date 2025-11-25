@@ -34,7 +34,7 @@ namespace Belle2 {
   public:
     /// The result of calibration
     enum EResult {
-      c_OK,           /**< Finished successfuly             =0 in Python */
+      c_OK,           /**< Finished successfully             =0 in Python */
       c_Iterate,      /**< Needs iteration                  =1 in Python */
       c_NotEnoughData,/**< Needs more data                  =2 in Python */
       c_Failure,      /**< Failed                           =3 in Python */
@@ -155,7 +155,7 @@ namespace Belle2 {
      * to be set the same for algo and collector. So we call the setter setPrefix
      * rather than setModuleName or whatever. This getter will work out of the
      * box for default cases -> return the name of module you have to add to your
-     * path to collect data for this algorihtm.
+     * path to collect data for this algorithm.
      */
     std::string getCollectorName() const {return getPrefix();}
 
@@ -208,10 +208,10 @@ namespace Belle2 {
     /// Submit constants from a (potentially previous) set of payloads
     bool commit(std::list<Database::DBImportQuery> payloads);
 
-    /// Get the description of the algoithm (set by developers in constructor)
+    /// Get the description of the algorithm (set by developers in constructor)
     const std::string& getDescription() const {return m_description;}
 
-    /// Load the m_inputJson variable from a string (useful from Python interface). The rturn bool indicates success or failure
+    /// Load the m_inputJson variable from a string (useful from Python interface). The return bool indicates success or failure
     //  of JSON object creation. Failure probably means that your JSON string was badly formatted.
     bool loadInputJson(const std::string& jsonString);
 
@@ -328,7 +328,7 @@ namespace Belle2 {
     /// Clears the m_outputJson member variable.
     void resetOutputJson() {m_jsonExecutionOutput.clear();}
 
-    /// Set a key:value pair for the outputJson object, expected to used interally during calibrate()
+    /// Set a key:value pair for the outputJson object, expected to used internally during calibrate()
     template<class T>
     void setOutputJsonValue(const std::string& key, const T& value) {m_jsonExecutionOutput[key] = value;}
 

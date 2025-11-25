@@ -23,7 +23,7 @@ ClusterBackgroundDetector::ClusterBackgroundDetector()
 
 std::string ClusterBackgroundDetector::getDescription()
 {
-  return "Marks clusters as background if the used filter detectes them as such";
+  return "Marks clusters as background if the used filter detects them as such";
 }
 
 void ClusterBackgroundDetector::exposeParameters(ModuleParamList* moduleParamList,

@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
   ("lfn,l", prog::value<string>(&lfn), "logical file name")
   ("globalTag,g", prog::value<string>(&gt), "global tag")
   ("description,d", prog::value<std::vector<std::string>>(&dataDescriptions),
-   "data description to set of the form key=value. If the argument does not contain an equal sign it's interpeted as a key to delete from the dataDescriptions")
+   "data description to set of the form key=value. If the argument does not contain an equal sign it's interpreted as a key to delete from the dataDescriptions")
   ;
 
   prog::positional_options_description posOptDesc;
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     return 1;
   }
   if (!varMap.count("lfn") &&  !varMap.count("globalTag") && !varMap.count("description")) {
-    B2ERROR("No metadata modificaton was requested, nothing to do");
+    B2ERROR("No metadata modification was requested, nothing to do");
     return 1;
   }
 

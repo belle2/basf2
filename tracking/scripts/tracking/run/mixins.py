@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -78,7 +77,7 @@ class BrowseTFileOnTerminateRunMixin(PostProcessingRunMixin):
             action='store_true',
             default=self.show_results,
             dest='show_results',
-            help='Show generated plots in a TBrowser immediatly.',)
+            help='Show generated plots in a TBrowser immediately.',)
 
         return argument_parser
 

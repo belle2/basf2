@@ -1,0 +1,49 @@
+# EventType: 1213038000
+# Description: [B+ -> (anti-D0 -> K+ pi-) (eta -> gamma gamma) pi+]
+# NickName: Bu_D0etapi_Kpi
+# Documentation: MC15rd signal request 
+# Tested: Yes
+# Physics WG: BHadronic 
+# Responsible: Vismaya
+# Cuts: None
+# Date: 20240207
+#
+#
+Alias etasig eta
+
+#
+# Y(4S) -> B+ B- 
+#
+
+Decay Upsilon(4S)
+0.5 B-sig   B+ VSS;
+0.5 B+sig   B- VSS;
+Enddecay
+
+#
+# B+ -> anti-D0 eta pi+
+#
+
+Decay B+sig
+1.0000 anti-D0sig etasig pi+ PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+#
+# anti-D0 -> K+ pi-
+#
+
+Decay anti-D0sig
+1.0000 K+ pi- PHOTOS PHSP;
+Enddecay
+CDecay D0sig
+
+#
+# eta -> gamma gamma
+#
+
+Decay etasig
+1.0000 gamma gamma PHSP;
+Enddecay
+
+End

@@ -12,7 +12,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/utilities/Utils.h>
 
-#include <algorithm>
 #include <stdexcept>
 
 using namespace Belle2;

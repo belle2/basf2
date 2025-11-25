@@ -14,8 +14,9 @@ import tempfile
 import validation
 import validationpath
 import validationserver
+import validationplots
 
-from validationtestutil import check_execute, check_path_exists
+from validationtestutil import check_path_exists
 
 
 def main():
@@ -80,14 +81,14 @@ def main():
         ]
         check_path_exists(path_to_check)
 
-        # remove generated plots and use create_validation_plots script to
+        # remove generated plots and use generate_new_plots function to
         # regenerate
         shutil.rmtree(expect_html_plots_comparison_folder)
 
         # recreate
         # switch to this folder
         os.chdir(str(tmpdir))
-        check_execute("create_validation_plots.py")
+        validationplots.generate_new_plots(all_tags, tmpdir)
         check_path_exists(path_to_check)
 
 

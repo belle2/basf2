@@ -1,0 +1,33 @@
+# EventType: 1110028100 
+# Descriptor: [B0 -> eta Ks]cc
+# NickName: Bd_etaKs
+# Documentation: Study of Acp in B0 -> eta K_S0
+# Tested: Yes
+# PhysicsWG: Bhadronic
+# Responsible: Wen-Yi Chen
+# Email: r09222054@ntu.edu.tw
+# Cuts: None
+# Date: 29/03/2024
+#
+#
+Alias etasig eta
+Alias K_S0sig K_S0
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0 etasig  K_S0sig SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; 
+Enddecay
+CDecay anti-B0sig
+
+Decay etasig
+1.0 gamma gamma PHSP;
+Enddecay
+
+Decay K_S0sig
+1.0 pi+ pi- PHSP;
+Enddecay
+
+End

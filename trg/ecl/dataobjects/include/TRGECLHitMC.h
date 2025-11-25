@@ -146,7 +146,7 @@ namespace Belle2 {
 
     //! The method to set # of output per TC
     void setTCOutput(int noutput) { m_noutput = noutput; }
-    //! set Signal Contribtion
+    //! set Signal Contribution
     void setSignalContribution(double signal_contribution) { m_signal_contribution =  signal_contribution; }
     //! set beambackground contribution
     void setBKGContribution(double bkg_contribution) { m_bkg_contribution =  bkg_contribution; }

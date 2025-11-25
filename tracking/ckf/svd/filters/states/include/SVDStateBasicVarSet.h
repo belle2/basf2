@@ -29,6 +29,13 @@ namespace Belle2 {
 
     "layer",
     "number",
+    "ladder",
+    "sensor",
+    "segment",
+    "id",
+
+    "cluster_1_time",
+    "cluster_2_time",
 
     "arcLengthOfHitPosition",
     "arcLengthOfCenterPosition",
@@ -44,16 +51,14 @@ namespace Belle2 {
 
     "chi2",
 
-    "ladder",
-    "sensor",
-    "segment",
-    "id",
-
     "last_layer",
     "last_ladder",
     "last_sensor",
     "last_segment",
     "last_id",
+
+    "last_cluster_1_time",
+    "last_cluster_2_time",
   };
 
   /// Vehicle class to transport the variable names

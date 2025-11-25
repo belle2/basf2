@@ -29,6 +29,7 @@
 #include <RooPlot.h>
 #include <RooArgList.h>
 #include <RooNovosibirsk.h>
+#include <RooFitResult.h>
 
 using namespace std;
 

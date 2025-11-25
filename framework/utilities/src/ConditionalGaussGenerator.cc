@@ -69,7 +69,8 @@ static std::vector<VectorXd> getOrthogonalSpace(VectorXd v0)
   return vList;
 }
 
-ConditionalGaussGenerator::ConditionalGaussGenerator(const VectorXd& mu, const MatrixXd& covMat) : m_mu(mu), m_covMat(covMat)
+ConditionalGaussGenerator::ConditionalGaussGenerator(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covMat) : m_mu(mu),
+  m_covMat(covMat)
 {
   Eigen::SelfAdjointEigenSolver<MatrixXd> sol(m_covMat);
   VectorXd vals = sol.eigenvalues();

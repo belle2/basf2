@@ -21,7 +21,7 @@
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 #include <tracking/ckf/cdc/filters/states/CDCStateFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>

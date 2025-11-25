@@ -10,7 +10,8 @@
 import basf2
 from softwaretrigger import constants
 from softwaretrigger.processing import setup_basf2_and_db, start_path, finalize_path
-from pxd import add_pxd_percentframe_phase3_early, add_roi_payload_assembler
+from pxd import add_pxd_percentframe_phase3_early
+from tracking import add_roi_payload_assembler
 
 args = setup_basf2_and_db()
 

@@ -6,9 +6,7 @@ Batch submission
 .. sidebar:: Overview
    :class: overview
 
-    **Teaching**: 10 min
-
-    **Exercises**: 10 min
+    **Length**: 15-30 min
 
     **Prerequisites**:
 
@@ -54,22 +52,15 @@ job state statistics.
 .. code-block:: bash
 
    $ bqueues -u $USER
-   QUEUE_NAME      PRIO STATUS          MAX JL/U JL/P JL/H NJOBS  PEND   RUN  SUSP
-   s               120  Open:Active    3000  600    -    - 30885 28774  2111     0
-   l               100  Open:Active       - 1000    -    - 39959 29395 10564     0
-   h               100  Open:Active    1500  300    -    -  1719  1416   303     0
-   p               100  Open:Active    1500  300    -    -   577     0   577     0
-   sx              100  Open:Active       -  200    -    -  2185  1986   199     0
-   lx              100  Open:Active       -  200    -    -     2     0     2     0
-   hx              100  Open:Active     300   60    -    -     0     0     0     0
-   px              100  Open:Active     300  100    -    -     0     0     0     0
-   P1              100  Open:Active       -    -    -    -     0     0     0     0
-   Pmpi            100  Open:Active       -    -    -    -     0     0     0     0
-   b_b             100  Open:Active       - 1000    -    -     0     0     0     0
-   cmb_p           100  Open:Active       -  300    -    -     0     0     0     0
-   cmb_px          100  Open:Active       -  100    -   10     0     0     0     0
-   a               100  Open:Active       -    4    -    -    11     3     8     0
-   dc_generic      100  Open:Active       -    -    -    -     0     0     0     0
+   QUEUE_NAME      PRIO STATUS          MAX JL/U JL/P JL/H NJOBS  PEND   RUN  SUSP 
+   s               120  Open:Active    3200  800    -    - 28126 24927  3199     0
+   b_index         110  Open:Active     600  100    -    -     0     0     0     0
+   b_nagoya        110  Open:Active     600  100    -    -     0     0     0     0
+   l               100  Open:Active       - 1200    -    - 42806 35090  7716     0
+   h               100  Open:Active    1200  200    -    -  1233   629   604     0
+   p               100  Open:Active    1200  240    -    -     0     0     0     0
+   b_b             100  Closed:Active     - 1000    -    -     0     0     0     0
+   a               100  Open:Active       -    4    -    -     0     0     0     0
 
 Different queues have different settings. For analysis you can use ``s``,
 ``l``, or ``h``. For short jobs with a computing time (`CPU time`_) of under 3 hours, the queue
@@ -137,7 +128,7 @@ and check the output
    Hello world, this is script example.sh.
    Finished!
 
-Use the same method, you can submit Python or basf2 scripts to bqueues!
+Use the same method, you can submit Python or `basf2` scripts to bqueues!
 
 .. code-block:: bash
 
@@ -158,12 +149,12 @@ To check the job status
 .. admonition:: Exercise
    :class: exercise stacked
 
-      Submit a ``basf2`` job to queue ``l``, and then check the status of your jobs.
+      Submit a `basf2` job to queue ``l``, and then check the status of your jobs.
 
 .. admonition:: Hint
    :class: xhint stacked toggle
 
-   A simple ``basf2`` job could be the following:
+   A simple `basf2` job could be the following:
 
    .. code-block:: python
 
@@ -204,12 +195,16 @@ More information is given `here
 
 Optional
 --------
+Now that you're familiar with the basics, let's go over some commands/options that 
+would be useful, but situational. 
+
+
+.. rubric:: Suspend jobs
+
 In some scenarios you might want to stop the submitted jobs and resume them
 later. For instance this might be due to scheduled maintenance of storage
 elements where the input data is located or the updating of analysis global tags
 that used in your jobs.
-
-.. rubric:: Suspend jobs
 
 To suspend unfinished jobs
 
@@ -230,6 +225,32 @@ To resumes suspended jobs
 
    bresume <job_ID>
 
+
+.. rubric:: Large memory usage
+
+
+In addition, you might have jobs that require more than 4GB of memory. In that case, 
+use the bsub option -n "parallel number X" to give you 4GB :math:`\times` X amount of 
+memory. 
+
+To have 16GB of memory on the short job queue
+
+.. code-block:: bash
+
+   bsub -q s -n 4 "bash example.sh"
+
+
+.. rubric:: Saving job output
+
+Finally, it would probably be a good idea to have the output of your LSF jobs into a 
+log file. The relevant bsub option is -o (standard output) and -e (standard error).
+
+To have 16GB of memory on the short job queue with a log file 
+
+.. code-block:: bash
+
+   bsub -q s -n 4 -o logfile.out -e errorfile.err "bash example.sh"
+
 .. admonition:: Key points
    :class: key-points
 
@@ -242,4 +263,4 @@ To resumes suspended jobs
 
 .. rubric:: Author of this lesson
 
-Chia-Ling Hsu
+Chia-Ling Hsu, Tommy Lam

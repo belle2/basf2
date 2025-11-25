@@ -209,7 +209,7 @@ namespace Belle2 {
 
       std::string directory = specific_options.m_workingDirectory;
       if (specific_options.m_workingDirectory.empty()) {
-        char* directory_template = strdup("/tmp/Basf2TMVA.XXXXXX");
+        char* directory_template = strdup((std::filesystem::temp_directory_path() / "Basf2TMVA.XXXXXX").c_str());
         directory = mkdtemp(directory_template);
         free(directory_template);
       }
@@ -312,7 +312,7 @@ namespace Belle2 {
 
       std::string directory = specific_options.m_workingDirectory;
       if (specific_options.m_workingDirectory.empty()) {
-        char* directory_template = strdup("/tmp/Basf2TMVA.XXXXXX");
+        char* directory_template = strdup((std::filesystem::temp_directory_path() / "Basf2TMVA.XXXXXX").c_str());
         directory = mkdtemp(directory_template);
         free(directory_template);
       }

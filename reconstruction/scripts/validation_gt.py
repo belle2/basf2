@@ -8,13 +8,8 @@
 
 
 def get_validation_globaltags():
-    # Legacy_IP_Information GT is for exp3 test file
     globaltags = [
-        'patch_main_release-08_flip_refit',
-        'patch_main_release-08',
-        'patch_main_release-07',
-        'validation_2020-08-11',
-        'online_2020-08-11',
-        'Legacy_IP_Information',
-        'Legacy_CollisionAxisCMS']
+        'validation_2025-06-30',
+        'online'
+    ]
     return globaltags

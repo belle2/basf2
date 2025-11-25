@@ -52,7 +52,7 @@ namespace Belle2 {
     /// Destructor.
     ~TRGCDCJSignal() {}
 
-    /// Assign operator with setting target clock with outputing final code.
+    /// Assign operator with setting target clock with outputting final code.
     TRGCDCJSignal& assignTo(TRGCDCJSignal const& rhs, int targetClock, std::string& finalCode);
     /// Assign operator with setting target clock.
     TRGCDCJSignal& assignTo(TRGCDCJSignal const& rhs, int targetClock);
@@ -104,7 +104,7 @@ namespace Belle2 {
     //TRGCDCJSignal const toUnsigned() const;
     /// Change signal to std_logic_vector using vector<bool>. (Will be deprecated.)
     static TRGCDCJSignal const toSlv(TRGCDCJSignal const& in, int test);
-    /// Change singal to std_logic_vector.
+    /// Change signal to std_logic_vector.
     static TRGCDCJSignal const toSlv(TRGCDCJSignal const&);
 
     /// Change slv to signed with target clock.
@@ -145,7 +145,7 @@ namespace Belle2 {
     void setDebug(bool debug);
     /// Sets print flag for signal.
     void setPrintVhdl(bool printVhdl);
-    /// Sets ouptut VHDL filename.
+    /// Sets output VHDL filename.
     void setVhdlOutputFile(const std::string& filename);
     /// Sets JSignalData to signal.
     void setCommonData(TRGCDCJSignalData*);
@@ -189,7 +189,7 @@ namespace Belle2 {
     int calBitwidth() const;
     /// Calculates the bit width using the arguments.
     int calBitwidth(int type, signed long long minInt, signed long long maxInt);
-    /// Claculates the clock tick where the signal is valid.
+    /// Calculates the clock tick where the signal is valid.
     int calFinishClock() const;
     /// Gets the vhdl code for the signal.
     std::string getVhdlCode() const;
@@ -267,7 +267,7 @@ namespace Belle2 {
 
   private:
 
-    /// Memebers.
+    /// Members.
     /// Name of signal
     std::string m_name;
     /// Type of signal.

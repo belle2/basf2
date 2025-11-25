@@ -420,15 +420,15 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
   //Set module properties
   setDescription("This module produces an ntuple with ECL-related quantities starting from mdst");
   addParam("writeToRoot", m_writeToRoot,
-           "set true if you want to save the informations in a root file named by parameter 'rootFileName'", bool(true));
+           "set true if you want to save the information in a root file named by parameter 'rootFileName'", bool(true));
   addParam("rootFileName", m_rootFileName,
            "fileName used for root file where info are saved. Will be ignored if parameter 'writeToRoot' is false (standard)",
            string("eclDataAnalysis"));
-  addParam("doTracking", m_doTracking, "set true if you want to save the informations from TrackFitResults'rootFileName'",
+  addParam("doTracking", m_doTracking, "set true if you want to save the information from TrackFitResults'rootFileName'",
            bool(false));
   addParam("doHits", m_doHits, "set true if you want to save the Hit and SimHit informations'", bool(false));
   addParam("doDigits", m_doDigits, "set true if you want to save the Digits and CalDigits informations'", bool(false));
-  addParam("doPureCsI", m_doPureCsI, "set true if you want to save the informations for upgrade option'", bool(false));
+  addParam("doPureCsI", m_doPureCsI, "set true if you want to save the information for upgrade option'", bool(false));
 
 }
 

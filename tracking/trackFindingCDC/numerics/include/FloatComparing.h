@@ -19,7 +19,7 @@ namespace Belle2 {
       return rhs == lhs or (std::isnan(lhs) and std::isnan(rhs));
     }
 
-    /// Safe less (<) comparision for floating point values putting NAN at the high end
+    /// Safe less (<) comparison for floating point values putting NAN at the high end
     template<class AFloat>
     bool lessFloatHighNaN(AFloat lhs, AFloat rhs)
     {
@@ -28,7 +28,7 @@ namespace Belle2 {
       return lhs < rhs;
     }
 
-    /// Safe greater (>) comparision for floating point values putting NAN at the high end
+    /// Safe greater (>) comparison for floating point values putting NAN at the high end
     template<class AFloat>
     bool greaterFloatHighNaN(AFloat lhs, AFloat rhs)
     {

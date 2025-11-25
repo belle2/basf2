@@ -54,7 +54,7 @@ namespace Belle2 {
     static const gidTYPE maxLabel   =
       maxGID;  /**< Label and internal id ("gid") are the same numbers (label is signed but 0 and <0 values are invalid to give to Pede)*/
 
-    /// Default constuctor. Members initialized in declaration
+    /// Default constructor. Members initialized in declaration
     GlobalLabel() {}
 
     /**
@@ -87,7 +87,6 @@ namespace Belle2 {
      * @param dbObjId id of the DB object in global calibration
      * @param element Element id in DB object (wire, sensor etc.)
      * @param param Paremetr id of the element (shift, angle, etc.)
-     * @return GlobalLabel
      */
     void construct(gidTYPE dbObjId, gidTYPE element, gidTYPE param)
     {
@@ -123,7 +122,7 @@ namespace Belle2 {
     void registerTimeDependent(gidTYPE start, gidTYPE end = maxTID);
 
     /**
-     * @brief Usefull setter to quickly change only the parameter id
+     * @brief Useful setter to quickly change only the parameter id
      *        and return back the encoded label (for use in RecoHits)
      * @param paramId Id of calibration/alignment parameter
      * @return Encoded Pede label with new parameter id
@@ -148,7 +147,7 @@ namespace Belle2 {
     operator unsigned int() {return (unsigned int)label();}
 
     /**
-     * @brief Returns the global id identifing DB object for constantwith this label
+     * @brief Returns the global id identifying DB object for constant with this label
      */
     gidTYPE getUniqueId() const {return eid / 100000;}
 
@@ -283,10 +282,10 @@ namespace Belle2 {
       return dictionary;
     }
 
-    //! Helper to compose elemnt id & param id
+    //! Helper to compose element id & param id
     gidTYPE makeEIDPID(gidTYPE eid_, gidTYPE pid_) {return pid_ * pidOffset + eid_ * eidOffest;}
 
-    //! Helper to compose time elemnt id & param id
+    //! Helper to compose time element id & param id
     gidTYPE makeTEIDPID(gidTYPE teid_, gidTYPE pid_) {return pid_ * pidOffset + teid_ * teidOffset;}
   private:
     //! global id

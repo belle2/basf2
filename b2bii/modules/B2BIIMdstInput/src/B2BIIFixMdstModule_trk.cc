@@ -105,7 +105,7 @@
 // scale_error implemented last year (by Higuchi; valid up to exp19) is incorporated
 //
 // Revision 1.17  2003/05/31 09:22:54  hitoshi
-// updae for exp25 (ny Miyabayashi and Senyo).
+// update for exp25 (ny Miyabayashi and Senyo).
 //
 // Revision 1.16  2002/12/26 13:35:01  katayama
 // scale_momenta for exp. 21 and 23 from Senyo san
@@ -1428,7 +1428,7 @@ namespace Belle2 {
 ////////////////////////////////////////////////////////////////////////
 
   static int SE_Message_Level; /**< Message level of scale_error(). 0: none, 1: warning, 2: info */
-  static int SE_Reprocess_Version = 0; /**< Reprocess verison used in scale_error() */
+  static int SE_Reprocess_Version = 0; /**< Reprocess version used in scale_error() */
 
 
   typedef void (*cal_scale_error_func_t)(double scale[5], const double pt, const double tanl); /**< Function pointer type */
@@ -2615,7 +2615,7 @@ namespace Belle2 {
   };
 
 
-  /** Get scale error fucntion for different Exp */
+  /** Get scale error function for different Exp */
   static cal_scale_error_func_set_t
   get_scale_error_func_for_exprun(const int no_exp, const int /*no_run*/)
   {
@@ -2653,7 +2653,7 @@ namespace Belle2 {
 
     struct cal_scale_error_func_set_t cal_func = get_scale_error_func_for_exprun(no_exp, no_run);
     if (cal_func == DUMMY_scale) {
-      B2ERROR("!!!! scale_error: FATAL: FATAL ERROR occured. Abort !!!!");
+      B2ERROR("!!!! scale_error: FATAL: FATAL ERROR occurred. Abort !!!!");
       // Scale error is not prepared for this EXP number!
       assert(0);
     }

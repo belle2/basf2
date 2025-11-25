@@ -103,28 +103,6 @@ class RankChecker(basf2.Module):
         assert simple_range == py_single_ranks, "ranks don't form a range from 1..n"
 
 
-# fixed random numbers
-random.seed(5)
-# so lets create 10 events
-path = basf2.Path()
-path.add_module("EventInfoSetter", evtNumList=10)
-# and put some electrons in there
-path.add_module(Generator())
-# load these electrons
-ma.fillParticleListFromMC("e-", "", path=path)
-# and sort them ...
-ma.rankByHighest("e-", "M", path=path)
-ma.rankByHighest("e-", "px", allowMultiRank=False, outputVariable="px_high_single", path=path)
-ma.rankByHighest("e-", "px", allowMultiRank=True, outputVariable="px_high_multi", path=path)
-ma.rankByLowest("e-", "py", allowMultiRank=False, outputVariable="py_low_single", path=path)
-ma.rankByLowest("e-", "py", allowMultiRank=True, outputVariable="py_low_multi", path=path)
-# and also check sorting
-path.add_module(RankChecker())
-
-# we set numBest = 2: this is used also for the assert
-numBest_value = 2
-
-
 class NumBestChecker(basf2.Module):
     """Check if 'numBest' works correctly"""
 
@@ -169,6 +147,27 @@ class NumBestChecker(basf2.Module):
             # The test fails if size > numBest_value as this is passed as a parameter into the module
             assert size <= self.num_best, f"numBest test failed: there are too many Particles ({size}) in the list!"
 
+
+# fixed random numbers
+random.seed(5)
+# so lets create 10 events
+path = basf2.Path()
+path.add_module("EventInfoSetter", evtNumList=10)
+# and put some electrons in there
+path.add_module(Generator())
+# load these electrons
+ma.fillParticleListFromMC("e-", "", path=path)
+# and sort them ...
+ma.rankByHighest("e-", "M", path=path)
+ma.rankByHighest("e-", "px", allowMultiRank=False, outputVariable="px_high_single", path=path)
+ma.rankByHighest("e-", "px", allowMultiRank=True, outputVariable="px_high_multi", path=path)
+ma.rankByLowest("e-", "py", allowMultiRank=False, outputVariable="py_low_single", path=path)
+ma.rankByLowest("e-", "py", allowMultiRank=True, outputVariable="py_low_multi", path=path)
+# and also check sorting
+path.add_module(RankChecker())
+
+# we set numBest = 2: this is used also for the assert
+numBest_value = 2
 
 # create a new list
 ma.fillParticleListFromMC("e-:numBest", "", path=path)

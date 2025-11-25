@@ -14,10 +14,6 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
-
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
 
@@ -30,7 +26,6 @@
 #include <G4VisAttributes.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -71,7 +66,7 @@ namespace Belle2 {
 
       int detID = 0;
       //Lets loop over all the Active nodes
-      BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+      for (const GearDir& activeParams : content.getNodes("Active")) {
         /*
               double x_pos[100];
               double y_pos[100];

@@ -108,7 +108,7 @@ namespace Belle2 {
 
     /**
      * Set n cos(theta_ch)
-     * @param n cos(theta_ch) for all pid hypotheses
+     * @param n_cos_theta_ch n cos(theta_ch) for all pid hypotheses
      */
     void setNCosThetaCh(const double* n_cos_theta_ch)
     {
@@ -161,8 +161,8 @@ namespace Belle2 {
     }
 
     /**
-     * Get n cos(theta_ch)
-     * @param n cos(theta_ch) for all pid hypotheses
+     * Get n cos(theta_ch) for given pid hypothesis
+     * @param part pid hypothesis
      */
     float getNCosThetaCh(const Const::ChargedStable& part) const
     {
@@ -175,8 +175,8 @@ namespace Belle2 {
     }
 
     /**
-     * Get phi_ch
-     * @param phi_ch for all pid hypotheses
+     * Get phi_ch for given pid hypothesis
+     * @param part pid hypothesis
      */
     float getPhiCh(const Const::ChargedStable& part) const
     {

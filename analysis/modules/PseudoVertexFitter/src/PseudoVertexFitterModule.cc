@@ -7,9 +7,11 @@
  **************************************************************************/
 
 #include <analysis/modules/PseudoVertexFitter/PseudoVertexFitterModule.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <framework/database/DBObjPtr.h>
+
+#include <framework/datastore/StoreObjPtr.h>
 
 using namespace std;
 using namespace Belle2;

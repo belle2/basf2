@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,7 +23,11 @@ import simulation as sim
 import svd as svd
 import glob
 
-useSimulation = True
+'''
+Usage: basf2 svdPerformanceTree.py -i <input_file>
+'''
+
+useSimulation = False
 
 # set this string to identify the output rootfiles
 tag = "_test"
@@ -79,13 +82,17 @@ trk.add_tracking_reconstruction(
     main,
     mcTrackFinding=MCTracking,
     trackFitHypotheses=[211],
-    append_full_grid_cdc_eventt0=True)
+    append_full_grid_cdc_eventt0=True,
+    skip_full_grid_cdc_eventt0_if_svd_time_present=False)
 
 # reconstruct strips
 svd.add_svd_create_recodigits(main)
 
 # look at raw time - uncomment if needed
 b2.set_module_parameters(main, "SVDClusterizer", returnClusterRawTime=True)
+
+# Histos
+main.add_module('HistoManager', histoFileName="histos.root")
 
 # fill TTrees
 main.add_module('SVDPerformanceTTree', outputFileName="SVDPerformanceTree"+str(tag)+".root")

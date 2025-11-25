@@ -35,18 +35,13 @@ DQMHistAnalysisDeltaTestModule::DQMHistAnalysisDeltaTestModule()
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("test"));
   addParam("histogramName", m_histogramName, "Name of Histogram", std::string("testHist"));
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:TEST"));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("TEST:"));
   B2DEBUG(1, "DQMHistAnalysisDeltaTest: Constructor done.");
-
 }
 
 DQMHistAnalysisDeltaTestModule::~DQMHistAnalysisDeltaTestModule()
 {
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
+  B2DEBUG(1, "DQMHistAnalysisDeltaTest: Destructor done.");
 }
 
 void DQMHistAnalysisDeltaTestModule::initialize()
@@ -61,16 +56,8 @@ void DQMHistAnalysisDeltaTestModule::initialize()
 
   m_monObj->addCanvas(m_cTest);
 
-#ifdef _BELLE2_EPICS
-  mychid.resize(2);
-  if (getUseEpics()) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    SEVCHK(ca_create_channel((m_pvPrefix + "TEST1").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "TEST2").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
-
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  registerEpicsPV(m_pvPrefix + "TEST1", "TEST1");
+  registerEpicsPV(m_pvPrefix + "TEST2", "TEST2");
 }
 
 void DQMHistAnalysisDeltaTestModule::beginRun()
@@ -162,7 +149,7 @@ void DQMHistAnalysisDeltaTestModule::event()
   m_cTest->cd(7);
   auto it = getDeltaList().find(m_histogramName);
   if (it != getDeltaList().end()) {
-    auto h = it->second->m_lastHist;
+    auto h = it->second.m_lastHist.get();
     if (h) {
       auto a = (TH1*)h->DrawClone("hist");
       a->SetTitle("last update histogram");
@@ -186,21 +173,13 @@ void DQMHistAnalysisDeltaTestModule::event()
     m_monObj->setVariable("data_Test1", data_Test1);
     m_monObj->setVariable("data_Test2", data_Test2);
 
-#ifdef _BELLE2_EPICS
-    if (getUseEpics()) {
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data_Test1), "ca_set failure");
-      SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&data_Test2), "ca_set failure");
-      // write out
-      SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-    }
-#endif
+    setEpicsPV("TEST1", data_Test1);
+    setEpicsPV("TEST2", data_Test2);
   }
 }
 
 void DQMHistAnalysisDeltaTestModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisDeltaTest: terminate called");
-  // MiraBelle export code should run at end of Run
-  // but it still "remembers" the state from last event call.
 }
 

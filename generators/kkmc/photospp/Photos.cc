@@ -1,7 +1,7 @@
 #include <stdarg.h>
 #include <iostream>
 #include <vector>
-
+#include "TRandom3.h"
 #include "PhotosRandom.h"
 #include "PhotosEvent.h"
 #include "Photos.h"
@@ -30,7 +30,9 @@ namespace Photospp {
   bool Photos::IfPair = false;
   bool Photos::IfPhot = true;
   int  Photos::EventNo = 0;
-  double (*Photos::randomDouble)() = PhotosRandom::randomReal;
+
+  double gRandomRndm() {return gRandom->Rndm(); }
+  double (*Photos::randomDouble)() = gRandomRndm; // changed random number generator
 
   Photos::MomentumUnits Photos::momentumUnit = Photos::DEFAULT_MOMENTUM;
 

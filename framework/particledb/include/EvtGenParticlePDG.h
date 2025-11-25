@@ -32,7 +32,7 @@ namespace Belle2 {
     Double_t MaxWidth() const { return m_maxWidth; }
     /** Return pythia id of this particle */
     Int_t PythiaID() const { return m_pythiaID; }
-    /** Return a string repesentation of this particle to be used when printing the particle in python */
+    /** Return a string representation of this particle to be used when printing the particle in python */
     std::string __repr__() const;
   protected:
     /** max width of the particle (max_Dm in evt.pdl) */

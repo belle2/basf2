@@ -27,14 +27,14 @@ namespace Belle2 {
       /// Deepness of the trigonometrical lookup table.
       static constexpr const int c_lookupGridLevel = 16;
 
-      /// convert curvature (one of the axis in legendre phase-space) to Pt (in GeV)
+      /// convert curvature (one of the axis in Legendre phase-space) to Pt (in GeV)
       static double convertRhoToPt(double curv) {return 1.5 * 0.00299792458 / fabs(curv); };
 
     public: // Variations of precision functions
       /**
        * Function type which is used for resolution calculations (resolution=f(curvature))
        * Takes a curvature value and returns a width in the curvature direction such that
-       * a certain amout of hits is covered by the box in the hough space.
+       * a certain amount of hits is covered by the box in the hough space.
        */
       using PrecisionFunction = std::function<double(double)>;
 
@@ -53,10 +53,10 @@ namespace Belle2 {
        * parameters of the function are taken from the fit:
        *
        * 10000 of pion tracks were generated with particle gun produced at (0,0,0) (IP) with pt=[0.05;2.0]GeV, phi=[-2pi;2pi]
-       * by resolution we imply size of the quadtree node which can cover 80% of the hits in legendre phase-space
+       * by resolution we imply size of the quadtree node which can cover 80% of the hits in Legendre phase-space
        * resolution was estimated in bins of pt with step of 200MeV
-       * distribution of resolutions was fitted with function exp(a+b*pt)+c+d*pt (this function has been choosen as it can describe the shape of the distribution)
-       * this function takes into account smearing of the track in legendre space due to energy losses
+       * distribution of resolutions was fitted with function exp(a+b*pt)+c+d*pt (this function has been chosen as it can describe the shape of the distribution)
+       * this function takes into account smearing of the track in Legendre space due to energy losses
        */
       static double getOriginCurvPrecision(double curv)
       {
@@ -78,10 +78,10 @@ namespace Belle2 {
        * parameters of the function are taken from the fit:
        *
        * 10000 of pion tracks were generated with particle gun with impact parameter in XY plane of 3 cm (pt=[0.05;2.0]GeV, phi=[-2pi;2pi])
-       * by resolution we imply size of the quadtree node which can cover 80% of the hits in legendre phase-space
+       * by resolution we imply size of the quadtree node which can cover 80% of the hits in Legendre phase-space
        * resolution was estimated in bins of pt with step of 200MeV
-       * distribution of resolutions was fitted with function exp(a+b*pt)+c (this function has been choosen as it can describe the shape of the distribution)
-       * this function takes into account smearing of the track in legendre space due to non-prompt production and energy losses
+       * distribution of resolutions was fitted with function exp(a+b*pt)+c (this function has been chosen as it can describe the shape of the distribution)
+       * this function takes into account smearing of the track in Legendre space due to non-prompt production and energy losses
        */
       static double getNonOriginCurvPrecision(double curv)
       {

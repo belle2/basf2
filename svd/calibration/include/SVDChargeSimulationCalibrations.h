@@ -36,7 +36,7 @@ namespace Belle2 {
 
     /** Return coupling constant.
      * Input:
-     * @param sensorID: identitiy of the sensor for which the calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p (u) side, false for n (v) side
      * @param couplingName: coupling name, specify which coupling to return. Possible values are:
      * "C0"          |  Coupling from readout implant to its readout channel
@@ -60,7 +60,7 @@ namespace Belle2 {
 
     /** Return Geant4 electron weight.
      * Input:
-     * @param sensorID: identitiy of the sensor for which the calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p (u) side, false for n (v) side
      *
      * Output: float corresponding to a Geant4-electron to real-electron weight.

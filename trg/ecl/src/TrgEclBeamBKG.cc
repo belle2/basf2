@@ -21,10 +21,10 @@ TrgEclBeamBKG::TrgEclBeamBKG()
 {
   for (int iii = 0; iii <= 2; iii++) {
     for (int jjj = 0; jjj <= 3; jjj++) {
-      Quadrant[iii][jjj] = 0;
+      m_Quadrant[iii][jjj] = 0;
     }
   }
-  _TCMap = new TrgEclMapping();
+  m_TCMap = new TrgEclMapping();
 
 }
 //
@@ -33,12 +33,12 @@ TrgEclBeamBKG::TrgEclBeamBKG()
 TrgEclBeamBKG::~TrgEclBeamBKG()
 {
 
-  delete _TCMap;
+  delete m_TCMap;
 }
 //
 //
 //
-int TrgEclBeamBKG::GetBeamBkg(std::vector<std::vector<double>> ThetaRingSum)
+int TrgEclBeamBKG::getBeamBkg(std::vector<std::vector<double>> ThetaRingSum)
 {
 
   // forward
@@ -46,17 +46,17 @@ int TrgEclBeamBKG::GetBeamBkg(std::vector<std::vector<double>> ThetaRingSum)
     int phiid = iFwd + 1;
     if (ThetaRingSum[0][iFwd] > 0) {
       if ((phiid >= 1 && phiid <= 9) || phiid == 32) {
-        Quadrant[0][0] = 1;
+        m_Quadrant[0][0] = 1;
       }
       if (phiid >= 8 && phiid <= 17) {
-        Quadrant[0][1] = 1;
+        m_Quadrant[0][1] = 1;
       }
       if (phiid >= 16 && phiid <= 25) {
-        Quadrant[0][2] = 1;
+        m_Quadrant[0][2] = 1;
       }
       // cppcheck-suppress knownConditionTrueFalse
       if ((phiid >= 24 && phiid <= 32) || phiid == 1) {
-        Quadrant[0][3] = 1;
+        m_Quadrant[0][3] = 1;
       }
     }
   }
@@ -65,28 +65,28 @@ int TrgEclBeamBKG::GetBeamBkg(std::vector<std::vector<double>> ThetaRingSum)
     int phiid = iBr + 1;
     if (ThetaRingSum[1][iBr] > 0) {
       if ((phiid >= 1 && phiid <= 10) || phiid == 36) {
-        Quadrant[1][0] = 1;
+        m_Quadrant[1][0] = 1;
       }
       if (phiid >= 9 && phiid <= 19) {
-        Quadrant[1][1] = 1;
+        m_Quadrant[1][1] = 1;
       }
       if (phiid >= 18 && phiid <= 28) {
-        Quadrant[1][2] = 1;
+        m_Quadrant[1][2] = 1;
       }
       // cppcheck-suppress knownConditionTrueFalse
       if ((phiid >= 27 && phiid <= 36) || phiid == 1) {
-        Quadrant[1][3] = 1;
+        m_Quadrant[1][3] = 1;
       }
     }
   }
   // selection for forward endcap
   bool boolForward =
-    ((Quadrant[0][0] && Quadrant[0][2]) ||
-     (Quadrant[0][1] && Quadrant[0][3]));
+    ((m_Quadrant[0][0] && m_Quadrant[0][2]) ||
+     (m_Quadrant[0][1] && m_Quadrant[0][3]));
   // selection for barrel
   bool boolBarrel =
-    ((Quadrant[1][0] && Quadrant[1][2]) ||
-     (Quadrant[1][1] && Quadrant[1][3]));
+    ((m_Quadrant[1][0] && m_Quadrant[1][2]) ||
+     (m_Quadrant[1][1] && m_Quadrant[1][3]));
   // bkg bit selection
   int iBeamBkgVeto0 = 0;
   int iBeamBkgVeto1 = 0;

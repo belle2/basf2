@@ -67,6 +67,7 @@ namespace Belle2 {
 
   };
 
+  /** magnetic field factor */
   template<typename PointType, typename DataType> DataType SelVarHelper<PointType, DataType>::s_MagneticFieldFactor = 1.5 *
       0.00299710;
 

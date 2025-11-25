@@ -6,9 +6,7 @@ Continuum Suppression (CS)
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 1 hour
-
-    **Exercises**: 1.5 hours
+    **Length**: 1.5-2 hrs
 
     **Prerequisites**:
 
@@ -97,7 +95,7 @@ while taking into account which particles belong to our signal reconstruction.
 
     In addition to the :ref:`analysis_continuumsuppression` tools that
     we will be using in this exercise, there is also the :ref:`analysis_eventshape` framework in
-    basf2 which calculates similar properties to the Continuum Suppression module.
+    ``basf2`` which calculates similar properties to the Continuum Suppression module.
     However, this does not use candidate-based analysis and is not designed for Continuum Suppression.
 
     Always make sure the variables you're using in the exercise are from the Continuum Suppression module and not the
@@ -110,7 +108,7 @@ A popular one is the ratio of the second and zeroth Fox-Wolfram moment:
 
     R_2 = \frac{H_2}{H_0}
 
-This variable is called `R2` in basf2 (not to be confused with `foxWolframR2` which is the same property
+This variable is called `R2` in ``basf2`` (not to be confused with `foxWolframR2` which is the same property
 but from the Event Shape Framework).
 
 Fox-Wolfram moments are rotationally-invariant parametrisations of the distribution of particles in an event.
@@ -126,14 +124,14 @@ E :sub:`event` and the Legendre Polynomials P :sub:`l`.
 Other powerful properties are those based on the thrust vector. This is the vector along which the total projection
 of a collection of momenta is maximised. This collection of momenta can be the B candidate or the rest of event.
 
-The cosine of the angle between both thrust vectors, `cosTBTO` in basf2, is a thrust-based discriminating variable.
+The cosine of the angle between both thrust vectors, `cosTBTO` in ``basf2``, is a thrust-based discriminating variable.
 In BB events, the particles are almost at rest and so the thrust vectors are uniformly distributed. Therefore,
 `cosTBTO` will also be uniformly distributed between 0 and 1.
 In qq events, the particles are collimated and the thrust axes point back-to-back, leading to a peak at high values of
 `cosTBTO`.
-A similar argument can be made for the angle of the thrust axis with the beam axis which is `cosTBz` in basf2.
+A similar argument can be made for the angle of the thrust axis with the beam axis which is `cosTBz` in ``basf2``.
 
-In addition to the angular quantities, basf2 also provides the total thrust magnitude of both the B candidate `thrustBm`
+In addition to the angular quantities, ``basf2`` also provides the total thrust magnitude of both the B candidate `thrustBm`
 and the ROE `thrustOm`. Depending on the signal process, these can also provide some discriminating power.
 
 If you would like to know more, Chapter 9 of `The Physics of the B Factories book <https://arxiv.org/abs/1406.6311>`_
@@ -143,7 +141,7 @@ has an extensive overview over these quantities.
 .. admonition:: Question
     :class: exercise stacked
 
-    Can you find out which other variables are provided by basf2 for continuum suppression?
+    Can you find out which other variables are provided by ``basf2`` for continuum suppression?
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -161,14 +159,14 @@ has an extensive overview over these quantities.
     * `thrustBm`
     * `thrustOm`
 
-    mentioned above, basf2 also provides "CLEO cones" (`CleoConeCS`) and
+    mentioned above, ``basf2`` also provides "CLEO cones" (`CleoConeCS`) and
     "Kakuno-Super-Fox-Wolfram" variables (`KSFWVariables`). These are more complex engineered variables and
     are mostly used with machine learning methods.
 
-First Continuum Suppression steps in basf2
-------------------------------------------
+First Continuum Suppression steps in ``basf2``
+----------------------------------------------
 
-Now, how do we access the shape of events in basf2?
+Now, how do we access the shape of events in ``basf2``?
 
 First we need some data. In this exercise we will use two samples, one with "uubar" continuum background and one
 with :math:`B^0 \to K_S^0 \pi^0` decays. These samples are called ``uubar_sample.root`` and
@@ -387,7 +385,7 @@ continuum events, simply add a cut on the continuum probability at the end.
     :class: exercise stacked
 
     Let us now create the script to train the BDT using the Ntuples that we've just
-    created. The training tools are implemented in basf2 within the
+    created. The training tools are implemented in ``basf2`` within the
     :ref:`mva/doc/index-01-mva:MVA package`. One needs to configure the global
     options and then perform the training (see :ref:`mva/doc/index-01-mva:globaloptions`
     and :ref:`mva/doc/index-01-mva:Fitting / How to perform a training`
@@ -397,7 +395,7 @@ continuum events, simply add a cut on the continuum probability at the end.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    The training script does not require creating a basf2 path and hence has no
+    The training script does not require creating a ``basf2`` path and hence has no
     ``basf2.process()`` at the end. The script is sufficient when the
     ``basf2_mva.teacher()`` is defined.
 
@@ -454,7 +452,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
 
     Use the steering file from the previous exercises, just with the ``path.add_module("MVAExpert", ...)``
     added at the end. Don't forget to change ``path`` to ``main`` or
-    whatever is the name of your basf2 path.
+    whatever is the name of your ``basf2`` path.
 
     We recommend to add aliases to your variables. For example ``ContProb`` for
     ``extraInfo(ContinuumProbability)``.
@@ -582,3 +580,4 @@ Moritz Bauer, Yaroslav Kulii
 .. rubric:: Code contributors
 
 Pablo Goldenzweig, Ilya Komarov
+

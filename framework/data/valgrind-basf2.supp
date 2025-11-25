@@ -161,7 +161,7 @@
 
 
 {
-   Unitialized value in TGeoHMatrix false positive
+   Uninitialized value in TGeoHMatrix false positive
    Memcheck:Cond
    fun:_ZN11TGeoHMatrixaSERK10TGeoMatrix
    fun:_ZN6Belle230SetupGenfitExtrapolationModule18updateVXDAlignmentEv
@@ -170,7 +170,7 @@
 
 
 {
-   Unitialized value in TGeoHMatrix false positive
+   Uninitialized value in TGeoHMatrix false positive
    Memcheck:Cond
    ...
    fun:_ZNK10TGeoMatrixmlERKS_
@@ -230,4 +230,15 @@
    fun:_ZNK6Belle23ECL20ECLShowerShapeModule25getSecondMomentCorrectionEddi
    fun:_ZNK6Belle23ECL20ECLShowerShapeModule23setShowerShapeVariablesEPNS_9ECLShowerEb
    fun:_ZN6Belle23ECL20ECLShowerShapeModule5eventEv
+}
+
+{
+   Leak in string assignment in findFile
+   Memcheck:Leak
+   fun:_Znwm
+   fun:_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE12_M_constructIPKcEEvT_S8_St20forward_iterator_tag
+   fun:_ZNKSt10filesystem7__cxx114path6stringIcSt11char_traitsIcESaIcEEENSt7__cxx1112basic_stringIT_T0_T1_EERKSA_
+   fun:_ZNKSt10filesystem7__cxx114path6stringEv
+   fun:_ZN6Belle210FileSystem8findFileERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKSt6vectorIS6_SaIS6_EEb
+   fun:_ZN6Belle210FileSystem8findFileERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEb
 }

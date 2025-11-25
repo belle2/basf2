@@ -33,7 +33,7 @@ do_scan(void * start)
         int i;
 
         for (i=0; i*4<0x100; i++) {
-                printf("COPPER REG %3d %08x\n", i, lp[i]);
+                printf("COPPER REG %3d %08lx\n", i, lp[i]);
         }
 
 }
@@ -48,6 +48,7 @@ find_offset()
                 return 0;
 
         n = fread(word, sizeof(unsigned long), 0x100, fp);
+        fclose(fp);
         if (n < 0x10)
                 return 0;
         assert(word[0] == 0x905410b5);

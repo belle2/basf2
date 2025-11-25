@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -17,8 +16,8 @@ from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdMu
 from variables import variables as vm
 
-__liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
-_VALIDATION_SAMPLE = "mdst14.root"
+__liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au>, Tommy Martinov <tommy.martinov@desy.de>"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -29,13 +28,13 @@ class LeptonicUntagged(BaseSkim):
         * :math:`B^- \\to \\mu^-`
 
     Cuts applied
-        * :math:`p_{\\ell}^{*} > 2\\,\\text{GeV}` in CMS Frame
-        * :math:`\\text{electronID_noTOP} > 0.5`
+        * :math:`p_{\\ell}^{*} > 1.8\\,\\text{GeV}` in CMS Frame
+        * :math:`\\text{electronID} > 0.5`
         * :math:`\\text{muonID} > 0.5`
         * :math:`n_{\\text{tracks}} \\geq 3`
     """
 
-    __authors__ = ["Phillip Urquijo"]
+    __authors__ = ["Daniel Jacobi"]
     __contact__ = __liaison__
     __description__ = (
         "Skim for leptonic analyses, "
@@ -44,6 +43,7 @@ class LeptonicUntagged(BaseSkim):
     __category__ = "physics, leptonic"
 
     validation_sample = _VALIDATION_SAMPLE
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -53,14 +53,14 @@ class LeptonicUntagged(BaseSkim):
         ma.cutAndCopyList(
             "e-:LeptonicUntagged",
             "e-:all",
-            "useCMSFrame(p) > 2.0 and electronID_noTOP > 0.5",
+            "useCMSFrame(p) > 1.8 and electronID > 0.5",
             True,
             path=path,
         )
         ma.cutAndCopyList(
             "mu-:LeptonicUntagged",
             "mu-:all",
-            "useCMSFrame(p) > 2.0 and muonID > 0.5",
+            "useCMSFrame(p) > 1.8 and muonID > 0.5",
             True,
             path=path,
         )
@@ -86,7 +86,7 @@ class LeptonicUntagged(BaseSkim):
             path=path,
         )
         vm.addAlias("d0_p", "daughter(0,p)")
-        vm.addAlias("d0_electronID_noTOP", "daughter(0,electronID_noTOP)")
+        vm.addAlias("d0_electronID", "daughter(0,electronID)")
         vm.addAlias("d0_muonID", "daughter(0,muonID)")
         vm.addAlias("MissP", "weMissP(basic,0)")
 
@@ -99,11 +99,10 @@ class LeptonicUntagged(BaseSkim):
             variables_1d=[
                 ("Mbc", 100, 4.0, 5.3, "Mbc", contact, "", ""),
                 ("d0_p", 100, 0, 5.2, "Signal-side lepton momentum", contact, "", ""),
-                ("d0_electronID_noTOP", 100, 0, 1, "electronID_noTOP of signal-side lepton",
+                ("d0_electronID", 100, 0, 1, "electronID of signal-side lepton",
                  contact, "", ""),
-                ("d0_muonID", 100, 0, 1, "electronID_noTOP of signal-side lepton", contact,
+                ("d0_muonID", 100, 0, 1, "muonID of signal-side lepton", contact,
                  "", ""),
-                ("R2", 100, 0, 1, "R2", contact, "", ""),
                 ("MissP", 100, 0, 5.3, "Missing momentum of event (CMS frame)", contact,
                  "", ""),
             ],
@@ -113,75 +112,3 @@ class LeptonicUntagged(BaseSkim):
             ],
             path=path,
         )
-
-
-@fancy_skim_header
-class dilepton(BaseSkim):
-    """
-    Reconstructed decays
-        * :math:`B\\overline{B} \\to l^+l^-`
-        * :math:`B\\overline{B} \\to l^+l^+`
-        * :math:`B\\overline{B} \\to l^-l^-`
-    """
-    __authors__ = ["Alessandro Gaz, Chiara La Licata"]
-    __contact__ = __liaison__
-    __description__ = (
-        "Inclusive dilepton skim"
-    )
-    __category__ = "physics, leptonic"
-
-    NoisyModules = ["EventShapeCalculator"]
-
-    def load_standard_lists(self, path):
-        stdE("all", path=path)
-        stdMu("all", path=path)
-
-    def build_lists(self, path):
-        ma.cutAndCopyList(
-            "e+:pid",
-            "e+:all",
-            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and electronID_noTOP > 0.5",
-            True,
-            path=path,
-        )
-        ma.cutAndCopyList(
-            "mu+:pid",
-            "mu+:all",
-            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and muonID > 0.5",
-            True,
-            path=path,
-        )
-
-        ma.buildEventShape(
-            inputListNames=[],
-            default_cleanup=True,
-            allMoments=False,
-            cleoCones=True,
-            collisionAxis=True,
-            foxWolfram=True,
-            harmonicMoments=True,
-            jets=True,
-            sphericity=True,
-            thrust=True,
-            checkForDuplicates=False,
-            path=path)
-
-        path = self.skim_event_cuts('sphericity > 0.18 and nTracks > 3', path=path)
-
-        ma.reconstructDecay('Upsilon(4S):ee   -> e+:pid e-:pid', 'M < 15', path=path)
-        ma.reconstructDecay('Upsilon(4S):emu  -> e+:pid mu-:pid', 'M < 15', path=path)
-        ma.reconstructDecay('Upsilon(4S):mumu -> mu+:pid mu-:pid', 'M < 15', path=path)
-
-        ma.reconstructDecay('Delta++:ee   -> e+:pid e+:pid', 'M < 15', path=path)
-        ma.reconstructDecay('Delta++:emu  -> e+:pid mu+:pid', 'M < 15', path=path)
-        ma.reconstructDecay('Delta++:mumu -> mu+:pid mu+:pid', 'M < 15', path=path)
-
-        ma.copyLists(outputListName='Upsilon(4S):ll',
-                     inputListNames=['Upsilon(4S):ee', 'Upsilon(4S):emu', 'Upsilon(4S):mumu'],
-                     path=path)
-
-        ma.copyLists(outputListName='Delta++:ll',
-                     inputListNames=['Delta++:ee', 'Delta++:emu', 'Delta++:mumu'],
-                     path=path)
-
-        return ["Upsilon(4S):ll", "Delta++:ll"]

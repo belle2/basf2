@@ -223,6 +223,6 @@ std::string SpacePointTrackCand::getRefereeStatusString(std::string delimiter) c
   if (hasRefereeStatus(c_isReserved)) statusString += "isReserved" + delimiter;
 
   statusString.erase(statusString.end() - delimiter.size(),
-                     statusString.end()); // remove last delimiter -> no error catching SHOULD be neccessary since the case of an empty (==0) refereeStatus is already dealt with above!
+                     statusString.end()); // remove last delimiter -> no error catching SHOULD be necessary since the case of an empty (==0) refereeStatus is already dealt with above!
   return statusString;
 }

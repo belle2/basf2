@@ -28,7 +28,7 @@ namespace Belle2 {
     /** Implements the representation \f$ x = s + \lambda \cdot t \f$ where \n
      *  \f$ s \f$ is the support point and  \f$ t \f$ is the tangential vector \n
      *  \f$ \lambda \f$ is called the parameter of the line. In the same sense as the Line2D\n
-     *  this line defines a direction of positiv advance ( the tangential vector ) as well as \n
+     *  this line defines a direction of positive advance ( the tangential vector ) as well as \n
      *  a right and a left half plane.
      */
     class ParameterLine2D {
@@ -140,14 +140,14 @@ namespace Belle2 {
         return tangential() * parameter += support();
       }
 
-      /// Indicates if the tangential vector point in a commmon direction with the first coordinate
+      /// Indicates if the tangential vector point in a common direction with the first coordinate
       /// axes
       EForwardBackward alignedWithFirst() const
       {
         return static_cast<EForwardBackward>(sign(tangential().first()));
       }
 
-      /// Indicates if the tangential vector point in a commmon direction with the second coordinate
+      /// Indicates if the tangential vector point in a common direction with the second coordinate
       /// axes
       EForwardBackward alignedWithSecond() const
       {
@@ -155,9 +155,9 @@ namespace Belle2 {
       }
 
       /// Normalizes the tangential vector inplace
-      /** Normalizes the line representation such that the parameter is indentical with the distance
-       *  from the support point of a point on the line. This can be usefull if you want to give the
-       *  parameter a certain meaning where you have to get rid of the proportional factor assizated
+      /** Normalizes the line representation such that the parameter is identical with the distance
+       *  from the support point of a point on the line. This can be useful if you want to give the
+       *  parameter a certain meaning where you have to get rid of the proportional factor associated
        *  with the length of the tangential.
        */
       void normalize()
@@ -192,16 +192,16 @@ namespace Belle2 {
 
     public:
       /// Gives the signed distance of a point to the line
-      /** Returns the signed distance of the point to the line. The sign is positiv \n
-       *  for the right side of the line and negativ for the left side. */
+      /** Returns the signed distance of the point to the line. The sign is positive \n
+       *  for the right side of the line and negative for the left side. */
       double distance(const Vector2D& point) const
       {
         return distanceToOrigin() - point.orthogonalComp(tangential());
       }
 
       /// Calculates the signed distance of the point given by its to coordinates to the line.
-      /** Returns the signed distance of the point to the line. The sign is positiv \n
-       *  for the right side of the line and negativ for the left side. */
+      /** Returns the signed distance of the point to the line. The sign is positive \n
+       *  for the right side of the line and negative for the left side. */
       double distance(const double first, const double second) const
       {
         return distance(Vector2D(first, second));
@@ -374,7 +374,7 @@ namespace Belle2 {
         return tangential().second() / tangential().first();
       }
 
-      /// The inveres line slope
+      /// The inverse line slope
       double inverseSlope() const
       {
         return tangential().first() / tangential().second();
@@ -417,7 +417,7 @@ namespace Belle2 {
         m_support.swapCoordinates();
       }
 
-      /// Gives the line assoziated with the inverse function as a copy.
+      /// Gives the line associated with the inverse function as a copy.
       ParameterLine2D inverted() const
       {
         return ParameterLine2D(Vector2D(support().second(), support().first()),

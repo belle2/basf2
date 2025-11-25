@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -36,7 +35,7 @@ main.add_module(babayaganlo)
 # add simulation
 add_simulation(main)
 
-# add trigger simlation of sub detectors (CDC, ECL, and bKLM are included currently)
+# add trigger simulation of sub detectors (CDC, ECL, and bKLM are included currently)
 add_subdetector_tsim(main, component=["CDC", "ECL", "KLM"])
 
 branches = [

@@ -65,7 +65,7 @@ def get_alignment_pre_collector_path_cosmic(entry_sequence=""):
 
     main.add_module('DAFRecoFitter',
                     pdgCodesToUseForFitting=[13],
-                    resortHits=True)
+                    resortHits=False)
 
     main.add_module('SetupGenfitExtrapolation',
                     noiseBetheBloch=False,
@@ -102,7 +102,7 @@ def get_alignment_pre_collector_path_physics(entry_sequence=""):
     # scintillator hits are rejected.
     basf2.set_module_parameters(main, 'Muid', MaxDt=1e9)
 
-    main.add_module('DAFRecoFitter', resortHits=True)
+    main.add_module('DAFRecoFitter', resortHits=False)
 
     main.add_module('SetupGenfitExtrapolation',
                     noiseBetheBloch=False,

@@ -117,12 +117,12 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
 {
   if (fastDistance(point) == 0) return point;
 
-  // solve the minization | point - pointOnCirlce | ^2 subjected to the on circle constraint
+  // solve the minimization | point - pointOnCirlce | ^2 subjected to the on circle constraint
   //                       1.0                   * m_n0 +
   //                       point.x()             * m_n1 +
   //                       point.y()             * m_n2 +
   //                       point.cylindricalRSquared() * m_n3 == 0
-  // solved with a lagrangian muliplicator for the constraint
+  // solved with a Lagrangian multiplicator for the constraint
 
   Vector2D gradientAtPoint = gradient(point);
   Vector2D coordinateSystem = gradientAtPoint.unit();

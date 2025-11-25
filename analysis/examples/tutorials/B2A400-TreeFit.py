@@ -87,6 +87,8 @@ variables = [
 
     "daughter(0, E)",  # momentum of the D0 that is updated if updateAllDaughters=True.
     "originalDaughter(0, E)",  # momentum of the original D0.
+    "x_uncertainty",  # uncertainty in x direction of B0 decay vertex
+    "daughter(0, prodVertexXErr)"  # uncertainty of D0's production vertex (== B0 decay vertex) in x direction
 ]
 
 # safe the output

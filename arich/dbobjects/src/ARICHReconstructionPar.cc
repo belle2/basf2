@@ -109,7 +109,7 @@ void ARICHReconstructionPar::print() const
   m_bkgPhiPDF->GetParameters(bkgPhiCorPars.data());
   for (int i = 0; i < Npar2; i++)cout << Form("bkg Pars %d = %e", i, bkgPhiCorPars[i]) << endl;
 
-  cout << endl << "-----flat backgroud per pad-----"  << endl;
+  cout << endl << "-----flat background per pad-----"  << endl;
   cout << " flat background per pad is " << m_flatBkgPerPad << endl;
 
   cout << endl << "----additional parameters (for wide gaus, quartz etc.)-----"  << endl;

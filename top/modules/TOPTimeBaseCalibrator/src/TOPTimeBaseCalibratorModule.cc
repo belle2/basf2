@@ -91,6 +91,7 @@ namespace Belle2 {
              "3 - matrix inversion w/ singular value decomposition.", (unsigned) 1);
     addParam("useFallingEdge", m_useFallingEdge,
              "if true, use cal pulse falling edge instead of rising edge", false);
+    addParam("saveMatrix", m_saveMatrix, "if true, save also matrix and its inverse in a root file", false);
 
   }
 
@@ -429,8 +430,10 @@ namespace Belle2 {
     // save as histograms
 
     string forWhat = "scrod " + to_string(scrodID) + " channel " + to_string(chan);
-    saveAsHistogram(A, "matA_ch" + to_string(chan), "Matrix for " + forWhat);
-    saveAsHistogram(b, "vecB_ch" + to_string(chan), "Right side for " + forWhat);
+    if (m_saveMatrix) {
+      saveAsHistogram(A, "matA_ch" + to_string(chan), "Matrix for " + forWhat);
+      saveAsHistogram(b, "vecB_ch" + to_string(chan), "Right side for " + forWhat);
+    }
 
     // invert matrix A and solve the equation: x = A^{-1}b
 
@@ -494,7 +497,7 @@ namespace Belle2 {
 
     // save results as histograms
 
-    saveAsHistogram(A, "invA_ch" + to_string(chan), "Inverted matrix for " + forWhat);
+    if (m_saveMatrix) saveAsHistogram(A, "invA_ch" + to_string(chan), "Inverted matrix for " + forWhat);
     saveAsHistogram(x, err, "dt_ch" + to_string(chan), "Sample time bins for " + forWhat,
                     "sample number", "#Delta t [ns]");
     saveAsHistogram(sampleTimes, "sampleTimes_ch" + to_string(chan),

@@ -215,8 +215,6 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
     RawDataBlock tempdblk;
     tempdblk.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
 
-    unsigned int utime = 0;
-    unsigned int ctime = 0;
     unsigned long long int mtime = 0;
 
     int store_time_flag = 0;
@@ -235,8 +233,8 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
         ftsw->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
 
         // Tentative for DESY TB 2017
-        utime = (unsigned int)(ftsw->GetTTUtime(0));
-        ctime = (unsigned int)(ftsw->GetTTCtime(0));
+        unsigned int utime = (unsigned int)(ftsw->GetTTUtime(0));
+        unsigned int ctime = (unsigned int)(ftsw->GetTTCtime(0));
         mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(std::round(ctime / 0.127216));
         store_time_flag = 1;
         continue;
@@ -245,8 +243,8 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
         // Not store RawCOPPER here. 2018.11.23
         RawCOPPER tempcpr_time;
         tempcpr_time.SetBuffer(cprbuf, nwds_buf, false, 1, 1);
-        utime = (unsigned int)(tempcpr_time.GetTTUtime(0));
-        ctime = (unsigned int)(tempcpr_time.GetTTCtime(0));
+        unsigned int utime = (unsigned int)(tempcpr_time.GetTTUtime(0));
+        unsigned int ctime = (unsigned int)(tempcpr_time.GetTTCtime(0));
         mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(std::round(ctime / 0.127216));
         store_time_flag = 1;
       }
@@ -282,6 +280,36 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
           B2WARNING(std::hex << cprbuf[i]);
         }
         B2FATAL("Unknown COPPER ID is found. CPRID = " << std::hex << subsysid << " Please check. Exiting...");
+      }
+
+      // Check the magic number of the Raw(ROB) header and trailer
+      if ((cprbuf[nwds_buf - (RawTrailer_latest::RAWTRAILER_NWORDS - RawTrailer_latest::POS_TERM_WORD)]
+           != RawTrailer_latest::MAGIC_WORD_TERM_TRAILER) ||
+          ((cprbuf[RawHeader_latest::POS_VERSION_HDRNWORDS] & RawHeader_latest::MAGIC_MASK)
+           != RawHeader_latest::MAGIC_WORD)) {
+        if (nwds_buf < 8) {
+          std::ostringstream oss;
+          for (int i = 0; i < nwds_buf; i++) {
+            oss << "0x" << std::setw(8) << std::setfill('0') << std::hex << cprbuf[i] << " ";
+          }
+          B2ERROR("All words of the error event: " << oss.str() <<
+                  "[Subsystem ID = " << subsysid << " ], [N_words = " << nwds_buf << "]");
+        } else {
+          std::ostringstream oss_first, oss_last;
+          // Print the first 8 words
+          for (int i = 0; i < 8; i++) {
+            oss_first << std::setw(8) << std::setfill('0') << std::hex << cprbuf[i] << " ";
+          }
+          // Print the last 8 words
+          for (int i = nwds_buf - 8; i < nwds_buf; i++) {
+            oss_last << std::setw(8) << std::setfill('0') << std::hex << cprbuf[i] << " ";
+          }
+          B2ERROR("The first 8 words of the error event: " << oss_first.str() <<
+                  "[Subsystem ID = " << subsysid << " ], [N_words = " << nwds_buf << "]");
+          B2ERROR("The  last 8 words of the error event: " << oss_last.str()  <<
+                  "[Subsystem ID = " << subsysid << " ], [N_words = " << nwds_buf << "]");
+        }
+        B2FATAL("Invalid magic number in Raw Trailer and/or Header. Exiting...");
       }
     }
 

@@ -162,7 +162,7 @@ int main()
 
   /* use LEF_TOTAL */
   val = 1; /* use LEF_TOTAL(1) or LEF_AB(0) */
-  ret = ioctl(cprfd, CPRIOSET_LEF_READSEL, &val, sizeof(val));
+  ioctl(cprfd, CPRIOSET_LEF_READSEL, &val, sizeof(val));
 
   /* set length fifo interrupt theshold */
   {

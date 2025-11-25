@@ -31,7 +31,7 @@ namespace Belle2 {
      *  Loosely inspired from http://en.wikipedia.org/wiki/Variadic_templates
      */
     struct EvalVariadic {
-      /// Constructor taking the variadic initalizer list.
+      /// Constructor taking the variadic initializer list.
       template <class... Ts>
       explicit EvalVariadic(Ts&& ... expressions __attribute__((unused)))
       {

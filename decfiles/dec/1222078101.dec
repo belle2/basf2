@@ -1,0 +1,56 @@
+# EventType: 1222078101
+# Descriptor: [B+ -> K+ X_2(4013) [ -> eta'sig [-> pi+pi-eta/rhogamma] eta_csig [->KS0 K pi]  ]cc
+# NickName: Bu_KpX_2(4013)_eta'eta_c
+# Documentation:
+# Tested: yes
+# Physics WG: Quarkonium
+# Responsible: Yang Li
+# Email: y_li@fudan.edu.cn
+# Cuts: None
+# Date: 20241128
+# Comments: add new particle X_2(4013) 
+# add_particle(X_2(4013), 9910440, 4014.30e-3, 4.00e-3, 0, 2, max_width=21e-3, lifetime=0, pythiaID=9910440)
+
+Alias X_2(4013)sig  X_2(4013)
+Alias eta_csig  eta_c
+Alias eta'sig   eta'
+Alias etasig    eta
+Alias K_S0sig   K_S0
+Alias rho0sig   rho0
+
+Decay Upsilon(4S)
+0.5   B+sig  B-    VSS;
+0.5   B+  B-sig    VSS;
+Enddecay
+
+Decay B+sig
+1.0   K+ X_2(4013)sig PHSP;
+Enddecay
+CDecay B-sig
+
+Decay X_2(4013)sig 
+1.0   eta_csig  eta'sig   PHSP;
+Enddecay
+
+Decay eta_csig
+0.5   K_S0sig  K- pi+   PHSP;
+0.5   K_S0sig  K+ pi-   PHSP;
+Enddecay
+
+Decay K_S0sig
+1.0   pi+   pi-         PHSP;
+Enddecay
+
+Decay eta'sig
+0.5   pi+  pi-  etasig     PHSP;
+0.5   rho0sig   gamma      PHSP;
+Enddecay
+
+Decay etasig
+1.0   gamma  gamma PHSP;
+Enddecay
+
+Decay rho0sig
+0.5   pi+  pi-   VSS;
+Enddecay
+End

@@ -42,27 +42,27 @@ def stdPi0s(
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              `Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
                               for information on the beam background MVA.
 
         fakePhotonMVAWeight (str): type of weight file for fake photon MVA; if empty, fake photon MVA will not be used
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              `Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
                               for information on the fake photon MVA.
 
         biasCorrectionTable (str): correction table for the photon energy bias correction (should only be applied to data)
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              `Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
                               for information on the names of available correction tables.
 
     """
 
     if listtype != 'all':
-        B2WARNING("stdPi0s is loading \"May2020\" pi0 recommendations. Please check Neutrals Performance Confluence"
+        B2WARNING("stdPi0s is loading \"May2020\" pi0 recommendations. Please check Neutrals Performance XWiki"
                   " page for most up-to-date pi0 recommendations.")
 
     if listtype == 'all':

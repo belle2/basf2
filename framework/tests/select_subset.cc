@@ -38,7 +38,7 @@ namespace {
     static bool SelectionCriterium(const KeyElementType a)
     {
       // The elements  whose UniqueID is prime are selected (well, if the UniqueID
-      // is equal or greather than 1369 the sieve is too coarse)
+      // is equal or greater than 1369 the sieve is too coarse)
       return (a % 2) != 0 && (a % 3) != 0 && (a % 5) != 0 && (a % 7) != 0 &&
              (a % 11) != 0 && (a % 13) != 0 && (a % 17) != 0 && (a % 19) != 0 && (a % 23) != 0 &&
              (a % 29) != 0 && (a % 31) != 0 ;
@@ -49,7 +49,7 @@ namespace {
       return  SelectionCriterium(a->GetUniqueID());
     }
 
-    // The following map type is ment as a container of all the relations
+    // The following map type is meant as a container of all the relations
     // from m_fromElement to al other elements in all the store arrays.
     // It maps the "To" KeyElement to the weight of Relation.
     using FromTargetElementsToWeight =  map< KeyElementType, double >;
@@ -63,7 +63,7 @@ namespace {
 
     public:
 
-      // the following map is ment to map the name of StoreArray to the
+      // the following map is meant to map the name of StoreArray to the
       // map linking the target "to" element to the weight of the relation.
       using FromStringToArrows = unordered_map< string, FromTargetElementsToWeight >;
 

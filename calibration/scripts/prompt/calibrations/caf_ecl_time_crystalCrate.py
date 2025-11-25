@@ -103,7 +103,7 @@ def get_calibrations(input_data, **kwargs):
     print("expert_config:  maxNumEventsCrystalCalib = ", maxNumEventsCrystalCalib)
 
     # Determine how large of an offset should be applied to correct for
-    # differences in the CDC event t0 in bhabha and hadronic events
+    # differences in the SVD event t0 in bhabha and hadronic events
     t0_bhabhaToHadron_correction = expert_config["t0_bhabhaToHadron_correction"]
     print("expert_config:  t0_bhabhaToHadron_correction = ", t0_bhabhaToHadron_correction)
 
@@ -223,8 +223,7 @@ def get_calibrations(input_data, **kwargs):
     prepare_cdst_analysis(rec_path_bhabha, components=['SVD', 'CDC', 'ECL', 'KLM'])
 
     # ====================================================
-    # t0BiasCorrection = -0.9  # Correct for the CDC t0 bias in ns
-    t0BiasCorrection = t0_bhabhaToHadron_correction  # Correct for the CDC t0 bias in ns
+    t0BiasCorrection = t0_bhabhaToHadron_correction  # Correct for the SVD t0 bias in ns
     # ====================================================
 
     col_bhabha = register_module('ECLBhabhaTCollector')
@@ -379,7 +378,7 @@ def get_calibrations(input_data, **kwargs):
             cal_ecl_merge_i = Calibration(name=mergeCalibName, collector="DummyCollector",
                                           input_files=input_files_bhabha_1perRun)
 
-            # Read in the previous crystal payload values for comparision
+            # Read in the previous crystal payload values for comparison
             cal_ecl_merge_i.algorithms = [merging_alg]
             print("merge algorithm: read previous payload for comparison purposes")
             print("merging_alg.readPrevCrysPayload = ", merging_alg.readPrevCrysPayload)
@@ -472,7 +471,7 @@ def get_calibrations(input_data, **kwargs):
         if 'Geometry' not in rec_path_bhabha_val:
             rec_path_bhabha_val.add_module('Geometry', useDB=True)
 
-        # exclude PXD and PID, so only CDC and ECL used for eventT0
+        # exclude PXD and PID; not needed
         prepare_user_cdst_analysis(rec_path_bhabha_val, components=['SVD', 'CDC', 'ECL', 'KLM'])
         col_bhabha_val = register_module('eclBhabhaTimeCalibrationValidationCollector')
         col_bhabha_val.param('timeAbsMax', 70)
@@ -548,7 +547,7 @@ def get_calibrations(input_data, **kwargs):
         if 'Geometry' not in rec_path_hadron_val:
             rec_path_hadron_val.add_module('Geometry', useDB=True)
 
-        # exclude PXD and PID, so only CDC and ECL used for eventT0
+        # exclude PXD and PID; not needed
         prepare_user_cdst_analysis(rec_path_hadron_val, components=['SVD', 'CDC', 'ECL', 'KLM'])
         col_hadron_val = register_module('eclHadronTimeCalibrationValidationCollector')
         col_hadron_val.param('timeAbsMax', 70)
@@ -619,7 +618,7 @@ def get_calibrations(input_data, **kwargs):
         # Collector setup for the calibration constant plotting
 
         # Set up the collector but with only one event per file
-        root_input = register_module('RootInput', entrySequences=['0:{}'.format(1)])
+        root_input = register_module('RootInput', entrySequences=[f'0:{1}'])
 
         rec_path_bhabha_plotting = create_path()
         rec_path_bhabha_plotting.add_module(root_input)

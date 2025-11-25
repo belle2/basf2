@@ -33,7 +33,7 @@ namespace Belle2 {
       /// Cut on difference in v-side cluster time of the two hits
       double m_DeltaTV = 17.5; // ns
       /// Use the delta t cuts between hits?
-      bool m_useDeltaTCuts = false;
+      bool m_useDeltaTCuts = true;
     };
 
   }

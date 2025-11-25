@@ -270,7 +270,7 @@ namespace Belle2 {
     struct dhc_direct_readout_frame_raw : public dhc_direct_readout_frame {
     };
 
-    /** DHC Zero supressed direct readout frame data struct.
+    /** DHC Zero suppressed direct readout frame data struct.
      * Dummy.
      * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
      */

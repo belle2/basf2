@@ -46,6 +46,8 @@ namespace Belle2 {
        * @param content A reference to the content part of the parameter
        *                description, which should to be used to create the ROOT
        *                objects.
+       * @param topVolume top volume
+       * @param type geometry type
        */
 
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);

@@ -112,7 +112,7 @@ namespace Belle2 {
     double CalculateMedian(TH1* hist)
     {
       double quantiles[1]; // One element just for median
-      double probSums[1] = {0.5}; // median definiton
+      double probSums[1] = {0.5}; // median definition
       hist->GetQuantiles(1, quantiles, probSums);
       return quantiles[0];
     }

@@ -15,8 +15,7 @@
 #include <unordered_set>
 #include <framework/gearbox/GearDir.h>
 #include <Math/Vector3D.h>
-#include "TVector3.h"
-#include "TVector2.h"
+#include <Math/Vector2D.h>
 #include <G4ThreeVector.hh>
 
 #define MAX_N_ALAYERS 5
@@ -24,7 +23,7 @@
 
 namespace Belle2 {
   //! The Class for ARICH Geometry Parameters
-  /*! This class provides ARICH gemetry paramters for simulation, reconstruction and so on.
+  /*! This class provides ARICH geometry parameters for simulation, reconstruction and so on.
     These parameters are gotten from gearbox.
   */
 
@@ -71,31 +70,29 @@ namespace Belle2 {
     //! get the total number of HAPD modules
     int getNMCopies() const;
     //! get the copy number of HAPD module containing point "hit"
-    int getCopyNo(TVector3 hit);
-    //! get the copy number of HAPD module containing point "hit"
     int getCopyNo(const ROOT::Math::XYZVector& hit);
     //! get the position of copyno-th HAPD module origin
-    TVector3 getOrigin(int copyno);
+    ROOT::Math::XYZVector getOrigin(int copyno);
     //! get the position of copyNo-th HAPD module origin (returns G4ThreeVector)
     G4ThreeVector getOriginG4(int copyNo);
     //! get the angle of copyno-th HAPD rotation
     double getModAngle(int copyno);
     //! get ID number of channel containing point "hit" (hit is in detector module local coordinates)
-    int getChannelID(TVector2 hit);
+    int getChannelID(ROOT::Math::XYVector hit);
     //! get center position of chID channel (in detector module local coordinates)
-    TVector2 getChannelCenterLoc(int chID);
+    ROOT::Math::XYVector getChannelCenterLoc(int chID);
     //! get channel quantum efficiency
     double getChannelQE(int moduleID, int channelID);
     //! get center position of chipID-th chip of detector module (in detector module local coordinates)
-    TVector2 getChipLocPos(int chipID);
+    ROOT::Math::XYVector getChipLocPos(int chipID);
     //! get ID number of chip containing point "locpos"
-    int getChipID(TVector2 locpos);
+    int getChipID(ROOT::Math::XYVector locpos);
     //! get center of chanID channel of modID detector module (in global coordinates)
-    TVector3 getChannelCenterGlob(int modID, int chanID);
+    ROOT::Math::XYZVector getChannelCenterGlob(int modID, int chanID);
     //! get normal vector of mirID-th mirror plate
-    TVector3 getMirrorNormal(int mirID);
+    ROOT::Math::XYZVector getMirrorNormal(int mirID);
     //! get one point lying on mirID-th mirror plate
-    TVector3 getMirrorPoint(int mirID);
+    ROOT::Math::XYZVector getMirrorPoint(int mirID);
     //! get transmission length of "ilayer" aerogel layer
     double getAerogelTransmissionLength(int ilayer);
     //! get refractive index of "ilayer" aerogel layer
@@ -124,7 +121,7 @@ namespace Belle2 {
     int getDetectorXPadNumber();
     //! get QE scaling factor for photons internally reflected in HAPD window
     double getQEScaling();
-    //! get absorbtion probability for photons internally reflected in HAPD window
+    //! get absorption probability for photons internally reflected in HAPD window
     double getWindowAbsorbtion();
     //! get factor to suppress p.e. detection efficiency due to negative polarity crosstalk among chip channels
     double getChipNegativeCrosstalk();
@@ -167,7 +164,7 @@ namespace Belle2 {
     int getNBoardsOnMerger(int mergerID);
 
     //! returns ID number of aerogel tile containing locpos (x-y) point.
-    int getAerogelTileID(TVector2 locpos);
+    int getAerogelTileID(ROOT::Math::XYVector locpos);
 
     //! Returns a set of copper ID's
     const std::unordered_set<unsigned int>& getCopperIDs() const
@@ -196,7 +193,7 @@ namespace Belle2 {
     int m_nRad;                            /*!< Number of aerogel layers */
     bool m_init;                          /*!< True if parametrization is already initialized */
     bool m_simple;                        /*!< True if parametrization initialized with simple geometry (beamtest) */
-    double m_aeroTrLength[MAX_N_ALAYERS];  /*!< Array of aerogel transmission lenths */
+    double m_aeroTrLength[MAX_N_ALAYERS];  /*!< Array of aerogel transmission lengths */
     double m_aeroRefIndex[MAX_N_ALAYERS];  /*!< Array of aerogel refracive indices */
     double m_aeroZPosition[MAX_N_ALAYERS]; /*!< Array of aerogel Z positions */
     double m_aeroThickness[MAX_N_ALAYERS]; /*!< Array of aerogel thickness */
@@ -209,7 +206,7 @@ namespace Belle2 {
     double m_LambdaStep;                  /*!< wavelength [nm]: step */
     int m_NpointsQE;                      /*!< number of QE data points */
     double m_qeScale;                     /*!< QE scale factor for photons internally reflected in HAPD window */
-    double m_windowAbsorbtion;            /*!< absorbtion probability for photons internally reflected in HAPD window */
+    double m_windowAbsorbtion;            /*!< absorption probability for photons internally reflected in HAPD window */
     double m_chipNegativeCrosstalk;       /*!< to simulate opposite polarity crosstalk among channels on chip */
     double m_QE[MAXPTS_QE];               /*!< quantum efficiency curve */
 
@@ -256,11 +253,12 @@ namespace Belle2 {
     std::vector<double> m_fR;       /*!< radial coordinate of detector modules */
     std::vector<double> m_fFi;      /*!< angular coordinate of detector modules */
     std::vector<double> m_fFiMod;      /*!< angle of detector module */
-    std::vector<TVector2> m_chipLocPos;   /*!< vector holding chip positions (in detector module local coordinates) */
-    std::map<int, TVector2> m_padLocPositions; /*!< map holding channel local positions (in detector module local coordinates) */
-    std::vector<TVector2> m_padWorldPositions; /*!< map holding channel global positions  */
-    std::vector<TVector3> m_mirrornorm;       /*!< vector holding normal vectors of mirror plates */
-    std::vector<TVector3> m_mirrorpoint;      /*!< vector holding one point of each mirror plate */
+    std::vector<ROOT::Math::XYVector> m_chipLocPos;   /*!< vector holding chip positions (in detector module local coordinates) */
+    std::map<int, ROOT::Math::XYVector>
+    m_padLocPositions; /*!< map holding channel local positions (in detector module local coordinates) */
+    std::vector<ROOT::Math::XYVector> m_padWorldPositions; /*!< map holding channel global positions  */
+    std::vector<ROOT::Math::XYZVector> m_mirrornorm;       /*!< vector holding normal vectors of mirror plates */
+    std::vector<ROOT::Math::XYZVector> m_mirrorpoint;      /*!< vector holding one point of each mirror plate */
 
     std::map<std::pair<unsigned, int>, unsigned> m_copper2merger; /*!< mapping of merger boards to cooper boards */
     std::map<int, std::vector<unsigned>> m_merger2feb; /*!< mapping of front-end boards to mergers */
@@ -287,7 +285,7 @@ namespace Belle2 {
     return m_fR.size();
   }
 
-  inline TVector2 ARICHGeometryPar::getChipLocPos(int chipID)
+  inline ROOT::Math::XYVector ARICHGeometryPar::getChipLocPos(int chipID)
   {
     return m_chipLocPos.at(chipID);
   }

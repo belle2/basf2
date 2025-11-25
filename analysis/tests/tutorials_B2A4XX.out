@@ -7,6 +7,7 @@ TBranch: __event__, 5
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: isSignal, 1
 TBranch: chiProb, 0.1779
@@ -15,3 +16,5 @@ TBranch: mcP, 1.49
 TBranch: pErr, 0.04083
 TBranch: daughter__bo0__cm__spE__bc, 2.749
 TBranch: originalDaughter__bo0__cm__spE__bc, 2.752
+TBranch: x_uncertainty, 0.294
+TBranch: daughter__bo0__cm__spprodVertexXErr__bc, 0.294

@@ -30,7 +30,7 @@ namespace Belle2 {
   }
 }
 
-/** Definitiions (.icc.h) **/
+/** Definitions (.icc.h) **/
 
 #include <TMatrixDSym.h>
 

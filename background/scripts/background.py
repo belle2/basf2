@@ -37,7 +37,7 @@ def get_background_files(folder=None, output_file_info=True):
 
     if folder is None:
         if env_name not in os.environ:
-            raise RuntimeError("Environment variable {} for backgound files not set. Terminanting this script.".format(env_name))
+            raise RuntimeError("Environment variable {} for background files not set. Terminanting this script.".format(env_name))
         folder = os.environ[env_name]
 
     bg = glob.glob(folder + '/*.root')

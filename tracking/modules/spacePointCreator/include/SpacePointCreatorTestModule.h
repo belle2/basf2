@@ -75,7 +75,7 @@ namespace Belle2 {
 
     // modification parameters
     std::string
-    m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
+    m_nameOfInstance; /**< allows the user to set an identifier for this module. Useful if one wants to use several instances of that module */
 
   };
 } // end namespace Belle2

@@ -76,9 +76,9 @@ namespace Belle2 {
       StoreArray<RecoTrack> m_RecoTracks;           /**< Tracks. */
       StoreArray<TrackFitResult> m_TrackFitResults; /**< Track fit results. */
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
-      std::string m_recoTrackArrayName ;       /**< Belle2::RecoTrack StoreArray nam.e */
+      std::string m_recoTrackArrayName ;       /**< Belle2::RecoTrack StoreArray name.e */
       std::string m_trackFitResultArrayName;  /**< Belle2::TrackFitResult StoreArray name. */
-      std::string m_relRecoTrackTrackName;     /**< Releation between RecoTrack and Belle2:Track. */
+      std::string m_relRecoTrackTrackName;     /**< Relation between RecoTrack and Belle2:Track. */
       std::string m_outputFileName;           /**< Output file name. */
       std::string m_treeName;    /**< output tree name. */
 

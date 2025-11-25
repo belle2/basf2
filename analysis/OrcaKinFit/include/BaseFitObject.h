@@ -237,7 +237,7 @@ namespace Belle2 {
       void invalidateCache() const {cachevalid = false;};
       virtual void updateCache() const = 0;
 
-      // these are the mothods that fill the fitter's matrices/vectors
+      // these are the methods that fill the fitter's matrices/vectors
 
       /// Add covariance matrix elements to
       /// global covariance matrix of size idim x idim

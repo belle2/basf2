@@ -12,8 +12,6 @@
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
 #include <analysis/VariableManager/Manager.h>
 
-#include <iostream>
-
 using namespace std;
 using namespace Belle2;
 
@@ -42,6 +40,7 @@ FlavorTaggerInfoFillerModule::FlavorTaggerInfoFillerModule() : Module()
 
 void FlavorTaggerInfoFillerModule::initialize()
 {
+  if (m_FANNmlp or m_TMVAfbdt) m_eventExtraInfo.isRequired();
 }
 
 void FlavorTaggerInfoFillerModule::event()

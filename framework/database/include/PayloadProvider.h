@@ -73,10 +73,10 @@ namespace Belle2::Conditions {
     bool find(PayloadMetadata& meta);
   private:
     /** Look for a payload in the local directory location, set the filename
-     * member of the metadata instance and return true on succes */
+     * member of the metadata instance and return true on success */
     bool getLocalFile(const PayloadLocation& loc, PayloadMetadata& meta) const;
     /** Look for a payload on a remote server and download if possible, set the
-     * filename member of the metadata instance and return true on succes */
+     * filename member of the metadata instance and return true on success */
     bool getRemoteFile(const PayloadLocation& loc, PayloadMetadata& meta);
     /** Try to download url into a temporary file, if successful set the
      * filename member of the metadata and return true. Otherwise return false.

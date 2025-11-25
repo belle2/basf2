@@ -55,7 +55,7 @@ namespace Belle2 {
     /** return entry number with given (event, run, experiment) from tree. Returns -1 if not found. */
     long getEntryNumberWithEvtRunExp(TTree* tree, long event, long run, long experiment);
 
-    /** Build TTreeIndex on tree (assumes EventMetaData branch exists there). */
+    /** Build TTreeIndex on tree (assumes either EventMetaData branch exists or is a ntuple tree). */
     void buildIndex(TTree* tree);
 
     /** Returns true if and only if 'cl' or one of its bases has I/O streamers.

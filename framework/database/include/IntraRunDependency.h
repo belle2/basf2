@@ -23,7 +23,7 @@ namespace Belle2 {
   public:
 
     /**
-     * Constructor for intra run depenent conditions.
+     * Constructor for intra run dependent conditions.
      * @param object   the first valid object in the run.
      * @param owner    flag that indicates whether the IntraRunDependency takes ownership of the payload objects or not.
      */

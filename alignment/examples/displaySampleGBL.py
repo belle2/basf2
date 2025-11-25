@@ -11,7 +11,7 @@
 #############################################################################
 #
 # This steering file expects a simulated data sample at innput and
-# perfoms the standard reconstruction. The MillepedeCollector
+# performs the standard reconstruction. The MillepedeCollector
 # is used to re-fit tracks with General Broken Lines
 #
 # Finally the display is run to demonstrate its capability to visualize tracks

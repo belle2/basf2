@@ -72,6 +72,12 @@ namespace Belle2 {
     bool m_neuroTrackInputMode;
     /** counter for tracks */
     int m_trackcounter;
+
+    /** Flag to save Fake track */
+    bool m_SaveFakeTrack;
+    /** Flag to use full hit Fake track */
+    int m_FullHitMode;
+
     //other data
     /** Instance of the NeuroTrigger. */
     NeuroTrigger m_NeuroTrigger;

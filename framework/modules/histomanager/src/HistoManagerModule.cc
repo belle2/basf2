@@ -28,7 +28,7 @@ REG_MODULE(HistoManager);
 HistoManagerModule::HistoManagerModule() : Module(), m_initmain(false), m_tupleManagerInitialized(false)
 {
   // Module description
-  setDescription("Manage histograms/Ntuples/TTrees for modules inheriting from the HistoModule class. See https://confluence.desy.de/display/BI/Software+HistogramManagement for details.");
+  setDescription("Manage histograms/Ntuples/TTrees for modules inheriting from the HistoModule class. See https://xwiki.desy.de/xwiki/rest/p/297bb for details.");
   setPropertyFlags(Module::c_HistogramManager);
 
   // Parameters

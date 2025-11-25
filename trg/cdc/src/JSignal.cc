@@ -210,23 +210,23 @@ namespace Belle2 {
       //if(t_type != 1) t_bitsize++;
       //// Check if bitwidth and calculated bitwidth match.
       //if(t_rhs.m_bitsize != t_bitsize){
-      //  cout<<"Bitsize and calcualted bitwidth don't match"<<endl;
+      //  cout<<"Bitsize and calculated bitwidth don't match"<<endl;
       //  cout<<"Bitsize: "<<t_rhs.m_bitsize<<" calBitsize: "<<t_bitsize<<endl;
       //  cout<<"LHS"<<endl;
       //  dump();
       //  cout<<"RHS"<<endl;
       //  t_rhs.dump();
-      //  cout<<"Bitsize and calcualted bitwidth don't match"<<endl;
+      //  cout<<"Bitsize and calculated bitwidth don't match"<<endl;
       //}
       //// Check if type and calculated type match.
       //if(t_rhs.m_type != t_type){
-      //  cout<<"Type and calcualted type don't match"<<endl;
+      //  cout<<"Type and calculated type don't match"<<endl;
       //  cout<<"Type: "<<t_rhs.m_type<<" calType: "<<t_type<<endl;
       //  cout<<"LHS"<<endl;
       //  dump();
       //  cout<<"RHS"<<endl;
       //  t_rhs.dump();
-      //  cout<<"Type and calcualted type don't match"<<endl;
+      //  cout<<"Type and calculated type don't match"<<endl;
       //}
 
       // Set arguments if needed.
@@ -1977,7 +1977,7 @@ namespace Belle2 {
     //// For signal <= combined signal.
     //if(t_vhdlCode != "") {
     //  return target.m_name + "<=" + t_vhdlCode + ";";
-    //// For signal <= constant. Do we need a seperate flag?
+    //// For signal <= constant. Do we need a separate flag?
     //} else if (from.m_minInt == from.m_maxInt) {
     //  if(from.m_type == 1) {
     //    return target.m_name + "<=to_unsigned(" + to_string(from.m_int) + "," + to_string(from.m_bitsize) + ")";

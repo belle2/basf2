@@ -13,12 +13,13 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCFacet;
 
-    /// Filter for the constuction of good facets based on simple criterions.
+    /// Filter for the construction of good facets based on simple criteria.
     class AllFacetFilter : public BaseFacetFilter {
 
     public:
       /// Main filter method returning the weight of the facet. Returns 3 to accept all facets.
-      Weight operator()(const CDCFacet& facet __attribute__((unused))) final {
+      Weight operator()(const CDCFacet& facet __attribute__((unused))) final
+      {
         return 3.0;
       }
     };

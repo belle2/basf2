@@ -10,7 +10,7 @@
 #define ARICHHIT_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -34,8 +34,10 @@ namespace Belle2 {
     //! Useful Constructor
     /*!
       \param position vector of track position on aerogel plane
+      \param mod module ID
+      \param ch channel ID
     */
-    ARICHHit(TVector3 position, int mod, int ch)
+    ARICHHit(ROOT::Math::XYZVector position, int mod, int ch)
     {
       m_x = (float) position.X();
       m_y = (float) position.Y();
@@ -45,7 +47,7 @@ namespace Belle2 {
     }
 
     //! Get photon hit position
-    TVector3 getPosition() const { TVector3 vec(m_x, m_y, m_z); return vec; }
+    ROOT::Math::XYZVector getPosition() const { return ROOT::Math::XYZVector(m_x, m_y, m_z); }
 
     //! Get channel ID
     int getChannel() const {return m_ch;}

@@ -15,7 +15,7 @@ namespace Belle2 {
 
   /**
    * Class to hold general basf2 configuration
-   * Used to intiate and configure CreateAnalysis object
+   * Used to initiate and configure CreateAnalysis object
    *
    * Steering file syntax:
    *

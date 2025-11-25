@@ -19,7 +19,7 @@
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 #include <rawdata/dataobjects/RawCDC.h>
-
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 namespace Belle2 {
 
   namespace CDC {
@@ -84,7 +84,7 @@ namespace Belle2 {
         }
 
         m_version = ((buf[0] & 0xff0000) >> 16); // Always zero.
-        m_boardId = (buf[0] & 0xffff);
+        m_boardId = (buf[0] & 0x01ff);
         m_triggerTime = ((buf[1] & 0xffff0000) >> 16);
         m_dataLength = (buf[1] & 0xffff);
         m_triggerNumber = buf[2];
@@ -242,6 +242,17 @@ namespace Belle2 {
       std::string m_xmlMapFileName;
 
       /**
+       * Relation name between CDCRawHit and CDCHit.
+       */
+      std::string m_relCDCRawHitToCDCHitName;
+
+      /**
+       * Relation name between CDCRawHitWaveForm and CDCHit.
+       */
+
+      std::string m_relCDCRawHitWFToCDCHitName;
+
+      /**
        * Short ward buffer of CDC event block.
        */
       std::vector<unsigned short> m_buffer;
@@ -339,6 +350,16 @@ namespace Belle2 {
        * True if data size error between CDCFE and COPPER has been already reported.
        */
       bool m_dataSizeError;
+
+      /**
+       * True if add relation of CDCHits, CDCRawHits, and CDCRawHitWaveForms."
+       */
+      bool m_relationRawHits;
+
+      /**
+       * Recover boardID error if true, skip information otherwise
+       */
+      bool m_recoverBoardIdError;
 
     };//end class declaration
 

@@ -32,7 +32,7 @@ namespace Belle2 {
     static std::string invertMakeROOTCompatible(std::string str);
 
     /**
-     * Substituation map for makeROOTCompatible
+     * Substitution map for makeROOTCompatible
      */
     static std::map<std::string, std::string> getSubstitutionMap();
 

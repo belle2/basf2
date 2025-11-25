@@ -1,0 +1,23 @@
+# EventType: 1210010000
+# Descriptor: [B+ -> pi+ nu_tau anti-nu_tau]cc
+# NickName: Bu_pinunu
+# Documentation: SM B+ -> pi+ nu nu signal MC  
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Ihor Prudiiev
+# Email: ihor.prudiiev@ijs.si
+# Cuts: None
+# Date: 20240707
+#
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.000 pi+  nu_tau  anti-nu_tau PHSP;
+Enddecay
+CDecay B-sig
+
+End

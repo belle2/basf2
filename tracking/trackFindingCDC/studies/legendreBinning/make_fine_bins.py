@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -10,7 +9,7 @@
 ##########################################################################
 
 
-from ROOT import Belle2  # make Belle2 namespace available # noqa
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import TrackFindingCDC as TFCDC
 
 
@@ -24,7 +23,7 @@ def is_power_of_two(x):
         return False
 
 
-assert(is_power_of_two(2048))
+assert (is_power_of_two(2048))
 
 
 def main():

@@ -398,7 +398,7 @@ bool TimeExtractionUtils::buildFullResidualCovarianceMatrix(const RecoTrack& rec
     HMatrices.push_back(H);
   }
 
-  // Add the measurment covariances, also calculate their full
+  // Add the measurement covariances, also calculate their full
   // (block-diagonal) inverse covariance matrix.
   fullResidualCovariance *= -1;
   inverseFullMeasurementCovariance = 0;

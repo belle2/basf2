@@ -24,7 +24,7 @@ namespace Belle2 {
     /** Default constructor */
     PXDClusterShapeClassifierPar() {}
 
-    /** Add shape likelyhood*/
+    /** Add shape likelihood*/
     void addShapeLikelyhood(int shape_index, float likelyhood) {m_shape_likelyhoods[shape_index] = likelyhood;}
 
     /** Return shape likelyhood map  */

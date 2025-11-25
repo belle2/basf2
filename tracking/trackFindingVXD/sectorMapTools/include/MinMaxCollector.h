@@ -27,7 +27,7 @@ namespace Belle2 {
 
   /** A container for collecting data, where min- and max-quantiles near q(0) and q(1) are to be found.
    *
-   * can only approximatly find actual quantiles and is sensitive to sorted data .
+   * can only approximately find actual quantiles and is sensitive to sorted data .
    * -> random samples have to be used!
    * Always exact for min and max, but the nearer the requested quantiles to the given quantileCut, the more sensitive it is to sorted data.
    * For random input, the quantiles always stay very near to the real ones (if they are not the correct ones already).
@@ -37,17 +37,17 @@ namespace Belle2 {
   template<class DataType>
   class MinMaxCollector {
   protected:
-    /** collects smallest values occured so far */
+    /** collects smallest values occurred so far */
     std::deque<DataType> m_smallestValues;
 
-    /** collects biggest values occured so far */
+    /** collects biggest values occurred so far */
     std::deque<DataType> m_biggestValues;
 
-    /** counts numbre of values added so far */
+    /** counts number of values added so far */
     unsigned m_sampleSize;
 
 
-    /** sets the threshold for storing data. min- and max-container will store the smalles/biggest quantileCut*100 (== %) of the total sample. */
+    /** sets the threshold for storing data. min- and max-container will store the smallest/biggest quantileCut*100 (== %) of the total sample. */
     DataType m_quantileCut;
 
 

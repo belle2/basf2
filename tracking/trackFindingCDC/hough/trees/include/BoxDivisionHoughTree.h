@@ -92,7 +92,7 @@ namespace Belle2 {
        *  @param lowerBound  Lower bound of the value range
        *  @param upperBound  Upper bound of the value range
        *  @param nBinOverlap Overlap of neighboring bins. Default is no overlap.
-       *                     Usuallly this is counted in number of discrete values
+       *                     Usually this is counted in number of discrete values
        *  @param nBinWidth   Width of the bins at lowest level. Default is width of 1.
        *                     Usually this is counted in numbers of discrete values
        */
@@ -179,7 +179,7 @@ namespace Belle2 {
         m_houghTree->fell();
       }
 
-      /// Release all memory that the tree aquired during the runs.
+      /// Release all memory that the tree acquired during the runs.
       void raze()
       {
         m_houghTree->raze();
@@ -238,23 +238,23 @@ namespace Belle2 {
       }
 
     private:
+      /// Array of the number of divisions at each level
+      const std::array<size_t, sizeof ...(divisions)> m_divisions = {{divisions ...}};
+
+      /// Dynamic hough tree structure traversed in the leaf search.
+      std::unique_ptr<HoughTree> m_houghTree = nullptr;
+
       /// Number of the maximum tree level.
       int m_maxLevel;
 
       /// Number of levels to skip in first level to form a finer sectored hough space.
       int m_sectorLevelSkip;
 
-      /// Array of the number of divisions at each level
-      const std::array<size_t, sizeof ...(divisions)> m_divisions = {{divisions ...}};
-
       /// An tuple of division overlaps in each coordinate.
       typename HoughBox::Delta m_overlaps;
 
       /// A tuple of value arrays providing the memory for the discrete bin bounds.
       Arrays m_arrays;
-
-      /// Dynamic hough tree structure traversed in the leaf search.
-      std::unique_ptr<HoughTree> m_houghTree = nullptr;
     };
   }
 }

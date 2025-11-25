@@ -39,6 +39,7 @@ mypath.add_module('VariablesToNtuple',
 mypath.add_module('VariablesToNtuple',
                   particleList='',
                   variables=['nTracks', 'isMC', 'year'],
+                  treeName='eventVariables',
                   fileName='EventVariables.root')
 
 # One can also call the VariablesToNtuple module in the roe_path to store the ROE particles' variables.

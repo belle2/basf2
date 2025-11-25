@@ -24,7 +24,7 @@ import modularAnalysis as ma
 from variables import variables as vm
 
 path = b2.Path()
-ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', True),
+ma.inputMdst(filename=b2.find_file('mdst16.root', 'validation', True),
              path=path)
 
 

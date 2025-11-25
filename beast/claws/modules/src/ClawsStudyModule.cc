@@ -12,14 +12,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
 
-#include <fstream>
 #include <string>
-
-// ROOT
-#include <TH1.h>
-#include <TH2.h>
 
 using namespace std;
 
@@ -121,7 +115,7 @@ void ClawsStudyModule::initialize()
 
   REG_HISTOGRAM
 
-  //get CLAWSS paramters ie energy threshold
+  //get CLAWSS parameters ie energy threshold
   getXMLData();
 }
 

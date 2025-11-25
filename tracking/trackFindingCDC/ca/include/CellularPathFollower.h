@@ -61,7 +61,7 @@ namespace Belle2 {
             // Insert a pointer to the cell into the path
             path.push_back(cellHolder);
 
-            // Recursivly grow the path
+            // Recursively grow the path
             growAllPaths(path, cellHolderRelations, paths);
             path.pop_back();
           }
@@ -163,7 +163,7 @@ namespace Belle2 {
 
       /**
        *  Helper function determining if the given neighbor is one of the best to be followed.
-       *  Since this is an algebraic property on comparision to the other alternatives is necessary.
+       *  Since this is an algebraic property on comparison to the other alternatives is necessary.
        */
       static bool isHighestContinuation(const WeightedRelation<ACellHolder>& relation)
       {
@@ -181,7 +181,7 @@ namespace Belle2 {
 
       /**
        *  Helper function determining if the given neighbor is one of the best to be followed.
-       *  Since this is an algebraic property no comparision to the other alternatives is necessary.
+       *  Since this is an algebraic property no comparison to the other alternatives is necessary.
        */
       static bool isHighestContinuation(ACellHolder& cellHolder,
                                         Weight relationWeight,

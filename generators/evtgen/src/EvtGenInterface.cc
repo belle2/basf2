@@ -74,10 +74,11 @@ EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName, const bool
     B2WARNING("If you are generating Y(4S) events, you _really_ must use the coherent decay mode.");
   }
 
-  return new EvtGen(DECFileName.c_str(), tmp.getName().c_str(), &EvtGenInterface::m_eng,
-                    radCorrEngine, &extraModels,  mixingMode);
+  EvtGen* evtGen = new EvtGen(DECFileName.c_str(), tmp.getName().c_str(), &EvtGenInterface::m_eng,
+                              radCorrEngine, &extraModels,  mixingMode);
 
   initLogCapture.finish();
+  return evtGen;
 }
 
 int EvtGenInterface::setup(const std::string& DECFileName, const std::string& parentParticle,
@@ -109,16 +110,39 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
 }
 
 
-int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVector pParentParticle,
-                                   ROOT::Math::XYZVector pPrimaryVertex,
-                                   int inclusiveType, const std::string& inclusiveParticle)
+// Add colliding electron/positron to the event graph
+static void addInitialParticle(MCParticleGraph& mpg, int pdg, ROOT::Math::PxPyPzEVector p4)
+{
+  MCParticleGraph::GraphParticle& part = mpg.addParticle();
+
+  part.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator | MCParticle::c_Initial);
+  part.setMass(Const::electronMass);
+  part.setPDG(pdg);
+
+  part.set4Vector(p4);
+
+  part.setProductionVertex(0, 0, 0);
+  part.setProductionTime(0);
+  part.setValidVertex(false);
+}
+
+
+
+
+int EvtGenInterface::simulateEvent(MCInitialParticles initial, int inclusiveType,
+                                   const std::string& inclusiveParticle)
 {
   EvtId inclusiveParticleID, inclusiveAntiParticleID;
 
   if (!m_ParentInitialized)
     B2FATAL("Parent particle is not initialized.");
   //Init evtgen
-  m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
+
+  ROOT::Math::PxPyPzEVector pParentParticle = initial.getHER() + initial.getLER();
+  ROOT::Math::PxPyPzEVector herCMS = initial.getBoostedHER();
+  ROOT::Math::XYZVector pPrimaryVertex = initial.getVertex();
+
+  EvtVector4R pinit(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
 
   if (inclusiveType != 0) {
     inclusiveParticleID = EvtPDL::getId(inclusiveParticle);
@@ -134,15 +158,27 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVe
   bool we_got_inclusive_particle = false;
   do {
     m_logCaptureDebug.start();
-    m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, m_pinit);
-    m_parent->setVectorSpinDensity();
+    m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, pinit);
+
+
+    // spin-density matrix for Vector particle produced in e+e-
+    EvtSpinDensity rho;
+    //Set helicity +1 and -1 to 1.
+    rho.setDiag(m_parent->getSpinStates());
+    rho.set(1, 1, EvtComplex(0.0, 0.0));
+
+    // set spin-density matrix, polarisation axis in CMS defined by alpha,beta Euler angles
+    double alpha = herCMS.Phi(), beta = herCMS.Theta(), gamma = 0;
+    m_parent->setSpinDensityForwardHelicityBasis(rho, alpha, beta, gamma);
+
+
     m_Generator->generateDecay(m_parent);
     m_logCaptureDebug.finish();
 
     if (inclusiveType != 0) {
       EvtParticle* p = m_parent;
       // following loop will go through generated event and check it for
-      // presense of inclusive particle
+      // presence of inclusive particle
       do {
         //for (int ii = 0; ii < iPart ; ii++) {
         //std::cout << p->getPDGId() << std::endl;
@@ -164,6 +200,10 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVe
   } while (!we_got_inclusive_particle);
 
   //  B2INFO("after generate Decay.");
+  MCParticleGraph graph;
+
+  addInitialParticle(graph, 11, initial.getHER());
+  addInitialParticle(graph, -11, initial.getLER());
 
   int iPart = addParticles2Graph(m_parent, graph, pPrimaryVertex, NULL);
   graph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
@@ -180,14 +220,14 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
   EvtId id;
   ROOT::Math::PxPyPzEVector momentum = parent.get4Vector();
   ROOT::Math::XYZVector vertex = parent.getVertex();
-  m_pinit.set(momentum.E(), momentum.X(), momentum.Y(), momentum.Z());
+  EvtVector4R pinit(momentum.E(), momentum.X(), momentum.Y(), momentum.Z());
   m_logCaptureDebug.start();
   // we want to decay the particle so the decay time in the tree needs to be lower
   // than whatever the daughters will get
   parent.setDecayTime(-std::numeric_limits<float>::infinity());
   pdg = parent.getPDG();
   id = EvtPDL::evtIdFromStdHep(pdg);
-  m_parent = EvtParticleFactory::particleFactory(id, m_pinit);
+  m_parent = EvtParticleFactory::particleFactory(id, pinit);
   if (pdg == 10022) // Virtual photon
     m_parent->setVectorSpinDensity();
   else

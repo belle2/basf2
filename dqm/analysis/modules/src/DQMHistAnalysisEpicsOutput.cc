@@ -9,8 +9,6 @@
 // Own header.
 #include <dqm/analysis/modules/DQMHistAnalysisEpicsOutput.h>
 
-#include <TH1F.h>
-
 using namespace std;
 using namespace Belle2;
 
@@ -33,13 +31,30 @@ void DQMHistAnalysisEpicsOutputModule::initialize()
   // Crosscheck
   if (!getUseEpics()) {
     B2ERROR("EPICS is not enabled, most likely DQMHistAnalysisEpicsEnableModule is missing in the beginning of the process chain.");
+  } else {
+    // -> now trigger flush to network
+    // this is the reason we want to have this module after all other Analysis modules
+    auto state = updateEpicsPVs(5.0); // 5 seconds
+    // be aware that any "error" arising from a PV in an analysis module, may only show up here (timeout etc)
+    if (state != ECA_NORMAL) checkPVStatus();
   }
+}
+
+void DQMHistAnalysisEpicsOutputModule::beginRun(void)
+{
+  checkPVStatus();
+}
+
+void DQMHistAnalysisEpicsOutputModule::endRun(void)
+{
+  checkPVStatus();
 }
 
 void DQMHistAnalysisEpicsOutputModule::event()
 {
   // -> now trigger flush to network
-  // this is the reason we want to have this modul after all other Analysis modules
-  updateEpicsPVs(5.0); // 5 seconds
+  // this is the reason we want to have this module after all other Analysis modules
+  auto state = updateEpicsPVs(5.0); // 5 seconds
   // be aware that any "error" arising from a PV in an analysis module, may only show up here (timeout etc)
+  if (state != ECA_NORMAL) checkPVStatus();
 }

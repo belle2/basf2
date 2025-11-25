@@ -7,4 +7,6 @@ env['LIBS'] = ['framework', 'geometry', 'simulation', 'top_dataobjects',
 	       'simulation_dataobjects',
                '$ROOT_LIBS', '$GEANT4_LIBS', 'CLHEP']
 
+env['CXXFLAGS'] += ['-fopenmp-simd']
+
 Return('env')

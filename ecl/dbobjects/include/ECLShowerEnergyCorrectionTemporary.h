@@ -16,7 +16,7 @@ namespace Belle2 {
 
   /**
    * Class to hold the information for the ECL shower energy corrections
-   * This is a temperary class as there is no information about phi dependence.
+   * This is a temporary class as there is no information about phi dependence.
    * An improved version will be implemented at a later time.
    *
    * NOTE - angles are in degrees

@@ -183,7 +183,7 @@ namespace Belle2 {
      */
     template<class Functor> [[nodiscard]] static ScopeGuard guardFunctor(Functor functor)
     {
-      typedef typename std::result_of<Functor()>::type value_type;
+      typedef typename std::invoke_result<Functor>::type value_type;
       std::function<void(const value_type&)> setter(functor);
       const auto old = functor();
       return ScopeGuard([setter, old] {setter(old);});
@@ -205,7 +205,7 @@ namespace Belle2 {
     template<class Functor> [[nodiscard]]
     static ScopeGuard guardFunctor(Functor functor, const typename std::result_of<Functor()>::type& newValue)
     {
-      typedef typename std::result_of<Functor()>::type value_type;
+      typedef typename std::invoke_result<Functor>::type value_type;
       std::function<void(const value_type&)> setter(functor);
       const auto old = functor();
       setter(newValue);

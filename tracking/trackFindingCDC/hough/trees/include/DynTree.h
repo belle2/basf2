@@ -99,7 +99,7 @@ namespace Belle2 {
         }
 
       private:
-        /// Remove to node from the tree hierachy.
+        /// Remove to node from the tree hierarchy.
         void unlink()
         {
           m_parent = nullptr;
@@ -208,7 +208,7 @@ namespace Belle2 {
         /// Level of the node within the tree
         int m_level = 0;
 
-        /// Parent in the tree hierachy of this node.
+        /// Parent in the tree hierarchy of this node.
         Node* m_parent = nullptr;
       };
 
@@ -296,7 +296,7 @@ namespace Belle2 {
         return result;
       }
 
-      /// Aquire the next unused child node structure, recycling all memory.
+      /// Acquire the next unused child node structure, recycling all memory.
       std::vector<Node>* getUnusedChildren()
       {
         if (m_nUsedChildren >= m_children.size()) {
@@ -341,7 +341,7 @@ namespace Belle2 {
         m_nUsedChildren = 0;
       }
 
-      /// Like fell but also releases all memory the tree has aquired during long execution.
+      /// Like fell but also releases all memory the tree has acquired during long execution.
       void raze()
       {
         this->fell();

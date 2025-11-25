@@ -217,7 +217,7 @@ Method in :b2:mod:`SVDTimeGrouping` module:
 
 Payloads related to SVDTimeGrouping:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#. :ref:`SVDRecoConfiguration<svdrecoconfiguration>` : The switiching ON/OFF of SVDTimeGrouping is controlled by this DBObject.
+#. :ref:`SVDRecoConfiguration<svdrecoconfiguration>` : The switching ON/OFF of SVDTimeGrouping is controlled by this DBObject.
 #. :ref:`SVDTimeGroupingConfiguration<svdtimegroupingconfiguration>` : All the parameters used by this module is stored in this DBObject.
 
 

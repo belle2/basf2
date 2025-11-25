@@ -7,6 +7,7 @@ TBranch: __event__, 2
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 2
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, 1.21
 TBranch: py, 2.932
@@ -148,6 +149,7 @@ TBranch: __event__, 2
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 2
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: isSignal, 1
 TBranch: mcErrors, 0
@@ -265,6 +267,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 5
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, -2.456
 TBranch: py, 2.383
@@ -294,10 +297,16 @@ TBranch: klmClusterIsForwardEKLM, 0
 TBranch: klmClusterIsBackwardEKLM, 0
 TBranch: klmClusterTheta, 1.47
 TBranch: klmClusterPhi, 2.371
+TBranch: klmClusterTrackDistance, nan
+TBranch: klmClusterTrackSeparationAngle, nan
+TBranch: klmClusterTrackRotationAngle, nan
+TBranch: klmClusterShapeStdDev1, 0
+TBranch: klmClusterShapeStdDev2, 0
+TBranch: klmClusterShapeStdDev3, 0
 TBranch: nKLMClusterTrackMatches, 1
 TBranch: nMatchedKLMClusters, nan
-TBranch: isFromECL, 0
-TBranch: isFromKLM, 1
+TBranch: isFromECL, False
+TBranch: isFromKLM, True
 TTree: klong
 TBranch: __experiment__, 0
 TBranch: __run__, 0
@@ -305,6 +314,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 5
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, -2.456
 TBranch: py, 2.383
@@ -334,6 +344,12 @@ TBranch: klmClusterIsForwardEKLM, 0
 TBranch: klmClusterIsBackwardEKLM, 0
 TBranch: klmClusterTheta, 1.47
 TBranch: klmClusterPhi, 2.371
+TBranch: klmClusterTrackDistance, nan
+TBranch: klmClusterTrackSeparationAngle, nan
+TBranch: klmClusterTrackRotationAngle, nan
+TBranch: klmClusterShapeStdDev1, 0
+TBranch: klmClusterShapeStdDev2, 0
+TBranch: klmClusterShapeStdDev3, 0
 TBranch: nKLMClusterTrackMatches, 1
 TBranch: nMatchedKLMClusters, nan
 TTree: phot
@@ -343,6 +359,7 @@ TBranch: __event__, 2
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 6
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, -0.107
 TBranch: py, 0.1756
@@ -392,7 +409,7 @@ TBranch: clusterSecondMoment, 0.4688
 TBranch: clusterTheta, 0.6785
 TBranch: clusterTiming, -0.9766
 TBranch: clusterTrackMatch, 0
-TBranch: goodBelleGamma, 1
+TBranch: goodBelleGamma, True
 TTree: muon
 TBranch: __experiment__, 0
 TBranch: __run__, 0
@@ -400,6 +417,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 4
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: nTracks, 4
 TBranch: px, -1.964
@@ -448,6 +466,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 4
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: nTracks, 4
 TBranch: px, -1.964
@@ -496,6 +515,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 4
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: nTracks, 4
 TBranch: px, -1.963
@@ -544,6 +564,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 4
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: nTracks, 4
 TBranch: px, -1.964
@@ -593,6 +614,7 @@ TBranch: __event__, 2
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, 1.209
 TBranch: py, 2.932
@@ -699,6 +721,7 @@ TBranch: __event__, 2
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 2
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, 1.21
 TBranch: py, 2.932
@@ -806,6 +829,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 6
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: combinationID, 3
 TBranch: deltaPhi, -2.264

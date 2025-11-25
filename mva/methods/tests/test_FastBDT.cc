@@ -27,26 +27,22 @@ namespace {
     EXPECT_EQ(specific_options.m_nLevels, 3);
     EXPECT_FLOAT_EQ(specific_options.m_shrinkage, 0.1);
     EXPECT_FLOAT_EQ(specific_options.m_randRatio, 0.5);
-#if FastBDT_VERSION_MAJOR >= 5
     EXPECT_EQ(specific_options.m_sPlot, false);
     EXPECT_EQ(specific_options.m_individual_nCuts.size(), 0);
     EXPECT_EQ(specific_options.m_individualPurityTransformation.size(), 0);
     EXPECT_EQ(specific_options.m_purityTransformation, false);
     EXPECT_FLOAT_EQ(specific_options.m_flatnessLoss, -1.0);
-#endif
 
     specific_options.m_nTrees = 100;
     specific_options.m_nCuts = 10;
     specific_options.m_nLevels = 2;
     specific_options.m_shrinkage = 0.2;
     specific_options.m_randRatio = 0.8;
-#if FastBDT_VERSION_MAJOR >= 5
     specific_options.m_individual_nCuts = {2, 3, 4};
     specific_options.m_flatnessLoss = 0.3;
     specific_options.m_sPlot = true;
     specific_options.m_purityTransformation = true;
     specific_options.m_individualPurityTransformation = {true, false, true};
-#endif
 
     boost::property_tree::ptree pt;
     specific_options.save(pt);
@@ -55,7 +51,6 @@ namespace {
     EXPECT_EQ(pt.get<unsigned int>("FastBDT_nLevels"), 2);
     EXPECT_FLOAT_EQ(pt.get<double>("FastBDT_shrinkage"), 0.2);
     EXPECT_FLOAT_EQ(pt.get<double>("FastBDT_randRatio"), 0.8);
-#if FastBDT_VERSION_MAJOR >= 5
     EXPECT_EQ(pt.get<unsigned int>("FastBDT_number_individual_nCuts"), 3);
     EXPECT_EQ(pt.get<unsigned int>("FastBDT_individual_nCuts0"), 2);
     EXPECT_EQ(pt.get<unsigned int>("FastBDT_individual_nCuts1"), 3);
@@ -67,7 +62,6 @@ namespace {
     EXPECT_EQ(pt.get<bool>("FastBDT_individualPurityTransformation0"), true);
     EXPECT_EQ(pt.get<bool>("FastBDT_individualPurityTransformation1"), false);
     EXPECT_EQ(pt.get<bool>("FastBDT_individualPurityTransformation2"), true);
-#endif
 
     MVA::FastBDTOptions specific_options2;
     specific_options2.load(pt);
@@ -77,7 +71,6 @@ namespace {
     EXPECT_EQ(specific_options2.m_nLevels, 2);
     EXPECT_FLOAT_EQ(specific_options2.m_shrinkage, 0.2);
     EXPECT_FLOAT_EQ(specific_options2.m_randRatio, 0.8);
-#if FastBDT_VERSION_MAJOR >= 5
     EXPECT_EQ(specific_options2.m_sPlot, true);
     EXPECT_FLOAT_EQ(specific_options2.m_flatnessLoss, 0.3);
     EXPECT_EQ(specific_options2.m_purityTransformation, true);
@@ -89,19 +82,13 @@ namespace {
     EXPECT_EQ(specific_options2.m_individual_nCuts[0], 2);
     EXPECT_EQ(specific_options2.m_individual_nCuts[1], 3);
     EXPECT_EQ(specific_options2.m_individual_nCuts[2], 4);
-#endif
 
     EXPECT_EQ(specific_options.getMethod(), std::string("FastBDT"));
 
     // Test if po::options_description is created without crashing
     auto description = specific_options.getDescription();
 
-    // flatnessLoss, sPlot and individualNCuts are only activated in FastBDT version 4
-#if FastBDT_VERSION_MAJOR >= 5
     EXPECT_EQ(description.options().size(), 10);
-#else
-    EXPECT_EQ(description.options().size(), 5);
-#endif
 
     // Check for B2ERROR and throw if version is wrong
     // we try with version 100, surely we will never reach this!
@@ -164,7 +151,6 @@ namespace {
 
   }
 
-#if FastBDT_VERSION_MAJOR >= 5
   TEST(FastBDTTest, FastBDTInterfaceWithPurityTransformation)
   {
     MVA::Interface<MVA::FastBDTOptions, MVA::FastBDTTeacher, MVA::FastBDTExpert> interface;
@@ -193,7 +179,6 @@ namespace {
     EXPECT_GE(probabilities[7], 0.8);
 
   }
-#endif
 
   TEST(FastBDTTest, WeightfilesOfDifferentVersionsAreConsistent)
   {
@@ -210,10 +195,8 @@ namespace {
     },
     {}, {0.0, 1.0, 0.0, 1.0, 0.0, 1.0});
 
-    // cppcheck-suppress unreadVariable
     auto expert = interface.getExpert();
 
-#if FastBDT_VERSION_MAJOR >= 3
     auto weightfile_v3 = MVA::Weightfile::loadFromFile(FileSystem::findFile("mva/methods/tests/FastBDTv3.xml"));
     expert->load(weightfile_v3);
     auto probabilities_v3 = expert->apply(dataset);
@@ -223,9 +206,7 @@ namespace {
     EXPECT_NEAR(probabilities_v3[3], 0.100049, 0.0001);
     EXPECT_NEAR(probabilities_v3[4], 0.0664554, 0.0001);
     EXPECT_NEAR(probabilities_v3[5], 0.00886221, 0.0001);
-#endif
 
-#if FastBDT_VERSION_MAJOR >= 5
     auto weightfile_v5 = MVA::Weightfile::loadFromFile(FileSystem::findFile("mva/methods/tests/FastBDTv5.xml"));
     expert->load(weightfile_v5);
     auto probabilities_v5 = expert->apply(dataset);
@@ -246,7 +227,6 @@ namespace {
     EXPECT_NEAR(probabilities_v5[3], probabilities_v3[3], 0.001);
     EXPECT_NEAR(probabilities_v5[4], probabilities_v3[4], 0.001);
     EXPECT_NEAR(probabilities_v5[5], probabilities_v3[5], 0.001);
-#endif
   }
 
 }

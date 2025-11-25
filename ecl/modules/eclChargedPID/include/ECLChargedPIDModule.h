@@ -36,7 +36,7 @@ namespace Belle2 {
    * hypothesis are obtained from pdfs stored in a conditions database payload, and then get stored in an ECLPidLikelihood object.
    *
    * The dimensionality of the likelihood depends on how many variables are stored in the payload.
-   * The baseline method could be a simple univariate likelihood based on E/p PDFs, but it could be extended to include more ECL quantitites (e.g. shower shape variables).
+   * The baseline method could be a simple univariate likelihood based on E/p PDFs, but it could be extended to include more ECL quantities (e.g. shower shape variables).
    *
    * Please note however that the multi-dimensional likelihood approach is based on the the assumption that PDFs of the observables can be factorised into a simple product:
    *
@@ -65,7 +65,7 @@ namespace Belle2 {
     virtual ~ECLChargedPIDModule();
 
     /**
-     * Check the PDFs payload for consistency everytime they change in the database.
+     * Check the PDFs payload for consistency every time they change in the database.
      */
     void checkPdfsDB();
 
@@ -198,7 +198,7 @@ namespace Belle2 {
     double getPdfVal(const double& x, const TF1* pdf);
 
     /**
-     * Defintion of sqrt(2)
+     * Definition of sqrt(2)
      */
     static constexpr double c_sqrt2 = 1.41421356237309504880;
 

@@ -82,7 +82,17 @@ int DqmMemFile::UpdateSharedMem()
   if (!m_writeMode) return -1;
   m_memfile->Write(0, TObject::kOverwrite);
   m_shm->lock();
-  m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
+  auto ret = m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
+
+  FILE* fh = fopen(("/dev/shm/tmp_" + m_name).c_str(), "wb+");
+  if (fh) {
+    fwrite(m_shm->ptr(), 1, ret, fh);
+    fclose(fh);
+    if (rename(("/dev/shm/tmp_" + m_name).c_str(), ("/dev/shm/" + m_name).c_str())) {
+      perror("Rename dhm file failed ");
+    }
+  }
+
   m_shm->unlock();
   return 0;
 }

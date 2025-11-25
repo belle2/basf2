@@ -425,11 +425,11 @@ It is also includes updated optical properties of HAPD quartz window.
   <!-- in order to fit in a given volume. Do not use this material for anything else. -->
   <Material name="merger_pcb">
     <state>Solid</state>
-    <!-- Density at 2 mm thikness            -->
+    <!-- Density at 2 mm thickness            -->
     <!-- <density unit="g/cm3">4.2</density> -->
-    <!-- Density at 1 mm thikness            -->
+    <!-- Density at 1 mm thickness            -->
     <!-- <density unit="g/cm3">8.4</density> -->
-    <!-- Density at 0.5 mm thikness          -->
+    <!-- Density at 0.5 mm thickness          -->
     <density unit="g/cm3">16.8</density>
     <Components>
       <Element fraction="0.14">Cu</Element>

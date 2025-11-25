@@ -800,7 +800,7 @@ namespace Belle2 {
         cout << endl;
     }
 
-    cout << "ouput : priority cell timing" << endl;
+    cout << "output : priority cell timing" << endl;
     o = 80;
     for (unsigned i = 0; i < 16; i++) {
       TRGState s = output.subset(o + i * 4, 4);
@@ -991,7 +991,7 @@ namespace Belle2 {
       if ((i % 4) == 3)
         cout << endl;
     }
-    cout << "ouput : priority cell timing" << endl;
+    cout << "output : priority cell timing" << endl;
     o = 80;
     for (unsigned i = 0; i < 16; i++) {
       TRGState s = output.subset(o + i * 4, 4);

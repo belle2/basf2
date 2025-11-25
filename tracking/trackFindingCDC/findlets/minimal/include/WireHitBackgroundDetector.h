@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 
+
 namespace Belle2 {
 
   namespace TrackFindingCDC {
@@ -41,7 +42,6 @@ namespace Belle2 {
 
       /// Chooseable WireHit filter to be used to filter background
       ChooseableWireHitFilter m_wireHitFilter;
-
     };
   }
 }

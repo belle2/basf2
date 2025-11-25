@@ -33,12 +33,12 @@ namespace Belle2 {
      * first vector should be outer hit, second = center hit, third is inner hit. */
     static int value(const PointType& a, const PointType& b, const PointType& c)
     {
-      B2Vector3<double> sigma_a = a.getPositionError();
-      B2Vector3<double> sigma_b = b.getPositionError();
-      B2Vector3<double> sigma_c = c.getPositionError();
+      B2Vector3D sigma_a = a.getPositionError();
+      B2Vector3D sigma_b = b.getPositionError();
+      B2Vector3D sigma_c = c.getPositionError();
 
-      B2Vector3<double> c2b(b.X() - c.X(), b.Y() - c.Y(), 0.0);
-      B2Vector3<double> b2a(a.X() - b.X(), a.Y() - b.Y(), 0.0);
+      B2Vector3D c2b(b.X() - c.X(), b.Y() - c.Y(), 0.0);
+      B2Vector3D b2a(a.X() - b.X(), a.Y() - b.Y(), 0.0);
       //TODO: check if acos of the dot product is better (faster)
       double angle = atan2(b2a[0], b2a[1]) - atan2(c2b[0], c2b[1]);
       //TODO 1/3...mean of the sigmas. Possible improvement: Use a parameter instead, and determine with simulated events.

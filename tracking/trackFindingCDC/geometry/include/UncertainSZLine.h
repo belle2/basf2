@@ -72,11 +72,11 @@ namespace Belle2 {
       /**
        *  Access to the constant interface of the underlying parameter line
        *  Allows the user of this "super" class to use the getters and
-       *  other methods to get inforamation about the line but disallows mutation
+       *  other methods to get information about the line but disallows mutation
        *  of internal state.
        *  This ensures that the parameters are not changed without proper adjustment to
        *  the covariance matrix in this class, which can be achieved by the more limited
-       *  set of methods in this class accessable by normal . method calls
+       *  set of methods in this class accessible by normal . method calls
        */
       const SZLine* operator->() const
       {

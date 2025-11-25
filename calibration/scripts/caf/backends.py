@@ -41,6 +41,15 @@ _input_data_file_path = Path("__BACKEND_INPUT_FILES__.json")
 _STDOUT_FILE = "stdout"
 #: stderr file name
 _STDERR_FILE = "stderr"
+#: Environment variables to export in each Backend job
+_backend_job_envvars = (
+    "TMPDIR",
+    "BELLE2_CONFIG_DIR",
+    "VO_BELLE2_SW_DIR",
+    "BELLE2_EXTERNALS_TOPDIR",
+    "BELLE2_CONDB_METADATA",
+    "BELLE2_CONDB_PROXY",
+)
 
 
 def get_input_data():
@@ -82,7 +91,7 @@ class ArgumentsGenerator():
     def __init__(self, generator_function, *args, **kwargs):
         """
         Simple little class to hold a generator (uninitialised) and the necessary args/kwargs to
-        initialise it. This lets us re-use a generator by setting it up again fresh. This is not
+        initialise it. This lets us reuse a generator by setting it up again fresh. This is not
         optimal for expensive calculations, but it is nice for making large sequences of
         Job input arguments on the fly.
 
@@ -90,8 +99,8 @@ class ArgumentsGenerator():
             generator_function (py:function): A function (callable) that contains a ``yield`` statement. This generator
                 should *not* be initialised i.e. you haven't called it with ``generator_function(*args, **kwargs)``
                 yet. That will happen when accessing the `ArgumentsGenerator.generator` property.
-            args (tuple): The positional arguments you want to send into the intialisation of the generator.
-            kwargs (dict): The keyword arguments you want to send into the intialisation of the generator.
+            args (tuple): The positional arguments you want to send into the initialisation of the generator.
+            kwargs (dict): The keyword arguments you want to send into the initialisation of the generator.
         """
         #: Generator function that has not been 'primed'.
         self.generator_function = generator_function
@@ -203,10 +212,10 @@ class MaxFilesSplitter(SubjobSplitter):
     def __init__(self, *, arguments_generator=None, max_files_per_subjob=1):
         """
         Parameters:
-            max_files_per_subjob (int): The maximium number of input files used per `SubJob` created.
+            max_files_per_subjob (int): The maximum number of input files used per `SubJob` created.
         """
         super().__init__(arguments_generator=arguments_generator)
-        #: The maximium number of input files that will be used for each `SubJob` created.
+        #: The maximum number of input files that will be used for each `SubJob` created.
         self.max_files_per_subjob = max_files_per_subjob
 
     def create_subjobs(self, job):
@@ -232,7 +241,7 @@ class MaxSubjobsSplitter(SubjobSplitter):
     def __init__(self, *, arguments_generator=None, max_subjobs=1000):
         """
         Parameters:
-            max_subjobs (int): The maximium number ofsubjobs that will be created.
+            max_subjobs (int): The maximum number ofsubjobs that will be created.
         """
         super().__init__(arguments_generator=arguments_generator)
         #: The maximum number of `SubJob` objects to be created, input files are split evenly between them.
@@ -279,7 +288,7 @@ class ArgumentsSplitter(SubjobSplitter):
 
     This splitter is useful for MC production jobs where you don't have any input files, but you want to control the exp/run
     numbers of subjobs. If you do have input files set for the parent `Job` objects, then the same input files will be
-    assinged to every `SubJob`.
+    assigned to every `SubJob`.
 
     Parameters:
         arguments_generator (ArgumentsGenerator): The standard ArgumentsGenerator that is used to assign arguments
@@ -332,7 +341,7 @@ class Job:
     """
 
     #: Allowed Job status dictionary. The  key is the status name and the value is its level. The lowest level
-    #: out of all subjobs is the one that is the overal status of the overall job.
+    #: out of all subjobs is the one that is the overall status of the overall job.
     statuses = {"init": 0, "submitted": 1, "running": 2, "failed": 3, "completed": 4}
 
     #: Job statuses that correspond to the Job being finished (successfully or not)
@@ -356,7 +365,7 @@ class Job:
             self.output_dir = Path()
             #: Files that we produce during the job and want to be returned. Can use wildcard (*)
             self.output_patterns = []
-            #: Command and arguments as a list that wil be run by the job on the backend
+            #: Command and arguments as a list that will be run by the job on the backend
             self.cmd = []
             #: The arguments that will be applied to the `cmd` (These are ignored by SubJobs as they have their own arguments)
             self.args = []
@@ -623,28 +632,20 @@ class Job:
         Note that this *doesn't mean that every environment variable is inherited* from the submitting
         process environment.
         """
+        def append_environment_variable(cmds, envvar):
+            """
+            Append a command for setting an environment variable.
+            """
+            if envvar in os.environ:
+                cmds.append(f"""if [ -z "${{{envvar}}}" ]; then""")
+                cmds.append(f"  export {envvar}={os.environ[envvar]}")
+                cmds.append("fi")
+
         if "BELLE2_TOOLS" not in os.environ:
             raise BackendError("No BELLE2_TOOLS found in environment")
-        if "BELLE2_CONFIG_DIR" in os.environ:
-            self.setup_cmds.append("""if [ -z "${BELLE2_CONFIG_DIR}" ]; then""")
-            self.setup_cmds.append(f"  export BELLE2_CONFIG_DIR={os.environ['BELLE2_CONFIG_DIR']}")
-            self.setup_cmds.append("fi")
-        if "VO_BELLE2_SW_DIR" in os.environ:
-            self.setup_cmds.append("""if [ -z "${VO_BELLE2_SW_DIR}" ]; then""")
-            self.setup_cmds.append(f"  export VO_BELLE2_SW_DIR={os.environ['VO_BELLE2_SW_DIR']}")
-            self.setup_cmds.append("fi")
-        if "BELLE2_EXTERNALS_TOPDIR" in os.environ:
-            self.setup_cmds.append("""if [ -z "${BELLE2_EXTERNALS_TOPDIR}" ]; then""")
-            self.setup_cmds.append(f"  export BELLE2_EXTERNALS_TOPDIR={os.environ['BELLE2_EXTERNALS_TOPDIR']}")
-            self.setup_cmds.append("fi")
-        if "BELLE2_CONDB_PROXY" in os.environ:
-            self.setup_cmds.append("""if [ -z "${BELLE2_CONDB_PROXY}" ]; then""")
-            self.setup_cmds.append(f"  export BELLE2_CONDB_PROXY={os.environ['BELLE2_CONDB_PROXY']}")
-            self.setup_cmds.append("fi")
-        if "BELLE2_CONDB_METADATA" in os.environ:
-            self.setup_cmds.append("""if [ -z "${BELLE2_CONDB_METADATA}" ]; then""")
-            self.setup_cmds.append(f"  export BELLE2_CONDB_METADATA={os.environ['BELLE2_CONDB_METADATA']}")
-            self.setup_cmds.append("fi")
+        # Export all the environment variables defined via _backend_job_envvars
+        for envvar in _backend_job_envvars:
+            append_environment_variable(self.setup_cmds, envvar)
         if "BELLE2_RELEASE" in os.environ:
             self.setup_cmds.append(f"source {os.environ['BELLE2_TOOLS']}/b2setup {os.environ['BELLE2_RELEASE']}")
         elif 'BELLE2_LOCAL_DIR' in os.environ:
@@ -892,7 +893,7 @@ class Result():
 
     def get_exit_code_from_file(self):
         """
-        Read the exit code file to discover the exit status of the job command. Useful falback if the job is no longer
+        Read the exit code file to discover the exit status of the job command. Useful fallback if the job is no longer
         known to the job database (batch system purged it for example). Since some backends may take time to download
         the output files of the job back to the working directory we use a time limit on how long to wait.
         """
@@ -916,7 +917,7 @@ class Local(Backend):
 
     Keyword Arguments:
         max_processes (int): Integer that specifies the size of the process pool that spawns the subjobs, default=1.
-            It's the maximium simultaneous subjobs.
+            It's the maximum simultaneous subjobs.
             Try not to specify a large number or a number larger than the number of cores.
             It won't crash the program but it will slow down and negatively impact performance.
     """
@@ -1288,7 +1289,7 @@ class Batch(Backend):
         # if a SubJob list comes through this function. Slightly inefficient, but much simpler logic.
 
         # The first thing to do is make sure that we are iterating through the jobs list in chunks that are
-        # equal to or smaller than the gloabl limit. Otherwise nothing will ever submit.
+        # equal to or smaller than the global limit. Otherwise nothing will ever submit.
 
         if jobs_per_check > self.global_job_limit:
             B2INFO(f"jobs_per_check (={jobs_per_check}) but this is higher than the global job "
@@ -1431,7 +1432,7 @@ class PBS(Batch):
             Update the job's (or subjobs') status by calling qstat.
             """
             B2DEBUG(29, f"Calling {self.job}.result.update_status()")
-            # Get all jobs info and re-use it for each status update to minimise tie spent on this updating.
+            # Get all jobs info and reuse it for each status update to minimise tie spent on this updating.
             qstat_output = PBS.qstat()
             if self.job.subjobs:
                 for subjob in self.job.subjobs.values():
@@ -1442,7 +1443,7 @@ class PBS(Batch):
         def _update_result_status(self, qstat_output):
             """
             Parameters:
-                    qstat_output (dict): The JSON output of a previous call to qstat which we can re-use to find the
+                    qstat_output (dict): The JSON output of a previous call to qstat which we can reuse to find the
                     status of this job. Obviously you should only be passing a JSON dict that contains the 'Job_Id' and
                     'job_state' information, otherwise it is useless.
 
@@ -1679,7 +1680,7 @@ class LSF(Batch):
             Update the job's (or subjobs') status by calling bjobs.
             """
             B2DEBUG(29, f"Calling {self.job.name}.result.update_status()")
-            # Get all jobs info and re-use it for each status update to minimise tie spent on this updating.
+            # Get all jobs info and reuse it for each status update to minimise tie spent on this updating.
             bjobs_output = LSF.bjobs(output_fields=["stat", "id"])
             if self.job.subjobs:
                 for subjob in self.job.subjobs.values():
@@ -1690,7 +1691,7 @@ class LSF(Batch):
         def _update_result_status(self, bjobs_output):
             """
             Parameters:
-                bjobs_output (dict): The JSON output of a previous call to bjobs which we can re-use to find the
+                bjobs_output (dict): The JSON output of a previous call to bjobs which we can reuse to find the
                     status of this job. Obviously you should only be passing a JSON dict that contains the 'stat' and
                     'id' information, otherwise it is useless.
 
@@ -1981,7 +1982,7 @@ class HTCondor(Batch):
                 else:
                     B2ERROR(f"Error during condor_submit: {str(e)}, sleeping for {sleep_time} seconds.")
                     time.sleep(30)
-        return sub_out.split()[0]
+        return re.search(r"(\d+\.\d+) - \d+\.\d+", sub_out).groups()[0]
 
     class HTCondorResult(Result):
         """
@@ -2016,7 +2017,7 @@ class HTCondor(Batch):
             Update the job's (or subjobs') status by calling condor_q.
             """
             B2DEBUG(29, f"Calling {self.job.name}.result.update_status()")
-            # Get all jobs info and re-use it for each status update to minimise tie spent on this updating.
+            # Get all jobs info and reuse it for each status update to minimise tie spent on this updating.
             condor_q_output = HTCondor.condor_q()
             if self.job.subjobs:
                 for subjob in self.job.subjobs.values():
@@ -2031,7 +2032,7 @@ class HTCondor(Batch):
             ``condor_history``, etc.
 
             Parameters:
-                condor_q_output (dict): The JSON output of a previous call to `HTCondor.condor_q` which we can re-use to find the
+                condor_q_output (dict): The JSON output of a previous call to `HTCondor.condor_q` which we can reuse to find the
                     status of this job if it was active when that command ran.
             """
             B2DEBUG(29, f"Calling {self.job}.result._update_result_status()")
@@ -2064,7 +2065,7 @@ class HTCondor(Batch):
                 jobs_info = HTCondor.condor_q(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
 
             # If no job information is returned then the job already left the queue
-            # check in the history to see if it suceeded or failed
+            # check in the history to see if it succeeded or failed
             if not jobs_info:
                 try:
                     jobs_info = HTCondor.condor_history(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
@@ -2176,7 +2177,7 @@ class HTCondor(Batch):
         # We get a JSON serialisable summary from condor_q. But we will alter it slightly to be more similar to other backends
         cmd = " ".join(cmd_list)
         B2DEBUG(29, f"Calling subprocess with command = '{cmd}'")
-        # condor_q occassionally fails
+        # condor_q occasionally fails
         try:
             records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
         except BaseException:

@@ -16,7 +16,7 @@ namespace Belle2 {
    * and compile it again after down- and upload. This base class hosts all the properties that are common to both
    * implementations, which is the pre scale factor list and the cut type (reject or accept).
    *
-   * Please refer to the child classes (especially to SoftwareTriggerCut) for mroe information.
+   * Please refer to the child classes (especially to SoftwareTriggerCut) for more information.
    */
   class SoftwareTriggerCutBase {
   public:

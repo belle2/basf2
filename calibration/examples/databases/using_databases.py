@@ -17,7 +17,7 @@ if database_file.exists():
     database_file.unlink()
 
 # The SQLiteDB is made as a context manager so it will open a connection and close it for you
-# If the database doesn't exist you ned to pass in a 'schema' that describes the tables to create
+# If the database doesn't exist you need to pass in a 'schema' that describes the tables to create
 # If the database already exists, no table creation is done so you don't need to pass in a schema
 with SQLiteDB(database_file, schema={"users": ["name text primary key", "age int", "gender text", "email text"]}) as db:
     # Database file and tables are created and committed automatically when opening

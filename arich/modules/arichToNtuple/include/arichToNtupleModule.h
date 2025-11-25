@@ -61,7 +61,7 @@ namespace Belle2 {
 
     /** Name of particle list with reconstructed particles. */
     std::string m_particleList;
-    /** Decay string with selected particles to which arich info should be appendend */
+    /** Decay string with selected particles to which arich info should be appended */
     std::string m_arichSelector;
     /** List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
     std::vector<std::string> m_variables;

@@ -90,7 +90,7 @@ namespace PurityCalcTests {
         clusters.push_back(new SVDCluster(sensorId, false, v, 1.0, 0.1, 0.001, 1, 1, 1, 1.0));
       } else { // set only one coordinate
         bool setU = (nClusters > 0);
-        clusters.push_back(new SVDCluster(sensorId, setU, u, 1.0, 0.1, 0.001, 1, 1, 1, 1.0)); // position doesnot actually matter!
+        clusters.push_back(new SVDCluster(sensorId, setU, u, 1.0, 0.1, 0.001, 1, 1, 1, 1.0)); // position doesn't actually matter!
       }
       return SpacePoint(clusters, &sensorInfo);
     }
@@ -398,7 +398,7 @@ namespace PurityCalcTests {
    * + -1, if there is no MCParticle (but a TrueHit)
    * + -2, if there is no TrueHit (but a Cluster in the SpacePoint)
    * NOTE: partly tests mock-up
-   * NOTE: seperate tests for SVD and PXD for better readability
+   * NOTE: separate tests for SVD and PXD for better readability
    */
   TEST_F(PurityCalculatorToolsTest, testGetMCParticlesPXD)
   {
@@ -421,7 +421,7 @@ namespace PurityCalcTests {
     ASSERT_FALSE(findIt == mcParts.end());
     EXPECT_DOUBLE_EQ(findIt->second, 1);
 
-    B2INFO("The occuring error message is expected! It is used to discover some corner cases in real usage!");
+    B2INFO("The occurring error message is expected! It is used to discover some corner cases in real usage!");
     mcParts = getMCParticles<PXDTrueHit>(m_spacePoints[3]); // PXD with two TrueHits pointing to one MCParticle
     ASSERT_EQ(mcParts.size(), 1);
     EXPECT_EQ(mcParts[0].first, 1); // related to MCParticle 2
@@ -434,7 +434,7 @@ namespace PurityCalcTests {
    * + -1, if there is no MCParticle (but a TrueHit)
    * + -2, if there is no TrueHit (but a Cluster in the SpacePoint)
    * NOTE: partly tests mock-up
-   * NOTE: seperate tests for SVD and PXD for better readability
+   * NOTE: separate tests for SVD and PXD for better readability
    */
   TEST_F(PurityCalculatorToolsTest, testGetMCParticlesSVD)
   {
@@ -496,11 +496,11 @@ namespace PurityCalcTests {
     ASSERT_FALSE(findIt == mcParts.end());
     EXPECT_DOUBLE_EQ(findIt->second, 21);
 
-    // NOTE: the rest of the occuring set-up cases should be covered by the above tests!
+    // NOTE: the rest of the occurring set-up cases should be covered by the above tests!
   }
 
   /**
-   * test the createPurityInfos function by comparing the created MCVXDpurityinfo objects with the expected ones (kown
+   * test the createPurityInfos function by comparing the created MCVXDpurityinfo objects with the expected ones (known
    * from mockup-construction)
    */
   TEST_F(PurityCalculatorToolsTest, testCreatePurityInfos)

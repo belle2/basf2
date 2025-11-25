@@ -16,10 +16,7 @@
 #include <TROOT.h>
 #include <csignal>
 
-#include <cstdio>
-#include <iostream>
 #include <unordered_map>
-#include <functional>
 
 using namespace Belle2;
 using namespace std;

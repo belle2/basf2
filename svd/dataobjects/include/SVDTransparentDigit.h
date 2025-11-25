@@ -612,7 +612,7 @@ namespace Belle2 {
 
     unsigned short m_nSample;  /**< Number of samples. */
 
-    //int  m_ADC[SVDPar::maxSample];  /**< ADC values fo strip signal. Index represents samples.*/
+    //int  m_ADC[SVDPar::maxSample];  /**< ADC values for strip signal. Index represents samples.*/
     short  m_ADC[128][6];  /**< ADC values of strip signal. Index represents channel index (0~127) and sample index (0~5).*/
 
     short  m_cmc1[6];  /**< 1st common-mode correction values. Index represents sample index (0~5).*/

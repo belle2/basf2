@@ -126,7 +126,7 @@ namespace Belle2 {
     //// KT study
     ////m_mConstV["wireZError"] = vector<double>  ({0.0581, 0.0785, 0.0728, 0.0767});
     ////m_mConstV["driftZError"] = vector<double>  ({0.00388, 0.00538, 0.00650, 0.00842});
-    //// Orginal study
+    //// Original study
     //m_mConstV["wireZError"] = vector<double> (4);
     //m_mConstV["wireZError"][0] = 3.19263;
     //m_mConstV["wireZError"][1] = 2.8765;
@@ -367,7 +367,7 @@ namespace Belle2 {
           m_mVector["mcTSs"][iSuperLayer] = (double)mcTSList[iTS]->cell().localId() / m_mConstV["nWires"][2 * iSuperLayer + 1] * 4 *
                                             m_mConstD["Trg_PI"];
         }
-        // Save MC ture CDC's hit position
+        // Save MC true CDC's hit position
         m_mVector["mcTSsX"] = vector<double> (4);
         m_mVector["mcTSsY"] = vector<double> (4);
         for (unsigned iTS = 0; iTS < mcTSList.size(); iTS++) {

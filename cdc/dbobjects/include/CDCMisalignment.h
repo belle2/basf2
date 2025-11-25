@@ -24,7 +24,7 @@ namespace Belle2 {
     // Define some not used wire/cell ids for other purposes ------------
     /// Last bit for wire (actually over 100 unused - but useful for us)
     static const baseType WireNone = 511;
-    /// Last bit for continous layer (unused)
+    /// Last bit for continuous layer (unused)
     static const baseType ICLayerNone = 63;
     /// layer = (ICLayer, 400)
     static const baseType Wire4Layers = 400;

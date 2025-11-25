@@ -39,7 +39,7 @@ const std::string& Belle2::PXD::PXDError::getPXDBitErrorName(int bit)
     // 36-39
     "Error bit in GHOST frame header not set", "Suspicious Padding/Checksum in DHP ZSP", "DHC Words in Event mismatch", "DHE Words in Event mismatch",
     // 40-43
-    "Row Overflow/out of bounds >=768", "DHP Frames not continuesly", "DHP Frame numbers of different frames differ>1", "DHP Frame differ from DHE Frame by >1",
+    "Row Overflow/out of bounds >=768", "DHP Frames not continuously", "DHP Frame numbers of different frames differ>1", "DHP Frame differ from DHE Frame by >1",
     // 44-47
     "DHE ID is invalid", "DHC ID Start/End Mismatch", "DHE End w/o Start", "double DHC End",
     // 48-51

@@ -54,7 +54,7 @@ Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
   const CDCAxialSegment2D& middleSegment = *ptrMiddleSegment;
   const CDCAxialSegment2D& endSegment = *ptrEndSegment;
 
-  /// Recheck the axial axial compatability
+  /// Recheck the axial axial compatibility
   Weight pairWeight =
     m_mcAxialSegmentPairFilter(CDCAxialSegmentPair(ptrStartSegment, ptrEndSegment));
 

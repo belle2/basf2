@@ -40,4 +40,3 @@ without arguments. Here we just document the most useful arguments, please use
     :func: get_argument_parser
     :prog: b2test-scripts
     :nodefaultconst:
-    :nogroupsections:

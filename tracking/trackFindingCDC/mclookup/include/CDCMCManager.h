@@ -21,11 +21,11 @@ namespace Belle2 {
     class CDCMCMap;
 
 
-    ///Class to organize and present the monte carlo hit information
+    ///Class to organize and present the Monte Carlo hit information
     class CDCMCManager  {
 
     public:
-      /// Getter for the singletone instance
+      /// Getter for the singleton instance
       static CDCMCManager& getInstance();
 
       /// Singleton: Delete copy constructor and assignment operator
@@ -34,33 +34,33 @@ namespace Belle2 {
       /// Operator =.
       CDCMCManager& operator=(const CDCMCManager&) = delete;
 
-      /// Getter for the singletone instance of the CDCMCMap
+      /// Getter for the singleton instance of the CDCMCMap
       static const CDCMCMap& getMCMap();
 
-      /// Getter for the singletone instance of the CDCMCTrackStore
+      /// Getter for the singleton instance of the CDCMCTrackStore
       static const CDCMCTrackStore& getMCTrackStore();
 
-      /// Getter for the singletone instance of the CDCSimHitLookUp
+      /// Getter for the singleton instance of the CDCSimHitLookUp
       static const CDCSimHitLookUp& getSimHitLookUp();
 
-      /// Getter for the singletone instance of the CDCMCHitLookUp
+      /// Getter for the singleton instance of the CDCMCHitLookUp
       static const CDCMCHitLookUp& getMCHitLookUp();
 
-      /// Getter for the singletone instance of the CDCMCSegment2DLookUp
+      /// Getter for the singleton instance of the CDCMCSegment2DLookUp
       static const CDCMCSegment2DLookUp& getMCSegment2DLookUp();
 
-      /// Getter for the singletone instance of the CDCMCSegment3DLookUp
+      /// Getter for the singleton instance of the CDCMCSegment3DLookUp
       static const CDCMCSegment3DLookUp& getMCSegment3DLookUp();
 
-      /// Getter for the singletone instance of the CDCMCTrackLookUp
+      /// Getter for the singleton instance of the CDCMCTrackLookUp
       static const CDCMCTrackLookUp& getMCTrackLookUp();
 
     private:
-      /// Default constructor only accessable for getInstance()
+      /// Default constructor only accessible for getInstance()
       CDCMCManager() = default;
 
     public:
-      /// Require the mc information store arrays.
+      /// Require the MC information store arrays.
       void requireTruthInformation();
 
       /// Clears all Monte Carlo information present in the last event
@@ -70,7 +70,7 @@ namespace Belle2 {
       void fill();
 
     private:
-      /// Memory for the event, run and experminent number corresponding to the currently stored data.
+      /// Memory for the event, run and experiment number corresponding to the currently stored data.
       EventMetaData m_eventMetaData = EventMetaData(-999, -999, -999);
     };
   }

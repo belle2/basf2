@@ -5,18 +5,18 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include "ecl/geometry/BelleCrystal.h"
 
-#include "globals.hh"
+/* Own header. */
+#include <ecl/geometry/BelleCrystal.h>
 
-#include "G4VoxelLimits.hh"
-#include "G4AffineTransform.hh"
+/* Geant4 headers. */
+#include <G4AffineTransform.hh>
+#include <G4VoxelLimits.hh>
+#include <G4VGraphicsScene.hh>
+#include <G4VPVParameterisation.hh>
 
-#include "G4VPVParameterisation.hh"
-
-#include "G4VGraphicsScene.hh"
-
-#include "CLHEP/Random/RandFlat.h"
+/* CLHEP headers. */
+#include <CLHEP/Random/RandFlat.h>
 
 using namespace Belle2;
 using namespace std;
@@ -191,7 +191,7 @@ BelleCrystal& BelleCrystal::operator = (const BelleCrystal& rhs)
 
 // Calculate the coef's of the plane p1->p2->p3->p4->p1
 // where the ThreeVectors 1-4 are in anti-clockwise order when viewed from
-// infront of the plane (i.e. from normal direction).
+// in front of the plane (i.e. from normal direction).
 //
 // Return true if the ThreeVectors are coplanar + set coef;s
 //        false if ThreeVectors are not coplanar
@@ -206,7 +206,7 @@ G4bool BelleCrystal::MakePlane(const G4ThreeVector& p1, const G4ThreeVector& p2,
 
   if (std::fabs(Vcross.dot(v14) / (Vcross.mag()*v14.mag())) > kCoplanar_Tolerance) {
     std::ostringstream message;
-    message << "Verticies are not in the same plane: " << GetName() << " volume =" << Vcross.dot(v14);
+    message << "Vertices are not in the same plane: " << GetName() << " volume =" << Vcross.dot(v14);
     G4Exception("BelleCrystal::MakePlane()", "BelleCrystal", FatalException, message);
   }
 
@@ -483,13 +483,13 @@ G4double BelleCrystal::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector
   G4double lmin = kInfinity;
 
   auto outside = [delta, &lmin, &iside](double d, double nv, unsigned int i) -> bool {
-    if (d > delta) // definitly outside
+    if (d > delta) // definitely outside
     {
       lmin = 0; iside = i; return true;
     } else
     {
       bool c = nv > 0;
-      if (d < -delta) { // definitly inside
+      if (d < -delta) { // definitely inside
         if (c) { // has to point to the same direction
           d = -d;
           if (d < nv * lmin) {lmin = d / nv; iside = i;}

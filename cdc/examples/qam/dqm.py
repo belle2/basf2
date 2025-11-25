@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -49,7 +48,7 @@ class DQM():
         call constructor of base class, required.
         """
 
-        super(DQM, self).__init__()
+        super().__init__()
 
         #: input file name
         self.f = TFile(fname)
@@ -153,7 +152,7 @@ class DQM():
 
     def fitADC(self, xmin=8, xmax=200):
         """
-        Fit all ADC histgrams.
+        Fit all ADC histograms.
         """
         if self.m_fitStatus is True:
             print("Fitting for ADC has been already applied.")
@@ -193,7 +192,7 @@ class DQM():
 
     def drawADC(self, lay=0, w=0):
         """
-        Draw ADC histgrams w.r.t (lay,wire).
+        Draw ADC histograms w.r.t (lay,wire).
         """
         i = self.getHistID(lay, w)
         for j in range(self.ndiv):
@@ -207,7 +206,7 @@ class DQM():
 
     def drawTDC(self, lay=0, w=0):
         """
-        Draw TDC histgrams w.r.t (lay,wire).
+        Draw TDC histograms w.r.t (lay,wire).
         """
         i = self.getHistID(lay, w)
         for j in range(self.ndiv):
@@ -221,7 +220,7 @@ class DQM():
 
     def drawHit(self, lay=0):
         """
-        Draw Hit histgrams w.r.t layer ID.
+        Draw Hit histograms w.r.t layer ID.
         """
         for j in range(self.ndiv):
             self.hid = lay + j
@@ -234,7 +233,7 @@ class DQM():
 
     def drawTDCByCell(self, i):
         """
-        Draw TDC histgrams w.r.t cell ID (0-14336).
+        Draw TDC histograms w.r.t cell ID (0-14336).
         """
         for j in range(self.ndiv):
             self.hid = i + j
@@ -247,7 +246,7 @@ class DQM():
 
     def drawADCByCell(self, i):
         """
-        Draw ADC histgrams w.r.t cell ID (0-14336).
+        Draw ADC histograms w.r.t cell ID (0-14336).
         """
         for j in range(self.ndiv):
             self.hid = i + j

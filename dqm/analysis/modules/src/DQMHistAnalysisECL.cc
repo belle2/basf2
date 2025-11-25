@@ -95,7 +95,7 @@ void DQMHistAnalysisECLModule::initialize()
   m_upper_boundary_time_offsets->SetLineColor(kBlue);
 
   //Summary crate_time_offsets plot
-  c_crate_time_offsets = new TCanvas("ECL/c_crate_time_offsets");
+  c_crate_time_offsets = new TCanvas("ECL/c_crate_time_offsets", "", 840, 840);
   h_crate_time_offsets = new TGraphErrors();
   h_crate_time_offsets->SetName("t_off");
   h_crate_time_offsets->SetTitle("Crate time offset (E > 1 GeV); Crate ID (same as ECLCollector ID); Time offset [ns]");
@@ -227,13 +227,13 @@ void DQMHistAnalysisECLModule::event()
   c_trigtag1_analysis->Clear();
   c_trigtag1_analysis->cd();
   c_trigtag1_analysis->Pad()->SetFrameFillColor(10);
-  c_trigtag1_analysis->Pad()->SetFillColor(kWhite);
+  c_trigtag1_analysis->Pad()->SetFillColor(c_ColorDefault);
   c_trigtag1_analysis->SetLogy();
   TH1* h_trigtag1 = findHist("ECL/trigtag1");
   if (h_trigtag1 != NULL) {
     h_trigtag1->SetMinimum(0.1);
     h_trigtag1->Draw("hist");
-    if (h_trigtag1->GetBinContent(2)) c_trigtag1_analysis->Pad()->SetFillColor(kRed);
+    if (h_trigtag1->GetBinContent(2)) c_trigtag1_analysis->Pad()->SetFillColor(c_ColorError);
   }
   c_trigtag1_analysis->Draw();
   c_trigtag1_analysis->Modified();
@@ -256,7 +256,7 @@ void DQMHistAnalysisECLModule::event()
   c_ampfail_quality_analysis->Clear();
   c_ampfail_quality_analysis->cd();
   c_ampfail_quality_analysis->Pad()->SetFrameFillColor(10);
-  c_ampfail_quality_analysis->Pad()->SetFillColor(kWhite);
+  c_ampfail_quality_analysis->Pad()->SetFillColor(c_ColorDefault);
   c_ampfail_quality_analysis->SetLogy();
   TH1* h_ampfail_quality = findHist("ECL/ampfail_quality");
   if (h_ampfail_quality != NULL) {
@@ -264,7 +264,7 @@ void DQMHistAnalysisECLModule::event()
     h_ampfail_quality->Draw("hist");
     for (unsigned short i = 1; i < 5; i++) {
       if (h_ampfail_quality->GetBinContent(i + 1)) {
-        c_ampfail_quality_analysis->Pad()->SetFillColor(kRed);
+        c_ampfail_quality_analysis->Pad()->SetFillColor(c_ColorError);
         break;
       }
     }
@@ -277,7 +277,7 @@ void DQMHistAnalysisECLModule::event()
   c_timefail_quality_analysis->Clear();
   c_timefail_quality_analysis->cd();
   c_timefail_quality_analysis->Pad()->SetFrameFillColor(10);
-  c_timefail_quality_analysis->Pad()->SetFillColor(kWhite);
+  c_timefail_quality_analysis->Pad()->SetFillColor(c_ColorDefault);
   c_timefail_quality_analysis->SetLogy();
   TH1* h_timefail_quality = findHist("ECL/timefail_quality");
   if (h_timefail_quality != NULL) {
@@ -285,7 +285,7 @@ void DQMHistAnalysisECLModule::event()
     h_timefail_quality->Draw("hist");
     for (unsigned short i = 1; i < 5; i++) {
       if (h_timefail_quality->GetBinContent(i + 1)) {
-        c_timefail_quality_analysis->Pad()->SetFillColor(kRed);
+        c_timefail_quality_analysis->Pad()->SetFillColor(c_ColorError);
         break;
       }
     }
@@ -299,13 +299,13 @@ void DQMHistAnalysisECLModule::event()
   c_trigtag2_analysis->Clear();
   c_trigtag2_analysis->cd();
   c_trigtag2_analysis->Pad()->SetFrameFillColor(10);
-  c_trigtag2_analysis->Pad()->SetFillColor(kWhite);
+  c_trigtag2_analysis->Pad()->SetFillColor(c_ColorDefault);
   TH1* h_trigtag2_trigid = findHist("ECL/trigtag2_trigid");
   if (h_trigtag2_trigid != NULL) {
     h_trigtag2_trigid->Draw("colz");
     for (unsigned short i = 0; i < 52; i++) {
       if (h_trigtag2_trigid->GetBinContent(h_trigtag2_trigid->GetBin(i + 1, 3))) {
-        c_trigtag2_analysis->Pad()->SetFillColor(kRed);
+        c_trigtag2_analysis->Pad()->SetFillColor(c_ColorError);
         break;
       }
     }
@@ -321,14 +321,14 @@ void DQMHistAnalysisECLModule::event()
   c_quality_fit_data_analysis->Clear();
   c_quality_fit_data_analysis->cd();
   c_quality_fit_data_analysis->Pad()->SetFrameFillColor(10);
-  c_quality_fit_data_analysis->Pad()->SetFillColor(kWhite);
+  c_quality_fit_data_analysis->Pad()->SetFillColor(c_ColorDefault);
   TH1* h_quality_fit_data = findHist("ECL/quality_fit_data");
   if (h_quality_fit_data != NULL) {
     h_quality_fit_data->Draw("hist");
     for (unsigned short i = 0; i < 4; i++) {
       for (unsigned short j = 0; j < 4; j++) {
         if (h_quality_fit_data->GetBinContent(h_quality_fit_data->GetBin(i + 1, j + 1)) > 0) {
-          c_quality_fit_data_analysis->Pad()->SetFillColor(kRed);
+          c_quality_fit_data_analysis->Pad()->SetFillColor(c_ColorError);
           break;
         }
       }
@@ -339,7 +339,7 @@ void DQMHistAnalysisECLModule::event()
   c_quality_fit_data_analysis->Update();
 
   //_time_crate_%1%_Thr1GeV
-  bool colRed = false;
+  bool crates_bad_timing = false;
 
   m_low.clear();
   h_crate_time_offsets->Set(0);
@@ -358,7 +358,7 @@ void DQMHistAnalysisECLModule::event()
         double yval = (h_time_crate_Thr1GeV->GetMean() > 0) ?
                       h_time_crate_Thr1GeV->GetMean() - 2 * h_time_crate_Thr1GeV->GetMeanError() :
                       h_time_crate_Thr1GeV->GetMean() + 2 * h_time_crate_Thr1GeV->GetMeanError();
-        if (fabs(yval) > m_CrateTimeOffsetsMax) colRed = true;
+        if (fabs(yval) > m_CrateTimeOffsetsMax) crates_bad_timing = true;
       } else {
         m_low.push_back(i + 1);
       }
@@ -372,7 +372,7 @@ void DQMHistAnalysisECLModule::event()
   c_crate_time_offsets->cd();
 
   c_crate_time_offsets->Pad()->SetFrameFillColor(10);
-  c_crate_time_offsets->Pad()->SetFillColor(kWhite);
+  c_crate_time_offsets->Pad()->SetFillColor(c_ColorDefault);
 
   h_crate_time_offsets->SetMinimum(-50);
   h_crate_time_offsets->SetMaximum(50);
@@ -380,14 +380,15 @@ void DQMHistAnalysisECLModule::event()
   for (unsigned short i = 0; i < 52; i++) h_crate_time_offsets->GetXaxis()->SetBinLabel(i + 1, std::to_string(i + 1).c_str());
   h_crate_time_offsets->GetXaxis()->LabelsOption("v");
 
-  h_crate_time_offsets->Draw("AP");
+  h_crate_time_offsets->GetHistogram()->Draw();
+  h_crate_time_offsets->Draw("P");
 
   if (!m_low.empty()) {
     auto tg = new TLatex(5, 40, "Low statistics");
     tg->SetTextSize(.06);
     tg->SetTextAlign(12);
     tg->Draw();
-    c_crate_time_offsets->Pad()->SetFillColor(kYellow);
+    c_crate_time_offsets->Pad()->SetFillColor(c_ColorTooFew);
     if (m_low.size() < 52) {
       std::ostringstream sstream;
       std::copy(m_low.begin(), m_low.end() - 1, std::ostream_iterator<short>(sstream, ","));
@@ -408,7 +409,7 @@ void DQMHistAnalysisECLModule::event()
   m_lower_boundary_time_offsets->Draw();
   m_upper_boundary_time_offsets->Draw();
 
-  if (colRed) c_crate_time_offsets->Pad()->SetFillColor(kRed);
+  if (crates_bad_timing) c_crate_time_offsets->Pad()->SetFillColor(c_ColorError);
 
   c_crate_time_offsets->Draw();
   c_crate_time_offsets->Modified();
@@ -435,11 +436,11 @@ void DQMHistAnalysisECLModule::event()
     c_logic_summary->cd();
 
     c_logic_summary->Pad()->SetFrameFillColor(10);
-    c_logic_summary->Pad()->SetFillColor(kWhite);
+    c_logic_summary->Pad()->SetFillColor(c_ColorGood);
 
     if (h_logic_summary->GetMaximum() > 0
-        && h_logic_summary->GetMaximum() < m_LogicTestMax) c_logic_summary->Pad()->SetFillColor(kYellow);
-    if (h_logic_summary->GetMaximum() >= m_LogicTestMax) c_logic_summary->Pad()->SetFillColor(kRed);
+        && h_logic_summary->GetMaximum() < m_LogicTestMax) c_logic_summary->Pad()->SetFillColor(c_ColorWarning);
+    if (h_logic_summary->GetMaximum() >= m_LogicTestMax) c_logic_summary->Pad()->SetFillColor(c_ColorError);
     h_logic_summary->Draw("textcol");
     c_logic_summary->Draw();
     c_logic_summary->Modified();
@@ -455,7 +456,7 @@ void DQMHistAnalysisECLModule::event()
     // Get minimal value for each type of saved waveforms
     if (events > 100000) {
       TH1* hist = findHist(str(boost::format("ECL/wf_cid_%1%") % wf_option));
-      m_wf_fraction[wf_option] = hist->GetMinimum();
+      m_wf_fraction[wf_option] = hist->GetBinContent(hist->GetMinimumBin());
     }
     auto pv_name = (boost::format("wf_frac:%s:min") % wf_option).str();
     setEpicsPV(pv_name, m_wf_fraction[wf_option]);
@@ -493,7 +494,6 @@ void DQMHistAnalysisECLModule::terminate()
   delete m_lower_boundary_time_offsets;
   delete m_upper_boundary_time_offsets;
   delete c_crate_time_offsets;
-  delete h_time_crate_Thr1GeV;
   delete h_crate_time_offsets;
   delete c_logic_summary;
   delete h_logic_summary;

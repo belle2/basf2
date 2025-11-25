@@ -18,14 +18,14 @@
     <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">false</SeeNeutrons>
     <SensitiveThreshold desc="Minimum deposited energy per geant4 step" unit="eV">0.1</SensitiveThreshold>
     <!-- Include Alignment information -->
-    <xi:include href="VTX-Alignment-CMOS6.xml"/>
+    <xi:include href="VTX-Alignment-CMOS5.xml"/>
     <!-- Include definition of logical volume encapsulating the VTX -->
     <!--xi:include href="VTX-Envelope.xml"/-->
     <!-- Include the definition of the mechanical support -->
     <!--xi:include href="VTX-Support.xml"/-->
     <!-- Include the definition of all the components like ladders, sensors and
          chips -->
-    <xi:include href="VTX-Components-CMOS6-staggered-L3mod-3xL12-2xL3456-wo69.xml"/>
+    <xi:include href="VTX-Components-5layer-2025-baseline.xml"/>
     <!-- include radiation sensor definition -->
     <!--xi:include href="VTX-RadiationSensors.xml"/-->
 

@@ -8,10 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import json
 import os
-import glob
-import basf2_mva
 from basf2 import B2FATAL
 import basf2
 from variables import variables as vm
@@ -55,17 +52,16 @@ def fill_particle_lists(maskName='TFLATDefaultMask', path=None):
 def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier='standard_tflat',
                  target='qrCombined', overwrite=False,
                  classifier_args=None,
-                 mva_steering_file='analysis/scripts/tflat/tensorflow_tflat_interface.py',
                  sampler_id=0,
                  path=None):
     """
-    Interfacing for the Transformer FlavorTagger (TFlat). This function can be used for training (``Teacher``), preparation of
+    Interfacing for the Transformer FlavorTagger (TFlat). This function can be used for preparation of
     training datasets (``Sampler``) and inference (``Expert``).
 
     This function requires reconstructed B meson signal particle list and where an RestOfEvent is built.
 
     :param particleLists:  string or list[string], particle list(s) of the reconstructed signal B meson
-    :param mode: string, valid modes are ``Expert`` (default), ``Teacher``, ``Sampler``
+    :param mode: string, valid modes are ``Expert`` (default), ``Sampler``
     :param working_dir: string, working directory for the method
     :param uniqueIdentifier: string, database identifier for the method
     :param target: string, target variable
@@ -79,10 +75,10 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
     if isinstance(particleLists, str):
         particleLists = [particleLists]
 
-    if mode not in ['Expert', 'Teacher', 'Sampler']:
+    if mode not in ['Expert', 'Sampler']:
         B2FATAL(f'Invalid mode  {mode}')
 
-    if mode in ['Sampler', 'Teacher']:
+    if mode in ['Sampler',]:
         trk_variable_list = config['trk_variable_list']
 
         ecl_variable_list = config['ecl_variable_list']
@@ -184,25 +180,3 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
         vm.addAlias('qrTFLAT', 'qrOutput(TFLAT)')
 
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
-
-    elif mode == 'Teacher':
-        input_files = os.path.join(working_dir, uniqueIdentifier + '_training_data*.root')
-        if len(glob.glob(input_files)) == 0:
-            B2FATAL('There is no training data file available. Run flavor tagger in Sampler mode first.')
-        general_options = basf2_mva.GeneralOptions()
-        general_options.m_datafiles = basf2_mva.vector(input_files)
-
-        general_options.m_treename = tree_name
-        general_options.m_target_variable = target
-        general_options.m_variables = basf2_mva.vector(*features)
-
-        general_options.m_identifier = uniqueIdentifier
-
-        specific_options = basf2_mva.PythonOptions()
-        specific_options.m_framework = 'tensorflow'
-        specific_options.m_steering_file = mva_steering_file
-        specific_options.m_training_fraction = config['train_valid_fraction']
-
-        specific_options.m_config = json.dumps(classifier_args)
-
-        basf2_mva.teacher(general_options, specific_options)

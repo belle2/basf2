@@ -32,14 +32,14 @@ finalstate = "charged"
 gen.add_evtgen_generator(finalstate=finalstate, path=path, eventType=finalstate)
 
 # Define skim
-skim = feiHadronic(
+fei_skim = feiHadronic(
     analysisGlobaltag=ma.getAnalysisGlobaltag(),
     OutputFileName="test_smartbkg_fei.udst.root"
 )
 
 # Add SmartBkg filtering by providing the skim
 sbg.add_smartbkg_filtering(
-    skim=skim,
+    skim=fei_skim,
     path=path
 )
 
@@ -48,7 +48,7 @@ sim.add_simulation(path)
 rec.add_reconstruction(path)
 
 # Apply the skim
-skim(path)
+fei_skim(path)
 
 # Start event processing
 b2.process(path)

@@ -48,8 +48,8 @@ SmartBackgroundModule::SmartBackgroundModule() : Module()
   addParam("overrideEventType", m_overrideEventType,
            "Override automatically determined event type", false);
   addParam("eventType", m_eventType,
-           "Event type (charged, mixed, uubar, ccbar, ddbar, ssbar, taupair; or 'unset' for automatic determination)",
-           std::string("unset"));
+           "Event type (charged, mixed, uubar, ccbar, ddbar, ssbar, taupair)",
+           std::string("charged"));
   addParam("payloadWeights", m_payloadWeights, "Name of payload storing neural network weights in ONNX format",
            std::string("SmartBackgroundWeights_default"));
   addParam("payloadConfig", m_payloadConfig, "Name of payload storing SmartBackgroundConfig object",
@@ -98,9 +98,7 @@ void SmartBackgroundModule::initialize()
     }
   }
   if (m_overrideEventType) {
-    if (m_eventType == "unset") {
-      B2FATAL("SmartBkg: overrideEventType is set to true but eventType is not set.");
-    } else if (m_eventtypeMapping.find(m_eventType) == m_eventtypeMapping.end()) {
+    if (m_eventtypeMapping.find(m_eventType) == m_eventtypeMapping.end()) {
       B2FATAL("SmartBkg: Provided event type " << m_eventType <<
               " is unknown. Allowed event types: charged, mixed, uubar, ddbar, ssbar, ccbar, taupair.");
     } else {

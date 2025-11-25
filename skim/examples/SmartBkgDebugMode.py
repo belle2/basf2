@@ -35,7 +35,7 @@ gen.add_evtgen_generator(finalstate=finalstate, path=path, eventType=finalstate)
 
 # Define skim (all 51 skims defined as of August 2025 work with the standard SmartBkg model)
 # Here we disable udst output because we only want the skim flags
-skim = feiHadronic(
+fei_skim = feiHadronic(
     analysisGlobaltag=ma.getAnalysisGlobaltag(),
     udstOutput=False
 )
@@ -44,7 +44,7 @@ skim = feiHadronic(
 # Here we enable debug mode so that no events are rejected or weighted and instead the model prediction is saved
 # to the event extra info as 'SmartBKG_Prediction_feiHadronic'
 sbg.add_smartbkg_filtering(
-    skim=skim,
+    skim=fei_skim,
     path=path,
     debug_mode=True
 )
@@ -60,13 +60,13 @@ mdst.add_mdst_output(
 )
 
 # Apply the skim
-skim(path)
+fei_skim(path)
 
 # Write out skim flags and SmartBkg predictions as ntuple
 var.addAlias("smartBkgPrediction", "eventExtraInfo(SmartBKG_Prediction_feiHadronic)")
 ma.variablesToNtuple(
     "",
-    [skim.flag, "smartBkgPrediction"],
+    [fei_skim.flag, "smartBkgPrediction"],
     treename="predictions",
     filename="test_flags_and_predictions.root",
     path=path

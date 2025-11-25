@@ -39,14 +39,14 @@ A part of your steering file might then look like this (for a full example see `
   gen.add_evtgen_generator(finalstate=finalstate, path=path, eventType=finalstate)
 
   # Define skim
-  skim = feiHadronic(
+  fei_skim = feiHadronic(
       analysisGlobaltag=ma.getAnalysisGlobaltag(),
       OutputFileName="your_output_file_name.udst.root"
   )
 
   # Add SmartBkg filtering by providing the skim
   skim.smartbkg.add_smartbkg_filtering(
-      skim=skim,
+      skim=fei_skim,
       path=path
   )
 
@@ -55,7 +55,7 @@ A part of your steering file might then look like this (for a full example see `
   rec.add_reconstruction(path)
 
   # Apply the skim
-  skim(path)
+  fei_skim(path)
 
 The event weights for the skim (or for each skim separately if you use a :py:class:`skim.core.CombinedSkim`) are stored in the 
 event extra info as ``weight_<SkimName>``. If an event is not sampled for a particular skim, the corresponding 

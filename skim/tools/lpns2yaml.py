@@ -270,18 +270,19 @@ def main():
                 DBGT = int(re.sub(r"^DB0*", "", DBGT))
                 expInteger = int(re.sub(r"^s00/e0*", "", expNumber))
 
+                # To differentiate between Whizard and default generator of lowmult MC
+                if "Whizard" in args.input or "whizard" in args.input:
+                    sampleLabel = (f"MC-{campaign}-{beamEnergy}-{MCEventType}-whizard-{args.bg}")
+                    addwhizard = "_whizard"
+                else:
+                    sampleLabel = (f"MC-{campaign}-{beamEnergy}-{MCEventType}-default-{args.bg}")
+                    addwhizard = ""
                 # If beam energy is not 4S, then point it out in label
                 onres = beamEnergy == "4S"
                 if onres:
-                    label = f"{campaign}_exp{expInteger}_{MCEventType}_{prodNumber}r{iGroup+1}"
+                    label = f"{campaign}_exp{expInteger}_{MCEventType}{addwhizard}_{prodNumber}r{iGroup+1}"
                 else:
-                    label = f"{campaign}_{beamEnergy}_exp{expInteger}_{MCEventType}_{prodNumber}r{iGroup+1}"
-
-                # HOTFIX to differentiate between Whizard and default generator of lowmult MC
-                if "Whizard" in args.input or "whizard" in args.input:
-                    sampleLabel = (f"MC-{campaign}-{beamEnergy}-{MCEventType}-whizard-{args.bg}")
-                else:
-                    sampleLabel = (f"MC-{campaign}-{beamEnergy}-{MCEventType}-default-{args.bg}")
+                    label = f"{campaign}_{beamEnergy}_exp{expInteger}_{MCEventType}{addwhizard}_{prodNumber}r{iGroup+1}"
 
                 # Add everything to our mega dict
                 DataBlocks[label] = {

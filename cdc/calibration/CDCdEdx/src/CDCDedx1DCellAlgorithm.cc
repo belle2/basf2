@@ -378,6 +378,7 @@ void CDCDedx1DCellAlgorithm::createPayload()
   B2INFO("dE/dx one cell calibration: Generating payloads");
 
   for (unsigned int il = 0; il < 2; il++) {
+
     if (isMerge) {
       unsigned int nbins = m_DBOneDCell->getNBins(il);
 
@@ -387,8 +388,45 @@ void CDCDedx1DCellAlgorithm::createPayload()
       for (unsigned int iea = 0; iea < nbins; iea++) {
         double prev = m_DBOneDCell->getMean(8 * il + 1, iea);
         m_onedcors[il][iea] *= prev;
-        // m_onedcors[il][iea] /= 0.98;
       }
+    }
+
+    double binsize = TMath::Pi() / m_onedcors[il].size();
+
+    auto computeAverages = [&](double angLow, double angHigh, const std::string & label) {
+      unsigned int binLow = std::floor((angLow + TMath::Pi() / 2.0) / binsize);
+      unsigned int binHigh = std::floor((angHigh + TMath::Pi() / 2.0) / binsize);
+      double sum_new = 0.0, sum_prev = 0.0;
+      int count = 0;
+
+      for (unsigned int iea = binLow; iea < binHigh; ++iea) {
+        sum_new += m_onedcors[il][iea];
+        sum_prev += m_DBOneDCell->getMean(8 * il + 1, iea);
+        ++count;
+      }
+
+      double avg_new = (count > 0) ? sum_new / count : 1.0;
+      double avg_prev = (count > 0) ? sum_prev / count : 1.0;
+      return std::make_pair(avg_new, avg_prev);
+    };
+
+    double negLow = -0.75, negHigh = -0.25;
+    double posLow = 0.25, posHigh = 0.75;
+
+    if (il == 0) {
+      negLow = -0.5; negHigh = -0.2;
+      posLow = 0.2; posHigh = 0.5;
+    }
+
+    auto [avgNewNeg, avgPrevNeg] = computeAverages(negLow, negHigh, "Negative");
+    auto [avgNewPos, avgPrevPos] = computeAverages(posLow, posHigh, "Positive");
+
+    double avgNew = (avgNewNeg + avgNewPos) / 2.0;
+    double avgPrev = (avgPrevNeg + avgPrevPos) / 2.0;
+    double scaleFactor = avgPrev / avgNew;
+
+    for (unsigned int iea = 0; iea < m_eaBin; iea++) {
+      m_onedcors[il][iea] *= scaleFactor;
     }
 
     if (m_chargeType > 0)

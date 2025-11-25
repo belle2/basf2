@@ -189,9 +189,11 @@ def get_metadata(*, TestingCombined=False):
     try:
         with open(LogDirectory / "metadata.json") as MetadataFile:
             metadata = json.load(MetadataFile)
-    except FileNotFoundError:
-        raise FileNotFoundError(f"{LogDirectory} / metadata.json has not been found.\
-        This is created when `b2skim-stats-submit` is called, which is required for `b2skim-stats-print` to work ")
+    except FileNotFoundError as e:
+        raise SkimNotRunException(
+            f"    Failed to open {LogDirectory} / metadata.json.\n"
+            +"    Perhaps you forgot to run ``b2skim-stats-submit`` first to create it?"
+        ) from e
     return metadata
 
 
@@ -221,7 +223,7 @@ def getLogFile(skim, sample, TestingCombined):
         raise SkimNotRunException(
             f"    Failed to open output log file for {skim} skim on {sample} sample.\n"
             "    Perhaps you forgot to run the skim with ``b2skim-stats-submit``?"
-        )
+        ) 
 
     if not testLogFile(logFileContents):
         raise SkimNotRunException(

@@ -16,7 +16,7 @@ The `add_weights_to_dataframe <sysvar.add_weights_to_dataframe>` helper function
 and it can simplify the uncertainty propagation. 
 
 .. warning::
-  The `add_weights_to_dataframe <sysvar.add_weights_to_dataframe>` helper function in basf2 will soon be deprecated. A seperate `sysvar <https://gitlab.desy.de/software/sysvar>`_ python package is recommended instead.
+  The `add_weights_to_dataframe <sysvar.add_weights_to_dataframe>` helper function in basf2 will soon be deprecated. A seperate `sysvar <https://gitlab.desy.de/belle2/software/sysvar>`_ python package will be recommended instead.
 
 Charged Particle Identification corrections
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

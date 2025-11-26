@@ -157,7 +157,7 @@ void DQMHistAnalysisSVDUnpackerModule::event()
   auto hErr = findHist("SVDUnpacker/DQMErrorEventsHisto");
 
   if (hErr != NULL) {
-    Float_t entries = hErr->GetEntries();
+    Float_t entries = hErr->GetBinContent(1) + hErr->GetBinContent(2);
     Float_t errors  = hErr->GetBinContent(2);
 
     if (entries > 0) {

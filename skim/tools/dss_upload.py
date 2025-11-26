@@ -360,8 +360,9 @@ def main():
         meta_file_list, failed_list = retrieve_metadata_combinedSkim(prod_list)
 
     if args.singleProductions:
-        prods = args.prods
-        meta_file_list, failed_list = retrieve_info_prods(prods)
+        # prods = args.prods
+        expanded_prods = expand_prod_tokens(args.prods or [])
+        meta_file_list, failed_list = retrieve_info_prods(expanded_prods)
 
     print("n metafiles to check:", len(meta_file_list), meta_file_list)
     print("")

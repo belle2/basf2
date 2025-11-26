@@ -152,6 +152,21 @@ void DQMHistAnalysisSVDUnpackerModule::event()
   if (m_printCanvas)
     m_cUnpacker->Print("c_SVDDataFormat.pdf");
 
+
+  //check data errors
+  auto hErr = findHist("SVDUnpacker/DQMErrorEventsHisto");
+
+  if (hErr != NULL) {
+    Float_t entries = hErr->GetEntries();
+    Float_t errors  = hErr->GetBinContent(2);
+    printf("events: %f\n", entries);
+
+    if (entries > 0) {
+      Float_t ratio = errors / entries;
+      setEpicsPV("UnpackError", ratio);
+    }
+  } else
+    B2INFO("Histogram SVDUnpacker/DQMErrorEventsHisto from SVDUnpackerDQM not found!");
 }
 
 void DQMHistAnalysisSVDUnpackerModule::endRun()

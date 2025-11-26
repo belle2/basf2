@@ -690,6 +690,13 @@ happen to fulfill all your selection criteria.
         :superscript:`2` and lots of background candidates as a broad bump left
         of the peak.
 
+.. admonition:: Hint
+    :class: dropdown xhint stacked
+
+    If you plan to continue your work with dataframes anyhow, 
+    you can use the `VariablesToTable` module to write out to
+    dataframe friendlier formats like `parquet` or `hdf5` directly.
+
 Adding MC information
 ---------------------
 

@@ -159,7 +159,6 @@ void DQMHistAnalysisSVDUnpackerModule::event()
   if (hErr != NULL) {
     Float_t entries = hErr->GetEntries();
     Float_t errors  = hErr->GetBinContent(2);
-    printf("events: %f\n", entries);
 
     if (entries > 0) {
       Float_t ratio = errors / entries;

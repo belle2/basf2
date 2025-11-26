@@ -694,7 +694,7 @@ happen to fulfill all your selection criteria.
     :class: dropdown xhint stacked
 
     If you plan to continue your work with dataframes anyhow, 
-    you can use the ``VariablesToTable`` module to write out to
+    you can use the :ref:`VariablesToTable <v2t>` module to write out to
     dataframe friendlier formats like ``parquet`` or ``hdf5`` directly.
 
 Adding MC information

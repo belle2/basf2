@@ -543,10 +543,15 @@ class TauToMuMuMu(BaseSkim):
     """
     **Channel**: :math:`\\tau \\to \\mu \\mu \\mu`
 
-    **Output particle lists**: ``mu+:tau_3mu_goodtrack``
+    **Output particle lists**:
 
-    **Criteria for 3mu states**: Number of good tracks < 7, :math:`1.3 < M < 2.2` GeV, :math:`-1.0 < \\Delta E < 0.5` GeV
+    *``mu+:tau_3mu_goodtrack``
 
+    **Criteria**:
+
+    * ``No. good tracks < 7``
+    * :math:`1.3 < M < 2.2` GeV
+    * :math:`-1.0 < \\Delta E < 0.5` GeV
     """
     __authors__ = ["Junewoo PARK"]
     __description__ = "Skim for Tau 3mu decays."

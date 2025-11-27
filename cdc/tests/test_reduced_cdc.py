@@ -11,7 +11,6 @@
 from basf2 import set_random_seed, create_path, process, Module
 from ROOT import Belle2
 from simulation import add_simulation
-from reconstruction import add_reconstruction
 
 
 def main():
@@ -20,13 +19,11 @@ def main():
 
     path = create_path()
     path.add_module("EvtGenInput")
-    path.add_module("EventInfoSetter", evtNumList=[10], expList=[0], runList=[0])
+    path.add_module("EventInfoSetter", evtNumList=[5], expList=[0], runList=[0])
     path.add_module("Gearbox")
     path.add_module("Geometry", useDB=False, excludedComponents=['CDC'], additionalComponents=['CDCReducedNoSL0SL1'])
 
     add_simulation(path)
-
-    add_reconstruction(path)
 
     class testCDCLayers(Module):
         """

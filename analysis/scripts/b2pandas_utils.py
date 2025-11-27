@@ -43,8 +43,8 @@ class VariablesToTable(basf2.Module):
         listname(str): name of the particle list
         variables(list[str]): list of variables to save for each particle
         filename(str): name of the output file to be created.
-            Needs to end with `.csv` for csv output, `.parquet` or `.pq` for parquet output,
-            `.h5`, `.hdf` or `.hdf5` for hdf5 output and `.feather` or `.arrow` for feather output
+            Needs to end with ``.csv`` for csv output, ``.parquet`` or ``.pq`` for parquet output,
+            ``.h5``, ``.hdf`` or ``.hdf5`` for hdf5 output and ``.feather`` or ``.arrow`` for feather output
         hdf_table_name(str): name of the table in the hdf5 file.
             If not provided, it will be the same as the listname. Defaults to None.
         event_buffer_size(int): number of events to buffer before writing to disk,
@@ -346,7 +346,7 @@ class VariablesToHDF5(VariablesToTable):
         listname(str): name of the particle list
         variables(list[str]): list of variables to save for each particle
         filename(str): name of the output file to be created.
-            Must end with `.h5`, `.hdf` or `.hdf5`.
+            Must end with ``.h5``, ``.hdf`` or ``.hdf5``.
         hdf_table_name(str): name of the table in the hdf5 file.
             If not provided, it will be the same as the listname. Defaults to None.
     """

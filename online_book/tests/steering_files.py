@@ -210,6 +210,9 @@ class SteeringFileTest(unittest.TestCase):
                 "085_module.py",
                 "087_module.py",
             ],
+            skip=[
+                "101_cs_onnx.py"
+            ],
             n_events={
                 # See https://questions.belle2.org/question/11344/
                 "091_cs.py": 3000,

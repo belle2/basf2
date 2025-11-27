@@ -541,13 +541,12 @@ class TauThrust(BaseSkim):
 @fancy_skim_header
 class TauToMuMuMu(BaseSkim):
     """
-    **Channel**: :math:`\\tau \\to \\mu \\mu \\mu, \\tau \\to \\pi \\pi \\pi`
+    **Channel**: :math:`\\tau \\to \\mu \\mu \\mu`
 
-    **Output particle lists**: ``mu+:tau_3mu_goodtrack, pi+:tau_3mu_goodtrack``
+    **Output particle lists**: ``mu+:tau_3mu_goodtrack``
 
-    **Criteria for 3mu states**: Number of good tracks < 7, :math:`1.4 < M < 2.0` GeV, :math:`-1.0 < \\Delta E < 0.5` GeV
+    **Criteria for 3mu states**: Number of good tracks < 7, :math:`1.3 < M < 2.2` GeV, :math:`-1.0 < \\Delta E < 0.5` GeV
 
-    **Criteria for 3pi states**: Number of good tracks < 7, :math:`0.5 < M < 2.0` GeV, :math:`-1.0 < \\Delta E < 0.5` GeV
     """
     __authors__ = ["Junewoo PARK"]
     __description__ = "Skim for Tau 3mu decays."
@@ -571,21 +570,11 @@ class TauToMuMuMu(BaseSkim):
         # reconstruct tau->mumumu
         ma.reconstructDecay(
             decayString="tau+:tau_3mu_mumumu -> mu+:tau_3mu_goodtrack mu+:all mu-:all",
-            cut="[nParticlesInList(pi+:tau_3mu_goodtrack) < 7] and [1.4 < M < 2.0] and [-1.0 < deltaE < 0.5]",
+            cut="[nParticlesInList(pi+:tau_3mu_goodtrack) < 7] and [1.3 < M < 2.2] and [-1.0 < deltaE < 0.5]",
             dmID=0,
             path=path)
 
-        # reconstruct tau->pipipi
-        ma.reconstructDecay(
-            decayString="tau+:tau_3mu_control -> pi+:tau_3mu_goodtrack pi+:all pi-:all",
-            cut="[nParticlesInList(pi+:tau_3mu_goodtrack) < 7] and [0.5 < M < 2.0] and [-1.0 < deltaE < 0.5]",
-            dmID=1,
-            path=path)
-
-        # combine list
-        ma.copyLists(outputListName="tau+:tau_3mu_comb", inputListNames=["tau+:tau_3mu_mumumu", "tau+:tau_3mu_control"], path=path)
-
-        return ["tau+:tau_3mu_comb"]
+        return ["tau+:tau_3mu_mumumu"]
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -598,7 +587,7 @@ class TauToMuMuMu(BaseSkim):
         # the variables that are printed out are: M, deltaE
         create_validation_histograms(
             rootfile=f'{self}_Validation.root',
-            particlelist='tau+:tau_3mu_comb',
+            particlelist='tau+:tau_3mu_mumumu',
             variables_1d=[
                 ('M', 100, 1.00, 2.00, '', contact, '', ''),
                 ('deltaE', 120, -1.6, 0.6, '', contact, '', '')],

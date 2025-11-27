@@ -45,6 +45,8 @@ def main():
                 assert cdcHit.getICLayer() >= 14, "Detected CDCHit in layer < 14 which must not be with the reduced CDC"
                 assert cdcHit.getISuperLayer() >= 2, "Detected CDCHit in Superlayer < 2 which must not be with the reduced CDC"
 
+    path.add_module(testCDCLayers())
+
     path.add_module("Progress")
     process(path, calculateStatistics=True)
 

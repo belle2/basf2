@@ -48,6 +48,29 @@ Assuming your ROOT file has different TTrees and you just want to access one of 
     variable_list = ["var1", "var2", "var3"]
     df = tree.arrays(variable_list, library='pd')
 
+ In case opening the ROOT files with uproot is too slow, you can also use directly ROOT and its RDataFrame class:
+
+.. code:: python
+
+    import ROOT
+    import pandas as pd
+
+    rdf = ROOT.RDataFrame("myTree", "path/to/dataset.root")
+    npy = rdf.AsNumpy()
+    df = pd.DataFrame(npy)
+
+If you want to use only a smaller subset of variables:
+
+.. code:: python
+
+    npy = rdf.AsNumpy(columns=["var1", "var2", "var3"])
+
+while, if you want to **exclude** some variables from your dataframe:
+
+.. code:: python
+
+    npy = rdf.AsNumpy(exclude=["var4", "var5", "var6"])
+
 
 DataFrames 
 ---------------------------------
@@ -66,7 +89,6 @@ You can get a quick sense of what is in your DataFrame via the following example
 
     # method 3
     df.describe() # built-in tool to describe DataFrame
-
 
 
 Functionality for data analysis

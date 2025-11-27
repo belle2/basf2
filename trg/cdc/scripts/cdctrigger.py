@@ -47,7 +47,7 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
 
         # fitters
         path.add_module('CDCTrigger2DFitter')
-        path.add_module('CDCTrigger3DFitter')
+        # path.add_module('CDCTrigger3DFitter')
         # neurotrigger
         if shortTracks:
             b2.B2ERROR("shortTracks=True is deprecated and no longer supported! "

@@ -23,7 +23,7 @@ def main():
     path.add_module("Gearbox")
     path.add_module("Geometry", useDB=False, excludedComponents=['CDC'], additionalComponents=['CDCReducedNoSL0SL1'])
 
-    add_simulation(path)
+    add_simulation(path, components=['CDC'])
 
     class testCDCLayers(Module):
         """

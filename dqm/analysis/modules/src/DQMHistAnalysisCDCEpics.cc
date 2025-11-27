@@ -503,7 +503,6 @@ void DQMHistAnalysisCDCEpicsModule::event()
 //------------------------------------
 void DQMHistAnalysisCDCEpicsModule::endRun()
 {
-  for (auto* line : m_lines) delete line;
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: end run");
 }
 
@@ -511,6 +510,8 @@ void DQMHistAnalysisCDCEpicsModule::endRun()
 //------------------------------------
 void DQMHistAnalysisCDCEpicsModule::terminate()
 {
+  for (auto* line : m_lines) delete line;
+  m_lines.clear();
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: terminate called");
 }
 

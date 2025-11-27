@@ -8,9 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# this is a test executable, not a module so we don't need doxygen warnings
-# @cond SUPPRESS_DOXYGEN
-
 """
 Check reading and writing of evt.pdl files as well as errors when creating new particles.
 
@@ -106,5 +103,3 @@ print("so reread default file...")
 db.ReadEvtGenTable()
 print("number of entries is now", db.ParticleList().GetEntries() and "positive" or "zero")
 sys.exit(retcode)
-
-# @endcond

@@ -223,15 +223,28 @@ class identity(nn.Module):
         return tensor
 
 
-class SN(object):
+class SN(nn.Module):
     """
     Spectral normalization base class
+
+    This base class expects subclasses to have a learnable weight parameter
+    (`self.weight`) as in `nn.Linear` or `nn.Conv2d`. It provides a method
+    to apply spectral normalization to that weight.
+
+    Attributes:
+        num_svs (int): Number of singular values.
+        num_itrs (int): Number of power iterations per step.
+        transpose (bool): Whether to transpose the weight matrix.
+        eps (float): Small constant to avoid divide-by-zero.
+        u (list[Tensor]): Registered left singular vectors (buffers).
+        sv (list[Tensor]): Registered singular values (buffers).
+        training (bool): Inherited from nn.Module. True if in training mode.
     """
-    # pylint: disable=no-member
 
     def __init__(self, num_svs, num_itrs, num_outputs, transpose=False, eps=1e-12):
         """constructor"""
 
+        super().__init__()
         #: Number of power iterations per step
         self.num_itrs = num_itrs
         #: Number of singular values
@@ -244,6 +257,8 @@ class SN(object):
         for i in range(self.num_svs):
             self.register_buffer(f"u{i:d}", torch.randn(1, num_outputs))
             self.register_buffer(f"sv{i:d}", torch.ones(1))
+        #: Training mode flag (inherited from nn.Module). True if the module is in training mode.
+        self.training: bool
 
     @property
     def u(self):
@@ -319,11 +334,13 @@ class SNConv2d(nn.Conv2d, SN):
         return F.conv2d(
             x,
             self.W_(),
+            # \cond false positive doxygen warning
             self.bias,
             self.stride,
             self.padding,
             self.dilation,
             self.groups,
+            # \endcond
         )
 
 
@@ -347,7 +364,9 @@ class SNLinear(nn.Linear, SN):
 
     #: forward
     def forward(self, x):
+        # \cond false positive doxygen warning
         return F.linear(x, self.W_(), self.bias)
+        # \endcond
 
 
 def fused_bn(x, mean, var, gain=None, bias=None, eps=1e-5):
@@ -417,17 +436,17 @@ class myBN(nn.Module):
         self.register_buffer("accumulation_counter", torch.zeros(1))
         #: Accumulate running means and vars
         self.accumulate_standing = False
+        #: Training mode flag (inherited from nn.Module). True if the module is in training mode.
+        self.training: bool
 
     #: reset standing stats
     def reset_stats(self):
-        # pylint: disable=no-member
         self.stored_mean[:] = 0
         self.stored_var[:] = 0
         self.accumulation_counter[:] = 0
 
     #: forward
     def forward(self, x, gain, bias):
-        # pylint: disable=no-member
         if self.training:
             out, mean, var = manual_bn(
                 x, gain, bias, return_mean_var=True, eps=self.eps
@@ -491,8 +510,15 @@ class bn(nn.Module):
             self.bn = myBN(output_size, self.eps, self.momentum)
         # Register buffers if neither of the above
         else:
+            #: Running mean buffer, updated during training
+            self.stored_mean = torch.zeros(output_size)
             self.register_buffer("stored_mean", torch.zeros(output_size))
+            #: Running variance buffer, updated during training
+            self.stored_var = torch.ones(output_size)
             self.register_buffer("stored_var", torch.ones(output_size))
+
+        #: Training mode flag (inherited from nn.Module). True if the module is in training mode.
+        self.training: bool
 
     #: forward
     def forward(self, x):
@@ -601,7 +627,9 @@ class ccbn(nn.Module):
     def extra_repr(self):
         s = "out: {output_size}, in: {input_size},"
         s += " cross_replica={cross_replica}"
+        # \cond false positive doxygen warning
         return s.format(**self.__dict__)
+        # \endcond
 
 
 class ILA(nn.Module):

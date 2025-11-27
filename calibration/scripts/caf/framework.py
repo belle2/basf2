@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-# disable doxygen check for this file
-# @cond
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -84,6 +81,8 @@ class Collection():
                  max_collector_jobs=None,
                  backend_args=None
                  ):
+        """
+        """
         #: Collector module of this collection
         self.collector = collector
         #: Internal input_files stored for this calibration
@@ -117,12 +116,14 @@ class Collection():
         self.splitter = None
         if max_files_per_collector_job and max_collector_jobs:
             B2FATAL("Cannot set both 'max_files_per_collector_job' and 'max_collector_jobs' of a collection!")
+        # \cond false positive doxygen warning
         elif max_files_per_collector_job:
             self.max_files_per_collector_job = max_files_per_collector_job
         elif max_collector_jobs:
             self.max_collector_jobs = max_collector_jobs
         else:
             self.max_collector_jobs = self.default_max_collector_jobs
+        # \endcond
 
         #: Dictionary passed to the collector Job object to configure how the `caf.backends.Backend` instance should treat
         #: the collector job when submitting. The choice of arguments here depends on which backend you plan on using.
@@ -143,6 +144,7 @@ class Collection():
             for tag in reversed(b2conditions.default_globaltags):
                 self.use_central_database(tag)
 
+        #: job script
         self.job_script = Path(find_file("calibration/scripts/caf/run_collector_path.py")).absolute()
         """The basf2 steering file that will be used for Collector jobs run by this collection.
 This script will be copied into subjob directories as part of the input sandbox."""
@@ -224,12 +226,17 @@ This script will be copied into subjob directories as part of the input sandbox.
 
     @property
     def input_files(self):
+        """
+        """
         return self._input_files
 
     @input_files.setter
     def input_files(self, value):
+        """
+        """
         if isinstance(value, str):
             # If it's a string, we convert to a list of URIs
+            #: set input files
             self._input_files = self.uri_list_from_input_file(value)
         elif isinstance(value, list):
             # If it's a list we loop and do the same thing
@@ -263,6 +270,8 @@ This script will be copied into subjob directories as part of the input sandbox.
         self._collector = collector
 
     def is_valid(self):
+        """
+        """
         if (not self.collector or not self.input_files):
             return False
         else:
@@ -270,6 +279,8 @@ This script will be copied into subjob directories as part of the input sandbox.
 
     @property
     def max_collector_jobs(self):
+        """
+        """
         if self.splitter:
             return self.splitter.max_subjobs
         else:
@@ -277,6 +288,8 @@ This script will be copied into subjob directories as part of the input sandbox.
 
     @max_collector_jobs.setter
     def max_collector_jobs(self, value):
+        """
+        """
         if value is None:
             self.splitter = None
         else:
@@ -284,6 +297,8 @@ This script will be copied into subjob directories as part of the input sandbox.
 
     @property
     def max_files_per_collector_job(self):
+        """
+        """
         if self.splitter:
             return self.splitter.max_files_per_subjob
         else:
@@ -291,6 +306,8 @@ This script will be copied into subjob directories as part of the input sandbox.
 
     @max_files_per_collector_job.setter
     def max_files_per_collector_job(self, value):
+        """
+        """
         if value is None:
             self.splitter = None
         else:
@@ -752,6 +769,8 @@ class Calibration(CalibrationBase):
             self.collections[self.default_collection_name].use_local_database(filename, directory)
 
     def _get_default_collection_attribute(self, attr):
+        """
+        """
         if self.default_collection_name in self.collections:
             return getattr(self.collections[self.default_collection_name], attr)
         else:
@@ -762,6 +781,8 @@ class Calibration(CalibrationBase):
             return None
 
     def _set_default_collection_attribute(self, attr, value):
+        """
+        """
         if self.default_collection_name in self.collections:
             setattr(self.collections[self.default_collection_name], attr, value)
         else:
@@ -995,6 +1016,7 @@ class Calibration(CalibrationBase):
                                           iov_to_calibrate=self.iov,
                                           initial_state=initial_state,
                                           iteration=initial_iteration)
+        #: state
         self.state = initial_state
         self.machine.root_dir = Path(os.getcwd(), self.name)
         self.machine.collector_backend = self.backend
@@ -1122,6 +1144,7 @@ class Algorithm():
         self.algorithm = algorithm
         #: The name of the algorithm, default is the Algorithm class name
         cppname = type(algorithm).__cpp_name__
+        #: reduced name
         self.name = cppname[cppname.rfind('::') + 2:]
         #: Function called before the pre_algorithm method to setup the input data that the CalibrationAlgorithm uses.
         #: The list of files matching the `Calibration.output_patterns` from the collector output
@@ -1473,5 +1496,3 @@ class CAF():
         # Will create a new database + tables, or do nothing but checks we can connect to existing one
         with CAFDB(self._db_path):
             pass
-
-# @endcond

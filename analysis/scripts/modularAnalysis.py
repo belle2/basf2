@@ -74,28 +74,6 @@ def inputMdst(filename, path, environmentType='default', skipNEvents=0, entrySeq
         parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
     """
 
-    # FIXME remove this check of "filename" at release-07
-    if filename == 'default':
-        B2FATAL("""
-We have simplified the arguments to inputMdst! If you are running on Belle II
-data or MC, you don't have to use "default" any more.
-Please replace:
-   inputMdst("default", "/your/input/file.root", path=mypath)
-With:
-   inputMdst("/your/input/file.root", path=mypath)
-                """)
-    elif filename == "Belle":
-        B2FATAL("""
-We have reordered the arguments to inputMdst! If you are running on Belle 1
-data or MC, you need to specify the 'environmentType'.
-Please replace:
-   inputMdst("Belle", "/your/input/file.root", path=mypath)
-With:
-   inputMdst("/your/input/file.root", path=mypath, environmentType='Belle')
-                """)
-    elif filename in [f"MC{i}" for i in range(5, 10)]:
-        B2FATAL(f"We no longer support the MC version {filename}. Sorry.")
-
     if entrySequence is not None:
         entrySequence = [entrySequence]
 
@@ -129,28 +107,6 @@ def inputMdstList(
         parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
         useB2BIIDBCache (bool): Loading of local KEKCC database (only to be deactivated in very special cases)
     """
-
-    # FIXME remove this check of "filename" at release-07
-    if filelist == 'default':
-        B2FATAL("""
-We have simplified the arguments to inputMdstList! If you are running on
-Belle II data or MC, you don't have to use "default" any more.
-Please replace:
-   inputMdstList("default", list_of_your_files, path=mypath)
-With:
-   inputMdstList(list_of_your_files, path=mypath)
-                """)
-    elif filelist == "Belle":
-        B2FATAL("""
-We have reordered the arguments to inputMdstList! If you are running on
-Belle 1 data or MC, you need to specify the 'environmentType'.
-Please replace:
-   inputMdstList("Belle", list_of_your_files, path=mypath)
-With:
-   inputMdstList(list_of_your_files, path=mypath, environmentType='Belle')
-                """)
-    elif filelist in [f"MC{i}" for i in range(5, 10)]:
-        B2FATAL(f"We no longer support the MC version {filelist}. Sorry.")
 
     roinput = register_module('RootInput')
     roinput.param('inputFileNames', filelist)
@@ -1806,10 +1762,11 @@ def reconstructRecoil(decayString,
     Creates new Particles that recoil against the input particles.
 
     For example the decay string M -> D1 D2 D3 will:
-     - create mother Particle M for each unique combination of D1, D2, D3 Particles
-     - Particles D1, D2, D3 will be appended as daughters to M
-     - the 4-momentum of the mother Particle M is given by
-         p(M) = p(HER) + p(LER) - Sum_i p(Di)
+
+    - create mother Particle M for each unique combination of D1, D2, D3 Particles
+    - Particles D1, D2, D3 will be appended as daughters to M
+    - the 4-momentum of the mother Particle M is given by
+      p(M) = p(HER) + p(LER) - Sum_i p(Di)
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
@@ -1852,10 +1809,11 @@ def reconstructRecoilDaughter(decayString,
     Creates new Particles that are daughters of the particle reconstructed in the recoil (always assumed to be the first daughter).
 
     For example the decay string M -> D1 D2 D3 will:
-     - create mother Particle M for each unique combination of D1, D2, D3 Particles
-     - Particles D1, D2, D3 will be appended as daughters to M
-     - the 4-momentum of the mother Particle M is given by
-         p(M) = p(D1) - Sum_i p(Di), where i>1
+
+    - create mother Particle M for each unique combination of D1, D2, D3 Particles
+    - Particles D1, D2, D3 will be appended as daughters to M
+    - the 4-momentum of the mother Particle M is given by
+      p(M) = p(D1) - Sum_i p(Di), where i>1
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
@@ -2512,6 +2470,43 @@ def looseMCTruth(list_name, path):
     mcMatch.set_name('LooseMCMatch_' + list_name)
     mcMatch.param('listName', list_name)
     mcMatch.param('looseMCMatching', True)
+    path.add_module(mcMatch)
+
+
+def matchTagTruth(list_name, path):
+    """
+    Performs tag matching for all particles in the specified ParticleList.
+    The difference between tag and normal mc matching algorithm is that
+    a (ccbar) tag (usually defined by ccbarFEI) does not correspond to an actual MC particle.
+    Instead the tag is meant to capture everything except the signal particle.
+    Requires that normal MC matching has already been performed and set relations.
+    Also note that low energy photons with energy < 0.1 GeV and ISR are ignored.
+    The results of (ccbar) tag matching algorithm are stored to the following extraInfo items:
+    - ccbarTagSignal: 1st digit is status of signal particle, 2nd digit is Nleft-1, 3rd digit is NextraFSP.
+    - ccbarTagMCpdg: PDG code of (charm) hadron outside tag (signal side).
+    - ccbarTagMCpdgMother: PDG code of the mother of the (charm) hadron outside tag (signal side).
+    - ccbarTagNleft: number of particles (composites have priority) left outisde tag.
+    - ccbarTagNextraFSP: number of extra FSP particles attached to the tag.
+    - ccbarTagSignalStatus: status of the targeted signal side particle.
+    - ccbarTagNwoMC: number of daughters without MC match.
+    - ccbarTagNwoMCMother: number of daughters without MC mother.
+    - ccbarTagNnoAllMother: number of daughters without common allmother.
+    - ccbarTagNmissGamma: number of daughters with missing gamma mc error.
+    - ccbarTagNmissNeutrino: number of daughters with missing neutrino mc error.
+    - ccbarTagNdecayInFlight: number of daughters with decay in flight mc error.
+    - ccbarTagNsevereMCError: number of daughters with severe mc error.
+    - ccbarTagNmissRecoDaughters: number of daughters with any mc error.
+    - ccbarTagNleft2ndPDG: PDG of one particle left additionally to the signal particle.
+    - ccbarTagAllMotherPDG: PDG code of the allmother (Z0 or virtual photon).
+
+    @param list_name name of the input ParticleList
+    @param path      modules are added to this path
+    """
+
+    mcMatch = register_module('MCMatcherParticles')
+    mcMatch.set_name('ccbarTagMatch_' + list_name)
+    mcMatch.param('listName', list_name)
+    mcMatch.param('ccbarTagMatching', True)
     path.add_module(mcMatch)
 
 
@@ -3421,6 +3416,10 @@ def writePi0EtaVeto(
     pi0soft = f'gamma:Pi0Soft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     # fill the particleList for soft photon with energy, timing and clusterNHits cuts
     fillParticleList(pi0soft, Pi0SoftPhotonCut, path=roe_path)
+    # register beambackground MVA for MC16rd
+    if 'MC16rd' in mode:
+        getBeamBackgroundProbability(pi0soft, weight="MC16rd", path=roe_path)
+        getFakePhotonProbability(pi0soft, weight="MC16rd", path=roe_path)
     # reconstruct pi0
     reconstructDecay('pi0:Pi0Veto' + ListName + suffix + f' -> {hardParticle}:HardPhoton{suffix} ' + pi0soft, pi0Selection,
                      allowChargeViolation=True, path=roe_path)
@@ -3463,6 +3462,10 @@ def writePi0EtaVeto(
 
     etasoft = f'gamma:EtaSoft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     fillParticleList(etasoft, EtaSoftPhotonCut, path=roe_path)
+    # register beambackground MVA for MC16rd
+    if 'MC16rd' in mode:
+        getBeamBackgroundProbability(etasoft, weight="MC16rd", path=roe_path)
+        getFakePhotonProbability(etasoft, weight="MC16rd", path=roe_path)
     reconstructDecay('eta:EtaVeto' + ListName + suffix + f' -> {hardParticle}:HardPhoton{suffix} ' + etasoft, etaSelection,
                      allowChargeViolation=True, path=roe_path)
     roe_path.add_module('MVAExpert', listNames=['eta:EtaVeto' + ListName + suffix],
@@ -3884,7 +3887,7 @@ def tagCurlTracks(particleLists,
     Identifies curl tracks and tags them with extraInfo(isCurl=1) for later removal.
     For Belle data with a `b2bii` analysis the available cut based selection is described in `BN1079`_.
 
-      .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
+    .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
 
 
     The module loops over all particles in a given list with a transverse momentum below the pre-selection **ptCut**

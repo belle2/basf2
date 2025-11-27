@@ -48,7 +48,7 @@ Changes since release-09
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v02-02-04 to v02-03-02
       :widths: 50 25 25
@@ -171,7 +171,7 @@ Changes since release-08
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v02-00-02 to v02-02-04
       :widths: 50 25 25
@@ -1101,7 +1101,7 @@ Changes since release-07
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v01-12-01 to v02-00-02
       :widths: 50 25 25
@@ -1166,7 +1166,7 @@ Changes since release-06
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v01-10-02 to v01-12-01
       :widths: 50 25 25
@@ -1849,7 +1849,7 @@ Changes since release-05
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v01-09-01 to v01-10-02
       :widths: 50 25 25

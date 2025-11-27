@@ -16,8 +16,6 @@ from unittest import TestCase, main
 import basf2
 from basf2 import pickle_path as b2pp
 
-# @cond internal_test
-
 
 class PathSerialisationTestCase(TestCase):
 
@@ -117,5 +115,3 @@ class PathSerialisationTestCase(TestCase):
 
 if __name__ == '__main__':
     main()
-
-# @endcond

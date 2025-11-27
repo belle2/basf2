@@ -292,7 +292,7 @@ namespace Belle2 {
        * underlying `std::vector<bool>` does not support getting a pointer to an
        * array. If you have a model with boolean inputs, either convert it to
        * accept a different type (e.g. uint8_t) or use the `Session::run`
-       * overload thet works directl with `Ort::Value` instances.
+       * overload that works directly with `Ort::Value` instances.
        */
       class Session {
       public:

@@ -338,9 +338,9 @@ class VariablesToHDF5(VariablesToTable):
     """
     Legacy class to not break existing code.
 
-    This class is a wrapper around :class:`VariablesToTable` that enforces HDF5 output
+    This class is a wrapper around `VariablesToTable` that enforces HDF5 output
     and uses default settings for buffer size and writer arguments.
-    It mostly exists for legacy reasons and new code should use :class:`VariablesToTable` directly.
+    It mostly exists for legacy reasons and new code should use `VariablesToTable` directly.
 
     Arguments:
         listname(str): name of the particle list

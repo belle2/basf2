@@ -147,7 +147,6 @@ The output format can be chosen based on the extension in the ``filename`` argum
         mypath.add_module(v2t)
 
 .. autoclass:: b2pandas_utils.VariablesToTable
-   :noindex:
 
 .. _v2hdf5:
 

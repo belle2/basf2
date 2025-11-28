@@ -2690,50 +2690,50 @@
         <Name>Shield</Name>
         <InnerR desc="Inner radius" unit="mm">356.5</InnerR>
         <OuterR desc="Outer radius" unit="mm">356.6</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">-579.95</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">1225.01</ForwardZ>
+        <BackwardZ desc="z position at backward endplate" unit="mm">-578.28</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1187.88</ForwardZ>
       </InnerWall>
       <InnerWall id="1" desc="Definition of CFRP 0.46 mm t">
         <Name>MiddleWall</Name>
         <InnerR desc="Inner radius" unit="mm">355.99</InnerR>
         <OuterR desc="Outer radius" unit="mm">356.45</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">-579.95</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">1225.01</ForwardZ>
+        <BackwardZ desc="z position at backward endplate" unit="mm">-578.28</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1187.88</ForwardZ>
       </InnerWall>
       <InnerWall id="2">
         <Name>InnerBackwardWall</Name>
         <InnerR desc="Inner radius" unit="mm">353.6</InnerR>
         <OuterR desc="Outer radius" unit="mm">355.84</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">-579.95</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">-564.95</ForwardZ>
+        <BackwardZ desc="z position at backward endplate" unit="mm">-578.28</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">-563.28</ForwardZ>
       </InnerWall>
       <InnerWall id="3">
         <Name>OuterBackwardWall</Name>
         <InnerR desc="Inner radius" unit="mm">353.6</InnerR>
         <OuterR desc="Outer radius" unit="mm">356.6</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">-588.95</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">-579.95</ForwardZ>
+        <BackwardZ desc="z position at backward endplate" unit="mm">-587.28</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">-578.28</ForwardZ>
       </InnerWall>
       <InnerWall id="4">
         <Name>InnerForwardWall</Name>
         <InnerR desc="Inner radius" unit="mm">353.6</InnerR>
         <OuterR desc="Outer radius" unit="mm">355.84</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">1220.01</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">1225.01</ForwardZ>
+        <BackwardZ desc="z position at backward endplate" unit="mm">1172.88</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1187.88</ForwardZ>
       </InnerWall>
       <InnerWall id="5">
         <Name>OuterForwardWall</Name>
         <InnerR desc="Inner radius" unit="mm">353.6</InnerR>
         <OuterR desc="Outer radius" unit="mm">356.6</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">1225.01</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">1234.01</ForwardZ>
+        <BackwardZ desc="z position at backward endplate" unit="mm">1187.88</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1196.88</ForwardZ>
       </InnerWall>
       <InnerWall id="6" desc="Definition of glue 0.05 mm t">
         <Name>MiddleGlue</Name>
         <InnerR desc="Inner radius" unit="mm">356.45</InnerR>
         <OuterR desc="Outer radius" unit="mm">356.5</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">-579.95</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">1225.01</ForwardZ>
+        <BackwardZ desc="z position at backward endplate" unit="mm">-578.28</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1187.88</ForwardZ>
       </InnerWall>
     </InnerWalls>
 

@@ -45,7 +45,7 @@ from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
 
-__liaison__ = "Yi Zhang <yi.zhang2@desy.de>"
+__liaison__ = "Shuping Lin <shuping.lin@pd.infn.it>"
 _VALIDATION_SAMPLE = "mdst16.root"
 
 
@@ -1613,11 +1613,11 @@ class antiB0toDstar0pipi_Kpi(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{-}\\to anti-D^{*0} (\\to \\bar{D}^{0} (\\to K^+ \\pi^-) \\pi^0/gamma) \\pi^+ \\pi^-`,
+    * :math:`B^{-}\\to \\overline{D}{}^{*0} (\\to \\bar{D}^{0} (\\to K^+ \\pi^-) \\pi^0/\\gamma) \\pi^+ \\pi^-`,
 
     Cuts applied:
 
-    * ``5.22 < Mbc``
+    * ``5.23 < Mbc``
     * ``-0.3 < deltaE < 0.2``
 
     """
@@ -1638,7 +1638,7 @@ class antiB0toDstar0pipi_Kpi(BaseSkim):
         loadStdDstar0_D0pi0_Kpi(path=path),
 
     def build_lists(self, path):
-        Bcuts = "Mbc > 5.22 and -0.3 < deltaE < 0.2"
+        Bcuts = "Mbc > 5.23 and -0.3 < deltaE < 0.2"
         Dstar0Cuts = 'massDifference(0) < 0.16'
 
         ma.reconstructDecay("B0:antiB0toDstar0pipi_D0pi0_Kpi -> anti-D*0:D0_Kpi pi+:GoodTrack pi-:GoodTrack", Bcuts, path=path)

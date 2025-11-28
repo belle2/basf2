@@ -58,7 +58,7 @@ namespace Belle2 {
       std::vector<float> init_bins({ -5.0, -3.0, -1.0, 1.0, 3.0, 5.0});
       SVDRecoTimeBase timeBase(sensorID, false, init_bins);
       // Test toString method
-      EXPECT_EQ("VXDID : 12548 = 3.4.1 side: V bins: -5 -3 -1 1 3 5 ", timeBase.toString());
+      EXPECT_EQ("VXDID : 25092 = 3.4.1 side: V bins: -5 -3 -1 1 3 5 ", timeBase.toString());
     }
 
   } // namespace SVD

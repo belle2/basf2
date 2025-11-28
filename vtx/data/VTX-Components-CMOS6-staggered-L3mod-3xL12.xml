@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Components>
+   <!-- VTX layout with 6 layers in a windmill structure
+      -->
+  <Ladder layer="1">
+    <!-- shift defines the shift of the sensor center along the rphi direction
+         of the ladder to create the windmill structure -->
+    <shift  unit="mm">2.9</shift>
+    <!-- radius (together with the phi angle specified in VTX.xml for each
+         ladder) specifies the center of the local coordinate system for the
+         ladder: x along rphi, 0 at specified phi, y going outward 0 at
+         specified radius, z = global z, 0 at global 0 -->
+
+    <!-- The nominal radius of the inner layer is 14 mm, but this is the inner
+         surface of the sensor and here we give the center of the sensor, so
+         let's add half of the thickness of supporting balcony (0.2mm) -->
+    <radius unit="mm">14.1425</radius>
+    <!-- The value of Sensors is the global z position -->
+    <Sensor id="1" type="layer1i" unit="mm" flipV="true">-28.218</Sensor>
+    <Sensor id="2" type="layer1i" unit="mm" flipV="true">2.050000</Sensor>
+    <Sensor id="3" type="layer1i" unit="mm" flipV="true">32.318</Sensor>
+    <Sensor id="4" type="layer1i" unit="mm" flipV="true">62.586</Sensor>
+  </Ladder>
+
+  <Ladder layer="2">
+    <shift  unit="mm">6</shift>
+    <radius unit="mm">22.1425</radius>
+    <Sensor id="1" type="layer1i" unit="mm" flipV="true">-28.218</Sensor>
+    <Sensor id="2" type="layer1i" unit="mm" flipV="true">2.050000</Sensor>
+    <Sensor id="3" type="layer1i" unit="mm" flipV="true">32.318</Sensor>
+    <Sensor id="4" type="layer1i" unit="mm" flipV="true">62.586</Sensor>
+  </Ladder>
+
+  <Ladder layer="3">
+    <shift  unit="mm">11</shift>
+    <radius unit="mm">69.2</radius>
+    <Sensor id="1" type="layer1o" unit="mm" flipV="true">-111.474</Sensor>
+    <Sensor id="2" type="layer1o" unit="mm" flipV="true">-81.206</Sensor>
+    <Sensor id="3" type="layer1o" unit="mm" flipV="true">-50.938</Sensor>
+    <Sensor id="4" type="layer1o" unit="mm" flipV="true">-20.67</Sensor>
+    <Sensor id="5" type="layer1o" unit="mm" flipV="true">9.597999</Sensor>
+    <Sensor id="6" type="layer1o" unit="mm" flipV="true">39.866</Sensor>
+    <Sensor id="7" type="layer1o" unit="mm" flipV="true">70.134</Sensor>
+    <Sensor id="8" type="layer1o" unit="mm" flipV="true">100.402</Sensor>
+    <Sensor id="9" type="layer1o" unit="mm" flipV="true">130.6700</Sensor>
+    <Sensor id="10" type="layer1o" unit="mm" flipV="true">160.9380</Sensor>
+    <Sensor id="11" type="layer1o" unit="mm" flipV="true">191.2060</Sensor>
+    <Sensor id="12" type="layer1o" unit="mm" flipV="true">221.474</Sensor>
+  </Ladder>
+
+  <Ladder layer="4">
+    <shift  unit="mm">0</shift>
+    <radius unit="mm">82.7</radius>
+    <Sensor id="1" type="layer1o" unit="mm" flipV="true">-157.144</Sensor>
+    <Sensor id="2" type="layer1o" unit="mm" flipV="true">-126.876</Sensor>
+    <Sensor id="3" type="layer1o" unit="mm" flipV="true">-96.608</Sensor>
+    <Sensor id="4" type="layer1o" unit="mm" flipV="true">-66.34</Sensor>
+    <Sensor id="5" type="layer1o" unit="mm" flipV="true">-36.072</Sensor>
+    <Sensor id="6" type="layer1o" unit="mm" flipV="true">-5.80400</Sensor>
+    <Sensor id="7" type="layer1o" unit="mm" flipV="true">24.464</Sensor>
+    <Sensor id="8" type="layer1o" unit="mm" flipV="true">54.732</Sensor>
+    <Sensor id="9" type="layer1o" unit="mm" flipV="true">85.0</Sensor>
+    <Sensor id="10" type="layer1o" unit="mm" flipV="true">115.2680</Sensor>
+    <Sensor id="11" type="layer1o" unit="mm" flipV="true">145.536</Sensor>
+    <Sensor id="12" type="layer1o" unit="mm" flipV="true">175.8039</Sensor>
+    <Sensor id="13" type="layer1o" unit="mm" flipV="true">206.072</Sensor>
+    <Sensor id="14" type="layer1o" unit="mm" flipV="true">236.3400</Sensor>
+    <Sensor id="15" type="layer1o" unit="mm" flipV="true">266.608</Sensor>
+    <Sensor id="16" type="layer1o" unit="mm" flipV="true">296.876</Sensor>
+  </Ladder>
+
+  <Ladder layer="5">
+    <shift  unit="mm">0</shift>
+    <radius unit="mm">108.2</radius>
+    <Sensor id="1" type="layer1o" unit="mm" flipV="true">-207.546</Sensor>
+    <Sensor id="2" type="layer1o" unit="mm" flipV="true">-177.278</Sensor>
+    <Sensor id="3" type="layer1o" unit="mm" flipV="true">-147.01</Sensor>
+    <Sensor id="4" type="layer1o" unit="mm" flipV="true">-116.741</Sensor>
+    <Sensor id="5" type="layer1o" unit="mm" flipV="true">-86.4739</Sensor>
+    <Sensor id="6" type="layer1o" unit="mm" flipV="true">-56.2059</Sensor>
+    <Sensor id="7" type="layer1o" unit="mm" flipV="true">-25.9379</Sensor>
+    <Sensor id="8" type="layer1o" unit="mm" flipV="true">4.330000</Sensor>
+    <Sensor id="9" type="layer1o" unit="mm" flipV="true">34.59800</Sensor>
+    <Sensor id="10" type="layer1o" unit="mm" flipV="true">64.86600</Sensor>
+    <Sensor id="11" type="layer1o" unit="mm" flipV="true">95.13400</Sensor>
+    <Sensor id="12" type="layer1o" unit="mm" flipV="true">125.4019</Sensor>
+    <Sensor id="13" type="layer1o" unit="mm" flipV="true">155.6700</Sensor>
+    <Sensor id="14" type="layer1o" unit="mm" flipV="true">185.9380</Sensor>
+    <Sensor id="15" type="layer1o" unit="mm" flipV="true">216.2060</Sensor>
+    <Sensor id="16" type="layer1o" unit="mm" flipV="true">246.474</Sensor>
+    <Sensor id="17" type="layer1o" unit="mm" flipV="true">276.742</Sensor>
+    <Sensor id="18" type="layer1o" unit="mm" flipV="true">307.0100</Sensor>
+    <Sensor id="19" type="layer1o" unit="mm" flipV="true">337.2780</Sensor>
+    <Sensor id="20" type="layer1o" unit="mm" flipV="true">367.546</Sensor>
+  </Ladder>
+
+  <Ladder layer="6">
+    <shift  unit="mm">0</shift>
+    <radius unit="mm">133.7</radius>
+    <Sensor id="1" type="layer1o" unit="mm" flipV="true">-249.082</Sensor>
+    <Sensor id="2" type="layer1o" unit="mm" flipV="true">-218.814</Sensor>
+    <Sensor id="3" type="layer1o" unit="mm" flipV="true">-188.546</Sensor>
+    <Sensor id="4" type="layer1o" unit="mm" flipV="true">-158.278</Sensor>
+    <Sensor id="5" type="layer1o" unit="mm" flipV="true">-128.01</Sensor>
+    <Sensor id="6" type="layer1o" unit="mm" flipV="true">-97.7419</Sensor>
+    <Sensor id="7" type="layer1o" unit="mm" flipV="true">-67.4739</Sensor>
+    <Sensor id="8" type="layer1o" unit="mm" flipV="true">-37.2059</Sensor>
+    <Sensor id="9" type="layer1o" unit="mm" flipV="true">-6.93799</Sensor>
+    <Sensor id="10" type="layer1o" unit="mm" flipV="true">23.33000</Sensor>
+    <Sensor id="11" type="layer1o" unit="mm" flipV="true">53.59800</Sensor>
+    <Sensor id="12" type="layer1o" unit="mm" flipV="true">83.86599</Sensor>
+    <Sensor id="13" type="layer1o" unit="mm" flipV="true">114.1340</Sensor>
+    <Sensor id="14" type="layer1o" unit="mm" flipV="true">144.4020</Sensor>
+    <Sensor id="15" type="layer1o" unit="mm" flipV="true">174.6700</Sensor>
+    <Sensor id="16" type="layer1o" unit="mm" flipV="true">204.938</Sensor>
+    <Sensor id="17" type="layer1o" unit="mm" flipV="true">235.2060</Sensor>
+    <Sensor id="18" type="layer1o" unit="mm" flipV="true">265.4740</Sensor>
+    <Sensor id="19" type="layer1o" unit="mm" flipV="true">295.7420</Sensor>
+    <Sensor id="20" type="layer1o" unit="mm" flipV="true">326.01</Sensor>
+    <Sensor id="21" type="layer1o" unit="mm" flipV="true">356.278</Sensor>
+    <Sensor id="22" type="layer1o" unit="mm" flipV="true">386.5460</Sensor>
+    <Sensor id="23" type="layer1o" unit="mm" flipV="true">416.8139</Sensor>
+    <Sensor id="24" type="layer1o" unit="mm" flipV="true">447.082</Sensor>
+  </Ladder>
+
+<Sensor type="layer1o">
+  <Material>Si</Material>
+  <width unit="mm">18.812</width>
+  <length unit="mm">30.168</length>
+  <height unit="mm">0.4</height>
+  <!-- definition of the active area of the module which is a part of the
+       whole thing. The position is given relative to the lower left edge of
+       the module (the point with the most negative local coordinates). -->
+  <Active>
+    <u unit="mm">3.5</u>
+    <v unit="mm">0.3</v>
+    <w>top</w>
+    <width unit="mm">15.312</width>
+    <length unit="mm">29.568</length>
+    <height unit="mm">0.03</height>
+    <!-- define the number of pixels in rphi direction -->
+    <pixelsU>464</pixelsU>
+    <pixelsV>896</pixelsV>
+     <!--
+           Maybe all those parameters don't make sense for Generic Pixel
+
+           Parameters describing the physical attributes of the sensor needed
+           for digitization. The voltages might be time dependent and than
+           should be placed somewhere else -->
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-30</BackVoltage>
+      <TopVoltage unit="V">-5.0</TopVoltage>
+      <BorderU unit="um">6.0</BorderU>
+      <BorderV unit="um">4.0</BorderV>
+      <ChargeThreshold unit="ADU">1.25</ChargeThreshold>
+      <NoiseFraction>0.0</NoiseFraction>
+      <!-- Parameters that were in the digitizer -->
+      <!-- Apply electronic effects? -->
+      <ApplyElectronicEffects>true</ApplyElectronicEffects>
+      <!-- Noise added by the electronics, set in ENC -->
+      <ElectronicNoise unit="ENC">20.0</ElectronicNoise>
+      <!-- Apply binary readout? -->
+      <ApplyBinaryReadout>false</ApplyBinaryReadout>
+      <!-- Binary hit treshold, set in ENC -->
+      <BinaryHitThreshold unit="ENC">200</BinaryHitThreshold>
+      <!-- ENC equivalent of 1 ADU -->
+      <ElectronToADU unit="ENC">120</ElectronToADU>
+      <!-- Maximum code for analog to digital converter (clamping) -->
+      <MaxADUCode>127</MaxADUCode>
+      <!-- Apply Poisson smearing of electrons collected on pixels -->
+      <ApplyPoissonSmearing>true</ApplyPoissonSmearing>
+      <!-- Use integration window? -->
+      <ApplyIntegrationWindow>true</ApplyIntegrationWindow>
+      <!-- Maximum segment length (in mm) -->
+      <SegmentLength unit="mm">0.005</SegmentLength>
+      <!-- Split Signalpoints in smaller groups of N electrons (in e) -->
+      <ElectronGroupSize>100</ElectronGroupSize>
+      <!-- Time step for tracking electron groups in readout plane (in ns) -->
+      <ElectronStepTime unit="ns">1.0</ElectronStepTime>
+      <!-- Maximum number of steps when propagating electrons -->
+      <ElectronMaxSteps>200</ElectronMaxSteps>
+      <!-- Constant time delay between bunch crossing and switching on triggergate (in ns) -->
+      <HardwareDelay unit="ns">0.0</HardwareDelay>
+      <!-- ADC conversion factor -->
+      <ADCunit>120</ADCunit>
+      <!-- Diffusion coefficient TODO add unit? is it diffusion coeff or cloud size??-->
+      <CloudSize>8.5e-05</CloudSize>
+      <!-- ADC gain factor -->
+      <Gq>1.0</Gq>
+      <!-- Averaged sensors X0 (for perpendicular incidence) -->
+      <X0average>0.001</X0average>
+      <!-- Tangent of Lorentz angle -->
+      <TanLorentzAngle>0.24</TanLorentzAngle>
+      <!-- Spatial resolution coefficient for u axis -->
+      <ResolutionCoefficientU>0.6</ResolutionCoefficientU>
+      <!-- Spatial resolution coefficient for v axis -->
+      <ResolutionCoefficientV>0.6</ResolutionCoefficientV>
+      <!-- Integration time for Generic Pixel -->
+      <IntegrationStart unit="ns">-50</IntegrationStart>
+      <IntegrationEnd   unit="ns">50</IntegrationEnd>
+    </Active>
+    <!-- Used for thinning in the VXD sensitive area
+
+         now we place some components on the sensor by giving the name of the
+         component defined further down and the positions of all placements on
+         the sensor in local coordinates, starting at the lower left edge
+
+         possible placements for the w-coordinate are:
+          - below: place below the sensor surface
+          - bottom: place in the sensor but at the bottom
+          - center: place in the sensor center
+          - top: place in the sensor touching the top surface
+          - above place on top of the sensor surface -->
+
+     <!-- Thinning of the sensor down to the sensitive thickness by cutting out
+         a piece of the silicon -->
+    <!--Component type="ThinningLayer14">
+      <u unit="mm">2.0</u><v unit="mm">0.0</v>
+    </Component-->
+  </Sensor>
+
+<Sensor type="layer1i">
+  <Material>Si</Material>
+  <width unit="mm">18.812</width>
+  <length unit="mm">30.168</length>
+  <height unit="mm">0.28500000000000003</height>
+  <!-- definition of the active area of the module which is a part of the
+       whole thing. The position is given relative to the lower left edge of
+       the module (the point with the most negative local coordinates). -->
+  <Active>
+    <u unit="mm">3.5</u>
+    <v unit="mm">0.3</v>
+    <w>top</w>
+    <width unit="mm">15.312</width>
+    <length unit="mm">29.568</length>
+    <height unit="mm">0.03</height>
+    <!-- define the number of pixels in rphi direction -->
+    <pixelsU>464</pixelsU>
+    <pixelsV>896</pixelsV>
+     <!--
+           Maybe all those parameters don't make sense for Generic Pixel
+
+           Parameters describing the physical attributes of the sensor needed
+           for digitization. The voltages might be time dependent and than
+           should be placed somewhere else -->
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-30</BackVoltage>
+      <TopVoltage unit="V">-5.0</TopVoltage>
+      <BorderU unit="um">6.0</BorderU>
+      <BorderV unit="um">4.0</BorderV>
+      <ChargeThreshold unit="ADU">1.25</ChargeThreshold>
+      <NoiseFraction>0.0</NoiseFraction>
+      <!-- Parameters that were in the digitizer -->
+      <!-- Apply electronic effects? -->
+      <ApplyElectronicEffects>true</ApplyElectronicEffects>
+      <!-- Noise added by the electronics, set in ENC -->
+      <ElectronicNoise unit="ENC">20.0</ElectronicNoise>
+      <!-- Apply binary readout? -->
+      <ApplyBinaryReadout>false</ApplyBinaryReadout>
+      <!-- Binary hit treshold, set in ENC -->
+      <BinaryHitThreshold unit="ENC">200</BinaryHitThreshold>
+      <!-- ENC equivalent of 1 ADU -->
+      <ElectronToADU unit="ENC">120</ElectronToADU>
+      <!-- Maximum code for analog to digital converter (clamping) -->
+      <MaxADUCode>127</MaxADUCode>
+      <!-- Apply Poisson smearing of electrons collected on pixels -->
+      <ApplyPoissonSmearing>true</ApplyPoissonSmearing>
+      <!-- Use integration window? -->
+      <ApplyIntegrationWindow>true</ApplyIntegrationWindow>
+      <!-- Maximum segment length (in mm) -->
+      <SegmentLength unit="mm">0.005</SegmentLength>
+      <!-- Split Signalpoints in smaller groups of N electrons (in e) -->
+      <ElectronGroupSize>100</ElectronGroupSize>
+      <!-- Time step for tracking electron groups in readout plane (in ns) -->
+      <ElectronStepTime unit="ns">1.0</ElectronStepTime>
+      <!-- Maximum number of steps when propagating electrons -->
+      <ElectronMaxSteps>200</ElectronMaxSteps>
+      <!-- Constant time delay between bunch crossing and switching on triggergate (in ns) -->
+      <HardwareDelay unit="ns">0.0</HardwareDelay>
+      <!-- ADC conversion factor -->
+      <ADCunit>120</ADCunit>
+      <!-- Diffusion coefficient TODO add unit? is it diffusion coeff or cloud size??-->
+      <CloudSize>8.5e-05</CloudSize>
+      <!-- ADC gain factor -->
+      <Gq>1.0</Gq>
+      <!-- Averaged sensors X0 (for perpendicular incidence) -->
+      <X0average>0.001</X0average>
+      <!-- Tangent of Lorentz angle -->
+      <TanLorentzAngle>0.24</TanLorentzAngle>
+      <!-- Spatial resolution coefficient for u axis -->
+      <ResolutionCoefficientU>0.6</ResolutionCoefficientU>
+      <!-- Spatial resolution coefficient for v axis -->
+      <ResolutionCoefficientV>0.6</ResolutionCoefficientV>
+      <!-- Integration time for Generic Pixel -->
+      <IntegrationStart unit="ns">-50</IntegrationStart>
+      <IntegrationEnd   unit="ns">50</IntegrationEnd>
+    </Active>
+    <!-- Used for thinning in the VXD sensitive area
+
+         now we place some components on the sensor by giving the name of the
+         component defined further down and the positions of all placements on
+         the sensor in local coordinates, starting at the lower left edge
+
+         possible placements for the w-coordinate are:
+          - below: place below the sensor surface
+          - bottom: place in the sensor but at the bottom
+          - center: place in the sensor center
+          - top: place in the sensor touching the top surface
+          - above place on top of the sensor surface -->
+
+     <!-- Thinning of the sensor down to the sensitive thickness by cutting out
+         a piece of the silicon -->
+    <!--Component type="ThinningLayer14">
+      <u unit="mm">2.0</u><v unit="mm">0.0</v>
+    </Component-->
+  </Sensor>
+
+  <Component name="ThinningLayer14">
+    <Material>ColdAir</Material>
+    <Color>#5599BB</Color>
+    <width  unit="mm">15.312</width>
+    <length unit="mm">118.272</length>
+    <height unit="mm">0.36</height>
+    <angle  unit="deg">0</angle>
+  </Component>
+
+  <Component name="ThinningLayer14i">
+    <Material>ColdAir</Material>
+    <Color>#5599BB</Color>
+    <width  unit="mm">15.312</width>
+    <length unit="mm">118.272</length>
+    <height unit="mm">0.36</height>
+    <angle  unit="deg">0</angle>
+  </Component>
+
+  <Component name="ThinningLayer12">
+    <Material>ColdAir</Material>
+    <Color>#5599BB</Color>
+    <width  unit="mm">15.312</width>
+    <length unit="mm">59.136</length>
+    <height unit="mm">0.36</height>
+    <angle  unit="deg">0</angle>
+  </Component>
+
+</Components>

@@ -32,11 +32,11 @@ namespace Belle2 {
     typedef unsigned short baseType;
     enum {
       /** Number of bits available to represent a layer */
-      LayerBits   = 4,
+      LayerBits   = 3,
       /** Number of bits available to represent a ladder */
       LadderBits  = 6,
       /** Number of bits available to represent a sensor */
-      SensorBits  = 4,
+      SensorBits  = 5,
       /** Number of bits available to represent segmentation of the sensor */
       SegmentBits = 2,
       /** Total bit size of the VxdID */

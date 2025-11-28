@@ -117,7 +117,7 @@ namespace Belle2 {
   TEST_F(GlobalLabelTest, GettersSettersOperators)
   {
     GlobalLabel vxdlabel1 = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
-    GlobalLabel vxdlabel2(100422809);
+    GlobalLabel vxdlabel2(100845209);
 
     // getters
     EXPECT_EQ(80, GlobalLabel::getCurrentTimeIntervalRef());
@@ -127,8 +127,8 @@ namespace Belle2 {
     EXPECT_EQ(vxdSensor, vxdlabel1.getElementId());
 
     // cast operators
-    EXPECT_EQ(100422809, (int)vxdlabel1);
-    EXPECT_EQ(100422809, (unsigned int)vxdlabel1);
+    EXPECT_EQ(100845209, (int)vxdlabel1);
+    EXPECT_EQ(100845209, (unsigned int)vxdlabel1);
 
     // getters (GlobalLabel from label)
     EXPECT_EQ(80, GlobalLabel::getCurrentTimeIntervalRef());
@@ -139,14 +139,14 @@ namespace Belle2 {
 
     // no detector mismatch (GlobalLabel from label)
     // cats operator (GlobalLabel from label)
-    EXPECT_EQ(100422809, (int)vxdlabel2);
-    EXPECT_EQ(100422809, (unsigned int)vxdlabel2);
+    EXPECT_EQ(100845209, (int)vxdlabel2);
+    EXPECT_EQ(100845209, (unsigned int)vxdlabel2);
 
     // Assignment
     GlobalLabel other = GlobalLabel::construct<CDCAlignment>(cdcWire, 2);
     EXPECT_EQ(270620402, other.label());
     other = vxdlabel1;
-    EXPECT_EQ(100422809, other.label());
+    EXPECT_EQ(100845209, other.label());
   }
 
   /// Test the default way of using this
@@ -156,12 +156,12 @@ namespace Belle2 {
     // Test time indep. detector constructors
     GlobalLabel vxdlabel = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
     GlobalLabel cdclabel = GlobalLabel::construct<CDCAlignment>(cdcWire, paramid);
-    EXPECT_EQ(100422809, vxdlabel.label());
+    EXPECT_EQ(100845209, vxdlabel.label());
     EXPECT_EQ(270620409, cdclabel.label());
     EXPECT_EQ(paramid, vxdlabel.getParameterId());
     EXPECT_EQ(paramid, cdclabel.getParameterId());
     // Test time indep. label constructor
-    vxdlabel = GlobalLabel(100422809);
+    vxdlabel = GlobalLabel(100845209);
     cdclabel = GlobalLabel(270620409);
     EXPECT_EQ(paramid, vxdlabel.getParameterId());
     EXPECT_EQ(paramid, cdclabel.getParameterId());

@@ -16,7 +16,7 @@
 
 
 #pragma link C++ class Belle2::VXDGeometryPar+; // checksum=0xb1354a95, version=5
-#pragma link C++ class Belle2::VXDHalfShellPar+; // checksum=0x3b97240a, version=5
+#pragma link C++ class Belle2::VXDHalfShellPar+; // checksum=0xa12ad16e, version=6
 #pragma link C++ class Belle2::VXDGlobalPar+; // checksum=0xfc361502, version=5
 #pragma link C++ class Belle2::VXDGeoSensorPlacementPar+; // checksum=0x6d0ac0a3, version=6
 #pragma link C++ class Belle2::VXDGeoSensorPar+; // checksum=0x874fdbe, version=5

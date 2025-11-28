@@ -326,8 +326,8 @@ float
 GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
 {
   const GRLMLP& expert = m_MLPs[isector];
-  vector<float> weights = expert.getWeights();
-  vector<float> bias = expert.getBias();
+  vector<float> weights = expert.get_weights();
+  vector<float> bias = expert.get_bias();
   vector<int> total_bit_bias = expert.get_total_bit_bias();
   vector<int> int_bit_bias = expert.get_int_bit_bias();
   vector<bool> is_signed_bias = expert.get_is_signed_bias();
@@ -374,13 +374,13 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
 
   //hidden layer and output layer
   vector<float> layeroutput = {};
-  unsigned num_layers = expert.getNumberOfLayers();
+  unsigned num_layers = expert.get_number_of_layers();
 
   unsigned num_total_neurons = 0;
   unsigned iw = 0;
   for (unsigned i_layer = 0; i_layer < num_layers - 1; i_layer++) {
     //read bias
-    unsigned num_neurons = expert.getNumberOfNodesLayer(i_layer + 1);
+    unsigned num_neurons = expert.get_number_of_nodes_layer(i_layer + 1);
     layeroutput.clear();
     layeroutput.assign(num_neurons, 0.);
     layeroutput.shrink_to_fit();
@@ -493,17 +493,17 @@ bool GRLNeuro::load(unsigned isector, const string& weightfilename, const string
           barray.push_back(element);
         }
 
-        if (warray.size() != expert.nWeightsCal()) {
+        if (warray.size() != expert.n_weights_cal()) {
           B2ERROR("Number of weights is not equal to registered architecture!");
           return false;
-        } else expert.setWeights(warray);
-        if (barray.size() != expert.nBiasCal()) {
+        } else expert.set_weights(warray);
+        if (barray.size() != expert.n_bias_cal()) {
           B2ERROR("Number of bias is not equal to registered architecture!");
           return false;
         }
 
-        expert.setWeights(warray);
-        expert.setBias(barray);
+        expert.set_weights(warray);
+        expert.set_bias(barray);
         return true;
       }
     }
@@ -513,7 +513,7 @@ bool GRLNeuro::load(unsigned isector, const string& weightfilename, const string
 bool GRLNeuro::load(unsigned isector, std::vector<float> warray, std::vector<float> barray)
 {
   GRLMLP& expert = m_MLPs[isector];
-  expert.setWeights(warray);
-  expert.setBias(barray);
+  expert.set_weights(warray);
+  expert.set_bias(barray);
   return true;
 }

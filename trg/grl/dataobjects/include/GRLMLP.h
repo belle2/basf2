@@ -30,25 +30,25 @@ namespace Belle2 {
     ~GRLMLP() { }
 
     /** check if weights are default values or set by some trainer */
-    bool isTrained() const { return m_trained; }
+    bool is_trained() const { return m_trained; }
     /** get number of layers */
-    unsigned getNumberOfLayers() const { return m_nNodes.size(); }
+    unsigned get_number_of_layers() const { return m_n_nodes.size(); }
     /** get number of nodes in a layer */
-    unsigned getNumberOfNodesLayer(unsigned iLayer) const { return m_nNodes[iLayer]; }
+    unsigned get_number_of_nodes_layer(unsigned i_layer) const { return m_n_nodes[i_layer]; }
     /** get number of weights from length of weights vector */
-    unsigned getNumberOfWeights() const { return m_weights.size(); }
+    unsigned get_number_of_weights() const { return m_weights.size(); }
     /** calculate number of weights from number of nodes */
-    unsigned nWeightsCal() const;
+    unsigned n_weights_cal() const;
     /** calculate number of weights from number of nodes */
-    unsigned nBiasCal() const;
+    unsigned n_bias_cal() const;
     /** get weights vector */
-    std::vector<float> getWeights() const { return m_weights; }
+    std::vector<float> get_weights() const { return m_weights; }
     /** get bias vector */
-    std::vector<float> getBias() const { return m_bias; }
+    std::vector<float> get_bias() const { return m_bias; }
     /** set weights vector */
-    void setWeights(std::vector<float>& weights) { m_weights = weights; }
+    void set_weights(std::vector<float>& weights) { m_weights = weights; }
     /** set bias vector */
-    void setBias(std::vector<float>& bias) { m_bias = bias; }
+    void set_bias(std::vector<float>& bias) { m_bias = bias; }
 
     /** get bit width etc. constant in each node */
     std::vector<int> get_total_bit_bias() const { return m_total_bit_bias; }
@@ -113,7 +113,7 @@ namespace Belle2 {
 
   private:
     /** Number of nodes in each layer, not including bias nodes. */
-    std::vector<unsigned short> m_nNodes;
+    std::vector<unsigned short> m_n_nodes;
     /** Weights of the network. */
     std::vector<float> m_weights;
     /** bias of the network. */
@@ -152,13 +152,13 @@ namespace Belle2 {
     bool m_trained;
 
     /** output variables: 1: z, 2: theta, 3: (z, theta) */
-    unsigned short m_targetVars;
+    unsigned short m_target_vars;
     /** Output[i] of the MLP is scaled from [-1, 1]
      *  to [outputScale[2i], outputScale[2i+1]]. */
-    std::vector<float> m_outputScale;
+    std::vector<float> m_output_scale;
 
     //! Needed to make the ROOT object storable
-    ClassDef(GRLMLP, 3);
+    ClassDef(GRLMLP, 4);
   };
 }
 #endif

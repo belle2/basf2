@@ -22,7 +22,7 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    TRGGRLConfig(): m_ecltaunn_threshold{-1} {}
+    TRGGRLConfig(): m_ecltaunn_threshold{-1.5} {}
 
     /** Getter functions*/
     float get_ecltaunn_threshold() const

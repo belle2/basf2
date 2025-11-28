@@ -18,7 +18,7 @@ namespace Belle2 {
 
   /**
    * Config class for the Smart Background module.
-   * Saves mappings of pdg numbers, skim codes and activation function paramters so they can be saved to
+   * Saves mappings required for the SmartBackgroundModule so they can be saved to
    * and loaded from the conditions database.
    */
   class SmartBackgroundConfig : public TObject {
@@ -31,7 +31,7 @@ namespace Belle2 {
     SmartBackgroundConfig() { }
 
     /**
-     * Constructor setting all three maps
+     * Constructor setting all maps
      */
     SmartBackgroundConfig(const std::unordered_map<int, int>& pdgMapping,
                           const std::unordered_map<int, uint16_t>& skimcodesMapping,

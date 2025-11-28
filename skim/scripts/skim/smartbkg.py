@@ -43,7 +43,7 @@ def add_smartbkg_filtering(
                                is written to the event extra info as 'SmartBKG_Prediction_<SkimName>')
             payload_weights (str): name of the payload storing neural network weights in ONNX format
             payload_config (str): name of the payload storing the SmartBackgroundConfig object
-            event_type (str or None): type of events thar are generated, allowed values are
+            event_type (str or None): type of events that are generated, allowed values are
                                       'charged', 'mixed', 'uubar', 'ddbar', 'ssbar', 'ccbar', 'taupair';
                                       if None, automatially determined from the event extra info
             activation_params (tuple(float, float) or None): custom parameters (a, b) for the activation function

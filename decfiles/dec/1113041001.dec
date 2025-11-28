@@ -33,7 +33,7 @@ CDecay anti-B0sig
 #
 
 Decay anti-D*0sig
-1.0000 anti-D0sig gamma PHOTOS VSS;
+1.0000 anti-D0sig gamma VSP_PWAVE;
 Enddecay
 CDecay D*0sig
 

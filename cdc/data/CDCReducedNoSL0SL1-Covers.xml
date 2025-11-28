@@ -58,7 +58,7 @@
     <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
     <PosZ desc="Z position near IP" unit="mm">-385.1</PosZ>
   </Cover>-->
-  <Cover id="6" desc="Backward inner cover 1">
+<!--  <Cover id="6" desc="Backward inner cover 1">
     <Name>BackwardCover</Name>
     <InnerR1 desc="Inner radius near IP" unit="mm">290.5</InnerR1>
     <InnerR2 desc="Inner radius far from IP" unit="mm">290.5</InnerR2>
@@ -67,7 +67,7 @@
     <Thickness desc="The thickness of the cover" unit="mm">300.0</Thickness>
     <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
     <PosZ desc="Z position near IP" unit="mm">-620.0</PosZ>
-  </Cover>
+  </Cover>-->
 <!--  <Cover id="7" desc="Backward inner cover 2">
     <Name>BackwardCover</Name>
     <InnerR1 desc="Inner radius near IP" unit="mm">290.5</InnerR1>
@@ -279,7 +279,7 @@
     <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
     <PosZ desc="Z position near IP" unit="mm">-681.2</PosZ>
   </Cover>
-  <Cover id="28" desc="Cooling plate 6">
+<!--  <Cover id="28" desc="Cooling plate 6">
     <Name>CoolingPlate</Name>
     <InnerR1 desc="Inner radius near IP" unit="mm">294.0</InnerR1>
     <InnerR2 desc="Inner radius far from IP" unit="mm">294.0</InnerR2>
@@ -288,7 +288,7 @@
     <Thickness desc="The thickness of the cover" unit="mm">1.0</Thickness>
     <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
     <PosZ desc="Z position near IP" unit="mm">-681.2</PosZ>
-  </Cover>
+  </Cover>-->
   <Cover id="29" desc="Cooling pipe 1">
     <Name>CoolingPipe</Name>
     <InnerR1 desc="Inner radius near IP" unit="mm">1013.45</InnerR1>
@@ -339,7 +339,7 @@
     <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
     <PosZ desc="Z position center" unit="mm">-678.025</PosZ>
   </Cover>
-  <Cover id="34" desc="Cooling pipe 6">
+<!--  <Cover id="34" desc="Cooling pipe 6">
     <Name>CoolingPipe</Name>
     <InnerR1 desc="Inner radius near IP" unit="mm">304.7</InnerR1>
     <InnerR2 desc="Inner radius far from IP" unit="mm">304.7</InnerR2>
@@ -348,7 +348,7 @@
     <Thickness desc="The thickness of the cover" unit="mm">0.8</Thickness>
     <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
     <PosZ desc="Z position center" unit="mm">-678.025</PosZ>
-  </Cover>
+  </Cover>-->
   <Cover id="35" desc="Cooling water 1">
     <Name>CoolingWater</Name>
     <InnerR1 desc="Inner radius near IP" unit="mm">1014.25</InnerR1>
@@ -399,7 +399,7 @@
     <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
     <PosZ desc="Z position center" unit="mm">-678.025</PosZ>
   </Cover>
-  <Cover id="40" desc="Cooling water 6">
+<!--  <Cover id="40" desc="Cooling water 6">
     <Name>CoolingWater</Name>
     <InnerR1 desc="Inner radius near IP" unit="mm">305.5</InnerR1>
     <InnerR2 desc="Inner radius far from IP" unit="mm">305.5</InnerR2>
@@ -408,7 +408,7 @@
     <Thickness desc="The thickness of the cover" unit="mm">2.375</Thickness>
     <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
     <PosZ desc="Z position center" unit="mm">-678.025</PosZ>
-  </Cover>
+  </Cover>-->
   <Cover id="47" desc="Backward Optical fiber outer">
     <Name>BackwardCover</Name>
     <InnerR1 desc="Inner radius near IP" unit="mm">463.75</InnerR1>

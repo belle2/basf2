@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <DetectorComponent name="CDC" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <Creator library="cdc">CDCCreatorReducedCDC</Creator>
+  <Creator library="cdc">CDCCreatorReducedCDCNoSL0SL1</Creator>
   <Content>
-    <xi:include href="CDCReduced-Covers.xml"/>
+    <xi:include href="CDCReducedNoSL0SL1-Covers.xml"/>
     <xi:include href="CDC-NeutronShields.xml"/>
     <GlobalPhiRotation desc="Global rotation in phi; valid only for sense wires now." unit="deg">0.0</GlobalPhiRotation>
     <ClockFrequencyForTDC desc="Frequency (GHz) of the clock used for TDC, where 1.017774 GHz is 2 x (accelerator's RF).">1.017774</ClockFrequencyForTDC>
@@ -24,8 +24,8 @@
     <MaxNSenseLayers desc="(Maximum) number of sense wire layers">56</MaxNSenseLayers>
     <MaxNFieldLayers desc="(Maximum) number of field wire layers">55</MaxNFieldLayers>
     <SuperLayers desc="Number of SuperLayers in the CDC">9</SuperLayers>
-    <FirstLayerOffset desc="Actual first layer of the CDC">8</FirstLayerOffset>
-    <SuperLayerOffset desc="Actual first super layer of the CDC">1</SuperLayerOffset>
+    <FirstLayerOffset desc="Actual first layer of the CDC">14</FirstLayerOffset>
+    <SuperLayerOffset desc="Actual first super layer of the CDC">2</SuperLayerOffset>
     <MaxNCells desc="Maximum number of cells within one layer">384</MaxNCells>
 
     <MomVol>
@@ -55,7 +55,6 @@
         <Rmax unit="mm">1140.0</Rmax>
       </ZBound>
       <ZBound id="5">
-<!--         <Z unit="mm">830</Z> -->
         <Z unit="mm">871.2</Z>
         <Rmin unit="mm">240.0</Rmin>
         <Rmax unit="mm">1140.0</Rmax>
@@ -68,66 +67,6 @@
     </MomVol>
 
     <SLayers>
-      <SLayer id="8">
-        <Radius desc="Radius of wires in this layer" unit="mm">257</Radius>
-        <BackwardZ desc="z position of this wire layer at backward endplate" unit="mm">-464.15</BackwardZ>
-        <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">855.1</ForwardZ>
-        <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0</Offset>
-        <BwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">12.8</BwdDeltaZ>
-        <FwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">22.2</FwdDeltaZ>
-      </SLayer>
-      <SLayer id="9">
-        <Radius desc="Radius of wires in this layer" unit="mm">275.2</Radius>
-        <BackwardZ desc="z position of this wire layer at backward endplate" unit="mm">-495.67</BackwardZ>
-        <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">920.63</ForwardZ>
-        <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
-        <BwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">12.8</BwdDeltaZ>
-        <FwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">28.2</FwdDeltaZ>
-      </SLayer>
-      <SLayer id="10">
-        <Radius desc="Radius of wires in this layer" unit="mm">293.4</Radius>
-        <BackwardZ desc="z position of this wire layer at backward endplate" unit="mm">-527.19</BackwardZ>
-        <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">980.16</ForwardZ>
-        <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0</Offset>
-        <BwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">12.8</BwdDeltaZ>
-        <FwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">28.2</FwdDeltaZ>
-      </SLayer>
-      <SLayer id="11">
-        <Radius desc="Radius of wires in this layer" unit="mm">311.6</Radius>
-        <BackwardZ desc="z position of this wire layer at backward endplate" unit="mm">-558.62</BackwardZ>
-        <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">1039.69</ForwardZ>
-        <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
-        <BwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">12.8</BwdDeltaZ>
-        <FwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">28.2</FwdDeltaZ>
-      </SLayer>
-      <SLayer id="12">
-        <Radius desc="Radius of wires in this layer" unit="mm">329.8</Radius>
-        <BackwardZ desc="z position of this wire layer at backward endplate" unit="mm">-572.07</BackwardZ>
-        <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">1099.22</ForwardZ>
-        <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0</Offset>
-        <BwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">03.2</BwdDeltaZ>
-        <FwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">28.2</FwdDeltaZ>
-      </SLayer>
-      <SLayer id="13">
-        <Radius desc="Radius of wires in this layer" unit="mm">348</Radius>
-        <BackwardZ desc="z position of this wire layer at backward endplate" unit="mm">-575.6</BackwardZ>
-        <ForwardZ desc="z position of this wire layer at forward endplate" unit="mm">1158.75</ForwardZ>
-        <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
-        <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
-        <BwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">03.2</BwdDeltaZ>
-        <FwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">28.2</FwdDeltaZ>
-      </SLayer>
       <SLayer id="14">
         <Radius desc="Radius of wires in this layer" unit="mm">365.2</Radius>
         <BackwardZ desc="z position of this wire layer at backward endplate" unit="mm">-578.95</BackwardZ> 
@@ -550,48 +489,6 @@
       </SLayer>
     </SLayers>
     <FLayers>
-      <FLayer id="8">
-        <Radius desc="Radius of field wires in this layer" unit="mm">266.1</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-479.91</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">890.87</ForwardZ>
-        <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
-      </FLayer>
-      <FLayer id="9">
-        <Radius desc="Radius of field wires in this layer" unit="mm">284.3</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-511.43</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">950.4</ForwardZ>
-        <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
-      </FLayer>
-      <FLayer id="10">
-        <Radius desc="Radius of field wires in this layer" unit="mm">302.5</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-542.96</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1009.92</ForwardZ>
-        <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
-      </FLayer>
-      <FLayer id="11">
-        <Radius desc="Radius of field wires in this layer" unit="mm">320.7</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-570.3</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1069.45</ForwardZ>
-        <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
-      </FLayer>
-      <FLayer id="12">
-        <Radius desc="Radius of field wires in this layer" unit="mm">338.9</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-573.84</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1128.98</ForwardZ>
-        <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
-      </FLayer>
-      <FLayer id="13">
-        <Radius desc="Radius of field wires in this layer" unit="mm">356.6</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-577.28</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1186.88</ForwardZ>
-        <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
-        <NShift desc="the shifted hole number of each wire in this layer">14</NShift>
-      </FLayer>
       <FLayer id="14">
         <Radius desc="Radius of field wires in this layer" unit="mm">374.3</Radius>
         <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-580.72</BackwardZ>
@@ -881,438 +778,6 @@
       </FLayer>
     </FLayers>
     <Endplates>
-      <Endplate id="8">
-        <EndplateLayer id="0">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">243</InnerR>
-          <OuterR desc="Outer radius" unit="mm">244.647</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-452.0</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-442.0</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="1">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">244.647</InnerR>
-          <OuterR desc="Outer radius" unit="mm">249.588</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-474.15</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-442.0</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="2">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">249.588</InnerR>
-          <OuterR desc="Outer radius" unit="mm">259.73</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-474.15</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-464.15</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="3">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">259.73</InnerR>
-          <OuterR desc="Outer radius" unit="mm">263.37</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-489.91</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-464.15</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="4">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">263.37</InnerR>
-          <OuterR desc="Outer radius" unit="mm">266.1</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-489.91</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-479.91</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="5">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">243</InnerR>
-          <OuterR desc="Outer radius" unit="mm">244.647</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">817.41</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">827.41</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="6">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">244.647</InnerR>
-          <OuterR desc="Outer radius" unit="mm">249.588</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">817.41</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">871.1</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="7">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">249.588</InnerR>
-          <OuterR desc="Outer radius" unit="mm">259.73</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">855.1</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">871.1</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="8">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">259.73</InnerR>
-          <OuterR desc="Outer radius" unit="mm">263.37</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">855.1</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">900.87</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="9">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">263.37</InnerR>
-          <OuterR desc="Outer radius" unit="mm">266.1</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">890.87</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">900.87</ForwardZ>
-        </EndplateLayer>
-      </Endplate>
-      <Endplate id="9">
-        <EndplateLayer id="0">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">266.1</InnerR>
-          <OuterR desc="Outer radius" unit="mm">268.83</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-489.91</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-479.91</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="1">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">268.83</InnerR>
-          <OuterR desc="Outer radius" unit="mm">272.47</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-505.67</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-479.91</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="2">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">272.47</InnerR>
-          <OuterR desc="Outer radius" unit="mm">277.93</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-505.67</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-495.67</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="3">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">277.93</InnerR>
-          <OuterR desc="Outer radius" unit="mm">281.57</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-521.43</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-495.67</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="4">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">281.57</InnerR>
-          <OuterR desc="Outer radius" unit="mm">284.3</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-521.43</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-511.43</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="5">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">266.1</InnerR>
-          <OuterR desc="Outer radius" unit="mm">268.83</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">890.87</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">900.87</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="6">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">268.83</InnerR>
-          <OuterR desc="Outer radius" unit="mm">272.47</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">890.87</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">930.63</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="7">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">272.47</InnerR>
-          <OuterR desc="Outer radius" unit="mm">277.93</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">920.63</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">930.63</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="8">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">277.93</InnerR>
-          <OuterR desc="Outer radius" unit="mm">281.57</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">920.63</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">960.4</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="9">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">281.57</InnerR>
-          <OuterR desc="Outer radius" unit="mm">284.3</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">950.4</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">960.4</ForwardZ>
-        </EndplateLayer>
-      </Endplate>
-      <Endplate id="10">
-        <EndplateLayer id="0">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">284.3</InnerR>
-          <OuterR desc="Outer radius" unit="mm">287.03</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-521.43</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-511.43</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="1">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">287.03</InnerR>
-          <OuterR desc="Outer radius" unit="mm">290.67</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-537.19</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-511.43</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="2">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">290.67</InnerR>
-          <OuterR desc="Outer radius" unit="mm">296.13</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-537.19</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-527.19</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="3">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">296.13</InnerR>
-          <OuterR desc="Outer radius" unit="mm">299.77</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-552.96</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-527.19</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="4">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">299.77</InnerR>
-          <OuterR desc="Outer radius" unit="mm">302.5</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-552.96</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-542.96</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="5">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">284.3</InnerR>
-          <OuterR desc="Outer radius" unit="mm">287.03</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">950.4</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">960.4</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="6">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">287.03</InnerR>
-          <OuterR desc="Outer radius" unit="mm">290.67</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">950.4</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">990.16</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="7">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">290.67</InnerR>
-          <OuterR desc="Outer radius" unit="mm">296.13</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">980.16</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">990.16</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="8">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">296.13</InnerR>
-          <OuterR desc="Outer radius" unit="mm">299.77</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">980.16</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1019.92</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="9">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">299.77</InnerR>
-          <OuterR desc="Outer radius" unit="mm">302.5</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1009.92</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1019.92</ForwardZ>
-        </EndplateLayer>
-      </Endplate>
-      <Endplate id="11">
-        <EndplateLayer id="0">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">302.5</InnerR>
-          <OuterR desc="Outer radius" unit="mm">305.23</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-552.96</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-542.96</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="1">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">305.23</InnerR>
-          <OuterR desc="Outer radius" unit="mm">308.87</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-568.62</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-542.96</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="2">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">308.87</InnerR>
-          <OuterR desc="Outer radius" unit="mm">314.33</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-568.62</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-558.62</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="3">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">314.33</InnerR>
-          <OuterR desc="Outer radius" unit="mm">317.97</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-580.3</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-558.62</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="4">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">317.97</InnerR>
-          <OuterR desc="Outer radius" unit="mm">320.7</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-580.3</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-570.3</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="5">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">302.5</InnerR>
-          <OuterR desc="Outer radius" unit="mm">305.23</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1009.92</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1019.92</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="6">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">305.23</InnerR>
-          <OuterR desc="Outer radius" unit="mm">308.87</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1009.92</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1049.69</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="7">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">308.87</InnerR>
-          <OuterR desc="Outer radius" unit="mm">314.33</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1039.69</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1049.69</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="8">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">314.33</InnerR>
-          <OuterR desc="Outer radius" unit="mm">317.97</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1039.69</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1079.45</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="9">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">317.97</InnerR>
-          <OuterR desc="Outer radius" unit="mm">320.7</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1069.45</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1079.45</ForwardZ>
-        </EndplateLayer>
-      </Endplate>
-      <Endplate id="12">
-        <EndplateLayer id="0">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">320.7</InnerR>
-          <OuterR desc="Outer radius" unit="mm">323.43</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-580.3</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-570.3</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="1">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">323.43</InnerR>
-          <OuterR desc="Outer radius" unit="mm">327.07</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-582.07</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-570.3</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="2">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">327.07</InnerR>
-          <OuterR desc="Outer radius" unit="mm">332.53</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-582.07</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-572.07</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="3">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">332.53</InnerR>
-          <OuterR desc="Outer radius" unit="mm">336.17</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-583.84</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-572.07</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="4">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">336.17</InnerR>
-          <OuterR desc="Outer radius" unit="mm">338.9</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-583.84</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-573.84</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="5">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">320.7</InnerR>
-          <OuterR desc="Outer radius" unit="mm">323.43</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1069.45</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1079.45</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="6">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">323.43</InnerR>
-          <OuterR desc="Outer radius" unit="mm">327.07</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1069.45</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1109.22</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="7">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">327.07</InnerR>
-          <OuterR desc="Outer radius" unit="mm">332.53</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1099.22</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1109.22</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="8">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">332.53</InnerR>
-          <OuterR desc="Outer radius" unit="mm">336.17</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1099.22</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1138.98</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="9">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">336.17</InnerR>
-          <OuterR desc="Outer radius" unit="mm">338.9</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1128.98</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1138.98</ForwardZ>
-        </EndplateLayer>
-      </Endplate>
-      <Endplate id="13">
-        <EndplateLayer id="0">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">338.9</InnerR>
-          <OuterR desc="Outer radius" unit="mm">341.63</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-583.84</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-573.84</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="1">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">341.63</InnerR>
-          <OuterR desc="Outer radius" unit="mm">345.27</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-585.6</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-573.84</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="2">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">345.27</InnerR>
-          <OuterR desc="Outer radius" unit="mm">350.58</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-585.6</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-575.6</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="3">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">350.58</InnerR>
-          <OuterR desc="Outer radius" unit="mm">354.02</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-587.28</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-575.6</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="4">
-          <Name>BackwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">354.02</InnerR>
-          <OuterR desc="Outer radius" unit="mm">356.6</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-587.28</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">-577.28</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="5">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">338.9</InnerR>
-          <OuterR desc="Outer radius" unit="mm">341.63</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1128.98</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1138.98</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="6">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">341.63</InnerR>
-          <OuterR desc="Outer radius" unit="mm">345.27</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1128.98</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1168.75</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="7">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">345.27</InnerR>
-          <OuterR desc="Outer radius" unit="mm">350.58</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1158.75</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1168.75</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="8">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">350.58</InnerR>
-          <OuterR desc="Outer radius" unit="mm">354.02</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1158.75</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1196.88</ForwardZ>
-        </EndplateLayer>
-        <EndplateLayer id="9">
-          <Name>ForwardEndplate</Name>
-          <InnerR desc="Inner radius" unit="mm">354.02</InnerR>
-          <OuterR desc="Outer radius" unit="mm">356.6</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">1186.88</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">1196.88</ForwardZ>
-        </EndplateLayer>
-      </Endplate>
       <Endplate id="14">
         <EndplateLayer id="0">
           <Name>BackwardEndplate</Name>
@@ -3223,52 +2688,52 @@
     <InnerWalls desc="Definition of the Inner Wall" >
       <InnerWall id="0" desc="Definition of Al Wall 0.1 mm t">
         <Name>Shield</Name>
-        <InnerR desc="Inner radius" unit="mm">242.9</InnerR>
-        <OuterR desc="Outer radius" unit="mm">243.0</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">-443.0</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">818.41</ForwardZ>
+        <InnerR desc="Inner radius" unit="mm">356.5</InnerR>
+        <OuterR desc="Outer radius" unit="mm">356.6</OuterR>
+        <BackwardZ desc="z position at backward endplate" unit="mm">-578.28</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1187.88</ForwardZ>
       </InnerWall>
       <InnerWall id="1" desc="Definition of CFRP 0.46 mm t">
         <Name>MiddleWall</Name>
-        <InnerR desc="Inner radius" unit="mm">242.39</InnerR>
-        <OuterR desc="Outer radius" unit="mm">242.85</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">-443.0</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">818.41</ForwardZ>
+        <InnerR desc="Inner radius" unit="mm">355.99</InnerR>
+        <OuterR desc="Outer radius" unit="mm">356.45</OuterR>
+        <BackwardZ desc="z position at backward endplate" unit="mm">-578.28</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1187.88</ForwardZ>
       </InnerWall>
       <InnerWall id="2">
         <Name>InnerBackwardWall</Name>
-        <InnerR desc="Inner radius" unit="mm">240.0</InnerR>
-        <OuterR desc="Outer radius" unit="mm">242.24</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">-443.0</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">-428.0</ForwardZ>
+        <InnerR desc="Inner radius" unit="mm">353.6</InnerR>
+        <OuterR desc="Outer radius" unit="mm">355.84</OuterR>
+        <BackwardZ desc="z position at backward endplate" unit="mm">-578.28</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">-563.28</ForwardZ>
       </InnerWall>
       <InnerWall id="3">
         <Name>OuterBackwardWall</Name>
-        <InnerR desc="Inner radius" unit="mm">240.0</InnerR>
-        <OuterR desc="Outer radius" unit="mm">243.0</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">-452.0</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">-443.0</ForwardZ>
+        <InnerR desc="Inner radius" unit="mm">353.6</InnerR>
+        <OuterR desc="Outer radius" unit="mm">356.6</OuterR>
+        <BackwardZ desc="z position at backward endplate" unit="mm">-587.28</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">-578.28</ForwardZ>
       </InnerWall>
       <InnerWall id="4">
         <Name>InnerForwardWall</Name>
-        <InnerR desc="Inner radius" unit="mm">240</InnerR>
-        <OuterR desc="Outer radius" unit="mm">242.24</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">803.41</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">818.41</ForwardZ>
+        <InnerR desc="Inner radius" unit="mm">353.6</InnerR>
+        <OuterR desc="Outer radius" unit="mm">355.84</OuterR>
+        <BackwardZ desc="z position at backward endplate" unit="mm">1172.88</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1187.88</ForwardZ>
       </InnerWall>
       <InnerWall id="5">
         <Name>OuterForwardWall</Name>
-        <InnerR desc="Inner radius" unit="mm">240</InnerR>
-        <OuterR desc="Outer radius" unit="mm">243.0</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">818.41</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">827.41</ForwardZ>
+        <InnerR desc="Inner radius" unit="mm">353.6</InnerR>
+        <OuterR desc="Outer radius" unit="mm">356.6</OuterR>
+        <BackwardZ desc="z position at backward endplate" unit="mm">1187.88</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1196.88</ForwardZ>
       </InnerWall>
       <InnerWall id="6" desc="Definition of glue 0.05 mm t">
         <Name>MiddleGlue</Name>
-        <InnerR desc="Inner radius" unit="mm">242.85</InnerR>
-        <OuterR desc="Outer radius" unit="mm">242.9</OuterR>
-        <BackwardZ desc="z position at backward endplate" unit="mm">-443.0</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">818.41</ForwardZ>
+        <InnerR desc="Inner radius" unit="mm">356.45</InnerR>
+        <OuterR desc="Outer radius" unit="mm">356.5</OuterR>
+        <BackwardZ desc="z position at backward endplate" unit="mm">-578.28</BackwardZ>
+        <ForwardZ desc="z position at forward endplate" unit="mm">1187.88</ForwardZ>
       </InnerWall>
     </InnerWalls>
 
@@ -3285,7 +2750,7 @@
         <InnerR desc="Inner radius" unit="mm">1120.6</InnerR>
         <OuterR desc="Outer radius" unit="mm">1126.065</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">-703</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">1569.41</ForwardZ>-->
+        <ForwardZ desc="z position at forward endplate" unit="mm">1569.41</ForwardZ>
       </OuterWall>
       <OuterWall id="2">
         <Name>InnerBackwardWall</Name>
@@ -3320,12 +2785,12 @@
     <SenseWire name="SenseWire">
       <Diameter desc="Diameter of sense wire" unit="mm">0.030</Diameter>
       <Tension desc="Tension of sense wire (unit in cm intentionally since gW unit is missing)" unit="cm">50.0</Tension>
-      <Number desc="The total number of sense wires">13056</Number>
+      <Number desc="The total number of sense wires">12096</Number>
       <SpaceResol desc="Nominal space resolution" unit="cm">0.0130</SpaceResol>
     </SenseWire>
     <FieldWire name="FieldWire">
       <Diameter desc="Diameter of field wire" unit="mm">0.126</Diameter>
-      <Number desc="The total number of field wires">38400</Number>
+      <Number desc="The total number of field wires">35520</Number>
     </FieldWire>
     <FeedThrough name="FeedThrough">
       <Length desc="Length of feedthrough" unit="mm">15</Length>

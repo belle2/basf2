@@ -545,7 +545,7 @@ class TauToMuMuMu(BaseSkim):
 
     **Output particle lists**:
 
-    *``mu+:tau_3mu_goodtrack``
+    * ``mu+:tau_3mu_goodtrack``
 
     **Criteria**:
 

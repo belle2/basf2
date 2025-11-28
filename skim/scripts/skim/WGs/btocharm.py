@@ -1609,11 +1609,11 @@ class BtoDstpipi_D0pi_Kpi(BaseSkim):
 
 
 @fancy_skim_header
-class BtoDst0pipi_D0pi0_Kpi(BaseSkim):
+class antiB0toDstar0pipi_Kpi(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{-}\\to anti-D^{*0} (\\to \\bar{D}^{0} (\\to K^+ \\pi^-) \\pi^0) \\pi^+ \\pi^-`,
+    * :math:`B^{-}\\to anti-D^{*0} (\\to \\bar{D}^{0} (\\to K^+ \\pi^-) \\pi^0/gamma) \\pi^+ \\pi^-`,
 
     Cuts applied:
 
@@ -1637,10 +1637,16 @@ class BtoDst0pipi_D0pi0_Kpi(BaseSkim):
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.22 and -0.3 < deltaE < 0.2"
+        Dstar0Cuts = 'massDifference(0) < 0.16'
 
-        ma.reconstructDecay("B0:Dst0pipi_D0pi0_Kpi -> anti-D*0:D0_Kpi pi+:GoodTrack pi-:GoodTrack", Bcuts, path=path)
+        ma.reconstructDecay("B0:antiB0toDstar0pipi_D0pi0_Kpi -> anti-D*0:D0pi0_Kpi pi+:GoodTrack pi-:GoodTrack", Bcuts, path=path)
+        ma.reconstructDecay("D*0:antiB0toDstar0pipi_D0gamma -> D0:Kpi gamma:loose", Dstar0Cuts, path=path)
+        ma.reconstructDecay(
+            "B0:antiB0toDstar0pipi_D0gamma_Kpi -> anti-D*0:antiB0toDstar0pipi_D0gamma pi+:GoodTrack pi-:GoodTrack",
+            Bcuts,
+            path=path)
 
-        return ["B-:Dst0pipi_D0pi0_Kpi"]
+        return ["B0:antiB0toDstar0pipi_D0pi0_Kpi", "B0:antiB0toDstar0pipi_D0gamma_Kpi"]
 
 
 @fancy_skim_header

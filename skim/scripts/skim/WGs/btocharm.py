@@ -1632,6 +1632,7 @@ class antiB0toDstar0pipi_Kpi(BaseSkim):
     def load_standard_lists(self, path):
         loadKForBtoHadrons(path=path),
         loadPiForBtoHadrons(path=path),
+        loadStdPi0ForBToHadrons(path=path),
         loadStdD0_Kpi(path=path),
         loadStdDstar0_D0pi0_Kpi(path=path),
 

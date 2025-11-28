@@ -1613,16 +1613,16 @@ class antiB0toDstar0pipi_Kpi(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{-}\\to \\overline{D}{}^{*0} (\\to \\bar{D}^{0} (\\to K^+ \\pi^-) \\pi^0/\\gamma) \\pi^+ \\pi^-`,
+    * :math:`B^{0}\\to \\overline{D}{}^{*0} (\\to \\bar{D}^{0} (\\to K^+ \\pi^-) \\pi^0/\\gamma) \\pi^+ \\pi^-`,
 
     Cuts applied:
 
-    * ``5.23 < Mbc``
+    * ``Mbc > 5.23``
     * ``-0.3 < deltaE < 0.2``
 
     """
     __authors__ = ["Xiaodong Shi"]
-    __description__ = ""
+    __description__ = "For B0 to anti-Dstar0pi+pi- study"
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 

@@ -550,8 +550,8 @@ class TauToMuMuMu(BaseSkim):
     **Criteria**:
 
     * ``No. good tracks < 7``
-    * :math:`1.3 < M < 2.2` GeV
-    * :math:`-1.0 < \\Delta E < 0.5` GeV
+    * ``1.3 < M < 2.2 GeV``
+    * ``-1.0 < deltaE < 0.5 GeV``
     """
     __authors__ = ["Junewoo PARK"]
     __description__ = "Skim for Tau 3mu decays."

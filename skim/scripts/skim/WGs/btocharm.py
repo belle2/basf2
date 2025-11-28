@@ -45,7 +45,7 @@ from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
 
-__liaison__ = "Yi Zhang <yi.zhang2@desy.de>"
+__liaison__ = "Shuping Lin <shuping.lin@pd.infn.it>"
 _VALIDATION_SAMPLE = "mdst16.root"
 
 
@@ -1577,7 +1577,7 @@ class BtoDstpipi_D0pi_Kpi(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{-}\\to D^{*+} (\\to D^0 (\\to K^+ \\pi^-) \\pi^+) \\pi^- \\pi^-`,
+    * :math:`B^{-}\\to D^{*+} (\\to \\bar{D}^{0} (\\to K^+ \\pi^-) \\pi^+) \\pi^- \\pi^-`,
 
     Cuts applied:
 
@@ -1606,6 +1606,49 @@ class BtoDstpipi_D0pi_Kpi(BaseSkim):
         ma.reconstructDecay("B-:Dsthpipi_D0pi_Kpi -> D*+:D0_Kpi pi-:GoodTrack pi-:GoodTrack", Bcuts, path=path)
 
         return ["B-:Dsthpipi_D0pi_Kpi"]
+
+
+@fancy_skim_header
+class antiB0toDstar0pipi_Kpi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to \\overline{D}{}^{*0} (\\to \\bar{D}^{0} (\\to K^+ \\pi^-) \\pi^0/\\gamma) \\pi^+ \\pi^-`,
+
+    Cuts applied:
+
+    * ``Mbc > 5.23``
+    * ``-0.3 < deltaE < 0.2``
+
+    """
+    __authors__ = ["Xiaodong Shi"]
+    __description__ = "For B0 to anti-Dstar0pi+pi- study"
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        loadKForBtoHadrons(path=path),
+        loadPiForBtoHadrons(path=path),
+        stdPhotons('loose', path=path)
+        loadStdPi0ForBToHadrons(path=path),
+        loadStdD0_Kpi(path=path),
+        loadStdDstar0_D0pi0_Kpi(path=path),
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.23 and -0.3 < deltaE < 0.2"
+        Dstar0Cuts = 'massDifference(0) < 0.16'
+
+        ma.reconstructDecay("B0:antiB0toDstar0pipi_D0pi0_Kpi -> anti-D*0:D0_Kpi pi+:GoodTrack pi-:GoodTrack", Bcuts, path=path)
+        ma.reconstructDecay("D*0:antiB0toDstar0pipi_D0gamma -> D0:Kpi gamma:loose", Dstar0Cuts, path=path)
+        ma.reconstructDecay(
+            "B0:antiB0toDstar0pipi_D0gamma_Kpi -> anti-D*0:antiB0toDstar0pipi_D0gamma pi+:GoodTrack pi-:GoodTrack",
+            Bcuts,
+            path=path)
+
+        return ["B0:antiB0toDstar0pipi_D0pi0_Kpi", "B0:antiB0toDstar0pipi_D0gamma_Kpi"]
 
 
 @fancy_skim_header

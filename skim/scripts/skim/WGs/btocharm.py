@@ -1640,7 +1640,7 @@ class antiB0toDstar0pipi_Kpi(BaseSkim):
         Bcuts = "Mbc > 5.22 and -0.3 < deltaE < 0.2"
         Dstar0Cuts = 'massDifference(0) < 0.16'
 
-        ma.reconstructDecay("B0:antiB0toDstar0pipi_D0pi0_Kpi -> anti-D*0:D0pi0_Kpi pi+:GoodTrack pi-:GoodTrack", Bcuts, path=path)
+        ma.reconstructDecay("B0:antiB0toDstar0pipi_D0pi0_Kpi -> anti-D*0:D0_Kpi pi+:GoodTrack pi-:GoodTrack", Bcuts, path=path)
         ma.reconstructDecay("D*0:antiB0toDstar0pipi_D0gamma -> D0:Kpi gamma:loose", Dstar0Cuts, path=path)
         ma.reconstructDecay(
             "B0:antiB0toDstar0pipi_D0gamma_Kpi -> anti-D*0:antiB0toDstar0pipi_D0gamma pi+:GoodTrack pi-:GoodTrack",

@@ -1,0 +1,42 @@
+# EventType: 1210030200
+# Descriptor: [B+ -> phi [-> K+ K-] K*+ [-> K_L0 pi+]]
+# NickName: Bu_phiKstar_K+K-KL0pi+
+# Documentation: None
+# Tested: Yes
+# PhysicsWG: TDCPV
+# Responsible: Noah Brenny
+# Email: nbrenny@iastate.edu
+# Cuts: None
+# Date: 20250827
+
+
+Alias phisig phi
+Alias K*+sig K*+
+Alias K*-sig K*-
+
+Decay Upsilon(4S)
+0.5  B+  B-sig      VSS;
+0.5  B+sig  B-      VSS;
+Enddecay
+
+Decay B+sig
+1.000    phisig K*+sig    SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
+Enddecay
+
+Decay B-sig
+1.000    phisig K*-sig    SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
+Enddecay
+
+Decay phisig
+1.0     K+      K-     PHOTOS VSS;
+Enddecay
+
+Decay K*+sig
+1.0   K_L0       pi+   VSS;
+Enddecay
+
+Decay K*-sig
+1.0   K_L0       pi-   VSS;
+Enddecay
+
+End

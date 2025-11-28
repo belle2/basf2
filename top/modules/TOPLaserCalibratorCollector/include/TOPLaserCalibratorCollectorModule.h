@@ -37,7 +37,7 @@ namespace Belle2 {
     void prepare() override;
 
     /**
-    Main mathod, called for each event.
+    Main method, called for each event.
     Applies an advances selection of the double calpulse,
     aligns the time of all the topDigits to the reference calpulse
     and saves a tree that is then passed to the calibrator class.

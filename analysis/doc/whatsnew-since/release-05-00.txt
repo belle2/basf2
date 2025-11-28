@@ -14,13 +14,13 @@ Variables
 * Variable ``TagVmcLBoost`` renamed to :b2:var:`mcTagVLBoost` and variable ``TagVmcOBoost`` renamed to :b2:var:`mcTagVOBoost`
 * Variable ``mcDeltaL`` renamed to :b2:var:`mcDeltaBoost` as it represents mc-truth version of :b2:var:`DeltaBoost` variable
 * Added variables to get track information of V0 daughters from TrackFitResult in V0 objects:
-  :b2:var:`v0DaughterNCDCHits`, :b2:var:`v0DaughterNSVDHits`, :b2:var:`v0DaughterNPXDHits`, :b2:var:`v0DaughterNVXDHits`,
-  :b2:var:`v0DaughterFirstSVDLayer`, :b2:var:`v0DaughterFirstPXDLayer`, :b2:var:`v0DaughterFirstCDCLayer`, :b2:var:`v0DaughterLastCDCLayer`,
-  :b2:var:`v0DaughterPValue`,
-  :b2:var:`v0DaughterD0`, :b2:var:`v0DaughterPhi0`, :b2:var:`v0DaughterOmega`, :b2:var:`v0DaughterZ0`, :b2:var:`v0DaughterTanLambda`,
-  :b2:var:`v0DaughterD0Error`, :b2:var:`v0DaughterPhi0Error`, :b2:var:`v0DaughterOmegaError`, :b2:var:`v0DaughterZ0Error`, :b2:var:`v0DaughterTanLambdaError`,
+  ``v0DaughterNCDCHits``, ``v0DaughterNSVDHits``, ``v0DaughterNPXDHits``, ``v0DaughterNVXDHits``,
+  ``v0DaughterFirstSVDLayer``, ``v0DaughterFirstPXDLayer``, ``v0DaughterFirstCDCLayer``, ``v0DaughterLastCDCLayer``,
+  ``v0DaughterPValue``,
+  ``v0DaughterD0``, ``v0DaughterPhi0``, ``v0DaughterOmega``, ``v0DaughterZ0``, ``v0DaughterTanLambda``,
+  ``v0DaughterD0Error``, ``v0DaughterPhi0Error``, ``v0DaughterOmegaError``, ``v0DaughterZ0Error``, ``v0DaughterTanLambdaError``,
   :b2:var:`v0DaughterD0PullWithTrueVertexAsPivot`, :b2:var:`v0DaughterPhi0PullWithTrueVertexAsPivot`, :b2:var:`v0DaughterOmegaPullWithTrueVertexAsPivot`, :b2:var:`v0DaughterZ0PullWithTrueVertexAsPivot`, :b2:var:`v0DaughterTanLambdaPullWithTrueVertexAsPivot`,
-  :b2:var:`v0DaughterD0PullWithOriginAsPivot`, :b2:var:`v0DaughterPhi0PullWithOriginAsPivot`, :b2:var:`v0DaughterOmegaPullWithOriginAsPivot`, :b2:var:`v0DaughterZ0PullWithOriginAsPivot`, :b2:var:`v0DaughterTanLambdaPullWithOriginAsPivot`,
+  ``v0DaughterD0PullWithOriginAsPivot``, ``v0DaughterPhi0PullWithOriginAsPivot``, ``v0DaughterOmegaPullWithOriginAsPivot``, ``v0DaughterZ0PullWithOriginAsPivot``, ``v0DaughterTanLambdaPullWithOriginAsPivot``,
   :b2:var:`v0DaughterTau`, :b2:var:`v0DaughterCov` in a new variable group ``V0Daughter``.
   These variables can also be used for the V0s from reconstructDecay, but the information are taken from the TrackFitResult of daughters.
 * Added new generated event kinematics variables :b2:var:`genMissingMass2OfEvent`,  :b2:var:`genMissingEnergyOfEventCMS`,

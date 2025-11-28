@@ -351,8 +351,7 @@ def add_postfilter_reconstruction(path,
     if reconstruct_cdst == 'rawFormat':
         add_dedx_modules(
             path,
-            components=components,
-            enableDebugOutput=True
+            components=components
         )
         if pruneTracks:
             add_prune_tracks(
@@ -448,7 +447,7 @@ def add_cosmics_reconstruction(
     if posttracking:
         if reconstruct_cdst:
             add_special_vxd_modules(path, components=components)
-            add_dedx_modules(path, components=components, enableDebugOutput=True)
+            add_dedx_modules(path, components=components)
             add_prune_tracks(path, components=components)
 
         else:
@@ -904,7 +903,7 @@ def add_ext_module(path, components=None):
         path.add_module('Ext')
 
 
-def add_dedx_modules(path, components=None, for_cdst_analysis=False, enableDebugOutput=False):
+def add_dedx_modules(path, components=None, for_cdst_analysis=False):
     """
     Add the dE/dX reconstruction modules to the path.
 
@@ -916,10 +915,10 @@ def add_dedx_modules(path, components=None, for_cdst_analysis=False, enableDebug
     # CDC dE/dx PID
     if components is None or 'CDC' in components:
         if for_cdst_analysis:
-            path.add_module('CDCDedxPIDCreator', enableDebugOutput=True)
+            path.add_module('CDCDedxPIDCreator')
         else:
             path.add_module('CDCDedxHitSaver')
-            path.add_module('CDCDedxPIDCreator', enableDebugOutput=enableDebugOutput)
+            path.add_module('CDCDedxPIDCreator')
     # VXD dE/dx PID
     # only run this if the SVD is enabled - PXD is disabled by default
     if components is None or 'SVD' in components:

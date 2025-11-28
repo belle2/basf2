@@ -136,7 +136,7 @@ This is done inside the FEI steering script.
 
 Note that when running on Belle converted data or MC you will need to use the ``B2BII`` and ``B2BII_MC`` database tags, respectively.
 
-If you have trouble finding the correct analysis tag, please ask a question at `B2Questions <https://questions.belle2.org>`_ and/or send a mail to frank.meier@belle2.org,
+If you have trouble finding the correct analysis tag, please ask a question at `B2Questions <https://questions.belle2.org>`_ and/or send a mail to vidya.sagar.vobbilisetti@belle2.org,
 
 Sphinx documentation
 ####################
@@ -229,7 +229,7 @@ Most stages consists of:
 *    Apply a multivariate classification method
 *    Apply more Cuts
 
- The FEI will reconstruct these 7 stages during the training phase, since the stages depend on one another, you have to run ``basf2`` multiple (7) times on the same data to train all the necessary multivariate classifiers.
+The FEI will reconstruct these 7 stages during the training phase, since the stages depend on one another, you have to run ``basf2`` multiple (7) times on the same data to train all the necessary multivariate classifiers.
 
 Since running a 7-phase training by hand would be very difficult there is a tool which implements the training (including distributing the jobs on a cluster, merging the training files, running the training, ...)
 
@@ -451,12 +451,12 @@ The :doc:`b2luigi:index` configuration of the FEI grid workflow is handled by th
 * ``gbasf2_install_directory``: Absolute path to the directory where you have installed the :doc:`gbasf2:index` tool. Please correct it to a meaningful path according to the installation you have performed previously.
 * ``gbasf2_input_dslist``: Absolute path to the dataset list of all datasets you would like to process. It is assumed by the ``FEIAnalysisSummaryTask``, that each line corresponds to a dataset sample, such that for each line in this dataset list one instance (file-based case) or multiple instances (event-based case) of ``FEIAnalysisTask`` are spawned. An example of a possible dataset list is given below:
 
-    .. code-block:: bash
+  .. code-block:: bash
 
-        /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014078/s00/e0000/4S/r00000/mixed/mdst
-        /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014079/s00/e0000/4S/r00000/mixed/mdst
-        /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014088/s00/e0000/4S/r00000/charged/mdst
-        /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014089/s00/e0000/4S/r00000/charged/mdst
+    /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014078/s00/e0000/4S/r00000/mixed/mdst
+    /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014079/s00/e0000/4S/r00000/mixed/mdst
+    /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014088/s00/e0000/4S/r00000/charged/mdst
+    /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014089/s00/e0000/4S/r00000/charged/mdst
 
 * ``gbasf2_project_name_prefix``: Prefix for the :doc:`gbasf2:index` tasks which will be created by :doc:`b2luigi:index` in the FEI grid workflow. Please try to keep it short and it is recommended to you to attach a date to it. Within the workflow, an additional string ``_Part{index}`` will be added for each enumerated instance of ``FEIAnalysisTask``, and :doc:`b2luigi:index` adds an additional hash number to the project name to keep it unique.
 * ``gbasf2_release``: The release to be used on the grid. Please make a choice here depending on what is supported by the :doc:`gbasf2:index` release you have checked out. You don't have to worry about the case, that the developments in `basf2` specific to running FEI training on the grid might not be contained in the official release. The FEI training steering file is adapted such, that it can run both with a development and an official release.
@@ -703,9 +703,9 @@ especially when running on the grid.
 * To test the workflow on the grid in a fast way, you can construct the dataset list provided to the ``gbasf2_input_dslist`` setting using individual file paths as content instead of dataset paths, and setting the maximum number of events to a small value, e.g. 10. There are several possibilities to do that. You can either set it directly for the ``FEIAnalysisTask`` using the ``max_event`` task parameter (see :doc:`b2luigi documentation <b2luigi:index>`), or extend the setting ``gbasf2_basf2opt`` from ``"-l ERROR"`` to ``"-l ERROR -n 10"``. The training itself will then have no meaning, since too few events for training, but you would be able to test the technical setup with that approach.
 * To run instances of ``FEIAnalysisTask`` efficiently on the grid, you should prepare yourself well for that.
 
-    * You should make sure, that the datasets you would like to process are available on as many sites as possible. In that way you would also increase the number of potential computing nodes on the grid that you can use.
-    * In case you would like to perform a central FEI training, which will then be provided centrally and used by several analysis groups, it would be good, that your jobs will get an increased priority on the grid to allow you to get the resources you need faster.
-    * If you do not trust some computing sites, or you trust only a few, you can make use of ``gbasf2_additional_params`` setting of :doc:`b2luigi:index` to ban some sites (``"--banned_site <SITE-1,SITE-2>"``) or specify sites you would like to run on (``"--site <SITE-1,SITE-2>"``). The value of the parameter ``gbasf2_additional_params`` will then be passed to :doc:`gbasf2:index`.
+  * You should make sure, that the datasets you would like to process are available on as many sites as possible. In that way you would also increase the number of potential computing nodes on the grid that you can use.
+  * In case you would like to perform a central FEI training, which will then be provided centrally and used by several analysis groups, it would be good, that your jobs will get an increased priority on the grid to allow you to get the resources you need faster.
+  * If you do not trust some computing sites, or you trust only a few, you can make use of ``gbasf2_additional_params`` setting of :doc:`b2luigi:index` to ban some sites (``"--banned_site <SITE-1,SITE-2>"``) or specify sites you would like to run on (``"--site <SITE-1,SITE-2>"``). The value of the parameter ``gbasf2_additional_params`` will then be passed to :doc:`gbasf2:index`.
 
 * Although the workflow is (more or less) automatic, you are strongly advised to have a look at its progress regularly and check, whether everything is done correctly and do not run it as a black box.
 * Please expect, that problems may arise during the process, because of (possible temporarily) bad state of sites, failing downloads due to connection problems etc. Individual jobs may need to be resubmitted several times until they are finished successfully.
@@ -764,17 +764,15 @@ There are two problems with this:
 * You don't have access to the old Belle condition database outside of KEK
 * You don't have access to the NeuroBayes installation outside of KEK
 
-To access the old Belle database anyway you have to forward to server to you local machine and set the environment variables correctly
+To access the old Belle database anyway you have to forward the server to your local machine and set the environment variables correctly
 
-    ``ssh -L 5432:can01kc.cc.kek.jp:5432 tkeck@cw02.cc.kek.jp``
+.. code-block:: bash
 
-    ``export BELLE2_FILECATALOG=NONE``
-
-    ``export USE_GRAND_REPROCESS_DATA=1``
-
-    ``export PGUSER=g0db``
-
-    ``export BELLE_POSTGRES_SERVER=localhost``
+  ssh -L 5432:can01kc.cc.kek.jp:5432 tkeck@cw02.cc.kek.jp
+  export BELLE2_FILECATALOG=NONE
+  export USE_GRAND_REPROCESS_DATA=1
+  export PGUSER=g0db
+  export BELLE_POSTGRES_SERVER=localhost
 
 Depending on how you use b2bii, the BELLE_POSTGRES_SERVER will be overridden by b2bii. Hence you have to enforce that localhost is used anyway.
 You can ensure this by adding:

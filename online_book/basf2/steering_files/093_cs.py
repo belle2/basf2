@@ -36,8 +36,8 @@ ma.reconstructDecay(
 ma.buildRestOfEvent(target_list_name="B0", path=main)
 cleanMask = (
     "cleanMask",
-    "nCDCHits > 0 and useCMSFrame(p)<=3.2",
-    "p >= 0.05 and useCMSFrame(p)<=3.2",
+    "pt > 0.1 and thetaInCDCAcceptance and abs(dz) < 3.0 and dr < 0.5",
+    "E > 0.05 and thetaInCDCAcceptance and abs(clusterTiming) < 200",
 )
 ma.appendROEMasks(list_name="B0", mask_tuples=[cleanMask], path=main)
 

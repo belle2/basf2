@@ -28,7 +28,7 @@ namespace Belle2 {
    */
 
   /**
-   * Provide more detailled timing info for FullSim module
+   * Provide more detailed timing info for FullSim module
    *
    * This module extends the FullSim to provide more detailed timing showing
    * how much time was spent in which sub detector.
@@ -80,7 +80,7 @@ namespace Belle2 {
     double m_eventTime {0};
     /** number of events with m_eventTime>0 */
     unsigned int m_eventCount {0};
-    /** remember whether we aleady initialized everything */
+    /** remember whether we already initialized everything */
     bool m_isInitialized {false};
   };
 }

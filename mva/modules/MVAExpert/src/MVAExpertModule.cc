@@ -28,7 +28,7 @@ REG_MODULE(MVAExpert);
 
 MVAExpertModule::MVAExpertModule() : Module()
 {
-  setDescription("Adds an ExtraInfo to the Particle objects in given ParticleLists which is calcuated by an expert defined by a weightfile.");
+  setDescription("Adds an ExtraInfo to the Particle objects in given ParticleLists which is calculated by an expert defined by a weightfile.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   std::vector<std::string> empty;

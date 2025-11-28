@@ -61,7 +61,7 @@ namespace Belle2 {
     virtual void terminate() override;
 
     /**
-     * Module funcions to define histograms
+     * Module functions to define histograms
      */
     virtual void defineHisto() override;
 
@@ -83,10 +83,10 @@ namespace Belle2 {
     float m_calibrationPulseThreshold1 =
       600; /**< minimum pulse height for the first calibration pulse to be qualified as calibration signals */
     float m_calibrationPulseThreshold2 =
-      450; /**< minimum pulse height for the secon calibration pulse to be qualified as calibration signals */
+      450; /**< minimum pulse height for the second calibration pulse to be qualified as calibration signals */
     float m_calibrationPulseInterval = 21.85; /**< nominal DeltaT value (time interval of two calibration signals) in a unit of ns */
     float m_calibrationPulseIntervalRange = 2; /**< tolerable shift of DeltaT from its nominal before calibration in a unit of ns */
-    float m_timePerWin = 23.581939; /**< time interval of onw window (=64 samples) [ns]  */
+    float m_timePerWin = 23.581939; /**< time interval of own window (=64 samples) [ns]  */
     int m_globalRefSlotNum =
       1;/**< slot number used to define "global" reference timing (a single reference timing in an event for all the channels of all the 16 modules.) slot01-asic0 (pixelId=1-8) is default. */
     int m_globalRefAsicNum =
@@ -111,7 +111,7 @@ namespace Belle2 {
     bool m_isReallyJunk[c_NMaxHitEvent] = {0}; /**< true if pedestal jump or other invalid hit is detected, not saved */
     float m_time[c_NMaxHitEvent] = {0}; /**< time in a unit of ns, defined as m_rawTime+64*m_winNum. Converted into ns unit with assumption of uniform sampling interval. 0 ns at the start of the window number 0. When waveform analysis is enabled, discontinuous window numbers are considered. */
     float m_rawTime[c_NMaxHitEvent] = {0}; /**< "m_rawTime" [0-256] in new TOPDigit (update at May, 2017) in sample(time bin) unit */
-    float m_refTime[c_NMaxHitEvent] = {0}; /**< time of the first calibration signal as reference timing. Chosen from a list of m_time for each asic. When waveform analysis is enabled, double pulse is required. Otherwise, hit timing in the calibration channel of a correcponding asic is used. */
+    float m_refTime[c_NMaxHitEvent] = {0}; /**< time of the first calibration signal as reference timing. Chosen from a list of m_time for each asic. When waveform analysis is enabled, double pulse is required. Otherwise, hit timing in the calibration channel of a corresponding asic is used. */
     float m_globalRefTime =
       0; /**< refTime of the specific asic, which is specified by parameters "globalRefSlotNum" and "globalRefAsicNum" */
     unsigned short m_sample[c_NMaxHitEvent] = {0}; /**< (m_rawTDC+m_winNum*64)%256, for time base correction */
@@ -144,7 +144,7 @@ namespace Belle2 {
     /**
      * Find reference timing. In case that the waveform analysis is enabled,
      * try to find a pair of calibration pulses and timing of the first one
-     * is used as reference timing for the correcponding asic.
+     * is used as reference timing for the corresponding asic.
      * If not enabled, feature extracted timing for a calibration channel is used.
      */
     void getReferenceTiming();

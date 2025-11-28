@@ -53,6 +53,7 @@ namespace Belle2::SVD {
   /** Text fixture for SVD variables. */
   class SVDVariableTest : public ::testing::Test {
   public:
+
     /** Set up test environment */
     void SetUp() override
     {
@@ -86,6 +87,7 @@ namespace Belle2::SVD {
       m_recoTracks.registerRelationTo(m_recoHitInformations);
       m_recoHitInformations.registerRelationTo(m_svdClusters);
       m_svdClusters.registerRelationTo(m_recoTracks);
+      DataStore::Instance().setInitializeActive(false);
 
       m_trackFitResults.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.1, 0.0, 0.0),
                                   TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
@@ -102,6 +104,12 @@ namespace Belle2::SVD {
       m_tracks[0]->addRelationTo(m_recoTracks[0]);
       m_svdClusters.appendNew(dummySVDCluster);
       m_recoTracks[0]->addSVDHit(m_svdClusters[0], 0);
+    }
+
+    /** Clear test environment */
+    void TearDown() override
+    {
+      DataStore::Instance().reset();
     }
 
     StoreArray<Particle> m_particles; /**< StoreArray for Particle objects */

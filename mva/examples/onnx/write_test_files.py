@@ -23,7 +23,7 @@ class Model(nn.Module):
 
     def __init__(self):
         """
-        Intialize with a single Linear layer
+        Initialize with a single Linear layer
         """
         super().__init__()
 

@@ -51,7 +51,7 @@ namespace Belle2 {
 
     /**
      * Returns polynomial coefficients of time walk calibration curve
-     * @return coefficents of polynomial [ns]
+     * @return coefficients of polynomial [ns]
      */
     const std::vector<double>& getTimeWalkParams() const {return m_timeWalkParams;}
 

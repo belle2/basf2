@@ -1820,3 +1820,41 @@ class antiB0toDsDsst_Kpi0(BaseSkim):
             BsigList.append("anti-B0:antiB0toDsDsst_Kpi0" + str(chID))
 
         return BsigList
+
+
+@fancy_skim_header
+class antiB0toDstpipi0_Kpi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`\\bar{B^{0}}\\to D^{*+} (\\to D^0 (\\to K^+ \\pi^-) \\pi^+) \\pi^- \\pi^0`,
+
+    Cuts applied:
+
+    * ``Mbc > 5.22``
+    * ``-0.3 < deltaE < 0.2``
+
+    """
+    __authors__ = ["Agrim Aggarwal"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        loadKForBtoHadrons(path=path),
+        loadPiForBtoHadrons(path=path),
+        loadStdD0_Kpi(path=path),
+        loadStdDstarPlus_D0pi_Kpi(path=path),
+        loadSlowPi(path=path)
+        stdPi0s("eff40_May2020", path=path)
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.22 and -0.3 < deltaE < 0.2"
+
+        ma.reconstructDecay("anti-B0:antiB0toDstpipi0_Kpi -> D*+:D0_Kpi pi-:GoodTrack pi0:eff40_May2020",
+                            Bcuts,
+                            path=path)
+        return ["anti-B0:antiB0toDstpipi0_Kpi"]

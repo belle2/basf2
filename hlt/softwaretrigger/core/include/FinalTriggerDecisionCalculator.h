@@ -28,7 +28,6 @@ namespace Belle2 {
        * for new data. A warning will be issued.
        */
       static bool getFinalTriggerDecision(const SoftwareTriggerResult& result, bool forgetTotalResult = false);
-
       /**
        * Calculate the "total_result" for a given base identifier by looping through all results with the given
        * base identifier. The result of the function then depends on the setting of accept overrides

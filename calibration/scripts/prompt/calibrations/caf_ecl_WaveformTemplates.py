@@ -33,7 +33,7 @@ settings = CalibrationSettings(
         "nFilesCollector": 50,
         "nParallelAlgos": 1
     },
-    produced_payloads=["ECLWaveformTemplate"])
+    produced_payloads=["ECLDigitWaveformParameters"])
 
 
 # --------------------------------------------------------------
@@ -130,6 +130,8 @@ def get_calibrations(input_data, **kwargs):
     algo_C4 = Belle2.ECL.eclWaveformTemplateCalibrationC4Algorithm()
     algo_C4.setFirstCellID(1)
     algo_C4.setLastCellID(8736)
+    algo_C4.setBatchSize(batchsize)
+    algo_C4.setNumBatches(batches)
 
     # ..The calibration
     cal_ecl_Wave_C4 = Calibration("ecl_Wave_C4",

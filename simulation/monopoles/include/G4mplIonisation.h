@@ -43,7 +43,7 @@ namespace Belle2 {
       virtual ~G4mplIonisation();
 
       /**
-       * Dummy to check if the proccess is is applicable to a certain particle.
+       * Dummy to check if the process is is applicable to a certain particle.
        * @param p Particle definition reference
        * @return true
        */
@@ -69,7 +69,7 @@ namespace Belle2 {
     protected:
 
       /**G4VEnergyLossProcess::InitialiseEnergyLossProcess() implementation.
-       * Initialise ionisation proccess, if not it has not been initialised yet.
+       * Initialise ionisation process, if not it has not been initialised yet.
        *
        * Concrete ionisation model is called inside this function.
        * @param p Particle definition pointer, the monopole in our case

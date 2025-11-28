@@ -18,6 +18,7 @@ from tabulate import tabulate
 
 _RegisteredSkims = [
     # --- Flagged skims ---
+    ("70000000", "flagged", "f_custom"),  # flag for running custom skim combinations
     ("71000100", "flagged", "f_SLME_p1"),
     ("71000200", "flagged", "f_SLME_p2"),
     ("71000300", "flagged", "f_SLME_p3"),
@@ -146,11 +147,13 @@ _RegisteredSkims = [
     ("14121403", "btocharm", "BtoDsDsst_Kpi_KK"),
     ("14123300", "btocharm", "antiB0toDpipi0_Kpipi"),
     ("14163400", "btocharm", "antiB0toDsDsst_Kpi0"),
+    ("14121404", "btocharm", "antiB0toDstpipi0_Kpi"),
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),
     ("15420100", "quarkonium", "BottomoniumEtabExclusive"),
     ("15440100", "quarkonium", "BottomoniumUpsilon"),
     ("15460400", "quarkonium", "InclusiveUpsilon"),
+    ("15460600", "quarkonium", "InclusiveUpsilonLoose"),
     # ("16460100", "quarkonium", "ISRpipicc"), Subset of 16460200, deleted.
     ("16460200", "quarkonium", "CharmoniumPsi"),
 
@@ -214,6 +217,7 @@ _RegisteredSkims = [
     ("18570600", "taupair", "TauGeneric"),
     ("18570700", "taupair", "TauThrust"),
     ("18570800", "taupair", "TauKshort"),
+    ("18570900", "taupair", "TauToMuMuMu"),
     ("18530100", "lowMulti", "TwoTrackLeptonsForLuminosity"),
     ("18520500", "lowMulti", "LowMassTwoTrack"),
     ("18530200", "lowMulti", "SingleTagPseudoScalar"),
@@ -235,6 +239,10 @@ _RegisteredSkims = [
     ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),
     ("19120400", "btocharmless", "BtoRhopRhom"),
     ("19140500", "btocharmless", "BtoEtapKstp"),
+    ("19140400", "btocharmless", "BtoEtapOmega"),
+    ("19140200", "btocharmless", "BtoEtapRhop"),
+    ("19140300", "btocharmless", "BtoEtaOmega"),
+    ("19140100", "btocharmless", "BtoEtaRhop"),
 ]
 """
 A list of all official registered skims and their skim code and parent module. Entries

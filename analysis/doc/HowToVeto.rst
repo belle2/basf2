@@ -32,7 +32,8 @@ The analysis of some specific signal side decay with a veto has the following st
 Here we use the worked example of a veto for background photons from a :math:`\pi^0\to\gamma\gamma` decay but the procedure generalises.
 
 #. Reconstruct signal decay candidates
-    * this includes filling of final-state particle lists, making combinations, performing vertex fits, applying cuts, etc...
+
+   * this includes filling of final-state particle lists, making combinations, performing vertex fits, applying cuts, etc...
 #. Create a :doc:`RestOfEvent` object for each signal candidate
 #. Create new `basf2.Path` to be executed for each :doc:`RestOfEvent` object in the event (one for each signal candidate)
 
@@ -49,7 +50,8 @@ Here we use the worked example of a veto for background photons from a :math:`\p
 #. Select the best :math:`\pi^0` candidate
 #. Write the probability (or likelihood value) calculated in step iv for the best :math:`\pi^0` candidate as extraInfo to the current :math:`B^0` candidate
 #. Continue with signal side reconstruction
-    * continuum suppression, flavour tagging, tag vertex, etc...
+
+   * continuum suppression, flavour tagging, tag vertex, etc...
 #. Fill flat `ntuple for offline analysis <v2nt>`.
 
 All analysis actions coloured in blue are executed once per event and all coloured in green are executed once per each :doc:`RestOfEvent` object in the event. The analysis actions coloured with green together construct a veto.

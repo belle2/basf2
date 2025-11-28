@@ -160,21 +160,33 @@ std::tuple<bool, std::optional<double>> DQMHistAnalysisEventT0TriggerJitterModul
   TF1 gauss1("gauss1", "gaus", -100, 100);
   TF1 gauss2("gauss2", "gaus", -100, 100);
 
+  // Sometimes the first Gaussian isn't the main one, messing up the DQM plots
+  // Thus, chose the Gaussian with the larger relative contribution to be the main one
+  const double mainFrac     = par[1] > 0.5 ? par[1] : (1 - par[1]);
+  const double mainMean     = par[1] > 0.5 ? par[2] : par[4];
+  const double mainSigma    = par[1] > 0.5 ? par[3] : par[5];
+  const double miniMean     = par[1] > 0.5 ? par[4] : par[2];
+  const double miniSigma    = par[1] > 0.5 ? par[5] : par[3];
+  const double mainMeanErr  = par[1] > 0.5 ? parErr[2] : parErr[4];
+  const double mainSigmaErr = par[1] > 0.5 ? parErr[3] : parErr[5];
+  const double miniMeanErr  = par[1] > 0.5 ? parErr[4] : parErr[2];
+  const double miniSigmaErr = par[1] > 0.5 ? parErr[5] : parErr[3];
+
   gauss1.SetLineColor(kBlue);
   gauss1.SetLineStyle(kDashed);
-  gauss1.SetParameters(par[0]*par[1], par[2], par[3]);
+  gauss1.SetParameters(par[0]*mainFrac, mainMean, mainSigma);
 
   gauss2.SetLineColor(kRed);
   gauss2.SetLineStyle(kDashed);
-  gauss2.SetParameters(par[0] * (1 - par[1]), par[4], par[5]);
+  gauss2.SetParameters(par[0] * (1 - mainFrac), miniMean, miniSigma);
 
   m_monObj->setVariable(Form("fit_%s", tag.Data()), 1);
   m_monObj->setVariable(Form("N_%s", tag.Data()), nValidEntries, TMath::Sqrt(nValidEntries));
-  m_monObj->setVariable(Form("f_%s", tag.Data()), par[1], parErr[1]);
-  m_monObj->setVariable(Form("mean1_%s", tag.Data()), par[2], parErr[2]);
-  m_monObj->setVariable(Form("sigma1_%s", tag.Data()), par[3], parErr[3]);
-  m_monObj->setVariable(Form("mean2_%s", tag.Data()), par[4], parErr[4]);
-  m_monObj->setVariable(Form("sigma2_%s", tag.Data()), par[5], parErr[5]);
+  m_monObj->setVariable(Form("f_%s", tag.Data()), mainFrac, parErr[1]);
+  m_monObj->setVariable(Form("mean1_%s", tag.Data()), mainMean, mainMeanErr);
+  m_monObj->setVariable(Form("sigma1_%s", tag.Data()), mainSigma, mainSigmaErr);
+  m_monObj->setVariable(Form("mean2_%s", tag.Data()), miniMean, miniMeanErr);
+  m_monObj->setVariable(Form("sigma2_%s", tag.Data()), miniSigma, miniSigmaErr);
 
   //SETUP gSTYLE - all plots
   gStyle->SetOptFit(1111);
@@ -186,7 +198,7 @@ std::tuple<bool, std::optional<double>> DQMHistAnalysisEventT0TriggerJitterModul
 
   if (retrieveMeanT0) {
     // return mean of the core Gaussian
-    return {true, par[2]};
+    return {true, mainMean};
   }
   return {true, {}};
 

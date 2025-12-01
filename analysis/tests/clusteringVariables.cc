@@ -760,7 +760,6 @@ namespace {
     }
 
     // grab variables
-    const Manager::Var* vClusterP = Manager::Instance().getVariable("klmClusterMomentum");
     const Manager::Var* vClNTrack = Manager::Instance().getVariable("nKLMClusterTrackMatches");
 
     // calculate the total KLM momentum from the KLong list --> VM

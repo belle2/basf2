@@ -40,6 +40,7 @@ namespace Belle2 {
         c_Reverse = 256,
         c_Alias = 512,
         c_BadADCOrTOT = 1024, // A CDCWireHit with bad ADC or TOT should not be used in pattern recognition.
+        c_BoardWithBadADC = 2048 // Ignore ADC/TOT info in filters (detected in each event)
       };
 
       /// Type for an ordered combination of the status flags of cells in the cellular automata
@@ -55,7 +56,9 @@ namespace Belle2 {
                                                       ECellFlag::c_Background +
                                                       ECellFlag::c_Reverse +
                                                       ECellFlag::c_Alias +
-                                                      ECellFlag::c_BadADCOrTOT);
+                                                      ECellFlag::c_BadADCOrTOT +
+                                                      ECellFlag::c_BoardWithBadADC
+                                                     );
 
       /// Flags that are reset at the start of each run of the cellular automaton
       static const ECellFlags c_TemporaryFlags = ECellFlags(ECellFlag::c_Assigned +
@@ -274,6 +277,27 @@ namespace Belle2 {
       {
         return hasAnyFlags(ECellFlag::c_BadADCOrTOT);
       }
+
+
+      ///
+      void setBoardWithBadADCFlag(bool setTo = true)
+      {
+        setFlags<ECellFlag::c_BoardWithBadADC>(setTo);
+      }
+
+      /// Resets the bad ADC or TOT flag to false.
+      void unsetBoardWithBadADCFlag()
+      {
+        setFlags<ECellFlag::c_BoardWithBadADC>(false);
+      }
+
+      /// Gets the current state of the bad ADC or TOT flag.
+      bool hasBoardWithBadADCFlag() const
+      {
+        return hasAnyFlags(ECellFlag::c_BoardWithBadADC);
+      }
+
+
 
       /// Sets the priority flag to the given value. Default value true.
       void setPriorityFlag(bool setTo = true)

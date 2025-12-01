@@ -286,17 +286,38 @@ def ksSelector(
             V0_thr = 0
             Lambda_thr = 0
             if output_label_name == 'standard':
-                B2INFO('KsSelector: Standard Cut is applied on '+outputListName+'.')
-                V0_thr = 0.92
-                Lambda_thr = 0.11
+                if (identifier_Ks == "Ks_LGBM_V0Selector_MC16" and identifier_vLambda == "Ks_LGBM_LambdaVeto_MC16"):
+                    V0_thr = 0.92
+                    Lambda_thr = 0.11
+                    B2INFO('KsSelector: Standard Cut for MC16 is applied on '+outputListName+'.')
+                elif (identifier_Ks == "Ks_LGBM_V0Selector" and identifier_vLambda == "Ks_LGBM_LambdaVeto"):
+                    V0_thr = 0.9
+                    Lambda_thr = 0.19
+                    B2INFO('KsSelector: Standard Cut for MC15 is applied on '+outputListName+'.')
+                else:
+                    B2INFO('KsSelector: none standard payload found, no cut applied.')
             elif output_label_name == 'tight':
-                B2INFO('KsSelector: Tight Cut is applied on '+outputListName+'.')
-                V0_thr = 0.98
-                Lambda_thr = 0.31
+                if (identifier_Ks == "Ks_LGBM_V0Selector_MC16" and identifier_vLambda == "Ks_LGBM_LambdaVeto_MC16"):
+                    B2INFO('KsSelector: Tight Cut for MC16 is applied on '+outputListName+'.')
+                    V0_thr = 0.98
+                    Lambda_thr = 0.31
+                elif (identifier_Ks == "Ks_LGBM_V0Selector" and identifier_vLambda == "Ks_LGBM_LambdaVeto"):
+                    B2INFO('KsSelector: Tight Cut for MC15 is applied on '+outputListName+'.')
+                    V0_thr = 0.97
+                    Lambda_thr = 0.45
+                else:
+                    B2INFO('KsSelector: none standard payload found, no cut applied.')
             elif output_label_name == 'loose':
-                B2INFO('KsSelector: Loose Cut is applied on '+outputListName+'.')
-                V0_thr = 0.43
-                Lambda_thr = 0.02
+                if (identifier_Ks == "Ks_LGBM_V0Selector_MC16" and identifier_vLambda == "Ks_LGBM_LambdaVeto_MC16"):
+                    B2INFO('KsSelector: Loose Cut for MC 16 is applied on '+outputListName+'.')
+                    V0_thr = 0.43
+                    Lambda_thr = 0.02
+                elif (identifier_Ks == "Ks_LGBM_V0Selector" and identifier_vLambda == "Ks_LGBM_LambdaVeto"):
+                    B2INFO('KsSelector: Loose Cut for MC 15 is applied on '+outputListName+'.')
+                    V0_thr = 0.51
+                    Lambda_thr = 0.02
+                else:
+                    B2INFO('KsSelector: none standard payload found, no cut applied.')
             B2INFO('KsSelector: Threshold is (' + str(V0_thr) + ', ' + str(Lambda_thr) + ')')
             cut_string = 'extraInfo('+extraInfoName_V0Selector+')>'+str(V0_thr) + \
                 ' and extraInfo('+extraInfoName_LambdaVeto+')>'+str(Lambda_thr)

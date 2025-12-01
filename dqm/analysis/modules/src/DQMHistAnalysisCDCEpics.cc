@@ -467,7 +467,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
           int rmdr = int(abs(ilay - 2) % 6);
           if ((rmdr == 0 && ilay > 2) || ilay == 55) {
             isl++;
-            el[isl] = new TEllipse(0, 0, lbinEdges[ilay], lbinEdges[ilay]);
+            el[isl] = new TEllipse(0, 0, m_lbinEdges[ilay], m_lbinEdges[ilay]);
             el[isl]->SetLineColor(kRed);
             el[isl]->SetLineWidth(2);
             el[isl]->SetFillStyle(0);
@@ -555,12 +555,12 @@ void DQMHistAnalysisCDCEpicsModule::fillEffiTH2(TH2F* hist, TH2F* attached, TH2F
   double firstR = cdcgeo.senseWireR(0);
   double secondR = cdcgeo.senseWireR(1);
   binEdges[0] = firstR - (secondR - firstR) / 2;
-  lbinEdges[0] = firstR;
+  m_lbinEdges[0] = firstR;
   for (int lay = 1; lay < nSLayers; lay++) {
     double prevR = cdcgeo.senseWireR(lay - 1);
     double currentR = cdcgeo.senseWireR(lay);
     binEdges[lay] = (prevR + currentR) / 2;
-    lbinEdges[lay] = currentR;
+    m_lbinEdges[lay] = currentR;
   }
   double lastR = cdcgeo.senseWireR(nSLayers - 1);
   double secondLastR = cdcgeo.senseWireR(nSLayers - 2);

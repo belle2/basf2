@@ -38,8 +38,16 @@ void CDCHitsRemover::apply(const std::vector<CDCWireHit>& wireHits)
   // Selector
   auto selector = [wireHits](const RelationsObject * p) -> bool {
     int idx = p->getArrayIndex();
-    bool bg = wireHits[idx]->hasBackgroundFlag();
-    return not bg;
+    auto it = std::ranges::find(wireHits, idx, &CDCWireHit::getStoreIHit);
+    if (it != wireHits.end())
+    {
+      const CDCWireHit& hit = *it;
+      return not hit->hasBackgroundFlag();
+    } else
+    {
+      B2WARNING("Un-matched CDCHit -- CDCWireHit");
+      return false;
+    }
   };
 
   m_cdc_selector.select(selector);

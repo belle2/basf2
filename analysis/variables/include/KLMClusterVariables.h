@@ -68,18 +68,6 @@ namespace Belle2 {
     double klmClusterLayers(const Particle* particle);
 
     /**
-     * Returns KLMCluster's energy (assuming the K_L0 hypothesis).
-     * @param[in] particle Input particle.
-     */
-    double klmClusterEnergy(const Particle* particle);
-
-    /**
-     * Returns KLMCluster's momentum magnitude. N.B.: klmClusterMomentum is proportional to klmClusterLayers.
-     * @param[in] particle Input particle.
-     */
-    double klmClusterMomentum(const Particle* particle);
-
-    /**
      * Returns 1 if the associated KLMCluster is in BKLM.
      * @param[in] particle Input particle.
      */

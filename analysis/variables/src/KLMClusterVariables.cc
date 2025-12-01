@@ -141,24 +141,6 @@ namespace Belle2::Variable {
     return cluster->getLayers();
   }
 
-  double klmClusterEnergy(const Particle* particle)
-  {
-    const KLMCluster* cluster = particle->getKLMCluster();
-    if (!cluster) {
-      return Const::doubleNaN;
-    }
-    return cluster->getEnergy();
-  }
-
-  double klmClusterMomentum(const Particle* particle)
-  {
-    const KLMCluster* cluster = particle->getKLMCluster();
-    if (!cluster) {
-      return Const::doubleNaN;
-    }
-    return cluster->getMomentumMag();
-  }
-
   double klmClusterIsBKLM(const Particle* particle)
   {
     const KLMCluster* cluster = particle->getKLMCluster();
@@ -355,24 +337,6 @@ Returns the :math:`z` position of the associated KLMCluster.
                     "Returns the number of the innermost KLM layer with a 2-dimensional hit of the associated KLMCluster.");
   REGISTER_VARIABLE("klmClusterLayers", klmClusterLayers,
                     "Returns the number of KLM layers with 2-dimensional hits of the associated KLMCluster.");
-  REGISTER_VARIABLE("klmClusterEnergy", klmClusterEnergy, R"DOC(
-Returns the energy of the associated KLMCluster. 
-
-.. warning::
-  This variable returns an approximation of the energy: it uses :b2:var:`klmClusterMomentum` as momentum and the hypothesis that the KLMCluster is originated by a :math:`K_{L}^0` 
-  (:math:`E_{\text{KLM}} = \sqrt{M_{K^0_L}^2 + p_{\text{KLM}}^2}`, where :math:`E_{\text{KLM}}` is this variable, :math:`M_{K^0_L}` is the :math:`K^0_L` mass and :math:`p_{\text{KLM}}` is :b2:var:`klmClusterMomentum`).
-  It should be used with caution, and may not be physically meaningful, especially for :math:`n` candidates.
-
-)DOC","GeV");
-  REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum, R"DOC(
-Returns the momentum magnitude of the associated KLMCluster. 
-
-.. warning::
-  This variable returns an approximation of the momentum, since it is proportional to :b2:var:`klmClusterLayers` 
-  (:math:`p_{\text{KLM}} = 0.215 \cdot N_{\text{layers}}`, where :math:`p_{\text{KLM}}` is this variable and :math:`N_{\text{layers}}` is :b2:var:`klmClusterLayers`).
-  It should be used with caution, and may not be physically meaningful.
-
-)DOC","GeV/c");
   REGISTER_VARIABLE("klmClusterIsBKLM", klmClusterIsBKLM,
                     "Returns 1 if the associated KLMCluster is in barrel KLM.");
   REGISTER_VARIABLE("klmClusterIsEKLM", klmClusterIsEKLM,

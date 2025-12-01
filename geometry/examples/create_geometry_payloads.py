@@ -68,7 +68,9 @@ early3.add_module(
         -1],
     excludedComponents=[
         'PXD',
-        'ServiceGapsMaterial'],
+        'ServiceGapsMaterial',
+        'Cryostat',
+        'BeamPipe'],
     additionalComponents=[
         'PXD-earlyPhase3',
         'ServiceGapsMaterial-earlyPhase3',
@@ -126,8 +128,9 @@ for filename in os.scandir('localdb/'):
     if not match:
         continue
     if match and match.groups() not in keep:
-        print(f"Removing {filename.name}: not needed")
-        os.unlink(filename.path)
+        pass
+        # print(f"Removing {filename.name}: not needed")
+        # os.unlink(filename.path)
     else:
         print(f"Normalizing {filename.name} as '{match.group(1)}'")
         subprocess.call(["b2file-normalize", "-i", "-n", match.group(1), filename.path])

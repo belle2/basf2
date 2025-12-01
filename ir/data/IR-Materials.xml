@@ -407,6 +407,15 @@
     </Components>
   </Material>
 
+  <!-- C10H22 paraffin (decane) -->
+  <Material name="IR-Paraffin">
+    <state>Liquid</state>
+    <density unit="g/cm3">0.730</density>
+    <Components>
+      <Material fraction="0.844">C</Material>
+      <Material fraction="0.156">H</Material>
+    </Components>
+  </Material>
 
 </Materials>
 

@@ -151,7 +151,7 @@
       <sec name="r18" unit="mm">11.2</sec>
       <sec name="r19" unit="mm">11.2</sec>
 
-      <Material>Paraffin</Material>
+      <Material>IR-Paraffin</Material>
     </Lv2Paraf1>
 
     <Lv2Paraf2>
@@ -165,7 +165,7 @@
       <sec name="R1" unit="mm">13.1</sec>
       <sec name="R2" unit="mm">13.1</sec>
 
-      <Material>Paraffin</Material>
+      <Material>IR-Paraffin</Material>
     </Lv2Paraf2>
 
     <Lv2Vacuum>
@@ -429,6 +429,19 @@
     <Lv1TaHERUp>
       <N desc="Number of planes">12</N>
 
+      <sec name="L0" unit="cm">-30.0</sec>
+      <sec name="L1" unit="cm">-48.2</sec>
+      <sec name="L2" unit="cm">-48.2</sec>
+      <sec name="L3" unit="cm">-50.0</sec>
+      <sec name="L4" unit="cm">-50.0</sec>
+      <sec name="L5" unit="cm">-55.7</sec>
+      <sec name="L6" unit="cm">-55.7</sec>
+      <sec name="L7" unit="cm">-59.4</sec>
+      <sec name="L8" unit="cm">-59.4</sec>
+      <sec name="L9" unit="cm">-62.5</sec>
+      <sec name="L10" unit="cm">-62.5</sec>
+      <sec name="L11" unit="cm">-100.0</sec>
+
       <sec name="R0" unit="cm">1.7</sec>
       <sec name="R1" unit="cm">1.7</sec>
       <sec name="R2" unit="cm">1.0</sec>
@@ -442,19 +455,6 @@
       <sec name="R10" unit="cm">1.2</sec>
       <sec name="R11" unit="cm">1.2</sec>
 
-      <sec name="L0" unit="cm">30.0</sec>
-      <sec name="L1" unit="cm">48.2</sec>
-      <sec name="L2" unit="cm">48.2</sec>
-      <sec name="L3" unit="cm">50.0</sec>
-      <sec name="L4" unit="cm">50.0</sec>
-      <sec name="L5" unit="cm">55.7</sec>
-      <sec name="L6" unit="cm">55.7</sec>
-      <sec name="L7" unit="cm">59.4</sec>
-      <sec name="L8" unit="cm">59.4</sec>
-      <sec name="L9" unit="cm">62.5</sec>
-      <sec name="L10" unit="cm">62.5</sec>
-      <sec name="L11" unit="cm">100.0</sec>
-
       <sec name="A1" unit="rad">0.0415</sec>
 
       <Material>Cu</Material>
@@ -463,12 +463,12 @@
     <Lv1SUSHERUp>
       <N desc="Number of planes">6</N>
 
-      <sec name="Z0" unit="cm">54.5</sec>
-      <sec name="Z1" unit="cm">55.7</sec>
-      <sec name="Z2" unit="cm">55.7</sec>
-      <sec name="Z3" unit="cm">59.4</sec>
-      <sec name="Z4" unit="cm">59.4</sec>
-      <sec name="Z5" unit="cm">60.6</sec>
+      <sec name="Z0" unit="cm">-54.5</sec>
+      <sec name="Z1" unit="cm">-55.7</sec>
+      <sec name="Z2" unit="cm">-55.7</sec>
+      <sec name="Z3" unit="cm">-59.4</sec>
+      <sec name="Z4" unit="cm">-59.4</sec>
+      <sec name="Z5" unit="cm">-60.6</sec>
 
       <sec name="RI0" unit="cm">1.9</sec>
       <sec name="RI1" unit="cm">1.9</sec>
@@ -496,6 +496,19 @@
     <Lv1TaLERDwn>
       <N desc="Number of planes">12</N>
 
+      <sec name="L0" unit="cm">-30.0</sec>
+      <sec name="L1" unit="cm">-48.2</sec>
+      <sec name="L2" unit="cm">-48.2</sec>
+      <sec name="L3" unit="cm">-50.0</sec>
+      <sec name="L4" unit="cm">-50.0</sec>
+      <sec name="L5" unit="cm">-55.7</sec>
+      <sec name="L6" unit="cm">-55.7</sec>
+      <sec name="L7" unit="cm">-59.4</sec>
+      <sec name="L8" unit="cm">-59.4</sec>
+      <sec name="L9" unit="cm">-62.5</sec>
+      <sec name="L10" unit="cm">-62.5</sec>
+      <sec name="L11" unit="cm">-100.0</sec>
+
       <sec name="R0" unit="cm">1.7</sec>
       <sec name="R1" unit="cm">1.7</sec>
       <sec name="R2" unit="cm">1.0</sec>
@@ -509,19 +522,6 @@
       <sec name="R10" unit="cm">1.2</sec>
       <sec name="R11" unit="cm">1.2</sec>
 
-      <sec name="L0" unit="cm">30.0</sec>
-      <sec name="L1" unit="cm">48.2</sec>
-      <sec name="L2" unit="cm">48.2</sec>
-      <sec name="L3" unit="cm">50.0</sec>
-      <sec name="L4" unit="cm">50.0</sec>
-      <sec name="L5" unit="cm">55.7</sec>
-      <sec name="L6" unit="cm">55.7</sec>
-      <sec name="L7" unit="cm">59.4</sec>
-      <sec name="L8" unit="cm">59.4</sec>
-      <sec name="L9" unit="cm">62.5</sec>
-      <sec name="L10" unit="cm">62.5</sec>
-      <sec name="L11" unit="cm">100.0</sec>
-
       <sec name="A1" unit="rad">-0.0415</sec>
 
       <Material>Cu</Material>
@@ -530,12 +530,12 @@
     <Lv1SUSLERDwn>
       <N desc="Number of planes">6</N>
 
-      <sec name="Z0" unit="cm">54.5</sec>
-      <sec name="Z1" unit="cm">55.7</sec>
-      <sec name="Z2" unit="cm">55.7</sec>
-      <sec name="Z3" unit="cm">59.4</sec>
-      <sec name="Z4" unit="cm">59.4</sec>
-      <sec name="Z5" unit="cm">60.6</sec>
+      <sec name="Z0" unit="cm">-54.5</sec>
+      <sec name="Z1" unit="cm">-55.7</sec>
+      <sec name="Z2" unit="cm">-55.7</sec>
+      <sec name="Z3" unit="cm">-59.4</sec>
+      <sec name="Z4" unit="cm">-59.4</sec>
+      <sec name="Z5" unit="cm">-60.6</sec>
 
       <sec name="RI0" unit="cm">1.9</sec>
       <sec name="RI1" unit="cm">1.9</sec>

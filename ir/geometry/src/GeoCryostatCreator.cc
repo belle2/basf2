@@ -159,7 +159,8 @@ namespace Belle2 {
 
       map<string, CryostatElement> elements;
 
-      cout << endl << "!!!  Creating a Cryostat copy..." << endl << endl;
+      // debug
+      //cout << endl << "!!!  Creating a Cryostat copy..." << endl << endl;
 
       //--------------
       //-   Bounding shapes

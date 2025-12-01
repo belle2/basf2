@@ -709,6 +709,8 @@
       EstimationMethod=tripletFit
       MCRecoTracksStoreArrayName=MCRecoTracks
       MCStrictQualityEstimator=True
+      MaterialBudgetFactor=1.4500000476837158
+      MaxPt=0.009999999776482582
       SpacePointTrackCandsStoreArrayName=SPTrackCands
   74. BestVXDTrackCandidatesSelector
       NameSpacePointTrackCands=SPTrackCands
@@ -734,6 +736,8 @@
       spacePointsTCsStoreArrayName=SPTrackCands
       svdClustersName=
       svdHitsStoreArrayName=
+      vtxClustersName=
+      vtxHitsStoreArrayName=
   79. DAFRecoFitter CDCRecoTracks
       bklmHitsStoreArrayName=
       cdcHitsStoreArrayName=
@@ -748,6 +752,7 @@
       resortHits=False
       svdHitsStoreArrayName=
       trackFitType=2
+      vtxHitsStoreArrayName=
   80. CDCToSVDSeedCKF_backward
       advanceEqualFilter=all
       advanceEqualFilterParameters={}
@@ -832,6 +837,7 @@
       resortHits=False
       svdHitsStoreArrayName=
       trackFitType=2
+      vtxHitsStoreArrayName=
   82. CDCToSVDSeedCKF_forward
       advanceEqualFilter=all
       advanceEqualFilterParameters={}
@@ -905,6 +911,9 @@
   83. RelatedTracksCombiner
       CDCRecoTracksStoreArrayName=CDCRecoTracks
       VXDRecoTracksStoreArrayName=SVDRecoTracks
+      allowMultipleRelations=False
+      keepOnlyGoodQITracks=False
+      minRequiredQuality=0.0
       recoTracksStoreArrayName=SVDPlusCDCStandaloneRecoTracks
   84. ToCDCCKF
       exportAllTracks=False
@@ -987,6 +996,7 @@
       resortHits=False
       svdHitsStoreArrayName=
       trackFitType=0
+      vtxHitsStoreArrayName=
   93. TrackCreator
       beamAxis=[0.0, 0.0, 1.0]
       beamSpot=[0.0, 0.0, 0.0]
@@ -1272,6 +1282,7 @@
       MinCDCStereoHits=0
       MinPXDHits=0
       MinSVDHits=0
+      MinVTXHits=0
       MinimalNDF=5
       Neutrals=False
       RecoTracksStoreArrayName=MCRecoTracks
@@ -1288,6 +1299,7 @@
       UseReassignedHits=False
       UseSVDHits=True
       UseSecondCDCHits=False
+      UseVTXHits=False
       WhichParticles=[]
       discardAuxiliaryHits=False
       ignoreCDCLayers=[]
@@ -1302,6 +1314,7 @@
       UseOnlyAxialCDCHits=False
       UsePXDHits=False
       UseSVDHits=True
+      UseVTXHits=False
       mcRecoTracksStoreArrayName=MCRecoTracks
       prRecoTracksStoreArrayName=RecoTracks
       useFittedTracks=True
@@ -3612,6 +3625,8 @@
       EstimationMethod=tripletFit
       MCRecoTracksStoreArrayName=MCRecoTracks
       MCStrictQualityEstimator=True
+      MaterialBudgetFactor=1.4500000476837158
+      MaxPt=0.009999999776482582
       SpacePointTrackCandsStoreArrayName=SPTrackCands
   74. BestVXDTrackCandidatesSelector
       NameSpacePointTrackCands=SPTrackCands
@@ -3637,6 +3652,8 @@
       spacePointsTCsStoreArrayName=SPTrackCands
       svdClustersName=
       svdHitsStoreArrayName=
+      vtxClustersName=
+      vtxHitsStoreArrayName=
   79. DAFRecoFitter CDCRecoTracks
       bklmHitsStoreArrayName=
       cdcHitsStoreArrayName=
@@ -3651,6 +3668,7 @@
       resortHits=False
       svdHitsStoreArrayName=
       trackFitType=2
+      vtxHitsStoreArrayName=
   80. CDCToSVDSeedCKF_backward
       advanceEqualFilter=all
       advanceEqualFilterParameters={}
@@ -3735,6 +3753,7 @@
       resortHits=False
       svdHitsStoreArrayName=
       trackFitType=2
+      vtxHitsStoreArrayName=
   82. CDCToSVDSeedCKF_forward
       advanceEqualFilter=all
       advanceEqualFilterParameters={}
@@ -3808,6 +3827,9 @@
   83. RelatedTracksCombiner
       CDCRecoTracksStoreArrayName=CDCRecoTracks
       VXDRecoTracksStoreArrayName=SVDRecoTracks
+      allowMultipleRelations=False
+      keepOnlyGoodQITracks=False
+      minRequiredQuality=0.0
       recoTracksStoreArrayName=SVDPlusCDCStandaloneRecoTracks
   84. ToCDCCKF
       exportAllTracks=False
@@ -3890,6 +3912,7 @@
       resortHits=False
       svdHitsStoreArrayName=
       trackFitType=0
+      vtxHitsStoreArrayName=
   93. TrackCreator
       beamAxis=[0.0, 0.0, 1.0]
       beamSpot=[0.0, 0.0, 0.0]
@@ -4192,6 +4215,7 @@
             MinCDCStereoHits=0
             MinPXDHits=0
             MinSVDHits=0
+            MinVTXHits=0
             MinimalNDF=5
             Neutrals=False
             RecoTracksStoreArrayName=MCRecoTracks
@@ -4208,6 +4232,7 @@
             UseReassignedHits=False
             UseSVDHits=True
             UseSecondCDCHits=False
+            UseVTXHits=False
             WhichParticles=[]
             discardAuxiliaryHits=False
             ignoreCDCLayers=[]
@@ -4222,6 +4247,7 @@
             UseOnlyAxialCDCHits=False
             UsePXDHits=False
             UseSVDHits=True
+            UseVTXHits=False
             mcRecoTracksStoreArrayName=MCRecoTracks
             prRecoTracksStoreArrayName=RecoTracks
             useFittedTracks=True

@@ -199,6 +199,7 @@
       PXDDigitsName=
       SVDShaperDigitsName=
       TOPDigitsName=
+      VTXDigitsName=
       bkgInfoName=
       components=['CDC', 'TOP', 'ARICH', 'KLM']
   14. BGOverlayExecutor_TRGCDC
@@ -208,6 +209,7 @@
       PXDDigitsName=
       SVDShaperDigitsName=
       TOPDigitsName=
+      VTXDigitsName=
       bkgInfoName=
       components=['CDC']
   15. CDCTriggerTSF
@@ -493,6 +495,7 @@
       PXDDigitsName=
       SVDShaperDigitsName=
       TOPDigitsName=
+      VTXDigitsName=
       bkgInfoName=
       components=['SVD']
   33. SVDShaperDigitSorter
@@ -542,6 +545,7 @@
             PXDDigitsName=pxd_unfiltered_digits
             SVDShaperDigitsName=
             TOPDigitsName=
+            VTXDigitsName=
             bkgInfoName=
             components=['PXD']
         5. PXDDigitSorter
@@ -693,6 +697,8 @@
             EstimationMethod=tripletFit
             MCRecoTracksStoreArrayName=MCRecoTracks
             MCStrictQualityEstimator=True
+            MaterialBudgetFactor=1.4500000476837158
+            MaxPt=0.009999999776482582
             SpacePointTrackCandsStoreArrayName=SPTrackCands__ROI
         20. BestVXDTrackCandidatesSelector
             NameSpacePointTrackCands=SPTrackCands__ROI
@@ -718,6 +724,8 @@
             spacePointsTCsStoreArrayName=SPTrackCands__ROI
             svdClustersName=__ROIsvdClusters
             svdHitsStoreArrayName=__ROIsvdClusters
+            vtxClustersName=
+            vtxHitsStoreArrayName=
         25. SVD-only DAFRecoFitter
             bklmHitsStoreArrayName=
             cdcHitsStoreArrayName=
@@ -732,6 +740,7 @@
             resortHits=False
             svdHitsStoreArrayName=__ROIsvdClusters
             trackFitType=0
+            vtxHitsStoreArrayName=
         26. PXDROIFinder
             PXDInterceptListName=PXDIntercepts
             ROIFindingForDQM=False
@@ -789,6 +798,7 @@
             PXDDigitsName=PXDDigits
             SVDShaperDigitsName=
             TOPDigitsName=
+            VTXDigitsName=
             bkgInfoName=
             components=['PXD']
         5. PXDDigitSorter

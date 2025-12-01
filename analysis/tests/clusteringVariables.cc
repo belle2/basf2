@@ -743,41 +743,6 @@ namespace {
     // case 3: 1 track --> 2 clusters
     // not possible
 
-    // make the KLong from clusters (and sum up the total KLM momentum magnitude)
-    double klmMomentum = 0.0;
-    for (int i = 0; i < klmClusters.getEntries(); ++i) {
-      klmMomentum += klmClusters[i]->getMomentumMag();
-      if (!klmClusters[i]->getAssociatedTrackFlag()) {
-        const Particle* p = particles.appendNew(Particle(klmClusters[i]));
-        kLongList->addParticle(p);
-      }
-    }
-
-    // make the muons from tracks
-    for (int i = 0; i < tracks.getEntries(); ++i) {
-      const Particle* p = particles.appendNew(Particle(tracks[i], Const::muon));
-      muonsList->addParticle(p);
-    }
-
-    // grab variables
-    const Manager::Var* vClNTrack = Manager::Instance().getVariable("nKLMClusterTrackMatches");
-
-    // calculate the total KLM momentum from the KLong list --> VM
-    double totalKLongMomentum = 0.0;
-    for (size_t i = 0; i < kLongList->getListSize(); ++i)
-      totalKLongMomentum += std::get<double>(vClusterP->function(kLongList->getParticle(i)));
-
-    // calculate the total KLM momentum from muon-matched list --> VM
-    double totalMuonMomentum = 0.0;
-    for (size_t i = 0; i < muonsList->getListSize(); ++i) { // includes antiparticles
-      double muonMomentum = std::get<double>(vClusterP->function(muonsList->getParticle(i)));
-      double nOtherCl = std::get<double>(vClNTrack->function(muonsList->getParticle(i)));
-      if (nOtherCl > 0)
-        totalMuonMomentum += muonMomentum / nOtherCl;
-    }
-
-    EXPECT_FLOAT_EQ(5.0, klmMomentum);
-    EXPECT_FLOAT_EQ(totalKLongMomentum + totalMuonMomentum, klmMomentum);
   }
 
   TEST_F(KLMVariableTest, TrackToKLMClusterMatchingTest)

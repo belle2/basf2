@@ -157,6 +157,23 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   if (!hasDeltaPar(m_name_dir, m_histoTrackingWireEff))
     addDeltaPar(m_name_dir, m_histoTrackingWireEff, HistDelta::c_Events, m_minevt, 1);
 
+  //creating box for normal adc and tdc windows, the real position is updated at begin run
+  m_line_ladc = new TLine(0, m_minadc, 300, m_minadc);
+  m_line_ladc->SetLineColor(kRed);
+  m_line_ladc->SetLineWidth(2);
+
+  m_line_hadc = new TLine(0, m_maxadc, 300, m_maxadc);
+  m_line_hadc->SetLineColor(kRed);
+  m_line_hadc->SetLineWidth(2);
+
+  m_line_ltdc = new TLine(0, m_mintdc, 300, m_mintdc);
+  m_line_ltdc->SetLineColor(kRed);
+  m_line_ltdc->SetLineWidth(2);
+
+  m_line_htdc = new TLine(0, m_maxtdc, 300, m_maxtdc);
+  m_line_htdc->SetLineColor(kRed);
+  m_line_htdc->SetLineWidth(2);
+
   registerEpicsPV(m_name_pvpfx + "cdcboards_wadc", "adcboards");
   registerEpicsPV(m_name_pvpfx + "cdcboards_wtdc", "tdcboards");
 
@@ -186,22 +203,15 @@ void DQMHistAnalysisCDCEpicsModule::beginRun()
   if (std::isnan(m_phiwarn)) m_phiwarn = 0.05; //>%5 is warning
   if (std::isnan(m_phialarm)) m_phialarm = 0.15; //>%15 is warning
 
-  //creating box for normal adc and tdc windows
-  m_line_ladc = new TLine(0, m_minadc, 300, m_minadc);
-  m_line_ladc->SetLineColor(kRed);
-  m_line_ladc->SetLineWidth(2);
-
-  m_line_hadc = new TLine(0, m_maxadc, 300, m_maxadc);
-  m_line_hadc->SetLineColor(kRed);
-  m_line_hadc->SetLineWidth(2);
-
-  m_line_ltdc = new TLine(0, m_mintdc, 300, m_mintdc);
-  m_line_ltdc->SetLineColor(kRed);
-  m_line_ltdc->SetLineWidth(2);
-
-  m_line_htdc = new TLine(0, m_maxtdc, 300, m_maxtdc);
-  m_line_htdc->SetLineColor(kRed);
-  m_line_htdc->SetLineWidth(2);
+  // Update Line position from Epics limits
+  m_line_ladc->SetY1(m_minadc);
+  m_line_ladc->SetY2(m_minadc);
+  m_line_hadc->SetY1(m_maxadc);
+  m_line_hadc->SetY2(m_maxadc);
+  m_line_ltdc->SetY1(m_mintdc);
+  m_line_ltdc->SetY2(m_mintdc);
+  m_line_htdc->SetY1(m_maxtdc);
+  m_line_htdc->SetY2(m_maxtdc);
 
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: beginRun run called");
 }

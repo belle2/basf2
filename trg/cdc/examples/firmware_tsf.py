@@ -141,7 +141,7 @@ if save_outout:
     main.add_module('RootOutput', outputFileName='tsfout.root')
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

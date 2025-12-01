@@ -37,6 +37,6 @@ add_hlt_processing(main_path, store_array_debug_prescale=1, components=component
 add_raw_seqoutput(main_path, additionalObjects=["SoftwareTriggerResults", "SoftwareTriggerVariables", "ROIs"])
 
 basf2.print_path(main_path)
-basf2.process(main_path)
+basf2.process(main_path, calculateStatistics=True)
 
 print(basf2.statistics)

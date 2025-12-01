@@ -9,8 +9,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <pxd/dataobjects/PXDSimHit.h>
-#include <pxd/dataobjects/PXDInjectionBGTiming.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <framework/dataobjects/RelationElement.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -18,6 +16,9 @@
 #include <vector>
 
 namespace Belle2 {
+  class PXDSimHit;
+  class PXDInjectionBGTiming;
+
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
   namespace PXD {
 

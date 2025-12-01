@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# @cond SUPPRESS_DOXYGEN
-
 """
  Contains classes to read in the monitoring output
  and some simple plotting routines.
@@ -93,9 +91,11 @@ class Statistic:
         """ Returns the purity of the reconstructed candidates. """
         if self._nSig == 0:
             return 0.0
+        # \cond false positive doxygen warning
         if self.nTotal == 0:
             return 0.0
         return self._nSig / float(self.nTotal)
+        # \endcond
 
     @property
     def efficiency(self):
@@ -109,9 +109,11 @@ class Statistic:
     @property
     def purityError(self):
         """ Returns the uncertainty of the purity. """
+        # \cond false positive doxygen warning
         if self.nTotal == 0:
             return 0.0
         return self.calcStandardDeviation(self._nSig, self.nTotal)
+        # \endcond
 
     @property
     def efficiencyError(self):
@@ -142,7 +144,9 @@ class Statistic:
 
     def __add__(self, a):
         """ Adds two Statistics objects and returns a new object. """
+        # \cond false positive doxygen warning
         return Statistic(self.nTrueSig, self.nSig + a.nSig, self.nBg + a.nBg)
+        # \endcond
 
     def __radd__(self, a):
         """
@@ -151,7 +155,9 @@ class Statistic:
         """
         if a != 0:
             return NotImplemented
+        # \cond false positive doxygen warning
         return Statistic(self.nTrueSig, self.nSig, self.nBg)
+        # \endcond
 
 
 class MonitoringHist:
@@ -723,5 +729,3 @@ class MonitoringParticle:
             else:
                 nBg += 1
         return Statistic(nTrueSig, nSig, nBg)
-
-# @endcond

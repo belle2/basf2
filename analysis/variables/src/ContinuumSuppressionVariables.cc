@@ -258,7 +258,7 @@ namespace Belle2 {
 
         int coneNumber = 0;
         try {
-          coneNumber = Belle2::convertString<int>(arguments[0]);
+          coneNumber = convertString<int>(arguments[0]);
         } catch (std::invalid_argument&) {
           B2FATAL("The first argument of the CleoConeCS meta function must be an integer!");
         }
@@ -317,8 +317,8 @@ namespace Belle2 {
         double low = 0;
         double high = 0;
         try {
-          low  = Belle2::convertString<double>(arguments[1]);
-          high = Belle2::convertString<double>(arguments[2]);
+          low  = convertString<double>(arguments[1]);
+          high = convertString<double>(arguments[2]);
         } catch (std::invalid_argument&) {
           B2FATAL("Second and third argument of transformedNetworkOutput meta function must be doubles!");
         }

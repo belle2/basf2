@@ -35,9 +35,9 @@ if __name__ == '__main__':
     check_tags = ['all', 'gamma', 'Tracking']
     filename = basf2.find_file('framework/tests/test_b2help_recommendation_payload.json')
     # List available tags
-    call_command(f'b2help-recommendation -l {filename}')
+    call_command(f'b2help-recommendation -l {filename} -f rst')
     # Call the script for tags
     for tag in check_tags:
         call_command(f'b2help-recommendation -t {tag} -l {filename} -f rst')
     # Call convert to payload
-    call_command(f'b2help-recommendation -l {filename} -t {check_tags[1]} -c -p test')
+    call_command(f'b2help-recommendation -l {filename} -f rst -t {check_tags[1]} -c -p test')

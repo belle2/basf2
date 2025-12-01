@@ -12,7 +12,7 @@
 <header>
   <input>EvtGenSimRec.root</input>
   <output>EventT0Validation.root</output>
-  <contact>Christian Wessel (christian.wessel@desy.de)</contact>
+  <contact>Giacomo De Pietro (giacomo.pietro@kit.edu)</contact>
   <description>
   Check the EventT0 performance
   </description>
@@ -41,7 +41,6 @@ def run():
 
     print(path)
     basf2.process(path)
-    print(basf2.statistics)
 
 
 if __name__ == '__main__':

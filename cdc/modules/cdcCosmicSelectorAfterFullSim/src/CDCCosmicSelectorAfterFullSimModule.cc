@@ -11,8 +11,6 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 
-#include <iostream>
-
 using namespace std;
 using namespace Belle2;
 

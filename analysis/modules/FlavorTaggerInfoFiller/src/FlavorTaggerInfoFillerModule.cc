@@ -10,6 +10,7 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
+#include <analysis/dataobjects/FlavorTaggerInfoMap.h>
 #include <analysis/VariableManager/Manager.h>
 
 using namespace std;

@@ -86,7 +86,7 @@ def get_color(i, n):
     if n <= 6:
         return "rgbcmy"[i]
     else:
-        cmap = mpl.cm.get_cmap("jet")
+        cmap = mpl.colormaps["jet"]
         return cmap(i / (n - 1.))
 
 

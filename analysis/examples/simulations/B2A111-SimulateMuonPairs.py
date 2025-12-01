@@ -65,5 +65,4 @@ add_mdst_output(
 main.add_module('ProgressBar')
 
 # process events and print call statistics
-b2.process(main)
-print(b2.statistics)
+b2.process(main, calculateStatistics=True)

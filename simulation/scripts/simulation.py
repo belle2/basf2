@@ -158,7 +158,7 @@ def add_simulation(
 
     path.add_module('StatisticsSummary').set_name('Sum_PreSimulation')
 
-    # Check compoments.
+    # Check components.
     check_components(components)
 
     # background mixing or overlay input before process forking

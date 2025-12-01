@@ -51,7 +51,7 @@ Decay B-sig
 0.007570000   D_10sig   mu-  anti-nu_mu                      LLSW 0.71 -1.6 -0.5 2.9;
 0.003890000   D_0*0sig  mu-  anti-nu_mu                      LLSW 0.68 -0.2 0.3;
 0.004310000   D'_10sig  mu-  anti-nu_mu                      LLSW 0.68 -0.2 0.3;
-0.003730000   D_2*0sig  mu-  anti-nu_mu                      LLSW 0.71 -1.6 -0.5 2.9;sig
+0.003730000   D_2*0sig  mu-  anti-nu_mu                      LLSW 0.71 -1.6 -0.5 2.9;
 
 0.001000000   D*+sig  pi-  mu-  anti-nu_mu                    GOITY_ROBERTS;
 0.001000000   D+sig  pi-  mu-  anti-nu_mu                     GOITY_ROBERTS;

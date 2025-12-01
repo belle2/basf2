@@ -6,12 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef VXD_SENSITIVEDETECTORBASE_H
-#define VXD_SENSITIVEDETECTORBASE_H
-
-//If this is defined, we create a root file with all information necessary to
-//check functionality of the implementation
-//#define VXD_SENSITIVEDETECTOR_DEBUG
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <vxd/simulation/SensorTraversal.h>
@@ -22,6 +17,8 @@
 namespace Belle2 {
   /** Namespace to provide code needed by Vertex Detectors, PXD, SVD and VTX */
   namespace VXD {
+    class SensorInfoBase;
+
     /** Base class for Sensitive Detector implementation of PXD, SVD and VTX.
      *
      * This base class provides common access to sensor information (like
@@ -177,4 +174,3 @@ namespace Belle2 {
     };
   }
 } //Belle2 namespace
-#endif

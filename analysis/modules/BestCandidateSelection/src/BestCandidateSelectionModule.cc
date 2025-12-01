@@ -10,8 +10,6 @@
 
 #include <analysis/utility/ValueIndexPairSorting.h>
 
-#include <analysis/VariableManager/Utility.h>
-
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 #include <framework/logging/Logger.h>

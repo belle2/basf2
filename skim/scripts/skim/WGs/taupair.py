@@ -537,6 +537,68 @@ class TauThrust(BaseSkim):
                 ('thrust', 50, 0.8, 1, '', self.__contact__, '', '')],
             path=path)
 
+
+@fancy_skim_header
+class TauToMuMuMu(BaseSkim):
+    """
+    **Channel**: :math:`\\tau \\to \\mu \\mu \\mu`
+
+    **Output particle lists**:
+
+    * ``mu+:tau_3mu_goodtrack``
+
+    **Criteria**:
+
+    * ``No. good tracks < 7``
+    * ``1.3 < M < 2.2 GeV``
+    * ``-1.0 < deltaE < 0.5 GeV``
+    """
+    __authors__ = ["Junewoo PARK"]
+    __description__ = "Skim for Tau 3mu decays."
+    __contact__ = __liaison__
+    __category__ = "physics, tau"
+
+    ApplyHLTHadronCut = False
+    produce_on_tau_samples = True  # retention is ~1.7% on taupair
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
+        stdPi("all", path=path)
+
+    def build_lists(self, path):
+        # particle selection
+        trackCuts = "[-3.0 < dz < 3.0] and [dr < 1.0]"
+        ma.cutAndCopyList("pi+:tau_3mu_goodtrack", "pi+:all", trackCuts, path=path)
+        ma.cutAndCopyList("mu+:tau_3mu_goodtrack", "mu+:all", trackCuts, path=path)
+
+        # reconstruct tau->mumumu
+        ma.reconstructDecay(
+            decayString="tau+:tau_3mu_mumumu -> mu+:tau_3mu_goodtrack mu+:all mu-:all",
+            cut="[nParticlesInList(pi+:tau_3mu_goodtrack) < 7] and [1.3 < M < 2.2] and [-1.0 < deltaE < 0.5]",
+            dmID=0,
+            path=path)
+
+        return ["tau+:tau_3mu_mumumu"]
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        # add contact information to histogram
+        contact = "junewoo@g.ecc.u-tokyo.ac.jp"
+
+        # the variables that are printed out are: M, deltaE
+        create_validation_histograms(
+            rootfile=f'{self}_Validation.root',
+            particlelist='tau+:tau_3mu_mumumu',
+            variables_1d=[
+                ('M', 100, 1.00, 2.00, '', contact, '', ''),
+                ('deltaE', 120, -1.6, 0.6, '', contact, '', '')],
+            variables_2d=[('M', 50, 1.00, 2.00, 'deltaE', 60, -1.6, 0.6, '', contact, '', '')],
+            path=path)
+
 ############################################################
 
 

@@ -100,6 +100,3 @@ ma.variablesToNtuple(
 
 # Start the event loop (actually start processing things)
 b2.process(main)
-
-# print out the summary
-print(b2.statistics)

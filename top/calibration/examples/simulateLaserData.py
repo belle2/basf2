@@ -48,7 +48,7 @@ def addLaserSource(x, angle, slotID, path):
     Adds a laser source to the path
     :param x local x coordinate of source in the local frame
     :param angle vertical tilt of the source
-    :param slotID 1-16, slot number. If it's 0, then all the coorinates are in the BelleII frame
+    :param slotID 1-16, slot number. If it's 0, then all the coordinates are in the BelleII frame
     :param path path
     '''
     path.add_module('OpticalGun',
@@ -109,7 +109,7 @@ main.add_module('SeqRootOutput', saveObjs=['EventMetaData', 'RawTOPs'], outputFi
 main.add_module('Progress')
 
 # Process events
-process(main)
+process(main, calculateStatistics=True)
 
 # Print call statistics
 print(statistics)

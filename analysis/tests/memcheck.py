@@ -135,7 +135,7 @@ for module in main.modules():
 main.add_module('Profile', outputFileName='vmem_profile.png', rssOutputFileName='rss_profile.png').set_log_level(LogLevel.INFO)
 
 # execute all
-process(main)
+process(main, calculateStatistics=True)
 
 # Print and store call statistics
 print(statistics)

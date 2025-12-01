@@ -108,7 +108,9 @@ skim(path)
 #     ma.variablesToNtuple("", {% if skims|length == 1 %}[skim.flag]{% else %}skim.flags{% endif %}, path=path)
 {%- endif %}
 
-b2.process(path)
 {%- if stats %}
+b2.process(path, calculateStatistics=True)
 print(b2.statistics)
+{%- else %}
+b2.process(path)
 {%- endif %}

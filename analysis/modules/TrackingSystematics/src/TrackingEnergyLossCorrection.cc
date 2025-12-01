@@ -10,9 +10,15 @@
 #include <analysis/modules/TrackingSystematics/TrackingEnergyLossCorrection.h>
 
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/logging/Logger.h>
+
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
 
 #include <Math/Vector4D.h>
 
@@ -52,6 +58,20 @@ void TrackingEnergyLossCorrectionModule::initialize()
     B2FATAL("Neither a valid value for the scale parameter nor a non-empty table name was provided. Please set (exactly) one of the two options!");
   } else if (!m_payloadName.empty()) {
     m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_payloadName);
+  }
+}
+
+void TrackingEnergyLossCorrectionModule::beginRun()
+{
+  if (m_ParticleWeightingLookUpTable != nullptr) {
+    if (not(*m_ParticleWeightingLookUpTable.get()).isValid()) {
+      StoreObjPtr<EventMetaData> evt;
+      B2FATAL("There is no valid payload for this run!"
+              << LogVar("payload", m_payloadName)
+              << LogVar("experiment", evt->getExperiment())
+              << LogVar("run", evt->getRun())
+             );
+    }
 
     std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
                                             *m_ParticleWeightingLookUpTable.get())->getAxesNames());

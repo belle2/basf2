@@ -59,6 +59,3 @@ ma.variablesToNtuple('K_S0:LambdaVeto',
 
 # Process the events
 b2.process(my_path, max_event=10000)
-
-# print out the summary
-print(b2.statistics)

@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef EXTPHYSICSCONSTRUCTOR_H_
-#define EXTPHYSICSCONSTRUCTOR_H_
+#pragma once
 
 #include <globals.hh>
 #include <G4VPhysicsConstructor.hh>
@@ -59,5 +58,3 @@ namespace Belle2 {
   } //end namespace Simulation
 
 } //end Belle2 namespace
-
-#endif /* EXTPHYSICSCONSTRUCTOR_H_ */

@@ -19,7 +19,8 @@ import os
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
     name="BoostVector Calibrations",
-    expert_username="zlebcr",
+    expert_username="zlebcik",
+    subsystem="beam",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["mumu_tight_or_highm_calib"],
@@ -33,7 +34,8 @@ settings = CalibrationSettings(
         "outerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
         "innerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
         "minPXDhits": 0},
-    depends_on=[beamspot])
+    depends_on=[beamspot],
+    produced_payloads=["CollisionBoostVector"])
 
 ##############################
 

@@ -14,6 +14,8 @@
 
 #include <framework/core/ModuleParamList.h>
 
+#include <ecl/dataobjects/ECLShower.h>
+
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/VectorUtil.h>
 

@@ -6,21 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef TRGTOPCOMBINEDT0DECISION_H
-#define TRGTOPCOMBINEDT0DECISION_H
+#pragma once
 
-//#pragma once
-
-//#include <TObject.h>
 #include <framework/datastore/RelationsObject.h>
-
-#include <vector>
-#include <limits>
 
 namespace Belle2 {
 
-  //! Example Detector
-  //  class TRGTOPCombinedT0Decision : public TObject {
+  //! TRGTOPCombinedT0Decision
   class TRGTOPCombinedT0Decision : public RelationsObject {
 
   public:
@@ -70,7 +62,6 @@ namespace Belle2 {
     int getCombinedT0RVC2GDL() const { return m_combinedT0RVC2GDL; }
     int getEventNumberL1() const { return m_eventNumberL1; }
     int getRVCL1() const { return m_rvcL1; }
-    //int get() const { return m_;}
 
     void setCombinedT0(int combinedT0);
     void setRVCNow(int rvcNow);
@@ -78,7 +69,6 @@ namespace Belle2 {
     void setCombinedT0RVC2GDL(int combinedT0RVC2GDL);
     void setEventNumberL1(int eventNumberL1);
     void setRVCL1(int rvcL1);
-    //void set(int );
 
   private:
 
@@ -100,5 +90,3 @@ namespace Belle2 {
   };
 
 } //end namespace Belle2
-
-#endif

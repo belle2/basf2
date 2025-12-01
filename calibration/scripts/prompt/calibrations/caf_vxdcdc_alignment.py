@@ -61,7 +61,8 @@ quality_flags = [INPUT_DATA_FILTERS["Run Type"]["physics"],
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="Full VXD and CDC Alignment",
-                               expert_username="bilkat",
+                               expert_username="tadeas.bilka",
+                               subsystem="alignment",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=collection_names,
@@ -73,7 +74,8 @@ settings = CalibrationSettings(name="Full VXD and CDC Alignment",
                                },
 
                                expert_config=default_config,
-                               depends_on=[cdc_calibration, svd_time_calibration])
+                               depends_on=[cdc_calibration, svd_time_calibration],
+                               produced_payloads=["VXDAlignment", "CDCAlignment"])
 
 
 def select_files(all_input_files, min_events, max_processed_events_per_file):
@@ -257,6 +259,7 @@ def create_prompt(files, cfg):
         fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=False),
         commands=[
             "method diagonalization 3 0.1",
+            "threads 10 10",
             "scaleerrors 1. 1.",
             "entries 1000"],
         params=dict(minPValue=0.00001, externalIterations=0, granularity="run"),

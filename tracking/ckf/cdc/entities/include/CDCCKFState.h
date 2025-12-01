@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 
 namespace Belle2 {

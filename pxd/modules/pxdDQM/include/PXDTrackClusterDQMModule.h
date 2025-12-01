@@ -11,14 +11,14 @@
 #include <framework/core/HistoModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <TH1F.h>
 
 #include <map>
 #include <array>
 
 namespace Belle2 {
+  class RecoTrack;
+  class Track;
 
   /** DQM of cluster in matched tracks
     */

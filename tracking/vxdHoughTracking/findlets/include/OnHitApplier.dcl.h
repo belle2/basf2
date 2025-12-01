@@ -11,8 +11,6 @@
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <vector>
-
 namespace Belle2 {
   namespace vxdHoughTracking {
 

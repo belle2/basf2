@@ -9,11 +9,12 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <analysis/dataobjects/Particle.h>
-
-#include <analysis/modules/CurlTagger/Selector.h>
 
 namespace Belle2 {
+  class Particle;
+  namespace CurlTagger {
+    class Selector;
+  }
   /**
   *This module is designed to tag curl tracks. Low pT particle will curl around in the barrel and be reconstructed as several tracks. This module will identify and tag these additional tracks for later removal.
   *

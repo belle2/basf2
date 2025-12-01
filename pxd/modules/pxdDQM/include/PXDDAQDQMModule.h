@@ -11,18 +11,17 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <vxd/geometry/GeoCache.h>
-#include <rawdata/dataobjects/RawSVD.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 #include <TH2.h>
 #include <TH1.h>
 #include <string>
-#include <vector>
 #include <map>
 
 namespace Belle2 {
+  class PXDDAQStatus;
+  class RawSVD;
+  class EventLevelTriggerTimeInfo;
 
   namespace PXD {
     /** The PXD DAQ DQM module.

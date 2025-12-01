@@ -115,4 +115,3 @@ ma.variablesToNtuple('D*+:Example', basic_vars, filename="isSignalAcceptFlags.ro
                      treename='Dst', path=mypath)
 
 b2.process(mypath)
-print(b2.statistics)

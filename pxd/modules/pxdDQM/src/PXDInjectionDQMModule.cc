@@ -7,6 +7,10 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDInjectionDQMModule.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+
 #include "TDirectory.h"
 
 using namespace std;

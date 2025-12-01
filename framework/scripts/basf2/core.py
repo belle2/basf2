@@ -176,7 +176,7 @@ def create_path():
     return pybasf2.Path()
 
 
-def process(path, max_event=0):
+def process(path, max_event=0, calculateStatistics=False):
     """
     Start processing events using the modules in the given `basf2.Path` object.
 
@@ -205,6 +205,7 @@ def process(path, max_event=0):
       path: The path with which the processing starts
       max_event:  The maximal number of events which will be processed,
                 0 for no limit
+      calculateStatistics: Switch to turn on calculation of processing statistics
 
     .. versionchanged:: release-03-00-00
        automatic Jupyter integration
@@ -231,10 +232,16 @@ def process(path, max_event=0):
 
     pybasf2.B2INFO("Starting event processing, random seed is set to '" + pybasf2.get_random_seed() + "'")
 
+    if calculateStatistics:
+        from ROOT import Belle2
+        Belle2.Environment.Instance().setStats(True)
     if max_event != 0:
         pybasf2._process(path, max_event)
     else:
         pybasf2._process(path)
+    if calculateStatistics:
+        from basf2 import statistics
+        print(statistics)
 
 
 def set_log_level(level):

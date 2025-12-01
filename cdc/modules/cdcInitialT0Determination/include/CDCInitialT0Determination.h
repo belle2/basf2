@@ -12,8 +12,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <TH1D.h>
+
 #include <string>
-#include "TH1.h"
 
 namespace Belle2 {
 

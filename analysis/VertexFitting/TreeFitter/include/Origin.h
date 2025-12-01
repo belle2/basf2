@@ -13,6 +13,8 @@
 #include <mdst/dbobjects/BeamSpot.h>
 #include <framework/database/DBObjPtr.h>
 
+#include <Eigen/Core>
+
 namespace TreeFitter {
 
   /** representation of the beamspot as a particle */

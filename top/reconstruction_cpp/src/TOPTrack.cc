@@ -262,7 +262,7 @@ namespace Belle2 {
 
       m_helix.moveReferencePosition(length);
 
-      return m_length > bar.B / 2; // require minimal track lenght inside quartz (more than half of bar thickness)
+      return m_length > bar.B / 2; // require minimal track length inside quartz (more than half of bar thickness)
     }
 
 

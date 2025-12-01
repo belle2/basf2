@@ -8,19 +8,8 @@
 
 #pragma once
 
-#include <algorithm>
-#include <iostream>
-#include <fstream>
-
-#include <TMath.h>
 #include <TH1D.h>
-#include <TCanvas.h>
 #include <TH2D.h>
-#include <TTree.h>
-#include <TStyle.h>
-#include <TLegend.h>
-#include <TRandom.h>
-
 
 #include <cdc/dbobjects/CDCDedx1DCell.h>
 #include <calibration/CalibrationAlgorithm.h>

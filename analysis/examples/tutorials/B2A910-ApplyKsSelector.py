@@ -43,6 +43,8 @@ ksSelector.ksSelector(particleListName='K_S0:merged',
                       output_label_name='standard',
                       extraInfoName_V0Selector='V0_mva',
                       extraInfoName_LambdaVeto='Lam_mva',
+                      identifier_Ks="Ks_LGBM_V0Selector",
+                      identifier_vLambda="Ks_LGBM_LambdaVeto",
                       path=my_path)
 
 ma.matchMCTruth(list_name='K_S0:standard', path=my_path)

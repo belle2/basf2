@@ -103,7 +103,7 @@ vx.treeFit(
 vx.TagV(list_name="B0:sig", MCassociation="breco", path=main)
 
 # select variables that will be stored to ntuple
-fs_vars = vc.pid + vc.track + vc.track_hits + vc.mc_truth + ["kaonIDNN", "pionIDNN"]
+fs_vars = vc.pid + vc.track + vc.track_hits + vc.mc_truth
 jpsiandk0s_vars = vc.mc_truth
 vertex_vars = vc.vertex + vc.mc_vertex + vc.kinematics + vc.mc_kinematics
 bvars = (

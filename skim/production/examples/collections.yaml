@@ -1,12 +1,13 @@
 # Example collections.yaml for use with `jobLauncher_skimSubmit.py`
 # (Un)comment blocks as required to be skimmed
-# Collections from https://gitlab.desy.de/belle2/data-production/mc/-/wikis/MC16rd-Collections#introduction
+# MC collections from https://gitlab.desy.de/belle2/data-production/mc/-/wikis/MC16rd-Collections#introduction
 proc16prompt:
   # hlt_hadron
-  - proc16_4S_hadron_v1
-  - exp30_to_exp35_hadron_4S_v1
-  #- proc16_offres_hadron_v1
-  #- exp30_to_exp35_hadron_4Soffres_v1
+  - proc16_4S_had_v1
+  - exp30_to_exp35_had_4S_v1
+  #- proc16_offres_had_v1
+  #- exp30_to_exp35_had_4Soffres_v1
+  #- proc16_5Sscan_had_v1
   ## all
   #- proc16_4S_all_v1
   #- proc16_offres_all_v1

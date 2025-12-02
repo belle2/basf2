@@ -334,7 +334,17 @@ Using MC information, `labelTauPairMC` identifies if the generated event is a ta
 
 The variables `tauPlusMCProng` and `tauMinusMCProng` store the prong (number of final state charged particles) coming from each one of the generated tau leptons. If the event is not a tau pair decay, the value in each one of these variables will be 0.
 
-The channel number will be stored in the variables `tauPlusMCMode`, and `tauMinusMCMode` (one for the positive and the other for the negative) according to the following table:
+The channel number will be stored in the variables `tauPlusMCMode`, and `tauMinusMCMode` (one for the positive and the other for the negative) according to the following tables.
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+TauolaBelle2 Decay Modes
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The table for TauolaBelle2 can be found in the note `BELLE2-NOTE-PH-2020-055 <https://docs.belle2.org/pub_data/documents/272/>`_.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TauolaBelle Decay Modes
+~~~~~~~~~~~~~~~~~~~~~~~
 
 ============  ===============================================  ============  ==================================================
 MC mode       Decay channel                                    MC mode       Decay channel

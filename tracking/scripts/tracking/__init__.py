@@ -204,7 +204,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           append_full_grid_cdc_eventt0=True,
                                           skip_full_grid_cdc_eventt0_if_svd_time_present=True,
                                           inverted_tracking=False,
-                                          useVTX=False, use_vtx_to_cdc_ckf=False, useVTXClusterShapes=True,
+                                          useVTX=False, use_vtx_to_cdc_ckf=True, useVTXClusterShapes=True,
                                           use_mc_vtx_cdc_merger=False):
     """
     This function adds the tracking reconstruction modules required to calculate HLT filter decision

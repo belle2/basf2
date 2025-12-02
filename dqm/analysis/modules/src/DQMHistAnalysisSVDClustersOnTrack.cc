@@ -224,13 +224,11 @@ void DQMHistAnalysisSVDClustersOnTrackModule::terminate()
 int DQMHistAnalysisSVDClustersOnTrackModule::getCanvasStatus(TH1F& histo)
 {
   int status = good;
-  histo.GetXaxis()->SetRange(110, 190); // [-40 ns,40 ns]
+  histo.GetXaxis()->SetRangeUser(m_refMean - 40, m_refMean + 40); // [-40 ns,40 ns]
   Float_t mean_PeakInCenter = histo.GetMean(); //
   histo.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
 
-  Float_t difference = fabs(mean_PeakInCenter - m_refMean);
-
-  if (difference > m_timeThreshold) {
+  if (fabs(mean_PeakInCenter) > m_timeThreshold) {
     status = error;
     TText* text = m_legProblem->GetLine(m_legProblem->GetSize() - 1);
     text->SetText(text->GetX(), text->GetY(), Form("Mean (%3.1f - #pm 40 ns): %3.1f ns", m_refMean, mean_PeakInCenter));

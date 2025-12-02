@@ -128,12 +128,12 @@ namespace Belle2 {
     TH1F* m_h_nKshortActiveNotTimeH = nullptr; /** Histogram for Ks events : && active veto && !timing cut */
     TH1F* m_h_nKshortActiveNotCDCECLH = nullptr; /* Histogram for Ks events : && active veto && !cdcecl cut */
 
-    /** HLTPriflter lines */
+    /** HLTPrefilter lines */
     std::string m_prefilter_Injection_Strip = "software_trigger_cut&filter&prefilter_InjectionStrip"; /** Timing cut for prefilter */
     std::string m_prefilter_CDCECL_Cut =
       "software_trigger_cut&filter&prefilter_CDCECLthreshold"; /** CDC-ECL occupancy cut for prefilter */
 
-    /** Flags for HLTPriflter lines */
+    /** Flags for HLTPrefilter lines */
     bool m_TimingCut = false; /** Flag for timing cut on injection strip */
     bool m_CDCECLCut = false; /** Flag for CDC-ECL occupancy cut */
 

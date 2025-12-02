@@ -400,23 +400,60 @@ Returns the number of Tracks matched to the KLMCluster associated to this Partic
   REGISTER_VARIABLE("nKLMClusterECLClusterMatches", nKLMClusterECLClusterMatches, R"DOC(
                      Returns the number of ECLClusters matched to the KLMCluster associated to this Particle.
               )DOC");
-  REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
-                    "Returns the distance between KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
-                    "cm");
-  REGISTER_VARIABLE("klmClusterTrackRotationAngle", klmClusterTrackRotationAngle,
-                    "Returns the angle between the direction at the IP and at the POCA to the KLMCluster associated to this Particle for the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
-                    "rad");
-  REGISTER_VARIABLE("klmClusterTrackSeparationAngle", klmClusterTrackSeparationAngle,
-                    "Returns the angle between the KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
-                    "rad");
 
-  REGISTER_VARIABLE("klmClusterShapeStdDev1", klmClusterShapeStdDev1,
-                    "Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
-                    "cm");
-  REGISTER_VARIABLE("klmClusterShapeStdDev2", klmClusterShapeStdDev2,
-                    "Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
-                    "cm");
-  REGISTER_VARIABLE("klmClusterShapeStdDev3", klmClusterShapeStdDev3,
-                    "Returns the std deviation of the 3rd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
-                    "cm");
+  REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance, R"DOC(
+Returns the distance between the KLMCluster associated to this Particle and the closest track to this cluster. This variable returns NaN if there is no Track-to-KLMCluster relationship.
+
+.. warning::
+  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
+  return NaN. Please check the release version of the input mdst using
+  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
+
+)DOC","cm");
+  REGISTER_VARIABLE("klmClusterTrackRotationAngle", klmClusterTrackRotationAngle, R"DOC(
+Returns the angle between momenta of the track initially at IP and then at POCA to the KLMCluster associated to this Particle for the closest Track. This variable returns NaN if there is no Track-to-KLMCluster relationship.
+
+.. warning::
+  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
+  return NaN. Please check the release version of the input mdst using
+  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
+
+)DOC","rad");
+  REGISTER_VARIABLE("klmClusterTrackSeparationAngle", klmClusterTrackSeparationAngle, R"DOC(
+Returns the angle between the KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.
+
+.. warning::
+  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
+  return NaN. Please check the release version of the input mdst using
+  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
+
+)DOC","rad");
+
+  REGISTER_VARIABLE("klmClusterShapeStdDev1", klmClusterShapeStdDev1, R"DOC(
+Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one 2D Hit.
+
+.. warning::
+  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
+  return NaN. Please check the release version of the input mdst using
+  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
+
+)DOC","cm");
+  REGISTER_VARIABLE("klmClusterShapeStdDev2", klmClusterShapeStdDev2, R"DOC(
+Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster has all the 2D hits lying on a single straight line.
+
+.. warning::
+  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
+  return NaN. Please check the release version of the input mdst using
+  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
+
+)DOC","cm");
+  REGISTER_VARIABLE("klmClusterShapeStdDev3", klmClusterShapeStdDev3, R"DOC(
+Returns the std deviation of the 3nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster has all the 2D hits lying on a 2D plane.
+
+.. warning::
+  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
+  return NaN. Please check the release version of the input mdst using
+  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
+
+)DOC","cm");
 }

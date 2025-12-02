@@ -359,12 +359,12 @@ Returns the :math:`z` position of the associated KLMCluster.
   This variable returns an approximation of the energy: it uses :b2:var:`klmClusterMomentum` as momentum and the hypothesis that the KLMCluster is originated by a :math:`K_{L}^0` 
   (:math:`E_{\text{KLM}} = \sqrt{M_{K^0_L}^2 + p_{\text{KLM}}^2}`, where :math:`E_{\text{KLM}}` is this variable, :math:`M_{K^0_L}` is the :math:`K^0_L` mass and :math:`p_{\text{KLM}}` is :b2:var:`klmClusterMomentum`).
   As this variable is deemed not physically meaningful, please avoid using it.
-)DOC","GeV");
+)DOC");
   MAKE_DEPRECATED("klmClusterMomentum", true, "light-2511-gacrux", R"DOC(
   This variable returns an approximation of the momentum, since it is proportional to :b2:var:`klmClusterLayers` 
   (:math:`p_{\text{KLM}} = 0.215 \cdot N_{\text{layers}}`, where :math:`p_{\text{KLM}}` is this variable and :math:`N_{\text{layers}}` is :b2:var:`klmClusterLayers`).
   As this variable is deemed not physically meaningful, please avoid using it.
-)DOC","GeV/c");
+)DOC");
   REGISTER_VARIABLE("klmClusterIsBKLM", klmClusterIsBKLM,
                     "Returns 1 if the associated KLMCluster is in barrel KLM.");
   REGISTER_VARIABLE("klmClusterIsEKLM", klmClusterIsEKLM,

@@ -40,7 +40,10 @@ namespace Belle2 {
     private:
 
       /// Min ADC value for the average
-      int m_badADCaverageMin = 200;
+      int m_badADCaverageMin = 1000;
+
+      /// Min TOT value for the average
+      int m_badTOTaverageMin = 15;
     };
   }
 }

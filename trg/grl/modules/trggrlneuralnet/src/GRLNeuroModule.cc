@@ -85,6 +85,10 @@ GRLNeuroModule::GRLNeuroModule() : Module()
            "(units: z[cm] / theta[degree])",
   {{ -1., 1.}});
 
+  addParam("csvThetaPhiFile", m_csvThetaPhiFile,
+           "CSV file for theta/phi correction per tcid.",
+  {FileSystem::findFile("/data/trg/grl/tcid_correct_theta_phi.csv", true)});
+
   addParam("TRGECLClusters", m_TrgECLClusterName,
            "Name of the StoreArray holding the information of trigger ecl clusters ",
            string("TRGECLClusters"));
@@ -102,7 +106,12 @@ GRLNeuroModule::initialize()
 
   std::unordered_map<int, double> phiMap;
 
-  const std::string csvPath = "/home/belle2/zhaoxy/basf2/trg/grl/modules/trggrlneuralnet/src/tcid_correct_theta_phi.csv";
+  std::string csvPath = FileSystem::findFile(m_csvThetaPhiFile, true);
+  if (csvPath.empty()) {
+    B2ERROR("Cannot find tcid_correct_theta_phi.csv");
+    return;
+  }
+
   std::ifstream infile(csvPath);
   if (!infile.is_open()) {
     B2ERROR(("Failed to open " + csvPath).c_str());

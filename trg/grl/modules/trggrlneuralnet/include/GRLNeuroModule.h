@@ -104,6 +104,9 @@ namespace Belle2 {
     /** Histograms to save the NN classifiers */
     std::vector<TH1D*> h_target;
 
+    std::string m_csvThetaPhiFile;
+    /**save the  ThetaPhi */
+
     /** flag to use database to load config */
     bool m_useDB;
     std::unordered_map<int, double> thetaMap;

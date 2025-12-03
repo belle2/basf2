@@ -67,6 +67,62 @@ def add_variable_collection():
     utils.add_collection(inputVariablesList, 'ks_selector_info')
 
 
+def LightGBM2ONNX(dumping_file_name,
+                  output_file_name,
+                  input_variable_list
+                  ):
+    """
+    Convert trained LightGBM payload to onnx format. Only work for (binary or regression) loss
+    @param dumping_file_name            file name for trained LightGBM payload
+    @param output_file_name             file name for output onnx payload
+    @param input_variable_list          model input variables list
+
+    """
+    import pickle
+    import base64
+    import ROOT
+    import basf2_mva_python_interface.lightgbm
+
+    with ROOT.TFile(dumping_file_name) as f:
+        w = ROOT.Belle2.MVA.Weightfile.loadFromStream(ROOT.stringstream(f.Get("Weightfile").m_data))
+
+    with open("temp_scripts.py", "w") as f:
+        f.write(pickle.loads(base64.b64decode(w.getElement["std::string"]("Python_Steeringfile")+"====")))
+
+    w.getFile("Python_Weightfile", "Python_Weightfile.pkl")
+
+    with open("temp_scripts.py") as f:
+        exec(f.read(), basf2_mva_python_interface.lightgbm.__dict__)
+
+    with open("Python_Weightfile.pkl", "rb") as f:
+        obj = pickle.load(f)
+        state = basf2_mva_python_interface.lightgbm.load(obj)
+        model = state.bst
+
+    from onnxmltools import convert_lightgbm
+    from onnxmltools.convert.common.data_types import FloatTensorType
+
+    num_features = len(input_variable_list)
+    initial_type = [('input', FloatTensorType([None, num_features]))]
+
+    onnx_model = convert_lightgbm(model, initial_types=initial_type)
+
+    with open("temp_model.onnx", "wb") as f:
+        f.write(onnx_model.SerializeToString())
+
+    from basf2_mva_util import create_onnx_mva_weightfile
+    weightfile = create_onnx_mva_weightfile(
+        "temp_model.onnx",
+        variables=input_variable_list,
+        target_variable="isSignal",
+    )
+    import os
+    os.remove("temp_model.onnx")
+    os.remove("Python_Weightfile.pkl")
+    os.remove("temp_scripts.py")
+    weightfile.save(output_file_name)
+
+
 def V0Selector_Training(
     train_data,
     tree_name="tree",
@@ -286,38 +342,20 @@ def ksSelector(
             V0_thr = 0
             Lambda_thr = 0
             if output_label_name == 'standard':
-                if (identifier_Ks == "Ks_LGBM_V0Selector_MC16" and identifier_vLambda == "Ks_LGBM_LambdaVeto_MC16"):
-                    V0_thr = 0.92
-                    Lambda_thr = 0.11
-                    B2INFO('KsSelector: Standard Cut for MC16 is applied on '+outputListName+'.')
-                elif (identifier_Ks == "Ks_LGBM_V0Selector" and identifier_vLambda == "Ks_LGBM_LambdaVeto"):
-                    V0_thr = 0.9
-                    Lambda_thr = 0.19
-                    B2INFO('KsSelector: Standard Cut for MC15 is applied on '+outputListName+'.')
-                else:
-                    B2INFO('KsSelector: none standard payload found, no cut applied.')
+                V0_thr = 0.92
+                Lambda_thr = 0.11
+                B2INFO('KsSelector: Standard Cut for MC16 is applied on '+outputListName+'.')
+
             elif output_label_name == 'tight':
-                if (identifier_Ks == "Ks_LGBM_V0Selector_MC16" and identifier_vLambda == "Ks_LGBM_LambdaVeto_MC16"):
-                    B2INFO('KsSelector: Tight Cut for MC16 is applied on '+outputListName+'.')
-                    V0_thr = 0.98
-                    Lambda_thr = 0.31
-                elif (identifier_Ks == "Ks_LGBM_V0Selector" and identifier_vLambda == "Ks_LGBM_LambdaVeto"):
-                    B2INFO('KsSelector: Tight Cut for MC15 is applied on '+outputListName+'.')
-                    V0_thr = 0.97
-                    Lambda_thr = 0.45
-                else:
-                    B2INFO('KsSelector: none standard payload found, no cut applied.')
+                B2INFO('KsSelector: Tight Cut for MC16 is applied on '+outputListName+'.')
+                V0_thr = 0.98
+                Lambda_thr = 0.31
+
             elif output_label_name == 'loose':
-                if (identifier_Ks == "Ks_LGBM_V0Selector_MC16" and identifier_vLambda == "Ks_LGBM_LambdaVeto_MC16"):
-                    B2INFO('KsSelector: Loose Cut for MC 16 is applied on '+outputListName+'.')
-                    V0_thr = 0.43
-                    Lambda_thr = 0.02
-                elif (identifier_Ks == "Ks_LGBM_V0Selector" and identifier_vLambda == "Ks_LGBM_LambdaVeto"):
-                    B2INFO('KsSelector: Loose Cut for MC 15 is applied on '+outputListName+'.')
-                    V0_thr = 0.51
-                    Lambda_thr = 0.02
-                else:
-                    B2INFO('KsSelector: none standard payload found, no cut applied.')
+                B2INFO('KsSelector: Loose Cut for MC 16 is applied on '+outputListName+'.')
+                V0_thr = 0.43
+                Lambda_thr = 0.02
+
             B2INFO('KsSelector: Threshold is (' + str(V0_thr) + ', ' + str(Lambda_thr) + ')')
             cut_string = 'extraInfo('+extraInfoName_V0Selector+')>'+str(V0_thr) + \
                 ' and extraInfo('+extraInfoName_LambdaVeto+')>'+str(Lambda_thr)

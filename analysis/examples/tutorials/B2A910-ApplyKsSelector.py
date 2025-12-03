@@ -41,7 +41,7 @@ b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 # if other list type, cut is applied on the original particle list.
 # For any other payload except MC16 payload, please use customized cut.
 ksSelector.ksSelector(particleListName='K_S0:merged',
-                      output_label_name='standard',
+                      output_label_name='custom',  # use 'standard', 'tight', or 'loose' for recommend cut of latest payload
                       extraInfoName_V0Selector='V0_mva',
                       extraInfoName_LambdaVeto='Lam_mva',
                       useCustomThreshold=True,  # if you want to use customized threshold, set it true

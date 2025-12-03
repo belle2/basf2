@@ -20,7 +20,6 @@
 #include <TStopwatch.h>
 
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;

@@ -5,13 +5,16 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #include <framework/utilities/EnvironmentVariables.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/python/import.hpp>
 #include <boost/python/extract.hpp>
+#include <algorithm>
 #include <cstdlib>
 
 namespace Belle2 {
+
   bool EnvironmentVariables::isSet(const std::string& name)
   {
     char* envValue = std::getenv(name.c_str());
@@ -32,24 +35,33 @@ namespace Belle2 {
   std::vector<std::string> EnvironmentVariables::getList(const std::string& name, const std::vector<std::string>& fallback,
                                                          const std::string& separators)
   {
-    if (!isSet(name)) return fallback;
+    if (!isSet(name))
+      return fallback;
     std::string value = get(name);
     std::vector<std::string> items;
-    //Treat empty string as empty list
-    if (value.empty()) return items;
+    // Treat an empty string as empty list
+    if (value.empty())
+      return items;
+    // We have something to return: split the string, trim each element and remove empty ones before returning
     boost::split(items, value, boost::is_any_of(separators));
+    std::for_each(items.begin(), items.end(), [](std::string & s) {boost::algorithm::trim(s);});
+    items.erase(std::remove_if(items.begin(), items.end(), [](const std::string & s) { return s.empty(); }), items.end());
     return items;
   }
 
   std::vector<std::string> EnvironmentVariables::getOrCreateList(const std::string& name, const std::string& fallback,
       const std::string& separators)
   {
-    //almost the same as above but we don't need to check if its set, we just parse the value or fallback into a list
+    // Almost the same as above but we don't need to check if its set, we just parse the value or fallback into a list
     std::string value = get(name, fallback);
     std::vector<std::string> items;
-    //Treat empty string as empty list
-    if (value.empty()) return items;
+    // Treat an empty string as empty list
+    if (value.empty())
+      return items;
+    // We have something to return: split the string, trim each element and remove empty ones before returning
     boost::split(items, value, boost::is_any_of(separators));
+    std::for_each(items.begin(), items.end(), [](std::string & s) {boost::algorithm::trim(s);});
+    items.erase(std::remove_if(items.begin(), items.end(), [](const std::string & s) { return s.empty(); }), items.end());
     return items;
   }
 

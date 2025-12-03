@@ -6,17 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef VXD_MISALIGNMENT_CACHE_H
-#define VXD_MISALIGNMENT_CACHE_H
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <vxd/dataobjects/VXDTrueHit.h>
 #include <unordered_map>
 #include <tuple>
 
 #include <TGeoMatrix.h>
 
 namespace Belle2 {
+  class VXDTrueHit;
+
   /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD */
   namespace VXD {
     /**
@@ -97,4 +97,3 @@ namespace Belle2 {
     };
   }
 } //Belle2 namespace
-#endif

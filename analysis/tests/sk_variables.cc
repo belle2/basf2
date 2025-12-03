@@ -11,7 +11,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
 #include <framework/datastore/StoreArray.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
@@ -32,12 +31,10 @@ namespace {
 
       DataStore::Instance().setInitializeActive(true);
       StoreArray<ECLCluster> myECLClusters;
-      StoreArray<KLMCluster> myKLMClusters;
       StoreArray<TrackFitResult> myTFRs;
       StoreArray<Track> myTracks;
       StoreArray<Particle> myParticles;
       myECLClusters.registerInDataStore();
-      myKLMClusters.registerInDataStore();
       myTFRs.registerInDataStore();
       myTracks.registerInDataStore();
       myParticles.registerInDataStore();

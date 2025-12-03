@@ -161,6 +161,8 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None, init
     print('Global tags reversed (this will be used for b2.conditions.override_globaltags(...)):')
     print([tag for tag in reversed(global_tags)])
 
+    b2.conditions.override_globaltags()
+
     for tag in [tag for tag in reversed(global_tags)]:
         if os.path.exists(tag):
             b2.conditions.append_testing_payloads(os.path.abspath(tag))

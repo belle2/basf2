@@ -12,25 +12,24 @@
 #include <framework/gearbox/Const.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <reconstruction/dataobjects/VXDDedxTrack.h>
-#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 #include <reconstruction/dataobjects/DedxConstants.h>
 
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <svd/dataobjects/SVDCluster.h>
-#include <pxd/dataobjects/PXDCluster.h>
-
 #include <framework/database/DBObjPtr.h>
-#include <svd/dbobjects/SVDdEdxPDFs.h>
-#include <pxd/dbobjects/PXDdEdxPDFs.h>
 
 #include <vector>
 
 
 namespace Belle2 {
   class HelixHelper;
+  class Track;
+  class RecoTrack;
+  class MCParticle;
+  class SVDCluster;
+  class PXDCluster;
+  class VXDDedxTrack;
+  class VXDDedxLikelihood;
+  class SVDdEdxPDFs;
+  class PXDdEdxPDFs;
 
   /** Extract dE/dx from fitted tracks.
    *

@@ -56,7 +56,7 @@ namespace Belle2 {
 
   void TOPTBCComparatorModule::defineHisto()
   {
-    // opens the file contining the list of directories and the labels
+    // opens the file containing the list of directories and the labels
     ifstream inputDirectoryListFile(m_inputDirectoryList.c_str());
 
     // checks the input file
@@ -231,7 +231,7 @@ namespace Belle2 {
       short colNum = (pixelID - 1) % 64 + 1; // 1- 64  column ID (right to left looking from the quartz to the PMTs)
       short rowNum = (pixelID - 1) / 64 + 1 ; // 1- 8 row ID (bottom to top looking from the quartz to the PMTs)
       short globalChannel = hardwareChannel + 512 * (m_slotID -
-                                                     1); // channel number across the whole detector, 0-8191. Used for cal monitorin only
+                                                     1); // channel number across the whole detector, 0-8191. Used for cal monitoring only
 
 
       // ---------
@@ -394,7 +394,7 @@ namespace Belle2 {
           }
 
           // Case 2: the entry is a sub-foder, containing the rootfiles
-          // The default direcotry structure is
+          // The default directory structure is
           // calSetDirectory/tbc_chxx/*.root,
           // so this should be the normal case
           if (entry->IsDirectory() && entryName != "." && entryName != "..") {
@@ -437,7 +437,7 @@ namespace Belle2 {
       }
       m_calSetID++; // jump to the next directory (i.e. the next calset)
     }
-    B2INFO("Analisys concluded.");
+    B2INFO("Analysis concluded.");
 
     makeComparisons();
 
@@ -454,7 +454,7 @@ namespace Belle2 {
 
     B2INFO("Writing histograms ");
 
-    // opens the input list to retrive, one last time, the labels
+    // opens the input list to retrieve, one last time, the labels
     ifstream inputDirectoryListFile(m_inputDirectoryList.c_str());
     std::string inputString;
     int iSet = 0;

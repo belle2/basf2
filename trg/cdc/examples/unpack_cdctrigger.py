@@ -81,5 +81,5 @@ main.add_module('RootOutput',
                                     'RawSVDs',
                                     'RawPXDs',
                                     'RawTOPs'])
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

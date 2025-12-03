@@ -50,7 +50,7 @@ copyLists('vpho:bhabha', ['vpho:1', 'vpho:2', 'vpho:3', 'vpho:4'], path=mypath)
 # define below aliases in very few lines), head over to
 # ``VariableManager/variableAliases.py``.
 variables.addAlias('combinationID', 'extraInfo(decayModeID)')
-variables.addAlias('deltaPhi', 'daughterDiffOfClusterPhi(0, 1)')
+variables.addAlias('deltaPhi', 'daughterDiffOf(0, 1, clusterPhi)')
 variables.addAlias('deltaTheta', 'formula(daughter(0, clusterTheta) - daughter(1, clusterTheta))')
 variables.addAlias('charge_0', 'daughter(0, charge)')
 variables.addAlias('charge_1', 'daughter(1, charge)')
@@ -67,7 +67,7 @@ variables.addAlias('clusterThetaCMS_0', 'daughter(0, useCMSFrame(clusterTheta))'
 variables.addAlias('clusterThetaCMS_1', 'daughter(1, useCMSFrame(clusterTheta))')
 variables.addAlias('clusterPhiCMS_0', 'daughter(0, useCMSFrame(clusterPhi))')
 variables.addAlias('clusterPhiCMS_1', 'daughter(1, useCMSFrame(clusterPhi))')
-variables.addAlias('deltaPhiCMS', 'daughterDiffOfClusterPhiCMS(0, 1)')
+variables.addAlias('deltaPhiCMS', 'daughterDiffOf(0, 1, useCMSFrame(clusterPhi))')
 
 # variables to ntuple
 vars = ['combinationID',
@@ -95,6 +95,3 @@ variablesToNtuple('vpho:bhabha', vars, filename='bhabha.root', path=mypath)
 
 # Process the events
 b2.process(mypath)
-
-# print out the summary
-print(b2.statistics)

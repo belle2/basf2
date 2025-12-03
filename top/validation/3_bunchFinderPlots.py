@@ -17,7 +17,7 @@
 </header>
 """
 
-from basf2 import create_path, process, statistics, Module
+from basf2 import create_path, process, Module
 from ROOT import Belle2
 from ROOT import TH1F, TFile, TNamed
 import math
@@ -151,6 +151,3 @@ main.add_module(MakePlots())
 main.add_module('Progress')
 # Process events
 process(main)
-
-# Print call statistics
-print(statistics)

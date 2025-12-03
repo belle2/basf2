@@ -42,7 +42,6 @@ def create_digits():
         branchNames=list(rec.DIGITS_OBJECTS))
     child_path.add_module('Progress')
     b2.process(child_path)
-    print(b2.statistics)
 
 
 if Belle2.FileSystem.findFile(path_to_output, True) == '':
@@ -62,4 +61,3 @@ main_path.add_module('RootInput',
 raw.add_packers(path=main_path)
 main_path.add_module('Progress')
 b2.process(main_path)
-print(b2.statistics)

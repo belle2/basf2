@@ -30,6 +30,3 @@ mdst.add_mdst_output(path=main, filename='my_mdst_output.root')
 
 # Process the steering path
 b2.process(path=main)
-
-# Finally, print out some statistics about the modules execution
-print(b2.statistics)

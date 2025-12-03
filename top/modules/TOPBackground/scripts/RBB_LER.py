@@ -26,7 +26,7 @@ topback = b2.register_module('TOPBackground')
 param_back = {'TimeOfSimulation': 100.0, 'Type': 'RBB_LER',
               'Output': 'RBB_LER.root'}
 # TimeOfSimulation in us
-# Type the backgound type just for labeing
+# Type the background type just for labeing
 
 topback.param(param_back)
 # --------------------------------------
@@ -147,5 +147,3 @@ main.add_module(topdigi)
 main.add_module(topback)
 
 b2.process(main)
-
-print(b2.statistics)

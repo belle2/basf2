@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef EXTMESSENGER_H_
-#define EXTMESSENGER_H_
+#pragma once
 
 #include <globals.hh>
 #include <G4UImessenger.hh>
@@ -75,5 +74,3 @@ namespace Belle2 {
   } //end namespace Simulation
 
 } //end Belle2 namespace
-
-#endif /* EXTMESSENGER_H_ */

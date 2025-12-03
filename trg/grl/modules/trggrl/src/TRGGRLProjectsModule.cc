@@ -78,7 +78,6 @@ TRGGRLProjectsModule::TRGGRLProjectsModule() : Module()
   setDescription("TRGGRLProjectsModule");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("DebugLevel", _debugLevel, "TRGGRL debug level", _debugLevel);
   addParam("ConfigFile",
            m_configFilename,
            "The filename of CDC trigger config file",
@@ -87,14 +86,6 @@ TRGGRLProjectsModule::TRGGRLProjectsModule() : Module()
            m_simulationMode,
            "TRGGRL simulation switch",
            1);
-  addParam("FastSimulationMode",
-           m_fastSimulationMode,
-           "TRGGRL fast simulation mode",
-           m_fastSimulationMode);
-  addParam("FirmwareSimulationMode",
-           m_firmwareSimulationMode,
-           "TRGGRL firmware simulation mode",
-           m_firmwareSimulationMode);
   addParam("2DfinderCollection", m_2DfinderCollectionName,
            "Name of the StoreArray holding the tracks made by the 2D finder to be used as input.",
            string("TRGCDC2DFinderTracks"));

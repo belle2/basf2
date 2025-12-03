@@ -16,6 +16,7 @@
 #include <framework/utilities/FileSystem.h>
 // framework - Database
 #include <framework/database/DBArray.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <iostream>
 

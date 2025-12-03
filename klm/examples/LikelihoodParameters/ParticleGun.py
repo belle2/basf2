@@ -91,7 +91,7 @@ output.param('outputFileName', outfile)
 output.param('branchNames', ['MCParticles', 'Muids'])
 main.add_module(output)
 
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(basf2.statistics)

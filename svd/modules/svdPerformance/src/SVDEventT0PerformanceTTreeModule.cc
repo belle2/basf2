@@ -149,8 +149,8 @@ void SVDEventT0PerformanceTTreeModule::event()
   m_eclEventT0Err       = std::numeric_limits<float>::quiet_NaN();
   m_eclOnlineEventT0    = std::numeric_limits<float>::quiet_NaN();
   m_eclOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN();
-  m_eclTCEmax           = std::numeric_limits<int>::quiet_NaN();
-  m_eclTCid             = std::numeric_limits<int>::quiet_NaN();
+  m_eclTCEmax           = 0;
+  m_eclTCid             = 0;
 
   StoreObjPtr<EventMetaData> evtMetaData;
   m_exp = evtMetaData->getExperiment();

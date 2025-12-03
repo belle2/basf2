@@ -58,7 +58,7 @@ namespace Belle2 {
       ("tmva_working_directory", po::value<std::string>(&m_workingDirectory), "TMVA working directory which stores e.g. TMVA.root")
       ("tmva_factory", po::value<std::string>(&m_factoryOption), "TMVA Factory options passed to TMVAFactory constructor")
       ("tmva_prepare", po::value<std::string>(&m_prepareOption),
-       "TMVA Preprare options passed to prepareTrainingAndTestTree function");
+       "TMVA Prepare options passed to prepareTrainingAndTestTree function");
       return description;
     }
 

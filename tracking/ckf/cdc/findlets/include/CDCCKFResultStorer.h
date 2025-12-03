@@ -12,12 +12,12 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFResult.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 #include <string>
 #include <vector>
 
 namespace Belle2 {
+  class RecoTrack;
   class ModuleParamInfo;
 
   /// Store resulting tracks and relations on the dataStore

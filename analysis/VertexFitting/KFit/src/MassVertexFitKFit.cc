@@ -7,11 +7,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <TMath.h>
-#include <TMatrixFSym.h>
-
-#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 #include <analysis/VertexFitting/KFit/MassVertexFitKFit.h>
+
+#include <TMath.h>
+
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/ROOTToCLHEP.h>
 #include <framework/gearbox/Const.h>
@@ -247,7 +248,7 @@ MassVertexFitKFit::prepareInputMatrix() {
     // charge, mass, a
     m_property[index][0] =  track.getCharge();
     m_property[index][1] =  track.getMass();
-    const double c = Belle2::Const::speedOfLight * 1e-4;
+    const double c = Const::speedOfLight * 1e-4;
     m_property[index][2] = -c * m_MagneticField * track.getCharge();
     index++;
   }

@@ -57,29 +57,28 @@ GRLNeuroModule::GRLNeuroModule() : Module()
            "Save the output histogram to root file.",
            false);
   addParam("nMLP", m_parameters.nMLP,
-           "Number of expert MLPs.", m_parameters.nMLP);
+           "Number of expert MLPs.", 1u);
   addParam("n_cdc_sector", m_parameters.n_cdc_sector,
-           "Number of expert CDC MLPs.", m_parameters.n_cdc_sector);
+           "Number of expert CDC MLPs.", 0u);
   addParam("n_ecl_sector", m_parameters.n_ecl_sector,
-           "Number of expert ECL MLPs.", m_parameters.n_ecl_sector);
+           "Number of expert ECL MLPs.", 1u);
   addParam("i_cdc_sector", m_parameters.i_cdc_sector,
-           "#cdc track of expert MLPs.", m_parameters.i_cdc_sector);
+           "#cdc track of expert MLPs.", {0});
   addParam("i_ecl_sector", m_parameters.i_ecl_sector,
-           "#ecl cluster of expert MLPs.", m_parameters.i_ecl_sector);
+           "#ecl cluster of expert MLPs.", {24});
   addParam("nHidden", m_parameters.nHidden,
            "Number of nodes in each hidden layer for all networks "
            "or factor to multiply with number of inputs (1 list or nMLP lists). "
            "The number of layers is derived from the shape.",
-           m_parameters.nHidden);
+  {{64, 64}});
   addParam("multiplyHidden", m_parameters.multiplyHidden,
-           "If true, multiply nHidden with number of input nodes.",
-           m_parameters.multiplyHidden);
+           "If true, multiply nHidden with number of input nodes.", false);
   addParam("outputScale", m_parameters.outputScale,
            "Output scale for all networks (1 value list or nMLP value lists). "
            "Output[i] of the MLP is scaled from [-1, 1] "
            "to [outputScale[2*i], outputScale[2*i+1]]. "
            "(units: z[cm] / theta[degree])",
-           m_parameters.outputScale);
+  {{ -1., 1.}});
   addParam("weightFiles", m_weightFileNames,
            "Name of the file where the weights of MLPs are saved. "
            "the default file is $BELLE2_LOCAL_DIR/data/trg/grl/weights.dat",

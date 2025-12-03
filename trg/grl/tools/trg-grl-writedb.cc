@@ -47,8 +47,10 @@ void setgrlconfig()
   std::vector<float> ecltaunn_i_ecl_sector[N_config]; //only 24 is supported for now
   ecltaunn_i_ecl_sector[0].push_back(1 * 6 * 4);
 
-  char wfilename[N_config][10][1000] = {
-    "/home/t2k/taichiro/public/grl/weights.dat"
+  char wfilename[N_config][10][1000] = {{{
+        "/home/t2k/taichiro/public/grl/weights.dat"
+      }
+    }
   };
   std::vector<std::vector<float>> ecltaunn_weight[N_config];
   for (int i = 0; i < N_config; i++) {
@@ -67,8 +69,10 @@ void setgrlconfig()
     }
   }
 
-  char bfilename[N_config][10][1000] = {
-    "/home/t2k/taichiro/public/grl/bias.dat"
+  char bfilename[N_config][10][1000] = {{{
+        "/home/t2k/taichiro/public/grl/bias.dat"
+      }
+    }
   };
   std::vector<std::vector<float>> ecltaunn_bias[N_config];
   for (int i = 0; i < N_config; i++) {

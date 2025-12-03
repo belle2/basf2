@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef GEOVXDASSEMBLY_H
-#define GEOVXDASSEMBLY_H
+#pragma once
 
 #include <vector>
 #include <G4Transform3D.hh>
@@ -59,4 +58,3 @@ namespace Belle2 {
     };
   } //VXD namespace
 } //Belle2 namespace
-#endif

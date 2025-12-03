@@ -31,7 +31,7 @@ main.add_module('RootInput', inputFileNames=[inputfile])
 # output file
 outputName = "eclCosmicECollectorOutput.root"
 narg = len(sys.argv)
-if(narg >= 2):
+if (narg >= 2):
     outputName = sys.argv[1]
 main.add_module("HistoManager", histoFileName=outputName)
 
@@ -52,7 +52,7 @@ main.add_module(eclCosmicE)
 # It is possible to force the job to use the specified global tag.
 # Default localdb is the subdirectory of current working directory
 centralGT = "data_reprocessing_prompt_bucket3b"
-if(narg >= 3):
+if (narg >= 3):
     centralGT = sys.argv[2]
 b2.reset_database()
 b2.use_database_chain()
@@ -60,5 +60,3 @@ b2.use_central_database(centralGT)
 b2.use_local_database("localdb/database.txt")
 
 b2.process(main)
-
-print(b2.statistics)

@@ -11,10 +11,10 @@
 #include <pxd/dbobjects/PXDMaskedPixelPar.h>
 #include <pxd/dbobjects/PXDDeadPixelPar.h>
 #include <framework/database/DBObjPtr.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <memory>
 
 namespace Belle2 {
+  class VxdID;
 
   namespace PXD {
     /**

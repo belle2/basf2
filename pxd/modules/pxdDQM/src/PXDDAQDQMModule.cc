@@ -7,9 +7,11 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDDAQDQMModule.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <rawdata/dataobjects/RawSVD.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 #include <TDirectory.h>
-#include <TAxis.h>
 #include <boost/format.hpp>
 #include <string>
 

@@ -34,7 +34,7 @@ from variables import variables
 
 # ..Check for the correct number of arguments
 narg = len(sys.argv)
-if(narg != 4):
+if (narg != 4):
     print("Job arguments: nEvents name newGeom; ", narg-1, "provided")
     sys.exit()
 
@@ -46,9 +46,9 @@ outputFileName = "ntuples/" + sys.argv[2] + ".root"
 
 # ..override ECL geometry if requested
 newGeom = int(sys.argv[3])
-if(newGeom == 1):
+if (newGeom == 1):
     conditions.globaltags = ['ecl_alignment']
-if(newGeom == 2):
+if (newGeom == 2):
     conditions.prepend_testing_payloads("localdb/database.txt")
 print(conditions.globaltags)
 
@@ -129,5 +129,5 @@ main.add_module('VariablesToNtuple', particleList='mu-:highp', variables=varsToS
 
 # ---------------------------------------------------------------------
 # Process events
-process(main)
+process(main, calculateStatistics=True)
 print(statistics)

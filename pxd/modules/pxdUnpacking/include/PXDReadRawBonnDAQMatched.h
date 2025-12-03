@@ -12,15 +12,14 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <framework/dataobjects/EventMetaData.h>
-#include <rawdata/dataobjects/RawPXD.h>
-
 #include <string>
 #include <map>
 #include <stdlib.h>
 
 
 namespace Belle2 {
+  class EventMetaData;
+  class RawPXD;
 
   namespace PXD {
 

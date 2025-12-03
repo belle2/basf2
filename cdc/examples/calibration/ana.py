@@ -163,7 +163,7 @@ main_path.add_module('HistoManager', histoFileName=outputfilename)
 #                     outputFileName = datadir + "evtT0." +prefix + name+'.root',
 #                     branchNames = ['CDCHits','EventT0'])
 b2.print_path(main_path)
-b2.process(main_path)
+b2.process(main_path, calculateStatistics=True)
 
 d = datetime.datetime.today()
 print(b2.statistics)

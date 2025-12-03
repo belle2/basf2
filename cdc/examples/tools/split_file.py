@@ -53,6 +53,6 @@ for i in range(0, int(nfile)):
     else:
         split.if_value(f'={i}', out[i])
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 print(b2.statistics)

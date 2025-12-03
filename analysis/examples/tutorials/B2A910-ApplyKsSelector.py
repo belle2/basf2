@@ -52,7 +52,7 @@ ksSelector.ksSelector(particleListName='K_S0:merged',
                       path=my_path)
 
 
-ma.matchMCTruth(list_name='K_S0:standard', path=my_path)
+ma.matchMCTruth(list_name='K_S0:custom', path=my_path)
 
 # set variables
 vars = vc.kinematics + vc.mc_kinematics + vc.mc_truth
@@ -60,7 +60,7 @@ vars += ['extraInfo(V0_mva)']
 vars += ['extraInfo(Lam_mva)']
 
 # output
-ma.variablesToNtuple('K_S0:standard',
+ma.variablesToNtuple('K_S0:custom',
                      variables=vars,
                      filename=output_file,
                      treename='tree',

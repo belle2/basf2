@@ -1,4 +1,3 @@
-[INFO] Steering file: reconstruction/tests/check_reconstruction_path.py
 [INFO] Modules and parameter settings in the path:
   1. EventsOfDoomBuster
 
@@ -209,6 +208,8 @@
       SpacePoints=PXDSpacePoints
   26. TFCDC_WireHitPreparer
       UseNLoops=inf
+      badADCaverageMin=1000
+      badTOTaverageMin=15
       blockNegativeDriftLength=False
       deviationFromMedianTDCinASIC=10.0
       filter=mva

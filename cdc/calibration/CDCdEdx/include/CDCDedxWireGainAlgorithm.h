@@ -8,27 +8,17 @@
 
 #pragma once
 
-#include <algorithm>
-#include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
 
 #include <TH1D.h>
-#include <TCanvas.h>
-#include <TMath.h>
-#include <TLine.h>
-#include <TStyle.h>
-#include <TH1I.h>
 
 #include <cdc/dbobjects/CDCDedxWireGain.h>
 #include <cdc/dbobjects/CDCDedxBadWires.h>
 #include <cdc/dbobjects/CDCGeometry.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
 
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeometryParConstants.h>
 
 const unsigned int c_nwireCDC = c_nSenseWires;

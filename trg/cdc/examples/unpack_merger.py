@@ -27,5 +27,5 @@ merger_unpacker.logging.debug_level = 100
 merger_unpacker.logging.set_info(b2.LogLevel.DEBUG, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
 
 main.add_module(merger_unpacker)
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

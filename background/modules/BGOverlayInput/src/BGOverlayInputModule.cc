@@ -252,7 +252,7 @@ bool BGOverlayInputModule::registerBranches()
 
   // StoreObjPointers have to be included explicitly
   const std::set<std::string> objPtrNames = {"Belle2::ECLWaveforms", "Belle2::PXDInjectionBGTiming", "Belle2::EventLevelTriggerTimeInfo",
-                                             "Belle2::TRGSummary"
+                                             "Belle2::TRGSummary", "Belle2::TOPInjectionVeto"
                                             };
 
   const TObjArray* branches = m_tree->GetListOfBranches();
@@ -292,8 +292,14 @@ bool BGOverlayInputModule::registerBranches()
     } else if (objPtrNames.find(objName) != objPtrNames.end()) {
       std::string name = branchName;
       if (objName == "Belle2::TRGSummary") name += m_extensionName; // to distinguish it from the one provided by simulation
+      // Determine the storeFlags for the current branch
+      auto currentStoreFlags = storeFlags;
+      if (objName == "Belle2::EventLevelTriggerTimeInfo") {
+        // Allow writing by RootOutput
+        currentStoreFlags = DataStore::c_ErrorIfAlreadyRegistered;
+      }
       bool ok = DataStore::Instance().registerEntry(name, durability, objectPtr->IsA(),
-                                                    false, storeFlags);
+                                                    false, currentStoreFlags);
       branch->ResetAddress();
       delete objectPtr;
 

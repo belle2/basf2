@@ -57,29 +57,28 @@ GRLNeuroModule::GRLNeuroModule() : Module()
            "Save the output histogram to root file.",
            false);
   addParam("nMLP", m_parameters.nMLP,
-           "Number of expert MLPs.", m_parameters.nMLP);
+           "Number of expert MLPs.", 1u);
   addParam("n_cdc_sector", m_parameters.n_cdc_sector,
-           "Number of expert CDC MLPs.", m_parameters.n_cdc_sector);
+           "Number of expert CDC MLPs.", 0u);
   addParam("n_ecl_sector", m_parameters.n_ecl_sector,
-           "Number of expert ECL MLPs.", m_parameters.n_ecl_sector);
+           "Number of expert ECL MLPs.", 1u);
   addParam("i_cdc_sector", m_parameters.i_cdc_sector,
-           "#cdc track of expert MLPs.", m_parameters.i_cdc_sector);
+           "#cdc track of expert MLPs.", {0});
   addParam("i_ecl_sector", m_parameters.i_ecl_sector,
-           "#ecl cluster of expert MLPs.", m_parameters.i_ecl_sector);
+           "#ecl cluster of expert MLPs.", {24});
   addParam("nHidden", m_parameters.nHidden,
            "Number of nodes in each hidden layer for all networks "
            "or factor to multiply with number of inputs (1 list or nMLP lists). "
            "The number of layers is derived from the shape.",
-           m_parameters.nHidden);
+  {{64, 64}});
   addParam("multiplyHidden", m_parameters.multiplyHidden,
-           "If true, multiply nHidden with number of input nodes.",
-           m_parameters.multiplyHidden);
+           "If true, multiply nHidden with number of input nodes.", false);
   addParam("outputScale", m_parameters.outputScale,
            "Output scale for all networks (1 value list or nMLP value lists). "
            "Output[i] of the MLP is scaled from [-1, 1] "
            "to [outputScale[2*i], outputScale[2*i+1]]. "
            "(units: z[cm] / theta[degree])",
-           m_parameters.outputScale);
+  {{ -1., 1.}});
   addParam("weightFiles", m_weightFileNames,
            "Name of the file where the weights of MLPs are saved. "
            "the default file is $BELLE2_LOCAL_DIR/data/trg/grl/weights.dat",
@@ -93,7 +92,9 @@ GRLNeuroModule::GRLNeuroModule() : Module()
            string("TRGECLClusters"));
   addParam("MVACut", m_nn_thres,
            "Cut value applied to the MLP output",
-  {0.4});
+  {-1});
+  addParam("useDB", m_useDB,
+           "Flag to use database to set config", true);
 }
 
 
@@ -101,12 +102,6 @@ void
 GRLNeuroModule::initialize()
 {
 
-  m_GRLNeuro.initialize(m_parameters);
-  for (unsigned it = 0; it < m_parameters.nMLP; it++) {
-    if (!m_GRLNeuro.load(it, m_weightFileNames[it], m_biasFileNames[it])) {
-      B2ERROR("NeuroTrigger could not be loaded correctly.");
-    }
-  }
   TrgEclMapping* trgecl_obj = new TrgEclMapping();
   for (int tc = 1; tc <= 576; tc++) {
     TCThetaID.push_back(trgecl_obj->getTCThetaIdFromTCId(tc));
@@ -125,22 +120,9 @@ GRLNeuroModule::initialize()
     CellLab.SetPz(CellPosition.Unit().Z());
     CellLab.SetE(1.);
 
-    //..cotan Theta and phi in lab
-    //TCPhiLab.push_back(CellPosition.Phi());
-    //double tantheta = tan(CellPosition.Theta());
-    //TCcotThetaLab.push_back(1. / tantheta);
+    TCThetaLab.push_back(CellLab.Theta()*TMath::RadToDeg());
+    TCPhiLab.push_back(CellLab.Phi()*TMath::RadToDeg() + 180.0);
 
-    //..Corresponding 4 vector in the COM frame
-    ROOT::Math::PxPyPzEVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
-    TCThetaCOM.push_back(CellCOM.Theta()*TMath::RadToDeg());
-    TCPhiCOM.push_back(CellCOM.Phi()*TMath::RadToDeg() + 180.0);
-
-  }
-  if (m_saveHist) {
-    for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {
-      h_target.push_back(new TH1D(("h_target_" + to_string(isector)).c_str(),
-                                  ("h_target_" + to_string(isector)).c_str(),  100, 0.0, 1.0));
-    }
   }
 
   delete trgecl_obj;
@@ -148,47 +130,106 @@ GRLNeuroModule::initialize()
 }
 
 void
+GRLNeuroModule::beginRun()
+{
+  if (m_useDB) {
+    if (not m_db_trggrlconfig.isValid()) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      B2FATAL("No database for TRG GRL config. exp " << evtMetaData->getExperiment() << " run "
+              << evtMetaData->getRun());
+    } else {
+      m_parameters.nMLP           = m_db_trggrlconfig->get_ecltaunn_nMLP();
+      m_parameters.multiplyHidden = m_db_trggrlconfig->get_ecltaunn_multiplyHidden();
+      m_parameters.nHidden        = m_db_trggrlconfig->get_ecltaunn_nHidden();
+      m_parameters.n_cdc_sector   = m_db_trggrlconfig->get_ecltaunn_n_cdc_sector();
+      m_parameters.n_ecl_sector   = m_db_trggrlconfig->get_ecltaunn_n_ecl_sector();
+      m_parameters.i_cdc_sector   = m_db_trggrlconfig->get_ecltaunn_i_cdc_sector();
+      m_parameters.i_ecl_sector   = m_db_trggrlconfig->get_ecltaunn_i_ecl_sector();
+      m_nn_thres[0]               = m_db_trggrlconfig->get_ecltaunn_threshold();
+
+      m_GRLNeuro.initialize(m_parameters);
+
+      for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {
+        if (!m_GRLNeuro.load(isector, m_db_trggrlconfig->get_ecltaunn_weight()[isector], m_db_trggrlconfig->get_ecltaunn_bias()[isector])) {
+          B2ERROR("weight of GRL ecltaunn could not be loaded correctly.");
+        }
+      }
+    }
+  }
+
+  if (m_saveHist) {
+    for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {
+      h_target.push_back(new TH1D(("h_target_" + to_string(isector)).c_str(),
+                                  ("h_target_" + to_string(isector)).c_str(),  100, 0.0, 1.0));
+    }
+  }
+}
+
+void
 GRLNeuroModule::event()
 {
-  //inputs and outputs
-  std::vector<float> MLPinput;
-  MLPinput.clear();
-  MLPinput.assign(19, 0);
 
   //ECL input
   //..Use only clusters within 100 ns of event timing (from ECL).
   //StoreArray<TRGECLTrg> trgArray;
   StoreArray<TRGECLCluster> eclTrgClusterArray(m_TrgECLClusterName);
   StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
-  //int ntrgArray = trgArray.getEntries();
-  //double EventTiming = -9999.;
-  //if (ntrgArray > 0) {EventTiming = trgArray[0]->getEventTiming();}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  std::vector<std::tuple<float, float, float, float>> eclClusters;
+///
   int necl = eclTrgClusterArray.getEntries();
   for (int ic = 0; ic < necl; ic++) {
     int TC = eclTrgClusterArray[ic]->getMaxTCId();
-    MLPinput[ic] = eclTrgClusterArray[ic]->getEnergyDep() * 1000.0;
-    MLPinput[ic + 6] =  TCThetaCOM[TC - 1];
-    MLPinput[ic + 12] = TCPhiCOM[TC - 1];
+    float energy = eclTrgClusterArray[ic]->getEnergyDep() * 1000.0;
+    float theta = TCThetaLab[TC - 1];
+    float phi = TCPhiLab[TC - 1];
+    float time = eclTrgClusterArray[ic]->getTimeAve();
+    eclClusters.emplace_back(energy, theta, phi, time);
   }
 
-  //Energy, theta and phi data are the quantized.
-  //Energy: LSB = ADC count (5MeV)
-  //theta : 0 ~ 180∘, LSB = 1.40625∘
-  //phi : 0 ~ 360∘, LSB = 1.40625∘
-  float LSB_ADC   = 1 / 5.0;
-  float LSB_agnle = 1 / 1.40625;
-  std::for_each(MLPinput.begin() + 0,  MLPinput.begin() + 6,    [LSB_ADC](float & x) { x = std::ceil(x * LSB_ADC); });
-  std::for_each(MLPinput.begin() + 6,  MLPinput.begin() + 12, [LSB_agnle](float & x) { x = std::ceil(x * LSB_agnle);});
-  std::for_each(MLPinput.begin() + 12, MLPinput.begin() + 18, [LSB_agnle](float & x) { x = std::ceil(x * LSB_agnle); });
-  MLPinput[18] = necl;
+  std::sort(eclClusters.begin(), eclClusters.end(),
+            [](const std::tuple<float, float, float, float>& a,
+  const std::tuple<float, float, float, float>& b) {
+    return std::get<0>(a) > std::get<0>(b);
+  });
 
-//cout<<"input: ";
-//for(int i=0;i<19;i++){
-//cout<<MLPinput[i]<<" ";
-//}
-//cout<<endl;
+  // MLPinput
+  std::vector<float> MLPinput;
+  MLPinput.clear();
+  MLPinput.assign(24, 0);
+
+  for (size_t i = 0; i < std::min(eclClusters.size(), size_t(6)); i++) {
+    MLPinput[i]  = std::get<0>(eclClusters[i]); // E
+    MLPinput[6 + i]  = std::get<1>(eclClusters[i]); // Theta
+    MLPinput[12 + i] = std::get<2>(eclClusters[i]); // Phi
+    MLPinput[18 + i]  = std::get<3>(eclClusters[i]); // time
+  }
+
+
+
+  // //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  //Energy, theta and phi data are the quantized.
+  //Energy: LSB = ADC count (5.5MeV)
+  //theta : 0 ~ 180∘, LSB = 1.6025∘
+  //phi : 0 ~ 360∘, LSB = 1.6025∘
+  float LSB_ADC   = 1 / 5.5;
+  float LSB_angle = 1 / 1.6025;
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  std::for_each(MLPinput.begin() + 0, MLPinput.begin() + 6, [LSB_ADC](float & x) { x = std::ceil(x * LSB_ADC); });
+  std::for_each(MLPinput.begin() + 6,  MLPinput.begin() + 12,  [LSB_angle](float & x) { x = std::ceil(x * LSB_angle);});
+  std::for_each(MLPinput.begin() + 12,  MLPinput.begin() + 18, [LSB_angle](float & x) { x = std::ceil(x * LSB_angle); });
+
+//new add
+//  float LSB_time = 1.0f;
+//  std::for_each(MLPinput.begin() + 18, MLPinput.begin() + 24, [](float &x) {
+//      x = std::ceil(x);
+//      x = std::min(x, 255.0f);
+//     x = std::max(x, 0.0f);
+//  });
+
+
   float target = m_GRLNeuro.runMLP(0, MLPinput);
-//cout<<"output: "<<target<<endl;
   if (m_saveHist) {
     h_target[0]->Fill(target);
   }

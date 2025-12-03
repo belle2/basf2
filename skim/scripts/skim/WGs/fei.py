@@ -708,8 +708,8 @@ class feiHadronic(BaseFEISkim):
 
     * :math:`M_{\\text{bc}} > 5.2~{\\rm GeV}`
     * :math:`|\\Delta E| < 0.3~{\\rm GeV}`
-    * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23 for
-      :math:`B^+`, and decay mode 25 for :math:`B^0`)
+    * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 25 for
+      :math:`B^+`, and decay mode 23 for :math:`B^0`)
 
     All available FEI :math:`B^0` and :math:`B^+` hadronic tags are reconstructed. From
     `Thomas Keck's thesis
@@ -749,8 +749,8 @@ class feiHadronic_DstEllNu(BaseFEISkim):
 
     * :math:`M_{\\text{bc}} > 5.27~{\\rm GeV}`
     * :math:`-0.150 < \\Delta E < 0.100~{\\rm GeV}`
-    * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23 for
-      :math:`B^+`, and decay mode 25 for :math:`B^0`)
+    * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 25 for
+      :math:`B^+`, and decay mode 23 for :math:`B^0`)
     * :math:`\\cos{TBTO} < 0.9`
     * Selects only the two best candidates that survive based on the signalProbability
 

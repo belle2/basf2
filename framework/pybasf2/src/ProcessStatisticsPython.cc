@@ -23,7 +23,7 @@ ProcessStatistics* ProcessStatisticsPython::getWrapped()
   StoreObjPtr<ProcessStatistics> stats("", DataStore::c_Persistent);
   if (!stats) {
     if (!Environment::Instance().getDryRun()) {
-      B2ERROR("ProcessStatistics data object is not available, you either disabled statistics with --no-stats or didn't run process(path) yet.");
+      B2ERROR("ProcessStatistics data object is not available, you either didn't enable statistics with --stats or didn't run process(path) yet.");
     }
     return nullptr;
   }
@@ -34,6 +34,9 @@ string ProcessStatisticsPython::getStatisticsString()
 {
   if (!getWrapped())
     return "";
+  if (getWrapped()->getStatisticsPrintStatus(m_type))
+    return "";
+  getWrapped()->setStatisticsPrintStatus(m_type, true);
   return getWrapped()->getStatisticsString(m_type, m_modules.empty() ? nullptr : &m_modules);
 }
 
@@ -41,6 +44,9 @@ string ProcessStatisticsPython::getStatisticsStringHTML()
 {
   if (!getWrapped())
     return "";
+  if (getWrapped()->getStatisticsPrintStatus(m_type))
+    return "";
+  getWrapped()->setStatisticsPrintStatus(m_type, true);
   return getWrapped()->getStatisticsString(m_type, m_modules.empty() ? nullptr : &m_modules, true);
 }
 
@@ -144,7 +150,7 @@ difference in resident memory before and after the `event() <Module.event>` call
     Memory consumption is reporting the difference in memory usage as reported
     by the kernel before and after the call. This is not the maximum memory the
     module has consumed. Negative values indicate that this module has freed
-    momemory which was allocated in other modules or function calls.
+    memory which was allocated in other modules or function calls.
 
 Information on other calls like `initialize() <Module.initialize>`,
 `terminate() <Module.terminate>`, etc. are also available through the different

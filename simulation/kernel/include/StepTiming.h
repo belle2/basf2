@@ -7,12 +7,11 @@
  **************************************************************************/
 
 #pragma once
-#ifndef SIMULATION_KERNEL_STEPTIMING_H
-#define SIMULATION_KERNEL_STEPTIMING_H
 
 #include <G4VSteppingVerbose.hh>
-#include <G4LogicalVolume.hh>
-#include <G4Track.hh>
+
+class G4LogicalVolume;
+class G4Track;
 
 namespace Belle2 {
   namespace Simulation {
@@ -21,7 +20,7 @@ namespace Belle2 {
      * This class overrides the default G4SteppingVerbose implementation which
      * is used by Geant4 to display stepping information. It measures the time
      * for each step and calls a given callback function with a pointer to the
-     * track, the volume in which the step occured and the time needed for that
+     * track, the volume in which the step occurred and the time needed for that
      * step.
      *
      * Measuring the time in each step causes a overhead of 10%-20% so this
@@ -70,4 +69,3 @@ namespace Belle2 {
 
   } //Simulation namespace
 } //Belle2 namespace
-#endif // SIMULATION_KERNEL_STEPTIMING_H

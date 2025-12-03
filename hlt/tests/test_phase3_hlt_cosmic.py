@@ -19,4 +19,4 @@ if __name__ == "__main__":
         test_folder(location=constants.Location.hlt,
                     run_type=constants.RunTypes.cosmic,
                     exp_number=1003,
-                    phase="phase3")
+                    event_distribution="ringbuffer")

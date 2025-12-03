@@ -10,12 +10,15 @@
 
 #include <framework/core/Module.h>
 
+#include <string>
+#include <vector>
+
 namespace Belle2 {
 
   /**
    * Tracking efficiency systematics module: removes tracks from the lists at random for efficiency studies
    */
-  class TrackingEfficiencyModule : public Module {
+  class TrackingEfficiencyModule final : public Module {
   public:
 
     /**
@@ -26,9 +29,10 @@ namespace Belle2 {
     /**
     * Function to be executed at each event
     */
-    virtual void event() override;
+    void event() override;
 
   private:
+
     /** input particle lists */
     std::vector<std::string> m_ParticleLists;
     /** fraction of particles to be removed from the particlelist */

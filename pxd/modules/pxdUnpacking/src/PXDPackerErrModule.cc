@@ -8,6 +8,8 @@
 
 #include <pxd/unpacking/PXDRawDataDefinitions.h>
 #include <pxd/modules/pxdUnpacking/PXDPackerErrModule.h>
+#include <rawdata/dataobjects/RawPXD.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>

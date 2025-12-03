@@ -14,7 +14,7 @@
 class EvtParticle;
 
 /**
- * Implementation of the B -> D^* \ell \bar{\nu}_\ell with new physics
+ * Implementation of \f$B \to D^* \ell \bar{\nu}_\ell\f$ with new physics
  * contributions and the BGL hadronic form factor parameterization.
  * Based on the publication:
  * Phys.Rev.D 107 (2023) 1, 015011; e-Print:2206.11283 [hep-ph]

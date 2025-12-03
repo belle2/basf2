@@ -1,0 +1,3 @@
+Import('env')
+env['TOOLS_LIBS']['trg-grl-writedb'] = ['framework', 'trg', 'trg_grl_dbobjects', '$ROOT_LIBS']
+Return('env')

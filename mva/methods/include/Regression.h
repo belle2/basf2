@@ -174,7 +174,7 @@ namespace Belle2 {
     template<class BaseClassifierExpert, class RegressionClassifierOptions>
     class RegressionExpert : public Expert {
     public:
-      /// Load the expert from the weightfile by loading each stored single classifier one ofter the other
+      /// Load the expert from the weightfile by loading each stored single classifier one after the other
       void load(Weightfile& weightfile) override;
 
       /// Apply the loaded experts by averaging over the single expert decisions

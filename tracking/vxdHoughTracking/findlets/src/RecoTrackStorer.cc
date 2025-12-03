@@ -7,7 +7,6 @@
  **************************************************************************/
 #include <tracking/vxdHoughTracking/findlets/RecoTrackStorer.h>
 #include <framework/core/ModuleParamList.h>
-#include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/BFieldManager.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <svd/dataobjects/SVDCluster.h>

@@ -124,6 +124,3 @@ main.add_module(
 
 # Process events
 basf2.process(main)
-
-# Print call statistics
-print(basf2.statistics)

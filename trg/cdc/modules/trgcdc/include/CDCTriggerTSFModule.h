@@ -22,6 +22,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <trg/cdc/dbobjects/CDCTriggerDeadch.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <trg/cdc/dbobjects/CDCTriggerTSFConfig.h>
 
 namespace Belle2 {
   typedef HepGeom::Point3D<double> Point3D;
@@ -112,7 +113,7 @@ namespace Belle2 {
     /** list of (# true right, # true left, # true background)
      *  for the outer super layers */
     std::vector<std::vector<unsigned>> outerTrueLRTable = {};
-    //** number of layers in Super layer**/
+    /** number of layers in Super layer */
     const static int MAX_N_LAYERS = c_maxWireLayersPerSuperLayer;
     /** bad channel mapping */
     bool deadch_map[c_nSuperLayers][MAX_N_LAYERS][c_maxNDriftCells] = {};
@@ -132,6 +133,11 @@ namespace Belle2 {
     /** relate all cdchtis to ts, not just opriority wire */
     bool m_relateAllHits;
 
+    /** switch to use database to load run dependent parameter*/
+    bool m_useDB;
+
+    /** run dependent parameter database of TSF */
+    DBObjPtr<CDCTriggerTSFConfig> m_cdctrgtsf_DB;
 
   };
 

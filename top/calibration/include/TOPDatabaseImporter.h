@@ -115,7 +115,7 @@ namespace Belle2 {
 
     /**
      * Import common T0 calibration constants derived form the offline data reprocessing to database
-     * The input is a root file containing a tree (one per run). In the future we may add a furter implementation
+     * The input is a root file containing a tree (one per run). In the future we may add a further implementation
      * that reads the IOV from the root file itself.
      * @param fileName name of the root file with constants of all modules
      * @param firstExp first experiment number of IOV
@@ -259,7 +259,7 @@ namespace Belle2 {
                            int lastExp = -1, int lastRun = -1);
 
     /**
-     * Import fit results of pulse height disribution for channel gain and threshold efficiency
+     * Import fit results of pulse height distribution for channel gain and threshold efficiency
      * @param fileName : name of the root file containing relevant data, which is obtained from TOPGainEfficiencyMonitor
      * @param firstExp first experiment number of IOV
      * @param firstRun first run number of IOV

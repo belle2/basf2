@@ -8,8 +8,8 @@
 
 #pragma once
 #include <framework/core/Module.h>
-#include <analysis/modules/MCDecayFinder/DecayTree.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -17,6 +17,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 namespace Belle2 {
+  template<class T> class DecayTree;
   /** Find decays in MCParticle list matching a given DecayString.
   Matched MCParticles are saved as Particle in a ParticleList. At the
   moment skipping of intermediate resonances is not implemented. */

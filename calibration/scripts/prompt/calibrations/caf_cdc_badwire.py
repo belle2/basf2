@@ -12,7 +12,8 @@ from prompt.calibrations.caf_cdc import settings as cdc_tracking_calibration
 from ROOT import Belle2
 
 settings = CalibrationSettings(name="CDC badwire",
-                               expert_username="manhtt",
+                               expert_username="ttmanh",
+                               subsystem="cdc",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["mumu_tight_or_highm_calib"],
@@ -27,7 +28,8 @@ settings = CalibrationSettings(name="CDC badwire",
                                    "components": ["CDC", "ECL", "KLM"],
                                     "payload_boundaries": [],
                                    "backend_args": {"request_memory": "4 GB"}
-                               })
+                               },
+                               produced_payloads=["CDCBadWires"])
 
 
 # Main function to get calibrations

@@ -115,4 +115,3 @@ main.add_module(rootOutput)
 # Final words:
 b2.log_to_file('createSim.log', append=False)
 b2.process(main)
-print(b2.statistics)

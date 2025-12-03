@@ -76,6 +76,7 @@ def default_event_abort(module, condition, error_flag):
 
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
+                       with_cdc_cellular_automaton=False,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
                        pxd_filtering_offline=False,
@@ -110,6 +111,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         the fitted hypotheses are pion, kaon and proton, i.e. [211, 321, 2212].
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
+    :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
+        after the global algorithm (Legendre).
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param add_trigger_calculation: add the software trigger modules for monitoring (do not make any cut)
@@ -163,6 +166,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  add_modules_for_trigger_calculation=add_trigger_calculation,
                                  skipGeometryAdding=skipGeometryAdding,
                                  trackFitHypotheses=trackFitHypotheses,
+                                 with_cdc_cellular_automaton=with_cdc_cellular_automaton,
                                  use_second_cdc_hits=use_second_cdc_hits,
                                  add_muid_hits=add_muid_hits,
                                  reconstruct_cdst=reconstruct_cdst,
@@ -197,6 +201,7 @@ def add_prefilter_reconstruction(path,
                                  add_modules_for_trigger_calculation=True,
                                  skipGeometryAdding=False,
                                  trackFitHypotheses=None,
+                                 with_cdc_cellular_automaton=False,
                                  use_second_cdc_hits=False,
                                  add_muid_hits=False,
                                  reconstruct_cdst=None,
@@ -220,6 +225,8 @@ def add_prefilter_reconstruction(path,
         all (but you will have to add it on your own then).
     :param trackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
         the fitted hypotheses are pion, kaon and proton, i.e. [211, 321, 2212].
+    :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
+        after the global algorithm (Legendre).
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
@@ -269,6 +276,7 @@ def add_prefilter_reconstruction(path,
         mcTrackFinding=False,
         skipGeometryAdding=skipGeometryAdding,
         trackFitHypotheses=trackFitHypotheses,
+        with_cdc_cellular_automaton=with_cdc_cellular_automaton,
         use_second_cdc_hits=use_second_cdc_hits,
         pxd_filtering_offline=pxd_filtering_offline,
         create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
@@ -343,8 +351,7 @@ def add_postfilter_reconstruction(path,
     if reconstruct_cdst == 'rawFormat':
         add_dedx_modules(
             path,
-            components=components,
-            enableDebugOutput=True
+            components=components
         )
         if pruneTracks:
             add_prune_tracks(
@@ -440,7 +447,7 @@ def add_cosmics_reconstruction(
     if posttracking:
         if reconstruct_cdst:
             add_special_vxd_modules(path, components=components)
-            add_dedx_modules(path, components=components, enableDebugOutput=True)
+            add_dedx_modules(path, components=components)
             add_prune_tracks(path, components=components)
 
         else:
@@ -752,6 +759,7 @@ def add_klm_modules(path, components=None):
     if components is None or 'KLM' in components:
         path.add_module('KLMReconstructor')
         path.add_module('KLMClustersReconstructor')
+        path.add_module('KLMClusterAna')
 
 
 def add_klm_mc_matcher_module(path, components=None):
@@ -895,7 +903,7 @@ def add_ext_module(path, components=None):
         path.add_module('Ext')
 
 
-def add_dedx_modules(path, components=None, for_cdst_analysis=False, enableDebugOutput=False):
+def add_dedx_modules(path, components=None, for_cdst_analysis=False):
     """
     Add the dE/dX reconstruction modules to the path.
 
@@ -907,10 +915,10 @@ def add_dedx_modules(path, components=None, for_cdst_analysis=False, enableDebug
     # CDC dE/dx PID
     if components is None or 'CDC' in components:
         if for_cdst_analysis:
-            path.add_module('CDCDedxPIDCreator', enableDebugOutput=True)
+            path.add_module('CDCDedxPIDCreator')
         else:
             path.add_module('CDCDedxHitSaver')
-            path.add_module('CDCDedxPIDCreator', enableDebugOutput=enableDebugOutput)
+            path.add_module('CDCDedxPIDCreator')
     # VXD dE/dx PID
     # only run this if the SVD is enabled - PXD is disabled by default
     if components is None or 'SVD' in components:

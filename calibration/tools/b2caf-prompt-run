@@ -172,7 +172,7 @@ Generally it is best not to set anything in the prompt script itself. Just use t
     required_input_data_names = cal_module.settings.input_data_names
     if not required_input_data_names.issubset(frozenset(input_data_files.keys())):
         error_message = (f"The input data does not contain all of the required input names.\n"
-                         f"Required: {sorted(cal_module.input_data_names)}\n"
+                         f"Required: {sorted(cal_module.settings.input_data_names)}\n"
                          f"Input:    {sorted(input_data_files.keys())}")
         raise KeyError(error_message)
 

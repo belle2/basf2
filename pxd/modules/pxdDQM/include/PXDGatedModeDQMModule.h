@@ -11,13 +11,13 @@
 #include <framework/core/HistoModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDRawHit.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <TH2.h>
 #include <string>
 #include <map>
 
 namespace Belle2 {
+  class EventLevelTriggerTimeInfo;
+  class PXDRawHit;
 
   namespace PXD {
     /** The PXD for GatedMode DQM module.

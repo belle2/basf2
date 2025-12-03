@@ -191,6 +191,9 @@ void DQMHistAnalysisTOPModule::initialize()
     }
   }
 
+  m_c_skipProcFlagFract = new TCanvas("TOP/c_skipProcFlagFract", "c_skipProcFlagFract");
+  m_c_injVetoFlagFract = new TCanvas("TOP/c_injVetoFlagFract", "c_injVetoFlagFract");
+
   m_text1 = new TPaveText(0.125, 0.8, 0.675, 0.88, "NDC");
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
@@ -292,6 +295,14 @@ void DQMHistAnalysisTOPModule::event()
 
   // Injection BG
   makeInjectionBGPlots();
+
+  // normalize histogram for injection veto flags check
+  auto* injVetoFlagDiff = (TH1F*) findHist("TOP/injVetoFlagDiff");
+  if (injVetoFlagDiff) injVetoFlagDiff->Scale(1 / injVetoFlagDiff->Integral(), "nosw2");
+
+  // make flag fraction plots
+  makeFlagFractPlot("TOP/skipProcFlag", m_skipProcFlagFract, m_c_skipProcFlagFract);
+  makeFlagFractPlot("TOP/injVetoFlag", m_injVetoFlagFract, m_c_injVetoFlagFract);
 
   // Set Epics variables
   setEpicsVariables();
@@ -905,6 +916,27 @@ void DQMHistAnalysisTOPModule::makeInjectionBGPlots()
 
 }
 
+void DQMHistAnalysisTOPModule::makeFlagFractPlot(const std::string& hname, TH1* histogram, TCanvas* canvas)
+{
+  if (histogram) delete histogram;
+  auto* h = (TH2F*) findHist(hname);
+  if (not h) return;
+
+  histogram = h->ProjectionX((hname + "Fract").c_str(), 2, 2);
+  auto* px = h->ProjectionX("tmp");
+  histogram->Divide(histogram, px, 1, 1, "B");
+  delete px;
+  histogram->SetTitle(TString(h->GetTitle()) + " is set");
+  histogram->SetYTitle("fraction of events");
+  histogram->SetMarkerStyle(24);
+  histogram->SetMinimum(0);
+
+  if (not canvas) return;
+  canvas->Clear();
+  canvas->cd();
+  histogram->Draw();
+  canvas->Modified();
+}
 
 void DQMHistAnalysisTOPModule::setMiraBelleVariables(const std::string& variableName, const TH1* histogram)
 {

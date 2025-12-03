@@ -40,7 +40,7 @@ class CDCCombined(TrackingValidationRun):
 
     def finder_module(self, path):
         """Add the CDC track-finding module to the basf2 path"""
-        add_cdc_track_finding(path, with_ca=True)
+        add_cdc_track_finding(path, with_cdc_cellular_automaton=True)
         # adjust_module(path, "TFCDC_WireHitPreparer",
         #               UseNLoops=1)
 

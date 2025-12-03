@@ -65,7 +65,7 @@ add_raw_seqoutput(main, 'raw.sroot', additionalObjects=['SoftwareTriggerResult',
 # add_raw_seqoutput(main, 'raw.sroot', additionalObjects=['SoftwareTriggerResult'])
 
 # Go!
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

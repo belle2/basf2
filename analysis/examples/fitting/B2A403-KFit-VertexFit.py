@@ -95,6 +95,3 @@ variablesToNtuple('D*+', dstar_vars + d0_vars + fs_hadron_vars,
 
 # Process the events
 b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)

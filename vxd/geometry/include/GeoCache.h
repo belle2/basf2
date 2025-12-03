@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef VXD_GEOCACHE_H
-#define VXD_GEOCACHE_H
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -183,4 +182,3 @@ namespace Belle2 {
     };
   }
 } //Belle2 namespace
-#endif

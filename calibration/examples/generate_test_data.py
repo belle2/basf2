@@ -30,5 +30,5 @@ main = b2.create_path()
 main.add_module('EventInfoSetter', expList=[experiment]*len(runs), runList=runs, evtNumList=[nevents]*len(runs))
 main.add_module('RootOutput',
                 outputFileName=output_dir + f'/DST_exp{experiment:d}_run{run_low:d}_run{run_high:d}.root')
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

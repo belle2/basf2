@@ -45,16 +45,16 @@ ECLCRFinderModule::ECLCRFinderModule() : Module(), m_eclCalDigits(eclCalDigitArr
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add module parameters.
-  addParam("energyCut0", m_energyCut[0], "Seed energy cut.", 10.0 * Belle2::Unit::MeV);
-  addParam("energyCut1", m_energyCut[1], "Growth energy cut.", 10.0 * Belle2::Unit::MeV);
+  addParam("energyCut0", m_energyCut[0], "Seed energy cut.", 20.0 * Belle2::Unit::MeV);
+  addParam("energyCut1", m_energyCut[1], "Growth energy cut.", 20.0 * Belle2::Unit::MeV);
   addParam("energyCut2", m_energyCut[2], "Digit energy cut.", 0.5 * Belle2::Unit::MeV);
-  addParam("timeCut0", m_timeCut[0], "Seed time cut (negative values for residual cut).", 99999.);
-  addParam("timeCut1", m_timeCut[1], "Growth time cut (negative values for residual cut).", 99999.);
+  addParam("timeCut0", m_timeCut[0], "Seed time cut (negative values for residual cut).", 400.);
+  addParam("timeCut1", m_timeCut[1], "Growth time cut (negative values for residual cut).", 400.);
   addParam("timeCut2", m_timeCut[2], "Digit time cut (negative values for residual cut).", 99999.);
   addParam("timeCut0maxEnergy", m_timeCut_maxEnergy[0], "Time cut is only applied below this energy for seed crystals.",
-           0.0 * Belle2::Unit::MeV);
+           99999.0 * Belle2::Unit::MeV);
   addParam("timeCut1maxEnergy", m_timeCut_maxEnergy[1], "Time cut is only applied below this energy for growth crystals.",
-           0.0 * Belle2::Unit::MeV);
+           99999.0 * Belle2::Unit::MeV);
   addParam("timeCut2maxEnergy", m_timeCut_maxEnergy[2], "Time cut is only applied below this energy for digits.",
            0.0 * Belle2::Unit::MeV);
   addParam("mapType0", m_mapType[0], "Map type for seed crystals.", std::string("N"));

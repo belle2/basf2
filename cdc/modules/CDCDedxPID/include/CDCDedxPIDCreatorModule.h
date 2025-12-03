@@ -32,8 +32,6 @@
 #include <cdc/dbobjects/CDCDedxHadronCor.h>
 #include <cdc/dbobjects/CDCDedxInjectionTime.h>
 
-#include <string.h>
-
 namespace Belle2 {
 
   /**

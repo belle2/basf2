@@ -1,14 +1,4 @@
 Import('env')
 env['TOOLS_LIBS']['trg-grl-writedb'] = ['framework', 'trg', 'trg_grl_dbobjects', '$ROOT_LIBS']
 Return('env')
-# Import('env')
 
-# env.Program(
-#     target='trg-grl-writedb',
-#     source='trg-grl-writedb.cc',
-#     LIBS=['framework', 'trg', 'trg_grl_dbobjects', 'Core', 'RIO', 'Tree', 'Hist'],
-# )
-
-# Import('env')
-# env['TOOLS_LIBS']['trg-grl-writedb'] = ['framework', 'trg', 'trg_grl_dbobjects', '$ROOT_LIBS']
-# Return('env')

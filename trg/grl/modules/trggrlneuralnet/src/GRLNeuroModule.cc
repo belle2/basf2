@@ -97,14 +97,16 @@ GRLNeuroModule::GRLNeuroModule() : Module()
   {0});
   addParam("useDB", m_useDB,
            "Flag to use database to set config", true);
+
+  // // TRGGRLInfo must exist for this module
+  // addRequired<TRGGRLInfo>(m_TrgGrlInformationName);
+
 }
 
 
 void
 GRLNeuroModule::initialize()
 {
-
-  std::unordered_map<int, double> phiMap;
 
   std::string csvPath = FileSystem::findFile(m_csvThetaPhiFile, true);
   if (csvPath.empty()) {
@@ -243,10 +245,10 @@ void GRLNeuroModule::event()
 
   //StoreArray<TRGECLTrg> trgArray;
   StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
-  if (!trgInfo.isValid()) {
-    std::cout << "[WARNING] TRGGRLObjects not found in this event!" << std::endl;
-    return;
-  }
+  // if (!trgInfo.isValid()) {
+  //   std::cout << "[WARNING] TRGGRLObjects not found in this event!" << std::endl;
+  //   return;
+  // }
 
   StoreArray<TRGECLCluster> eclTrgClusterArray(m_TrgECLClusterName);
   int necl = eclTrgClusterArray.getEntries();

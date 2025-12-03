@@ -24,6 +24,19 @@ def add_grl_trigger(path, SimulationMode=1):
     grlnn = b2.register_module('GRLNeuro')
     path.add_module(grlnn)
 
+    _TRGGRLInfo = 'TRGGRLObjects'
+
+    path.add_module(
+        'TRGGRLProjects',
+        SimulationMode=SimulationMode,
+        TrgGrlInformation=_TRGGRLInfo
+    )
+
+    path.add_module(
+        'TRGGRLInjectionVetoFromOverlay',
+        TRGGRLInfoName=_TRGGRLInfo
+    )
+
     objects = b2.register_module('TRGGRLProjects')
     objects.param('SimulationMode', SimulationMode)
     path.add_module(objects)

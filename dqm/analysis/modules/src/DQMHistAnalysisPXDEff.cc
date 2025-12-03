@@ -580,6 +580,7 @@ void DQMHistAnalysisPXDEffModule::event()
           tt->SetTextSize(0.035);
           tt->SetTextAngle(90);// Rotated
           tt->SetTextAlign(12);// Centered
+          ltmap[it] = tt;
         } else {
           tt->SetY(scale_min);
         }

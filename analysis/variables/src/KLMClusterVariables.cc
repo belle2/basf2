@@ -361,7 +361,7 @@ Returns the energy of the associated KLMCluster. This variable returns an approx
 
 )DOC","GeV");
   MAKE_DEPRECATED("klmClusterEnergy", true, "light-2511-gacrux", R"DOC(
-As this variable is deemed not physically meaningful it has been deprecated to avoid further use.
+                   As this variable is deemed not physically meaningful it has been deprecated to avoid further use.
 )DOC");
   REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum, R"DOC(
 Returns the momentum magnitude of the associated KLMCluster. This variable returns an approximation of the momentum, since it is proportional to :b2:var:`klmClusterLayers` 
@@ -369,7 +369,7 @@ Returns the momentum magnitude of the associated KLMCluster. This variable retur
 
 )DOC","GeV/c");
   MAKE_DEPRECATED("klmClusterMomentum", true, "light-2511-gacrux", R"DOC(
-As this variable is deemed not physically meaningful it has been deprecated to avoid further use.
+                   As this variable is deemed not physically meaningful it has been deprecated to avoid further use.
 )DOC");
   REGISTER_VARIABLE("klmClusterIsBKLM", klmClusterIsBKLM,
                     "Returns 1 if the associated KLMCluster is in barrel KLM.");

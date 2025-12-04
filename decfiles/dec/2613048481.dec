@@ -1,6 +1,6 @@
-# EventType: 2613042403
-# Descriptor: [ccbar anti-Xic02anti-XipKmPi0 anti-Xip2anti-LambdaPip anti-Lambda2anti-PmPip]
-# NickName: anti-Xic02anti-XipKmPi0_anti-Xip2anti-LambdaPip_anti-Lambda2anti-PmPip
+# EventType: 2613048481
+# Descriptor: [ccbar anti-Xic02anti-XipPimEta anti-Xip2anti-LambdaPip anti-Lambda2anti-PmPip Eta2GammaGamma]
+# NickName: anti-Xic02anti-XipPimEta_anti-Xip2anti-LambdaPip_anti-Lambda2anti-PmPip_Eta2GammaGamma
 # PhysicsWG: Charm
 # Responsible: Young Jun Kim 
 # Date: 20251125 (YYYYMMDD)
@@ -15,9 +15,10 @@ Enddecay
 
 Alias MyAntiXi+ anti-Xi+
 Alias MyAntiLambda anti-Lambda0
+Alias MyEta eta
 
 Decay anti-Xi_c0
-1.000 MyAntiXi+ K- pi0       PHSP;
+1.000 MyAntiXi+ pi- MyEta       PHSP;
 Enddecay
 
 Decay MyAntiXi+
@@ -26,6 +27,10 @@ Enddecay
 
 Decay MyAntiLambda
 1.000 anti-p- pi+       PHSP;
+Enddecay
+
+Decay MyEta
+1.000 gamma gamma       PHSP;
 Enddecay
 
 End

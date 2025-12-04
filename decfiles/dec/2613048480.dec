@@ -1,6 +1,6 @@
-# EventType: 2613062400
-# Descriptor: [ccbar Xic02XimPipEta Xim2LambdaPim Lambda2PpPim Eta2PipPimPi0]
-# NickName: Xic02XimPipEta_Xim2LambdaPim_Lambda2PpPim_Eta2PipPimPi0
+# EventType: 2613048480
+# Descriptor: [ccbar Xic02XimPipEta Xim2LambdaPim Lambda2PpPim Eta2GammaGamma]
+# NickName: Xic02XimPipEta_Xim2LambdaPim_Lambda2PpPim_Eta2GammaGamma
 # PhysicsWG: Charm
 # Responsible: Young Jun Kim 
 # Date: 20251125 (YYYYMMDD)
@@ -30,7 +30,7 @@ Decay MyLambda
 Enddecay
 
 Decay MyEta
-1.000 pi+ pi- pi0       PHSP;
+1.000 gamma gamma       PHSP;
 Enddecay
 
 End

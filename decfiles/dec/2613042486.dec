@@ -1,6 +1,6 @@
-# EventType: 2613042408
-# Descriptor: [ccbar Xic02Xi1530barPi0 Xi1530bar2XimPip Xim2LambdaPim Lambda2PpPim]
-# NickName: Xic02Xi1530barPi0_Xi1530bar2XimPip_Xim2LambdaPim_Lambda2PpPim
+# EventType: 2613042486
+# Descriptor: [ccbar Xic02Xi1530mPip Xi1530m2XimPi0 Xim2LambdaPim Lambda2PpPim]
+# NickName: Xic02Xi1530mPip_Xi1530m2XimPi0_Xim2LambdaPim_Lambda2PpPim
 # PhysicsWG: Charm
 # Responsible: Young Jun Kim 
 # Date: 20251125 (YYYYMMDD)
@@ -13,16 +13,16 @@ Decay vpho
 1.000 c    anti-c      PYTHIA 91;
 Enddecay
 
-Alias MyXi1530 anti-Xi*0
+Alias MyXi1530- Xi*-
 Alias MyXi- Xi-
 Alias MyLambda Lambda0
 
 Decay Xi_c0
-1.000 MyXi1530 pi0       PHSP;
+1.000 MyXi1530- pi+       PHSP;
 Enddecay
 
-Decay MyXi1530
-1.000 MyXi- pi+       PHSP;
+Decay MyXi1530-
+1.000 MyXi- pi0       PHSP;
 Enddecay
 
 Decay MyXi-

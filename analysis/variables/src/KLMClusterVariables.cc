@@ -356,7 +356,8 @@ Returns the :math:`z` position of the associated KLMCluster.
   REGISTER_VARIABLE("klmClusterLayers", klmClusterLayers,
                     "Returns the number of KLM layers with 2-dimensional hits of the associated KLMCluster.");
   REGISTER_VARIABLE("klmClusterEnergy", klmClusterEnergy, R"DOC(
-Returns the energy of the associated KLMCluster. This variable returns an approximation of the energy: it uses `klmClusterMomentum` as momentum and the hypothesis that the KLMCluster is originated by a :math:`K_{L}^0` 
+Returns the energy of the associated KLMCluster. This variable returns an approximation of the energy: it uses `klmClusterMomentum` as momentum and the hypothesis that the KLMCluster is originated by a :math:`K_{L}^0`
+
   (:math:`E_{\text{KLM}} = \sqrt{M_{K^0_L}^2 + p_{\text{KLM}}^2}`, where :math:`E_{\text{KLM}}` is this variable, :math:`M_{K^0_L}` is the :math:`K^0_L` mass and :math:`p_{\text{KLM}}` is `klmClusterMomentum`).
 
 )DOC","GeV");
@@ -364,8 +365,8 @@ Returns the energy of the associated KLMCluster. This variable returns an approx
                    As this variable is deemed not physically meaningful it has been deprecated to avoid further use.
 )DOC");
   REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum, R"DOC(
-Returns the momentum magnitude of the associated KLMCluster. This variable returns an approximation of the momentum, since it is proportional to `klmClusterLayers` 
-      
+Returns the momentum magnitude of the associated KLMCluster. This variable returns an approximation of the momentum, since it is proportional to `klmClusterLayers`
+
   (:math:`p_{\text{KLM}} = 0.215 \cdot N_{\text{layers}}`, where :math:`p_{\text{KLM}}` is this variable and :math:`N_{\text{layers}}` is `klmClusterLayers`).
 
 )DOC","GeV/c");

@@ -746,54 +746,6 @@ namespace Belle2 {
 
       //----------
       //- Lv3AuCoat
-      prep = "Lv2AuCoat.";
-      //
-      const int Lv2AuCoat_num = 2;
-      //
-      // Part1
-      //
-      double Lv2AuCoat1_Z[Lv2AuCoat_num];
-      Lv2AuCoat1_Z[0] = -m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
-      Lv2AuCoat1_Z[1] = -m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
-      double Lv2AuCoat1_rI[Lv2AuCoat_num];
-      Lv2AuCoat1_rI[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
-      Lv2AuCoat1_rI[1] = Lv2AuCoat1_rI[0];
-      double Lv2AuCoat1_rO[Lv2AuCoat_num];
-      Lv2AuCoat1_rO[0] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
-      Lv2AuCoat1_rO[1] = Lv2AuCoat1_rO[0];
-      //
-      // Part2
-      //
-      double Lv2AuCoat2_Z[Lv2AuCoat_num];
-      Lv2AuCoat2_Z[0] = m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
-      Lv2AuCoat2_Z[1] = m_config.getParameter(prep + "L4") * Unit::cm / Unit::mm;
-      double Lv2AuCoat2_rI[Lv2AuCoat_num];
-      Lv2AuCoat2_rI[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
-      Lv2AuCoat2_rI[1] = Lv2AuCoat2_rI[0];
-      double Lv2AuCoat2_rO[Lv2AuCoat_num];
-      Lv2AuCoat2_rO[0] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
-      Lv2AuCoat2_rO[1] = Lv2AuCoat2_rO[0];
-      //
-      string strMat_Lv2AuCoat = m_config.getParameterStr(prep + "Material");
-      G4Material* mat_Lv2AuCoat = Materials::get(strMat_Lv2AuCoat);
-
-      //define geometry
-      G4Polycone* geo_Lv2AuCoat1 = new G4Polycone("geo_Lv2AuCoat1_name", 0, 2 * M_PI, Lv2AuCoat_num, Lv2AuCoat1_Z, Lv2AuCoat1_rI,
-                                                  Lv2AuCoat1_rO);
-      G4Polycone* geo_Lv2AuCoat2 = new G4Polycone("geo_Lv2AuCoat2_name", 0, 2 * M_PI, Lv2AuCoat_num, Lv2AuCoat2_Z, Lv2AuCoat2_rI,
-                                                  Lv2AuCoat2_rO);
-      G4UnionSolid* geo_Lv2AuCoat = new G4UnionSolid("geo_Lv2AuCoat_name", geo_Lv2AuCoat1, geo_Lv2AuCoat2);
-      G4LogicalVolume* logi_Lv2AuCoat = new G4LogicalVolume(geo_Lv2AuCoat, mat_Lv2AuCoat, "logi_Lv2AuCoat_name");
-
-      //-   put volume
-      setColor(*logi_Lv2AuCoat, "#CCCC00");
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2AuCoat, "phys_Lv2AuCoat_name", logi_Lv2Paraf, false, 0);
-
-      //-
-      //----------
-
-      //----------
-      //- Lv3AuCoat
 
       // Get parameters from .xml file
       prep = "Lv3AuCoat.";

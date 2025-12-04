@@ -1343,7 +1343,7 @@ if __name__ == "__main__":
     )
 
     # NOTE: can't calculate weighted MC averages for combined skims, since certain stats are lists
-    if not args.dataonly and not args.combined:
+    if not args.data_only and not args.combined:
         allSkimStats = addWeightedMC(allSkimStats, statSpecifier, samples, args.VERBOSE)
 
     if args.confluence:

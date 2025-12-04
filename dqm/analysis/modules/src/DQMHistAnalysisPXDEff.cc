@@ -526,7 +526,8 @@ void DQMHistAnalysisPXDEffModule::event()
       m_cEffAllUpdate->cd(0);
 
       auto gr = m_eEffAllUpdate->GetPaintedGraph();
-      auto gr3 = (TGraphAsymmErrors*) m_eEffAll->GetPaintedGraph()->Clone();
+      // A clone in next line would create a memory leak unless taken care of as member. No clone results in acceptable minor displayement of points
+      auto gr3 = (TGraphAsymmErrors*) m_eEffAll->GetPaintedGraph(); // ->Clone();
       if (gr3) {
         for (int i = 0; i < gr3->GetN(); i++) {
           Double_t x, y;

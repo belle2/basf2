@@ -3,6 +3,25 @@
 ONNX MVA tutorial
 =================
 
+.. sidebar:: Overview
+   :class: overview
+
+   **Length**: 2 hrs
+
+   **Prerequisites**:
+
+    * :ref:`onlinebook_cs` lesson
+
+   **Questions**:
+
+   * Ho do I apply custom MVA methods within basf2?
+
+   **Objectives**:
+
+   * Train a custom MVA model for continuum suppression
+   * Convert the model into the ONNX format
+   * Apply the model within basf2 and evaluate its performance
+
 .. note::
 
     This tutorial closely follows the :ref:`online_book_cs_bdt` tutorial. If you are new to either Continnum suppression or Machine Learning in general read that one first.

@@ -87,8 +87,8 @@ void DQMHistAnalysisSVDClustersOnTrackModule::beginRun()
   // cluster time on tracks legend
   m_legProblem->Clear();
   m_legProblem->AddText("ERROR!");
-  m_legProblem->AddText(Form("abs(Mean) > %3.1f ns", m_timeThreshold));
-  m_legProblem->AddText("Mean (#pm 40 ns): 0.0 ns");
+  m_legProblem->AddText(Form("abs(MaxPos) > %3.1f ns", m_timeThreshold));
+  m_legProblem->AddText("MaxPos: 0.0 ns");
 
 
   m_legWarning->Clear();
@@ -96,8 +96,8 @@ void DQMHistAnalysisSVDClustersOnTrackModule::beginRun()
 
   m_legNormal->Clear();
   m_legNormal->AddText("TIME SHIFT UNDER LIMIT");
-  m_legNormal->AddText(Form("abs(Mean) < %3.1f ns", m_timeThreshold));
-  m_legNormal->AddText("Mean (#pm 40 ns): 0.0 ns");
+  m_legNormal->AddText(Form("abs(MaxPos) < %3.1f ns", m_timeThreshold));
+  m_legNormal->AddText("MaxPos: 0.0 ns");
 
   m_legLowStat->Clear();
   m_legLowStat->AddText("Not enough statistics");
@@ -148,11 +148,10 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
     m_hClusterOnTrackTime_L456V.SetStats(false);
 
     Int_t binMax = m_hClusterOnTrackTime_L456V.GetMaximumBin();
-    m_refMean = m_hClusterOnTrackTime_L456V.GetXaxis()->GetBinCenter(binMax);
-    printf("mean %f\n", m_refMean);
+    double refMean = m_hClusterOnTrackTime_L456V.GetXaxis()->GetBinCenter(binMax);
 
     if (nEvents > m_statThreshold)
-      status = getCanvasStatus(m_hClusterOnTrackTime_L456V);
+      status = getCanvasStatus(refMean);
     else
       status = lowStat;
 
@@ -182,8 +181,12 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
       m_hClusterOnTrackTimeL456V3Samples.SetName(hName.Data());
       m_hClusterOnTrackTimeL456V3Samples.SetTitle(Form("ClusterOnTrack Time L456V 3 samples %s", runID.Data()));
 
+      Int_t binMax = m_hClusterOnTrackTime_L456V.GetMaximumBin();
+      double refMean = m_hClusterOnTrackTime_L456V.GetXaxis()->GetBinCenter(binMax);
+
+
       if (nEvents > m_statThreshold)
-        status = getCanvasStatus(m_hClusterOnTrackTimeL456V3Samples);
+        status = getCanvasStatus(refMean);
       else
         status = lowStat;
 
@@ -221,21 +224,19 @@ void DQMHistAnalysisSVDClustersOnTrackModule::terminate()
   delete m_cClusterOnTrackTimeL456V3Samples;
 }
 
-int DQMHistAnalysisSVDClustersOnTrackModule::getCanvasStatus(TH1F& histo)
+int DQMHistAnalysisSVDClustersOnTrackModule::getCanvasStatus(double refMean)
 {
   int status = good;
-  histo.GetXaxis()->SetRangeUser(m_refMean - 40, m_refMean + 40); // [-40 ns,40 ns]
-  Float_t mean_PeakInCenter = histo.GetMean(); //
-  histo.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
 
-  if (fabs(mean_PeakInCenter) > m_timeThreshold) {
+  if (fabs(refMean) > m_timeThreshold) {
     status = error;
     TText* text = m_legProblem->GetLine(m_legProblem->GetSize() - 1);
-    text->SetText(text->GetX(), text->GetY(), Form("Mean (%3.1f - #pm 40 ns): %3.1f ns", m_refMean, mean_PeakInCenter));
+    text->SetText(text->GetX(), text->GetY(), Form("MaxPos: %3.1f ns", refMean));
   } else {
     status = good;
     TText* text = m_legNormal->GetLine(m_legNormal->GetSize() - 1);
-    text->SetText(text->GetX(), text->GetY(), Form("Mean (%3.1f - #pm 40 ns): %3.1f ns", m_refMean, mean_PeakInCenter));
+    text->SetText(text->GetX(), text->GetY(), Form("MaxPos: %3.1f ns", refMean));
   }
+
   return status;
 }

@@ -72,9 +72,8 @@ namespace Belle2 {
 
     double m_statThreshold; /**< minimal number of events to compare histograms */
     double m_timeThreshold; /**< difference between mean of cluster time for present and reference run */
-    float m_refMean; /**< mean of the signal time peak  */
 
-    int getCanvasStatus(TH1F& histo); /**< get canvas status */
+    int getCanvasStatus(double refMean); /**< get canvas status */
 
     TH1F m_hClusterOnTrackTime_L456V; /**< time for clusters on Track for L456V histo*/
     TCanvas* m_cClusterOnTrackTime_L456V = nullptr; /**< time for clusters on Track for L456V canvas*/

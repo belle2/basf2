@@ -246,10 +246,13 @@ inline float sim_result_t(float val)
 void
 GRLNeuro::initialize(const Parameters& p)
 {
+  using std::vector;
+  B2INFO("GRLNeuro::initialize: nMLP=" << p.nMLP
+         << " nHidden.size=" << p.nHidden.size()
+         << " outputScale.size=" << p.outputScale.size());
 
-  // check parameters
+  // basic checks already present
   bool okay = true;
-  // ensure that length of lists matches number of sectors
   if (p.nHidden.size() != 1 && p.nHidden.size() != p.nMLP) {
     B2ERROR("Number of nHidden lists should be 1 or " << p.nMLP);
     okay = false;
@@ -258,8 +261,7 @@ GRLNeuro::initialize(const Parameters& p)
     B2ERROR("Number of outputScale lists should be 1 or " << p.nMLP);
     okay = false;
   }
-  // ensure that number of target nodes is valid
-  unsigned short nTarget = int(p.targetresult);
+  unsigned short nTarget = static_cast<unsigned short>(p.targetresult);
   if (nTarget < 1) {
     B2ERROR("No outputs! Turn on targetresult.");
     okay = false;
@@ -270,57 +272,141 @@ GRLNeuro::initialize(const Parameters& p)
       okay = false;
     }
   }
-
   if (!okay) return;
-  // initialize MLPs
+
+  // --- comprehensive parameter-size validation ---
+  auto check_size = [&](const auto & v, const char* name) -> bool {
+    const size_t s = v.size();
+    if (s != 1 && s != static_cast<size_t>(p.nMLP))
+    {
+      B2ERROR(std::string(name) + " size (" + std::to_string(s)
+              + ") != 1 and != nMLP (" + std::to_string(p.nMLP) + ")");
+      return false;
+    }
+    return true;
+  };
+
+  bool params_ok = true;
+  params_ok &= check_size(p.i_cdc_sector, "i_cdc_sector");
+  params_ok &= check_size(p.i_ecl_sector, "i_ecl_sector");
+  params_ok &= check_size(p.nHidden, "nHidden");
+  params_ok &= check_size(p.outputScale, "outputScale");
+
+  // all bit/quantization parameter containers (expected vector< vector<int/bool> >)
+  params_ok &= check_size(p.total_bit_bias, "total_bit_bias");
+  params_ok &= check_size(p.int_bit_bias, "int_bit_bias");
+  params_ok &= check_size(p.is_signed_bias, "is_signed_bias");
+  params_ok &= check_size(p.rounding_bias, "rounding_bias");
+  params_ok &= check_size(p.saturation_bias, "saturation_bias");
+
+  params_ok &= check_size(p.total_bit_accum, "total_bit_accum");
+  params_ok &= check_size(p.int_bit_accum, "int_bit_accum");
+  params_ok &= check_size(p.is_signed_accum, "is_signed_accum");
+  params_ok &= check_size(p.rounding_accum, "rounding_accum");
+  params_ok &= check_size(p.saturation_accum, "saturation_accum");
+
+  params_ok &= check_size(p.total_bit_weight, "total_bit_weight");
+  params_ok &= check_size(p.int_bit_weight, "int_bit_weight");
+  params_ok &= check_size(p.is_signed_weight, "is_signed_weight");
+  params_ok &= check_size(p.rounding_weight, "rounding_weight");
+  params_ok &= check_size(p.saturation_weight, "saturation_weight");
+
+  params_ok &= check_size(p.total_bit_relu, "total_bit_relu");
+  params_ok &= check_size(p.int_bit_relu, "int_bit_relu");
+  params_ok &= check_size(p.is_signed_relu, "is_signed_relu");
+  params_ok &= check_size(p.rounding_relu, "rounding_relu");
+  params_ok &= check_size(p.saturation_relu, "saturation_relu");
+
+  params_ok &= check_size(p.total_bit, "total_bit");
+  params_ok &= check_size(p.int_bit, "int_bit");
+  params_ok &= check_size(p.is_signed, "is_signed");
+  params_ok &= check_size(p.rounding, "rounding");
+  params_ok &= check_size(p.saturation, "saturation");
+
+  // W_input and I_input are expected to be vector< vector<...> >
+  params_ok &= check_size(p.W_input, "W_input");
+  params_ok &= check_size(p.I_input, "I_input");
+
+  if (!params_ok) {
+    B2ERROR("GRLNeuro::initialize aborted due to invalid parameter vector sizes.");
+    return;
+  }
+
+  // initialize MLPs safely
   m_MLPs.clear();
+  m_MLPs.reserve(p.nMLP);
+
   for (unsigned iMLP = 0; iMLP < p.nMLP; ++iMLP) {
-    //get indices for sector parameters
-    unsigned short nInput = p.i_cdc_sector[iMLP] + p.i_ecl_sector[iMLP];
-    vector<float> nhidden =  p.nHidden[iMLP];
-    vector<unsigned short> nNodes = {nInput};
+    // helper: if container.size()==1 use element 0 (broadcast), else use element iMLP
+    auto pick = [&](const auto & container) -> const auto& {
+      return (container.size() == 1) ? container[0] : container[iMLP];
+    };
+
+    // get indices for sector parameters (scalar containers)
+    unsigned short i_cdc = static_cast<unsigned short>(pick(p.i_cdc_sector));
+    unsigned short i_ecl = static_cast<unsigned short>(pick(p.i_ecl_sector));
+    unsigned short nInput = static_cast<unsigned short>(i_cdc + i_ecl);
+
+    // nHidden: vector< vector<float> >
+    const vector<float>& nhidden = pick(p.nHidden);
+    vector<unsigned short> nNodes = { nInput };
     for (unsigned iHid = 0; iHid < nhidden.size(); ++iHid) {
       if (p.multiplyHidden) {
-        nNodes.push_back(nhidden[iHid] * nNodes[0]);
+        nNodes.push_back(static_cast<unsigned short>(nhidden[iHid] * nNodes[0]));
       } else {
-        nNodes.push_back(nhidden[iHid]);
+        nNodes.push_back(static_cast<unsigned short>(nhidden[iHid]));
       }
     }
     nNodes.push_back(nTarget);
-    unsigned short targetVars = int(p.targetresult);
-    vector<float> outputScale = (p.outputScale.size() == 1) ? p.outputScale[0] : p.outputScale[iMLP];
+    unsigned short targetVars = static_cast<unsigned short>(p.targetresult);
+
+    // outputScale: vector< vector<float> >
+    const vector<float>& outputScale = pick(p.outputScale);
+
     GRLMLP grlmlp_temp = GRLMLP(nNodes, targetVars, outputScale);
-    grlmlp_temp.set_total_bit_bias(p.total_bit_bias[iMLP]);
-    grlmlp_temp.set_int_bit_bias(p.int_bit_bias[iMLP]);
-    grlmlp_temp.set_is_signed_bias(p.is_signed_bias[iMLP]);
-    grlmlp_temp.set_rounding_bias(p.rounding_bias[iMLP]);
-    grlmlp_temp.set_saturation_bias(p.saturation_bias[iMLP]);
-    grlmlp_temp.set_total_bit_accum(p.total_bit_accum[iMLP]);
-    grlmlp_temp.set_int_bit_accum(p.int_bit_accum[iMLP]);
-    grlmlp_temp.set_is_signed_accum(p.is_signed_accum[iMLP]);
-    grlmlp_temp.set_rounding_accum(p.rounding_accum[iMLP]);
-    grlmlp_temp.set_saturation_accum(p.saturation_accum[iMLP]);
-    grlmlp_temp.set_total_bit_weight(p.total_bit_weight[iMLP]);
-    grlmlp_temp.set_int_bit_weight(p.int_bit_weight[iMLP]);
-    grlmlp_temp.set_is_signed_weight(p.is_signed_weight[iMLP]);
-    grlmlp_temp.set_rounding_weight(p.rounding_weight[iMLP]);
-    grlmlp_temp.set_saturation_weight(p.saturation_weight[iMLP]);
-    grlmlp_temp.set_total_bit_relu(p.total_bit_relu[iMLP]);
-    grlmlp_temp.set_int_bit_relu(p.int_bit_relu[iMLP]);
-    grlmlp_temp.set_is_signed_relu(p.is_signed_relu[iMLP]);
-    grlmlp_temp.set_rounding_relu(p.rounding_relu[iMLP]);
-    grlmlp_temp.set_saturation_relu(p.saturation_relu[iMLP]);
-    grlmlp_temp.set_total_bit(p.total_bit[iMLP]);
-    grlmlp_temp.set_int_bit(p.int_bit[iMLP]);
-    grlmlp_temp.set_is_signed(p.is_signed[iMLP]);
-    grlmlp_temp.set_rounding(p.rounding[iMLP]);
-    grlmlp_temp.set_saturation(p.saturation[iMLP]);
-    grlmlp_temp.set_W_input(p.W_input[iMLP]);
-    grlmlp_temp.set_I_input(p.I_input[iMLP]);
-    m_MLPs.push_back(grlmlp_temp);
-    //m_MLPs.push_back(GRLMLP(nNodes, targetVars, outputScale));
+
+    // For all parameter groups that are vector<vector<...>>, pick the correct sub-vector
+    // and pass to the GRLMLP setters.
+    grlmlp_temp.set_total_bit_bias(pick(p.total_bit_bias));
+    grlmlp_temp.set_int_bit_bias(pick(p.int_bit_bias));
+    grlmlp_temp.set_is_signed_bias(pick(p.is_signed_bias));
+    grlmlp_temp.set_rounding_bias(pick(p.rounding_bias));
+    grlmlp_temp.set_saturation_bias(pick(p.saturation_bias));
+
+    grlmlp_temp.set_total_bit_accum(pick(p.total_bit_accum));
+    grlmlp_temp.set_int_bit_accum(pick(p.int_bit_accum));
+    grlmlp_temp.set_is_signed_accum(pick(p.is_signed_accum));
+    grlmlp_temp.set_rounding_accum(pick(p.rounding_accum));
+    grlmlp_temp.set_saturation_accum(pick(p.saturation_accum));
+
+    grlmlp_temp.set_total_bit_weight(pick(p.total_bit_weight));
+    grlmlp_temp.set_int_bit_weight(pick(p.int_bit_weight));
+    grlmlp_temp.set_is_signed_weight(pick(p.is_signed_weight));
+    grlmlp_temp.set_rounding_weight(pick(p.rounding_weight));
+    grlmlp_temp.set_saturation_weight(pick(p.saturation_weight));
+
+    grlmlp_temp.set_total_bit_relu(pick(p.total_bit_relu));
+    grlmlp_temp.set_int_bit_relu(pick(p.int_bit_relu));
+    grlmlp_temp.set_is_signed_relu(pick(p.is_signed_relu));
+    grlmlp_temp.set_rounding_relu(pick(p.rounding_relu));
+    grlmlp_temp.set_saturation_relu(pick(p.saturation_relu));
+
+    grlmlp_temp.set_total_bit(pick(p.total_bit));
+    grlmlp_temp.set_int_bit(pick(p.int_bit));
+    grlmlp_temp.set_is_signed(pick(p.is_signed));
+    grlmlp_temp.set_rounding(pick(p.rounding));
+    grlmlp_temp.set_saturation(pick(p.saturation));
+
+    // W_input / I_input: pick returns a vector<vector<int>> element (i.e. vector<int>)
+    grlmlp_temp.set_W_input(pick(p.W_input));
+    grlmlp_temp.set_I_input(pick(p.I_input));
+
+    m_MLPs.push_back(std::move(grlmlp_temp));
   }
+
+  B2INFO("GRLNeuro::initialize finished. created " << m_MLPs.size() << " MLP(s).");
 }
+
 
 float
 GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)

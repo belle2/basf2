@@ -29,6 +29,7 @@ namespace Belle2 {
     void FastRaytracer::propagate(const PhotonState& photon, bool averaging) const
     {
       clear();
+      m_photonStates.reserve(m_bars.size() * 2 + 2);
       m_photonStates.push_back(photon);
 
       int nbars = m_bars.size();
@@ -66,8 +67,7 @@ namespace Belle2 {
         m_Nyb += (m_Nyb % 2 == 0) ? newState.getNy() : -newState.getNy();
       }
 
-      // Copy instead of reference to avoid invalid reference through vector resize after push_back
-      const auto lastState = m_photonStates.back();
+      const auto& lastState = m_photonStates.back();
       m_photonStates.push_back(lastState);
       auto& newState = m_photonStates.back();
       newState.propagate(m_prism);

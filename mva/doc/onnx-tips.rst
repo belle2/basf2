@@ -172,13 +172,15 @@ In case you want/need to run inference of an ONNX model in a C++ basf2 module, t
 sufficient for most use-cases. To run your inference, first you need to fetch your ONNX model from the conditions database. We recommend 
 saving the model as a raw file into the database, such that it can simply be accessed like this:
 
-.. code:: c++
+.. code:: cpp
+
     auto accessor = DBAccessorBase(DBStoreEntry::c_RawFile, payloadName, true);
     const std::string filename = accessor.getFilename();
 
-where `payloadName` is the name of the payload storing the raw ONNX file. Now, you can initialize an ONNX inference session:
+where ``payloadName`` is the name of the payload storing the raw ONNX file. Now, you can initialize an ONNX inference session:
 
-.. code:: c++
+.. code:: cpp
+
     std::unique_ptr<MVA::ONNX::Session> m_session;
     m_session = std::make_unique<MVA::ONNX::Session>(filename.c_str());
 
@@ -187,30 +189,34 @@ where we recommend keeping the session pointer as a member variable of your modu
 Now you need to fill all required input tensors for your model. You can create input tensors in different ways, for example by providing 
 a flat vector that contains all values, and a vector describing the shape of the tensor:
 
-.. code:: c++
+.. code:: cpp
+
     // Create a 2 by 2 tensor of int32_t values from a flat vector of length 4
     std::vector<int32_t> inputs = {1, 2, 3, 4};
     auto inputTensor = MVA::ONNX::Tensor<int32_t>::make_shared(inputs, {2, 2});
 
 Alternatively, you can also create an empty tensor and fill it element by element:
 
-.. code:: c++
+.. code:: cpp
+
     // Create a 2 by 2 tensor of int32_t values by manually setting the elements
     auto inputTensor = MVA::ONNX::Tensor<int32_t>::make_shared({2, 2});
     for (int i=0; i<4; i++) {
       inputTensor->at(i) = i;
     }
 
-The `at()` method works both with flat indices (when given a single value) or with tensor indices (when given a vector of values).
+The ``at`` method works both with flat indices (when given a single value) or with tensor indices (when given a vector of values).
 You also need an output tensor to capture the inference results:
 
-.. code:: c++
+.. code:: cpp
+
     // Create an output tensor for an ONNX model with 10 float outputs
     auto outputTensor = MVA::ONNX::Tensor<float>::make_shared({10});
 
-Finally, you can run inference simply by calling the `run()` method providing a map of input/output names to the appropriate tensors:
+Finally, you can run inference simply by calling the ``run`` method providing a map of input/output names to the appropriate tensors:
 
-.. code:: c++
+.. code:: cpp
+
     // Run inference on a model with two inputs 'input1' and 'input2' and one output 'output' by providing the corresponding tensors
     m_session->run({{"input1", inputTensor1}, {"input2", inputTensor2}}, {{"output", outputTensor}});
 

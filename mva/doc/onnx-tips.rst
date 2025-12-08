@@ -18,8 +18,8 @@ To convert a model in an existing MVA weightfile, the steps are
 - download or open the original weightfile from the database
 - extract the contained model
 - (optional depending on model) modify the model to include pre- or postprocessing
-- convert it to onnx
-- (optional depending on model) modify the onnx model to include pre- or postprocessing
+- convert it to ONNX
+- (optional depending on model) modify the ONNX model to include pre- or postprocessing
 - create a new MVA weightfile with the ONNX model in it
 - test if the outputs are consistent
 
@@ -59,7 +59,7 @@ If we convert a weightfile that uses the MVA Python method, in addition to the w
 
 Most of the time custom code we need to consider is found in the ``apply`` function.
 
-For ``torch`` it's most delicate since the whole model state, potentially including custom class definitions is pickled. Here we will have to ``exec`` the steering file in the ``torch`` MVA module namespace, e.g. to be able to unpickle models:
+For ``torch`` it's most delicate since the whole model state, potentially including custom class definitions, is pickled. Here we will have to ``exec`` the steering file in the ``torch`` MVA module namespace, e.g. to be able to unpickle models:
 
 .. code:: python
 
@@ -90,8 +90,8 @@ If this is not possible, e.g. because the transformation was done in a different
 
 Finally one can manually craft and modify ONNX models, e.g. using `onnx.helper <https://onnx.ai/onnx/api/helper.html>`__. For adding larger sets of custom operations, `onnxscript <https://github.com/microsoft/onnxscript>`__ offers an alternative with less boilerplate code.
 
-Torch example
-^^^^^^^^^^^^^
+Preprocessing: torch example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In torch one fast way is to wrap the existing model into the forward pass of a new model, for example applying a scaling:
 
@@ -126,8 +126,8 @@ In torch one fast way is to wrap the existing model into the forward pass of a n
         )
 
 
-Keras example
-^^^^^^^^^^^^^
+Preprocessing: keras example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In keras we can use the functional API (in ``keras>3`` use `keras.ops <https://keras.io/api/ops/>`__ for non-trivial operations) to add additional steps before or after the model:
 
@@ -165,14 +165,55 @@ Also mention onnxscript here
 Graph networks
 --------------
 
-Using ONNX standalone
----------------------
+ONNX in a basf2 C++ module
+--------------------------
 
-Prototyping in python
-^^^^^^^^^^^^^^^^^^^^^
+In case you want/need to run inference of an ONNX model in a C++ basf2 module, the MVA package provides a simple interface which should be 
+sufficient for most use-cases. To run your inference, first you need to fetch your ONNX model from the conditions database. We recommend 
+saving the model as a raw file into the database, such that it can simply be accessed like this:
 
-Write a basf2 c++ module
-^^^^^^^^^^^^^^^^^^^^^^^^
+.. code:: c++
+    auto accessor = DBAccessorBase(DBStoreEntry::c_RawFile, payloadName, true);
+    const std::string filename = accessor.getFilename();
+
+where `payloadName` is the name of the payload storing the raw ONNX file. Now, you can initialize an ONNX inference session:
+
+.. code:: c++
+    std::unique_ptr<MVA::ONNX::Session> m_session;
+    m_session = std::make_unique<MVA::ONNX::Session>(filename.c_str());
+
+where we recommend keeping the session pointer as a member variable of your module if you intend to run the inference multiple times.
+
+Now you need to fill all required input tensors for your model. You can create input tensors in different ways, for example by providing 
+a flat vector that contains all values, and a vector describing the shape of the tensor:
+
+.. code:: c++
+    // Create a 2 by 2 tensor of int32_t values from a flat vector of length 4
+    std::vector<int32_t> inputs = {1, 2, 3, 4};
+    auto inputTensor = MVA::ONNX::Tensor<int32_t>::make_shared(inputs, {2, 2});
+
+Alternatively, you can also create an empty tensor and fill it element by element:
+
+.. code:: c++
+    // Create a 2 by 2 tensor of int32_t values by manually setting the elements
+    auto inputTensor = MVA::ONNX::Tensor<int32_t>::make_shared({2, 2});
+    for (int i=0; i<4; i++) {
+      inputTensor->at(i) = i;
+    }
+
+The `at()` method works both with flat indices (when given a single value) or with tensor indices (when given a vector of values).
+You also need an output tensor to capture the inference results:
+
+.. code:: c++
+    // Create an output tensor for an ONNX model with 10 float outputs
+    auto outputTensor = MVA::ONNX::Tensor<float>::make_shared({10});
+
+Finally, you can run inference simply by calling the `run()` method providing a map of input/output names to the appropriate tensors:
+
+.. code:: c++
+    // Run inference on a model with two inputs 'input1' and 'input2' and one output 'output' by providing the corresponding tensors
+    m_session->run({{"input1", inputTensor1}, {"input2", inputTensor2}}, {{"output", outputTensor}});
+
 
 General notes
 -------------

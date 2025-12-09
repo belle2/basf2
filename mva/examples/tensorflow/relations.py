@@ -157,8 +157,8 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             return - tf.reduce_sum(w * tf.math.log(diff_from_truth + epsilon)) / tf.reduce_sum(w)
 
     state = State(model=my_model())
-    state.epoch = 0  # added for debugging
-    state.avg_costs = []  # added for debugging
+    state.epoch = 0
+    state.avg_costs = []
     return state
 
 
@@ -191,12 +191,11 @@ def partial_fit(state, X, S, y, w, epoch, batch):
                 x, state.model.parameters, True)]
         with tf.GradientTape() as tape:
             avg_cost = state.model.loss(state.model.pre_train(S), y, w)
-            # print("avg_cost is:", avg_cost)
             grads = tape.gradient(avg_cost, pre_trainable_variables)
         state.model.pre_optimizer.apply_gradients(zip(grads, pre_trainable_variables))
 
         if state.epoch == epoch:
-            state.avg_costs.append(avg_cost)  # added for debugging
+            state.avg_costs.append(avg_cost)
         else:
             # started a new epoch, reset the avg_costs and update the counter
             print(f"Pre-Training: Epoch: {epoch-1:05d}, cost={np.mean(state.avg_costs):.5f}")
@@ -233,7 +232,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 
 if __name__ == "__main__":
     import os
-    import pandas
+    # import pandas
     import uproot
     import tempfile
     import json
@@ -296,12 +295,10 @@ if __name__ == "__main__":
                 dic.update({name: data[:, i]})
             dic.update({'isSignal': target})
 
-            df = pandas.DataFrame(dic, dtype=np.float32)
             with uproot.recreate(os.path.join(path, filename)) as outfile:
-                branch_types = {k: v.dtype for k, v in df.items()}
+                branch_types = {k: v.dtype for k, v in dic.items()}
                 outfile.mktree("variables", branch_types)
-                outfile["variables"].extend(df.to_dict(orient="list"))
-                # outfile['variables'] = df
+                outfile["variables"].extend(dic)
 
         # ##########################Do Training#################################
         # Do a comparison of different Nets for this task.

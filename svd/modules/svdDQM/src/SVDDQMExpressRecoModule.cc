@@ -687,16 +687,16 @@ void SVDDQMExpressRecoModule::defineHisto()
     }
 
     //----------------------------------------------------------------
-    // Strips Counts for cluster time group id = 0
+    // Strips Counts for cluster time group id = 0, 1, 2, 3
     //----------------------------------------------------------------
-    name = str(format("SVDDQM_%1%_StripCountGroupId0U") % sensorDescr);
-    title = str(format("SVD Sensor %1% Integrated NumberFired U-Strip for group Id = 0 vs Strip Number") % sensorDescr);
+    name = str(format("SVDDQM_%1%_StripCountGroupId0U") % sensorDescr); //  keep same name for backward compatibilty
+    title = str(format("SVD Sensor %1% Integrated NumberFired U-Strip for group Id = 0, 1, 2 & 3 vs Strip Number") % sensorDescr);
     m_stripCountGroupId0U[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
     m_stripCountGroupId0U[i]->GetXaxis()->SetTitle("cellID");
     m_stripCountGroupId0U[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_stripCountGroupId0U[i]);
-    name = str(format("SVDDQM_%1%_StripCountGroupId0V") % sensorDescr);
-    title = str(format("SVD Sensor %1% Integrated Number of Fired V-Strip for group Id = 0 vs Strip Number") % sensorDescr);
+    name = str(format("SVDDQM_%1%_StripCountGroupId0V") % sensorDescr); //  keep same name for backward compatibilty
+    title = str(format("SVD Sensor %1% Integrated Number of Fired V-Strip for group Id = 0, 1, 2 & 3 vs Strip Number") % sensorDescr);
     m_stripCountGroupId0V[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
     m_stripCountGroupId0V[i]->GetXaxis()->SetTitle("cellID");
     m_stripCountGroupId0V[i]->GetYaxis()->SetTitle("count");
@@ -1116,7 +1116,7 @@ void SVDDQMExpressRecoModule::event()
         if (m_hitMapUCl[index] != nullptr) m_hitMapUCl[index]->Fill(SensorInfo.getUCellID(cluster.getPosition()));
 
       // groupId for U side
-      if (groupId == 0) {
+      if (groupId == 0 || groupId == 1 || groupId == 2 || groupId == 3) {
         for (const SVDShaperDigit& digitIn : cluster.getRelationsTo<SVDShaperDigit>(m_storeSVDShaperDigitsName)) {
           if (m_stripCountGroupId0U != nullptr) m_stripCountGroupId0U[index]->Fill(digitIn.getCellID());
         }
@@ -1161,7 +1161,7 @@ void SVDDQMExpressRecoModule::event()
         if (m_hitMapVCl[index] != nullptr) m_hitMapVCl[index]->Fill(SensorInfo.getVCellID(cluster.getPosition()));
 
       // groupId for V side
-      if (groupId == 0) {
+      if (groupId == 0 || groupId == 1 || groupId == 2 || groupId == 3) {
         for (const SVDShaperDigit& digitIn : cluster.getRelationsTo<SVDShaperDigit>(m_storeSVDShaperDigitsName)) {
           if (m_stripCountGroupId0V != nullptr) m_stripCountGroupId0V[index]->Fill(digitIn.getCellID());
         }

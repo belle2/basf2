@@ -192,9 +192,9 @@ std::tuple<bool, std::optional<double>> DQMHistAnalysisEventT0TriggerJitterModul
   gStyle->SetOptFit(1111);
 
   h->Draw();
-  fitf.DrawClone("same");
-  gauss1.DrawClone("same");
-  gauss2.DrawClone("same");
+  fitf.Draw("same");// Hotfix. removed DrawClone as it leaks memory but, even so plotted
+  gauss1.Draw("same");// it is not shown anymore as local object are deleted by scope end
+  gauss2.Draw("same");// Need to keep track of created objects
 
   if (retrieveMeanT0) {
     // return mean of the core Gaussian

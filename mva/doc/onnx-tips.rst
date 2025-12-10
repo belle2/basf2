@@ -90,8 +90,8 @@ If this is not possible, e.g. because the transformation was done in a different
 
 Finally one can manually craft and modify ONNX models, e.g. using `onnx.helper <https://onnx.ai/onnx/api/helper.html>`__. For adding larger sets of custom operations, `onnxscript <https://github.com/microsoft/onnxscript>`__ offers an alternative with less boilerplate code.
 
-Preprocessing: torch example
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Torch example
+^^^^^^^^^^^^^
 
 In torch one fast way is to wrap the existing model into the forward pass of a new model, for example applying a scaling:
 
@@ -126,8 +126,8 @@ In torch one fast way is to wrap the existing model into the forward pass of a n
         )
 
 
-Preprocessing: keras example
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Keras example
+^^^^^^^^^^^^^
 
 In keras we can use the functional API (in ``keras>3`` use `keras.ops <https://keras.io/api/ops/>`__ for non-trivial operations) to add additional steps before or after the model:
 
@@ -157,13 +157,43 @@ In keras we can use the functional API (in ``keras>3`` use `keras.ops <https://k
     new_model.export("model.onnx", format="onnx")
 
 
-Merging models
-^^^^^^^^^^^^^^
+Merging models (onnx/onnxscript example)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Also mention onnxscript here
+Suppose you already have a trained model in ONNX format. We can implement the same prescaling as above by directly constructing an ONNX ModelProto 
+and merging with the provided one:
 
-Graph networks
---------------
+.. code:: python
+
+    import onnx
+    from onnxscript import script, FLOAT
+    from onnxscript import opset22
+
+    offset = ...
+    scale = ...
+
+    # Load the existing model
+    model = onnx.load("path/to/model.onnx")
+
+    # Construct scaling transformation using the script decorator from onnxscript,
+    # we assume here the loaded model has one input of size 10, N is the batch dimension
+    @script(default_opset=opset22)
+    def prescale(X: FLOAT["N", 10]) -> FLOAT["N", 10]:
+        return (X - offset) / scale
+    
+    prescale_model = prescale.to_model_proto()
+
+    # Merge prescale and actual model by providing mapping between prescaling output 
+    # (default name 'return_val') and model input (here assumed to be called 'input')
+    combined_model = onnx.compose.merge_models(
+        prescale_model,
+        model,
+        io_map=[("return_val", "input")],
+        name="scaled_model"
+    )
+
+    onnx.save(combined_model, "path/to/output.onnx")
+
 
 ONNX in a basf2 C++ module
 --------------------------

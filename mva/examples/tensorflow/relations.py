@@ -232,7 +232,6 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 
 if __name__ == "__main__":
     import os
-    # import pandas
     import uproot
     import tempfile
     import json

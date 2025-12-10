@@ -82,10 +82,17 @@ b2test_utils.safe_process(early3)
 # most of the components are identical so we avoid uploading two
 # revisions so we remove most of them. We only need separate payloads for the
 # for some of them
-phase2 = ["GeoConfiguration", "PXDGeometryPar", "SVDGeometryPar", "BeamPipeGeo", "ServiceGapsMaterialsPar"]
+phase2_comp_list = ["GeoConfiguration", "PXDGeometryPar", "SVDGeometryPar", "BeamPipeGeo", "ServiceGapsMaterialsPar"]
 # once we have a different ServiceGapsMaterial configuration for phase 3 we
 # want to put that here as well
-early3 = ["PXDGeometryPar"]
+early3_comp_list = [
+    "GeoConfiguration",
+    "PXDGeometryPar",
+    "BeamabortGeo",
+    "BeamPipeGeo",
+    "CryostatGeo",
+    "FarBeamLineGeo",
+    "ServiceGapsMaterialsPar"]
 database_content = []
 line_match = re.compile(r"^dbstore/(.*?) ([0-9a-f]+) ([0-9\-,]*)$")
 keep = set()
@@ -99,18 +106,18 @@ with open("localdb/database.txt") as dbfile:
         # if so check whether we can unify the payloads
         iov = tuple(int(e) for e in iov.split(','))
         if iov[0] == 0:
-            if name in phase2:
+            if name in phase2_comp_list:
                 keep.add((name, str(revision)))  # we keep all revision one payloads somehow
                 database_content.append(f'dbstore/{name} {revision} 0,0,0,-1\n')
-                if name not in early3:
+                if name not in early3_comp_list:
                     database_content.append(f'dbstore/{name} {revision} 1003,0,1003,-1\n')
                 # luckily nothing we have in early phase 3 is identical between
                 # phase 3 and phase 2 so need for extra checks if in early3 but
                 # not phase2
                 continue
-        elif iov[0] == 1002 and name not in phase2:
+        elif iov[0] == 1002 and name not in phase2_comp_list:
             continue
-        elif iov[0] == 1003 and name not in early3:
+        elif iov[0] == 1003 and name not in early3_comp_list:
             continue
 
         # otherwise keep as it is ...
@@ -129,8 +136,8 @@ for filename in os.scandir('localdb/'):
         continue
     if match and match.groups() not in keep:
         pass
-        # print(f"Removing {filename.name}: not needed")
-        # os.unlink(filename.path)
+        print(f"Removing {filename.name}: not needed")
+        os.unlink(filename.path)
     else:
         print(f"Normalizing {filename.name} as '{match.group(1)}'")
         subprocess.call(["b2file-normalize", "-i", "-n", match.group(1), filename.path])

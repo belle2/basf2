@@ -1101,6 +1101,15 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 2.0);
 
+    // Test if min and max have correct behavior with bool variables
+    var = Manager::Instance().getVariable("min(passesCut(E > 1), passesCut(pz > 1))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.0);
+
+    var = Manager::Instance().getVariable("max(passesCut(E > 1), passesCut(pz > 1))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.0);
+
     var = Manager::Instance().getVariable("log10(px)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -1.0);

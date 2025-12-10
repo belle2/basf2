@@ -85,22 +85,32 @@ void DQMHistAnalysisSVDUnpackerModule::event()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDUnpacker: event called.");
 
-  //find nEvents
-  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents", true);
-  if (hnEvnts == NULL) {
-    B2INFO("no events, nothing to do here");
-    return;
+  //check data errors
+  auto hErr = findHist("SVDUnpacker/DQMErrorEventsHisto");
+
+  Float_t events = 0;
+  Float_t errors = 0;
+  if (hErr != NULL) {
+    events = hErr->GetBinContent(1) + hErr->GetBinContent(2);
+    errors = hErr->GetBinContent(2);
+
+    if (events > 0) {
+      Float_t ratio = errors / events;
+      setEpicsPV("UnpackError", ratio);
+    }
   } else {
-    B2DEBUG(10, "SVDExpReco/SVDDQM_nEvents found");
+    B2INFO("Histogram SVDUnpacker/DQMErrorEventsHisto from SVDUnpackerDQM not found!");
+    return;
   }
 
-  TString tmp = hnEvnts->GetTitle();
+  TString tmp = hErr->GetTitle();
   Int_t pos = tmp.Last('~');
-  if (pos == -1) pos = 0;
+  Int_t pos1 = tmp.Last('#');
+  if (pos == -1)  pos = 0;
+  if (pos1 == -1) pos1 = 0;
 
-  TString runID = tmp(pos, tmp.Length() - pos);
+  TString runID = tmp(pos, pos1 - pos);
   B2INFO("DQMHistAnalysisSVDUnpackerModule::runID = " << runID);
-  Float_t nEvents = hnEvnts->GetEntries();
 
   //check DATA FORMAT
   auto h = findHist("SVDUnpacker/DQMUnpackerHisto");
@@ -123,7 +133,7 @@ void DQMHistAnalysisSVDUnpackerModule::event()
         if (counts > maxCnts)
           maxCnts = counts;
 
-        if (counts / nEvents > m_unpackError) {
+        if (counts / events > m_unpackError) {
           hasError = true;
         }
       }
@@ -140,8 +150,6 @@ void DQMHistAnalysisSVDUnpackerModule::event()
       h->SetStats(0);
       setStatusOfCanvas(error, m_cUnpacker, true);
     }
-    if (nEvents > 0)
-      setEpicsPV("UnpackError", maxCnts / nEvents);
   } else {
     B2INFO("Histogram SVDUnpacker/DQMUnpackerHisto from SVDUnpackerDQM not found!");
     m_cUnpacker->cd();
@@ -151,21 +159,6 @@ void DQMHistAnalysisSVDUnpackerModule::event()
 
   if (m_printCanvas)
     m_cUnpacker->Print("c_SVDDataFormat.pdf");
-
-
-  //check data errors
-  auto hErr = findHist("SVDUnpacker/DQMErrorEventsHisto");
-
-  if (hErr != NULL) {
-    Float_t events = hErr->GetBinContent(1) + hErr->GetBinContent(2);
-    Float_t errors = hErr->GetBinContent(2);
-
-    if (events > 0) {
-      Float_t ratio = errors / events;
-      setEpicsPV("UnpackError", ratio);
-    }
-  } else
-    B2INFO("Histogram SVDUnpacker/DQMErrorEventsHisto from SVDUnpackerDQM not found!");
 }
 
 void DQMHistAnalysisSVDUnpackerModule::endRun()

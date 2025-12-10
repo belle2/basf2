@@ -296,7 +296,7 @@ if __name__ == "__main__":
             dic.update({'isSignal': target})
 
             with uproot.recreate(os.path.join(path, filename)) as outfile:
-                branch_types = {k: v.dtype for k, v in dic.items()}
+                branch_types = {k: np.float32 for k, v in dic.items()}
                 outfile.mktree("variables", branch_types)
                 outfile["variables"].extend(dic)
 

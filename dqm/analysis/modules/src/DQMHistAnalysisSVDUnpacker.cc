@@ -88,14 +88,14 @@ void DQMHistAnalysisSVDUnpackerModule::event()
   //check data errors
   auto hErr = findHist("SVDUnpacker/DQMErrorEventsHisto");
 
-  Float_t events = 0;
-  Float_t errors = 0;
+  Float_t ratio = 0;
+
   if (hErr != NULL) {
-    events = hErr->GetBinContent(1) + hErr->GetBinContent(2);
-    errors = hErr->GetBinContent(2);
+    Float_t events = hErr->GetBinContent(1) + hErr->GetBinContent(2);
+    Float_t errors = hErr->GetBinContent(2);
 
     if (events > 0) {
-      Float_t ratio = errors / events;
+      ratio = errors / events;
       setEpicsPV("UnpackError", ratio);
     }
   } else {
@@ -116,28 +116,12 @@ void DQMHistAnalysisSVDUnpackerModule::event()
   auto h = findHist("SVDUnpacker/DQMUnpackerHisto");
 
   if (h != NULL) {
-    h->SetTitle(Form("SVD Data Format Monitor %s", runID.Data()));
-    //check if number of errors is above the allowed limit
-    Int_t nXbins = h->GetXaxis()->GetNbins();
-    Int_t nYbins = h->GetYaxis()->GetNbins();
-
-    //test ERROR:
-//     h->SetBinContent(10, 20, 1000000);
-//     h->SetBinContent(10, 40, 10000000);
-
-    Float_t maxCnts = 0;
     bool hasError = false;
-    for (int i = 0; i < nXbins - 1; ++i) { // exclude SEU recovery
-      for (int j = 0; j < nYbins; ++j) {
-        Float_t counts = h->GetBinContent(i + 1, j + 1);
-        if (counts > maxCnts)
-          maxCnts = counts;
 
-        if (counts / events > m_unpackError) {
-          hasError = true;
-        }
-      }
-    }
+    h->SetTitle(Form("SVD Data Format Monitor %s", runID.Data()));
+
+    if (ratio > m_unpackError)
+      hasError = true;
 
     if (!hasError) {
       m_cUnpacker->cd();

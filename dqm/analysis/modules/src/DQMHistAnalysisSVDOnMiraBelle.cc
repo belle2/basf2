@@ -110,12 +110,10 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
                                      "L6.X.1", "L6.X.2", "L6.X.3", "L6.X.4", "L6.X.5"
                                     };
 
-  // sensors to monitored
-  // for high occupancy sensors
-  // and for low DCDC sensors
-  std::vector<string> sensorLabel = {"L3.1.1", "L3.1.2",  "L3.2.1", "L3.2.2", "L4.6.1", "L4.6.2", "L5.8.1", "L5.8.2", "L6.10.1", "L6.10.2",
-                                     "L4.1.1", "L4.10.2", "L4.3.3", "L5.1.3", "L5.1.4", "L5.9.2", "L5.9.4", "L6.4.3", "L6.6.4",  "L6.10.3", "L6.11.5", "L6.12.4"
-                                    };
+  // sensors to monitored from GT
+  // "3.1.1", "3.1.2",  "3.2.1", "3.2.2", "4.1.1", "4.3.3", "4.6.1", "4.6.2", "4.9.2", "4.10.2", "5.1.3", "5.1.4", "5.8.1",
+  // "5.8.2", "5.9.2", "5.9.4", "6.4.3",  "6.6.4", "6.10.1", "6.10.2", "6.10.3", "6.11.5", "6.12.4"
+
 
   // offline occupancy - integrated number of ZS5 fired strips
   TH1F* h_zs5countsU = (TH1F*)findHist("SVDExpReco/SVDDQM_StripCountsU"); // made by SVDDQMExperssRecoModule
@@ -181,12 +179,12 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     }
 
     // average occupancy for high occupancy sensors
-    for (const auto& it : sensorLabel) {
+    for (const auto& it : m_listOfSensorsToMonitor) {
       string sensorDescr = it;
       int layer = 0;
       int ladder = 0;
       int sensor = 0;
-      sscanf(it.c_str(), "L%d.%d.%d", &layer, &ladder, &sensor);
+      sscanf(it.c_str(), "%d.%d.%d", &layer, &ladder, &sensor);
       std::pair<float, float> avgOffOccL = avgOccupancyUV(h_zs5countsU, h_zs5countsV, nE, layer, ladder, sensor);
       addVariable(Form("avgOffOccL%d%d%dUV", layer, ladder, sensor), avgOffOccL);
     }
@@ -249,12 +247,12 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
     // average efficiency for high occupancy sensors and
     // average efficiency for low DCDC
-    for (const auto& it : sensorLabel) {
+    for (const auto& it : m_listOfSensorsToMonitor) {
       string sensorDescr = it;
       int layer = 0;
       int ladder = 0;
       int sensor = 0;
-      sscanf(it.c_str(), "L%d.%d.%d", &layer, &ladder, &sensor);
+      sscanf(it.c_str(), "%d.%d.%d", &layer, &ladder, &sensor);
       std::pair<float, float> avgEffL = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, layer, ladder,
                                                         sensor);
       addVariable(Form("avgEffL%d%d%dUV", layer, ladder, sensor), avgEffL);

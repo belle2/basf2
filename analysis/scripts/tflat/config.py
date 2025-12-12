@@ -39,15 +39,11 @@ config.update({  # Input lists
         'pidPairProbabilityExpert(13, 211, KLM)',
         'pidPairProbabilityExpert(211, 321, TOP)',
         'pidPairProbabilityExpert(211, 321, ARICH)',
-        # 'nCDCHits/56',
         'nPXDHits/2',
         'nSVDHits/8',
         'dxdiff',
         'dydiff',
         'dzdiff',
-        # 'dz',
-        # 'dr',
-        # 'chiProb',
         'clusterEoP',
         'clusterLAT',
     ],
@@ -65,7 +61,6 @@ config.update({  # Input lists
         'countInList(gamma:tflat)/8',
         'countInList(pi+:tflat)/6',
         'NumberOfKShortsInRoe',
-        'isPXDOn',
         'ptTracksRoe('+maskName+')',
     ],
 })
@@ -95,7 +90,8 @@ config.update({  # Training parameters
     'decay_steps': 2000000,
     'alpha': 1e-1,
     'patience': 20,
-    'batch_size': 256,
+    'batch_size': 2048,
     'epochs': 200,
     'train_valid_fraction': .92,
+    'chunk_size': 10240  # Should be multiple of batch size
 })

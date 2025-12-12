@@ -31,7 +31,7 @@ from prompt import ValidationSettings
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-settings = ValidationSettings(name="CDC dedx calibration",
+settings = ValidationSettings(name="CDC dedx",
                               description=__doc__,
                               download_files=[],
                               expert_config={

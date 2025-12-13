@@ -243,113 +243,118 @@ inline float sim_result_t(float val)
   return sim_ap_fixed(val, 25, 9, true, 0, 2, 0);  // AP_RND, AP_SAT_SYM
 }
 
+
 void
 GRLNeuro::initialize(const Parameters& p)
 {
   using std::vector;
-  B2INFO("GRLNeuro::initialize: nMLP=" << p.nMLP
-         << " nHidden.size=" << p.nHidden.size()
-         << " outputScale.size=" << p.outputScale.size());
 
-  // basic checks already present
-  bool okay = true;
+  B2DEBUG(10, "GRLNeuro::initialize: nMLP=" << p.nMLP
+          << " nHidden.size=" << p.nHidden.size()
+          << " outputScale.size=" << p.outputScale.size());
+
+  // ------------------------------------------------------------------
+  // Basic parameter validation (fatal in initialize)
+  // ------------------------------------------------------------------
+
   if (p.nHidden.size() != 1 && p.nHidden.size() != p.nMLP) {
-    B2ERROR("Number of nHidden lists should be 1 or " << p.nMLP);
-    okay = false;
+    B2FATAL("Number of nHidden lists should be 1 or " << p.nMLP);
   }
+
   if (p.outputScale.size() != 1 && p.outputScale.size() != p.nMLP) {
-    B2ERROR("Number of outputScale lists should be 1 or " << p.nMLP);
-    okay = false;
+    B2FATAL("Number of outputScale lists should be 1 or " << p.nMLP);
   }
+
   unsigned short nTarget = static_cast<unsigned short>(p.targetresult);
   if (nTarget < 1) {
-    B2ERROR("No outputs! Turn on targetresult.");
-    okay = false;
+    B2FATAL("No outputs! Turn on targetresult.");
   }
+
   for (unsigned iScale = 0; iScale < p.outputScale.size(); ++iScale) {
     if (p.outputScale[iScale].size() != 2 * nTarget) {
-      B2ERROR("outputScale should be exactly " << 2 * nTarget << " values");
-      okay = false;
+      B2FATAL("outputScale should be exactly " << 2 * nTarget << " values");
     }
   }
-  if (!okay) return;
 
-  // --- comprehensive parameter-size validation ---
-  auto check_size = [&](const auto & v, const char* name) -> bool {
+  // ------------------------------------------------------------------
+  // Comprehensive parameter-size validation
+  // ------------------------------------------------------------------
+
+  auto check_size = [&](const auto & v, const char* name) {
     const size_t s = v.size();
-    if (s != 1 && s != static_cast<size_t>(p.nMLP))
-    {
-      B2ERROR(std::string(name) + " size (" + std::to_string(s)
+    if (s != 1 && s != static_cast<size_t>(p.nMLP)) {
+      B2FATAL(std::string(name) + " size (" + std::to_string(s)
               + ") != 1 and != nMLP (" + std::to_string(p.nMLP) + ")");
-      return false;
     }
-    return true;
   };
 
-  bool params_ok = true;
-  params_ok &= check_size(p.i_cdc_sector, "i_cdc_sector");
-  params_ok &= check_size(p.i_ecl_sector, "i_ecl_sector");
-  params_ok &= check_size(p.nHidden, "nHidden");
-  params_ok &= check_size(p.outputScale, "outputScale");
+  // sector / structure parameters
+  check_size(p.i_cdc_sector, "i_cdc_sector");
+  check_size(p.i_ecl_sector, "i_ecl_sector");
+  check_size(p.nHidden, "nHidden");
+  check_size(p.outputScale, "outputScale");
 
-  // all bit/quantization parameter containers (expected vector< vector<int/bool> >)
-  params_ok &= check_size(p.total_bit_bias, "total_bit_bias");
-  params_ok &= check_size(p.int_bit_bias, "int_bit_bias");
-  params_ok &= check_size(p.is_signed_bias, "is_signed_bias");
-  params_ok &= check_size(p.rounding_bias, "rounding_bias");
-  params_ok &= check_size(p.saturation_bias, "saturation_bias");
+  // bias
+  check_size(p.total_bit_bias, "total_bit_bias");
+  check_size(p.int_bit_bias, "int_bit_bias");
+  check_size(p.is_signed_bias, "is_signed_bias");
+  check_size(p.rounding_bias, "rounding_bias");
+  check_size(p.saturation_bias, "saturation_bias");
 
-  params_ok &= check_size(p.total_bit_accum, "total_bit_accum");
-  params_ok &= check_size(p.int_bit_accum, "int_bit_accum");
-  params_ok &= check_size(p.is_signed_accum, "is_signed_accum");
-  params_ok &= check_size(p.rounding_accum, "rounding_accum");
-  params_ok &= check_size(p.saturation_accum, "saturation_accum");
+  // accumulator
+  check_size(p.total_bit_accum, "total_bit_accum");
+  check_size(p.int_bit_accum, "int_bit_accum");
+  check_size(p.is_signed_accum, "is_signed_accum");
+  check_size(p.rounding_accum, "rounding_accum");
+  check_size(p.saturation_accum, "saturation_accum");
 
-  params_ok &= check_size(p.total_bit_weight, "total_bit_weight");
-  params_ok &= check_size(p.int_bit_weight, "int_bit_weight");
-  params_ok &= check_size(p.is_signed_weight, "is_signed_weight");
-  params_ok &= check_size(p.rounding_weight, "rounding_weight");
-  params_ok &= check_size(p.saturation_weight, "saturation_weight");
+  // weights
+  check_size(p.total_bit_weight, "total_bit_weight");
+  check_size(p.int_bit_weight, "int_bit_weight");
+  check_size(p.is_signed_weight, "is_signed_weight");
+  check_size(p.rounding_weight, "rounding_weight");
+  check_size(p.saturation_weight, "saturation_weight");
 
-  params_ok &= check_size(p.total_bit_relu, "total_bit_relu");
-  params_ok &= check_size(p.int_bit_relu, "int_bit_relu");
-  params_ok &= check_size(p.is_signed_relu, "is_signed_relu");
-  params_ok &= check_size(p.rounding_relu, "rounding_relu");
-  params_ok &= check_size(p.saturation_relu, "saturation_relu");
+  // relu
+  check_size(p.total_bit_relu, "total_bit_relu");
+  check_size(p.int_bit_relu, "int_bit_relu");
+  check_size(p.is_signed_relu, "is_signed_relu");
+  check_size(p.rounding_relu, "rounding_relu");
+  check_size(p.saturation_relu, "saturation_relu");
 
-  params_ok &= check_size(p.total_bit, "total_bit");
-  params_ok &= check_size(p.int_bit, "int_bit");
-  params_ok &= check_size(p.is_signed, "is_signed");
-  params_ok &= check_size(p.rounding, "rounding");
-  params_ok &= check_size(p.saturation, "saturation");
+  // generic
+  check_size(p.total_bit, "total_bit");
+  check_size(p.int_bit, "int_bit");
+  check_size(p.is_signed, "is_signed");
+  check_size(p.rounding, "rounding");
+  check_size(p.saturation, "saturation");
 
-  // W_input and I_input are expected to be vector< vector<...> >
-  params_ok &= check_size(p.W_input, "W_input");
-  params_ok &= check_size(p.I_input, "I_input");
+  // inputs
+  check_size(p.W_input, "W_input");
+  check_size(p.I_input, "I_input");
 
-  if (!params_ok) {
-    B2ERROR("GRLNeuro::initialize aborted due to invalid parameter vector sizes.");
-    return;
-  }
+  // ------------------------------------------------------------------
+  // Initialize MLPs
+  // ------------------------------------------------------------------
 
-  // initialize MLPs safely
   m_MLPs.clear();
   m_MLPs.reserve(p.nMLP);
 
   for (unsigned iMLP = 0; iMLP < p.nMLP; ++iMLP) {
-    // helper: if container.size()==1 use element 0 (broadcast), else use element iMLP
+
+    // helper: broadcast if size == 1
     auto pick = [&](const auto & container) -> const auto& {
       return (container.size() == 1) ? container[0] : container[iMLP];
     };
 
-    // get indices for sector parameters (scalar containers)
     unsigned short i_cdc = static_cast<unsigned short>(pick(p.i_cdc_sector));
     unsigned short i_ecl = static_cast<unsigned short>(pick(p.i_ecl_sector));
     unsigned short nInput = static_cast<unsigned short>(i_cdc + i_ecl);
 
-    // nHidden: vector< vector<float> >
+    // nHidden: vector<vector<float>>
     const vector<float>& nhidden = pick(p.nHidden);
     vector<unsigned short> nNodes = { nInput };
+
     for (unsigned iHid = 0; iHid < nhidden.size(); ++iHid) {
       if (p.multiplyHidden) {
         nNodes.push_back(static_cast<unsigned short>(nhidden[iHid] * nNodes[0]));
@@ -357,55 +362,60 @@ GRLNeuro::initialize(const Parameters& p)
         nNodes.push_back(static_cast<unsigned short>(nhidden[iHid]));
       }
     }
+
     nNodes.push_back(nTarget);
     unsigned short targetVars = static_cast<unsigned short>(p.targetresult);
 
-    // outputScale: vector< vector<float> >
     const vector<float>& outputScale = pick(p.outputScale);
 
-    GRLMLP grlmlp_temp = GRLMLP(nNodes, targetVars, outputScale);
+    GRLMLP grlmlp_temp(nNodes, targetVars, outputScale);
 
-    // For all parameter groups that are vector<vector<...>>, pick the correct sub-vector
-    // and pass to the GRLMLP setters.
+    // bias
     grlmlp_temp.set_total_bit_bias(pick(p.total_bit_bias));
     grlmlp_temp.set_int_bit_bias(pick(p.int_bit_bias));
     grlmlp_temp.set_is_signed_bias(pick(p.is_signed_bias));
     grlmlp_temp.set_rounding_bias(pick(p.rounding_bias));
     grlmlp_temp.set_saturation_bias(pick(p.saturation_bias));
 
+    // accumulator
     grlmlp_temp.set_total_bit_accum(pick(p.total_bit_accum));
     grlmlp_temp.set_int_bit_accum(pick(p.int_bit_accum));
     grlmlp_temp.set_is_signed_accum(pick(p.is_signed_accum));
     grlmlp_temp.set_rounding_accum(pick(p.rounding_accum));
     grlmlp_temp.set_saturation_accum(pick(p.saturation_accum));
 
+    // weights
     grlmlp_temp.set_total_bit_weight(pick(p.total_bit_weight));
     grlmlp_temp.set_int_bit_weight(pick(p.int_bit_weight));
     grlmlp_temp.set_is_signed_weight(pick(p.is_signed_weight));
     grlmlp_temp.set_rounding_weight(pick(p.rounding_weight));
     grlmlp_temp.set_saturation_weight(pick(p.saturation_weight));
 
+    // relu
     grlmlp_temp.set_total_bit_relu(pick(p.total_bit_relu));
     grlmlp_temp.set_int_bit_relu(pick(p.int_bit_relu));
     grlmlp_temp.set_is_signed_relu(pick(p.is_signed_relu));
     grlmlp_temp.set_rounding_relu(pick(p.rounding_relu));
     grlmlp_temp.set_saturation_relu(pick(p.saturation_relu));
 
+    // generic
     grlmlp_temp.set_total_bit(pick(p.total_bit));
     grlmlp_temp.set_int_bit(pick(p.int_bit));
     grlmlp_temp.set_is_signed(pick(p.is_signed));
     grlmlp_temp.set_rounding(pick(p.rounding));
     grlmlp_temp.set_saturation(pick(p.saturation));
 
-    // W_input / I_input: pick returns a vector<vector<int>> element (i.e. vector<int>)
+    // inputs
     grlmlp_temp.set_W_input(pick(p.W_input));
     grlmlp_temp.set_I_input(pick(p.I_input));
 
     m_MLPs.push_back(std::move(grlmlp_temp));
   }
 
-  B2INFO("GRLNeuro::initialize finished. created " << m_MLPs.size() << " MLP(s).");
+  B2DEBUG(10, "GRLNeuro::initialize finished. created "
+          << m_MLPs.size() << " MLP(s).");
 }
+
 
 
 float

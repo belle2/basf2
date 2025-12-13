@@ -41,25 +41,15 @@
       </ZBound>
       <ZBound id="2">
         <Z unit="mm">-930.0</Z>
-        <Rmin unit="mm">250.0</Rmin>
+        <Rmin unit="mm">353.0</Rmin>
         <Rmax unit="mm">1140.0</Rmax>
       </ZBound>
       <ZBound id="3">
-        <Z unit="mm">-650</Z>
-        <Rmin unit="mm">250.0</Rmin>
+        <Z unit="mm">871.2</Z>
+        <Rmin unit="mm">353.0</Rmin>
         <Rmax unit="mm">1140.0</Rmax>
       </ZBound>
       <ZBound id="4">
-        <Z unit="mm">-455</Z>
-        <Rmin unit="mm">240.0</Rmin>
-        <Rmax unit="mm">1140.0</Rmax>
-      </ZBound>
-      <ZBound id="5">
-        <Z unit="mm">871.2</Z>
-        <Rmin unit="mm">240.0</Rmin>
-        <Rmax unit="mm">1140.0</Rmax>
-      </ZBound>
-      <ZBound id="6">
         <Z unit="mm">1655.0</Z>
         <Rmin unit="mm">437.0</Rmin>
         <Rmax unit="mm">1140.0</Rmax>

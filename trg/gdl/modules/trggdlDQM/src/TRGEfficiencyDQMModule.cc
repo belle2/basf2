@@ -9,20 +9,22 @@
 // Own include
 #include <trg/gdl/modules/trggdlDQM/TRGEfficiencyDQMModule.h>
 
-// Dataobject classes
+// Belle II headers
+#include <mdst/dataobjects/HitPatternCDC.h>
+
+// ROOT headers
+#include <cmath>
 #include <Math/Vector3D.h>
 #include <TVector3.h>
 #include <TDirectory.h>
-#include <fstream>
-#include <math.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
 
-using namespace std;
+// C++ headers
+#include <cmath>
+#include <vector>
+
+
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register module
-//-----------------------------------------------------------------
 
 REG_MODULE(TRGEfficiencyDQM);
 
@@ -188,9 +190,9 @@ void TRGEfficiencyDQMModule::event()
     return;
   }
 
-  /*///////////////////////////////////////////////////////////////////
-  ///////////- - - - ECL TRG - - - - -////////////////////////////////
-  ///////////////////////////////////////////////////////////////////*/
+  ///////////////////////////////////////////////////////////////////
+  ///////////- - - - ECL TRG - - - - -///////////////////////////////
+  ///////////////////////////////////////////////////////////////////
 
   // calculate the total energy
   double E_ecl_all = 0;       // the ECL total energy
@@ -275,17 +277,15 @@ void TRGEfficiencyDQMModule::event()
     m_ecltiming_E_psnecl_ftdf->Fill(E_ecl_all);
   }
 
-  /*///////////////////////////////////////////////////////////////////
-  ///////////- - - - KLM TRG - - - - -////////////////////////////////
-  ///////////////////////////////////////////////////////////////////*/
+  ///////////////////////////////////////////////////////////////////
+  ///////////- - - - KLM TRG - - - - -///////////////////////////////
+  ///////////////////////////////////////////////////////////////////
   for (const auto& b2klmcluster : m_KLMClusters) {
     int nlayer = b2klmcluster.getLayers();
-    // ROOT::Math::XYZVector position = b2klmcluster.getClusterPosition();
 
     if (nlayer <= 6)
       continue;
 
-    // double p3        = b2klmcluster.getMomentum().R();  // 3-momentum
     double theta     = b2klmcluster.getMomentum().Theta() / Unit::deg;
     double phiDegree = b2klmcluster.getMomentum().Phi() / Unit::deg;
 
@@ -308,17 +308,13 @@ void TRGEfficiencyDQMModule::event()
     m_eklmhit_theta->Fill(theta);
 
     if (trg_KLMecl) {
-      // m_klmhit_phi_psnecl->Fill(phiDegree);
       m_klmhit_theta_psnecl->Fill(theta);
-      // m_eklmhit_phi_psnecl->Fill(phiDegree);
       m_eklmhit_theta_psnecl->Fill(theta);
     }
     if (trg_KLMecl && trg_klmhit) {
-      // m_klmhit_phi_psnecl_ftdf->Fill(phiDegree);
       m_klmhit_theta_psnecl_ftdf->Fill(theta);
     }
     if (trg_KLMecl && trg_eklmhit) {
-      // m_eklmhit_phi_psnecl_ftdf->Fill(phiDegree);
       m_eklmhit_theta_psnecl_ftdf->Fill(theta);
     }
 
@@ -337,28 +333,15 @@ void TRGEfficiencyDQMModule::event()
     }
   }
 
-  /*///////////////////////////////////////////////////////////////////
-  ///////////- - - - CDC TRG - - - - -////////////////////////////////
-  ///////////////////////////////////////////////////////////////////*/
+  ///////////////////////////////////////////////////////////////////
+  ///////////- - - - CDC TRG - - - - -///////////////////////////////
+  ///////////////////////////////////////////////////////////////////
 
-  vector<double> p_stt_P3_psnecl_ftdf, p_stt_P3_psnecl, p_stt_P3, phi_fyo_dphi, phi_fyo_dphi_psnecl, phi_fyo_dphi_psnecl_ftdf ;
-  p_stt_P3_psnecl_ftdf.clear();
-  p_stt_P3_psnecl.clear();
-  p_stt_P3.clear();
+  std::vector<double> p_stt_P3_psnecl_ftdf, p_stt_P3_psnecl, p_stt_P3, phi_fyo_dphi, phi_fyo_dphi_psnecl, phi_fyo_dphi_psnecl_ftdf ;
 
-  phi_fyo_dphi.clear();
-  phi_fyo_dphi_psnecl.clear();
-  phi_fyo_dphi_psnecl_ftdf.clear();
-
-  vector<double> p_nobha_stt_P3_psnecl_ftdf, p_nobha_stt_P3_psnecl, p_nobha_stt_P3, phi_nobha_fyo_dphi, phi_nobha_fyo_dphi_psnecl,
-         phi_nobha_fyo_dphi_psnecl_ftdf ;
-  p_nobha_stt_P3_psnecl_ftdf.clear();
-  p_nobha_stt_P3_psnecl.clear();
-  p_nobha_stt_P3.clear();
-
-  phi_nobha_fyo_dphi.clear();
-  phi_nobha_fyo_dphi_psnecl.clear();
-  phi_nobha_fyo_dphi_psnecl_ftdf.clear();
+  std::vector<double> p_nobha_stt_P3_psnecl_ftdf, p_nobha_stt_P3_psnecl, p_nobha_stt_P3, phi_nobha_fyo_dphi,
+      phi_nobha_fyo_dphi_psnecl,
+      phi_nobha_fyo_dphi_psnecl_ftdf ;
 
   int nitrack = 0;    // the i track of the m_Tracks
   for (const auto& b2track : m_Tracks) {
@@ -377,7 +360,7 @@ void TRGEfficiencyDQMModule::event()
     }
 
     // IP tracks at barrel
-    if (fabs(fitresult->getD0()) < 1.0 && fabs(fitresult->getZ0()) < 1.0 && fitresult->getHitPatternCDC().getLastLayer() > 50
+    if (std::abs(fitresult->getD0()) < 1.0 && std::abs(fitresult->getZ0()) < 1.0 && fitresult->getHitPatternCDC().getLastLayer() > 50
         && fitresult->getHitPatternCDC().getFirstLayer() < 5) {
       double phiDegree = fitresult->getPhi() / Unit::deg;
       double pt        = fitresult->getTransverseMomentum();
@@ -533,10 +516,10 @@ void TRGEfficiencyDQMModule::event()
         }
 
         // IP tracks at barrel
-        if (fabs(jfitresult->getD0()) < 1.0 && fabs(jfitresult->getZ0()) < 1.0 && jfitresult->getHitPatternCDC().getLastLayer() > 50
+        if (std::abs(jfitresult->getD0()) < 1.0 && std::abs(jfitresult->getZ0()) < 1.0 && jfitresult->getHitPatternCDC().getLastLayer() > 50
             && jfitresult->getHitPatternCDC().getFirstLayer() < 5) {
           double jrk_phiDegree = jfitresult->getPhi() / Unit::deg;
-          double deltea_phi    = fabs(phiDegree - jrk_phiDegree);
+          double deltea_phi    = std::abs(phiDegree - jrk_phiDegree);
           double dphi          = deltea_phi;
 
           if (deltea_phi > 180)

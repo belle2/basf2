@@ -175,18 +175,25 @@ void TRGEfficiencyDQMModule::event()
     return;
   }
   if (!m_TrgSummary.isValid()) {
-    B2WARNING("TRGSummary object not available but require to estimate the trigger efficiency");
+    B2WARNING("TRGSummary object not available but required to estimate the trigger efficiency");
     return;
   }
   if (!m_HltResult.isValid()) {
-    B2WARNING("SoftwareTriggerResult object not available but require to select bhabha/mumu/hadron HLT skimmed events");
+    B2WARNING("SoftwareTriggerResult object not available but required to get the HLT result");
     return;
   }
 
-  const std::map<std::string, int>& fresults = m_HltResult->getResults();
-  if ((fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end())
-      || (fresults.find("software_trigger_cut&skim&accept_hadron") == fresults.end())) {
-    B2WARNING("TRGEfficiencyDQMModule: Can't find required bhabha or mumu or hadron trigger identifier");
+  const std::map<std::string, int>& hltResult = m_HltResult->getResults();
+  if ((hltResults.find("software_trigger_cut&skim&accept_bhabha") == hltResults.end())
+      || (hltResults.find("software_trigger_cut&skim&accept_hadron") == hltResults.end())
+      || (hltResults.find("software_trigger_cut&filter&total_result") == hltResults.end())) {
+    B2WARNING("TRGEfficiencyDQMModule: Can't find required HLT identifiers");
+    return;
+  }
+
+  const bool hltAccepted = (m_HltResult->getResult("software_trigger_cut&filter&total_result") == SoftwareTriggerCutResult::c_accept);
+  if (not hltAccepted) {
+    B2WARNING("TRGEfficiencyDQMModule: Event rejected by the HLT filter, skipping the module");
     return;
   }
 

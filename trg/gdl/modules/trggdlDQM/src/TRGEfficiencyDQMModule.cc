@@ -184,9 +184,9 @@ void TRGEfficiencyDQMModule::event()
   }
 
   const std::map<std::string, int>& hltResult = m_HltResult->getResults();
-  if ((hltResults.find("software_trigger_cut&skim&accept_bhabha") == hltResults.end())
-      || (hltResults.find("software_trigger_cut&skim&accept_hadron") == hltResults.end())
-      || (hltResults.find("software_trigger_cut&filter&total_result") == hltResults.end())) {
+  if ((hltResult.find("software_trigger_cut&skim&accept_bhabha") == hltResult.end())
+      || (hltResult.find("software_trigger_cut&skim&accept_hadron") == hltResult.end())
+      || (hltResult.find("software_trigger_cut&filter&total_result") == hltResult.end())) {
     B2WARNING("TRGEfficiencyDQMModule: Can't find required HLT identifiers");
     return;
   }
@@ -202,21 +202,8 @@ void TRGEfficiencyDQMModule::event()
   ///////////////////////////////////////////////////////////////////
 
   // calculate the total energy
-  double E_ecl_all = 0;       // the ECL total energy
-  double E_ecl_hie =
-    0;       // the ECL total energy in the thetaID range 2<=ThetaID<=15 (corresponds to 22.49<=theta<=126.80) for ehigh bit
-  for (const auto& test_b2eclcluster : m_ECLClusters) {
-    if (!(test_b2eclcluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))) continue;
-    double energy = test_b2eclcluster.getEnergyRaw();
-    double theta  = test_b2eclcluster.getTheta() / Unit::deg;
-
-    if (energy < 0.1) continue;
-
-    E_ecl_all = E_ecl_all + energy;
-    if (theta >= 22.49 && theta <= 126.8) {
-      E_ecl_hie = E_ecl_hie + energy;
-    }
-  }
+  double E_ecl_all = 0; // the ECL total energy
+  double E_ecl_hie = 0; // the ECL total energy in the hie "acceptance"
 
   bool trg_hie_psncdc       = 0;  // for ECL energy trigger, for hie
   bool trg_hie_Eecl         = 0;  // for ECL energy trigger, for hie
@@ -225,12 +212,20 @@ void TRGEfficiencyDQMModule::event()
   bool trg_nobha_hie_Eecl   = 0;
 
   for (const auto& b2eclcluster : m_ECLClusters) {
+
     if (!(b2eclcluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))) continue;
+
     double phi    = b2eclcluster.getPhi() / Unit::deg;
     double theta  = b2eclcluster.getTheta() / Unit::deg;
     double energy = b2eclcluster.getEnergyRaw();
 
     if (energy < 0.1) continue;
+
+    E_ecl_all += energy;
+    // the ECL total energy in the thetaID range 2<=ThetaID<=15 (corresponds to 22.49<=theta<=126.80) for ehigh bit
+    if (theta >= 22.49 && theta <= 126.8) {
+      E_ecl_hie += energy;
+    }
 
     bool trg_psncdc    = m_TrgSummary->testPsnm("ffy") || m_TrgSummary->testPsnm("fyo") || m_TrgSummary->testPsnm("stt");
     bool trg_hie       = m_TrgSummary->testFtdl("hie");

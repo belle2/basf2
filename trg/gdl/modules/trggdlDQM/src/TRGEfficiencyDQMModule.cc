@@ -215,9 +215,9 @@ void TRGEfficiencyDQMModule::event()
 
     if (!(b2eclcluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))) continue;
 
-    double phi    = b2eclcluster.getPhi() / Unit::deg;
-    double theta  = b2eclcluster.getTheta() / Unit::deg;
-    double energy = b2eclcluster.getEnergyRaw();
+    const double phi    = b2eclcluster.getPhi() / Unit::deg;
+    const double theta  = b2eclcluster.getTheta() / Unit::deg;
+    const double energy = b2eclcluster.getEnergyRaw();
 
     if (energy < 0.1) continue;
 
@@ -227,10 +227,10 @@ void TRGEfficiencyDQMModule::event()
       E_ecl_hie += energy;
     }
 
-    bool trg_psncdc    = m_TrgSummary->testPsnm("ffy") || m_TrgSummary->testPsnm("fyo") || m_TrgSummary->testPsnm("stt");
-    bool trg_hie       = m_TrgSummary->testFtdl("hie");
-    bool trg_hie_nobha = m_TrgSummary->testInput("ehigh");   // remove the bha_veto for hie bit
-    bool trg_ecltiming = m_TrgSummary->testFtdl("ecltiming");
+    const bool trg_psncdc    = m_TrgSummary->testPsnm("ffy") || m_TrgSummary->testPsnm("fyo") || m_TrgSummary->testPsnm("stt");
+    const bool trg_hie       = m_TrgSummary->testFtdl("hie");
+    const bool trg_hie_nobha = m_TrgSummary->testInput("ehigh");   // remove the bha_veto for hie bit
+    const bool trg_ecltiming = m_TrgSummary->testFtdl("ecltiming");
 
     m_ecltiming_theta->Fill(theta);
     m_ecltiming_phi->Fill(phi);
@@ -283,13 +283,13 @@ void TRGEfficiencyDQMModule::event()
   ///////////- - - - KLM TRG - - - - -///////////////////////////////
   ///////////////////////////////////////////////////////////////////
   for (const auto& b2klmcluster : m_KLMClusters) {
-    int nlayer = b2klmcluster.getLayers();
+    const int nlayer = b2klmcluster.getLayers();
 
     if (nlayer <= 6)
       continue;
 
-    double theta     = b2klmcluster.getMomentum().Theta() / Unit::deg;
-    double phiDegree = b2klmcluster.getMomentum().Phi() / Unit::deg;
+    const double phi       = b2klmcluster.getMomentum().Phi() / Unit::deg;
+    const double theta     = b2klmcluster.getMomentum().Theta() / Unit::deg;
 
     bool trg_KLMecl  = m_TrgSummary->testPsnm("hie")        || m_TrgSummary->testPsnm("c4")   || m_TrgSummary->testPsnm("eclmumu") ||
                        m_TrgSummary->testPsnm("lml1")       || m_TrgSummary->testPsnm("lml2") || m_TrgSummary->testPsnm("lml6")    ||
@@ -301,12 +301,12 @@ void TRGEfficiencyDQMModule::event()
     } catch (const std::exception&) {
     }
 
-    bool trg_klmhit  = m_TrgSummary->testFtdl("klmhit");
-    bool trg_eklmhit = m_TrgSummary->testFtdl("eklmhit");
+    const bool trg_klmhit  = m_TrgSummary->testFtdl("klmhit");
+    const bool trg_eklmhit = m_TrgSummary->testFtdl("eklmhit");
 
-    m_klmhit_phi->Fill(phiDegree);
+    m_klmhit_phi->Fill(phi);
     m_klmhit_theta->Fill(theta);
-    m_eklmhit_phi->Fill(phiDegree);
+    m_eklmhit_phi->Fill(phi);
     m_eklmhit_theta->Fill(theta);
 
     if (trg_KLMecl) {
@@ -322,16 +322,16 @@ void TRGEfficiencyDQMModule::event()
 
     // add theta cut for phi distribution, since the efficiency at some theta range is very low.
     if (trg_KLMecl && theta > 50 && theta < 120) {
-      m_klmhit_phi_psnecl->Fill(phiDegree);
+      m_klmhit_phi_psnecl->Fill(phi);
     }
     if (trg_KLMecl && ((theta > 20 && theta < 40) || (theta > 120 && theta < 160))) {
-      m_eklmhit_phi_psnecl->Fill(phiDegree);
+      m_eklmhit_phi_psnecl->Fill(phi);
     }
     if (trg_KLMecl && trg_klmhit && theta > 50 && theta < 120) {
-      m_klmhit_phi_psnecl_ftdf->Fill(phiDegree);
+      m_klmhit_phi_psnecl_ftdf->Fill(phi);
     }
     if (trg_KLMecl && trg_eklmhit && ((theta > 20 && theta < 40) || (theta > 120 && theta < 160))) {
-      m_eklmhit_phi_psnecl_ftdf->Fill(phiDegree);
+      m_eklmhit_phi_psnecl_ftdf->Fill(phi);
     }
   }
 
@@ -355,7 +355,7 @@ void TRGEfficiencyDQMModule::event()
     }
 
     // require high NDF track
-    int ndf = fitresult->getNDF();
+    const int ndf = fitresult->getNDF();
     if (ndf < 20) {
       nitrack++;
       continue;
@@ -364,10 +364,10 @@ void TRGEfficiencyDQMModule::event()
     // IP tracks at barrel
     if (std::abs(fitresult->getD0()) < 1.0 && std::abs(fitresult->getZ0()) < 1.0 && fitresult->getHitPatternCDC().getLastLayer() > 50
         && fitresult->getHitPatternCDC().getFirstLayer() < 5) {
-      double phiDegree = fitresult->getPhi() / Unit::deg;
-      double pt        = fitresult->getTransverseMomentum();
-      double p3        = fitresult->getMomentum().R();  // 3-momentum
-      double theta     = fitresult->getMomentum().Theta() / Unit::deg;
+      const double phi       = fitresult->getPhi() / Unit::deg;
+      const double pt        = fitresult->getTransverseMomentum();
+      const double p3        = fitresult->getMomentum().R();  // 3-momentum
+      const double theta     = fitresult->getMomentum().Theta() / Unit::deg;
 
       bool trg_psnecl  = m_TrgSummary->testPsnm("hie")        || m_TrgSummary->testPsnm("c4")   || m_TrgSummary->testPsnm("eclmumu") ||
                          m_TrgSummary->testPsnm("lml1")       || m_TrgSummary->testPsnm("lml2") || m_TrgSummary->testPsnm("lml6")    ||
@@ -379,46 +379,46 @@ void TRGEfficiencyDQMModule::event()
       } catch (const std::exception&) {
       }
 
-      bool trg_ftdf    = m_TrgSummary->testFtdl("f");
+      const bool trg_ftdf    = m_TrgSummary->testFtdl("f");
 
       // for f bit, reomove the Bhabha_veto
-      bool trg_itdt2 = (m_TrgSummary->testInput("t2_0") || m_TrgSummary->testInput("t2_1") || m_TrgSummary->testInput("t2_2")
-                        || m_TrgSummary->testInput("t2_3"));
+      const bool trg_itdt2 = (m_TrgSummary->testInput("t2_0") || m_TrgSummary->testInput("t2_1") || m_TrgSummary->testInput("t2_2")
+                              || m_TrgSummary->testInput("t2_3"));
 
       // for z, reomove the Bhabha_veto
-      bool trg_itdt3 = (m_TrgSummary->testInput("t3_0") || m_TrgSummary->testInput("t3_1") || m_TrgSummary->testInput("t3_2")
-                        || m_TrgSummary->testInput("t3_3"));
+      const bool trg_itdt3 = (m_TrgSummary->testInput("t3_0") || m_TrgSummary->testInput("t3_1") || m_TrgSummary->testInput("t3_2")
+                              || m_TrgSummary->testInput("t3_3"));
 
       // for y, reomove the Bhabha_veto
-      bool trg_itdt4 = (m_TrgSummary->testInput("ty_0") || m_TrgSummary->testInput("ty_1") || m_TrgSummary->testInput("ty_2")
-                        || m_TrgSummary->testInput("ty_3"));
+      const bool trg_itdt4 = (m_TrgSummary->testInput("ty_0") || m_TrgSummary->testInput("ty_1") || m_TrgSummary->testInput("ty_2")
+                              || m_TrgSummary->testInput("ty_3"));
 
       // (t3>0 and !bhaveto and !veto)  for z
-      bool trg_ftdz = m_TrgSummary->testFtdl("z");
+      const bool trg_ftdz = m_TrgSummary->testFtdl("z");
 
       // (ty>0 and !bhaveto and !veto)  for y
-      bool trg_ftdy = m_TrgSummary->testFtdl("y");
+      const bool trg_ftdy = m_TrgSummary->testFtdl("y");
 
       // typ and !bha veto and !veto
-      bool trg_stt  = m_TrgSummary->testFtdl("stt");
+      const bool trg_stt  = m_TrgSummary->testFtdl("stt");
 
       // remove bha_veto
-      bool trg_stt_nobha  = m_TrgSummary->testInput("typ") ;
+      const bool trg_stt_nobha  = m_TrgSummary->testInput("typ") ;
 
       // require pt > 0.3 GeV
       if (pt > 0.3) {
-        m_hPhi->Fill(phiDegree);
+        m_hPhi->Fill(phi);
         if (trg_psnecl) {
-          m_hPhi_psnecl->Fill(phiDegree);
+          m_hPhi_psnecl->Fill(phi);
         }
         if (trg_psnecl && trg_ftdf) {
-          m_hPhi_psnecl_ftdf->Fill(phiDegree);
+          m_hPhi_psnecl_ftdf->Fill(phi);
         }
       }
 
       m_hPt->Fill(pt);
       m_nobha_hPt->Fill(pt);
-      m_nobha_f_phi->Fill(phiDegree);
+      m_nobha_f_phi->Fill(phi);
 
       m_hP3_z->Fill(p3);
       m_hP3_y->Fill(p3);
@@ -426,22 +426,22 @@ void TRGEfficiencyDQMModule::event()
       m_nobha_hP3_z->Fill(p3);
       m_nobha_hP3_y->Fill(p3);
 
-      m_nobha_phi_z->Fill(phiDegree);
-      m_nobha_phi_y->Fill(phiDegree);
+      m_nobha_phi_z->Fill(phi);
+      m_nobha_phi_y->Fill(phi);
 
       m_stt_theta->Fill(theta);
-      m_stt_phi->Fill(phiDegree);
+      m_stt_phi->Fill(phi);
       p_stt_P3.push_back(p3);
 
       m_nobha_stt_theta->Fill(theta);
-      m_nobha_stt_phi->Fill(phiDegree);
+      m_nobha_stt_phi->Fill(phi);
       p_nobha_stt_P3.push_back(p3);
 
 
       if (trg_psnecl) {
         m_hPt_psnecl->Fill(pt);
         m_nobha_hPt_psnecl->Fill(pt);
-        m_nobha_f_phi_psnecl->Fill(phiDegree);
+        m_nobha_f_phi_psnecl->Fill(phi);
 
         m_hP3_z_psnecl->Fill(p3);           // for z bit
         m_hP3_y_psnecl->Fill(p3);           // for y bit
@@ -449,14 +449,14 @@ void TRGEfficiencyDQMModule::event()
         m_nobha_hP3_z_psnecl->Fill(p3);     // remove bhabha veto for z bit
         m_nobha_hP3_y_psnecl->Fill(p3);     // remove bhabha veto for y bit
 
-        m_nobha_phi_z_psnecl->Fill(phiDegree);
-        m_nobha_phi_y_psnecl->Fill(phiDegree);
+        m_nobha_phi_z_psnecl->Fill(phi);
+        m_nobha_phi_y_psnecl->Fill(phi);
 
-        m_stt_phi_psnecl->Fill(phiDegree);
+        m_stt_phi_psnecl->Fill(phi);
         p_stt_P3_psnecl.push_back(p3);
         m_stt_theta_psnecl->Fill(theta);
 
-        m_nobha_stt_phi_psnecl->Fill(phiDegree);
+        m_nobha_stt_phi_psnecl->Fill(phi);
         p_nobha_stt_P3_psnecl.push_back(p3);
         m_nobha_stt_theta_psnecl->Fill(theta);
       }
@@ -466,7 +466,7 @@ void TRGEfficiencyDQMModule::event()
       }
       if (trg_psnecl && trg_itdt2) {
         m_nobha_hPt_psnecl_ftdf->Fill(pt);
-        m_nobha_f_phi_psnecl_ftdf->Fill(phiDegree);
+        m_nobha_f_phi_psnecl_ftdf->Fill(phi);
       }
 
       if (trg_psnecl && trg_ftdz) {
@@ -477,20 +477,20 @@ void TRGEfficiencyDQMModule::event()
       }
       if (trg_psnecl && trg_itdt3) {
         m_nobha_hP3_z_psnecl_ftdf->Fill(p3);
-        m_nobha_phi_z_psnecl_ftdf->Fill(phiDegree);
+        m_nobha_phi_z_psnecl_ftdf->Fill(phi);
       }
       if (trg_psnecl && trg_itdt4) {
         m_nobha_hP3_y_psnecl_ftdf->Fill(p3);
-        m_nobha_phi_y_psnecl_ftdf->Fill(phiDegree);
+        m_nobha_phi_y_psnecl_ftdf->Fill(phi);
       }
 
       if (trg_psnecl && trg_stt) {
-        m_stt_phi_psnecl_ftdf->Fill(phiDegree);
+        m_stt_phi_psnecl_ftdf->Fill(phi);
         p_stt_P3_psnecl_ftdf.push_back(p3);
         m_stt_theta_psnecl_ftdf->Fill(theta);
       }
       if (trg_psnecl && trg_stt_nobha) {
-        m_nobha_stt_phi_psnecl_ftdf->Fill(phiDegree);
+        m_nobha_stt_phi_psnecl_ftdf->Fill(phi);
         p_nobha_stt_P3_psnecl_ftdf.push_back(p3);
         m_nobha_stt_theta_psnecl_ftdf->Fill(theta);
       }
@@ -520,20 +520,18 @@ void TRGEfficiencyDQMModule::event()
         // IP tracks at barrel
         if (std::abs(jfitresult->getD0()) < 1.0 && std::abs(jfitresult->getZ0()) < 1.0 && jfitresult->getHitPatternCDC().getLastLayer() > 50
             && jfitresult->getHitPatternCDC().getFirstLayer() < 5) {
-          double jrk_phiDegree = jfitresult->getPhi() / Unit::deg;
-          double deltea_phi    = std::abs(phiDegree - jrk_phiDegree);
-          double dphi          = deltea_phi;
+          const double jrk_phi = jfitresult->getPhi() / Unit::deg;
+          const double delta_phi    = std::abs(phi - jrk_phi);
+          const double dphi          = (delta_phi > 180) ? 360 - delta_phi : delta_phi;
 
-          if (deltea_phi > 180)
-            dphi = 360 - deltea_phi;
-
-          bool trg_fyo = m_TrgSummary->testFtdl("fyo");
-          bool trg_fyo_nobha = (m_TrgSummary->testInput("t2_1")       ||  m_TrgSummary->testInput("t2_2") || m_TrgSummary->testInput("t2_3"))
-                               &&
-                               (m_TrgSummary->testInput("ty_0")       ||  m_TrgSummary->testInput("ty_1") || m_TrgSummary->testInput("ty_2")
-                                || m_TrgSummary->testInput("ty_3"))
-                               &&
-                               m_TrgSummary->testInput("cdc_open90");
+          const bool trg_fyo = m_TrgSummary->testFtdl("fyo");
+          const bool trg_fyo_nobha = (m_TrgSummary->testInput("t2_1")       ||  m_TrgSummary->testInput("t2_2")
+                                      || m_TrgSummary->testInput("t2_3"))
+                                     &&
+                                     (m_TrgSummary->testInput("ty_0")       ||  m_TrgSummary->testInput("ty_1") || m_TrgSummary->testInput("ty_2")
+                                      || m_TrgSummary->testInput("ty_3"))
+                                     &&
+                                     m_TrgSummary->testInput("cdc_open90");
 
           phi_fyo_dphi.push_back(dphi);
           phi_nobha_fyo_dphi.push_back(dphi);
@@ -557,69 +555,69 @@ void TRGEfficiencyDQMModule::event()
 
   // the largest cdc_open angle in an event for fyo bit
   if (phi_fyo_dphi_psnecl_ftdf.size() != 0) {
-    auto max_it      = std::max_element(phi_fyo_dphi_psnecl_ftdf.begin(), phi_fyo_dphi_psnecl_ftdf.end());
-    double max_value = *max_it;
+    const auto max_it      = std::max_element(phi_fyo_dphi_psnecl_ftdf.begin(), phi_fyo_dphi_psnecl_ftdf.end());
+    const double max_value = *max_it;
     m_fyo_dphi_psnecl_ftdf->Fill(max_value);
   }
   if (phi_fyo_dphi_psnecl.size() != 0) {
-    auto max_it      = std::max_element(phi_fyo_dphi_psnecl.begin(), phi_fyo_dphi_psnecl.end());
-    double max_value = *max_it;
+    const auto max_it      = std::max_element(phi_fyo_dphi_psnecl.begin(), phi_fyo_dphi_psnecl.end());
+    const double max_value = *max_it;
     m_fyo_dphi_psnecl->Fill(max_value);
   }
   if (phi_fyo_dphi.size() != 0) {
-    auto max_it      = std::max_element(phi_fyo_dphi.begin(), phi_fyo_dphi.end());
-    double max_value = *max_it;
+    const auto max_it      = std::max_element(phi_fyo_dphi.begin(), phi_fyo_dphi.end());
+    const double max_value = *max_it;
     m_fyo_dphi->Fill(max_value);
   }
 
   //
   if (phi_nobha_fyo_dphi_psnecl_ftdf.size() != 0) {
-    auto max_it      = std::max_element(phi_nobha_fyo_dphi_psnecl_ftdf.begin(), phi_nobha_fyo_dphi_psnecl_ftdf.end());
-    double max_value = *max_it;
+    const auto max_it      = std::max_element(phi_nobha_fyo_dphi_psnecl_ftdf.begin(), phi_nobha_fyo_dphi_psnecl_ftdf.end());
+    const double max_value = *max_it;
     m_nobha_fyo_dphi_psnecl_ftdf->Fill(max_value);
   }
   if (phi_nobha_fyo_dphi_psnecl.size() != 0) {
-    auto max_it      = std::max_element(phi_nobha_fyo_dphi_psnecl.begin(), phi_nobha_fyo_dphi_psnecl.end());
-    double max_value = *max_it;
+    const auto max_it      = std::max_element(phi_nobha_fyo_dphi_psnecl.begin(), phi_nobha_fyo_dphi_psnecl.end());
+    const double max_value = *max_it;
     m_nobha_fyo_dphi_psnecl->Fill(max_value);
   }
   if (phi_nobha_fyo_dphi.size() != 0) {
-    auto max_it      = std::max_element(phi_nobha_fyo_dphi.begin(), phi_nobha_fyo_dphi.end());
-    double max_value = *max_it;
+    const auto max_it      = std::max_element(phi_nobha_fyo_dphi.begin(), phi_nobha_fyo_dphi.end());
+    const double max_value = *max_it;
     m_nobha_fyo_dphi->Fill(max_value);
   }
 
   // the largest momentum track p in an event for stt bit
   if (p_stt_P3_psnecl_ftdf.size() != 0) {
-    auto max_it      = std::max_element(p_stt_P3_psnecl_ftdf.begin(), p_stt_P3_psnecl_ftdf.end());
-    double max_value = *max_it;
+    const auto max_it      = std::max_element(p_stt_P3_psnecl_ftdf.begin(), p_stt_P3_psnecl_ftdf.end());
+    const double max_value = *max_it;
     m_stt_P3_psnecl_ftdf->Fill(max_value);
   }
   if (p_stt_P3_psnecl.size() != 0) {
-    auto max_it      = std::max_element(p_stt_P3_psnecl.begin(), p_stt_P3_psnecl.end());
-    double max_value = *max_it;
+    const auto max_it      = std::max_element(p_stt_P3_psnecl.begin(), p_stt_P3_psnecl.end());
+    const double max_value = *max_it;
     m_stt_P3_psnecl->Fill(max_value);
   }
   if (p_stt_P3.size() != 0) {
-    auto max_it      = std::max_element(p_stt_P3.begin(), p_stt_P3.end());
-    double max_value = *max_it;
+    const auto max_it      = std::max_element(p_stt_P3.begin(), p_stt_P3.end());
+    const double max_value = *max_it;
     m_stt_P3->Fill(max_value);
   }
 
   //
   if (p_nobha_stt_P3_psnecl_ftdf.size() != 0) {
-    auto max_it      = std::max_element(p_nobha_stt_P3_psnecl_ftdf.begin(), p_nobha_stt_P3_psnecl_ftdf.end());
-    double max_value = *max_it;
+    const auto max_it      = std::max_element(p_nobha_stt_P3_psnecl_ftdf.begin(), p_nobha_stt_P3_psnecl_ftdf.end());
+    const double max_value = *max_it;
     m_nobha_stt_P3_psnecl_ftdf->Fill(max_value);
   }
   if (p_nobha_stt_P3_psnecl.size() != 0) {
-    auto max_it      = std::max_element(p_nobha_stt_P3_psnecl.begin(), p_nobha_stt_P3_psnecl.end());
-    double max_value = *max_it;
+    const auto max_it      = std::max_element(p_nobha_stt_P3_psnecl.begin(), p_nobha_stt_P3_psnecl.end());
+    const double max_value = *max_it;
     m_nobha_stt_P3_psnecl->Fill(max_value);
   }
   if (p_nobha_stt_P3.size() != 0) {
-    auto max_it      = std::max_element(p_nobha_stt_P3.begin(), p_nobha_stt_P3.end());
-    double max_value = *max_it;
+    const auto max_it      = std::max_element(p_nobha_stt_P3.begin(), p_nobha_stt_P3.end());
+    const double max_value = *max_it;
     m_nobha_stt_P3->Fill(max_value);
   }
 

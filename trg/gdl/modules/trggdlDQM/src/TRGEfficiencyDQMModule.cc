@@ -7,7 +7,7 @@
  **************************************************************************/
 
 // Own include
-#include <trg/gdl/modules/trggdlDQM/TRGEFFDQMModule.h>
+#include <trg/gdl/modules/trggdlDQM/TRGEfficiencyDQMModule.h>
 
 // Dataobject classes
 #include <TF1.h>
@@ -25,20 +25,20 @@ using namespace Belle2;
 //                 Register module
 //-----------------------------------------------------------------
 
-REG_MODULE(TRGEFFDQM);
+REG_MODULE(TRGEfficiencyDQM);
 
-TRGEFFDQMModule::TRGEFFDQMModule() : HistoModule()
+TRGEfficiencyDQMModule::TRGEfficiencyDQMModule() : HistoModule()
 {
   // set module description (e.g. insert text)
   setDescription("Make kinematics dependent efficiency plot");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-TRGEFFDQMModule::~TRGEFFDQMModule()
+TRGEfficiencyDQMModule::~TRGEfficiencyDQMModule()
 {
 }
 
-void TRGEFFDQMModule::defineHisto()
+void TRGEfficiencyDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("TRGEFF");
@@ -161,7 +161,7 @@ void TRGEFFDQMModule::defineHisto()
   oldDir->cd();
 }
 
-void TRGEFFDQMModule::initialize()
+void TRGEfficiencyDQMModule::initialize()
 {
   REG_HISTOGRAM
 
@@ -183,7 +183,7 @@ void TRGEFFDQMModule::initialize()
   }
 }
 
-void TRGEFFDQMModule::beginRun()
+void TRGEfficiencyDQMModule::beginRun()
 {
   if (!m_RecoTracks.isOptional()) {
     B2DEBUG(22, "Missing recoTracks array in beginRun() ");
@@ -192,7 +192,7 @@ void TRGEFFDQMModule::beginRun()
 
 }
 
-void TRGEFFDQMModule::event()
+void TRGEfficiencyDQMModule::event()
 {
   if (!m_trgSummary.isValid()) {
     B2WARNING("TRGSummary object not available but require to estimate trg efficiency");
@@ -207,7 +207,7 @@ void TRGEFFDQMModule::event()
   const std::map<std::string, int>& fresults = m_TrgResult->getResults();
   if ((fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end())
       || (fresults.find("software_trigger_cut&skim&accept_hadron") == fresults.end())) {
-    B2WARNING("TRGEFFDQMModule: Can't find required bhabha or mumu or hadron trigger identifier");
+    B2WARNING("TRGEfficiencyDQMModule: Can't find required bhabha or mumu or hadron trigger identifier");
     return;
   }
 
@@ -683,10 +683,10 @@ void TRGEFFDQMModule::event()
 
 
 
-void TRGEFFDQMModule::endRun()
+void TRGEfficiencyDQMModule::endRun()
 {
 }
 
-void TRGEFFDQMModule::terminate()
+void TRGEfficiencyDQMModule::terminate()
 {
 }

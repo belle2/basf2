@@ -31,19 +31,19 @@ namespace Belle2 {
   /**
    * Make summary of data quality from reconstruction
    */
-  class TRGEFFDQMModule : public HistoModule {
+  class TRGEfficiencyDQMModule : public HistoModule {
 
   public:
 
     /**
      * Constructor
      */
-    TRGEFFDQMModule();
+    TRGEfficiencyDQMModule();
 
     /**
      * Destructor
      */
-    virtual ~TRGEFFDQMModule();
+    virtual ~TRGEfficiencyDQMModule();
 
     /**
      * Initialize the Module.

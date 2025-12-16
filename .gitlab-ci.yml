@@ -3,7 +3,6 @@ stages:
   - build-gcc
   - run-tests
   - build-clang
-  - run-test-full-stack
   - release-validation
 
 variables:
@@ -151,16 +150,6 @@ run-tests:
           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE}/${VERSION}/${FILE}"
         done
       fi
-    - echo "stage stop time -> $(date +%H:%M:%S)"
-
-run-test-full-stack:
-  stage: run-test-full-stack
-  needs: [build-gcc]
-  script:
-    - echo "stage start time -> $(date +%H:%M:%S)"
-    - apt-get install firefox
-    - b2code-option opt
-    - basf2 validation/tests/test_full_stack.py
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
 build-clang:

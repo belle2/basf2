@@ -57,12 +57,6 @@ namespace Belle2 {
     void defineHisto() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    void beginRun() override;
-
-    /**
      * Event processor.
      */
     void event() override;
@@ -72,7 +66,6 @@ namespace Belle2 {
     StoreArray<Track> m_Tracks; /**< Tracks. */
     StoreArray<ECLCluster> m_ECLClusters; /**< ECL Clusters. */
     StoreArray<KLMCluster> m_KLMClusters; /**< KLM Clusters. */
-    StoreArray<RecoTrack> m_RecoTracks; /**< RecoTracks. */
     StoreObjPtr<TRGSummary> m_TrgSummary; /**< Trigger summary. */
     StoreObjPtr<SoftwareTriggerResult> m_HltResult; /**< HLT result. */
 

@@ -28,8 +28,7 @@ REG_MODULE(TRGEfficiencyDQM);
 
 TRGEfficiencyDQMModule::TRGEfficiencyDQMModule() : HistoModule()
 {
-  // set module description (e.g. insert text)
-  setDescription("Make kinematics dependent efficiency plot");
+  setDescription("DQM module to calculcate the L1 trigger efficiency.");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -151,55 +150,34 @@ void TRGEfficiencyDQMModule::defineHisto()
   m_eklmhit_theta_psnecl         = new TH1F("eklmhit_theta_psnecl", "", 18, 0, 180);
   m_eklmhit_theta_psnecl_ftdf    = new TH1F("eklmhit_theta_psnecl_ftdf", "", 18, 0, 180);
 
-
-
-
-
-
-
   oldDir->cd();
 }
 
 void TRGEfficiencyDQMModule::initialize()
 {
   REG_HISTOGRAM
-
-  if (!m_Tracks.isOptional()) {
-    B2WARNING("Missing Tracks array");
-    return;
-  }
-  if (!m_ECLClusters.isOptional()) {
-    B2WARNING("Missing ECLCLuster array");
-    return;
-  }
-  if (!m_KLMClusters.isOptional()) {
-    B2WARNING("Missing KLMCLuster array");
-    return;
-  }
-  if (!m_TrgSummary.isOptional()) {
-    B2WARNING("Missing TRGSummary");
-    return;
-  }
-}
-
-void TRGEfficiencyDQMModule::beginRun()
-{
-  if (!m_RecoTracks.isOptional()) {
-    B2DEBUG(22, "Missing recoTracks array in beginRun() ");
-    return;
-  }
-
 }
 
 void TRGEfficiencyDQMModule::event()
 {
-  if (!m_TrgSummary.isValid()) {
-    B2WARNING("TRGSummary object not available but require to estimate trg efficiency");
+  if (!m_Tracks.isOptional()) {
+    B2WARNING("Tracks array not available, but required to estimate the trigger efficiency");
     return;
   }
-
+  if (!m_ECLClusters.isOptional()) {
+    B2WARNING("ECLClusters array not available, but required to estimate the trigger efficiency");
+    return;
+  }
+  if (!m_KLMClusters.isOptional()) {
+    B2WARNING("KLMClusters array not available, but required to estimate the trigger efficiency");
+    return;
+  }
+  if (!m_TrgSummary.isValid()) {
+    B2WARNING("TRGSummary object not available but require to estimate the trigger efficiency");
+    return;
+  }
   if (!m_HltResult.isValid()) {
-    B2WARNING("SoftwareTriggerResult object not available but require to select bhabha/mumu/hadron events skim");
+    B2WARNING("SoftwareTriggerResult object not available but require to select bhabha/mumu/hadron HLT skimmed events");
     return;
   }
 

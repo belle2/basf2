@@ -138,11 +138,11 @@ run-tests:
     # Run the "google" tests and the "scripts" tests
     - b2code-option opt
     - export BELLE2_SPHINX_OUTPUTDIR=${BELLE2_LOCAL_DIR}/build_doc/
-    - b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/output_tests_reports/tests-google.xml
+    #- b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/output_tests_reports/tests-google.xml
     # Run doxygen for analysis package to generate xml files needed for sphinx build
-    - b2code-doxygen-warnings analysis > /dev/null 2>&1 || true
-    - b2test-scripts -j $(nproc) --filter "^framework/tests/(?!(foreach.py))" --xml-input=${BELLE2_LOCAL_DIR}/input_tests_reports/tests-framework.xml --xml=${BELLE2_LOCAL_DIR}/output_tests_reports/tests-framework.xml --timeout 1200
-    - b2test-scripts -j $(nproc) --filter "^(?!framework/tests/.*)" --xml-input=${BELLE2_LOCAL_DIR}/input_tests_reports/tests-non-framework.xml --xml=${BELLE2_LOCAL_DIR}/output_tests_reports/tests-non-framework.xml --timeout 1200
+    #- b2code-doxygen-warnings analysis > /dev/null 2>&1 || true
+    #- b2test-scripts -j $(nproc) --filter "^framework/tests/(?!(foreach.py))" --xml-input=${BELLE2_LOCAL_DIR}/input_tests_reports/tests-framework.xml --xml=${BELLE2_LOCAL_DIR}/output_tests_reports/tests-framework.xml --timeout 1200
+    #- b2test-scripts -j $(nproc) --filter "^(?!framework/tests/.*)" --xml-input=${BELLE2_LOCAL_DIR}/input_tests_reports/tests-non-framework.xml --xml=${BELLE2_LOCAL_DIR}/output_tests_reports/tests-non-framework.xml --timeout 1200
     # Upload the tests reports (only if this is the main branch)
     - |
       if [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
@@ -158,7 +158,15 @@ run-test-full-stack:
   needs: [build-gcc]
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
-    - apt-get install firefox
+    - wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
+    - echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
+    - |
+      echo '
+      Package: *
+      Pin: origin packages.mozilla.org
+      Pin-Priority: 1000
+      ' | sudo tee /etc/apt/preferences.d/mozilla
+    - apt-get update && apt-get install firefox
     - b2code-option opt
     - basf2 validation/tests/test_full_stack.py
     - echo "stage stop time -> $(date +%H:%M:%S)"

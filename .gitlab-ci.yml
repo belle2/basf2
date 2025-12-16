@@ -159,13 +159,13 @@ run-test-full-stack:
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
     - wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
-    - echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
+    - echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
     - |
       echo '
       Package: *
       Pin: origin packages.mozilla.org
       Pin-Priority: 1000
-      ' | tee /etc/apt/preferences.d/mozilla
+      ' | sudo tee /etc/apt/preferences.d/mozilla
     - apt-get update && apt-get install firefox
     - b2code-option opt
     - basf2 validation/tests/test_full_stack.py

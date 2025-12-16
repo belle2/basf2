@@ -10,7 +10,6 @@
 #include <trg/gdl/modules/trggdlDQM/TRGEfficiencyDQMModule.h>
 
 // Dataobject classes
-#include <TF1.h>
 #include <Math/Vector3D.h>
 #include <TVector3.h>
 #include <TDirectory.h>
@@ -177,7 +176,7 @@ void TRGEfficiencyDQMModule::initialize()
     B2WARNING("Missing KLMCLuster array");
     return;
   }
-  if (!m_trgSummary.isOptional()) {
+  if (!m_TrgSummary.isOptional()) {
     B2WARNING("Missing TRGSummary");
     return;
   }
@@ -194,23 +193,22 @@ void TRGEfficiencyDQMModule::beginRun()
 
 void TRGEfficiencyDQMModule::event()
 {
-  if (!m_trgSummary.isValid()) {
+  if (!m_TrgSummary.isValid()) {
     B2WARNING("TRGSummary object not available but require to estimate trg efficiency");
     return;
   }
 
-  if (!m_TrgResult.isValid()) {
+  if (!m_HltResult.isValid()) {
     B2WARNING("SoftwareTriggerResult object not available but require to select bhabha/mumu/hadron events skim");
     return;
   }
 
-  const std::map<std::string, int>& fresults = m_TrgResult->getResults();
+  const std::map<std::string, int>& fresults = m_HltResult->getResults();
   if ((fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end())
       || (fresults.find("software_trigger_cut&skim&accept_hadron") == fresults.end())) {
     B2WARNING("TRGEfficiencyDQMModule: Can't find required bhabha or mumu or hadron trigger identifier");
     return;
   }
-
 
   /*///////////////////////////////////////////////////////////////////
   ///////////- - - - ECL TRG - - - - -////////////////////////////////
@@ -247,10 +245,10 @@ void TRGEfficiencyDQMModule::event()
 
     if (energy < 0.1) continue;
 
-    bool trg_psncdc    = m_trgSummary->testPsnm("ffy") || m_trgSummary->testPsnm("fyo") || m_trgSummary->testPsnm("stt");
-    bool trg_hie       = m_trgSummary->testFtdl("hie");
-    bool trg_hie_nobha = m_trgSummary->testInput("ehigh");   // remove the bha_veto for hie bit
-    bool trg_ecltiming = m_trgSummary->testFtdl("ecltiming");
+    bool trg_psncdc    = m_TrgSummary->testPsnm("ffy") || m_TrgSummary->testPsnm("fyo") || m_TrgSummary->testPsnm("stt");
+    bool trg_hie       = m_TrgSummary->testFtdl("hie");
+    bool trg_hie_nobha = m_TrgSummary->testInput("ehigh");   // remove the bha_veto for hie bit
+    bool trg_ecltiming = m_TrgSummary->testFtdl("ecltiming");
 
     m_ecltiming_theta->Fill(theta);
     m_ecltiming_phi->Fill(phi);
@@ -299,11 +297,6 @@ void TRGEfficiencyDQMModule::event()
     m_ecltiming_E_psnecl_ftdf->Fill(E_ecl_all);
   }
 
-
-
-
-
-
   /*///////////////////////////////////////////////////////////////////
   ///////////- - - - KLM TRG - - - - -////////////////////////////////
   ///////////////////////////////////////////////////////////////////*/
@@ -318,19 +311,18 @@ void TRGEfficiencyDQMModule::event()
     double theta     = b2klmcluster.getMomentum().Theta() / Unit::deg;
     double phiDegree = b2klmcluster.getMomentum().Phi() / Unit::deg;
 
-    bool trg_KLMecl  = m_trgSummary->testPsnm("hie")        || m_trgSummary->testPsnm("c4")   || m_trgSummary->testPsnm("eclmumu") ||
-                       m_trgSummary->testPsnm("lml1")       || m_trgSummary->testPsnm("lml2") || m_trgSummary->testPsnm("lml6")    ||
-                       m_trgSummary->testPsnm("lml7")       || m_trgSummary->testPsnm("lml8") || m_trgSummary->testPsnm("lml9")    ||
-                       m_trgSummary->testPsnm("lml10");
+    bool trg_KLMecl  = m_TrgSummary->testPsnm("hie")        || m_TrgSummary->testPsnm("c4")   || m_TrgSummary->testPsnm("eclmumu") ||
+                       m_TrgSummary->testPsnm("lml1")       || m_TrgSummary->testPsnm("lml2") || m_TrgSummary->testPsnm("lml6")    ||
+                       m_TrgSummary->testPsnm("lml7")       || m_TrgSummary->testPsnm("lml8") || m_TrgSummary->testPsnm("lml9")    ||
+                       m_TrgSummary->testPsnm("lml10");
     // these trigger flags are not available in older data
     try {
-      trg_KLMecl |= m_trgSummary->testPsnm("ecltaub2b3") || m_trgSummary->testPsnm("hie4");
+      trg_KLMecl |= m_TrgSummary->testPsnm("ecltaub2b3") || m_TrgSummary->testPsnm("hie4");
     } catch (const std::exception&) {
     }
 
-
-    bool trg_klmhit  = m_trgSummary->testFtdl("klmhit");
-    bool trg_eklmhit = m_trgSummary->testFtdl("eklmhit");
+    bool trg_klmhit  = m_TrgSummary->testFtdl("klmhit");
+    bool trg_eklmhit = m_TrgSummary->testFtdl("eklmhit");
 
     m_klmhit_phi->Fill(phiDegree);
     m_klmhit_theta->Fill(theta);
@@ -367,12 +359,9 @@ void TRGEfficiencyDQMModule::event()
     }
   }
 
-
-
   /*///////////////////////////////////////////////////////////////////
   ///////////- - - - CDC TRG - - - - -////////////////////////////////
   ///////////////////////////////////////////////////////////////////*/
-
 
   vector<double> p_stt_P3_psnecl_ftdf, p_stt_P3_psnecl, p_stt_P3, phi_fyo_dphi, phi_fyo_dphi_psnecl, phi_fyo_dphi_psnecl_ftdf ;
   p_stt_P3_psnecl_ftdf.clear();
@@ -417,42 +406,41 @@ void TRGEfficiencyDQMModule::event()
       double p3        = fitresult->getMomentum().R();  // 3-momentum
       double theta     = fitresult->getMomentum().Theta() / Unit::deg;
 
-      bool trg_psnecl  = m_trgSummary->testPsnm("hie")        || m_trgSummary->testPsnm("c4")   || m_trgSummary->testPsnm("eclmumu") ||
-                         m_trgSummary->testPsnm("lml1")       || m_trgSummary->testPsnm("lml2") || m_trgSummary->testPsnm("lml6")    ||
-                         m_trgSummary->testPsnm("lml7")       || m_trgSummary->testPsnm("lml8") || m_trgSummary->testPsnm("lml9")    ||
-                         m_trgSummary->testPsnm("lml10");
+      bool trg_psnecl  = m_TrgSummary->testPsnm("hie")        || m_TrgSummary->testPsnm("c4")   || m_TrgSummary->testPsnm("eclmumu") ||
+                         m_TrgSummary->testPsnm("lml1")       || m_TrgSummary->testPsnm("lml2") || m_TrgSummary->testPsnm("lml6")    ||
+                         m_TrgSummary->testPsnm("lml7")       || m_TrgSummary->testPsnm("lml8") || m_TrgSummary->testPsnm("lml9")    ||
+                         m_TrgSummary->testPsnm("lml10");
       // these trigger flags are not available in older data
       try {
-        trg_psnecl |= m_trgSummary->testPsnm("ecltaub2b3") || m_trgSummary->testPsnm("hie4");
+        trg_psnecl |= m_TrgSummary->testPsnm("ecltaub2b3") || m_TrgSummary->testPsnm("hie4");
       } catch (const std::exception&) {
       }
 
-      bool trg_ftdf    = m_trgSummary->testFtdl("f");
+      bool trg_ftdf    = m_TrgSummary->testFtdl("f");
 
       // for f bit, reomove the Bhabha_veto
-      bool trg_itdt2 = (m_trgSummary->testInput("t2_0") || m_trgSummary->testInput("t2_1") || m_trgSummary->testInput("t2_2")
-                        || m_trgSummary->testInput("t2_3"));
+      bool trg_itdt2 = (m_TrgSummary->testInput("t2_0") || m_TrgSummary->testInput("t2_1") || m_TrgSummary->testInput("t2_2")
+                        || m_TrgSummary->testInput("t2_3"));
 
       // for z, reomove the Bhabha_veto
-      bool trg_itdt3 = (m_trgSummary->testInput("t3_0") || m_trgSummary->testInput("t3_1") || m_trgSummary->testInput("t3_2")
-                        || m_trgSummary->testInput("t3_3"));
+      bool trg_itdt3 = (m_TrgSummary->testInput("t3_0") || m_TrgSummary->testInput("t3_1") || m_TrgSummary->testInput("t3_2")
+                        || m_TrgSummary->testInput("t3_3"));
 
       // for y, reomove the Bhabha_veto
-      bool trg_itdt4 = (m_trgSummary->testInput("ty_0") || m_trgSummary->testInput("ty_1") || m_trgSummary->testInput("ty_2")
-                        || m_trgSummary->testInput("ty_3"));
+      bool trg_itdt4 = (m_TrgSummary->testInput("ty_0") || m_TrgSummary->testInput("ty_1") || m_TrgSummary->testInput("ty_2")
+                        || m_TrgSummary->testInput("ty_3"));
 
       // (t3>0 and !bhaveto and !veto)  for z
-      bool trg_ftdz = m_trgSummary->testFtdl("z");
+      bool trg_ftdz = m_TrgSummary->testFtdl("z");
 
       // (ty>0 and !bhaveto and !veto)  for y
-      bool trg_ftdy = m_trgSummary->testFtdl("y");
+      bool trg_ftdy = m_TrgSummary->testFtdl("y");
 
       // typ and !bha veto and !veto
-      bool trg_stt  = m_trgSummary->testFtdl("stt");
+      bool trg_stt  = m_TrgSummary->testFtdl("stt");
 
       // remove bha_veto
-      bool trg_stt_nobha  = m_trgSummary->testInput("typ") ;
-
+      bool trg_stt_nobha  = m_TrgSummary->testInput("typ") ;
 
       // require pt > 0.3 GeV
       if (pt > 0.3) {
@@ -544,7 +532,6 @@ void TRGEfficiencyDQMModule::event()
         m_nobha_stt_theta_psnecl_ftdf->Fill(theta);
       }
 
-
       // the following is for fyo \deleta_phi
       int njtrack = 0;   // the j track of the m_Tracks
       for (const auto& j_b2track : m_Tracks) {
@@ -577,14 +564,13 @@ void TRGEfficiencyDQMModule::event()
           if (deltea_phi > 180)
             dphi = 360 - deltea_phi;
 
-          bool trg_fyo = m_trgSummary->testFtdl("fyo");
-          bool trg_fyo_nobha = (m_trgSummary->testInput("t2_1")       ||  m_trgSummary->testInput("t2_2") || m_trgSummary->testInput("t2_3"))
+          bool trg_fyo = m_TrgSummary->testFtdl("fyo");
+          bool trg_fyo_nobha = (m_TrgSummary->testInput("t2_1")       ||  m_TrgSummary->testInput("t2_2") || m_TrgSummary->testInput("t2_3"))
                                &&
-                               (m_trgSummary->testInput("ty_0")       ||  m_trgSummary->testInput("ty_1") || m_trgSummary->testInput("ty_2")
-                                || m_trgSummary->testInput("ty_3")) &&
-                               m_trgSummary->testInput("cdc_open90");
-
-          // cout<<"i = "<<nitrack <<"   j= "<<njtrack  <<"   phiDegree = "<<phiDegree<<"    jrk_phiDegree =  "<<jrk_phiDegree<<"     dphi "<<dphi<<endl;
+                               (m_TrgSummary->testInput("ty_0")       ||  m_TrgSummary->testInput("ty_1") || m_TrgSummary->testInput("ty_2")
+                                || m_TrgSummary->testInput("ty_3"))
+                               &&
+                               m_TrgSummary->testInput("cdc_open90");
 
           phi_fyo_dphi.push_back(dphi);
           phi_nobha_fyo_dphi.push_back(dphi);
@@ -605,7 +591,6 @@ void TRGEfficiencyDQMModule::event()
     }
     nitrack++;
   }
-
 
   // the largest cdc_open angle in an event for fyo bit
   if (phi_fyo_dphi_psnecl_ftdf.size() != 0) {
@@ -641,7 +626,6 @@ void TRGEfficiencyDQMModule::event()
     m_nobha_fyo_dphi->Fill(max_value);
   }
 
-
   // the largest momentum track p in an event for stt bit
   if (p_stt_P3_psnecl_ftdf.size() != 0) {
     auto max_it      = std::max_element(p_stt_P3_psnecl_ftdf.begin(), p_stt_P3_psnecl_ftdf.end());
@@ -676,17 +660,4 @@ void TRGEfficiencyDQMModule::event()
     m_nobha_stt_P3->Fill(max_value);
   }
 
-
-
-
-}
-
-
-
-void TRGEfficiencyDQMModule::endRun()
-{
-}
-
-void TRGEfficiencyDQMModule::terminate()
-{
 }

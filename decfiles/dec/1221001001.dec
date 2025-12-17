@@ -1,0 +1,27 @@
+# EventType: 1221001001
+# Descriptor: Y(4S)-> B+(-> D_s*+ gamma)B-
+# NickName: Bu_Dsst+gamma
+# Documentation: Signal MC of B+ -> D_s*+ gamma
+# Tested: Yes
+# Responsible: Nihar Pawar
+# Email: ph24resch11018@iith.ac.in
+# PhysicsWG: EWP
+# Cuts: None
+# Date: 10/10/2025
+
+Alias      B+sig B+
+Alias      B-sig B-
+
+ChargeConj B+sig B-sig
+
+Decay Upsilon(4S)
+0.5 B+ B-sig VSS;
+0.5 B- B+sig VSS;
+Enddecay
+
+Decay B+sig
+1.0 D_s*+ gamma SVP_HELAMP 1.0 0.0 1.0 0.0;
+Enddecay
+CDecay B-sig
+
+End

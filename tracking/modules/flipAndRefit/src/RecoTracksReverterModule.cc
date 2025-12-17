@@ -7,6 +7,9 @@
  **************************************************************************/
 
 #include <tracking/modules/flipAndRefit/RecoTracksReverterModule.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dbobjects/TrackFlippingCuts.h>
 
 using namespace Belle2;
 

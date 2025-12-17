@@ -423,7 +423,7 @@ void HadronBgPrep::setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>&
     // fit the chi distribution  in bins of beta-gamma
     gstatus chistat;
     fit(hchi_bg[i], pdg.data(), chistat);
-    if (bgstat == OK) {
+    if (chistat == OK) {
       satchi = hchi_bg[i]->GetFunction("gaus")->GetParameter(1);
       satchierr  = hchi_bg[i]->GetFunction("gaus")->GetParError(1);
       satchiwidth = hchi_bg[i]->GetFunction("gaus")->GetParameter(2);

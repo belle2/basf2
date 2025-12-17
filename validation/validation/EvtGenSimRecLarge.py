@@ -26,8 +26,8 @@
 from basf2 import set_random_seed, create_path, process
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-from beamparameters import add_beamparameters
 from validation import statistics_plots, event_timing_plot
+from validationgenerators import add_evtgen_for_validation
 from background import get_background_files
 
 set_random_seed(12345)
@@ -37,11 +37,8 @@ main = create_path()
 # specify number of events to be generated
 main.add_module("EventInfoSetter", evtNumList=[10000], runList=[1], expList=[0])
 
-# beam parameters
-add_beamparameters(main, "Y4S")
-
 # generate BBbar events
-main.add_module("EvtGenInput")
+add_evtgen_for_validation(main)
 
 # detector and L1 trigger simulation
 add_simulation(main, bkgfiles=get_background_files())

@@ -23,6 +23,7 @@ from simulation import add_simulation
 from reconstruction import add_reconstruction
 from svd import add_svd_create_recodigits
 from validation import statistics_plots, event_timing_plot
+from validationgenerators import add_evtgen_for_validation
 from background import get_background_files
 
 set_random_seed(12345)
@@ -36,7 +37,7 @@ main = create_path()
 main.add_module("EventInfoSetter", evtNumList=[1000], runList=[1], expList=[0])
 
 # generate BBbar events
-main.add_module("EvtGenInput")
+add_evtgen_for_validation(main)
 
 # detector and L1 trigger simulation
 add_simulation(main, bkgfiles=get_background_files())

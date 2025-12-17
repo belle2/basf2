@@ -10,7 +10,7 @@
 
 """
 <header>
-  <contact>arul.prakash@physik.uni-muenchen.de</contact>
+  <contact>giacomo.pietro@kit.edu</contact>
   <output>EvtGenSimRecLarge.root</output>
   <description>
     This steering file produces 10000 generic BBbar events with
@@ -59,7 +59,7 @@ process(main, calculateStatistics=True)
 
 statistics_plots(
     "EvtGenSimRecLarge_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation and reconstruction job with generic "
     "EvtGen events",
     prefix="EvtGenSimRecLarge",
@@ -67,7 +67,7 @@ statistics_plots(
 event_timing_plot(
     "../EvtGenSimRecLarge.root",
     "EvtGenSimRecLarge_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation and reconstruction job with generic "
     "EvtGen events",
     prefix="EvtGenSimRecLarge",

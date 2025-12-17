@@ -12,7 +12,7 @@
 <header>
   <output>EvtGenSimNoBkg.root</output>
   <cacheable/>
-  <contact>arul.prakash@physik.uni-muenchen.de</contact>
+  <contact>giacomo.pietro@kit.edu</contact>
   <description>This steering file produces 1000 generic BBbar events with EvtGen
   and runs the detector simulation without mixed in background.</description>
 </header>
@@ -47,14 +47,14 @@ process(main, calculateStatistics=True)
 
 statistics_plots(
     "EvtGenSimNoBkg_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation job with generic EvtGen events and no beam background",
     prefix="EvtGenSimNoBkg",
 )
 event_timing_plot(
     "../EvtGenSimNoBkg.root",
     "EvtGenSimNoBkg_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation job with generic EvtGen events and no beam background",
     prefix="EvtGenSimNoBkg",
 )

@@ -12,7 +12,7 @@
 <header>
   <output>EvtGenSimRec.root</output>
   <cacheable/>
-  <contact>arul.prakash@physik.uni-muenchen.de</contact>
+  <contact>giacomo.pietro@kit.edu</contact>
   <description>This steering file produces 1000 generic BBbar events with EvtGen,
   runs the detector simulation with mixed in background, and performs the standard reconstruction.</description>
 </header>
@@ -64,14 +64,14 @@ process(main, calculateStatistics=True)
 
 statistics_plots(
     "EvtGenSimRec_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation and reconstruction job with generic EvtGen events",
     prefix="EvtGenSimRec",
 )
 event_timing_plot(
     "../EvtGenSimRec.root",
     "EvtGenSimRec_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation and reconstruction job with generic EvtGen events",
     prefix="EvtGenSimRec",
 )

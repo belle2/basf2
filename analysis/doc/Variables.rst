@@ -3,15 +3,13 @@
 Variables
 =========
 
-While ``basf2`` operates on :doxygen:`ParticleList <classBelle2_1_1ParticleList>` s, it is also important to calculate physics quantities associated with a given candidate or event.
+While ``basf2`` operates on :doxygen:`ParticleList <classBelle2_1_1ParticleList>`s, it is also important to calculate physics quantities associated with a given candidate or event.
 
-In ``basf2`` analysis, variables are handled by the `VariableManager`.
+In ``basf2``, variables are handled by the `VariableManager`.
 There are many variables available for use in analysis.
-Probably the most obvious, and useful are: :b2:var:`p`, :b2:var:`E`, :b2:var:`Mbc`, and :b2:var:`deltaE`.
+You can search the variables alphabetically in the :ref:`b2-varindex` or browse :ref:`variablesByGroup`.
 
-You can search the variables in an alphabetical :ref:`b2-varindex`, or browse :ref:`variablesByGroup`.
-
-.. warning::
+.. danger::
 
           Some variables return ``NaN`` instead of being converted to a numerical value. 
           Before cutting on any variables, **please pay attention** to whether or not your variable returns ``NaN``. 
@@ -22,11 +20,9 @@ You can search the variables in an alphabetical :ref:`b2-varindex`, or browse :r
 VariableManager
 ---------------
 
-The VariableManager handles all variables in ``basf2`` analysis.
+The VariableManager handles all variables in ``basf2``.
 It is implemented as a `singleton <https://en.wikipedia.org/wiki/Singleton_pattern>`_
-C++ class with a python interface.
-
-The C++ documentation is :doxygen:`here <classBelle2_1_1Variable_1_1Manager>`.
+C++ class with a python interface. The C++ documentation is :doxygen:`here<classBelle2_1_1Variable_1_1Manager>`.
 
 .. tip::
 
@@ -59,9 +55,7 @@ The C++ documentation is :doxygen:`here <classBelle2_1_1Variable_1_1Manager>`.
       Variable names are deliberately verbose and explicit (to avoid ambiguity).
       However, it is often not desirable to deal with long unwieldy variable names particularly in the context of :doc:`VariableManagerOutput`.
 
-      Example:
-
-      Aliases to a verbose variable may be set with:
+      Aliases for verbose variables may be set with:
 
       >>> from variables import variables as vm
       >>> vm.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
@@ -74,7 +68,7 @@ The C++ documentation is :doxygen:`here <classBelle2_1_1Variable_1_1Manager>`.
       .. warning::
 
           The VariableManager instance is configured independently of the `basf2.Path`.
-          In case of adding the same alias twice, the configuration just before calling `basf2.process` is what wins.
+          In case of adding the same alias twice, the alias implemented just before calling `basf2.process` is what wins.
 
       :param str alias: New alias to create
       :param str expression: The expression the alias should evaluate to
@@ -83,12 +77,12 @@ The C++ documentation is :doxygen:`here <classBelle2_1_1Variable_1_1Manager>`.
 
    .. py:method:: getAliasNames()
 
-      Get a list of all alias names (in reverse order added)
+      Get a list of all alias names in reverse order of definition.
 
       .. tip::
 
           This returns a ``ROOT.vector`` which you will probably
-          need to convert into a python ``list(str)``.
+          need to convert into a python ``list(str)`` using the code below:
 
           >>> my_aliases = list(vm.getAliasNames())
 
@@ -103,14 +97,14 @@ The C++ documentation is :doxygen:`here <classBelle2_1_1Variable_1_1Manager>`.
          This method takes a ``ROOT.vector<string>`` as input.
          It's probably easier to use `variables.utils.add_collection` which wraps this function for you.
 
-      :param str collection: The new collection to create.
-      :param variables: A ``ROOT.std.vector(string)`` instance of variables to add as the variable collection.
+      :param str collection: The new collection to create
+      :param variables: A ``ROOT.std.vector(string)`` instance of variables to add as the variable collection
 
       :returns: True if the collection was successfully added
 
    .. py:method:: getCollection(collection)
 
-      Get a list of all variables in the ``collection``.
+      Get a list of all variables in the collection.
 
       :param str collection: The name of the existing variable collection
 
@@ -119,7 +113,7 @@ The C++ documentation is :doxygen:`here <classBelle2_1_1Variable_1_1Manager>`.
    .. py:method:: printAliases()
 
       Prints all aliases currently registered.
-      Useful to call just before calling `basf2.process` on an analysis `basf2.Path` when debugging.
+      This is useful to call just before `basf2.process` on an analysis `basf2.Path` when debugging.
 
 
 .. _variablesByGroup:

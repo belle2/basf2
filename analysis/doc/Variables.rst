@@ -195,25 +195,22 @@ If a likelihood is not available from the selected detector list, **NaN** is ret
 .. b2-variables::
    :group: PID_expert
 
-ECL Cluster
+ECL cluster
 ~~~~~~~~~~~
-
-Here is a list of variables related to ECL cluster.
-All ECLCluster-based variables return NaN if no ECLCluster is found.
 
 .. _importantNoteECL:
 
 .. note::
-    All floating type variables in the mdst dataobject ECLCluster use ROOT Double32_t types with
-    specific range declaration to save disk storage. This has two important consequences for a user:
+    All floating type variables in the mdst dataobject ``ECLCluster`` use `ROOT Double32_t <https://root.cern.ch/root/html520/ListOfTypes.html>`_ 
+    types with a specific range declaration to save disk storage. This has two important consequences for a user:
 
     - All ECL cluster variables have a limited precision. This precision is always better than
       the intrinsic ECL data acquisition precision. However, if these variables are histogrammed,
       binning effects are likely.
-    - All ECL cluster variables are clipped at the lower and upper boundaries: Values below (above)
+    - All ECL cluster variables are clipped at the lower and upper boundaries: values below (above)
       these boundaries will be set to the lower (upper) bound.
 
-    Lower and upper limits, and precision of these variables are mentioned inside the note box below them.
+    If relevant, lower and upper limits as well as the variable precision are mentioned in the note box below the respective variable.
     One should note this in the context of binning effects.
 
 

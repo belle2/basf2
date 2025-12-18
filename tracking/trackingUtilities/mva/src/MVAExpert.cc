@@ -86,6 +86,9 @@ void MVAExpert::Impl::initialize()
     using DBWeightFileRepresentation = DBObjPtr<DatabaseRepresentationOfWeightfile>;
     m_weightfileRepresentation = std::make_unique<DBWeightFileRepresentation>(m_identifier);
   }
+  if (not m_weightfileRepresentation) {
+    B2FATAL("No weight file could be loaded in tracking/trackingUtilities/mva/MVAExpert.");
+  }
 }
 
 void MVAExpert::Impl::beginRun()

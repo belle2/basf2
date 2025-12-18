@@ -33,7 +33,7 @@ void ECLClusterRounderModule::event()
     ECLCluster* cluster = m_eclclusters[i];
 
     TMatrixDSym covMat = cluster->getCovarianceMatrix3x3();
-    double matRounded[6] = {
+    const double matRounded[6] = {
       roundToPrecision(covMat(0, 0), 0.0, 0.3, 10),
       roundToPrecision(covMat(1, 0), 0.0, 10.0, 12),
       roundToPrecision(covMat(1, 1), 0.0, 0.05, 8),
@@ -57,7 +57,13 @@ void ECLClusterRounderModule::event()
     cluster->setTheta(roundToPrecision(cluster->getTheta(), 0.0, 3.14159265358979323846, 16));
     cluster->setPhi(roundToPrecision(cluster->getPhi(), -3.14159265358979323846, 3.14159265358979323846, 16));
     cluster->setR(roundToPrecision(cluster->getR(), 75.0, 300.0, 16));
-    cluster->setLogEnergy(roundToPrecision(log(cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)), -5.0, 3.0, 18));
+    if (!cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+      cluster->addHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      cluster->setLogEnergy(roundToPrecision(log(cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)), -5.0, 3.0, 18));
+      cluster->removeHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+    } else {
+      cluster->setLogEnergy(roundToPrecision(log(cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)), -5.0, 3.0, 18));
+    }
     cluster->setLogEnergyRaw(roundToPrecision(log(cluster->getEnergyRaw()), -5.0, 3.0, 18));
     cluster->setLogEnergyHighestCrystal(roundToPrecision(log(cluster->getEnergyHighestCrystal()), -5.0, 3.0, 18));
     cluster->setPulseShapeDiscriminationMVA(roundToPrecision(cluster->getPulseShapeDiscriminationMVA(), 0.0, 1.0, 18));

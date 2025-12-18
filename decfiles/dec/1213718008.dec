@@ -1,0 +1,40 @@
+# EventType:  1213718008
+# Descriptor: [B- -> D*0 eta l- nu] non-resonant cc
+# NickName: Bu_Dstlnu_Deta_nonres
+# Documentation: b->c l nu process, B- mode, non-resonant D* eta production by introducing a dummy resonance
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Philipp Horak
+# Email: phorak@uvic.ca
+# Cuts: None
+# Date: 20251016
+#
+
+Alias Dsteta0sig D'_10
+Alias anti-Dsteta0sig anti-D'_10
+ChargeConj Dsteta0sig anti-Dsteta0sig
+
+# Set custom dummy particle properties (mass, width)
+Particle Dsteta0sig        2.55      3.0
+Particle anti-Dsteta0sig   2.55      3.0
+
+ChargeConj Dsteta0sig anti-Dsteta0sig
+
+Decay Upsilon(4S)
+0.500 B-sig B+  VSS;
+0.500 B- B+sig  VSS;
+Enddecay
+
+Decay B-sig
+0.500  Dsteta0sig     e-  anti-nu_e  PHOTOS LLSW 0.68 -0.2 0.3;
+0.500  Dsteta0sig     mu- anti-nu_mu PHOTOS LLSW 0.68 -0.2 0.3;
+Enddecay
+CDecay B+sig
+
+# Dummy resonance decays to produce non-resonant D* eta
+Decay Dsteta0sig
+1.0   D*0 eta     PHSP;
+Enddecay
+CDecay anti-Dsteta0sig
+
+End

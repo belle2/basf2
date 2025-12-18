@@ -7,9 +7,11 @@
  **************************************************************************/
 
 #pragma once
+
 #include <calibration/CalibrationAlgorithm.h>
-#include <TH1F.h>
-#include "vector"
+#include <TH1D.h>
+#include <vector>
+
 namespace Belle2 {
   namespace CDC {
     /**

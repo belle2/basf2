@@ -88,8 +88,6 @@ namespace Belle2 {
     int m_nRun = 0;
     //!  Event number
     int m_nEvent = 0;
-    //! Bhabha option
-    int m_Bhabha = 1;
     //! Clustering option
     int m_Clustering = 1;
     //! Cluster Limit

@@ -9,11 +9,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <tracking/trackingUtilities/findlets/base/Findlet.h>
-#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
-
-#include <string>
-#include <vector>
 
 namespace Belle2 {
   class ModuleParamList;

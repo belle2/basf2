@@ -11,9 +11,6 @@
 #include <tracking/trackingUtilities/numerics/WithWeight.h>
 #include <tracking/trackingUtilities/numerics/Weight.h>
 
-#include <vector>
-#include <string>
-
 namespace Belle2 {
   class ModuleParamList;
 

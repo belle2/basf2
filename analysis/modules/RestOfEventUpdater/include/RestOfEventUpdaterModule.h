@@ -10,8 +10,6 @@
 #include <framework/core/Module.h>
 
 #include <analysis/VariableManager/Utility.h>
-#include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/dataobjects/Particle.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -21,6 +19,8 @@
 #include <map>
 
 namespace Belle2 {
+  class Particle;
+  class RestOfEvent;
 
   /**
    * Updates an existing mask (map of boolean values) for tracks or eclClusters in RestOfEvent with an available property (e.g. after performing training)

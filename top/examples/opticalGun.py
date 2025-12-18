@@ -39,7 +39,7 @@ main.add_module('OpticalGun',
                 pulseWidth=10.0e-3,  # laser time Jitter, in ns
                 numPhotons=10,
                 diameter=10.0e-3,  # source diameter in cm
-                slotID=5,  # if nonzero, local (slot) referenc frame is used, otherwise Belle II
+                slotID=5,  # if nonzero, local (slot) reference frame is used, otherwise Belle II
                 x=-22.6,
                 y=0.0,
                 z=-129.9,
@@ -77,7 +77,7 @@ main.add_module('RootOutput',
 main.add_module('Progress')
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

@@ -14,7 +14,6 @@
 #include <tracking/ckf/cdc/filters/paths/CDCPathFilterFactory.h>
 
 #include <tracking/ckf/cdc/filters/pathPairs/CDCPathPairFilterFactory.h>
-#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 #include <ecl/dataobjects/ECLShower.h>
 

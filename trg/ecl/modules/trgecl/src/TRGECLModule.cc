@@ -52,10 +52,6 @@ namespace Belle2 {
              m_debugLevel,
              "TRGECL debug level",
              m_debugLevel);
-    addParam("Bhabha",
-             m_Bhabha,
-             "TRGECL Bhabha method  0 : Belle I, 1 : Belle II (default)",
-             m_Bhabha);
     addParam("Clustering",
              m_Clustering,
              "TRGECL Clustering method  0 : use only ICN, 1 : ICN + Energy(Default)",
@@ -611,7 +607,6 @@ namespace Belle2 {
     etm->initialize();
     etm->setClusterMethod(m_Clustering);
     etm->setClusterLimit(m_ClusterLimit);
-    etm->setBhabhaMethod(m_Bhabha);
     etm->setEventTimingMethod(m_EventTiming);
     etm->setTimeWindow(m_TimeWindow);
     etm->setOverlapWindow(m_OverlapWindow);

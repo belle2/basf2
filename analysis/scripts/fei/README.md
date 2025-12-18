@@ -76,7 +76,8 @@ if os.path.exists('basf2_input.root') and config.cache > 1:
   tree = root_file.Get('tree')
   datastorelists = []
   for branch in tree.GetListOfBranches():
-    if ":" not in branch.GetName():
+    # keep non particle lists branches (e.g. Tracks, ECLClusters, ...) and in Belle also mdst particle lists (e.g. gamma:mdst) for ROE Builder
+    if ":" not in branch.GetName() or "mdst" in branch.GetName():
       datastorelists.append(branch.GetName())
 
   listWithConjugates = [str(name) for name in list(Belle2.ParticleListName.addAntiParticleLists(required_lists))]

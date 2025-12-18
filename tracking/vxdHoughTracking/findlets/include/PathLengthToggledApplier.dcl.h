@@ -10,8 +10,6 @@
 #include <tracking/vxdHoughTracking/findlets/OnHitApplier.dcl.h>
 #include <tracking/trackingUtilities/numerics/WithWeight.h>
 
-#include <vector>
-
 namespace Belle2 {
   namespace vxdHoughTracking {
     /**

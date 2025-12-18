@@ -36,7 +36,7 @@ main.add_module(eventinfosetter)
 main.add_module(gdltrg)
 
 # ...Process events...
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # ...Print call statistics...
 print(b2.statistics)

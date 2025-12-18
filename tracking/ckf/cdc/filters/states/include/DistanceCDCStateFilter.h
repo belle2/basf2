@@ -8,10 +8,11 @@
 #pragma once
 
 #include <tracking/ckf/cdc/filters/states/BaseCDCStateFilter.h>
-#include <framework/core/ModuleParamList.h>
 #include <tracking/trackingUtilities/numerics/Weight.h>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   /// Give a weight based on the distance from the hit to the path
   class DistanceCDCStateFilter : public BaseCDCStateFilter {
   public:

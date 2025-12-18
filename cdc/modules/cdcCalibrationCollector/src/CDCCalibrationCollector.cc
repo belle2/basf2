@@ -42,7 +42,7 @@ CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationColl
   setDescription("Collector module for cdc calibration");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("recoTracksColName", m_recoTrackArrayName, "Name of collection hold genfit::Track", std::string(""));
-  addParam("bField", m_bField, "If true -> #Params ==5 else #params ==4 for calculate P-Val", false);
+  //addParam("bField", m_bField, "If true -> #Params ==5 else #params ==4 for calculate P-Val", false);
   addParam("calExpectedDriftTime", m_calExpectedDriftTime, "if true module will calculate expected drift time, it take a time",
            true);
   addParam("storeTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", false);
@@ -118,6 +118,18 @@ void CDCCalibrationCollectorModule::prepare()
   registerObject<TH1F>("hEventT0", m_hEventT0);
   registerObject<TH1F>("hNTracks", m_hNTracks);
   registerObject<TH1F>("hOccupancy", m_hOccupancy);
+
+  ROOT::Math::XYZVector pos(0, 0, 0);
+  ROOT::Math::XYZVector bfield = BFieldManager::getFieldInTesla(pos);
+  if (bfield.Z() > 0.5) {
+    m_bField = true;
+    B2INFO("CDCCalibrationCollector: Magnetic field is ON");
+  } else {
+    m_bField = false;
+    B2INFO("CDCCalibrationCollector: Magnetic field is OFF");
+  }
+  B2INFO("BField at (0,0,0)  = " << bfield.R());
+
 }
 
 void CDCCalibrationCollectorModule::collect()
@@ -151,28 +163,10 @@ void CDCCalibrationCollectorModule::collect()
   // WireID collection finished
 
   const int nTr = m_Tracks.getEntries();
-  // Skip events which have number of charged tracks <= 1.
-  int nCTracks  = 0;
-  for (int i = 0; i < nTr; ++i) {
-    const Belle2::Track* b2track = m_Tracks[i];
-    const Belle2::TrackFitResult* fitresult = b2track->getTrackFitResultWithClosestMass(Const::muon);
-    if (!fitresult) continue;
-
-    short charge = fitresult->getChargeSign();
-    if (std::abs(charge) > 0) {
-      nCTracks++;
-    }
-  }
-
-  if (nCTracks <= 1) {
-    return ;
-  } else {
-    getObjectPtr<TH1F>("hNTracks")->Fill(nCTracks);
-  }
-
   const int nHits = m_CDCHits.getEntries();
   const int nWires = 14336;
   float oc = static_cast<float>(nHits) / static_cast<float>(nWires);
+  getObjectPtr<TH1F>("hNTracks")->Fill(nTr);
   getObjectPtr<TH1F>("hOccupancy")->Fill(oc);
 
   for (int i = 0; i < nTr; ++i) {

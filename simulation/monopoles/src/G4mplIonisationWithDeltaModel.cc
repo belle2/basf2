@@ -39,8 +39,8 @@ using namespace CLHEP;
 std::vector<G4double>* G4mplIonisationWithDeltaModel::dedx0 = nullptr;
 
 G4mplIonisationWithDeltaModel::G4mplIonisationWithDeltaModel(G4double mCharge,
-    const G4String& nam)
-  : G4VEmModel(nam), G4VEmFluctuationModel(nam),
+    const G4String& name)
+  : G4VEmModel(name), G4VEmFluctuationModel(name),
     magCharge(mCharge),
     twoln10(log(100.0)),
     betalow(0.01),

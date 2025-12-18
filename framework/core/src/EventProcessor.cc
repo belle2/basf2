@@ -226,7 +226,7 @@ void EventProcessor::process(const PathPtr& startPath, long maxEvent)
 void EventProcessor::callEvent(Module* module)
 {
   LogSystem& logSystem = LogSystem::Instance();
-  const bool collectStats = !Environment::Instance().getNoStats();
+  const bool collectStats = Environment::Instance().getStats();
   // set up logging
   logSystem.updateModule(&(module->getLogConfig()), module->getName());
   // set up statistics is requested
@@ -329,7 +329,7 @@ bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule
     m_lastMetadataUpdate = time;
   }
 
-  const bool collectStats = !Environment::Instance().getNoStats();
+  const bool collectStats = Environment::Instance().getStats();
 
   while (!moduleIter.isDone()) {
     Module* module = moduleIter.get();
@@ -413,7 +413,7 @@ void EventProcessor::processCore(const PathPtr& startPath, const ModulePtrList& 
   //Remember the previous event meta data, and identify end of data meta data
   m_previousEventMetaData.setEndOfData(); //invalid start state
 
-  const bool collectStats = !Environment::Instance().getNoStats();
+  const bool collectStats = Environment::Instance().getStats();
 
   //Loop over the events
   long currEvent = 0;

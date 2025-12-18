@@ -434,6 +434,9 @@ namespace Belle2 {
       }
 
       /// Calculates the part of this vector that is parallel to the given vector
+      /// @attention: A generalised version for 2D and 3D vectors is implemented in
+      /// framework/geometry/include/VectorUtil.h
+      /// If this class is ever replaced by ROOT::Math::Vector2D, this method can be replaced by that in the basf2 VectorUtil.
       Vector2D parallelVector(const Vector2D& relativTo) const
       {
         return relativTo.scaled(relativTo.dot(*this) / relativTo.normSquared());

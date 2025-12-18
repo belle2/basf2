@@ -6,27 +6,22 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
 #pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <pxd/dataobjects/PXDCluster.h>
-
 #include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/ROIid.h>
-
 
 //root stuff
 #include "TFile.h"
 #include "TNtuple.h"
 
-
 namespace Belle2 {
+  class PXDCluster;
+  class Track;
+  class RecoTrack;
+  class ROIid;
 
   /**
    * Creates Ntuples for PXD Efficiency analysis

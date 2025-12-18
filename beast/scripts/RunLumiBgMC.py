@@ -277,8 +277,5 @@ else:
 # main.add_module("RootOutput", outputFileName="%s.root" % generator)
 b2.process(main)
 
-print('Event Statistics:')
-print(b2.statistics)
-
 d = datetime.datetime.today()
 print(d.strftime('job finish: %Y-%m-%d %H:%M:%S\n'))

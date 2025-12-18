@@ -10,6 +10,7 @@
 #include <framework/geometry/VectorUtil.h>
 #include <Math/Vector2D.h>
 #include <Math/Vector3D.h>
+#include <Math/VectorUtil.h>
 
 #include <cmath>
 
@@ -88,7 +89,7 @@ namespace Belle2 {
       /// Calculates the distance of the given point to the wire *without* wire sag effect
       double nominalDistance(const ROOT::Math::XYZVector& pos3D) const
       {
-        return VectorUtil::orthogonalComp((pos3D - refPos3D()), ROOT::Math::XYZVector(nominalMovePerZ().X(), nominalMovePerZ().Y(), 1));
+        return ROOT::Math::VectorUtil::Perp((pos3D - refPos3D()), ROOT::Math::XYZVector(nominalMovePerZ().X(), nominalMovePerZ().Y(), 1));
       }
 
       /// Calculates the distance of the given point to the wire *with* wire sag effect
@@ -97,14 +98,14 @@ namespace Belle2 {
         const ROOT::Math::XYZVector& wirePos3D = sagPos3DAtZ(pos3D.z());
         const ROOT::Math::XYVector& tmp = sagMovePerZ(pos3D.z());
         const ROOT::Math::XYZVector movePerZ(tmp.X(), tmp.Y(), 1);
-        return VectorUtil::orthogonalComp((pos3D - wirePos3D), movePerZ);
+        return ROOT::Math::VectorUtil::Perp((pos3D - wirePos3D), movePerZ);
       }
 
       /// Returns the closest approach on the wire *without* wire sag effect to the give point
       ROOT::Math::XYZVector nominalClosest3D(const ROOT::Math::XYZVector& point) const
       {
-        return refPos3D() - VectorUtil::parallelVector((point - refPos3D()), ROOT::Math::XYZVector(nominalMovePerZ().X(),
-                                                       nominalMovePerZ().Y(), 1));
+        return refPos3D() - ROOT::Math::VectorUtil::ProjVector((point - refPos3D()), ROOT::Math::XYZVector(nominalMovePerZ().X(),
+                                                               nominalMovePerZ().Y(), 1));
       }
 
       /// Returns the closest approach on the wire *with* wire sag effect to the give point
@@ -113,7 +114,7 @@ namespace Belle2 {
         const ROOT::Math::XYZVector& wirePos3D = sagPos3DAtZ(point.z());
         const ROOT::Math::XYVector& tmp = sagMovePerZ(point.z());
         const ROOT::Math::XYZVector movePerZ(tmp.X(), tmp.Y(), 1);
-        return  wirePos3D - VectorUtil::parallelVector((point - wirePos3D), movePerZ);
+        return  wirePos3D - ROOT::Math::VectorUtil::ProjVector((point - wirePos3D), movePerZ);
       }
 
       /// Gives the position of the forward point

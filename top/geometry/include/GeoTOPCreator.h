@@ -252,7 +252,7 @@ namespace Belle2 {
       BkgSensitiveDetector* m_sensitivePCB1 = 0;  /**< PCB sensitive for BG studies */
       BkgSensitiveDetector* m_sensitivePCB2 = 0;  /**< PCB sensitive for BG studies */
       TOPGeometryPar* m_topgp = TOPGeometryPar::Instance(); /**< singleton class */
-      int m_isBeamBkgStudy = 0; /**< flag for beam backgound simulation */
+      int m_isBeamBkgStudy = 0; /**< flag for beam background simulation */
 
       G4UnionSolid* m_moduleEnvelope = 0; /**< module envelope solid */
       G4AssemblyVolume* m_qbb = 0; /**< QBB assembly volume */

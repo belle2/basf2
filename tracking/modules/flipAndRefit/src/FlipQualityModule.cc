@@ -8,6 +8,7 @@
 
 #include <tracking/modules/flipAndRefit/FlipQualityModule.h>
 #include <mva/interface/Interface.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <memory>
 

@@ -10,7 +10,6 @@
 
 #include <analysis/modules/CurlTagger/Selector.h>
 
-#include <analysis/dataobjects/Particle.h>
 #include <vector>
 #include <string>
 
@@ -24,6 +23,7 @@
 #include "TTree.h"
 
 namespace Belle2 {
+  class Particle;
   namespace CurlTagger {
 
     /** MVA based selector for tagging curl tracks in Belle and Belle II */

@@ -8,18 +8,15 @@
 #pragma once
 
 #include <tracking/trackingUtilities/findlets/base/Findlet.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/PXDIntercept.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/geometry/B2Vector3.h>
-
-#include <string>
-#include <vector>
 
 namespace Belle2 {
   class ModuleParamList;
   class SpacePointTrackCand;
+  class ROIid;
+  class PXDIntercept;
+  class QualityEstimatorBase;
 
   namespace vxdHoughTracking {
 

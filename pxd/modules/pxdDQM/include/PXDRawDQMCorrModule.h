@@ -9,15 +9,13 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-
 #include <framework/datastore/StoreArray.h>
-
-#include <pxd/dataobjects/PXDRawHit.h>
 
 #include "TH1F.h"
 #include "TH2F.h"
 
 namespace Belle2 {
+  class PXDRawHit;
 
   /** PXD DQM Corr Module */
   class PXDRawDQMCorrModule : public HistoModule {  // <- derived from HistoModule class

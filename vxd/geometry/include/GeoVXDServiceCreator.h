@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef GEOVXDSERVICECREATOR_H
-#define GEOVXDSERVICECREATOR_H
+#pragma once
 
 #include <geometry/CreatorBase.h>
 
@@ -71,5 +70,3 @@ namespace Belle2 {
     };
   } // namespace VXD
 } //namespace Belle2
-
-#endif /* GEOVXDSERVICECREATOR_H */

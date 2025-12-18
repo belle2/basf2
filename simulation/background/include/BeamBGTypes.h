@@ -17,7 +17,7 @@ namespace Belle2 {
 
     /**
      * Class to define BG types and to convert between BG types and tags or v.v.
-     * Designed primarely for BeamBkgTagSetter and BeamBkgMixer modules
+     * Designed primarily for BeamBkgTagSetter and BeamBkgMixer modules
      * Suitable also to convert backgroundTag in SimHit classes to name (BG type)
      */
     class BeamBGTypes {

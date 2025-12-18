@@ -9,8 +9,6 @@ from unittest import TestCase, main
 
 from hep_ipython_tools.entities import StoreContent, StoreContentList, StatisticsColumn, Statistics
 
-# @cond internal_test
-
 
 class TestStoreContent(TestCase):
 
@@ -66,4 +64,3 @@ class TestStatistics(TestCase):
 
 if __name__ == "__main__":
     main()
-# @endcond

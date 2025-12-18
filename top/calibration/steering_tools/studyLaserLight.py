@@ -65,9 +65,9 @@ class TOPLaserHistogrammerModule(b2.Module):
     #: output root file
     outname = 'outStudyLaserResolution.root'
 
-    #: ignores the hits wthout calibration
+    #: ignores the hits without calibration
     m_ignoreNotCalibrated = True
-    #: ignores the hits wthout calibration
+    #: ignores the hits without calibration
     m_runOnData = True
 
     #: maximum width to accept a TOPDigit
@@ -114,7 +114,7 @@ class TOPLaserHistogrammerModule(b2.Module):
         self.m_mcCorrectionsFile = MCfile
 
     def ignoreNotCalibrated(self, ignoreNotCal):
-        ''' Sets the flag to ingore the hits without calibration '''
+        ''' Sets the flag to ignore the hits without calibration '''
         #: output name
         self.m_ignoreNotCalibrated = ignoreNotCal
 
@@ -124,7 +124,7 @@ class TOPLaserHistogrammerModule(b2.Module):
         digits = Belle2.PyStoreArray('TOPDigits')
         nhits = [0 for i in range(16)]
         for digit in digits:
-            if(not self.ignoreNotCalibrated and not digit.isTimeBaseCalibrated()):
+            if (not self.ignoreNotCalibrated and not digit.isTimeBaseCalibrated()):
                 continue
             if (digit.getHitQuality() == 1 and
                 digit.getPulseWidth() > self.m_minWidth and digit.getPulseWidth() < self.m_maxWidth and
@@ -180,7 +180,7 @@ else:
 # Suppress messages and warnings during processing
 b2.set_log_level(b2.LogLevel.ERROR)
 
-# Define a global tag (note: the one given bellow can be out-dated!)
+# Define a global tag (note: the one given below can be out-dated!)
 b2.conditions.append_globaltag('data_reprocessing_proc8')
 
 # Create path
@@ -252,11 +252,6 @@ main.add_module(progress)
 
 # Process events
 b2.process(main)
-
-# Print call statistics
-print(b2.statistics)
-print(b2.statistics(b2.statistics.TERM))
-
 
 fitLaserResolution(dataFile=outfile, outputFile='laserResolutionResults.root', pdfType='cb', saveFits=True)
 plotLaserResolution()

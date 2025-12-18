@@ -6,6 +6,8 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+from docutils import nodes
+from docutils.parsers.rst import directives
 from sphinx import addnodes
 from sphinx.roles import XRefRole
 from sphinx.directives import ObjectDescription
@@ -21,8 +23,6 @@ class Basf2Object(ObjectDescription):
     A basf2 x-ref directive registered with Sphinx.add_object_type().
     Basically copied together from sphinxcontrib-domaintools and sphinxcontrib-adadomain.
     """
-
-#: \cond Doxygen_suppress
 
     doc_field_types = {
         TypedField("parameter", label="Parameters", names=("param", "parameter", "arg", "argument"),
@@ -58,8 +58,6 @@ class Basf2Object(ObjectDescription):
         # return the object name for referencing
         return name
 
-#: \endcond
-
     def add_target_and_index(self, name, sig, signode):
         # Create a full id from objtype and name
         targetname = f'{self.objtype}-{name}'
@@ -83,7 +81,6 @@ class Basf2Object(ObjectDescription):
 
 class Basf2ModuleIndex(Index):
     """Create an alphabetic index of all modules"""
-    #: \cond Doxygen_suppress
     name = "modindex"
     localname = "basf2 Module Index"
     shortname = "basf2 modules"
@@ -96,12 +93,10 @@ class Basf2ModuleIndex(Index):
             content.setdefault(letter, [])
             content[letter].append([modname, 0, docname, target, "", "", ""])
         return list(content.items()), False
-    #: \endcond
 
 
 class Basf2VariableIndex(Index):
     """Create an alphabetic index of all variables"""
-    #: \cond Doxygen_suppress
     name = "varindex"
     localname = "basf2 Variable Index"
     shortname = "basf2 variables"
@@ -115,12 +110,30 @@ class Basf2VariableIndex(Index):
             content.setdefault(letter, [])
             content[letter].append([modname, 0, docname, target, "", "", ""])
         return list(content.items()), False
-    #: \endcond
+
+
+class Basf2VariableObject(Basf2Object):
+    # extend the option spec to accept a source: URL
+    option_spec = Basf2Object.option_spec.copy() if hasattr(Basf2Object, "option_spec") else {}
+    option_spec.update({
+        "source": directives.uri,   # support :source: option
+    })
+
+    def handle_signature(self, sig, signode):
+        # Call parent to parse the signature and add the variable name
+        name = super().handle_signature(sig, signode)
+
+        # If :source: option is given, add a [source] link inline
+        if "source" in self.options:
+            uri = self.options["source"]
+            linknode = nodes.reference('', '[source]', refuri=uri, classes=['var-source-link'])
+            signode += linknode
+
+        return name
 
 
 class Basf2Domain(Domain):
     """basf2 Software Domain"""
-    #: \cond Doxygen_suppress
     name = "b2"
     label = "Belle II Software"
     object_types = {
@@ -130,7 +143,7 @@ class Basf2Domain(Domain):
 
     directives = {
         "module": Basf2Object,
-        "variable": Basf2Object,
+        "variable": Basf2VariableObject,
     }
     roles = {
         "mod": XRefRole(),
@@ -144,7 +157,6 @@ class Basf2Domain(Domain):
         Basf2ModuleIndex,
         Basf2VariableIndex,
     ]
-    #: \endcond
 
     def clear_doc(self, docname):
         """Remove the existing domain data for a given document name"""
@@ -156,11 +168,10 @@ class Basf2Domain(Domain):
             except Exception:
                 pass
 
-    #: \cond Doxygen_suppress
     def get_objects(self):
         for i, type in enumerate(["modules", "variables"]):
             for name, (docname, target) in self.data[type].items():
-                yield(name, name, type, docname, target, i)
+                yield (name, name, type, docname, target, i)
 
     def get_type_name(self, type, primary=False):
         # never prepend "Default"
@@ -175,4 +186,3 @@ class Basf2Domain(Domain):
                                 labelid, contnode)
         except Exception:
             return None
-    #: \endcond

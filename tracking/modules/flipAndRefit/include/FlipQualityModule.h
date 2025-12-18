@@ -13,13 +13,15 @@
 #include <tracking/modules/flipAndRefit/utilities/FlipRecoTrackExtractor.h>
 #include <tracking/modules/flipAndRefit/utilities/Flip2ndRecoTrackExtractor.h>
 
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/RecoTrack.h>
+
 #include <vector>
 #include <string>
 #include <memory>
 
 namespace Belle2 {
+  class RecoTrack;
 
   /**
    * This module can be used for applying the MVA filters and get the 2 flipping QIs.

@@ -18,7 +18,6 @@
 #include <TTree.h>
 #include <TH1I.h>
 #include <TH2F.h>
-//#include <TEfficiency.h>
 
 #include <boost/format.hpp>
 

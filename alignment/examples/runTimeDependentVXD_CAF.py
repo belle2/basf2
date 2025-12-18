@@ -189,7 +189,7 @@ def generate_test_data(filename):
     main.add_module("RootOutput", outputFileName=filename)
     main.add_module("Progress")
 
-    b2.process(main)
+    b2.process(main, calculateStatistics=True)
     print(b2.statistics)
     return os.path.abspath(filename)
 

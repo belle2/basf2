@@ -245,12 +245,13 @@ namespace Belle2 {
      * @param pdg The PDG code of the particle.
      * @param vertex Production vertex.
      * @param boost Lorentz boost vector.
-     * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
-     * @param isInitial If the particle is a initial particle for ISR, set this to true.
+     * @param isVirtual If the particle is a virtual particle, set this to true.
+     * @param isInitial If the particle is a initial particle, set this to true.
+     * @param isISRFSR  If the particle is a ISR/FSR particle, set this to true.
      */
     void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
                        ROOT::Math::LorentzRotation boost,
-                       bool isVirtual = false, bool isInitial = false);
+                       bool isVirtual = false, bool isInitial = false, bool isISRFSR = false);
 
   private:
 

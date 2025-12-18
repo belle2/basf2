@@ -12,22 +12,18 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <pxd/dataobjects/PXDCluster.h>
-
 #include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
-
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/PXDIntercept.h>
 
 #include "TH1F.h"
 #include "TH1D.h"
 #include "TH2F.h"
-#include <Math/Vector3D.h>
 
 
 namespace Belle2 {
+  class PXDCluster;
+  class RecoTrack;
+  class ROIid;
+  class PXDIntercept;
 
   /**
    * Creates the basic histograms for PXD Efficiency DQM

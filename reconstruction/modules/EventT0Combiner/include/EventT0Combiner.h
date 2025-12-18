@@ -11,9 +11,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventT0.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 namespace Belle2 {
+  class EventLevelTriggerTimeInfo;
 
   /** Module to combine the EventT0 values from multiple sub-detectors
    */

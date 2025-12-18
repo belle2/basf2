@@ -260,7 +260,7 @@ namespace Belle2::Variable {
 
   double nMatchedKLMClusters(const Particle* particle)
   {
-    Belle2::Particle::EParticleSourceObject particleSource = particle->getParticleSource();
+    Particle::EParticleSourceObject particleSource = particle->getParticleSource();
     if (particleSource == Particle::EParticleSourceObject::c_Track) {
       return particle->getTrack()->getRelationsTo<KLMCluster>().size();
     } else if (particleSource == Particle::EParticleSourceObject::c_ECLCluster) {
@@ -356,23 +356,23 @@ Returns the :math:`z` position of the associated KLMCluster.
   REGISTER_VARIABLE("klmClusterLayers", klmClusterLayers,
                     "Returns the number of KLM layers with 2-dimensional hits of the associated KLMCluster.");
   REGISTER_VARIABLE("klmClusterEnergy", klmClusterEnergy, R"DOC(
-Returns the energy of the associated KLMCluster. 
+Returns the energy of the associated KLMCluster. This variable returns an approximation of the energy: it uses `klmClusterMomentum` as momentum and the hypothesis that the KLMCluster is originated by a :math:`K_{L}^0`
 
-.. warning::
-  This variable returns an approximation of the energy: it uses :b2:var:`klmClusterMomentum` as momentum and the hypothesis that the KLMCluster is originated by a :math:`K_{L}^0` 
-  (:math:`E_{\text{KLM}} = \sqrt{M_{K^0_L}^2 + p_{\text{KLM}}^2}`, where :math:`E_{\text{KLM}}` is this variable, :math:`M_{K^0_L}` is the :math:`K^0_L` mass and :math:`p_{\text{KLM}}` is :b2:var:`klmClusterMomentum`).
-  It should be used with caution, and may not be physically meaningful, especially for :math:`n` candidates.
+  (:math:`E_{\text{KLM}} = \sqrt{M_{K^0_L}^2 + p_{\text{KLM}}^2}`, where :math:`E_{\text{KLM}}` is this variable, :math:`M_{K^0_L}` is the :math:`K^0_L` mass and :math:`p_{\text{KLM}}` is `klmClusterMomentum`).
 
 )DOC","GeV");
+  MAKE_DEPRECATED("klmClusterEnergy", true, "light-2511-gacrux", R"DOC(
+                   As this variable is deemed not physically meaningful it has been deprecated to avoid further use.
+)DOC");
   REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum, R"DOC(
-Returns the momentum magnitude of the associated KLMCluster. 
+Returns the momentum magnitude of the associated KLMCluster. This variable returns an approximation of the momentum, since it is proportional to `klmClusterLayers`
 
-.. warning::
-  This variable returns an approximation of the momentum, since it is proportional to :b2:var:`klmClusterLayers` 
-  (:math:`p_{\text{KLM}} = 0.215 \cdot N_{\text{layers}}`, where :math:`p_{\text{KLM}}` is this variable and :math:`N_{\text{layers}}` is :b2:var:`klmClusterLayers`).
-  It should be used with caution, and may not be physically meaningful.
+  (:math:`p_{\text{KLM}} = 0.215 \cdot N_{\text{layers}}`, where :math:`p_{\text{KLM}}` is this variable and :math:`N_{\text{layers}}` is `klmClusterLayers`).
 
 )DOC","GeV/c");
+  MAKE_DEPRECATED("klmClusterMomentum", true, "light-2511-gacrux", R"DOC(
+                   As this variable is deemed not physically meaningful it has been deprecated to avoid further use.
+)DOC");
   REGISTER_VARIABLE("klmClusterIsBKLM", klmClusterIsBKLM,
                     "Returns 1 if the associated KLMCluster is in barrel KLM.");
   REGISTER_VARIABLE("klmClusterIsEKLM", klmClusterIsEKLM,
@@ -402,23 +402,60 @@ Returns the number of Tracks matched to the KLMCluster associated to this Partic
   REGISTER_VARIABLE("nKLMClusterECLClusterMatches", nKLMClusterECLClusterMatches, R"DOC(
                      Returns the number of ECLClusters matched to the KLMCluster associated to this Particle.
               )DOC");
-  REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
-                    "Returns the distance between KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.",
-                    "cm");
-  REGISTER_VARIABLE("klmClusterTrackRotationAngle", klmClusterTrackRotationAngle,
-                    "Returns the angle between the direction at the IP and at the POCA to the KLMCluster associated to this Particle for the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
-                    "rad");
-  REGISTER_VARIABLE("klmClusterTrackSeparationAngle", klmClusterTrackSeparationAngle,
-                    "Returns the angle between the KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship"
-                    "rad");
 
-  REGISTER_VARIABLE("klmClusterShapeStdDev1", klmClusterShapeStdDev1,
-                    "Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster."
-                    "cm");
-  REGISTER_VARIABLE("klmClusterShapeStdDev2", klmClusterShapeStdDev2,
-                    "Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster."
-                    "cm");
-  REGISTER_VARIABLE("klmClusterShapeStdDev3", klmClusterShapeStdDev3,
-                    "Returns the std deviation of the 3rd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster."
-                    "cm");
+  REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance, R"DOC(
+Returns the distance between the KLMCluster associated to this Particle and the closest track to this cluster. This variable returns NaN if there is no Track-to-KLMCluster relationship.
+
+.. warning::
+  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
+  return NaN. Please check the release version of the input mdst using
+  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
+
+)DOC","cm");
+  REGISTER_VARIABLE("klmClusterTrackRotationAngle", klmClusterTrackRotationAngle, R"DOC(
+Returns the angle between momenta of the track initially at IP and then at POCA to the KLMCluster associated to this Particle for the closest Track. This variable returns NaN if there is no Track-to-KLMCluster relationship.
+
+.. warning::
+  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
+  return NaN. Please check the release version of the input mdst using
+  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
+
+)DOC","rad");
+  REGISTER_VARIABLE("klmClusterTrackSeparationAngle", klmClusterTrackSeparationAngle, R"DOC(
+Returns the angle between the KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.
+
+.. warning::
+  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
+  return NaN. Please check the release version of the input mdst using
+  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
+
+)DOC","rad");
+
+  REGISTER_VARIABLE("klmClusterShapeStdDev1", klmClusterShapeStdDev1, R"DOC(
+Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one 2D Hit.
+
+.. warning::
+  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
+  return NaN. Please check the release version of the input mdst using
+  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
+
+)DOC","cm");
+  REGISTER_VARIABLE("klmClusterShapeStdDev2", klmClusterShapeStdDev2, R"DOC(
+Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster has all the 2D hits lying on a single straight line.
+
+.. warning::
+  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
+  return NaN. Please check the release version of the input mdst using
+  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
+
+)DOC","cm");
+  REGISTER_VARIABLE("klmClusterShapeStdDev3", klmClusterShapeStdDev3, R"DOC(
+Returns the std deviation of the 3nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster has all the 2D hits lying on a 2D plane.
+
+.. warning::
+  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
+  return NaN. Please check the release version of the input mdst using
+  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
+
+)DOC","cm");
 }

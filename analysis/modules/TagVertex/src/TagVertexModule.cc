@@ -29,8 +29,13 @@
 #include <analysis/utility/DistanceTools.h>
 #include <analysis/utility/RotationTools.h>
 
-// vertex fitting
-#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+// rave
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
+
+#include <CLHEP/Geometry/Point3D.h>
+#include <CLHEP/Matrix/SymMatrix.h>
+#include <CLHEP/Vector/LorentzVector.h>
 
 // mdst dataobject
 #include <mdst/dataobjects/HitPatternVXD.h>
@@ -573,8 +578,8 @@ bool TagVertexModule::compBrecoBgen(const Particle* Breco, const MCParticle* Bge
 
   bool isDecMode = true;
 
-  const std::vector<Belle2::Particle*> recDau = Breco->getDaughters();
-  const std::vector<Belle2::MCParticle*> genDau = Bgen->getDaughters();
+  const std::vector<Particle*> recDau = Breco->getDaughters();
+  const std::vector<MCParticle*> genDau = Bgen->getDaughters();
 
   if (recDau.size() > 0 && genDau.size() > 0) {
     for (auto dauRec : recDau) {

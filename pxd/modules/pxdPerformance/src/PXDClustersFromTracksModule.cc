@@ -10,6 +10,9 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
+#include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/Track.h>
+
 #include <framework/datastore/StoreArray.h>
 
 

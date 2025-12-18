@@ -8,10 +8,10 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/filters/relations/BaseRelationFilter.h>
-#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
+    class VXDHoughState;
 
     /// Filter for relations based on the polar angle difference.
     class SimpleRelationFilter : public BaseRelationFilter {

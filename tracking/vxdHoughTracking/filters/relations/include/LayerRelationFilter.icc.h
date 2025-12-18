@@ -10,6 +10,7 @@
 #include <tracking/vxdHoughTracking/filters/relations/LayerRelationFilter.dcl.h>
 #include <tracking/trackingUtilities/filters/base/RelationFilter.icc.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <vxd/geometry/GeoCache.h>

@@ -12,14 +12,14 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <rawdata/dataobjects/RawPXD.h>
-#include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDInjectionBGTiming.h>
 
-#include <pxd/dbobjects/PXDDHHFirmwareVersionPar.h>
 #include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
+  class PXDDigit;
+  class RawPXD;
+  class PXDInjectionBGTiming;
+  class PXDDHHFirmwareVersionPar;
 
   namespace PXD {
 

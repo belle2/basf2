@@ -74,8 +74,6 @@ namespace Belle2 {
     void setClusterMethod(int cluster) {m_Clustering = cluster;}
     /** Set the limit # of Cluster*/
     void setClusterLimit(int limit) {m_ClusterLimit = limit;}
-    /** Set Bhabha*/
-    void setBhabhaMethod(int bhabha) {m_Bhabha = bhabha;}
     /** Set Cluster*/
     void setEventTimingMethod(int EventTiming) {m_EventTiming = EventTiming;}
     /** Set Trigger Decision window size*/
@@ -279,8 +277,6 @@ namespace Belle2 {
 
     /** clustering option*/
     int m_Clustering;
-    /** Bhabha option*/
-    int m_Bhabha;
     /** EventTiming option*/
     int m_EventTiming;
     /** # of considered TC in energy weighted Timing method */

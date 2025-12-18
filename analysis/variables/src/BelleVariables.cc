@@ -9,22 +9,27 @@
 // Own header.
 #include <analysis/variables/BelleVariables.h>
 
-// include VariableManager
-#include <analysis/VariableManager/Manager.h>
-
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dbobjects/BellePi0EtaProbParameters.h>
+#include <analysis/variables/AcceptanceVariables.h>
 #include <analysis/variables/Variables.h>
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/ECLVariables.h>
 #include <analysis/variables/V0DaughterTrackVariables.h>
-#include <mdst/dataobjects/Track.h>
+#include <analysis/variables/VertexVariables.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
+#include <mdst/dataobjects/Track.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <b2bii/dataobjects/BelleTrkExtra.h>
 
 #include <cmath>
+#include <optional>
 #include <TVectorF.h>
 
 namespace Belle2 {
@@ -68,7 +73,6 @@ namespace Belle2 {
       } else
         return false;
     }
-
 
     double goodBelleLambda(const Particle* Lambda)
     {
@@ -281,7 +285,7 @@ namespace Belle2 {
       double time = belleTrkExtra->getTof();
       double length = belleTrkExtra->getPathLength();
       double p = particle->getP(); //3-momentum
-      double tofbeta = length / time / Belle2::Const::speedOfLight;
+      double tofbeta = length / time / Const::speedOfLight;
       double tofmass = p * sqrt(1. / (tofbeta * tofbeta) - 1.); //(GeV)
 
       return tofmass;
@@ -327,7 +331,163 @@ namespace Belle2 {
       return belleTrkExtra->getACCQuality();
     }
 
+    double Pi0_Prob(double mass, double energy, int eclRegion)
+    {
+      static const double massMin = 0.034976;
+      static const double massMax = 0.234976;
+      static const double logEnergyMin = 1.3;
+      static const double logEnergyMax = 3.7;
+      static const int p_bins = 24;
+      static const int m_bins = 50;
 
+      double logp = log(1000 * energy) / log(10.);
+      if ((logp < logEnergyMin) || (logp > logEnergyMax)) return 0;
+
+      double drow = p_bins * (logp - logEnergyMin) / (logEnergyMax - logEnergyMin);
+      int row = int(drow);
+      double dcol = m_bins * (mass - massMin) / (massMax - massMin);
+      int col = int(dcol);
+      if ((row < 0) || (row >= p_bins) || (col < 0) || (col >= m_bins)) {
+        B2ERROR("Fault in getting the coordinates of pi0 probability");
+        return Const::doubleNaN;
+      }
+      int pos = m_bins * row + col ;
+      if (pos > m_bins * p_bins) {
+        B2ERROR("Fault in getting the coordinates of pi0 probability");
+        return Const::doubleNaN;
+      }
+      static DBObjPtr<BellePi0EtaProbParameters> probs;
+      if (!probs.isValid()) {
+        return Const::doubleNaN;
+      }
+      if (eclRegion == 1) {
+        return probs->getBelleFWDPi0Probability(pos);
+      } else if (eclRegion == 2) {
+        return probs->getBelleBRLPi0Probability(pos);
+      } else if (eclRegion == 3) {
+        return probs->getBelleBWDPi0Probability(pos);
+      } else return Const::doubleNaN;
+    }
+
+    double Eta_Prob(double mass, double energy, int eclRegion)
+    {
+      static const double massMin = 0.4473;
+      static const double massMax = 0.6473;
+      static const double logEnergyMin = 1.3;
+      static const double logEnergyMax = 3.7;
+      static const int p_bins = 24;
+      static const int m_bins = 50;
+
+      double logp = log(1000 * energy) / log(10.);
+      if ((logp < logEnergyMin) || (logp > logEnergyMax)) return 0;
+
+      double drow = p_bins * (logp - logEnergyMin) / (logEnergyMax - logEnergyMin);
+      int row = int(drow);
+      double dcol = m_bins * (mass - massMin) / (massMax - massMin);
+      int col = int(dcol);
+      if ((row < 0) || (row >= p_bins) || (col < 0) || (col >= m_bins)) {
+        B2ERROR("Fault in getting the coordinates of eta probability");
+        return Const::doubleNaN;
+      }
+      int pos = m_bins * row + col ;
+      if (pos > m_bins * p_bins) {
+        B2ERROR("Fault in getting the coordinates of eta probability");
+        return Const::doubleNaN;
+      }
+
+      static DBObjPtr<BellePi0EtaProbParameters> probs;
+      if (!probs.isValid())
+        return Const::doubleNaN;
+      if (eclRegion == 1) {
+        return probs->getBelleFWDEtaProbability(pos);
+      } else if (eclRegion == 2) {
+        return probs->getBelleBRLEtaProbability(pos);
+      } else if (eclRegion == 3) {
+        return probs->getBelleBWDEtaProbability(pos);
+      } else return Const::doubleNaN;
+    }
+
+    Manager::FunctionPtr BellePi0Veto(const std::vector<std::string>& arguments)
+    {
+      std::string photonListName = "gamma:mdst";
+      if (arguments.size() == 1) photonListName = arguments[0];
+
+      auto func = [photonListName](const Particle * particle) -> double {
+        StoreObjPtr<ParticleList> photonList(photonListName);
+        if (!(photonList.isValid()))
+        {
+          B2FATAL("Invalid photon list name " << photonListName << " given to BellePi0Veto!");
+        }
+
+        ROOT::Math::PxPyPzEVector particle4Vector = particle->get4Vector();
+        unsigned int particleIndex = particle->getMdstArrayIndex();
+        std::optional<double> temppi0;
+
+        for (unsigned int i = 0; i < photonList->getListSize(); i++)
+        {
+          const Particle* photon = photonList->getParticle(i);
+
+          if (photon->getMdstArrayIndex() == particleIndex) continue;
+
+          ROOT::Math::PxPyPzEVector Pi0 = particle4Vector + photon->get4Vector();
+
+          double mass = Pi0.M();
+          if (mass < 0.11 or mass > 0.15) continue;
+
+          double pi0_prob = Pi0_Prob(
+            mass,
+            photon->getEnergy(),
+            eclClusterDetectionRegion(photon)
+          );
+          if (!temppi0 or pi0_prob > *temppi0) {
+            temppi0 = pi0_prob;
+          }
+        }
+        return temppi0.value_or(Const::doubleNaN);
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr BelleEtaVeto(const std::vector<std::string>& arguments)
+    {
+      std::string photonListName = "gamma:mdst";
+      if (arguments.size() == 1) photonListName = arguments[0];
+
+      auto func = [photonListName](const Particle * particle) -> double {
+        StoreObjPtr<ParticleList> photonList(photonListName);
+        if (!(photonList.isValid()))
+        {
+          B2FATAL("Invalid photon list name " << photonListName << " given to BelleEtaVeto!");
+        }
+
+        ROOT::Math::PxPyPzEVector particle4Vector = particle->get4Vector();
+        unsigned int particleIndex = particle->getMdstArrayIndex();
+        std::optional<double> tempeta;
+
+        for (unsigned int i = 0; i < photonList->getListSize(); i++)
+        {
+          const Particle* photon = photonList->getParticle(i);
+
+          if (photon->getMdstArrayIndex() == particleIndex) continue;
+
+          ROOT::Math::PxPyPzEVector Eta = particle4Vector + photon->get4Vector();
+
+          double mass = Eta.M();
+          if (mass < 0.5 or mass > 0.58) continue;
+
+          double eta_prob = Eta_Prob(
+            mass,
+            photon->getEnergy(),
+            eclClusterDetectionRegion(photon)
+          );
+          if (!tempeta or eta_prob > *tempeta) {
+            tempeta = eta_prob;
+          }
+        }
+        return tempeta.value_or(Const::doubleNaN);
+      };
+      return func;
+    }
 
     VARIABLE_GROUP("Belle Variables");
 
@@ -439,6 +599,7 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
 
     REGISTER_VARIABLE("BelleTofMass", BelleTofMass, R"DOC(
 [Legacy] Returns the TOF mass calculated from the time of flight and path length. (Belle only).
+
 )DOC", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("BelledEdx", BelledEdx, R"DOC(
@@ -457,6 +618,19 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
     REGISTER_VARIABLE("BelleACCQuality", BelleACCQuality, R"DOC(
 [Legacy] Returns the ACC quality flag. Original definition in the panther tables: if 0 normal, if 1 the track is out of ACC acceptance. (Belle only).
 )DOC");
+
+    REGISTER_METAVARIABLE("BellePi0Veto(photonlistname)", BellePi0Veto, R"DOC(
+[Legacy] Meta-variable that computes the maximum probability that a photon candidate is
+consistent with originating from a pi0 decay when combined with any other photon in a given list.
+Calculated within a mass window of 0.11 - 0.15 GeV/c^2, based on mass, energy, and ecl cluster region,
+using lookup tables derived in Belle. For more details, see Belle Note 665.
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("BelleEtaVeto(photonlistname)", BelleEtaVeto,  R"DOC(
+[Legacy] Meta-variable that computes the maximum probability that a photon candidate is
+consistent with originating from an eta decay when combined with any other photon in a given list.
+Calculated within a mass window of 0.50 - 0.58 GeV/c^2, based on mass, energy, and ecl cluster region,
+using lookup tables derived in Belle. For more details, see Belle Note 665.
+)DOC", Manager::VariableDataType::c_double);
 
 
     // this is defined in ECLVariables.{h,cc}

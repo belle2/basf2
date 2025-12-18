@@ -14,10 +14,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <pxd/dataobjects/PXDRawHit.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
-#include <rawdata/dataobjects/RawFTSW.h>
 #include <TCanvas.h>
 #include <TH2F.h>
 #include <TLine.h>
@@ -25,6 +21,11 @@
 
 
 namespace Belle2 {
+  class EventMetaData;
+  class PXDDAQStatus;
+  class PXDRawHit;
+  class RawFTSW;
+  class VxdID;
 
   namespace PXD {
     /**

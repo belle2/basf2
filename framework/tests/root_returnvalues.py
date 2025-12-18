@@ -8,9 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# this is a test executable, not a module so we don't need doxygen warnings
-# @cond SUPPRESS_DOXYGEN
-
 """
 Check that ROOT returns the correct values (ints, floats) when calling a C++
 function from python
@@ -111,5 +108,3 @@ for func, value, dtype in results:
         failures += 1
 
 sys.exit(failures)
-
-# @endcond

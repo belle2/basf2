@@ -115,7 +115,7 @@ contVars = [
     'thrustOm',
     'cosTBTO',
     'cosTBz',
-    'KSFWVariables(et)',
+    'KSFWVariables(pt_sum)',
     'KSFWVariables(mm2)',
     'KSFWVariables(hso00)',
     'KSFWVariables(hso02)',
@@ -188,4 +188,3 @@ ma.variablesToNtuple('B0', variables + expertVars, treename='tree', filename=out
 main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 basf2.process(main)
-print(basf2.statistics)

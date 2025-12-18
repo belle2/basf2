@@ -6,7 +6,7 @@ TBranch: __run__, 0
 TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
-TBranch: __ncandidates__, 5
+TBranch: __ncandidates__, 6
 TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: nTracks, 10
@@ -109,14 +109,14 @@ TBranch: lambda0_pz, -0.307
 TBranch: lambda0_pt, 0.7474
 TBranch: lambda0_p, 0.808
 TBranch: lambda0_E, 1.378
-TBranch: lambda0_daughterDiffOfPhi_0_1, -0.1366
+TBranch: lambda0_daughterDiffOf_0_1_phi, -0.1366
 TBranch: lambda0_CMS_px, -0.7943
 TBranch: lambda0_CMS_py, -0.1275
 TBranch: lambda0_CMS_pz, -0.7187
 TBranch: lambda0_CMS_pt, 0.8045
 TBranch: lambda0_CMS_p, 1.079
 TBranch: lambda0_CMS_E, 1.552
-TBranch: lambda0_CMS_daughterDiffOfPhi_0_1, -0.1236
+TBranch: lambda0_CMS_daughterDiffOf_0_1_phi, -0.1236
 TBranch: lambda0_M, 1.116
 TBranch: lambda0_ErrM, 0.0002758
 TBranch: lambda0_SigM, 1.164
@@ -778,14 +778,14 @@ TBranch: jpsi_pz
 TBranch: jpsi_pt
 TBranch: jpsi_p
 TBranch: jpsi_E
-TBranch: jpsi_daughterDiffOfPhi_0_1
+TBranch: jpsi_daughterDiffOf_0_1_phi
 TBranch: jpsi_CMS_px
 TBranch: jpsi_CMS_py
 TBranch: jpsi_CMS_pz
 TBranch: jpsi_CMS_pt
 TBranch: jpsi_CMS_p
 TBranch: jpsi_CMS_E
-TBranch: jpsi_CMS_daughterDiffOfPhi_0_1
+TBranch: jpsi_CMS_daughterDiffOf_0_1_phi
 TBranch: jpsi_M
 TBranch: jpsi_ErrM
 TBranch: jpsi_SigM

@@ -295,9 +295,6 @@ def main():
     basf2.print_path(path)
     basf2.process(path)
 
-    # show call statistics
-    print(basf2.statistics)
-
 
 # Helper functions #
 # ################ #

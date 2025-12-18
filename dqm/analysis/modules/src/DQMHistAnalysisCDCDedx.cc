@@ -44,7 +44,7 @@ void DQMHistAnalysisCDCDedxModule::initialize()
   B2DEBUG(20, "DQMHistAnalysisCDCDedx: initialized.");
 
   //intra-run cavnas 1D
-  m_c_ir_dedx = new TCanvas("CDCDedx/m_c_ir_dedx", "", 1400, 500);
+  m_c_ir_dedx = new TCanvas("CDCDedx/c_ir_dedx", "", 1400, 500);
 
   //per run canvas
   m_c_pr_dedx = new TCanvas("CDCDedx/c_CDCdedxMean", "", 800, 800);

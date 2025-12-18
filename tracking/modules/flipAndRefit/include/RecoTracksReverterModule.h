@@ -9,17 +9,16 @@
 
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
-
 #include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/dbobjects/TrackFlippingCuts.h>
 
 /**
  * module to revert the recotracks.
  */
 namespace Belle2 {
+  class RecoTrack;
+  class Track;
+  class TrackFlippingCuts;
+
   /// Module to revert RecoTracks.
   class RecoTracksReverterModule : public Module {
 

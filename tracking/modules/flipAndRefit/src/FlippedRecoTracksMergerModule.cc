@@ -7,7 +7,10 @@
  **************************************************************************/
 
 #include <tracking/modules/flipAndRefit/FlippedRecoTracksMergerModule.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dbobjects/TrackFlippingCuts.h>
 
 using namespace Belle2;
 
@@ -23,17 +26,6 @@ FlippedRecoTracksMergerModule::FlippedRecoTracksMergerModule() :
            "Name of the input StoreArray");
   addParam("inputStoreArrayNameFlipped", m_inputStoreArrayNameFlipped,
            "Name of the input StoreArray for flipped tracks");
-
-  addParam("pxdHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the input PXD hits.",
-           m_param_pxdHitsStoreArrayName);
-  addParam("svdHitsStoreArrayName", m_param_svdHitsStoreArrayName, "StoreArray name of the input SVD hits.",
-           m_param_svdHitsStoreArrayName);
-  addParam("cdcHitsStoreArrayName", m_param_cdcHitsStoreArrayName, "StoreArray name of the input CDC hits.",
-           m_param_cdcHitsStoreArrayName);
-  addParam("bklmHitsStoreArrayName", m_param_bklmHitsStoreArrayName, "StoreArray name of the input BKLM hits.",
-           m_param_bklmHitsStoreArrayName);
-  addParam("eklmHitsStoreArrayName", m_param_eklmHitsStoreArrayName, "StoreArray name of the input EKLM hits.",
-           m_param_eklmHitsStoreArrayName);
 }
 
 void FlippedRecoTracksMergerModule::initialize()
@@ -76,7 +68,7 @@ void FlippedRecoTracksMergerModule::event()
     double mvaFlipCut = (*m_flipCutsFromDB).getSecondCut();
 
     // if we should not flip the tracks: the 2nd MVA QI is nan (aka didn't pass the 1st MVA filter) or smaller than the cut
-    if (isnan(recoTrack.get2ndFlipQualityIndicator()) or (recoTrack.get2ndFlipQualityIndicator() < mvaFlipCut)) continue;
+    if (std::isnan(recoTrack.get2ndFlipQualityIndicator()) or (recoTrack.get2ndFlipQualityIndicator() < mvaFlipCut)) continue;
     // get the related flippedRecoTrack
     RecoTrack* flippedRecoTrack =  recoTrack.getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
 

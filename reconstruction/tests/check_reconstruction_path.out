@@ -1191,13 +1191,8 @@
       indexOfFlippingMVA=2
       recoTracksStoreArrayName=RecoTracks
   97. FlippedRecoTracksMerger
-      bklmHitsStoreArrayName=
-      cdcHitsStoreArrayName=
-      eklmHitsStoreArrayName=
       inputStoreArrayName=RecoTracks
       inputStoreArrayNameFlipped=RecoTracks_flipped
-      pxdHitsStoreArrayName=
-      svdHitsStoreArrayName=
   98. V0Finder
       CopiedRecoTracks=CopiedRecoTracks
       RecoTracks=RecoTracks
@@ -1282,7 +1277,7 @@
   108. CDCDedxHitSaver
   109. CDCDedxPIDCreator
       dedxTracksName=
-      enableDebugOutput=False
+      enableDebugOutput=True
       likelihoodsName=
       removeHighest=0.25
       removeLowest=0.05

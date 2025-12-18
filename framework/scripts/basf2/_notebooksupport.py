@@ -105,7 +105,7 @@ def _child_process(pipe, path, max_events):
         name = str(name)
         storeobj = Belle2.PyStoreObj(name, Belle2.DataStore.c_Persistent)
         if storeobj.isValid():
-            return_objects[name] = str(ROOT.TBufferJSON.ToJSON(storeobj.obj()))
+            return_objects[name] = str(ROOT.TBufferJSON.ConvertToJSON(storeobj.obj()))
     pipe.send(return_objects)
     pipe.close()
 

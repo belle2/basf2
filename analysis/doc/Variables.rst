@@ -3,7 +3,7 @@
 Variables
 =========
 
-While ``basf2`` operates on :doxygen:`ParticleList <classBelle2_1_1ParticleList>`s, it is also important to calculate physics quantities associated with a given candidate or event.
+While ``basf2`` operates on :doxygen:`ParticleList <classBelle2_1_1ParticleList>` objects, it is also important to calculate physics quantities associated with a given candidate or event.
 
 In ``basf2``, variables are handled by the `VariableManager`.
 There are many variables available for use in analysis.
@@ -57,8 +57,10 @@ C++ class with a python interface. The C++ documentation is :doxygen:`here<class
 
       Aliases for verbose variables may be set with:
 
-      >>> from variables import variables as vm
-      >>> vm.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
+      .. code-block:: python
+
+            from variables import variables as vm
+            vm.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
 
       .. seealso::
 
@@ -84,7 +86,9 @@ C++ class with a python interface. The C++ documentation is :doxygen:`here<class
           This returns a ``ROOT.vector`` which you will probably
           need to convert into a python ``list(str)`` using the code below:
 
-          >>> my_aliases = list(vm.getAliasNames())
+          .. code-block:: python
+
+               my_aliases = list(vm.getAliasNames())
 
       :returns: ``ROOT.vector`` list of alias names
 

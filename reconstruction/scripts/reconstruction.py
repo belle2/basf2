@@ -910,7 +910,6 @@ def add_dedx_modules(path, components=None, for_cdst_analysis=False):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     :param for_cdst_analysis: if True, add only DedxPIDCreator module, otherwise add both
-    :param enableDebugOutput: enable/disable writing out debugging information to CDCDedxTracks
     """
     # CDC dE/dx PID
     if components is None or 'CDC' in components:

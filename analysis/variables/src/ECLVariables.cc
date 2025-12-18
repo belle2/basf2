@@ -1143,135 +1143,124 @@ namespace Belle2 {
       return func;
     }
 
-    VARIABLE_GROUP("ECL Cluster related");
+    VARIABLE_GROUP("ECL cluster related");
     REGISTER_VARIABLE("clusterEoP", eclClusterEoP, R"DOC(
-Returns ratio of uncorrelated energy E over momentum p, a convenience
-alias for (clusterE / p).
+Returns ratio of the ECL cluster energy :math:`E` over momentum :math:`p`.
+
 )DOC");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion, R"DOC(
-Returns an integer code for the ECL region of a cluster.
+Returns an integer code representing the ECL region for the ECL cluster:
 
-- 1: forward, 2: barrel, 3: backward,
-- 11: between FWD and barrel, 13: between BWD and barrel,
-- 0: otherwise
+- 1: forward, 2: barrel, 3: backward
+- 11: between forward endcap and barrel, 13: between backward endcap and barrel
+- 0: outside the ECL acceptance region
+
 )DOC");
     REGISTER_VARIABLE("clusterDeltaLTemp", eclClusterDeltaL, R"DOC(
-| Returns DeltaL for the shower shape.
-| A cluster comprises the energy depositions of several crystals. All these crystals have slightly
-  different orientations in space. A shower direction can be constructed by calculating the weighted
-  average of these orientations using the corresponding energy depositions as weights. The intersection
-  (more precisely the point of closest approach) of the vector with this direction originating from the
-  cluster center and an extrapolated track can be used as reference for the calculation of the shower
-  depth. It is defined as the distance between this intersection and the cluster center.
+| Returns the :math:`$\Delta L$` for the ECL cluster shape as defined below. 
 
-.. warning::
-    This distance is calculated on the reconstructed level and is temporarily
-    included to the ECL cluster MDST data format for studying purposes. If it is found
-    that it is not crucial for physics analysis then this variable will be removed
-    in future releases.
-    Therefore, keep in mind that this variable might be removed in the future!
+  First, the cluster direction is constructed by calculating the weighted average of the orientation 
+  for the crystals in the cluster. The POCA of the vector with this direction originating from the
+  cluster center and an extrapolated track can be used to the calculate the shower
+  depth. :math:`$\Delta L$` is then defined as the distance between this intersection and the cluster center. 
+
+.. attention::
+    This distance is calculated on the reconstruction level and is temporarily
+    included in mdst for investigation purposes. If it is found
+    that it is not crucial for physics analyses then this variable will be removed
+    in future releases. So keep in mind that this variable might be removed in the future.
 
 .. note::
     | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`-250.0`
-    | Upper limit: :math:`250.0`
-    | Precision: :math:`10` bit
+    | - Lower limit: :math:`-250.0`
+    | - Upper limit: :math:`250.0`
+    | - Precision: :math:`10` bit
 ..
 
 )DOC","cm");
-
     REGISTER_VARIABLE("minC2TDist", eclClusterIsolation, R"DOC(
-Returns the distance between the ECL cluster and its nearest track. 
+Returns the distance between the ECL cluster and its nearest track.  
 
 For all tracks in the event, the distance between each of their extrapolated hits in the ECL and the ECL shower 
-position is calculated, and the overall smallest distance is returned. The track array index of the track that is 
-closest to the ECL cluster can be retrieved using `minC2TDistID`. 
+position is calculated, and the overall smallest distance is returned. If there are no extrapolated hits found in the ECL 
+for the event, ``NaN`` will be returned. 
 
-If the calculated distance is greater than :math:`250.0`, the returned distance will be capped at :math:`250.0`. 
-If there are no extrapolated hits found in the ECL for the event, NaN will be returned. 
-
-.. note::
-    This distance is calculated on the reconstructed level.
+The track array index of the track that is closest to the ECL cluster can be retrieved using `minC2TDistID`. 
 
 .. note::
     | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`250.0`
-    | Precision: :math:`10` bit
+    | - Lower limit: :math:`0.0`
+    | - Upper limit: :math:`250.0`
+    | - Precision: :math:`10` bit
 ..
 
 )DOC","cm");
     REGISTER_VARIABLE("minC2TDistID", eclClusterIsolationID, R"DOC(
 Returns the track array index of the nearest track to the ECL cluster. The nearest track is calculated
 using the `minC2TDist` variable. 
+
 )DOC");
     REGISTER_METAVARIABLE("minC2TDistVar(variable,particleList=pi-:all)", eclClusterIsolationVar, R"DOC(
-Returns the variable value of the nearest track to the given ECL cluster as calculated by `minC2TDist`. The 
-first argument is the variable name, e.g. `nCDCHits`, while the second (optional) argument is the particle list name which 
-will be used to pick up the nearest track in the calculation of `minC2TDist`. The default particle list used 
+Returns the value of your chosen variable for the track nearest to the given ECL cluster as calculated by 
+`minC2TDist`. 
+
+The first argument is the variable name e.g. `nCDCHits`, while the second (optional) argument is the 
+particle list name which will be used in the calculation of `minC2TDist`. The default particle list used 
 is ``pi-:all``. 
+
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("clusterE", eclClusterE, R"DOC(
 Returns ECL cluster's energy corrected for leakage and background.
 
-The raw photon energy is given by the weighted sum of all ECL crystal energies within the ECL cluster.
-The weights per crystals are :math:`\leq 1` after cluster energy splitting in the case of overlapping
-clusters. The number of crystals that are included in the sum depends on a initial energy estimation
-and local beam background levels at the highest energy crystal position. It is optimized to minimize
-the core width (resolution) of true photons. Photon energy distributions always show a low energy tail
-due to unavoidable longitudinal and transverse leakage that can be further modified by the clustering
-algorithm and beam backgrounds.The peak position of the photon energy distributions are corrected to
-match the true photon energy in MC:
-
-- Leakage correction: Using large MC samples of mono-energetic single photons, a correction factor
-  :math:`f` as function of reconstructed detector position, reconstructed photon energy and beam backgrounds
-  is determined via :math:`f = \frac{\text{peak_reconstructed}}{\text{energy_true}}`.
-
-- Cluster energy calibration (data only): To reach the target precision of :math:`< 1.8\%` energy
-  resolution for high energetic photons, the remaining difference between MC and data must be calibrated
-  using kinematically fit muon pairs. This calibration is only applied to data and not to MC and will
-  take time to develop.
-
-- Energy Bias Correction module, sub-percent correction, is NOT applied on clusterE, but on photon energy
-  and momentum. Only applied to data.
-
-It is important to note that after perfect leakage correction and cluster energy calibration,
-the :math:`\pi^{0}` mass peak will be shifted slightly to smaller values than the PDG average
-due to the low energy tails of photons. The :math:`\pi^{0}` mass peak must not be corrected
-to the PDG value by adjusting the reconstructed photon energies. Selection criteria based on
-the mass for :math:`\pi^{0}` candidates must be based on the biased value. Most analysis
-will used mass constrained :math:`\pi^{0}` s anyhow.
-
-.. warning::
+.. attention::
     We only store clusters with :math:`E > 20\,` MeV.
+
+.. topic::
+
+    The raw photon energy is given by the weighted sum of all crystal energies within the ECL cluster.
+    The weights per crystals are :math:`\leq 1` after cluster energy splitting in the case of overlapping
+    clusters. The number of crystals that are included in the sum depends on a initial energy estimation
+    and local beam background levels for the highest energy crystal. The crystal number is optimized to minimize
+    the resolution of photons. Photon energy distributions always show a low energy tail
+    due to unavoidable longitudinal and transverse leakage. The peak position of the photon energy distributions are 
+    corrected to match the true photon energy in MC. The corrections applied include: 
+
+    - Leakage correction: using  MC samples of mono-energetic single photon, a correction factor
+      :math:`f` as function of the reconstructed detector position, photon energy and beam background level 
+      is determined via :math:`f = \frac{\text{peak_reconstructed}}{\text{energy_true}}`
+
+    - Cluster energy calibration (data only): to reach the target precision of :math:`< 1.8\%` energy
+      resolution for high energetic photons, the remaining difference between MC and data is calibrated
+      using kinematically fits to muon pairs
+
+    It is important to note that after perfect leakage corrections and cluster energy calibrations,
+    the :math:`\pi^{0}` mass peak will be shifted slightly to smaller values than the PDG average
+    due to the low energy tails of photons. 
 
 .. note::
     | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`-5` (:math:`e^{-5} = 0.00674\,` GeV)
-    | Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV)
-    | Precision: :math:`18` bit
-    | This value can be changed to a different reference frame with :b2:var:`useCMSFrame`.
-..
+    | - Lower limit: :math:`-5` (:math:`e^{-5} = 0.00674\,` GeV in the lab frame)
+    | - Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV in the lab frame)
+    | - Precision: :math:`18` bit
 
 )DOC","GeV");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE, R"DOC(
-Returns ECL cluster's uncertainty on energy
-(from background level and energy dependent tabulation).
+Returns the uncertainty on the ECL cluster energy. It is derived from 
+a background level and energy-dependent error tabulation. 
 
 )DOC","GeV");
     REGISTER_VARIABLE("clusterErrorPhi", eclClusterErrorPhi, R"DOC(
-Returns ECL cluster's uncertainty on :math:`\phi`
-(from background level and energy dependent tabulation).
+Returns the uncertainty on the phi angle of the ECL cluster. It is derived from 
+a background level and energy-dependent error tabulation. 
 
 )DOC","rad");
     REGISTER_VARIABLE("clusterErrorTheta", eclClusterErrorTheta, R"DOC(
-Returns ECL cluster's uncertainty on :math:`\theta`
-(from background level and energy dependent tabulation).
+Returns the uncertainty on the theta angle of the ECL cluster. It is derived from 
+a background level and energy-dependent error tabulation. 
 
 )DOC","rad");
-
     REGISTER_VARIABLE("clusterR", eclClusterR, R"DOC(
-Returns ECL cluster's centroid distance from :math:`(0,0,0)`.
+Returns the distance of the ECL cluster centroid from :math:`(0,0,0)`.
 
 )DOC","cm");
     REGISTER_VARIABLE("clusterPhi", eclClusterPhi, R"DOC(

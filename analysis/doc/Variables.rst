@@ -219,7 +219,7 @@ ECL cluster
 
 
 .. b2-variables::
-   :group: ECL Cluster related
+   :group: ECL cluster related
 
 There are also some special variables related to the MC matching of ECL clusters (specifically).
 

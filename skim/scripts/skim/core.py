@@ -106,6 +106,12 @@ class BaseSkim(ABC):
     PID globaltag.
     """
 
+    roundECLClusters = False
+    """
+    Add the ECLClusterRounder module before running the skim.
+    Useful when skipping mdst output before skimming.
+    """
+
     @property
     @abstractmethod
     def __description__(self):
@@ -141,6 +147,7 @@ class BaseSkim(ABC):
         mc=True,
         analysisGlobaltag=None,
         pidGlobaltag=None,
+        roundECLClusters=False
     ):
         """Initialise the BaseSkim class.
 
@@ -154,6 +161,7 @@ class BaseSkim(ABC):
             mc (bool): If True, include MC quantities in output.
             analysisGlobaltag (str): Analysis globaltag.
             pidGlobaltag (str): PID globaltag.
+            roundECLClusters (bool): If True, add ECLClusterRounder module before skim
         """
         self.name = self.__class__.__name__
         self.OutputFileName = OutputFileName
@@ -163,6 +171,7 @@ class BaseSkim(ABC):
         self.mc = mc
         self.analysisGlobaltag = analysisGlobaltag
         self.pidGlobaltag = pidGlobaltag
+        self.roundECLClusters = roundECLClusters
 
         if self.NoisyModules is None:
             self.NoisyModules = []
@@ -225,6 +234,9 @@ class BaseSkim(ABC):
             path (basf2.Path): Skim path to be processed.
         """
         self._MainPath = path
+
+        if self.roundECLClusters:
+            path.add_module("ECLClusterRounder")
 
         self.initialise_skim_flag(path)
         self.load_standard_lists(path)
@@ -517,6 +529,7 @@ class CombinedSkim(BaseSkim):
             mc=None,
             analysisGlobaltag=None,
             pidGlobaltag=None,
+            roundECLClusters=False
     ):
         """Initialise the CombinedSkim class.
 
@@ -535,6 +548,7 @@ class CombinedSkim(BaseSkim):
             mc (bool): If True, include MC quantities in output.
             analysisGlobaltag (str): Analysis globaltag.
             pidGlobaltag (str): PID globaltag.
+            roundECLClusters (bool): If True, add ECLClusterRounder module before skim
         """
 
         if NoisyModules is None:
@@ -577,6 +591,7 @@ class CombinedSkim(BaseSkim):
             for skim in self:
                 skim.pidGlobaltag = pidGlobaltag
 
+        self.roundECLClusters = roundECLClusters
         self._mdstOutput = mdstOutput
         self.mdst_kwargs = mdst_kwargs or {}
         self.mdst_kwargs.update(OutputFileName=OutputFileName)
@@ -595,6 +610,9 @@ class CombinedSkim(BaseSkim):
     def __call__(self, path):
         for skim in self:
             skim._MainPath = path
+
+        if self.roundECLClusters:
+            path.add_module("ECLClusterRounder")
 
         self.initialise_skim_flag(path)
         self.load_standard_lists(path)

@@ -30,6 +30,9 @@ namespace Belle2 {
     /// Declare required StoreArray
     void initialize() override;
 
+    /// Begin run
+    void beginRun() override;
+
     /// Event processing
     void event() override;
 
@@ -43,8 +46,7 @@ namespace Belle2 {
     /// store array for the input flipped RecoTracks
     StoreArray<RecoTrack> m_inputRecoTracksFlipped;
     /// flipping cuts could be read from the DB
-    OptionalDBObjPtr<TrackFlippingCuts> m_flipCutsFromDB{"TRKTrackFlipAndRefit_MVA_cuts"};
-
+    DBObjPtr<TrackFlippingCuts> m_flipCutsFromDB{"TRKTrackFlipAndRefit_MVA_cuts"};
     /// StoreArray of TrackFitResult, only default name should be considered here
     StoreArray<TrackFitResult> m_trackFitResults;
   };

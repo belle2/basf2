@@ -51,6 +51,7 @@ cluster = [
     'clusterTheta',
     'clusterTiming',
     'clusterTrackMatch',
+    'clusterTimeNorm90',
     'goodBelleGamma',
 ]
 

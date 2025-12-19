@@ -11,6 +11,8 @@
 
 //framework
 #include <framework/logging/Logger.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/core/Environment.h>
 
 //analysis
 #include <analysis/dataobjects/Particle.h>
@@ -19,6 +21,7 @@
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/VariableManager/Utility.h>
+#include <analysis/dbobjects/ECLTimingNormalization.h>
 
 //MDST
 #include <mdst/dataobjects/KlId.h>
@@ -27,7 +30,7 @@
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 #include <Math/Vector4D.h>
-
+#include <TRandom.h>
 #include <cmath>
 #include <stack>
 
@@ -729,6 +732,94 @@ namespace Belle2 {
       } else return Const::doubleNaN;
 
       return Const::doubleNaN;
+    }
+
+    double eclClusterTimeNorm90(const Particle* particle)
+    {
+
+      const ECLCluster* cluster = particle->getECLCluster();
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+
+      //..Get the appropriate (data or MC) payload
+      std::string payloadName = "ECLTimingNormalization_data";
+      if (Environment::Instance().isMC()) {payloadName = "ECLTimingNormalization_MC";}
+      static DBObjPtr<ECLTimingNormalization> ECLTimingNormalization(payloadName);
+
+      if (elci and cluster) {
+
+        //..Only valid for crystals in CDC acceptance
+        unsigned short cellID = cluster->getMaxECellId(); // [1, 8736]
+        const unsigned short firstCellID = 161; // first cellID in CDC acceptance
+        const unsigned short lastCellID = 8608; // last cellID in CDC acceptance
+        if (cellID < firstCellID or cellID > lastCellID) {return Const::doubleNaN;}
+        int iCrys = cellID - 1; // [0, 8735]
+
+        //..clusterTiming. Dither to remove artifacts from compression
+        double rawTime = cluster->getTime();
+        const double timingBit = 2000. / 4096.;
+        double tSmear = timingBit * (gRandom->Uniform() - 0.5);
+        double time = rawTime + tSmear;
+
+        //..Uncorrected single crystal energy
+        double clusterECorrected = cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+        double clusterERaw = cluster->getEnergyRaw();
+        double singleECorrected = cluster->getEnergyHighestCrystal();
+        double singleCrystalE = singleECorrected * clusterERaw / clusterECorrected;
+        double basicEScale = 0.1 / singleCrystalE;
+
+        //..Background level for the region for this cellID
+        const int firstBarrel = 1153; // first cellID in barrel
+        const int lastBarrel = 7776; // last cellID in barrel
+        double ootCrys = elci->getNECLCalDigitsOutOfTimeBarrel();
+        if (cellID < firstBarrel) {ootCrys = elci->getNECLCalDigitsOutOfTimeFWD();}
+        if (cellID > lastBarrel) {ootCrys = elci->getNECLCalDigitsOutOfTimeBWD();}
+
+        //..Time walk correction (7 parameters)
+        //  E0 / bias at E0 / lowE slope / highE slope / curvature / Emin / Emax
+        std::array< std::array<float, 7>,  8736> tWalk = ECLTimingNormalization->getTimeWalkPar();
+
+        float EForCor = singleCrystalE;
+        if (EForCor < tWalk[iCrys][5]) {EForCor = tWalk[iCrys][5];}
+        if (EForCor > tWalk[iCrys][6]) {EForCor = tWalk[iCrys][6];}
+        float dE = EForCor - tWalk[iCrys][0];
+        double timeWalkCor = tWalk[iCrys][1] + tWalk[iCrys][2] * dE;
+        if (dE > 0) {
+          timeWalkCor = tWalk[iCrys][1] + tWalk[iCrys][3] * dE + tWalk[iCrys][4] * dE * dE;
+        }
+
+        //..Dependence on regional background level (5 parameters)
+        //  intercept / slope / p2 / min ootCrys / max ootCrys
+        std::array< std::array<float, 5>,  8736> bPar = ECLTimingNormalization->getBackgroundPar();
+
+        float oot = ootCrys;
+        if (oot < bPar[iCrys][3]) {oot = bPar[iCrys][3];}
+        if (oot > bPar[iCrys][4]) {oot = bPar[iCrys][4];}
+        double backgroundNorm = bPar[iCrys][0] + bPar[iCrys][1] * oot + bPar[iCrys][2] * oot * oot;
+
+        //..Dependence on single crystal energy (7 parameters)
+        //  E0 / res at E0 / lowE slope / highE slope / curvature / Emin / Emax
+        std::array< std::array<float, 7>,  8736> EPar = ECLTimingNormalization->getEnergyPar();
+
+        EForCor = singleCrystalE;
+        if (EForCor < EPar[iCrys][5]) {EForCor = EPar[iCrys][5];}
+        if (EForCor > EPar[iCrys][6]) {EForCor = EPar[iCrys][6];}
+        dE = EForCor - EPar[iCrys][0];
+        double energyNorm = EPar[iCrys][1] + EPar[iCrys][2] * dE;
+        if (dE > 0) {
+          energyNorm = EPar[iCrys][1] + EPar[iCrys][3] * dE  + EPar[iCrys][4] * dE * dE;
+        }
+
+        //..Overall normalization. Cannot be too small.
+        double minTNorm = (double)ECLTimingNormalization->getMinTNormalization();
+        double tNormalization = basicEScale * backgroundNorm * energyNorm;
+        if (tNormalization < minTNorm) {tNormalization = minTNorm;}
+        double tNorm90 = (time - timeWalkCor) / tNormalization;
+        return tNorm90;
+
+      } else {
+        return Const::doubleNaN;
+
+      }
     }
 
 
@@ -1758,6 +1849,13 @@ to MC difference in KL efficiency.
       Returns the mdst index of the nearest truth (anti)neutron, extrapolated to the cluster radius, if it is
       within the matching cone. To use this variable, it is required to run getNeutralHadronGeomMatches function. 
 )DOC");
+  REGISTER_VARIABLE("clusterTimeNorm90", eclClusterTimeNorm90,
+  R"DOC(
+  Returns ECL cluster's timing normalized such that :math:`90\%` of real photons will 
+  have :math:`|\text{clusterTimeNorm90}| < 1`. Normalization depends on energy, background
+  level, and cellID, and differs for data and MC. Valid only for crystals within the CDC acceptance, :math:`161 <= |\text{clusterCellID}| <= 8608`.
+  )DOC",
+                      "dimensionless");
 
   }
 }

@@ -29,6 +29,7 @@ void ECLClusterRounderModule::initialize() { }
 
 void ECLClusterRounderModule::event()
 {
+  B2DEBUG(20, "Rounding all Double32_t ECLCluster members to mdst precision...");
   for (int i = 0; i < m_eclclusters.getEntries(); i++) {
     ECLCluster* cluster = m_eclclusters[i];
 

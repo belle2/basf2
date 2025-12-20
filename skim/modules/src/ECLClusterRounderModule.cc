@@ -34,7 +34,7 @@ void ECLClusterRounderModule::event()
     ECLCluster* cluster = m_eclclusters[i];
 
     TMatrixDSym covMat = cluster->getCovarianceMatrix3x3();
-    const double matRounded[6] = {
+    double matRounded[6] = {
       roundToPrecision(covMat(0, 0), 0.0, 0.3, 10),
       roundToPrecision(covMat(1, 0), 0.0, 10.0, 12),
       roundToPrecision(covMat(1, 1), 0.0, 0.05, 8),

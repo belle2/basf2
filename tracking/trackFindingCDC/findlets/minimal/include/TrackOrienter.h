@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
 #include <vector>
@@ -15,15 +15,18 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
+
+  namespace TrackFindingCDC {
 
     /// Fixes the orientation of tracks by a simple heuristic
-    class TrackOrienter : public Findlet<const CDCTrack, CDCTrack> {
+    class TrackOrienter : public TrackingUtilities::Findlet<const TrackingUtilities::CDCTrack, TrackingUtilities::CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCTrack, CDCTrack>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCTrack, TrackingUtilities::CDCTrack>;
 
     public:
       /// Short description of the findlet
@@ -36,7 +39,8 @@ namespace Belle2 {
       void initialize() final;
 
       /// Main algorithm applying the adjustment of the orientation.
-      void apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks) final;
+      void apply(const std::vector<TrackingUtilities::CDCTrack>& inputTracks,
+                 std::vector<TrackingUtilities::CDCTrack>& outputTracks) final;
 
     private:
       /**

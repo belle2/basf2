@@ -9,16 +9,18 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <cdc/topology/CDCWireTopology.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool AdvancedSegmentVarSet::extract(const CDCSegment2D* segment)
 {
@@ -60,7 +62,7 @@ bool AdvancedSegmentVarSet::extract(const CDCSegment2D* segment)
     totalNNeighbors += nNeighbors;
 
     // hit position information
-    totalInnerDistance += wireHit.getRefPos2D().norm();
+    totalInnerDistance += wireHit.getRefPos2D().R();
 
     // Drift circle information
     double driftLength = wireHit.getRefDriftLength();

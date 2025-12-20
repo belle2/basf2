@@ -7,15 +7,16 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/MonopoleStereoHitFinder.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::ChooseableFilter<StereoHitFilterFactory>;
+template class TrackingUtilities::ChooseableFilter<StereoHitFilterFactory>;
 
 MonopoleStereoHitFinder::MonopoleStereoHitFinder() : Super()
 {

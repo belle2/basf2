@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/fitting/EigenObservationMatrix.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
 #include <framework/logging/Logger.h>
 
@@ -21,6 +21,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 RiemannsMethod::RiemannsMethod()
   : m_lineConstrained(false)

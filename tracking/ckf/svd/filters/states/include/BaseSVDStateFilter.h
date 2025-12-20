@@ -7,13 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
 
 namespace Belle2 {
   /// Base filter for CKF SVD states
   using BaseSVDStateFilter =
-    TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>, CKFToSVDState*>>;
+    TrackingUtilities::Filter<std::pair<const std::vector<TrackingUtilities::WithWeight<const CKFToSVDState*>>, CKFToSVDState*>>;
 }

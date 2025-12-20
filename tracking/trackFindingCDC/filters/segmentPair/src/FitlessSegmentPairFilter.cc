@@ -7,15 +7,16 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterOnVarSet.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::FilterOnVarSet<SkimmedHitGapSegmentPairVarSet>;
+template class TrackingUtilities::FilterOnVarSet<SkimmedHitGapSegmentPairVarSet>;
 
 Weight FitlessSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {

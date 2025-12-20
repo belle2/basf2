@@ -8,11 +8,11 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/filters/trackletFilters/TrackletFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
     /// A chooseable filter for picking out the relations between states
-    using ChooseableTrackletFilter = TrackFindingCDC::ChooseableFilter<TrackletFilterFactory>;
+    using ChooseableTrackletFilter = TrackingUtilities::ChooseableFilter<TrackletFilterFactory>;
   }
 }

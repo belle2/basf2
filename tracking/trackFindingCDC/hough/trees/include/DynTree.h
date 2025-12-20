@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
 #include <framework/logging/Logger.h>
 #include <vector>
 #include <deque>
@@ -162,7 +162,7 @@ namespace Belle2 {
 
               // After the walking the children we reevaluate the priority
               bool reheap = false;
-              erase_remove_if(prioritisedChildNodes,
+              TrackingUtilities::erase_remove_if(prioritisedChildNodes,
               [&reheap, &priority](std::pair<float, Node*>& prioritisedChildNode) {
                 float childPriority = priority(prioritisedChildNode.second);
                 if (std::isnan(childPriority)) return true;
@@ -288,7 +288,7 @@ namespace Belle2 {
           result->resize(subProperties.size(), Node(subProperties.back()));
           size_t iSubNode = 0;
           for (auto& properties : subProperties) {
-            clearIfApplicable(result->at(iSubNode));
+            TrackingUtilities::clearIfApplicable(result->at(iSubNode));
             result->at(iSubNode) = properties;
             ++iSubNode;
           }
@@ -329,12 +329,12 @@ namespace Belle2 {
       /// Fell to tree meaning deleting all child nodes from the tree. Keeps the top node.
       void fell()
       {
-        clearIfApplicable(m_topNode);
+        TrackingUtilities::clearIfApplicable(m_topNode);
         m_topNode.unlink();
         m_topNode.m_tree = this;
         for (typename Node::Children& children : m_children) {
           for (Node& node : children) {
-            clearIfApplicable(node);
+            TrackingUtilities::clearIfApplicable(node);
             node.unlink();
           }
         }

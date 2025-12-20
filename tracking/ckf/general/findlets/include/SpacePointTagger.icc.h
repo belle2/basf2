@@ -9,8 +9,8 @@
 
 #include <tracking/ckf/general/findlets/SpacePointTagger.dcl.h>
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
@@ -32,12 +32,12 @@ namespace Belle2 {
   void SpacePointTagger<AResult, ACluster>::exposeParameters(ModuleParamList* moduleParamList,
                                                              const std::string& prefix)
   {
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "singleClusterLevel"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "singleClusterLevel"),
                                   m_param_singleClusterLevel,
                                   "Mark SP as used, if the share a single cluster with the results, or if they "
                                   "share a whole SP.",
                                   m_param_singleClusterLevel);
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "markUsedSpacePoints"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "markUsedSpacePoints"),
                                   m_param_markUsedSpacePoints,
                                   "Mark used space points as assigned.",
                                   m_param_markUsedSpacePoints);
@@ -69,7 +69,7 @@ namespace Belle2 {
     }
 
     for (const SpacePoint* spacePoint : spacePoints) {
-      if (TrackFindingCDC::is_in(spacePoint, m_usedSpacePoints)) {
+      if (TrackingUtilities::is_in(spacePoint, m_usedSpacePoints)) {
         spacePoint->setAssignmentState(true);
         continue;
       }
@@ -80,7 +80,7 @@ namespace Belle2 {
 
       const auto& relatedClusters = spacePoint->getRelationsTo<ACluster>();
       for (const ACluster& relatedCluster : relatedClusters) {
-        if (TrackFindingCDC::is_in(&relatedCluster, m_usedClusters)) {
+        if (TrackingUtilities::is_in(&relatedCluster, m_usedClusters)) {
           spacePoint->setAssignmentState(true);
           break;
         }

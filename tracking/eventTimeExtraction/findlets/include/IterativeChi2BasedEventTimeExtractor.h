@@ -10,7 +10,7 @@
 #include <tracking/eventTimeExtraction/findlets/IterativeEventTimeExtractor.dcl.h>
 #include <tracking/eventTimeExtraction/findlets/Chi2BasedEventTimeExtractor.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
 #include <string>
 
@@ -26,7 +26,7 @@ namespace Belle2 {
     {
       Super::exposeParameters(moduleParamList, prefix);
 
-      moduleParamList->getParameter<bool>(TrackFindingCDC::prefixed(prefix, "useLastEventT0")).setDefaultValue(false);
+      moduleParamList->getParameter<bool>(TrackingUtilities::prefixed(prefix, "useLastEventT0")).setDefaultValue(false);
     }
   };
 }

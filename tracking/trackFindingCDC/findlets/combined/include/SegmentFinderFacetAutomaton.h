@@ -17,23 +17,24 @@
 
 #include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
-#include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
+#include <tracking/trackingUtilities/findlets/minimal/WeightedRelationCreator.h>
+#include <tracking/trackingUtilities/findlets/base/StoreVectorSwapper.h>
 
 #include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Findlet implementing the segment finding part of the full track finder
-    class SegmentFinderFacetAutomaton : public Findlet<CDCWireHitCluster&, CDCSegment2D> {
+    class SegmentFinderFacetAutomaton : public
+      TrackingUtilities::Findlet<TrackingUtilities::CDCWireHitCluster&, TrackingUtilities::CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHitCluster&, CDCSegment2D>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHitCluster&, TrackingUtilities::CDCSegment2D>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -49,7 +50,8 @@ namespace Belle2 {
       void beginEvent() final;
 
       /// Generates the segment from wire hits
-      void apply(std::vector<CDCWireHitCluster>& clusters, std::vector<CDCSegment2D>& outputSegments) final;
+      void apply(std::vector<TrackingUtilities::CDCWireHitCluster>& clusters,
+                 std::vector<TrackingUtilities::CDCSegment2D>& outputSegments) final;
 
     private:
       // Findlets
@@ -57,7 +59,8 @@ namespace Belle2 {
       FacetCreator m_facetCreator;
 
       /// Creates the facet (hit triplet) relations of the cellular automaton
-      WeightedRelationCreator<const CDCFacet, ChooseableFacetRelationFilter> m_facetRelationCreator;
+      TrackingUtilities::WeightedRelationCreator<const TrackingUtilities::CDCFacet, TrackFindingCDC::ChooseableFacetRelationFilter>
+      m_facetRelationCreator;
 
       /// Find the segments by composition of facets path from a cellular automaton
       SegmentCreatorFacetAutomaton m_segmentCreatorFacetAutomaton;
@@ -75,20 +78,20 @@ namespace Belle2 {
       SegmentLinker m_segmentLinker;
 
       /// Puts the internal facets on the DataStore
-      StoreVectorSwapper<CDCFacet> m_facetSwapper{"CDCFacetVector"};
+      TrackingUtilities::StoreVectorSwapper<TrackingUtilities::CDCFacet> m_facetSwapper{"CDCFacetVector"};
 
       // Object pools
       /// Memory for the generated facets
-      std::vector<CDCFacet> m_facets;
+      std::vector<TrackingUtilities::CDCFacet> m_facets;
 
       /// Memory for the generated facet relations
-      std::vector<WeightedRelation<const CDCFacet> > m_facetRelations;
+      std::vector<TrackingUtilities::WeightedRelation<const TrackingUtilities::CDCFacet> > m_facetRelations;
 
       /// Memory for the reconstructed segments
-      std::vector<CDCSegment2D> m_segments;
+      std::vector<TrackingUtilities::CDCSegment2D> m_segments;
 
       /// Memory for the reconstructed segments
-      std::vector<CDCSegment2D> m_intermediateSegments;
+      std::vector<TrackingUtilities::CDCSegment2D> m_intermediateSegments;
     };
   }
 }

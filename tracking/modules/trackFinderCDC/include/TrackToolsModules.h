@@ -13,19 +13,19 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**
      * Module implementation using the TrackRejecter
      */
-    class TFCDC_TrackRejecterModule : public FindletModule<TrackRejecter> {
+    class TFCDC_TrackRejecterModule : public TrackingUtilities::FindletModule<TrackRejecter> {
 
     private:
       /// Type of the base class
-      using Super = FindletModule<TrackRejecter>;
+      using Super = TrackingUtilities::FindletModule<TrackRejecter>;
 
     public:
       /// Constructor setting the default store vector names
@@ -35,11 +35,11 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackQualityAsserter
      */
-    class TFCDC_TrackQualityAsserterModule: public FindletModule<TrackQualityAsserter> {
+    class TFCDC_TrackQualityAsserterModule: public TrackingUtilities::FindletModule<TrackQualityAsserter> {
 
     private:
       /// Type of the base class
-      using Super = FindletModule<TrackQualityAsserter>;
+      using Super = TrackingUtilities::FindletModule<TrackQualityAsserter>;
 
     public:
       /// Constructor setting the default store vector names
@@ -49,11 +49,11 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackOrienter
      */
-    class TFCDC_TrackOrienterModule : public FindletModule<TrackOrienter> {
+    class TFCDC_TrackOrienterModule : public TrackingUtilities::FindletModule<TrackOrienter> {
 
     private:
       /// Type of the base class
-      using Super = FindletModule<TrackOrienter>;
+      using Super = TrackingUtilities::FindletModule<TrackOrienter>;
 
     public:
       /// Constructor setting the default store vector names
@@ -63,11 +63,11 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackFlightTimeAdjuster
      */
-    class TFCDC_TrackFlightTimeAdjusterModule : public FindletModule<TrackFlightTimeAdjuster> {
+    class TFCDC_TrackFlightTimeAdjusterModule : public TrackingUtilities::FindletModule<TrackFlightTimeAdjuster> {
 
     private:
       /// Type of the base class
-      using Super = FindletModule<TrackFlightTimeAdjuster>;
+      using Super = TrackingUtilities::FindletModule<TrackFlightTimeAdjuster>;
 
     public:
       /// Constructor setting the default store vector names
@@ -77,11 +77,11 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackExporter
      */
-    class TFCDC_TrackExporterModule : public FindletModule<TrackExporter> {
+    class TFCDC_TrackExporterModule : public TrackingUtilities::FindletModule<TrackExporter> {
 
     private:
       /// Type of the base class
-      using Super = FindletModule<TrackExporter>;
+      using Super = TrackingUtilities::FindletModule<TrackExporter>;
 
     public:
       /// Constructor setting the default store vector names

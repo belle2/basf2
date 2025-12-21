@@ -744,6 +744,9 @@ namespace Belle2 {
       std::string payloadName = "ECLTimingNormalization_data";
       if (Environment::Instance().isMC()) {payloadName = "ECLTimingNormalization_MC";}
       static DBObjPtr<ECLTimingNormalization> ECLTimingNormalization(payloadName);
+      if (!ECLTimingNormalization.isValid()) {
+        B2FATAL(payloadName << " payload is not available");
+      }
 
       if (elci and cluster) {
 
@@ -776,15 +779,15 @@ namespace Belle2 {
 
         //..Time walk correction (7 parameters)
         //  E0 / bias at E0 / lowE slope / highE slope / curvature / Emin / Emax
-        std::array< std::array<float, 7>,  8736> tWalk = ECLTimingNormalization->getTimeWalkPar();
+        std::array< std::array<float, 7>,  8736> par7 = ECLTimingNormalization->getTimeWalkPar();
 
         float EForCor = singleCrystalE;
-        if (EForCor < tWalk[iCrys][5]) {EForCor = tWalk[iCrys][5];}
-        if (EForCor > tWalk[iCrys][6]) {EForCor = tWalk[iCrys][6];}
-        float dE = EForCor - tWalk[iCrys][0];
-        double timeWalkCor = tWalk[iCrys][1] + tWalk[iCrys][2] * dE;
+        if (EForCor < par7[iCrys][5]) {EForCor = par7[iCrys][5];}
+        if (EForCor > par7[iCrys][6]) {EForCor = par7[iCrys][6];}
+        float dE = EForCor - par7[iCrys][0];
+        double timeWalkCor = par7[iCrys][1] + par7[iCrys][2] * dE;
         if (dE > 0) {
-          timeWalkCor = tWalk[iCrys][1] + tWalk[iCrys][3] * dE + tWalk[iCrys][4] * dE * dE;
+          timeWalkCor = par7[iCrys][1] + par7[iCrys][3] * dE + par7[iCrys][4] * dE * dE;
         }
 
         //..Dependence on regional background level (5 parameters)
@@ -798,15 +801,15 @@ namespace Belle2 {
 
         //..Dependence on single crystal energy (7 parameters)
         //  E0 / res at E0 / lowE slope / highE slope / curvature / Emin / Emax
-        std::array< std::array<float, 7>,  8736> EPar = ECLTimingNormalization->getEnergyPar();
+        par7 = ECLTimingNormalization->getEnergyPar();
 
         EForCor = singleCrystalE;
-        if (EForCor < EPar[iCrys][5]) {EForCor = EPar[iCrys][5];}
-        if (EForCor > EPar[iCrys][6]) {EForCor = EPar[iCrys][6];}
-        dE = EForCor - EPar[iCrys][0];
-        double energyNorm = EPar[iCrys][1] + EPar[iCrys][2] * dE;
+        if (EForCor < par7[iCrys][5]) {EForCor = par7[iCrys][5];}
+        if (EForCor > par7[iCrys][6]) {EForCor = par7[iCrys][6];}
+        dE = EForCor - par7[iCrys][0];
+        double energyNorm = par7[iCrys][1] + par7[iCrys][2] * dE;
         if (dE > 0) {
-          energyNorm = EPar[iCrys][1] + EPar[iCrys][3] * dE  + EPar[iCrys][4] * dE * dE;
+          energyNorm = par7[iCrys][1] + par7[iCrys][3] * dE  + par7[iCrys][4] * dE * dE;
         }
 
         //..Overall normalization. Cannot be too small.

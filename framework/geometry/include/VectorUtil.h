@@ -180,7 +180,7 @@ namespace Belle2 {
     {
       const double v2Mag2 = v2.Mag2();
       if (v2Mag2 == 0)
-        return aVector(0, 0, 0);
+        return aVector();
       const double dotp = v1.Dot(v2);           // = relativTo.dot(*this)
       const aVector tmp = v2 * (dotp / v2Mag2); // = relativTo.scaled(dotp / relativTo.normSquared())
       return tmp;

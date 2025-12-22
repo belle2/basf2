@@ -11,6 +11,7 @@
 #include <tracking/trackingUtilities/numerics/Quadratic.h>
 
 #include <framework/geometry/B2Vector3.h>
+#include <framework/geometry/VectorUtil.h>
 #include <Math/Vector3D.h>
 
 #include <string>
@@ -171,6 +172,11 @@ namespace Belle2 {
       {
         return x() * rhs.x() + y() * rhs.y() + z() * rhs.z();
       }
+      /// Calculates the three dimensional dot product, ROOT::Math compatible
+      double Dot(const Vector3D& rhs) const
+      {
+        return dot(rhs);
+      }
 
       /// Calculates the two dimensional dot product in xy projection.
       double dotXY(const Vector3D& rhs) const
@@ -202,6 +208,11 @@ namespace Belle2 {
       double normSquared() const
       {
         return x() * x() + y() * y() + z() * z();
+      }
+      /// Alias for normSquared
+      double Mag2() const
+      {
+        return normSquared();
       }
 
       /// Calculates the length of the vector
@@ -414,15 +425,6 @@ namespace Belle2 {
         return relativTo.dot(*this) / relativTo.norm();
       }
 
-      /// Calculates the part of this vector that is parallel to the given vector
-      /// @attention: A generalised version for 2D and 3D vectors is implemented in
-      /// framework/geometry/include/VectorUtil.h
-      /// If this class is ever replaced by ROOT::Math::Vecto3D, this method can be replaced by that in the basf2 VectorUtil.
-      Vector3D parallelVector(const Vector3D& relativTo) const
-      {
-        return relativTo.scaled(relativTo.dot(*this) / relativTo.normSquared());
-      }
-
       /// Same as parallelComp() but assumes the given vector to be of unit length.
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
        *  a costly computation of the vector norm()*/
@@ -441,10 +443,10 @@ namespace Belle2 {
         return relativTo.cross(*this).norm() / relativTo.norm();
       }
 
-      /// Calculates the part of this vector that is parallel to the given vector
+      /// Calculates the part of this vector that is orthogonal to the given vector
       Vector3D orthogonalVector(const Vector3D& relativTo) const
       {
-        return *this - parallelVector(relativTo);
+        return *this - Belle2::VectorUtil::parallelVector(*this, relativTo);
       }
 
       /// Same as orthogonalComp() but assumes the given vector to be of unit length

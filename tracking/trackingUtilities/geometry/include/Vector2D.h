@@ -14,6 +14,8 @@
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
+#include <framework/geometry/VectorUtil.h>
+
 #include <Math/Vector2D.h>
 
 #include <utility>
@@ -173,6 +175,12 @@ namespace Belle2 {
       {
         return x() * rhs.x() + y() * rhs.y();
       }
+      /// Calculates the two dimensional dot product.
+      double Dot(const Vector2D& rhs) const
+      {
+        return dot(rhs);
+      }
+
       /// Calculated the two dimensional cross product.
       double cross(const Vector2D& rhs) const
       {
@@ -183,6 +191,11 @@ namespace Belle2 {
       double normSquared() const
       {
         return x() * x() + y() * y();
+      }
+      /// Alias for normSquared
+      double Mag2() const
+      {
+        return normSquared();
       }
 
       /// Calculates the length of the vector.
@@ -390,7 +403,7 @@ namespace Belle2 {
       /// Reflects this vector along line designated by the given vector.
       Vector2D flippedAlong(const Vector2D& flippingDirection) const
       {
-        return *this - parallelVector(flippingDirection) * 2;
+        return *this - Belle2::VectorUtil::parallelVector(*this, flippingDirection) * 2;
       }
 
       /// Transforms the vector to conformal space inplace
@@ -431,15 +444,6 @@ namespace Belle2 {
       double parallelComp(const Vector2D& relativTo) const
       {
         return relativTo.dot(*this) / relativTo.norm();
-      }
-
-      /// Calculates the part of this vector that is parallel to the given vector
-      /// @attention: A generalised version for 2D and 3D vectors is implemented in
-      /// framework/geometry/include/VectorUtil.h
-      /// If this class is ever replaced by ROOT::Math::Vector2D, this method can be replaced by that in the basf2 VectorUtil.
-      Vector2D parallelVector(const Vector2D& relativTo) const
-      {
-        return relativTo.scaled(relativTo.dot(*this) / relativTo.normSquared());
       }
 
       /// Same as parallelComp() but assumes the given vector to be of unit length.

@@ -172,7 +172,7 @@ namespace Belle2 {
       {
         return x() * rhs.x() + y() * rhs.y() + z() * rhs.z();
       }
-      /// Calculates the two dimensional dot product, ROOT::Math compatible
+      /// Calculates the three dimensional dot product, ROOT::Math compatible
       double Dot(const Vector3D& rhs) const
       {
         return dot(rhs);

@@ -26,16 +26,16 @@ namespace Belle2 {
       static const size_t c_N = EParamaters::c_N;
 
       /// The vector type representing the n related parameters.
-      using ParameterVector = ParameterVector<c_N>;
+      using ParameterVector = TrackingUtilities::ParameterVector<c_N>;
 
       /// The matrix type representing the covariance of the n related parameters
-      using CovarianceMatrix = CovarianceMatrix<c_N>;
+      using CovarianceMatrix = TrackingUtilities::CovarianceMatrix<c_N>;
 
       /// The matrix type representing the precision of the n related parameters
-      using PrecisionMatrix = PrecisionMatrix<c_N>;
+      using PrecisionMatrix = TrackingUtilities::PrecisionMatrix<c_N>;
 
       /// The matrix type used to translate covariances and precisions im auto mapping of the parameter space
-      using JacobianMatrix = JacobianMatrix<c_N>;
+      using JacobianMatrix = TrackingUtilities::JacobianMatrix<c_N>;
 
       /// Transport the covariance matrix inplace with the given jacobian matrix
       static void transport(const JacobianMatrix& jacobian, CovarianceMatrix& cov);

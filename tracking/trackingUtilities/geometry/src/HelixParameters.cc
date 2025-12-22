@@ -140,7 +140,7 @@ double HelixUtil::average(const PerigeeUtil::ParameterVector& fromPar,
                           const PerigeeUtil::ParameterVector& toPar,
                           const PerigeeUtil::CovarianceMatrix& toCov,
                           const PerigeeHelixAmbiguity& toAmbiguity,
-                          const SZParameters& szParameters,
+                          const SZUtil::ParameterVector& szParameters,
                           HelixParameters& avgPar,
                           HelixCovariance& avgCov)
 {

@@ -94,8 +94,8 @@ double HelixUtil::average(const HelixParameters& fromPar,
   return chi2;
 }
 
-double HelixUtil::average(const PerigeeParameters& fromPar,
-                          const PerigeeCovariance& fromCov,
+double HelixUtil::average(const PerigeeUtil::ParameterVector& fromPar,
+                          const PerigeeUtil::CovarianceMatrix& fromCov,
                           const PerigeeHelixAmbiguity& fromAmbiguity,
                           const HelixParameters& toPar,
                           const HelixCovariance& toCov,
@@ -134,13 +134,13 @@ double HelixUtil::average(const PerigeeParameters& fromPar,
   return chi2;
 }
 
-double HelixUtil::average(const PerigeeParameters& fromPar,
-                          const PerigeeCovariance& fromCov,
+double HelixUtil::average(const PerigeeUtil::ParameterVector& fromPar,
+                          const PerigeeUtil::CovarianceMatrix& fromCov,
                           const PerigeeHelixAmbiguity& fromAmbiguity,
-                          const PerigeeParameters& toPar,
-                          const PerigeeCovariance& toCov,
+                          const PerigeeUtil::ParameterVector& toPar,
+                          const PerigeeUtil::CovarianceMatrix& toCov,
                           const PerigeeHelixAmbiguity& toAmbiguity,
-                          const SZParameters& szParameters,
+                          const SZUtil::ParameterVector& szParameters,
                           HelixParameters& avgPar,
                           HelixCovariance& avgCov)
 {

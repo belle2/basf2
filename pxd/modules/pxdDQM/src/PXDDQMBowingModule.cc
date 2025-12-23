@@ -35,9 +35,6 @@ PXDDQMBowingModule::PXDDQMBowingModule() : HistoModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where the histogram will be placed",
            std::string("PXDBow"));
 
-  addParam("outputRecoTracksArrayName", m_outputRecoTracksArrayName, "Name of the StoreArray with the recoTracks without PXD hits",
-           m_outputRecoTracksArrayName);
-
   addParam("cutResU", m_cutResU, "Cut value on |res u| (upper limit)", 0.04);
   addParam("cutP", m_cutP, "Cut on the track momentum (lower limit)", 1.0);
   addParam("cutD0", m_cutD0, "Cut on |d0| (upper limit)", 0.1);
@@ -57,11 +54,6 @@ void PXDDQMBowingModule::initialize()
   /// register the required array as optional so validation succeeds also for cases where they are not available, however the module will not do anything without them
   m_recoTracks.isOptional();
   m_ParticleList.isOptional(m_particleListName);
-
-  if (m_recoTracks.isValid()) {
-    m_outputRecoTracks.registerInDataStore(m_outputRecoTracksArrayName);
-    RecoTrack::registerRequiredRelations(m_outputRecoTracks);
-  }
 
   /// get the bowing amplitude from the alignment
   DBObjPtr<VXDAlignment> alignment;
@@ -116,6 +108,7 @@ void PXDDQMBowingModule::event()
     Helix helix = fitResult->getHelix();
     const auto d0 = helix.getD0();
     const auto z0 = helix.getZ0();
+    //const auto tanLambda = helix.getTanLambda();
     if (TMath::Abs(d0) > m_cutD0 || TMath::Abs(z0) > m_cutZ0) continue;
 
     auto recoTrack = b2track->getRelatedTo<RecoTrack>();
@@ -123,7 +116,19 @@ void PXDDQMBowingModule::event()
       B2ERROR("No RecoTrack for Track");
       continue;
     }
-    /// copy track without hits
+
+    /// select tracks that have at least one PXD hit on forward sensors
+    int forwardPXDhits = 0;
+    for (const auto& hit : recoTrack->getSortedPXDHitList()) {
+      auto sensorID = hit->getSensorID();
+      if (sensorID.getSensorNumber() == 1) forwardPXDhits++;
+    }
+    if (forwardPXDhits == 0) continue;
+
+    /// track without PXD hits
+    auto noPXDTrack = recoTrack->getRelatedTo<RecoTrack>("SVDCDCRecoTracks");
+
+    /*// OR copy track without hits
     auto noPXDTrack = recoTrack->copyToStoreArray(m_outputRecoTracks);
     int sortingPar = 0;
     /// add SVD hits
@@ -139,6 +144,9 @@ void PXDDQMBowingModule::event()
     /// refit the track without PXD hits
     TrackFitter fitter;
     fitter.fit(*noPXDTrack);
+    B2INFO("With refit recotrack");
+    //*/
+
     /// get the original genfit track to get the PXDhits
     genfit::Track& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
     for (unsigned int i = 0; i < track.getNumPoints() - 1; ++i) {

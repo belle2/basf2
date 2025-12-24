@@ -46,6 +46,12 @@ namespace Belle2 {
         return m_obj;
       }
 
+      /// Get the object
+      T getValue() const
+      {
+        return m_obj;
+      }
+
       /// Dereferencing access for the case that T is a pointer
       typename std::remove_pointer<T>::type& operator*() const
       {

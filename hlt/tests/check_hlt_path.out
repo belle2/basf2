@@ -1318,9 +1318,6 @@
   145. Sum_Postfilter_Tracking
   146. CDCDedxHitSaver
   147. CDCDedxPIDCreator
-      dedxTracksName=
-      enableDebugOutput=True
-      likelihoodsName=
       removeHighest=0.25
       removeLowest=0.05
       trackLevel=True
@@ -4240,9 +4237,6 @@
         7. Sum_Postfilter_Tracking
         8. CDCDedxHitSaver
         9. CDCDedxPIDCreator
-            dedxTracksName=
-            enableDebugOutput=True
-            likelihoodsName=
             removeHighest=0.25
             removeLowest=0.05
             trackLevel=True

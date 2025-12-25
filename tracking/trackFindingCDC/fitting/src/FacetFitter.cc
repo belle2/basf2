@@ -278,8 +278,8 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
 }
 
 
-UncertainParameterLine2D FacetFitter::fit(Matrix<double, 3, 3> xyl,
-                                          Matrix<double, 3, 1> w,
+UncertainParameterLine2D FacetFitter::fit(TrackingUtilities::Matrix<double, 3, 3> xyl,
+                                          TrackingUtilities::Matrix<double, 3, 1> w,
                                           int nSteps)
 {
   return ::fit(std::move(xyl), std::move(w), nSteps);

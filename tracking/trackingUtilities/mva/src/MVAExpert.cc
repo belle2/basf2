@@ -32,8 +32,8 @@ namespace Belle2 {
       void beginRun(); /**< Called once before a new run begins */
       std::unique_ptr<MVA::Weightfile> getWeightFile(); /**< Get the weight file */
       double predict(); /**< Get the MVA prediction */
-      std::vector<float> predict(float* /* test_data */, int /* nFeature */, int /* nRows */); /** Get predictions for several inputs */
-      std::vector<std::string> getVariableNames();
+      std::vector<float> predict(float* /* test_data */, int /* nFeature */, int /* nRows */); /**< Get predictions for several inputs */
+      std::vector<std::string> getVariableNames();  /**< Get selected variable names */
     private:
       /// References to the all named values from the source variable set.
       std::vector<Named<Float_t*> > m_allNamedVariables;

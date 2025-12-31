@@ -35,14 +35,14 @@ void FlippedRecoTracksMergerModule::initialize()
   m_trackFitResults.isRequired();
 }
 
+void FlippedRecoTracksMergerModule::beginRun()
+{
+  if (!m_flipCutsFromDB.isValid())
+    B2FATAL("TRKTrackFlipAndRefit_MVA_cuts payload is not available");
+}
+
 void FlippedRecoTracksMergerModule::event()
 {
-  // get the cut from DB
-  if (!m_flipCutsFromDB.isValid()) {
-    B2WARNING("DBobjects : TrackFlippingCuts not found!");
-    return;
-  }
-
   // check if the flip&refit is switched on (or off)
   if (!(*m_flipCutsFromDB).getOnOffInfo()) return;
 
@@ -54,7 +54,6 @@ void FlippedRecoTracksMergerModule::event()
     if (not recoTrack.wasFitSuccessful()) {
       continue;
     }
-
 
     // get the related Belle2::Tracks
     Track* track = recoTrack.getRelatedFrom<Belle2::Track>();

@@ -456,11 +456,10 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         eff2dHist->SetBinContent(binx + 1, biny + 1, 0.);
         errHist->SetBinContent(binx + 1, biny + 1, 0.);
       } else {
-
+        double sigmaR   = 0.0;
+        double Z        = 0.0;
         if (ratioPlot) {
           eff2dVal = mainEff / refEff;
-          // Set threshold to warnThr("high") to capture efficiency drops across layers earlier
-          if (eff2dVal < warnThr) {errHist->SetBinContent(binx + 1, biny + 1, eff2dVal);}
         } else {
           eff2dVal = (mainEff - refEff) / pow(pow(mainErr, 2) + pow(refErr, 2), 0.5);
         }
@@ -477,16 +476,27 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
           eff2dHist->SetBinContent(binx + 1, biny + 1, minVal);
         }
 
+        // propagated statistical error on efficiency ratio
+        sigmaR = eff2dVal * std::sqrt(
+                   std::pow(mainErr / mainEff, 2) +
+                   std::pow(refErr  / refEff,  2)
+                 );
+        // significance wrt warning threshold
+        if (sigmaR > 0) {
+          Z = (eff2dVal - warnThr) / sigmaR;
+        }
         // set alarm
-        if (mainEntries < (int)m_minEntries) {
+        if (mainEntries < (int)m_minEntries
+            || sigmaR / eff2dVal > 0.05) { // this uncertainty cut is 5% which is becomes imp to deal with low stat
           setFew = true;
         } else {
-          if (eff2dVal < warnThr) {
+          if (eff2dVal < warnThr && Z < -1.5) {
             pvcount += 1;
-            if ((eff2dVal <= alarmThr) && (eff2dVal >= stopThr)) {
+            errHist->SetBinContent(binx + 1, biny + 1, sigmaR);
+            if ((eff2dVal <= alarmThr && Z < -2.5) && (eff2dVal >= stopThr && Z > -5.0)) {
               setWarn = true;
               layercount++;                  // Increment layercount when alarm condition is met
-            } else if (eff2dVal < stopThr) {
+            } else if (eff2dVal < stopThr && Z <= -5.0) {
               setAlarm = true;
               layercount++;                  // Increment layercount when a stop condition is met
             }

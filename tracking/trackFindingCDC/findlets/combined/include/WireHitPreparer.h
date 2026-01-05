@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundDetector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/AsicBackgroundDetector.h>
+#include <tracking/trackFindingCDC/findlets/minimal/BadBoardADCDetector.h>
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
@@ -60,6 +61,9 @@ namespace Belle2 {
 
       /// Marks higher order loops as background for tuning analysis
       WireHitMCMultiLoopBlocker m_wireHitMCMultiLoopBlocker;
+
+      /// Detect boards with bad ADC values
+      BadBoardADCDetector m_badBoardADCDetector;
     };
   }
 }

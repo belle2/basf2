@@ -211,6 +211,8 @@
       SpacePoints=PXDSpacePoints
   26. TFCDC_WireHitPreparer
       UseNLoops=inf
+      badADCaverageMin=1000
+      badTOTaverageMin=15
       blockNegativeDriftLength=False
       deviationFromMedianTDCinASIC=10.0
       filter=mva

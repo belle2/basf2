@@ -37,6 +37,7 @@
       timeCut1maxEnergy=99.999
       timeCut2=99999.0
       timeCut2maxEnergy=0.0
+      useParametersFromDatabase=True
   7. ECLLocalMaximumFinder
       cutOffset=2.5
       cutRatioCorrection=0.0
@@ -46,6 +47,7 @@
       method=none
       outfileName=ECLLocalMaximumFinderOutput.root
       truthFraction=0.51
+      useParametersFromDatabase=True
   8. ECLSplitterN1
       cutDigitEnergyForEnergy=0.0005
       cutDigitTimeResidualForEnergy=5.0
@@ -1193,13 +1195,8 @@
       indexOfFlippingMVA=2
       recoTracksStoreArrayName=RecoTracks
   97. FlippedRecoTracksMerger
-      bklmHitsStoreArrayName=
-      cdcHitsStoreArrayName=
-      eklmHitsStoreArrayName=
       inputStoreArrayName=RecoTracks
       inputStoreArrayNameFlipped=RecoTracks_flipped
-      pxdHitsStoreArrayName=
-      svdHitsStoreArrayName=
   98. V0Finder
       CopiedRecoTracks=CopiedRecoTracks
       RecoTracks=RecoTracks
@@ -1283,9 +1280,6 @@
   107. Sum_Postfilter_Tracking
   108. CDCDedxHitSaver
   109. CDCDedxPIDCreator
-      dedxTracksName=
-      enableDebugOutput=True
-      likelihoodsName=
       removeHighest=0.25
       removeLowest=0.05
       trackLevel=True

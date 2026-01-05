@@ -51,7 +51,7 @@ namespace Belle2 {
 
       /// Find only the leave with the highest weight = number of items
       std::vector<std::pair<HoughBox, std::vector<AHitPtr>>>
-      findSingleBest(const Weight& minWeight)
+      findSingleBest(const TrackingUtilities::Weight& minWeight)
       {
         AInBoxAlgorithm inBoxAlgorithm;
         auto skipLowWeightNode = [minWeight](const typename Super::Node * node) {

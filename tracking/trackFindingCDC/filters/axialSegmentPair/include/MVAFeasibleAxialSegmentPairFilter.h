@@ -12,24 +12,24 @@
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/BasicAxialSegmentPairVarSet.h>
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/HitGapAxialSegmentPairVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    extern template class TrackFindingCDC::MVA<BaseAxialSegmentPairFilter>;
+    // extern template class TrackingUtilities::MVA<BaseAxialSegmentPairFilter>;
 
     /// Filter for the construction of segment pairs based on simple criteria without the common fit.
-    class MVAFeasibleAxialSegmentPairFilter : public MVA<BaseAxialSegmentPairFilter> {
+    class MVAFeasibleAxialSegmentPairFilter : public TrackingUtilities::MVA<BaseAxialSegmentPairFilter> {
 
     private:
       /// Type of the base class
-      using Super = MVA<BaseAxialSegmentPairFilter>;
+      using Super = TrackingUtilities::MVA<BaseAxialSegmentPairFilter>;
 
-      /// Type of the VarSet the filter is working on
-      using VarSet = VariadicUnionVarSet<BasicAxialSegmentPairVarSet, HitGapAxialSegmentPairVarSet>;
+      /// Type of the TrackingUtilities::VarSet the filter is working on
+      using VarSet = TrackingUtilities::VariadicUnionVarSet<BasicAxialSegmentPairVarSet, HitGapAxialSegmentPairVarSet>;
 
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.

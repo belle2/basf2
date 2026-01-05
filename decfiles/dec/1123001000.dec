@@ -1,0 +1,22 @@
+# EventType: 1123001000
+# Descriptor: Y(4S)-> anti-B0(-> D*0 gamma)B0
+# NickName: Bd_Dst0gamma
+# Documentation: Signal MC of anti-B0 -> D*0 gamma
+# Tested: Yes
+# Responsible: Nihar Pawar
+# Email: ph24resch11018@iith.ac.in
+# PhysicsWG: EWP
+# Cuts: None
+# Date: 10/10/2025
+
+
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0	             	VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0 anti-D*0 gamma SVP_HELAMP 1.0 0.0 1.0 0.0;
+Enddecay
+CDecay anti-B0sig
+
+End

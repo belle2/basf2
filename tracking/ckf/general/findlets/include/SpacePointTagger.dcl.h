@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <set>
 #include <vector>
@@ -19,9 +19,9 @@ namespace Belle2 {
 
   /// Findlet for tagging all space points in the results vector as used
   template <class AResult, class ACluster>
-  class SpacePointTagger : public TrackFindingCDC::Findlet<const AResult, const SpacePoint* const> {
+  class SpacePointTagger : public TrackingUtilities::Findlet<const AResult, const SpacePoint* const> {
     /// The parent class
-    using Super = TrackFindingCDC::Findlet<const AResult, const SpacePoint* const>;
+    using Super = TrackingUtilities::Findlet<const AResult, const SpacePoint* const>;
 
   public:
     /// Clear the used clusters

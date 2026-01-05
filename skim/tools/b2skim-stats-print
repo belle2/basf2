@@ -157,10 +157,10 @@ def getArgumentParser():
 
     SampleGroup = parser.add_mutually_exclusive_group()
     SampleGroup.add_argument(
-        "--mconly", action="store_true", help="Test on only MC samples."
+        "--mc-only", action="store_true", help="Test on only MC samples."
     )
     SampleGroup.add_argument(
-        "--dataonly", action="store_true", help="Test on only data samples."
+        "--data-only", action="store_true", help="Test on only data samples."
     )
 
     parser.add_argument(
@@ -186,8 +186,14 @@ def getArgumentParser():
 
 def get_metadata(*, TestingCombined=False):
     LogDirectory = Path("log") / ("combined" if TestingCombined else "single")
-    with open(LogDirectory / "metadata.json") as MetadataFile:
-        metadata = json.load(MetadataFile)
+    try:
+        with open(LogDirectory / "metadata.json") as MetadataFile:
+            metadata = json.load(MetadataFile)
+    except FileNotFoundError as e:
+        raise SkimNotRunException(
+            f"    Failed to open {LogDirectory} / metadata.json.\n"
+            +"    Perhaps you forgot to run ``b2skim-stats-submit`` first to create it?"
+        ) from e
     return metadata
 
 
@@ -217,7 +223,7 @@ def getLogFile(skim, sample, TestingCombined):
         raise SkimNotRunException(
             f"    Failed to open output log file for {skim} skim on {sample} sample.\n"
             "    Perhaps you forgot to run the skim with ``b2skim-stats-submit``?"
-        )
+        ) 
 
     if not testLogFile(logFileContents):
         raise SkimNotRunException(
@@ -934,10 +940,10 @@ def fillSkimStatsDict(
             for statName, statSpec in statSpecifier.items():
                 statFunction = statSpec["Calculate"]
 
-                if statName in ["cpuTime","averageCandidateMultiplicity","memoryAverage","memoryMaximum"]:
-                    statFunctionArgs=[skim, sample, TestingCombined]
+                if statName in ["cpuTime", "averageCandidateMultiplicity", "memoryAverage", "memoryMaximum"]:
+                    statFunctionArgs = [skim, sample, TestingCombined]
                 else:
-                    statFunctionArgs=[skim, sample, TestingCombined, flagged]
+                    statFunctionArgs = [skim, sample, TestingCombined, flagged]
 
                 try:
                     allSkimStats[skim][statName][sample.encodeable_name] = statFunction(*statFunctionArgs)
@@ -1321,9 +1327,9 @@ if __name__ == "__main__":
 
     # Get list of test samples from b2skim-stats-submit output metadata.json
     samples = TestSampleList(SampleDict=metadata["Samples"])
-    if args.mconly:
+    if args.mc_only:
         samples = TestSampleList(SampleList=samples.mc_samples)
-    if args.dataonly:
+    if args.data_only:
         samples = TestSampleList(SampleList=samples.data_samples)
 
     statSpecifier = getStatSpecifier()
@@ -1337,7 +1343,7 @@ if __name__ == "__main__":
     )
 
     # NOTE: can't calculate weighted MC averages for combined skims, since certain stats are lists
-    if not args.dataonly and not args.combined:
+    if not args.data_only and not args.combined:
         allSkimStats = addWeightedMC(allSkimStats, statSpecifier, samples, args.VERBOSE)
 
     if args.confluence:

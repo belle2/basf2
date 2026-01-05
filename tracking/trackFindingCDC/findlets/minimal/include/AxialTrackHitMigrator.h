@@ -7,24 +7,27 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
 
+  namespace TrackingUtilities {
+    class CDCTrack;
+    class CDCWireHit;
+  }
 
   namespace TrackFindingCDC {
-    class CDCWireHit;
-    class CDCTrack;
 
     /// Exchanges hits between axial tracks based on their distance to the respective trajectory.
-    class AxialTrackHitMigrator : public Findlet<const CDCWireHit* const, CDCTrack> {
+    class AxialTrackHitMigrator : public
+      TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit* const, TrackingUtilities::CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHit* const, CDCTrack>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit* const, TrackingUtilities::CDCTrack>;
 
     public:
       /// Short description of the findlet
@@ -34,8 +37,8 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Do the hit migration
-      void apply(const std::vector<const CDCWireHit*>& axialWireHits,
-                 std::vector<CDCTrack>& axialTracks) final;
+      void apply(const std::vector<const TrackingUtilities::CDCWireHit*>& axialWireHits,
+                 std::vector<TrackingUtilities::CDCTrack>& axialTracks) final;
 
     private:
       /// Parameter : Distance for a hit to be removed

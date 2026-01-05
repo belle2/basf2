@@ -217,6 +217,7 @@
       timeCut1maxEnergy=99.999
       timeCut2=99999.0
       timeCut2maxEnergy=0.0
+      useParametersFromDatabase=True
   38. ECLLocalMaximumFinder
       cutOffset=2.5
       cutRatioCorrection=0.0
@@ -226,6 +227,7 @@
       method=none
       outfileName=ECLLocalMaximumFinderOutput.root
       truthFraction=0.51
+      useParametersFromDatabase=True
   39. ECLSplitterN1
       cutDigitEnergyForEnergy=0.0005
       cutDigitTimeResidualForEnergy=5.0
@@ -1318,9 +1320,6 @@
   145. Sum_Postfilter_Tracking
   146. CDCDedxHitSaver
   147. CDCDedxPIDCreator
-      dedxTracksName=
-      enableDebugOutput=True
-      likelihoodsName=
       removeHighest=0.25
       removeLowest=0.05
       trackLevel=True
@@ -3122,6 +3121,7 @@
       timeCut1maxEnergy=99.999
       timeCut2=99999.0
       timeCut2maxEnergy=0.0
+      useParametersFromDatabase=True
   38. ECLLocalMaximumFinder
       cutOffset=2.5
       cutRatioCorrection=0.0
@@ -3131,6 +3131,7 @@
       method=none
       outfileName=ECLLocalMaximumFinderOutput.root
       truthFraction=0.51
+      useParametersFromDatabase=True
   39. ECLSplitterN1
       cutDigitEnergyForEnergy=0.0005
       cutDigitTimeResidualForEnergy=5.0
@@ -4240,9 +4241,6 @@
         7. Sum_Postfilter_Tracking
         8. CDCDedxHitSaver
         9. CDCDedxPIDCreator
-            dedxTracksName=
-            enableDebugOutput=True
-            likelihoodsName=
             removeHighest=0.25
             removeLowest=0.05
             trackLevel=True

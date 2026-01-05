@@ -9,12 +9,12 @@
 #include <tracking/vxdHoughTracking/findlets/RawTrackCandCleaner.icc.h>
 #include <tracking/vxdHoughTracking/utilities/SVDHoughTrackingHelpers.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 using namespace vxdHoughTracking;
 
 SVDHoughTracking::~SVDHoughTracking() = default;
@@ -35,10 +35,10 @@ void SVDHoughTracking::exposeParameters(ModuleParamList* moduleParamList, const 
   Super::exposeParameters(moduleParamList, prefix);
 
   m_spacePointLoaderAndPreparer.exposeParameters(moduleParamList, prefix);
-  m_multiHouthSpaceInterceptFinder.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "multi"));
+  m_multiHouthSpaceInterceptFinder.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "multi"));
   m_singleHouthSpaceInterceptFinder.exposeParameters(moduleParamList, prefix);
   m_rawTCCleaner.exposeParameters(moduleParamList, prefix);
-  m_overlapResolver.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "finalOverlapResolver"));
+  m_overlapResolver.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "finalOverlapResolver"));
   m_recoTrackStorer.exposeParameters(moduleParamList, prefix);
   m_roiFinder.exposeParameters(moduleParamList, prefix);
 
@@ -48,7 +48,7 @@ void SVDHoughTracking::exposeParameters(ModuleParamList* moduleParamList, const 
   moduleParamList->getParameter<std::string>("fourHitFilter").setDefaultValue("qualityIndicator");
   moduleParamList->getParameter<std::string>("fiveHitFilter").setDefaultValue("qualityIndicator");
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useMultiHoughSpaceInterceptFinding"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "useMultiHoughSpaceInterceptFinding"),
                                 m_useMultiHoughSpaceInterceptFinding,
                                 "Use Hough spaces working on a subset of hits (=true), or just one Hough space working on all hits at the same time (=false)?",
                                 m_useMultiHoughSpaceInterceptFinding);

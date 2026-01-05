@@ -7,10 +7,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segment/BasicSegmentVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool BasicSegmentVarSet::extract(const CDCSegment2D* ptrSegment2D)
 {

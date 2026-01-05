@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -25,8 +25,8 @@ namespace Belle2 {
 
       /// Redirect the first element of a pair to the next algorithm.
       template<class APairObject>
-      Weight operator()(const APairObject& pairObject,
-                        const HoughBox* box)
+      TrackingUtilities::Weight operator()(const APairObject& pairObject,
+                                           const HoughBox* box)
       {
         AHitInBoxAlgorithm hitInBoxAlgorithm;
         return hitInBoxAlgorithm(pairObject.first, box);

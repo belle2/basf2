@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/display/Mapping.h>
 
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+#include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
 
 #include <map>
 #include <vector>
@@ -18,9 +18,11 @@
 namespace Belle2 {
   class CDCHit;
 
-  namespace TrackFindingCDC {
-
+  namespace TrackingUtilities {
     class CDCWireHit;
+  }
+
+  namespace TrackFindingCDC {
 
     /// CDCHit to stroke width map highlighting the CDCHits with 0 drift length.
     class ZeroDriftLengthStrokeWidthMap : public Mapping<const CDCHit> {
@@ -50,7 +52,7 @@ namespace Belle2 {
 
     private:
       /// Memory of the handle to the CDCWireHits on the DataStore.
-      StoreWrappedObjPtr<std::vector<CDCWireHit> > m_storedWireHits{"CDCWireHitVector"};
+      TrackingUtilities::StoreWrappedObjPtr<std::vector<TrackingUtilities::CDCWireHit> > m_storedWireHits{"CDCWireHitVector"};
     };
 
     /// CDCHit to color map by their local right left passage information from Monte Carlo truth

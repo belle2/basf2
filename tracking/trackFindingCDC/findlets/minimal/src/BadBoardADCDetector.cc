@@ -7,10 +7,9 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/BadBoardADCDetector.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
@@ -31,17 +30,17 @@ std::string BadBoardADCDetector::getDescription()
 void BadBoardADCDetector::exposeParameters(ModuleParamList* moduleParamList,
                                            const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "badADCaverageMin"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "badADCaverageMin"),
                                 m_badADCaverageMin,
                                 "Minimal value of average ADC to consider board bad",
                                 m_badADCaverageMin);
-  moduleParamList->addParameter(prefixed(prefix, "badTOTaverageMin"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "badTOTaverageMin"),
                                 m_badTOTaverageMin,
                                 "Minimal value of average TOT to consider board bad",
                                 m_badTOTaverageMin);
 }
 
-void BadBoardADCDetector::apply(std::vector<CDCWireHit>& wireHits)
+void BadBoardADCDetector::apply(std::vector<TrackingUtilities::CDCWireHit>& wireHits)
 {
   CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
   // first loop: average ADC per board

@@ -66,11 +66,10 @@ namespace Belle2 {
     StoreArray<BKLMHit1d> m_BklmHit1ds; /**< BKLM hit 1D*/
     StoreArray<KLMDigit> m_KLMDigits; /**< KLM digits*/
     const EKLMElementNumbers* m_eklmElementNumbers; /**< EKLM Element numbers. */
-    // KLM Background Triggers bits of Interest
     const TRGSummary::ETimingType m_klmBackTriggers[3] = {TRGSummary::ETimingType::TTYP_RAND,
                                                           TRGSummary::ETimingType::TTYP_POIS,
                                                           TRGSummary::ETimingType::TTYP_DPHY
-                                                         };
+                                                         }; /**< Background Triggers bits of Interest */
 
     //ARICH stuff
     StoreArray<ARICHHit>m_ARICHHits; /**< ARICH hits*/

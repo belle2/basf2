@@ -148,6 +148,12 @@ namespace Belle2 {
     /** efficiency ratio (run-)stop threshold **/
     float m_stopThr = 0;
 
+    /** z-score threshold for inefficient layers **/
+    double m_zThreshold = 0;
+
+    /** uncertainty threshold for low statistics **/
+    double m_errorThreshold = 0;
+
     /** efficiency ratio min z scale **/
     float m_min = 0;
 

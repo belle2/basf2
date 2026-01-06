@@ -36,6 +36,8 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   addParam("RunStopThreshold", m_stopThr, "Set stop threshold", float(0.20));
   addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0.5));
   addParam("WarnThreshold", m_warnThr, "Set warn threshold", float(0.92));
+  addParam("ZThreshold", m_zThreshold, "Set Z-score threshold for inefficient layers ", -1.5);
+  addParam("ErrorThreshold", m_errorThreshold, "Set uncertainty threshold for low statistics", 0.05);
   addParam("Min2DEff", m_min, "2D efficiency min", float(0.5));
   addParam("Max2DEff", m_max, "2D efficiency max", float(2));
   addParam("RatioPlot", m_ratio, "2D efficiency ratio or difference plot ", bool(true));
@@ -60,6 +62,7 @@ void DQMHistAnalysisKLM2Module::initialize()
   registerEpicsPV("KLM:Eff:nEffBKLMLayers", "nEffBKLMLayers");
   registerEpicsPV("KLM:Eff:nEffEKLMLayers", "nEffEKLMLayers");
   registerEpicsPV("KLM:Eff:2DEffSettings", "2DEffSettings");
+  registerEpicsPV("KLM:Eff:2DAlarmSettings", "2DAlarmSettings");
 
   gROOT->cd();
   m_c_eff_bklm = new TCanvas((m_histogramDirectoryName + "/c_eff_bklm_plane").data());
@@ -224,6 +227,7 @@ void DQMHistAnalysisKLM2Module::beginRun()
   double unused = NAN;
   //ratio/diff mode should only be possible if references exist
   // values for LOLO, LOW & High error are used for (run-)stopThr, alarmThr and warnThr settings
+  // value of HIHI is used for zThreshold settings
   // default values should be initially defined in input parameters?
   double tempStop = (double) m_stopThr;
   double tempAlarm = (double) m_alarmThr;
@@ -249,6 +253,8 @@ void DQMHistAnalysisKLM2Module::beginRun()
   m_EKLMLayerWarn = 5;
   requestLimitsFromEpicsPVs("nEffBKLMLayers", unused, unused, unused, m_BKLMLayerWarn);
   requestLimitsFromEpicsPVs("nEffEKLMLayers", unused, unused, unused, m_EKLMLayerWarn);
+
+  requestLimitsFromEpicsPVs("2DAlarmSettings", m_minEntries, m_errorThreshold, m_zThreshold, unused);
 
 }
 
@@ -416,9 +422,6 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   float refErr;
   float maxVal = m_max;
   float minVal = m_min;
-  float alarmThr = m_alarmThr;
-  float warnThr = m_warnThr;
-  float stopThr = m_stopThr;
   float eff2dVal;
   bool setAlarm = false;
   bool setWarn = false;
@@ -460,8 +463,17 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         double Z        = 0.0;
         if (ratioPlot) {
           eff2dVal = mainEff / refEff;
+          // Calculate uncertainty on the ratio
+          sigmaR = eff2dVal * sqrt(pow(mainErr / mainEff, 2) + pow(refErr  / refEff,  2));
+
+          // Z-score: how many sigma is the ratio from the warning threshold
+          if (sigmaR > 0) {
+            Z = (eff2dVal - m_warnThr) / sigmaR;  // ideal-case w'd be warnThr is 1, so Z = (R - 1) / sigmaR
+          }
         } else {
-          eff2dVal = (mainEff - refEff) / pow(pow(mainErr, 2) + pow(refErr, 2), 0.5);
+          sigmaR  = pow(pow(mainErr, 2) + pow(refErr, 2), 0.5);
+          eff2dVal = (mainEff - refEff);
+          Z = eff2dVal / sigmaR;
         }
 
         // main histogram
@@ -476,27 +488,23 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
           eff2dHist->SetBinContent(binx + 1, biny + 1, minVal);
         }
 
-        // propagated statistical error on efficiency ratio
-        sigmaR = eff2dVal * std::sqrt(
-                   std::pow(mainErr / mainEff, 2) +
-                   std::pow(refErr  / refEff,  2)
-                 );
-        // significance wrt warning threshold
-        if (sigmaR > 0) {
-          Z = (eff2dVal - warnThr) / sigmaR;
-        }
         // set alarm
-        if (mainEntries < (int)m_minEntries
-            || sigmaR / eff2dVal > 0.05) { // this uncertainty cut is 5% which is becomes imp to deal with low stat
+        if (mainEntries < (int)m_minEntries) {
+          setFew = true;
+        } else if (ratioPlot && sigmaR / eff2dVal > m_errorThreshold) {
+          // For ratio mode: relative uncertainty
+          setFew = true;
+        } else if (!ratioPlot && sigmaR > m_errorThreshold) {
+          // For difference mode: absolute uncertainty
           setFew = true;
         } else {
-          if (eff2dVal < warnThr && Z < -1.5) {
+          if (eff2dVal < m_warnThr && Z < m_zThreshold) {
             pvcount += 1;
             errHist->SetBinContent(binx + 1, biny + 1, sigmaR);
-            if ((eff2dVal <= alarmThr && Z < -2.5) && (eff2dVal >= stopThr && Z > -5.0)) {
+            if ((eff2dVal <= m_alarmThr && Z < m_zThreshold - 1.0) && (eff2dVal >= m_stopThr && Z > m_zThreshold - 4.0)) {
               setWarn = true;
               layercount++;                  // Increment layercount when alarm condition is met
-            } else if (eff2dVal < stopThr && Z <= -5.0) {
+            } else if (eff2dVal < m_stopThr && Z <= m_zThreshold - 4.0) {
               setAlarm = true;
               layercount++;                  // Increment layercount when a stop condition is met
             }

@@ -61,7 +61,7 @@ config.update({  # Input lists
         'countInList(gamma:tflat)/8',
         'countInList(pi+:tflat)/6',
         'NumberOfKShortsInRoe',
-        'ptTracksRoe('+maskName+')',
+        f'ptTracksRoe({maskName})',
     ],
 })
 
@@ -94,4 +94,10 @@ config.update({  # Training parameters
     'epochs': 200,
     'train_valid_fraction': .92,
     'chunk_size': 10240  # Should be multiple of batch size
+})
+
+config.update({  # Miscellaneous parameters
+    'VersionBeamBackgroundMVA': 'MC15ri',
+    'VersionFakePhotonMVA': 'MC15ri',
+
 })

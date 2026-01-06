@@ -36,7 +36,7 @@ if __name__ == '__main__':
     Samples a chunk of training data for TFlat
     '''
     b2.set_log_level(b2.LogLevel.ERROR)
-    b2.conditions.prepend_globaltag('analysis_tools_light-2501-betelgeuse')
+    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
     path = b2.Path()
 
     ma.inputMdstList(environmentType="default", filelist='', path=path)

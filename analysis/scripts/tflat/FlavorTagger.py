@@ -25,7 +25,7 @@ def fill_particle_lists(maskName='TFLATDefaultMask', path=None):
     """
 
     # create particle list with pions
-    trk_cut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and p >= 0'
+    trk_cut = f'isInRestOfEvent > 0.5 and passesROEMask({maskName}) > 0.5 and p >= 0'
     ma.fillParticleList('pi+:tflat', trk_cut, path=path)
 
     # create particle list with gammas
@@ -36,13 +36,13 @@ def fill_particle_lists(maskName='TFLATDefaultMask', path=None):
         "",
         path=path,
     )
-    ma.getBeamBackgroundProbability("gamma:all", "MC15ri", path=path)
-    ma.getFakePhotonProbability("gamma:all", "MC15ri", path=path)
+    ma.getBeamBackgroundProbability("gamma:all", config['VersionBeamBackgroundMVA'], path=path)
+    ma.getFakePhotonProbability("gamma:all", config['VersionFakePhotonMVA'], path=path)
 
     stdPhotons(listtype='tight',  path=path)
 
-    gamma_cut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + \
-        ') > 0.5 and beamBackgroundSuppression > 0.4 and fakePhotonSuppression > 0.3'
+    gamma_cut = f'isInRestOfEvent > 0.5 and passesROEMask({maskName}) > 0.5 \
+        and beamBackgroundSuppression > 0.4 and fakePhotonSuppression > 0.3'
     ma.cutAndCopyList('gamma:tflat', 'gamma:tight', gamma_cut, path=path)
 
     ma.reconstructDecay('K_S0:inRoe -> pi+:tflat pi-:tflat', '0.40<=M<=0.60', False, path=path)
@@ -117,7 +117,7 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
         # filter rest of events only for specific particle list
         ma.signalSideParticleListsFilter(
             particleLists,
-            'nROE_Charged(' + maskName + ', 0) > 0 and abs(qrCombined) == 1',
+            f'nROE_Charged({maskName}, 0) > 0 and abs(qrCombined) == 1',
             roe_path,
             dead_end_path)
 
@@ -146,12 +146,11 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
         # filter rest of events only for specific particle list
         ma.signalSideParticleListsFilter(
             particleLists,
-            'nROE_Charged(' + maskName + ', 0) > 0',
+            f'nROE_Charged({maskName}, 0) > 0',
             roe_path,
             dead_end_path)
 
-        flavorTaggerInfoBuilder = basf2.register_module('FlavorTaggerInfoBuilder')
-        path.add_module(flavorTaggerInfoBuilder)
+        path.add_module('FlavorTaggerInfoBuilder')
 
         fill_particle_lists(maskName, roe_path)
 

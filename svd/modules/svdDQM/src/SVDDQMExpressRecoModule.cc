@@ -11,6 +11,7 @@
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>
@@ -821,6 +822,8 @@ void SVDDQMExpressRecoModule::initialize()
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
+  m_rawTTD.isOptional();
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() != 0) {
     //Register collections
@@ -874,13 +877,18 @@ void SVDDQMExpressRecoModule::event()
     const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
     if (!eventAccepted) return;
   }
-  m_nEvents->Fill(0);
 
   int nSamples = 0;
   if (m_svdEventInfo.isValid())
     nSamples = m_svdEventInfo->getNSamples();
   else
     return;
+
+  // checking empty events
+  if (!m_rawTTD.isValid() || !m_rawTTD.getEntries())
+    return;
+
+  m_nEvents->Fill(0);
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;

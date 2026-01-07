@@ -10,6 +10,7 @@
 
 #include <framework/core/HistoModule.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <mdst/dataobjects/TRGSummary.h>
@@ -24,6 +25,7 @@
 #include "TH2F.h"
 
 namespace Belle2 {
+  class RawFTSW;
 
   /** SVD DQM Module for Express Reco */
   class SVDDQMExpressRecoModule : public HistoModule {  // <- derived from HistoModule class
@@ -67,6 +69,9 @@ namespace Belle2 {
 
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
+
+    /** Input: DAQ status. Has timing and injection info. */
+    StoreArray<RawFTSW> m_rawTTD;
 
     /** if true skip events rejected by HLT */
     bool m_skipRejectedEvents = false;

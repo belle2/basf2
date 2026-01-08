@@ -42,16 +42,20 @@ def check_components(components):
 
 def is_detector_present(component: str, components: list[str] | None = None) -> bool:
     """
-    Check whether a detector component is contained in the list of components
-    AND if it is an allowed component.
+    Check whether a detector component is contained in the list of components AND if it is an allowed component.
+
+    Returns True, if components is None, or if the component is contained in the list of components and if the component is allowed,
+    else, returns False.
 
     Parameters:
     :param component (str): Detector componet
-    :param components (list(str)): List of geometry components.
+    :param components (list(str)): List of geometry components present in the current setting.
     :returns Bool indicating whether the detector component is contained and valid.
         Returning True if the components list is None.
     """
+
     if (components is None) or ((component in components) and (component in ALLOWED_COMPONENTS)):
         return True
 
+    basf2.BINFO(f"Component {component} is not present in list of components.")
     return False

@@ -140,16 +140,19 @@ namespace Belle2 {
     const EKLMElementNumbers* m_EklmElementNumbers;
 
     /** efficiency ratio warning threshold **/
-    float m_warnThr = 0;
+    double m_warnThr = 0.0;
 
     /** efficiency ratio alarm threshold **/
-    float m_alarmThr = 0;
+    double m_alarmThr = 0.0;
 
     /** efficiency ratio (run-)stop threshold **/
-    float m_stopThr = 0;
+    double m_stopThr = 0.0;
 
     /** z-score threshold for inefficient layers **/
     double m_zThreshold = 0;
+
+    /** efficiency threshold for z-score calculation **/
+    double m_zEffThreshold = 0;
 
     /** uncertainty threshold for low statistics **/
     double m_errorThreshold = 0;

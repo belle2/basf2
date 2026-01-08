@@ -1,0 +1,40 @@
+# EventType: 2830843040
+# Descriptor: [e+e- -> (omega -> pi- pi+ (pi0 -> gamma gamma)) (chi_c1 -> (J/psi -> mu+ mu- / e+ e-) gamma)]
+# NickName: ee_omega_chi_c1
+# Documentation: Study of ee -> omega chi_c1
+# Tested: Yes
+# PhysicsWG: Quarkonium
+# Responsible: Yijia Chen
+# Email: 2411020002@m.fudan.edu.cn
+# Cuts: None
+# Date: 20260105
+#
+#
+
+Alias myJ/psi J/psi
+Alias mychic1 chi_c1
+
+Decay vpho
+1.0   omega       mychic1     PHSP;
+Enddecay
+#
+Decay omega
+1.0   pi-  pi+  pi0          OMEGA_DALITZ; 
+Enddecay
+#
+Decay mychic1
+1.0   myJ/psi       gamma      VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+#
+
+Decay pi0
+1.0  gamma           gamma        PHSP;
+Enddecay
+
+
+Decay myJ/psi
+0.5   mu+  mu-               PHOTOS   VLL;
+0.5   e+   e-                PHOTOS   VLL;
+Enddecay
+#
+End

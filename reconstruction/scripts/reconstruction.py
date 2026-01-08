@@ -651,8 +651,8 @@ def add_cdst_output(path,
     """
     This function adds the `RootOutput` module to a path with the settings needed to produce a cDST output.
     The actual cDST output content depends on the value of the parameter `mc`:
-    * if `mc` is `False` (default setting), the cDST content is raw + tracking dataobjects;
-    * if `mc` is `True`, the cDST content is digits + MCParticles + tracking dataobjects.
+    * if `mc` is `False`, the cDST content is raw + tracking dataobjects;
+    * if `mc` is `True` (default setting), the cDST content is digits + MCParticles + tracking dataobjects.
 
     @param path Path to add modules to.
     @param mc Define the type of cDST output content: `False` for raw + tracking dataobjects, `True` for digits +

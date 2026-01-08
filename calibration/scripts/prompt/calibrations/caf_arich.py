@@ -82,6 +82,13 @@ def get_calibrations(input_data, **kwargs):
     from ROOT.Belle2 import ARICHChannelMaskMaker
 
     alg_arich = ARICHChannelMaskMaker()
+    expert_config = kwargs.get("expert_config", {})
+    if "arich_min_frac" in expert_config:
+        alg_arich.setMinFrac(expert_config["arich_min_frac"])
+    if "arich_min_s2n" in expert_config:
+        alg_arich.setMinS2N(expert_config["arich_min_s2n"])
+    if "arich_min_hit_per_chn" in expert_config:
+        alg_arich.setMinHitPerChn(expert_config["arich_min_hit_per_chn"])
 
     ###################################################
     # Calibration setup

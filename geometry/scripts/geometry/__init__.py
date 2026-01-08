@@ -15,6 +15,9 @@ Functions related to building or using the simulation/reconstruction geometry
 import basf2
 
 
+ALLOWED_COMPONENTS = ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']
+
+
 def check_components(components):
     """
     Check list of geometry components. This function is used by the standard
@@ -32,7 +35,23 @@ def check_components(components):
 
     if components is None:
         return
-    allowed_components = ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']
     for component in components:
-        if not (component in allowed_components):
+        if not (component in ALLOWED_COMPONENTS):
             basf2.B2FATAL(f'Geometry component {component} is unknown or it cannot be used in standard scripts.')
+
+
+def is_detector_present(component: str, components: list[str] | None = None) -> bool:
+    """
+    Check whether a detector component is contained in the list of components
+    AND if it is an allowed component.
+
+    Parameters:
+    :param component (str): Detector componet
+    :param components (list(str)): List of geometry components.
+    :returns Bool indicating whether the detector component is contained and valid.
+        Returning True if the components list is None.
+    """
+    if (components is None) or ((component in components) and (component in ALLOWED_COMPONENTS)):
+        return True
+
+    return False

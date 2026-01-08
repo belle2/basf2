@@ -10,7 +10,7 @@
 
 
 from daqdqm.commondqm import add_common_dqm
-from geometry import is_detector_present, are_components_present
+from geometry import is_detector_present, are_detectors_present
 
 
 def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mode="dont_care", create_hlt_unit_histograms=False):
@@ -48,7 +48,7 @@ def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF', z0minCut=-9999, z0maxCut=9999, d0Cut=9999)
 
     # KLM2 (requires mu+ particle list from add_analysis_dqm)
-    if are_components_present(["KLM", "CDC"], components) and (dqm_mode in ["dont_care", "filtered"]):
+    if are_detectors_present(["KLM", "CDC"], components) and (dqm_mode in ["dont_care", "filtered"]):
         path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM',
                         MinimalMatchingDigits=14,
                         MinimalMatchingDigitsOuterLayers=4,

@@ -10,7 +10,7 @@
 
 import basf2 as b2
 
-from geometry import is_detector_present, are_components_present, is_any_detector_present
+from geometry import is_detector_present, are_detectors_present, is_any_detector_present
 
 # Many scripts import these functions from `tracking`, so leave these imports here
 from tracking.path_utils import (  # noqa
@@ -240,7 +240,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
     """
 
-    if not are_components_present(["SVD", "CDC"], components):
+    if not are_detectors_present(["SVD", "CDC"], components):
         return
 
     if (add_cdcTrack_QI or add_vxdTrack_QI or add_recoTrack_QI) and not fit_tracks:
@@ -508,7 +508,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         One known issue is a reduced hit efficiency when using the full chain.
         Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
     """
-    if not are_components_present(["SVD", "CDC"], components):
+    if not are_detectors_present(["SVD", "CDC"], components):
         return
 
     if use_ecl_to_cdc_ckf and not is_detector_present("CDC", components):
@@ -670,7 +670,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,
         reco_tracks_from_track_finding = "NonMergedRecoTracks"
 
     cdc_reco_tracks = "CDCRecoTracks"
-    if not are_components_present(["PXD", "SVD"], components):
+    if not are_detectors_present(["PXD", "SVD"], components):
         cdc_reco_tracks = reco_tracks_from_track_finding
 
     svd_cdc_reco_tracks = "SVDCDCRecoTracks"

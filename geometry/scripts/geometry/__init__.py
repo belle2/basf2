@@ -61,7 +61,7 @@ def is_detector_present(component: str, components: list[str] | None = None) -> 
     return False
 
 
-def are_components_present(components_to_check: list[str], components: list[str] | None = None) -> bool:
+def are_detectors_present(components_to_check: list[str], components: list[str] | None = None) -> bool:
     """
     Check whether all detectors in the list "components_to_check" are present in the list of components.
 

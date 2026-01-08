@@ -12,7 +12,7 @@ from pybasf2 import B2WARNING, B2FATAL
 from ROOT import Belle2  # noqa: make the Belle2 namespace available
 
 from basf2 import register_module
-from geometry import is_detector_present, are_components_present, is_any_detector_present
+from geometry import is_detector_present, are_detectors_present, is_any_detector_present
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, add_cosmics_pxd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
@@ -781,7 +781,7 @@ def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", 
     :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     """
-    if not are_components_present(["CDC", "ECL"], components):
+    if not are_detectors_present(["CDC", "ECL"], components):
         return
 
     ecl_cdc_reco_tracks = "ECLCDCRecoTracks"

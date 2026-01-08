@@ -14,7 +14,7 @@ os.environ['OMP_THREAD_LIMIT'] = "1"  # noqa
 
 import basf2
 
-from geometry import check_components, is_detector_present, are_components_present, is_any_detector_present
+from geometry import check_components, is_detector_present, are_detectors_present, is_any_detector_present
 
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
@@ -178,7 +178,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  switch_off_slow_modules_for_online=switch_off_slow_modules_for_online)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
-    if add_trigger_calculation and are_components_present(["CDC", "ECL", "KLM"], components):
+    if add_trigger_calculation and are_detectors_present(["CDC", "ECL", "KLM"], components):
         add_filter_software_trigger(path,
                                     use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
 
@@ -192,7 +192,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                   switch_off_slow_modules_for_online=switch_off_slow_modules_for_online)
 
     # Add the modules calculating the software trigger skims
-    if add_trigger_calculation and are_components_present(["CDC", "ECL", "KLM"], components):
+    if add_trigger_calculation and are_detectors_present(["CDC", "ECL", "KLM"], components):
         add_skim_software_trigger(path)
 
 
@@ -729,7 +729,7 @@ def add_cluster_expert_modules(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if are_components_present(["KLM", "ECL"], components):
+    if are_detectors_present(["KLM", "ECL"], components):
         path.add_module('KLMExpert')
         path.add_module('ClusterMatcher')
 
@@ -743,7 +743,7 @@ def add_pid_module(path, components=None, run_klm_dnn=True):
     :param run_klm_dnn: If True, add the ``KLMMuonIDDNNExpert`` module to the path.
         This flag is automatically set to false on HLT and ExpressReco.
     """
-    if are_components_present(["SVD", "CDC"], components):
+    if are_detectors_present(["SVD", "CDC"], components):
         path.add_module('MdstPID')
     if is_detector_present("KLM", components) and run_klm_dnn:
         path.add_module('KLMMuonIDDNNExpert')
@@ -782,7 +782,7 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
     :param components: The components to use or None to use all standard components.
     """
     # Muid is needed for muonID computation AND ECLCluster-Track matching.
-    if are_components_present(["CDC", "ECL", "KLM"], components):
+    if are_detectors_present(["CDC", "ECL", "KLM"], components):
         path.add_module('Muid',
                         addHitsToRecoTrack=add_hits_to_reco_track)
     if is_detector_present("CDC", components):

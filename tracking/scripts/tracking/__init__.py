@@ -324,7 +324,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     """
 
     # do not add any new modules if no tracking detectors are in the components
-    if components and not ('SVD' in components or 'CDC' in components):
+    if components and not is_any_detector_present(["SVD", "CDC"], components):
         return
 
     flip_and_refit_temporary_RecoTracks = "RecoTracks_flipped"

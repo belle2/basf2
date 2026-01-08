@@ -786,11 +786,11 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
         path.add_module('Muid',
                         addHitsToRecoTrack=add_hits_to_reco_track)
     if is_detector_present("CDC", components):
-        if ('ECL' not in components and 'KLM' in components):
+        if not is_detector_present("ECL", components) and is_detector_present("KLM", components):
             basf2.B2WARNING('You added KLM to the components list but not ECL: the module Muid, that is necessary '
                             'for correct muonID computation, will not be added to your reconstruction path. '
                             'Make sure that this is fine for your purposes, otherwise please include also ECL.')
-        if ('ECL' in components and 'KLM' not in components):
+        if is_detector_present("ECL", components) and not is_detector_present("KLM", components):
             basf2.B2WARNING('You added ECL to the components list but not KLM: the module Muid, that is necessary '
                             'for correct ECLCluster-Track matching, will not be added to your reconstruction path. '
                             ' Make sure that this is fine for your purposes, otherwise please include also KLM.')

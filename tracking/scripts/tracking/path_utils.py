@@ -12,7 +12,7 @@ from pybasf2 import B2WARNING, B2FATAL
 from ROOT import Belle2  # noqa: make the Belle2 namespace available
 
 from basf2 import register_module
-from geometry import is_detector_present, are_components_present
+from geometry import is_detector_present, are_components_present, is_any_detector_present
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, add_cosmics_pxd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
@@ -281,7 +281,7 @@ def add_prune_tracks(path, components=None, reco_tracks="RecoTracks"):
     """
 
     # do not add any pruning, if no tracking detectors are in the components
-    if components and not ('SVD' in components or 'CDC' in components):
+    if components and not is_any_detector_present(["SVD", "CDC"], components):
         return
 
     path.add_module('PruneRecoTracks', storeArrayName=reco_tracks).set_name("PruneRecoTracks " + reco_tracks)

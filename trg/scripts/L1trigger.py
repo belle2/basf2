@@ -9,6 +9,7 @@
 ##########################################################################
 
 from basf2 import B2INFO, B2FATAL
+from geometry import is_detector_present
 from cdctrigger import add_cdc_trigger
 from ecltrigger import add_ecl_trigger
 from klmtrigger import add_klm_trigger
@@ -77,11 +78,11 @@ def add_subdetector_tsim(
     @param components: List of subdetector components to be included in TSIM.
     '''
 
-    if ('CDC' in components):
+    if is_detector_present('CDC', components):
         add_cdc_trigger(path=path, SimulationMode=SimulationMode, shortTracks=shortTracks, thetaDef='avg', zDef='min')
-    if ('ECL' in components):
+    if is_detector_present('ECL', components):
         add_ecl_trigger(path=path)
-    if ('KLM' in components):
+    if is_detector_present('KLM', components):
         add_klm_trigger(path=path)
 
 

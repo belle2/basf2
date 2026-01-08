@@ -743,7 +743,7 @@ def add_pid_module(path, components=None, run_klm_dnn=True):
     :param run_klm_dnn: If True, add the ``KLMMuonIDDNNExpert`` module to the path.
         This flag is automatically set to false on HLT and ExpressReco.
     """
-    if are_detectors_present(["SVD", "CDC"], components):
+    if is_any_detector_present(["SVD", "CDC"], components):
         path.add_module('MdstPID')
     if is_detector_present("KLM", components) and run_klm_dnn:
         path.add_module('KLMMuonIDDNNExpert')

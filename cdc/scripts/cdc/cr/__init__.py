@@ -8,6 +8,7 @@
 import basf2 as b2
 from ROOT import Belle2
 import ROOT
+from geometry import is_detector_present
 from tracking.path_utils import add_cdc_cr_track_finding, add_cdc_track_finding
 
 # Propagation velocity of the light in the scinti.
@@ -162,13 +163,13 @@ def add_cdc_cr_simulation(path,
     #    path.add_module(RandomizeTrackTimeModule(8.0))
 
     # CDC digitization
-    if components is None or 'CDC' in components:
+    if is_detector_present("CDC", components):
         cdc_digitizer = b2.register_module('CDCDigitizer')
         cdc_digitizer.param("Output2ndHit", generate_2nd_cdc_hits)
         path.add_module(cdc_digitizer)
 
     # ECL digitization
-    if components is None or 'ECL' in components:
+    if is_detector_present("ECL", components):
         ecl_digitizer = b2.register_module('ECLDigitizer')
         if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)
@@ -355,7 +356,7 @@ def getDataPeriod(exp=0, run=0):
 
 def getPhiRotation():
     global globalPhi
-    return(globalPhi)
+    return (globalPhi)
 
 
 def getMapperAngle(exp=1, run=3118):

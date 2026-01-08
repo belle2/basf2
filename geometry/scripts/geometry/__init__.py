@@ -57,7 +57,7 @@ def is_detector_present(component: str, components: list[str] | None = None) -> 
     if (components is None) or ((component in components) and (component in ALLOWED_COMPONENTS)):
         return True
 
-    basf2.BINFO(f"Component {component} is not present in list of components.")
+    basf2.B2INFO(f"Component {component} is not present in list of components.")
     return False
 
 

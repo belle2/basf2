@@ -81,3 +81,25 @@ def are_components_present(components_to_check: list[str], components: list[str]
             return False
 
     return True
+
+
+def is_any_detector_present(components_to_check: list[str], components: list[str] | None = None) -> bool:
+    """
+    Check whether any detector in the list "components_to_check" is present in the list of components.
+
+    Returns True if any detector components in "components_to_check is contained in components, else, returns False.
+
+    Parameters:
+    :param components_to_check (list(str)): List of detector componets to be checked
+    :param components (list(str)): List of geometry components present in the current setting.
+    :returns Bool indicating whether all the detectors are contained
+    """
+
+    if components is None:
+        return True
+
+    for component in components_to_check:
+        if is_detector_present(component, components):
+            return True
+
+    return False

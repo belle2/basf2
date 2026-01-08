@@ -30,19 +30,25 @@ void ECLClusterRounderModule::initialize() { }
 void ECLClusterRounderModule::event()
 {
   B2DEBUG(20, "Rounding all Double32_t ECLCluster members to mdst precision...");
+  const double pi = 3.141592653589793238462643383279502884;
   for (int i = 0; i < m_eclclusters.getEntries(); i++) {
     ECLCluster* cluster = m_eclclusters[i];
 
     TMatrixDSym covMat = cluster->getCovarianceMatrix3x3();
     double matRounded[6] = {
-      roundToPrecision(covMat(0, 0), 0.0, 0.3, 10),
+      covMat(0, 0),
       roundToPrecision(covMat(1, 0), 0.0, 10.0, 12),
-      roundToPrecision(covMat(1, 1), 0.0, 0.05, 8),
+      covMat(1, 1),
       roundToPrecision(covMat(2, 0), 0.0, 10.0, 12),
       roundToPrecision(covMat(2, 1), 0.0, 10.0, 12),
-      roundToPrecision(covMat(2, 2), 0.0, 0.05, 8)
+      covMat(2, 2)
     };
     cluster->setCovarianceMatrix(matRounded);
+    // Set diagonal entries seperately to avoid sqrt after rounding
+    cluster->setUncertaintyEnergy(roundToPrecision(cluster->getUncertaintyEnergy(), 0.0, 0.3, 10));
+    cluster->setUncertaintyPhi(roundToPrecision(cluster->getUncertaintyPhi(), 0.0, 0.05, 8));
+    cluster->setUncertaintyTheta(roundToPrecision(cluster->getUncertaintyTheta(), 0.0, 0.05, 8));
+
     cluster->setdeltaL(roundToPrecision(cluster->getDeltaL(), -250.0, 250.0, 10));
     cluster->setMinTrkDistance(roundToPrecision(cluster->getMinTrkDistance(), 0.0, 250.0, 10));
     cluster->setAbsZernike40(roundToPrecision(cluster->getAbsZernike40(), 0.0, 1.7, 10));
@@ -55,9 +61,13 @@ void ECLClusterRounderModule::event()
     cluster->setNumberOfCrystals(roundToPrecision(cluster->getNumberOfCrystals(), 0.0, 200.0, 10));
     cluster->setTime(roundToPrecision(cluster->getTime(), -1000.0, 1000.0, 12));
     cluster->setDeltaTime99(roundToPrecision(cluster->getDeltaTime99(), 0.0, 1000.0, 12));
-    cluster->setTheta(roundToPrecision(cluster->getTheta(), 0.0, 3.14159265358979323846, 16));
-    cluster->setPhi(roundToPrecision(cluster->getPhi(), -3.14159265358979323846, 3.14159265358979323846, 16));
+    cluster->setTheta(roundToPrecision(cluster->getTheta(), 0.0, pi, 16));
+    cluster->setPhi(roundToPrecision(cluster->getPhi(), -pi, pi, 16));
     cluster->setR(roundToPrecision(cluster->getR(), 75.0, 300.0, 16));
+    cluster->setPulseShapeDiscriminationMVA(roundToPrecision(cluster->getPulseShapeDiscriminationMVA(), 0.0, 1.0, 18));
+    cluster->setNumberOfHadronDigits(roundToPrecision(cluster->getNumberOfHadronDigits(), 0.0, 255.0, 18));
+
+    // Behavior of getEnergy depends on cluster hypothesis
     if (!cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
       cluster->addHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       cluster->setLogEnergy(roundToPrecision(log(cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)), -5.0, 3.0, 18));
@@ -67,8 +77,6 @@ void ECLClusterRounderModule::event()
     }
     cluster->setLogEnergyRaw(roundToPrecision(log(cluster->getEnergyRaw()), -5.0, 3.0, 18));
     cluster->setLogEnergyHighestCrystal(roundToPrecision(log(cluster->getEnergyHighestCrystal()), -5.0, 3.0, 18));
-    cluster->setPulseShapeDiscriminationMVA(roundToPrecision(cluster->getPulseShapeDiscriminationMVA(), 0.0, 1.0, 18));
-    cluster->setNumberOfHadronDigits(roundToPrecision(cluster->getNumberOfHadronDigits(), 0.0, 255.0, 18));
   }
 }
 
@@ -81,6 +89,6 @@ double ECLClusterRounderModule::roundToPrecision(Double32_t value, double min, d
     B2FATAL("the number of mantissa bits for ECLCluster Double32_t rounding must be positive");
   }
   const double range = max - min;
-  const double step = range / (1 << nBits);
-  return min + std::round((std::clamp(value, min, max) - min) / step) * step;
+  const double scale = (1 << nBits) / range;
+  return min + std::lround((std::clamp(value, min, max) - min) * scale) / scale;
 }

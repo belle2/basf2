@@ -172,7 +172,7 @@ def add_simulation(
                 bkgmixer.param('components', components)
             path.add_module(bkgmixer)
             if usePXDGatedMode:
-                if components is None or 'PXD' in components:
+                if is_detector_present("PXD", components):
                     # PXD is sensitive to hits in interval -20us to +20us
                     bkgmixer.param('minTimePXD', -20000.0)
                     bkgmixer.param('maxTimePXD', 20000.0)

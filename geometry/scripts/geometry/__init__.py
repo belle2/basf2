@@ -59,3 +59,25 @@ def is_detector_present(component: str, components: list[str] | None = None) -> 
 
     basf2.BINFO(f"Component {component} is not present in list of components.")
     return False
+
+
+def are_components_present(components_to_check: list[str], components: list[str] | None = None) -> bool:
+    """
+    Check whether all detectors in the list "components_to_check" are present in the list of components.
+
+    Returns True if all detector components in "components_to_check are contained in components, else, returns False.
+
+    Parameters:
+    :param components_to_check (list(str)): List of detector componets to be checked
+    :param components (list(str)): List of geometry components present in the current setting.
+    :returns Bool indicating whether all the detectors are contained
+    """
+
+    if components is None:
+        return True
+
+    for component in components_to_check:
+        if not is_detector_present(component, components):
+            return False
+
+    return True

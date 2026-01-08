@@ -1264,71 +1264,57 @@ Returns the distance of the ECL cluster centroid from :math:`(0,0,0)`.
 
 )DOC","cm");
     REGISTER_VARIABLE("clusterPhi", eclClusterPhi, R"DOC(
-Returns ECL cluster's azimuthal angle :math:`\phi`
-(this is not generally equal to a photon azimuthal angle).
+Returns the azimuthal angle :math:`\phi` of the ECL cluster. This is generally not equal 
+to the azimuthal angle of the photon. 
 
-| The direction of a cluster is given by the connecting line of :math:`\,(0,0,0)\,` and
-  cluster centroid position in the ECL.
-| The cluster centroid position is calculated using up to 21 crystals (5x5 excluding corners)
-  after cluster energy splitting in the case of overlapping clusters.
-| The centroid position is the logarithmically weighted average of all crystals evaluated at
-  the crystal centers. Cluster centroids are generally biased towards the centers of the
-  highest energetic crystal. This effect is larger for low energetic photons.
-| Beam backgrounds slightly decrease the position resolution, mainly for low energetic photons.
+..topic::
 
-.. note::
-    Radius of a cluster is almost constant in the barrel and should not be used directly in any selection.
-
-Unlike for charged tracks, the uncertainty (covariance) of the photon directions is not determined
-based on individual cluster properties but taken from on MC-based parametrizations of the resolution
-as function of true photon energy, true photon direction and beam background level.
-
-.. warning::
-    Users must use the actual particle direction (done automatically in the modularAnalysis using the average
-    IP position (can be changed if needed)) and not the ECL Cluster direction (position in the ECL measured
-    from :math:`(0,0,0)`) for particle kinematics.
+    The direction of a cluster is given by the connecting line from :math:`\,(0,0,0)\,` to 
+    cluster centroid position in the ECL. The centroid position is calculated using up to 21 crystals 
+    (as 5x5 grid excluding corners) after the crystal energies are split in the case of overlapping clusters. 
+    The centroid position is the logarithmically weighted average of all crystals evaluated at the 
+    crystal centers. The centroid is generally biased towards the centers of the highest energetic 
+    crystal. This effect is larger for low energy photons. Beam backgrounds slightly decrease the 
+    position resolution, and mainly effects the low energy photons. 
+    
+    Unlike for charged tracks, the uncertainty (covariance) of the photon direction is not determined 
+    based on individual cluster properties but taken from MC-based parametrizations of the resolution 
+    as function of true photon energy, true photon direction and beam background level. 
 
 .. note::
     | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`-\pi`
-    | Upper limit: :math:`\pi`
-    | Precision: :math:`16` bit
+    | - Lower limit: :math:`-\pi`
+    | - Upper limit: :math:`\pi`
+    | - Precision: :math:`16` bit
 ..
 
 )DOC","rad");
     REGISTER_VARIABLE("clusterConnectedRegionID", eclClusterConnectedRegionID, R"DOC(
-Returns ECL cluster's connected region ID.
+Returns connected region ID for the ECL cluster. 
 )DOC");
     REGISTER_VARIABLE("clusterTheta", eclClusterTheta, R"DOC(
-Returns ECL cluster's polar angle :math:`\theta`
-(this is not generally equal to a photon polar angle).
+Returns the polar angle :math:`\theta` of the ECL cluster. This is generally not equal 
+to the polar angle of the photon. 
 
-| The direction of a cluster is given by the connecting line of :math:`\,(0,0,0)\,` and
-  cluster centroid position in the ECL.
-| The cluster centroid position is calculated using up to 21 crystals (5x5 excluding corners)
-  after cluster energy splitting in the case of overlapping clusters.
-| The centroid position is the logarithmically weighted average of all crystals evaluated at
-  the crystal centers. Cluster centroids are generally biased towards the centers of the
-  highest energetic crystal. This effect is larger for low energetic photons.
-| Beam backgrounds slightly decrease the position resolution, mainly for low energetic photons.
+..topic::
 
-.. note::
-    Radius of a cluster is almost constant in the barrel and should not be used directly in any selection.
-
-Unlike for charged tracks, the uncertainty (covariance) of the photon directions is not determined
-based on individual cluster properties but taken from on MC-based parametrizations of the resolution
-as function of true photon energy, true photon direction and beam background level.
-
-.. warning::
-    Users must use the actual particle direction (done automatically in the modularAnalysis using the average
-    IP position (can be changed if needed)) and not the ECL Cluster direction (position in the ECL measured
-    from :math:`(0,0,0)`) for particle kinematics.
+    The direction of a cluster is given by the connecting line from :math:`\,(0,0,0)\,` to 
+    cluster centroid position in the ECL. The centroid position is calculated using up to 21 crystals 
+    (as 5x5 grid excluding corners) after the crystal energies are split in the case of overlapping clusters. 
+    The centroid position is the logarithmically weighted average of all crystals evaluated at the 
+    crystal centers. The centroid is generally biased towards the centers of the highest energetic 
+    crystal. This effect is larger for low energy photons. Beam backgrounds slightly decrease the 
+    position resolution, and mainly effects the low energy photons. 
+    
+    Unlike for charged tracks, the uncertainty (covariance) of the photon direction is not determined 
+    based on individual cluster properties but taken from MC-based parametrizations of the resolution 
+    as function of true photon energy, true photon direction and beam background level. 
 
 .. note::
     | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`\pi`
-    | Precision: :math:`16` bit
+    | - Lower limit: :math:`0.0`
+    | - Upper limit: :math:`\pi`
+    | - Precision: :math:`16` bit
 ..
 
 )DOC","rad");
@@ -1345,9 +1331,9 @@ documentation for `clusterHasFailedTiming`). (For MC, the calibrations and corre
 
 .. note::
     | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`-1000.0`
-    | Upper limit: :math:`1000.0`
-    | Precision: :math:`12` bit
+    | - Lower limit: :math:`-1000.0`
+    | - Upper limit: :math:`1000.0`
+    | - Precision: :math:`12` bit
 ..
 
 **In Belle:**

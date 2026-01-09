@@ -26,9 +26,17 @@ void CDCWireHitVarSet::initialize()
 bool CDCWireHitVarSet::extract(const CDCWireHit* wireHit)
 {
   const auto* cdcHit = wireHit->getHit();
-  var<named("adc")>() = cdcHit->getADCCount();
-  var<named("tot")>() = cdcHit->getTOT();
   var<named("tdc")>() = cdcHit->getTDCCount();
   var<named("slayer")>() = cdcHit->getISuperLayer() == 0 ? 0 : 1;
+
+  if ((*wireHit)->hasBoardWithBadADCFlag())
+    var<named("adc")>() = 100; //reasonable value
+  else
+    var<named("adc")>() = cdcHit->getADCCount();
+
+  if ((*wireHit)->hasBoardWithBadTOTFlag())
+    var<named("tot")>() =  3; //reasonable value
+  else
+    var<named("tot")>() = cdcHit->getTOT();
   return true;
 }

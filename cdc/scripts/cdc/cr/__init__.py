@@ -356,7 +356,7 @@ def getDataPeriod(exp=0, run=0):
 
 def getPhiRotation():
     global globalPhi
-    return (globalPhi)
+    return globalPhi
 
 
 def getMapperAngle(exp=1, run=3118):

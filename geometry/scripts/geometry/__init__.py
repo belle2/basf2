@@ -42,7 +42,8 @@ def check_components(components):
 
 def is_detector_present(component: str, components: list[str] | None = None) -> bool:
     """
-    Check whether a detector component is contained in the list of components AND if it is an allowed component.
+    Check whether a detector component is contained in the list of components AND if it is an allowed component,
+    or if components is None.
 
     Returns True, if components is None, or if the component is contained in the list of components and if the component is allowed,
     else, returns False.
@@ -62,7 +63,8 @@ def is_detector_present(component: str, components: list[str] | None = None) -> 
 
 def are_detectors_present(components_to_check: list[str], components: list[str] | None = None) -> bool:
     """
-    Check whether all detectors in the list "components_to_check" are present in the list of components.
+    Check whether all detectors in the list "components_to_check" are present in the list of components,
+    or if components is None.
 
     Returns True if all detector components in "components_to_check are contained in components, else, returns False.
 
@@ -84,7 +86,8 @@ def are_detectors_present(components_to_check: list[str], components: list[str] 
 
 def is_any_detector_present(components_to_check: list[str], components: list[str] | None = None) -> bool:
     """
-    Check whether any detector in the list "components_to_check" is present in the list of components.
+    Check whether any detector in the list "components_to_check" is present in the list of components,
+    or if components is None.
 
     Returns True if any detector components in "components_to_check is contained in components, else, returns False.
 

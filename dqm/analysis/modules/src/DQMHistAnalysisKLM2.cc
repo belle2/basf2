@@ -19,7 +19,6 @@
 
 /* Standard Library*/
 #include <algorithm>
-#include <sys/types.h>
 
 using namespace Belle2;
 
@@ -34,9 +33,9 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
   addParam("RefHistogramDirectoryName", m_refHistogramDirectoryName, "Name of ref histogram directory",
            std::string("KLMEfficiencyDQM"));
-  addParam("RunStopThreshold", m_stopThr, "Set stop threshold", -0.50);
-  addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", -0.15);
-  addParam("WarnThreshold", m_warnThr, "Set warn threshold", -0.05);
+  addParam("deltaEffStopThreshold", m_stopThr, "Set stop threshold", -0.50);
+  addParam("deltaEffAlarmThreshold", m_alarmThr, "Set alarm threshold", -0.15);
+  addParam("deltaEffWarnThreshold", m_warnThr, "Set warn threshold", -0.05);
   addParam("zEffThreshold", m_zEffThreshold, "Set efficiency threshold for z-score calculation", 0.90);
   addParam("ZThreshold", m_zThreshold, "Set Z-score threshold for inefficient layers ", -1.5);
   addParam("ErrorThreshold", m_errorThreshold, "Set uncertainty threshold for low statistics", 0.05);
@@ -67,10 +66,8 @@ void DQMHistAnalysisKLM2Module::initialize()
   registerEpicsPV("KLM:Eff:zScoreThreshold", "zScoreThreshold");
   registerEpicsPV("KLM:Eff:uncertaintyThreshold", "uncertaintyThreshold");
   registerEpicsPV("KLM:Eff:minEntriesThreshold", "minEntriesThreshold");
-  registerEpicsPV("KLM:Eff:alarmThreshold", "alarmThreshold");
-  registerEpicsPV("KLM:Eff:RunStopThreshold", "RunStopThreshold");
-  registerEpicsPV("KLM:Eff:WarnThreshold", "WarnThreshold");
-
+  registerEpicsPV("KLM:Eff:deltaEffThreshold", "deltaEffThreshold");
+  registerEpicsPV("KLM:EFF:deltaEffStopThreshold", "deltaEffStopThreshold");
 
   gROOT->cd();
   m_c_eff_bklm = new TCanvas((m_histogramDirectoryName + "/c_eff_bklm_plane").data());
@@ -234,19 +231,20 @@ void DQMHistAnalysisKLM2Module::beginRun()
 
   double unused = NAN;
   //ratio/diff mode should only be possible if references exist
-  // default values should be initially defined in input parameters?
+  // default values should be initially defined in input parameters
   requestLimitsFromEpicsPVs("zScoreThreshold", unused, m_zThreshold, unused, unused);
-  requestLimitsFromEpicsPVs("zEffThreshold", unused, unused, m_zEffThreshold, unused);
+  requestLimitsFromEpicsPVs("zEffThreshold", unused, m_zEffThreshold, unused, unused);
   requestLimitsFromEpicsPVs("uncertaintyThreshold", unused, unused, m_errorThreshold, unused);
   requestLimitsFromEpicsPVs("minEntriesThreshold", unused, m_minEntries, unused, unused);
 
-  requestLimitsFromEpicsPVs("WarnThreshold", unused, unused, m_warnThr, unused);      // convention: upper warn threshold
-  requestLimitsFromEpicsPVs("alarmThreshold", unused, m_alarmThr, unused, unused);  // convention: lower warn threshold
-  requestLimitsFromEpicsPVs("RunStopThreshold", m_stopThr, unused, unused, unused); // convention: lower stop threshold
-  m_BKLMLayerWarn = 5;
-  m_EKLMLayerWarn = 5;
-  requestLimitsFromEpicsPVs("nEffBKLMLayers", unused, unused, m_BKLMLayerWarn, unused);
-  requestLimitsFromEpicsPVs("nEffEKLMLayers", unused, unused, m_EKLMLayerWarn, unused);
+  requestLimitsFromEpicsPVs("deltaEffThreshold", m_alarmThr, m_warnThr, unused,
+                            unused);  // lower warn/alarm thresholds for delta efficiency
+  requestLimitsFromEpicsPVs("deltaEffStopThreshold", m_stopThr, unused, unused,
+                            unused);  // lower stop-alarm threshold for delta efficiency
+  m_BKLMLayerAlarm = 5;
+  m_EKLMLayerAlarm = 5;
+  requestLimitsFromEpicsPVs("nEffBKLMLayers", unused, unused, unused, m_BKLMLayerAlarm);
+  requestLimitsFromEpicsPVs("nEffEKLMLayers", unused, unused, unused, m_EKLMLayerAlarm);
 
 }
 
@@ -459,7 +457,7 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
           // Calculate uncertainty on the ratio
           sigmaR = eff2dVal * sqrt(pow(mainErr / mainEff, 2) + pow(refErr  / refEff,  2));
 
-          // Z-score: how many sigma is the ratio from the warning threshold
+          // Z-score: how many sigma is the ratio from the threshold
           if (sigmaR > 0) {
             deltaR = eff2dVal - m_zEffThreshold;
             Z = deltaR / sigmaR;  // ideal-case w'd be effThr is 1, so Z = (R - 1) / sigmaR
@@ -467,6 +465,7 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         } else {
           sigmaR  = pow(pow(mainErr, 2) + pow(refErr, 2), 0.5);
           eff2dVal = (mainEff - refEff);
+          deltaR = eff2dVal;
           Z = eff2dVal / sigmaR;
         }
 
@@ -497,7 +496,7 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
           if (deltaR < m_warnThr && Z < m_zThreshold) {
             pvcount += 1;
             errHist->SetBinContent(binx + 1, biny + 1, sigmaR);
-            if (deltaR < m_alarmThr) {
+            if ((deltaR <= m_alarmThr) && (deltaR >= m_stopThr)) {
               setWarn = true;
               layercount++;                  // Increment layercount when alarm condition is met
             } else if (deltaR < m_stopThr) {
@@ -593,12 +592,12 @@ void DQMHistAnalysisKLM2Module::event()
   /* Make Diff 2D plots */
   process2DEffHistogram(m_eff_bklm, m_ref_efficiencies_bklm, m_eff2d_bklm, m_err_bklm,
                         BKLMElementNumbers::getMaximalLayerNumber(), BKLMElementNumbers::getMaximalSectorGlobalNumber(),
-                        m_ratio, m_nEffBKLMLayers, m_BKLMLayerWarn, m_c_eff2d_bklm);
+                        m_ratio, m_nEffBKLMLayers, m_BKLMLayerAlarm, m_c_eff2d_bklm);
 
   process2DEffHistogram(m_eff_eklm, m_ref_efficiencies_eklm, m_eff2d_eklm, m_err_eklm,
                         EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),
                         EKLMElementNumbers::getMaximalPlaneGlobalNumber() / EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),
-                        m_ratio, m_nEffEKLMLayers, m_EKLMLayerWarn, m_c_eff2d_eklm);
+                        m_ratio, m_nEffEKLMLayers, m_EKLMLayerAlarm, m_c_eff2d_eklm);
   /* Set EPICS PV Values*/
   B2DEBUG(20, "DQMHistAnalysisKLM2: Updating EPICS PVs");
   // only update PVs if there's enough statistics and datasize != 0

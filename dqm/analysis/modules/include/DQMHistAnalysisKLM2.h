@@ -205,11 +205,11 @@ namespace Belle2 {
     /** Number of inefficient EKLM Layers*/
     int m_nEffEKLMLayers;
 
-    /** warn limits from inefficient BKLM layers PV */
-    double m_BKLMLayerWarn;
+    /** alarm limits from inefficient BKLM layers PV */
+    double m_BKLMLayerAlarm;
 
-    /** warn limits from inefficient EKLM layers PV*/
-    double m_EKLMLayerWarn;
+    /** alarm limits from inefficient EKLM layers PV*/
+    double m_EKLMLayerAlarm;
 
   };
 

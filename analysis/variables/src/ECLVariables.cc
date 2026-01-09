@@ -1157,12 +1157,12 @@ Returns an integer code representing the ECL region for the ECL cluster:
 
 )DOC");
     REGISTER_VARIABLE("clusterDeltaLTemp", eclClusterDeltaL, R"DOC(
-| Returns the :math:`$\Delta L$` for the ECL cluster shape as defined below. 
+Returns the :math:`\Delta L` for the ECL cluster shape as defined below. 
 
-  First, the cluster direction is constructed by calculating the weighted average of the orientation 
-  for the crystals in the cluster. The POCA of the vector with this direction originating from the
-  cluster center and an extrapolated track can be used to the calculate the shower
-  depth. :math:`$\Delta L$` is then defined as the distance between this intersection and the cluster center. 
+First, the cluster direction is constructed by calculating the weighted average of the orientation 
+for the crystals in the cluster. The POCA of the vector with this direction originating from the
+cluster center and an extrapolated track can be used to the calculate the shower
+depth. :math:`\Delta L` is then defined as the distance between this intersection and the cluster center. 
 
 .. attention::
     This distance is calculated on the reconstruction level and is temporarily
@@ -1215,7 +1215,7 @@ Returns ECL cluster's energy corrected for leakage and background.
 .. attention::
     We only store clusters with :math:`E > 20\,` MeV.
 
-.. topic::
+.. topic:: Calculating Photon Energy
 
     The raw photon energy is given by the weighted sum of all crystal energies within the ECL cluster.
     The weights per crystals are :math:`\leq 1` after cluster energy splitting in the case of overlapping
@@ -1267,7 +1267,7 @@ Returns the distance of the ECL cluster centroid from :math:`(0,0,0)`.
 Returns the azimuthal angle :math:`\phi` of the ECL cluster. This is generally not equal 
 to the azimuthal angle of the photon. 
 
-..topic::
+..topic:: Calculating Cluster Direction
 
     The direction of a cluster is given by the connecting line from :math:`\,(0,0,0)\,` to 
     cluster centroid position in the ECL. The centroid position is calculated using up to 21 crystals 
@@ -1296,7 +1296,7 @@ Returns connected region ID for the ECL cluster.
 Returns the polar angle :math:`\theta` of the ECL cluster. This is generally not equal 
 to the polar angle of the photon. 
 
-..topic::
+..topic:: Calculating Cluster Direction
 
     The direction of a cluster is given by the connecting line from :math:`\,(0,0,0)\,` to 
     cluster centroid position in the ECL. The centroid position is calculated using up to 21 crystals 
@@ -1319,120 +1319,122 @@ to the polar angle of the photon.
 
 )DOC","rad");
     REGISTER_VARIABLE("clusterTiming", eclClusterTiming, R"DOC(
-**In Belle II:**
-Returns the time of the ECL cluster. It is calculated as the Photon timing minus the Event t0.
-Photon timing is given by the fitted time of the recorded waveform of the highest energy crystal in the
-cluster. After all calibrations and corrections (including Time-Of-Flight), photons from the interaction
-point (IP) should have a Photon timing that corresponds to the Event t0, :math:`t_{0}`.  The Event t0 is the
-time of the event and may be measured by a different sub-detector (see Event t0 documentation). For an ECL
-cluster produced at the interaction point in time with the event, the cluster time should be consistent with zero
-within the uncertainties. Special values are returned if the fit for the Photon timing fails (see
-documentation for `clusterHasFailedTiming`). (For MC, the calibrations and corrections are not fully simulated).
+Returns the time of the ECL cluster. This is calculated **differently** in Belle and Belle II. Please 
+read their definitions below. 
 
-.. note::
-    | Please read `this <importantNoteECL>` first.
-    | - Lower limit: :math:`-1000.0`
-    | - Upper limit: :math:`1000.0`
-    | - Precision: :math:`12` bit
-..
+.. topic:: In Belle II
+    It is calculated as the cluster time minus the `eventT0`. The cluster time is obtained by a fit to 
+    the recorded waveform of the highest energy crystal in the cluster. For an ECL cluster produced by a 
+    particle from the IP, the cluster time should be consistent with `eventT0` within the uncertainties 
+    following all calibrations and corrections. For MC, note that the calibrations and corrections are not 
+    fully simulated. In order to see if the waveform fit fails, see `clusterHasFailedTiming`.    
 
-**In Belle:**
-Returns the trigger cell (TC) time of the ECL cluster (photon).
-This information is available only in Belle data since experiment 31, and not available in Belle MC.
-Clusters produced at the interaction point in time with the event, have TC time in the range of 9000-11000
-Calculated based on the Appendix of Belle note 831.
+    .. note::
+        | Please read `this <importantNoteECL>` first.
+        | - Lower limit: :math:`-1000.0`
+        | - Upper limit: :math:`1000.0`
+        | - Precision: :math:`12` bit
+    ..
 
-.. note::
-    | In case this variable is obtained from Belle data that is stored in Belle II mdst/udst format, it will be truncated to:
-    | Lower limit: :math:`-1000.0`
-    | Upper limit: :math:`1000.0`
-    | Precision: :math:`12` bit
-..
+.. topic:: In Belle
+    It is equal to the trigger cell (TC) time corresponding to the ECL cluster. This information is only 
+    available in Belle data since experiment 31, and not available in Belle MC. Clusters produced at the IP 
+    in time with the event have a TC time in the range of 9000 - 11000. 
+
+    .. note::
+        | In case this variable is obtained from Belle data that is stored in Belle II mdst/udst format, it will be truncated to:
+        | - Lower limit: :math:`-1000.0`
+        | - Upper limit: :math:`1000.0`
+        | - Precision: :math:`12` bit
+    ..
 
 )DOC","ns");
     REGISTER_VARIABLE("clusterHasFailedTiming", eclClusterHasFailedTiming, R"DOC(
-Status bit for if the ECL cluster's timing fit failed. Photon timing is given by the fitted time
-of the recorded waveform of the highest energetic crystal in a cluster; however, that fit can fail and so
-this variable tells the user if that has happened.
+Status bit indicating if the waveform fit for the `clusterTiming` calculation has failed. 
 )DOC");
     REGISTER_VARIABLE("clusterErrorTiming", eclClusterErrorTiming, R"DOC(
-Returns ECL cluster's timing uncertainty that contains :math:`99\%` of true photons (dt99).
+Returns the ECL cluster timing uncertainty which is equal to the :math:`dt99` value as defined below. Very large 
+values of :math:`dt99` are an indication of a failed waveform fit for the ECL cluster.  
 
-The photon timing uncertainty is currently determined using MC. The resulting parametrization depends on
-the true energy deposition in the highest energetic crystal and the local beam background level in that crystal.
-The resulting timing distribution is non-Gaussian and for each photon the value dt99 is stored,
-where :math:`|\text{timing}| / \text{dt99} < 1` is designed to give a :math:`99\%`
-timing efficiency for true photons from the IP.
-The resulting efficiency is approximately flat in energy and independent of beam background levels.
+The timing distribution for each ECL cluster is non-Gaussian and so the value :math:`dt99` is stored where 
+:math:`|\text{timing}| / \text{dt99} < 1` is designed to give a :math:`99\%` timing efficiency for 
+true photons from the IP. (This definition results in an efficiency that is approximately flat in energy 
+and independent of the beam background level). The :math:`dt99` value stored is determined using MC with a 
+parametrisation that depends on the true energy deposition in the highest energetic crystal and the 
+local beam background level in that crystal.  
 
-Very large values of dt99 are an indication of failed waveform fits in the ECL.
-We remove such clusters in most physics photon lists.
-
-.. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`1000.0`
-    | Precision: :math:`12` bit
-
-.. warning::
+.. caution::
     In real data there will be a sizeable number of high energetic Bhabha events
     (from previous or later bunch collisions) that can easily be rejected by timing cuts.
     However, these events create large ECL clusters that can overlap with other ECL clusters
-    and it is not clear that a simple rejection is the correction strategy.
-..
+    so it is not clear that a simply timing-based rejection strategy is optimal. 
+
+.. note::
+    | Please read `this <importantNoteECL>` first.
+    | - Lower limit: :math:`0.0`
+    | - Upper limit: :math:`1000.0`
+    | - Precision: :math:`12` bit
 
 )DOC","ns");
     REGISTER_VARIABLE("clusterHasFailedErrorTiming", eclClusterHasFailedErrorTiming, R"DOC(
-Status bit for if the ECL cluster's timing uncertainty calculation failed. Photon timing is given by the fitted time
-of the recorded waveform of the highest energetic crystal in a cluster; however, that fit can fail and so
-this variable tells the user if that has happened.
+Status bit indicating if the calculation of `clusterErrorTiming` has failed due to a failed 
+waveform fit. 
 )DOC");
     REGISTER_VARIABLE("clusterHighestE", eclClusterHighestE, R"DOC(
-Returns energy of the highest energetic crystal in the ECL cluster after reweighting.
+Returns the energy of the highest energetic crystal in the ECL cluster after reweighting. 
 
-.. warning::
-    This variable must be used carefully since it can bias shower selection
-    towards photons that hit crystals in the center and hence have a large energy
+.. caution::
+    This variable must be used carefully since it can bias your cluster selection
+    towards particles that hit crystals in the center and hence have a large energy
     deposition in the highest energy crystal.
 
 .. note::
     | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`-5` (:math:`e^{-5} = 0.00674\,` GeV)
-    | Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV)
-    | Precision: :math:`18` bit
+    | - Lower limit: :math:`-5` (:math:`e^{-5} = 0.00674\,` GeV)
+    | - Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV)
+    | - Precision: :math:`18` bit
 ..
 
 )DOC","GeV");
     REGISTER_VARIABLE("clusterCellID", eclClusterCellId,
-                      "Returns cellId of the crystal with highest energy in the ECLCluster.");
-    REGISTER_VARIABLE("clusterThetaID", eclClusterThetaId,
-                      "Returns thetaId of the crystal with highest energy in the ECLCluster.");
-    REGISTER_VARIABLE("clusterPhiID", eclClusterPhiId,
-                      "Returns phiId of the crystal with highest energy in the ECLCluster.");
+                      "Returns the cell ID of the crystal with highest energy in the ECLCluster.");
+    REGISTER_VARIABLE("clusterThetaID", eclClusterThetaId, R"DOC(
+Returns the :math:`\theta` ID of the crystal with highest energy in the ECLCluster. There are 
+69 :math:`\theta` IDs in total covering the entire ECL acceptance. The mapping between crystal number 
+and :math:`\theta` ID can be found in the 
+`code definition <https://software.belle2.org/development/doxygen/ECLVariables_8cc_source.html#l00299>`_. 
+)DOC");
+    REGISTER_VARIABLE("clusterPhiID", eclClusterPhiId, R"DOC(
+Returns the :math:`\phi` ID of the crystal with highest energy in the ECLCluster.
+)DOC");
     REGISTER_VARIABLE("clusterE1E9", eclClusterE1E9, R"DOC(
-Returns ratio of energies of the central crystal, E1, and 3x3 crystals, E9, around the central crystal.
-Since :math:`E1 \leq E9`, this ratio is :math:`\leq 1` and tends towards larger values for photons
-and smaller values for hadrons.
+Returns the ratio of the energy in the central crystal (:math:`E1`) to the total energy in the 
+3x3 crystal grid around the central crystal (:math:`E9`). Since :math:`E1 \leq E9`, this ratio is 
+:math:`\leq 1` and tends towards larger values for photons and smaller values for hadrons. 
 
 .. note::
     | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`1.0`
-    | Precision: :math:`10` bit
+    | - Lower limit: :math:`0.0`
+    | - Upper limit: :math:`1.0`
+    | - Precision: :math:`10` bit
+
 )DOC");
     REGISTER_VARIABLE("clusterE9E25", eclClusterE9E25, R"DOC(
-Deprecated - kept for backwards compatibility - returns clusterE9E21.
+.. deprecated::
+    Returns `clusterE9E21`. Kept for backwards compatibility. 
 )DOC");
     REGISTER_VARIABLE("clusterE9E21", eclClusterE9E21, R"DOC(
-Returns ratio of energies in inner 3x3 crystals, E9, and 5x5 crystals around the central crystal without corners.
-Since :math:`E9 \leq E21`, this ratio is :math:`\leq 1` and tends towards larger values for photons
-and smaller values for hadrons.
+Returns the ratio of the total energy in the 3x3 crystal grid around the central 
+crystal (:math:`E9`) to the total energy in the 5x5 crystal grid (:math:`E25`) around the central crystal 
+excluding the corners. Since :math:`E9 \leq E21`, this ratio is :math:`\leq 1` and tends towards larger 
+values for photons and smaller values for hadrons. 
 
 .. note::
     | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`1.0`
-    | Precision: :math:`10` bit
+    | - Lower limit: :math:`0.0`
+    | - Upper limit: :math:`1.0`
+    | - Precision: :math:`10` bit
+    
 )DOC");
     REGISTER_VARIABLE("clusterAbsZernikeMoment40", eclClusterAbsZernikeMoment40, R"DOC(
 Returns absolute value of Zernike moment 40 (:math:`|Z_{40}|`). (shower shape variable).

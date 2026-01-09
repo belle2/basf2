@@ -14,7 +14,7 @@ Enddecay
 Alias Myanti-Lambda anti-Lambda0
 
 Decay anti-Lambda_c-
-1.000 Myanti-Lambda K- pi+ pi+       PHSP;
+1.000 Myanti-Lambda K- pi- pi+       PHSP;
 Enddecay
 
 Decay Myanti-Lambda

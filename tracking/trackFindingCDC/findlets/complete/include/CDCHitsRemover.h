@@ -9,17 +9,17 @@
 #pragma once
 
 #include <framework/datastore/SelectSubset.h>
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <cdc/dataobjects/CDCHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     /**
      *  Findlet to remove background hits from CDCHits list. Useful for background studies.
      */

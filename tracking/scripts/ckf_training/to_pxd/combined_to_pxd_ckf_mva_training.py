@@ -721,7 +721,7 @@ class ResultRecordingTask(Basf2PathTask, LSFTask):
         fast_bdt_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
 
         # write the tracking MVA filter parameters and the cut on MVA classifier to be applied on a local db
-        iov = [0, 0, 0, -1]
+        iov = [self.experiment_number, 0, self.experiment_number, -1]
         write_tracking_mva_filter_payloads_to_db(
             f"trk_ToPXDStateFilter_1_Parameter{fast_bdt_string}",
             iov,
@@ -995,7 +995,7 @@ class ValidationAndOptimisationTask(Basf2PathTask, LSFTask):
         fbdt_result_filter_string = create_fbdt_option_string(self.fast_bdt_option_result_filter)
 
         # write the tracking MVA filter parameters and the cut on MVA classifier to be applied on a local db
-        iov = [0, 0, 0, -1]
+        iov = [self.experiment_number, 0, self.experiment_number, -1]
         write_tracking_mva_filter_payloads_to_db(
             f"trk_ToPXDStateFilter_1_Parameter{fbdt_state_filter_string}",
             iov,

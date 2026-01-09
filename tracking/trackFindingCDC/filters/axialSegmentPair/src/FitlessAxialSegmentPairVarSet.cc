@@ -7,15 +7,16 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/FitlessAxialSegmentPairVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCAxialSegmentPair.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/numerics/Angle.h>
+#include <tracking/trackingUtilities/numerics/Angle.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool FitlessAxialSegmentPairVarSet::extract(const CDCAxialSegmentPair* ptrAxialSegmentPair)
 {

@@ -7,10 +7,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentTripleAutomaton.h>
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 TrackFinderSegmentTripleAutomaton::TrackFinderSegmentTripleAutomaton()
 {

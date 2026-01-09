@@ -12,22 +12,25 @@
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundDetector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/AsicBackgroundDetector.h>
+#include <tracking/trackFindingCDC/findlets/minimal/BadBoardADCDetector.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <string>
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
+  }
+  namespace TrackFindingCDC {
 
     /// Findlet preparing the wire hits for the track finding
-    class WireHitPreparer : public Findlet<CDCWireHit> {
+    class WireHitPreparer : public TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHit>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -40,7 +43,7 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main function preparing the wire hits
-      void apply(std::vector<CDCWireHit>& outputWireHits) final;
+      void apply(std::vector<TrackingUtilities::CDCWireHit>& outputWireHits) final;
 
     private:
       // Findlets
@@ -58,6 +61,9 @@ namespace Belle2 {
 
       /// Marks higher order loops as background for tuning analysis
       WireHitMCMultiLoopBlocker m_wireHitMCMultiLoopBlocker;
+
+      /// Detect boards with bad ADC values
+      BadBoardADCDetector m_badBoardADCDetector;
     };
   }
 }

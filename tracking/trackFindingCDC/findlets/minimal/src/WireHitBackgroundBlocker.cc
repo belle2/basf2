@@ -7,9 +7,9 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundBlocker.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
@@ -17,6 +17,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 std::string WireHitBackgroundBlocker::getDescription()
 {

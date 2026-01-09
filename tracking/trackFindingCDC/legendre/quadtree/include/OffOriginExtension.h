@@ -12,9 +12,11 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
     class Vector2D;
+  }
+  namespace TrackFindingCDC {
 
     /**
      *  Class performs extension (adding new hits) of given candidate using conformal transformation w.r.t point on the trajectory
@@ -23,13 +25,13 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      explicit OffOriginExtension(std::vector<const CDCWireHit*> allAxialWireHits, double levelPrecision = 9);
+      explicit OffOriginExtension(std::vector<const TrackingUtilities::CDCWireHit*> allAxialWireHits, double levelPrecision = 9);
 
       /// Main entry point for the post processing call from the QuadTreeProcessor
-      void operator()(const std::vector<const CDCWireHit*>& inputWireHits, void* qt) final;
+      void operator()(const std::vector<const TrackingUtilities::CDCWireHit*>& inputWireHits, void* qt) final;
 
       /// Perform transformation for set of given hits; reference position taken as POCA of the fitted trajectory
-      std::vector<const CDCWireHit*> roadSearch(const std::vector<const CDCWireHit*>& wireHits);
+      std::vector<const TrackingUtilities::CDCWireHit*> roadSearch(const std::vector<const TrackingUtilities::CDCWireHit*>& wireHits);
       /**
        * @brief Get hits which are compatible with given trajectory
        *
@@ -38,7 +40,8 @@ namespace Belle2 {
        * @param theta angle between x-axis and vector to the center of the circle which represents trajectory
        * @return vector of CDCWireHit objects which satisfy legendre transformation with respect to the given parameters
        */
-      std::vector<const CDCWireHit*> getHitsWRTtoRefPos(const Vector2D& refPos, float curv, float theta);
+      std::vector<const TrackingUtilities::CDCWireHit*> getHitsWRTtoRefPos(const TrackingUtilities::Vector2D& refPos, float curv,
+          float theta);
 
     private:
 

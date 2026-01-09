@@ -11,13 +11,13 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>
@@ -25,6 +25,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 std::string WireHitMCMultiLoopBlocker::getDescription()
 {

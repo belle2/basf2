@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 #include <tracking/ckf/svd/filters/results/ChooseableSVDResultFilter.h>
 
 namespace Belle2 {
@@ -23,12 +23,12 @@ namespace Belle2 {
    *
    * Doing this, one can additionally apply a filter.
    */
-  class RecoTrackRelator : public TrackFindingCDC::Findlet<const CKFToSVDResult,
-    TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>> {
+  class RecoTrackRelator : public TrackingUtilities::Findlet<const CKFToSVDResult,
+    TrackingUtilities::WeightedRelation<const RecoTrack, const RecoTrack>> {
   public:
     /// The parent findlet
-    using Super = TrackFindingCDC::Findlet<CKFToSVDResult,
-          TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>;
+    using Super = TrackingUtilities::Findlet<CKFToSVDResult,
+          TrackingUtilities::WeightedRelation<const RecoTrack, const RecoTrack>>;
 
     /// Add the sub findelts as listener
     RecoTrackRelator();
@@ -38,7 +38,7 @@ namespace Belle2 {
 
     /// Create relations between tracks from the results (applying a filter)
     void apply(const std::vector<CKFToSVDResult>& results,
-               std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>& relationsCDCToSVD) final;
+               std::vector<TrackingUtilities::WeightedRelation<const RecoTrack, const RecoTrack>>& relationsCDCToSVD) final;
 
   private:
     /// Filter for the results

@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 
 namespace Belle2 {
   /// Base filter for CKF CDC states
   using BaseCDCStateFilter =
-    TrackFindingCDC::Filter<std::pair<const CDCCKFPath*, CDCCKFState*>>;
+    TrackingUtilities::Filter<std::pair<const CDCCKFPath*, CDCCKFState*>>;
 }

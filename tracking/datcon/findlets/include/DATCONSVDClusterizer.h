@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
@@ -28,9 +28,9 @@ namespace Belle2 {
    * This finldet only clusters strips on one side.
    * The created SVDClusters can be stored in the DataStore by setting m_param_saveClusterToDataStore to true.
    */
-  class DATCONSVDClusterizer : public TrackFindingCDC::Findlet<const DATCONSVDDigit, SVDCluster> {
+  class DATCONSVDClusterizer : public TrackingUtilities::Findlet<const DATCONSVDDigit, SVDCluster> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const DATCONSVDDigit, SVDCluster>;
+    using Super = TrackingUtilities::Findlet<const DATCONSVDDigit, SVDCluster>;
 
     /** Simple representation of a SVD Noise Map */
     typedef std::map<int, float> SimpleSVDNoiseMap;

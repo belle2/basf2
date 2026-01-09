@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Range.h>
-#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+#include <tracking/trackingUtilities/utilities/Range.h>
+#include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
 #include <map>
 #include <set>
@@ -67,10 +67,10 @@ namespace Belle2 {
 
     public:
       /// Seeks the CDCSimHit related to the CDCHit.
-      MayBePtr<const CDCSimHit> getSimHit(const CDCHit* hit) const;
+      TrackingUtilities::MayBePtr<const CDCSimHit> getSimHit(const CDCHit* hit) const;
 
       /// Seeks the CDCHit related to the CDCSimHit - nullptr if no CDCHit is related.
-      MayBePtr<const CDCHit> getHit(const CDCSimHit* simHit) const;
+      TrackingUtilities::MayBePtr<const CDCHit> getHit(const CDCSimHit* simHit) const;
 
       /// Indicates if the CDCSimHit is considered background.
       bool isBackground(const CDCSimHit* simHit) const;
@@ -82,24 +82,24 @@ namespace Belle2 {
        *  Seeks the MCParticle related to the CDCHit.
        *  Nullptr if no MCParticle is related, this is also the case for background hits.
        */
-      MayBePtr<const MCParticle> getMCParticle(const CDCHit* hit) const;
+      TrackingUtilities::MayBePtr<const MCParticle> getMCParticle(const CDCHit* hit) const;
 
       /**
        *  Seeks the MCParticle related to the CDCSimHit.
        *  Nullptr if no MCParticle is related, this is also the case for background hits.
        */
-      MayBePtr<const MCParticle> getMCParticle(const CDCSimHit* simHit) const;
+      TrackingUtilities::MayBePtr<const MCParticle> getMCParticle(const CDCSimHit* simHit) const;
 
       /// Getter for the range MCParticle to CDCSimHits relations which come from the given MCParticle
       auto getSimHits(const MCParticle* mcParticle) const
       {
-        return asRange(m_simHitsByMCParticle.equal_range(mcParticle));
+        return TrackingUtilities::asRange(m_simHitsByMCParticle.equal_range(mcParticle));
       }
 
       /// Getter for the range MCParticle to CDCHits relations which come from the given MCParticle.
       auto getHits(const MCParticle* mcParticle) const
       {
-        return asRange(m_hitsByMCParticle.equal_range(mcParticle));
+        return TrackingUtilities::asRange(m_hitsByMCParticle.equal_range(mcParticle));
       }
 
       /// Indicates if the CDCSimHit has been reassigned to a primary MCParticle

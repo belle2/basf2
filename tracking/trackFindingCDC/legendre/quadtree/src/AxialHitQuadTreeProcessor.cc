@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <array>
 #include <vector>
@@ -19,6 +19,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   bool sameSign(double n1, double n2, double n3, double n4)

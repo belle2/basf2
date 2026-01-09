@@ -8,7 +8,7 @@
 #pragma once
 
 #include <tracking/ckf/general/findlets/StateRejecter.dcl.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/logging/Logger.h>
 
 
@@ -27,16 +27,16 @@ namespace Belle2 {
   template <class AState, class AFindlet>
   void StateRejecter<AState, AFindlet>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
-    m_firstFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("first", prefix));
-    m_advanceFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("advance", prefix));
-    m_secondFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("second", prefix));
-    m_updateFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("update", prefix));
-    m_thirdFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("third", prefix));
+    m_firstFilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed("first", prefix));
+    m_advanceFilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed("advance", prefix));
+    m_secondFilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed("second", prefix));
+    m_updateFilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed("update", prefix));
+    m_thirdFilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed("third", prefix));
   };
 
   template <class AState, class AFindlet>
-  void StateRejecter<AState, AFindlet>::apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
-                                              std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
+  void StateRejecter<AState, AFindlet>::apply(const std::vector<TrackingUtilities::WithWeight<const AState*>>& currentPath,
+                                              std::vector<TrackingUtilities::WithWeight<AState*>>& childStates)
   {
     B2DEBUG(29, "Starting with " << childStates.size() << " states.");
     m_firstFilter.apply(currentPath, childStates);

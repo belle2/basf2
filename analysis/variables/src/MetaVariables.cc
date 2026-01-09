@@ -1683,6 +1683,12 @@ namespace Belle2 {
           } else if (std::holds_alternative<int>(var_result1))
           {
             val1 = std::get<int>(var_result1);
+          } else if (std::holds_alternative<bool>(var_result1))
+          {
+            val1 = std::get<bool>(var_result1);
+          } else
+          {
+            B2FATAL("A variable in meta function max holds no double, int or bool values");
           }
           if (std::holds_alternative<double>(var_result2))
           {
@@ -1690,6 +1696,12 @@ namespace Belle2 {
           } else if (std::holds_alternative<int>(var_result2))
           {
             val2 = std::get<int>(var_result2);
+          } else if (std::holds_alternative<bool>(var_result2))
+          {
+            val2 = std::get<bool>(var_result2);
+          } else
+          {
+            B2FATAL("A variable in meta function max holds no double, int or bool values");
           }
           return std::max(val1, val2);
         };
@@ -1718,6 +1730,12 @@ namespace Belle2 {
           } else if (std::holds_alternative<int>(var_result1))
           {
             val1 = std::get<int>(var_result1);
+          } else if (std::holds_alternative<bool>(var_result1))
+          {
+            val1 = std::get<bool>(var_result1);
+          } else
+          {
+            B2FATAL("A variable in meta function min holds no double, int or bool values");
           }
           if (std::holds_alternative<double>(var_result2))
           {
@@ -1725,6 +1743,12 @@ namespace Belle2 {
           } else if (std::holds_alternative<int>(var_result2))
           {
             val2 = std::get<int>(var_result2);
+          } else if (std::holds_alternative<bool>(var_result2))
+          {
+            val2 = std::get<bool>(var_result2);
+          } else
+          {
+            B2FATAL("A variable in meta function min holds no double, int or bool values");
           }
           return std::min(val1, val2);
         };

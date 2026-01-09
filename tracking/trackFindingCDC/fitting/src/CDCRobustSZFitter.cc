@@ -11,13 +11,14 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCSZObservations.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 
-#include <tracking/trackFindingCDC/numerics/Median.h>
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/Median.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CDCTrajectorySZ CDCRobustSZFitter::fitUsingSimplifiedTheilSen(const CDCSZObservations& observationsSZ) const
 {

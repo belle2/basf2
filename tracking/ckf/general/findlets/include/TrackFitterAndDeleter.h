@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/dbobjects/DAFConfiguration.h>
 
 namespace Belle2 {
@@ -15,7 +15,7 @@ namespace Belle2 {
   /**
    * Findlet to fit tracks and remove all non fitted ones.
    */
-  class TrackFitterAndDeleter : public TrackFindingCDC::Findlet<RecoTrack*> {
+  class TrackFitterAndDeleter : public TrackingUtilities::Findlet<RecoTrack*> {
   public:
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

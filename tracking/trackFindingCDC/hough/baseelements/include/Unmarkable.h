@@ -7,17 +7,17 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Scalar.h>
+#include <tracking/trackingUtilities/utilities/Scalar.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Mixin class to attach a mark that is shared among many instances.
     template<class T>
-    class Unmarkable : public ScalarToClass<T> {
+    class Unmarkable : public TrackingUtilities::ScalarToClass<T> {
     private:
       /// Base class of the mixin
-      using Super = ScalarToClass<T>;
+      using Super = TrackingUtilities::ScalarToClass<T>;
 
     public:
       /// Mixin class to make an object unmarkable (the mark information is saved - but never used in the tree

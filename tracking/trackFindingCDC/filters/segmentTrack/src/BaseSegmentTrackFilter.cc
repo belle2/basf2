@@ -7,9 +7,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentTrack/BaseSegmentTrackFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::Filter<WeightedRelation<CDCTrack, const CDCSegment2D>>;
+template class TrackingUtilities::Filter<WeightedRelation<CDCTrack, const CDCSegment2D>>;

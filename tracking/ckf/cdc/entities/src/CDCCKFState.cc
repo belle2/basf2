@@ -6,7 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 namespace Belle2 {
   std::ostream& operator<<(std::ostream& output, const CDCCKFState& state)

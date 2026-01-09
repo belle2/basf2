@@ -9,11 +9,11 @@
 
 #include <tracking/ckf/pxd/filters/relations/LayerPXDRelationFilter.dcl.h>
 #include <tracking/ckf/pxd/filters/relations/PXDPairFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   /// A chooseable filter for picking out the relations between states
-  extern template class LayerPXDRelationFilter<TrackFindingCDC::ChooseableFilter<PXDPairFilterFactory>>;
+  extern template class LayerPXDRelationFilter<TrackingUtilities::ChooseableFilter<PXDPairFilterFactory>>;
   /// A chooseable filter for picking out the relations between states
-  using ChooseablePXDRelationFilter = LayerPXDRelationFilter<TrackFindingCDC::ChooseableFilter<PXDPairFilterFactory>>;
+  using ChooseablePXDRelationFilter = LayerPXDRelationFilter<TrackingUtilities::ChooseableFilter<PXDPairFilterFactory>>;
 }

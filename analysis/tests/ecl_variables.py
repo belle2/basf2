@@ -59,7 +59,6 @@ ecl_vars = [
     'clusterR',
     'clusterSecondMoment',
     'clusterTheta',
-    'clusterTimeNorm90',
     'clusterTiming',
     'clusterTrackMatch',
     'goodBelleGamma',

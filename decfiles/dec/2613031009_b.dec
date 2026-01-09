@@ -1,0 +1,27 @@
+# EventType: 2613031009_b
+# Descriptor: [ccbar Dstarm2anti-D0Pim anti-D02KpPimGamma]
+# NickName: DstmToanti-D0Pim_anti-D02KpPimGamma
+# PhysicsWG: Charm
+# Responsible: Young Jun Kim 
+# Date: 20251230 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+# Pythia6 definition "32" for "vpho -> q qbar" should be used.
+#   (this is automatically converted to Pythia8 definition "91")
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Alias anti-MyD0 anti-D0
+
+Decay D*-
+1.000 anti-MyD0 pi-        VSS;
+Enddecay
+
+Decay anti-MyD0
+1.000 K+ pi-  gamma       PHSP;
+Enddecay
+
+End
+

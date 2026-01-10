@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
+#include <tracking/trackingUtilities/utilities/EvalVariadic.h>
 
 #include <type_traits>
 #include <utility>
@@ -76,11 +76,11 @@ namespace Belle2 {
 
       /// Accessor for the index of a certain coordinate which amounts to a std::integral_constant.
       template<class T>
-      using TypeIndex = GetIndexInTuple<T, Point>;
+      using TypeIndex = TrackingUtilities::GetIndexInTuple<T, Point>;
 
       /// Check if the type is a coordinate of the box which amounts to a std::integral_constant.
       template<class T>
-      using HasType = TypeInTuple<T, Point>;
+      using HasType = TrackingUtilities::TypeInTuple<T, Point>;
 
       /// Accessor for the individual coordinate difference types.
       template<std::size_t I>

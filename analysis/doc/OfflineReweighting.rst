@@ -15,6 +15,9 @@ These data/MC corrections often depend on particle properties, so they are typic
 The `add_weights_to_dataframe <sysvar.add_weights_to_dataframe>` helper function can add the data/MC corrections to the ntuples according to the defined binning
 and it can simplify the uncertainty propagation. 
 
+.. warning::
+  The `add_weights_to_dataframe <sysvar.add_weights_to_dataframe>` helper function in basf2 will soon be deprecated. A seperate `sysvar <https://gitlab.desy.de/belle2/software/sysvar>`_ python package will be recommended instead.
+
 Charged Particle Identification corrections
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -7,18 +7,20 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/cluster/BasicClusterVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <cdc/topology/CDCWireTopology.h>
+#include <cdc/topology/ISuperLayer.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <cassert>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool BasicClusterVarSet::extract(const CDCWireHitCluster* ptrCluster)
 {
@@ -50,7 +52,7 @@ bool BasicClusterVarSet::extract(const CDCWireHitCluster* ptrCluster)
     totalNNeighbors += nNeighbors;
 
     // hit position information
-    totalInnerDistance += wireHit->getRefPos2D().norm();
+    totalInnerDistance += wireHit->getRefPos2D().R();
 
     // Drift circle information
     double driftLength = wireHit->getRefDriftLength();

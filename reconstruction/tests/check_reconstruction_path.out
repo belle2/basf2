@@ -37,6 +37,7 @@
       timeCut1maxEnergy=99.999
       timeCut2=99999.0
       timeCut2maxEnergy=0.0
+      useParametersFromDatabase=True
   7. ECLLocalMaximumFinder
       cutOffset=2.5
       cutRatioCorrection=0.0
@@ -46,6 +47,7 @@
       method=none
       outfileName=ECLLocalMaximumFinderOutput.root
       truthFraction=0.51
+      useParametersFromDatabase=True
   8. ECLSplitterN1
       cutDigitEnergyForEnergy=0.0005
       cutDigitTimeResidualForEnergy=5.0
@@ -209,6 +211,8 @@
       SpacePoints=PXDSpacePoints
   26. TFCDC_WireHitPreparer
       UseNLoops=inf
+      badADCaverageMin=1000
+      badTOTaverageMin=15
       blockNegativeDriftLength=False
       deviationFromMedianTDCinASIC=10.0
       filter=mva
@@ -1191,13 +1195,8 @@
       indexOfFlippingMVA=2
       recoTracksStoreArrayName=RecoTracks
   97. FlippedRecoTracksMerger
-      bklmHitsStoreArrayName=
-      cdcHitsStoreArrayName=
-      eklmHitsStoreArrayName=
       inputStoreArrayName=RecoTracks
       inputStoreArrayNameFlipped=RecoTracks_flipped
-      pxdHitsStoreArrayName=
-      svdHitsStoreArrayName=
   98. V0Finder
       CopiedRecoTracks=CopiedRecoTracks
       RecoTracks=RecoTracks
@@ -1281,9 +1280,6 @@
   107. Sum_Postfilter_Tracking
   108. CDCDedxHitSaver
   109. CDCDedxPIDCreator
-      dedxTracksName=
-      enableDebugOutput=False
-      likelihoodsName=
       removeHighest=0.25
       removeLowest=0.05
       trackLevel=True
@@ -2098,10 +2094,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=True
-  200. MCMatch_pi0:GoodPi0ForHLT
-      listName=pi0:GoodPi0ForHLT
-      looseMCMatching=False
-  201. ParticleCombiner_D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT
+  200. ParticleCombiner_D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=1.7 < M < 2.0
@@ -2111,7 +2104,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  202. ParticleCombiner_D0:Kpipi0ForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi0:GoodPi0ForHLT
+  201. ParticleCombiner_D0:Kpipi0ForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi0:GoodPi0ForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=1.7 < M < 2.0
@@ -2121,7 +2114,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  203. ParticleCombiner_D0:KpipipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT pi-:GoodTrackForHLT
+  202. ParticleCombiner_D0:KpipipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT pi-:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=1.7 < M < 2.0
@@ -2131,7 +2124,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  204. ParticleCombiner_D+:KpipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT
+  203. ParticleCombiner_D+:KpipiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=1.8 < M < 1.9
@@ -2141,7 +2134,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  205. ParticleCombiner_D*+:D0_KpiForHLT -> D0:KpiForHLT pi+:GoodTrackForHLT
+  204. ParticleCombiner_D*+:D0_KpiForHLT -> D0:KpiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=massDifference(0) < 0.16
@@ -2151,7 +2144,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  206. ParticleCombiner_D*+:D0_Kpipi0ForHLT -> D0:Kpipi0ForHLT pi+:GoodTrackForHLT
+  205. ParticleCombiner_D*+:D0_Kpipi0ForHLT -> D0:Kpipi0ForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=massDifference(0) < 0.16
@@ -2161,7 +2154,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  207. ParticleCombiner_D*+:D0_KpipipiForHLT -> D0:KpipipiForHLT pi+:GoodTrackForHLT
+  206. ParticleCombiner_D*+:D0_KpipipiForHLT -> D0:KpipipiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=massDifference(0) < 0.16
@@ -2171,7 +2164,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  208. ParticleCombiner_B+:BtoD0pi_KpiForHLT -> anti-D0:KpiForHLT pi+:GoodTrackForHLT
+  207. ParticleCombiner_B+:BtoD0pi_KpiForHLT -> anti-D0:KpiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=Mbc > 5.15 and abs(deltaE) < 0.5
@@ -2181,7 +2174,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  209. ParticleCombiner_B+:BtoD0pi_Kpipi0ForHLT -> anti-D0:Kpipi0ForHLT pi+:GoodTrackForHLT
+  208. ParticleCombiner_B+:BtoD0pi_Kpipi0ForHLT -> anti-D0:Kpipi0ForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=Mbc > 5.15 and abs(deltaE) < 0.3
@@ -2191,7 +2184,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  210. ParticleCombiner_B+:BtoD0pi_KpipipiForHLT -> anti-D0:KpipipiForHLT pi+:GoodTrackForHLT
+  209. ParticleCombiner_B+:BtoD0pi_KpipipiForHLT -> anti-D0:KpipipiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=Mbc > 5.15 and abs(deltaE) < 0.3
@@ -2201,7 +2194,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  211. ParticleCombiner_B0:B0toDpi_KpipiForHLT -> D-:KpipiForHLT pi+:GoodTrackForHLT
+  210. ParticleCombiner_B0:B0toDpi_KpipiForHLT -> D-:KpipiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=5.15 < Mbc and abs(deltaE) < 0.3
@@ -2211,7 +2204,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  212. ParticleCombiner_B0:B0toDstarPi_D0pi_KpiForHLT -> D*-:D0_KpiForHLT pi+:GoodTrackForHLT
+  211. ParticleCombiner_B0:B0toDstarPi_D0pi_KpiForHLT -> D*-:D0_KpiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=5.15 < Mbc and abs(deltaE) < 0.3
@@ -2221,7 +2214,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  213. ParticleCombiner_B0:B0toDstarPi_D0pi_KpipipiForHLT -> D*-:D0_KpipipiForHLT pi+:GoodTrackForHLT
+  212. ParticleCombiner_B0:B0toDstarPi_D0pi_KpipipiForHLT -> D*-:D0_KpipipiForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=5.15 < Mbc and abs(deltaE) < 0.3
@@ -2231,7 +2224,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  214. ParticleCombiner_B0:B0toDstarPi_D0pi_Kpipi0ForHLT -> D*-:D0_Kpipi0ForHLT pi+:GoodTrackForHLT
+  213. ParticleCombiner_B0:B0toDstarPi_D0pi_Kpipi0ForHLT -> D*-:D0_Kpipi0ForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
       cut=5.15 < Mbc and abs(deltaE) < 0.3
@@ -2241,7 +2234,7 @@
       maximumNumberOfCandidates=10000
       recoilParticleType=0
       writeOut=False
-  215. PListCopy_B+:BtoCharmForHLT
+  214. PListCopy_B+:BtoCharmForHLT
       cut=
       ignoreMotherFlavor=False
       inputListNames=['B+:BtoD0pi_KpiForHLT', 'B+:BtoD0pi_Kpipi0ForHLT', 'B+:BtoD0pi_KpipipiForHLT']
@@ -2249,7 +2242,7 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  216. PListCopy_B0:BtoCharmForHLT
+  215. PListCopy_B0:BtoCharmForHLT
       cut=
       ignoreMotherFlavor=False
       inputListNames=['B0:B0toDpi_KpipiForHLT', 'B0:B0toDstarPi_D0pi_KpiForHLT', 'B0:B0toDstarPi_D0pi_KpipipiForHLT', 'B0:B0toDstarPi_D0pi_Kpipi0ForHLT']
@@ -2257,11 +2250,11 @@
       preferLowest=True
       variable=mdstIndex
       writeOut=False
-  217. SoftwareTrigger
+  216. SoftwareTrigger
       baseIdentifier=skim
       debugOutputFileName=software_trigger_debug.root
       preScaleStoreDebugOutputToDataStore=0
       resultStoreArrayName=
       storeDebugOutputToROOTFile=False
       useRandomNumbersForPreScale=True
-  218. Sum_HLT_Skim_Calculation
+  217. Sum_HLT_Skim_Calculation

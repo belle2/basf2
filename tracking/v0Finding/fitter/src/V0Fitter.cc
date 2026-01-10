@@ -20,10 +20,6 @@
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <cdc/dataobjects/CDCRecoHit.h>
-#include <pxd/reconstruction/PXDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit2D.h>
 
 #include <genfit/Track.h>
 #include <genfit/TrackPoint.h>

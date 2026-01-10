@@ -10,20 +10,21 @@
 #include <tracking/trackFindingCDC/filters/track/BestMatchedTruthVarSet.h>
 #include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/FilterVarSet.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterVarSet.icc.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 // these types are the only difference to TrackFilterFactory, since here BestMatchedTruthVarSet is
 // used whereas the base class uses TruthTrackVarSet
@@ -38,7 +39,7 @@ namespace {
   using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
 } // namespace
 
-template class TrackFindingCDC::FilterFactory<BaseTrackFilter>;
+template class TrackingUtilities::FilterFactory<BaseTrackFilter>;
 
 std::string TrackQualityFilterFactory::getFilterPurpose() const
 {

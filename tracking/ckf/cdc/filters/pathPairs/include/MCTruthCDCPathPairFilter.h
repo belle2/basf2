@@ -9,7 +9,7 @@
 
 #include <tracking/ckf/cdc/filters/pathPairs/BaseCDCPathPairFilter.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 
 namespace Belle2 {
@@ -17,6 +17,6 @@ namespace Belle2 {
   class MCTruthCDCPathPairFilter : public BaseCDCPathPairFilter {
   public:
     /// Input: pair of paths, returns 1 if pair.first to be selected, 0 otherwise.
-    TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final;
+    TrackingUtilities::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final;
   };
 }

@@ -9,31 +9,33 @@
 
 #include <tracking/trackFindingCDC/filters/cluster/ClusterFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/UnionRecordingFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+#include <tracking/trackingUtilities/varsets/BaseVarSet.h>
 
 #include <vector>
 #include <string>
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHitCluster;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter to record multiple chooseable variable sets for wire hit clusters
-    class UnionRecordingClusterFilter : public UnionRecordingFilter<ClusterFilterFactory> {
+    class UnionRecordingClusterFilter : public TrackingUtilities::UnionRecordingFilter<ClusterFilterFactory> {
 
     private:
       /// Type of the base class
-      using Super = UnionRecordingFilter<ClusterFilterFactory>;
+      using Super = TrackingUtilities::UnionRecordingFilter<ClusterFilterFactory>;
 
     public:
       /// Get the valid names of variable sets for wire hit clusters.
       std::vector<std::string> getValidVarSetNames() const override;
 
       /// Create a concrete variables set for wire hit clusters from a name.
-      std::unique_ptr<BaseVarSet<CDCWireHitCluster> >
+      std::unique_ptr<TrackingUtilities::BaseVarSet<TrackingUtilities::CDCWireHitCluster> >
       createVarSet(const std::string& name) const override;
     };
   }

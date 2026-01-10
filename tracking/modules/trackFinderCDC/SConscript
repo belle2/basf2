@@ -4,7 +4,8 @@ env['LIBS'] = [
     'tracking_trackFindingCDC',
     'cdc_dataobjects',
     'mdst_dataobjects',
-    'framework'
+    'framework',
+    'tracking'
     ]
 
 env.Append(CXXFLAGS=['-Wshadow'])

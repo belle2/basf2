@@ -7,12 +7,13 @@
  **************************************************************************/
 #include <tracking/modules/trackFinderCDC/AxialTrackFinderModules.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 REG_MODULE(TFCDC_AxialTrackFinderLegendre);
 REG_MODULE(TFCDC_AxialTrackFinderHough);

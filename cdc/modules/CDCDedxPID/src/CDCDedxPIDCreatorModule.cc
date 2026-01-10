@@ -51,12 +51,6 @@ namespace Belle2 {
     addParam("trackLevel", m_trackLevel,
              "ONLY USEFUL FOR MC: Use track-level MC (generate truncated mean from predicted mean and sigma using MC truth). "
              "If false, use hit-level MC (use truncated mean determined from hits)", true);
-    addParam("enableDebugOutput", m_enableDebugOutput,
-             "Option to write out debugging information to CDCDedxTracks", true);
-    addParam("likelihoodsName", m_likelihoodsName,
-             "name of CDCDedxLikelihood collection", string(""));
-    addParam("dedxTracksName", m_dedxTracksName,
-             "name of CDCDedxTrack collection", string(""));
   }
 
   CDCDedxPIDCreatorModule::~CDCDedxPIDCreatorModule()
@@ -69,9 +63,9 @@ namespace Belle2 {
     m_hits.isOptional(); // in order to run also with old cdst's where this collection doesn't exist
     m_mcParticles.isOptional();
     m_TTDInfo.isOptional();
-    m_likelihoods.registerInDataStore(m_likelihoodsName);
+    m_likelihoods.registerInDataStore();
     m_tracks.registerRelationTo(m_likelihoods);
-    m_dedxTracks.registerInDataStore(m_dedxTracksName);
+    m_dedxTracks.registerInDataStore();
     m_tracks.registerRelationTo(m_dedxTracks);
 
     m_nLayerWires[0] = 1280;
@@ -151,7 +145,7 @@ namespace Belle2 {
       const auto* mcParticle = isData ? nullptr : track.getRelated<MCParticle>();
 
       // debug output
-      CDCDedxTrack* dedxTrack = m_enableDebugOutput ? m_dedxTracks.appendNew() : nullptr;
+      CDCDedxTrack* dedxTrack = m_dedxTracks.appendNew();
       if (dedxTrack) {
         dedxTrack->m_track = track.getArrayIndex();
         dedxTrack->m_charge = fitResult->getChargeSign();

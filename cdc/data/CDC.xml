@@ -1049,7 +1049,7 @@
           <Name>ForwardEndplate</Name>
           <InnerR desc="Inner radius" unit="mm">163</InnerR>
           <OuterR desc="Outer radius" unit="mm">166</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">572.0</BackwardZ>-->
+          <BackwardZ desc="Backward z position" unit="mm">572.0</BackwardZ>
           <ForwardZ desc="Forward z position" unit="mm">582.1</ForwardZ>
         </EndplateLayer>
         <EndplateLayer id="5">
@@ -3979,7 +3979,7 @@
         <InnerR desc="Inner radius" unit="mm">1120.6</InnerR>
         <OuterR desc="Outer radius" unit="mm">1126.065</OuterR>
         <BackwardZ desc="z position at backward endplate" unit="mm">-703</BackwardZ>
-        <ForwardZ desc="z position at forward endplate" unit="mm">1569.41</ForwardZ>-->
+        <ForwardZ desc="z position at forward endplate" unit="mm">1569.41</ForwardZ>
       </OuterWall>
       <OuterWall id="2">
         <Name>InnerBackwardWall</Name>

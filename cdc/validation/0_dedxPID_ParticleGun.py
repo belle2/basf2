@@ -36,12 +36,6 @@ main.add_module("Geometry")
 # Reconstruct events.
 add_reconstruction(main)
 
-# enable debug output for the module added by add_reconstruction()
-for m in main.modules():
-    if m.name() == 'CDCDedxPIDCreator':
-        m.param('enableDebugOutput', True)
-
-
 output = basf2.register_module('RootOutput')
 output.param('outputFileName', '../ParticleGunSimRec_dedx.root')
 # let's keep this small

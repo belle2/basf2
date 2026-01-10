@@ -31,7 +31,7 @@ from prompt import ValidationSettings
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-settings = ValidationSettings(name="CDC dedx calibration",
+settings = ValidationSettings(name="CDC dedx",
                               description=__doc__,
                               download_files=[],
                               expert_config={
@@ -424,7 +424,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     for exp, run_list in exp_run_dict.items():
         for run in run_list:
             logger.info("Processing rungain validation plots...")
-            suffix = f'e{exp}_r{run}'
+            suffix = f'e{exp}'
             rungain_validation(val_path, suffix)
 
             logger.info("Processing wire gain validation plots...")
@@ -443,9 +443,9 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
             oneDcell_validation(val_path, suffix)
 
             source_path = os.path.join(job_path, 'validation0', '0', 'algorithm_output', 'plots')
-            shutil.copy(source_path+f"/costh/dedxpeaks_vs_cos_e{exp}_r{run}.pdf", 'plots/validation/')
+            shutil.copy(source_path+f"/costh/dedxpeaks_vs_cos_{suffix}.pdf", 'plots/validation/')
 
-            shutil.copy(source_path+f"/mom/dedxpeaks_vs_mom_e{exp}_r{run}.pdf", 'plots/validation/')
+            shutil.copy(source_path+f"/mom/dedxpeaks_vs_mom_{suffix}.pdf", 'plots/validation/')
 
 
 if __name__ == "__main__":

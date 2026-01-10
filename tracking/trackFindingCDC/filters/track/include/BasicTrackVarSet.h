@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
 
 // BOOST accumulators
 #include <boost/accumulators/accumulators.hpp>
@@ -22,8 +22,10 @@
 namespace bacc = boost::accumulators;
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
+  namespace TrackFindingCDC {
 
     /// Names of the variables to be generated
     constexpr
@@ -86,13 +88,13 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct BasicTrackVarSetNames : public VarNames<CDCTrack> {
+    struct BasicTrackVarSetNames : public TrackingUtilities::VarNames<TrackingUtilities::CDCTrack> {
 
       /// Number of variables to be generated
       // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
       // at least tell cppcheck that everything is fine
       // cppcheck-suppress duplInheritedMember
-      static const size_t nVars = size(basicTrackVarNames);
+      static const size_t nVars = TrackingUtilities::size(basicTrackVarNames);
 
       /// Getter for the name at the given index
       static constexpr char const* getName(int iName)
@@ -105,11 +107,11 @@ namespace Belle2 {
      *  Class to compute floating point variables from a track
      *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
-    class BasicTrackVarSet : public VarSet<BasicTrackVarSetNames> {
+    class BasicTrackVarSet : public TrackingUtilities::VarSet<BasicTrackVarSetNames> {
 
     public:
       /// Generate and assign the contained variables
-      bool extract(const CDCTrack* track) override;
+      bool extract(const TrackingUtilities::CDCTrack* track) override;
 
       /** Set of statistics/features to accumulate for each variable category (e.g. drift length).
        * The statistics set is defined with the boost::accumulator framework, which handles the

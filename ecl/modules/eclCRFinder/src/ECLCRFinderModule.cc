@@ -325,14 +325,19 @@ std::vector<std::vector<int>> ECLCRFinderModule::getConnectedRegions(const std::
 {
   std::vector<std::vector<int>> connectedRegions;
 
+  // We iterate 0..8737 for the seeds (A), as A is a sparse vector mapped to cellID
   for (unsigned int i = 0; i < A.size(); ++i) {
     if (A[i] > 0) {
       std::vector<int> region;
       region.push_back(i);
 
-      for (unsigned int j = 0; j < B.size(); ++j) {
-        if (B[j] > 0 && areNeighbours(i, j, maptype)) {
-          region.push_back(j);
+      // Instead of looping j = 0 to 8737, we only loop over actual geometric neighbors.
+      const auto& neighbors = m_neighbourMaps[maptype]->getNeighbours(i);
+
+      for (int neighborID : neighbors) {
+        // We only care if this specific neighbor is active in vector B
+        if (neighborID < static_cast<int>(B.size()) && B[neighborID] > 0) {
+          region.push_back(neighborID);
         }
       }
 

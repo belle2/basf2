@@ -344,7 +344,8 @@ std::vector<std::vector<int>> ECLCRFinderModule::getConnectedRegions(const std::
       }
 
       std::sort(region.begin(), region.end());
-      region.erase(unique(region.begin(), region.end()), region.end());
+      region.erase(std::unique(region.begin(), region.end()), region.end());
+
       connectedRegions.push_back(region);
     }
   }

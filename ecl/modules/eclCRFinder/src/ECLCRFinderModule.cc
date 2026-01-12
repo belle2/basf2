@@ -307,6 +307,8 @@ std::vector<std::vector<int>> ECLCRFinderModule::getConnectedRegions(const std::
   for (unsigned int i = 0; i < A.size(); ++i) {
     if (A[i] > 0) {
       std::vector<int> region;
+      // Reserve with max neighbor count to prevent reallocations
+      region.reserve(21);
       region.push_back(i);
 
       // Instead of looping j = 0 to 8737, we only loop over actual geometric neighbors.

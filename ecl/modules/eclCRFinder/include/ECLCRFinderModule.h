@@ -97,10 +97,6 @@ namespace Belle2 {
     /** Neighbour maps. */
     std::vector<ECL::ECLNeighbours*> m_neighbourMaps;
 
-    /** Check if two crystals are neighbours. */
-    // void checkNeighbours(const int cellid, const int tempcrid, const int type);
-    bool areNeighbours(const int cellid1, const int cellid2, const int maptype);
-
     /** Convert vector of cell ids to 0/1 vectors from 1-8737. */
     std::vector<int> oneHotVector(std::vector<int>& A, const int n);
 

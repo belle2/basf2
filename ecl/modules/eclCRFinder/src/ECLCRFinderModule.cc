@@ -242,14 +242,6 @@ void ECLCRFinderModule::terminate()
 
 }
 
-bool ECLCRFinderModule::areNeighbours(const int cellid1, const int cellid2, const int maptype)
-{
-  for (const auto& neighbour : m_neighbourMaps[maptype]->getNeighbours(cellid1)) {
-    if (neighbour == cellid2) return true;
-  }
-  return false;
-}
-
 std::vector<int> ECLCRFinderModule::flattenVector(std::vector<std::vector<int>>& A)
 {
   std::vector<int> C;

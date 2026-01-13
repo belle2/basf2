@@ -19,8 +19,8 @@ if __name__ == "__main__":
 
     import torch
     import keras
+    from fitter import fit
     from tflat.config import config
-    from tflat.fitter import fit
     from tflat.model import get_tflat_model
     from tflat.utils import get_variables
     from basf2_mva_util import create_onnx_mva_weightfile

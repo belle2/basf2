@@ -93,7 +93,7 @@ config.update({  # Training parameters
     'batch_size': 2048,
     'epochs': 200,
     'train_valid_fraction': .92,
-    'chunk_size': 10240  # Should be multiple of batch size
+    'chunk_size': 3072000  # Should be multiple of batch size
 })
 
 config.update({  # Miscellaneous parameters

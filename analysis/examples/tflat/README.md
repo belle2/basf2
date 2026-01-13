@@ -23,14 +23,17 @@ If the GPU utilization is less than ~70% it might be possible to speed up the tr
 
 ## Step-by-Step Training Guide
 
-1. **Sample training data**
+1. **Configuration**
+   - Possible update 'VersionBeamBackgroundMVA' and 'VersionFakePhotonMVA' in the config file if newer versions are available.
+
+2. **Sample training data**
    - Run sampler script on grid
     ```bash
     gbasf2 sampler.py -p {name} -i {collection_name} -s {basf2_release} --basf2opt='' -n 3
     ```
    - Download the resulting parquets
 
-2. **Prepare training data**
+3. **Prepare training data**
    - The training samples need to be split into a training and validation dataset.
    The datasets also need to be shuffled and split into chunks to allow them to be loaded into memory piece by piece.
    - All of this is done by running the `merge_sample_parquets.py` script:
@@ -39,9 +42,6 @@ If the GPU utilization is less than ~70% it might be possible to speed up the tr
     ```
     - `/path/to/input_parquets/` is the path to the directory containing the paruqet outputs produced by the sampler scipt.
     - The resulting training and validation files are saved to the `/path/to/output_parquets/` directory
-
-3. **Configuration**
-   - Possible update 'VersionBeamBackgroundMVA' and 'VersionFakePhotonMVA' in the config file if newer versions are available.
 
 4. **Training**
     - To launch the training use the `trainer.py` script:
@@ -53,14 +53,3 @@ If the GPU utilization is less than ~70% it might be possible to speed up the tr
    python3 trainer.py --train_input /path/to/output_parquets/tflat_training_samples.parquet --val_input /path/to/output_parquets/tflat_validation_samples.parquet --warmstart
     ```
    - Once the training is done a `localdb` that contains the packaged onnx weightfile is produced.
-
----
-
-## Others
-
-   - When training on a compute cluster it may be necessary to overwrite the default temp directory. This can be done by exporting some variables in the shell before staring the training:
-   ```bash
-   export TMPDIR=/path/to/tmp
-   export TEMP=$TMPDIR
-   export TMP=$TMPDIR
-   ```

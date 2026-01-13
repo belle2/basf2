@@ -193,11 +193,6 @@ namespace Belle2 {
     double nExtraVXDHits(const Particle*);
 
     /**
-     * returns 1 if PXD ON, 0 otherwise.
-     */
-    bool isPXDOn(const Particle*);
-
-    /**
      * returns the number of PXD hits not assigned to any track
      */
     double nExtraPXDHits(const Particle*);

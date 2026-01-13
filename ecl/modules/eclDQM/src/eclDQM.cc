@@ -68,7 +68,7 @@ ECLDQMModule::ECLDQMModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "histogram directory in ROOT file", std::string("ECL"));
   addParam("EnergyUpperThr", m_EnergyUpperThr, "Upper threshold of energy deposition in event, [GeV]", 20.0 * Belle2::Unit::GeV);
-  addParam("HitThresholds", m_HitThresholds, "Thresholds to display hit occupancy, MeV", std::vector<double> {0, 5, 10, 50});
+  addParam("HitThresholds", m_HitThresholds, "Thresholds to display hit occupancy, MeV", std::vector<double> {0, 5, 10, 20, 50});
   addParam("TotalEnergyThresholds", m_TotalEnergyThresholds, "Thresholds to display total energy, MeV", std::vector<double> {0, 5, 7});
   addParam("TimingThresholds", m_TimingThresholds, "Thresholds (MeV) to display ECL timing", std::vector<double> {5, 10, 50});
   addParam("HitNumberUpperlimits", m_HitNumberUpperLimits,

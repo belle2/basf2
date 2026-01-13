@@ -99,5 +99,4 @@ config.update({  # Training parameters
 config.update({  # Miscellaneous parameters
     'VersionBeamBackgroundMVA': 'MC15ri',
     'VersionFakePhotonMVA': 'MC15ri',
-
 })

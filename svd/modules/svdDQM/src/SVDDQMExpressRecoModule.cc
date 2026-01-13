@@ -885,8 +885,10 @@ void SVDDQMExpressRecoModule::event()
     return;
 
   // checking empty events
-  if (!m_rawTTD.isValid() || !m_rawTTD.getEntries())
+  if (!m_rawTTD.isValid() || !m_rawTTD.getEntries()) {
+    B2WARNING("Missing RawFTSW, SVDDQMExpressRecoModule is skipped.");
     return;
+  }
 
   m_nEvents->Fill(0);
 

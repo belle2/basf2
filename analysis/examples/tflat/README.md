@@ -7,14 +7,13 @@ The provided scripts cover all steps that are required to get from the mdst samp
 
 ## Training Samples
 
-The Training of TFlaT requires $'B^0 \rightarrow \nu \overline{\nu}'$ samples to be produced. The baseline performance was achieved with a dataset of 50M MC16 run dependent samples.
+The Training of TFlaT requires $B^0 \rightarrow \nu \overline{\nu}$ samples to be produced. The baseline performance was achieved with a dataset of 50M MC16 run dependent samples.
 
 ---
 
 ## Hardware Requirements
 The training process requires a CUDA capable GPU.\
 The time needed to complete a training depends on the specific GPU. For a NVIDIA A100 GPU the expected time to completion with 50M samples is ~4 days.\
-The system ram requirements are ~#TODO GB for the default configuration.\
 Depending on the hardware used for the training some of the parameters found in the basf2/analysis/scrips/tflat/config.py file might need to be adjusted.\
 If the VRAM of the used GPU is not sufficient, reduce the value of the 'batch_size' parameter.\
 If the system memory is not sufficient, reduce the value of the 'chunk_size' parameter. Not that for optimal efficiency the 'chunk_size' should be an integer multiple of the 'batch_size'.\
@@ -57,11 +56,11 @@ If the GPU utilization is less than ~70% it might be possible to speed up the tr
 
 ---
 
-
 ## Others
-    - When training on a compute cluster it may be necessary to overwrite the default temp directory. This can be done by exporting some variables in the shell before staring the training:
-    ```bash
-    export TMPDIR=/path/to/tmp
-    export TEMP=$TMPDIR
-    export TMP=$TMPDIR
-    ```
+
+   - When training on a compute cluster it may be necessary to overwrite the default temp directory. This can be done by exporting some variables in the shell before staring the training:
+   ```bash
+   export TMPDIR=/path/to/tmp
+   export TEMP=$TMPDIR
+   export TMP=$TMPDIR
+   ```

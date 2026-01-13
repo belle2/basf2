@@ -25,43 +25,43 @@ class batch_generator(keras.utils.PyDataset):
         Prepare all variables and prefetch 2 chunks.
         """
         super().__init__(workers=1, use_multiprocessing=False, max_queue_size=10)
-        # List of input variable names
-        self.variables = variables  # List of input variable names
-        # Name of target variable
+        #: List of input variable names
+        self.variables = variables
+        #: Name of target variable
         self.target = target
-        # Batch size of the model
+        #: Batch size of the model
         self.batch_size = batch_size
-        # Parquet metadata
+        #: Parquet metadata
         self.pf = pq.ParquetFile(parquet_path)
-        # Number of batches in a chunk
+        #: Number of batches in a chunk
         self.max_batches = chunk_size//batch_size
-        # Number of chunks in the data file
+        #: Number of chunks in the data file
         self.n_chunks = self.pf.num_row_groups
-        # Index of chunk currently in use
+        #: Index of chunk currently in use
         self.current_chunk_idx = 0
-        # Number of rows in datafile
+        #: Number of rows in datafile
         self.dataset_length = sum(
             self.pf.metadata.row_group(i).num_rows for i in range(self.n_chunks)
         )
 
         # Multithreading
-        # Chunklock to avoid race conditions
+        #: Chunklock to avoid race conditions
         self.chunk_lock = threading.Lock()
-        # Flag that indicated weather the new chunk is done loading into memory
+        #: Flag that indicated weather the new chunk is done loading into memory
         self.chunk_ready = False
-        # Thread that loads new chunk while main thread is training
+        #: Thread that loads new chunk while main thread is training
         self.loader_thread = None
 
         # Prefetch first chunk
         self._start_async_load()
         self._wait_for_chunk()  # ensure first chunk is ready
-        # Chunk currently in use
+        #: Chunk currently in use
         self.chunk_in_use = self.chunk_in_waiting
 
         # Prepare next chunk
         self._start_async_load()
 
-        # Index of current batch in current chunk
+        #: Index of current batch in current chunk
         self.current_batch = 0
 
     def __len__(self):
@@ -101,11 +101,11 @@ class batch_generator(keras.utils.PyDataset):
         y = df[self.target].to_numpy()
         max_batches = len(df) // self.batch_size
 
-        # Atomically publish chunk
+        # Publish chunk
         with self.chunk_lock:
-            # Next chunk
+            #: Next chunk
             self.chunk_in_waiting = (X, y)
-            # Maximum number of batches in this chunk
+            #: Maximum number of batches in this chunk
             self.max_batches_next = max_batches
             self.chunk_ready = True
 

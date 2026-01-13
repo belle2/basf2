@@ -103,8 +103,8 @@ namespace Belle2 {
     /** Convert vector of vectors to one long vector. */
     std::vector<int> flattenVector(std::vector<std::vector<int>>& A);
 
-    /** Find all lists of cell-ids that share at least one cell. */
-    std::vector<std::set<int>> mergeVectorsUsingSets(std::vector<std::vector<int>>& A);
+    /** Find all lists of cell-ids that share at least one cell using Breadth First Search (BFS) graph traversal algorithm. */
+    std::vector<std::set<int>> mergeVectorsUsingBFSTraversal(std::vector<std::vector<int>>& A);
 
     /** Get all connected regions. */
     std::vector<std::vector<int>> getConnectedRegions(const std::vector<int>& A, const std::vector<int>& B, const int maptype);

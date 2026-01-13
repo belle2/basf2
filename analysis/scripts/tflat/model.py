@@ -16,16 +16,23 @@ class MyConcatenate(keras.layers.Layer):
     """Concatenate the 3D input tensors and their 2D masks along the axis=1 dimension."""
 
     def call(self, inputs):
-        # Expect the input to be list of 3D tensors
+        '''
+        Expect the input to be list of 3D tensors
+        '''
         return keras.ops.concatenate(inputs, axis=1)
 
     def compute_mask(self, inputs, mask=None):
-        # Expect the mask to be list of 2D mask tensors
+        '''
+        Expect the mask to be list of 2D mask tensors
+        '''
         if mask is None:
             return None
         return keras.ops.concatenate(mask, axis=1)
 
     def get_config(self):
+        '''
+        Keras needs this
+        '''
         return super().get_config()
 
 

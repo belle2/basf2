@@ -12,7 +12,6 @@
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
-#include <klm/dataobjects/bklm/BKLMHit1d.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <top/dataobjects/TOPDigit.h>
@@ -75,13 +74,15 @@ void DetectorOccupanciesDQMModule::defineHisto()
   //outside active_veto window:
   std::string histoName = "bklm_plane_occupancy";
   std::string histoTitle = "BKLM plane occupancy";
-  m_BKLM_Plane_Occupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+  m_BKLM_Plane_Occupancy[0] = new TH2F((histoName + "_" + tag[0]).c_str(),
                                        (histoTitle + " " + title[0]).c_str(),
-                                       240, 0.5, 240.5);
+                                       240, 0.5, 240.5,
+                                       200, double(-2224.5), double(-199.5));
   m_BKLM_Plane_Occupancy[0]->GetXaxis()->SetTitle("Layer number");
+  m_BKLM_Plane_Occupancy[0]->GetYaxis()->SetTitle("Time (ns)");
 
   //inside active_veto window:
-  m_BKLM_Plane_Occupancy[1] = new TH1F(*m_BKLM_Plane_Occupancy[0]);
+  m_BKLM_Plane_Occupancy[1] = new TH2F(*m_BKLM_Plane_Occupancy[0]);
   m_BKLM_Plane_Occupancy[1]->SetName((histoName + "_" + tag[1]).c_str());
 
   m_BKLM_Plane_Occupancy[1]->SetTitle((histoTitle + " " + title[1]).c_str());
@@ -91,13 +92,15 @@ void DetectorOccupanciesDQMModule::defineHisto()
   //outside active_veto window:
   histoName = "bklm_plane_trg_occupancy";
   histoTitle = "BKLM plane occupancy (w/ trgs)";
-  m_BKLM_PlaneTrg_Occupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+  m_BKLM_PlaneTrg_Occupancy[0] = new TH2F((histoName + "_" + tag[0]).c_str(),
                                           (histoTitle + " " + title[0]).c_str(),
-                                          240, 0.5, 240.5);
+                                          240, 0.5, 240.5,
+                                          200, double(-2224.5), double(-199.5));
   m_BKLM_PlaneTrg_Occupancy[0]->GetXaxis()->SetTitle("Layer number");
+  m_BKLM_PlaneTrg_Occupancy[0]->GetYaxis()->SetTitle("Time (ns)");
 
   //inside active_veto window:
-  m_BKLM_PlaneTrg_Occupancy[1] = new TH1F(*m_BKLM_PlaneTrg_Occupancy[0]);
+  m_BKLM_PlaneTrg_Occupancy[1] = new TH2F(*m_BKLM_PlaneTrg_Occupancy[0]);
   m_BKLM_PlaneTrg_Occupancy[1]->SetName((histoName + "_" + tag[1]).c_str());
   m_BKLM_PlaneTrg_Occupancy[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
@@ -106,13 +109,15 @@ void DetectorOccupanciesDQMModule::defineHisto()
   //outside active_veto window:
   histoName = "eklm_plane_occupancy";
   histoTitle = "EKLM plane occupancy";
-  m_EKLM_Plane_Occupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+  m_EKLM_Plane_Occupancy[0] = new TH2F((histoName + "_" + tag[0]).c_str(),
                                        (histoTitle + " " + title[0]).c_str(),
-                                       208, 0.5, 208.5);
+                                       208, 0.5, 208.5,
+                                       100, double(-5300), double(-4300));
   m_EKLM_Plane_Occupancy[0]->GetXaxis()->SetTitle("Plane number");
+  m_EKLM_Plane_Occupancy[0]->GetYaxis()->SetTitle("Time (ns)");
 
   //inside active_veto window:
-  m_EKLM_Plane_Occupancy[1] = new TH1F(*m_EKLM_Plane_Occupancy[0]);
+  m_EKLM_Plane_Occupancy[1] = new TH2F(*m_EKLM_Plane_Occupancy[0]);
   m_EKLM_Plane_Occupancy[1]->SetName((histoName + "_" + tag[1]).c_str());
   m_EKLM_Plane_Occupancy[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
@@ -120,55 +125,19 @@ void DetectorOccupanciesDQMModule::defineHisto()
   //outside active_veto window:
   histoName = "eklm_plane_trg_occupancy";
   histoTitle = "EKLM plane occupancy (w/ trgs)";
-  m_EKLM_PlaneTrg_Occupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+  m_EKLM_PlaneTrg_Occupancy[0] = new TH2F((histoName + "_" + tag[0]).c_str(),
                                           (histoTitle + " " + title[0]).c_str(),
-                                          208, 0.5, 208.5);
+                                          208, 0.5, 208.5,
+                                          100, double(-5300), double(-4300));
   m_EKLM_PlaneTrg_Occupancy[0]->GetXaxis()->SetTitle("Plane number");
+  m_EKLM_PlaneTrg_Occupancy[0]->GetXaxis()->SetTitle("Time (ns)");
 
   //inside active_veto window:
-  m_EKLM_PlaneTrg_Occupancy[1] = new TH1F(*m_EKLM_PlaneTrg_Occupancy[0]);
+  m_EKLM_PlaneTrg_Occupancy[1] = new TH2F(*m_EKLM_PlaneTrg_Occupancy[0]);
   m_EKLM_PlaneTrg_Occupancy[1]->SetName((histoName + "_" + tag[1]).c_str());
   m_EKLM_PlaneTrg_Occupancy[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
 
-  //RPC Time
-  histoName = "bklm_rpc_time";
-  histoTitle = "BKLM RPC Hit Time";
-  m_BKLM_TimeRPC[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
-                               (histoTitle + " " + title[0]).c_str(),
-                               128, double(-1223.5), double(-199.5));
-  m_BKLM_TimeRPC[0]->GetXaxis()->SetTitle("Time [ns]");
-
-  //inside active_veto window:
-  m_BKLM_TimeRPC[1] = new TH1F(*m_BKLM_TimeRPC[0]);
-  m_BKLM_TimeRPC[1]->SetName((histoName + "_" + tag[1]).c_str());
-  m_BKLM_TimeRPC[1]->SetTitle((histoTitle + " " + title[1]).c_str());
-
-  //BKLM Scintillator Time
-  histoName = "bklm_scintillator_time";
-  histoTitle = "BKLM Scintillator Hit Time";
-  m_BKLM_TimeScintillator[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
-                                        (histoTitle + " " + title[0]).c_str(),
-                                        100, double(-5300), double(-4300));
-  m_BKLM_TimeScintillator[0]->GetXaxis()->SetTitle("Time [ns]");
-
-  //inside active_veto window:
-  m_BKLM_TimeScintillator[1] = new TH1F(*m_BKLM_TimeScintillator[0]);
-  m_BKLM_TimeScintillator[1]->SetName((histoName + "_" + tag[1]).c_str());
-  m_BKLM_TimeScintillator[1]->SetTitle((histoTitle + " " + title[1]).c_str());
-
-  //EKLM Scintillator Time
-  histoName = "eklm_scintillator_time";
-  histoTitle = "EKLM Scintillator Hit Time";
-  m_EKLM_TimeScintillator[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
-                                        (histoTitle + " " + title[0]).c_str(),
-                                        100, double(-5300), double(-4300));
-  m_EKLM_TimeScintillator[0]->GetXaxis()->SetTitle("Time [ns]");
-
-  //inside active_veto window:
-  m_EKLM_TimeScintillator[1] = new TH1F(*m_EKLM_TimeScintillator[0]);
-  m_EKLM_TimeScintillator[1]->SetName((histoName + "_" + tag[1]).c_str());
-  m_EKLM_TimeScintillator[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
   //ARICH plane occupancy
   //outside active_veto window:
@@ -216,7 +185,6 @@ void DetectorOccupanciesDQMModule::initialize()
   m_eventMetaData.isOptional();
   m_trgSummary.isOptional();
   m_KLMDigits.isOptional();
-  m_BklmHit1ds.isOptional();
   m_ARICHHits.isOptional();
   m_topDigits.isOptional();
   m_eclCalDigits.isOptional();
@@ -234,9 +202,6 @@ void DetectorOccupanciesDQMModule::beginRun()
     if (m_BKLM_PlaneTrg_Occupancy[i] != nullptr)  m_BKLM_PlaneTrg_Occupancy[i]->Reset();
     if (m_EKLM_Plane_Occupancy[i] != nullptr)  m_EKLM_Plane_Occupancy[i]->Reset();
     if (m_EKLM_PlaneTrg_Occupancy[i] != nullptr)  m_EKLM_PlaneTrg_Occupancy[i]->Reset();
-    if (m_BKLM_TimeRPC[i] != nullptr) m_BKLM_TimeRPC[i]->Reset();
-    if (m_BKLM_TimeScintillator[i] != nullptr) m_BKLM_TimeScintillator[i]->Reset();
-    if (m_EKLM_TimeScintillator[i] != nullptr) m_EKLM_TimeScintillator[i]->Reset();
     if (m_ARICH_Occupancy[i] != nullptr)  m_ARICH_Occupancy[i]->Reset();
     if (m_TOP_Occupancy[i] != nullptr)  m_TOP_Occupancy[i]->Reset();
     if (m_ECL_Occupancy[i] != nullptr)  m_ECL_Occupancy[i]->Reset();
@@ -282,18 +247,6 @@ void DetectorOccupanciesDQMModule::event()
                          );
 
 
-  //fill the BKLM plane occupancy plots
-  for (const BKLMHit1d& hit1d : m_BklmHit1ds) {
-    int section = hit1d.getSection();
-    int sector = hit1d.getSector();
-    int layer = hit1d.getLayer();
-    int layerGlobal = BKLMElementNumbers::layerGlobalNumber(
-                        section, sector, layer);
-    m_BKLM_Plane_Occupancy[index]->Fill(layerGlobal);
-    if (backBooleanFlag) m_BKLM_PlaneTrg_Occupancy[index]->Fill(layerGlobal);
-
-  }
-
   for (const KLMDigit& digit : m_KLMDigits) {
     /*
      * Reject digits that are below the threshold (such digits may appear
@@ -308,12 +261,22 @@ void DetectorOccupanciesDQMModule::event()
       int sector = digit.getSector();
       int plane = digit.getPlane();
       int planeGlobal = m_eklmElementNumbers->planeNumber(section, layer, sector, plane);
-      m_EKLM_Plane_Occupancy[index]->Fill(planeGlobal);
-      if (backBooleanFlag) m_EKLM_PlaneTrg_Occupancy[index]->Fill(planeGlobal);
-      m_EKLM_TimeScintillator[index]->Fill(digit.getTime());
+      m_EKLM_Plane_Occupancy[index]->Fill(planeGlobal, digit.getTime());
+      if (backBooleanFlag) m_EKLM_PlaneTrg_Occupancy[index]->Fill(planeGlobal, digit.getTime());
     } else if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
-      if (digit.inRPC()) m_BKLM_TimeRPC[index]->Fill(digit.getTime());
-      else m_BKLM_TimeScintillator[index]->Fill(digit.getTime());
+      int section = digit.getSection();
+      int layer = digit.getLayer();
+      int sector = digit.getSector();
+      int layerGlobal = BKLMElementNumbers::layerGlobalNumber(
+                          section, sector, layer);
+      float offset = (digit.inRPC()) ? 0. : 4300 - 1223.5; // shifting scintillator hits to be near RPC hits
+      bool goodRPCHit = (!(digit.getTime() > -1223.5 && digit.getTime() < -199.5) && (digit.inRPC()));  //RPC time window
+      bool goodScintHit = (!(digit.getTime() > -5300 && digit.getTime() < -4300) && !(digit.inRPC())); //scint. time window
+      if (goodRPCHit || goodScintHit)
+        continue;
+      m_BKLM_Plane_Occupancy[index]->Fill(layerGlobal, digit.getTime() + offset);
+      if (backBooleanFlag)
+        m_BKLM_PlaneTrg_Occupancy[index]->Fill(layerGlobal, digit.getTime() + offset);
     }
   }
 

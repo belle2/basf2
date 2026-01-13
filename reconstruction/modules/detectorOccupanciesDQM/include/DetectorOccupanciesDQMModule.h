@@ -15,12 +15,12 @@
 
 #include <string>
 #include <TH1F.h>
+#include <TH2F.h>
 #include <TProfile.h>
 
 namespace Belle2 {
   class EventMetaData;
   class TRGSummary;
-  class BKLMHit1d;
   class KLMDigit;
   class EKLMElementNumbers;
   class ARICHHit;
@@ -60,14 +60,10 @@ namespace Belle2 {
     StoreObjPtr<TRGSummary> m_trgSummary; /**< trg summary */
 
     //KLM stuff
-    StoreArray<BKLMHit1d> m_BklmHit1ds; /**< BKLM hit 1D*/
     StoreArray<KLMDigit> m_KLMDigits; /**< KLM digits*/
     const EKLMElementNumbers* m_eklmElementNumbers; /**< EKLM Element numbers. */
-    // KLM Background Triggers bits of Interest
-    const TRGSummary::ETimingType m_klmBackTriggers[3] = {TRGSummary::ETimingType::TTYP_RAND,
-                                                          TRGSummary::ETimingType::TTYP_POIS,
-                                                          TRGSummary::ETimingType::TTYP_DPHY
-                                                         };
+    // KLM Background Trigger bit(s) of Interest
+    const TRGSummary::ETimingType m_klmBackTriggers[1] = {TRGSummary::ETimingType::TTYP_DPHY};  /**< Background Triggers bits of Interest */
 
     //ARICH stuff
     StoreArray<ARICHHit>m_ARICHHits; /**< ARICH hits*/
@@ -81,13 +77,10 @@ namespace Belle2 {
 
     //histograms (all)
     //index: 0 = passive veto; 1 = active veto
-    TH1F* m_BKLM_Plane_Occupancy[2]; /**< BKLM plane integrated occupancy */;
-    TH1F* m_BKLM_PlaneTrg_Occupancy[2]; /**< BKLM plane integrated occupancy w/ trgs */;
-    TH1F* m_EKLM_Plane_Occupancy[2]; /**< EKLM plane integrated occupancy */;
-    TH1F* m_EKLM_PlaneTrg_Occupancy[2]; /**< EKLM plane integrated occupancy w/ trgs */;
-    TH1F* m_BKLM_TimeRPC[2]; /**< RPC Hit Time */;
-    TH1F* m_BKLM_TimeScintillator[2]; /**< BKLM Scintillator Hit Time */;
-    TH1F* m_EKLM_TimeScintillator[2]; /**< EKLM  Scintillator Hit Time */;
+    TH2F* m_BKLM_Plane_Occupancy[2]; /**< BKLM plane integrated occupancy */;
+    TH2F* m_BKLM_PlaneTrg_Occupancy[2]; /**< BKLM plane integrated occupancy w/ trgs */;
+    TH2F* m_EKLM_Plane_Occupancy[2]; /**< EKLM plane integrated occupancy */;
+    TH2F* m_EKLM_PlaneTrg_Occupancy[2]; /**< EKLM plane integrated occupancy w/ trgs */;
     TH1F* m_ARICH_Occupancy[2]; /**< ARICH Digit Occupancy*/
     TH1F* m_TOP_Occupancy[2]; /**< TOP occupancy (good hits only) */
     TProfile* m_ECL_Occupancy[2]; /**< ECL occupancy (hits above 5 MeV) */

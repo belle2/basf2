@@ -15,6 +15,9 @@
 //boost
 #include "boost/format.hpp"
 
+//std
+#include <numeric>
+
 using namespace Belle2;
 
 REG_MODULE(DQMHistAnalysisECLShapers);
@@ -41,6 +44,10 @@ void DQMHistAnalysisECLShapersModule::initialize()
   }
   for (auto part_id : {"fw", "br", "bw", "al"}) {
     std::string pv_name = "pedwidth:max_";
+    pv_name += part_id;
+    registerEpicsPV(m_pvPrefix + pv_name, pv_name);
+
+    pv_name = "pedwidth:avg_";
     pv_name += part_id;
     registerEpicsPV(m_pvPrefix + pv_name, pv_name);
   }
@@ -90,9 +97,17 @@ void DQMHistAnalysisECLShapersModule::event()
     m_pedwidth_max[1] = robust_max(barrel_pedwidth) * adc_to_mev;
     m_pedwidth_max[2] = robust_max(bwd_pedwidth)    * adc_to_mev;
     m_pedwidth_max[3] = *std::max_element(&m_pedwidth_max[0], &m_pedwidth_max[2]);
+
+    // Sum of a given multiset
+    auto sum = [](std::multiset<double> x) { return std::accumulate(x.begin(), x.end(), 0.0); };
+
+    m_pedwidth_avg[0] = sum(fwd_pedwidth) / fwd_pedwidth.size() * adc_to_mev;
+    m_pedwidth_avg[1] = sum(barrel_pedwidth) / barrel_pedwidth.size() * adc_to_mev;
+    m_pedwidth_avg[2] = sum(bwd_pedwidth) / bwd_pedwidth.size() * adc_to_mev;
   } else {
     for (int i = 0; i < 4; i++) {
       m_pedwidth_max[i] = 0;
+      m_pedwidth_avg[i] = 0;
     }
   }
 
@@ -113,6 +128,12 @@ void DQMHistAnalysisECLShapersModule::event()
       std::string pv_name = "pedwidth:max_";
       pv_name += part_id[i];
       setEpicsPV(pv_name, m_pedwidth_max[i]);
+    }
+    for (int i = 0; i < 4; i++) {
+      if (m_pedwidth_avg[i] <= 0) continue;
+      std::string pv_name = "pedwidth:avg_";
+      pv_name += part_id[i];
+      setEpicsPV(pv_name, m_pedwidth_avg[i]);
     }
   }
 }
@@ -140,6 +161,7 @@ void DQMHistAnalysisECLShapersModule::endRun()
   m_monObj->setVariable("pedwidthBarrel", m_pedwidth_max[1]);
   m_monObj->setVariable("pedwidthBWD", m_pedwidth_max[2]);
   m_monObj->setVariable("pedwidthTotal", m_pedwidth_max[3]);
+  // TODO: Add avg variables here as well
 }
 
 

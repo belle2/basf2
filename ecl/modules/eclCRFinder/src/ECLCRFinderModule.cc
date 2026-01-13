@@ -227,7 +227,7 @@ void ECLCRFinderModule::event()
   std::vector<std::vector<int>> connectedRegions_ABBC = getConnectedRegions(ABB, m_cellIdToDigitVec, 0);
 
   //final step: merge all CRs that share at least one crystal
-  std::vector<std::set<int>> connectedRegionsMerged_ABBC_sets = mergeVectorsUsingSets(connectedRegions_ABBC);
+  std::vector<std::set<int>> connectedRegionsMerged_ABBC_sets = mergeVectorsUsingBFSTraversal(connectedRegions_ABBC);
 
   // Create CRs and add relations to digits.
   unsigned int connectedRegionID = 0;
@@ -286,27 +286,65 @@ std::vector<int> ECLCRFinderModule::oneHotVector(std::vector<int>& A, const int 
   return C;
 }
 
-std::vector<std::set<int>> ECLCRFinderModule::mergeVectorsUsingSets(std::vector<std::vector<int>>& A)
+std::vector<std::set<int>> ECLCRFinderModule::mergeVectorsUsingBFSTraversal(std::vector<std::vector<int>>& A)
 {
+  std::vector<std::set<int>> output;
 
-  // Make empty list of sets "output"
-  std::vector< std::set<int> > output;
+  // 1. Data Structures for lookup
+  // We use a fixed-size adjacency list for all crystals (Max ID 8736)
+  std::vector<std::vector<int>> adj(8737);
+  std::vector<bool> visited(8737, false);
+  std::vector<int> relevantNodes;
 
-  for (auto& vec : A) {
-    std::set<int> s(vec.begin(), vec.end());
+  // Reserve memory to prevent reallocations
+  relevantNodes.reserve(A.size() * 4);
 
-    //Check whether element intersects with any in output
-    for (auto it = output.begin(); it != output.end();) {
-      std::set<int> intersect;
-      std::set_intersection(it->begin(), it->end(), s.begin(), s.end(),
-                            std::inserter(intersect, intersect.begin()));
+  // 2. Build the Graph
+  // If a vector contains {1, 2, 3}, we mark them as connected neighbors.
+  for (const auto& group : A) {
+    if (group.empty()) continue;
 
-      if (!intersect.empty()) {
-        s.insert(it->begin(), it->end());
-        it = output.erase(it);
-      } else ++it;
+    int root = group[0];
+    relevantNodes.push_back(root);
+
+    for (size_t i = 1; i < group.size(); ++i) {
+      int neighbor = group[i];
+      relevantNodes.push_back(neighbor);
+
+      // Add bi-directional edges
+      adj[root].push_back(neighbor);
+      adj[neighbor].push_back(root);
     }
-    output.push_back(s);
+  }
+
+  // 3. Find Connected Components (BFS)
+  // We only iterate over nodes that actually appeared in the event.
+  for (int startNode : relevantNodes) {
+    if (visited[startNode]) continue;
+
+    // Start a new cluster
+    std::set<int> component;
+    std::vector<int> q; // BFS Queue
+
+    visited[startNode] = true;
+    q.push_back(startNode);
+    component.insert(startNode);
+
+    int head = 0;
+    while (head < static_cast<int>(q.size())) {
+      int u = q[head++];
+
+      for (int v : adj[u]) {
+        if (!visited[v]) {
+          visited[v] = true;
+          component.insert(v);
+          q.push_back(v);
+        }
+      }
+    }
+
+    // Move the finished component to output
+    output.push_back(std::move(component));
   }
 
   return output;

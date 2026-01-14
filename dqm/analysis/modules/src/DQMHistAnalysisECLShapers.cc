@@ -157,11 +157,14 @@ void DQMHistAnalysisECLShapersModule::endRun()
 
   // set values of monitoring variables (if variable already exists this will
   // change its value, otherwise it will insert new variable)
-  m_monObj->setVariable("pedwidthFWD", m_pedwidth_max[0]);
-  m_monObj->setVariable("pedwidthBarrel", m_pedwidth_max[1]);
-  m_monObj->setVariable("pedwidthBWD", m_pedwidth_max[2]);
-  m_monObj->setVariable("pedwidthTotal", m_pedwidth_max[3]);
-  // TODO: Add avg variables here as well
+  m_monObj->setVariable("pedwidthmaxFWD", m_pedwidth_max[0]);
+  m_monObj->setVariable("pedwidthmaxBarrel", m_pedwidth_max[1]);
+  m_monObj->setVariable("pedwidthmaxBWD", m_pedwidth_max[2]);
+  m_monObj->setVariable("pedwidthmaxTotal", m_pedwidth_max[3]);
+  m_monObj->setVariable("pedwidthavgFWD", m_pedwidth_avg[0]);
+  m_monObj->setVariable("pedwidthavgBarrel", m_pedwidth_avg[1]);
+  m_monObj->setVariable("pedwidthavgBWD", m_pedwidth_avg[2]);
+  m_monObj->setVariable("pedwidthavgTotal", m_pedwidth_avg[3]);
 }
 
 

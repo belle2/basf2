@@ -8,6 +8,7 @@
 
 /* Own header. */
 #include <klm/time/KLMTime.h>
+#include <utility>
 
 using namespace Belle2;
 
@@ -61,6 +62,30 @@ std::pair<int, double> KLMTime::getRPCTimes(int ctime, int tdc, int triggerTime)
     relativeTime -= trigger + 0x800;
   return std::pair<int, double>(ctime - triggerTime,
                                 relativeTime * m_TDCPeriod);
+}
+
+std::pair<int, double> KLMTime::getFTime(int ctime, int triggerTime) const
+{
+  /*
+   * Algorithm (per Chris Ketter, cketter_klm_weekly_251111.pdf):
+   * Result is negative (hits in the past from L1 trigger), typically -1200 to +200 TTD clocks.
+   */
+
+  /* FRAME9_MAX: RPC ftime counter cycles from 0 to 11519, then resets */
+  const int FRAME9_MAX = 11520;
+
+  /* Calculate relative time in TTD clock ticks with overflow correction */
+  int relativeTime;
+  if (ctime <= triggerTime) {
+    /* Normal case: hit before trigger in same frame9 cycle */
+    relativeTime = ctime - triggerTime;
+  } else {
+    /* Overflow: trigger wrapped at 11520, adjust before subtraction */
+    relativeTime = ctime - (triggerTime + FRAME9_MAX);
+  }
+
+  /* Convert to nanoseconds using TTD period (~7.861 ns) */
+  return std::pair<int, double>(relativeTime, relativeTime * m_CTimePeriod);
 }
 
 double KLMTime::getTimeSimulation(int tdc, bool scintillator) const

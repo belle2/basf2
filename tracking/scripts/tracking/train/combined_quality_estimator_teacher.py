@@ -1542,7 +1542,8 @@ class HarvestingValidationBaseTask(Basf2PathTask):
     reco_output_file_name = "reconstruction.root"
     #: Components for the MC matching and track fit creation.
     components = None
-    cdc_training_target = "truth"  # may be subject to change, added for debugging
+    #: Feature/variable to use as truth label for the CDC track quality estimator.
+    cdc_training_target = "truth"
 
     @property
     def teacher_task(self) -> TrackQETeacherBaseTask:
@@ -1921,6 +1922,7 @@ class TrackQEEvaluationBaseTask(Task):
         #: \endcond
     )
 
+    #: Teacher task to require to provide a quality estimator weightfile for ``add_tracking_with_quality_estimation``
     @property
     def teacher_task(self) -> TrackQETeacherBaseTask:
         """
@@ -2189,7 +2191,8 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
         default=True
         #: \endcond
     )  # normalize finding efficiencies to primary MC-tracks
-    cdc_training_target = "truth"  # may be subject to change, added for debugging
+    #: Feature/variable to use as truth label for the CDC track quality estimator.
+    cdc_training_target = "truth"
 
     @property
     def harvesting_validation_task_instance(self) -> HarvestingValidationBaseTask:
@@ -2199,6 +2202,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
         """
         raise NotImplementedError("Must define a QI harvesting validation task for which to do the plots")
 
+    #: Name of the output PDF file containing the validation plots
     @property
     def output_pdf_file_basename(self):
         """

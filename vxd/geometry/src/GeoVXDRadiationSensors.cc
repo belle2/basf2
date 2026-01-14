@@ -8,10 +8,12 @@
 
 #include <vxd/geometry/GeoVXDRadiationSensors.h>
 #include <geometry/Materials.h>
+#include <framework/gearbox/GearDir.h>
 
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <G4Box.hh>
 #include <G4PVPlacement.hh>
+#include <G4LogicalVolume.hh>
 #include <simulation/background/BkgSensitiveDetector.h>
 
 namespace Belle2 {

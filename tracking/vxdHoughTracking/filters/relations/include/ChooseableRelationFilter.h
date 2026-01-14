@@ -9,11 +9,11 @@
 
 #include <tracking/vxdHoughTracking/filters/relations/LayerRelationFilter.dcl.h>
 #include <tracking/vxdHoughTracking/filters/relations/RelationFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
     /// A chooseable filter for picking out the relations between states
-    using ChooseableRelationFilter = LayerRelationFilter<TrackFindingCDC::ChooseableFilter<RelationFilterFactory>>;
+    using ChooseableRelationFilter = LayerRelationFilter<TrackingUtilities::ChooseableFilter<RelationFilterFactory>>;
   }
 }

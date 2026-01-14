@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
 #include <boost/range/adaptor/reversed.hpp>
@@ -15,7 +15,7 @@
 
 namespace Belle2 {
   /// Merge similar paths
-  class CDCCKFPathMerger : public TrackFindingCDC::Findlet<CDCCKFPath> {
+  class CDCCKFPathMerger : public TrackingUtilities::Findlet<CDCCKFPath> {
   public:
     /// main method of the findlet, reads/returns merged paths
     void apply(std::vector<CDCCKFPath>& newPaths) override

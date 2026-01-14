@@ -14,8 +14,10 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
+  namespace TrackFindingCDC {
 
     /// Relation filter that lets only possibilities with small phi distance pass
     class PhiTrackRelationFilter : public BaseTrackRelationFilter {
@@ -29,7 +31,8 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
       /// Implementation of the phi calculation.
-      Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCTrack& fromTrack,
+                                           const TrackingUtilities::CDCTrack& toTrack) final;
 
     private:
       /// Parameter : The maximal deviation in phi between the trajectories of the track.

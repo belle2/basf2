@@ -13,8 +13,6 @@
 #include <G4ParticleDefinition.hh>
 #include <globals.hh>
 
-#include <CLHEP/Units/SystemOfUnits.h>
-
 namespace Belle2 {
 
   namespace Monopoles {

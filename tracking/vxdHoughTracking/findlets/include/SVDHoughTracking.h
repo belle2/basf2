@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/vxdHoughTracking/findlets/SpacePointLoaderAndPreparer.h>
 #include <tracking/vxdHoughTracking/findlets/MultiHoughSpaceFastInterceptFinder.h>
 #include <tracking/vxdHoughTracking/findlets/SingleHoughSpaceFastInterceptFinder.h>
@@ -15,9 +15,6 @@
 #include <tracking/vxdHoughTracking/findlets/TrackCandidateOverlapResolver.h>
 #include <tracking/vxdHoughTracking/findlets/RecoTrackStorer.h>
 #include <tracking/vxdHoughTracking/findlets/ROIFinder.h>
-
-#include <string>
-#include <vector>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -30,9 +27,9 @@ namespace Belle2 {
     /**
     * Main Findlet for the SVDHoughTracking.
     */
-    class SVDHoughTracking : public TrackFindingCDC::Findlet<> {
+    class SVDHoughTracking : public TrackingUtilities::Findlet<> {
       /// Parent class
-      using Super = TrackFindingCDC::Findlet<>;
+      using Super = TrackingUtilities::Findlet<>;
 
     public:
       /// Constructor for adding the subfindlets

@@ -11,7 +11,7 @@
 """
 <header>
   <output>CosmicsSimNoBkgTrackingVolume.root</output>
-  <contact>arul.prakash@physik.uni-muenchen.de</contact>
+  <contact>giacomo.pietro@kit.edu</contact>
   <cacheable/>
   <description>
     This steering file produces 10000 cosmic ray events without background, for the early_phase3 geometry.
@@ -20,7 +20,7 @@
 </header>
 """
 
-from basf2 import create_path, statistics, set_random_seed, process
+from basf2 import create_path, set_random_seed, process
 from simulation import add_simulation
 from validation import statistics_plots, event_timing_plot
 
@@ -49,21 +49,18 @@ main.add_module(
 )
 
 main.add_module('Progress')
-process(main)
-
-# Print call statistics
-print(statistics)
+process(main, calculateStatistics=True)
 
 statistics_plots(
     "CosmicsSimNoBkgTrackingVolume_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation job with Cosmics events",
     prefix="CosmicsSimNoBkgTrackingVolume",
 )
 event_timing_plot(
     "../CosmicsSimNoBkgTrackingVolume.root",
     "CosmicsSimNoBkgTrackingVolume_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation job with Cosmics events",
     prefix="CosmicsSimNoBkgTrackingVolume",
 )

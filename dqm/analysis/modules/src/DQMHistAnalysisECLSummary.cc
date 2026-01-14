@@ -55,7 +55,11 @@ void DQMHistAnalysisECLSummaryModule::initialize()
   //=== Set up ECL alarms and corresponding PVs
 
   m_ecl_alarms = {
-    {"dead",     "#splitline{dead}{channels}",         1,  1,  1e5},
+    // name      title                                 alarm_limit
+    //  |          |                                   |   warning_limit
+    //  |          |                                   |   |   required_statistics
+    //  |          |                                   |   |   |
+    {"dead",     "#splitline{dead}{channels}",         1,  1,  3e4},
     {"cold",     "#splitline{cold}{channels}",         1,  2,  1e5},
     {"hot",      "#splitline{hot}{channels}",          25, 50, 1e5},
     {"bad_chi2", "#splitline{bad #chi^{2}}{channels}", 5,  10, 1e6},
@@ -269,30 +273,26 @@ void DQMHistAnalysisECLSummaryModule::event()
   // Based on https://root-forum.cern.ch/t/different-color-palettes-for-different-plots-with-texec/5250/3
   // and https://root.cern/doc/master/multipalette_8C.html
 
-  if (!m_ecl_style) delete m_ecl_style;
-  if (!m_default_style) delete m_default_style;
-
-  m_ecl_style     = new TExec("ecl_style",
-                              "gStyle->SetPalette(kRainBow);"
-                              "if (channels_summary) channels_summary->SetDrawOption(\"col\");");
-  h_channels_summary->GetListOfFunctions()->Add(m_ecl_style);
-  m_default_style = new TExec("default_style",
-                              "gStyle->SetPalette(kBird);"); // " Changing back to the default color palette
-
   //=== Draw with special style
   //    https://root.cern.ch/js/latest/examples.htm#th2_colpal77
   h_channels_summary->Draw("");
-  h_channels_summary->Draw("colpal55;same");
+  h_channels_summary->Draw("col;pal55;same");
   for (auto& text : m_labels) {
     text->Draw();
   }
   drawGrid(h_channels_summary);
-  m_default_style->Draw("same");
 
   //
   c_channels_summary->Modified();
   c_channels_summary->Update();
   c_channels_summary->Draw();
+
+  m_ecl_style     = new TExec("ecl_style",
+                              "gStyle->SetPalette(kRainBow);");
+  c_channels_summary->GetListOfPrimitives()->AddFirst(m_ecl_style);
+  m_default_style = new TExec("default_style",
+                              "gStyle->SetPalette(kBird);"); // " Changing back to the default color palette
+  c_channels_summary->GetListOfPrimitives()->AddLast(m_default_style);
 
   gStyle->SetTitleH(gstyle_title_h);
   gStyle->SetTitleX(gstyle_title_x);
@@ -655,12 +655,12 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
     if (total_events >= dead_alarm.required_statistics) {
       double min_occupancy;
       const std::string run_type = getRunType();
-      if (run_type == "null" || run_type == "debug" || run_type == "cosmic") {
-        // For null runs, occupancy should be higher than 0.0001%
-        min_occupancy = 1e-6;
-      } else if (run_type == "physics") {
+      if (run_type == "physics") {
         // For physics runs, occupancy should be higher than 0.01%
         min_occupancy = 1e-4;
+      } else {
+        // For every other run type, occupancy should be higher than 0.0001%
+        min_occupancy = 1e-6;
       }
       if (not_normalized) {
         // The histogram is not normalized, multiply the threshold by evt count

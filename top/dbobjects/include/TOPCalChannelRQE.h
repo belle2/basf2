@@ -78,7 +78,7 @@ namespace Belle2 {
      * Returns the relative QE for a single channel (1.0 if status is c_Default)
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
-     * @return relative quantum efficieny (absolute value, not in %)
+     * @return relative quantum efficiency (absolute value, not in %)
      */
     double getRQE(int moduleID, unsigned channel) const
     {

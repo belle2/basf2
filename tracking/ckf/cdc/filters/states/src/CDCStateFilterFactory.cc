@@ -7,13 +7,13 @@
  **************************************************************************/
 #include <tracking/ckf/cdc/filters/states/CDCStateFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AndFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.icc.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/ckf/cdc/filters/states/CDCStateBasicVarSet.h>
 #include <tracking/ckf/cdc/filters/states/CDCfromEclStateTruthVarSet.h>
@@ -26,7 +26,7 @@
 #include <tracking/ckf/cdc/filters/states/MCTruthEclSeedFilter.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// Recording filter for SVD seeding.
@@ -80,10 +80,10 @@ std::unique_ptr<BaseCDCStateFilter>
 CDCStateFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BaseCDCStateFilter>>();
+    return std::make_unique<TrackingUtilities::NoneFilter<BaseCDCStateFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
-    return std::make_unique<TrackFindingCDC::AllFilter<BaseCDCStateFilter>>();
+    return std::make_unique<TrackingUtilities::AllFilter<BaseCDCStateFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "rough") {
     return std::make_unique<RoughCDCStateFilter>();

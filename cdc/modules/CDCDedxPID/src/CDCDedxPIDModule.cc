@@ -8,10 +8,7 @@
 
 #include <cdc/modules/CDCDedxPID/CDCDedxPIDModule.h>
 
-#include <reconstruction/dataobjects/DedxConstants.h>
 #include <cdc/modules/CDCDedxPID/LineHelper.h>
-
-#include <framework/gearbox/Const.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
@@ -20,6 +17,10 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
+
+#include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+#include <reconstruction/dataobjects/DedxConstants.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 
 #include <genfit/AbsTrackRep.h>
@@ -56,8 +57,6 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module()
            "Portion of events with high dE/dx that should be discarded", double(0.25));
   addParam("useBackHalfCurlers", m_backHalfCurlers,
            "Whether to use the back half of curlers", false);
-  addParam("enableDebugOutput", m_enableDebugOutput,
-           "Option to write out debugging information to CDCDedxTracks (DataStore objects).", true);
   addParam("useIndividualHits", m_useIndividualHits,
            "If using lookup table PDFs, include PDF value for each hit in likelihood. If false, the truncated mean of dedx values will be used.",
            true);
@@ -120,11 +119,8 @@ void CDCDedxPIDModule::initialize()
   m_mcparticles.isOptional();
   m_tracks.optionalRelationTo(m_mcparticles);
 
-  // register optional outputs
-  if (m_enableDebugOutput) {
-    m_dedxTracks.registerInDataStore();
-    m_tracks.registerRelationTo(m_dedxTracks);
-  }
+  m_dedxTracks.registerInDataStore();
+  m_tracks.registerRelationTo(m_dedxTracks);
 
   // register outputs
   m_dedxLikelihoods.registerInDataStore();
@@ -204,7 +200,7 @@ void CDCDedxPIDModule::event()
       continue;
     }
 
-    if ((m_enableDebugOutput or m_onlyPrimaryParticles) and numMCParticles != 0) {
+    if (m_onlyPrimaryParticles and numMCParticles != 0) {
       // find MCParticle corresponding to this track
       const MCParticle* mcpart = track.getRelatedTo<MCParticle>();
 
@@ -500,11 +496,10 @@ void CDCDedxPIDModule::event()
           if (nomom) cellDedx *= std::sin(std::atan(1 / fitResult->getCotTheta()));
           else cellDedx *= std::sin(trackMom.Theta());
 
-          if (m_enableDebugOutput)
-            dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS,
-                              adcCount, adcbaseCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
-                              driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
-                              foundByTrackFinder, weightPionHypo, weightKaonHypo, weightProtHypo);
+          dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS,
+                            adcCount, adcbaseCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
+                            driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
+                            foundByTrackFinder, weightPionHypo, weightKaonHypo, weightProtHypo);
 
           // --------------------
           // save layer hits only with active wires
@@ -574,7 +569,7 @@ void CDCDedxPIDModule::event()
     // If using track-level MC, get the predicted mean and resolution and throw a random
     // number to get the simulated dE/dx truncated mean. Otherwise, calculate the truncated
     // mean from the simulated hits (hit-level MC).
-    if (!m_useIndividualHits or m_enableDebugOutput) {
+    if (!m_useIndividualHits) {
       calculateMeans(&(dedxTrack->m_dedxAvg),
                      &(dedxTrack->m_dedxAvgTruncatedNoSat),
                      &(dedxTrack->m_dedxAvgTruncatedErr),
@@ -622,11 +617,9 @@ void CDCDedxPIDModule::event()
     CDCDedxLikelihood* likelihoodObj = m_dedxLikelihoods.appendNew(pidvalues);
     track.addRelationTo(likelihoodObj);
 
-    if (m_enableDebugOutput) {
-      // book the information for this track
-      CDCDedxTrack* newCDCDedxTrack = m_dedxTracks.appendNew(*dedxTrack);
-      track.addRelationTo(newCDCDedxTrack);
-    }
+    // book the information for this track
+    CDCDedxTrack* newCDCDedxTrack = m_dedxTracks.appendNew(*dedxTrack);
+    track.addRelationTo(newCDCDedxTrack);
 
   } // end of loop over tracks
 }

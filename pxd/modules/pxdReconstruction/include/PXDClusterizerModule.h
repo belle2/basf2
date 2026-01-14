@@ -10,10 +10,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <pxd/dbobjects/PXDClusterPositionErrorPar.h>
-#include <pxd/reconstruction/ClusterCache.h>
-#include <pxd/reconstruction/ClusterProjection.h>
 #include <pxd/reconstruction/NoiseMap.h>
 #include <string>
 #include <memory>
@@ -22,7 +18,14 @@ namespace Belle2 {
   class RelationArray;
   class RelationElement;
   class EventLevelTrackingInfo;
+  class PXDClusterPositionErrorPar;
+  class VxdID;
 
+  namespace PXD {
+    class ClusterCache;
+    class ClusterCandidate;
+    class ClusterProjection;
+  }
 
   namespace PXD {
 

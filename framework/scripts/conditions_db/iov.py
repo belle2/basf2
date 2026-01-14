@@ -200,9 +200,11 @@ class IntervalOfValidity:
             True
 
         """
+        # \cond false positive doxygen warning
         if other.first <= self.final and other.final >= self.first:
             return IntervalOfValidity(*(max(self.first, other.first) + min(self.final, other.final)))
         return None
+        # \endcond
 
     def union(self, other, allow_startone=False):
         """
@@ -238,9 +240,11 @@ class IntervalOfValidity:
                     (0, 0, 1, inf)
 
         """
+        # \cond false positive doxygen warning
         # check the trivial case of overlapping
         if other.first <= self.final and other.final >= self.first:
             return IntervalOfValidity(min(self.first, other.first) + max(self.final, other.final))
+        # \endcond
         # ok, let's do the less simple case where they don't overlap but join directly
         for i1, i2 in (self, other), (other, self):
             if (i1.first == (i2.final_exp, i2.final_run + 1) or
@@ -459,11 +463,13 @@ class IoVSet:
         # ok for all combinations a,b from set1 and set2 check the intersection
         # and if not empty add to the result
         result = IoVSet()
+        # \cond false positive doxygen warning
         for a, b in product(self.iovs, iov.iovs):
             c = a & b
             if c:
                 result.add(c)
         return result
+        # \endcond
 
     def contains(self, iov):
         """
@@ -533,11 +539,13 @@ class IoVSet:
         if isinstance(iov, IntervalOfValidity):
             iov = IoVSet([iov])
 
+        # \cond false positive doxygen warning
         for a, b in product(self.iovs, iov.iovs):
             c = a & b
             if c:
                 return True
         return False
+        # \endcond
 
     def copy(self):
         """Return a copy of this set"""
@@ -554,6 +562,7 @@ class IoVSet:
         """Return the set of valid iovs"""
         return self.__iovs
 
+    # \cond false positive doxygen warning
     @property
     def first(self):
         """Return the first run covered by this iov set
@@ -577,6 +586,7 @@ class IoVSet:
         if not self.__iovs:
             return None
         return max(self.iovs).final
+    # \endcond
 
     @property
     def gaps(self):

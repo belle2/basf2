@@ -144,5 +144,5 @@ main.add_module(b2.register_module('RootInput'))
 main.add_module(TreeWriterModule())
 
 # process events and print call statistics
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

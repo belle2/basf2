@@ -7,10 +7,7 @@
  **************************************************************************/
 
 #include "pxd/modules/pxdDQM/PXDRawDQMCorrModule.h"
-
-#include <framework/core/HistoModule.h>
-
-#include <framework/datastore/StoreArray.h>
+#include <pxd/dataobjects/PXDRawHit.h>
 
 #include <vector>
 #include <boost/format.hpp>

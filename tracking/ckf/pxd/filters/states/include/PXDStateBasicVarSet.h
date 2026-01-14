@@ -6,9 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/FixedSizeNamedFloatTuple.h>
 
 #include <tracking/ckf/pxd/filters/states/BasePXDStateFilter.h>
 #include <tracking/ckf/pxd/utilities/PXDKalmanStepper.h>
@@ -69,11 +69,11 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class PXDStateBasicVarNames : public TrackFindingCDC::VarNames<BasePXDStateFilter::Object> {
+  class PXDStateBasicVarNames : public TrackingUtilities::VarNames<BasePXDStateFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(pxdStateBasicVarNames);
+    static const size_t nVars = TrackingUtilities::size(pxdStateBasicVarNames);
 
     /// Get the name of the column.
     constexpr
@@ -86,7 +86,7 @@ namespace Belle2 {
   /**
    * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match.
    */
-  class PXDStateBasicVarSet : public TrackFindingCDC::VarSet<PXDStateBasicVarNames> {
+  class PXDStateBasicVarSet : public TrackingUtilities::VarSet<PXDStateBasicVarNames> {
 
   public:
     /// Generate and assign the variables from the VXD-CDC-pair

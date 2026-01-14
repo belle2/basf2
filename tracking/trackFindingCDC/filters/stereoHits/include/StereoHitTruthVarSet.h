@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
 
 #include <tracking/trackFindingCDC/filters/stereoHits/BaseStereoHitFilter.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
@@ -25,13 +25,13 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct StereoHitTruthVarNames : public VarNames<BaseStereoHitFilter::Object> {
+    struct StereoHitTruthVarNames : public TrackingUtilities::VarNames<BaseStereoHitFilter::Object> {
 
       /// Number of variables to be generated
       // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
       // at least tell cppcheck that everything is fine
       // cppcheck-suppress duplInheritedMember
-      static const size_t nVars = size(stereoHitTruthVarNames);
+      static const size_t nVars = TrackingUtilities::size(stereoHitTruthVarNames);
 
       /// Getter for the name at the given index
       static constexpr char const* getName(int iName)
@@ -44,7 +44,7 @@ namespace Belle2 {
      *  Class to compute floating point variables from a stereo hit to track match
      *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
-    class StereoHitTruthVarSet : public VarSet<StereoHitTruthVarNames> {
+    class StereoHitTruthVarSet : public TrackingUtilities::VarSet<StereoHitTruthVarNames> {
 
     public:
       /// Generate and assign the contained variables
@@ -53,13 +53,13 @@ namespace Belle2 {
       void initialize() override
       {
         CDCMCManager::getInstance().requireTruthInformation();
-        VarSet<StereoHitTruthVarNames>::initialize();
+        TrackingUtilities::VarSet<StereoHitTruthVarNames>::initialize();
       }
 
       void beginEvent() override
       {
         CDCMCManager::getInstance().fill();
-        VarSet<StereoHitTruthVarNames>::beginEvent();
+        TrackingUtilities::VarSet<StereoHitTruthVarNames>::beginEvent();
       }
     };
   }

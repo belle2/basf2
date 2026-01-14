@@ -57,7 +57,4 @@ add_mdst_output(path=my_path,
 my_path.add_module('ProgressBar')
 
 # Process the events
-b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)
+b2.process(my_path, calculateStatistics=True)

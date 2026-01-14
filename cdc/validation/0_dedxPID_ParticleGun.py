@@ -20,6 +20,8 @@
 import basf2
 from reconstruction import add_reconstruction
 
+basf2.set_random_seed(1337)
+
 main = basf2.create_path()
 
 # Read input.
@@ -34,12 +36,6 @@ main.add_module("Geometry")
 # Reconstruct events.
 add_reconstruction(main)
 
-# enable debug output for the module added by add_reconstruction()
-for m in main.modules():
-    if m.name() == 'CDCDedxPIDCreator':
-        m.param('enableDebugOutput', True)
-
-
 output = basf2.register_module('RootOutput')
 output.param('outputFileName', '../ParticleGunSimRec_dedx.root')
 # let's keep this small
@@ -49,4 +45,3 @@ main.add_module(output)
 main.add_module("ProgressBar")
 
 basf2.process(main)
-print(basf2.statistics)

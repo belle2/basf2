@@ -9,10 +9,11 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCCloneLookUp.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 std::string CDCMCCloneLookUpFiller::getDescription()
 {

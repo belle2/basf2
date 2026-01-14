@@ -7,19 +7,20 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/TrackQualityEstimator.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::ChooseableFilter<TrackQualityFilterFactory>;
+template class TrackingUtilities::ChooseableFilter<TrackQualityFilterFactory>;
 
 TrackQualityEstimator::TrackQualityEstimator(const std::string& defaultFilterName)
   : m_trackQualityFilter(defaultFilterName)

@@ -8,9 +8,12 @@
 #pragma once
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+
+  namespace TrackingUtilities {
     class CDCTrajectory2D;
     class UncertainPerigeeCircle;
+  }
+  namespace TrackFindingCDC {
     class CDCObservations2D;
 
     /// Class implementing the Riemann fit for two dimensional trajectory circle
@@ -24,11 +27,11 @@ namespace Belle2 {
        *  Executes the fit and updates the trajectory parameters
        *  This may render the information in the observation object.
        */
-      void update(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const;
+      void update(TrackingUtilities::CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const;
 
     private:
       /// Internal method doing the heavy work.
-      UncertainPerigeeCircle fitInternal(CDCObservations2D& observations2D) const;
+      TrackingUtilities::UncertainPerigeeCircle fitInternal(CDCObservations2D& observations2D) const;
 
     public:
       /// Getter for the indicator that lines should be fitted by this fitter

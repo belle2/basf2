@@ -96,7 +96,7 @@ b2.conditions.append_globaltag(ma.getAnalysisGlobaltag())
 #
 # NEVER set uploadToDatabaseAfterTraining to True if you are not a librarian!!!
 #
-# BGx1 stays for MC generated with machine Background.
+# BGx1 stands for MC generated with machine Background.
 # The official weight files are trained using B0-> nu_tau anti-nu_tau as signal channel (no CP violation)
 # to avoid that the flavor tagger learns asymmetries on the tag side.
 # Only this kind of weight files are supported since release-03-01-00.
@@ -175,7 +175,7 @@ bvars = vc.reco_stats + \
     vertex_vars
 
 # Attention: the collection of flavor tagging variables is defined in the flavorTagger
-bvars += ft.flavor_tagging
+bvars += ['flavor_tagging']
 
 # Create aliases to save information for different particles
 bvars = bvars + \
@@ -199,7 +199,4 @@ ma.summaryOfLists(particleLists=['J/psi:mumu', 'B0:sig'],
                   path=cp_val_path)
 
 # Process the events
-b2.process(cp_val_path)
-
-# print out the summary
-print(b2.statistics)
+b2.process(cp_val_path, calculateStatistics=True)

@@ -9,7 +9,7 @@
 ##########################################################################
 
 
-from basf2 import set_random_seed, create_path, process, statistics, Module
+from basf2 import set_random_seed, create_path, process, Module
 from ROOT import Belle2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
@@ -66,9 +66,6 @@ def main():
 
     main.add_module('Progress')
     process(main)
-
-    # Print call statistics
-    print(statistics)
 
 
 if __name__ == "__main__":

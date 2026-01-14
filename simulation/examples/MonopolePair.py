@@ -67,5 +67,5 @@ output = b2.register_module('RootOutput')  # Set output filename
 output.param('outputFileName', 'MonopolePair.root')
 main.add_module(output)
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

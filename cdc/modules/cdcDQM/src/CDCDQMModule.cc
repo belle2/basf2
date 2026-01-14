@@ -9,19 +9,16 @@
 // Own include
 #include <cdc/modules/cdcDQM/CDCDQMModule.h>
 
-// Dataobject classes
-#include <framework/database/DBObjPtr.h>
+#include <cdc/dataobjects/WireID.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
-#include <TF1.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
+
 #include <TMath.h>
 #include <TDirectory.h>
 
-#include <fstream>
-#include <math.h>
 #include <set>
-
-#include <cdc/dataobjects/WireID.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 
 using namespace std;
 using namespace Belle2;

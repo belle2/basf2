@@ -22,7 +22,7 @@ gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
 
 
-DriftTimeUtil = Belle2.TrackFindingCDC.DriftTimeUtil
+DriftTimeUtil = Belle2.TrackingUtilities.DriftTimeUtil
 
 
 def main():
@@ -294,9 +294,6 @@ def main():
     # generate events
     basf2.print_path(path)
     basf2.process(path)
-
-    # show call statistics
-    print(basf2.statistics)
 
 
 # Helper functions #

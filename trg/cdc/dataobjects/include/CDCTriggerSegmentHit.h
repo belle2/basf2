@@ -166,7 +166,7 @@ namespace Belle2 {
     /** adc pattern*/
     unsigned int m_adcpattern;
 
-    /* Full ADC information*/
+    /** Full ADC information*/
     std::vector<float> m_adcinfo;
 
 

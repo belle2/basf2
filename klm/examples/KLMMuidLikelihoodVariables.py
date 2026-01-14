@@ -113,5 +113,5 @@ ma.variablesToNtuple('mu+:muid',
                      path=main)
 
 # Process the path
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 print(basf2.statistics)

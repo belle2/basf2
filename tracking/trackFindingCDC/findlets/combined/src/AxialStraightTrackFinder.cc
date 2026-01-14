@@ -7,12 +7,13 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/AxialStraightTrackFinder.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 AxialStraightTrackFinder::AxialStraightTrackFinder()
 {

@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
 
 #include <vector>
 #include <string>
@@ -32,10 +32,11 @@ namespace Belle2 {
    */
   template <class AState, class AFilter>
   class StateRejecter : public
-    TrackFindingCDC::Findlet<const TrackFindingCDC::WithWeight<const AState*>, TrackFindingCDC::WithWeight<AState*>> {
+    TrackingUtilities::Findlet<const TrackingUtilities::WithWeight<const AState*>, TrackingUtilities::WithWeight<AState*>> {
   private:
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const TrackFindingCDC::WithWeight<const AState*>, TrackFindingCDC::WithWeight<AState*>>;
+    using Super =
+      TrackingUtilities::Findlet<const TrackingUtilities::WithWeight<const AState*>, TrackingUtilities::WithWeight<AState*>>;
 
   public:
     /// Construct this findlet and add the subfindlet as listener
@@ -45,8 +46,8 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
     /// Apply all five filters to the child states.
-    void apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
-               std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates) final;
+    void apply(const std::vector<TrackingUtilities::WithWeight<const AState*>>& currentPath,
+               std::vector<TrackingUtilities::WithWeight<AState*>>& childStates) final;
 
   private:
     /// State filter to decide which available continuations should be traversed next.

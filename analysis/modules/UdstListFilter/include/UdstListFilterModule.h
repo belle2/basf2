@@ -22,6 +22,7 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 namespace Belle2 {

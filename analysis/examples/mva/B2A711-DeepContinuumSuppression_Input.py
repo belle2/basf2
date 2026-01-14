@@ -119,7 +119,7 @@ contVars = [
     'thrustOm',
     'cosTBTO',
     'cosTBz',
-    'KSFWVariables(et)',
+    'KSFWVariables(pt_sum)',
     'KSFWVariables(mm2)',
     'KSFWVariables(hso00)',
     'KSFWVariables(hso02)',
@@ -191,7 +191,6 @@ ma.variablesToNtuple('B0', variables + contVars, treename='tree', filename=outfi
 firstpath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 basf2.process(firstpath)
-print(basf2.statistics)
 
 # Shuffle Data. Use only if enough Ram is available
 try:

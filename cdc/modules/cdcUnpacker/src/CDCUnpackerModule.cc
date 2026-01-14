@@ -16,6 +16,7 @@
 #include <framework/utilities/FileSystem.h>
 // framework - Database
 #include <framework/database/DBArray.h>
+#include <cdc/topology/CDCWireTopology.h>
 
 #include <iostream>
 
@@ -101,7 +102,7 @@ void CDCUnpackerModule::initialize()
     B2INFO("CDCUnpacker: " << LogVar("FADC threshold", m_fadcThreshold));
   }
 
-  TrackFindingCDC::CDCWireTopology::getInstance();
+  CDCWireTopology::getInstance();
 }
 
 void CDCUnpackerModule::beginRun()
@@ -124,7 +125,7 @@ void CDCUnpackerModule::event()
   // TDC count for the trigger scinti.
   int tdcCountTrig = m_tdcOffset;
 
-  const TrackFindingCDC::CDCWireTopology& wireTopology = TrackFindingCDC::CDCWireTopology::getInstance();
+  const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
   // Create Data objects.
   m_CDCHits.clear();

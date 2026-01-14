@@ -25,11 +25,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Btube.h>
 
-// rave
-#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
-#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
-#include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
-
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 namespace Belle2 {
   /**

@@ -8,6 +8,7 @@
  **************************************************************************/
 
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
+#include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
 namespace TreeFitter {
 

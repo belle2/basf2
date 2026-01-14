@@ -9,19 +9,19 @@
 
 #include <tracking/trackFindingCDC/filters/stereoHits/BaseStereoHitFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     // Guard to prevent repeated instantiations
-    extern template class FilterFactory<BaseStereoHitFilter>;
+    // extern template class TrackingUtilities::FilterFactory<BaseStereoHitFilter>;
 
     /// Factory that can create appropriate stereo hit to track combination filters from associated names.
-    class StereoHitFilterFactory : public FilterFactory<BaseStereoHitFilter> {
+    class StereoHitFilterFactory : public TrackingUtilities::FilterFactory<BaseStereoHitFilter> {
 
     private:
       /// Type of the base class
-      using Super = FilterFactory<BaseStereoHitFilter>;
+      using Super = TrackingUtilities::FilterFactory<BaseStereoHitFilter>;
 
     public:
       /// Constructor forwarding the default filter name

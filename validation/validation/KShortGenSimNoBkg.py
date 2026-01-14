@@ -11,7 +11,7 @@
 """
 <header>
   <output>KShortGenSimNoBkg.root</output>
-  <contact>arul.prakash@physik.uni-muenchen.de</contact>
+  <contact>giacomo.pietro@kit.edu</contact>
   <cacheable/>
   <description>This steering file produces 500 events with five KLong each
   and runs the detector simulation without mixing in background.</description>
@@ -22,7 +22,6 @@ from basf2 import (
     set_random_seed,
     create_path,
     process,
-    statistics,
     register_module,
 )
 from simulation import add_simulation
@@ -56,21 +55,18 @@ main.add_module(register_module("Profile"))
 main.add_module("RootOutput", outputFileName="../KShortGenSimNoBkg.root")
 
 main.add_module('Progress')
-process(main)
-
-# Print call statistics
-print(statistics)
+process(main, calculateStatistics=True)
 
 statistics_plots(
     "KShortGenSimNoBkg_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation job with KShortGenSimNoBkg particleGun",
     prefix="KShortGenSimNoBkg",
 )
 event_timing_plot(
     "../KShortGenSimNoBkg.root",
     "KShortGenSimNoBkg_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation job with Klong particleGun",
     prefix="KShortGenSimNoBkg",
 )

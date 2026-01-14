@@ -10,13 +10,13 @@
 #include <tracking/trackFindingCDC/filters/segmentTriple/BaseSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTriple/SegmentTripleFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     // Guard to prevent repeated instantiations
-    extern template class Chooseable<BaseSegmentTripleFilter>;
-    extern template class ChooseableFilter<SegmentTripleFilterFactory>;
-    using ChooseableSegmentTripleFilter = ChooseableFilter<SegmentTripleFilterFactory>;
+    // extern template class TrackingUtilities::Chooseable<BaseSegmentTripleFilter>;
+    // extern template class TrackingUtilities::ChooseableFilter<SegmentTripleFilterFactory>;
+    using ChooseableSegmentTripleFilter = TrackingUtilities::ChooseableFilter<SegmentTripleFilterFactory>;
   }
 }

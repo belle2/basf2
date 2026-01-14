@@ -8,7 +8,7 @@
 #include <tracking/datcon/findlets/ToPXDExtrapolator.h>
 #include <tracking/datcon/utilities/DATCONHelpers.h>
 #include <tracking/dataobjects/PXDIntercept.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
@@ -17,7 +17,7 @@
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 ToPXDExtrapolator::ToPXDExtrapolator() : Super()
 {
@@ -27,18 +27,18 @@ void ToPXDExtrapolator::exposeParameters(ModuleParamList* moduleParamList, const
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "extrapolationPhiCutL1"), m_param_phiCutL1,
+  moduleParamList->addParameter(prefixed(prefix, "extrapolationPhiCutL1"), m_param_phiCutL1,
                                 "Only extrapolate to PXD sensors within this value away from the track phi value, L1.",
                                 m_param_phiCutL1);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "extrapolationPhiCutL2"), m_param_phiCutL2,
+  moduleParamList->addParameter(prefixed(prefix, "extrapolationPhiCutL2"), m_param_phiCutL2,
                                 "Only extrapolate to PXD sensors within this value away from the track phi value, L2.",
                                 m_param_phiCutL2);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "createPXDIntercepts"), m_param_createPXDIntercepts,
+  moduleParamList->addParameter(prefixed(prefix, "createPXDIntercepts"), m_param_createPXDIntercepts,
                                 "Store PXDIntercepts to StoreArray?", m_param_createPXDIntercepts);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storePXDInterceptsName"), m_param_PXDInterceptStoreArrayName,
+  moduleParamList->addParameter(prefixed(prefix, "storePXDInterceptsName"), m_param_PXDInterceptStoreArrayName,
                                 "Name of the PXDIntercepts StoreArray?", m_param_PXDInterceptStoreArrayName);
 
 }

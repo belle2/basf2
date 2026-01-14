@@ -9,33 +9,35 @@
 
 #include <tracking/trackFindingCDC/filters/facetRelation/FacetRelationFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/UnionRecordingFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+#include <tracking/trackingUtilities/varsets/BaseVarSet.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackingUtilities/utilities/Relation.h>
 
 #include <vector>
 #include <string>
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCFacet;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter to record multiple chooseable variable sets for facet relations
-    class UnionRecordingFacetRelationFilter: public UnionRecordingFilter<FacetRelationFilterFactory> {
+    class UnionRecordingFacetRelationFilter: public TrackingUtilities::UnionRecordingFilter<FacetRelationFilterFactory> {
 
     private:
       /// Type of the base class
-      using Super = UnionRecordingFilter<FacetRelationFilterFactory>;
+      using Super = TrackingUtilities::UnionRecordingFilter<FacetRelationFilterFactory>;
 
     public:
       /// Get the valid names of variable sets for facet relations.
       std::vector<std::string> getValidVarSetNames() const override;
 
       /// Create a concrete variables set for facet relations from a name.
-      std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >
+      std::unique_ptr<TrackingUtilities::BaseVarSet<TrackingUtilities::Relation<const TrackingUtilities::CDCFacet> > >
       createVarSet(const std::string& name) const override;
     };
   }

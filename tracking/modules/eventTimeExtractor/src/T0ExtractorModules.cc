@@ -11,7 +11,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 REG_MODULE(DriftLengthBasedT0Extractor);
 REG_MODULE(Chi2BasedT0Extractor);

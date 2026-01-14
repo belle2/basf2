@@ -5,7 +5,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::Variable-;
 #pragma link C++ class Belle2::Variable::Manager-;
 #pragma link C++ class Belle2::Variable::Manager::VarBase-;
 #pragma link C++ class Belle2::Variable::Manager::Var-;

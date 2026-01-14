@@ -10,6 +10,7 @@
 #include <analysis/modules/ParticleWeighting/ParticleWeightingModule.h>
 
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/database/DBObjPtr.h>
 #include <analysis/VariableManager/Manager.h>
 
 // framework aux

@@ -135,13 +135,13 @@ class HitCleaner(basf2.Module):
             mc_track = mc_matcher_lookup.getAnyChargeMatchedMCRecoTrack(track)
 
             if mc_track:
-                mc_trajectory = Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(mc_track.getPosSeed()),
-                                                                       Belle2.TrackFindingCDC.Vector3D(mc_track.getMomSeed()),
-                                                                       mc_track.getChargeSeed())
-                startingPosition = Belle2.TrackFindingCDC.Vector3D(track.getPosSeed().X(), track.getPosSeed().Y(), 0)
+                mc_trajectory = Belle2.TrackingUtilities.CDCTrajectory3D(Belle2.TrackingUtilities.Vector3D(mc_track.getPosSeed()),
+                                                                         Belle2.TrackingUtilities.Vector3D(mc_track.getMomSeed()),
+                                                                         mc_track.getChargeSeed())
+                startingPosition = Belle2.TrackingUtilities.Vector3D(track.getPosSeed().X(), track.getPosSeed().Y(), 0)
                 sStartingPosition = mc_trajectory.calcArcLength2D(startingPosition)
                 zStartingPosition = mc_trajectory.getTrajectorySZ().mapSToZ(sStartingPosition)
-                mc_trajectory.setLocalOrigin(Belle2.TrackFindingCDC.Vector3D(startingPosition.xy(), zStartingPosition))
+                mc_trajectory.setLocalOrigin(Belle2.TrackingUtilities.Vector3D(startingPosition.xy(), zStartingPosition))
 
                 # pos = ROOT.TVector3(
                 #     mc_trajectory.getSupport().x(), mc_trajectory.getSupport().y(), mc_trajectory.getSupport().z())

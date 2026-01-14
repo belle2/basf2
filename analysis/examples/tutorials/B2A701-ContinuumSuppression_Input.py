@@ -40,11 +40,10 @@ import sys
 # For each of this four sets you need to submit separate grid job.
 # (Or use files that are already prepared for B2A702 and B2A703).
 
-
 input_file_list = []
 
 # Please pick a meaningful output name when running on the grid
-outfile = "B2A702_output.root"
+outfile = "B2A701_output_"
 
 step = 'train'
 
@@ -66,7 +65,7 @@ elif step == 'apply_qqbar':
     input_file_list = [b2.find_file('ccbar_sample_to_test.root', 'examples', False)]
 else:
     sys.exit('Step does not match any of the available samples: `train`, `test`, `apply_signal`or `apply_qqbar`')
-outfile = step + '.root'
+outfile += step + '.root'
 
 # ---------------------------------------------------------------------------------------------
 
@@ -101,8 +100,7 @@ ma.reconstructDecay(decayString='B0   -> K_S0 pi0',
 ma.matchMCTruth(list_name='B0', path=my_path)
 ma.buildRestOfEvent(target_list_name='B0', path=my_path)
 
-# The momentum cuts used to be hard-coded in the continuum suppression module. They can now be applied
-# via this mask. The nCDCHits requirement is new, and is recommended to remove VXD-only fake tracks.
+# define mask with momentum cuts and requirement of at least one CDC hit to remove VXD-only fake tracks
 cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
 ma.appendROEMasks(list_name='B0',
                   mask_tuples=[cleanMask],
@@ -110,6 +108,7 @@ ma.appendROEMasks(list_name='B0',
 
 ma.buildContinuumSuppression(list_name='B0',
                              roe_mask='cleanMask',
+                             ipprofile_fit=False,
                              path=my_path)
 
 # Define the variables for training.
@@ -122,7 +121,7 @@ trainVars = [
     'thrustOm',
     'cosTBTO',
     'cosTBz',
-    'KSFWVariables(et)',
+    'KSFWVariables(pt_sum)',
     'KSFWVariables(mm2)',
     'KSFWVariables(hso00)',
     'KSFWVariables(hso01)',
@@ -162,4 +161,3 @@ ma.variablesToNtuple(decayString='B0',
                      path=my_path)
 
 b2.process(my_path)
-print(b2.statistics)

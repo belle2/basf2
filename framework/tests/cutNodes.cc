@@ -6,21 +6,24 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <functional>
+#include <variant>
 #include <iostream>
 #include <cmath>
 #include <boost/python.hpp>
+
 #include <framework/utilities/CutNodes.h>
 #include <framework/utilities/TestHelpers.h>
-#include <analysis/VariableManager/Manager.h>
 #include <framework/utilities/Conversion.h>
+
 #include <gtest/gtest.h>
 
 
 using namespace Belle2;
 namespace {
   namespace py = boost::python;
-  using VarVariant = Belle2::Variable::Manager::VarVariant;
-/// Class to mock objects for our variable manager.
+  /** Typedef for variable return type, can either be double, int or bool in std::variant */
+  typedef std::variant<double, int, bool> VarVariant;
+  /// Class to mock objects for our variable manager.
   struct MockObjectType {
     /// Stupid singlevalued object.
     explicit MockObjectType(const double& d) : m_value{d} {}
@@ -74,8 +77,8 @@ namespace {
     using Object = MockObjectType;
     /// Use MockvariableType as Variables.
     using Var = MockVariableType;
-    /// Define Node evaluation type
-    using VarVariant = Belle2::Variable::Manager::VarVariant;
+    /** Typedef for variable return type, can either be double, int or bool in std::variant */
+    typedef std::variant<double, int, bool> VarVariant;
 
     /// Singleton.
     static MockVariableManager& Instance()

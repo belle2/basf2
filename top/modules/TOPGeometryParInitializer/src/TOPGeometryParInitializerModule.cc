@@ -38,7 +38,7 @@ namespace Belle2 {
     // set module description
     setDescription("Class for initializing TOPGeometryPar. "
                    "This class is by default initialized when Geant geometry is created. "
-                   "Useful if Geant geometry is not needed. Be carefull when using!");
+                   "Useful if Geant geometry is not needed. Be careful when using!");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters

@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <framework/datastore/StoreArray.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <string>
-#include <vector>
+#include <bitset>
+#include <array>
+#include <map>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -24,9 +24,9 @@ namespace Belle2 {
     * The found track candidates are then clustered via a recursive search. Afterwards track candidates are formed
     * and stored in the output vector.
     */
-    class SingleHoughSpaceFastInterceptFinder : public TrackFindingCDC::Findlet<VXDHoughState, std::vector<VXDHoughState*>> {
+    class SingleHoughSpaceFastInterceptFinder : public TrackingUtilities::Findlet<VXDHoughState, std::vector<VXDHoughState*>> {
       /// Parent class
-      using Super = TrackFindingCDC::Findlet<VXDHoughState, std::vector<VXDHoughState*>>;
+      using Super = TrackingUtilities::Findlet<VXDHoughState, std::vector<VXDHoughState*>>;
 
     public:
       /// Find intercepts in the 2D Hough space

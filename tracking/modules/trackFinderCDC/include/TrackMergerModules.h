@@ -10,8 +10,8 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackLinker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCombiner.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 
 /******* Minimal Findlets **********/
 
@@ -20,10 +20,10 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackLinker
      */
-    class TFCDC_TrackLinkerModule : public FindletModule<TrackLinker> {
+    class TFCDC_TrackLinkerModule : public TrackingUtilities::FindletModule<TrackLinker> {
 
       /// Type of the base class
-      using Super = FindletModule<TrackLinker>;
+      using Super = TrackingUtilities::FindletModule<TrackLinker>;
 
     public:
       /// Constructor setting the default store vector names
@@ -33,10 +33,10 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackCombiner
      */
-    class TFCDC_TrackCombinerModule : public FindletModule<TrackCombiner> {
+    class TFCDC_TrackCombinerModule : public TrackingUtilities::FindletModule<TrackCombiner> {
 
       /// Type of the base class
-      using Super = FindletModule<TrackCombiner>;
+      using Super = TrackingUtilities::FindletModule<TrackCombiner>;
 
     public:
       /// Constructor setting the default store vector names

@@ -17,9 +17,9 @@
 import basf2
 import sys
 import glob
+from background import get_trigger_types_for_bgo, SelectTRGTypes
 from rawdata import add_unpackers
 from svd import add_svd_reconstruction
-from ROOT import Belle2
 
 # Argument parsing
 argvs = sys.argv
@@ -30,7 +30,6 @@ if len(argvs) < 4:
 expNo = 'e' + '{:0=4d}'.format(int(argvs[1]))
 runNo = 'r' + '{:0=5d}'.format(int(argvs[2]))
 global_tag = argvs[3]
-trigTypes = [5, 7]  # trigger types for event selection (see TRGSummary.h)
 
 indir = '/hsm/belle2/bdata/Data/Raw/' + expNo + '/' + runNo + '/sub00'
 files = sorted(glob.glob(indir + '/*.root'))
@@ -42,25 +41,6 @@ outdir = '.'
 if len(argvs) > 4:
     outdir = argvs[4]
 outputFile = outdir + '/beamBkgHitRates-' + expNo + '-' + runNo + '.root'
-
-
-class SelectTRGTypes(basf2.Module):
-    ''' select events according to given trigger types '''
-
-    def event(self):
-        ''' event processing '''
-
-        self.return_value(0)
-        trg_summary = Belle2.PyStoreObj('TRGSummary')
-        if not trg_summary.isValid():
-            basf2.B2ERROR('No TRGSummary available - event ignored')
-            return
-
-        for trgType in trigTypes:
-            if trg_summary.getTimType() == trgType:
-                self.return_value(1)
-                return
-
 
 # Define global tag
 basf2.conditions.prepend_globaltag(global_tag)
@@ -86,10 +66,11 @@ main.add_module('TRGGDLSummary')
 main.add_module('Progress')
 
 # Skip events not matching given trigger types, if the list is not empty
-if len(trigTypes) > 0:
-    selector = SelectTRGTypes()
-    main.add_module(selector)
-    selector.if_false(emptypath)
+trg_types = get_trigger_types_for_bgo()
+selector = main.add_module(
+    SelectTRGTypes(trg_types=trg_types)
+)
+selector.if_false(emptypath)
 
 # Unpack detector data
 add_unpackers(path=main,
@@ -115,7 +96,7 @@ main.add_module('TFCDC_WireHitPreparer',
 main.add_module(
     'BeamBkgHitRateMonitor',
     outputFileName=outputFile,
-    trgTypes=trigTypes,
+    trgTypes=trg_types,
     svdShaperDigitsName='SVDShaperDigitsZS5',
     cdcTimeWindowLowerEdgeSmallCell=4720,
     cdcTimeWindowUpperEdgeSmallCell=5020,
@@ -124,6 +105,3 @@ main.add_module(
 
 # Process events
 basf2.process(main)
-
-# Print call statistics
-print(basf2.statistics)

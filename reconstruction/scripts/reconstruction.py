@@ -19,8 +19,6 @@ from geometry import check_components
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
 
-from rawdata import add_unpackers
-
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 
 from tracking import (
@@ -958,6 +956,7 @@ def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=
     # Add the unpackers only if not running on MC, otherwise check the components and simply add
     # the Gearbox and the Geometry modules
     if not mc:
+        from rawdata import add_unpackers  # noqa
         add_unpackers(path,
                       components=components)
     else:

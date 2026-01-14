@@ -474,8 +474,11 @@ void DQMHistAnalysisECLModule::endRun()
     auto var_name = (boost::format("wf_frac_%s_min") % wf_option).str();
     m_monObj->setVariable(var_name, m_wf_fraction[wf_option]);
   }
+  TH1* h_ECL_ncev_10 = findHist("ECL/ncev_Thr10MeV");
+  TH1* h_ECL_ncev_20 = findHist("ECL/ncev_Thr20MeV");
+  m_monObj->setVariable("average_number_of_ECL_digits_at_10_MeV", h_ECL_ncev_10->GetMean());
+  m_monObj->setVariable("average_number_of_ECL_digits_at_20_MeV", h_ECL_ncev_20->GetMean());
 }
-
 
 void DQMHistAnalysisECLModule::terminate()
 {

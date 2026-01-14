@@ -89,7 +89,7 @@ void DQMHistAnalysisECLShapersModule::event()
     m_pedwidth_max[0] = robust_max(fwd_pedwidth)    * adc_to_mev;
     m_pedwidth_max[1] = robust_max(barrel_pedwidth) * adc_to_mev;
     m_pedwidth_max[2] = robust_max(bwd_pedwidth)    * adc_to_mev;
-    m_pedwidth_max[3] = *std::max(&m_pedwidth_max[0], &m_pedwidth_max[2]);
+    m_pedwidth_max[3] = *std::max_element(&m_pedwidth_max[0], &m_pedwidth_max[2]);
   } else {
     for (int i = 0; i < 4; i++) {
       m_pedwidth_max[i] = 0;

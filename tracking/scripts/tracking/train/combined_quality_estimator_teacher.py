@@ -1262,6 +1262,9 @@ class TrackQETeacherBaseTask(Basf2Task):
         if fast_bdt_option is None:
             fast_bdt_option = self.fast_bdt_option
         if recotrack_option is None and hasattr(self, 'recotrack_option'):
+            #: RecoTrack option, use string that is additive: deleteCDCQI0XY (= deletes CDCTracks with
+            # CDC-QI below 0.XY), useCDC (= uses trained CDC stored in datafiles/), useVXD (uses trained
+            # VXD stored in datafiles/), noVXD (= doesn't use the VXD MVA at all)
             if isinstance(self.recotrack_option, str):
                 recotrack_option = self.recotrack_option
             else:
@@ -2067,6 +2070,8 @@ class TrackQEEvaluationBaseTask(Task):
             'The weightfile for QE Evaluate is:',
             self.get_input_file_names(
                 self.teacher_task.get_weightfile_identifier(
+                    #: Task that is required by the evaluation base class to create the MVA
+                    # weightfile that needs to be evaluated.
                     self.teacher_task,
                     fast_bdt_option=self.fast_bdt_option) +
                 '.xml')[0])  # .root
@@ -2222,6 +2227,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
         Generate list of output files that the task should produce.
         The task is considered finished if and only if the outputs all exist.
         """
+        #: Name of the output PDF file containing the validation plots
         yield self.add_to_output(self.output_pdf_file_basename)
 
     @b2luigi.on_temporary_files

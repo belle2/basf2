@@ -1568,50 +1568,61 @@ of overlapping clusters where individual crystal energies are split among them, 
     | - Lower limit: :math:`0.0`
     | - Upper limit: :math:`200.0`
     | - Precision: :math:`10` bit
+
 )DOC");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched, R"DOC(
-Returns 1.0 if at least one reconstructed charged track is matched to the ECL cluster.
+Returns 1.0 if at least one reconstructed charged track is matched to the cluster. Track-cluster 
+matching is briefly described below. 
 
-Every reconstructed charged track is extrapolated into the ECL.
-Every ECL crystal that is crossed by the track extrapolation is marked.
-Each ECL cluster that contains any marked crystal is matched to the track.
-Multiple tracks can be matched to one cluster and multiple clusters can be matched to one track.
-It is conceptually correct to have two tracks matched to the same cluster.
+Every reconstructed track is extrapolated to the ECL. Every ECL crystal that is crossed by 
+the extrapolated track is marked. Following this, every cluster that contains a marked crystal 
+becomes associated with the original track. A cluster can only have one matched track 
+but multiple tracks can be matched to the same cluster. In the latter case, all tracks matched 
+to the same cluster will return the same cluster variables e.g. all will have the same `clusterE`. 
 )DOC");
     REGISTER_VARIABLE("nECLClusterTrackMatches", nECLClusterTrackMatches, R"DOC(
-Returns number of charged tracks matched to this cluster.
+Returns the number of tracks matched to the cluster. For more information on track-cluster matching 
+please see the description for `clusterTrackMatch`. 
 
-.. note::
-    Sometimes (perfectly correctly) two tracks are extrapolated into the same cluster.
-
-    - For charged particles, this should return at least 1 (but sometimes 2 or more).
-    - For neutrals, this should always return 0.
-    - Returns NaN if there is no cluster.
+For the clusters of neutral particles, this should always return 0. If there is no cluster ``NaN`` is 
+returned. 
 )DOC");
     REGISTER_VARIABLE("clusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination, R"DOC(
-Status bit to indicate if cluster has digits with waveforms that passed energy and :math:`\chi^2`
-thresholds for computing PSD variables.
+Status bit to indicate if the waveforms from the cluster pass the requirements for computing pulse 
+shape discrimination variables such as 'clusterPulseShapeDiscriminationMVA'. 
+
+.. topic:: Pulse Shape Information Requirements
+    
+    The exact requirements for a cluster have pulse shape information are as follows:
+    - there is at least one crystal with energy above 30 MeV for phase 2 data or 50 MeV for phase 3 data 
+    (this is the energy threshold requirement for saving waveforms offline)
+    - one of the waveforms for the cluster must have a good :math:`\chi^2` fit 
+
 )DOC");
     REGISTER_VARIABLE("beamBackgroundSuppression", beamBackgroundSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from beam background clusters.
 Class 1 is for true photon clusters while class 0 is for beam background clusters.
 
-The MVA has been trained using MC and the features used are:
+The MVA has been trained using MC and the features used, in decreasing importance, are:
 
 - `clusterTiming`
 - `clusterPulseShapeDiscriminationMVA`
 - `clusterE`
 - `clusterTheta`
+- `clusterZernikeMVA` (this has been removed starting from the MC16 training)
 
-The variable `clusterZernikeMVA` is also used but only for the MC15 training. 
-Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
-the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
+.. seealso:
 
-Please cite `this <https://inspirehep.net/literature/2785196>`_ if using this tool. 
+    For the correct usage, please see 
+    the `Performance Recommendations Webpage <https://belle2.pages.desy.de/performance/recommendations/>`_.
+
+.. important:
+
+    Please cite `this <https://inspirehep.net/literature/2785196>`_ if using this tool. 
 )DOC");
     REGISTER_VARIABLE("fakePhotonSuppression", fakePhotonSuppression, R"DOC(
-Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from fake photon clusters (e.g. split-offs,
-track-cluster matching failures etc.). Class 1 is for true photon clusters while class 0 is for fake photon clusters. 
+Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from fake photon clusters. 
+Class 1 is for true photon clusters while class 0 is for fake photon clusters. 
 
 The MVA has been trained using MC and the features are:
 
@@ -1620,34 +1631,22 @@ The MVA has been trained using MC and the features are:
 - `clusterE`
 - `clusterTiming`
 - `clusterTheta`
+- `clusterZernikeMVA` (this has been removed starting from the MC16 training)
 
-The variable `clusterZernikeMVA` is also used but only for the MC15 training. 
-Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
-the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
+.. seealso:
 
-Please cite `this <https://inspirehep.net/literature/2785196>`_ if using this tool. 
+    For the correct usage, please see 
+    the `Performance Recommendations Webpage <https://belle2.pages.desy.de/performance/recommendations/>`_.
 
-(This MVA is the same as the one used for `hadronicSplitOffSuppression` but that variable should not be used as it is deprecated and does not use the new weights). 
+.. important:
+
+    Please cite `this <https://inspirehep.net/literature/2785196>`_ if using this tool. 
+
 )DOC");
     REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
-Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.
-The classes are: 
-
-- 1 for true photon clusters
-- 0 for hadronic splitoff clusters
-
-The MVA has been trained using samples of signal photons and hadronic splitoff photons coming from MC. The features used are (in decreasing order of significance): 
-
-- `clusterPulseShapeDiscriminationMVA`
-- `minC2TDist`
-- `clusterZernikeMVA`
-- `clusterE`
-- `clusterLAT`
-- `clusterE1E9`
-- `clusterSecondMoment`
-)DOC");
-    MAKE_DEPRECATED("hadronicSplitOffSuppression", true, "light-2302-genetta", R"DOC(
-                     Use the variable `fakePhotonSuppression` instead which is maintained and uses the latest weight files.
+.. deprecated::
+    The training for this variable has been not been updated since MC14. 
+    Please use `fakePhotonSuppression` instead which is an improved and up-to-date version of this MVA.  
 )DOC");
     REGISTER_VARIABLE("clusterKlId", eclClusterKlId, R"DOC(
 Returns MVA classifier that uses ECL clusters variables to discriminate Klong clusters from em background.

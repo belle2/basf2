@@ -284,6 +284,25 @@ namespace Belle2 {
     }
 
     /**
+     * Get Revo9 DC arrival time for RPC hits in ttd clock.
+     * For scintillator hits not valid
+     * @return Revo9 DC arrival time in ttd clock.
+     */
+    int getRevo9DCArrivalTime() const
+    {
+      return m_Revo9DCArrivalTime;
+    }
+
+    /**
+     * Set Revo9 DC arrival time for RPC hits.
+     * @param[in] revo9DCArrivalTime Revo9 DC arrival time in ttd clock.
+     */
+    void setRevo9DCArrivalTime(int revo9DCArrivalTime)
+    {
+      m_Revo9DCArrivalTime = revo9DCArrivalTime;
+    }
+
+    /**
      * Get energy deposit.
      * @return Energy deposit.
      */
@@ -441,6 +460,9 @@ namespace Belle2 {
     /** Time of the hit. */
     float m_Time;
 
+    /** Revo9 DC arrival time (for RPC hits with overflow correction, not for scintillators). */
+    int m_Revo9DCArrivalTime;
+
     /** Energy deposition. */
     float m_EnergyDeposit;
 
@@ -460,7 +482,7 @@ namespace Belle2 {
     float m_SiPMMCTime;
 
     /** Class version. */
-    ClassDefOverride(Belle2::KLMDigit, 1);
+    ClassDefOverride(Belle2::KLMDigit, 2);
 
   };
 

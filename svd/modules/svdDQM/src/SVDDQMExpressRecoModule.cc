@@ -825,7 +825,18 @@ void SVDDQMExpressRecoModule::initialize()
   REG_HISTOGRAM
 
   m_rawSVD.isOptional();
+  m_rawFTSW.isOptional();
   m_trgSummary.isOptional();
+
+  if (m_useParamFromDB) {
+    if (!m_svdPlotsConfig.isValid())
+      B2FATAL("no valid configuration found for SVD reconstruction");
+    else {
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
+      m_3Samples = m_svdPlotsConfig->isPlotsFor3SampleMonitoring();
+      m_skipRejectedEvents = m_svdPlotsConfig->isSkipHLTRejectedEvents();
+    }
+  }
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() != 0) {
@@ -926,7 +937,7 @@ void SVDDQMExpressRecoModule::event()
   const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
 
   if (!storeSVDShaperDigits.isValid() || !storeSVDShaperDigits.getEntries()) {
-    B2WARNING("Missing SVDShaperDigit, SVDDQMDose is skipped.");
+    B2WARNING("Missing SVDShaperDigit, SVDDQMExpressRecoModule is skipped.");
     return;
   }
 

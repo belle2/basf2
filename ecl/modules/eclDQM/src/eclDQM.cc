@@ -68,11 +68,12 @@ ECLDQMModule::ECLDQMModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "histogram directory in ROOT file", std::string("ECL"));
   addParam("EnergyUpperThr", m_EnergyUpperThr, "Upper threshold of energy deposition in event, [GeV]", 20.0 * Belle2::Unit::GeV);
-  addParam("HitThresholds", m_HitThresholds, "Thresholds to display hit occupancy, MeV", std::vector<double> {0, 5, 10, 20, 50});
+  addParam("HitThresholds", m_HitThresholds,
+           "Thresholds to display hit occupancy, MeV. Note that it has to be consistent with m_HitNumberUpperLimits", std::vector<double> {0, 5, 10, 20, 50});
   addParam("TotalEnergyThresholds", m_TotalEnergyThresholds, "Thresholds to display total energy, MeV", std::vector<double> {0, 5, 7});
   addParam("TimingThresholds", m_TimingThresholds, "Thresholds (MeV) to display ECL timing", std::vector<double> {5, 10, 50});
   addParam("HitNumberUpperlimits", m_HitNumberUpperLimits,
-           "Upper limit (# of hits) to display hit multiplicity", std::vector<double> {10000, 1000, 700, 200});
+           "Upper limit (# of hits) to display hit multiplicity. Note that it has to be consistent with m_HitThresholds", std::vector<double> {10000, 1000, 700, 400, 200});
   addParam("WaveformOption", m_WaveformOption, "Option (all,psd,logic,rand,dphy,other) to display waveform flow",
            m_WaveformOption);
   addParam("DPHYTTYP", m_DPHYTTYP,
@@ -163,6 +164,9 @@ void ECLDQMModule::defineHisto()
     h_time_endcaps.push_back(h_time_endcap);
   }
 
+  if (m_HitThresholds.size() != m_HitNumberUpperLimits.size()) {
+    B2FATAL("m_HitThresholds[] and m_HitNumberUpperLimits[] have different sizes");
+  }
   for (const auto& id : boost::combine(m_HitThresholds, m_HitNumberUpperLimits)) {
     double id1 = 0, id2 = 0;
     boost::tie(id1, id2) = id;

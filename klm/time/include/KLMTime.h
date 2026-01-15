@@ -61,21 +61,13 @@ namespace Belle2 {
 
     /**
      * Get coarse and fine times for RPC.
+     * Returns DC arrival time (clocks, first) and TDC-based time (nanoseconds, second).
      * @param[in] ctime        REVO9 time.
      * @param[in] tdc          TDC.
      * @param[in] triggerTime  REVO9 Trigger time.
      */
     std::pair<int, double> getRPCTimes(int ctime, int tdc, int triggerTime) const;
 
-    /**
-     * Get FTime for RPC hits.
-     * FTime is the timestamp applied in the Data Concentrator when an RPC hit
-     * packet arrives. It uses the TTD clock period (~7.861 ns) and the counter
-     * resets using the frame9 signal (cycles from 0 to 11520).
-     * @param[in] ctime           REVO9 time (16-bit).
-     * @param[in] triggerTime     REVO9 Trigger time (to correct for overflow).
-     */
-    std::pair<int, double> getFTime(int ctime, int triggerTime) const;
     /**
      * Get time for simulation.
      * @param[in] tdc          TDC.

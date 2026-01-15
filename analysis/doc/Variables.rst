@@ -199,8 +199,8 @@ If a likelihood is not available from the selected detector list, **NaN** is ret
 .. b2-variables::
    :group: PID_expert
 
-ECL cluster
-~~~~~~~~~~~
+ECL Clusters
+~~~~~~~~~~~~
 
 .. _importantNoteECL:
 

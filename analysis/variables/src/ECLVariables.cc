@@ -1169,9 +1169,8 @@ Returns the distance between the cluster and its nearest track.
 
 For all tracks in the event, the distance between each of their extrapolated hits in the ECL and the ECL shower 
 position is calculated, and the overall smallest distance is returned. If there are no extrapolated hits found in the ECL 
-for the event, ``NaN`` will be returned. 
-
-The track array index of the track that is closest to the cluster can be retrieved using `minC2TDistID`. 
+for the event, ``NaN`` will be returned. The track array index of the track that is closest to the cluster can be 
+retrieved using `minC2TDistID`. 
 
 .. note::
     | Please read `this <importantNoteECL>` first.
@@ -1190,8 +1189,8 @@ using the `minC2TDist` variable.
 Returns the value of your chosen variable for the track nearest to the given cluster as calculated by 
 `minC2TDist`. 
 
-The first argument is the variable name e.g. `nCDCHits`, while the second (optional) argument is the 
-particle list name which will be used in the calculation of `minC2TDist`. The default particle list used 
+The first parameter ``variable`` is the variable name e.g. `nCDCHits`, while the second (optional) parameter ``particleList`` 
+is the particle list name which will be used in the calculation of `minC2TDist`. The default particle list used 
 is ``pi-:all``. 
 
 )DOC", Manager::VariableDataType::c_double);
@@ -1339,12 +1338,12 @@ read their definitions below.
     following all calibrations and corrections. For MC, note that the calibrations and corrections are not 
     fully simulated. In order to see if the waveform fit fails, see `clusterHasFailedTiming`.    
 
-    .. note::
-        | Please read `this <importantNoteECL>` first.
-        | - Lower limit: :math:`-1000.0`
-        | - Upper limit: :math:`1000.0`
-        | - Precision: :math:`12` bit
-    ..
+.. note::
+    | Please read `this <importantNoteECL>` first.
+    | - Lower limit: :math:`-1000.0`
+    | - Upper limit: :math:`1000.0`
+    | - Precision: :math:`12` bit
+..
 
 .. topic:: In Belle
 
@@ -1352,12 +1351,12 @@ read their definitions below.
     available in Belle data since experiment 31, and not available in Belle MC. Clusters produced at the IP 
     in time with the event have a TC time in the range of 9000 - 11000. 
 
-    .. note::
-        | In case this variable is obtained from Belle data that is stored in Belle II mdst/udst format, it will be truncated to:
-        | - Lower limit: :math:`-1000.0`
-        | - Upper limit: :math:`1000.0`
-        | - Precision: :math:`12` bit
-    ..
+.. note::
+    | In case this variable is obtained from Belle data that is stored in Belle II mdst/udst format, it will be truncated to:
+    | - Lower limit: :math:`-1000.0`
+    | - Upper limit: :math:`1000.0`
+    | - Precision: :math:`12` bit
+..
 
 )DOC","ns");
     REGISTER_VARIABLE("clusterHasFailedTiming", eclClusterHasFailedTiming, R"DOC(
@@ -1374,8 +1373,8 @@ and independent of the beam background level). The :math:`dt99` value stored is 
 parametrisation that depends on the true energy deposition in the highest energetic crystal and the 
 local beam background level in that crystal.  
 
-.. danger::
-    This variable should not be used a selection variable or in an MVA for photon identification as it is not 
+.. warning::
+    This variable should should only be used for relative timing selections as it is not 
     a directly-reconstructed quantity. For more information please see the 
     `ECL Cluster Recommendations <https://indico.belle2.org/event/13722/contributions/84645/attachments/31512/51585/ecl_recommendation.pdf>`_ 
     slides.
@@ -1419,8 +1418,8 @@ and :math:`\theta` ID can be found in the
 Returns the :math:`\phi` ID of the crystal with highest energy in the cluster.
 )DOC");
     REGISTER_VARIABLE("clusterE1E9", eclClusterE1E9, R"DOC(
-Returns the ratio of the energy in the central crystal (:math:`E1`) to the total energy in the 
-3x3 crystal grid around the central crystal (:math:`E9`). Since :math:`E1 \leq E9`, this ratio is 
+Returns the ratio of the energy in the central crystal (:math:`E_1`) to the total energy in the 
+3x3 crystal grid around the central crystal (:math:`E_9`). Since :math:`E_1 \leq E_9`, this ratio is 
 :math:`\leq 1` and tends towards larger values for photons and smaller values for hadrons. 
 
 .. note::
@@ -1431,13 +1430,14 @@ Returns the ratio of the energy in the central crystal (:math:`E1`) to the total
 
 )DOC");
     REGISTER_VARIABLE("clusterE9E25", eclClusterE9E25, R"DOC(
-.. deprecated::
-    Returns `clusterE9E21`. Kept for backwards compatibility. 
+.. deprecated:: release-XX-XX-XX
+
+    Returns `clusterE9E21`. Kept for backwards compatibility.   
 )DOC");
     REGISTER_VARIABLE("clusterE9E21", eclClusterE9E21, R"DOC(
 Returns the ratio of the total energy in the 3x3 crystal grid around the central 
-crystal (:math:`E9`) to the total energy in the 5x5 crystal grid (:math:`E25`) around the central crystal 
-excluding the corners. Since :math:`E9 \leq E21`, this ratio is :math:`\leq 1` and tends towards larger 
+crystal (:math:`E_9`) to the total energy in the 5x5 crystal grid around the central crystal 
+excluding the corners (:math:`E_21`). Since :math:`E_9 \leq E_21`, this ratio is :math:`\leq 1` and tends towards larger 
 values for photons and smaller values for hadrons. 
 
 .. note::
@@ -1599,12 +1599,12 @@ The MVA has been trained using MC and the features used, in decreasing importanc
 - `clusterTheta`
 - `clusterZernikeMVA` (this has been removed starting from the MC16 training)
 
-.. seealso:
+.. seealso::
 
     For the correct usage, please see 
     the `Performance Recommendations Webpage <https://belle2.pages.desy.de/performance/recommendations/>`_.
 
-.. important:
+.. important::
 
     Please cite `this proceeding <https://inspirehep.net/literature/2785196>`_ if using this tool. 
 )DOC");
@@ -1630,9 +1630,11 @@ The MVA has been trained using MC and the features are:
 
 )DOC");
     REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
-.. deprecated::
+.. deprecated:: light-2302-genetta
+
     The training for this variable has been not been updated since MC14. 
-    Please use `fakePhotonSuppression` instead which is an improved and up-to-date version of this MVA.  
+    Please use `fakePhotonSuppression` instead which is an improved and up-to-date version of this MVA. 
+
 )DOC");
     REGISTER_VARIABLE("clusterPulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA, R"DOC(
 Returns the output of an MVA classifier that uses pulse shape information to discriminate between electromagnetic 
@@ -1679,15 +1681,18 @@ Returns the :math:`\phi` angle of the extrapolated track associated to the clust
 
 .. warning::
     This requires the ``ECLTrackCalDigitMatch`` module to be executed.
+
 )DOC","rad");
     REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, R"DOC(
 Returns the :math:`\phi` ID of the extrapolated track associated to the cluster (if any). 
 
 .. warning::
     This requires the ``ECLTrackCalDigitMatch`` module to be executed.
+
 )DOC");
     REGISTER_VARIABLE("weightedAverageECLTime", weightedAverageECLTime, R"DOC(
 Returns the weighted average time of all clusters corresponding to daughter particles of the provided particle. 
+
 )DOC", "ns");
     REGISTER_VARIABLE("maxWeightedDistanceFromAverageECLTime", maxWeightedDistanceFromAverageECLTime, R"DOC(
 Returns maximum weighted distance between time of the cluster of a photon and the ECL average time, amongst
@@ -1835,6 +1840,9 @@ Returns the distance to the nearest truth-matched :math:`K_L^0` particle that ha
 
   REGISTER_VARIABLE("distanceToMcNeutron",distanceToMcNeutron,R"DOC(
 Returns the distance to the nearest truth-matched (anti)neutron particle that has been extrapolated to the cluster. 
+
+.. warning::
+    This requires the `getNeutralHadronGeomMatches` function to be used.
 
 )DOC", "cm");
 

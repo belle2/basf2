@@ -25,7 +25,8 @@
 #include "TH2F.h"
 
 namespace Belle2 {
-  class RawFTSW;
+  class RawSVD;
+  class TRGSummary;
 
   /** SVD DQM Module for Express Reco */
   class SVDDQMExpressRecoModule : public HistoModule {  // <- derived from HistoModule class
@@ -71,7 +72,11 @@ namespace Belle2 {
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
 
     /** Input: DAQ status. Has timing and injection info. */
-    StoreArray<RawFTSW> m_rawTTD;
+    StoreArray<RawSVD> m_rawSVD;
+
+    /** Input: trigger type. */
+    StoreObjPtr<TRGSummary> m_trgSummary;
+
 
     /** if true skip events rejected by HLT */
     bool m_skipRejectedEvents = false;
@@ -197,10 +202,10 @@ namespace Belle2 {
     TH1F** m_onlineZSstripCountV = nullptr;
 
     /** U strip count for cluster time group Id = 0 */
-    TH1F** m_stripCountGroupId0U = nullptr;
+    TH1F** m_stripCountSignalGroupIDsU = nullptr;
 
     /** V strip count for cluster time group Id = 0 */
-    TH1F** m_stripCountGroupId0V = nullptr;
+    TH1F** m_stripCountSignalGroupIDsV = nullptr;
 
     /** u strip count for 3 samples */
     TH1F** m_strip3SampleCountU = nullptr;

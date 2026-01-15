@@ -25,6 +25,7 @@
 #include "TH2F.h"
 
 namespace Belle2 {
+  class RawFTSW;
   class RawSVD;
   class TRGSummary;
 
@@ -71,8 +72,11 @@ namespace Belle2 {
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
 
-    /** Input: DAQ status. Has timing and injection info. */
+    /** Input: raw SVD status. */
     StoreArray<RawSVD> m_rawSVD;
+
+    /** Input: DAQ status. */
+    StoreArray<RawFTSW> m_rawFTSW;
 
     /** Input: trigger type. */
     StoreObjPtr<TRGSummary> m_trgSummary;

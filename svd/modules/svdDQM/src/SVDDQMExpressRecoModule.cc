@@ -12,6 +12,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawSVD.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -903,6 +904,19 @@ void SVDDQMExpressRecoModule::event()
     B2WARNING("Empty RawSVD, SVDDQMExpressRecoModule is skipped.");
     return;
   }
+
+  // FTSW validity
+  if (!m_rawFTSW.isValid()) {
+    B2WARNING("Missing RawFTSW, SVDDQMExpressRecoModule is skipped.");
+    return;
+  }
+
+  // checking empty events
+  if (m_rawFTSW.getEntries() == 0) {
+    B2WARNING("Empty RawFTSW, SVDDQMExpressRecoModule is skipped.");
+    return;
+  }
+
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;

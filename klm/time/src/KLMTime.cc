@@ -61,8 +61,6 @@ std::pair<int, double> KLMTime::getRPCTimes(int ctime, int tdc, int triggerTime)
     relativeTime -= trigger + 0x800;
 
   /* DC Arrival Time calculation  for RPC hits*/
-  /* FRAME9_MAX: RPC Frame9 Clock Counter from 0 to 11519, then resets */
-  const int FRAME9_MAX = 11520;
   const int halfFRAME = FRAME9_MAX / 2;  /* Threshold for overflow detection */
 
   int relativeDCTime = ctime - triggerTime;

@@ -111,6 +111,9 @@ namespace Belle2 {
     /** CTIME period. */
     double m_CTimePeriod = 0.;
 
+    /** RPC Frame9 Clock Counter from 0 to 11519, then resets */
+    static const int FRAME9_MAX = 11520;
+
   };
 
 }

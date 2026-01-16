@@ -285,12 +285,12 @@ namespace Belle2 {
 
     /**
      * Get Revo9 DC arrival time for RPC hits in ttd clock.
-     * For scintillator hits not valid
+     * For scintillator hits this is not valid.
      * @return Revo9 DC arrival time in ttd clock.
      */
     int getRevo9DCArrivalTime() const
     {
-      return m_Revo9DCArrivalTime;
+      return m_NGeneratedPhotoelectrons;
     }
 
     /**
@@ -299,7 +299,25 @@ namespace Belle2 {
      */
     void setRevo9DCArrivalTime(int revo9DCArrivalTime)
     {
-      m_Revo9DCArrivalTime = revo9DCArrivalTime;
+      m_NGeneratedPhotoelectrons = revo9DCArrivalTime;
+    }
+
+    /**
+     * Get hit index for RPCs.
+     * @return hit index.
+     */
+    int getRPCHitIndex() const
+    {
+      return static_cast<int>(m_MCTime);
+    }
+
+    /**
+     * Set hit index for RPCs.
+     * @param[in] rpcHitIndex hit index.
+     */
+    void setRPCHitIndex(int rpcHitIndex)
+    {
+      m_MCTime = static_cast<float>(rpcHitIndex);
     }
 
     /**
@@ -460,29 +478,30 @@ namespace Belle2 {
     /** Time of the hit. */
     float m_Time;
 
-    /** Revo9 DC arrival time (for RPC hits with overflow correction, not for scintillators). */
-    int m_Revo9DCArrivalTime;
-
     /** Energy deposition. */
     float m_EnergyDeposit;
 
     /** Number of photoelectrons. */
     float m_NPhotoelectrons;
 
-    /** Generated number of photoelectrons (MC only). */
+    /** Generated number of photoelectrons (MC only) for scintillators.
+    * Also used for Hit time relative to Revo9 clock for RPCs
+    */
     int m_NGeneratedPhotoelectrons;
 
     /** Fit status. */
     int m_FitStatus;
 
-    /** MC time. */
+    /** MC time for scintillators.
+    * Hit index for RPCs.
+    */
     float m_MCTime;
 
     /** MC time at SiPM. */
     float m_SiPMMCTime;
 
     /** Class version. */
-    ClassDefOverride(Belle2::KLMDigit, 2);
+    ClassDefOverride(Belle2::KLMDigit, 1);
 
   };
 

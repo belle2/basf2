@@ -109,6 +109,7 @@ void KLMUnpackerModule::createDigit(
       m_Time->getRPCTimes(raw->getCTime(), raw->getTDC(), triggerTime);
     klmDigit->setTime(rpcTimes.second);
     klmDigit->setRevo9DCArrivalTime(rpcTimes.first);
+    klmDigit->setRPCHitIndex(klmDigitEventInfo->getRPCHits());
   } else {
     /*
      * For scintillator hits, store the ctime relative to the event header's

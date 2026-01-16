@@ -65,50 +65,45 @@ namespace Belle2 {
     */
     virtual void terminate();
 
-    /**
-    *Prints module parameters.
-    */
-    void printModuleParams() const;
-
   private:
 
     std::string m_filename; /**< Output file name.   */
 
-    std::vector<Float_t> trj_x; /**< X component of trajectory position */
-    std::vector<Float_t> trj_y; /**< Y component of trajectory position */
-    std::vector<Float_t> trj_z; /**< Z component of trajectory position */
-    std::vector<Float_t> trj_px; /**< X component of trajectory momentum */
-    std::vector<Float_t> trj_py; /**< Y component of trajectory momentum */
-    std::vector<Float_t> trj_pz; /**< Z component of trajectory momentum */
-    Float_t vtxProdX; /**< McParticle prod. vertex position X */
-    Float_t vtxProdY; /**< McParticle prod. vertex position Y */
-    Float_t vtxProdZ; /**< McParticle prod. vertex position Z */
-    Float_t E_init;   /**< McParticle energy [GeV] */
-    Float_t mass;   /**< McParticle mass [GeV] */
-    Float_t lifeTime;   /**< McParticle lifetime [ns] */
-    Int_t PDG; /**< PDG */
-    Int_t subDet; /**< Subdetector */
-    Int_t iden; /**< iden */
-    Int_t trackID; /**< TrackID */
-    Int_t iEvent; /**< Event identifier */
-    Int_t iEntry; /**< Entry identifier */
-    Int_t nSimHits[13]; /**< Array with number of SimHits */
-    Int_t hitPDG[13]; /**< Array with PDG hits */
-    Int_t momPDG[13]; /**< Array with PDG momentum */
-    Float_t E_start; /**< Starting energy */
-    Float_t E_end; /**< Ending energy */
-    Float_t eDep; /**< Deposited energy */
-    Float_t trackLength; /**< Track length */
-    Float_t momentumX; /**< X component of momentum */
-    Float_t momentumY; /**< Y component of momentum */
-    Float_t momentumZ; /**< Z component of momentum */
-    Float_t positionX; /**< X component of position */
-    Float_t positionY; /**< Y component of position */
-    Float_t positionZ; /**< Z component of position */
-    Float_t nWeight; /**< Weight */
+    std::vector<Float_t> m_trj_x; /**< X component of trajectory position */
+    std::vector<Float_t> m_trj_y; /**< Y component of trajectory position */
+    std::vector<Float_t> m_trj_z; /**< Z component of trajectory position */
+    std::vector<Float_t> m_trj_px; /**< X component of trajectory momentum */
+    std::vector<Float_t> m_trj_py; /**< Y component of trajectory momentum */
+    std::vector<Float_t> m_trj_pz; /**< Z component of trajectory momentum */
+    Float_t m_vtxProdX; /**< McParticle prod. vertex position X */
+    Float_t m_vtxProdY; /**< McParticle prod. vertex position Y */
+    Float_t m_vtxProdZ; /**< McParticle prod. vertex position Z */
+    Float_t m_E_init;   /**< McParticle energy [GeV] */
+    Float_t m_mass;   /**< McParticle mass [GeV] */
+    Float_t m_lifeTime;   /**< McParticle lifetime [ns] */
+    Int_t m_PDG; /**< PDG */
+    Int_t m_subDet; /**< Subdetector */
+    Int_t m_iden; /**< iden */
+    Int_t m_trackID; /**< TrackID */
+    Int_t m_iEvent; /**< Event identifier */
+    Int_t m_iEntry; /**< Entry identifier */
+    Int_t m_nSimHits[13]; /**< Array with number of SimHits */
+    Int_t m_hitPDG[13]; /**< Array with PDG hits */
+    Int_t m_momPDG[13]; /**< Array with PDG momentum */
+    Float_t m_E_start; /**< Starting energy */
+    Float_t m_E_end; /**< Ending energy */
+    Float_t m_eDep; /**< Deposited energy */
+    Float_t m_trackLength; /**< Track length */
+    Float_t m_momentumX; /**< X component of momentum */
+    Float_t m_momentumY; /**< Y component of momentum */
+    Float_t m_momentumZ; /**< Z component of momentum */
+    Float_t m_positionX; /**< X component of position */
+    Float_t m_positionY; /**< Y component of position */
+    Float_t m_positionZ; /**< Z component of position */
+    Float_t m_nWeight; /**< Weight */
 
-    TFile* ff;    /**< Output root file.   */
-    TTree* tree1;   /**< Output tree */
-    TTree* tree2;   /**< Output tree */
+    TFile* m_ff;    /**< Output root file.   */
+    TTree* m_tree1;   /**< Output tree */
+    TTree* m_tree2;   /**< Output tree */
   };
 } // Belle2 namespace

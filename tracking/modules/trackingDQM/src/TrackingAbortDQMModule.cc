@@ -120,6 +120,33 @@ void TrackingAbortDQMModule::defineHisto()
   m_svdL3uZS5Occupancy[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
   m_svdL3uZS5Occupancy[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
+  //SVD L3 occupancy when VXDTF2 Aborts- see SVDDQMDose module for details
+  histoName = "SVDL3UOccVXDTF2aborts";
+  histoTitle = "SVD L3 u-side ZS5 Occupancy (%) when VXDTF2 Aborts";
+  //outside active_veto window:
+  m_svdL3uZS5Occupancy_VXDTF2aborts[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
+                                                  TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+                                                  180, 0, 100.0 / 1536.0 * 180);
+  m_svdL3uZS5Occupancy_VXDTF2aborts[0]->GetXaxis()->SetTitle("occupancy [%]");
+  m_svdL3uZS5Occupancy_VXDTF2aborts[0]->GetYaxis()->SetTitle("Number of Events");
+  //inside active_veto window:
+  m_svdL3uZS5Occupancy_VXDTF2aborts[1] = new TH1F(*m_svdL3uZS5Occupancy_VXDTF2aborts[0]);
+  m_svdL3uZS5Occupancy_VXDTF2aborts[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
+  m_svdL3uZS5Occupancy_VXDTF2aborts[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
+
+//SVD L3 occupancy when toSVDCFK Aborts- see SVDDQMDose module for details
+  histoName = "SVDL3UOccToSVDCKFaborts";
+  histoTitle = "SVD L3 u-side ZS5 Occupancy (%) when toSVDCKF Aborts";
+  //outside active_veto window:
+  m_svdL3uZS5Occupancy_toSVDCKFaborts[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
+                                                    TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+                                                    180, 0, 100.0 / 1536.0 * 180);
+  m_svdL3uZS5Occupancy_toSVDCKFaborts[0]->GetXaxis()->SetTitle("occupancy [%]");
+  m_svdL3uZS5Occupancy_toSVDCKFaborts[0]->GetYaxis()->SetTitle("Number of Events");
+  //inside active_veto window:
+  m_svdL3uZS5Occupancy_toSVDCKFaborts[1] = new TH1F(*m_svdL3uZS5Occupancy_toSVDCKFaborts[0]);
+  m_svdL3uZS5Occupancy_toSVDCKFaborts[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
+  m_svdL3uZS5Occupancy_toSVDCKFaborts[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
   //CDC extra hits
   histoName = "nCDCExtraHits";
@@ -193,6 +220,10 @@ void TrackingAbortDQMModule::beginRun()
   if (m_nEventsWithAbort[1] != nullptr)  m_nEventsWithAbort[1]->Reset();
   if (m_svdL3uZS5Occupancy[0] != nullptr)  m_svdL3uZS5Occupancy[0]->Reset();
   if (m_svdL3uZS5Occupancy[1] != nullptr)  m_svdL3uZS5Occupancy[1]->Reset();
+  if (m_svdL3uZS5Occupancy_VXDTF2aborts[0] != nullptr)  m_svdL3uZS5Occupancy_VXDTF2aborts[0]->Reset();
+  if (m_svdL3uZS5Occupancy_VXDTF2aborts[1] != nullptr)  m_svdL3uZS5Occupancy_VXDTF2aborts[1]->Reset();
+  if (m_svdL3uZS5Occupancy_toSVDCKFaborts[0] != nullptr)  m_svdL3uZS5Occupancy_toSVDCKFaborts[0]->Reset();
+  if (m_svdL3uZS5Occupancy_toSVDCKFaborts[1] != nullptr)  m_svdL3uZS5Occupancy_toSVDCKFaborts[1]->Reset();
   if (m_nCDCExtraHits[0] != nullptr) m_nCDCExtraHits[0]->Reset();
   if (m_nCDCExtraHits[1] != nullptr) m_nCDCExtraHits[1]->Reset();
   if (m_svdTime[0] != nullptr) m_svdTime[0]->Reset();
@@ -281,7 +312,14 @@ void TrackingAbortDQMModule::event()
   }
 
   // fill the svd L3 v ZS5 occupancy, add the overflow in the last bin to make them visible in the plot
-  m_svdL3uZS5Occupancy[index]->Fill(std::min((double)nStripsL3UZS5 / m_nStripsL3U * 100, (double)5.82));
+  double tmp_L3uZS5occupancy = (double)nStripsL3UZS5 / m_nStripsL3U * 100;
+  double L3uZS5occupancy = std::min(tmp_L3uZS5occupancy, (double)100.0 / 1536.0 * 90);
+  m_svdL3uZS5Occupancy[index]->Fill(L3uZS5occupancy);
+  double L3uZS5occupancy_abort = std::min(tmp_L3uZS5occupancy, (double)100.0 / 1536.0 * 180);
+  if (m_eventLevelTrackingInfo->hasVXDTF2AbortionFlag())
+    m_svdL3uZS5Occupancy_VXDTF2aborts[index]->Fill(L3uZS5occupancy_abort);
+  if (m_eventLevelTrackingInfo->hasSVDCKFAbortionFlag())
+    m_svdL3uZS5Occupancy_toSVDCKFaborts[index]->Fill(L3uZS5occupancy_abort);
 
   //fill the nCDCExtraHits, add the overflow in the last bin to make them visible in the plot
   if (m_eventLevelTrackingInfo.isValid())

@@ -11,9 +11,6 @@
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <rawdata/dataobjects/RawSVD.h>
-#include <rawdata/dataobjects/RawFTSW.h>
-#include <mdst/dataobjects/TRGSummary.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>
@@ -824,10 +821,6 @@ void SVDDQMExpressRecoModule::initialize()
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
-  m_rawSVD.isOptional();
-  m_rawFTSW.isOptional();
-  m_trgSummary.isOptional();
-
   if (m_useParamFromDB) {
     if (!m_svdPlotsConfig.isValid())
       B2FATAL("no valid configuration found for SVD reconstruction");
@@ -898,37 +891,6 @@ void SVDDQMExpressRecoModule::event()
   else
     return;
 
-  // trigger validty
-  if (!m_trgSummary.isValid()) {
-    B2WARNING("Missing TRGSummary, SVDDQMExpressRecoModule is skipped.");
-    return;
-  }
-
-  // rawSVD validity
-  if (!m_rawSVD.isValid()) {
-    B2WARNING("Missing RawSVD, SVDDQMExpressRecoModule is skipped.");
-    return;
-  }
-
-  // checking empty events
-  if (m_rawSVD.getEntries() == 0) {
-    B2WARNING("Empty RawSVD, SVDDQMExpressRecoModule is skipped.");
-    return;
-  }
-
-  // FTSW validity
-  if (!m_rawFTSW.isValid()) {
-    B2WARNING("Missing RawFTSW, SVDDQMExpressRecoModule is skipped.");
-    return;
-  }
-
-  // checking empty events
-  if (m_rawFTSW.getEntries() == 0) {
-    B2WARNING("Empty RawFTSW, SVDDQMExpressRecoModule is skipped.");
-    return;
-  }
-
-
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
@@ -936,7 +898,7 @@ void SVDDQMExpressRecoModule::event()
   const StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
   const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
 
-  if (!storeSVDShaperDigits.isValid() || !storeSVDShaperDigits.getEntries()) {
+  if (!storeSVDShaperDigits.isValid()) {
     B2WARNING("Missing SVDShaperDigit, SVDDQMExpressRecoModule is skipped.");
     return;
   }

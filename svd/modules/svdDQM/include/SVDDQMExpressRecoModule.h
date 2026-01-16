@@ -25,9 +25,6 @@
 #include "TH2F.h"
 
 namespace Belle2 {
-  class RawFTSW;
-  class RawSVD;
-  class TRGSummary;
 
   /** SVD DQM Module for Express Reco */
   class SVDDQMExpressRecoModule : public HistoModule {  // <- derived from HistoModule class
@@ -71,16 +68,6 @@ namespace Belle2 {
 
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
-
-    /** Input: raw SVD status. */
-    StoreArray<RawSVD> m_rawSVD;
-
-    /** Input: DAQ status. */
-    StoreArray<RawFTSW> m_rawFTSW;
-
-    /** Input: trigger type. */
-    StoreObjPtr<TRGSummary> m_trgSummary;
-
 
     /** if true skip events rejected by HLT */
     bool m_skipRejectedEvents = false;

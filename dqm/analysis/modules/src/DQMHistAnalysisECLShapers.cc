@@ -96,7 +96,7 @@ void DQMHistAnalysisECLShapersModule::event()
     m_pedwidth_max[0] = robust_max(fwd_pedwidth)    * adc_to_mev;
     m_pedwidth_max[1] = robust_max(barrel_pedwidth) * adc_to_mev;
     m_pedwidth_max[2] = robust_max(bwd_pedwidth)    * adc_to_mev;
-    m_pedwidth_max[3] = *std::max(&m_pedwidth_max[0], &m_pedwidth_max[2]);
+    m_pedwidth_max[3] = *std::max_element(&m_pedwidth_max[0], &m_pedwidth_max[2]);
 
     // Sum of a given multiset
     auto sum = [](std::multiset<double> x) { return std::accumulate(x.begin(), x.end(), 0.0); };

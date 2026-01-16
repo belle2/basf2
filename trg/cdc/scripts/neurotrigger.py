@@ -7,7 +7,6 @@
 ##########################################################################
 
 import basf2
-from ROOT import Belle2
 import nntd
 
 ################################################################################
@@ -56,16 +55,10 @@ class casefilter(basf2.Module):
             setattr(self, key, value)
 
     def event(self):
+        from ROOT import Belle2  # noqa
         lower = self.lowerthan == 0 or bool(len(Belle2.PyStoreArray(self.filterarrayname)) < self.lowerthan)
         higher = bool(len(Belle2.PyStoreArray(self.filterarrayname)) > self.higherthan)
         self.return_value(lower and higher)
-
-
-lt2reco = basf2.register_module(casefilter())
-lt2reco.param({"filterarrayname": "RecoTracks", "lowerthan": 2})
-
-lt4reco = basf2.register_module(casefilter())
-lt4reco.param({"filterarrayname": "RecoTracks", "lowerthan": 4})
 
 
 class nnt_eventfilter(basf2.Module):
@@ -81,9 +74,11 @@ class nnt_eventfilter(basf2.Module):
         self.if_false(self.nullpath)
 
     def hastrginfo(self):
+        from ROOT import Belle2  # noqa
         return bool(Belle2.PyStoreArray(self.twodtracksname).getEntries() > 0)
 
     def neurotrack_allgoodquality(self):
+        from ROOT import Belle2  # noqa
         isgoodquality = True
         for tr in Belle2.PyStoreArray("CDCTriggerNeuroTracks"):
             if tr.getQualityVector() > 0:
@@ -411,7 +406,7 @@ def add_neurotrigger_sim(path, nntweightfile=None, debug_level=4, debugout=False
     else:
         nnt.param('fixedPoint', True)
     if nntweightfile is not None:
-        nnt.param('filename', Belle2.FileSystem.findFile(nntweightfile))
+        nnt.param('filename', basf2.find_file(nntweightfile))
 
     if 'et_option' in kwargs:
         nnt.param('et_option', kwargs['et_option'])
@@ -451,7 +446,7 @@ def add_neurotrigger_hw(path, nntweightfile=None, debug_level=4, debugout=False,
         nnt.param('realinputCollectionName', hwneuroinput2dfindertracks)
 
     if nntweightfile is not None:
-        nnt.param('filename', Belle2.FileSystem.findFile(nntweightfile))
+        nnt.param('filename', basf2.find_file(nntweightfile))
     nnt.param('NeuroHWTrackInputMode', True)
     if 'et_option' in kwargs:
         nnt.param('et_option', kwargs['et_option'])
@@ -474,11 +469,11 @@ def add_neuro_simulation(path, nntweightfile=None, **kwargs):
     if "InnerTSLUTFile" in kwargs:
         tsf.param("InnerTSLUTFile", kwargs["InnerTSLUTFile"])
     else:
-        tsf.param("InnerTSLUTFile", Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe"))
+        tsf.param("InnerTSLUTFile", basf2.find_file("data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe"))
     if "OuterTSLUTFile" in kwargs:
         tsf.param("OuterTSLUTFile", kwargs["OuterTSLUTFile"])
     else:
-        tsf.param("OuterTSLUTFile", Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe"))
+        tsf.param("OuterTSLUTFile", basf2.find_file("data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe"))
     tsf.param("TSHitCollectionName", simsegmenthits)
     tsf.param("CDCHitCollectionName", "CDCHits")
     if "relateAllHits" in kwargs:
@@ -497,7 +492,7 @@ def add_neuro_simulation(path, nntweightfile=None, **kwargs):
                     hitCollectionName=simsegmenthits,
                     outputCollectionName=sim2dtracks_swts)
     if nntweightfile is not None:
-        nnt.param('filename', Belle2.FileSystem.findFile(nntweightfile))
+        nnt.param('filename', basf2.find_file(nntweightfile))
     if 'et_option' in kwargs:
         nnt.param('et_option', kwargs['et_option'])
     nnt.param('inputCollectionName', sim2dtracks_swts)

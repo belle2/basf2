@@ -2350,7 +2350,7 @@
   262. ECLDQM
       DPHYTTYP=False
       EnergyUpperThr=20.0
-      HitNumberUpperlimits=[10000.0, 1000.0, 700.0, 200.0]
+      HitNumberUpperlimits=[10000.0, 1000.0, 700.0, 400.0, 200.0]
       HitThresholds=[0.0, 5.0, 10.0, 20.0, 50.0]
       PI0PListName=pi0:eclDQM
       TimingThresholds=[5.0, 10.0, 50.0]
@@ -5271,7 +5271,7 @@
         124. ECLDQM
             DPHYTTYP=False
             EnergyUpperThr=20.0
-            HitNumberUpperlimits=[10000.0, 1000.0, 700.0, 200.0]
+            HitNumberUpperlimits=[10000.0, 1000.0, 700.0, 400.0, 200.0]
             HitThresholds=[0.0, 5.0, 10.0, 20.0, 50.0]
             PI0PListName=pi0:eclDQM
             TimingThresholds=[5.0, 10.0, 50.0]

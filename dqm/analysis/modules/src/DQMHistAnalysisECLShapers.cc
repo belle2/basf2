@@ -70,9 +70,10 @@ void DQMHistAnalysisECLShapersModule::event()
   TH1* h_fail_crateid  = findHist("ECL/fail_crateid");
   TProfile* h_pedrms_cellid = (TProfile*)findHist("ECL/pedrms_cellid");
 
-  double pedwidth_sum = 0;
   if (h_pedrms_cellid != NULL) {
+    double pedwidth_sum = 0;
     // Using multiset to automatically sort the added values.
+    // (so we can easily calculate the max value)
     std::multiset<double> barrel_pedwidth;
     std::multiset<double> bwd_pedwidth;
     std::multiset<double> fwd_pedwidth;

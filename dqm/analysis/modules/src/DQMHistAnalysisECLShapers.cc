@@ -70,6 +70,7 @@ void DQMHistAnalysisECLShapersModule::event()
   TH1* h_fail_crateid  = findHist("ECL/fail_crateid");
   TProfile* h_pedrms_cellid = (TProfile*)findHist("ECL/pedrms_cellid");
 
+  double pedwidth_sum = 0;
   if (h_pedrms_cellid != NULL) {
     // Using multiset to automatically sort the added values.
     std::multiset<double> barrel_pedwidth;
@@ -80,6 +81,7 @@ void DQMHistAnalysisECLShapersModule::event()
       const int cellid = i + 1;
       if (h_pedrms_cellid->GetBinEntries(cellid) < 100) continue;
       double pedrms = h_pedrms_cellid->GetBinContent(cellid);
+      pedwidth_sum += pedrms;
       if (cellid < 1153) {
         fwd_pedwidth.insert(pedrms);
       } else if (cellid < 7777) {
@@ -104,6 +106,7 @@ void DQMHistAnalysisECLShapersModule::event()
     m_pedwidth_avg[0] = sum(fwd_pedwidth) / fwd_pedwidth.size() * adc_to_mev;
     m_pedwidth_avg[1] = sum(barrel_pedwidth) / barrel_pedwidth.size() * adc_to_mev;
     m_pedwidth_avg[2] = sum(bwd_pedwidth) / bwd_pedwidth.size() * adc_to_mev;
+    m_pedwidth_avg[3] = pedwidth_sum / 8736 * adc_to_mev;
   } else {
     for (int i = 0; i < 4; i++) {
       m_pedwidth_max[i] = 0;

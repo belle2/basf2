@@ -77,7 +77,7 @@ void DQMHistAnalysisECLShapersModule::event()
     std::multiset<double> bwd_pedwidth;
     std::multiset<double> fwd_pedwidth;
 
-    for (int i = 0; i < 8736; i++) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
       const int cellid = i + 1;
       if (h_pedrms_cellid->GetBinEntries(cellid) < 100) continue;
       double pedrms = h_pedrms_cellid->GetBinContent(cellid);
@@ -106,7 +106,7 @@ void DQMHistAnalysisECLShapersModule::event()
     m_pedwidth_avg[0] = sum(fwd_pedwidth) / fwd_pedwidth.size() * adc_to_mev;
     m_pedwidth_avg[1] = sum(barrel_pedwidth) / barrel_pedwidth.size() * adc_to_mev;
     m_pedwidth_avg[2] = sum(bwd_pedwidth) / bwd_pedwidth.size() * adc_to_mev;
-    m_pedwidth_avg[3] = pedwidth_sum / 8736 * adc_to_mev;
+    m_pedwidth_avg[3] = pedwidth_sum / ECLElementNumbers::c_NCrystals * adc_to_mev;
   } else {
     for (int i = 0; i < 4; i++) {
       m_pedwidth_max[i] = 0;

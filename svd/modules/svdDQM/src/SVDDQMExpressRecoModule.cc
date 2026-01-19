@@ -689,13 +689,13 @@ void SVDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     // Strips Counts for cluster time group id = 0, 1, 2, 3
     //----------------------------------------------------------------
-    name = str(format("SVDDQM_%1%_SripCountSignalGroupIDsU") % sensorDescr);
+    name = str(format("SVDDQM_%1%_StripCountSignalGroupIDsU") % sensorDescr);
     title = str(format("SVD Sensor %1% Integrated NumberFired U-Strip for group Id = 0, 1, 2 & 3 vs Strip Number") % sensorDescr);
     m_stripCountSignalGroupIDsU[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
     m_stripCountSignalGroupIDsU[i]->GetXaxis()->SetTitle("cellID");
     m_stripCountSignalGroupIDsU[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_stripCountSignalGroupIDsU[i]);
-    name = str(format("SVDDQM_%1%_SripCountSignalGroupIDsV") % sensorDescr);
+    name = str(format("SVDDQM_%1%_StripCountSignalGroupIDsV") % sensorDescr);
     title = str(format("SVD Sensor %1% Integrated Number of Fired V-Strip for group Id = 0, 1, 2 & 3 vs Strip Number") % sensorDescr);
     m_stripCountSignalGroupIDsV[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
     m_stripCountSignalGroupIDsV[i]->GetXaxis()->SetTitle("cellID");

@@ -436,7 +436,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     }
 
     // groupId0 side U
-    TString tmpnameGrpId0 = Form("SVDExpReco/SVDDQM_%d_%d_%d_SripCountSignalGroupIDsU", tmp_layer, tmp_ladder, tmp_sensor);
+    TString tmpnameGrpId0 = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountSignalGroupIDsU", tmp_layer, tmp_ladder, tmp_sensor);
     htmp = (TH1F*)findHist(tmpnameGrpId0.Data());
     if (htmp == NULL) {
       B2INFO("Occupancy U histogram for group Id0 not found");
@@ -498,7 +498,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     }
 
     // groupId0 side V
-    tmpnameGrpId0 = Form("SVDExpReco/SVDDQM_%d_%d_%d_SripCountSignalGroupIDsV", tmp_layer, tmp_ladder, tmp_sensor);
+    tmpnameGrpId0 = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountSignalGroupIDsV", tmp_layer, tmp_ladder, tmp_sensor);
 
     htmp = (TH1F*)findHist(tmpnameGrpId0.Data());
     if (htmp == NULL) {

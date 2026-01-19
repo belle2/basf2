@@ -1248,8 +1248,6 @@ List of possible values (taken from the Geant4 source of
                       "Returns 1.0 if the MC particle was seen in the ARICH, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInKLM", seenInKLM,
                       "Returns 1.0 if the MC particle was seen in the KLM, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
-
-    VARIABLE_GROUP("MC Matching for ECLClusters");
     REGISTER_VARIABLE("clusterMCMatchWeight", particleClusterMatchWeight,
                       "Returns the weight of the ECLCluster -> MCParticle relation for the MCParticle matched to the particle. "
                       "Returns NaN if: no cluster is related to the particle, the particle is not MC matched, or if there are no mcmatches for the cluster. "
@@ -1260,7 +1258,6 @@ List of possible values (taken from the Geant4 source of
                       "Returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
     REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight,
                       "Returns the sum of all weights of the ECLCluster -> MCParticles relations.");
-
     REGISTER_VARIABLE("clusterTotalMCMatchWeightForKlong", particleClusterTotalMCMatchWeightForKlong,
                       "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is a Klong or daughter of a Klong");
     REGISTER_VARIABLE("clusterTotalMCMatchWeightForBestKlong", particleClusterTotalMCMatchWeightForBestKlong,

@@ -14,6 +14,10 @@
 #
 # Y(4S) -> B+ B- 
 #
+Alias rho+sig rho+
+Alias rho-sig rho-
+Alias rho0sig rho0
+Alias pi0sig pi0
 
 Decay Upsilon(4S)
 0.50000 B- B+sig  VSS;
@@ -26,11 +30,22 @@ Enddecay
 ### |H0| = sqrt(f_L), |H-|=|H+| = sqrt((1-f_L)/2)
 ### 2019 PDG f_L = 0.950 +- 0.016
 Decay B+sig
-1.0  rho+ rho0          PHOTOS SVV_HELAMP  0 0 1 0 0 0;
+1.0  rho+sig rho0sig          PHOTOS SVV_HELAMP  0 0 1 0 0 0;
 Enddecay
 CDecay B-sig
 ###
+Decay rho+sig
+1.0  pi+  pi0sig VSS;
+Enddecay
+CDecay rho-sig
 ### 
+Decay rho0sig 
+1.0 pi+  pi- VSS;
+Enddecay
+###
+Decay pi0sig
+1.0 gamma gamma PHSP;
+Enddecay
 ###
 ### 
 ###

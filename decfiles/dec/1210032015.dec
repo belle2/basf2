@@ -11,6 +11,7 @@
 Alias rho+sig rho+
 Alias rho-sig rho-
 Alias pi0sig pi0
+ChargeConj rho+sig rho-sig
 
 Decay Upsilon(4S)
 0.50000 B- B+sig  VSS;

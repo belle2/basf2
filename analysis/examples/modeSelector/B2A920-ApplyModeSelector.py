@@ -35,39 +35,81 @@ my_path = b2.create_path()
 # Input file (should be FEI output with B meson candidates)
 # For this example, we assume a file with B+:feiHadronic and B0:feiHadronic lists
 ma.inputMdstList(
-    filelist=['/home/pf/dataframes/MC16rd_skim/udst_000001_prod00051442_task230000001.root'],  # Replace with your input file
+    filelist=['/home/pf/dataframes/MC16rd_skim/udst_000001_prod00051442_task230000001.root'],
     path=my_path
 )
 
 # Prepend the analysis globaltag for accessing payloads
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
+# FEI list identifier
+fei_identifier = 'feiHadronic'
+
+# Define ROE masks for continuum suppression
+track_mask = "[[dr < 2] and [abs(dz) < 4] and [pt > 0.2] and [thetaInCDCAcceptance==1]]"
+ecl_mask = ("[[[[clusterReg==1] and [E>0.080]] or [[clusterReg==2] and [E > 0.03]] "
+            "or [[clusterReg==3] and [E > 0.06]]] and [clusterNHits > 1.5] "
+            "and [abs(clusterTiming) < 200] and [thetaInCDCAcceptance==1]]")
+cleanMask = ("cleanMask", track_mask, ecl_mask)
+
+# Apply FEI calibration cuts and build continuum suppression
+for b in ['B+', 'B0']:
+    # Apply cuts (matching FEI calibration)
+    ma.applyCuts(f'{b}:{fei_identifier}', '[Mbc > 5.22] and [-0.15 < deltaE < 0.1]', path=my_path)
+
+    # Build the Rest of Event
+    ma.buildRestOfEvent(f'{b}:{fei_identifier}', path=my_path)
+    ma.appendROEMasks(f'{b}:{fei_identifier}', [cleanMask], path=my_path)
+
+    # Build continuum suppression (provides cosTBTO variable)
+    ma.buildContinuumSuppression(f'{b}:{fei_identifier}', 'cleanMask', path=my_path)
+
+    # Apply cosTBTO cut
+    ma.applyCuts(f'{b}:{fei_identifier}', 'cosTBTO < 0.9', path=my_path)
+
+# Build event shape variables (sphericity, thrust, etc.)
+ma.buildEventShape(
+    allMoments=False,
+    cleoCones=False,
+    jets=False,
+    collisionAxis=False,
+    harmonicMoments=True,
+    foxWolfram=True,
+    sphericity=True,
+    thrust=True,
+    path=my_path
+)
+
 # Create standard pi0 list needed for D* veto reconstruction
-stdPi0s('eff50_May2020Fit', path=my_path)
+# Using MC16rd weights for background suppression
+beamBackgroundMVAWeight = "MC16rd"
+fakePhotonMVAWeight = "MC16rd"
+stdPi0s('eff50_May2020Fit', path=my_path, beamBackgroundMVAWeight=beamBackgroundMVAWeight,
+        fakePhotonMVAWeight=fakePhotonMVAWeight)
+
+# Apply additional pi0 cuts (matching training preprocessing)
+pi0Cuts = '[useCMSFrame(p) < 0.5]'
+pi0Cuts += ' and [daughter(0,beamBackgroundSuppression) > 0.5] and [daughter(0,fakePhotonSuppression) > 0.1]'
+pi0Cuts += ' and [daughter(1,beamBackgroundSuppression) > 0.5] and [daughter(1,fakePhotonSuppression) > 0.1]'
+ma.applyCuts('pi0:eff50_May2020Fit', pi0Cuts, path=my_path)
 
 # Define the particle lists to process
 particle_lists = ['B+:feiHadronic', 'B0:feiHadronic']
 
-# Option 1: Use ModeSelector with D* veto reconstruction
-# This provides better discrimination but requires more computation
+# Add D* veto reconstruction
 for plist in particle_lists:
     modeSelector.addDstarVeto(plist, path=my_path)
 
-# modeSelector.modeSelector(
-#     particleLists=particle_lists,
-#     output_variable='BplusScore',
-#     path=my_path
-# )
-
-# Option 2: Use ModeSelector with local model files (for testing/development)
-# Uncomment the following to use local ONNX models instead of database payloads:
-#
+# Apply ModeSelector with local model files (for testing/development)
+# Set debug=True to print feature values for comparison
 modeSelector.modeSelector(
     particleLists=particle_lists,
     cat_model_path='modeSelector_test/cat_model.onnx',
     main_model_path='modeSelector_test/main_model.onnx',
     has_inputs_path='modeSelector_test/has_inputs.txt',
     output_variable='BplusScore',
+    debug=True,  # Enable debug output
+    debug_max_events=3,  # Print first 3 events
     path=my_path
 )
 
@@ -75,6 +117,8 @@ modeSelector.modeSelector(
 output_variables = [
     # Basic kinematics
     'Mbc', 'deltaE', 'M',
+    # Continuum suppression
+    'cosTBTO',
     # FEI signal probability
     'extraInfo(SignalProbability)',
     'extraInfo(decayModeID)',

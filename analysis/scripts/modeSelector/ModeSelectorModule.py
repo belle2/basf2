@@ -54,6 +54,8 @@ class ModeSelectorModule(b2.Module):
         payload_cat_model='ModeSelector_cat_model',
         payload_main_model='ModeSelector_main_model',
         payload_has_inputs='ModeSelector_has_inputs',
+        debug=False,
+        debug_max_events=10,
     ):
         super().__init__()
         #: Input particle lists
@@ -74,6 +76,14 @@ class ModeSelectorModule(b2.Module):
         self.payload_main_model = payload_main_model
         #: Payload name for has_inputs
         self.payload_has_inputs = payload_has_inputs
+        #: Debug mode
+        self.debug = debug
+        #: Max events to debug
+        self.debug_max_events = debug_max_events
+        #: Event counter for debug
+        self.event_count = 0
+        #: Store debug features for comparison
+        self.debug_features = []
 
         # Feature configuration
         #: Number of decay mode indices (dmID * 2 + is_charged)
@@ -196,7 +206,7 @@ class ModeSelectorModule(b2.Module):
             'Dstp_chiProb': 'extraInfo(Dstp_chiProb)',
             'deltaE': 'deltaE',
             'Mbc': 'Mbc',  # Included for index compatibility (excluded via has_inputs)
-            'cosTBTO': 'cosThetaBetweenParticleAndNominalB',
+            'cosTBTO': 'cosTBTO',  # From buildContinuumSuppression
         }
 
         # D* deltaMassDiff cut
@@ -317,18 +327,112 @@ class ModeSelectorModule(b2.Module):
         return all_features, max_input_id
 
     def _get_event_features(self):
-        """Extract event-level features."""
-        # These are event-level variables from EventExtraInfo or similar
+        """Extract event-level features from EventShapeContainer."""
         event_features = {}
 
-        # Try to get from EventExtraInfo first
-        event_extra_info = Belle2.PyStoreObj('EventExtraInfo')
-        if event_extra_info.isValid():
-            for name in self.event_features:
-                if event_extra_info.hasExtraInfo(name):
-                    event_features[name] = event_extra_info.getExtraInfo(name)
+        # Event shape variables are stored in EventShapeContainer
+        event_shape = Belle2.PyStoreObj('EventShapeContainer')
+        if event_shape.isValid():
+            obj = event_shape.obj()
+            # Map feature names to EventShapeContainer methods
+            if 'sphericity' in self.event_features:
+                event_features['sphericity'] = obj.getSphericityEigenvalue(0)
+            if 'thrust' in self.event_features:
+                event_features['thrust'] = obj.getThrust()
+            if 'thrustAxisCosTheta' in self.event_features:
+                thrust_axis = obj.getThrustAxis()
+                # Compute cosTheta = z / |r|
+                import math
+                r = math.sqrt(thrust_axis.X()**2 + thrust_axis.Y()**2 + thrust_axis.Z()**2)
+                event_features['thrustAxisCosTheta'] = thrust_axis.Z() / r if r > 0 else 0.0
+            if 'aplanarity' in self.event_features:
+                # Aplanarity = 1.5 * smallest sphericity eigenvalue
+                event_features['aplanarity'] = 1.5 * obj.getSphericityEigenvalue(2)
+            if 'foxWolframR2' in self.event_features:
+                # R2 = H2/H0
+                h0 = obj.getFWMoment(0)
+                h2 = obj.getFWMoment(2)
+                event_features['foxWolframR2'] = h2 / h0 if h0 != 0 else 0.0
+            if 'harmonicMomentThrust0' in self.event_features:
+                event_features['harmonicMomentThrust0'] = obj.getHarmonicMomentThrust(0)
+            if 'harmonicMomentThrust1' in self.event_features:
+                event_features['harmonicMomentThrust1'] = obj.getHarmonicMomentThrust(1)
+            if 'harmonicMomentThrust2' in self.event_features:
+                event_features['harmonicMomentThrust2'] = obj.getHarmonicMomentThrust(2)
 
         return event_features
+
+    def _print_debug_info(self, candidates_data, event_features, all_features, max_input_id):
+        """Print debug information for comparing with offline preprocessing."""
+        # Get event identification
+        event_meta = Belle2.PyStoreObj('EventMetaData')
+        if event_meta.isValid():
+            exp = event_meta.getExperiment()
+            run = event_meta.getRun()
+            evt = event_meta.getEvent()
+            event_id_str = f"exp={exp}, run={run}, evt={evt}"
+        else:
+            event_id_str = "unknown"
+
+        print(f"\n{'='*60}")
+        print(f"DEBUG Event {self.event_count} ({event_id_str})")
+        print(f"{'='*60}")
+        print(f"Number of candidates: {len(candidates_data)}")
+        print(f"Max input_id (best candidate): {max_input_id}")
+
+        print("\n--- Candidates ---")
+        for i, (input_id, features) in enumerate(candidates_data):
+            print(f"  Candidate {i}: input_id={input_id}")
+            for key, val in features.items():
+                print(f"    {key}: {val}")
+
+        print("\n--- Event Features ---")
+        for key, val in event_features.items():
+            print(f"  {key}: {val}")
+
+        print("\n--- Feature Array (non-zero, first 5 blocks) ---")
+        n_blocks = len(self.feature_blocks)
+        for block_idx in range(min(5, n_blocks)):
+            block_name = self.feature_blocks[block_idx][0]
+            start = block_idx * self.n_input_ids
+            end = start + self.n_input_ids
+            block_data = all_features[start:end]
+            non_zero = [(j, v) for j, v in enumerate(block_data) if v != 0]
+            if non_zero:
+                print(f"  {block_name}: {non_zero[:10]}...")
+
+        # Print last few features (event-level)
+        n_candidate_features = n_blocks * self.n_input_ids
+        event_feat_start = n_candidate_features
+        print(f"\n--- Event-level features (indices {event_feat_start}+) ---")
+        event_feat_names = self.event_features + ['ncandidates/10', 'max_input_id/50', 'scnd_max_input_id/50']
+        for i, name in enumerate(event_feat_names):
+            idx = event_feat_start + i
+            if idx < len(all_features):
+                print(f"  {name}: {all_features[idx]}")
+
+        print(f"\n--- Total feature array shape: {len(all_features)} ---")
+
+        # Store for later comparison
+        self.debug_features.append({
+            'event_id_str': event_id_str,
+            'all_features': all_features.copy(),
+            'max_input_id': max_input_id,
+            'n_candidates': len(candidates_data),
+            'candidates_data': candidates_data,
+        })
+
+    def terminate(self):
+        """Called at the end of processing."""
+        if self.debug and self.debug_features:
+            # Save debug features to file
+            debug_file = 'modeSelector_debug_features.npz'
+            feature_arrays = np.array([d['all_features'] for d in self.debug_features])
+            np.savez(debug_file,
+                     features=feature_arrays,
+                     n_candidates=[d['n_candidates'] for d in self.debug_features],
+                     max_input_ids=[d['max_input_id'] for d in self.debug_features])
+            print(f"\n[DEBUG] Saved {len(self.debug_features)} events to {debug_file}")
 
     def event(self):
         """Called for each event."""
@@ -356,6 +460,11 @@ class ModeSelectorModule(b2.Module):
 
         # Build feature array
         all_features, max_input_id = self._build_feature_array(candidates_data, event_features)
+
+        # Debug output
+        if self.debug and self.event_count < self.debug_max_events:
+            self._print_debug_info(candidates_data, event_features, all_features, max_input_id)
+            self.event_count += 1
 
         # Select features based on has_inputs (indices used during training)
         if self.has_inputs is not None:

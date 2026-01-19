@@ -53,6 +53,8 @@ def modeSelector(
     output_variable='BplusScore',
     addDstarVetoReco=False,
     store_event_info=True,
+    debug=False,
+    debug_max_events=10,
     path=None
 ):
     """
@@ -151,6 +153,8 @@ def modeSelector(
         has_inputs_path=has_inputs_path,
         output_variable=output_variable,
         store_event_info=store_event_info,
+        debug=debug,
+        debug_max_events=debug_max_events,
     )
     path.add_module(module)
 

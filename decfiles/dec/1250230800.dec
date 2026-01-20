@@ -1,0 +1,32 @@
+# EventType: 1250230800
+# Descriptor: [B+ -> n0 anti-n0 e+ nu_e]cc
+# NickName: Bu_n0n0barenu
+# Documentation: Rare SL process
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Tristan Fillinger, Yinghui Guan
+# Email: tristan.fillinger@kek.jp, yinghui.guan@kek.jp
+# Cuts: None
+# Date: 20260120
+
+
+Alias B-sig B-
+Alias B+sig B+
+ChargeConj B-sig B+sig
+
+
+Decay Upsilon(4S)
+0.50000 B+sig B-  VSS;
+0.50000 B+ B-sig  VSS;
+Enddecay
+
+Decay B-sig
+1.0   n0  anti-n0  e-    anti-nu_e      PHSP;
+Enddecay
+
+Decay B+sig
+1.0   n0  anti-n0   e+    nu_e          PHSP;
+Enddecay
+
+
+End

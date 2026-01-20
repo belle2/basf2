@@ -80,6 +80,15 @@ SVDDQMExpressRecoModule::~SVDDQMExpressRecoModule()
 
 void SVDDQMExpressRecoModule::defineHisto()
 {
+  if (m_useParamFromDB) {
+    if (!m_svdPlotsConfig.isValid())
+      B2FATAL("no valid configuration found for SVD reconstruction");
+    else {
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
+      m_3Samples = m_svdPlotsConfig->isPlotsFor3SampleMonitoring();
+      m_skipRejectedEvents = m_svdPlotsConfig->isSkipHLTRejectedEvents();
+    }
+  }
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfLayers() == 0) {
@@ -947,16 +956,6 @@ void SVDDQMExpressRecoModule::initialize()
 {
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
-
-  if (m_useParamFromDB) {
-    if (!m_svdPlotsConfig.isValid())
-      B2FATAL("no valid configuration found for SVD reconstruction");
-    else {
-      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
-      m_3Samples = m_svdPlotsConfig->isPlotsFor3SampleMonitoring();
-      m_skipRejectedEvents = m_svdPlotsConfig->isSkipHLTRejectedEvents();
-    }
-  }
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() != 0) {

@@ -40,6 +40,7 @@
   <xi:include href="../beast/fangs/FANGS-Materials.xml"/>
   <xi:include href="../beast/plume/PLUME-Materials.xml"/>
   <xi:include href="../beast/qcsmonitor/QCSMONITOR-Materials.xml"/>
+
   <!-- Magnetic field -->
   <xi:include href="../geometry/MagneticFieldConstant.xml"/>
   <xi:include href="../geometry/MagneticFieldConstant4LimitedRSVD.xml"/>
@@ -48,15 +49,21 @@
   <xi:include href="../geometry/MagneticField2d.xml"/>
   <xi:include href="../geometry/MagneticField3dQuadBeamline.xml"/>
   <xi:include href="../geometry/MagneticField3dTotalVolume.xml"/>
+
   <!-- Accelerator -->
   <xi:include href="SuperKEKB.xml"/>
+
+  <!-- Accelerator tunnel -->
+  <DetectorComponent name="FarBeamLine" isDefault="false">
+    <xi:include href="../ir/FarBeamLine.xml" xpointer="xpointer(/DetectorComponent/*)"/>
+  </DetectorComponent>
+
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>
   <xi:include href="../structure/STR.xml"/>
   <xi:include href="../structure/ServiceGaps.xml"/>
   <xi:include href="../ir/BeamPipe.xml"/>
   <xi:include href="../ir/Cryostat.xml"/>
-  <xi:include href="../ir/FarBeamLine.xml"/>
   <xi:include href="../vxd/HeavyMetalShield.xml"/>
   <xi:include href="../vxd/Service.xml"/>
   <xi:include href="../pxd/PXD.xml"/>
@@ -66,6 +73,7 @@
   <xi:include href="../arich/ARICH.xml"/>
   <xi:include href="../ecl/ECL.xml"/>
   <xi:include href="../klm/KLM.xml"/>
+
   <!-- phase 2 specific subdetectors -->
   <DetectorComponent name="BeamPipe-phase2" isDefault="false">
     <xi:include href="../ir/BeamPipe-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
@@ -103,14 +111,17 @@
   <DetectorComponent name="ServiceGapsMaterial-phase2" isDefault="false">
     <xi:include href="../structure/ServiceGaps-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
+
   <!-- early phase 3 Service Gaps -->
   <DetectorComponent name="ServiceGapsMaterial-earlyPhase3" isDefault="false">
     <xi:include href="../structure/ServiceGaps-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
+
   <!-- early phase 3 PXD -->
   <DetectorComponent name="PXD-earlyPhase3" isDefault="false">
     <xi:include href="../pxd/PXD-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
+
   <!-- early phase 3 and phase3 Beast system -->
   <DetectorComponent name="MICROTPC" isDefault="false">
     <xi:include href="../beast/microtpc/MICROTPC-phase3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
@@ -124,10 +135,12 @@
   <DetectorComponent name="CLAWS" isDefault="false">
     <xi:include href="../beast/claws/CLAWS3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
+
   <!-- CDC without SL0 and SL1 -->
   <DetectorComponent name="CDCReducedNoSL0SL1" isDefault="false">
     <xi:include href="../cdc/CDCReducedNoSL0SL1.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
+
   <!-- MUID muon identification -->
   <Muid>
     <xi:include href="../klm/MuidParameters.xml"/>

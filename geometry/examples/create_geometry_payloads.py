@@ -33,14 +33,14 @@ shutil.rmtree("localdb", ignore_errors=True)
 phase3 = basf2.Path()
 phase3.add_module("EventInfoSetter")
 phase3.add_module("Gearbox")
-phase3.add_module("Geometry", createPayloads=True, payloadIov=[0, 0, 0, -1], additionalComponents=['FarBeamLine'])
+phase3.add_module("Geometry", createPayloads=True, payloadIov=[0, 0, 0, -1])
 b2test_utils.safe_process(phase3)
 
 # create post LS1 geometry: Identical to the default one
 postLS1 = basf2.Path()
 postLS1.add_module("EventInfoSetter")
 postLS1.add_module("Gearbox")
-postLS1.add_module("Geometry", createPayloads=True, payloadIov=[1004, 0, 1004, -1], additionalComponents=['FarBeamLine'])
+postLS1.add_module("Geometry", createPayloads=True, payloadIov=[1004, 0, 1004, -1])
 b2test_utils.safe_process(postLS1)
 
 # create phase2 geometry. For this we need to manually add all the phase2
@@ -76,7 +76,7 @@ early3.add_module(
         'ServiceGapsMaterial-earlyPhase3',
         'BeamPipe-earlyPhase3',
         'Cryostat-earlyPhase3',
-        'FarBeamLine-earlyPhase3'])
+    ])
 b2test_utils.safe_process(early3)
 
 # most of the components are identical so we avoid uploading two
@@ -135,7 +135,6 @@ for filename in os.scandir('localdb/'):
     if not match:
         continue
     if match and match.groups() not in keep:
-        pass
         print(f"Removing {filename.name}: not needed")
         os.unlink(filename.path)
     else:

@@ -54,17 +54,13 @@
   <!-- Accelerator -->
   <xi:include href="SuperKEKB.xml"/>
 
-  <!-- Accelerator tunnel -->
-  <DetectorComponent name="FarBeamLine" isDefault="false">
-    <xi:include href="../ir/FarBeamLine.xml" xpointer="xpointer(/DetectorComponent/*)"/>
-  </DetectorComponent>
-
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>
   <xi:include href="../structure/STR.xml"/>
   <xi:include href="../structure/ServiceGaps.xml"/>
   <xi:include href="../ir/BeamPipe.xml"/>
   <xi:include href="../ir/Cryostat.xml"/>
+  <xi:include href="../ir/FarBeamLine.xml"/>
   <xi:include href="../vxd/HeavyMetalShield.xml"/>
   <xi:include href="../vxd/Service.xml"/>
   <xi:include href="../pxd/PXD.xml"/>

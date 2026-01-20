@@ -69,8 +69,9 @@ early3.add_module(
     excludedComponents=[
         'PXD',
         'ServiceGapsMaterial',
+        'BeamPipe',
         'Cryostat',
-        'BeamPipe'],
+        'FarBeamLine'],
     additionalComponents=[
         'PXD-earlyPhase3',
         'ServiceGapsMaterial-earlyPhase3',

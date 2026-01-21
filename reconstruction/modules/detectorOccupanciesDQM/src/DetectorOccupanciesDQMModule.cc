@@ -41,13 +41,13 @@ DetectorOccupanciesDQMModule::DetectorOccupanciesDQMModule() : HistoModule()
            std::string("DetectorOccupancies"));
   addParam("eclEnergyThr", m_eclEnergyThr, "Energy threshold (in MeV) for ECL occupancy histogram", 5.0);
   addParam("BKLMTimeMin", m_BKLMTimeMin,
-           "Min time for BKLM time histogram.", double(-6500.5));
+           "Min time for BKLM time histogram.", double(-6500));
   addParam("BKLMTimeMax", m_BKLMTimeMax,
-           "Max time for BKLM time histogram.", double(5500));
+           "Max time for BKLM time histogram.", double(5000));
   addParam("EKLMTimeMin", m_EKLMTimeMin,
-           "Min time for EKLM time histogram.", double(-5300.5));
+           "Min time for EKLM time histogram.", double(-5100));
   addParam("EKLMTimeMax", m_EKLMTimeMax,
-           "Max time for EKLM time histogram.", double(-4300));
+           "Max time for EKLM time histogram.", double(-4500));
   addParam("BKLMScintOffset", m_BKLMScintOffset,
            "Offset to center BKLM Scint. times at 0", double(-4705.));
   addParam("BKLMRPCOffset", m_BKLMRPCOffset,

@@ -1086,6 +1086,12 @@
   111. TrackingAbortDQM_before_filter
       histogramDirectoryName=TrackingAbort_before_filter
   112. DetectorOccupanciesDQM_before_filter
+      BKLMRPCOffset=-4300.5
+      BKLMScintOffset=-4705.0
+      BKLMTimeMax=5000.0
+      BKLMTimeMin=-6500.0
+      EKLMTimeMax=-4500.0
+      EKLMTimeMin=-5100.0
       eclEnergyThr=5.0
       histogramDirectoryName=DetectorOccupancies_before_filter
   113. StatisticsTimingHLTDQM
@@ -2325,6 +2331,12 @@
   256. TrackingAbortDQM
       histogramDirectoryName=TrackingAbort
   257. DetectorOccupanciesDQM
+      BKLMRPCOffset=-4300.5
+      BKLMScintOffset=-4705.0
+      BKLMTimeMax=5000.0
+      BKLMTimeMin=-6500.0
+      EKLMTimeMax=-4500.0
+      EKLMTimeMin=-5100.0
       eclEnergyThr=5.0
       histogramDirectoryName=DetectorOccupancies
   258. SoftwareTriggerHLTDQM_skim_nobhabha
@@ -3990,6 +4002,12 @@
   111. TrackingAbortDQM_before_filter
       histogramDirectoryName=TrackingAbort_before_filter
   112. DetectorOccupanciesDQM_before_filter
+      BKLMRPCOffset=-4300.5
+      BKLMScintOffset=-4705.0
+      BKLMTimeMax=5000.0
+      BKLMTimeMin=-6500.0
+      EKLMTimeMax=-4500.0
+      EKLMTimeMin=-5100.0
       eclEnergyThr=5.0
       histogramDirectoryName=DetectorOccupancies_before_filter
   113. StatisticsTimingHLTDQM
@@ -5246,6 +5264,12 @@
         118. TrackingAbortDQM
             histogramDirectoryName=TrackingAbort
         119. DetectorOccupanciesDQM
+            BKLMRPCOffset=-4300.5
+            BKLMScintOffset=-4705.0
+            BKLMTimeMax=5000.0
+            BKLMTimeMin=-6500.0
+            EKLMTimeMax=-4500.0
+            EKLMTimeMin=-5100.0
             eclEnergyThr=5.0
             histogramDirectoryName=DetectorOccupancies
         120. SoftwareTriggerHLTDQM_skim_nobhabha

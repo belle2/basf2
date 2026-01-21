@@ -13,7 +13,6 @@ from basf2 import B2FATAL
 import basf2
 from variables import variables as vm
 import modularAnalysis as ma
-from b2pandas_utils import VariablesToTable
 from stdPhotons import stdPhotons
 from vertex import kFit
 from tflat.config import config
@@ -91,6 +90,7 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
     else:
         assert isinstance(classifier_args, dict)
 
+    tree_name = 'tflat_variables'
     rank_variable = 'p'
 
     # create default ROE-mask
@@ -99,18 +99,17 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
     for name in particleLists:
         ma.appendROEMasks(list_name=name, mask_tuples=[TFLAT_mask], path=path)
 
-    # create tagging specific variables
-    if mode != 'Expert':
-        features = get_variables('pi+:tflat', rank_variable, trk_variable_list, particleNumber=config['parameters']['num_trk'])
-        features += get_variables('gamma:tflat', rank_variable, ecl_variable_list, particleNumber=config['parameters']['num_ecl'])
-        features += get_variables('pi+:tflat', rank_variable, roe_variable_list, particleNumber=config['parameters']['num_roe'])
-
     # create roe specific paths
     roe_path = basf2.create_path()
     dead_end_path = basf2.create_path()
 
     if mode == 'Sampler':
-        output_file_name = os.path.join(working_dir, uniqueIdentifier + f'_training_data{sampler_id}.parquet')
+        # create tagging specific variables
+        features = get_variables('pi+:tflat', rank_variable, trk_variable_list, particleNumber=config['parameters']['num_trk'])
+        features += get_variables('gamma:tflat', rank_variable, ecl_variable_list, particleNumber=config['parameters']['num_ecl'])
+        features += get_variables('pi+:tflat', rank_variable, roe_variable_list, particleNumber=config['parameters']['num_roe'])
+
+        output_file_name = os.path.join(working_dir, uniqueIdentifier + f'_training_data{sampler_id}.root')
         if os.path.isfile(output_file_name) and not overwrite:
             B2FATAL(f'Outputfile {output_file_name} already exists. Aborting writeout.')
 
@@ -136,8 +135,8 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
         # and add target
         all_variables = features + [target]
 
-        # write to parquet table
-        VariablesToTable('', all_variables, output_file_name, roe_path)
+        # write to ntuples
+        ma.variablesToNtuple('', all_variables, tree_name, output_file_name, roe_path)
 
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

@@ -33,15 +33,25 @@ REG_MODULE(DetectorOccupanciesDQM);
 //-----------------------------------------------------------------
 
 DetectorOccupanciesDQMModule::DetectorOccupanciesDQMModule() : HistoModule()
-  , m_eklmElementNumbers{&(EKLMElementNumbers::Instance())}
+  , m_eklmElementNumbers{&(EKLMElementNumbers::Instance())}, m_klmTime{&(KLMTime::Instance())}
 {
   setDescription("DQM Module to monitor basic detector quantities");
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
            std::string("DetectorOccupancies"));
-
   addParam("eclEnergyThr", m_eclEnergyThr, "Energy threshold (in MeV) for ECL occupancy histogram", 5.0);
-
+  addParam("BKLMTimeMin", m_BKLMTimeMin,
+           "Min time for BKLM time histogram.", double(-6500.5));
+  addParam("BKLMTimeMax", m_BKLMTimeMax,
+           "Max time for BKLM time histogram.", double(5500));
+  addParam("EKLMTimeMin", m_EKLMTimeMin,
+           "Min time for EKLM time histogram.", double(-5300.5));
+  addParam("EKLMTimeMax", m_EKLMTimeMax,
+           "Max time for EKLM time histogram.", double(-4300));
+  addParam("BKLMScintOffset", m_BKLMScintOffset,
+           "Offset to center BKLM Scint. times at 0", double(-4705.));
+  addParam("BKLMRPCOffset", m_BKLMRPCOffset,
+           "Offset to center BKLM RPC times at 0", double(-4300.5));
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -77,9 +87,9 @@ void DetectorOccupanciesDQMModule::defineHisto()
   m_BKLM_Plane_Occupancy[0] = new TH2F((histoName + "_" + tag[0]).c_str(),
                                        (histoTitle + " " + title[0]).c_str(),
                                        240, 0.5, 240.5,
-                                       200, double(-2224.5), double(-199.5));
+                                       200, m_BKLMTimeMin, m_BKLMTimeMax);
   m_BKLM_Plane_Occupancy[0]->GetXaxis()->SetTitle("Layer number");
-  m_BKLM_Plane_Occupancy[0]->GetYaxis()->SetTitle("Time (ns)");
+  m_BKLM_Plane_Occupancy[0]->GetYaxis()->SetTitle("Shifted Time (ns)");
 
   //inside active_veto window:
   m_BKLM_Plane_Occupancy[1] = new TH2F(*m_BKLM_Plane_Occupancy[0]);
@@ -95,9 +105,9 @@ void DetectorOccupanciesDQMModule::defineHisto()
   m_BKLM_PlaneTrg_Occupancy[0] = new TH2F((histoName + "_" + tag[0]).c_str(),
                                           (histoTitle + " " + title[0]).c_str(),
                                           240, 0.5, 240.5,
-                                          200, double(-2224.5), double(-199.5));
+                                          200, m_BKLMTimeMin, m_BKLMTimeMax);
   m_BKLM_PlaneTrg_Occupancy[0]->GetXaxis()->SetTitle("Layer number");
-  m_BKLM_PlaneTrg_Occupancy[0]->GetYaxis()->SetTitle("Time (ns)");
+  m_BKLM_PlaneTrg_Occupancy[0]->GetYaxis()->SetTitle("Shifted Time (ns)");
 
   //inside active_veto window:
   m_BKLM_PlaneTrg_Occupancy[1] = new TH2F(*m_BKLM_PlaneTrg_Occupancy[0]);
@@ -112,9 +122,9 @@ void DetectorOccupanciesDQMModule::defineHisto()
   m_EKLM_Plane_Occupancy[0] = new TH2F((histoName + "_" + tag[0]).c_str(),
                                        (histoTitle + " " + title[0]).c_str(),
                                        208, 0.5, 208.5,
-                                       100, double(-5300), double(-4300));
+                                       100, m_EKLMTimeMin, m_EKLMTimeMax);
   m_EKLM_Plane_Occupancy[0]->GetXaxis()->SetTitle("Plane number");
-  m_EKLM_Plane_Occupancy[0]->GetYaxis()->SetTitle("Time (ns)");
+  m_EKLM_Plane_Occupancy[0]->GetYaxis()->SetTitle("Time from L1Trigger (ns)");
 
   //inside active_veto window:
   m_EKLM_Plane_Occupancy[1] = new TH2F(*m_EKLM_Plane_Occupancy[0]);
@@ -128,9 +138,9 @@ void DetectorOccupanciesDQMModule::defineHisto()
   m_EKLM_PlaneTrg_Occupancy[0] = new TH2F((histoName + "_" + tag[0]).c_str(),
                                           (histoTitle + " " + title[0]).c_str(),
                                           208, 0.5, 208.5,
-                                          100, double(-5300), double(-4300));
+                                          100, m_EKLMTimeMin, m_EKLMTimeMax);
   m_EKLM_PlaneTrg_Occupancy[0]->GetXaxis()->SetTitle("Plane number");
-  m_EKLM_PlaneTrg_Occupancy[0]->GetXaxis()->SetTitle("Time (ns)");
+  m_EKLM_PlaneTrg_Occupancy[0]->GetXaxis()->SetTitle("Time from L1Trigger (ns)");
 
   //inside active_veto window:
   m_EKLM_PlaneTrg_Occupancy[1] = new TH2F(*m_EKLM_PlaneTrg_Occupancy[0]);
@@ -196,7 +206,7 @@ void DetectorOccupanciesDQMModule::initialize()
 
 void DetectorOccupanciesDQMModule::beginRun()
 {
-
+  m_klmTime->updateConstants(); //to get correct CTime
   for (int i = 0; i < 2; i++) {
     if (m_BKLM_Plane_Occupancy[i] != nullptr)  m_BKLM_Plane_Occupancy[i]->Reset();
     if (m_BKLM_PlaneTrg_Occupancy[i] != nullptr)  m_BKLM_PlaneTrg_Occupancy[i]->Reset();
@@ -269,14 +279,16 @@ void DetectorOccupanciesDQMModule::event()
       int sector = digit.getSector();
       int layerGlobal = BKLMElementNumbers::layerGlobalNumber(
                           section, sector, layer);
-      float offset = (digit.inRPC()) ? 0. : 4300 - 1223.5; // shifting scintillator hits to be near RPC hits
-      bool goodRPCHit = (!(digit.getTime() > -1223.5 && digit.getTime() < -199.5) && (digit.inRPC()));  //RPC time window
-      bool goodScintHit = (!(digit.getTime() > -5300 && digit.getTime() < -4300) && !(digit.inRPC())); //scint. time window
-      if (goodRPCHit || goodScintHit)
+      float offset = (digit.inRPC()) ? m_BKLMRPCOffset : m_BKLMScintOffset;
+      float rawTime = (digit.inRPC()) ? digit.getRevo9DCArrivalTime() * m_klmTime->getCTimePeriod() : digit.getTime();
+      float time = rawTime - offset; //shift is to align scintillator and RPC hits on one graph
+
+      bool goodHit = (rawTime > -11000 && rawTime < 0);  //~11us from L1 trigger
+      if (!goodHit)
         continue;
-      m_BKLM_Plane_Occupancy[index]->Fill(layerGlobal, digit.getTime() + offset);
+      m_BKLM_Plane_Occupancy[index]->Fill(layerGlobal, time);
       if (backBooleanFlag)
-        m_BKLM_PlaneTrg_Occupancy[index]->Fill(layerGlobal, digit.getTime() + offset);
+        m_BKLM_PlaneTrg_Occupancy[index]->Fill(layerGlobal, time);
     }
   }
 

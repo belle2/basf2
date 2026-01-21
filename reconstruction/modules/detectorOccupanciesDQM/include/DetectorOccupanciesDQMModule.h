@@ -13,6 +13,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/HistoModule.h>
 #include <mdst/dataobjects/TRGSummary.h>
+#include <klm/time/KLMTime.h>
 
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLElementNumbers.h>
@@ -73,8 +74,17 @@ namespace Belle2 {
     //KLM stuff
     StoreArray<KLMDigit> m_KLMDigits; /**< KLM digits*/
     const EKLMElementNumbers* m_eklmElementNumbers; /**< EKLM Element numbers. */
+    KLMTime* m_klmTime; /**< KLM Time conversion. */
     // KLM Background Trigger bit(s) of Interest
     const TRGSummary::ETimingType m_klmBackTriggers[1] = {TRGSummary::ETimingType::TTYP_DPHY};  /**< Background Triggers bits of Interest */
+    // parameters for KLM histograms
+    double m_BKLMTimeMin; /**< Min time for BKLM time */
+    double m_BKLMTimeMax; /**< Max time for BKLM time */
+    double m_EKLMTimeMin; /**< Min time for EKLM Scint */
+    double m_EKLMTimeMax; /**< Max time for EKLM Scint */
+    double m_BKLMScintOffset; /**< Min time for RPC */
+    double m_BKLMRPCOffset; /**< Max time for RPC */
+
 
     //ARICH stuff
     StoreArray<ARICHHit>m_ARICHHits; /**< ARICH hits*/

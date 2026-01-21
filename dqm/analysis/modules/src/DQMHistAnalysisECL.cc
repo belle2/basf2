@@ -35,7 +35,7 @@ DQMHistAnalysisECLModule::DQMHistAnalysisECLModule()
     " 1. Normalize some low-level DQM histograms by the event count.\n"
     " 2. Display time offsets for each ECL crate.\n"
     " 3. Display the number of failed fits in each ECL module.");
-  addParam("HitMapThresholds", m_HitMapThresholds, "Thresholds to display hit map, MeV", std::vector<double> {0, 5, 10, 50});
+  addParam("HitMapThresholds", m_HitMapThresholds, "Thresholds to display hit map, MeV", std::vector<double> {0, 5, 10, 20, 50});
   addParam("WaveformOption", m_WaveformOption, "Option (all,psd,logic,rand,dphy) to display waveform flow",
            m_WaveformOption);
   addParam("CrateTimeOffsetsMax", m_CrateTimeOffsetsMax, "Maximum boundary for crate time offsets", 20.);
@@ -474,8 +474,14 @@ void DQMHistAnalysisECLModule::endRun()
     auto var_name = (boost::format("wf_frac_%s_min") % wf_option).str();
     m_monObj->setVariable(var_name, m_wf_fraction[wf_option]);
   }
+  for (auto threshold : m_HitMapThresholds) {
+    auto var_name_avg = (boost::format("average_number_of_ECL_digits_at_%1%_MeV") % threshold).str();
+    auto var_name_std = (boost::format("standard_deviation_of_ECL_digits_at_%1%_MeV") % threshold).str();
+    TH1* h_ECL_ncev = findHist(str(boost::format("ECL/ncev_Thr%1%MeV") % threshold));
+    m_monObj->setVariable(var_name_avg, h_ECL_ncev->GetMean());
+    m_monObj->setVariable(var_name_std, h_ECL_ncev->GetStdDev());
+  }
 }
-
 
 void DQMHistAnalysisECLModule::terminate()
 {

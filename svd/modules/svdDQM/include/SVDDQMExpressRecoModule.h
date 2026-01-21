@@ -238,13 +238,13 @@ namespace Belle2 {
     TH2F* m_clusterTimeCoarseGroupIdV = nullptr;
 
     /** u charge group id  of clusters for layer 3 sensors */
-    TH1F* m_clusterChargeSignalGroupIDsL3U = nullptr;
+    TH1F* m_clusterChargeGroupIDsL3U = nullptr;
     /** v charge group id  of clusters for layer 3  sensors */
-    TH1F* m_clusterChargeSignalGroupIDsL3V = nullptr;
+    TH1F* m_clusterChargeGroupIDsL3V = nullptr;
     /** u charge group id  of clusters for layer 4,5,6 sensors */
-    TH1F* m_clusterChargeSignalGroupIDsL456U = nullptr;
+    TH1F* m_clusterChargeGroupIDsL456U = nullptr;
     /** v charge group id  of clusters for layer 4,5,6 sensors */
-    TH1F* m_clusterChargeSignalGroupIDsL456V = nullptr;
+    TH1F* m_clusterChargeGroupIDsL456V = nullptr;
 
     /** u SNR group id  of clusters for layer 3 sensors */
     TH1F* m_clusterSNRGroupIDsL3U = nullptr;

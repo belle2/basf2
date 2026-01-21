@@ -24,6 +24,8 @@ If the GPU utilization is less than ~70% it might be possible to speed up the tr
 ## Step-by-Step Training Guide
 
 1. **Configuration**
+   - Create new .yaml config file in analysis/data with parameters for your training (start with the latest version as a baseline).\
+      The name of the file will also be the uniqueIdentifier of the final weightfile.
    - Possible update 'VersionBeamBackgroundMVA' and 'VersionFakePhotonMVA' in the config file if newer versions are available.
 
 2. **Sample training data**
@@ -38,7 +40,7 @@ If the GPU utilization is less than ~70% it might be possible to speed up the tr
    The datasets also need to be shuffled and split into chunks to allow them to be loaded into memory piece by piece.
    - All of this is done by running the `merge_samples_to_parquet.py` script:
     ```bash
-    python3 merge_samples_to_parquet.py ----root_dir /path/to/input_root/ --parquet_dir /path/to/output_parquet/
+    python3 merge_samples_to_parquet.py ----root_dir /path/to/input_root/ --parquet_dir /path/to/output_parquet/ --uniqueIdentifier {uniqueIdentifier}
     ```
     - `/path/to/input_root/` is the path to the directory containing the root outputs produced by the sampler script.
     - The resulting training and validation files are saved to the `/path/to/output_parquet/` directory
@@ -46,10 +48,10 @@ If the GPU utilization is less than ~70% it might be possible to speed up the tr
 4. **Training**
     - To launch the training use the `trainer.py` script:
     ```bash
-   python3 trainer.py --train_input /path/to/output_parquet/tflat_training_samples.parquet --val_input /path/to/output_parquet/tflat_validation_samples.parquet
+   python3 trainer.py --train_input /path/to/output_parquet/tflat_training_samples.parquet --val_input /path/to/output_parquet/tflat_validation_samples.parquet --uniqueIdentifier {uniqueIdentifier}
     ```
     - Should the training crash at any point it can be restarted from the latest checkpoint like this:
     ```bash
-   python3 trainer.py --train_input /path/to/output_parquet/tflat_training_samples.parquet --val_input /path/to/output_parquet/tflat_validation_samples.parquet --warmstart
+   python3 trainer.py --train_input /path/to/output_parquet/tflat_training_samples.parquet --val_input /path/to/output_parquet/tflat_validation_samples.parquet --uniqueIdentifier {uniqueIdentifier} --warmstart
     ```
    - Once the training is done a `localdb` that contains the packaged onnx weightfile is produced.

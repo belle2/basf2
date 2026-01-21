@@ -9,7 +9,9 @@
 ##########################################################################
 
 import os
+import yaml
 import ROOT
+import basf2
 import argparse
 
 os.environ["KERAS_BACKEND"] = "torch"
@@ -20,7 +22,6 @@ if __name__ == "__main__":
     import torch
     import keras
     from fitter import fit
-    from tflat.config import config
     from tflat.model import get_tflat_model
     from tflat.utils import get_variables
     from basf2_mva_util import create_onnx_mva_weightfile
@@ -43,6 +44,14 @@ if __name__ == "__main__":
         default="dummyin_val.parquet",
         help='Path to validation parquet file'
     )
+    parser.add_argument(  # input parser
+        '--uniqueIdentifier',
+        metavar='uniqueIdentifier',
+        dest='uniqueIdentifier',
+        type=str,
+        default="TFlaT_MC16rd_light_2601_hyperion",
+        help='Name of the config .yaml to be used and the produced weightfile'
+    )
     parser.add_argument(  # checkpoint parser
         '--checkpoint',
         metavar='checkpoint',
@@ -63,7 +72,9 @@ if __name__ == "__main__":
     val_file = args.val_input
     checkpoint_filepath = args.checkpoint
     warmstart = args.warmstart
+    uniqueIdentifier = args.uniqueIdentifier
 
+    config = yaml.full_load(basf2.find_file(f'{uniqueIdentifier}.yaml'))
     parameters = config['parameters']
     rank_variable = 'p'
     trk_variable_list = config['trk_variable_list']
@@ -127,4 +138,4 @@ if __name__ == "__main__":
         target_variable="qrCombined",
     )
 
-    ROOT.Belle2.MVA.Weightfile.saveToDatabase(weightfile, "standard_tflat")
+    ROOT.Belle2.MVA.Weightfile.saveToDatabase(weightfile, uniqueIdentifier)

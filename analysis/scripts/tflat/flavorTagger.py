@@ -9,17 +9,17 @@
 ##########################################################################
 
 import os
+import yaml
 from basf2 import B2FATAL
 import basf2
 from variables import variables as vm
 import modularAnalysis as ma
 from stdPhotons import stdPhotons
 from vertex import kFit
-from tflat.config import config
 from tflat.utils import get_variables
 
 
-def fill_particle_lists(maskName='TFLATDefaultMask', path=None):
+def fill_particle_lists(config, maskName='TFLATDefaultMask', path=None):
     """
     Fills the particle lists.
     """
@@ -51,7 +51,6 @@ def fill_particle_lists(maskName='TFLATDefaultMask', path=None):
 
 def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier='standard_tflat',
                  target='qrCombined', overwrite=False,
-                 classifier_args=None,
                  sampler_id=0,
                  path=None):
     """
@@ -66,7 +65,6 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
     :param uniqueIdentifier: string, database identifier for the method
     :param target: string, target variable
     :param overwrite: bool, overwrite already (locally!) existing training
-    :param classifier_args: dictionary, customized arguments for tflat
     :param sampler_id: identifier of sampled file for parallel sampling
     :param path: basf2 path obj
     :return: None
@@ -78,20 +76,10 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
     if mode not in ['Expert', 'Sampler']:
         B2FATAL(f'Invalid mode  {mode}')
 
-    if mode in ['Sampler',]:
-        trk_variable_list = config['trk_variable_list']
-
-        ecl_variable_list = config['ecl_variable_list']
-
-        roe_variable_list = config['roe_variable_list']
-
-    if classifier_args is None:
-        classifier_args = {}
-    else:
-        assert isinstance(classifier_args, dict)
-
     tree_name = 'tflat_variables'
     rank_variable = 'p'
+
+    config = yaml.full_load(basf2.find_file(f'{uniqueIdentifier}.yaml'))
 
     # create default ROE-mask
     TFLAT_mask = config['TFLAT_Mask']
@@ -104,6 +92,9 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
     dead_end_path = basf2.create_path()
 
     if mode == 'Sampler':
+        trk_variable_list = config['trk_variable_list']
+        ecl_variable_list = config['ecl_variable_list']
+        roe_variable_list = config['roe_variable_list']
         # create tagging specific variables
         features = get_variables('pi+:tflat', rank_variable, trk_variable_list, particleNumber=config['parameters']['num_trk'])
         features += get_variables('gamma:tflat', rank_variable, ecl_variable_list, particleNumber=config['parameters']['num_ecl'])
@@ -120,7 +111,7 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
             roe_path,
             dead_end_path)
 
-        fill_particle_lists(maskName, roe_path)
+        fill_particle_lists(config, maskName, roe_path)
 
         ma.rankByHighest('pi+:tflat', rank_variable, path=roe_path)
         ma.rankByHighest('gamma:tflat', rank_variable, path=roe_path)

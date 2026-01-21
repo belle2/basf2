@@ -20,7 +20,7 @@ stdV0s and stdHyperons
 ++++++++++++++++++++++
 * Added argument ``addSuffix`` to add a suffix of the form ``_<fitter>`` to the output ParticleList name, depending on the chosen fitter.
 Changes in the analysis package in light-2601-hyperion
-----------------------------------------------------
+------------------------------------------------------
 
 FlavorTagger
 ++++++++++++

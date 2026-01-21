@@ -10,13 +10,14 @@
 
 import os
 import glob
+import yaml
 import uproot
 import numpy as np
 import pyarrow.parquet as pq
 import pyarrow as pa
 import pandas as pd
 import argparse
-from tflat.config import config
+import basf2
 
 
 def merge_root_to_parquet(root_dir, parquet_dir, mask_value, tree_name="tflat_variables"):
@@ -126,10 +127,21 @@ if __name__ == "__main__":
         type=str,
         help='Path to directory where parquet files are saved to'
     )
+    parser.add_argument(  # input parser
+        '--uniqueIdentifier',
+        metavar='uniqueIdentifier',
+        dest='uniqueIdentifier',
+        type=str,
+        default="TFlaT_MC16rd_light_2601_hyperion",
+        help='Name of the config .yaml to be used and the produced weightfile'
+    )
     args = parser.parse_args()
     root_dir = args.root_dir
     parquet_dir = args.parquet_dir
+    uniqueIdentifier = args.uniqueIdentifier
     os.makedirs(parquet_dir, exist_ok=True)
+
+    config = yaml.full_load(basf2.find_file(f'{uniqueIdentifier}.yaml'))
     val_split = config['train_valid_fraction']
     chunk_size = config['chunk_size']
     mask_value = config['parameters']['mask_value']

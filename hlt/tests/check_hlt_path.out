@@ -1,4 +1,4 @@
-[INFO] Steering file: check_hlt_path.py
+[INFO] Steering file: hlt/tests/check_hlt_path.py
 [INFO] basf2 path for beam_reco_monitor:
 
 [1mRooFit v3.60 -- Developed by Wouter Verkerke and David Kirkby[0m 

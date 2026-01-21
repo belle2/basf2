@@ -31,25 +31,25 @@ If the GPU utilization is less than ~70% it might be possible to speed up the tr
     ```bash
     gbasf2 sampler.py -p {name} -i {collection_name} -s {basf2_release} --basf2opt='' -n 3
     ```
-   - Download the resulting parquets
+   - Download the resulting ntuples
 
 3. **Prepare training data**
    - The training samples need to be split into a training and validation dataset.
    The datasets also need to be shuffled and split into chunks to allow them to be loaded into memory piece by piece.
-   - All of this is done by running the `merge_sample_parquets.py` script:
+   - All of this is done by running the `merge_samples_to_parquet.py` script:
     ```bash
-    python3 merge_sample_parquets.py --parquet_in /path/to/input_parquets/ --parquet_out /path/to/output_parquets/
+    python3 merge_samples_to_parquet.py ----root_dir /path/to/input_root/ --parquet_dir /path/to/output_parquet/
     ```
-    - `/path/to/input_parquets/` is the path to the directory containing the paruqet outputs produced by the sampler scipt.
-    - The resulting training and validation files are saved to the `/path/to/output_parquets/` directory
+    - `/path/to/input_root/` is the path to the directory containing the root outputs produced by the sampler script.
+    - The resulting training and validation files are saved to the `/path/to/output_parquet/` directory
 
 4. **Training**
     - To launch the training use the `trainer.py` script:
     ```bash
-   python3 trainer.py --train_input /path/to/output_parquets/tflat_training_samples.parquet --val_input /path/to/output_parquets/tflat_validation_samples.parquet
+   python3 trainer.py --train_input /path/to/output_parquet/tflat_training_samples.parquet --val_input /path/to/output_parquet/tflat_validation_samples.parquet
     ```
     - Should the training crash at any point it can be restarted from the latest checkpoint like this:
     ```bash
-   python3 trainer.py --train_input /path/to/output_parquets/tflat_training_samples.parquet --val_input /path/to/output_parquets/tflat_validation_samples.parquet --warmstart
+   python3 trainer.py --train_input /path/to/output_parquet/tflat_training_samples.parquet --val_input /path/to/output_parquet/tflat_validation_samples.parquet --warmstart
     ```
    - Once the training is done a `localdb` that contains the packaged onnx weightfile is produced.

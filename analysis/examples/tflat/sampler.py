@@ -9,7 +9,7 @@
 ##########################################################################
 import basf2 as b2
 import modularAnalysis as ma
-from tflat.FlavorTagger import flavorTagger
+from tflat.flavorTagger import flavorTagger
 
 
 def reconstructB2nunubar(path):

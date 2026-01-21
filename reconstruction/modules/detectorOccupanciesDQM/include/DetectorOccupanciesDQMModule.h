@@ -75,8 +75,7 @@ namespace Belle2 {
     StoreArray<KLMDigit> m_KLMDigits; /**< KLM digits*/
     const EKLMElementNumbers* m_eklmElementNumbers; /**< EKLM Element numbers. */
     KLMTime* m_klmTime; /**< KLM Time conversion. */
-    // KLM Background Trigger bit(s) of Interest
-    const TRGSummary::ETimingType m_klmBackTriggers[1] = {TRGSummary::ETimingType::TTYP_DPHY};  /**< Background Triggers bits of Interest */
+    const TRGSummary::ETimingType m_klmBackTriggers[1] = {TRGSummary::ETimingType::TTYP_DPHY};  /**< Background Trigger bit(s) of interest */
     // parameters for KLM histograms
     double m_BKLMTimeMin; /**< Min time for BKLM time */
     double m_BKLMTimeMax; /**< Max time for BKLM time */

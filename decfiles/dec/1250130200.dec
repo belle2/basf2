@@ -14,13 +14,9 @@ Decay Upsilon(4S)
 0.50000 B+ B-sig  VSS;
 Enddecay
 
-Decay B-sig
-1.0   K_L0  K_L0  mu-    anti-nu_mu      PHSP;
-Enddecay
-
 Decay B+sig
 1.0   K_L0  K_L0   mu+    nu_mu          PHSP;
 Enddecay
-
+CDecay B-sig
 
 End

@@ -1,4 +1,4 @@
-[INFO] Steering file: hlt/tests/check_hlt_path.py
+[INFO] Steering file: check_hlt_path.py
 [INFO] basf2 path for beam_reco_monitor:
 [INFO] Modules and parameter settings in the path:
   1. Sum_Wait
@@ -1084,6 +1084,12 @@
   111. TrackingAbortDQM_before_filter
       histogramDirectoryName=TrackingAbort_before_filter
   112. DetectorOccupanciesDQM_before_filter
+      BKLMRPCOffset=-4300.5
+      BKLMScintOffset=-4705.0
+      BKLMTimeMax=5500.0
+      BKLMTimeMin=-6500.5
+      EKLMTimeMax=-4300.0
+      EKLMTimeMin=-5300.5
       eclEnergyThr=5.0
       histogramDirectoryName=DetectorOccupancies_before_filter
   113. StatisticsTimingHLTDQM
@@ -2323,6 +2329,12 @@
   256. TrackingAbortDQM
       histogramDirectoryName=TrackingAbort
   257. DetectorOccupanciesDQM
+      BKLMRPCOffset=-4300.5
+      BKLMScintOffset=-4705.0
+      BKLMTimeMax=5500.0
+      BKLMTimeMin=-6500.5
+      EKLMTimeMax=-4300.0
+      EKLMTimeMin=-5300.5
       eclEnergyThr=5.0
       histogramDirectoryName=DetectorOccupancies
   258. SoftwareTriggerHLTDQM_skim_nobhabha
@@ -3986,6 +3998,12 @@
   111. TrackingAbortDQM_before_filter
       histogramDirectoryName=TrackingAbort_before_filter
   112. DetectorOccupanciesDQM_before_filter
+      BKLMRPCOffset=-4300.5
+      BKLMScintOffset=-4705.0
+      BKLMTimeMax=5500.0
+      BKLMTimeMin=-6500.5
+      EKLMTimeMax=-4300.0
+      EKLMTimeMin=-5300.5
       eclEnergyThr=5.0
       histogramDirectoryName=DetectorOccupancies_before_filter
   113. StatisticsTimingHLTDQM
@@ -5242,6 +5260,12 @@
         118. TrackingAbortDQM
             histogramDirectoryName=TrackingAbort
         119. DetectorOccupanciesDQM
+            BKLMRPCOffset=-4300.5
+            BKLMScintOffset=-4705.0
+            BKLMTimeMax=5500.0
+            BKLMTimeMin=-6500.5
+            EKLMTimeMax=-4300.0
+            EKLMTimeMin=-5300.5
             eclEnergyThr=5.0
             histogramDirectoryName=DetectorOccupancies
         120. SoftwareTriggerHLTDQM_skim_nobhabha

@@ -5,8 +5,8 @@ TFLAT_Mask: !!python/tuple # ROE Mask
   and clusterReg==2] or                     [E>0.06 and clusterReg==3]] and abs(clusterTiming)
   < 200
 
-trk_cut: isInRestOfEvent > 0.5 and passesROEMask({maskName}) > 0.5 and p >= 0
-gamma_cut: isInRestOfEvent > 0.5 and passesROEMask({maskName}) > 0.5 and beamBackgroundSuppression > 0.4 and fakePhotonSuppression > 0.3
+trk_cut: isInRestOfEvent > 0.5 and passesROEMask(TFLATDefaultMask) > 0.5 and p >= 0
+gamma_cut: isInRestOfEvent > 0.5 and passesROEMask(TFLATDefaultMask) > 0.5 and beamBackgroundSuppression > 0.4 and fakePhotonSuppression > 0.3
 
 trk_variable_list: # Input lists
 - charge
@@ -47,18 +47,15 @@ roe_variable_list:
 - countInList(gamma:tflat)/8
 - countInList(pi+:tflat)/6
 - NumberOfKShortsInRoe
-- ptTracksRoe({maskName})
+- ptTracksRoe(TFLATDefaultMask)
 
 parameters: # Architecture parameters
   seed: null
   clip_value: 4
   mask_value: 0
   num_trk: 10
-  num_trk_features: 27
   num_ecl: 20
-  num_ecl_features: 6
   num_roe: 1
-  num_roe_features: 4
   num_transformer_blocks: 6
   num_heads: 4
   embedding_dims: 128

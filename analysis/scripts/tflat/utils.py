@@ -35,12 +35,6 @@ def load_config(uniqueIdentifier):
     with open(find_file(f'{uniqueIdentifier}.yaml')) as f:
         config = full_load(f)
 
-    # Resolve placeholder names
-    maskName = config["TFLAT_Mask"][0]
-    config["roe_variable_list"] = [v.format(maskName=maskName) for v in config["roe_variable_list"]]
-    config["trk_cut"] = config["trk_cut"].format(maskName=maskName)
-    config["gamma_cut"] = config["gamma_cut"].format(maskName=maskName)
-
     # Calculate input list lengths
     config["parameters"]["num_trk_features"] = len(config["trk_variable_list"])
     config["parameters"]["num_ecl_features"] = len(config["ecl_variable_list"])

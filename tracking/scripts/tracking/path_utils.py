@@ -84,6 +84,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
+    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param v0_finding: if false, the V0Finder module is not executed
     :param add_mva_quality_indicator: If true, add the MVA track quality estimation
@@ -127,8 +128,8 @@ def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHyp
 
     if add_mva_quality_indicator:
         path.add_module("TrackQualityEstimatorMVA", collectEventFeatures=True)
-    # create Belle2 Tracks from the genfit Tracks
     # The following particle hypothesis will be fitted: Pion, Kaon and Proton
+    # create Belle2 tracks from the RecoTrack objects (which have genfit tracks)
     # Muon fit is working but gives very similar as the Pion due to the closeness of masses
     # -> therefore not in the default fit list
     # Electron fit has as systematic bias and therefore not done here. Therefore, pion fits

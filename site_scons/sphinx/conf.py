@@ -409,13 +409,33 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
 
+
+# Get package versions for pinned intersphinx mapping
+def get_package_version(package_name):
+    """Get version of an installed package."""
+    try:
+        module = __import__(package_name)
+        return getattr(module, "__version__", "stable")
+    except ImportError:
+        return "stable"
+
+
 # allow to have links to python documentation
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3.11/", None),
-    "numpy": ("https://numpy.org/doc/stable/", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/version/2.2/", None),
-    "matplotlib": ("https://matplotlib.org/stable/", None),
+    "numpy": (f"https://numpy.org/doc/{get_package_version('numpy')}/", None),
+    "scipy": (
+        f"https://docs.scipy.org/doc/scipy-{get_package_version('scipy')}/",
+        None,
+    ),
+    "pandas": (
+        f"https://pandas.pydata.org/pandas-docs/version/{get_package_version('pandas')}/",
+        None,
+    ),
+    "matplotlib": (
+        f"https://matplotlib.org/{get_package_version('matplotlib')}/",
+        None,
+    ),
     "b2luigi": ("https://b2luigi.belle2.org/", None),
     "gbasf2": ("https://gbasf2.belle2.org/", None),
     "uproot": ("https://uproot.readthedocs.io/en/stable/", None),

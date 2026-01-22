@@ -9,14 +9,13 @@
 ##########################################################################
 
 import os
-import yaml
 from basf2 import B2FATAL
 import basf2
 from variables import variables as vm
 import modularAnalysis as ma
 from stdPhotons import stdPhotons
 from vertex import kFit
-from tflat.utils import get_variables
+import tflat.utils as utils
 
 
 def fill_particle_lists(config, maskName='TFLATDefaultMask', path=None):
@@ -25,7 +24,7 @@ def fill_particle_lists(config, maskName='TFLATDefaultMask', path=None):
     """
 
     # create particle list with pions
-    trk_cut = f'isInRestOfEvent > 0.5 and passesROEMask({maskName}) > 0.5 and p >= 0'
+    trk_cut = config['trk_cut']
     ma.fillParticleList('pi+:tflat', trk_cut, path=path)
 
     # create particle list with gammas
@@ -41,15 +40,14 @@ def fill_particle_lists(config, maskName='TFLATDefaultMask', path=None):
 
     stdPhotons(listtype='tight',  path=path)
 
-    gamma_cut = f'isInRestOfEvent > 0.5 and passesROEMask({maskName}) > 0.5 \
-        and beamBackgroundSuppression > 0.4 and fakePhotonSuppression > 0.3'
+    gamma_cut = config['gamma_cut']
     ma.cutAndCopyList('gamma:tflat', 'gamma:tight', gamma_cut, path=path)
 
     ma.reconstructDecay('K_S0:inRoe -> pi+:tflat pi-:tflat', '0.40<=M<=0.60', False, path=path)
     kFit('K_S0:inRoe', 0.01, path=path)
 
 
-def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier='standard_tflat',
+def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier='TFlaT_MC16rd_light_2601_hyperion',
                  target='qrCombined', overwrite=False,
                  sampler_id=0,
                  path=None):
@@ -79,7 +77,7 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
     tree_name = 'tflat_variables'
     rank_variable = 'p'
 
-    config = yaml.full_load(basf2.find_file(f'{uniqueIdentifier}.yaml'))
+    config = utils.load_config(uniqueIdentifier)
 
     # create default ROE-mask
     TFLAT_mask = config['TFLAT_Mask']
@@ -96,9 +94,12 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
         ecl_variable_list = config['ecl_variable_list']
         roe_variable_list = config['roe_variable_list']
         # create tagging specific variables
-        features = get_variables('pi+:tflat', rank_variable, trk_variable_list, particleNumber=config['parameters']['num_trk'])
-        features += get_variables('gamma:tflat', rank_variable, ecl_variable_list, particleNumber=config['parameters']['num_ecl'])
-        features += get_variables('pi+:tflat', rank_variable, roe_variable_list, particleNumber=config['parameters']['num_roe'])
+        features = utils.get_variables('pi+:tflat', rank_variable, trk_variable_list,
+                                       particleNumber=config['parameters']['num_trk'])
+        features += utils.get_variables('gamma:tflat', rank_variable, ecl_variable_list,
+                                        particleNumber=config['parameters']['num_ecl'])
+        features += utils.get_variables('pi+:tflat', rank_variable, roe_variable_list,
+                                        particleNumber=config['parameters']['num_roe'])
 
         output_file_name = os.path.join(working_dir, uniqueIdentifier + f'_training_data{sampler_id}.root')
         if os.path.isfile(output_file_name) and not overwrite:

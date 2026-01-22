@@ -10,21 +10,20 @@
 
 import os
 import glob
-import yaml
 import uproot
 import numpy as np
 import pyarrow.parquet as pq
 import pyarrow as pa
 import pandas as pd
 import argparse
-import basf2
+import tflat.utils as utils
 
 
-def merge_root_to_parquet(root_dir, parquet_dir, mask_value, tree_name="tflat_variables"):
+def merge_root_to_parquet(root_dir, parquet_dir, mask_value, uniqueIdentifier, tree_name="tflat_variables"):
     '''
     Merges tflat sampled root files into one parquet file
     '''
-    files = sorted(glob.glob(os.path.join(root_dir, "standard_tflat_training_data*.root")))
+    files = sorted(glob.glob(os.path.join(root_dir, f"{uniqueIdentifier}_training_data*.root")))
     writer = None
     print("Merging root files into parquet")
     for i in range(len(files)):
@@ -50,7 +49,9 @@ def merge_root_to_parquet(root_dir, parquet_dir, mask_value, tree_name="tflat_va
 
         table = pa.Table.from_pandas(df)
         if writer is None:
-            writer = pq.ParquetWriter(parquet_dir+'tflat_samples_merged.parquet', table.schema, compression='snappy')
+            writer = pq.ParquetWriter(
+                os.path.join(parquet_dir, f'{uniqueIdentifier}_samples_merged.parquet'),
+                table.schema, compression='snappy')
         writer.write_table(table)
 
     writer.close()
@@ -62,7 +63,7 @@ def create_dataset(pf, parquet_path, index, chunk_size, n_rowgroups, rowgroup_ed
     Created paruet file is segmented into rowgroups with maximum size given by chunk_size.
     '''
     writer = None
-    n_chunks = len(index)//chunk_size + 1
+    n_chunks = (len(index)-1)//chunk_size + 1
     for chunk in range(n_chunks):
         print(f"\r{chunk+1}/{n_chunks}", end="", flush=True)
         chunk_df = pd.DataFrame()
@@ -89,12 +90,12 @@ def create_dataset(pf, parquet_path, index, chunk_size, n_rowgroups, rowgroup_ed
     writer.close()
 
 
-def shuffle_and_chunk_parquet(parquet_dir, val_split, chunk_size):
+def shuffle_and_chunk_parquet(parquet_dir, val_split, chunk_size, uniqueIdentifier):
     '''
     Splits single parquet file into a training and validation parquet file.
     The data contained in the resulting files is shuffled and segmented into chunks.
     '''
-    pf = pq.ParquetFile(parquet_dir+'tflat_samples_merged.parquet')
+    pf = pq.ParquetFile(os.path.join(parquet_dir, f'{uniqueIdentifier}_samples_merged.parquet'))
     rowgroup_edges = []
     n_rows = 0
     n_rowgroups = pf.num_row_groups
@@ -107,10 +108,26 @@ def shuffle_and_chunk_parquet(parquet_dir, val_split, chunk_size):
     n_training_samples = int(n_rows*val_split)
     index_training = index[:n_training_samples]
     index_validation = index[n_training_samples:]
-    print('Creating training dataset')
-    create_dataset(pf, parquet_dir+'tflat_training_samples.parquet', index_training, chunk_size, n_rowgroups, rowgroup_edges)
-    print('Creating validation dataset')
-    create_dataset(pf, parquet_dir+'tflat_validation_samples.parquet', index_validation, chunk_size, n_rowgroups, rowgroup_edges)
+    print('\nCreating training dataset')
+    create_dataset(
+        pf,
+        os.path.join(
+            parquet_dir +
+            f'{uniqueIdentifier}_training_samples.parquet'),
+        index_training,
+        chunk_size,
+        n_rowgroups,
+        rowgroup_edges)
+    print('\nCreating validation dataset')
+    create_dataset(
+        pf,
+        os.path.join(
+            parquet_dir +
+            f'{uniqueIdentifier}_validation_samples.parquet'),
+        index_validation,
+        chunk_size,
+        n_rowgroups,
+        rowgroup_edges)
 
 
 if __name__ == "__main__":
@@ -133,7 +150,7 @@ if __name__ == "__main__":
         dest='uniqueIdentifier',
         type=str,
         default="TFlaT_MC16rd_light_2601_hyperion",
-        help='Name of the config .yaml to be used and the produced weightfile'
+        help='Name of both the config .yaml to be used and the produced weightfile'
     )
     args = parser.parse_args()
     root_dir = args.root_dir
@@ -141,7 +158,7 @@ if __name__ == "__main__":
     uniqueIdentifier = args.uniqueIdentifier
     os.makedirs(parquet_dir, exist_ok=True)
 
-    config = yaml.full_load(basf2.find_file(f'{uniqueIdentifier}.yaml'))
+    config = utils.load_config(uniqueIdentifier)
     val_split = config['train_valid_fraction']
     chunk_size = config['chunk_size']
     mask_value = config['parameters']['mask_value']
@@ -150,5 +167,12 @@ if __name__ == "__main__":
         root_dir=root_dir,
         parquet_dir=parquet_dir,
         mask_value=mask_value,
+        uniqueIdentifier=uniqueIdentifier
     )
-    shuffle_and_chunk_parquet(parquet_dir, val_split, chunk_size)
+    shuffle_and_chunk_parquet(
+        parquet_dir=parquet_dir,
+        val_split=val_split,
+        chunk_size=chunk_size,
+        uniqueIdentifier=uniqueIdentifier
+        )
+    print('\nDone!')

@@ -7,6 +7,7 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+import argparse
 import basf2 as b2
 import modularAnalysis as ma
 from tflat.flavorTagger import flavorTagger
@@ -35,6 +36,18 @@ if __name__ == '__main__':
     '''
     Samples a chunk of training data for TFlat
     '''
+    parser = argparse.ArgumentParser(description='Sample TFlat')
+    parser.add_argument(  # input parser
+        '--uniqueIdentifier',
+        metavar='uniqueIdentifier',
+        dest='uniqueIdentifier',
+        type=str,
+        default="TFlaT_MC16rd_light_2601_hyperion",
+        help='Name of both the config .yaml to be used and the produced weightfile'
+    )
+    args = parser.parse_args()
+    uniqueIdentifier = args.uniqueIdentifier
+
     b2.set_log_level(b2.LogLevel.ERROR)
     b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
     path = b2.Path()
@@ -47,7 +60,7 @@ if __name__ == '__main__':
         'B0:sig',
         mode='Sampler',
         working_dir='',
-        uniqueIdentifier='standard_tflat',
+        uniqueIdentifier=uniqueIdentifier,
         path=path)
     ma.summaryOfLists(particleLists=['B0:sig'], path=path)
     b2.process(path)

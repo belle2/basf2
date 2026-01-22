@@ -9,9 +9,7 @@
 ##########################################################################
 
 import os
-import yaml
 import ROOT
-import basf2
 import argparse
 
 os.environ["KERAS_BACKEND"] = "torch"
@@ -22,8 +20,8 @@ if __name__ == "__main__":
     import torch
     import keras
     from fitter import fit
+    import tflat.utils as utils
     from tflat.model import get_tflat_model
-    from tflat.utils import get_variables
     from basf2_mva_util import create_onnx_mva_weightfile
 
     # parse cli arguments
@@ -74,15 +72,15 @@ if __name__ == "__main__":
     warmstart = args.warmstart
     uniqueIdentifier = args.uniqueIdentifier
 
-    config = yaml.full_load(basf2.find_file(f'{uniqueIdentifier}.yaml'))
+    config = utils.load_config(uniqueIdentifier)
     parameters = config['parameters']
     rank_variable = 'p'
     trk_variable_list = config['trk_variable_list']
     ecl_variable_list = config['ecl_variable_list']
     roe_variable_list = config['roe_variable_list']
-    variables = get_variables('pi+:tflat', rank_variable, trk_variable_list, particleNumber=parameters['num_trk'])
-    variables += get_variables('gamma:tflat', rank_variable, ecl_variable_list, particleNumber=parameters['num_ecl'])
-    variables += get_variables('pi+:tflat', rank_variable, roe_variable_list, particleNumber=parameters['num_roe'])
+    variables = utils.get_variables('pi+:tflat', rank_variable, trk_variable_list, particleNumber=parameters['num_trk'])
+    variables += utils.get_variables('gamma:tflat', rank_variable, ecl_variable_list, particleNumber=parameters['num_ecl'])
+    variables += utils.get_variables('pi+:tflat', rank_variable, roe_variable_list, particleNumber=parameters['num_roe'])
 
     if not warmstart:
         if os.path.isfile(checkpoint_filepath):

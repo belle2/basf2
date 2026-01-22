@@ -33,8 +33,6 @@ class batch_generator(keras.utils.PyDataset):
         self.batch_size = batch_size
         #: Parquet metadata
         self.pf = pq.ParquetFile(parquet_path)
-        #: Number of batches in a chunk
-        self.max_batches = chunk_size//batch_size
         #: Number of chunks in the data file
         self.n_chunks = self.pf.num_row_groups
         #: Index of chunk currently in use
@@ -57,6 +55,8 @@ class batch_generator(keras.utils.PyDataset):
         self._wait_for_chunk()  # ensure first chunk is ready
         #: Chunk currently in use
         self.chunk_in_use = self.chunk_in_waiting
+        #: Number of batches in a chunk
+        self.max_batches = self.max_batches_next
 
         # Prepare next chunk
         self._start_async_load()

@@ -8,6 +8,10 @@
 # Email: riccardo.manfredi@ts.infn.it
 # Cuts: None
 # Date: 28/02/2022
+Alias rho+sig rho+
+Alias rho-sig rho-
+Alias pi0sig pi0
+ChargeConj rho+sig rho-sig
 
 Decay Upsilon(4S)
 0.50000 B- B+sig  VSS;
@@ -15,8 +19,17 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B+sig
-1.0  rho+ pi+ pi-                PHOTOS PHSP;
+1.0  rho+sig pi+ pi-                PHOTOS PHSP;
 Enddecay
 CDecay B-sig
+
+Decay rho+sig
+1.0  pi+  pi0sig VSS;
+Enddecay
+CDecay rho-sig
+###
+Decay pi0sig
+1.0 gamma gamma PHSP;
+Enddecay
 
 End

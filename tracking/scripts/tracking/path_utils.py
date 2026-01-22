@@ -96,6 +96,10 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
                                               reco_tracks=reco_tracks,
                                               add_mva_quality_indicator=add_mva_quality_indicator)
 
+    add_postfilter_track_fit_and_track_creator(path, components=components,
+                                               trackFitHypotheses=trackFitHypotheses,
+                                               reco_tracks=reco_tracks)
+
     # V0 finding
     if v0_finding:
         path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
@@ -105,6 +109,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
 
 
 def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHypotheses=None,
+                                              stopOnSuccessfulTrackFit=True,
                                               reco_tracks="RecoTracks", add_mva_quality_indicator=True):
     """
     Helper function to add only the modules required to calculate HLT filter decision:
@@ -113,6 +118,9 @@ def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHyp
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param stopOnSuccessfulTrackFit: If true (default), the TrackCreator will stop when a fit is successful
+        among the listed "trackFitHypotheses"
     :param add_mva_quality_indicator: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found tracks.
     """
@@ -128,15 +136,39 @@ def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHyp
 
     if add_mva_quality_indicator:
         path.add_module("TrackQualityEstimatorMVA", collectEventFeatures=True)
-    # The following particle hypothesis will be fitted: Pion, Kaon and Proton
     # create Belle2 tracks from the RecoTrack objects (which have genfit tracks)
+    # By default, only stops creating Belle2 tracks when a successful fit is found among given hypothesis,
+    # rest will be fitted in the postfilter
+    path.add_module('TrackCreator', recoTrackColName=reco_tracks,
+                    pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses,
+                    stopOnSuccessfulTrackFit=stopOnSuccessfulTrackFit
+                    ).set_name("TrackCreator_prefilter")
+
+
+def add_postfilter_track_fit_and_track_creator(path,
+                                               trackFitHypotheses=None,
+                                               reco_tracks="RecoTracks"):
+    """
+    Helper function to add the modules not required to calculate HLT filter decision,
+    and ran after the HLT decision calculation.
+    It performs track fit and creates Belle II tracks with additional mass hypothesis.
+
+    :param path: The path to add the tracking reconstruction modules to
+    :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    """
+
+    # By default, some hypotheses are already fitted until a successful fit is found in the prefilter
+    # Rest of the hypotheses will be fitted here.
     # Muon fit is working but gives very similar as the Pion due to the closeness of masses
     # -> therefore not in the default fit list
     # Electron fit has as systematic bias and therefore not done here. Therefore, pion fits
     # will be used for electrons which gives a better result as GenFit's current electron
     # implementation.
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
-                    pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses)
+                    pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses,
+                    stopOnSuccessfulTrackFit=False
+                    ).set_name("TrackCreator_postfilter")
 
 
 def add_cr_track_fit_and_track_creator(path, components=None,

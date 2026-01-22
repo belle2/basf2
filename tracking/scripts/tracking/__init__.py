@@ -28,6 +28,7 @@ from tracking.path_utils import (  # noqa
     add_pxd_track_finding,
     add_svd_track_finding,
     add_prefilter_track_fit_and_track_creator,
+    add_postfilter_track_fit_and_track_creator,
     add_svd_standalone_tracking,
 )
 
@@ -166,6 +167,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
                                            pruneTracks=pruneTracks,
+                                           fit_tracks=fit_tracks,
+                                           trackFitHypotheses=trackFitHypotheses,
                                            reco_tracks=reco_tracks,
                                            use_second_cdc_hits=use_second_cdc_hits,
                                            prune_temporary_tracks=prune_temporary_tracks,
@@ -176,6 +179,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
 def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdding=False,
                                           mcTrackFinding=False, trackFitHypotheses=None, reco_tracks="RecoTracks",
+                                          stopOnSuccessfulTrackFit=True,
                                           prune_temporary_tracks=True, fit_tracks=True,
                                           with_cdc_cellular_automaton=False,
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
@@ -190,7 +194,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           use_cat_finder=False):
     """
     This function adds the tracking reconstruction modules required to calculate HLT filter decision
-    to a path.
+    to a path. By default, track fitting stops when a successful fit is found among trackFitHypotheses.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
@@ -209,6 +213,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         after the global algorithm (Legendre).
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param stopOnSuccessfulTrackFit: If true (default), the TrackCreator will stop when a fit is successful
+        among the listed "trackFitHypotheses"
     :param svd_standalone_mode: Which SVD standalone tracking is used.
            Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
            Defaults to "VXDTF2"
@@ -301,12 +307,14 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         add_prefilter_track_fit_and_track_creator(path, components=components,
                                                   trackFitHypotheses=trackFitHypotheses,
                                                   reco_tracks=reco_tracks,
+                                                  stopOnSuccessfulTrackFit=stopOnSuccessfulTrackFit,
                                                   add_mva_quality_indicator=add_recoTrack_QI)
     # estimate the track time
     path.add_module('TrackTimeEstimator')
 
 
 def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, reco_tracks="RecoTracks",
+                                           fit_tracks=True, trackFitHypotheses=None,
                                            use_second_cdc_hits=False, prune_temporary_tracks=True, v0_finding=True,
                                            flip_recoTrack=True, mcTrackFinding=False, kink_finding=True):
     """
@@ -318,6 +326,8 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param pruneTracks: Delete all hits except the first and the last in the found tracks.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param fit_tracks: If false, the track find and the TrackCreator module will not be executed
+    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
     :param v0_finding: If false, the V0 module will not be executed
@@ -336,6 +346,11 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     v0finder_temporary_RecoTracks = "CopiedRecoTracks"
     kinkfinder_temporary_RecoTracks = "RecoTracksKinkTmp"
     temporary_reco_track_list = []
+
+    if fit_tracks:
+        add_postfilter_track_fit_and_track_creator(path,
+                                                   trackFitHypotheses=trackFitHypotheses,
+                                                   reco_tracks=reco_tracks)
 
     # flip & refit to fix the charge of some tracks
     if flip_recoTrack and not mcTrackFinding and is_detector_present("PXD", components):

@@ -22,7 +22,7 @@ path.add_module('EvtGenInput')
 add_simulation(path, bkgOverlay=False, forceSetPXDDataReduction=True, usePXDDataReduction=False, cleanupPXDDataReduction=False)
 
 # add tracking and track fitting, without MC matching
-add_prefilter_tracking_reconstruction(path)
+add_prefilter_tracking_reconstruction(path, stopOnSuccessfulTrackFit=False)
 
 # Add the Chi2-matcher to path
 # We need CutOffs values, which are from a preliminary optimisation

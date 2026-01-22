@@ -110,7 +110,7 @@ if __name__ == "__main__":
     #####################################################
     # Step 2: run the tracking reconstruction
 
-    add_prefilter_tracking_reconstruction(main)
+    add_prefilter_tracking_reconstruction(main, stopOnSuccessfulTrackFit=False)
 
     main.add_module('TrackTimeEstimator')
     add_mc_matcher(main, reco_tracks="RecoTracks")

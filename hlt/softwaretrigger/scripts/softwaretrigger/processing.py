@@ -275,7 +275,8 @@ def add_hlt_processing(path,
         accept_path,
         run_type=run_type,
         components=reco_components,
-        switch_off_slow_modules_for_online=switch_off_slow_modules_for_online
+        switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
+        **kwargs
     )
 
     # Only create the ROIs for accepted events

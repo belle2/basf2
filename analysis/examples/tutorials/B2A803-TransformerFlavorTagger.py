@@ -141,7 +141,7 @@ bvars = bvars + \
                                    decay_string='B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]')
 
 # Saving variables to ntuple
-output_file = 'B2A802-FlavorTagger.root'
+output_file = 'B2A803-FlavorTagger.root'
 ma.variablesToNtuple(decayString='B0:sig',
                      variables=bvars,
                      filename=output_file,

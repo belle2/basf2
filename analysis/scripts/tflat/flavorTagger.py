@@ -143,7 +143,7 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
 
         path.add_module('FlavorTaggerInfoBuilder')
 
-        fill_particle_lists(maskName, roe_path)
+        fill_particle_lists(config, maskName, roe_path)
 
         ma.rankByHighest('pi+:tflat', rank_variable, path=roe_path)
         ma.rankByHighest('gamma:tflat', rank_variable, path=roe_path)

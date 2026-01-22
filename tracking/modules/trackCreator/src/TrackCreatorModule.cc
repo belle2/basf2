@@ -52,6 +52,9 @@ TrackCreatorModule::TrackCreatorModule() :
            m_useBFieldAtHit);
   addParam("useSeedForTrackFitMomentumRange", m_useSeedForTrackFitMomentumRange, "Flag to use the momentum seed of the RecoTrack "
            "for the TrackFitMomentumRange selection. By default the fitted value is used",  m_useSeedForTrackFitMomentumRange);
+  addParam("stopOnSuccessfulTrackFit", m_stopOnSuccessfulTrackFit, "Flag to stop creating new tracks when a particle hypothesis "
+           "leads to a successful track fit. Switched off by default (fit all given pdg codes) but turned on before HLT filter for optimzation",
+           m_stopOnSuccessfulTrackFit);
 
 }
 
@@ -59,14 +62,31 @@ void TrackCreatorModule::initialize()
 {
   m_RecoTracks.isRequired(m_recoTrackColName);
 
-  StoreArray<Track> tracks(m_trackColName);
-  const bool tracksRegistered = tracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
-  StoreArray<TrackFitResult> trackFitResults(m_trackFitResultColName);
-  const bool trackFitResultsRegistered = trackFitResults.registerInDataStore();
+  static bool firstCall = true;
+  if (firstCall) {
+    StoreArray<Track> tracks(m_trackColName);
+    const bool tracksRegistered = tracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+    StoreArray<TrackFitResult> trackFitResults(m_trackFitResultColName);
+    const bool trackFitResultsRegistered = trackFitResults.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 
-  B2ASSERT("Could not register output store arrays.", (tracksRegistered and trackFitResultsRegistered));
+    B2ASSERT("Could not register output store arrays for tracks.", tracksRegistered);
+    B2ASSERT("Could not register output store arrays for track fit results.", trackFitResultsRegistered);
 
-  tracks.registerRelationTo(m_RecoTracks);
+    tracks.registerRelationTo(m_RecoTracks);
+    firstCall = false;
+  } else {
+    StoreArray<Track> tracks;
+    const bool tracksRegistered = tracks.isRequired(m_trackColName);
+    StoreArray<TrackFitResult> trackFitResults;
+    const bool trackFitResultsRegistered = trackFitResults.isRequired(m_trackFitResultColName);
+
+    B2ASSERT("Could not find output store arrays for tracks.", tracksRegistered);
+    B2ASSERT("Could not find output store arrays for track fit results.", trackFitResultsRegistered);
+
+    const bool hasRelation = tracks.hasRelationTo(m_RecoTracks);
+    B2ASSERT("RecoTracks are not related to the tracks.", hasRelation);
+  }
+
 
 
   B2ASSERT("BeamSpot should have exactly 3 parameters", m_beamSpot.size() == 3);
@@ -113,6 +133,11 @@ void TrackCreatorModule::event()
 
       if (initialTotalMomentum <= m_trackFitMomentumRange->getMomentumRange(pdg)) {
         trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
+      }
+      if (m_stopOnSuccessfulTrackFit) {
+        if (recoTrack.wasFitSuccessful()) {
+          break;
+        }
       }
     }
     trackBuilder.storeTrackFromRecoTrack(recoTrack, m_useClosestHitToIP);

@@ -32,7 +32,7 @@ def load_config(uniqueIdentifier):
     All dynamic alterations of the config are handeled in this function.
     The final config is returned as a dict.
     """
-    with open(find_file(f'{uniqueIdentifier}.yaml')) as f:
+    with open(find_file(f'analysis/data/{uniqueIdentifier}.yaml')) as f:
         config = full_load(f)
 
     # Calculate input list lengths

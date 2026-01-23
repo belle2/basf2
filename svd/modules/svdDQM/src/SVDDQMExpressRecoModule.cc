@@ -411,6 +411,96 @@ void SVDDQMExpressRecoModule::defineHisto()
     m_histoList->Add(m_cluster6SampleTimeV456);
   }
 
+
+  //----------------------------------------------------------------
+  // Charge of clusters for L3/L456 sensors group id = 0, 1, 2, 3
+  //----------------------------------------------------------------
+  name = str(format("SVDDQM_ClusterChargeGroupIDsL3U"));
+  title = str(format("SVD U-Cluster Charge for layer 3 sensors for group Id = 0, 1, 2 & 3"));
+  m_clusterChargeGroupIDsL3U = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeGroupIDsL3U->GetXaxis()->SetTitle("cluster charge [ke-]");
+  m_clusterChargeGroupIDsL3U->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterChargeGroupIDsL3U);
+  name = str(format("SVDDQM_ClusterChargeGroupIDsL3V"));
+  title = str(format("SVD V-Cluster Charge for layer 3 sensors for group Id = 0, 1, 2 & 3"));
+  m_clusterChargeGroupIDsL3V = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeGroupIDsL3V->GetXaxis()->SetTitle("cluster charge [ke-]");
+  m_clusterChargeGroupIDsL3V->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterChargeGroupIDsL3V);
+
+  name = str(format("SVDDQM_ClusterChargeGroupIDsL456U"));
+  title = str(format("SVD U-Cluster Charge for layers 4,5,6 sensors for group Id = 0, 1, 2 & 3"));
+  m_clusterChargeGroupIDsL456U = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeGroupIDsL456U->GetXaxis()->SetTitle("cluster charge [ke-]");
+  m_clusterChargeGroupIDsL456U->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterChargeGroupIDsL456U);
+
+  name = str(format("SVDDQM_ClusterChargeGroupIDsL456V"));
+  title = str(format("SVD V-Cluster Charge for layers 4,5,6 sensors for group Id = 0, 1, 2 & 3"));
+  m_clusterChargeGroupIDsL456V = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeGroupIDsL456V->GetXaxis()->SetTitle("cluster charge [ke-]");
+  m_clusterChargeGroupIDsL456V->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterChargeGroupIDsL456V);
+
+  //----------------------------------------------------------------
+  // SNR of clusters for L3/L456 sensors group id = 0, 1, 2, 3
+  //----------------------------------------------------------------
+  name = str(format("SVDDQM_ClusterSNRGroupIDsL3U"));
+  title = str(format("SVD U-Cluster SNR for layer 3 sensors for group Id = 0, 1, 2 & 3"));
+  m_clusterSNRGroupIDsL3U = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+  m_clusterSNRGroupIDsL3U->GetXaxis()->SetTitle("cluster SNR");
+  m_clusterSNRGroupIDsL3U->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterSNRGroupIDsL3U);
+  name = str(format("SVDDQM_ClusterSNRGroupIDsL3V"));
+  title = str(format("SVD V-Cluster SNR for layer 3 sensors for group Id = 0, 1, 2 & 3"));
+  m_clusterSNRGroupIDsL3V = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+  m_clusterSNRGroupIDsL3V->GetXaxis()->SetTitle("cluster SNR");
+  m_clusterSNRGroupIDsL3V->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterSNRGroupIDsL3V);
+
+  name = str(format("SVDDQM_ClusterSNRGroupIDsL456U"));
+  title = str(format("SVD U-Cluster SNR for layers 4,5,6 sensors for group Id = 0, 1, 2 & 3"));
+  m_clusterSNRGroupIDsL456U = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+  m_clusterSNRGroupIDsL456U->GetXaxis()->SetTitle("cluster SNR");
+  m_clusterSNRGroupIDsL456U->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterSNRGroupIDsL456U);
+  name = str(format("SVDDQM_ClusterSNRGroupIDsL456V"));
+  title = str(format("SVD V-Cluster SNR for layers 4,5,6 sensors for group Id = 0, 1, 2 & 3"));
+  m_clusterSNRGroupIDsL456V = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+  m_clusterSNRGroupIDsL456V->GetXaxis()->SetTitle("cluster SNR");
+  m_clusterSNRGroupIDsL456V->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterSNRGroupIDsL456V);
+
+
+  //----------------------------------------------------------------
+  // Time of clusters for L3/L456 sensors group id = 0, 1, 2, 3
+  //----------------------------------------------------------------
+  Name = "SVDDQM_ClusterTimeGroupIDsL3U";
+  Title = Form("SVD U-Cluster Time %s for layer 3 sensors for group Id = 0, 1, 2 & 3", refFrame.Data());
+  m_clusterTimeGroupIDsL3U = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeGroupIDsL3U->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTimeGroupIDsL3U->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterTimeGroupIDsL3U);
+  name = str(format("SVDDQM_ClusterTimeGroupIDsL3V"));
+  Title = Form("SVD V-Cluster Time %s for layer 3 sensors for group Id = 0, 1, 2 & 3", refFrame.Data());
+  m_clusterTimeGroupIDsL3V = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeGroupIDsL3V->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTimeGroupIDsL3V->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterTimeGroupIDsL3V);
+
+  name = str(format("SVDDQM_ClusterTimeGroupIDsL456U"));
+  Title = Form("SVD U-Cluster Time %s for layers 4,5,6 sensors for group Id = 0, 1, 2 & 3", refFrame.Data());
+  m_clusterTimeGroupIDsL456U = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeGroupIDsL456U->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTimeGroupIDsL456U->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterTimeGroupIDsL456U);
+  name = str(format("SVDDQM_ClusterTimeGroupIDsL456V"));
+  Title = Form("SVD V-Cluster Time %s for layers 4,5,6 sensors for group Id = 0, 1, 2 & 3", refFrame.Data());
+  m_clusterTimeGroupIDsL456V = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeGroupIDsL456V->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTimeGroupIDsL456V->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterTimeGroupIDsL456V);
+
   //----------------------------------------------------------------
   // Cluster time group Id vs cluster time for U/V sensors
   //----------------------------------------------------------------
@@ -501,6 +591,7 @@ void SVDDQMExpressRecoModule::defineHisto()
   m_stripMaxBinV6->GetXaxis()->SetTitle("max bin");
   m_stripMaxBinV6->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_stripMaxBinV6);
+
 
   for (int i = 0; i < nSVDSensors; i++) {
     VxdID id = gTools->getSensorIDFromSVDIndex(i);
@@ -821,16 +912,6 @@ void SVDDQMExpressRecoModule::initialize()
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
-  if (m_useParamFromDB) {
-    if (!m_svdPlotsConfig.isValid())
-      B2FATAL("no valid configuration found for SVD reconstruction");
-    else {
-      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
-      m_3Samples = m_svdPlotsConfig->isPlotsFor3SampleMonitoring();
-      m_skipRejectedEvents = m_svdPlotsConfig->isSkipHLTRejectedEvents();
-    }
-  }
-
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() != 0) {
     //Register collections
@@ -1128,6 +1209,18 @@ void SVDDQMExpressRecoModule::event()
 
       // groupId for U side
       if (groupId == 0 || groupId == 1 || groupId == 2 || groupId == 3) {
+        if (iLayer == 3) {
+          if (m_clusterChargeGroupIDsL3U != nullptr) m_clusterChargeGroupIDsL3U->Fill(cluster.getCharge() /
+                1000.0);  // in kelectrons
+          if (m_clusterSNRGroupIDsL3U != nullptr) m_clusterSNRGroupIDsL3U->Fill(cluster.getSNR());
+          if (m_clusterTimeGroupIDsL3U != nullptr) m_clusterTimeGroupIDsL3U->Fill(time);
+        } else {
+          if (m_clusterChargeGroupIDsL456U != nullptr) m_clusterChargeGroupIDsL456U->Fill(cluster.getCharge() /
+                1000.0);  // in kelectrons
+          if (m_clusterSNRGroupIDsL456U != nullptr) m_clusterSNRGroupIDsL456U->Fill(cluster.getSNR());
+          if (m_clusterTimeGroupIDsL456U != nullptr) m_clusterTimeGroupIDsL456U->Fill(time);
+        }
+
         for (const SVDShaperDigit& digitIn : cluster.getRelationsTo<SVDShaperDigit>(m_storeSVDShaperDigitsName)) {
           if (m_stripCountSignalGroupIDsU != nullptr) m_stripCountSignalGroupIDsU[index]->Fill(digitIn.getCellID());
         }
@@ -1173,6 +1266,17 @@ void SVDDQMExpressRecoModule::event()
 
       // groupId for V side
       if (groupId == 0 || groupId == 1 || groupId == 2 || groupId == 3) {
+        if (iLayer == 3) {
+          if (m_clusterChargeGroupIDsL3V != nullptr) m_clusterChargeGroupIDsL3V->Fill(cluster.getCharge() /
+                1000.0);  // in kelectrons
+          if (m_clusterSNRGroupIDsL3V != nullptr) m_clusterSNRGroupIDsL3V->Fill(cluster.getSNR());
+          if (m_clusterTimeGroupIDsL3V != nullptr) m_clusterTimeGroupIDsL3V->Fill(time);
+        } else {
+          if (m_clusterChargeGroupIDsL456V != nullptr) m_clusterChargeGroupIDsL456V->Fill(cluster.getCharge() /
+                1000.0);  // in kelectrons
+          if (m_clusterSNRGroupIDsL456V != nullptr) m_clusterSNRGroupIDsL456V->Fill(cluster.getSNR());
+          if (m_clusterTimeGroupIDsL456V != nullptr) m_clusterTimeGroupIDsL456V->Fill(time);
+        }
         for (const SVDShaperDigit& digitIn : cluster.getRelationsTo<SVDShaperDigit>(m_storeSVDShaperDigitsName)) {
           if (m_stripCountSignalGroupIDsV != nullptr) m_stripCountSignalGroupIDsV[index]->Fill(digitIn.getCellID());
         }

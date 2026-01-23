@@ -227,7 +227,6 @@ namespace Belle2 {
     /** time group id for  V side**/
     TH2F* m_clusterTimeGroupIdV = nullptr;
 
-
     /** time group id for  U side for fine trigger**/
     TH2F* m_clusterTimeFineGroupIdU = nullptr;
     /** time group id for  V side for fine trigger**/
@@ -237,6 +236,33 @@ namespace Belle2 {
     TH2F* m_clusterTimeCoarseGroupIdU = nullptr;
     /** time group id for  V side for coarse trigger**/
     TH2F* m_clusterTimeCoarseGroupIdV = nullptr;
+
+    /** u charge group id  of clusters for layer 3 sensors */
+    TH1F* m_clusterChargeGroupIDsL3U = nullptr;
+    /** v charge group id  of clusters for layer 3  sensors */
+    TH1F* m_clusterChargeGroupIDsL3V = nullptr;
+    /** u charge group id  of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeGroupIDsL456U = nullptr;
+    /** v charge group id  of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeGroupIDsL456V = nullptr;
+
+    /** u SNR group id  of clusters for layer 3 sensors */
+    TH1F* m_clusterSNRGroupIDsL3U = nullptr;
+    /** v SNR group id  of clusters for layer 3  sensors */
+    TH1F* m_clusterSNRGroupIDsL3V = nullptr;
+    /** u SNR group id  of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterSNRGroupIDsL456U = nullptr;
+    /** v SNR group id  of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterSNRGroupIDsL456V = nullptr;
+
+    /** u Time  group id of clusters for layer 3 sensors */
+    TH1F* m_clusterTimeGroupIDsL3U = nullptr;
+    /** v Time group id  of clusters for layer 3  sensors */
+    TH1F* m_clusterTimeGroupIDsL3V = nullptr;
+    /** u Time group id  of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterTimeGroupIDsL456U = nullptr;
+    /** v Time group id  of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterTimeGroupIDsL456V = nullptr;
 
     /** u time */
     TH1F** m_clusterTimeU = nullptr;

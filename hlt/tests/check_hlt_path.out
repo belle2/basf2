@@ -2391,6 +2391,8 @@
       EKLMScintTimeMin=-5300.0
       RPCTimeMax=-199.5
       RPCTimeMin=-1223.5
+      Revo9DCArrivalTimeMax=3000.0
+      Revo9DCArrivalTimeMin=-10000.0
       histogramDirectoryName=KLM
   268. TRGGDLDQM
       bitConditionToDumpVcd=
@@ -5324,6 +5326,8 @@
             EKLMScintTimeMin=-5300.0
             RPCTimeMax=-199.5
             RPCTimeMin=-1223.5
+            Revo9DCArrivalTimeMax=3000.0
+            Revo9DCArrivalTimeMin=-10000.0
             histogramDirectoryName=KLM
         130. TRGGDLDQM
             bitConditionToDumpVcd=

@@ -1,8 +1,9 @@
 Import('env')
 
-env['LIBS'] = ['klm_dataobjects', 
+env['LIBS'] = ['klm',
+               'klm_dataobjects',
                'framework', 
                'rawdata_dataobjects',
-               '$ROOT_LIBS']
+               'mdst_dataobjects']
 
 Return('env')

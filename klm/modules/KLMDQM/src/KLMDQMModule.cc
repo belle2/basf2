@@ -38,6 +38,7 @@ KLMDQMModule::KLMDQMModule() :
   m_DigitsMultiStripEKLM{nullptr},
   m_TriggerBitsBKLM{nullptr},
   m_TriggerBitsEKLM{nullptr},
+  m_EventL1TriggerBits{nullptr},
   m_DigitsAfterLERInj{nullptr},
   m_TriggersLERInj{nullptr},
   m_DigitsAfterHERInj{nullptr},
@@ -49,7 +50,8 @@ KLMDQMModule::KLMDQMModule() :
   m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
   m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
   m_ElementNumbers{&(KLMElementNumbers::Instance())},
-  m_eklmElementNumbers{&(EKLMElementNumbers::Instance())}
+  m_eklmElementNumbers{&(EKLMElementNumbers::Instance())},
+  m_klmTime{&(KLMTime::Instance())}
 {
   setDescription("KLM data quality monitor.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -68,6 +70,10 @@ KLMDQMModule::KLMDQMModule() :
            "Min time for EKLM scintillator time histogram.", double(-5300));
   addParam("EKLMScintTimeMax", m_EKLMScintTimeMax,
            "Max time for EKLM scintillator time histogram.", double(-4300));
+  addParam("Revo9DCArrivalTimeMin", m_Revo9DCArrivalTimeMin,
+           "Min time for RPC hit revo9DCArrivalTime histogram.", double(-10000));
+  addParam("Revo9DCArrivalTimeMax", m_Revo9DCArrivalTimeMax,
+           "Max time for RPC hit revo9DCArrivalTime histogram.", double(3000));
 }
 
 KLMDQMModule::~KLMDQMModule()
@@ -111,6 +117,9 @@ void KLMDQMModule::defineHisto()
     new TH1F("time_scintillator_eklm", "Scintillator hit time (EKLM)",
              100, m_EKLMScintTimeMin, m_EKLMScintTimeMax);
   m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
+  m_TimeRevo9DCArrivalTime = new TH1F("time_revo9dc_arrival_time", "DC arrival hit time (RPC)",
+                                      10000, m_Revo9DCArrivalTimeMin, m_Revo9DCArrivalTimeMax);
+  m_TimeRevo9DCArrivalTime->GetXaxis()->SetTitle("Time, ns");
   /* Number of hits per plane. */
   m_PlaneBKLMPhi = new TH1F("plane_bklm_phi",
                             "BKLM plane occupancy (#phi readout)",
@@ -227,6 +236,19 @@ void KLMDQMModule::defineHisto()
   m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x4, "0x4");
   m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x2, "0x2");
   m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x1, "0x1");
+
+  /* Event-level L1 trigger bits (TRGSummary). */
+  int nTimingBits = (int)c_KlmL1Triggers.size();          // TTYP_DPHY, TTYP_RAND, TTYP_POIS
+  int nL1Bins = nTimingBits + 1;                          // extra bin for bha_delay
+  m_EventL1TriggerBits = new TH1F("event_l1_trigger_bits",
+                                  "Event L1 trigger bits (TRGSummary);Trigger bit;Events",
+                                  nL1Bins, 0.5, 0.5 + nL1Bins);
+  /* Keep labels explicit to match the actual trigger bits. */
+  m_EventL1TriggerBits->GetXaxis()->SetBinLabel(1, "TTYP_DPHY");
+  m_EventL1TriggerBits->GetXaxis()->SetBinLabel(2, "TTYP_RAND");
+  m_EventL1TriggerBits->GetXaxis()->SetBinLabel(3, "TTYP_POIS");
+  m_EventL1TriggerBits->GetXaxis()->SetBinLabel(4, "bha_delay");
+
   /* Number of digits after injection */
   /* For the histograms below, we use the same style as for other subdetectors. */
   m_DigitsAfterLERInj = new TH1F("KLMOccInjLER", "KLM digits after LER injection / Time;Time [#mus];Number of KLM digits / (5 #mus)",
@@ -280,6 +302,7 @@ void KLMDQMModule::initialize()
   REG_HISTOGRAM;
   m_RawFtsws.isOptional();
   m_RawKlms.isOptional();
+  m_trgSummary.isOptional();
   m_Digits.isOptional();
   m_BklmHit1ds.isOptional();
   m_Hit2ds.isOptional();
@@ -297,6 +320,8 @@ void KLMDQMModule::beginRun()
   m_TimeRPC->Reset();
   m_TimeScintillatorBKLM->Reset();
   m_TimeScintillatorEKLM->Reset();
+  m_TimeRevo9DCArrivalTime->Reset();
+  m_klmTime->updateConstants(); //to get correct CTime
   /* Plane hits. */
   m_PlaneEKLM->Reset();
   m_PlaneBKLMPhi->Reset();
@@ -324,6 +349,9 @@ void KLMDQMModule::beginRun()
   /* Trigger bits. */
   m_TriggerBitsBKLM->Reset();
   m_TriggerBitsEKLM->Reset();
+  /* Event-level L1 trigger bits. */
+  if (m_EventL1TriggerBits != nullptr)
+    m_EventL1TriggerBits->Reset();
   /* Injection information. */
   m_DigitsAfterLERInj->Reset();
   m_TriggersLERInj->Reset();
@@ -350,6 +378,23 @@ void KLMDQMModule::beginRun()
 
 void KLMDQMModule::event()
 {
+  /* Event-level L1 trigger bits (TRGSummary), filled once per event. */
+  if (m_trgSummary.isValid() && m_EventL1TriggerBits != nullptr) {
+    const int nTimingBits = (int)c_KlmL1Triggers.size();
+    // Timing-type triggers: TTYP_DPHY, TTYP_RAND, TTYP_POIS
+    for (int i = 0; i < nTimingBits; ++i) {
+      if (m_trgSummary->testInput(c_KlmL1Triggers[i]))
+        m_EventL1TriggerBits->Fill((double)i + 1.0);
+    }
+    // trigger bit: "bha_delay"
+    try {
+      if (m_trgSummary->testInput("bha_delay"))
+        m_EventL1TriggerBits->Fill((double)nTimingBits + 1.0);
+    } catch (const std::exception&) {
+      // Ignore if it is not available
+    }
+  }
+
   int nDigits = m_Digits.getEntries();
   int nDigitsRPC = 0, nDigitsScintillatorBKLM = 0, nDigitsScintillatorEKLM = 0;
   int nDigitsMultiStripBKLM = 0, nDigitsMultiStripEKLM = 0;
@@ -433,6 +478,7 @@ void KLMDQMModule::event()
       if (digit.inRPC()) {
         nDigitsRPC++;
         m_TimeRPC->Fill(digit.getTime());
+        m_TimeRevo9DCArrivalTime->Fill(digit.getRevo9DCArrivalTime() * m_klmTime->getCTimePeriod());
       } else {
         nDigitsScintillatorBKLM++;
         m_TimeScintillatorBKLM->Fill(digit.getTime());

@@ -718,7 +718,7 @@ std::pair<float, float> DQMHistAnalysisSVDOnMiraBelleModule::avgOccupancyGrpId0U
     int tmp_ladder = m_SVDModules[i].getLadderNumber();
     int tmp_sensor = m_SVDModules[i].getSensorNumber();
 
-    TString tmpnameGrpId0U = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountGroupId0U", tmp_layer, tmp_ladder, tmp_sensor);
+    TString tmpnameGrpId0U = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountSignalGroupIDsU", tmp_layer, tmp_ladder, tmp_sensor);
     TH1F* htmpU = (TH1F*)findHist(tmpnameGrpId0U.Data());
     if (htmpU == NULL) {
       B2INFO("Occupancy U histogram for group Id0 not found");
@@ -727,7 +727,7 @@ std::pair<float, float> DQMHistAnalysisSVDOnMiraBelleModule::avgOccupancyGrpId0U
         avgOffOccU.push_back(htmpU->GetEntries() / nStripsU / nEvents * 100);
     }
 
-    TString tmpnameGrpId0V = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountGroupId0V", tmp_layer, tmp_ladder, tmp_sensor);
+    TString tmpnameGrpId0V = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountSignalGroupIDsV", tmp_layer, tmp_ladder, tmp_sensor);
     TH1F* htmpV = (TH1F*)findHist(tmpnameGrpId0V.Data());
     if (htmpV == NULL) {
       B2INFO("Occupancy V histogram for group Id0 not found");

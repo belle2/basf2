@@ -182,8 +182,8 @@ void SVDDQMExpressRecoModule::defineHisto()
   m_strip6SampleCountU = new TH1F*[nSVDSensors];
   m_strip6SampleCountV = new TH1F*[nSVDSensors];
 
-  m_stripCountGroupId0U = new TH1F*[nSVDSensors];
-  m_stripCountGroupId0V = new TH1F*[nSVDSensors];
+  m_stripCountSignalGroupIDsU = new TH1F*[nSVDSensors];
+  m_stripCountSignalGroupIDsV = new TH1F*[nSVDSensors];
 
   m_onlineZSstripCountU = new TH1F*[nSVDSensors];
   m_onlineZSstripCountV = new TH1F*[nSVDSensors];
@@ -687,20 +687,20 @@ void SVDDQMExpressRecoModule::defineHisto()
     }
 
     //----------------------------------------------------------------
-    // Strips Counts for cluster time group id = 0
+    // Strips Counts for cluster time group id = 0, 1, 2, 3
     //----------------------------------------------------------------
-    name = str(format("SVDDQM_%1%_StripCountGroupId0U") % sensorDescr);
-    title = str(format("SVD Sensor %1% Integrated NumberFired U-Strip for group Id = 0 vs Strip Number") % sensorDescr);
-    m_stripCountGroupId0U[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
-    m_stripCountGroupId0U[i]->GetXaxis()->SetTitle("cellID");
-    m_stripCountGroupId0U[i]->GetYaxis()->SetTitle("count");
-    m_histoList->Add(m_stripCountGroupId0U[i]);
-    name = str(format("SVDDQM_%1%_StripCountGroupId0V") % sensorDescr);
-    title = str(format("SVD Sensor %1% Integrated Number of Fired V-Strip for group Id = 0 vs Strip Number") % sensorDescr);
-    m_stripCountGroupId0V[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
-    m_stripCountGroupId0V[i]->GetXaxis()->SetTitle("cellID");
-    m_stripCountGroupId0V[i]->GetYaxis()->SetTitle("count");
-    m_histoList->Add(m_stripCountGroupId0V[i]);
+    name = str(format("SVDDQM_%1%_StripCountSignalGroupIDsU") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated NumberFired U-Strip for group Id = 0, 1, 2 & 3 vs Strip Number") % sensorDescr);
+    m_stripCountSignalGroupIDsU[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_stripCountSignalGroupIDsU[i]->GetXaxis()->SetTitle("cellID");
+    m_stripCountSignalGroupIDsU[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_stripCountSignalGroupIDsU[i]);
+    name = str(format("SVDDQM_%1%_StripCountSignalGroupIDsV") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of Fired V-Strip for group Id = 0, 1, 2 & 3 vs Strip Number") % sensorDescr);
+    m_stripCountSignalGroupIDsV[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_stripCountSignalGroupIDsV[i]->GetXaxis()->SetTitle("cellID");
+    m_stripCountSignalGroupIDsV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_stripCountSignalGroupIDsV[i]);
 
     //----------------------------------------------------------------
     // Cluster size distribution
@@ -821,6 +821,16 @@ void SVDDQMExpressRecoModule::initialize()
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
+  if (m_useParamFromDB) {
+    if (!m_svdPlotsConfig.isValid())
+      B2FATAL("no valid configuration found for SVD reconstruction");
+    else {
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_svdPlotsConfig->get_uniqueID());
+      m_3Samples = m_svdPlotsConfig->isPlotsFor3SampleMonitoring();
+      m_skipRejectedEvents = m_svdPlotsConfig->isSkipHLTRejectedEvents();
+    }
+  }
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() != 0) {
     //Register collections
@@ -874,7 +884,6 @@ void SVDDQMExpressRecoModule::event()
     const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
     if (!eventAccepted) return;
   }
-  m_nEvents->Fill(0);
 
   int nSamples = 0;
   if (m_svdEventInfo.isValid())
@@ -885,14 +894,16 @@ void SVDDQMExpressRecoModule::event()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
-
   const StoreArray<SVDShaperDigit> storeNoZSSVDShaperDigits(m_storeNoZSSVDShaperDigitsName);
   const StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
   const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
 
-  if (!storeSVDShaperDigits.isValid() || !storeSVDShaperDigits.getEntries()) {
+  if (!storeSVDShaperDigits.isValid()) {
+    B2WARNING("Missing SVDShaperDigit, SVDDQMExpressRecoModule is skipped.");
     return;
   }
+
+  m_nEvents->Fill(0);
 
   int firstSVDLayer = gTools->getFirstSVDLayer();
   int lastSVDLayer = gTools->getLastSVDLayer();
@@ -1116,9 +1127,9 @@ void SVDDQMExpressRecoModule::event()
         if (m_hitMapUCl[index] != nullptr) m_hitMapUCl[index]->Fill(SensorInfo.getUCellID(cluster.getPosition()));
 
       // groupId for U side
-      if (groupId == 0) {
+      if (groupId == 0 || groupId == 1 || groupId == 2 || groupId == 3) {
         for (const SVDShaperDigit& digitIn : cluster.getRelationsTo<SVDShaperDigit>(m_storeSVDShaperDigitsName)) {
-          if (m_stripCountGroupId0U != nullptr) m_stripCountGroupId0U[index]->Fill(digitIn.getCellID());
+          if (m_stripCountSignalGroupIDsU != nullptr) m_stripCountSignalGroupIDsU[index]->Fill(digitIn.getCellID());
         }
       }
     } else {
@@ -1161,9 +1172,9 @@ void SVDDQMExpressRecoModule::event()
         if (m_hitMapVCl[index] != nullptr) m_hitMapVCl[index]->Fill(SensorInfo.getVCellID(cluster.getPosition()));
 
       // groupId for V side
-      if (groupId == 0) {
+      if (groupId == 0 || groupId == 1 || groupId == 2 || groupId == 3) {
         for (const SVDShaperDigit& digitIn : cluster.getRelationsTo<SVDShaperDigit>(m_storeSVDShaperDigitsName)) {
-          if (m_stripCountGroupId0V != nullptr) m_stripCountGroupId0V[index]->Fill(digitIn.getCellID());
+          if (m_stripCountSignalGroupIDsV != nullptr) m_stripCountSignalGroupIDsV[index]->Fill(digitIn.getCellID());
         }
       }
     }

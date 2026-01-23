@@ -53,6 +53,7 @@ void FlavorTaggerInfoBuilderModule::event()
     flavTag -> addMethodMap("FBDT");
     flavTag -> addMethodMap("FANN");
     flavTag -> addMethodMap("DNN");
+    flavTag -> addMethodMap("TFLAT");
 
     if (!roe->getRelatedTo<FlavorTaggerInfo>()) {
       // create relations: Particle <-> FlavorTaggerInfo , RestOfEvent <-> FlavorTaggerInfo

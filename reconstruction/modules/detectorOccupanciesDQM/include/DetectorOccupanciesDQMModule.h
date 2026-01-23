@@ -12,6 +12,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/HistoModule.h>
+#include <mdst/dataobjects/TRGSummary.h>
+#include <klm/time/KLMTime.h>
 
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLElementNumbers.h>
@@ -25,9 +27,17 @@
 
 #include <string>
 #include <TH1F.h>
+#include <TH2F.h>
 #include <TProfile.h>
 
 namespace Belle2 {
+  class EventMetaData;
+  class TRGSummary;
+  class KLMDigit;
+  class EKLMElementNumbers;
+  class ARICHHit;
+  class TOPDigit;
+  class ECLCalDigit;
 
 
   /** DQM Module for basic detector quantities before the HLT filter*/
@@ -62,9 +72,18 @@ namespace Belle2 {
     StoreObjPtr<TRGSummary> m_trgSummary; /**< trg summary */
 
     //KLM stuff
-    StoreArray<BKLMHit1d> m_BklmHit1ds; /**< BKLM hit 1D*/
     StoreArray<KLMDigit> m_KLMDigits; /**< KLM digits*/
     const EKLMElementNumbers* m_eklmElementNumbers; /**< EKLM Element numbers. */
+    KLMTime* m_klmTime; /**< KLM Time conversion. */
+    const TRGSummary::ETimingType m_klmBackTriggers[1] = {TRGSummary::ETimingType::TTYP_DPHY};  /**< Background Trigger bit(s) of interest */
+    // parameters for KLM histograms
+    double m_BKLMTimeMin; /**< Min time for BKLM time */
+    double m_BKLMTimeMax; /**< Max time for BKLM time */
+    double m_EKLMTimeMin; /**< Min time for EKLM Scint */
+    double m_EKLMTimeMax; /**< Max time for EKLM Scint */
+    double m_BKLMScintOffset; /**< Min time for RPC */
+    double m_BKLMRPCOffset; /**< Max time for RPC */
+
 
     //ARICH stuff
     StoreArray<ARICHHit>m_ARICHHits; /**< ARICH hits*/
@@ -78,12 +97,10 @@ namespace Belle2 {
 
     //histograms (all)
     //index: 0 = passive veto; 1 = active veto
-    TH1F* m_BKLM_PlanePhi_Occupancy[2]; /**< BKLM phi plane integrated occupancy */;
-    TH1F* m_BKLM_PlaneZ_Occupancy[2]; /**< BKLM z plane integrated occupancy */;
-    TH1F* m_EKLM_Plane_Occupancy[2]; /**< EKLM plane integrated occupancy */;
-    TH1F* m_BKLM_TimeRPC[2]; /**< RPC Hit Time */;
-    TH1F* m_BKLM_TimeScintillator[2]; /**< BKLM Scintillator Hit Time */;
-    TH1F* m_EKLM_TimeScintillator[2]; /**< EKLM  Scintillator Hit Time */;
+    TH2F* m_BKLM_Plane_Occupancy[2]; /**< BKLM plane integrated occupancy */;
+    TH2F* m_BKLM_PlaneTrg_Occupancy[2]; /**< BKLM plane integrated occupancy w/ trgs */;
+    TH2F* m_EKLM_Plane_Occupancy[2]; /**< EKLM plane integrated occupancy */;
+    TH2F* m_EKLM_PlaneTrg_Occupancy[2]; /**< EKLM plane integrated occupancy w/ trgs */;
     TH1F* m_ARICH_Occupancy[2]; /**< ARICH Digit Occupancy*/
     TH1F* m_TOP_Occupancy[2]; /**< TOP occupancy (good hits only) */
     TProfile* m_ECL_Occupancy[2]; /**< ECL occupancy (hits above 5 MeV) */

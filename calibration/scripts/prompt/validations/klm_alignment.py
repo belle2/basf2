@@ -24,6 +24,9 @@ settings = ValidationSettings(name='KLM alignment',
                               download_files=['stdout'],
                               expert_config=None)
 
+# Avoid looking for the release globaltag
+basf2.conditions.override_globaltags()
+
 
 def get_result(job_path, tmp_dir):
     database_file = f'{job_path}/outputdb/database.txt'

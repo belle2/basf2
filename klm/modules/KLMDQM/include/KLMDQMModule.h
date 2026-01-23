@@ -190,8 +190,8 @@ namespace Belle2 {
     /** Trigger bits: EKLM scintillators. */
     TH1F* m_TriggerBitsEKLM;
 
-    /** Event-level L1 trigger bits (from TRGSummary). */
-    TH1F* m_EventL1TriggerBits;
+    /** Event-level background trigger summary (from TRGSummary). */
+    TH1F* m_EventBackgroundTriggerSummary;
 
     /** Number of KLM Digits after LER injection. */
     TH1F* m_DigitsAfterLERInj;

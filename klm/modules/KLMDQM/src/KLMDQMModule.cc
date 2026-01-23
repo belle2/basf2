@@ -38,7 +38,7 @@ KLMDQMModule::KLMDQMModule() :
   m_DigitsMultiStripEKLM{nullptr},
   m_TriggerBitsBKLM{nullptr},
   m_TriggerBitsEKLM{nullptr},
-  m_EventL1TriggerBits{nullptr},
+  m_EventBackgroundTriggerSummary{nullptr},
   m_DigitsAfterLERInj{nullptr},
   m_TriggersLERInj{nullptr},
   m_DigitsAfterHERInj{nullptr},
@@ -240,14 +240,14 @@ void KLMDQMModule::defineHisto()
   /* Event-level L1 trigger bits (TRGSummary). */
   int nTimingBits = (int)c_KlmL1Triggers.size();          // TTYP_DPHY, TTYP_RAND, TTYP_POIS
   int nL1Bins = nTimingBits + 1;                          // extra bin for bha_delay
-  m_EventL1TriggerBits = new TH1F("event_l1_trigger_bits",
-                                  "Event L1 trigger bits (TRGSummary);Trigger bit;Events",
-                                  nL1Bins, 0.5, 0.5 + nL1Bins);
+  m_EventBackgroundTriggerSummary = new TH1F("event_background_trigger_summary",
+                                             "Event background trigger summary;Trigger Decision;Events",
+                                             nL1Bins, 0.5, 0.5 + nL1Bins);
   /* Keep labels explicit to match the actual trigger bits. */
-  m_EventL1TriggerBits->GetXaxis()->SetBinLabel(1, "TTYP_DPHY");
-  m_EventL1TriggerBits->GetXaxis()->SetBinLabel(2, "TTYP_RAND");
-  m_EventL1TriggerBits->GetXaxis()->SetBinLabel(3, "TTYP_POIS");
-  m_EventL1TriggerBits->GetXaxis()->SetBinLabel(4, "bha_delay");
+  m_EventBackgroundTriggerSummary->GetXaxis()->SetBinLabel(1, "TTYP_DPHY");
+  m_EventBackgroundTriggerSummary->GetXaxis()->SetBinLabel(2, "TTYP_RAND");
+  m_EventBackgroundTriggerSummary->GetXaxis()->SetBinLabel(3, "TTYP_POIS");
+  m_EventBackgroundTriggerSummary->GetXaxis()->SetBinLabel(4, "bha_delay");
 
   /* Number of digits after injection */
   /* For the histograms below, we use the same style as for other subdetectors. */
@@ -349,9 +349,9 @@ void KLMDQMModule::beginRun()
   /* Trigger bits. */
   m_TriggerBitsBKLM->Reset();
   m_TriggerBitsEKLM->Reset();
-  /* Event-level L1 trigger bits. */
-  if (m_EventL1TriggerBits != nullptr)
-    m_EventL1TriggerBits->Reset();
+  /* Event-level background trigger summary. */
+  if (m_EventBackgroundTriggerSummary != nullptr)
+    m_EventBackgroundTriggerSummary->Reset();
   /* Injection information. */
   m_DigitsAfterLERInj->Reset();
   m_TriggersLERInj->Reset();
@@ -378,18 +378,18 @@ void KLMDQMModule::beginRun()
 
 void KLMDQMModule::event()
 {
-  /* Event-level L1 trigger bits (TRGSummary), filled once per event. */
-  if (m_trgSummary.isValid() && m_EventL1TriggerBits != nullptr) {
+  /* Event-level background trigger summary, filled once per event. */
+  if (m_trgSummary.isValid() && m_EventBackgroundTriggerSummary != nullptr) {
     const int nTimingBits = (int)c_KlmL1Triggers.size();
-    // Timing-type triggers: TTYP_DPHY, TTYP_RAND, TTYP_POIS
+    // GDL Background triggers: TTYP_DPHY, TTYP_RAND, TTYP_POIS
     for (int i = 0; i < nTimingBits; ++i) {
       if (m_trgSummary->testInput(c_KlmL1Triggers[i]))
-        m_EventL1TriggerBits->Fill((double)i + 1.0);
+        m_EventBackgroundTriggerSummary->Fill((double)i + 1.0);
     }
-    // trigger bit: "bha_delay"
+    // L1 trigger bit: "bha_delay"
     try {
       if (m_trgSummary->testInput("bha_delay"))
-        m_EventL1TriggerBits->Fill((double)nTimingBits + 1.0);
+        m_EventBackgroundTriggerSummary->Fill((double)nTimingBits + 1.0);
     } catch (const std::exception&) {
       // Ignore if it is not available
     }

@@ -18,7 +18,7 @@ import ast
 from pandas.errors import PerformanceWarning
 
 warnings.warn(
-    "This module is deprecated and will be removed in a future release. "
+    "This module will soon be deprecated and eventually removed in a future release. "
     "Its functionality is being taken over by the standalone SysVar package: "
     "https://gitlab.desy.de/belle2/software/sysvar",
     FutureWarning,

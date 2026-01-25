@@ -16,6 +16,14 @@ import pdg
 import warnings
 from pandas.errors import PerformanceWarning
 
+warnings.warn(
+    "This module is deprecated and will be removed in a future release. "
+    "Its functionality is being taken over by the standalone SysVar package: "
+    "https://gitlab.desy.de/belle2/software/sysvar",
+    FutureWarning,
+    stacklevel=2
+)
+
 """
 A module that adds corrections to analysis dataframe.
 It adds weight variations according to the total uncertainty for easier error propagation.

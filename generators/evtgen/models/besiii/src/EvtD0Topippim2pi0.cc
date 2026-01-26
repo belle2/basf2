@@ -40,7 +40,7 @@
 #include "TMath.h"
 
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include "generators/evtgen/models/EvtD0Topippim2pi0.h"
+#include "generators/evtgen/models/besiii/EvtD0Topippim2pi0.h"
 
 namespace Belle2 {
 

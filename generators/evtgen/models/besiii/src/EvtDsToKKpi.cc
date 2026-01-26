@@ -47,7 +47,7 @@
 
 // Added by Jiyuan Zhang
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include "generators/evtgen/models/EvtDsToKKpi.h"
+#include "generators/evtgen/models/besiii/EvtDsToKKpi.h"
 
 namespace Belle2 {
 

@@ -12,9 +12,6 @@
 //      based on the EvtGen framework.  If you use all or part
 //      of it, please give an appropriate acknowledgement.
 //
-// Copyright Information: See EvtGen/BesCopyright
-//      Copyright (A) 2006      Ping Rong-Gang @IHEP
-//
 // Module: EvtD0ToKpipi0pi0.cc
 //         the necessary file: EvtD0ToKpipi0pi0.hh
 //
@@ -31,30 +28,24 @@
 #include "EvtGenBase/EvtGenKine.hh"
 #include "EvtGenBase/EvtPDL.hh"
 #include "EvtGenBase/EvtReport.hh"
-//#include "EvtGenModels/EvtD0ToKpipi0pi0.hh"  // Commented out, does not exist
 #include "EvtGenBase/EvtComplex.hh"
 #include "EvtGenBase/EvtDecayTable.hh"
 #include <stdlib.h>
 
-#include <generators/evtgen/EvtGenModelRegister.h>     // Added
-#include "generators/evtgen/models/EvtD0ToKpipi0pi0.h" // Added
+#include <generators/evtgen/EvtGenModelRegister.h>
+#include "generators/evtgen/models/besiii/EvtD0ToKpipi0pi0.h"
 
-namespace Belle2 { // Added
+namespace Belle2 {
 
   /** register the model in EvtGen */
-  B2_EVTGEN_REGISTER_MODEL(EvtD0ToKpipi0pi0); // Added
+  B2_EVTGEN_REGISTER_MODEL(EvtD0ToKpipi0pi0);
 
   EvtD0ToKpipi0pi0::~EvtD0ToKpipi0pi0() {}
 
-//void EvtD0ToKpipi0pi0::getName(std::string& model_name){ // Commented out
-//   model_name="D0ToKpipi0pi0";                           // Commented out
-//}                                                        // Commented out
-
-  std::string EvtD0ToKpipi0pi0::getName() // Added
+  std::string EvtD0ToKpipi0pi0::getName()
   {
-    // Added
-    return "D0ToKpipi0pi0";               // Added
-  }                                       // Added
+    return "D0ToKpipi0pi0";
+  }
 
   EvtDecayBase* EvtD0ToKpipi0pi0::clone()
   {
@@ -243,12 +234,12 @@ namespace Belle2 { // Added
     Km[1] = Km0.get(1); Pip[1] = pi1.get(1); Pi01[1] = pi2.get(1); Pi02[1] = pi3.get(1);
     Km[2] = Km0.get(2); Pip[2] = pi1.get(2); Pi01[2] = pi2.get(2); Pi02[2] = pi3.get(2);
     Km[3] = Km0.get(3); Pip[3] = pi1.get(3); Pi01[3] = pi2.get(3); Pi02[3] = pi3.get(3);
-    double prob = calPDF(Km, Pip, Pi01, Pi02);
+    double prob = PDF(Km, Pip, Pi01, Pi02);
     setProb(prob);
     return;
   }
 
-  double EvtD0ToKpipi0pi0::calPDF(double Km[], double Pip[], double Pi01[], double Pi02[])
+  double EvtD0ToKpipi0pi0::PDF(double* Km, double* Pip, double* Pi01, double* Pi02)
   {
     Km[0]   = sqrt(mass_Kaon * mass_Kaon + Km[1] * Km[1] + Km[2] * Km[2] + Km[3] * Km[3]);
     Pip[0] = sqrt(mass_Pion * mass_Pion + Pip[1] * Pip[1] + Pip[2] * Pip[2] + Pip[3] * Pip[3]);
@@ -388,7 +379,7 @@ namespace Belle2 { // Added
   }
   EvtComplex EvtD0ToKpipi0pi0::KPiSFormfactor(double sa, double sb, double sc, double r)
   {
-    (void)r;                                          // Added, L=0(S wave) so r does not come into play
+    (void)r;
     double m1430 = 1.463;
     double sa0 = m1430 * m1430;
     double w1430 = 0.233;
@@ -396,8 +387,8 @@ namespace Belle2 { // Added
     if (q0 < 0) q0 = 1e-16;
     double qs = (sa + sb - sc) * (sa + sb - sc) / (4 * sa) - sb;
     double q = sqrt(qs);
-    double Width = w1430 * q * m1430 / sqrt(sa * q0) * r / r; // changed width -> Width
-    double temp_R = atan(m1430 * Width / (sa0 - sa)); // changed width -> Width
+    double Width = w1430 * q * m1430 / sqrt(sa * q0) * r / r;
+    double temp_R = atan(m1430 * Width / (sa0 - sa));
     if (temp_R < 0) temp_R += math_pi;
     double deltaR = -5.31 + temp_R;
     double temp_F = atan(2 * 1.07 * q / (2 + (-1.8) * 1.07 * qs));
@@ -408,7 +399,7 @@ namespace Belle2 { // Added
     EvtComplex amp = 0.8 * sin(deltaF) * cF + sin(deltaR) * cR * cF * cF;
     return amp;
   }
-  EvtComplex EvtD0ToKpipi0pi0::D2VV(double P1[], double P2[], double P3[], double P4[], int g[], int flag)
+  EvtComplex EvtD0ToKpipi0pi0::D2VV(const double* P1, const double* P2, const double* P3, const double* P4, int* g, const int flag)
   {
     double t1V1[4], t1V2[4], t1D[4], t2D[4][4];
     double temp_PDF = 0;
@@ -422,13 +413,13 @@ namespace Belle2 { // Added
       pV2[i] = P3[i] + P4[i];
       pD[i] = pV1[i] + pV2[i];
     }
-    sa[0] = dot(pV1, pV1);
-    sb[0] = dot(P1, P1);
-    sc[0] = dot(P2, P2);
-    sa[1] = dot(pV2, pV2);
-    sb[1] = dot(P3, P3);
-    sc[1] = dot(P4, P4);
-    sa[2] = dot(pD, pD);
+    sa[0] = LorentzDotProduct(pV1, pV1);
+    sb[0] = LorentzDotProduct(P1, P1);
+    sc[0] = LorentzDotProduct(P2, P2);
+    sa[1] = LorentzDotProduct(pV2, pV2);
+    sb[1] = LorentzDotProduct(P3, P3);
+    sc[1] = LorentzDotProduct(P4, P4);
+    sa[2] = LorentzDotProduct(pD, pD);
     sb[2] = sa[0];
     sc[2] = sa[1];
     if (g[0] == 1) {
@@ -441,10 +432,10 @@ namespace Belle2 { // Added
     }
     if (g[0] == 0) pro[0] = 1;
     if (g[1] == 0) pro[1] = 1;
-    B[0] = barrier(1, sa[0], sb[0], sc[0], rRes);
-    B[1] = barrier(1, sa[1], sb[1], sc[1], rRes);
-    calt1(P1, P2, t1V1);
-    calt1(P3, P4, t1V2);
+    B[0] = BWBarrierFactor(1, sa[0], sb[0], sc[0], rRes);
+    B[1] = BWBarrierFactor(1, sa[1], sb[1], sc[1], rRes);
+    covariantTensor1(P1, P2, t1V1);
+    covariantTensor1(P3, P4, t1V2);
     if (g[2] == 0) {
       for (int i = 0; i != 4; i++) {
         temp_PDF += (G[i][i]) * t1V1[i] * t1V2[i];
@@ -452,7 +443,7 @@ namespace Belle2 { // Added
       B[2] = 1;
     }
     if (g[2] == 1) {
-      calt1(pV1, pV2, t1D);
+      covariantTensor1(pV1, pV2, t1D);
       for (int i = 0; i != 4; i++) {
         for (int j = 0; j != 4; j++) {
           for (int k = 0; k != 4; k++) {
@@ -462,43 +453,44 @@ namespace Belle2 { // Added
           }
         }
       }
-      B[2] = barrier(1, sa[2], sb[2], sc[2], rD);
+      B[2] = BWBarrierFactor(1, sa[2], sb[2], sc[2], rD);
     }
     if (g[2] == 2) {
-      calt2(pV1, pV2, t2D);
+      covariantTensor2(pV1, pV2, t2D);
       for (int i = 0; i != 4; i++) {
         for (int j = 0; j != 4; j++) {
           temp_PDF += t2D[i][j] * t1V1[i] * t1V2[j] * (G[i][i]) * (G[j][j]);
         }
       }
-      B[2] = barrier(2, sa[2], sb[2], sc[2], rD);
+      B[2] = BWBarrierFactor(2, sa[2], sb[2], sc[2], rD);
     }
     amp_PDF = temp_PDF * B[0] * B[1] * B[2] * pro[0] * pro[1];
     return amp_PDF;
   }
 
-  EvtComplex EvtD0ToKpipi0pi0::D2AP_A2VP(double P1[], double P2[], double P3[], double P4[], int g[], int flag)
+  EvtComplex EvtD0ToKpipi0pi0::D2AP_A2VP(const double* P1, const double* P2, const double* P3, const double* P4, int* g,
+                                         const int flag)
   {
     double temp_PDF = 0;
     EvtComplex amp_PDF(0, 0);
     EvtComplex pro[2];
     double t1V[4], t1D[4], t2A[4][4];
-    double sa[3], sb[3], sc[3], B[3];
+    double sa[3], sb[3], sc[3], B[3] = {0, 0, 0};
     double pV[4], pA[4], pD[4];
     for (int i = 0; i != 4; i++) {
       pV[i] = P3[i] + P4[i];
       pA[i] = pV[i] + P2[i];
       pD[i] = pA[i] + P1[i];
     }
-    sa[0] = dot(pV, pV);
-    sb[0] = dot(P3, P3);
-    sc[0] = dot(P4, P4);
-    sa[1] = dot(pA, pA);
+    sa[0] = LorentzDotProduct(pV, pV);
+    sb[0] = LorentzDotProduct(P3, P3);
+    sc[0] = LorentzDotProduct(P4, P4);
+    sa[1] = LorentzDotProduct(pA, pA);
     sb[1] = sa[0];
-    sc[1] = dot(P2, P2);
-    sa[2] = dot(pD, pD);
+    sc[1] = LorentzDotProduct(P2, P2);
+    sa[2] = LorentzDotProduct(pD, pD);
     sb[2] = sa[1];
-    sc[2] = dot(P1, P1);
+    sc[2] = LorentzDotProduct(P1, P1);
     if (g[0] == 1) {
       if (flag == 0 || flag == 3) pro[0] = propagatorGS(mass[4], width[4], sa[0], sb[0], sc[0], rRes, 1);
       else if (flag == 1 ||  flag == 21) pro[0] = propagatorRBW(mass[2], width[2], sa[0], sb[0], sc[0], rRes, 1);
@@ -508,10 +500,10 @@ namespace Belle2 { // Added
       if (flag == 0) pro[1] = propagatorRBW(mass[0], width[0], sa[1], sb[1], sc[1], rRes, g[2]);
       if (flag == 1 || flag == 21 || flag == 31 || flag == 3) pro[1] = propagatorRBW(mass[1], width[1], sa[1], sb[1], sc[1], rRes, g[2]);
     } else if (g[1] == 0) pro[1] = 1;
-    B[0] = barrier(1, sa[0], sb[0], sc[0], rRes);
-    B[2] = barrier(1, sa[2], sb[2], sc[2], rD);
-    calt1(P3, P4, t1V);
-    calt1(pA, P1, t1D);
+    B[0] = BWBarrierFactor(1, sa[0], sb[0], sc[0], rRes);
+    B[2] = BWBarrierFactor(1, sa[2], sb[2], sc[2], rD);
+    covariantTensor1(P3, P4, t1V);
+    covariantTensor1(pA, P1, t1D);
     if (g[2] == 0) {
       for (int i = 0; i != 4; i++) {
         for (int j = 0; j != 4; j++) {
@@ -520,19 +512,19 @@ namespace Belle2 { // Added
       }
       B[1] = 1;
     } else if (g[2] == 2) {
-      calt2(pV, P2, t2A);
+      covariantTensor2(pV, P2, t2A);
       for (int i = 0; i != 4; i++) {
         for (int j = 0; j != 4; j++) {
           temp_PDF += t1D[i] * t2A[i][j] * t1V[j] * (G[i][i]) * (G[j][j]);
         }
       }
-      B[1] = barrier(2, sa[1], sb[1], sc[1], rRes);
+      B[1] = BWBarrierFactor(2, sa[1], sb[1], sc[1], rRes);
     }
     amp_PDF = temp_PDF * B[0] * B[1] * B[2] * pro[0] * pro[1];
     return amp_PDF;
   }
 
-  EvtComplex EvtD0ToKpipi0pi0::D2AP_A2SP(double P1[], double P2[], double P3[], double P4[], int flag)
+  EvtComplex EvtD0ToKpipi0pi0::D2AP_A2SP(const double* P1, const double* P2, const double* P3, const double* P4, const int flag)
   {
     //flag = 0, S = rho; flag = 1, S = K*
     double temp_PDF = 0;
@@ -546,19 +538,19 @@ namespace Belle2 { // Added
       pA[i] = pS[i] + P2[i];
       pD[i] = pA[i] + P1[i];
     }
-    sa[0] = dot(pS, pS);
-    sb[0] = dot(P3, P3);
-    sc[0] = dot(P4, P4);
-    sa[1] = dot(pA, pA);
+    sa[0] = LorentzDotProduct(pS, pS);
+    sb[0] = LorentzDotProduct(P3, P3);
+    sc[0] = LorentzDotProduct(P4, P4);
+    sa[1] = LorentzDotProduct(pA, pA);
     sb[1] = sa[0];
-    sc[1] = dot(P2, P2);
-    sa[2] = dot(pD, pD);
+    sc[1] = LorentzDotProduct(P2, P2);
+    sa[2] = LorentzDotProduct(pD, pD);
     sb[2] = sa[1];
-    sc[2] = dot(P1, P1);
-    B[1] = barrier(1, sa[1], sb[1], sc[1], rRes);
-    B[2] = barrier(1, sa[2], sb[2], sc[2], rD);
-    calt1(pA, P1, t1D);
-    calt1(pS, P2, t1A);
+    sc[2] = LorentzDotProduct(P1, P1);
+    B[1] = BWBarrierFactor(1, sa[1], sb[1], sc[1], rRes);
+    B[2] = BWBarrierFactor(1, sa[2], sb[2], sc[2], rD);
+    covariantTensor1(pA, P1, t1D);
+    covariantTensor1(pS, P2, t1A);
     for (int i = 0; i != 4; i++) {
       temp_PDF += t1D[i] * t1A[i] * (G[i][i]);
     }
@@ -567,7 +559,7 @@ namespace Belle2 { // Added
     return amp_PDF;
   }
 
-  EvtComplex EvtD0ToKpipi0pi0::D2PP_P2VP(double P1[], double P2[], double P3[], double P4[], int flag)
+  EvtComplex EvtD0ToKpipi0pi0::D2PP_P2VP(const double* P1, const double* P2, const double* P3, const double* P4, const int flag)
   {
     //modeidx = 0 :(K*0 pi0)pi0
     //modeidx = 10:(K*- pi+)pi0
@@ -585,21 +577,21 @@ namespace Belle2 { // Added
       pP[i] = pV[i] + P2[i];
       pD[i] = pP[i] + P1[i];
     }
-    sa[0] = dot(pV, pV);
-    sb[0] = dot(P3, P3);
-    sc[0] = dot(P4, P4);
-    sa[1] = dot(pP, pP);
+    sa[0] = LorentzDotProduct(pV, pV);
+    sb[0] = LorentzDotProduct(P3, P3);
+    sc[0] = LorentzDotProduct(P4, P4);
+    sa[1] = LorentzDotProduct(pP, pP);
     sb[1] = sa[0];
-    sc[1] = dot(P2, P2);
-    sa[2] = dot(pD, pD);
+    sc[1] = LorentzDotProduct(P2, P2);
+    sa[2] = LorentzDotProduct(pD, pD);
     sb[2] = sa[1];
-    sc[2] = dot(P1, P1);
-    B[0] = barrier(1, sa[0], sb[0], sc[0], rRes);
-    B[1] = barrier(1, sa[1], sb[1], sc[1], rRes);
+    sc[2] = LorentzDotProduct(P1, P1);
+    B[0] = BWBarrierFactor(1, sa[0], sb[0], sc[0], rRes);
+    B[1] = BWBarrierFactor(1, sa[1], sb[1], sc[1], rRes);
     if (flag == 0) prop = propagatorRBW(mass[3], width[3], sa[0], sb[0], sc[0], rRes, 1);
     else if (flag == 10 || 20) prop = propagatorRBW(mass[2], width[2], sa[0], sb[0], sc[0], rRes, 1);
     else if (flag == 1 || 11) prop = propagatorGS(mass[4], width[4], sa[0], sb[0], sc[0], rRes, 1);
-    calt1(P3, P4, t1V);
+    covariantTensor1(P3, P4, t1V);
     for (int i = 0; i != 4; i++) {
       temp_PDF += P2[i] * t1V[i] * (G[i][i]);
     }
@@ -607,7 +599,7 @@ namespace Belle2 { // Added
     return amp;
   }
 
-  EvtComplex EvtD0ToKpipi0pi0::D2VP_V2VP(double P1[], double P2[], double P3[], double P4[], int flag)
+  EvtComplex EvtD0ToKpipi0pi0::D2VP_V2VP(const double* P1, const double* P2, const double* P3, const double* P4, const int flag)
   {
     double temp_PDF = 0;
     EvtComplex amp_PDF(0, 0);
@@ -630,26 +622,26 @@ namespace Belle2 { // Added
         }
       }
     }
-    sa[0] = dot(pV2, pV2);
-    sb[0] = dot(P3, P3);
-    sc[0] = dot(P4, P4);
-    sa[1] = dot(pV1, pV1);
+    sa[0] = LorentzDotProduct(pV2, pV2);
+    sb[0] = LorentzDotProduct(P3, P3);
+    sc[0] = LorentzDotProduct(P4, P4);
+    sa[1] = LorentzDotProduct(pV1, pV1);
     sb[1] = sa[0];
-    sc[1] = dot(P2, P2);
-    sa[2] = dot(pD, pD);
+    sc[1] = LorentzDotProduct(P2, P2);
+    sa[2] = LorentzDotProduct(pD, pD);
     sb[2] = sa[1];
-    sc[2] = dot(P1, P1);
+    sc[2] = LorentzDotProduct(P1, P1);
     if (flag == 0 || flag == 10) pro = propagatorRBW(mass[2], width[2], sa[0], sb[0], sc[0], rRes, 1);
     else if (flag == 20) pro = propagatorRBW(mass[3], width[3], sa[0], sb[0], sc[0], rRes, 1);
     else if (flag == 1 || flag == 2) pro = propagatorGS(mass[4], width[4], sa[0], sb[0], sc[0], rRes, 1);
-    B[0] = barrier(1, sa[0], sb[0], sc[0], rRes);
-    B[1] = barrier(1, sa[1], sb[1], sc[1], rRes);
-    B[2] = barrier(1, sa[2], sb[2], sc[2], rD);
+    B[0] = BWBarrierFactor(1, sa[0], sb[0], sc[0], rRes);
+    B[1] = BWBarrierFactor(1, sa[1], sb[1], sc[1], rRes);
+    B[2] = BWBarrierFactor(1, sa[2], sb[2], sc[2], rD);
     amp_PDF = temp_PDF * B[0] * B[1] * B[2] * pro;
     return amp_PDF;
   }
 
-  EvtComplex EvtD0ToKpipi0pi0::D2VS(double P1[], double P2[], double P3[], double P4[], int g, int flag)
+  EvtComplex EvtD0ToKpipi0pi0::D2VS(const double* P1, const double* P2, const double* P3, const double* P4, int g, const int flag)
   {
     double temp_PDF = 0;
     EvtComplex amp_PDF(0, 0);
@@ -662,13 +654,13 @@ namespace Belle2 { // Added
       pV[i] = P1[i] + P2[i];
       pD[i] = pS[i] + pV[i];
     }
-    sa[0] = dot(pS, pS);
-    sb[0] = dot(P3, P3);
-    sc[0] = dot(P4, P4);
-    sa[1] = dot(pV, pV);
-    sb[1] = dot(P1, P1);
-    sc[1] = dot(P2, P2);
-    sa[2] = dot(pD, pD);
+    sa[0] = LorentzDotProduct(pS, pS);
+    sb[0] = LorentzDotProduct(P3, P3);
+    sc[0] = LorentzDotProduct(P4, P4);
+    sa[1] = LorentzDotProduct(pV, pV);
+    sb[1] = LorentzDotProduct(P1, P1);
+    sc[1] = LorentzDotProduct(P2, P2);
+    sa[2] = LorentzDotProduct(pD, pD);
     sb[2] = sa[0];
     sc[2] = sa[1];
     if (g == 1) {
@@ -677,10 +669,10 @@ namespace Belle2 { // Added
       else if (flag == 11) pro = propagatorRBW(mass[3], width[3], sa[1], sb[1], sc[1], rRes, 1);
       else if (flag == 10) pro = 1;
     } else if (g == 0) pro = 1;
-    B[1] = barrier(1, sa[1], sb[1], sc[1], rRes);
-    B[2] = barrier(1, sa[2], sb[2], sc[2], rD);
-    calt1(P1, P2, t1V);
-    calt1(pS, pV, t1D);
+    B[1] = BWBarrierFactor(1, sa[1], sb[1], sc[1], rRes);
+    B[2] = BWBarrierFactor(1, sa[2], sb[2], sc[2], rD);
+    covariantTensor1(P1, P2, t1V);
+    covariantTensor1(pS, pV, t1D);
     for (int i = 0; i != 4; i++) {
       temp_PDF += G[i][i] * t1D[i] * t1V[i];
     }
@@ -690,7 +682,7 @@ namespace Belle2 { // Added
     return amp_PDF;
   }
 
-  EvtComplex EvtD0ToKpipi0pi0::D2TS(double P1[], double P2[], double P3[], double P4[], int flag)
+  EvtComplex EvtD0ToKpipi0pi0::D2TS(const double* P1, const double* P2, const double* P3, const double* P4, const int flag)
   {
     // flag == 0 KPiT. 1 PiPiT
     double temp_PDF = 0;
@@ -703,19 +695,19 @@ namespace Belle2 { // Added
       pT[i] = P1[i] + P2[i];
       pD[i] = pT[i] + pS[i];
     }
-    sa[0] = dot(pT, pT);
-    sb[0] = dot(P1, P1);
-    sc[0] = dot(P2, P2);
-    sa[1] = dot(pS, pS);
-    sb[1] = dot(P3, P3);
-    sc[1] = dot(P4, P4);
-    sa[2] = dot(pD, pD);
+    sa[0] = LorentzDotProduct(pT, pT);
+    sb[0] = LorentzDotProduct(P1, P1);
+    sc[0] = LorentzDotProduct(P2, P2);
+    sa[1] = LorentzDotProduct(pS, pS);
+    sb[1] = LorentzDotProduct(P3, P3);
+    sc[1] = LorentzDotProduct(P4, P4);
+    sa[2] = LorentzDotProduct(pD, pD);
     sb[2] = sa[0];
     sc[2] = sa[1];
-    B[0] = barrier(2, sa[0], sb[0], sc[0], rRes);
-    B[2] = barrier(2, sa[2], sb[2], sc[2], rD);
-    calt2(P1, P2, t2T);
-    calt2(pT, pS, t2D);
+    B[0] = BWBarrierFactor(2, sa[0], sb[0], sc[0], rRes);
+    B[2] = BWBarrierFactor(2, sa[2], sb[2], sc[2], rD);
+    covariantTensor2(P1, P2, t2T);
+    covariantTensor2(pT, pS, t2D);
     for (int i = 0; i != 4; i++) {
       for (int j = 0; j != 4; j++) {
         temp_PDF += t2D[i][j] * t2T[j][i] * (G[i][i]) * (G[j][j]);
@@ -726,7 +718,7 @@ namespace Belle2 { // Added
     return amp_PDF;
   }
 
-  EvtComplex EvtD0ToKpipi0pi0::PHSP(double P1[], double P2[])
+  EvtComplex EvtD0ToKpipi0pi0::PHSP(double* P1, double* P2)
   {
     EvtComplex amp_PDF(0, 0);
     double sa, sb, sc;
@@ -734,23 +726,17 @@ namespace Belle2 { // Added
     for (int i = 0; i != 4; i++) {
       KPi[i] = P1[i] + P2[i];
     }
-    sa = dot(KPi, KPi);
-    sb = dot(P1, P1);
-    sc = dot(P2, P2);
+    sa = LorentzDotProduct(KPi, KPi);
+    sb = LorentzDotProduct(P1, P1);
+    sc = LorentzDotProduct(P2, P2);
     amp_PDF = KPiSFormfactor(sa, sb, sc, rRes);
     return amp_PDF;
   }
 
-  EvtComplex EvtD0ToKpipi0pi0::propogator(double Mass, double Width, double sx)const // changed mass -> Mass, width -> Width
-  {
-    EvtComplex ci(0, 1);
-    EvtComplex prop = 1.0 / (Mass * Mass - sx - ci * Mass * Width); // changed mass -> Mass, width -> Width
-    return prop;
-  }
-  double EvtD0ToKpipi0pi0::wid(double Mass, double sa, double sb, double sc, double r, int l)const // changed mass -> Mass
+  double EvtD0ToKpipi0pi0::energyDependentWidth(const double Mass, double sa, double sb, double sc, double r, int l)const
   {
     double widm(0.), q(0.), q0(0.);
-    double sa0 = Mass * Mass; // changed mass -> Mass
+    double sa0 = Mass * Mass;
     double m = sqrt(sa);
     q = Qabcs(sa, sb, sc);
     q0 = Qabcs(sa0, sb, sc);
@@ -762,7 +748,7 @@ namespace Belle2 { // Added
     if (l == 0) F = 1;
     if (l == 1) F = sqrt((1 + z0) / (1 + z));
     if (l == 2) F = sqrt((9 + 3 * z0 + z0 * z0) / (9 + 3 * z + z * z));
-    widm = pow(t, l + 0.5) * Mass / m * F * F; // changed mass -> Mass
+    widm = pow(t, l + 0.5) * Mass / m * F * F;
     return widm;
   }
   double EvtD0ToKpipi0pi0::h(double m, double q)const
@@ -771,62 +757,47 @@ namespace Belle2 { // Added
     h = 2 / pi * q / m * log((m + 2 * q) / (2 * mpi));
     return h;
   }
-  double EvtD0ToKpipi0pi0::dh(double Mass, double q0)const // changed mass -> Mass
+  double EvtD0ToKpipi0pi0::dh(double Mass, double q0)const
   {
-    double dh = h(Mass, q0) * (1.0 / (8 * q0 * q0) - 1.0 / (2 * Mass * Mass)) + 1.0 / (2 * pi * Mass * Mass); // changed mass -> Mass
+    double dh = h(Mass, q0) * (1.0 / (8 * q0 * q0) - 1.0 / (2 * Mass * Mass)) + 1.0 / (2 * pi * Mass * Mass);
     return dh;
   }
-  double EvtD0ToKpipi0pi0::f(double Mass, double sx, double q0, double q)const // changed mass -> Mass
+  double EvtD0ToKpipi0pi0::f(double Mass, double sx, double q0, double q)const
   {
     double m = sqrt(sx);
     double f = Mass * Mass / (pow(q0, 3)) * (q * q * (h(m, q) - h(Mass, q0)) + (Mass * Mass - sx) * q0 * q0 * dh(Mass,
-                                             q0)); // changed mass -> Mass
+                                             q0));
     return f;
   }
-  double EvtD0ToKpipi0pi0::d(double Mass, double q0)const // changed mass -> Mass
+  double EvtD0ToKpipi0pi0::d(double Mass, double q0)const
   {
     double d = 3.0 / pi * mpi * mpi / (q0 * q0) * log((Mass + 2 * q0) / (2 * mpi)) + Mass / (2 * pi * q0) - (mpi * mpi * Mass) /
-               (pi * pow(q0, 3)); // changed mass -> Mass
+               (pi * pow(q0, 3));
     return d;
   }
   EvtComplex EvtD0ToKpipi0pi0::propagatorRBW(double Mass, double Width, double sa, double sb, double sc, double r,
-                                             int l)const // changed mass -> Mass, width -> Width
+                                             int l)const
   {
     EvtComplex ci(0, 1);
-    EvtComplex prop = 1.0 / (Mass * Mass - sa - ci * Mass * Width * wid(Mass, sa, sb, sc, r,
-                             l)); // changed mass -> Mass, width -> Width
+    EvtComplex prop = 1.0 / (Mass * Mass - sa - ci * Mass * Width * energyDependentWidth(Mass, sa, sb, sc, r,
+                             l));
     return prop;
   }
   EvtComplex EvtD0ToKpipi0pi0::propagatorGS(double Mass, double Width, double sa, double sb, double sc, double r,
-                                            int l)const // changed mass -> Mass, width -> Width
+                                            int l)const
   {
     EvtComplex ci(0, 1);
     double q = Qabcs(sa, sb, sc);
-    double sa0 = Mass * Mass; // changed mass -> Mass
+    double sa0 = Mass * Mass;
     double q0 = Qabcs(sa0, sb, sc);
     q = sqrt(q);
     q0 = sqrt(q0);
-    EvtComplex prop = (1 + d(Mass, q0) * Width / Mass) / (Mass * Mass - sa + Width * f(Mass, sa, q0, q) - ci * Mass * Width * wid(Mass,
-                                                          sa, sb, sc, r, l)); // changed mass -> Mass, width -> Width
+    EvtComplex prop = (1 + d(Mass, q0) * Width / Mass) / (Mass * Mass - sa + Width * f(Mass, sa, q0,
+                                                          q) - ci * Mass * Width * energyDependentWidth(Mass,
+                                                              sa, sb, sc, r, l));
     return prop;
   }
-  double EvtD0ToKpipi0pi0::Flatte_rhoab(double sa, double sb, double sc)const
-  {
-    double q = Qabcs(sa, sb, sc);
-    double Rho = sqrt(q / sa); // changed rho -> Rho
-    return Rho;              // changed rho -> Rho
-  }
-  EvtComplex EvtD0ToKpipi0pi0::propagatorFlatte(double Mass, double Width, double sx, double* sb,
-                                                double* sc)const // changed mass -> Mass, width -> Width
-  {
-    (void)Width; // Added
-    EvtComplex ci(0, 1);
-    double rho1 = Flatte_rhoab(sx, sb[0], sc[0]);
-    double rho2 = Flatte_rhoab(sx, sb[1], sc[1]);
-    EvtComplex prop = 1.0 / (Mass * Mass - sx - ci * (g1 * g1 * rho1 + g2 * g2 * rho2)); // changed mass -> Mass
-    return prop;
-  }
-  double EvtD0ToKpipi0pi0::dot(double* a1, double* a2)const
+  double EvtD0ToKpipi0pi0::LorentzDotProduct(const double* a1, const double* a2)const
   {
     double dot = 0;
     for (int i = 0; i != 4; i++) {
@@ -840,7 +811,7 @@ namespace Belle2 { // Added
     if (Qabcs < 0) Qabcs = 1e-16;
     return Qabcs;
   }
-  double EvtD0ToKpipi0pi0::barrier(double l, double sa, double sb, double sc, double r)const
+  double EvtD0ToKpipi0pi0::BWBarrierFactor(double l, double sa, double sb, double sc, double r)const
   {
     double q = Qabcs(sa, sb, sc);
     q = sqrt(q);
@@ -858,7 +829,7 @@ namespace Belle2 { // Added
     }
     return F;
   }
-  void EvtD0ToKpipi0pi0::calt1(double daug1[], double daug2[], double t1[]) const
+  void EvtD0ToKpipi0pi0::covariantTensor1(const double* daug1, const double* daug2, double* t1) const
   {
     double p, pq;
     double pa[4], qa[4];
@@ -866,22 +837,22 @@ namespace Belle2 { // Added
       pa[i] = daug1[i] + daug2[i];
       qa[i] = daug1[i] - daug2[i];
     }
-    p = dot(pa, pa);
-    pq = dot(pa, qa);
+    p = LorentzDotProduct(pa, pa);
+    pq = LorentzDotProduct(pa, qa);
     for (int i = 0; i != 4; i++) {
       t1[i] = qa[i] - pq / p * pa[i];
     }
   }
-  void EvtD0ToKpipi0pi0::calt2(double daug1[], double daug2[], double t2[][4]) const
+  void EvtD0ToKpipi0pi0::covariantTensor2(const double* daug1, const double* daug2, double (*t2)[4]) const
   {
     double p, r;
     double pa[4], t1[4];
-    calt1(daug1, daug2, t1);
-    r = dot(t1, t1);
+    covariantTensor1(daug1, daug2, t1);
+    r = LorentzDotProduct(t1, t1);
     for (int i = 0; i != 4; i++) {
       pa[i] = daug1[i] + daug2[i];
     }
-    p = dot(pa, pa);
+    p = LorentzDotProduct(pa, pa);
     for (int i = 0; i != 4; i++) {
       for (int j = 0; j != 4; j++) {
         t2[i][j] = t1[i] * t1[j] - 1.0 / 3 * r * (G[i][j] - pa[i] * pa[j] / p);
@@ -889,4 +860,4 @@ namespace Belle2 { // Added
     }
   }
 
-} // Belle 2 namespace // Added
+} // Belle 2 namespace

@@ -36,7 +36,7 @@
 #include <stdlib.h>
 
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include "generators/evtgen/models/EvtD0TopipiEta.h"
+#include "generators/evtgen/models/besiii/EvtD0TopipiEta.h"
 
 namespace Belle2 {
 

@@ -430,12 +430,6 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   m_c_nks->cd(4);
   m_KshortActiveNotCDCECL_frame->Draw();
 
-  // Delete RooPlot objects
-  delete m_KshortAll_frame;
-  delete m_KshortActive_frame;
-  delete m_KshortActiveNotTime_frame;
-  delete m_KshortActiveNotCDCECL_frame;
-
   B2DEBUG(20, "DQMHistAnalysisHLTMonObj : endRun called");
 }
 

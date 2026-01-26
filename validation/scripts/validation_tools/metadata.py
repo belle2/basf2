@@ -19,6 +19,9 @@ import basf2
 import ROOT
 from ROOT import Belle2
 
+# circumvent BII-1264
+ROOT.gInterpreter.Declare("#include <framework/utilities/MakeROOTCompatible.h>")
+
 
 def file_description_set(
     rootfile: Union[ROOT.TFile, str, pathlib.PurePath], description: str
@@ -39,7 +42,7 @@ def file_description_set(
     if not isinstance(rootfile, ROOT.TFile):
         if isinstance(rootfile, pathlib.PurePath):
             rootfile = str(rootfile)
-        rootfile = ROOT.TFile.Open(rootfile, "UPDATE")
+        rootfile = ROOT.TFile(rootfile, "UPDATE")
         opened = True
     if not rootfile.IsOpen() or not rootfile.IsWritable():
         raise RuntimeError(
@@ -154,7 +157,7 @@ def validation_metadata_update(
     if not isinstance(rootfile, ROOT.TFile):
         if isinstance(rootfile, pathlib.PurePath):
             rootfile = str(rootfile)
-        rootfile = ROOT.TFile.Open(rootfile, "UPDATE")
+        rootfile = ROOT.TFile(rootfile, "UPDATE")
         opened = True
     if not rootfile.IsOpen() or not rootfile.IsWritable():
         raise RuntimeError(
@@ -250,7 +253,7 @@ class ValidationMetadataSetter(basf2.Module):
             validation_metadata_update(self._tfile, name, *metadata)
         if self._description:
             file_description_set(self._tfile, self._description)
-        self._tfile.Close()
+        del self._tfile
 
 
 def create_validation_histograms(
@@ -322,7 +325,6 @@ def create_validation_histograms(
     path.add_module(
         ValidationMetadataSetter(metadata, rootfile, description=description)
     )
-
     path.add_module(
         "VariablesToHistogram",
         particleList=particlelist,

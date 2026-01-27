@@ -43,6 +43,7 @@ void DQMHistAnalysisMiraBelleModule::initialize()
   //mon_mumu = new Belle2::MonitoringObject("mumu");
   mon_mumu = getMonitoringObject("mumu");
   mon_dst = getMonitoringObject("dst");
+  mon_tautau = getMonitoringObject("tautau");
   //bhabha,hadrons
   mon_bhabha = getMonitoringObject("bhabha");
   mon_hadron = getMonitoringObject("hadronb2");
@@ -812,6 +813,74 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_dst->setVariable("mean_D0_K_PID_ARICH_kaon", mean_D0_K_PID_ARICH_kaon);
   mon_dst->setVariable("mean_D0_K_PID_ECL_kaon", mean_D0_K_PID_ECL_kaon);
   mon_dst->setVariable("mean_D0_K_PID_KLM_kaon", mean_D0_K_PID_KLM_kaon);
+
+  //L1 efficiency with taupair
+  // get existing histograms produced by DQM modules
+  auto* histtau_L1ECL1x1 = findHist("PhysicsObjectsMiraBelleTrgEfficiency/hist_L1ECL1x1");
+  auto* histtau_L1ECL1x3 = findHist("PhysicsObjectsMiraBelleTrgEfficiency/hist_L1ECL1x3");
+  auto* histtau_L1CDC1x1 = findHist("PhysicsObjectsMiraBelleTrgEfficiency/hist_L1CDC1x1");
+  auto* histtau_L1CDC1x3 = findHist("PhysicsObjectsMiraBelleTrgEfficiency/hist_L1CDC1x3");
+  auto* histtau_L1CDCKLM1x1 = findHist("PhysicsObjectsMiraBelleTrgEfficiency/hist_L1CDCKLM1x1");
+  auto* histtau_L1CDCKLM1x3 = findHist("PhysicsObjectsMiraBelleTrgEfficiency/hist_L1CDCKLM1x3");
+  if (histtau_L1ECL1x1 == nullptr) {
+    B2ERROR("Can not find the histtau_L1ECL1x1 histogram!");
+    return;
+  }
+  if (histtau_L1ECL1x3 == nullptr) {
+    B2ERROR("Can not find the histtau_L1ECL1x3 histogram!");
+    return;
+  }
+  if (histtau_L1ECL1x1 == nullptr) {
+    B2ERROR("Can not find the histtau_L1ECL1x1 histogram!");
+    return;
+  }
+  if (histtau_L1ECL1x3 == nullptr) {
+    B2ERROR("Can not find the histtau_L1ECL1x3 histogram!");
+    return;
+  }
+  if (histtau_L1ECL1x1 == nullptr) {
+    B2ERROR("Can not find the histtau_L1ECL1x1 histogram!");
+    return;
+  }
+  if (histtau_L1ECL1x3 == nullptr) {
+    B2ERROR("Can not find the histtau_L1ECL1x3 histogram!");
+    return;
+  }
+
+  // Variables needed for L1 efficiency using tau pairs
+  double Ntautau_ECL1x1[30];
+  double Ntautau_ECL1x3[30];
+  double Ntautau_CDC1x1[30];
+  double Ntautau_CDC1x3[30];
+  double Ntautau_CDCKLM1x1[30];
+  double Ntautau_CDCKLM1x3[30];
+
+  for (int bin = 1; bin <= 30; bin++) {
+    Ntautau_ECL1x1[bin] = histtau_L1ECL1x1->GetBinContent(bin);
+    Ntautau_ECL1x3[bin] = histtau_L1ECL1x3->GetBinContent(bin);
+    Ntautau_CDC1x1[bin] = histtau_L1CDC1x1->GetBinContent(bin);
+    Ntautau_CDC1x3[bin] = histtau_L1CDC1x3->GetBinContent(bin);
+    Ntautau_CDCKLM1x1[bin] = histtau_L1CDCKLM1x1->GetBinContent(bin);
+    Ntautau_CDCKLM1x3[bin] = histtau_L1CDCKLM1x3->GetBinContent(bin);
+  }
+
+
+  // set values
+  for (int bin = 1; bin <= 30; bin++) {
+    if (Ntautau_ECL1x1[bin] != 0)
+      mon_tautau->setVariable(histtau_L1ECL1x1->GetXaxis()->GetBinLabel(bin), Ntautau_ECL1x1[bin]);
+    if (Ntautau_ECL1x3[bin] != 0)
+      mon_tautau->setVariable(histtau_L1ECL1x3->GetXaxis()->GetBinLabel(bin), Ntautau_ECL1x3[bin]);
+    if (Ntautau_CDC1x1[bin] != 0)
+      mon_tautau->setVariable(histtau_L1CDC1x1->GetXaxis()->GetBinLabel(bin), Ntautau_CDC1x1[bin]);
+    if (Ntautau_CDC1x3[bin] != 0)
+      mon_tautau->setVariable(histtau_L1CDC1x3->GetXaxis()->GetBinLabel(bin), Ntautau_CDC1x3[bin]);
+    if (Ntautau_CDCKLM1x1[bin] != 0)
+      mon_tautau->setVariable(histtau_L1CDCKLM1x1->GetXaxis()->GetBinLabel(bin), Ntautau_CDCKLM1x1[bin]);
+    if (Ntautau_CDCKLM1x3[bin] != 0)
+      mon_tautau->setVariable(histtau_L1CDCKLM1x3->GetXaxis()->GetBinLabel(bin), Ntautau_CDCKLM1x3[bin]);
+
+  }
 
   //bhabha,hadrons
   // ========== bhabha_all

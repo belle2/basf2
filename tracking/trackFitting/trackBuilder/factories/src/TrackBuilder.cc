@@ -155,18 +155,12 @@ uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack, c
 
       genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
 
-      VTXRecoHit* vtxHit = dynamic_cast<VTXRecoHit*>(absMeas);
-      if (vtxHit) {
-        const int layerNumber = vtxHit->getSensorID().getLayerNumber();
-        const int currentHits = hitPatternVXD.getVTXLayer(layerNumber);
-        hitPatternVXD.setVTXLayer(layerNumber, currentHits + 1);
-      }
-
       PXDRecoHit* pxdHit = dynamic_cast<PXDRecoHit*>(absMeas);
       SVDRecoHit* svdHit = dynamic_cast<SVDRecoHit*>(absMeas);
       SVDRecoHit2D* svdHit2D = dynamic_cast<SVDRecoHit2D*>(absMeas);
+      VTXRecoHit* vtxHit = dynamic_cast<VTXRecoHit*>(absMeas);
 
-      if (!pxdHit && !svdHit2D && !svdHit)
+      if (!pxdHit && !svdHit2D && !svdHit && !vtxHit)
         continue; // consider only VXD hits
 
       if (kalmanInfo) {
@@ -196,6 +190,12 @@ uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack, c
             hitPatternVXD.setSVDLayer(layerNumber, currentHits.first + 1, currentHits.second);
           else
             hitPatternVXD.setSVDLayer(layerNumber, currentHits.first, currentHits.second + 1);
+        }
+
+        if (vtxHit) {
+          const int layerNumber = vtxHit->getSensorID().getLayerNumber();
+          const int currentHits = hitPatternVXD.getVTXLayer(layerNumber);
+          hitPatternVXD.setVTXLayer(layerNumber, currentHits + 1);
         }
 
       }   // end of if kalmanInfo

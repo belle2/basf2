@@ -16,7 +16,6 @@ class RooAddPdf;
 class RooChebychev;
 class RooGaussian;
 class RooRealVar;
-class RooPlot;
 
 namespace Belle2 {
 

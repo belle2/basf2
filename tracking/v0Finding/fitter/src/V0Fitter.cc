@@ -692,6 +692,12 @@ int V0Fitter::checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const 
         B2WARNING("No SVD U-cluster in the innermost cluster.");
         return -1;
       }
+    } else if (recoHitInfoPlus->getTrackingDetector() == RecoHitInformation::c_VTX) {
+      const VTXCluster* clusterPlus = recoHitInfoPlus->getRelatedTo<VTXCluster>();
+      const VTXCluster* clusterMinus = recoHitInfoMinus->getRelatedTo<VTXCluster>();
+      if (clusterPlus == clusterMinus) { // if they share a same PXDCluster, set the flag
+        flag = 3; // VTX cluster is a 2D-hit
+      }
     }
   }
   return flag;

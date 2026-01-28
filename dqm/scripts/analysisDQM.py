@@ -124,7 +124,7 @@ def add_mirabelle_dqm(path):
         resultOnMissing=0,
     )
     trigger_skim_dstar_2.if_value("==1", MiraBelleDst2_path, b2.AfterConditionPath.CONTINUE)
-    trigger_skim_tau = MiraBelleTau_path.add_module(
+    trigger_skim_tau = path.add_module(
         "TriggerSkim",
         triggerLines=["software_trigger_cut&skim&accept_tau_2trk", "software_trigger_cut&skim&accept_tau_Ntrk"],
         expectedResult=1,

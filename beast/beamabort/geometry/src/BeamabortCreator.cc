@@ -51,7 +51,7 @@ namespace Belle2 {
       //get parameters from .xml file
       std::string prep = "Active.";
 
-      B2INFO("BeamabortCreator phase3");
+      B2DEBUG(20, "BeamabortCreator phase3");
       //Visualization Attributes
       G4VisAttributes* orange = new G4VisAttributes(G4Colour(1, 2, 0));
       orange->SetForceAuxEdgeVisible(true);
@@ -139,7 +139,7 @@ namespace Belle2 {
       l_pa->SetVisAttributes(magenta);
       G4Transform3D transform;
       for (unsigned int i = 0; i < dimz; i++) {
-        B2INFO("DIA-" << i << "RotateZ3D phi: " << phi[i]);
+        B2DEBUG(20, "DIA-" << i << "RotateZ3D phi: " << phi[i]);
 
         if (phase == 1) {
           transform = G4Translate3D(x_pos[i], y_pos[i], z_pos[i]) * G4RotateX3D(thetaX[i]) *
@@ -150,7 +150,7 @@ namespace Belle2 {
                       G4RotateZ3D(svdAngle[i]) * G4RotateY3D(M_PI / 2);
         }
         new G4PVPlacement(transform, l_pa, TString::Format("p_dia_pa_%d", i).Data(), &topVolume, false, 0);
-        B2INFO("DIA-" << i << " placed at: " << transform.getTranslation() << " mm ");
+        B2DEBUG(20, "DIA-" << i << " placed at: " << transform.getTranslation() << " mm ");
       }
 
       //create beamabort volumes
@@ -180,11 +180,11 @@ namespace Belle2 {
 
         new G4PVPlacement(transform, l_BEAMABORT, TString::Format("p_dia_%d", i).Data(), &topVolume, false, i);
 
-        B2INFO("DIA-sensitive volume-" << i << " placed at: " << transform.getTranslation() << " mm "
-               << "  at phi angle = " << phi[i] << "   at theta angle = "
-               << thetaZ[i]);
-        B2INFO("DIA-sensitive volume-" << i << " G4RotateZ3D of: phi= " << phi[i] << "  G4RotateX3D = "
-               << (-M_PI / 2 - thetaZ[i]));
+        B2DEBUG(20, "DIA-sensitive volume-" << i << " placed at: " << transform.getTranslation() << " mm "
+                << "  at phi angle = " << phi[i] << "   at theta angle = "
+                << thetaZ[i]);
+        B2DEBUG(20, "DIA-sensitive volume-" << i << " G4RotateZ3D of: phi= " << phi[i] << "  G4RotateX3D = "
+                << (-M_PI / 2 - thetaZ[i]));
       }
     }
   }

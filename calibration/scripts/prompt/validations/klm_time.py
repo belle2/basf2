@@ -36,6 +36,9 @@ settings = ValidationSettings(name='KLM time',
                                   "UpperTimeBoundaryScintillatorsEKLM": -4600.0,
                               })
 
+# Avoid looking for the release globaltag
+basf2.conditions.override_globaltags()
+
 
 def run_validation(job_path, input_data_path, requested_iov, expert_config):
     '''

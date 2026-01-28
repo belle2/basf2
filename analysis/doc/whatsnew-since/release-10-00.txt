@@ -1,3 +1,11 @@
+Changes in the analysis package in light-2601-hyperion
+------------------------------------------------------
+
+FlavorTagger
+++++++++++++
+* Introduced a new end to end Flavor Tagger TFlaT based on the transformer architecture.
+  TFlaT is a drop in replacement for the previous Flavour Taggers and achieves an effective tagging efficiency on data of ~44.5%.
+
 Changes in the analysis package in light-2511-gacrux
 ----------------------------------------------------
 
@@ -19,6 +27,7 @@ Variables
 stdV0s and stdHyperons
 ++++++++++++++++++++++
 * Added argument ``addSuffix`` to add a suffix of the form ``_<fitter>`` to the output ParticleList name, depending on the chosen fitter.
+
 
 Changes in the analysis package in light-2509-fornax
 ----------------------------------------------------

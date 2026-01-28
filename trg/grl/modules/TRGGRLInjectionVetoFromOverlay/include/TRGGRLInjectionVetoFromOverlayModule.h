@@ -59,7 +59,7 @@ namespace Belle2 {
     std::string m_extensionName;
 
     /** Array of L1 input bit names to overlay */
-    const std::array<std::string, 4> m_inputBitNames{{"cdc_veto", "ecl_veto", "cdcecl_veto", "passive_veto", "veto"}};
+    const std::array<std::string, 5> m_inputBitNames{{"cdc_veto", "ecl_veto", "cdcecl_veto", "passive_veto", "veto"}};
 
   };
 

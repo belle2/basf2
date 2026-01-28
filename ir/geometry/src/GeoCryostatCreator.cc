@@ -1416,8 +1416,7 @@ namespace Belle2 {
               double cut_R = m_config.getParameter(prep + "cutR" + oss_block_num.str()) * unitFactor;
 
               geo_cut = new G4Tubs(geo_cut_name, 0.0, cut_R, cut_L / 2.0, 0.0, 2.0 * M_PI);
-            } else
-              continue;
+            }
 
             double cut_X0 = m_config.getParameter(prep + "cutX0" + oss_block_num.str()) * unitFactor;
             double cut_Y0 = m_config.getParameter(prep + "cutY0" + oss_block_num.str()) * unitFactor;

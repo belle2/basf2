@@ -96,7 +96,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
                                               reco_tracks=reco_tracks,
                                               add_mva_quality_indicator=add_mva_quality_indicator)
 
-    add_postfilter_track_fit_and_track_creator(path, components=components,
+    add_postfilter_track_fit_and_track_creator(path,
                                                trackFitHypotheses=trackFitHypotheses,
                                                reco_tracks=reco_tracks)
 
@@ -137,7 +137,7 @@ def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHyp
     if add_mva_quality_indicator:
         path.add_module("TrackQualityEstimatorMVA", collectEventFeatures=True)
     # create Belle2 tracks from the RecoTrack objects (which have genfit tracks)
-    # By default, only stops creating Belle2 tracks when a successful fit is found among given hypothesis,
+    # By default, stops creating Belle2 tracks when a successful fit is found among given hypothesis,
     # rest will be fitted in the postfilter
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
                     pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses,

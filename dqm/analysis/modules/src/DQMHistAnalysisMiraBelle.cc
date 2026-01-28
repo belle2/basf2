@@ -855,7 +855,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   double Ntautau_CDCKLM1x1[30];
   double Ntautau_CDCKLM1x3[30];
 
-  for (int bin = 1; bin <= 30; bin++) {
+  for (int bin = 1; bin < 30; bin++) {
     Ntautau_ECL1x1[bin] = histtau_L1ECL1x1->GetBinContent(bin);
     Ntautau_ECL1x3[bin] = histtau_L1ECL1x3->GetBinContent(bin);
     Ntautau_CDC1x1[bin] = histtau_L1CDC1x1->GetBinContent(bin);

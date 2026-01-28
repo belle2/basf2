@@ -58,8 +58,9 @@ namespace Belle2 {
     void defineHisto() override;
 
   private:
-    /** Trigger identifier strings used to select events for the histograms */
+    /** Trigger identifier string used to select 1x1 tau pairs for the histograms */
     std::string m_triggerIdentifierTau2trk = "";
+    /** Trigger identifier string used to select 1x3 tau pairs for the histograms */
     std::string m_triggerIdentifierTauNtrk = "";
 
     // ======== Hitograms for run dependence

@@ -866,7 +866,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
 
 
   // set values
-  for (int bin = 1; bin <= 30; bin++) {
+  for (int bin = 1; bin < 30; bin++) {
     if (Ntautau_ECL1x1[bin] != 0)
       mon_tautau->setVariable(histtau_L1ECL1x1->GetXaxis()->GetBinLabel(bin), Ntautau_ECL1x1[bin]);
     if (Ntautau_ECL1x3[bin] != 0)

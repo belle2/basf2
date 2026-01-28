@@ -167,7 +167,7 @@ def add_postfilter_track_fit_and_track_creator(path,
     # implementation.
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
                     pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses,
-                    stopOnSuccessfulTrackFit=False
+                    stopOnSuccessfulTrackFit=False, firstCall=False
                     ).set_name("TrackCreator_postfilter")
 
 

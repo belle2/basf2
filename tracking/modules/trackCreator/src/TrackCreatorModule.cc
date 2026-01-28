@@ -52,6 +52,8 @@ TrackCreatorModule::TrackCreatorModule() :
            m_useBFieldAtHit);
   addParam("useSeedForTrackFitMomentumRange", m_useSeedForTrackFitMomentumRange, "Flag to use the momentum seed of the RecoTrack "
            "for the TrackFitMomentumRange selection. By default the fitted value is used",  m_useSeedForTrackFitMomentumRange);
+  addParam("firstCall", m_firstCall, "Flag to declare that the module is called for the first time.",
+           m_firstCall);
   addParam("stopOnSuccessfulTrackFit", m_stopOnSuccessfulTrackFit, "Flag to stop creating new tracks when a particle hypothesis "
            "leads to a successful track fit. Switched off by default (fit all given pdg codes) but turned on before HLT filter for optimzation",
            m_stopOnSuccessfulTrackFit);
@@ -62,18 +64,16 @@ void TrackCreatorModule::initialize()
 {
   m_RecoTracks.isRequired(m_recoTrackColName);
 
-  static bool firstCall = true;
-  if (firstCall) {
+  if (m_firstCall) {
     StoreArray<Track> tracks(m_trackColName);
     const bool tracksRegistered = tracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
     StoreArray<TrackFitResult> trackFitResults(m_trackFitResultColName);
-    const bool trackFitResultsRegistered = trackFitResults.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+    const bool trackFitResultsRegistered = trackFitResults.registerInDataStore();
 
     B2ASSERT("Could not register output store arrays for tracks.", tracksRegistered);
     B2ASSERT("Could not register output store arrays for track fit results.", trackFitResultsRegistered);
 
     tracks.registerRelationTo(m_RecoTracks);
-    firstCall = false;
   } else {
     StoreArray<Track> tracks;
     const bool tracksRegistered = tracks.isRequired(m_trackColName);

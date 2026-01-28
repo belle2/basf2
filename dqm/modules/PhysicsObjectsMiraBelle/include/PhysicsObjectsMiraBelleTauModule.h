@@ -19,13 +19,13 @@ namespace Belle2 {
    *
    *  A detailed description of your module.
    */
-  class PhysicsObjectsMiraBelleTrgEfficiencyModule : public HistoModule {
+  class PhysicsObjectsMiraBelleTauModule : public HistoModule {
   public:
 
     /**
      * Constructor.
      */
-    PhysicsObjectsMiraBelleTrgEfficiencyModule();
+    PhysicsObjectsMiraBelleTauModule();
 
     /**
      * Initializer.

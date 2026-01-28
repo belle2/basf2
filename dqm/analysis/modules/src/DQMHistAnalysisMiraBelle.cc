@@ -816,70 +816,77 @@ void DQMHistAnalysisMiraBelleModule::endRun()
 
   //L1 efficiency with taupair
   // get existing histograms produced by DQM modules
-  auto* histtau_L1ECL1x1 = findHist("PhysicsObjectsMiraBelleTrgEfficiency/hist_L1ECL1x1");
-  auto* histtau_L1ECL1x3 = findHist("PhysicsObjectsMiraBelleTrgEfficiency/hist_L1ECL1x3");
-  auto* histtau_L1CDC1x1 = findHist("PhysicsObjectsMiraBelleTrgEfficiency/hist_L1CDC1x1");
-  auto* histtau_L1CDC1x3 = findHist("PhysicsObjectsMiraBelleTrgEfficiency/hist_L1CDC1x3");
-  auto* histtau_L1CDCKLM1x1 = findHist("PhysicsObjectsMiraBelleTrgEfficiency/hist_L1CDCKLM1x1");
-  auto* histtau_L1CDCKLM1x3 = findHist("PhysicsObjectsMiraBelleTrgEfficiency/hist_L1CDCKLM1x3");
-  if (histtau_L1ECL1x1 == nullptr) {
+  auto* hist_tau_L1ECL1x1 = findHist("PhysicsObjectsMiraBelleTau/hist_L1ECL1x1");
+  auto* hist_tau_L1ECL1x3 = findHist("PhysicsObjectsMiraBelleTau/hist_L1ECL1x3");
+  auto* hist_tau_L1CDC1x1 = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDC1x1");
+  auto* hist_tau_L1CDC1x3 = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDC1x3");
+  auto* hist_tau_L1CDCKLM1x1 = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDCKLM1x1");
+  auto* hist_tau_L1CDCKLM1x3 = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDCKLM1x3");
+  if (hist_tau_L1ECL1x1 == nullptr) {
     B2ERROR("Can not find the histtau_L1ECL1x1 histogram!");
     return;
   }
-  if (histtau_L1ECL1x3 == nullptr) {
+  if (hist_tau_L1ECL1x3 == nullptr) {
     B2ERROR("Can not find the histtau_L1ECL1x3 histogram!");
     return;
   }
-  if (histtau_L1ECL1x1 == nullptr) {
-    B2ERROR("Can not find the histtau_L1ECL1x1 histogram!");
+  if (hist_tau_L1CDC1x1 == nullptr) {
+    B2ERROR("Can not find the histtau_L1CDC1x1 histogram!");
     return;
   }
-  if (histtau_L1ECL1x3 == nullptr) {
-    B2ERROR("Can not find the histtau_L1ECL1x3 histogram!");
+  if (hist_tau_L1CDC1x3 == nullptr) {
+    B2ERROR("Can not find the histtau_L1CDC1x3 histogram!");
     return;
   }
-  if (histtau_L1ECL1x1 == nullptr) {
-    B2ERROR("Can not find the histtau_L1ECL1x1 histogram!");
+  if (hist_tau_L1CDCKLM1x1 == nullptr) {
+    B2ERROR("Can not find the histtau_L1CDCKLM1x1 histogram!");
     return;
   }
-  if (histtau_L1ECL1x3 == nullptr) {
-    B2ERROR("Can not find the histtau_L1ECL1x3 histogram!");
+  if (hist_tau_L1CDCKLM1x3 == nullptr) {
+    B2ERROR("Can not find the histtau_L1CDCKLM1x3 histogram!");
     return;
   }
 
   // Variables needed for L1 efficiency using tau pairs
-  double Ntautau_ECL1x1[30];
-  double Ntautau_ECL1x3[30];
-  double Ntautau_CDC1x1[30];
-  double Ntautau_CDC1x3[30];
-  double Ntautau_CDCKLM1x1[30];
-  double Ntautau_CDCKLM1x3[30];
+  double Ntautau_ECL1x1[15];
+  double Ntautau_ECL1x3[15];
+  double Ntautau_CDC1x1[18];
+  double Ntautau_CDC1x3[18];
+  double Ntautau_CDCKLM1x1[7];
+  double Ntautau_CDCKLM1x3[7];
 
-  for (int bin = 1; bin < 30; bin++) {
-    Ntautau_ECL1x1[bin] = histtau_L1ECL1x1->GetBinContent(bin);
-    Ntautau_ECL1x3[bin] = histtau_L1ECL1x3->GetBinContent(bin);
-    Ntautau_CDC1x1[bin] = histtau_L1CDC1x1->GetBinContent(bin);
-    Ntautau_CDC1x3[bin] = histtau_L1CDC1x3->GetBinContent(bin);
-    Ntautau_CDCKLM1x1[bin] = histtau_L1CDCKLM1x1->GetBinContent(bin);
-    Ntautau_CDCKLM1x3[bin] = histtau_L1CDCKLM1x3->GetBinContent(bin);
+  for (int bin = 1; bin < 15; bin++) {
+    Ntautau_ECL1x1[bin] = hist_tau_L1ECL1x1->GetBinContent(bin);
+    Ntautau_ECL1x3[bin] = hist_tau_L1ECL1x3->GetBinContent(bin);
+  }
+  for (int bin = 1; bin < 18; bin++) {
+    Ntautau_CDC1x1[bin] = hist_tau_L1CDC1x1->GetBinContent(bin);
+    Ntautau_CDC1x3[bin] = hist_tau_L1CDC1x3->GetBinContent(bin);
+  }
+  for (int bin = 1; bin < 7; bin++) {
+    Ntautau_CDCKLM1x1[bin] = hist_tau_L1CDCKLM1x1->GetBinContent(bin);
+    Ntautau_CDCKLM1x3[bin] = hist_tau_L1CDCKLM1x3->GetBinContent(bin);
   }
 
 
   // set values
-  for (int bin = 1; bin < 30; bin++) {
+  for (int bin = 1; bin < 15; bin++) {
     if (Ntautau_ECL1x1[bin] != 0)
-      mon_tautau->setVariable(histtau_L1ECL1x1->GetXaxis()->GetBinLabel(bin), Ntautau_ECL1x1[bin]);
+      mon_tautau->setVariable(hist_tau_L1ECL1x1->GetXaxis()->GetBinLabel(bin), Ntautau_ECL1x1[bin]);
     if (Ntautau_ECL1x3[bin] != 0)
-      mon_tautau->setVariable(histtau_L1ECL1x3->GetXaxis()->GetBinLabel(bin), Ntautau_ECL1x3[bin]);
+      mon_tautau->setVariable(hist_tau_L1ECL1x3->GetXaxis()->GetBinLabel(bin), Ntautau_ECL1x3[bin]);
+  }
+  for (int bin = 1; bin < 18; bin++) {
     if (Ntautau_CDC1x1[bin] != 0)
-      mon_tautau->setVariable(histtau_L1CDC1x1->GetXaxis()->GetBinLabel(bin), Ntautau_CDC1x1[bin]);
+      mon_tautau->setVariable(hist_tau_L1CDC1x1->GetXaxis()->GetBinLabel(bin), Ntautau_CDC1x1[bin]);
     if (Ntautau_CDC1x3[bin] != 0)
-      mon_tautau->setVariable(histtau_L1CDC1x3->GetXaxis()->GetBinLabel(bin), Ntautau_CDC1x3[bin]);
+      mon_tautau->setVariable(hist_tau_L1CDC1x3->GetXaxis()->GetBinLabel(bin), Ntautau_CDC1x3[bin]);
+  }
+  for (int bin = 1; bin < 7; bin++) {
     if (Ntautau_CDCKLM1x1[bin] != 0)
-      mon_tautau->setVariable(histtau_L1CDCKLM1x1->GetXaxis()->GetBinLabel(bin), Ntautau_CDCKLM1x1[bin]);
+      mon_tautau->setVariable(hist_tau_L1CDCKLM1x1->GetXaxis()->GetBinLabel(bin), Ntautau_CDCKLM1x1[bin]);
     if (Ntautau_CDCKLM1x3[bin] != 0)
-      mon_tautau->setVariable(histtau_L1CDCKLM1x3->GetXaxis()->GetBinLabel(bin), Ntautau_CDCKLM1x3[bin]);
-
+      mon_tautau->setVariable(hist_tau_L1CDCKLM1x3->GetXaxis()->GetBinLabel(bin), Ntautau_CDCKLM1x3[bin]);
   }
 
   //bhabha,hadrons

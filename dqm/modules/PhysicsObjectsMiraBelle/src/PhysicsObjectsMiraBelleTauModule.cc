@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <dqm/modules/PhysicsObjectsMiraBelle/PhysicsObjectsMiraBelleTrgEfficiencyModule.h>
+#include <dqm/modules/PhysicsObjectsMiraBelle/PhysicsObjectsMiraBelleTauModule.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -20,9 +20,9 @@
 
 using namespace Belle2;
 
-REG_MODULE(PhysicsObjectsMiraBelleTrgEfficiency);
+REG_MODULE(PhysicsObjectsMiraBelleTau);
 
-PhysicsObjectsMiraBelleTrgEfficiencyModule::PhysicsObjectsMiraBelleTrgEfficiencyModule() : HistoModule()
+PhysicsObjectsMiraBelleTauModule::PhysicsObjectsMiraBelleTauModule() : HistoModule()
 {
   setDescription("Monitor Physics Objects Quality");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -40,11 +40,11 @@ PhysicsObjectsMiraBelleTrgEfficiencyModule::PhysicsObjectsMiraBelleTrgEfficiency
 
 }
 
-void PhysicsObjectsMiraBelleTrgEfficiencyModule::defineHisto()
+void PhysicsObjectsMiraBelleTauModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("PhysicsObjectsMiraBelleTrgEfficiency");
-  oldDir->cd("PhysicsObjectsMiraBelleTrgEfficiency");
+  oldDir->mkdir("PhysicsObjectsMiraBelleTau");
+  oldDir->cd("PhysicsObjectsMiraBelleTau");
 
   // Create histograms for efficiency of ECL bits
   m_h_L1ECL1x1 = new TH1F("hist_L1ECL1x1", "hist_L1ECL1x1", 30, 0, 30);
@@ -96,7 +96,7 @@ void PhysicsObjectsMiraBelleTrgEfficiencyModule::defineHisto()
 }
 
 
-void PhysicsObjectsMiraBelleTrgEfficiencyModule::initialize()
+void PhysicsObjectsMiraBelleTauModule::initialize()
 {
   REG_HISTOGRAM
 
@@ -104,7 +104,7 @@ void PhysicsObjectsMiraBelleTrgEfficiencyModule::initialize()
   result.isOptional();
 }
 
-void PhysicsObjectsMiraBelleTrgEfficiencyModule::beginRun()
+void PhysicsObjectsMiraBelleTauModule::beginRun()
 {
   m_h_L1ECL1x1->Reset();
   m_h_L1ECL1x3->Reset();
@@ -115,7 +115,7 @@ void PhysicsObjectsMiraBelleTrgEfficiencyModule::beginRun()
 
 }
 
-void PhysicsObjectsMiraBelleTrgEfficiencyModule::event()
+void PhysicsObjectsMiraBelleTauModule::event()
 {
 
   StoreObjPtr<SoftwareTriggerResult> result;
@@ -148,71 +148,74 @@ void PhysicsObjectsMiraBelleTrgEfficiencyModule::event()
 
     //Get 1x1 tau pairs for L1 efficiency calculation
     StoreObjPtr<ParticleList> Z0Particles1x1(m_tautau1x1PListName);
-    if (Z0Particles1x1.isValid() && Z0Particles1x1->getListSize() > 0) {
-      // Fill ECL histogram
-      // Reference: CDC bits (fff||ffo), Target: ECL bits
-      // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of ECL bit in x>1 bin = N(x>1)/N(x=1)]
-      if (m_CDC_ref)
-        m_h_L1ECL1x1->Fill(1);
-      int bin = 2;
-      // Loop over ECL bits
-      for (const auto& bit : m_ECLTrgBit) {
-        if (m_trgSummary.isValid()) {
-          bool m_ECL_target = false;
-          try {
-            m_ECL_target = m_trgSummary->testFtdl(bit.c_str());
-          } catch (const std::exception&) {
-            m_ECL_target = false;
+    if (Z0Particles1x1.isValid()) {
+      for (unsigned int i = 0; i < Z0Particles1x1->getListSize(); i++) {
+        // Fill ECL histogram
+        // Reference: CDC bits (fff||ffo), Target: ECL bits
+        // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of ECL bit in x>1 bin = N(x>1)/N(x=1)]
+        if (m_CDC_ref)
+          m_h_L1ECL1x1->Fill(1);
+        int bin = 2;
+        // Loop over ECL bits
+        for (const auto& bit : m_ECLTrgBit) {
+          if (m_trgSummary.isValid()) {
+            bool m_ECL_target = false;
+            try {
+              m_ECL_target = m_trgSummary->testFtdl(bit.c_str());
+            } catch (const std::exception&) {
+              m_ECL_target = false;
+            }
+
+            if (m_CDC_ref && m_ECL_target)
+              m_h_L1ECL1x1->Fill(bin);
           }
-
-          if (m_CDC_ref && m_ECL_target)
-            m_h_L1ECL1x1->Fill(bin);
+          bin++;
         }
-        bin++;
-      }
 
-      // Fill CDC histogram
-      // Reference: ECL bits (hie||c4||eclmumu), Target: CDC bits
-      // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of CDC bit in x>1 bin = N(x>1)/N(x=1)]
-      if (m_ECL_ref)
-        m_h_L1CDC1x1->Fill(1);
-      bin = 2;
-      // Loop over CDC bits
-      for (const auto& bit : m_CDCTrgBit) {
-        if (m_trgSummary.isValid()) {
-          bool m_CDC_target = false;
-          try {
-            m_CDC_target = m_trgSummary->testFtdl(bit.c_str());
-          } catch (const std::exception&) {
-            m_CDC_target = false;
+        // Fill CDC histogram
+        // Reference: ECL bits (hie||c4||eclmumu), Target: CDC bits
+        // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of CDC bit in x>1 bin = N(x>1)/N(x=1)]
+        if (m_ECL_ref)
+          m_h_L1CDC1x1->Fill(1);
+        bin = 2;
+        // Loop over CDC bits
+        for (const auto& bit : m_CDCTrgBit) {
+          if (m_trgSummary.isValid()) {
+            bool m_CDC_target = false;
+            try {
+              m_CDC_target = m_trgSummary->testFtdl(bit.c_str());
+            } catch (const std::exception&) {
+              m_CDC_target = false;
+            }
+
+            if (m_ECL_ref && m_CDC_target)
+              m_h_L1CDC1x1->Fill(bin);
           }
-
-          if (m_ECL_ref && m_CDC_target)
-            m_h_L1CDC1x1->Fill(bin);
+          bin++;
         }
-        bin++;
-      }
 
-      // Fill CDC-KLM histogram
-      // Reference: ECL bits (hie||c4||eclmumu), Target: CDC-KLM bits
-      // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of CDC-KLM bit in x>1 bin = N(x>1)/N(x=1)]
-      if (m_ECL_ref)
-        m_h_L1CDCKLM1x1->Fill(1);
-      bin = 2;
-      // Loop over CDC bits
-      for (const auto& bit : m_CDCKLMTrgBit) {
-        if (m_trgSummary.isValid()) {
-          bool m_CDCKLM_target = false;
-          try {
-            m_CDCKLM_target = m_trgSummary->testFtdl(bit.c_str());
-          } catch (const std::exception&) {
-            m_CDCKLM_target = false;
+        // Fill CDC-KLM histogram
+        // Reference: ECL bits (hie||c4||eclmumu), Target: CDC-KLM bits
+        // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of CDC-KLM bit in x>1 bin = N(x>1)/N(x=1)]
+        if (m_ECL_ref)
+          m_h_L1CDCKLM1x1->Fill(1);
+        bin = 2;
+        // Loop over CDC bits
+        for (const auto& bit : m_CDCKLMTrgBit) {
+          if (m_trgSummary.isValid()) {
+            bool m_CDCKLM_target = false;
+            try {
+              m_CDCKLM_target = m_trgSummary->testFtdl(bit.c_str());
+            } catch (const std::exception&) {
+              m_CDCKLM_target = false;
+            }
+
+            if (m_ECL_ref && m_CDCKLM_target)
+              m_h_L1CDCKLM1x1->Fill(bin);
           }
-
-          if (m_ECL_ref && m_CDCKLM_target)
-            m_h_L1CDCKLM1x1->Fill(bin);
+          bin++;
         }
-        bin++;
+
       }
 
     }
@@ -226,70 +229,72 @@ void PhysicsObjectsMiraBelleTrgEfficiencyModule::event()
 
     //Get 1x3 tau pairs for L1 efficiency calculation
     StoreObjPtr<ParticleList> Z0Particles1x3(m_tautau1x3PListName);
-    if (Z0Particles1x3.isValid() && Z0Particles1x3->getListSize() > 0) {
-      // Fill ECL histogram
-      // Reference: CDC bits (fff||ffo), Target: ECL bits
-      // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of ECL bit in x>1 bin = N(x>1)/N(x=1)]
-      if (m_CDC_ref)
-        m_h_L1ECL1x3->Fill(1);
-      int bin = 2;
-      // Loop over ECL bits
-      for (const auto& bit : m_ECLTrgBit) {
-        bool m_ECL_target = false;
-        if (m_trgSummary.isValid()) {
-          try {
-            m_ECL_target = m_trgSummary->testFtdl(bit.c_str());
-          } catch (const std::exception&) {
-            m_ECL_target = false;
+    if (Z0Particles1x3.isValid()) {
+      for (unsigned int i = 0; i < Z0Particles1x3->getListSize(); i++) {
+        // Fill ECL histogram
+        // Reference: CDC bits (fff||ffo), Target: ECL bits
+        // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of ECL bit in x>1 bin = N(x>1)/N(x=1)]
+        if (m_CDC_ref)
+          m_h_L1ECL1x3->Fill(1);
+        int bin = 2;
+        // Loop over ECL bits
+        for (const auto& bit : m_ECLTrgBit) {
+          if (m_trgSummary.isValid()) {
+            bool m_ECL_target = false;
+            try {
+              m_ECL_target = m_trgSummary->testFtdl(bit.c_str());
+            } catch (const std::exception&) {
+              m_ECL_target = false;
+            }
+
+            if (m_CDC_ref && m_ECL_target)
+              m_h_L1ECL1x3->Fill(bin);
           }
-
-          if (m_CDC_ref && m_ECL_target)
-            m_h_L1ECL1x3->Fill(bin);
+          bin++;
         }
-        bin++;
-      }
-      // Fill CDC histogram
-      // Reference: ECL bits (hie||c4||eclmumu), Target: CDC bits
-      // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of CDC bit in x>1 bin = N(x>1)/N(x=1)]
-      if (m_ECL_ref)
-        m_h_L1CDC1x3->Fill(1);
-      bin = 2;
-      // Loop over CDC bits
-      for (const auto& bit : m_CDCTrgBit) {
-        bool m_CDC_target = false;
-        if (m_trgSummary.isValid()) {
-          try {
-            m_CDC_target = m_trgSummary->testFtdl(bit.c_str());
-          } catch (const std::exception&) {
-            m_CDC_target = false;
+        // Fill CDC histogram
+        // Reference: ECL bits (hie||c4||eclmumu), Target: CDC bits
+        // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of CDC bit in x>1 bin = N(x>1)/N(x=1)]
+        if (m_ECL_ref)
+          m_h_L1CDC1x3->Fill(1);
+        bin = 2;
+        // Loop over CDC bits
+        for (const auto& bit : m_CDCTrgBit) {
+          if (m_trgSummary.isValid()) {
+            bool m_CDC_target = false;
+            try {
+              m_CDC_target = m_trgSummary->testFtdl(bit.c_str());
+            } catch (const std::exception&) {
+              m_CDC_target = false;
+            }
+
+            if (m_ECL_ref && m_CDC_target)
+              m_h_L1CDC1x3->Fill(bin);
           }
-
-          if (m_ECL_ref && m_CDC_target)
-            m_h_L1CDC1x3->Fill(bin);
+          bin++;
         }
-        bin++;
-      }
+        // Fill CDC-KLM histogram
+        // Reference: ECL bits (hie||c4||eclmumu), Target: CDC-KLM bits
+        // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of CDC-KLM bit in x>1 bin = N(x>1)/N(x=1)]
+        if (m_ECL_ref)
+          m_h_L1CDCKLM1x3->Fill(1);
+        bin = 2;
+        // Loop over CDC bits
+        for (const auto& bit : m_CDCKLMTrgBit) {
+          if (m_trgSummary.isValid()) {
+            bool m_CDCKLM_target = false;
+            try {
+              m_CDCKLM_target = m_trgSummary->testFtdl(bit.c_str());
+            } catch (const std::exception&) {
+              m_CDCKLM_target = false;
+            }
 
-      // Fill CDC-KLM histogram
-      // Reference: ECL bits (hie||c4||eclmumu), Target: CDC-KLM bits
-      // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of CDC-KLM bit in x>1 bin = N(x>1)/N(x=1)]
-      if (m_ECL_ref)
-        m_h_L1CDCKLM1x3->Fill(1);
-      bin = 2;
-      // Loop over CDC bits
-      for (const auto& bit : m_CDCKLMTrgBit) {
-        bool m_CDCKLM_target = false;
-        if (m_trgSummary.isValid()) {
-          try {
-            m_CDCKLM_target = m_trgSummary->testFtdl(bit.c_str());
-          } catch (const std::exception&) {
-            m_CDCKLM_target = false;
+            if (m_ECL_ref && m_CDCKLM_target)
+              m_h_L1CDCKLM1x3->Fill(bin);
           }
-
-          if (m_ECL_ref && m_CDCKLM_target)
-            m_h_L1CDCKLM1x3->Fill(bin);
+          bin++;
         }
-        bin++;
+
       }
 
     }
@@ -300,11 +305,11 @@ void PhysicsObjectsMiraBelleTrgEfficiencyModule::event()
 
 }
 
-void PhysicsObjectsMiraBelleTrgEfficiencyModule::endRun()
+void PhysicsObjectsMiraBelleTauModule::endRun()
 {
 }
 
-void PhysicsObjectsMiraBelleTrgEfficiencyModule::terminate()
+void PhysicsObjectsMiraBelleTauModule::terminate()
 {
 }
 

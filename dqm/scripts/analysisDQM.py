@@ -193,10 +193,10 @@ def add_mirabelle_dqm(path):
     ma.cutAndCopyLists(
         'gamma:goodMiraBelleTau',
         'gamma:MiraBelleTau',
-        '0.2<E and !isDescendantOfList(pi0:MiraBelleTau,1)',
+        '0.2<E and isDescendantOfList(pi0:MiraBelleTau)==0',
         path=MiraBelleTau_path)
     vm.addAlias("nPi0Tau", "countInList(pi0:MiraBelleTau)")
-    ma.buildEventShape(['pi+:MiraBelleTau', 'mu+:MiraBelleTau', 'pi+:MiraBelleTau', 'gamma:good'],
+    ma.buildEventShape(['pi+:MiraBelleTau', 'gamma:MiraBelleTau'],
                        thrust=True,
                        foxWolfram=False,
                        cleoCones=False,
@@ -230,7 +230,7 @@ def add_mirabelle_dqm(path):
             'Z0:physMiraBelleTau1x3 -> pi+:MiraBelleTau1prong tau-:MiraBelleTau3prong',
             f'{Tau1x3Cuts} and [nGoodGammaTauPara <= 1] and [nGoodGammaTauAnti <= 1] and [nPi0Tau <= 2]',
             path=MiraBelleTau_path)
-    MiraBelleTau = b2.register_module('PhysicsObjectsMiraBelleTrgEfficiency')
+    MiraBelleTau = b2.register_module('PhysicsObjectsMiraBelleTau')
     MiraBelleTau.param('tautau1x1PListName', 'Z0:physMiraBelleTau1x1')
     MiraBelleTau.param('tautau1x3PListName', 'Z0:physMiraBelleTau1x3')
     MiraBelleTau_path.add_module(MiraBelleTau)

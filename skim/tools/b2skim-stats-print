@@ -157,10 +157,10 @@ def getArgumentParser():
 
     SampleGroup = parser.add_mutually_exclusive_group()
     SampleGroup.add_argument(
-        "--mconly", action="store_true", help="Test on only MC samples."
+        "--mc-only", action="store_true", help="Test on only MC samples."
     )
     SampleGroup.add_argument(
-        "--dataonly", action="store_true", help="Test on only data samples."
+        "--data-only", action="store_true", help="Test on only data samples."
     )
 
     parser.add_argument(
@@ -1327,9 +1327,9 @@ if __name__ == "__main__":
 
     # Get list of test samples from b2skim-stats-submit output metadata.json
     samples = TestSampleList(SampleDict=metadata["Samples"])
-    if args.mconly:
+    if args.mc_only:
         samples = TestSampleList(SampleList=samples.mc_samples)
-    if args.dataonly:
+    if args.data_only:
         samples = TestSampleList(SampleList=samples.data_samples)
 
     statSpecifier = getStatSpecifier()
@@ -1343,7 +1343,7 @@ if __name__ == "__main__":
     )
 
     # NOTE: can't calculate weighted MC averages for combined skims, since certain stats are lists
-    if not args.dataonly and not args.combined:
+    if not args.data_only and not args.combined:
         allSkimStats = addWeightedMC(allSkimStats, statSpecifier, samples, args.VERBOSE)
 
     if args.confluence:

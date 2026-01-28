@@ -9,8 +9,8 @@
 
 #include <tracking/trackFindingCDC/hough/boxes/Box.h>
 #include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
 
 #include <framework/gearbox/Unit.h>
@@ -52,8 +52,8 @@ namespace Belle2 {
       using HoughBox = Box<DiscreteQ, DiscreteP, DiscreteZ0>;
 
       /// Returns weight of the hit for the given hough box; in this algorithm - 1 if hit inside the box, NaN otherwise
-      Weight operator()(const CDCRecoHit3D& recoHit,
-                        const HoughBox* hyperBox)
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCRecoHit3D& recoHit,
+                                           const HoughBox* hyperBox)
       {
         const float lowerQ = *(hyperBox->getLowerBound<DiscreteQ>()); //DiscreteValue is based on std::vector<T>::const_iterator
         const float upperQ = *(hyperBox->getUpperBound<DiscreteQ>());
@@ -79,7 +79,8 @@ namespace Belle2 {
       * Compares distances from two hits to the track represented by the given box.
       * The comparison is done based on reconstructed Z coordinates of hits and track Z position.
       */
-      static bool compareDistances(const HoughBox& hyperBox, const CDCRecoHit3D& lhsRecoHit, const CDCRecoHit3D& rhsRecoHit)
+      static bool compareDistances(const HoughBox& hyperBox, const TrackingUtilities::CDCRecoHit3D& lhsRecoHit,
+                                   const TrackingUtilities::CDCRecoHit3D& rhsRecoHit)
       {
         const float centerQ = *(hyperBox.getCenter<0>());
         const float centerP = *(hyperBox.getCenter<1>());

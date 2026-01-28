@@ -1455,7 +1455,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         * 19 hadronic channels for tag :math:`\\Lambda_{c}^{+}` reconstruction
 
     **Selection Criteria**:
-        * Cut on :math:`\\pi^{+}, K^{+}` : charm_skim_std_charged pion and kaon with PIDNN > 0.1
+        * Cut on :math:`\\pi^{+}, K^{+}` : charm_skim_std_charged pion and kaon with pionID > 0.01 and kaonID > 0.1
         * Cut on :math:`p^{+}` : abs(dr) < 1.0 and abs(dz) < 3.0 and protonID > 0.1
         * Cut on :math:`\\gamma` : E > 0.05
         * Cut on :math:`\\pi^{0}\\to \\gamma \\gamma` : 0.115 < M < 0.160

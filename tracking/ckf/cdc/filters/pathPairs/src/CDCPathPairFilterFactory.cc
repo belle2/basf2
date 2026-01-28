@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/ckf/cdc/filters/pathPairs/CDCPathPairFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
 
 #include <tracking/ckf/cdc/filters/pathPairs/DistanceBasedCDCPathPairFilter.h>
 #include <tracking/ckf/cdc/filters/pathPairs/DuplicateCDCPathPairFilter.h>
@@ -17,11 +17,11 @@
 #include <tracking/ckf/cdc/filters/pathPairs/ArcLengthBasedCDCfromEclPathPairFilter.h>
 #include <tracking/ckf/cdc/filters/pathPairs/MCTruthCDCPathPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 CDCPathPairFilterFactory::CDCPathPairFilterFactory(const std::string& defaultFilterName)
@@ -60,10 +60,10 @@ std::unique_ptr<BaseCDCPathPairFilter>
 CDCPathPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BaseCDCPathPairFilter>>();
+    return std::make_unique<TrackingUtilities::NoneFilter<BaseCDCPathPairFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
-    return std::make_unique<TrackFindingCDC::AllFilter<BaseCDCPathPairFilter>>();
+    return std::make_unique<TrackingUtilities::AllFilter<BaseCDCPathPairFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "distance") {
     return std::make_unique<DistanceBasedCDCPathPairFilter>();

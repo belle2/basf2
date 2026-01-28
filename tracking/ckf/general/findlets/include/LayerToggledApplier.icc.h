@@ -9,7 +9,7 @@
 
 #include <tracking/ckf/general/findlets/LayerToggledApplier.dcl.h>
 #include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 namespace Belle2 {
 
@@ -27,19 +27,19 @@ namespace Belle2 {
   void LayerToggledApplier<AState, AFindlet>::exposeParameters(ModuleParamList* moduleParamList,
       const std::string& prefix)
   {
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "toggleOnLayer"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "toggleOnLayer"),
                                   m_param_toggleOnLayer, "Where to toggle between low, equal and high filter",
                                   m_param_toggleOnLayer);
 
-    m_highLayerFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "high"));
-    m_equalLayerFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "equal"));
-    m_lowLayerFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "low"));
+    m_highLayerFindlet.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "high"));
+    m_equalLayerFindlet.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "equal"));
+    m_lowLayerFindlet.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "low"));
   }
 
   /// The weight is calculated using the subfilter based on the geometrical layer of the state.
   template <class AState, class AFindlet>
-  void LayerToggledApplier<AState, AFindlet>::apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
-                                                    std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
+  void LayerToggledApplier<AState, AFindlet>::apply(const std::vector<TrackingUtilities::WithWeight<const AState*>>& currentPath,
+                                                    std::vector<TrackingUtilities::WithWeight<AState*>>& childStates)
   {
     const AState* previousState = currentPath.back();
     const int layer = previousState->getGeometricalLayer();

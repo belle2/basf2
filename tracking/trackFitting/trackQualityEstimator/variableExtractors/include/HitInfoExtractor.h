@@ -24,7 +24,7 @@ namespace Belle2 {
     /** Constructor fills variableSet with variables to be extracted
      * @param variableSet set of variable to be filled
      */
-    explicit HitInfoExtractor(std::vector<Named<float*>>& variableSet) :
+    explicit HitInfoExtractor(std::vector<TrackingUtilities::Named<float*>>& variableSet) :
       VariableExtractor()
     {
       addVariable("N_TrackPoints_without_KalmanFitterInfo", variableSet);
@@ -117,7 +117,7 @@ namespace Belle2 {
 
   protected:
     /// initialize statistics subsets of variables from clusters that get combined for SPTC
-    void initializeStats(const std::string& identifier, std::vector<Named<float*>>& variables)
+    void initializeStats(const std::string& identifier, std::vector<TrackingUtilities::Named<float*>>& variables)
     {
       addVariable(identifier + "_max", variables);
       addVariable(identifier + "_min", variables);

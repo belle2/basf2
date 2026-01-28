@@ -12,13 +12,14 @@
 #include <tracking/trackFindingCDC/filters/cluster/UnionRecordingClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/cluster/MVABackgroundClusterFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
 
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::FilterFactory<BaseClusterFilter>;
+template class TrackingUtilities::FilterFactory<BaseClusterFilter>;
 
 ClusterFilterFactory::ClusterFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

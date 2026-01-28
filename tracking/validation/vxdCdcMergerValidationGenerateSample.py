@@ -13,7 +13,9 @@
   <contact>software-tracking@belle2.org</contact>
   <output>VxdCdcValidationHarvested.root</output>
   <input>EvtGenSimNoBkg.root</input>
-  <description>This module generates events for the V0 validation.</description>
+  <description>
+    This script creates a sample for the validation of the simple CDC+SVD track merging algorithm without background.
+  </description>
 </header>
 """
 

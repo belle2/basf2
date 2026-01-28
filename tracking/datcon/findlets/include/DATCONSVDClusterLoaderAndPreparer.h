@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <string>
@@ -24,10 +24,10 @@ namespace Belle2 {
    * of coordinates for finding track candidates in r-phi and r-z.
    */
   class DATCONSVDClusterLoaderAndPreparer : public
-    TrackFindingCDC::Findlet<const SVDCluster, const SVDCluster, std::pair<VxdID, std::pair<long, long>>,
+    TrackingUtilities::Findlet<const SVDCluster, const SVDCluster, std::pair<VxdID, std::pair<long, long>>,
         std::pair<VxdID, std::pair<long, long>>> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const SVDCluster, const SVDCluster, std::pair<VxdID, std::pair<long, long>>,
+    using Super = TrackingUtilities::Findlet<const SVDCluster, const SVDCluster, std::pair<VxdID, std::pair<long, long>>,
           std::pair<VxdID, std::pair<long, long>>>;
 
   public:

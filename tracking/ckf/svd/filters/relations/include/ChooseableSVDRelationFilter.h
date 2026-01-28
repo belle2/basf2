@@ -9,9 +9,9 @@
 
 #include <tracking/ckf/svd/filters/relations/LayerSVDRelationFilter.dcl.h>
 #include <tracking/ckf/svd/filters/relations/SVDPairFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   /// A chooseable filter for picking out the relations between states
-  using ChooseableSVDRelationFilter = LayerSVDRelationFilter<TrackFindingCDC::ChooseableFilter<SVDPairFilterFactory>>;
+  using ChooseableSVDRelationFilter = LayerSVDRelationFilter<TrackingUtilities::ChooseableFilter<SVDPairFilterFactory>>;
 }

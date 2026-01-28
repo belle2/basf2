@@ -56,7 +56,8 @@ ECLLocalMaximumFinderModule::ECLLocalMaximumFinderModule() : Module(),
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add module parameters.
-  addParam("energyCut", m_energyCut, "Seed energy cut [MeV], minimum is 5.0 MeV.", 20.0 * Belle2::Unit::MeV);
+  addParam("energyCut", m_energyCut, "Seed energy cut, minimum is 5.0 MeV.", 20.0 * Belle2::Unit::MeV);
+  addParam("useParametersFromDatabase", m_useParametersFromDatabase, "get energyCut from payload", true);
   addParam("isTrainingMode", m_isTrainingMode,
            "Run in training mode (i.e. fill file with MVA input variables and determine MC truth of LM.).", 0);
   addParam("outfileName", m_outfileName, "Output file name for training file.", std::string("ECLLocalMaximumFinderOutput.root"));
@@ -83,12 +84,6 @@ void ECLLocalMaximumFinderModule::initialize()
   m_eclLocalMaximums.registerInDataStore(eclLocalMaximumArrayName());
   m_eclConnectedRegions.registerRelationTo(m_eclLocalMaximums);
   m_eventLevelClusteringInfo.isRequired();
-
-  // Check user input.
-  if (m_energyCut < c_minEnergyCut) {
-    B2WARNING("ECLLocalMaximumFinderModule::initialize: Energy threshold too small, resetting to " << c_minEnergyCut << " GeV");
-    m_energyCut = c_minEnergyCut;
-  }
 
   if (m_truthFraction < 1e-6) {
     B2WARNING("ECLLocalMaximumFinderModule::initialize: Matching fraction must be above 1e-6, input: " << m_truthFraction <<
@@ -158,10 +153,26 @@ void ECLLocalMaximumFinderModule::initialize()
 
 }
 
+
+//-----------------------------------------------------------------
+//..By default, get the threshold for seed energies, m_energyCut, from the
+//  eclClusteringParameters dbObject
 void ECLLocalMaximumFinderModule::beginRun()
 {
-  ;
+  if (m_useParametersFromDatabase and m_eclClusteringParameters.hasChanged()) {
+    m_energyCut = m_eclClusteringParameters->getLMEnergyCut();
+  }
+
+  // Check user input.
+  if (m_energyCut < c_minEnergyCut) {
+    B2WARNING("ECLLocalMaximumFinderModule::beginRun: Energy threshold " << m_energyCut << " GeV is too small, resetting to " <<
+              c_minEnergyCut << " GeV");
+    m_energyCut = c_minEnergyCut;
+  }
 }
+
+
+//-----------------------------------------------------------------
 
 void ECLLocalMaximumFinderModule::event()
 {
@@ -331,7 +342,6 @@ void ECLLocalMaximumFinderModule::event()
       } // end CalDigit loop
 
       makeLocalMaximum(aCR, highestEnergyCellId, 0);
-
     }
 
   } // end CR loop

@@ -7,17 +7,17 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Scalar.h>
+#include <tracking/trackingUtilities/utilities/Scalar.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Mixin class to attach a mark that is shared among many instances.
     template<class T>
-    class WithSharedMark : public ScalarToClass<T> {
+    class WithSharedMark : public TrackingUtilities::ScalarToClass<T> {
     private:
       /// Base class of the mixin
-      using Super = ScalarToClass<T>;
+      using Super = TrackingUtilities::ScalarToClass<T>;
 
     public:
       /// Mixin class Wraps an object including r the mark is provided from a shared position.

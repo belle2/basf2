@@ -7,14 +7,15 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterBackgroundDetector.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <vector>
 #include <string>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 ClusterBackgroundDetector::ClusterBackgroundDetector()
 {

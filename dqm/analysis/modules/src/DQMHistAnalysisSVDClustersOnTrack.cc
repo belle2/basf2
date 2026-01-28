@@ -46,8 +46,6 @@ DQMHistAnalysisSVDClustersOnTrackModule::DQMHistAnalysisSVDClustersOnTrackModule
   addParam("statThreshold", m_statThreshold, "Minimal number of events to compare histograms", double(10000.));
   addParam("timeThreshold", m_timeThreshold, "Acceptable difference between mean of central peak for present and reference run",
            double(6)); // 6 ns
-  addParam("refMCTP", m_refMeanP, "Mean of the signal time peak from Physics reference run", float(0.0)); // Approximate, from exp 20
-  addParam("refMCTC", m_refMeanC, "Mean of the signal time peak from Cosmic reference run", float(0.0));  //
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 }
@@ -89,8 +87,8 @@ void DQMHistAnalysisSVDClustersOnTrackModule::beginRun()
   // cluster time on tracks legend
   m_legProblem->Clear();
   m_legProblem->AddText("ERROR!");
-  m_legProblem->AddText(Form("abs(Mean) > %3.1f ns", m_timeThreshold));
-  m_legProblem->AddText("Mean (#pm 40 ns): 0.0 ns");
+  m_legProblem->AddText(Form("abs(Mode) > %3.1f ns", m_timeThreshold));
+  m_legProblem->AddText("Mode: 0.0 ns");
 
 
   m_legWarning->Clear();
@@ -98,8 +96,8 @@ void DQMHistAnalysisSVDClustersOnTrackModule::beginRun()
 
   m_legNormal->Clear();
   m_legNormal->AddText("TIME SHIFT UNDER LIMIT");
-  m_legNormal->AddText(Form("abs(Mean) < %3.1f ns", m_timeThreshold));
-  m_legNormal->AddText("Mean (#pm 40 ns): 0.0 ns");
+  m_legNormal->AddText(Form("abs(Mode) < %3.1f ns", m_timeThreshold));
+  m_legNormal->AddText("Mode: 0.0 ns");
 
   m_legLowStat->Clear();
   m_legLowStat->AddText("Not enough statistics");
@@ -147,9 +145,13 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
     TString hName = getHistoNameFromCanvas(m_cClusterOnTrackTime_L456V->GetName());
     m_hClusterOnTrackTime_L456V.SetName(hName.Data());
     m_hClusterOnTrackTime_L456V.SetTitle(Form("ClusterOnTrack Time L456V %s", runID.Data()));
+    m_hClusterOnTrackTime_L456V.SetStats(false);
+
+    Int_t binMax = m_hClusterOnTrackTime_L456V.GetMaximumBin();
+    double mode = m_hClusterOnTrackTime_L456V.GetXaxis()->GetBinCenter(binMax);
 
     if (nEvents > m_statThreshold)
-      status = getCanvasStatus(m_hClusterOnTrackTime_L456V);
+      status = getCanvasStatus(mode);
     else
       status = lowStat;
 
@@ -179,8 +181,12 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
       m_hClusterOnTrackTimeL456V3Samples.SetName(hName.Data());
       m_hClusterOnTrackTimeL456V3Samples.SetTitle(Form("ClusterOnTrack Time L456V 3 samples %s", runID.Data()));
 
+      Int_t binMax = m_hClusterOnTrackTime_L456V.GetMaximumBin();
+      double mode = m_hClusterOnTrackTime_L456V.GetXaxis()->GetBinCenter(binMax);
+
+
       if (nEvents > m_statThreshold)
-        status = getCanvasStatus(m_hClusterOnTrackTimeL456V3Samples);
+        status = getCanvasStatus(mode);
       else
         status = lowStat;
 
@@ -218,33 +224,19 @@ void DQMHistAnalysisSVDClustersOnTrackModule::terminate()
   delete m_cClusterOnTrackTimeL456V3Samples;
 }
 
-int DQMHistAnalysisSVDClustersOnTrackModule::getCanvasStatus(TH1F& histo)
+int DQMHistAnalysisSVDClustersOnTrackModule::getCanvasStatus(double mode)
 {
   int status = good;
-  histo.GetXaxis()->SetRange(110, 190); // [-40 ns,40 ns]
-  Float_t mean_PeakInCenter = histo.GetMean(); //
-  histo.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
-  Float_t difference = 0;
 
-  if (m_runtype == "physics")
-    difference = fabs(mean_PeakInCenter - m_refMeanP);
-
-  else if (m_runtype == "cosmic")
-    difference = fabs(mean_PeakInCenter - m_refMeanC);
-
-  else {// taking cosmic limits
-    B2WARNING("Run type:" << m_runtype << "taken cosmics criteria");
-    difference = fabs(mean_PeakInCenter - m_refMeanC);
-  }
-
-  if (difference > m_timeThreshold) {
+  if (fabs(mode) > m_timeThreshold) {
     status = error;
     TText* text = m_legProblem->GetLine(m_legProblem->GetSize() - 1);
-    text->SetText(text->GetX(), text->GetY(), Form("Mean (#pm 40 ns): %3.1f ns", mean_PeakInCenter));
+    text->SetText(text->GetX(), text->GetY(), Form("Mode: %3.1f ns", mode));
   } else {
     status = good;
     TText* text = m_legNormal->GetLine(m_legNormal->GetSize() - 1);
-    text->SetText(text->GetX(), text->GetY(), Form("Mean (#pm 40 ns): %3.1f ns", mean_PeakInCenter));
+    text->SetText(text->GetX(), text->GetY(), Form("Mode: %3.1f ns", mode));
   }
+
   return status;
 }

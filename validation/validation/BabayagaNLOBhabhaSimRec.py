@@ -12,7 +12,7 @@
 <header>
   <output>BabayagaNLOBhabhaSimRec.root</output>
   <cacheable/>
-  <contact>arul.prakash@physik.uni-muenchen.de</contact>
+  <contact>giacomo.pietro@kit.edu</contact>
   <description>
     This steering file produces 1000 radiative Bhabha events with
     Babayaga.NLO, runs the detector simulation with mixed in background, and
@@ -72,7 +72,7 @@ process(main, calculateStatistics=True)
 
 statistics_plots(
     "BabayagaNLOBhabhaSimRec_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation and reconstruction job with radiative "
     "Bhabha events using Babayaga.NLO",
     prefix="BabayagaNLOBhabhaSimRec",
@@ -80,7 +80,7 @@ statistics_plots(
 event_timing_plot(
     "../BabayagaNLOBhabhaSimRec.root",
     "BabayagaNLOBhabhaSimRec_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation and reconstruction job with radiative "
     "Bhabha events using Babayaga.NLO",
     prefix="BabayagaNLOBhabhaSimRec",

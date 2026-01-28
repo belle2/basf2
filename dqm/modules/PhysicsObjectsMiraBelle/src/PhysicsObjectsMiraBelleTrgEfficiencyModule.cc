@@ -157,8 +157,8 @@ void PhysicsObjectsMiraBelleTrgEfficiencyModule::event()
       int bin = 2;
       // Loop over ECL bits
       for (const auto& bit : m_ECLTrgBit) {
-        bool m_ECL_target = false;
         if (m_trgSummary.isValid()) {
+          bool m_ECL_target = false;
           try {
             m_ECL_target = m_trgSummary->testFtdl(bit.c_str());
           } catch (const std::exception&) {
@@ -179,8 +179,8 @@ void PhysicsObjectsMiraBelleTrgEfficiencyModule::event()
       bin = 2;
       // Loop over CDC bits
       for (const auto& bit : m_CDCTrgBit) {
-        bool m_CDC_target = false;
         if (m_trgSummary.isValid()) {
+          bool m_CDC_target = false;
           try {
             m_CDC_target = m_trgSummary->testFtdl(bit.c_str());
           } catch (const std::exception&) {
@@ -201,8 +201,8 @@ void PhysicsObjectsMiraBelleTrgEfficiencyModule::event()
       bin = 2;
       // Loop over CDC bits
       for (const auto& bit : m_CDCKLMTrgBit) {
-        bool m_CDCKLM_target = false;
         if (m_trgSummary.isValid()) {
+          bool m_CDCKLM_target = false;
           try {
             m_CDCKLM_target = m_trgSummary->testFtdl(bit.c_str());
           } catch (const std::exception&) {

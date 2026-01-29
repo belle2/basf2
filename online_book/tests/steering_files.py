@@ -27,7 +27,7 @@ from pathlib import Path
 from ROOT import TFile
 
 # basf2
-from basf2 import find_file
+from basf2 import find_file, B2INFO
 from b2test_utils import clean_working_directory, is_ci
 
 
@@ -66,10 +66,9 @@ def _touch_file_with_subprocess_and_root(path: str) -> None:
 def _touch_file_test(method, path: str, **kwargs):
     try:
         method(path, **kwargs)
-    except Exception as e:
-        print(f"{method.__name__}: Tried to touch file with, but failed: {e}")
+    except Exception:
+        pass
     else:
-        print(f"{method.__name__}: Successfully touched file")
         Path(path).unlink()
 
 
@@ -78,14 +77,6 @@ def _permission_report(folder: str) -> None:
     of files in it
     """
     folder = Path(folder)
-    print("-" * 80)
-    print(f"Permissions of {folder}: {folder.stat()}")
-    content = list(folder.iterdir())
-    if content:
-        print(
-            f"Permission of one of its contents. {content[0]}: "
-            f"{content[0].stat()}"
-        )
     test_file = folder / "Bd2JpsiKS.root"
     methods = [
         _touch_file_default,
@@ -95,7 +86,6 @@ def _permission_report(folder: str) -> None:
     ]
     for method in methods:
         _touch_file_test(method, str(test_file))
-    print("-" * 80)
 
 
 class SteeringFileTest(unittest.TestCase):
@@ -147,7 +137,6 @@ class SteeringFileTest(unittest.TestCase):
         # into a new directory and then cd it as working directory when subprocess.run is executed,
         # otherwise the test will fail horribly if find_file is called by one of the tested steerings.
         original_dir = find_file(path_to_glob)
-        print(f"Our user id: {os.getuid()}")
         _permission_report(original_dir)
         working_dir = find_file(shutil.copytree(original_dir, "working_dir"))
         _permission_report(working_dir)
@@ -166,6 +155,7 @@ class SteeringFileTest(unittest.TestCase):
             if filename in skip:
                 continue
             with self.subTest(msg=filename):
+                B2INFO(f'Executing now the steering file {filename}')
                 # pylint: disable=subprocess-run-check
                 result = subprocess.run(
                     [

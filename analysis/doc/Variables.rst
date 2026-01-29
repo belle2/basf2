@@ -211,8 +211,8 @@ ECL Clusters
     - All ECL cluster variables have a limited precision. This precision is always better than
       the intrinsic ECL data acquisition precision. However, if these variables are histogrammed,
       binning effects are likely.
-    - All ECL cluster variables are clipped at the lower and upper boundaries: values below (above)
-      these boundaries will be set to the lower (upper) bound.
+    - Values below the lower boundary will be set to the lower bound 
+      while values above the upper boundary will be set to the upper bound. 
 
     If relevant, lower and upper limits as well as the variable precision are mentioned in the note box below the respective variable.
     One should note this in the context of binning effects.

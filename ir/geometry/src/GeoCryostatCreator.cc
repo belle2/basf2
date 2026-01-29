@@ -1302,7 +1302,7 @@ namespace Belle2 {
             ostringstream oss_block_num;
             oss_block_num << i;
 
-            if (i == block_cut_N) {
+            if (i == block_cut_N - 1) {
               geo_block_name = "geo_" + name + "_name";
             } else {
               geo_block_name = "geo_" + name + "_x" + oss_block_num.str() + "_name";
@@ -1396,7 +1396,7 @@ namespace Belle2 {
 
             //string cut_type = m_config.getParameterStr(prep + "cutType" + oss_block_num.str());
             double cut_type = m_config.getParameter(prep + "cutType" + oss_block_num.str());
-            if (i == layer_cut_N) {
+            if (i == layer_cut_N - 1) {
               geo_layer_name = "geo_" + name + "_name";
             } else {
               geo_layer_name = "geo_" + name + "_x" + oss_block_num.str() + "_name";

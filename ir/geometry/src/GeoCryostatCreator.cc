@@ -1449,6 +1449,7 @@ namespace Belle2 {
           string phys_layer_name = "phys_" + name + "_name";
           new G4PVPlacement(layer.transform, layer.logi, phys_layer_name, &topVolume, false, 0);
 
+          // cppcheck-suppress unreadVariable
           elements[name] = layer;
         }
       }

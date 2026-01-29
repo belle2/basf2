@@ -1,0 +1,26 @@
+# EventType: 2510032002
+# Descriptor: [ccbar Lcp2SigmapPipPim Sigmap2PpPi0]
+# NickName: Lcp2SigmapPipPim_Sigmap2PpPi0
+# PhysicsWG: Charm
+# Responsible: Young Jun Kim 
+# Date: 20251125 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+# Pythia6 definition "32" for "vpho -> q qbar" should be used.
+#   (this is automatically converted to Pythia8 definition "91")
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Alias MySigma+ Sigma+
+
+Decay Lambda_c+
+1.000 MySigma+ pi+ pi-       PHSP;
+Enddecay
+
+Decay MySigma+
+1.000 p+ pi0       PHSP;
+Enddecay
+
+End

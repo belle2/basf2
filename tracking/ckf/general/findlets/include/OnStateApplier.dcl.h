@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <vector>
 
@@ -23,20 +23,21 @@ namespace Belle2 {
    */
   template <class AState>
   class OnStateApplier : public
-    TrackFindingCDC::Findlet<const TrackFindingCDC::WithWeight<const AState*>, TrackFindingCDC::WithWeight<AState*>> {
+    TrackingUtilities::Findlet<const TrackingUtilities::WithWeight<const AState*>, TrackingUtilities::WithWeight<AState*>> {
   private:
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const TrackFindingCDC::WithWeight<const AState*>, TrackFindingCDC::WithWeight<AState*>>;
+    using Super =
+      TrackingUtilities::Findlet<const TrackingUtilities::WithWeight<const AState*>, TrackingUtilities::WithWeight<AState*>>;
 
   public:
     /// The object this filter refers to
-    using Object = std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>;
+    using Object = std::pair<const std::vector<TrackingUtilities::WithWeight<const AState*>>, AState*>;
 
     /// Apply the () operator to all pairs of state and current path.
-    void apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
-               std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates) override;
+    void apply(const std::vector<TrackingUtilities::WithWeight<const AState*>>& currentPath,
+               std::vector<TrackingUtilities::WithWeight<AState*>>& childStates) override;
 
     /// The filter operator for this class
-    virtual TrackFindingCDC::Weight operator()(const Object& object);
+    virtual TrackingUtilities::Weight operator()(const Object& object);
   };
 }

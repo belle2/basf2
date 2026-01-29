@@ -11,7 +11,7 @@
 
 #include <tracking/ckf/general/utilities/Advancer.h>
 #include <tracking/ckf/general/utilities/KalmanStepper.h>
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <string>
 
@@ -24,7 +24,7 @@ namespace Belle2 {
     ExtrapolateAndUpdateCDCStateFilter();
 
     /// Extrapolate along the path (pair.first) to the CDC wireHit-state (pair.second). Return 1/chi2 if Ok, NAN otherwise.
-    TrackFindingCDC::Weight operator()(const BaseCDCStateFilter::Object& pair) final;
+    TrackingUtilities::Weight operator()(const BaseCDCStateFilter::Object& pair) final;
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

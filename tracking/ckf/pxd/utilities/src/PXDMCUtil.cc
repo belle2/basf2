@@ -12,7 +12,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 using namespace Belle2;
 
@@ -27,7 +27,7 @@ bool MCUtil::pxdHitIsCorrect(const RecoTrack* mcRecoTrack, const SpacePoint* spa
 
   for (const PXDCluster& relatedCluster : spacePoint->getRelationsTo<PXDCluster>()) {
     const auto& relatedMCTracksToCluster = relatedCluster.getRelationsTo<RecoTrack>(mcRecoTrackStoreArrayName);
-    if (not TrackFindingCDC::any(relatedMCTracksToCluster, isSameMCTrack)) {
+    if (not TrackingUtilities::any(relatedMCTracksToCluster, isSameMCTrack)) {
       return false;
     }
   }
@@ -72,7 +72,7 @@ unsigned int MCUtil::getNumberOfCorrectPXDHits(const RecoTrack* mcRecoTrack, con
   return numberOfCorrectHits;
 }
 
-bool MCUtil::allStatesCorrect(const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& states) const
+bool MCUtil::allStatesCorrect(const std::vector<TrackingUtilities::WithWeight<const CKFToPXDState*>>& states) const
 {
   const RecoTrack* seed = states.front()->getSeed();
 

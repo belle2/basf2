@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/ckf/svd/findlets/SpacePointLoader.h>
 #include <tracking/ckf/general/findlets/TrackLoader.h>
@@ -23,7 +23,7 @@
 #include <tracking/ckf/pxd/filters/relations/ChooseablePXDRelationFilter.h>
 #include <tracking/ckf/pxd/filters/results/ChooseablePXDResultFilter.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
 #include <string>
 #include <vector>
@@ -50,9 +50,9 @@ namespace Belle2 {
    * * Write the results out to the data store
    *
    */
-  class CKFToPXDFindlet : public TrackFindingCDC::Findlet<> {
+  class CKFToPXDFindlet : public TrackingUtilities::Findlet<> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<>;
+    using Super = TrackingUtilities::Findlet<>;
 
   public:
     /// Constructor, for setting module description and parameters.
@@ -109,7 +109,7 @@ namespace Belle2 {
     /// States for the hits
     std::vector<CKFToPXDState> m_states;
     /// Relations between states
-    std::vector<TrackFindingCDC::WeightedRelation<CKFToPXDState>> m_relations;
+    std::vector<TrackingUtilities::WeightedRelation<CKFToPXDState>> m_relations;
     /// Vector for storing the results
     std::vector<CKFToPXDResult> m_results;
     /// Vector for storing the filtered results

@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/mclookup/ITrackType.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
@@ -42,13 +42,13 @@ namespace Belle2 {
       CDCMCCloneLookUp& operator=(const CDCMCCloneLookUp&) = delete;
 
       /// fill with all cdcTracks in an event
-      void fill(std::vector<CDCTrack>& cdcTracks);
+      void fill(std::vector<TrackingUtilities::CDCTrack>& cdcTracks);
 
       /// Clear eventwise lookup tables
       void clear();
 
       /// getter for information from m_cdcTrackIsCloneMap
-      bool isTrackClone(const CDCTrack& cdcTrack);
+      bool isTrackClone(const TrackingUtilities::CDCTrack& cdcTrack);
 
     private:
       /// Singleton: Default ctor only available to getInstance method
@@ -56,22 +56,22 @@ namespace Belle2 {
 
       /// Helper function which returns a map of MCTrackIDs to vectors of CDTrack pointers.
       /// Need that to find clone candidates: tracks with same MCTrackID
-      std::map<const ITrackType, std::vector<CDCTrack*>> getMatchedCDCTracksByMCID(
-                                                        std::vector<CDCTrack>& cdcTracks);
+      std::map<const ITrackType, std::vector<TrackingUtilities::CDCTrack*>> getMatchedCDCTracksByMCID(
+            std::vector<TrackingUtilities::CDCTrack>& cdcTracks);
 
       /// Helper function which takes a vector of pointers to CDCTracks which are matched to the
       /// same MC particle.
       /// Returns track ptr which is assumed to be not a clone.
-      CDCTrack* findBestMatchedTrack(std::vector<CDCTrack*> matchedTrackPtrs);
+      TrackingUtilities::CDCTrack* findBestMatchedTrack(std::vector<TrackingUtilities::CDCTrack*> matchedTrackPtrs);
 
       /// Map of track pointers to isClone indicator from MCTruth-based assumption
-      std::map<const CDCTrack*, bool> m_cdcTrackIsCloneMap;
+      std::map<const TrackingUtilities::CDCTrack*, bool> m_cdcTrackIsCloneMap;
     };
 
     /// Functor which which decides which of two tracks to declare as best match
     struct CompareCDCTracks {
       /// marker function for the isFunctor test
-      operator FunctorTag();
+      operator TrackingUtilities::FunctorTag();
 
       /// Constructor of the CDC track comparer to get the better match, taking references to MC
       /// lookup singletons.
@@ -86,11 +86,11 @@ namespace Belle2 {
        * Returns true if track1 has a lower loop number at the first hit than track1.
        * If both tracks have the same loop number, return true if track1 has larger number of matched hits.
        */
-      bool operator()(const CDCTrack* ptrCDCTrack1, const CDCTrack* ptrCDCTrack2) const;
+      bool operator()(const TrackingUtilities::CDCTrack* ptrCDCTrack1, const TrackingUtilities::CDCTrack* ptrCDCTrack2) const;
 
     private:
       /// Get number of hits in track that are correctly matched
-      unsigned int getNumberOfCorrectHits(const CDCTrack* ptrCDCTrack) const;
+      unsigned int getNumberOfCorrectHits(const TrackingUtilities::CDCTrack* ptrCDCTrack) const;
 
       /// Reference to a CDCMCTrackLookUp instance, assigned in the constructor of this functor
       const CDCMCTrackLookUp& m_CDCMCTrackLookUp;

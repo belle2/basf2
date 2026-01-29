@@ -9,7 +9,7 @@
 #pragma once
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <tracking/trackFindingVXD/utilities/Named.h>
+#include <tracking/trackingUtilities/utilities/Named.h>
 #include <tracking/trackFindingVXD/variableExtractors/VariableExtractor.h>
 #include <numeric>
 
@@ -22,7 +22,7 @@ namespace Belle2 {
      * @param variableSet set of variable to be filled
      * @param useTimingInfo whether to use the timing info in clusters
      */
-    ClusterInfoExtractor(std::vector<Named<float*>>& variableSet, bool useTimingInfo) :
+    ClusterInfoExtractor(std::vector<TrackingUtilities::Named<float*>>& variableSet, bool useTimingInfo) :
       VariableExtractor(), m_UseTimingInfo(useTimingInfo)
     {
       initializeStats("charge", variableSet);
@@ -93,7 +93,7 @@ namespace Belle2 {
     bool m_UseTimingInfo;
 
     /// initialize statistics subsets of variables from clusters that get combined for SPTC
-    void initializeStats(const std::string& identifier, std::vector<Named<float*>>& variables)
+    void initializeStats(const std::string& identifier, std::vector<TrackingUtilities::Named<float*>>& variables)
     {
       addVariable(identifier + "_max", variables);
       addVariable(identifier + "_min", variables);

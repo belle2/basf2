@@ -10,7 +10,7 @@
 #include <tracking/eventTimeExtraction/findlets/IterativeEventTimeExtractor.dcl.h>
 #include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.icc.h>
 #include <tracking/eventTimeExtraction/utilities/TimeExtractionUtils.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
 
@@ -76,27 +76,27 @@ namespace Belle2 {
   {
     Super::exposeParameters(moduleParamList, prefix);
 
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxIterations"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maxIterations"),
                                   m_param_maxIterations,
                                   "How many iterations should be done maximally?",
                                   m_param_maxIterations);
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minIterations"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minIterations"),
                                   m_param_minIterations,
                                   "How many iterations should be done minimally?",
                                   m_param_minIterations);
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimalDeltaT0"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minimalDeltaT0"),
                                   m_param_minimalDeltaT0,
                                   "What is the final precision?",
                                   m_param_minimalDeltaT0);
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useLastEventT0"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "useLastEventT0"),
                                   m_param_useLastEventT0,
                                   "Use the last event t0 instead of the best one.",
                                   m_param_useLastEventT0);
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "abortOnUnsuccessfulStep"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "abortOnUnsuccessfulStep"),
                                   m_param_abortOnUnsuccessfulStep,
                                   "Abort on a single unsuccessful step. Otherwise, the success is defined by the last step",
                                   m_param_abortOnUnsuccessfulStep);
 
-    m_findlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("sub", prefix));
+    m_findlet.exposeParameters(moduleParamList, TrackingUtilities::prefixed("sub", prefix));
   }
 }

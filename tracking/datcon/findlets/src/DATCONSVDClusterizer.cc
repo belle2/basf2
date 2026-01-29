@@ -8,7 +8,7 @@
 #include <tracking/datcon/findlets/DATCONSVDClusterizer.h>
 #include <tracking/datcon/entities/DATCONSVDDigit.h>
 #include <tracking/datcon/entities/DATCONSVDClusterCandidate.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/geometry/SensorInfo.h>
@@ -17,7 +17,7 @@
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 DATCONSVDClusterizer::DATCONSVDClusterizer() : Super()
 {
@@ -27,32 +27,32 @@ void DATCONSVDClusterizer::exposeParameters(ModuleParamList* moduleParamList, co
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "noiseMap"), m_param_noiseMapfileName,
+  moduleParamList->addParameter(prefixed(prefix, "noiseMap"), m_param_noiseMapfileName,
                                 "Name of the text file containing strip noise information.", m_param_noiseMapfileName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeNoiseMapsToFile"), m_param_writeNoiseMapsToFile,
+  moduleParamList->addParameter(prefixed(prefix, "writeNoiseMapsToFile"), m_param_writeNoiseMapsToFile,
                                 "Write noise information to text file?", m_param_writeNoiseMapsToFile);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumClusterSize"), m_param_maxiClusterSize,
+  moduleParamList->addParameter(prefixed(prefix, "maximumClusterSize"), m_param_maxiClusterSize,
                                 "Maximum SVD cluster size for this side. Data type: unsigned short", m_param_maxiClusterSize);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "noiseCut"), m_param_noiseCut,
+  moduleParamList->addParameter(prefixed(prefix, "noiseCut"), m_param_noiseCut,
                                 "Cut for using default noise (noise < this value), or actual noise (noise > this value).",
                                 m_param_noiseCut);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "requiredSNRstrip"),
+  moduleParamList->addParameter(prefixed(prefix, "requiredSNRstrip"),
                                 m_param_requiredSNRstrip, "Required SNR per strip.", m_param_requiredSNRstrip);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "requiredSNRcluster"),
+  moduleParamList->addParameter(prefixed(prefix, "requiredSNRcluster"),
                                 m_param_requiredSNRcluster, "Required SNR for the cluster.", m_param_requiredSNRcluster);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "isUClusterizer"),
+  moduleParamList->addParameter(prefixed(prefix, "isUClusterizer"),
                                 m_param_isU, "Is this u or v side?", m_param_isU);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "saveClusterToDataStore"),
+  moduleParamList->addParameter(prefixed(prefix, "saveClusterToDataStore"),
                                 m_param_saveClusterToDataStore, "Save SVDClusters for analysis?", m_param_saveClusterToDataStore);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storeSVDClustersName"),
+  moduleParamList->addParameter(prefixed(prefix, "storeSVDClustersName"),
                                 m_param_storeSVDClustersName, "Name of the SVDClusters StoreArray", m_param_storeSVDClustersName);
 
 }

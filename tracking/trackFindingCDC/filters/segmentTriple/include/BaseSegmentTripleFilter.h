@@ -7,16 +7,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/Filter.dcl.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegmentTriple;
+  }
+  namespace TrackFindingCDC {
 
     // Guard to prevent repeated instantiations
-    extern template class Filter<CDCSegmentTriple>;
+    // extern template class TrackingUtilities::Filter<CDCSegmentTriple>;
 
     /// Base filter for the construction of segment triples.
-    using BaseSegmentTripleFilter = Filter<CDCSegmentTriple>;
+    using BaseSegmentTripleFilter = TrackingUtilities::Filter<TrackingUtilities::CDCSegmentTriple>;
   }
 }

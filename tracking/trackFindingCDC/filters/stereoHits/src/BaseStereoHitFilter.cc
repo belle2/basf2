@@ -7,9 +7,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/stereoHits/BaseStereoHitFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::Filter<WeightedRelation<CDCTrack, const CDCRLWireHit>>;
+template class TrackingUtilities::Filter<WeightedRelation<CDCTrack, const CDCRLWireHit>>;

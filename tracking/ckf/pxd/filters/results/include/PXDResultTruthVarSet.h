@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/FixedSizeNamedFloatTuple.h>
 
 #include <tracking/ckf/pxd/utilities/PXDMCUtil.h>
 
@@ -32,14 +32,14 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class PXDResultTruthVarNames : public TrackFindingCDC::VarNames<CKFToPXDResult> {
+  class PXDResultTruthVarNames : public TrackingUtilities::VarNames<CKFToPXDResult> {
 
   public:
     /// Number of variables to be generated.
     // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
     // at least tell cppcheck that everything is fine
     // cppcheck-suppress duplInheritedMember
-    static const size_t nVars = TrackFindingCDC::size(pxdResultTruthNames);
+    static const size_t nVars = TrackingUtilities::size(pxdResultTruthNames);
 
     /// Get the name of the column.
     constexpr
@@ -53,7 +53,7 @@ namespace Belle2 {
    * Var set used in the CKF for calculating the probability of a correct result,
    * which knows the truth information if two tracks belong together or not.
    */
-  class PXDResultTruthVarSet : public TrackFindingCDC::VarSet<PXDResultTruthVarNames> {
+  class PXDResultTruthVarSet : public TrackingUtilities::VarSet<PXDResultTruthVarNames> {
   public:
     /// Generate and assign the variables from the object.
     bool extract(const CKFToPXDResult* result) final;

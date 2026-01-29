@@ -6,9 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/pxd/filters/results/ChooseablePXDResultFilter.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 using namespace Belle2;
 
-template class TrackFindingCDC::Chooseable<BasePXDResultFilter>;
-template class TrackFindingCDC::ChooseableFilter<PXDResultFilterFactory>;
+template class TrackingUtilities::Chooseable<BasePXDResultFilter>;
+template class TrackingUtilities::ChooseableFilter<PXDResultFilterFactory>;

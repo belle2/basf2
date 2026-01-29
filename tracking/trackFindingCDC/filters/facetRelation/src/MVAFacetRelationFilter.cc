@@ -8,12 +8,13 @@
 #include <tracking/trackFindingCDC/filters/facetRelation/MVAFacetRelationFilter.h>
 
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::MVA<BaseFacetRelationFilter>;
+template class TrackingUtilities::MVA<BaseFacetRelationFilter>;
 
 MVAFacetRelationFilter::MVAFacetRelationFilter()
   : Super(std::make_unique<MVAFacetRelationVarSet>(), "FacetRelationFilter", -2.19)

@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/numerics/LookupTable.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/numerics/LookupTable.h>
 
 #include <memory>
 #include <cmath>
@@ -28,7 +28,7 @@ namespace Belle2 {
 
       /// Default estimator for the flight time
       virtual double
-      getFlightTime2D(const Vector2D& /*pos2D*/, double /*alpha*/, double /*beta */ = 1) const
+      getFlightTime2D(const TrackingUtilities::Vector2D& /*pos2D*/, double /*alpha*/, double /*beta */ = 1) const
       {
         return 0;
       }
@@ -47,7 +47,7 @@ namespace Belle2 {
       BeamEventFlightTimeEstimator();
 
       /// Flight time estimator for regular beam events
-      double getFlightTime2D(const Vector2D& pos2D, double alpha, double beta = 1) const override
+      double getFlightTime2D(const TrackingUtilities::Vector2D& pos2D, double alpha, double beta = 1) const override
       {
         double absAlpha = std::fabs(alpha);
         double directDist2D = pos2D.cylindricalR();
@@ -56,7 +56,7 @@ namespace Belle2 {
 
     private:
       /// Lookup table for the sinc function
-      LookupTable<float> m_firstPeriodAlphaFlightTimeFactor;
+      TrackingUtilities::LookupTable<float> m_firstPeriodAlphaFlightTimeFactor;
     };
 
     /// Concrete estimator for the cosmic ray setup - estimates negative times on incoming arm
@@ -64,12 +64,12 @@ namespace Belle2 {
 
     public:
       /// Constructor also setting up the flight time lookup table
-      explicit CosmicRayFlightTimeEstimator(Vector3D triggerPoint = Vector3D(0, 0, 0));
+      explicit CosmicRayFlightTimeEstimator(TrackingUtilities::Vector3D triggerPoint = TrackingUtilities::Vector3D(0, 0, 0));
 
       /// Flight time estimator for cosmic ray events
-      double getFlightTime2D(const Vector2D& pos2D, double alpha, double beta = 1) const override
+      double getFlightTime2D(const TrackingUtilities::Vector2D& pos2D, double alpha, double beta = 1) const override
       {
-        Vector2D relPos2D = pos2D - m_triggerPoint.xy();
+        TrackingUtilities::Vector2D relPos2D = pos2D - m_triggerPoint.xy();
         double deltaAlpha = pos2D.angleWith(relPos2D);
         alpha += deltaAlpha;
         double absAlpha = std::fabs(alpha);
@@ -79,10 +79,10 @@ namespace Belle2 {
 
     private:
       /// Lookup table for the sinc function
-      LookupTable<float> m_halfPeriodAlphaFlightTimeFactor;
+      TrackingUtilities::LookupTable<float> m_halfPeriodAlphaFlightTimeFactor;
 
       /// Trigger point of the cosmic ray setup
-      Vector3D m_triggerPoint;
+      TrackingUtilities::Vector3D m_triggerPoint;
     };
 
   }

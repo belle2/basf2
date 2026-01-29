@@ -20,7 +20,7 @@ import basf2 as b2
 import os
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-from ROOT import Belle2
+from validationgenerators import add_evtgen_for_validation
 import glob
 
 b2.set_random_seed(123451)
@@ -33,9 +33,8 @@ eventinfosetter.param('evtNumList', [1000])
 main.add_module(eventinfosetter)
 
 # generate events (B0 -> K+pi- + cc, other B0 generic)
-evtgeninput = b2.register_module('EvtGenInput')
-evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('top/validation/B2Kpi.dec'))
-main.add_module(evtgeninput)
+add_evtgen_for_validation(main)
+b2.set_module_parameters(main, name='EvtGenInput', userDECFile=b2.find_file('top/validation/B2Kpi.dec'))
 
 # detector simulation
 bg = None

@@ -9,31 +9,33 @@
 
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/AxialSegmentPairFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/UnionRecordingFilter.dcl.h>
 
 #include <vector>
 #include <string>
 #include <memory>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCAxialSegmentPair;
+  }
+  namespace TrackFindingCDC {
 
-    extern template class TrackFindingCDC::UnionRecordingFilter<AxialSegmentPairFilterFactory>;
+    // extern template class TrackingUtilities::UnionRecordingFilter<AxialSegmentPairFilterFactory>;
 
     /// Filter to record multiple chooseable variable sets for axial segment pairs
-    class UnionRecordingAxialSegmentPairFilter: public UnionRecordingFilter<AxialSegmentPairFilterFactory> {
+    class UnionRecordingAxialSegmentPairFilter: public TrackingUtilities::UnionRecordingFilter<AxialSegmentPairFilterFactory> {
 
     private:
       /// Type of the base class
-      using Super = UnionRecordingFilter<AxialSegmentPairFilterFactory>;
+      using Super = TrackingUtilities::UnionRecordingFilter<AxialSegmentPairFilterFactory>;
 
     public:
       /// Get the valid names of variable sets for axial segment pairs.
       std::vector<std::string> getValidVarSetNames() const final;
 
       /// Create a concrete variables set for axial segment pairs from a name.
-      std::unique_ptr<BaseVarSet<CDCAxialSegmentPair> >
+      std::unique_ptr<TrackingUtilities::BaseVarSet<TrackingUtilities::CDCAxialSegmentPair> >
       createVarSet(const std::string& name) const final;
     };
   }

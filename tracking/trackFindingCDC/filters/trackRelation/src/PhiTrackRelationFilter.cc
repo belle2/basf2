@@ -7,16 +7,17 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/trackRelation/PhiTrackRelationFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/numerics/Angle.h>
+#include <tracking/trackingUtilities/numerics/Angle.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 void PhiTrackRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
                                               const std::string& prefix)

@@ -15,7 +15,7 @@ namespace Belle2 {
   class SensorSVDPairFilter : public BaseSVDPairFilter {
   public:
     /// Return the weight based on layer
-    TrackFindingCDC::Weight operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation) override;
+    TrackingUtilities::Weight operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation) override;
     /// Expose the parameters.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

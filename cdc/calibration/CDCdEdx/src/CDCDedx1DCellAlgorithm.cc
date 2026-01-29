@@ -401,7 +401,7 @@ void CDCDedx1DCellAlgorithm::createPayload()
 
     double binsize = TMath::Pi() / m_onedcors[il].size();
 
-    auto computeAverages = [&](double angLow, double angHigh, const std::string & label) {
+    auto computeAverages = [&](double angLow, double angHigh) {
       unsigned int binLow = std::floor((angLow + TMath::Pi() / 2.0) / binsize);
       unsigned int binHigh = std::floor((angHigh + TMath::Pi() / 2.0) / binsize);
       double sum_new = 0.0, sum_prev = 0.0;
@@ -426,14 +426,14 @@ void CDCDedx1DCellAlgorithm::createPayload()
       posLow = 0.2; posHigh = 0.5;
     }
 
-    auto [avgNewNeg, avgPrevNeg] = computeAverages(negLow, negHigh, "Negative");
-    auto [avgNewPos, avgPrevPos] = computeAverages(posLow, posHigh, "Positive");
+    auto [avgNewNeg, avgPrevNeg] = computeAverages(negLow, negHigh);
+    auto [avgNewPos, avgPrevPos] = computeAverages(posLow, posHigh);
 
     double avgNew = (avgNewNeg + avgNewPos) / 2.0;
     double avgPrev = (avgPrevNeg + avgPrevPos) / 2.0;
     double scaleFactor = avgPrev / avgNew;
 
-    for (unsigned int iea = 0; iea < m_eaBin; iea++) {
+    for (int iea = 0; iea < m_eaBin; iea++) {
       m_onedcors[il][iea] *= scaleFactor;
     }
 

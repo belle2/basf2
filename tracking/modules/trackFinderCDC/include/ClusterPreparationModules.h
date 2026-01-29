@@ -15,18 +15,18 @@
 
 #include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**
      * Module implementation using the ClusterPreparer
      */
-    class TFCDC_ClusterPreparerModule : public FindletModule<ClusterPreparer> {
+    class TFCDC_ClusterPreparerModule : public TrackingUtilities::FindletModule<ClusterPreparer> {
 
       /// Type of the base class
-      using Super = FindletModule<ClusterPreparer>;
+      using Super = TrackingUtilities::FindletModule<ClusterPreparer>;
 
     public:
       /// Constructor setting the default store vector names
@@ -36,10 +36,10 @@ namespace Belle2 {
     /**
      * Module implementation using the SuperClusterCreator
      */
-    class TFCDC_SuperClusterCreatorModule : public FindletModule<SuperClusterCreator> {
+    class TFCDC_SuperClusterCreatorModule : public TrackingUtilities::FindletModule<SuperClusterCreator> {
 
       /// Type of the base class
-      using Super = FindletModule<SuperClusterCreator>;
+      using Super = TrackingUtilities::FindletModule<SuperClusterCreator>;
 
     public:
       /// Constructor setting the default store vector names
@@ -49,10 +49,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ClusterRefiner
      */
-    class TFCDC_ClusterRefinerModule : public FindletModule<ClusterRefiner<BridgingWireHitRelationFilter>> {
+    class TFCDC_ClusterRefinerModule : public TrackingUtilities::FindletModule<ClusterRefiner<BridgingWireHitRelationFilter>> {
 
       /// Type of the base class
-      using Super = FindletModule<ClusterRefiner<BridgingWireHitRelationFilter>>;
+      using Super = TrackingUtilities::FindletModule<ClusterRefiner<BridgingWireHitRelationFilter>>;
 
     public:
       /// Constructor setting the default store vector names
@@ -62,10 +62,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ClusterBackgroundDetector
      */
-    class TFCDC_ClusterBackgroundDetectorModule : public FindletModule<ClusterBackgroundDetector> {
+    class TFCDC_ClusterBackgroundDetectorModule : public TrackingUtilities::FindletModule<ClusterBackgroundDetector> {
 
       /// Type of the base class
-      using Super = FindletModule<ClusterBackgroundDetector>;
+      using Super = TrackingUtilities::FindletModule<ClusterBackgroundDetector>;
 
     public:
       /// Constructor setting the default store vector names

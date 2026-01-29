@@ -23,6 +23,7 @@
 #include <RooGaussian.h>
 #include <RooMsgService.h>
 #include <RooRealVar.h>
+#include <RooPlot.h>
 
 // C++ headers
 #include <regex>
@@ -59,6 +60,7 @@ void DQMHistAnalysisHLTMonObjModule::initialize()
   m_c_hardware = new TCanvas("Hardware", "hardware", 1000, 1000);
   m_c_l1 = new TCanvas("L1", "l1", 750, 400);
   m_c_ana_eff_shifter = new TCanvas("ana_eff_shifter", "ana_eff_shifter", 1000, 1000);
+  m_c_nks = new TCanvas("Ks", "Ks_histograms", 1000, 1000);
 
   // add canvases to MonitoringObject
   m_monObj->addCanvas(m_c_filter);
@@ -66,6 +68,7 @@ void DQMHistAnalysisHLTMonObjModule::initialize()
   m_monObj->addCanvas(m_c_hardware);
   m_monObj->addCanvas(m_c_l1);
   m_monObj->addCanvas(m_c_ana_eff_shifter);
+  m_monObj->addCanvas(m_c_nks);
 
 
   //--- HLTPrefilter monitoring ---//
@@ -89,7 +92,7 @@ void DQMHistAnalysisHLTMonObjModule::initialize()
 
   //--- Signal and Background yields ---//
   m_sig = new RooRealVar("N_{sig}", "SIGNAL EVENTS", 1000, 10, 5000000);
-  m_bkg = new RooRealVar("N_{bkg}", "SIGNAL EVENTS", 2000, 100, 20000000);
+  m_bkg = new RooRealVar("N_{bkg}", "BACKGROUND EVENTS", 2000, 100, 20000000);
 
   //--- Total fit pdf ---//
   m_KsPdf = new RooAddPdf("m_KsPdf", "Two Gaussian + Pol1 background", RooArgList(*m_double_gauss, *m_chebpol), RooArgList(*m_sig,
@@ -361,10 +364,19 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   auto m_hKshortActiveNotTimeH = findHist("PhysicsObjects/hist_nKshortActiveNotTimeH");
   auto m_hKshortActiveNotCDCECLH = findHist("PhysicsObjects/hist_nKshortActiveNotCDCECLH");
 
+  // Create RooPlot objects
+  RooPlot* m_KshortAll_frame = m_KsInvMass->frame() ;
+  RooPlot* m_KshortActive_frame = m_KsInvMass->frame() ;
+  RooPlot* m_KshortActiveNotTime_frame = m_KsInvMass->frame() ;
+  RooPlot* m_KshortActiveNotCDCECL_frame = m_KsInvMass->frame() ;
+
   if (m_hKshortAllH) {
     RooDataHist* KsHist_all = new RooDataHist("KsHist_all", "Histogram data", RooArgList(*m_KsInvMass), m_hKshortAllH);
     m_KsPdf->fitTo(*KsHist_all, RooFit::Minos(true));
     nKs_all = m_sig->getValV();
+    KsHist_all->plotOn(m_KshortAll_frame) ;
+    m_KsPdf->plotOn(m_KshortAll_frame);
+    m_KsPdf->paramOn(m_KshortAll_frame, RooFit::Layout(0.6, 0.9, 0.9));
     delete KsHist_all;
   }
   m_monObj->setVariable("nKs_all_hlt", nKs_all);
@@ -373,6 +385,9 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
     RooDataHist* KsHist_active = new RooDataHist("KsHist_active", "Histogram data", RooArgList(*m_KsInvMass), m_hKshortActiveH);
     m_KsPdf->fitTo(*KsHist_active, RooFit::Minos(true));
     nKs_active = m_sig->getValV();
+    KsHist_active->plotOn(m_KshortActive_frame) ;
+    m_KsPdf->plotOn(m_KshortActive_frame);
+    m_KsPdf->paramOn(m_KshortActive_frame, RooFit::Layout(0.6, 0.9, 0.9));
     delete KsHist_active;
   }
   m_monObj->setVariable("nKs_activeVeto_hlt", nKs_active);
@@ -382,6 +397,9 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
                                                         m_hKshortActiveNotTimeH);
     m_KsPdf->fitTo(*KsHist_activeNotTime, RooFit::Minos(true));
     nKs_activeNotTime = m_sig->getValV();
+    KsHist_activeNotTime->plotOn(m_KshortActiveNotTime_frame) ;
+    m_KsPdf->plotOn(m_KshortActiveNotTime_frame);
+    m_KsPdf->paramOn(m_KshortActiveNotTime_frame, RooFit::Layout(0.6, 0.9, 0.9));
     delete KsHist_activeNotTime;
   }
   m_monObj->setVariable("nKs_activeVetoPrefilterTime_hlt", nKs_activeNotTime);
@@ -391,11 +409,26 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
                                                           m_hKshortActiveNotCDCECLH);
     m_KsPdf->fitTo(*KsHist_activeNotCDCECL, RooFit::Minos(true));
     nKs_activeNotCDCECL = m_sig->getValV();
+    KsHist_activeNotCDCECL->plotOn(m_KshortActiveNotCDCECL_frame) ;
+    m_KsPdf->plotOn(m_KshortActiveNotCDCECL_frame);
+    m_KsPdf->paramOn(m_KshortActiveNotCDCECL_frame, RooFit::Layout(0.6, 0.9, 0.9));
     delete KsHist_activeNotCDCECL;
   }
-
   m_monObj->setVariable("nKs_activeVetoPrefilterCDCECL_hlt", nKs_activeNotCDCECL);
 
+  // set the contents of Ks canvas
+  m_c_nks->Clear(); // clear existing content
+  m_c_nks->cd();
+  m_c_nks->Divide(2, 2);
+
+  m_c_nks->cd(1);
+  m_KshortAll_frame->Draw();
+  m_c_nks->cd(2);
+  m_KshortActive_frame->Draw();
+  m_c_nks->cd(3);
+  m_KshortActiveNotTime_frame->Draw();
+  m_c_nks->cd(4);
+  m_KshortActiveNotCDCECL_frame->Draw();
 
   B2DEBUG(20, "DQMHistAnalysisHLTMonObj : endRun called");
 }

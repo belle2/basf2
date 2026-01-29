@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <string>
 
@@ -34,7 +34,7 @@ namespace Belle2 {
     void MCSymmetric<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {
       Super::exposeParameters(moduleParamList, prefix);
-      moduleParamList->addParameter(prefixed(prefix, "allowReverse"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "allowReverse"),
                                     m_param_allowReverse,
                                     "Indication whether the reverse to the truth is accepted"
                                     "preserving the propagation reversal symmetry.",

@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.dcl.h>
 #include <tracking/ckf/svd/filters/results/SVDResultVarSet.h>
 
 namespace Belle2 {
   /// Base filter for CKF SVD results (on overlap check)
-  class SizeSVDResultFilter : public TrackFindingCDC::ChoosableFromVarSetFilter<SVDResultVarSet> {
+  class SizeSVDResultFilter : public TrackingUtilities::ChoosableFromVarSetFilter<SVDResultVarSet> {
   public:
-    SizeSVDResultFilter() : TrackFindingCDC::ChoosableFromVarSetFilter<SVDResultVarSet>("number_of_hits")
+    SizeSVDResultFilter() : TrackingUtilities::ChoosableFromVarSetFilter<SVDResultVarSet>("number_of_hits")
     {
 
     }

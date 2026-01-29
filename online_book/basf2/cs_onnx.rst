@@ -78,7 +78,7 @@ Now, we prepare input and output arrays and split randomly 50:50 into train and 
         "thrustOm",
         "cosTBTO",
         "cosTBz",
-        "KSFWVariables(et)",
+        "KSFWVariables(pt_sum)",
         "KSFWVariables(mm2)",
         "KSFWVariables(hso00)",
         "KSFWVariables(hso02)",

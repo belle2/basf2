@@ -25,7 +25,7 @@
 #pragma link C++ class Belle2::CDCGeometry::Rib5+; // checksum=0xaa54c218, version=1
 #pragma link C++ class Belle2::CDCGeometry::Cover+; // checksum=0xa036546c, version=1
 #pragma link C++ class Belle2::CDCGeometry::Cover2+; // checksum=0xfacdecfb, version=1
-#pragma link C++ class Belle2::CDCGeometry::NeutronShield+; // checksum=0x6ebcef33, version=1
+#pragma link C++ class Belle2::CDCGeometry::NeutronShield+; // checksum=0x1833ae20, version=1
 #pragma link C++ class Belle2::CDCGeometry::Frontend+; // checksum=0xf32d61e2, version=1
 #pragma link C++ class Belle2::CDCGeometry::MotherVolume+; // checksum=0xdee26a1b, version=1
 #pragma link C++ class Belle2::CDCGeometry::EndPlate+; // checksum=0x9f99f74f, version=1

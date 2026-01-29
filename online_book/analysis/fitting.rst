@@ -1,7 +1,7 @@
 .. _onlinebook_fitting:
 
-Fitting Training
-================
+Fitting
+=======
 
-To do: link to the fitting training section
+Links to various fitting resources are provided in the section :ref:`general_fitting`.
 

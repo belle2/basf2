@@ -176,7 +176,7 @@ namespace Belle2 {
     try {
       if (remote) {
         // Check if this is the new central server by looking for the new central URL pattern
-        if (m_currentProvider.find("belle2-hsf.sdcc.bnl.gov") != std::string::npos) {
+        if (m_currentProvider.find("belle2-cdb-hsf.apps.sdcc.bnl.gov") != std::string::npos) {
           m_metadataProvider = std::make_unique<Conditions::NewCentralMetadataProvider>(m_currentProvider, m_usableTagStates);
         } else {
           m_metadataProvider = std::make_unique<Conditions::CentralMetadataProvider>(m_currentProvider, m_usableTagStates);

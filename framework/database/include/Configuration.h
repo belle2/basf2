@@ -340,7 +340,7 @@ namespace Belle2::Conditions {
     /** default local path for the local metadata provider */
     std::string m_defaultLocalMetadataProviderPath{"/cvmfs/belle.cern.ch/conditions"};
     /** default server URL for the new central metadata provider */
-    std::string m_defaultNewCentralMetadataProviderServer{"http://belle2-hsf.sdcc.bnl.gov/b2s/rest/"};
+    std::string m_defaultNewCentralMetadataProviderServer{"http://belle2-cdb-hsf.apps.sdcc.bnl.gov/api/cdb_rest/"};
     /** the file to put the newly created payload information */
     std::string m_newPayloadFile{"localdb/database.txt"};
     /** the directory to put newly downloaded payloads */

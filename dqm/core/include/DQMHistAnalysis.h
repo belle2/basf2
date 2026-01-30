@@ -598,13 +598,13 @@ namespace Belle2 {
     void cleanupEpicsPVs(void);
 
     /**
-     * get global Prefix for EPICS PVs
+     * get global prefix for EPICS PVs
      * @return prefix in use
      */
     std::string& getPVPrefix(void) {return m_PVPrefix;};
 
     /**
-     * set global Prefix for EPICS PVs
+     * set global prefix for EPICS PVs
      * @param prefix Prefix to set
      */
     void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};

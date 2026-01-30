@@ -35,7 +35,7 @@ settings = ValidationSettings(name="CDC dedx calibration",
                               description=__doc__,
                               download_files=[],
                               expert_config={
-                                "GT": "data_prompt_rel08",
+                                "GT": "data_prompt_rel09",
                                   })
 
 

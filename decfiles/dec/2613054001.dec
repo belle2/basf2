@@ -21,7 +21,7 @@ Decay D*-
 Enddecay
 
 Decay Myanti-D0
-1.000 Myeta Myomega       SVS;
+1.000 Myomega Myeta       SVS;
 Enddecay
 
 Decay Myeta

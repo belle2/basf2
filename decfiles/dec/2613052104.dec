@@ -21,7 +21,7 @@ Decay D*-
 Enddecay
 
 Decay Myanti-D0
-1.000 MyKS0 Myomega       SVS;
+1.000 Myomega MyKS0       SVS;
 Enddecay
 
 Decay MyKS0

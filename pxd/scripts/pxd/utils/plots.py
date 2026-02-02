@@ -248,31 +248,16 @@ def plot_in_module_efficiency(df, pxdid=1052, figsize=(12, 16), alpha=0.7, save_
       yerr_low (str): column of the lower error
       yerr_up (str): column of the upper error
     """
-    # MINIMAL FIX: Replace .query() with compatible filtering for Awkward Arrays
-    fig, axes = plt.subplots(4, 1, sharex=False, sharey=True, figsize=figsize)
 
+    fig, axes = plt.subplots(4, 1, sharex=False, sharey=True, figsize=figsize)
     for uBin in range(4):
         ax = axes[uBin]
         for vBin in range(6):
-            try:
-                # Try to use query first (works with regular DataFrames)
-                filtered = df.query(cut + "&" + f"pxdid=={pxdid}&uBin=={uBin}&vBin=={vBin}")
-            except Exception:
-                # Fallback to boolean indexing (works with Awkward Arrays)
-                mask = (df['pxdid'] == pxdid) & (df['uBin'] == uBin) & (df['vBin'] == vBin)
-                if cut:
-                    mask = mask & df.eval(cut)
-                filtered = df[mask]
-
-            if len(filtered) > 0:
-                filtered.errorbar(
-                    y=y, x=x, yerr_low=yerr_low, yerr_up=yerr_up,
-                    ax=ax, label=f"{pxdid},u{uBin}v{vBin}", alpha=alpha)
-
+            df.query(cut + "&" + f"pxdid=={pxdid}&uBin=={uBin}&vBin=={vBin}").errorbar(
+                y=y, x=x, yerr_low=yerr_low, yerr_up=yerr_up, ax=ax, label=f"{pxdid},u{uBin}v{vBin}", alpha=0.7)
         ax.legend(bbox_to_anchor=(1, 1), loc="upper left")
         ymin, ymax = ax.get_ylim()
         ax.set_ylim(ymin, 1.)
-
     if save_to:
         fig.savefig(save_to, bbox_inches="tight")
 
@@ -282,7 +267,9 @@ def plot_efficiency_vs_run(
         eff_var="eff",
         eff_sel_var="eff_sel",
         max_err=0.01,
-        figsize=(12, 6),
+        figsize=(
+            12,
+            6),
         save_to="pxd_efficiency_vs_run.png"):
     """
     Helper function to plot efficiency vs run
@@ -296,39 +283,20 @@ def plot_efficiency_vs_run(
     """
 
     plt.figure(figsize=figsize)
-
-    """
-    # ORIGINAL CODE: df.query(f"{eff_var}_err_low<{max_err}")
-    # FIXED VERSION: Compatible with Awkward Arrays
-    """
-    try:
-        df1 = df.query(f"{eff_var}_err_low<{max_err}")
-    except Exception:
-        df1 = df[df[f"{eff_var}_err_low"] < max_err]
-
-    if len(df1) > 0:
-        df1.errorbar(
-            y=eff_var,
-            x="run",
-            yerr_low=f"{eff_var}_err_low",
-            yerr_up=f"{eff_var}_err_up",
-            alpha=0.7,
-            label="All regions")
-
-    try:
-        df2 = df.query(f"{eff_sel_var}_err_low<{max_err}")
-    except Exception:
-        df2 = df[df[f"{eff_sel_var}_err_low"] < max_err]
-
-    if len(df2) > 0:
-        df2.errorbar(
-            y=eff_sel_var,
-            x="run",
-            yerr_low=f"{eff_sel_var}_err_low",
-            yerr_up=f"{eff_sel_var}_err_up",
-            alpha=0.7,
-            label="Excluding hot/dead regions")
-
+    df.query(f"{eff_var}_err_low<{max_err}").errorbar(
+        y=eff_var,
+        x="run",
+        yerr_low=f"{eff_var}_err_low",
+        yerr_up=f"{eff_var}_err_up",
+        alpha=0.7,
+        label="All regions")
+    df.query(f"{eff_sel_var}_err_low<{max_err}").errorbar(
+        y=eff_sel_var,
+        x="run",
+        yerr_low=f"{eff_sel_var}_err_low",
+        yerr_up=f"{eff_sel_var}_err_up",
+        alpha=0.7,
+        label="Excluding hot/dead regions")
     plt.ylabel("PXD efficiency")
     ymin, ymax = plt.ylim()
     plt.ylim(ymin, 1.0)

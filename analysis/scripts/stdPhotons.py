@@ -34,7 +34,7 @@ def stdPhotons(
     - 'gamma:pi0' gamma list for pi0 list
     - 'gamma:pi0highE' gamma list for pi0 list, high energy selection
 
-    -  For latest pi0 recommendations see https://xwiki.desy.de/xwiki/rest/p/e23c8
+    -  For latest pi0 recommendations see https://belle2.pages.desy.de/performance/recommendations/
 
     Parameters:
         listtype (str): name of standard list
@@ -43,21 +43,21 @@ def stdPhotons(
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
+                              `Neutrals Performance XWiki page <https://belle2.pages.desy.de/performance/recommendations/>`_
                               for information on the beam background MVA.
 
         fakePhotonMVAWeight (str): type of weight file for fake photon MVA; if empty, fake photon MVA will not be used
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
+                              `Neutrals Performance XWiki page <https://belle2.pages.desy.de/performance/recommendations/>`_
                               for information on the fake photon MVA.
 
         biasCorrectionTable (str): correction table for the photon energy bias correction (should only be applied to data)
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
+                              `Neutrals Performance XWiki page <https://belle2.pages.desy.de/performance/recommendations/>`_
                               for information on the names of available correction tables..
     """
 

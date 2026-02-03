@@ -40,6 +40,7 @@ DQMHistAnalysisTRGGDLModule::DQMHistAnalysisTRGGDLModule()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("debug", m_debug, "debug mode", false);
   addParam("alert", m_enableAlert, "Enable color alert", true);
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("TRG:"));
 }
 
 DQMHistAnalysisTRGGDLModule::~DQMHistAnalysisTRGGDLModule()
@@ -72,10 +73,17 @@ void DQMHistAnalysisTRGGDLModule::initialize()
   m_h_eff_shifter_fast = new TH1D("hGDL_ana_eff_shifter_fast", "hGDL_ana_eff_shifter_fast", n_eff_shifter, 0, n_eff_shifter);
   m_h_eff_shifter_fast->GetYaxis()->SetTitle("efficiency");
   for (int i = 0; i < n_eff_shifter; i++) {
+    double lo_limit, hi_limit, dummy;
+    const std::string eff_shifter_prefix = "shifter_eff_";
+    std::string now_pvname = eff_shifter_prefix + c_mon_eff_shifter[i];
+    registerEpicsPV(m_pvPrefix + now_pvname, now_pvname);
+    requestLimitsFromEpicsPVs(now_pvname, lo_limit, dummy, dummy, hi_limit);
     m_h_eff_shifter->GetXaxis()->SetBinLabel(i + 1, c_eff_shifter[i]);
     m_h_eff_shifter_fast->GetXaxis()->SetBinLabel(i + 1, c_eff_shifter[i]);
-    m_line_limit_low_shifter[i]  = new TLine(i, m_limit_low_shifter[i], i + 1, m_limit_low_shifter[i]);
-    m_line_limit_high_shifter[i] = new TLine(i, m_limit_high_shifter[i], i + 1, m_limit_high_shifter[i]);
+    m_line_limit_low_shifter[i]  = new TLine(i, lo_limit, i + 1, lo_limit);
+    m_line_limit_high_shifter[i] = new TLine(i, hi_limit, i + 1, hi_limit);
+    m_temp_lo_limit.push_back(lo_limit);
+    m_temp_hi_limit.push_back(hi_limit);
   }
   m_c_eff_shifter = new TCanvas("TRGGDL/hGDL_ana_eff_shifter");
   m_c_eff_shifter_fast = new TCanvas("TRGGDL/hGDL_ana_eff_shifter_fast");
@@ -665,8 +673,8 @@ void DQMHistAnalysisTRGGDLModule::event()
       double eff_err_min_fast = eff_fast - 2 * err_fast;
       double eff_err_max_fast = eff_fast + 2 * err_fast;
       if (
-        (eff_err_max < m_limit_low_shifter[i]) || (eff_err_min > m_limit_high_shifter[i]) ||
-        (eff_err_max_fast < m_limit_low_shifter[i]) || (eff_err_min_fast > m_limit_high_shifter[i])
+        (eff_err_max < m_temp_lo_limit[i]) || (eff_err_min > m_temp_hi_limit[i]) ||
+        (eff_err_max_fast < m_temp_lo_limit[i]) || (eff_err_min_fast > m_temp_hi_limit[i])
       ) {error_check = 1;}
     }
 
@@ -771,27 +779,10 @@ void DQMHistAnalysisTRGGDLModule::endRun()
 {
   B2DEBUG(20, "DQMHistAnalysisTRGGDL : endRun called");
 
-  // mirabelle
-  const char* mon_eff_shifter[n_eff_shifter] = {
-    "CDC_fff",
-    "CDC_ffo",
-    "CDC_ffy",
-    "CDC_fyo",
-    "ECL_hie",
-    "ECL_c4",
-    "BKLM_b2b",
-    "EKLM_b2b",
-    "CDC_BKLM_lt1",
-    "CDC_ECL_lt1",
-    "ECL_EKLM_lt0",
-    "CDC_syo",
-    "CDC_yio",
-    "CDC_stt"
-  };  // The name of the Mirabelle variable for the bin labels of the simplified efficiency histogram.
   for (int i = 1; i <= n_eff_shifter; i++) {
-    B2DEBUG(1, "The name for MonitoringObject histogram is " << mon_eff_shifter[i - 1] << "  " << m_h_eff_shifter_fast->GetBinContent(
+    B2DEBUG(1, "The name for MonitoringObject histogram is " << c_mon_eff_shifter[i - 1] << "  " << m_h_eff_shifter_fast->GetBinContent(
               i) << "   " << m_h_eff_shifter_fast->GetBinError(i));
-    m_mon_h_eff_shifter_fast->setVariable(mon_eff_shifter[i - 1],
+    m_mon_h_eff_shifter_fast->setVariable(c_mon_eff_shifter[i - 1],
                                           m_h_eff_shifter_fast->GetBinContent(i),
                                           m_h_eff_shifter_fast->GetBinError(i),
                                           m_h_eff_shifter_fast->GetBinError(i));

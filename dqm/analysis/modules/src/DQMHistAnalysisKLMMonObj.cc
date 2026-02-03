@@ -123,28 +123,30 @@ void DQMHistAnalysisKLMMonObjModule::endRun()
     bklm_trg[i] = (TH2F*)findHist(m_histogramDirectoryName + histPrefix + "_" + m_tag[i]);
   }
 
-  TH1F* background_trigger_count;
-  background_trigger_count = (TH1F*)findHist("KLM/event_background_trigger_summary");
+  auto* background_trigger_count = findHist("KLM/event_background_trigger_summary");
+  if (not background_trigger_count) {
+    B2ERROR("Cannot find histogram: KLM/event_background_trigger_summary");
+    return;
+  }
 
+  Double_t totalEventsTrg = background_trigger_count->GetBinContent(1); // TTYP_DPHY == 1
   std::string prefix = "BKLM_";
   std::string suffix = "hit_rate";
 
   for (size_t i = 0; i < 2; i++) {
-    // Process for each tag (IN and OUT) histograms
-    if (bklm_trg[i]) {
-      for (int layerGlobal = 0; layerGlobal < 240; layerGlobal++) {
-        Double_t totalEventsTrg = background_trigger_count->GetBinContent(1)
-                                  ; // Get total events (entries) from background trigger histogram (TTYP_DPHY == 1)
-        int section, sector, layer;
-        m_BklmElementNumbers->layerGlobalNumberToElementNumbers(
-          layerGlobal, &section, &sector, &layer);
-        Double_t layerAreaTrg = m_bklmGeoPar->getBKLMLayerArea(section, sector, layer); // in cm^2
-        Double_t hitRate, hitRateErr;
-        CalculateKLMHitRate(bklm_trg[i], layer, totalEventsTrg, layerAreaTrg, hitRate, hitRateErr);
-        m_klmMonObj->setVariable(prefix + "layer" + std::to_string(layer) + "_trg_" + suffix + "_" + m_tag[i], hitRate, hitRateErr);
-      }
+    if (not bklm_trg[i]) {
+      B2ERROR("Cannot find histogram: " << m_histogramDirectoryName + histPrefix + "_" + m_tag[i]);
+      continue;
+    }
+    for (int layerGlobal = 0; layerGlobal < 240; layerGlobal++) {
+      int section, sector, layer;
+      m_BklmElementNumbers->layerGlobalNumberToElementNumbers(
+        layerGlobal, &section, &sector, &layer);
+      Double_t layerAreaTrg = m_bklmGeoPar->getBKLMLayerArea(section, sector, layer); // in cm^2
+      Double_t hitRate, hitRateErr;
+      CalculateKLMHitRate(bklm_trg[i], layer, totalEventsTrg, layerAreaTrg, hitRate, hitRateErr);
+      m_klmMonObj->setVariable(prefix + "layer" + std::to_string(layer) + "_trg_" + suffix + "_" + m_tag[i], hitRate, hitRateErr);
     }
   }
-
 }
 

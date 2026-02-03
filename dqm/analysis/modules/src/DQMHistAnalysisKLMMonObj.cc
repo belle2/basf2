@@ -8,6 +8,7 @@
 
 #include <cstddef>
 #include <dqm/analysis/modules/DQMHistAnalysisKLMMonObj.h>
+#include <TH2.h>
 #include <iostream>
 using namespace Belle2;
 
@@ -63,9 +64,10 @@ void DQMHistAnalysisKLMMonObjModule::event()
   B2DEBUG(20, "DQMHistAnalysisKLMMonObj: event called.");
 }
 
-void DQMHistAnalysisKLMMonObjModule::CalculateKLMHitRate(TH2* hist2D, int layer, Double_t totalEvents,
+void DQMHistAnalysisKLMMonObjModule::CalculateKLMHitRate(TH1* hist, int layer, Double_t totalEvents,
                                                          Double_t layerArea, Double_t& hitRate, Double_t& hitRateErr)
 {
+  auto* hist2D = static_cast<TH2*>(hist);
   if (!hist2D || layer <= 0 || layerArea <= 0 || totalEvents <= 0) {
     B2ERROR("CalculateKLMHitRate: Invalid input parameters.");
     hitRate = 0.0;
@@ -130,7 +132,7 @@ void DQMHistAnalysisKLMMonObjModule::endRun()
   }
 
   Double_t totalEventsTrg = background_trigger_count->GetBinContent(1); // TTYP_DPHY == 1
-  std::string prefix = "BKLM_";
+  std::string prefix = "KLM_";
   std::string suffix = "hit_rate";
 
   for (size_t i = 0; i < 2; i++) {
@@ -145,7 +147,12 @@ void DQMHistAnalysisKLMMonObjModule::endRun()
       Double_t layerAreaTrg = m_bklmGeoPar->getBKLMLayerArea(section, sector, layer); // in cm^2
       Double_t hitRate, hitRateErr;
       CalculateKLMHitRate(bklm_trg[i], layer, totalEventsTrg, layerAreaTrg, hitRate, hitRateErr);
-      m_klmMonObj->setVariable(prefix + "layer" + std::to_string(layer) + "_trg_" + suffix + "_" + m_tag[i], hitRate, hitRateErr);
+      // Naming consistent with KLM2: B/F for section, 0-based sector, 1-based layer
+      std::string varName = prefix + "B";
+      varName += (section == 0) ? "B" : "F";
+      varName += std::to_string((sector - 1) % BKLMElementNumbers::getMaximalSectorNumber());
+      varName += "_layer" + std::to_string(layer) + "_trg_" + suffix + "_" + m_tag[i];
+      m_klmMonObj->setVariable(varName, hitRate, hitRateErr);
     }
   }
 }

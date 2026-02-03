@@ -64,11 +64,10 @@ void DQMHistAnalysisKLMMonObjModule::event()
   B2DEBUG(20, "DQMHistAnalysisKLMMonObj: event called.");
 }
 
-void DQMHistAnalysisKLMMonObjModule::CalculateKLMHitRate(TH1* hist, int layer, Double_t totalEvents,
+void DQMHistAnalysisKLMMonObjModule::CalculateKLMHitRate(auto* hist, int layer, Double_t totalEvents,
                                                          Double_t layerArea, Double_t& hitRate, Double_t& hitRateErr)
 {
-  auto* hist2D = static_cast<TH2*>(hist);
-  if (!hist2D || layer <= 0 || layerArea <= 0 || totalEvents <= 0) {
+  if (!hist || hist->GetDimension() != 2 || layer <= 0 || layerArea <= 0 || totalEvents <= 0) {
     B2ERROR("CalculateKLMHitRate: Invalid input parameters.");
     hitRate = 0.0;
     hitRateErr = 0.0;
@@ -79,13 +78,13 @@ void DQMHistAnalysisKLMMonObjModule::CalculateKLMHitRate(TH1* hist, int layer, D
   // Layer number is on X-axis, so we sum over all Y bins for a given X bin (layer)
   Double_t numDigits = 0.0;
 
-  int nBinsX = hist2D->GetNbinsX();
-  int nBinsY = hist2D->GetNbinsY();
+  int nBinsX = hist->GetNbinsX();
+  int nBinsY = hist->GetNbinsY();
 
   // Layer corresponds to X-axis bins
   if (layer > 0 && layer <= nBinsX) {
     for (int binY = 1; binY <= nBinsY; binY++) {
-      Double_t binContent = hist2D->GetBinContent(layer, binY);
+      Double_t binContent = hist->GetBinContent(layer, binY);
       numDigits += binContent;
     }
   } else {
@@ -114,7 +113,7 @@ void DQMHistAnalysisKLMMonObjModule::CalculateKLMHitRate(TH1* hist, int layer, D
 
 void DQMHistAnalysisKLMMonObjModule::endRun()
 {
-  // Calculate hit rates for each layer from TH2 histograms
+  // Calculate hit rates for each layer from 2D histograms
   // BKLM layer types:
   //   - Layers 1-2: Scintillator
   //   - Layers 3-15: RPC
@@ -133,7 +132,7 @@ void DQMHistAnalysisKLMMonObjModule::endRun()
 
   Double_t totalEventsTrg = background_trigger_count->GetBinContent(1); // TTYP_DPHY == 1
   std::string prefix = "KLM_";
-  std::string suffix = "hit_rate";
+  std::string suffix = "hitRate";
 
   for (size_t i = 0; i < 2; i++) {
     if (not bklm_trg[i]) {

@@ -68,7 +68,7 @@ namespace Belle2 {
      * @param[out] hitRate        Calculated KLM hit rate for the specific layer (Hz/cm^2)
      * @param[out] hitRateErr     Error on KLM hit rate for the specific layer (Hz/cm^2)
      */
-    void CalculateKLMHitRate(TH1* hist, int layer, Double_t totalEvents, Double_t layerArea,
+    void CalculateKLMHitRate(auto* hist, int layer, Double_t totalEvents, Double_t layerArea,
                              Double_t& hitRate, Double_t& hitRateErr);
 
 

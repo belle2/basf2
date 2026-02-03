@@ -477,9 +477,11 @@ void DQMHistAnalysisECLModule::endRun()
   for (auto threshold : m_HitMapThresholds) {
     auto var_name_avg = (boost::format("average_number_of_ECL_digits_at_%1%_MeV") % threshold).str();
     auto var_name_std = (boost::format("standard_deviation_of_ECL_digits_at_%1%_MeV") % threshold).str();
-    TH1* h_ECL_ncev = findHist(str(boost::format("ECL/ncev_Thr%1%MeV") % threshold));
-    m_monObj->setVariable(var_name_avg, h_ECL_ncev->GetMean());
-    m_monObj->setVariable(var_name_std, h_ECL_ncev->GetStdDev());
+    auto h_ECL_ncev = findHist(str(boost::format("ECL/ncev_Thr%1%MeV") % threshold));
+    if (h_ECL_ncev) {
+      m_monObj->setVariable(var_name_avg, h_ECL_ncev->GetMean());
+      m_monObj->setVariable(var_name_std, h_ECL_ncev->GetStdDev());
+    }
   }
 }
 

@@ -43,21 +43,21 @@ def stdPhotons(
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance XWiki page <https://belle2.pages.desy.de/performance/recommendations/>`_
+                              `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_
                               for information on the beam background MVA.
 
         fakePhotonMVAWeight (str): type of weight file for fake photon MVA; if empty, fake photon MVA will not be used
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance XWiki page <https://belle2.pages.desy.de/performance/recommendations/>`_
+                              `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_
                               for information on the fake photon MVA.
 
         biasCorrectionTable (str): correction table for the photon energy bias correction (should only be applied to data)
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance XWiki page <https://belle2.pages.desy.de/performance/recommendations/>`_
+                              `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_
                               for information on the names of available correction tables..
     """
 

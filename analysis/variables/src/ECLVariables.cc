@@ -111,6 +111,19 @@ namespace Belle2 {
       return fakePhotonSuppression(particle);
     }
 
+    double eclClusterKlId(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) {
+        return Const::doubleNaN;
+      }
+      const KlId* klid = cluster->getRelatedTo<KlId>();
+      if (!klid) {
+        return Const::doubleNaN;
+      }
+      return klid->getKlId();
+    }
+
     double eclPulseShapeDiscriminationMVA(const Particle* particle)
     {
       const ECLCluster* cluster = particle->getECLCluster();
@@ -1131,7 +1144,7 @@ namespace Belle2 {
 
     VARIABLE_GROUP("ECL cluster related");
     REGISTER_VARIABLE("clusterEoP", eclClusterEoP, R"DOC(
-Returns ratio of the cluster energy :math:`clusterE` over momentum :math:`p`. 
+Returns ratio of the cluster energy `clusterE` over momentum :math:`p`. 
 
 .. attention:: 
     The cluster energy is already corrected for Bremsstrahlung. 
@@ -1165,7 +1178,6 @@ depth. :math:`\Delta L` is then defined as the distance between this intersectio
     - Lower limit: :math:`-250.0`
     - Upper limit: :math:`250.0`
     - Precision: :math:`10` bit
-..
 
 )DOC","cm");
     REGISTER_VARIABLE("minC2TDist", eclClusterIsolation, R"DOC(
@@ -1182,7 +1194,6 @@ retrieved using `minC2TDistID`.
     - Lower limit: :math:`0.0`
     - Upper limit: :math:`250.0`
     - Precision: :math:`10` bit
-..
 
 )DOC","cm");
     REGISTER_VARIABLE("minC2TDistID", eclClusterIsolationID, R"DOC(
@@ -1301,7 +1312,6 @@ to the azimuthal angle of the photon.
     - Lower limit: :math:`-\pi`
     - Upper limit: :math:`\pi`
     - Precision: :math:`16` bit
-..
 
 )DOC","rad");
     REGISTER_VARIABLE("clusterConnectedRegionID", eclClusterConnectedRegionID, R"DOC(
@@ -1331,7 +1341,6 @@ to the polar angle of the photon.
     - Lower limit: :math:`0.0`
     - Upper limit: :math:`\pi`
     - Precision: :math:`16` bit
-..
 
 )DOC","rad");
     REGISTER_VARIABLE("clusterTiming", eclClusterTiming, R"DOC(
@@ -1352,7 +1361,6 @@ read their definitions below.
     - Lower limit: :math:`-1000.0`
     - Upper limit: :math:`1000.0`
     - Precision: :math:`12` bit
-..
 
 .. topic:: In Belle
 
@@ -1367,7 +1375,6 @@ read their definitions below.
     - Lower limit: :math:`-1000.0`
     - Upper limit: :math:`1000.0`
     - Precision: :math:`12` bit
-..
 
 )DOC","ns");
     REGISTER_VARIABLE("clusterHasFailedTiming", eclClusterHasFailedTiming, R"DOC(
@@ -1416,7 +1423,6 @@ Returns the energy of the highest energetic crystal in the cluster after reweigh
     - Lower limit: :math:`-5` (:math:`e^{-5} = 0.00674\,` GeV)
     - Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV)
     - Precision: :math:`18` bit
-..
 
 )DOC","GeV");
     REGISTER_VARIABLE("clusterCellID", eclClusterCellId,
@@ -1443,9 +1449,10 @@ Returns the ratio of the energy in the central crystal (:math:`E_1`) to the tota
 
 )DOC");
     REGISTER_VARIABLE("clusterE9E25", eclClusterE9E25, R"DOC(
-.. deprecated:: release-XX-XX-XX
-
-    Returns `clusterE9E21`. Kept for backwards compatibility.   
+Returns the ratio of the total energy in the 3x3 crystal grid around the central 
+crystal (:math:`E_9`) to the total energy in the 5x5 crystal grid around the central crystal (:math:`E_25`). 
+Since :math:`E_9 \leq E_25`, this ratio is :math:`\leq 1` and tends towards larger 
+values for photons and smaller values for hadrons. 
 )DOC");
     REGISTER_VARIABLE("clusterE9E21", eclClusterE9E21, R"DOC(
 Returns the ratio of the total energy in the 3x3 crystal grid around the central 
@@ -1471,6 +1478,7 @@ shape variable is in the description for the `clusterZernikeMVA` variable.
     - Lower limit: :math:`0.0`
     - Upper limit: :math:`1.7`
     - Precision: :math:`10` bit
+
 )DOC");
     REGISTER_VARIABLE("clusterAbsZernikeMoment51", eclClusterAbsZernikeMoment51, R"DOC(
 Returns absolute value of the 51st Zernike moment :math:`|Z_{51}|`. An explanation on this shower 
@@ -1482,6 +1490,7 @@ shape variable is in the description for the `clusterZernikeMVA` variable.
     - Lower limit: :math:`0.0`
     - Upper limit: :math:`1.2`
     - Precision: :math:`10` bit
+
 )DOC");
     REGISTER_VARIABLE("clusterZernikeMVA", eclClusterZernikeMVA, R"DOC(
 Returns output of an MVA trained to use eleven Zernike moments of the cluster. 
@@ -1516,6 +1525,7 @@ energy of the :math:`i`-th crystal associated with the shower.
     - Lower limit: :math:`0.0`
     - Upper limit: :math:`1.0`
     - Precision: :math:`10` bit
+
 )DOC");
     REGISTER_VARIABLE("clusterSecondMoment", eclClusterSecondMoment, R"DOC(
 Returns the second moment :math:`S` of the cluster. This is mainly implemented for reconstructing high a 
@@ -1564,6 +1574,7 @@ and :math:`r_{0} \approx 5\,cm` is the average distance between two crystal cent
     - Lower limit: :math:`0.0`
     - Upper limit: :math:`1.0`
     - Precision: :math:`10` bit
+
 )DOC");
     REGISTER_VARIABLE("clusterNHits", eclClusterNHits, R"DOC(
 Returns sum of weights :math:`w_{i}` (:math:`w_{i} \leq 1`) of all crystals in the cluster.
@@ -1653,11 +1664,36 @@ The MVA has been trained using MC and the features, in decreasing importance, ar
 
 )DOC");
     REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
-.. deprecated:: light-2302-genetta
+Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.
+The classes are: 
 
-    The training for this variable has been not been updated since MC14. 
-    Please use `fakePhotonSuppression` instead which is an improved and up-to-date version of this MVA. 
+- 1 for true photon clusters
+- 0 for hadronic splitoff clusters
 
+The MVA has been trained using samples of signal photons and hadronic splitoff photons coming from MC. 
+The features used are (in decreasing order of significance):
+
+- `clusterPulseShapeDiscriminationMVA`
+- `minC2TDist`
+- `clusterZernikeMVA`
+- `clusterE`
+- `clusterLAT`
+- `clusterE1E9`
+- `clusterSecondMoment`
+
+)DOC");
+    MAKE_DEPRECATED("hadronicSplitOffSuppression", true, "light-2302-genetta", R"DOC(
+                     Use the variable `fakePhotonSuppression` instead which is maintained and uses the latest weight files.
+)DOC");
+    REGISTER_VARIABLE("clusterKlId", eclClusterKlId, R"DOC(
+Returns MVA classifier that uses ECL clusters variables to discriminate Klong clusters from em background.
+    
+- 1 for Kl
+- 0 for background
+
+)DOC");
+    MAKE_DEPRECATED("clusterKlId", true, "light-2603-i", R"DOC(
+                     
 )DOC");
     REGISTER_VARIABLE("clusterPulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA, R"DOC(
 Returns the output of an MVA classifier that uses pulse shape information to discriminate between electromagnetic 
@@ -1681,6 +1717,7 @@ that have :math:`> 3\,` MeV for the hadronic scintillation component. The digits
     - Lower limit: :math:`0.0`
     - Upper limit: :math:`255.0`
     - Precision: :math:`18` bit
+    
 )DOC");
     REGISTER_VARIABLE("clusterClusterID", eclClusterId, R"DOC(
 Returns the ID the cluster within the connected region to which it belongs. 

@@ -14,6 +14,9 @@
 /* C++ headers. */
 #include <string>
 
+/* ROOT forward declaration. */
+class TH2;
+
 /* KLM headers */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/bklm/geometry/GeometryPar.h>
@@ -68,7 +71,7 @@ namespace Belle2 {
      * @param[out] hitRate        Calculated KLM hit rate for the specific layer (Hz/cm^2)
      * @param[out] hitRateErr     Error on KLM hit rate for the specific layer (Hz/cm^2)
      */
-    void CalculateKLMHitRate(auto* hist, int layer, Double_t totalEvents, Double_t layerArea,
+    void CalculateKLMHitRate(TH2* hist, int layer, Double_t totalEvents, Double_t layerArea,
                              Double_t& hitRate, Double_t& hitRateErr);
 
 

@@ -64,7 +64,7 @@ void DQMHistAnalysisKLMMonObjModule::event()
   B2DEBUG(20, "DQMHistAnalysisKLMMonObj: event called.");
 }
 
-void DQMHistAnalysisKLMMonObjModule::CalculateKLMHitRate(auto* hist, int layer, Double_t totalEvents,
+void DQMHistAnalysisKLMMonObjModule::CalculateKLMHitRate(TH2* hist, int layer, Double_t totalEvents,
                                                          Double_t layerArea, Double_t& hitRate, Double_t& hitRateErr)
 {
   if (!hist || hist->GetDimension() != 2 || layer <= 0 || layerArea <= 0 || totalEvents <= 0) {

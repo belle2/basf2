@@ -786,6 +786,9 @@ void DQMHistAnalysisTRGGDLModule::beginRun()
     std::string now_pvname = eff_shifter_prefix + c_mon_eff_shifter[i];
     requestLimitsFromEpicsPVs(now_pvname, lo_limit, dummy, dummy, hi_limit);
 
+    if (std::isnan(lo_limit)) lo_limit = 0;
+    if (std::isnan(hi_limit)) hi_limit = 1;
+
     delete m_line_limit_low_shifter[i];
     delete m_line_limit_high_shifter[i];
     m_line_limit_low_shifter[i]  = new TLine(i, lo_limit, i + 1, lo_limit);

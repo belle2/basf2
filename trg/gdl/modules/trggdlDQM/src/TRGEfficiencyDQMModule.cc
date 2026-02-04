@@ -184,9 +184,9 @@ void TRGEfficiencyDQMModule::event()
   }
 
   bool hltAccepted = false;
-  if (m_softwareTriggerResult) {
+  if (m_HltResult) {
     try {
-      hltAccepted = (m_softwareTriggerResult->getResult("software_trigger_cut&filter&total_result") == SoftwareTriggerCutResult::c_accept)
+      hltAccepted = (m_HltResult->getResult("software_trigger_cut&filter&total_result") == SoftwareTriggerCutResult::c_accept)
                     ?
                     true : false;
     } catch (const std::out_of_range&) {

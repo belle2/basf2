@@ -183,15 +183,17 @@ void TRGEfficiencyDQMModule::event()
     return;
   }
 
-  const std::map<std::string, int>& hltResult = m_HltResult->getResults();
-  if ((hltResult.find("software_trigger_cut&skim&accept_bhabha") == hltResult.end())
-      || (hltResult.find("software_trigger_cut&skim&accept_hadron") == hltResult.end())
-      || (hltResult.find("software_trigger_cut&filter&total_result") == hltResult.end())) {
-    B2WARNING("TRGEfficiencyDQMModule: Can't find required HLT identifiers");
-    return;
+  bool hltAccepted = false;
+  if (m_softwareTriggerResult) {
+    try {
+      hltAccepted = (m_softwareTriggerResult->getResult("software_trigger_cut&filter&total_result") == SoftwareTriggerCutResult::c_accept)
+                    ?
+                    true : false;
+    } catch (const std::out_of_range&) {
+      hltAccepted = false;
+    }
   }
 
-  const bool hltAccepted = (m_HltResult->getResult("software_trigger_cut&filter&total_result") == SoftwareTriggerCutResult::c_accept);
   if (not hltAccepted) {
     B2WARNING("TRGEfficiencyDQMModule: Event rejected by the HLT filter, skipping the module");
     return;

@@ -43,6 +43,7 @@ the execution time and memory consumption. It is not necessary to explicitly pri
 automatically done when switching the calculation on.
 
 .. include:: analysis/doc/whatsnew-since/release-10-00.txt
+.. include:: framework/doc/whatsnew-since/release-10-00.txt
 
 Changes since release-09
 ========================

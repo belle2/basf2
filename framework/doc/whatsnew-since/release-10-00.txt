@@ -1,0 +1,6 @@
+Changes in the framework package
+--------------------------------
+
+Particle data
+++++++++++++++
+* Particle database file evt.pdl has been updated to PDG 2024 data.

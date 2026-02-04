@@ -60,6 +60,12 @@ namespace Belle2 {
     void event() override final;
 
     /**
+     * Begin-of-run action.
+     * Initialize run-related stuff
+     */
+    void beginRun() override final;
+
+    /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
@@ -164,7 +170,7 @@ namespace Belle2 {
       "CDC_syo",
       "CDC_yio",
       "CDC_stt"
-    };  /**<The name of the Mirabelle variable for the bin labels of the simplified efficiency histogram.*/
+    };  /**<The name of the Mirabelle variable and the PVs for the bin labels of the simplified efficiency histogram.*/
     const char* c_eff_shifter[n_eff_shifter] = {
       "CDC fff",
       "CDC ffo",

@@ -72,18 +72,16 @@ void DQMHistAnalysisTRGGDLModule::initialize()
   m_h_eff_shifter->GetYaxis()->SetTitle("efficiency");
   m_h_eff_shifter_fast = new TH1D("hGDL_ana_eff_shifter_fast", "hGDL_ana_eff_shifter_fast", n_eff_shifter, 0, n_eff_shifter);
   m_h_eff_shifter_fast->GetYaxis()->SetTitle("efficiency");
+  m_temp_lo_limit.resize(n_eff_shifter);
+  m_temp_hi_limit.resize(n_eff_shifter);
   for (int i = 0; i < n_eff_shifter; i++) {
-    double lo_limit, hi_limit, dummy;
     const std::string eff_shifter_prefix = "shifter_eff_";
     std::string now_pvname = eff_shifter_prefix + c_mon_eff_shifter[i];
     registerEpicsPV(m_pvPrefix + now_pvname, now_pvname);
-    requestLimitsFromEpicsPVs(now_pvname, lo_limit, dummy, dummy, hi_limit);
     m_h_eff_shifter->GetXaxis()->SetBinLabel(i + 1, c_eff_shifter[i]);
     m_h_eff_shifter_fast->GetXaxis()->SetBinLabel(i + 1, c_eff_shifter[i]);
-    m_line_limit_low_shifter[i]  = new TLine(i, lo_limit, i + 1, lo_limit);
-    m_line_limit_high_shifter[i] = new TLine(i, hi_limit, i + 1, hi_limit);
-    m_temp_lo_limit.push_back(lo_limit);
-    m_temp_hi_limit.push_back(hi_limit);
+    m_line_limit_low_shifter[i]  = nullptr;
+    m_line_limit_high_shifter[i] = nullptr;
   }
   m_c_eff_shifter = new TCanvas("TRGGDL/hGDL_ana_eff_shifter");
   m_c_eff_shifter_fast = new TCanvas("TRGGDL/hGDL_ana_eff_shifter_fast");
@@ -773,6 +771,25 @@ void DQMHistAnalysisTRGGDLModule::event()
   }
 #endif
 
+}
+
+void DQMHistAnalysisTRGGDLModule::beginRun()
+{
+  B2DEBUG(20, "DQMHistAnalysisTRGGDL : beginRun called");
+  for (int i = 0; i < n_eff_shifter; i++) {
+    double lo_limit, hi_limit, dummy;
+    const std::string eff_shifter_prefix = "shifter_eff_";
+    std::string now_pvname = eff_shifter_prefix + c_mon_eff_shifter[i];
+    requestLimitsFromEpicsPVs(now_pvname, lo_limit, dummy, dummy, hi_limit);
+
+    delete m_line_limit_low_shifter[i];
+    delete m_line_limit_high_shifter[i];
+    m_line_limit_low_shifter[i]  = new TLine(i, lo_limit, i + 1, lo_limit);
+    m_line_limit_high_shifter[i] = new TLine(i, hi_limit, i + 1, hi_limit);
+
+    m_temp_lo_limit[i] = lo_limit;
+    m_temp_hi_limit[i] = hi_limit;
+  }
 }
 
 void DQMHistAnalysisTRGGDLModule::endRun()

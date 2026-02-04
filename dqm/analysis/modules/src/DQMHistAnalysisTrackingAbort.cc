@@ -269,13 +269,15 @@ void DQMHistAnalysisTrackingAbortModule::event()
   TH1* hCDCExtraHitsOut = findHist("TrackingAbort/nCDCExtraHits_OUT");
   if (hCDCExtraHitsOut != nullptr) {
     m_monObj->setVariable("nCDCExtraHits_outActiveVeto", hCDCExtraHitsOut->GetMean());
+    m_monObj->setVariable("nCDCExtraHitsRMS_outActiveVeto", hCDCExtraHitsOut->GetRMS());
 
     // count fraction of events with nExtraCDCHits > 2700 (outside Active Veto)
     int from_bin = h->FindBin(2700);
-    int to_bin = h->GetNbinsX();
+    int to_bin = h->GetNbinsX() + 1;
     double integral = h->Integral(from_bin, to_bin);
-    m_monObj->setVariable("fEventsWithCDCExtraHitsAbove_outActiveVeto",   integral / hCDCExtraHitsOut->GetEntries())
-  }
+    if (hCDCExtraHitsOut->GetEntries() > 0)
+      m_monObj->setVariable("fEventsWithCDCExtraHitsAbove_outActiveVeto",   integral / hCDCExtraHitsOut->GetEntries())
+    }
   TH1* hCDCExtraHitsIn_BF = findHist("TrackingAbort_before_filter/nCDCExtraHits_IN");
   if (hCDCExtraHitsIn_BF != nullptr) m_monObj->setVariable("nCDCExtraHitsBeforeFilter_inActiveVeto", hCDCExtraHitsIn_BF->GetMean());
   TH1* hCDCExtraHitsOut_BF = findHist("TrackingAbort_before_filter/nCDCExtraHits_OUT");

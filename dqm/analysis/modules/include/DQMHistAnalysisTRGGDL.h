@@ -205,7 +205,8 @@ namespace Belle2 {
     TLine* m_line_limit_low_shifter[n_eff_shifter] = {}; /**<lower limit line for the simplified efficiency histogram*/
     TLine* m_line_limit_high_shifter[n_eff_shifter] = {}; /**<upper limit line for the simplified efficiency histogram*/
     std::vector<double> m_temp_lo_limit; /**<lower limit threshold for the efficiencies monitored by shifters*/
-    std::vector<double>m_temp_hi_limit; /**<upper limit threshold for the efficiencies monitored by shifters*/
+    std::vector<double> m_temp_hi_limit; /**<upper limit threshold for the efficiencies monitored by shifters*/
+    std::vector<std::string> m_temp_pvnames; /**<Names of PVs for the efficiencies monitored by shifters*/
 
     /** Run type flag for physics runs. */
     bool m_IsPhysicsRun;

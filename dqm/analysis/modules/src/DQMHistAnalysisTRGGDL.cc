@@ -74,10 +74,12 @@ void DQMHistAnalysisTRGGDLModule::initialize()
   m_h_eff_shifter_fast->GetYaxis()->SetTitle("efficiency");
   m_temp_lo_limit.resize(n_eff_shifter);
   m_temp_hi_limit.resize(n_eff_shifter);
+  m_temp_pvnames.resize(n_eff_shifter);
   for (int i = 0; i < n_eff_shifter; i++) {
     const std::string eff_shifter_prefix = "shifter_eff_";
     std::string now_pvname = eff_shifter_prefix + c_mon_eff_shifter[i];
     registerEpicsPV(m_pvPrefix + now_pvname, now_pvname);
+    m_temp_pvnames[i] = now_pvname;
     m_h_eff_shifter->GetXaxis()->SetBinLabel(i + 1, c_eff_shifter[i]);
     m_h_eff_shifter_fast->GetXaxis()->SetBinLabel(i + 1, c_eff_shifter[i]);
     m_line_limit_low_shifter[i]  = nullptr;
@@ -670,6 +672,8 @@ void DQMHistAnalysisTRGGDLModule::event()
       double err_fast = m_h_eff_shifter_fast->GetBinError(i + 1);
       double eff_err_min_fast = eff_fast - 2 * err_fast;
       double eff_err_max_fast = eff_fast + 2 * err_fast;
+
+      setEpicsPV(m_temp_pvnames[i], eff_fast);
       if (
         (eff_err_max < m_temp_lo_limit[i]) || (eff_err_min > m_temp_hi_limit[i]) ||
         (eff_err_max_fast < m_temp_lo_limit[i]) || (eff_err_min_fast > m_temp_hi_limit[i])

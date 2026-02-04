@@ -66,7 +66,7 @@ def analyse_root_file(file_name, tree_name="tree"):
 
     plot_efficiency_vs_run(df=df_sum_all, max_err=0.01, save_to=prefix + "pxd_efficiency_vs_run.png")
 
-    # Calculate efficiences of modules
+    # Calculate efficiencies of modules
     df_module_sum = df.groupby(['exp', 'run', 'pxdid'])[["nTrackPoints", "nSelTrackPoints",
                                                          "nTrackClusters", "nSelTrackClusters"]].sum().reset_index()
     df_module_sum["pxdid"] = df_module_sum["pxdid"].astype(np.int64)

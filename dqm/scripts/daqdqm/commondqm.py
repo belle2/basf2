@@ -319,11 +319,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     # TRG after skim
     if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "filtered"]):
         # TRGGDL
-        trggdldqm_skim = b2.register_module('TRGGDLDQM')
-        trggdldqm_skim.param('skim', 1)
-        path.add_module(trggdldqm_skim)
-        trgeffdqm = b2.register_module("TRGEFFDQM")
-        path.add_module(trgeffdqm)
+        path.add_module('TRGGDLDQM', skim=1)
+        path.add_module('TRGEfficiencyDQM')
 
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):

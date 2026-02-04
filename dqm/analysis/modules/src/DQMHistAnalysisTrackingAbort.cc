@@ -270,7 +270,7 @@ void DQMHistAnalysisTrackingAbortModule::event()
   if (hCDCExtraHitsOut != nullptr) {
     m_monObj->setVariable("nCDCExtraHits_outActiveVeto", hCDCExtraHitsOut->GetMean());
 
-    // count fraction of events with nExtraCDC outside Active Veto > 2700
+    // count fraction of events with nExtraCDCHits > 2700 (outside Active Veto)
     int from_bin = h->FindBin(2700);
     int to_bin = h->GetNbinsX();
     double integral = h->Integral(from_bin, to_bin);

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <Python.h>
+
 namespace Belle2 {
   /** Proxy class to register python modules (the things you can 'import').
    *

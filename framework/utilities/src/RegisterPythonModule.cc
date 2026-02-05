@@ -6,10 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <boost/python.hpp>
-
 #include <framework/utilities/RegisterPythonModule.h>
 #include <framework/logging/Logger.h>
+
+#include <Python.h>
 
 #include <string>
 

@@ -37,7 +37,7 @@ from shutil import copyfile, rmtree
 
 
 #: Tells the automated system some details of this script
-settings = ValidationSettings(name='eCMS Calibrations',
+settings = ValidationSettings(name='Ecms Calibrations',
                               description=__doc__,
                               download_files=['stdout'],
                               expert_config={})
@@ -111,7 +111,7 @@ def get_Ecms_values(path):
 
         f = ROOT.TFile.Open(fName)
         ecmsObj = f.Get("CollisionInvariantMass")
-        assert(ecmsObj.ClassName() == "Belle2::CollisionInvariantMass")
+        assert (ecmsObj.ClassName() == "Belle2::CollisionInvariantMass")
 
         eCMS = ecmsObj.getMass()
         eCMSe = ecmsObj.getMassError()
@@ -447,7 +447,7 @@ def create_hadB_fit_plots(outputDir, pdflatex):
             if int(round(arr[i0Temp][0][0], 0)) == t:
                 i0 = i0Temp
                 break
-        assert(i0 is not None)
+        assert (i0 is not None)
 
         frac = 1. / (items[t] + 0.2)
         if items[t] >= 6:

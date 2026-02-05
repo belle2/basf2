@@ -10,6 +10,7 @@
 
 #include <framework/core/HistoModule.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <mdst/dataobjects/TRGSummary.h>
@@ -192,10 +193,10 @@ namespace Belle2 {
     TH1F** m_onlineZSstripCountV = nullptr;
 
     /** U strip count for cluster time group Id = 0 */
-    TH1F** m_stripCountGroupId0U = nullptr;
+    TH1F** m_stripCountSignalGroupIDsU = nullptr;
 
     /** V strip count for cluster time group Id = 0 */
-    TH1F** m_stripCountGroupId0V = nullptr;
+    TH1F** m_stripCountSignalGroupIDsV = nullptr;
 
     /** u strip count for 3 samples */
     TH1F** m_strip3SampleCountU = nullptr;

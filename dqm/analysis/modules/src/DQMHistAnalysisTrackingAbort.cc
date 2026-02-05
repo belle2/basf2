@@ -275,8 +275,9 @@ void DQMHistAnalysisTrackingAbortModule::event()
     int from_bin = hCDCExtraHitsOut->FindBin(2700);
     int to_bin = hCDCExtraHitsOut->GetNbinsX() + 1;
     double integral = hCDCExtraHitsOut->Integral(from_bin, to_bin);
-    if (hCDCExtraHitsOut->GetEntries() > 0)
+    if (hCDCExtraHitsOut->GetEntries() > 0) {
       m_monObj->setVariable("fEventsWithCDCExtraHitsAbove2700_outActiveVeto",   integral / hCDCExtraHitsOut->GetEntries());
+    }
   }
   TH1* hCDCExtraHitsIn_BF = findHist("TrackingAbort_before_filter/nCDCExtraHits_IN");
   if (hCDCExtraHitsIn_BF != nullptr) m_monObj->setVariable("nCDCExtraHitsBeforeFilter_inActiveVeto", hCDCExtraHitsIn_BF->GetMean());

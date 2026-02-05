@@ -9,8 +9,6 @@
 #include <framework/utilities/RegisterPythonModule.h>
 #include <framework/logging/Logger.h>
 
-#include <Python.h>
-
 #include <string>
 
 using namespace Belle2;

@@ -19,8 +19,6 @@
 #include <mva/interface/Expert.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
-#include <boost/algorithm/string/predicate.hpp>
-
 // here's where the functions are hidden
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"
 
@@ -55,7 +53,7 @@ void ECLExpertModule::initialize()
   m_eclClusters.registerRelationTo(m_klids);
 
 
-  if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
+  if (not(m_identifier.ends_with(".root") or m_identifier.ends_with(".xml"))) {
     m_weightfile_representation = std::make_unique<DBObjPtr<DatabaseRepresentationOfWeightfile>>(MVA::makeSaveForDatabase(
                                     m_identifier));
   }

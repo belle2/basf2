@@ -17,7 +17,6 @@
 #include <boost/archive/iterators/transform_width.hpp>
 
 #include <boost/property_tree/xml_parser.hpp>
-#include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/regex.hpp>
@@ -149,9 +148,9 @@ namespace Belle2 {
 
     void Weightfile::save(Weightfile& weightfile, const std::string& filename, const Belle2::IntervalOfValidity& iov)
     {
-      if (boost::ends_with(filename, ".root")) {
+      if (filename.ends_with(".root")) {
         return saveToROOTFile(weightfile, filename);
-      } else if (boost::ends_with(filename, ".xml")) {
+      } else if (filename.ends_with(".xml")) {
         return saveToXMLFile(weightfile, filename);
       } else {
         return saveToDatabase(weightfile, filename, iov);
@@ -190,9 +189,9 @@ namespace Belle2 {
 
     Weightfile Weightfile::load(const std::string& filename, const Belle2::EventMetaData& emd)
     {
-      if (boost::ends_with(filename, ".root")) {
+      if (filename.ends_with(".root")) {
         return loadFromROOTFile(filename);
-      } else if (boost::ends_with(filename, ".xml")) {
+      } else if (filename.ends_with(".xml")) {
         return loadFromXMLFile(filename);
       } else {
         return loadFromDatabase(filename, emd);
@@ -201,9 +200,9 @@ namespace Belle2 {
 
     Weightfile Weightfile::loadFromFile(const std::string& filename)
     {
-      if (boost::ends_with(filename, ".root")) {
+      if (filename.ends_with(".root")) {
         return loadFromROOTFile(filename);
-      } else if (boost::ends_with(filename, ".xml")) {
+      } else if (filename.ends_with(".xml")) {
         return loadFromXMLFile(filename);
       } else {
         throw std::runtime_error("Cannot load file " + filename + " because file extension is not supported");

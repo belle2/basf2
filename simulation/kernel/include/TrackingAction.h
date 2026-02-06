@@ -6,7 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#pragma once
+#ifndef TRACKINGACTION_H_
+#define TRACKINGACTION_H_
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <simulation/dataobjects/MCParticleTrajectory.h>
@@ -16,7 +17,6 @@
 #include <G4UserTrackingAction.hh>
 
 namespace Belle2 {
-  class MCParticleTrajectory;
 
   namespace Simulation {
 
@@ -101,6 +101,25 @@ namespace Belle2 {
        */
       void setPairConversionsEnergyCut(double cut_MeV) {m_pairConversionsEnergyCut = cut_MeV;}
 
+      /** Set the backward z limit for improved matching region */
+      void setRegionZBackward(double z) { m_regionZBackward = z; }
+      /** Set the forward z limit for improved matching region */
+      void setRegionZForward(double z) { m_regionZForward = z; }
+      /** Set the rho limit for improved matching region */
+      void setRegionRho(double rho) { m_regionRho = rho; }
+      /** Set the kinetic energy threshold for ignoring secondaries */
+      void setKineticEnergyThreshold(double threshold) { m_kineticEnergyThreshold = threshold; }
+      /** Set the distance threshold for ignoring secondaries */
+      void setDistanceThreshold(double threshold) { m_distanceThreshold = threshold; }
+      /** Set whether to check if particle is EM for ignoring secondaries */
+      void setUseIsEM(bool use) { m_useIsEM = use; }
+      /** Set whether to check if particle is Nuclei for ignoring secondaries */
+      void setUseIsNuclei(bool use) { m_useIsNuclei = use; }
+      /** Set whether to check if particle is seen in ECL for ignoring secondaries */
+      void setUseSeenInECL(bool use) { m_useSeenInECL = use; }
+      /** Set whether to use detailed particle matching */
+      void setUseDetailedParticleMatching(bool use) { m_useDetailedParticleMatching = use; }
+
       /** Sets the trajectory option to enable storing of the simulated particle trajectories */
       void setStoreTrajectories(int store, double distanceTolerance);
 
@@ -117,6 +136,16 @@ namespace Belle2 {
       bool m_ignorePairConversions;             /**< do not store e+ or e- from pair conversions in MCparticles */
       double m_pairConversionsEnergyCut;        /**< kinetic energy cut for stored e+ or e- from pair conversions [MeV] */
 
+      double m_regionZBackward; /**< Region backward z limit */
+      double m_regionZForward; /**< Region forward z limit */
+      double m_regionRho; /**< Region rho limit */
+      double m_kineticEnergyThreshold; /**< kinetic energy threshold */
+      double m_distanceThreshold; /**< distance threshold */
+      bool m_useIsEM; /**< use is EM check */
+      bool m_useIsNuclei; /**< use is Nuclei check */
+      bool m_useSeenInECL; /**< use seen in ECL check */
+      bool m_useDetailedParticleMatching; /**< use detailed particle matching logic to filter secondaries */
+
 
       int m_storeTrajectories;    /**< Store trajectories for 0=none, 1=primary or 2=all particles */
       double m_distanceTolerance;  /**< distance tolerance to merge trajectory points */
@@ -129,3 +158,5 @@ namespace Belle2 {
 
   }  // end namespace Simulation
 } // end namespace Belle2
+
+#endif /* TRACKINGACTION_H_ */

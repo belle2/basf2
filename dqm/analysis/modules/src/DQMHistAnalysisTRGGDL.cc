@@ -22,6 +22,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <limits>
 
 using namespace std;
 using namespace Belle2;
@@ -782,6 +783,8 @@ void DQMHistAnalysisTRGGDLModule::beginRun()
   B2DEBUG(20, "DQMHistAnalysisTRGGDL : beginRun called");
   for (int i = 0; i < n_eff_shifter; i++) {
     double lo_limit, hi_limit, dummy;
+    lo_limit = std::numeric_limits<double>::quiet_NaN();
+    hi_limit = std::numeric_limits<double>::quiet_NaN();
     const std::string eff_shifter_prefix = "shifter_eff_";
     std::string now_pvname = eff_shifter_prefix + c_mon_eff_shifter[i];
     requestLimitsFromEpicsPVs(now_pvname, lo_limit, dummy, dummy, hi_limit);

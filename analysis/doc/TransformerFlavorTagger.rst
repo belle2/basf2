@@ -29,7 +29,7 @@ case of attributes of the dataset, than putting in only explicit knowledge by pr
 Algorithm
 ---------
 
-The core of the algorithm is a stack of six transformer blocks processing the detected tracks and photon clusters.
+The core of the algorithm is a stack of six transformer blocks processing the detected tracks and photon clusters
 as input tokens. It is trained with the AdamW stochastic gradient descent optimizer.
 
 .. figure:: figs/tflat_transformer.png
@@ -62,13 +62,13 @@ tracks, (3) the number of K_S and (4) the total transverse momentum of tracks in
 MultiLayerPerceptron is used to map these four features into a 128 dimensional embedding space.
 
 After these padding and embedding steps, we have a now sequence of 31 tokens with a dimension of 128. We also have a mask
-telling us if a token was padded. The sequence of tokens and the mask are new processed by a stack of six transformer
+telling us if a token was padded. The sequence of tokens and the mask are now processed by a stack of six transformer
 blocks. Each transformer block utilizes MultiHeadAttention to compute contextualized embeddings. Padded tokens are excluded
-from the computation of attentions. After the last transformer block, the 31 embeddings are averaged. Again, padded tokens are
+from the computation of attention. After the last transformer block, the final 31 embeddings are averaged. Again, padded tokens are
 excluded from the averaging. The averaged embedding is fed into a final MultiLayerPerceptron with a single output neuron.
 
-The output of the algorithm is the variable ``'qrTFLAT'``, which corresponds to the tag-side :math:`B` flavor :math:`q_{\rm TFlaT}`
-times the dilution factor :math:`r_{\rm TFlaT}`. The range of ``'qrTFLAT'`` is :math:`[-1, 1]`.
+The output of the algorithm is the variable ``'qrTFLAT'``, which corresponds to the tag-side :math:`B` flavor :math:`q_{\textrm TFlaT}`
+times the dilution factor :math:`r_{\textrm TFlaT}`. The range of ``'qrTFLAT'`` is :math:`[-1, 1]`.
 The output is close to :math:`-1` if the tag side of an event is likely to be related to a :math:`\bar{B}^0`,
 and close to :math:`1` for a :math:`B^0`. The value :math:`0` corresponds to a random decision.
 
@@ -93,6 +93,7 @@ After reconstructing your signal :math:`B` meson, make sure that you build the r
 To use the Transformer Flavor Tagger with basic functionality on Belle II data or MC, use
 
 ::
+
     ft.flavorTagger(particleLists=['B0:sig'],
                      path=main)
 

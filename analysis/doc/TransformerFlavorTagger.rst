@@ -115,6 +115,16 @@ tag side ``'mcFlavorOfOtherB'``.
                          path=path)
 
 
+Tutorials
+---------
+
+An example tutorial for normal use can be found under:
+
+::
+
+  analysis/examples/tutorials/B2A803-TransformerFlavorTagger.py
+
+
 Functions
 ---------
 

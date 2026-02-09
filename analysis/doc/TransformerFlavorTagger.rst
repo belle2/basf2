@@ -34,8 +34,8 @@ as input tokens. It is trained with the AdamW stochastic gradient descent optimi
 
 .. figure:: figs/tflat_transformer.png
 
-The model is implemented with the `keras <https://keras.io>` framework using `torch <https://pytorch.org>` as the
-backend. The final trained model is exported to `ONNX <https://onnx.ai>` and can directly be used by the basf2
+The model is implemented with the `keras <https://keras.io>`_ framework using `torch <https://pytorch.org>`_ as the
+backend. The final trained model is exported to `ONNX <https://onnx.ai>`_ and can directly be used by the basf2
 MVAExpert.
 
 Currently, the input of the algorithm is based on charged tracks, photon clusters and global rest of event

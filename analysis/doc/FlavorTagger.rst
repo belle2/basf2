@@ -1,12 +1,5 @@
 .. _FlavorTagger:
 
-Please note that the Belle II software features a number of different flavor tagging algorithms.
-Below is a listing of the alternative algorithms:
-
-A transformer based flavor tagger :ref:`analysis/doc/TransformerFlavorTagger:Principle`
-
-A deep neural network flavor tagger :ref:`analysis/doc/DeepFlavorTagger:Principle`
-
 Flavor Tagger
 ==============
 
@@ -23,6 +16,13 @@ with a charged :math:`B` meson pair.
 
   * The paper: `B-flavor tagging at Belle II <https://link.springer.com/article/10.1140/epjc/s10052-022-10180-9>`_
   * The note on calibration using 62.8/fb data collected in 2019 and 2020: `BELLE2-NOTE-PH-2021-001 <https://docs.belle2.org/record/2686>`_
+
+Please note that the Belle II software features a number of different flavor tagging algorithms.
+Below is a listing of the alternative algorithms:
+
+A transformer based flavor tagger :ref:`analysis/doc/TransformerFlavorTagger:Principle`
+
+A deep neural network flavor tagger :ref:`analysis/doc/DeepFlavorTagger:Principle`
 
 Flavor Tagging Principle
 ------------------------

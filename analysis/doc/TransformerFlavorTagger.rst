@@ -1,4 +1,4 @@
-.. _DeepFlavorTagger:
+.. _TransformerFlavorTagger:
 
 Transformer Flavor Tagger (TFlaT)
 =================================

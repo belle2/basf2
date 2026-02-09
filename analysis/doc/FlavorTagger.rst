@@ -4,6 +4,7 @@ Please note that the Belle II software features a number of different flavor tag
 Below is a listing of the alternative algorithms:
 
 A transformer based flavor tagger :ref:`analysis/doc/TransformerFlavorTagger:`
+
 A deep neural network flavor tagger :ref:`analysis/doc/DeepFlavorTagger:`
 
 Flavor Tagger

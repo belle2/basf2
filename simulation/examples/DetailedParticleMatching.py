@@ -30,7 +30,6 @@ main.add_module("Gearbox")
 main.add_module("Geometry")
 
 # Run full simulation with ParticleMatching enabled
-
 main.add_module("FullSim",
                 StoreAllSecondaries=False,
                 DetailedParticleMatching=True,
@@ -38,9 +37,9 @@ main.add_module("FullSim",
                 RegionZForward=184.0,
                 RegionZBackward=-92.0,
                 KineticEnergyThreshold=0.02,
-                DistanceThreshold=40,
+                DistanceThreshold=40.0,
                 UseIsEM=True,
-                UseIsNuclei=False,
+                UseIsNuclei=True,
                 UseSeenInECL=True
                 )
 

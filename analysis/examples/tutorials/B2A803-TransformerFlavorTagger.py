@@ -34,6 +34,7 @@ import tflat.flavorTagger as ft
 import vertex as vx
 import variables.collections as vc
 import variables.utils as vu
+import stdV0s as stdV0s
 
 
 # create path
@@ -57,12 +58,11 @@ ma.fillParticleList(decayString='mu+:all', cut='', path=main)
 ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='dM<0.11', path=main)
 
 
-# reconstruct Ks from standard pi+ particle list
-ma.fillParticleList(decayString='pi+:all', cut='', path=main)
-ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=main)
+# reconstruct Ks
+stdV0s.stdKshorts(path=main)
 
 # reconstruct B0 -> J/psi Ks decay
-ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=main)
+ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:merged', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=main)
 
 # Does the matching between reconstructed and MC particles
 ma.matchMCTruth(list_name='B0:sig', path=main)

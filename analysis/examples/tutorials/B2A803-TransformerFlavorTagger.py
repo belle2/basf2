@@ -42,17 +42,6 @@ main = b2.Path()
 # Environment of the MC or data sample
 environmentType = "default"
 
-# For Belle data/MC use
-# from b2biiConversion import convertBelleMdstToBelleIIMdst
-# import os
-
-# os.environ['PGUSER'] = 'g0db'
-# os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
-
-# environmentType = "Belle"
-
-# # You can use Belle MC/data as input calling this script as basf2 -i 'YourConvertedBelleData*.root' B2A802-FlavorTagger.py
-# ma.inputMdstList(environmentType=environmentType, filelist=[], path=main)
 
 # load input ROOT file
 ma.inputMdst(environmentType=environmentType,
@@ -66,11 +55,6 @@ ma.fillParticleList(decayString='mu+:all', cut='', path=main)
 # reconstruct J/psi -> mu+ mu- decay
 # keep only candidates with dM<0.11
 ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='dM<0.11', path=main)
-
-
-# For Belle data/MC use
-#  # use the existent K_S0:mdst list to reconstruct B0 -> J/psi Ks decay
-#  ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=main)
 
 
 # reconstruct Ks from standard pi+ particle list

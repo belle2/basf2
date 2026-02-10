@@ -13,7 +13,7 @@
 
 [INFO] Steering file: ${BELLE2_SOFTWARE_DIR}/generators/tests/check_rho_mass_shift.py_noexec
 [INFO] The random number seed is set to "11"
-[INFO] The peak of the rho mass shift distribution is at 21 MeV
+[INFO] The peak of the rho mass shift distribution is at -34 MeV
 
 [INFO] Steering file: ${BELLE2_SOFTWARE_DIR}/generators/tests/check_rho_mass_shift.py_noexec
 [INFO] The random number seed is set to "13"

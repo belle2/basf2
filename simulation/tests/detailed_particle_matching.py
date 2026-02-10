@@ -27,7 +27,7 @@ gearbox = b2.register_module('Gearbox')
 geometry = b2.register_module('Geometry')
 pgun = b2.register_module('ParticleGun')
 pgun.param('pdgCodes', [11])
-pgun.param('momentumParams', [1.0])
+pgun.param('momentumParams', [1.0, 2.0])
 
 # Configure FullSim with the new parameters
 full_sim = b2.register_module('FullSim')

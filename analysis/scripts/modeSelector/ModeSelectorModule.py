@@ -261,15 +261,23 @@ class ModeSelectorModule(b2.Module):
             numpy.ndarray: Feature array ready for NN input
         """
         # Initialize feature matrix (n_feature_blocks * n_input_ids)
-        # We exclude Mbc (block 10), so we have 11 blocks
         n_blocks = len(self.feature_blocks)
         feature_matrix = np.zeros((n_blocks, self.n_input_ids), dtype=np.float32)
 
-        # Fill in per-candidate features
+        # Deduplicate by input_id: keep candidate with highest sigProb
+        # (matches offline preprocessing behavior)
+        best_by_input_id = {}
         for input_id, features in candidates_data:
             if input_id < 0 or input_id >= self.n_input_ids:
                 continue
+            sig_prob = features.get('sigProb')
+            if sig_prob is None:
+                sig_prob = -1
+            if input_id not in best_by_input_id or sig_prob > best_by_input_id[input_id][1]:
+                best_by_input_id[input_id] = (features, sig_prob)
 
+        # Fill in per-candidate features using deduplicated candidates
+        for input_id, (features, _) in best_by_input_id.items():
             for block_idx, (feat_name, transform) in enumerate(self.feature_blocks):
                 val = features.get(feat_name)
                 if val is not None:
@@ -283,35 +291,25 @@ class ModeSelectorModule(b2.Module):
             event_features.get(name, 0.0) for name in self.event_features
         ]
 
-        # Add ncandidates / 10
-        n_candidates = len(candidates_data)
+        # Add ncandidates / 10 (unique input_ids, matching offline)
+        n_candidates = len(best_by_input_id)
         event_feat_values.append(n_candidates / 10.0)
 
-        # Find best candidate (highest sigProb) and compute input_ids
-        if candidates_data:
-            sig_probs = []
-            for input_id, features in candidates_data:
-                sp = features.get('sigProb')
-                sig_probs.append(sp if sp is not None else -1)
+        # Find best candidate (highest sigProb) using deduped data
+        if best_by_input_id:
+            # Best candidate overall (highest sigProb among unique input_ids)
+            max_input_id = max(best_by_input_id.keys(), key=lambda k: best_by_input_id[k][1])
 
-            # Best candidate overall
-            best_idx = np.argmax(sig_probs)
-            max_input_id = candidates_data[best_idx][0]
-
-            # Best neutral (B0) and charged (B+) candidates
-            neutral_ids = [(i, inp_id, sp) for i, (inp_id, features) in enumerate(candidates_data)
-                           for sp in [features.get('sigProb', -1)]
-                           if inp_id % 2 == 0]  # Even input_id = neutral
-            charged_ids = [(i, inp_id, sp) for i, (inp_id, features) in enumerate(candidates_data)
-                           for sp in [features.get('sigProb', -1)]
-                           if inp_id % 2 == 1]  # Odd input_id = charged
+            # Best neutral (B0, even input_id) and charged (B+, odd input_id)
+            neutral_ids = {k: v for k, v in best_by_input_id.items() if k % 2 == 0}
+            charged_ids = {k: v for k, v in best_by_input_id.items() if k % 2 == 1}
 
             # Second best from other B type
             best_pdg_is_charged = max_input_id % 2 == 1
             if best_pdg_is_charged and neutral_ids:
-                scnd_max_input_id = max(neutral_ids, key=lambda x: x[2])[1]
+                scnd_max_input_id = max(neutral_ids.keys(), key=lambda k: neutral_ids[k][1])
             elif not best_pdg_is_charged and charged_ids:
-                scnd_max_input_id = max(charged_ids, key=lambda x: x[2])[1]
+                scnd_max_input_id = max(charged_ids.keys(), key=lambda k: charged_ids[k][1])
             else:
                 scnd_max_input_id = -10
         else:
@@ -324,7 +322,7 @@ class ModeSelectorModule(b2.Module):
         # Concatenate all features
         all_features = np.concatenate([flat_features, np.array(event_feat_values, dtype=np.float32)])
 
-        return all_features, max_input_id
+        return all_features, max_input_id, n_candidates
 
     def _get_event_features(self):
         """Extract event-level features from EventShapeContainer."""
@@ -336,7 +334,8 @@ class ModeSelectorModule(b2.Module):
             obj = event_shape.obj()
             # Map feature names to EventShapeContainer methods
             if 'sphericity' in self.event_features:
-                event_features['sphericity'] = obj.getSphericityEigenvalue(0)
+                # Sphericity = 3/2 * (λ2 + λ3)
+                event_features['sphericity'] = 1.5 * (obj.getSphericityEigenvalue(1) + obj.getSphericityEigenvalue(2))
             if 'thrust' in self.event_features:
                 event_features['thrust'] = obj.getThrust()
             if 'thrustAxisCosTheta' in self.event_features:
@@ -413,15 +412,6 @@ class ModeSelectorModule(b2.Module):
 
         print(f"\n--- Total feature array shape: {len(all_features)} ---")
 
-        # Store for later comparison
-        self.debug_features.append({
-            'event_id_str': event_id_str,
-            'all_features': all_features.copy(),
-            'max_input_id': max_input_id,
-            'n_candidates': len(candidates_data),
-            'candidates_data': candidates_data,
-        })
-
     def terminate(self):
         """Called at the end of processing."""
         if self.debug and self.debug_features:
@@ -431,7 +421,10 @@ class ModeSelectorModule(b2.Module):
             np.savez(debug_file,
                      features=feature_arrays,
                      n_candidates=[d['n_candidates'] for d in self.debug_features],
-                     max_input_ids=[d['max_input_id'] for d in self.debug_features])
+                     max_input_ids=[d['max_input_id'] for d in self.debug_features],
+                     exp=[d['exp'] for d in self.debug_features],
+                     run=[d['run'] for d in self.debug_features],
+                     evt=[d['evt'] for d in self.debug_features])
             print(f"\n[DEBUG] Saved {len(self.debug_features)} events to {debug_file}")
 
     def event(self):
@@ -459,11 +452,26 @@ class ModeSelectorModule(b2.Module):
         event_features = self._get_event_features()
 
         # Build feature array
-        all_features, max_input_id = self._build_feature_array(candidates_data, event_features)
+        all_features, max_input_id, n_unique_candidates = self._build_feature_array(candidates_data, event_features)
 
         # Debug output
-        if self.debug and self.event_count < self.debug_max_events:
-            self._print_debug_info(candidates_data, event_features, all_features, max_input_id)
+        if self.debug:
+            # Save metadata for all events
+            event_meta = Belle2.PyStoreObj('EventMetaData')
+            if event_meta.isValid():
+                self.debug_features.append({
+                    'exp': event_meta.getExperiment(),
+                    'run': event_meta.getRun(),
+                    'evt': event_meta.getEvent(),
+                    'all_features': all_features.copy(),
+                    'max_input_id': max_input_id,
+                    'n_candidates': n_unique_candidates,
+                })
+
+            # Print verbose output for first few events
+            if self.event_count < self.debug_max_events:
+                self._print_debug_info(candidates_data, event_features, all_features, max_input_id)
+
             self.event_count += 1
 
         # Select features based on has_inputs (indices used during training)

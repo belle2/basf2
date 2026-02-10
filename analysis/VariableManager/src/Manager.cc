@@ -410,7 +410,7 @@ void Variable::Manager::deprecateVariable(const std::string& name, bool make_fat
   auto mapIter = m_variables.find(name);
   if (mapIter != m_variables.end()) {
     if (make_fatal) {
-      mapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
+      mapIter->second.get()->extendDescriptionString("\n\n.. deprecated:: " + version + "\n " + description);
     } else {
       mapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
     }
@@ -418,7 +418,7 @@ void Variable::Manager::deprecateVariable(const std::string& name, bool make_fat
     auto parMapIter = m_parameter_variables.find(name);
     if (parMapIter != m_parameter_variables.end()) {
       if (make_fatal) {
-        parMapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
+        parMapIter->second.get()->extendDescriptionString("\n\n.. deprecated:: " + version + "\n " + description);
       } else {
         parMapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
       }
@@ -426,7 +426,7 @@ void Variable::Manager::deprecateVariable(const std::string& name, bool make_fat
       auto metaMapIter = m_meta_variables.find(name);
       if (metaMapIter != m_meta_variables.end()) {
         if (make_fatal) {
-          metaMapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
+          metaMapIter->second.get()->extendDescriptionString("\n\n.. deprecated:: " + version + "\n " + description);
         } else {
           metaMapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
         }

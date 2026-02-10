@@ -1201,7 +1201,7 @@ Returns the track array index of the nearest track to the cluster. The nearest t
 using the `minC2TDist` variable. 
 
 )DOC");
-    REGISTER_METAVARIABLE("minC2TDistVar(variable,particleList=pi-:all)", eclClusterIsolationVar, R"DOC(
+    REGISTER_METAVARIABLE("minC2TDistVar(variable,particleList='pi-:all')", eclClusterIsolationVar, R"DOC(
 Returns the value of your chosen variable for the track nearest to the given cluster as calculated by 
 `minC2TDist`. 
 
@@ -1449,15 +1449,12 @@ Returns the ratio of the energy in the central crystal (:math:`E_1`) to the tota
 
 )DOC");
     REGISTER_VARIABLE("clusterE9E25", eclClusterE9E25, R"DOC(
-Returns the ratio of the total energy in the 3x3 crystal grid around the central 
-crystal (:math:`E_9`) to the total energy in the 5x5 crystal grid around the central crystal (:math:`E_25`). 
-Since :math:`E_9 \leq E_25`, this ratio is :math:`\leq 1` and tends towards larger 
-values for photons and smaller values for hadrons. 
+Returns `clusterE9E21`. This variable is kept for backwards compatibility. 
 )DOC");
     REGISTER_VARIABLE("clusterE9E21", eclClusterE9E21, R"DOC(
 Returns the ratio of the total energy in the 3x3 crystal grid around the central 
 crystal (:math:`E_9`) to the total energy in the 5x5 crystal grid around the central crystal 
-excluding the corners (:math:`E_21`). Since :math:`E_9 \leq E_21`, this ratio is :math:`\leq 1` and tends towards larger 
+excluding the corners (:math:`E_{21}`). Since :math:`E_9 \leq E_{21}`, this ratio is :math:`\leq 1` and tends towards larger 
 values for photons and smaller values for hadrons. 
 
 .. note::
@@ -1598,8 +1595,8 @@ matching is briefly described below.
 
 Every reconstructed track is extrapolated to the ECL. Every ECL crystal that is crossed by 
 the extrapolated track is marked. Following this, every cluster that contains a marked crystal 
-becomes associated with the original track. A cluster can only have one matched track 
-but multiple tracks can be matched to the same cluster. In the latter case, all tracks matched 
+becomes associated with the original track. The current algorithm matches only one cluster to a 
+track but can match multiple tracks to the same cluster. In the latter case, all tracks matched 
 to the same cluster will return the same cluster variables e.g. all will have the same `clusterE`. 
 )DOC");
     REGISTER_VARIABLE("nECLClusterTrackMatches", nECLClusterTrackMatches, R"DOC(

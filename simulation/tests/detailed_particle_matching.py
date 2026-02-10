@@ -11,6 +11,7 @@
 
 """
 Test for the DetailedParticleMatching configuration in FullSim.
+This script checks, that the Detailed Particle Matching actually works, not if its behaviour changed!
 """
 
 import basf2 as b2

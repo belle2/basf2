@@ -60,6 +60,12 @@ namespace Belle2 {
     void event() override final;
 
     /**
+     * Begin-of-run action.
+     * Initialize run-related stuff
+     */
+    void beginRun() override final;
+
+    /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
@@ -74,6 +80,7 @@ namespace Belle2 {
   protected:
     bool m_debug;/**<debug*/
     bool m_enableAlert;/**<Enable alert by base color of canvases*/
+    std::string m_pvPrefix; /**<Prefix for the PV variables of TRGGDL*/
 
 
     static const int nskim_gdldqm = 11;      /**<number of HLT skims*/
@@ -148,6 +155,22 @@ namespace Belle2 {
     TH1D* m_h_eff_shifter = nullptr;          /**<Histogram for TRGGDL efficiency, simplified one for CR shifter*/
     TH1D* m_h_eff_shifter_fast = nullptr;     /**<Histogram for TRGGDL efficiency, simplified one for CR shifter*/
     static const int n_eff_shifter = 14;      /**<number of bins for the simplified efficiency histogram*/
+    const char* c_mon_eff_shifter[n_eff_shifter] = {
+      "CDC_fff",
+      "CDC_ffo",
+      "CDC_ffy",
+      "CDC_fyo",
+      "ECL_hie",
+      "ECL_c4",
+      "BKLM_b2b",
+      "EKLM_b2b",
+      "CDC_BKLM_lt1",
+      "CDC_ECL_lt1",
+      "ECL_EKLM_lt0",
+      "CDC_syo",
+      "CDC_yio",
+      "CDC_stt"
+    };  /**<The name of the Mirabelle variable and the PVs for the bin labels of the simplified efficiency histogram.*/
     const char* c_eff_shifter[n_eff_shifter] = {
       "CDC fff",
       "CDC ffo",
@@ -181,12 +204,9 @@ namespace Belle2 {
 
     TLine* m_line_limit_low_shifter[n_eff_shifter] = {}; /**<lower limit line for the simplified efficiency histogram*/
     TLine* m_line_limit_high_shifter[n_eff_shifter] = {}; /**<upper limit line for the simplified efficiency histogram*/
-    double m_limit_low_shifter[n_eff_shifter] = {
-      0.70, 0.70, 0.70, 0.70, 0.80, 0.80, 0.35, 0.05, 0.25, 0.80, 0.20, 0.40, 0.00, 0.70
-    }; /**<lower limit value in each bin*/
-    double m_limit_high_shifter[n_eff_shifter] = {
-      0.95, 0.95, 0.95, 0.95, 1.00, 1.00, 0.50, 0.20, 0.55, 1.00, 0.40, 0.70, 1.00, 0.90
-    }; /**<upper limit value in each bin*/
+    std::vector<double> m_temp_lo_limit; /**<lower limit threshold for the efficiencies monitored by shifters*/
+    std::vector<double> m_temp_hi_limit; /**<upper limit threshold for the efficiencies monitored by shifters*/
+    std::vector<std::string> m_temp_pvnames; /**<Names of PVs for the efficiencies monitored by shifters*/
 
     /** Run type flag for physics runs. */
     bool m_IsPhysicsRun;

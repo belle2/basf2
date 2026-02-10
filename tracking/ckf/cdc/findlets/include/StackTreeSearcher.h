@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/ckf/cdc/findlets/CDCCKFStateCreator.h>
 #include <tracking/ckf/cdc/findlets/CDCCKFStateFilter.h>
@@ -17,14 +17,14 @@
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
 
 
 namespace Belle2 {
   /// CKF tree searcher which traces several best paths.
   class StackTreeSearcher : public
-    TrackFindingCDC::Findlet<CDCCKFPath, const TrackFindingCDC::CDCWireHit* const> {
+    TrackingUtilities::Findlet<CDCCKFPath, const TrackingUtilities::CDCWireHit* const> {
   public:
     StackTreeSearcher()
     {
@@ -38,14 +38,14 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
       m_stateCreator.exposeParameters(moduleParamList, prefix);
-      m_stateFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("state", prefix));
+      m_stateFilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed("state", prefix));
       m_pathMerger.exposeParameters(moduleParamList, prefix);
-      m_pathSelector.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("path", prefix));
+      m_pathSelector.exposeParameters(moduleParamList, TrackingUtilities::prefixed("path", prefix));
     }
 
     /// Main method to update the paths. Input: vector of the selected paths and a vector of CDC wirehits to be considered.
     void apply(std::vector<CDCCKFPath>& paths,
-               const std::vector<const TrackFindingCDC::CDCWireHit*>& wireHits) override
+               const std::vector<const TrackingUtilities::CDCWireHit*>& wireHits) override
     {
 
       if (paths.empty()) {

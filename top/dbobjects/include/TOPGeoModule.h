@@ -247,7 +247,7 @@ namespace Belle2 {
     }
 
     /**
-     * Returns full length (including prism, wavelenght filter and glue joints)
+     * Returns full length (including prism, wavelength filter and glue joints)
      * @return length
      */
     double getFullLength() const {return getBarLength() + m_prism.getFullLength();}
@@ -259,7 +259,7 @@ namespace Belle2 {
     double getForwardZ() const {return getBackwardZ() + getBarLength();}
 
     /**
-     * Returns average bar thickness (weigthed by segment lengths)
+     * Returns average bar thickness (weighted by segment lengths)
      * @return average bar thickness
      */
     double getBarThickness() const
@@ -270,7 +270,7 @@ namespace Belle2 {
     }
 
     /**
-     * Returns average bar width (weigthed by segment lengths)
+     * Returns average bar width (weighted by segment lengths)
      * @return average bar width
      */
     double getBarWidth() const
@@ -281,7 +281,7 @@ namespace Belle2 {
     }
 
     /**
-     * Returns average surface reflectivity at given photon energy (weigthed by segment lengths)
+     * Returns average surface reflectivity at given photon energy (weighted by segment lengths)
      * @param energy photon energy in [eV]
      * @return average reflectivity
      */
@@ -293,7 +293,7 @@ namespace Belle2 {
     }
 
     /**
-     * Returns average surface roughness parameter (weigthed by segment lengths)
+     * Returns average surface roughness parameter (weighted by segment lengths)
      * @return average surface roughness
      */
     double getSigmaAlpha() const

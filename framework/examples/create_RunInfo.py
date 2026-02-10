@@ -42,10 +42,6 @@ def get_argument_parser():
     return parser
 
 
-# Doxygen complains about undocumented variables below which are not exported
-# ... so hide them on purpose
-# @cond this_is_a_main_block_and_not_exported
-
 if __name__ == "__main__":
     parser = get_argument_parser()
     args = parser.parse_args()
@@ -107,5 +103,3 @@ if __name__ == "__main__":
     B2INFO(f"Imported {imported} RunInfo objects")
     if errors > 0:
         B2FATAL(f"{errors} errors occurred")
-
-# @endcond

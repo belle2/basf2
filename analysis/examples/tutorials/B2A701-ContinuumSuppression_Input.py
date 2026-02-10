@@ -40,11 +40,10 @@ import sys
 # For each of this four sets you need to submit separate grid job.
 # (Or use files that are already prepared for B2A702 and B2A703).
 
-
 input_file_list = []
 
 # Please pick a meaningful output name when running on the grid
-outfile = "B2A702_output.root"
+outfile = "B2A701_output_"
 
 step = 'train'
 
@@ -66,7 +65,7 @@ elif step == 'apply_qqbar':
     input_file_list = [b2.find_file('ccbar_sample_to_test.root', 'examples', False)]
 else:
     sys.exit('Step does not match any of the available samples: `train`, `test`, `apply_signal`or `apply_qqbar`')
-outfile = step + '.root'
+outfile += step + '.root'
 
 # ---------------------------------------------------------------------------------------------
 
@@ -122,7 +121,7 @@ trainVars = [
     'thrustOm',
     'cosTBTO',
     'cosTBz',
-    'KSFWVariables(et)',
+    'KSFWVariables(pt_sum)',
     'KSFWVariables(mm2)',
     'KSFWVariables(hso00)',
     'KSFWVariables(hso01)',

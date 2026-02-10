@@ -62,12 +62,12 @@ There are several reasons for discouraging the self-production of very large MC 
      of :math:`10\;\text{kB}`.
 
 .. admonition:: Hint
-     :class: xhint toggle stacked
+     :class: xhint dropdown stacked
 
      The only other input we need is the cross section for for the production of :math:`B^0 \bar{B}^0` events.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      Knowing that the cross section for the production of :math:`B^0 \bar{B}^0` events at Belle II is
      :math:`0.540\;\text{nb}`, we would need about :math:`2.55\;\text{TB}` for storing such a sample.
@@ -132,12 +132,12 @@ number.
      have to use for `EventInfoSetter`?
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Check the documentation (`EventInfoSetter`) to identify the module's parameters and their names.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      You have to add to your steering path the following line:
 
@@ -177,12 +177,12 @@ Now we have to add to the steering path the relevant functions for:
      of :math:`B^0 \bar{B}^0` MC events?
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Do not forget to import all the relevant python modules (for example, ``import simulation`` for ``add_simulation()``).
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      .. literalinclude:: steering_files/065_generate_mc.py
         :language: python
@@ -217,7 +217,7 @@ Now we have to add to the steering path the relevant functions for:
      How can we perform a physics analysis on the output mDST file of the previous exercise?
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      This is very simple: write a steering file similar to the one you wrote in the
      :ref:`onlinebook_first_steering_file` lesson.
@@ -309,12 +309,12 @@ easily get all the relevant information: :ref:`b2help-particles`.
      :math:`3.6\;\text{GeV/c}^2` are defined in the `evt.pdl`_ file?
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Can you use `b2help-particles` for this?
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      Running ``b2help-particles --min 3.0 --max 3.6`` shows that there are 7 particles in this particular mass range:
      :math:`J/\Psi`, :math:`\Xi_{cc}^+`, :math:`\bar{\Xi}_{cc}^-` :math:`\chi_{c0}`, :math:`\chi_{c1}`,
@@ -328,7 +328,7 @@ easily get all the relevant information: :ref:`b2help-particles`.
      does it have to be modified? Run the resulting steering file again.
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      .. literalinclude:: steering_files/067_generate_mc.py
         :language: python
@@ -342,7 +342,7 @@ easily get all the relevant information: :ref:`b2help-particles`.
      :math:`\text{BF}(K^0_S \to \pi^0 \pi^0) = 0.3`. Which decay file would you write?
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+     :class: dropdown xhint stacked
 
      Use :ref:`b2help-particles` to identify the names to be used for :math:`\phi`, :math:`K^+` and :math:`\pi^0`.
      Probably you want to check their `PDG codes`_ if you do not remember them...
@@ -350,7 +350,7 @@ easily get all the relevant information: :ref:`b2help-particles`.
 .. _PDG codes: https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
 
 .. admonition:: Solution
-     :class: toggle solution
+     :class: dropdown solution
 
      .. code-block::
 

@@ -19,8 +19,6 @@ from geometry import check_components
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
 
-from rawdata import add_unpackers
-
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 
 from tracking import (
@@ -351,8 +349,7 @@ def add_postfilter_reconstruction(path,
     if reconstruct_cdst == 'rawFormat':
         add_dedx_modules(
             path,
-            components=components,
-            enableDebugOutput=True
+            components=components
         )
         if pruneTracks:
             add_prune_tracks(
@@ -448,7 +445,7 @@ def add_cosmics_reconstruction(
     if posttracking:
         if reconstruct_cdst:
             add_special_vxd_modules(path, components=components)
-            add_dedx_modules(path, components=components, enableDebugOutput=True)
+            add_dedx_modules(path, components=components)
             add_prune_tracks(path, components=components)
 
         else:
@@ -652,8 +649,8 @@ def add_cdst_output(path,
     """
     This function adds the `RootOutput` module to a path with the settings needed to produce a cDST output.
     The actual cDST output content depends on the value of the parameter `mc`:
-    * if `mc` is `False` (default setting), the cDST content is raw + tracking dataobjects;
-    * if `mc` is `True`, the cDST content is digits + MCParticles + tracking dataobjects.
+    * if `mc` is `False`, the cDST content is raw + tracking dataobjects;
+    * if `mc` is `True` (default setting), the cDST content is digits + MCParticles + tracking dataobjects.
 
     @param path Path to add modules to.
     @param mc Define the type of cDST output content: `False` for raw + tracking dataobjects, `True` for digits +
@@ -904,22 +901,21 @@ def add_ext_module(path, components=None):
         path.add_module('Ext')
 
 
-def add_dedx_modules(path, components=None, for_cdst_analysis=False, enableDebugOutput=False):
+def add_dedx_modules(path, components=None, for_cdst_analysis=False):
     """
     Add the dE/dX reconstruction modules to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     :param for_cdst_analysis: if True, add only DedxPIDCreator module, otherwise add both
-    :param enableDebugOutput: enable/disable writing out debugging information to CDCDedxTracks
     """
     # CDC dE/dx PID
     if components is None or 'CDC' in components:
         if for_cdst_analysis:
-            path.add_module('CDCDedxPIDCreator', enableDebugOutput=True)
+            path.add_module('CDCDedxPIDCreator')
         else:
             path.add_module('CDCDedxHitSaver')
-            path.add_module('CDCDedxPIDCreator', enableDebugOutput=enableDebugOutput)
+            path.add_module('CDCDedxPIDCreator')
     # VXD dE/dx PID
     # only run this if the SVD is enabled - PXD is disabled by default
     if components is None or 'SVD' in components:
@@ -960,6 +956,7 @@ def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=
     # Add the unpackers only if not running on MC, otherwise check the components and simply add
     # the Gearbox and the Geometry modules
     if not mc:
+        from rawdata import add_unpackers  # noqa
         add_unpackers(path,
                       components=components)
     else:

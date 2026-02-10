@@ -673,7 +673,7 @@ class ValidationAndOptimisationTask(Basf2PathTask, LSFTask):
         fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
 
         # write the tracking MVA filter parameters and the cut on MVA classifier to be applied on a local db
-        iov = [0, 0, 0, -1]
+        iov = [self.experiment_number, 0, self.experiment_number, -1]
         write_tracking_mva_filter_payloads_to_db(
             f"trk_CDCToSVDSeedResultFilterParameter{fbdt_string}",
             iov,

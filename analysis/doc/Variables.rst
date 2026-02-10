@@ -177,20 +177,6 @@ PID
 
 Here is a list of particle identification variables:
 
-.. warning ::
-  The **definitions** of the default PID variables have changed between
-  release-01 and release-02.
-
-  Prior to release-02-00-00 (i.e. in release-01-XX-YY) each ID was calculated
-  against the pion likelihood alone, or the kaon in the case of the pion itself.
-  Namely the pair probability (also known as the binary probability) was returned:
-
-  * for all particles: :math:`\text{<Part>ID}=\mathcal{L}_{\text{<Part>}}/\mathcal{L}_\pi`, where :math:`\text{<Part>}\in[e,\mu,K,p,d]`.
-  * for pions: :math:`\text{PionID}=\mathcal{L}_\pi/\mathcal{L}_K`.
-
-  In other words, pionID was sensitive only to the pion-kaon mis-id, and not to
-  the pion-proton or pion-muon mis-identification.
-
 .. b2-variables::
    :group: PID
 
@@ -774,7 +760,7 @@ How to use my variable at grid?
 
 * Prepare the environment with the ``b2analysis-create`` tool.
 
->>> b2analysis-create myanalysis <current central release, e.g. release-04-00-00>
+>>> b2analysis-create myanalysis <current central release, e.g. light-2509-fornax>
 >>> cd myanalysis
 >>> b2setup
 

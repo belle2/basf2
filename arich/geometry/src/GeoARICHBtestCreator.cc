@@ -85,8 +85,10 @@ namespace Belle2 {
       StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
       int run = 68;
+      [[clang::suppress]]
       PyObject* m = PyImport_AddModule(strdup("__main__"));
       if (m) {
+        [[clang::suppress]]
         PyObject* v = PyObject_GetAttrString(m, strdup("runno"));
         if (v) {
           run = PyLong_AsLong(v);
@@ -542,9 +544,11 @@ namespace Belle2 {
       double meantrlen  = 0;
 
       // get parameter from python script
+      [[clang::suppress]]
       PyObject* m = PyImport_AddModule(strdup("__main__"));
       if (m) {
         int averageagel = 0;
+        [[clang::suppress]]
         PyObject* v = PyObject_GetAttrString(m, strdup("averageagel"));
         if (v) {
           averageagel = PyLong_AsLong(v);

@@ -48,7 +48,7 @@ namespace Belle2 {
 
   private:
 
-    /** Finds best fit value and confidence interval form a LL vie direct scan */
+    /** Finds best fit value and confidence interval form a LL via direct scan */
     void scanLikelihood(std::vector<float>masses, std::vector<float>logLs, float deltaLL, float& maxLL, float& massMax,
                         float& minMassRange, float& maxMassRange);
 

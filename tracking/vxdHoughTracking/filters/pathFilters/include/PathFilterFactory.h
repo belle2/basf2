@@ -8,17 +8,17 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/filters/pathFilters/BasePathFilter.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
 
     /// Factory that can create appropriate cluster filters from associated names.
-    class PathFilterFactory : public TrackFindingCDC::FilterFactory<BasePathFilter> {
+    class PathFilterFactory : public TrackingUtilities::FilterFactory<BasePathFilter> {
 
     private:
       /// Type of the base class
-      using Super = TrackFindingCDC::FilterFactory<BasePathFilter>;
+      using Super = TrackingUtilities::FilterFactory<BasePathFilter>;
 
     public:
       /// Constructor forwarding the default filter name

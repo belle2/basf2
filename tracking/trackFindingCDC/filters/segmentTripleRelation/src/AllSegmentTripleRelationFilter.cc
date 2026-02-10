@@ -7,11 +7,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/AllSegmentTripleRelationFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 Weight AllSegmentTripleRelationFilter::operator()(const CDCSegmentTriple& fromSegmentTriple
                                                   __attribute__((unused)),

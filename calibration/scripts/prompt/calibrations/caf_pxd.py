@@ -21,7 +21,7 @@ from math import ceil
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
-                               expert_username="maiko.takahashi",
+                               expert_username="3978526368",
                                subsystem="pxd",
                                description=__doc__,
                                input_data_formats=["raw"],

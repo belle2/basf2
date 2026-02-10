@@ -289,8 +289,6 @@ TBranch: klmClusterPositionY, 142.1
 TBranch: klmClusterPositionZ, 20.7
 TBranch: klmClusterInnermostLayer, 1
 TBranch: klmClusterLayers, 15
-TBranch: klmClusterEnergy, 3.476
-TBranch: klmClusterMomentum, 3.44
 TBranch: klmClusterIsBKLM, 1
 TBranch: klmClusterIsEKLM, 0
 TBranch: klmClusterIsForwardEKLM, 0
@@ -336,8 +334,6 @@ TBranch: klmClusterPositionY, 142.1
 TBranch: klmClusterPositionZ, 20.7
 TBranch: klmClusterInnermostLayer, 1
 TBranch: klmClusterLayers, 15
-TBranch: klmClusterEnergy, 3.476
-TBranch: klmClusterMomentum, 3.44
 TBranch: klmClusterIsBKLM, 1
 TBranch: klmClusterIsEKLM, 0
 TBranch: klmClusterIsForwardEKLM, 0

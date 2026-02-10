@@ -136,21 +136,23 @@ namespace Belle2 {
     double nMatchedKLMClusters(const Particle* particle);
 
     /**
-     * Returns the distance between the Track and the KLMCluster associated to this Particle.
+     * Returns the distance between the KLMCluster associated to this Particle and the closest track to this cluster.
      * This variable returns NaN if there is no Track-to-KLMCluster relationship.
      * @param[in] particle Input particle.
      */
     double klmClusterTrackDistance(const Particle* particle);
 
     /**
-     * Returns the angle between the direction at the IP and at the POCA to the KLMCluster associated to this Particle for the closest Track.
+     * Returns the angle between momenta of the track initially at IP and then at POCA to the KLMCluster
+     * associated to this Particle for the closest Track.
      * This variable returns NaN if there is no Track-to-KLMCluster relationship.
      * @param[in] particle Input particle.
      */
     double klmClusterTrackRotationAngle(const Particle* particle);
 
     /**
-     * Returns the angle between the KLMCluster associated to this Particle and the closest Track.
+     * Returns the angle between the momentum vector of the track at POCA to the KLMCluster associated to
+     * this Particle and the spatial angle of the KLM cluster itself for the closest Track.
      * This variable returns NaN if there is no Track-to-KLMCluster relationship.
      * @param[in] particle Input particle.
      */
@@ -158,21 +160,21 @@ namespace Belle2 {
 
     /**
      * Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle.
-     * This variable returns NaN if this KLMCluster contains only one KLMHit2d cluster.
+     * This variable returns 0 if this KLMCluster contains only one 2D hit.
      * @param[in] particle Input particle.
      */
     double klmClusterShapeStdDev1(const Particle* particle);
 
     /**
      * Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle.
-     * This variable returns NaN if this KLMCluster contains only one KLMHit2d cluster.
+     * This variable returns 0 if this KLMCluster has all the 2D hits lying on a single straight line.
      * @param[in] particle Input particle.
      */
     double klmClusterShapeStdDev2(const Particle* particle);
 
     /**
      * Returns the std deviation of the 3rd axis from a PCA of the KLMCluster associated to this Particle.
-     * This variable returns NaN if this KLMCluster contains only one KLMHit2d cluster.
+     * This variable returns 0 if this KLMCluster has all the 2D hits lying on a 2D plane.
      * @param[in] particle Input particle.
      */
     double klmClusterShapeStdDev3(const Particle* particle);

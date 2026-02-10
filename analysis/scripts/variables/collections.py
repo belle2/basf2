@@ -97,8 +97,6 @@ klm_cluster = [
     'klmClusterPositionZ',
     'klmClusterInnermostLayer',
     'klmClusterLayers',
-    'klmClusterEnergy',
-    'klmClusterMomentum',
     'klmClusterIsBKLM',
     'klmClusterIsEKLM',
     'klmClusterIsForwardEKLM',

@@ -1097,7 +1097,7 @@ namespace Belle2 {
 
     The result is meaningful and nontrivial when the signal B vertex is determined by `vertex.treeFit` with ``ipConstraint=True`` and the `vertex.TagV` is called with the ``tube`` constraint.
 
-                                               )DOC", "ps");
+    )DOC", "ps");
 
     REGISTER_VARIABLE("TagVLBoost", tagVBoostDirection,
                       "Returns the TagV component in the boost direction\n\n", "cm");

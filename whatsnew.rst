@@ -17,6 +17,23 @@ be adapted when changing to the new release.
 Changes since release-10
 ========================
 
+.. admonition:: New and updated packages in externals
+   :class: dropdown
+
+   .. list-table:: New and updated packages in externals from v02-03-02 to v02-03-03
+      :widths: 50 25 25
+      :header-rows: 1
+
+      * - package
+        - old version
+        - new version
+      * - FastBDT
+        - 5.2
+        - 5.3
+      * - sphinx-togglebutton
+        -
+        - 0.3.2
+
 .. rubric:: Calculation and printing of processing statistics
 
 The calculation of the processing statistics is by default turned off. It can be enabled for debugging purposes, e.g.,
@@ -31,7 +48,7 @@ Changes since release-09
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v02-02-04 to v02-03-02
       :widths: 50 25 25
@@ -154,7 +171,7 @@ Changes since release-08
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v02-00-02 to v02-02-04
       :widths: 50 25 25
@@ -1084,7 +1101,7 @@ Changes since release-07
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v01-12-01 to v02-00-02
       :widths: 50 25 25
@@ -1149,7 +1166,7 @@ Changes since release-06
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v01-10-02 to v01-12-01
       :widths: 50 25 25
@@ -1832,7 +1849,7 @@ Changes since release-05
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v01-09-01 to v01-10-02
       :widths: 50 25 25

@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/SimpleRLTaggedWireHitHoughTree.h>
 #include <tracking/trackFindingCDC/hough/algorithms/InPhi0CurvBox.h>
 
-#include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
+#include <tracking/trackingUtilities/utilities/ParameterVariant.h>
 
 #include <vector>
 #include <string>
@@ -20,16 +20,20 @@
 namespace Belle2 {
 
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
     class CDCTrack;
+  }
+
+  namespace TrackFindingCDC {
 
     /// Generates axial tracks from hit using the special leaf processing inspired by the legendre algorithm.
-    class AxialTrackCreatorHitHough : public Findlet<const CDCWireHit* const, CDCTrack> {
+    class AxialTrackCreatorHitHough : public
+      TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit* const, TrackingUtilities::CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHit* const, CDCTrack>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit* const, TrackingUtilities::CDCTrack>;
 
     public:
       /// Short description of the findlet
@@ -42,7 +46,8 @@ namespace Belle2 {
       void initialize() final;
 
       /// Generates the tracks from the given segments into the output argument.
-      void apply(const std::vector<const CDCWireHit*>& axialWireHits, std::vector<CDCTrack>& tracks) final;
+      void apply(const std::vector<const TrackingUtilities::CDCWireHit*>& axialWireHits,
+                 std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
       /// Cleanup the findlet after event processing
       void terminate() final;
@@ -79,7 +84,7 @@ namespace Belle2 {
       int m_param_discreteCurvOverlap = -1;
 
       /// Parameter: Relaxation schedule for the leaf processor in the hough tree
-      std::vector<ParameterVariantMap> m_param_relaxationSchedule;
+      std::vector<TrackingUtilities::ParameterVariantMap> m_param_relaxationSchedule;
 
       /// Fixed parameter: Number of divisions in the phi0 direction
       static const int c_phi0Divisions = 2;

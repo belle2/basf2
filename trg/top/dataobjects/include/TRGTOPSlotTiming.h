@@ -6,20 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef TRGTOPSLOTTIMING_H
-#define TRGTOPSLOTTIMING_H
+#pragma once
 
-//#include <TObject.h>
 #include <framework/datastore/RelationsObject.h>
-
-#include <vector>
-#include <limits>
-
 
 namespace Belle2 {
 
-  //! Example Detector
-  //  class TRGTOPSlotTiming : public TObject {
+  //! TRGTOPSlotTiming
   class TRGTOPSlotTiming : public RelationsObject {
 
   public:
@@ -88,7 +81,6 @@ namespace Belle2 {
     int getSlotNErrors() const { return m_slotNErrors;}
     int getSlotThisBoard() const { return m_slotThisBoard;}
     int getSlotFirstTS() const { return m_slotFirstTS;}
-    //int get() const { return m_;}
 
     void setSlotId(int slotId);
     void setSlotTiming(int slotTiming);
@@ -99,7 +91,6 @@ namespace Belle2 {
     void setSlotNErrors(int slotNErrors);
     void setSlotThisBoard(int slotThisBoard);
     void setSlotFirstTS(int slotFirstTS);
-    //void set(int );
 
     bool isThisBoard() const;
 
@@ -132,5 +123,3 @@ namespace Belle2 {
   };
 
 } //end namespace Belle2
-
-#endif

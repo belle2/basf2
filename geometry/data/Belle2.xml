@@ -10,13 +10,12 @@
          be determined automatically to fit all volumes placed inside of it.
          -->
     <!-- half-width along x direction -->
-    <width  unit="m">8.0</width>
+    <width unit="m">8.0</width>
     <!-- half-length along z direction -->
     <length unit="m">8.0</length>
     <!-- half-height along y direction -->
     <height unit="m">8.0</height>
   </Global>
-
   <!-- Define materials -->
   <xi:include href="BasicMaterials.xml"/>
   <xi:include href="../structure/STR-Materials.xml"/>
@@ -32,7 +31,7 @@
   <xi:include href="../ecl/ECL-Materials.xml"/>
   <xi:include href="../klm/BKLMMaterials.xml"/>
   <xi:include href="../klm/EKLMMaterials.xml"/>
-  <xi:include href="../beast/bgo/BGO-Materials.xml" />
+  <xi:include href="../beast/bgo/BGO-Materials.xml"/>
   <xi:include href="../beast/microtpc/MICROTPC-Materials.xml"/>
   <xi:include href="../beast/pindiode/PINDIODE-Materials.xml"/>
   <xi:include href="../beast/beamabort/BEAMABORT-Materials.xml"/>
@@ -41,7 +40,6 @@
   <xi:include href="../beast/fangs/FANGS-Materials.xml"/>
   <xi:include href="../beast/plume/PLUME-Materials.xml"/>
   <xi:include href="../beast/qcsmonitor/QCSMONITOR-Materials.xml"/>
-
   <!-- Magnetic field -->
   <xi:include href="../geometry/MagneticFieldConstant.xml"/>
   <xi:include href="../geometry/MagneticFieldConstant4LimitedRSVD.xml"/>
@@ -50,10 +48,8 @@
   <xi:include href="../geometry/MagneticField2d.xml"/>
   <xi:include href="../geometry/MagneticField3dQuadBeamline.xml"/>
   <xi:include href="../geometry/MagneticField3dTotalVolume.xml"/>
-
   <!-- Accelerator -->
   <xi:include href="SuperKEKB.xml"/>
-
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>
   <xi:include href="../structure/STR.xml"/>
@@ -70,78 +66,70 @@
   <xi:include href="../arich/ARICH.xml"/>
   <xi:include href="../ecl/ECL.xml"/>
   <xi:include href="../klm/KLM.xml"/>
-
   <!-- phase 2 specific subdetectors -->
   <DetectorComponent name="BeamPipe-phase2" isDefault="false">
-    <xi:include href="../ir/BeamPipe-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../ir/BeamPipe-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="PXD-phase2" isDefault="false">
-    <xi:include href="../pxd/PXD-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../pxd/PXD-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="SVD-phase2" isDefault="false">
-    <xi:include href="../svd/SVD-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../svd/SVD-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="MICROTPC-phase2" isDefault="false">
-    <xi:include href="../beast/microtpc/MICROTPC-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../beast/microtpc/MICROTPC-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="PINDIODE-phase2" isDefault="false">
-    <xi:include href="../beast/pindiode/PINDIODE-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../beast/pindiode/PINDIODE-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="BEAMABORT-phase2" isDefault="false">
-    <xi:include href="../beast/beamabort/BEAMABORT-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../beast/beamabort/BEAMABORT-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="HE3TUBE-phase2" isDefault="false">
-    <xi:include href="../beast/he3tube/HE3TUBE-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../beast/he3tube/HE3TUBE-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="CLAWS-phase2" isDefault="false">
-    <xi:include href="../beast/claws/CLAWS.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../beast/claws/CLAWS.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="FANGS-phase2" isDefault="false">
-    <xi:include href="../beast/fangs/FANGS.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../beast/fangs/FANGS.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="PLUME-phase2" isDefault="false">
-    <xi:include href="../beast/plume/PLUME_pos2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../beast/plume/PLUME_pos2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="QCSMONITOR-phase2" isDefault="false">
-    <xi:include href="../beast/qcsmonitor/QCSMONITOR-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../beast/qcsmonitor/QCSMONITOR-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="ServiceGapsMaterial-phase2" isDefault="false">
-    <xi:include href="../structure/ServiceGaps-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../structure/ServiceGaps-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
-
   <!-- early phase 3 Service Gaps -->
   <DetectorComponent name="ServiceGapsMaterial-earlyPhase3" isDefault="false">
-    <xi:include href="../structure/ServiceGaps-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../structure/ServiceGaps-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
-
   <!-- early phase 3 PXD -->
   <DetectorComponent name="PXD-earlyPhase3" isDefault="false">
-    <xi:include href="../pxd/PXD-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../pxd/PXD-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
-
   <!-- early phase 3 and phase3 Beast system -->
   <DetectorComponent name="MICROTPC" isDefault="false">
-    <xi:include href="../beast/microtpc/MICROTPC-phase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../beast/microtpc/MICROTPC-phase3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="BEAMABORT" isDefault="true">
-    <xi:include href="../beast/beamabort/BEAMABORT.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../beast/beamabort/BEAMABORT.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="HE3TUBE" isDefault="false">
-    <xi:include href="../beast/he3tube/HE3TUBE.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../beast/he3tube/HE3TUBE.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
   <DetectorComponent name="CLAWS" isDefault="false">
-    <xi:include href="../beast/claws/CLAWS3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+    <xi:include href="../beast/claws/CLAWS3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
-
-  <!-- CDC without SL0 -->
-  <DetectorComponent name="CDCReduced" isDefault="false">
-    <xi:include href="../cdc/CDCReduced.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  <!-- CDC without SL0 and SL1 -->
+  <DetectorComponent name="CDCReducedNoSL0SL1" isDefault="false">
+    <xi:include href="../cdc/CDCReducedNoSL0SL1.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
-
-
   <!-- MUID muon identification -->
   <Muid>
     <xi:include href="../klm/MuidParameters.xml"/>
   </Muid>
-
 </Detector>

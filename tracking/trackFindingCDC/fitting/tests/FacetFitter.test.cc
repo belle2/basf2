@@ -7,11 +7,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
-#include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
-#include <tracking/trackFindingCDC/geometry/LineParameters.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
+#include <tracking/trackingUtilities/geometry/LineParameters.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/Matrix.h>
+#include <tracking/trackingUtilities/numerics/Matrix.h>
 
 #include <framework/logging/Logger.h>
 
@@ -19,6 +19,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 TEST(TrackFindingCDCTest, fitting_FacetFitter_fitLine)

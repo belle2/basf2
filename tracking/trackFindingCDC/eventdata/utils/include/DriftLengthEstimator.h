@@ -15,13 +15,15 @@ namespace Belle2 {
 }
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
-    class CDCFacet;
-    class CDCRecoHit2D;
+  namespace TrackingUtilities {
+    class CDCTrack;
     class CDCRecoHit3D;
+    class CDCRecoHit2D;
+    class CDCFacet;
     class CDCSegment2D;
     class CDCSegment3D;
-    class CDCTrack;
+  }
+  namespace TrackFindingCDC {
 
     /// Helper construct implementing the (re)estimation of the drift length for various hit objects
     struct DriftLengthEstimator {
@@ -30,26 +32,26 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
       /// Update the drift length of the reconstructed hit in place.
-      double updateDriftLength(CDCRecoHit2D& recoHit2D);
+      double updateDriftLength(TrackingUtilities::CDCRecoHit2D& recoHit2D);
 
       /// Update the drift length of the reconstructed hit in place.
-      double updateDriftLength(CDCRecoHit3D& recoHit3D, double tanLambda);
+      double updateDriftLength(TrackingUtilities::CDCRecoHit3D& recoHit3D, double tanLambda);
 
       /**
        *  Re-estimate the drift length of all three contained drift circles.
        *  Using the additional flight direction information the accuracy of the drift length
        *  can be increased a lot helping the filters following this step
        */
-      void updateDriftLength(CDCFacet& facet);
+      void updateDriftLength(TrackingUtilities::CDCFacet& facet);
 
       /// Update the drift length of the contained reconstructed hit in place.
-      void updateDriftLength(CDCSegment2D& segment);
+      void updateDriftLength(TrackingUtilities::CDCSegment2D& segment);
 
       /// Update the drift length of the contained reconstructed hit in place.
-      void updateDriftLength(CDCSegment3D& segment, double tanLambda);
+      void updateDriftLength(TrackingUtilities::CDCSegment3D& segment, double tanLambda);
 
       /// Update the drift length of the contained reconstructed hit in place.
-      void updateDriftLength(CDCTrack& track, double tanLambda);
+      void updateDriftLength(TrackingUtilities::CDCTrack& track, double tanLambda);
 
       /// Parameter : Switch to serve the alpha angle to the drift length translator.
       bool m_param_useAlphaInDriftLength = true;

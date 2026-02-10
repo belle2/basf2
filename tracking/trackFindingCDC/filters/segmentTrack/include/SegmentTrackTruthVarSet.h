@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
@@ -28,10 +28,10 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct SegmentTrackTruthVarNames : public VarNames<BaseSegmentTrackFilter::Object> {
+    struct SegmentTrackTruthVarNames : public TrackingUtilities::VarNames<BaseSegmentTrackFilter::Object> {
 
       /// Number of variables to be generated
-      static const size_t nVars = size(segmentTrackTruthVarNames);
+      static const size_t nVars = TrackingUtilities::size(segmentTrackTruthVarNames);
 
       /// Getter for the name at the given index
       static constexpr char const* getName(int iName)
@@ -44,7 +44,7 @@ namespace Belle2 {
      *  Class to compute floating point variables from a segment to track match
      *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
-    class SegmentTrackTruthVarSet : public VarSet<SegmentTrackTruthVarNames> {
+    class SegmentTrackTruthVarSet : public TrackingUtilities::VarSet<SegmentTrackTruthVarNames> {
 
     public:
       /// Generate and assign the contained variables
@@ -54,13 +54,13 @@ namespace Belle2 {
       void initialize() override
       {
         CDCMCManager::getInstance().requireTruthInformation();
-        VarSet<SegmentTrackTruthVarNames>::initialize();
+        TrackingUtilities::VarSet<SegmentTrackTruthVarNames>::initialize();
       }
 
       void beginEvent() override
       {
         CDCMCManager::getInstance().fill();
-        VarSet<SegmentTrackTruthVarNames>::beginEvent();
+        TrackingUtilities::VarSet<SegmentTrackTruthVarNames>::beginEvent();
       }
     };
   }

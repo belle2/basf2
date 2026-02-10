@@ -12,22 +12,22 @@
 #include <tracking/trackFindingCDC/filters/segmentRelation/BasicSegmentRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentRelation/HitGapSegmentRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the construction of segment pairs based on simple criteria without the common fit.
-    class MVAFeasibleSegmentRelationFilter : public MVA<BaseSegmentRelationFilter> {
+    class MVAFeasibleSegmentRelationFilter : public TrackingUtilities::MVA<BaseSegmentRelationFilter> {
 
     private:
       /// Type of the base class
-      using Super = MVA<BaseSegmentRelationFilter>;
+      using Super = TrackingUtilities::MVA<BaseSegmentRelationFilter>;
 
-      /// Type of the VarSet the filter is working on
-      using VarSet = VariadicUnionVarSet<BasicSegmentRelationVarSet, HitGapSegmentRelationVarSet>;
+      /// Type of the TrackingUtilities::VarSet the filter is working on
+      using VarSet = TrackingUtilities::VariadicUnionVarSet<BasicSegmentRelationVarSet, HitGapSegmentRelationVarSet>;
 
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.

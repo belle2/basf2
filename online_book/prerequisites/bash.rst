@@ -61,7 +61,7 @@ available on your system. For macOS and Linux this is basically always the case
 but for Windows you need to install it first.
 
 .. admonition:: Installation on Windows
-    :class: toggle
+    :class: dropdown
 
     Luckily with recent Windows versions it has become exceedingly easy to
     install a bash and use it. We recommend to follow the `Ubuntu Instructions
@@ -124,7 +124,7 @@ defined in this way.
     of the variable ``$myvariable``.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     Create a file ``print_myvariable.sh`` that just contains one line:
 
@@ -156,7 +156,7 @@ definition.
     exercise again.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     Now the script should show the value you assigned so the output should be
 
@@ -192,7 +192,7 @@ some names have special meaning. The most important one is the variable
     Print the value of ``$PATH`` in your shell.
 
 .. admonition:: Solution
-    :class: solution toggle
+    :class: dropdown solution
 
     You should see a number of directory names separated by colon, for example
 
@@ -216,7 +216,7 @@ This command will print the full path to the program that would be called.
     Find out in which directory the ``ls`` program is located.
 
 .. admonition:: Solution
-    :class: solution toggle
+    :class: dropdown solution
 
     Running ``which ls`` should produce
 
@@ -238,7 +238,7 @@ could use:
     Why do we have ``$PATH`` in the value of the variable assignment?
 
 .. admonition:: Solution
-    :class: solution toggle
+    :class: dropdown solution
 
     We want to add a directory to the existing ``$PATH``, not fully replace the
     value. Otherwise the shell would **only** look in our home directory for

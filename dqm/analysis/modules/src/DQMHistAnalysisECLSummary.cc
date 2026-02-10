@@ -55,7 +55,11 @@ void DQMHistAnalysisECLSummaryModule::initialize()
   //=== Set up ECL alarms and corresponding PVs
 
   m_ecl_alarms = {
-    {"dead",     "#splitline{dead}{channels}",         1,  1,  1e5},
+    // name      title                                 alarm_limit
+    //  |          |                                   |   warning_limit
+    //  |          |                                   |   |   required_statistics
+    //  |          |                                   |   |   |
+    {"dead",     "#splitline{dead}{channels}",         1,  1,  3e4},
     {"cold",     "#splitline{cold}{channels}",         1,  2,  1e5},
     {"hot",      "#splitline{hot}{channels}",          25, 50, 1e5},
     {"bad_chi2", "#splitline{bad #chi^{2}}{channels}", 5,  10, 1e6},
@@ -651,12 +655,12 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
     if (total_events >= dead_alarm.required_statistics) {
       double min_occupancy;
       const std::string run_type = getRunType();
-      if (run_type == "null" || run_type == "debug" || run_type == "cosmic") {
-        // For null runs, occupancy should be higher than 0.0001%
-        min_occupancy = 1e-6;
-      } else if (run_type == "physics") {
+      if (run_type == "physics") {
         // For physics runs, occupancy should be higher than 0.01%
         min_occupancy = 1e-4;
+      } else {
+        // For every other run type, occupancy should be higher than 0.0001%
+        min_occupancy = 1e-6;
       }
       if (not_normalized) {
         // The histogram is not normalized, multiply the threshold by evt count

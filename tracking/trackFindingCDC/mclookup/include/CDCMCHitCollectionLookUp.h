@@ -9,8 +9,8 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
-#include <tracking/trackFindingCDC/numerics/Index.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/numerics/Index.h>
 
 #include <map>
 
@@ -18,8 +18,11 @@ namespace Belle2 {
   class MCParticle;
   class CDCHit;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrajectory3D;
+  }
+
+  namespace TrackFindingCDC {
 
     /// Structure representing a matched Monte Carlo track id with the corresponding purity
     struct MCTrackIdPurityPair {
@@ -106,39 +109,39 @@ namespace Belle2 {
 
 
       /// Getter for in track id for the first hit in the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getFirstInTrackId(const ACDCHitCollection* ptrHits) const
+      TrackingUtilities::Index getFirstInTrackId(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getInTrackId(getFirstHit(ptrHits)); }
 
       /// Getter for in track id for the last hit in the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getLastInTrackId(const ACDCHitCollection* ptrHits) const
+      TrackingUtilities::Index getLastInTrackId(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getInTrackId(getLastHit(ptrHits)); }
 
 
 
       /// Getter for in track collection of hits id for the first hit in the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getFirstInTrackSegmentId(const ACDCHitCollection* ptrHits) const
+      TrackingUtilities::Index getFirstInTrackSegmentId(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getInTrackSegmentId(getFirstHit(ptrHits)); }
 
       /// Getter for in track collection of hits id for the last hit in the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getLastInTrackSegmentId(const ACDCHitCollection* ptrHits) const
+      TrackingUtilities::Index getLastInTrackSegmentId(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getInTrackSegmentId(getLastHit(ptrHits)); }
 
 
 
       /// Getter for number of passed superlayer till the first hit the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getFirstNPassedSuperLayers(const ACDCHitCollection* ptrHits) const
+      TrackingUtilities::Index getFirstNPassedSuperLayers(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getNPassedSuperLayers(getFirstHit(ptrHits)); }
 
       /// Getter for number of passed superlayer till the last hit the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getLastNPassedSuperLayers(const ACDCHitCollection* ptrHits) const
+      TrackingUtilities::Index getLastNPassedSuperLayers(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getNPassedSuperLayers(getLastHit(ptrHits)); }
 
       /// Getter for number of loops till the first hit the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getFirstNLoops(const ACDCHitCollection* ptrHits) const
+      TrackingUtilities::Index getFirstNLoops(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getNLoops(getFirstHit(ptrHits)); }
 
       /// Getter for number of loops till the last hit the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getLastNLoops(const ACDCHitCollection* ptrHits) const
+      TrackingUtilities::Index getLastNLoops(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getNLoops(getLastHit(ptrHits)); }
 
       /**
@@ -148,7 +151,7 @@ namespace Belle2 {
        *  * Returns EForwardBackward::c_Backward if the collection of hits is coaligned with the matched track interpreted in reverse.
        *  * Returns EForwardBackward::c_Unknown if the matter cannot be decided.
        */
-      EForwardBackward isForwardOrBackwardToMCTrack(const ACDCHitCollection* ptrHits) const;
+      TrackingUtilities::EForwardBackward isForwardOrBackwardToMCTrack(const ACDCHitCollection* ptrHits) const;
 
       /**
        *  Returns if the second collection of hits follows the first collection of hits in their common Monte Carlo track.
@@ -161,19 +164,19 @@ namespace Belle2 {
        *                     with the Monte Carlo track and the second collection of hits
        *                     comes after the first in the reversed sense.
        */
-      EForwardBackward areAlignedInMCTrack(const ACDCHitCollection* ptrFromHits,
-                                           const ACDCHitCollection* ptrToHits) const;
+      TrackingUtilities::EForwardBackward areAlignedInMCTrack(const ACDCHitCollection* ptrFromHits,
+                                                              const ACDCHitCollection* ptrToHits) const;
 
       /**
        *  Returns if the second collection of hits follows the first collection of hits in their common Monte Carlo track.
        *
        *  Also checks that the majority of the right left passage information agrees with the forward backward information
        */
-      EForwardBackward areAlignedInMCTrackWithRLCheck(const ACDCHitCollection* ptrFromHits,
-                                                      const ACDCHitCollection* ptrToHits) const;
+      TrackingUtilities::EForwardBackward areAlignedInMCTrackWithRLCheck(const ACDCHitCollection* ptrFromHits,
+          const ACDCHitCollection* ptrToHits) const;
 
       /** Returns the trajectory of the collection of hits */
-      CDCTrajectory3D getTrajectory3D(const ACDCHitCollection* ptrHits) const;
+      TrackingUtilities::CDCTrajectory3D getTrajectory3D(const ACDCHitCollection* ptrHits) const;
 
     private:
       /// Threshold for the purity that must be exceeded to be considered as a match.

@@ -123,6 +123,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
     }
     for (iSection = 1; iSection <= nSections; iSection++) {
       nDetectorLayers = m_GeoDat->getNDetectorLayers(iSection);
+      assert(nDetectorLayers <= nLayers);
       for (iLayer = 1; iLayer <= nDetectorLayers; iLayer++) {
         for (iSector = 1; iSector <= nSectors; iSector++) {
           sector = m_ElementNumbers->sectorNumber(iSection, iLayer, iSector);
@@ -133,19 +134,13 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
           for (iPlane = 1; iPlane <= nPlanes; iPlane++) {
             /* First plane is rotated. */
             if (iPlane == 1) {
-              if (m_PlaneDisplacement[iSection - 1] &&
-                  m_PlaneDisplacement[iSection - 1][iLayer - 1] &&
-                  m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1]) {
-                m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1] =
-                  HepGeom::Translate3D(
-                    sectorAlignment->getDeltaV() * CLHEP::cm / Unit::cm,
-                    sectorAlignment->getDeltaU() * CLHEP::cm / Unit::cm, 0) *
-                  HepGeom::RotateZ3D(-sectorAlignment->getDeltaGamma() *
-                                     CLHEP::rad / Unit::rad);
-              } else {
-                //NOTE: this check is only to suppress clang warnings
-                B2FATAL("Missing m_PlaneDisplacement allocation for section/layer/sector in TransformData.cc");
-              }
+              [[clang::suppress]]
+              m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1] =
+                HepGeom::Translate3D(
+                  sectorAlignment->getDeltaV() * CLHEP::cm / Unit::cm,
+                  sectorAlignment->getDeltaU() * CLHEP::cm / Unit::cm, 0) *
+                HepGeom::RotateZ3D(-sectorAlignment->getDeltaGamma() *
+                                   CLHEP::rad / Unit::rad);
             } else {
               m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1] =
                 HepGeom::Translate3D(
@@ -264,16 +259,10 @@ void EKLM::TransformData::transformsToGlobal()
         if (iLayer >= nDetectorLayers)
           continue;
         for (iPlane = 0; iPlane < nPlanes; iPlane++) {
-          if (m_Plane[iSection] &&
-              m_Plane[iSection][iLayer] &&
-              m_Plane[iSection][iLayer][iSector]) {
-            m_Plane[iSection][iLayer][iSector][iPlane] =
-              m_Sector[iSection][iLayer][iSector] *
-              m_Plane[iSection][iLayer][iSector][iPlane];
-          } else {
-            //NOTE: this check is only to suppress clang warnings
-            B2FATAL("Missing m_Plane allocation for section/layer/sector");
-          }
+          [[clang::suppress]]
+          m_Plane[iSection][iLayer][iSector][iPlane] =
+            m_Sector[iSection][iLayer][iSector] *
+            m_Plane[iSection][iLayer][iSector][iPlane];
           for (iSegment = 0; iSegment < nSegments; iSegment++) {
             m_Segment[iSection][iLayer][iSector][iPlane][iSegment] =
               m_Plane[iSection][iLayer][iSector][iPlane] *

@@ -11,9 +11,6 @@ import random
 import modularAnalysis as ma
 from ROOT import Belle2
 
-# disable doxygen check for this test
-# @cond
-
 
 class Generator(basf2.Module):
     """Generate list of 10 electrons which have random momenta and one
@@ -109,5 +106,3 @@ ma.applyCuts('e-:best', 'extraInfo(identifier) > 0', path=path)
 path.add_module(MergingChecker())
 
 basf2.process(path)
-
-# @endcond

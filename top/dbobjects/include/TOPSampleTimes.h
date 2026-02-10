@@ -15,7 +15,7 @@
 namespace Belle2 {
 
   /**
-   * Calibration constants of a singe ASIC channel: time axis (sample times)
+   * Calibration constants of a single ASIC channel: time axis (sample times)
    */
   class TOPSampleTimes: public TObject {
   public:

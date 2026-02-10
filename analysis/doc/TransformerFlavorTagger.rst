@@ -129,6 +129,6 @@ An example tutorial for normal use can be found under:
 Functions
 ---------
 
-.. automodule:: tflat.flavorTagger.flavorTagger
-   :members:
+.. automodule:: tflat.flavorTagger
+   :members: flavorTagger
    :undoc-members:

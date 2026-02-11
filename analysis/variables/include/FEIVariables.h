@@ -39,5 +39,10 @@ namespace Belle2 {
     If continuum event this will return -1.
     */
     double percentageWrongParticlesBTag(const Particle* part);
+    /*
+    Returns the magnitude of the 3-momentum difference (in CMS frame) between the reconstructed particle
+    and the generated B meson identified by mostcommonBTagIndex. Returns NaN if no B meson found.
+    */
+    double mostcommonBTagDeltaP(const Particle* part);
   } // Variable namespace
 } // Belle2 namespace

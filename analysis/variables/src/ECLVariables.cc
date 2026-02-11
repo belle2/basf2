@@ -1356,7 +1356,7 @@ read their definitions below.
     fully simulated. In order to see if the waveform fit fails, see `clusterHasFailedTiming`.    
 
 .. note::
-    Please read this <importantNoteECL> first.
+    Please read `this <importantNoteECL>` first.
     
     - Lower limit: :math:`-1000.0`
     - Upper limit: :math:`1000.0`

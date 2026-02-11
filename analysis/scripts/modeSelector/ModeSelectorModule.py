@@ -415,11 +415,17 @@ class ModeSelectorModule(b2.Module):
     def terminate(self):
         """Called at the end of processing."""
         if self.debug and self.debug_features:
-            # Save debug features to file
+            # Save debug features and NN outputs to file
             debug_file = 'modeSelector_debug_features.npz'
             feature_arrays = np.array([d['all_features'] for d in self.debug_features])
+            cat_outputs = np.array([d['cat_output'] for d in self.debug_features])
+            main_outputs = np.array([d['main_output'] for d in self.debug_features])
             np.savez(debug_file,
                      features=feature_arrays,
+                     cat_outputs=cat_outputs,
+                     main_outputs=main_outputs,
+                     charged_cat=[d['charged_cat'] for d in self.debug_features],
+                     bp_score=[d['bp_score'] for d in self.debug_features],
                      n_candidates=[d['n_candidates'] for d in self.debug_features],
                      max_input_ids=[d['max_input_id'] for d in self.debug_features],
                      exp=[d['exp'] for d in self.debug_features],
@@ -453,26 +459,6 @@ class ModeSelectorModule(b2.Module):
 
         # Build feature array
         all_features, max_input_id, n_unique_candidates = self._build_feature_array(candidates_data, event_features)
-
-        # Debug output
-        if self.debug:
-            # Save metadata for all events
-            event_meta = Belle2.PyStoreObj('EventMetaData')
-            if event_meta.isValid():
-                self.debug_features.append({
-                    'exp': event_meta.getExperiment(),
-                    'run': event_meta.getRun(),
-                    'evt': event_meta.getEvent(),
-                    'all_features': all_features.copy(),
-                    'max_input_id': max_input_id,
-                    'n_candidates': n_unique_candidates,
-                })
-
-            # Print verbose output for first few events
-            if self.event_count < self.debug_max_events:
-                self._print_debug_info(candidates_data, event_features, all_features, max_input_id)
-
-            self.event_count += 1
 
         # Select features based on has_inputs (indices used during training)
         if self.has_inputs is not None:
@@ -510,31 +496,73 @@ class ModeSelectorModule(b2.Module):
         main_output = self.main_session.run(None, {self.main_input_name: main_input})[0][0]
 
         # Extract scores
-        # Main network outputs: signal probability for different categories
-        # Index 1 = is_target for neutral, Index 5 = is_target for charged
-        if charged_cat > 0.5:
-            bplus_score = main_output[5] if len(main_output) > 5 else main_output[1]
-        else:
-            bplus_score = main_output[1]
+        # Main network outputs (6 classes after softmax):
+        #   [0] bad_tag, [1] is_target_neutral, [2] cross_deltaC1,
+        #   [3] cross_internal, [4] continuum, [5] is_target_charged
+        bp_score = float(main_output[5] - main_output[1])
 
-        # Store results on the best candidate
-        best_candidate = None
-        best_sig_prob = -1
+        # eqSigProb: maps Bp_score to [0, 1] range
+        eq_sig_prob_bp = 0.5 + bp_score / 2
+        eq_sig_prob_b0 = 0.5 - bp_score / 2
+
+        # Find best B+ and best B0 candidate (highest sigProb within each type)
+        best_bp = None
+        best_bp_sig = -1
+        best_b0 = None
+        best_b0_sig = -1
         for particle in all_candidates:
             sig_prob = vm.evaluate('extraInfo(SignalProbability)', particle)
-            if sig_prob > best_sig_prob:
-                best_sig_prob = sig_prob
-                best_candidate = particle
+            pdg = abs(int(vm.evaluate('PDG', particle)))
+            if pdg == 521:  # B+
+                if sig_prob > best_bp_sig:
+                    best_bp_sig = sig_prob
+                    best_bp = particle
+            elif pdg == 511:  # B0
+                if sig_prob > best_b0_sig:
+                    best_b0_sig = sig_prob
+                    best_b0 = particle
 
-        if best_candidate is not None:
-            best_candidate.addExtraInfo(self.output_variable, float(bplus_score))
-            best_candidate.addExtraInfo(f'{self.output_variable}_catB0', float(cat_output[0]))
-            best_candidate.addExtraInfo(f'{self.output_variable}_catBp', float(cat_output[1]))
-            best_candidate.addExtraInfo(f'{self.output_variable}_catCont', float(cat_output[2]))
+        # Store results on best B+ candidate
+        if best_bp is not None:
+            best_bp.addExtraInfo(self.output_variable, bp_score)
+            best_bp.addExtraInfo(f'{self.output_variable}_eqSigProb', eq_sig_prob_bp)
+            best_bp.addExtraInfo(f'{self.output_variable}_catB0', float(cat_output[0]))
+            best_bp.addExtraInfo(f'{self.output_variable}_catBp', float(cat_output[1]))
+            best_bp.addExtraInfo(f'{self.output_variable}_catCont', float(cat_output[2]))
+
+        # Store results on best B0 candidate
+        if best_b0 is not None:
+            best_b0.addExtraInfo(self.output_variable, bp_score)
+            best_b0.addExtraInfo(f'{self.output_variable}_eqSigProb', eq_sig_prob_b0)
+            best_b0.addExtraInfo(f'{self.output_variable}_catB0', float(cat_output[0]))
+            best_b0.addExtraInfo(f'{self.output_variable}_catBp', float(cat_output[1]))
+            best_b0.addExtraInfo(f'{self.output_variable}_catCont', float(cat_output[2]))
 
         # Optionally store event-level info
         if self.store_event_info:
             event_extra_info = Belle2.PyStoreObj('EventExtraInfo')
             if not event_extra_info.isValid():
                 event_extra_info.create()
-            event_extra_info.addExtraInfo(self.output_variable, float(bplus_score))
+            event_extra_info.addExtraInfo(self.output_variable, bp_score)
+
+        # Debug output (after NN inference so we can save outputs too)
+        if self.debug:
+            event_meta = Belle2.PyStoreObj('EventMetaData')
+            if event_meta.isValid():
+                self.debug_features.append({
+                    'exp': event_meta.getExperiment(),
+                    'run': event_meta.getRun(),
+                    'evt': event_meta.getEvent(),
+                    'all_features': all_features.copy(),
+                    'max_input_id': max_input_id,
+                    'n_candidates': n_unique_candidates,
+                    'cat_output': cat_output.copy(),
+                    'main_output': main_output.copy(),
+                    'charged_cat': charged_cat,
+                    'bp_score': bp_score,
+                })
+
+            if self.event_count < self.debug_max_events:
+                self._print_debug_info(candidates_data, event_features, all_features, max_input_id)
+
+            self.event_count += 1

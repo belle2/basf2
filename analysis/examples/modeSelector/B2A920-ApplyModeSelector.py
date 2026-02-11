@@ -124,6 +124,7 @@ output_variables = [
     'extraInfo(decayModeID)',
     # ModeSelector output
     'extraInfo(BplusScore)',
+    'extraInfo(BplusScore_eqSigProb)',
     'extraInfo(BplusScore_catB0)',
     'extraInfo(BplusScore_catBp)',
     'extraInfo(BplusScore_catCont)',

@@ -53,6 +53,8 @@ class ModeSelectorModule(b2.Module):
         payload_cat_model='ModeSelector_cat_model',
         payload_main_model='ModeSelector_main_model',
         payload_has_inputs='ModeSelector_has_inputs',
+        training_mode=False,
+        training_output='modeSelector_training.npz',
         debug=False,
         debug_max_events=10,
     ):
@@ -73,6 +75,12 @@ class ModeSelectorModule(b2.Module):
         self.payload_main_model = payload_main_model
         #: Payload name for has_inputs
         self.payload_has_inputs = payload_has_inputs
+        #: Training mode (save features + MC truth, skip NN inference)
+        self.training_mode = training_mode
+        #: Output file for training mode
+        self.training_output = training_output
+        #: Training data storage
+        self.training_data = []
         #: Debug mode
         self.debug = debug
         #: Max events to debug
@@ -95,6 +103,14 @@ class ModeSelectorModule(b2.Module):
 
     def initialize(self):
         """Called at the beginning of processing."""
+        # Build feature index mapping (needed for both inference and training)
+        self._build_feature_indices()
+
+        if self.training_mode:
+            b2.B2INFO("ModeSelector: Running in TRAINING mode (saving features, no NN inference)")
+            self.has_inputs = None
+            return
+
         import ast
 
         import onnxruntime as ort
@@ -145,11 +161,6 @@ class ModeSelectorModule(b2.Module):
         b2.B2INFO(f"ModeSelector: Loaded main model (input size: {self.main_input_size})")
         if self.has_inputs:
             b2.B2INFO(f"ModeSelector: Using {len(self.has_inputs)} selected features")
-
-        # Build feature index mapping
-        # The training uses a specific set of feature indices (has_inputs)
-        # We need to compute features for all positions and select the right ones
-        self._build_feature_indices()
 
     def _build_feature_indices(self):
         """
@@ -358,6 +369,37 @@ class ModeSelectorModule(b2.Module):
 
         return event_features
 
+    #: MC truth variables to evaluate on best candidates (for training labels)
+    TRAINING_MC_VARS = [
+        'isSignalAcceptWrongFSPs',
+        'isSignalAcceptMissing',
+        'mcErrors',
+        'PDG',
+        'extraInfo(decayModeID)',
+        'Mbc',
+        'extraInfo(SignalProbability)',
+        'mostcommonBTagIndex',
+        # 'mostcommonBTagDeltaP',
+        'percentageWrongParticlesBTag',
+        'percentageMissingParticlesBTag',
+        'extraInfo(looseMCMotherPDG)',
+        'extraInfo(looseMCWrongDaughterN)',
+        'isBBCrossfeed',
+        # Generator B meson PDGs (for tag_is_gen_PDG computation)
+        'genParticle(3, varForMCGen(PDG))',
+        'genParticle(4, varForMCGen(PDG))',
+    ]
+
+    def _extract_mc_truth(self, particle):
+        """Extract MC truth variables from a particle for training labels."""
+        if particle is None:
+            return {name: np.nan for name in self.TRAINING_MC_VARS}
+        truth = {}
+        for var_name in self.TRAINING_MC_VARS:
+            val = vm.evaluate(var_name, particle)
+            truth[var_name] = float(val) if not np.isnan(val) else np.nan
+        return truth
+
     def _print_debug_info(self, candidates_data, event_features, all_features, max_input_id):
         """Print debug information for comparing with offline preprocessing."""
         # Get event identification
@@ -411,6 +453,9 @@ class ModeSelectorModule(b2.Module):
 
     def terminate(self):
         """Called at the end of processing."""
+        if self.training_mode and self.training_data:
+            self._save_training_data()
+
         if self.debug and self.debug_features:
             # Save debug features and NN outputs to file
             debug_file = 'modeSelector_debug_features.npz'
@@ -429,6 +474,47 @@ class ModeSelectorModule(b2.Module):
                      run=[d['run'] for d in self.debug_features],
                      evt=[d['evt'] for d in self.debug_features])
             print(f"\n[DEBUG] Saved {len(self.debug_features)} events to {debug_file}")
+
+    def _save_training_data(self):
+        """Save collected training data to npz."""
+        from scipy import sparse
+
+        n_events = len(self.training_data)
+        feature_arrays = np.array([d['all_features'] for d in self.training_data])
+
+        # Convert to sparse for efficient storage
+        sparse_features = sparse.csr_matrix(feature_arrays)
+
+        # Event metadata
+        exp = np.array([d['exp'] for d in self.training_data])
+        run = np.array([d['run'] for d in self.training_data])
+        evt = np.array([d['evt'] for d in self.training_data])
+        max_input_ids = np.array([d['max_input_id'] for d in self.training_data])
+        n_candidates = np.array([d['n_candidates'] for d in self.training_data])
+
+        # MC truth for best B+ and B0 candidates
+        mc_var_names = self.TRAINING_MC_VARS
+        bp_truth = np.array([
+            [d['bp_mc_truth'][v] for v in mc_var_names]
+            for d in self.training_data
+        ])
+        b0_truth = np.array([
+            [d['b0_mc_truth'][v] for v in mc_var_names]
+            for d in self.training_data
+        ])
+
+        sparse.save_npz(self.training_output.replace('.npz', '_features.npz'), sparse_features)
+        np.savez(self.training_output,
+                 exp=exp, run=run, evt=evt,
+                 max_input_ids=max_input_ids,
+                 n_candidates=n_candidates,
+                 bp_truth=bp_truth,
+                 b0_truth=b0_truth,
+                 mc_var_names=mc_var_names)
+
+        print(f"\n[TRAINING] Saved {n_events} events to {self.training_output}")
+        print(f"[TRAINING] Sparse features: {self.training_output.replace('.npz', '_features.npz')}")
+        print(f"[TRAINING] MC truth variables: {mc_var_names}")
 
     def event(self):
         """Called for each event."""
@@ -469,6 +555,24 @@ class ModeSelectorModule(b2.Module):
         # Build feature array
         all_features, max_input_id, n_unique_candidates = self._build_feature_array(candidates_data, event_features)
 
+        # Training mode: save features + MC truth, skip NN inference
+        if self.training_mode:
+            event_meta = Belle2.PyStoreObj('EventMetaData')
+            entry = {
+                'exp': event_meta.getExperiment() if event_meta.isValid() else -1,
+                'run': event_meta.getRun() if event_meta.isValid() else -1,
+                'evt': event_meta.getEvent() if event_meta.isValid() else -1,
+                'all_features': all_features.copy(),
+                'max_input_id': max_input_id,
+                'n_candidates': n_unique_candidates,
+                'bp_mc_truth': self._extract_mc_truth(best_bp),
+                'b0_mc_truth': self._extract_mc_truth(best_b0),
+            }
+            self.training_data.append(entry)
+            return
+
+        # --- Inference mode ---
+
         # Select features based on has_inputs (indices used during training)
         if self.has_inputs is not None:
             features = all_features[self.has_inputs]
@@ -478,7 +582,6 @@ class ModeSelectorModule(b2.Module):
         # Verify feature size matches model expectation
         if len(features) != self.cat_input_size:
             b2.B2WARNING(f"Feature size mismatch: got {len(features)}, expected {self.cat_input_size}")
-            # Pad or truncate as needed
             if len(features) < self.cat_input_size:
                 features = np.pad(features, (0, self.cat_input_size - len(features)))
             else:

@@ -52,6 +52,8 @@ def modeSelector(
     has_inputs_path=None,
     output_variable='BplusScore',
     addDstarVetoReco=False,
+    training_mode=False,
+    training_output='modeSelector_training.npz',
     debug=False,
     debug_max_events=10,
     path=None
@@ -153,6 +155,8 @@ def modeSelector(
         main_model_path=main_model_path,
         has_inputs_path=has_inputs_path,
         output_variable=output_variable,
+        training_mode=training_mode,
+        training_output=training_output,
         debug=debug,
         debug_max_events=debug_max_events,
     )

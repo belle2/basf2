@@ -5,3 +5,4 @@ Pythonisations
 ++++++++++++++
 * Added function to fill a PyStoreArray through an array-oriented interface, making the operation much faster
 * Added function to read from a PyStoreArray through an array-oriented interface
+* Particle database file evt.pdl has been updated to PDG 2024 data.

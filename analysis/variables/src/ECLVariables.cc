@@ -778,8 +778,7 @@ namespace Belle2 {
 
         //..Time walk correction (7 parameters)
         //  E0 / bias at E0 / lowE slope / highE slope / curvature / Emin / Emax
-        std::array< std::array<float, 7>,  8736> par7 = ECLTimingNormalization->getTimeWalkPar();
-
+        const auto& par7 = ECLTimingNormalization->getTimeWalkPar();
         float EForCor = singleCrystalE;
         if (EForCor < par7[iCrys][5]) {EForCor = par7[iCrys][5];}
         if (EForCor > par7[iCrys][6]) {EForCor = par7[iCrys][6];}
@@ -791,8 +790,7 @@ namespace Belle2 {
 
         //..Dependence on regional background level (5 parameters)
         //  intercept / slope / p2 / min ootCrys / max ootCrys
-        std::array< std::array<float, 5>,  8736> bPar = ECLTimingNormalization->getBackgroundPar();
-
+        const auto& bPar = ECLTimingNormalization->getBackgroundPar();
         float oot = ootCrys;
         if (oot < bPar[iCrys][3]) {oot = bPar[iCrys][3];}
         if (oot > bPar[iCrys][4]) {oot = bPar[iCrys][4];}
@@ -800,15 +798,15 @@ namespace Belle2 {
 
         //..Dependence on single crystal energy (7 parameters)
         //  E0 / res at E0 / lowE slope / highE slope / curvature / Emin / Emax
-        par7 = ECLTimingNormalization->getEnergyPar();
+        const auto& par7Energy = ECLTimingNormalization->getEnergyPar();
 
         EForCor = singleCrystalE;
-        if (EForCor < par7[iCrys][5]) {EForCor = par7[iCrys][5];}
-        if (EForCor > par7[iCrys][6]) {EForCor = par7[iCrys][6];}
-        dE = EForCor - par7[iCrys][0];
-        double energyNorm = par7[iCrys][1] + par7[iCrys][2] * dE;
+        if (EForCor < par7Energy[iCrys][5]) {EForCor = par7Energy[iCrys][5];}
+        if (EForCor > par7Energy[iCrys][6]) {EForCor = par7Energy[iCrys][6];}
+        dE = EForCor - par7Energy[iCrys][0];
+        double energyNorm = par7Energy[iCrys][1] + par7Energy[iCrys][2] * dE;
         if (dE > 0) {
-          energyNorm = par7[iCrys][1] + par7[iCrys][3] * dE  + par7[iCrys][4] * dE * dE;
+          energyNorm = par7Energy[iCrys][1] + par7Energy[iCrys][3] * dE  + par7Energy[iCrys][4] * dE * dE;
         }
 
         //..Overall normalization. Cannot be too small.

@@ -3,7 +3,7 @@
 Transformer Flavor Tagger (TFlaT)
 =================================
 
-**Authors: B. Schwenker and L. Herzberg**
+**Authors: B. Schwenker, L. Herzberg and T. Humair**
 
 The Transformer Flavor Tagger is a multivariate tool to estimate the
 flavor of :math:`B_{tag}` mesons, without having to reconstruct the decays

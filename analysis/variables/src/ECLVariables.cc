@@ -1434,6 +1434,47 @@ and :math:`\theta` ID can be found in the source code linked to the right of thi
 )DOC");
     REGISTER_VARIABLE("clusterPhiID", eclClusterPhiId, R"DOC(
 Returns the :math:`\phi` ID of the crystal with highest energy in the cluster.
+While :math:`\theta` ID indicates the specific ring of the calorimeter,
+:math:`\phi` ID indicates a position of a crystal in that ring. When facing
+towards the direction of an electron beam, :math:`\phi` IDs go clockwise, with
+0 corresponding to the crystal closest to the outer side of the main ring tunnel.
+
+.. admonition:: Diagram
+    :class: dropdown xhint stacked
+
+    \code
+            
+                    phi_id = (nring/4)   phi_id = (nring/4) - 1
+                                      
+                                . ... ││. .. .
+                            .... . .  ││..  .. . .
+                          .. . . .... ││ ..... . . . .
+                      .. . . .               . . . . .
+                    ... ...                      .. . ..
+                    ... ..                         ... . ..
+                  . . .                             ..  . .
+                ... .                                  ....
+                . . ..                                   .. .
+                . . .                                    .. ..
+    nring/2     ─────           (towards the            ───── phi_id = 0
+    nring/2 - 1 ─────            electron beam)         ───── phi_id = (nring - 1)
+                . ..                                     .. ..
+                . ....                                  . . .
+                .. ..                                  ... .
+                . .. .                               .. ...
+                    . . ..                          .. . .
+                    .. . ...                     ..  ...
+                      . . .  . .             .. .. ..
+                        ... . . . .. ││. .. . .... .
+                            . . . . .││ ... ... .
+                                .....││.. . .
+
+              phi_id = (nring*3/4) - 1  phi_id = (nring/4) - 1
+
+    \endcode
+
+    The number of crystals per ring can be found see the `code <https://software.belle2.org/development/doxygen/classBelle2_1_1ECL_1_1ECLNeighbours.html#a4d5f886765986da6afb0559fb398106b>`_.   
+
 )DOC");
     REGISTER_VARIABLE("clusterE1E9", eclClusterE1E9, R"DOC(
 Returns the ratio of the energy in the central crystal (:math:`E_1`) to the total energy in the 

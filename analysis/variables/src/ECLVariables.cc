@@ -1441,37 +1441,35 @@ towards the direction of an electron beam, :math:`\phi` IDs go clockwise, with
 
 .. admonition:: Diagram
     :class: dropdown xhint stacked
+    
+    .. code-block:: text
 
-    \code
-            
-                    phi_id = (nring/4)   phi_id = (nring/4) - 1
+                        phi_id = (nring/4)   phi_id = (nring/4) - 1
                                       
-                                . ... ││. .. .
-                            .... . .  ││..  .. . .
-                          .. . . .... ││ ..... . . . .
-                      .. . . .               . . . . .
-                    ... ...                      .. . ..
-                    ... ..                         ... . ..
-                  . . .                             ..  . .
-                ... .                                  ....
-                . . ..                                   .. .
-                . . .                                    .. ..
-    nring/2     ─────           (towards the            ───── phi_id = 0
-    nring/2 - 1 ─────            electron beam)         ───── phi_id = (nring - 1)
-                . ..                                     .. ..
-                . ....                                  . . .
-                .. ..                                  ... .
-                . .. .                               .. ...
-                    . . ..                          .. . .
-                    .. . ...                     ..  ...
-                      . . .  . .             .. .. ..
-                        ... . . . .. ││. .. . .... .
-                            . . . . .││ ... ... .
-                                .....││.. . .
+                                    . ... ││. .. .
+                                .... . .  ││..  .. . .
+                              .. . . .... ││ ..... . . . .
+                          .. . . .               . . . . .
+                        ... ...                      .. . ..
+                        ... ..                         ... . ..
+                      . . .                             ..  . .
+                    ... .                                  ....
+                    . . ..                                   .. .
+                    . . .                                    .. ..
+        nring/2     ─────           (towards the            ───── phi_id = 0
+        nring/2 - 1 ─────            electron beam)         ───── phi_id = (nring - 1)
+                    . ..                                     .. ..
+                    . ....                                  . . .
+                    .. ..                                  ... .
+                    . .. .                               .. ...
+                        . . ..                          .. . .
+                        .. . ...                     ..  ...
+                          . . .  . .             .. .. ..
+                            ... . . . .. ││. .. . .... .
+                                . . . . .││ ... ... .
+                                    .....││.. . .
 
-              phi_id = (nring*3/4) - 1  phi_id = (nring/4) - 1
-
-    \endcode
+                  phi_id = (nring*3/4) - 1  phi_id = (nring/4) - 1
 
     The number of crystals per ring can be found see the `code <https://software.belle2.org/development/doxygen/classBelle2_1_1ECL_1_1ECLNeighbours.html#a4d5f886765986da6afb0559fb398106b>`_.   
 

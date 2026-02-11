@@ -21,7 +21,6 @@ by the FEI, which is important for the ModeSelector neural network.
 
 import basf2 as b2
 import modularAnalysis as ma
-import vertex
 from variables import variables as vm
 
 
@@ -45,7 +44,8 @@ def addDstarVeto(
     path: b2.Path = None,
     deltaMassDiffCut: tuple = (-0.02, 0.02),
     dMassCut: tuple = (-0.03, 0.03),
-    writeExtraInfo: bool = True
+    writeExtraInfo: bool = True,
+    skipTreeFit: bool = False
 ):
     """
     Add D* veto reconstruction to the path for a B meson particle list.
@@ -76,18 +76,23 @@ def addDstarVeto(
         Cut on D and D* mass deviation (dM) in GeV
     writeExtraInfo : bool
         Whether to write ExtraInfo to particles
+    skipTreeFit : bool
+        If True, skip the vertex TreeFit (significant speedup). The deltaMassDiff
+        will use InvM-based computation instead of fit-based, and chiProb will not
+        be available (stored as NaN). Candidates are ranked by abs(deltaMassDiffInvM)
+        instead of chiProb. Default: False
 
     The following ExtraInfo fields are added to B candidates:
 
     For D0 daughter (D*+ and D*0 veto):
         - Dstp_deltaMassDiff: Delta mass difference for D*+ -> D0 pi+
-        - Dstp_chiProb: Vertex fit chi2 probability for D*+
+        - Dstp_chiProb: Vertex fit chi2 probability for D*+ (NaN if skipTreeFit)
         - Dst0_deltaMassDiff: Delta mass difference for D*0 -> D0 pi0
-        - Dst0_chiProb: Vertex fit chi2 probability for D*0
+        - Dst0_chiProb: Vertex fit chi2 probability for D*0 (NaN if skipTreeFit)
 
     For D+ daughter (D*+ veto only):
         - Dstp_deltaMassDiff: Delta mass difference for D*+ -> D+ pi0
-        - Dstp_chiProb: Vertex fit chi2 probability for D*+
+        - Dstp_chiProb: Vertex fit chi2 probability for D*+ (NaN if skipTreeFit)
     """
     if path is None:
         b2.B2FATAL("Path is required for addDstarVeto")
@@ -110,13 +115,14 @@ def addDstarVeto(
 
     # For veto reconstruction, use InvM-based deltaMassDiff
     extra_info_veto_dstp = {
-        'daughter(0,chiProb)': 'Dstp_chiProb',
         'daughter(0,deltaMassDiffInvM)': 'Dstp_deltaMassDiff',
     }
     extra_info_veto_dst0 = {
-        'daughter(0,chiProb)': 'Dst0_chiProb',
         'daughter(0,deltaMassDiffInvM)': 'Dst0_deltaMassDiff',
     }
+    if not skipTreeFit:
+        extra_info_veto_dstp['daughter(0,chiProb)'] = 'Dstp_chiProb'
+        extra_info_veto_dst0['daughter(0,chiProb)'] = 'Dst0_chiProb'
 
     # Create pi+ list for D*+ -> D0 pi+ reconstruction
     from_ip = "[[dr < 2] and [abs(dz) < 4]]"
@@ -195,21 +201,24 @@ def addDstarVeto(
             if dst_daughter == 'pi0':
                 ma.rankByHighest(dst_list, 'daughter(1,chiProb)', 1, path=roe_path)
             elif dst_daughter == 'pi+':
-                # Will rank by vertex fit quality after fit
-                pass
+                if skipTreeFit:
+                    ma.rankByLowest(dst_list, 'abs(deltaMassDiffInvM)', 1, path=roe_path)
+                # else: will rank by vertex fit quality after fit
 
-            # Vertex fit with mass constraints
-            vertex.treeFit(
-                list_name=dst_list,
-                conf_level=0,
-                ipConstraint=False,
-                updateAllDaughters=False,
-                massConstraint=["D*+", "D*0", "D+", "D0", "K_S0", "pi0"],
-                path=roe_path,
-            )
+            if not skipTreeFit:
+                # Vertex fit with mass constraints
+                import vertex
+                vertex.treeFit(
+                    list_name=dst_list,
+                    conf_level=0,
+                    ipConstraint=False,
+                    updateAllDaughters=False,
+                    massConstraint=["D*+", "D*0", "D+", "D0", "K_S0", "pi0"],
+                    path=roe_path,
+                )
 
-            if dst_daughter == 'pi+':
-                ma.rankByHighest(dst_list, 'chiProb', 1, path=roe_path)
+                if dst_daughter == 'pi+':
+                    ma.rankByHighest(dst_list, 'chiProb', 1, path=roe_path)
 
             if 'D*+:veto' in dst_list:
                 dstp_lists.append(dst_list)

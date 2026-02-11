@@ -113,9 +113,9 @@ for plist in particle_lists:
     ma.matchMCTruth(plist, path=my_path)
     ma.looseMCTruth(plist, path=my_path)
 
-# Add D* veto reconstruction
+# Add D* veto reconstruction (skipTreeFit for faster processing)
 for plist in particle_lists:
-    modeSelector.addDstarVeto(plist, path=my_path)
+    modeSelector.addDstarVeto(plist, skipTreeFit=True, path=my_path)
 
 # Run ModeSelector in training mode (no NN models needed)
 modeSelector.modeSelector(

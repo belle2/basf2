@@ -29,12 +29,10 @@
 import argparse
 
 # import sys
-#
 # sys.path.insert(0, '/home/pf/basf2/analysis/scripts')
 import basf2 as b2
 import modeSelector
 import modularAnalysis as ma
-from stdPi0s import stdPi0s
 
 # Parse arguments (basf2 strips its own args, remaining go to script)
 parser = argparse.ArgumentParser()
@@ -93,18 +91,6 @@ ma.buildEventShape(
     path=my_path
 )
 
-# Create standard pi0 list needed for D* veto reconstruction
-beamBackgroundMVAWeight = "MC16rd"
-fakePhotonMVAWeight = "MC16rd"
-stdPi0s('eff50_May2020Fit', path=my_path, beamBackgroundMVAWeight=beamBackgroundMVAWeight,
-        fakePhotonMVAWeight=fakePhotonMVAWeight)
-
-# Apply additional pi0 cuts (matching training preprocessing)
-pi0Cuts = '[useCMSFrame(p) < 0.5]'
-pi0Cuts += ' and [daughter(0,beamBackgroundSuppression) > 0.5] and [daughter(0,fakePhotonSuppression) > 0.1]'
-pi0Cuts += ' and [daughter(1,beamBackgroundSuppression) > 0.5] and [daughter(1,fakePhotonSuppression) > 0.1]'
-ma.applyCuts('pi0:eff50_May2020Fit', pi0Cuts, path=my_path)
-
 # Define the particle lists to process
 particle_lists = ['B+:feiHadronic', 'B0:feiHadronic']
 
@@ -113,9 +99,8 @@ for plist in particle_lists:
     ma.matchMCTruth(plist, path=my_path)
     ma.looseMCTruth(plist, path=my_path)
 
-# Add D* veto reconstruction (skipTreeFit for faster processing)
-for plist in particle_lists:
-    modeSelector.addDstarVeto(plist, skipTreeFit=True, path=my_path)
+# Add D* veto reconstruction (pi0 list created internally, skipTreeFit for speed)
+modeSelector.addDstarVeto(particle_lists, skipTreeFit=False, path=my_path)
 
 # Run ModeSelector in training mode (no NN models needed)
 modeSelector.modeSelector(

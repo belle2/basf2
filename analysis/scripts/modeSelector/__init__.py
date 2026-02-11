@@ -145,8 +145,7 @@ def modeSelector(
 
     # Optionally add D* veto reconstruction
     if addDstarVetoReco:
-        for plist in particleLists:
-            addDstarVeto(plist, path=path)
+        addDstarVeto(particleLists, path=path)
 
     # Add the ModeSelector module
     module = ModeSelectorModule(

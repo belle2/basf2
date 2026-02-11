@@ -19,12 +19,10 @@
 ##########################################################################
 
 # import sys
-#
 # sys.path.insert(0, '/home/pf/basf2/analysis/scripts')
 import basf2 as b2
 import modeSelector
 import modularAnalysis as ma
-from stdPi0s import stdPi0s
 
 # Set up logging
 b2.set_log_level(b2.LogLevel.INFO)
@@ -80,25 +78,15 @@ ma.buildEventShape(
     path=my_path
 )
 
-# Create standard pi0 list needed for D* veto reconstruction
-# Using MC16rd weights for background suppression
-beamBackgroundMVAWeight = "MC16rd"
-fakePhotonMVAWeight = "MC16rd"
-stdPi0s('eff50_May2020Fit', path=my_path, beamBackgroundMVAWeight=beamBackgroundMVAWeight,
-        fakePhotonMVAWeight=fakePhotonMVAWeight)
-
-# Apply additional pi0 cuts (matching training preprocessing)
-pi0Cuts = '[useCMSFrame(p) < 0.5]'
-pi0Cuts += ' and [daughter(0,beamBackgroundSuppression) > 0.5] and [daughter(0,fakePhotonSuppression) > 0.1]'
-pi0Cuts += ' and [daughter(1,beamBackgroundSuppression) > 0.5] and [daughter(1,fakePhotonSuppression) > 0.1]'
-ma.applyCuts('pi0:eff50_May2020Fit', pi0Cuts, path=my_path)
-
 # Define the particle lists to process
 particle_lists = ['B+:feiHadronic', 'B0:feiHadronic']
 
-# Add D* veto reconstruction
+# MC truth matching
 for plist in particle_lists:
-    modeSelector.addDstarVeto(plist, path=my_path)
+    ma.matchMCTruth(plist, path=my_path)
+
+# Add D* veto reconstruction (pi0 list created internally)
+modeSelector.addDstarVeto(particle_lists, path=my_path)
 
 # Apply ModeSelector with local model files (for testing/development)
 # Set debug=True to print feature values for comparison
@@ -129,6 +117,10 @@ output_variables = [
     'eventExtraInfo(BplusScore_catB0)',
     'eventExtraInfo(BplusScore_catBp)',
     'eventExtraInfo(BplusScore_catCont)',
+    # MC truth matching
+    'isSignal',
+    # 'mostcommonBTagDeltaP',
+    'mostcommonBTagIndex',
     # D* veto variables (if addDstarVeto was used)
     'extraInfo(Dstp_deltaMassDiff)',
     'extraInfo(Dstp_chiProb)',

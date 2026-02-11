@@ -52,7 +52,6 @@ def modeSelector(
     has_inputs_path=None,
     output_variable='BplusScore',
     addDstarVetoReco=False,
-    store_event_info=True,
     debug=False,
     debug_max_events=10,
     path=None
@@ -84,9 +83,6 @@ def modeSelector(
     addDstarVetoReco : bool
         Whether to add D* veto reconstruction before the NN.
         Default: False (assumes already added or not needed)
-    store_event_info : bool
-        Whether to store the score in EventExtraInfo as well.
-        Default: True
     path : basf2.Path
         The basf2 path to add the module to.
 
@@ -96,8 +92,13 @@ def modeSelector(
 
     Notes
     -----
-    The ModeSelector neural network outputs several ExtraInfo variables:
-    - {output_variable}: The main signal probability score
+    The ModeSelector neural network outputs:
+
+    Candidate-level (ExtraInfo on best B+ and best B0):
+    - {output_variable}_eqSigProb: Signal probability (0.5 + Bp_score/2 for B+, 0.5 - Bp_score/2 for B0)
+
+    Event-level (EventExtraInfo):
+    - {output_variable}: Bp_score = main_output[5] - main_output[1]
     - {output_variable}_catB0: Category network B0 probability
     - {output_variable}_catBp: Category network B+ probability
     - {output_variable}_catCont: Category network continuum probability
@@ -152,7 +153,6 @@ def modeSelector(
         main_model_path=main_model_path,
         has_inputs_path=has_inputs_path,
         output_variable=output_variable,
-        store_event_info=store_event_info,
         debug=debug,
         debug_max_events=debug_max_events,
     )

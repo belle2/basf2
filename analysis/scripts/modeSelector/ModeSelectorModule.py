@@ -50,7 +50,6 @@ class ModeSelectorModule(b2.Module):
         main_model_path=None,
         has_inputs_path=None,
         output_variable='BplusScore',
-        store_event_info=True,
         payload_cat_model='ModeSelector_cat_model',
         payload_main_model='ModeSelector_main_model',
         payload_has_inputs='ModeSelector_has_inputs',
@@ -68,8 +67,6 @@ class ModeSelectorModule(b2.Module):
         self.has_inputs_path = has_inputs_path
         #: Output variable name
         self.output_variable = output_variable
-        #: Store event-level info
-        self.store_event_info = store_event_info
         #: Payload name for category model
         self.payload_cat_model = payload_cat_model
         #: Payload name for main model
@@ -436,8 +433,11 @@ class ModeSelectorModule(b2.Module):
     def event(self):
         """Called for each event."""
         # Collect all candidates from all particle lists
-        all_candidates = []
         candidates_data = []
+        best_bp = None
+        best_bp_sig = -1
+        best_b0 = None
+        best_b0_sig = -1
 
         for list_name in self.particle_lists:
             plist = Belle2.PyStoreObj(list_name)
@@ -446,12 +446,21 @@ class ModeSelectorModule(b2.Module):
 
             for i in range(plist.getListSize()):
                 particle = plist.obj().getParticle(i)
-                all_candidates.append(particle)
 
                 input_id, features = self._extract_particle_features(particle)
                 candidates_data.append((input_id, features))
 
-        if not all_candidates:
+                # Track best B+ and B0 by sigProb
+                sig_prob = features.get('sigProb', -1) or -1
+                pdg = abs(int(vm.evaluate('PDG', particle)))
+                if pdg == 521 and sig_prob > best_bp_sig:
+                    best_bp_sig = sig_prob
+                    best_bp = particle
+                elif pdg == 511 and sig_prob > best_b0_sig:
+                    best_b0_sig = sig_prob
+                    best_b0 = particle
+
+        if not candidates_data:
             return
 
         # Get event-level features
@@ -505,45 +514,20 @@ class ModeSelectorModule(b2.Module):
         eq_sig_prob_bp = 0.5 + bp_score / 2
         eq_sig_prob_b0 = 0.5 - bp_score / 2
 
-        # Find best B+ and best B0 candidate (highest sigProb within each type)
-        best_bp = None
-        best_bp_sig = -1
-        best_b0 = None
-        best_b0_sig = -1
-        for particle in all_candidates:
-            sig_prob = vm.evaluate('extraInfo(SignalProbability)', particle)
-            pdg = abs(int(vm.evaluate('PDG', particle)))
-            if pdg == 521:  # B+
-                if sig_prob > best_bp_sig:
-                    best_bp_sig = sig_prob
-                    best_bp = particle
-            elif pdg == 511:  # B0
-                if sig_prob > best_b0_sig:
-                    best_b0_sig = sig_prob
-                    best_b0 = particle
-
-        # Store results on best B+ candidate
+        # Store eqSigProb on best B+ and B0 candidates (candidate-specific)
         if best_bp is not None:
-            best_bp.addExtraInfo(self.output_variable, bp_score)
             best_bp.addExtraInfo(f'{self.output_variable}_eqSigProb', eq_sig_prob_bp)
-            best_bp.addExtraInfo(f'{self.output_variable}_catB0', float(cat_output[0]))
-            best_bp.addExtraInfo(f'{self.output_variable}_catBp', float(cat_output[1]))
-            best_bp.addExtraInfo(f'{self.output_variable}_catCont', float(cat_output[2]))
-
-        # Store results on best B0 candidate
         if best_b0 is not None:
-            best_b0.addExtraInfo(self.output_variable, bp_score)
             best_b0.addExtraInfo(f'{self.output_variable}_eqSigProb', eq_sig_prob_b0)
-            best_b0.addExtraInfo(f'{self.output_variable}_catB0', float(cat_output[0]))
-            best_b0.addExtraInfo(f'{self.output_variable}_catBp', float(cat_output[1]))
-            best_b0.addExtraInfo(f'{self.output_variable}_catCont', float(cat_output[2]))
 
-        # Optionally store event-level info
-        if self.store_event_info:
-            event_extra_info = Belle2.PyStoreObj('EventExtraInfo')
-            if not event_extra_info.isValid():
-                event_extra_info.create()
-            event_extra_info.addExtraInfo(self.output_variable, bp_score)
+        # Store event-level outputs in EventExtraInfo
+        event_extra_info = Belle2.PyStoreObj('EventExtraInfo')
+        if not event_extra_info.isValid():
+            event_extra_info.create()
+        event_extra_info.addExtraInfo(self.output_variable, bp_score)
+        event_extra_info.addExtraInfo(f'{self.output_variable}_catB0', float(cat_output[0]))
+        event_extra_info.addExtraInfo(f'{self.output_variable}_catBp', float(cat_output[1]))
+        event_extra_info.addExtraInfo(f'{self.output_variable}_catCont', float(cat_output[2]))
 
         # Debug output (after NN inference so we can save outputs too)
         if self.debug:

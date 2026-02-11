@@ -122,12 +122,13 @@ output_variables = [
     # FEI signal probability
     'extraInfo(SignalProbability)',
     'extraInfo(decayModeID)',
-    # ModeSelector output
-    'extraInfo(BplusScore)',
+    # ModeSelector output (candidate-level)
     'extraInfo(BplusScore_eqSigProb)',
-    'extraInfo(BplusScore_catB0)',
-    'extraInfo(BplusScore_catBp)',
-    'extraInfo(BplusScore_catCont)',
+    # ModeSelector output (event-level)
+    'eventExtraInfo(BplusScore)',
+    'eventExtraInfo(BplusScore_catB0)',
+    'eventExtraInfo(BplusScore_catBp)',
+    'eventExtraInfo(BplusScore_catCont)',
     # D* veto variables (if addDstarVeto was used)
     'extraInfo(Dstp_deltaMassDiff)',
     'extraInfo(Dstp_chiProb)',

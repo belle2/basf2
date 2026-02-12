@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef FULLSIMMODULE_H_
-#define FULLSIMMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -168,5 +167,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* FULLSIMMODULE_H_ */

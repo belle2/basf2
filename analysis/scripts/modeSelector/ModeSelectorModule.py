@@ -26,6 +26,9 @@ import numpy as np
 from ROOT import Belle2
 from variables import variables as vm
 
+from modeSelector import config
+from modeSelector.config import load_has_inputs
+
 
 class ModeSelectorModule(b2.Module):
     """
@@ -90,16 +93,11 @@ class ModeSelectorModule(b2.Module):
         #: Store debug features for comparison
         self.debug_features = []
 
-        # Feature configuration
+        # Feature configuration (from modeSelector.config)
         #: Number of decay mode indices (dmID * 2 + is_charged)
-        self.n_input_ids = 136
-        #: Number of feature blocks (sigProb, chiProb, etc.)
-        self.n_feature_blocks = 11  # Mbc is excluded
+        self.n_input_ids = config.N_INPUT_IDS
         #: Event-level feature names
-        self.event_features = [
-            'sphericity', 'thrust', 'thrustAxisCosTheta', 'aplanarity', 'foxWolframR2',
-            'harmonicMomentThrust0', 'harmonicMomentThrust1', 'harmonicMomentThrust2'
-        ]
+        self.event_features = config.EVENT_FEATURES
 
     def initialize(self):
         """Called at the beginning of processing."""
@@ -111,21 +109,17 @@ class ModeSelectorModule(b2.Module):
             self.has_inputs = None
             return
 
-        import ast
-
         import onnxruntime as ort
 
         # Load has_inputs (feature indices) from file or database
         if self.has_inputs_path:
-            with open(self.has_inputs_path, 'r') as f:
-                self.has_inputs = ast.literal_eval(f.read())
+            self.has_inputs = load_has_inputs(self.has_inputs_path)
         else:
             try:
                 db_accessor = Belle2.DBAccessorBase(
                     Belle2.DBStoreEntry.c_RawFile, self.payload_has_inputs, True
                 )
-                with open(db_accessor.getFilename(), 'r') as f:
-                    self.has_inputs = ast.literal_eval(f.read())
+                self.has_inputs = load_has_inputs(db_accessor.getFilename())
             except Exception as e:
                 b2.B2WARNING(f"ModeSelector: Could not load has_inputs from database: {e}")
                 b2.B2WARNING("ModeSelector: Using all features (this may not match training!)")
@@ -164,62 +158,19 @@ class ModeSelectorModule(b2.Module):
 
     def _build_feature_indices(self):
         """
-        Build the feature index mapping.
+        Build the feature index mapping from config.
 
         The training used sparse matrices with specific non-zero columns.
         We need to match that structure.
         """
-        # Feature blocks (in order):
-        # 0: sigProb (1.0 + val * 100)
-        # 1: chiProb (2.0 + val)
-        # 2: Bdaughter_sigProb (1.0 + val * 10)
-        # 3: Bdaughter2_sigProb (1.0 + val * 10)
-        # 4: Bdaughter_chiProb (2.0 + val)
-        # 5: Dst0_deltaMassDiff (1.0 + val * 20 + 0.5)
-        # 6: Dstp_deltaMassDiff (1.0 + val * 20 + 0.5)
-        # 7: Dst0_chiProb (2.0 + val)
-        # 8: Dstp_chiProb (2.0 + val)
-        # 9: deltaE (1.0 + val * 5 + 0.75)
-        # 10: Mbc - EXCLUDED from training
-        # 11: cosTBTO (1.0 + val)
+        #: Feature block names and transformations (from config)
+        self.feature_blocks = [(name, transform) for name, _, transform in config.FEATURE_BLOCKS]
 
-        #: Feature block names and transformations
-        # Note: Mbc is included to match training structure (excluded via has_inputs)
-        self.feature_blocks = [
-            ('sigProb', lambda x: 1.0 + x * 100),
-            ('chiProb', lambda x: 2.0 + x),
-            ('Bdaughter_sigProb', lambda x: 1.0 + x * 10),
-            ('Bdaughter2_sigProb', lambda x: 1.0 + x * 10),
-            ('Bdaughter_chiProb', lambda x: 2.0 + x),
-            ('Dst0_deltaMassDiff', lambda x: 1.0 + x * 20 + 0.5),
-            ('Dstp_deltaMassDiff', lambda x: 1.0 + x * 20 + 0.5),
-            ('Dst0_chiProb', lambda x: 2.0 + x),
-            ('Dstp_chiProb', lambda x: 2.0 + x),
-            ('deltaE', lambda x: 1.0 + x * 5 + 0.75),
-            ('Mbc', lambda x: 1.0 + (x - 5.23) * 20),  # Included for index compatibility
-            ('cosTBTO', lambda x: 1.0 + x),
-        ]
+        #: Variable mapping for particle features (from config)
+        self.particle_vars = {name: var_name for name, var_name, _ in config.FEATURE_BLOCKS}
 
-        # Variable names to extract from particles
-        #: Variable mapping for particle features
-        self.particle_vars = {
-            'sigProb': 'extraInfo(SignalProbability)',
-            'chiProb': 'chiProb',
-            'Bdaughter_sigProb': 'daughter(0, extraInfo(SignalProbability))',
-            'Bdaughter2_sigProb': 'daughter(1, extraInfo(SignalProbability))',
-            'Bdaughter_chiProb': 'daughter(0, chiProb)',
-            'Dst0_deltaMassDiff': 'extraInfo(Dst0_deltaMassDiff)',
-            'Dstp_deltaMassDiff': 'extraInfo(Dstp_deltaMassDiff)',
-            'Dst0_chiProb': 'extraInfo(Dst0_chiProb)',
-            'Dstp_chiProb': 'extraInfo(Dstp_chiProb)',
-            'deltaE': 'deltaE',
-            'Mbc': 'Mbc',  # Included for index compatibility (excluded via has_inputs)
-            'cosTBTO': 'cosTBTO',  # From buildContinuumSuppression
-        }
-
-        # D* deltaMassDiff cut
         #: Cut range for D* delta mass difference
-        self.deltaM_cut = (-0.05, 0.05)
+        self.deltaM_cut = config.DELTA_M_CUT
 
     def _get_input_id(self, particle):
         """
@@ -370,25 +321,7 @@ class ModeSelectorModule(b2.Module):
         return event_features
 
     #: MC truth variables to evaluate on best candidates (for training labels)
-    TRAINING_MC_VARS = [
-        'isSignalAcceptWrongFSPs',
-        'isSignalAcceptMissing',
-        'mcErrors',
-        'PDG',
-        'extraInfo(decayModeID)',
-        'Mbc',
-        'extraInfo(SignalProbability)',
-        'mostcommonBTagIndex',
-        # 'mostcommonBTagDeltaP',
-        'percentageWrongParticlesBTag',
-        'percentageMissingParticlesBTag',
-        'extraInfo(looseMCMotherPDG)',
-        'extraInfo(looseMCWrongDaughterN)',
-        'isBBCrossfeed',
-        # Generator B meson PDGs (for tag_is_gen_PDG computation)
-        'genParticle(3, varForMCGen(PDG))',
-        'genParticle(4, varForMCGen(PDG))',
-    ]
+    TRAINING_MC_VARS = config.TRAINING_MC_VARS
 
     def _extract_mc_truth(self, particle):
         """Extract MC truth variables from a particle for training labels."""

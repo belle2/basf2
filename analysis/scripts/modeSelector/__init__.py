@@ -34,10 +34,12 @@ Example usage:
     variables = ['extraInfo(BplusScore)']
 """
 
+from modeSelector import config
 from modeSelector.dstarVeto import add_dstar_veto_aliases, addDstarVeto
 from modeSelector.ModeSelectorModule import ModeSelectorModule
 
 __all__ = [
+    'config',
     'modeSelector',
     'addDstarVeto',
     'add_dstar_veto_aliases',

@@ -401,7 +401,7 @@ void FullSimModule::initialize()
     }
   }
 
-  // Inactivate all secondary-generating processes for g4e particles. This comprises
+  // Deactivate all secondary-generating processes for g4e particles. This comprises
   // Cerenkov and Scintillation that were inserted by G4OpticalPhysics and the
   // CaptureAtRest process for g4e anti-deuteron.
   partIter->reset();

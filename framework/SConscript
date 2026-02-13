@@ -4,7 +4,7 @@ env['LIBS'] = ['$ROOT_LIBS', 'ROOTTPython',
                'GenVector', # for LorentzRotation
                'EG', # for TDatabasePDG
                'XMLIO', # for TBufferXML
-               'boost_python', 'boost_filesystem', 'boost_iostreams', 'boost_system',
+               'boost_python', 'boost_filesystem', 'boost_iostreams',
                '$PYTHON_LIBS', '$XML_LIBS', '$MYSQL_LIBS' , '$PGSQL_LIBS',
                'rt', # for clock_gettime() on some systems
                'zmq',

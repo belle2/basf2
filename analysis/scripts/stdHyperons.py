@@ -113,21 +113,21 @@ def stdXi0(gammatype='eff40', beamBackgroundMVAWeight="", fakePhotonMVAWeight=""
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
+                              `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_
                               for information on the beam background MVA.
 
         fakePhotonMVAWeight (str): type of weight file for fake photon MVA; if empty, fake photon MVA will not be used
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
+                              `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_
                               for information on the fake photon MVA.
 
         biasCorrectionTable (str): correction table for the photon energy bias correction (should only be applied to data)
 
                           .. tip::
                               Please refer to the
-                              `Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
+                              `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_
                               for information on the names of available correction tables.
 
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list

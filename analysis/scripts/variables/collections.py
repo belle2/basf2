@@ -16,42 +16,32 @@ kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
 
 #: Cluster-related variables
 cluster = [
-    'clusterKlId',
-    'clusterPulseShapeDiscriminationMVA',
-    'clusterHasPulseShapeDiscrimination',
-    'clusterNumberOfHadronDigits',
-    'clusterDeltaLTemp',
-    'minC2TDist',
-    'nECLClusterTrackMatches',
-    'clusterZernikeMVA',
-    'clusterReg',
     'clusterAbsZernikeMoment40',
     'clusterAbsZernikeMoment51',
-    'clusterBelleQuality',
     'clusterClusterID',
     'clusterConnectedRegionID',
+    'clusterE',
     'clusterE1E9',
     'clusterE9E21',
-    'clusterE9E25',
     'clusterEoP',
-    'clusterErrorE',
-    'clusterErrorPhi',
-    'clusterErrorTheta',
-    'clusterErrorTiming',
-    'clusterHighestE',
     'clusterHasFailedErrorTiming',
     'clusterHasFailedTiming',
     'clusterHasNPhotons',
     'clusterHasNeutralHadron',
+    'clusterHasPulseShapeDiscrimination',
     'clusterLAT',
     'clusterNHits',
     'clusterPhi',
-    'clusterR',
+    'clusterPulseShapeDiscriminationMVA',
+    'clusterReg',
     'clusterSecondMoment',
     'clusterTheta',
     'clusterTiming',
     'clusterTrackMatch',
-    'goodBelleGamma',
+    'clusterZernikeMVA',
+    'maxWeightedDistanceFromAverageECLTime',
+    'minC2TDist',
+    'nECLClusterTrackMatches'
 ]
 
 #: Cluster-related event variables
@@ -79,12 +69,7 @@ event_level_cluster = [
     'nECLTriggerCells',
     'nECLTriggerCellsBWDEndcap',
     'nECLTriggerCellsBarrel',
-    'nECLTriggerCellsFWDEndcap'
-]
-
-#: Cluster averages
-cluster_average = [
-    'maxWeightedDistanceFromAverageECLTime',
+    'nECLTriggerCellsFWDEndcap',
     'weightedAverageECLTime'
 ]
 

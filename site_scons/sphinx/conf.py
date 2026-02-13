@@ -411,19 +411,32 @@ texinfo_documents = [
 
 
 # Get package versions for pinned intersphinx mapping
-def get_package_version(package_name):
+def get_package_version(package_name, major_minor_only=False):
     """Get version of an installed package."""
-    try:
-        module = __import__(package_name)
-        return getattr(module, "__version__", "stable")
-    except ImportError:
-        return "stable"
+    if package_name == "python":
+        version = f"{sys.version_info.major}.{sys.version_info.minor}"
+    else:
+        try:
+            module = __import__(package_name)
+            version = getattr(module, "__version__", "stable")
+        except ImportError:
+            return "stable"
+    if major_minor_only and version != "stable" and "." in version:
+        parts = version.split(".")
+        version = ".".join(parts[:2])
+    return version
 
 
 # allow to have links to python documentation
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3.11/", None),
-    "numpy": (f"https://numpy.org/doc/{get_package_version('numpy')}/", None),
+    "python": (
+        f"https://docs.python.org/{get_package_version('python', major_minor_only=True)}/",
+        None,
+    ),
+    "numpy": (
+        f"https://numpy.org/doc/{get_package_version('numpy', major_minor_only=True)}/",
+        None,
+    ),
     "scipy": (
         f"https://docs.scipy.org/doc/scipy-{get_package_version('scipy')}/",
         None,

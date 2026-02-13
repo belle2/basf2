@@ -347,7 +347,7 @@ Examples:
 * Print the version of the cuts which was present in 8/1 online in a format understandable by GitLab
   (you need to have the tabulate package installed)
 
-    %(prog)s print --database "online:8/1" --format plain
+    %(prog)s print --database "online:8/1" --format human-readable
 
 * Add a new skim cut named "accept_b2bcluster_3D" with the specified parameters and upload it to localdb
 

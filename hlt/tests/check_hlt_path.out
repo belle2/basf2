@@ -2107,7 +2107,7 @@
       useMissing=False
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
-      writeOut=True
+      writeOut=False
   230. PListCopy_gamma:GoodPi0ForHLT
       cut=
       ignoreMotherFlavor=False
@@ -2115,7 +2115,7 @@
       outputListName=gamma:GoodPi0ForHLT
       preferLowest=True
       variable=mdstIndex
-      writeOut=True
+      writeOut=False
   231. ParticleSelector_applyCuts_gamma:GoodPi0ForHLT
       cut=[clusterReg == 1 and E > 0.02250] or                                                 [clusterReg == 2 and E > 0.020] or                                                 [clusterReg == 3 and E > 0.020]
       decayString=gamma:GoodPi0ForHLT
@@ -2126,12 +2126,12 @@
       allowChargeViolation=False
       chargeConjugation=True
       cut=0.105 < M < 0.150
-      decayMode=1
+      decayMode=0
       decayString=pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT
       ignoreIfTooManyCandidates=True
       maximumNumberOfCandidates=10000
       recoilParticleType=0
-      writeOut=True
+      writeOut=False
   234. ParticleCombiner_D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True
@@ -2552,7 +2552,7 @@
       ignoreIfTooManyCandidates=True
       maximumNumberOfCandidates=10000
       recoilParticleType=0
-      writeOut=True
+      writeOut=False
   286. ParticleLoader_K_S0:V0_ToFit_TreeFit -> pi+ pi-
       addDaughters=False
       decayStrings=['K_S0:V0_ToFit_TreeFit -> pi+ pi-']
@@ -2572,7 +2572,7 @@
       useMissing=False
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
-      writeOut=True
+      writeOut=False
   287. PListCopy_K_S0:V0_ToFit_TreeFit
       cut=
       ignoreMotherFlavor=False
@@ -2580,7 +2580,7 @@
       outputListName=K_S0:V0_ToFit_TreeFit
       preferLowest=True
       variable=mdstIndex
-      writeOut=True
+      writeOut=False
   288. TreeFitter_K_S0:V0_ToFit_TreeFit
       autoSetGeoConstraintAndMergeVertices=True
       confidenceLevel=0.0
@@ -2625,7 +2625,7 @@
       useMissing=False
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
-      writeOut=True
+      writeOut=False
   291. ParticleCombiner_K_S0:RD_TreeFit -> pi+:all pi-:all
       allowChargeViolation=False
       chargeConjugation=True
@@ -2635,7 +2635,7 @@
       ignoreIfTooManyCandidates=True
       maximumNumberOfCandidates=10000
       recoilParticleType=0
-      writeOut=True
+      writeOut=False
   292. TreeFitter_K_S0:RD_TreeFit
       autoSetGeoConstraintAndMergeVertices=True
       confidenceLevel=0.0
@@ -2678,7 +2678,7 @@
       ignoreIfTooManyCandidates=True
       maximumNumberOfCandidates=10000
       recoilParticleType=0
-      writeOut=True
+      writeOut=False
   296. ParticleLoader_e+:physDQM
       addDaughters=False
       decayStrings=['e+:physDQM']
@@ -2719,7 +2719,7 @@
       ignoreIfTooManyCandidates=True
       maximumNumberOfCandidates=10000
       recoilParticleType=0
-      writeOut=True
+      writeOut=False
   300. ParticleLoader_pi+:hadbphysDQM
       addDaughters=False
       decayStrings=['pi+:hadbphysDQM']
@@ -5042,7 +5042,7 @@
             useMissing=False
             useOnlyMostEnergeticECLCluster=True
             useROEs=False
-            writeOut=True
+            writeOut=False
         92. PListCopy_gamma:GoodPi0ForHLT
             cut=
             ignoreMotherFlavor=False
@@ -5050,7 +5050,7 @@
             outputListName=gamma:GoodPi0ForHLT
             preferLowest=True
             variable=mdstIndex
-            writeOut=True
+            writeOut=False
         93. ParticleSelector_applyCuts_gamma:GoodPi0ForHLT
             cut=[clusterReg == 1 and E > 0.02250] or                                                 [clusterReg == 2 and E > 0.020] or                                                 [clusterReg == 3 and E > 0.020]
             decayString=gamma:GoodPi0ForHLT
@@ -5061,12 +5061,12 @@
             allowChargeViolation=False
             chargeConjugation=True
             cut=0.105 < M < 0.150
-            decayMode=1
+            decayMode=0
             decayString=pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT
             ignoreIfTooManyCandidates=True
             maximumNumberOfCandidates=10000
             recoilParticleType=0
-            writeOut=True
+            writeOut=False
         96. ParticleCombiner_D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT
             allowChargeViolation=False
             chargeConjugation=True
@@ -5487,7 +5487,7 @@
             ignoreIfTooManyCandidates=True
             maximumNumberOfCandidates=10000
             recoilParticleType=0
-            writeOut=True
+            writeOut=False
         148. ParticleLoader_K_S0:V0_ToFit_TreeFit -> pi+ pi-
             addDaughters=False
             decayStrings=['K_S0:V0_ToFit_TreeFit -> pi+ pi-']
@@ -5507,7 +5507,7 @@
             useMissing=False
             useOnlyMostEnergeticECLCluster=True
             useROEs=False
-            writeOut=True
+            writeOut=False
         149. PListCopy_K_S0:V0_ToFit_TreeFit
             cut=
             ignoreMotherFlavor=False
@@ -5515,7 +5515,7 @@
             outputListName=K_S0:V0_ToFit_TreeFit
             preferLowest=True
             variable=mdstIndex
-            writeOut=True
+            writeOut=False
         150. TreeFitter_K_S0:V0_ToFit_TreeFit
             autoSetGeoConstraintAndMergeVertices=True
             confidenceLevel=0.0
@@ -5560,7 +5560,7 @@
             useMissing=False
             useOnlyMostEnergeticECLCluster=True
             useROEs=False
-            writeOut=True
+            writeOut=False
         153. ParticleCombiner_K_S0:RD_TreeFit -> pi+:all pi-:all
             allowChargeViolation=False
             chargeConjugation=True
@@ -5570,7 +5570,7 @@
             ignoreIfTooManyCandidates=True
             maximumNumberOfCandidates=10000
             recoilParticleType=0
-            writeOut=True
+            writeOut=False
         154. TreeFitter_K_S0:RD_TreeFit
             autoSetGeoConstraintAndMergeVertices=True
             confidenceLevel=0.0
@@ -5613,7 +5613,7 @@
             ignoreIfTooManyCandidates=True
             maximumNumberOfCandidates=10000
             recoilParticleType=0
-            writeOut=True
+            writeOut=False
         158. ParticleLoader_e+:physDQM
             addDaughters=False
             decayStrings=['e+:physDQM']
@@ -5654,7 +5654,7 @@
             ignoreIfTooManyCandidates=True
             maximumNumberOfCandidates=10000
             recoilParticleType=0
-            writeOut=True
+            writeOut=False
         162. ParticleLoader_pi+:hadbphysDQM
             addDaughters=False
             decayStrings=['pi+:hadbphysDQM']

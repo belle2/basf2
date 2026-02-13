@@ -19,7 +19,7 @@ namespace Belle2 {
   public:
 
     /// Constructor
-    TRGGRLShortTrack(): m_TS_ID({0}) {}
+    TRGGRLShortTrack() {}
     /// Destructor
     ~TRGGRLShortTrack() {}
 
@@ -45,7 +45,7 @@ namespace Belle2 {
   private:
 
     /**TSF ID used for the short track*/
-    std::vector<int> m_TS_ID = std::vector<int>(0, 0);
+    std::vector<int> m_TS_ID = std::vector<int>(5, 0);
 
     /**! The Class title*/
     ClassDef(TRGGRLShortTrack, 1); /*< the class title */

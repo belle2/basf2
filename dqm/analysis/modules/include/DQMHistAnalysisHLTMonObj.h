@@ -59,6 +59,7 @@ namespace Belle2 {
     TCanvas* m_c_hardware = nullptr; /**<Canvas with histograms related to HLT hardware*/
     TCanvas* m_c_l1 = nullptr; /**<Canvas with histograms related to L1*/
     TCanvas* m_c_ana_eff_shifter = nullptr; /**<Canvas with histogram related to ana_eff_shifter*/
+    TCanvas* m_c_nks = nullptr; /**<Canvas to plot Ks histograms*/
 
     MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
 

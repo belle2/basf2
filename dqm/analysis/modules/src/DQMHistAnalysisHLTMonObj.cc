@@ -355,6 +355,7 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
 
   double nKs_all = 0;
+  double nKs_uncertainty_all = 0;
   double nKs_active = 0;
   double nKs_activeNotTime = 0;
   double nKs_activeNotCDCECL = 0;
@@ -374,12 +375,14 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
     RooDataHist* KsHist_all = new RooDataHist("KsHist_all", "Histogram data", RooArgList(*m_KsInvMass), m_hKshortAllH);
     m_KsPdf->fitTo(*KsHist_all, RooFit::Minos(true));
     nKs_all = m_sig->getValV();
+    nKs_uncertainty_all = m_sig->getError();
     KsHist_all->plotOn(m_KshortAll_frame) ;
     m_KsPdf->plotOn(m_KshortAll_frame);
     m_KsPdf->paramOn(m_KshortAll_frame, RooFit::Layout(0.6, 0.9, 0.9));
     delete KsHist_all;
   }
   m_monObj->setVariable("nKs_all_hlt", nKs_all);
+  m_monObj->setVariable("nKs_uncertainty_all_hlt", nKs_uncertainty_all);
 
   if (m_hKshortActiveH) {
     RooDataHist* KsHist_active = new RooDataHist("KsHist_active", "Histogram data", RooArgList(*m_KsInvMass), m_hKshortActiveH);

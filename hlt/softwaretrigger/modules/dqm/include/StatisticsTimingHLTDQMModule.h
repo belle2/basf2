@@ -158,7 +158,7 @@ namespace Belle2 {
       const double m_processingTimeMax = 15000;
 
       /// Number of bins for the histograms of processingTime
-      const double m_processingTimeNBins = 250;
+      const double m_processingTimeNBins = 375;
 
       /// Maximum for the histograms of fullMemory
       const double m_fullMemoryMax = 4000;

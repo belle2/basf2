@@ -1,4 +1,3 @@
-[INFO] Steering file: simulation/tests/check_simulation_path.py
 
 **************************************************************
  Geant4 version Name: geant4-11-02-patch-01    (16-February-2024)
@@ -53,6 +52,8 @@
       CDCProductionCut=0.0
       DetailedParticleMatching=False
       DistanceThreshold=0.0
+      DoNotStoreEMParticles=False
+      DoNotStoreNuclei=False
       ECLProductionCut=0.0
       EmProcessVerbosity=0
       EnableVisualization=False
@@ -86,8 +87,6 @@
       UICommandsAtIdle=[]
       UICommandsAtPreInit=[]
       UseHighPrecisionNeutrons=False
-      DoNotStoreEMParticles=False
-      DoNotStoreNuclei=False
       UseSeenInECL=False
       deltaChordInMagneticField=0.25
       magneticCacheDistance=0.0

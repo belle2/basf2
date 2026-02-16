@@ -12,6 +12,8 @@
 #include <svd/variables/SVDClusterVariables.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <vxd/geometry/GeoCache.h>
+#include <vxd/geometry/SensorInfoBase.h>
 
 namespace {
   Belle2::RecoTrack* getRecoTrack(const Belle2::Particle* particle)
@@ -307,6 +309,60 @@ namespace Belle2::Variable {
     return svdCluster ? svdCluster->isUCluster() : false;
   }
 
+  double SVDClusterChargeNormTrkLenght(const Particle* particle, const std::vector<double>& indices)
+  {
+    if (!particle) {
+      return Const::doubleNaN;
+    }
+    if (indices.size() != 1) {
+      B2FATAL("Exactly one parameter (cluster index) is required.");
+    }
+    const auto clusterIndex = static_cast<unsigned int>(indices[0]);
+
+    const RecoTrack* recoTrack = getRecoTrack(particle);
+    if (!recoTrack) {
+      return Const::doubleNaN;
+    }
+    const SVDCluster* svdCluster = getSVDCluster(recoTrack, clusterIndex);
+    if (!svdCluster) {
+      return Const::doubleNaN;
+    }
+    const RecoHitInformation* recoHitInformation = recoTrack->getRecoHitInformation(svdCluster);
+    if (!recoHitInformation) {
+      return Const::doubleNaN;
+    }
+
+    try {
+      // Get measured state on plane to extract track angles
+      genfit::MeasuredStateOnPlane measuredState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(recoHitInformation);
+      const TVectorD& state = measuredState.getState();
+
+      // Extract track prime (du/dw) and track prime OS (dv/dw)
+      // State vector elements: [0]=q/p, [1]=du/dw, [2]=dv/dw, [3]=u, [4]=v
+      const double trackPrime = state[1];
+      const double trackPrimeOS = state[2];
+
+      // Get sensor information to retrieve thickness
+      static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+      const VxdID sensorID = svdCluster->getSensorID();
+      const VXD::SensorInfoBase& sensorInfo = geo.getSensorInfo(sensorID);
+
+      // Calculate track length in sensor: thickness * sqrt(1 + (du/dw)^2 + (dv/dw)^2)
+      const double trkLength = sensorInfo.getThickness() * sqrt(1.0 + trackPrime * trackPrime + trackPrimeOS * trackPrimeOS);
+
+      // Get cluster charge and normalize by track length
+      const double clusterCharge = svdCluster->getCharge();
+
+      return clusterCharge / trkLength;
+    } catch (const NoTrackFitResult&) {
+      B2WARNING("No track fit result available for this hit!");
+      return Const::doubleNaN;
+    } catch (...) {
+      B2WARNING("Could not compute SVDClusterChargeNormTrkLenght.");
+      return Const::doubleNaN;
+    }
+  }
+
   VARIABLE_GROUP("SVD Validation");
 
   REGISTER_VARIABLE("SVDClusterCharge(i)", SVDClusterCharge,
@@ -325,6 +381,8 @@ namespace Belle2::Variable {
                     "Returns the unbiased track position error of the i-th SVD cluster related to the Particle.");
   REGISTER_VARIABLE("SVDTruePosition(i)", SVDTruePosition,
                     "Returns the true position of the i-th SVD cluster related to the Particle.");
+  REGISTER_VARIABLE("SVDClusterChargeNormTrkLenght(i)", SVDClusterChargeNormTrkLenght,
+                    "Returns the cluster charge normalized to track length in SVD for the i-th SVD cluster related to the Particle.");
   REGISTER_VARIABLE("SVDLayer(i)", SVDLayer,
                     "Returns the layer number of the i-th SVD cluster related to the Particle. If no SVD cluster is found, returns -1.");
   REGISTER_VARIABLE("SVDLadder(i)", SVDLadder,

@@ -175,4 +175,14 @@ namespace Belle2::SVD {
     EXPECT_EQ(Variable::SVDSensor(nullptr,        {0}), -1);
     EXPECT_EQ(Variable::SVDSensor(m_particles[0], {1}), -1);
   }
+
+  /** Test SVDClusterChargeNormTrkLenght */
+  TEST_F(SVDVariableTest, SVDClusterChargeNormTrkLenght)
+  {
+    // Without proper genfit track fitting setup, this should return NaN
+    // but the function should not crash
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterChargeNormTrkLenght(m_particles[0], {0})));
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterChargeNormTrkLenght(nullptr,        {0})));
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterChargeNormTrkLenght(m_particles[0], {1})));
+  }
 } // namespace Belle2::SVD

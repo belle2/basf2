@@ -32,7 +32,7 @@ TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph) : G4UserTrackin
   m_ignorePairConversions(false), m_pairConversionsEnergyCut(0.0),
   m_regionZBackward(0.0), m_regionZForward(0.0), m_regionRho(0.0),
   m_kineticEnergyThreshold(0.0), m_distanceThreshold(0.0),
-  m_useIsEM(false), m_useIsNuclei(false), m_useSeenInECL(false),
+  m_doNotStoreEMParticles(false), m_doNotStoreNuclei(false), m_useSeenInECL(false),
   m_useDetailedParticleMatching(false),
   m_storeTrajectories(false), m_distanceTolerance(0),
   m_storeMCTrajectories(), m_relMCTrajectories(StoreArray<MCParticle>(), m_storeMCTrajectories)
@@ -175,9 +175,10 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
               " Region Rho: " <<
               m_regionRho
               << " Kinetic Energy Threshold: " << m_kineticEnergyThreshold
-              << "Distance: " << distance << " Distance Threshold: " << m_distanceThreshold << " Use is EM: " << m_useIsEM << " Use is Nuclei: "
+              << "Distance: " << distance << " Distance Threshold: " << m_distanceThreshold << " Do Not Store EM: " << m_doNotStoreEMParticles <<
+              " Do Not Store Nuclei: "
               <<
-              m_useIsNuclei << " Use Seen in ECL: " << m_useSeenInECL);
+              m_doNotStoreNuclei << " Use Seen in ECL: " << m_useSeenInECL);
 
       // first, check if the particle is above the kinetic energy threshold
       if (isAboveKinematicThreshold) {
@@ -198,21 +199,21 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
           // if the particle was produced in the Region, first check the distance threshold
           if (hasTraveledDistance) {
             // check, if we want to care about the isEM flag, but not the isNuclei flag
-            if (m_useIsEM && !m_useIsNuclei) {
+            if (m_doNotStoreEMParticles && !m_doNotStoreNuclei) {
               // check, if the particle is not an EM particle
               if (!isEM) {
                 // now, set the ignore flag to false
                 currParticle.setIgnore(false);
               }
               // next check, if we care about the isNuclei flag, but not the isEM flag
-            } else if (!m_useIsEM && m_useIsNuclei) {
+            } else if (!m_doNotStoreEMParticles && m_doNotStoreNuclei) {
               // check, if the particle is not a nucleus
               if (!isNuclei) {
                 // now, set the ignore flag to false
                 currParticle.setIgnore(false);
               }
               // next check, if we care about both the isEM and isNuclei flags
-            } else if (m_useIsEM && m_useIsNuclei) {
+            } else if (m_doNotStoreEMParticles && m_doNotStoreNuclei) {
               // check, if the particle is not an EM particle or a nucleus
               if (!isEM || !isNuclei) {
                 // now, set the ignore flag to false

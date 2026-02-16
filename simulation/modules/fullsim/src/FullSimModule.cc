@@ -138,10 +138,10 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("DistanceThreshold", m_distanceThreshold,
            "Distance threshold [cm] for particles produced inside the defined region volume. "
            "Only particles that travel further than this distance are considered.", 0.0);
-  addParam("UseIsEM", m_useIsEM,
+  addParam("DoNotStoreEMParticles", m_doNotStoreEMParticles,
            "If true, electromagnetic particles (e+, e-, gamma) produced inside the defined region and passing the distance threshold "
            "are NOT stored (they are filtered out). If false, EM particles can be stored.", false);
-  addParam("UseIsNuclei", m_useIsNuclei,
+  addParam("DoNotStoreNuclei", m_doNotStoreNuclei,
            "If true, nuclei (PDG > 10^9) produced inside the defined region and passing the distance threshold "
            "are NOT stored (they are filtered out). If false, nuclei can be stored.", false);
   addParam("UseSeenInECL", m_useSeenInECL,
@@ -350,8 +350,8 @@ void FullSimModule::initialize()
   trackingAction->setRegionRho(m_regionRho);
   trackingAction->setKineticEnergyThreshold(m_kineticEnergyThreshold);
   trackingAction->setDistanceThreshold(m_distanceThreshold);
-  trackingAction->setUseIsEM(m_useIsEM);
-  trackingAction->setUseIsNuclei(m_useIsNuclei);
+  trackingAction->setDoNotStoreEMParticles(m_doNotStoreEMParticles);
+  trackingAction->setDoNotStoreNuclei(m_doNotStoreNuclei);
   trackingAction->setUseSeenInECL(m_useSeenInECL);
 
   runManager.SetUserAction(trackingAction);

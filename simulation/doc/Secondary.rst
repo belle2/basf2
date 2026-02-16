@@ -58,8 +58,8 @@ It can be activated in the FullSim by setting the parameter DetailedParticleMatc
 The algorithm to decide which secondary particles to ignore or not splits the detector into two regions using the parameters ``RegionZForward``, ``RegionZBackward`` and ``RegionRho``. 
 Every Secondary that is created in the inner region, and passes the kinematic cuts (``KineticEnergyThreshold``) will be kept.
 For Secondaries created outside the inner region, additionally the distance between the creation and decay position must be larger than the ``DistanceThreshold``.
-If the ``UseIsEM`` flag is set, the Secondary also must be a non-EM particle to be kept (the kinematic and distance criteria still apply).
-Similarly, if the ``UseIsNuclei`` flag is set, the Secondary also must be a non-nuclei particle to be kept (the kinematic and distance criteria still apply).
+If the ``DoNotStoreEMParticles`` flag is set, the Secondary also must be a non-EM particle to be kept (the kinematic and distance criteria still apply).
+Similarly, if the ``DoNotStoreNuclei`` flag is set, the Secondary also must be a non-nuclei particle to be kept (the kinematic and distance criteria still apply).
 Finally, if the ``UseSeenInECL`` flag is set, Secondaries created in the inner region must also be seen in the ECL to be kept (the kinematic criteria still apply).
 
 

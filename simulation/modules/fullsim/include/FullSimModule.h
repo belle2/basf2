@@ -124,8 +124,8 @@ namespace Belle2 {
     double m_regionRho;                    /**< Region rho limit for filtering secondaries */
     double m_kineticEnergyThreshold;       /**< kinetic energy threshold for filtering secondaries */
     double m_distanceThreshold;            /**< distance threshold for filtering secondaries */
-    bool m_useIsEM;                        /**< use is EM check for filtering secondaries */
-    bool m_useIsNuclei;                    /**< use is Nuclei check for filtering secondaries */
+    bool m_doNotStoreEMParticles;          /**< use is EM check for filtering secondaries */
+    bool m_doNotStoreNuclei;               /**< use is Nuclei check for filtering secondaries */
     bool m_useSeenInECL;                   /**< use seen in ECL check for filtering secondaries */
 
     std::string m_magneticFieldName;       /**< magnetic field stepper to use */

@@ -111,9 +111,9 @@ namespace Belle2 {
       /** Set the distance threshold for ignoring secondaries */
       void setDistanceThreshold(double threshold) { m_distanceThreshold = threshold; }
       /** Set whether to check if particle is EM for ignoring secondaries */
-      void setUseIsEM(bool use) { m_useIsEM = use; }
+      void setDoNotStoreEMParticles(bool value) { m_doNotStoreEMParticles = value; }
       /** Set whether to check if particle is Nuclei for ignoring secondaries */
-      void setUseIsNuclei(bool use) { m_useIsNuclei = use; }
+      void setDoNotStoreNuclei(bool value) { m_doNotStoreNuclei = value; }
       /** Set whether to check if particle is seen in ECL for ignoring secondaries */
       void setUseSeenInECL(bool use) { m_useSeenInECL = use; }
       /** Set whether to use detailed particle matching */
@@ -140,8 +140,8 @@ namespace Belle2 {
       double m_regionRho; /**< Region rho limit */
       double m_kineticEnergyThreshold; /**< kinetic energy threshold */
       double m_distanceThreshold; /**< distance threshold */
-      bool m_useIsEM; /**< use is EM check */
-      bool m_useIsNuclei; /**< use is Nuclei check */
+      bool m_doNotStoreEMParticles; /**< use is EM check */
+      bool m_doNotStoreNuclei; /**< use is Nuclei check */
       bool m_useSeenInECL; /**< use seen in ECL check */
       bool m_useDetailedParticleMatching; /**< use detailed particle matching logic to filter secondaries */
 

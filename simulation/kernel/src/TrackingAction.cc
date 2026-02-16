@@ -11,9 +11,7 @@
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <G4TrackingManager.hh>
 #include <G4Track.hh>

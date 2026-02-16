@@ -54,9 +54,6 @@ namespace Belle2 {
      */
     ~KLMEventT0HitResolution();
 
-    // --------------------------------------------------------------------
-    // Explicit setters
-    // --------------------------------------------------------------------
 
     /**
      * Set per-hit sigma for EKLM scintillator.
@@ -101,9 +98,6 @@ namespace Belle2 {
      */
     void setSigma(float sigma, float sigmaErr, int category);
 
-    // --------------------------------------------------------------------
-    // Explicit getters
-    // --------------------------------------------------------------------
 
     /** Get per-hit sigma for EKLM scintillator [ns]. */
     float getSigmaEKLMScint() const;
@@ -135,9 +129,6 @@ namespace Belle2 {
     /** Get per-hit sigma uncertainty for BKLM RPC Z-readout [ns]. */
     float getSigmaRPCZErr() const;
 
-    // --------------------------------------------------------------------
-    // Generic getters by category
-    // --------------------------------------------------------------------
 
     /**
      * Get per-hit sigma for a given category.
@@ -186,7 +177,7 @@ namespace Belle2 {
     float m_SigmaRPCZErr = 0.0;
 
     /** Class version. */
-    ClassDef(KLMEventT0HitResolution, 2);
+    ClassDef(KLMEventT0HitResolution, 1);
 
   };
 

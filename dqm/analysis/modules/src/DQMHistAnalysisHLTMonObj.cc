@@ -366,10 +366,26 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   auto m_hKshortActiveNotCDCECLH = findHist("PhysicsObjects/hist_nKshortActiveNotCDCECLH");
 
   // Create RooPlot objects
-  RooPlot* m_KshortAll_frame = m_KsInvMass->frame() ;
-  RooPlot* m_KshortActive_frame = m_KsInvMass->frame() ;
-  RooPlot* m_KshortActiveNotTime_frame = m_KsInvMass->frame() ;
-  RooPlot* m_KshortActiveNotCDCECL_frame = m_KsInvMass->frame() ;
+  // All Ks candidates
+  RooPlot* m_KshortAll_frame =
+    m_KsInvMass->frame(RooFit::Title("All events"));
+  m_KshortAll_frame->GetXaxis()->SetTitle("M_{#pi^{+}#pi^{-}} [GeV/c^{2}]");
+  m_KshortAll_frame->GetYaxis()->SetTitle("Candidates / (2 MeV/c^{2})");
+  // Ks from Active veto
+  RooPlot* m_KshortActive_frame =
+    m_KsInvMass->frame(RooFit::Title("Active veto"));
+  m_KshortActive_frame->GetXaxis()->SetTitle("M_{#pi^{+}#pi^{-}} [GeV/c^{2}]");
+  m_KshortActive_frame->GetYaxis()->SetTitle("Candidates / (2 MeV/c^{2})");
+  // Ks from Active veto after Prefilter (timing cut)
+  RooPlot* m_KshortActiveNotTime_frame =
+    m_KsInvMass->frame(RooFit::Title("Active veto (Prefilter Time)"));
+  m_KshortActiveNotTime_frame->GetXaxis()->SetTitle("M_{#pi^{+}#pi^{-}} [GeV/c^{2}]");
+  m_KshortActiveNotTime_frame->GetYaxis()->SetTitle("Candidates / (2 MeV/c^{2})");
+  // Ks from Active veto after Prefilter (CDC-ECL cut)
+  RooPlot* m_KshortActiveNotCDCECL_frame =
+    m_KsInvMass->frame(RooFit::Title("Active veto (Prefilter CDC+ECL)"));
+  m_KshortActiveNotCDCECL_frame->GetXaxis()->SetTitle("M_{#pi^{+}#pi^{-}} [GeV/c^{2}]");
+  m_KshortActiveNotCDCECL_frame->GetYaxis()->SetTitle("Candidates / (2 MeV/c^{2})");
 
   if (m_hKshortAllH) {
     RooDataHist* KsHist_all = new RooDataHist("KsHist_all", "Histogram data", RooArgList(*m_KsInvMass), m_hKshortAllH);

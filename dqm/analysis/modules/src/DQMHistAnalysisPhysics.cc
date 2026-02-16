@@ -194,7 +194,7 @@ void DQMHistAnalysisPhysicsModule::endRun()
     m_monObj->setVariable("ratio_hadronb2_tight_bhabha_hlt", ratio_hadronb2_tight_bhabha_final);
     m_monObj->setVariable("ratio_mumu_tight_bhabha_hlt", ratio_mumu_tight_bhabha_final);
     m_monObj->setVariable("hadronb2_tight_hlt", hadb2_tight_ntot);
-    m_monObj->setVariable("bhabha_hlt", bhabha_all_ntot);
+    m_monObj->setVariable("bhabha_all_hlt", bhabha_ntot);
 
   }
 }

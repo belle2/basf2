@@ -105,24 +105,34 @@ namespace Belle2 {
     // Explicit getters
     // --------------------------------------------------------------------
 
-    /// EKLM scintillator
+    /** Get per-hit sigma for EKLM scintillator [ns]. */
     float getSigmaEKLMScint() const;
+
+    /** Get per-hit sigma uncertainty for EKLM scintillator [ns]. */
     float getSigmaEKLMScintErr() const;
 
-    /// BKLM scintillator
+    /** Get per-hit sigma for BKLM scintillator [ns]. */
     float getSigmaBKLMScint() const;
+
+    /** Get per-hit sigma uncertainty for BKLM scintillator [ns]. */
     float getSigmaBKLMScintErr() const;
 
-    /// BKLM RPC (combined)
+    /** Get per-hit sigma for BKLM RPC (combined) [ns]. */
     float getSigmaRPC() const;
+
+    /** Get per-hit sigma uncertainty for BKLM RPC (combined) [ns]. */
     float getSigmaRPCErr() const;
 
-    /// BKLM RPC Phi-readout
+    /** Get per-hit sigma for BKLM RPC Phi-readout [ns]. */
     float getSigmaRPCPhi() const;
+
+    /** Get per-hit sigma uncertainty for BKLM RPC Phi-readout [ns]. */
     float getSigmaRPCPhiErr() const;
 
-    /// BKLM RPC Z-readout
+    /** Get per-hit sigma for BKLM RPC Z-readout [ns]. */
     float getSigmaRPCZ() const;
+
+    /** Get per-hit sigma uncertainty for BKLM RPC Z-readout [ns]. */
     float getSigmaRPCZErr() const;
 
     // --------------------------------------------------------------------

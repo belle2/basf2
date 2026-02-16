@@ -38,8 +38,8 @@ main.add_module("FullSim",
                 RegionZBackward=-92.0,
                 KineticEnergyThreshold=0.02,
                 DistanceThreshold=40.0,
-                UseIsEM=True,
-                UseIsNuclei=True,
+                DoNotStoreEMParticles=True,
+                DoNotStoreNuclei=True,
                 UseSeenInECL=True
                 )
 

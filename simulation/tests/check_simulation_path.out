@@ -86,8 +86,8 @@
       UICommandsAtIdle=[]
       UICommandsAtPreInit=[]
       UseHighPrecisionNeutrons=False
-      UseIsEM=False
-      UseIsNuclei=False
+      DoNotStoreEMParticles=False
+      DoNotStoreNuclei=False
       UseSeenInECL=False
       deltaChordInMagneticField=0.25
       magneticCacheDistance=0.0

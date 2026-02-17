@@ -190,6 +190,10 @@ void SVDSpacePointCreatorModule::initialize()
 
 void SVDSpacePointCreatorModule::event()
 {
+  // nothing to do if there are no clusters
+  // this check also avoids ERRORS when the SVD is excluded
+  // and either SVDGrouping or SNRFraction selection is ON
+  if (m_svdClusters.getEntries() == 0) return;
 
   bool useSVDGroupInfo = m_useSVDGroupInfoIn6Sample || m_useSVDGroupInfoIn3Sample;
   bool useSVDSpacePointSNRFraction = m_useSVDSpacePointSNRFractionFor6Samples

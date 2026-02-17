@@ -19,8 +19,6 @@ from geometry import check_components
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
 
-from rawdata import add_unpackers
-
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 
 from tracking import (
@@ -651,8 +649,8 @@ def add_cdst_output(path,
     """
     This function adds the `RootOutput` module to a path with the settings needed to produce a cDST output.
     The actual cDST output content depends on the value of the parameter `mc`:
-    * if `mc` is `False` (default setting), the cDST content is raw + tracking dataobjects;
-    * if `mc` is `True`, the cDST content is digits + MCParticles + tracking dataobjects.
+    * if `mc` is `False`, the cDST content is raw + tracking dataobjects;
+    * if `mc` is `True` (default setting), the cDST content is digits + MCParticles + tracking dataobjects.
 
     @param path Path to add modules to.
     @param mc Define the type of cDST output content: `False` for raw + tracking dataobjects, `True` for digits +
@@ -958,6 +956,7 @@ def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=
     # Add the unpackers only if not running on MC, otherwise check the components and simply add
     # the Gearbox and the Geometry modules
     if not mc:
+        from rawdata import add_unpackers  # noqa
         add_unpackers(path,
                       components=components)
     else:

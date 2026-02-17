@@ -111,6 +111,26 @@ class TestValidationMetadataSetter(unittest.TestCase):
             description="Overall description of plots in this package.",
         )
 
+        create_validation_histograms(
+            path,
+            out_file_path,
+            "Upsilon(4S)",
+            variables_1d=[
+                (
+                    "InvM",
+                    110,
+                    5.5,
+                    15.5,
+                    "another_mass",
+                    "us <wontreply@dont.try>",
+                    "description of InvM",
+                    "really nothing to check",
+                    "second x label",
+                )
+            ],
+            description="Another description of plots in this package.",
+        )
+
         basf2.process(path=path)
 
         # Test outcome
@@ -134,6 +154,12 @@ class TestValidationMetadataSetter(unittest.TestCase):
         self.assertEqual(md["check"], "nothing to check")
         self.assertEqual(md["metaoptions"], [])
         self.assertEqual(md["contact"], "me <wontreply@dont.try>")
+
+        md = get_metadata(tf.Get("InvM"))
+        self.assertEqual(md["description"], "description of InvM")
+        self.assertEqual(md["check"], "really nothing to check")
+        self.assertEqual(md["metaoptions"], [])
+        self.assertEqual(md["contact"], "us <wontreply@dont.try>")
 
         # 2D Histogram
         # ************

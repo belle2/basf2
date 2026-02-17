@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'simulation_dataobjects', 'mdst_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'cdc_dataobjects', 'arich_dataobjects', 'top_dataobjects', 'ecl_dataobjects', 'klm_dataobjects']
+ 	
+Return('env')

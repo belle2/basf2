@@ -18,8 +18,8 @@ Standard Particles
         * `stdV0s.stdKshorts`
         * `stdV0s.stdLambdas`
 
-        However, please check
-        `this Neutrals Performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_
+        However, please refer to the
+        `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_
         for the latest updates.
 
 .. tip::

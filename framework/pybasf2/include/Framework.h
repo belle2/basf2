@@ -165,6 +165,8 @@ namespace Belle2 {
      *   then relative to the local directory
      * - 'validation': look for validation data in $BELLE2_VALIDATION_DATA_DIR,
      *   then relative to the local directory
+     * - 'starterkit': look for starterkit data in $BELLE2_STARTERKIT_DATA_DIR,
+     *   then relative to the local directory
      *
      * @param filename relative filename to look for, either in a central place
      *        or in the current working directory

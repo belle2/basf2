@@ -39,7 +39,7 @@ settings = CalibrationSettings(name="CDC Sigma fudge factor",
                                     "payload_boundaries": [],
                                    "backend_args": {"request_memory": "4 GB"}
                                },
-                               produced_payloads=["CDCFudgeFactorsForSigma"])
+                               produced_payloads=[])
 
 
 ################################################

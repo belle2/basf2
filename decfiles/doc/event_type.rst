@@ -160,7 +160,7 @@ Decay Flag
 ++++++++++
 
 The **Decay Flag** indicates general features of the scheme used to force the decay of the particle(s)
-indicated by the Selection fFag. Tables below list the definitions. Events with additional photons,
+indicated by the Selection Flag. Tables below list the definitions. Events with additional photons,
 which may occur via radiative corrections, are considered as a single decay mode. Intermediate 
 esonances that are not explicitly defined in the decay file (for example, the use of resonant decay
 models such as ``DALITZ`` and ``VUB``), are not counted either.
@@ -302,11 +302,11 @@ Track Flag
 ++++++++++
 
 The **Track Flag** is equal to the total number of “stable” charged particles in the forced part of 
-he decay chain of the selected particles. The forced part of the decay chains is defined by the Decay
+the decay chain of the selected particles. The forced part of the decay chains is defined by the Decay
 Flag, and the selected particles are those involved in the definition of the Selection Flag. Only the
 following charged particles are counted: protons, charged pions, charged kaons, electrons, and muons
 (tracks from :math:`K^0_S` and :math:`\Lambda` are counted as well). If the count is larger than 9, 
-he Track Flag is set to 9. The value 0 is possible. If the Decay Flag is 2, 3, 4, 7, or 8 the
+the Track Flag is set to 9. The value 0 is possible. If the Decay Flag is 2, 3, 4, 7, or 8 the
 assignment of the Track Flag may become ambiguous. In that case, tracks should be counted using the
 dominant or more representative forced decay chain. For machine background event types (General
 Flag = 6) the Track Flag is used to indicate for which beam the events are produced, as defined in the

@@ -20,15 +20,19 @@
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
 
+#include <simulation/background/BkgSensitiveDetector.h>
+
 //Shapes
 #include <G4Box.hh>
 #include <G4Trd.hh>
 #include <G4Tubs.hh>
+#include <G4Cons.hh>
 #include <G4Polycone.hh>
 #include <G4EllipticalTube.hh>
 #include <G4UnionSolid.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4ExtrudedSolid.hh>
 #include <G4UserLimits.hh>
 
 using namespace std;
@@ -154,6 +158,9 @@ namespace Belle2 {
       transform_LER = transform_LER * G4RotateY3D(crossingAngleLER);
 
       map<string, CryostatElement> elements;
+
+      // debug
+      //cout << endl << "!!!  Creating a Cryostat copy..." << endl << endl;
 
       //--------------
       //-   Bounding shapes
@@ -451,7 +458,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*C1wal1.logi, "#CC0000");
-      setVisibility(*C1wal1.logi, false);
+//--andrii      setVisibility(*C1wal1.logi, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), C1wal1.logi, "phys_C1wal1_name", &topVolume, false, 0);
 
       elements["C1wal1"] = C1wal1;
@@ -591,7 +598,7 @@ namespace Belle2 {
 
       //put volume
       setColor(*F1wal1.logi, "#CC0000");
-      setVisibility(*F1wal1.logi, false);
+//--andrii      setVisibility(*F1wal1.logi, false);
       new G4PVPlacement(F1wal1.transform, F1wal1.logi, "phys_F1wal1_name", &topVolume, false, 0);
 
       elements["F1wal1"] = F1wal1;
@@ -664,22 +671,19 @@ namespace Belle2 {
           string geo_cut_name = "geo_" + name + "_cut" + oss_block_num.str() + "_name";
 
           G4VSolid* geo_cut;
-          //if(cut_type == "Box")
+
           if (cut_type == 0.0) {
             double cut_L = m_config.getParameter(prep + "cutL" + oss_block_num.str()) * unitFactor;
             double cut_W = m_config.getParameter(prep + "cutW" + oss_block_num.str()) * unitFactor;
             double cut_H = m_config.getParameter(prep + "cutH" + oss_block_num.str()) * unitFactor;
 
             geo_cut = new G4Box(geo_cut_name, cut_W / 2.0, cut_H / 2.0, cut_L / 2.0);
-            // else if(cut_type == "Tubs")
-          } else { // if (cut_type != 0.0) {
+          } else {
             double cut_L = m_config.getParameter(prep + "cutL" + oss_block_num.str()) * unitFactor;
             double cut_R = m_config.getParameter(prep + "cutR" + oss_block_num.str()) * unitFactor;
 
             geo_cut = new G4Tubs(geo_cut_name, 0.0, cut_R, cut_L / 2.0, 0.0, 2.0 * M_PI);
           }
-          //} else
-          //  continue;
 
           double cut_X0 = m_config.getParameter(prep + "cutDX" + oss_block_num.str()) * unitFactor;
           double cut_Y0 = m_config.getParameter(prep + "cutDY" + oss_block_num.str()) * unitFactor;
@@ -713,6 +717,330 @@ namespace Belle2 {
 
         elements[name] = sup;
       }
+
+      //----------------------------------
+      //-   Bellows shield geometry
+      prep = "BellowsShield.";
+      double BS_fwdZ0 = m_config.getParameter(prep + "fwdZ0") * unitFactor;
+      double BS_fwdZ1 = m_config.getParameter(prep + "fwdZ1") * unitFactor;
+      double BS_fwdZ2 = m_config.getParameter(prep + "fwdZ2") * unitFactor;
+      double BS_fwdZ3 = m_config.getParameter(prep + "fwdZ3") * unitFactor;
+      double BS_fwdZ4 = m_config.getParameter(prep + "fwdZ4") * unitFactor;
+      double BS_bwdZ0 = m_config.getParameter(prep + "bwdZ0") * unitFactor;
+      double BS_bwdZ1 = m_config.getParameter(prep + "bwdZ1") * unitFactor;
+      double BS_bwdZ2 = m_config.getParameter(prep + "bwdZ2") * unitFactor;
+      double BS_bwdZ3 = m_config.getParameter(prep + "bwdZ3") * unitFactor;
+      //double BS_bwdZ4 = m_config.getParameter(prep + "bwdZ4")*unitFactor;
+
+      string strMat_BS = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_BS = Materials::get(strMat_BS);
+
+      // Parameters for Base10/11 (FWD)
+      double BS_fwdP0_R     = m_config.getParameter(prep + "fwdP0_R") * unitFactor;
+      double BS_fwdP0_Yout  = m_config.getParameter(prep + "fwdP0_Yout") * unitFactor;
+      double BS_fwdP0_Yin   = m_config.getParameter(prep + "fwdP0_Yin") * unitFactor;
+      double BS_fwdP0_Xin   = m_config.getParameter(prep + "fwdP0_Xin") * unitFactor;
+      double BS_fwdP0_Yedge = m_config.getParameter(prep + "fwdP0_Yedge") * unitFactor;
+      double BS_fwdP0_Xedge = m_config.getParameter(prep + "fwdP0_Xedge") * unitFactor;
+      double BS_fwdP0_Yside = m_config.getParameter(prep + "fwdP0_Yside") * unitFactor;
+      double BS_fwdP0_Xside = m_config.getParameter(prep + "fwdP0_Xside") * unitFactor;
+
+      double BS_fwdP0_DHalf = (BS_fwdZ2 - BS_fwdZ0) / 2;
+      G4VSolid* geo_BS_fwdP0_B0 = new G4Tubs("geo_BS_fwdP0_B0", 0, BS_fwdP0_R, BS_fwdP0_DHalf, 0, 2 * M_PI);
+      G4Transform3D tfm_BS_fwdP0_B0 = G4Translate3D(0, 0, BS_fwdP0_DHalf);
+
+      G4VSolid* geo_BS_fwdP0_V0T = new G4Tubs("geo_BS_fwdP0_V0T", 0, BS_fwdP0_Yin, BS_fwdP0_DHalf, 0.25 * M_PI, 0.5 * M_PI);
+      G4VSolid* geo_BS_fwdP0_V0B = new G4Tubs("geo_BS_fwdP0_V0B", 0, BS_fwdP0_Yin, BS_fwdP0_DHalf, 1.25 * M_PI, 0.5 * M_PI);
+      G4Transform3D tfm_BS_fwdP0_V0L = G4Translate3D(-BS_fwdP0_Xin, 0, BS_fwdP0_DHalf);
+      G4Transform3D tfm_BS_fwdP0_V0R = G4Translate3D(+BS_fwdP0_Xin, 0, BS_fwdP0_DHalf);
+
+      G4VSolid* geo_BS_fwdP0_V1 = new G4Box("geo_BS_fwdP0_V1", BS_fwdP0_Xside, BS_fwdP0_Yedge, BS_fwdP0_DHalf);
+      G4Transform3D tfm_BS_fwdP0_V1 = G4Translate3D(0, 0, BS_fwdP0_DHalf);
+
+      G4VSolid* geo_BS_fwdP0_V2 = new G4Box("geo_BS_fwdP0_V2", 100, 100, BS_fwdP0_DHalf);
+      G4Transform3D tfm_BS_fwdP0_V2TR = G4Translate3D(+(100 + BS_fwdP0_Xedge), +(100 + BS_fwdP0_Yside), BS_fwdP0_DHalf);
+      G4Transform3D tfm_BS_fwdP0_V2TL = G4Translate3D(-(100 + BS_fwdP0_Xedge), +(100 + BS_fwdP0_Yside), BS_fwdP0_DHalf);
+      G4Transform3D tfm_BS_fwdP0_V2BR = G4Translate3D(+(100 + BS_fwdP0_Xedge), -(100 + BS_fwdP0_Yside), BS_fwdP0_DHalf);
+      G4Transform3D tfm_BS_fwdP0_V2BL = G4Translate3D(-(100 + BS_fwdP0_Xedge), -(100 + BS_fwdP0_Yside), BS_fwdP0_DHalf);
+
+      G4VSolid* geo_BS_fwdP0_V3 = new G4Box("geo_BS_fwdP0_V3", BS_fwdP0_Xin, BS_fwdP0_Yin, BS_fwdP0_DHalf);
+      G4Transform3D tfm_BS_fwdP0_V3 = G4Translate3D(0, 0, BS_fwdP0_DHalf);
+
+      double BS_fwdP0_C0_DHalf = (BS_fwdZ1 - BS_fwdZ0) / 2;
+      G4VSolid* geo_BS_fwdP0_V4 = new G4Box("geo_BS_fwdP0_V4", 100, 100, BS_fwdP0_C0_DHalf);
+      G4Transform3D tfm_BS_fwdP0_V4T = G4Translate3D(0, +(100 + BS_fwdP0_Yout), BS_fwdP0_C0_DHalf);
+      G4Transform3D tfm_BS_fwdP0_V4B = G4Translate3D(0, -(100 + BS_fwdP0_Yout), BS_fwdP0_C0_DHalf);
+
+      G4VSolid* geo_BS_fwdP0_Base = new G4DisplacedSolid("geo_BS_fwdP0_Base_00", geo_BS_fwdP0_B0, tfm_BS_fwdP0_B0);
+      geo_BS_fwdP0_Base = new G4SubtractionSolid("geo_BS_fwdP0_Base_01", geo_BS_fwdP0_Base, geo_BS_fwdP0_V0T, tfm_BS_fwdP0_V0L);
+      geo_BS_fwdP0_Base = new G4SubtractionSolid("geo_BS_fwdP0_Base_02", geo_BS_fwdP0_Base, geo_BS_fwdP0_V0T, tfm_BS_fwdP0_V0R);
+      geo_BS_fwdP0_Base = new G4SubtractionSolid("geo_BS_fwdP0_Base_03", geo_BS_fwdP0_Base, geo_BS_fwdP0_V0B, tfm_BS_fwdP0_V0L);
+      geo_BS_fwdP0_Base = new G4SubtractionSolid("geo_BS_fwdP0_Base_04", geo_BS_fwdP0_Base, geo_BS_fwdP0_V0B, tfm_BS_fwdP0_V0R);
+      geo_BS_fwdP0_Base = new G4SubtractionSolid("geo_BS_fwdP0_Base_05", geo_BS_fwdP0_Base, geo_BS_fwdP0_V1, tfm_BS_fwdP0_V1);
+      geo_BS_fwdP0_Base = new G4SubtractionSolid("geo_BS_fwdP0_Base_06", geo_BS_fwdP0_Base, geo_BS_fwdP0_V2, tfm_BS_fwdP0_V2TR);
+      geo_BS_fwdP0_Base = new G4SubtractionSolid("geo_BS_fwdP0_Base_07", geo_BS_fwdP0_Base, geo_BS_fwdP0_V2, tfm_BS_fwdP0_V2TL);
+      geo_BS_fwdP0_Base = new G4SubtractionSolid("geo_BS_fwdP0_Base_08", geo_BS_fwdP0_Base, geo_BS_fwdP0_V2, tfm_BS_fwdP0_V2BR);
+      geo_BS_fwdP0_Base = new G4SubtractionSolid("geo_BS_fwdP0_Base_09", geo_BS_fwdP0_Base, geo_BS_fwdP0_V2, tfm_BS_fwdP0_V2BL);
+      geo_BS_fwdP0_Base = new G4SubtractionSolid("geo_BS_fwdP0_Base_10", geo_BS_fwdP0_Base, geo_BS_fwdP0_V3, tfm_BS_fwdP0_V3);
+      geo_BS_fwdP0_Base = new G4SubtractionSolid("geo_BS_fwdP0_Base_11", geo_BS_fwdP0_Base, geo_BS_fwdP0_V4, tfm_BS_fwdP0_V4T);
+      geo_BS_fwdP0_Base = new G4SubtractionSolid("geo_BS_fwdP0_Base_12", geo_BS_fwdP0_Base, geo_BS_fwdP0_V4, tfm_BS_fwdP0_V4B);
+
+      // Parameters for Base20/21 (BWD)
+      double BS_bwdP0_R0  = m_config.getParameter(prep + "bwdP0_R0") * unitFactor;
+      double BS_bwdP0_R1  = m_config.getParameter(prep + "bwdP0_R1") * unitFactor;
+      double BS_bwdP0_Yin = m_config.getParameter(prep + "bwdP0_Yin") * unitFactor;
+      double BS_bwdP0_Xin = m_config.getParameter(prep + "bwdP0_Xin") * unitFactor;
+
+      double BS_bwdP0a_DHalf = (BS_bwdZ0 - BS_bwdZ1) / 2;
+      G4VSolid* geo_BS_bwdP0_B0 = new G4Tubs("geo_BS_bwdP0_B0", 0, BS_bwdP0_R0, BS_bwdP0a_DHalf, 0, 2 * M_PI);
+      G4Transform3D tfm_BS_bwdP0_B0 = G4Translate3D(0, 0, -BS_bwdP0a_DHalf);
+
+      double BS_bwdP0b_DHalf = (BS_bwdZ1 - BS_bwdZ2) / 2;
+      G4VSolid* geo_BS_bwdP0_B1 = new G4Tubs("geo_BS_bwdP0_B1", 0, BS_bwdP0_R1, BS_bwdP0b_DHalf, 0.5 * M_PI, M_PI);
+      G4Transform3D tfm_BS_bwdP0_B1 = G4Translate3D(-BS_bwdP0_Xin, 0, -BS_bwdP0b_DHalf - 2 * BS_bwdP0a_DHalf);
+
+      G4VSolid* geo_BS_bwdP0_B2 = new G4Tubs("geo_BS_bwdP0_B2", 0, BS_bwdP0_R1, BS_bwdP0b_DHalf, 1.5 * M_PI, M_PI);
+      G4Transform3D tfm_BS_bwdP0_B2 = G4Translate3D(+BS_bwdP0_Xin, 0, -BS_bwdP0b_DHalf - 2 * BS_bwdP0a_DHalf);
+
+      G4VSolid* geo_BS_bwdP0_B3 = new G4Box("geo_BS_bwdP0_B3", BS_bwdP0_Xin, BS_bwdP0_R1, BS_bwdP0b_DHalf);
+      G4Transform3D tfm_BS_bwdP0_B3 = G4Translate3D(0, 0, -BS_bwdP0b_DHalf - 2 * BS_bwdP0a_DHalf);
+
+      double BS_bwdP0c_DHalf = (BS_bwdZ0 - BS_bwdZ2) / 2;
+      G4VSolid* geo_BS_bwdP0_V0 = new G4Tubs("geo_BS_bwdP0_V0", 0, BS_bwdP0_Yin, BS_bwdP0c_DHalf, 0.5 * M_PI, M_PI);
+      G4Transform3D tfm_BS_bwdP0_V0 = G4Translate3D(-BS_bwdP0_Xin, 0, -BS_bwdP0c_DHalf);
+
+      G4VSolid* geo_BS_bwdP0_V1 = new G4Tubs("geo_BS_bwdP0_V1", 0, BS_bwdP0_Yin, BS_bwdP0c_DHalf, 1.5 * M_PI, M_PI);
+      G4Transform3D tfm_BS_bwdP0_V1 = G4Translate3D(+BS_bwdP0_Xin, 0, -BS_bwdP0c_DHalf);
+
+      G4VSolid* geo_BS_bwdP0_V2 = new G4Box("geo_BS_bwdP0_V2", BS_bwdP0_Xin, BS_bwdP0_Yin, BS_bwdP0c_DHalf);
+      G4Transform3D tfm_BS_bwdP0_V2 = G4Translate3D(0, 0, -BS_bwdP0c_DHalf);
+
+      G4VSolid* geo_BS_bwdP0_Base = new G4DisplacedSolid("geo_BS_bwdP0_Base_00", geo_BS_bwdP0_B0, tfm_BS_bwdP0_B0);
+      geo_BS_bwdP0_Base = new G4UnionSolid("geo_BS_bwdP0_Base_01", geo_BS_bwdP0_Base, geo_BS_bwdP0_B1, tfm_BS_bwdP0_B1);
+      geo_BS_bwdP0_Base = new G4UnionSolid("geo_BS_bwdP0_Base_02", geo_BS_bwdP0_Base, geo_BS_bwdP0_B2, tfm_BS_bwdP0_B2);
+      geo_BS_bwdP0_Base = new G4UnionSolid("geo_BS_bwdP0_Base_03", geo_BS_bwdP0_Base, geo_BS_bwdP0_B3, tfm_BS_bwdP0_B3);
+      geo_BS_bwdP0_Base = new G4SubtractionSolid("geo_BS_bwdP0_Base_04", geo_BS_bwdP0_Base, geo_BS_bwdP0_V0, tfm_BS_bwdP0_V0);
+      geo_BS_bwdP0_Base = new G4SubtractionSolid("geo_BS_bwdP0_Base_05", geo_BS_bwdP0_Base, geo_BS_bwdP0_V1, tfm_BS_bwdP0_V1);
+      geo_BS_bwdP0_Base = new G4SubtractionSolid("geo_BS_bwdP0_Base_06", geo_BS_bwdP0_Base, geo_BS_bwdP0_V2, tfm_BS_bwdP0_V2);
+
+      // Parameters for Base5/6
+      double BS_P1_Yout  = m_config.getParameter(prep + "P1_Yout") * unitFactor;
+      double BS_P1_Yin   = m_config.getParameter(prep + "P1_Yin") * unitFactor;
+      double BS_P1_Rout  = m_config.getParameter(prep + "P1_Rout") * unitFactor;
+      double BS_P1_Rin   = m_config.getParameter(prep + "P1_Rin") * unitFactor;
+      double BS_P1_Aout  = m_config.getParameter(prep + "P1_Aout");
+      double BS_P1_Ain   = m_config.getParameter(prep + "P1_Ain");
+      double BS_P1_RX    = m_config.getParameter(prep + "P1_RX") * unitFactor;
+      double BS_fwdZhole = m_config.getParameter(prep + "fwdZhole") * unitFactor;
+      double BS_bwdZhole = m_config.getParameter(prep + "bwdZhole") * unitFactor;
+      double BS_P1_Rhole = m_config.getParameter(prep + "P1_Rhole") * unitFactor;
+      double BS_P1_Rbump = m_config.getParameter(prep + "P1_Rbump") * unitFactor;
+      double BS_P1_Yhole = m_config.getParameter(prep + "P1_Yhole") * unitFactor;
+      double BS_P1_MillD1 = m_config.getParameter(prep + "P1_MillD1") * unitFactor;
+      double BS_P1_MillD2 = m_config.getParameter(prep + "P1_MillD2") * unitFactor;
+      double BS_P1_MillX = m_config.getParameter(prep + "P1_MillX") * unitFactor;
+      double BS_P1_MillW = m_config.getParameter(prep + "P1_MillW") * unitFactor;
+      double BS_fwdZcut   = m_config.getParameter(prep + "fwdZcut") * unitFactor;
+      double BS_bwdZcut   = m_config.getParameter(prep + "bwdZcut") * unitFactor;
+      double BS_P1_XcutTL = m_config.getParameter(prep + "P1_XcutTL") * unitFactor;
+      double BS_P1_XcutTR = m_config.getParameter(prep + "P1_XcutTR") * unitFactor;
+      double BS_P1_XcutBL = m_config.getParameter(prep + "P1_XcutBL") * unitFactor;
+      double BS_P1_XcutBR = m_config.getParameter(prep + "P1_XcutBR") * unitFactor;
+
+      double BS_P1_Xout  = BS_P1_Rout * cos(BS_P1_Aout) + BS_P1_RX;
+      double BS_P1_Xin   = BS_P1_Rin * cos(BS_P1_Ain) + BS_P1_RX;
+
+      double BS_P1fwd_DHalf = (BS_fwdZ3 - BS_fwdZ2) / 2;
+      G4VSolid* geo_BS_P1fwd_B0 = new G4Box("geo_BS_P1fwd_B0", BS_P1_Xout, BS_P1_Yout, BS_P1fwd_DHalf);
+      G4Transform3D tfm_BS_P1fwd_B0 =  G4Translate3D(0, 0, BS_P1fwd_DHalf);
+
+      G4VSolid* geo_BS_P1fwd_B1 = new G4Tubs("geo_BS_P1fwd_B1", 0, BS_P1_Rout, BS_P1fwd_DHalf, M_PI - BS_P1_Aout, 2 * BS_P1_Aout);
+      G4Transform3D tfm_BS_P1fwd_B1 =  G4Translate3D(-BS_P1_RX, 0, BS_P1fwd_DHalf);
+
+      G4VSolid* geo_BS_P1fwd_B2 = new G4Tubs("geo_BS_P1fwd_B2", 0, BS_P1_Rout, BS_P1fwd_DHalf, 2 * M_PI - BS_P1_Aout, 2 * BS_P1_Aout);
+      G4Transform3D tfm_BS_P1fwd_B2 =  G4Translate3D(+BS_P1_RX, 0, BS_P1fwd_DHalf);
+
+      G4VSolid* geo_BS_P1fwd_B3 = new G4Tubs("geo_BS_P1fwd_B3", 0, BS_P1_Rbump, BS_P1fwd_DHalf, 0, 2 * M_PI);
+      G4Transform3D tfm_BS_P1fwd_B3T =  G4Translate3D(0, +BS_P1_Yhole, BS_P1fwd_DHalf);
+      G4Transform3D tfm_BS_P1fwd_B3B =  G4Translate3D(0, -BS_P1_Yhole, BS_P1fwd_DHalf);
+
+      G4VSolid* geo_BS_P1fwd_V0 = new G4Box("geo_BS_P1fwd_V0", BS_P1_Xin, BS_P1_Yin, BS_P1fwd_DHalf);
+      G4Transform3D tfm_BS_P1fwd_V0 =  G4Translate3D(0, 0, BS_P1fwd_DHalf);
+
+      G4VSolid* geo_BS_P1fwd_V1 = new G4Tubs("geo_BS_P1fwd_V1", 0, BS_P1_Rin, BS_P1fwd_DHalf, M_PI - BS_P1_Ain, 2 * BS_P1_Ain);
+      G4Transform3D tfm_BS_P1fwd_V1 =  G4Translate3D(-BS_P1_RX, 0, BS_P1fwd_DHalf);
+
+      G4VSolid* geo_BS_P1fwd_V2 = new G4Tubs("geo_BS_P1fwd_V2", 0, BS_P1_Rin, BS_P1fwd_DHalf, 2 * M_PI - BS_P1_Ain, 2 * BS_P1_Ain);
+      G4Transform3D tfm_BS_P1fwd_V2 =  G4Translate3D(+BS_P1_RX, 0, BS_P1fwd_DHalf);
+
+      double BS_P1fwd_V3_DHalf = (BS_fwdZ3 - BS_fwdZhole) / 2;
+      G4VSolid* geo_BS_P1fwd_V3 = new G4Tubs("geo_BS_P1fwd_V3", 0, BS_P1_Rhole, BS_P1fwd_V3_DHalf, 0, 2 * M_PI);
+      G4Transform3D tfm_BS_P1fwd_V3T =  G4Translate3D(0, +BS_P1_Yhole, -BS_P1fwd_V3_DHalf + 2 * BS_P1fwd_DHalf);
+      G4Transform3D tfm_BS_P1fwd_V3B =  G4Translate3D(0, -BS_P1_Yhole, -BS_P1fwd_V3_DHalf + 2 * BS_P1fwd_DHalf);
+
+      G4VSolid* geo_BS_P1fwd_V4 = new G4Box("geo_BS_P1fwd_V4", BS_P1_MillW / 2, 100, BS_P1_MillD1 / 2);
+      G4Transform3D tfm_BS_P1fwd_V4a =  G4Translate3D(-BS_P1_MillX, 0, BS_P1_MillD1 / 2) * G4RotateZ3D(0.25 * M_PI);
+      G4Transform3D tfm_BS_P1fwd_V4b =  G4Translate3D(-BS_P1_MillX, 0, BS_P1_MillD1 / 2) * G4RotateZ3D(0.75 * M_PI);
+
+      G4VSolid* geo_BS_P1fwd_V5 = new G4Box("geo_BS_P1fwd_V5", BS_P1_MillW / 2, 100, BS_P1_MillD2 / 2);
+      G4Transform3D tfm_BS_P1fwd_V5a =  G4Translate3D(+BS_P1_MillX, 0, BS_P1_MillD2 / 2) * G4RotateZ3D(0.25 * M_PI);
+      G4Transform3D tfm_BS_P1fwd_V5b =  G4Translate3D(+BS_P1_MillX, 0, BS_P1_MillD2 / 2) * G4RotateZ3D(0.75 * M_PI);
+
+      double BS_P1fwd_V67_DHalf = (BS_fwdZ3 - BS_fwdZcut) / 2;
+      double BS_P1fwd_V67_Pos   = (BS_fwdZcut - BS_fwdZ2);
+      G4VSolid* geo_BS_P1fwd_V6 = new G4Box("geo_BS_P1fwd_V6", (BS_P1_XcutTR - BS_P1_XcutTL) / 2, 100, BS_P1fwd_V67_DHalf);
+      G4Transform3D tfm_BS_P1fwd_V6 =  G4Translate3D((BS_P1_XcutTR + BS_P1_XcutTL) / 2, +100, BS_P1fwd_V67_DHalf + BS_P1fwd_V67_Pos);
+
+      G4VSolid* geo_BS_P1fwd_V7 = new G4Box("geo_BS_P1fwd_V7", (BS_P1_XcutBR - BS_P1_XcutBL) / 2, 100, BS_P1fwd_V67_DHalf);
+      G4Transform3D tfm_BS_P1fwd_V7 =  G4Translate3D((BS_P1_XcutBR + BS_P1_XcutBL) / 2, -100, BS_P1fwd_V67_DHalf + BS_P1fwd_V67_Pos);
+
+
+      G4VSolid* geo_BS_P1fwd_Base = new G4DisplacedSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_B0, tfm_BS_P1fwd_B0);
+      geo_BS_P1fwd_Base = new G4UnionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_B1, tfm_BS_P1fwd_B1);
+      geo_BS_P1fwd_Base = new G4UnionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_B2, tfm_BS_P1fwd_B2);
+      geo_BS_P1fwd_Base = new G4UnionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_B3, tfm_BS_P1fwd_B3T);
+      geo_BS_P1fwd_Base = new G4UnionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_B3, tfm_BS_P1fwd_B3B);
+      geo_BS_P1fwd_Base = new G4SubtractionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_V0, tfm_BS_P1fwd_V0);
+      geo_BS_P1fwd_Base = new G4SubtractionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_V1, tfm_BS_P1fwd_V1);
+      geo_BS_P1fwd_Base = new G4SubtractionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_V2, tfm_BS_P1fwd_V2);
+      geo_BS_P1fwd_Base = new G4SubtractionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_V3, tfm_BS_P1fwd_V3T);
+      geo_BS_P1fwd_Base = new G4SubtractionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_V3, tfm_BS_P1fwd_V3B);
+      geo_BS_P1fwd_Base = new G4SubtractionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_V4, tfm_BS_P1fwd_V4a);
+      geo_BS_P1fwd_Base = new G4SubtractionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_V4, tfm_BS_P1fwd_V4b);
+      geo_BS_P1fwd_Base = new G4SubtractionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_V5, tfm_BS_P1fwd_V5a);
+      geo_BS_P1fwd_Base = new G4SubtractionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_V5, tfm_BS_P1fwd_V5b);
+      geo_BS_P1fwd_Base = new G4SubtractionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_V6, tfm_BS_P1fwd_V6);
+      geo_BS_P1fwd_Base = new G4SubtractionSolid("geo_BS_P1fwd_Base", geo_BS_P1fwd_Base, geo_BS_P1fwd_V7, tfm_BS_P1fwd_V7);
+
+      double BS_P1bwd_DHalf = -(BS_bwdZ3 - BS_bwdZ2) / 2;
+      G4VSolid* geo_BS_P1bwd_B0 = new G4Box("geo_BS_P1bwd_B0", BS_P1_Xout, BS_P1_Yout, BS_P1bwd_DHalf);
+      G4Transform3D tfm_BS_P1bwd_B0 =  G4Translate3D(0, 0, BS_P1bwd_DHalf);
+
+      G4VSolid* geo_BS_P1bwd_B1 = new G4Tubs("geo_BS_P1bwd_B1", 0, BS_P1_Rout, BS_P1bwd_DHalf, M_PI - BS_P1_Aout, 2 * BS_P1_Aout);
+      G4Transform3D tfm_BS_P1bwd_B1 =  G4Translate3D(-BS_P1_RX, 0, BS_P1bwd_DHalf);
+
+      G4VSolid* geo_BS_P1bwd_B2 = new G4Tubs("geo_BS_P1bwd_B2", 0, BS_P1_Rout, BS_P1bwd_DHalf, 2 * M_PI - BS_P1_Aout, 2 * BS_P1_Aout);
+      G4Transform3D tfm_BS_P1bwd_B2 =  G4Translate3D(+BS_P1_RX, 0, BS_P1bwd_DHalf);
+
+      G4VSolid* geo_BS_P1bwd_B3 = new G4Tubs("geo_BS_P1bwd_B3", 0, BS_P1_Rbump, BS_P1bwd_DHalf, 0, 2 * M_PI);
+      G4Transform3D tfm_BS_P1bwd_B3T =  G4Translate3D(0, +BS_P1_Yhole, BS_P1bwd_DHalf);
+      G4Transform3D tfm_BS_P1bwd_B3B =  G4Translate3D(0, -BS_P1_Yhole, BS_P1bwd_DHalf);
+
+      G4VSolid* geo_BS_P1bwd_V0 = new G4Box("geo_BS_P1bwd_V0", BS_P1_Xin, BS_P1_Yin, BS_P1bwd_DHalf);
+      G4Transform3D tfm_BS_P1bwd_V0 =  G4Translate3D(0, 0, BS_P1bwd_DHalf);
+
+      G4VSolid* geo_BS_P1bwd_V1 = new G4Tubs("geo_BS_P1bwd_V1", 0, BS_P1_Rin, BS_P1bwd_DHalf, M_PI - BS_P1_Ain, 2 * BS_P1_Ain);
+      G4Transform3D tfm_BS_P1bwd_V1 =  G4Translate3D(-BS_P1_RX, 0, BS_P1bwd_DHalf);
+
+      G4VSolid* geo_BS_P1bwd_V2 = new G4Tubs("geo_BS_P1bwd_V2", 0, BS_P1_Rin, BS_P1bwd_DHalf, 2 * M_PI - BS_P1_Ain, 2 * BS_P1_Ain);
+      G4Transform3D tfm_BS_P1bwd_V2 =  G4Translate3D(+BS_P1_RX, 0, BS_P1bwd_DHalf);
+
+      double BS_P1bwd_V3_DHalf = -(BS_bwdZ3 - BS_bwdZhole) / 2;
+      G4VSolid* geo_BS_P1bwd_V3 = new G4Tubs("geo_BS_P1bwd_V3", 0, BS_P1_Rhole, BS_P1bwd_V3_DHalf, 0, 2 * M_PI);
+      G4Transform3D tfm_BS_P1bwd_V3T =  G4Translate3D(0, +BS_P1_Yhole, -BS_P1bwd_V3_DHalf + 2 * BS_P1bwd_DHalf);
+      G4Transform3D tfm_BS_P1bwd_V3B =  G4Translate3D(0, -BS_P1_Yhole, -BS_P1bwd_V3_DHalf + 2 * BS_P1bwd_DHalf);
+
+      G4VSolid* geo_BS_P1bwd_V4 = new G4Box("geo_BS_P1bwd_V4", BS_P1_MillW / 2, 100, BS_P1_MillD1 / 2);
+      G4Transform3D tfm_BS_P1bwd_V4a =  G4Translate3D(-BS_P1_MillX, 0, BS_P1_MillD1 / 2) * G4RotateZ3D(0.25 * M_PI);
+      G4Transform3D tfm_BS_P1bwd_V4b =  G4Translate3D(-BS_P1_MillX, 0, BS_P1_MillD1 / 2) * G4RotateZ3D(0.75 * M_PI);
+
+      G4VSolid* geo_BS_P1bwd_V5 = new G4Box("geo_BS_P1bwd_V5", BS_P1_MillW / 2, 100, BS_P1_MillD2 / 2);
+      G4Transform3D tfm_BS_P1bwd_V5a =  G4Translate3D(+BS_P1_MillX, 0, BS_P1_MillD2 / 2) * G4RotateZ3D(0.25 * M_PI);
+      G4Transform3D tfm_BS_P1bwd_V5b =  G4Translate3D(+BS_P1_MillX, 0, BS_P1_MillD2 / 2) * G4RotateZ3D(0.75 * M_PI);
+
+      double BS_P1bwd_V67_DHalf = -(BS_bwdZ3 - BS_bwdZcut) / 2;
+      double BS_P1bwd_V67_Pos   = -(BS_bwdZcut - BS_bwdZ2);
+      G4VSolid* geo_BS_P1bwd_V6 = new G4Box("geo_BS_P1bwd_V6", (BS_P1_XcutTR - BS_P1_XcutTL) / 2, 100, BS_P1bwd_V67_DHalf);
+      G4Transform3D tfm_BS_P1bwd_V6 =  G4Translate3D((BS_P1_XcutTR + BS_P1_XcutTL) / 2, +100, BS_P1bwd_V67_DHalf + BS_P1bwd_V67_Pos);
+
+      G4VSolid* geo_BS_P1bwd_V7 = new G4Box("geo_BS_P1bwd_V7", (BS_P1_XcutBR - BS_P1_XcutBL) / 2, 100, BS_P1bwd_V67_DHalf);
+      G4Transform3D tfm_BS_P1bwd_V7 =  G4Translate3D((BS_P1_XcutBR + BS_P1_XcutBL) / 2, -100, BS_P1bwd_V67_DHalf + BS_P1bwd_V67_Pos);
+
+
+      G4VSolid* geo_BS_P1bwd_Base = new G4DisplacedSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_B0, tfm_BS_P1bwd_B0);
+      geo_BS_P1bwd_Base = new G4UnionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_B1, tfm_BS_P1bwd_B1);
+      geo_BS_P1bwd_Base = new G4UnionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_B2, tfm_BS_P1bwd_B2);
+      geo_BS_P1bwd_Base = new G4UnionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_B3, tfm_BS_P1bwd_B3T);
+      geo_BS_P1bwd_Base = new G4UnionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_B3, tfm_BS_P1bwd_B3B);
+      geo_BS_P1bwd_Base = new G4SubtractionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_V0, tfm_BS_P1bwd_V0);
+      geo_BS_P1bwd_Base = new G4SubtractionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_V1, tfm_BS_P1bwd_V1);
+      geo_BS_P1bwd_Base = new G4SubtractionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_V2, tfm_BS_P1bwd_V2);
+      geo_BS_P1bwd_Base = new G4SubtractionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_V3, tfm_BS_P1bwd_V3T);
+      geo_BS_P1bwd_Base = new G4SubtractionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_V3, tfm_BS_P1bwd_V3B);
+      geo_BS_P1bwd_Base = new G4SubtractionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_V4, tfm_BS_P1bwd_V4a);
+      geo_BS_P1bwd_Base = new G4SubtractionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_V4, tfm_BS_P1bwd_V4b);
+      geo_BS_P1bwd_Base = new G4SubtractionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_V5, tfm_BS_P1bwd_V5a);
+      geo_BS_P1bwd_Base = new G4SubtractionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_V5, tfm_BS_P1bwd_V5b);
+      geo_BS_P1bwd_Base = new G4SubtractionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_V6, tfm_BS_P1bwd_V6);
+      geo_BS_P1bwd_Base = new G4SubtractionSolid("geo_BS_P1bwd_Base", geo_BS_P1bwd_Base, geo_BS_P1bwd_V7, tfm_BS_P1bwd_V7);
+
+      // Parameters for Base7/8 (FWD) Base23/24 (BWD)
+      double BS_P2_Rout  = m_config.getParameter(prep + "P2_Rout") * unitFactor;
+      double BS_P2_Rin   = m_config.getParameter(prep + "P2_Rin") * unitFactor;
+      double BS_P2_Xin   = m_config.getParameter(prep + "P2_Xin") * unitFactor;
+      double BS_P2_Rhole = m_config.getParameter(prep + "P2_Rhole") * unitFactor;
+      double BS_P2_Yhole = m_config.getParameter(prep + "P2_Yhole") * unitFactor;
+      double BS_P2_XcutTL = m_config.getParameter(prep + "P2_XcutTL") * unitFactor;
+      double BS_P2_XcutTR = m_config.getParameter(prep + "P2_XcutTR") * unitFactor;
+      double BS_P2_XcutBL = m_config.getParameter(prep + "P2_XcutBL") * unitFactor;
+      double BS_P2_XcutBR = m_config.getParameter(prep + "P2_XcutBR") * unitFactor;
+
+      double BS_P2fwd_DHalf = (BS_fwdZ4 - BS_fwdZ3) / 2;
+      G4VSolid* geo_BS_P2fwd_B0 = new G4Tubs("geo_BS_P2fwd_B0", 0, BS_P2_Rout, BS_P2fwd_DHalf, 0, 2 * M_PI);
+      G4Transform3D tfm_BS_P2fwd_B0 =  G4Translate3D(0, 0, BS_P2fwd_DHalf);
+
+      G4VSolid* geo_BS_P2fwd_V0 = new G4Box("geo_BS_P2fwd_V0", BS_P2_Xin, BS_P2_Rin, BS_P2fwd_DHalf);
+      G4Transform3D tfm_BS_P2fwd_V0 =  G4Translate3D(0, 0, BS_P2fwd_DHalf);
+
+      G4VSolid* geo_BS_P2fwd_V1 = new G4Tubs("geo_BS_P2fwd_V1", 0, BS_P2_Rin, BS_P2fwd_DHalf, 0, 2 * M_PI);
+      G4Transform3D tfm_BS_P2fwd_V1L =  G4Translate3D(-BS_P2_Xin, 0, BS_P2fwd_DHalf);
+      G4Transform3D tfm_BS_P2fwd_V1R =  G4Translate3D(+BS_P2_Xin, 0, BS_P2fwd_DHalf);
+
+      G4VSolid* geo_BS_P2fwd_V2 = new G4Tubs("geo_BS_P2fwd_V2", 0, BS_P2_Rhole, BS_P2fwd_DHalf, 0, 2 * M_PI);
+      G4Transform3D tfm_BS_P2fwd_V2T =  G4Translate3D(0, +BS_P2_Yhole, BS_P2fwd_DHalf);
+      G4Transform3D tfm_BS_P2fwd_V2B =  G4Translate3D(0, -BS_P2_Yhole, BS_P2fwd_DHalf);
+
+      G4VSolid* geo_BS_P2fwd_V3 = new G4Box("geo_BS_P2fwd_V3", (BS_P2_XcutTR - BS_P2_XcutTL) / 2, 100, BS_P2fwd_DHalf);
+      G4Transform3D tfm_BS_P2fwd_V3 =  G4Translate3D((BS_P2_XcutTR + BS_P2_XcutTL) / 2, +100, BS_P2fwd_DHalf);
+
+      G4VSolid* geo_BS_P2fwd_V4 = new G4Box("geo_BS_P2fwd_V4", (BS_P2_XcutBR - BS_P2_XcutBL) / 2, 100, BS_P2fwd_DHalf);
+      G4Transform3D tfm_BS_P2fwd_V4 =  G4Translate3D((BS_P2_XcutBR + BS_P2_XcutBL) / 2, -100, BS_P2fwd_DHalf);
+
+      G4VSolid* geo_BS_P2fwd_Base = new G4DisplacedSolid("geo_BS_P2fwd_Base", geo_BS_P2fwd_B0, tfm_BS_P2fwd_B0);
+      geo_BS_P2fwd_Base = new G4SubtractionSolid("geo_BS_P2fwd_Base", geo_BS_P2fwd_Base, geo_BS_P2fwd_V0, tfm_BS_P2fwd_V0);
+      geo_BS_P2fwd_Base = new G4SubtractionSolid("geo_BS_P2fwd_Base", geo_BS_P2fwd_Base, geo_BS_P2fwd_V1, tfm_BS_P2fwd_V1L);
+      geo_BS_P2fwd_Base = new G4SubtractionSolid("geo_BS_P2fwd_Base", geo_BS_P2fwd_Base, geo_BS_P2fwd_V1, tfm_BS_P2fwd_V1R);
+      geo_BS_P2fwd_Base = new G4SubtractionSolid("geo_BS_P2fwd_Base", geo_BS_P2fwd_Base, geo_BS_P2fwd_V2, tfm_BS_P2fwd_V2T);
+      geo_BS_P2fwd_Base = new G4SubtractionSolid("geo_BS_P2fwd_Base", geo_BS_P2fwd_Base, geo_BS_P2fwd_V2, tfm_BS_P2fwd_V2B);
+      geo_BS_P2fwd_Base = new G4SubtractionSolid("geo_BS_P2fwd_Base", geo_BS_P2fwd_Base, geo_BS_P2fwd_V3, tfm_BS_P2fwd_V3);
+      geo_BS_P2fwd_Base = new G4SubtractionSolid("geo_BS_P2fwd_Base", geo_BS_P2fwd_Base, geo_BS_P2fwd_V4, tfm_BS_P2fwd_V4);
+
+
+      //++++ Assemble and place the FWD bellows shield ++++//
+      G4Transform3D tfm_BS_fwdP1 = G4Translate3D(0, 0, BS_fwdZ2 - BS_fwdZ0);
+      G4Transform3D tfm_BS_fwdP2 = G4Translate3D(0, 0, BS_fwdZ3 - BS_fwdZ0);
+
+      G4VSolid* geo_BS_fwd = geo_BS_fwdP0_Base;
+      geo_BS_fwd = new G4UnionSolid("geo_BS_fwd", geo_BS_fwd, geo_BS_P1fwd_Base, tfm_BS_fwdP1);
+      geo_BS_fwd = new G4UnionSolid("geo_BS_fwd", geo_BS_fwd, geo_BS_P2fwd_Base, tfm_BS_fwdP2);
+
+      G4LogicalVolume* logi_BS_fwd = new G4LogicalVolume(geo_BS_fwd, mat_BS, "logi_BS_fwd");
+
+      G4Transform3D tfm_BS_fwd = G4Translate3D(0, 0, BS_fwdZ0);
+      new G4PVPlacement(tfm_BS_fwd, logi_BS_fwd, "phys_BS_fwd", &topVolume, false, 0);
+      //++++ +++++++++++++++++++++++++++++++++++++++++++ ++++//
+
+      //++++ Assemble and place the BWD bellows shield ++++//
+      G4Transform3D tfm_BS_bwdP1 = G4Translate3D(0, 0, BS_bwdZ2 - BS_bwdZ0) * G4RotateY3D(M_PI);
+
+      G4VSolid* geo_BS_bwd = geo_BS_bwdP0_Base;
+      geo_BS_bwd = new G4UnionSolid("geo_BS_bwd", geo_BS_bwd, geo_BS_P1bwd_Base, tfm_BS_bwdP1);
+
+      G4LogicalVolume* logi_BS_bwd = new G4LogicalVolume(geo_BS_bwd, mat_BS, "logi_BS_bwd");
+
+      G4Transform3D tfm_BS_bwd = G4Translate3D(0, 0, BS_bwdZ0);
+      new G4PVPlacement(tfm_BS_bwd, logi_BS_bwd, "phys_BS_bwd", &topVolume, false, 0);
+      //++++ +++++++++++++++++++++++++++++++++++++++++++ ++++//
 
 
       //--------------
@@ -903,6 +1231,229 @@ namespace Belle2 {
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_elp_QC1RP, "phys_elp_QC1RP_name", elements["B2wal1"].logi, false, 0);
 
 
+
+
+      //--------------------------------------------------------------------------------------------
+      //-   2023 QCS shielding
+
+      if (m_config.getParameter("polyBlock-R-L1.L", -1) > 0) {
+        // earlyPhase3 = false; post LS1
+
+        std::vector<std::string> polyBlocks;
+        boost::split(polyBlocks, m_config.getParameterStr("PolyBlock"), boost::is_any_of(" "));
+        for (const auto& name : polyBlocks) {
+          prep = name + ".";
+          //string type = m_config.getParameterStr(prep + "type");
+
+          double block_L = m_config.getParameter(prep + "L") * unitFactor;
+          double block_R = m_config.getParameter(prep + "R") * unitFactor;
+          double block_r = m_config.getParameter(prep + "r") * unitFactor;
+          double block_W = m_config.getParameter(prep + "W") * unitFactor;
+          double block_w = m_config.getParameter(prep + "w") * unitFactor;
+          double block_t = m_config.getParameter(prep + "t") * unitFactor;
+          double block_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+          double block_dr = m_config.getParameter(prep + "dr", 0.0) * unitFactor;
+          // Number of instances
+          int block_N = int(m_config.getParameter(prep + "N"));
+
+          std::vector<double> block_PHIs(block_N);
+          for (int i = 0; i < block_N; ++i) {
+            ostringstream oss_block_num;
+            oss_block_num << i;
+            block_PHIs[i] = m_config.getParameter(prep + "PHI" + oss_block_num.str());
+          }
+
+          // Box shaped cuts, if any
+          double block_cut_L0 = m_config.getParameter(prep + "cutL0", 0.0) * unitFactor;
+          double block_cut_L1 = m_config.getParameter(prep + "cutL1", 0.0) * unitFactor;
+          int block_cut_N = 0;
+          if (block_cut_L0 != 0.0 && block_cut_L1 != 0.0) {
+            block_cut_N = 2;
+          } else if (block_cut_L0 != 0.0 || block_cut_L1 != 0.0) {
+            block_cut_N = 1;
+          } else {
+            block_cut_N = 0;
+          }
+
+          //define geometry
+          string geo_block_name;
+          if (block_cut_N == 0) {
+            geo_block_name = "geo_" + name + "_name";
+          } else {
+            geo_block_name = "geo_" + name + "_x_name";
+          }
+
+          double block_T = sqrt((block_R - block_r) * (block_R - block_r) + (block_W - block_w) * (block_W - block_w) / 4.0);
+
+          int nSect = 5;
+          std::vector<G4TwoVector> xy(nSect);
+          xy[0].set(0.0, 0.0);
+          xy[1].set(-block_T, (block_W - block_w) / 2.0);
+          xy[2].set(-block_t, block_W / 2.0);
+          xy[3].set(-block_T, (block_w + block_W) / 2.0);
+          xy[4].set(0.0, block_W);
+
+          G4TwoVector offset1(block_dr, 0.0), offset2(0.0, 0.0);
+          G4double scale1 = 1.0, scale2 = 1.0;
+
+          G4VSolid* geo_block = new G4ExtrudedSolid(geo_block_name, xy, block_L / 2.0, offset1, scale1, offset2, scale2);
+
+          for (int i = 0; i < block_cut_N; ++i) {
+            ostringstream oss_block_num;
+            oss_block_num << i;
+
+            if (i == block_cut_N - 1) {
+              geo_block_name = "geo_" + name + "_name";
+            } else {
+              geo_block_name = "geo_" + name + "_x" + oss_block_num.str() + "_name";
+            }
+            string geo_cut_name = "geo_" + name + "_cut" + oss_block_num.str() + "_name";
+
+            double cut_L = m_config.getParameter(prep + "cutL" + oss_block_num.str()) * unitFactor;
+            double cut_W = m_config.getParameter(prep + "cutW" + oss_block_num.str()) * unitFactor;
+            double cut_H = m_config.getParameter(prep + "cutH" + oss_block_num.str()) * unitFactor;
+
+            G4VSolid* geo_cut = new G4Box(geo_cut_name, cut_W / 2.0, cut_H / 2.0, cut_L / 2.0);
+
+            double cut_X0 = m_config.getParameter(prep + "cutX0" + oss_block_num.str()) * unitFactor;
+            double cut_Y0 = m_config.getParameter(prep + "cutY0" + oss_block_num.str()) * unitFactor;
+            double cut_Z0 = m_config.getParameter(prep + "cutZ0" + oss_block_num.str()) * unitFactor;
+            double cut_PHI = m_config.getParameter(prep + "cutPHI" + oss_block_num.str());
+
+            G4Transform3D cut_transform = G4Translate3D(cut_X0, cut_Y0, cut_Z0);
+            cut_transform = cut_transform * G4RotateY3D(cut_PHI / Unit::rad);
+
+            geo_block = new G4SubtractionSolid(geo_block_name, geo_block, geo_cut,  cut_transform);
+            //geo_block = new G4UnionSolid(geo_block_name, geo_block, geo_cut,  cut_transform);
+          }
+
+          // logical volume
+          string strMat_block = m_config.getParameterStr(prep + "Material");
+          G4Material* mat_block = Materials::get(strMat_block);
+
+          string logi_block_name = "logi_" + name + "_name";
+          G4LogicalVolume* logi_block = new G4LogicalVolume(geo_block, mat_block, logi_block_name);
+
+          //put volume
+          setColor(*logi_block, "#00CC00");
+          //setVisibility(*logi_block, false);
+
+          for (int i = 0; i < block_N; ++i) {
+            // storable element
+            CryostatElement block;
+            block.geo = geo_block;
+            block.logi = logi_block;
+
+            double block_PHI = block_PHIs[i];
+            double block_X0 = block_R * cos(block_PHI);
+            double block_Y0 = block_R * sin(block_PHI);
+            double block_dPHI = asin(block_W / block_R / 2.0);
+
+            block.transform = G4Translate3D(block_X0, block_Y0, block_Z0);
+            block.transform = block.transform * G4RotateZ3D((block_PHI + block_dPHI) / Unit::rad);
+
+            ostringstream oss_block_num;
+            oss_block_num << i;
+            string phys_block_name = "phys_" + name + "-" + oss_block_num.str() + "_name";
+            new G4PVPlacement(block.transform, block.logi, phys_block_name, &topVolume, false, 0);
+
+            elements[name] = block;
+          }
+        }
+
+        std::vector<std::string> SWXLayers;
+        boost::split(SWXLayers, m_config.getParameterStr("SWXLayer"), boost::is_any_of(" "));
+        for (const auto& name : SWXLayers) {
+          prep = name + ".";
+          //string type = m_config.getParameterStr(prep + "type");
+
+          // storable element
+          CryostatElement layer;
+
+          double layer_L = m_config.getParameter(prep + "L") * unitFactor;
+          double layer_r1 = m_config.getParameter(prep + "r1") * unitFactor;
+          double layer_r2 = m_config.getParameter(prep + "r2") * unitFactor;
+          double layer_t = m_config.getParameter(prep + "t") * unitFactor;
+          double layer_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+          int layer_cut_N = int(m_config.getParameter(prep + "N", 0));
+
+          layer.transform = G4Translate3D(0.0, 0.0, layer_Z0);
+
+          //define geometry
+          string geo_layer_name;
+          if (layer_cut_N == 0) {
+            geo_layer_name = "geo_" + name + "_name";
+          } else {
+            geo_layer_name = "geo_" + name + "_x_name";
+          }
+
+          G4VSolid* geo_layer = new G4Cons(geo_layer_name, layer_r1, layer_r1 + layer_t, layer_r2, layer_r2 + layer_t, layer_L / 2.0, 0.0,
+                                           2.0 * M_PI);
+
+          for (int i = 0; i < layer_cut_N; ++i) {
+            ostringstream oss_block_num;
+            oss_block_num << i;
+
+            //string cut_type = m_config.getParameterStr(prep + "cutType" + oss_block_num.str());
+            double cut_type = m_config.getParameter(prep + "cutType" + oss_block_num.str());
+            if (i == layer_cut_N - 1) {
+              geo_layer_name = "geo_" + name + "_name";
+            } else {
+              geo_layer_name = "geo_" + name + "_x" + oss_block_num.str() + "_name";
+            }
+            string geo_cut_name = "geo_" + name + "_cut" + oss_block_num.str() + "_name";
+
+            G4VSolid* geo_cut;
+
+            if (cut_type == 0.0) {
+              double cut_L = m_config.getParameter(prep + "cutL" + oss_block_num.str()) * unitFactor;
+              double cut_W = m_config.getParameter(prep + "cutW" + oss_block_num.str()) * unitFactor;
+              double cut_H = m_config.getParameter(prep + "cutH" + oss_block_num.str()) * unitFactor;
+
+              geo_cut = new G4Box(geo_cut_name, cut_W / 2.0, cut_H / 2.0, cut_L / 2.0);
+            } else {
+              double cut_L = m_config.getParameter(prep + "cutL" + oss_block_num.str()) * unitFactor;
+              double cut_R = m_config.getParameter(prep + "cutR" + oss_block_num.str()) * unitFactor;
+
+              geo_cut = new G4Tubs(geo_cut_name, 0.0, cut_R, cut_L / 2.0, 0.0, 2.0 * M_PI);
+            }
+
+            double cut_X0 = m_config.getParameter(prep + "cutX0" + oss_block_num.str()) * unitFactor;
+            double cut_Y0 = m_config.getParameter(prep + "cutY0" + oss_block_num.str()) * unitFactor;
+            double cut_Z0 = m_config.getParameter(prep + "cutZ0" + oss_block_num.str()) * unitFactor;
+            double cut_PHI = m_config.getParameter(prep + "cutPHI" + oss_block_num.str());
+            double cut_TH = m_config.getParameter(prep + "cutTH" + oss_block_num.str());
+
+            G4Transform3D cut_transform = G4Translate3D(cut_X0, cut_Y0, cut_Z0);
+            cut_transform = cut_transform * G4RotateY3D(cut_PHI / Unit::rad);
+            cut_transform = cut_transform * G4RotateX3D(cut_TH / Unit::rad);
+
+            geo_layer = new G4SubtractionSolid(geo_layer_name, geo_layer, geo_cut,  layer.transform.inverse()*cut_transform);
+            //geo_layer = new G4UnionSolid(geo_layer_name, geo_layer, geo_cut,  layer.transform.inverse()*cut_transform);
+          }
+
+          layer.geo = geo_layer;
+
+          // logical volume
+          string strMat_layer = m_config.getParameterStr(prep + "Material");
+          G4Material* mat_layer = Materials::get(strMat_layer);
+
+          string logi_layer_name = "logi_" + name + "_name";
+          G4LogicalVolume* logi_layer = new G4LogicalVolume(layer.geo, mat_layer, logi_layer_name);
+          layer.logi = logi_layer;
+
+          //put volume
+          setColor(*logi_layer, "#B100CC");
+          //setVisibility(*logi_layer, false);
+
+          string phys_layer_name = "phys_" + name + "_name";
+          new G4PVPlacement(layer.transform, layer.logi, phys_layer_name, &topVolume, false, 0);
+
+          // cppcheck-suppress unreadVariable
+          elements[name] = layer;
+        }
+      }
+
       //---------------------------
       // for dose simulation
       //---------------------------
@@ -1012,7 +1563,6 @@ namespace Belle2 {
        logi_F7lyr4   ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 202));
        logi_F7lyr5   ->SetSensitiveDetector(new BkgSensitiveDetector("IR", 203));
       */
-
     }
   }
 }

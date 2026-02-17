@@ -25,12 +25,15 @@
 using namespace Belle2;
 using namespace Belle2::Simulation;
 
-TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph):
-  G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph),
+TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph) : G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph),
   m_ignoreOpticalPhotons(false),
   m_ignoreSecondaries(false), m_secondariesEnergyCut(0.0),
   m_ignoreBremsstrahlungPhotons(false), m_bremsstrahlungPhotonsEnergyCut(0.0),
   m_ignorePairConversions(false), m_pairConversionsEnergyCut(0.0),
+  m_regionZBackward(0.0), m_regionZForward(0.0), m_regionRho(0.0),
+  m_kineticEnergyThreshold(0.0), m_distanceThreshold(0.0),
+  m_doNotStoreEMParticles(false), m_doNotStoreNuclei(false), m_useSeenInECL(false),
+  m_useDetailedParticleMatching(false),
   m_storeTrajectories(false), m_distanceTolerance(0),
   m_storeMCTrajectories(), m_relMCTrajectories(StoreArray<MCParticle>(), m_storeMCTrajectories)
 {
@@ -58,21 +61,22 @@ void TrackingAction::setStoreTrajectories(int store, double distanceTolerance)
 
 void TrackingAction::PreUserTrackingAction(const G4Track* track)
 {
-  //We only want to do the following for new tracks, not for suspended and reactivated ones"
-  if (track->GetCurrentStepNumber() > 0) return;
+  // We only want to do the following for new tracks, not for suspended and reactivated ones"
+  if (track->GetCurrentStepNumber() > 0)
+    return;
 
   const G4DynamicParticle* dynamicParticle = track->GetDynamicParticle();
 
   try {
-    //Check if the dynamic particle has a primary particle attached.
-    //If the answer is yes, the UserInfo of the primary particle is recycled as the UserInfo of the track.
+    // Check if the dynamic particle has a primary particle attached.
+    // If the answer is yes, the UserInfo of the primary particle is recycled as the UserInfo of the track.
     const bool isPrimary = dynamicParticle->GetPrimaryParticle() != nullptr;
     bool neutral_llp = false;
     if (isPrimary) {
       const G4PrimaryParticle* primaryParticle = dynamicParticle->GetPrimaryParticle();
       if (primaryParticle->GetUserInformation() != nullptr) {
         const_cast<G4Track*>(track)->SetUserInformation(new TrackInfo(ParticleInfo::getInfo(*primaryParticle)));
-        //check for neutral long-lived primary particle
+        // check for neutral long-lived primary particle
         if (primaryParticle->GetParticleDefinition() == G4ParticleTable::GetParticleTable()->FindParticle("LongLivedNeutralParticle")) {
           neutral_llp = true;
         }
@@ -81,10 +85,10 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
       }
     }
 
-    //Get particle of current track
+    // Get particle of current track
     MCParticleGraph::GraphParticle& currParticle = TrackInfo::getInfo(*track);
 
-    G4ThreeVector dpMom  = dynamicParticle->GetMomentum() / CLHEP::MeV * Unit::MeV;
+    G4ThreeVector dpMom = dynamicParticle->GetMomentum() / CLHEP::MeV * Unit::MeV;
     currParticle.setTrackID(track->GetTrackID());
     // If the particle is a primary particle with simulated parents update the
     // production vertex and time to the real values from Geant4. As convention
@@ -96,7 +100,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
       currParticle.setProductionVertex(trVtxPos.x(), trVtxPos.y(), trVtxPos.z());
     }
 
-    //Set the Values of the particle which are already known
+    // Set the Values of the particle which are already known
     if (!neutral_llp) {
       currParticle.setPDG(dynamicParticle->GetPDGcode());
       currParticle.setMass(dynamicParticle->GetMass() / CLHEP::MeV * Unit::MeV);
@@ -104,42 +108,38 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
       currParticle.setMomentum(dpMom.x(), dpMom.y(), dpMom.z());
     }
 
-    //Primary or secondary particle?
+    // Primary or secondary particle?
     if (isPrimary) {
-      //Primary particle
+      // Primary particle
       currParticle.setSecondaryPhysicsProcess(0);
-      currParticle.setIgnore(false);  //Store the generator info in the MCParticles block.
-
+      currParticle.setIgnore(false); // Store the generator info in the MCParticles block.
     } else if (track->GetCreatorProcess() != nullptr) {
-      //Secondary particle
+      // Secondary particle
       const int& processSubType = track->GetCreatorProcess()->GetProcessSubType();
-      currParticle.setSecondaryPhysicsProcess(processSubType); //Store the physics process type.
+      currParticle.setSecondaryPhysicsProcess(processSubType); // Store the physics process type.
 
-      //Decay-in-flight
+      // Decay-in-flight
       if (processSubType >= static_cast<int>(DECAY) && processSubType <= static_cast<int>(DECAY_External))
-        currParticle.setIgnore(false);  //Store the generator info in the MCParticles block.
-
+        currParticle.setIgnore(false); // Store the generator info in the MCParticles block.
     } else {
-      //Unknown origin. This could be a bug originated from Geant4.
+      // Unknown origin. This could be a bug originated from Geant4.
       currParticle.setSecondaryPhysicsProcess(-1);
     }
 
-    //Either we store all the trajectories
+    // Either we store all the trajectories
     if (m_storeTrajectories > 2 ||
-        //Or only the primary ones
+        // Or only the primary ones
         (m_storeTrajectories == 1 && isPrimary) ||
-        //Or all except optical photons
+        // Or all except optical photons
         (m_storeTrajectories == 2 && track->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition())) {
       TrackInfo& info = dynamic_cast<TrackInfo&>(*track->GetUserInformation());
       m_relMCTrajectories.add(track->GetTrackID(), m_storeMCTrajectories.getEntries());
       info.setTrajectory(m_storeMCTrajectories.appendNew());
     }
-
   } catch (CouldNotFindUserInfo& exc) {
     B2FATAL(exc.what());
   }
 }
-
 
 void TrackingAction::PostUserTrackingAction(const G4Track* track)
 {
@@ -149,6 +149,85 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
   try {
     MCParticleGraph::GraphParticle& currParticle = TrackInfo::getInfo(*track);
 
+    if (m_useDetailedParticleMatching) {
+
+      // A custom check to flip the ignore flag for seco primaries
+      const bool producedInBarrel = (currParticle.getProductionVertex().Rho() > m_regionRho);
+      const bool producedInEndCap = (currParticle.getProductionVertex().Z() > m_regionZForward)
+                                    || (currParticle.getProductionVertex().Z() < m_regionZBackward);
+      const bool producedInRegion = producedInBarrel || producedInEndCap;
+      const bool isAboveKinematicThreshold = std::sqrt(currParticle.getMomentum().mag2()) > m_kineticEnergyThreshold;
+      G4ThreeVector decVtx = postStep->GetPosition() / CLHEP::mm * Unit::mm;
+      currParticle.setDecayVertex(decVtx.x(), decVtx.y(), decVtx.z());
+      const float distance = std::sqrt((currParticle.getProductionVertex() - currParticle.getDecayVertex()).mag2());
+      const bool hasTraveledDistance = distance >
+                                       m_distanceThreshold;
+      const bool isEM = ((currParticle.getPDG() == 11) || (currParticle.getPDG() == -11) || (currParticle.getPDG() == 22));
+      const bool isNuclei = (currParticle.getPDG() > 100'000'000'0);
+      const bool seenInECL = currParticle.hasSeenInDetector(Const::ECL);
+      B2DEBUG(10, "Particle: " << currParticle.getIndex() << "Particle pdg: " << currParticle.getPDG() << "current ignore flag: " <<
+              currParticle.getIgnore() << " produced in Region: " <<
+              producedInRegion << " above threshold: " <<
+              isAboveKinematicThreshold
+              << " traveled distance: " << hasTraveledDistance << " is EM: " << isEM << " is Nuclei: " << isNuclei << " seen in ECL: " <<
+              seenInECL);
+      B2DEBUG(10, "Extra Info: " << "Region Z Backward: " << m_regionZBackward << " Region Z Forward: " << m_regionZForward <<
+              " Region Rho: " <<
+              m_regionRho
+              << " Kinetic Energy Threshold: " << m_kineticEnergyThreshold
+              << "Distance: " << distance << " Distance Threshold: " << m_distanceThreshold << " Do Not Store EM: " << m_doNotStoreEMParticles <<
+              " Do Not Store Nuclei: "
+              <<
+              m_doNotStoreNuclei << " Use Seen in ECL: " << m_useSeenInECL);
+
+      // first, check if the particle is above the kinetic energy threshold
+      if (isAboveKinematicThreshold) {
+        // next check, if the particle was produced before the Region
+        if (!producedInRegion) {
+          // check, if we want to care about the seenInECL flag
+          if (m_useSeenInECL) {
+            // check, if the particle was seen in the ECL
+            if (seenInECL) {
+              // now, set the ignore flag to false
+              currParticle.setIgnore(false);
+            }
+          } else {
+            // if we don't care about the seenInECL flag, set the ignore flag to false
+            currParticle.setIgnore(false);
+          }
+        } else {
+          // if the particle was produced in the Region, first check the distance threshold
+          if (hasTraveledDistance) {
+            // check, if we want to care about the isEM flag, but not the isNuclei flag
+            if (m_doNotStoreEMParticles && !m_doNotStoreNuclei) {
+              // check, if the particle is not an EM particle
+              if (!isEM) {
+                // now, set the ignore flag to false
+                currParticle.setIgnore(false);
+              }
+              // next check, if we care about the isNuclei flag, but not the isEM flag
+            } else if (!m_doNotStoreEMParticles && m_doNotStoreNuclei) {
+              // check, if the particle is not a nucleus
+              if (!isNuclei) {
+                // now, set the ignore flag to false
+                currParticle.setIgnore(false);
+              }
+              // next check, if we care about both the isEM and isNuclei flags
+            } else if (m_doNotStoreEMParticles && m_doNotStoreNuclei) {
+              // check, if the particle is not an EM particle or a nucleus
+              if (!isEM || !isNuclei) {
+                // now, set the ignore flag to false
+                currParticle.setIgnore(false);
+              }
+              // if we don't care about either flag, set the ignore flag to false
+            } else {
+              currParticle.setIgnore(false);
+            }
+          }
+        }
+      }
+    }
+    B2DEBUG(10, "Ignore Flag: " << currParticle.getIgnore());
     // Add particle and decay Information to all the secondaries
     for (G4Track* daughterTrack : *fpTrackingManager->GimmeSecondaries()) {
 
@@ -159,21 +238,21 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
         MCParticleGraph::GraphParticle& daughterParticle = m_mcParticleGraph.addParticle();
         const_cast<G4Track*>(daughterTrack)->SetUserInformation(new TrackInfo(daughterParticle));
 
-        currParticle.decaysInto(daughterParticle); //Add the decay history
+        currParticle.decaysInto(daughterParticle); // Add the decay history
 
         // Optical photons and secondaries:  steering of output to MCParticles
         if (daughterTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
 
           // Optical photons
-          if (m_ignoreOpticalPhotons) daughterParticle.setIgnore();
-          // to apply quantum efficiency only once, if optical photon is a daughter of optical photon
+          if (m_ignoreOpticalPhotons)
+            daughterParticle.setIgnore();
+          // to apply quantum efficiency only once, if optical photon is a daugher of optical photon
           if (track->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
             TrackInfo* currInfo = dynamic_cast<TrackInfo*>(track->GetUserInformation());
             TrackInfo* daughterInfo = dynamic_cast<TrackInfo*>(daughterTrack->GetUserInformation());
             daughterInfo->setStatus(currInfo->getStatus());
             daughterInfo->setFraction(currInfo->getFraction());
           }
-
         } else if (daughterTrack->GetCreatorProcess()->GetProcessSubType() == fBremsstrahlung) {
 
           // Bremsstrahlung photons
@@ -181,7 +260,6 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
           // if the ignore flag is set or its energy is too low in [MeV].
           if (m_ignoreBremsstrahlungPhotons || daughterTrack->GetKineticEnergy() < m_bremsstrahlungPhotonsEnergyCut)
             daughterParticle.setIgnore();
-
         } else if (daughterTrack->GetCreatorProcess()->GetProcessSubType() == fGammaConversion) {
 
           // e+ or e- created by gamma conversion to pairs
@@ -189,7 +267,6 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
           // if the ignore flag is set or kinetic energy is too low in [MeV].
           if (m_ignorePairConversions || daughterTrack->GetKineticEnergy() < m_pairConversionsEnergyCut)
             daughterParticle.setIgnore();
-
         } else {
 
           // Do not store the generator info in the final MCParticles block
@@ -197,31 +274,31 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
           if (m_ignoreSecondaries || daughterTrack->GetKineticEnergy() < m_secondariesEnergyCut)
             daughterParticle.setIgnore();
 
-          //B2INFO("Secondary Physics Process: " << daughterTrack->GetCreatorProcess()->GetProcessSubType());
+          // B2INFO("Secondary Physics Process: " << daughterTrack->GetCreatorProcess()->GetProcessSubType());
         }
-
       }
     }
-    //If the track is just suspended we can return here: the rest should be filled once the track is done
-    if (track->GetTrackStatus() == fSuspend) return;
+    // If the track is just suspended we can return here: the rest should be filled once the track is done
+    if (track->GetTrackStatus() == fSuspend)
+      return;
 
-    //Check if particle left the detector/simulation volume.
+    // Check if particle left the detector/simulation volume.
     if (postStep->GetStepStatus() == fWorldBoundary) {
       currParticle.addStatus(MCParticle::c_LeftDetector);
     }
 
-    //Check if particle was stopped in the detector/simulation volume
+    // Check if particle was stopped in the detector/simulation volume
     if (track->GetKineticEnergy() <= 0.0) {
       currParticle.addStatus(MCParticle::c_StoppedInDetector);
     }
 
-    //Set the values for the particle
+    // Set the values for the particle
     G4ThreeVector decVtx = postStep->GetPosition() / CLHEP::mm * Unit::mm;
     currParticle.setDecayVertex(decVtx.x(), decVtx.y(), decVtx.z());
     currParticle.setDecayTime(postStep->GetGlobalTime()); // Time does not need a conversion factor
     currParticle.setValidVertex(true);
 
-    //Check if we can remove some points from the trajectory
+    // Check if we can remove some points from the trajectory
     if (m_storeTrajectories) {
       MCParticleTrajectory* tr = dynamic_cast<TrackInfo*>(track->GetUserInformation())->getTrajectory();
       if (tr) {

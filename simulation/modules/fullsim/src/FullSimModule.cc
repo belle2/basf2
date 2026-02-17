@@ -123,6 +123,31 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("PairConversionsEnergyCut", m_pairConversionsEnergyCut,
            "[MeV] Kinetic energy cut for storing e+ or e- from pair conversions", 10.0);
 
+  addParam("DetailedParticleMatching", m_useDetailedParticleMatching,
+           "If true, use enhanced logic to store specific secondaries that would otherwise be ignored. "
+           "This allows to rescue particles based on their production vertex position relative to the defined region, "
+           "kinetic energy, and other properties.", false);
+  addParam("RegionZBackward", m_regionZBackward,
+           "The backward z limit [cm] of the region, used to define the region volume for particle matching.", 0.0);
+  addParam("RegionZForward", m_regionZForward,
+           "The forward z limit [cm] of the region, used to define the region volume for particle matching.", 0.0);
+  addParam("RegionRho", m_regionRho, "The rho limit [cm] of the region, used to define the region volume for particle matching.",
+           0.0);
+  addParam("KineticEnergyThreshold", m_kineticEnergyThreshold,
+           "Kinetic energy threshold [MeV]. Only particles above this energy are considered for detailed matching.", 0.0);
+  addParam("DistanceThreshold", m_distanceThreshold,
+           "Distance threshold [cm] for particles produced inside the defined region volume. "
+           "Only particles that travel further than this distance are considered.", 0.0);
+  addParam("DoNotStoreEMParticles", m_doNotStoreEMParticles,
+           "If true, electromagnetic particles (e+, e-, gamma) produced inside the defined region and passing the distance threshold "
+           "are NOT stored (they are filtered out). If false, EM particles can be stored.", false);
+  addParam("DoNotStoreNuclei", m_doNotStoreNuclei,
+           "If true, nuclei (PDG > 10^9) produced inside the defined region and passing the distance threshold "
+           "are NOT stored (they are filtered out). If false, nuclei can be stored.", false);
+  addParam("UseSeenInECL", m_useSeenInECL,
+           "If true, particles produced before the defined region (inverse of inside region) must have been 'seen' in the ECL (created hits) to be stored. "
+           "If false, all eligible particles produced before the defined region are stored.", false);
+
   addParam("magneticField", m_magneticFieldName,
            "Chooses the magnetic field stepper used by Geant4. Possible values are: default, nystrom, expliciteuler, simplerunge",
            string("default"));
@@ -319,6 +344,15 @@ void FullSimModule::initialize()
   trackingAction->setBremsstrahlungPhotonsEnergyCut(m_bremsstrahlungPhotonsEnergyCut);
   trackingAction->setIgnorePairConversions(!m_storePairConversions);
   trackingAction->setPairConversionsEnergyCut(m_pairConversionsEnergyCut);
+  trackingAction->setUseDetailedParticleMatching(m_useDetailedParticleMatching);
+  trackingAction->setRegionZBackward(m_regionZBackward);
+  trackingAction->setRegionZForward(m_regionZForward);
+  trackingAction->setRegionRho(m_regionRho);
+  trackingAction->setKineticEnergyThreshold(m_kineticEnergyThreshold);
+  trackingAction->setDistanceThreshold(m_distanceThreshold);
+  trackingAction->setDoNotStoreEMParticles(m_doNotStoreEMParticles);
+  trackingAction->setDoNotStoreNuclei(m_doNotStoreNuclei);
+  trackingAction->setUseSeenInECL(m_useSeenInECL);
 
   runManager.SetUserAction(trackingAction);
 
@@ -413,7 +447,7 @@ void FullSimModule::initialize()
     m_visManager->Initialize();
   }
 
-  //Apply the Geant4 UI commands at Idle state - after initialization
+  //Apply the Geant4 UI commands at Idle state - after initilization
   if (m_uiCommandsAtIdle.size() > 0) {
     G4UImanager* uiManager = G4UImanager::GetUIpointer();
     for (vector<string>::iterator iter = m_uiCommandsAtIdle.begin(); iter != m_uiCommandsAtIdle.end(); ++iter) {

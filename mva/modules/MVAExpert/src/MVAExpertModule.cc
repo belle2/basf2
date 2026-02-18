@@ -17,8 +17,6 @@
 
 #include <mva/interface/Interface.h>
 
-#include <boost/algorithm/string/predicate.hpp>
-
 #include <framework/logging/Logger.h>
 
 
@@ -73,7 +71,7 @@ void MVAExpertModule::initialize()
     extraInfo.isRequired();
   }
 
-  if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
+  if (not(m_identifier.ends_with(".root") or m_identifier.ends_with(".xml"))) {
     m_weightfile_representation = std::make_unique<DBObjPtr<DatabaseRepresentationOfWeightfile>>(
                                     MVA::makeSaveForDatabase(m_identifier));
   }

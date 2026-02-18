@@ -15,8 +15,6 @@
 
 #include <mva/interface/Interface.h>
 
-#include <boost/algorithm/string/predicate.hpp>
-
 #include <framework/logging/Logger.h>
 
 
@@ -74,7 +72,7 @@ void MVAMultipleExpertsModule::initialize()
   m_existGivenExtraInfo.resize(m_identifiers.size(), false);
 
   for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
-    if (not(boost::ends_with(m_identifiers[i], ".root") or boost::ends_with(m_identifiers[i], ".xml"))) {
+    if (not(m_identifiers[i].ends_with(".root") or m_identifiers[i].ends_with(".xml"))) {
       m_weightfile_representations[i] = std::make_unique<DBObjPtr<DatabaseRepresentationOfWeightfile>>(
                                           MVA::makeSaveForDatabase(m_identifiers[i]));
     }

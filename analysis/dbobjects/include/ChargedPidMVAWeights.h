@@ -22,10 +22,6 @@
 #include <TParameter.h>
 #include <TFile.h>
 
-//BOOST
-#include <boost/algorithm/string/predicate.hpp>
-
-
 namespace Belle2 {
 
   /**
@@ -159,9 +155,9 @@ namespace Belle2 {
         }
 
         MVA::Weightfile weightfile;
-        if (boost::ends_with(path, ".root")) {
+        if (path.ends_with(".root")) {
           weightfile = MVA::Weightfile::loadFromROOTFile(path);
-        } else  if (boost::ends_with(path, ".xml")) {
+        } else  if (path.ends_with(".xml")) {
           weightfile = MVA::Weightfile::loadFromXMLFile(path);
         } else {
           B2WARNING("Unknown file extension for file: " << path << ", fallback to xml...");

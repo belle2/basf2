@@ -12,7 +12,6 @@
 #include <mva/interface/Expert.h>
 #include <mva/interface/Weightfile.h>
 #include <framework/database/DBObjPtr.h>
-#include <boost/algorithm/string/predicate.hpp>
 
 namespace Belle2 {
   class DatabaseRepresentationOfWeightfile;
@@ -80,9 +79,8 @@ MVAExpert::Impl::Impl(const std::string& identifier,
 void MVAExpert::Impl::initialize()
 {
   MVA::AbstractInterface::initSupportedInterfaces();
-  using boost::algorithm::ends_with;
   if (not m_weightfileRepresentation and
-      not(ends_with(m_identifier, ".root") or ends_with(m_identifier, ".xml"))) {
+      not(m_identifier.ends_with(".root") or m_identifier.ends_with(".xml"))) {
     using DBWeightFileRepresentation = DBObjPtr<DatabaseRepresentationOfWeightfile>;
     m_weightfileRepresentation = std::make_unique<DBWeightFileRepresentation>(m_identifier);
   }

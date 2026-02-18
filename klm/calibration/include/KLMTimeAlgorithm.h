@@ -31,10 +31,9 @@
 
 /* C++ STL headers. */
 #include <functional>
-#include <map>     // For std::map in readCalibrationDataCounts
-#include <utility> // For std::pair in readCalibrationDataFor2DFit
-#include <vector>  // For std::vector in readCalibrationDataFor2DFit
-#include <functional>  // ADD THIS - needed for std::function in readCalibrationDataBatch
+#include <map>
+#include <utility>
+#include <vector>
 
 class TFile;  // forward declaration
 

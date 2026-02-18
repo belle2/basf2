@@ -31,8 +31,8 @@
 #include <TTree.h>
 
 /* C++ headers. */
-#include <functional>  // ADD THIS
-#include <set>         // ADD THIS
+#include <functional>
+#include <set>
 
 using namespace Belle2;
 using namespace ROOT::Math;
@@ -948,9 +948,6 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   m_cFlag.clear();
   m_minimizerOptions.SetDefaultStrategy(2);
 
-  // ===================================================================
-  // COUNT EVENTS PER CHANNEL (lightweight scan, no full data load)
-  // ===================================================================
   B2INFO("Counting events per channel...");
   std::map<KLMChannelNumber, unsigned int> eventCounts;
   readCalibrationDataCounts(eventCounts);
@@ -989,23 +986,19 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   std::sort(channelsBKLM.begin(), channelsBKLM.end(), compareEventNumber);
   std::sort(channelsEKLM.begin(), channelsEKLM.end(), compareEventNumber);
 
-  // ===================================================================
-  // TWO-DIMENSIONAL FIT (needs data for top channels only)
-  // ===================================================================
+  /* Two-dimensional fit using top channels only. */
   double delayBKLM, delayBKLMError;
   double delayEKLM, delayEKLMError;
 
-  // Load data for 2D fit channels only
+  /* Load data for 2D fit channels only. */
   readCalibrationDataFor2DFit(channelsBKLM, channelsEKLM);
   timeDistance2dFit(channelsBKLM, delayBKLM, delayBKLMError);
   timeDistance2dFit(channelsEKLM, delayEKLM, delayEKLMError);
-  m_evts.clear(); // Clear after 2D fit
+  m_evts.clear();
 
   B2INFO("2D fits complete, data cleared.");
 
-  // ===================================================================
-  // DEFINE 6 PROCESSING BATCHES
-  // ===================================================================
+  /* Define processing batches for channel calibration. */
   auto isRPCBackward = [](const KLMChannelIndex & ch) {
     return ch.getSubdetector() == KLMElementNumbers::c_BKLM &&
            ch.getLayer() >= BKLMElementNumbers::c_FirstRPCLayer &&
@@ -1779,9 +1772,7 @@ void KLMTimeAlgorithm::saveHist()
   m_outFile->cd();
   B2INFO("Save Histograms into Files.");
 
-  // ===================================================================
-  // VITAL PLOTS - Always saved
-  // ===================================================================
+  /* Save vital plots. */
   TDirectory* dir_monitor = m_outFile->mkdir("monitor_Hists", "", true);
   dir_monitor->cd();
   h_calibrated->SetDirectory(dir_monitor);
@@ -1832,9 +1823,7 @@ void KLMTimeAlgorithm::saveHist()
 
   B2INFO("Top file setup Done.");
 
-  // ===================================================================
-  // DEBUG PLOTS - Only saved if m_saveAllPlots is true
-  // ===================================================================
+  /* Save debug plots (only if m_saveAllPlots is true). */
   if (!m_saveAllPlots) {
     B2INFO("Skipping debug histogram directory creation (m_saveAllPlots = false)");
     m_outFile->cd();

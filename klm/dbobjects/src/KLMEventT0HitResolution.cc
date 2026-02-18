@@ -22,37 +22,33 @@ KLMEventT0HitResolution::~KLMEventT0HitResolution()
 {
 }
 
-// ----------------------------------------------------------------------
-// Explicit setters
-// ----------------------------------------------------------------------
-
 void KLMEventT0HitResolution::setSigmaEKLMScint(float sigma, float sigmaErr)
 {
-  m_SigmaEKLMScint    = sigma;
+  m_SigmaEKLMScint = sigma;
   m_SigmaEKLMScintErr = sigmaErr;
 }
 
 void KLMEventT0HitResolution::setSigmaBKLMScint(float sigma, float sigmaErr)
 {
-  m_SigmaBKLMScint    = sigma;
+  m_SigmaBKLMScint = sigma;
   m_SigmaBKLMScintErr = sigmaErr;
 }
 
 void KLMEventT0HitResolution::setSigmaRPC(float sigma, float sigmaErr)
 {
-  m_SigmaRPC    = sigma;
+  m_SigmaRPC = sigma;
   m_SigmaRPCErr = sigmaErr;
 }
 
 void KLMEventT0HitResolution::setSigmaRPCPhi(float sigma, float sigmaErr)
 {
-  m_SigmaRPCPhi    = sigma;
+  m_SigmaRPCPhi = sigma;
   m_SigmaRPCPhiErr = sigmaErr;
 }
 
 void KLMEventT0HitResolution::setSigmaRPCZ(float sigma, float sigmaErr)
 {
-  m_SigmaRPCZ    = sigma;
+  m_SigmaRPCZ = sigma;
   m_SigmaRPCZErr = sigmaErr;
 }
 
@@ -77,10 +73,6 @@ void KLMEventT0HitResolution::setSigma(float sigma, float sigmaErr, int category
   }
   B2FATAL("KLMEventT0HitResolution::setSigma: incorrect category: " << category);
 }
-
-// ----------------------------------------------------------------------
-// Explicit getters
-// ----------------------------------------------------------------------
 
 float KLMEventT0HitResolution::getSigmaEKLMScint() const
 {
@@ -131,10 +123,6 @@ float KLMEventT0HitResolution::getSigmaRPCZErr() const
 {
   return m_SigmaRPCZErr;
 }
-
-// ----------------------------------------------------------------------
-// Generic getters by category
-// ----------------------------------------------------------------------
 
 float KLMEventT0HitResolution::getSigma(int category) const
 {

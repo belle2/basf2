@@ -35,13 +35,13 @@ namespace Belle2 {
       c_BKLMScint = 2,
 
       /** BKLM RPC (combined phi/z). */
-      c_RPC       = 3,
+      c_RPC = 3,
 
       /** BKLM RPC Phi-readout. */
-      c_RPCPhi    = 4,
+      c_RPCPhi = 4,
 
       /** BKLM RPC Z-readout. */
-      c_RPCZ      = 5,
+      c_RPCZ = 5,
     };
 
     /**

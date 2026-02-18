@@ -776,7 +776,7 @@ void KLMEventT0EstimatorModule::endRun()
   auto fillSummaryGaussian = [&](TH1D * h, int bin, const char* name) {
     if (!h || !m_hPullSummary_Mean || !m_hPullSummary_Width) return;
     if (h->GetEntries() < 50) {
-      B2WARNING("KLMEventT0Estimator: Insufficient entries (" << (h ? h->GetEntries() : 0)
+      B2WARNING("KLMEventT0Estimator: Insufficient entries (" << h->GetEntries()
                 << ") for " << name << " pull Gaussian fit - skipping.");
       return;
     }
@@ -939,7 +939,7 @@ void KLMEventT0EstimatorModule::endRun()
   auto fillResidualSummaryGaussian = [&](TH1D * h, int bin, const char* name) {
     if (!h || !m_hResidualSummary_Mean || !m_hResidualSummary_Width) return;
     if (h->GetEntries() < 50) {
-      B2WARNING("KLMEventT0Estimator: Insufficient entries (" << (h ? h->GetEntries() : 0)
+      B2WARNING("KLMEventT0Estimator: Insufficient entries (" << h->GetEntries()
                 << ") for " << name << " residual Gaussian fit - skipping.");
       return;
     }
@@ -2020,7 +2020,6 @@ void KLMEventT0EstimatorModule::event()
       return {v[0].first, std::isfinite(v[0].second) ? v[0].second : 0.0};
     }
 
-    double wsum = 0.0, wtsum = 0.0;
     bool allValid = true;
     for (const auto& [t0, sem] : v)
     {
@@ -2029,6 +2028,7 @@ void KLMEventT0EstimatorModule::event()
 
     if (allValid)
     {
+      double wsum = 0.0, wtsum = 0.0;
       for (const auto& [t0, sem] : v) {
         const double w = 1.0 / (sem * sem);
         wsum += w;
@@ -2166,10 +2166,10 @@ void KLMEventT0EstimatorModule::event()
       else if (useE) sourceBin = 2;
       else sourceBin = 3;
     } else {
-      double wsum = 0.0, wtsum = 0.0;
       bool okW = true;
       for (auto& pr : parts) { const double se = pr.second; if (!std::isfinite(se) || se <= 0.0) { okW = false; break; } }
       if (okW) {
+        double wsum = 0.0, wtsum = 0.0;
         for (auto& pr : parts) { const double w = 1.0 / (pr.second * pr.second); wsum += w; wtsum += w * pr.first; }
         if (wsum > 0.0) { finalT0 = wtsum / wsum; finalSE = std::sqrt(1.0 / wsum); }
       }
@@ -2177,11 +2177,9 @@ void KLMEventT0EstimatorModule::event()
         double s = 0.0;
         for (auto& pr : parts) s += pr.first;
         finalT0 = s / parts.size();
-        if (parts.size() > 1) {
-          double ss = 0.0;
-          for (auto& pr : parts) { const double d = pr.first - finalT0; ss += d * d; }
-          finalSE = std::sqrt((ss / (parts.size() - 1)) / parts.size());
-        } else finalSE = std::isfinite(parts[0].second) ? parts[0].second : 0.0;
+        double ss = 0.0;
+        for (auto& pr : parts) { const double d = pr.first - finalT0; ss += d * d; }
+        finalSE = std::sqrt((ss / (parts.size() - 1)) / parts.size());
       }
       // Determine source combination
       if (useB && useE && useR) sourceBin = 7;
@@ -2225,7 +2223,6 @@ void KLMEventT0EstimatorModule::event()
     {
       return {parts[0].first, std::isfinite(parts[0].second) ? parts[0].second : 0.0};
     }
-    double wsum = 0.0, wtsum = 0.0;
     bool okW = true;
     for (const auto& pr : parts)
     {
@@ -2233,6 +2230,7 @@ void KLMEventT0EstimatorModule::event()
     }
     if (okW)
     {
+      double wsum = 0.0, wtsum = 0.0;
       for (const auto& pr : parts) {
         const double w = 1.0 / (pr.second * pr.second);
         wsum += w;
@@ -2463,10 +2461,8 @@ void KLMEventT0EstimatorModule::event()
         }
       }
     }
-  }
 
-  // ---------------- Residual distributions (mirror of pulls, without normalization) ----------------
-  if (m_FillPulls) {
+    // ---------------- Residual distributions (mirror of pulls, without normalization) ----------------
     // Basic residual function: ΔT0 = T0_i − T0_j (no SEM normalization)
     auto fill_pairs_residual = [&](const std::vector<TrkVal>& vv, TH1D * h) {
       if (!h) return;
@@ -2597,11 +2593,9 @@ void KLMEventT0EstimatorModule::event()
         }
       }
     }
-  }
 
-  // ---------------- Cross-detector ΔT0 analysis (by region) ----------------
-  // Regions: 0=EKLM Backward, 1=EKLM Forward, 2=BKLM RPC, 3=BKLM Scint
-  if (m_FillPulls) {
+    // ---------------- Cross-detector ΔT0 analysis (by region) ----------------
+    // Regions: 0=EKLM Backward, 1=EKLM Forward, 2=BKLM RPC, 3=BKLM Scint
     // Build a unified list of all tracks with their detector region
     struct RegionTrk {
       double mu;

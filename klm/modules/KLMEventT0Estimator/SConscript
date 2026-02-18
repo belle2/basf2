@@ -1,27 +1,8 @@
-# klm/modules/KLMEventT0Estimator/SConscript
 Import('env')
 
-# Link the same core libs used by the reconstructor & time collector.
-env['LIBS'] = [
-    'klm', 'klm_dataobjects', 'klm_dbobjects',
-    'framework', 'analysis',
-    'mdst_dataobjects',
-    'tracking_dataobjects',
-    'analysis_dataobjects',
-    '$ROOT_LIBS',   # ROOT already needed elsewhere; fine to keep
-    'CLHEP',
-]
-
-# ---------- Optional: build-time switch for histograms (disabled by default) ----------
-# If you later wrap histogram code in the sources with `#ifdef KLM_T0_HISTO`,
-# you can enable it in one of two ways:
-#
-# (A) Hard-enable in this file by uncommenting the next two lines:
-# from SCons.Script import ARGUMENTS
-# env.Append(CPPDEFINES={'KLM_T0_HISTO': 1})
-#
-# (B) Or pass the macro from the command line without touching this file:
-#     scons CPPDEFINES=KLM_T0_HISTO
-# (You can also use: scons CPPDEFINES="KLM_T0_HISTO,OTHER=1")
+env['LIBS'] = ['klm', 'klm_dataobjects', 'klm_dbobjects',
+               'framework', 'analysis', 'mdst_dataobjects',
+               'tracking_dataobjects', 'analysis_dataobjects',
+               '$ROOT_LIBS', 'CLHEP']
 
 Return('env')

@@ -1,10 +1,9 @@
-// klm/modules/KLMEventT0Estimator/include/KLMEventT0EstimatorModule.h
 /**************************************************************************
- * basf2 (Belle II Analysis Software Framework)
- * Author: The Belle II Collaboration
- *
- * See git log for contributors and copyright holders.
- * This file is licensed under LGPL-3.0, see LICENSE.md.
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #pragma once
@@ -32,11 +31,11 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 /* Framework */
-#include <framework/core/HistoModule.h>               // use HistoModule (like KLMDQM2)
+#include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/database/DBObjPtr.h>             // needed for DBObjPtr<T>
-#include <framework/datastore/RelationVector.h>       // needed for RelationVector<T>
+#include <framework/database/DBObjPtr.h>
+#include <framework/datastore/RelationVector.h>
 #include <framework/dataobjects/EventT0.h>
 #include <framework/gearbox/Unit.h>
 
@@ -44,9 +43,9 @@
 #include <map>
 #include <string>
 #include <utility>
-#include <limits>                                      // needed for std::numeric_limits
+#include <limits>
 
-/* ---- ROOT forward declarations (global namespace) ---- */
+/* ROOT forward declarations. */
 class TH1D;
 class TH1I;
 class TH2D;
@@ -157,18 +156,19 @@ namespace Belle2 {
     void terminate() override;
 
   private:
-    /* ---------- Local helpers (implemented in .cc) ---------- */
+    /* Local helpers. */
 
+    /** Multimap of ExtHit objects keyed by channel or module number. */
     using ExtMap  = std::multimap<unsigned int, Belle2::ExtHit>;
+
+    /** Pair of entry and exit ExtHit pointers. */
     using ExtPair = std::pair<Belle2::ExtHit*, Belle2::ExtHit*>;
 
-    // In the private section, add these member variables:
     double m_ADCCut_BKLM_Scint_Min;  /**< Minimum ADC cut for BKLM scintillator */
     double m_ADCCut_BKLM_Scint_Max;  /**< Maximum ADC cut for BKLM scintillator */
     double m_ADCCut_EKLM_Scint_Min;  /**< Minimum ADC cut for EKLM scintillator */
     double m_ADCCut_EKLM_Scint_Max;  /**< Maximum ADC cut for EKLM scintillator */
 
-    // Add this helper function declaration:
     /**
      * Check if a digit passes the ADC charge cut
      * @param charge ADC charge value
@@ -197,8 +197,6 @@ namespace Belle2 {
 
     /**
      * Accumulate EKLM scintillator per-digit T0 estimates.
-     * NEW: Now includes sumW_new and sumWT_new for calibrated weighting,
-     * plus diagnostic accumulators (nHits, sumPropDist, sumLayer, sumSection, sumSector).
      * Note: EKLM section 1=backward (z<0), section 2=forward (z>0).
      */
     void accumulateEKLM(const RelationVector<KLMHit2d>&, const ExtMap&,
@@ -209,8 +207,6 @@ namespace Belle2 {
 
     /**
      * Accumulate BKLM scintillator per-digit T0 estimates.
-     * NEW: Now includes sumW_new and sumWT_new for calibrated weighting,
-     * plus diagnostic accumulators (nHits, sumPropDist, sumLayer, sumSection, sumSector).
      */
     void accumulateBKLMScint(RelationVector<KLMHit2d>&, const ExtMap&,
                              double& sumW, double& sumWT, double& sumWT2,
@@ -220,11 +216,21 @@ namespace Belle2 {
 
     /**
      * Accumulate BKLM RPC per-digit T0 estimates (filtered by readout direction).
-     * NEW: Now includes sumW_new and sumWT_new for calibrated weighting,
-     * plus diagnostic accumulators (nHits, sumPropDist, sumLayer, sumSection, sumSector).
-     * @param acceptPhi if true, only accumulate phi-readout hits; if false, only z-readout
+     * @param[in]  klmHit2ds    KLM 2D hits associated with the track.
+     * @param[in]  rpcMap       Map of extrapolated RPC hits keyed by module number.
+     * @param[in]  acceptPhi    If true, accumulate phi-readout hits; if false, z-readout.
+     * @param[out] sumW         Sum of inverse-variance weights.
+     * @param[out] sumWT        Sum of weight times time.
+     * @param[out] sumWT2       Sum of weight times time squared.
+     * @param[out] sumW_new     Sum of calibrated inverse-variance weights.
+     * @param[out] sumWT_new    Sum of calibrated weight times time.
+     * @param[out] nHits        Number of accepted hits.
+     * @param[out] sumPropDist  Sum of propagation distances [cm].
+     * @param[out] sumLayer     Sum of layer numbers.
+     * @param[out] sumSection   Sum of section indices.
+     * @param[out] sumSector    Sum of sector indices.
      */
-    void accumulateBKLMRPCFiltered(RelationVector<KLMHit2d>&, const ExtMap&,
+    void accumulateBKLMRPCFiltered(RelationVector<KLMHit2d>& klmHit2ds, const ExtMap& rpcMap,
                                    bool acceptPhi,
                                    double& sumW, double& sumWT, double& sumWT2,
                                    double& sumW_new, double& sumWT_new,
@@ -276,8 +282,10 @@ namespace Belle2 {
     /** Parent directory inside the ROOT file (HistoManager) for this module. */
     std::string m_histDirName;
 
-    /** Subdirectory names for uncorrected and truth-corrected histograms, created under m_histDirName. */
+    /** Subdirectory name for uncorrected timing histograms. */
     std::string m_histSubdirUncorr{"uncorrected"};
+
+    /** Subdirectory name for truth-corrected timing histograms. */
     std::string m_histSubdirCorr{"truth_corrected"};
 
     /** If true, duplicate and fill truth-corrected timing histograms when MC truth Event T0 is present. */
@@ -304,13 +312,15 @@ namespace Belle2 {
     /** If true, also form cross-subdet pulls using the same track. */
     bool m_PullsUseSameTrackCross{false};
 
-    /* ---------- Geometry / conditions ---------- */
+    /* Geometry and conditions. */
 
     /** BKLM geometry. */
     Belle2::bklm::GeometryPar* m_geoParB{nullptr};
 
-    /** EKLM geometry and transforms. */
+    /** EKLM geometry data. */
     const Belle2::EKLM::GeometryData* m_geoParE{nullptr};
+
+    /** EKLM strip transformation data. */
     Belle2::EKLM::TransformData* m_transformE{nullptr};
 
     /** Element numbering helpers. */
@@ -322,16 +332,20 @@ namespace Belle2 {
     /** NEW: Per-hit time resolution for EventT0 estimation. */
     DBObjPtr<KLMEventT0HitResolution> m_eventT0HitResolution;
 
-    /* ---------- Inputs ---------- */
+    /* Inputs. */
 
-    /** Selected particle list and tracks (for relations to KLMHit2d / ExtHit). */
+    /** Selected muon particle list. */
     StoreObjPtr<ParticleList> m_MuonList;
+
+    /** Reconstructed tracks. */
     StoreArray<Track> m_tracks;
 
-    /* ---------- Working buffers (reused each event) ---------- */
+    /* Working buffers. */
 
-    /** Extrapolated hits keyed by channel (scint) and by module (RPC). */
+    /** Extrapolated hits keyed by channel number (scintillator). */
     ExtMap m_extScint;
+
+    /** Extrapolated hits keyed by module number (RPC). */
     ExtMap m_extRPC;
 
     /** Optional seed from CDC (for logging only). */
@@ -340,255 +354,450 @@ namespace Belle2 {
     /** Cached truth Event T0 for this event (ns). NAN if not available. */
     double m_truthT0{std::numeric_limits<double>::quiet_NaN()};
 
-    /* ---------- Monitoring histograms ---------- */
+    /* Monitoring histograms. */
 
-    /* Diagnostics (uncorrected only) */
-    TH1I* m_hNumKLM2DPerTrack{nullptr};          // h_nKLM2d_pertrk
-    TH1I* m_hNumDigitsPerB1dRPC{nullptr};        // h_nDigits_perB1d_rpc
-    TH1I* m_hNumDigitsPerB1dScint{nullptr};      // h_nDigits_perB1d_scint
-    TH1I* m_hNumDigitsPerE2dScint{nullptr};      // h_nDigits_perE2d_scint
-    TH1D* m_hDigitCharge_BKLM_Scint{nullptr};    // h_digitQ_bklm_scint
-    TH1D* m_hDigitCharge_EKLM_Scint{nullptr};    // h_digitQ_eklm_scint
+    /** Number of KLM 2D hits per track. */
+    TH1I* m_hNumKLM2DPerTrack{nullptr};
 
-    // Per-track diagnostics for pull validation
-    TH1I* m_hNHits_PerTrack_BKLM_Scint{nullptr}; // h_nhits_pertrk_bklm_scint
-    TH1I* m_hNHits_PerTrack_EKLM_Scint{nullptr}; // h_nhits_pertrk_eklm_scint
-    TH1D* m_hSEM_PerTrack_BKLM_Scint{nullptr};   // h_sem_pertrk_bklm_scint
-    TH1D* m_hSEM_PerTrack_EKLM_Scint{nullptr};   // h_sem_pertrk_eklm_scint
+    /** Number of digits per BKLM RPC 1D hit. */
+    TH1I* m_hNumDigitsPerB1dRPC{nullptr};
 
-    /* Sample type and truth t0 monitors (booked if m_fillSampleTypeFlag) */
-    TH1I* m_hSampleType{nullptr};                // h_sample_type (bin 1: Data, bin 2: MC)
-    TH1D* m_hTruthT0{nullptr};                   // h_truth_t0 (ns), MC only
+    /** Number of digits per BKLM scintillator 1D hit. */
+    TH1I* m_hNumDigitsPerB1dScint{nullptr};
 
-    /* --- Uncorrected timing histograms (in <dir>/uncorrected) --- */
+    /** Number of digits per EKLM scintillator 2D hit. */
+    TH1I* m_hNumDigitsPerE2dScint{nullptr};
 
-    // Per-track T0 distributions (per category)
-    TH1D* m_hT0Trk_BKLM_Scint{nullptr};          // h_t0trk_bklm_scint
-    TH1D* m_hT0Trk_BKLM_RPC{nullptr};            // h_t0trk_bklm_rpc
-    TH1D* m_hT0Trk_EKLM_Scint{nullptr};          // h_t0trk_eklm_scint
+    /** ADC charge distribution for BKLM scintillator digits. */
+    TH1D* m_hDigitCharge_BKLM_Scint{nullptr};
 
-    // Per-event T0 (track-average) MEAN
-    TH1D* m_hT0Evt_TrkAvg_BKLM_Scint{nullptr};   // h_t0evt_trkavg_bklm_scint
-    TH1D* m_hT0Evt_TrkAvg_BKLM_RPC{nullptr};     // h_t0evt_trkavg_bklm_rpc
-    TH1D* m_hT0Evt_TrkAvg_EKLM_Scint{nullptr};   // h_t0evt_trkavg_eklm_scint
-    TH1D* m_hT0Evt_TrkAvg_All{nullptr};          // h_t0evt_trkavg_all
-    // Per-event T0 (track-average) SEM
-    TH1D* m_hT0Evt_TrkAvg_BKLM_Scint_SEM{nullptr};  // h_t0evt_trkavg_bklm_scint_sem
-    TH1D* m_hT0Evt_TrkAvg_BKLM_RPC_SEM{nullptr};    // h_t0evt_trkavg_bklm_rpc_sem
-    TH1D* m_hT0Evt_TrkAvg_EKLM_Scint_SEM{nullptr};  // h_t0evt_trkavg_eklm_scint_sem
-    TH1D* m_hT0Evt_TrkAvg_All_SEM{nullptr};         // h_t0evt_trkavg_all_sem
+    /** ADC charge distribution for EKLM scintillator digits. */
+    TH1D* m_hDigitCharge_EKLM_Scint{nullptr};
 
-    // Per-event T0 (hit-average) MEAN
-    TH1D* m_hT0Evt_HitAvg_BKLM_Scint{nullptr};   // h_t0evt_hitavg_bklm_scint
-    TH1D* m_hT0Evt_HitAvg_BKLM_RPC{nullptr};     // h_t0evt_hitavg_bklm_rpc
-    TH1D* m_hT0Evt_HitAvg_EKLM_Scint{nullptr};   // h_t0evt_hitavg_eklm_scint
-    TH1D* m_hT0Evt_HitAvg_All{nullptr};          // h_t0evt_hitavg_all
-    // Per-event T0 (hit-average) SEM
-    TH1D* m_hT0Evt_HitAvg_BKLM_Scint_SEM{nullptr};  // h_t0evt_hitavg_bklm_scint_sem
-    TH1D* m_hT0Evt_HitAvg_BKLM_RPC_SEM{nullptr};    // h_t0evt_hitavg_bklm_rpc_sem
-    TH1D* m_hT0Evt_HitAvg_EKLM_Scint_SEM{nullptr};  // h_t0evt_hitavg_eklm_scint_sem
-    TH1D* m_hT0Evt_HitAvg_All_SEM{nullptr};         // h_t0evt_hitavg_all_sem
+    /* Per-track diagnostics. */
 
-    // Final-source audit (uncorrected): 1=B only, 2=E only, 3=R only, 4=B+E, 5=B+R, 6=E+R, 7=B+E+R
-    TH1I* m_hFinalSource{nullptr};                  // h_final_source
+    /** Number of BKLM scintillator hits per track. */
+    TH1I* m_hNHits_PerTrack_BKLM_Scint{nullptr};
 
-    // Optional dimuon ΔT0 (uncorrected only)
-    TH1D* m_hDimuonDeltaT0{nullptr};                // h_dimuon_delta_t0
+    /** Number of EKLM scintillator hits per track. */
+    TH1I* m_hNHits_PerTrack_EKLM_Scint{nullptr};
+
+    /** T0 standard error of mean per track for BKLM scintillator [ns]. */
+    TH1D* m_hSEM_PerTrack_BKLM_Scint{nullptr};
+
+    /** T0 standard error of mean per track for EKLM scintillator [ns]. */
+    TH1D* m_hSEM_PerTrack_EKLM_Scint{nullptr};
+
+    /** Sample type counter (bin 1: Data, bin 2: MC). */
+    TH1I* m_hSampleType{nullptr};
+
+    /** MC truth Event T0 [ns]. */
+    TH1D* m_hTruthT0{nullptr};
+
+    /** Per-track T0 for BKLM scintillator [ns]. */
+    TH1D* m_hT0Trk_BKLM_Scint{nullptr};
+
+    /** Per-track T0 for BKLM RPC [ns]. */
+    TH1D* m_hT0Trk_BKLM_RPC{nullptr};
+
+    /** Per-track T0 for EKLM scintillator [ns]. */
+    TH1D* m_hT0Trk_EKLM_Scint{nullptr};
+
+    /** Per-event T0 track-average for BKLM scintillator (mean) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_BKLM_Scint{nullptr};
+
+    /** Per-event T0 track-average for BKLM RPC (mean) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_BKLM_RPC{nullptr};
+
+    /** Per-event T0 track-average for EKLM scintillator (mean) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_EKLM_Scint{nullptr};
+
+    /** Per-event T0 track-average combined (mean) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_All{nullptr};
+
+    /** Per-event T0 track-average for BKLM scintillator (SEM) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_BKLM_Scint_SEM{nullptr};
+
+    /** Per-event T0 track-average for BKLM RPC (SEM) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_BKLM_RPC_SEM{nullptr};
+
+    /** Per-event T0 track-average for EKLM scintillator (SEM) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_EKLM_Scint_SEM{nullptr};
+
+    /** Per-event T0 track-average combined (SEM) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_All_SEM{nullptr};
+
+    /** Per-event T0 hit-average for BKLM scintillator (mean) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_BKLM_Scint{nullptr};
+
+    /** Per-event T0 hit-average for BKLM RPC (mean) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_BKLM_RPC{nullptr};
+
+    /** Per-event T0 hit-average for EKLM scintillator (mean) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_EKLM_Scint{nullptr};
+
+    /** Per-event T0 hit-average combined (mean) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_All{nullptr};
+
+    /** Per-event T0 hit-average for BKLM scintillator (SEM) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_BKLM_Scint_SEM{nullptr};
+
+    /** Per-event T0 hit-average for BKLM RPC (SEM) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_BKLM_RPC_SEM{nullptr};
+
+    /** Per-event T0 hit-average for EKLM scintillator (SEM) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_EKLM_Scint_SEM{nullptr};
+
+    /** Per-event T0 hit-average combined (SEM) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_All_SEM{nullptr};
+
+    /** Final EventT0 source selection (7 bins). */
+    TH1I* m_hFinalSource{nullptr};
+
+    /** Dimuon delta-T0 distribution [ns]. */
+    TH1D* m_hDimuonDeltaT0{nullptr};
+
+    /** Dimuon delta-T0 for BKLM scintillator [ns]. */
     TH1D* m_hDimuonDeltaT0_B{nullptr};
+
+    /** Dimuon delta-T0 for BKLM RPC [ns]. */
     TH1D* m_hDimuonDeltaT0_R{nullptr};
+
+    /** Dimuon delta-T0 for EKLM scintillator [ns]. */
     TH1D* m_hDimuonDeltaT0_E{nullptr};
 
-    // Dimuon ΔT0 for combined categories (matching final event T0 styles)
-    TH1D* m_hDimuonDeltaT0_ScintOnly{nullptr};      // h_dimuon_delta_t0_scint_only (BKLM+EKLM scint per track)
-    TH1D* m_hDimuonDeltaT0_WithRPC{nullptr};        // h_dimuon_delta_t0_with_rpc (all detectors per track)
-    TH1D* m_hDimuonDeltaT0_WithRPCDir{nullptr};     // h_dimuon_delta_t0_with_rpc_dir (RPC phi/z separate)
+    /** Dimuon delta-T0 for scintillator-only combination [ns]. */
+    TH1D* m_hDimuonDeltaT0_ScintOnly{nullptr};
 
-    // T0 resolution summaries (filled in endRun from Gaussian fits to ΔT0)
-    // Per-track resolution: σ_track = σ(ΔT0)/√2
-    // Event T0 resolution (combining 2 tracks): σ_event = σ_track/√2 = σ(ΔT0)/2
-    TH1D* m_hPerTrackT0Resolution{nullptr};        // h_per_track_t0_resolution: σ(ΔT0)/√2
-    TH1D* m_hEventT0Resolution{nullptr};           // h_event_t0_resolution: σ(ΔT0)/2
+    /** Dimuon delta-T0 with all detectors [ns]. */
+    TH1D* m_hDimuonDeltaT0_WithRPC{nullptr};
 
-    // Per-digit timing components (uncorrected)
-    TH1D* m_hTrec_BKLM_Scint{nullptr};              // h_Trec_bklm_scint
-    TH1D* m_hTcable_BKLM_Scint{nullptr};            // h_Tcable_bklm_scint
-    TH1D* m_hTprop_BKLM_Scint{nullptr};             // h_Tprop_bklm_scint
-    TH1D* m_hTfly_BKLM_Scint{nullptr};              // h_Tfly_bklm_scint
+    /** Dimuon delta-T0 with RPC phi/z separate [ns]. */
+    TH1D* m_hDimuonDeltaT0_WithRPCDir{nullptr};
 
-    TH1D* m_hTrec_BKLM_RPC{nullptr};                // h_Trec_bklm_rpc
-    TH1D* m_hTcable_BKLM_RPC{nullptr};              // h_Tcable_bklm_rpc
-    TH1D* m_hTprop_BKLM_RPC{nullptr};               // h_Tprop_bklm_rpc
-    TH1D* m_hTfly_BKLM_RPC{nullptr};                // h_Tfly_bklm_rpc
+    /** Per-track T0 resolution from dimuon fits [ns]. */
+    TH1D* m_hPerTrackT0Resolution{nullptr};
 
-    TH1D* m_hTrec_EKLM_Scint{nullptr};              // h_Trec_eklm_scint
-    TH1D* m_hTcable_EKLM_Scint{nullptr};            // h_Tcable_eklm_scint
-    TH1D* m_hTprop_EKLM_Scint{nullptr};             // h_Tprop_eklm_scint
-    TH1D* m_hTfly_EKLM_Scint{nullptr};              // h_Tfly_eklm_scint
+    /** Per-event T0 resolution from dimuon fits [ns]. */
+    TH1D* m_hEventT0Resolution{nullptr};
 
-    /* --- Truth-corrected timing histograms (in <dir>/truth_corrected) ---
-     * Names are identical to uncorrected counterparts but live in a different subdirectory.
-     * They are filled only when MC truth Event T0 is available and m_fillTruthCorrectedTiming is true.
-     * Component histograms (T_rec, T_cable, T_prop, T_fly) and SEMs are mirrored (no truth subtraction).
-     */
+    /** Reconstructed time for BKLM scintillator digits [ns]. */
+    TH1D* m_hTrec_BKLM_Scint{nullptr};
 
-    // Per-track T0 distributions (per category, corrected = T0 - T0_true)
-    TH1D* m_hT0Trk_BKLM_Scint_corr{nullptr};        // h_t0trk_bklm_scint
-    TH1D* m_hT0Trk_BKLM_RPC_corr{nullptr};          // h_t0trk_bklm_rpc
-    TH1D* m_hT0Trk_EKLM_Scint_corr{nullptr};        // h_t0trk_eklm_scint
+    /** Cable delay for BKLM scintillator digits [ns]. */
+    TH1D* m_hTcable_BKLM_Scint{nullptr};
 
-    // Per-event T0 (track-average, corrected) MEAN and mirrored SEM
-    TH1D* m_hT0Evt_TrkAvg_BKLM_Scint_corr{nullptr}; // h_t0evt_trkavg_bklm_scint
-    TH1D* m_hT0Evt_TrkAvg_BKLM_RPC_corr{nullptr};   // h_t0evt_trkavg_bklm_rpc
-    TH1D* m_hT0Evt_TrkAvg_EKLM_Scint_corr{nullptr}; // h_t0evt_trkavg_eklm_scint
-    TH1D* m_hT0Evt_TrkAvg_All_corr{nullptr};        // h_t0evt_trkavg_all
-    TH1D* m_hT0Evt_TrkAvg_BKLM_Scint_SEM_corr{nullptr}; // h_t0evt_trkavg_bklm_scint_sem
-    TH1D* m_hT0Evt_TrkAvg_BKLM_RPC_SEM_corr{nullptr};   // h_t0evt_trkavg_bklm_rpc_sem
-    TH1D* m_hT0Evt_TrkAvg_EKLM_Scint_SEM_corr{nullptr}; // h_t0evt_trkavg_eklm_scint_sem
-    TH1D* m_hT0Evt_TrkAvg_All_SEM_corr{nullptr};        // h_t0evt_trkavg_all_sem
+    /** Propagation time for BKLM scintillator digits [ns]. */
+    TH1D* m_hTprop_BKLM_Scint{nullptr};
 
-    // Per-event T0 (hit-average, corrected) MEAN and mirrored SEM
-    TH1D* m_hT0Evt_HitAvg_BKLM_Scint_corr{nullptr}; // h_t0evt_hitavg_bklm_scint
-    TH1D* m_hT0Evt_HitAvg_BKLM_RPC_corr{nullptr};   // h_t0evt_hitavg_bklm_rpc
-    TH1D* m_hT0Evt_HitAvg_EKLM_Scint_corr{nullptr}; // h_t0evt_hitavg_eklm_scint
-    TH1D* m_hT0Evt_HitAvg_All_corr{nullptr};        // h_t0evt_hitavg_all
-    TH1D* m_hT0Evt_HitAvg_BKLM_Scint_SEM_corr{nullptr}; // h_t0evt_hitavg_bklm_scint_sem
-    TH1D* m_hT0Evt_HitAvg_BKLM_RPC_SEM_corr{nullptr};   // h_t0evt_hitavg_bklm_rpc_sem
-    TH1D* m_hT0Evt_HitAvg_EKLM_Scint_SEM_corr{nullptr}; // h_t0evt_hitavg_eklm_scint_sem
-    TH1D* m_hT0Evt_HitAvg_All_SEM_corr{nullptr};        // h_t0evt_hitavg_all_sem
+    /** Flight time for BKLM scintillator digits [ns]. */
+    TH1D* m_hTfly_BKLM_Scint{nullptr};
 
-    // Per-digit timing components (truth-corrected dir; mirrored values)
-    TH1D* m_hTrec_BKLM_Scint_corr{nullptr};         // h_Trec_bklm_scint
-    TH1D* m_hTcable_BKLM_Scint_corr{nullptr};       // h_Tcable_bklm_scint
-    TH1D* m_hTprop_BKLM_Scint_corr{nullptr};        // h_Tprop_bklm_scint
-    TH1D* m_hTfly_BKLM_Scint_corr{nullptr};         // h_Tfly_bklm_scint
+    /** Reconstructed time for BKLM RPC digits [ns]. */
+    TH1D* m_hTrec_BKLM_RPC{nullptr};
 
-    TH1D* m_hTrec_BKLM_RPC_corr{nullptr};           // h_Trec_bklm_rpc
-    TH1D* m_hTcable_BKLM_RPC_corr{nullptr};         // h_Tcable_bklm_rpc
-    TH1D* m_hTprop_BKLM_RPC_corr{nullptr};          // h_Tprop_bklm_rpc
-    TH1D* m_hTfly_BKLM_RPC_corr{nullptr};           // h_Tfly_bklm_rpc
+    /** Cable delay for BKLM RPC digits [ns]. */
+    TH1D* m_hTcable_BKLM_RPC{nullptr};
 
-    TH1D* m_hTrec_EKLM_Scint_corr{nullptr};         // h_Trec_eklm_scint
-    TH1D* m_hTcable_EKLM_Scint_corr{nullptr};       // h_Tcable_eklm_scint
-    TH1D* m_hTprop_EKLM_Scint_corr{nullptr};        // h_Tprop_eklm_scint
-    TH1D* m_hTfly_EKLM_Scint_corr{nullptr};         // h_Tfly_eklm_scint
+    /** Propagation time for BKLM RPC digits [ns]. */
+    TH1D* m_hTprop_BKLM_RPC{nullptr};
 
-    /* ---------- Pull histograms (uncorrected) ---------- */
+    /** Flight time for BKLM RPC digits [ns]. */
+    TH1D* m_hTfly_BKLM_RPC{nullptr};
 
-    // Same-subdetector pulls: (T0_i − T0_j) / sqrt(SEM_i^2 + SEM_j^2)
-    TH1D* m_hPull_BKLM_Scint{nullptr};              // h_pull_bklm_scint
-    TH1D* m_hPull_BKLM_RPC{nullptr};                // h_pull_bklm_rpc (combined phi+z for backward compat)
-    TH1D* m_hPull_BKLM_RPC_Phi{nullptr};            // h_pull_bklm_rpc_phi (direction-specific)
-    TH1D* m_hPull_BKLM_RPC_Z{nullptr};              // h_pull_bklm_rpc_z (direction-specific)
-    TH1D* m_hPull_EKLM_Scint{nullptr};              // h_pull_eklm_scint
+    /** Reconstructed time for EKLM scintillator digits [ns]. */
+    TH1D* m_hTrec_EKLM_Scint{nullptr};
 
-    // Cross-subdetector pulls
-    TH1D* m_hPull_B_vs_E{nullptr};                  // h_pull_bklm_scint_vs_eklm_scint
-    TH1D* m_hPull_B_vs_R{nullptr};                  // h_pull_bklm_scint_vs_bklm_rpc
-    TH1D* m_hPull_E_vs_R{nullptr};                  // h_pull_eklm_scint_vs_bklm_rpc
+    /** Cable delay for EKLM scintillator digits [ns]. */
+    TH1D* m_hTcable_EKLM_Scint{nullptr};
 
-    /* ---------- Pairwise sector pull histograms ---------- */
+    /** Propagation time for EKLM scintillator digits [ns]. */
+    TH1D* m_hTprop_EKLM_Scint{nullptr};
 
-    // Sector counts for pairwise analysis
-    static constexpr int c_nBKLMSectors = 8;        // BKLM sectors 0-7
-    static constexpr int c_nEKLMSectors = 4;        // EKLM sectors 1-4
+    /** Flight time for EKLM scintillator digits [ns]. */
+    TH1D* m_hTfly_EKLM_Scint{nullptr};
 
-    // Pairwise sector pull histograms: pull_sector_i_vs_sector_j
-    // For each pair (i,j), stores pulls computed from track1 hits in sector i vs track2 hits in sector j
-    // BKLM Scintillator: 8x8 matrix
+    /** Truth-corrected per-track T0 for BKLM scintillator [ns]. */
+    TH1D* m_hT0Trk_BKLM_Scint_corr{nullptr};
+
+    /** Truth-corrected per-track T0 for BKLM RPC [ns]. */
+    TH1D* m_hT0Trk_BKLM_RPC_corr{nullptr};
+
+    /** Truth-corrected per-track T0 for EKLM scintillator [ns]. */
+    TH1D* m_hT0Trk_EKLM_Scint_corr{nullptr};
+
+    /** Truth-corrected per-event T0 track-average for BKLM scintillator (mean) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_BKLM_Scint_corr{nullptr};
+
+    /** Truth-corrected per-event T0 track-average for BKLM RPC (mean) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_BKLM_RPC_corr{nullptr};
+
+    /** Truth-corrected per-event T0 track-average for EKLM scintillator (mean) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_EKLM_Scint_corr{nullptr};
+
+    /** Truth-corrected per-event T0 track-average combined (mean) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_All_corr{nullptr};
+
+    /** Truth-corrected per-event T0 track-average for BKLM scintillator (SEM) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_BKLM_Scint_SEM_corr{nullptr};
+
+    /** Truth-corrected per-event T0 track-average for BKLM RPC (SEM) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_BKLM_RPC_SEM_corr{nullptr};
+
+    /** Truth-corrected per-event T0 track-average for EKLM scintillator (SEM) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_EKLM_Scint_SEM_corr{nullptr};
+
+    /** Truth-corrected per-event T0 track-average combined (SEM) [ns]. */
+    TH1D* m_hT0Evt_TrkAvg_All_SEM_corr{nullptr};
+
+    /** Truth-corrected per-event T0 hit-average for BKLM scintillator (mean) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_BKLM_Scint_corr{nullptr};
+
+    /** Truth-corrected per-event T0 hit-average for BKLM RPC (mean) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_BKLM_RPC_corr{nullptr};
+
+    /** Truth-corrected per-event T0 hit-average for EKLM scintillator (mean) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_EKLM_Scint_corr{nullptr};
+
+    /** Truth-corrected per-event T0 hit-average combined (mean) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_All_corr{nullptr};
+
+    /** Truth-corrected per-event T0 hit-average for BKLM scintillator (SEM) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_BKLM_Scint_SEM_corr{nullptr};
+
+    /** Truth-corrected per-event T0 hit-average for BKLM RPC (SEM) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_BKLM_RPC_SEM_corr{nullptr};
+
+    /** Truth-corrected per-event T0 hit-average for EKLM scintillator (SEM) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_EKLM_Scint_SEM_corr{nullptr};
+
+    /** Truth-corrected per-event T0 hit-average combined (SEM) [ns]. */
+    TH1D* m_hT0Evt_HitAvg_All_SEM_corr{nullptr};
+
+    /** Truth-corrected reconstructed time for BKLM scintillator digits [ns]. */
+    TH1D* m_hTrec_BKLM_Scint_corr{nullptr};
+
+    /** Truth-corrected cable delay for BKLM scintillator digits [ns]. */
+    TH1D* m_hTcable_BKLM_Scint_corr{nullptr};
+
+    /** Truth-corrected propagation time for BKLM scintillator digits [ns]. */
+    TH1D* m_hTprop_BKLM_Scint_corr{nullptr};
+
+    /** Truth-corrected flight time for BKLM scintillator digits [ns]. */
+    TH1D* m_hTfly_BKLM_Scint_corr{nullptr};
+
+    /** Truth-corrected reconstructed time for BKLM RPC digits [ns]. */
+    TH1D* m_hTrec_BKLM_RPC_corr{nullptr};
+
+    /** Truth-corrected cable delay for BKLM RPC digits [ns]. */
+    TH1D* m_hTcable_BKLM_RPC_corr{nullptr};
+
+    /** Truth-corrected propagation time for BKLM RPC digits [ns]. */
+    TH1D* m_hTprop_BKLM_RPC_corr{nullptr};
+
+    /** Truth-corrected flight time for BKLM RPC digits [ns]. */
+    TH1D* m_hTfly_BKLM_RPC_corr{nullptr};
+
+    /** Truth-corrected reconstructed time for EKLM scintillator digits [ns]. */
+    TH1D* m_hTrec_EKLM_Scint_corr{nullptr};
+
+    /** Truth-corrected cable delay for EKLM scintillator digits [ns]. */
+    TH1D* m_hTcable_EKLM_Scint_corr{nullptr};
+
+    /** Truth-corrected propagation time for EKLM scintillator digits [ns]. */
+    TH1D* m_hTprop_EKLM_Scint_corr{nullptr};
+
+    /** Truth-corrected flight time for EKLM scintillator digits [ns]. */
+    TH1D* m_hTfly_EKLM_Scint_corr{nullptr};
+
+    /* Pull histograms. */
+
+    /** Pull distribution for BKLM scintillator. */
+    TH1D* m_hPull_BKLM_Scint{nullptr};
+
+    /** Pull distribution for BKLM RPC (phi+z combined). */
+    TH1D* m_hPull_BKLM_RPC{nullptr};
+
+    /** Pull distribution for BKLM RPC phi-readout. */
+    TH1D* m_hPull_BKLM_RPC_Phi{nullptr};
+
+    /** Pull distribution for BKLM RPC z-readout. */
+    TH1D* m_hPull_BKLM_RPC_Z{nullptr};
+
+    /** Pull distribution for EKLM scintillator. */
+    TH1D* m_hPull_EKLM_Scint{nullptr};
+
+    /** Pull distribution: BKLM scintillator vs EKLM scintillator. */
+    TH1D* m_hPull_B_vs_E{nullptr};
+
+    /** Pull distribution: BKLM scintillator vs BKLM RPC. */
+    TH1D* m_hPull_B_vs_R{nullptr};
+
+    /** Pull distribution: EKLM scintillator vs BKLM RPC. */
+    TH1D* m_hPull_E_vs_R{nullptr};
+
+    /* Pairwise sector pull histograms. */
+
+    /** Number of BKLM sectors. */
+    static constexpr int c_nBKLMSectors = 8;
+
+    /** Number of EKLM sectors per endcap. */
+    static constexpr int c_nEKLMSectors = 4;
+
+    /** Pairwise sector pull histograms for BKLM scintillator. */
     TH1D* m_hPullPairwise_BScint[c_nBKLMSectors][c_nBKLMSectors] {};
-    // EKLM Scintillator cross-endcap: Forward sector vs Backward sector (4x4 matrix)
-    // Index [i][j] = pull for track in forward sector (i+1) vs track in backward sector (j+1)
+
+    /** Pairwise sector pull histograms for EKLM scintillator (forward vs backward). */
     TH1D* m_hPullPairwise_EScint_FwdVsBwd[c_nEKLMSectors][c_nEKLMSectors] {};
-    // RPC Phi: 8x8 matrix
+
+    /** Pairwise sector pull histograms for BKLM RPC phi-readout. */
     TH1D* m_hPullPairwise_RPC_Phi[c_nBKLMSectors][c_nBKLMSectors] {};
-    // RPC Z: 8x8 matrix
+
+    /** Pairwise sector pull histograms for BKLM RPC z-readout. */
     TH1D* m_hPullPairwise_RPC_Z[c_nBKLMSectors][c_nBKLMSectors] {};
 
-    // Summary 2D histograms: bin (i,j) contains fitted mean/sigma from pairwise histogram
-    // BKLM Scintillator
-    TH2D* m_h2PullSummary_BScint_Mean{nullptr};     // Fitted Gaussian mean for each (sector_i, sector_j) pair
-    TH2D* m_h2PullSummary_BScint_Sigma{nullptr};    // Fitted Gaussian sigma for each (sector_i, sector_j) pair
-    // EKLM Scintillator cross-endcap: Forward sector (X-axis) vs Backward sector (Y-axis)
+    /** Pull summary 2D: fitted mean per sector pair (BKLM scintillator). */
+    TH2D* m_h2PullSummary_BScint_Mean{nullptr};
+
+    /** Pull summary 2D: fitted sigma per sector pair (BKLM scintillator). */
+    TH2D* m_h2PullSummary_BScint_Sigma{nullptr};
+
+    /** Pull summary 2D: fitted mean per sector pair (EKLM fwd vs bwd). */
     TH2D* m_h2PullSummary_EScint_FwdVsBwd_Mean{nullptr};
+
+    /** Pull summary 2D: fitted sigma per sector pair (EKLM fwd vs bwd). */
     TH2D* m_h2PullSummary_EScint_FwdVsBwd_Sigma{nullptr};
-    // RPC Phi
+
+    /** Pull summary 2D: fitted mean per sector pair (RPC phi). */
     TH2D* m_h2PullSummary_RPC_Phi_Mean{nullptr};
+
+    /** Pull summary 2D: fitted sigma per sector pair (RPC phi). */
     TH2D* m_h2PullSummary_RPC_Phi_Sigma{nullptr};
-    // RPC Z
+
+    /** Pull summary 2D: fitted mean per sector pair (RPC z). */
     TH2D* m_h2PullSummary_RPC_Z_Mean{nullptr};
+
+    /** Pull summary 2D: fitted sigma per sector pair (RPC z). */
     TH2D* m_h2PullSummary_RPC_Z_Sigma{nullptr};
 
-    // Overall pull summary: one bin per detector category (4 bins)
-    TH1D* m_hPullSummary_Mean{nullptr};             // Mean of each overall pull distribution
-    TH1D* m_hPullSummary_Width{nullptr};            // Sigma of each overall pull distribution
+    /** Overall pull summary: mean per detector category. */
+    TH1D* m_hPullSummary_Mean{nullptr};
 
-    /* ---------- Residual histograms (uncorrected) ---------- */
-    // Mirror of pull histograms but without normalization: ΔT0 = T0_i − T0_j
+    /** Overall pull summary: sigma per detector category. */
+    TH1D* m_hPullSummary_Width{nullptr};
 
-    // Same-subdetector residuals
-    TH1D* m_hResidual_BKLM_Scint{nullptr};          // h_residual_bklm_scint
-    TH1D* m_hResidual_BKLM_RPC{nullptr};            // h_residual_bklm_rpc (combined phi+z)
-    TH1D* m_hResidual_BKLM_RPC_Phi{nullptr};        // h_residual_bklm_rpc_phi (direction-specific)
-    TH1D* m_hResidual_BKLM_RPC_Z{nullptr};          // h_residual_bklm_rpc_z (direction-specific)
-    TH1D* m_hResidual_EKLM_Scint{nullptr};          // h_residual_eklm_scint
+    /* Residual histograms. */
 
-    // Cross-subdetector residuals
-    TH1D* m_hResidual_B_vs_E{nullptr};              // h_residual_bklm_scint_vs_eklm_scint
-    TH1D* m_hResidual_B_vs_R{nullptr};              // h_residual_bklm_scint_vs_bklm_rpc
-    TH1D* m_hResidual_E_vs_R{nullptr};              // h_residual_eklm_scint_vs_bklm_rpc
+    /** Residual (delta-T0) for BKLM scintillator [ns]. */
+    TH1D* m_hResidual_BKLM_Scint{nullptr};
 
-    // Pairwise sector residual histograms (same structure as pulls)
+    /** Residual (delta-T0) for BKLM RPC (phi+z combined) [ns]. */
+    TH1D* m_hResidual_BKLM_RPC{nullptr};
+
+    /** Residual (delta-T0) for BKLM RPC phi-readout [ns]. */
+    TH1D* m_hResidual_BKLM_RPC_Phi{nullptr};
+
+    /** Residual (delta-T0) for BKLM RPC z-readout [ns]. */
+    TH1D* m_hResidual_BKLM_RPC_Z{nullptr};
+
+    /** Residual (delta-T0) for EKLM scintillator [ns]. */
+    TH1D* m_hResidual_EKLM_Scint{nullptr};
+
+    /** Residual: BKLM scintillator vs EKLM scintillator [ns]. */
+    TH1D* m_hResidual_B_vs_E{nullptr};
+
+    /** Residual: BKLM scintillator vs BKLM RPC [ns]. */
+    TH1D* m_hResidual_B_vs_R{nullptr};
+
+    /** Residual: EKLM scintillator vs BKLM RPC [ns]. */
+    TH1D* m_hResidual_E_vs_R{nullptr};
+
+    /** Pairwise sector residual histograms for BKLM scintillator [ns]. */
     TH1D* m_hResidualPairwise_BScint[c_nBKLMSectors][c_nBKLMSectors] {};
+
+    /** Pairwise sector residual histograms for EKLM scintillator (forward vs backward) [ns]. */
     TH1D* m_hResidualPairwise_EScint_FwdVsBwd[c_nEKLMSectors][c_nEKLMSectors] {};
+
+    /** Pairwise sector residual histograms for BKLM RPC phi-readout [ns]. */
     TH1D* m_hResidualPairwise_RPC_Phi[c_nBKLMSectors][c_nBKLMSectors] {};
+
+    /** Pairwise sector residual histograms for BKLM RPC z-readout [ns]. */
     TH1D* m_hResidualPairwise_RPC_Z[c_nBKLMSectors][c_nBKLMSectors] {};
 
-    // Summary 2D histograms for residuals
+    /** Residual summary 2D: fitted mean per sector pair (BKLM scintillator) [ns]. */
     TH2D* m_h2ResidualSummary_BScint_Mean{nullptr};
+
+    /** Residual summary 2D: fitted sigma per sector pair (BKLM scintillator) [ns]. */
     TH2D* m_h2ResidualSummary_BScint_Sigma{nullptr};
+
+    /** Residual summary 2D: fitted mean per sector pair (EKLM fwd vs bwd) [ns]. */
     TH2D* m_h2ResidualSummary_EScint_FwdVsBwd_Mean{nullptr};
+
+    /** Residual summary 2D: fitted sigma per sector pair (EKLM fwd vs bwd) [ns]. */
     TH2D* m_h2ResidualSummary_EScint_FwdVsBwd_Sigma{nullptr};
+
+    /** Residual summary 2D: fitted mean per sector pair (RPC phi) [ns]. */
     TH2D* m_h2ResidualSummary_RPC_Phi_Mean{nullptr};
+
+    /** Residual summary 2D: fitted sigma per sector pair (RPC phi) [ns]. */
     TH2D* m_h2ResidualSummary_RPC_Phi_Sigma{nullptr};
+
+    /** Residual summary 2D: fitted mean per sector pair (RPC z) [ns]. */
     TH2D* m_h2ResidualSummary_RPC_Z_Mean{nullptr};
+
+    /** Residual summary 2D: fitted sigma per sector pair (RPC z) [ns]. */
     TH2D* m_h2ResidualSummary_RPC_Z_Sigma{nullptr};
 
-    // Overall residual summary: one bin per detector category (4 bins)
-    TH1D* m_hResidualSummary_Mean{nullptr};         // Mean of each overall residual distribution
-    TH1D* m_hResidualSummary_Width{nullptr};        // Sigma of each overall residual distribution
+    /** Overall residual summary: mean per detector category [ns]. */
+    TH1D* m_hResidualSummary_Mean{nullptr};
 
-    /* ---------- Cross-detector ΔT0 analysis (by region) ---------- */
-    // Regions: 0=EKLM Backward, 1=EKLM Forward, 2=BKLM RPC, 3=BKLM Scint
-    // This answers: "Are there biases when tracks are in different subdetectors?"
+    /** Overall residual summary: sigma per detector category [ns]. */
+    TH1D* m_hResidualSummary_Width{nullptr};
 
-    static constexpr int c_nDetectorRegions = 4;    // EKLM Bwd, EKLM Fwd, BKLM RPC, BKLM Scint
+    /* Cross-detector delta-T0 analysis. */
 
-    // 4x4 matrix of ΔT0 histograms for each region combination
-    // [i][j] = ΔT0 for track in region i vs track in region j
+    /** Number of detector regions for cross-detector analysis. */
+    static constexpr int c_nDetectorRegions = 4;
+
+    /** Delta-T0 histograms for each detector region pair [ns]. */
     TH1D* m_hDeltaT0_DetectorCombo[c_nDetectorRegions][c_nDetectorRegions] {};
 
-    // 2D summary histograms: fitted mean and sigma for each region combination
+    /** Delta-T0 summary 2D: fitted mean per detector region pair [ns]. */
     TH2D* m_h2DeltaT0_DetectorCombo_Mean{nullptr};
+
+    /** Delta-T0 summary 2D: fitted sigma per detector region pair [ns]. */
     TH2D* m_h2DeltaT0_DetectorCombo_Sigma{nullptr};
+
+    /** Delta-T0 summary 2D: number of entries per detector region pair. */
     TH2D* m_h2DeltaT0_DetectorCombo_Entries{nullptr};
 
-    /* ---------- Multiple Final EventT0 combinations ---------- */
+    /* Final EventT0 combinations. */
 
-    // Scintillator only (BKLM Scint + EKLM Scint) - default, no RPC
-    TH1D* m_hT0Evt_Final_ScintOnly{nullptr};        // h_t0evt_final_scint_only
-    TH1D* m_hT0Evt_Final_ScintOnly_SEM{nullptr};    // h_t0evt_final_scint_only_sem
+    /** Final EventT0 scintillator-only combination (mean) [ns]. */
+    TH1D* m_hT0Evt_Final_ScintOnly{nullptr};
 
-    // Scintillator + RPC combined (all detectors, RPC phi+z combined)
-    TH1D* m_hT0Evt_Final_WithRPC{nullptr};          // h_t0evt_final_with_rpc
-    TH1D* m_hT0Evt_Final_WithRPC_SEM{nullptr};      // h_t0evt_final_with_rpc_sem
+    /** Final EventT0 scintillator-only combination (SEM) [ns]. */
+    TH1D* m_hT0Evt_Final_ScintOnly_SEM{nullptr};
 
-    // Scintillator + RPC with directions separate (phi and z as separate categories)
-    TH1D* m_hT0Evt_Final_WithRPCDir{nullptr};       // h_t0evt_final_with_rpc_dir
-    TH1D* m_hT0Evt_Final_WithRPCDir_SEM{nullptr};   // h_t0evt_final_with_rpc_dir_sem
+    /** Final EventT0 with all detectors (mean) [ns]. */
+    TH1D* m_hT0Evt_Final_WithRPC{nullptr};
 
-    // Truth-corrected versions (MC only)
+    /** Final EventT0 with all detectors (SEM) [ns]. */
+    TH1D* m_hT0Evt_Final_WithRPC_SEM{nullptr};
+
+    /** Final EventT0 with RPC phi/z separate (mean) [ns]. */
+    TH1D* m_hT0Evt_Final_WithRPCDir{nullptr};
+
+    /** Final EventT0 with RPC phi/z separate (SEM) [ns]. */
+    TH1D* m_hT0Evt_Final_WithRPCDir_SEM{nullptr};
+
+    /** Truth-corrected final EventT0 scintillator-only combination [ns]. */
     TH1D* m_hT0Evt_Final_ScintOnly_corr{nullptr};
+
+    /** Truth-corrected final EventT0 with all detectors [ns]. */
     TH1D* m_hT0Evt_Final_WithRPC_corr{nullptr};
+
+    /** Truth-corrected final EventT0 with RPC phi/z separate [ns]. */
     TH1D* m_hT0Evt_Final_WithRPCDir_corr{nullptr};
   };
 

@@ -1,16 +1,15 @@
-// klm/modules/KLMEventT0Estimator/src/KLMEventT0EstimatorModule.cc
 /**************************************************************************
- * basf2 (Belle II Analysis Software Framework)
- * Author: The Belle II Collaboration
- *
- * See git log for contributors and copyright holders.
- * This file is licensed under LGPL-3.0, see LICENSE.md.
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* Own header */
+/* Own header. */
 #include <klm/modules/KLMEventT0Estimator/KLMEventT0EstimatorModule.h>
 
-/* KLM geometry & dataobjects */
+/* KLM headers. */
 #include <klm/bklm/geometry/Module.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/KLMHit2d.h>
@@ -20,25 +19,19 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
-
-/* EKLM geometry */
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
-
-/* KLM conditions */
 #include <klm/dbobjects/KLMTimeConstants.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMEventT0HitResolution.h>
 
-/* Tracking / analysis */
+/* Basf2 headers. */
 #include <mdst/dataobjects/Track.h>
 #include <framework/dataobjects/EventExtraInfo.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-
-/* Framework */
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -47,14 +40,14 @@
 #include <framework/dataobjects/EventT0.h>
 #include <framework/dataobjects/MCInitialParticles.h>
 
-/* ROOT */
+/* ROOT headers. */
 #include <TDirectory.h>
 #include <TF1.h>
 #include <TH1D.h>
 #include <TH1I.h>
 #include <TH2D.h>
 
-/* C++ */
+/* C++ headers. */
 #include <cmath>
 #include <algorithm>
 #include <vector>
@@ -66,9 +59,9 @@ using namespace Belle2;
 using namespace Belle2::bklm;
 using namespace Belle2::EKLM;
 
-REG_MODULE(KLMEventT0Estimator)
+REG_MODULE(KLMEventT0Estimator);
 
-/* ------------------------------ ctor/dtor ------------------------------ */
+/* Constructor and destructor. */
 
 KLMEventT0EstimatorModule::KLMEventT0EstimatorModule() :
   HistoModule(),
@@ -146,7 +139,7 @@ KLMEventT0EstimatorModule::~KLMEventT0EstimatorModule()
   delete m_transformE;
 }
 
-/* ------------------------- histogram definition ------------------------ */
+/* Histogram definition. */
 
 void KLMEventT0EstimatorModule::defineHisto()
 {
@@ -167,7 +160,7 @@ void KLMEventT0EstimatorModule::defineHisto()
     return new TH1D(n, t, nb, lo, hi);
   };
 
-  /* -------------------- UNCORRECTED: organized into subdirectories -------------------- */
+  /* Uncorrected timing histograms. */
   {
     TDirectory::TContext ctxUnc{gDirectory, d_unc};
 
@@ -657,7 +650,7 @@ void KLMEventT0EstimatorModule::defineHisto()
     } // end final/ directory
   } // end uncorrected/ directory
 
-  /* -------------------- TRUTH-CORRECTED: timing only (MC) -------------------- */
+  /* Truth-corrected timing histograms. */
   if (m_fillTruthCorrectedTiming) {
     TDirectory::TContext ctxCor{gDirectory, d_cor};
 
@@ -734,7 +727,7 @@ void KLMEventT0EstimatorModule::defineHisto()
   }
 }
 
-/* ------------------------------ lifecycle ------------------------------ */
+/* Lifecycle. */
 
 void KLMEventT0EstimatorModule::initialize()
 {
@@ -1103,7 +1096,7 @@ void KLMEventT0EstimatorModule::endRun()
 
 void KLMEventT0EstimatorModule::terminate() {}
 
-/* ---------------------------- helper methods --------------------------- */
+/* Helper methods. */
 
 bool KLMEventT0EstimatorModule::passesADCCut(double charge, int subdetector, int layer, bool inRPC) const
 {
@@ -1248,7 +1241,7 @@ void KLMEventT0EstimatorModule::collectExtrapolatedHits(const Track* track,
   }
 }
 
-/* ====================== per-subdetector accumulators ===================== */
+/* Per-subdetector accumulators. */
 
 namespace {
   // OLD: Unweighted (for empirical variance calculation)
@@ -1655,7 +1648,7 @@ void KLMEventT0EstimatorModule::accumulateBKLMRPCZ(RelationVector<KLMHit2d>& klm
                             sumSection, sumSector);
 }
 
-/* -------------------------------- event -------------------------------- */
+/* Event. */
 
 void KLMEventT0EstimatorModule::event()
 {
@@ -2727,4 +2720,3 @@ void KLMEventT0EstimatorModule::event()
   }
 }
 
-/* --------------------------------- EOF --------------------------------- */

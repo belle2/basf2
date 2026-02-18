@@ -381,9 +381,9 @@ void KLMDQMModule::event()
   /* Event-level background trigger summary, filled once per event. */
   if (m_trgSummary.isValid() && m_EventBackgroundTriggerSummary != nullptr) {
     const int nTimingBits = (int)c_KlmL1Triggers.size();
-    // GDL Background triggers: TTYP_DPHY, TTYP_RAND, TTYP_POIS
+    // GDL Background triggers: TTYP_DPHY, TTYP_RAND, TTYP_POIS (event-level timing source)
     for (int i = 0; i < nTimingBits; ++i) {
-      if (m_trgSummary->testInput(c_KlmL1Triggers[i]))
+      if (m_trgSummary->getTimType() == c_KlmL1Triggers[i])
         m_EventBackgroundTriggerSummary->Fill((double)i + 1.0);
     }
     // L1 trigger bit: "bha_delay"

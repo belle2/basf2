@@ -78,7 +78,7 @@ namespace Belle2 {
       po::options_description description("Python options");
       description.add_options()
       ("framework", po::value<std::string>(&m_framework),
-       "Framework which should be used. Currently supported are sklearn, xgboost, tensorflow, keras, torch,  and theano")
+       "Framework which should be used. Currently supported are sklearn, xgboost, tensorflow, keras and torch")
       ("steering_file", po::value<std::string>(&m_steering_file), "Steering file which describes the model")
       ("mini_batch_size", po::value<unsigned int>(&m_mini_batch_size), "Size of the mini batch given to partial_fit function")
       ("nIterations", po::value<unsigned int>(&m_nIterations), "Number of iterations")
@@ -130,7 +130,7 @@ namespace Belle2 {
         if (m_initialized_python) {
           if (Py_IsInitialized()) {
             // We don't finalize Python because this call only frees some memory,
-            // but can cause crashes in loaded python-modules like Theano
+            // but can cause crashes in loaded python-modules
             // https://docs.python.org/3/c-api/init.html
             // Py_Finalize();
           }

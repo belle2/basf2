@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef INCLUDE_GUARD_BELLE2_MVA_THEANO_HEADER
-#define INCLUDE_GUARD_BELLE2_MVA_THEANO_HEADER
 
 #include <mva/interface/Options.h>
 #include <mva/interface/Teacher.h>
@@ -70,7 +68,7 @@ namespace Belle2 {
        */
       virtual std::string getMethod() const override { return "Python"; }
 
-      std::string m_framework = "sklearn"; /**< framework to use e.g. sklearn, xgboost, theano, tensorflow, ... */
+      std::string m_framework = "sklearn"; /**< framework to use e.g. sklearn, xgboost, tensorflow, ... */
       std::string m_steering_file = ""; /**< steering file provided by the user to override the functions in the framework */
       std::string m_config = "null"; /**< Config string in json, which is passed to the get model function */
       unsigned int m_mini_batch_size = 0; /**< Mini batch size, 0 passes the whole data in one call */
@@ -142,4 +140,3 @@ namespace Belle2 {
 
   }
 }
-#endif

@@ -42,6 +42,8 @@ import alignment.collections
 import alignment.constraints
 import alignment.parameters
 
+import variables.collections
+
 collection_names = ["cosmic", "hadron", "mumu", "offip"]
 
 default_config = {
@@ -143,6 +145,49 @@ def create_std_path():
     return path
 
 
+def create_dimuon_validation_path():
+    """
+    Returns default path for dimuon validation collection
+    """
+    path = create_std_path()
+    ana.fillParticleList('mu+:validation', 'p > 1.0 and abs(dz) < 2.0 and abs(dr) < 0.5 and nTracks == 2', path=path)
+    ana.reconstructDecay('Upsilon(4S):validation -> mu+:validation mu-:validation', '9.5<M<11.5', path=path)
+    vtx.treeFit('Upsilon(4S):validation', path=path)
+
+    track_variables = [
+        'd0', 'z0', 'phi0', 'omega', 'tanLambda', 'pt',
+        'z0FromIP', 'd0FromIP', 'phi0FromIP',
+        'electronID', 'muonID',
+        'nVXDHits', 'nPXDHits', 'nSVDHits', 'nCDCHits',
+        'nTracks',
+        'x', 'y', 'z', 'M'
+        ]
+
+    ana.variablesToNtuple('Upsilon(4S):validation',
+                          variables=[
+                              'chiProb',
+                              'nTracks',
+                              'pt', 'pz',
+                              'p', 'E', 'theta', 'phi',
+                              'InvM', 'M',
+                              'date', 'eventTimeSeconds',
+                              'IPX', 'IPY', 'IPZ'
+                              ]
+                          + variables.collections.vertex
+                          + ['daughter(0, {})'.format(var) for var in track_variables]
+                          + ['daughter(1, {})'.format(var) for var in track_variables]
+                          + ['useRestFrame(daughter(0, {}))'.format(var) for var in track_variables]
+                          + ['useRestFrame(daughter(1, {}))'.format(var) for var in track_variables]
+                          + ['useCMSFrame(daughter(0, {}))'.format(var) for var in track_variables]
+                          + ['useCMSFrame(daughter(1, {}))'.format(var) for var in track_variables]
+                          + ['V0d0(0)', 'V0d0(1)', 'V0z0(0)', 'V0z0(1)'],
+                          filename='dimuon_ana.root',
+                          path=path
+                          )
+
+    return path
+
+
 def create_cosmics_path():
     """
     Returns default path for cosmic collection
@@ -171,6 +216,12 @@ def create_cosmics_path():
         '[z0 <= 57. or abs(d0) >= 26.5] and abs(dz) > 0.4 and nTracks == 1',
         path=path)
     path.add_module('SkimFilter', particleLists=['mu+:goodForVXDCDCAlignment']).if_false(basf2.create_path())
+
+    path.add_module(
+        "CDCCosmicAnalysis",
+        StoreTrackParErrors=True,
+        RecoTracksColName="NonMergedRecoTracks",
+        Output="cosmic_ana.root")
 
     return path
 
@@ -243,7 +294,7 @@ def create_validation(files, cfg, name='VXDCDCalignment_validation'):
         dbobjects=['VXDAlignment', 'CDCAlignment'],
         collections=[
             mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),
-            mpc.make_collection("mumu", path=create_std_path(), tracks=["RecoTracks"])
+            mpc.make_collection("mumu", path=create_dimuon_validation_path(), tracks=["RecoTracks"])
         ],
         tags=None,
         files=dict(mumu=mumu, cosmic=cosmic),

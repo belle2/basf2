@@ -188,6 +188,43 @@ def create_dimuon_validation_path():
     return path
 
 
+def create_cosmic_validation_path():
+    """
+    Returns validation path for cosmic collection
+    """
+    path = basf2.create_path()
+    path.add_module('Progress')
+    path.add_module('RootInput')
+    path.add_module('Gearbox')
+    path.add_module('Geometry')
+
+    raw.add_unpackers(path)
+    path.add_module('SetupGenfitExtrapolation')
+    reco.add_cosmics_reconstruction(
+        path,
+        pruneTracks=False,
+        skipGeometryAdding=True,
+        addClusterExpertModules=False,
+        merge_tracks=False
+    )
+
+    path.add_module('SetRecoTrackMomentum', automatic=True)
+    path.add_module('DAFRecoFitter', pdgCodesToUseForFitting=[13])
+
+    ana.fillParticleList(
+        'mu+:goodForVXDCDCAlignment',
+        '[z0 <= 57. or abs(d0) >= 26.5] and abs(dz) > 0.4 and nTracks == 2',
+        path=path)
+    path.add_module('SkimFilter', particleLists=['mu+:goodForVXDCDCAlignment']).if_false(basf2.create_path())
+
+    path.add_module(
+        "CDCCosmicAnalysis",
+        StoreTrackParErrors=True,
+        Output="cosmic_ana.root")
+
+    return path
+
+
 def create_cosmics_path():
     """
     Returns default path for cosmic collection
@@ -216,12 +253,6 @@ def create_cosmics_path():
         '[z0 <= 57. or abs(d0) >= 26.5] and abs(dz) > 0.4 and nTracks == 1',
         path=path)
     path.add_module('SkimFilter', particleLists=['mu+:goodForVXDCDCAlignment']).if_false(basf2.create_path())
-
-    path.add_module(
-        "CDCCosmicAnalysis",
-        StoreTrackParErrors=True,
-        RecoTracksColName="NonMergedRecoTracks",
-        Output="cosmic_ana.root")
 
     return path
 
@@ -293,7 +324,7 @@ def create_validation(files, cfg, name='VXDCDCalignment_validation'):
         name=name,
         dbobjects=['VXDAlignment', 'CDCAlignment'],
         collections=[
-            mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),
+            mpc.make_collection("cosmic", path=create_cosmic_validation_path(), tracks=["RecoTracks"]),
             mpc.make_collection("mumu", path=create_dimuon_validation_path(), tracks=["RecoTracks"])
         ],
         tags=None,

@@ -15,7 +15,6 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
-#include <analysis/dataobjects/Particle.h>
 
 #include <Math/Vector4D.h>
 
@@ -25,7 +24,6 @@ namespace Belle2 {
   /**
    * MdstRounder module
    * Rounds all Double32_t members of all ECLClusters and TrackFitResults to precision as if read from mdst
-   * Updates all already created particles
    */
   class MdstRounderModule : public Module {
 
@@ -72,11 +70,6 @@ namespace Belle2 {
      * StoreArray of TrackFitResults
      */
     StoreArray<TrackFitResult> m_trackfitresults;
-
-    /**
-     * StoreArray of Particles
-     */
-    StoreArray<Particle> m_particles;
 
     /**
      * ClusterUtils to compute four-momentum from ECLClusters

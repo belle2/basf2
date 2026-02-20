@@ -8,9 +8,6 @@
 
 #include <skim/modules/MdstRounderModule.h>
 
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Particle.h>
-
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
@@ -29,8 +26,8 @@ MdstRounderModule::MdstRounderModule() : Module()
 {
   setDescription("This module loads all ECLClusters and TrackFitResults present in each event and "
                  "rounds their Double32_t member variables to the precision they"
-                 "would have if they were read from an mdst file. Also updates all particles that were "
-                 "already created. Useful if you want "
+                 "would have if they were read from an mdst file. "
+                 "Useful if you want "
                  "to perform analysis/skimming in the same steering file that also runs"
                  "event generation/simulation/reconstruction.");
 }

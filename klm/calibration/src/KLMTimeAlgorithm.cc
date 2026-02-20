@@ -2055,19 +2055,19 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     readCalibrationDataBatch(batch.second);
 
     for (const auto& channelPair : m_evts) {
-      KLMChannelNumber channelId = channelPair.first;
-      const std::vector<Event>& eventsChannel = channelPair.second;
+      KLMChannelNumber chId = channelPair.first;
+      const std::vector<Event>& chEvents = channelPair.second;
 
       // Get channel geometry
       int subdetector, section, sector, layer, plane, strip;
       m_ElementNumbers->channelNumberToElementNumbers(
-        channelId, &subdetector, &section, &sector, &layer, &plane, &strip);
+        chId, &subdetector, &section, &sector, &layer, &plane, &strip);
 
       // Convert to 0-indexed immediately (consistent with loops 1-4)
       int iSub = subdetector;
       int iL = layer - 1;
 
-      for (const Event& event : eventsChannel) {
+      for (const Event& event : chEvents) {
         // Apply ADC cut with 0-indexed layer
         if (!passesADCCut(event, iSub, iL))
           continue;
@@ -2078,7 +2078,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int charge = event.Track_Charge;
 
         // Compute calibrated time for this hit
-        double timeHit = event.time() - m_timeShift[channelId];
+        double timeHit = event.time() - m_timeShift[chId];
 
         if (timeHit <= -400e3)
           continue;
@@ -2153,10 +2153,11 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     if (trackMap.size() != 2)
       continue;
 
-    auto it = trackMap.begin();
-    const TrackT0Info& track1 = it->second;
-    ++it;
-    const TrackT0Info& track2 = it->second;
+    auto it1 = trackMap.begin();
+    auto it2 = trackMap.begin();
+    ++it2;
+    const TrackT0Info& track1 = it1->second;
+    const TrackT0Info& track2 = it2->second;
 
     // Check opposite charges
     if (track1.charge * track2.charge >= 0)
@@ -2164,7 +2165,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
 
     // Identify mu+ and mu-
     const TrackT0Info& muPlus  = (track1.charge > 0) ? track1 : track2;
-    const TrackT0Info& muMinus = (track1.charge < 0) ? track1 : track2;
+    const TrackT0Info& muMinus = (track1.charge > 0) ? track2 : track1;
 
     // === BKLM Scintillator ===
     if (muPlus.nHits_BKLM_Scint > 0 && muMinus.nHits_BKLM_Scint > 0) {

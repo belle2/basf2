@@ -52,16 +52,22 @@ namespace Belle2 {
      */
     struct Event {
 
-      /** Di-muon Events */
+      /** Run number. */
       double Run = 0;
+
+      /** Event number. */
       double Events = 0;
+
+      /** Track index. */
       double nTrack = 0;
+
+      /** Track charge. */
       double Track_Charge = 0;
 
       /** EventT0 for the digit. */
       double t0 = 0;
 
-      /*Event T0 Resolution*/
+      /** Event T0 resolution. */
       double t0_uc = 0;
 
       /** Particle flying time. */
@@ -97,8 +103,10 @@ namespace Belle2 {
       /** If phi and z plane flipped, used for testing and not necessary. */
       bool isFlipped = 0;
 
-      /** Flag the good and bad hits*/
+      /** Flag the good and bad hits. */
       bool isGood = 0;
+
+      /** ADC count. */
       uint16_t getADCcount = 0;
 
       /**
@@ -865,34 +873,76 @@ namespace Belle2 {
     /** Corrected EventT0 for EKLM scintillator hits. */
     TH1F* hc_eventT0_scint_end = nullptr;
 
-    /** NEW diagnostic histograms */
+    /** Number of RPC hits per mu+ track. */
     TH1F* h_nHits_plus_rpc;
+
+    /** Number of RPC hits per mu- track. */
     TH1F* h_nHits_minus_rpc;
+
+    /** Number of BKLM scintillator hits per mu+ track. */
     TH1F* h_nHits_plus_scint;
+
+    /** Number of BKLM scintillator hits per mu- track. */
     TH1F* h_nHits_minus_scint;
+
+    /** Number of EKLM scintillator hits per mu+ track. */
     TH1F* h_nHits_plus_scint_end;
+
+    /** Number of EKLM scintillator hits per mu- track. */
     TH1F* h_nHits_minus_scint_end;
 
+    /** DeltaT0 vs inverse hit count for RPC. */
     TH2F* h2_deltaT0_vs_v_rpc;
+
+    /** DeltaT0 vs inverse hit count for BKLM scintillator. */
     TH2F* h2_deltaT0_vs_v_scint;
+
+    /** DeltaT0 vs inverse hit count for EKLM scintillator. */
     TH2F* h2_deltaT0_vs_v_scint_end;
 
+    /** DeltaT0 RMS vs inverse hit count profile for RPC. */
     TProfile* prof_deltaT0_rms_vs_v_rpc;
+
+    /** DeltaT0 RMS vs inverse hit count profile for BKLM scintillator. */
     TProfile* prof_deltaT0_rms_vs_v_scint;
+
+    /** DeltaT0 RMS vs inverse hit count profile for EKLM scintillator. */
     TProfile* prof_deltaT0_rms_vs_v_scint_end;
 
+    /** DeltaT0 vs total hit count for RPC. */
     TH2F* h2_deltaT0_vs_nhits_rpc;
+
+    /** DeltaT0 vs total hit count for BKLM scintillator. */
     TH2F* h2_deltaT0_vs_nhits_scint;
+
+    /** DeltaT0 vs total hit count for EKLM scintillator. */
     TH2F* h2_deltaT0_vs_nhits_scint_end;
 
+    /** Corrected EventT0 for RPC with low hit count. */
     TH1F* hc_eventT0_rpc_lowN;
+
+    /** Corrected EventT0 for RPC with medium hit count. */
     TH1F* hc_eventT0_rpc_midN;
+
+    /** Corrected EventT0 for RPC with high hit count. */
     TH1F* hc_eventT0_rpc_highN;
+
+    /** Corrected EventT0 for BKLM scintillator with low hit count. */
     TH1F* hc_eventT0_scint_lowN;
+
+    /** Corrected EventT0 for BKLM scintillator with medium hit count. */
     TH1F* hc_eventT0_scint_midN;
+
+    /** Corrected EventT0 for BKLM scintillator with high hit count. */
     TH1F* hc_eventT0_scint_highN;
+
+    /** Corrected EventT0 for EKLM scintillator with low hit count. */
     TH1F* hc_eventT0_scint_end_lowN;
+
+    /** Corrected EventT0 for EKLM scintillator with medium hit count. */
     TH1F* hc_eventT0_scint_end_midN;
+
+    /** Corrected EventT0 for EKLM scintillator with high hit count. */
     TH1F* hc_eventT0_scint_end_highN;
 
     /* Formulas used for fitting. */
@@ -916,7 +966,7 @@ namespace Belle2 {
     bool m_saveAllPlots = false;
 
     /** Write per-channel temporary histograms (_tc/raw/hc_) in minimal mode. */
-    bool m_saveChannelHists = true;
+    bool m_saveChannelHists = false;
 
     /**
      * Directory structure for per-channel histograms (BKLM).

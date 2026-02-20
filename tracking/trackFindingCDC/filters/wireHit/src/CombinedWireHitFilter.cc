@@ -15,20 +15,32 @@ using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 
 
-CombinedWireHitFilter::CombinedWireHitFilter()
+CombinedWireHitFilter::CombinedWireHitFilter() : m_mvaFilter(), m_cutsFromDBFilter()
 {
 }
 
 void CombinedWireHitFilter::initialize()
 {
+  m_cutsFromDBFilter.initialize();
+  m_mvaFilter.initialize();
 }
 
 void CombinedWireHitFilter::beginRun()
 {
+  m_cutsFromDBFilter.beginRun();
+  m_mvaFilter.beginRun();
 }
+
 
 
 
 Weight CombinedWireHitFilter::operator()(const CDCWireHit& wireHit)
 {
+  const auto* cdcHit = wireHit.getHit();
+  const auto sl = cdcHit->getISuperLayer();
+  if (sl <= 1) {
+    return m_cutsFromDBFilter(wireHit);
+  } else {
+    return m_mvaFilter(wireHit);
+  }
 }

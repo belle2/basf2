@@ -9,6 +9,8 @@
 
 #include <tracking/trackFindingCDC/filters/wireHit/BaseWireHitFilter.h>
 #include <tracking/trackFindingCDC/filters/wireHit/CutsFromDBWireHitFilter.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/wireHit/CDCWireHitVarSet.h>
 #include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
@@ -38,6 +40,7 @@ namespace Belle2 {
 
     private:
       /// MVA filter
+      TrackingUtilities::MVAFilter<CDCWireHitVarSet> m_mvaFilter;
 
       /// Cuts from DB filter
       CutsFromDBWireHitFilter m_cutsFromDBFilter;

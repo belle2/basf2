@@ -7,11 +7,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/wireHit/AllWireHitFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 Weight AllWireHitFilter::operator()(const CDCWireHit& wireHit)
 {

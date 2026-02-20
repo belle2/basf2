@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <cassert>
 
@@ -85,7 +85,7 @@ namespace Belle2 {
       /// Informal string summarizing the translation from the object to the attribute value.
       std::string info() override
       {
-        return "Cycle through " + bracketed(join(", ", m_values)) + "\n";
+        return "Cycle through " + TrackingUtilities::bracketed(TrackingUtilities::join(", ", m_values)) + "\n";
       }
 
     private:

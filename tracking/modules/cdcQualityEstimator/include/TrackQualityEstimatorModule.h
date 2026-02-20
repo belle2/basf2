@@ -8,19 +8,19 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/combined/TrackQualityEstimator.h>
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/eventdata/utils/ClassMnemomics.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**
      * Module implementation using the TrackTrackQualityEstimator findlet
      */
-    class TFCDC_TrackQualityEstimatorModule : public FindletModule<TrackQualityEstimator> {
+    class TFCDC_TrackQualityEstimatorModule : public TrackingUtilities::FindletModule<TrackQualityEstimator> {
 
     private:
       /// Type of the base class
-      using Super = FindletModule<TrackQualityEstimator>;
+      using Super = TrackingUtilities::FindletModule<TrackQualityEstimator>;
 
     public:
       /// Constructor setting the default store vector names

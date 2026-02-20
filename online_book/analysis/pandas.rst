@@ -48,7 +48,7 @@ Assuming your ROOT file has different TTrees and you just want to access one of 
     variable_list = ["var1", "var2", "var3"]
     df = tree.arrays(variable_list, library='pd')
 
- In case opening the ROOT files with uproot is too slow, you can also use directly ROOT and its RDataFrame class:
+In case opening the ROOT files with uproot is too slow, you can also use directly ROOT and its RDataFrame class:
 
 .. code:: python
 

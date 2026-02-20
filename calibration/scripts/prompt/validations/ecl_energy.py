@@ -19,7 +19,7 @@ import sys
 # Will be used to construct the validation in the automated system, as well as set up the submission web forms.
 
 #: Tells the automated system some details of this script
-settings = ValidationSettings(name='ECL_Energy',
+settings = ValidationSettings(name='ecl_energy',
                               description=__doc__,
                               download_files=['stdout'],
                               expert_config=None)
@@ -99,16 +99,16 @@ def run_validation(job_path, input_data_path, expert_config):
             outputCalib = CalibVsCrysIDgg.GetBinContent(cellID)
             ratio = outputCalib / inputCalib
             ggRatio.Fill(ratio)
-            if(ratio < 0.95 or ratio > 1.05):
+            if (ratio < 0.95 or ratio > 1.05):
                 bigChange += 1
                 print(f"{bigChange:.2f} cellID {cellID:.4f} {ratio:.3f} {status}\n")
 
             # Look for large deviations in the barrel excluding first and last
-            if(cellID >= 1297 and cellID <= 7632):
-                if(ratio < minBarrelRatio):
+            if (cellID >= 1297 and cellID <= 7632):
+                if (ratio < minBarrelRatio):
                     minBarrelRatio = ratio
                     minCellID = cellID
-                if(ratio > maxBarrelRatio):
+                if (ratio > maxBarrelRatio):
                     maxBarrelRatio = ratio
                     maxCellID = cellID
 
@@ -142,11 +142,11 @@ def run_validation(job_path, input_data_path, expert_config):
     for cellID in range(1, 8736 + 1):
         inputCalib = AverageInitCalibee.GetBinContent(cellID)
         outputCalib = CalibVsCrysIDee.GetBinContent(cellID)
-        if(outputCalib > 0):
+        if (outputCalib > 0):
             eeCalibrated += 1
             ratio = outputCalib / inputCalib
             eeRatio.Fill(ratio)
-            if(ratio < 0.95 or ratio > 1.05):
+            if (ratio < 0.95 or ratio > 1.05):
                 bigChange += 1
                 print(f" {int(bigChange):2} cellID {cellID:.4f} {ratio:5.3f}\n")
 
@@ -170,8 +170,8 @@ def run_validation(job_path, input_data_path, expert_config):
         ggstatus = StatusVsCrysIDgg.GetBinContent(cellID)
         ggCalib = CalibVsCrysIDgg.GetBinContent(cellID)
         eeCalib = CalibVsCrysIDee.GetBinContent(cellID)
-        if(ggstatus > 0. and eeCalib > 0.):
-            if(cellID >= 1297 and cellID <= 7632):
+        if (ggstatus > 0. and eeCalib > 0.):
+            if (cellID >= 1297 and cellID <= 7632):
                 eeggRatio.Fill(eeCalib / ggCalib)
                 xcellID[nPo] = cellID
                 yratio[nPo] = eeCalib / ggCalib
@@ -231,8 +231,8 @@ def run_validation(job_path, input_data_path, expert_config):
         ggCalib = CalibVsCrysIDgg.GetBinContent(cellID)
         mumustatus = StatusVsCrysIDmumu.GetBinContent(cellID)
         mumuCalib = CalibVsCrysIDmumu.GetBinContent(cellID)
-        if(ggstatus > 7.5 and mumustatus > 7.5):
-            if(cellID >= 1297 and cellID <= 7632):
+        if (ggstatus > 7.5 and mumustatus > 7.5):
+            if (cellID >= 1297 and cellID <= 7632):
                 mumuggRatio.Fill(mumuCalib / ggCalib)
                 xcellID[nPo] = cellID
                 yratio[nPo] = mumuCalib / ggCalib
@@ -273,7 +273,7 @@ def run_validation(job_path, input_data_path, expert_config):
         ggstatus = StatusVsCrysIDgg.GetBinContent(cellID)
         newOldRatio = newPayload.GetBinContent(cellID) / existingPayload.GetBinContent(cellID)
         newggRatio = newPayload.GetBinContent(cellID) / CalibVsCrysIDgg.GetBinContent(cellID)
-        if(ggstatus > 0.):
+        if (ggstatus > 0.):
             checkMerge.Fill(newggRatio)
             finalRatio.Fill(newOldRatio)
             xcellID[nPo] = cellID

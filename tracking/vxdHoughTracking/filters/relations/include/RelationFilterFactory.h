@@ -8,17 +8,17 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/filters/relations/BaseRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
 
     /// Factory that can create appropriate filters for relations between hits from associated names.
-    class RelationFilterFactory : public TrackFindingCDC::FilterFactory<BaseRelationFilter> {
+    class RelationFilterFactory : public TrackingUtilities::FilterFactory<BaseRelationFilter> {
 
     private:
       /// Type of the base class
-      using Super = TrackFindingCDC::FilterFactory<BaseRelationFilter>;
+      using Super = TrackingUtilities::FilterFactory<BaseRelationFilter>;
 
     public:
       /// Constructor forwarding the default filter name

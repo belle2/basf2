@@ -6,9 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/svd/filters/relations/SectorMapBasedSVDPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
@@ -27,11 +27,11 @@ namespace Belle2 {
 
   void SectorMapBasedSVDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "sectorMapName"), m_param_sectorMapName,
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "sectorMapName"), m_param_sectorMapName,
                                   "Name of the sector map to use.", m_param_sectorMapName);
   }
 
-  TrackFindingCDC::Weight SectorMapBasedSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>&
+  TrackingUtilities::Weight SectorMapBasedSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>&
       relation)
   {
     const CKFToSVDState* fromState = relation.first;

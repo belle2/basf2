@@ -413,21 +413,27 @@ void HadronBgPrep::setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>&
     // fit the dE/dx distribution in bins of beta-gamma
     gstatus bgstat;
     fit(hdedx_bg[i],  pdg.data(), bgstat);
-    if (bgstat == OK) {
-      satdedx = m_means[i] = hdedx_bg[i]->GetFunction("gaus")->GetParameter(1);
-      satdedxerr = m_errors[i] = hdedx_bg[i]->GetFunction("gaus")->GetParError(1);
-      satdedxwidth = hdedx_bg[i]->GetFunction("gaus")->GetParameter(2);
+    TF1* f = hdedx_bg[i]->GetFunction("gaus");
+    if (bgstat == OK && f) {
+      const auto mean = f->GetParameter(1);
+      satdedx = mean;
+      m_means[i] = mean;
+      const auto err = f->GetParError(1);
+      satdedxerr = err;
+      m_errors[i] = err;
+      satdedxwidth = f->GetParameter(2);
     } else { satdedx = 0.0; satdedxerr = 0.0; satdedxwidth = 0.0;}
 
     //2. -------------------------
     // fit the chi distribution  in bins of beta-gamma
     gstatus chistat;
     fit(hchi_bg[i], pdg.data(), chistat);
-    if (bgstat == OK) {
-      satchi = hchi_bg[i]->GetFunction("gaus")->GetParameter(1);
-      satchierr  = hchi_bg[i]->GetFunction("gaus")->GetParError(1);
-      satchiwidth = hchi_bg[i]->GetFunction("gaus")->GetParameter(2);
-      satchiwidth_err = hchi_bg[i]->GetFunction("gaus")->GetParError(2);
+    f = hchi_bg[i]->GetFunction("gaus");
+    if (chistat == OK && f) {
+      satchi = f->GetParameter(1);
+      satchierr  = f->GetParError(1);
+      satchiwidth = f->GetParameter(2);
+      satchiwidth_err = f->GetParError(2);
     } else { satchi = 0.0; satchierr = 0.0; satchiwidth = 0.0; satchiwidth_err = 0.0;}
 
 

@@ -8,7 +8,7 @@
 #pragma once
 
 #include <vector>
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
 
 namespace Belle2 {
   class SpacePoint;
@@ -22,7 +22,7 @@ namespace Belle2 {
     unsigned int getNumberOfCorrectPXDHits(const RecoTrack* mcRecoTrack, const std::vector<const SpacePoint*>& hits) const;
 
     /// Are all hits related to the same MC track the seed is related to?
-    bool allStatesCorrect(const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& states) const;
+    bool allStatesCorrect(const std::vector<TrackingUtilities::WithWeight<const CKFToPXDState*>>& states) const;
 
     /// Returns true, of the space point is related to the mc track and if it is on the first half.
     bool pxdHitIsCorrect(const RecoTrack* mcRecoTrack, const SpacePoint* spacePoint) const;

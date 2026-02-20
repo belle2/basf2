@@ -8,7 +8,7 @@
 
 #include <tracking/ckf/cdc/findlets/CKFToCDCFindlet.h>
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 #include <framework/core/ModuleParamList.h>
 
@@ -51,12 +51,12 @@ void CKFToCDCFindlet::beginEvent()
   m_results.clear();
 }
 
-void CKFToCDCFindlet::apply(const std::vector<TrackFindingCDC::CDCWireHit>& wireHits)
+void CKFToCDCFindlet::apply(const std::vector<TrackingUtilities::CDCWireHit>& wireHits)
 {
   m_trackHandler.apply(m_vxdRecoTrackVector);
   m_seedCreator.apply(m_vxdRecoTrackVector, m_seeds);
 
-  const auto& wireHitPtrs = TrackFindingCDC::as_pointers<const TrackFindingCDC::CDCWireHit>(wireHits);
+  const auto& wireHitPtrs = TrackingUtilities::as_pointers<const TrackingUtilities::CDCWireHit>(wireHits);
 
   for (const auto& seed : m_seeds) {
     B2DEBUG(29, "Starting new seed");

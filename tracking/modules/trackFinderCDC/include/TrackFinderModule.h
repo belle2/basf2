@@ -8,13 +8,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/complete/TrackFinder.h>
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Module for the track finder combining global and local search
-    class TFCDC_TrackFinderModule : public FindletModule<TrackFinder> {
+    class TFCDC_TrackFinderModule : public TrackingUtilities::FindletModule<TrackFinder> {
     };
   }
 }

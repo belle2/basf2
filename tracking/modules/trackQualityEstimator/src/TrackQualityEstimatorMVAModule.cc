@@ -9,6 +9,7 @@
 #include <tracking/modules/trackQualityEstimator/TrackQualityEstimatorMVAModule.h>
 
 using namespace Belle2;
+using namespace TrackingUtilities;
 
 
 REG_MODULE(TrackQualityEstimatorMVA);

@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
 
 #include <vector>
 #include <string>
@@ -18,13 +18,13 @@ namespace Belle2 {
 
   /// Simple findlet for searching the best candidate for a given seed applying the given filter.
   template<class AFilter>
-  class OverlapResolver : public TrackFindingCDC::Findlet<typename AFilter::Object, typename AFilter::Object> {
+  class OverlapResolver : public TrackingUtilities::Findlet<typename AFilter::Object, typename AFilter::Object> {
   public:
     /// The object to filter
     using Object = typename AFilter::Object;
 
     /// The parent class
-    using Super = TrackFindingCDC::Findlet<typename AFilter::Object, typename AFilter::Object>;
+    using Super = TrackingUtilities::Findlet<typename AFilter::Object, typename AFilter::Object>;
 
     /// Construct this findlet and add the subfindlet as listener
     OverlapResolver();
@@ -41,7 +41,7 @@ namespace Belle2 {
 
     // Temporary vectors
     /// temporary results vector with weights, out of which the overlaps will be build.
-    std::vector<TrackFindingCDC::WithWeight<Object*>> m_resultsWithWeight;
+    std::vector<TrackingUtilities::WithWeight<Object*>> m_resultsWithWeight;
 
     // Parameters
     /// Parameter: Enable overlap

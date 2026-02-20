@@ -18,8 +18,6 @@
 #include <analysis/dataobjects/Particle.h>
 
 #include <Math/Vector4D.h>
-#include <TMatrixDSym.h>
-#include <TMatrixFSym.h>
 
 
 namespace Belle2 {
@@ -56,11 +54,6 @@ namespace Belle2 {
     double roundToPrecision(Double32_t value, double min, double max, int nBits) const;
 
     /**
-     * Calculates 7x7 error matrix for particle four-momentum and vertex from 6x6 momentum-vertex covariance matrix and energy
-     */
-    TMatrixFSym getErrMatrixFromCov(const TMatrixDSym& cov6, const ROOT::Math::PxPyPzEVector& vec) const;
-
-    /**
      * Round Double32_t members of all ECLClusters to appropriate precision
      */
     void roundECLClusters() const;
@@ -69,11 +62,6 @@ namespace Belle2 {
      * Rounds Double32_t members of all TrackFitResults to appropriate precision
      */
     void roundTrackFitResults() const;
-
-    /**
-     * Updates all particles previously created with new rounded values
-     */
-    void updateParticles();
 
     /**
      * StoreArray of ECLClusters

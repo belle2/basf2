@@ -236,6 +236,7 @@ class BaseSkim(ABC):
         self._MainPath = path
 
         if self.roundToMdstPrecision:
+            path.add_module("PruneDataStore", keepMatchedEntries=False, matchEntries=[".*:all", ".*:kink", ".*:V0"])
             path.add_module("MdstRounder")
 
         self.initialise_skim_flag(path)
@@ -612,6 +613,7 @@ class CombinedSkim(BaseSkim):
             skim._MainPath = path
 
         if self.roundToMdstPrecision:
+            path.add_module("PruneDataStore", keepMatchedEntries=False, matchEntries=[".*:all", ".*:kink", ".*:V0"])
             path.add_module("MdstRounder")
 
         self.initialise_skim_flag(path)

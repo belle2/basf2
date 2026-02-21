@@ -9,38 +9,40 @@
 #include <tracking/trackFindingCDC/filters/wireHit/CutsFromDBWireHitFilter.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <tracking/dbobjects/WireHitFilterSettings.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 
 
-CombinedWireHitFilter::CombinedWireHitFilter() : m_mvaFilter(), m_cutsFromDBFilter()
+CombinedWireHitFilter::CombinedWireHitFilter()
 {
+  this->addProcessingSignalListener(&m_mvaFilter);
+  this->addProcessingSignalListener(&m_cutsFromDBFilter);
 }
 
-void CombinedWireHitFilter::initialize()
+void CombinedWireHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  m_cutsFromDBFilter.initialize();
-  m_mvaFilter.initialize();
+  m_mvaFilter.exposeParameters(moduleParamList, prefix);
+  m_cutsFromDBFilter.exposeParameters(moduleParamList, prefix);
 }
-
-void CombinedWireHitFilter::beginRun()
-{
-  m_cutsFromDBFilter.beginRun();
-  m_mvaFilter.beginRun();
-}
-
-
 
 
 Weight CombinedWireHitFilter::operator()(const CDCWireHit& wireHit)
 {
+  if (not m_WireHitFilterSettings.isValid()) {
+    B2FATAL("WireHitFilterSetting DB object is invalid");
+  }
+  const int switchSLayer = m_WireHitFilterSettings->getMVASwitchSuperLayer();
   const auto* cdcHit = wireHit.getHit();
   const auto sl = cdcHit->getISuperLayer();
-  if (sl <= 1) {
+
+  if (sl < switchSLayer) {
+    B2INFO(" here cut " << sl);
     return m_cutsFromDBFilter(wireHit);
   } else {
+    B2INFO(" here mva " << sl);
     return m_mvaFilter(wireHit);
   }
 }

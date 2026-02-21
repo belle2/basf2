@@ -12,6 +12,7 @@
 #include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/wireHit/CDCWireHitVarSet.h>
 #include <framework/database/DBObjPtr.h>
+#include <tracking/dbobjects/WireHitFilterSettings.h>
 
 namespace Belle2 {
   namespace TrackingUtilities {
@@ -29,11 +30,8 @@ namespace Belle2 {
       /// Default destructor.
       virtual ~CombinedWireHitFilter() = default;
 
-      /// Called at the beginning of the processing.
-      void initialize() final;
-
-      /// Called when a new run is started.
-      void beginRun() final;
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Basic filter method to override.
       TrackingUtilities::Weight operator()(const TrackingUtilities::CDCWireHit& wireHit) final;
@@ -44,6 +42,10 @@ namespace Belle2 {
 
       /// Cuts from DB filter
       CutsFromDBWireHitFilter m_cutsFromDBFilter;
+
+      /// Switch to MVA super layer from database.
+      DBObjPtr<WireHitFilterSettings> m_WireHitFilterSettings;
+
     };
   }
 }

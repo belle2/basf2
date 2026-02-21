@@ -247,12 +247,12 @@ void DetectorOccupanciesDQMModule::event()
   } catch (const std::exception&) {
   }
 
-  // Check if any L1Triggers in the backTriggers list are hot
+  // Check if event timing source matches any of the background triggers (TTYP_DPHY, etc.)
   bool backBooleanFlag = std::any_of(
                            std::begin(m_klmBackTriggers),
                            std::end(m_klmBackTriggers),
   [trg = m_trgSummary](TRGSummary::ETimingType trgBit) {
-    return trg->testInput(trgBit);
+    return trg->getTimType() == trgBit;
   }
                          );
 

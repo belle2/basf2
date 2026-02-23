@@ -16,6 +16,7 @@ import modularAnalysis as ma
 from stdPhotons import stdPhotons
 from vertex import kFit
 import tflat.utils as utils
+import b2bii
 
 
 def fill_particle_lists(config, maskName='TFLATDefaultMask', path=None):
@@ -27,17 +28,16 @@ def fill_particle_lists(config, maskName='TFLATDefaultMask', path=None):
     trk_cut = config['trk_cut']
     ma.fillParticleList('pi+:tflat', trk_cut, path=path)
 
+    # load MVA's for gammas
+    if b2bii.isB2BII():
+        ma.getBeamBackgroundProbability(particleList=['gamma:mdst'], weight=config['VersionBeamBackgroundMVA'], path=path)
+        ma.getFakePhotonProbability(particleList=['gamma:mdst'], weight=config['VersionFakePhotonMVA'], path=path)
+    else:
+        ma.fillParticleList("gamma:all", "", path=path)
+        ma.getBeamBackgroundProbability("gamma:all", config['VersionBeamBackgroundMVA'], path=path)
+        ma.getFakePhotonProbability("gamma:all", config['VersionFakePhotonMVA'], path=path)
+
     # create particle list with gammas
-
-    # load MVA's for all gamma
-    ma.fillParticleList(
-        "gamma:all",
-        "",
-        path=path,
-    )
-    ma.getBeamBackgroundProbability("gamma:all", config['VersionBeamBackgroundMVA'], path=path)
-    ma.getFakePhotonProbability("gamma:all", config['VersionFakePhotonMVA'], path=path)
-
     stdPhotons(listtype='tight',  path=path)
 
     gamma_cut = config['gamma_cut']

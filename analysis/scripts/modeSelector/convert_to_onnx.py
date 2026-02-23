@@ -91,8 +91,14 @@ def convert_network_to_onnx(
         Whether to apply softmax to the output
     """
     # Create model and load weights
+    checkpoint = torch.load(pt_path, map_location='cpu', weights_only=True)
+    # Checkpoints are dicts with 'model_state_dict' key; support bare state dicts too
+    if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
+        state_dict = checkpoint['model_state_dict']
+    else:
+        state_dict = checkpoint
     model = MultiLabelNet(input_size, num_labels)
-    model.load_state_dict(torch.load(pt_path, map_location='cpu', weights_only=True))
+    model.load_state_dict(state_dict)
     model.eval()
 
     # Wrap with softmax for inference
@@ -170,7 +176,7 @@ def main():
     os.makedirs(args.output_dir, exist_ok=True)
 
     # Convert category network
-    cat_pt_path = os.path.join(args.input_dir, 'net_cat.pt')
+    cat_pt_path = os.path.join(args.input_dir, 'net_category.pt')
     cat_onnx_path = os.path.join(args.output_dir, 'modeSelector_cat.onnx')
 
     if os.path.exists(cat_pt_path):
@@ -184,7 +190,7 @@ def main():
         print(f"Warning: {cat_pt_path} not found")
 
     # Convert main network
-    main_pt_path = os.path.join(args.input_dir, 'net.pt')
+    main_pt_path = os.path.join(args.input_dir, 'net_main.pt')
     main_onnx_path = os.path.join(args.output_dir, 'modeSelector_main.onnx')
 
     if os.path.exists(main_pt_path):

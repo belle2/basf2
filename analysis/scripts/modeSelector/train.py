@@ -816,9 +816,12 @@ def main():
         print(f"    B+:        {(cat_preds == 1).sum()} ({(cat_preds == 1).mean() * 100:.1f}%)")
         print(f"    Continuum: {(cat_preds == 2).sum()} ({(cat_preds == 2).mean() * 100:.1f}%)")
 
-        # Concatenate category outputs to features
+        # Compute charged_cat flag: 1 if B+ is predicted over B0 (matches ModeSelectorModule inference)
+        charged_cat = (cat_outputs[:, 1] > cat_outputs[:, 0]).astype(np.float32)
+
+        # Concatenate category outputs + charged_cat flag to features
         print("\nConcatenating category outputs to features...")
-        features_with_cat = np.hstack([features_dense, cat_outputs])
+        features_with_cat = np.hstack([features_dense, cat_outputs, charged_cat.reshape(-1, 1)])
         features_dense = features_with_cat
         input_size = features_dense.shape[1]
         print(f"  New feature shape: {features_dense.shape}")

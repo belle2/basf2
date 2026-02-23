@@ -107,7 +107,7 @@ namespace Belle2 {
     RealisticTDCCountTranslator tdcTranslator;
 
     // is data or MC ?
-    bool isData = not Environment::Instance().isMC();
+    bool isData =  m_mcParticles.getEntries() == 0;
 
     // track independent calibration constants
     double runGain = isData ? m_DBRunGain->getRunGain() : 1.0;

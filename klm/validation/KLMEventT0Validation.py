@@ -145,11 +145,16 @@ class KLMEventT0ValidationModule(basf2.Module):
         """
         super().__init__()
         self.set_name('KLMEventT0ValidationModule')
+        # Name of the muon ParticleList.
         self._muon_list_name = muon_list_name
+        # Path of the output ROOT file.
         self._output_file_path = output_file
+        # If True, only use opposite-charge track pairs.
         self._opp_charges_only = opposite_charges_only
 
+        # TFile object for the output ROOT file.
         self._output_file = None
+        # Dictionary of booked ROOT histograms keyed by short name.
         self._histograms = {}
 
     # ------------------------------------------------------------------
@@ -160,6 +165,7 @@ class KLMEventT0ValidationModule(basf2.Module):
 
     # ------------------------------------------------------------------
     def _book_histograms(self):
+        """Create and register all validation histograms in the output file."""
         h = self._histograms
         f = self._output_file
 

@@ -39,16 +39,21 @@
 #include <framework/dataobjects/EventT0.h>
 #include <framework/gearbox/Unit.h>
 
-/* C++ */
+/* ROOT headers. */
+#include <TDirectory.h>
+#include <TF1.h>
+#include <TH1D.h>
+#include <TH1I.h>
+#include <TH2D.h>
+
+/* C++ headers. */
+#include <cmath>
+#include <algorithm>
+#include <vector>
+#include <limits>
 #include <map>
 #include <string>
 #include <utility>
-#include <limits>
-
-/* ROOT forward declarations. */
-class TH1D;
-class TH1I;
-class TH2D;
 
 namespace Belle2 {
 

@@ -19,18 +19,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 
-/* ROOT headers. */
-#include <TDirectory.h>
-#include <TH1D.h>
-#include <TH1I.h>
-#include <TH2D.h>
-
-/* C++ headers. */
-#include <cmath>
-#include <algorithm>
-#include <vector>
-#include <limits>
-
 using namespace Belle2;
 using namespace Belle2::bklm;
 using namespace Belle2::EKLM;

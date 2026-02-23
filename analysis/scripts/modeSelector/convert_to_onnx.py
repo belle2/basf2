@@ -158,7 +158,7 @@ def create_mva_weightfile(
 def main():
     parser = argparse.ArgumentParser(description='Convert ModeSelector networks to ONNX')
     parser.add_argument('--input-dir', type=str, required=True,
-                        help='Directory containing net.pt and net_cat.pt')
+                        help='Directory containing net_category.pt and net_main.pt')
     parser.add_argument('--output-dir', type=str, required=True,
                         help='Directory for output ONNX files')
     parser.add_argument('--cat-input-size', type=int, default=1004,

@@ -55,7 +55,6 @@ class ModeSelectorModule(b2.Module):
         output_variable='BplusScore',
         payload_cat_model='ModeSelector_cat_model',
         payload_main_model='ModeSelector_main_model',
-        payload_has_inputs='ModeSelector_has_inputs',
         training_mode=False,
         training_output='modeSelector_training.npz',
         debug=False,
@@ -76,8 +75,6 @@ class ModeSelectorModule(b2.Module):
         self.payload_cat_model = payload_cat_model
         #: Payload name for main model
         self.payload_main_model = payload_main_model
-        #: Payload name for has_inputs
-        self.payload_has_inputs = payload_has_inputs
         #: Training mode (save features + MC truth, skip NN inference)
         self.training_mode = training_mode
         #: Output file for training mode
@@ -111,19 +108,16 @@ class ModeSelectorModule(b2.Module):
 
         import onnxruntime as ort
 
-        # Load has_inputs (feature indices) from file or database
+        # Derive has_inputs from config.REMOVE_INPUTS by default; file only as explicit override
+        n_total = len(config.FEATURE_BLOCKS) * config.N_INPUT_IDS + len(config.EVENT_FEATURES) + 3
         if self.has_inputs_path:
             self.has_inputs = load_has_inputs(self.has_inputs_path)
+            b2.B2INFO(f"ModeSelector: has_inputs loaded from file {self.has_inputs_path} "
+                      f"({len(self.has_inputs)} features)")
         else:
-            try:
-                db_accessor = Belle2.DBAccessorBase(
-                    Belle2.DBStoreEntry.c_RawFile, self.payload_has_inputs, True
-                )
-                self.has_inputs = load_has_inputs(db_accessor.getFilename())
-            except Exception as e:
-                b2.B2WARNING(f"ModeSelector: Could not load has_inputs from database: {e}")
-                b2.B2WARNING("ModeSelector: Using all features (this may not match training!)")
-                self.has_inputs = None
+            self.has_inputs = sorted(set(range(n_total)) - set(config.REMOVE_INPUTS))
+            b2.B2INFO(f"ModeSelector: Using config.REMOVE_INPUTS "
+                      f"({len(self.has_inputs)} features kept)")
 
         # Load models from files or database
         if self.cat_model_path:

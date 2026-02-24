@@ -418,6 +418,8 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   }
   calculationResult["BhabhaECL"] = BhabhaECL;
 
+  // Bhabha skim (BhabhaCDC) for CDC dE/dx calib studies
+  double BhabhaCDC = 0.;
   // Radiative Bhabha skim (radee)
   double radee = 0.;
   const double lowdEdxEdge = 0.70, highdEdxEdge = 1.30;
@@ -449,9 +451,6 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       if (!trackFit1) continue;
       if (trackFit1->getHitPatternCDC().getNHits() <= 0) continue;
 
-      const CDCDedxTrack* dedxTrack1 = track1->getRelatedTo<CDCDedxTrack>();
-      if (!dedxTrack1) continue;
-
       //------------Second track variables----------------
       for (unsigned int j = i + 1; j < m_pionParticles->getListSize(); j++) {
 
@@ -476,7 +475,12 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         if (!trackFit2) continue;
         if (trackFit2->getHitPatternCDC().getNHits() <= 0) continue;
 
-        CDCDedxTrack* dedxTrack2 = track2->getRelatedTo<CDCDedxTrack>();
+        BhabhaCDC = 1;
+
+        const CDCDedxTrack* dedxTrack1 = track1->getRelatedTo<CDCDedxTrack>();
+        if (!dedxTrack1) continue;
+
+        const CDCDedxTrack* dedxTrack2 = track2->getRelatedTo<CDCDedxTrack>();
         if (!dedxTrack2) continue;
 
         double p1_dedxnosat = dedxTrack1->getDedxNoSat();
@@ -489,68 +493,8 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     }
   }
 
-  calculationResult["Radee"] = radee;
-
-  // Bhabha skim (BhabhaCDC) for CDC dE/dx calib studies
-  double BhabhaCDC = 0.;
-
-  if (m_pionParticles->getListSize() == 2) {
-
-    //------------First track variables----------------
-    for (unsigned int i = 0; i < m_pionParticles->getListSize() - 1; i++) {
-
-      Particle* part1 = m_pionParticles->getParticle(i);
-      if (!part1) continue;
-
-      const auto chargep1 = part1->getCharge();
-      if (std::abs(chargep1) != 1) continue;
-
-      const ECLCluster* eclTrack1 = part1->getECLCluster();
-      if (!eclTrack1) continue;
-      if (!eclTrack1->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
-
-      const double momentum1 = part1->getMomentumMagnitude();
-      const double energyOverMomentum1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / momentum1;
-      if (energyOverMomentum1 <= 0.7 || energyOverMomentum1 >= 1.3) continue;
-
-      const Track* track1 = part1->getTrack();
-      if (!track1) continue;
-
-      const TrackFitResult* trackFit1 = track1->getTrackFitResultWithClosestMass(Const::pion);
-      if (!trackFit1) continue;
-      if (trackFit1->getHitPatternCDC().getNHits() <= 0) continue;
-
-      //------------Second track variables----------------
-      for (unsigned int j = i + 1; j < m_pionParticles->getListSize(); j++) {
-
-        Particle* part2 = m_pionParticles->getParticle(j);
-        if (!part2) continue;
-
-        const auto chargep2 = part2->getCharge();
-        if (std::abs(chargep2) != 1 || (chargep1 + chargep2 != 0)) continue;
-
-        const ECLCluster* eclTrack2 = part2->getECLCluster();
-        if (!eclTrack2) continue;
-        if (!eclTrack2->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
-
-        const double momentum2 = part2->getMomentumMagnitude();
-        const double energyOverMomentum2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / momentum2;
-        if (energyOverMomentum2 <= 0.7 || energyOverMomentum2 >= 1.3) continue;
-
-        const Track* track2 = part2->getTrack();
-        if (!track2) continue;
-
-        const TrackFitResult* trackFit2 = track2->getTrackFitResultWithClosestMass(Const::pion);
-        if (!trackFit2) continue;
-        if (trackFit2->getHitPatternCDC().getNHits() <= 0) continue;
-
-        BhabhaCDC = 1;
-
-      }
-    }
-  }
-
   calculationResult["BhabhaCDC"] = BhabhaCDC;
+  calculationResult["Radee"] = radee;
 
   // Dimuon skim (mumutight) taken from the offline skim + Radiative dimuon (radmumu)
   double mumutight = 0.;

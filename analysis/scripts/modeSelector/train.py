@@ -26,6 +26,7 @@ The script implements:
 import argparse
 import glob
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import numpy as np
 import torch
@@ -206,92 +207,75 @@ def load_and_sample_data(input_files, fraction=0.7, cont_fraction=0.25,
     if not input_files:
         raise ValueError("No input files found.")
 
-    if random_state is not None:
-        np.random.seed(random_state)
+    rng = np.random.default_rng(random_state)
+    # Pre-generate per-file seeds so parallel workers are independent
+    seeds = rng.integers(0, 2**31, size=len(input_files))
+
+    def _process_one_file(args):
+        input_file, seed = args
+        data = np.load(input_file, allow_pickle=True)
+        feats = sparse.load_npz(input_file.replace('.npz', '_features.npz'))
+
+        bp_truth = data['bp_truth']
+        b0_truth = data['b0_truth']
+        file_mc_var_names = list(data['mc_var_names'])
+
+        sigprob_idx = file_mc_var_names.index('extraInfo(SignalProbability)')
+        mbc_idx = file_mc_var_names.index('Mbc')
+        gen3_idx = file_mc_var_names.index('genParticle(3, varForMCGen(PDG))')
+        gen4_idx = file_mc_var_names.index('genParticle(4, varForMCGen(PDG))')
+
+        event_calib_bp, event_calib_b0 = compute_event_calib(
+            bp_truth, b0_truth, file_mc_var_names,
+            use_delta_p_good_tag=use_delta_p_good_tag,
+            delta_p_thresh=delta_p_thresh,
+        )
+
+        bp_sigprob = np.where(np.isnan(bp_truth[:, sigprob_idx]), -1, bp_truth[:, sigprob_idx])
+        b0_sigprob = np.where(np.isnan(b0_truth[:, sigprob_idx]), -1, b0_truth[:, sigprob_idx])
+        bp_is_best = bp_sigprob > b0_sigprob
+
+        best_sigprob = np.where(bp_is_best, bp_sigprob, b0_sigprob)
+        best_mbc = np.where(bp_is_best, bp_truth[:, mbc_idx], b0_truth[:, mbc_idx])
+        event_calib = np.where(bp_is_best, event_calib_bp, event_calib_b0)
+
+        gen3 = np.where(bp_is_best, bp_truth[:, gen3_idx], b0_truth[:, gen3_idx])
+        gen4 = np.where(bp_is_best, bp_truth[:, gen4_idx], b0_truth[:, gen4_idx])
+        is_cont = (np.abs(gen3) < 10) & (np.abs(gen4) < 10)
+
+        presel = (best_sigprob > sigprob_thresh) & (best_mbc > mbc_thresh)
+
+        sample_prob = np.minimum(event_calib * fraction, 1.0)
+        sample_prob[is_cont] *= cont_fraction
+
+        file_rng = np.random.default_rng(seed)
+        sampled = (file_rng.random(len(bp_truth)) < sample_prob) & presel
+
+        return feats[sampled], bp_truth[sampled], b0_truth[sampled], file_mc_var_names
 
     features_list = []
     bp_list = []
     b0_list = []
     mc_var_names = None
 
-    for input_file in input_files:
-        # Load data
-        print(f"Loading {input_file}...")
-        data = np.load(input_file, allow_pickle=True)
-        features = sparse.load_npz(input_file.replace('.npz', '_features.npz'))
-
-        bp_truth = data['bp_truth']
-        b0_truth = data['b0_truth']
-        file_mc_var_names = list(data['mc_var_names'])
-
-        # Verify mc_var_names consistency across files
-        if mc_var_names is None:
-            mc_var_names = file_mc_var_names
-        elif file_mc_var_names != mc_var_names:
-            raise ValueError(
-                f"mc_var_names mismatch in {input_file}. "
-                "All input files must have identical truth variable names."
-            )
-
-        n_events = len(bp_truth)
-        print(f"  Loaded {n_events} events, {features.shape[1]} features")
-
-        # Get indices for MC truth variables
-        sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
-        mbc_idx = mc_var_names.index('Mbc')
-        gen3_idx = mc_var_names.index('genParticle(3, varForMCGen(PDG))')
-        gen4_idx = mc_var_names.index('genParticle(4, varForMCGen(PDG))')
-
-        # Compute event calibration weights
-        print("Computing FEI calibration weights...")
-        event_calib_bp, event_calib_b0 = compute_event_calib(bp_truth, b0_truth, mc_var_names,
-                                                             use_delta_p_good_tag=use_delta_p_good_tag,
-                                                             delta_p_thresh=delta_p_thresh)
-
-        # Determine best candidate (highest sigProb between B+ and B0)
-        bp_sigprob = bp_truth[:, sigprob_idx]
-        b0_sigprob = b0_truth[:, sigprob_idx]
-
-        # Handle NaN (no candidate of that type)
-        bp_sigprob = np.where(np.isnan(bp_sigprob), -1, bp_sigprob)
-        b0_sigprob = np.where(np.isnan(b0_sigprob), -1, b0_sigprob)
-
-        bp_is_best = bp_sigprob > b0_sigprob
-
-        # Get best candidate's properties for each event
-        best_sigprob = np.where(bp_is_best, bp_sigprob, b0_sigprob)
-        best_mbc = np.where(bp_is_best, bp_truth[:, mbc_idx], b0_truth[:, mbc_idx])
-        event_calib = np.where(bp_is_best, event_calib_bp, event_calib_b0)
-
-        # Determine if continuum (both gen particles are quarks)
-        gen3 = np.where(bp_is_best, bp_truth[:, gen3_idx], b0_truth[:, gen3_idx])
-        gen4 = np.where(bp_is_best, bp_truth[:, gen4_idx], b0_truth[:, gen4_idx])
-        is_cont = (np.abs(gen3) < 10) & (np.abs(gen4) < 10)
-
-        # Apply preselection
-        print(f"Applying preselection (sigProb > {sigprob_thresh}, Mbc > {mbc_thresh})...")
-        presel = (best_sigprob > sigprob_thresh) & (best_mbc > mbc_thresh)
-        print(f"  {presel.sum()} / {n_events} events pass ({presel.mean() * 100:.1f}%)")
-
-        # Apply sampling with FEI calibration and fraction
-        print(f"Applying sampling (fraction={fraction}, cont_fraction={cont_fraction})...")
-        sample_prob = event_calib * fraction
-        sample_prob[is_cont] *= cont_fraction
-
-        # Cap probabilities at 1.0
-        sample_prob = np.minimum(sample_prob, 1.0)
-
-        random_vals = np.random.random(n_events)
-        sampled = (random_vals < sample_prob) & presel
-
-        print(f"  {sampled.sum()} / {n_events} events sampled ({sampled.mean() * 100:.1f}%)")
-        print(f"    BB events: {(sampled & ~is_cont).sum()}")
-        print(f"    Continuum: {(sampled & is_cont).sum()}")
-
-        # Accumulate sampled chunks
-        features_list.append(features[sampled])
-        bp_list.append(bp_truth[sampled])
-        b0_list.append(b0_truth[sampled])
+    n_workers = min(32, len(input_files))
+    with ThreadPoolExecutor(max_workers=n_workers) as executor:
+        futures = {
+            executor.submit(_process_one_file, (f, s)): f
+            for f, s in zip(input_files, seeds)
+        }
+        for future in tqdm(as_completed(futures), total=len(futures), desc="Loading files"):
+            feats, bp, b0, file_mc_var_names = future.result()
+            if mc_var_names is None:
+                mc_var_names = file_mc_var_names
+            elif file_mc_var_names != mc_var_names:
+                raise ValueError(
+                    f"mc_var_names mismatch in {futures[future]}. "
+                    "All input files must have identical truth variable names."
+                )
+            features_list.append(feats)
+            bp_list.append(bp)
+            b0_list.append(b0)
 
     # Concatenate across all files
     features = sparse.vstack(features_list, format='csr')

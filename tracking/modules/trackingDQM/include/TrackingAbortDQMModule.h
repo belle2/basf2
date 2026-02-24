@@ -66,7 +66,8 @@ namespace Belle2 {
 
     StoreArray<SVDShaperDigit> m_strips; /**< SVD strips*/
     StoreArray<SVDCluster> m_clusters; /**< SVD clusters*/
-    TrackingUtilities::StoreWrappedObjPtr<std::vector<Belle2::TrackingUtilities::CDCWireHit>> m_wireHitVector{"CDCWireHitVector"};
+    TrackingUtilities::StoreWrappedObjPtr<std::vector<Belle2::TrackingUtilities::CDCWireHit>> m_wireHitVector{"CDCWireHitVector"}; /**< CDC wire hits*/
+    * /
     StoreObjPtr<TRGSummary> m_trgSummary; /**< trg summary */
 
     //index: 0 = passive veto; 1 = active veto

@@ -196,6 +196,7 @@ class KLMEventT0ValidationModule(basf2.Module):
                  adc_cut_bklm_scint_max: float = 320.0,
                  adc_cut_eklm_scint_min: float = 40.0,
                  adc_cut_eklm_scint_max: float = 350.0):
+        """Initialise the module with histogram booking parameters and ADC cuts."""
         super().__init__()
         self.set_name('KLMEventT0ValidationModule')
         #: Muon ParticleList name.
@@ -204,11 +205,13 @@ class KLMEventT0ValidationModule(basf2.Module):
         self._output_file_path = output_file
         #: Only use opposite-charge track pairs for pull/residual histograms.
         self._opp_charges_only = opposite_charges_only
-        #: ADC cuts for BKLM scintillator digits.
+        #: Lower ADC cut for BKLM scintillator digits.
         self._adc_bklm_min = adc_cut_bklm_scint_min
+        #: Upper ADC cut for BKLM scintillator digits.
         self._adc_bklm_max = adc_cut_bklm_scint_max
-        #: ADC cuts for EKLM scintillator digits.
+        #: Lower ADC cut for EKLM scintillator digits.
         self._adc_eklm_min = adc_cut_eklm_scint_min
+        #: Upper ADC cut for EKLM scintillator digits.
         self._adc_eklm_max = adc_cut_eklm_scint_max
 
         #: Output TFile.
@@ -216,18 +219,26 @@ class KLMEventT0ValidationModule(basf2.Module):
         #: All booked histograms, keyed by short name.
         self._h = {}
 
-        # Geometry (initialised in initialize())
+        #: BKLM geometry parameters (initialised in initialize()).
         self._geo_bklm = None
+        #: EKLM geometry data (initialised in initialize()).
         self._geo_eklm = None
+        #: EKLM coordinate transform helper (initialised in initialize()).
         self._transform_eklm = None
+        #: EKLM element-number helper (initialised in initialize()).
         self._elem_num = None
 
-        # DB payload caches (refreshed in beginRun())
+        #: Propagation-delay constant for EKLM strips (ns/cm), refreshed in beginRun().
         self._delay_eklm = 0.0
+        #: Propagation-delay constant for BKLM scintillator strips (ns/cm), refreshed in beginRun().
         self._delay_bklm = 0.0
+        #: Propagation-delay constant for BKLM RPC phi strips (ns/cm), refreshed in beginRun().
         self._delay_rpc_phi = 0.0
+        #: Propagation-delay constant for BKLM RPC z strips (ns/cm), refreshed in beginRun().
         self._delay_rpc_z = 0.0
-        self._db_cable_delay = None   # kept as a PyDBObj to query per-channel
+        #: Cable-delay PyDBObj used to query per-channel offsets, refreshed in beginRun().
+        self._db_cable_delay = None
+        #: Channel-status PyDBObj used to skip bad channels, refreshed in beginRun().
         self._db_channel_status = None
 
     # ------------------------------------------------------------------

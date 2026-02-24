@@ -261,8 +261,9 @@ namespace Belle2 {
         // Find the framework file. Then execute it in the scope of the new module
         auto framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
         auto framework_file = framework.attr("__file__");
-        auto framework_file_source_code = loadPythonFileAsString(boost::python::extract<std::string>(boost::python::object(
-                                                                   framework_file)));
+        boost::python::extract<std::string> extractor(framework_file);
+        std::string framework_filename = extractor();
+        auto framework_file_source_code = loadPythonFileAsString(framework_filename);
         builtins.attr("exec")(framework_file_source_code.c_str(), boost::python::object(unique_mva_module.attr("__dict__")));
         // Overwrite framework with user-defined code from the steering file
         builtins.attr("exec")(steering_file_source_code.c_str(), boost::python::object(unique_mva_module.attr("__dict__")));
@@ -312,7 +313,7 @@ namespace Belle2 {
 
             // Release Global Interpreter Lock in python to allow multithreading while reading root files
             // also see: https://docs.python.org/3.5/c-api/init.html
-            PyThreadState* m_thread_state =  PyEval_SaveThread();
+            Py_BEGIN_ALLOW_THREADS;
             for (uint64_t iEvent = 0; iEvent < batch_size; ++iEvent) {
               training_data.loadEvent(iteration_index_vector.at(iEvent + iBatch * batch_size) + numberOfValidationEvents);
               if (m_specific_options.m_normalize) {
@@ -328,14 +329,15 @@ namespace Belle2 {
               w[iEvent] = training_data.m_weight;
             }
 
+            // Reactivate Global Interpreter Lock to safely execute python code
+            Py_END_ALLOW_THREADS;
+
             // Maybe slow, create ndarrays outside of loop?
             auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
             auto ndarray_S = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_S, NPY_FLOAT32, S.get()));
             auto ndarray_y = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_y, NPY_FLOAT32, y.get()));
             auto ndarray_w = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_w, NPY_FLOAT32, w.get()));
 
-            // Reactivate Global Interpreter Lock to safely execute python code
-            PyEval_RestoreThread(m_thread_state);
             auto r = unique_mva_module.attr("partial_fit")(state, ndarray_X, ndarray_S, ndarray_y,
                                                            ndarray_w, iIteration, iBatch);
             boost::python::extract<bool> proxy(r);
@@ -427,8 +429,9 @@ namespace Belle2 {
         // Find the framework file. Then execute it in the scope of the new module
         auto framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
         auto framework_file = framework.attr("__file__");
-        auto framework_file_source_code = loadPythonFileAsString(boost::python::extract<std::string>(boost::python::object(
-                                                                   framework_file)));
+        boost::python::extract<std::string> extractor(framework_file);
+        std::string framework_filename = extractor();
+        auto framework_file_source_code = loadPythonFileAsString(framework_filename);
         builtins.attr("exec")(framework_file_source_code.c_str(), boost::python::object(m_unique_mva_module.attr("__dict__")));
 
         // Overwrite framework with user-defined code from the steering file if defined

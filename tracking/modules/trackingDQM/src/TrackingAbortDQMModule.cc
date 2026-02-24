@@ -221,7 +221,7 @@ void TrackingAbortDQMModule::defineHisto()
     m_nCDCHitsSL[0][sl]->GetXaxis()->SetTitle("nCDCHits");
     m_nCDCHitsSL[0][sl]->GetYaxis()->SetTitle("Number of Events");
     //inside active_veto window:
-    m_nCDCHitsSL[1][sl] = new TH1F(*m_nCDCExtraHitsSL[0][sl]);
+    m_nCDCHitsSL[1][sl] = new TH1F(*m_nCDCHitsSL[0][sl]);
     m_nCDCHitsSL[1][sl]->SetName(TString::Format("%s%d_%s", histoName.c_str(), sl, tag[1].c_str()));
     m_nCDCHitsSL[1][sl]->SetTitle(TString::Format("%s%d %s", histoTitle.c_str(), sl, title[1].c_str()));
   }

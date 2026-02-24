@@ -476,13 +476,13 @@ def evaluate(model, loader, criterion, device):
             loss = criterion(output, target)
             total_loss += loss.item() * len(data)
 
+    if len(loader.dataset) == 0:
+        return float('nan')
     return total_loss / len(loader.dataset)
 
 
 def distance_corr(var_1, var_2, normedweight=None, power=1):
     """
-    Compute distance correlation between var_1 and var_2.
-
     Computes distance correlation between var_1 and var_2.
 
     The distance correlation is a measure of dependence between two random variables.
@@ -1016,8 +1016,8 @@ def main():
             print(f"Epoch {epoch+1:3d}/{args.epochs}: "
                   f"train_loss={train_loss:.6f}, val_loss={val_loss:.6f}")
 
-        # Save best model
-        if val_loss < best_val_loss:
+        # Save best model (treat nan val_loss as always saving, for no-val-set runs)
+        if not (val_loss >= best_val_loss):
             best_val_loss = val_loss
             best_epoch = epoch
             model_path = os.path.join(args.output, f'net_{args.network}.pt')
@@ -1046,6 +1046,10 @@ def main():
     print(f"Model saved to: {os.path.join(args.output, f'net_{args.network}.pt')}")
 
     # Evaluation on validation set
+    if len(val_loader.dataset) == 0:
+        print("\nNo validation set, skipping evaluation.")
+        return
+
     print("\n" + "=" * 60)
     print("Evaluation on validation set")
     print("=" * 60)

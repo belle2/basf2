@@ -148,8 +148,10 @@ class ModeSelectorModule(b2.Module):
         #: Feature block names and transformations (from config)
         self.feature_blocks = [(name, transform) for name, _, transform in config.FEATURE_BLOCKS]
 
-        #: Variable mapping for particle features (from config)
-        self.particle_vars = {name: var_name for name, var_name, _ in config.FEATURE_BLOCKS}
+        # Register basf2 aliases where alias name differs from variable string
+        for name, var, _ in config.FEATURE_BLOCKS:
+            if name != var:
+                vm.addAlias(name, var)
 
         #: Cut range for D* delta mass difference
         self.deltaM_cut = config.DELTA_M_CUT
@@ -175,8 +177,8 @@ class ModeSelectorModule(b2.Module):
         input_id = self._get_input_id(particle)
 
         features = {}
-        for name, var_name in self.particle_vars.items():
-            val = vm.evaluate(var_name, particle)
+        for name, transform in self.feature_blocks:
+            val = vm.evaluate(name, particle)
             if np.isnan(val):
                 val = None
             features[name] = val
@@ -275,7 +277,7 @@ class ModeSelectorModule(b2.Module):
             obj = event_shape.obj()
             # Map feature names to EventShapeContainer methods
             if 'sphericity' in self.event_features:
-                # Sphericity = 3/2 * (λ2 + λ3)
+                # Sphericity = 3/2 * (lambda2 + lambda3)
                 event_features['sphericity'] = 1.5 * (obj.getSphericityEigenvalue(1) + obj.getSphericityEigenvalue(2))
             if 'thrust' in self.event_features:
                 event_features['thrust'] = obj.getThrust()

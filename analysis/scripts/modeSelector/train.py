@@ -774,7 +774,7 @@ def main():
                         help='Which network to train')
     parser.add_argument('--cat_model', help='Trained category model (required for main network)')
     parser.add_argument('--output', default='networks/', help='Output directory for trained models')
-    parser.add_argument('--fraction', type=float, default=0.7, help='Sampling fraction for BB events')
+    parser.add_argument('--fraction', type=float, default=0.9, help='Sampling fraction for BB events')
     parser.add_argument('--cont_fraction', type=float, default=0.25, help='Additional fraction for continuum')
     parser.add_argument('--batch_size', type=int, default=8192, help='Batch size')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of DataLoader worker processes')

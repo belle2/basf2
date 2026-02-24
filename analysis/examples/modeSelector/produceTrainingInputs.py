@@ -52,9 +52,9 @@ ma.inputMdstList(filelist=args.input, path=my_path)
 # Prepend the analysis globaltag
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
-# Apply base fraction cut using eventRandom (25% of events)
+# Apply base fraction cut using eventRandom (20% of events)
 # This matches the offline preprocessing base_fraction parameter
-BASE_FRACTION = 0.25
+BASE_FRACTION = 0.2
 b2.B2INFO(f"Applying base fraction cut: eventRandom < {BASE_FRACTION}")
 ma.applyEventCuts(f'[eventRandom < {BASE_FRACTION}]', path=my_path)
 

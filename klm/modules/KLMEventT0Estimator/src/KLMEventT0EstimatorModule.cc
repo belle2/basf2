@@ -230,11 +230,11 @@ void KLMEventT0EstimatorModule::initialize()
   m_transformE = new EKLM::TransformData(true, EKLM::TransformData::c_None);
 
   // Log ADC cut settings
-  B2INFO("KLMEventT0Estimator: ADC cuts configured:"
-         << LogVar("BKLM Scint min", m_ADCCut_BKLM_Scint_Min)
-         << LogVar("BKLM Scint max", m_ADCCut_BKLM_Scint_Max)
-         << LogVar("EKLM Scint min", m_ADCCut_EKLM_Scint_Min)
-         << LogVar("EKLM Scint max", m_ADCCut_EKLM_Scint_Max));
+  B2DEBUG(20, "KLMEventT0Estimator: ADC cuts configured:"
+          << LogVar("BKLM Scint min", m_ADCCut_BKLM_Scint_Min)
+          << LogVar("BKLM Scint max", m_ADCCut_BKLM_Scint_Max)
+          << LogVar("EKLM Scint min", m_ADCCut_EKLM_Scint_Min)
+          << LogVar("EKLM Scint max", m_ADCCut_EKLM_Scint_Max));
 }
 
 void KLMEventT0EstimatorModule::beginRun()
@@ -244,10 +244,10 @@ void KLMEventT0EstimatorModule::beginRun()
       B2FATAL("KLMEventT0Estimator: KLM EventT0 hit resolution data are not available. "
               "Either provide the calibration or set UseNewHitResolution=False.");
 
-    B2INFO("KLMEventT0Estimator: Using NEW calibrated per-hit resolution method."
-           << LogVar("sigma_RPC (ns)", m_eventT0HitResolution->getSigmaRPC())
-           << LogVar("sigma_BKLM_Scint (ns)", m_eventT0HitResolution->getSigmaBKLMScint())
-           << LogVar("sigma_EKLM_Scint (ns)", m_eventT0HitResolution->getSigmaEKLMScint()));
+    B2DEBUG(20, "KLMEventT0Estimator: Using NEW calibrated per-hit resolution method."
+            << LogVar("sigma_RPC (ns)", m_eventT0HitResolution->getSigmaRPC())
+            << LogVar("sigma_BKLM_Scint (ns)", m_eventT0HitResolution->getSigmaBKLMScint())
+            << LogVar("sigma_EKLM_Scint (ns)", m_eventT0HitResolution->getSigmaEKLMScint()));
   } else {
     B2WARNING("KLMEventT0Estimator: Using OLD per-event SEM calculation (may be unreliable with few hits).");
   }
@@ -718,34 +718,6 @@ void KLMEventT0EstimatorModule::accumulateBKLMRPCFiltered(RelationVector<KLMHit2
   }
 }
 
-// Wrapper: accumulate ALL RPC hits (both phi and z) for backward compatibility
-void KLMEventT0EstimatorModule::accumulateBKLMRPC(RelationVector<KLMHit2d>& klmHit2ds,
-                                                  const ExtMap& rpcMap,
-                                                  double& sumW, double& sumWT, double& sumWT2,
-                                                  double& sumW_new, double& sumWT_new)
-{
-  accumulateBKLMRPCFiltered(klmHit2ds, rpcMap, true,  sumW, sumWT, sumWT2, sumW_new, sumWT_new);
-  accumulateBKLMRPCFiltered(klmHit2ds, rpcMap, false, sumW, sumWT, sumWT2, sumW_new, sumWT_new);
-}
-
-// Wrapper: accumulate only phi-readout RPC hits
-void KLMEventT0EstimatorModule::accumulateBKLMRPCPhi(RelationVector<KLMHit2d>& klmHit2ds,
-                                                     const ExtMap& rpcMap,
-                                                     double& sumW, double& sumWT, double& sumWT2,
-                                                     double& sumW_new, double& sumWT_new)
-{
-  accumulateBKLMRPCFiltered(klmHit2ds, rpcMap, true, sumW, sumWT, sumWT2, sumW_new, sumWT_new);
-}
-
-// Wrapper: accumulate only z-readout RPC hits
-void KLMEventT0EstimatorModule::accumulateBKLMRPCZ(RelationVector<KLMHit2d>& klmHit2ds,
-                                                   const ExtMap& rpcMap,
-                                                   double& sumW, double& sumWT, double& sumWT2,
-                                                   double& sumW_new, double& sumWT_new)
-{
-  accumulateBKLMRPCFiltered(klmHit2ds, rpcMap, false, sumW, sumWT, sumWT2, sumW_new, sumWT_new);
-}
-
 /* Event. */
 
 void KLMEventT0EstimatorModule::event()
@@ -824,9 +796,9 @@ void KLMEventT0EstimatorModule::event()
 
     // RPC: accumulate separately for phi and z
     double wRphi = 0, wTRphi = 0, wT2Rphi = 0, wRphi_new = 0, wTRphi_new = 0;
-    accumulateBKLMRPCPhi(hit2ds, m_extRPC, wRphi, wTRphi, wT2Rphi, wRphi_new, wTRphi_new);
+    accumulateBKLMRPCFiltered(hit2ds, m_extRPC, true,  wRphi, wTRphi, wT2Rphi, wRphi_new, wTRphi_new);
     double wRz = 0, wTRz = 0, wT2Rz = 0, wRz_new = 0, wTRz_new = 0;
-    accumulateBKLMRPCZ(hit2ds, m_extRPC, wRz, wTRz, wT2Rz, wRz_new, wTRz_new);
+    accumulateBKLMRPCFiltered(hit2ds, m_extRPC, false, wRz,   wTRz,   wT2Rz,   wRz_new,   wTRz_new);
 
     // Combined RPC for backward compatibility
     const double wR     = wRphi + wRz;
@@ -1102,10 +1074,10 @@ void KLMEventT0EstimatorModule::event()
     }
   }
 
-  B2INFO("KLMEventT0Estimator: "
-         << "T0_hitavg_all=" << t0_hit_all << " ns  (seed CDC=" << m_seedT0 << " ns)"
-         << " | E=" << t0_hit_E << " | Bsc=" << t0_hit_B << " | Brpc=" << t0_hit_R
-         << (std::isfinite(finalT0) ? (std::string(" | FINAL KLM=") + std::to_string(finalT0) + " ns") : std::string("")));
+  B2DEBUG(20, "KLMEventT0Estimator: "
+          << "T0_hitavg_all=" << t0_hit_all << " ns  (seed CDC=" << m_seedT0 << " ns)"
+          << " | E=" << t0_hit_E << " | Bsc=" << t0_hit_B << " | Brpc=" << t0_hit_R
+          << (std::isfinite(finalT0) ? (std::string(" | FINAL KLM=") + std::to_string(finalT0) + " ns") : std::string("")));
 
   StoreObjPtr<EventT0> outT0("EventT0", DataStore::c_Event);
   if (!outT0.isValid()) outT0.construct();

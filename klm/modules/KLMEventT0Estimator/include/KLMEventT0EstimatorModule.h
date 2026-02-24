@@ -174,28 +174,6 @@ namespace Belle2 {
                                    double& sumW, double& sumWT, double& sumWT2,
                                    double& sumW_new, double& sumWT_new);
 
-    /**
-     * Convenience wrapper: accumulate ALL BKLM RPC hits (both phi and z).
-     * Calls accumulateBKLMRPCFiltered twice to get both directions.
-     */
-    void accumulateBKLMRPC(RelationVector<KLMHit2d>&, const ExtMap&,
-                           double& sumW, double& sumWT, double& sumWT2,
-                           double& sumW_new, double& sumWT_new);
-
-    /**
-     * Convenience wrapper: accumulate only phi-readout BKLM RPC hits.
-     */
-    void accumulateBKLMRPCPhi(RelationVector<KLMHit2d>&, const ExtMap&,
-                              double& sumW, double& sumWT, double& sumWT2,
-                              double& sumW_new, double& sumWT_new);
-
-    /**
-     * Convenience wrapper: accumulate only z-readout BKLM RPC hits.
-     */
-    void accumulateBKLMRPCZ(RelationVector<KLMHit2d>&, const ExtMap&,
-                            double& sumW, double& sumWT, double& sumWT2,
-                            double& sumW_new, double& sumWT_new);
-
     /* ---------- Parameters (set via addParam in constructor) ---------- */
 
     /** If true, use calibrated per-hit resolution from KLMEventT0HitResolution payload (default: true). */

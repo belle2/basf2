@@ -24,6 +24,7 @@ The script implements:
 """
 
 import argparse
+import glob
 import os
 
 import numpy as np
@@ -194,6 +195,16 @@ def load_and_sample_data(input_files, fraction=0.7, cont_fraction=0.25,
     """
     if isinstance(input_files, str):
         input_files = [input_files]
+
+    # Expand any glob patterns and exclude _features.npz files
+    expanded = []
+    for f in input_files:
+        matches = glob.glob(f)
+        expanded.extend(matches if matches else [f])
+    input_files = [f for f in expanded if not f.endswith('_features.npz')]
+
+    if not input_files:
+        raise ValueError("No input files found.")
 
     if random_state is not None:
         np.random.seed(random_state)

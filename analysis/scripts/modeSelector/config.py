@@ -15,6 +15,8 @@ used by the ModeSelector module. Both inference and training must use these
 definitions to ensure consistency.
 """
 
+import numpy as _np
+
 # Number of input_id values (dmID * 2 + is_charged)
 N_INPUT_IDS = 136
 
@@ -108,6 +110,18 @@ FEI_CALIB_B0 = {
 }
 FEI_CALIB_B0_REST = 1.143776
 
+# Normalisation reference for FEI calibration weights: 90th percentile of all calibration values
+# across B+ and B0. Weights are divided by this before multiplying by fraction to give sample_prob.
+# Events where sample_prob exceeds 1.0 after this are capped and reported as a warning.
+# Using a percentile rather than the maximum prevents outlier modes from compressing the
+# sampling of all other events.
+_all_calib = (
+    list(FEI_CALIB_BP.values()) + [FEI_CALIB_BP_REST] +
+    list(FEI_CALIB_B0.values()) + [FEI_CALIB_B0_REST]
+)
+CALIB_WEIGHT_CAP = float(_np.percentile(_all_calib, 90, method='closest_observation'))
+del _np, _all_calib
+
 
 # Indices to REMOVE from the full 1643-feature array (all-zero columns + Mbc block 10).
 # Complement of the 1065 selected features. Verified against offline training.
@@ -160,4 +174,4 @@ REMOVE_INPUTS = [
     1492, 1493, 1494, 1495,
     1510, 1511, 1514, 1515, 1562, 1563, 1564, 1565, 1588, 1589, 1590, 1591,
     1594, 1595, 1614, 1618, 1630, 1631,
-]  # 578 indices removed → 1065 features kept
+]  # 578 indices removed -> 1065 features kept

@@ -160,7 +160,7 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names, use_delta_p_good
     return event_calib_bp, event_calib_b0
 
 
-def load_and_sample_data(input_files, fraction=0.7, cont_fraction=0.25,
+def load_and_sample_data(input_files, fraction=1.0, cont_fraction=0.25,
                          sigprob_thresh=0.01, mbc_thresh=5.23, random_state=None,
                          use_delta_p_good_tag=False, delta_p_thresh=0.1):
     """
@@ -171,9 +171,9 @@ def load_and_sample_data(input_files, fraction=0.7, cont_fraction=0.25,
     input_files : str or list of str
         Path(s) to modeSelector_training.npz file(s)
     fraction : float
-        Fraction of BB events to sample (default 0.7)
+        Base sampling fraction for all events (default 1.0); continuum is further scaled by cont_fraction
     cont_fraction : float
-        Additional fraction for continuum (default 0.25)
+        Additional downscale for continuum events (default 0.25)
     sigprob_thresh : float
         Minimum signal probability threshold
     mbc_thresh : float
@@ -206,6 +206,12 @@ def load_and_sample_data(input_files, fraction=0.7, cont_fraction=0.25,
 
     if not input_files:
         raise ValueError("No input files found.")
+
+    if fraction > 1.0:
+        raise ValueError(f"fraction must be <= 1.0, got {fraction}.")
+
+    if cont_fraction > 1.0:
+        raise ValueError(f"cont_fraction must be <= 1.0, got {cont_fraction}.")
 
     rng = np.random.default_rng(random_state)
     # Pre-generate per-file seeds so parallel workers are independent
@@ -245,18 +251,22 @@ def load_and_sample_data(input_files, fraction=0.7, cont_fraction=0.25,
 
         presel = (best_sigprob > sigprob_thresh) & (best_mbc > mbc_thresh)
 
-        sample_prob = np.minimum(event_calib * fraction, 1.0)
+        sample_prob = event_calib / config.CALIB_WEIGHT_CAP * fraction
         sample_prob[is_cont] *= cont_fraction
+        n_clipped = int((sample_prob > 1.0).sum())
+        sample_prob = np.minimum(sample_prob, 1.0)
 
         file_rng = np.random.default_rng(seed)
         sampled = (file_rng.random(len(bp_truth)) < sample_prob) & presel
 
-        return feats[sampled], bp_truth[sampled], b0_truth[sampled], file_mc_var_names
+        return feats[sampled], bp_truth[sampled], b0_truth[sampled], file_mc_var_names, n_clipped
 
     features_list = []
     bp_list = []
     b0_list = []
     mc_var_names = None
+    total_clipped = 0
+    total_events = 0
 
     n_workers = min(32, len(input_files))
     with ThreadPoolExecutor(max_workers=n_workers) as executor:
@@ -265,7 +275,7 @@ def load_and_sample_data(input_files, fraction=0.7, cont_fraction=0.25,
             for f, s in zip(input_files, seeds)
         }
         for future in tqdm(as_completed(futures), total=len(futures), desc="Loading files"):
-            feats, bp, b0, file_mc_var_names = future.result()
+            feats, bp, b0, file_mc_var_names, n_clipped = future.result()
             if mc_var_names is None:
                 mc_var_names = file_mc_var_names
             elif file_mc_var_names != mc_var_names:
@@ -276,6 +286,13 @@ def load_and_sample_data(input_files, fraction=0.7, cont_fraction=0.25,
             features_list.append(feats)
             bp_list.append(bp)
             b0_list.append(b0)
+            total_clipped += n_clipped
+            total_events += len(bp)
+
+    if total_clipped > 0:
+        print(f"WARNING: calibration weight exceeded CALIB_WEIGHT_CAP ({config.CALIB_WEIGHT_CAP:.4f}) "
+              f"for {total_clipped} events ({total_clipped / total_events * 100:.1f}% of sampled events). "
+              f"These events were capped and their sampling weight reduced.")
 
     # Concatenate across all files
     features = sparse.vstack(features_list, format='csr')
@@ -767,7 +784,7 @@ def main():
                         help='Which network to train')
     parser.add_argument('--cat_model', help='Trained category model (required for main network)')
     parser.add_argument('--output', default='networks/', help='Output directory for trained models')
-    parser.add_argument('--fraction', type=float, default=0.9, help='Sampling fraction for BB events')
+    parser.add_argument('--fraction', type=float, default=1.0, help='Base sampling fraction for all events')
     parser.add_argument('--cont_fraction', type=float, default=0.25, help='Additional fraction for continuum')
     parser.add_argument('--batch_size', type=int, default=8192, help='Batch size')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of DataLoader worker processes')
@@ -803,6 +820,7 @@ def main():
     print("\n" + "=" * 60)
     print("Loading and sampling data")
     print("=" * 60)
+    print(f"Calibration weight cap (90th percentile): {config.CALIB_WEIGHT_CAP:.4f}")
     features, bp_truth, b0_truth, mc_var_names, has_inputs = load_and_sample_data(
         args.input,
         fraction=args.fraction,

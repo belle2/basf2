@@ -23,11 +23,9 @@ The module:
 
 import basf2 as b2
 import numpy as np
+from modeSelector import config
 from ROOT import Belle2
 from variables import variables as vm
-
-from modeSelector import config
-from modeSelector.config import load_has_inputs
 
 
 class ModeSelectorModule(b2.Module):
@@ -51,7 +49,6 @@ class ModeSelectorModule(b2.Module):
         particle_lists,
         cat_model_path=None,
         main_model_path=None,
-        has_inputs_path=None,
         output_variable='BplusScore',
         payload_cat_model='ModeSelector_cat_model',
         payload_main_model='ModeSelector_main_model',
@@ -67,8 +64,6 @@ class ModeSelectorModule(b2.Module):
         self.cat_model_path = cat_model_path
         #: Path to main model
         self.main_model_path = main_model_path
-        #: Path to has_inputs file
-        self.has_inputs_path = has_inputs_path
         #: Output variable name
         self.output_variable = output_variable
         #: Payload name for category model
@@ -108,16 +103,9 @@ class ModeSelectorModule(b2.Module):
 
         import onnxruntime as ort
 
-        # Derive has_inputs from config.REMOVE_INPUTS by default; file only as explicit override
         n_total = len(config.FEATURE_BLOCKS) * config.N_INPUT_IDS + len(config.EVENT_FEATURES) + 3
-        if self.has_inputs_path:
-            self.has_inputs = load_has_inputs(self.has_inputs_path)
-            b2.B2INFO(f"ModeSelector: has_inputs loaded from file {self.has_inputs_path} "
-                      f"({len(self.has_inputs)} features)")
-        else:
-            self.has_inputs = sorted(set(range(n_total)) - set(config.REMOVE_INPUTS))
-            b2.B2INFO(f"ModeSelector: Using config.REMOVE_INPUTS "
-                      f"({len(self.has_inputs)} features kept)")
+        self.has_inputs = sorted(set(range(n_total)) - set(config.REMOVE_INPUTS))
+        b2.B2INFO(f"ModeSelector: Using config.REMOVE_INPUTS ({len(self.has_inputs)} features kept)")
 
         # Load models from files or database
         if self.cat_model_path:

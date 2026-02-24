@@ -10,17 +10,35 @@
 
 ##########################################################################
 #                                                                        #
-# This tutorial demonstrates how to apply ModeSelector to FEI B meson    #
-# candidates for improved signal probability estimation.                  #
+# This tutorial demonstrates how to apply ModeSelector to FEI B meson   #
+# candidates for improved signal probability estimation.                 #
 #                                                                        #
-# ModeSelector is a neural network that considers information from all   #
-# B candidates in an event to provide a better signal probability score. #
+# Usage:                                                                 #
+#   basf2 applyModeSelector.py -- [options]                              #
+#                                                                        #
+# Output files:                                                          #
+#   <output>_Bp.root  - B+ candidates ntuple                            #
+#   <output>_B0.root  - B0 candidates ntuple                            #
 #                                                                        #
 ##########################################################################
+
+import argparse
 
 import basf2 as b2
 import modeSelector
 import modularAnalysis as ma
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--input', nargs='+',
+                    default=['/home/pf/dataframes/MC16rd_skim/udst_000001_prod00051442_task230000001.root'],
+                    help='Input ROOT file(s) with FEI B meson candidates')
+parser.add_argument('--output', default='modeSelector_output',
+                    help='Output prefix for ntuples (default: modeSelector_output)')
+parser.add_argument('--cat-model', default='modeSelector_test/cat_model.onnx',
+                    help='Path to category ONNX model')
+parser.add_argument('--main-model', default='modeSelector_test/main_model.onnx',
+                    help='Path to main ONNX model')
+args = parser.parse_args()
 
 # Set up logging
 b2.set_log_level(b2.LogLevel.INFO)
@@ -28,10 +46,8 @@ b2.set_log_level(b2.LogLevel.INFO)
 # Create path
 my_path = b2.create_path()
 
-# Input file (should be FEI output with B meson candidates)
-# For this example, we assume a file with B+:feiHadronic and B0:feiHadronic lists
 ma.inputMdstList(
-    filelist=['/home/pf/dataframes/MC16rd_skim/udst_000001_prod00051442_task230000001.root'],
+    filelist=args.input,
     path=my_path
 )
 
@@ -90,9 +106,8 @@ modeSelector.addDstarVeto(particle_lists, path=my_path)
 # Set debug=True to print feature values for comparison
 modeSelector.modeSelector(
     particleLists=particle_lists,
-    cat_model_path='modeSelector_test/cat_model.onnx',
-    main_model_path='modeSelector_test/main_model.onnx',
-    has_inputs_path='modeSelector_test/has_inputs.txt',
+    cat_model_path=args.cat_model,
+    main_model_path=args.main_model,
     output_variable='BplusScore',
     debug=True,  # Enable debug output
     debug_max_events=3,  # Print first 3 events
@@ -130,7 +145,7 @@ output_variables = [
 ma.variablesToNtuple(
     'B+:feiHadronic',
     variables=output_variables,
-    filename='modeSelector_output_Bp.root',
+    filename=args.output + '_Bp.root',
     treename='Bp',
     path=my_path
 )
@@ -139,7 +154,7 @@ ma.variablesToNtuple(
 ma.variablesToNtuple(
     'B0:feiHadronic',
     variables=output_variables,
-    filename='modeSelector_output_B0.root',
+    filename=args.output + '_B0.root',
     treename='B0',
     path=my_path
 )

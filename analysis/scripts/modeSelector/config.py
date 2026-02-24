@@ -161,24 +161,3 @@ REMOVE_INPUTS = [
     1510, 1511, 1514, 1515, 1562, 1563, 1564, 1565, 1588, 1589, 1590, 1591,
     1594, 1595, 1614, 1618, 1630, 1631,
 ]  # 578 indices removed → 1065 features kept
-
-
-def load_has_inputs(filepath):
-    """
-    Load the has_inputs list from a text file.
-
-    The file should contain a Python list of integer indices.
-
-    Parameters
-    ----------
-    filepath : str
-        Path to the has_inputs file.
-
-    Returns
-    -------
-    list of int
-        Feature indices to select from the full feature array.
-    """
-    import ast
-    with open(filepath, 'r') as f:
-        return ast.literal_eval(f.read())

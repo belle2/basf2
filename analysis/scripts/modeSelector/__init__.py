@@ -22,7 +22,7 @@ Example usage:
     import modeSelector
 
     # Add D* veto reconstruction (optional, improves performance)
-    modeSelector.addDstarVeto('B+:fei', path=my_path)
+    modeSelector.addDstarVeto(['B+:fei', 'B0:fei'], path=my_path)
 
     # Add ModeSelector NN evaluation
     modeSelector.modeSelector(
@@ -51,7 +51,6 @@ def modeSelector(
     particleLists,
     cat_model_path=None,
     main_model_path=None,
-    has_inputs_path=None,
     output_variable='BplusScore',
     addDstarVetoReco=False,
     training_mode=False,
@@ -121,11 +120,11 @@ def modeSelector(
     >>>
     >>> # Assume FEI B lists are available
     >>> # Add D* veto reconstruction
-    >>> modeSelector.addDstarVeto('B+:fei', path=path)
+    >>> modeSelector.addDstarVeto(['B+:fei', 'B0:fei'], path=path)
     >>>
     >>> # Add ModeSelector
     >>> modeSelector.modeSelector(
-    ...     particleLists=['B+:fei'],
+    ...     particleLists=['B+:fei', 'B0:fei'],
     ...     path=path
     ... )
     >>>
@@ -154,7 +153,6 @@ def modeSelector(
         particle_lists=particleLists,
         cat_model_path=cat_model_path,
         main_model_path=main_model_path,
-        has_inputs_path=has_inputs_path,
         output_variable=output_variable,
         training_mode=training_mode,
         training_output=training_output,

@@ -38,6 +38,8 @@ parser.add_argument('--input', default='/home/pf/dataframes/MC16rd_skim/udst_000
                     help='Input ROOT file(s) with FEI B meson candidates')
 parser.add_argument('--output', default='modeSelector_training',
                     help='Output prefix for training files (default: modeSelector_training)')
+parser.add_argument('--cont-fraction', type=float, default=0.25,
+                    help='Continuum downsampling fraction relative to BB (default: 0.25)')
 args = parser.parse_args()
 
 # Set up logging
@@ -52,11 +54,16 @@ ma.inputMdstList(filelist=args.input, path=my_path)
 # Prepend the analysis globaltag
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
-# Apply base fraction cut using eventRandom (20% of events)
-# This matches the offline preprocessing base_fraction parameter
+# Apply event fraction cuts using eventRandom.
+# BB events: 20% base fraction. Continuum: additionally downsampled by cont_fraction.
 BASE_FRACTION = 0.2
-b2.B2INFO(f"Applying base fraction cut: eventRandom < {BASE_FRACTION}")
-ma.applyEventCuts(f'[eventRandom < {BASE_FRACTION}]', path=my_path)
+CONT_FRACTION = BASE_FRACTION * args.cont_fraction
+b2.B2INFO(f"Applying event cuts: BB fraction={BASE_FRACTION}, continuum fraction={CONT_FRACTION}")
+ma.applyEventCuts(
+    f'[isContinuumEvent == 0 and eventRandom < {BASE_FRACTION}] or '
+    f'[isContinuumEvent == 1 and eventRandom < {CONT_FRACTION}]',
+    path=my_path
+)
 
 # FEI list identifier
 fei_identifier = 'feiHadronic'

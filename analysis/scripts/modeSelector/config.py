@@ -86,11 +86,13 @@ TRAINING_MC_VARS = [
     'extraInfo(looseMCMotherPDG)',
     'extraInfo(looseMCWrongDaughterN)',
     'isBBCrossfeed',
-    # Generator B meson PDGs (for tag_is_gen_PDG computation)
+    # Generated B meson PDGs (indices 3 and 4 in MCParticle list = first and second B meson).
+    # Used for future cross_deltaC1 vs cross_internal classification.
     'genParticle(3, varForMCGen(PDG))',
     'genParticle(4, varForMCGen(PDG))',
-    # Event-level for sampling
-    'eventRandom',  # For base fraction cut (e.g. eventRandom < 0.25 for 25% sample)
+    # Event-level flags
+    'isContinuumEvent',  # 1 for qqbar continuum, 0 for BB
+    'eventRandom',       # For base fraction cut (e.g. eventRandom < 0.25 for 25% sample)
 ]
 
 # FEI calibration factors for sampling

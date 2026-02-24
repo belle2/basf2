@@ -18,9 +18,12 @@ Usage:
 
 The script implements:
 - FEI calibration sampling (decayModeID-based weights)
-- Continuum downsampling (25% relative to BB)
-- Fraction sampling (configurable, default 0.7)
-- sigProb and Mbc preselection
+- Continuum downsampling (applied at production by produceTrainingInputs.py; --cont_fraction defaults to 1.0)
+- Fraction sampling (configurable, default 1.0)
+- sigProb and Mbc preselection (skipped for continuum events)
+
+Note: input npz files must be produced with the current config.TRAINING_MC_VARS, which includes
+isContinuumEvent. Re-run produceTrainingInputs.py if upgrading from older npz files.
 """
 
 import argparse
@@ -93,8 +96,7 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names, use_delta_p_good
     # Get column indices
     pdg_idx = list(mc_var_names).index('PDG')
     dm_idx = list(mc_var_names).index('extraInfo(decayModeID)')
-    gen3_idx = list(mc_var_names).index('genParticle(3, varForMCGen(PDG))')
-    gen4_idx = list(mc_var_names).index('genParticle(4, varForMCGen(PDG))')
+    is_cont_idx = list(mc_var_names).index('isContinuumEvent')
     if use_delta_p_good_tag:
         delta_p_idx = list(mc_var_names).index('mostcommonBTagDeltaP')
     else:
@@ -121,10 +123,7 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names, use_delta_p_good
             tag_is_gen = ((bp_mc_truth[has_bp, sig_acc_wrong_idx] == 1) |
                           (bp_mc_truth[has_bp, sig_acc_miss_idx] == 1))
 
-        # Check if continuum (both gen particles are quarks)
-        gen3 = np.where(np.isnan(bp_mc_truth[has_bp, gen3_idx]), 0, bp_mc_truth[has_bp, gen3_idx])
-        gen4 = np.where(np.isnan(bp_mc_truth[has_bp, gen4_idx]), 0, bp_mc_truth[has_bp, gen4_idx])
-        is_cont = (np.abs(gen3) < 10) & (np.abs(gen4) < 10)
+        is_cont = bp_mc_truth[has_bp, is_cont_idx] == 1
 
         # Validate decayModeIDs
         if (dm_ids < 0).any() or (dm_ids > 67).any():
@@ -146,9 +145,7 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names, use_delta_p_good
             tag_is_gen = ((b0_mc_truth[has_b0, sig_acc_wrong_idx] == 1) |
                           (b0_mc_truth[has_b0, sig_acc_miss_idx] == 1))
 
-        gen3 = np.where(np.isnan(b0_mc_truth[has_b0, gen3_idx]), 0, b0_mc_truth[has_b0, gen3_idx])
-        gen4 = np.where(np.isnan(b0_mc_truth[has_b0, gen4_idx]), 0, b0_mc_truth[has_b0, gen4_idx])
-        is_cont = (np.abs(gen3) < 10) & (np.abs(gen4) < 10)
+        is_cont = b0_mc_truth[has_b0, is_cont_idx] == 1
 
         # Validate decayModeIDs
         if (dm_ids < 0).any() or (dm_ids > 67).any():
@@ -160,7 +157,7 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names, use_delta_p_good
     return event_calib_bp, event_calib_b0
 
 
-def load_and_sample_data(input_files, fraction=1.0, cont_fraction=0.25,
+def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
                          sigprob_thresh=0.01, mbc_thresh=5.23, random_state=None,
                          use_delta_p_good_tag=False, delta_p_thresh=0.1):
     """
@@ -173,7 +170,8 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=0.25,
     fraction : float
         Base sampling fraction for all events (default 1.0); continuum is further scaled by cont_fraction
     cont_fraction : float
-        Additional downscale for continuum events (default 0.25)
+        Additional downscale for continuum events (default 1.0, i.e. no extra downsampling;
+        continuum is already downsampled at production time by produceTrainingInputs.py)
     sigprob_thresh : float
         Minimum signal probability threshold
     mbc_thresh : float
@@ -228,8 +226,7 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=0.25,
 
         sigprob_idx = file_mc_var_names.index('extraInfo(SignalProbability)')
         mbc_idx = file_mc_var_names.index('Mbc')
-        gen3_idx = file_mc_var_names.index('genParticle(3, varForMCGen(PDG))')
-        gen4_idx = file_mc_var_names.index('genParticle(4, varForMCGen(PDG))')
+        is_cont_idx = file_mc_var_names.index('isContinuumEvent')
 
         event_calib_bp, event_calib_b0 = compute_event_calib(
             bp_truth, b0_truth, file_mc_var_names,
@@ -245,11 +242,12 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=0.25,
         best_mbc = np.where(bp_is_best, bp_truth[:, mbc_idx], b0_truth[:, mbc_idx])
         event_calib = np.where(bp_is_best, event_calib_bp, event_calib_b0)
 
-        gen3 = np.where(bp_is_best, bp_truth[:, gen3_idx], b0_truth[:, gen3_idx])
-        gen4 = np.where(bp_is_best, bp_truth[:, gen4_idx], b0_truth[:, gen4_idx])
-        is_cont = (np.abs(gen3) < 10) & (np.abs(gen4) < 10)
+        is_cont_val = np.where(bp_is_best, bp_truth[:, is_cont_idx], b0_truth[:, is_cont_idx])
+        is_cont = is_cont_val == 1
 
-        presel = (best_sigprob > sigprob_thresh) & (best_mbc > mbc_thresh)
+        # Continuum events bypass the sigprob/mbc presel (FEI sigProb is near-zero for fake
+        # candidates in qqbar events; Mbc is not meaningful for continuum)
+        presel = is_cont | ((best_sigprob > sigprob_thresh) & (best_mbc > mbc_thresh))
 
         sample_prob = event_calib / config.CALIB_WEIGHT_CAP * fraction
         sample_prob[is_cont] *= cont_fraction
@@ -599,8 +597,7 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names, use_delta_p_good_tag=Fal
     # Get column indices
     pdg_idx = mc_var_names.index('PDG')
     sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
-    gen3_idx = mc_var_names.index('genParticle(3, varForMCGen(PDG))')
-    gen4_idx = mc_var_names.index('genParticle(4, varForMCGen(PDG))')
+    is_cont_idx = mc_var_names.index('isContinuumEvent')
     if use_delta_p_good_tag:
         delta_p_idx = mc_var_names.index('mostcommonBTagDeltaP')
     else:
@@ -615,8 +612,6 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names, use_delta_p_good_tag=Fal
 
         # Extract truth info (handle NaN for missing candidates)
         pdg = truth_array[:, pdg_idx]
-        gen3 = np.where(np.isnan(truth_array[:, gen3_idx]), 0, truth_array[:, gen3_idx])
-        gen4 = np.where(np.isnan(truth_array[:, gen4_idx]), 0, truth_array[:, gen4_idx])
 
         # Determine event type
         if use_delta_p_good_tag:
@@ -626,7 +621,7 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names, use_delta_p_good_tag=Fal
             is_signal_wrong = np.where(np.isnan(truth_array[:, sig_acc_wrong_idx]), 0, truth_array[:, sig_acc_wrong_idx])
             is_signal_miss = np.where(np.isnan(truth_array[:, sig_acc_miss_idx]), 0, truth_array[:, sig_acc_miss_idx])
             is_target = (is_signal_wrong == 1) | (is_signal_miss == 1)
-        is_cont = (np.abs(gen3) < 10) & (np.abs(gen4) < 10)
+        is_cont = truth_array[:, is_cont_idx] == 1
 
         # For BB events (not continuum), check crossfeed
         # NOTE: For crossfeed, we'd need mostcommonBTagPDG to determine deltaC=1 vs internal
@@ -746,20 +741,15 @@ def build_category_labels(bp_truth, b0_truth, mc_var_names):
     # Get column indices
     pdg_idx = mc_var_names.index('PDG')
     sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
-    gen3_idx = mc_var_names.index('genParticle(3, varForMCGen(PDG))')
-    gen4_idx = mc_var_names.index('genParticle(4, varForMCGen(PDG))')
+    is_cont_idx = mc_var_names.index('isContinuumEvent')
 
     # Determine best candidate (highest sigProb)
     bp_sigprob = np.where(np.isnan(bp_truth[:, sigprob_idx]), -1, bp_truth[:, sigprob_idx])
     b0_sigprob = np.where(np.isnan(b0_truth[:, sigprob_idx]), -1, b0_truth[:, sigprob_idx])
     bp_is_best = bp_sigprob > b0_sigprob
 
-    # Determine if continuum (both gen particles are quarks)
-    gen3 = np.where(bp_is_best, bp_truth[:, gen3_idx], b0_truth[:, gen3_idx])
-    gen4 = np.where(bp_is_best, bp_truth[:, gen4_idx], b0_truth[:, gen4_idx])
-    gen3 = np.where(np.isnan(gen3), 0, gen3)
-    gen4 = np.where(np.isnan(gen4), 0, gen4)
-    is_cont = (np.abs(gen3) < 10) & (np.abs(gen4) < 10)
+    is_cont_val = np.where(bp_is_best, bp_truth[:, is_cont_idx], b0_truth[:, is_cont_idx])
+    is_cont = is_cont_val == 1
 
     # Build labels
     labels = np.zeros(n_events, dtype=np.int64)
@@ -785,7 +775,9 @@ def main():
     parser.add_argument('--cat_model', help='Trained category model (required for main network)')
     parser.add_argument('--output', default='networks/', help='Output directory for trained models')
     parser.add_argument('--fraction', type=float, default=1.0, help='Base sampling fraction for all events')
-    parser.add_argument('--cont_fraction', type=float, default=0.25, help='Additional fraction for continuum')
+    parser.add_argument('--cont_fraction', type=float, default=1.0,
+                        help='Additional continuum downscale at training time (default 1.0; '
+                             'continuum is already downsampled at production by produceTrainingInputs.py)')
     parser.add_argument('--batch_size', type=int, default=8192, help='Batch size')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of DataLoader worker processes')
     parser.add_argument('--epochs', type=int, default=40, help='Number of epochs')

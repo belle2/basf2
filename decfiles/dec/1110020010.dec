@@ -1,7 +1,7 @@
 # EventType: 1110020010
 # Descriptor: [B0 -> K0star Xinv ]cc
 # NickName: Bd_K0starXinv
-# Documentation: b->s Xinv 
+# Documentation: b->s Xinv, all Kstar0 decays are allowed 
 # Tested: Yes
 # PhysicsWG: DSLM
 # Responsible: Slavomira Stefkova, Roberta Volpe

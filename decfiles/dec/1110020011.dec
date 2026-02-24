@@ -14,9 +14,6 @@ Alias MyK*0 K*0
 Alias Myanti-K*0 anti-K*0
 ChargeConj MyK*0 Myanti-K*0
 
-# Need to define B0 mass eigenstates for VSS_BMIX model
-Define dm 0.510e12
-
 
 # Set the Upsilon(4S) to decay entirely into our signal B's
 Decay Upsilon(4S)

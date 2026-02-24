@@ -7,8 +7,11 @@ This script trains the two-stage ModeSelector:
 2. Main network (signal vs background classification using category output)
 
 Usage:
-    # Train category network
+    # Train category network (single file)
     python train.py --input modeSelector_training.npz --network category --output networks/
+
+    # Train category network (multiple files)
+    python train.py --input modeSelector_training_*.npz --network category --output networks/
 
     # Train main network (requires trained category network)
     python train.py --input modeSelector_training.npz --network main --cat_model networks/net_cat.pt --output networks/
@@ -157,7 +160,7 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names, use_delta_p_good
     return event_calib_bp, event_calib_b0
 
 
-def load_and_sample_data(input_file, fraction=0.7, cont_fraction=0.25,
+def load_and_sample_data(input_files, fraction=0.7, cont_fraction=0.25,
                          sigprob_thresh=0.01, mbc_thresh=5.23, random_state=None,
                          use_delta_p_good_tag=False, delta_p_thresh=0.1):
     """
@@ -165,8 +168,8 @@ def load_and_sample_data(input_file, fraction=0.7, cont_fraction=0.25,
 
     Parameters
     ----------
-    input_file : str
-        Path to modeSelector_training.npz
+    input_files : str or list of str
+        Path(s) to modeSelector_training.npz file(s)
     fraction : float
         Fraction of BB events to sample (default 0.7)
     cont_fraction : float
@@ -191,77 +194,102 @@ def load_and_sample_data(input_file, fraction=0.7, cont_fraction=0.25,
     has_inputs : list of int
         Selected feature indices (non-zero features, excluding Mbc)
     """
+    if isinstance(input_files, str):
+        input_files = [input_files]
+
     if random_state is not None:
         np.random.seed(random_state)
 
-    # Load data
-    print(f"Loading {input_file}...")
-    data = np.load(input_file, allow_pickle=True)
-    features = sparse.load_npz(input_file.replace('.npz', '_features.npz'))
+    features_list = []
+    bp_list = []
+    b0_list = []
+    mc_var_names = None
 
-    bp_truth = data['bp_truth']
-    b0_truth = data['b0_truth']
-    mc_var_names = list(data['mc_var_names'])
+    for input_file in input_files:
+        # Load data
+        print(f"Loading {input_file}...")
+        data = np.load(input_file, allow_pickle=True)
+        features = sparse.load_npz(input_file.replace('.npz', '_features.npz'))
 
-    n_events = len(bp_truth)
-    print(f"  Loaded {n_events} events, {features.shape[1]} features")
+        bp_truth = data['bp_truth']
+        b0_truth = data['b0_truth']
+        file_mc_var_names = list(data['mc_var_names'])
 
-    # Get indices for MC truth variables
-    sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
-    mbc_idx = mc_var_names.index('Mbc')
-    gen3_idx = mc_var_names.index('genParticle(3, varForMCGen(PDG))')
-    gen4_idx = mc_var_names.index('genParticle(4, varForMCGen(PDG))')
+        # Verify mc_var_names consistency across files
+        if mc_var_names is None:
+            mc_var_names = file_mc_var_names
+        elif file_mc_var_names != mc_var_names:
+            raise ValueError(
+                f"mc_var_names mismatch in {input_file}. "
+                "All input files must have identical truth variable names."
+            )
 
-    # Compute event calibration weights
-    print("Computing FEI calibration weights...")
-    event_calib_bp, event_calib_b0 = compute_event_calib(bp_truth, b0_truth, mc_var_names,
-                                                         use_delta_p_good_tag=use_delta_p_good_tag,
-                                                         delta_p_thresh=delta_p_thresh)
+        n_events = len(bp_truth)
+        print(f"  Loaded {n_events} events, {features.shape[1]} features")
 
-    # Determine best candidate (highest sigProb between B+ and B0)
-    bp_sigprob = bp_truth[:, sigprob_idx]
-    b0_sigprob = b0_truth[:, sigprob_idx]
+        # Get indices for MC truth variables
+        sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
+        mbc_idx = mc_var_names.index('Mbc')
+        gen3_idx = mc_var_names.index('genParticle(3, varForMCGen(PDG))')
+        gen4_idx = mc_var_names.index('genParticle(4, varForMCGen(PDG))')
 
-    # Handle NaN (no candidate of that type)
-    bp_sigprob = np.where(np.isnan(bp_sigprob), -1, bp_sigprob)
-    b0_sigprob = np.where(np.isnan(b0_sigprob), -1, b0_sigprob)
+        # Compute event calibration weights
+        print("Computing FEI calibration weights...")
+        event_calib_bp, event_calib_b0 = compute_event_calib(bp_truth, b0_truth, mc_var_names,
+                                                             use_delta_p_good_tag=use_delta_p_good_tag,
+                                                             delta_p_thresh=delta_p_thresh)
 
-    bp_is_best = bp_sigprob > b0_sigprob
+        # Determine best candidate (highest sigProb between B+ and B0)
+        bp_sigprob = bp_truth[:, sigprob_idx]
+        b0_sigprob = b0_truth[:, sigprob_idx]
 
-    # Get best candidate's properties for each event
-    best_sigprob = np.where(bp_is_best, bp_sigprob, b0_sigprob)
-    best_mbc = np.where(bp_is_best, bp_truth[:, mbc_idx], b0_truth[:, mbc_idx])
-    event_calib = np.where(bp_is_best, event_calib_bp, event_calib_b0)
+        # Handle NaN (no candidate of that type)
+        bp_sigprob = np.where(np.isnan(bp_sigprob), -1, bp_sigprob)
+        b0_sigprob = np.where(np.isnan(b0_sigprob), -1, b0_sigprob)
 
-    # Determine if continuum (both gen particles are quarks)
-    gen3 = np.where(bp_is_best, bp_truth[:, gen3_idx], b0_truth[:, gen3_idx])
-    gen4 = np.where(bp_is_best, bp_truth[:, gen4_idx], b0_truth[:, gen4_idx])
-    is_cont = (np.abs(gen3) < 10) & (np.abs(gen4) < 10)
+        bp_is_best = bp_sigprob > b0_sigprob
 
-    # Apply preselection
-    print(f"Applying preselection (sigProb > {sigprob_thresh}, Mbc > {mbc_thresh})...")
-    presel = (best_sigprob > sigprob_thresh) & (best_mbc > mbc_thresh)
-    print(f"  {presel.sum()} / {n_events} events pass ({presel.mean() * 100:.1f}%)")
+        # Get best candidate's properties for each event
+        best_sigprob = np.where(bp_is_best, bp_sigprob, b0_sigprob)
+        best_mbc = np.where(bp_is_best, bp_truth[:, mbc_idx], b0_truth[:, mbc_idx])
+        event_calib = np.where(bp_is_best, event_calib_bp, event_calib_b0)
 
-    # Apply sampling with FEI calibration and fraction
-    print(f"Applying sampling (fraction={fraction}, cont_fraction={cont_fraction})...")
-    sample_prob = event_calib * fraction
-    sample_prob[is_cont] *= cont_fraction
+        # Determine if continuum (both gen particles are quarks)
+        gen3 = np.where(bp_is_best, bp_truth[:, gen3_idx], b0_truth[:, gen3_idx])
+        gen4 = np.where(bp_is_best, bp_truth[:, gen4_idx], b0_truth[:, gen4_idx])
+        is_cont = (np.abs(gen3) < 10) & (np.abs(gen4) < 10)
 
-    # Cap probabilities at 1.0
-    sample_prob = np.minimum(sample_prob, 1.0)
+        # Apply preselection
+        print(f"Applying preselection (sigProb > {sigprob_thresh}, Mbc > {mbc_thresh})...")
+        presel = (best_sigprob > sigprob_thresh) & (best_mbc > mbc_thresh)
+        print(f"  {presel.sum()} / {n_events} events pass ({presel.mean() * 100:.1f}%)")
 
-    random_vals = np.random.random(n_events)
-    sampled = (random_vals < sample_prob) & presel
+        # Apply sampling with FEI calibration and fraction
+        print(f"Applying sampling (fraction={fraction}, cont_fraction={cont_fraction})...")
+        sample_prob = event_calib * fraction
+        sample_prob[is_cont] *= cont_fraction
 
-    print(f"  {sampled.sum()} / {n_events} events sampled ({sampled.mean() * 100:.1f}%)")
-    print(f"    BB events: {(sampled & ~is_cont).sum()}")
-    print(f"    Continuum: {(sampled & is_cont).sum()}")
+        # Cap probabilities at 1.0
+        sample_prob = np.minimum(sample_prob, 1.0)
 
-    # Apply sampling
-    features = features[sampled]
-    bp_truth = bp_truth[sampled]
-    b0_truth = b0_truth[sampled]
+        random_vals = np.random.random(n_events)
+        sampled = (random_vals < sample_prob) & presel
+
+        print(f"  {sampled.sum()} / {n_events} events sampled ({sampled.mean() * 100:.1f}%)")
+        print(f"    BB events: {(sampled & ~is_cont).sum()}")
+        print(f"    Continuum: {(sampled & is_cont).sum()}")
+
+        # Accumulate sampled chunks
+        features_list.append(features[sampled])
+        bp_list.append(bp_truth[sampled])
+        b0_list.append(b0_truth[sampled])
+
+    # Concatenate across all files
+    features = sparse.vstack(features_list, format='csr')
+    bp_truth = np.vstack(bp_list)
+    b0_truth = np.vstack(b0_list)
+
+    print(f"\nTotal after concatenation: {features.shape[0]} events")
 
     # Compute remove_inputs dynamically and verify against config.REMOVE_INPUTS
     print("\nVerifying REMOVE_INPUTS from feature sparsity...")
@@ -740,7 +768,8 @@ def build_category_labels(bp_truth, b0_truth, mc_var_names):
 
 def main():
     parser = argparse.ArgumentParser(description='Train ModeSelector networks')
-    parser.add_argument('--input', required=True, help='Input npz file from training mode')
+    parser.add_argument('--input', required=True, nargs='+',
+                        help='One or more modeSelector_training.npz paths (shell glob or space-separated list)')
     parser.add_argument('--network', choices=['category', 'main'], required=True,
                         help='Which network to train')
     parser.add_argument('--cat_model', help='Trained category model (required for main network)')

@@ -201,7 +201,7 @@ void TrackingAbortDQMModule::defineHisto()
     //outside active_veto window:
     m_nCDCExtraHitsSL[0][sl] = new TH1F(TString::Format("%s%d_%s", histoName.c_str(), sl, tag[0].c_str()),
                                         TString::Format("%s%d %s", histoTitle.c_str(), sl, title[0].c_str()),
-                                        200, 0, 1000);
+                                        201, -1000 / 200 / 2, 1000 + 1000 / 200 / 2);
     m_nCDCExtraHitsSL[0][sl]->GetXaxis()->SetTitle("nCDCExtraHits");
     m_nCDCExtraHitsSL[0][sl]->GetYaxis()->SetTitle("Number of Events");
     //inside active_veto window:
@@ -217,7 +217,7 @@ void TrackingAbortDQMModule::defineHisto()
     //outside active_veto window:
     m_nCDCHitsSL[0][sl] = new TH1F(TString::Format("%s%d_%s", histoName.c_str(), sl, tag[0].c_str()),
                                    TString::Format("%s%d %s", histoTitle.c_str(), sl, title[0].c_str()),
-                                   100, 0, 100);
+                                   101, -0.5, 100 + 0.5);
     m_nCDCHitsSL[0][sl]->GetXaxis()->SetTitle("nCDCHits");
     m_nCDCHitsSL[0][sl]->GetYaxis()->SetTitle("Number of Events");
     //inside active_veto window:
@@ -387,8 +387,8 @@ void TrackingAbortDQMModule::event()
     int nSignalCDCHits = nTakenCDCHits[sl] - nBgCDCHits[sl];
     int nCDCExtraHits = nTotalCDCHits[sl] - nSignalCDCHits;
 
-    if (m_nCDCExtraHitsSL[index][sl] != nullptr) m_nCDCExtraHitsSL[index][sl]->Fill(std::min((int)nCDCExtraHits, (int)999));
-    if (m_nCDCHitsSL[index][sl] != nullptr) m_nCDCHitsSL[index][sl]->Fill(std::min((int)nSignalCDCHits, (int)99));
+    if (m_nCDCExtraHitsSL[index][sl] != nullptr) m_nCDCExtraHitsSL[index][sl]->Fill(std::min(nCDCExtraHits, (int)999));
+    if (m_nCDCHitsSL[index][sl] != nullptr) m_nCDCHitsSL[index][sl]->Fill(std::min(nSignalCDCHits, (int)99));
   }
 
   // fill the integrated averages TH1F

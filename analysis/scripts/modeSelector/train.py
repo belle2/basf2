@@ -21,9 +21,6 @@ The script implements:
 - Continuum downsampling (applied at production by produceTrainingInputs.py; --cont_fraction defaults to 1.0)
 - Fraction sampling (configurable, default 1.0)
 - sigProb and Mbc preselection (skipped for continuum events)
-
-Note: input npz files must be produced with the current config.TRAINING_MC_VARS, which includes
-isContinuumEvent. Re-run produceTrainingInputs.py if upgrading from older npz files.
 """
 
 import argparse
@@ -598,6 +595,7 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names, use_delta_p_good_tag=Fal
     pdg_idx = mc_var_names.index('PDG')
     sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
     is_cont_idx = mc_var_names.index('isContinuumEvent')
+    tag_pdg_idx = mc_var_names.index('mostcommonBTagPDG')
     if use_delta_p_good_tag:
         delta_p_idx = mc_var_names.index('mostcommonBTagDeltaP')
     else:
@@ -610,41 +608,33 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names, use_delta_p_good_tag=Fal
         n = len(truth_array)
         labels = np.zeros(n, dtype=np.int64)
 
-        # Extract truth info (handle NaN for missing candidates)
+        # Extract truth info
         pdg = truth_array[:, pdg_idx]
+        tag_pdg = truth_array[:, tag_pdg_idx]
 
-        # Determine event type
-        if use_delta_p_good_tag:
-            delta_p = truth_array[:, delta_p_idx]
-            is_target = ~np.isnan(delta_p) & (delta_p < delta_p_thresh)
-        else:
-            is_signal_wrong = np.where(np.isnan(truth_array[:, sig_acc_wrong_idx]), 0, truth_array[:, sig_acc_wrong_idx])
-            is_signal_miss = np.where(np.isnan(truth_array[:, sig_acc_miss_idx]), 0, truth_array[:, sig_acc_miss_idx])
-            is_target = (is_signal_wrong == 1) | (is_signal_miss == 1)
         is_cont = truth_array[:, is_cont_idx] == 1
 
-        # For BB events (not continuum), check crossfeed
-        # NOTE: For crossfeed, we'd need mostcommonBTagPDG to determine deltaC=1 vs internal
-        # Since we don't have that in the simplified structure, we use isBBCrossfeed
-        # and assume that different B types = deltaC1, same B type = internal
-        has_candidate = ~np.isnan(pdg)
-        if 'isBBCrossfeed' in mc_var_names:
-            crossfeed_idx = mc_var_names.index('isBBCrossfeed')
-            is_crossfeed = np.where(np.isnan(truth_array[:, crossfeed_idx]), 0, truth_array[:, crossfeed_idx])
-            is_crossfeed = is_crossfeed == 1
+        # is_target: good reconstruction AND exact PDG match with the true tag B.
+        # Exact match (not abs) ensures CP-conjugate candidates are never labelled as target.
+        if use_delta_p_good_tag:
+            delta_p = truth_array[:, delta_p_idx]
+            is_target = ~np.isnan(delta_p) & (delta_p < delta_p_thresh) & (tag_pdg == pdg)
         else:
-            # Fallback: not target and not continuum = crossfeed
-            is_crossfeed = ~is_target & ~is_cont & has_candidate
+            is_signal_wrong = truth_array[:, sig_acc_wrong_idx]
+            is_signal_miss = truth_array[:, sig_acc_miss_idx]
+            is_target = ((is_signal_wrong == 1) | (is_signal_miss == 1)) & (tag_pdg == pdg)
 
-        # For proper deltaC1 vs internal, we need mostcommonBTagPDG
-        # Simplified: assume crossfeed within same B type is internal
-        # For now, put all crossfeed in cross_internal (class 3)
-        # This can be refined if we add mostcommonBTagPDG to the truth
+        # Crossfeed split based on absolute PDG comparison (groups B+/B- and B0/B0bar):
+        # cross_deltaC1 (class 2): |mostcommonBTagPDG| != |reco PDG| (different charge type)
+        # cross_internal (class 3): |mostcommonBTagPDG| == |reco PDG| (same charge type)
+        is_cross_deltaC1 = ~is_target & (np.abs(tag_pdg) != np.abs(pdg))
+        is_cross_internal = ~is_target & (np.abs(tag_pdg) == np.abs(pdg))
 
         # Assign labels (default 0 = bad_tag)
-        labels[is_target] = 1  # is_target
-        labels[is_crossfeed & ~is_target] = 3  # cross_internal (simplified)
-        labels[is_cont] = 4  # continuum
+        labels[is_target] = 1
+        labels[is_cross_deltaC1] = 2
+        labels[is_cross_internal] = 3
+        labels[is_cont] = 4
 
         return labels
 

@@ -85,11 +85,10 @@ TRAINING_MC_VARS = [
     'percentageMissingParticlesBTag',
     'extraInfo(looseMCMotherPDG)',
     'extraInfo(looseMCWrongDaughterN)',
-    'isBBCrossfeed',
+    'mostcommonBTagPDG',  # PDG of the true tag B (for cross_deltaC1 vs cross_internal)
     # Generated B meson PDGs (indices 3 and 4 in MCParticle list = first and second B meson).
-    # Used for future cross_deltaC1 vs cross_internal classification.
-    'genParticle(3, varForMCGen(PDG))',
-    'genParticle(4, varForMCGen(PDG))',
+    # 'genParticle(3, varForMCGen(PDG))',
+    # 'genParticle(4, varForMCGen(PDG))',
     # Event-level flags
     'isContinuumEvent',  # 1 for qqbar continuum, 0 for BB
     'eventRandom',       # For base fraction cut (e.g. eventRandom < 0.25 for 25% sample)

@@ -426,3 +426,17 @@ def is_cdb_down() -> bool:
         "y",
         "on",
     ]
+
+
+def is_rundb_down() -> bool:
+    """
+    Returns true if the RunDB is currently unavailable or slow to respond.
+    The 'BELLE2_IS_RUNDB_DOWN' environment variable can be used to dynamically exclude some
+    tests that rely on the RunDB in case of problems.
+    """
+    return os.environ.get("BELLE2_IS_RUNDB_DOWN", "no").lower() in [
+        "yes",
+        "1",
+        "y",
+        "on",
+    ]

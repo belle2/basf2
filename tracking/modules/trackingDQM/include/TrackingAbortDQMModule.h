@@ -12,7 +12,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
 #include <svd/calibration/SVDNoiseCalibrations.h>
 
@@ -27,11 +26,6 @@ namespace Belle2 {
   class TRGSummary;
   class SVDCluster;
   class SVDShaperDigit;
-// class CDCWireHit;
-
-  using TrackingUtilities::StoreWrappedObjPtr;
-  using TrackingUtilities::CDCWireHit;
-  using TrackingUtilities::AutomatonCell;
 
   /** Tracking DQM Module to monitor aborts & background conditions before the HLT filter*/
   class TrackingAbortDQMModule : public HistoModule {
@@ -72,7 +66,7 @@ namespace Belle2 {
 
     StoreArray<SVDShaperDigit> m_strips; /**< SVD strips*/
     StoreArray<SVDCluster> m_clusters; /**< SVD clusters*/
-    StoreWrappedObjPtr<std::vector<CDCWireHit>> m_wireHitVector{"CDCWireHitVector"};
+    TrackingUtilities::StoreWrappedObjPtr<std::vector<Belle2::TrackingUtilities::CDCWireHit>> m_wireHitVector{"CDCWireHitVector"};
     StoreObjPtr<TRGSummary> m_trgSummary; /**< trg summary */
 
     //index: 0 = passive veto; 1 = active veto

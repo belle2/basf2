@@ -212,7 +212,7 @@ void TrackingAbortDQMModule::defineHisto()
 
   //CDC signal hits per SL
   histoName = "nCDCHitsSL";
-  histoTitle = "Number of CDC Hits in SL";
+  histoTitle = "Number of Signal CDC Hits in SL";
   for (int sl = 0; sl < 9; sl++) {
     //outside active_veto window:
     m_nCDCHitsSL[0][sl] = new TH1F(TString::Format("%s%d_%s", histoName.c_str(), sl, tag[0].c_str()),
@@ -379,9 +379,8 @@ void TrackingAbortDQMModule::event()
     else nCDCHitsOuter++;
 
     nTotalCDCHits[sl] += 1;
-    AutomatonCell const& a_cell = wireHit.getAutomatonCell();
-    if (a_cell.hasTakenFlag()) nTakenCDCHits[sl] += 1;
-    if (a_cell.hasBackgroundFlag()) nBgCDCHits[sl] += 1;
+    if (wireHit->hasTakenFlag()) nTakenCDCHits[sl] += 1;
+    if (wireHit->hasBackgroundFlag()) nBgCDCHits[sl] += 1;
   }
 
   for (int sl = 0; sl < 9; sl++) {

@@ -87,7 +87,7 @@ for plist in particle_lists:
     ma.matchMCTruth(plist, path=my_path)
 
 # Add D* veto reconstruction (pi0 list created internally)
-modeSelector.addDstarVeto(particle_lists, skipTreeFit=False, path=my_path)
+modeSelector.addDstarVeto(particle_lists, path=my_path)
 
 # Apply ModeSelector with local model files (for testing/development)
 # Set debug=True to print feature values for comparison

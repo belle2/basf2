@@ -78,7 +78,7 @@ TRAINING_MC_VARS = [
     'Mbc',
     'extraInfo(SignalProbability)',
     'mostcommonBTagIndex',
-    # 'mostcommonBTagDeltaP',
+    'mostcommonBTagDeltaP',
     'percentageWrongParticlesBTag',
     'percentageMissingParticlesBTag',
     'extraInfo(looseMCMotherPDG)',

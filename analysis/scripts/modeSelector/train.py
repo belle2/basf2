@@ -59,7 +59,8 @@ def get_fei_calib(dm_id, pdg):
         return 1.0  # Continuum
 
 
-def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names):
+def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names, use_delta_p_good_tag=False,
+                        delta_p_thresh=0.1):
     """
     Compute event calibration weights for FEI sampling (vectorized).
 
@@ -71,6 +72,11 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names):
         MC truth for best B0 candidate
     mc_var_names : list
         Names of MC truth variables
+    use_delta_p_good_tag : bool
+        If True, define good tags as mostcommonBTagDeltaP < delta_p_thresh.
+        If False (default), use isSignalAcceptWrongFSPs | isSignalAcceptMissing.
+    delta_p_thresh : float
+        Threshold for mostcommonBTagDeltaP good-tag definition. Default: 0.1
 
     Returns
     -------
@@ -84,10 +90,13 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names):
     # Get column indices
     pdg_idx = list(mc_var_names).index('PDG')
     dm_idx = list(mc_var_names).index('extraInfo(decayModeID)')
-    sig_acc_wrong_idx = list(mc_var_names).index('isSignalAcceptWrongFSPs')
-    sig_acc_miss_idx = list(mc_var_names).index('isSignalAcceptMissing')
     gen3_idx = list(mc_var_names).index('genParticle(3, varForMCGen(PDG))')
     gen4_idx = list(mc_var_names).index('genParticle(4, varForMCGen(PDG))')
+    if use_delta_p_good_tag:
+        delta_p_idx = list(mc_var_names).index('mostcommonBTagDeltaP')
+    else:
+        sig_acc_wrong_idx = list(mc_var_names).index('isSignalAcceptWrongFSPs')
+        sig_acc_miss_idx = list(mc_var_names).index('isSignalAcceptMissing')
 
     # Initialize with default weight
     event_calib_bp = np.ones(n_events)
@@ -102,9 +111,12 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names):
     if has_bp.any():
         dm_ids = bp_mc_truth[has_bp, dm_idx].astype(int)
 
-        # tag_is_gen_PDG: isSignal variants
-        tag_is_gen = ((bp_mc_truth[has_bp, sig_acc_wrong_idx] == 1) |
-                      (bp_mc_truth[has_bp, sig_acc_miss_idx] == 1))
+        if use_delta_p_good_tag:
+            delta_p = bp_mc_truth[has_bp, delta_p_idx]
+            tag_is_gen = ~np.isnan(delta_p) & (delta_p < delta_p_thresh)
+        else:
+            tag_is_gen = ((bp_mc_truth[has_bp, sig_acc_wrong_idx] == 1) |
+                          (bp_mc_truth[has_bp, sig_acc_miss_idx] == 1))
 
         # Check if continuum (both gen particles are quarks)
         gen3 = np.where(np.isnan(bp_mc_truth[has_bp, gen3_idx]), 0, bp_mc_truth[has_bp, gen3_idx])
@@ -124,8 +136,12 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names):
     if has_b0.any():
         dm_ids = b0_mc_truth[has_b0, dm_idx].astype(int)
 
-        tag_is_gen = ((b0_mc_truth[has_b0, sig_acc_wrong_idx] == 1) |
-                      (b0_mc_truth[has_b0, sig_acc_miss_idx] == 1))
+        if use_delta_p_good_tag:
+            delta_p = b0_mc_truth[has_b0, delta_p_idx]
+            tag_is_gen = ~np.isnan(delta_p) & (delta_p < delta_p_thresh)
+        else:
+            tag_is_gen = ((b0_mc_truth[has_b0, sig_acc_wrong_idx] == 1) |
+                          (b0_mc_truth[has_b0, sig_acc_miss_idx] == 1))
 
         gen3 = np.where(np.isnan(b0_mc_truth[has_b0, gen3_idx]), 0, b0_mc_truth[has_b0, gen3_idx])
         gen4 = np.where(np.isnan(b0_mc_truth[has_b0, gen4_idx]), 0, b0_mc_truth[has_b0, gen4_idx])
@@ -142,7 +158,8 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names):
 
 
 def load_and_sample_data(input_file, fraction=0.7, cont_fraction=0.25,
-                         sigprob_thresh=0.01, mbc_thresh=5.23, random_state=None):
+                         sigprob_thresh=0.01, mbc_thresh=5.23, random_state=None,
+                         use_delta_p_good_tag=False, delta_p_thresh=0.1):
     """
     Load training data and apply sampling.
 
@@ -197,7 +214,9 @@ def load_and_sample_data(input_file, fraction=0.7, cont_fraction=0.25,
 
     # Compute event calibration weights
     print("Computing FEI calibration weights...")
-    event_calib_bp, event_calib_b0 = compute_event_calib(bp_truth, b0_truth, mc_var_names)
+    event_calib_bp, event_calib_b0 = compute_event_calib(bp_truth, b0_truth, mc_var_names,
+                                                         use_delta_p_good_tag=use_delta_p_good_tag,
+                                                         delta_p_thresh=delta_p_thresh)
 
     # Determine best candidate (highest sigProb between B+ and B0)
     bp_sigprob = bp_truth[:, sigprob_idx]
@@ -266,15 +285,13 @@ def load_and_sample_data(input_file, fraction=0.7, cont_fraction=0.25,
 
     # Verify against hardcoded list in config
     if computed_remove != config.REMOVE_INPUTS:
-        raise ValueError(
-            f"REMOVE_INPUTS mismatch!\n"
-            f"  Computed from data: {len(computed_remove)} indices\n"
-            f"  config.REMOVE_INPUTS: {len(config.REMOVE_INPUTS)} indices\n"
-            f"  Update config.REMOVE_INPUTS to:\n{computed_remove}"
-        )
-    print(f"  REMOVE_INPUTS verified OK ({len(config.REMOVE_INPUTS)} removed, "
-          f"{n_total - len(config.REMOVE_INPUTS)} kept)")
-
+        print("  WARNING: REMOVE_INPUTS mismatch!")
+        print(f"    Computed from data: {len(computed_remove)} indices removed ({n_total - len(computed_remove)} kept)")
+        print(f"    config.REMOVE_INPUTS: {len(config.REMOVE_INPUTS)} indices removed ({n_total - len(config.REMOVE_INPUTS)} kept)")
+        print("    Using config.REMOVE_INPUTS (data may not cover all input_ids)")
+    else:
+        print(f"  REMOVE_INPUTS verified OK ({len(config.REMOVE_INPUTS)} removed, "
+              f"{n_total - len(config.REMOVE_INPUTS)} kept)")
     has_inputs = sorted(set(range(n_total)) - set(config.REMOVE_INPUTS))
 
     # Apply feature selection
@@ -503,7 +520,8 @@ def distance_corr(var_1, var_2, normedweight=None, power=1):
     return dCorr
 
 
-def build_main_labels(bp_truth, b0_truth, mc_var_names):
+def build_main_labels(bp_truth, b0_truth, mc_var_names, use_delta_p_good_tag=False,
+                      delta_p_thresh=0.1):
     """
     Build main network labels (6 classes) from MC truth.
 
@@ -528,6 +546,11 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names):
         MC truth for B0 candidates
     mc_var_names : list
         Names of MC truth variables
+    use_delta_p_good_tag : bool
+        If True, define good tags as mostcommonBTagDeltaP < delta_p_thresh.
+        If False (default), use isSignalAcceptWrongFSPs | isSignalAcceptMissing.
+    delta_p_thresh : float
+        Threshold for mostcommonBTagDeltaP good-tag definition. Default: 0.1
 
     Returns
     -------
@@ -538,10 +561,13 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names):
     # Get column indices
     pdg_idx = mc_var_names.index('PDG')
     sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
-    sig_acc_wrong_idx = mc_var_names.index('isSignalAcceptWrongFSPs')
-    sig_acc_miss_idx = mc_var_names.index('isSignalAcceptMissing')
     gen3_idx = mc_var_names.index('genParticle(3, varForMCGen(PDG))')
     gen4_idx = mc_var_names.index('genParticle(4, varForMCGen(PDG))')
+    if use_delta_p_good_tag:
+        delta_p_idx = mc_var_names.index('mostcommonBTagDeltaP')
+    else:
+        sig_acc_wrong_idx = mc_var_names.index('isSignalAcceptWrongFSPs')
+        sig_acc_miss_idx = mc_var_names.index('isSignalAcceptMissing')
 
     # Compute labels for B0 and B+ candidates separately
     def compute_output_label(truth_array):
@@ -550,14 +576,18 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names):
         labels = np.zeros(n, dtype=np.int64)
 
         # Extract truth info (handle NaN for missing candidates)
-        is_signal_wrong = np.where(np.isnan(truth_array[:, sig_acc_wrong_idx]), 0, truth_array[:, sig_acc_wrong_idx])
-        is_signal_miss = np.where(np.isnan(truth_array[:, sig_acc_miss_idx]), 0, truth_array[:, sig_acc_miss_idx])
         pdg = truth_array[:, pdg_idx]
         gen3 = np.where(np.isnan(truth_array[:, gen3_idx]), 0, truth_array[:, gen3_idx])
         gen4 = np.where(np.isnan(truth_array[:, gen4_idx]), 0, truth_array[:, gen4_idx])
 
         # Determine event type
-        is_target = (is_signal_wrong == 1) | (is_signal_miss == 1)
+        if use_delta_p_good_tag:
+            delta_p = truth_array[:, delta_p_idx]
+            is_target = ~np.isnan(delta_p) & (delta_p < delta_p_thresh)
+        else:
+            is_signal_wrong = np.where(np.isnan(truth_array[:, sig_acc_wrong_idx]), 0, truth_array[:, sig_acc_wrong_idx])
+            is_signal_miss = np.where(np.isnan(truth_array[:, sig_acc_miss_idx]), 0, truth_array[:, sig_acc_miss_idx])
+            is_target = (is_signal_wrong == 1) | (is_signal_miss == 1)
         is_cont = (np.abs(gen3) < 10) & (np.abs(gen4) < 10)
 
         # For BB events (not continuum), check crossfeed
@@ -727,6 +757,11 @@ def main():
                         help='Distance correlation penalty coefficient (0=disabled)')
     parser.add_argument('--use_sparse', action='store_true',
                         help='Use sparse data loading (memory-efficient but slower)')
+    parser.add_argument('--use_delta_p_good_tag', action='store_true',
+                        help='Define good tags as mostcommonBTagDeltaP < 0.1 instead of '
+                             'isSignalAcceptWrongFSPs | isSignalAcceptMissing')
+    parser.add_argument('--delta_p_thresh', type=float, default=0.1,
+                        help='Threshold for mostcommonBTagDeltaP good-tag definition (default: 0.1)')
 
     args = parser.parse_args()
 
@@ -749,7 +784,9 @@ def main():
         args.input,
         fraction=args.fraction,
         cont_fraction=args.cont_fraction,
-        random_state=args.seed
+        random_state=args.seed,
+        use_delta_p_good_tag=args.use_delta_p_good_tag,
+        delta_p_thresh=args.delta_p_thresh,
     )
 
     print(f"\nFeature matrix shape: {features.shape}")
@@ -827,7 +864,9 @@ def main():
         print(f"  New feature shape: {features_dense.shape}")
 
         # Build main network labels
-        labels = build_main_labels(bp_truth, b0_truth, mc_var_names)
+        labels = build_main_labels(bp_truth, b0_truth, mc_var_names,
+                                   use_delta_p_good_tag=args.use_delta_p_good_tag,
+                                   delta_p_thresh=args.delta_p_thresh)
         num_labels = 6
         print("  Main network label distribution:")
         print(f"    bad_tag:           {(labels == 0).sum()} ({(labels == 0).mean() * 100:.1f}%)")

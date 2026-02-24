@@ -44,7 +44,7 @@ def addDstarVeto(
     deltaMassDiffCut: tuple = (-0.02, 0.02),
     dMassCut: tuple = (-0.03, 0.03),
     writeExtraInfo: bool = True,
-    skipTreeFit: bool = False
+    skipTreeFit: bool = True
 ):
     """
     Add D* veto reconstruction to the path for B meson particle lists.
@@ -78,7 +78,7 @@ def addDstarVeto(
         If True, skip the vertex TreeFit (significant speedup). The deltaMassDiff
         will use InvM-based computation instead of fit-based, and chiProb will not
         be available (stored as NaN). Candidates are ranked by abs(deltaMassDiffInvM)
-        instead of chiProb. Default: False
+        instead of chiProb. Default: True
 
     The following ExtraInfo fields are added to B candidates:
 

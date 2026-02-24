@@ -30,12 +30,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from modeSelector import config
 from scipy import sparse
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
-
-# Import config
-from . import config
 
 
 def get_fei_calib(dm_id, pdg):
@@ -556,7 +554,7 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names, use_delta_p_good_tag=Fal
     Classes:
     - 0: bad_tag (background)
     - 1: is_target_neutral (signal B0)
-    - 2: cross_deltaC1 (BB crossfeed, ΔC=1 - different B type)
+    - 2: cross_deltaC1 (BB crossfeed, Delta C=1 - different B type)
     - 3: cross_internal (BB crossfeed, internal - same B type)
     - 4: continuum
     - 5: is_target_charged (signal B+)

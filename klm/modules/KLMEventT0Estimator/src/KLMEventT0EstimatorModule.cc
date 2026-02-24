@@ -245,9 +245,9 @@ void KLMEventT0EstimatorModule::beginRun()
               "Either provide the calibration or set UseNewHitResolution=False.");
 
     B2INFO("KLMEventT0Estimator: Using NEW calibrated per-hit resolution method."
-           << LogVar("σ_RPC (ns)", m_eventT0HitResolution->getSigmaRPC())
-           << LogVar("σ_BKLM_Scint (ns)", m_eventT0HitResolution->getSigmaBKLMScint())
-           << LogVar("σ_EKLM_Scint (ns)", m_eventT0HitResolution->getSigmaEKLMScint()));
+           << LogVar("sigma_RPC (ns)", m_eventT0HitResolution->getSigmaRPC())
+           << LogVar("sigma_BKLM_Scint (ns)", m_eventT0HitResolution->getSigmaBKLMScint())
+           << LogVar("sigma_EKLM_Scint (ns)", m_eventT0HitResolution->getSigmaEKLMScint()));
   } else {
     B2WARNING("KLMEventT0Estimator: Using OLD per-event SEM calculation (may be unreliable with few hits).");
   }

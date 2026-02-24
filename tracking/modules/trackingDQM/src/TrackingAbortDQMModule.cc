@@ -212,7 +212,7 @@ void TrackingAbortDQMModule::defineHisto()
 
   //CDC signal hits per SL
   histoName = "nCDCHitsSL";
-  histoTitle = "Number of Signal CDC Hits in SL";
+  histoTitle = "Total Number of Signal CDC Hits in SL";
   for (int sl = 0; sl < 9; sl++) {
     //outside active_veto window:
     m_nCDCHitsSL[0][sl] = new TH1F(TString::Format("%s%d_%s", histoName.c_str(), sl, tag[0].c_str()),
@@ -236,7 +236,6 @@ void TrackingAbortDQMModule::initialize()
   m_eventMetaData.isOptional();
   m_trgSummary.isOptional();
   m_strips.isOptional();
-//  m_cdcHits.isOptional();
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM

@@ -18,9 +18,6 @@
 #                                                                        #
 ##########################################################################
 
-# import sys
-#
-# sys.path.insert(0, '/home/pf/basf2/analysis/scripts')
 import basf2 as b2
 import modeSelector
 import modularAnalysis as ma

@@ -28,9 +28,6 @@
 
 import argparse
 
-# import sys
-#
-# sys.path.insert(0, '/home/pf/basf2/analysis/scripts')
 import basf2 as b2
 import modeSelector
 import modularAnalysis as ma
@@ -99,7 +96,7 @@ ma.buildEventShape(
 )
 
 # Define the particle lists to process
-particle_lists = ['B+:feiHadronic', 'B0:feiHadronic']
+particle_lists = [f'B+:{fei_identifier}', f'B0:{fei_identifier}']
 
 # MC truth matching (required for training labels)
 for plist in particle_lists:

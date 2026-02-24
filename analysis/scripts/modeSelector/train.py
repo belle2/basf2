@@ -478,7 +478,7 @@ def distance_corr(var_1, var_2, normedweight=None, power=1):
     """
     Compute distance correlation between var_1 and var_2.
 
-    Based on /home/pf/IJS/feq/training/train.py lines 604-661.
+    Computes distance correlation between var_1 and var_2.
 
     The distance correlation is a measure of dependence between two random variables.
     It is zero if and only if the variables are independent.
@@ -553,7 +553,7 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names, use_delta_p_good_tag=Fal
     """
     Build main network labels (6 classes) from MC truth.
 
-    Classes (based on /home/pf/IJS/feq/training/training.py lines 386-420):
+    Classes:
     - 0: bad_tag (background)
     - 1: is_target_neutral (signal B0)
     - 2: cross_deltaC1 (BB crossfeed, ΔC=1 - different B type)
@@ -777,6 +777,7 @@ def main():
     parser.add_argument('--fraction', type=float, default=0.7, help='Sampling fraction for BB events')
     parser.add_argument('--cont_fraction', type=float, default=0.25, help='Additional fraction for continuum')
     parser.add_argument('--batch_size', type=int, default=8192, help='Batch size')
+    parser.add_argument('--num_workers', type=int, default=4, help='Number of DataLoader worker processes')
     parser.add_argument('--epochs', type=int, default=40, help='Number of epochs')
     parser.add_argument('--lr', type=float, default=0.0001, help='Learning rate')
     parser.add_argument('--weight_decay', type=float, default=1e-4, help='Weight decay for AdamW')
@@ -949,9 +950,9 @@ def main():
         train_dataset = SparseDataset(features[train_idx], labels[train_idx], mbc_train_np)
         val_dataset = SparseDataset(features[val_idx], labels[val_idx], mbc_val_np)
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
-                                  collate_fn=sparse_collate_fn, num_workers=4)
+                                  collate_fn=sparse_collate_fn, num_workers=args.num_workers)
         val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False,
-                                collate_fn=sparse_collate_fn, num_workers=4)
+                                collate_fn=sparse_collate_fn, num_workers=args.num_workers)
     else:
         # Dense loading (default)
         X_train = torch.from_numpy(features_dense[train_idx])
@@ -967,8 +968,10 @@ def main():
             train_dataset = TensorDataset(X_train, y_train)
             val_dataset = TensorDataset(X_val, y_val)
 
-        train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
-        val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
+        train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
+                                  num_workers=args.num_workers)
+        val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False,
+                                num_workers=args.num_workers)
 
     # Create model
     print("\n" + "=" * 60)

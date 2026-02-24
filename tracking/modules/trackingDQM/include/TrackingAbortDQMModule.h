@@ -10,6 +10,9 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
 #include <svd/calibration/SVDNoiseCalibrations.h>
 
@@ -24,7 +27,11 @@ namespace Belle2 {
   class TRGSummary;
   class SVDCluster;
   class SVDShaperDigit;
-  class CDCHit;
+// class CDCWireHit;
+
+  using TrackingUtilities::StoreWrappedObjPtr;
+  using TrackingUtilities::CDCWireHit;
+  using TrackingUtilities::AutomatonCell;
 
   /** Tracking DQM Module to monitor aborts & background conditions before the HLT filter*/
   class TrackingAbortDQMModule : public HistoModule {
@@ -65,7 +72,7 @@ namespace Belle2 {
 
     StoreArray<SVDShaperDigit> m_strips; /**< SVD strips*/
     StoreArray<SVDCluster> m_clusters; /**< SVD clusters*/
-    StoreArray<CDCHit> m_cdcHits; /**< CDCHits*/
+    StoreWrappedObjPtr<std::vector<CDCWireHit>> m_wireHitVector{"CDCWireHitVector"};
     StoreObjPtr<TRGSummary> m_trgSummary; /**< trg summary */
 
     //index: 0 = passive veto; 1 = active veto
@@ -77,6 +84,8 @@ namespace Belle2 {
     TH1F* m_nCDCExtraHits[2]; /**< distribution of the number of extra CDC hits */
     TH1F* m_svdTime[2]; /**< L3 V-side time for all clusters*/
     TH1D* m_integratedAverages[2]; /**< integrated averages of additional SVD, CDC variables */
+    TH1F* m_nCDCExtraHitsSL[2][9]; /**< distribution of the number of extra CDC hits divided by SL */
+    TH1F* m_nCDCHitsSL[2][9]; /**< distribution of the number of signal CDC hits divided by SL */
 
     /** function to update the bin content */
     void updateBinContent(int index, int bin, float valueToBeAdded);

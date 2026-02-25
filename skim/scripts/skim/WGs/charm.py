@@ -1812,7 +1812,7 @@ class DpToEtaHp(BaseSkim):
     """
     **Decay Modes**:
         * :math:`D^{+}\\to \\eta \\pi^+` (and CC)
-        * :math:`D^{+}\\to \\eta \\K^+` (and CC)
+        * :math:`D^{+}\\to \\eta K^{+}` (and CC)
 
     **Selection Criteria**:
         * Track cuts are `charm_skim_std_charged` pion and Kaon

@@ -17,8 +17,7 @@
 #   basf2 applyModeSelector.py -- [options]                              #
 #                                                                        #
 # Output files:                                                          #
-#   <output>_Bp.root  - B+ candidates ntuple                            #
-#   <output>_B0.root  - B0 candidates ntuple                            #
+#   <output>  - ROOT file with Bp and B0 candidate trees                #
 #                                                                        #
 ##########################################################################
 
@@ -27,13 +26,15 @@ import argparse
 import basf2 as b2
 import modeSelector
 import modularAnalysis as ma
+import variables.utils as vu
+from variables import variables as vm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', nargs='+',
                     default=['/home/pf/dataframes/MC16rd_skim/udst_000001_prod00051442_task230000001.root'],
                     help='Input ROOT file(s) with FEI B meson candidates')
-parser.add_argument('--output', default='modeSelector_output',
-                    help='Output prefix for ntuples (default: modeSelector_output)')
+parser.add_argument('--output', default='modeSelector_output.root',
+                    help='Output ROOT file (default: modeSelector_output.root)')
 parser.add_argument('--cat-model', default='modeSelector_test/cat_model.onnx',
                     help='Path to category ONNX model')
 parser.add_argument('--main-model', default='modeSelector_test/main_model.onnx',
@@ -66,7 +67,6 @@ cleanMask = ("cleanMask", track_mask, ecl_mask)
 
 # Apply FEI calibration cuts and build continuum suppression
 for b in ['B+', 'B0']:
-    # Apply cuts (matching FEI calibration)
     ma.applyCuts(f'{b}:{fei_identifier}', '[Mbc > 5.22] and [-0.15 < deltaE < 0.1]', path=my_path)
 
     # Build the Rest of Event
@@ -79,8 +79,8 @@ for b in ['B+', 'B0']:
     # Apply cosTBTO cut
     ma.applyCuts(f'{b}:{fei_identifier}', 'cosTBTO < 0.9', path=my_path)
 
-    # TODO
     # BCS
+    ma.rankByHighest(f'{b}:{fei_identifier}', 'extraInfo(SignalProbability)', numBest=1, path=my_path)
 
 # Build event shape variables (sphericity, thrust, etc.)
 ma.buildEventShape(
@@ -96,7 +96,7 @@ ma.buildEventShape(
 )
 
 # Define the particle lists to process
-particle_lists = ['B+:feiHadronic', 'B0:feiHadronic']
+particle_lists = [f'B+:{fei_identifier}', f'B0:{fei_identifier}']
 
 # MC truth matching
 for plist in particle_lists:
@@ -117,8 +117,18 @@ modeSelector.modeSelector(
     path=my_path
 )
 
-# TODO
-# aliases
+# Create aliases for cleaner branch names in output ntuple
+vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
+vm.addAlias('dmID', 'extraInfo(decayModeID)')
+vu.create_aliases(
+    ['BplusScore_eqSigProb',
+     'Dstp_deltaMassDiff', 'Dstp_chiProb', 'Dst0_deltaMassDiff', 'Dst0_chiProb'],
+    wrapper='extraInfo({variable})'
+)
+vu.create_aliases(
+    ['BplusScore', 'BplusScore_catB0', 'BplusScore_catBp', 'BplusScore_catCont'],
+    wrapper='eventExtraInfo({variable})'
+)
 
 # Define output variables
 output_variables = [
@@ -127,40 +137,38 @@ output_variables = [
     # Continuum suppression
     'cosTBTO',
     # FEI signal probability
-    'extraInfo(SignalProbability)',
-    'extraInfo(decayModeID)',
+    'sigProb',
+    'dmID',
     # ModeSelector output (candidate-level)
-    'extraInfo(BplusScore_eqSigProb)',
+    'BplusScore_eqSigProb',
     # ModeSelector output (event-level)
-    'eventExtraInfo(BplusScore)',
-    'eventExtraInfo(BplusScore_catB0)',
-    'eventExtraInfo(BplusScore_catBp)',
-    'eventExtraInfo(BplusScore_catCont)',
+    'BplusScore',
+    'BplusScore_catB0',
+    'BplusScore_catBp',
+    'BplusScore_catCont',
     # MC truth matching
     'isSignal',
-    # 'mostcommonBTagDeltaP',
     'mostcommonBTagIndex',
-    # D* veto variables (if addDstarVeto was used)
-    'extraInfo(Dstp_deltaMassDiff)',
-    'extraInfo(Dstp_chiProb)',
-    'extraInfo(Dst0_deltaMassDiff)',
-    'extraInfo(Dst0_chiProb)',
+    # D* veto variables
+    'Dstp_deltaMassDiff',
+    'Dstp_chiProb',
+    'Dst0_deltaMassDiff',
+    'Dst0_chiProb',
 ]
 
-# Write output ntuple for B+ candidates
+# Write output ntuples for B+ and B0 candidates
 ma.variablesToNtuple(
     'B+:feiHadronic',
     variables=output_variables,
-    filename=args.output + '_Bp.root',
+    filename=args.output,
     treename='Bp',
     path=my_path
 )
 
-# Write output ntuple for B0 candidates
 ma.variablesToNtuple(
     'B0:feiHadronic',
     variables=output_variables,
-    filename=args.output + '_B0.root',
+    filename=args.output,
     treename='B0',
     path=my_path
 )

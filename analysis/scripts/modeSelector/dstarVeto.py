@@ -19,9 +19,37 @@ This helps identify B -> D* X decays that were reconstructed as B -> D X
 by the FEI, which is important for the ModeSelector neural network.
 """
 
+import math
+
 import basf2 as b2
 import modularAnalysis as ma
 from variables import variables as vm
+
+
+class _SetDstarVetoDefaults(b2.Module):
+    """Set missing D* veto ExtraInfo keys to NaN on all B candidates.
+
+    This ensures every B candidate has Dstp_deltaMassDiff and Dst0_deltaMassDiff
+    set (even when the corresponding D* type is not its first daughter and no veto
+    candidate is reconstructed).
+    """
+
+    def __init__(self, particle_lists, keys):
+        super().__init__()
+        self._particle_lists = particle_lists
+        self._keys = keys
+
+    def event(self):
+        from ROOT import Belle2
+        for list_name in self._particle_lists:
+            plist = Belle2.PyStoreObj(list_name)
+            if not plist.isValid():
+                continue
+            for i in range(plist.obj().getListSize()):
+                p = plist.obj().getParticle(i)
+                for key in self._keys:
+                    if not p.hasExtraInfo(key):
+                        p.addExtraInfo(key, math.nan)
 
 
 def add_dstar_veto_aliases():
@@ -279,5 +307,16 @@ def addDstarVeto(
 
             # Execute ROE path
             path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+        if writeExtraInfo:
+            # After all real values are set, fill any remaining missing deltaMassDiff
+            # keys with NaN. This ensures every B candidate has these keys so that
+            # ModeSelectorModule's hasExtraInfo check does not FATAL. NaN is converted
+            # to None in ModeSelectorModule and stored as 0 in the sparse feature matrix,
+            # matching the behaviour of a genuinely absent veto candidate.
+            path.add_module(_SetDstarVetoDefaults(
+                [particleList],
+                ['Dstp_deltaMassDiff', 'Dst0_deltaMassDiff'],
+            ))
 
     b2.B2INFO(f"DstarVeto: Added D* veto reconstruction for {particleLists}")

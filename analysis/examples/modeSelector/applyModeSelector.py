@@ -79,9 +79,6 @@ for b in ['B+', 'B0']:
     # Apply cosTBTO cut
     ma.applyCuts(f'{b}:{fei_identifier}', 'cosTBTO < 0.9', path=my_path)
 
-    # BCS
-    ma.rankByHighest(f'{b}:{fei_identifier}', 'extraInfo(SignalProbability)', numBest=1, path=my_path)
-
 # Build event shape variables (sphericity, thrust, etc.)
 ma.buildEventShape(
     allMoments=False,
@@ -113,9 +110,13 @@ modeSelector.modeSelector(
     main_model_path=args.main_model,
     output_variable='BplusScore',
     debug=True,  # Enable debug output
-    debug_max_events=3,  # Print first 3 events
+    debug_max_events=10,  # Print info for first 10 events
     path=my_path
 )
+
+for b in ['B+', 'B0']:
+    # only select BCs after modeSelector!
+    ma.rankByHighest(f'{b}:{fei_identifier}', 'extraInfo(SignalProbability)', numBest=1, path=my_path)
 
 # Create aliases for cleaner branch names in output ntuple
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')

@@ -297,8 +297,8 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
 
     print(f"\nTotal after concatenation: {features.shape[0]} events")
 
-    # Compute remove_inputs dynamically and verify against config.REMOVE_INPUTS
-    print("\nVerifying REMOVE_INPUTS from feature sparsity...")
+    # Compute has_inputs dynamically and verify against config.HAS_INPUTS
+    print("\nVerifying HAS_INPUTS from feature sparsity...")
 
     n_total = features.shape[1]  # 1643
 
@@ -312,21 +312,29 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     mbc_end = n_input_ids * 11
     mbc_cols = set(range(mbc_start, mbc_end))
 
-    computed_remove = sorted(all_zero_cols | mbc_cols)
+    computed_has_inputs = sorted(set(range(n_total)) - (all_zero_cols | mbc_cols))
+    n_computed_remove = n_total - len(computed_has_inputs)
     print(f"  All-zero columns:  {len(all_zero_cols)}")
     print(f"  Mbc block [{mbc_start}, {mbc_end}): {len(mbc_cols)} columns")
-    print(f"  Total to remove:   {len(computed_remove)}")
+    print(f"  Total to remove:   {n_computed_remove}")
 
     # Verify against hardcoded list in config
-    if computed_remove != config.REMOVE_INPUTS:
-        print("  WARNING: REMOVE_INPUTS mismatch!")
-        print(f"    Computed from data: {len(computed_remove)} indices removed ({n_total - len(computed_remove)} kept)")
-        print(f"    config.REMOVE_INPUTS: {len(config.REMOVE_INPUTS)} indices removed ({n_total - len(config.REMOVE_INPUTS)} kept)")
-        print("    Using config.REMOVE_INPUTS (data may not cover all input_ids)")
+    if computed_has_inputs != config.HAS_INPUTS:
+        print("  WARNING: HAS_INPUTS mismatch!")
+        print(f"    Computed from data: {len(computed_has_inputs)} kept ({n_computed_remove} removed)")
+        print(f"    config.HAS_INPUTS: {len(config.HAS_INPUTS)} kept ({n_total - len(config.HAS_INPUTS)} removed)")
+        print("    Using config.HAS_INPUTS (data may not cover all input_ids)")
+        out_path = "has_inputs_recomputed.txt"
+        with open(out_path, "w") as f:
+            f.write("[\n")
+            for idx in computed_has_inputs:
+                f.write(f"    {idx},\n")
+            f.write("]\n")
+        print(f"    Recomputed list written to {out_path}")
     else:
-        print(f"  REMOVE_INPUTS verified OK ({len(config.REMOVE_INPUTS)} removed, "
-              f"{n_total - len(config.REMOVE_INPUTS)} kept)")
-    has_inputs = sorted(set(range(n_total)) - set(config.REMOVE_INPUTS))
+        print(f"  HAS_INPUTS verified OK ({len(config.HAS_INPUTS)} kept, "
+              f"{n_total - len(config.HAS_INPUTS)} removed)")
+    has_inputs = list(config.HAS_INPUTS)
 
     # Apply feature selection
     features = features[:, has_inputs]

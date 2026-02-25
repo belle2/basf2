@@ -107,9 +107,8 @@ class ModeSelectorModule(b2.Module):
 
         import onnxruntime as ort
 
-        n_total = len(config.FEATURE_BLOCKS) * config.N_INPUT_IDS + len(config.EVENT_FEATURES) + 3
-        self.has_inputs = sorted(set(range(n_total)) - set(config.REMOVE_INPUTS))
-        b2.B2INFO(f"ModeSelector: Using config.REMOVE_INPUTS ({len(self.has_inputs)} features kept)")
+        self.has_inputs = list(config.HAS_INPUTS)
+        b2.B2INFO(f"ModeSelector: Using config.HAS_INPUTS ({len(self.has_inputs)} features kept)")
 
         # Load models from files or database
         if self.cat_model_path:

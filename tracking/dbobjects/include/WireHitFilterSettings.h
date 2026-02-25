@@ -25,34 +25,20 @@ namespace Belle2 {
      */
     ~WireHitFilterSettings() = default;
 
-    /** Set filter */
-    void setFilterName(const std::string& name)
-    {
-      m_FilterName = name;
-    }
-
-    /** Set swich layer */
+    /** Set from which SuperLayer to start using the MVA filter. The previous SuperLayers will use the DB cuts */
     void setMVASwitchSuperLayer(int superLayer)
     {
       m_CombinedFilterMVASwitchSuperLayer = superLayer;
     }
 
-    /** Get filter name */
-    std::string getFilterName() const
-    {
-      return m_FilterName;
-    }
-
-    /** Get filter name */
+    /** Get from which SuperLayer to start using the MVA filter. The previous SuperLayers will use the DB cuts */
     int getMVASwitchSuperLayer() const
     {
       return m_CombinedFilterMVASwitchSuperLayer;
     }
 
   private:
-    /** Filter name */
-    std::string m_FilterName = "combined";
-    /** For the combined filter, super layer number to switch to MVA */
+    /** For the combined filter, super layer number from which to start using MVA */
     int m_CombinedFilterMVASwitchSuperLayer = 2;
 
     ClassDef(WireHitFilterSettings, 1);

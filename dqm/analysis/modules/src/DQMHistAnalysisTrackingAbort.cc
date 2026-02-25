@@ -286,6 +286,14 @@ void DQMHistAnalysisTrackingAbortModule::event()
                                                               hCDCExtraHitsOut_BF->GetMean());
 
   // nCDCExtraHits & nCDCHits in SLs
+  TH1* noCDCHitsInSLIn_BF = findHist("TrackingAbort_before_filter/noCDCHitsInSL_IN");
+  if ((noCDCHitsInSLIn_BF != nullptr) && (nEventsINbf > 0)) noCDCHitsInSLIn_BF->Scale(1. / nEventsINbf);
+  TH1* noCDCHitsInSLOut_BF = findHist("TrackingAbort_before_filter/noCDCHitsInSL_OUT");
+  if ((noCDCHitsInSLOut_BF != nullptr) && (nEventsOUTbf > 0)) noCDCHitsInSLOut_BF->Scale(1. / nEventsOUTbf);
+  TH1* noCDCHitsInSLIn = findHist("TrackingAbort/noCDCHitsInSL_IN");
+  if ((noCDCHitsInSLIn != nullptr) && (nEventsIN > 0)) noCDCHitsInSLIn->Scale(1. / nEventsIN);
+  TH1* noCDCHitsInSLOut = findHist("TrackingAbort/noCDCHitsInSL_OUT");
+  if ((noCDCHitsInSLOut != nullptr) && (nEventsOUT > 0)) noCDCHitsInSLOut->Scale(1. / nEventsOUT);
   for (int sl = 0; sl < 9; sl++) {
     //before filter IN & OUT
     TH1* hCDCExtraHitsSLIn_BF = findHist(Form("TrackingAbort_before_filter/nCDCExtraHitsSL%d_IN", sl));
@@ -315,8 +323,14 @@ void DQMHistAnalysisTrackingAbortModule::event()
                                                           hCDCHitsSLOut->GetMean());
 
     //events with no signal hits in each SL after filter and outside active veto
-    if (hCDCHitsSLOut != nullptr) m_monObj->setVariable(Form("noCDCHitsInSL%d_outActiveVeto", sl),
-                                                          hCDCHitsSLOut->GetBinContent(1));
+    if (noCDCHitsInSLIn_BF != nullptr) m_monObj->setVariable(Form("noCDCHitsInSL%dBeforeFilter_inActiveVeto", sl),
+                                                               noCDCHitsInSLIn_BF->GetBinContent(sl));
+    if (noCDCHitsInSLOut_BF != nullptr) m_monObj->setVariable(Form("noCDCHitsOutSL%dBeforeFilter_inActiveVeto", sl),
+                                                                noCDCHitsInSLOut_BF->GetBinContent(sl));
+    if (noCDCHitsInSLIn != nullptr) m_monObj->setVariable(Form("noCDCHitsInSL%d_inActiveVeto", sl),
+                                                            noCDCHitsInSLIn->GetBinContent(sl));
+    if (noCDCHitsInSLOut != nullptr) m_monObj->setVariable(Form("noCDCHitsOutSL%d_inActiveVeto", sl),
+                                                             noCDCHitsInSLOut->GetBinContent(sl));
   }
 
 

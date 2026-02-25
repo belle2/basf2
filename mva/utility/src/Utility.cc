@@ -17,7 +17,6 @@
 
 #include <framework/utilities/MakeROOTCompatible.h>
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
 #include <cstdlib>
@@ -33,9 +32,9 @@ void Utility::download(const std::string& identifier, const std::string& filenam
 {
   Belle2::EventMetaData emd(event, run, experiment);
   Belle2::MVA::Weightfile weightfile = Belle2::MVA::Weightfile::loadFromDatabase(identifier, emd);
-  if (boost::ends_with(filename, ".root")) {
+  if (filename.ends_with(".root")) {
     Belle2::MVA::Weightfile::saveToROOTFile(weightfile, filename);
-  } else if (boost::ends_with(filename, ".xml")) {
+  } else if (filename.ends_with(".xml")) {
     Belle2::MVA::Weightfile::saveToXMLFile(weightfile, filename);
   } else {
     std::cerr << "Unknown file extension, fallback to xml" << std::endl;
@@ -47,9 +46,9 @@ void Utility::upload(const std::string& filename, const std::string& identifier,
 {
   Belle2::IntervalOfValidity iov(exp1, run1, exp2, run2);
   Belle2::MVA::Weightfile weightfile;
-  if (boost::ends_with(filename, ".root")) {
+  if (filename.ends_with(".root")) {
     weightfile = Belle2::MVA::Weightfile::loadFromROOTFile(filename);
-  } else  if (boost::ends_with(filename, ".xml")) {
+  } else if (filename.ends_with(".xml")) {
     weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(filename);
   } else {
     std::cerr << "Unknown file extension, fallback to xml" << std::endl;
@@ -67,9 +66,9 @@ void Utility::upload_array(const std::vector<std::string>& filenames, const std:
   for (const auto& filename : filenames) {
 
     Belle2::MVA::Weightfile weightfile;
-    if (boost::ends_with(filename, ".root")) {
+    if (filename.ends_with(".root")) {
       weightfile = Belle2::MVA::Weightfile::loadFromROOTFile(filename);
-    } else  if (boost::ends_with(filename, ".xml")) {
+    } else if (filename.ends_with(".xml")) {
       weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(filename);
     } else {
       std::cerr << "Unknown file extension, fallback to xml" << std::endl;

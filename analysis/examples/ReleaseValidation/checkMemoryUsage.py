@@ -22,13 +22,20 @@
 #####################################################################
 
 import argparse
+
 import basf2 as b2
 import modularAnalysis as ma
 import stdV0s
-import flavorTagger as ft
-import vertex as vx
 import variables.collections as vc
 import variables.utils as vu
+import vertex as vx
+
+use_tflat = True
+
+if use_tflat:
+    import tflat.flavorTagger as ft
+else:
+    import flavorTagger as ft
 
 b2.set_random_seed("aSeed")
 
@@ -76,14 +83,24 @@ ma.buildRestOfEvent(target_list_name="B0:sig", path=main)
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # Flavor Tagging
-ft.flavorTagger(
-    particleLists=["B0:sig"], weightFiles="B2nunubarBGx1", path=main, useGNN=True
-)
+if use_tflat:
+    # TFlaT
+    ft.flavorTagger(
+        particleLists=['B0:sig'],
+        uniqueIdentifier='TFlaT_MC16rd_light_2601_hyperion',
+        path=main)
+    ft_var = 'qrTFLAT'
+else:
+    # GNN
+    ft.flavorTagger(
+        particleLists=["B0:sig"], weightFiles="B2nunubarBGx1", path=main, useGNN=True
+    )
+    ft_var = 'qrOutput(FBDT)'
 
 # rank by highest r- factor
 ma.rankByHighest(
     particleList="B0:sig",
-    variable="abs(qrOutput(FBDT))",
+    variable=f"abs({ft_var})",
     numBest=0,
     outputVariable="Dilution_rank",
     path=main,
@@ -116,8 +133,11 @@ bvars = (
     + vertex_vars
 )
 
-# Attention: the collection of flavor tagging variables is defined in the flavorTagger
-bvars += ft.flavor_tagging
+if use_tflat:
+    bvars += ['qrTFLAT']
+else:
+    # Attention: the collection of flavor tagging variables is defined in the flavorTagger
+    bvars += ft.flavor_tagging
 
 # Create aliases to save information for different particles
 bvars = (

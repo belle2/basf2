@@ -9,7 +9,7 @@
 
 def get_validation_globaltags():
     globaltags = [
-        'validation_2025-11-17',
+        'validation_2026-01-14',
         'online'
     ]
     return globaltags

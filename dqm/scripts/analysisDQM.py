@@ -34,13 +34,13 @@ def add_analysis_dqm(path):
     ma.fillParticleList('mu+:KLMDQM2', 'p>1.5 and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.fillParticleList('gamma:physDQM', 'E > 0.15', path=path)
     ma.fillParticleList('mu+:physDQM', 'pt>2. and abs(d0) < 2 and abs(z0) < 4', path=path)
-    ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, True, path)
+    ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, writeOut=False, path=path)
     # std Kshorts-TreeFit
-    stdV0s.stdKshorts(path=path, fitter='TreeFit', updateAllDaughters=True, writeOut=True, addSuffix=True)
-    ma.reconstructDecay('Upsilon:physDQM -> mu-:physDQM mu+:physDQM', '9 < M < 12', 1, True, path)
+    stdV0s.stdKshorts(path=path, fitter='TreeFit', updateAllDaughters=True, writeOut=False, addSuffix=True)
+    ma.reconstructDecay('Upsilon:physDQM -> mu-:physDQM mu+:physDQM', '9 < M < 12', 1, writeOut=False, path=path)
     # bhabha,hadrons
     ma.fillParticleList('e+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)
-    ma.reconstructDecay('Upsilon:ephysDQM -> e-:physDQM e+:physDQM', '4 < M < 12', 1, True, path)
+    ma.reconstructDecay('Upsilon:ephysDQM -> e-:physDQM e+:physDQM', '4 < M < 12', 1, writeOut=False, path=path)
     ma.fillParticleList('pi+:hadbphysDQM', 'p>0.1 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)
 
     # have to manually create "all" lists of pi+ and photons to use inside buildEventShape
@@ -165,7 +165,7 @@ def add_mirabelle_dqm(path):
     # MiraBelle D* (followed by D0 -> K pi pi0) path
     ma.fillParticleList('pi+:MiraBelleDst2', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
     ma.fillParticleList('K+:MiraBelleDst2', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
-    stdPi0s(listtype='eff60_May2020', path=MiraBelleDst2_path)
+    stdPi0s(listtype='eff60_May2020', writeOut=False, path=MiraBelleDst2_path)
     ma.reconstructDecay(
         'D0:MiraBelleDst2_kpipi0 -> K-:MiraBelleDst2 pi+:MiraBelleDst2 pi0:eff60_May2020',
         '1.7 < M < 2.1',

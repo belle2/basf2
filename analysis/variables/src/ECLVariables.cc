@@ -124,7 +124,6 @@ namespace Belle2 {
       return klid->getKlId();
     }
 
-
     double eclPulseShapeDiscriminationMVA(const Particle* particle)
     {
       const ECLCluster* cluster = particle->getECLCluster();
@@ -779,8 +778,7 @@ namespace Belle2 {
 
         //..Time walk correction (7 parameters)
         //  E0 / bias at E0 / lowE slope / highE slope / curvature / Emin / Emax
-        std::array< std::array<float, 7>,  8736> par7 = ECLTimingNormalization->getTimeWalkPar();
-
+        const auto& par7 = ECLTimingNormalization->getTimeWalkPar();
         float EForCor = singleCrystalE;
         if (EForCor < par7[iCrys][5]) {EForCor = par7[iCrys][5];}
         if (EForCor > par7[iCrys][6]) {EForCor = par7[iCrys][6];}
@@ -792,8 +790,7 @@ namespace Belle2 {
 
         //..Dependence on regional background level (5 parameters)
         //  intercept / slope / p2 / min ootCrys / max ootCrys
-        std::array< std::array<float, 5>,  8736> bPar = ECLTimingNormalization->getBackgroundPar();
-
+        const auto& bPar = ECLTimingNormalization->getBackgroundPar();
         float oot = ootCrys;
         if (oot < bPar[iCrys][3]) {oot = bPar[iCrys][3];}
         if (oot > bPar[iCrys][4]) {oot = bPar[iCrys][4];}
@@ -801,15 +798,15 @@ namespace Belle2 {
 
         //..Dependence on single crystal energy (7 parameters)
         //  E0 / res at E0 / lowE slope / highE slope / curvature / Emin / Emax
-        par7 = ECLTimingNormalization->getEnergyPar();
+        const auto& par7Energy = ECLTimingNormalization->getEnergyPar();
 
         EForCor = singleCrystalE;
-        if (EForCor < par7[iCrys][5]) {EForCor = par7[iCrys][5];}
-        if (EForCor > par7[iCrys][6]) {EForCor = par7[iCrys][6];}
-        dE = EForCor - par7[iCrys][0];
-        double energyNorm = par7[iCrys][1] + par7[iCrys][2] * dE;
+        if (EForCor < par7Energy[iCrys][5]) {EForCor = par7Energy[iCrys][5];}
+        if (EForCor > par7Energy[iCrys][6]) {EForCor = par7Energy[iCrys][6];}
+        dE = EForCor - par7Energy[iCrys][0];
+        double energyNorm = par7Energy[iCrys][1] + par7Energy[iCrys][2] * dE;
         if (dE > 0) {
-          energyNorm = par7[iCrys][1] + par7[iCrys][3] * dE  + par7[iCrys][4] * dE * dE;
+          energyNorm = par7Energy[iCrys][1] + par7Energy[iCrys][3] * dE  + par7Energy[iCrys][4] * dE * dE;
         }
 
         //..Overall normalization. Cannot be too small.
@@ -1143,348 +1140,402 @@ namespace Belle2 {
       return func;
     }
 
-    VARIABLE_GROUP("ECL Cluster related");
+    VARIABLE_GROUP("ECL cluster related");
     REGISTER_VARIABLE("clusterEoP", eclClusterEoP, R"DOC(
-Returns ratio of uncorrelated energy E over momentum p, a convenience
-alias for (clusterE / p).
+Returns ratio of the cluster energy `clusterE` over momentum :math:`p`. 
+
+.. attention:: 
+    The cluster energy is already corrected for Bremsstrahlung. 
+
 )DOC");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion, R"DOC(
-Returns an integer code for the ECL region of a cluster.
+Returns an integer code representing the ECL region for the cluster:
 
-- 1: forward, 2: barrel, 3: backward,
-- 11: between FWD and barrel, 13: between BWD and barrel,
-- 0: otherwise
+- 1: forward, 2: barrel, 3: backward
+- 11: between forward endcap and barrel, 13: between backward endcap and barrel
+- 0: outside the ECL acceptance region
+
 )DOC");
     REGISTER_VARIABLE("clusterDeltaLTemp", eclClusterDeltaL, R"DOC(
-| Returns DeltaL for the shower shape.
-| A cluster comprises the energy depositions of several crystals. All these crystals have slightly
-  different orientations in space. A shower direction can be constructed by calculating the weighted
-  average of these orientations using the corresponding energy depositions as weights. The intersection
-  (more precisely the point of closest approach) of the vector with this direction originating from the
-  cluster center and an extrapolated track can be used as reference for the calculation of the shower
-  depth. It is defined as the distance between this intersection and the cluster center.
+Returns the :math:`\Delta L` for the cluster shape as defined below. 
 
-.. warning::
-    This distance is calculated on the reconstructed level and is temporarily
-    included to the ECL cluster MDST data format for studying purposes. If it is found
-    that it is not crucial for physics analysis then this variable will be removed
-    in future releases.
-    Therefore, keep in mind that this variable might be removed in the future!
+First, the cluster direction is constructed by calculating the weighted average of the orientation 
+for the crystals in the cluster. The POCA of the vector with this direction originating from the
+cluster center and an extrapolated track can be used to the calculate the shower
+depth. :math:`\Delta L` is then defined as the distance between this intersection and the cluster center. 
+
+.. attention::
+    This distance is calculated on the reconstruction level and is temporarily
+    included in mdst for investigation purposes. If it is found
+    that it is not crucial for physics analyses then this variable will be removed
+    in future releases. So keep in mind that this variable might be removed in the future.
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`-250.0`
-    | Upper limit: :math:`250.0`
-    | Precision: :math:`10` bit
-..
+    Please read `this <importantNoteECL>` first.
+
+    - Lower limit: :math:`-250.0`
+    - Upper limit: :math:`250.0`
+    - Precision: :math:`10` bit
 
 )DOC","cm");
-
     REGISTER_VARIABLE("minC2TDist", eclClusterIsolation, R"DOC(
-Returns the distance between the ECL cluster and its nearest track. 
+Returns the distance between the cluster and its nearest track.  
 
 For all tracks in the event, the distance between each of their extrapolated hits in the ECL and the ECL shower 
-position is calculated, and the overall smallest distance is returned. The track array index of the track that is 
-closest to the ECL cluster can be retrieved using `minC2TDistID`. 
-
-If the calculated distance is greater than :math:`250.0`, the returned distance will be capped at :math:`250.0`. 
-If there are no extrapolated hits found in the ECL for the event, NaN will be returned. 
+position is calculated, and the overall smallest distance is returned. If there are no extrapolated hits found in the ECL 
+for the event, ``NaN`` will be returned. The track array index of the track that is closest to the cluster can be 
+retrieved using `minC2TDistID`. 
 
 .. note::
-    This distance is calculated on the reconstructed level.
-
-.. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`250.0`
-    | Precision: :math:`10` bit
-..
+    Please read `this <importantNoteECL>` first.
+    
+    - Lower limit: :math:`0.0`
+    - Upper limit: :math:`250.0`
+    - Precision: :math:`10` bit
 
 )DOC","cm");
     REGISTER_VARIABLE("minC2TDistID", eclClusterIsolationID, R"DOC(
-Returns the track array index of the nearest track to the ECL cluster. The nearest track is calculated
+Returns the track array index of the nearest track to the cluster. The nearest track is calculated
 using the `minC2TDist` variable. 
+
 )DOC");
-    REGISTER_METAVARIABLE("minC2TDistVar(variable,particleList=pi-:all)", eclClusterIsolationVar, R"DOC(
-Returns the variable value of the nearest track to the given ECL cluster as calculated by `minC2TDist`. The 
-first argument is the variable name, e.g. `nCDCHits`, while the second (optional) argument is the particle list name which 
-will be used to pick up the nearest track in the calculation of `minC2TDist`. The default particle list used 
+    REGISTER_METAVARIABLE("minC2TDistVar(variable,particleList='pi-:all')", eclClusterIsolationVar, R"DOC(
+Returns the value of your chosen variable for the track nearest to the given cluster as calculated by 
+`minC2TDist`. 
+
+The first parameter ``variable`` is the variable name e.g. `nCDCHits`, while the second (optional) parameter ``particleList`` 
+is the particle list name which will be used in the calculation of `minC2TDist`. The default particle list used 
 is ``pi-:all``. 
+
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("clusterE", eclClusterE, R"DOC(
-Returns ECL cluster's energy corrected for leakage and background.
+Returns the cluster energy corrected for leakage and background.
 
-The raw photon energy is given by the weighted sum of all ECL crystal energies within the ECL cluster.
-The weights per crystals are :math:`\leq 1` after cluster energy splitting in the case of overlapping
-clusters. The number of crystals that are included in the sum depends on a initial energy estimation
-and local beam background levels at the highest energy crystal position. It is optimized to minimize
-the core width (resolution) of true photons. Photon energy distributions always show a low energy tail
-due to unavoidable longitudinal and transverse leakage that can be further modified by the clustering
-algorithm and beam backgrounds.The peak position of the photon energy distributions are corrected to
-match the true photon energy in MC:
-
-- Leakage correction: Using large MC samples of mono-energetic single photons, a correction factor
-  :math:`f` as function of reconstructed detector position, reconstructed photon energy and beam backgrounds
-  is determined via :math:`f = \frac{\text{peak_reconstructed}}{\text{energy_true}}`.
-
-- Cluster energy calibration (data only): To reach the target precision of :math:`< 1.8\%` energy
-  resolution for high energetic photons, the remaining difference between MC and data must be calibrated
-  using kinematically fit muon pairs. This calibration is only applied to data and not to MC and will
-  take time to develop.
-
-- Energy Bias Correction module, sub-percent correction, is NOT applied on clusterE, but on photon energy
-  and momentum. Only applied to data.
-
-It is important to note that after perfect leakage correction and cluster energy calibration,
-the :math:`\pi^{0}` mass peak will be shifted slightly to smaller values than the PDG average
-due to the low energy tails of photons. The :math:`\pi^{0}` mass peak must not be corrected
-to the PDG value by adjusting the reconstructed photon energies. Selection criteria based on
-the mass for :math:`\pi^{0}` candidates must be based on the biased value. Most analysis
-will used mass constrained :math:`\pi^{0}` s anyhow.
-
-.. warning::
+.. attention::
     We only store clusters with :math:`E > 20\,` MeV.
 
+.. topic:: Calculating Photon Energy
+
+    The raw photon energy is given by the weighted sum of all crystal energies within the cluster.
+    The weights per crystals are :math:`\leq 1` after cluster energy splitting in the case of overlapping
+    clusters. The number of crystals that are included in the sum depends on a initial energy estimation
+    and local beam background levels for the highest energy crystal. The crystal number is optimized to minimize
+    the resolution of photons. Photon energy distributions always show a low energy tail
+    due to unavoidable longitudinal and transverse leakage. The peak position of the photon energy distributions are 
+    corrected to match the true photon energy in MC. The corrections applied include: 
+
+    - Leakage correction: using  MC samples of mono-energetic single photon, a correction factor
+      :math:`f` as function of the reconstructed detector position, photon energy and beam background level 
+      is determined via :math:`f = \frac{\text{peak_reconstructed}}{\text{energy_true}}`
+
+    - Cluster energy calibration (data only): to reach the target precision of :math:`< 1.8\%` energy
+      resolution for high energetic photons, the remaining difference between MC and data is calibrated
+      using kinematically fits to muon pairs
+
+    It is important to note that after perfect leakage corrections and cluster energy calibrations,
+    the :math:`\pi^{0}` mass peak will be shifted slightly to smaller values than the PDG average
+    due to the low energy tails of photons. 
+
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`-5` (:math:`e^{-5} = 0.00674\,` GeV)
-    | Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV)
-    | Precision: :math:`18` bit
-    | This value can be changed to a different reference frame with :b2:var:`useCMSFrame`.
-..
+    Please read `this <importantNoteECL>` first.
+    
+    - Lower limit: :math:`-5` (:math:`e^{-5} = 0.00674\,` GeV in the lab frame)
+    - Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV in the lab frame)
+    - Precision: :math:`18` bit
 
 )DOC","GeV");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE, R"DOC(
-Returns ECL cluster's uncertainty on energy
-(from background level and energy dependent tabulation).
+Returns the uncertainty on the cluster energy. It is derived from 
+a background level and energy-dependent error tabulation. 
+
+.. danger::
+    This variable should not be used a selection variable or in an MVA for photon identification as it is not 
+    a directly-reconstructed quantity. For more information please see the 
+    `ECL Cluster Recommendations <https://indico.belle2.org/event/13722/contributions/84645/attachments/31512/51585/ecl_recommendation.pdf>`_ 
+    slides.
 
 )DOC","GeV");
     REGISTER_VARIABLE("clusterErrorPhi", eclClusterErrorPhi, R"DOC(
-Returns ECL cluster's uncertainty on :math:`\phi`
-(from background level and energy dependent tabulation).
+Returns the uncertainty on the phi angle of the cluster. It is derived from 
+a background level and energy-dependent error tabulation. 
+
+.. danger::
+    This variable should not be used a selection variable or in an MVA for photon identification as it is not 
+    a directly-reconstructed quantity. For more information please see the 
+    `ECL Cluster Recommendations <https://indico.belle2.org/event/13722/contributions/84645/attachments/31512/51585/ecl_recommendation.pdf>`_ 
+    slides.
 
 )DOC","rad");
     REGISTER_VARIABLE("clusterErrorTheta", eclClusterErrorTheta, R"DOC(
-Returns ECL cluster's uncertainty on :math:`\theta`
-(from background level and energy dependent tabulation).
+Returns the uncertainty on the theta angle of the cluster. It is derived from 
+a background level and energy-dependent error tabulation. 
+
+.. danger::
+    This variable should not be used a selection variable or in an MVA for photon identification as it is not 
+    a directly-reconstructed quantity. For more information please see the 
+    `ECL Cluster Recommendations <https://indico.belle2.org/event/13722/contributions/84645/attachments/31512/51585/ecl_recommendation.pdf>`_ 
+    slides.
 
 )DOC","rad");
-
     REGISTER_VARIABLE("clusterR", eclClusterR, R"DOC(
-Returns ECL cluster's centroid distance from :math:`(0,0,0)`.
+Returns the distance of the cluster centroid from :math:`(0,0,0)`.
+
+.. warning::
+    This variable is not recommended for use in analyses as they are difficult to interpret. For more information please see the 
+    `ECL Cluster Recommendations <https://indico.belle2.org/event/13722/contributions/84645/attachments/31512/51585/ecl_recommendation.pdf>`_ 
+    slides.
 
 )DOC","cm");
     REGISTER_VARIABLE("clusterPhi", eclClusterPhi, R"DOC(
-Returns ECL cluster's azimuthal angle :math:`\phi`
-(this is not generally equal to a photon azimuthal angle).
+Returns the azimuthal angle :math:`\phi` of the cluster. This is generally not equal 
+to the azimuthal angle of the photon. 
 
-| The direction of a cluster is given by the connecting line of :math:`\,(0,0,0)\,` and
-  cluster centroid position in the ECL.
-| The cluster centroid position is calculated using up to 21 crystals (5x5 excluding corners)
-  after cluster energy splitting in the case of overlapping clusters.
-| The centroid position is the logarithmically weighted average of all crystals evaluated at
-  the crystal centers. Cluster centroids are generally biased towards the centers of the
-  highest energetic crystal. This effect is larger for low energetic photons.
-| Beam backgrounds slightly decrease the position resolution, mainly for low energetic photons.
+.. topic:: Calculating Cluster Direction
 
-.. note::
-    Radius of a cluster is almost constant in the barrel and should not be used directly in any selection.
-
-Unlike for charged tracks, the uncertainty (covariance) of the photon directions is not determined
-based on individual cluster properties but taken from on MC-based parametrizations of the resolution
-as function of true photon energy, true photon direction and beam background level.
-
-.. warning::
-    Users must use the actual particle direction (done automatically in the modularAnalysis using the average
-    IP position (can be changed if needed)) and not the ECL Cluster direction (position in the ECL measured
-    from :math:`(0,0,0)`) for particle kinematics.
+    The direction of a cluster is given by the connecting line from :math:`\,(0,0,0)\,` to 
+    cluster centroid position in the ECL. The centroid position is calculated using up to 21 crystals 
+    (as 5x5 grid excluding corners) after the crystal energies are split in the case of overlapping clusters. 
+    The centroid position is the logarithmically weighted average of all crystals evaluated at the 
+    crystal centers. The centroid is generally biased towards the centers of the highest energetic 
+    crystal. This effect is larger for low energy photons. Beam backgrounds slightly decrease the 
+    position resolution, and mainly effects the low energy photons. 
+    
+    Unlike for charged tracks, the uncertainty (covariance) of the photon direction is not determined 
+    based on individual cluster properties but taken from MC-based parametrizations of the resolution 
+    as function of true photon energy, true photon direction and beam background level. 
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`-\pi`
-    | Upper limit: :math:`\pi`
-    | Precision: :math:`16` bit
-..
+    Please read `this <importantNoteECL>` first.
+    
+    - Lower limit: :math:`-\pi`
+    - Upper limit: :math:`\pi`
+    - Precision: :math:`16` bit
 
 )DOC","rad");
     REGISTER_VARIABLE("clusterConnectedRegionID", eclClusterConnectedRegionID, R"DOC(
-Returns ECL cluster's connected region ID.
+Returns connected region ID for the cluster. 
 )DOC");
     REGISTER_VARIABLE("clusterTheta", eclClusterTheta, R"DOC(
-Returns ECL cluster's polar angle :math:`\theta`
-(this is not generally equal to a photon polar angle).
+Returns the polar angle :math:`\theta` of the cluster. This is generally not equal 
+to the polar angle of the photon. 
 
-| The direction of a cluster is given by the connecting line of :math:`\,(0,0,0)\,` and
-  cluster centroid position in the ECL.
-| The cluster centroid position is calculated using up to 21 crystals (5x5 excluding corners)
-  after cluster energy splitting in the case of overlapping clusters.
-| The centroid position is the logarithmically weighted average of all crystals evaluated at
-  the crystal centers. Cluster centroids are generally biased towards the centers of the
-  highest energetic crystal. This effect is larger for low energetic photons.
-| Beam backgrounds slightly decrease the position resolution, mainly for low energetic photons.
+.. topic:: Calculating Cluster Direction
 
-.. note::
-    Radius of a cluster is almost constant in the barrel and should not be used directly in any selection.
-
-Unlike for charged tracks, the uncertainty (covariance) of the photon directions is not determined
-based on individual cluster properties but taken from on MC-based parametrizations of the resolution
-as function of true photon energy, true photon direction and beam background level.
-
-.. warning::
-    Users must use the actual particle direction (done automatically in the modularAnalysis using the average
-    IP position (can be changed if needed)) and not the ECL Cluster direction (position in the ECL measured
-    from :math:`(0,0,0)`) for particle kinematics.
+    The direction of a cluster is given by the connecting line from :math:`\,(0,0,0)\,` to 
+    cluster centroid position in the ECL. The centroid position is calculated using up to 21 crystals 
+    (as 5x5 grid excluding corners) after the crystal energies are split in the case of overlapping clusters. 
+    The centroid position is the logarithmically weighted average of all crystals evaluated at the 
+    crystal centers. The centroid is generally biased towards the centers of the highest energetic 
+    crystal. This effect is larger for low energy photons. Beam backgrounds slightly decrease the 
+    position resolution, and mainly effects the low energy photons. 
+    
+    Unlike for charged tracks, the uncertainty (covariance) of the photon direction is not determined 
+    based on individual cluster properties but taken from MC-based parametrizations of the resolution 
+    as function of true photon energy, true photon direction and beam background level. 
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`\pi`
-    | Precision: :math:`16` bit
-..
+    Please read `this <importantNoteECL>` first.
+    
+    - Lower limit: :math:`0.0`
+    - Upper limit: :math:`\pi`
+    - Precision: :math:`16` bit
 
 )DOC","rad");
     REGISTER_VARIABLE("clusterTiming", eclClusterTiming, R"DOC(
-**In Belle II:**
-Returns the time of the ECL cluster. It is calculated as the Photon timing minus the Event t0.
-Photon timing is given by the fitted time of the recorded waveform of the highest energy crystal in the
-cluster. After all calibrations and corrections (including Time-Of-Flight), photons from the interaction
-point (IP) should have a Photon timing that corresponds to the Event t0, :math:`t_{0}`.  The Event t0 is the
-time of the event and may be measured by a different sub-detector (see Event t0 documentation). For an ECL
-cluster produced at the interaction point in time with the event, the cluster time should be consistent with zero
-within the uncertainties. Special values are returned if the fit for the Photon timing fails (see
-documentation for `clusterHasFailedTiming`). (For MC, the calibrations and corrections are not fully simulated).
+Returns the time of the cluster. This is calculated **differently** in Belle and Belle II. Please 
+read their definitions below. 
+
+.. topic:: In Belle II
+
+    It is calculated as the cluster time minus the `eventT0`. The cluster time is obtained by a fit to 
+    the recorded waveform of the highest energy crystal in the cluster. For a cluster produced by a 
+    particle from the IP, the cluster time should be consistent with `eventT0` within the uncertainties 
+    following all calibrations and corrections. For MC, note that the calibrations and corrections are not 
+    fully simulated. In order to see if the waveform fit fails, see `clusterHasFailedTiming`.    
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`-1000.0`
-    | Upper limit: :math:`1000.0`
-    | Precision: :math:`12` bit
-..
+    Please read `this <importantNoteECL>` first.
+    
+    - Lower limit: :math:`-1000.0`
+    - Upper limit: :math:`1000.0`
+    - Precision: :math:`12` bit
 
-**In Belle:**
-Returns the trigger cell (TC) time of the ECL cluster (photon).
-This information is available only in Belle data since experiment 31, and not available in Belle MC.
-Clusters produced at the interaction point in time with the event, have TC time in the range of 9000-11000
-Calculated based on the Appendix of Belle note 831.
+.. topic:: In Belle
+
+    It is equal to the trigger cell (TC) time corresponding to the cluster. This information is only 
+    available in Belle data since experiment 31, and not available in Belle MC. Clusters produced at the IP 
+    in time with the event have a TC time in the range of 9000 - 11000. More information can be found in the 
+    Appendix of Belle note 831. 
 
 .. note::
-    | In case this variable is obtained from Belle data that is stored in Belle II mdst/udst format, it will be truncated to:
-    | Lower limit: :math:`-1000.0`
-    | Upper limit: :math:`1000.0`
-    | Precision: :math:`12` bit
-..
+    In case this variable is obtained from Belle data that is stored in Belle II mdst/udst format, it will be truncated to:
+    
+    - Lower limit: :math:`-1000.0`
+    - Upper limit: :math:`1000.0`
+    - Precision: :math:`12` bit
 
 )DOC","ns");
     REGISTER_VARIABLE("clusterHasFailedTiming", eclClusterHasFailedTiming, R"DOC(
-Status bit for if the ECL cluster's timing fit failed. Photon timing is given by the fitted time
-of the recorded waveform of the highest energetic crystal in a cluster; however, that fit can fail and so
-this variable tells the user if that has happened.
+Status bit indicating if the waveform fit for the `clusterTiming` calculation has failed. 
 )DOC");
     REGISTER_VARIABLE("clusterErrorTiming", eclClusterErrorTiming, R"DOC(
-Returns ECL cluster's timing uncertainty that contains :math:`99\%` of true photons (dt99).
+Returns the cluster timing uncertainty which is equal to the :math:`dt99` value as defined below. Very large 
+values of :math:`dt99` are an indication of a failed waveform fit for the cluster.  
 
-The photon timing uncertainty is currently determined using MC. The resulting parametrization depends on
-the true energy deposition in the highest energetic crystal and the local beam background level in that crystal.
-The resulting timing distribution is non-Gaussian and for each photon the value dt99 is stored,
-where :math:`|\text{timing}| / \text{dt99} < 1` is designed to give a :math:`99\%`
-timing efficiency for true photons from the IP.
-The resulting efficiency is approximately flat in energy and independent of beam background levels.
-
-Very large values of dt99 are an indication of failed waveform fits in the ECL.
-We remove such clusters in most physics photon lists.
-
-.. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`1000.0`
-    | Precision: :math:`12` bit
+The timing distribution for each cluster is non-Gaussian and so the value :math:`dt99` is stored where 
+:math:`|\text{timing}| / \text{dt99} < 1` is designed to give a :math:`99\%` timing efficiency for 
+true photons from the IP. (This definition results in an efficiency that is approximately flat in energy 
+and independent of the beam background level). The :math:`dt99` value stored is determined using MC with a 
+parametrisation that depends on the true energy deposition in the highest energetic crystal and the 
+local beam background level in that crystal.  
 
 .. warning::
-    In real data there will be a sizeable number of high energetic Bhabha events
-    (from previous or later bunch collisions) that can easily be rejected by timing cuts.
-    However, these events create large ECL clusters that can overlap with other ECL clusters
-    and it is not clear that a simple rejection is the correction strategy.
-..
+    This variable should should only be used for relative timing selections as it is not 
+    a directly-reconstructed quantity. For more information please see the 
+    `ECL Cluster Recommendations <https://indico.belle2.org/event/13722/contributions/84645/attachments/31512/51585/ecl_recommendation.pdf>`_ 
+    slides.
+
+.. note::
+    Please read `this <importantNoteECL>` first.
+
+    - Lower limit: :math:`0.0`
+    - Upper limit: :math:`1000.0`
+    - Precision: :math:`12` bit
 
 )DOC","ns");
     REGISTER_VARIABLE("clusterHasFailedErrorTiming", eclClusterHasFailedErrorTiming, R"DOC(
-Status bit for if the ECL cluster's timing uncertainty calculation failed. Photon timing is given by the fitted time
-of the recorded waveform of the highest energetic crystal in a cluster; however, that fit can fail and so
-this variable tells the user if that has happened.
+Status bit indicating if the calculation of `clusterErrorTiming` has failed due to a failed 
+waveform fit. 
 )DOC");
     REGISTER_VARIABLE("clusterHighestE", eclClusterHighestE, R"DOC(
-Returns energy of the highest energetic crystal in the ECL cluster after reweighting.
+Returns the energy of the highest energetic crystal in the cluster after reweighting. 
 
 .. warning::
-    This variable must be used carefully since it can bias shower selection
-    towards photons that hit crystals in the center and hence have a large energy
-    deposition in the highest energy crystal.
+    This variable is not recommended for use in analyses as they are difficult to interpret. For more information please see the 
+    `ECL Cluster Recommendations <https://indico.belle2.org/event/13722/contributions/84645/attachments/31512/51585/ecl_recommendation.pdf>`_ 
+    slides.
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`-5` (:math:`e^{-5} = 0.00674\,` GeV)
-    | Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV)
-    | Precision: :math:`18` bit
-..
+    Please read `this <importantNoteECL>` first.
+    
+    - Lower limit: :math:`-5` (:math:`e^{-5} = 0.00674\,` GeV)
+    - Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV)
+    - Precision: :math:`18` bit
 
 )DOC","GeV");
     REGISTER_VARIABLE("clusterCellID", eclClusterCellId,
-                      "Returns cellId of the crystal with highest energy in the ECLCluster.");
-    REGISTER_VARIABLE("clusterThetaID", eclClusterThetaId,
-                      "Returns thetaId of the crystal with highest energy in the ECLCluster.");
-    REGISTER_VARIABLE("clusterPhiID", eclClusterPhiId,
-                      "Returns phiId of the crystal with highest energy in the ECLCluster.");
+                      "Returns the cell ID of the crystal with highest energy in the cluster.");
+    REGISTER_VARIABLE("clusterThetaID", eclClusterThetaId, R"DOC(
+Returns the :math:`\theta` ID of the crystal with highest energy in the cluster. There are 
+69 :math:`\theta` IDs in total covering the entire ECL acceptance. The mapping between cell ID number 
+and :math:`\theta` ID can be found in the source code linked to the right of this variable description. 
+)DOC");
+    REGISTER_VARIABLE("clusterPhiID", eclClusterPhiId, R"DOC(
+Returns the :math:`\phi` ID of the crystal with highest energy in the cluster.
+While :math:`\theta` ID indicates the specific ring of the calorimeter,
+:math:`\phi` ID indicates a position of a crystal in that ring. When facing
+towards the direction of an electron beam, :math:`\phi` IDs go clockwise, with
+0 corresponding to the crystal closest to the outer side of the main ring tunnel.
+
+.. admonition:: Diagram
+    :class: dropdown xhint stacked
+    
+    .. code-block:: text
+
+                        phi_id = (nring/4)   phi_id = (nring/4) - 1
+                                      
+                                    . ... ││. .. .
+                                .... . .  ││..  .. . .
+                              .. . . .... ││ ..... . . . .
+                          .. . . .               . . . . .
+                        ... ...                      .. . ..
+                        ... ..                         ... . ..
+                      . . .                             ..  . .
+                    ... .                                  ....
+                    . . ..                                   .. .
+                    . . .                                    .. ..
+        nring/2     ─────           (towards the            ───── phi_id = 0
+        nring/2 - 1 ─────            electron beam)         ───── phi_id = (nring - 1)
+                    . ..                                     .. ..
+                    . ....                                  . . .
+                    .. ..                                  ... .
+                    . .. .                               .. ...
+                        . . ..                          .. . .
+                        .. . ...                     ..  ...
+                          . . .  . .             .. .. ..
+                            ... . . . .. ││. .. . .... .
+                                . . . . .││ ... ... .
+                                    .....││.. . .
+
+                  phi_id = (nring*3/4) - 1  phi_id = (nring/4) - 1
+
+    The number of crystals per ring can be found see the `code <https://software.belle2.org/development/doxygen/classBelle2_1_1ECL_1_1ECLNeighbours.html#a4d5f886765986da6afb0559fb398106b>`_.   
+
+)DOC");
     REGISTER_VARIABLE("clusterE1E9", eclClusterE1E9, R"DOC(
-Returns ratio of energies of the central crystal, E1, and 3x3 crystals, E9, around the central crystal.
-Since :math:`E1 \leq E9`, this ratio is :math:`\leq 1` and tends towards larger values for photons
-and smaller values for hadrons.
+Returns the ratio of the energy in the central crystal (:math:`E_1`) to the total energy in the 
+3x3 crystal grid around the central crystal (:math:`E_9`). Since :math:`E_1 \leq E_9`, this ratio is 
+:math:`\leq 1` and tends towards larger values for photons and smaller values for hadrons. 
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`1.0`
-    | Precision: :math:`10` bit
+    Please read `this <importantNoteECL>` first.
+
+    - Lower limit: :math:`0.0`
+    - Upper limit: :math:`1.0`
+    - Precision: :math:`10` bit
+
 )DOC");
     REGISTER_VARIABLE("clusterE9E25", eclClusterE9E25, R"DOC(
-Deprecated - kept for backwards compatibility - returns clusterE9E21.
+Returns `clusterE9E21`. This variable is kept for backwards compatibility. 
 )DOC");
     REGISTER_VARIABLE("clusterE9E21", eclClusterE9E21, R"DOC(
-Returns ratio of energies in inner 3x3 crystals, E9, and 5x5 crystals around the central crystal without corners.
-Since :math:`E9 \leq E21`, this ratio is :math:`\leq 1` and tends towards larger values for photons
-and smaller values for hadrons.
+Returns the ratio of the total energy in the 3x3 crystal grid around the central 
+crystal (:math:`E_9`) to the total energy in the 5x5 crystal grid around the central crystal 
+excluding the corners (:math:`E_{21}`). Since :math:`E_9 \leq E_{21}`, this ratio is :math:`\leq 1` and tends towards larger 
+values for photons and smaller values for hadrons. 
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`1.0`
-    | Precision: :math:`10` bit
+    Please read `this <importantNoteECL>` first.
+
+    - Lower limit: :math:`0.0`
+    - Upper limit: :math:`1.0`
+    - Precision: :math:`10` bit
+    
 )DOC");
     REGISTER_VARIABLE("clusterAbsZernikeMoment40", eclClusterAbsZernikeMoment40, R"DOC(
-Returns absolute value of Zernike moment 40 (:math:`|Z_{40}|`). (shower shape variable).
+Returns absolute value of the 40th Zernike moment :math:`|Z_{40}|`. An explanation on this shower 
+shape variable is in the description for the `clusterZernikeMVA` variable.
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`1.7`
-    | Precision: :math:`10` bit
+    Please read `this <importantNoteECL>` first.
+
+    - Lower limit: :math:`0.0`
+    - Upper limit: :math:`1.7`
+    - Precision: :math:`10` bit
+
 )DOC");
     REGISTER_VARIABLE("clusterAbsZernikeMoment51", eclClusterAbsZernikeMoment51, R"DOC(
-Returns absolute value of Zernike moment 51 (:math:`|Z_{51}|`). (shower shape variable).
+Returns absolute value of the 51st Zernike moment :math:`|Z_{51}|`. An explanation on this shower 
+shape variable is in the description for the `clusterZernikeMVA` variable.
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`1.2`
-    | Precision: :math:`10` bit
+    Please read `this <importantNoteECL>` first.
+
+    - Lower limit: :math:`0.0`
+    - Upper limit: :math:`1.2`
+    - Precision: :math:`10` bit
+
 )DOC");
     REGISTER_VARIABLE("clusterZernikeMVA", eclClusterZernikeMVA, R"DOC(
-Returns output of a MVA using eleven Zernike moments of the cluster. Zernike moments are calculated per
-shower in a plane perpendicular to the shower direction via
+Returns output of an MVA trained to use eleven Zernike moments of the cluster. 
+
+Zernike moments are calculated for each shower in the plane perpendicular to 
+the shower direction via 
 
 .. math::
     |Z_{nm}| = \frac{n+1}{\pi} \frac{1}{\sum_{i} w_{i} E_{i}} \left|\sum_{i} R_{nm}(\rho_{i}) e^{-im\alpha_{i}} w_{i} E_{i} \right|
 
-where n, m are the integers, :math:`i` runs over the crystals in the shower,
+where :math:`n, m` are the integers, :math:`i` runs over each crystal in the shower,
 :math:`E_{i}` is the energy of the i-th crystal in the shower,
 :math:`R_{nm}` is a polynomial of degree :math:`n`,
 :math:`\rho_{i}` is the radial distance of the :math:`i`-th crystal in the perpendicular plane,
@@ -1492,134 +1543,159 @@ and :math:`\alpha_{i}` is the polar angle of the :math:`i`-th crystal in the per
 As a crystal can be related to more than one shower, :math:`w_{i}` is the fraction of the
 energy of the :math:`i`-th crystal associated with the shower.
 
-**Note:** this variable is sensitive to other nearby particles and so cluster isolation properties should always be checked; 
-for more information please see the 
-`ECL Cluster Recommendations <https://indico.belle2.org/event/13722/contributions/84645/attachments/31512/51585/ecl_recommendation.pdf>`_. 
+.. caution::
+    This variable is sensitive to other nearby particles and so cluster isolation properties shoud 
+    always be checked. For more information please see the 
+    `ECL Cluster Recommendations <https://indico.belle2.org/event/13722/contributions/84645/attachments/31512/51585/ecl_recommendation.pdf>`_ 
+    slides.
 
-More details about the implementation can be found in `BELLE2-NOTE-TE-2017-001 <https://docs.belle2.org/record/454?ln=en>`_ .
-
-More details about Zernike polynomials can be found in `Wikipedia <https://en.wikipedia.org/wiki/Zernike_polynomials>`_ .
-
-| For cluster with hypothesisId==N1: raw MVA output.
-| For cluster with hypothesisId==N2: 1 - prod{clusterZernikeMVA}, where the product is on all N1 showers
-  belonging to the same connected region (shower shape variable).
+.. seealso::
+    - More details about the implementation can be found in `BELLE2-NOTE-TE-2017-001 <https://docs.belle2.org/record/454?ln=en>`_ .
+    - More details about Zernike polynomials can be found on `Wikipedia <https://en.wikipedia.org/wiki/Zernike_polynomials>`_ .
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`1.0`
-    | Precision: :math:`10` bit
+    Please read `this <importantNoteECL>` first.
+    
+    - Lower limit: :math:`0.0`
+    - Upper limit: :math:`1.0`
+    - Precision: :math:`10` bit
+
 )DOC");
     REGISTER_VARIABLE("clusterSecondMoment", eclClusterSecondMoment, R"DOC(
-Returns second moment :math:`S`. It is defined as:
+Returns the second moment :math:`S` of the cluster. This is mainly implemented for reconstructing high a 
+energy :math:`\pi^0` originating from merged clusters. 
+
+It is defined as:
 
 .. math::
     S = \frac{1}{S_{0}(\theta)}\frac{\sum_{i=0}^{n} w_{i} E_{i} r^2_{i}}{\sum_{i=0}^{n} w_{i} E_{i}}
 
-where :math:`E_{i} = (E_0, E_1, ...)` are the single crystal energies sorted by energy, :math:`w_{i}` is
-the crystal weight, and :math:`r_{i}` is the distance of the :math:`i`-th digit to the shower center projected
-to a plane perpendicular to the shower axis. :math:`S_{0}(\theta)` normalizes :math:`S` to 1 for isolated photons.
+where :math:`E_{i} = (E_0, E_1, ...)` are the crystal energies sorted by descending energy, :math:`w_{i}` is
+the fraction of the crystal energy associated with the shower, and :math:`r_{i}` is the distance of 
+the :math:`i`-th digit to the shower center projected onto a plane perpendicular to the 
+shower axis. :math:`S_{0}(\theta)` normalizes :math:`S` to 1 for isolated photons.
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`40.0`
-    | Precision: :math:`10` bit
-..
+    Please read `this <importantNoteECL>` first.
+    
+    - Lower limit: :math:`0.0`
+    - Upper limit: :math:`40.0`
+    - Precision: :math:`10` bit
 
 )DOC","dimensionless");
     REGISTER_VARIABLE("clusterLAT", eclClusterLAT, R"DOC(
-Returns lateral energy distribution (shower variable). It is defined as following:
+Returns lateral energy distribution of the shower. For radially-symmetric electromagnetic showers, this 
+variable peaks at :math:`\approx 0.3`. It is larger for hadronic particles and electrons with a nearby relative 
+or Bremsstrahlung photon. 
+
+It is defined as following:
 
 .. math::
     S = \frac{\sum_{i=2}^{n} w_{i} E_{i} r^2_{i}}{(w_{0} E_{0} + w_{1} E_{1}) r^2_{0} + \sum_{i=2}^{n} w_{i} E_{i} r^2_{i}}
 
-where :math:`E_{i} = (E_{0}, E_{1}, ...)` are the single crystal energies sorted by energy
-(:math:`E_{0}` is the highest energy and :math:`E_{1}` the second highest), :math:`w_{i}`
-is the crystal weight, :math:`r_{i}` is the distance of the :math:`i`-th digit to the
-shower center projected to a plane perpendicular to the shower axis,
-and :math:`r_{0} \approx 5\,cm` is the distance between two crystals.
+where :math:`E_{i} = (E_0, E_1, ...)` are the crystal energies sorted by descending energy, :math:`w_{i}` is
+the fraction of the crystal energy associated with the shower, :math:`r_{i}` is the distance of 
+the :math:`i`-th digit to the shower center projected onto a plane perpendicular to the shower axis,
+and :math:`r_{0} \approx 5\,cm` is the average distance between two crystal centres.
 
-clusterLAT peaks around 0.3 for radially symmetrical electromagnetic showers and is larger
-for hadronic events, and electrons with a close-by radiative or Bremsstrahlung photon.
+.. tip::
+    This variable peaks around 0.3 for symmetrical electromagnetic showers and is larger for hadronic 
+    showers and electrons with a close-by radiative or Bremsstrahlung photon.
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`1.0`
-    | Precision: :math:`10` bit
+    Please read `this <importantNoteECL>` first.
+    
+    - Lower limit: :math:`0.0`
+    - Upper limit: :math:`1.0`
+    - Precision: :math:`10` bit
+
 )DOC");
     REGISTER_VARIABLE("clusterNHits", eclClusterNHits, R"DOC(
-Returns sum of weights :math:`w_{i}` (:math:`w_{i} \leq 1`) of all crystals in an ECL cluster.
-For non-overlapping clusters this is equal to the number of crystals in the cluster.
-In case of energy splitting among nearby clusters, this can be a non-integer value.
+Returns sum of weights :math:`w_{i}` (:math:`w_{i} \leq 1`) of all crystals in the cluster.
+For non-overlapping clusters this is equal to the number of crystals in the cluster. However, in the case 
+of overlapping clusters where individual crystal energies are split among them, this can be a non-integer value. 
+
+.. tip::
+    If fractional weights are not of interest, this value should be cast to the nearest `int`
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`200.0`
-    | Precision: :math:`10` bit
-    | If fractional weights are not of interest, this value should be cast to the nearest integer.
+    Please read `this <importantNoteECL>` first.
+    
+    - Lower limit: :math:`0.0`
+    - Upper limit: :math:`200.0`
+    - Precision: :math:`10` bit
+
 )DOC");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched, R"DOC(
-Returns 1.0 if at least one reconstructed charged track is matched to the ECL cluster.
+Returns 1.0 if at least one reconstructed charged track is matched to the cluster. Track-cluster 
+matching is briefly described below. 
 
-Every reconstructed charged track is extrapolated into the ECL.
-Every ECL crystal that is crossed by the track extrapolation is marked.
-Each ECL cluster that contains any marked crystal is matched to the track.
-Multiple tracks can be matched to one cluster and multiple clusters can be matched to one track.
-It is conceptually correct to have two tracks matched to the same cluster.
+Every reconstructed track is extrapolated to the ECL. Every ECL crystal that is crossed by 
+the extrapolated track is marked. Following this, every cluster that contains a marked crystal 
+becomes associated with the original track. The current algorithm matches only one cluster to a 
+track but can match multiple tracks to the same cluster. In the latter case, all tracks matched 
+to the same cluster will return the same cluster variables e.g. all will have the same `clusterE`. 
 )DOC");
     REGISTER_VARIABLE("nECLClusterTrackMatches", nECLClusterTrackMatches, R"DOC(
-Returns number of charged tracks matched to this cluster.
+Returns the number of tracks matched to the cluster. For more information on track-cluster matching 
+please see the description for `clusterTrackMatch`. 
 
-.. note::
-    Sometimes (perfectly correctly) two tracks are extrapolated into the same cluster.
-
-    - For charged particles, this should return at least 1 (but sometimes 2 or more).
-    - For neutrals, this should always return 0.
-    - Returns NaN if there is no cluster.
+For the clusters of neutral particles, this should always return 0. If there is no cluster ``NaN`` is 
+returned. 
 )DOC");
     REGISTER_VARIABLE("clusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination, R"DOC(
-Status bit to indicate if cluster has digits with waveforms that passed energy and :math:`\chi^2`
-thresholds for computing PSD variables.
+Status bit to indicate if the waveforms from the cluster pass the requirements for computing pulse 
+shape discrimination variables such as `clusterPulseShapeDiscriminationMVA`. 
+
+.. topic:: Pulse Shape Information Requirements
+    
+    The exact requirements for a cluster have pulse shape information are as follows:
+    - there is at least one crystal with energy above 30 MeV for phase 2 data or 50 MeV for phase 3 data 
+    (this is the energy threshold requirement for saving waveforms offline)
+    - one of the waveforms for the cluster must have a good :math:`\chi^2` fit 
+
 )DOC");
     REGISTER_VARIABLE("beamBackgroundSuppression", beamBackgroundSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from beam background clusters.
 Class 1 is for true photon clusters while class 0 is for beam background clusters.
 
-The MVA has been trained using MC and the features used are:
+The MVA has been trained using MC and the features used, in decreasing importance, are:
 
 - `clusterTiming`
 - `clusterPulseShapeDiscriminationMVA`
 - `clusterE`
 - `clusterTheta`
+- `clusterZernikeMVA` (this has been removed starting from the MC16 training)
 
-The variable `clusterZernikeMVA` is also used but only for the MC15 training. 
-Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
-the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
+.. seealso::
 
-Please cite `this <https://inspirehep.net/literature/2785196>`_ if using this tool. 
+    For the correct usage, please see 
+    the `Performance Recommendations Webpage <https://belle2.pages.desy.de/performance/recommendations/>`_.
+
+.. important::
+
+    Please cite `this proceeding <https://inspirehep.net/literature/2785196>`_ if using this tool. 
 )DOC");
     REGISTER_VARIABLE("fakePhotonSuppression", fakePhotonSuppression, R"DOC(
-Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from fake photon clusters (e.g. split-offs,
-track-cluster matching failures etc.). Class 1 is for true photon clusters while class 0 is for fake photon clusters. 
+Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from fake photon clusters. 
+Class 1 is for true photon clusters while class 0 is for fake photon clusters. 
 
-The MVA has been trained using MC and the features are:
+The MVA has been trained using MC and the features, in decreasing importance, are:
 
 - `clusterPulseShapeDiscriminationMVA`
 - `minC2TDist`
 - `clusterE`
 - `clusterTiming`
 - `clusterTheta`
+- `clusterZernikeMVA` (this has been removed starting from the MC16 training)
 
-The variable `clusterZernikeMVA` is also used but only for the MC15 training. 
-Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
-the `Neutrals Performance XWiki Page <https://xwiki.desy.de/xwiki/rest/p/e23c8>`_.
+.. seealso::
+    For the correct usage, please see 
+    the `Performance Recommendations Webpage <https://belle2.pages.desy.de/performance/recommendations/>`_.
 
-Please cite `this <https://inspirehep.net/literature/2785196>`_ if using this tool. 
+.. important::
+    Please cite `this proceeding <https://inspirehep.net/literature/2785196>`_ if using this tool. 
 
-(This MVA is the same as the one used for `hadronicSplitOffSuppression` but that variable should not be used as it is deprecated and does not use the new weights). 
 )DOC");
     REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.
@@ -1628,7 +1704,8 @@ The classes are:
 - 1 for true photon clusters
 - 0 for hadronic splitoff clusters
 
-The MVA has been trained using samples of signal photons and hadronic splitoff photons coming from MC. The features used are (in decreasing order of significance): 
+The MVA has been trained using samples of signal photons and hadronic splitoff photons coming from MC. 
+The features used are (in decreasing order of significance):
 
 - `clusterPulseShapeDiscriminationMVA`
 - `minC2TDist`
@@ -1637,6 +1714,7 @@ The MVA has been trained using samples of signal photons and hadronic splitoff p
 - `clusterLAT`
 - `clusterE1E9`
 - `clusterSecondMoment`
+
 )DOC");
     MAKE_DEPRECATED("hadronicSplitOffSuppression", true, "light-2302-genetta", R"DOC(
                      Use the variable `fakePhotonSuppression` instead which is maintained and uses the latest weight files.
@@ -1646,52 +1724,69 @@ Returns MVA classifier that uses ECL clusters variables to discriminate Klong cl
     
 - 1 for Kl
 - 0 for background
+
+)DOC");
+    MAKE_DEPRECATED("clusterKlId", true, "light-2603-i", R"DOC(
+                     
 )DOC");
     REGISTER_VARIABLE("clusterPulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA, R"DOC(
-Returns MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers.
+Returns the output of an MVA classifier that uses pulse shape information to discriminate between electromagnetic 
+and hadronic showers. Class 1 is for electromagnetic showers while class 0 is for hadronic showers. 
 
-- 1 for electromagnetic showers
-- 0 for hadronic showers
+.. important::
+    Please cite `this paper <https://inspirehep.net/literature/1807894>`_ if using this tool. 
 
-For details, see the following `PSD arxiv paper <https://arxiv.org/pdf/2007.09642>`_  
 )DOC");
     REGISTER_VARIABLE("clusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits, R"DOC(
-Returns ECL cluster's number of hadron digits in cluster (pulse shape discrimination variable).
-Weighted sum of digits in cluster with significant scintillation emission (:math:`> 3\,` MeV)
-in the hadronic scintillation component.
-Computed only using cluster digits with energy :math:`> 50\,` MeV and good offline waveform fit :math:`\chi^2`.
+Returns the number of hadron digits in the cluster based on pulse shape information. This is the weight sum of cluster digits 
+that have :math:`> 3\,` MeV for the hadronic scintillation component. The digits must have pulse shape information available 
+(see `clusterHasPulseShapeDiscrimination` for more information). 
+
+.. warning::
+    This is a purely technical flag and should not be used for any physics-level selection
 
 .. note::
-    | Please read `this <importantNoteECL>` first.
-    | Lower limit: :math:`0.0`
-    | Upper limit: :math:`255.0`
-    | Precision: :math:`18` bit
+    Please read `this <importantNoteECL>` first.
+    
+    - Lower limit: :math:`0.0`
+    - Upper limit: :math:`255.0`
+    - Precision: :math:`18` bit
+    
 )DOC");
     REGISTER_VARIABLE("clusterClusterID", eclClusterId, R"DOC(
-Returns ECL cluster ID of this ECL cluster within the connected region (CR) to which it belongs to.
+Returns the ID the cluster within the connected region to which it belongs. 
 )DOC");
     REGISTER_VARIABLE("clusterHasNPhotons", eclClusterHasNPhotonsHypothesis, R"DOC(
-Returns 1.0 if cluster has the 'N photons' hypothesis (historically called 'N1'),
-0.0 if not, and NaN if no cluster is associated to the particle.
+Returns 1.0 if the cluster has the "N photons" hypothesis (historically called "N1"),
+0.0 if not, and ``NaN`` if no cluster is associated to the particle.
 )DOC");
     REGISTER_VARIABLE("clusterHasNeutralHadron", eclClusterHasNeutralHadronHypothesis, R"DOC(
-Returns 1.0 if the cluster has the 'neutral hadrons' hypothesis (historically called 'N2'),
-0.0 if not, and NaN if no cluster is associated to the particle.
+Returns 1.0 if the cluster has the "neutral hadrons" hypothesis (historically called "N2"),
+0.0 if not, and ``NaN`` if no cluster is associated to the particle.
 )DOC");
     REGISTER_VARIABLE("eclExtTheta", eclExtTheta, R"DOC(
-Returns extrapolated :math:`\theta` of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed.
+Returns the :math:`\theta` angle of the extrapolated track associated to the cluster (if any). 
+
+.. warning::
+    This requires the ``ECLTrackCalDigitMatch`` module to be executed.
 
 )DOC","rad");
     REGISTER_VARIABLE("eclExtPhi", eclExtPhi, R"DOC(
-Returns extrapolated :math:`\phi` of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed..
+Returns the :math:`\phi` angle of the extrapolated track associated to the cluster (if any). 
+
+.. warning::
+    This requires the ``ECLTrackCalDigitMatch`` module to be executed.
 
 )DOC","rad");
     REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, R"DOC(
-Returns extrapolated :math:`\phi` ID of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed..
+Returns the :math:`\phi` ID of the extrapolated track associated to the cluster (if any). 
+
+.. warning::
+    This requires the ``ECLTrackCalDigitMatch`` module to be executed.
+
 )DOC");
     REGISTER_VARIABLE("weightedAverageECLTime", weightedAverageECLTime, R"DOC(
-Returns ECL weighted average time of all clusters (neutrals) and matched clusters (charged) of daughters
-(of any generation) of the provided particle.
+Returns the weighted average time of all clusters corresponding to daughter particles of the provided particle. 
 
 )DOC", "ns");
     REGISTER_VARIABLE("maxWeightedDistanceFromAverageECLTime", maxWeightedDistanceFromAverageECLTime, R"DOC(
@@ -1700,161 +1795,171 @@ the clusters (neutrals) and matched clusters (charged) of daughters (of all gene
 
 )DOC", "ns");
     REGISTER_VARIABLE("clusterMdstIndex", eclClusterMdstIndex, R"DOC(
-StoreArray index(0 - based) of the MDST ECLCluster (useful for track-based particles matched to a cluster).
+Returns the ``StoreArray`` index of the cluster mDST object. This can be useful for track-based particles that are matched to an cluster. 
 )DOC");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystals", nECLOutOfTimeCrystals, R"DOC(
-[Eventbased] Returns the number of crystals (ECLCalDigits) that are out of time.
+**[Eventbased]** Returns the number of crystals that are out of time with the `eventT0` by more than 110.0 ns. Only crystals with an energy greater than 
+7 MeV are are counted.  
 )DOC");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystalsFWDEndcap", nECLOutOfTimeCrystalsFWDEndcap, R"DOC(
-[Eventbased] Returns the number of crystals (ECLCalDigits) that are out of time in the forward endcap.
+**[Eventbased]** Returns the number of crystals in the forward endcap that are out of time with the `eventT0` by more than 110.0 ns. Only crystals with an energy greater than 
+7 MeV are are counted.  
 )DOC");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystalsBarrel", nECLOutOfTimeCrystalsBarrel, R"DOC(
-[Eventbased] Returns the number of crystals (ECLCalDigits) that are out of time in the barrel.
+**[Eventbased]** Returns the number of crystals in the barrel that are out of time with the `eventT0` by more than 110.0 ns. Only crystals with an energy greater than 
+7 MeV are are counted.  
 )DOC");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystalsBWDEndcap", nECLOutOfTimeCrystalsBWDEndcap, R"DOC(
-[Eventbased] Returns the number of crystals (ECLCalDigits) that are out of time in the backward endcap.
+**[Eventbased]** Returns the number of crystals in the backward endcap that are out of time with the `eventT0` by more than 110.0 ns. Only crystals with an energy greater than 
+7 MeV are are counted.  
 )DOC");
 
     REGISTER_VARIABLE("nRejectedECLShowers", nRejectedECLShowers, R"DOC(
-[Eventbased] Returns the number of showers in the ECL that do not become clusters.
+**[Eventbased]** Returns the number of ECL showers that do not become clusters. If the number exceeds 255, the variable is set to 255.
 )DOC");
 
     REGISTER_VARIABLE("nRejectedECLShowersFWDEndcap", nRejectedECLShowersFWDEndcap, R"DOC(
-[Eventbased] Returns the number of showers in the ECL that do not become clusters, from the forward endcap.
-If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
+**[Eventbased]** Returns the number of ECL showers in the forward endcap that do not become clusters.
+If the number exceeds 255, the variable is set to 255.
 )DOC");
 
     REGISTER_VARIABLE("nRejectedECLShowersBarrel", nRejectedECLShowersBarrel, R"DOC(
-[Eventbased] Returns the number of showers in the ECL that do not become clusters, from the barrel.
-If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
+**[Eventbased]** Returns the number of ECL showers in the barrel that do not become clusters.
+If the number exceeds 255, the variable is set to 255.
 )DOC");
 
     REGISTER_VARIABLE("nRejectedECLShowersBWDEndcap", nRejectedECLShowersBWDEndcap, R"DOC(
-[Eventbased] Returns the number of showers in the ECL that do not become clusters, from the backward endcap.
-If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
+**[Eventbased]** Returns the number of ECL showers in the backward endcap that do not become clusters.
+If the number exceeds 255, the variable is set to 255.
 )DOC");
   
   REGISTER_VARIABLE("nKLMMultistripHitsFWDEndcap", nKLMMultistripHitsFWDEndcap, R"DOC(
-[Eventbased] Returns the number of multi-strip hits in the KLM forward endcap.
+**[Eventbased]** Returns the number of multi-strip hits in the KLM forward endcap associated with the ECL cluster.
 )DOC");
   
   REGISTER_VARIABLE("nKLMMultistripHitsBarrel", nKLMMultistripHitsBarrel, R"DOC(
-[Eventbased] Returns the number of multi-strip hits in the KLM barrel.
+**[Eventbased]** Returns the number of multi-strip hits in the KLM barrel associated with the ECL cluster.
 )DOC");
   
   REGISTER_VARIABLE("nKLMMultistripHitsBWDEndcap", nKLMMultistripHitsBWDEndcap, R"DOC(
-[Eventbased] Returns the number of multi-strip hits in the KLM backward endcap.
+**[Eventbased]** Returns the number of multi-strip hits in the KLM backward endcap associated with the ECL cluster.
 )DOC");
   
   REGISTER_VARIABLE("nKLMMultistripHits", nKLMMultistripHits, R"DOC(
-[Eventbased] Returns the number of multi-strip hits in the KLM.
+**[Eventbased]** Returns the number of multi-strip hits in the KLM associated with the ECL cluster.
 )DOC");
   
   REGISTER_VARIABLE("nECLShowersFWDEndcap", nECLShowersFWDEndcap, R"DOC(
-[Eventbased] Returns the number of ECLShowers in the forward endcap.
+**[Eventbased]** Returns the number of ECL showers in the forward endcap.
 )DOC");
   
   REGISTER_VARIABLE("nECLShowersBarrel", nECLShowersBarrel, R"DOC(
-[Eventbased] Returns the number of ECLShowers in the barrel.
+**[Eventbased]** Returns the number of ECL showers in the barrel.
 )DOC");
   
   REGISTER_VARIABLE("nECLShowersBWDEndcap", nECLShowersBWDEndcap, R"DOC(
-[Eventbased] Returns the number of ECLShowers in the backward endcap.
+**[Eventbased]** Returns the number of ECL showers in the backward endcap.
 )DOC");
 
   REGISTER_VARIABLE("nECLShowers", nECLShowers, R"DOC(
-[Eventbased] Returns the number of ECLShowers.
+**[Eventbased]** Returns the number of ECL showers.
 )DOC");
   
   REGISTER_VARIABLE("nECLLocalMaximumsFWDEndcap", nECLLocalMaximumsFWDEndcap, R"DOC(
-[Eventbased] Returns the number of LocalMaximums in the ECL forward endcap.
+**[Eventbased]** Returns the number of Local Maximums in the ECL forward endcap.
 )DOC");
   
   REGISTER_VARIABLE("nECLLocalMaximumsBarrel", nECLLocalMaximumsBarrel, R"DOC(
-[Eventbased] Returns the number of LocalMaximums in the ECL barrel.
+**[Eventbased]** Returns the number of Local Maximums in the ECL barrel.
 )DOC");
   
   REGISTER_VARIABLE("nECLLocalMaximumsBWDEndcap", nECLLocalMaximumsBWDEndcap, R"DOC(
-[Eventbased] Returns the number of LocalMaximums in the ECL backward endcap.
+**[Eventbased]** Returns the number of Local Maximums in the ECL backward endcap.
 )DOC");
 
   REGISTER_VARIABLE("nECLLocalMaximums", nECLLocalMaximums, R"DOC(
-[Eventbased] Returns the number of LocalMaximums in the ECL.
+**[Eventbased]** Returns the number of Local Maximums in the ECL.
 )DOC");
   
   REGISTER_VARIABLE("nECLTriggerCellsFWDEndcap", nECLTriggerCellsFWDEndcap, R"DOC(
-[Eventbased] Returns the number of ECL trigger cells above 100 MeV in the forward endcap.
+**[Eventbased]** Returns the number of ECL trigger cells above 100 MeV in the forward endcap.
 )DOC");
   
   REGISTER_VARIABLE("nECLTriggerCellsBarrel", nECLTriggerCellsBarrel, R"DOC(
-[Eventbased] Returns the number of ECL trigger cells above 100 MeV in the barrel.
+**[Eventbased]** Returns the number of ECL trigger cells above 100 MeV in the barrel.
 )DOC");
   
   REGISTER_VARIABLE("nECLTriggerCellsBWDEndcap", nECLTriggerCellsBWDEndcap, R"DOC(
-[Eventbased] Returns the number of ECL trigger cells above 100 MeV in the backward endcap.
+**[Eventbased]** Returns the number of ECL trigger cells above 100 MeV in the backward endcap.
 )DOC");
 
   REGISTER_VARIABLE("nECLTriggerCells", nECLTriggerCells, R"DOC(
-[Eventbased] Returns the number of ECL trigger cells above 100 MeV.
+**[Eventbased]** Returns the number of ECL trigger cells above 100 MeV.
 )DOC");
 
-    REGISTER_VARIABLE("eclClusterOnlyInvariantMass", eclClusterOnlyInvariantMass, R"DOC(
-[Expert] The invariant mass calculated from all ECLCluster daughters (i.e. photons) and
-cluster-matched tracks using the cluster 4-momenta.
-
-Used for ECL-based dark sector physics and debugging track-cluster matching.
+  REGISTER_VARIABLE("eclClusterOnlyInvariantMass", eclClusterOnlyInvariantMass, R"DOC(
+Returns the invariant mass calculated from all neutral and track-matched cluster daughters using the cluster 4-momenta. 
+This is primarily used for ECL-based dark sector physics and debugging track-cluster matching.
 
 )DOC","GeV/:math:`\\text{c}^2`");
 
-    REGISTER_METAVARIABLE("photonHasOverlap(cutString, photonlistname, tracklistname)", photonHasOverlap, R"DOC(
-      Returns true if the connected ECL region of the particle's cluster is shared by another particle's cluster.
-      Neutral and charged cluster are considered.
-      A cut string can be provided to ignore cluster that do not satisfy the given criteria.
-      By default, the ParticleList ``gamma:all`` is used for the check of neutral ECL cluster,
-      and the ParticleList ``e-:all`` for the check of charged ECL cluster.
-      However, one can customize the name of the ParticleLists via additional arguments.
-      If no argument or only a cut string is provided and ``gamma:all`` or ``e-:all`` does not exist
-      or if the variable is requested for a particle that is not a photon, NaN is returned.
-      )DOC", Manager::VariableDataType::c_double);
+  REGISTER_METAVARIABLE("photonHasOverlap(cutString, photonlistname, tracklistname)", photonHasOverlap, R"DOC(
+Returns ``True`` if the connection region of the cluster is shared by another cluster. Both neutral and track-matched clusters 
+are considered. 
 
-    REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE, R"DOC(
-[Expert] [Calibration] Returns ECL cluster's uncorrected energy. That is, before leakage corrections.
-This variable should only be used for study of the ECL. Please see :b2:var:`clusterE`.
+A ``cutString`` can be provided in order to ignore clusters that do not satisfy a given criteria. By default, the particle lists  
+``gamma:all`` and ``e-:all`` are used to check for neutral and track-matched clusters respectively. However, this can be customised 
+by using the ``photonlistname`` and ``tracklistname`` parameters. If ``gamma:all`` or ``e-:all`` does not exist or if this variable is applied 
+to a particle that is not a photon, ``NaN`` will be returned. 
+)DOC", Manager::VariableDataType::c_double);
+
+  REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE, R"DOC(
+Returns the uncorrected energy of the cluster. 
+
+.. danger:: 
+    This variable should not be used for any physics analysis but only for ECL or calibration studies. 
 
 )DOC","GeV");
 
-    REGISTER_VARIABLE("distanceToMcKl",distanceToMcKl,R"DOC(
-Returns the distance to the nearest truth KL particle, extrapolated to the cluster radius. To use
-this variable, it is required to run getNeutralHadronGeomMatches function. Optionally, it can return 
-negative values to indicate that the ECL cluster should be removed from the analysis to correct for data
-to MC difference in KL efficiency.
+  REGISTER_VARIABLE("distanceToMcKl",distanceToMcKl,R"DOC(
+Returns the distance to the nearest truth-matched :math:`K_L^0` particle that has been extrapolated to the cluster. 
+
+.. warning::
+    This requires the `getNeutralHadronGeomMatches` function to be used.
 
 )DOC", "cm");
 
-    REGISTER_VARIABLE("distanceToMcNeutron",distanceToMcNeutron,R"DOC(
-Returns the distance to the nearest truth (anti)neutron, extrapolated to the cluster radius. To use
-this variable, it is required to run getNeutralHadronGeomMatches function. Optionally, it can return 
-negative values to indicate that the ECL cluster should be removed from the analysis to correct for data
-to MC difference in KL efficiency.
+  REGISTER_VARIABLE("distanceToMcNeutron",distanceToMcNeutron,R"DOC(
+Returns the distance to the nearest truth-matched (anti)neutron particle that has been extrapolated to the cluster. 
+
+.. warning::
+    This requires the `getNeutralHadronGeomMatches` function to be used.
 
 )DOC", "cm");
 
-    REGISTER_VARIABLE("mdstIndexMcKl",mdstIndexMcKl,R"DOC(
-      Returns the mdst index of the nearest truth KL, extrapolated to the cluster radius, if it is
-      within the matching cone. To use this variable, it is required to run getNeutralHadronGeomMatches function. 
+  REGISTER_VARIABLE("mdstIndexMcKl",mdstIndexMcKl,R"DOC(
+Returns the ``StoreArray`` index of the mDST object corresponding to the nearest truth-matched :math:`K_L^0` particle as determined 
+during the calculation of the `distanceToMcKl` variable. 
+
+.. warning::
+    This requires the `getNeutralHadronGeomMatches` function to be used.
+
 )DOC");
 
-    REGISTER_VARIABLE("mdstIndexMcNeutron",mdstIndexMcNeutron,R"DOC(
-      Returns the mdst index of the nearest truth (anti)neutron, extrapolated to the cluster radius, if it is
-      within the matching cone. To use this variable, it is required to run getNeutralHadronGeomMatches function. 
+  REGISTER_VARIABLE("mdstIndexMcNeutron",mdstIndexMcNeutron,R"DOC(
+Returns the ``StoreArray`` index of the mDST object corresponding to the nearest truth-matched (anti)neutron particle as determined 
+during the calculation of the `distanceToMcKl` variable. 
+
+.. warning::
+    This requires the `getNeutralHadronGeomMatches` function to be used.
 )DOC");
   REGISTER_VARIABLE("clusterTimeNorm90", eclClusterTimeNorm90,
   R"DOC(
-  Returns ECL cluster's timing normalized such that :math:`90\%` of real photons will 
+  Returns cluster's timing normalized such that :math:`90\%` of real photons will 
   have :math:`|\text{clusterTimeNorm90}| < 1`. Normalization depends on energy, background
   level, and cellID, and differs for data and MC. Valid only for crystals within the CDC acceptance, :math:`161 <= |\text{clusterCellID}| <= 8608`. Note: the required payloads are stored in the neutrals global tag. Please find the latest recommendation using :ref:`b2help-recommendation`.)DOC",
                       "dimensionless");

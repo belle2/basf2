@@ -2069,7 +2069,7 @@
       useMissing=False
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
-      writeOut=True
+      writeOut=False
   196. PListCopy_gamma:GoodPi0ForHLT
       cut=
       ignoreMotherFlavor=False
@@ -2077,7 +2077,7 @@
       outputListName=gamma:GoodPi0ForHLT
       preferLowest=True
       variable=mdstIndex
-      writeOut=True
+      writeOut=False
   197. ParticleSelector_applyCuts_gamma:GoodPi0ForHLT
       cut=[clusterReg == 1 and E > 0.02250] or                                                 [clusterReg == 2 and E > 0.020] or                                                 [clusterReg == 3 and E > 0.020]
       decayString=gamma:GoodPi0ForHLT
@@ -2088,12 +2088,12 @@
       allowChargeViolation=False
       chargeConjugation=True
       cut=0.105 < M < 0.150
-      decayMode=1
+      decayMode=0
       decayString=pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT
       ignoreIfTooManyCandidates=True
       maximumNumberOfCandidates=10000
       recoilParticleType=0
-      writeOut=True
+      writeOut=False
   200. ParticleCombiner_D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True

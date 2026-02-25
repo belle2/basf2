@@ -29,6 +29,7 @@ from collections import defaultdict
 import argparse
 import math
 import basf2 as b2
+from conditions_db.iov import IoVSet
 from conditions_db.testing_payloads import parse_testing_payloads_file
 
 
@@ -86,6 +87,11 @@ def get_args():
         help="Set the end of last iov for each payload to -1 -1",
         action="store_true",
     )
+    parser.add_argument(
+        "--merge-same",
+        help="Merge contiguous iovs if they have the same payload",
+        action="store_true",
+    )
 
     return parser.parse_args()
 
@@ -116,7 +122,6 @@ def get_start_end_time(obj, module):
 
 
 if __name__ == "__main__":
-
     import ROOT as r
     from ROOT import Belle2
 
@@ -143,9 +148,7 @@ if __name__ == "__main__":
                             all_objects2 = payload_file2.Get(iov2.module)
                             first_object2 = all_objects2.getObjectByIndex(0)
                             # Remove one second to avoid rounding errors
-                            t2 = (
-                                get_start_end_time(first_object2, iov2.module)[0] - 1
-                            )
+                            t2 = get_start_end_time(first_object2, iov2.module)[0] - 1
                             # If I add a new payload I encode as lenght 5 seconds (or the gap between the two payloads if it is smaller). In this payloads that are supposed to cover gaps will not seem long and so important in validation.
                             t2 = min(t2, t1 + 5)
                             if iov1.module == "BeamSpot":
@@ -225,7 +228,7 @@ if __name__ == "__main__":
             if last_iov.iov_tuple[2:] != (-1, -1):
                 print(
                     f"Modify {last_iov.module} rev {last_iov.revision} from {last_iov.iov_tuple} ",
-                    f"to {list(last_iov.iov_tuple[:2])+[-1, -1]}"
+                    f"to {list(last_iov.iov_tuple[:2]) + [-1, -1]}",
                 )
                 iovs_to_modify[last_iov] = [*last_iov.iov_tuple[:2], -1, -1]
 
@@ -248,3 +251,27 @@ if __name__ == "__main__":
                             + ",".join([str(j) for j in i.iov_tuple])
                             + "\n"
                         )
+
+    if args.merge_same:
+        payloads = get_local_payloads(args.database)
+
+        payload_ids = {key: defaultdict(IoVSet) for key in payloads}
+        for iovs_ in payloads.values():
+            for iov in iovs_:
+                payload_ids[iov.module][iov.revision].add(iov.iov_tuple)
+
+        list_payloads_to_write = []
+        for name, iovs_ in payload_ids.items():
+            for revision, iov_set in iovs_.items():
+                for iov_ in iov_set.iovs:
+                    list_payloads_to_write.append((name, revision, *iov_.tuple))
+
+        list_payloads_to_write.sort(key=lambda x: (x[0], x[2:4]))
+
+        with open(args.database, "w") as f:
+            for ll in list_payloads_to_write:
+                f.write(
+                    f"dbstore/{ll[0]} {ll[1]} "
+                    + ",".join([str(j) for j in ll[2:]])
+                    + "\n"
+                )

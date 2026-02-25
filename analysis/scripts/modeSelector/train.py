@@ -155,7 +155,7 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names, use_delta_p_good
 
 
 def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
-                         sigprob_thresh=0.01, mbc_thresh=5.23, random_state=None,
+                         sigprob_thresh=0.01, mbc_thresh=5.22, random_state=None,
                          use_delta_p_good_tag=False, delta_p_thresh=0.1):
     """
     Load training data and apply sampling.
@@ -242,9 +242,9 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         is_cont_val = np.where(bp_is_best, bp_truth[:, is_cont_idx], b0_truth[:, is_cont_idx])
         is_cont = is_cont_val == 1
 
-        # Continuum events bypass the sigprob/mbc presel (FEI sigProb is near-zero for fake
-        # candidates in qqbar events; Mbc is not meaningful for continuum)
-        presel = is_cont | ((best_sigprob > sigprob_thresh) & (best_mbc > mbc_thresh))
+        # Keep events where the best candidate (highest sigProb) passes both thresholds.
+        # Applies to all events including continuum.
+        presel = (best_sigprob > sigprob_thresh) & (best_mbc > mbc_thresh)
 
         sample_prob = event_calib / config.CALIB_WEIGHT_CAP * fraction
         sample_prob[is_cont] *= cont_fraction

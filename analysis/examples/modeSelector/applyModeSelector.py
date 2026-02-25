@@ -79,6 +79,9 @@ for b in ['B+', 'B0']:
     # Apply cosTBTO cut
     ma.applyCuts(f'{b}:{fei_identifier}', 'cosTBTO < 0.9', path=my_path)
 
+    # TODO
+    # BCS
+
 # Build event shape variables (sphericity, thrust, etc.)
 ma.buildEventShape(
     allMoments=False,
@@ -113,6 +116,9 @@ modeSelector.modeSelector(
     debug_max_events=3,  # Print first 3 events
     path=my_path
 )
+
+# TODO
+# aliases
 
 # Define output variables
 output_variables = [

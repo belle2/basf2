@@ -26,6 +26,7 @@ The script implements:
 import argparse
 import glob
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import numpy as np
@@ -981,7 +982,7 @@ def main():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode='min', factor=0.5, patience=3, verbose=True
+        optimizer, mode='min', factor=0.5, patience=3
     )
 
     # Training loop
@@ -993,8 +994,12 @@ def main():
 
     best_val_loss = float('inf')
     best_epoch = 0
+    training_start = time.time()
 
     for epoch in range(args.epochs):
+        epoch_start = time.time()
+        current_lr = optimizer.param_groups[0]['lr']
+
         # Train
         train_loss, disco_loss = train_epoch(
             model, train_loader, criterion, optimizer, device,
@@ -1004,17 +1009,23 @@ def main():
         # Validate
         val_loss = evaluate(model, val_loader, criterion, device)
 
+        epoch_time = time.time() - epoch_start
+
         # Scheduler step
         scheduler.step(val_loss)
+        new_lr = optimizer.param_groups[0]['lr']
 
         # Print progress
         if args.disco_lambda > 0:
             print(f"Epoch {epoch+1:3d}/{args.epochs}: "
                   f"train_loss={train_loss:.6f}, disco_loss={disco_loss:.6f}, "
-                  f"val_loss={val_loss:.6f}")
+                  f"val_loss={val_loss:.6f}, lr={current_lr:.2e}, time={epoch_time:.1f}s")
         else:
             print(f"Epoch {epoch+1:3d}/{args.epochs}: "
-                  f"train_loss={train_loss:.6f}, val_loss={val_loss:.6f}")
+                  f"train_loss={train_loss:.6f}, val_loss={val_loss:.6f}, "
+                  f"lr={current_lr:.2e}, time={epoch_time:.1f}s")
+        if new_lr < current_lr:
+            print(f"  -> LR reduced: {current_lr:.2e} -> {new_lr:.2e}")
 
         # Save best model (treat nan val_loss as always saving, for no-val-set runs)
         if not (val_loss >= best_val_loss):
@@ -1041,6 +1052,10 @@ def main():
     print("\n" + "=" * 60)
     print("Training complete")
     print("=" * 60)
+    training_time = time.time() - training_start
+    minutes = int(training_time // 60)
+    seconds = int(training_time % 60)
+    print(f"Training time: {minutes}m {seconds}s")
     print(f"Best epoch: {best_epoch+1}")
     print(f"Best val loss: {best_val_loss:.6f}")
     print(f"Model saved to: {os.path.join(args.output, f'net_{args.network}.pt')}")

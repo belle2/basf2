@@ -232,12 +232,12 @@ void TrackingAbortDQMModule::defineHisto()
   //outside active_veto window:
   m_noCDCHitsInSL[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
                                 TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
-                                10, -0.5, 8 + 0.5);
+                                9, -0.5, 8 + 0.5);
   m_noCDCHitsInSL[0]->GetXaxis()->SetTitle("SuperLayer");
   m_noCDCHitsInSL[0]->GetYaxis()->SetTitle("Number of Events");
   //inside active_veto window:
   m_noCDCHitsInSL[1] = new TH1F(*m_noCDCHitsInSL[0]);
-  m_noCDCHitsInSL[1]->SetName(TString::Format("%s%s", histoName.c_str(), tag[1].c_str()));
+  m_noCDCHitsInSL[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
   m_noCDCHitsInSL[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
   oldDir->cd();

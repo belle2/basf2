@@ -212,19 +212,33 @@ void TrackingAbortDQMModule::defineHisto()
 
   //CDC signal hits per SL
   histoName = "nCDCHitsSL";
-  histoTitle = "Total Number of Signal CDC Hits in SL";
+  histoTitle = "Average Number of CDC Hits per Track in SL";
   for (int sl = 0; sl < 9; sl++) {
     //outside active_veto window:
     m_nCDCHitsSL[0][sl] = new TH1F(TString::Format("%s%d_%s", histoName.c_str(), sl, tag[0].c_str()),
                                    TString::Format("%s%d %s", histoTitle.c_str(), sl, title[0].c_str()),
-                                   101, -0.5, 100 + 0.5);
-    m_nCDCHitsSL[0][sl]->GetXaxis()->SetTitle("nCDCHits");
+                                   31, -0.5, 30 + 0.5);
+    m_nCDCHitsSL[0][sl]->GetXaxis()->SetTitle("average nCDCHits per track");
     m_nCDCHitsSL[0][sl]->GetYaxis()->SetTitle("Number of Events");
     //inside active_veto window:
     m_nCDCHitsSL[1][sl] = new TH1F(*m_nCDCHitsSL[0][sl]);
     m_nCDCHitsSL[1][sl]->SetName(TString::Format("%s%d_%s", histoName.c_str(), sl, tag[1].c_str()));
     m_nCDCHitsSL[1][sl]->SetTitle(TString::Format("%s%d %s", histoTitle.c_str(), sl, title[1].c_str()));
   }
+
+  //no CDC signal hits in SL
+  histoName = "noCDCHitsInSL";
+  histoTitle = "No Signal CDC Hits in SL";
+  //outside active_veto window:
+  m_noCDCHitsInSL[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
+                                TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+                                10, -0.5, 8 + 0.5);
+  m_noCDCHitsInSL[0]->GetXaxis()->SetTitle("SuperLayer");
+  m_noCDCHitsInSL[0]->GetYaxis()->SetTitle("Number of Events");
+  //inside active_veto window:
+  m_noCDCHitsInSL[1] = new TH1F(*m_noCDCHitsInSL[0]);
+  m_noCDCHitsInSL[1]->SetName(TString::Format("%s%s", histoName.c_str(), tag[1].c_str()));
+  m_noCDCHitsInSL[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
   oldDir->cd();
 
@@ -267,6 +281,9 @@ void TrackingAbortDQMModule::beginRun()
     if (m_nCDCHitsSL[0][sl] != nullptr) m_nCDCHitsSL[0][sl]->Reset();
     if (m_nCDCHitsSL[1][sl] != nullptr) m_nCDCHitsSL[1][sl]->Reset();
   }
+  if (m_noCDCHitsInSL[0] != nullptr) m_noCDCHitsInSL[0]->Reset();
+  if (m_noCDCHitsInSL[1] != nullptr) m_noCDCHitsInSL[1]->Reset();
+
 }
 
 void TrackingAbortDQMModule::event()
@@ -362,7 +379,9 @@ void TrackingAbortDQMModule::event()
     m_nCDCExtraHits[index]->Fill(std::min((int)m_eventLevelTrackingInfo->getNCDCHitsNotAssigned(), (int)4999));
 
   //compute number of CDC hits in the inner and outer layers
-  //and the number of signal and extra hits per SL
+  //and the number of signal-per-track and extra hits per SL
+  int nTracks = m_tracks.getEntries();
+
   int nCDCHitsInner = 0;
   int nCDCHitsOuter = 0;
   int nTotalCDCHits[9] = {0};
@@ -384,11 +403,15 @@ void TrackingAbortDQMModule::event()
 
   for (int sl = 0; sl < 9; sl++) {
 
-    int nSignalCDCHits = nTakenCDCHits[sl] - nBgCDCHits[sl];
+    float nSignalCDCHits = nTakenCDCHits[sl] - nBgCDCHits[sl];
     int nCDCExtraHits = nTotalCDCHits[sl] - nSignalCDCHits;
+    if (nTracks > 0) nSignalCDCHits = nSignalCDCHits / nTracks;
 
-    if (m_nCDCExtraHitsSL[index][sl] != nullptr) m_nCDCExtraHitsSL[index][sl]->Fill(std::min(nCDCExtraHits, (int)999));
-    if (m_nCDCHitsSL[index][sl] != nullptr) m_nCDCHitsSL[index][sl]->Fill(std::min(nSignalCDCHits, (int)99));
+    if (nSignalCDCHits == 0) m_noCDCHitsInSL[index]->Fill(sl);
+    else {
+      if (m_nCDCExtraHitsSL[index][sl] != nullptr) m_nCDCExtraHitsSL[index][sl]->Fill(std::min(nCDCExtraHits, (int)999));
+      if (m_nCDCHitsSL[index][sl] != nullptr) m_nCDCHitsSL[index][sl]->Fill(std::min(nSignalCDCHits, (float)30.5));
+    }
   }
 
   // fill the integrated averages TH1F

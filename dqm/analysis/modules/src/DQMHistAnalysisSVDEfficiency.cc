@@ -44,7 +44,7 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", double(0.9));
   addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", double(0.94));
   addParam("statThreshold", m_statThreshold, "minimal number of tracks per sensor to set green/red alert", double(100));
-  addParam("effSigmas", m_effSigmas, "Number of sigmas to consider for setting the DQM status, where sigma = efficiency uncertainty",
+  addParam("nSigma", m_nSigma, "Number of sigmas to set the DQM status, where sigma = efficiency uncertainty",
            double(3.));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
@@ -505,11 +505,11 @@ void DQMHistAnalysisSVDEfficiencyModule::setEffStatus(float den, float eff, floa
     *efficiencyStatus = std::max(noStat, *efficiencyStatus);
   } else if (den < m_statThreshold) {
     *efficiencyStatus = std::max(lowStat, *efficiencyStatus);
-  } else if (eff + m_effSigmas * err > m_effWarning) {
+  } else if (eff + m_nSigma * err > m_effWarning) {
     *efficiencyStatus = std::max(good, *efficiencyStatus);
-  } else if ((eff + m_effSigmas * err <= m_effWarning) && (eff + m_effSigmas * err > m_effError)) {
+  } else if ((eff + m_nSigma * err <= m_effWarning) && (eff + m_nSigma * err > m_effError)) {
     *efficiencyStatus = std::max(warning, *efficiencyStatus);
-  } else if ((eff + m_effSigmas * err <= m_effError)) {
+  } else if ((eff + m_nSigma * err <= m_effError)) {
     *efficiencyStatus = std::max(error, *efficiencyStatus);
   }
 }

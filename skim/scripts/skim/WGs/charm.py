@@ -40,7 +40,7 @@ from stdV0s import stdKshorts, stdLambdas
 from variables import variables as vm
 
 
-__liaison__ = "Jaeyoung Kim <jaeyoung_kim@yonsei.ac.kr>"
+__liaison__ = "Young Jun Kim <rladudwns118@korea.ac.kr>"
 _VALIDATION_SAMPLE = "mdst16.root"
 
 

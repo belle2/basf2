@@ -156,7 +156,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("percentageWrongParticlesBTag", percentageWrongParticlesBTag,
                       "Get the percentage of wrong particles by using the mostcommonBTagIndex. In this context wrong means that the reconstructed particles originated from the other B meson. The absolute number is divided by the total number of generated FSP from the given B meson index. If no B meson found on generator level -1 is returned.");
     REGISTER_VARIABLE("mostcommonBTagDeltaP", mostcommonBTagDeltaP,
-                      "Returns the magnitude of the 3-momentum difference (in CMS frame) between the "
+                      "Returns the magnitude of the 3-momentum difference in CMS frame between the "
                       "reconstructed particle and the generated B meson identified by mostcommonBTagIndex. "
                       "Returns NaN if no B meson found on generator level.", "GeV/c");
     REGISTER_VARIABLE("mostcommonBTagPDG", mostcommonBTagPDG,

@@ -325,11 +325,19 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         print(f"    config.HAS_INPUTS: {len(config.HAS_INPUTS)} kept ({n_total - len(config.HAS_INPUTS)} removed)")
         print("    Using config.HAS_INPUTS (data may not cover all input_ids)")
         out_path = "has_inputs_recomputed.txt"
+        n_kept = len(computed_has_inputs)
+        n_removed = n_total - n_kept
         with open(out_path, "w") as f:
-            f.write("[\n")
+            f.write("HAS_INPUTS = [\n")
+            row = []
             for idx in computed_has_inputs:
-                f.write(f"    {idx},\n")
-            f.write("]\n")
+                row.append(idx)
+                if len(row) == 17:
+                    f.write("    " + ", ".join(str(x) for x in row) + ",\n")
+                    row = []
+            if row:
+                f.write("    " + ", ".join(str(x) for x in row) + ",\n")
+            f.write(f"]  # {n_kept} indices kept ({n_total} - {n_removed} removed)\n")
         print(f"    Recomputed list written to {out_path}")
     else:
         print(f"  HAS_INPUTS verified OK ({len(config.HAS_INPUTS)} kept, "
@@ -1003,6 +1011,7 @@ def main():
     best_val_loss = float('inf')
     best_epoch = 0
     training_start = time.time()
+    history = {'train_loss': [], 'val_loss': [], 'disco_loss': [], 'lr': []}
 
     for epoch in range(args.epochs):
         epoch_start = time.time()
@@ -1022,6 +1031,11 @@ def main():
         # Scheduler step
         scheduler.step(val_loss)
         new_lr = optimizer.param_groups[0]['lr']
+
+        history['train_loss'].append(train_loss)
+        history['val_loss'].append(val_loss)
+        history['disco_loss'].append(disco_loss)
+        history['lr'].append(current_lr)
 
         # Print progress
         if args.disco_lambda > 0:
@@ -1046,6 +1060,7 @@ def main():
                 'optimizer_state_dict': optimizer.state_dict(),
                 'val_loss': val_loss,
                 'train_loss': train_loss,
+                'history': history,
                 'has_inputs': has_inputs,
                 'config': {
                     'input_size': input_size,

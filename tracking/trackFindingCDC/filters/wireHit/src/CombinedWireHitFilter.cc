@@ -39,10 +39,8 @@ Weight CombinedWireHitFilter::operator()(const CDCWireHit& wireHit)
   const auto sl = cdcHit->getISuperLayer();
 
   if (sl < switchSLayer) {
-    B2INFO(" here cut " << sl);
     return m_cutsFromDBFilter(wireHit);
   } else {
-    B2INFO(" here mva " << sl);
     return m_mvaFilter(wireHit);
   }
 }

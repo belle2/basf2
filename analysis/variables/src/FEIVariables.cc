@@ -158,9 +158,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("mostcommonBTagDeltaP", mostcommonBTagDeltaP,
                       "Returns the magnitude of the 3-momentum difference in CMS frame between the "
                       "reconstructed particle and the generated B meson identified by mostcommonBTagIndex. "
-                      "Returns NaN if no B meson found on generator level.", "GeV/c");
+                      "Returns NaN if no B meson is found on generator level.", "GeV/c");
     REGISTER_VARIABLE("mostcommonBTagPDG", mostcommonBTagPDG,
                       "Returns the PDG code of the generated B meson identified by mostcommonBTagIndex. "
-                      "Returns NaN if no B meson found on generator level.");
+                      "Returns NaN if no B meson is found on generator level. "
+                      "Note: this is equivalent to ``genParticle(mostcommonBTagIndex, PDG)``. "
+                      "Other variables can be accessed the same way by replacing ``PDG`` with any variable, "
+                      "e.g. ``genParticle(mostcommonBTagIndex, nDaughters)``.");
   }
 }

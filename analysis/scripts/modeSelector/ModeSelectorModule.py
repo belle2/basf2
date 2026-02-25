@@ -84,6 +84,10 @@ class ModeSelectorModule(b2.Module):
         self.event_count = 0
         #: Store debug features for comparison
         self.debug_features = []
+        #: Flag to check event shape prerequisite once
+        self._event_shape_checked = False
+        #: Flag to check D* veto prerequisite once
+        self._dstar_veto_checked = False
 
         # Feature configuration (from modeSelector.config)
         #: Number of decay mode indices (dmID * 2 + is_charged)
@@ -435,6 +439,16 @@ class ModeSelectorModule(b2.Module):
 
     def event(self):
         """Called for each event."""
+        # Check that EventShapeCalculator was run (once per job)
+        if not self._event_shape_checked:
+            self._event_shape_checked = True
+            _es = Belle2.PyStoreObj('EventShapeContainer')
+            if not _es.isValid():
+                b2.B2FATAL(
+                    "ModeSelector: EventShapeContainer not found. "
+                    "Run the EventShapeCalculator module before ModeSelector."
+                )
+
         # Collect all candidates from all particle lists
         candidates_data = []
         best_bp = None
@@ -449,6 +463,15 @@ class ModeSelectorModule(b2.Module):
 
             for i in range(plist.getListSize()):
                 particle = plist.obj().getParticle(i)
+
+                # Check that DstarVeto was run (once per job, on first particle)
+                if not self._dstar_veto_checked:
+                    self._dstar_veto_checked = True
+                    if not particle.hasExtraInfo('Dst0_deltaMassDiff'):
+                        b2.B2FATAL(
+                            "ModeSelector: D* veto ExtraInfo (Dst0_deltaMassDiff) not found on B candidates. "
+                            "Run the DstarVeto module before ModeSelector."
+                        )
 
                 input_id, features = self._extract_particle_features(particle)
                 candidates_data.append((input_id, features))

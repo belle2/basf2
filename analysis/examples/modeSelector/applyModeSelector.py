@@ -35,9 +35,9 @@ parser.add_argument('--input', nargs='+',
                     help='Input ROOT file(s) with FEI B meson candidates')
 parser.add_argument('--output', default='modeSelector_output.root',
                     help='Output ROOT file (default: modeSelector_output.root)')
-parser.add_argument('--cat-model', default='modeSelector_test/cat_model.onnx',
+parser.add_argument('--cat-model', default='onnx/modeSelector_cat.onnx',
                     help='Path to category ONNX model')
-parser.add_argument('--main-model', default='modeSelector_test/main_model.onnx',
+parser.add_argument('--main-model', default='onnx/modeSelector_main.onnx',
                     help='Path to main ONNX model')
 args = parser.parse_args()
 

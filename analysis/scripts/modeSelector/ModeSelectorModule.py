@@ -520,11 +520,11 @@ class ModeSelectorModule(b2.Module):
 
         # Verify feature size matches model expectation
         if len(features) != self.cat_input_size:
-            b2.B2WARNING(f"Feature size mismatch: got {len(features)}, expected {self.cat_input_size}")
-            if len(features) < self.cat_input_size:
-                features = np.pad(features, (0, self.cat_input_size - len(features)))
-            else:
-                features = features[:self.cat_input_size]
+            b2.B2FATAL(
+                f"ModeSelector: category model input size mismatch: "
+                f"got {len(features)} features, model expects {self.cat_input_size}. "
+                f"The ONNX model and current config must match."
+            )
 
         # Run category network
         cat_input = features.reshape(1, -1).astype(np.float32)
@@ -537,11 +537,11 @@ class ModeSelectorModule(b2.Module):
         main_features = np.concatenate([features, cat_output, [charged_cat]])
 
         if len(main_features) != self.main_input_size:
-            b2.B2WARNING(f"Main feature size mismatch: got {len(main_features)}, expected {self.main_input_size}")
-            if len(main_features) < self.main_input_size:
-                main_features = np.pad(main_features, (0, self.main_input_size - len(main_features)))
-            else:
-                main_features = main_features[:self.main_input_size]
+            b2.B2FATAL(
+                f"ModeSelector: main model input size mismatch: "
+                f"got {len(main_features)} features, model expects {self.main_input_size}. "
+                f"The ONNX model and current config must match."
+            )
 
         main_input = main_features.reshape(1, -1).astype(np.float32)
         main_output = self.main_session.run(None, {self.main_input_name: main_input})[0][0]

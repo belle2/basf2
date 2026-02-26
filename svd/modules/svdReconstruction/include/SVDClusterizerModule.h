@@ -62,8 +62,8 @@ namespace Belle2 {
 
     protected:
 
-      /** true if we are reconstructing Data*/
-      bool m_isData = true;
+      /** true if we are reconstructing MC*/
+      bool m_isMC = false;
 
       //1. Collections and relations Names
       /** Name of the collection to use for the SVDEventInfo */

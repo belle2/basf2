@@ -250,7 +250,7 @@ void SVDClusterizerModule::initialize()
 
 void SVDClusterizerModule::event()
 {
-  m_isData =  m_storeMCParticles.getEntries() == 0;
+  m_isMC =  m_storeMCParticles.getEntries() > 0;
 
   int nDigits = m_storeDigits.getEntries();
   if (nDigits == 0)
@@ -411,7 +411,7 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
     writeClusterRelations(rawCluster);
 
     //alter cluster position and time on MC to match resolution measured on data
-    if (!m_isData) {
+    if (m_isMC) {
       // if no truehit associated to the cluster there is nothing to fudge
       int clsIndex = m_storeClusters.getEntries() - 1;
       SVDTrueHit* trueHit = m_storeClusters[clsIndex]->getRelatedTo<SVDTrueHit>(m_storeTrueHitsName);
@@ -494,11 +494,11 @@ double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID 
 {
 
   //Lorentz shift correction - PATCHED
-  //NOTE: layer 3 is upside down with respect to L4,5,6 in the real data (real SVD), but _not_ in the simulation. We need to change the sign of the Lorentz correction on L3 only if reconstructing data, i.e. if Environment::Instance().isMC() is FALSE or m_isData is TRUE.
+  //NOTE: layer 3 is upside down with respect to L4,5,6 in the real data (real SVD), but _not_ in the simulation. We need to change the sign of the Lorentz correction on L3 only if reconstructing data, i.e. if Environment::Instance().isMC() is FALSE.
 
   const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(vxdID));
 
-  if ((vxdID.getLayerNumber() == 3) && m_isData)
+  if ((vxdID.getLayerNumber() == 3) && ! m_isMC)
     position += sensorInfo.getLorentzShift(isU, position);
   else
     position -= sensorInfo.getLorentzShift(isU, position);

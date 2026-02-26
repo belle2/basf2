@@ -76,6 +76,33 @@ TRGGDLDQMModule::TRGGDLDQMModule() : HistoModule()
   addParam("skim", m_skim,
            "use skim information or not",
            int(-1));
+  addParam("filterAbortGap", m_filterAbortGap,
+           "Flag to filter abort gap events",
+           false);
+  addParam("abortGapExp37min1", m_abortGapExp37min1,
+           "exp37 min revo clock of abort gap 1",
+           544);
+  addParam("abortGapExp37max1", m_abortGapExp37max1,
+           "exp37 max revo clock of abort gap 1",
+           586);
+  addParam("abortGapExp37min2", m_abortGapExp37min2,
+           "exp37 min revo clock of abort gap 2",
+           1183);
+  addParam("abortGapExp37max2", m_abortGapExp37max2,
+           "exp37 max revo clock of abort gap 2",
+           1225);
+  addParam("abortGapExp39min1", m_abortGapExp39min1,
+           "exp39 min revo clock of abort gap 1",
+           316);
+  addParam("abortGapExp39max1", m_abortGapExp39max1,
+           "exp39 max revo clock of abort gap 1",
+           358);
+  addParam("abortGapExp39min2", m_abortGapExp39min2,
+           "exp39 min revo clock of abort gap 2",
+           956);
+  addParam("abortGapExp39max2", m_abortGapExp39max2,
+           "exp39 max revo clock of abort gap 2",
+           998);
   B2DEBUG(20, "eventByEventTimingFlag(" << m_eventByEventTimingHistRecord
           << "), m_dumpVcdFile(" << m_dumpVcdFile
           << "), m_bitConditionToDumpVcd(" << m_bitConditionToDumpVcd
@@ -708,6 +735,26 @@ void TRGGDLDQMModule::event()
     h_ns_topTocdc[skim[ifill]]->Fill(c2_diff_topTocdc *  clkTo2ns);
   }
 
+  // filster abort gap events
+  if (m_filterAbortGap) {
+    if (_exp == 37) {
+      if ((m_abortGapExp37min1 <= coml1rvc && coml1rvc < m_abortGapExp37max1) ||
+          (m_abortGapExp37min2 <= coml1rvc && coml1rvc < m_abortGapExp37max2)) {
+        setReturnValue(false);
+      } else {
+        setReturnValue(true);
+      }
+    } else if (_exp == 39) {
+      if ((m_abortGapExp39min1 <= coml1rvc && coml1rvc < m_abortGapExp39max1) ||
+          (m_abortGapExp39min2 <= coml1rvc && coml1rvc < m_abortGapExp39max2)) {
+        setReturnValue(false);
+      } else {
+        setReturnValue(true);
+      }
+    } else {
+      setReturnValue(true);
+    }
+  }
 
   // vcd dump
   if (m_dumpVcdFile) {

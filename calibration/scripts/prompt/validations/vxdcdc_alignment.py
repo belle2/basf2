@@ -8,13 +8,18 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+import os
+from glob import glob
 from pathlib import Path
+import argparse
 
 import matplotlib
 import matplotlib.pyplot as plt
 
 from prompt import ValidationSettings
-import alignment.validation as validation
+
+import alignment_validation.dimuon as dimuonval
+import alignment_validation.cosmics as cosmicval
 
 import ROOT as r
 r.PyConfig.IgnoreCommandLineOptions = True
@@ -45,13 +50,27 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     pattern_cosmic = str(collector_output_dir_cosmic) + "/*/cosmic_ana.root"
     pattern_mumu = str(collector_output_dir_mumu) + "/*/dimuon_ana.root"
 
-    validation.main("cosmics", pattern_cosmic, output_dir=output_dir)
-    validation.main("dimuon", pattern_mumu, output_dir=output_dir)
+    def hadd_and_get_merged_file(filenames_pattern, input_type):
+        root_files = glob(filenames_pattern)
+        merged_file = output_dir / f"{input_type}.root"
+
+        if len(root_files) > 1:
+            os.system(f"hadd -f {merged_file} {' '.join(root_files)}")
+        elif len(root_files) == 1:
+            os.system(f"cp {root_files[0]} {merged_file}")
+        else:
+            raise FileNotFoundError(f"No root files found for pattern: {filenames_pattern}")
+
+        return str(merged_file)
+
+    cosmic_file = hadd_and_get_merged_file(pattern_cosmic, "cosmics")
+    mumu_file = hadd_and_get_merged_file(pattern_mumu, "dimuon")
+
+    cosmicval.run_validation([cosmic_file], output_dir=str(output_dir / "cosmics/"))
+    dimuonval.run_validation([mumu_file], output_dir=str(output_dir / "dimuon/"))
 
 
 if __name__ == '__main__':
-
-    import argparse
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawTextHelpFormatter)
 

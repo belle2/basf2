@@ -39,8 +39,19 @@ NBINS = 100
 def _cb_norm(mu, sigma, alpha, n, a, b):
     """Closed-form integral of the Crystal Ball function over [a, b].
 
-    The power-law tail is on the LOW-MASS side:
-    x_break = mu - alpha * sigma.
+    The power-law tail is on the LOW-MASS side: x_break = mu - alpha * sigma.
+
+    Parameters
+    ----------
+    mu, sigma, alpha, n : float
+        Crystal Ball shape parameters (mean, width, tail onset, tail exponent).
+    a, b : float
+        Integration limits.
+
+    Returns
+    -------
+    float
+        Integral of the (unnormalised) Crystal Ball over [a, b].
     """
     xb = mu - alpha * sigma
     A = (n / alpha) ** n * np.exp(-0.5 * alpha**2)
@@ -72,14 +83,42 @@ def _cb_norm(mu, sigma, alpha, n, a, b):
 
 
 def _exp_norm(slope, a, b, x0):
-    """Integral of exp(slope*(x - x0)) over [a, b]."""
+    """Integral of exp(slope*(x - x0)) over [a, b].
+
+    Parameters
+    ----------
+    slope : float
+        Exponential slope. If ``abs(slope) < 1e-12`` the function is treated
+        as flat and the result is ``b - a``.
+    a, b : float
+        Integration limits.
+    x0 : float
+        Pivot point of the exponential (reduces numerical sensitivity).
+
+    Returns
+    -------
+    float
+    """
     if abs(slope) < 1e-12:
         return b - a
     return (np.exp(slope * (b - x0)) - np.exp(slope * (a - x0))) / slope
 
 
 def _cb(x, mu, sigma, alpha, n):
-    """Crystal Ball (unnormalised): Gaussian core + power-law tail on the left."""
+    """Evaluate the unnormalised Crystal Ball function at ``x``.
+
+    Gaussian core for ``(x - mu)/sigma >= -alpha``, power-law tail for lower values.
+
+    Parameters
+    ----------
+    x : array-like
+    mu, sigma, alpha, n : float
+        Shape parameters (mean, width, tail onset, tail exponent).
+
+    Returns
+    -------
+    ndarray
+    """
     t = (x - mu) / sigma
     A = (n / alpha) ** n * np.exp(-0.5 * alpha**2)
     B = n / alpha - alpha
@@ -94,11 +133,41 @@ def _cb(x, mu, sigma, alpha, n):
 
 
 def _exp(x, slope, x0):
+    """Evaluate exp(slope * (x - x0)).
+
+    Parameters
+    ----------
+    x : array-like
+    slope : float
+    x0 : float
+        Pivot point.
+
+    Returns
+    -------
+    ndarray
+    """
     return np.exp(slope * (x - x0))
 
 
 def _hessian(f, x0, eps=1e-5):
-    """Symmetric finite-difference Hessian (n + n*(n+1)/2 + 1 evaluations)."""
+    """Compute the symmetric finite-difference Hessian of ``f`` at ``x0``.
+
+    Uses ``n + n*(n+1)/2 + 1`` function evaluations.
+
+    Parameters
+    ----------
+    f : callable
+        Scalar function of a 1-D array.
+    x0 : array-like
+        Point at which the Hessian is evaluated.
+    eps : float, optional
+        Finite-difference step size. Default is ``1e-5``.
+
+    Returns
+    -------
+    numpy.ndarray of shape (n, n)
+        Symmetric Hessian matrix.
+    """
     nd = len(x0)
     f0 = f(x0)
     fi = [f(x0 + eps * np.eye(nd)[i]) for i in range(nd)]
@@ -244,6 +313,7 @@ def fit(data, mass_min=MASS_MIN, mass_max=MASS_MAX, nbins=NBINS,
         rf"$\sigma$ = {sig_f * 1000:.2f} $\pm$ {errors[1] * 1000:.2f} MeV/$c^2$",
         rf"$\alpha$ = {alp_f:.3f} $\pm$ {errors[2]:.3f}",
         rf"$n$ = {n_f:.2f} $\pm$ {errors[3]:.2f}",
+        rf"slope = {sl_f:.3f} $\pm$ {errors[4]:.3f}",
         rf"$f_{{\rm sig}}$ = {fs_f:.3f} $\pm$ {errors[5]:.3f}",
         rf"$\chi^2$/NDF = {chi2v:.0f}/{ndf} = {chi2v / ndf:.2f}",
         rf"$p$-value = {pval:.4f}",

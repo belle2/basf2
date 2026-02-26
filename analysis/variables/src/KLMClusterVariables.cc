@@ -1,10 +1,10 @@
 /**************************************************************************
-* basf2 (Belle II Analysis Software Framework)                           *
-* Author: The Belle II Collaboration                                     *
-*                                                                        *
-* See git log for contributors and copyright holders.                    *
-* This file is licensed under LGPL-3.0, see LICENSE.md.                  *
-**************************************************************************/
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 /* Own header. */
 #include <analysis/variables/KLMClusterVariables.h>
@@ -15,7 +15,6 @@
 /* Analysis headers. */
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/variables/TrackVariables.h>
 
 /* Basf2 headers. */
 #include <framework/datastore/StoreArray.h>
@@ -363,6 +362,8 @@ namespace Belle2::Variable {
     const Const::ChargedStable& pionHypo = Const::pion;
     for (const Track& track : tracks) { // loop on all tracks here, and select the one with the minimum distance
       const TrackFitResult* trackfit = track.getTrackFitResult(pionHypo);
+      if (!trackfit)
+        return Const::doubleNaN;
       std::vector<double> parameters(3);
       if (isBKLM) {
         parameters[0] = r_BKLM + (innermostLayer - 1 + nLayers / 2) * 9.1;
@@ -485,7 +486,6 @@ Returns the number of Tracks matched to the KLMCluster associated to this Partic
   REGISTER_VARIABLE("nKLMClusterECLClusterMatches", nKLMClusterECLClusterMatches, R"DOC(
                      Returns the number of ECLClusters matched to the KLMCluster associated to this Particle.
               )DOC");
-
   REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance, R"DOC(
 Returns the distance between the KLMCluster associated to this Particle and the closest track to this cluster. This variable returns NaN if there is no Track-to-KLMCluster relationship.
 
@@ -541,4 +541,26 @@ Returns the std deviation of the 3nd axis from a PCA of the KLMCluster associate
   `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
 
 )DOC","cm");
+  REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
+                    "Returns the distance between KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
+                    "cm");
+  REGISTER_VARIABLE("klmClusterTrackDistance_helix_extrapolation", klmClusterTrackDistance_helix_extrapolation,
+                    "This also returns the distance between KLM cluster and its closes track, but calculated using helix extrapolation. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
+                    "cm");
+  REGISTER_VARIABLE("klmClusterTrackRotationAngle", klmClusterTrackRotationAngle,
+                    "Returns the angle between the direction at the IP and at the POCA to the KLMCluster associated to this Particle for the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
+                    "rad");
+  REGISTER_VARIABLE("klmClusterTrackSeparationAngle", klmClusterTrackSeparationAngle,
+                    "Returns the angle between the KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
+                    "rad");
+
+  REGISTER_VARIABLE("klmClusterShapeStdDev1", klmClusterShapeStdDev1,
+                    "Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
+                    "cm");
+  REGISTER_VARIABLE("klmClusterShapeStdDev2", klmClusterShapeStdDev2,
+                    "Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
+                    "cm");
+  REGISTER_VARIABLE("klmClusterShapeStdDev3", klmClusterShapeStdDev3,
+                    "Returns the std deviation of the 3rd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
+                    "cm");
 }

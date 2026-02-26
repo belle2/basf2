@@ -1967,7 +1967,7 @@ during the calculation of the `distanceToMcKl` variable.
   R"DOC(
   Returns cluster's timing normalized such that :math:`90\%` of real photons will 
   have :math:`|\text{clusterTimeNorm90}| < 1`. Normalization depends on energy, background
-  level, and cellID, and differs for data and MC. Calculated only for crystals within the CDC acceptance, :math:`161 <= |\text{clusterCellID}| <= 8608`; outside this region, :math:`1.5*\text{clusterTiming}/\text{clusterErrorTiming}` is returned. Note: the required payloads are stored in the neutrals global tag. Please find the latest recommendation using :ref:`b2help-recommendation`.)DOC",
+  level, and cellID, and differs for data and MC. Calculated only for crystals within the CDC acceptance, :math:`161 <= |\text{clusterCellID}| <= 8608`; outside this region, :math:`1.5*\text{clusterTiming}/\text{clusterErrorTiming}` is returned. Typical requirement is :math:`|\text{clusterTimeNorm90}<3`. Note: the required payloads are stored in the neutrals global tag. Please find the latest recommendation using :ref:`b2help-recommendation`.)DOC",
                       "dimensionless");
 
   }

@@ -9,13 +9,13 @@
 
 #include <tracking/trackFindingCDC/filters/wireHit/BaseWireHitFilter.h>
 #include <tracking/trackFindingCDC/filters/wireHit/CutsFromDBWireHitFilter.h>
-#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/wireHit/CDCWireHitVarSet.h>
 #include <framework/database/DBObjPtr.h>
 #include <tracking/dbobjects/WireHitFilterSettings.h>
 
 namespace Belle2 {
-  namespace TrackingUtilities {
+  namespace TrackFindingCDC {
     class CDCWireHit;
   }
   namespace TrackFindingCDC {
@@ -34,11 +34,11 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Basic filter method to override.
-      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCWireHit& wireHit) final;
+      TrackFindingCDC::Weight operator()(const TrackFindingCDC::CDCWireHit& wireHit) final;
 
     private:
       /// MVA filter
-      TrackingUtilities::MVAFilter<CDCWireHitVarSet> m_mvaFilter;
+      TrackFindingCDC::MVAFilter<CDCWireHitVarSet> m_mvaFilter;
 
       /// Cuts from DB filter
       CutsFromDBWireHitFilter m_cutsFromDBFilter;

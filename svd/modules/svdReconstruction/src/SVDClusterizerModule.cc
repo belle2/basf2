@@ -250,6 +250,7 @@ void SVDClusterizerModule::initialize()
 
 void SVDClusterizerModule::event()
 {
+  // False by default
   m_isMC =  m_storeMCParticles.getEntries() > 0;
 
   int nDigits = m_storeDigits.getEntries();

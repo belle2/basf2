@@ -185,6 +185,9 @@ def create_dimuon_validation_path():
                           path=path
                           )
 
+    path.add_module("TrackDQM")
+    path.add_module("AlignDQM")
+
     return path
 
 
@@ -221,6 +224,9 @@ def create_cosmic_validation_path():
         "CDCCosmicAnalysis",
         StoreTrackParErrors=True,
         Output="cosmic_ana.root")
+
+    path.add_module("TrackDQM")
+    path.add_module("AlignDQM")
 
     return path
 

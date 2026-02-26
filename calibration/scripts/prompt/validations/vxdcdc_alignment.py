@@ -66,8 +66,22 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     cosmic_file = hadd_and_get_merged_file(pattern_cosmic, "cosmics")
     mumu_file = hadd_and_get_merged_file(pattern_mumu, "dimuon")
 
+    print(f"Merged ntuples saved in {cosmic_file} and {mumu_file}")
+    print("Running validation...")
+
     cosmicval.run_validation([cosmic_file], output_dir=str(output_dir / "cosmics/"))
     dimuonval.run_validation([mumu_file], output_dir=str(output_dir / "dimuon/"))
+
+    # Now merge std histograms stored in ColectorOutput.root
+    histo_pattern_cosmic = str(collector_output_dir_cosmic) + "/*/CollectorOutput.root"
+    histo_pattern_mumu = str(collector_output_dir_mumu) + "/*/CollectorOutput.root"
+
+    histo_cosmic = hadd_and_get_merged_file(histo_pattern_cosmic, "cosmic_CollectorOutput")
+    histo_mumu = hadd_and_get_merged_file(histo_pattern_mumu, "dimuon_CollectorOutput")
+
+    print(f"Merged CollectorOutput histograms saved in {histo_cosmic} and {histo_mumu}")
+
+    print("Alignment validation completed.")
 
 
 if __name__ == '__main__':

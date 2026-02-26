@@ -28,6 +28,7 @@ Physics = [
 # Skims used for calibration
 Calibration = [
     "skim accept bhabha all",
+    "skim accept bhabha cdc",
     "skim accept gamma gamma",
     "skim accept hadron",
     "skim accept mumutight",
@@ -46,6 +47,7 @@ Others = [
     "skim accept b2bclusterlow phi",
     "skim accept bhabha",
     "skim accept bhabhaecl",
+    "skim accept bhabha trk ecl",
     "skim accept mumu 1trk",
     "skim accept mumu 2trk",
     "skim accept l1 nn info",

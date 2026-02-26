@@ -289,22 +289,22 @@ void DQMHistAnalysisTrackingAbortModule::event()
   TH1* noCDCHitsInSLIn_BF = findHist("TrackingAbort_before_filter/noCDCHitsInSL_IN");
   if ((noCDCHitsInSLIn_BF != nullptr) && (nEventsINbf > 0)) {
     noCDCHitsInSLIn_BF->Scale(1. / nEventsINbf);
-    noCDCHitsInSLIn_BF->GetXaxis()->SetTitle("Fraction of Events");
+    noCDCHitsInSLIn_BF->GetYaxis()->SetTitle("Fraction of Events");
   }
   TH1* noCDCHitsInSLOut_BF = findHist("TrackingAbort_before_filter/noCDCHitsInSL_OUT");
   if ((noCDCHitsInSLOut_BF != nullptr) && (nEventsOUTbf > 0)) {
     noCDCHitsInSLOut_BF->Scale(1. / nEventsOUTbf);
-    noCDCHitsInSLOut_BF->GetXaxis()->SetTitle("Fraction of Events");
+    noCDCHitsInSLOut_BF->GetYaxis()->SetTitle("Fraction of Events");
   }
   TH1* noCDCHitsInSLIn = findHist("TrackingAbort/noCDCHitsInSL_IN");
   if ((noCDCHitsInSLIn != nullptr) && (nEventsIN > 0)) {
     noCDCHitsInSLIn->Scale(1. / nEventsIN);
-    noCDCHitsInSLIn->GetXaxis()->SetTitle("Fraction of Events");
+    noCDCHitsInSLIn->GetYaxis()->SetTitle("Fraction of Events");
   }
   TH1* noCDCHitsInSLOut = findHist("TrackingAbort/noCDCHitsInSL_OUT");
   if ((noCDCHitsInSLOut != nullptr) && (nEventsOUT > 0)) {
     noCDCHitsInSLOut->Scale(1. / nEventsOUT);
-    noCDCHitsInSLOut->GetXaxis()->SetTitle("Fraction of Events");
+    noCDCHitsInSLOut->GetYaxis()->SetTitle("Fraction of Events");
   }
   for (int sl = 0; sl < 9; sl++) {
     //before filter IN & OUT

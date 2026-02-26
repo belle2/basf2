@@ -22,7 +22,7 @@
 
 
 using namespace Belle2;
-using namespace TrackingUtilities;
+using namespace TrackFindingCDC;
 
 //-----------------------------------------------------------------
 //                 Register the Module

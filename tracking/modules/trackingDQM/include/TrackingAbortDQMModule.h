@@ -10,8 +10,8 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
-#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <mdst/dataobjects/Track.h>
 
 #include <svd/calibration/SVDNoiseCalibrations.h>
@@ -67,7 +67,7 @@ namespace Belle2 {
 
     StoreArray<SVDShaperDigit> m_strips; /**< SVD strips*/
     StoreArray<SVDCluster> m_clusters; /**< SVD clusters*/
-    TrackingUtilities::StoreWrappedObjPtr<std::vector<Belle2::TrackingUtilities::CDCWireHit>> m_wireHitVector{"CDCWireHitVector"}; /**< CDC wire hits*/
+    TrackFindingCDC::StoreWrappedObjPtr<std::vector<TrackFindingCDC::CDCWireHit>> m_wireHitVector{"CDCWireHitVector"}; /**< CDC wire hits*/
     StoreObjPtr<TRGSummary> m_trgSummary; /**< trg summary */
     StoreArray<Track> m_tracks; /**< tracks */
 

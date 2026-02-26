@@ -17,7 +17,8 @@
 #   basf2 applyModeSelector.py -- [options]                              #
 #                                                                        #
 # Output files:                                                          #
-#   <output>  - ROOT file with Bp and B0 candidate trees                #
+#   <output>_Bp.pq  - parquet table with B+ candidates                 #
+#   <output>_B0.pq  - parquet table with B0 candidates                 #
 #                                                                        #
 ##########################################################################
 
@@ -27,14 +28,15 @@ import basf2 as b2
 import modeSelector
 import modularAnalysis as ma
 import variables.utils as vu
+from b2pandas_utils import VariablesToTable
 from variables import variables as vm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', nargs='+',
                     default=['/home/pf/dataframes/MC16rd_skim/udst_000001_prod00051442_task230000001.root'],
                     help='Input ROOT file(s) with FEI B meson candidates')
-parser.add_argument('--output', default='modeSelector_output.root',
-                    help='Output ROOT file (default: modeSelector_output.root)')
+parser.add_argument('--output', default='modeSelector_output',
+                    help='Output prefix (default: modeSelector_output)')
 parser.add_argument('--cat-model', default='onnx/modeSelector_cat.onnx',
                     help='Path to category ONNX model')
 parser.add_argument('--main-model', default='onnx/modeSelector_main.onnx',
@@ -109,8 +111,8 @@ modeSelector.modeSelector(
     cat_model_path=args.cat_model,
     main_model_path=args.main_model,
     output_variable='BplusScore',
-    debug=True,  # Enable debug output
-    debug_max_events=10,  # Print info for first 10 events
+    debug=False,  # Enable debug output
+    debug_max_events=10,  # Print info for first 10 events, if debug is enabled
     path=my_path
 )
 
@@ -149,7 +151,11 @@ output_variables = [
     'BplusScore_catCont',
     # MC truth matching
     'isSignal',
+    'PDG',
+    'isContinuumEvent',
     'mostcommonBTagIndex',
+    'mostcommonBTagDeltaP',
+    'mostcommonBTagPDG',
     # D* veto variables
     'Dstp_deltaMassDiff',
     'Dstp_chiProb',
@@ -157,22 +163,15 @@ output_variables = [
     'Dst0_chiProb',
 ]
 
-# Write output ntuples for B+ and B0 candidates
-ma.variablesToNtuple(
-    'B+:feiHadronic',
-    variables=output_variables,
-    filename=args.output,
-    treename='Bp',
-    path=my_path
-)
-
-ma.variablesToNtuple(
-    'B0:feiHadronic',
-    variables=output_variables,
-    filename=args.output,
-    treename='B0',
-    path=my_path
-)
+# Write output parquet tables for B+ and B0 candidates
+for b_str, b_pdg in [('Bp', 'B+'), ('B0', 'B0')]:
+    v2t = VariablesToTable(
+        f'{b_pdg}:feiHadronic',
+        variables=output_variables,
+        filename=f'{args.output}_{b_str}.pq',
+        event_buffer_size=500_000,
+    )
+    my_path.add_module(v2t)
 
 # Process events
 b2.process(my_path)

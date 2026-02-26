@@ -366,7 +366,7 @@
       badTOTaverageMin=15
       blockNegativeDriftLength=False
       deviationFromMedianTDCinASIC=10.0
-      filter=mva
+      filter=combined
       filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'}
       flightTimeEstimation=outwards
       ignoreLayers=[]
@@ -3279,7 +3279,7 @@
       badTOTaverageMin=15
       blockNegativeDriftLength=False
       deviationFromMedianTDCinASIC=10.0
-      filter=mva
+      filter=combined
       filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'}
       flightTimeEstimation=outwards
       ignoreLayers=[]

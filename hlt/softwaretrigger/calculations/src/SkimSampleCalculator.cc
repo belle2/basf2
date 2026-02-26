@@ -420,7 +420,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   }
   calculationResult["BhabhaECL"] = BhabhaECL;
 
-  // Radiative Bhabha skim (radee) for CDC dE/dx calib studies
+  // Bhabha skim (BhabhaCDC) for CDC dE/dx calib studies
+  double BhabhaCDC = 0.;
+  // Radiative Bhabha skim (radee)
   double radee = 0.;
   const double lowdEdxEdge = 0.70, highdEdxEdge = 1.30;
   const double lowEoPEdge = 0.70, highEoPEdge = 1.30;
@@ -451,9 +453,6 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       if (!trackFit1) continue;
       if (trackFit1->getHitPatternCDC().getNHits() <= 0) continue;
 
-      const CDCDedxTrack* dedxTrack1 = track1->getRelatedTo<CDCDedxTrack>();
-      if (!dedxTrack1) continue;
-
       //------------Second track variables----------------
       for (unsigned int j = i + 1; j < m_pionParticles->getListSize(); j++) {
 
@@ -478,7 +477,12 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         if (!trackFit2) continue;
         if (trackFit2->getHitPatternCDC().getNHits() <= 0) continue;
 
-        CDCDedxTrack* dedxTrack2 = track2->getRelatedTo<CDCDedxTrack>();
+        BhabhaCDC = 1;
+
+        const CDCDedxTrack* dedxTrack1 = track1->getRelatedTo<CDCDedxTrack>();
+        if (!dedxTrack1) continue;
+
+        const CDCDedxTrack* dedxTrack2 = track2->getRelatedTo<CDCDedxTrack>();
         if (!dedxTrack2) continue;
 
         double p1_dedxnosat = dedxTrack1->getDedxNoSat();
@@ -491,6 +495,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     }
   }
 
+  calculationResult["BhabhaCDC"] = BhabhaCDC;
   calculationResult["Radee"] = radee;
 
   // Dimuon skim (mumutight) taken from the offline skim + Radiative dimuon (radmumu)

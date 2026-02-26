@@ -19,6 +19,16 @@ output_dir = "validation_plots"
 #: Image file format
 file_format = "pdf"
 
+# Global typography defaults
+plt.rcParams.update({
+    "axes.labelsize": 14,
+    "axes.titlesize": 14,
+    "xtick.labelsize": 11,
+    "ytick.labelsize": 11,
+    "legend.fontsize": 12,
+    "figure.titlesize": 16,
+})
+
 
 def plot_histogram(
         data_list: list,
@@ -154,9 +164,9 @@ def plot_correlations(
         for x, varx in enumerate(x_data_list[0].keys()):
             for i, _ in enumerate(x_data_list):
                 if y == (len(y_data_list[0].keys()) - 1):
-                    axs[y, x].set_xlabel(x_data_labels[x])
+                    axs[y, x].set_xlabel(x_data_labels[x], fontsize=10)
                 if x == 0:
-                    axs[y, x].set_ylabel(y_data_labels[y], fontsize=8)
+                    axs[y, x].set_ylabel(y_data_labels[y], fontsize=10)
 
                 if plot_type == 'median':
                     x_vals, y_vals, x_width, y_err, _, _ = to_bins(
@@ -165,7 +175,7 @@ def plot_correlations(
                     x_vals, _, x_width, _, y_vals, y_err = to_bins(
                         x_data_list[i][varx], y_data_list[i][vary], nbins, ranges[0][varx])
 
-                axs[y, x].tick_params(labelsize=7)
+                axs[y, x].tick_params(labelsize=9)
                 with np.errstate(invalid='ignore'):
                     axs[y, x].errorbar(x_vals, y_vals, y_err, x_width, fmt=".", label=data_labels[i])
 
@@ -231,9 +241,9 @@ def plot_correlations_2D_histograms(
             axs[y, x].set_ylim(ranges[1][vary])
 
             if y == (len(y_data.keys()) - 1):
-                axs[y, x].set_xlabel(x_data_labels[x])
+                axs[y, x].set_xlabel(x_data_labels[x], fontsize=10)
             if x == 0:
-                axs[y, x].set_ylabel(y_data_labels[y])
+                axs[y, x].set_ylabel(y_data_labels[y], fontsize=10)
 
             with np.errstate(invalid='ignore'):
                 axs[y, x].hist2d(x_data[varx], y_data[vary], [nbins, 10],
@@ -242,6 +252,7 @@ def plot_correlations_2D_histograms(
             axs[y, x].set_xlim(ranges[0][varx][0], ranges[0][varx][1])
         axs[y, x].set_ylim(ranges[1][vary][0], ranges[1][vary][1])
 
+    fig.tight_layout()
     plt.savefig(format=f"{file_format}", fname=f"{output_dir}/Correlations_2dhist_{data_label}.{file_format}")
     plt.close()
 
@@ -275,8 +286,8 @@ def plot_2D_histogram(data: dict, label: str, bins: tuple, phi_var, tan_lambda_v
         rasterized=True,
     )
     plt.colorbar(label="Events")
-    plt.ylabel(phi_var.latex + phi_var.unit.name)
-    plt.xlabel(tan_lambda_var.latex + tan_lambda_var.unit.name)
+    plt.ylabel(phi_var.latex + phi_var.unit.name, fontsize=12)
+    plt.xlabel(tan_lambda_var.latex + tan_lambda_var.unit.name, fontsize=12)
     plt.savefig(format=f"{file_format}", fname=f"{output_dir}/map_2dhist_{label}.{file_format}")
     plt.close()
 
@@ -286,6 +297,7 @@ def draw_map(
         data: dict,
         label: str,
         variable,
+        observable_mode: str,
         bins: tuple,
         phi_var,
         tan_lambda_var,
@@ -295,9 +307,14 @@ def draw_map(
     """Draw a median or resolution detector map for ``variable`` binned in phi vs tan(lambda).
 
     The map is built by iterating over phi strips and computing per-bin
-    statistics along tan(lambda) within each strip using :func:`to_bins`.
-    For the ``d`` variable the sum (track1 + track2) is used; for all other
-    variables the difference (track1 - track2) is used.
+    statistics along tan(lambda) within each strip using :func:`to_bins`. The
+    caller explicitly chooses how track pairs are combined via
+    ``observable_mode``:
+    - ``'delta'``: difference (track1 - track2)
+    - ``'sigma'``: sum (track1 + track2)
+
+    In this codebase, ``sigma`` is intended for dimuon d0 observables, while
+    cosmics maps typically use ``delta``.
 
     Saves to ``{output_dir}/{map_type}_map_{variable.plaintext}_{label}.{file_format}``.
 
@@ -312,6 +329,10 @@ def draw_map(
         Dataset label used in the figure title and file name.
     variable : TrackVariable
         Observable to map (e.g. ``d`` or ``z``).
+    observable_mode : str
+        Combination mode for track1/track2 values:
+        - ``'delta'`` for difference (track1 - track2)
+        - ``'sigma'`` for sum (track1 + track2)
     bins : tuple of int
         ``(n_phi_bins, n_tan_lambda_bins)`` for the map grid.
     phi_var : TrackVariable
@@ -340,6 +361,8 @@ def draw_map(
         plt.title(f"Resolution map ({label})")
     else:
         raise ValueError("map_type must be 'median' or 'resolution'")
+    if observable_mode not in {"delta", "sigma"}:
+        raise ValueError("observable_mode must be 'delta' or 'sigma'")
 
     x_bins = np.histogram_bin_edges(
         np.concatenate((data[tan_lambda_var.name1], data[tan_lambda_var.name2])), bins[1], (-2, 3))
@@ -351,33 +374,23 @@ def draw_map(
             continue
         tracks1 = np.logical_and(y_bins[i] <= data[phi_var.name1], data[phi_var.name1] <= y_bins[i + 1])
         tracks2 = np.logical_and(y_bins[i] <= data[phi_var.name2], data[phi_var.name2] <= y_bins[i + 1])
+        if observable_mode == "sigma":
+            values = np.concatenate((
+                data[variable.name1][tracks1] + data[variable.name2][tracks1],
+                data[variable.name1][tracks2] + data[variable.name2][tracks2],
+            ))
+        else:
+            values = np.concatenate((
+                data[variable.name1][tracks1] - data[variable.name2][tracks1],
+                data[variable.name1][tracks2] - data[variable.name2][tracks2],
+            ))
 
         if map_type == "median":
-            if variable.plaintext == "d":
-                values = np.concatenate((
-                    data[variable.name1][tracks1] + data[variable.name2][tracks1],
-                    data[variable.name1][tracks2] + data[variable.name2][tracks2],
-                ))
-            else:
-                values = np.concatenate((
-                    data[variable.name1][tracks1] - data[variable.name2][tracks1],
-                    data[variable.name1][tracks2] - data[variable.name2][tracks2],
-                ))
             _, map_data[i], _, _, _, _ = to_bins(
                 np.concatenate((data[tan_lambda_var.name1][tracks1], data[tan_lambda_var.name2][tracks2])),
                 values, bins[1], (-2, 3),
             )
         elif map_type == "resolution":
-            if variable.plaintext == "d":
-                values = np.concatenate((
-                    data[variable.name1][tracks1] + data[variable.name2][tracks1],
-                    data[variable.name1][tracks2] + data[variable.name2][tracks2],
-                ))
-            else:
-                values = np.concatenate((
-                    data[variable.name1][tracks1] - data[variable.name2][tracks1],
-                    data[variable.name1][tracks2] - data[variable.name2][tracks2],
-                ))
             _, _, _, _, map_data[i], _ = to_bins(
                 np.concatenate((data[tan_lambda_var.name1][tracks1], data[tan_lambda_var.name2][tracks2])),
                 values, bins[1], (-2, 3),
@@ -397,17 +410,17 @@ def draw_map(
 
     plt.pcolormesh(x_bins, y_bins, map_data / 2 ** 0.5 * variable.unit.convert, vmax=vmax, vmin=vmin, rasterized=True)
     if map_type == "median":
-        if variable.plaintext == "d":
+        if observable_mode == "sigma":
             plt.colorbar(label=f"$\\tilde{{}}$($\\Sigma${variable.latex})/$\\sqrt{{2}}$" + variable.unit.dname)
         else:
             plt.colorbar(label=f"$\\tilde{{}}$($\\Delta${variable.latex})/$\\sqrt{{2}}$" + variable.unit.dname)
     elif map_type == "resolution":
-        if variable.plaintext == "d":
+        if observable_mode == "sigma":
             plt.colorbar(label=f"$\\sigma_{{68}}$($\\Sigma${variable.latex})/$\\sqrt{{2}}$" + variable.unit.dname)
         else:
             plt.colorbar(label=f"$\\sigma_{{68}}$($\\Delta${variable.latex})/$\\sqrt{{2}}$" + variable.unit.dname)
-    plt.ylabel(phi_var.latex + phi_var.unit.name)
-    plt.xlabel(tan_lambda_var.latex + tan_lambda_var.unit.name)
+    plt.ylabel(phi_var.latex + phi_var.unit.name, fontsize=12)
+    plt.xlabel(tan_lambda_var.latex + tan_lambda_var.unit.name, fontsize=12)
     plt.savefig(format=f"{file_format}",
                 fname=f"{output_dir}/{map_type}_map_{variable.plaintext}_{label}.{file_format}")
     plt.close()
@@ -421,7 +434,7 @@ def plot_resolutions_hist(
         ranges=90,
         vars_to_fit: list = [],
         shape: tuple = (2, 3),
-        figsize: tuple = (9.0, 6.0),
+        figsize: tuple = (11.0, 8.0),
         ):
     """Plot a grid of residual histograms, optionally with Gaussian fits, for each variable.
 
@@ -488,7 +501,7 @@ def plot_resolutions_hist(
                     fr"$\mu$ = {fit[1]:.3}" + r" $\pm$ " + f"{err[1]:.1} " + used_units + "\n" +
                     fr"$\sigma$ = {fit[2]:.3}" + r" $\pm$ " + f"{err[2]:.1} " + used_units
                 )
-                ax.text(ax.get_xlim()[0], ax.get_ylim()[1], fit_parameters, size=9, va='bottom')
+                ax.text(ax.get_xlim()[0], ax.get_ylim()[1], fit_parameters, size=11, va='bottom')
             except Exception:
                 print(f"[Warning] Failed to fit {var.plaintext}")
 
@@ -504,7 +517,7 @@ def plot_resolution_comparison(
         nbins: float,
         ranges=90,
         shape: tuple = (2, 3),
-        figsize: tuple = (9.0, 6.0),
+        figsize: tuple = (11.0, 8.0),
         ):
     """Overlay residual distributions from multiple datasets and annotate with median and sigma68.
 
@@ -584,7 +597,7 @@ def plot_resolution(
         fitfunction: callable = None,
         fitlabel: callable = None,
         fitrange: list = None,
-        figsize: tuple = (10.0, 6),
+        figsize: tuple = (12.0, 7.0),
         err_override: dict = None,
         ):
     """Plot sigma68 vs an x variable (e.g. pseudomomentum) for each observable.
@@ -669,8 +682,8 @@ def plot_resolution(
 
         ax.set_xlim(xlimit[0], xlimit[1])
         ax.set_ylim(ylimits[var][0], ylimits[var][1])
-        ax.set_xlabel(axlabels[var][0], fontsize=16)
-        ax.set_ylabel(axlabels[var][1], fontsize=16)
+        ax.set_xlabel(axlabels[var][0])
+        ax.set_ylabel(axlabels[var][1])
         ax.legend()
 
     varsplaintext = f"{[var.plaintext for var in datadict.keys()]}".replace("'", "").replace(" ", "")

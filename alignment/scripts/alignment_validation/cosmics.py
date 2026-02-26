@@ -20,15 +20,24 @@ from alignment_validation.plotting import (
 # Variable definitions
 # ---------------------------------------------------------------------------
 
+#: Run number metadata.
 run = GlobalVariable("run", "run", unit, "run")
+#: Event time metadata.
 time = GlobalVariable("evtT0", r"t$_{0}$", s, "time")
+#: Track d0 metadata (track1/track2).
 d = TrackVariable("D01", "D02", r"d$_{0}$", cm, "d")
+#: Track z0 metadata (track1/track2).
 z = TrackVariable("Z01", "Z02", r"z$_{0}$", cm, "z")
+#: Track phi0 metadata (track1/track2).
 phi = TrackVariable("Phi01", "Phi02", r"$\Phi_{0}$", rad, "phi")
+#: Track tan(lambda) metadata (track1/track2).
 tanLambda = TrackVariable("tanLambda1", "tanLambda2", r"$\tan(\lambda$)", unit, "tanLambda")
+#: Track omega metadata (track1/track2).
 omega = TrackVariable("Omega1", "Omega2", r"$\omega$", inverse_cm, "omega")
+#: Track transverse momentum metadata (track1/track2).
 pt = TrackVariable("Pt1", "Pt2", r"$P_{t}$", gev, "pt")
 
+#: Default ROOT selection for cosmics tracks.
 SELECTION = (
     "run>=0"
     " && abs(D01)<1 && abs(D02)<1"
@@ -79,14 +88,15 @@ def load_data(filenames: list, selection: str = SELECTION) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def run_validation(filenames: list, output_dir: str, file_format: str = "pdf"):
+def run_validation(filenames: list, output_dir: str, file_format: str = "png"):
     """Load cosmics data and produce all validation plots.
 
     Produces the following sets of plots in ``output_dir``:
 
     - Per-variable histograms and track1 − track2 difference histograms.
     - Correlation profiles (median and sigma68 vs each track parameter).
-    - 2D detector maps (phi vs tan(lambda)) of median and resolution for d0 and z0.
+    - 2D detector maps (phi vs tan(lambda)) of median and resolution for d0 and z0,
+      using Delta mode (track1 - track2) for both variables.
     - Resolution histograms per dataset and a multi-dataset comparison.
     - Resolution vs pseudomomentum for d0, z0, phi0, tan(lambda).
     - Pt resolution vs Pt.
@@ -181,8 +191,8 @@ def run_validation(filenames: list, output_dir: str, file_format: str = "pdf"):
         label = Path(f).stem
         plot_2D_histogram(data[f], label, map_bins, phi, tanLambda)
         for var in [d, z]:
-            draw_map('median', data[f], label, var, map_bins, phi, tanLambda)
-            draw_map('resolution', data[f], label, var, map_bins, phi, tanLambda)
+            draw_map('median', data[f], label, var, 'delta', map_bins, phi, tanLambda)
+            draw_map('resolution', data[f], label, var, 'delta', map_bins, phi, tanLambda)
 
     # -----------------------------------------------------------------------
     # Resolutions
@@ -216,7 +226,7 @@ def run_validation(filenames: list, output_dir: str, file_format: str = "pdf"):
         "Resolutions",
         [resolutions_data[f] for f in filenames],
         labels, resolutions_labels,
-        nbins=40, figsize=(11.0, 6.0),
+        nbins=40, figsize=(13.0, 8.0),
     )
 
     # -----------------------------------------------------------------------

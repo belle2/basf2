@@ -20,41 +20,51 @@ from alignment_validation.plotting import (
 # Variable definitions (CMS frame)
 # ---------------------------------------------------------------------------
 
+#: Run number metadata.
 run = GlobalVariable("__run__", "run", unit, "run")
+#: Event time metadata.
 time = GlobalVariable("eventTimeSeconds", r"t$_{0}$", s, "time")
+#: Invariant mass metadata.
 InvM = GlobalVariable("InvM", r"$M_{inv}$", gev, "InvM")
 
+#: Track d0 metadata (track1/track2).
 d = TrackVariable(
     "useCMSFrame__bodaughter__bo0__cm__spd0__bc__bc",
     "useCMSFrame__bodaughter__bo1__cm__spd0__bc__bc",
     r"d$_{0}$", cm, "d",
 )
+#: Track z0 metadata (track1/track2).
 z = TrackVariable(
     "useCMSFrame__bodaughter__bo0__cm__spz0__bc__bc",
     "useCMSFrame__bodaughter__bo1__cm__spz0__bc__bc",
     r"z$_{0}$", cm, "z",
 )
+#: Track phi0 metadata (track1/track2).
 phi = TrackVariable(
     "useCMSFrame__bodaughter__bo0__cm__spphi0__bc__bc",
     "useCMSFrame__bodaughter__bo1__cm__spphi0__bc__bc",
     r"$\Phi_{0}$", rad, "phi",
 )
+#: Track tan(lambda) metadata (track1/track2).
 tanLambda = TrackVariable(
     "useCMSFrame__bodaughter__bo0__cm__sptanLambda__bc__bc",
     "useCMSFrame__bodaughter__bo1__cm__sptanLambda__bc__bc",
     r"tan($\lambda$)", unit, "tanLambda",
 )
+#: Track omega metadata (track1/track2).
 omega = TrackVariable(
     "useCMSFrame__bodaughter__bo0__cm__spomega__bc__bc",
     "useCMSFrame__bodaughter__bo1__cm__spomega__bc__bc",
     r"$\omega$", inverse_cm, "omega",
 )
+#: Track transverse momentum metadata (track1/track2).
 pt = TrackVariable(
     "useCMSFrame__bodaughter__bo0__cm__sppt__bc__bc",
     "useCMSFrame__bodaughter__bo1__cm__sppt__bc__bc",
     r"$P_{t}$", gev, "pt",
 )
 
+#: Default ROOT selection for dimuon tracks.
 SELECTION = (
     "__run__>=0"
     " && daughter__bo0__cm__spmuonID__bc>=0.8"
@@ -218,7 +228,7 @@ def load_data(filenames: list, selection: str = SELECTION) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def run_validation(filenames: list, output_dir: str, file_format: str = "pdf",
+def run_validation(filenames: list, output_dir: str, file_format: str = "png",
                    ip_correction: str = "run_by_run"):
     """Load dimuon data and produce all validation plots.
 
@@ -230,7 +240,8 @@ def run_validation(filenames: list, output_dir: str, file_format: str = "pdf",
     - Correlation profiles (median and sigma68 of d0 sum / z0 difference vs
       phi and tan(lambda)).
     - 2D detector maps (phi vs tan(lambda)) of median and resolution for d0
-      and z0.
+      and z0, using Sigma mode (track1 + track2) for d0 and Delta mode
+      (track1 - track2) for z0.
     - Resolution histograms per dataset and a multi-dataset comparison.
     - Resolution vs pseudomomentum for d0 and z0.
     - Pt resolution vs Pt.
@@ -366,8 +377,9 @@ def run_validation(filenames: list, output_dir: str, file_format: str = "pdf",
         label = Path(f).stem
         plot_2D_histogram(data[f], label, map_bins, phi, tanLambda)
         for var in [d, z]:
-            draw_map('median', data[f], label, var, map_bins, phi, tanLambda)
-            draw_map('resolution', data[f], label, var, map_bins, phi, tanLambda)
+            mode = 'sigma' if var is d else 'delta'
+            draw_map('median', data[f], label, var, mode, map_bins, phi, tanLambda)
+            draw_map('resolution', data[f], label, var, mode, map_bins, phi, tanLambda)
 
     # -----------------------------------------------------------------------
     # Resolutions
@@ -389,14 +401,14 @@ def run_validation(filenames: list, output_dir: str, file_format: str = "pdf",
             f"Resolutions {Path(f).stem}",
             resolutions_data[f], resolutions_labels,
             nbins=40, vars_to_fit=resolutions_data[f].keys(),
-            shape=(1, 2), figsize=(9.0, 4.0),
+            shape=(1, 2), figsize=(11.0, 5.0),
         )
 
     plot_resolution_comparison(
         "Resolutions",
         [resolutions_data[f] for f in filenames],
         labels, resolutions_labels,
-        nbins=40, shape=(1, 2), figsize=(9.0, 4.0),
+        nbins=40, shape=(1, 2), figsize=(11.0, 5.0),
     )
 
     # -----------------------------------------------------------------------

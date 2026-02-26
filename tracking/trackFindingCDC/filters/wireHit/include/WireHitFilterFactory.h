@@ -10,8 +10,6 @@
 #include <tracking/trackFindingCDC/filters/wireHit/BaseWireHitFilter.h>
 
 #include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
-#include <framework/database/DBObjPtr.h>
-#include <tracking/dbobjects/WireHitFilterSettings.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

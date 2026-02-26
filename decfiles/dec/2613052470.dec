@@ -1,6 +1,6 @@
-# EventType: 2613052007
-# Descriptor: [ccbar anti-Omega_c02anti-Xi_cmPip, anti-Xi_cm2anti-SigmamKpPim]
-# NickName: anti-Omega_c02anti-Xi_cmPip_anti-Xi_cm2anti-SigmamKpPim
+# EventType: 2613052470
+# Descriptor: [ccbar Xi_cp2Xi0PimPipPip,Xi02Lambda0Pi0]
+# NickName: Xi_cp2Xi0PimPipPip_Xi02Lambda0Pi0
 # PhysicsWG: Charm
 # Responsible: Rishav K Jaiswal
 # Date: 20260212 (YYYYMMDD)
@@ -13,20 +13,20 @@ Decay vpho
 1.000 c    anti-c      PYTHIA 91;
 Enddecay
 
-Alias MyantiXi_c- anti-Xi_c-
-Alias MyantiSigma- anti-Sigma-
+Alias MyXi0 Xi0
+Alias MyLambda0 Lambda0
 Alias Mypi0 pi0
 
-Decay anti-Omega_c0
-1.000 MyantiXi_c- pi+                   PHSP;
+Decay Xi_c+
+1.000 MyXi0   pi-   pi+  pi+        PHSP;
 Enddecay
 
-Decay MyantiXi_c-
-1.000 MyantiSigma- K+ pi-               PHSP;
+Decay MyXi0
+1.000 MyLambda0 Mypi0               PHSP;
 Enddecay
 
-Decay MyantiSigma-
-1.000 anti-p- Mypi0                      PHSP;
+Decay MyLambda0
+1.000 p+ pi-                        PHSP; 
 Enddecay
 
 Decay Mypi0

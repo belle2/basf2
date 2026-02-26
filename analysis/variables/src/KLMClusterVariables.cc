@@ -1,10 +1,10 @@
 /**************************************************************************
- * basf2 (Belle II Analysis Software Framework)                           *
- * Author: The Belle II Collaboration                                     *
- *                                                                        *
- * See git log for contributors and copyright holders.                    *
- * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
- **************************************************************************/
+* basf2 (Belle II Analysis Software Framework)                           *
+* Author: The Belle II Collaboration                                     *
+*                                                                        *
+* See git log for contributors and copyright holders.                    *
+* This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+**************************************************************************/
 
 /* Own header. */
 #include <analysis/variables/KLMClusterVariables.h>
@@ -15,9 +15,12 @@
 /* Analysis headers. */
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/variables/TrackVariables.h>
 
 /* Basf2 headers. */
 #include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/Helix.h>
+#include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KlId.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -301,6 +304,86 @@ namespace Belle2::Variable {
     if (!cluster)
       return Const::doubleNaN;
     return cluster->getClusterTrackRotationAngle();
+  }
+
+  ROOT::Math::XYZVector getPositionOnHelix_trackfit(const TrackFitResult* trackFit, const std::vector<double>& pars)
+  {
+    const double r = pars[0];
+    const double zfwd = pars[1];
+    const double zbwd = pars[2];
+
+    // get helix and parameters
+    const double z0 = trackFit->getZ0();
+    const double tanlambda = trackFit->getTanLambda();
+    const Helix h = trackFit->getHelix();
+
+    // extrapolate to radius
+    const double arcLength = h.getArcLength2DAtCylindricalR(r);
+    const double lHelixRadius = arcLength > 0 ? arcLength : std::numeric_limits<double>::max();
+
+    // extrapolate to FWD z
+    const double lFWD = (zfwd - z0) / tanlambda > 0 ? (zfwd - z0) / tanlambda : std::numeric_limits<double>::max();
+
+    // extrapolate to BWD z
+    const double lBWD = (zbwd - z0) / tanlambda > 0 ? (zbwd - z0) / tanlambda : std::numeric_limits<double>::max();
+
+    // pick smallest arclength
+    const double l = std::min({lHelixRadius, lFWD, lBWD});
+
+    return h.getPositionAtArcLength2D(l);
+  }
+
+  double klmClusterTrackDistance_helix_extrapolation(const Particle* particle)
+  {
+    const KLMCluster* cluster = particle->getKLMCluster();
+    if (!cluster)
+      return Const::doubleNaN;
+    static const ROOT::Math::XYZVector vecNaN(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
+
+    int innermostLayer = cluster->getInnermostLayer();
+    int nLayers = cluster->getLayers();
+    double cluster_x = cluster->getClusterPosition().X();
+    double cluster_y = cluster->getClusterPosition().Y();
+    double cluster_z = cluster->getClusterPosition().Z();
+
+    double r_BKLM =  201.6;
+    double z_EFWD =  283.9;
+    double z_EBWD = -189.9;
+
+    bool isBKLM = false;
+    bool isEFWD = false;
+    bool isEBWD = false;
+    isBKLM = (cluster_z > -180 && cluster_z < 275);
+    isEFWD = (cluster_z > 275);
+    isEBWD = (cluster_z < -180);
+
+    double min_dist = 1e10;
+
+    StoreArray<Track> tracks;
+    const Const::ChargedStable& pionHypo = Const::pion;
+    for (const Track& track : tracks) { // loop on all tracks here, and select the one with the minimum distance
+      const TrackFitResult* trackfit = track.getTrackFitResult(pionHypo);
+      std::vector<double> parameters(3);
+      if (isBKLM) {
+        parameters[0] = r_BKLM + (innermostLayer - 1 + nLayers / 2) * 9.1;
+        parameters[1] = z_EFWD;
+        parameters[2] = z_EBWD;
+      } else if (isEFWD) {
+        parameters[0] = r_BKLM;
+        parameters[1] = z_EFWD + (innermostLayer - 1 + nLayers / 2) * 9.1;
+        parameters[2] = z_EBWD;
+      } else if (isEBWD) {
+        parameters[0] = r_BKLM;
+        parameters[1] = z_EFWD;
+        parameters[2] = z_EBWD + (innermostLayer - 1 + nLayers / 2) * 9.1;
+      }
+      ROOT::Math::XYZVector position = getPositionOnHelix_trackfit(trackfit, parameters);
+      if (position == vecNaN) return Const::doubleNaN;
+      double dist = sqrt(pow(position.X() - cluster_x, 2) + pow(position.Y() - cluster_y, 2) + pow(position.Z() - cluster_z, 2));
+      if (dist < min_dist) min_dist = dist;
+    }
+
+    return min_dist;
   }
 
   double klmClusterShapeStdDev1(const Particle* particle)

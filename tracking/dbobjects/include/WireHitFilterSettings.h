@@ -41,6 +41,6 @@ namespace Belle2 {
     /** For the combined filter, super layer number from which to start using MVA */
     int m_CombinedFilterMVASwitchSuperLayer = 2;
 
-    ClassDef(WireHitFilterSettings, 1);
+    ClassDef(WireHitFilterSettings, 1);  /**< ClassDef, necessary for ROOT */
   };
 }

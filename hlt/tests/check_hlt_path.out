@@ -1,4 +1,3 @@
-[INFO] Steering file: check_hlt_path.py
 [INFO] basf2 path for beam_reco_monitor:
 [INFO] Modules and parameter settings in the path:
   1. Sum_Wait
@@ -364,7 +363,7 @@
       badTOTaverageMin=15
       blockNegativeDriftLength=False
       deviationFromMedianTDCinASIC=10.0
-      filter=mva
+      filter=combined
       filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'}
       flightTimeEstimation=outwards
       ignoreLayers=[]
@@ -3282,7 +3281,7 @@
       badTOTaverageMin=15
       blockNegativeDriftLength=False
       deviationFromMedianTDCinASIC=10.0
-      filter=mva
+      filter=combined
       filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'}
       flightTimeEstimation=outwards
       ignoreLayers=[]

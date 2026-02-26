@@ -1,4 +1,4 @@
-# EventType: 1110020010
+# EventType: 1120020010
 # Descriptor: [B0 -> K0star Xinv ]cc
 # NickName: Bd_K0starXinv
 # Documentation: b->s Xinv, all Kstar0 decays are allowed 
@@ -17,7 +17,7 @@ Enddecay
 # Set the signal side B decay, need the other side to decay generically for tagging
 
 Decay B0sig
-1.0 K*0 Xinv PHOTOS PHSP;
+1.0 K*0 Xinv PHOTOS SVS;
 Enddecay
 CDecay anti-B0sig
 

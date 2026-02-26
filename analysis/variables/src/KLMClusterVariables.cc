@@ -20,6 +20,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/Helix.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/VectorUtil.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KlId.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -262,7 +263,7 @@ namespace Belle2::Variable {
 
   double nMatchedKLMClusters(const Particle* particle)
   {
-    Particle::EParticleSourceObject particleSource = particle->getParticleSource();
+    Belle2::Particle::EParticleSourceObject particleSource = particle->getParticleSource();
     if (particleSource == Particle::EParticleSourceObject::c_Track) {
       return particle->getTrack()->getRelationsTo<KLMCluster>().size();
     } else if (particleSource == Particle::EParticleSourceObject::c_ECLCluster) {
@@ -289,6 +290,79 @@ namespace Belle2::Variable {
     return cluster->getClusterTrackSeparation();
   }
 
+  ROOT::Math::XYZVector getPositionOnHelix_trackfit(const TrackFitResult* trackFit)
+  {
+    double r_BKLM =  201.6;
+    double z_EFWD =  283.9;
+    double z_EBWD = -189.9;
+
+    // get helix and parameters
+    const double z0 = trackFit->getZ0();
+    const double tanlambda = trackFit->getTanLambda();
+    const Helix h = trackFit->getHelix();
+
+    // extrapolate to radius
+    const double arcLength = h.getArcLength2DAtCylindricalR(r_BKLM);
+    const double lHelixRadius = arcLength > 0 ? arcLength : std::numeric_limits<double>::max();
+
+    // extrapolate to FWD z
+    const double lFWD = (z_EFWD - z0) / tanlambda > 0 ? (z_EFWD - z0) / tanlambda : std::numeric_limits<double>::max();
+
+    // extrapolate to BWD z
+    const double lBWD = (z_EBWD - z0) / tanlambda > 0 ? (z_EBWD - z0) / tanlambda : std::numeric_limits<double>::max();
+
+    // pick smallest arclength
+    const double l = std::min({lHelixRadius, lFWD, lBWD});
+
+    ROOT::Math::XYZVector ext_helix = h.getPositionAtArcLength2D(l);
+    double helixExtR_surface = r_BKLM / sin(ext_helix.Theta());
+    if (l == lFWD) { helixExtR_surface = z_EFWD / cos(ext_helix.Theta());}
+    else if (l == lBWD) { helixExtR_surface = z_EBWD / cos(ext_helix.Theta());}
+
+    ROOT::Math::XYZVector helixExt_surface_position(0, 0, 0);
+    VectorUtil::setMagThetaPhi(helixExt_surface_position, helixExtR_surface, ext_helix.Theta(), ext_helix.Phi());
+
+    return helixExt_surface_position;
+  }
+
+  double klmClusterTrackDistance_helix_extrapolation(const Particle* particle)
+  {
+    const KLMCluster* cluster = particle->getKLMCluster();
+    static const ROOT::Math::XYZVector vecNaN(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
+    double r_BKLM =  201.6;
+    double z_EFWD =  283.9;
+    double z_EBWD = -189.9;
+
+    bool isEFWD = false;
+    bool isEBWD = false;
+    isEFWD = (cluster->getClusterPosition().Z() > 275);
+    isEBWD = (cluster->getClusterPosition().Z() < -180);
+
+    double klmClusterR_surface = r_BKLM / sin(cluster->getClusterPosition().Theta());
+    if (isEFWD) {klmClusterR_surface = z_EFWD / cos(cluster->getClusterPosition().Theta());}
+    else if (isEBWD) {klmClusterR_surface = z_EBWD / cos(cluster->getClusterPosition().Theta());}
+
+    ROOT::Math::XYZVector klmCluster_surface_position(0, 0, 0);
+    VectorUtil::setMagThetaPhi(klmCluster_surface_position, klmClusterR_surface,  cluster->getClusterPosition().Theta(),
+                               cluster->getClusterPosition().Phi());
+
+    double min_dist = 1e10, dist = 1e10;
+
+    StoreArray<Track> tracks;
+    for (const Track& track : tracks) { // loop on all tracks here, and select the one with the minimum distance
+      const TrackFitResult* trackfit = track.getTrackFitResultWithBestPValue();
+      if (!trackfit) {continue;}
+      ROOT::Math::XYZVector helixExt_surface_position = getPositionOnHelix_trackfit(trackfit);
+      if (helixExt_surface_position == vecNaN) return Const::doubleNaN;
+
+      dist = (klmCluster_surface_position - helixExt_surface_position).R();
+      if (dist < min_dist) min_dist = dist;
+    }
+    if (min_dist > 9999) min_dist = -1;
+    return min_dist;
+  }
+
+
   double klmClusterTrackSeparationAngle(const Particle* particle)
   {
     const KLMCluster* cluster = particle->getKLMCluster();
@@ -303,88 +377,6 @@ namespace Belle2::Variable {
     if (!cluster)
       return Const::doubleNaN;
     return cluster->getClusterTrackRotationAngle();
-  }
-
-  ROOT::Math::XYZVector getPositionOnHelix_trackfit(const TrackFitResult* trackFit, const std::vector<double>& pars)
-  {
-    const double r = pars[0];
-    const double zfwd = pars[1];
-    const double zbwd = pars[2];
-
-    // get helix and parameters
-    const double z0 = trackFit->getZ0();
-    const double tanlambda = trackFit->getTanLambda();
-    const Helix h = trackFit->getHelix();
-
-    // extrapolate to radius
-    const double arcLength = h.getArcLength2DAtCylindricalR(r);
-    const double lHelixRadius = arcLength > 0 ? arcLength : std::numeric_limits<double>::max();
-
-    // extrapolate to FWD z
-    const double lFWD = (zfwd - z0) / tanlambda > 0 ? (zfwd - z0) / tanlambda : std::numeric_limits<double>::max();
-
-    // extrapolate to BWD z
-    const double lBWD = (zbwd - z0) / tanlambda > 0 ? (zbwd - z0) / tanlambda : std::numeric_limits<double>::max();
-
-    // pick smallest arclength
-    const double l = std::min({lHelixRadius, lFWD, lBWD});
-
-    return h.getPositionAtArcLength2D(l);
-  }
-
-  double klmClusterTrackDistance_helix_extrapolation(const Particle* particle)
-  {
-    const KLMCluster* cluster = particle->getKLMCluster();
-    if (!cluster)
-      return Const::doubleNaN;
-    static const ROOT::Math::XYZVector vecNaN(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
-
-    int innermostLayer = cluster->getInnermostLayer();
-    int nLayers = cluster->getLayers();
-    double cluster_x = cluster->getClusterPosition().X();
-    double cluster_y = cluster->getClusterPosition().Y();
-    double cluster_z = cluster->getClusterPosition().Z();
-
-    double r_BKLM =  201.6;
-    double z_EFWD =  283.9;
-    double z_EBWD = -189.9;
-
-    bool isBKLM = false;
-    bool isEFWD = false;
-    bool isEBWD = false;
-    isBKLM = (cluster_z > -180 && cluster_z < 275);
-    isEFWD = (cluster_z > 275);
-    isEBWD = (cluster_z < -180);
-
-    double min_dist = 1e10;
-
-    StoreArray<Track> tracks;
-    const Const::ChargedStable& pionHypo = Const::pion;
-    for (const Track& track : tracks) { // loop on all tracks here, and select the one with the minimum distance
-      const TrackFitResult* trackfit = track.getTrackFitResult(pionHypo);
-      if (!trackfit)
-        return Const::doubleNaN;
-      std::vector<double> parameters(3);
-      if (isBKLM) {
-        parameters[0] = r_BKLM + (innermostLayer - 1 + nLayers / 2) * 9.1;
-        parameters[1] = z_EFWD;
-        parameters[2] = z_EBWD;
-      } else if (isEFWD) {
-        parameters[0] = r_BKLM;
-        parameters[1] = z_EFWD + (innermostLayer - 1 + nLayers / 2) * 9.1;
-        parameters[2] = z_EBWD;
-      } else if (isEBWD) {
-        parameters[0] = r_BKLM;
-        parameters[1] = z_EFWD;
-        parameters[2] = z_EBWD + (innermostLayer - 1 + nLayers / 2) * 9.1;
-      }
-      ROOT::Math::XYZVector position = getPositionOnHelix_trackfit(trackfit, parameters);
-      if (position == vecNaN) return Const::doubleNaN;
-      double dist = sqrt(pow(position.X() - cluster_x, 2) + pow(position.Y() - cluster_y, 2) + pow(position.Z() - cluster_z, 2));
-      if (dist < min_dist) min_dist = dist;
-    }
-
-    return min_dist;
   }
 
   double klmClusterShapeStdDev1(const Particle* particle)
@@ -440,23 +432,23 @@ Returns the :math:`z` position of the associated KLMCluster.
   REGISTER_VARIABLE("klmClusterLayers", klmClusterLayers,
                     "Returns the number of KLM layers with 2-dimensional hits of the associated KLMCluster.");
   REGISTER_VARIABLE("klmClusterEnergy", klmClusterEnergy, R"DOC(
-Returns the energy of the associated KLMCluster. This variable returns an approximation of the energy: it uses `klmClusterMomentum` as momentum and the hypothesis that the KLMCluster is originated by a :math:`K_{L}^0`
+Returns the energy of the associated KLMCluster. 
 
-  (:math:`E_{\text{KLM}} = \sqrt{M_{K^0_L}^2 + p_{\text{KLM}}^2}`, where :math:`E_{\text{KLM}}` is this variable, :math:`M_{K^0_L}` is the :math:`K^0_L` mass and :math:`p_{\text{KLM}}` is `klmClusterMomentum`).
+.. warning::
+  This variable returns an approximation of the energy: it uses :b2:var:`klmClusterMomentum` as momentum and the hypothesis that the KLMCluster is originated by a :math:`K_{L}^0` 
+  (:math:`E_{\text{KLM}} = \sqrt{M_{K^0_L}^2 + p_{\text{KLM}}^2}`, where :math:`E_{\text{KLM}}` is this variable, :math:`M_{K^0_L}` is the :math:`K^0_L` mass and :math:`p_{\text{KLM}}` is :b2:var:`klmClusterMomentum`).
+  It should be used with caution, and may not be physically meaningful, especially for :math:`n` candidates.
 
 )DOC","GeV");
-  MAKE_DEPRECATED("klmClusterEnergy", true, "light-2511-gacrux", R"DOC(
-                   As this variable is deemed not physically meaningful it has been deprecated to avoid further use.
-)DOC");
   REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum, R"DOC(
-Returns the momentum magnitude of the associated KLMCluster. This variable returns an approximation of the momentum, since it is proportional to `klmClusterLayers`
+Returns the momentum magnitude of the associated KLMCluster. 
 
-  (:math:`p_{\text{KLM}} = 0.215 \cdot N_{\text{layers}}`, where :math:`p_{\text{KLM}}` is this variable and :math:`N_{\text{layers}}` is `klmClusterLayers`).
+.. warning::
+  This variable returns an approximation of the momentum, since it is proportional to :b2:var:`klmClusterLayers` 
+  (:math:`p_{\text{KLM}} = 0.215 \cdot N_{\text{layers}}`, where :math:`p_{\text{KLM}}` is this variable and :math:`N_{\text{layers}}` is :b2:var:`klmClusterLayers`).
+  It should be used with caution, and may not be physically meaningful.
 
 )DOC","GeV/c");
-  MAKE_DEPRECATED("klmClusterMomentum", true, "light-2511-gacrux", R"DOC(
-                   As this variable is deemed not physically meaningful it has been deprecated to avoid further use.
-)DOC");
   REGISTER_VARIABLE("klmClusterIsBKLM", klmClusterIsBKLM,
                     "Returns 1 if the associated KLMCluster is in barrel KLM.");
   REGISTER_VARIABLE("klmClusterIsEKLM", klmClusterIsEKLM,
@@ -486,61 +478,6 @@ Returns the number of Tracks matched to the KLMCluster associated to this Partic
   REGISTER_VARIABLE("nKLMClusterECLClusterMatches", nKLMClusterECLClusterMatches, R"DOC(
                      Returns the number of ECLClusters matched to the KLMCluster associated to this Particle.
               )DOC");
-  REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance, R"DOC(
-Returns the distance between the KLMCluster associated to this Particle and the closest track to this cluster. This variable returns NaN if there is no Track-to-KLMCluster relationship.
-
-.. warning::
-  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
-  return NaN. Please check the release version of the input mdst using
-  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
-
-)DOC","cm");
-  REGISTER_VARIABLE("klmClusterTrackRotationAngle", klmClusterTrackRotationAngle, R"DOC(
-Returns the angle between momenta of the track initially at IP and then at POCA to the KLMCluster associated to this Particle for the closest Track. This variable returns NaN if there is no Track-to-KLMCluster relationship.
-
-.. warning::
-  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
-  return NaN. Please check the release version of the input mdst using
-  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
-
-)DOC","rad");
-  REGISTER_VARIABLE("klmClusterTrackSeparationAngle", klmClusterTrackSeparationAngle, R"DOC(
-Returns the angle between the KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.
-
-.. warning::
-  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
-  return NaN. Please check the release version of the input mdst using
-  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
-
-)DOC","rad");
-
-  REGISTER_VARIABLE("klmClusterShapeStdDev1", klmClusterShapeStdDev1, R"DOC(
-Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one 2D Hit.
-
-.. warning::
-  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
-  return NaN. Please check the release version of the input mdst using
-  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
-
-)DOC","cm");
-  REGISTER_VARIABLE("klmClusterShapeStdDev2", klmClusterShapeStdDev2, R"DOC(
-Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster has all the 2D hits lying on a single straight line.
-
-.. warning::
-  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
-  return NaN. Please check the release version of the input mdst using
-  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
-
-)DOC","cm");
-  REGISTER_VARIABLE("klmClusterShapeStdDev3", klmClusterShapeStdDev3, R"DOC(
-Returns the std deviation of the 3nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster has all the 2D hits lying on a 2D plane.
-
-.. warning::
-  This variable only works on mdsts created with release-10 and onwards. For mdsts created with a previous release this variable would
-  return NaN. Please check the release version of the input mdst using
-  `b2file-metadata-show <https://software.belle2.org/development/sphinx/framework/doc/tools/02-b2file.html#b2file-metadata-show-show-the-metadata-of-a-basf2-output-file>`_ with the ``--all`` option.
-
-)DOC","cm");
   REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
                     "Returns the distance between KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
                     "cm");
@@ -551,16 +488,16 @@ Returns the std deviation of the 3nd axis from a PCA of the KLMCluster associate
                     "Returns the angle between the direction at the IP and at the POCA to the KLMCluster associated to this Particle for the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
                     "rad");
   REGISTER_VARIABLE("klmClusterTrackSeparationAngle", klmClusterTrackSeparationAngle,
-                    "Returns the angle between the KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship.\n\n",
+                    "Returns the angle between the KLMCluster associated to this Particle and the closest track. This variable returns NaN if there is no Track-to-KLMCluster relationship"
                     "rad");
 
   REGISTER_VARIABLE("klmClusterShapeStdDev1", klmClusterShapeStdDev1,
-                    "Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
+                    "Returns the std deviation of the 1st axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster."
                     "cm");
   REGISTER_VARIABLE("klmClusterShapeStdDev2", klmClusterShapeStdDev2,
-                    "Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
+                    "Returns the std deviation of the 2nd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster."
                     "cm");
   REGISTER_VARIABLE("klmClusterShapeStdDev3", klmClusterShapeStdDev3,
-                    "Returns the std deviation of the 3rd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster.\n\n",
+                    "Returns the std deviation of the 3rd axis from a PCA of the KLMCluster associated to this Particle. This variable returns 0 if this KLMCluster contains only one KLMHit2d cluster."
                     "cm");
 }

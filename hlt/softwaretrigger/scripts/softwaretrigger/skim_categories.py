@@ -29,6 +29,7 @@ Physics = [
 Calibration = [
     "skim accept bhabha all",
     "skim accept bhabha cdc",
+    "skim accept bhabha combined",
     "skim accept gamma gamma",
     "skim accept hadron",
     "skim accept mumutight",

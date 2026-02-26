@@ -1,4 +1,3 @@
-[INFO] Steering file: hlt/tests/check_hlt_path.py
 [INFO] basf2 path for beam_reco_monitor:
 [INFO] Modules and parameter settings in the path:
   1. Sum_Wait

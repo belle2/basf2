@@ -88,7 +88,7 @@ def load_data(filenames: list, selection: str = SELECTION) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def run_validation(filenames: list, output_dir: str, file_format: str = "png"):
+def run_validation(filenames: list, output_dir: str, file_format: str = "pdf"):
     """Load cosmics data and produce all validation plots.
 
     Produces the following sets of plots in ``output_dir``:

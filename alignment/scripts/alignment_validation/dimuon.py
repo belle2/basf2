@@ -228,7 +228,7 @@ def load_data(filenames: list, selection: str = SELECTION) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def run_validation(filenames: list, output_dir: str, file_format: str = "png",
+def run_validation(filenames: list, output_dir: str, file_format: str = "pdf",
                    ip_correction: str = "run_by_run"):
     """Load dimuon data and produce all validation plots.
 

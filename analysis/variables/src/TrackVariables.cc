@@ -276,6 +276,14 @@ namespace Belle2 {
       return count;
     }
 
+    double trackQualityIndicator(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return Const::doubleNaN;
+
+      return track->getQualityIndicator();
+    }
+
     // used in trackHelixExtTheta and trackHelixExtPhi
     ROOT::Math::XYZVector getPositionOnHelix(const TrackFitResult* trackFit, const std::vector<double>& pars)
     {
@@ -407,7 +415,6 @@ namespace Belle2 {
       };
       return func;
     }
-
 
     /***************************************************
      * Event level tracking quantities
@@ -925,6 +932,20 @@ always 0 or 1 with newer versions of ECL reconstruction.
               # these two are equivalent
               ma.fillParticleList("e+:unmatched", "isNAN(clusterE) == 1", path)
               ma.fillParticleList("e+:unmatched2", "trackNECLClusters == 0", path)
+
+Returns NaN if called for something other than a track-based particle.
+    )DOC");
+    REGISTER_VARIABLE("trackQualityIndicator", trackQualityIndicator, R"DOC(
+Returns the quality indicator of the track, a classification of fake vs. real track.
+A value near zero means the track has a greater chance to be fake.
+
+.. note::
+
+        During reconstruction, the probability (given a certain sample composition) of a track
+        to originate from a charged particle rather than e.g. a random combination of hits from
+        different charged particles and background contributions is estimated. This estimate
+        includes information, that isn't used for the calculation of the p-value of the fit, e.g.
+        energy-deposition, timing, and cluster-shape information. 
 
 Returns NaN if called for something other than a track-based particle.
     )DOC");

@@ -336,13 +336,13 @@ void DQMHistAnalysisTrackingAbortModule::event()
 
     //events with no signal hits in each SL after filter and outside active veto
     if (noCDCHitsInSLIn_BF != nullptr) m_monObj->setVariable(Form("noCDCHitsSL%dBeforeFilter_inActiveVeto", sl),
-                                                               noCDCHitsInSLIn_BF->GetBinContent(sl));
+                                                               noCDCHitsInSLIn_BF->GetBinContent(sl + 1));
     if (noCDCHitsInSLOut_BF != nullptr) m_monObj->setVariable(Form("noCDCHitsSL%dBeforeFilter_outActiveVeto", sl),
-                                                                noCDCHitsInSLOut_BF->GetBinContent(sl));
+                                                                noCDCHitsInSLOut_BF->GetBinContent(sl + 1));
     if (noCDCHitsInSLIn != nullptr) m_monObj->setVariable(Form("noCDCHitsSL%d_inActiveVeto", sl),
-                                                            noCDCHitsInSLIn->GetBinContent(sl));
+                                                            noCDCHitsInSLIn->GetBinContent(sl + 1));
     if (noCDCHitsInSLOut != nullptr) m_monObj->setVariable(Form("noCDCHitsSL%d_outActiveVeto", sl),
-                                                             noCDCHitsInSLOut->GetBinContent(sl));
+                                                             noCDCHitsInSLOut->GetBinContent(sl + 1));
   }
 
 

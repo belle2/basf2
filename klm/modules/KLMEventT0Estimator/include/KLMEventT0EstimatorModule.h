@@ -241,24 +241,6 @@ namespace Belle2 {
 
     /* Monitoring histograms. */
 
-    /** Number of KLM 2D hits per track. */
-    TH1I* m_hNumKLM2DPerTrack{nullptr};
-
-    /** Number of digits per BKLM RPC 1D hit. */
-    TH1I* m_hNumDigitsPerB1dRPC{nullptr};
-
-    /** Number of digits per BKLM scintillator 1D hit. */
-    TH1I* m_hNumDigitsPerB1dScint{nullptr};
-
-    /** Number of digits per EKLM scintillator 2D hit. */
-    TH1I* m_hNumDigitsPerE2dScint{nullptr};
-
-    /** ADC charge distribution for BKLM scintillator digits. */
-    TH1D* m_hDigitCharge_BKLM_Scint{nullptr};
-
-    /** ADC charge distribution for EKLM scintillator digits. */
-    TH1D* m_hDigitCharge_EKLM_Scint{nullptr};
-
     /** Per-track T0 for BKLM scintillator [ns]. */
     TH1D* m_hT0Trk_BKLM_Scint{nullptr};
 
@@ -318,42 +300,6 @@ namespace Belle2 {
 
     /** Final EventT0 source selection (7 bins). */
     TH1I* m_hFinalSource{nullptr};
-
-    /** Reconstructed time for BKLM scintillator digits [ns]. */
-    TH1D* m_hTrec_BKLM_Scint{nullptr};
-
-    /** Cable delay for BKLM scintillator digits [ns]. */
-    TH1D* m_hTcable_BKLM_Scint{nullptr};
-
-    /** Propagation time for BKLM scintillator digits [ns]. */
-    TH1D* m_hTprop_BKLM_Scint{nullptr};
-
-    /** Flight time for BKLM scintillator digits [ns]. */
-    TH1D* m_hTfly_BKLM_Scint{nullptr};
-
-    /** Reconstructed time for BKLM RPC digits [ns]. */
-    TH1D* m_hTrec_BKLM_RPC{nullptr};
-
-    /** Cable delay for BKLM RPC digits [ns]. */
-    TH1D* m_hTcable_BKLM_RPC{nullptr};
-
-    /** Propagation time for BKLM RPC digits [ns]. */
-    TH1D* m_hTprop_BKLM_RPC{nullptr};
-
-    /** Flight time for BKLM RPC digits [ns]. */
-    TH1D* m_hTfly_BKLM_RPC{nullptr};
-
-    /** Reconstructed time for EKLM scintillator digits [ns]. */
-    TH1D* m_hTrec_EKLM_Scint{nullptr};
-
-    /** Cable delay for EKLM scintillator digits [ns]. */
-    TH1D* m_hTcable_EKLM_Scint{nullptr};
-
-    /** Propagation time for EKLM scintillator digits [ns]. */
-    TH1D* m_hTprop_EKLM_Scint{nullptr};
-
-    /** Flight time for EKLM scintillator digits [ns]. */
-    TH1D* m_hTfly_EKLM_Scint{nullptr};
 
     /* Final EventT0 combinations. */
 

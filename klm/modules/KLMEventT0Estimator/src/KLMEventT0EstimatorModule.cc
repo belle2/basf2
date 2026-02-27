@@ -153,40 +153,7 @@ void KLMEventT0EstimatorModule::defineHisto()
       m_hFinalSource->GetXaxis()->SetBinLabel(7, "B+E+R");
     }
 
-    // --- diagnostics/ subdirectory ---
-    TDirectory* d_diag = d_unc->mkdir("diagnostics");
-    {
-      TDirectory::TContext ctxDiag{gDirectory, d_diag};
-
-      // Hit counting
-      m_hNumKLM2DPerTrack     = new TH1I("h_nKLM2d_pertrk",        "N KLMHit2d per track;count", 20, 0, 20);
-      m_hNumDigitsPerB1dRPC   = new TH1I("h_nDigits_perB1d_rpc",   "Number of KLMDigit per BKLMHit1d (RPC);digits",   15, 0, 15);
-      m_hNumDigitsPerB1dScint = new TH1I("h_nDigits_perB1d_scint", "Number of KLMDigit per BKLMHit1d (scint);digits", 15, 0, 15);
-      m_hNumDigitsPerE2dScint = new TH1I("h_nDigits_perE2d_scint", "Number of KLMDigit per EKLMHit2d (scint);digits", 15, 0, 15);
-
-      // Digit charge
-      m_hDigitCharge_BKLM_Scint = H1("h_digitQ_bklm_scint", "KLMDigit charge (BKLM Scint);ADC (a.u.)", 100, 0.0, 800.0);
-      m_hDigitCharge_EKLM_Scint = H1("h_digitQ_eklm_scint", "KLMDigit charge (EKLM Scint);ADC (a.u.)", 100, 0.0, 800.0);
-
-      // Per-digit timing components
-      m_hTrec_BKLM_Scint   = H1("h_Trec_bklm_scint",   "T_{rec} (BKLM Scint);time [ns]", 800, -5000, -4000);
-      m_hTcable_BKLM_Scint = H1("h_Tcable_bklm_scint", "T_{cable} (BKLM Scint);time [ns]", 800, -5000, -4000);
-      m_hTprop_BKLM_Scint  = H1("h_Tprop_bklm_scint",  "T_{prop} (BKLM Scint);time [ns]", 800, -50, 50);
-      m_hTfly_BKLM_Scint   = H1("h_Tfly_bklm_scint",   "T_{fly} (BKLM Scint);time [ns]", 800, -100, 100);
-
-      m_hTrec_BKLM_RPC     = H1("h_Trec_bklm_rpc",     "T_{rec} (BKLM RPC);time [ns]", 800, -800, -500);
-      m_hTcable_BKLM_RPC   = H1("h_Tcable_bklm_rpc",   "T_{cable} (BKLM RPC);time [ns]", 800, -800, -500);
-      m_hTprop_BKLM_RPC    = H1("h_Tprop_bklm_rpc",    "T_{prop} (BKLM RPC);time [ns]", 800, -50, 50);
-      m_hTfly_BKLM_RPC     = H1("h_Tfly_bklm_rpc",     "T_{fly} (BKLM RPC);time [ns]", 800, -100, 100);
-
-      m_hTrec_EKLM_Scint   = H1("h_Trec_eklm_scint",   "T_{rec} (EKLM Scint);time [ns]", 800, -5000, -4000);
-      m_hTcable_EKLM_Scint = H1("h_Tcable_eklm_scint", "T_{cable} (EKLM Scint);time [ns]", 800, -5000, -4000);
-      m_hTprop_EKLM_Scint  = H1("h_Tprop_eklm_scint",  "T_{prop} (EKLM Scint);time [ns]", 800, -50, 50);
-      m_hTfly_EKLM_Scint   = H1("h_Tfly_eklm_scint",   "T_{fly} (EKLM Scint);time [ns]", 800, -100, 100);
-
-    } // end diagnostics/ directory
-
-    // --- final/ subdirectory (skipping to here; pulls/residuals/cross_detector
+    // --- final/ subdirectory (pulls/residuals/cross_detector/diagnostics
     //     are handled by KLMEventT0ValidationModule in klm/validation/) ---
     // --- final/ subdirectory ---
     TDirectory* d_final = d_unc->mkdir("final");
@@ -457,9 +424,6 @@ void KLMEventT0EstimatorModule::accumulateEKLM(const RelationVector<KLMHit2d>& k
 
       ++nGoodDigits;
 
-      // Fill ADC histogram BEFORE cut
-      if (m_hDigitCharge_EKLM_Scint) m_hDigitCharge_EKLM_Scint->Fill(d.getCharge());
-
       // Apply ADC cut
       if (!passesADCCut(d.getCharge(), KLMElementNumbers::c_EKLM, d.getLayer(), false)) {
         continue;
@@ -487,13 +451,6 @@ void KLMEventT0EstimatorModule::accumulateEKLM(const RelationVector<KLMHit2d>& k
       const double Tprop = dist_mm * delayScint;
       const double Tfly = flyTime;
 
-      // Fill component histograms
-      if (m_hTrec_EKLM_Scint)   m_hTrec_EKLM_Scint->Fill(Trec);
-      if (m_hTcable_EKLM_Scint) m_hTcable_EKLM_Scint->Fill(Tcable);
-      if (m_hTprop_EKLM_Scint)  m_hTprop_EKLM_Scint->Fill(Tprop);
-      if (m_hTfly_EKLM_Scint)   m_hTfly_EKLM_Scint->Fill(Tfly);
-
-
       // Correct digit time
       double t = Trec;
       if (timeCableDelay.isValid()) t -= Tcable;
@@ -512,7 +469,6 @@ void KLMEventT0EstimatorModule::accumulateEKLM(const RelationVector<KLMHit2d>& k
 
     }
 
-    if (m_hNumDigitsPerE2dScint) m_hNumDigitsPerE2dScint->Fill(nGoodDigits);
   }
 }
 
@@ -552,9 +508,6 @@ void KLMEventT0EstimatorModule::accumulateBKLMScint(RelationVector<KLMHit2d>& kl
         if (m_channelStatus.isValid() &&
             m_channelStatus->getChannelStatus(cid) != KLMChannelStatus::c_Normal) continue;
 
-        // Fill ADC histogram BEFORE cut
-        if (m_hDigitCharge_BKLM_Scint) m_hDigitCharge_BKLM_Scint->Fill(d.getCharge());
-
         ++nGoodDigitsForThisB1d;
 
         // Apply ADC cut
@@ -585,12 +538,6 @@ void KLMEventT0EstimatorModule::accumulateBKLMScint(RelationVector<KLMHit2d>& kl
         const double Tprop = propaLen * delayScint;
         const double Tfly = flyTime;
 
-        if (m_hTrec_BKLM_Scint)   m_hTrec_BKLM_Scint->Fill(Trec);
-        if (m_hTcable_BKLM_Scint) m_hTcable_BKLM_Scint->Fill(Tcable);
-        if (m_hTprop_BKLM_Scint)  m_hTprop_BKLM_Scint->Fill(Tprop);
-        if (m_hTfly_BKLM_Scint)   m_hTfly_BKLM_Scint->Fill(Tfly);
-
-
         double t = Trec;
         if (timeCableDelay.isValid()) t -= Tcable;
         t -= Tprop;
@@ -608,7 +555,6 @@ void KLMEventT0EstimatorModule::accumulateBKLMScint(RelationVector<KLMHit2d>& kl
 
       }
 
-      if (m_hNumDigitsPerB1dScint) m_hNumDigitsPerB1dScint->Fill(nGoodDigitsForThisB1d);
     }
   }
 }
@@ -689,12 +635,6 @@ void KLMEventT0EstimatorModule::accumulateBKLMRPCFiltered(RelationVector<KLMHit2
         const double Tprop = propaDist * (isPhi ? delayPhi : delayZ);  // delay is in ns/cm
         const double Tfly = flyTime;
 
-        if (m_hTrec_BKLM_RPC)   m_hTrec_BKLM_RPC->Fill(Trec);
-        if (m_hTcable_BKLM_RPC) m_hTcable_BKLM_RPC->Fill(Tcable);
-        if (m_hTprop_BKLM_RPC)  m_hTprop_BKLM_RPC->Fill(Tprop);
-        if (m_hTfly_BKLM_RPC)   m_hTfly_BKLM_RPC->Fill(Tfly);
-
-
         double t = Trec;
         if (timeCableDelay.isValid()) t -= Tcable;
         t -= Tprop;
@@ -713,7 +653,6 @@ void KLMEventT0EstimatorModule::accumulateBKLMRPCFiltered(RelationVector<KLMHit2
 
       }
 
-      if (m_hNumDigitsPerB1dRPC) m_hNumDigitsPerB1dRPC->Fill(nGoodDigitsForThisB1d);
     }
   }
 }
@@ -779,8 +718,6 @@ void KLMEventT0EstimatorModule::event()
 
     RelationVector<KLMHit2d> hit2ds = track->getRelationsTo<KLMHit2d>();
     if (hit2ds.size() == 0) continue;
-
-    if (m_hNumKLM2DPerTrack) m_hNumKLM2DPerTrack->Fill(static_cast<int>(hit2ds.size()));
 
     // Build ExtHit maps for this track
     m_extScint.clear();

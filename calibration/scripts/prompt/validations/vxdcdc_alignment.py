@@ -29,7 +29,7 @@ matplotlib.use('Agg')
 plt.style.use("belle2")
 
 #: Tells the automated system some details of this script
-settings = ValidationSettings(name="vxdcdc_alignment",
+settings = ValidationSettings(name="Full VXD and CDC Alignment",
                               description=__doc__,
                               download_files=[],
                               expert_config=None)

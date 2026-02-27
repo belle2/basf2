@@ -17,4 +17,6 @@
 // Tracking MVAFilter payloads
 #pragma link C++ class Belle2::TrackingMVAFilterParameters+; // checksum=0xd0221a33, version=1
 
+#pragma link C++ class Belle2::WireHitFilterSettings+; // checksum=0xb2e21a93, version=1
+
 #endif

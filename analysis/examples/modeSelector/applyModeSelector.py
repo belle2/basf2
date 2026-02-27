@@ -143,6 +143,7 @@ vm.addAlias(
 
 # Create aliases for cleaner branch names in output ntuple
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
+vm.addAlias('sigProb_rank', 'extraInfo(sigProb_rank)')
 vm.addAlias('dmID', 'extraInfo(decayModeID)')
 vu.create_aliases(
     ['BplusScore_eqSigProb',

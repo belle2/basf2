@@ -12,7 +12,7 @@ Decay vpho
 Enddecay
 
 Alias MyD0 D0
-Alias MyX X_inv
+Alias MyX Xinv
 
 Decay D*+
 1.000 MyD0 pi+       VSS;

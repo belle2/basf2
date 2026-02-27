@@ -159,7 +159,7 @@ namespace Belle2 {
     /**
      * returns the quality indicator of the track, a classification of fake vs. real track.
      */
-    double trackNECLClusters(const Particle* part);
+    double trackQualityIndicator(const Particle* part);
 
     /**
      * returns the number of CDC hits in the event not assigned to any track

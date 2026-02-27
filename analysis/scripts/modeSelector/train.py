@@ -1046,6 +1046,12 @@ def main():
     print(f"Best val loss: {best_val_loss:.6f}")
     print(f"Model saved to: {os.path.join(args.output, f'net_{args.network}.pt')}")
 
+    # Update checkpoint with full history (best-epoch save only captured history up to that point)
+    model_path = os.path.join(args.output, f'net_{args.network}.pt')
+    final_ckpt = torch.load(model_path)
+    final_ckpt['history'] = history
+    torch.save(final_ckpt, model_path)
+
     # Evaluation on validation set
     if len(val_loader.dataset) == 0:
         print("\nNo validation set, skipping evaluation.")

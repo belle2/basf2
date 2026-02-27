@@ -57,6 +57,11 @@ ma.inputMdstList(
 # Prepend the analysis globaltag for accessing payloads
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
+# Apply event fraction cuts using eventRandom
+EVENT_FRACTION = 0.1
+b2.B2INFO(f"Applying event cuts: fraction={EVENT_FRACTION}")
+ma.applyEventCuts(f'eventRandom > {1 - EVENT_FRACTION}', path=my_path)
+
 # FEI list identifier
 fei_identifier = 'feiHadronic'
 
@@ -116,9 +121,25 @@ modeSelector.modeSelector(
     path=my_path
 )
 
-for b in ['B+', 'B0']:
-    # only select BCs after modeSelector!
-    ma.rankByHighest(f'{b}:{fei_identifier}', 'extraInfo(SignalProbability)', numBest=1, path=my_path)
+# only AFTER running modeSelector
+for b, b_str in zip(['B+', 'B0'], ['Bp', 'B0']):
+    # apply sigProb cut
+    ma.applyCuts(f'{b}:{fei_identifier}', 'sigProb > 0.01', path=my_path)
+    # BCS
+    ma.rankByHighest(f'{b}:{fei_identifier}', 'sigProb', numBest=1, outputVariable='sigProb_rank', path=my_path)
+    vm.addAlias(f'{b_str}SigProb_rank1', f'ifNANgiveX(getVariableByRank({b}:feiHadronic, sigProb, sigProb, 1),-1)')
+
+
+# to select rank offline
+vm.addAlias('sigProbOfBpGTB0', 'conditionalVariableSelector(BpSigProb_rank1 > B0SigProb_rank1, 1, 0)')
+vm.addAlias('sigProbOfB0GTBp', 'conditionalVariableSelector(B0SigProb_rank1 > BpSigProb_rank1, 1, 0)')
+vm.addAlias(
+    'isBestCandidate', 'conditionalVariableSelector( \
+    [[sigProbOfBpGTB0 == 1] and [abs(PDG) == 521]] or \
+    [[sigProbOfB0GTBp == 1] and [abs(PDG) == 511]], \
+    1, 0)'
+)
+
 
 # Create aliases for cleaner branch names in output ntuple
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
@@ -161,6 +182,9 @@ output_variables = [
     'Dstp_chiProb',
     'Dst0_deltaMassDiff',
     'Dst0_chiProb',
+    # ranking variables
+    'sigProb_rank',
+    'isBestCandidate',
 ]
 
 # Write output parquet tables for B+ and B0 candidates

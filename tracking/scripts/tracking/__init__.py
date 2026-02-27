@@ -272,22 +272,20 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     if mcTrackFinding:
         add_mc_track_finding(path, components=components, reco_tracks=reco_tracks,
                              use_second_cdc_hits=use_second_cdc_hits)
-        cdc_backtrack_chain, svd_backtrack_chain = [], []
     else:
-        cdc_backtrack_chain, svd_backtrack_chain = \
-            add_track_finding(path, components=components, reco_tracks=reco_tracks,
-                              prune_temporary_tracks=prune_temporary_tracks,
-                              with_cdc_cellular_automaton=with_cdc_cellular_automaton,
-                              use_second_cdc_hits=use_second_cdc_hits,
-                              svd_standalone_mode=svd_standalone_mode,
-                              use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
-                              svd_ckf_mode=svd_ckf_mode,
-                              use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
-                              add_cdcTrack_QI=add_cdcTrack_QI,
-                              add_vxdTrack_QI=add_vxdTrack_QI,
-                              pxd_filtering_offline=pxd_filtering_offline,
-                              create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
-                              inverted_tracking=inverted_tracking)
+        add_track_finding(path, components=components, reco_tracks=reco_tracks,
+                          prune_temporary_tracks=prune_temporary_tracks,
+                          with_cdc_cellular_automaton=with_cdc_cellular_automaton,
+                          use_second_cdc_hits=use_second_cdc_hits,
+                          svd_standalone_mode=svd_standalone_mode,
+                          use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
+                          svd_ckf_mode=svd_ckf_mode,
+                          use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
+                          add_cdcTrack_QI=add_cdcTrack_QI,
+                          add_vxdTrack_QI=add_vxdTrack_QI,
+                          pxd_filtering_offline=pxd_filtering_offline,
+                          create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
+                          inverted_tracking=inverted_tracking)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -551,7 +549,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
 
     # Default tracking with CDC first, followed by SVD tracking
     if not inverted_tracking:
-        latest_reco_tracks, tmp_reco_track_list, cdc_backtrack_chain, svd_backtrack_chain = \
+        latest_reco_tracks, tmp_reco_track_list = \
             add_default_cdc_svd_tracking_chain(path,
                                                components=components,
                                                svd_reco_tracks=svd_reco_tracks,
@@ -574,7 +572,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         # ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
         # One known issue is a reduced hit efficiency when using the full chain.
         # Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
-        latest_reco_tracks, tmp_reco_track_list, cdc_backtrack_chain, svd_backtrack_chain = \
+        latest_reco_tracks, tmp_reco_track_list = \
             add_inverted_svd_cdc_tracking_chain(path,
                                                 components=components,
                                                 svd_reco_tracks=svd_reco_tracks,
@@ -603,8 +601,6 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                         Temp1RecoTracksStoreArrayName=latest_reco_tracks,
                         Temp2RecoTracksStoreArrayName=ecl_reco_tracks,
                         recoTracksStoreArrayName=combined_ecl_reco_tracks)
-        cdc_backtrack_chain.append(combined_ecl_reco_tracks)
-        svd_backtrack_chain.append(combined_ecl_reco_tracks)
         temporary_reco_track_list.append(ecl_reco_tracks)
         temporary_reco_track_list.append(combined_ecl_reco_tracks)
         latest_reco_tracks = combined_ecl_reco_tracks
@@ -647,8 +643,6 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                               use_mc_truth=use_mc_truth, output_reco_tracks=reco_tracks,
                               temporary_reco_tracks=pxd_reco_tracks,
                               add_both_directions=add_both_directions)
-        cdc_backtrack_chain.append(reco_tracks)
-        svd_backtrack_chain.append(reco_tracks)
         temporary_reco_track_list.append(pxd_reco_tracks)
 
     if prune_temporary_tracks:
@@ -660,7 +654,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                     "PruneRecoTracks " +
                     temporary_reco_track_name)
 
-    return (cdc_backtrack_chain, svd_backtrack_chain)
+    return
 
 
 def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,

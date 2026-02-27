@@ -37,29 +37,29 @@ _RegisteredSkims = [
 
     # --- WG0: Systematics ---
     ("10000000", "systematics", "Random"),
-    # ("10600100", "systematics", "Systematics"), renamed to SystematicsDstar.
+    ("10600100", "systematics", "Systematics_invalid"),  # renamed to SystematicsDstar.
     ("10600300", "systematics", "SystematicsTracking"),
     ("10600400", "systematics", "Resonance"),
     ("10600500", "systematics", "SystematicsRadMuMu"),
     ("10600600", "systematics", "SystematicsEELL"),
     ("10600700", "systematics", "SystematicsRadEE"),
-    ("10620200", "systematics", "SystematicsLambda"),
-    ("11640100", "systematics", "SystematicsPhiGamma"),
     ("10600800", "systematics", "SystematicsFourLeptonFromHLTFlag"),
     ("10600900", "systematics", "SystematicsRadMuMuFromHLTFlag"),
-    ("10611000", "systematics", "SystematicsJpsi"),
-    ("10611100", "systematics", "SystematicsKshort"),
     ("10601200", "systematics", "SystematicsBhabha"),
     ("10601300", "systematics", "SystematicsCombinedHadronic"),
-    ("10601401", "systematics", "SystematicsCombinedLowMulti"),
     ("10601400", "systematics", "SystematicsCombinedLowMulti_invalid"),  # Previous version of 10601401 w/o SystematicPhiGamma
+    ("10601401", "systematics", "SystematicsCombinedLowMulti"),
     ("10601500", "systematics", "SystematicsDstar"),
+    ("10611000", "systematics", "SystematicsJpsi"),
+    ("10611100", "systematics", "SystematicsKshort"),
+    ("10620200", "systematics", "SystematicsLambda"),
+    ("11640100", "systematics", "SystematicsPhiGamma"),
 
     # --- WG1: SL + missing energy ---
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),
     ("11130300", "leptonic", "LeptonicUntagged"),
+    ("11130301", "leptonic", "dilepton_invalid"),  # transferred to TDCPV WG skim file. New skim code: 13130300
     ("11160200", "semileptonic", "SLUntagged"),
-    # ("11130301", "leptonic", "dilepton"), transferred to TDCPV WG skim file. New skim code: 13130300
     ("11160201", "semileptonic", "B0toDstarl_Kpi_Kpipi0_Kpipipi"),
     ("11170100", "semileptonic", "BtoDl_and_ROE_e_or_mu_or_lowmult"),
     ("11180100", "fei", "feiHadronicB0"),
@@ -72,24 +72,26 @@ _RegisteredSkims = [
     ("11180600", "fei", "feiSL"),
 
     # --- WG2: Electroweak penguins ---
-    ("12160100", "ewp", "BtoXgamma"),
-    ("12160200", "ewp", "BtoXll"),
-    ("12160300", "ewp", "BtoXll_LFV"),
     ("12120400", "ewp", "B0TwoBody"),
     ("12120500", "ewp", "FourLepton"),
     ("12120600", "ewp", "RadiativeDilepton"),
-    # ("12160400", "ewp", "inclusiveBplusToKplusNuNu"), # deprecated skim
+    ("12160100", "ewp", "BtoXgamma"),
+    ("12160200", "ewp", "BtoXll"),
+    ("12160300", "ewp", "BtoXll_LFV"),
+    ("12160400", "ewp", "inclusiveBplusToKplusNuNu_invalid"),  # deprecated skim
 
     # --- WG3: Time-dependent CP violation ---
+    ("13110100", "tdcpv", "TDCPV_inclusiveJpsi"),
+    ("13130300", "tdcpv", "TDCPV_dilepton"),
     ("13160200", "tdcpv", "TDCPV_ccs"),
     ("13160300", "tdcpv", "TDCPV_qqs"),
-    ("13130300", "tdcpv", "TDCPV_dilepton"),
-
+    ("13160400", "tdcpv", "TDCPV_klong"),
 
     # --- WG4: Charmed B decays ---
     ("14120300", "btocharm", "BtoD0h_Kspi0"),
     ("14120400", "btocharm", "BtoD0h_Kspipipi0"),
-    # B0 -> D-(k+ ""- pi-)pi+ # ("14140500", "", "BtoD0h_Kspi0pi0"),
+    # B0 -> D-(k+ ""- pi-)pi+
+    ("14140500", "btocharm", "BtoD0h_Kspi0pi0_invalid"),  # deprecated
     # Add when skim script is ready
     ("14161400", "btocharm", "BtoDstarpipipi0_D0pi_Kpi"),
     ("14120600", "btocharm", "B0toDpi_Kpipi"),
@@ -122,18 +124,25 @@ _RegisteredSkims = [
     ("14141701", "btocharm", "B0toDomegapi_Kpipi_pipipi0"),
     ("14141702", "btocharm", "B0toDomegapi_Kspi_pipipi0"),
     ("14141703", "btocharm", "BtoD0pi_Kpiomega_pipipi0"),
+    ("14141805", "btocharm", "antiB0toDstar0pipi_Kpi"),
+    ("14121401", "btocharm", "BtoDstpipi_D0pi_Kpi"),
+    ("14121402", "btocharm", "BtoDpipi_Kpipi"),
+    ("14121403", "btocharm", "BtoDsDsst_Kpi_KK"),
+    ("14123300", "btocharm", "antiB0toDpipi0_Kpipi"),
+    ("14163400", "btocharm", "antiB0toDsDsst_Kpi0"),
+    ("14121404", "btocharm", "antiB0toDstpipi0_Kpi"),
 
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),
     ("15420100", "quarkonium", "BottomoniumEtabExclusive"),
     ("15440100", "quarkonium", "BottomoniumUpsilon"),
     ("15460400", "quarkonium", "InclusiveUpsilon"),
-    # ("16460100", "quarkonium", "ISRpipicc"), Subset of 16460200, deleted.
+    ("15460600", "quarkonium", "InclusiveUpsilonLoose"),
+    ("16460100", "quarkonium", "ISRpipicc_invalid"),  # Subset of 16460200, deleted.
     ("16460200", "quarkonium", "CharmoniumPsi"),
 
     # --- WG7: Charm physics ---
     ("17230100", "charm", "XToD0_D0ToHpJm"),  # D0 -> K pi/pi pi/K K
-    # D0 -> pi0 pi0/Ks pi0/Ks Ks # ("17230100", "", "D0ToHpJm"),
     # D0 -> K pi/pi pi/K K
     ("17230200", "charm", "XToD0_D0ToNeutrals"),
     ("17230300", "charm", "DstToD0Pi_D0ToRare"),  # D0 -> g g/e e/mu mu
@@ -172,40 +181,49 @@ _RegisteredSkims = [
     ("17260100", "charm", "DpToHpOmega"),  # D+ -> K/pi+ omega / omega -> pi+ pi- pi0
     ("17260200", "charm", "DspToHpOmega"),  # D_s+ -> K/pi+ omega / omega -> pi+ pi- pi0
     ("17241300", "charm", "DpToEtaHp"),  # D+ -> eta h+
-
+    ("17241400", "charm", "LambdacToGeneric"),  # Lambda_c+ -> X
 
     # --- WG8: Dark matter searches and tau physics ---
+    ("18000000", "dark", "InelasticDarkMatter"),
+    ("18000001", "dark", "RadBhabhaV0Control"),
     ("18020100", "dark", "SinglePhotonDark"),
     ("18020200", "dark", "GammaGammaControlKLMDark"),
     ("18020300", "dark", "ALP3Gamma"),
     ("18020400", "dark", "EGammaControlDark"),
-    ("18000000", "dark", "InelasticDarkMatter"),
-    ("18000001", "dark", "RadBhabhaV0Control"),
+    ("18020500", "dark", "InelasticDarkMatterWithDarkHiggs"),
+    ("18020600", "dark", "DimuonPlusVisibleDarkHiggs"),
+    ("18020700", "dark", "DielectronPlusVisibleDarkHiggs"),
+    ("18020800", "dark", "BtoK_ALP2Gamma"),
+    ("18020900", "dark", "TopologicalDarkPion"),
+    ("18022400", "dark", "DimuonRecoilMassSquared"),
+    ("18022500", "dark", "DarkShower"),
+    ("18130100", "dark", "BtoKplusLLP"),
     ("18360100", "taupair", "TauLFV"),
+    ("18370100", "dark", "AA2uuuu"),
     ("18520100", "dark", "DimuonPlusMissingEnergy"),
     ("18520200", "dark", "ElectronMuonPlusMissingEnergy"),
     ("18520300", "dark", "DielectronPlusMissingEnergy"),
     ("18520400", "dark", "LFVZpVisible"),
-    ("18130100", "dark", "BtoKplusLLP"),
+    ("18520500", "lowMulti", "LowMassTwoTrack"),
+    ("18530100", "lowMulti", "TwoTrackLeptonsForLuminosity"),
+    ("18530200", "lowMulti", "SingleTagPseudoScalar"),
+    ("18530600", "lowMulti", "LowMassOneTrack"),
     ("18570600", "taupair", "TauGeneric"),
     ("18570700", "taupair", "TauThrust"),
     ("18570800", "taupair", "TauKshort"),
-    ("18530100", "lowMulti", "TwoTrackLeptonsForLuminosity"),
-    ("18520500", "lowMulti", "LowMassTwoTrack"),
-    ("18530200", "lowMulti", "SingleTagPseudoScalar"),
-    ("18020500", "dark", "InelasticDarkMatterWithDarkHiggs"),
-    ("18370100", "dark", "AA2uuuu"),
-    ("18020600", "dark", "DimuonPlusVisibleDarkHiggs"),
-    ("18020700", "dark", "DielectronPlusVisibleDarkHiggs"),
-    ("18530600", "lowMulti", "LowMassOneTrack"),
+    ("18570900", "taupair", "TauToMuMuMu"),
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),
-    ("19130600", "btocharmless", "BtoPi0Eta"),
+    ("19120400", "btocharmless", "BtoRhopRhom"),
     ("19130201", "btocharmless", "BtoHadTracks"),
     ("19130300", "btocharmless", "BtoHad1Pi0"),
     ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),
-    ("19120400", "btocharmless", "BtoRhopRhom"),
+    ("19130600", "btocharmless", "BtoPi0Eta"),
+    ("19140100", "btocharmless", "BtoEtaRhop"),
+    ("19140200", "btocharmless", "BtoEtapRhop"),
+    ("19140300", "btocharmless", "BtoEtaOmega"),
+    ("19140400", "btocharmless", "BtoEtapOmega"),
     ("19140500", "btocharmless", "BtoEtapKstp"),
 ]
 """

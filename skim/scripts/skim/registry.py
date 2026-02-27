@@ -68,8 +68,8 @@ _RegisteredSkims = [
     ("10611100", "systematics", "SystematicsKshort"),
     ("10601200", "systematics", "SystematicsBhabha"),
     ("10601300", "systematics", "SystematicsCombinedHadronic"),
-    ("10601401", "systematics", "SystematicsCombinedLowMulti"),  # Added the SystematicsPhiGamma skim
-    #    ("10601400", "systematics", "SystematicsCombinedLowMulti"),
+    ("10601401", "systematics", "SystematicsCombinedLowMulti"),
+    ("10601400", "systematics", "SystematicsCombinedLowMulti_invalid"),  # Previous version of 10601401 w/o SystematicPhiGamma
     ("10601500", "systematics", "SystematicsDstar"),
 
     # --- WG1: SL + missing energy ---

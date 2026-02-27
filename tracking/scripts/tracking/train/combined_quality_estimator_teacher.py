@@ -172,6 +172,7 @@ import simulation
 import tracking
 import tracking.root_utils as root_utils
 from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
+from tracking_mva_filter_payloads.write_tracking_mva_filter_payloads_to_db import write_tracking_mva_filter_payloads_to_db
 
 # @cond internal_test
 
@@ -623,9 +624,7 @@ class SplitNMergeSimTask(Basf2Task):
         """
         create_output_dirs(self)
 
-        file_list = []
-        for _, file_name in self.get_input_file_names().items():
-            file_list.append(*file_name)
+        file_list = list(self.get_all_input_file_names())
         print("Merge the following files:")
         print(file_list)
         cmd = ["b2file-merge", "-f"]
@@ -897,7 +896,7 @@ class CDCQEDataCollectionTask(Basf2PathTask):
             filter_choice = "recording"
             # tracking.add_hit_preparation_modules(path)  # only needed for SVD and
             # PXD hit preparation. Does not change the CDC output.
-        tracking.add_cdc_track_finding(path, with_cdc_cellular_automaton=False, add_mva_quality_indicator=True)
+        tracking.add_cdc_track_finding(path, add_mva_quality_indicator=True)
 
         basf2.set_module_parameters(
             path,
@@ -960,7 +959,12 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
         if random_seed is None:
             random_seed = self.random_seed
         if recotrack_option is None:
-            recotrack_option = self.recotrack_option
+            if isinstance(self.recotrack_option, str):
+                recotrack_option = self.recotrack_option
+            else:
+                recotrack_option = self.recotrack_option._default
+        if not isinstance(recotrack_option, str):
+            recotrack_option = recotrack_option._default
         if 'rec' not in random_seed:
             random_seed += '_rec'
         if 'DATA' in random_seed:
@@ -1064,6 +1068,7 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
             add_unpackers(path)
         tracking.add_tracking_reconstruction(path, add_cdcTrack_QI=mvaCDC, add_vxdTrack_QI=mvaVXD, add_recoTrack_QI=True)
 
+        cdc_identifier = ""
         # if data shall be processed check if newly trained mva files are available. Otherwise use default ones (CDB payloads):
         # if useCDC/VXD is specified, use the identifier lying in datafiles/ Otherwise, replace weightfile identifiers from defaults
         # (CDB payloads) to new weightfiles created by this b2luigi script
@@ -1103,6 +1108,7 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
         cdc_qe_mva_filter_parameters = None
         # if tracks below a certain CDC QI index shall be deleted online, this needs to be specified in the filter parameters.
         # this is also possible in case of the default (CBD) payloads.
+        cut = 0
         if 'deleteCDCQI' in self.recotrack_option:
             cut_index = self.recotrack_option.find('deleteCDCQI') + len('deleteCDCQI')
             cut = int(self.recotrack_option[cut_index:cut_index+3])/100.
@@ -1115,6 +1121,17 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
         elif replace_cdc_qi:
             cdc_qe_mva_filter_parameters = {
                 "identifier": cdc_identifier}
+        # change weightfile of quality estimator to the one produced by this training script
+        basf2.conditions.prepend_testing_payloads("localdb/database.txt")
+
+        if cdc_qe_mva_filter_parameters is not None and cdc_identifier is not None:
+            name = 'TrackingMVAFilterParameters'
+            write_tracking_mva_filter_payloads_to_db(
+                dbobj_name=name,
+                iovList=(0, 0, 0, -1),
+                weightfile_identifier=cdc_identifier,
+                cut_value=cut)
+            cdc_qe_mva_filter_parameters = {'DBPayloadName': name}
         if cdc_qe_mva_filter_parameters is not None:
             # if no cut is specified, the default value is at zero and nothing is deleted.
             basf2.set_module_parameters(
@@ -1132,13 +1149,12 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
 
         # Replace final quality estimator module by training data collector module
         track_qe_module_name = "TrackQualityEstimatorMVA"
-        module_found = False
+        mc_track_matcher_module_name = "MCRecoTracksMatcher"
+        mc_matcher_module_found = False
+        qe_module_found = False
         new_path = basf2.create_path()
         for module in path.modules():
-            if module.name() != track_qe_module_name:
-                if not module.name == 'TrackCreator':
-                    new_path.add_module(module)
-            else:
+            if module.name() == track_qe_module_name:
                 # the TrackCreator needs to be conducted before the Collector such that
                 # MDSTTracks are related to RecoTracks and d0 and z0 can be read out
                 new_path.add_module(
@@ -1149,25 +1165,22 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
                         2212],
                     recoTrackColName='RecoTracks',
                     trackColName='MDSTTracks')  # , useClosestHitToIP=True, useBFieldAtHit=True)
+                qe_module_found = True
+            elif module.name() == mc_track_matcher_module_name:
+                new_path.add_module(module)
+                # move TrackQETrainingDataCollector module after the MCRecoTracksMatcher module
                 new_path.add_module(
                     "TrackQETrainingDataCollector",
-                    TrainingDataOutputName=self.get_output_file_name(
-                        self.get_records_file_name()),
-                    collectEventFeatures=True,
-                    cdcRecoTracksStoreArrayBacktrackChain=[
-                        "CDCRecoTracks",
-                        "SVDPlusCDCStandaloneRecoTracks",
-                        "SVDCDCRecoTracks",
-                        "RecoTracks"],
-                    svdRecoTracksStoreArrayBacktrackChain=[
-                        "SVDRecoTracks",
-                        "SVDPlusCDCStandaloneRecoTracks",
-                        "SVDCDCRecoTracks",
-                        "RecoTracks"],
-                 )
-                module_found = True
-        if not module_found:
+                    TrainingDataOutputName=self.get_output_file_name(self.get_records_file_name()),
+                    collectEventFeatures=True
+                )
+                mc_matcher_module_found = True
+            else:
+                new_path.add_module(module)
+        if not qe_module_found:
             raise KeyError(f"No module {track_qe_module_name} found in path")
+        if not mc_matcher_module_found:
+            raise KeyError(f"No module {mc_matcher_module_found} found in path")
         path = new_path
         return path
 
@@ -1233,14 +1246,17 @@ class TrackQETeacherBaseTask(Basf2Task):
         if fast_bdt_option is None:
             fast_bdt_option = self.fast_bdt_option
         if recotrack_option is None and hasattr(self, 'recotrack_option'):
-            recotrack_option = self.recotrack_option
+            if isinstance(self.recotrack_option, str):
+                recotrack_option = self.recotrack_option
+            else:
+                recotrack_option = self.recotrack_option._default
         else:
             recotrack_option = ''
         weightfile_details = create_fbdt_option_string(fast_bdt_option)
         weightfile_name = self.weightfile_identifier_basename + weightfile_details
         if recotrack_option != '':
             weightfile_name = weightfile_name + '_' + recotrack_option
-        return weightfile_name + ".weights.xml"
+        return weightfile_name + "_weights.xml"
 
     @property
     def tree_name(self):
@@ -1643,18 +1659,31 @@ class CDCQEHarvestingValidationTask(HarvestingValidationBaseTask):
             add_mva_quality_indicator=True,
         )
         # change weightfile of quality estimator to the one produced by this training script
+        basf2.conditions.prepend_testing_payloads("localdb/database.txt")
         cdc_qe_mva_filter_parameters = {
             "identifier": self.get_input_file_names(
                 CDCQETeacherTask.get_weightfile_xml_identifier(
                     CDCQETeacherTask,
                     fast_bdt_option=self.fast_bdt_option))[0]}
+
+        # fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
+        name = 'TrackingMVAFilterParameters'
+        write_tracking_mva_filter_payloads_to_db(
+            dbobj_name=name,
+            iovList=(0, 0, 0, -1),
+            weightfile_identifier=self.get_input_file_names(
+                    CDCQETeacherTask.get_weightfile_xml_identifier(
+                        CDCQETeacherTask,
+                        fast_bdt_option=self.fast_bdt_option))[0],
+            cut_value=0)
+        cdc_qe_mva_filter_parameters = {'DBPayloadName': name}  # 'identifier': 'trackfindingcdc_TrackQualityIndicator',
         basf2.set_module_parameters(
             path,
             name="TFCDC_TrackQualityEstimator",
             filterParameters=cdc_qe_mva_filter_parameters,
         )
-        tracking.add_mc_matcher(path, components=["CDC"])
         tracking.add_track_fit_and_track_creator(path, components=["CDC"])
+        tracking.add_mc_matcher(path, components=["CDC"])
 
 
 class RecoTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
@@ -1732,11 +1761,24 @@ class RecoTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
 
         # Replace the weightfiles of all quality estimator modules by those
         # produced in the training by b2luigi
+        basf2.conditions.prepend_testing_payloads("localdb/database.txt")
         cdc_qe_mva_filter_parameters = {
             "identifier": self.get_input_file_names(
                 CDCQETeacherTask.get_weightfile_xml_identifier(
                     CDCQETeacherTask,
                     fast_bdt_option=self.fast_bdt_option))[0]}
+
+        # fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
+        name = 'TrackingMVAFilterParameters'
+        write_tracking_mva_filter_payloads_to_db(
+            dbobj_name=name,
+            iovList=(0, 0, 0, -1),
+            weightfile_identifier=self.get_input_file_names(
+                    CDCQETeacherTask.get_weightfile_xml_identifier(
+                        CDCQETeacherTask,
+                        fast_bdt_option=self.fast_bdt_option))[0],
+            cut_value=0)
+        cdc_qe_mva_filter_parameters = {'DBPayloadName': name}
         basf2.set_module_parameters(
             path,
             name="TFCDC_TrackQualityEstimator",
@@ -1901,8 +1943,26 @@ class TrackQEEvaluationBaseTask(Task):
                 self.data_collection_task.get_records_file_name(
                     self.data_collection_task,
                     n_events=self.n_events_testing,
-                    random_seed=self.process + '_test_' +
+                    random_seed=self.process_type + '_test_' +
                     self.task_acronym))[0]
+        teacher_task = None
+        for req in b2luigi.task.flatten(self.requires()):
+            if isinstance(req, self.teacher_task):
+                teacher_task = req
+                break
+        if hasattr(teacher_task, 'recotrack_option'):
+            records_files = teacher_task.get_input_file_names(
+                self.data_collection_task.get_records_file_name(
+                    self.data_collection_task,
+                    n_events=self.n_events_training,
+                    random_seed=self.process_type + '_' + teacher_task.random_seed,
+                    recotrack_option=teacher_task.recotrack_option))
+        else:
+            records_files = teacher_task.get_input_file_names(
+                self.data_collection_task.get_records_file_name(
+                    self.data_collection_task,
+                    n_events=self.n_events_training,
+                    random_seed=self.process_type + '_' + teacher_task.random_seed))
         cmd = [
             "basf2_mva_evaluate.py",
             "--identifiers",
@@ -1910,6 +1970,8 @@ class TrackQEEvaluationBaseTask(Task):
                 self.teacher_task.get_weightfile_xml_identifier(
                     self.teacher_task,
                     fast_bdt_option=self.fast_bdt_option))[0],
+            "--train_datafiles",
+            records_files[0],
             "--datafiles",
             datafiles,
             "--treename",
@@ -1937,13 +1999,7 @@ class TrackQEEvaluationBaseTask(Task):
             os.remove(stderr_log_file_path)
 
         # Run evaluation via subprocess and write output into logfiles
-        with open(stdout_log_file_path, "a") as stdout_file:
-            with open(stderr_log_file_path, "a") as stderr_file:
-                try:
-                    subprocess.run(cmd, check=True, stdin=stdout_file, stderr=stderr_file)
-                except subprocess.CalledProcessError as err:
-                    stderr_file.write(f"Evaluation failed with error:\n{err}")
-                    raise err
+        subprocess.run(cmd, check=True)
 
 
 class VXDTrackQEEvaluationTask(TrackQEEvaluationBaseTask):
@@ -2675,7 +2731,10 @@ class MasterTask(b2luigi.WrapperTask):
         'smoothedChi2_median',
         'smoothedChi2_n_zeros',
         'smoothedChi2_firstCDCHit',
-        'smoothedChi2_lastSVDHit']
+        'smoothedChi2_lastSVDHit',
+        'SVD_QI'] + \
+        ["SVD_" + x for x in exclude_variables_vxd] + \
+        ["SVDbefore_" + x for x in exclude_variables_vxd]
 
     def requires(self):
         """
@@ -2714,7 +2773,7 @@ class MasterTask(b2luigi.WrapperTask):
                         n_events=self.n_events_testing,
                         experiment_number=experiment_number,
                         random_seed=self.process_type + '_test',
-                        recotrack_option='useCDC_noVXD_deleteCDCQI'+cut,
+                        recotrack_option='useCDC_useVXD_deleteCDCQI'+cut,
                         cdc_training_target=cdc_training_target,
                         fast_bdt_option=fast_bdt_option,
                     )

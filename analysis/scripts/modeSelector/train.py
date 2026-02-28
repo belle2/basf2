@@ -336,7 +336,7 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
 class MultiClassNet(nn.Module):
     """Multi-class classification network with fully connected layers.
 
-    Architecture matches the offline training network:
+    Architecture:
     - 256 -> 128 (dropout 0.2) -> 64 (dropout 0.15) -> 32 (dropout 0.1) -> 16 -> num_labels
     - ReLU activation
     - Xavier initialization (gain=0.5, bias=0.01)
@@ -720,7 +720,7 @@ def build_category_labels(bp_truth, b0_truth, mc_var_names):
     n_events = len(bp_truth)
 
     # Get column indices
-    pdg_idx = mc_var_names.index('PDG')
+    tag_pdg_idx = mc_var_names.index('mostcommonBTagPDG')
     sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
     is_cont_idx = mc_var_names.index('isContinuumEvent')
 
@@ -736,10 +736,21 @@ def build_category_labels(bp_truth, b0_truth, mc_var_names):
     labels = np.zeros(n_events, dtype=np.int64)
     labels[is_cont] = 2  # continuum
 
-    # For BB events, determine B0 vs B+
+    # For BB events, use mostcommonBTagPDG to determine true MC event type (B0 vs B+).
     bb_mask = ~is_cont
-    best_pdg = np.where(bp_is_best, bp_truth[:, pdg_idx], b0_truth[:, pdg_idx])
-    is_charged = np.abs(best_pdg) == 521
+    best_tag_pdg = np.where(bp_is_best, bp_truth[:, tag_pdg_idx], b0_truth[:, tag_pdg_idx])
+
+    valid_tag_pdg = {511, -511, 521, -521}
+    bb_tag_pdg = best_tag_pdg[bb_mask]
+    invalid = ~np.isin(bb_tag_pdg, list(valid_tag_pdg))
+    if invalid.any():
+        bad_vals = np.unique(bb_tag_pdg[invalid])
+        raise ValueError(
+            "mostcommonBTagPDG has unexpected values for non-continuum events: "
+            + str(bad_vals)
+        )
+
+    is_charged = np.abs(best_tag_pdg) == 521
 
     labels[bb_mask & is_charged] = 1  # B+
     labels[bb_mask & ~is_charged] = 0  # B0
@@ -988,7 +999,7 @@ def main():
     print(f"  Num labels: {num_labels}")
     print(f"  Parameters: {sum(p.numel() for p in model.parameters()):,}")
 
-    # Loss and optimizer (matching offline training)
+    # Loss and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(

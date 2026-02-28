@@ -211,7 +211,6 @@ class ModeSelectorModule(b2.Module):
         feature_matrix = np.zeros((n_blocks, self.n_input_ids), dtype=np.float32)
 
         # Deduplicate by input_id: keep candidate with highest sigProb
-        # (matches offline preprocessing behavior)
         best_by_input_id = {}
         for input_id, features in candidates_data:
             if input_id < 0 or input_id >= self.n_input_ids:
@@ -237,7 +236,7 @@ class ModeSelectorModule(b2.Module):
             event_features.get(name, 0.0) for name in self.event_features
         ]
 
-        # Add ncandidates / 10 (all candidates before deduplication, matching offline)
+        # Add ncandidates / 10 (all candidates before deduplication)
         n_candidates = len(candidates_data)
         event_feat_values.append(n_candidates / 10.0)
 
@@ -326,7 +325,7 @@ class ModeSelectorModule(b2.Module):
         return truth
 
     def _print_debug_info(self, candidates_data, event_features, all_features, max_input_id):
-        """Print debug information for comparing with offline preprocessing."""
+        """Print debug information for preprocessing."""
         # Get event identification
         event_meta = Belle2.PyStoreObj('EventMetaData')
         if event_meta.isValid():

@@ -1,6 +1,6 @@
-# EventType: 2812450000
-# Descriptor: [e+ e- -> J/psi [-> mu+ mu-] X->[D*+ D*-]->[D0 pi+]->[D0->K- pi+]]
-# NickName: ee_Jpsi_DstDst_mumu_D02Kpi
+# EventType: 2812552000
+# Descriptor: [e+ e- -> J/psi [-> mu+ mu-] X->[D*+ D*-]->[D0 pi+]->[D0->K+ pi- pi0]]
+# NickName: ee_Jpsi_DstDst_ee_D02Kpipi0
 # Documentation: Double charmonium production.
 # Tested:Yes 
 # PhysicsWG: Quarkonium
@@ -22,7 +22,7 @@ ChargeConj myD0 myantiD0
 
 
 Decay vpho
-1.00  Myjpsi  X4160    PHSP;
+1.00  Myjpsi X4160    PHSP;
 Enddecay
 
 Decay X4160
@@ -31,7 +31,7 @@ Decay X4160
 Enddecay
 
 Decay Myjpsi
-1.00   mu+ mu-            PHOTOS VLL;
+1.00   e+ e-            PHOTOS VLL;
 Enddecay
 
 Decay myD*+
@@ -40,9 +40,13 @@ Enddecay
 CDecay myD*-
 
 Decay myD0
-1.00    K-    pi+         PHSP;
+1.00    pi+  K-   pi0      D_DALITZ;
 Enddecay
 CDecay myantiD0
+
+Decay pi0
+1.00   gamma  gamma      PHSP;
+Enddecay
 
 End
 

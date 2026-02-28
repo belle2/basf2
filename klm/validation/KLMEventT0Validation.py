@@ -44,26 +44,25 @@ Histograms produced (directory structure):
     h_digitQ_{bklm_scint,eklm_scint}
     h_sample_type
     h_T{rec,cable,prop,fly}_{bklm_scint,bklm_rpc,eklm_scint}
+    h_dimuon_{all,bklm_scint,bklm_rpc,eklm_scint,scint_only,with_rpc,with_rpc_dir}
+    h_per_track_resolution  -- σ(ΔT0)/√2, 6 categories (filled in terminate)
 
   pulls/
     h_pull_{bklm_scint,eklm_scint,rpc_phi,rpc_z,bklm_rpc}
     h_pull_{B_vs_E,B_vs_R,E_vs_R}
     h_pull_summary_{mean,width}
-    sector/bklm_scint/  -- 8x8 pairwise pull histograms
-    sector/eklm_scint_fwd_vs_bwd/ -- 4x4 pairwise
-    sector/rpc_phi/     -- 8x8 pairwise
-    sector/rpc_z/       -- 8x8 pairwise
-    (+ 2D summary TH2D for each sector group)
+    sector/
+      h2_pull_{bklm_scint,eklm_fwd_bwd,rpc_phi,rpc_z}_{mean,sigma}  -- 2D summary TH2D
+      bklm_scint/  -- 8x8 pairwise pull histograms
+      eklm_scint_fwd_vs_bwd/ -- 4x4 pairwise
+      rpc_phi/     -- 8x8 pairwise
+      rpc_z/       -- 8x8 pairwise
 
   residuals/            -- same structure as pulls but unnormalized (ns)
 
   cross_detector/
     h_deltaT0_<RegA>_vs_<RegB>  -- 4x4 matrix (4 detector regions)
     h2_deltaT0_{mean,sigma,entries}
-
-  dimuon/
-    h_dimuon_{all,bklm_scint,bklm_rpc,eklm_scint,scint_only,with_rpc,with_rpc_dir}
-    h_per_track_resolution  -- σ(ΔT0)/√2, 6 categories (filled in terminate)
 
   final/
     h_t0evt_final_{scint_only,with_rpc,with_rpc_dir}
@@ -77,6 +76,7 @@ Usage
   ))
 """
 
+import ctypes
 import math
 
 import basf2
@@ -84,6 +84,10 @@ import ROOT
 from ROOT import Belle2, TFile, TH1D, TH1I, TH2D, gROOT, TF1
 
 gROOT.SetBatch(True)
+ROOT.gSystem.Load('libklm')
+ROOT.gInterpreter.Declare('#include "klm/bklm/geometry/GeometryPar.h"')
+ROOT.gInterpreter.Declare('#include "klm/eklm/geometry/GeometryData.h"')
+ROOT.gInterpreter.Declare('#include "klm/eklm/geometry/TransformData.h"')
 
 # ---------------------------------------------------------------------------
 # Constants mirroring the C++ module
@@ -258,13 +262,13 @@ class KLMEventT0ValidationModule(basf2.Module):
 
         # Register DB dependencies
         self._db_cable_delay = Belle2.PyDBObj(
-            'KLMTimeCableDelay', Belle2.KLMTimeCableDelay)
+            'KLMTimeCableDelay', Belle2.KLMTimeCableDelay.Class())
         self._db_channel_status = Belle2.PyDBObj(
-            'KLMChannelStatus', Belle2.KLMChannelStatus)
+            'KLMChannelStatus', Belle2.KLMChannelStatus.Class())
 
     def beginRun(self):
         """Cache run-dependent DB constants from KLMTimeConstants payload."""
-        tc = Belle2.PyDBObj('KLMTimeConstants', Belle2.KLMTimeConstants)
+        tc = Belle2.PyDBObj('KLMTimeConstants', Belle2.KLMTimeConstants.Class())
         if tc.isValid():
             obj = tc.obj()
             self._delay_eklm = obj.getDelay(Belle2.KLMTimeConstants.c_EKLM)
@@ -358,8 +362,8 @@ class KLMEventT0ValidationModule(basf2.Module):
             h[f'Tfly_{key}'] = H1(f'h_Tfly_{key.lower()}',
                                   f'T_{{fly}} ({label});time [ns]', 800, -100, 100)
 
-        # --- dimuon/ ---
-        f.mkdir('dimuon').cd()
+        # --- dimuon (inside diagnostics/, matching C++ module layout) ---
+        self._safe_cd(f, 'diagnostics')
         h['dimuon_all'] = H1('h_dimuon_all',
                              'Dimuon #DeltaT_{0} (all KLM);T_{0}(#mu^{+})-T_{0}(#mu^{-}) [ns]',
                              400, -50, 50)
@@ -410,43 +414,44 @@ class KLMEventT0ValidationModule(basf2.Module):
             h['pull_smean'].GetXaxis().SetBinLabel(ib, lab)
             h['pull_swidth'].GetXaxis().SetBinLabel(ib, lab)
 
-        # Pairwise sector pull histograms
+        # Pairwise sector pull histograms (each in its own subdirectory)
         h['ppw_B'] = self._book_pairwise(
             f, 'pulls/sector/bklm_scint', 'h_pull_B_s{i}_vs_s{j}',
             'BKLM Scint Pull: Sec {i} vs Sec {j};pull',
             _N_BKLM_SECTORS, 200, -10, 10)
+        h['ppw_E'] = self._book_pairwise(
+            f, 'pulls/sector/eklm_scint_fwd_vs_bwd',
+            'h_pull_E_fwd{i}_vs_bwd{j}',
+            'EKLM Pull: Fwd Sec {i} vs Bwd Sec {j};pull',
+            _N_EKLM_SECTORS, 200, -10, 10, offset=1)
+        h['ppw_Rphi'] = self._book_pairwise(
+            f, 'pulls/sector/rpc_phi', 'h_pull_Rphi_s{i}_vs_s{j}',
+            'RPC Phi Pull: Sec {i} vs Sec {j};pull',
+            _N_BKLM_SECTORS, 200, -10, 10)
+
+        h['ppw_Rz'] = self._book_pairwise(
+            f, 'pulls/sector/rpc_z', 'h_pull_Rz_s{i}_vs_s{j}',
+            'RPC Z Pull: Sec {i} vs Sec {j};pull',
+            _N_BKLM_SECTORS, 200, -10, 10)
+
+        # 2D summary histograms live in pulls/sector/ (matching C++ layout)
+        self._safe_cd(f, 'pulls/sector')
         h['ppw_2d_B_mean'] = self._book_2d_summary(
             'h2_pull_bklm_scint_mean', 'Pull Mean (BKLM Scint);Sec 1;Sec 2',
             _N_BKLM_SECTORS)
         h['ppw_2d_B_sigma'] = self._book_2d_summary(
             'h2_pull_bklm_scint_sigma', 'Pull Sigma (BKLM Scint);Sec 1;Sec 2',
             _N_BKLM_SECTORS)
-
-        h['ppw_E'] = self._book_pairwise(
-            f, 'pulls/sector/eklm_scint_fwd_vs_bwd',
-            'h_pull_E_fwd{i}_vs_bwd{j}',
-            'EKLM Pull: Fwd Sec {i} vs Bwd Sec {j};pull',
-            _N_EKLM_SECTORS, 200, -10, 10, offset=1)
         h['ppw_2d_E_mean'] = self._book_2d_summary(
             'h2_pull_eklm_fwd_bwd_mean', 'Pull Mean (EKLM Fwd vs Bwd);Fwd Sec;Bwd Sec',
             _N_EKLM_SECTORS, lo=0.5)
         h['ppw_2d_E_sigma'] = self._book_2d_summary(
             'h2_pull_eklm_fwd_bwd_sigma', 'Pull Sigma (EKLM Fwd vs Bwd);Fwd Sec;Bwd Sec',
             _N_EKLM_SECTORS, lo=0.5)
-
-        h['ppw_Rphi'] = self._book_pairwise(
-            f, 'pulls/sector/rpc_phi', 'h_pull_Rphi_s{i}_vs_s{j}',
-            'RPC Phi Pull: Sec {i} vs Sec {j};pull',
-            _N_BKLM_SECTORS, 200, -10, 10)
         h['ppw_2d_Rphi_mean'] = self._book_2d_summary(
             'h2_pull_rpc_phi_mean', 'Pull Mean (RPC Phi);Sec 1;Sec 2', _N_BKLM_SECTORS)
         h['ppw_2d_Rphi_sigma'] = self._book_2d_summary(
             'h2_pull_rpc_phi_sigma', 'Pull Sigma (RPC Phi);Sec 1;Sec 2', _N_BKLM_SECTORS)
-
-        h['ppw_Rz'] = self._book_pairwise(
-            f, 'pulls/sector/rpc_z', 'h_pull_Rz_s{i}_vs_s{j}',
-            'RPC Z Pull: Sec {i} vs Sec {j};pull',
-            _N_BKLM_SECTORS, 200, -10, 10)
         h['ppw_2d_Rz_mean'] = self._book_2d_summary(
             'h2_pull_rpc_z_mean', 'Pull Mean (RPC Z);Sec 1;Sec 2', _N_BKLM_SECTORS)
         h['ppw_2d_Rz_sigma'] = self._book_2d_summary(
@@ -478,23 +483,33 @@ class KLMEventT0ValidationModule(basf2.Module):
             h['res_smean'].GetXaxis().SetBinLabel(ib, lab)
             h['res_swidth'].GetXaxis().SetBinLabel(ib, lab)
 
-        # Pairwise sector residual histograms (same structure as pulls)
+        # Pairwise sector residual histograms (each in its own subdirectory)
         h['rpw_B'] = self._book_pairwise(
             f, 'residuals/sector/bklm_scint', 'h_residual_B_s{i}_vs_s{j}',
-            'BKLM Scint Residual: Sec {i} vs Sec {j};#DeltaT_{0} [ns]',
+            'BKLM Scint Residual: Sec {i} vs Sec {j};#DeltaT_{{0}} [ns]',
             _N_BKLM_SECTORS, 200, -50, 50)
+        h['rpw_E'] = self._book_pairwise(
+            f, 'residuals/sector/eklm_scint_fwd_vs_bwd',
+            'h_residual_E_fwd{i}_vs_bwd{j}',
+            'EKLM Residual: Fwd Sec {i} vs Bwd Sec {j};#DeltaT_{{0}} [ns]',
+            _N_EKLM_SECTORS, 200, -50, 50, offset=1)
+        h['rpw_Rphi'] = self._book_pairwise(
+            f, 'residuals/sector/rpc_phi', 'h_residual_Rphi_s{i}_vs_s{j}',
+            'RPC Phi Residual: Sec {i} vs Sec {j};#DeltaT_{{0}} [ns]',
+            _N_BKLM_SECTORS, 200, -50, 50)
+        h['rpw_Rz'] = self._book_pairwise(
+            f, 'residuals/sector/rpc_z', 'h_residual_Rz_s{i}_vs_s{j}',
+            'RPC Z Residual: Sec {i} vs Sec {j};#DeltaT_{{0}} [ns]',
+            _N_BKLM_SECTORS, 200, -50, 50)
+
+        # 2D summary histograms live in residuals/sector/ (matching C++ layout)
+        self._safe_cd(f, 'residuals/sector')
         h['rpw_2d_B_mean'] = self._book_2d_summary(
             'h2_residual_bklm_scint_mean', 'Residual Mean (BKLM Scint);Sec 1;Sec 2',
             _N_BKLM_SECTORS)
         h['rpw_2d_B_sigma'] = self._book_2d_summary(
             'h2_residual_bklm_scint_sigma', 'Residual Sigma (BKLM Scint);Sec 1;Sec 2',
             _N_BKLM_SECTORS)
-
-        h['rpw_E'] = self._book_pairwise(
-            f, 'residuals/sector/eklm_scint_fwd_vs_bwd',
-            'h_residual_E_fwd{i}_vs_bwd{j}',
-            'EKLM Residual: Fwd Sec {i} vs Bwd Sec {j};#DeltaT_{0} [ns]',
-            _N_EKLM_SECTORS, 200, -50, 50, offset=1)
         h['rpw_2d_E_mean'] = self._book_2d_summary(
             'h2_residual_eklm_fwd_bwd_mean',
             'Residual Mean (EKLM Fwd vs Bwd);Fwd Sec;Bwd Sec',
@@ -503,22 +518,12 @@ class KLMEventT0ValidationModule(basf2.Module):
             'h2_residual_eklm_fwd_bwd_sigma',
             'Residual Sigma (EKLM Fwd vs Bwd);Fwd Sec;Bwd Sec',
             _N_EKLM_SECTORS, lo=0.5)
-
-        h['rpw_Rphi'] = self._book_pairwise(
-            f, 'residuals/sector/rpc_phi', 'h_residual_Rphi_s{i}_vs_s{j}',
-            'RPC Phi Residual: Sec {i} vs Sec {j};#DeltaT_{0} [ns]',
-            _N_BKLM_SECTORS, 200, -50, 50)
         h['rpw_2d_Rphi_mean'] = self._book_2d_summary(
             'h2_residual_rpc_phi_mean', 'Residual Mean (RPC Phi);Sec 1;Sec 2',
             _N_BKLM_SECTORS)
         h['rpw_2d_Rphi_sigma'] = self._book_2d_summary(
             'h2_residual_rpc_phi_sigma', 'Residual Sigma (RPC Phi);Sec 1;Sec 2',
             _N_BKLM_SECTORS)
-
-        h['rpw_Rz'] = self._book_pairwise(
-            f, 'residuals/sector/rpc_z', 'h_residual_Rz_s{i}_vs_s{j}',
-            'RPC Z Residual: Sec {i} vs Sec {j};#DeltaT_{0} [ns]',
-            _N_BKLM_SECTORS, 200, -50, 50)
         h['rpw_2d_Rz_mean'] = self._book_2d_summary(
             'h2_residual_rpc_z_mean', 'Residual Mean (RPC Z);Sec 1;Sec 2',
             _N_BKLM_SECTORS)
@@ -575,7 +580,16 @@ class KLMEventT0ValidationModule(basf2.Module):
 
         *offset* shifts sector indices in name/title (use 1 for EKLM sectors 1–4).
         """
-        rootfile.mkdir(dirpath).cd()
+        # Navigate step-by-step, creating each sub-directory if needed.
+        # rootfile.mkdir(dirpath).cd() is unreliable in cppyy when
+        # intermediate directories already exist (mkdir may return None).
+        d = rootfile
+        for part in dirpath.split('/'):
+            sub = d.GetDirectory(part)
+            if not sub:
+                sub = d.mkdir(part)
+            d = sub
+        d.cd()
         grid = {}
         for i in range(n):
             grid[i] = {}
@@ -586,6 +600,17 @@ class KLMEventT0ValidationModule(basf2.Module):
                     title_tmpl.format(i=si, j=sj),
                     nb, lo, hi)
         return grid
+
+    @staticmethod
+    def _safe_cd(rootfile, dirpath):
+        """Navigate *rootfile* to *dirpath*, creating sub-dirs as needed."""
+        d = rootfile
+        for part in dirpath.split('/'):
+            sub = d.GetDirectory(part)
+            if not sub:
+                sub = d.mkdir(part)
+            d = sub
+        d.cd()
 
     def _book_2d_summary(self, name, title, n, lo=-0.5):
         """Book a TH2D for pairwise Gaussian-fit summaries."""
@@ -602,6 +627,16 @@ class KLMEventT0ValidationModule(basf2.Module):
                 ROOT.SetOwnership(obj, False)
         for v in self._h.values():
             _traverse(v)
+
+    # ------------------------------------------------------------------
+    # Helper: midpoint of two ROOT::Math::XYZVector (cppyy may lack operator+)
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _midpoint(a, b):
+        """Return the midpoint of two XYZVector-like objects."""
+        return ROOT.Math.XYZVector(0.5 * (a.X() + b.X()),
+                                   0.5 * (a.Y() + b.Y()),
+                                   0.5 * (a.Z() + b.Z()))
 
     # ------------------------------------------------------------------
     # ExtHit map building (mirrors collectExtrapolatedHits in C++)
@@ -622,10 +657,11 @@ class KLMEventT0ValidationModule(basf2.Module):
         scint_raw = {}   # key → list of ExtHit
         rpc_raw = {}
 
-        muid = track.getRelatedTo('KLMMuidLikelihood')
+        _muids = track.getRelationsTo['Belle2::KLMMuidLikelihood']('KLMMuidLikelihoods')
+        muid = _muids[0] if _muids.size() > 0 else None
         elem = self._elem_num
 
-        for ext in track.getRelationsTo('ExtHit'):
+        for ext in track.getRelationsTo['Belle2::ExtHit']('ExtHits'):
             if ext.getStatus() != Belle2.EXT_EXIT:
                 continue
 
@@ -639,15 +675,17 @@ class KLMEventT0ValidationModule(basf2.Module):
 
             if is_bklm:
                 # Decode BKLM channel number → element numbers
-                fwd = ROOT.Long(0)
-                sec = ROOT.Long(0)
-                lay = ROOT.Long(0)
-                pla = ROOT.Long(0)
-                strip = ROOT.Long(0)
+                # copy_id is int but KLMChannelNumber is uint16_t;
+                # C++ narrows implicitly, Python/cppyy does not.
+                fwd = ctypes.c_int(0)
+                sec = ctypes.c_int(0)
+                lay = ctypes.c_int(0)
+                pla = ctypes.c_int(0)
+                strip = ctypes.c_int(0)
                 Belle2.BKLMElementNumbers.channelNumberToElementNumbers(
-                    copy_id, fwd, sec, lay, pla, strip)
-                fwd, sec, lay, pla, strip = (int(fwd), int(sec),
-                                             int(lay), int(pla), int(strip))
+                    copy_id & 0xFFFF, fwd, sec, lay, pla, strip)
+                fwd, sec, lay, pla, strip = (fwd.value, sec.value,
+                                             lay.value, pla.value, strip.value)
 
                 # Check layer was crossed
                 if muid:
@@ -666,15 +704,15 @@ class KLMEventT0ValidationModule(basf2.Module):
 
             else:  # is_eklm
                 # Decode EKLM strip number → element numbers
-                fwd = ROOT.Long(0)
-                lay = ROOT.Long(0)
-                sec = ROOT.Long(0)
-                pla = ROOT.Long(0)
-                strip = ROOT.Long(0)
+                fwd = ctypes.c_int(0)
+                lay = ctypes.c_int(0)
+                sec = ctypes.c_int(0)
+                pla = ctypes.c_int(0)
+                strip = ctypes.c_int(0)
                 Belle2.EKLMElementNumbers.Instance().stripNumberToElementNumbers(
                     copy_id, fwd, lay, sec, pla, strip)
-                fwd, lay, sec, pla, strip = (int(fwd), int(lay),
-                                             int(sec), int(pla), int(strip))
+                fwd, lay, sec, pla, strip = (fwd.value, lay.value,
+                                             sec.value, pla.value, strip.value)
 
                 if muid:
                     if not muid.isExtrapolatedEndcapLayerCrossed(lay - 1):
@@ -712,11 +750,11 @@ class KLMEventT0ValidationModule(basf2.Module):
         status_db = self._db_channel_status
         delay = self._delay_eklm
 
-        for hit2d in track.getRelationsTo('KLMHit2d'):
+        for hit2d in track.getRelationsTo['Belle2::KLMHit2d']('KLMHit2ds'):
             if hit2d.getSubdetector() != Belle2.KLMElementNumbers.c_EKLM:
                 continue
 
-            for digit in hit2d.getRelationsTo('KLMDigit'):
+            for digit in hit2d.getRelationsTo['Belle2::KLMDigit']('KLMDigits'):
                 if not digit.isGood():
                     continue
 
@@ -749,8 +787,8 @@ class KLMEventT0ValidationModule(basf2.Module):
                                 * _MM_TO_BASF2)
 
                 # Global hit position in CLHEP mm
-                pos = 0.5 * (entry_ext.getPosition() + exit_ext.getPosition())
-                hit_global = ROOT.HepGeom.Point3Dd(
+                pos = self._midpoint(entry_ext.getPosition(), exit_ext.getPosition())
+                hit_global = ROOT.HepGeom.Point3D('double')(
                     pos.X() * _BASF2_TO_MM,
                     pos.Y() * _BASF2_TO_MM,
                     pos.Z() * _BASF2_TO_MM)
@@ -798,7 +836,7 @@ class KLMEventT0ValidationModule(basf2.Module):
         status_db = self._db_channel_status
         delay = self._delay_bklm
 
-        for hit2d in track.getRelationsTo('KLMHit2d'):
+        for hit2d in track.getRelationsTo['Belle2::KLMHit2d']('KLMHit2ds'):
             if hit2d.getSubdetector() != Belle2.KLMElementNumbers.c_BKLM:
                 continue
             if hit2d.inRPC():
@@ -810,10 +848,10 @@ class KLMEventT0ValidationModule(basf2.Module):
                 hit2d.getSection(), hit2d.getSector(), hit2d.getLayer())
             pos2d = hit2d.getPosition()
 
-            for b1d in hit2d.getRelationsTo('BKLMHit1d'):
+            for b1d in hit2d.getRelationsTo['Belle2::BKLMHit1d']('BKLMHit1ds'):
                 is_phi = b1d.isPhiReadout()
 
-                for digit in b1d.getRelationsTo('KLMDigit'):
+                for digit in b1d.getRelationsTo['Belle2::KLMDigit']('KLMDigits'):
                     if digit.inRPC() or not digit.isGood():
                         continue
 
@@ -836,7 +874,7 @@ class KLMEventT0ValidationModule(basf2.Module):
                     entry_ext, exit_ext = pair
 
                     Tfly = 0.5 * (entry_ext.getTOF() + exit_ext.getTOF())
-                    pos_ext = 0.5 * (entry_ext.getPosition() + exit_ext.getPosition())
+                    pos_ext = self._midpoint(entry_ext.getPosition(), exit_ext.getPosition())
 
                     # Gate in local coordinates (position consistency check)
                     loc_ext = mod.globalToLocal(
@@ -891,7 +929,7 @@ class KLMEventT0ValidationModule(basf2.Module):
         status_db = self._db_channel_status
         delay = self._delay_rpc_phi if accept_phi else self._delay_rpc_z
 
-        for hit2d in track.getRelationsTo('KLMHit2d'):
+        for hit2d in track.getRelationsTo['Belle2::KLMHit2d']('KLMHit2ds'):
             if hit2d.getSubdetector() != Belle2.KLMElementNumbers.c_BKLM:
                 continue
             if not hit2d.inRPC():
@@ -903,14 +941,14 @@ class KLMEventT0ValidationModule(basf2.Module):
                 hit2d.getSection(), hit2d.getSector(), hit2d.getLayer())
             pos2d = hit2d.getPosition()
 
-            for b1d in hit2d.getRelationsTo('BKLMHit1d'):
+            for b1d in hit2d.getRelationsTo['Belle2::BKLMHit1d']('BKLMHit1ds'):
                 is_phi = b1d.isPhiReadout()
                 if accept_phi and not is_phi:
                     continue
                 if not accept_phi and is_phi:
                     continue
 
-                for digit in b1d.getRelationsTo('KLMDigit'):
+                for digit in b1d.getRelationsTo['Belle2::KLMDigit']('KLMDigits'):
                     if not digit.inRPC():
                         continue
                     if not digit.isGood():
@@ -932,7 +970,7 @@ class KLMEventT0ValidationModule(basf2.Module):
                     entry_ext, exit_ext = pair
 
                     Tfly = 0.5 * (entry_ext.getTOF() + exit_ext.getTOF())
-                    pos_ext = 0.5 * (entry_ext.getPosition() + exit_ext.getPosition())
+                    pos_ext = self._midpoint(entry_ext.getPosition(), exit_ext.getPosition())
 
                     loc_ext = mod.globalToLocal(
                         ROOT.CLHEP.Hep3Vector(pos_ext.X(), pos_ext.Y(), pos_ext.Z()),

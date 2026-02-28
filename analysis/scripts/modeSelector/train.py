@@ -142,7 +142,7 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names):
 
 
 def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
-                         sigprob_thresh=0.01, mbc_thresh=5.22, random_state=None):
+                         sigprob_thresh=0.01, mbc_thresh=5.23, random_state=None):
     """
     Load training data and apply sampling.
 
@@ -553,7 +553,7 @@ def distance_corr(var_1, var_2, normedweight=None, power=1):
     return dCorr
 
 
-def build_main_labels(bp_truth, b0_truth, mc_var_names, delta_p_thresh=0.15):
+def build_main_labels(bp_truth, b0_truth, mc_var_names, charged_cat, delta_p_thresh=0.15):
     """
     Build main network labels (6 classes) from MC truth.
 
@@ -568,9 +568,9 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names, delta_p_thresh=0.15):
     - 5: is_target_charged (signal B+)
 
     Logic:
-    - Use category network logic to determine best candidate (B0 vs B+)
-    - For B0 candidates: assign labels 0-4 directly
-    - For B+ candidates: assign labels 0-4, but map is_target (1) -> 5
+    - Use category network output (charged_cat) to determine B+ vs B0 per event
+    - For B0 predicted: assign labels 0-4 directly
+    - For B+ predicted: assign labels 0-4, but map is_target (1) -> 5
 
     Parameters
     ----------
@@ -580,6 +580,8 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names, delta_p_thresh=0.15):
         MC truth for B0 candidates
     mc_var_names : list
         Names of MC truth variables
+    charged_cat : ndarray of bool
+        Boolean array: True if category network predicts B+ (charged), False for B0 (neutral)
     delta_p_thresh : float
         Threshold for mostcommonBTagDeltaP good-tag definition. Default: 0.15
 
@@ -587,6 +589,8 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names, delta_p_thresh=0.15):
     -------
     labels : ndarray
         Main network labels (0-5)
+    train_selection : ndarray of bool
+        Mask of events where the category-selected candidate type has a valid candidate
     """
 
     # Get column indices
@@ -631,21 +635,19 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names, delta_p_thresh=0.15):
     b0_labels = compute_output_label(b0_truth)
     bp_labels = compute_output_label(bp_truth)
 
-    # Determine best candidate (highest sigProb)
-    bp_sigprob = np.where(np.isnan(bp_truth[:, sigprob_idx]), -1, bp_truth[:, sigprob_idx])
-    b0_sigprob = np.where(np.isnan(b0_truth[:, sigprob_idx]), -1, b0_truth[:, sigprob_idx])
-    bp_is_best = bp_sigprob > b0_sigprob
-
-    # Main network label logic:
-    # - For neutral predicted (B0 best): use B0 labels (0-4)
-    # - For charged predicted (B+ best): use B+ labels, but is_target (1) -> 5
-    labels = np.where(bp_is_best, bp_labels, b0_labels)
+    # Use category network prediction to select which candidate type to use per event
+    labels = np.where(charged_cat, bp_labels, b0_labels)
 
     # Map is_target for charged candidates to class 5
-    is_target_charged = bp_is_best & (bp_labels == 1)
+    is_target_charged = charged_cat & (bp_labels == 1)
     labels[is_target_charged] = 5
 
-    return labels
+    # Keep only events where the category-selected candidate type has a valid candidate
+    bp_has_cand = ~np.isnan(bp_truth[:, sigprob_idx])
+    b0_has_cand = ~np.isnan(b0_truth[:, sigprob_idx])
+    train_selection = np.where(charged_cat, bp_has_cand, b0_has_cand)
+
+    return labels, train_selection
 
 
 class SparseDataset(torch.utils.data.Dataset):
@@ -757,7 +759,8 @@ def main():
     parser.add_argument('--cont_fraction', type=float, default=1.0,
                         help='Additional continuum downscale at training time (default 1.0; '
                              'continuum is already downsampled at production by produceTrainingInputs.py)')
-    parser.add_argument('--batch_size', type=int, default=8192, help='Batch size')
+    parser.add_argument('--batch_size', type=int, default=None,
+                        help='Batch size (default: 8192 for category network, 32768 for main network)')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of DataLoader worker processes')
     parser.add_argument('--epochs', type=int, default=40, help='Number of epochs')
     parser.add_argument('--lr', type=float, default=0.0001, help='Learning rate')
@@ -770,6 +773,10 @@ def main():
                         help='Use sparse data loading (memory-efficient but slower)')
 
     args = parser.parse_args()
+
+    if args.batch_size is None:
+        args.batch_size = 8192 if args.network == 'category' else 32768
+    print(f"Batch size: {args.batch_size}")
 
     # Set random seeds
     np.random.seed(args.seed)
@@ -859,7 +866,8 @@ def main():
         print(f"    Continuum: {(cat_preds == 2).sum()} ({(cat_preds == 2).mean() * 100:.1f}%)")
 
         # Compute charged_cat flag: 1 if B+ is predicted over B0 (matches ModeSelectorModule inference)
-        charged_cat = (cat_outputs[:, 1] > cat_outputs[:, 0]).astype(np.float32)
+        charged_cat_bool = cat_outputs[:, 1] > cat_outputs[:, 0]
+        charged_cat = charged_cat_bool.astype(np.float32)
 
         # Concatenate category outputs + charged_cat flag to features
         print("\nConcatenating category outputs to features...")
@@ -868,10 +876,12 @@ def main():
         input_size = features_dense.shape[1]
         print(f"  New feature shape: {features_dense.shape}")
 
-        # Build main network labels
-        labels = build_main_labels(bp_truth, b0_truth, mc_var_names)
+        # Build main network labels using category network prediction
+        labels, train_selection = build_main_labels(
+            bp_truth, b0_truth, mc_var_names, charged_cat=charged_cat_bool
+        )
         num_labels = 6
-        print("  Main network label distribution:")
+        print("  Main network label distribution (before train_selection):")
         print(f"    bad_tag:           {(labels == 0).sum()} ({(labels == 0).mean() * 100:.1f}%)")
         print(f"    is_target_neutral: {(labels == 1).sum()} ({(labels == 1).mean() * 100:.1f}%)")
         print(f"    cross_deltaC1:     {(labels == 2).sum()} ({(labels == 2).mean() * 100:.1f}%)")
@@ -879,20 +889,40 @@ def main():
         print(f"    continuum:         {(labels == 4).sum()} ({(labels == 4).mean() * 100:.1f}%)")
         print(f"    is_target_charged: {(labels == 5).sum()} ({(labels == 5).mean() * 100:.1f}%)")
 
-    # Extract Mbc values for DisCo loss (if enabled)
-    mbc_values = None
-    if args.disco_lambda > 0:
-        print("\nExtracting Mbc values for distance correlation...")
-        mbc_idx = mc_var_names.index('Mbc')
-        # Get Mbc from best candidate (same logic as labels)
-        bp_sigprob = np.where(np.isnan(bp_truth[:, mc_var_names.index('extraInfo(SignalProbability)')]), -1,
-                              bp_truth[:, mc_var_names.index('extraInfo(SignalProbability)')])
-        b0_sigprob = np.where(np.isnan(b0_truth[:, mc_var_names.index('extraInfo(SignalProbability)')]), -1,
-                              b0_truth[:, mc_var_names.index('extraInfo(SignalProbability)')])
-        bp_is_best = bp_sigprob > b0_sigprob
-        mbc_array = np.where(bp_is_best, bp_truth[:, mbc_idx], b0_truth[:, mbc_idx])
-        mbc_values = torch.from_numpy(mbc_array.astype(np.float32))
-        print(f"  Mbc values extracted: {len(mbc_values)}")
+        # Extract Mbc values for DisCo loss (if enabled)
+        mbc_values = None
+        if args.disco_lambda > 0:
+            print("\nExtracting Mbc values for distance correlation...")
+            mbc_idx = mc_var_names.index('Mbc')
+            mbc_array = np.where(charged_cat_bool, bp_truth[:, mbc_idx], b0_truth[:, mbc_idx])
+            mbc_values = torch.from_numpy(mbc_array.astype(np.float32))
+            print(f"  Mbc values extracted: {len(mbc_values)}")
+
+        # Apply train_selection: drop events where the category-selected candidate type has no candidate
+        n_before = len(features_dense)
+        features_dense = features_dense[train_selection]
+        labels = labels[train_selection]
+        if mbc_values is not None:
+            mbc_values = mbc_values[train_selection]
+        n_dropped = n_before - int(train_selection.sum())
+        print(f"  train_selection: dropped {n_dropped} events ({n_dropped / n_before * 100:.1f}%)")
+
+    # Extract Mbc values for DisCo loss (category network only; main network handles above)
+    if args.network == 'category':
+        mbc_values = None
+        if args.disco_lambda > 0:
+            print("\nExtracting Mbc values for distance correlation...")
+            mbc_idx = mc_var_names.index('Mbc')
+            bp_sigprob = np.where(
+                np.isnan(bp_truth[:, mc_var_names.index('extraInfo(SignalProbability)')]), -1,
+                bp_truth[:, mc_var_names.index('extraInfo(SignalProbability)')])
+            b0_sigprob = np.where(
+                np.isnan(b0_truth[:, mc_var_names.index('extraInfo(SignalProbability)')]), -1,
+                b0_truth[:, mc_var_names.index('extraInfo(SignalProbability)')])
+            bp_is_best = bp_sigprob > b0_sigprob
+            mbc_array = np.where(bp_is_best, bp_truth[:, mbc_idx], b0_truth[:, mbc_idx])
+            mbc_values = torch.from_numpy(mbc_array.astype(np.float32))
+            print(f"  Mbc values extracted: {len(mbc_values)}")
 
     # Train/val split
     print(f"\nSplitting train/val (val_split={args.val_split})...")
@@ -923,7 +953,8 @@ def main():
         train_dataset = SparseDataset(features[train_idx], labels[train_idx], mbc_train_np)
         val_dataset = SparseDataset(features[val_idx], labels[val_idx], mbc_val_np)
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
-                                  collate_fn=sparse_collate_fn, num_workers=args.num_workers)
+                                  collate_fn=sparse_collate_fn, num_workers=args.num_workers,
+                                  drop_last=True)
         val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False,
                                 collate_fn=sparse_collate_fn, num_workers=args.num_workers)
     else:
@@ -942,7 +973,7 @@ def main():
             val_dataset = TensorDataset(X_val, y_val)
 
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
-                                  num_workers=args.num_workers)
+                                  num_workers=args.num_workers, drop_last=True)
         val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False,
                                 num_workers=args.num_workers)
 
@@ -961,7 +992,7 @@ def main():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode='min', factor=0.5, patience=3
+        optimizer, mode='min', factor=0.5, patience=5, min_lr=1e-6
     )
 
     # Training loop
@@ -975,6 +1006,8 @@ def main():
     best_epoch = 0
     training_start = time.time()
     history = {'train_loss': [], 'val_loss': [], 'disco_loss': [], 'lr': []}
+    patience_counter = 0
+    early_stopping_patience = 20
 
     for epoch in range(args.epochs):
         epoch_start = time.time()
@@ -1016,6 +1049,7 @@ def main():
         if not (val_loss >= best_val_loss):
             best_val_loss = val_loss
             best_epoch = epoch
+            patience_counter = 0
             model_path = os.path.join(args.output, f'net_{args.network}.pt')
             torch.save({
                 'epoch': epoch,
@@ -1034,6 +1068,11 @@ def main():
                 }
             }, model_path)
             print(f"  -> Saved best model (val_loss={val_loss:.6f})")
+        else:
+            patience_counter += 1
+            if patience_counter >= early_stopping_patience:
+                print(f"  -> Early stopping at epoch {epoch + 1}")
+                break
 
     print("\n" + "=" * 60)
     print("Training complete")

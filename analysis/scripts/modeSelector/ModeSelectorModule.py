@@ -237,8 +237,8 @@ class ModeSelectorModule(b2.Module):
             event_features.get(name, 0.0) for name in self.event_features
         ]
 
-        # Add ncandidates / 10 (unique input_ids, matching offline)
-        n_candidates = len(best_by_input_id)
+        # Add ncandidates / 10 (all candidates before deduplication, matching offline)
+        n_candidates = len(candidates_data)
         event_feat_values.append(n_candidates / 10.0)
 
         # Find best candidate (highest sigProb) using deduped data
@@ -264,6 +264,11 @@ class ModeSelectorModule(b2.Module):
 
         event_feat_values.append(max_input_id / 50.0)
         event_feat_values.append(scnd_max_input_id / 50.0)
+
+        # Add experiment number (from EventMetaData)
+        event_meta = Belle2.PyStoreObj('EventMetaData')
+        experiment = int(event_meta.getExperiment()) if event_meta.isValid() else 0
+        event_feat_values.append(experiment / 10.0)
 
         # Concatenate all features
         all_features = np.concatenate([flat_features, np.array(event_feat_values, dtype=np.float32)])
@@ -363,7 +368,7 @@ class ModeSelectorModule(b2.Module):
         n_candidate_features = n_blocks * self.n_input_ids
         event_feat_start = n_candidate_features
         print(f"\n--- Event-level features (indices {event_feat_start}+) ---")
-        event_feat_names = self.event_features + ['ncandidates/10', 'max_input_id/50', 'scnd_max_input_id/50']
+        event_feat_names = self.event_features + ['ncandidates/10', 'max_input_id/50', 'scnd_max_input_id/50', '__experiment__/10']
         for i, name in enumerate(event_feat_names):
             idx = event_feat_start + i
             if idx < len(all_features):

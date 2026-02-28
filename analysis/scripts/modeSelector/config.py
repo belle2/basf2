@@ -72,26 +72,15 @@ EVENT_FEATURES = [
 
 # MC truth variables to evaluate on best candidates (for training labels)
 TRAINING_MC_VARS = [
-    'isSignalAcceptWrongFSPs',
-    'isSignalAcceptMissing',
-    'mcErrors',
+    'isSignal',
     'PDG',
     'extraInfo(decayModeID)',
     'Mbc',
     'extraInfo(SignalProbability)',
-    'mostcommonBTagIndex',
     'mostcommonBTagDeltaP',
-    'percentageWrongParticlesBTag',
-    'percentageMissingParticlesBTag',
-    'extraInfo(looseMCMotherPDG)',
-    'extraInfo(looseMCWrongDaughterN)',
-    'mostcommonBTagPDG',  # PDG of the true tag B (for cross_deltaC1 vs cross_internal)
-    # Generated B meson PDGs (indices 3 and 4 in MCParticle list = first and second B meson).
-    # 'genParticle(3, varForMCGen(PDG))',
-    # 'genParticle(4, varForMCGen(PDG))',
-    # Event-level flags
-    'isContinuumEvent',  # 1 for qqbar continuum, 0 for BB
-    'eventRandom',       # For base fraction cut (e.g. eventRandom < 0.25 for 25% sample)
+    'mostcommonBTagPDG',
+    'isContinuumEvent',
+    'eventRandom',
 ]
 
 # FEI calibration factors for sampling
@@ -124,7 +113,7 @@ CALIB_WEIGHT_CAP = float(_np.percentile(_all_calib, 90, method='closest_observat
 del _np, _all_calib
 
 
-# Indices to KEEP from the full 1643-feature array (all-zero columns removed,
+# Indices to KEEP from the full 1644-feature array (all-zero columns removed,
 # Mbc block 10 excluded, treefitter chiProb columns excluded).
 # train.py recomputes this dynamically and asserts equality -- update here
 # if it changes.
@@ -158,5 +147,5 @@ HAS_INPUTS = [
     1505, 1506, 1507, 1508, 1509, 1510, 1512, 1513, 1514, 1517, 1519, 1520, 1521, 1523, 1524, 1525, 1526,
     1527, 1528, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543,
     1544, 1545, 1546, 1547, 1548, 1549, 1550, 1551, 1552, 1553, 1554, 1555, 1556, 1557, 1559, 1561, 1567,
-    1632, 1633, 1634, 1635, 1636, 1637, 1638, 1639, 1640, 1641, 1642,
-]  # 504 indices kept (1643 - 1139 removed)
+    1632, 1633, 1634, 1635, 1636, 1637, 1638, 1639, 1640, 1641, 1642, 1643,
+]  # 505 indices kept (1644 - 1139 removed)

@@ -44,6 +44,7 @@ args = parser.parse_args()
 
 # Set up logging
 b2.set_log_level(b2.LogLevel.INFO)
+b2.set_random_seed(1337)
 
 # Create path
 my_path = b2.create_path()
@@ -77,7 +78,7 @@ cleanMask = ("cleanMask", track_mask, ecl_mask)
 
 # Apply FEI calibration cuts and build continuum suppression
 for b in ['B+', 'B0']:
-    ma.applyCuts(f'{b}:{fei_identifier}', '[Mbc > 5.22] and [-0.15 < deltaE < 0.1]', path=my_path)
+    ma.applyCuts(f'{b}:{fei_identifier}', '[Mbc > 5.23] and [-0.15 < deltaE < 0.1]', path=my_path)
 
     # Build the Rest of Event
     ma.buildRestOfEvent(f'{b}:{fei_identifier}', path=my_path)
@@ -108,7 +109,6 @@ particle_lists = [f'B+:{fei_identifier}', f'B0:{fei_identifier}']
 # MC truth matching (required for training labels)
 for plist in particle_lists:
     ma.matchMCTruth(plist, path=my_path)
-    ma.looseMCTruth(plist, path=my_path)
 
 # Add D* veto reconstruction (pi0 list created internally)
 modeSelector.addDstarVeto(particle_lists, path=my_path)

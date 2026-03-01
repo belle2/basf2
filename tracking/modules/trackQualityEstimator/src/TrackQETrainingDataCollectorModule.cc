@@ -8,6 +8,8 @@
 
 #include <tracking/modules/trackQualityEstimator/TrackQETrainingDataCollectorModule.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 
 using namespace Belle2;
 
@@ -66,7 +68,15 @@ void TrackQETrainingDataCollectorModule::initialize()
   m_subRecoTrackExtractor = std::make_unique<SubRecoTrackExtractor>(m_variableSet);
   m_hitInfoExtractor = std::make_unique<HitInfoExtractor>(m_variableSet);
 
-  m_estimator = std::make_unique<QualityEstimatorTripletFit>();
+  // create pointer to chosen estimator
+  if (m_EstimationMethod == "tripletFit") {
+    m_estimator = std::make_unique<QualityEstimatorTripletFit>();
+  } else if (m_EstimationMethod == "circleFit") {
+    m_estimator = std::make_unique<QualityEstimatorCircleFit>();
+  } else if (m_EstimationMethod == "helixFit") {
+    m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
+  }
+  B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
 
   m_qeResultsExtractor = std::make_unique<QEResultsExtractor>(m_SVDEstimationMethod, m_variableSet, "SVD_");
   m_variableSet.emplace_back("SVD_NSpacePoints", &m_nSpacePoints);

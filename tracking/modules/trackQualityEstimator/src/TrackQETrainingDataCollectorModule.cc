@@ -49,6 +49,11 @@ TrackQETrainingDataCollectorModule::TrackQETrainingDataCollectorModule() : Modul
            m_collectEventFeatures,
            "Whether to use eventwise features.",
            m_collectEventFeatures);
+
+  addParam("SVDEstimationMethod",
+           m_SVDEstimationMethod,
+           "Identifier which estimation method to use for SVD. Valid identifiers are: [tripletFit, circleFit, helixFit]",
+           m_SVDEstimationMethod);
 }
 
 void TrackQETrainingDataCollectorModule::initialize()
@@ -63,11 +68,11 @@ void TrackQETrainingDataCollectorModule::initialize()
 
   m_estimator = std::make_unique<QualityEstimatorTripletFit>();
 
-  m_qeResultsExtractor = std::make_unique<QEResultsExtractor>("tripletFit", m_variableSet, "SVD_");
+  m_qeResultsExtractor = std::make_unique<QEResultsExtractor>(m_SVDEstimationMethod, m_variableSet, "SVD_");
   m_variableSet.emplace_back("SVD_NSpacePoints", &m_nSpacePoints);
   m_clusterInfoExtractor = std::make_unique<ClusterInfoExtractor>(m_variableSet, false, "SVD_");
 
-  m_qeResultsExtractorBefore = std::make_unique<QEResultsExtractor>("tripletFit", m_variableSet, "SVDbefore_");
+  m_qeResultsExtractorBefore = std::make_unique<QEResultsExtractor>(m_SVDEstimationMethod, m_variableSet, "SVDbefore_");
   m_variableSet.emplace_back("SVDbefore_NSpacePoints", &m_nSpacePointsBefore);
   m_clusterInfoExtractorBefore = std::make_unique<ClusterInfoExtractor>(m_variableSet, false, "SVDbefore_");
 

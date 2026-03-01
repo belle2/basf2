@@ -654,8 +654,6 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                     "PruneRecoTracks " +
                     temporary_reco_track_name)
 
-    return
-
 
 def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,
                          merge_tracks=True, use_second_cdc_hits=False):

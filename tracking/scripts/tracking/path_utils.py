@@ -562,8 +562,6 @@ def add_svd_track_finding(
             for temp_reco_track in [combined_svd_cdc_standalone_tracks, "CKFCDCRecoTracks"]:
                 path.add_module('PruneRecoTracks', storeArrayName=temp_reco_track).set_name("PruneRecoTracks " + temp_reco_track)
 
-    return
-
 
 def add_svd_standalone_tracking(path,
                                 components=["SVD"],
@@ -1414,8 +1412,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
         # The output of the additional SVD tracking (ToSVDCKF in this case) depends on whether
         # the CKF is the last or second to last algorithm to run. If it's the last one, use 'output_reco_tracks',
         # else use 'CDCSVDRecoTracks'
-        tmp_output_reco_tracks = output_reco_tracks if temporary_reco_tracks_merging_strategy == "before_ToSVDCKF" \
-            else combined_reco_tracks_name
+        tmp_output_reco_tracks = output_reco_tracks if "before_ToSVDCKF" else combined_reco_tracks_name
         add_svd_track_finding(path,
                               components=components,
                               input_reco_tracks=latest_reco_tracks,

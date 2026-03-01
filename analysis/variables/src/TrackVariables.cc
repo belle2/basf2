@@ -416,6 +416,7 @@ namespace Belle2 {
       return func;
     }
 
+
     /***************************************************
      * Event level tracking quantities
      */

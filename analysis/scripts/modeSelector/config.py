@@ -17,8 +17,13 @@ definitions to ensure consistency.
 
 import numpy as _np
 
-# Number of input_id values (dmID * 2 + is_charged)
-N_INPUT_IDS = 136
+# Number of FEI decay modes per B type (dmID range)
+N_BP_MODES = 36  # B+/B- decay modes (dmID 0-35)
+N_B0_MODES = 32  # B0/anti-B0 decay modes (dmID 0-31)
+
+# Total input_id slots: B+ sector (0 to 2*N_BP_MODES-1) + B0 sector (2*N_BP_MODES to N_INPUT_IDS-1)
+# Encoding: offset + dmID * 2 + is_particle (1 if PDG > 0 else 0)
+N_INPUT_IDS = N_BP_MODES * 2 + N_B0_MODES * 2  # = 136
 
 # D* delta mass difference cut applied to features
 DELTA_M_CUT = (-0.05, 0.05)

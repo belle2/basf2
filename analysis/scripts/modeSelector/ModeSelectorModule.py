@@ -90,7 +90,7 @@ class ModeSelectorModule(b2.Module):
         self._dstar_veto_checked = False
 
         # Feature configuration (from modeSelector.config)
-        #: Number of decay mode indices (dmID * 2 + is_charged)
+        #: Number of input_id slots (B+ sector + B0 sector, each split by particle/antiparticle)
         self.n_input_ids = config.N_INPUT_IDS
         #: Event-level feature names
         self.event_features = config.EVENT_FEATURES
@@ -161,14 +161,21 @@ class ModeSelectorModule(b2.Module):
 
     def _get_input_id(self, particle):
         """
-        Compute input_id from decay mode ID and B charge.
+        Compute input_id from decay mode ID, B type, and particle/antiparticle sign.
 
-        input_id = dmID * 2 + is_charged
+        Encoding:
+          B+ sector (input_ids 0 to 2*N_BP_MODES-1):
+            anti-B+ (PDG=-521): dmID * 2 + 0
+            B+      (PDG=+521): dmID * 2 + 1
+          B0 sector (input_ids 2*N_BP_MODES to N_INPUT_IDS-1):
+            anti-B0 (PDG=-511): N_BP_MODES*2 + dmID * 2 + 0
+            B0      (PDG=+511): N_BP_MODES*2 + dmID * 2 + 1
         """
         dm_id = int(vm.evaluate('extraInfo(decayModeID)', particle))
         pdg = int(vm.evaluate('PDG', particle))
-        is_charged = 1 if abs(pdg) == 521 else 0
-        return dm_id * 2 + is_charged
+        is_particle = 1 if pdg > 0 else 0
+        offset = 0 if abs(pdg) == 521 else config.N_BP_MODES * 2
+        return offset + dm_id * 2 + is_particle
 
     def _extract_particle_features(self, particle):
         """
@@ -245,16 +252,15 @@ class ModeSelectorModule(b2.Module):
             # Best candidate overall (highest sigProb among unique input_ids)
             max_input_id = max(best_by_input_id.keys(), key=lambda k: best_by_input_id[k][1])
 
-            # Best neutral (B0, even input_id) and charged (B+, odd input_id)
-            neutral_ids = {k: v for k, v in best_by_input_id.items() if k % 2 == 0}
-            charged_ids = {k: v for k, v in best_by_input_id.items() if k % 2 == 1}
+            # Best candidate in B+ sector (input_id < N_BP_MODES * 2) and B0 sector (>= N_BP_MODES * 2)
+            bp_sector_ids = {k: v for k, v in best_by_input_id.items() if k < config.N_BP_MODES * 2}
+            b0_sector_ids = {k: v for k, v in best_by_input_id.items() if k >= config.N_BP_MODES * 2}
 
-            # Second best from other B type
-            best_pdg_is_charged = max_input_id % 2 == 1
-            if best_pdg_is_charged and neutral_ids:
-                scnd_max_input_id = max(neutral_ids.keys(), key=lambda k: neutral_ids[k][1])
-            elif not best_pdg_is_charged and charged_ids:
-                scnd_max_input_id = max(charged_ids.keys(), key=lambda k: charged_ids[k][1])
+            best_is_bp = max_input_id < config.N_BP_MODES * 2
+            if best_is_bp and b0_sector_ids:
+                scnd_max_input_id = max(b0_sector_ids.keys(), key=lambda k: b0_sector_ids[k][1])
+            elif not best_is_bp and bp_sector_ids:
+                scnd_max_input_id = max(bp_sector_ids.keys(), key=lambda k: bp_sector_ids[k][1])
             else:
                 scnd_max_input_id = -10
         else:

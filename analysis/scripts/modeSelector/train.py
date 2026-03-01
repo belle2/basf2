@@ -20,7 +20,7 @@ The script implements:
 - FEI calibration sampling (decayModeID-based weights)
 - Continuum downsampling (applied at production by produceTrainingInputs.py; --cont_fraction defaults to 1.0)
 - Fraction sampling (configurable, default 1.0)
-- sigProb and Mbc preselection (skipped for continuum events)
+- sigProb and Mbc preselection (applied to all events including continuum)
 """
 
 import argparse
@@ -91,15 +91,15 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names):
     pdg_idx = list(mc_var_names).index('PDG')
     dm_idx = list(mc_var_names).index('extraInfo(decayModeID)')
     is_cont_idx = list(mc_var_names).index('isContinuumEvent')
-    tag_pdg_idx = list(mc_var_names).index('mostcommonBTagPDG')
+    gen_pdg_idx = list(mc_var_names).index('mostcommonBTagPDG')
 
     # Initialize with default weight
     event_calib_bp = np.ones(n_events)
     event_calib_b0 = np.ones(n_events)
 
     # Create vectorized calibration lookup
-    bp_calib_array = np.array([config.FEI_CALIB_BP.get(i, config.FEI_CALIB_BP_REST) for i in range(68)])
-    b0_calib_array = np.array([config.FEI_CALIB_B0.get(i, config.FEI_CALIB_B0_REST) for i in range(68)])
+    bp_calib_array = np.array([config.FEI_CALIB_BP.get(i, config.FEI_CALIB_BP_REST) for i in range(config.N_BP_MODES)])
+    b0_calib_array = np.array([config.FEI_CALIB_B0.get(i, config.FEI_CALIB_B0_REST) for i in range(config.N_B0_MODES)])
 
     # Process B+ candidates
     has_bp = ~np.isnan(bp_mc_truth[:, pdg_idx])
@@ -107,13 +107,13 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names):
         dm_ids = bp_mc_truth[has_bp, dm_idx].astype(int)
 
         pdg = bp_mc_truth[has_bp, pdg_idx]
-        tag_pdg = bp_mc_truth[has_bp, tag_pdg_idx]
-        tag_is_gen = (tag_pdg == pdg)
+        gen_pdg = bp_mc_truth[has_bp, gen_pdg_idx]
+        tag_is_gen = (gen_pdg == pdg)
 
         is_cont = bp_mc_truth[has_bp, is_cont_idx] == 1
 
         # Validate decayModeIDs
-        if (dm_ids < 0).any() or (dm_ids > 67).any():
+        if (dm_ids < 0).any() or (dm_ids > config.N_BP_MODES - 1).any():
             raise ValueError(f"Invalid decayModeID found in B+ candidates: min={dm_ids.min()}, max={dm_ids.max()}")
 
         # Apply calibration: only for tag_is_gen and not continuum
@@ -126,13 +126,13 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names):
         dm_ids = b0_mc_truth[has_b0, dm_idx].astype(int)
 
         pdg = b0_mc_truth[has_b0, pdg_idx]
-        tag_pdg = b0_mc_truth[has_b0, tag_pdg_idx]
-        tag_is_gen = (tag_pdg == pdg)
+        gen_pdg = b0_mc_truth[has_b0, gen_pdg_idx]
+        tag_is_gen = (gen_pdg == pdg)
 
         is_cont = b0_mc_truth[has_b0, is_cont_idx] == 1
 
         # Validate decayModeIDs
-        if (dm_ids < 0).any() or (dm_ids > 67).any():
+        if (dm_ids < 0).any() or (dm_ids > config.N_B0_MODES - 1).any():
             raise ValueError(f"Invalid decayModeID found in B0 candidates: min={dm_ids.min()}, max={dm_ids.max()}")
 
         apply_calib = tag_is_gen & ~is_cont
@@ -597,7 +597,7 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names, charged_cat, delta_p_thr
     pdg_idx = mc_var_names.index('PDG')
     sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
     is_cont_idx = mc_var_names.index('isContinuumEvent')
-    tag_pdg_idx = mc_var_names.index('mostcommonBTagPDG')
+    gen_pdg_idx = mc_var_names.index('mostcommonBTagPDG')
     delta_p_idx = mc_var_names.index('mostcommonBTagDeltaP')
 
     # Compute labels for B0 and B+ candidates separately
@@ -606,22 +606,20 @@ def build_main_labels(bp_truth, b0_truth, mc_var_names, charged_cat, delta_p_thr
         n = len(truth_array)
         labels = np.zeros(n, dtype=np.int64)
 
-        # Extract truth info
         pdg = truth_array[:, pdg_idx]
-        tag_pdg = truth_array[:, tag_pdg_idx]
-
+        gen_pdg = truth_array[:, gen_pdg_idx]
         is_cont = truth_array[:, is_cont_idx] == 1
 
         # is_target: good reconstruction AND exact PDG match with the true tag B.
         # Exact match (not abs) ensures CP-conjugate candidates are never labelled as target.
         delta_p = truth_array[:, delta_p_idx]
-        is_target = ~is_cont & (delta_p < delta_p_thresh) & (tag_pdg == pdg)
+        is_target = ~is_cont & (delta_p < delta_p_thresh) & (gen_pdg == pdg)
 
         # Crossfeed split based on absolute PDG comparison (groups B+/B- and B0/B0bar):
         # cross_deltaC1 (class 2): |mostcommonBTagPDG| != |reco PDG| (different charge type)
         # cross_internal (class 3): |mostcommonBTagPDG| == |reco PDG| (same charge type)
-        is_cross_deltaC1 = ~is_cont & (np.abs(tag_pdg) != np.abs(pdg))
-        is_cross_internal = ~is_cont & (tag_pdg != pdg) & (np.abs(tag_pdg) == np.abs(pdg))
+        is_cross_deltaC1 = ~is_cont & (np.abs(gen_pdg) != np.abs(pdg))
+        is_cross_internal = ~is_cont & (gen_pdg != pdg) & (np.abs(gen_pdg) == np.abs(pdg))
 
         # Assign labels (default 0 = bad_tag)
         labels[is_target] = 1
@@ -720,13 +718,20 @@ def build_category_labels(bp_truth, b0_truth, mc_var_names):
     n_events = len(bp_truth)
 
     # Get column indices
-    tag_pdg_idx = mc_var_names.index('mostcommonBTagPDG')
+    gen_pdg_idx = mc_var_names.index('mostcommonBTagPDG')
     sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
     is_cont_idx = mc_var_names.index('isContinuumEvent')
 
+    # Consistency check: each event should have at least one candidate (B0 or B+)
+    both_nan = np.isnan(bp_truth[:, sigprob_idx]) & np.isnan(b0_truth[:, sigprob_idx])
+    if both_nan.any():
+        raise ValueError(
+            str(both_nan.sum()) + " events have no B0 or B+ candidates (sigProb NaN for both)"
+        )
+
     # Determine best candidate (highest sigProb)
-    bp_sigprob = np.where(np.isnan(bp_truth[:, sigprob_idx]), -1, bp_truth[:, sigprob_idx])
-    b0_sigprob = np.where(np.isnan(b0_truth[:, sigprob_idx]), -1, b0_truth[:, sigprob_idx])
+    bp_sigprob = np.nan_to_num(bp_truth[:, sigprob_idx], nan=-1.0)
+    b0_sigprob = np.nan_to_num(b0_truth[:, sigprob_idx], nan=-1.0)
     bp_is_best = bp_sigprob > b0_sigprob
 
     is_cont_val = np.where(bp_is_best, bp_truth[:, is_cont_idx], b0_truth[:, is_cont_idx])
@@ -738,22 +743,22 @@ def build_category_labels(bp_truth, b0_truth, mc_var_names):
 
     # For BB events, use mostcommonBTagPDG to determine true MC event type (B0 vs B+).
     bb_mask = ~is_cont
-    best_tag_pdg = np.where(bp_is_best, bp_truth[:, tag_pdg_idx], b0_truth[:, tag_pdg_idx])
+    best_gen_pdg = np.where(bp_is_best, bp_truth[:, gen_pdg_idx], b0_truth[:, gen_pdg_idx])
 
-    valid_tag_pdg = {511, -511, 521, -521}
-    bb_tag_pdg = best_tag_pdg[bb_mask]
-    invalid = ~np.isin(bb_tag_pdg, list(valid_tag_pdg))
+    valid_gen_pdg = {511, -511, 521, -521}
+    bb_gen_pdg = best_gen_pdg[bb_mask]
+    invalid = ~np.isin(bb_gen_pdg, list(valid_gen_pdg))
     if invalid.any():
-        bad_vals = np.unique(bb_tag_pdg[invalid])
+        bad_vals = np.unique(bb_gen_pdg[invalid])
         raise ValueError(
             "mostcommonBTagPDG has unexpected values for non-continuum events: "
             + str(bad_vals)
         )
 
-    is_charged = np.abs(best_tag_pdg) == 521
+    gen_is_charged = np.abs(best_gen_pdg) == 521
 
-    labels[bb_mask & is_charged] = 1  # B+
-    labels[bb_mask & ~is_charged] = 0  # B0
+    labels[bb_mask & gen_is_charged] = 1   # B+
+    labels[bb_mask & ~gen_is_charged] = 0  # B0
 
     return labels
 
@@ -924,12 +929,9 @@ def main():
         if args.disco_lambda > 0:
             print("\nExtracting Mbc values for distance correlation...")
             mbc_idx = mc_var_names.index('Mbc')
-            bp_sigprob = np.where(
-                np.isnan(bp_truth[:, mc_var_names.index('extraInfo(SignalProbability)')]), -1,
-                bp_truth[:, mc_var_names.index('extraInfo(SignalProbability)')])
-            b0_sigprob = np.where(
-                np.isnan(b0_truth[:, mc_var_names.index('extraInfo(SignalProbability)')]), -1,
-                b0_truth[:, mc_var_names.index('extraInfo(SignalProbability)')])
+            sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
+            bp_sigprob = np.nan_to_num(bp_truth[:, sigprob_idx], nan=-1.0)
+            b0_sigprob = np.nan_to_num(b0_truth[:, sigprob_idx], nan=-1.0)
             bp_is_best = bp_sigprob > b0_sigprob
             mbc_array = np.where(bp_is_best, bp_truth[:, mbc_idx], b0_truth[:, mbc_idx])
             mbc_values = torch.from_numpy(mbc_array.astype(np.float32))

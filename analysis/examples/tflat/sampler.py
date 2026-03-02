@@ -109,4 +109,4 @@ if __name__ == '__main__':
     inputfile = args.inputfile
     working_dir = args.working_dir
 
-    main(uniqueIdentifier, inputfile, working_dir, belle=False)
+    main(uniqueIdentifier, inputfile, working_dir, is_belle=False)

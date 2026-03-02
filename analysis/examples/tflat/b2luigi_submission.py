@@ -39,7 +39,7 @@ class RecoTask(b2luigi.Task):
         workdir = os.path.join(OUTPATH, f"key={mykey}/num={mynum}/")
         os.makedirs(workdir, exist_ok=True)
 
-        sampler_main(unique_id, DICO_DATA[mykey][mynum].tolist(), working_dir=workdir)
+        sampler_main(unique_id, DICO_DATA[mykey][mynum].tolist(), working_dir=workdir, is_belle=True)
 
 
 class Wrapper(b2luigi.WrapperTask):

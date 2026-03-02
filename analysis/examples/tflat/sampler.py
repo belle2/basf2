@@ -40,10 +40,10 @@ def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False):
     '''
 
     b2.set_log_level(b2.LogLevel.ERROR)
-    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
     path = b2.Path()
 
     if not is_belle:
+        b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
         ma.inputMdstList(environmentType="default", filelist='', path=path)
     else:
         # Set Belle enviroment
@@ -59,6 +59,7 @@ def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False):
             path=path)
 
         ma.setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path=path)
+        b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltagB2BII())
 
     reconstructB2nunubar(path)
     buildROE(path)

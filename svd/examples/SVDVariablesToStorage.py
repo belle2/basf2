@@ -38,7 +38,7 @@ def addSVDVariablesToStorageModule(path, storageType):
                 "SVDClusterSNR",
                 "SVDClusterSize",
                 "SVDClusterTime",
-                "SVDEventT0",
+                "SVDClusterTimeMinusEventT0",
                 "SVDTrackPrime",
                 "SVDResidual",
                 "SVDLayer",

@@ -360,6 +360,12 @@ namespace Belle2::Variable {
     if (!recoHitInformation) {
       return Const::doubleNaN;
     }
+    if (!recoTrack->wasFitSuccessful()) {
+      return Const::doubleNaN;
+    }
+    if (!recoHitInformation->useInFit()) {
+      return Const::doubleNaN;
+    }
 
     try {
       // Get measured state on plane to extract track angles
@@ -371,18 +377,12 @@ namespace Belle2::Variable {
       const double trackPrime = state[1];
       const double trackPrimeOS = state[2];
 
-      // Get sensor information to retrieve thickness
-      static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-      const VxdID sensorID = svdCluster->getSensorID();
-      const VXD::SensorInfoBase& sensorInfo = geo.getSensorInfo(sensorID);
-
-      // Calculate track length in sensor: thickness * sqrt(1 + (du/dw)^2 + (dv/dw)^2)
-      const double trkLength = sensorInfo.getThickness() * sqrt(1.0 + trackPrime * trackPrime + trackPrimeOS * trackPrimeOS);
+      const double normTrkLength = sqrt(1.0 + trackPrime * trackPrime + trackPrimeOS * trackPrimeOS);
 
       // Get cluster charge and normalize by track length
       const double clusterCharge = svdCluster->getCharge();
 
-      return clusterCharge / trkLength;
+      return clusterCharge / normTrkLength;
     } catch (const NoTrackFitResult&) {
       B2WARNING("No track fit result available for this hit!");
       return Const::doubleNaN;

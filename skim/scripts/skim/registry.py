@@ -81,11 +81,9 @@ _RegisteredSkims = [
     ("12160400", "ewp", "inclusiveBplusToKplusNuNu_invalid"),  # deprecated skim
 
     # --- WG3: Time-dependent CP violation ---
-    ("13110100", "tdcpv", "TDCPV_inclusiveJpsi"),
     ("13130300", "tdcpv", "TDCPV_dilepton"),
     ("13160200", "tdcpv", "TDCPV_ccs"),
     ("13160300", "tdcpv", "TDCPV_qqs"),
-    ("13160400", "tdcpv", "TDCPV_klong"),
 
     # --- WG4: Charmed B decays ---
     ("14120300", "btocharm", "BtoD0h_Kspi0"),
@@ -124,20 +122,12 @@ _RegisteredSkims = [
     ("14141701", "btocharm", "B0toDomegapi_Kpipi_pipipi0"),
     ("14141702", "btocharm", "B0toDomegapi_Kspi_pipipi0"),
     ("14141703", "btocharm", "BtoD0pi_Kpiomega_pipipi0"),
-    ("14141805", "btocharm", "antiB0toDstar0pipi_Kpi"),
-    ("14121401", "btocharm", "BtoDstpipi_D0pi_Kpi"),
-    ("14121402", "btocharm", "BtoDpipi_Kpipi"),
-    ("14121403", "btocharm", "BtoDsDsst_Kpi_KK"),
-    ("14123300", "btocharm", "antiB0toDpipi0_Kpipi"),
-    ("14163400", "btocharm", "antiB0toDsDsst_Kpi0"),
-    ("14121404", "btocharm", "antiB0toDstpipi0_Kpi"),
 
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),
     ("15420100", "quarkonium", "BottomoniumEtabExclusive"),
     ("15440100", "quarkonium", "BottomoniumUpsilon"),
     ("15460400", "quarkonium", "InclusiveUpsilon"),
-    ("15460600", "quarkonium", "InclusiveUpsilonLoose"),
     ("16460100", "quarkonium", "ISRpipicc_invalid"),  # Subset of 16460200, deleted.
     ("16460200", "quarkonium", "CharmoniumPsi"),
 
@@ -181,7 +171,6 @@ _RegisteredSkims = [
     ("17260100", "charm", "DpToHpOmega"),  # D+ -> K/pi+ omega / omega -> pi+ pi- pi0
     ("17260200", "charm", "DspToHpOmega"),  # D_s+ -> K/pi+ omega / omega -> pi+ pi- pi0
     ("17241300", "charm", "DpToEtaHp"),  # D+ -> eta h+
-    ("17241400", "charm", "LambdacToGeneric"),  # Lambda_c+ -> X
 
     # --- WG8: Dark matter searches and tau physics ---
     ("18000000", "dark", "InelasticDarkMatter"),
@@ -193,10 +182,6 @@ _RegisteredSkims = [
     ("18020500", "dark", "InelasticDarkMatterWithDarkHiggs"),
     ("18020600", "dark", "DimuonPlusVisibleDarkHiggs"),
     ("18020700", "dark", "DielectronPlusVisibleDarkHiggs"),
-    ("18020800", "dark", "BtoK_ALP2Gamma"),
-    ("18020900", "dark", "TopologicalDarkPion"),
-    ("18022400", "dark", "DimuonRecoilMassSquared"),
-    ("18022500", "dark", "DarkShower"),
     ("18130100", "dark", "BtoKplusLLP"),
     ("18360100", "taupair", "TauLFV"),
     ("18370100", "dark", "AA2uuuu"),
@@ -211,7 +196,6 @@ _RegisteredSkims = [
     ("18570600", "taupair", "TauGeneric"),
     ("18570700", "taupair", "TauThrust"),
     ("18570800", "taupair", "TauKshort"),
-    ("18570900", "taupair", "TauToMuMuMu"),
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),
@@ -220,10 +204,6 @@ _RegisteredSkims = [
     ("19130300", "btocharmless", "BtoHad1Pi0"),
     ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),
     ("19130600", "btocharmless", "BtoPi0Eta"),
-    ("19140100", "btocharmless", "BtoEtaRhop"),
-    ("19140200", "btocharmless", "BtoEtapRhop"),
-    ("19140300", "btocharmless", "BtoEtaOmega"),
-    ("19140400", "btocharmless", "BtoEtapOmega"),
     ("19140500", "btocharmless", "BtoEtapKstp"),
 ]
 """

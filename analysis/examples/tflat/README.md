@@ -30,13 +30,16 @@ The parameters set in the yaml config file are optimized for a A100 GPU and 120G
       The default naming scheme is 'TFlaT_{MC_version}_{light_release}' e.g. 'TFlaT_MC16rd_light_2601_hyperion'
    - Possible update 'VersionBeamBackgroundMVA' and 'VersionFakePhotonMVA' in the config file if newer versions are available.
 
-2. **Sample training data**
+2. **Sample Belle II training data on the grid**
    - Run sampler script on grid
     ```bash
     gbasf2 sampler.py -p {name} -i {collection_name} -s {basf2_release} --basf2opt='-- uniqueIdentifier {uniqueIdentifier}' -f {uniqueIdentifier}.yaml -n 3
     ```
    - Note that the yaml config file also needs to be passed to the grid as it contains the input lists
    - Download the resulting ntuples
+
+   **Alternatively, sample Belle training data locally**
+   - Run sampler script locally
 
 3. **Prepare training data**
    - The training samples need to be split into a training and validation dataset.

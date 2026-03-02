@@ -69,6 +69,7 @@ namespace Belle2 {
   protected:
     /// name of estimation method
     std::string m_method;
+    /// prefix that will be added before the variable names
     std::string m_prefix;
   };
 }

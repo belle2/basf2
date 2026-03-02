@@ -21,6 +21,7 @@ namespace Belle2 {
     /** Constructor fills variableSet with variables to be extracted
      * @param variableSet set of variable to be filled
      * @param useTimingInfo whether to use the timing info in clusters
+     * @param prefix prefix that will be added before the variable names
      */
     ClusterInfoExtractor(std::vector<TrackingUtilities::Named<float*>>& variableSet, bool useTimingInfo,
                          const std::string& prefix = "") :
@@ -92,6 +93,7 @@ namespace Belle2 {
   protected:
     /// whether to use timing info from cluster
     bool m_UseTimingInfo;
+    /// prefix that will be added before the variable names
     std::string m_prefix;
 
     /// initialize statistics subsets of variables from clusters that get combined for SPTC

@@ -14,6 +14,8 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <framework/dataobjects/EventT0.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 namespace {
   Belle2::RecoTrack* getRecoTrack(const Belle2::Particle* particle)
@@ -309,7 +311,34 @@ namespace Belle2::Variable {
     return svdCluster ? svdCluster->isUCluster() : false;
   }
 
-  double SVDClusterChargeNormTrkLenght(const Particle* particle, const std::vector<double>& indices)
+  double SVDClusterTimeMinusEventT0(const Particle* particle, const std::vector<double>& indices)
+  {
+    if (!particle) {
+      return Const::doubleNaN;
+    }
+    if (indices.size() != 1) {
+      B2FATAL("Exactly one parameter (cluster index) is required.");
+    }
+    const auto clusterIndex = static_cast<unsigned int>(indices[0]);
+
+    SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+    if (!svdCluster) {
+      return Const::doubleNaN;
+    }
+
+    StoreObjPtr<EventT0> evtT0;
+    if (!evtT0.isValid()) {
+      B2WARNING("StoreObjPtr<EventT0> does not exist, are you running over cDST data?");
+      return Const::doubleNaN;
+    }
+    if (!evtT0->hasEventT0()) {
+      return Const::doubleNaN;
+    }
+
+    return svdCluster->getClsTime() - evtT0->getEventT0();
+  }
+
+  double SVDClusterChargeNormTrkLength(const Particle* particle, const std::vector<double>& indices)
   {
     if (!particle) {
       return Const::doubleNaN;
@@ -358,7 +387,7 @@ namespace Belle2::Variable {
       B2WARNING("No track fit result available for this hit!");
       return Const::doubleNaN;
     } catch (...) {
-      B2WARNING("Could not compute SVDClusterChargeNormTrkLenght.");
+      B2WARNING("Could not compute SVDClusterChargeNormTrkLength.");
       return Const::doubleNaN;
     }
   }
@@ -381,8 +410,10 @@ namespace Belle2::Variable {
                     "Returns the unbiased track position error of the i-th SVD cluster related to the Particle.");
   REGISTER_VARIABLE("SVDTruePosition(i)", SVDTruePosition,
                     "Returns the true position of the i-th SVD cluster related to the Particle.");
-  REGISTER_VARIABLE("SVDClusterChargeNormTrkLenght(i)", SVDClusterChargeNormTrkLenght,
+  REGISTER_VARIABLE("SVDClusterChargeNormTrkLength(i)", SVDClusterChargeNormTrkLength,
                     "Returns the cluster charge normalized to track length in SVD for the i-th SVD cluster related to the Particle.");
+  REGISTER_VARIABLE("SVDClusterTimeMinusEventT0(i)", SVDClusterTimeMinusEventT0,
+                    "Returns the cluster time minus the event T0 for the i-th SVD cluster related to the Particle.");
   REGISTER_VARIABLE("SVDLayer(i)", SVDLayer,
                     "Returns the layer number of the i-th SVD cluster related to the Particle. If no SVD cluster is found, returns -1.");
   REGISTER_VARIABLE("SVDLadder(i)", SVDLadder,

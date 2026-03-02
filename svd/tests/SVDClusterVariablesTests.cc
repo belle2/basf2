@@ -20,6 +20,8 @@
 #include <genfit/AbsFitterInfo.h>
 
 #include <svd/variables/SVDClusterVariables.h>
+#include <framework/dataobjects/EventT0.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 using namespace Belle2;
 
@@ -87,6 +89,7 @@ namespace Belle2::SVD {
       m_recoTracks.registerRelationTo(m_recoHitInformations);
       m_recoHitInformations.registerRelationTo(m_svdClusters);
       m_svdClusters.registerRelationTo(m_recoTracks);
+      m_eventT0.registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
 
       m_trackFitResults.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.1, 0.0, 0.0),
@@ -118,6 +121,7 @@ namespace Belle2::SVD {
     StoreArray<SVDCluster> m_svdClusters; /**< StoreArray for SVDCluster objects */
     StoreArray<TrackFitResult> m_trackFitResults; /**< StoreArray for TrackFitResult objects */
     StoreArray<RecoHitInformation> m_recoHitInformations; /**< StoreArray for RecoHitInformation objects */
+    StoreObjPtr<EventT0> m_eventT0; /**< StoreObjPtr for EventT0 */
   };
 
   /** Test SVDClusterCharge */
@@ -176,13 +180,33 @@ namespace Belle2::SVD {
     EXPECT_EQ(Variable::SVDSensor(m_particles[0], {1}), -1);
   }
 
-  /** Test SVDClusterChargeNormTrkLenght */
-  TEST_F(SVDVariableTest, SVDClusterChargeNormTrkLenght)
+  /** Test SVDClusterChargeNormTrkLength */
+  TEST_F(SVDVariableTest, SVDClusterChargeNormTrkLength)
   {
     // Without proper genfit track fitting setup, this should return NaN
     // but the function should not crash
-    EXPECT_TRUE(std::isnan(Variable::SVDClusterChargeNormTrkLenght(m_particles[0], {0})));
-    EXPECT_TRUE(std::isnan(Variable::SVDClusterChargeNormTrkLenght(nullptr,        {0})));
-    EXPECT_TRUE(std::isnan(Variable::SVDClusterChargeNormTrkLenght(m_particles[0], {1})));
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterChargeNormTrkLength(m_particles[0], {0})));
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterChargeNormTrkLength(nullptr,        {0})));
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterChargeNormTrkLength(m_particles[0], {1})));
+  }
+
+  /** Test SVDClusterTimeMinusEventT0 */
+  TEST_F(SVDVariableTest, SVDClusterTimeMinusEventT0)
+  {
+    // nullptr particle or out-of-range cluster -> NaN
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterTimeMinusEventT0(nullptr,        {0})));
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterTimeMinusEventT0(m_particles[0], {1})));
+
+    // EventT0 not yet created -> NaN
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterTimeMinusEventT0(m_particles[0], {0})));
+
+    // EventT0 created but no final T0 set -> NaN
+    m_eventT0.create();
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterTimeMinusEventT0(m_particles[0], {0})));
+
+    // EventT0 set -> clsTime - eventT0
+    const double eventT0Value = 5.0;
+    m_eventT0->setEventT0(eventT0Value, 1.0, Const::SVD);
+    EXPECT_DOUBLE_EQ(Variable::SVDClusterTimeMinusEventT0(m_particles[0], {0}), defaultClsTime - eventT0Value);
   }
 } // namespace Belle2::SVD

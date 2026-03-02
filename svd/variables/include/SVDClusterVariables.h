@@ -21,7 +21,8 @@ namespace Belle2::Variable {
   double SVDTrackPositionErrorUnbiased(const Particle*, const std::vector<double>& indices);
   double SVDTruePosition(const Particle*, const std::vector<double>& indices);
   double SVDResidual(const Particle*, const std::vector<double>& indices);
-  double SVDClusterChargeNormTrkLenght(const Particle*, const std::vector<double>& indices);
+  double SVDClusterChargeNormTrkLength(const Particle*, const std::vector<double>& indices);
+  double SVDClusterTimeMinusEventT0(const Particle*, const std::vector<double>& indices);
   int SVDLayer(const Particle*, const std::vector<double>& indices);
   int SVDLadder(const Particle*, const std::vector<double>& indices);
   int SVDSensor(const Particle*, const std::vector<double>& indices);

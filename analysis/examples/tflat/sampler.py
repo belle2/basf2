@@ -11,6 +11,8 @@ import argparse
 import basf2 as b2
 import modularAnalysis as ma
 from tflat.flavorTagger import flavorTagger
+from b2biiConversion import convertBelleMdstToBelleIIMdst
+import os
 
 
 def reconstructB2nunubar(path):
@@ -32,12 +34,52 @@ def buildROE(path):
     ma.buildRestOfEvent(target_list_name='B0:sig', path=path)
 
 
+def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False):
+    '''
+    Samples a chunk of training data for TFlat
+    '''
+
+    b2.set_log_level(b2.LogLevel.ERROR)
+    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
+    path = b2.Path()
+
+    if not is_belle:
+        ma.inputMdstList(environmentType="default", filelist='', path=path)
+    else:
+        # Set Belle enviroment
+        os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
+        os.environ['PGUSER'] = 'g0db'
+        # environmentType = "Belle"
+
+        # Load and convert input files
+        convertBelleMdstToBelleIIMdst(
+            inputBelleMDSTFile=inputfile,
+            enableLocalDB=False,
+            generatorLevelMCMatching=False,
+            path=path)
+
+        ma.setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path=path)
+
+    reconstructB2nunubar(path)
+    buildROE(path)
+
+    flavorTagger(
+        'B0:sig',
+        mode='Sampler',
+        working_dir=working_dir,
+        uniqueIdentifier=uniqueIdentifier,
+        path=path)
+    ma.summaryOfLists(particleLists=['B0:sig'], path=path)
+    b2.process(path)
+    print(b2.statistics)
+
+
 if __name__ == '__main__':
     '''
     Samples a chunk of training data for TFlat
     '''
     parser = argparse.ArgumentParser(description='Sample TFlat')
-    parser.add_argument(  # input parser
+    parser.add_argument(
         '--uniqueIdentifier',
         metavar='uniqueIdentifier',
         dest='uniqueIdentifier',
@@ -45,23 +87,26 @@ if __name__ == '__main__':
         default="TFlaT_MC16rd_light_2601_hyperion",
         help='Name of both the config .yaml to be used and the produced weightfile'
     )
+    parser.add_argument(
+        '--inputfile',
+        metavar='inputfile',
+        dest='inputfile',
+        type=str,
+        default='',
+        help='Inputfile to sample'
+    )
+    parser.add_argument(
+        '--working_dir',
+        metavar='working_dir',
+        dest='working_dir',
+        type=str,
+        default='',
+        help='working_dir'
+    )
+
     args = parser.parse_args()
     uniqueIdentifier = args.uniqueIdentifier
+    inputfile = args.inputfile
+    working_dir = args.working_dir
 
-    b2.set_log_level(b2.LogLevel.ERROR)
-    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
-    path = b2.Path()
-
-    ma.inputMdstList(environmentType="default", filelist='', path=path)
-    reconstructB2nunubar(path)
-    buildROE(path)
-
-    flavorTagger(
-        'B0:sig',
-        mode='Sampler',
-        working_dir='',
-        uniqueIdentifier=uniqueIdentifier,
-        path=path)
-    ma.summaryOfLists(particleLists=['B0:sig'], path=path)
-    b2.process(path)
-    print(b2.statistics)
+    main(uniqueIdentifier, inputfile, working_dir, belle=False)

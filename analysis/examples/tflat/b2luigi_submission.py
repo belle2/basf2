@@ -2,7 +2,7 @@ import os
 import b2luigi
 import numpy as np
 import json
-from sampler_b2bii import main as sampler_main
+from sampler import main as sampler_main
 
 OUTPATH = '/group/belle2/group/physics/TDCPV/TFlaT_Belle/Test_Submission/'
 
@@ -17,9 +17,7 @@ def get_chunked_array(filename):
 
 
 # Declare Input Files
-DICO_DATA["TFLaT_Files_Test"] = get_chunked_array(
-    "/group/belle2/group/physics/TDCPV/TFlaT_Belle/Simulated_Samples/Input_Files_test.json")
-# DICO_DATA["TFLaT_Files"] = get_chunked_array("/group/belle2/group/physics/TDCPV/TFlaT_Belle/Simulated_Samples/Input_Files.json")
+DICO_DATA["TFLaT_Files_Test"] = get_chunked_array("Input_Files_test.json")
 
 
 class RecoTask(b2luigi.Task):

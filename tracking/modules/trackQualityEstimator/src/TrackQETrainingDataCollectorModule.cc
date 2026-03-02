@@ -69,14 +69,14 @@ void TrackQETrainingDataCollectorModule::initialize()
   m_hitInfoExtractor = std::make_unique<HitInfoExtractor>(m_variableSet);
 
   // create pointer to chosen estimator
-  if (m_EstimationMethod == "tripletFit") {
+  if (m_SVDEstimationMethod == "tripletFit") {
     m_estimator = std::make_unique<QualityEstimatorTripletFit>();
-  } else if (m_EstimationMethod == "circleFit") {
+  } else if (m_SVDEstimationMethod == "circleFit") {
     m_estimator = std::make_unique<QualityEstimatorCircleFit>();
-  } else if (m_EstimationMethod == "helixFit") {
+  } else if (m_SVDEstimationMethod == "helixFit") {
     m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
   }
-  B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
+  B2ASSERT("QualityEstimator could not be initialized with method: " << m_SVDEstimationMethod, m_estimator);
 
   m_qeResultsExtractor = std::make_unique<QEResultsExtractor>(m_SVDEstimationMethod, m_variableSet, "SVD_");
   m_variableSet.emplace_back("SVD_NSpacePoints", &m_nSpacePoints);

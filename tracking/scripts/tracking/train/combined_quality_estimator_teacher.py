@@ -173,6 +173,7 @@ import tracking
 import tracking.root_utils as root_utils
 from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
 from tracking_mva_filter_payloads.write_tracking_mva_filter_payloads_to_db import write_tracking_mva_filter_payloads_to_db
+from tracking_mva_filter_payloads.write_tracking_mva_filter_payloads_to_db import write_mva_weightfile_content_to_db
 
 # @cond internal_test
 
@@ -1126,12 +1127,17 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
 
         if cdc_qe_mva_filter_parameters is not None and cdc_identifier is not None:
             name = 'TrackingMVAFilterParameters'
-            write_tracking_mva_filter_payloads_to_db(
+            name = write_tracking_mva_filter_payloads_to_db(
                 dbobj_name=name,
                 iovList=(0, 0, 0, -1),
                 weightfile_identifier=cdc_identifier,
                 cut_value=cut)
             cdc_qe_mva_filter_parameters = {'DBPayloadName': name}
+        if replace_vxd_qi and vxd_identifier is not None:
+            vxd_name = 'VXDQualityEstimatorMVAWeightFileIdentifier'
+            with open(vxd_identifier) as f:
+                weight_file_content = f.read()
+            vxd_name = write_mva_weightfile_content_to_db(vxd_name, weight_file_content, (0, 0, 0, -1))
         if cdc_qe_mva_filter_parameters is not None:
             # if no cut is specified, the default value is at zero and nothing is deleted.
             basf2.set_module_parameters(
@@ -1595,12 +1601,20 @@ class VXDQEHarvestingValidationTask(HarvestingValidationBaseTask):
         )
         # Replace the weightfiles of all quality estimator module by those
         # produced in this training by b2luigi
+        vxd_identifier = self.get_input_file_names(
+                self.teacher_task.get_weightfile_xml_identifier(self.teacher_task, fast_bdt_option=self.fast_bdt_option)
+            )[0]
+        with open(vxd_identifier) as f:
+            weight_file_content = f.read()
+        vxd_name = write_mva_weightfile_content_to_db(
+            dbobj_name='VXDQualityEstimatorMVAWeightFileIdentifier',
+            content=weight_file_content,
+            iovList=(0, 0, 0, -1)
+        )
         basf2.set_module_parameters(
             path,
             name="VXDQualityEstimatorMVA",
-            WeightFileIdentifier=self.get_input_file_names(
-                self.teacher_task.get_weightfile_xml_identifier(self.teacher_task, fast_bdt_option=self.fast_bdt_option)
-            )[0],
+            WeightFileIdentifier=vxd_name,
         )
         tracking.add_mc_matcher(path, components=["SVD"])
         tracking.add_track_fit_and_track_creator(path, components=["SVD"])
@@ -1668,7 +1682,7 @@ class CDCQEHarvestingValidationTask(HarvestingValidationBaseTask):
 
         # fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
         name = 'TrackingMVAFilterParameters'
-        write_tracking_mva_filter_payloads_to_db(
+        name = write_tracking_mva_filter_payloads_to_db(
             dbobj_name=name,
             iovList=(0, 0, 0, -1),
             weightfile_identifier=self.get_input_file_names(
@@ -1756,7 +1770,7 @@ class RecoTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
             add_vxdTrack_QI=True,
             add_recoTrack_QI=True,
             skipGeometryAdding=True,
-            skipHitPreparerAdding=False,
+            skipHitPreparerAdding=True,
         )
 
         # Replace the weightfiles of all quality estimator modules by those
@@ -1770,7 +1784,7 @@ class RecoTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
 
         # fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
         name = 'TrackingMVAFilterParameters'
-        write_tracking_mva_filter_payloads_to_db(
+        name = write_tracking_mva_filter_payloads_to_db(
             dbobj_name=name,
             iovList=(0, 0, 0, -1),
             weightfile_identifier=self.get_input_file_names(
@@ -1784,19 +1798,35 @@ class RecoTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
             name="TFCDC_TrackQualityEstimator",
             filterParameters=cdc_qe_mva_filter_parameters,
         )
+        vxd_identifier = self.get_input_file_names(
+                VXDQETeacherTask.get_weightfile_xml_identifier(VXDQETeacherTask, fast_bdt_option=self.fast_bdt_option)
+            )[0]
+        with open(vxd_identifier) as f:
+            weight_file_content = f.read()
+        vxd_name = write_mva_weightfile_content_to_db(
+            dbobj_name='VXDQualityEstimatorMVAWeightFileIdentifier',
+            content=weight_file_content,
+            iovList=(0, 0, 0, -1)
+        )
         basf2.set_module_parameters(
             path,
             name="VXDQualityEstimatorMVA",
-            WeightFileIdentifier=self.get_input_file_names(
-                VXDQETeacherTask.get_weightfile_xml_identifier(VXDQETeacherTask, fast_bdt_option=self.fast_bdt_option)
-            )[0],
+            WeightFileIdentifier=vxd_name,
+        )
+        recotrack_identifier = self.get_input_file_names(
+                RecoTrackQETeacherTask.get_weightfile_xml_identifier(RecoTrackQETeacherTask, fast_bdt_option=self.fast_bdt_option)
+            )[0]
+        with open(recotrack_identifier) as f:
+            weight_file_content = f.read()
+        recotrack_name = write_mva_weightfile_content_to_db(
+            dbobj_name='RecoTrackQualityEstimatorMVAWeightFileIdentifier',
+            content=weight_file_content,
+            iovList=(0, 0, 0, -1)
         )
         basf2.set_module_parameters(
             path,
             name="TrackQualityEstimatorMVA",
-            WeightFileIdentifier=self.get_input_file_names(
-                RecoTrackQETeacherTask.get_weightfile_xml_identifier(RecoTrackQETeacherTask, fast_bdt_option=self.fast_bdt_option)
-            )[0],
+            WeightFileIdentifier=recotrack_name,
         )
 
 
@@ -1915,7 +1945,7 @@ class TrackQEEvaluationBaseTask(Task):
         The task is considered finished if and only if the outputs all exist.
         """
         weightfile_details = create_fbdt_option_string(self.fast_bdt_option)
-        evaluation_pdf_output = self.teacher_task.weightfile_identifier_basename + weightfile_details + ".pdf"
+        evaluation_pdf_output = self.teacher_task.weightfile_identifier_basename + weightfile_details + ".zip"
         yield self.add_to_output(evaluation_pdf_output)
 
     @b2luigi.on_temporary_files
@@ -1927,7 +1957,7 @@ class TrackQEEvaluationBaseTask(Task):
         evaluated on separate test data.
         """
         weightfile_details = create_fbdt_option_string(self.fast_bdt_option)
-        evaluation_pdf_output_basename = self.teacher_task.weightfile_identifier_basename + weightfile_details + ".pdf"
+        evaluation_pdf_output_basename = self.teacher_task.weightfile_identifier_basename + weightfile_details + ".zip"
 
         evaluation_pdf_output_path = self.get_output_file_name(evaluation_pdf_output_basename)
 
@@ -1999,7 +2029,13 @@ class TrackQEEvaluationBaseTask(Task):
             os.remove(stderr_log_file_path)
 
         # Run evaluation via subprocess and write output into logfiles
-        subprocess.run(cmd, check=True)
+        with open(stdout_log_file_path, "a") as stdout_file:
+            with open(stderr_log_file_path, "a") as stderr_file:
+                try:
+                    subprocess.run(cmd, check=True, stdout=stdout_file, stderr=stderr_file)
+                except subprocess.CalledProcessError as err:
+                    stderr_file.write(f"Evaluation failed with error:\n{err}")
+                    raise err
 
 
 class VXDTrackQEEvaluationTask(TrackQEEvaluationBaseTask):

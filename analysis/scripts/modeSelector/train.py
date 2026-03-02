@@ -779,7 +779,7 @@ def main():
                         help='Batch size (default: 8192 for category network, 32768 for main network)')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of DataLoader worker processes')
     parser.add_argument('--epochs', type=int, default=40, help='Number of epochs')
-    parser.add_argument('--lr', type=float, default=0.0001, help='Learning rate')
+    parser.add_argument('--lr', type=float, default=1e-3, help='Initial learning rate (cosine annealed to 1e-6)')
     parser.add_argument('--weight_decay', type=float, default=1e-4, help='Weight decay for AdamW')
     parser.add_argument('--val_split', type=float, default=0.1, help='Validation split')
     parser.add_argument('--seed', type=int, default=42, help='Random seed')
@@ -1004,9 +1004,7 @@ def main():
     # Loss and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode='min', factor=0.5, patience=5, min_lr=1e-6
-    )
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs, eta_min=1e-6)
 
     # Training loop
     print("\n" + "=" * 60)
@@ -1038,7 +1036,7 @@ def main():
         epoch_time = time.time() - epoch_start
 
         # Scheduler step
-        scheduler.step(val_loss)
+        scheduler.step()
         new_lr = optimizer.param_groups[0]['lr']
 
         history['train_loss'].append(train_loss)

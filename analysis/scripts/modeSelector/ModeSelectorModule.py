@@ -433,6 +433,14 @@ class ModeSelectorModule(b2.Module):
             for d in self.training_data
         ])
 
+        # MC truth per input_id slot: shape (n_events, N_INPUT_IDS, n_mc_vars)
+        n_mc_vars = len(mc_var_names)
+        mc_truth_arr = np.full((n_events, self.n_input_ids, n_mc_vars), np.nan, dtype=np.float32)
+        for evt_idx, d in enumerate(self.training_data):
+            for iid, mc_truth_dict in d['mc_truth_by_input_id'].items():
+                for v_idx, v_name in enumerate(mc_var_names):
+                    mc_truth_arr[evt_idx, iid, v_idx] = mc_truth_dict[v_name]
+
         sparse.save_npz(self.training_output.replace('.npz', '_features.npz'), sparse_features)
         np.savez(self.training_output,
                  exp=exp, run=run, evt=evt,
@@ -440,10 +448,12 @@ class ModeSelectorModule(b2.Module):
                  n_candidates=n_candidates,
                  bp_truth=bp_truth,
                  b0_truth=b0_truth,
+                 mc_truth_by_input_id=mc_truth_arr,
                  mc_var_names=mc_var_names)
 
         print(f"\n[TRAINING] Saved {n_events} events to {self.training_output}")
         print(f"[TRAINING] Sparse features: {self.training_output.replace('.npz', '_features.npz')}")
+        print(f"[TRAINING] mc_truth_by_input_id: shape {mc_truth_arr.shape}")
         print(f"[TRAINING] MC truth variables: {mc_var_names}")
 
     def event(self):
@@ -464,6 +474,8 @@ class ModeSelectorModule(b2.Module):
         best_bp_sig = -1
         best_b0 = None
         best_b0_sig = -1
+        particle_by_input_id = {}   # input_id -> Particle with highest sigProb
+        _sigprob_by_input_id = {}   # input_id -> sigProb for deduplication
 
         for list_name in self.particle_lists:
             plist = Belle2.PyStoreObj(list_name)
@@ -495,6 +507,13 @@ class ModeSelectorModule(b2.Module):
                     best_b0_sig = sig_prob
                     best_b0 = particle
 
+                # Track best particle per input_id (same deduplication as _build_feature_array)
+                if 0 <= input_id < self.n_input_ids:
+                    prev_sig = _sigprob_by_input_id.get(input_id, -2)
+                    if sig_prob > prev_sig:
+                        _sigprob_by_input_id[input_id] = sig_prob
+                        particle_by_input_id[input_id] = particle
+
         if not candidates_data:
             return
 
@@ -507,6 +526,10 @@ class ModeSelectorModule(b2.Module):
         # Training mode: save features + MC truth, skip NN inference
         if self.training_mode:
             event_meta = Belle2.PyStoreObj('EventMetaData')
+            mc_truth_by_input_id = {
+                iid: self._extract_mc_truth(p)
+                for iid, p in particle_by_input_id.items()
+            }
             entry = {
                 'exp': event_meta.getExperiment() if event_meta.isValid() else -1,
                 'run': event_meta.getRun() if event_meta.isValid() else -1,
@@ -516,6 +539,7 @@ class ModeSelectorModule(b2.Module):
                 'n_candidates': n_unique_candidates,
                 'bp_mc_truth': self._extract_mc_truth(best_bp),
                 'b0_mc_truth': self._extract_mc_truth(best_b0),
+                'mc_truth_by_input_id': mc_truth_by_input_id,
             }
             self.training_data.append(entry)
             return
@@ -557,20 +581,27 @@ class ModeSelectorModule(b2.Module):
         main_output = self.main_session.run(None, {self.main_input_name: main_input})[0][0]
 
         # Extract scores
-        # Main network outputs (6 classes after softmax):
-        #   [0] bad_tag, [1] is_target_neutral, [2] cross_deltaC1,
-        #   [3] cross_internal, [4] continuum, [5] is_target_charged
-        bp_score = float(main_output[5] - main_output[1])
+        # Main network outputs (140 classes after softmax):
+        #   [0..N_INPUT_IDS-1] = P(true mode is that input_id); class index = input_id
+        #   [N_INPUT_IDS+0] = bad_tag
+        #   [N_INPUT_IDS+1] = cross_deltaC1
+        #   [N_INPUT_IDS+2] = cross_internal
+        #   [N_INPUT_IDS+3] = continuum
+        bp_threshold = config.N_BP_MODES * 2
+        sign = 1.0 if charged_cat else -1.0
+        if charged_cat:
+            max_mode_prob = float(np.max(main_output[:bp_threshold]))
+        else:
+            max_mode_prob = float(np.max(main_output[bp_threshold:config.N_INPUT_IDS]))
+        bp_score = sign * max_mode_prob
 
-        # eqSigProb: maps Bp_score to [0, 1] range
-        eq_sig_prob_bp = 0.5 + bp_score / 2
-        eq_sig_prob_b0 = 0.5 - bp_score / 2
-
-        # Store eqSigProb on best B+ and B0 candidates (candidate-specific)
-        if best_bp is not None:
-            best_bp.addExtraInfo(f'{self.output_variable}_eqSigProb', eq_sig_prob_bp)
-        if best_b0 is not None:
-            best_b0.addExtraInfo(f'{self.output_variable}_eqSigProb', eq_sig_prob_b0)
+        # Assign BplusScore_eqSigProb per candidate in the predicted sector only.
+        # Non-predicted sector candidates are left unset (sigProb-based ranking used downstream).
+        for input_id, particle in particle_by_input_id.items():
+            is_bp_sector = input_id < bp_threshold
+            if bool(charged_cat) == is_bp_sector:
+                candidate_score = float(main_output[input_id])
+                particle.addExtraInfo(f'{self.output_variable}_eqSigProb', candidate_score)
 
         # Store event-level outputs in EventExtraInfo
         event_extra_info = Belle2.PyStoreObj('EventExtraInfo')

@@ -25,14 +25,17 @@ def convert_network_to_onnx(pt_path, onnx_path):
     """Convert a ModeSelector .pt checkpoint to ONNX.
 
     Input size and number of output classes are derived automatically
-    from the saved weights.
+    from the saved weights. The category network has 3 output classes;
+    the main network has N_INPUT_IDS + 4 = 140 output classes.
     """
     checkpoint = torch.load(pt_path, map_location='cpu', weights_only=True)
     state_dict = checkpoint['model_state_dict']
 
-    # Derive dimensions from the saved weights
+    # Derive dimensions from the saved weights.
+    # The last linear layer index depends on architecture depth, so find it dynamically.
     input_size = state_dict['network.0.weight'].shape[1]
-    num_labels = state_dict['network.13.bias'].shape[0]
+    last_layer_idx = max(int(k.split('.')[1]) for k in state_dict if k.endswith('.bias'))
+    num_labels = state_dict[f'network.{last_layer_idx}.bias'].shape[0]
 
     model = MultiClassNet(input_size, num_labels)
     model.load_state_dict(state_dict)

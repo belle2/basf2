@@ -207,6 +207,9 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         b0_truth = data['b0_truth']
         file_mc_var_names = list(data['mc_var_names'])
 
+        # Load per-input_id mc truth if available (new field from updated training data)
+        mc_truth_by_id = data['mc_truth_by_input_id'] if 'mc_truth_by_input_id' in data else None
+
         sigprob_idx = file_mc_var_names.index('extraInfo(SignalProbability)')
         mbc_idx = file_mc_var_names.index('Mbc')
         is_cont_idx = file_mc_var_names.index('isContinuumEvent')
@@ -238,11 +241,13 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         file_rng = np.random.default_rng(seed)
         sampled = (file_rng.random(len(bp_truth)) < sample_prob) & presel
 
-        return feats[sampled], bp_truth[sampled], b0_truth[sampled], file_mc_var_names, n_clipped
+        mc_truth_sampled = mc_truth_by_id[sampled] if mc_truth_by_id is not None else None
+        return feats[sampled], bp_truth[sampled], b0_truth[sampled], file_mc_var_names, n_clipped, mc_truth_sampled
 
     features_list = []
     bp_list = []
     b0_list = []
+    mc_truth_list = []
     mc_var_names = None
     total_clipped = 0
     total_events = 0
@@ -254,7 +259,7 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
             for f, s in zip(input_files, seeds)
         }
         for future in tqdm(as_completed(futures), total=len(futures), desc="Loading files"):
-            feats, bp, b0, file_mc_var_names, n_clipped = future.result()
+            feats, bp, b0, file_mc_var_names, n_clipped, mc_truth = future.result()
             if mc_var_names is None:
                 mc_var_names = file_mc_var_names
             elif file_mc_var_names != mc_var_names:
@@ -265,6 +270,7 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
             features_list.append(feats)
             bp_list.append(bp)
             b0_list.append(b0)
+            mc_truth_list.append(mc_truth)
             total_clipped += n_clipped
             total_events += len(bp)
 
@@ -277,6 +283,10 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     features = sparse.vstack(features_list, format='csr')
     bp_truth = np.vstack(bp_list)
     b0_truth = np.vstack(b0_list)
+    if all(m is not None for m in mc_truth_list):
+        mc_truth_by_input_id_arr = np.concatenate(mc_truth_list, axis=0)
+    else:
+        mc_truth_by_input_id_arr = None
 
     print(f"\nTotal after concatenation: {features.shape[0]} events")
 
@@ -330,16 +340,18 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     # Apply feature selection
     features = features[:, has_inputs]
 
-    return (features, bp_truth, b0_truth, mc_var_names, has_inputs)
+    return (features, bp_truth, b0_truth, mc_var_names, has_inputs, mc_truth_by_input_id_arr)
 
 
 class MultiClassNet(nn.Module):
     """Multi-class classification network with fully connected layers.
 
-    Architecture:
-    - 256 -> 128 (dropout 0.2) -> 64 (dropout 0.15) -> 32 (dropout 0.1) -> 16 -> num_labels
-    - ReLU activation
-    - Xavier initialization (gain=0.5, bias=0.01)
+    Two architectures selected automatically by num_labels:
+    - Deep (num_labels <= 10, e.g. category network with 3 classes):
+      256 -> 128 (dropout 0.2) -> 64 (dropout 0.15) -> 32 (dropout 0.1) -> 16 -> num_labels
+    - Shallow (num_labels > 10, e.g. main network with 140 classes):
+      256 -> 128 (dropout 0.1) -> 128 (dropout 0.1) -> 64 (dropout 0.05) -> num_labels
+    - ReLU activation, Xavier initialization (gain=0.5, bias=0.01)
     """
 
     def __init__(self, input_size, num_labels=3):
@@ -347,22 +359,38 @@ class MultiClassNet(nn.Module):
 
         self.activation = nn.ReLU()
 
-        self.network = nn.Sequential(
-            nn.Linear(input_size, 256),
-            self.activation,
-            nn.Linear(256, 128),
-            nn.Dropout(0.2),
-            self.activation,
-            nn.Linear(128, 64),
-            nn.Dropout(0.15),
-            self.activation,
-            nn.Linear(64, 32),
-            nn.Dropout(0.1),
-            self.activation,
-            nn.Linear(32, 16),
-            self.activation,
-            nn.Linear(16, num_labels)
-        )
+        if num_labels <= 10:
+            self.network = nn.Sequential(
+                nn.Linear(input_size, 256),
+                self.activation,
+                nn.Linear(256, 128),
+                nn.Dropout(0.2),
+                self.activation,
+                nn.Linear(128, 64),
+                nn.Dropout(0.15),
+                self.activation,
+                nn.Linear(64, 32),
+                nn.Dropout(0.1),
+                self.activation,
+                nn.Linear(32, 16),
+                self.activation,
+                nn.Linear(16, num_labels)
+            )
+        else:
+            self.network = nn.Sequential(
+                nn.Linear(input_size, 256),
+                self.activation,
+                nn.Linear(256, 128),
+                nn.Dropout(0.1),
+                self.activation,
+                nn.Linear(128, 128),
+                nn.Dropout(0.1),
+                self.activation,
+                nn.Linear(128, 64),
+                nn.Dropout(0.05),
+                self.activation,
+                nn.Linear(64, num_labels)
+            )
 
         self._init_weights()
 
@@ -431,21 +459,28 @@ def train_epoch(model, train_loader, criterion, optimizer, device, disco_lambda=
         if disco_lambda > 0 and batch_mbc is not None:
             probs = torch.softmax(output, dim=1)
 
-            if probs.shape[1] == 6:  # main network
-                combined_output = -(probs[:, 5] - probs[:, 1])
+            if probs.shape[1] > config.NUM_CAT_LABELS:  # main network
+                # Signal proxy: max softmax prob over predicted sector's signal modes.
+                # charged_cat is appended as the last feature in the batch.
+                bp_threshold = config.N_BP_MODES * 2
+                charged_cat_batch = data[:, -1] > 0.5
+                bp_max = probs[:, :bp_threshold].max(dim=1).values
+                b0_max = probs[:, bp_threshold:config.N_INPUT_IDS].max(dim=1).values
+                signal_prob = torch.where(charged_cat_batch, bp_max, b0_max)
 
-                # Continuum class (4)
-                cont_mask = target == 4
+                cont_class = config.N_INPUT_IDS + 3
+                cross_int_class = config.N_INPUT_IDS + 2
+
+                cont_mask = target == cont_class
                 if cont_mask.sum() > 1:
                     disco_loss = disco_loss + disco_lambda * distance_corr(
-                        combined_output[cont_mask], batch_mbc[cont_mask]
+                        signal_prob[cont_mask], batch_mbc[cont_mask]
                     )
 
-                # Crossfeed internal class (3)
-                cross_mask = target == 3
+                cross_mask = target == cross_int_class
                 if cross_mask.sum() > 1:
                     disco_loss = disco_loss + 2 * disco_lambda * distance_corr(
-                        combined_output[cross_mask], batch_mbc[cross_mask]
+                        signal_prob[cross_mask], batch_mbc[cross_mask]
                     )
 
         loss = cls_loss + disco_loss
@@ -553,98 +588,123 @@ def distance_corr(var_1, var_2, normedweight=None, power=1):
     return dCorr
 
 
-def build_main_labels(bp_truth, b0_truth, mc_var_names, charged_cat, delta_p_thresh=0.15):
+def build_mode_labels(bp_truth, b0_truth, mc_truth_by_input_id_arr, mc_var_names,
+                      charged_cat, delta_p_thresh=0.15):
     """
-    Build main network labels (6 classes) from MC truth.
-
-    Good tags are defined as mostcommonBTagDeltaP < delta_p_thresh.
+    Build mode-prediction labels (0 to N_INPUT_IDS+3) from MC truth.
 
     Classes:
-    - 0: bad_tag (background)
-    - 1: is_target_neutral (signal B0)
-    - 2: cross_deltaC1 (BB crossfeed, Delta C=1 - different B type)
-    - 3: cross_internal (BB crossfeed, internal - same B type)
-    - 4: continuum
-    - 5: is_target_charged (signal B+)
+    - 0 to N_INPUT_IDS-1: signal mode; class index equals the candidate's input_id
+    - N_INPUT_IDS+0 (136): bad_tag
+    - N_INPUT_IDS+1 (137): cross_deltaC1 (|mostcommonBTagPDG| != |PDG|)
+    - N_INPUT_IDS+2 (138): cross_internal (same charge type, wrong CP conjugate)
+    - N_INPUT_IDS+3 (139): continuum
 
-    Logic:
-    - Use category network output (charged_cat) to determine B+ vs B0 per event
-    - For B0 predicted: assign labels 0-4 directly
-    - For B+ predicted: assign labels 0-4, but map is_target (1) -> 5
+    Signal label assignment per event:
+    1. Use charged_cat to select the predicted B sector (B+ or B0).
+    2. Among all candidates in that sector, find the one with smallest
+       mostcommonBTagDeltaP that satisfies mostcommonBTagPDG == PDG and is not
+       continuum. If found and DeltaP < delta_p_thresh: label = that input_id.
+    3. Otherwise assign background class from best_bp / best_b0 truth.
 
     Parameters
     ----------
-    bp_truth : ndarray
-        MC truth for B+ candidates
-    b0_truth : ndarray
-        MC truth for B0 candidates
+    bp_truth : ndarray, shape (n_events, n_vars)
+        MC truth for best B+ candidate
+    b0_truth : ndarray, shape (n_events, n_vars)
+        MC truth for best B0 candidate
+    mc_truth_by_input_id_arr : ndarray, shape (n_events, N_INPUT_IDS, n_vars)
+        MC truth per input_id slot (NaN where absent)
     mc_var_names : list
-        Names of MC truth variables
+        Names of MC truth variables (must match order in mc_truth_by_input_id_arr)
     charged_cat : ndarray of bool
-        Boolean array: True if category network predicts B+ (charged), False for B0 (neutral)
+        True if category network predicts B+, False for B0
     delta_p_thresh : float
-        Threshold for mostcommonBTagDeltaP good-tag definition. Default: 0.15
+        Threshold for mostcommonBTagDeltaP. Default: 0.15
 
     Returns
     -------
-    labels : ndarray
-        Main network labels (0-5)
+    labels : ndarray of int64
+        Mode labels (0 to N_INPUT_IDS+3)
     train_selection : ndarray of bool
-        Mask of events where the category-selected candidate type has a valid candidate
+        True for events where the category-selected sector has a valid candidate
     """
-
-    # Get column indices
+    mc_var_names = list(mc_var_names)
     pdg_idx = mc_var_names.index('PDG')
     sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
     is_cont_idx = mc_var_names.index('isContinuumEvent')
     gen_pdg_idx = mc_var_names.index('mostcommonBTagPDG')
     delta_p_idx = mc_var_names.index('mostcommonBTagDeltaP')
 
-    # Compute labels for B0 and B+ candidates separately
-    def compute_output_label(truth_array):
-        """Compute output label (0-4) for a single candidate type."""
-        n = len(truth_array)
-        labels = np.zeros(n, dtype=np.int64)
+    n_events = len(bp_truth)
+    bp_threshold = config.N_BP_MODES * 2   # 72
+    n_input_ids = config.N_INPUT_IDS        # 136
 
-        pdg = truth_array[:, pdg_idx]
-        gen_pdg = truth_array[:, gen_pdg_idx]
-        is_cont = truth_array[:, is_cont_idx] == 1
+    BG_BAD_TAG = n_input_ids       # 136
+    BG_CROSS_DC1 = n_input_ids + 1  # 137
+    BG_CROSS_INT = n_input_ids + 2  # 138
+    BG_CONT = n_input_ids + 3       # 139
 
-        # is_target: good reconstruction AND exact PDG match with the true tag B.
-        # Exact match (not abs) ensures CP-conjugate candidates are never labelled as target.
-        delta_p = truth_array[:, delta_p_idx]
-        is_target = ~is_cont & (delta_p < delta_p_thresh) & (gen_pdg == pdg)
+    # --- Vectorised is_target detection across all events and input_ids ---
+    # mc_truth_by_input_id_arr shape: (n_events, N_INPUT_IDS, n_vars)
+    all_pdg = mc_truth_by_input_id_arr[:, :, pdg_idx]
+    all_gen_pdg = mc_truth_by_input_id_arr[:, :, gen_pdg_idx]
+    all_delta_p = mc_truth_by_input_id_arr[:, :, delta_p_idx]
+    all_is_cont = mc_truth_by_input_id_arr[:, :, is_cont_idx]
 
-        # Crossfeed split based on absolute PDG comparison (groups B+/B- and B0/B0bar):
-        # cross_deltaC1 (class 2): |mostcommonBTagPDG| != |reco PDG| (different charge type)
-        # cross_internal (class 3): |mostcommonBTagPDG| == |reco PDG| (same charge type)
-        is_cross_deltaC1 = ~is_cont & (np.abs(gen_pdg) != np.abs(pdg))
-        is_cross_internal = ~is_cont & (gen_pdg != pdg) & (np.abs(gen_pdg) == np.abs(pdg))
+    # Sector mask: True at positions belonging to the predicted sector
+    input_ids_range = np.arange(n_input_ids)
+    charged_cat_col = charged_cat.reshape(-1, 1)
+    sector_mask = np.where(charged_cat_col,
+                           input_ids_range < bp_threshold,
+                           input_ids_range >= bp_threshold)
 
-        # Assign labels (default 0 = bad_tag)
-        labels[is_target] = 1
-        labels[is_cross_deltaC1] = 2
-        labels[is_cross_internal] = 3
-        labels[is_cont] = 4
+    # Consistency checks
+    assert not np.isnan(all_pdg).any(), "PDG contains NaN"
+    gen_pdg_nan = np.isnan(all_gen_pdg)
+    assert (gen_pdg_nan == np.isnan(all_delta_p)).all(), "isnan(gen_pdg) != isnan(delta_p)"
+    assert (gen_pdg_nan == (all_is_cont == 1)).all(), "isnan(gen_pdg) != (is_cont == 1)"
 
-        return labels
+    is_target = (
+        sector_mask
+        & (all_is_cont != 1)
+        & (all_gen_pdg == all_pdg)
+        & (all_delta_p < delta_p_thresh)
+    )
 
-    # Compute labels for both candidate types
-    b0_labels = compute_output_label(b0_truth)
-    bp_labels = compute_output_label(bp_truth)
+    # Find the is_target candidate with smallest DeltaP per event
+    delta_p_for_min = np.where(is_target, all_delta_p, np.inf)
+    has_target = is_target.any(axis=1)
+    best_input_id = np.argmin(delta_p_for_min, axis=1)  # valid only where has_target
 
-    # Use category network prediction to select which candidate type to use per event
-    labels = np.where(charged_cat, bp_labels, b0_labels)
+    labels = np.full(n_events, BG_BAD_TAG, dtype=np.int64)
+    labels[has_target] = best_input_id[has_target]
 
-    # Map is_target for charged candidates to class 5
-    is_target_charged = charged_cat & (bp_labels == 1)
-    labels[is_target_charged] = 5
+    # --- Background labels for events without an is_target candidate ---
+    no_target = ~has_target
+    if no_target.any():
+        truth_for_bg = np.where(charged_cat_col, bp_truth, b0_truth)
+        pdg_bg = truth_for_bg[:, pdg_idx]
+        gen_pdg_bg = truth_for_bg[:, gen_pdg_idx]
+        is_cont_bg = truth_for_bg[:, is_cont_idx] == 1
 
-    # Keep only events where the category-selected candidate type has a valid candidate
+        nt = no_target
+        labels[nt & is_cont_bg] = BG_CONT
+        cross_dc1 = nt & ~is_cont_bg & (np.abs(gen_pdg_bg) != np.abs(pdg_bg))
+        labels[cross_dc1] = BG_CROSS_DC1
+        cross_int = nt & ~is_cont_bg & (gen_pdg_bg != pdg_bg) & (np.abs(gen_pdg_bg) == np.abs(pdg_bg))
+        labels[cross_int] = BG_CROSS_INT
+        # remaining no_target events keep BG_BAD_TAG (set as default above)
+
+    # train_selection: keep events where the predicted sector has a valid candidate
     bp_has_cand = ~np.isnan(bp_truth[:, sigprob_idx])
     b0_has_cand = ~np.isnan(b0_truth[:, sigprob_idx])
     train_selection = np.where(charged_cat, bp_has_cand, b0_has_cand)
 
+    assert labels.min() >= 0 and labels.max() <= config.N_INPUT_IDS + 3, (
+        f"Labels out of range [0, {config.N_INPUT_IDS + 3}]: "
+        f"min={labels.min()}, max={labels.max()}"
+    )
     return labels, train_selection
 
 
@@ -785,6 +845,8 @@ def main():
     parser.add_argument('--seed', type=int, default=42, help='Random seed')
     parser.add_argument('--disco_lambda', type=float, default=0.0,
                         help='Distance correlation penalty coefficient (0=disabled)')
+    parser.add_argument('--label_smoothing', type=float, default=0.1,
+                        help='Label smoothing for CrossEntropyLoss (0=disabled, default 0.1)')
     parser.add_argument('--use_sparse', action='store_true',
                         help='Use sparse data loading (memory-efficient but slower)')
 
@@ -810,7 +872,7 @@ def main():
     print("Loading and sampling data")
     print("=" * 60)
     print(f"Calibration weight cap (90th percentile): {config.CALIB_WEIGHT_CAP:.4f}")
-    features, bp_truth, b0_truth, mc_var_names, has_inputs = load_and_sample_data(
+    features, bp_truth, b0_truth, mc_var_names, has_inputs, mc_truth_by_input_id_arr = load_and_sample_data(
         args.input,
         fraction=args.fraction,
         cont_fraction=args.cont_fraction,
@@ -892,18 +954,29 @@ def main():
         input_size = features_dense.shape[1]
         print(f"  New feature shape: {features_dense.shape}")
 
-        # Build main network labels using category network prediction
-        labels, train_selection = build_main_labels(
-            bp_truth, b0_truth, mc_var_names, charged_cat=charged_cat_bool
+        # Build mode-prediction labels using category network prediction
+        if mc_truth_by_input_id_arr is None:
+            raise ValueError(
+                "mc_truth_by_input_id not found in training data. "
+                "Re-collect training data with produceTrainingInputs.py."
+            )
+        labels, train_selection = build_mode_labels(
+            bp_truth, b0_truth, mc_truth_by_input_id_arr, mc_var_names,
+            charged_cat=charged_cat_bool
         )
-        num_labels = 6
+        num_labels = config.N_INPUT_IDS + 4  # 140
+        n_signal = int((labels < config.N_INPUT_IDS).sum())
+        bg_bad = int((labels == config.N_INPUT_IDS).sum())
+        bg_dc1 = int((labels == config.N_INPUT_IDS + 1).sum())
+        bg_int = int((labels == config.N_INPUT_IDS + 2).sum())
+        bg_cont = int((labels == config.N_INPUT_IDS + 3).sum())
+        n_tot = len(labels)
         print("  Main network label distribution (before train_selection):")
-        print(f"    bad_tag:           {(labels == 0).sum()} ({(labels == 0).mean() * 100:.1f}%)")
-        print(f"    is_target_neutral: {(labels == 1).sum()} ({(labels == 1).mean() * 100:.1f}%)")
-        print(f"    cross_deltaC1:     {(labels == 2).sum()} ({(labels == 2).mean() * 100:.1f}%)")
-        print(f"    cross_internal:    {(labels == 3).sum()} ({(labels == 3).mean() * 100:.1f}%)")
-        print(f"    continuum:         {(labels == 4).sum()} ({(labels == 4).mean() * 100:.1f}%)")
-        print(f"    is_target_charged: {(labels == 5).sum()} ({(labels == 5).mean() * 100:.1f}%)")
+        print(f"    signal modes (0-{config.N_INPUT_IDS - 1}): {n_signal} ({n_signal / n_tot * 100:.1f}%)")
+        print(f"    bad_tag ({config.N_INPUT_IDS}):        {bg_bad} ({bg_bad / n_tot * 100:.1f}%)")
+        print(f"    cross_deltaC1 ({config.N_INPUT_IDS + 1}):  {bg_dc1} ({bg_dc1 / n_tot * 100:.1f}%)")
+        print(f"    cross_internal ({config.N_INPUT_IDS + 2}): {bg_int} ({bg_int / n_tot * 100:.1f}%)")
+        print(f"    continuum ({config.N_INPUT_IDS + 3}):      {bg_cont} ({bg_cont / n_tot * 100:.1f}%)")
 
         # Extract Mbc values for DisCo loss (if enabled)
         mbc_values = None
@@ -1002,9 +1075,9 @@ def main():
     print(f"  Parameters: {sum(p.numel() for p in model.parameters()):,}")
 
     # Loss and optimizer
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
     optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs, eta_min=1e-6)
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs, eta_min=1e-5)
 
     # Training loop
     print("\n" + "=" * 60)
@@ -1018,7 +1091,7 @@ def main():
     training_start = time.time()
     history = {'train_loss': [], 'val_loss': [], 'disco_loss': [], 'lr': []}
     patience_counter = 0
-    early_stopping_patience = 20
+    early_stopping_patience = 10
 
     for epoch in range(args.epochs):
         epoch_start = time.time()
@@ -1132,23 +1205,46 @@ def main():
     val_labels = np.concatenate(val_labels_list)
 
     # Per-class metrics
-    if args.network == 'category':
-        class_names = ['B0', 'B+', 'continuum']
-    else:
-        class_names = ['bad_tag', 'is_target_neutral', 'cross_deltaC1',
-                       'cross_internal', 'continuum', 'is_target_charged']
+    print(f"\n  {'Class':<28} {'N':>8} {'Accuracy':>10} {'Mean P':>10} {'Median P':>10}")
+    print(f"  {'-'*66}")
 
-    print(f"\n  {'Class':<22} {'N':>8} {'Accuracy':>10} {'Mean P':>10} {'Median P':>10}")
-    print(f"  {'-'*62}")
-    for cls_idx, cls_name in enumerate(class_names):
-        cls_mask = val_labels == cls_idx
-        n_cls = cls_mask.sum()
-        if n_cls > 0:
-            cls_probs = val_probs[cls_mask, cls_idx]
-            pred_cls = np.argmax(val_probs[cls_mask], axis=1)
-            accuracy = (pred_cls == cls_idx).mean()
-            print(f"  {cls_name:<22} {n_cls:>8,} {accuracy:>10.4f} "
-                  f"{cls_probs.mean():>10.4f} {np.median(cls_probs):>10.4f}")
+    if args.network == 'category':
+        eval_classes = [(i, name) for i, name in enumerate(['B0', 'B+', 'continuum'])]
+        for cls_idx, cls_name in eval_classes:
+            cls_mask = val_labels == cls_idx
+            n_cls = cls_mask.sum()
+            if n_cls > 0:
+                cls_probs = val_probs[cls_mask, cls_idx]
+                pred_cls = np.argmax(val_probs[cls_mask], axis=1)
+                accuracy = (pred_cls == cls_idx).mean()
+                print(f"  {cls_name:<28} {n_cls:>8,} {accuracy:>10.4f} "
+                      f"{cls_probs.mean():>10.4f} {np.median(cls_probs):>10.4f}")
+    else:
+        # Main network: show signal modes aggregate + 4 background classes
+        signal_mask = val_labels < config.N_INPUT_IDS
+        n_sig = signal_mask.sum()
+        if n_sig > 0:
+            sig_true = val_labels[signal_mask]
+            sig_probs = val_probs[signal_mask][np.arange(n_sig), sig_true]
+            sig_acc = (np.argmax(val_probs[signal_mask], axis=1) == sig_true).mean()
+            cls_name = f'signal modes (0-{config.N_INPUT_IDS - 1})'
+            print(f"  {cls_name:<28} {n_sig:>8,} {sig_acc:>10.4f} "
+                  f"{sig_probs.mean():>10.4f} {np.median(sig_probs):>10.4f}")
+        bg_classes = [
+            (config.N_INPUT_IDS, 'bad_tag'),
+            (config.N_INPUT_IDS + 1, 'cross_deltaC1'),
+            (config.N_INPUT_IDS + 2, 'cross_internal'),
+            (config.N_INPUT_IDS + 3, 'continuum'),
+        ]
+        for cls_idx, cls_name in bg_classes:
+            cls_mask = val_labels == cls_idx
+            n_cls = cls_mask.sum()
+            if n_cls > 0:
+                cls_probs = val_probs[cls_mask, cls_idx]
+                pred_cls = np.argmax(val_probs[cls_mask], axis=1)
+                accuracy = (pred_cls == cls_idx).mean()
+                print(f"  {cls_name:<28} {n_cls:>8,} {accuracy:>10.4f} "
+                      f"{cls_probs.mean():>10.4f} {np.median(cls_probs):>10.4f}")
 
     # Overall accuracy
     overall_acc = (np.argmax(val_probs, axis=1) == val_labels).mean()

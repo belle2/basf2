@@ -40,6 +40,8 @@ DQMHistAnalysisPhysicsModule::DQMHistAnalysisPhysicsModule() : DQMHistAnalysisMo
   setDescription("DQM Analysis for Physics histograms");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("Physics:"));
+  addParam("minEntriesUPSmumu", m_minEntriesUPSmumu, "minimum number of new entries for last time slot for Ups(mumu)", 1000);
+  addParam("minEntriesUPSee", m_minEntriesUPSee, "minimum number of new entries for last time slot for Ups(ee)", 1000);
 
   B2DEBUG(20, "DQMHistAnalysisPhysics: Constructor done.");
 }
@@ -53,24 +55,34 @@ void DQMHistAnalysisPhysicsModule::initialize()
   gROOT->cd();
   m_monObj = getMonitoringObject("physics_hlt");
   //new text for plots
-  m_cmUPS_text = new TPaveText(0.7, 0.8, 0.9, 0.9, "NDC");
-  m_cmUPS_text->SetFillColor(0);
-  m_cmUPS_text->SetFillStyle(0);
-  m_cmUPS_text->SetTextAlign(12);
-  m_cmUPS_text->SetBorderSize(0);
-  m_cmUPS_text->SetTextSize(0.026);
-  m_cmUPSe_text = new TPaveText(0.7, 0.8, 0.9, 0.9, "NDC");
-  m_cmUPSe_text->SetFillColor(0);
-  m_cmUPSe_text->SetFillStyle(0);
-  m_cmUPSe_text->SetTextAlign(12);
-  m_cmUPSe_text->SetBorderSize(0);
-  m_cmUPSe_text->SetTextSize(0.026);
+  m_cmUPSmumu_text = new TPaveText(0.7, 0.8, 0.9, 0.9, "NDC");
+  m_cmUPSmumu_text->SetFillColor(0);
+  m_cmUPSmumu_text->SetFillStyle(0);
+  m_cmUPSmumu_text->SetTextAlign(12);
+  m_cmUPSmumu_text->SetBorderSize(0);
+  m_cmUPSmumu_text->SetTextSize(0.026);
+  m_cmUPSee_text = new TPaveText(0.7, 0.8, 0.9, 0.9, "NDC");
+  m_cmUPSee_text->SetFillColor(0);
+  m_cmUPSee_text->SetFillStyle(0);
+  m_cmUPSee_text->SetTextAlign(12);
+  m_cmUPSee_text->SetBorderSize(0);
+  m_cmUPSee_text->SetTextSize(0.026);
   m_ratio_text = new TPaveText(0.55, 0.6, 0.85, 0.9, "NDC");
   m_ratio_text->SetFillColor(0);
   m_ratio_text->SetFillStyle(0);
   m_ratio_text->SetTextAlign(12);
   m_ratio_text->SetBorderSize(0);
   m_ratio_text->SetTextSize(0.026);
+
+  addDeltaPar("PhysicsObjects", "mUPSe", HistDelta::c_Entries, m_minEntriesUPSee, 1);
+  registerEpicsPV(m_pvPrefix + "mUPSee_mean", "mUPSee_mean");
+  registerEpicsPV(m_pvPrefix + "mUPSee_width", "mUPSee_width");
+  m_cmUPSee = new TCanvase("PhysicsObjects/fit_mUPSee");
+
+  addDeltaPar("PhysicsObjects", "mUPS", HistDelta::c_Entries, m_minEntriesUPSmumu, 1);
+  registerEpicsPV(m_pvPrefix + "mUPSmumu_mean", "mUPSmumu_mean");
+  registerEpicsPV(m_pvPrefix + "mUPSmumu_width", "mUPSmumu_width");
+  m_cmUPSmumu = new TCanvase("PhysicsObjects/fit_mUPSmumu");
 
   //new ratio hadronb2_tight/bhabha_all
   addDeltaPar("PhysicsObjects", "physicsresults", HistDelta::c_Events, 3000000, 1); // update each 10000 events
@@ -85,7 +97,8 @@ void DQMHistAnalysisPhysicsModule::beginRun()
   B2DEBUG(20, "DQMHistAnalysisPhysics: beginRun called.");
 }
 
-void DQMHistAnalysisPhysicsModule::fitUpsilonFromHisto(TH1* histo, TPaveText* text, std::string parts, std::string prefix)
+void DQMHistAnalysisPhysicsModule::fitUpsilonFromHisto(TH1* histo, TPaveText* text, std::string parts, std::string prefix,
+                                                       std::string pvname)
 {
   double xMin = histo->GetXaxis()->GetXmin();
   double xMax = histo->GetXaxis()->GetXmax();
@@ -132,6 +145,8 @@ void DQMHistAnalysisPhysicsModule::fitUpsilonFromHisto(TH1* histo, TPaveText* te
   text->AddText(Form("fit mean : %.3f +-%.3f", float(measuredMass), float(massUncertainty)));
   text->AddText(Form("fit width : %.3f", float(measuredWidth)));
   text->Draw();
+  setEpicsPV(pvname + "_mean", measuredMass);
+  setEpicsPV(pvname + "_width", measuredWidth);
   m_monObj->setVariable(prefix + "mass", measuredMass, massUncertainty);
   m_monObj->setVariable(prefix + "width", measuredWidth);
 
@@ -192,21 +207,21 @@ void DQMHistAnalysisPhysicsModule::event()
       }
     }
 
-    auto m_hmUPS = findHist("PhysicsObjects/mUPS", false);// check if updated
-    auto m_cmUPS = findCanvas("PhysicsObjects/c_mUPS");
-    if (m_cmUPS and m_hmUPS) {
-      m_cmUPS->cd();
-      fitUpsilonFromHisto(m_hmUPS, m_cmUPS_text, "M(#mu#mu) [GeV/c^2]", "UPS_mumu");
-      m_cmUPS->Modified();
-      m_cmUPS->Update();
+    auto hmUPSmumu = getDelta("PhysicsObjects/mUPS");
+    if (m_cmUPSmumu and m_hmUPSmumu) {
+      m_cmUPSmumu->cd();
+      fitUpsilonFromHisto(hmUPS, m_cmUPSmumu_text, "M(#mu#mu) [GeV/c^2]", "UPSmumu", m_pvPrefix + "mUPSmumu");
+      m_cmUPSmumu->Modified();
+      m_cmUPSmumu->Update();
+      CanvasUpdated(m_cmUPSmumu);
     }
-    auto m_hmUPSe = findHist("PhysicsObjects/mUPSe", false);// check if updated
-    auto m_cmUPSe = findCanvas("PhysicsObjects/c_mUPSe");
-    if (m_cmUPSe and m_hmUPSe) {
-      m_cmUPSe->cd();
-      fitUpsilonFromHisto(m_hmUPSe, m_cmUPSe_text, "M(ee) [GeV/c^2]", "UPSee");
-      m_cmUPSe->Modified();
-      m_cmUPSe->Update();
+    auto hmUPSee = getDelta("PhysicsObjects/mUPSe");// check if updated
+    if (m_cmUPSee and hmUPSee) {
+      m_cmUPSee->cd();
+      fitUpsilonFromHisto(hmUPSee, m_cmUPSee_text, "M(ee) [GeV/c^2]", "UPSee", m_pvPrefix + "mUPSee");
+      m_cmUPSee->Modified();
+      m_cmUPSee->Update();
+      CanvasUpdated(m_cmUPSee);
     }
     auto* m_cphysicsresults = findCanvas("PhysicsObjects/c_physicsresults");
     if (m_cphysicsresults) {

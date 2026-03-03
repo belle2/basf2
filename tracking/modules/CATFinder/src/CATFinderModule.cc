@@ -16,9 +16,7 @@
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/modules/CATFinder/CATFinderUtils.h>
 
-#include <mva/interface/Weightfile.h>
-#include <mva/interface/Interface.h>
-#include <mva/interface/Expert.h>
+#include <mva/methods/ONNX.h>
 
 #include <TMatrixDSym.h>
 #include <cmath>
@@ -31,10 +29,11 @@
 #include <fstream>
 
 using namespace Belle2;
+using Belle2::MVA::ONNX::Tensor;
 
 REG_MODULE(CATFinder);
 
-CATFinderModule::CATFinderModule() : Module()
+CATFinderModule::CATFinderModule() : Module(), m_session("/home/gdepietro/cat-finder-onnx/cdcnet.onnx")
 {
   setDescription("GNN based CDC track finding.");
   addParam("recoTracksStoreArrayName", m_CDCRecoTracksName, "StoreArray name of the output CDC reco tracks.",
@@ -55,30 +54,34 @@ void CATFinderModule::initialize()
 
 void CATFinderModule::beginRun()
 {
-  // Initialize CATFinder weightfile
-  if (m_weightfileRepresentation.isValid()) {
-    std::stringstream ss(m_weightfileRepresentation -> m_data);
-    auto weightFile = MVA::Weightfile::loadFromStream(ss);
-    initializeMVA(weightFile);
-  }
 }
 
 void CATFinderModule::event()
 {
-  preprocess();
-  runGNN();
-  postprocess();
-}
-
-void CATFinderModule::preprocess()
-{
   const std::vector<TrackFindingCDC::CDCWireHit>& wireHitVector = *m_wireHitVector;
 
-  m_dataset->m_input.clear();
-  m_dataset->m_input.reserve(wireHitVector.size() * N_INPUT_FEATURES);
+  // Ugly solution, I know
+  unsigned int nHits = 0;
+  for (const auto& wireHit : wireHitVector) {
+    if (wireHit.getAutomatonCell().hasMaskedFlag())
+      continue;
+    nHits++;
+  }
+
+  // Nothing to do: let's return
+  if (nHits == 0)
+    return;
+
+  auto input = Tensor<float>::make_shared({nHits, 7});
+  auto beta = Tensor<float>::make_shared({nHits, 1});
+  auto ccoords = Tensor<float>::make_shared({nHits, 3});
+  auto p = Tensor<float>::make_shared({nHits, 3});
+  auto vertex = Tensor<float>::make_shared({nHits, 3});
+  auto charge = Tensor<float>::make_shared({nHits, 1});
+
+  unsigned int iHit = 0;
 
   for (const auto& wireHit : wireHitVector) {
-
     if (wireHit.getAutomatonCell().hasMaskedFlag())
       continue;
 
@@ -90,7 +93,6 @@ void CATFinderModule::preprocess()
 
     const double tdc_scaled = (static_cast<double>(cdcHit.getTDCCount()) - TDC_OFFSET) / TDC_SCALE;
     const double adc_clipped = cdcHit.getADCCount() > ADC_CLIP ? 1. : static_cast<double>(cdcHit.getADCCount()) / ADC_CLIP;
-    //unsigned short tot = cdcHit.getTOT();
 
     const B2Vector3D posForward = m_CDCGeometryPar->wireForwardPosition(clayer, wire, wirePos);
     const B2Vector3D posBackward = m_CDCGeometryPar->wireBackwardPosition(clayer, wire, wirePos);
@@ -108,44 +110,39 @@ void CATFinderModule::preprocess()
     //double driftTime = wireHit.getDriftTime();
     //double driftLength = wireHit.getRefDriftLength();
 
-    m_dataset->m_input.push_back(x);
-    m_dataset->m_input.push_back(y);
-    m_dataset->m_input.push_back(tdc_scaled);
-    m_dataset->m_input.push_back(adc_clipped);
-    m_dataset->m_input.push_back(superlayer_scaled);
-    m_dataset->m_input.push_back(clayer_scaled);
-    m_dataset->m_input.push_back(layer_scaled);
+    input->at({iHit, 0}) = x;
+    input->at({iHit, 1}) = y;
+    input->at({iHit, 2}) = tdc_scaled;
+    input->at({iHit, 3}) = adc_clipped;
+    input->at({iHit, 4}) = superlayer_scaled;
+    input->at({iHit, 5}) = clayer_scaled;
+    input->at({iHit, 6}) = layer_scaled;
+
+    ++iHit;
   }
 
   // Final step: let's prepare the vectors for the GNN output and the post-processing.
   prepareVectors();
-}
 
-void CATFinderModule::runGNN()
-{
-  // Running the GNN
-  const unsigned int outputSize = (m_dataset->m_input.size() / N_INPUT_FEATURES) * N_OUTPUT_FEATURES;
-  auto output = m_expert->applyArbitrarySize(*m_dataset, outputSize);
+  m_session.run(
+  {{"input", input}}, {
+    {"beta", beta},
+    {"ccoords", ccoords},
+    {"p", p},
+    {"vertex", vertex},
+    {"charge", charge}
+  }
+  );
 
   // Extracting the GNN outputs
-  for (size_t i = 0; i + N_OUTPUT_FEATURES <= output.size(); i += N_OUTPUT_FEATURES) {
-    // For each CDCHit, the returned output is the following one:
-    // - 1 double for the beta value
-    // - X doubles for the coordinates of the condensation point in the latent space (e.g.: if the latent space has 3 dimensions, X=3)
-    // - 3 doubles for the coordinates of the predicted momentum
-    // - 3 doubles for the coordinates of the predicted starting point
-    // - 1 double for the predicted charge
-    // We have: 1 + X + 3 + 3 + 1 == N_OUTPUT_FEATURES
-    m_predBetas.push_back(output[i]);
-    m_coords.push_back(std::vector<double>(output.begin() + i + 1, output.begin() + i + 1 + LATENT_SPACE_N_DIM));
-    m_predPs.push_back(std::vector<double>(output.begin() + i + 1 + LATENT_SPACE_N_DIM, output.begin() + i + 4 + LATENT_SPACE_N_DIM));
-    m_predVs.push_back(std::vector<double>(output.begin() + i + 4 + LATENT_SPACE_N_DIM, output.begin() + i + 7 + LATENT_SPACE_N_DIM));
-    m_predQs.push_back(output[i + N_OUTPUT_FEATURES - 1]);
+  for (size_t i = 0; i < iHit; ++i) {
+    m_predBetas.push_back(beta->at({i, 0}));
+    m_coords.push_back({ccoords->at({i, 0}), ccoords->at({i, 1}), ccoords->at({i, 2})});
+    m_predPs.push_back({p->at({i, 0}), p->at({i, 1}), p->at({i, 2})});
+    m_predVs.push_back({vertex->at({i, 0}), vertex->at({i, 1}), vertex->at({i, 2})});
+    m_predQs.push_back(charge->at({i, 0}));
   }
-}
 
-void CATFinderModule::postprocess()
-{
   // Creating the beta mask
   std::vector<unsigned int> betaIndices(m_predBetas.size());
   std::vector<uint8_t> selectedBetas(m_predBetas.size());
@@ -195,20 +192,20 @@ void CATFinderModule::postprocess()
     }
 
     //Calculate CDCHits and GNN nodes assigned to the condensation point
-    std::vector<int> CDCHitIndices;
-    CDCHitIndices.reserve(r.size());
+    std::vector<int> indices;
+    indices.reserve(r.size());
     std::vector<std::vector<double>> gnnNodes;
     gnnNodes.reserve(r.size());
 
     for (size_t i = 0; i < r.size(); ++i) {
       if (r[i] < HIT_DISTANCE) {
-        CDCHitIndices.push_back(i);
-        gnnNodes.push_back({m_dataset->m_input[7 * i] * SPATIAL_COORDINATES_SCALE, m_dataset->m_input[7 * i + 1] * SPATIAL_COORDINATES_SCALE});
+        indices.push_back(i);
+        gnnNodes.push_back({input->at({i, 0}), input->at({i, 1})}); // x, y
       }
     }
 
     // Cut on the amount of CDC hits assigned to the condensation point
-    if (CDCHitIndices.size() < CDC_HIT_INDICES_CUT) {
+    if (indices.size() < CDC_HIT_INDICES_CUT) {
       continue;
     }
 
@@ -230,16 +227,16 @@ void CATFinderModule::postprocess()
 
     // Get the charge of the condensation point
     auto tCharge = m_conPointQs[conPoint];
-    const short charge = (tCharge >= 0.5) ? 1 : -1;
+    const short ccharge = (tCharge >= 0.5) ? 1 : -1;
 
     // Order the hits with KDT
     CATFinderUtils::HitOrderer hitOrderer;
-    std::vector<int> sortedIndices = hitOrderer.orderHits({position.X(), position.Y()}, gnnNodes, CDCHitIndices);
+    std::vector<int> sortedIndices = hitOrderer.orderHits({position.X(), position.Y()}, gnnNodes, indices);
 
     // Create a new RecoTrack and fill it with position, momentum and charge information
     RecoTrack* cdcRecotrack = m_CDCRecoTracks.appendNew();
     cdcRecotrack -> setPositionAndMomentum(position, momentum);
-    cdcRecotrack -> setChargeSeed(charge);
+    cdcRecotrack -> setChargeSeed(ccharge);
 
     // Create a covatiance matrix and add it to the RecoTrack
     auto seed_cov = TMatrixDSym(6);
@@ -257,19 +254,6 @@ void CATFinderModule::postprocess()
       ++k;
     }
   }
-}
-
-void CATFinderModule::initializeMVA(MVA::Weightfile& weightfile)
-{
-  auto supportedInterfaces = MVA::AbstractInterface::getSupportedInterfaces();
-  MVA::GeneralOptions generalOptions;
-  weightfile.getOptions(generalOptions);
-
-  m_expert = supportedInterfaces[generalOptions.m_method] -> getExpert();
-  m_expert -> load(weightfile);
-
-  std::vector<float> dummy;
-  m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(generalOptions, std::move(dummy), 0));
 }
 
 void CATFinderModule::collectOverThreshold(const std::vector<unsigned int>& betaIndices,

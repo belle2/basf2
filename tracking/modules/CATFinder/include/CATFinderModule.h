@@ -11,12 +11,10 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <mva/methods/ONNX.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-#include <mva/interface/Weightfile.h>
-#include <mva/interface/Expert.h>
 
 
 namespace Belle2 {
@@ -29,11 +27,11 @@ namespace Belle2 {
    * by applying a Graph Neural Network (GNN) followed by condensation-based clustering and spatial hit ordering.
    *
    * The module workflow consists of:
-   * - **Preprocessing** raw CDC wire hits to construct input feature vectors.
+   * - **Preprocessing** raw CDC wire hits to construct input feature tensor.
    * - **GNN inference** using a trained model loaded from a weight file.
    * - **Postprocessing** GNN outputs to extract condensation points, assign hits, and build `RecoTrack` objects.
    *
-   * The GNN is run via the basf2 MVA interface using `MVA::Expert` and `SingleDataset`.
+   * The GNN is run via the basf2 ONNX interface.
    */
   class CATFinderModule : public Module {
 
@@ -63,8 +61,8 @@ namespace Belle2 {
     /**
      * @brief Processes a single event in the CATFinderModule.
      *
-     * Increments the event counter and sequentially performs preprocessing,
-     * Graph Neural Network (GNN) inference, and postprocessing for the current event.
+     * Sequentially performs preprocessing, Graph Neural Network (GNN) inference, and postprocessing
+     * for the current event.
      */
     void event() override;
 
@@ -147,8 +145,6 @@ namespace Belle2 {
     /** Intermediate storage for CDC hit TDC (Time-to-Digital Converter) values. */
     std::vector<short> m_CDCHitTDC;
 
-    /** Dataset containing input features for GNN inference. */
-    std::unique_ptr<MVA::SingleDataset> m_dataset;
     /** Raw output buffer from the GNN model. */
     std::vector<double> m_outputs;
 
@@ -179,57 +175,12 @@ namespace Belle2 {
     std::vector<int> m_selectedBetas;
 
     // MVA
-    /** Pointer to the MVA expert responsible for running GNN inference. */
-    std::unique_ptr<MVA::Expert> m_expert;
     /** Identifier used to locate or reference the CATFinder weight file. */
     const std::string m_identifier = "CATFinderWeightfile";
-    /** Pointer to the database-stored representation of the CATFinder weight file. */
-    DBObjPtr<DatabaseRepresentationOfWeightfile> m_weightfileRepresentation{m_identifier};
+
+    Belle2::MVA::ONNX::Session m_session;
 
     // Methods
-    /**
-     * @brief Prepares input features for GNN inference from CDC wire hits.
-     *
-     * Iterates over the wire hit vector, filters out masked hits, and extracts relevant features
-     * such as TDC, ADC, wire position, and layer information from each unmasked hit.
-     * Computes and scales spatial and layer-related quantities and stores them in the dataset's
-     * input buffer (`m_dataset->m_input`) for subsequent processing.
-     *
-     * Also calls `prepareVectors()` to initialize necessary internal data structures.
-     */
-    void preprocess();
-
-    /**
-     * @brief Runs the Graph Neural Network (GNN) inference on the preprocessed input features.
-     *
-     * Applies the GNN model to the input data stored in the dataset, producing output predictions.
-     * The output is parsed into separate prediction components, including:
-     * - `predBetas`: scalar confidence values,
-     * - `coords`: latent space coordinates,
-     * - `predPs`: momentum predictions,
-     * - `predVs`: vertex predictions,
-     * - `predQs`: charge predictions.
-     *
-     * The output is structured based on `N_OUTPUT_FEATURES` and `LATENT_SPACE_N_DIM` constants.
-     */
-    void runGNN();
-
-    /**
-     * @brief Processes GNN outputs to construct CDC RecoTracks based on condensation points.
-     *
-     * Applies a threshold to predicted beta values (`predBetas`) to identify condensation points.
-     * For each valid condensation point:
-     * - Gathers nearby GNN nodes based on Euclidean distance in latent space,
-     * - Applies a minimum hit count cut,
-     * - Extracts momentum, position, and charge predictions,
-     * - Sorts associated CDC hits spatially using a KD-tree-like ordering,
-     * - Creates and populates a `RecoTrack` object with the gathered information.
-     *
-     * Also performs basic validity checks (e.g. for NaNs) and initializes a default seed
-     * covariance matrix for each track.
-     */
-    void postprocess();
-
 
     /**
      * @brief Clears all intermediate vectors used in GNN processing.
@@ -252,17 +203,6 @@ namespace Belle2 {
      */
     void collectOverThreshold(const std::vector<unsigned int>& betaIndices, const std::vector<std::vector<double>>& coords,
                               std::vector<uint8_t>& selectedBetas);
-
-    /**
-     * @brief Initializes the MVA expert and dataset from a given weight file.
-     *
-     * Extracts general MVA options from the provided `weightfile` and selects the corresponding
-     * expert implementation based on the method specified. The expert is then loaded with the weight file.
-     * Finally, a new `SingleDataset` instance is created using the extracted options.
-     *
-     * @param weightfile Reference to the MVA weight file containing model parameters and metadata.
-     */
-    void initializeMVA(MVA::Weightfile& weightfile);
 
     /**
      * @brief Checks whether a condensation point candidate is sufficiently distant from existing points.

@@ -163,7 +163,6 @@ namespace Belle2 {
                       "Returns the PDG code of the generated B meson identified by mostcommonBTagIndex. "
                       "Returns NaN if no B meson is found on generator level. "
                       "Note: this is equivalent to ``genParticle(mostcommonBTagIndex, PDG)``. "
-                      "Other variables can be accessed the same way by replacing ``PDG`` with any variable, "
-                      "e.g. ``genParticle(mostcommonBTagIndex, nDaughters)``.");
+                      "Other variables can be accessed the same way by replacing ``PDG`` with any variable.");
   }
 }

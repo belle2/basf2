@@ -27,7 +27,7 @@ namespace Belle2 {
     {}
 
     /**
-     * Usefull constructor
+     * Useful constructor
      * @param moduleID slot number, photon hits from this slot used to determine t0
      * @param t0 value of t0
      * @param err estimated error on t0
@@ -57,7 +57,7 @@ namespace Belle2 {
     void setAssumedMass(double mass) {m_assumedMass = mass;}
 
     /**
-     * Sets time zero to invalid. Usefull when time zero not successfully determined.
+     * Sets time zero to invalid. Useful when time zero not successfully determined.
      */
     void setInvalid() {m_valid = false;}
 

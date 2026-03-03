@@ -103,7 +103,7 @@ namespace Belle2 {
     std::unique_ptr<SimpleVariableRecorder> m_recorder;
 
     /** set of named variables to be collected */
-    std::vector<Named<float*>> m_variableSet;
+    std::vector<TrackingUtilities::Named<float*>> m_variableSet;
 
     /** number of SpacePoints in SPTC as additional info to be collected,
      * type is float to be consistent with m_variableSet (and TTree + MVA implementation) */

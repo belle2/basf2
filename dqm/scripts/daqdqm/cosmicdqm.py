@@ -50,6 +50,6 @@ def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     if (components is None or ('KLM' in components and 'CDC' in components)) and (dqm_mode in ["dont_care", "filtered"]):
         path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM',
                         MinimalMatchingDigits=14,
-                        MinimalMatchingDigitsOuterLayers=0,
+                        MinimalMatchingDigitsOuterLayers=4,
                         MinimalMomentumNoOuterLayers=4.0,
                         SoftwareTriggerName="")

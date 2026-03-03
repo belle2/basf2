@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# @cond SUPPRESS_DOXYGEN
-
 """
  Configuration classes
 
@@ -310,5 +308,3 @@ class Particle:
                                           decayModeID=decayModeID,
                                           pi0veto=pi0veto))
         return self
-
-# @endcond

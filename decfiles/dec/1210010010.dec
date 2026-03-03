@@ -1,0 +1,26 @@
+# EventType: 1210010010
+# Descriptor: [B+ -> K+ Xinv ]cc
+# NickName: Bu_KXinv
+# Documentation: b->s Xinv 
+# Tested: Yes
+# PhysicsWG: DSLM
+# Responsible: Slavomira Stefkova, Roberta Volpe
+# Email: slavomira.stefkova@kit.edu, roberta.volpe@cern.ch
+# Cuts: None
+# Date: 20251010
+# to be added in the steering file, to to run several mass hypotheses 
+# pdg.add_particle('Xinv', 900000, mass=1.0, width=0, charge=0, spin=0)
+
+# Set the Upsilon(4S) to decay entirely into our signal B's 
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+# Set the signal side B decay, need the other side to decay generically for tagging
+Decay B+sig
+1.0 K+ Xinv PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+End

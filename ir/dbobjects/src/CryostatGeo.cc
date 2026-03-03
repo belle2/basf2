@@ -20,7 +20,7 @@ void CryostatGeo::initialize(const GearDir& content)
 
   addParameter("LimitStepLength", content.getInt("LimitStepLength"));
 
-  std::vector<std::string> names = {"CrossingAngle", "TubeR", "TubeR2", "TubeL", "A1spc1", "A1spc2", "B1spc1", "B1spc2", "D1spc1", "E1spc1", "C1wal1", "F1wal1"};
+  std::vector<std::string> names = {"CrossingAngle", "TubeR", "TubeR2", "TubeL", "A1spc1", "A1spc2", "B1spc1", "B1spc2", "D1spc1", "E1spc1", "C1wal1", "F1wal1", "BellowsShield"};
 
   for (auto name : names) {
     GearDir sect(content, name + "/");
@@ -53,4 +53,24 @@ void CryostatGeo::initialize(const GearDir& content)
     supports += name;
   }
   addParameter("Support", supports);
+
+  std::string polyBlocks;
+  for (const GearDir& polyBlock : content.getNodes("PolyBlock")) {
+    std::string name = polyBlock.getString("@name");
+    addParameters(polyBlock, name);
+    if (!polyBlocks.empty()) polyBlocks += " ";
+    polyBlocks += name;
+  }
+  addParameter("PolyBlock", polyBlocks);
+
+  std::string SWXLayers;
+  for (const GearDir& SWXLayer : content.getNodes("SWXLayer")) {
+    std::string name = SWXLayer.getString("@name");
+    addParameters(SWXLayer, name);
+    if (!SWXLayers.empty()) SWXLayers += " ";
+    SWXLayers += name;
+  }
+  addParameter("SWXLayer", SWXLayers);
+
 }
+

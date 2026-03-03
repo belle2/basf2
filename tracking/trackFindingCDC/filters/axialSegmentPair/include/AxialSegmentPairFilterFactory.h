@@ -9,19 +9,19 @@
 
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/BaseAxialSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     // Guard to prevent repeated instantiations
-    extern template class FilterFactory<BaseAxialSegmentPairFilter>;
+    // extern template class TrackingUtilities::FilterFactory<BaseAxialSegmentPairFilter>;
 
     /// Factory that can create appropriate axial segment pair filters from associated names.
-    class AxialSegmentPairFilterFactory : public FilterFactory<BaseAxialSegmentPairFilter> {
+    class AxialSegmentPairFilterFactory : public TrackingUtilities::FilterFactory<BaseAxialSegmentPairFilter> {
 
     private:
       /// Type of the base class
-      using Super = FilterFactory<BaseAxialSegmentPairFilter>;
+      using Super = TrackingUtilities::FilterFactory<BaseAxialSegmentPairFilter>;
 
     public:
       /// Constructor forwarding the default filter name

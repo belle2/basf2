@@ -182,6 +182,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["clusterEPosC"] = NAN; /**< clusterE lab of max p positively charged track GeV */
   calculationResult["dPhiCmsC"] = NAN; /**< delta phi cms of max p positive and negative tracks deg */
 
+  //..Filters lines for HLTPrefilter decision
+  calculationResult["Prefilter_InjectionStrip"] = 0; /**< Events in the injection strip */
+  calculationResult["Prefilter_CDCECLthreshold"] = 0; /**< Events with high CDC-ECL occupancy */
 
   // Passed on L1 information
   if (m_l1Trigger.isValid()) {
@@ -1046,5 +1049,46 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     delete vertexFit;
 
   }
+
+  // HLT prefilter stuff
+  // Initialise parameters of HLTPrefilter
+  if (!m_hltPrefilterParameters.isValid())
+    B2FATAL("HLTprefilter parameters are not available.");
+
+  // Timing mode thresholds
+  m_timingPrefilter.LERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMin();
+  m_timingPrefilter.LERtimeSinceLastInjectionMax = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMax();
+  m_timingPrefilter.HERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getHERtimeSinceLastInjectionMin();
+  m_timingPrefilter.HERtimeSinceLastInjectionMax = m_hltPrefilterParameters->getHERtimeSinceLastInjectionMax();
+  m_timingPrefilter.LERtimeInBeamCycleMin        = m_hltPrefilterParameters->getLERtimeInBeamCycleMin();
+  m_timingPrefilter.LERtimeInBeamCycleMax        = m_hltPrefilterParameters->getLERtimeInBeamCycleMax();
+  m_timingPrefilter.HERtimeInBeamCycleMin        = m_hltPrefilterParameters->getHERtimeInBeamCycleMin();
+  m_timingPrefilter.HERtimeInBeamCycleMax        = m_hltPrefilterParameters->getHERtimeInBeamCycleMax();
+  m_timingPrefilter.prescale = m_hltPrefilterParameters->getHLTPrefilterPrescale();
+
+  // CDC-ECL mode thresholds
+  m_cdceclPrefilter.nCDCHitsMax = m_hltPrefilterParameters->getCDCHitsMax();
+  m_cdceclPrefilter.nECLDigitsMax = m_hltPrefilterParameters->getECLDigitsMax();
+  m_cdceclPrefilter.prescale = m_hltPrefilterParameters->getHLTPrefilterPrescale();
+
+  //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
+  int index = 0; //events accepted in the passive veto window but not in the active
+  try {
+    if (m_l1Trigger->testInput("passive_veto") == 1 &&  m_l1Trigger->testInput("cdcecl_veto") == 0) index = 1; //events in active veto
+  } catch (const std::exception&) {
+  }
+
+  // Check if event is in active veto
+  if (index == 1) {
+
+    if (m_timingPrefilter.computeDecision()) {
+      calculationResult["Prefilter_InjectionStrip"] = 1;
+    }
+
+    if (m_cdceclPrefilter.computeDecision()) {
+      calculationResult["Prefilter_CDCECLthreshold"] = 1;
+    }
+  }
+
 
 }

@@ -118,12 +118,22 @@ namespace Belle2 {
     bool m_storePairConversions;           /**< controls storing of e+ or e- from pair conversions in MCParticles */
     double m_pairConversionsEnergyCut;     /**< kinetic energy cut for the stored e+ or e- from pair conversions */
 
+    bool m_useDetailedParticleMatching;    /**< If true, secondaries are ignored unless they pass additional checks (e.g. ECL, kinetic energy) */
+    double m_regionZBackward;              /**< Region backward z limit for filtering secondaries */
+    double m_regionZForward;               /**< Region forward z limit for filtering secondaries */
+    double m_regionRho;                    /**< Region rho limit for filtering secondaries */
+    double m_kineticEnergyThreshold;       /**< kinetic energy threshold for filtering secondaries */
+    double m_distanceThreshold;            /**< distance threshold for filtering secondaries */
+    bool m_doNotStoreEMParticles;          /**< use is EM check for filtering secondaries */
+    bool m_doNotStoreNuclei;               /**< use is Nuclei check for filtering secondaries */
+    bool m_useSeenInECL;                   /**< use seen in ECL check for filtering secondaries */
+
     std::string m_magneticFieldName;       /**< magnetic field stepper to use */
     double m_magneticCacheDistance;        /**< minimal distance for magnetic field lookup. If distance is smaller, return last value */
     double m_deltaChordInMagneticField;    /**< The maximum miss-distance between the trajectory curve and its linear chord(s) approximation */
 
     int m_trajectoryStore;                 /**< If true, store the trajectories of all primary particles */
-    double m_trajectoryDistanceTolerance;  /**< Maximum distance to actuall trajectory when merging points */
+    double m_trajectoryDistanceTolerance;  /**< Maximum distance to actual trajectory when merging points */
     std::vector<float> m_absorbers;        /**< The absorbers defined at given radii where tracks across them will be destroyed.
                                                 This set is used in the PXD only simulation for PXD gain calibration.*/
 

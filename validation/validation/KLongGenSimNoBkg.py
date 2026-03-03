@@ -11,7 +11,7 @@
 """
 <header>
   <output>KLongGenSimNoBkg.root</output>
-  <contact>arul.prakash@physik.uni-muenchen.de</contact>
+  <contact>giacomo.pietro@kit.edu</contact>
   <cacheable/>
   <description>This steering file produces 1000 events with one KLong each
   and runs the detector simulation without mixing in background.</description>
@@ -72,14 +72,14 @@ process(main, calculateStatistics=True)
 
 statistics_plots(
     "KLongGenSimNoBkg_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation job with generic KLongGenSimNoBkg events",
     prefix="KLongGenSimNoBkg",
 )
 event_timing_plot(
     "../KLongGenSimNoBkg.root",
     "KLongGenSimNoBkg_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation job with Klong events",
     prefix="KLongGenSimNoBkg",
 )

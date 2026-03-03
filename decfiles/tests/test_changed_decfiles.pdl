@@ -16,4 +16,5 @@ add  p Particle  P_Lambda_psis0               9432142           4.3382          
 add  p Particle  anti-P_Lambda_psis0         -9432142           4.3382          0.007   0.0           0      1              0  -9432142
 add  p Particle  P_Lambda_psi+                9421142           4.03517208      0.007   0.0           3      1              0   9421142
 add  p Particle  anti-P_Lambda_psi-          -9421142           4.03517208      0.007   0.0          -3      1              0  -9421142
+add  p Particle  Xinv                         900000            1.0             0.0     0.0           0      0              0         0
 * No 'end' needed here as the default pdl is concatenated with this file.

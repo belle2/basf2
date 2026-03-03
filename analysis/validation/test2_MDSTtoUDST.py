@@ -12,7 +12,7 @@
 <header>
 <input>../DSTtoMDST.mdst.root</input>
 <output>../MDSTtoUDST.udst.root</output>
-<contact>Frank Meier; frank.meier@duke.edu</contact>
+<contact>Paul Feichtinger; paul.feichtinger@ijs.si</contact>
 </header>
 """
 

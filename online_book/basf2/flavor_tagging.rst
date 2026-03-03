@@ -37,6 +37,13 @@ Luckily, such sets of weights are contained in the conditions database.
 That means that we only need to use a specific global tag (if you forgot what
 that is, consult this page again: :ref:`conditionsdb_overview`).
 
+Please note that the Belle II software features a number of different flavor tagging algorithms.
+Below is a listing of the alternative algorithms:
+
+A transformer based flavor tagger :ref:`analysis/doc/TransformerFlavorTagger:Principle`
+
+A deep neural network flavor tagger :ref:`analysis/doc/DeepFlavorTagger:Principle`
+
 .. admonition:: Exercise
     :class: stacked exercise
 
@@ -48,7 +55,7 @@ that is, consult this page again: :ref:`conditionsdb_overview`).
     `modularAnalysis.getAnalysisGlobaltag`.
 
 .. admonition:: Solution
-    :class: solution toggle
+    :class: dropdown solution
 
     Simply add this to the top of your steering file:
 
@@ -67,7 +74,7 @@ start right away!
     path and your particle list).
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     Remember to import the module:
 
@@ -91,7 +98,7 @@ start right away!
     variables
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S43
@@ -104,7 +111,7 @@ start right away!
     Run your steering file!
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     This is the full steering file at this point:
 
@@ -143,14 +150,14 @@ it to ``FBDT_qrCombined``!
     Compare the output of ``qrMC`` to that of ``FBDT_qrCombined``.
 
 .. admonition:: Hint
-    :class: xhint stacked toggle
+    :class: xhint stacked dropdown
 
     For clearly defined MC flavor tag, you only have to distinguish between
     ``qrMC == 0`` and ``qrMC == 1``. For these two cases you can then plot
     the distribution of ``FBDT_qrCombined``.
 
 .. admonition:: Solution
-    :class: solution toggle
+    :class: dropdown solution
 
     .. literalinclude:: flavor_tagging/plot_flavor_tags.py
         :language: python        

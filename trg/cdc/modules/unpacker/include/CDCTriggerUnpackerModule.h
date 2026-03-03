@@ -143,8 +143,8 @@ namespace Belle2 {
       // int nWordsize = 3075;  // temporary solution to hard coded the correct event size (for 2D only?)
       // empty data buffer
       if (nWords[iFinesse_i] < headerSize) {
-        B2WARNING("The module " << name << " does not have enough data (" <<
-                  nWords[iFinesse_i] << "). Nothing will be unpacked.");
+        B2DEBUG(20, "The module " << name << " does not have enough data (" <<
+                nWords[iFinesse_i] << "). Nothing will be unpacked.");
         return 0;
       } else if (nWords[iFinesse_i] == headerSize) {
         B2DEBUG(20, "The module " << name <<

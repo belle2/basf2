@@ -22,25 +22,29 @@ REG_MODULE(DQMHistAnalysisCDCEpics);
 DQMHistAnalysisCDCEpicsModule::DQMHistAnalysisCDCEpicsModule()
   : DQMHistAnalysisModule()
 {
-  addParam("HistDirectory", m_histoDir, "CDC Dir of DQM Histogram", std::string("CDC"));
-  addParam("HistADC", m_histoADC, "ADC Histogram Name", std::string("hADC"));
-  addParam("HistTDC", m_histoTDC, "TDC Histogram Name", std::string("hTDC"));
-  addParam("HistPhiIndex", m_histoPhiIndex, "Phi Index Histogram Name", std::string("hPhiIndex"));
-  addParam("HistPhiEff", m_histoPhiEff, "Phi Eff Histogram Name", std::string("hPhiEff"));
-  addParam("HistHitsPhi", m_histoHitsPhi, "Phi Hits Histogram Name", std::string("hPhiNCDC"));
-  addParam("HistTrackingWireEff", m_histoTrackingWireEff, "Wire Eff Histogram Name", std::string("hTrackingWireEff"));
-  addParam("PvPrefix", m_pvPrefix, "PV Prefix and Name", std::string("CDC:"));
-  addParam("RefFilePhi", m_refNamePhi, "Reference histogram file name", std::string("CDCDQM_PhiRef.root"));
-  addParam("RefDirectory", m_refDir, "Reference histogram dir", std::string("ref/CDC/default"));
+  addParam("HistDirectory", m_name_dir, "CDC Dir of DQM Histogram", std::string("CDC"));
+  addParam("RefDirectory", m_name_refdir, "Reference histogram dir", std::string("ref/CDC/default"));
+  addParam("PvPrefix", m_name_pvpfx, "PV Prefix and Name", std::string("CDC:"));
+  addParam("RefFilePhi", m_fname_refphi, "Reference histogram file name", std::string("CDCDQM_PhiRef.root"));
+  addParam("HistLayerADC", m_hname_ladc, "Layer ADC Histogram Name", std::string("hADCLayer"));
+  addParam("HistBoardADC", m_hname_badc, "Board ADC Histogram Name", std::string("hADCBoard"));
+  addParam("HistBoardTDC", m_hname_btdc, "Board TDC Histogram Name", std::string("hTDC"));
+  addParam("HistPhiIndex", m_hname_idxphi, "Phi Index Histogram Name", std::string("hPhiIndex"));
+  addParam("HistPhiEff", m_hname_effphi, "Phi Eff Histogram Name", std::string("hPhiEff"));
+  addParam("HistHitsPhi", m_hname_hitsphi, "Phi Hits Histogram Name", std::string("hPhiNCDC"));
   addParam("MinEvt", m_minevt, "Min events for intra-run point", 1000);
+  addParam("HistTrackingWireEff", m_histoTrackingWireEff, "Wire Eff Histogram Name", std::string("hTrackingWireEff"));
   addParam("DoTH2PolyTrackingWireEff", m_doTH2PolyTrackingWireEff,
            "If true, creates TH2Poly instead of TH2F for TrackingWireEff Histos", m_doTH2PolyTrackingWireEff);
   addParam("FirstEffBoundary", m_firstEffBoundary, "The first boundary of the efficiency range", m_firstEffBoundary);
   addParam("SecondEffBoundary", m_secondEffBoundary, "The second boundary of the efficiency range", m_secondEffBoundary);
   for (int i = 0; i < 300; i++) {
-    m_hADCs[i] = nullptr;
-    m_hTDCs[i] = nullptr;
+    m_hists_bADC[i] = nullptr;
+    m_hists_bTDC[i] = nullptr;
+    //layer
+    if (i < 56)m_hists_lADC[i] = nullptr;
   }
+
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: Constructor done.");
 }
 
@@ -50,7 +54,12 @@ DQMHistAnalysisCDCEpicsModule::~DQMHistAnalysisCDCEpicsModule()
 
 void DQMHistAnalysisCDCEpicsModule::initialize()
 {
+
   gROOT->cd();
+  c_histmd_ladc = new TCanvas("CDC/c_histmd_ladc", "c_histmd_ladc", 500, 400);
+  m_histmd_ladc = new TH1F("CDC/histmd_ladc", "m_histmd_ladc", 56, 0, 56);
+  m_histmd_ladc->SetTitle("ADC Medians vs Layers (SL-lines); CDC Layer index; ADC medians");
+
   c_hist_adc = new TCanvas("CDC/c_hist_adc", "c_hist_adc", 500, 400);
   m_hist_adc = new TH1F("CDC/hist_adc", "m_hist_adc", 300, 0, 300);
   m_hist_adc->SetTitle("ADC Medians; CDC board index; ADC medians");
@@ -67,15 +76,29 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   c_hist_crphi = new TCanvas("CDC/c_hist_crphi", "c_hist_crphi", 500, 400);
   c_hist_hitsphi = new TCanvas("CDC/c_hist_hitsphi", "c_hist_hitsphi", 500, 400);
 
-  //CR alram reference
-  if (m_refNamePhi != "") {
-    m_fileRefPhi = TFile::Open(m_refNamePhi.data(), "READ");
+  //CR alarm reference
+  if (m_fname_refphi != "") {
+    m_fileRefPhi = TFile::Open(m_fname_refphi.data(), "READ");
     if (m_fileRefPhi && m_fileRefPhi->IsOpen()) {
-      B2INFO("DQMHistAnalysisCDCEpics: reference (" << m_refNamePhi << ") found OK");
-      m_histref_phiindex = (TH2F*)m_fileRefPhi->Get((m_refDir + "/hPhiIndex").data());
+      B2INFO("DQMHistAnalysisCDCEpics: reference (" << m_fname_refphi << ") found OK");
+      m_histref_phiindex = (TH2F*)m_fileRefPhi->Get((m_name_refdir + "/hPhiIndex").data());
       if (!m_histref_phiindex)B2INFO("\t .. but (histogram) not found");
       else B2INFO("\t ..and (cdcdqm_phiref) also exist");
     }
+  }
+
+  m_lines.clear();
+  m_lines.reserve(kNumLayers);
+  for (unsigned il = 0; il < kNumLayers; ++il) {
+    int bin = il + 1;
+    auto* line = new TLine(bin, 0, bin, 1.0);
+    line->SetLineStyle(2);
+    if (bin >= 8 && bin < 14)line->SetLineColor(kRed);  // U-type
+    else if (bin >= 20 && bin < 26)line->SetLineColor(kGreen);  // V-type
+    else if (bin >= 32 && bin < 38)line->SetLineColor(kRed);  // U-type
+    else if (bin >= 44 && bin < 50)line->SetLineColor(kGreen);  // v-type
+    else line->SetLineColor(kGray); // A-type
+    m_lines.push_back(line);
   }
 
   c_hist_effphi = new TCanvas("CDC/c_hist_effphi", "c_hist_effphi", 500, 400);
@@ -113,31 +136,51 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
                                        208, -0.02, 1.02);
   m_hist_wire_attach_eff_1d->GetYaxis()->SetTitleOffset(1.4);
 
-  if (!hasDeltaPar(m_histoDir, m_histoADC))
-    addDeltaPar(m_histoDir, m_histoADC, HistDelta::c_Entries, m_minevt, 1);
+  if (!hasDeltaPar(m_name_dir, m_hname_ladc))
+    addDeltaPar(m_name_dir, m_hname_ladc, HistDelta::c_Entries, m_minevt, 1);
 
-  if (!hasDeltaPar(m_histoDir, m_histoTDC))
-    addDeltaPar(m_histoDir, m_histoTDC, HistDelta::c_Entries, m_minevt, 1);
+  if (!hasDeltaPar(m_name_dir, m_hname_badc))
+    addDeltaPar(m_name_dir, m_hname_badc, HistDelta::c_Entries, m_minevt, 1);
 
-  if (!hasDeltaPar(m_histoDir, m_histoPhiIndex))
-    addDeltaPar(m_histoDir, m_histoPhiIndex, HistDelta::c_Entries, m_minevt, 1);
+  if (!hasDeltaPar(m_name_dir, m_hname_btdc))
+    addDeltaPar(m_name_dir, m_hname_btdc, HistDelta::c_Entries, m_minevt, 1);
 
-  if (!hasDeltaPar(m_histoDir, m_histoPhiEff))
-    addDeltaPar(m_histoDir, m_histoPhiEff, HistDelta::c_Entries, m_minevt, 1);
+  if (!hasDeltaPar(m_name_dir, m_hname_idxphi))
+    addDeltaPar(m_name_dir, m_hname_idxphi, HistDelta::c_Entries, m_minevt, 1);
 
-  if (!hasDeltaPar(m_histoDir, m_histoHitsPhi))
-    addDeltaPar(m_histoDir, m_histoHitsPhi, HistDelta::c_Entries, m_minevt, 1);
+  if (!hasDeltaPar(m_name_dir, m_hname_effphi))
+    addDeltaPar(m_name_dir, m_hname_effphi, HistDelta::c_Entries, m_minevt, 1);
 
-  if (!hasDeltaPar(m_histoDir, m_histoTrackingWireEff))
-    addDeltaPar(m_histoDir, m_histoTrackingWireEff, HistDelta::c_Events, m_minevt, 1);
+  if (!hasDeltaPar(m_name_dir, m_hname_hitsphi))
+    addDeltaPar(m_name_dir, m_hname_hitsphi, HistDelta::c_Entries, m_minevt, 1);
 
-  registerEpicsPV(m_pvPrefix + "cdcboards_wadc", "adcboards");
-  registerEpicsPV(m_pvPrefix + "cdcboards_wtdc", "tdcboards");
+  if (!hasDeltaPar(m_name_dir, m_histoTrackingWireEff))
+    addDeltaPar(m_name_dir, m_histoTrackingWireEff, HistDelta::c_Events, m_minevt, 1);
 
-  registerEpicsPV(m_pvPrefix + "adc_median_window", "adcmedianwindow");
-  registerEpicsPV(m_pvPrefix + "tdc_median_window", "tdcmedianwindow");
+  //creating box for normal adc and tdc windows, the real position is updated at begin run
+  m_line_ladc = new TLine(0, m_minadc, 300, m_minadc);
+  m_line_ladc->SetLineColor(kRed);
+  m_line_ladc->SetLineWidth(2);
 
-  registerEpicsPV(m_pvPrefix + "phi_compare_window", "phicomparewindow");
+  m_line_hadc = new TLine(0, m_maxadc, 300, m_maxadc);
+  m_line_hadc->SetLineColor(kRed);
+  m_line_hadc->SetLineWidth(2);
+
+  m_line_ltdc = new TLine(0, m_mintdc, 300, m_mintdc);
+  m_line_ltdc->SetLineColor(kRed);
+  m_line_ltdc->SetLineWidth(2);
+
+  m_line_htdc = new TLine(0, m_maxtdc, 300, m_maxtdc);
+  m_line_htdc->SetLineColor(kRed);
+  m_line_htdc->SetLineWidth(2);
+
+  registerEpicsPV(m_name_pvpfx + "cdcboards_wadc", "adcboards");
+  registerEpicsPV(m_name_pvpfx + "cdcboards_wtdc", "tdcboards");
+
+  registerEpicsPV(m_name_pvpfx + "adc_median_window", "adcmedianwindow");
+  registerEpicsPV(m_name_pvpfx + "tdc_median_window", "tdcmedianwindow");
+
+  registerEpicsPV(m_name_pvpfx + "phi_compare_window", "phicomparewindow");
 
   m_monObj = getMonitoringObject("cdc");
 
@@ -160,41 +203,62 @@ void DQMHistAnalysisCDCEpicsModule::beginRun()
   if (std::isnan(m_phiwarn)) m_phiwarn = 0.05; //>%5 is warning
   if (std::isnan(m_phialarm)) m_phialarm = 0.15; //>%15 is warning
 
-  //creating box for normal adc and tdc windows
-  m_line_ladc = new TLine(0, m_minadc, 300, m_minadc);
-  m_line_ladc->SetLineColor(kRed);
-  m_line_ladc->SetLineWidth(2);
-
-  m_line_hadc = new TLine(0, m_maxadc, 300, m_maxadc);
-  m_line_hadc->SetLineColor(kRed);
-  m_line_hadc->SetLineWidth(2);
-
-  m_line_ltdc = new TLine(0, m_mintdc, 300, m_mintdc);
-  m_line_ltdc->SetLineColor(kRed);
-  m_line_ltdc->SetLineWidth(2);
-
-  m_line_htdc = new TLine(0, m_maxtdc, 300, m_maxtdc);
-  m_line_htdc->SetLineColor(kRed);
-  m_line_htdc->SetLineWidth(2);
+  // Update Line position from Epics limits
+  m_line_ladc->SetY1(m_minadc);
+  m_line_ladc->SetY2(m_minadc);
+  m_line_hadc->SetY1(m_maxadc);
+  m_line_hadc->SetY2(m_maxadc);
+  m_line_ltdc->SetY1(m_mintdc);
+  m_line_ltdc->SetY2(m_mintdc);
+  m_line_htdc->SetY1(m_maxtdc);
+  m_line_htdc->SetY2(m_maxtdc);
 
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: beginRun run called");
 }
 
 void DQMHistAnalysisCDCEpicsModule::event()
 {
-  //get intra-run histogram from CDC DQM module
-  auto m_delta_adc = (TH2F*)getDelta(m_histoDir, m_histoADC, 0, true); //true=only if updated
+  //1. get adc median vs layer numbers
+  auto m_delta_ladc = (TH2F*)getDelta(m_name_dir, m_hname_ladc, 0, true);
+  if (m_delta_ladc) {
+    m_histmd_ladc->Reset();
+    for (unsigned il = 0; il < kNumLayers; ++il) {
+      if (m_hists_lADC[il]) delete m_hists_lADC[il];
+      m_hists_lADC[il] = m_delta_ladc->ProjectionY(Form("histmd_adc_layer%d", il + 1), il + 1, il + 1, "");
+      m_hists_lADC[il]->SetTitle(Form("histmd_adc_layer%d", il));
+      float md_ladc = getHistMedian(m_hists_lADC[il]);
+      m_histmd_ladc->SetBinContent(il + 1, md_ladc);
+    }
+    // Draw canvas
+    c_histmd_ladc->Clear();
+    c_histmd_ladc->cd();
+    getHistStyle(m_histmd_ladc, "layeradc", 0);
+    double y_max = m_histmd_ladc->GetMaximum();
+    m_histmd_ladc->SetFillColor(kYellow);
+    m_histmd_ladc->SetMinimum(0);
+    m_histmd_ladc->SetMaximum(y_max * 1.20);
+    m_histmd_ladc->Draw("hist");
+    for (auto* line : m_lines) {
+      line->SetY2(y_max * 1.20);
+      line->Draw("same");
+    }
+    c_histmd_ladc->Update();
+    UpdateCanvas(c_histmd_ladc);
+  }
+
+  //2. get adc medians vs board ID
+  auto m_delta_adc = (TH2F*)getDelta(m_name_dir, m_hname_badc, 0, true); //true=only if updated
   if (m_delta_adc) {
     m_hist_adc->Reset();
     int cadcgood = 0;
     int cadcbad = 0;
     double sumadcgood = 0;
-    for (int ic = 0; ic < 300; ++ic) {
+    for (unsigned ic = 0; ic < kNumBoards; ++ic) {
       if (ic == 0) continue; //299 boards only
-      if (m_hADCs[ic]) delete m_hADCs[ic];
-      m_hADCs[ic] = m_delta_adc->ProjectionY(Form("hADC%d", ic + 1), ic + 1, ic + 1, "");
-      m_hADCs[ic]->SetTitle(Form("hADC%d", ic));
-      float md_adc = getHistMedian(m_hADCs[ic]);
+      if (m_hists_bADC[ic]) delete m_hists_bADC[ic];
+      m_hists_bADC[ic] = m_delta_adc->ProjectionY(Form("histmd_tdc_board%d", ic + 1), ic + 1, ic + 1, "");
+      m_hists_bADC[ic]->SetTitle(Form("histmd_adc_board%d", ic));
+      float md_adc = getHistMedian(m_hists_bADC[ic]);
       m_hist_adc->SetBinContent(ic + 1, md_adc);
       if (md_adc >= m_minadc && md_adc <= m_maxadc) {
         sumadcgood = sumadcgood + md_adc;
@@ -216,24 +280,24 @@ void DQMHistAnalysisCDCEpicsModule::event()
     UpdateCanvas(c_hist_adc);
   }
 
-  auto m_delta_tdc = (TH2F*)getDelta(m_histoDir, m_histoTDC, 0, true);
+  //3. get tdc medians vs board ID
+  auto m_delta_tdc = (TH2F*)getDelta(m_name_dir, m_hname_btdc, 0, true);
   if (m_delta_tdc) {
     m_hist_tdc->Reset();
     int ctdcgood = 0;
     int ctdcbad = 0;
     double sumtdcgood = 0;
-    for (int ic = 0; ic < 300; ++ic) {
+    for (unsigned ic = 0; ic < kNumBoards; ++ic) {
       if (ic == 0) continue; //299 boards only
-      if (m_hTDCs[ic]) delete m_hTDCs[ic];
-      m_hTDCs[ic] = m_delta_tdc->ProjectionY(Form("hTDC%d", ic + 1), ic + 1, ic + 1, "");
-      m_hTDCs[ic]->SetTitle(Form("hTDC%d", ic));
-      float md_tdc = getHistMedian(m_hTDCs[ic]);
+      if (m_hists_bTDC[ic]) delete m_hists_bTDC[ic];
+      m_hists_bTDC[ic] = m_delta_tdc->ProjectionY(Form("histmd_tdc_board%d", ic + 1), ic + 1, ic + 1, "");
+      m_hists_bTDC[ic]->SetTitle(Form("histmd_tdc_board%d", ic));
+      float md_tdc = getHistMedian(m_hists_bTDC[ic]);
       m_hist_tdc->SetBinContent(ic + 1, md_tdc);
       if (md_tdc >= m_mintdc && md_tdc <= m_maxtdc) {
         ctdcgood++;
         sumtdcgood = sumtdcgood + md_tdc;
       } else ctdcbad++;
-
     }
     double tdcfrac = ctdcgood / 2.99;
     setEpicsPV("tdcboards", tdcfrac);
@@ -250,7 +314,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   //get phi plots for various options
-  auto m_delta_skimphi = (TH2F*)getDelta(m_histoDir, m_histoPhiIndex, 0, true); //true=only if updated
+  auto m_delta_skimphi = (TH2F*)getDelta(m_name_dir, m_hname_idxphi, 0, true); //true=only if updated
   if (m_delta_skimphi) {
     TString sip[2] = {"OffIP", "IP"};
     TString sname[4] = {"all", "bhabha", "hadron", "mumutrk"};
@@ -279,30 +343,33 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_hist_crphi->SetTitle("cdc-track #phi (IP + hadrons);cdc-track #phi;norm entries");
     if (m_hist_crphi) {
       double maxnow = m_hist_crphi->Integral();
-      m_hist_crphi->Scale(1.0 / maxnow);
-      if (maxnow < 10000) isFew = true;
-      else {
+      if (maxnow > 0)m_hist_crphi->Scale(1.0 / maxnow);
+      if (maxnow < 10000) {
+        isFew = true;
+      } else {
         if (m_histref_phiindex) {
           m_hist_refphi = m_histref_phiindex->ProjectionX("histphi_ip_hadronsref", 7, 7, "");
           double nbinref = m_hist_refphi->GetNbinsX();
           double nbinnow = m_hist_crphi->GetNbinsX();
           if (nbinref == nbinnow) { //same bins
             double maxref = m_hist_refphi->Integral();
-            m_hist_refphi->Scale(1.0 / maxref);
-            double maxphidiff = 0;
-            double maxphidiff_angle = 0;
-            for (int iphi = 0; iphi < nbinnow; iphi++) {
-              double icnow = m_hist_crphi->GetBinContent(iphi + 1);
-              double icref = m_hist_refphi->GetBinContent(iphi + 1);
-              double phidiff = fabs(icnow - icref);
-              if (phidiff > m_phiwarn)isWarn = true;
-              if (phidiff > m_phialarm)isAlarm = true;
-              if (phidiff > maxphidiff) {
-                maxphidiff = phidiff;
-                maxphidiff_angle = m_hist_crphi->GetBinLowEdge(iphi + 1) + m_hist_crphi->GetBinWidth(iphi + 1);
+            if (maxref > 0) {
+              m_hist_refphi->Scale(1.0 / maxref);
+              double maxphidiff = 0;
+              double maxphidiff_angle = 0;
+              for (int iphi = 0; iphi < nbinnow; iphi++) {
+                double icnow = m_hist_crphi->GetBinContent(iphi + 1);
+                double icref = m_hist_refphi->GetBinContent(iphi + 1);
+                double phidiff = fabs(icnow - icref);
+                if (phidiff > m_phiwarn)isWarn = true;
+                if (phidiff > m_phialarm)isAlarm = true;
+                if (phidiff > maxphidiff) {
+                  maxphidiff = phidiff;
+                  maxphidiff_angle = m_hist_crphi->GetBinLowEdge(iphi + 1) + m_hist_crphi->GetBinWidth(iphi + 1);
+                }
               }
+              m_hist_crphi->SetTitle(Form("%s (diff = %0.03f at %0.1f)", m_hist_crphi->GetTitle(), maxphidiff, maxphidiff_angle));
             }
-            m_hist_crphi->SetTitle(Form("%s (diff = %0.03f at %0.1f)", m_hist_crphi->GetTitle(), maxphidiff, maxphidiff_angle));
           }
         }
       }
@@ -321,7 +388,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   //get tracking efficiency
-  auto m_delta_effphi = (TH2F*)getDelta(m_histoDir, m_histoPhiEff, 0, true); //true=only if updated
+  auto m_delta_effphi = (TH2F*)getDelta(m_name_dir, m_hname_effphi, 0, true); //true=only if updated
   if (m_delta_effphi) {
     c_hist_effphi->Clear();
     double eff = -1;
@@ -335,6 +402,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
       if (den > 0)eff = num * 100.0 / den;
       m_hist_effphi->SetBinContent(iphi + 1, eff);
       m_hist_effphi->SetBinError(iphi + 1, 0);
+      delete temp;
     }
     m_hist_effphi->GetYaxis()->SetRangeUser(80.0, 110.0); //per efficiency
     m_hist_effphi->SetTitle("CDC track efficiency(cdchits>20/all); cdc-track #phi; tracking efficiency");
@@ -348,7 +416,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   //get cdc hits vs phi
-  auto m_delta_hitphi = (TH2F*)getDelta(m_histoDir, m_histoHitsPhi, 0, true); //true=only if updated
+  auto m_delta_hitphi = (TH2F*)getDelta(m_name_dir, m_hname_hitsphi, 0, true); //true=only if updated
   if (m_delta_hitphi) {
     c_hist_hitsphi->Clear();
     m_delta_hitphi->SetTitle("CDC track #phi vs cdchits; cdc-track #phi; nCDCHits");
@@ -363,7 +431,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   double fracWiresWithLowAttachProb = 0;
   double fracWiresWithHighAttachProb = 0;
   gStyle->SetNumberContours(100);
-  auto m_delta_efflay = (TH2F*)getDelta(m_histoDir, m_histoTrackingWireEff, 0, true); //true=only if updated
+  auto m_delta_efflay = (TH2F*)getDelta(m_name_dir, m_histoTrackingWireEff, 0, true); //true=only if updated
   if (m_delta_efflay) {
     for (int ij = 0; ij < 4; ij++) c_hist_attach_eff[ij]->Clear();
     m_hist_wire_attach_eff_1d->Reset();
@@ -399,7 +467,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
           int rmdr = int(abs(ilay - 2) % 6);
           if ((rmdr == 0 && ilay > 2) || ilay == 55) {
             isl++;
-            el[isl] = new TEllipse(0, 0, lbinEdges[ilay], lbinEdges[ilay]);
+            el[isl] = new TEllipse(0, 0, m_lbinEdges[ilay], m_lbinEdges[ilay]);
             el[isl]->SetLineColor(kRed);
             el[isl]->SetLineWidth(2);
             el[isl]->SetFillStyle(0);
@@ -448,6 +516,16 @@ void DQMHistAnalysisCDCEpicsModule::endRun()
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: end run");
 }
 
+
+//------------------------------------
+void DQMHistAnalysisCDCEpicsModule::terminate()
+{
+  for (auto* line : m_lines) delete line;
+  m_lines.clear();
+  B2DEBUG(20, "DQMHistAnalysisCDCEpics: terminate called");
+}
+
+
 //------------------------------------
 float DQMHistAnalysisCDCEpicsModule::getHistMedian(TH1D* h) const
 {
@@ -465,11 +543,6 @@ float DQMHistAnalysisCDCEpicsModule::getHistMedian(TH1D* h) const
   return median;
 }
 
-//------------------------------------
-void DQMHistAnalysisCDCEpicsModule::terminate()
-{
-  B2DEBUG(20, "DQMHistAnalysisCDCEpics: terminate called");
-}
 
 void DQMHistAnalysisCDCEpicsModule::fillEffiTH2(TH2F* hist, TH2F* attached, TH2F* expected, TH2F* efficiency)
 {
@@ -482,12 +555,12 @@ void DQMHistAnalysisCDCEpicsModule::fillEffiTH2(TH2F* hist, TH2F* attached, TH2F
   double firstR = cdcgeo.senseWireR(0);
   double secondR = cdcgeo.senseWireR(1);
   binEdges[0] = firstR - (secondR - firstR) / 2;
-  lbinEdges[0] = firstR;
+  m_lbinEdges[0] = firstR;
   for (int lay = 1; lay < nSLayers; lay++) {
     double prevR = cdcgeo.senseWireR(lay - 1);
     double currentR = cdcgeo.senseWireR(lay);
     binEdges[lay] = (prevR + currentR) / 2;
-    lbinEdges[lay] = currentR;
+    m_lbinEdges[lay] = currentR;
   }
   double lastR = cdcgeo.senseWireR(nSLayers - 1);
   double secondLastR = cdcgeo.senseWireR(nSLayers - 2);

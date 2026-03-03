@@ -1578,7 +1578,7 @@ def get_ccbarLambdaC_channels(
     ]
 
     ccbarTag_user_cut = '1.8 < mRecoil < 2.6'
-    variables.addAlias('ccbarTagSignalBinary', 'conditionalVariableSelector(ccbarTagSignal==1,1,0)')
+    variables.addAlias('ccbarTagSignalBinary', 'conditionalVariableSelector(extraInfo(ccbarTagSignal)==1,1,0)')
 
     # region 6th stage
     LambdaCTag = Particle(

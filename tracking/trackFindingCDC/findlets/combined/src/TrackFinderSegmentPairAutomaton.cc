@@ -7,13 +7,14 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/core/ModuleParam.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 TrackFinderSegmentPairAutomaton::TrackFinderSegmentPairAutomaton()
 {

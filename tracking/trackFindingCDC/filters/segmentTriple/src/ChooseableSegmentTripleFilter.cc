@@ -7,10 +7,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentTriple/ChooseableSegmentTripleFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::Chooseable<BaseSegmentTripleFilter>;
-template class TrackFindingCDC::ChooseableFilter<SegmentTripleFilterFactory>;
+template class TrackingUtilities::Chooseable<BaseSegmentTripleFilter>;
+template class TrackingUtilities::ChooseableFilter<SegmentTripleFilterFactory>;

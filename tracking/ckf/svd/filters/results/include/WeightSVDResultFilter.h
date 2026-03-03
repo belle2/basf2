@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.dcl.h>
 #include <tracking/ckf/svd/filters/results/SVDResultVarSet.h>
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 
@@ -16,7 +16,7 @@ namespace Belle2 {
   class WeightSVDResultFilter : public BaseSVDResultFilter {
   public:
     /// Return the sum of CKF SVD weights
-    TrackFindingCDC::Weight operator()(const CKFToSVDResult& result) override
+    TrackingUtilities::Weight operator()(const CKFToSVDResult& result) override
     {
       return result.getWeightSum();
     }

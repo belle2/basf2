@@ -128,7 +128,7 @@ void DQMHistAnalysisSVDOccupancyModule::initialize()
   // change name by hand cos side index not at the end
   hName = getHistoNameFromCanvas("SVDAnalysis/c_SVDOccupancyGroupId0U", "@view");
   m_hOccupancyGroupId0 = new SVDSummaryPlots(hName.Data(),
-                                             "Average OFFLINE Sensor Occupancy (%), @view/@side Side for cluster time group Id = 0");
+                                             "Average OFFLINE Sensor Occupancy (%), @view/@side Side for cluster time group Id = 0, 1, 2 & 3");
   m_hOccupancyGroupId0->setStats(0);
 
   if (m_3Samples) {
@@ -436,7 +436,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     }
 
     // groupId0 side U
-    TString tmpnameGrpId0 = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountGroupId0U", tmp_layer, tmp_ladder, tmp_sensor);
+    TString tmpnameGrpId0 = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountSignalGroupIDsU", tmp_layer, tmp_ladder, tmp_sensor);
     htmp = (TH1F*)findHist(tmpnameGrpId0.Data());
     if (htmp == NULL) {
       B2INFO("Occupancy U histogram for group Id0 not found");
@@ -498,7 +498,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     }
 
     // groupId0 side V
-    tmpnameGrpId0 = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountGroupId0V", tmp_layer, tmp_ladder, tmp_sensor);
+    tmpnameGrpId0 = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountSignalGroupIDsV", tmp_layer, tmp_ladder, tmp_sensor);
 
     htmp = (TH1F*)findHist(tmpnameGrpId0.Data());
     if (htmp == NULL) {

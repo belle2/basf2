@@ -130,6 +130,13 @@ OBSOLETE = [
     "filter muonPairV"
 ]
 
+# HLTprefilter lines
+HLT_PREFILTER = [
+    "filter prefilter InjectionStrip",
+    "filter prefilter CDCECLthreshold"
+        ]
+
+
 # General channels
 RESULTS = [
     "total events",

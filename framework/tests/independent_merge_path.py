@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# @cond
-
 import basf2
 from ROOT import Belle2
 
@@ -185,5 +183,3 @@ main.add_module(CheckData())
 
 basf2.print_path(main)
 basf2.process(main)
-
-# @endcond

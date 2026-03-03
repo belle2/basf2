@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# avoid race conditions beetween pyroot and GUI thread
+# avoid race conditions between pyroot and GUI thread
 from ROOT import PyConfig
 PyConfig.StartGuiThread = False  # noqa
 
@@ -121,7 +121,7 @@ add_simulation(main, bkgfiles=bg)
 # Reconstruction
 add_reconstruction(main)
 
-# dispay
+# display
 main.add_module(TOPDisplay())
 
 # Show progress of processing

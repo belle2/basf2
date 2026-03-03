@@ -8,9 +8,9 @@
 #pragma once
 
 #include <tracking/ckf/svd/filters/results/SVDResultFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   /// Alias for filter to weight the SVD clusters
-  using ChooseableSVDResultFilter = TrackFindingCDC::ChooseableFilter<SVDResultFilterFactory>;
+  using ChooseableSVDResultFilter = TrackingUtilities::ChooseableFilter<SVDResultFilterFactory>;
 }

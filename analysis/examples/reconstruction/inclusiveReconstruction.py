@@ -13,9 +13,6 @@ An example script to reconstruct unspecified particles and the use of MC
 matching tools for inclusive analyses with sum-of-exclusive method.
 """
 
-# Doxygen should skip this script
-# @cond
-
 import basf2
 from modularAnalysis import inputMdst, reconstructDecay, matchMCTruth, \
     copyLists, variablesToNtuple
@@ -54,5 +51,3 @@ vm.printAliases()
 variablesToNtuple("B0:inclusive", interesting_variables, path=mypath)
 
 basf2.process(mypath)
-
-# @endcond

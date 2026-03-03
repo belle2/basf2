@@ -9,10 +9,10 @@
 #include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
 #include <tracking/ckf/general/findlets/LayerToggledApplier.icc.h>
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 template class
 Belle2::LayerToggledApplier<CKFToPXDState, LimitedOnStateApplier<CKFToPXDState, ChooseableFilter<PXDStateFilterFactory>>>;

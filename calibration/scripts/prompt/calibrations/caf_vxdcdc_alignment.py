@@ -42,6 +42,8 @@ import alignment.collections
 import alignment.constraints
 import alignment.parameters
 
+import variables.collections
+
 collection_names = ["cosmic", "hadron", "mumu", "offip"]
 
 default_config = {
@@ -143,6 +145,92 @@ def create_std_path():
     return path
 
 
+def create_dimuon_validation_path():
+    """
+    Returns default path for dimuon validation collection
+    """
+    path = create_std_path()
+    ana.fillParticleList('mu+:validation', 'p > 1.0 and abs(dz) < 2.0 and abs(dr) < 0.5 and nTracks == 2', path=path)
+    ana.reconstructDecay('Upsilon(4S):validation -> mu+:validation mu-:validation', '9.5<M<11.5', path=path)
+    vtx.treeFit('Upsilon(4S):validation', path=path)
+
+    track_variables = [
+        'd0', 'z0', 'phi0', 'omega', 'tanLambda', 'pt',
+        'z0FromIP', 'd0FromIP', 'phi0FromIP',
+        'electronID', 'muonID',
+        'nVXDHits', 'nPXDHits', 'nSVDHits', 'nCDCHits',
+        'nTracks',
+        'x', 'y', 'z', 'M'
+        ]
+
+    ana.variablesToNtuple('Upsilon(4S):validation',
+                          variables=[
+                              'chiProb',
+                              'nTracks',
+                              'pt', 'pz',
+                              'p', 'E', 'theta', 'phi',
+                              'InvM', 'M',
+                              'date', 'eventTimeSeconds',
+                              'IPX', 'IPY', 'IPZ'
+                              ]
+                          + variables.collections.vertex
+                          + ['daughter(0, {})'.format(var) for var in track_variables]
+                          + ['daughter(1, {})'.format(var) for var in track_variables]
+                          + ['useRestFrame(daughter(0, {}))'.format(var) for var in track_variables]
+                          + ['useRestFrame(daughter(1, {}))'.format(var) for var in track_variables]
+                          + ['useCMSFrame(daughter(0, {}))'.format(var) for var in track_variables]
+                          + ['useCMSFrame(daughter(1, {}))'.format(var) for var in track_variables]
+                          + ['V0d0(0)', 'V0d0(1)', 'V0z0(0)', 'V0z0(1)'],
+                          filename='dimuon_ana.root',
+                          path=path
+                          )
+
+    path.add_module("TrackDQM")
+    path.add_module("AlignDQM")
+
+    return path
+
+
+def create_cosmic_validation_path():
+    """
+    Returns validation path for cosmic collection
+    """
+    path = basf2.create_path()
+    path.add_module('Progress')
+    path.add_module('RootInput')
+    path.add_module('Gearbox')
+    path.add_module('Geometry')
+
+    raw.add_unpackers(path)
+    path.add_module('SetupGenfitExtrapolation')
+    reco.add_cosmics_reconstruction(
+        path,
+        pruneTracks=False,
+        skipGeometryAdding=True,
+        addClusterExpertModules=False,
+        merge_tracks=False
+    )
+
+    path.add_module('SetRecoTrackMomentum', automatic=True)
+    path.add_module('DAFRecoFitter', pdgCodesToUseForFitting=[13])
+
+    ana.fillParticleList(
+        'mu+:goodForVXDCDCAlignment',
+        '[z0 <= 57. or abs(d0) >= 26.5] and abs(dz) > 0.4 and nTracks == 2',
+        path=path)
+    path.add_module('SkimFilter', particleLists=['mu+:goodForVXDCDCAlignment']).if_false(basf2.create_path())
+
+    path.add_module(
+        "CDCCosmicAnalysis",
+        StoreTrackParErrors=True,
+        Output="cosmic_ana.root")
+
+    path.add_module("TrackDQM")
+    path.add_module("AlignDQM")
+
+    return path
+
+
 def create_cosmics_path():
     """
     Returns default path for cosmic collection
@@ -224,7 +312,50 @@ def make_mumu_collection(
         primaryVertices=[f"Upsilon(4S):{name}"])
 
 
-def create_prompt(files, cfg):
+def create_validation(files, cfg, name='VXDCDCalignment_validation'):
+    """
+    Returns configured (original) validation stage alignment
+
+    Parameters
+    ----------
+    files : list(str)
+      Dictionary with all input files by category (name)
+    cfg : dict
+      Expert config dictionary
+    """
+    mumu = select_files(files["mumu"], 0.2e6, cfg["mumu.max_processed_events_per_file"])
+    cosmic = select_files(files["cosmic"], 1e6, cfg["cosmic.max_processed_events_per_file"])
+
+    cal = mpc.create(
+        name=name,
+        dbobjects=['VXDAlignment', 'CDCAlignment'],
+        collections=[
+            mpc.make_collection("cosmic", path=create_cosmic_validation_path(), tracks=["RecoTracks"]),
+            mpc.make_collection("mumu", path=create_dimuon_validation_path(), tracks=["RecoTracks"])
+        ],
+        tags=None,
+        files=dict(mumu=mumu, cosmic=cosmic),
+        timedep=None,
+        constraints=[
+            alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),
+            alignment.constraints.CDCLayerConstraints(z_offset=True, z_scale=False, twist=True)
+        ],
+        fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=False),
+        commands=[
+            "method diagonalization 3 0.1",
+            "threads 10 10",
+            "scaleerrors 1. 1.",
+            "entries 1000"],
+        params=dict(minPValue=0.00001, externalIterations=0, granularity="run"),
+        min_entries=1000000)
+
+    cal.max_iterations = 0
+    cal.save_payloads = False
+
+    return cal
+
+
+def create_prompt(files, cfg, name='VXDCDCalignment_prompt'):
     """
     Returns configured (original) prompt stage alignment
 
@@ -241,7 +372,7 @@ def create_prompt(files, cfg):
     offip = select_files(files["offip"], 0.2e6, cfg["offip.max_processed_events_per_file"])
 
     cal = mpc.create(
-        name='VXDCDCalignment_prompt',
+        name=name,
         dbobjects=['VXDAlignment', 'CDCAlignment'],
         collections=[
             mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),
@@ -259,6 +390,7 @@ def create_prompt(files, cfg):
         fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=False),
         commands=[
             "method diagonalization 3 0.1",
+            "threads 10 10",
             "scaleerrors 1. 1.",
             "entries 1000"],
         params=dict(minPValue=0.00001, externalIterations=0, granularity="run"),
@@ -269,7 +401,7 @@ def create_prompt(files, cfg):
     return cal
 
 
-def create_beamspot(files, cfg):
+def create_beamspot(files, cfg, name='VXDCDCalignment_beamspot'):
     """
     Returns configured beamspot calibration
 
@@ -321,7 +453,7 @@ def create_beamspot(files, cfg):
                                input_files=mumu,
                                pre_collector_path=path)
 
-    calibration_bs = Calibration('VXDCDCalignment_beamspot', algorithms=algorithm_bs)
+    calibration_bs = Calibration(name, algorithms=algorithm_bs)
     calibration_bs.add_collection("mumu", collection_bs)
 
     calibration_bs.strategies = SingleIOV
@@ -329,7 +461,7 @@ def create_beamspot(files, cfg):
     return calibration_bs
 
 
-def create_stage1(files, cfg):
+def create_stage1(files, cfg, name='VXDCDCalignment_stage1'):
     """
     Returns configured stage1 alignment (full constant alignment with wires, beamspot fixed)
 
@@ -346,7 +478,7 @@ def create_stage1(files, cfg):
     hadron_and_offip = select_files(files["hadron"] + files["offip"], int(4.0e6 / 10.), cfg["hadron.max_processed_events_per_file"])
 
     cal = mpc.create(
-        name='VXDCDCalignment_stage1',
+        name=name,
         dbobjects=['VXDAlignment', 'CDCAlignment', 'BeamSpot'],
         collections=[
             mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),
@@ -381,7 +513,7 @@ def create_stage1(files, cfg):
     return cal
 
 
-def create_stage2(files, cfg):
+def create_stage2(files, cfg, name='VXDCDCalignment_stage2'):
     """
     Returns configured stage2 alignment (run-dependent alignment)
 
@@ -396,7 +528,7 @@ def create_stage2(files, cfg):
     cosmic = select_files(files["cosmic"], 2e6, cfg["cosmic.max_processed_events_per_file"])
 
     cal = mpc.create(
-        name='VXDCDCalignment_stage2',
+        name=name,
         dbobjects=['VXDAlignment', 'CDCAlignment', 'BeamSpot'],
         collections=[
             mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),
@@ -451,10 +583,13 @@ def get_calibrations(input_data, **kwargs):
     stage1 = create_stage1(files, cfg)
     stage2 = create_stage2(files, cfg)
 
+    # Add last prompt alignment as validation (does not save payloads)
+    validation = create_validation(files, cfg)
+
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
-    for cal in [prompt, beamspot, stage1, stage2]:
+    for cal in [prompt, beamspot, stage1, stage2, validation]:
         for colname in collection_names:
             if colname not in cal.collections.keys():
                 continue
@@ -475,6 +610,8 @@ def get_calibrations(input_data, **kwargs):
     beamspot.depends_on(prompt)
     stage1.depends_on(beamspot)
     stage2.depends_on(stage1)
+    # finally a validation
+    validation.depends_on(stage2)
 
     # Do not save BeamSpot payloads in the final output database
     # because alignment is changed -> BeamSpot payloads now invalid
@@ -483,7 +620,7 @@ def get_calibrations(input_data, **kwargs):
     if cfg["only_prompt"]:
         return [prompt]
 
-    return [prompt, beamspot, stage1, stage2]
+    return [prompt, beamspot, stage1, stage2, validation]
 
 
 if __name__ == '__main__':

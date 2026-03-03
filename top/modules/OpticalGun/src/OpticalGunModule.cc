@@ -113,7 +113,7 @@ namespace Belle2 {
       if (result != 0) {
         B2FATAL(m_angularDistribution << " TFormula does not compile.");
       }
-      double testPoint = m_minAlpha; // let's test if the function is postive defined everywhere
+      double testPoint = m_minAlpha; // let's test if the function is positive defined everywhere
       while (testPoint < m_maxAlpha) {
         double value = testFormula.Eval(testPoint * Unit::deg);
         if (value < 0) {
@@ -214,7 +214,7 @@ namespace Belle2 {
   bool OpticalGunModule::isInsideSlit(const XYZPoint& point,
                                       const XYZVector& direction) const
   {
-    if (m_slitZ < 0.01) return true; // no screen with a slit is put infront of a source
+    if (m_slitZ < 0.01) return true; // no screen with a slit is put in front of a source
     if (direction.Z() < 1.0e-6) return false; // must fly toward the slit
 
     double pathLength = (m_slitZ - point.Z()) / direction.Z();

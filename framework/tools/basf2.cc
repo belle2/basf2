@@ -30,7 +30,6 @@
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string/predicate.hpp> //for iequals()
 
-#include <csignal>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -62,13 +61,6 @@ namespace {
 
 int main(int argc, char* argv[])
 {
-  //remove SIGPIPE handler set by ROOT which sometimes caused infinite loops
-  //See https://savannah.cern.ch/bugs/?97991
-  //default action is to abort
-  if (signal(SIGPIPE, SIG_DFL) == SIG_ERR) {
-    B2FATAL("Cannot remove SIGPIPE signal handler");
-  }
-
   //Initialize metadata service
   MetadataService::Instance();
 

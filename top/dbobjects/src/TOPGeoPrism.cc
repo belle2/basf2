@@ -65,7 +65,7 @@ namespace Belle2 {
     cout << ", flat surface length: " << getFlatLength() << " " << s_unitName << endl;
     cout << " Material: " << getMaterial() << endl;
     if (getFilterThickness() > 0) { // old payload
-      cout << " Wavelenght filter: " << getFilterMaterial()
+      cout << " Wavelength filter: " << getFilterMaterial()
            << ", thickness: " << getFilterThickness() << " " << s_unitName << endl;
     }
     if (!m_peelOffRegions.empty()) {

@@ -63,6 +63,9 @@ namespace Belle2 {
 
     protected:
 
+      /** true if we are reconstructing MC*/
+      bool m_isMC = false;
+
       //1. Collections and relations Names
       /** Name of the collection to use for the SVDEventInfo */
       std::string m_svdEventInfoName;
@@ -170,7 +173,7 @@ namespace Belle2 {
       /**
        * alter the cluster position (applied on MC to match resolution measured on data)
        */
-      void alterClusterPosition();
+      void alterClusterPosition(Belle2::SVDTrueHit* trueHit);
 
       /**
        * alter the cluster time (applied on MC to match resolution measured on data)

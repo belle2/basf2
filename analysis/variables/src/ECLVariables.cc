@@ -749,15 +749,21 @@ namespace Belle2 {
 
       if (elci and cluster) {
 
-        //..Only valid for crystals in CDC acceptance
+        //..Only available for crystals in CDC acceptance. Otherwise, return
+        //  1.5*|t|/dt99, which gives similar efficiency for nominal cuts.
         unsigned short cellID = cluster->getMaxECellId(); // [1, 8736]
         const unsigned short firstCellID = 161; // first cellID in CDC acceptance
         const unsigned short lastCellID = 8608; // last cellID in CDC acceptance
-        if (cellID < firstCellID or cellID > lastCellID) {return Const::doubleNaN;}
+        const double rawTime = cluster->getTime();
+        double tNorm90 = -99.;
+        if (cellID < firstCellID or cellID > lastCellID) {
+          const double dt99 = cluster->getDeltaTime99();
+          if (dt99 != 0) {tNorm90 = 1.5 * rawTime / dt99;}
+          return tNorm90;
+        }
         int iCrys = cellID - 1; // [0, 8735]
 
         //..clusterTiming. Dither to remove artifacts from compression
-        double rawTime = cluster->getTime();
         const double timingBit = 2000. / 4096.;
         double tSmear = timingBit * (gRandom->Uniform() - 0.5);
         double time = rawTime + tSmear;
@@ -813,7 +819,7 @@ namespace Belle2 {
         double minTNorm = (double)ECLTimingNormalization->getMinTNormalization();
         double tNormalization = basicEScale * backgroundNorm * energyNorm;
         if (tNormalization < minTNorm) {tNormalization = minTNorm;}
-        double tNorm90 = (time - timeWalkCor) / tNormalization;
+        tNorm90 = (time - timeWalkCor) / tNormalization;
         return tNorm90;
 
       } else {
@@ -1957,12 +1963,14 @@ during the calculation of the `distanceToMcKl` variable.
 .. warning::
     This requires the `getNeutralHadronGeomMatches` function to be used.
 )DOC");
-  REGISTER_VARIABLE("clusterTimeNorm90", eclClusterTimeNorm90,
-  R"DOC(
-  Returns cluster's timing normalized such that :math:`90\%` of real photons will 
-  have :math:`|\text{clusterTimeNorm90}| < 1`. Normalization depends on energy, background
-  level, and cellID, and differs for data and MC. Valid only for crystals within the CDC acceptance, :math:`161 <= |\text{clusterCellID}| <= 8608`. Note: the required payloads are stored in the neutrals global tag. Please find the latest recommendation using :ref:`b2help-recommendation`.)DOC",
-                      "dimensionless");
+  REGISTER_VARIABLE("clusterTimeNorm90", eclClusterTimeNorm90,R"DOC(
+Returns cluster's timing normalized such that :math:`90\%` of real photons will 
+have :math:`|\text{clusterTimeNorm90}| < 1`. Normalization depends on energy, background
+level, and cellID, and differs for data and MC. Calculated only for crystals within the CDC acceptance, :math:`161 <= |\text{clusterCellID}| <= 8608`; outside this region, :math:`1.5*\text{clusterTiming}/\text{clusterErrorTiming}` is returned. Typical requirement is :math:`|\text{clusterTimeNorm90}|<3`. 
+
+Note: the required payloads are stored in the neutrals global tag. Please find the latest recommendation using :ref:`b2help-recommendation`.
+
+)DOC", "dimensionless");
 
   }
 }

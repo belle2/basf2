@@ -47,9 +47,9 @@ REG_MODULE(ECLDigitizerModuleUp);
 //-----------------------------------------------------------------
 
 ECLDigitizerModuleUp::ECLDigitizerModuleUp() : Module(), m_waveformParametersMC("ECLDigitWaveformParametersForMC"),
-  m_waveformParameters("ECLWFParametersUp"),
-  m_algoParameters("ECLWFAlgoParamsUp"),
-  m_noiseParameters("ECLWFNoiseParamsUp")
+  m_waveformParameters("ECLWFParameters"),
+  m_algoParameters("ECLWFAlgoParams"),
+  m_noiseParameters("ECLWFNoiseParams")
 {
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");

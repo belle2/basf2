@@ -2099,15 +2099,22 @@ namespace Belle2 {
     Manager::FunctionPtr genParticle(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        int particleNumber = 0;
-        try {
-          particleNumber = convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("First argument of genParticle meta function must be integer!");
-        }
+        std::string indexString = arguments[0];
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
 
-        auto func = [var, particleNumber](const Particle*) -> double {
+        auto func = [var, indexString](const Particle * particle) -> double {
+          // First get the partcile index. If not int, evaluate the variable
+          int particleNumber = 0;
+          try
+          {
+            particleNumber = convertString<int>(indexString);
+          } catch (std::invalid_argument&)
+          {
+            auto indexFunction = convertToInt({indexString, "-1"});
+            auto indexVarResult = indexFunction(particle);
+            particleNumber = std::get<int>(indexVarResult);
+          }
+
           StoreArray<MCParticle> mcParticles("MCParticles");
           if (particleNumber >= mcParticles.getEntries())
           {

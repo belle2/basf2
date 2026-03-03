@@ -15,6 +15,7 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dbobjects/SVDSpacePointSNRFractionSelector.h>
+#include <svd/reconstruction/SVDMaxSumAlgorithm.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -95,10 +96,29 @@ namespace Belle2 {
     float noise = 0;
     for (auto iSD : shaperDigits) {
       auto samples = iSD.getSamples();
+      std::vector<float> selectedSamples;
+      B2INFO("number of samples : " << samples.size());
 
-      inputVector[0] += samples[0];
-      inputVector[1] += samples[1];
-      inputVector[2] += samples[2];
+      if (samples.size() == 6) {
+        Belle2::SVD::SVDMaxSumAlgorithm maxSum(samples);
+        auto maxSamples = maxSum.getSelectedSamples(); // std::array<float,3>
+        selectedSamples.assign(maxSamples.begin(), maxSamples.end());
+        // --- TEMPORARY DEBUG CODE ---
+        B2INFO("Original 6: " << samples[0] << ", " << samples[1] << ", " << samples[2] << ", "
+               << samples[3] << ", " << samples[4] << ", " << samples[5]);
+        B2INFO("Size, Selected 3: " << maxSamples.size() << ", " << maxSamples[0] << ", " << maxSamples[1] << ", " << maxSamples[2]);
+        // ----------------------------
+      } else {
+        selectedSamples.assign(samples.begin(), samples.end());
+      }
+      if (selectedSamples.size() < 3) continue;
+
+      inputVector[0] += selectedSamples[0];
+      inputVector[1] += selectedSamples[1];
+      inputVector[2] += selectedSamples[2];
+      //inputVector[0] += samples[0];
+      //inputVector[1] += samples[1];
+      //inputVector[2] += samples[2];
 
       VxdID thisSensorID = iSD.getSensorID();
       bool thisSide = iSD.isUStrip();

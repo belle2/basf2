@@ -25,7 +25,7 @@ using Belle2::MVA::ONNX::Tensor;
 
 REG_MODULE(CATFinder);
 
-CATFinderModule::CATFinderModule() : Module(), m_session("/home/gdepietro/cat-finder-onnx/cdcnet.onnx")
+CATFinderModule::CATFinderModule() : Module(), m_session("/work/gdepietro/cat-finder-cpp/cdcnet.onnx")
 {
   setDescription("GNN based CDC track finding.");
   addParam("recoTracksStoreArrayName", m_CDCRecoTracksName, "StoreArray name of the output CDC reco tracks.",
@@ -66,10 +66,13 @@ void CATFinderModule::event()
 
   auto input = Tensor<float>::make_shared({nHits, 7});
   auto beta = Tensor<float>::make_shared({nHits, 1});
-  auto ccoords = Tensor<float>::make_shared({nHits, 3});
+  auto coord = Tensor<float>::make_shared({nHits, 3});
   auto p = Tensor<float>::make_shared({nHits, 3});
   auto vertex = Tensor<float>::make_shared({nHits, 3});
   auto charge = Tensor<float>::make_shared({nHits, 1});
+
+  std::vector<unsigned int> tensorIndexToHitIndex;
+  tensorIndexToHitIndex.reserve(nHits);
 
   unsigned int iHit = 0;
 
@@ -77,14 +80,14 @@ void CATFinderModule::event()
     if (wireHit.getAutomatonCell().hasMaskedFlag())
       continue;
 
-    const CDCHit cdcHit = *wireHit.getHit();
+    const CDCHit* cdcHit = wireHit.getHit();
 
-    const unsigned short clayer = cdcHit.getICLayer();
-    const unsigned short wire = cdcHit.getIWire();
+    const unsigned short clayer = cdcHit->getICLayer();
+    const unsigned short wire = cdcHit->getIWire();
     const auto wirePos = m_CDCGeometryPar->c_Aligned;
 
-    const double tdc_scaled = (static_cast<double>(cdcHit.getTDCCount()) - TDC_OFFSET) / TDC_SCALE;
-    const double adc_clipped = cdcHit.getADCCount() > ADC_CLIP ? 1. : static_cast<double>(cdcHit.getADCCount()) / ADC_CLIP;
+    const double tdc_scaled = (static_cast<double>(cdcHit->getTDCCount()) - TDC_OFFSET) / TDC_SCALE;
+    const double adc_clipped = cdcHit->getADCCount() > ADC_CLIP ? 1. : static_cast<double>(cdcHit->getADCCount()) / ADC_CLIP;
 
     const B2Vector3D posForward = m_CDCGeometryPar->wireForwardPosition(clayer, wire, wirePos);
     const B2Vector3D posBackward = m_CDCGeometryPar->wireBackwardPosition(clayer, wire, wirePos);
@@ -92,9 +95,9 @@ void CATFinderModule::event()
     const double x = 0.5 * (posForward.x() + posBackward.x()) / SPATIAL_COORDINATES_SCALE;
     const double y = 0.5 * (posForward.y() + posBackward.y()) / SPATIAL_COORDINATES_SCALE;
 
-    const double superlayer_scaled = static_cast<double>(cdcHit.getISuperLayer()) / SLAYER_SCALE;
+    const double superlayer_scaled = static_cast<double>(cdcHit->getISuperLayer()) / SLAYER_SCALE;
     const double clayer_scaled = static_cast<double>(clayer) / CLAYER_SCALE;
-    const double layer_scaled = static_cast<double>(cdcHit.getILayer()) / LAYER_SCALE;
+    const double layer_scaled = static_cast<double>(cdcHit->getILayer()) / LAYER_SCALE;
 
     input->at({iHit, 0}) = x;
     input->at({iHit, 1}) = y;
@@ -103,6 +106,8 @@ void CATFinderModule::event()
     input->at({iHit, 4}) = superlayer_scaled;
     input->at({iHit, 5}) = clayer_scaled;
     input->at({iHit, 6}) = layer_scaled;
+
+    tensorIndexToHitIndex.push_back(iHit);
 
     ++iHit;
   }
@@ -113,7 +118,7 @@ void CATFinderModule::event()
   m_session.run(
   {{"input", input}}, {
     {"beta", beta},
-    {"ccoords", ccoords},
+    {"ccoords", coord},
     {"p", p},
     {"vertex", vertex},
     {"charge", charge}
@@ -123,7 +128,7 @@ void CATFinderModule::event()
   // Extracting the GNN outputs
   for (size_t i = 0; i < iHit; ++i) {
     m_predBetas.push_back(beta->at({i, 0}));
-    m_coords.push_back({ccoords->at({i, 0}), ccoords->at({i, 1}), ccoords->at({i, 2})});
+    m_coords.push_back({coord->at({i, 0}), coord->at({i, 1}), coord->at({i, 2})});
     m_predPs.push_back({p->at({i, 0}), p->at({i, 1}), p->at({i, 2})});
     m_predVs.push_back({vertex->at({i, 0}), vertex->at({i, 1}), vertex->at({i, 2})});
     m_predQs.push_back(charge->at({i, 0}));
@@ -235,8 +240,9 @@ void CATFinderModule::event()
 
     // Add the sorted CDCHits to the RecoTrack
     int k = 0;
-    for (int cdcHitIndex : sortedIndices) {
-      cdcRecotrack->addCDCHit(m_CDCHits[cdcHitIndex], k);
+    for (int tensorIndex : sortedIndices) {
+      unsigned int hitIndex = tensorIndexToHitIndex[tensorIndex];
+      cdcRecotrack->addCDCHit(wireHitVector[hitIndex].getHit(), k);
       ++k;
     }
   }

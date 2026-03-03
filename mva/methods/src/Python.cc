@@ -465,7 +465,7 @@ namespace Belle2 {
       std::vector<float> probabilities(output_size, std::numeric_limits<float>::quiet_NaN());
       try {
         auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(1, dimensions_X, NPY_FLOAT32, X.get()));
-        auto result = m_framework.attr("apply")(m_state, ndarray_X);
+        auto result = m_unique_mva_module.attr("apply")(m_state, ndarray_X);
 
         for (unsigned int i = 0; i < output_size; ++i) {
           probabilities[i] = static_cast<float>(*static_cast<float*>(PyArray_GETPTR1(reinterpret_cast<PyArrayObject*>(result.ptr()), i)));

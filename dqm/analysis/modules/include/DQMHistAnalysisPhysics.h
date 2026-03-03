@@ -60,6 +60,8 @@ namespace Belle2 {
 
   private:
 
+    // fit histogram with UPS mass
+    void fitUpsilonFromHisto(TH1* histo, TPaveText* text, std::string parts, std::string prefix);
 
     //! TPaveText, Ups Invariant Mass (mumu)
     TPaveText* m_cmUPS_text = nullptr;

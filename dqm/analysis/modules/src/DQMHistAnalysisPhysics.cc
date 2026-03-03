@@ -13,6 +13,13 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisPhysics.h>
 #include <TROOT.h>
+#include <RooRealVar.h>
+#include <RooDataHist.h>
+#include "RooCBShape.h"
+#include "RooCrystalBall.h"
+#include "RooChebychev.h"
+#include "RooAddPdf.h"
+#include "RooPlot.h"
 
 using namespace std;
 using namespace Belle2;
@@ -78,6 +85,58 @@ void DQMHistAnalysisPhysicsModule::beginRun()
   B2DEBUG(20, "DQMHistAnalysisPhysics: beginRun called.");
 }
 
+void DQMHistAnalysisPhysicsModule::fitUpsilonFromHisto(TH1* histo, TPaveText* text, std::string parts, std::string prefix)
+{
+  double xMin = histo->GetXaxis()->GetXmin();
+  double xMax = histo->GetXaxis()->GetXmax();
+  RooRealVar m("m", parts.c_str(), xMin, xMax);
+
+  RooDataHist data("data", "histogram", m, histo);
+
+  RooRealVar mean("mean", "mass", 10.579, 10.5, 10.7);
+  RooRealVar sigma("sigma", "resolution", 0.05, 0.01, 0.15);
+  RooRealVar alphaL("alphaL", "left tail alpha", 1.5, 0.1, 5);
+  RooRealVar nL("nL", "left tail n", 1.0, 0.1, 10);
+  RooRealVar alphaR("alphaR", "right tail alpha", 2.0, 0.1, 5);
+  RooRealVar nR("nR", "right tail n", 1.0, 0.1, 10);
+
+  RooCrystalBall signal("signal", "Double CB", m, mean, sigma, sigma, alphaL, nL, alphaR, nR);
+
+  RooRealVar a0("a0", "poly constant", 0.0, -1.0, 1.0);
+  RooChebychev bkg("bkg", "Background PDF", m, RooArgList(a0));
+
+  // Set the max to 2x the total entries to ensure the fit never hits a ceiling
+  double nMax = histo->GetEntries() * 2.0;
+  RooRealVar nsig("nsig", "yield of signal", histo->GetEntries() * 0.3, 0, nMax);
+  RooRealVar nbkg("nbkg", "yield of background", histo->GetEntries() * 0.7, 0, nMax);
+
+  RooAddPdf model("model", "sig+bkg", RooArgList(signal, bkg), RooArgList(nsig, nbkg));
+
+  model.fitTo(data, RooFit::Extended(kTRUE));
+
+  RooPlot* frame = m.frame();
+  data.plotOn(frame, RooFit::DrawOption("B"), RooFit::FillColor(kGray), RooFit::LineWidth(2), RooFit::MarkerSize(0),
+              RooFit::XErrorSize(0), RooFit::DataError(RooAbsData::None), RooFit::LineStyle(kSolid), RooFit::LineColor(kBlack));
+  model.plotOn(frame, RooFit::LineColor(kBlue));
+  frame->SetTitle("Upsilon(4S) Mass Fit");
+  frame->GetXaxis()->SetTitle((parts).c_str());
+  frame->Draw();
+
+  auto measuredMass = mean.getVal();
+  auto massUncertainty = mean.getError();
+  auto measuredWidth = sigma.getVal();
+
+  text->Clear();
+  double mean_mUPS = histo->GetMean();
+  text->AddText(Form("mean : %.3f", float(mean_mUPS)));
+  text->AddText(Form("fit mean : %.3f +-%.3f", float(measuredMass), float(massUncertainty)));
+  text->AddText(Form("fit width : %.3f", float(measuredWidth)));
+  text->Draw();
+  m_monObj->setVariable(prefix + "mass", measuredMass, massUncertainty);
+  m_monObj->setVariable(prefix + "width", measuredWidth);
+
+}
+
 void DQMHistAnalysisPhysicsModule::event()
 {
 
@@ -85,19 +144,6 @@ void DQMHistAnalysisPhysicsModule::event()
   bool m_IsPhysicsRun = (getRunType() == "physics") || (getRunType() == "debug");
   if (m_IsPhysicsRun == true) {
 
-    m_cmUPS_text->Clear();
-    auto m_hmUPS = findHist("PhysicsObjects/mUPS", true);// check if updated
-    if (m_hmUPS) {
-      double mean_mUPS = m_hmUPS->GetMean();
-      m_cmUPS_text->AddText(Form("mean : %.2f", float(mean_mUPS)));
-
-    }
-    m_cmUPSe_text->Clear();
-    auto m_hmUPSe = findHist("PhysicsObjects/mUPSe", true);// check if updated
-    if (m_hmUPSe) {
-      double mean_mUPSe = m_hmUPSe->GetMean();
-      m_cmUPSe_text->AddText(Form("mean : %.2f", float(mean_mUPSe)));
-    }
     m_ratio_text->Clear();
     auto m_hphysicsresults = findHist("PhysicsObjects/physicsresults", true);// check if updated
     if (m_hphysicsresults) {
@@ -146,17 +192,19 @@ void DQMHistAnalysisPhysicsModule::event()
       }
     }
 
-    auto* m_cmUPS = findCanvas("PhysicsObjects/c_mUPS");
-    if (m_cmUPS) {
+    auto m_hmUPS = findHist("PhysicsObjects/mUPS", false);// check if updated
+    auto m_cmUPS = findCanvas("PhysicsObjects/c_mUPS");
+    if (m_cmUPS and m_hmUPS) {
       m_cmUPS->cd();
-      m_cmUPS_text->Draw();
+      fitUpsilonFromHisto(m_hmUPS, m_cmUPS_text, "M(#mu#mu) [GeV/c^2]", "UPS_mumu");
       m_cmUPS->Modified();
       m_cmUPS->Update();
     }
-    auto* m_cmUPSe = findCanvas("PhysicsObjects/c_mUPSe");
-    if (m_cmUPSe) {
+    auto m_hmUPSe = findHist("PhysicsObjects/mUPSe", false);// check if updated
+    auto m_cmUPSe = findCanvas("PhysicsObjects/c_mUPSe");
+    if (m_cmUPSe and m_hmUPSe) {
       m_cmUPSe->cd();
-      m_cmUPSe_text->Draw();
+      fitUpsilonFromHisto(m_hmUPSe, m_cmUPSe_text, "M(ee) [GeV/c^2]", "UPSee");
       m_cmUPSe->Modified();
       m_cmUPSe->Update();
     }

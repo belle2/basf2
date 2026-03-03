@@ -38,11 +38,13 @@ void drawTRGHist(){
 	h1 = (TH1F*)file1->Get("hin_expert");
 	h2 = (TH1F*)file2->Get("hin_expert");
 	h1->SetLineColor(2);
+	h1->SetFillColor(2);
+        h1->SetFillStyle(2003);
 	h2->SetLineColor(4);
 
 	c1=new TCanvas("c1_hin","",1600,600);
 	h1->Draw("HIST");
-	h2->Draw("HIST");
+	h2->Draw("HISTsame");
 
 	int bin1 = h1->GetXaxis()->GetNbins();
  	for(int ibin = 1; ibin<=bin1; ibin++){
@@ -61,6 +63,16 @@ void drawTRGHist(){
 			}
 		}
 	}
+        TLegend * leg = new TLegend(0.65, 0.75,  0.9, 0.9);
+        leg->AddEntry(h1, "Main", "F");
+        leg->AddEntry(h2, "Feature", "L");
+        leg->SetLineColor(0);
+        leg->SetFillColor(0);
+        leg->SetFillStyle(0);
+        leg->SetTextFont(62);
+        leg->SetTextSize(0.05);
+        leg->Draw();
+
 
 	c1->SaveAs("inputBits_Compare.eps");
 

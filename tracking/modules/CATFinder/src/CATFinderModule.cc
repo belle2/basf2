@@ -6,27 +6,19 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/geometry/CDCGeometryPar.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
-
 #include <tracking/modules/CATFinder/CATFinderModule.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <framework/logging/Logger.h>
 #include <tracking/modules/CATFinder/CATFinderUtils.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <mva/methods/ONNX.h>
-
-#include <TMatrixDSym.h>
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
-#include <algorithm>
 #include <numeric>
-#include <sstream>
 #include <vector>
-#include <iostream>
-#include <fstream>
+
+#include <TMatrixDSym.h>
 
 using namespace Belle2;
 using Belle2::MVA::ONNX::Tensor;
@@ -58,7 +50,7 @@ void CATFinderModule::beginRun()
 
 void CATFinderModule::event()
 {
-  const std::vector<TrackFindingCDC::CDCWireHit>& wireHitVector = *m_wireHitVector;
+  const std::vector<TrackingUtilities::CDCWireHit>& wireHitVector = *m_wireHitVector;
 
   // Ugly solution, I know
   unsigned int nHits = 0;
@@ -100,15 +92,9 @@ void CATFinderModule::event()
     const double x = 0.5 * (posForward.x() + posBackward.x()) / SPATIAL_COORDINATES_SCALE;
     const double y = 0.5 * (posForward.y() + posBackward.y()) / SPATIAL_COORDINATES_SCALE;
 
-    //auto wireHitX = wireHit.getRefPos2D().x();
-    //auto wireHitY = wireHit.getRefPos2D().y();
-
     const double superlayer_scaled = static_cast<double>(cdcHit.getISuperLayer()) / SLAYER_SCALE;
     const double clayer_scaled = static_cast<double>(clayer) / CLAYER_SCALE;
     const double layer_scaled = static_cast<double>(cdcHit.getILayer()) / LAYER_SCALE;
-    //double chargeDeposit = wireHit.getRefChargeDeposit();
-    //double driftTime = wireHit.getDriftTime();
-    //double driftLength = wireHit.getRefDriftLength();
 
     input->at({iHit, 0}) = x;
     input->at({iHit, 1}) = y;
@@ -191,7 +177,7 @@ void CATFinderModule::event()
                         m_conPoints[conPoint][2] - m_coords[i][2]);
     }
 
-    //Calculate CDCHits and GNN nodes assigned to the condensation point
+    // Calculate CDCHits and GNN nodes assigned to the condensation point
     std::vector<int> indices;
     indices.reserve(r.size());
     std::vector<std::vector<double>> gnnNodes;

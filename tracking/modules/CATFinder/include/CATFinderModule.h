@@ -7,15 +7,15 @@
  **************************************************************************/
 #pragma once
 
+#include <framework/core/Module.h>
+
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mva/methods/ONNX.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
 
 namespace Belle2 {
 
@@ -71,7 +71,7 @@ namespace Belle2 {
     /** Input store array of CDC hits used for track finding. */
     StoreArray<CDCHit> m_CDCHits;
     /** Input vector of CDC wire hits for the current event. */
-    TrackFindingCDC::StoreWrappedObjPtr<std::vector<TrackFindingCDC::CDCWireHit>> m_wireHitVector{"CDCWireHitVector"};
+    TrackingUtilities::StoreWrappedObjPtr<std::vector<TrackingUtilities::CDCWireHit>> m_wireHitVector{"CDCWireHitVector"};
     /** Name of the output store array of reconstructted CDC tracks. */
     std::string m_CDCRecoTracksName = "";
     /** Output store array of reconstructed CDC tracks. */

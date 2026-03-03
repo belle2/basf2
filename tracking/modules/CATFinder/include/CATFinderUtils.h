@@ -136,7 +136,7 @@ namespace Belle2::CATFinderUtils {
      * @return Pointer to the root node of the constructed KD-tree.
      */
     KDTNode* buildKDTree(std::vector<KDTHit>::iterator begin, std::vector<KDTHit>::iterator end, int depth, KDTNodePool& pool,
-                         const int INSERTION_SORT_THRESHOLD = 10);
+                         const size_t INSERTION_SORT_THRESHOLD = 10);
 
     /**
      * @brief Sorts a small range using insertion sort for performance.

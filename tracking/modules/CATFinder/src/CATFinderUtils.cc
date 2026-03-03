@@ -55,10 +55,11 @@ inline void HitOrderer::insertionSort(Iterator begin, Iterator end, Compare cmp)
 }
 
 KDTNode* HitOrderer::buildKDTree(std::vector<KDTHit>::iterator begin, std::vector<KDTHit>::iterator end, int depth,
-                                 KDTNodePool& pool, const int INSERTION_SORT_THRESHOLD)
+                                 KDTNodePool& pool, const size_t INSERTION_SORT_THRESHOLD)
 {
 
-  if (begin >= end) return nullptr;
+  if (begin >= end)
+    return nullptr;
 
   int dim = depth % 2;
   auto cmp = [dim](const KDTHit & a, const KDTHit & b) {
@@ -110,7 +111,8 @@ bool HitOrderer::markUsed(KDTNode* node, const KDTHit& hit)
 
 void HitOrderer::freeKDTree(KDTNode* node)
 {
-  if (!node) return;
+  if (!node)
+    return;
   HitOrderer::freeKDTree(node->left);
   HitOrderer::freeKDTree(node->right);
   delete node;

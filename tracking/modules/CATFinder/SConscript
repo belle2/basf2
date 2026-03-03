@@ -1,10 +1,10 @@
 Import('env')
 
 env['LIBS'] = [
-  'tracking_trackFindingCDC',
   'cdc_dataobjects',
   'framework',
   'mva',
+  'tracking',
   '$ROOT_LIBS'
 ]
 

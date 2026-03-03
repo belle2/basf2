@@ -42,6 +42,14 @@ to learn about the execution time of a steering file so that it can be provided 
 the execution time and memory consumption. It is not necessary to explicitly print the statistics since this is
 automatically done when switching the calculation on.
 
+.. only:: not light
+
+   .. rubric:: Removed deprecated parameters from the ``LHEInput`` module
+
+   The deprecated parameters ``meanDecayLength``, ``Rmin``, ``Rmax`` and ``pdg_displaced``, which were used to displace
+   the vertex of a given ``MCParticle``, have been removed from the ``LHEInput`` module. Users should use the
+   ``GeneratedVertexDisplacer`` module to displace an ``MCParticle``.
+
 .. include:: analysis/doc/whatsnew-since/release-10-00.txt
 
 Changes since release-09

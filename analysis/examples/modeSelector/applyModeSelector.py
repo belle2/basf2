@@ -123,28 +123,68 @@ modeSelector.modeSelector(
 )
 
 # only AFTER running modeSelector
-for b, b_str in zip(['B+', 'B0'], ['Bp', 'B0']):
-    # apply sigProb cut
+# Rank candidates in each list by two criteria stored for offline comparison:
+# 1. sigProb_rank: pure sigProb ranking (all sigProb>0.01 candidates kept)
+# 2. eqSigProb_rank: BplusScore_eqSigProb in predicted sector, sigProb otherwise
+vm.addAlias(
+    'BpEqSigProbRankVar',
+    'conditionalVariableSelector(eventExtraInfo(BplusScore) > 0, '
+    'extraInfo(BplusScore_eqSigProb), extraInfo(SignalProbability))')
+vm.addAlias(
+    'B0EqSigProbRankVar',
+    'conditionalVariableSelector(eventExtraInfo(BplusScore) < 0, '
+    'extraInfo(BplusScore_eqSigProb), extraInfo(SignalProbability))')
+
+for b, eq_rank_var in zip(['B+', 'B0'], ['BpEqSigProbRankVar', 'B0EqSigProbRankVar']):
     ma.applyCuts(f'{b}:{fei_identifier}', 'sigProb > 0.01', path=my_path)
-    # BCS
-    ma.rankByHighest(f'{b}:{fei_identifier}', 'sigProb', numBest=1, outputVariable='sigProb_rank', path=my_path)
-    vm.addAlias(f'{b_str}SigProb_rank1', f'ifNANgiveX(getVariableByRank({b}:feiHadronic, sigProb, sigProb, 1),-1)')
+    # rank by sigProb (pure), keep all candidates for offline comparison
+    ma.rankByHighest(f'{b}:{fei_identifier}', 'extraInfo(SignalProbability)',
+                     numBest=0, outputVariable='sigProb_rank', path=my_path)
+    # rank by eqSigProb in predicted sector, sigProb in non-predicted sector
+    ma.rankByHighest(f'{b}:{fei_identifier}', eq_rank_var,
+                     numBest=0, outputVariable='eqSigProb_rank', path=my_path)
 
+# sigProb of rank-1 candidate in each list (for cross-sector comparison)
+vm.addAlias(
+    'BpSigProb_rank1',
+    'ifNANgiveX(getVariableByRank(B+:feiHadronic, extraInfo(SignalProbability), '
+    'extraInfo(SignalProbability), 1), -1)')
+vm.addAlias(
+    'B0SigProb_rank1',
+    'ifNANgiveX(getVariableByRank(B0:feiHadronic, extraInfo(SignalProbability), '
+    'extraInfo(SignalProbability), 1), -1)')
 
-# to select rank offline
+# isBestCandidate: pure sigProb; rank-1 in the sector with the higher sigProb
 vm.addAlias('sigProbOfBpGTB0', 'conditionalVariableSelector(BpSigProb_rank1 > B0SigProb_rank1, 1, 0)')
 vm.addAlias('sigProbOfB0GTBp', 'conditionalVariableSelector(B0SigProb_rank1 > BpSigProb_rank1, 1, 0)')
 vm.addAlias(
     'isBestCandidate', 'conditionalVariableSelector( \
-    [[sigProbOfBpGTB0 == 1] and [abs(PDG) == 521]] or \
-    [[sigProbOfB0GTBp == 1] and [abs(PDG) == 511]], \
+    [[sigProbOfBpGTB0 == 1] and [abs(PDG) == 521] and [sigProb_rank == 1]] or \
+    [[sigProbOfB0GTBp == 1] and [abs(PDG) == 511] and [sigProb_rank == 1]], \
     1, 0)'
 )
+
+# isBestCandidate_eqSigProb: eqSigProb ranking; rank-1 in the predicted sector only
+vm.addAlias(
+    'isBestCandidate_eqSigProb', 'conditionalVariableSelector( \
+    [[eventExtraInfo(BplusScore) > 0] and [abs(PDG) == 521] and [eqSigProb_rank == 1]] or \
+    [[eventExtraInfo(BplusScore) < 0] and [abs(PDG) == 511] and [eqSigProb_rank == 1]], \
+    1, 0)'
+)
+
+# Keep at most 2 candidates per list: rank-1 by sigProb and rank-1 by eqSigProb.
+# In the non-predicted sector eqSigProb falls back to sigProb, so only 1 is kept there.
+# isBestCandidate / isBestCandidate_eqSigProb stored in output for offline selection.
+for b in ['B+', 'B0']:
+    ma.applyCuts(f'{b}:{fei_identifier}',
+                 '[sigProb_rank == 1] or [eqSigProb_rank == 1]',
+                 path=my_path)
 
 
 # Create aliases for cleaner branch names in output ntuple
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
 vm.addAlias('sigProb_rank', 'extraInfo(sigProb_rank)')
+vm.addAlias('eqSigProb_rank', 'extraInfo(eqSigProb_rank)')
 vm.addAlias('dmID', 'extraInfo(decayModeID)')
 vu.create_aliases(
     ['BplusScore_eqSigProb',
@@ -185,7 +225,9 @@ output_variables = [
     'Dst0_chiProb',
     # ranking variables
     'sigProb_rank',
+    'eqSigProb_rank',
     'isBestCandidate',
+    'isBestCandidate_eqSigProb',
 ]
 
 # Write output parquet tables for B+ and B0 candidates

@@ -152,16 +152,6 @@ namespace Belle2 {
     unsigned _run = 0;
     std::vector<int> skim;
 
-    bool m_filterAbortGap;
-    int m_abortGapExp37min1 = -1;
-    int m_abortGapExp37max1 = -1;
-    int m_abortGapExp37min2 = -1;
-    int m_abortGapExp37max2 = -1;
-    int m_abortGapExp39min1 = -1;
-    int m_abortGapExp39max1 = -1;
-    int m_abortGapExp39min2 = -1;
-    int m_abortGapExp39max2 = -1;
-
     static const int n_output_extra = 105;
     static const char* output_extra[n_output_extra];
     static const int n_output_overlap = 130;

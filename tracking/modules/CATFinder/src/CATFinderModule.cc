@@ -235,8 +235,8 @@ void CATFinderModule::event()
 
     // Create a new RecoTrack and fill it with position, momentum and charge information
     RecoTrack* cdcRecotrack = m_CDCRecoTracks.appendNew();
-    cdcRecotrack -> setPositionAndMomentum(position, momentum);
-    cdcRecotrack -> setChargeSeed(ccharge);
+    cdcRecotrack->setPositionAndMomentum(position, momentum);
+    cdcRecotrack->setChargeSeed(ccharge);
 
     // Create a covatiance matrix and add it to the RecoTrack
     auto seed_cov = TMatrixDSym(6);
@@ -245,12 +245,12 @@ void CATFinderModule::event()
         seed_cov[i][k] = 1e-1;
       }
     }
-    cdcRecotrack -> setSeedCovariance(seed_cov);
+    cdcRecotrack->setSeedCovariance(seed_cov);
 
     // Add the sorted CDCHits to the RecoTrack
     int k = 0;
     for (int cdcHitIndex : sortedIndices) {
-      cdcRecotrack -> addCDCHit(m_CDCHits[cdcHitIndex], k);
+      cdcRecotrack->addCDCHit(m_CDCHits[cdcHitIndex], k);
       ++k;
     }
   }

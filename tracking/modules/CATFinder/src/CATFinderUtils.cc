@@ -75,12 +75,12 @@ KDTNode* HitOrderer::buildKDTree(std::vector<KDTHit>::iterator begin, std::vecto
   }
 
   KDTNode* node = pool.allocate();
-  node -> hit = *mid;
-  node -> used = false;
-  node -> dim = dim;
+  node->hit = *mid;
+  node->used = false;
+  node->dim = dim;
 
-  node -> left =  HitOrderer::buildKDTree(begin, mid, depth + 1, pool);
-  node -> right = HitOrderer::buildKDTree(mid + 1, end, depth + 1, pool);
+  node->left =  HitOrderer::buildKDTree(begin, mid, depth + 1, pool);
+  node->right = HitOrderer::buildKDTree(mid + 1, end, depth + 1, pool);
 
   return node;
 }
@@ -88,11 +88,11 @@ KDTNode* HitOrderer::buildKDTree(std::vector<KDTHit>::iterator begin, std::vecto
 void HitOrderer::nearestNeighbor(KDTNode* node, const KDTHit& query, KDTHit& best, double& bestDist)
 {
   if (!node) return;
-  if (!node -> used) {
-    double d = query.squaredDistanceTo(node -> hit);
+  if (!node->used) {
+    double d = query.squaredDistanceTo(node->hit);
     if (d < bestDist) {
       bestDist = d;
-      best = node -> hit;
+      best = node->hit;
     }
   }
 }
@@ -100,19 +100,19 @@ void HitOrderer::nearestNeighbor(KDTNode* node, const KDTHit& query, KDTHit& bes
 bool HitOrderer::markUsed(KDTNode* node, const KDTHit& hit)
 {
   if (!node) return false;
-  if (node -> hit.hitIndex == hit.hitIndex) {
-    node -> used = true;
+  if (node->hit.hitIndex == hit.hitIndex) {
+    node->used = true;
     return true;
   }
-  return markUsed(node -> left, hit) || markUsed(node -> right, hit);
+  return markUsed(node->left, hit) || markUsed(node->right, hit);
 
 }
 
 void HitOrderer::freeKDTree(KDTNode* node)
 {
   if (!node) return;
-  HitOrderer::freeKDTree(node -> left);
-  HitOrderer::freeKDTree(node -> right);
+  HitOrderer::freeKDTree(node->left);
+  HitOrderer::freeKDTree(node->right);
   delete node;
 }
 

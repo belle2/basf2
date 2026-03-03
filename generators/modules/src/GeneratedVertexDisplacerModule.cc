@@ -100,7 +100,7 @@ void GeneratedVertexDisplacerModule::displace(MCParticle& particle, float lifeti
   ROOT::Math::PxPyPzEVector* displacementVector = new ROOT::Math::PxPyPzEVector();
   getDisplacement(particle, lifetime, *displacementVector);
 
-  ROOT::Math::XYZVector newDecayVertex = particle.getProductionVertex();
+  ROOT::Math::XYZVector newDecayVertex = particle.getDecayVertex();
   newDecayVertex.SetX(newDecayVertex.X() + displacementVector->X());
   newDecayVertex.SetY(newDecayVertex.Y() + displacementVector->Y());
   newDecayVertex.SetZ(newDecayVertex.Z() + displacementVector->Z());

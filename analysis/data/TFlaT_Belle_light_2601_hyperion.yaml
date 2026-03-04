@@ -13,11 +13,13 @@ trk_variable_list: # Input lists
 - useCMSFrame(p)
 - useCMSFrame(cosTheta)
 - useCMSFrame(phi)
-- electronID
-- muonID
-- kaonID
+- eIDBelle
+- muIDBelle
+- muIDBelleQuality
+- ifNANgiveX(atcPIDBelle(3,2), 0.5)
 - pionID
-- protonID
+- ifNANgiveX(atcPIDBelle(4,2), 0.5)
+- ifNANgiveX(atcPIDBelle(4,3), 0.5)
 - pidPairProbabilityExpert(321, 211, CDC)
 - pidPairProbabilityExpert(321, 211, TOP)
 - pidPairProbabilityExpert(321, 211, ARICH)
@@ -29,6 +31,9 @@ trk_variable_list: # Input lists
 - pidPairProbabilityExpert(13, 211, KLM)
 - pidPairProbabilityExpert(211, 321, TOP)
 - pidPairProbabilityExpert(211, 321, ARICH)
+- ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)
+- ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)
+- ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)
 - nSVDHits/8
 - dxdiff
 - dydiff
@@ -39,7 +44,6 @@ ecl_variable_list:
 - useCMSFrame(p)
 - useCMSFrame(cosTheta)
 - useCMSFrame(phi)
-- clusterE1E9
 - clusterE9E21
 - clusterLAT
 roe_variable_list:

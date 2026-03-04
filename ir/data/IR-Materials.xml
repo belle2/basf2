@@ -71,4 +71,351 @@
     </Components>
   </Material>
 
+
+  <!-- Following borated polyethylene definition copied from STR-Materials.xml -->
+
+  <!-- Polyethylene with 3%(w/w) natural Boron; PE + B -->
+  <Material name="IR-PEB03">
+    <state>Solid</state>
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.03">B</Element>
+       <Material fraction="0.97">G4_POLYETHYLENE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 5%(w/w) natural Boron; PE + B -->
+  <Material name="IR-PEB05">
+    <state>Solid</state>
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.05">B</Element>
+       <Material fraction="0.95">G4_POLYETHYLENE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 10%(w/w) natural Boron; PE + B -->
+  <Material name="IR-PEB10">
+    <state>Solid</state>
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.10">B</Element>
+       <Material fraction="0.90">G4_POLYETHYLENE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 15%(w/w) natural Boron; PE + B -->
+  <Material name="IR-PEB15">
+    <state>Solid</state>
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.15">B</Element>
+       <Material fraction="0.85">G4_POLYETHYLENE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 20%(w/w) natural Boron; PE + B -->
+  <Material name="IR-PEB20">
+    <state>Solid</state>
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.20">B</Element>
+       <Material fraction="0.80">G4_POLYETHYLENE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 25%(w/w) natural Boron; PE + B -->
+  <Material name="IR-PEB25">
+    <state>Solid</state>
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.25">B</Element>
+       <Material fraction="0.75">G4_POLYETHYLENE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyurethane; PU -->
+  <Material name="IR-Polyurethane">
+    <state>Solid</state>
+    <density unit="g/cm3">1.22</density>
+    <Components>
+       <Element  fraction="0.0489">H</Element>
+       <Element  fraction="0.4093">C</Element>
+       <Element  fraction="0.0740">N</Element>
+       <Element  fraction="0.3600">O</Element>
+       <Element  fraction="0.0007">Na</Element>
+       <Element  fraction="0.1062">Al</Element>
+       <Element  fraction="0.0002">Si</Element>
+       <Element  fraction="0.0007">Fe</Element>
+    </Components>
+  </Material>
+
+  <!-- Polyurethane with 9%(w/w) natural Boron; PU + B -->
+  <Material name="IR-PUB09">
+    <state>Solid</state>
+    <density unit="g/cm3">1.22</density>
+    <Components>
+       <Material fraction="0.91">IR-Polyurethane</Material>
+       <Element  fraction="0.09">B</Element>
+    </Components>
+  </Material>
+
+  <!-- Polyurethane with 3%(w/w) natural Boron; PU + B -->
+  <Material name="IR-PUB03">
+    <state>Solid</state>
+    <density unit="g/cm3">1.22</density>
+    <Components>
+       <Material fraction="0.97">IR-Polyurethane</Material>
+       <Element  fraction="0.03">B</Element>
+    </Components>
+  </Material>
+
+  <!-- Polyurethane with 5%(w/w) natural Boron; PU + B -->
+  <Material name="IR-PUB05">
+    <state>Solid</state>
+    <density unit="g/cm3">1.22</density>
+    <Components>
+       <Material fraction="0.95">IR-Polyurethane</Material>
+       <Element  fraction="0.05">B</Element>
+    </Components>
+  </Material>
+
+  <!-- Kretekast; KR -->
+  <Material name="IR-Kretekast">
+    <state>Solid</state>
+    <density unit="g/cm3">1.68</density>
+    <Components>
+       <Element  fraction="0.6341">O</Element>
+       <Element  fraction="0.2108">Al</Element>
+       <Element  fraction="0.0693">Ca</Element>
+       <Element  fraction="0.0500">H</Element>
+       <Element  fraction="0.0147">Si</Element>
+       <Element  fraction="0.0146">C</Element>
+       <Element  fraction="0.0031">Fe</Element>
+       <Element  fraction="0.0017">S</Element>
+       <Element  fraction="0.0014">Na</Element>
+       <Element  fraction="0.0003">N</Element>
+    </Components>
+  </Material>
+
+  <!-- Kretekast with 3%(w/w) natural Boron; KR + B -->
+  <Material name="IR-KRB03">
+    <state>Solid</state>
+    <density unit="g/cm3">1.68</density>
+    <Components>
+       <Material fraction="0.97">IR-Kretekast</Material>
+       <Element  fraction="0.03">B</Element>
+    </Components>
+  </Material>
+
+  <!-- Kretekast with 5%(w/w) natural Boron; KR + B -->
+  <Material name="IR-KRB05">
+    <state>Solid</state>
+    <density unit="g/cm3">1.68</density>
+    <Components>
+       <Material fraction="0.95">IR-Kretekast</Material>
+       <Element  fraction="0.05">B</Element>
+    </Components>
+  </Material>
+
+  <!-- Silicone Elastomer; SE -->
+  <Material name="IR-SiElastomer">
+    <state>Solid</state>
+    <density unit="g/cm3">1.59</density>
+    <Components>
+       <Element  fraction="0.4714">O</Element>
+       <Element  fraction="0.1899">Al</Element>
+       <Element  fraction="0.1775">Si</Element>
+       <Element  fraction="0.1109">C</Element>
+       <Element  fraction="0.0480">H</Element>
+       <Element  fraction="0.0012">Na</Element>
+       <Element  fraction="0.0001">Fe</Element>
+       <Element  fraction="0.0010">Zn</Element>
+    </Components>
+  </Material>
+
+  <!-- Silicone Elastomer with 30%(w/w) natural Boron; SE + B -->
+  <Material name="IR-SEB30">
+    <state>Solid</state>
+    <density unit="g/cm3">1.59</density>
+    <Components>
+       <Material fraction="0.70">IR-SiElastomer</Material>
+       <Element  fraction="0.30">B</Element>
+    </Components>
+  </Material>
+
+  <!-- Silicone Elastomer with 3%(w/w) natural Boron; SE + B -->
+  <Material name="IR-SEB03">
+    <state>Solid</state>
+    <density unit="g/cm3">1.59</density>
+    <Components>
+       <Material fraction="0.97">IR-SiElastomer</Material>
+       <Element  fraction="0.03">B</Element>
+    </Components>
+  </Material>
+
+  <!-- Silicone Elastomer with 5%(w/w) natural Boron; SE + B -->
+  <Material name="IR-SEB05">
+    <state>Solid</state>
+    <density unit="g/cm3">1.59</density>
+    <Components>
+       <Material fraction="0.95">IR-SiElastomer</Material>
+       <Element  fraction="0.05">B</Element>
+    </Components>
+  </Material>
+
+  <!-- Polyurethane with 9.3%(w/w) natural Boron; PU + B -->
+  <Material name="IR-PUB093">
+    <state>Solid</state>
+    <density unit="g/cm3">1.22</density>
+    <Components>
+       <Element  fraction="0.0444">H</Element>
+       <Element  fraction="0.0930">B</Element>
+       <Element  fraction="0.3713">C</Element>
+       <Element  fraction="0.0671">N</Element>
+       <Element  fraction="0.3265">O</Element>
+       <Element  fraction="0.0006">Na</Element>
+       <Element  fraction="0.0963">Al</Element>
+       <Element  fraction="0.0002">Si</Element>
+       <Element  fraction="0.0006">Fe</Element>
+    </Components>
+  </Material>
+
+  <!-- Flexi-boron with 27.6%(w/w) natural Boron; FL + B -->
+  <Material name="IR-FLB276">
+    <state>Solid</state>
+    <density unit="g/cm3">1.64</density>
+    <Components>
+       <Element  fraction="0.2755">B</Element>
+       <Element  fraction="0.2685">Si</Element>
+       <Element  fraction="0.2357">O</Element>
+       <Element  fraction="0.1869">C</Element>
+       <Element  fraction="0.0276">H</Element>
+       <Element  fraction="0.0026">Zn</Element>
+       <Element  fraction="0.0016">N</Element>
+       <Element  fraction="0.0016">Fe</Element>
+    </Components>
+  </Material>
+
+  <!-- Borated polyurethane -->
+  <Material name="SWX-227ATH">
+    <state>Solid</state>
+    <density unit="g/cm3">1.22</density>
+    <Components>
+       <Element  fraction="0.0444">H</Element>
+       <Element  fraction="0.0930">B</Element>
+       <Element  fraction="0.3713">C</Element>
+       <Element  fraction="0.0671">N</Element>
+       <Element  fraction="0.3265">O</Element>
+       <Element  fraction="0.0006">Na</Element>
+       <Element  fraction="0.0963">Al</Element>
+       <Element  fraction="0.0002">Si</Element>
+       <Element  fraction="0.0006">Fe</Element>
+    </Components>
+  </Material>
+
+  <!-- Flexi-boron -->
+  <Material name="SWX-238">
+    <state>Solid</state>
+    <density unit="g/cm3">1.64</density>
+    <Components>
+       <Element  fraction="0.2755">B</Element>
+       <Element  fraction="0.2685">Si</Element>
+       <Element  fraction="0.2357">O</Element>
+       <Element  fraction="0.1869">C</Element>
+       <Element  fraction="0.0276">H</Element>
+       <Element  fraction="0.0026">Zn</Element>
+       <Element  fraction="0.0016">N</Element>
+       <Element  fraction="0.0016">Fe</Element>
+    </Components>
+  </Material>
+
+  <!-- Polyurethane -->
+  <Material name="SWX-227ATH-0">
+    <state>Solid</state>
+    <density unit="g/cm3">1.22</density>
+    <Components>
+       <Element  fraction="0.0490">H</Element>
+       <Element  fraction="0.3462">C</Element>
+       <Element  fraction="0.0666">N</Element>
+       <Element  fraction="0.3996">O</Element>
+       <Element  fraction="0.0009">Na</Element>
+       <Element  fraction="0.1376">Al</Element>
+       <Element  fraction="0.0001">Si</Element>
+    </Components>
+  </Material>
+
+  <!-- High-Temperature Neutron Moderator -->
+  <Material name="SWX-237-0">
+    <state>Solid</state>
+    <density unit="g/cm3">1.59</density>
+    <Components>
+       <Element  fraction="0.4755">O</Element>
+       <Element  fraction="0.1926">Al</Element>
+       <Element  fraction="0.1754">Si</Element>
+       <Element  fraction="0.1063">C</Element>
+       <Element  fraction="0.0479">H</Element>
+       <Element  fraction="0.0012">Na</Element>
+       <Element  fraction="0.0010">Zn</Element>
+       <Element  fraction="0.0001">Fe</Element>
+    </Components>
+  </Material>
+
+  <!-- 3D-printing material (C19H12O3 from https://gemc.jlab.org/work/doxy/1.8/cpp__materials_8cc_source.html) -->
+  <Material name="PEEK">
+    <state>Solid</state>
+    <density unit="g/cm3">1.31</density>
+    <Components>
+       <Element  fraction="0.76">C</Element>
+       <Element  fraction="0.08">H</Element>
+       <Element  fraction="0.16">O</Element>
+    </Components>
+  </Material>
+
+  <!-- Epoxy resin (FANGS-Epoxy from https://stash.desy.de/projects/B2/repos/basf2/browse/beast/fangs/data/FANGS-Materials.xml) -->
+  <Material name="EPOXY1">
+    <state>Solid</state>
+    <density unit="g/cm3">1.13</density>
+    <Components>
+       <Element  fraction="0.4390">C</Element>
+       <Element  fraction="0.0732">O</Element>
+       <Element  fraction="0.4878">H</Element>
+    </Components>
+  </Material>
+
+  <!-- Epoxy resin (Epoxy_C15H44O7 from https://stash.desy.de/projects/B2/repos/basf2/browse/beast/ph1sustr/data/PH1SUSTR-Materials.xml) -->
+  <Material name="EPOXY2">
+    <state>Solid</state>
+    <density unit="g/cm3">1.3</density>
+    <Components>
+       <Element  fraction="0.227273">C</Element>
+       <Element  fraction="0.666667">H</Element>
+       <Element  fraction="0.106060">O</Element>
+    </Components>
+  </Material>
+
+  <!-- Epoxy resin (Cryo_Epoxy from https://stash.desy.de/projects/B2/repos/basf2/browse/ir/data/IR-Materials.xml) -->
+  <Material name="EPOXY3">
+    <state>Solid</state>
+    <density unit="g/cm3">1.3</density>
+    <Components>
+       <Element fraction="0.461">C</Element>
+       <Element fraction="0.292">H</Element>
+       <Element fraction="0.025">Cl</Element>
+       <Element fraction="0.040">O</Element>
+       <Element fraction="0.182">N</Element>
+    </Components>
+  </Material>
+
+  <!-- C10H22 paraffin (decane) -->
+  <Material name="IR-Paraffin">
+    <state>Liquid</state>
+    <density unit="g/cm3">0.730</density>
+    <Components>
+      <Material fraction="0.844">C</Material>
+      <Material fraction="0.156">H</Material>
+    </Components>
+  </Material>
+
 </Materials>
+

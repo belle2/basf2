@@ -23,8 +23,8 @@ namespace Belle2 {
   class CDCTriggerMLPData : public TObject {
   public:
     struct HeaderSet {
-      float relID[18];
-      unsigned exPert;
+      float relID[18] {};
+      unsigned exPert{0};
       HeaderSet() {}
       HeaderSet(std::vector<float> line)
       {

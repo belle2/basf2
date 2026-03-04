@@ -6,6 +6,17 @@ FlavorTagger
 * Introduced a new end to end Flavor Tagger TFlaT based on the transformer architecture.
   TFlaT is a drop in replacement for the previous Flavour Taggers and achieves an effective tagging efficiency on data of ~44.5%.
 
+Variables
++++++++++
+* The metavariables `min` and `max` now support bool values as well.
+* Added a variable `clusterTimeNorm90` to provide ECL cluster's timing normalized such that :math:`90\%` of real photons will 
+  have :math:`|\text{clusterTimeNorm90}| < 1`.
+* In `KSFWVariables` the ``et`` variable is now called ``pt_sum`` to better reflect the original definition.
+
+SysVar
+++++++
+* Add deprecation warning suggesting to use the standalone `SysVar package <https://sysvar.belle2.org/>`_.
+
 Changes in the analysis package in light-2511-gacrux
 ----------------------------------------------------
 

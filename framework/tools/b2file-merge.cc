@@ -215,7 +215,7 @@ The following restrictions apply:
       if(release == "") {
         B2ERROR("Cannot determine release used to create " <<  std::quoted(input));
         continue;
-      }else if(boost::algorithm::ends_with(fileMetaData.getRelease(), "-modified")){
+      } else if (fileMetaData.getRelease().ends_with("-modified")) {
         B2WARNING("File " << std::quoted(input) << " created with modified software "
                   <<  fileMetaData.getRelease()
                   << ": cannot verify that files are compatible");

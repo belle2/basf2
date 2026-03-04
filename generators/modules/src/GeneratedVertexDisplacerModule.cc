@@ -27,7 +27,7 @@ GeneratedVertexDisplacerModule::GeneratedVertexDisplacerModule() : Module()
 {
   // Set module properties
   setDescription(
-    R"DOC(Takes a list of PDG values and lifetime parameters to displaces the vertex of MCParticles with matching PDG value corresponding to the given lifetime parameter. Can be used betwenerator and the detector simulation. NOTE: this module only works properly for particles with 0 lifetime.)DOC");
+    R"DOC(Takes a list of PDG values and lifetime parameters to displace the vertex of MCParticles with matching PDG value corresponding to the given lifetime parameter. Can be used between generator and the detector simulation. NOTE: this module only works properly for particles with 0 lifetime.)DOC");
 
   // Parameter definitions
   addParam("lifetimeOption", m_lifetimeOption,
@@ -64,7 +64,7 @@ void GeneratedVertexDisplacerModule::initialize()
     auto particle = evtGenDB->GetParticle(aPdgVal);
     if (not particle) B2FATAL("Particle pdg code = " << aPdgVal << " not found in EvtGenDatabasePDG.");
     if (particle->Lifetime() != 0) B2FATAL("Particle pdg code = " << aPdgVal <<
-                                             " has non-zero lifetime! Module only work for 0 lifetime!");
+                                             " has non-zero lifetime! Module only works for 0 lifetime!");
   }
 
   if ((m_lifetimeOption.compare("fixed") != 0) && (m_lifetimeOption.compare("flat") != 0)

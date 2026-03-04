@@ -208,7 +208,7 @@ void DQMHistAnalysisPhysicsModule::event()
     }
 
     auto hmUPSmumu = getDelta("PhysicsObjects/mUPS");
-    if (m_cmUPSmumu and m_hmUPSmumu) {
+    if (m_cmUPSmumu and hmUPSmumu) {
       m_cmUPSmumu->cd();
       fitUpsilonFromHisto(hmUPS, m_cmUPSmumu_text, "M(#mu#mu) [GeV/c^2]", "UPSmumu", m_pvPrefix + "mUPSmumu");
       m_cmUPSmumu->Modified();

@@ -44,8 +44,8 @@ class ModeSelectorModule(b2.Module):
         store_event_info (bool): Whether to store event-level info
     """
     TR_EVENT_FIELDS = ('all_features',)
+    TR_EVENT_BEST_FIELDS = ('best_bp_iid', 'best_bp_dp', 'best_b0_iid', 'best_b0_dp')
     TR_BEST_FIELDS = ('pdg', 'dm', 'sigprob', 'is_cont', 'tag_pdg')
-    TR_CAND_FIELDS = ('evt_idx', 'iid', 'is_cont', 'tag_pdg', 'pdg', 'dp')
 
     def __init__(
         self,
@@ -79,9 +79,9 @@ class ModeSelectorModule(b2.Module):
         self.training_output = training_output
         #: Training storage (columnar buffers)
         self._tr_event = {name: [] for name in self.TR_EVENT_FIELDS}
+        self._tr_event_best = {name: [] for name in self.TR_EVENT_BEST_FIELDS}
         self._tr_bp = {name: [] for name in self.TR_BEST_FIELDS}
         self._tr_b0 = {name: [] for name in self.TR_BEST_FIELDS}
-        self._tr_cand = {name: [] for name in self.TR_CAND_FIELDS}
         #: Debug mode
         self.debug = debug
         #: Max events to debug
@@ -346,27 +346,6 @@ class ModeSelectorModule(b2.Module):
             for name, value in raw.items()
         }
 
-    def _fill_sector_best(self, iid_out, dp_out, valid, sector_mask,
-                          row_evt_idx, row_iid, row_dp, row_order):
-        """Fill per-event best candidate for one sector from flattened candidate rows."""
-        mask = valid & sector_mask
-        if not np.any(mask):
-            return
-        evt = row_evt_idx[mask]
-        iid = row_iid[mask]
-        dp = row_dp[mask]
-        ord_idx = row_order[mask]
-        sort_idx = np.lexsort((ord_idx, dp, evt))
-        evt = evt[sort_idx]
-        iid = iid[sort_idx]
-        dp = dp[sort_idx]
-        first = np.empty(evt.shape[0], dtype=bool)
-        first[0] = True
-        first[1:] = evt[1:] != evt[:-1]
-        sel_evt = evt[first]
-        iid_out[sel_evt] = iid[first].astype(np.int16)
-        dp_out[sel_evt] = dp[first].astype(np.float32)
-
     def _print_debug_info(self, candidates_data, event_features, all_features, max_input_id):
         """Print debug information for preprocessing."""
         # Get event identification
@@ -450,19 +429,17 @@ class ModeSelectorModule(b2.Module):
             self._tr_event,
             dtype_map={'all_features': np.float32}
         )
-        bp = self._block_to_arrays(self._tr_bp, dtype_map={k: np.float32 for k in self.TR_BEST_FIELDS})
-        b0 = self._block_to_arrays(self._tr_b0, dtype_map={k: np.float32 for k in self.TR_BEST_FIELDS})
-        cand = self._block_to_arrays(
-            self._tr_cand,
+        ev_best = self._block_to_arrays(
+            self._tr_event_best,
             dtype_map={
-                'evt_idx': np.int32,
-                'iid': np.int32,
-                'is_cont': np.float32,
-                'tag_pdg': np.float32,
-                'pdg': np.float32,
-                'dp': np.float32,
+                'best_bp_iid': np.int16,
+                'best_bp_dp': np.float32,
+                'best_b0_iid': np.int16,
+                'best_b0_dp': np.float32,
             }
         )
+        bp = self._block_to_arrays(self._tr_bp, dtype_map={k: np.float32 for k in self.TR_BEST_FIELDS})
+        b0 = self._block_to_arrays(self._tr_b0, dtype_map={k: np.float32 for k in self.TR_BEST_FIELDS})
 
         n_events = len(ev['all_features'])
         feature_arrays = ev['all_features']
@@ -470,30 +447,10 @@ class ModeSelectorModule(b2.Module):
         # Convert to sparse for efficient storage
         sparse_features = sparse.csr_matrix(feature_arrays)
 
-        # Per-sector best is_target candidate: smallest mostcommonBTagDeltaP
-        # where mostcommonBTagPDG == PDG and isContinuumEvent != 1.
-        # delta_p_thresh cut is NOT applied here; it stays in build_mode_labels().
-        bp_threshold = config.N_BP_MODES * 2
-        best_bp_iid = np.full(n_events, -1, dtype=np.int16)
-        best_bp_dp = np.full(n_events, np.inf, dtype=np.float32)
-        best_b0_iid = np.full(n_events, -1, dtype=np.int16)
-        best_b0_dp = np.full(n_events, np.inf, dtype=np.float32)
-
-        if cand['evt_idx'].size > 0:
-            row_evt_idx = cand['evt_idx']
-            row_iid = cand['iid']
-            row_is_cont = cand['is_cont']
-            row_tag_pdg = cand['tag_pdg']
-            row_pdg = cand['pdg']
-            row_dp = cand['dp']
-            row_order = np.arange(row_evt_idx.shape[0], dtype=np.int32)
-
-            valid = (row_is_cont != 1.0) & (row_tag_pdg == row_pdg)
-            if np.any(valid):
-                self._fill_sector_best(best_bp_iid, best_bp_dp, valid, row_iid < bp_threshold,
-                                       row_evt_idx, row_iid, row_dp, row_order)
-                self._fill_sector_best(best_b0_iid, best_b0_dp, valid, row_iid >= bp_threshold,
-                                       row_evt_idx, row_iid, row_dp, row_order)
+        best_bp_iid = ev_best['best_bp_iid']
+        best_bp_dp = ev_best['best_bp_dp']
+        best_b0_iid = ev_best['best_b0_iid']
+        best_b0_dp = ev_best['best_b0_dp']
 
         # Compact per-event MC truth scalars (14 bytes/event)
         bp_pdg = bp['pdg']
@@ -515,7 +472,7 @@ class ModeSelectorModule(b2.Module):
         is_cont = (is_cont_f == 1.0).astype(np.int8)
 
         gen_pdg_f = np.where(bp_is_best == 1, bp_gen_pdg, b0_gen_pdg)
-        gen_pdg = np.where(is_cont == 1, 0.0, np.nan_to_num(gen_pdg_f, nan=-1))
+        gen_pdg = np.where(is_cont == 1, -1, np.nan_to_num(gen_pdg_f, nan=-1)).astype(np.int16)
 
         bp_dm_i = np.nan_to_num(bp_dm, nan=-1).astype(np.int16)
         b0_dm_i = np.nan_to_num(b0_dm, nan=-1).astype(np.int16)
@@ -627,7 +584,6 @@ class ModeSelectorModule(b2.Module):
 
         # Training mode: save features + MC truth, skip NN inference
         if self.training_mode:
-            event_idx = len(self._tr_event['all_features'])
             event_row = {
                 'all_features': all_features.copy(),
             }
@@ -640,17 +596,39 @@ class ModeSelectorModule(b2.Module):
             self._append_training_row(self._tr_bp, bp_row)
             self._append_training_row(self._tr_b0, b0_row)
 
+            bp_threshold = config.N_BP_MODES * 2
+            best_bp_iid = -1
+            best_bp_dp = np.inf
+            best_b0_iid = -1
+            best_b0_dp = np.inf
+
             for iid, particle in particle_by_input_id.items():
                 cand_truth = self._extract_mc_truth_scalars(particle)
-                cand_row = {
-                    'evt_idx': event_idx,
-                    'iid': int(iid),
-                    'is_cont': cand_truth['is_cont'],
-                    'tag_pdg': cand_truth['tag_pdg'],
-                    'pdg': cand_truth['pdg'],
-                    'dp': cand_truth['dp'],
-                }
-                self._append_training_row(self._tr_cand, cand_row)
+                is_cont = cand_truth['is_cont']
+                tag_pdg = cand_truth['tag_pdg']
+                pdg = cand_truth['pdg']
+                dp = cand_truth['dp']
+                if np.isnan(is_cont) or np.isnan(tag_pdg) or np.isnan(pdg) or np.isnan(dp):
+                    continue
+                if is_cont == 1.0 or (tag_pdg != pdg):
+                    continue
+
+                if int(iid) < bp_threshold:
+                    if (best_bp_iid < 0) or (dp < best_bp_dp):
+                        best_bp_iid = int(iid)
+                        best_bp_dp = dp
+                else:
+                    if (best_b0_iid < 0) or (dp < best_b0_dp):
+                        best_b0_iid = int(iid)
+                        best_b0_dp = dp
+
+            event_best_row = {
+                'best_bp_iid': best_bp_iid,
+                'best_bp_dp': best_bp_dp,
+                'best_b0_iid': best_b0_iid,
+                'best_b0_dp': best_b0_dp,
+            }
+            self._append_training_row(self._tr_event_best, event_best_row)
             return
 
         # --- Inference mode ---

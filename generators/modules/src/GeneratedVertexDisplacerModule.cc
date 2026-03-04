@@ -8,7 +8,7 @@
 
 #include <generators/modules/GeneratedVertexDisplacerModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
-
+#include <framework/particledb/EvtGenDatabasePDG.h>
 
 
 using namespace Belle2;
@@ -27,7 +27,7 @@ GeneratedVertexDisplacerModule::GeneratedVertexDisplacerModule() : Module()
 {
   // Set module properties
   setDescription(
-    R"DOC(Takes a list of PDG values and lifetime parameters to displaces the vertex of MCParticles with matching PDG value corresponding to the given lifetime parameter. Can be used betwenerator and the detector simulation.)DOC");
+    R"DOC(Takes a list of PDG values and lifetime parameters to displaces the vertex of MCParticles with matching PDG value corresponding to the given lifetime parameter. Can be used betwenerator and the detector simulation. NOTE: this module only works properly for particles with 0 lifetime.)DOC");
 
   // Parameter definitions
   addParam("lifetimeOption", m_lifetimeOption,
@@ -56,6 +56,15 @@ void GeneratedVertexDisplacerModule::initialize()
 
   if (m_pdgVals.size() != m_lifetime.size()) {
     B2FATAL("List of PDG values and lifetime parameters have different sizes. Specify a lifetime for each PDG value.");
+  }
+
+  // Module does not work properly for particles with finite lifetime
+  EvtGenDatabasePDG* evtGenDB = EvtGenDatabasePDG::Instance();
+  for (auto aPdgVal : m_pdgVals) {
+    auto particle = evtGenDB->GetParticle(aPdgVal);
+    if (not particle) B2FATAL("Particle pdg code = " << aPdgVal << " not found in EvtGenDatabasePDG.");
+    if (particle->Lifetime() != 0) B2FATAL("Particle pdg code = " << aPdgVal <<
+                                             " has non-zero lifetime! Module only work for 0 lifetime!");
   }
 
   if ((m_lifetimeOption.compare("fixed") != 0) && (m_lifetimeOption.compare("flat") != 0)
@@ -100,7 +109,7 @@ void GeneratedVertexDisplacerModule::displace(MCParticle& particle, float lifeti
   ROOT::Math::PxPyPzEVector* displacementVector = new ROOT::Math::PxPyPzEVector();
   getDisplacement(particle, lifetime, *displacementVector);
 
-  ROOT::Math::XYZVector newDecayVertex = particle.getDecayVertex();
+  ROOT::Math::XYZVector newDecayVertex = particle.getProductionVertex();
   newDecayVertex.SetX(newDecayVertex.X() + displacementVector->X());
   newDecayVertex.SetY(newDecayVertex.Y() + displacementVector->Y());
   newDecayVertex.SetZ(newDecayVertex.Z() + displacementVector->Z());

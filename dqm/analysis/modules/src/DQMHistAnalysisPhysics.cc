@@ -20,6 +20,7 @@
 #include "RooChebychev.h"
 #include "RooAddPdf.h"
 #include "RooPlot.h"
+#include "RooFitResult.h"
 
 using namespace std;
 using namespace Belle2;

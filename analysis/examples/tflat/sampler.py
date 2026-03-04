@@ -49,7 +49,6 @@ def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False):
         # Set Belle enviroment
         os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
         os.environ['PGUSER'] = 'g0db'
-        # environmentType = "Belle"
 
         # Load and convert input files
         convertBelleMdstToBelleIIMdst(
@@ -105,9 +104,19 @@ if __name__ == '__main__':
         help='working_dir'
     )
 
+    parser.add_argument(
+        '--BELLE',
+        metavar='BELLE',
+        dest='BELLE',
+        type=bool,
+        default=False,
+        help='Indicate if Belle or Belle II files are to be processed'
+    )
+
     args = parser.parse_args()
     uniqueIdentifier = args.uniqueIdentifier
     inputfile = args.inputfile
     working_dir = args.working_dir
+    is_belle = args.BELLE
 
-    main(uniqueIdentifier, inputfile, working_dir, is_belle=False)
+    main(uniqueIdentifier, inputfile, working_dir, is_belle)

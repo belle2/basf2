@@ -152,6 +152,7 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         sentinel -1 when no qualifying candidate exists; best_bp_dp/b0_dp are float32
         with sentinel inf. Pre-filtered: gen_pdg == pdg and is_cont != 1.
     """
+
     if isinstance(input_files, str):
         input_files = [input_files]
 
@@ -164,6 +165,40 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
 
     if not input_files:
         raise ValueError("No input files found.")
+
+    # Preflight: verify all archives have required keys before parallel loading starts.
+    required_keys = (
+        'is_cont', 'gen_pdg', 'bp_is_best', 'best_sigprob',
+        'best_bp_sigprob_iid', 'best_b0_sigprob_iid',
+        'bp_tag_is_gen', 'b0_tag_is_gen',
+        'best_bp_iid', 'best_bp_dp', 'best_b0_iid', 'best_b0_dp'
+    )
+    preflight_errors = []
+    for input_file in input_files:
+        features_file = input_file.replace('.npz', '_features.npz')
+        if not os.path.exists(features_file):
+            preflight_errors.append(
+                f"{input_file}: missing companion sparse features file '{features_file}'"
+            )
+            continue
+        try:
+            data = np.load(input_file, allow_pickle=True)
+            keys = set(data.files)
+        except Exception as exc:
+            preflight_errors.append(f"{input_file}: failed to read npz ({exc})")
+            continue
+        missing = [k for k in required_keys if k not in keys]
+        if missing:
+            preflight_errors.append(
+                f"{input_file}: missing keys {missing}; available keys: {sorted(keys)}"
+            )
+
+    if preflight_errors:
+        msg = ["Input preflight failed. Fix input files before training."]
+        msg.extend(preflight_errors[:20])
+        if len(preflight_errors) > 20:
+            msg.append(f"... and {len(preflight_errors) - 20} more files")
+        raise ValueError("\n".join(msg))
 
     if fraction > 1.0:
         raise ValueError(f"fraction must be <= 1.0, got {fraction}.")

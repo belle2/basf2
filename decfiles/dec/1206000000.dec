@@ -28,14 +28,14 @@ Enddecay
 
 Decay B-sig
 0.009009770   D_s- D0                    	 PHOTOS PHSP;
-0.008218450   D_s- D*0               	         PHOTOS SVS;
+0.008218450   D*0 D_s-              	         PHOTOS SVS;
 0.007600000   D_s*- D0              	         PHOTOS SVS;
 0.017100000   D_s*- D*0                  	 PHOTOS SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
 0.000520000   D_s- D_0*0                 	 PHOTOS PHSP;
 0.000440000   D_s*- D_0*0                 	 PHOTOS SVS;
-0.000430000   D_s- D'_10                  	 PHOTOS SVS;
+0.000430000   D'_10 D_s-                   	 PHOTOS SVS;
 0.000910000   D_s*- D'_10                 	 PHOTOS SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
-0.000990000   D_s- D_10                   	 PHOTOS SVS;
+0.000990000   D_10  D_s-                    	 PHOTOS SVS;
 0.002070000   D_s*- D_10                   	 PHOTOS SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
 0.001260000   D_s- D_2*0                   	 PHOTOS STS;
 0.001060000   D_s*- D_2*0                  	 PHOTOS PHSP;

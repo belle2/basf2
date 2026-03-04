@@ -43,6 +43,9 @@ class ModeSelectorModule(b2.Module):
         output_variable (str): Name of ExtraInfo variable for output score
         store_event_info (bool): Whether to store event-level info
     """
+    TR_EVENT_FIELDS = ('all_features',)
+    TR_BEST_FIELDS = ('pdg', 'dm', 'sigprob', 'is_cont', 'tag_pdg')
+    TR_CAND_FIELDS = ('evt_idx', 'iid', 'is_cont', 'tag_pdg', 'pdg', 'dp')
 
     def __init__(
         self,
@@ -74,8 +77,11 @@ class ModeSelectorModule(b2.Module):
         self.training_mode = training_mode
         #: Output file for training mode
         self.training_output = training_output
-        #: Training data storage
-        self.training_data = []
+        #: Training storage (columnar buffers)
+        self._tr_event = {name: [] for name in self.TR_EVENT_FIELDS}
+        self._tr_bp = {name: [] for name in self.TR_BEST_FIELDS}
+        self._tr_b0 = {name: [] for name in self.TR_BEST_FIELDS}
+        self._tr_cand = {name: [] for name in self.TR_CAND_FIELDS}
         #: Debug mode
         self.debug = debug
         #: Max events to debug
@@ -251,24 +257,8 @@ class ModeSelectorModule(b2.Module):
         if best_by_input_id:
             # Best candidate overall (highest sigProb among unique input_ids)
             max_input_id = max(best_by_input_id.keys(), key=lambda k: best_by_input_id[k][1])
-
-            # Best candidate in B+ sector (input_id < N_BP_MODES * 2) and B0 sector (>= N_BP_MODES * 2)
-            bp_sector_ids = {k: v for k, v in best_by_input_id.items() if k < config.N_BP_MODES * 2}
-            b0_sector_ids = {k: v for k, v in best_by_input_id.items() if k >= config.N_BP_MODES * 2}
-
-            best_is_bp = max_input_id < config.N_BP_MODES * 2
-            if best_is_bp and b0_sector_ids:
-                scnd_max_input_id = max(b0_sector_ids.keys(), key=lambda k: b0_sector_ids[k][1])
-            elif not best_is_bp and bp_sector_ids:
-                scnd_max_input_id = max(bp_sector_ids.keys(), key=lambda k: bp_sector_ids[k][1])
-            else:
-                scnd_max_input_id = -10
         else:
             max_input_id = 0
-            scnd_max_input_id = -10
-
-        event_feat_values.append(max_input_id / 50.0)
-        event_feat_values.append(scnd_max_input_id / 50.0)
 
         # Add experiment number (from EventMetaData)
         event_meta = Belle2.PyStoreObj('EventMetaData')
@@ -317,18 +307,66 @@ class ModeSelectorModule(b2.Module):
 
         return event_features
 
-    #: MC truth variables to evaluate on best candidates (for training labels)
-    TRAINING_MC_VARS = config.TRAINING_MC_VARS
+    def _append_training_row(self, block, row):
+        """Append a row dict into a columnar training block."""
+        for key in block:
+            block[key].append(row[key])
 
-    def _extract_mc_truth(self, particle):
-        """Extract MC truth variables from a particle for training labels."""
+    def _block_to_arrays(self, block, dtype_map=None):
+        """Convert a columnar training block (lists) into numpy arrays."""
+        arrays = {}
+        for key, values in block.items():
+            if dtype_map and key in dtype_map:
+                arrays[key] = np.asarray(values, dtype=dtype_map[key])
+            else:
+                arrays[key] = np.asarray(values)
+        return arrays
+
+    def _extract_mc_truth_scalars(self, particle):
+        """Extract compact MC truth scalars used by training output."""
         if particle is None:
-            return {name: np.nan for name in self.TRAINING_MC_VARS}
-        truth = {}
-        for var_name in self.TRAINING_MC_VARS:
-            val = vm.evaluate(var_name, particle)
-            truth[var_name] = float(val) if not np.isnan(val) else np.nan
-        return truth
+            return {
+                'pdg': np.nan,
+                'dm': np.nan,
+                'sigprob': np.nan,
+                'is_cont': np.nan,
+                'tag_pdg': np.nan,
+                'dp': np.nan,
+            }
+
+        raw = {
+            'pdg': vm.evaluate('PDG', particle),
+            'dm': vm.evaluate('extraInfo(decayModeID)', particle),
+            'sigprob': vm.evaluate('extraInfo(SignalProbability)', particle),
+            'is_cont': vm.evaluate('isContinuumEvent', particle),
+            'tag_pdg': vm.evaluate('mostcommonBTagPDG', particle),
+            'dp': vm.evaluate('mostcommonBTagDeltaP', particle),
+        }
+        return {
+            name: np.nan if np.isnan(value) else value
+            for name, value in raw.items()
+        }
+
+    def _fill_sector_best(self, iid_out, dp_out, valid, sector_mask,
+                          row_evt_idx, row_iid, row_dp, row_order):
+        """Fill per-event best candidate for one sector from flattened candidate rows."""
+        mask = valid & sector_mask
+        if not np.any(mask):
+            return
+        evt = row_evt_idx[mask]
+        iid = row_iid[mask]
+        dp = row_dp[mask]
+        ord_idx = row_order[mask]
+        sort_idx = np.lexsort((ord_idx, dp, evt))
+        evt = evt[sort_idx]
+        iid = iid[sort_idx]
+        dp = dp[sort_idx]
+        first = np.empty(evt.shape[0], dtype=bool)
+        first[0] = True
+        first[1:] = evt[1:] != evt[:-1]
+        sel_evt = evt[first]
+        iid_out[sel_evt] = iid[first].astype(np.int16)
+        dp_out[sel_evt] = dp[first].astype(np.float32)
 
     def _print_debug_info(self, candidates_data, event_features, all_features, max_input_id):
         """Print debug information for preprocessing."""
@@ -373,7 +411,7 @@ class ModeSelectorModule(b2.Module):
         n_candidate_features = n_blocks * self.n_input_ids
         event_feat_start = n_candidate_features
         print(f"\n--- Event-level features (indices {event_feat_start}+) ---")
-        event_feat_names = self.event_features + ['ncandidates/10', 'max_input_id/50', 'scnd_max_input_id/50', '__experiment__/10']
+        event_feat_names = self.event_features + ['ncandidates/10', '__experiment__/10']
         for i, name in enumerate(event_feat_names):
             idx = event_feat_start + i
             if idx < len(all_features):
@@ -383,7 +421,7 @@ class ModeSelectorModule(b2.Module):
 
     def terminate(self):
         """Called at the end of processing."""
-        if self.training_mode and self.training_data:
+        if self.training_mode and self._tr_event['all_features']:
             self._save_training_data()
 
         if self.debug and self.debug_features:
@@ -409,29 +447,29 @@ class ModeSelectorModule(b2.Module):
         """Save collected training data to npz."""
         from scipy import sparse
 
-        n_events = len(self.training_data)
-        feature_arrays = np.array([d['all_features'] for d in self.training_data])
+        ev = self._block_to_arrays(
+            self._tr_event,
+            dtype_map={'all_features': np.float32}
+        )
+        bp = self._block_to_arrays(self._tr_bp, dtype_map={k: np.float32 for k in self.TR_BEST_FIELDS})
+        b0 = self._block_to_arrays(self._tr_b0, dtype_map={k: np.float32 for k in self.TR_BEST_FIELDS})
+        cand = self._block_to_arrays(
+            self._tr_cand,
+            dtype_map={
+                'evt_idx': np.int32,
+                'iid': np.int32,
+                'is_cont': np.float32,
+                'tag_pdg': np.float32,
+                'pdg': np.float32,
+                'dp': np.float32,
+            }
+        )
+
+        n_events = len(ev['all_features'])
+        feature_arrays = ev['all_features']
 
         # Convert to sparse for efficient storage
         sparse_features = sparse.csr_matrix(feature_arrays)
-
-        # Event metadata
-        exp = np.array([d['exp'] for d in self.training_data])
-        run = np.array([d['run'] for d in self.training_data])
-        evt = np.array([d['evt'] for d in self.training_data])
-        max_input_ids = np.array([d['max_input_id'] for d in self.training_data])
-        n_candidates = np.array([d['n_candidates'] for d in self.training_data])
-
-        # MC truth for best B+ and B0 candidates
-        mc_var_names = self.TRAINING_MC_VARS
-        bp_truth = np.array([
-            [d['bp_mc_truth'][v] for v in mc_var_names]
-            for d in self.training_data
-        ])
-        b0_truth = np.array([
-            [d['b0_mc_truth'][v] for v in mc_var_names]
-            for d in self.training_data
-        ])
 
         # Per-sector best is_target candidate: smallest mostcommonBTagDeltaP
         # where mostcommonBTagPDG == PDG and isContinuumEvent != 1.
@@ -442,41 +480,81 @@ class ModeSelectorModule(b2.Module):
         best_b0_iid = np.full(n_events, -1, dtype=np.int16)
         best_b0_dp = np.full(n_events, np.inf, dtype=np.float32)
 
-        for evt_idx, d in enumerate(self.training_data):
-            for iid, mc in d['mc_truth_by_input_id'].items():
-                if mc['isContinuumEvent'] == 1:
-                    continue
-                if mc['mostcommonBTagPDG'] != mc['PDG']:
-                    continue
-                dp = mc['mostcommonBTagDeltaP']
-                if iid < bp_threshold:
-                    if dp < best_bp_dp[evt_idx]:
-                        best_bp_dp[evt_idx] = dp
-                        best_bp_iid[evt_idx] = iid
-                else:
-                    if dp < best_b0_dp[evt_idx]:
-                        best_b0_dp[evt_idx] = dp
-                        best_b0_iid[evt_idx] = iid
+        if cand['evt_idx'].size > 0:
+            row_evt_idx = cand['evt_idx']
+            row_iid = cand['iid']
+            row_is_cont = cand['is_cont']
+            row_tag_pdg = cand['tag_pdg']
+            row_pdg = cand['pdg']
+            row_dp = cand['dp']
+            row_order = np.arange(row_evt_idx.shape[0], dtype=np.int32)
+
+            valid = (row_is_cont != 1.0) & (row_tag_pdg == row_pdg)
+            if np.any(valid):
+                self._fill_sector_best(best_bp_iid, best_bp_dp, valid, row_iid < bp_threshold,
+                                       row_evt_idx, row_iid, row_dp, row_order)
+                self._fill_sector_best(best_b0_iid, best_b0_dp, valid, row_iid >= bp_threshold,
+                                       row_evt_idx, row_iid, row_dp, row_order)
+
+        # Compact per-event MC truth scalars (14 bytes/event)
+        bp_pdg = bp['pdg']
+        b0_pdg = b0['pdg']
+        bp_dm = bp['dm']
+        b0_dm = b0['dm']
+        bp_sig = bp['sigprob']
+        b0_sig = b0['sigprob']
+        bp_is_cont = bp['is_cont']
+        bp_gen_pdg = bp['tag_pdg']
+        b0_gen_pdg = b0['tag_pdg']
+
+        bp_is_best = (bp_sig >= b0_sig).astype(np.int8)
+        best_sigprob = np.maximum(bp_sig, b0_sig).astype(np.float32)
+
+        is_cont = (bp_is_cont == 1.0).astype(np.int8)
+
+        gen_pdg_f = np.where(bp_is_best == 1, bp_gen_pdg, b0_gen_pdg)
+        gen_pdg = np.nan_to_num(gen_pdg_f, nan=0.0).astype(np.int16)
+
+        bp_dm_i = np.nan_to_num(bp_dm, nan=0.0).astype(np.int16)
+        b0_dm_i = np.nan_to_num(b0_dm, nan=0.0).astype(np.int16)
+
+        best_bp_sigprob_iid = np.full(n_events, -1, dtype=np.int16)
+        best_b0_sigprob_iid = np.full(n_events, -1, dtype=np.int16)
+        bp_valid = (~np.isnan(bp_pdg)) & (~np.isnan(bp_dm))
+        b0_valid = (~np.isnan(b0_pdg)) & (~np.isnan(b0_dm))
+        bp_offset = np.where(np.abs(bp_pdg) == 521, 0, config.N_BP_MODES * 2)
+        b0_offset = np.where(np.abs(b0_pdg) == 521, 0, config.N_BP_MODES * 2)
+        bp_sign = (bp_pdg > 0).astype(np.int16)
+        b0_sign = (b0_pdg > 0).astype(np.int16)
+        best_bp_sigprob_iid[bp_valid] = (bp_offset[bp_valid] + bp_dm_i[bp_valid] * 2 + bp_sign[bp_valid]).astype(np.int16)
+        best_b0_sigprob_iid[b0_valid] = (b0_offset[b0_valid] + b0_dm_i[b0_valid] * 2 + b0_sign[b0_valid]).astype(np.int16)
+
+        bp_tag_pdg = bp_gen_pdg
+        b0_tag_pdg = b0_gen_pdg
+        bp_tag_is_gen = ((~np.isnan(bp_pdg)) & (~np.isnan(bp_tag_pdg)) & (bp_tag_pdg == bp_pdg)).astype(np.int8)
+        b0_tag_is_gen = ((~np.isnan(b0_pdg)) & (~np.isnan(b0_tag_pdg)) & (b0_tag_pdg == b0_pdg)).astype(np.int8)
 
         sparse.save_npz(self.training_output.replace('.npz', '_features.npz'), sparse_features)
         np.savez_compressed(self.training_output,
-                            exp=exp, run=run, evt=evt,
-                            max_input_ids=max_input_ids,
-                            n_candidates=n_candidates,
-                            bp_truth=bp_truth,
-                            b0_truth=b0_truth,
+                            is_cont=is_cont,
+                            gen_pdg=gen_pdg,
+                            bp_is_best=bp_is_best,
+                            best_sigprob=best_sigprob,
+                            best_bp_sigprob_iid=best_bp_sigprob_iid,
+                            best_b0_sigprob_iid=best_b0_sigprob_iid,
+                            bp_tag_is_gen=bp_tag_is_gen,
+                            b0_tag_is_gen=b0_tag_is_gen,
                             best_bp_iid=best_bp_iid,
                             best_bp_dp=best_bp_dp,
                             best_b0_iid=best_b0_iid,
-                            best_b0_dp=best_b0_dp,
-                            mc_var_names=mc_var_names)
+                            best_b0_dp=best_b0_dp)
 
         n_bp_signal = int((best_bp_iid >= 0).sum())
         n_b0_signal = int((best_b0_iid >= 0).sum())
         print(f"\n[TRAINING] Saved {n_events} events to {self.training_output}")
         print(f"[TRAINING] Sparse features: {self.training_output.replace('.npz', '_features.npz')}")
         print(f"[TRAINING] is_target found: B+ sector {n_bp_signal} events, B0 sector {n_b0_signal} events")
-        print(f"[TRAINING] MC truth variables: {mc_var_names}")
+        print(f"[TRAINING] Mean best sigProb: {best_sigprob.mean():.4f}")
 
     def event(self):
         """Called for each event."""
@@ -547,23 +625,30 @@ class ModeSelectorModule(b2.Module):
 
         # Training mode: save features + MC truth, skip NN inference
         if self.training_mode:
-            event_meta = Belle2.PyStoreObj('EventMetaData')
-            mc_truth_by_input_id = {
-                iid: self._extract_mc_truth(p)
-                for iid, p in particle_by_input_id.items()
-            }
-            entry = {
-                'exp': event_meta.getExperiment() if event_meta.isValid() else -1,
-                'run': event_meta.getRun() if event_meta.isValid() else -1,
-                'evt': event_meta.getEvent() if event_meta.isValid() else -1,
+            event_idx = len(self._tr_event['all_features'])
+            event_row = {
                 'all_features': all_features.copy(),
-                'max_input_id': max_input_id,
-                'n_candidates': n_unique_candidates,
-                'bp_mc_truth': self._extract_mc_truth(best_bp),
-                'b0_mc_truth': self._extract_mc_truth(best_b0),
-                'mc_truth_by_input_id': mc_truth_by_input_id,
             }
-            self.training_data.append(entry)
+            self._append_training_row(self._tr_event, event_row)
+
+            bp_truth = self._extract_mc_truth_scalars(best_bp)
+            b0_truth = self._extract_mc_truth_scalars(best_b0)
+            bp_row = {name: bp_truth[name] for name in self.TR_BEST_FIELDS}
+            b0_row = {name: b0_truth[name] for name in self.TR_BEST_FIELDS}
+            self._append_training_row(self._tr_bp, bp_row)
+            self._append_training_row(self._tr_b0, b0_row)
+
+            for iid, particle in particle_by_input_id.items():
+                cand_truth = self._extract_mc_truth_scalars(particle)
+                cand_row = {
+                    'evt_idx': event_idx,
+                    'iid': int(iid),
+                    'is_cont': cand_truth['is_cont'],
+                    'tag_pdg': cand_truth['tag_pdg'],
+                    'pdg': cand_truth['pdg'],
+                    'dp': cand_truth['dp'],
+                }
+                self._append_training_row(self._tr_cand, cand_row)
             return
 
         # --- Inference mode ---
@@ -603,12 +688,11 @@ class ModeSelectorModule(b2.Module):
         main_output = self.main_session.run(None, {self.main_input_name: main_input})[0][0]
 
         # Extract scores
-        # Main network outputs (140 classes after softmax):
+        # Main network outputs (139 classes after softmax):
         #   [0..N_INPUT_IDS-1] = P(true mode is that input_id); class index = input_id
         #   [N_INPUT_IDS+0] = bad_tag
         #   [N_INPUT_IDS+1] = cross_deltaC1
-        #   [N_INPUT_IDS+2] = cross_internal
-        #   [N_INPUT_IDS+3] = continuum
+        #   [N_INPUT_IDS+2] = continuum
         bp_threshold = config.N_BP_MODES * 2
         sign = 1.0 if charged_cat else -1.0
         if charged_cat:

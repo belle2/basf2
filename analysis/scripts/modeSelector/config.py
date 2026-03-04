@@ -30,7 +30,7 @@ DELTA_M_CUT = (-0.05, 0.05)
 
 # Network output sizes
 NUM_CAT_LABELS = 3   # B0, B+, continuum
-NUM_MAIN_LABELS = 6  # bad_tag, is_target_neutral, cross_deltaC1, cross_internal, continuum, is_target_charged
+NUM_MAIN_LABELS = 5  # bad_tag, is_target_neutral, cross_deltaC1, continuum, is_target_charged
 
 # Feature block definitions: (name, basf2 variable, transform function)
 # Block ordering matters - it defines the feature array layout.

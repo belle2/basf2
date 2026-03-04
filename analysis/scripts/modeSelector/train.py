@@ -20,7 +20,7 @@ The script implements:
 - FEI calibration sampling (decayModeID-based weights)
 - Continuum downsampling (applied at production by produceTrainingInputs.py; --cont_fraction defaults to 1.0)
 - Fraction sampling (configurable, default 1.0)
-- sigProb and Mbc preselection (applied to all events including continuum)
+- sigProb preselection (applied to all events including continuum)
 """
 
 import argparse
@@ -37,6 +37,11 @@ from modeSelector import config
 from scipy import sparse
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
+
+MAIN_BG_BAD_TAG = config.N_INPUT_IDS
+MAIN_BG_CROSS_DC1 = config.N_INPUT_IDS + 1
+MAIN_BG_CONT = config.N_INPUT_IDS + 2
+MAIN_NUM_LABELS = config.N_INPUT_IDS + 3
 
 
 def get_fei_calib(dm_id, pdg):
@@ -63,20 +68,26 @@ def get_fei_calib(dm_id, pdg):
         return 1.0  # Continuum
 
 
-def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names):
+def compute_event_calib(best_bp_sigprob_iid, best_b0_sigprob_iid,
+                        bp_tag_is_gen, b0_tag_is_gen, is_cont):
     """
     Compute event calibration weights for FEI sampling (vectorized).
 
-    Calibration factors are applied to events where mostcommonBTagPDG == PDG.
+    Calibration factors are applied to events where the best-sigProb
+    candidate's mostcommonBTagPDG == PDG and the event is not continuum.
 
     Parameters
     ----------
-    bp_mc_truth : ndarray, shape (n_events, n_vars)
-        MC truth for best B+ candidate
-    b0_mc_truth : ndarray, shape (n_events, n_vars)
-        MC truth for best B0 candidate
-    mc_var_names : list
-        Names of MC truth variables
+    best_bp_sigprob_iid : ndarray of int16
+        input_id of best-sigProb B+ candidate; -1 if absent
+    best_b0_sigprob_iid : ndarray of int16
+        input_id of best-sigProb B0 candidate; -1 if absent
+    bp_tag_is_gen : ndarray of int8
+        1 if best-sigProb B+ has mostcommonBTagPDG == PDG, else 0
+    b0_tag_is_gen : ndarray of int8
+        1 if best-sigProb B0 has mostcommonBTagPDG == PDG, else 0
+    is_cont : ndarray of int8
+        1 if event is continuum, else 0
 
     Returns
     -------
@@ -85,64 +96,31 @@ def compute_event_calib(bp_mc_truth, b0_mc_truth, mc_var_names):
     event_calib_b0 : ndarray
         Calibration weights for B0 candidates
     """
-    n_events = len(bp_mc_truth)
+    n_events = len(best_bp_sigprob_iid)
+    bp_threshold = config.N_BP_MODES * 2
 
-    # Get column indices
-    pdg_idx = list(mc_var_names).index('PDG')
-    dm_idx = list(mc_var_names).index('extraInfo(decayModeID)')
-    is_cont_idx = list(mc_var_names).index('isContinuumEvent')
-    gen_pdg_idx = list(mc_var_names).index('mostcommonBTagPDG')
+    bp_calib_arr = np.array([config.FEI_CALIB_BP.get(i, config.FEI_CALIB_BP_REST)
+                             for i in range(config.N_BP_MODES)])
+    b0_calib_arr = np.array([config.FEI_CALIB_B0.get(i, config.FEI_CALIB_B0_REST)
+                             for i in range(config.N_B0_MODES)])
 
-    # Initialize with default weight
     event_calib_bp = np.ones(n_events)
+    apply_bp = (best_bp_sigprob_iid >= 0) & (bp_tag_is_gen == 1) & (is_cont == 0)
+    if apply_bp.any():
+        dm_ids = (best_bp_sigprob_iid[apply_bp].astype(np.int32) % bp_threshold) // 2
+        event_calib_bp[apply_bp] = bp_calib_arr[dm_ids]
+
     event_calib_b0 = np.ones(n_events)
-
-    # Create vectorized calibration lookup
-    bp_calib_array = np.array([config.FEI_CALIB_BP.get(i, config.FEI_CALIB_BP_REST) for i in range(config.N_BP_MODES)])
-    b0_calib_array = np.array([config.FEI_CALIB_B0.get(i, config.FEI_CALIB_B0_REST) for i in range(config.N_B0_MODES)])
-
-    # Process B+ candidates
-    has_bp = ~np.isnan(bp_mc_truth[:, pdg_idx])
-    if has_bp.any():
-        dm_ids = bp_mc_truth[has_bp, dm_idx].astype(int)
-
-        pdg = bp_mc_truth[has_bp, pdg_idx]
-        gen_pdg = bp_mc_truth[has_bp, gen_pdg_idx]
-        tag_is_gen = (gen_pdg == pdg)
-
-        is_cont = bp_mc_truth[has_bp, is_cont_idx] == 1
-
-        # Validate decayModeIDs
-        if (dm_ids < 0).any() or (dm_ids > config.N_BP_MODES - 1).any():
-            raise ValueError(f"Invalid decayModeID found in B+ candidates: min={dm_ids.min()}, max={dm_ids.max()}")
-
-        # Apply calibration: only for tag_is_gen and not continuum
-        apply_calib = tag_is_gen & ~is_cont
-        event_calib_bp[has_bp] = np.where(apply_calib, bp_calib_array[dm_ids], 1.0)
-
-    # Process B0 candidates
-    has_b0 = ~np.isnan(b0_mc_truth[:, pdg_idx])
-    if has_b0.any():
-        dm_ids = b0_mc_truth[has_b0, dm_idx].astype(int)
-
-        pdg = b0_mc_truth[has_b0, pdg_idx]
-        gen_pdg = b0_mc_truth[has_b0, gen_pdg_idx]
-        tag_is_gen = (gen_pdg == pdg)
-
-        is_cont = b0_mc_truth[has_b0, is_cont_idx] == 1
-
-        # Validate decayModeIDs
-        if (dm_ids < 0).any() or (dm_ids > config.N_B0_MODES - 1).any():
-            raise ValueError(f"Invalid decayModeID found in B0 candidates: min={dm_ids.min()}, max={dm_ids.max()}")
-
-        apply_calib = tag_is_gen & ~is_cont
-        event_calib_b0[has_b0] = np.where(apply_calib, b0_calib_array[dm_ids], 1.0)
+    apply_b0 = (best_b0_sigprob_iid >= 0) & (b0_tag_is_gen == 1) & (is_cont == 0)
+    if apply_b0.any():
+        dm_ids = (best_b0_sigprob_iid[apply_b0].astype(np.int32) - bp_threshold) // 2
+        event_calib_b0[apply_b0] = b0_calib_arr[dm_ids]
 
     return event_calib_bp, event_calib_b0
 
 
 def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
-                         sigprob_thresh=0.01, mbc_thresh=5.23, random_state=None):
+                         sigprob_thresh=0.01, random_state=None):
     """
     Load training data and apply sampling.
 
@@ -157,8 +135,6 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         continuum is already downsampled at production time by produceTrainingInputs.py)
     sigprob_thresh : float
         Minimum signal probability threshold
-    mbc_thresh : float
-        Minimum Mbc threshold
     random_state : int
         Random seed
 
@@ -166,12 +142,9 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     -------
     features : sparse matrix
         Sampled and filtered feature matrix (only has_inputs columns)
-    bp_truth : ndarray
-        MC truth for B+ candidates
-    b0_truth : ndarray
-        MC truth for B0 candidates
-    mc_var_names : list
-        Names of MC truth variables
+    event_scalars : tuple (is_cont, gen_pdg, bp_is_best, best_sigprob,
+                           best_bp_sigprob_iid, best_b0_sigprob_iid)
+        Per-event compact MC truth scalars; int8/int16/float32 arrays of shape (n_events,).
     has_inputs : list of int
         Selected feature indices (non-zero features, excluding Mbc)
     mc_truth_cand : tuple (best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp)
@@ -207,57 +180,50 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         data = np.load(input_file, allow_pickle=True)
         feats = sparse.load_npz(input_file.replace('.npz', '_features.npz'))
 
-        bp_truth = data['bp_truth']
-        b0_truth = data['b0_truth']
-        file_mc_var_names = list(data['mc_var_names'])
+        is_cont = data['is_cont']
+        gen_pdg = data['gen_pdg']
+        bp_is_best = data['bp_is_best']
+        best_sigprob = data['best_sigprob']
+        best_bp_sigprob_iid = data['best_bp_sigprob_iid']
+        best_b0_sigprob_iid = data['best_b0_sigprob_iid']
+        bp_tag_is_gen = data['bp_tag_is_gen']
+        b0_tag_is_gen = data['b0_tag_is_gen']
 
         best_bp_iid = data['best_bp_iid']
         best_bp_dp = data['best_bp_dp']
         best_b0_iid = data['best_b0_iid']
         best_b0_dp = data['best_b0_dp']
 
-        sigprob_idx = file_mc_var_names.index('extraInfo(SignalProbability)')
-        mbc_idx = file_mc_var_names.index('Mbc')
-        is_cont_idx = file_mc_var_names.index('isContinuumEvent')
-
         event_calib_bp, event_calib_b0 = compute_event_calib(
-            bp_truth, b0_truth, file_mc_var_names,
+            best_bp_sigprob_iid, best_b0_sigprob_iid,
+            bp_tag_is_gen, b0_tag_is_gen, is_cont,
         )
+        event_calib = np.where(bp_is_best == 1, event_calib_bp, event_calib_b0)
 
-        bp_sigprob = np.where(np.isnan(bp_truth[:, sigprob_idx]), -1, bp_truth[:, sigprob_idx])
-        b0_sigprob = np.where(np.isnan(b0_truth[:, sigprob_idx]), -1, b0_truth[:, sigprob_idx])
-        bp_is_best = bp_sigprob > b0_sigprob
-
-        best_sigprob = np.where(bp_is_best, bp_sigprob, b0_sigprob)
-        best_mbc = np.where(bp_is_best, bp_truth[:, mbc_idx], b0_truth[:, mbc_idx])
-        event_calib = np.where(bp_is_best, event_calib_bp, event_calib_b0)
-
-        is_cont_val = np.where(bp_is_best, bp_truth[:, is_cont_idx], b0_truth[:, is_cont_idx])
-        is_cont = is_cont_val == 1
-
-        # Keep events where the best candidate (highest sigProb) passes both thresholds.
+        # Keep events where the best candidate passes the sigProb threshold.
         # Applies to all events including continuum.
-        presel = (best_sigprob > sigprob_thresh) & (best_mbc > mbc_thresh)
+        presel = best_sigprob > sigprob_thresh
 
         sample_prob = event_calib / config.CALIB_WEIGHT_CAP * fraction
-        sample_prob[is_cont] *= cont_fraction
+        sample_prob[is_cont == 1] *= cont_fraction
         n_clipped = int((sample_prob > 1.0).sum())
         sample_prob = np.minimum(sample_prob, 1.0)
 
         file_rng = np.random.default_rng(seed)
-        sampled = (file_rng.random(len(bp_truth)) < sample_prob) & presel
+        sampled = (file_rng.random(len(best_sigprob)) < sample_prob) & presel
 
-        return (feats[sampled], bp_truth[sampled], b0_truth[sampled],
-                file_mc_var_names, n_clipped,
+        return (feats[sampled],
+                is_cont[sampled], gen_pdg[sampled], bp_is_best[sampled], best_sigprob[sampled],
+                best_bp_sigprob_iid[sampled], best_b0_sigprob_iid[sampled],
+                n_clipped,
                 best_bp_iid[sampled], best_bp_dp[sampled],
                 best_b0_iid[sampled], best_b0_dp[sampled])
 
     features_list = []
-    bp_list = []
-    b0_list = []
+    is_cont_list, gen_pdg_list, bp_is_best_list, best_sigprob_list = [], [], [], []
+    best_bp_sigprob_iid_list, best_b0_sigprob_iid_list = [], []
     best_bp_iid_list, best_bp_dp_list = [], []
     best_b0_iid_list, best_b0_dp_list = [], []
-    mc_var_names = None
     total_clipped = 0
     total_events = 0
 
@@ -268,23 +234,24 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         results = [f.result() for f in tqdm(future_list, desc="Loading files")]
 
     for result in results:
-        feats, bp, b0, file_mc_var_names, n_clipped, bp_iid, bp_dp, b0_iid, b0_dp = result
-        if mc_var_names is None:
-            mc_var_names = file_mc_var_names
-        elif file_mc_var_names != mc_var_names:
-            raise ValueError(
-                "mc_var_names mismatch across files. "
-                "All input files must have identical truth variable names."
-            )
+        (feats,
+         is_cont_r, gen_pdg_r, bp_is_best_r, best_sigprob_r,
+         best_bp_sigprob_iid_r, best_b0_sigprob_iid_r,
+         n_clipped,
+         bp_iid, bp_dp, b0_iid, b0_dp) = result
         features_list.append(feats)
-        bp_list.append(bp)
-        b0_list.append(b0)
+        is_cont_list.append(is_cont_r)
+        gen_pdg_list.append(gen_pdg_r)
+        bp_is_best_list.append(bp_is_best_r)
+        best_sigprob_list.append(best_sigprob_r)
+        best_bp_sigprob_iid_list.append(best_bp_sigprob_iid_r)
+        best_b0_sigprob_iid_list.append(best_b0_sigprob_iid_r)
         best_bp_iid_list.append(bp_iid)
         best_bp_dp_list.append(bp_dp)
         best_b0_iid_list.append(b0_iid)
         best_b0_dp_list.append(b0_dp)
         total_clipped += n_clipped
-        total_events += len(bp)
+        total_events += len(is_cont_r)
 
     if total_clipped > 0:
         print(f"WARNING: calibration weight exceeded CALIB_WEIGHT_CAP ({config.CALIB_WEIGHT_CAP:.4f}) "
@@ -293,8 +260,12 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
 
     # Concatenate across all files
     features = sparse.vstack(features_list, format='csr')
-    bp_truth = np.vstack(bp_list)
-    b0_truth = np.vstack(b0_list)
+    is_cont = np.concatenate(is_cont_list)
+    gen_pdg = np.concatenate(gen_pdg_list)
+    bp_is_best = np.concatenate(bp_is_best_list)
+    best_sigprob = np.concatenate(best_sigprob_list)
+    best_bp_sigprob_iid = np.concatenate(best_bp_sigprob_iid_list)
+    best_b0_sigprob_iid = np.concatenate(best_b0_sigprob_iid_list)
 
     print(f"\nTotal after concatenation: {features.shape[0]} events")
 
@@ -324,7 +295,7 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         print("  WARNING: HAS_INPUTS mismatch!")
         print(f"    Computed from data: {len(computed_has_inputs)} kept ({n_computed_remove} removed)")
         print(f"    config.HAS_INPUTS: {len(config.HAS_INPUTS)} kept ({n_total - len(config.HAS_INPUTS)} removed)")
-        print("    Using config.HAS_INPUTS (data may not cover all input_ids)")
+        print("    Data may not cover all input_ids.")
         out_path = "has_inputs_recomputed.txt"
         n_kept = len(computed_has_inputs)
         n_removed = n_total - n_kept
@@ -343,7 +314,13 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     else:
         print(f"  HAS_INPUTS verified OK ({len(config.HAS_INPUTS)} kept, "
               f"{n_total - len(config.HAS_INPUTS)} removed)")
-    has_inputs = list(config.HAS_INPUTS)
+
+    if max(config.HAS_INPUTS) >= n_total:
+        print("  WARNING: config.HAS_INPUTS contains out-of-range indices for current feature layout.")
+        print("           Using recomputed HAS_INPUTS for this run.")
+        has_inputs = computed_has_inputs
+    else:
+        has_inputs = list(config.HAS_INPUTS)
 
     # Apply feature selection
     features = features[:, has_inputs]
@@ -354,7 +331,9 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         np.concatenate(best_b0_iid_list),
         np.concatenate(best_b0_dp_list),
     )
-    return (features, bp_truth, b0_truth, mc_var_names, has_inputs, mc_truth_cand)
+    event_scalars = (is_cont, gen_pdg, bp_is_best, best_sigprob,
+                     best_bp_sigprob_iid, best_b0_sigprob_iid)
+    return (features, event_scalars, has_inputs, mc_truth_cand)
 
 
 class MultiClassNet(nn.Module):
@@ -363,7 +342,7 @@ class MultiClassNet(nn.Module):
     Two architectures selected automatically by num_labels:
     - Deep (num_labels <= 10, e.g. category network with 3 classes):
       256 -> 128 (dropout 0.2) -> 64 (dropout 0.15) -> 32 (dropout 0.1) -> 16 -> num_labels
-    - Shallow (num_labels > 10, e.g. main network with 140 classes):
+    - Shallow (num_labels > 10, e.g. main network with 139 classes):
       256 -> 128 (dropout 0.1) -> 128 (dropout 0.1) -> 64 (dropout 0.05) -> num_labels
     - ReLU activation, Xavier initialization (gain=0.5, bias=0.01)
     """
@@ -482,19 +461,12 @@ def train_epoch(model, train_loader, criterion, optimizer, device, disco_lambda=
                 b0_max = probs[:, bp_threshold:config.N_INPUT_IDS].max(dim=1).values
                 signal_prob = torch.where(charged_cat_batch, bp_max, b0_max)
 
-                cont_class = config.N_INPUT_IDS + 3
-                cross_int_class = config.N_INPUT_IDS + 2
+                cont_class = MAIN_BG_CONT
 
                 cont_mask = target == cont_class
                 if cont_mask.sum() > 1:
                     disco_loss = disco_loss + disco_lambda * distance_corr(
                         signal_prob[cont_mask], batch_mbc[cont_mask]
-                    )
-
-                cross_mask = target == cross_int_class
-                if cross_mask.sum() > 1:
-                    disco_loss = disco_loss + 2 * disco_lambda * distance_corr(
-                        signal_prob[cross_mask], batch_mbc[cross_mask]
                     )
 
         loss = cls_loss + disco_loss
@@ -602,62 +574,51 @@ def distance_corr(var_1, var_2, normedweight=None, power=1):
     return dCorr
 
 
-def build_mode_labels(bp_truth, b0_truth, mc_truth_cand, mc_var_names,
-                      charged_cat, delta_p_thresh=0.15):
+def build_mode_labels(mc_truth_cand, charged_cat, is_cont, gen_pdg,
+                      best_bp_sigprob_iid, best_b0_sigprob_iid,
+                      delta_p_thresh=0.15):
     """
-    Build mode-prediction labels (0 to N_INPUT_IDS+3) from MC truth.
+    Build mode-prediction labels (0 to N_INPUT_IDS+2) from MC truth.
 
     Classes:
     - 0 to N_INPUT_IDS-1: signal mode; class index equals the candidate's input_id
     - N_INPUT_IDS+0 (136): bad_tag
-    - N_INPUT_IDS+1 (137): cross_deltaC1 (|mostcommonBTagPDG| != |PDG|)
-    - N_INPUT_IDS+2 (138): cross_internal (same charge type, wrong CP conjugate)
-    - N_INPUT_IDS+3 (139): continuum
+    - N_INPUT_IDS+1 (137): cross_deltaC1 (|mostcommonBTagPDG| != |PDG sector|)
+    - N_INPUT_IDS+2 (138): continuum
 
     Signal label assignment per event:
     1. Use charged_cat to select the predicted B sector (B+ or B0).
     2. Among all candidates in that sector, find the one with smallest
        mostcommonBTagDeltaP that satisfies mostcommonBTagPDG == PDG and is not
        continuum. If found and DeltaP < delta_p_thresh: label = that input_id.
-    3. Otherwise assign background class from best_bp / best_b0 truth.
+    3. Otherwise assign background class from compact event scalars.
 
     Parameters
     ----------
-    bp_truth : ndarray, shape (n_events, n_vars)
-        MC truth for best B+ candidate
-    b0_truth : ndarray, shape (n_events, n_vars)
-        MC truth for best B0 candidate
     mc_truth_cand : tuple (best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp)
         Per-event arrays from load_and_sample_data. best_bp_iid/b0_iid are int16
         with sentinel -1; best_bp_dp/b0_dp are float32 with sentinel inf.
-    mc_var_names : list
-        Names of MC truth variables in bp_truth/b0_truth (used for background labels)
     charged_cat : ndarray of bool
         True if category network predicts B+, False for B0
+    is_cont : ndarray of int8
+        1 if continuum event (from best overall candidate), else 0
+    gen_pdg : ndarray of int16
+        mostcommonBTagPDG of best overall candidate (0 for continuum)
+    best_bp_sigprob_iid : ndarray of int16
+        input_id of best-sigProb B+ candidate; -1 if absent
+    best_b0_sigprob_iid : ndarray of int16
+        input_id of best-sigProb B0 candidate; -1 if absent
     delta_p_thresh : float
         Threshold for mostcommonBTagDeltaP. Default: 0.15
 
     Returns
     -------
     labels : ndarray of int64
-        Mode labels (0 to N_INPUT_IDS+3)
+        Mode labels (0 to N_INPUT_IDS+2)
     train_selection : ndarray of bool
         True for events where the category-selected sector has a valid candidate
     """
-    mc_var_names = list(mc_var_names)
-    pdg_idx = mc_var_names.index('PDG')
-    sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
-    is_cont_idx = mc_var_names.index('isContinuumEvent')
-    gen_pdg_idx = mc_var_names.index('mostcommonBTagPDG')
-
-    n_events = len(bp_truth)
-    charged_cat_col = charged_cat.reshape(-1, 1)
-    n_input_ids = config.N_INPUT_IDS        # 136
-
-    BG_BAD_TAG = n_input_ids       # 136
-    BG_CROSS_DC1 = n_input_ids + 1  # 137
-    BG_CROSS_INT = n_input_ids + 2  # 138
-    BG_CONT = n_input_ids + 3       # 139
+    n_events = len(is_cont)
 
     # --- Per-sector best candidate lookup ---
     best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp = mc_truth_cand
@@ -665,32 +626,27 @@ def build_mode_labels(bp_truth, b0_truth, mc_truth_cand, mc_var_names,
     best_dp = np.where(charged_cat, best_bp_dp, best_b0_dp)
 
     has_target = (best_iid >= 0) & (best_dp < delta_p_thresh)
-    labels = np.full(n_events, BG_BAD_TAG, dtype=np.int64)
+    labels = np.full(n_events, MAIN_BG_BAD_TAG, dtype=np.int64)
     labels[has_target] = best_iid[has_target]
 
     # --- Background labels for events without an is_target candidate ---
     no_target = ~has_target
     if no_target.any():
-        truth_for_bg = np.where(charged_cat_col, bp_truth, b0_truth)
-        pdg_bg = truth_for_bg[:, pdg_idx]
-        gen_pdg_bg = truth_for_bg[:, gen_pdg_idx]
-        is_cont_bg = truth_for_bg[:, is_cont_idx] == 1
+        sector_abs_pdg = np.where(charged_cat, 521, 511)
 
         nt = no_target
-        labels[nt & is_cont_bg] = BG_CONT
-        cross_dc1 = nt & ~is_cont_bg & (np.abs(gen_pdg_bg) != np.abs(pdg_bg))
-        labels[cross_dc1] = BG_CROSS_DC1
-        cross_int = nt & ~is_cont_bg & (gen_pdg_bg != pdg_bg) & (np.abs(gen_pdg_bg) == np.abs(pdg_bg))
-        labels[cross_int] = BG_CROSS_INT
-        # remaining no_target events keep BG_BAD_TAG (set as default above)
+        labels[nt & (is_cont == 1)] = MAIN_BG_CONT
+        cross_dc1 = nt & (is_cont == 0) & (np.abs(gen_pdg.astype(np.int32)) != sector_abs_pdg)
+        labels[cross_dc1] = MAIN_BG_CROSS_DC1
+        # remaining no_target events keep bad_tag (set as default above)
 
     # train_selection: keep events where the predicted sector has a valid candidate
-    bp_has_cand = ~np.isnan(bp_truth[:, sigprob_idx])
-    b0_has_cand = ~np.isnan(b0_truth[:, sigprob_idx])
-    train_selection = np.where(charged_cat, bp_has_cand, b0_has_cand)
+    train_selection = np.where(charged_cat,
+                               best_bp_sigprob_iid >= 0,
+                               best_b0_sigprob_iid >= 0)
 
-    assert labels.min() >= 0 and labels.max() <= config.N_INPUT_IDS + 3, (
-        f"Labels out of range [0, {config.N_INPUT_IDS + 3}]: "
+    assert labels.min() >= 0 and labels.max() <= MAIN_BG_CONT, (
+        f"Labels out of range [0, {MAIN_BG_CONT}]: "
         f"min={labels.min()}, max={labels.max()}"
     )
     return labels, train_selection
@@ -745,70 +701,27 @@ def sparse_collate_fn(batch):
         return torch.stack(features), torch.stack(labels)
 
 
-def build_category_labels(bp_truth, b0_truth, mc_var_names):
+def build_category_labels(is_cont, gen_pdg):
     """
-    Build category labels (B0=0, B+=1, continuum=2) from MC truth.
+    Build category labels (B0=0, B+=1, continuum=2) from compact MC truth scalars.
 
     Parameters
     ----------
-    bp_truth : ndarray
-        MC truth for B+ candidates
-    b0_truth : ndarray
-        MC truth for B0 candidates
-    mc_var_names : list
-        Names of MC truth variables
+    is_cont : ndarray of int8
+        1 if continuum event, 0 otherwise
+    gen_pdg : ndarray of int16
+        mostcommonBTagPDG of the best-sigProb candidate (0 for continuum)
 
     Returns
     -------
-    labels : ndarray
+    labels : ndarray of int64
         Category labels (0=B0, 1=B+, 2=continuum)
     """
-    n_events = len(bp_truth)
-
-    # Get column indices
-    gen_pdg_idx = mc_var_names.index('mostcommonBTagPDG')
-    sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
-    is_cont_idx = mc_var_names.index('isContinuumEvent')
-
-    # Consistency check: each event should have at least one candidate (B0 or B+)
-    both_nan = np.isnan(bp_truth[:, sigprob_idx]) & np.isnan(b0_truth[:, sigprob_idx])
-    if both_nan.any():
-        raise ValueError(
-            str(both_nan.sum()) + " events have no B0 or B+ candidates (sigProb NaN for both)"
-        )
-
-    # Determine best candidate (highest sigProb)
-    bp_sigprob = np.nan_to_num(bp_truth[:, sigprob_idx], nan=-1.0)
-    b0_sigprob = np.nan_to_num(b0_truth[:, sigprob_idx], nan=-1.0)
-    bp_is_best = bp_sigprob > b0_sigprob
-
-    is_cont_val = np.where(bp_is_best, bp_truth[:, is_cont_idx], b0_truth[:, is_cont_idx])
-    is_cont = is_cont_val == 1
-
-    # Build labels
-    labels = np.zeros(n_events, dtype=np.int64)
-    labels[is_cont] = 2  # continuum
-
-    # For BB events, use mostcommonBTagPDG to determine true MC event type (B0 vs B+).
-    bb_mask = ~is_cont
-    best_gen_pdg = np.where(bp_is_best, bp_truth[:, gen_pdg_idx], b0_truth[:, gen_pdg_idx])
-
-    valid_gen_pdg = {511, -511, 521, -521}
-    bb_gen_pdg = best_gen_pdg[bb_mask]
-    invalid = ~np.isin(bb_gen_pdg, list(valid_gen_pdg))
-    if invalid.any():
-        bad_vals = np.unique(bb_gen_pdg[invalid])
-        raise ValueError(
-            "mostcommonBTagPDG has unexpected values for non-continuum events: "
-            + str(bad_vals)
-        )
-
-    gen_is_charged = np.abs(best_gen_pdg) == 521
-
-    labels[bb_mask & gen_is_charged] = 1   # B+
-    labels[bb_mask & ~gen_is_charged] = 0  # B0
-
-    return labels
+    return np.where(
+        is_cont,
+        2,
+        np.where(np.abs(gen_pdg.astype(np.int32)) == 521, 1, 0)
+    ).astype(np.int64)
 
 
 def main():
@@ -860,12 +773,13 @@ def main():
     print("Loading and sampling data")
     print("=" * 60)
     print(f"Calibration weight cap (90th percentile): {config.CALIB_WEIGHT_CAP:.4f}")
-    features, bp_truth, b0_truth, mc_var_names, has_inputs, mc_truth_cand = load_and_sample_data(
+    features, event_scalars, has_inputs, mc_truth_cand = load_and_sample_data(
         args.input,
         fraction=args.fraction,
         cont_fraction=args.cont_fraction,
         random_state=args.seed,
     )
+    is_cont, gen_pdg, bp_is_best, best_sigprob, best_bp_sigprob_iid, best_b0_sigprob_iid = event_scalars
 
     print(f"\nFeature matrix shape: {features.shape}")
     print(f"  Sparse matrix memory: {features.data.nbytes / 1024**2:.1f} MB")
@@ -874,7 +788,7 @@ def main():
     # Build labels
     print("\nBuilding labels...")
     if args.network == 'category':
-        labels = build_category_labels(bp_truth, b0_truth, mc_var_names)
+        labels = build_category_labels(is_cont, gen_pdg)
         num_labels = 3
         print("  Category distribution:")
         print(f"    B0:        {(labels == 0).sum()} ({(labels == 0).mean() * 100:.1f}%)")
@@ -949,31 +863,22 @@ def main():
                 "Re-collect training data with produceTrainingInputs.py."
             )
         labels, train_selection = build_mode_labels(
-            bp_truth, b0_truth, mc_truth_cand, mc_var_names,
-            charged_cat=charged_cat_bool
+            mc_truth_cand, charged_cat_bool, is_cont, gen_pdg,
+            best_bp_sigprob_iid, best_b0_sigprob_iid,
         )
-        num_labels = config.N_INPUT_IDS + 4  # 140
+        num_labels = MAIN_NUM_LABELS
         n_signal = int((labels < config.N_INPUT_IDS).sum())
-        bg_bad = int((labels == config.N_INPUT_IDS).sum())
-        bg_dc1 = int((labels == config.N_INPUT_IDS + 1).sum())
-        bg_int = int((labels == config.N_INPUT_IDS + 2).sum())
-        bg_cont = int((labels == config.N_INPUT_IDS + 3).sum())
+        bg_bad = int((labels == MAIN_BG_BAD_TAG).sum())
+        bg_dc1 = int((labels == MAIN_BG_CROSS_DC1).sum())
+        bg_cont = int((labels == MAIN_BG_CONT).sum())
         n_tot = len(labels)
         print("  Main network label distribution (before train_selection):")
         print(f"    signal modes (0-{config.N_INPUT_IDS - 1}): {n_signal} ({n_signal / n_tot * 100:.1f}%)")
-        print(f"    bad_tag ({config.N_INPUT_IDS}):        {bg_bad} ({bg_bad / n_tot * 100:.1f}%)")
-        print(f"    cross_deltaC1 ({config.N_INPUT_IDS + 1}):  {bg_dc1} ({bg_dc1 / n_tot * 100:.1f}%)")
-        print(f"    cross_internal ({config.N_INPUT_IDS + 2}): {bg_int} ({bg_int / n_tot * 100:.1f}%)")
-        print(f"    continuum ({config.N_INPUT_IDS + 3}):      {bg_cont} ({bg_cont / n_tot * 100:.1f}%)")
+        print(f"    bad_tag ({MAIN_BG_BAD_TAG}):        {bg_bad} ({bg_bad / n_tot * 100:.1f}%)")
+        print(f"    cross_deltaC1 ({MAIN_BG_CROSS_DC1}):  {bg_dc1} ({bg_dc1 / n_tot * 100:.1f}%)")
+        print(f"    continuum ({MAIN_BG_CONT}):      {bg_cont} ({bg_cont / n_tot * 100:.1f}%)")
 
-        # Extract Mbc values for DisCo loss (if enabled)
         mbc_values = None
-        if args.disco_lambda > 0:
-            print("\nExtracting Mbc values for distance correlation...")
-            mbc_idx = mc_var_names.index('Mbc')
-            mbc_array = np.where(charged_cat_bool, bp_truth[:, mbc_idx], b0_truth[:, mbc_idx])
-            mbc_values = torch.from_numpy(mbc_array.astype(np.float32))
-            print(f"  Mbc values extracted: {len(mbc_values)}")
 
         # Apply train_selection: drop events where the category-selected candidate type has no candidate
         n_before = len(features_dense)
@@ -984,19 +889,9 @@ def main():
         n_dropped = n_before - int(train_selection.sum())
         print(f"  train_selection: dropped {n_dropped} events ({n_dropped / n_before * 100:.1f}%)")
 
-    # Extract Mbc values for DisCo loss (category network only; main network handles above)
+    # Mbc values for DisCo loss (category network; main network handled above)
     if args.network == 'category':
         mbc_values = None
-        if args.disco_lambda > 0:
-            print("\nExtracting Mbc values for distance correlation...")
-            mbc_idx = mc_var_names.index('Mbc')
-            sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
-            bp_sigprob = np.nan_to_num(bp_truth[:, sigprob_idx], nan=-1.0)
-            b0_sigprob = np.nan_to_num(b0_truth[:, sigprob_idx], nan=-1.0)
-            bp_is_best = bp_sigprob > b0_sigprob
-            mbc_array = np.where(bp_is_best, bp_truth[:, mbc_idx], b0_truth[:, mbc_idx])
-            mbc_values = torch.from_numpy(mbc_array.astype(np.float32))
-            print(f"  Mbc values extracted: {len(mbc_values)}")
 
     # Train/val split
     print(f"\nSplitting train/val (val_split={args.val_split})...")
@@ -1208,7 +1103,7 @@ def main():
                 print(f"  {cls_name:<28} {n_cls:>8,} {accuracy:>10.4f} "
                       f"{cls_probs.mean():>10.4f} {np.median(cls_probs):>10.4f}")
     else:
-        # Main network: show signal modes aggregate + 4 background classes
+        # Main network: show signal modes aggregate + 3 background classes
         signal_mask = val_labels < config.N_INPUT_IDS
         n_sig = signal_mask.sum()
         if n_sig > 0:
@@ -1219,10 +1114,9 @@ def main():
             print(f"  {cls_name:<28} {n_sig:>8,} {sig_acc:>10.4f} "
                   f"{sig_probs.mean():>10.4f} {np.median(sig_probs):>10.4f}")
         bg_classes = [
-            (config.N_INPUT_IDS, 'bad_tag'),
-            (config.N_INPUT_IDS + 1, 'cross_deltaC1'),
-            (config.N_INPUT_IDS + 2, 'cross_internal'),
-            (config.N_INPUT_IDS + 3, 'continuum'),
+            (MAIN_BG_BAD_TAG, 'bad_tag'),
+            (MAIN_BG_CROSS_DC1, 'cross_deltaC1'),
+            (MAIN_BG_CONT, 'continuum'),
         ]
         for cls_idx, cls_name in bg_classes:
             cls_mask = val_labels == cls_idx

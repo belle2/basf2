@@ -26,7 +26,7 @@ def convert_network_to_onnx(pt_path, onnx_path):
 
     Input size and number of output classes are derived automatically
     from the saved weights. The category network has 3 output classes;
-    the main network has N_INPUT_IDS + 4 = 140 output classes.
+    the main network has N_INPUT_IDS + 3 = 139 output classes.
     """
     checkpoint = torch.load(pt_path, map_location='cpu', weights_only=True)
     state_dict = checkpoint['model_state_dict']

@@ -253,9 +253,8 @@ class ModeSelectorModule(b2.Module):
         n_candidates = len(candidates_data)
         event_feat_values.append(n_candidates / 10.0)
 
-        # Find best candidate (highest sigProb) using deduped data
+        # Best candidate overall (highest sigProb among unique input_ids), for debug only
         if best_by_input_id:
-            # Best candidate overall (highest sigProb among unique input_ids)
             max_input_id = max(best_by_input_id.keys(), key=lambda k: best_by_input_id[k][1])
         else:
             max_input_id = 0
@@ -501,8 +500,8 @@ class ModeSelectorModule(b2.Module):
         b0_pdg = b0['pdg']
         bp_dm = bp['dm']
         b0_dm = b0['dm']
-        bp_sig = bp['sigprob']
-        b0_sig = b0['sigprob']
+        bp_sig = np.nan_to_num(bp['sigprob'], nan=-1.0)
+        b0_sig = np.nan_to_num(b0['sigprob'], nan=-1.0)
         bp_is_cont = bp['is_cont']
         bp_gen_pdg = bp['tag_pdg']
         b0_gen_pdg = b0['tag_pdg']

@@ -921,9 +921,10 @@ def main():
         mbc_val_np = mbc_val.numpy() if mbc_val is not None else None
         train_dataset = SparseDataset(features[train_idx], labels[train_idx], mbc_train_np)
         val_dataset = SparseDataset(features[val_idx], labels[val_idx], mbc_val_np)
+        drop_last = len(train_dataset) > args.batch_size
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
                                   collate_fn=sparse_collate_fn, num_workers=args.num_workers,
-                                  drop_last=True)
+                                  drop_last=drop_last)
         val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False,
                                 collate_fn=sparse_collate_fn, num_workers=args.num_workers)
     else:
@@ -941,8 +942,9 @@ def main():
             train_dataset = TensorDataset(X_train, y_train)
             val_dataset = TensorDataset(X_val, y_val)
 
+        drop_last = len(train_dataset) > args.batch_size
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
-                                  num_workers=args.num_workers, drop_last=True)
+                                  num_workers=args.num_workers, drop_last=drop_last)
         val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False,
                                 num_workers=args.num_workers)
 

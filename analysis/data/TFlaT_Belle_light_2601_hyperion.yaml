@@ -6,7 +6,7 @@ TFLAT_Mask: !!python/tuple # ROE Mask
   < 200
 
 trk_cut: isInRestOfEvent > 0.5 and passesROEMask(TFLATDefaultMask) > 0.5 and p >= 0
-gamma_cut: isInRestOfEvent > 0.5 and passesROEMask(TFLATDefaultMask) > 0.5 and beamBackgroundSuppression > 0.4 and fakePhotonSuppression > 0.3
+gamma_cut: isInRestOfEvent > 0.5 and passesROEMask(TFLATDefaultMask) > 0.5 and beamBackgroundSuppression > 0.2 and fakePhotonSuppression > 0.2
 
 trk_variable_list: # Input lists
 - charge

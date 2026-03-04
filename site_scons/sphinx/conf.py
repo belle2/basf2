@@ -33,20 +33,20 @@ sys.path.insert(0, os.path.abspath("extensions"))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.autodoc',
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.autodoc",
     # 'sphinx.ext.autosummary',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.autosectionlabel',
-    'sphinx_codeautolink',
-    'sphinx_togglebutton',
-    'sphinxarg.ext',
-    'basf2ext',
-    'nbsphinx',
-    'sphinxcontrib.programoutput',
-    'IPython.sphinxext.ipython_console_highlighting',
+    "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.autosectionlabel",
+    "sphinx_codeautolink",
+    "sphinx_togglebutton",
+    "sphinxarg.ext",
+    "basf2ext",
+    "nbsphinx",
+    "sphinxcontrib.programoutput",
+    "IPython.sphinxext.ipython_console_highlighting",
 ]
 
 # Codeautolink warnings for compilation. Turned off due to conflicts with line
@@ -63,7 +63,7 @@ nbsphinx_allow_errors = True
 # prefix each section with the name of the document it is in followed by a
 # colon
 autosectionlabel_prefix_document = True
-suppress_warnings = ['autosectionlabel.*', 'codeautolink.*']
+suppress_warnings = ["autosectionlabel.*", "codeautolink.*"]
 
 # The text that appears on the toggle buttons (default is "Click to show")
 togglebutton_hint = "Click to reveal"
@@ -76,39 +76,41 @@ togglebutton_selector = ".toggle, .admonition.dropdown"
 togglebutton_hint_toggle = "▶▼"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_sphinxtemplates']
+templates_path = ["_sphinxtemplates"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-project = 'basf2'
-copyright = 'Belle II Collaboration'
-author = 'Belle II Software Group'
+project = "basf2"
+copyright = "Belle II Collaboration"
+author = "Belle II Software Group"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode().strip()
+version = (
+    subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode().strip()
+)
 # Used for links to the repository
 basf2_repository = "https://gitlab.desy.de/belle2/software/basf2/"
 basf2_commitid = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
 basf2_issues = "https://gitlab.desy.de/belle2/software/basf2/-/issues/"
 
 # The full version, including alpha/beta/rc tags.
-release = os.environ.get('BELLE2_RELEASE', 'development')
-if release == 'head':
-    release = 'development'
+release = os.environ.get("BELLE2_RELEASE", "development")
+if release == "head":
+    release = "development"
 
 # Add warnings in the code if this is not a release
 keep_warnings = release == "development"
@@ -116,10 +118,19 @@ nitpicky = keep_warnings
 
 # Mask false warnings
 nitpick_ignore = []
-for entry in ['cppyy.gbl.TObject', 'cppyy.gbl.TFile', 'ROOT.TFile']:
-    nitpick_ignore.append(('py:class', entry))
-for entry in ['int', 'bool', 'list', 'str', 'object', 'None', 'LogConfig', 'ProcessStatistics.ModuleStatistics']:
-    nitpick_ignore.append(('py:class', entry + ' :'))
+for entry in ["cppyy.gbl.TObject", "cppyy.gbl.TFile", "ROOT.TFile"]:
+    nitpick_ignore.append(("py:class", entry))
+for entry in [
+    "int",
+    "bool",
+    "list",
+    "str",
+    "object",
+    "None",
+    "LogConfig",
+    "ProcessStatistics.ModuleStatistics",
+]:
+    nitpick_ignore.append(("py:class", entry + " :"))
 
 basf2_doxygen_baseurl = f"https://software.belle2.org/{release}/doxygen/"
 
@@ -128,7 +139,7 @@ basf2_doxygen_baseurl = f"https://software.belle2.org/{release}/doxygen/"
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = 'en'
+language = "en"
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -139,12 +150,32 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['.*', '_sphinxbuild', 'Thumbs.db', 'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons']
+exclude_patterns = [
+    ".*",
+    "_sphinxbuild",
+    "Thumbs.db",
+    "build",
+    "include",
+    "lib",
+    "bin",
+    "modules",
+    "data",
+    "site_scons",
+]
 # If we want to create the light release documentation then we need to exclude anything not in the light release.
-if tags.has('light'):  # noqa
-    light_packages = {entry.strip('/') for entry in open('../../.light').read().split() if entry.endswith('/')}
+if tags.has("light"):  # noqa
+    light_packages = {
+        entry.strip("/")
+        for entry in open("../../.light").read().split()
+        if entry.endswith("/")
+    }
     for entry in os.listdir("../../"):
-        if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_patterns or entry in light_packages:
+        if (
+            entry.find(".") > -1
+            or os.path.isfile(entry)
+            or entry in exclude_patterns
+            or entry in light_packages
+        ):
             continue
         exclude_patterns.append(entry)
     del light_packages
@@ -152,13 +183,19 @@ if tags.has('light'):  # noqa
 # now we need to exclude everything in the build dir except for the tools_doc
 # sub dir but there's no negative exclusion pattern so do it manually
 exclude_patterns.remove("build")
-exclude_patterns += ['build/html', 'build/latex', 'build/json', 'build/Linux*', 'build/belle2_tools']
+exclude_patterns += [
+    "build/html",
+    "build/latex",
+    "build/json",
+    "build/Linux*",
+    "build/belle2_tools",
+]
 # Ignore jupyter notebooks by default, we only want the ones meant for documentation
-exclude_patterns += ['**/*.ipynb', '*.ipynb']
+exclude_patterns += ["**/*.ipynb", "*.ipynb"]
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents. :any: allows easy linking to functions/classes/modules
-default_role = 'any'
+default_role = "any"
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 # add_function_parentheses = True
@@ -172,7 +209,7 @@ default_role = 'any'
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -192,7 +229,7 @@ numfig = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinx_book_theme'
+html_theme = "sphinx_book_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -200,7 +237,9 @@ html_theme = 'sphinx_book_theme'
 # html_theme_options = {'stickysidebar': True}
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = ["_themes", ]
+html_theme_path = [
+    "_themes",
+]
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
@@ -221,7 +260,7 @@ html_logo = "b2logo.svg"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_sphinxstatic']
+html_static_path = ["_sphinxstatic"]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -286,20 +325,17 @@ html_static_path = ['_sphinxstatic']
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'basf2doc'
+htmlhelp_basename = "basf2doc"
 
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    'papersize': 'a4paper',
-
+    "papersize": "a4paper",
     # The font size ('10pt', '11pt' or '12pt').
-    'pointsize': '10pt',
-
+    "pointsize": "10pt",
     # Additional stuff for the LaTeX preamble.
-    'preamble': '\\setcounter{tocdepth}{2}',
-
+    "preamble": "\\setcounter{tocdepth}{2}",
     # Latex figure (float) alignment
     # 'figure_align': 'htbp',
 }
@@ -308,8 +344,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'basf2.tex', 'Belle II Software Documentation',
-     author, 'manual'),
+    (master_doc, "basf2.tex", "Belle II Software Documentation", author, "manual"),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -319,7 +354,7 @@ latex_logo = "belle2-logo.pdf"
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
 latex_use_parts = True
-latex_show_urls = 'footnote'
+latex_show_urls = "footnote"
 latex_show_pagerefs = True
 
 # If true, show page references after internal links.
@@ -339,10 +374,7 @@ latex_show_pagerefs = True
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'basf2', 'basf2 Documentation',
-     [author], 1)
-]
+man_pages = [(master_doc, "basf2", "basf2 Documentation", [author], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -354,9 +386,15 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'basf2', 'basf2 Documentation',
-     author, 'basf2', 'One line description of project.',
-     'Miscellaneous'),
+    (
+        master_doc,
+        "basf2",
+        "basf2 Documentation",
+        author,
+        "basf2",
+        "One line description of project.",
+        "Miscellaneous",
+    ),
 ]
 
 # Documents to append as an appendix to all manuals.
@@ -371,24 +409,59 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
 
+
+# Get package versions for pinned intersphinx mapping
+def get_package_version(package_name, major_minor_only=False):
+    """Get version of an installed package."""
+    if package_name == "python":
+        version = f"{sys.version_info.major}.{sys.version_info.minor}"
+    else:
+        try:
+            module = __import__(package_name)
+            version = getattr(module, "__version__", "stable")
+        except ImportError:
+            return "stable"
+    if major_minor_only and version != "stable" and "." in version:
+        parts = version.split(".")
+        version = ".".join(parts[:2])
+    return version
+
+
 # allow to have links to python documentation
-intersphinx_mapping = {'python': ('https://docs.python.org/3.11/', None),
-                       'numpy': ('https://numpy.org/doc/stable/', None),
-                       'scipy': ('https://docs.scipy.org/doc/scipy/', None),
-                       'pandas': ('https://pandas.pydata.org/pandas-docs/version/2.2/', None),
-                       'matplotlib': ('https://matplotlib.org/stable/', None),
-                       'b2luigi': ('https://b2luigi.belle2.org/', None),
-                       'gbasf2': ('https://gbasf2.belle2.org/', None),
-                       'uproot': ('https://uproot.readthedocs.io/en/stable/', None)}
+intersphinx_mapping = {
+    "python": (
+        f"https://docs.python.org/{get_package_version('python', major_minor_only=True)}/",
+        None,
+    ),
+    "numpy": (
+        f"https://numpy.org/doc/{get_package_version('numpy', major_minor_only=True)}/",
+        None,
+    ),
+    "scipy": (
+        f"https://docs.scipy.org/doc/scipy-{get_package_version('scipy')}/",
+        None,
+    ),
+    "pandas": (
+        f"https://pandas.pydata.org/pandas-docs/version/{get_package_version('pandas')}/",
+        None,
+    ),
+    "matplotlib": (
+        f"https://matplotlib.org/{get_package_version('matplotlib')}/",
+        None,
+    ),
+    "b2luigi": ("https://b2luigi.belle2.org/", None),
+    "gbasf2": ("https://gbasf2.belle2.org/", None),
+    "uproot": ("https://uproot.readthedocs.io/en/stable/", None),
+}
 
 
 def process_sig(app, what, name, obj, options, signature, return_annotation):
     """
     remove unhelpful 'self' arguments from methods.
     """
-    if what == 'method' and signature:
-        reg = re.compile('^\\( \\(.*\\)arg1')
-        signature = reg.sub('(', signature)
+    if what == "method" and signature:
+        reg = re.compile("^\\( \\(.*\\)arg1")
+        signature = reg.sub("(", signature)
         return (signature, return_annotation)
 
 
@@ -411,44 +484,47 @@ def improve_docstring(obj):
         classname = obj.__class__.__name__
         pyclass = obj.__class__
 
-    if '::' not in classname:
+    if "::" not in classname:
         return  # not a ROOT class?
-    pos = classname.find('Belle2::')
+    pos = classname.find("Belle2::")
     classname = classname[pos:]
     if pyclass.__doc__ is None:
-        pyclass.__doc__ = ''
+        pyclass.__doc__ = ""
 
-    pyclass.__name__ = 'Belle2.' + classname
+    pyclass.__name__ = "Belle2." + classname
 
     from ROOT import TClass
+
     tclass = TClass(classname)
     # if tclass:
     #    pyclass.__doc__ += '\n' + tclass.GetTitle()
 
-    doxygen_url = f'{basf2_doxygen_baseurl}/class'
-    doxygen_url += '_1_1'.join(classname.split('::'))
-    doxygen_url += '.html'
-    pyclass.__doc__ += f'\n`Doxygen page for {classname} <{doxygen_url}>`_'
+    doxygen_url = f"{basf2_doxygen_baseurl}/class"
+    doxygen_url += "_1_1".join(classname.split("::"))
+    doxygen_url += ".html"
+    pyclass.__doc__ += f"\n`Doxygen page for {classname} <{doxygen_url}>`_"
 
     # TODO put this into the member docstrings directly? (sadly, readonly)
     members = tclass.GetListOfMethods()
     if members.GetEntries() > 0:
-        pyclass.__doc__ += '\n\nMember functions:'
+        pyclass.__doc__ += "\n\nMember functions:"
     for f in members:
         # getattr(pyclass, f.GetName()).__doc__ = "test"
-        pyclass.__doc__ += f'\n * {f.GetReturnTypeName()} {f.GetName()}{f.GetSignature()}'
+        pyclass.__doc__ += (
+            f"\n * {f.GetReturnTypeName()} {f.GetName()}{f.GetSignature()}"
+        )
         title = f.GetTitle()
         if title:
-            pyclass.__doc__ += f' ({title})'
+            pyclass.__doc__ += f" ({title})"
 
     members = tclass.GetListOfAllPublicDataMembers()
     if members.GetEntries() > 0:
-        pyclass.__doc__ += '\n\nPublic data members'
+        pyclass.__doc__ += "\n\nPublic data members"
     for f in members:
-        pyclass.__doc__ += f'\n * {f.GetName()}'
+        pyclass.__doc__ += f"\n * {f.GetName()}"
         title = f.GetTitle()
         if title:
-            pyclass.__doc__ += f' ({title})'
+            pyclass.__doc__ += f" ({title})"
 
 
 def skipmember(app, what, name, obj, skip, options):
@@ -468,8 +544,8 @@ def process_docstring(app, what, name, obj, options, lines):
     convert doxygen syntax to sphinx
     """
     substitutions = {
-        re.compile(r'^( *)@param (.*?):? '): r':param \2: ',
-        re.compile(r'^( *)@returns? '): r':return: ',
+        re.compile(r"^( *)@param (.*?):? "): r":param \2: ",
+        re.compile(r"^( *)@returns? "): r":return: ",
     }
     newlines = []
     for line in lines:
@@ -478,7 +554,7 @@ def process_docstring(app, what, name, obj, options, lines):
             new = reg.sub(sub, new)
         if new != line:
             # Sphinx wants a new paragraph before these, so let's add one
-            newlines += ['']
+            newlines += [""]
         newlines += [new]
     lines[:] = newlines
 
@@ -487,7 +563,7 @@ def setup(app):
     """
     Install some event handlers to improve output.
     """
-    app.connect('autodoc-process-signature', process_sig)
-    app.connect('autodoc-process-docstring', process_docstring)
-    app.connect('autodoc-skip-member', skipmember)
-    app.add_css_file('css/custom.css')
+    app.connect("autodoc-process-signature", process_sig)
+    app.connect("autodoc-process-docstring", process_docstring)
+    app.connect("autodoc-skip-member", skipmember)
+    app.add_css_file("css/custom.css")

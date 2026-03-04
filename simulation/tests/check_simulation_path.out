@@ -51,12 +51,17 @@
       AbsorbersRadii=[]
       BremsstrahlungPhotonsEnergyCut=10.0
       CDCProductionCut=0.0
+      DetailedParticleMatching=False
+      DistanceThreshold=0.0
+      DoNotStoreEMParticles=False
+      DoNotStoreNuclei=False
       ECLProductionCut=0.0
       EmProcessVerbosity=0
       EnableVisualization=False
       HadronProcessVerbosity=0
       InputMCParticleCollection=
       KLMProductionCut=0.0
+      KineticEnergyThreshold=0.0
       MaxNumberSteps=100000
       MonopoleMagCharge=1.0
       PXDProductionCut=0.0
@@ -64,6 +69,9 @@
       PhotonFraction=0.5
       PhysicsList=Belle2
       ProductionCut=0.07
+      RegionRho=0.0
+      RegionZBackward=0.0
+      RegionZForward=0.0
       RegisterMonopoles=False
       RegisterOptics=True
       RunEventVerbosity=0
@@ -80,6 +88,7 @@
       UICommandsAtIdle=[]
       UICommandsAtPreInit=[]
       UseHighPrecisionNeutrons=False
+      UseSeenInECL=False
       deltaChordInMagneticField=0.25
       magneticCacheDistance=0.0
       magneticField=default

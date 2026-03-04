@@ -11,8 +11,7 @@
 #include <framework/core/HistoModule.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/database/DBArray.h>
-#include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/TRGSummary.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
@@ -31,19 +30,19 @@ namespace Belle2 {
   /**
    * Make summary of data quality from reconstruction
    */
-  class TRGEFFDQMModule : public HistoModule {
+  class TRGEfficiencyDQMModule : public HistoModule {
 
   public:
 
     /**
      * Constructor
      */
-    TRGEFFDQMModule();
+    TRGEfficiencyDQMModule();
 
     /**
      * Destructor
      */
-    virtual ~TRGEFFDQMModule();
+    virtual ~TRGEfficiencyDQMModule();
 
     /**
      * Initialize the Module.
@@ -58,38 +57,17 @@ namespace Belle2 {
     void defineHisto() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    void beginRun() override;
-
-    /**
      * Event processor.
      */
     void event() override;
 
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    void endRun() override;
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    void terminate() override;
-
-
   protected:
 
-    StoreObjPtr<TRGSummary> m_trgSummary;         /**< Trigger summary. */
-    StoreArray<Track> m_Tracks;                   /**< Tracks. */
-    StoreArray<ECLCluster>  m_ECLClusters;        /**< ECL Clusters. */
-    StoreArray<KLMCluster>  m_KLMClusters;        /**< KLM Clusters. */
-    StoreArray<RecoTrack> m_RecoTracks;           /**< RecoTracks. */
-    std::string m_recoTrackArrayName = "" ;       /**< Belle2::RecoTrack StoreArray name. */
-    StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
+    StoreArray<Track> m_Tracks; /**< Tracks. */
+    StoreArray<ECLCluster> m_ECLClusters; /**< ECL Clusters. */
+    StoreArray<KLMCluster> m_KLMClusters; /**< KLM Clusters. */
+    StoreObjPtr<TRGSummary> m_TrgSummary; /**< Trigger summary. */
+    StoreObjPtr<SoftwareTriggerResult> m_HltResult; /**< HLT result. */
 
     TH1F* m_hPhi                = nullptr;            /**< Histogram of cdc phi of IP tracks*/
     TH1F* m_hPhi_psnecl         = nullptr;            /**< Histogram of cdc phi of IP tracks with ecl bit*/
@@ -133,7 +111,6 @@ namespace Belle2 {
     TH1F* m_nobha_phi_y             = nullptr;
     TH1F* m_nobha_phi_y_psnecl      = nullptr;
     TH1F* m_nobha_phi_y_psnecl_ftdf = nullptr;
-
 
     //-"fyo" with track deleta_phi distribution
     TH1F* m_fyo_dphi                    = nullptr;
@@ -207,17 +184,6 @@ namespace Belle2 {
     TH1F* m_eklmhit_theta             = nullptr;
     TH1F* m_eklmhit_theta_psnecl      = nullptr;
     TH1F* m_eklmhit_theta_psnecl_ftdf = nullptr;
-
-
-
-
-
-
-
-
-
-
-
 
   };
 

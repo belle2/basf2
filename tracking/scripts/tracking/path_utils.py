@@ -671,7 +671,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_cdc_cellul
                         wirePosition="aligned",
                         useSecondHits=use_second_hits,
                         flightTimeEstimation="outwards",
-                        filter="mva",
+                        filter="combined",
                         filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
 
     # Constructs clusters
@@ -1360,7 +1360,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
                         wirePosition="aligned",
                         useSecondHits=use_second_cdc_hits,
                         flightTimeEstimation="outwards",
-                        filter="mva",
+                        filter="combined",
                         filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
 
         path.add_module("ToCDCCKF",

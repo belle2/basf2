@@ -37,6 +37,13 @@ Luckily, such sets of weights are contained in the conditions database.
 That means that we only need to use a specific global tag (if you forgot what
 that is, consult this page again: :ref:`conditionsdb_overview`).
 
+Please note that the Belle II software features a number of different flavor tagging algorithms.
+Below is a listing of the alternative algorithms:
+
+A transformer based flavor tagger :ref:`analysis/doc/TransformerFlavorTagger:Principle`
+
+A deep neural network flavor tagger :ref:`analysis/doc/DeepFlavorTagger:Principle`
+
 .. admonition:: Exercise
     :class: stacked exercise
 

@@ -368,7 +368,7 @@ You can use arbitrary mva frameworks which have a Python interface.
 There is a good description how to do this in ``mva/examples/python/how_to_use_arbitrary_methods.py``
 
 In short, there are several hook functions which are called by the 'Python' backend of the mva package.
-There are sensible defaults for these hook functions implemented for many frameworks like tensorflow, theano, sklearn, hep_ml (see ``mva/scripts/basf2_mva_python_interface/``).
+There are sensible defaults for these hook functions implemented for many frameworks like tensorflow, sklearn, hep_ml (see ``mva/scripts/basf2_mva_python_interface/``).
 However, you can override these hook functions and ultimately have full control:
 
 During the fitting phase the following happens:
@@ -555,11 +555,6 @@ Websites and papers for the frameworks which are supported by the mva package
 
   * Website `<https://www.tensorflow.org/>`_
   * Martin Abadi et al. "TensorFlow: A system for large-scale machine learning" `<https://arxiv.org/abs/1605.08695>`_
-
-* Theano
-
-  * Website `<http://deeplearning.net/software/theano/>`_
-  * Rami Al-Rfou et al. "Theano: A Python framework for fast computation of mathematical expressions" `<https://arxiv.org/abs/1605.02688>`_
 
 * NeuroBayes
 

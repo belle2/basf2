@@ -77,12 +77,12 @@ void DQMHistAnalysisPhysicsModule::initialize()
   addDeltaPar("PhysicsObjects", "mUPSe", HistDelta::c_Entries, m_minEntriesUPSee, 1);
   registerEpicsPV(m_pvPrefix + "mUPSee_mean", "mUPSee_mean");
   registerEpicsPV(m_pvPrefix + "mUPSee_width", "mUPSee_width");
-  m_cmUPSee = new TCanvase("PhysicsObjects/fit_mUPSee");
+  m_cmUPSee = new TCanvas("PhysicsObjects/fit_mUPSee");
 
   addDeltaPar("PhysicsObjects", "mUPS", HistDelta::c_Entries, m_minEntriesUPSmumu, 1);
   registerEpicsPV(m_pvPrefix + "mUPSmumu_mean", "mUPSmumu_mean");
   registerEpicsPV(m_pvPrefix + "mUPSmumu_width", "mUPSmumu_width");
-  m_cmUPSmumu = new TCanvase("PhysicsObjects/fit_mUPSmumu");
+  m_cmUPSmumu = new TCanvas("PhysicsObjects/fit_mUPSmumu");
 
   //new ratio hadronb2_tight/bhabha_all
   addDeltaPar("PhysicsObjects", "physicsresults", HistDelta::c_Events, 3000000, 1); // update each 10000 events
@@ -210,7 +210,7 @@ void DQMHistAnalysisPhysicsModule::event()
     auto hmUPSmumu = getDelta("PhysicsObjects/mUPS");
     if (m_cmUPSmumu and hmUPSmumu) {
       m_cmUPSmumu->cd();
-      fitUpsilonFromHisto(hmUPS, m_cmUPSmumu_text, "M(#mu#mu) [GeV/c^2]", "UPSmumu", m_pvPrefix + "mUPSmumu");
+      fitUpsilonFromHisto(hmUPSmumu, m_cmUPSmumu_text, "M(#mu#mu) [GeV/c^2]", "UPSmumu", m_pvPrefix + "mUPSmumu");
       m_cmUPSmumu->Modified();
       m_cmUPSmumu->Update();
       UpdateCanvas(m_cmUPSmumu);

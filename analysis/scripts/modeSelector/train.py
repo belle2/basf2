@@ -272,7 +272,7 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     # Compute has_inputs dynamically and verify against config.HAS_INPUTS
     print("\nVerifying HAS_INPUTS from feature sparsity...")
 
-    n_total = features.shape[1]  # 1643
+    n_total = features.shape[1]
 
     # Stage 1: All-zero columns
     nonzero_cols = set(np.unique(features.nonzero()[1]))
@@ -311,15 +311,11 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
                 f.write("    " + ", ".join(str(x) for x in row) + ",\n")
             f.write(f"]  # {n_kept} indices kept ({n_total} - {n_removed} removed)\n")
         print(f"    Recomputed list written to {out_path}")
+        print("    Using recomputed HAS_INPUTS for this run.")
+        has_inputs = computed_has_inputs
     else:
         print(f"  HAS_INPUTS verified OK ({len(config.HAS_INPUTS)} kept, "
               f"{n_total - len(config.HAS_INPUTS)} removed)")
-
-    if max(config.HAS_INPUTS) >= n_total:
-        print("  WARNING: config.HAS_INPUTS contains out-of-range indices for current feature layout.")
-        print("           Using recomputed HAS_INPUTS for this run.")
-        has_inputs = computed_has_inputs
-    else:
         has_inputs = list(config.HAS_INPUTS)
 
     # Apply feature selection
@@ -717,10 +713,12 @@ def build_category_labels(is_cont, gen_pdg):
     labels : ndarray of int64
         Category labels (0=B0, 1=B+, 2=continuum)
     """
+    abs_gen_pdg = np.abs(gen_pdg.astype(np.int32))
+    known_tag = (abs_gen_pdg == 511) | (abs_gen_pdg == 521)
     return np.where(
-        is_cont,
+        is_cont | (~known_tag),
         2,
-        np.where(np.abs(gen_pdg.astype(np.int32)) == 521, 1, 0)
+        np.where(abs_gen_pdg == 521, 1, 0)
     ).astype(np.int64)
 
 

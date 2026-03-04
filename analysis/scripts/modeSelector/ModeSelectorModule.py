@@ -503,16 +503,19 @@ class ModeSelectorModule(b2.Module):
         bp_sig = np.nan_to_num(bp['sigprob'], nan=-1.0)
         b0_sig = np.nan_to_num(b0['sigprob'], nan=-1.0)
         bp_is_cont = bp['is_cont']
+        b0_is_cont = b0['is_cont']
         bp_gen_pdg = bp['tag_pdg']
         b0_gen_pdg = b0['tag_pdg']
 
         bp_is_best = (bp_sig >= b0_sig).astype(np.int8)
         best_sigprob = np.maximum(bp_sig, b0_sig).astype(np.float32)
 
-        is_cont = (bp_is_cont == 1.0).astype(np.int8)
+        # choosing from Bp/B0 to have at least one candidate and not return NaN
+        is_cont_f = np.where(bp_is_best == 1, bp_is_cont, b0_is_cont)
+        is_cont = (is_cont_f == 1.0).astype(np.int8)
 
         gen_pdg_f = np.where(bp_is_best == 1, bp_gen_pdg, b0_gen_pdg)
-        gen_pdg = np.nan_to_num(gen_pdg_f, nan=0.0).astype(np.int16)
+        gen_pdg = np.where(is_cont == 1, 0.0, np.nan_to_num(gen_pdg_f, nan=0.0))
 
         bp_dm_i = np.nan_to_num(bp_dm, nan=0.0).astype(np.int16)
         b0_dm_i = np.nan_to_num(b0_dm, nan=0.0).astype(np.int16)
@@ -620,7 +623,7 @@ class ModeSelectorModule(b2.Module):
         event_features = self._get_event_features()
 
         # Build feature array
-        all_features, max_input_id, n_unique_candidates = self._build_feature_array(candidates_data, event_features)
+        all_features, max_input_id, n_candidates = self._build_feature_array(candidates_data, event_features)
 
         # Training mode: save features + MC truth, skip NN inference
         if self.training_mode:
@@ -727,7 +730,7 @@ class ModeSelectorModule(b2.Module):
                     'evt': event_meta.getEvent(),
                     'all_features': all_features.copy(),
                     'max_input_id': max_input_id,
-                    'n_candidates': n_unique_candidates,
+                    'n_candidates': n_candidates,
                     'cat_output': cat_output.copy(),
                     'main_output': main_output.copy(),
                     'charged_cat': charged_cat,

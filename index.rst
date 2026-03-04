@@ -12,7 +12,7 @@ tools and its Python programming interface.
 .. tip:: If you are new to the Belle II software, you should take a look
     at the :ref:`onlinebook` to help you get started. 
 
-.. tip:: In case of any questions regarding thee Belle II software, or for additional information,
+.. tip:: In case of any questions regarding the Belle II software, or for additional information,
    please check the `Belle II Questions <https://questions.belle2.org>`_ forum. 
 
 ----

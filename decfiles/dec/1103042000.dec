@@ -30,7 +30,7 @@ Decay anti-B0sig
 0.000028410   D_s+  Lambda0  anti-p-                       PHSP;
 0.000027480   D_s+  K-                                     PHSP; 
 0.000021900   D_s*+  K-                                    SVS;
-0.000035000   D_s+  K*-                                    SVS;
+0.000035000   K*-   D_s+                                   SVS;
 0.000096960   D_s+  pi-  anti-K0                           PHSP;
 0.000032000   D_s*+  K*-                                   SVV_HELAMP 1.0 0.0 1.0 0.0 1.0 0.0; 
 0.000020000   D_s+  D_s-                                   PHSP;

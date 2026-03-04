@@ -23,5 +23,3 @@ else
    source /cvmfs/belle.cern.ch/tools/b2setup "$BASF2_VERSION"
 fi
 
-# For development purposes
-#export BELLE2_LOCAL_DIR=/home/belle2/benjamin/development

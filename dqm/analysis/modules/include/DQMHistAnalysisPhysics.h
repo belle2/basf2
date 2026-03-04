@@ -61,7 +61,7 @@ namespace Belle2 {
   private:
 
     //! fit histogram with UPS mass
-    void fitUpsilonFromHisto(TH1* histo, TPaveText* text, std::string parts, std::string prefix);
+    void fitUpsilonFromHisto(TH1* histo, TPaveText* text, std::string parts, std::string prefix, std::string pvname);
 
     //! min entries for Ups(mumu)
     int m_minEntriesUPSmumu;

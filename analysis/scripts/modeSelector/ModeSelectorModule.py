@@ -433,27 +433,49 @@ class ModeSelectorModule(b2.Module):
             for d in self.training_data
         ])
 
-        # MC truth per input_id slot: shape (n_events, N_INPUT_IDS, n_mc_vars)
-        n_mc_vars = len(mc_var_names)
-        mc_truth_arr = np.full((n_events, self.n_input_ids, n_mc_vars), np.nan, dtype=np.float32)
+        # Per-sector best is_target candidate: smallest mostcommonBTagDeltaP
+        # where mostcommonBTagPDG == PDG and isContinuumEvent != 1.
+        # delta_p_thresh cut is NOT applied here; it stays in build_mode_labels().
+        bp_threshold = config.N_BP_MODES * 2
+        best_bp_iid = np.full(n_events, -1, dtype=np.int16)
+        best_bp_dp = np.full(n_events, np.inf, dtype=np.float32)
+        best_b0_iid = np.full(n_events, -1, dtype=np.int16)
+        best_b0_dp = np.full(n_events, np.inf, dtype=np.float32)
+
         for evt_idx, d in enumerate(self.training_data):
-            for iid, mc_truth_dict in d['mc_truth_by_input_id'].items():
-                for v_idx, v_name in enumerate(mc_var_names):
-                    mc_truth_arr[evt_idx, iid, v_idx] = mc_truth_dict[v_name]
+            for iid, mc in d['mc_truth_by_input_id'].items():
+                if mc['isContinuumEvent'] == 1:
+                    continue
+                if mc['mostcommonBTagPDG'] != mc['PDG']:
+                    continue
+                dp = mc['mostcommonBTagDeltaP']
+                if iid < bp_threshold:
+                    if dp < best_bp_dp[evt_idx]:
+                        best_bp_dp[evt_idx] = dp
+                        best_bp_iid[evt_idx] = iid
+                else:
+                    if dp < best_b0_dp[evt_idx]:
+                        best_b0_dp[evt_idx] = dp
+                        best_b0_iid[evt_idx] = iid
 
         sparse.save_npz(self.training_output.replace('.npz', '_features.npz'), sparse_features)
-        np.savez(self.training_output,
-                 exp=exp, run=run, evt=evt,
-                 max_input_ids=max_input_ids,
-                 n_candidates=n_candidates,
-                 bp_truth=bp_truth,
-                 b0_truth=b0_truth,
-                 mc_truth_by_input_id=mc_truth_arr,
-                 mc_var_names=mc_var_names)
+        np.savez_compressed(self.training_output,
+                            exp=exp, run=run, evt=evt,
+                            max_input_ids=max_input_ids,
+                            n_candidates=n_candidates,
+                            bp_truth=bp_truth,
+                            b0_truth=b0_truth,
+                            best_bp_iid=best_bp_iid,
+                            best_bp_dp=best_bp_dp,
+                            best_b0_iid=best_b0_iid,
+                            best_b0_dp=best_b0_dp,
+                            mc_var_names=mc_var_names)
 
+        n_bp_signal = int((best_bp_iid >= 0).sum())
+        n_b0_signal = int((best_b0_iid >= 0).sum())
         print(f"\n[TRAINING] Saved {n_events} events to {self.training_output}")
         print(f"[TRAINING] Sparse features: {self.training_output.replace('.npz', '_features.npz')}")
-        print(f"[TRAINING] mc_truth_by_input_id: shape {mc_truth_arr.shape}")
+        print(f"[TRAINING] is_target found: B+ sector {n_bp_signal} events, B0 sector {n_b0_signal} events")
         print(f"[TRAINING] MC truth variables: {mc_var_names}")
 
     def event(self):

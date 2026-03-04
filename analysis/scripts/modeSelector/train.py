@@ -27,7 +27,7 @@ import argparse
 import glob
 import os
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import torch
@@ -174,6 +174,10 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         Names of MC truth variables
     has_inputs : list of int
         Selected feature indices (non-zero features, excluding Mbc)
+    mc_truth_cand : tuple (best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp)
+        Per-event arrays of shape (n_events,). best_bp_iid/b0_iid are int16 with
+        sentinel -1 when no qualifying candidate exists; best_bp_dp/b0_dp are float32
+        with sentinel inf. Pre-filtered: gen_pdg == pdg and is_cont != 1.
     """
     if isinstance(input_files, str):
         input_files = [input_files]
@@ -207,8 +211,10 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         b0_truth = data['b0_truth']
         file_mc_var_names = list(data['mc_var_names'])
 
-        # Load per-input_id mc truth if available (new field from updated training data)
-        mc_truth_by_id = data['mc_truth_by_input_id'] if 'mc_truth_by_input_id' in data else None
+        best_bp_iid = data['best_bp_iid']
+        best_bp_dp = data['best_bp_dp']
+        best_b0_iid = data['best_b0_iid']
+        best_b0_dp = data['best_b0_dp']
 
         sigprob_idx = file_mc_var_names.index('extraInfo(SignalProbability)')
         mbc_idx = file_mc_var_names.index('Mbc')
@@ -241,38 +247,44 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         file_rng = np.random.default_rng(seed)
         sampled = (file_rng.random(len(bp_truth)) < sample_prob) & presel
 
-        mc_truth_sampled = mc_truth_by_id[sampled] if mc_truth_by_id is not None else None
-        return feats[sampled], bp_truth[sampled], b0_truth[sampled], file_mc_var_names, n_clipped, mc_truth_sampled
+        return (feats[sampled], bp_truth[sampled], b0_truth[sampled],
+                file_mc_var_names, n_clipped,
+                best_bp_iid[sampled], best_bp_dp[sampled],
+                best_b0_iid[sampled], best_b0_dp[sampled])
 
     features_list = []
     bp_list = []
     b0_list = []
-    mc_truth_list = []
+    best_bp_iid_list, best_bp_dp_list = [], []
+    best_b0_iid_list, best_b0_dp_list = [], []
     mc_var_names = None
     total_clipped = 0
     total_events = 0
 
     n_workers = min(32, len(input_files))
     with ThreadPoolExecutor(max_workers=n_workers) as executor:
-        futures = {
-            executor.submit(_process_one_file, (f, s)): f
-            for f, s in zip(input_files, seeds)
-        }
-        for future in tqdm(as_completed(futures), total=len(futures), desc="Loading files"):
-            feats, bp, b0, file_mc_var_names, n_clipped, mc_truth = future.result()
-            if mc_var_names is None:
-                mc_var_names = file_mc_var_names
-            elif file_mc_var_names != mc_var_names:
-                raise ValueError(
-                    f"mc_var_names mismatch in {futures[future]}. "
-                    "All input files must have identical truth variable names."
-                )
-            features_list.append(feats)
-            bp_list.append(bp)
-            b0_list.append(b0)
-            mc_truth_list.append(mc_truth)
-            total_clipped += n_clipped
-            total_events += len(bp)
+        future_list = [executor.submit(_process_one_file, (f, s))
+                       for f, s in zip(input_files, seeds)]
+        results = [f.result() for f in tqdm(future_list, desc="Loading files")]
+
+    for result in results:
+        feats, bp, b0, file_mc_var_names, n_clipped, bp_iid, bp_dp, b0_iid, b0_dp = result
+        if mc_var_names is None:
+            mc_var_names = file_mc_var_names
+        elif file_mc_var_names != mc_var_names:
+            raise ValueError(
+                "mc_var_names mismatch across files. "
+                "All input files must have identical truth variable names."
+            )
+        features_list.append(feats)
+        bp_list.append(bp)
+        b0_list.append(b0)
+        best_bp_iid_list.append(bp_iid)
+        best_bp_dp_list.append(bp_dp)
+        best_b0_iid_list.append(b0_iid)
+        best_b0_dp_list.append(b0_dp)
+        total_clipped += n_clipped
+        total_events += len(bp)
 
     if total_clipped > 0:
         print(f"WARNING: calibration weight exceeded CALIB_WEIGHT_CAP ({config.CALIB_WEIGHT_CAP:.4f}) "
@@ -283,10 +295,6 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     features = sparse.vstack(features_list, format='csr')
     bp_truth = np.vstack(bp_list)
     b0_truth = np.vstack(b0_list)
-    if all(m is not None for m in mc_truth_list):
-        mc_truth_by_input_id_arr = np.concatenate(mc_truth_list, axis=0)
-    else:
-        mc_truth_by_input_id_arr = None
 
     print(f"\nTotal after concatenation: {features.shape[0]} events")
 
@@ -340,7 +348,13 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     # Apply feature selection
     features = features[:, has_inputs]
 
-    return (features, bp_truth, b0_truth, mc_var_names, has_inputs, mc_truth_by_input_id_arr)
+    mc_truth_cand = (
+        np.concatenate(best_bp_iid_list),
+        np.concatenate(best_bp_dp_list),
+        np.concatenate(best_b0_iid_list),
+        np.concatenate(best_b0_dp_list),
+    )
+    return (features, bp_truth, b0_truth, mc_var_names, has_inputs, mc_truth_cand)
 
 
 class MultiClassNet(nn.Module):
@@ -588,7 +602,7 @@ def distance_corr(var_1, var_2, normedweight=None, power=1):
     return dCorr
 
 
-def build_mode_labels(bp_truth, b0_truth, mc_truth_by_input_id_arr, mc_var_names,
+def build_mode_labels(bp_truth, b0_truth, mc_truth_cand, mc_var_names,
                       charged_cat, delta_p_thresh=0.15):
     """
     Build mode-prediction labels (0 to N_INPUT_IDS+3) from MC truth.
@@ -613,10 +627,11 @@ def build_mode_labels(bp_truth, b0_truth, mc_truth_by_input_id_arr, mc_var_names
         MC truth for best B+ candidate
     b0_truth : ndarray, shape (n_events, n_vars)
         MC truth for best B0 candidate
-    mc_truth_by_input_id_arr : ndarray, shape (n_events, N_INPUT_IDS, n_vars)
-        MC truth per input_id slot (NaN where absent)
+    mc_truth_cand : tuple (best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp)
+        Per-event arrays from load_and_sample_data. best_bp_iid/b0_iid are int16
+        with sentinel -1; best_bp_dp/b0_dp are float32 with sentinel inf.
     mc_var_names : list
-        Names of MC truth variables (must match order in mc_truth_by_input_id_arr)
+        Names of MC truth variables in bp_truth/b0_truth (used for background labels)
     charged_cat : ndarray of bool
         True if category network predicts B+, False for B0
     delta_p_thresh : float
@@ -634,10 +649,9 @@ def build_mode_labels(bp_truth, b0_truth, mc_truth_by_input_id_arr, mc_var_names
     sigprob_idx = mc_var_names.index('extraInfo(SignalProbability)')
     is_cont_idx = mc_var_names.index('isContinuumEvent')
     gen_pdg_idx = mc_var_names.index('mostcommonBTagPDG')
-    delta_p_idx = mc_var_names.index('mostcommonBTagDeltaP')
 
     n_events = len(bp_truth)
-    bp_threshold = config.N_BP_MODES * 2   # 72
+    charged_cat_col = charged_cat.reshape(-1, 1)
     n_input_ids = config.N_INPUT_IDS        # 136
 
     BG_BAD_TAG = n_input_ids       # 136
@@ -645,40 +659,14 @@ def build_mode_labels(bp_truth, b0_truth, mc_truth_by_input_id_arr, mc_var_names
     BG_CROSS_INT = n_input_ids + 2  # 138
     BG_CONT = n_input_ids + 3       # 139
 
-    # --- Vectorised is_target detection across all events and input_ids ---
-    # mc_truth_by_input_id_arr shape: (n_events, N_INPUT_IDS, n_vars)
-    all_pdg = mc_truth_by_input_id_arr[:, :, pdg_idx]
-    all_gen_pdg = mc_truth_by_input_id_arr[:, :, gen_pdg_idx]
-    all_delta_p = mc_truth_by_input_id_arr[:, :, delta_p_idx]
-    all_is_cont = mc_truth_by_input_id_arr[:, :, is_cont_idx]
+    # --- Per-sector best candidate lookup ---
+    best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp = mc_truth_cand
+    best_iid = np.where(charged_cat, best_bp_iid, best_b0_iid).astype(np.int64)
+    best_dp = np.where(charged_cat, best_bp_dp, best_b0_dp)
 
-    # Sector mask: True at positions belonging to the predicted sector
-    input_ids_range = np.arange(n_input_ids)
-    charged_cat_col = charged_cat.reshape(-1, 1)
-    sector_mask = np.where(charged_cat_col,
-                           input_ids_range < bp_threshold,
-                           input_ids_range >= bp_threshold)
-
-    # Consistency checks
-    assert not np.isnan(all_pdg).any(), "PDG contains NaN"
-    gen_pdg_nan = np.isnan(all_gen_pdg)
-    assert (gen_pdg_nan == np.isnan(all_delta_p)).all(), "isnan(gen_pdg) != isnan(delta_p)"
-    assert (gen_pdg_nan == (all_is_cont == 1)).all(), "isnan(gen_pdg) != (is_cont == 1)"
-
-    is_target = (
-        sector_mask
-        & (all_is_cont != 1)
-        & (all_gen_pdg == all_pdg)
-        & (all_delta_p < delta_p_thresh)
-    )
-
-    # Find the is_target candidate with smallest DeltaP per event
-    delta_p_for_min = np.where(is_target, all_delta_p, np.inf)
-    has_target = is_target.any(axis=1)
-    best_input_id = np.argmin(delta_p_for_min, axis=1)  # valid only where has_target
-
+    has_target = (best_iid >= 0) & (best_dp < delta_p_thresh)
     labels = np.full(n_events, BG_BAD_TAG, dtype=np.int64)
-    labels[has_target] = best_input_id[has_target]
+    labels[has_target] = best_iid[has_target]
 
     # --- Background labels for events without an is_target candidate ---
     no_target = ~has_target
@@ -872,7 +860,7 @@ def main():
     print("Loading and sampling data")
     print("=" * 60)
     print(f"Calibration weight cap (90th percentile): {config.CALIB_WEIGHT_CAP:.4f}")
-    features, bp_truth, b0_truth, mc_var_names, has_inputs, mc_truth_by_input_id_arr = load_and_sample_data(
+    features, bp_truth, b0_truth, mc_var_names, has_inputs, mc_truth_cand = load_and_sample_data(
         args.input,
         fraction=args.fraction,
         cont_fraction=args.cont_fraction,
@@ -955,13 +943,13 @@ def main():
         print(f"  New feature shape: {features_dense.shape}")
 
         # Build mode-prediction labels using category network prediction
-        if mc_truth_by_input_id_arr is None:
+        if mc_truth_cand is None:
             raise ValueError(
-                "mc_truth_by_input_id not found in training data. "
+                "mc_truth_cand not found in training data. "
                 "Re-collect training data with produceTrainingInputs.py."
             )
         labels, train_selection = build_mode_labels(
-            bp_truth, b0_truth, mc_truth_by_input_id_arr, mc_var_names,
+            bp_truth, b0_truth, mc_truth_cand, mc_var_names,
             charged_cat=charged_cat_bool
         )
         num_labels = config.N_INPUT_IDS + 4  # 140

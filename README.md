@@ -32,3 +32,8 @@ just starting out.
 
 More information about the core software can be found in the
 [2018 paper](https://arxiv.org/abs/1809.04299).
+
+**Citing basf2**
+
+If you use the basf2 software, you must properly cite it. Information on how to cite basf2 properly can be
+found [here](https://zenodo.org/records/16267708). 

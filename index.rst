@@ -1,16 +1,19 @@
 Belle II Software Documentation
 ===============================
 
-This document contains documentation of the Belle II software, its command line
-tools and the Python programming interface.
+This document provides documentation for the Belle II software, its command line
+tools and its Python programming interface.
 
 .. note:: Generated on |today| for release |release|, commit |version|.
 
-In case of questions regarding the Belle II software or for additional
-information, please check `Belle II Questions <https://questions.belle2.org>`_.
+.. important:: If you use the Belle II software for your work, you must properly cite it.
+   Information on this can be found on the page `here <https://zenodo.org/records/16267708>`_. 
 
-.. tip:: If you are new to the Belle II software, you might want to take a look
-    at the :ref:`onlinebook`, a series of lessons that get you started in no time!
+.. tip:: If you are new to the Belle II software, you should take a look
+    at the :ref:`onlinebook` to help you get started. 
+
+.. tip:: In case of any questions regarding thee Belle II software, or for additional information,
+   please check the `Belle II Questions <https://questions.belle2.org>`_ forum. 
 
 ----
 
@@ -32,8 +35,8 @@ information, please check `Belle II Questions <https://questions.belle2.org>`_.
 
 .. only:: format_html
 
-  Indices and tables
-  ==================
+  Indexes
+  =======
 
   * :ref:`genindex`
   * :ref:`modindex`

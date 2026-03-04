@@ -114,7 +114,6 @@ class BaseFEISkim(BaseSkim):
 
     ApplyHLTHadronCut = True
     produce_on_tau_samples = True  # Note retention is very close to zero on taupair
-    roundToMdstPrecision = True
 
     @staticmethod
     @lru_cache()

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set Submission Parameters
-export OUTPUT_PATH="tests" # Path where to store the output
+export OUTPUT_PATH="Sampled_Data" # Path where to store the output
 export INPUT_DIRECTORY="/group/belle2/group/physics/TDCPV/TFlaT_Belle/Simulated_Samples_Test/" # Small Dataset for testing purposes
 #export INPUT_DIRECTORY="/group/belle2/group/physics/TDCPV/TFlaT_Belle/Simulated_Samples/" # Entire Dataset of produced mdst files
 
@@ -24,4 +24,4 @@ else
 fi
 
 # For development purposes
-export BELLE2_LOCAL_DIR=/home/belle2/benjamin/development
+#export BELLE2_LOCAL_DIR=/home/belle2/benjamin/development

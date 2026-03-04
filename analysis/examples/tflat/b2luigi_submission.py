@@ -26,11 +26,6 @@ if not INPUT_DIRECTORY:
         "INPUT_DIRECTORY not defined! Make sure config_submission.sh exports INPUT_DIRECTORY."
     )
 
-if not BASF2_VERSION:
-    raise RuntimeError(
-        "BASF2_VERSION not defined! Make sure config_submission.sh exports BASF2_VERSION."
-    )
-
 if not BELLE:
     raise RuntimeError(
         "BELLE not defined! Make sure config_submission.sh exports BELLE."

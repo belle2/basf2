@@ -4,6 +4,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPDigit.h>
 
 namespace Belle2 {
@@ -18,10 +19,10 @@ namespace Belle2 {
     void event() override;
 
   private:
-    /// StoreArray connected to ECL clusters in DataStore
     StoreArray<ECLCluster> m_eclClusters;
     StoreArray<TOPDigit> m_digits;
-
+    StoreArray<MCParticle> m_MCParticles; // for debugging nbar
+    //std:: ;//fitparams?
   };
 
 } // namespace Belle2

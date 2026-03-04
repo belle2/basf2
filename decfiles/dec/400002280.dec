@@ -1,0 +1,16 @@
+# EventType: 400002280
+# Descriptor: [eetopnpipi0]
+# NickName: eetopnpipi0 
+# Cuts: None
+# Documentation: e+ e- ->anti-neutron proton pion pi0
+# PhysicsWG: Dark Sector and Low Multiplicity
+# Tested: Yes
+# Responsible: Savino Longo 
+# Email: Savino.Longo@umanitoba.ca
+# Date: 20260304
+
+Decay vpho
+1.0 n0  anti-p- pi+ pi0 PHSP;
+Enddecay
+
+End

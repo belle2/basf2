@@ -515,10 +515,10 @@ class ModeSelectorModule(b2.Module):
         is_cont = (is_cont_f == 1.0).astype(np.int8)
 
         gen_pdg_f = np.where(bp_is_best == 1, bp_gen_pdg, b0_gen_pdg)
-        gen_pdg = np.where(is_cont == 1, 0.0, np.nan_to_num(gen_pdg_f, nan=0.0))
+        gen_pdg = np.where(is_cont == 1, 0.0, np.nan_to_num(gen_pdg_f, nan=-1))
 
-        bp_dm_i = np.nan_to_num(bp_dm, nan=0.0).astype(np.int16)
-        b0_dm_i = np.nan_to_num(b0_dm, nan=0.0).astype(np.int16)
+        bp_dm_i = np.nan_to_num(bp_dm, nan=-1).astype(np.int16)
+        b0_dm_i = np.nan_to_num(b0_dm, nan=-1).astype(np.int16)
 
         best_bp_sigprob_iid = np.full(n_events, -1, dtype=np.int16)
         best_b0_sigprob_iid = np.full(n_events, -1, dtype=np.int16)

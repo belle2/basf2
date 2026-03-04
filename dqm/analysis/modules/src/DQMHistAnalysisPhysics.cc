@@ -213,7 +213,7 @@ void DQMHistAnalysisPhysicsModule::event()
       fitUpsilonFromHisto(hmUPS, m_cmUPSmumu_text, "M(#mu#mu) [GeV/c^2]", "UPSmumu", m_pvPrefix + "mUPSmumu");
       m_cmUPSmumu->Modified();
       m_cmUPSmumu->Update();
-      CanvasUpdated(m_cmUPSmumu);
+      UpdateCanvas(m_cmUPSmumu);
     }
     auto hmUPSee = getDelta("PhysicsObjects/mUPSe");// check if updated
     if (m_cmUPSee and hmUPSee) {
@@ -221,7 +221,7 @@ void DQMHistAnalysisPhysicsModule::event()
       fitUpsilonFromHisto(hmUPSee, m_cmUPSee_text, "M(ee) [GeV/c^2]", "UPSee", m_pvPrefix + "mUPSee");
       m_cmUPSee->Modified();
       m_cmUPSee->Update();
-      CanvasUpdated(m_cmUPSee);
+      UpdateCanvas(m_cmUPSee);
     }
     auto* m_cphysicsresults = findCanvas("PhysicsObjects/c_physicsresults");
     if (m_cphysicsresults) {

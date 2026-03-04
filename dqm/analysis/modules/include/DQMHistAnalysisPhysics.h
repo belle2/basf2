@@ -69,12 +69,12 @@ namespace Belle2 {
     int m_minEntriesUPSee;
 
     //! Tcanvas for mUPSee
-    TCanvas* m_cmUPSee{}
+    TCanvas* m_cmUPSee{};
     //! Tcanvas for mUPSmumu
-    TCanvas* m_cmUPSmumu{}
+    TCanvas* m_cmUPSmumu{};
 
     //! TPaveText, Ups Invariant Mass (mumu)
-    TPaveText* m_cmUPSumu_text{};
+    TPaveText* m_cmUPSmumu_text{};
     //! TPaveText, Ups ee Invariant Mass
     TPaveText* m_cmUPSee_text{};
 

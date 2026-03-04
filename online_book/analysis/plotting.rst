@@ -18,3 +18,6 @@ for each of these packages are linked below:
 
 - `mplhep <https://mplhep.readthedocs.io/en/latest/guide/>`_ (specifically designed for high energy physics)
 - `matplotlib <https://matplotlib.org/stable/tutorials/index.html>`_ 
+
+.. rubric:: Author(s) of this topic
+    Priyanka Cheema

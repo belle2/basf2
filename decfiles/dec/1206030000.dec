@@ -1,0 +1,80 @@
+# EventType: 1206030000
+# Descriptor: B- -> D_s- X inclusive decays
+# NickName: Bu_DsmX
+# Documentation: B- -> D_s- X inclusive decays
+# Responsible: Varsha Gautam
+# Email: a22ph09007@iitbbs.ac.in
+# Tested: yes
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 04/03/2026
+#
+
+
+
+# Define Aliases
+Alias MyK*0 K*0
+Alias Myanti-K*0 anti-K*0
+ChargeConj MyK*0 Myanti-K*0
+Alias MyK_S0   K_S0
+Alias Myphi   phi
+
+# Upsilon(4S) decay
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+
+Decay B-sig
+0.009009770   D_s- D0                    	 PHOTOS PHSP;
+0.008218450   D_s- D*0               	         PHOTOS SVS;
+0.007600000   D_s*- D0              	         PHOTOS SVS;
+0.017100000   D_s*- D*0                  	 PHOTOS SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
+0.000520000   D_s- D_0*0                 	 PHOTOS PHSP;
+0.000440000   D_s*- D_0*0                 	 PHOTOS SVS;
+0.000430000   D_s- D'_10                  	 PHOTOS SVS;
+0.000910000   D_s*- D'_10                 	 PHOTOS SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
+0.000990000   D_s- D_10                   	 PHOTOS SVS;
+0.002070000   D_s*- D_10                   	 PHOTOS SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
+0.001260000   D_s- D_2*0                   	 PHOTOS STS;
+0.001060000   D_s*- D_2*0                  	 PHOTOS PHSP;
+0.007617290   D_s0*- D0                          PHOTOS PHSP;
+0.017063010   D_s0*- D*0                         PHOTOS SVS;
+0.000450000   D'_s1- D0                          PHOTOS SVS;
+0.000940000   D'_s1- D*0                         PHOTOS SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
+0.003600000   D_s-  D+  pi-                      PHOTOS PHSP;
+0.001800000   D_s-  D0  pi0                      PHOTOS PHSP;
+0.003700000   D_s*- D+  pi-                      PHOTOS PHSP;
+0.001800000   D_s*- D0  pi0                      PHOTOS PHSP;
+0.003300000   D_s-  D+  pi-  pi0                 PHOTOS PHSP;
+0.003300000   D_s-  D0  pi-  pi+                 PHOTOS PHSP;
+0.000800000   D_s-  D0  pi0  pi0                 PHOTOS PHSP;
+0.003300000   D_s*- D+  pi-  pi0                 PHOTOS PHSP;
+0.003300000   D_s*- D0  pi-  pi+                 PHOTOS PHSP;
+0.000800000   D_s*- D0  pi0  pi0                 PHOTOS PHSP;
+0.003091320   D_s1- D0                           PHOTOS SVS;
+0.011960470   D_s1- D*0                          PHOTOS SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
+Enddecay
+CDecay B+sig
+
+Decay D_s-
+0.02250000      Myphi    pi-                     SVS;
+0.02500776      MyK*0    K-                      SVS;
+0.0103698278    MyK_S0   K-                      PHSP;
+Enddecay
+CDecay D_s+
+
+Decay MyK*0
+1.00      K+  pi-                                VSS;
+Enddecay
+CDecay Myanti-K*0
+
+Decay MyK_S0
+1.00    pi+  pi-                                 PHSP;
+Enddecay
+
+Decay Myphi
+1.00  K+   K-                                    VSS;
+Enddecay
+End

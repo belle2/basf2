@@ -17,12 +17,12 @@
 #   basf2 applyModeSelector.py -- [options]                              #
 #                                                                        #
 # Output files:                                                          #
-#   <output>_Bp.pq  - parquet table with B+ candidates                 #
-#   <output>_B0.pq  - parquet table with B0 candidates                 #
+#   <output>.pq  - parquet table with merged B+ and B0 candidates      #
 #                                                                        #
 ##########################################################################
 
 import argparse
+import os
 
 import basf2 as b2
 import modeSelector
@@ -36,12 +36,20 @@ parser.add_argument('--input', nargs='+',
                     default=['/home/pf/dataframes/MC16rd_skim/udst_000001_prod00051442_task230000001.root'],
                     help='Input ROOT file(s) with FEI B meson candidates')
 parser.add_argument('--output', default='modeSelector_output',
-                    help='Output prefix (default: modeSelector_output)')
+                    help='Output parquet filename or stem (default: modeSelector_output)')
 parser.add_argument('--cat-model', default='onnx/modeSelector_cat.onnx',
                     help='Path to category ONNX model')
 parser.add_argument('--main-model', default='onnx/modeSelector_main.onnx',
                     help='Path to main ONNX model')
 args = parser.parse_args()
+
+output_root, output_suffix = os.path.splitext(args.output)
+if output_suffix.lower() in ['.pq', '.parquet']:
+    final_output = args.output
+elif output_suffix != '':
+    final_output = output_root + '.pq'
+else:
+    final_output = args.output + '.pq'
 
 # Set up logging
 b2.set_log_level(b2.LogLevel.INFO)
@@ -125,18 +133,22 @@ modeSelector.modeSelector(
 # only AFTER running modeSelector
 # Rank candidates in each list by two criteria stored for offline comparison:
 # 1. sigProb_rank: pure sigProb ranking (all sigProb>0.01 candidates kept)
-# 2. eqSigProb_rank: BplusScore_eqSigProb in predicted sector, sigProb otherwise
-vm.addAlias('BpEqSigProbRankVar', 'conditionalVariableSelector(BplusScore > 0, extraInfo(BplusScore_eqSigProb), sigProb)')
-vm.addAlias('B0EqSigProbRankVar', 'conditionalVariableSelector(BplusScore < 0, extraInfo(BplusScore_eqSigProb), sigProb)')
+# 2. modeSelector_rank: BplusScore_eqSigProb in predicted sector, sigProb otherwise
+vm.addAlias('BpModeSelectorRankVar', 'conditionalVariableSelector(BplusScore > 0, extraInfo(BplusScore_eqSigProb), sigProb)')
+vm.addAlias('B0ModeSelectorRankVar', 'conditionalVariableSelector(BplusScore < 0, extraInfo(BplusScore_eqSigProb), sigProb)')
 
-for b, eq_rank_var in zip(['B+', 'B0'], ['BpEqSigProbRankVar', 'B0EqSigProbRankVar']):
-    ma.applyCuts(f'{b}:{fei_identifier}', 'sigProb > 0.01', path=my_path)
+for b, eq_rank_var in zip(['B+', 'B0'], ['BpModeSelectorRankVar', 'B0ModeSelectorRankVar']):
     # rank by sigProb (pure), keep all candidates for offline comparison
     ma.rankByHighest(f'{b}:{fei_identifier}', 'sigProb',
                      numBest=0, outputVariable='sigProb_rank', path=my_path)
     # rank by eqSigProb in predicted sector, sigProb in non-predicted sector
     ma.rankByHighest(f'{b}:{fei_identifier}', eq_rank_var,
-                     numBest=0, outputVariable='eqSigProb_rank', path=my_path)
+                     numBest=0, outputVariable='modeSelector_rank', path=my_path)
+
+for b, eq_rank_var in zip(['B+', 'B0'], ['BpModeSelectorRankVar', 'B0ModeSelectorRankVar']):
+    # this cut can remove some eqSigProb best candidates
+    # should be done after ranking for consistency between BplusScore and modeSelector_rank
+    ma.applyCuts(f'{b}:{fei_identifier}', 'sigProb > 0.01', path=my_path)
 
 # sigProb of rank-1 candidate in each list (for cross-sector comparison)
 vm.addAlias('BpSigProb_rank1', 'ifNANgiveX(getVariableByRank(B+:feiHadronic, sigProb, sigProb, 1), -1)')
@@ -155,24 +167,26 @@ vm.addAlias(
 # isBestCandidate_eqSigProb: eqSigProb ranking; rank-1 in the predicted sector only
 vm.addAlias(
     'isBestCandidate_eqSigProb', 'conditionalVariableSelector( \
-    [[BplusScore > 0] and [abs(PDG) == 521] and [eqSigProb_rank == 1]] or \
-    [[BplusScore < 0] and [abs(PDG) == 511] and [eqSigProb_rank == 1]], \
+    [[BplusScore > 0] and [abs(PDG) == 521] and [modeSelector_rank == 1]] or \
+    [[BplusScore < 0] and [abs(PDG) == 511] and [modeSelector_rank == 1]], \
     1, 0)'
 )
+
+vm.addAlias('BplusScore_cat', 'conditionalVariableSelector(BplusScore_catBp > BplusScore_catB0, 1, -1)')
 
 # Keep at most 2 candidates per list: rank-1 by sigProb and rank-1 by eqSigProb.
 # In the non-predicted sector eqSigProb falls back to sigProb, so only 1 is kept there.
 # isBestCandidate_sigProb / isBestCandidate_eqSigProb stored in output for offline selection.
 for b in ['B+', 'B0']:
     ma.applyCuts(f'{b}:{fei_identifier}',
-                 '[sigProb_rank == 1] or [eqSigProb_rank == 1]',
+                 '[sigProb_rank == 1] or [modeSelector_rank == 1]',
                  path=my_path)
 
 
 # Create aliases for cleaner branch names in output ntuple
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
 vm.addAlias('sigProb_rank', 'extraInfo(sigProb_rank)')
-vm.addAlias('eqSigProb_rank', 'extraInfo(eqSigProb_rank)')
+vm.addAlias('modeSelector_rank', 'extraInfo(modeSelector_rank)')
 vm.addAlias('dmID', 'extraInfo(decayModeID)')
 vu.create_aliases(
     ['BplusScore_eqSigProb', 'Dstp_deltaMassDiff', 'Dstp_chiProb', 'Dst0_deltaMassDiff', 'Dst0_chiProb'],
@@ -199,6 +213,8 @@ output_variables = [
     'BplusScore_catB0',
     'BplusScore_catBp',
     'BplusScore_catCont',
+    # +1 if pred charged, else -1
+    'BplusScore_cat',
     # MC truth matching
     'isSignal',
     'PDG',
@@ -212,7 +228,7 @@ output_variables = [
     'Dst0_chiProb',
     # ranking variables
     'sigProb_rank',
-    'eqSigProb_rank',
+    'modeSelector_rank',
     'isBestCandidate_sigProb',
     'isBestCandidate_eqSigProb',
     # 'useCMSFrame(False)',
@@ -220,15 +236,36 @@ output_variables = [
     # 'nTrackFitResults(blah)',
 ]
 
-# Write output parquet tables for B+ and B0 candidates
-for b_str, b_pdg in [('Bp', 'B+'), ('B0', 'B0')]:
-    v2t = VariablesToTable(
-        f'{b_pdg}:feiHadronic',
-        variables=output_variables,
-        filename=f'{args.output}_{b_str}.pq',
-        event_buffer_size=500_000,
+# Wrap B+ and B0 in a common Upsilon(4S) candidate and merge lists
+for b, b_str in zip(['B+', 'B0'], ['Bp', 'B0']):
+    ma.reconstructDecay(
+        f'Upsilon(4S):{b_str} -> {b}:{fei_identifier}',
+        '',
+        allowChargeViolation=True,
+        path=my_path
     )
-    my_path.add_module(v2t)
+
+ma.copyLists(
+    outputListName='Upsilon(4S):all',
+    inputListNames=['Upsilon(4S):Bp', 'Upsilon(4S):B0'],
+    path=my_path
+)
+
+# Save daughter(0, ...) variables with B_ prefix in output columns
+merged_output_variables = vu.create_daughter_aliases(
+    output_variables,
+    [0],
+    prefix='B',
+    include_indices=False
+)
+
+v2t = VariablesToTable(
+    'Upsilon(4S):all',
+    variables=merged_output_variables,
+    filename=final_output,
+    event_buffer_size=500_000,
+)
+my_path.add_module(v2t)
 
 # Process events
 b2.process(my_path)

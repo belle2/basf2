@@ -39,7 +39,14 @@ The parameters set in the yaml config file are optimized for a A100 GPU and 120G
    - Download the resulting ntuples
 
    **Alternatively, sample Belle training data locally**
-   - Run sampler script locally
+   - Run b2setup on the basf2 development version and go to folder `analysis/examples/tflat`
+   ```bash
+    source config_submission.sh
+    basf2 b2luigi_submission.py
+    mkdir Sampled_Data2
+    cp Sampled_Data/key=TFLaT/*/*.root  Sampled_Data2
+    ```
+   - The folder `Sampled_Data2` will contain all sampled root files needed for the next step.
 
 3. **Prepare training data**
    - The training samples need to be split into a training and validation dataset.

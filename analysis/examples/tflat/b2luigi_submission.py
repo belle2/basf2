@@ -59,7 +59,8 @@ def get_all_file_paths(directory):
     file_paths = []
     for root, _, files in os.walk(directory):
         for file in files:
-            if file.endswith(".mdst"):
+            ext = file.rsplit(".", 1)[-1]
+            if ext == "mdst" or ext.startswith("mdst-"):
                 file_paths.append(os.path.join(root, file))
 
     if not file_paths:

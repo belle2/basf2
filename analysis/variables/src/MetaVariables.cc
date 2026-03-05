@@ -3470,13 +3470,15 @@ namespace Belle2 {
 
       std::string arg = arguments[0];
       TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(arg.c_str());
-      int absPdg;
+      int absPdg = 0;
       if (part != nullptr) {
         absPdg = std::abs(part->PdgCode());
       } else {
         try {
-          absPdg = convertString<int>(arg);
-        } catch (std::exception& e) {}
+          absPdg = std::abs(convertString<int>(arg));
+        } catch (std::exception& e) {
+          B2FATAL("nTrackFitResults: argument '" << arg << "' is neither a valid particle name nor a PDG code");
+        }
       }
 
       auto func = [absPdg](const Particle*) -> int {

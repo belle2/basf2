@@ -166,6 +166,11 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     if not input_files:
         raise ValueError("No input files found.")
 
+    parent_dirs = sorted({os.path.dirname(os.path.abspath(f)) for f in input_files})
+    print("Resolved input parent directories:")
+    for d in parent_dirs:
+        print(f"  {d}")
+
     # Preflight: verify all archives have required keys before parallel loading starts.
     required_keys = (
         'is_cont', 'gen_pdg', 'bp_is_best', 'best_sigprob',
@@ -690,7 +695,7 @@ class SparseDataset(torch.utils.data.Dataset):
     Slower than dense loading but significantly more memory-efficient.
     """
 
-    def __init__(self, features_sparse, labels, mbc_values=None):
+    def __init__(self, features_sparse, labels, mbc_values=None, extra_features=None):
         """
         Parameters
         ----------
@@ -700,19 +705,23 @@ class SparseDataset(torch.utils.data.Dataset):
             Target labels
         mbc_values : np.ndarray, optional, shape (n_samples,)
             Mbc values per event (for DisCo loss)
+        extra_features : np.ndarray, optional, shape (n_samples, n_extra)
+            Additional dense features concatenated per sample
         """
         self.features = features_sparse.tocsr()
         self.labels = labels
         self.mbc_values = mbc_values
+        self.extra_features = extra_features
 
     def __len__(self):
         return self.features.shape[0]
 
     def __getitem__(self, idx):
         # Convert sparse row to dense 1D tensor
-        feature_row = torch.from_numpy(
-            self.features[idx].toarray().astype(np.float32).squeeze()
-        )
+        feature_row = self.features[idx].toarray().astype(np.float32).squeeze()
+        if self.extra_features is not None:
+            feature_row = np.concatenate([feature_row, self.extra_features[idx]]).astype(np.float32)
+        feature_row = torch.from_numpy(feature_row)
         label = torch.tensor(self.labels[idx], dtype=torch.long)
 
         if self.mbc_values is not None:
@@ -755,6 +764,44 @@ def build_category_labels(is_cont, gen_pdg):
         2,
         np.where(abs_gen_pdg == 521, 1, 0)
     ).astype(np.int64)
+
+
+def generate_category_outputs(cat_model, features, batch_size, device, use_sparse):
+    """
+    Generate category softmax outputs for all samples.
+
+    Parameters
+    ----------
+    cat_model : nn.Module
+        Trained category model in eval mode
+    features : scipy.sparse matrix or np.ndarray
+        Input feature matrix
+    batch_size : int
+        Batch size for inference
+    device : torch.device
+        Device to use
+    use_sparse : bool
+        Whether features is sparse and should be densified batch-wise
+
+    Returns
+    -------
+    np.ndarray
+        Category softmax outputs with shape (n_samples, 3)
+    """
+    print("\nGenerating category outputs...")
+    n_samples = features.shape[0]
+    cat_outputs = []
+    with torch.no_grad():
+        for i in tqdm(range(0, n_samples, batch_size), desc="  Processing batches"):
+            batch_slice = slice(i, i + batch_size)
+            if use_sparse:
+                batch_np = features[batch_slice].toarray().astype(np.float32)
+            else:
+                batch_np = features[batch_slice]
+            batch = torch.from_numpy(batch_np).to(device)
+            cat_out = torch.softmax(cat_model(batch), dim=1)
+            cat_outputs.append(cat_out.cpu().numpy())
+    return np.vstack(cat_outputs)
 
 
 def main():
@@ -817,6 +864,7 @@ def main():
     print(f"\nFeature matrix shape: {features.shape}")
     print(f"  Sparse matrix memory: {features.data.nbytes / 1024**2:.1f} MB")
     print(f"  Selected features (has_inputs): {len(has_inputs)}")
+    sparse_extra_features = None
 
     # Build labels
     print("\nBuilding labels...")
@@ -854,22 +902,18 @@ def main():
         cat_model.eval()
         print(f"  Category model loaded (epoch {cat_checkpoint['epoch']+1})")
 
-        # Convert to dense for category prediction
-        print("\nConverting to dense arrays...")
-        features_dense = features.toarray().astype(np.float32)
-
-        # Generate category outputs for all samples
-        print("\nGenerating category outputs...")
-        cat_outputs = []
-        with torch.no_grad():
-            for i in tqdm(range(0, len(features_dense), args.batch_size),
-                          desc="  Processing batches"):
-                batch = torch.from_numpy(
-                    features_dense[i:i + args.batch_size]
-                ).to(device)
-                cat_out = torch.softmax(cat_model(batch), dim=1)
-                cat_outputs.append(cat_out.cpu().numpy())
-        cat_outputs = np.vstack(cat_outputs)
+        if not args.use_sparse:
+            print("\nConverting to dense arrays...")
+            features_dense = features.toarray().astype(np.float32)
+            cat_outputs = generate_category_outputs(
+                cat_model, features_dense, args.batch_size, device, use_sparse=False
+            )
+        else:
+            print("\nUsing sparse data loading (memory-efficient)...")
+            features_dense = None
+            cat_outputs = generate_category_outputs(
+                cat_model, features, args.batch_size, device, use_sparse=True
+            )
 
         print(f"  Category outputs shape: {cat_outputs.shape}")
         print("  Category predictions:")
@@ -882,12 +926,13 @@ def main():
         charged_cat_bool = cat_outputs[:, 1] > cat_outputs[:, 0]
         charged_cat = charged_cat_bool.astype(np.float32)
 
-        # Concatenate category outputs + charged_cat flag to features
-        print("\nConcatenating category outputs to features...")
-        features_with_cat = np.hstack([features_dense, cat_outputs, charged_cat.reshape(-1, 1)])
-        features_dense = features_with_cat
-        input_size = features_dense.shape[1]
-        print(f"  New feature shape: {features_dense.shape}")
+        # Add category outputs + charged_cat flag to features
+        print("\nAppending category outputs to input features...")
+        cat_augments = np.hstack([cat_outputs, charged_cat.reshape(-1, 1)]).astype(np.float32)
+        input_size = features.shape[1] + cat_augments.shape[1]
+        print(f"  New feature size: {input_size}")
+        if features_dense is not None:
+            features_dense = np.hstack([features_dense, cat_augments]).astype(np.float32)
 
         # Build mode-prediction labels using category network prediction
         if mc_truth_cand is None:
@@ -914,8 +959,12 @@ def main():
         mbc_values = None
 
         # Apply train_selection: drop events where the category-selected candidate type has no candidate
-        n_before = len(features_dense)
-        features_dense = features_dense[train_selection]
+        n_before = len(labels)
+        if features_dense is not None:
+            features_dense = features_dense[train_selection]
+        else:
+            features = features[train_selection]
+            sparse_extra_features = cat_augments[train_selection]
         labels = labels[train_selection]
         if mbc_values is not None:
             mbc_values = mbc_values[train_selection]
@@ -928,7 +977,7 @@ def main():
 
     # Train/val split
     print(f"\nSplitting train/val (val_split={args.val_split})...")
-    n_events = features.shape[0] if features_dense is None else len(features_dense)
+    n_events = len(labels) if features_dense is None else len(features_dense)
     n_val = int(n_events * args.val_split)
     n_train = n_events - n_val
 
@@ -949,11 +998,13 @@ def main():
 
     # Create dataloaders (sparse or dense)
     if features_dense is None:
-        # Sparse loading: category network only
+        # Sparse loading (category and main networks)
         mbc_train_np = mbc_train.numpy() if mbc_train is not None else None
         mbc_val_np = mbc_val.numpy() if mbc_val is not None else None
-        train_dataset = SparseDataset(features[train_idx], labels[train_idx], mbc_train_np)
-        val_dataset = SparseDataset(features[val_idx], labels[val_idx], mbc_val_np)
+        train_extra = sparse_extra_features[train_idx] if sparse_extra_features is not None else None
+        val_extra = sparse_extra_features[val_idx] if sparse_extra_features is not None else None
+        train_dataset = SparseDataset(features[train_idx], labels[train_idx], mbc_train_np, train_extra)
+        val_dataset = SparseDataset(features[val_idx], labels[val_idx], mbc_val_np, val_extra)
         drop_last = len(train_dataset) > args.batch_size
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
                                   collate_fn=sparse_collate_fn, num_workers=args.num_workers,

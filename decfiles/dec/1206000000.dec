@@ -38,23 +38,23 @@ Decay B-sig
 0.000990000   D_10  D_s-                     PHOTOS SVS;
 0.002070000   D_10  D_s*-                  	 PHOTOS SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
 0.001260000   D_2*0 D_s-                  	 PHOTOS STS;
-0.001060000   D_2*0 D_s*-                   	 PHOTOS PHSP;
-0.007617290   D_s0*- D0                          PHOTOS PHSP;
-0.017063010   D_s0*- D*0                         PHOTOS SVS;
-0.000450000   D'_s1- D0                          PHOTOS SVS;
-0.000940000   D'_s1- D*0                         PHOTOS SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
-0.003600000   D_s-  D+  pi-                      PHOTOS PHSP;
-0.001800000   D_s-  D0  pi0                      PHOTOS PHSP;
-0.003700000   D_s*- D+  pi-                      PHOTOS PHSP;
-0.001800000   D_s*- D0  pi0                      PHOTOS PHSP;
-0.003300000   D_s-  D+  pi-  pi0                 PHOTOS PHSP;
-0.003300000   D_s-  D0  pi-  pi+                 PHOTOS PHSP;
-0.000800000   D_s-  D0  pi0  pi0                 PHOTOS PHSP;
-0.003300000   D_s*- D+  pi-  pi0                 PHOTOS PHSP;
-0.003300000   D_s*- D0  pi-  pi+                 PHOTOS PHSP;
-0.000800000   D_s*- D0  pi0  pi0                 PHOTOS PHSP;
-0.003091320   D_s1- D0                           PHOTOS SVS;
-0.011960470   D_s1- D*0                          PHOTOS SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
+0.001060000   D_2*0 D_s*-                    PHOTOS PHSP;
+0.007617290   D0  D_s0*-                     PHOTOS PHSP;
+0.017063010   D*0  D_s0*-                    PHOTOS SVS;
+0.000450000   D'_s1- D0                      PHOTOS SVS;
+0.000940000   D*0   D'_s1-                   PHOTOS SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
+0.003600000   D_s-  D+  pi-                  PHOTOS PHSP;
+0.001800000   D_s-  D0  pi0                   PHOTOS PHSP;
+0.003700000   D_s*- D+  pi-                   PHOTOS PHSP;
+0.001800000   D_s*- D0  pi0                   PHOTOS PHSP;
+0.003300000   D_s-  D+  pi-  pi0              PHOTOS PHSP;
+0.003300000   D_s-  D0  pi-  pi+              PHOTOS PHSP;
+0.000800000   D_s-  D0  pi0  pi0              PHOTOS PHSP;
+0.003300000   D_s*- D+  pi-  pi0              PHOTOS PHSP;
+0.003300000   D_s*- D0  pi-  pi+              PHOTOS PHSP;
+0.000800000   D_s*- D0  pi0  pi0              PHOTOS PHSP;
+0.003091320   D_s1- D0                        PHOTOS SVS;
+0.011960470   D*0 D_s1-                       PHOTOS SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
 Enddecay
 CDecay B+sig
 

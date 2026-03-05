@@ -34,7 +34,7 @@ def buildROE(path):
     ma.buildRestOfEvent(target_list_name='B0:sig', path=path)
 
 
-def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False):
+def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False, sampler_id=0):
     '''
     Samples a chunk of training data for TFlat
     '''
@@ -68,6 +68,7 @@ def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False):
         mode='Sampler',
         working_dir=working_dir,
         uniqueIdentifier=uniqueIdentifier,
+        sampler_id=sampler_id,
         path=path)
     ma.summaryOfLists(particleLists=['B0:sig'], path=path)
     b2.process(path)

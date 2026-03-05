@@ -114,6 +114,7 @@ class RecoTask(b2luigi.Task):
             uniqueIdentifier=UNIQUEIDENTIFIER,
             inputfile=inputfile,
             working_dir=output_path,
+            sampler_id=self.num,
             is_belle=BELLE
         )
 

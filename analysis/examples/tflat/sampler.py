@@ -53,6 +53,7 @@ def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False, sampler
         # Load and convert input files
         convertBelleMdstToBelleIIMdst(
             inputBelleMDSTFile=inputfile,
+            applySkim=False,
             enableLocalDB=False,
             generatorLevelMCMatching=False,
             path=path)

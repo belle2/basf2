@@ -146,7 +146,8 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
             roe_path,
             dead_end_path)
 
-        path.add_module('FlavorTaggerInfoBuilder')
+        if 'FlavorTaggerInfoBuilder' not in path:
+            path.add_module('FlavorTaggerInfoBuilder')
 
         fill_particle_lists(config, maskName, roe_path)
 

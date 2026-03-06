@@ -57,7 +57,7 @@ def merge_root_to_parquet(root_dir, parquet_dir, mask_value, uniqueIdentifier, t
         writer.write_table(table)
 
     writer.close()
-    print(f'Number of events: {n_rows}')
+    print(f'\nNumber of events: {n_rows}')
 
 
 def create_dataset(pf, parquet_path, index, chunk_size, n_rowgroups, rowgroup_edges):
@@ -111,7 +111,7 @@ def shuffle_and_chunk_parquet(parquet_dir, val_split, chunk_size, uniqueIdentifi
     n_training_samples = int(n_rows*val_split)
     index_training = index[:n_training_samples]
     index_validation = index[n_training_samples:]
-    print('\nCreating training dataset')
+    print('Creating training dataset')
     create_dataset(
         pf,
         os.path.join(

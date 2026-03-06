@@ -56,8 +56,8 @@ ma.inputMdstList(filelist=args.input, path=my_path)
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # Apply event fraction cuts using eventRandom.
-# BB events: 30% base fraction. Continuum: additionally downsampled by cont_fraction.
-BASE_FRACTION = 0.3
+# BB events: 40% base fraction. Continuum: additionally downsampled by cont_fraction.
+BASE_FRACTION = 0.4
 CONT_FRACTION = BASE_FRACTION * args.cont_fraction
 b2.B2INFO(f"Applying event cuts: BB fraction={BASE_FRACTION}, continuum fraction={CONT_FRACTION}")
 ma.applyEventCuts(

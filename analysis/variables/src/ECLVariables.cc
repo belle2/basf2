@@ -1964,11 +1964,19 @@ during the calculation of the `distanceToMcKl` variable.
     This requires the `getNeutralHadronGeomMatches` function to be used.
 )DOC");
   REGISTER_VARIABLE("clusterTimeNorm90", eclClusterTimeNorm90,R"DOC(
-Returns cluster's timing normalized such that :math:`90\%` of real photons will 
-have :math:`|\text{clusterTimeNorm90}| < 1`. Normalization depends on energy, background
-level, and cellID, and differs for data and MC. Calculated only for crystals within the CDC acceptance, :math:`161 <= |\text{clusterCellID}| <= 8608`; outside this region, :math:`1.5*\text{clusterTiming}/\text{clusterErrorTiming}` is returned. Typical requirement is :math:`|\text{clusterTimeNorm90}|<3`. 
+Returns a normalised version of `clusterTiming` such that :math:`90\%` of real photons will 
+have :math:`|\text{timing\ normalised}| < 1`. 
 
-Note: the required payloads are stored in the neutrals global tag. Please find the latest recommendation using :ref:`b2help-recommendation`.
+This is calculated only for crystals within the CDC acceptance (:math:`161 \leq` `clusterCellID` :math:`\leq 8608`). Outside
+this region, :math:`1.5 \times` `clusterTiming` / `clusterErrorTiming` is returned. The normalisation depends on the photon
+energy, beam background level and cell ID. It also differs for data and MC. 
+
+.. tip::
+    A typical requirement for this variable is :math:`|\text{timing\ normalised}| < 3` 
+
+.. attention:
+    The required payloads for this variable are stored in the Neutrals global tag. The recommended global tag to use can be
+    found on the `Performance Recommendations Webpage <https://belle2.pages.desy.de/performance/recommendations/>`_.
 
 )DOC", "dimensionless");
 

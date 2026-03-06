@@ -82,6 +82,10 @@ class ModeSelectorModule(b2.Module):
         self._tr_event_best = {name: [] for name in self.TR_EVENT_BEST_FIELDS}
         self._tr_bp = {name: [] for name in self.TR_BEST_FIELDS}
         self._tr_b0 = {name: [] for name in self.TR_BEST_FIELDS}
+        self._tr_sig_input_ids = []
+        self._tr_sig_btag_index = []
+        self._tr_sig_delta_p = []
+        self._tr_sig_sigprob = []
         #: Debug mode
         self.debug = debug
         #: Max events to debug
@@ -253,11 +257,28 @@ class ModeSelectorModule(b2.Module):
         n_candidates = len(candidates_data)
         event_feat_values.append(n_candidates / 10.0)
 
-        # Best candidate overall (highest sigProb among unique input_ids), for debug only
+        # Find best candidate (highest sigProb) using deduped data
         if best_by_input_id:
+            # Best candidate overall (highest sigProb among unique input_ids)
             max_input_id = max(best_by_input_id.keys(), key=lambda k: best_by_input_id[k][1])
+
+            # Best candidate in B+ sector (input_id < N_BP_MODES * 2) and B0 sector (>= N_BP_MODES * 2)
+            bp_sector_ids = {k: v for k, v in best_by_input_id.items() if k < config.N_BP_MODES * 2}
+            b0_sector_ids = {k: v for k, v in best_by_input_id.items() if k >= config.N_BP_MODES * 2}
+
+            best_is_bp = max_input_id < config.N_BP_MODES * 2
+            if best_is_bp and b0_sector_ids:
+                scnd_max_input_id = max(b0_sector_ids.keys(), key=lambda k: b0_sector_ids[k][1])
+            elif not best_is_bp and bp_sector_ids:
+                scnd_max_input_id = max(bp_sector_ids.keys(), key=lambda k: bp_sector_ids[k][1])
+            else:
+                scnd_max_input_id = -10
         else:
             max_input_id = 0
+            scnd_max_input_id = -10
+
+        event_feat_values.append(max_input_id / 50.0)
+        event_feat_values.append(scnd_max_input_id / 50.0)
 
         # Add experiment number (from EventMetaData)
         event_meta = Belle2.PyStoreObj('EventMetaData')
@@ -389,7 +410,7 @@ class ModeSelectorModule(b2.Module):
         n_candidate_features = n_blocks * self.n_input_ids
         event_feat_start = n_candidate_features
         print(f"\n--- Event-level features (indices {event_feat_start}+) ---")
-        event_feat_names = self.event_features + ['ncandidates/10', '__experiment__/10']
+        event_feat_names = self.event_features + ['ncandidates/10', 'max_input_id/50', 'scnd_max_input_id/50', '__experiment__/10']
         for i, name in enumerate(event_feat_names):
             idx = event_feat_start + i
             if idx < len(all_features):
@@ -493,6 +514,24 @@ class ModeSelectorModule(b2.Module):
         bp_tag_is_gen = ((~np.isnan(bp_pdg)) & (~np.isnan(bp_tag_pdg)) & (bp_tag_pdg == bp_pdg)).astype(np.int8)
         b0_tag_is_gen = ((~np.isnan(b0_pdg)) & (~np.isnan(b0_tag_pdg)) & (b0_tag_pdg == b0_pdg)).astype(np.int8)
 
+        # Packed per-event input_id lists where isSignal == 1 on the deduplicated
+        # candidate set (particle_by_input_id). Event i list is:
+        #   sig_input_ids_values[sig_input_ids_offsets[i]:sig_input_ids_offsets[i+1]]
+        sig_lengths = np.asarray([len(ids) for ids in self._tr_sig_input_ids], dtype=np.int32)
+        sig_input_ids_offsets = np.empty(n_events + 1, dtype=np.int32)
+        sig_input_ids_offsets[0] = 0
+        np.cumsum(sig_lengths, out=sig_input_ids_offsets[1:])
+        if sig_input_ids_offsets[-1] > 0:
+            sig_input_ids_values = np.concatenate(self._tr_sig_input_ids).astype(np.int16, copy=False)
+            sig_btag_index_values = np.concatenate(self._tr_sig_btag_index).astype(np.int16, copy=False)
+            sig_delta_p_values = np.concatenate(self._tr_sig_delta_p).astype(np.float32, copy=False)
+            sig_sigprob_values = np.concatenate(self._tr_sig_sigprob).astype(np.float32, copy=False)
+        else:
+            sig_input_ids_values = np.empty(0, dtype=np.int16)
+            sig_btag_index_values = np.empty(0, dtype=np.int16)
+            sig_delta_p_values = np.empty(0, dtype=np.float32)
+            sig_sigprob_values = np.empty(0, dtype=np.float32)
+
         sparse.save_npz(self.training_output.replace('.npz', '_features.npz'), sparse_features)
         np.savez_compressed(self.training_output,
                             is_cont=is_cont,
@@ -506,7 +545,12 @@ class ModeSelectorModule(b2.Module):
                             best_bp_iid=best_bp_iid,
                             best_bp_dp=best_bp_dp,
                             best_b0_iid=best_b0_iid,
-                            best_b0_dp=best_b0_dp)
+                            best_b0_dp=best_b0_dp,
+                            sig_input_ids_values=sig_input_ids_values,
+                            sig_input_ids_offsets=sig_input_ids_offsets,
+                            sig_btag_index_values=sig_btag_index_values,
+                            sig_delta_p_values=sig_delta_p_values,
+                            sig_sigprob_values=sig_sigprob_values)
 
         n_bp_signal = int((best_bp_iid >= 0).sum())
         n_b0_signal = int((best_b0_iid >= 0).sum())
@@ -621,6 +665,23 @@ class ModeSelectorModule(b2.Module):
                     if (best_b0_iid < 0) or (dp < best_b0_dp):
                         best_b0_iid = int(iid)
                         best_b0_dp = dp
+
+            sig_rows = []
+            for iid, particle in particle_by_input_id.items():
+                is_signal = vm.evaluate('isSignal', particle)
+                if not np.isnan(is_signal) and int(is_signal) == 1:
+                    btag_index = vm.evaluate('mostcommonBTagIndex', particle)
+                    delta_p = vm.evaluate('mostcommonBTagDeltaP', particle)
+                    sig_prob = vm.evaluate('extraInfo(SignalProbability)', particle)
+                    btag_index_i = -1 if np.isnan(btag_index) else int(btag_index)
+                    delta_p_f = np.inf if np.isnan(delta_p) else float(delta_p)
+                    sig_prob_f = -1.0 if np.isnan(sig_prob) else float(sig_prob)
+                    sig_rows.append((int(iid), btag_index_i, delta_p_f, sig_prob_f))
+            sig_rows.sort(key=lambda row: row[0])
+            self._tr_sig_input_ids.append(np.asarray([row[0] for row in sig_rows], dtype=np.int16))
+            self._tr_sig_btag_index.append(np.asarray([row[1] for row in sig_rows], dtype=np.int16))
+            self._tr_sig_delta_p.append(np.asarray([row[2] for row in sig_rows], dtype=np.float32))
+            self._tr_sig_sigprob.append(np.asarray([row[3] for row in sig_rows], dtype=np.float32))
 
             event_best_row = {
                 'best_bp_iid': best_bp_iid,

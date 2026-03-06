@@ -151,6 +151,11 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         Per-event arrays of shape (n_events,). best_bp_iid/b0_iid are int16 with
         sentinel -1 when no qualifying candidate exists; best_bp_dp/b0_dp are float32
         with sentinel inf. Pre-filtered: gen_pdg == pdg and is_cont != 1.
+    sig_truth : tuple (sig_input_ids_values, sig_input_ids_offsets,
+                       sig_btag_index_values, sig_delta_p_values, sig_sigprob_values)
+        Packed ragged arrays of per-event isSignal==1 candidates on deduplicated
+        input_ids. Event i slice is values[offsets[i]:offsets[i+1]] and aligned
+        across all *_values arrays.
     """
 
     if isinstance(input_files, str):
@@ -176,7 +181,9 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         'is_cont', 'gen_pdg', 'bp_is_best', 'best_sigprob',
         'best_bp_sigprob_iid', 'best_b0_sigprob_iid',
         'bp_tag_is_gen', 'b0_tag_is_gen',
-        'best_bp_iid', 'best_bp_dp', 'best_b0_iid', 'best_b0_dp'
+        'best_bp_iid', 'best_bp_dp', 'best_b0_iid', 'best_b0_dp',
+        'sig_input_ids_values', 'sig_input_ids_offsets',
+        'sig_btag_index_values', 'sig_delta_p_values', 'sig_sigprob_values'
     )
     preflight_errors = []
     for input_file in input_files:
@@ -233,6 +240,11 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         best_bp_dp = data['best_bp_dp']
         best_b0_iid = data['best_b0_iid']
         best_b0_dp = data['best_b0_dp']
+        sig_input_ids_values = data['sig_input_ids_values']
+        sig_input_ids_offsets = data['sig_input_ids_offsets']
+        sig_btag_index_values = data['sig_btag_index_values']
+        sig_delta_p_values = data['sig_delta_p_values']
+        sig_sigprob_values = data['sig_sigprob_values']
 
         event_calib_bp, event_calib_b0 = compute_event_calib(
             best_bp_sigprob_iid, best_b0_sigprob_iid,
@@ -252,18 +264,46 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         file_rng = np.random.default_rng(seed)
         sampled = (file_rng.random(len(best_sigprob)) < sample_prob) & presel
 
+        keep_events = np.flatnonzero(sampled).astype(np.int32)
+
+        def _subset_packed(values, offsets, keep):
+            out_offsets = np.empty(len(keep) + 1, dtype=np.int32)
+            out_offsets[0] = 0
+            chunks = []
+            total_len = 0
+            for i, evt_idx in enumerate(keep):
+                start = int(offsets[evt_idx])
+                end = int(offsets[evt_idx + 1])
+                chunk = values[start:end]
+                chunks.append(chunk)
+                total_len += (end - start)
+                out_offsets[i + 1] = total_len
+            if total_len > 0:
+                out_values = np.concatenate(chunks).astype(values.dtype, copy=False)
+            else:
+                out_values = np.empty(0, dtype=values.dtype)
+            return out_values, out_offsets
+
+        sig_iid_v_s, sig_off_s = _subset_packed(sig_input_ids_values, sig_input_ids_offsets, keep_events)
+        sig_btag_v_s, _ = _subset_packed(sig_btag_index_values, sig_input_ids_offsets, keep_events)
+        sig_dp_v_s, _ = _subset_packed(sig_delta_p_values, sig_input_ids_offsets, keep_events)
+        sig_sigprob_v_s, _ = _subset_packed(sig_sigprob_values, sig_input_ids_offsets, keep_events)
+
         return (feats[sampled],
                 is_cont[sampled], gen_pdg[sampled], bp_is_best[sampled], best_sigprob[sampled],
                 best_bp_sigprob_iid[sampled], best_b0_sigprob_iid[sampled],
                 n_clipped,
                 best_bp_iid[sampled], best_bp_dp[sampled],
-                best_b0_iid[sampled], best_b0_dp[sampled])
+                best_b0_iid[sampled], best_b0_dp[sampled],
+                sig_iid_v_s, sig_off_s, sig_btag_v_s, sig_dp_v_s, sig_sigprob_v_s)
 
     features_list = []
     is_cont_list, gen_pdg_list, bp_is_best_list, best_sigprob_list = [], [], [], []
     best_bp_sigprob_iid_list, best_b0_sigprob_iid_list = [], []
     best_bp_iid_list, best_bp_dp_list = [], []
     best_b0_iid_list, best_b0_dp_list = [], []
+    sig_input_ids_values_list, sig_input_ids_offsets_list = [], []
+    sig_btag_index_values_list, sig_delta_p_values_list, sig_sigprob_values_list = [], [], []
     total_clipped = 0
     total_events = 0
 
@@ -278,7 +318,8 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
          is_cont_r, gen_pdg_r, bp_is_best_r, best_sigprob_r,
          best_bp_sigprob_iid_r, best_b0_sigprob_iid_r,
          n_clipped,
-         bp_iid, bp_dp, b0_iid, b0_dp) = result
+         bp_iid, bp_dp, b0_iid, b0_dp,
+         sig_iid_v, sig_off, sig_btag_v, sig_dp_v, sig_sigprob_v) = result
         features_list.append(feats)
         is_cont_list.append(is_cont_r)
         gen_pdg_list.append(gen_pdg_r)
@@ -290,6 +331,11 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         best_bp_dp_list.append(bp_dp)
         best_b0_iid_list.append(b0_iid)
         best_b0_dp_list.append(b0_dp)
+        sig_input_ids_values_list.append(sig_iid_v)
+        sig_input_ids_offsets_list.append(sig_off)
+        sig_btag_index_values_list.append(sig_btag_v)
+        sig_delta_p_values_list.append(sig_dp_v)
+        sig_sigprob_values_list.append(sig_sigprob_v)
         total_clipped += n_clipped
         total_events += len(is_cont_r)
 
@@ -367,9 +413,54 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         np.concatenate(best_b0_iid_list),
         np.concatenate(best_b0_dp_list),
     )
+    if sig_input_ids_offsets_list:
+        global_offsets = [0]
+        shift = 0
+        for file_offsets in sig_input_ids_offsets_list:
+            global_offsets.extend((file_offsets[1:] + shift).tolist())
+            shift = global_offsets[-1]
+        sig_input_ids_offsets = np.asarray(global_offsets, dtype=np.int32)
+    else:
+        sig_input_ids_offsets = np.zeros(features.shape[0] + 1, dtype=np.int32)
+
+    if sig_input_ids_values_list:
+        sig_input_ids_values = np.concatenate(sig_input_ids_values_list).astype(np.int16, copy=False)
+        sig_btag_index_values = np.concatenate(sig_btag_index_values_list).astype(np.int16, copy=False)
+        sig_delta_p_values = np.concatenate(sig_delta_p_values_list).astype(np.float32, copy=False)
+        sig_sigprob_values = np.concatenate(sig_sigprob_values_list).astype(np.float32, copy=False)
+    else:
+        sig_input_ids_values = np.empty(0, dtype=np.int16)
+        sig_btag_index_values = np.empty(0, dtype=np.int16)
+        sig_delta_p_values = np.empty(0, dtype=np.float32)
+        sig_sigprob_values = np.empty(0, dtype=np.float32)
+
+    if len(sig_input_ids_offsets) != features.shape[0] + 1:
+        raise ValueError(
+            f"sig_input_ids_offsets length mismatch: got {len(sig_input_ids_offsets)}, "
+            f"expected {features.shape[0] + 1}"
+        )
+    expected_n = int(sig_input_ids_offsets[-1])
+    for name, arr in (
+        ('sig_input_ids_values', sig_input_ids_values),
+        ('sig_btag_index_values', sig_btag_index_values),
+        ('sig_delta_p_values', sig_delta_p_values),
+        ('sig_sigprob_values', sig_sigprob_values),
+    ):
+        if len(arr) != expected_n:
+            raise ValueError(
+                f"{name} length mismatch: got {len(arr)}, expected {expected_n} from offsets"
+            )
+
+    sig_truth = (
+        sig_input_ids_values,
+        sig_input_ids_offsets,
+        sig_btag_index_values,
+        sig_delta_p_values,
+        sig_sigprob_values,
+    )
     event_scalars = (is_cont, gen_pdg, bp_is_best, best_sigprob,
                      best_bp_sigprob_iid, best_b0_sigprob_iid)
-    return (features, event_scalars, has_inputs, mc_truth_cand)
+    return (features, event_scalars, has_inputs, mc_truth_cand, sig_truth)
 
 
 class MultiClassNet(nn.Module):
@@ -610,7 +701,7 @@ def distance_corr(var_1, var_2, normedweight=None, power=1):
     return dCorr
 
 
-def build_mode_labels(mc_truth_cand, charged_cat, is_cont, gen_pdg,
+def build_mode_labels(mc_truth_cand, sig_truth, charged_cat, is_cont, gen_pdg,
                       best_bp_sigprob_iid, best_b0_sigprob_iid,
                       delta_p_thresh=0.15):
     """
@@ -623,17 +714,23 @@ def build_mode_labels(mc_truth_cand, charged_cat, is_cont, gen_pdg,
     - N_INPUT_IDS+2 (138): continuum
 
     Signal label assignment per event:
-    1. Use charged_cat to select the predicted B sector (B+ or B0).
-    2. Among all candidates in that sector, find the one with smallest
-       mostcommonBTagDeltaP that satisfies mostcommonBTagPDG == PDG and is not
-       continuum. If found and DeltaP < delta_p_thresh: label = that input_id.
-    3. Otherwise assign background class from compact event scalars.
+    1. Use charged_cat to select predicted B sector (B+ or B0).
+    2. If exactly one candidate in that sector has isSignal==1: choose it.
+    3. If multiple isSignal==1 candidates:
+       - If all have same mostcommonBTagIndex: choose largest input_id.
+       - If they have different mostcommonBTagIndex: choose smallest deltaP.
+         Tie-break by larger sigProb, then larger input_id.
+    4. If no isSignal==1 candidate in predicted sector, fall back to current
+       deltaP-based logic from compact truth scalars.
 
     Parameters
     ----------
     mc_truth_cand : tuple (best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp)
         Per-event arrays from load_and_sample_data. best_bp_iid/b0_iid are int16
         with sentinel -1; best_bp_dp/b0_dp are float32 with sentinel inf.
+    sig_truth : tuple (sig_input_ids_values, sig_input_ids_offsets,
+                       sig_btag_index_values, sig_delta_p_values, sig_sigprob_values)
+        Packed ragged isSignal==1 candidate metadata.
     charged_cat : ndarray of bool
         True if category network predicts B+, False for B0
     is_cont : ndarray of int8
@@ -653,20 +750,89 @@ def build_mode_labels(mc_truth_cand, charged_cat, is_cont, gen_pdg,
         Mode labels (0 to N_INPUT_IDS+2)
     train_selection : ndarray of bool
         True for events where the category-selected sector has a valid candidate
+    stats : dict
+        Counters for how labels were assigned.
     """
     n_events = len(is_cont)
+    bp_threshold = config.N_BP_MODES * 2
+
+    (sig_input_ids_values, sig_input_ids_offsets,
+     sig_btag_index_values, sig_delta_p_values, sig_sigprob_values) = sig_truth
+
+    if len(sig_input_ids_offsets) != n_events + 1:
+        raise ValueError(
+            f"sig_input_ids_offsets length mismatch: got {len(sig_input_ids_offsets)}, expected {n_events + 1}"
+        )
 
     # --- Per-sector best candidate lookup ---
     best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp = mc_truth_cand
     best_iid = np.where(charged_cat, best_bp_iid, best_b0_iid).astype(np.int64)
     best_dp = np.where(charged_cat, best_bp_dp, best_b0_dp)
 
-    has_target = (best_iid >= 0) & (best_dp < delta_p_thresh)
     labels = np.full(n_events, MAIN_BG_BAD_TAG, dtype=np.int64)
+    assigned = np.zeros(n_events, dtype=bool)
+
+    stats = {
+        'single_signal': 0,
+        'multi_same_btag': 0,
+        'multi_diff_btag': 0,
+        'fallback': 0,
+    }
+
+    for evt in range(n_events):
+        start = int(sig_input_ids_offsets[evt])
+        end = int(sig_input_ids_offsets[evt + 1])
+        if start >= end:
+            continue
+
+        evt_iids = sig_input_ids_values[start:end]
+        evt_btag_idx = sig_btag_index_values[start:end]
+        evt_dp = sig_delta_p_values[start:end]
+        evt_sigprob = sig_sigprob_values[start:end]
+
+        if charged_cat[evt]:
+            sector_mask = evt_iids < bp_threshold
+        else:
+            sector_mask = evt_iids >= bp_threshold
+
+        if not np.any(sector_mask):
+            continue
+
+        sector_iids = evt_iids[sector_mask]
+        sector_btag_idx = evt_btag_idx[sector_mask]
+        sector_dp = evt_dp[sector_mask]
+        sector_sigprob = evt_sigprob[sector_mask]
+
+        if len(sector_iids) == 1:
+            labels[evt] = int(sector_iids[0])
+            assigned[evt] = True
+            stats['single_signal'] += 1
+            continue
+
+        if len(np.unique(sector_btag_idx)) == 1:
+            labels[evt] = int(np.max(sector_iids))
+            assigned[evt] = True
+            stats['multi_same_btag'] += 1
+            continue
+
+        best_tuple = None
+        best_label = None
+        for iid_val, dp_val, sigprob_val in zip(sector_iids, sector_dp, sector_sigprob):
+            key = (float(dp_val), -float(sigprob_val), -int(iid_val))
+            if (best_tuple is None) or (key < best_tuple):
+                best_tuple = key
+                best_label = int(iid_val)
+        labels[evt] = best_label
+        assigned[evt] = True
+        stats['multi_diff_btag'] += 1
+
+    # --- Fallback labels for events without an isSignal==1 target ---
+    fallback_mask = ~assigned
+    stats['fallback'] = int(fallback_mask.sum())
+    has_target = fallback_mask & (best_iid >= 0) & (best_dp < delta_p_thresh)
     labels[has_target] = best_iid[has_target]
 
-    # --- Background labels for events without an is_target candidate ---
-    no_target = ~has_target
+    no_target = fallback_mask & (~has_target)
     if no_target.any():
         sector_abs_pdg = np.where(charged_cat, 521, 511)
 
@@ -685,7 +851,7 @@ def build_mode_labels(mc_truth_cand, charged_cat, is_cont, gen_pdg,
         f"Labels out of range [0, {MAIN_BG_CONT}]: "
         f"min={labels.min()}, max={labels.max()}"
     )
-    return labels, train_selection
+    return labels, train_selection, stats
 
 
 class SparseDataset(torch.utils.data.Dataset):
@@ -857,7 +1023,7 @@ def main():
     print("Loading and sampling data")
     print("=" * 60)
     print(f"Calibration weight cap (90th percentile): {config.CALIB_WEIGHT_CAP:.4f}")
-    features, event_scalars, has_inputs, mc_truth_cand = load_and_sample_data(
+    features, event_scalars, has_inputs, mc_truth_cand, sig_truth = load_and_sample_data(
         args.input,
         fraction=args.fraction,
         cont_fraction=args.cont_fraction,
@@ -939,13 +1105,13 @@ def main():
             features_dense = np.hstack([features_dense, cat_augments]).astype(np.float32)
 
         # Build mode-prediction labels using category network prediction
-        if mc_truth_cand is None:
+        if mc_truth_cand is None or sig_truth is None:
             raise ValueError(
-                "mc_truth_cand not found in training data. "
+                "Required main-network truth arrays not found in training data. "
                 "Re-collect training data with produceTrainingInputs.py."
             )
-        labels, train_selection = build_mode_labels(
-            mc_truth_cand, charged_cat_bool, is_cont, gen_pdg,
+        labels, train_selection, label_stats = build_mode_labels(
+            mc_truth_cand, sig_truth, charged_cat_bool, is_cont, gen_pdg,
             best_bp_sigprob_iid, best_b0_sigprob_iid,
         )
         num_labels = MAIN_NUM_LABELS
@@ -959,6 +1125,11 @@ def main():
         print(f"    bad_tag ({MAIN_BG_BAD_TAG}):        {bg_bad} ({bg_bad / n_tot * 100:.1f}%)")
         print(f"    cross_deltaC1 ({MAIN_BG_CROSS_DC1}):  {bg_dc1} ({bg_dc1 / n_tot * 100:.1f}%)")
         print(f"    continuum ({MAIN_BG_CONT}):      {bg_cont} ({bg_cont / n_tot * 100:.1f}%)")
+        print("  Label assignment branches:")
+        print(f"    isSignal single candidate: {label_stats['single_signal']}")
+        print(f"    isSignal multi, same btag index: {label_stats['multi_same_btag']}")
+        print(f"    isSignal multi, different btag index: {label_stats['multi_diff_btag']}")
+        print(f"    fallback deltaP/background logic: {label_stats['fallback']}")
 
         mbc_values = None
 

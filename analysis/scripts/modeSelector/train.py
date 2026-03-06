@@ -390,9 +390,9 @@ class MultiClassNet(nn.Module):
 
         if num_labels <= 10:
             self.network = nn.Sequential(
-                nn.Linear(input_size, 256),
+                nn.Linear(input_size, 128),
                 self.activation,
-                nn.Linear(256, 128),
+                nn.Linear(128, 128),
                 nn.Dropout(0.2),
                 self.activation,
                 nn.Linear(128, 64),
@@ -819,19 +819,19 @@ def main():
     parser.add_argument('--batch_size', type=int, default=None,
                         help='Batch size (default: 8192 for category network, 32768 for main network)')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of DataLoader worker processes')
-    parser.add_argument('--epochs', type=int, default=40, help='Number of epochs')
-    parser.add_argument('--lr', type=float, default=1e-3, help='Initial learning rate')
+    parser.add_argument('--epochs', type=int, default=50, help='Number of epochs')
+    parser.add_argument('--lr', type=float, default=5e-4, help='Initial learning rate')
     parser.add_argument('--lr_schedule', choices=['constant', 'cosine'], default='cosine',
                         help='Learning rate schedule (default: cosine)')
     parser.add_argument('--eta_min', type=float, default=1e-5,
                         help='Minimum learning rate for cosine schedule (default 1e-5)')
-    parser.add_argument('--weight_decay', type=float, default=1e-4, help='Weight decay for AdamW')
-    parser.add_argument('--val_split', type=float, default=0.1, help='Validation split')
+    parser.add_argument('--weight_decay', type=float, default=2e-4, help='Weight decay for AdamW')
+    parser.add_argument('--val_split', type=float, default=0.3, help='Validation split')
     parser.add_argument('--seed', type=int, default=42, help='Random seed')
     parser.add_argument('--disco_lambda', type=float, default=0.0,
                         help='Distance correlation penalty coefficient (0=disabled)')
-    parser.add_argument('--label_smoothing', type=float, default=0.1,
-                        help='Label smoothing for CrossEntropyLoss (0=disabled, default 0.1)')
+    parser.add_argument('--label_smoothing', type=float, default=0,
+                        help='Label smoothing for CrossEntropyLoss (0=disabled, default)')
     parser.add_argument('--use_sparse', action='store_true',
                         help='Use sparse data loading (memory-efficient but slower)')
 
@@ -1076,7 +1076,7 @@ def main():
     training_start = time.time()
     history = {'train_loss': [], 'val_loss': [], 'disco_loss': [], 'lr': []}
     patience_counter = 0
-    early_stopping_patience = 10
+    early_stopping_patience = 5
 
     for epoch in range(args.epochs):
         epoch_start = time.time()

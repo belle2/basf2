@@ -820,7 +820,11 @@ def main():
                         help='Batch size (default: 8192 for category network, 32768 for main network)')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of DataLoader worker processes')
     parser.add_argument('--epochs', type=int, default=40, help='Number of epochs')
-    parser.add_argument('--lr', type=float, default=1e-3, help='Initial learning rate (cosine annealed to 1e-6)')
+    parser.add_argument('--lr', type=float, default=1e-3, help='Initial learning rate')
+    parser.add_argument('--lr_schedule', choices=['constant', 'cosine'], default='cosine',
+                        help='Learning rate schedule (default: cosine)')
+    parser.add_argument('--eta_min', type=float, default=1e-5,
+                        help='Minimum learning rate for cosine schedule (default 1e-5)')
     parser.add_argument('--weight_decay', type=float, default=1e-4, help='Weight decay for AdamW')
     parser.add_argument('--val_split', type=float, default=0.1, help='Validation split')
     parser.add_argument('--seed', type=int, default=42, help='Random seed')
@@ -834,7 +838,7 @@ def main():
     args = parser.parse_args()
 
     if args.batch_size is None:
-        args.batch_size = 8192 if args.network == 'category' else 32768
+        args.batch_size = 2**14 if args.network == 'category' else 2**15
     print(f"Batch size: {args.batch_size}")
 
     # Set random seeds
@@ -1046,7 +1050,11 @@ def main():
     # Loss and optimizer
     criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
     optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs, eta_min=1e-5)
+    scheduler = None
+    if args.lr_schedule == 'cosine':
+        scheduler = optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=args.epochs, eta_min=args.eta_min
+        )
 
     # Training loop
     print("\n" + "=" * 60)
@@ -1054,6 +1062,14 @@ def main():
     print("=" * 60)
     if args.disco_lambda > 0:
         print(f"Using distance correlation with lambda={args.disco_lambda}")
+    print("Training configuration:")
+    print(f"  epochs: {args.epochs}")
+    print(f"  batch_size: {args.batch_size}")
+    print(f"  lr: {args.lr:.2e}")
+    print(f"  lr_schedule: {args.lr_schedule}")
+    if args.lr_schedule == 'cosine':
+        print(f"  eta_min: {args.eta_min:.2e}")
+    print(f"  label_smoothing: {args.label_smoothing}")
 
     best_val_loss = float('inf')
     best_epoch = 0
@@ -1078,7 +1094,8 @@ def main():
         epoch_time = time.time() - epoch_start
 
         # Scheduler step
-        scheduler.step()
+        if scheduler is not None:
+            scheduler.step()
         new_lr = optimizer.param_groups[0]['lr']
 
         history['train_loss'].append(train_loss)
@@ -1118,6 +1135,10 @@ def main():
                     'fraction': args.fraction,
                     'cont_fraction': args.cont_fraction,
                     'network_type': args.network,
+                    'lr': args.lr,
+                    'lr_schedule': args.lr_schedule,
+                    'eta_min': args.eta_min,
+                    'label_smoothing': args.label_smoothing,
                 }
             }, model_path)
             print(f"  -> Saved best model (val_loss={val_loss:.6f})")

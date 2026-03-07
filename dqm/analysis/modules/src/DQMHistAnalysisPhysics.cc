@@ -208,21 +208,41 @@ void DQMHistAnalysisPhysicsModule::event()
       }
     }
 
-    auto hmUPSmumu = getDelta("PhysicsObjects/mUPS");
-    if (m_cmUPSmumu and hmUPSmumu) {
-      m_cmUPSmumu->cd();
-      fitUpsilonFromHisto(hmUPSmumu, m_cmUPSmumu_text, "M(#mu#mu) [GeV/c^2]", "UPSmumu", m_pvPrefix + "mUPSmumu");
-      m_cmUPSmumu->Modified();
-      m_cmUPSmumu->Update();
-      UpdateCanvas(m_cmUPSmumu);
+    if (m_cmUPSmumu) {
+      auto hmUPSmumu = getDelta("PhysicsObjects/mUPS");// check if updated
+      if (hmUPSmumu) {
+        m_cmUPSmumu->cd();
+        fitUpsilonFromHisto(hmUPSmumu, m_cmUPSmumu_text, "M(#mu#mu) [GeV/c^2]", "UPSmumu", m_pvPrefix + "mUPSmumu");
+        m_cmUPSmumu->Modified();
+        m_cmUPSmumu->Update();
+        UpdateCanvas(m_cmUPSmumu);
+      } else {
+        hmUPSmumu = findHist("PhysicsObjects/mUPS");// even if not updated
+        if (hmUPSmumu and hmUPSmumu->GetEntries() < m_minEntriesUPSmumu) {
+          // only if integral plot is below delta entries
+          m_cmUPSmumu->cd();
+          m_cmUPSmumu->Clear();
+          hmUPSmumu->Draw("hist");
+        }
+      }
     }
-    auto hmUPSee = getDelta("PhysicsObjects/mUPSe");// check if updated
-    if (m_cmUPSee and hmUPSee) {
-      m_cmUPSee->cd();
-      fitUpsilonFromHisto(hmUPSee, m_cmUPSee_text, "M(ee) [GeV/c^2]", "UPSee", m_pvPrefix + "mUPSee");
-      m_cmUPSee->Modified();
-      m_cmUPSee->Update();
-      UpdateCanvas(m_cmUPSee);
+    if (m_cmUPSee) {
+      auto hmUPSee = getDelta("PhysicsObjects/mUPSe");// check if updated
+      if (hmUPSee) {
+        m_cmUPSee->cd();
+        fitUpsilonFromHisto(hmUPSee, m_cmUPSee_text, "M(ee) [GeV/c^2]", "UPSee", m_pvPrefix + "mUPSee");
+        m_cmUPSee->Modified();
+        m_cmUPSee->Update();
+        UpdateCanvas(m_cmUPSee);
+      } else {
+        hmUPSee = findHist("PhysicsObjects/mUPSe");// even if not updated
+        if (hmUPSee and hmUPSee->GetEntries() < m_minEntriesUPSee) {
+          // only if integral plot is below delta entries
+          m_cmUPSee->cd();
+          m_cmUPSee->Clear();
+          hmUPSee->Draw("hist");
+        }
+      }
     }
     auto* m_cphysicsresults = findCanvas("PhysicsObjects/c_physicsresults");
     if (m_cphysicsresults) {

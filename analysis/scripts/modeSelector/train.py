@@ -17,9 +17,8 @@ Usage:
     python train.py --input modeSelector_training.npz --network main --cat_model networks/net_cat.pt --output networks/
 
 The script implements:
-- FEI calibration sampling (decayModeID-based weights)
-- Continuum downsampling (applied at production by produceTrainingInputs.py; --cont_fraction defaults to 1.0)
-- Fraction sampling (configurable, default 1.0)
+- loading pre-produced training inputs
+- optional global downsampling (uniform for BB, scaled by cont_fraction for continuum)
 - sigProb preselection (applied to all events including continuum)
 """
 
@@ -44,95 +43,19 @@ MAIN_BG_CONT = config.N_INPUT_IDS + 2
 MAIN_NUM_LABELS = config.N_INPUT_IDS + 3
 
 
-def get_fei_calib(dm_id, pdg):
-    """
-    Get FEI calibration factor for a decay mode.
-
-    Parameters
-    ----------
-    dm_id : int
-        Decay mode ID
-    pdg : int
-        PDG code (521 for B+, 511 for B0)
-
-    Returns
-    -------
-    float
-        Calibration weight
-    """
-    if abs(pdg) == 521:
-        return config.FEI_CALIB_BP.get(dm_id, config.FEI_CALIB_BP_REST)
-    elif abs(pdg) == 511:
-        return config.FEI_CALIB_B0.get(dm_id, config.FEI_CALIB_B0_REST)
-    else:
-        return 1.0  # Continuum
-
-
-def compute_event_calib(best_bp_sigprob_iid, best_b0_sigprob_iid,
-                        bp_tag_is_gen, b0_tag_is_gen, is_cont):
-    """
-    Compute event calibration weights for FEI sampling (vectorized).
-
-    Calibration factors are applied to events where the best-sigProb
-    candidate's mostcommonBTagPDG == PDG and the event is not continuum.
-
-    Parameters
-    ----------
-    best_bp_sigprob_iid : ndarray of int16
-        input_id of best-sigProb B+ candidate; -1 if absent
-    best_b0_sigprob_iid : ndarray of int16
-        input_id of best-sigProb B0 candidate; -1 if absent
-    bp_tag_is_gen : ndarray of int8
-        1 if best-sigProb B+ has mostcommonBTagPDG == PDG, else 0
-    b0_tag_is_gen : ndarray of int8
-        1 if best-sigProb B0 has mostcommonBTagPDG == PDG, else 0
-    is_cont : ndarray of int8
-        1 if event is continuum, else 0
-
-    Returns
-    -------
-    event_calib_bp : ndarray
-        Calibration weights for B+ candidates
-    event_calib_b0 : ndarray
-        Calibration weights for B0 candidates
-    """
-    n_events = len(best_bp_sigprob_iid)
-    bp_threshold = config.N_BP_MODES * 2
-
-    bp_calib_arr = np.array([config.FEI_CALIB_BP.get(i, config.FEI_CALIB_BP_REST)
-                             for i in range(config.N_BP_MODES)])
-    b0_calib_arr = np.array([config.FEI_CALIB_B0.get(i, config.FEI_CALIB_B0_REST)
-                             for i in range(config.N_B0_MODES)])
-
-    event_calib_bp = np.ones(n_events)
-    apply_bp = (best_bp_sigprob_iid >= 0) & (bp_tag_is_gen == 1) & (is_cont == 0)
-    if apply_bp.any():
-        dm_ids = (best_bp_sigprob_iid[apply_bp].astype(np.int32) % bp_threshold) // 2
-        event_calib_bp[apply_bp] = bp_calib_arr[dm_ids]
-
-    event_calib_b0 = np.ones(n_events)
-    apply_b0 = (best_b0_sigprob_iid >= 0) & (b0_tag_is_gen == 1) & (is_cont == 0)
-    if apply_b0.any():
-        dm_ids = (best_b0_sigprob_iid[apply_b0].astype(np.int32) - bp_threshold) // 2
-        event_calib_b0[apply_b0] = b0_calib_arr[dm_ids]
-
-    return event_calib_bp, event_calib_b0
-
-
 def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
                          sigprob_thresh=0.01, random_state=None):
     """
-    Load training data and apply sampling.
+    Load training data and apply optional global downsampling.
 
     Parameters
     ----------
     input_files : str or list of str
         Path(s) to modeSelector_training.npz file(s)
     fraction : float
-        Base sampling fraction for all events (default 1.0); continuum is further scaled by cont_fraction
+        Uniform BB sampling fraction applied after loading (default 1.0)
     cont_fraction : float
-        Additional downscale for continuum events (default 1.0, i.e. no extra downsampling;
-        continuum is already downsampled at production time by produceTrainingInputs.py)
+        Additional continuum downscale relative to fraction (default 1.0)
     sigprob_thresh : float
         Minimum signal probability threshold
     random_state : int
@@ -233,8 +156,6 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         best_sigprob = data['best_sigprob']
         best_bp_sigprob_iid = data['best_bp_sigprob_iid']
         best_b0_sigprob_iid = data['best_b0_sigprob_iid']
-        bp_tag_is_gen = data['bp_tag_is_gen']
-        b0_tag_is_gen = data['b0_tag_is_gen']
 
         best_bp_iid = data['best_bp_iid']
         best_bp_dp = data['best_bp_dp']
@@ -246,19 +167,12 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         sig_delta_p_values = data['sig_delta_p_values']
         sig_sigprob_values = data['sig_sigprob_values']
 
-        event_calib_bp, event_calib_b0 = compute_event_calib(
-            best_bp_sigprob_iid, best_b0_sigprob_iid,
-            bp_tag_is_gen, b0_tag_is_gen, is_cont,
-        )
-        event_calib = np.where(bp_is_best == 1, event_calib_bp, event_calib_b0)
-
         # Keep events where the best candidate passes the sigProb threshold.
         # Applies to all events including continuum.
         presel = best_sigprob > sigprob_thresh
 
-        sample_prob = event_calib / config.CALIB_WEIGHT_CAP * fraction
+        sample_prob = np.full(len(best_sigprob), fraction, dtype=np.float32)
         sample_prob[is_cont == 1] *= cont_fraction
-        n_clipped = int((sample_prob > 1.0).sum())
         sample_prob = np.minimum(sample_prob, 1.0)
 
         file_rng = np.random.default_rng(seed)
@@ -292,7 +206,6 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         return (feats[sampled],
                 is_cont[sampled], gen_pdg[sampled], bp_is_best[sampled], best_sigprob[sampled],
                 best_bp_sigprob_iid[sampled], best_b0_sigprob_iid[sampled],
-                n_clipped,
                 best_bp_iid[sampled], best_bp_dp[sampled],
                 best_b0_iid[sampled], best_b0_dp[sampled],
                 sig_iid_v_s, sig_off_s, sig_btag_v_s, sig_dp_v_s, sig_sigprob_v_s)
@@ -304,8 +217,6 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     best_b0_iid_list, best_b0_dp_list = [], []
     sig_input_ids_values_list, sig_input_ids_offsets_list = [], []
     sig_btag_index_values_list, sig_delta_p_values_list, sig_sigprob_values_list = [], [], []
-    total_clipped = 0
-    total_events = 0
 
     n_workers = min(32, len(input_files))
     with ThreadPoolExecutor(max_workers=n_workers) as executor:
@@ -317,7 +228,6 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         (feats,
          is_cont_r, gen_pdg_r, bp_is_best_r, best_sigprob_r,
          best_bp_sigprob_iid_r, best_b0_sigprob_iid_r,
-         n_clipped,
          bp_iid, bp_dp, b0_iid, b0_dp,
          sig_iid_v, sig_off, sig_btag_v, sig_dp_v, sig_sigprob_v) = result
         features_list.append(feats)
@@ -336,13 +246,6 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         sig_btag_index_values_list.append(sig_btag_v)
         sig_delta_p_values_list.append(sig_dp_v)
         sig_sigprob_values_list.append(sig_sigprob_v)
-        total_clipped += n_clipped
-        total_events += len(is_cont_r)
-
-    if total_clipped > 0:
-        print(f"WARNING: calibration weight exceeded CALIB_WEIGHT_CAP ({config.CALIB_WEIGHT_CAP:.4f}) "
-              f"for {total_clipped} events ({total_clipped / total_events * 100:.1f}% of sampled events). "
-              f"These events were capped and their sampling weight reduced.")
 
     # Concatenate across all files
     features = sparse.vstack(features_list, format='csr')
@@ -978,13 +881,14 @@ def main():
                         help='Which network to train')
     parser.add_argument('--cat_model', help='Trained category model (required for main network)')
     parser.add_argument('--output', default='networks/', help='Output directory for trained models')
-    parser.add_argument('--fraction', type=float, default=1.0, help='Base sampling fraction for all events')
+    parser.add_argument('--fraction', type=float, default=1.0,
+                        help='Optional uniform BB downsampling fraction after loading inputs')
     parser.add_argument('--cont_fraction', type=float, default=1.0,
-                        help='Additional continuum downscale at training time (default 1.0; '
-                             'continuum is already downsampled at production by produceTrainingInputs.py)')
+                        help='Additional continuum downscale relative to --fraction at training time')
     parser.add_argument('--batch_size', type=int, default=None,
                         help='Batch size (default: 16384 for category network, 32768 for main network)')
-    parser.add_argument('--num_workers', type=int, default=4, help='Number of DataLoader worker processes')
+    parser.add_argument('--num_workers', type=int, default=None,
+                        help='Number of DataLoader worker processes (default: auto = min(8, max(1, cpu_count//2)))')
     parser.add_argument('--epochs', type=int, default=50, help='Number of epochs')
     parser.add_argument('--lr', type=float, default=5e-4, help='Initial learning rate')
     parser.add_argument('--lr_schedule', choices=['constant', 'cosine'], default='cosine',
@@ -1006,6 +910,12 @@ def main():
     if args.batch_size is None:
         args.batch_size = 2**14 if args.network == 'category' else 2**15
     print(f"Batch size: {args.batch_size}")
+    if args.num_workers is None:
+        cpu_count = os.cpu_count() or 1
+        resolved_num_workers = min(8, max(1, cpu_count // 2))
+    else:
+        resolved_num_workers = args.num_workers
+    print(f"DataLoader workers: {resolved_num_workers}")
 
     # Set random seeds
     np.random.seed(args.seed)
@@ -1018,11 +928,10 @@ def main():
     # Create output directory
     os.makedirs(args.output, exist_ok=True)
 
-    # Load and sample data
+    # Load input data and apply optional post-production downsampling
     print("\n" + "=" * 60)
-    print("Loading and sampling data")
+    print("Loading data")
     print("=" * 60)
-    print(f"Calibration weight cap (90th percentile): {config.CALIB_WEIGHT_CAP:.4f}")
     features, event_scalars, has_inputs, mc_truth_cand, sig_truth = load_and_sample_data(
         args.input,
         fraction=args.fraction,
@@ -1182,10 +1091,10 @@ def main():
         val_dataset = SparseDataset(features[val_idx], labels[val_idx], mbc_val_np, val_extra)
         drop_last = len(train_dataset) > args.batch_size
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
-                                  collate_fn=sparse_collate_fn, num_workers=args.num_workers,
+                                  collate_fn=sparse_collate_fn, num_workers=resolved_num_workers,
                                   drop_last=drop_last)
         val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False,
-                                collate_fn=sparse_collate_fn, num_workers=args.num_workers)
+                                collate_fn=sparse_collate_fn, num_workers=resolved_num_workers)
     else:
         # Dense loading (default)
         X_train = torch.from_numpy(features_dense[train_idx])
@@ -1203,9 +1112,9 @@ def main():
 
         drop_last = len(train_dataset) > args.batch_size
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
-                                  num_workers=args.num_workers, drop_last=drop_last)
+                                  num_workers=resolved_num_workers, drop_last=drop_last)
         val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False,
-                                num_workers=args.num_workers)
+                                num_workers=resolved_num_workers)
 
     # Create model
     print("\n" + "=" * 60)

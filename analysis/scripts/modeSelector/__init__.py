@@ -26,7 +26,8 @@ Example usage:
 
     # Add ModeSelector NN evaluation
     modeSelector.modeSelector(
-        particleLists=['B+:fei', 'B0:fei'],
+        bp_list='B+:fei',
+        b0_list='B0:fei',
         path=my_path
     )
 
@@ -35,20 +36,27 @@ Example usage:
 """
 
 from modeSelector import config
+from modeSelector.calibrationSampling import (
+    CalibratedEventRandomFilterModule,
+    addCalibratedEventRandomSampling,
+)
 from modeSelector.dstarVeto import add_dstar_veto_aliases, addDstarVeto
 from modeSelector.ModeSelectorModule import ModeSelectorModule
 
 __all__ = [
     'config',
+    'addCalibratedEventRandomSampling',
     'modeSelector',
     'addDstarVeto',
     'add_dstar_veto_aliases',
+    'CalibratedEventRandomFilterModule',
     'ModeSelectorModule',
 ]
 
 
 def modeSelector(
-    particleLists,
+    bp_list,
+    b0_list,
     cat_model_path=None,
     main_model_path=None,
     output_variable='BplusScore',
@@ -71,9 +79,12 @@ def modeSelector(
 
     Parameters
     ----------
-    particleLists : str or list
-        Name(s) of B meson particle list(s) to process.
-        Example: 'B+:feiHadronic' or ['B+:fei', 'B0:fei']
+    bp_list : str
+        B+ meson particle list name to process.
+        Example: 'B+:feiHadronic'
+    b0_list : str
+        B0 meson particle list name to process.
+        Example: 'B0:feiHadronic'
     cat_model_path : str, optional
         Path to the category network ONNX model file.
         If None, loads from conditions database.
@@ -124,7 +135,8 @@ def modeSelector(
     >>>
     >>> # Add ModeSelector
     >>> modeSelector.modeSelector(
-    ...     particleLists=['B+:fei', 'B0:fei'],
+    ...     bp_list='B+:fei',
+    ...     b0_list='B0:fei',
     ...     path=path
     ... )
     >>>
@@ -141,16 +153,23 @@ def modeSelector(
     if path is None:
         b2.B2FATAL("Path is required for modeSelector")
 
-    if isinstance(particleLists, str):
-        particleLists = [particleLists]
+    if not isinstance(bp_list, str) or not bp_list:
+        b2.B2FATAL("ModeSelector: bp_list must be a non-empty string")
+    if not isinstance(b0_list, str) or not b0_list:
+        b2.B2FATAL("ModeSelector: b0_list must be a non-empty string")
+    if not bp_list.startswith('B+:'):
+        b2.B2FATAL(f"ModeSelector: bp_list must start with 'B+:'; got '{bp_list}'")
+    if not b0_list.startswith('B0:'):
+        b2.B2FATAL(f"ModeSelector: b0_list must start with 'B0:'; got '{b0_list}'")
+    particle_lists = [bp_list, b0_list]
 
     # Optionally add D* veto reconstruction
     if addDstarVetoReco:
-        addDstarVeto(particleLists, path=path)
+        addDstarVeto(particle_lists, path=path)
 
     # Add the ModeSelector module
     module = ModeSelectorModule(
-        particle_lists=particleLists,
+        particle_lists=particle_lists,
         cat_model_path=cat_model_path,
         main_model_path=main_model_path,
         output_variable=output_variable,
@@ -161,5 +180,5 @@ def modeSelector(
     )
     path.add_module(module)
 
-    b2.B2INFO(f"ModeSelector: Added to path for particle lists: {particleLists}")
+    b2.B2INFO(f"ModeSelector: Added to path for particle lists: {particle_lists}")
     b2.B2INFO(f"ModeSelector: Output variable: extraInfo({output_variable})")

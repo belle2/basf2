@@ -15,8 +15,6 @@ used by the ModeSelector module. Both inference and training must use these
 definitions to ensure consistency.
 """
 
-import numpy as _np
-
 # Number of FEI decay modes per B type (dmID range)
 N_BP_MODES = 36  # B+/B- decay modes (dmID 0-35)
 N_B0_MODES = 32  # B0/anti-B0 decay modes (dmID 0-31)
@@ -27,6 +25,9 @@ N_INPUT_IDS = N_BP_MODES * 2 + N_B0_MODES * 2  # = 136
 
 # D* delta mass difference cut applied to features
 DELTA_M_CUT = (-0.05, 0.05)
+
+# Default threshold for mostcommonBTagDeltaP when defining good-tag fallback truth.
+DELTA_P_THRESH = 0.15
 
 # Network output sizes
 NUM_CAT_LABELS = 3   # B0, B+, continuum
@@ -110,18 +111,6 @@ FEI_CALIB_B0 = {
     19: 2.001476, 26: 0.472930,
 }
 FEI_CALIB_B0_REST = 1.143776
-
-# Normalisation reference for FEI calibration weights: 90th percentile of all calibration values
-# across B+ and B0. Weights are divided by this before multiplying by fraction to give sample_prob.
-# Events where sample_prob exceeds 1.0 after this are capped and reported as a warning.
-# Using a percentile rather than the maximum prevents outlier modes from compressing the
-# sampling of all other events.
-_all_calib = (
-    list(FEI_CALIB_BP.values()) + [FEI_CALIB_BP_REST] +
-    list(FEI_CALIB_B0.values()) + [FEI_CALIB_B0_REST]
-)
-CALIB_WEIGHT_CAP = float(_np.percentile(_all_calib, 90, method='closest_observation'))
-del _np, _all_calib
 
 
 # Indices to KEEP from the full 1644-feature array (all-zero columns removed,

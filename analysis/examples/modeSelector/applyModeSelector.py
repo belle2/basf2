@@ -66,13 +66,26 @@ ma.inputMdstList(
 # Prepend the analysis globaltag for accessing payloads
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
-# Apply event fraction cuts using eventRandom
-EVENT_FRACTION = 0.1
-b2.B2INFO(f"Applying event cuts: fraction={EVENT_FRACTION}")
-ma.applyEventCuts(f'eventRandom > {1 - EVENT_FRACTION}', path=my_path)
-
 # FEI list identifier
 fei_identifier = 'feiHadronic'
+
+# Define the particle lists to process
+particle_lists = [f'B+:{fei_identifier}', f'B0:{fei_identifier}']
+
+# MC truth matching
+for plist in particle_lists:
+    ma.matchMCTruth(plist, path=my_path)
+
+# Keep an approximately complementary holdout band with 1 - eventRandom.
+vm.addAlias('eventRandomComplement', 'formula(1 - eventRandom)')
+modeSelector.addCalibratedEventRandomSampling(
+    bp_list=f'B+:{fei_identifier}',
+    b0_list=f'B0:{fei_identifier}',
+    base_fraction=0.1,
+    cont_fraction=1.0,
+    random_variable='eventRandomComplement',
+    path=my_path
+)
 
 # Define ROE masks for continuum suppression
 track_mask = "[[dr < 2] and [abs(dz) < 4] and [pt > 0.2] and [thetaInCDCAcceptance==1]]"
@@ -81,7 +94,7 @@ ecl_mask = ("[[[[clusterReg==1] and [E>0.080]] or [[clusterReg==2] and [E > 0.03
             "and [abs(clusterTiming) < 200] and [thetaInCDCAcceptance==1]]")
 cleanMask = ("cleanMask", track_mask, ecl_mask)
 
-# Apply FEI calibration cuts and build continuum suppression
+# Apply FEI calibration cuts and build continuum suppression on kept events.
 for b in ['B+', 'B0']:
     ma.applyCuts(f'{b}:{fei_identifier}', '[Mbc > 5.23] and [-0.15 < deltaE < 0.1]', path=my_path)
 
@@ -95,7 +108,7 @@ for b in ['B+', 'B0']:
     # Apply cosTBTO cut
     ma.applyCuts(f'{b}:{fei_identifier}', 'cosTBTO < 0.9', path=my_path)
 
-# Build event shape variables (sphericity, thrust, etc.)
+# Build event shape variables (sphericity, thrust, etc.) only for kept events.
 ma.buildEventShape(
     allMoments=False,
     cleoCones=False,
@@ -108,20 +121,14 @@ ma.buildEventShape(
     path=my_path
 )
 
-# Define the particle lists to process
-particle_lists = [f'B+:{fei_identifier}', f'B0:{fei_identifier}']
-
-# MC truth matching
-for plist in particle_lists:
-    ma.matchMCTruth(plist, path=my_path)
-
 # Add D* veto reconstruction (pi0 list created internally)
 modeSelector.addDstarVeto(particle_lists, path=my_path)
 
 # Apply ModeSelector with local model files (for testing/development)
 # Set debug=True to print feature values for comparison
 modeSelector.modeSelector(
-    particleLists=particle_lists,
+    bp_list=f'B+:{fei_identifier}',
+    b0_list=f'B0:{fei_identifier}',
     cat_model_path=args.cat_model,
     main_model_path=args.main_model,
     output_variable='BplusScore',
@@ -165,6 +172,7 @@ vm.addAlias(
 )
 
 # isBestCandidate_eqSigProb: eqSigProb ranking; rank-1 in the predicted sector only
+# could just define based on eqSigProb_rank, only considering predicted class?
 vm.addAlias(
     'isBestCandidate_eqSigProb', 'conditionalVariableSelector( \
     [[BplusScore > 0] and [abs(PDG) == 521] and [modeSelector_rank == 1]] or \
@@ -193,7 +201,14 @@ vu.create_aliases(
     wrapper='extraInfo({variable})'
 )
 vu.create_aliases(
-    ['BplusScore', 'BplusScore_catB0', 'BplusScore_catBp', 'BplusScore_catCont'],
+    [
+        'BplusScore',
+        'BplusScore_catB0',
+        'BplusScore_catBp',
+        'BplusScore_catCont',
+        'modeSelectorCalibWeight',
+        'modeSelectorCalibInputId',
+    ],
     wrapper='eventExtraInfo({variable})'
 )
 
@@ -213,6 +228,8 @@ output_variables = [
     'BplusScore_catB0',
     'BplusScore_catBp',
     'BplusScore_catCont',
+    'modeSelectorCalibWeight',
+    'modeSelectorCalibInputId',
     # +1 if pred charged, else -1
     'BplusScore_cat',
     # MC truth matching

@@ -55,19 +55,25 @@ ma.inputMdstList(filelist=args.input, path=my_path)
 # Prepend the analysis globaltag
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
-# Apply event fraction cuts using eventRandom.
-# BB events: 40% base fraction. Continuum: additionally downsampled by cont_fraction.
-BASE_FRACTION = 0.4
-CONT_FRACTION = BASE_FRACTION * args.cont_fraction
-b2.B2INFO(f"Applying event cuts: BB fraction={BASE_FRACTION}, continuum fraction={CONT_FRACTION}")
-ma.applyEventCuts(
-    f'[isContinuumEvent == 0 and eventRandom < {BASE_FRACTION}] or '
-    f'[isContinuumEvent == 1 and eventRandom < {CONT_FRACTION}]',
-    path=my_path
-)
-
 # FEI list identifier
 fei_identifier = 'feiHadronic'
+
+# Define the particle lists to process
+particle_lists = [f'B+:{fei_identifier}', f'B0:{fei_identifier}']
+
+# MC truth matching (required for training labels)
+for plist in particle_lists:
+    ma.matchMCTruth(plist, path=my_path)
+
+# Apply calibration-aware eventRandom sampling on the raw FEI lists.
+BASE_FRACTION = 0.3
+modeSelector.addCalibratedEventRandomSampling(
+    bp_list=f'B+:{fei_identifier}',
+    b0_list=f'B0:{fei_identifier}',
+    base_fraction=BASE_FRACTION,
+    cont_fraction=args.cont_fraction,
+    path=my_path
+)
 
 # Define ROE masks for continuum suppression
 track_mask = "[[dr < 2] and [abs(dz) < 4] and [pt > 0.2] and [thetaInCDCAcceptance==1]]"
@@ -76,7 +82,7 @@ ecl_mask = ("[[[[clusterReg==1] and [E>0.080]] or [[clusterReg==2] and [E > 0.03
             "and [abs(clusterTiming) < 200] and [thetaInCDCAcceptance==1]]")
 cleanMask = ("cleanMask", track_mask, ecl_mask)
 
-# Apply FEI calibration cuts and build continuum suppression
+# Apply FEI calibration cuts and build continuum suppression on kept events.
 for b in ['B+', 'B0']:
     ma.applyCuts(f'{b}:{fei_identifier}', '[Mbc > 5.23] and [-0.15 < deltaE < 0.1]', path=my_path)
 
@@ -90,7 +96,7 @@ for b in ['B+', 'B0']:
     # Apply cosTBTO cut
     ma.applyCuts(f'{b}:{fei_identifier}', 'cosTBTO < 0.9', path=my_path)
 
-# Build event shape variables (sphericity, thrust, etc.)
+# Build event shape variables (sphericity, thrust, etc.) only for kept events.
 ma.buildEventShape(
     allMoments=False,
     cleoCones=False,
@@ -103,19 +109,13 @@ ma.buildEventShape(
     path=my_path
 )
 
-# Define the particle lists to process
-particle_lists = [f'B+:{fei_identifier}', f'B0:{fei_identifier}']
-
-# MC truth matching (required for training labels)
-for plist in particle_lists:
-    ma.matchMCTruth(plist, path=my_path)
-
 # Add D* veto reconstruction (pi0 list created internally)
 modeSelector.addDstarVeto(particle_lists, path=my_path)
 
 # Run ModeSelector in training mode (no NN models needed)
 modeSelector.modeSelector(
-    particleLists=particle_lists,
+    bp_list=f'B+:{fei_identifier}',
+    b0_list=f'B0:{fei_identifier}',
     training_mode=True,
     training_output=f'{args.output}.npz',
     path=my_path

@@ -32,6 +32,12 @@ DELTA_M_CUT = (-0.05, 0.05)
 NUM_CAT_LABELS = 3   # B0, B+, continuum
 NUM_MAIN_LABELS = N_INPUT_IDS + 3  # signal input_id classes + bad_tag + cross_deltaC1 + continuum
 
+# Warn if a monitored high-confidence fraction exceeds this value.
+MONITOR_WARN_FRACTION = 1e-3  # 0.1%
+
+# High-confidence definition for monitoring warnings.
+HIGH_CONF_BPLUSSCORE_ABS = 0.01
+
 # Feature block definitions: (name, basf2 variable, transform function)
 # Block ordering matters - it defines the feature array layout.
 #

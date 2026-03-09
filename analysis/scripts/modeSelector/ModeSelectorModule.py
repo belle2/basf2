@@ -98,6 +98,18 @@ class ModeSelectorModule(b2.Module):
         self._event_shape_checked = False
         #: Flag to check D* veto prerequisite once
         self._dstar_veto_checked = False
+        #: Number of events where predicted sector had no candidate in the event
+        self._empty_predicted_sector_count = 0
+        #: Number of inference events processed
+        self._inference_event_count = 0
+        #: Number of high-confidence inference events (abs(BplusScore) > threshold)
+        self._high_conf_event_count = 0
+        #: Number of events where sector top-output input_id has no candidate in the event
+        self._missing_top_mode_count = 0
+        #: Number of high-confidence events where sector top-output input_id has no candidate
+        self._missing_top_mode_high_conf_count = 0
+        #: Number of high-confidence events where fallback was used
+        self._empty_predicted_sector_high_conf_count = 0
 
         # Feature configuration (from modeSelector.config)
         #: Number of input_id slots (B+ sector + B0 sector, each split by particle/antiparticle)
@@ -423,6 +435,47 @@ class ModeSelectorModule(b2.Module):
         if self.training_mode and self._tr_event['all_features']:
             self._save_training_data()
 
+        if self._inference_event_count > 0:
+            missing_base_count = self._inference_event_count - self._empty_predicted_sector_count
+            missing_frac = 0.0
+            if missing_base_count > 0:
+                missing_frac = self._missing_top_mode_count / missing_base_count
+            high_conf_missing_base_count = self._high_conf_event_count - self._empty_predicted_sector_high_conf_count
+            high_conf_missing_frac = 0.0
+            if high_conf_missing_base_count > 0:
+                high_conf_missing_frac = self._missing_top_mode_high_conf_count / high_conf_missing_base_count
+            b2.B2INFO(
+                "ModeSelector: missing top mode among event candidates "
+                "(excluding events with no predicted-sector candidate): "
+                f"{self._missing_top_mode_count}/{missing_base_count} event(s) "
+                f"({100.0 * missing_frac:.3f}%), high-confidence "
+                f"{self._missing_top_mode_high_conf_count}/{high_conf_missing_base_count} event(s) "
+                f"({100.0 * high_conf_missing_frac:.3f}%)."
+            )
+            if high_conf_missing_frac > config.MONITOR_WARN_FRACTION:
+                b2.B2WARNING(
+                    "ModeSelector: missing top mode high-confidence fraction exceeds threshold "
+                    f"({100.0 * high_conf_missing_frac:.3f}% > {100.0 * config.MONITOR_WARN_FRACTION:.3f}%)."
+                )
+
+        if self._inference_event_count > 0:
+            fallback_frac = self._empty_predicted_sector_count / self._inference_event_count
+            high_conf_fallback_frac = 0.0
+            if self._high_conf_event_count > 0:
+                high_conf_fallback_frac = self._empty_predicted_sector_high_conf_count / self._high_conf_event_count
+            b2.B2INFO(
+                "ModeSelector: predicted sector had no candidate in "
+                f"{self._empty_predicted_sector_count}/{self._inference_event_count} event(s) "
+                f"({100.0 * fallback_frac:.3f}%), high-confidence "
+                f"{self._empty_predicted_sector_high_conf_count}/{self._high_conf_event_count} event(s) "
+                f"({100.0 * high_conf_fallback_frac:.3f}%); used score fallback."
+            )
+            if high_conf_fallback_frac > config.MONITOR_WARN_FRACTION:
+                b2.B2WARNING(
+                    "ModeSelector: predicted-sector-empty high-confidence fraction exceeds threshold "
+                    f"({100.0 * high_conf_fallback_frac:.3f}% > {100.0 * config.MONITOR_WARN_FRACTION:.3f}%)."
+                )
+
         if self.debug and self.debug_features:
             # Save debug features and NN outputs to file
             debug_file = 'modeSelector_debug_features.npz'
@@ -727,6 +780,7 @@ class ModeSelectorModule(b2.Module):
 
         main_input = main_features.reshape(1, -1).astype(np.float32)
         main_output = self.main_session.run(None, {self.main_input_name: main_input})[0][0]
+        self._inference_event_count += 1
 
         # Extract scores
         # Main network outputs (139 classes after softmax):
@@ -736,11 +790,35 @@ class ModeSelectorModule(b2.Module):
         #   [N_INPUT_IDS+2] = continuum
         bp_threshold = config.N_BP_MODES * 2
         sign = 1.0 if charged_cat else -1.0
+        predicted_is_bp = bool(charged_cat)
+        predicted_input_ids = [
+            iid for iid in particle_by_input_id
+            if (iid < bp_threshold) == predicted_is_bp
+        ]
         if charged_cat:
-            max_mode_prob = float(np.max(main_output[:bp_threshold]))
+            predicted_top_iid = int(np.argmax(main_output[:bp_threshold]))
         else:
-            max_mode_prob = float(np.max(main_output[bp_threshold:config.N_INPUT_IDS]))
+            predicted_top_iid = int(np.argmax(main_output[bp_threshold:config.N_INPUT_IDS])) + bp_threshold
+        has_predicted_candidate = bool(predicted_input_ids)
+        if has_predicted_candidate and predicted_top_iid not in particle_by_input_id:
+            self._missing_top_mode_count += 1
+        if predicted_input_ids:
+            max_mode_prob = max(float(main_output[iid]) for iid in predicted_input_ids)
+        else:
+            # Defensive fallback. This path is not expected in normal workflows.
+            if charged_cat:
+                max_mode_prob = float(np.max(main_output[:bp_threshold]))
+            else:
+                max_mode_prob = float(np.max(main_output[bp_threshold:config.N_INPUT_IDS]))
+            self._empty_predicted_sector_count += 1
         bp_score = sign * max_mode_prob
+        is_high_conf = abs(bp_score) > config.HIGH_CONF_BPLUSSCORE_ABS
+        if is_high_conf:
+            self._high_conf_event_count += 1
+        if has_predicted_candidate and predicted_top_iid not in particle_by_input_id and is_high_conf:
+            self._missing_top_mode_high_conf_count += 1
+        if not predicted_input_ids and is_high_conf:
+            self._empty_predicted_sector_high_conf_count += 1
 
         # Assign BplusScore_eqSigProb per candidate in the predicted sector only.
         # Non-predicted sector candidates are left unset (sigProb-based ranking used downstream).

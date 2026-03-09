@@ -983,7 +983,7 @@ def main():
                         help='Additional continuum downscale at training time (default 1.0; '
                              'continuum is already downsampled at production by produceTrainingInputs.py)')
     parser.add_argument('--batch_size', type=int, default=None,
-                        help='Batch size (default: 8192 for category network, 32768 for main network)')
+                        help='Batch size (default: 16384 for category network, 32768 for main network)')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of DataLoader worker processes')
     parser.add_argument('--epochs', type=int, default=50, help='Number of epochs')
     parser.add_argument('--lr', type=float, default=5e-4, help='Initial learning rate')

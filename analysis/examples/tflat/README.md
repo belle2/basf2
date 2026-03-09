@@ -38,15 +38,15 @@ The parameters set in the yaml config file are optimized for a A100 GPU and 120G
    - Note that the yaml config file also needs to be passed to the grid as it contains the input lists
    - Download the resulting ntuples
 
-   **Alternatively, sample Belle training data locally**
-   - Run b2setup on the basf2 development version and go to folder `analysis/examples/tflat`
+   **Alternatively, sample Belle/Belle2 training data locally**
+   - Go to folder `analysis/examples/tflat` in your basf2 installation
+   - Select basf2 version in `setup_basf2.sh`
    ```bash
-    source config_submission.sh
-    basf2 b2luigi_submission.py
-    mkdir Sampled_Data2
-    cp Sampled_Data/key=TFLaT/*/*.root  Sampled_Data2
+    basf2 b2luigi_sampler.py -- --input_dir /path/to/input_files/ --output_dir /path/to/output_root/ --uniqueIdentifier {uniqueIdentifier} --is_belle {True/False}
+    mkdir /path/to/output_root_flat/
+    cp /path/to/output_root/*/*.root  /path/to/output_root_flat/
     ```
-   - The folder `Sampled_Data2` will contain all sampled root files needed for the next step.
+   - The folder `/path/to/output_root_flat/` will contain all sampled root files needed for the next step.
 
 3. **Prepare training data**
    - The training samples need to be split into a training and validation dataset.

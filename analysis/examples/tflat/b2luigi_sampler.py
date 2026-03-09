@@ -65,7 +65,7 @@ if __name__ == "__main__":
         help='If True, sample .mdst files with Belle MC'
     )
 
-    args = parser.parse_args()
+    args, _ = parser.parse_known_args()
     output_dir = args.output_dir
     input_dir = args.input_dir
     uniqueIdentifier = args.uniqueIdentifier
@@ -88,7 +88,17 @@ if __name__ == "__main__":
     b2luigi.set_setting("log_dir", output_dir)
     b2luigi.set_setting("executable", ["python3"])
     b2luigi.set_setting("env_script", "setup_basf2.sh")
+    b2luigi.set_setting("task_cmd_additional_args",
+                        ["--output_dir",
+                         output_dir,
+                         "--input_dir",
+                         input_dir,
+                         "--uniqueIdentifier",
+                         uniqueIdentifier,
+                         "--is_belle",
+                         str(is_belle)])
 
     # Launch the workflow
     b2luigi.process([SamplerTask(num=i, input_file=file, output_dir=output_dir, uniqueIdentifier=uniqueIdentifier,
-                                 is_belle=is_belle) for i, file in enumerate(files)], batch=True, workers=200, )
+                                 is_belle=is_belle) for i, file in enumerate(files)],
+                    batch=True, workers=200, ignore_additional_command_line_args=True)

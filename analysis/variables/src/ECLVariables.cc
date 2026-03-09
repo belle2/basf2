@@ -1965,16 +1965,16 @@ during the calculation of the `distanceToMcKl` variable.
 )DOC");
   REGISTER_VARIABLE("clusterTimeNorm90", eclClusterTimeNorm90,R"DOC(
 Returns a normalised version of `clusterTiming` such that :math:`90\%` of real photons will 
-have :math:`|\text{timing\ normalised}| < 1`. 
+have :math:`|\text{timing normalised}| < 1`. 
 
 This is calculated only for crystals within the CDC acceptance (:math:`161 \leq` `clusterCellID` :math:`\leq 8608`). Outside
 this region, :math:`1.5 \times` `clusterTiming` / `clusterErrorTiming` is returned. The normalisation depends on the photon
 energy, beam background level and cell ID. It also differs for data and MC. 
 
 .. tip::
-    A typical requirement for this variable is :math:`|\text{timing\ normalised}| < 3` 
+    A typical requirement for this variable is :math:`|\text{clusterTimeNorm90}| < 3`
 
-.. attention:
+.. attention::
     The required payloads for this variable are stored in the Neutrals global tag. The recommended global tag to use can be
     found on the `Performance Recommendations Webpage <https://belle2.pages.desy.de/performance/recommendations/>`_.
 

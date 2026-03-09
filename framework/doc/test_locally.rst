@@ -15,7 +15,7 @@ The output will be produced in ``$BELLE2_LOCAL_DIR/build/html`` and you can
 navigate it with your favorite browser to check if the output is what you
 expect.
 
-If you only made changes to the ``analysis`` or ``online_book`` packages, you can also
+If you only made changes to the ``analysis``, ``framework`` or ``online_book`` packages, you can also
 add the ``--light`` option to your command to greatly speed up the compilation time. 
 
 Once basf2 has been compiled, you can build the documentation any time using
@@ -30,7 +30,7 @@ If you're only interested in sphinx warnings, use
 
     b2code-sphinx-warnings
 
-.. important:: 
+.. tip:: 
     It is recommended to re-compile basf2 every time changes are made to the documentation
     to ensure that nothing in basf2 has been broken. 
 

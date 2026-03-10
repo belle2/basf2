@@ -104,7 +104,7 @@ namespace Belle2 {
     svdStatus m_effUstatus; /**< number representing the status of the efficiency U side */
     svdStatus m_effVstatus;/**< number representing the status of the efficiency V side */
 
-    void setEffStatus(float den, float eff, float err, bool isU = false); /**< set efficiency status */
+    void setEffStatus(float den, float eff, float err, svdStatus& efficiencyStatus); /**< set efficiency status */
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;

@@ -1217,8 +1217,8 @@ C=================================================
         IF(II.EQ.67) NAMES(I-NLT)='  TAU-  --> mu- a0(980) !nu_tau' ! TauDecayModeBBB = 369 ! a0(980)->pi0eta(pi0pi0pi0) 
         IF(II.EQ.68) NAMES(I-NLT)='  TAU-  --> mu- a0(980) !nu_tau' ! TauDecayModeBBB = 370 ! a0(980)->pi0eta(pi+pi-pi0) 
         IF(II.EQ.69) NAMES(I-NLT)='  TAU-  --> mu- a0(980) !nu_tau' ! TauDecayModeBBB = 371 ! a0(980)->pi0eta(pi+pi-gamma) 
-        IF(II.EQ.70) NAMES(I-NLT)='  TAU-  --> e-  invi    !nu_tau' ! TauDecayModeBBB = 372
-        IF(II.EQ.71) NAMES(I-NLT)='  TAU-  --> mu- invi    !nu_tau' ! TauDecayModeBBB = 373
+        IF(II.EQ.70) NAMES(I-NLT)='  TAU-  --> e-  alfa    !nu_tau' ! TauDecayModeBBB = 372
+        IF(II.EQ.71) NAMES(I-NLT)='  TAU-  --> mu- alfa    !nu_tau' ! TauDecayModeBBB = 373
         IF(II.EQ.72) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 374
         IF(II.EQ.73) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 375
         IF(II.EQ.74) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx1xxxxxx   ' ! TauDecayModeBBB = 376

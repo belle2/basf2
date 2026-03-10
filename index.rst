@@ -7,7 +7,7 @@ tools and its Python programming interface.
 .. note:: Generated on |today| for release |release|, commit |version|.
 
 .. important:: If you use the Belle II software for your work, you must properly cite it.
-   Information on this can be found on the page `here <https://zenodo.org/records/16267708>`_. 
+   Information on this can be found on the page `here <https://doi.org/10.5281/zenodo.5574115>`_. 
 
 .. tip:: If you are new to the Belle II software, you should take a look
     at the :ref:`onlinebook` to help you get started. 

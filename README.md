@@ -36,4 +36,4 @@ More information about the core software can be found in the
 **Citing basf2**
 
 If you use the basf2 software, you must properly cite it. Information on how to cite basf2 properly can be
-found [here](https://zenodo.org/records/16267708). 
+found [here](https://doi.org/10.5281/zenodo.5574115). 

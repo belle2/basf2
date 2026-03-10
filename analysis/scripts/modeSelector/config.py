@@ -42,6 +42,10 @@ MONITOR_WARN_FRACTION = 1e-3  # 0.1%
 # High-confidence definition for monitoring warnings.
 HIGH_CONF_BPLUSSCORE_ABS = 0.01
 
+# Default sigProb working point used for FEI calibration lookup and training
+# preselection.
+DEFAULT_FEI_SIGPROB_THRESHOLD = 0.001
+
 
 def is_flavour_agnostic_b0_mode(pdg, dm_id):
     """
@@ -125,22 +129,86 @@ TRAINING_MC_VARS = [
     'eventRandom',
 ]
 
-# FEI calibration factors for sampling
-# Maps decayModeID to weight for B+ and B0
-# From FEI_cal_factors tables with sigProb > 0.01 threshold
-FEI_CALIB_BP = {
-    0: 1.118901, 1: 0.870929, 3: 1.323061, 4: 1.206390,
-    15: 1.082857, 16: 1.213346, 18: 1.183716, 19: 1.757377,
-    23: 1.188785, 24: 1.441938, 30: 0.225780,
+# FEI calibration factors for sampling.
+# Maps decayModeID to weight for B+ and B0 at the supported sigProb working
+# points. These values come from the Run1_Run2 FEI calibration tables.
+FEI_CALIB_BP_0P001 = {
+    0: 1.138851, 1: 0.905437, 3: 1.385399, 4: 1.276519,
+    15: 1.087855, 16: 1.253812, 18: 1.248877, 19: 1.523771,
+    23: 1.204457, 24: 1.491400, 30: 0.281916,
 }
-FEI_CALIB_BP_REST = 0.848726
+FEI_CALIB_BP_REST_0P001 = 0.896106
 
-FEI_CALIB_B0 = {
-    0: 1.181143, 1: 1.149421, 3: 1.291726, 4: 1.303912,
-    5: 0.919011, 15: 1.092668, 16: 1.292981, 18: 1.269102,
-    19: 2.001476, 26: 0.472930,
+FEI_CALIB_B0_0P001 = {
+    0: 1.184584, 1: 1.158116, 3: 1.403397, 4: 1.280758,
+    5: 1.176502, 15: 1.125413, 16: 1.315412, 18: 1.323810,
+    19: 1.880735, 26: 0.384119,
 }
-FEI_CALIB_B0_REST = 1.143776
+FEI_CALIB_B0_REST_0P001 = 1.123409
+
+FEI_CALIB_BP_0P01 = {
+    0: 1.130930, 1: 0.864989, 3: 1.330744, 4: 1.191804,
+    15: 1.092275, 16: 1.227374, 18: 1.140640, 19: 1.837227,
+    23: 1.144115, 24: 1.477695, 30: 0.226261,
+}
+FEI_CALIB_BP_REST_0P01 = 0.821417
+
+FEI_CALIB_B0_0P01 = {
+    0: 1.174824, 1: 1.153559, 3: 1.268829, 4: 1.269541,
+    5: 0.938204, 15: 1.120399, 16: 1.310116, 18: 1.277308,
+    19: 1.996069, 26: 0.474330,
+}
+FEI_CALIB_B0_REST_0P01 = 1.107227
+
+
+def get_fei_calibration_map(pdg):
+    """
+    Return the FEI calibration map for the requested B sector.
+    """
+    abs_pdg = abs(int(pdg))
+
+    if abs_pdg == 521:
+        if DEFAULT_FEI_SIGPROB_THRESHOLD == 0.001:
+            return FEI_CALIB_BP_0P001
+        if DEFAULT_FEI_SIGPROB_THRESHOLD == 0.01:
+            return FEI_CALIB_BP_0P01
+    if abs_pdg == 511:
+        if DEFAULT_FEI_SIGPROB_THRESHOLD == 0.001:
+            return FEI_CALIB_B0_0P001
+        if DEFAULT_FEI_SIGPROB_THRESHOLD == 0.01:
+            return FEI_CALIB_B0_0P01
+
+    if abs_pdg not in (511, 521):
+        return {}
+
+    raise ValueError(
+        f"Unsupported DEFAULT_FEI_SIGPROB_THRESHOLD: {DEFAULT_FEI_SIGPROB_THRESHOLD}"
+    )
+
+
+def get_fei_calibration_rest(pdg):
+    """
+    Return the FEI calibration fallback factor for the requested B sector.
+    """
+    abs_pdg = abs(int(pdg))
+
+    if abs_pdg == 521:
+        if DEFAULT_FEI_SIGPROB_THRESHOLD == 0.001:
+            return FEI_CALIB_BP_REST_0P001
+        if DEFAULT_FEI_SIGPROB_THRESHOLD == 0.01:
+            return FEI_CALIB_BP_REST_0P01
+    if abs_pdg == 511:
+        if DEFAULT_FEI_SIGPROB_THRESHOLD == 0.001:
+            return FEI_CALIB_B0_REST_0P001
+        if DEFAULT_FEI_SIGPROB_THRESHOLD == 0.01:
+            return FEI_CALIB_B0_REST_0P01
+
+    if abs_pdg not in (511, 521):
+        return 1.0
+
+    raise ValueError(
+        f"Unsupported DEFAULT_FEI_SIGPROB_THRESHOLD: {DEFAULT_FEI_SIGPROB_THRESHOLD}"
+    )
 
 
 # Indices to KEEP from the full 1644-feature array (all-zero columns removed,

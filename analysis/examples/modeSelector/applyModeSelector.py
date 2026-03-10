@@ -139,7 +139,7 @@ modeSelector.modeSelector(
 
 # only AFTER running modeSelector
 # Rank candidates in each list by two criteria stored for offline comparison:
-# 1. sigProb_rank: pure sigProb ranking (all sigProb>0.01 candidates kept)
+# 1. sigProb_rank: pure sigProb ranking (all sigProb>0.001 candidates kept)
 # 2. modeSelector_rank: BplusScore_eqSigProb in predicted sector, sigProb otherwise
 vm.addAlias('BpModeSelectorRankVar', 'conditionalVariableSelector(BplusScore > 0, extraInfo(BplusScore_eqSigProb), sigProb)')
 vm.addAlias('B0ModeSelectorRankVar', 'conditionalVariableSelector(BplusScore < 0, extraInfo(BplusScore_eqSigProb), sigProb)')
@@ -155,7 +155,7 @@ for b, eq_rank_var in zip(['B+', 'B0'], ['BpModeSelectorRankVar', 'B0ModeSelecto
 # for b, eq_rank_var in zip(['B+', 'B0'], ['BpModeSelectorRankVar', 'B0ModeSelectorRankVar']):
 #     # this cut can remove some eqSigProb best candidates
 #     # should be done after ranking for consistency between BplusScore and modeSelector_rank
-#     ma.applyCuts(f'{b}:{fei_identifier}', 'sigProb > 0.01', path=my_path)
+#     ma.applyCuts(f'{b}:{fei_identifier}', 'sigProb > 0.001', path=my_path)
 
 # sigProb of rank-1 candidate in each list (for cross-sector comparison)
 vm.addAlias('BpSigProb_rank1', 'ifNANgiveX(getVariableByRank(B+:feiHadronic, sigProb, sigProb, 1), -1)')

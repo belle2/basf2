@@ -44,7 +44,8 @@ MAIN_NUM_LABELS = config.N_INPUT_IDS + 3
 
 
 def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
-                         sigprob_thresh=0.01, random_state=None):
+                         sigprob_thresh=config.DEFAULT_FEI_SIGPROB_THRESHOLD,
+                         random_state=None):
     """
     Load training data and apply optional global downsampling.
 
@@ -57,7 +58,7 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     cont_fraction : float
         Additional continuum downscale relative to fraction (default 1.0)
     sigprob_thresh : float
-        Minimum signal probability threshold
+        Minimum signal probability threshold. Default: 0.001.
     random_state : int
         Random seed
 

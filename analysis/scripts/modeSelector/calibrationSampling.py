@@ -34,10 +34,10 @@ def get_fei_calib(dm_id, pdg):
     """
     Get the FEI calibration factor for a decay mode.
     """
-    if abs(pdg) == 521:
-        return config.FEI_CALIB_BP.get(dm_id, config.FEI_CALIB_BP_REST)
-    if abs(pdg) == 511:
-        return config.FEI_CALIB_B0.get(dm_id, config.FEI_CALIB_B0_REST)
+    if abs(pdg) in (511, 521):
+        calib_map = config.get_fei_calibration_map(pdg)
+        calib_rest = config.get_fei_calibration_rest(pdg)
+        return calib_map.get(dm_id, calib_rest)
     return 1.0
 
 

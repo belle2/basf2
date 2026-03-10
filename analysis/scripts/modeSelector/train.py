@@ -73,7 +73,7 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     mc_truth_cand : tuple (best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp)
         Per-event arrays of shape (n_events,). best_bp_iid/b0_iid are int16 with
         sentinel -1 when no qualifying candidate exists; best_bp_dp/b0_dp are float32
-        with sentinel inf. Pre-filtered: gen_pdg == pdg and is_cont != 1.
+        with sentinel inf. Pre-filtered: truth-compatible tag PDG and is_cont != 1.
     sig_truth : tuple (sig_input_ids_values, sig_input_ids_offsets,
                        sig_btag_index_values, sig_delta_p_values, sig_sigprob_values)
         Packed ragged arrays of per-event isSignal==1 candidates on deduplicated

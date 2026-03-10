@@ -152,10 +152,10 @@ for b, eq_rank_var in zip(['B+', 'B0'], ['BpModeSelectorRankVar', 'B0ModeSelecto
     ma.rankByHighest(f'{b}:{fei_identifier}', eq_rank_var,
                      numBest=0, outputVariable='modeSelector_rank', path=my_path)
 
-for b, eq_rank_var in zip(['B+', 'B0'], ['BpModeSelectorRankVar', 'B0ModeSelectorRankVar']):
-    # this cut can remove some eqSigProb best candidates
-    # should be done after ranking for consistency between BplusScore and modeSelector_rank
-    ma.applyCuts(f'{b}:{fei_identifier}', 'sigProb > 0.01', path=my_path)
+# for b, eq_rank_var in zip(['B+', 'B0'], ['BpModeSelectorRankVar', 'B0ModeSelectorRankVar']):
+#     # this cut can remove some eqSigProb best candidates
+#     # should be done after ranking for consistency between BplusScore and modeSelector_rank
+#     ma.applyCuts(f'{b}:{fei_identifier}', 'sigProb > 0.01', path=my_path)
 
 # sigProb of rank-1 candidate in each list (for cross-sector comparison)
 vm.addAlias('BpSigProb_rank1', 'ifNANgiveX(getVariableByRank(B+:feiHadronic, sigProb, sigProb, 1), -1)')

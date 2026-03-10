@@ -29,6 +29,9 @@ DELTA_M_CUT = (-0.05, 0.05)
 # Default threshold for mostcommonBTagDeltaP when defining good-tag fallback truth.
 DELTA_P_THRESH = 0.15
 
+# Neutral B decay modes without flavour information in the truth tag.
+B0_FLAVOUR_AGNOSTIC_DMIDS = frozenset((23, 25))
+
 # Network output sizes
 NUM_CAT_LABELS = 3   # B0, B+, continuum
 NUM_MAIN_LABELS = N_INPUT_IDS + 3  # signal input_id classes + bad_tag + cross_deltaC1 + continuum
@@ -38,6 +41,33 @@ MONITOR_WARN_FRACTION = 1e-3  # 0.1%
 
 # High-confidence definition for monitoring warnings.
 HIGH_CONF_BPLUSSCORE_ABS = 0.01
+
+
+def is_flavour_agnostic_b0_mode(pdg, dm_id):
+    """
+    Whether a reconstructed neutral-B decay mode has no flavour information.
+    """
+    try:
+        return abs(int(pdg)) == 511 and int(dm_id) in B0_FLAVOUR_AGNOSTIC_DMIDS
+    except (TypeError, ValueError, OverflowError):
+        return False
+
+
+def truth_tag_matches_pdg(pdg, tag_pdg, dm_id):
+    """
+    Whether the MC B-tag PDG is truth-compatible with the reconstructed mode.
+    """
+    try:
+        pdg_i = int(pdg)
+        tag_pdg_i = int(tag_pdg)
+    except (TypeError, ValueError, OverflowError):
+        return False
+
+    if tag_pdg_i == pdg_i:
+        return True
+
+    return is_flavour_agnostic_b0_mode(pdg_i, dm_id) and abs(tag_pdg_i) == 511
+
 
 # Feature block definitions: (name, basf2 variable, transform function)
 # Block ordering matters - it defines the feature array layout.

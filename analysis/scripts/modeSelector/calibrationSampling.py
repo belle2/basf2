@@ -16,7 +16,6 @@ from modeSelector import config
 from ROOT import Belle2
 from variables import variables as vm
 
-
 DEFAULT_WEIGHT_VARIABLE = 'modeSelectorCalibWeight'
 DEFAULT_INPUT_ID_VARIABLE = 'modeSelectorCalibInputId'
 NO_SELECTED_INPUT_ID = -1
@@ -50,7 +49,7 @@ def compute_candidate_calibration(pdg, dm_id, tag_pdg, is_cont):
         return 1.0
     if pdg is None or dm_id is None or tag_pdg is None:
         return 1.0
-    if tag_pdg != pdg:
+    if not config.truth_tag_matches_pdg(pdg, tag_pdg, dm_id):
         return 1.0
     return get_fei_calib(dm_id, pdg)
 
@@ -69,7 +68,7 @@ def is_event_sample_probability_clipped(event_calib, is_cont, base_fraction, con
     Whether the requested keep probability is clipped at one.
     """
     if is_cont:
-        return base_fraction * cont_fraction > 1.0
+        return False
     return base_fraction * event_calib > 1.0
 
 
@@ -106,7 +105,11 @@ def is_truth_compatible_candidate(candidate, delta_p_thresh=config.DELTA_P_THRES
         return False
     if candidate['delta_p'] is None or candidate['sigprob'] is None or candidate['input_id'] is None:
         return False
-    if candidate['pdg'] != candidate['tag_pdg']:
+    if not config.truth_tag_matches_pdg(
+        candidate['pdg'],
+        candidate['tag_pdg'],
+        candidate['dm_id'],
+    ):
         return False
     return candidate['is_signal'] or candidate['delta_p'] < delta_p_thresh
 
@@ -201,6 +204,7 @@ class CalibratedEventRandomFilterModule(b2.Module):
             'kept': 0,
             'kept_cont': 0,
             'kept_bb': 0,
+            'empty_events': 0,
             'used_is_signal': 0,
             'used_delta_p_fallback': 0,
             'no_truth_match_bb': 0,
@@ -301,7 +305,9 @@ class CalibratedEventRandomFilterModule(b2.Module):
 
     def event(self):
         candidates = self._collect_candidates()
+        self._summary['processed'] += 1
         if not candidates:
+            self._summary['empty_events'] += 1
             self._store_event_extra_info(self.weight_variable, 1.0)
             self._store_event_extra_info(self.input_id_variable, float(NO_SELECTED_INPUT_ID))
             self.return_value(1 if not self.apply_cut else 0)
@@ -354,7 +360,6 @@ class CalibratedEventRandomFilterModule(b2.Module):
                 )
             keep_event = reference_candidate['event_random'] < keep_prob
 
-        self._summary['processed'] += 1
         if keep_event:
             self._summary['kept'] += 1
             if metadata['is_cont']:
@@ -378,6 +383,7 @@ class CalibratedEventRandomFilterModule(b2.Module):
             f"{kept}/{processed} event(s) ({frac:.2f}%), "
             f"cut={cut_mode}, "
             f"BB={self._summary['kept_bb']}, continuum={self._summary['kept_cont']}, "
+            f"empty={self._summary['empty_events']}, "
             f"isSignal={self._summary['used_is_signal']}, "
             f"deltaP_fallback={self._summary['used_delta_p_fallback']}, "
             f"bb_no_truth={self._summary['no_truth_match_bb']}, "

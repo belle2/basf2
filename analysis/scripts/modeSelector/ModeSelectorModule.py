@@ -564,8 +564,22 @@ class ModeSelectorModule(b2.Module):
 
         bp_tag_pdg = bp_gen_pdg
         b0_tag_pdg = b0_gen_pdg
-        bp_tag_is_gen = ((~np.isnan(bp_pdg)) & (~np.isnan(bp_tag_pdg)) & (bp_tag_pdg == bp_pdg)).astype(np.int8)
-        b0_tag_is_gen = ((~np.isnan(b0_pdg)) & (~np.isnan(b0_tag_pdg)) & (b0_tag_pdg == b0_pdg)).astype(np.int8)
+        bp_tag_is_gen = np.fromiter(
+            (
+                int(config.truth_tag_matches_pdg(pdg, tag_pdg, dm_id))
+                for pdg, tag_pdg, dm_id in zip(bp_pdg, bp_tag_pdg, bp_dm)
+            ),
+            dtype=np.int8,
+            count=n_events,
+        )
+        b0_tag_is_gen = np.fromiter(
+            (
+                int(config.truth_tag_matches_pdg(pdg, tag_pdg, dm_id))
+                for pdg, tag_pdg, dm_id in zip(b0_pdg, b0_tag_pdg, b0_dm)
+            ),
+            dtype=np.int8,
+            count=n_events,
+        )
 
         # Packed per-event input_id lists where isSignal == 1 on the deduplicated
         # candidate set (particle_by_input_id). Event i list is:
@@ -705,9 +719,10 @@ class ModeSelectorModule(b2.Module):
                 tag_pdg = cand_truth['tag_pdg']
                 pdg = cand_truth['pdg']
                 dp = cand_truth['dp']
-                if np.isnan(is_cont) or np.isnan(tag_pdg) or np.isnan(pdg) or np.isnan(dp):
+                dm_id = cand_truth['dm']
+                if np.isnan(is_cont) or np.isnan(tag_pdg) or np.isnan(pdg) or np.isnan(dp) or np.isnan(dm_id):
                     continue
-                if is_cont == 1.0 or (tag_pdg != pdg):
+                if is_cont == 1.0 or not config.truth_tag_matches_pdg(pdg, tag_pdg, dm_id):
                     continue
 
                 if int(iid) < bp_threshold:

@@ -37,9 +37,7 @@ Example usage:
 
 from modeSelector import config
 from modeSelector.calibrationSampling import (
-    CalibratedEventRandomFilterModule,
-    addCalibratedEventRandomSampling,
-)
+    CalibratedEventRandomFilterModule, addCalibratedEventRandomSampling)
 from modeSelector.dstarVeto import add_dstar_veto_aliases, addDstarVeto
 from modeSelector.ModeSelectorModule import ModeSelectorModule
 

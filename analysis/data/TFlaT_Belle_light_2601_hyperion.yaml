@@ -33,6 +33,7 @@ trk_variable_list: # Input lists
 - pidPairProbabilityExpert(11, 211, CDC, SVD)
 - pidPairProbabilityExpert(13, 211, CDC, SVD)
 - pidPairProbabilityExpert(211, 321, CDC, SVD)
+- BelledEdx
 - nSVDHits/8
 - dxdiff
 - dydiff

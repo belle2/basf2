@@ -89,6 +89,8 @@ KDTNode* HitOrderer::buildKDTree(std::vector<KDTHit>::iterator begin, std::vecto
 void HitOrderer::nearestNeighbor(KDTNode* node, const KDTHit& query, KDTHit& best, double& bestDist)
 {
   if (!node) return;
+
+  // Check current node
   if (!node->used) {
     double d = query.squaredDistanceTo(node->hit);
     if (d < bestDist) {
@@ -96,17 +98,46 @@ void HitOrderer::nearestNeighbor(KDTNode* node, const KDTHit& query, KDTHit& bes
       best = node->hit;
     }
   }
+
+  // Decide which way to go
+  int dim = node->dim;
+  double qVal = (dim == 0) ? query.x : query.y;
+  double nVal = (dim == 0) ? node->hit.x : node->hit.y;
+
+  KDTNode* near = (qVal < nVal) ? node->left : node->right;
+  KDTNode* far  = (qVal < nVal) ? node->right : node->left;
+
+  // Search for the "near" side
+  nearestNeighbor(near, query, best, bestDist);
+
+  // Pruning: search only the "far" side if the distance to the
+  // splitting plane is less than the best distance found so far
+  double diff = qVal - nVal;
+  if ((diff * diff) < bestDist) {
+    nearestNeighbor(far, query, best, bestDist);
+  }
 }
 
 bool HitOrderer::markUsed(KDTNode* node, const KDTHit& hit)
 {
   if (!node) return false;
+
+  // If this is the node, mark it
   if (node->hit.hitIndex == hit.hitIndex) {
     node->used = true;
     return true;
   }
-  return markUsed(node->left, hit) || markUsed(node->right, hit);
 
+  // Use the KD-tree structure to find the node
+  int dim = node->dim;
+  double hVal = (dim == 0) ? hit.x : hit.y;
+  double nVal = (dim == 0) ? node->hit.x : node->hit.y;
+
+  if (hVal < nVal) {
+    return markUsed(node->left, hit);
+  } else {
+    return markUsed(node->right, hit);
+  }
 }
 
 void HitOrderer::freeKDTree(KDTNode* node)

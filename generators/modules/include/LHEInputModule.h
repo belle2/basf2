@@ -59,6 +59,10 @@ namespace Belle2 {
     int m_runNum;                    /**< Run number */
     int m_expNum;                    /**< Experiment number */
     int m_evtNum;                    /**< Event number to start from if the reader handles EventMetaData */
+    double m_meanDecayLength;        /**< Mean lifetime*c of displaced particle, default to be zero */
+    double m_Rmin;                   /**< Minimum of distance between displaced vertex to IP. */
+    double m_Rmax;                   /**< Maximum of distance between dispalced vertex to IP. */
+    int m_pdg_displaced;             /**<PDG code of the displaced particle . */
 
   private:
 

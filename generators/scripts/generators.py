@@ -963,6 +963,10 @@ def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False, eventT
         parameterFile = b2.find_file('generators/treps/data/parameterFiles/treps_par_ppbar.dat')
         differentialCrossSectionFile = b2.find_file('generators/treps/data/differentialCrossSectionFiles/ppbardcs.dat')
         wListTableFile = b2.find_file('generators/treps/data/wListFiles/wlist_table_ppbar.dat')
+    elif finalstate == 'gammapi+pi-jpsi':
+        parameterFile = b2.find_file('generators/treps/data/parameterFiles/treps_par_chic2p.dat')
+        differentialCrossSectionFile = b2.find_file('generators/treps/data/differentialCrossSectionFiles/chic2p_dcs.dat')
+        wListTableFile = b2.find_file('generators/treps/data/wListFiles/wlist_table_chic2p.dat')
     else:
         b2.B2FATAL("add_treps_generator final state not supported: {}".format(finalstate))
 

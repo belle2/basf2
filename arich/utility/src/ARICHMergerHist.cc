@@ -6,11 +6,15 @@
 
 #include <arich/utility/ARICHMergerHist.h>
 #include <framework/logging/Logger.h>
+
 #include <TLine.h>
 #include <TColor.h>
-#include <cmath>
 #include <TGraph.h>
 #include <TAxis.h>
+#include <TLatex.h>
+
+#include <cmath>
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -33,8 +37,6 @@ static const double ROW1_OFFSETS[3] = {+18.0, 0.0, -18.0};
 static const double ROW2_OFFSETS[4] = {+23.0, +13.0, -13.0, -23.0};
 static const double ROW3_OFFSETS[4] = {+22.0, +9.0,  -9.0,  -22.0};
 static const double ROW4_OFFSETS[1] = {0.0};
-
-static const double RLINE = 180.0;
 // ---------------------------------------------
 
 void ARICHMergerHist::pol2xy(double r, double angDeg, double& x, double& y)
@@ -142,16 +144,41 @@ void ARICHMergerHist::Draw(Option_t* option)
 {
   TH2Poly::Draw(option);
 
+  // -------------------------------------------------
+  // Sector lines (shorter + gray)
+  // -------------------------------------------------
+  const double rInner = 55.0;
+  const double rOuter = 130.0;
+
   for (int k = 0; k < 6; ++k) {
     const double aDeg = k * 60.0 + m_globalRotationDeg;
 
     double x1, y1, x2, y2;
-    pol2xy(-RLINE, aDeg, x1, y1);
-    pol2xy(+RLINE, aDeg, x2, y2);
+    pol2xy(rInner, aDeg, x1, y1);
+    pol2xy(rOuter, aDeg, x2, y2);
 
     m_lines[k] = TLine(x1, y1, x2, y2);
     m_lines[k].SetLineWidth(2);
-    m_lines[k].SetLineColor(kRed);
+    m_lines[k].SetLineColor(kGray + 2);
     m_lines[k].Draw();
+  }
+
+  // -------------------------------------------------
+  // Sector labels S-1 ... S-6
+  // -------------------------------------------------
+  const double rLabel = 45.0;
+
+  for (int s = 0; s < 6; ++s) {
+    const double centerDeg = SECTOR_CENTER_DEG[s + 1] + m_globalRotationDeg;
+
+    double x, y;
+    pol2xy(rLabel, centerDeg, x, y);
+
+    auto* txt = new TLatex(x, y, Form("S-%d", s + 1));
+    txt->SetBit(kCanDelete);
+    txt->SetTextAlign(22);
+    txt->SetTextFont(62);
+    txt->SetTextSize(0.030);
+    txt->Draw();
   }
 }

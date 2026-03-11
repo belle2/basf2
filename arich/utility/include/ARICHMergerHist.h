@@ -43,7 +43,7 @@ namespace Belle2 {
     /// @param hist Input TH1 with 72 bins
     void fillFromTH1(TH1* hist);
 
-    /// Draw with sector lines.
+    /// Draw with sector lines and labels.
     /// @param option ROOT draw option string
     void Draw(Option_t* option = "") override;
 

@@ -2,8 +2,7 @@ TFLAT_Mask: !!python/tuple # ROE Mask
 - TFLATDefaultMask
 - thetaInCDCAcceptance and p<infinity and p >= 0 and dr<1 and abs(dz)<3
 - thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.06
-  and clusterReg==2] or                     [E>0.06 and clusterReg==3]] and abs(clusterTiming)
-  < 200
+  and clusterReg==2] or                     [E>0.06 and clusterReg==3]]
 
 trk_cut: isInRestOfEvent > 0.5 and passesROEMask(TFLATDefaultMask) > 0.5 and p >= 0
 gamma_cut: isInRestOfEvent > 0.5 and passesROEMask(TFLATDefaultMask) > 0.5 and beamBackgroundSuppression > 0.2 and fakePhotonSuppression > 0.2

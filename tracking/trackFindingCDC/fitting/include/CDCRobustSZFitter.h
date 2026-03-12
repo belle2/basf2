@@ -8,9 +8,12 @@
 #pragma once
 
 namespace Belle2 {
+
+  namespace TrackingUtilities {
+    class CDCTrajectorySZ;
+  }
   namespace TrackFindingCDC {
     class CDCSZObservations;
-    class CDCTrajectorySZ;
 
     /// Utility class implementing robust versions of linear sz trajectory line fits.
     class CDCRobustSZFitter {
@@ -29,21 +32,21 @@ namespace Belle2 {
        *    - Use RANSAC instead of Theil-Sen.
        *    - Think about the parameters better.
        */
-      CDCTrajectorySZ fitUsingSimplifiedTheilSen(const CDCSZObservations& szObservations) const;
+      TrackingUtilities::CDCTrajectorySZ fitUsingSimplifiedTheilSen(const CDCSZObservations& szObservations) const;
 
       /**
        *  Implements the original Theil-Sen line fit algorithm
        *
        *  Does not estimate the covariances of the fit parameters.
        */
-      CDCTrajectorySZ fitTheilSen(const CDCSZObservations& szObservations) const;
+      TrackingUtilities::CDCTrajectorySZ fitTheilSen(const CDCSZObservations& szObservations) const;
 
       /**
        *  Implements the weighted Theil-Sen line fit algorithm
        *
        *  Does not estimate the covariances of the fit parameters.
        */
-      CDCTrajectorySZ fitWeightedTheilSen(const CDCSZObservations& szObservations) const;
+      TrackingUtilities::CDCTrajectorySZ fitWeightedTheilSen(const CDCSZObservations& szObservations) const;
 
 
     private:

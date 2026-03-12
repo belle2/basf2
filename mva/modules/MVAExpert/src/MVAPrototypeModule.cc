@@ -10,7 +10,6 @@
 #include <mva/modules/MVAExpert/MVAPrototypeModule.h>
 #include <mva/interface/Interface.h>
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <memory>
 
 using namespace Belle2;
@@ -42,7 +41,7 @@ void MVAPrototypeModule::initialize()
 {
   // If the identifier does not end on .root or .xml, we are dealing with a database identifier
   // so we need to create a DBObjPtr, which will fetch the weightfile from the database
-  if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
+  if (not(m_identifier.ends_with(".root") or m_identifier.ends_with(".xml"))) {
     m_weightfile_representation = std::make_unique<DBObjPtr<DatabaseRepresentationOfWeightfile>>(m_identifier);
   }
 

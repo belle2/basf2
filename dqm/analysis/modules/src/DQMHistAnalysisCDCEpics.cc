@@ -157,6 +157,23 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   if (!hasDeltaPar(m_name_dir, m_histoTrackingWireEff))
     addDeltaPar(m_name_dir, m_histoTrackingWireEff, HistDelta::c_Events, m_minevt, 1);
 
+  //creating box for normal adc and tdc windows, the real position is updated at begin run
+  m_line_ladc = new TLine(0, m_minadc, 300, m_minadc);
+  m_line_ladc->SetLineColor(kRed);
+  m_line_ladc->SetLineWidth(2);
+
+  m_line_hadc = new TLine(0, m_maxadc, 300, m_maxadc);
+  m_line_hadc->SetLineColor(kRed);
+  m_line_hadc->SetLineWidth(2);
+
+  m_line_ltdc = new TLine(0, m_mintdc, 300, m_mintdc);
+  m_line_ltdc->SetLineColor(kRed);
+  m_line_ltdc->SetLineWidth(2);
+
+  m_line_htdc = new TLine(0, m_maxtdc, 300, m_maxtdc);
+  m_line_htdc->SetLineColor(kRed);
+  m_line_htdc->SetLineWidth(2);
+
   registerEpicsPV(m_name_pvpfx + "cdcboards_wadc", "adcboards");
   registerEpicsPV(m_name_pvpfx + "cdcboards_wtdc", "tdcboards");
 
@@ -186,22 +203,15 @@ void DQMHistAnalysisCDCEpicsModule::beginRun()
   if (std::isnan(m_phiwarn)) m_phiwarn = 0.05; //>%5 is warning
   if (std::isnan(m_phialarm)) m_phialarm = 0.15; //>%15 is warning
 
-  //creating box for normal adc and tdc windows
-  m_line_ladc = new TLine(0, m_minadc, 300, m_minadc);
-  m_line_ladc->SetLineColor(kRed);
-  m_line_ladc->SetLineWidth(2);
-
-  m_line_hadc = new TLine(0, m_maxadc, 300, m_maxadc);
-  m_line_hadc->SetLineColor(kRed);
-  m_line_hadc->SetLineWidth(2);
-
-  m_line_ltdc = new TLine(0, m_mintdc, 300, m_mintdc);
-  m_line_ltdc->SetLineColor(kRed);
-  m_line_ltdc->SetLineWidth(2);
-
-  m_line_htdc = new TLine(0, m_maxtdc, 300, m_maxtdc);
-  m_line_htdc->SetLineColor(kRed);
-  m_line_htdc->SetLineWidth(2);
+  // Update Line position from Epics limits
+  m_line_ladc->SetY1(m_minadc);
+  m_line_ladc->SetY2(m_minadc);
+  m_line_hadc->SetY1(m_maxadc);
+  m_line_hadc->SetY2(m_maxadc);
+  m_line_ltdc->SetY1(m_mintdc);
+  m_line_ltdc->SetY2(m_mintdc);
+  m_line_htdc->SetY1(m_maxtdc);
+  m_line_htdc->SetY2(m_maxtdc);
 
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: beginRun run called");
 }
@@ -457,7 +467,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
           int rmdr = int(abs(ilay - 2) % 6);
           if ((rmdr == 0 && ilay > 2) || ilay == 55) {
             isl++;
-            el[isl] = new TEllipse(0, 0, lbinEdges[ilay], lbinEdges[ilay]);
+            el[isl] = new TEllipse(0, 0, m_lbinEdges[ilay], m_lbinEdges[ilay]);
             el[isl]->SetLineColor(kRed);
             el[isl]->SetLineWidth(2);
             el[isl]->SetFillStyle(0);
@@ -503,7 +513,6 @@ void DQMHistAnalysisCDCEpicsModule::event()
 //------------------------------------
 void DQMHistAnalysisCDCEpicsModule::endRun()
 {
-  for (auto* line : m_lines) delete line;
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: end run");
 }
 
@@ -511,6 +520,8 @@ void DQMHistAnalysisCDCEpicsModule::endRun()
 //------------------------------------
 void DQMHistAnalysisCDCEpicsModule::terminate()
 {
+  for (auto* line : m_lines) delete line;
+  m_lines.clear();
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: terminate called");
 }
 
@@ -544,12 +555,12 @@ void DQMHistAnalysisCDCEpicsModule::fillEffiTH2(TH2F* hist, TH2F* attached, TH2F
   double firstR = cdcgeo.senseWireR(0);
   double secondR = cdcgeo.senseWireR(1);
   binEdges[0] = firstR - (secondR - firstR) / 2;
-  lbinEdges[0] = firstR;
+  m_lbinEdges[0] = firstR;
   for (int lay = 1; lay < nSLayers; lay++) {
     double prevR = cdcgeo.senseWireR(lay - 1);
     double currentR = cdcgeo.senseWireR(lay);
     binEdges[lay] = (prevR + currentR) / 2;
-    lbinEdges[lay] = currentR;
+    m_lbinEdges[lay] = currentR;
   }
   double lastR = cdcgeo.senseWireR(nSLayers - 1);
   double secondLastR = cdcgeo.senseWireR(nSLayers - 2);

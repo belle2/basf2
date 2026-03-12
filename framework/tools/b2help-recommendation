@@ -26,6 +26,7 @@ import terminal_utils
 import itertools
 
 MC_CAMPAIGN = ['MC15', 'MC16']
+RELEASE = [6, 8]
 
 class FormatterStrategy(ABC):
     """
@@ -446,8 +447,10 @@ def get_argument_parser():
     """
     Get the argument parser.
     """
-    parser = argparse.ArgumentParser(description="Outputs recommendation for data/MC corrections and systematics, use tags to navigate.")
+    parser = argparse.ArgumentParser(description="Outputs recommendation for data/MC corrections and systematics, use tags to navigate. Can also be accessed via web version: https://belle2.pages.desy.de/performance/recommendations/")
     group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-r", "--release", help="Show recommendations for this release's MC campaign and the corresponding data processing",
+                        choices=RELEASE, type=int)
     group.add_argument("-mc", "--mccampaign", help="Show recommendations for this MC campaign and the corresponding data processing",
                         choices=MC_CAMPAIGN)
     group.add_argument("-l", "--localfile", help="If one wants to check a json file locally.", default=None)
@@ -489,9 +492,13 @@ def main():
             sys.exit(0)
 
     if args.localfile is None:
-        if args.mccampaign is None:
-            b2.B2ERROR(f"The MC campaign is not provided! Available choices for -mc argument: {MC_CAMPAIGN}")
+        if (args.mccampaign is None) and (args.release is None):
+            b2.B2ERROR(f"The release (to corresponding MC campaign and data processsing) is not provided! Available choices for -r/--release argument: {RELEASE}")
             sys.exit(1)
+        elif args.release is None:
+            b2.B2WARNING("The -mc/--mccampaign argument is being deprecated. Please use -r/--release argument instead.")
+        else:
+            args.mccampaign = MC_CAMPAIGN[RELEASE.index(args.release)]
         gt_name = args.globaltag
         if gt_name is None:
             gt_name = versioning.performance_recommendation_global_tag(args.mccampaign)['global_tag']

@@ -233,7 +233,7 @@ void ContinuumSuppressionBuilderModule::addContinuumSuppression(const Particle* 
     // use_finalstate_for_sig == 0
     KsfwM.usefinal(0);
     ksfwFS0.push_back(KsfwM.mm2());
-    ksfwFS0.push_back(KsfwM.et());
+    ksfwFS0.push_back(KsfwM.pt_sum());
     ksfwFS0.push_back(KsfwM.Hso(0, 0));
     ksfwFS0.push_back(KsfwM.Hso(0, 1));
     ksfwFS0.push_back(KsfwM.Hso(0, 2));
@@ -253,7 +253,7 @@ void ContinuumSuppressionBuilderModule::addContinuumSuppression(const Particle* 
     // use_finalstate_for_sig == 1
     KsfwM.usefinal(1);
     ksfwFS1.push_back(KsfwM.mm2());
-    ksfwFS1.push_back(KsfwM.et());
+    ksfwFS1.push_back(KsfwM.pt_sum());
     ksfwFS1.push_back(KsfwM.Hso(0, 0));
     ksfwFS1.push_back(KsfwM.Hso(0, 1));
     ksfwFS1.push_back(KsfwM.Hso(0, 2));

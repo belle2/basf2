@@ -202,9 +202,10 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
     :class: exercise stacked
 
     Now, create a Rest of Event for the B0 candidates and append a mask with the track cuts
-    ``'nCDCHits > 0 and useCMSFrame(p)<=3.2'`` and the cluster cuts ``'p >= 0.05 and useCMSFrame(p)<=3.2'`` to it.
-    These cuts are common choices for continuum suppression, however they might not be the best ones for your analysis
-    later on!
+    ``'pt > 0.1 and thetaInCDCAcceptance and abs(dz) < 3.0 and dr < 0.5'`` and the cluster cuts
+    ``'E > 0.05 and thetaInCDCAcceptance and abs(clusterTiming) < 200'`` to it.
+    **These cuts are common choices for continuum suppression, however they might not be the best ones for your analysis
+    later on. Make sure you always optimise cuts for your own analysis.**
 
     Then, adding the continuum suppression module is just a single call to the
     `modularAnalysis.buildContinuumSuppression` function. You have to pass the name of the ROE mask you've just created

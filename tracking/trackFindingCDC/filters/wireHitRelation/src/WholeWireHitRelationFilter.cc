@@ -7,15 +7,15 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/wireHitRelation/WholeWireHitRelationFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <cdc/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWire.h>
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
@@ -24,9 +24,11 @@
 #include <cassert>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::RelationFilter<const CDCWireHit>;
+template class TrackingUtilities::RelationFilter<const CDCWireHit>;
 
 WholeWireHitRelationFilter::WholeWireHitRelationFilter(int neighborhoodDegree)
   : m_param_degree(neighborhoodDegree)

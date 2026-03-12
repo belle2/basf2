@@ -20,8 +20,10 @@ namespace Belle2 {
   class RecoTrack;
   class CDCHit;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     /// Interface for a mapping of object and an index to styling attributes
     template <class AObject>
@@ -209,11 +211,11 @@ namespace Belle2 {
      * This Class handles the mapping from the colormapping-method name given as a string to the
      * actual AColorMap for CDCSegments.
      */
-    class ChooseableSegmentStyling : public ChooseableStyling<const CDCSegment2D> {
+    class ChooseableSegmentStyling : public ChooseableStyling<const TrackingUtilities::CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = ChooseableStyling<const CDCSegment2D>;
+      using Super = ChooseableStyling<const TrackingUtilities::CDCSegment2D>;
 
       /// Mapping to be constructed
       using Super::ObjectMapping;

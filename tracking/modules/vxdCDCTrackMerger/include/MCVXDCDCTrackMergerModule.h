@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/collectors/selectors/BestMatchSelector.h>
-#include <tracking/trackFindingCDC/collectors/adders/RelationAdder.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/collectors/selectors/BestMatchSelector.h>
+#include <tracking/trackingUtilities/collectors/adders/RelationAdder.h>
 
 #include <tracking/modules/vxdCDCTrackMerger/StoreArrayMerger.h>
 
@@ -20,7 +20,7 @@ namespace Belle2 {
   class RecoTrack;
 
   /// Findlet for merging VXD and CDC tracks with MC information.
-  class MCVXDCDCTrackMergerFindlet : public TrackFindingCDC::Findlet<> {
+  class MCVXDCDCTrackMergerFindlet : public TrackingUtilities::Findlet<> {
   public:
     /// Constructor, for setting module description and parameters.
     MCVXDCDCTrackMergerFindlet();
@@ -36,9 +36,9 @@ namespace Belle2 {
     /// Get and write back the relations to the store array.
     StoreArrayMerger m_storeArrayMerger;
     /// Make a best candidate selection
-    TrackFindingCDC::BestMatchSelector<RecoTrack*, RecoTrack*> m_bestMatchSelector;
+    TrackingUtilities::BestMatchSelector<RecoTrack*, RecoTrack*> m_bestMatchSelector;
     /// Use the weighted relations to turn them into real DataStore relations.
-    TrackFindingCDC::RelationAdder<RecoTrack*, RecoTrack*> m_relationAdder;
+    TrackingUtilities::RelationAdder<RecoTrack*, RecoTrack*> m_relationAdder;
 
     // Parameters
     /// Only use fitted CDC tracks, as otherwise the comparison with the CKF is unfair.
@@ -46,7 +46,7 @@ namespace Belle2 {
   };
 
   /// This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC using MC
-  class MCVXDCDCTrackMergerModule : public TrackFindingCDC::FindletModule<MCVXDCDCTrackMergerFindlet> {
+  class MCVXDCDCTrackMergerModule : public TrackingUtilities::FindletModule<MCVXDCDCTrackMergerFindlet> {
   public:
     MCVXDCDCTrackMergerModule()
     {

@@ -8,13 +8,14 @@
 #include <tracking/trackFindingCDC/display/SegmentColorMapping.h>
 
 #include <tracking/trackFindingCDC/display/Colors.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 const std::string c_bkgSegmentColor = "orange";
 

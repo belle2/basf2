@@ -15,25 +15,25 @@
 #   basf2 eclWriteClusteringParameters.py
 #
 #   where the parameters are:
-#   LM_energy_cut [ECLLocalMaximumFinder]: Seed energy cut [MeV]
-#   CRF_energy_cut0 [ECLCRFinder]: seed energy cut [MeV]
-#   CRF_energy_cut1 [ECLCRFinder]: growth energy cut [MeV]
-#   CRF_energy_cut2 [ECLCRFinder]: digit energy cut [MeV]
+#   LM_energy_cut [ECLLocalMaximumFinder]: Seed energy cut [GeV]
+#   CRF_energy_cut0 [ECLCRFinder]: seed energy cut [GeV]
+#   CRF_energy_cut1 [ECLCRFinder]: growth energy cut [GeV]
+#   CRF_energy_cut2 [ECLCRFinder]: digit energy cut [GeV]
 #   CRF_time_cut0 [ECLCRFinder]: seed time cut [ns]
 #   CRF_time_cut1 [ECLCRFinder]: growth time cut [ns]
 #   CRF_time_cut2 [ECLCRFinder]: digit time cut [ns]
-#   CRF_timeCut_maxEnergy0 [ECLCRFinder]: max energy for seed time cut [MeV]
-#   CRF_timeCut_maxEnergy1 [ECLCRFinder]: max energy for growth time cut [MeV]
-#   CRF_timeCut_maxEnergy2 [ECLCRFinder]: max energy for digit time cut [MeV]
+#   CRF_timeCut_maxEnergy0 [ECLCRFinder]: max energy for seed time cut [GeV]
+#   CRF_timeCut_maxEnergy1 [ECLCRFinder]: max energy for growth time cut [GeV]
+#   CRF_timeCut_maxEnergy2 [ECLCRFinder]: max energy for digit time cut [GeV]
 
 from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import ECLClusteringParameters, Database, IntervalOfValidity
 import array
 
 parameters = ECLClusteringParameters()
-parameters.setLMEnergyCut(20.0)
+parameters.setLMEnergyCut(0.020)
 
-CRF_energy_cut = array.array('d', [20.0, 20.0, 0.5])
+CRF_energy_cut = array.array('d', [0.020, 0.020, 0.0005])
 parameters.setCRFEnergyCut(CRF_energy_cut)
 
 CRF_time_cut = array.array('d', [400.0, 400.0, 99999.0])

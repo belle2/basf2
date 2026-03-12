@@ -235,15 +235,15 @@
 	      <Plane id="1">
 		<posZ unit="cm">-145</posZ>
 		<innerRadius unit="cm">46.5</innerRadius>
-		<outerRadius unit="cm">51.5</outerRadius>
+		<outerRadius unit="cm">51.4999</outerRadius>
 	      </Plane>
 	      <Plane id="2">
 		<posZ unit="cm">-125</posZ>
 		<innerRadius unit="cm">46.5</innerRadius>
-		<outerRadius unit="cm">51.5</outerRadius>
+		<outerRadius unit="cm">51.4999</outerRadius>
 	      </Plane>
 	      <Plane id="3">
-		<posZ unit="cm">-115.6</posZ>
+		<posZ unit="cm">-115.6001</posZ>
 		<innerRadius unit="cm">46.5</innerRadius>
 		<outerRadius unit="cm">46.5</outerRadius>
 	      </Plane>

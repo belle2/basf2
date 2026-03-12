@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/Filter.dcl.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
     /// Base filter for hits stored in the HitData
-    using BaseTrackletFilter = TrackFindingCDC::Filter<SpacePointTrackCand>;
+    using BaseTrackletFilter = TrackingUtilities::Filter<SpacePointTrackCand>;
   }
 }

@@ -10,6 +10,10 @@
 #include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
 
 namespace Belle2 {
+
+  namespace TrackingUtilities {
+    class CDCTrack;
+  }
   namespace TrackFindingCDC {
 
     /// Relation filter that lets all possible combinations pass.
@@ -21,7 +25,8 @@ namespace Belle2 {
 
     public:
       /// Implementation accepting all possible neighbors.
-      Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCTrack& fromTrack,
+                                           const TrackingUtilities::CDCTrack& toTrack) final;
     };
   }
 }

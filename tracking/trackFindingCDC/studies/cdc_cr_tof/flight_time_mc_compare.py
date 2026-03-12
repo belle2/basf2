@@ -22,7 +22,7 @@ gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
 
 
-DriftTimeUtil = Belle2.TrackFindingCDC.DriftTimeUtil
+DriftTimeUtil = Belle2.TrackingUtilities.DriftTimeUtil
 
 
 def main():

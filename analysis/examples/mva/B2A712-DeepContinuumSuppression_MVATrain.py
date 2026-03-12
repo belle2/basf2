@@ -48,7 +48,7 @@ def choose_input_features(use_vertex_features=True, use_charge_and_ROE_features=
         'thrustOm',
         'cosTBTO',
         'cosTBz',
-        'KSFWVariables(et)',
+        'KSFWVariables(pt_sum)',
         'KSFWVariables(mm2)',
         'KSFWVariables(hso00)',
         'KSFWVariables(hso02)',

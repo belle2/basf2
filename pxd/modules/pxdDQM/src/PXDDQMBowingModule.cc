@@ -60,8 +60,8 @@ void PXDDQMBowingModule::initialize()
   /// get the bowing amplitude from the alignment
   DBObjPtr<VXDAlignment> alignment;
   VXD::GeoCache& geometry(VXD::GeoCache::getInstance());
-  std::vector<VxdID> sensors = geometry.getListOfSensors();
-  for (VxdID& aVxdID : sensors) {
+  const std::vector<VxdID>& sensors = geometry.getListOfSensors();
+  for (const VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geometry.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD || aVxdID.getSensorNumber() != 1) continue;
     const double sensor_length = info.getLength();
@@ -101,10 +101,10 @@ void PXDDQMBowingModule::event()
 
     /// selection: high momentum track from IP
     const TrackFitResult* fitResult = b2track->getTrackFitResultWithClosestMass(Const::pion);
-    ROOT::Math::XYZVector mom = fitResult->getMomentum();
+    const ROOT::Math::XYZVector& mom = fitResult->getMomentum();
     const auto p = mom.R();
     if (p < m_cutP) continue;
-    const Helix helix = fitResult->getHelix();
+    const Helix& helix = fitResult->getHelix();
     const auto d0 = helix.getD0();
     const auto z0 = helix.getZ0();
     if (std::abs(d0) > m_cutD0 || std::abs(z0) > m_cutZ0) continue;
@@ -135,12 +135,12 @@ void PXDDQMBowingModule::event()
 
       const auto fitterInfo = track.getPoint(i)->getFitterInfo();
       if (fitterInfo) {
-        auto vxdid = VxdID(hit->getPlaneId());
+        const auto& vxdid = VxdID(hit->getPlaneId());
         if (vxdid.getSensorNumber() != 1) continue;
-        auto plane = fitterInfo->getPlane();
+        const auto& plane = fitterInfo->getPlane();
         bool biased = true;
-        auto state = fitterInfo->getFittedState(biased).getState();
-        auto residual = fitterInfo->getResidual(0, biased).getState();
+        const auto& state = fitterInfo->getFittedState(biased).getState();
+        const auto residual = fitterInfo->getResidual(0, biased).getState();
 
         const double hitposU = state[3] + residual[0];
         const double hitposV = state[4] + residual[1];
@@ -178,7 +178,7 @@ void PXDDQMBowingModule::defineHisto()
   std::vector<VxdID> sensors = vxdGeometry.getListOfSensors();
   std::sort(sensors.begin(), sensors.end());  // make sure it is our natural order
   for (VxdID& avxdid : sensors) {
-    VXD::SensorInfoBase info = vxdGeometry.getSensorInfo(avxdid);
+    const VXD::SensorInfoBase& info = vxdGeometry.getSensorInfo(avxdid);
     if (info.getType() != VXD::SensorInfoBase::PXD
         || avxdid.getSensorNumber() != 1) continue;  /** we are only interested in forward PXD sensor */
 

@@ -105,7 +105,6 @@ if __name__ == '__main__':
         default='',
         help='working_dir'
     )
-
     parser.add_argument(
         '--BELLE',
         metavar='BELLE',
@@ -114,11 +113,20 @@ if __name__ == '__main__':
         default=False,
         help='Indicate if Belle or Belle II files are to be processed'
     )
+    parser.add_argument(
+        '--sampler_id',
+        metavar='sampler_id',
+        dest='sampler_id',
+        type=int,
+        default=0,
+        help='sampler_id'
+    )
 
     args = parser.parse_args()
     uniqueIdentifier = args.uniqueIdentifier
     inputfile = args.inputfile
     working_dir = args.working_dir
     is_belle = args.BELLE
+    sampler_id = args.sampler_id
 
-    main(uniqueIdentifier, inputfile, working_dir, is_belle)
+    main(uniqueIdentifier, inputfile, working_dir, is_belle, sampler_id)

@@ -64,8 +64,8 @@ void PXDDQMBowingModule::initialize()
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geometry.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD || aVxdID.getSensorNumber() != 1) continue;
-    double sensor_length = info.getLength();
-    double sensor_alpha = alignment->get(aVxdID, VXDAlignment::dAlpha);
+    const double sensor_length = info.getLength();
+    const double sensor_alpha = alignment->get(aVxdID, VXDAlignment::dAlpha);
     m_dwAlignment[aVxdID] = sensor_alpha * sensor_length;
   }
 }
@@ -102,15 +102,11 @@ void PXDDQMBowingModule::event()
     /// selection: high momentum track from IP
     const TrackFitResult* fitResult = b2track->getTrackFitResultWithClosestMass(Const::pion);
     ROOT::Math::XYZVector mom = fitResult->getMomentum();
-    const auto px = mom.X();
-    const auto py = mom.Y();
-    const auto pz = mom.Z();
     const auto p = mom.R();
     if (p < m_cutP) continue;
-    Helix helix = fitResult->getHelix();
+    const Helix helix = fitResult->getHelix();
     const auto d0 = helix.getD0();
     const auto z0 = helix.getZ0();
-    //const auto tanLambda = helix.getTanLambda();
     if (std::abs(d0) > m_cutD0 || std::abs(z0) > m_cutZ0) continue;
 
     auto recoTrack = b2track->getRelatedTo<RecoTrack>();
@@ -120,7 +116,7 @@ void PXDDQMBowingModule::event()
     }
 
     /// select tracks that have at least one PXD hit on forward sensors
-    auto& hits = recoTrack->getSortedPXDHitList();
+    auto hits = recoTrack->getSortedPXDHitList();
     if (!std::any_of(hits.begin(), hits.end(),
     [](const auto & hit) {
     return hit->getSensorID().getSensorNumber() == 1;
@@ -146,23 +142,23 @@ void PXDDQMBowingModule::event()
         auto state = fitterInfo->getFittedState(biased).getState();
         auto residual = fitterInfo->getResidual(0, biased).getState();
 
-        auto hitposU = state[3] + residual[0];
-        auto hitposV = state[4] + residual[1];
+        const double hitposU = state[3] + residual[0];
+        const double hitposV = state[4] + residual[1];
 
         auto noPXDState = genfit::StateOnPlane(noPXDTrack->getMeasuredStateOnPlaneFromFirstHit());
         noPXDState.extrapolateToPlane(plane);
 
-        auto noPXDhitPredU = noPXDState.getState()[3];
-        auto noPXDhitPredV = noPXDState.getState()[4];
+        const double noPXDhitPredU = noPXDState.getState()[3];
+        const double noPXDhitPredV = noPXDState.getState()[4];
 
-        auto noPXDhitPredVp = noPXDState.getState()[2];
+        const double noPXDhitPredVp = noPXDState.getState()[2];
 
-        auto residualU = hitposU - noPXDhitPredU;
+        const double residualU = hitposU - noPXDhitPredU;
 
         if (std::abs(residualU) > m_cutResU) continue;
-        const auto residualV = hitposV - noPXDhitPredV;
-        const auto residualW = residualV / noPXDhitPredVp;
-        const auto sagitta = residualW + m_dwAlignment[vxdid];
+        const double residualV = hitposV - noPXDhitPredV;
+        const double residualW = residualV / noPXDhitPredVp;
+        const double sagitta = residualW + m_dwAlignment[vxdid];
 
         if (m_hResV[vxdid]) m_hResV[vxdid]->Fill(residualV);
         if (m_hSagitta[vxdid] && hitposV < -2) m_hSagitta[vxdid]->Fill(sagitta);

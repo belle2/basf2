@@ -48,20 +48,18 @@
 
 namespace Belle2 {
   namespace Variable {
-    namespace {
-      double requireDoubleForFrameVariable(const Variable::Manager::Var* var,
-                                           const Variable::Manager::VarVariant& value,
-                                           const std::string& frameFunction)
-      {
-        if (std::holds_alternative<double>(value)) {
-          return std::get<double>(value);
-        }
-
-        const char* returnedType = std::holds_alternative<int>(value) ? "int" : "bool";
-        B2ERROR("Meta function " << frameFunction << " expects a floating-point variable, but '" << var->name
-                << "' returned " << returnedType << ". Returning NaN.");
-        return Const::doubleNaN;
+    double requireDoubleForFrameVariable(const Variable::Manager::Var* var,
+                                         const Variable::Manager::VarVariant& value,
+                                         const std::string& frameFunction)
+    {
+      if (std::holds_alternative<double>(value)) {
+        return std::get<double>(value);
       }
+
+      const char* returnedType = std::holds_alternative<int>(value) ? "int" : "bool";
+      B2ERROR("Meta function " << frameFunction << " expects a double variable, but '" << var->name
+              << "' returned " << returnedType << ". Returning NaN.");
+      return Const::doubleNaN;
     }
 
     Manager::FunctionPtr useRestFrame(const std::vector<std::string>& arguments)
@@ -3469,14 +3467,19 @@ namespace Belle2 {
       }
 
       std::string arg = arguments[0];
-      TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(arg.c_str());
+      TDatabasePDG* pdgDatabase = TDatabasePDG::Instance();
+      TParticlePDG* part = pdgDatabase->GetParticle(arg.c_str());
       int absPdg = 0;
       if (part != nullptr) {
         absPdg = std::abs(part->PdgCode());
       } else {
         try {
           absPdg = std::abs(convertString<int>(arg));
-        } catch (std::exception& e) {
+        } catch (const std::exception&) {
+          absPdg = 0;
+        }
+
+        if (absPdg == 0 || pdgDatabase->GetParticle(absPdg) == nullptr) {
           B2FATAL("nTrackFitResults: argument '" << arg << "' is neither a valid particle name nor a PDG code");
         }
       }

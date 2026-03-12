@@ -72,8 +72,9 @@ def modeSelector(
     to compute an improved signal probability score. The network considers
     information from all B candidates in the event.
 
-    The output score (BplusScore) is stored as ExtraInfo on the best B candidate
-    and optionally in EventExtraInfo.
+    The main output score is stored in EventExtraInfo using output_variable.
+    Auxiliary category and per-candidate mode outputs are stored with the
+    fixed modeSelector_* names.
 
     Parameters
     ----------
@@ -107,13 +108,18 @@ def modeSelector(
     The ModeSelector neural network outputs:
 
     Candidate-level (ExtraInfo on best B+ and best B0):
-    - {output_variable}_eqSigProb: Signal probability (0.5 + Bp_score/2 for B+, 0.5 - Bp_score/2 for B0)
+    - modeSelector_eqSigProb: Probability assigned to a candidate's input_id
+      in the predicted sector
 
     Event-level (EventExtraInfo):
-    - {output_variable}: Bp_score = main_output[5] - main_output[1]
-    - {output_variable}_catB0: Category network B0 probability
-    - {output_variable}_catBp: Category network B+ probability
-    - {output_variable}_catCont: Category network continuum probability
+    - {output_variable}: signed main score
+    - modeSelector_catB0: Category network B0 probability
+    - modeSelector_catBp: Category network B+ probability
+    - modeSelector_catCont: Category network continuum probability
+
+    Candidate-level ranking (ExtraInfo on deduplicated representatives):
+    - modeSelector_rank: predicted sector ranked by modeSelector_eqSigProb,
+      non-predicted sector ranked by sigProb
 
     For best performance, run addDstarVeto() before modeSelector() to
     provide D* veto features to the network.

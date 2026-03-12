@@ -46,6 +46,7 @@ class ModeSelectorModule(b2.Module):
     TR_EVENT_FIELDS = ('all_features',)
     TR_EVENT_BEST_FIELDS = ('best_bp_iid', 'best_bp_dp', 'best_b0_iid', 'best_b0_dp')
     TR_BEST_FIELDS = ('pdg', 'dm', 'sigprob', 'is_cont', 'tag_pdg')
+    AUXILIARY_OUTPUT_PREFIX = 'modeSelector'
 
     def __init__(
         self,
@@ -92,8 +93,6 @@ class ModeSelectorModule(b2.Module):
         self.debug_max_events = debug_max_events
         #: Event counter for debug
         self.event_count = 0
-        #: Store debug features for comparison
-        self.debug_features = []
         #: Flag to check event shape prerequisite once
         self._event_shape_checked = False
         #: Flag to check D* veto prerequisite once
@@ -180,6 +179,16 @@ class ModeSelectorModule(b2.Module):
 
         #: Cut range for D* delta mass difference
         self.deltaM_cut = config.DELTA_M_CUT
+
+    @staticmethod
+    def _assign_rank_extra_info(particle_score_input_id_triples, variable_name):
+        """Assign deterministic descending ranks to the given particles."""
+        ranked_pairs = sorted(
+            particle_score_input_id_triples,
+            key=lambda triple: (-triple[1], triple[2])
+        )
+        for rank, (particle, _, _) in enumerate(ranked_pairs, start=1):
+            particle.addExtraInfo(variable_name, rank)
 
     def _get_input_id(self, particle):
         """
@@ -475,25 +484,6 @@ class ModeSelectorModule(b2.Module):
                     "ModeSelector: predicted-sector-empty high-confidence fraction exceeds threshold "
                     f"({100.0 * high_conf_fallback_frac:.3f}% > {100.0 * config.MONITOR_WARN_FRACTION:.3f}%)."
                 )
-
-        if self.debug and self.debug_features:
-            # Save debug features and NN outputs to file
-            debug_file = 'modeSelector_debug_features.npz'
-            feature_arrays = np.array([d['all_features'] for d in self.debug_features])
-            cat_outputs = np.array([d['cat_output'] for d in self.debug_features])
-            main_outputs = np.array([d['main_output'] for d in self.debug_features])
-            np.savez(debug_file,
-                     features=feature_arrays,
-                     cat_outputs=cat_outputs,
-                     main_outputs=main_outputs,
-                     charged_cat=[d['charged_cat'] for d in self.debug_features],
-                     bp_score=[d['bp_score'] for d in self.debug_features],
-                     n_candidates=[d['n_candidates'] for d in self.debug_features],
-                     max_input_ids=[d['max_input_id'] for d in self.debug_features],
-                     exp=[d['exp'] for d in self.debug_features],
-                     run=[d['run'] for d in self.debug_features],
-                     evt=[d['evt'] for d in self.debug_features])
-            print(f"\n[DEBUG] Saved {len(self.debug_features)} events to {debug_file}")
 
     def _save_training_data(self):
         """Save collected training data to npz."""
@@ -835,40 +825,33 @@ class ModeSelectorModule(b2.Module):
         if not predicted_input_ids and is_high_conf:
             self._empty_predicted_sector_high_conf_count += 1
 
-        # Assign BplusScore_eqSigProb per candidate in the predicted sector only.
+        # Assign modeSelector_eqSigProb per candidate in the predicted sector only.
         # Non-predicted sector candidates are left unset (sigProb-based ranking used downstream).
+        predicted_rank_pairs = []
+        non_predicted_rank_pairs = []
         for input_id, particle in particle_by_input_id.items():
             is_bp_sector = input_id < bp_threshold
             if bool(charged_cat) == is_bp_sector:
                 candidate_score = float(main_output[input_id])
-                particle.addExtraInfo(f'{self.output_variable}_eqSigProb', candidate_score)
+                particle.addExtraInfo(f'{self.AUXILIARY_OUTPUT_PREFIX}_eqSigProb', candidate_score)
+                predicted_rank_pairs.append((particle, candidate_score, input_id))
+            else:
+                non_predicted_rank_pairs.append((particle, float(_sigprob_by_input_id[input_id]), input_id))
+
+        self._assign_rank_extra_info(predicted_rank_pairs, f'{self.AUXILIARY_OUTPUT_PREFIX}_rank')
+        self._assign_rank_extra_info(non_predicted_rank_pairs, f'{self.AUXILIARY_OUTPUT_PREFIX}_rank')
 
         # Store event-level outputs in EventExtraInfo
         event_extra_info = Belle2.PyStoreObj('EventExtraInfo')
         if not event_extra_info.isValid():
             event_extra_info.create()
         event_extra_info.addExtraInfo(self.output_variable, bp_score)
-        event_extra_info.addExtraInfo(f'{self.output_variable}_catB0', float(cat_output[0]))
-        event_extra_info.addExtraInfo(f'{self.output_variable}_catBp', float(cat_output[1]))
-        event_extra_info.addExtraInfo(f'{self.output_variable}_catCont', float(cat_output[2]))
+        event_extra_info.addExtraInfo(f'{self.AUXILIARY_OUTPUT_PREFIX}_catB0', float(cat_output[0]))
+        event_extra_info.addExtraInfo(f'{self.AUXILIARY_OUTPUT_PREFIX}_catBp', float(cat_output[1]))
+        event_extra_info.addExtraInfo(f'{self.AUXILIARY_OUTPUT_PREFIX}_catCont', float(cat_output[2]))
 
         # Debug output (after NN inference so we can save outputs too)
         if self.debug:
-            event_meta = Belle2.PyStoreObj('EventMetaData')
-            if event_meta.isValid():
-                self.debug_features.append({
-                    'exp': event_meta.getExperiment(),
-                    'run': event_meta.getRun(),
-                    'evt': event_meta.getEvent(),
-                    'all_features': all_features.copy(),
-                    'max_input_id': max_input_id,
-                    'n_candidates': n_candidates,
-                    'cat_output': cat_output.copy(),
-                    'main_output': main_output.copy(),
-                    'charged_cat': charged_cat,
-                    'bp_score': bp_score,
-                })
-
             if self.event_count < self.debug_max_events:
                 self._print_debug_info(candidates_data, event_features, all_features, max_input_id)
 

@@ -41,6 +41,8 @@ parser.add_argument('--cat-model', default='onnx/modeSelector_cat.onnx',
                     help='Path to category ONNX model')
 parser.add_argument('--main-model', default='onnx/modeSelector_main.onnx',
                     help='Path to main ONNX model')
+parser.add_argument('--data', action='store_true',
+                    help='Run in data mode: keep 10% of events with eventRandom and drop MC-only output variables')
 args = parser.parse_args()
 
 output_root, output_suffix = os.path.splitext(args.output)
@@ -72,20 +74,23 @@ fei_identifier = 'feiHadronic'
 # Define the particle lists to process
 particle_lists = [f'B+:{fei_identifier}', f'B0:{fei_identifier}']
 
-# MC truth matching
-for plist in particle_lists:
-    ma.matchMCTruth(plist, path=my_path)
+if args.data:
+    ma.applyEventCuts('eventRandom < 0.1', path=my_path)
+else:
+    # MC truth matching
+    for plist in particle_lists:
+        ma.matchMCTruth(plist, path=my_path)
 
-# Keep an approximately complementary holdout band with 1 - eventRandom.
-vm.addAlias('eventRandomComplement', 'formula(1 - eventRandom)')
-modeSelector.addCalibratedEventRandomSampling(
-    bp_list=f'B+:{fei_identifier}',
-    b0_list=f'B0:{fei_identifier}',
-    base_fraction=0.1,
-    cont_fraction=1.0,
-    random_variable='eventRandomComplement',
-    path=my_path
-)
+    # Keep an approximately complementary holdout band with 1 - eventRandom.
+    vm.addAlias('eventRandomComplement', 'formula(1 - eventRandom)')
+    modeSelector.addCalibratedEventRandomSampling(
+        bp_list=f'B+:{fei_identifier}',
+        b0_list=f'B0:{fei_identifier}',
+        base_fraction=0.05,
+        cont_fraction=1.0,
+        random_variable='eventRandomComplement',
+        path=my_path
+    )
 
 # Define ROE masks for continuum suppression
 track_mask = "[[dr < 2] and [abs(dz) < 4] and [pt > 0.2] and [thetaInCDCAcceptance==1]]"
@@ -94,7 +99,7 @@ ecl_mask = ("[[[[clusterReg==1] and [E>0.080]] or [[clusterReg==2] and [E > 0.03
             "and [abs(clusterTiming) < 200] and [thetaInCDCAcceptance==1]]")
 cleanMask = ("cleanMask", track_mask, ecl_mask)
 
-# Apply FEI calibration cuts and build continuum suppression on kept events.
+# Apply FEI preselection and build continuum suppression on kept events.
 for b in ['B+', 'B0']:
     ma.applyCuts(f'{b}:{fei_identifier}', '[Mbc > 5.23] and [-0.15 < deltaE < 0.1]', path=my_path)
 
@@ -138,24 +143,13 @@ modeSelector.modeSelector(
 )
 
 # only AFTER running modeSelector
-# Rank candidates in each list by two criteria stored for offline comparison:
+# Rank candidates by two criteria stored for offline comparison:
 # 1. sigProb_rank: pure sigProb ranking (all sigProb>0.001 candidates kept)
-# 2. modeSelector_rank: BplusScore_eqSigProb in predicted sector, sigProb otherwise
-vm.addAlias('BpModeSelectorRankVar', 'conditionalVariableSelector(BplusScore > 0, extraInfo(BplusScore_eqSigProb), sigProb)')
-vm.addAlias('B0ModeSelectorRankVar', 'conditionalVariableSelector(BplusScore < 0, extraInfo(BplusScore_eqSigProb), sigProb)')
-
-for b, eq_rank_var in zip(['B+', 'B0'], ['BpModeSelectorRankVar', 'B0ModeSelectorRankVar']):
+# 2. modeSelector_rank: ModeSelector-based rank written by the module
+for b in ['B+', 'B0']:
     # rank by sigProb (pure), keep all candidates for offline comparison
     ma.rankByHighest(f'{b}:{fei_identifier}', 'sigProb',
                      numBest=0, outputVariable='sigProb_rank', path=my_path)
-    # rank by eqSigProb in predicted sector, sigProb in non-predicted sector
-    ma.rankByHighest(f'{b}:{fei_identifier}', eq_rank_var,
-                     numBest=0, outputVariable='modeSelector_rank', path=my_path)
-
-# for b, eq_rank_var in zip(['B+', 'B0'], ['BpModeSelectorRankVar', 'B0ModeSelectorRankVar']):
-#     # this cut can remove some eqSigProb best candidates
-#     # should be done after ranking for consistency between BplusScore and modeSelector_rank
-#     ma.applyCuts(f'{b}:{fei_identifier}', 'sigProb > 0.001', path=my_path)
 
 # sigProb of rank-1 candidate in each list (for cross-sector comparison)
 vm.addAlias('BpSigProb_rank1', 'ifNANgiveX(getVariableByRank(B+:feiHadronic, sigProb, sigProb, 1), -1)')
@@ -171,24 +165,10 @@ vm.addAlias(
     1, 0)'
 )
 
-# isBestCandidate_eqSigProb: eqSigProb ranking; rank-1 in the predicted sector only
-# could just define based on eqSigProb_rank, only considering predicted class?
-vm.addAlias(
-    'isBestCandidate_eqSigProb', 'conditionalVariableSelector( \
-    [[BplusScore > 0] and [abs(PDG) == 521] and [modeSelector_rank == 1]] or \
-    [[BplusScore < 0] and [abs(PDG) == 511] and [modeSelector_rank == 1]], \
-    1, 0)'
-)
-
-vm.addAlias('BplusScore_cat', 'conditionalVariableSelector(BplusScore_catBp > BplusScore_catB0, 1, -1)')
-
 # Keep at most 2 candidates per list: rank-1 by sigProb and rank-1 by eqSigProb.
-# In the non-predicted sector eqSigProb falls back to sigProb, so only 1 is kept there.
-# isBestCandidate_sigProb / isBestCandidate_eqSigProb stored in output for offline selection.
+# isBestCandidate_sigProb stored in output for offline selection.
 for b in ['B+', 'B0']:
-    ma.applyCuts(f'{b}:{fei_identifier}',
-                 '[sigProb_rank == 1] or [modeSelector_rank == 1]',
-                 path=my_path)
+    ma.applyCuts(f'{b}:{fei_identifier}', '[sigProb_rank == 1] or [modeSelector_rank == 1]', path=my_path)
 
 
 # Create aliases for cleaner branch names in output ntuple
@@ -196,21 +176,28 @@ vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
 vm.addAlias('sigProb_rank', 'extraInfo(sigProb_rank)')
 vm.addAlias('modeSelector_rank', 'extraInfo(modeSelector_rank)')
 vm.addAlias('dmID', 'extraInfo(decayModeID)')
-vu.create_aliases(
-    ['BplusScore_eqSigProb', 'Dstp_deltaMassDiff', 'Dstp_chiProb', 'Dst0_deltaMassDiff', 'Dst0_chiProb'],
-    wrapper='extraInfo({variable})'
-)
-vu.create_aliases(
-    [
-        'BplusScore',
-        'BplusScore_catB0',
-        'BplusScore_catBp',
-        'BplusScore_catCont',
+
+candidate_variables = [
+    'modeSelector_eqSigProb',
+    'Dstp_deltaMassDiff',
+    'Dstp_chiProb',
+    'Dst0_deltaMassDiff',
+    'Dst0_chiProb'
+]
+vu.create_aliases(candidate_variables, wrapper='extraInfo({variable})')
+
+event_output_variables = [
+    'BplusScore',
+    'modeSelector_catB0',
+    'modeSelector_catBp',
+    'modeSelector_catCont'
+]
+if not args.data:
+    event_output_variables.extend([
         'modeSelectorCalibWeight',
         'modeSelectorCalibInputId',
-    ],
-    wrapper='eventExtraInfo({variable})'
-)
+    ])
+vu.create_aliases(event_output_variables, wrapper='eventExtraInfo({variable})')
 
 # Define output variables
 output_variables = [
@@ -222,22 +209,13 @@ output_variables = [
     'sigProb',
     'dmID',
     # ModeSelector output (candidate-level)
-    'BplusScore_eqSigProb',
+    'modeSelector_eqSigProb',
     # ModeSelector output (event-level)
     'BplusScore',
-    'BplusScore_catB0',
-    'BplusScore_catBp',
-    'BplusScore_catCont',
-    'modeSelectorCalibWeight',
-    'modeSelectorCalibInputId',
-    # +1 if pred charged, else -1
-    'BplusScore_cat',
-    # MC truth matching
-    'isSignal',
+    'modeSelector_catB0',
+    'modeSelector_catBp',
+    'modeSelector_catCont',
     'PDG',
-    'isContinuumEvent',
-    'mostcommonBTagDeltaP',
-    'mostcommonBTagPDG',
     # D* veto variables
     'Dstp_deltaMassDiff',
     'Dstp_chiProb',
@@ -247,11 +225,18 @@ output_variables = [
     'sigProb_rank',
     'modeSelector_rank',
     'isBestCandidate_sigProb',
-    'isBestCandidate_eqSigProb',
-    # 'useCMSFrame(False)',
-    # 'useCMSFrame(nCleanedTracks())',
-    # 'nTrackFitResults(blah)',
+    'eventRandom',
 ]
+
+if not args.data:
+    output_variables.extend([
+        'modeSelectorCalibWeight',
+        'modeSelectorCalibInputId',
+        'isSignal',
+        'isContinuumEvent',
+        'mostcommonBTagDeltaP',
+        'mostcommonBTagPDG',
+    ])
 
 # Wrap B+ and B0 in a common Upsilon(4S) candidate and merge lists
 for b, b_str in zip(['B+', 'B0'], ['Bp', 'B0']):

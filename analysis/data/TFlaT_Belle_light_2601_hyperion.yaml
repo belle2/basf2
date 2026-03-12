@@ -39,13 +39,13 @@ trk_variable_list: # Input lists
 - dydiff
 - dzdiff
 - clusterEoP
-- clusterLAT
+- clusterLAT/10
 ecl_variable_list:
 - useCMSFrame(p)
 - useCMSFrame(cosTheta)
 - useCMSFrame(phi)
 - clusterE9E21
-- clusterLAT
+- clusterLAT/10
 roe_variable_list:
 - countInList(gamma:tflat)/8
 - countInList(pi+:tflat)/6

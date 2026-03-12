@@ -39,6 +39,9 @@ DQMHistAnalysisPXDBowModule::DQMHistAnalysisPXDBowModule()
   addParam("sagittaThreshold", m_sagittaThreshold,
            "threshold for the warning related to the sagitta",
            m_sagittaThreshold);
+  addParam("sagittaErrorThreshold", m_sagittaErrorThreshold,
+           "threshold for the error related to the sagitta",
+           m_sagittaErrorThreshold);
   addParam("roiThreshold", m_roiThreshold,
            "threshold for the warning related to the roi",
            m_roiThreshold);
@@ -54,13 +57,13 @@ void DQMHistAnalysisPXDBowModule::initialize()
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  int valideModule = 0;
+  int validModule = 0;
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD || aVxdID.getSensorNumber() != 1) continue;
     m_PXDModules.push_back(aVxdID); // reorder
 
-    if (VxdID(m_moduleName) == aVxdID) valideModule++;
+    if (VxdID(m_moduleName) == aVxdID) validModule++;
 
     // Epics for all the forward PXD module
     auto buff = (std::string)aVxdID;
@@ -70,7 +73,7 @@ void DQMHistAnalysisPXDBowModule::initialize()
     registerEpicsPV("PXD:sagitta:" + buff, "sagitta:" + (std::string)aVxdID);
   }
 
-  if (valideModule == 0) {
+  if (validModule == 0) {
     B2WARNING("Invalid moduleName, only PXD forward module are acceptable, nameModule parameter set to default (2.2.1)");
     m_moduleName = "2.2.1";
   }
@@ -94,19 +97,19 @@ void DQMHistAnalysisPXDBowModule::beginRun()
   /// get RoI size in the v coordinate
   DBObjPtr<ROICalculationParameters> roiParams;
   if (!roiParams.isValid()) B2WARNING("Cannot get roi parameters, ROI v half size defined as default (0.1 cm)");
-  m_roiThreshold = roiParams->getSigmaSystV() * roiParams->getNumSigmaTotV() / 2;
+  else m_roiThreshold = roiParams->getSigmaSystV() * roiParams->getNumSigmaTotV() / 2;
 }
 
 void DQMHistAnalysisPXDBowModule::event()
 {
   for (VxdID& aPXDModule : m_PXDModules) {
-    auto buff = (std::string)m_moduleName;
+    auto buff = (std::string)aPXDModule;
     std::replace(buff.begin(), buff.end(), '.', '_');
 
     TH1* hV = getDelta(m_histogramDirectoryName + "resV_" + buff, true);
     TH1* hS = getDelta(m_histogramDirectoryName + "sagitta_" + buff, true);
+    bool enough = false, warnflag = false, errorflag = false;
     if (hS != NULL && hV != NULL) {
-      bool enough = false, warnflag = false, errorflag = false;
       B2DEBUG(20, "Histos resS_" << buff << " and resV_" << buff << " found");
       if (hS->GetEntries() > m_statThreshold) {
         enough = true;
@@ -114,13 +117,12 @@ void DQMHistAnalysisPXDBowModule::event()
         // Epics PVs
         double meanResV = hV->GetMean();
         double stdResV = hV->GetStdDev();
-        double resV = TMath::Abs(meanResV) + 3 * stdResV;
+        double resV = std::abs(meanResV) + 3 * stdResV;
         double bowAmplitude = hS->GetMean();
 
-        VxdID vxdid(m_moduleName);
-        if (TMath::Abs(bowAmplitude) > 0.1) errorflag = true; /// error
+        if (std::abs(bowAmplitude) > m_sagittaErrorThreshold) errorflag = true; /// error
         else if (resV > m_roiThreshold
-                 || TMath::Abs(bowAmplitude) > m_sagittaThreshold) warnflag = true;/// warning
+                 || std::abs(bowAmplitude) > m_sagittaThreshold) warnflag = true;/// warning
 
         setEpicsPV("meanResV:" + buff, meanResV);
         setEpicsPV("stdResV:" + buff, stdResV);
@@ -146,16 +148,4 @@ void DQMHistAnalysisPXDBowModule::event()
   }
 }
 
-void DQMHistAnalysisPXDBowModule::endRun()
-{
-  // if this function is not needed, please remove
-  B2DEBUG(20, "DQMHistAnalysisPXDBow : endRun called");
-}
-
-
-void DQMHistAnalysisPXDBowModule::terminate()
-{
-  // if this function is not needed, please remove
-  B2DEBUG(20, "terminate called");
-}
 

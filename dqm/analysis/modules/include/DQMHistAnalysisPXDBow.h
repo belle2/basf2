@@ -42,17 +42,6 @@ namespace Belle2 {
      */
     void event() override final;
 
-    /**
-     * This method is called if the current run ends.
-     * Save run-related stuff, such as statistics.
-     */
-    void endRun() override final;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override final;
-
     //! Parameters accessible from basf2 scripts
   private:
     //! name of histogram directory
@@ -70,7 +59,8 @@ namespace Belle2 {
 
     float m_roiThreshold{0.1}; /**< Threshold values for warning flag on the resV, the value is related on the dimesion of the ROI*/
     float m_statThreshold{300}; /**< Threshold values for statistic flag on the plotted histograms*/
-    float m_sagittaThreshold{0.06}; /**< Threshold values for error flag on the sagitta*/
+    float m_sagittaThreshold{0.06}; /**< Threshold values for warning flag on the sagitta*/
+    float m_sagittaErrorThreshold{0.1}; /**< Threshold values for error flag on the sagitta*/
     std::string m_moduleName{"2.2.1"}; /**< name of the module which distribution will be plotted on the dqm*/
   };
 } // end namespace Belle2

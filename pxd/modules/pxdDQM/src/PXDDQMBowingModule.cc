@@ -9,10 +9,12 @@
 #include <pxd/modules/pxdDQM/PXDDQMBowingModule.h>
 
 #include <alignment/dbobjects/VXDAlignment.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <framework/database/DBObjPtr.h>
 #include <genfit/Track.h>
 #include <mdst/dataobjects/Track.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <vxd/geometry/GeoCache.h>
 #include "TDirectory.h"
@@ -103,13 +105,13 @@ void PXDDQMBowingModule::event()
     const auto px = mom.X();
     const auto py = mom.Y();
     const auto pz = mom.Z();
-    const auto p = TMath::Sqrt(px * px + py * py + pz * pz);
+    const auto p = mom.R();
     if (p < m_cutP) continue;
     Helix helix = fitResult->getHelix();
     const auto d0 = helix.getD0();
     const auto z0 = helix.getZ0();
     //const auto tanLambda = helix.getTanLambda();
-    if (TMath::Abs(d0) > m_cutD0 || TMath::Abs(z0) > m_cutZ0) continue;
+    if (std::abs(d0) > m_cutD0 || std::abs(z0) > m_cutZ0) continue;
 
     auto recoTrack = b2track->getRelatedTo<RecoTrack>();
     if (!recoTrack) {
@@ -118,44 +120,24 @@ void PXDDQMBowingModule::event()
     }
 
     /// select tracks that have at least one PXD hit on forward sensors
-    int forwardPXDhits = 0;
-    for (const auto& hit : recoTrack->getSortedPXDHitList()) {
-      auto sensorID = hit->getSensorID();
-      if (sensorID.getSensorNumber() == 1) forwardPXDhits++;
-    }
-    if (forwardPXDhits == 0) continue;
+    auto& hits = recoTrack->getSortedPXDHitList();
+    if (!std::any_of(hits.begin(), hits.end(),
+    [](const auto & hit) {
+    return hit->getSensorID().getSensorNumber() == 1;
+    })) continue;
 
     /// track without PXD hits
     auto noPXDTrack = recoTrack->getRelatedTo<RecoTrack>("SVDCDCRecoTracks");
 
-    /*// OR copy track without hits
-    auto noPXDTrack = recoTrack->copyToStoreArray(m_outputRecoTracks);
-    int sortingPar = 0;
-    /// add SVD hits
-    for (const auto& hit : recoTrack->getSortedSVDHitList()) {
-      noPXDTrack->addSVDHit(hit, sortingPar);
-      sortingPar++;
-    }
-    /// add CDC hits
-    for (const auto& hit : recoTrack->getSortedCDCHitList()) {
-      noPXDTrack->addCDCHit(hit, sortingPar);
-      sortingPar++;
-    }
-    /// refit the track without PXD hits
-    TrackFitter fitter;
-    fitter.fit(*noPXDTrack);
-    B2INFO("With refit recotrack");
-    //*/
-
     /// get the original genfit track to get the PXDhits
-    genfit::Track& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
+    const genfit::Track& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
     for (unsigned int i = 0; i < track.getNumPoints() - 1; ++i) {
       if (!track.getPoint(i)->hasRawMeasurements()) continue;
 
-      PXDRecoHit* hit = dynamic_cast<PXDRecoHit*>(track.getPoint(i)->getRawMeasurement(0));
+      const PXDRecoHit* hit = dynamic_cast<PXDRecoHit*>(track.getPoint(i)->getRawMeasurement(0));
       if (!hit) continue;
 
-      auto fitterInfo = track.getPoint(i)->getFitterInfo();
+      const auto fitterInfo = track.getPoint(i)->getFitterInfo();
       if (fitterInfo) {
         auto vxdid = VxdID(hit->getPlaneId());
         if (vxdid.getSensorNumber() != 1) continue;
@@ -177,7 +159,7 @@ void PXDDQMBowingModule::event()
 
         auto residualU = hitposU - noPXDhitPredU;
 
-        if (TMath::Abs(residualU) > m_cutResU) continue;
+        if (std::abs(residualU) > m_cutResU) continue;
         const auto residualV = hitposV - noPXDhitPredV;
         const auto residualW = residualV / noPXDhitPredVp;
         const auto sagitta = residualW + m_dwAlignment[vxdid];
@@ -196,7 +178,7 @@ void PXDDQMBowingModule::defineHisto()
     oldDir->mkdir(m_histogramDirectoryName.c_str());
     oldDir->cd(m_histogramDirectoryName.c_str());
   }
-  VXD::GeoCache& vxdGeometry(VXD::GeoCache::getInstance());
+  const VXD::GeoCache& vxdGeometry(VXD::GeoCache::getInstance());
   std::vector<VxdID> sensors = vxdGeometry.getListOfSensors();
   std::sort(sensors.begin(), sensors.end());  // make sure it is our natural order
   for (VxdID& avxdid : sensors) {
@@ -212,5 +194,4 @@ void PXDDQMBowingModule::defineHisto()
   }
   oldDir->cd();
 }
-
 

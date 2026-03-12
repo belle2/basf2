@@ -8,16 +8,17 @@
 
 #pragma once
 
-#include <analysis/dataobjects/ParticleList.h>
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <vxd/dataobjects/VxdID.h>
 
 #include "TH1F.h"
 
 namespace Belle2 {
+  class RecoTrack;
+  class ParticleList;
+
   /**
    * Create basic histograms for PXD bowing monitoring
    */
@@ -49,7 +50,7 @@ namespace Belle2 {
 
     std::string m_histogramDirectoryName;  /**< Name of the directory where the histogram will be placed */
     std::string m_outputRecoTracksArrayName{"NoPXDRecoTracks"};  /**< Name of the StoreArray with the recoTracks without PXD hits */
-    std::string m_particleListName{""};  /**< Name of the particle list to which the module is applied */
+    std::string m_particleListName{"pi+:all"};  /**< Name of the particle list to which the module is applied */
 
 
     StoreObjPtr<ParticleList>

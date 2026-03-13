@@ -108,8 +108,8 @@ void DQMHistAnalysisPXDBowModule::event()
 
     TH1* hV = getDelta(m_histogramDirectoryName + "resV_" + buff, true);
     TH1* hS = getDelta(m_histogramDirectoryName + "sagitta_" + buff, true);
-    bool enough = false, warnflag = false, errorflag = false;
     if (hS != NULL && hV != NULL) {
+      bool enough = false, warnflag = false, errorflag = false;
       B2DEBUG(20, "Histos resS_" << buff << " and resV_" << buff << " found");
       if (hS->GetEntries() > m_statThreshold) {
         enough = true;

@@ -52,16 +52,27 @@ if __name__ == "__main__":
     njobs = 0
     for sampler_id, file in enumerate(files):
 
-        # Do nothing if output file already exists
+        # If the output file exists and the log file indicates success, skip the job.
         output_file_name = os.path.join(output_dir, uniqueIdentifier + f'_training_data{sampler_id}.root')
-        if os.path.isfile(output_file_name):
-            continue
+        log_file_name = f'{log_dir}/{uniqueIdentifier}_{sampler_id}.log'
+        if os.path.isfile(output_file_name) and os.path.isfile(log_file_name):
+            with open(log_file_name, 'r') as file:
+                content = file.read()
+                if '\nSuccessfully completed.\n' in content:
+                    continue
+        # remove old log file before submission to avoid later interference with checking for success
+        if os.path.isfile(log_file_name):
+            os.remove(log_file_name)
 
         # Submit job to create output file
         os.system(
-            f'bsub -q s -o {log_dir}/{uniqueIdentifier}_{sampler_id}.log python3 sampler.py --uniqueIdentifier {uniqueIdentifier}'
+            f'bsub -q s -o {log_file_name} python3 sampler.py --uniqueIdentifier {uniqueIdentifier}'
             f' --inputfile {file} --working_dir {output_dir} --BELLE {str(is_belle)} --sampler_id {sampler_id}')
 
         njobs += 1
 
-    print(f"Submitted {njobs} jobs to queue to create {njobs} missing output files")
+    if njobs == len(files):
+        print(f"Submitted {njobs} jobs to queue to create {njobs} output files")
+    else:
+        print(f"Submitted {njobs} jobs to queue to create {njobs} missing output files."
+              f" {len(files)-njobs} existing files skipped.")

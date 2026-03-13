@@ -32,8 +32,6 @@ WireEfficiencyAlgorithm::WireEfficiencyAlgorithm(): CalibrationAlgorithm("CDCBad
 
 bool WireEfficiencyAlgorithm::buildEfficiencies()
 {
-  B2INFO("Creating efficiencies for every layer");
-
   unsigned short wireID;
   unsigned short layerID;
   float z;
@@ -45,59 +43,71 @@ bool WireEfficiencyAlgorithm::buildEfficiencies()
   efftree->SetBranchAddress("z", &z);
   efftree->SetBranchAddress("isFound", &isFound);
 
-  // Set ranges and names for the TEfficiency objects
-  B2INFO("Building empty efficiency objects");
   static const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-  B2INFO("Wire Topology found");
   static const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  B2INFO("CDC Geometry found");
 
   for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
     unsigned short layerNo = wireLayer.getICLayer();
-    //B2INFO("Got layer " << layerNo);
-    //std::string m_nameOfLayer = std::string("effLayer_").append(std::to_string(layerNo));
-    //std::string m_titleOfLayer = std::string("Efficiency of wires in layer ").append(std::to_string(layerNo));
-    //B2INFO("Built names for " << layerNo);
 
     unsigned short nzbins = 30 - layerNo / 7;
     unsigned short nwidbins = cdcgeo.nWiresInLayer(layerNo);
-    double widbins[2] = { -0.5, cdcgeo.nWiresInLayer(layerNo) - 0.5};
+    double widbins[2] = { -0.5, (double)cdcgeo.nWiresInLayer(layerNo) - 0.5};
     double zbins[2] = {wireLayer.getBackwardZ(), wireLayer.getForwardZ()};
 
-    TEfficiency* effInLayer = new TEfficiency(Form("effLayer_%d", layerNo), Form("Hit efficiency pf L%d ; z (cm) ; IWire ", layerNo),
-                                              nzbins, zbins[0], zbins[1], nwidbins,  widbins[0], widbins[1]);
+    TEfficiency* effInLayer = new TEfficiency(Form("effLayer_%d", layerNo),
+                                              Form("Hit efficiency pf L%d ; z (cm) ; IWire ", layerNo),
+                                              nzbins, zbins[0], zbins[1], nwidbins, widbins[0], widbins[1]);
     m_efficiencyList->Add(effInLayer);
-    B2INFO("Teff for layer " << layerNo << " was successfully listed.");
   }
-  TFile* outputCollection = new TFile("LayerEfficiencies.root", "RECREATE");
 
-  // loop over entries in the tree and build the TEfficiencies
-  B2INFO("Filling the efficiencies");
   const Long64_t nEntries = efftree->GetEntries();
-  B2INFO("Number of entries in tree: " << nEntries);
   for (Long64_t i = 0; i < nEntries; i++) {
     efftree->GetEntry(i);
-    TEfficiency* efficiencyInLayer = (TEfficiency*)m_efficiencyList->At(layerID);
-    efficiencyInLayer->Fill(isFound, z, wireID);
+    if (layerID < m_efficiencyList->GetEntries()) {
+      TEfficiency* efficiencyInLayer = (TEfficiency*)m_efficiencyList->At(layerID);
+      efficiencyInLayer->Fill(isFound, z, wireID);
+    }
   }
+
+  double totalCountsForActiveWires = 0;
+  long long activeWireCount = 0;
+
+  for (int i = 0; i < m_efficiencyList->GetEntries(); ++i) {
+    TEfficiency* eff = (TEfficiency*)m_efficiencyList->At(i);
+    // GetTotalHistogram contains both 'passed' and 'failed' attempts (total trials)
+    TH2* hTotal = (TH2*)eff->GetTotalHistogram();
+
+    // Loop through Y-bins (Wire IDs)
+    for (int yBin = 1; yBin <= hTotal->GetNbinsY(); ++yBin) {
+      // Sum all Z-bins (X-axis) for this specific wire (Y-bin)
+      // Integral(firstX, lastX, firstY, lastY). 0 and -1 include under/overflow.
+      double wireTotalEntries = hTotal->Integral(0, -1, yBin, yBin);
+
+      if (wireTotalEntries > 0) {
+        totalCountsForActiveWires += wireTotalEntries;
+        activeWireCount++;
+      }
+    }
+  }
+
+  double averageOccupancy = (activeWireCount > 0) ? (totalCountsForActiveWires / activeWireCount) : 0;
+  B2INFO("Average number of hits per wire in this run: " << averageOccupancy);
+
+  TFile* outputCollection = new TFile("LayerEfficiencies.root", "RECREATE");
   m_efficiencyList->Write();
-  B2INFO("TEfficiencies successfully filled.");
   outputCollection->Close();
-  B2INFO("TEfficiencies successfully saved");
-  // setting 1000 entries as the minimum value to consider "enough data", but this might need to be tailored in the future.
-  if (nEntries > 1000) return true;
-  else return false;
+  delete outputCollection;
+
+  // Return true if average hits per non-empty wire > 20000
+  return (averageOccupancy > 20000);
 }
 
 void WireEfficiencyAlgorithm::detectBadWires()
 {
-  B2INFO("Beginning detection of bad wires");
   static const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-  B2INFO("Wire Topology found");
 
   for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
     unsigned short layerNo = wireLayer.getICLayer();
-    B2INFO("Checking layer " << layerNo);
 
     // need to use casting here because GetPassedHistogram assumes it returns TH1
     auto efficiencyInLayer = (TEfficiency*)m_efficiencyList->At(layerNo);
@@ -140,9 +150,6 @@ void WireEfficiencyAlgorithm::detectBadWires()
 
     TGraphAsymmErrors* graphEfficiencyProjected = efficiencyProjectedX->CreateGraph();
 
-    B2INFO("Successfully determined average properties of layer " << layerNo);
-    B2INFO("Looping over wires");
-
     // Due to the way histograms are binned, every bin center should correspond a wire ID.
     for (int i = 0; i <= passed->GetNbinsY(); ++i) {
 
@@ -182,11 +189,9 @@ void WireEfficiencyAlgorithm::detectBadWires()
         m_badWireList->setWire(layerNo, round(wireID), singleWireEfficiencyFromFit);
       }
     }
-    B2INFO("Bad wires for " << layerNo << " recorded");
   }
   m_badWireList->outputToFile("wireFile.txt");
   saveCalibration(m_badWireList, "CDCBadWires");
-  B2INFO("Bad wire list successfully saved.");
 }
 
 double WireEfficiencyAlgorithm::chiTest(TGraphAsymmErrors* graph1, TGraphAsymmErrors* graph2, double minValue, double maxValue)
@@ -226,7 +231,6 @@ CalibrationAlgorithm::EResult WireEfficiencyAlgorithm::calibrate()
   B2INFO("ExpRun used for DB Geometry : " << exprun.first << " " << exprun.second);
   updateDBObjPtrs(1, exprun.second, exprun.first);
 
-  B2INFO("Creating CDCGeometryPar object");
   CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   bool enoughEventsInInput;

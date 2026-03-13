@@ -64,6 +64,10 @@ if __name__ == "__main__":
         if os.path.isfile(log_file_name):
             os.remove(log_file_name)
 
+        # remove old .root file before submission to avoid interference with flavorTagger
+        if os.path.isfile(output_file_name):
+            os.remove(output_file_name)
+
         # Submit job to create output file
         os.system(
             f'bsub -q s -o {log_file_name} python3 sampler.py --uniqueIdentifier {uniqueIdentifier}'

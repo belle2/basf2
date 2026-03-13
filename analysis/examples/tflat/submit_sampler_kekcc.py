@@ -45,8 +45,9 @@ if __name__ == "__main__":
 
     print(f"Found {len(files)} files for sampling")
 
+    log_dir = os.path.join(output_dir, 'logs')
     # Make sure output directory exists
-    os.makedirs(output_dir, exist_ok=True)
+    os.makedirs(log_dir, exist_ok=True)
 
     njobs = 0
     for sampler_id, file in enumerate(files):
@@ -58,8 +59,8 @@ if __name__ == "__main__":
 
         # Submit job to create output file
         os.system(
-            f'bsub -q s python3 sampler.py --uniqueIdentifier {uniqueIdentifier} --inputfile {file}'
-            f' --working_dir {output_dir} --BELLE {str(is_belle)} --sampler_id {sampler_id}')
+            f'bsub -q s -o {log_dir}/{uniqueIdentifier}_{sampler_id}.log python3 sampler.py --uniqueIdentifier {uniqueIdentifier}'
+            f' --inputfile {file} --working_dir {output_dir} --BELLE {str(is_belle)} --sampler_id {sampler_id}')
 
         njobs += 1
 

@@ -56,8 +56,8 @@ if __name__ == "__main__":
         output_file_name = os.path.join(output_dir, uniqueIdentifier + f'_training_data{sampler_id}.root')
         log_file_name = f'{log_dir}/{uniqueIdentifier}_{sampler_id}.log'
         if os.path.isfile(output_file_name) and os.path.isfile(log_file_name):
-            with open(log_file_name, 'r') as file:
-                content = file.read()
+            with open(log_file_name, 'r') as log_file:
+                content = log_file.read()
                 if '\nSuccessfully completed.\n' in content:
                     continue
         # remove old log file before submission to avoid later interference with checking for success

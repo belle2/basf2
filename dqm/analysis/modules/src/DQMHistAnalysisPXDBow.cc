@@ -81,7 +81,7 @@ void DQMHistAnalysisPXDBowModule::initialize()
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
   if (m_PXDModules.size() == 0) {
-    B2ERROR("No PXDModules in Geometry found!");
+    B2WARNING("No PXDModules in Geometry found!");
   }
 
   m_cResV = new TCanvas("c_resV");

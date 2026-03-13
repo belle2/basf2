@@ -37,10 +37,14 @@ parser.add_argument('--input', nargs='+',
                     help='Input ROOT file(s) with FEI B meson candidates')
 parser.add_argument('--output', default='modeSelector_output',
                     help='Output parquet filename or stem (default: modeSelector_output)')
-parser.add_argument('--cat-model', default='onnx/modeSelector_cat.onnx',
-                    help='Path to category ONNX model')
-parser.add_argument('--main-model', default='onnx/modeSelector_main.onnx',
-                    help='Path to main ONNX model')
+parser.add_argument('--cat-model', default=None,
+                    help='Path to category ONNX model (omit to load from conditions DB)')
+parser.add_argument('--main-model', default=None,
+                    help='Path to main ONNX model (omit to load from conditions DB)')
+parser.add_argument('--cat-payload-name', default='modeSelector_cat_model_v0',
+                    help='Conditions DB payload name for the category model')
+parser.add_argument('--main-payload-name', default='modeSelector_main_model_v0',
+                    help='Conditions DB payload name for the main model')
 parser.add_argument('--data', action='store_true',
                     help='Run in data mode: keep 10% of events with eventRandom and drop MC-only output variables')
 args = parser.parse_args()
@@ -64,6 +68,9 @@ ma.inputMdstList(
     filelist=args.input,
     path=my_path
 )
+
+b2.conditions.prepend_globaltag('user_feichtip_modeSelector')
+# b2.conditions.prepend_testing_payloads('localdb/database.txt')
 
 # Prepend the analysis globaltag for accessing payloads
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
@@ -129,13 +136,16 @@ ma.buildEventShape(
 # Add D* veto reconstruction (pi0 list created internally)
 modeSelector.addDstarVeto(particle_lists, path=my_path)
 
-# Apply ModeSelector with local model files (for testing/development)
-# Set debug=True to print feature values for comparison
+# Apply ModeSelector using local ONNX files when provided, otherwise load from
+# the configured conditions DB globaltags or testing payloads.
+# Set debug=True to print feature values for comparison.
 modeSelector.modeSelector(
     bp_list=f'B+:{fei_identifier}',
     b0_list=f'B0:{fei_identifier}',
     cat_model_path=args.cat_model,
     main_model_path=args.main_model,
+    payload_cat_model=args.cat_payload_name,
+    payload_main_model=args.main_payload_name,
     output_variable='BplusScore',
     debug=False,  # Enable debug output
     debug_max_events=10,  # Print info for first 10 events, if debug is enabled

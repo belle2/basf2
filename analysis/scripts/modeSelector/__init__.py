@@ -57,6 +57,8 @@ def modeSelector(
     b0_list,
     cat_model_path=None,
     main_model_path=None,
+    payload_cat_model='modeSelector_cat_model_v0',
+    payload_main_model='modeSelector_main_model_v0',
     output_variable='BplusScore',
     addDstarVetoReco=False,
     training_mode=False,
@@ -90,6 +92,12 @@ def modeSelector(
     main_model_path : str, optional
         Path to the main network ONNX model file.
         If None, loads from conditions database.
+    payload_cat_model : str, optional
+        Conditions DB payload name for the category model.
+        Used only when cat_model_path is None.
+    payload_main_model : str, optional
+        Conditions DB payload name for the main model.
+        Used only when main_model_path is None.
     output_variable : str
         Name of the ExtraInfo variable for the output score.
         Default: 'BplusScore'
@@ -176,6 +184,8 @@ def modeSelector(
         particle_lists=particle_lists,
         cat_model_path=cat_model_path,
         main_model_path=main_model_path,
+        payload_cat_model=payload_cat_model,
+        payload_main_model=payload_main_model,
         output_variable=output_variable,
         training_mode=training_mode,
         training_output=training_output,

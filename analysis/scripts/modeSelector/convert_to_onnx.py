@@ -15,10 +15,11 @@ Usage:
 
 import argparse
 import os
+
 import torch
 import torch.nn as nn
-
 from modeSelector.train import MultiClassNet
+from ROOT import Belle2
 
 
 def convert_network_to_onnx(pt_path, onnx_path):
@@ -57,16 +58,53 @@ def convert_network_to_onnx(pt_path, onnx_path):
     print(f"Exported {pt_path} -> {onnx_path} (input={input_size}, labels={num_labels})")
 
 
+def add_onnx_payloads(cat_model, main_model, cat_payload_name, main_payload_name, iov):
+    """Copy the ModeSelector ONNX files into localdb/database.txt."""
+    database = Belle2.Database.Instance()
+
+    if not database.addPayload(cat_payload_name, cat_model, iov):
+        raise RuntimeError(
+            'Failed to add category payload '
+            + cat_payload_name
+            + ' from '
+            + cat_model
+        )
+    if not database.addPayload(main_payload_name, main_model, iov):
+        raise RuntimeError(
+            'Failed to add main payload '
+            + main_payload_name
+            + ' from '
+            + main_model
+        )
+
+    print('Created localdb/database.txt with ModeSelector payloads')
+
+
 def main():
     parser = argparse.ArgumentParser(description='Convert ModeSelector networks to ONNX')
     parser.add_argument('--input-dir', required=True,
                         help='Directory containing net_category.pt and net_main.pt')
     parser.add_argument('--output-dir', required=True,
                         help='Directory for output ONNX files')
+    parser.add_argument('--add-payloads', action='store_true',
+                        help='Copy the exported ONNX files into localdb/database.txt')
+    parser.add_argument('--cat-payload-name', default='modeSelector_cat_model_v0',
+                        help='Payload name for the category model')
+    parser.add_argument('--main-payload-name', default='modeSelector_main_model_v0',
+                        help='Payload name for the main model')
+    parser.add_argument('--first-exp', type=int, default=0,
+                        help='First experiment of the interval of validity')
+    parser.add_argument('--first-run', type=int, default=0,
+                        help='First run of the interval of validity')
+    parser.add_argument('--final-exp', type=int, default=-1,
+                        help='Final experiment of the interval of validity')
+    parser.add_argument('--final-run', type=int, default=-1,
+                        help='Final run of the interval of validity')
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
 
+    exported_models = {}
     for pt_name, onnx_name in [
         ('net_category.pt', 'modeSelector_cat.onnx'),
         ('net_main.pt', 'modeSelector_main.onnx'),
@@ -75,8 +113,34 @@ def main():
         onnx_path = os.path.join(args.output_dir, onnx_name)
         if os.path.exists(pt_path):
             convert_network_to_onnx(pt_path, onnx_path)
+            exported_models[onnx_name] = onnx_path
         else:
             print(f"Warning: {pt_path} not found")
+
+    if args.add_payloads:
+        missing_files = [
+            model_name for model_name in ('modeSelector_cat.onnx', 'modeSelector_main.onnx')
+            if model_name not in exported_models
+        ]
+        if missing_files:
+            raise RuntimeError(
+                'Cannot add payloads because these ONNX files were not created: '
+                + ', '.join(missing_files)
+            )
+
+        iov = Belle2.IntervalOfValidity(
+            args.first_exp,
+            args.first_run,
+            args.final_exp,
+            args.final_run,
+        )
+        add_onnx_payloads(
+            exported_models['modeSelector_cat.onnx'],
+            exported_models['modeSelector_main.onnx'],
+            args.cat_payload_name,
+            args.main_payload_name,
+            iov,
+        )
 
 
 if __name__ == '__main__':

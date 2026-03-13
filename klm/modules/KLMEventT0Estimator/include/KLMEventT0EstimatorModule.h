@@ -41,16 +41,12 @@
 
 /* ROOT headers. */
 #include <TDirectory.h>
-#include <TF1.h>
 #include <TH1D.h>
 #include <TH1I.h>
-#include <TH2D.h>
 
 /* C++ headers. */
 #include <cmath>
-#include <algorithm>
 #include <vector>
-#include <limits>
 #include <map>
 #include <string>
 #include <utility>
@@ -62,7 +58,8 @@ namespace Belle2 {
    *
    * Inputs:
    *   - ParticleList (tracks with relations to KLMHit2d and ExtHit)
-   *   - KLM conditions (time constants, cable delays, channel status)
+   *   - KLM conditions (time constants, cable delays, channel status,
+   *     calibrated per-hit resolution)
    *   - BKLM/EKLM geometry for propagation distances and transforms
    *
    * Outputs:
@@ -71,8 +68,7 @@ namespace Belle2 {
    *     addTemporaryEventT0 and setEventT0.
    *   - Monitoring histograms under histogramDirectoryName with subdirectories:
    *       per_track/  — per-track T0 by detector category
-   *       per_event/  — per-event averages (track-avg and hit-avg) and SEMs
-   *       diagnostics/ — hit/digit counting and timing component breakdowns
+   *       per_event/  — per-event track-averages and SEMs
    *       final/      — final combined EventT0 and source audit
    *
    * Validation histograms (pulls, residuals, dimuon ΔT0, pairwise sector
@@ -134,7 +130,8 @@ namespace Belle2 {
     ExtPair matchExt(unsigned int key, ExtMap& v_ExtHits);
 
     /**
-     * Get per-hit sigma for a digit based on detector category (uses new or old method).
+     * Get per-hit sigma for a digit based on detector category.
+     * Uses calibrated per-hit resolution from KLMEventT0HitResolution payload.
      * @param subdetector KLM subdetector (BKLM or EKLM)
      * @param layer Layer number (1-indexed)
      * @param inRPC Whether the digit is from RPC
@@ -144,40 +141,29 @@ namespace Belle2 {
     double getHitSigma(int subdetector, int layer, bool inRPC, int plane = 0) const;
 
     /**
-     * Accumulate EKLM scintillator per-digit T0 estimates.
+     * Accumulate EKLM scintillator per-digit T0 estimates (weighted).
      * Note: EKLM section 1=backward (z<0), section 2=forward (z>0).
      */
     void accumulateEKLM(const RelationVector<KLMHit2d>&, const ExtMap&,
-                        double& sumW, double& sumWT, double& sumWT2,
-                        double& sumW_new, double& sumWT_new);
+                        double& sumW, double& sumWT);
 
     /**
-     * Accumulate BKLM scintillator per-digit T0 estimates.
+     * Accumulate BKLM scintillator per-digit T0 estimates (weighted).
      */
     void accumulateBKLMScint(RelationVector<KLMHit2d>&, const ExtMap&,
-                             double& sumW, double& sumWT, double& sumWT2,
-                             double& sumW_new, double& sumWT_new);
+                             double& sumW, double& sumWT);
 
     /**
-     * Accumulate BKLM RPC per-digit T0 estimates (filtered by readout direction).
+     * Accumulate BKLM RPC per-digit T0 estimates (weighted, both readout directions).
      * @param[in]  klmHit2ds    KLM 2D hits associated with the track.
      * @param[in]  rpcMap       Map of extrapolated RPC hits keyed by module number.
-     * @param[in]  acceptPhi    If true, accumulate phi-readout hits; if false, z-readout.
      * @param[out] sumW         Sum of inverse-variance weights.
      * @param[out] sumWT        Sum of weight times time.
-     * @param[out] sumWT2       Sum of weight times time squared.
-     * @param[out] sumW_new     Sum of calibrated inverse-variance weights.
-     * @param[out] sumWT_new    Sum of calibrated weight times time.
      */
-    void accumulateBKLMRPCFiltered(RelationVector<KLMHit2d>& klmHit2ds, const ExtMap& rpcMap,
-                                   bool acceptPhi,
-                                   double& sumW, double& sumWT, double& sumWT2,
-                                   double& sumW_new, double& sumWT_new);
+    void accumulateBKLMRPC(RelationVector<KLMHit2d>& klmHit2ds, const ExtMap& rpcMap,
+                           double& sumW, double& sumWT);
 
     /* ---------- Parameters (set via addParam in constructor) ---------- */
-
-    /** If true, use calibrated per-hit resolution from KLMEventT0HitResolution payload (default: true). */
-    bool m_UseNewHitResolution{true};
 
     /** Input ParticleList (e.g. "mu+:forT0"). */
     std::string m_MuonListName;
@@ -193,12 +179,6 @@ namespace Belle2 {
 
     /** Subdirectory name for uncorrected timing histograms. */
     std::string m_histSubdirUncorr{"uncorrected"};
-
-    /** Final KLM averaging mode: "track" (default) or "hit". */
-    std::string m_FinalAverageMode{"track"};
-
-    /** If true, include BKLM-RPC in the final KLM weighting (default: false). */
-    bool m_FinalUseRPCInKLM{false};
 
     /* Geometry and conditions. */
 
@@ -217,7 +197,7 @@ namespace Belle2 {
     /** Channel status (Normal/Dead/etc.). */
     DBObjPtr<KLMChannelStatus> m_channelStatus;
 
-    /** NEW: Per-hit time resolution for EventT0 estimation. */
+    /** Per-hit time resolution for EventT0 estimation. */
     DBObjPtr<KLMEventT0HitResolution> m_eventT0HitResolution;
 
     /* Inputs. */
@@ -274,52 +254,8 @@ namespace Belle2 {
     /** Per-event T0 track-average combined (SEM) [ns]. */
     TH1D* m_hT0Evt_TrkAvg_All_SEM{nullptr};
 
-    /** Per-event T0 hit-average for BKLM scintillator (mean) [ns]. */
-    TH1D* m_hT0Evt_HitAvg_BKLM_Scint{nullptr};
-
-    /** Per-event T0 hit-average for BKLM RPC (mean) [ns]. */
-    TH1D* m_hT0Evt_HitAvg_BKLM_RPC{nullptr};
-
-    /** Per-event T0 hit-average for EKLM scintillator (mean) [ns]. */
-    TH1D* m_hT0Evt_HitAvg_EKLM_Scint{nullptr};
-
-    /** Per-event T0 hit-average combined (mean) [ns]. */
-    TH1D* m_hT0Evt_HitAvg_All{nullptr};
-
-    /** Per-event T0 hit-average for BKLM scintillator (SEM) [ns]. */
-    TH1D* m_hT0Evt_HitAvg_BKLM_Scint_SEM{nullptr};
-
-    /** Per-event T0 hit-average for BKLM RPC (SEM) [ns]. */
-    TH1D* m_hT0Evt_HitAvg_BKLM_RPC_SEM{nullptr};
-
-    /** Per-event T0 hit-average for EKLM scintillator (SEM) [ns]. */
-    TH1D* m_hT0Evt_HitAvg_EKLM_Scint_SEM{nullptr};
-
-    /** Per-event T0 hit-average combined (SEM) [ns]. */
-    TH1D* m_hT0Evt_HitAvg_All_SEM{nullptr};
-
     /** Final EventT0 source selection (7 bins). */
     TH1I* m_hFinalSource{nullptr};
-
-    /* Final EventT0 combinations. */
-
-    /** Final EventT0 scintillator-only combination (mean) [ns]. */
-    TH1D* m_hT0Evt_Final_ScintOnly{nullptr};
-
-    /** Final EventT0 scintillator-only combination (SEM) [ns]. */
-    TH1D* m_hT0Evt_Final_ScintOnly_SEM{nullptr};
-
-    /** Final EventT0 with all detectors (mean) [ns]. */
-    TH1D* m_hT0Evt_Final_WithRPC{nullptr};
-
-    /** Final EventT0 with all detectors (SEM) [ns]. */
-    TH1D* m_hT0Evt_Final_WithRPC_SEM{nullptr};
-
-    /** Final EventT0 with RPC phi/z separate (mean) [ns]. */
-    TH1D* m_hT0Evt_Final_WithRPCDir{nullptr};
-
-    /** Final EventT0 with RPC phi/z separate (SEM) [ns]. */
-    TH1D* m_hT0Evt_Final_WithRPCDir_SEM{nullptr};
   };
 
 } // namespace Belle2

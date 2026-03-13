@@ -33,7 +33,7 @@ KLMEventT0EstimatorModule::KLMEventT0EstimatorModule() :
   m_geoParE(nullptr),
   m_transformE(nullptr)
 {
-  setDescription("Estimate per-event T0 using KLM digits matched to extrapolated tracks (BKLM/EKLM scintillators and RPC) with per-event track/hit averages, uncertainties (SEM), final combined KLM value, and optional pull distributions.");
+  setDescription("Estimate per-event T0 using KLM digits matched to extrapolated tracks (BKLM/EKLM scintillators and RPC) with per-event track averages, uncertainties, and final combined KLM value.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("MuonListName", m_MuonListName,
@@ -51,17 +51,6 @@ KLMEventT0EstimatorModule::KLMEventT0EstimatorModule() :
   addParam("histogramSubdirUncorrected", m_histSubdirUncorr,
            "Subdirectory name for uncorrected timing histograms.",
            std::string("uncorrected"));
-
-  // Steering parameters
-  addParam("FinalAverageMode", m_FinalAverageMode,
-           "Final KLM averaging mode: 'track' or 'hit'. Default: 'track'.",
-           std::string("track"));
-  addParam("FinalUseRPCInKLM", m_FinalUseRPCInKLM,
-           "If true, include BKLM-RPC in the final KLM weighting. Default: false.",
-           false);
-  addParam("UseNewHitResolution", m_UseNewHitResolution,
-           "If true, use calibrated per-hit resolution from payload. If false, use old per-event SEM calculation.",
-           true);
 
   // ADC cut parameters
   addParam("ADCCut_BKLM_Scint_Min", m_ADCCut_BKLM_Scint_Min,
@@ -131,17 +120,6 @@ void KLMEventT0EstimatorModule::defineHisto()
       m_hT0Evt_TrkAvg_EKLM_Scint_SEM = H1("h_t0evt_trkavg_eklm_scint_sem", "SEM (track-avg, EKLM Scint);SEM [ns]", 800, 0.0, 20.0);
       m_hT0Evt_TrkAvg_All_SEM        = H1("h_t0evt_trkavg_all_sem",        "SEM (track-avg, all categories);SEM [ns]", 800, 0.0, 20.0);
 
-      // Hit-average
-      m_hT0Evt_HitAvg_BKLM_Scint     = H1("h_t0evt_hitavg_bklm_scint",     "Per-event T0 (hit-avg, BKLM Scint);T0 [ns]", 800, -100, 100);
-      m_hT0Evt_HitAvg_BKLM_RPC       = H1("h_t0evt_hitavg_bklm_rpc",       "Per-event T0 (hit-avg, BKLM RPC);T0 [ns]",   800, -100, 100);
-      m_hT0Evt_HitAvg_EKLM_Scint     = H1("h_t0evt_hitavg_eklm_scint",     "Per-event T0 (hit-avg, EKLM Scint);T0 [ns]", 800, -100, 100);
-      m_hT0Evt_HitAvg_All            = H1("h_t0evt_hitavg_all",            "Per-event T0 (hit-avg, all categories);T0 [ns]", 800, -100,
-                                          100);
-      m_hT0Evt_HitAvg_BKLM_Scint_SEM = H1("h_t0evt_hitavg_bklm_scint_sem", "SEM (hit-avg, BKLM Scint);SEM [ns]", 800, 0.0, 20.0);
-      m_hT0Evt_HitAvg_BKLM_RPC_SEM   = H1("h_t0evt_hitavg_bklm_rpc_sem",   "SEM (hit-avg, BKLM RPC);SEM [ns]",   800, 0.0, 20.0);
-      m_hT0Evt_HitAvg_EKLM_Scint_SEM = H1("h_t0evt_hitavg_eklm_scint_sem", "SEM (hit-avg, EKLM Scint);SEM [ns]", 800, 0.0, 20.0);
-      m_hT0Evt_HitAvg_All_SEM        = H1("h_t0evt_hitavg_all_sem",        "SEM (hit-avg, all categories);SEM [ns]", 800, 0.0, 20.0);
-
       // Final-source audit: all possible combinations of B(KLM Scint), E(KLM Scint), R(PC)
       m_hFinalSource = new TH1I("h_final_source", "Final KLM source;;events", 7, 0.5, 7.5);
       m_hFinalSource->GetXaxis()->SetBinLabel(1, "B only");
@@ -152,30 +130,6 @@ void KLMEventT0EstimatorModule::defineHisto()
       m_hFinalSource->GetXaxis()->SetBinLabel(6, "E+R");
       m_hFinalSource->GetXaxis()->SetBinLabel(7, "B+E+R");
     }
-
-    // --- final/ subdirectory (pulls/residuals/cross_detector/diagnostics
-    //     are handled by KLMEventT0ValidationModule in klm/validation/) ---
-    // --- final/ subdirectory ---
-    TDirectory* d_final = d_unc->mkdir("final");
-    {
-      TDirectory::TContext ctxFinal{gDirectory, d_final};
-
-      // Multiple Final EventT0 combinations (always booked)
-      m_hT0Evt_Final_ScintOnly = H1("h_t0evt_final_scint_only",
-                                    "Final KLM T0 (Scint only: BKLM+EKLM);T0 [ns]", 800, -100, 100);
-      m_hT0Evt_Final_ScintOnly_SEM = H1("h_t0evt_final_scint_only_sem",
-                                        "Final KLM T0 SEM (Scint only);SEM [ns]", 800, 0.0, 20.0);
-
-      m_hT0Evt_Final_WithRPC = H1("h_t0evt_final_with_rpc",
-                                  "Final KLM T0 (Scint + RPC combined);T0 [ns]", 800, -100, 100);
-      m_hT0Evt_Final_WithRPC_SEM = H1("h_t0evt_final_with_rpc_sem",
-                                      "Final KLM T0 SEM (Scint + RPC);SEM [ns]", 800, 0.0, 20.0);
-
-      m_hT0Evt_Final_WithRPCDir = H1("h_t0evt_final_with_rpc_dir",
-                                     "Final KLM T0 (Scint + RPC phi/z separate);T0 [ns]", 800, -100, 100);
-      m_hT0Evt_Final_WithRPCDir_SEM = H1("h_t0evt_final_with_rpc_dir_sem",
-                                         "Final KLM T0 SEM (Scint + RPC dir);SEM [ns]", 800, 0.0, 20.0);
-    } // end final/ directory
   } // end uncorrected/ directory
 
 }
@@ -206,18 +160,13 @@ void KLMEventT0EstimatorModule::initialize()
 
 void KLMEventT0EstimatorModule::beginRun()
 {
-  if (m_UseNewHitResolution) {
-    if (!m_eventT0HitResolution.isValid())
-      B2FATAL("KLMEventT0Estimator: KLM EventT0 hit resolution data are not available. "
-              "Either provide the calibration or set UseNewHitResolution=False.");
+  if (!m_eventT0HitResolution.isValid())
+    B2FATAL("KLMEventT0Estimator: KLM EventT0 hit resolution data are not available.");
 
-    B2DEBUG(20, "KLMEventT0Estimator: Using NEW calibrated per-hit resolution method."
-            << LogVar("sigma_RPC (ns)", m_eventT0HitResolution->getSigmaRPC())
-            << LogVar("sigma_BKLM_Scint (ns)", m_eventT0HitResolution->getSigmaBKLMScint())
-            << LogVar("sigma_EKLM_Scint (ns)", m_eventT0HitResolution->getSigmaEKLMScint()));
-  } else {
-    B2WARNING("KLMEventT0Estimator: Using OLD per-event SEM calculation (may be unreliable with few hits).");
-  }
+  B2DEBUG(20, "KLMEventT0Estimator: Using calibrated per-hit resolution."
+          << LogVar("sigma_RPC (ns)", m_eventT0HitResolution->getSigmaRPC())
+          << LogVar("sigma_BKLM_Scint (ns)", m_eventT0HitResolution->getSigmaBKLMScint())
+          << LogVar("sigma_EKLM_Scint (ns)", m_eventT0HitResolution->getSigmaEKLMScint()));
 }
 
 void KLMEventT0EstimatorModule::endRun()
@@ -250,12 +199,6 @@ bool KLMEventT0EstimatorModule::passesADCCut(double charge, int subdetector, int
 
 double KLMEventT0EstimatorModule::getHitSigma(int subdetector, int layer, bool inRPC, int plane) const
 {
-  if (!m_UseNewHitResolution) {
-    // OLD METHOD: Return dummy value (uncertainty will be computed from scatter)
-    return 1.0; // Placeholder, not actually used in old method
-  }
-
-  // NEW METHOD: Use calibrated payload
   if (!m_eventT0HitResolution.isValid()) {
     B2ERROR("KLMEventT0Estimator: Calibrated hit resolution payload not available!");
     return 1.0; // Fallback
@@ -336,7 +279,6 @@ void KLMEventT0EstimatorModule::collectExtrapolatedHits(const Track* track,
                 : true;
       if (!crossed) continue;
 
-      // FIX 1: Use constant instead of hardcoded value
       const bool isRPC = (tLay >= BKLMElementNumbers::c_FirstRPCLayer);
 
       if (isRPC) {
@@ -374,15 +316,7 @@ void KLMEventT0EstimatorModule::collectExtrapolatedHits(const Track* track,
 /* Per-subdetector accumulators. */
 
 namespace {
-  // OLD: Unweighted (for empirical variance calculation)
-  inline void acc_stat_unweighted(double t, double& w, double& wt, double& wt2)
-  {
-    w += 1.0;
-    wt += t;
-    wt2 += t * t;
-  }
-
-  // NEW: Weighted accumulation using per-hit sigma
+  // Weighted accumulation using per-hit sigma
   inline void acc_stat_weighted(double t, double sigma, double& sumW, double& sumWT)
   {
     if (sigma <= 0.0 || !std::isfinite(sigma)) return;
@@ -395,8 +329,7 @@ namespace {
 /* EKLM scintillator */
 void KLMEventT0EstimatorModule::accumulateEKLM(const RelationVector<KLMHit2d>& klmHit2ds,
                                                const ExtMap& scintMap,
-                                               double& sumW, double& sumWT, double& sumWT2,
-                                               double& sumW_new, double& sumWT_new)
+                                               double& sumW, double& sumWT)
 {
   DBObjPtr<KLMTimeConstants> timeConstants;
   DBObjPtr<KLMTimeCableDelay> timeCableDelay;
@@ -413,16 +346,12 @@ void KLMEventT0EstimatorModule::accumulateEKLM(const RelationVector<KLMHit2d>& k
     RelationVector<KLMDigit> digits = hit2d.getRelationsTo<KLMDigit>();
     if (digits.size() == 0) continue;
 
-    int nGoodDigits = 0;
-
     for (const KLMDigit& d : digits) {
       if (!d.isGood()) continue;
 
       unsigned int cid = d.getUniqueChannelID();
       if (m_channelStatus.isValid() &&
           m_channelStatus->getChannelStatus(cid) != KLMChannelStatus::c_Normal) continue;
-
-      ++nGoodDigits;
 
       // Apply ADC cut
       if (!passesADCCut(d.getCharge(), KLMElementNumbers::c_EKLM, d.getLayer(), false)) {
@@ -459,24 +388,17 @@ void KLMEventT0EstimatorModule::accumulateEKLM(const RelationVector<KLMHit2d>& k
       const double t0_est = t - Tfly;
       if (!std::isfinite(t0_est)) continue;
 
-      // OLD METHOD: Unweighted accumulation
-      acc_stat_unweighted(t0_est, sumW, sumWT, sumWT2);
-
-      // NEW METHOD: Weighted accumulation using calibrated sigma
+      // Weighted accumulation using calibrated sigma
       const double sigma = getHitSigma(KLMElementNumbers::c_EKLM, d.getLayer(), false);
-      acc_stat_weighted(t0_est, sigma, sumW_new, sumWT_new);
-
-
+      acc_stat_weighted(t0_est, sigma, sumW, sumWT);
     }
-
   }
 }
 
 /* BKLM scintillator */
 void KLMEventT0EstimatorModule::accumulateBKLMScint(RelationVector<KLMHit2d>& klmHit2ds,
                                                     const ExtMap& scintMap,
-                                                    double& sumW, double& sumWT, double& sumWT2,
-                                                    double& sumW_new, double& sumWT_new)
+                                                    double& sumW, double& sumWT)
 {
   DBObjPtr<KLMTimeConstants> timeConstants;
   DBObjPtr<KLMTimeCableDelay> timeCableDelay;
@@ -499,16 +421,12 @@ void KLMEventT0EstimatorModule::accumulateBKLMScint(RelationVector<KLMHit2d>& kl
     for (const BKLMHit1d& h1d : b1ds) {
       RelationVector<KLMDigit> digits = h1d.getRelationsTo<KLMDigit>();
 
-      int nGoodDigitsForThisB1d = 0;
-
       for (const KLMDigit& d : digits) {
         if (d.inRPC() || !d.isGood()) continue;
 
         unsigned int cid = d.getUniqueChannelID();
         if (m_channelStatus.isValid() &&
             m_channelStatus->getChannelStatus(cid) != KLMChannelStatus::c_Normal) continue;
-
-        ++nGoodDigitsForThisB1d;
 
         // Apply ADC cut
         if (!passesADCCut(d.getCharge(), KLMElementNumbers::c_BKLM, d.getLayer(), false)) {
@@ -545,27 +463,18 @@ void KLMEventT0EstimatorModule::accumulateBKLMScint(RelationVector<KLMHit2d>& kl
         const double t0_est = t - Tfly;
         if (!std::isfinite(t0_est)) continue;
 
-        // OLD METHOD: Unweighted accumulation
-        acc_stat_unweighted(t0_est, sumW, sumWT, sumWT2);
-
-        // NEW METHOD: Weighted accumulation using calibrated sigma
+        // Weighted accumulation using calibrated sigma
         const double sigma = getHitSigma(KLMElementNumbers::c_BKLM, d.getLayer(), false);
-        acc_stat_weighted(t0_est, sigma, sumW_new, sumWT_new);
-
-
+        acc_stat_weighted(t0_est, sigma, sumW, sumWT);
       }
-
     }
   }
 }
 
 /* BKLM RPC */
-// Accumulate BKLM RPC hits with a specific readout plane filter
-void KLMEventT0EstimatorModule::accumulateBKLMRPCFiltered(RelationVector<KLMHit2d>& klmHit2ds,
-                                                          const ExtMap& rpcMap,
-                                                          bool acceptPhi,
-                                                          double& sumW, double& sumWT, double& sumWT2,
-                                                          double& sumW_new, double& sumWT_new)
+void KLMEventT0EstimatorModule::accumulateBKLMRPC(RelationVector<KLMHit2d>& klmHit2ds,
+                                                  const ExtMap& rpcMap,
+                                                  double& sumW, double& sumWT)
 {
   DBObjPtr<KLMTimeConstants> timeConstants;
   DBObjPtr<KLMTimeCableDelay> timeCableDelay;
@@ -589,17 +498,10 @@ void KLMEventT0EstimatorModule::accumulateBKLMRPCFiltered(RelationVector<KLMHit2
     const ROOT::Math::XYZVector posG2d = hit2d.getPosition();
 
     for (const BKLMHit1d& h1d : b1ds) {
-      // Filter by readout direction if specified
       const bool isPhi = h1d.isPhiReadout();
-      if (acceptPhi && !isPhi) continue;  // Want phi but this is z
-      if (!acceptPhi && isPhi) continue;  // Want z but this is phi
-
       RelationVector<KLMDigit> digits = h1d.getRelationsTo<KLMDigit>();
 
-      int nGoodDigitsForThisB1d = 0;
-
       for (const KLMDigit& d : digits) {
-        // *** FIX 3: CRITICAL - Skip non-RPC digits! ***
         if (!d.inRPC()) continue;
 
         unsigned int cid = d.getUniqueChannelID();
@@ -607,9 +509,6 @@ void KLMEventT0EstimatorModule::accumulateBKLMRPCFiltered(RelationVector<KLMHit2
             m_channelStatus->getChannelStatus(cid) != KLMChannelStatus::c_Normal) continue;
 
         if (!d.isGood()) continue;
-        ++nGoodDigitsForThisB1d;
-
-        // NOTE: No ADC cut for RPC
 
         // RPC matched by module key
         unsigned int moduleKey = m_elementNum->moduleNumber(d.getSubdetector(), d.getSection(), d.getSector(), d.getLayer());
@@ -625,14 +524,13 @@ void KLMEventT0EstimatorModule::accumulateBKLMRPCFiltered(RelationVector<KLMHit2
         const CLHEP::Hep3Vector diff = locExt - locHit2;
         if (std::fabs(diff.z()) > mod->getZStripWidth() || std::fabs(diff.y()) > mod->getPhiStripWidth()) continue;
 
-        // FIX: Use getPropagationDistance() (not getPropagationTimes()) to avoid double speed conversion
         const CLHEP::Hep3Vector propaV = mod->getPropagationDistance(locExt);
-        const double propaDist = isPhi ? propaV.y() : propaV.z();  // Distance in cm
+        const double propaDist = isPhi ? propaV.y() : propaV.z();
 
         // Components
         const double Trec = d.getTime();
         const double Tcable = timeCableDelay.isValid() ? timeCableDelay->getTimeDelay(cid) : 0.0;
-        const double Tprop = propaDist * (isPhi ? delayPhi : delayZ);  // delay is in ns/cm
+        const double Tprop = propaDist * (isPhi ? delayPhi : delayZ);
         const double Tfly = flyTime;
 
         double t = Trec;
@@ -642,17 +540,11 @@ void KLMEventT0EstimatorModule::accumulateBKLMRPCFiltered(RelationVector<KLMHit2
         const double t0_est = t - Tfly;
         if (!std::isfinite(t0_est)) continue;
 
-        // OLD METHOD: Unweighted accumulation
-        acc_stat_unweighted(t0_est, sumW, sumWT, sumWT2);
-
-        // NEW METHOD: Weighted accumulation using calibrated sigma with direction-specific resolution
+        // Weighted accumulation using calibrated sigma with direction-specific resolution
         const int plane = isPhi ? BKLMElementNumbers::c_PhiPlane : BKLMElementNumbers::c_ZPlane;
         const double sigma = getHitSigma(KLMElementNumbers::c_BKLM, d.getLayer(), true, plane);
-        acc_stat_weighted(t0_est, sigma, sumW_new, sumWT_new);
-
-
+        acc_stat_weighted(t0_est, sigma, sumW, sumWT);
       }
-
     }
   }
 }
@@ -675,198 +567,14 @@ void KLMEventT0EstimatorModule::event()
   const unsigned nTracks = m_MuonList->getListSize();
   if (nTracks == 0u) return;
 
-  // Per-event accumulators for hit-averages (OLD method)
-  double sumW = 0.0, sumWT = 0.0, sumWT2 = 0.0; // overall
-  double sumWE = 0.0, sumWTE = 0.0, sumWT2E = 0.0; // EKLM
-  double sumWB = 0.0, sumWTB = 0.0, sumWT2B = 0.0; // BKLM scint
-  double sumWR = 0.0, sumWTR = 0.0, sumWT2R = 0.0; // RPC (combined for backward compat)
-  double sumWRphi = 0.0, sumWTRphi = 0.0, sumWT2Rphi = 0.0; // RPC Phi
-  double sumWRz = 0.0, sumWTRz = 0.0, sumWT2Rz = 0.0; // RPC Z
-
-  // Per-event accumulators for hit-averages (NEW method - weighted)
-  double sumW_new = 0.0, sumWT_new = 0.0;
-  double sumWE_new = 0.0, sumWTE_new = 0.0;
-  double sumWB_new = 0.0, sumWTB_new = 0.0;
-  double sumWR_new = 0.0, sumWTR_new = 0.0; // Combined for backward compat
-  double sumWRphi_new = 0.0, sumWTRphi_new = 0.0; // RPC Phi
-  double sumWRz_new = 0.0, sumWTRz_new = 0.0; // RPC Z
-
-  // For per-event track-averages: pairs of (T0, SEM) for weighted averaging
-  std::vector<std::pair<double, double>> vTrk_B, vTrk_R, vTrk_Rphi, vTrk_Rz, vTrk_E, vTrk_All;
-
-  // Helper to compute mean and SEM from running sums (OLD method - empirical variance)
-  auto mu_sem_from_sums = [](double w, double wt, double wt2) -> std::pair<double, double> {
-    if (w <= 0.0) return {NAN, NAN};
-    const double mu = wt / w;
-    if (w <= 1.0) return {mu, 0.0};
-    const double ss  = std::max(wt2 - w* mu * mu, 0.0);
-    const double var = ss / (w - 1.0);
-    return {mu, std::sqrt(var / w)};
-  };
-
-  // Helper to compute weighted mean and uncertainty (NEW method)
+  // Weighted mean and uncertainty from running sums
   auto weighted_result = [](double wsum, double wtsum) -> std::pair<double, double> {
     if (wsum <= 0.0) return {NAN, NAN};
     return {wtsum / wsum, std::sqrt(1.0 / wsum)};
   };
 
-  for (unsigned i = 0; i < nTracks; ++i) {
-    const Particle* particle = m_MuonList->getParticle(i);
-    if (!particle) continue;
-    const Track* track = particle->getTrack();
-    if (!track) continue;
-
-    RelationVector<KLMHit2d> hit2ds = track->getRelationsTo<KLMHit2d>();
-    if (hit2ds.size() == 0) continue;
-
-    // Build ExtHit maps for this track
-    m_extScint.clear();
-    m_extRPC.clear();
-    collectExtrapolatedHits(track, m_extScint, m_extRPC);
-
-    // Per-track digit sums per category
-    double wE = 0, wTE = 0, wT2E = 0, wE_new = 0, wTE_new = 0;
-    accumulateEKLM(hit2ds, m_extScint, wE, wTE, wT2E, wE_new, wTE_new);
-
-    double wB = 0, wTB = 0, wT2B = 0, wB_new = 0, wTB_new = 0;
-    accumulateBKLMScint(hit2ds, m_extScint, wB, wTB, wT2B, wB_new, wTB_new);
-
-    // RPC: accumulate separately for phi and z
-    double wRphi = 0, wTRphi = 0, wT2Rphi = 0, wRphi_new = 0, wTRphi_new = 0;
-    accumulateBKLMRPCFiltered(hit2ds, m_extRPC, true,  wRphi, wTRphi, wT2Rphi, wRphi_new, wTRphi_new);
-    double wRz = 0, wTRz = 0, wT2Rz = 0, wRz_new = 0, wTRz_new = 0;
-    accumulateBKLMRPCFiltered(hit2ds, m_extRPC, false, wRz,   wTRz,   wT2Rz,   wRz_new,   wTRz_new);
-
-    // Combined RPC for backward compatibility
-    const double wR     = wRphi + wRz;
-    const double wTR    = wTRphi + wTRz;
-    const double wT2R   = wT2Rphi + wT2Rz;
-    const double wR_new  = wRphi_new + wRz_new;
-    const double wTR_new = wTRphi_new + wTRz_new;
-
-    // Update per-event hit-avg accumulators (OLD)
-    sumWE += wE; sumWTE += wTE; sumWT2E += wT2E;
-    sumWB += wB; sumWTB += wTB; sumWT2B += wT2B;
-    sumWR += wR; sumWTR += wTR; sumWT2R += wT2R;
-    sumWRphi += wRphi; sumWTRphi += wTRphi; sumWT2Rphi += wT2Rphi;
-    sumWRz += wRz; sumWTRz += wTRz; sumWT2Rz += wT2Rz;
-    sumW  += (wE + wB + wR);
-    sumWT += (wTE + wTB + wTR);
-    sumWT2 += (wT2E + wT2B + wT2R);
-
-    // Update per-event hit-avg accumulators (NEW)
-    sumWE_new += wE_new; sumWTE_new += wTE_new;
-    sumWB_new += wB_new; sumWTB_new += wTB_new;
-    sumWR_new += wR_new; sumWTR_new += wTR_new;
-    sumWRphi_new += wRphi_new; sumWTRphi_new += wTRphi_new;
-    sumWRz_new += wRz_new; sumWTRz_new += wTRz_new;
-    sumW_new  += (wE_new + wB_new + wR_new);
-    sumWT_new += (wTE_new + wTB_new + wTR_new);
-
-    // Per-track means and SEMs by category
-    double trkW_all = 0.0, trkWT_all = 0.0;
-
-    if (wB > 0.0) {
-      double muB, seB;
-      if (m_UseNewHitResolution) {
-        std::tie(muB, seB) = weighted_result(wB_new, wTB_new);
-      } else {
-        std::tie(muB, seB) = mu_sem_from_sums(wB, wTB, wT2B);
-      }
-      if (m_hT0Trk_BKLM_Scint && std::isfinite(muB)) m_hT0Trk_BKLM_Scint->Fill(muB);
-      if (std::isfinite(muB)) {
-        vTrk_B.push_back({muB, seB});
-        trkW_all += wB;
-        trkWT_all += wTB;
-      }
-    }
-
-    // RPC combined (backward compatibility)
-    if (wR > 0.0) {
-      double muR, seR;
-      if (m_UseNewHitResolution) {
-        std::tie(muR, seR) = weighted_result(wR_new, wTR_new);
-      } else {
-        std::tie(muR, seR) = mu_sem_from_sums(wR, wTR, wT2R);
-      }
-      if (m_hT0Trk_BKLM_RPC && std::isfinite(muR)) m_hT0Trk_BKLM_RPC->Fill(muR);
-      if (std::isfinite(muR)) {
-        vTrk_R.push_back({muR, seR});
-        trkW_all += wR;
-        trkWT_all += wTR;
-      }
-    }
-
-    // RPC Phi (direction-specific)
-    if (wRphi > 0.0) {
-      double muRphi, seRphi;
-      if (m_UseNewHitResolution) {
-        std::tie(muRphi, seRphi) = weighted_result(wRphi_new, wTRphi_new);
-      } else {
-        std::tie(muRphi, seRphi) = mu_sem_from_sums(wRphi, wTRphi, wT2Rphi);
-      }
-      if (std::isfinite(muRphi)) {
-        vTrk_Rphi.push_back({muRphi, seRphi});
-      }
-    }
-
-    // RPC Z (direction-specific)
-    if (wRz > 0.0) {
-      double muRz, seRz;
-      if (m_UseNewHitResolution) {
-        std::tie(muRz, seRz) = weighted_result(wRz_new, wTRz_new);
-      } else {
-        std::tie(muRz, seRz) = mu_sem_from_sums(wRz, wTRz, wT2Rz);
-      }
-      if (std::isfinite(muRz)) {
-        vTrk_Rz.push_back({muRz, seRz});
-      }
-    }
-
-    if (wE > 0.0) {
-      double muE, seE;
-      if (m_UseNewHitResolution) {
-        std::tie(muE, seE) = weighted_result(wE_new, wTE_new);
-      } else {
-        std::tie(muE, seE) = mu_sem_from_sums(wE, wTE, wT2E);
-      }
-      if (m_hT0Trk_EKLM_Scint && std::isfinite(muE)) m_hT0Trk_EKLM_Scint->Fill(muE);
-      if (std::isfinite(muE)) {
-        vTrk_E.push_back({muE, seE});
-        trkW_all += wE;
-        trkWT_all += wTE;
-      }
-    }
-
-    // Per-track overall (if any category present)
-    {
-      const double wAll_trk  = (m_UseNewHitResolution) ? (wB_new + wE_new + wR_new) : trkW_all;
-      const double wtAll_trk = (m_UseNewHitResolution) ? (wTB_new + wTE_new + wTR_new) : trkWT_all;
-      if (wAll_trk > 0.0) {
-        const double t0_trk_all = wtAll_trk / wAll_trk;
-        const double se_trk_all = (m_UseNewHitResolution) ? std::sqrt(1.0 / wAll_trk) : 0.0;
-        vTrk_All.push_back({t0_trk_all, se_trk_all});
-      }
-    }
-  }
-
-  if (sumW <= 0.0 && sumW_new <= 0.0) {
-    B2DEBUG(20, "KLMEventT0Estimator: no usable KLM timing residuals for this event.");
-    return;
-  }
-
-  // Helpers for empirical variance (OLD method)
-  auto mean_sem_hits = [](double w, double wt, double wt2) -> std::pair<double, double> {
-    if (w <= 0.0) return {NAN, NAN};
-    const double mu = wt / w;
-    if (w <= 1.0) return {mu, 0.0};
-    const double ss  = std::max(wt2 - w* mu * mu, 0.0);
-    const double var = ss / (w - 1.0);
-    return {mu, std::sqrt(var / w)};
-  };
-
   // Weighted track averaging using inverse-variance (1/SEM²) weighting
-  auto mean_sem_tracks_weighted = [](const std::vector<std::pair<double, double>>& v) -> std::pair<double, double> {
+  auto mean_sem_tracks = [](const std::vector<std::pair<double, double>>& v) -> std::pair<double, double> {
     if (v.empty()) return {NAN, NAN};
     if (v.size() == 1)
     {
@@ -902,13 +610,74 @@ void KLMEventT0EstimatorModule::event()
     return {mu, std::sqrt(var / v.size())};
   };
 
+  // For per-event track-averages: pairs of (T0, SEM) for weighted averaging
+  std::vector<std::pair<double, double>> vTrk_B, vTrk_R, vTrk_E, vTrk_All;
+
+  for (unsigned i = 0; i < nTracks; ++i) {
+    const Particle* particle = m_MuonList->getParticle(i);
+    if (!particle) continue;
+    const Track* track = particle->getTrack();
+    if (!track) continue;
+
+    RelationVector<KLMHit2d> hit2ds = track->getRelationsTo<KLMHit2d>();
+    if (hit2ds.size() == 0) continue;
+
+    // Build ExtHit maps for this track
+    m_extScint.clear();
+    m_extRPC.clear();
+    collectExtrapolatedHits(track, m_extScint, m_extRPC);
+
+    // Per-track digit sums per category (weighted)
+    double wE = 0, wTE = 0;
+    accumulateEKLM(hit2ds, m_extScint, wE, wTE);
+
+    double wB = 0, wTB = 0;
+    accumulateBKLMScint(hit2ds, m_extScint, wB, wTB);
+
+    double wR = 0, wTR = 0;
+    accumulateBKLMRPC(hit2ds, m_extRPC, wR, wTR);
+
+    // Per-track means and SEMs by category
+    if (wB > 0.0) {
+      auto [muB, seB] = weighted_result(wB, wTB);
+      if (m_hT0Trk_BKLM_Scint && std::isfinite(muB)) m_hT0Trk_BKLM_Scint->Fill(muB);
+      if (std::isfinite(muB)) vTrk_B.push_back({muB, seB});
+    }
+
+    if (wR > 0.0) {
+      auto [muR, seR] = weighted_result(wR, wTR);
+      if (m_hT0Trk_BKLM_RPC && std::isfinite(muR)) m_hT0Trk_BKLM_RPC->Fill(muR);
+      if (std::isfinite(muR)) vTrk_R.push_back({muR, seR});
+    }
+
+    if (wE > 0.0) {
+      auto [muE, seE] = weighted_result(wE, wTE);
+      if (m_hT0Trk_EKLM_Scint && std::isfinite(muE)) m_hT0Trk_EKLM_Scint->Fill(muE);
+      if (std::isfinite(muE)) vTrk_E.push_back({muE, seE});
+    }
+
+    // Per-track overall (if any category present)
+    {
+      const double wAll = wB + wE + wR;
+      const double wtAll = wTB + wTE + wTR;
+      if (wAll > 0.0) {
+        const double t0 = wtAll / wAll;
+        const double se = std::sqrt(1.0 / wAll);
+        vTrk_All.push_back({t0, se});
+      }
+    }
+  }
+
+  if (vTrk_All.empty()) {
+    B2DEBUG(20, "KLMEventT0Estimator: no usable KLM timing residuals for this event.");
+    return;
+  }
+
   // Per-event track-averages using inverse-variance (1/SEM²) weighting
-  const auto [muB_trk,    seB_trk]    = mean_sem_tracks_weighted(vTrk_B);
-  const auto [muR_trk,    seR_trk]    = mean_sem_tracks_weighted(vTrk_R);
-  const auto [muRphi_trk, seRphi_trk] = mean_sem_tracks_weighted(vTrk_Rphi);
-  const auto [muRz_trk,   seRz_trk]   = mean_sem_tracks_weighted(vTrk_Rz);
-  const auto [muE_trk,    seE_trk]    = mean_sem_tracks_weighted(vTrk_E);
-  const auto [muAll_trk,  seAll_trk]  = mean_sem_tracks_weighted(vTrk_All);
+  const auto [muB_trk,   seB_trk]   = mean_sem_tracks(vTrk_B);
+  const auto [muR_trk,   seR_trk]   = mean_sem_tracks(vTrk_R);
+  const auto [muE_trk,   seE_trk]   = mean_sem_tracks(vTrk_E);
+  const auto [muAll_trk, seAll_trk]  = mean_sem_tracks(vTrk_All);
 
   if (m_hT0Evt_TrkAvg_BKLM_Scint && std::isfinite(muB_trk))   m_hT0Evt_TrkAvg_BKLM_Scint->Fill(muB_trk);
   if (m_hT0Evt_TrkAvg_BKLM_RPC   && std::isfinite(muR_trk))   m_hT0Evt_TrkAvg_BKLM_RPC->Fill(muR_trk);
@@ -920,100 +689,36 @@ void KLMEventT0EstimatorModule::event()
   if (m_hT0Evt_TrkAvg_EKLM_Scint_SEM && std::isfinite(seE_trk))   m_hT0Evt_TrkAvg_EKLM_Scint_SEM->Fill(seE_trk);
   if (m_hT0Evt_TrkAvg_All_SEM        && std::isfinite(seAll_trk)) m_hT0Evt_TrkAvg_All_SEM->Fill(seAll_trk);
 
-  // Per-event hit-averages (choose method based on toggle)
-  double t0_hit_E, seE_hit, t0_hit_B, seB_hit, t0_hit_R, seR_hit, t0_hit_all, seAll_hit;
-  double t0_hit_Rphi, seRphi_hit, t0_hit_Rz, seRz_hit;
-
-  if (m_UseNewHitResolution) {
-    std::tie(t0_hit_E,    seE_hit)    = weighted_result(sumWE_new,    sumWTE_new);
-    std::tie(t0_hit_B,    seB_hit)    = weighted_result(sumWB_new,    sumWTB_new);
-    std::tie(t0_hit_R,    seR_hit)    = weighted_result(sumWR_new,    sumWTR_new);
-    std::tie(t0_hit_Rphi, seRphi_hit) = weighted_result(sumWRphi_new, sumWTRphi_new);
-    std::tie(t0_hit_Rz,   seRz_hit)   = weighted_result(sumWRz_new,   sumWTRz_new);
-    std::tie(t0_hit_all,  seAll_hit)  = weighted_result(sumW_new,     sumWT_new);
-  } else {
-    std::tie(t0_hit_E,    seE_hit)    = mean_sem_hits(sumWE,    sumWTE,    sumWT2E);
-    std::tie(t0_hit_B,    seB_hit)    = mean_sem_hits(sumWB,    sumWTB,    sumWT2B);
-    std::tie(t0_hit_R,    seR_hit)    = mean_sem_hits(sumWR,    sumWTR,    sumWT2R);
-    std::tie(t0_hit_Rphi, seRphi_hit) = mean_sem_hits(sumWRphi, sumWTRphi, sumWT2Rphi);
-    std::tie(t0_hit_Rz,   seRz_hit)   = mean_sem_hits(sumWRz,   sumWTRz,   sumWT2Rz);
-    std::tie(t0_hit_all,  seAll_hit)  = mean_sem_hits(sumW,     sumWT,     sumWT2);
-  }
-
-  if (m_hT0Evt_HitAvg_BKLM_Scint && std::isfinite(t0_hit_B))   m_hT0Evt_HitAvg_BKLM_Scint->Fill(t0_hit_B);
-  if (m_hT0Evt_HitAvg_BKLM_RPC   && std::isfinite(t0_hit_R))   m_hT0Evt_HitAvg_BKLM_RPC->Fill(t0_hit_R);
-  if (m_hT0Evt_HitAvg_EKLM_Scint && std::isfinite(t0_hit_E))   m_hT0Evt_HitAvg_EKLM_Scint->Fill(t0_hit_E);
-  if (m_hT0Evt_HitAvg_All        && std::isfinite(t0_hit_all)) m_hT0Evt_HitAvg_All->Fill(t0_hit_all);
-
-  if (m_hT0Evt_HitAvg_BKLM_Scint_SEM && std::isfinite(seB_hit))   m_hT0Evt_HitAvg_BKLM_Scint_SEM->Fill(seB_hit);
-  if (m_hT0Evt_HitAvg_BKLM_RPC_SEM   && std::isfinite(seR_hit))   m_hT0Evt_HitAvg_BKLM_RPC_SEM->Fill(seR_hit);
-  if (m_hT0Evt_HitAvg_EKLM_Scint_SEM && std::isfinite(seE_hit))   m_hT0Evt_HitAvg_EKLM_Scint_SEM->Fill(seE_hit);
-  if (m_hT0Evt_HitAvg_All_SEM        && std::isfinite(seAll_hit)) m_hT0Evt_HitAvg_All_SEM->Fill(seAll_hit);
-
   // ---------------- Final KLM combination (single saved component) ----------------
-  double muB = NAN, muE = NAN, muR = NAN;
-  double seB = NAN, seE = NAN, seR = NAN;
-
-  if (m_FinalAverageMode == "hit") {
-    muB = t0_hit_B; seB = seB_hit;
-    muE = t0_hit_E; seE = seE_hit;
-    muR = t0_hit_R; seR = seR_hit;
-  } else {
-    muB = muB_trk; seB = seB_trk;
-    muE = muE_trk; seE = seE_trk;
-    muR = muR_trk; seR = seR_trk;
-  }
-
-  const bool useB = std::isfinite(muB);
-  const bool useE = std::isfinite(muE);
-  const bool useR = std::isfinite(muR);
+  const bool useB = std::isfinite(muB_trk);
+  const bool useE = std::isfinite(muE_trk);
+  const bool useR = std::isfinite(muR_trk);
 
   double finalT0 = NAN, finalSE = NAN;
   int sourceBin = -1;
 
   {
     std::vector<std::pair<double, double>> parts;
-    if (useB) parts.emplace_back(muB, seB);
-    if (useE) parts.emplace_back(muE, seE);
-    if (useR) parts.emplace_back(muR, seR);
+    if (useB) parts.emplace_back(muB_trk, seB_trk);
+    if (useE) parts.emplace_back(muE_trk, seE_trk);
+    if (useR) parts.emplace_back(muR_trk, seR_trk);
 
-    if (parts.empty()) {
-      B2DEBUG(20, "KLMEventT0Estimator: No eligible KLM categories for final KLM EventT0.");
-    } else if (parts.size() == 1) {
-      finalT0 = parts[0].first;
-      finalSE = std::isfinite(parts[0].second) ? parts[0].second : 0.0;
-      if (useB) sourceBin = 1;
-      else if (useE) sourceBin = 2;
-      else sourceBin = 3;
-    } else {
-      bool okW = true;
-      for (auto& pr : parts) { const double se = pr.second; if (!std::isfinite(se) || se <= 0.0) { okW = false; break; } }
-      if (okW) {
-        double wsum = 0.0, wtsum = 0.0;
-        for (auto& pr : parts) { const double w = 1.0 / (pr.second * pr.second); wsum += w; wtsum += w * pr.first; }
-        if (wsum > 0.0) { finalT0 = wtsum / wsum; finalSE = std::sqrt(1.0 / wsum); }
-      }
-      if (!std::isfinite(finalT0)) {
-        double s = 0.0;
-        for (auto& pr : parts) s += pr.first;
-        finalT0 = s / parts.size();
-        double ss = 0.0;
-        for (auto& pr : parts) { const double d = pr.first - finalT0; ss += d * d; }
-        finalSE = std::sqrt((ss / (parts.size() - 1)) / parts.size());
-      }
-      if (useB && useE && useR) sourceBin = 7;
-      else if (useB && useE) sourceBin = 4;
-      else if (useB && useR) sourceBin = 5;
-      else if (useE && useR) sourceBin = 6;
-      else if (useB) sourceBin = 1;
-      else if (useE) sourceBin = 2;
-      else sourceBin = 3;
-    }
+    auto [t0, se] = mean_sem_tracks(parts);
+    finalT0 = t0;
+    finalSE = se;
+
+    if (useB && useE && useR) sourceBin = 7;
+    else if (useB && useE) sourceBin = 4;
+    else if (useB && useR) sourceBin = 5;
+    else if (useE && useR) sourceBin = 6;
+    else if (useB) sourceBin = 1;
+    else if (useE) sourceBin = 2;
+    else if (useR) sourceBin = 3;
   }
 
   B2DEBUG(20, "KLMEventT0Estimator: "
-          << "T0_hitavg_all=" << t0_hit_all << " ns  (seed CDC=" << m_seedT0 << " ns)"
-          << " | E=" << t0_hit_E << " | Bsc=" << t0_hit_B << " | Brpc=" << t0_hit_R
+          << "T0_trkavg_all=" << muAll_trk << " ns  (seed CDC=" << m_seedT0 << " ns)"
+          << " | E=" << muE_trk << " | Bsc=" << muB_trk << " | Brpc=" << muR_trk
           << (std::isfinite(finalT0) ? (std::string(" | FINAL KLM=") + std::to_string(finalT0) + " ns") : std::string("")));
 
   StoreObjPtr<EventT0> outT0("EventT0", DataStore::c_Event);
@@ -1026,85 +731,5 @@ void KLMEventT0EstimatorModule::event()
                                              Const::KLM, "KLM", quality);
     outT0->addTemporaryEventT0(klmT0Component);
     outT0->setEventT0(klmT0Component);
-  }
-
-  // ---------------- Multiple Final EventT0 combinations ----------------
-  auto combineFinal = [](const std::vector<std::pair<double, double>>& parts) -> std::pair<double, double> {
-    if (parts.empty()) return {NAN, NAN};
-    if (parts.size() == 1)
-    {
-      return {parts[0].first, std::isfinite(parts[0].second) ? parts[0].second : 0.0};
-    }
-    bool okW = true;
-    for (const auto& pr : parts)
-    {
-      if (!std::isfinite(pr.second) || pr.second <= 0.0) { okW = false; break; }
-    }
-    if (okW)
-    {
-      double wsum = 0.0, wtsum = 0.0;
-      for (const auto& pr : parts) {
-        const double w = 1.0 / (pr.second * pr.second);
-        wsum += w;
-        wtsum += w * pr.first;
-      }
-      if (wsum > 0.0) return {wtsum / wsum, std::sqrt(1.0 / wsum)};
-    }
-    double s = 0.0;
-    for (const auto& pr : parts) s += pr.first;
-    double mu = s / parts.size();
-    double ss = 0.0;
-    for (const auto& pr : parts) { const double d = pr.first - mu; ss += d * d; }
-    double se = (parts.size() > 1) ? std::sqrt((ss / (parts.size() - 1)) / parts.size()) : 0.0;
-    return {mu, se};
-  };
-
-  double muRphi_final = NAN, seRphi_final = NAN;
-  double muRz_final = NAN, seRz_final = NAN;
-  if (m_FinalAverageMode == "hit") {
-    muRphi_final = t0_hit_Rphi; seRphi_final = seRphi_hit;
-    muRz_final = t0_hit_Rz; seRz_final = seRz_hit;
-  } else {
-    muRphi_final = muRphi_trk; seRphi_final = seRphi_trk;
-    muRz_final = muRz_trk; seRz_final = seRz_trk;
-  }
-
-  // 1. Scintillator only (BKLM Scint + EKLM Scint) - no RPC
-  {
-    std::vector<std::pair<double, double>> partsScint;
-    if (std::isfinite(muB)) partsScint.emplace_back(muB, seB);
-    if (std::isfinite(muE)) partsScint.emplace_back(muE, seE);
-    const auto [t0_scint, se_scint] = combineFinal(partsScint);
-    if (std::isfinite(t0_scint)) {
-      if (m_hT0Evt_Final_ScintOnly) m_hT0Evt_Final_ScintOnly->Fill(t0_scint);
-      if (m_hT0Evt_Final_ScintOnly_SEM && std::isfinite(se_scint)) m_hT0Evt_Final_ScintOnly_SEM->Fill(se_scint);
-    }
-  }
-
-  // 2. Scintillator + RPC combined (all detectors, RPC as single category)
-  {
-    std::vector<std::pair<double, double>> partsWithRPC;
-    if (std::isfinite(muB)) partsWithRPC.emplace_back(muB, seB);
-    if (std::isfinite(muE)) partsWithRPC.emplace_back(muE, seE);
-    if (std::isfinite(muR)) partsWithRPC.emplace_back(muR, seR);
-    const auto [t0_rpc, se_rpc] = combineFinal(partsWithRPC);
-    if (std::isfinite(t0_rpc)) {
-      if (m_hT0Evt_Final_WithRPC) m_hT0Evt_Final_WithRPC->Fill(t0_rpc);
-      if (m_hT0Evt_Final_WithRPC_SEM && std::isfinite(se_rpc)) m_hT0Evt_Final_WithRPC_SEM->Fill(se_rpc);
-    }
-  }
-
-  // 3. Scintillator + RPC with directions separate (phi and z as separate categories)
-  {
-    std::vector<std::pair<double, double>> partsWithRPCDir;
-    if (std::isfinite(muB)) partsWithRPCDir.emplace_back(muB, seB);
-    if (std::isfinite(muE)) partsWithRPCDir.emplace_back(muE, seE);
-    if (std::isfinite(muRphi_final)) partsWithRPCDir.emplace_back(muRphi_final, seRphi_final);
-    if (std::isfinite(muRz_final)) partsWithRPCDir.emplace_back(muRz_final, seRz_final);
-    const auto [t0_dir, se_dir] = combineFinal(partsWithRPCDir);
-    if (std::isfinite(t0_dir)) {
-      if (m_hT0Evt_Final_WithRPCDir) m_hT0Evt_Final_WithRPCDir->Fill(t0_dir);
-      if (m_hT0Evt_Final_WithRPCDir_SEM && std::isfinite(se_dir)) m_hT0Evt_Final_WithRPCDir_SEM->Fill(se_dir);
-    }
   }
 }

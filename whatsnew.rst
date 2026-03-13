@@ -52,6 +52,8 @@ automatically done when switching the calculation on.
 
 .. include:: analysis/doc/whatsnew-since/release-10-00.txt
 
+.. include:: generators/doc/whatsnew-since/release-10-00.txt
+
 Changes since release-09
 ========================
 

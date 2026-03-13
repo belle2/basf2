@@ -263,7 +263,7 @@ namespace Belle2::Variable {
 
   double nMatchedKLMClusters(const Particle* particle)
   {
-    Belle2::Particle::EParticleSourceObject particleSource = particle->getParticleSource();
+    Particle::EParticleSourceObject particleSource = particle->getParticleSource();
     if (particleSource == Particle::EParticleSourceObject::c_Track) {
       return particle->getTrack()->getRelationsTo<KLMCluster>().size();
     } else if (particleSource == Particle::EParticleSourceObject::c_ECLCluster) {
@@ -290,75 +290,88 @@ namespace Belle2::Variable {
     return cluster->getClusterTrackSeparation();
   }
 
-  ROOT::Math::XYZVector getPositionOnHelix_trackfit(const TrackFitResult* trackFit)
+  double ClusterTrackDistance_usingHelixExtrapolate(const KLMCluster* cluster, const Belle2::Track* specificTrack = nullptr)
   {
-    double r_BKLM =  201.6;
-    double z_EFWD =  283.9;
+    double r_BKLM = 201.6;
+    double z_EFWD = 283.9;
     double z_EBWD = -189.9;
+    static const ROOT::Math::XYZVector vecNaN(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
 
-    // get helix and parameters
-    const double z0 = trackFit->getZ0();
-    const double tanlambda = trackFit->getTanLambda();
-    const Helix h = trackFit->getHelix();
+    // Define the Lambda function
+    auto getPositionOnHelix_trackfit = [&](const TrackFitResult * trackFit) -> ROOT::Math::XYZVector {
+      if (!trackFit) return vecNaN;
 
-    // extrapolate to radius
-    const double arcLength = h.getArcLength2DAtCylindricalR(r_BKLM);
-    const double lHelixRadius = arcLength > 0 ? arcLength : std::numeric_limits<double>::max();
+      // get helix and parameters
+      const double z0 = trackFit->getZ0();
+      const double tanlambda = trackFit->getTanLambda();
+      const Helix h = trackFit->getHelix();
 
-    // extrapolate to FWD z
-    const double lFWD = (z_EFWD - z0) / tanlambda > 0 ? (z_EFWD - z0) / tanlambda : std::numeric_limits<double>::max();
+      // extrapolate to radius
+      const double arcLength = h.getArcLength2DAtCylindricalR(r_BKLM);
+      const double lHelixRadius = arcLength > 0 ? arcLength : std::numeric_limits<double>::max();
 
-    // extrapolate to BWD z
-    const double lBWD = (z_EBWD - z0) / tanlambda > 0 ? (z_EBWD - z0) / tanlambda : std::numeric_limits<double>::max();
+      // extrapolate to FWD z
+      const double lFWD = (z_EFWD - z0) / tanlambda > 0 ? (z_EFWD - z0) / tanlambda : std::numeric_limits<double>::max();
 
-    // pick smallest arclength
-    const double l = std::min({lHelixRadius, lFWD, lBWD});
+      // extrapolate to BWD z
+      const double lBWD = (z_EBWD - z0) / tanlambda > 0 ? (z_EBWD - z0) / tanlambda : std::numeric_limits<double>::max();
 
-    ROOT::Math::XYZVector ext_helix = h.getPositionAtArcLength2D(l);
-    double helixExtR_surface = r_BKLM / sin(ext_helix.Theta());
-    if (l == lFWD) { helixExtR_surface = z_EFWD / cos(ext_helix.Theta());}
-    else if (l == lBWD) { helixExtR_surface = z_EBWD / cos(ext_helix.Theta());}
+      // pick smallest arclength
+      const double l = std::min({lHelixRadius, lFWD, lBWD});
 
-    ROOT::Math::XYZVector helixExt_surface_position(0, 0, 0);
-    VectorUtil::setMagThetaPhi(helixExt_surface_position, helixExtR_surface, ext_helix.Theta(), ext_helix.Phi());
+      ROOT::Math::XYZVector ext_helix = h.getPositionAtArcLength2D(l);
+      double helixExtR_surface = r_BKLM / sin(ext_helix.Theta());
 
-    return helixExt_surface_position;
+      if (l == lFWD)
+      {
+        helixExtR_surface = z_EFWD / cos(ext_helix.Theta());
+      } else if (l == lBWD)
+      {
+        helixExtR_surface = z_EBWD / cos(ext_helix.Theta());
+      }
+
+      ROOT::Math::XYZVector helixExt_surface_position(0, 0, 0);
+      VectorUtil::setMagThetaPhi(helixExt_surface_position, helixExtR_surface, ext_helix.Theta(), ext_helix.Phi());
+
+      return helixExt_surface_position;
+    };
+
+    bool isEFWD = (cluster->getClusterPosition().Z() > 275);
+    bool isEBWD = (cluster->getClusterPosition().Z() < -180);
+
+    float klmClusterR_surface = r_BKLM / sin(cluster->getClusterPosition().Theta());
+    if (isEFWD) { klmClusterR_surface = z_EFWD / cos(cluster->getClusterPosition().Theta()); }
+    else if (isEBWD) { klmClusterR_surface = z_EBWD / cos(cluster->getClusterPosition().Theta()); }
+
+    ROOT::Math::XYZVector klmCluster_surface_position(0, 0, 0);
+    VectorUtil::setMagThetaPhi(klmCluster_surface_position,
+                               klmClusterR_surface, cluster->getClusterPosition().Theta(), cluster->getClusterPosition().Phi());
+
+    double min_dist = 1e10;
+
+    if (specificTrack != nullptr) {
+      const TrackFitResult* trackfit = specificTrack->getTrackFitResultWithBestPValue();
+      ROOT::Math::XYZVector helixPos = getPositionOnHelix_trackfit(trackfit);
+      if (helixPos != vecNaN) min_dist = (klmCluster_surface_position - helixPos).R();
+    } else {
+      StoreArray<Track> tracks;
+      for (const Track& track : tracks) {
+        const TrackFitResult* trackfit = track.getTrackFitResultWithBestPValue();
+        ROOT::Math::XYZVector helixPos = getPositionOnHelix_trackfit(trackfit);
+        if (helixPos == vecNaN) continue;
+
+        double dist = (klmCluster_surface_position - helixPos).R();
+        if (dist < min_dist) min_dist = dist;
+      }
+    }
+
+    return (min_dist > 1e9) ? Const::doubleNaN : min_dist;
   }
 
   double klmClusterTrackDistance_helix_extrapolation(const Particle* particle)
   {
     const KLMCluster* cluster = particle->getKLMCluster();
-    static const ROOT::Math::XYZVector vecNaN(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
-    double r_BKLM =  201.6;
-    double z_EFWD =  283.9;
-    double z_EBWD = -189.9;
-
-    bool isEFWD = false;
-    bool isEBWD = false;
-    isEFWD = (cluster->getClusterPosition().Z() > 275);
-    isEBWD = (cluster->getClusterPosition().Z() < -180);
-
-    double klmClusterR_surface = r_BKLM / sin(cluster->getClusterPosition().Theta());
-    if (isEFWD) {klmClusterR_surface = z_EFWD / cos(cluster->getClusterPosition().Theta());}
-    else if (isEBWD) {klmClusterR_surface = z_EBWD / cos(cluster->getClusterPosition().Theta());}
-
-    ROOT::Math::XYZVector klmCluster_surface_position(0, 0, 0);
-    VectorUtil::setMagThetaPhi(klmCluster_surface_position, klmClusterR_surface,  cluster->getClusterPosition().Theta(),
-                               cluster->getClusterPosition().Phi());
-
-    double min_dist = 1e10, dist = 1e10;
-
-    StoreArray<Track> tracks;
-    for (const Track& track : tracks) { // loop on all tracks here, and select the one with the minimum distance
-      const TrackFitResult* trackfit = track.getTrackFitResultWithBestPValue();
-      if (!trackfit) {continue;}
-      ROOT::Math::XYZVector helixExt_surface_position = getPositionOnHelix_trackfit(trackfit);
-      if (helixExt_surface_position == vecNaN) return Const::doubleNaN;
-
-      dist = (klmCluster_surface_position - helixExt_surface_position).R();
-      if (dist < min_dist) min_dist = dist;
-    }
-    if (min_dist > 9999) min_dist = -1;
+    double min_dist = ClusterTrackDistance_usingHelixExtrapolate(cluster);
     return min_dist;
   }
 

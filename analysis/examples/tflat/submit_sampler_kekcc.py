@@ -48,8 +48,19 @@ if __name__ == "__main__":
     # Make sure output directory exists
     os.makedirs(output_dir, exist_ok=True)
 
-    # Submit sampler jobs
+    njobs = 0
     for sampler_id, file in enumerate(files):
+
+        # Do nothing if output file already exists
+        output_file_name = os.path.join(output_dir, uniqueIdentifier + f'_training_data{sampler_id}.root')
+        if os.path.isfile(output_file_name):
+            continue
+
+        # Submit job to create output file
         os.system(
             f'bsub -q s python3 sampler.py --uniqueIdentifier {uniqueIdentifier} --inputfile {file}'
             f' --working_dir {output_dir} --BELLE {str(is_belle)} --sampler_id {sampler_id}')
+
+        njobs += 1
+
+    print(f"Submitted {njobs} jobs to queue to create {njobs} missing output files")

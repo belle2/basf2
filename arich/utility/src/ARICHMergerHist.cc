@@ -21,23 +21,30 @@
 
 using namespace Belle2;
 
-// ---- Geometry ----
+// --------------------------------------------------
+// Geometry
+// --------------------------------------------------
 static const double SECTOR_CENTER_DEG[7] =
 {0.0, 30.0, 90.0, 150.0, 210.0, 270.0, 330.0};
 
-static const double BLOCK_W = 14.0;
-static const double BLOCK_H = 8.0;
+// Global drawing scale (conversion to ROOT coordinates)
+static const double GEOM_SCALE = 11.0;
 
-static const double R1 = 70.0;
-static const double R2 = 88.0;
-static const double R3 = 106.0;
-static const double R4 = 122.0;
+// Block size
+static const double BLOCK_W = 1.3 * GEOM_SCALE;
+static const double BLOCK_H = 0.8 * GEOM_SCALE;
 
-static const double ROW1_OFFSETS[3] = {+18.0, 0.0, -18.0};
-static const double ROW2_OFFSETS[4] = {+23.0, +13.0, -13.0, -23.0};
-static const double ROW3_OFFSETS[4] = {+22.0, +9.0,  -9.0,  -22.0};
-static const double ROW4_OFFSETS[1] = {0.0};
-// ---------------------------------------------
+// Ring radii
+static const double R1 = 6.1  * GEOM_SCALE;
+static const double R2 = 7.7  * GEOM_SCALE;
+static const double R3 = 9.5  * GEOM_SCALE;
+static const double R4 = 11.25 * GEOM_SCALE;
+
+static const double ROW1_OFFSETS[3] = {+21.5,  0.0, -21.5};
+static const double ROW2_OFFSETS[4] = {+22.5, +9.5, -9.5, -22.5};
+static const double ROW3_OFFSETS[4] = {+19.0,  +8.0,  -8.0, -19.0};
+static const double ROW4_OFFSETS[1] = {+1.0};
+// --------------------------------------------------
 
 void ARICHMergerHist::pol2xy(double r, double angDeg, double& x, double& y)
 {
@@ -147,7 +154,7 @@ void ARICHMergerHist::Draw(Option_t* option)
   // -------------------------------------------------
   // Sector lines (shorter + gray)
   // -------------------------------------------------
-  const double rInner = 55.0;
+  const double rInner = 50.0;
   const double rOuter = 130.0;
 
   for (int k = 0; k < 6; ++k) {

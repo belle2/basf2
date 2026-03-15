@@ -224,8 +224,8 @@ void DQMHistAnalysisCDCEpicsModule::beginRun()
   if (std::isnan(m_mintdc_sl28)) m_mintdc_sl28 = 4500.0;
   if (std::isnan(m_maxtdc_sl28)) m_maxtdc_sl28 = 5000.0;
 
-  if (std::isnan(m_phiwarn)) m_phiwarn = 0.05; //>%10 is warning
-  if (std::isnan(m_phialarm)) m_phialarm = 0.15; //>%25 is warning
+  if (std::isnan(m_phiwarn)) m_phiwarn = 0.05;
+  if (std::isnan(m_phialarm)) m_phialarm = 0.15;
 
   m_line_ladc_sl01->SetY1(m_minadc_sl01);
   m_line_ladc_sl01->SetY2(m_minadc_sl01);
@@ -430,8 +430,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
     if (!m_histref_phiindex)m_hist_crphi->SetTitle(Form("%s (no ref file)", m_hist_crphi->GetTitle()));
     m_hist_crphi->Draw("hist");
     if (isFew) colorizeCanvas(c_hist_crphi, c_StatusTooFew);
-    else if (isWarn)colorizeCanvas(c_hist_crphi, c_StatusWarning);
     else if (isAlarm)colorizeCanvas(c_hist_crphi, c_StatusError);
+    else if (isWarn)colorizeCanvas(c_hist_crphi, c_StatusWarning);
     else colorizeCanvas(c_hist_crphi, c_StatusGood);
     c_hist_crphi->Update();
     UpdateCanvas(c_hist_crphi);

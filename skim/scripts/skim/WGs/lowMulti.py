@@ -184,6 +184,8 @@ class LowMassTwoTrack(BaseSkim):
         return ParticleLists
 
     def validation_histograms(self, path):
+        if path is None:
+            return
         from ROOT import Belle2
         vm.addAlias('pip_p_cms', 'daughter(0, useCMSFrame(p))')
         vm.addAlias('pim_p_cms', 'daughter(1, useCMSFrame(p))')

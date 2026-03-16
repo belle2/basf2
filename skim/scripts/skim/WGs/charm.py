@@ -40,7 +40,7 @@ from stdV0s import stdKshorts, stdLambdas
 from variables import variables as vm
 
 
-__liaison__ = "Jaeyoung Kim <jaeyoung_kim@yonsei.ac.kr>"
+__liaison__ = "Rishav Kumar Jaiswal <rishav@korea.ac.kr>"
 _VALIDATION_SAMPLE = "mdst16.root"
 
 
@@ -1812,7 +1812,7 @@ class DpToEtaHp(BaseSkim):
     """
     **Decay Modes**:
         * :math:`D^{+}\\to \\eta \\pi^+` (and CC)
-        * :math:`D^{+}\\to \\eta \\K^+` (and CC)
+        * :math:`D^{+}\\to \\eta K^{+}` (and CC)
 
     **Selection Criteria**:
         * Track cuts are `charm_skim_std_charged` pion and Kaon

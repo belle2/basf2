@@ -17,6 +17,7 @@ from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm
 
+__liaison__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
 _VALIDATION_SAMPLE = "mdst16.root"
 
 

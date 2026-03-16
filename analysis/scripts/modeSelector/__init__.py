@@ -36,18 +36,19 @@ Example usage:
 """
 
 from modeSelector import config
-from modeSelector.calibrationSampling import (
-    CalibratedEventRandomFilterModule, addCalibratedEventRandomSampling)
-from modeSelector.dstarVeto import add_dstar_veto_aliases, addDstarVeto
+from modeSelector.dstarVeto import addDstarVeto
+from modeSelector.generatedDecayWeights import (GeneratedDecayWeightModule,
+                                                addGeneratedDecayWeights)
 from modeSelector.ModeSelectorModule import ModeSelectorModule
 
 __all__ = [
     'config',
-    'addCalibratedEventRandomSampling',
+    'addGeneratedDecayWeights',
     'modeSelector',
     'addDstarVeto',
     'add_dstar_veto_aliases',
-    'CalibratedEventRandomFilterModule',
+    'GeneratedDecayWeightModule',
+    'get_exact_dmid_from_signature',
     'ModeSelectorModule',
 ]
 

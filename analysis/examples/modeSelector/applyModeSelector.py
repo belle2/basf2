@@ -69,8 +69,8 @@ ma.inputMdstList(
     path=my_path
 )
 
-b2.conditions.prepend_globaltag('user_feichtip_modeSelector')
-# b2.conditions.prepend_testing_payloads('localdb/database.txt')
+# b2.conditions.prepend_globaltag('user_feichtip_modeSelector')
+b2.conditions.prepend_testing_payloads('localdb/database.txt')
 
 # Prepend the analysis globaltag for accessing payloads
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
@@ -88,16 +88,8 @@ else:
     for plist in particle_lists:
         ma.matchMCTruth(plist, path=my_path)
 
-    # Keep an approximately complementary holdout band with 1 - eventRandom.
-    vm.addAlias('eventRandomComplement', 'formula(1 - eventRandom)')
-    modeSelector.addCalibratedEventRandomSampling(
-        bp_list=f'B+:{fei_identifier}',
-        b0_list=f'B0:{fei_identifier}',
-        base_fraction=0.05,
-        cont_fraction=1.0,
-        random_variable='eventRandomComplement',
-        path=my_path
-    )
+    # Keep a complementary high-band holdout sample for smaller MC output.
+    ma.applyEventCuts('eventRandom > 0.95', path=my_path)
 
 # Define ROE masks for continuum suppression
 track_mask = "[[dr < 2] and [abs(dz) < 4] and [pt > 0.2] and [thetaInCDCAcceptance==1]]"
@@ -180,19 +172,29 @@ vm.addAlias(
 for b in ['B+', 'B0']:
     ma.applyCuts(f'{b}:{fei_identifier}', '[sigProb_rank == 1] or [modeSelector_rank == 1]', path=my_path)
 
+if not args.data:
+    modeSelector.addGeneratedDecayWeights(
+        bp_list=f'B+:{fei_identifier}',
+        b0_list=f'B0:{fei_identifier}',
+        store_btag_candidate_signature=True,
+        path=my_path
+    )
+
 
 # Create aliases for cleaner branch names in output ntuple
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
-vm.addAlias('sigProb_rank', 'extraInfo(sigProb_rank)')
-vm.addAlias('modeSelector_rank', 'extraInfo(modeSelector_rank)')
 vm.addAlias('dmID', 'extraInfo(decayModeID)')
 
 candidate_variables = [
+    'sigProb_rank',
+    'modeSelector_rank',
     'modeSelector_eqSigProb',
     'Dstp_deltaMassDiff',
     'Dstp_chiProb',
     'Dst0_deltaMassDiff',
-    'Dst0_chiProb'
+    'Dst0_chiProb',
+    'genDecayModeID',
+    'genFEICalibWeight',
 ]
 vu.create_aliases(candidate_variables, wrapper='extraInfo({variable})')
 
@@ -202,11 +204,6 @@ event_output_variables = [
     'modeSelector_catBp',
     'modeSelector_catCont'
 ]
-if not args.data:
-    event_output_variables.extend([
-        'modeSelectorCalibWeight',
-        'modeSelectorCalibInputId',
-    ])
 vu.create_aliases(event_output_variables, wrapper='eventExtraInfo({variable})')
 
 # Define output variables
@@ -240,8 +237,8 @@ output_variables = [
 
 if not args.data:
     output_variables.extend([
-        'modeSelectorCalibWeight',
-        'modeSelectorCalibInputId',
+        'genDecayModeID',
+        'genFEICalibWeight',
         'isSignal',
         'isContinuumEvent',
         'mostcommonBTagDeltaP',

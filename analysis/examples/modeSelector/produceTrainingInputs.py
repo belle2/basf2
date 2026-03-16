@@ -39,7 +39,7 @@ parser.add_argument('--input', default='/home/pf/dataframes/MC16rd_skim/udst_000
 parser.add_argument('--output', default='modeSelector_training',
                     help='Output prefix for training files (default: modeSelector_training)')
 parser.add_argument('--cont-fraction', type=float, default=0.25,
-                    help='Continuum downsampling fraction relative to BB (default: 0.25)')
+                    help='Continuum keep fraction relative to the 30% BB band (default: 0.25)')
 args = parser.parse_args()
 
 # Set up logging
@@ -65,13 +65,11 @@ particle_lists = [f'B+:{fei_identifier}', f'B0:{fei_identifier}']
 for plist in particle_lists:
     ma.matchMCTruth(plist, path=my_path)
 
-# Apply calibration-aware eventRandom sampling on the raw FEI lists.
+# Apply simple eventRandom cuts on the raw FEI lists.
 BASE_FRACTION = 0.3
-modeSelector.addCalibratedEventRandomSampling(
-    bp_list=f'B+:{fei_identifier}',
-    b0_list=f'B0:{fei_identifier}',
-    base_fraction=BASE_FRACTION,
-    cont_fraction=args.cont_fraction,
+ma.applyEventCuts(
+    f'[[isContinuumEvent == 1] and [eventRandom < {BASE_FRACTION * args.cont_fraction}]] or '
+    f'[[isContinuumEvent != 1] and [eventRandom < {BASE_FRACTION}]]',
     path=my_path
 )
 
@@ -111,6 +109,11 @@ ma.buildEventShape(
 
 # Add D* veto reconstruction (pi0 list created internally)
 modeSelector.addDstarVeto(particle_lists, path=my_path)
+modeSelector.addGeneratedDecayWeights(
+    bp_list=f'B+:{fei_identifier}',
+    b0_list=f'B0:{fei_identifier}',
+    path=my_path
+)
 
 # Run ModeSelector in training mode (no NN models needed)
 modeSelector.modeSelector(

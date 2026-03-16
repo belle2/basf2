@@ -18,7 +18,7 @@ The module:
 1. Collects features from all B candidates in the event
 2. Runs a category network to classify as B0/B+/continuum
 3. Runs a main network using category output to compute final scores
-4. Stores results as ExtraInfo on the best candidate
+4. Stores results as ExtraInfo
 """
 
 import basf2 as b2
@@ -45,7 +45,7 @@ class ModeSelectorModule(b2.Module):
     """
     TR_EVENT_FIELDS = ('all_features',)
     TR_EVENT_BEST_FIELDS = ('best_bp_iid', 'best_bp_dp', 'best_b0_iid', 'best_b0_dp')
-    TR_BEST_FIELDS = ('pdg', 'dm', 'sigprob', 'is_cont', 'tag_pdg')
+    TR_BEST_FIELDS = ('pdg', 'dm', 'sigprob', 'is_cont', 'tag_pdg', 'gen_dm_id', 'gen_calib_weight')
     AUXILIARY_OUTPUT_PREFIX = 'modeSelector'
 
     def __init__(
@@ -372,6 +372,8 @@ class ModeSelectorModule(b2.Module):
                 'sigprob': np.nan,
                 'is_cont': np.nan,
                 'tag_pdg': np.nan,
+                'gen_dm_id': np.nan,
+                'gen_calib_weight': np.nan,
                 'dp': np.nan,
             }
 
@@ -381,6 +383,8 @@ class ModeSelectorModule(b2.Module):
             'sigprob': vm.evaluate('extraInfo(SignalProbability)', particle),
             'is_cont': vm.evaluate('isContinuumEvent', particle),
             'tag_pdg': vm.evaluate('mostcommonBTagPDG', particle),
+            'gen_dm_id': vm.evaluate('extraInfo(genDecayModeID)', particle),
+            'gen_calib_weight': vm.evaluate('extraInfo(genFEICalibWeight)', particle),
             'dp': vm.evaluate('mostcommonBTagDeltaP', particle),
         }
         return {
@@ -502,8 +506,8 @@ class ModeSelectorModule(b2.Module):
                 'best_b0_dp': np.float32,
             }
         )
-        bp = self._block_to_arrays(self._tr_bp, dtype_map={k: np.float32 for k in self.TR_BEST_FIELDS})
-        b0 = self._block_to_arrays(self._tr_b0, dtype_map={k: np.float32 for k in self.TR_BEST_FIELDS})
+        bp = self._block_to_arrays(self._tr_bp, dtype_map={key: np.float32 for key in self.TR_BEST_FIELDS})
+        b0 = self._block_to_arrays(self._tr_b0, dtype_map={key: np.float32 for key in self.TR_BEST_FIELDS})
 
         n_events = len(ev['all_features'])
         feature_arrays = ev['all_features']
@@ -527,6 +531,10 @@ class ModeSelectorModule(b2.Module):
         b0_is_cont = b0['is_cont']
         bp_gen_pdg = bp['tag_pdg']
         b0_gen_pdg = b0['tag_pdg']
+        bp_gen_dm_id = np.nan_to_num(bp['gen_dm_id'], nan=-1).astype(np.int16)
+        b0_gen_dm_id = np.nan_to_num(b0['gen_dm_id'], nan=-1).astype(np.int16)
+        bp_gen_calib_weight = np.nan_to_num(bp['gen_calib_weight'], nan=1.0).astype(np.float32)
+        b0_gen_calib_weight = np.nan_to_num(b0['gen_calib_weight'], nan=1.0).astype(np.float32)
 
         bp_is_best = (bp_sig >= b0_sig).astype(np.int8)
         best_sigprob = np.maximum(bp_sig, b0_sig).astype(np.float32)
@@ -593,6 +601,10 @@ class ModeSelectorModule(b2.Module):
         np.savez_compressed(self.training_output,
                             is_cont=is_cont,
                             gen_pdg=gen_pdg,
+                            bp_gen_decay_mode_id=bp_gen_dm_id,
+                            b0_gen_decay_mode_id=b0_gen_dm_id,
+                            bp_gen_fei_calib_weight=bp_gen_calib_weight,
+                            b0_gen_fei_calib_weight=b0_gen_calib_weight,
                             bp_is_best=bp_is_best,
                             best_sigprob=best_sigprob,
                             best_bp_sigprob_iid=best_bp_sigprob_iid,

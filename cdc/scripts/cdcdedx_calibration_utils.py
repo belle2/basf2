@@ -16,7 +16,11 @@ def make_electron_collection(path_electron):
     prepare_cdst_analysis(path=path_electron)
 
     # Add a TriggerSkim module to apply a specific trigger line
-    trg_bhabhaskim = path_electron.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_radee"])
+    trg_bhabhaskim = path_electron.add_module(
+        "TriggerSkim",
+        triggerLines=[
+            "software_trigger_cut&skim&accept_radee",
+            "software_trigger_cut&skim&accept_bhabha_cdc"])
     trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
     # Add the CDCDedxCorrection module to correct dE/dx (no saturation)

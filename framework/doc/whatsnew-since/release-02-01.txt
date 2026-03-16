@@ -91,7 +91,7 @@ Core Framework
 
   .. seealso::
 
-      Pull request `[PR#2790] <https://stash.desy.de/projects/B2/repos/software/pull-requests/2790>`_
+      Pull request `[PR#2790] <https://gitlab.desy.de/belle2/software/software/-/merge_requests/2790>`_
 
 
 * There is now support for named relations to allow multiple relations

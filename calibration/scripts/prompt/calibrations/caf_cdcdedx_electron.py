@@ -228,7 +228,7 @@ def pre_collector(name='rg'):
     """
 
     reco_path = basf2.create_path()
-    recon.prepare_cdst_analysis(path=reco_path)
+
     if (name == "validation"):
         basf2.B2INFO("no trigger skim")
     elif (name == "timegain" or name == "onedcell"):
@@ -252,6 +252,8 @@ def pre_collector(name='rg'):
     else:
         trg_bhabhaskim = reco_path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
         trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
+
+    recon.prepare_cdst_analysis(path=reco_path)
 
     reco_path.add_module(
         'CDCDedxCorrection',

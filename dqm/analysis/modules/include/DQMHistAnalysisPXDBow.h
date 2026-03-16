@@ -42,6 +42,8 @@ namespace Belle2 {
      */
     void event() override final;
 
+    void plotCanvas(bool enough, bool errorflag, bool warnflag, std::string buff);
+
     //! Parameters accessible from basf2 scripts
   private:
     //! name of histogram directory

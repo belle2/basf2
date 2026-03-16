@@ -31,7 +31,7 @@ DQMHistAnalysisPXDBowModule::DQMHistAnalysisPXDBowModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where the histogram is placed",
            std::string("PXDBow/"));
   addParam("moduleName", m_moduleName,
-           "Layer_ladder_sensor numbers of the module which residual histogram will be plotted on the DQM",
+           "Layer_ladder_sensor numbers of the module which residual histogram will be plotted on the DQM, if empty all histogram are plotted",
            std::string("2.2.1"));
   addParam("statThreshold", m_statThreshold,
            "minimum number of entries needed to calculate the mean in the delta distribution of the sagitta",
@@ -73,10 +73,12 @@ void DQMHistAnalysisPXDBowModule::initialize()
     registerEpicsPV("PXD:sagitta:" + buff, "sagitta:" + (std::string)aVxdID);
   }
 
-  if (validModule == 0) {
+
+  if (validModule == 0 and m_moduleName != "") {
     B2WARNING("Invalid moduleName, only PXD forward module are acceptable, nameModule parameter set to default (2.2.1)");
     m_moduleName = "2.2.1";
-  }
+  } else if (m_moduleName == "") B2INFO("Plotting the histogram for all forward sensors");
+  else B2INFO("Plotting histogram for module " << m_moduleName);
 
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
@@ -130,22 +132,27 @@ void DQMHistAnalysisPXDBowModule::event()
       } else
         enough = false;
 
-      if (aPXDModule == VxdID(m_moduleName)) {
-        EStatus status = makeStatus(enough, errorflag, warnflag);
-        TH1* h = findHist(m_histogramDirectoryName + "resV_" + buff, true);
-        if (h != NULL) {
-          m_hResV.Clear();
-          h->Copy(m_hResV);
-          m_hResV.SetName("ResV");
-          m_hResV.SetTitle("v residuals");
-          m_cResV->Clear();
-          m_cResV->cd();
-          m_hResV.Draw();
-          colorizeCanvas(m_cResV, status);
-        }
-      }
+      if (m_moduleName == "") {
+        plotCanvas(enough, errorflag, warnflag, buff);
+      } else if (aPXDModule == VxdID(m_moduleName)) {
+        plotCanvas(enough, errorflag, warnflag, buff);
+      } else B2WARNING("Invalid input for the parameter m_moduleName");
     } else B2DEBUG(20, "Histo resV_" << buff << " not found");
   }
 }
 
-
+void DQMHistAnalysisPXDBowModule::plotCanvas(bool enough, bool errorflag, bool warnflag, std::string buff)
+{
+  EStatus status = makeStatus(enough, errorflag, warnflag);
+  TH1* h = findHist(m_histogramDirectoryName + "resV_" + buff, true);
+  if (h != NULL) {
+    m_hResV.Clear();
+    h->Copy(m_hResV);
+    m_hResV.SetName("ResV");
+    m_hResV.SetTitle("v residuals");
+    m_cResV->Clear();
+    m_cResV->cd();
+    m_hResV.Draw();
+    colorizeCanvas(m_cResV, status);
+  }
+}

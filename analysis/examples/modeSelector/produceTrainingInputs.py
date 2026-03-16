@@ -107,8 +107,6 @@ ma.buildEventShape(
     path=my_path
 )
 
-# Add D* veto reconstruction (pi0 list created internally)
-modeSelector.addDstarVeto(particle_lists, path=my_path)
 modeSelector.addGeneratedDecayWeights(
     bp_list=f'B+:{fei_identifier}',
     b0_list=f'B0:{fei_identifier}',

@@ -80,6 +80,13 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         Packed ragged arrays of per-event isSignal==1 candidates on deduplicated
         input_ids. Event i slice is values[offsets[i]:offsets[i+1]] and aligned
         across all *_values arrays.
+    calib_inputs : tuple (bp_tag_is_gen, b0_tag_is_gen, bp_gen_dm_id, b0_gen_dm_id,
+                          bp_gen_calib_w, b0_gen_calib_w, stored_fei_calib_w)
+        Per-event arrays for FEI calibration weight computation. bp/b0_gen_dm_id
+        are int16 with sentinel -1 (missing) or 999 (rest calibration).
+        stored_fei_calib_w is the pre-computed event-level weight from the npz,
+        used to verify the recomputed weights in compute_event_weights.
+        bp/b0_gen_calib_w are float32 stored calibration weights from generatedDecayWeights.
     """
 
     if isinstance(input_files, str):
@@ -105,6 +112,9 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         'is_cont', 'gen_pdg', 'bp_is_best', 'best_sigprob',
         'best_bp_sigprob_iid', 'best_b0_sigprob_iid',
         'bp_tag_is_gen', 'b0_tag_is_gen',
+        'bp_gen_decay_mode_id', 'b0_gen_decay_mode_id',
+        'bp_gen_fei_calib_weight', 'b0_gen_fei_calib_weight',
+        'fei_calib_weight',
         'best_bp_iid', 'best_bp_dp', 'best_b0_iid', 'best_b0_dp',
         'sig_input_ids_values', 'sig_input_ids_offsets',
         'sig_btag_index_values', 'sig_delta_p_values', 'sig_sigprob_values'
@@ -158,6 +168,14 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         best_bp_sigprob_iid = data['best_bp_sigprob_iid']
         best_b0_sigprob_iid = data['best_b0_sigprob_iid']
 
+        bp_tag_is_gen = data['bp_tag_is_gen']
+        b0_tag_is_gen = data['b0_tag_is_gen']
+        bp_gen_decay_mode_id = data['bp_gen_decay_mode_id']
+        b0_gen_decay_mode_id = data['b0_gen_decay_mode_id']
+        bp_gen_fei_calib_weight = data['bp_gen_fei_calib_weight']
+        b0_gen_fei_calib_weight = data['b0_gen_fei_calib_weight']
+        fei_calib_weight = data['fei_calib_weight']
+
         best_bp_iid = data['best_bp_iid']
         best_bp_dp = data['best_bp_dp']
         best_b0_iid = data['best_b0_iid']
@@ -209,7 +227,11 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
                 best_bp_sigprob_iid[sampled], best_b0_sigprob_iid[sampled],
                 best_bp_iid[sampled], best_bp_dp[sampled],
                 best_b0_iid[sampled], best_b0_dp[sampled],
-                sig_iid_v_s, sig_off_s, sig_btag_v_s, sig_dp_v_s, sig_sigprob_v_s)
+                sig_iid_v_s, sig_off_s, sig_btag_v_s, sig_dp_v_s, sig_sigprob_v_s,
+                bp_tag_is_gen[sampled], b0_tag_is_gen[sampled],
+                bp_gen_decay_mode_id[sampled], b0_gen_decay_mode_id[sampled],
+                bp_gen_fei_calib_weight[sampled], b0_gen_fei_calib_weight[sampled],
+                fei_calib_weight[sampled])
 
     features_list = []
     is_cont_list, gen_pdg_list, bp_is_best_list, best_sigprob_list = [], [], [], []
@@ -218,6 +240,10 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     best_b0_iid_list, best_b0_dp_list = [], []
     sig_input_ids_values_list, sig_input_ids_offsets_list = [], []
     sig_btag_index_values_list, sig_delta_p_values_list, sig_sigprob_values_list = [], [], []
+    bp_tag_is_gen_list, b0_tag_is_gen_list = [], []
+    bp_gen_dm_id_list, b0_gen_dm_id_list = [], []
+    bp_gen_calib_w_list, b0_gen_calib_w_list = [], []
+    stored_fei_calib_w_list = []
 
     n_workers = min(32, len(input_files))
     with ThreadPoolExecutor(max_workers=n_workers) as executor:
@@ -230,7 +256,8 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
          is_cont_r, gen_pdg_r, bp_is_best_r, best_sigprob_r,
          best_bp_sigprob_iid_r, best_b0_sigprob_iid_r,
          bp_iid, bp_dp, b0_iid, b0_dp,
-         sig_iid_v, sig_off, sig_btag_v, sig_dp_v, sig_sigprob_v) = result
+         sig_iid_v, sig_off, sig_btag_v, sig_dp_v, sig_sigprob_v,
+         bp_tg, b0_tg, bp_gd, b0_gd, bp_gcw, b0_gcw, stored_fcw) = result
         features_list.append(feats)
         is_cont_list.append(is_cont_r)
         gen_pdg_list.append(gen_pdg_r)
@@ -247,6 +274,13 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         sig_btag_index_values_list.append(sig_btag_v)
         sig_delta_p_values_list.append(sig_dp_v)
         sig_sigprob_values_list.append(sig_sigprob_v)
+        bp_tag_is_gen_list.append(bp_tg)
+        b0_tag_is_gen_list.append(b0_tg)
+        bp_gen_dm_id_list.append(bp_gd)
+        b0_gen_dm_id_list.append(b0_gd)
+        bp_gen_calib_w_list.append(bp_gcw)
+        b0_gen_calib_w_list.append(b0_gcw)
+        stored_fei_calib_w_list.append(stored_fcw)
 
     # Concatenate across all files
     features = sparse.vstack(features_list, format='csr')
@@ -364,7 +398,16 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     )
     event_scalars = (is_cont, gen_pdg, bp_is_best, best_sigprob,
                      best_bp_sigprob_iid, best_b0_sigprob_iid)
-    return (features, event_scalars, has_inputs, mc_truth_cand, sig_truth)
+    calib_inputs = (
+        np.concatenate(bp_tag_is_gen_list),
+        np.concatenate(b0_tag_is_gen_list),
+        np.concatenate(bp_gen_dm_id_list),
+        np.concatenate(b0_gen_dm_id_list),
+        np.concatenate(bp_gen_calib_w_list),
+        np.concatenate(b0_gen_calib_w_list),
+        np.concatenate(stored_fei_calib_w_list),
+    )
+    return (features, event_scalars, has_inputs, mc_truth_cand, sig_truth, calib_inputs)
 
 
 class MultiClassNet(nn.Module):
@@ -438,10 +481,12 @@ def train_epoch(model, train_loader, criterion, optimizer, device, disco_lambda=
     model : nn.Module
         Model to train
     train_loader : DataLoader
-        Training data loader. When disco_lambda > 0, batches must be 3-tuples
-        (features, labels, mbc_values); otherwise 2-tuples (features, labels).
+        Training data loader. Batch tuple formats supported:
+        - 2-tuple (features, labels): no weights, no DisCo
+        - 3-tuple (features, labels, weights): weighted loss, no DisCo
+        - 4-tuple (features, labels, mbc, weights): weighted loss + DisCo
     criterion : nn.Module
-        Loss function
+        Loss function with reduction='none' (per-sample losses required)
     optimizer : torch.optim.Optimizer
         Optimizer
     device : torch.device
@@ -452,7 +497,7 @@ def train_epoch(model, train_loader, criterion, optimizer, device, disco_lambda=
     Returns
     -------
     train_loss : float
-        Average classification loss
+        Average (weighted) classification loss
     disco_loss : float
         Average distance correlation loss (0.0 if disabled)
     """
@@ -462,21 +507,31 @@ def train_epoch(model, train_loader, criterion, optimizer, device, disco_lambda=
     n_batches = 0
 
     for batch in train_loader:
-        # Unpack batch - 3-tuple when DisCo enabled, 2-tuple otherwise
-        if len(batch) == 3:
-            data, target, batch_mbc = batch
+        # Unpack batch based on tuple length
+        if len(batch) == 4:
+            data, target, batch_mbc, sample_weights = batch
             batch_mbc = batch_mbc.to(device)
+            sample_weights = sample_weights.to(device)
+        elif len(batch) == 3:
+            data, target, sample_weights = batch
+            batch_mbc = None
+            sample_weights = sample_weights.to(device)
         else:
             data, target = batch
             batch_mbc = None
+            sample_weights = None
 
         data, target = data.to(device), target.to(device)
 
         optimizer.zero_grad()
         output = model(data)
 
-        # Classification loss
-        cls_loss = criterion(output, target)
+        # Classification loss (per-sample when criterion has reduction='none')
+        loss_per_sample = criterion(output, target)
+        if sample_weights is not None:
+            cls_loss = (loss_per_sample * sample_weights).mean()
+        else:
+            cls_loss = loss_per_sample.mean()
 
         # Distance correlation loss (if enabled)
         disco_loss = torch.tensor(0.0, device=device)
@@ -517,15 +572,25 @@ def train_epoch(model, train_loader, criterion, optimizer, device, disco_lambda=
 
 
 def evaluate(model, loader, criterion, device):
-    """Evaluate model. Handles both 2-tuple and 3-tuple batches (3rd element ignored)."""
+    """Evaluate model, applying per-sample weights when present.
+
+    Expects criterion with reduction='none'. Weights are read from the last
+    batch element when the batch has more than 2 elements.
+    """
     model.eval()
     total_loss = 0
 
     with torch.no_grad():
         for batch in loader:
-            data, target = batch[0].to(device), batch[1].to(device)
+            data = batch[0].to(device)
+            target = batch[1].to(device)
             output = model(data)
-            loss = criterion(output, target)
+            loss_per_sample = criterion(output, target)
+            if len(batch) > 2:
+                sample_weights = batch[-1].to(device)
+                loss = (loss_per_sample * sample_weights).mean()
+            else:
+                loss = loss_per_sample.mean()
             total_loss += loss.item() * len(data)
 
     if len(loader.dataset) == 0:
@@ -765,7 +830,8 @@ class SparseDataset(torch.utils.data.Dataset):
     Slower than dense loading but significantly more memory-efficient.
     """
 
-    def __init__(self, features_sparse, labels, mbc_values=None, extra_features=None):
+    def __init__(self, features_sparse, labels, mbc_values=None, extra_features=None,
+                 weights=None):
         """
         Parameters
         ----------
@@ -777,11 +843,14 @@ class SparseDataset(torch.utils.data.Dataset):
             Mbc values per event (for DisCo loss)
         extra_features : np.ndarray, optional, shape (n_samples, n_extra)
             Additional dense features concatenated per sample
+        weights : np.ndarray, optional, shape (n_samples,)
+            Per-event loss weights (e.g. FEI calibration weights)
         """
         self.features = features_sparse.tocsr()
         self.labels = labels
         self.mbc_values = mbc_values
         self.extra_features = extra_features
+        self.weights = weights
 
     def __len__(self):
         return self.features.shape[0]
@@ -796,19 +865,29 @@ class SparseDataset(torch.utils.data.Dataset):
 
         if self.mbc_values is not None:
             mbc = torch.tensor(self.mbc_values[idx], dtype=torch.float32)
+            if self.weights is not None:
+                w = torch.tensor(self.weights[idx], dtype=torch.float32)
+                return feature_row, label, mbc, w
             return feature_row, label, mbc
+
+        if self.weights is not None:
+            w = torch.tensor(self.weights[idx], dtype=torch.float32)
+            return feature_row, label, w
 
         return feature_row, label
 
 
 def sparse_collate_fn(batch):
-    """Collate function for SparseDataset with optional Mbc values."""
+    """Collate function for SparseDataset with optional Mbc and weight tensors."""
+    if len(batch[0]) == 4:
+        features, labels, mbc, weights = zip(*batch)
+        return (torch.stack(features), torch.stack(labels),
+                torch.stack(mbc), torch.stack(weights))
     if len(batch[0]) == 3:
-        features, labels, mbc = zip(*batch)
-        return torch.stack(features), torch.stack(labels), torch.stack(mbc)
-    else:
-        features, labels = zip(*batch)
-        return torch.stack(features), torch.stack(labels)
+        features, labels, third = zip(*batch)
+        return torch.stack(features), torch.stack(labels), torch.stack(third)
+    features, labels = zip(*batch)
+    return torch.stack(features), torch.stack(labels)
 
 
 def build_category_labels(is_cont, gen_pdg):
@@ -834,6 +913,152 @@ def build_category_labels(is_cont, gen_pdg):
         2,
         np.where(abs_gen_pdg == 521, 1, 0)
     ).astype(np.int64)
+
+
+def compute_event_weights(event_scalars, mc_truth_cand, calib_inputs,
+                          delta_p_thresh=config.DELTA_P_THRESH):
+    """
+    Compute per-event FEI calibration weights for the training loss.
+
+    Uses the calibration weight for the highest-sigProb candidate's decay mode
+    when that candidate has a truth-compatible tag PDG and DeltaP below
+    delta_p_thresh; falls back to the generated decay mode weight otherwise.
+    Continuum events always receive weight config.FEI_CALIB_CONT.
+
+    Parameters
+    ----------
+    event_scalars : tuple
+        From load_and_sample_data: (is_cont, gen_pdg, bp_is_best, best_sigprob,
+        best_bp_sigprob_iid, best_b0_sigprob_iid)
+    mc_truth_cand : tuple
+        From load_and_sample_data: (best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp)
+    calib_inputs : tuple
+        From load_and_sample_data: (bp_tag_is_gen, b0_tag_is_gen, bp_gen_dm_id,
+        b0_gen_dm_id, bp_gen_calib_w, b0_gen_calib_w, stored_fei_calib_w)
+    delta_p_thresh : float
+        DeltaP threshold for tag quality (default: config.DELTA_P_THRESH)
+
+    Returns
+    -------
+    weights : ndarray of float32, shape (n_events,)
+        Per-event FEI calibration weights.
+    """
+    is_cont, gen_pdg, bp_is_best, _, best_bp_sigprob_iid, best_b0_sigprob_iid = event_scalars
+    _, best_bp_dp, _, best_b0_dp = mc_truth_cand
+    (bp_tag_is_gen, b0_tag_is_gen, bp_gen_dm_id, b0_gen_dm_id,
+     bp_gen_calib_w, b0_gen_calib_w, stored_fei_calib_w) = calib_inputs
+
+    # Build per-sector lookup arrays (index = dmID, value = calibration weight)
+    bp_calib_map = config.get_fei_calibration_map(521)
+    bp_calib_rest = config.get_fei_calibration_rest(521)
+    bp_lookup = np.full(config.N_BP_MODES, bp_calib_rest, dtype=np.float32)
+    for dm, w in bp_calib_map.items():
+        if 0 <= dm < config.N_BP_MODES:
+            bp_lookup[dm] = w
+
+    b0_calib_map = config.get_fei_calibration_map(511)
+    b0_calib_rest = config.get_fei_calibration_rest(511)
+    b0_lookup = np.full(config.N_B0_MODES, b0_calib_rest, dtype=np.float32)
+    for dm, w in b0_calib_map.items():
+        if 0 <= dm < config.N_B0_MODES:
+            b0_lookup[dm] = w
+
+    # Determine primary sector per event (sector with overall best sigProb candidate)
+    use_bp = (bp_is_best == 1)
+    tag_is_gen = np.where(use_bp, bp_tag_is_gen.astype(np.int8),
+                          b0_tag_is_gen.astype(np.int8))
+    best_dp = np.where(use_bp, best_bp_dp, best_b0_dp)
+    sigprob_iid = np.where(use_bp,
+                           best_bp_sigprob_iid.astype(np.int32),
+                           best_b0_sigprob_iid.astype(np.int32))
+
+    # use_reco: best-sigProb candidate has truth-compatible tag PDG, good DeltaP,
+    # and a reconstructed candidate is present in this sector
+    use_reco = (tag_is_gen == 1) & (best_dp < delta_p_thresh) & (sigprob_iid >= 0)
+
+    # Start with continuum weight for all events; overwrite BB below
+    weights = np.full(len(is_cont), config.FEI_CALIB_CONT, dtype=np.float32)
+    bb_mask = (is_cont != 1)
+    bp_threshold = config.N_BP_MODES * 2
+
+    # --- Reco path: decode decay mode from best sigprob input_id ---
+    reco_mask = bb_mask & use_reco
+
+    reco_bp = reco_mask & use_bp
+    if reco_bp.any():
+        dm = np.clip(best_bp_sigprob_iid[reco_bp].astype(np.int32) // 2,
+                     0, config.N_BP_MODES - 1)
+        weights[reco_bp] = bp_lookup[dm]
+
+    reco_b0 = reco_mask & ~use_bp
+    if reco_b0.any():
+        dm = np.clip(
+            (best_b0_sigprob_iid[reco_b0].astype(np.int32) - bp_threshold) // 2,
+            0, config.N_B0_MODES - 1
+        )
+        weights[reco_b0] = b0_lookup[dm]
+
+    # --- Gen path: look up by generated decay mode id ---
+    gen_mask = bb_mask & ~use_reco
+    if gen_mask.any():
+        abs_pdg = np.abs(gen_pdg.astype(np.int32))
+        gen_dm = np.where(use_bp,
+                          bp_gen_dm_id.astype(np.int32),
+                          b0_gen_dm_id.astype(np.int32))
+
+        gen_bp = gen_mask & (abs_pdg == 521)
+        if gen_bp.any():
+            dm = gen_dm[gen_bp]
+            w = np.full(int(gen_bp.sum()), bp_calib_rest, dtype=np.float32)
+            valid = (dm >= 0) & (dm < config.N_BP_MODES)
+            if valid.any():
+                w[valid] = bp_lookup[dm[valid]]
+            weights[gen_bp] = w
+
+        gen_b0 = gen_mask & (abs_pdg == 511)
+        if gen_b0.any():
+            dm = gen_dm[gen_b0]
+            w = np.full(int(gen_b0.sum()), b0_calib_rest, dtype=np.float32)
+            valid = (dm >= 0) & (dm < config.N_B0_MODES)
+            if valid.any():
+                w[valid] = b0_lookup[dm[valid]]
+            weights[gen_b0] = w
+
+        # Verify recomputed gen weights against stored values
+        stored_gen_w = np.where(use_bp,
+                                bp_gen_calib_w.astype(np.float32),
+                                b0_gen_calib_w.astype(np.float32))
+        check_mask = gen_mask & ((abs_pdg == 521) | (abs_pdg == 511))
+        if check_mask.any():
+            recomputed = weights[check_mask]
+            stored = stored_gen_w[check_mask]
+            mismatch = np.abs(recomputed - stored) > 1e-4
+            if mismatch.any():
+                print(
+                    f"  WARNING: {int(mismatch.sum())} gen-path weight mismatches "
+                    f"(recomputed vs stored). Max delta: "
+                    f"{float(np.abs(recomputed - stored).max()):.6f}"
+                )
+
+    diff = np.abs(weights - stored_fei_calib_w.astype(np.float32))
+    n_mismatch = int((diff > 1e-5).sum())
+    if n_mismatch > 0:
+        print(
+            f"  [WARNING] compute_event_weights: {n_mismatch}/{len(weights)} events "
+            f"have stored/recomputed weight mismatch "
+            f"(max diff={diff.max():.6f})"
+        )
+
+    print(
+        f"  Event weights: mean={weights.mean():.4f}, "
+        f"min={weights.min():.4f}, max={weights.max():.4f}"
+    )
+    print(
+        f"  Reco path: {int(reco_mask.sum())} events, "
+        f"Gen path: {int(gen_mask.sum())} events, "
+        f"Continuum: {int((is_cont == 1).sum())} events"
+    )
+    return weights
 
 
 def generate_category_outputs(cat_model, features, batch_size, device, use_sparse):
@@ -933,13 +1158,16 @@ def main():
     print("\n" + "=" * 60)
     print("Loading data")
     print("=" * 60)
-    features, event_scalars, has_inputs, mc_truth_cand, sig_truth = load_and_sample_data(
+    features, event_scalars, has_inputs, mc_truth_cand, sig_truth, calib_inputs = load_and_sample_data(
         args.input,
         fraction=args.fraction,
         cont_fraction=args.cont_fraction,
         random_state=args.seed,
     )
     is_cont, gen_pdg, bp_is_best, best_sigprob, best_bp_sigprob_iid, best_b0_sigprob_iid = event_scalars
+
+    print("\nComputing event weights...")
+    event_weights = compute_event_weights(event_scalars, mc_truth_cand, calib_inputs)
 
     print(f"\nFeature matrix shape: {features.shape}")
     print(f"  Sparse matrix memory: {features.data.nbytes / 1024**2:.1f} MB")
@@ -1051,6 +1279,7 @@ def main():
             features = features[train_selection]
             sparse_extra_features = cat_augments[train_selection]
         labels = labels[train_selection]
+        event_weights = event_weights[train_selection]
         if mbc_values is not None:
             mbc_values = mbc_values[train_selection]
         n_dropped = n_before - int(train_selection.sum())
@@ -1070,7 +1299,7 @@ def main():
     train_idx = indices[:n_train]
     val_idx = indices[n_train:]
 
-    # Split Mbc values
+    # Split Mbc values and event weights
     if mbc_values is not None:
         mbc_train = mbc_values[train_idx]
         mbc_val = mbc_values[val_idx]
@@ -1078,18 +1307,23 @@ def main():
         mbc_train = None
         mbc_val = None
 
+    w_train = event_weights[train_idx]
+    w_val = event_weights[val_idx]
+
     print(f"  Train: {n_train} events")
     print(f"  Val:   {n_val} events")
 
     # Create dataloaders (sparse or dense)
     if features_dense is None:
         # Sparse loading (category and main networks)
-        mbc_train_np = mbc_train.numpy() if mbc_train is not None else None
-        mbc_val_np = mbc_val.numpy() if mbc_val is not None else None
+        mbc_train_np = mbc_train if mbc_train is not None else None
+        mbc_val_np = mbc_val if mbc_val is not None else None
         train_extra = sparse_extra_features[train_idx] if sparse_extra_features is not None else None
         val_extra = sparse_extra_features[val_idx] if sparse_extra_features is not None else None
-        train_dataset = SparseDataset(features[train_idx], labels[train_idx], mbc_train_np, train_extra)
-        val_dataset = SparseDataset(features[val_idx], labels[val_idx], mbc_val_np, val_extra)
+        train_dataset = SparseDataset(features[train_idx], labels[train_idx],
+                                      mbc_train_np, train_extra, w_train)
+        val_dataset = SparseDataset(features[val_idx], labels[val_idx],
+                                    mbc_val_np, val_extra, w_val)
         drop_last = len(train_dataset) > args.batch_size
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
                                   collate_fn=sparse_collate_fn, num_workers=resolved_num_workers,
@@ -1102,14 +1336,16 @@ def main():
         y_train = torch.from_numpy(labels[train_idx])
         X_val = torch.from_numpy(features_dense[val_idx])
         y_val = torch.from_numpy(labels[val_idx])
+        w_train_t = torch.from_numpy(w_train)
+        w_val_t = torch.from_numpy(w_val)
 
         if mbc_train is not None:
             # Include mbc in dataset so shuffling aligns correctly with DisCo
-            train_dataset = TensorDataset(X_train, y_train, mbc_train)
-            val_dataset = TensorDataset(X_val, y_val, mbc_val)
+            train_dataset = TensorDataset(X_train, y_train, mbc_train, w_train_t)
+            val_dataset = TensorDataset(X_val, y_val, mbc_val, w_val_t)
         else:
-            train_dataset = TensorDataset(X_train, y_train)
-            val_dataset = TensorDataset(X_val, y_val)
+            train_dataset = TensorDataset(X_train, y_train, w_train_t)
+            val_dataset = TensorDataset(X_val, y_val, w_val_t)
 
         drop_last = len(train_dataset) > args.batch_size
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
@@ -1129,7 +1365,8 @@ def main():
     print(f"  Parameters: {sum(p.numel() for p in model.parameters()):,}")
 
     # Loss and optimizer
-    criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
+    # reduction='none' gives per-sample losses; weights are applied in train_epoch and evaluate
+    criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing, reduction='none')
     optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     scheduler = None
     if args.lr_schedule == 'cosine':
@@ -1169,7 +1406,6 @@ def main():
             disco_lambda=args.disco_lambda
         )
 
-        # Validate
         val_loss = evaluate(model, val_loader, criterion, device)
 
         epoch_time = time.time() - epoch_start

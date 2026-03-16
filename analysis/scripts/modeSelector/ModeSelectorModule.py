@@ -363,6 +363,77 @@ class ModeSelectorModule(b2.Module):
                 arrays[key] = np.asarray(values)
         return arrays
 
+    def _compute_fei_calib_weight(self, best_bp, best_b0):
+        """
+        Compute event-level FEI calibration weight from the best candidates.
+
+        Uses the reco path (truth-compatible tag PDG and DeltaP < DELTA_P_THRESH)
+        when applicable, falling back to the gen path (generated decay mode ID)
+        and finally the sector rest weight. Returns FEI_CALIB_CONT for continuum
+        events or when generated-decay annotation marked the candidate as
+        continuum or missing generated B truth.
+
+        Requires extraInfo(genDecayModeID) to be available on candidates;
+        add addGeneratedDecayWeights before ModeSelector in the basf2 path.
+        If genDecayModeID is unavailable at this point, the function returns
+        NaN to distinguish that case from the explicit sentinel value -1.
+        """
+        bp_sig = -1.0
+        b0_sig = -1.0
+        if best_bp is not None:
+            v = vm.evaluate('extraInfo(SignalProbability)', best_bp)
+            if not np.isnan(v):
+                bp_sig = float(v)
+        if best_b0 is not None:
+            v = vm.evaluate('extraInfo(SignalProbability)', best_b0)
+            if not np.isnan(v):
+                b0_sig = float(v)
+
+        best = best_bp if bp_sig >= b0_sig else best_b0
+        if best is None:
+            return config.FEI_CALIB_CONT
+
+        is_cont_v = vm.evaluate('isContinuumEvent', best)
+        if np.isnan(is_cont_v) or int(is_cont_v) == 1:
+            return config.FEI_CALIB_CONT
+
+        pdg_v = vm.evaluate('PDG', best)
+        dm_v = vm.evaluate('extraInfo(decayModeID)', best)
+        tag_pdg_v = vm.evaluate('mostcommonBTagPDG', best)
+        dp_v = vm.evaluate('mostcommonBTagDeltaP', best)
+        gen_dm_v = vm.evaluate('extraInfo(genDecayModeID)', best)
+
+        if np.isnan(pdg_v) or np.isnan(dm_v):
+            return config.FEI_CALIB_CONT
+
+        abs_pdg = abs(int(pdg_v))
+        if abs_pdg not in (511, 521):
+            return config.FEI_CALIB_CONT
+
+        calib_map = config.get_fei_calibration_map(abs_pdg)
+        calib_rest = config.get_fei_calibration_rest(abs_pdg)
+
+        # Reco path: truth-compatible tag PDG and low DeltaP
+        tag_is_gen = (not np.isnan(tag_pdg_v)) and config.truth_tag_matches_pdg(pdg_v, tag_pdg_v, dm_v)
+        dp_ok = (not np.isnan(dp_v)) and float(dp_v) < config.DELTA_P_THRESH
+        if tag_is_gen and dp_ok:
+            iid = self._get_input_id(best)
+            if abs_pdg == 521:
+                dm = max(0, min(iid // 2, config.N_BP_MODES - 1))
+            else:
+                dm = max(0, min((iid - config.N_BP_MODES * 2) // 2, config.N_B0_MODES - 1))
+            return calib_map.get(dm, calib_rest)
+
+        # Gen path: use generated decay mode ID if available.
+        # -1 is the explicit sentinel for continuum or missing generated B truth.
+        if not np.isnan(gen_dm_v):
+            if int(gen_dm_v) == -1:
+                return config.FEI_CALIB_CONT
+            if int(gen_dm_v) > 0:
+                return calib_map.get(int(gen_dm_v), calib_rest)
+            return np.nan
+        return np.nan
+
     def _extract_mc_truth_scalars(self, particle):
         """Extract compact MC truth scalars used by training output."""
         if particle is None:
@@ -597,6 +668,73 @@ class ModeSelectorModule(b2.Module):
             sig_delta_p_values = np.empty(0, dtype=np.float32)
             sig_sigprob_values = np.empty(0, dtype=np.float32)
 
+        # Compute per-event FEI calibration weight (same logic as compute_event_weights in train.py)
+        bp_calib_map = config.get_fei_calibration_map(521)
+        bp_calib_rest = config.get_fei_calibration_rest(521)
+        bp_lookup = np.full(config.N_BP_MODES, bp_calib_rest, dtype=np.float32)
+        for _dm, _w in bp_calib_map.items():
+            if 0 <= _dm < config.N_BP_MODES:
+                bp_lookup[_dm] = _w
+
+        b0_calib_map = config.get_fei_calibration_map(511)
+        b0_calib_rest = config.get_fei_calibration_rest(511)
+        b0_lookup = np.full(config.N_B0_MODES, b0_calib_rest, dtype=np.float32)
+        for _dm, _w in b0_calib_map.items():
+            if 0 <= _dm < config.N_B0_MODES:
+                b0_lookup[_dm] = _w
+
+        use_bp = (bp_is_best == 1)
+        tag_is_gen_ev = np.where(use_bp, bp_tag_is_gen.astype(np.int8), b0_tag_is_gen.astype(np.int8))
+        best_dp_ev = np.where(use_bp, best_bp_dp, best_b0_dp)
+        sigprob_iid_ev = np.where(
+            use_bp,
+            best_bp_sigprob_iid.astype(np.int32),
+            best_b0_sigprob_iid.astype(np.int32),
+        )
+        bb_mask_ev = (is_cont != 1)
+        use_reco_ev = (tag_is_gen_ev == 1) & (best_dp_ev < config.DELTA_P_THRESH) & (sigprob_iid_ev >= 0)
+
+        fei_calib_weight = np.full(n_events, config.FEI_CALIB_CONT, dtype=np.float32)
+
+        bp_threshold = config.N_BP_MODES * 2
+        reco_mask_ev = bb_mask_ev & use_reco_ev
+        reco_bp_ev = reco_mask_ev & use_bp
+        if reco_bp_ev.any():
+            _dm = np.clip(best_bp_sigprob_iid[reco_bp_ev].astype(np.int32) // 2, 0, config.N_BP_MODES - 1)
+            fei_calib_weight[reco_bp_ev] = bp_lookup[_dm]
+        reco_b0_ev = reco_mask_ev & ~use_bp
+        if reco_b0_ev.any():
+            _dm = np.clip(
+                (best_b0_sigprob_iid[reco_b0_ev].astype(np.int32) - bp_threshold) // 2,
+                0, config.N_B0_MODES - 1,
+            )
+            fei_calib_weight[reco_b0_ev] = b0_lookup[_dm]
+
+        gen_mask_ev = bb_mask_ev & ~use_reco_ev
+        if gen_mask_ev.any():
+            abs_pdg_ev = np.abs(gen_pdg.astype(np.int32))
+            gen_dm_ev = np.where(
+                use_bp,
+                bp_gen_dm_id.astype(np.int32),
+                b0_gen_dm_id.astype(np.int32),
+            )
+            gen_bp_ev = gen_mask_ev & (abs_pdg_ev == 521)
+            if gen_bp_ev.any():
+                _dm = gen_dm_ev[gen_bp_ev]
+                _w = np.full(int(gen_bp_ev.sum()), bp_calib_rest, dtype=np.float32)
+                valid = (_dm >= 0) & (_dm < config.N_BP_MODES)
+                if valid.any():
+                    _w[valid] = bp_lookup[_dm[valid]]
+                fei_calib_weight[gen_bp_ev] = _w
+            gen_b0_ev = gen_mask_ev & (abs_pdg_ev == 511)
+            if gen_b0_ev.any():
+                _dm = gen_dm_ev[gen_b0_ev]
+                _w = np.full(int(gen_b0_ev.sum()), b0_calib_rest, dtype=np.float32)
+                valid = (_dm >= 0) & (_dm < config.N_B0_MODES)
+                if valid.any():
+                    _w[valid] = b0_lookup[_dm[valid]]
+                fei_calib_weight[gen_b0_ev] = _w
+
         sparse.save_npz(self.training_output.replace('.npz', '_features.npz'), sparse_features)
         np.savez_compressed(self.training_output,
                             is_cont=is_cont,
@@ -611,6 +749,7 @@ class ModeSelectorModule(b2.Module):
                             best_b0_sigprob_iid=best_b0_sigprob_iid,
                             bp_tag_is_gen=bp_tag_is_gen,
                             b0_tag_is_gen=b0_tag_is_gen,
+                            fei_calib_weight=fei_calib_weight,
                             best_bp_iid=best_bp_iid,
                             best_bp_dp=best_bp_dp,
                             best_b0_iid=best_b0_iid,
@@ -858,6 +997,9 @@ class ModeSelectorModule(b2.Module):
         if not event_extra_info.isValid():
             event_extra_info.create()
         event_extra_info.addExtraInfo(self.output_variable, bp_score)
+        event_extra_info.addExtraInfo(
+            'modeSelector_feiCalibWeight', self._compute_fei_calib_weight(best_bp, best_b0)
+        )
         event_extra_info.addExtraInfo(f'{self.AUXILIARY_OUTPUT_PREFIX}_catB0', float(cat_output[0]))
         event_extra_info.addExtraInfo(f'{self.AUXILIARY_OUTPUT_PREFIX}_catBp', float(cat_output[1]))
         event_extra_info.addExtraInfo(f'{self.AUXILIARY_OUTPUT_PREFIX}_catCont', float(cat_output[2]))

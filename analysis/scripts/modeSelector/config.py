@@ -46,6 +46,9 @@ HIGH_CONF_BPLUSSCORE_ABS = 0.01
 # preselection.
 DEFAULT_FEI_SIGPROB_THRESHOLD = 0.001
 
+# Default calibration weight assigned to continuum events.
+FEI_CALIB_CONT = 1.0
+
 
 def is_flavour_agnostic_b0_mode(pdg, dm_id):
     """

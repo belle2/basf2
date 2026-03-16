@@ -466,6 +466,18 @@ class GeneratedDecayWeightModule(b2.Module):
         else:
             particle.addExtraInfo(key, value)
 
+    @staticmethod
+    def _is_non_continuum_event(particle):
+        is_cont = vm.evaluate('isContinuumEvent', particle)
+        return int(is_cont) != 1
+
+    @staticmethod
+    def _report_missing_truth_annotation(list_name, particle, reason):
+        b2.B2ERROR(
+            "ModeSelector generated weights: non-continuum candidate missing generated "
+            f"B truth annotation in {list_name} (array index {particle.getArrayIndex()}): {reason}"
+        )
+
     def _annotate_list(self, list_name, truth_cache):
         plist = Belle2.PyStoreObj(list_name)
         if not plist.isValid():
@@ -476,13 +488,34 @@ class GeneratedDecayWeightModule(b2.Module):
             particle = particle_list.getParticle(i)
             btag_index = self._normalize_int(vm.evaluate('mostcommonBTagIndex', particle))
             tag_pdg = self._normalize_int(vm.evaluate('mostcommonBTagPDG', particle))
+            is_non_continuum = self._is_non_continuum_event(particle)
 
             gen_dm_id = INVALID_DMID
-            weight = 1.0
+            weight = config.FEI_CALIB_CONT
             match = None
-            if btag_index is not None and tag_pdg is not None and abs(tag_pdg) in (511, 521):
+            if btag_index is None:
+                if is_non_continuum:
+                    self._report_missing_truth_annotation(list_name, particle, 'mostcommonBTagIndex is NaN')
+            elif tag_pdg is None:
+                if is_non_continuum:
+                    self._report_missing_truth_annotation(list_name, particle, 'mostcommonBTagPDG is NaN')
+            elif abs(tag_pdg) not in (511, 521):
+                if is_non_continuum:
+                    self._report_missing_truth_annotation(
+                        list_name,
+                        particle,
+                        f'mostcommonBTagPDG={tag_pdg} is not a B0 or B+ PDG'
+                    )
+            else:
                 match = truth_cache.get(btag_index)
-                if match is not None:
+                if match is None:
+                    if is_non_continuum:
+                        self._report_missing_truth_annotation(
+                            list_name,
+                            particle,
+                            f'mostcommonBTagIndex={btag_index} is not present in the event truth cache'
+                        )
+                else:
                     gen_dm_id = match['gen_dm_id']
                     weight = match['weight']
 

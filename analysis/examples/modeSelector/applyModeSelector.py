@@ -125,9 +125,6 @@ ma.buildEventShape(
     path=my_path
 )
 
-# Add D* veto reconstruction (pi0 list created internally)
-modeSelector.addDstarVeto(particle_lists, path=my_path)
-
 # Apply ModeSelector using local ONNX files when provided, otherwise load from
 # the configured conditions DB globaltags or testing payloads.
 # Set debug=True to print feature values for comparison.
@@ -180,7 +177,6 @@ if not args.data:
         path=my_path
     )
 
-
 # Create aliases for cleaner branch names in output ntuple
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
 vm.addAlias('dmID', 'extraInfo(decayModeID)')
@@ -202,7 +198,8 @@ event_output_variables = [
     'BplusScore',
     'modeSelector_catB0',
     'modeSelector_catBp',
-    'modeSelector_catCont'
+    'modeSelector_catCont',
+    'modeSelector_feiCalibWeight',
 ]
 vu.create_aliases(event_output_variables, wrapper='eventExtraInfo({variable})')
 
@@ -222,6 +219,7 @@ output_variables = [
     'modeSelector_catB0',
     'modeSelector_catBp',
     'modeSelector_catCont',
+    'modeSelector_feiCalibWeight',
     'PDG',
     # D* veto variables
     'Dstp_deltaMassDiff',

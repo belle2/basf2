@@ -61,7 +61,7 @@ def modeSelector(
     payload_cat_model='modeSelector_cat_model_v0',
     payload_main_model='modeSelector_main_model_v0',
     output_variable='BplusScore',
-    addDstarVetoReco=False,
+    addDstarVetoReco=True,
     training_mode=False,
     training_output='modeSelector_training.npz',
     debug=False,
@@ -78,6 +78,9 @@ def modeSelector(
     The main output score is stored in EventExtraInfo using output_variable.
     Auxiliary category and per-candidate mode outputs are stored with the
     fixed modeSelector_* names.
+    If generated-decay annotations are already present, the event-level
+    modeSelector_feiCalibWeight uses them on the gen path and interprets
+    genDecayModeID = -1 as continuum or missing generated B truth.
 
     Parameters
     ----------
@@ -104,7 +107,7 @@ def modeSelector(
         Default: 'BplusScore'
     addDstarVetoReco : bool
         Whether to add D* veto reconstruction before the NN.
-        Default: False (assumes already added or not needed)
+        Default: True
     path : basf2.Path
         The basf2 path to add the module to.
 
@@ -176,8 +179,8 @@ def modeSelector(
         b2.B2FATAL(f"ModeSelector: b0_list must start with 'B0:'; got '{b0_list}'")
     particle_lists = [bp_list, b0_list]
 
-    # Optionally add D* veto reconstruction
     if addDstarVetoReco:
+        # Add D* veto reconstruction (pi0 list created internally)
         addDstarVeto(particle_lists, path=path)
 
     # Add the ModeSelector module

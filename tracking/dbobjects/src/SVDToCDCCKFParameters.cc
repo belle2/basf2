@@ -14,92 +14,92 @@ ClassImp(SVDToCDCCKFParameters);
 
 /** FLOAT PARAMETERS */
 
-void setMaximalDeltaPhi(float phi) { m_maximalDeltaPhi = phi; }
-float getMaximalDeltaPhi() const { return m_maximalDeltaPhi; }
+void SVDToCDCCKFParameters::setMaximalDeltaPhi(float phi) { m_maximalDeltaPhi = phi; }
+float SVDToCDCCKFParameters::getMaximalDeltaPhi() const { return m_maximalDeltaPhi; }
 
-void setMinimalPtRequirement(float pt) { m_minimalPtRequirement = pt; }
-float getMinimalPtRequirement() const { return m_minimalPtRequirement; }
+void SVDToCDCCKFParameters::setMinimalPtRequirement(float pt) { m_minimalPtRequirement = pt; }
+float SVDToCDCCKFParameters::getMinimalPtRequirement() const { return m_minimalPtRequirement; }
 
 
 /** INTEGER PARAMETERS */
 
-void setMaximalLayerJump(int layer) { m_maximalLayerJump = layer; }
-int getMaximalLayerJump() const { return m_maximalLayerJump; }
+void SVDToCDCCKFParameters::setMaximalLayerJump(int layer) { m_maximalLayerJump = layer; }
+int SVDToCDCCKFParameters::getMaximalLayerJump() const { return m_maximalLayerJump; }
 
-void setMaximalLayerJumpBackwardSeed(int layer) { m_maximalLayerJumpBackwardSeed = layer; }
-int getMaximalLayerJumpBackwardSeed() const { return m_maximalLayerJumpBackwardSeed; }
+void SVDToCDCCKFParameters::setMaximalLayerJumpBackwardSeed(int layer) { m_maximalLayerJumpBackwardSeed = layer; }
+int SVDToCDCCKFParameters::getMaximalLayerJumpBackwardSeed() const { return m_maximalLayerJumpBackwardSeed; }
 
-void setPathMaximalCandidatesInFlight(unsigned int max) { m_pathMaximalCandidatesInFlight = max; }
-unsigned int getPathMaximalCandidatesInFlight() const { return m_pathMaximalCandidatesInFlight; }
+void SVDToCDCCKFParameters::setPathMaximalCandidatesInFlight(unsigned int max) { m_pathMaximalCandidatesInFlight = max; }
+unsigned int SVDToCDCCKFParameters::getPathMaximalCandidatesInFlight() const { return m_pathMaximalCandidatesInFlight; }
 
-void setStateMaximalHitCandidates(unsigned int max) { m_stateMaximalHitCandidates = max; }
-unsigned int getStateMaximalHitCandidates() const { return m_stateMaximalHitCandidates; }
+void SVDToCDCCKFParameters::setStateMaximalHitCandidates(unsigned int max) { m_stateMaximalHitCandidates = max; }
+unsigned int SVDToCDCCKFParameters::getStateMaximalHitCandidates() const { return m_stateMaximalHitCandidates; }
 
 
 /** BOOLEAN PARAMETERS */
 
-void setExportAllTracks(bool value) { m_exportAllTracks = value; }
-bool getExportAllTracks() const { return m_exportAllTracks; }
+void SVDToCDCCKFParameters::setExportAllTracks(bool value) { m_exportAllTracks = value; }
+bool SVDToCDCCKFParameters::getExportAllTracks() const { return m_exportAllTracks; }
 
-void setExportTracks(bool value) { m_exportTracks = value; }
-bool getExportTracks() const { return m_exportTracks; }
+void SVDToCDCCKFParameters::setExportTracks(bool value) { m_exportTracks = value; }
+bool SVDToCDCCKFParameters::getExportTracks() const { return m_exportTracks; }
 
-void setIgnoreTracksWithCDChits(bool value) { m_ignoreTracksWithCDChits = value; }
-bool getIgnoreTracksWithCDChits() const { return m_ignoreTracksWithCDChits; }
+void SVDToCDCCKFParameters::setIgnoreTracksWithCDChits(bool value) { m_ignoreTracksWithCDChits = value; }
+bool SVDToCDCCKFParameters::getIgnoreTracksWithCDChits() const { return m_ignoreTracksWithCDChits; }
 
-void setTakenFlag(bool value) { m_setTakenFlag = value; }
-bool getTakenFlag() const { return m_setTakenFlag; }
+void SVDToCDCCKFParameters::setTakenFlag(bool value) { m_setTakenFlag = value; }
+bool SVDToCDCCKFParameters::getTakenFlag() const { return m_setTakenFlag; }
 
 
 /** STRING PARAMETERS */
 
-void setFilter(const std::string& filter) { m_filter = filter; }
-const std::string& getFilter() const { return m_filter; }
+void SVDToCDCCKFParameters::setHitFindingDirection(const std::string& direction) { m_hitFindingDirection = direction; }
+const std::string& SVDToCDCCKFParameters::getHitFindingDirection() const { return m_hitFindingDirection; }
 
-void setHitFindingDirection(const std::string& direction) { m_hitFindingDirection = direction; }
-const std::string& getHitFindingDirection() const { return m_hitFindingDirection; }
+void SVDToCDCCKFParameters::setFilter(const std::string& filter) { m_filter = filter; }
+const std::string& SVDToCDCCKFParameters::getFilter() const { return m_filter; }
 
-void setInputRecoTrackStoreArrayName(const std::string& name) { m_inputRecoTrackStoreArrayName = name; }
-const std::string& getInputRecoTrackStoreArrayName() const { return m_inputRecoTrackStoreArrayName; }
+void SVDToCDCCKFParameters::setInputRecoTrackStoreArrayName(const std::string& name) { m_inputRecoTrackStoreArrayName = name; }
+const std::string& SVDToCDCCKFParameters::getInputRecoTrackStoreArrayName() const { return m_inputRecoTrackStoreArrayName; }
 
-void setInputWireHits(const std::string& hits) { m_inputWireHits = hits; }
-const std::string& getInputWireHits() const { return m_inputWireHits; }
+void SVDToCDCCKFParameters::setInputWireHits(const std::string& hits) { m_inputWireHits = hits; }
+const std::string& SVDToCDCCKFParameters::getInputWireHits() const { return m_inputWireHits; }
 
-void setOutputRecoTrackStoreArrayName(const std::string& name) { m_outputRecoTrackStoreArrayName = name; }
-const std::string& getOutputRecoTrackStoreArrayName() const { return m_outputRecoTrackStoreArrayName; }
+void SVDToCDCCKFParameters::setOutputRecoTrackStoreArrayName(const std::string& name) { m_outputRecoTrackStoreArrayName = name; }
+const std::string& SVDToCDCCKFParameters::getOutputRecoTrackStoreArrayName() const { return m_outputRecoTrackStoreArrayName; }
 
-void setOutputRelationRecoTrackStoreArrayName(const std::string& name) { m_outputRelationRecoTrackStoreArrayName = name; }
-const std::string& getOutputRelationRecoTrackStoreArrayName() const { return m_outputRelationRecoTrackStoreArrayName; }
+void SVDToCDCCKFParameters::setOutputRelationRecoTrackStoreArrayName(const std::string& name) { m_outputRelationRecoTrackStoreArrayName = name; }
+const std::string& SVDToCDCCKFParameters::getOutputRelationRecoTrackStoreArrayName() const { return m_outputRelationRecoTrackStoreArrayName; }
 
-void setPathFilter(const std::string& filter) { m_pathFilter = filter; }
-const std::string& getPathFilter() const { return m_pathFilter; }
+void SVDToCDCCKFParameters::setPathFilter(const std::string& filter) { m_pathFilter = filter; }
+const std::string& SVDToCDCCKFParameters::getPathFilter() const { return m_pathFilter; }
 
-void setRelatedRecoTrackStoreArrayName(const std::string& name) { m_relatedRecoTrackStoreArrayName = name; }
-const std::string& getRelatedRecoTrackStoreArrayName() const { return m_relatedRecoTrackStoreArrayName; }
+void SVDToCDCCKFParameters::setRelatedRecoTrackStoreArrayName(const std::string& name) { m_relatedRecoTrackStoreArrayName = name; }
+const std::string& SVDToCDCCKFParameters::getRelatedRecoTrackStoreArrayName() const { return m_relatedRecoTrackStoreArrayName; }
 
-void setRelationCheckForDirection(const std::string& direction) { m_relationCheckForDirection = direction; }
-const std::string& getRelationCheckForDirection() const { return m_relationCheckForDirection; }
+void SVDToCDCCKFParameters::setRelationCheckForDirection(const std::string& direction) { m_relationCheckForDirection = direction; }
+const std::string& SVDToCDCCKFParameters::getRelationCheckForDirection() const { return m_relationCheckForDirection; }
 
-void setSeedComponent(const std::string& component) { m_seedComponent = component; }
-const std::string& getSeedComponent() const { return m_seedComponent; }
+void SVDToCDCCKFParameters::setSeedComponent(const std::string& component) { m_seedComponent = component; }
+const std::string& SVDToCDCCKFParameters::getSeedComponent() const { return m_seedComponent; }
 
-void setStateBasicFilter(const std::string& filter) { m_stateBasicFilter = filter; }
-const std::string& getStateBasicFilter() const { return m_stateBasicFilter; }
+void SVDToCDCCKFParameters::setStateBasicFilter(const std::string& filter) { m_stateBasicFilter = filter; }
+const std::string& SVDToCDCCKFParameters::getStateBasicFilter() const { return m_stateBasicFilter; }
 
-void setStateExtrapolationFilter(const std::string& filter) { m_stateExtrapolationFilter = filter; }
-const std::string& getStateExtrapolationFilter() const { return m_stateExtrapolationFilter; }
+void SVDToCDCCKFParameters::setStateExtrapolationFilter(const std::string& filter) { m_stateExtrapolationFilter = filter; }
+const std::string& SVDToCDCCKFParameters::getStateExtrapolationFilter() const { return m_stateExtrapolationFilter; }
 
-void setStateFinalFilter(const std::string& filter) { m_stateFinalFilter = filter; }
-const std::string& getStateFinalFilter() const { return m_stateFinalFilter; }
+void SVDToCDCCKFParameters::setStateFinalFilter(const std::string& filter) { m_stateFinalFilter = filter; }
+const std::string& SVDToCDCCKFParameters::getStateFinalFilter() const { return m_stateFinalFilter; }
 
-void setStatePreFilter(const std::string& filter) { m_statePreFilter = filter; }
-const std::string& getStatePreFilter() const { return m_statePreFilter; }
+void SVDToCDCCKFParameters::setStatePreFilter(const std::string& filter) { m_statePreFilter = filter; }
+const std::string& SVDToCDCCKFParameters::getStatePreFilter() const { return m_statePreFilter; }
 
-void setTrackFindingDirection(const std::string& direction) { m_trackFindingDirection = direction; }
-const std::string& getTrackFindingDirection() const { return m_trackFindingDirection; }
+void SVDToCDCCKFParameters::setTrackFindingDirection(const std::string& direction) { m_trackFindingDirection = direction; }
+const std::string& SVDToCDCCKFParameters::getTrackFindingDirection() const { return m_trackFindingDirection; }
 
-void setWriteOutDirection(const std::string& direction) { m_writeOutDirection = direction; }
-const std::string& getWriteOutDirection() const { return m_writeOutDirection; }
+void SVDToCDCCKFParameters::setWriteOutDirection(const std::string& direction) { m_writeOutDirection = direction; }
+const std::string& SVDToCDCCKFParameters::getWriteOutDirection() const { return m_writeOutDirection; }
 
 
 /** FILTER PARAMETERS */

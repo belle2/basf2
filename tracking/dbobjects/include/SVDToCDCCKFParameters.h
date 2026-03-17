@@ -39,6 +39,84 @@ namespace Belle2 {
     /** Destructor */
     virtual ~SVDToCDCCKFParameters() {}
 
+    void setMaximalDeltaPhi(float phi);
+    float getMaximalDeltaPhi() const;
+
+    void setMinimalPtRequirement(float pt);
+    float getMinimalPtRequirement() const;
+
+    void setMaximalLayerJump(int layer);
+    int getMaximalLayerJump() const;
+
+    void setMaximalLayerJumpBackwardSeed(int layer);
+    int getMaximalLayerJumpBackwardSeed() const;
+
+    void setPathMaximalCandidatesInFlight(unsigned int max);
+    unsigned int getPathMaximalCandidatesInFlight() const;
+
+    void setStateMaximalHitCandidates(unsigned int max);
+    unsigned int getStateMaximalHitCandidates() const;
+
+    void setExportAllTracks(bool value);
+    bool getExportAllTracks() const;
+
+    void setExportTracks(bool value);
+    bool getExportTracks() const;
+
+    void setIgnoreTracksWithCDChits(bool value);
+    bool getIgnoreTracksWithCDChits() const;
+
+    void setTakenFlag(bool value);
+    bool getTakenFlag() const;
+
+    void setHitFindingDirection(const std::string& direction);
+    const std::string& getHitFindingDirection() const;
+
+    void setFilter(const std::string& filter);
+    const std::string& getFilter() const;
+
+    void setInputRecoTrackStoreArrayName(const std::string& name);
+    const std::string& getInputRecoTrackStoreArrayName() const;
+
+    void setInputWireHits(const std::string& hits);
+    const std::string& getInputWireHits() const;
+
+    void setOutputRecoTrackStoreArrayName(const std::string& name);
+    const std::string& getOutputRecoTrackStoreArrayName() const;
+
+    void setOutputRelationRecoTrackStoreArrayName(const std::string& name);
+    const std::string& getOutputRelationRecoTrackStoreArrayName() const;
+
+    void setPathFilter(const std::string& filter);
+    const std::string& getPathFilter() const;
+
+    void setRelatedRecoTrackStoreArrayName(const std::string& name);
+    const std::string& getRelatedRecoTrackStoreArrayName() const;
+
+    void setRelationCheckForDirection(const std::string& direction);
+    const std::string& getRelationCheckForDirection() const;
+
+    void setSeedComponent(const std::string& component);
+    const std::string& getSeedComponent() const;
+
+    void setStateBasicFilter(const std::string& filter);
+    const std::string& getStateBasicFilter() const;
+
+    void setStateExtrapolationFilter(const std::string& filter);
+    const std::string& getStateExtrapolationFilter() const;
+
+    void setStateFinalFilter(const std::string& filter);
+    const std::string& getStateFinalFilter() const;
+
+    void setStatePreFilter(const std::string& filter);
+    const std::string& getStatePreFilter() const;
+
+    void setTrackFindingDirection(const std::string& direction);
+    const std::string& getTrackFindingDirection() const;
+
+    void setWriteOutDirection(const std::string& direction);
+    const std::string& getWriteOutDirection() const;
+
 
     /** ALTERNATIVE TO FILTER PARAMETERS MAPS */
 
@@ -189,7 +267,7 @@ namespace Belle2 {
      *
      *   void setFilterParameters(const FilterParamMap& params);
      *   const FilterParamMap& getFilterParameters() const;
-     *   ... (same for path, stateBasic, stateExtrapolation, stateFinal, statePre)
+     *   ... (same for other parameters.)
      *
      *   FilterParamMap m_filterParameters;
      *   FilterParamMap m_pathFilterParameters;

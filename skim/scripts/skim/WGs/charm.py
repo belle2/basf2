@@ -2220,8 +2220,8 @@ class DstToD0Pi_D0ToEtaEta(BaseSkim):
         * Track cuts are `charm_skim_std_charged` pion
         * Use photons from `stdPhotons.loadStdSkimPhoton`
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
-        * :math:`0.4 < M(\\eta_{\\gamma\\gamma} < 0.6`
-        * :math:`0.4 < M(\\eta_{\\pi^{+}\\pi^{-}\\pi^{0}} < 0.6`
+        * :math:`0.4 < M(\\eta_{\\gamma\\gamma}) < 0.6`
+        * :math:`0.4 < M(\\eta_{\\pi^{+}\\pi^{-}\\pi^{0}}) < 0.6`
         * :math:`1.6 < M(D^0) < 2.1`
         * :math:`p^{*}(D^{*+})>2.0` and :math:`M(D^{*+})-M(D^{0})<0.160`
     """

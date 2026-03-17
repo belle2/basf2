@@ -40,10 +40,10 @@ settings = CalibrationSettings(
     subsystem="cdc",
     description=__doc__,
     input_data_formats=["cdst"],
-    input_data_names=["hadron_calib", "bhabha_all_calib", "radmumu_calib"],
+    input_data_names=["hadron_calib", "bhabha_combined_calib", "radmumu_calib"],
     input_data_filters={
       "hadron_calib": [INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"]] + quality_flags,
-      "bhabha_all_calib": [INPUT_DATA_FILTERS['Data Tag']['bhabha_all_calib']] + quality_flags,
+      "bhabha_combined_calib": [INPUT_DATA_FILTERS['Data Tag']['bhabha_combined_calib']] + quality_flags,
       "radmumu_calib": [INPUT_DATA_FILTERS['Data Tag']['radmumu_calib']] + quality_flags
       },
     expert_config={"payload_boundaries": [],
@@ -83,7 +83,7 @@ def get_calibrations(input_data, **kwargs):
     # In this script we want to use one sources of input data.
     # Get the input files from the input_data variable
     file_to_iov_muon = input_data["radmumu_calib"]
-    file_to_iov_electron = input_data["bhabha_all_calib"]
+    file_to_iov_electron = input_data["bhabha_combined_calib"]
     file_to_iov_hadron = input_data["hadron_calib"]
 
     expert_config = kwargs.get("expert_config")

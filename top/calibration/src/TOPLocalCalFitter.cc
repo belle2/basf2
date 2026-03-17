@@ -1,30 +1,97 @@
 /**************************************************************************
- * basf2 (Belle II Analysis Software Framework)                           *
- * Author: The Belle II Collaboration                                     *
- *                                                                        *
- * See git log for contributors and copyright holders.                    *
- * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
- **************************************************************************/
+* basf2 (Belle II Analysis Software Framework)                           *
+* Author: The Belle II Collaboration                                     *
+*                                                                        *
+* See git log for contributors and copyright holders.                    *
+* This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+**************************************************************************/
 
 #include <top/calibration/TOPLocalCalFitter.h>
 
-#include "TH2F.h"
-#include "TFile.h"
-#include "TMath.h"
+// C++ STL
+#include <algorithm>
+#include <cmath>
+#include <iomanip>
+#include <limits>
+
+// ROOT
 #include "TF1.h"
+#include "TFile.h"
+#include "TH2F.h"
+#include "TMath.h"
 #include "TROOT.h"
 #include "TTree.h"
-#include "math.h"
-#include <limits>
+
+// Belle II
 #include <framework/logging/Logger.h>
 #include <top/dbobjects/TOPCalChannelT0.h>
 
+void Belle2::TOP::TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
+{
+  fitChannel(iSlot, iChannel, h_profile, /*inBins=*/false, /*frac=*/0.0);
+}
 
-//using namespace std;
-using namespace Belle2;
-using namespace TOP;
+void Belle2::TOP::TOPLocalCalFitter::buildChannelMaps()
+{
+  if (!m_treeTTS) {
+    B2ERROR("TOPLocalCalFitter::buildChannelMaps called with null m_treeTTS.");
+    return;
+  }
 
-double crystalball_function(double x, double alpha, double n, double sigma, double mean)
+  // The TTS tree is indexed as (channel + 512 * slot), 0-based for both.
+  for (short slot = 0; slot < 16; ++slot) {
+    for (short ch = 0; ch < 512; ++ch) {
+      const Long64_t idx = static_cast<Long64_t>(ch) + 512LL * slot;
+      m_treeTTS->GetEntry(idx);
+      m_rowOf[slot][ch] = static_cast<short>(m_pixelRow);
+      m_colOf[slot][ch] = static_cast<short>(m_pixelCol);
+    }
+  }
+  m_hasChannelMaps = true;
+}
+
+// Destructor
+Belle2::TOP::TOPLocalCalFitter::~TOPLocalCalFitter()
+{
+  // Close & delete input files
+  if (m_inputTTS) {
+    m_inputTTS->Close();
+    delete m_inputTTS;
+    m_inputTTS = nullptr;
+  }
+  if (m_inputConstraints) {
+    m_inputConstraints->Close();
+    delete m_inputConstraints;
+    m_inputConstraints = nullptr;
+  }
+
+  // Delete trees if still around (ROOT does not auto-delete in-memory TTrees)
+  if (m_fitTree) {
+    delete m_fitTree;
+    m_fitTree = nullptr;
+  }
+  if (m_timewalkTree) {
+    delete m_timewalkTree;
+    m_timewalkTree = nullptr;
+  }
+  if (m_crosstalkTree) {
+    delete m_crosstalkTree;
+    m_crosstalkTree = nullptr;
+  }
+  if (m_fitTree_noXtalk) {
+    delete m_fitTree_noXtalk;
+    m_fitTree_noXtalk = nullptr;
+  }
+
+  // Close & delete output file last
+  if (m_histFile) {
+    m_histFile->Close();
+    delete m_histFile;
+    m_histFile = nullptr;
+  }
+}
+
+static double crystalball_function(double x, double alpha, double n, double sigma, double mean)
 {
   // evaluate the crystal ball function
   if (sigma < 0.)     return 0.;
@@ -42,7 +109,7 @@ double crystalball_function(double x, double alpha, double n, double sigma, doub
   }
 }
 
-double crystalball_pdf(double x, double alpha, double n, double sigma, double mean)
+static double crystalball_pdf(double x, double alpha, double n, double sigma, double mean)
 {
   // evaluation of the PDF ( is defined only for n >1)
   if (sigma < 0.)     return 0.;
@@ -54,22 +121,20 @@ double crystalball_pdf(double x, double alpha, double n, double sigma, double me
   return N * crystalball_function(x, alpha, n, sigma, mean);
 }
 
-
-
 // Two gaussians to model the TTS of the MCP-PMTs.
-double TTSPDF(double x, double time, double deltaT, double sigma1, double sigma2, double f1)
+static double TTSPDF(double x, double time, double deltaT, double sigma1, double sigma2, double f1)
 {
   return f1 * TMath::Gaus(x, time, sigma1, kTRUE) + (1 - f1) * TMath::Gaus(x, time + deltaT, sigma2, kTRUE)  ;
 }
-
 
 // Full PDF to fit the laser, made of:
 // 2 TTSPDF
 // 1 crystal ball PDF for the extra peak at +1 ns we don't understand
 // 1 gaussian to help modelling the tail
 // cppcheck-suppress constParameter
-double laserPDF(double* x, double* p)
+static double laserPDF(double* x, double* p)
 {
+  // Define parameters
   double time = p[0];
   double sigma = p[1];
   double fraction = p[2];
@@ -78,18 +143,16 @@ double laserPDF(double* x, double* p)
   double deltaTTS = p[5];
   double f1 = p[6];
   double norm = p[7];
-
   double deltaTExtra = p[8];
   double sigmaExtra = p[9];
   double normExtra = p[10];
-
   double deltaTBkg  = p[11];
   double sigmaBkg = p[12];
   double bkg = p[13];
-
   double alpha = p[14];
   double n = p[15];
 
+  // Define function
   double mainPeak = fraction * TTSPDF(x[0], time, deltaTTS, sigma, TMath::Sqrt(sigma * sigma + sigmaRatio * sigmaRatio), f1);
   double secondaryPeak = (1. - fraction) * TTSPDF(x[0], time + deltaTLaser, deltaTTS, sigma,
                                                   TMath::Sqrt(sigma * sigma + sigmaRatio * sigmaRatio), f1);
@@ -99,8 +162,7 @@ double laserPDF(double* x, double* p)
   return norm * (mainPeak + secondaryPeak) + normExtra * extraPeak + bkg * background;
 }
 
-
-TOPLocalCalFitter::TOPLocalCalFitter(): CalibrationAlgorithm("TOPLaserCalibratorCollector")
+Belle2::TOP::TOPLocalCalFitter::TOPLocalCalFitter(): CalibrationAlgorithm("TOPLaserCalibratorCollector")
 {
   setDescription(
     "Perform the fit of the laser and pulser runs"
@@ -108,9 +170,7 @@ TOPLocalCalFitter::TOPLocalCalFitter(): CalibrationAlgorithm("TOPLaserCalibrator
 
 }
 
-
-
-void  TOPLocalCalFitter::loadMCInfoTrees()
+void Belle2::TOP::TOPLocalCalFitter::loadMCInfoTrees()
 {
   m_inputTTS = TFile::Open(m_TTSData.c_str());
   m_inputConstraints = TFile::Open(m_fitConstraints.c_str());
@@ -125,6 +185,8 @@ void  TOPLocalCalFitter::loadMCInfoTrees()
   m_treeTTS->SetBranchAddress("fraction2", &m_f2);
   m_treeTTS->SetBranchAddress("pixelRow", &m_pixelRow);
   m_treeTTS->SetBranchAddress("pixelCol", &m_pixelCol);
+
+  buildChannelMaps(); // build the maps rowOf[slot][channel], colOf[slot][channel]
 
   if (m_fitterMode == "MC")
     std::cout << "Running in MC mode, not constraints will be set" << std::endl;
@@ -147,8 +209,7 @@ void  TOPLocalCalFitter::loadMCInfoTrees()
   return;
 }
 
-
-void  TOPLocalCalFitter::setupOutputTreeAndFile()
+void Belle2::TOP::TOPLocalCalFitter::setupOutputTreeAndFile()
 {
   m_histFile = new TFile(m_output.c_str(), "recreate");
   m_histFile->cd();
@@ -175,7 +236,6 @@ void  TOPLocalCalFitter::setupOutputTreeAndFile()
   m_fitTree->Branch<float>("timeBackground", &m_timeBackground);
   m_fitTree->Branch<float>("sigmaBackground", &m_sigmaBackground);
   m_fitTree->Branch<float>("yieldLaserBackground", &m_yieldLaserBackground);
-
   m_fitTree->Branch<float>("fractionMC", &m_fractionMC);
   m_fitTree->Branch<float>("deltaTMC", &m_deltaTMC);
   m_fitTree->Branch<float>("peakTimeMC", &m_peakTimeMC);
@@ -184,14 +244,14 @@ void  TOPLocalCalFitter::setupOutputTreeAndFile()
   m_fitTree->Branch<float>("secondPulserTime", &m_secondPulserTime);
   m_fitTree->Branch<float>("secondPulserSigma", &m_secondPulserSigma);
   m_fitTree->Branch<short>("fitStatus", &m_fitStatus);
-
+  m_fitTree->Branch<double>("width", &m_width);
+  m_fitTree->Branch<double>("amplitude", &m_amplitude);
   m_fitTree->Branch<float>("chi2", &m_chi2);
   m_fitTree->Branch<float>("rms", &m_rms);
 
 
   if (m_isFitInAmplitudeBins) {
     m_timewalkTree = new TTree("timewalkTree", "timewalkTree");
-
     m_timewalkTree->Branch<float>("binLowerEdge", &m_binLowerEdge);
     m_timewalkTree->Branch<float>("binUpperEdge", &m_binUpperEdge);
     m_timewalkTree->Branch<short>("channel", &m_channel);
@@ -217,7 +277,6 @@ void  TOPLocalCalFitter::setupOutputTreeAndFile()
     m_timewalkTree->Branch<float>("timeBackground", &m_timeBackground);
     m_timewalkTree->Branch<float>("sigmaBackground", &m_sigmaBackground);
     m_timewalkTree->Branch<float>("yieldLaserBackground", &m_yieldLaserBackground);
-
     m_timewalkTree->Branch<float>("fractionMC", &m_fractionMC);
     m_timewalkTree->Branch<float>("deltaTMC", &m_deltaTMC);
     m_timewalkTree->Branch<float>("peakTimeMC", &m_peakTimeMC);
@@ -226,21 +285,75 @@ void  TOPLocalCalFitter::setupOutputTreeAndFile()
     m_timewalkTree->Branch<float>("secondPulserTime", &m_secondPulserTime);
     m_timewalkTree->Branch<float>("secondPulserSigma", &m_secondPulserSigma);
     m_timewalkTree->Branch<short>("fitStatus", &m_fitStatus);
-
+    m_timewalkTree->Branch<double>("width", &m_width);
+    m_timewalkTree->Branch<double>("amplitude", &m_amplitude);
     m_timewalkTree->Branch<float>("chi2", &m_chi2);
     m_timewalkTree->Branch<float>("rms", &m_rms);
+  }
+
+  if (m_detectCrosstalk) {
+
+    // Create tree that stores candidate crosstalk events
+    m_crosstalkTree = new TTree("crosstalkTree", "Tree containing candidate crosstalks");
+    m_crosstalkTree->Branch<short>("sl0", &m_sl0);
+    m_crosstalkTree->Branch<short>("sl1", &m_sl1); // slot numbers (they will be the same, including them for checks)
+    m_crosstalkTree->Branch<short>("ch0", &m_ch0);
+    m_crosstalkTree->Branch<short>("ch1", &m_ch1); // channel numbers
+    m_crosstalkTree->Branch<float>("ht0", &m_ht0);
+    m_crosstalkTree->Branch<float>("ht1", &m_ht1); // hit times
+    m_crosstalkTree->Branch<float>("a0", &m_a0);
+    m_crosstalkTree->Branch<float>("a1", &m_a1); // amplitudes
+    m_crosstalkTree->Branch<float>("w0", &m_w0);
+    m_crosstalkTree->Branch<float>("w1", &m_w1); // widths
+    m_crosstalkTree->Branch<float>("q0", &m_q0);
+    m_crosstalkTree->Branch<float>("q1", &m_q1); // integrated charges
+    m_crosstalkTree->Branch<float>("f_q0", &m_f_q0); // fraction of charge on channel 0
+
+    // Create tree that stores fit results of hits without associated crosstalk
+    // Unlike the "vanilla" fitTree, this doesn't contain the results of the fits to the calibration pulses
+    m_fitTree_noXtalk = new TTree("fitTreeNoXTalk", "Fits to channels with no detected crosstalk");
+    m_fitTree_noXtalk->Branch<short>("channel", &m_channel);
+    m_fitTree_noXtalk->Branch<short>("slot", &m_slot);
+    m_fitTree_noXtalk->Branch<short>("row", &m_row);
+    m_fitTree_noXtalk->Branch<short>("col", &m_col);
+    m_fitTree_noXtalk->Branch<float>("peakTime", &m_peakTime);
+    m_fitTree_noXtalk->Branch<float>("peakTimeErr", &m_peakTimeErr);
+    m_fitTree_noXtalk->Branch<float>("deltaT", &m_deltaT);
+    m_fitTree_noXtalk->Branch<float>("deltaTErr", &m_deltaTErr);
+    m_fitTree_noXtalk->Branch<float>("sigma", &m_sigma);
+    m_fitTree_noXtalk->Branch<float>("sigmaErr", &m_sigmaErr);
+    m_fitTree_noXtalk->Branch<float>("fraction", &m_fraction);
+    m_fitTree_noXtalk->Branch<float>("fractionErr", &m_fractionErr);
+    m_fitTree_noXtalk->Branch<float>("yieldLaser", &m_yieldLaser);
+    m_fitTree_noXtalk->Branch<float>("yieldLaserErr", &m_yieldLaserErr);
+    m_fitTree_noXtalk->Branch<float>("timeExtra", &m_timeExtra);
+    m_fitTree_noXtalk->Branch<float>("sigmaExtra", &m_sigmaExtra);
+    m_fitTree_noXtalk->Branch<float>("nExtra", &m_nExtra);
+    m_fitTree_noXtalk->Branch<float>("alphaExtra", &m_alphaExtra);
+    m_fitTree_noXtalk->Branch<float>("yieldLaserExtra", &m_yieldLaserExtra);
+    m_fitTree_noXtalk->Branch<float>("timeBackground", &m_timeBackground);
+    m_fitTree_noXtalk->Branch<float>("sigmaBackground", &m_sigmaBackground);
+    m_fitTree_noXtalk->Branch<float>("yieldLaserBackground", &m_yieldLaserBackground);
+    m_fitTree_noXtalk->Branch<float>("fractionMC", &m_fractionMC);
+    m_fitTree_noXtalk->Branch<float>("deltaTMC", &m_deltaTMC);
+    m_fitTree_noXtalk->Branch<float>("peakTimeMC", &m_peakTimeMC);
+    m_fitTree_noXtalk->Branch<float>("firstPulserTime", &m_firstPulserTime);
+    m_fitTree_noXtalk->Branch<float>("firstPulserSigma", &m_firstPulserSigma);
+    m_fitTree_noXtalk->Branch<float>("secondPulserTime", &m_secondPulserTime);
+    m_fitTree_noXtalk->Branch<float>("secondPulserSigma", &m_secondPulserSigma);
+    m_fitTree_noXtalk->Branch<short>("fitStatus", &m_fitStatus);
+    m_fitTree_noXtalk->Branch<double>("width", &m_width);
+    m_fitTree_noXtalk->Branch<double>("amplitude", &m_amplitude);
+    m_fitTree_noXtalk->Branch<float>("chi2", &m_chi2);
+    m_fitTree_noXtalk->Branch<float>("rms", &m_rms);
 
   }
 
   return;
 }
 
-
-
-
-void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
+void Belle2::TOP::TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile, bool inBins, double frac)
 {
-
   // loads the TTS infos and the fit constraint for the given channel and slot
   if (m_fitterMode == "monitoring")
     m_treeConstraints->GetEntry(iChannel + 512 * iSlot);
@@ -269,9 +382,13 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
     laser.SetParameter(1, 0.02);
     laser.SetParLimits(1, 0., 0.04);
   }
+
   // par[2] = fraction of the main peak respect to the total
   laser.SetParameter(2, m_fractionConstraints);
   laser.SetParLimits(2, 0.5, 1.);
+  if (inBins) {
+    laser.FixParameter(2, frac);
+  }
 
   // par[3]= time difference between the main and secondary path. fixed to the MC value
   laser.FixParameter(3, m_deltaTConstraints);
@@ -293,16 +410,17 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
     laser.FixParameter(6, 0);
 
   // par[7] is the PDF normalization, = integral*bin width
-  laser.SetParameter(7,  integral * 0.005);
-  laser.SetParLimits(7,  0.2 * integral * 0.005, 2.*integral * 0.005);
+  const double binw = h_profile->GetXaxis()->GetBinWidth(1);
+  laser.SetParameter(7,  integral * binw);
+  laser.SetParLimits(7,  0.2 * integral * binw, 2.*integral * binw);
 
   // par[8-10] are the relative position, the sigma and the integral of the extra peak
   laser.SetParameter(8, 1.);
   laser.SetParLimits(8, 0.3, 2.);
   laser.SetParameter(9, 0.2);
   laser.SetParLimits(9, 0.08, 1.);
-  laser.SetParameter(10,  0.1 * integral * 0.005);
-  laser.SetParLimits(10,  0., 0.2 * integral * 0.005);
+  laser.SetParameter(10,  0.1 * integral * binw);
+  laser.SetParLimits(10,  0., 0.2 * integral * binw);
   // par[14-15] are the tail parameters of the crystal ball function used to describe the extra peak
   laser.SetParameter(14, -2.);
   laser.SetParameter(15, 2.);
@@ -313,8 +431,8 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
   laser.SetParLimits(11, 0.1, 5.);
   laser.SetParameter(12, 0.8);
   laser.SetParLimits(12, 0., 5.);
-  laser.SetParameter(13,  0.01 * integral * 0.005);
-  laser.SetParLimits(13,  0., 0.2 * integral * 0.005);
+  laser.SetParameter(13,  0.01 * integral * binw);
+  laser.SetParLimits(13,  0., 0.2 * integral * binw);
 
   // if it's a monitoring fit, fix a buch more parameters.
   if (m_fitterMode == "monitoring") {
@@ -327,7 +445,6 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
     laser.FixParameter(11, m_timeBackgroundConstraints);
     laser.FixParameter(12, m_sigmaBackgroundConstraints);
   }
-
 
   // if it's a MC fit, fix a buch more parameters.
   if (m_fitterMode == "MC") {
@@ -346,15 +463,11 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
     laser.FixParameter(10, 0.);
   }
 
-
-
   // make the plot of the fit function nice setting 2000 sampling points
   laser.SetNpx(2000);
 
-
   // do the fit!
   h_profile->Fit("laser", "R L Q");
-
 
   // Add by hand the different fit components to the histogram, mostly for debugging/presentation purposes
   TF1* peak1 = new TF1("peak1", laserPDF, maxpos - 1, maxpos + 2., 16);
@@ -371,15 +484,12 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
   peak1->FixParameter(7, (1 - laser.GetParameter(2))*laser.GetParameter(7));
   peak1->FixParameter(10, 0.);
   peak1->FixParameter(13, 0.);
-
   peak2->FixParameter(2, 1.);
   peak2->FixParameter(7, laser.GetParameter(2)*laser.GetParameter(7));
   peak2->FixParameter(10, 0.);
   peak2->FixParameter(13, 0.);
-
   extra->FixParameter(7, 0.);
   extra->FixParameter(13, 0.);
-
   background->FixParameter(7, 0.);
   background->FixParameter(10, 0.);
 
@@ -388,11 +498,10 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
   h_profile->GetListOfFunctions()->Add(extra);
   h_profile->GetListOfFunctions()->Add(background);
 
-
   // save the results in the variables linked to the tree branches
   m_channel = iChannel;
-  m_row = m_pixelRow;
-  m_col = m_pixelCol;
+  m_row = rowOf(iSlot, iChannel);
+  m_col = colOf(iSlot, iChannel);
   m_slot = iSlot + 1;
   m_peakTime = laser.GetParameter(0);
   m_peakTimeErr = laser.GetParError(0);
@@ -402,16 +511,16 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
   m_sigmaErr = laser.GetParError(1);
   m_fraction = laser.GetParameter(2);
   m_fractionErr = laser.GetParError(2);
-  m_yieldLaser = laser.GetParameter(7) / 0.005;
-  m_yieldLaserErr = laser.GetParError(7) / 0.005;
+  m_yieldLaser = laser.GetParameter(7) / binw;
+  m_yieldLaserErr = laser.GetParError(7) / binw;
   m_timeExtra = laser.GetParameter(8);
   m_sigmaExtra = laser.GetParameter(9);
-  m_yieldLaserExtra = laser.GetParameter(10) / 0.005;
+  m_yieldLaserExtra = laser.GetParameter(10) / binw;
   m_alphaExtra = laser.GetParameter(14);
   m_nExtra = laser.GetParameter(15);
   m_timeBackground = laser.GetParameter(11);
   m_sigmaBackground = laser.GetParameter(12);
-  m_yieldLaserBackground = laser.GetParameter(13) / 0.005;
+  m_yieldLaserBackground = laser.GetParameter(13) / binw;
   m_chi2 = laser.GetChisquare() / laser.GetNDF();
 
   // copy some MC information to the output tree
@@ -422,8 +531,7 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
   return;
 }
 
-
-void  TOPLocalCalFitter::fitPulser(TH1* h_profileFirstPulser, TH1* h_profileSecondPulser)
+void Belle2::TOP::TOPLocalCalFitter::fitPulser(TH1* h_profileFirstPulser, TH1* h_profileSecondPulser)
 {
   float maxpos = h_profileFirstPulser->GetBinCenter(h_profileFirstPulser->GetMaximumBin());
   h_profileFirstPulser->GetXaxis()->SetRangeUser(maxpos - 1, maxpos + 1.);
@@ -459,9 +567,7 @@ void  TOPLocalCalFitter::fitPulser(TH1* h_profileFirstPulser, TH1* h_profileSeco
   return;
 }
 
-
-
-void  TOPLocalCalFitter::determineFitStatus()
+void Belle2::TOP::TOPLocalCalFitter::determineFitStatus()
 {
   if (m_chi2 < 4 && m_sigma < 0.2 && m_yieldLaser > 1000) {
     m_fitStatus = 0;
@@ -471,21 +577,19 @@ void  TOPLocalCalFitter::determineFitStatus()
   return;
 }
 
-
-void TOPLocalCalFitter::calculateChennelT0()
+void Belle2::TOP::TOPLocalCalFitter::calculateChannelT0()
 {
-  int nEntries = m_fitTree->GetEntries();
+  Long64_t nEntries = m_fitTree->GetEntries();
   if (nEntries != 8192) {
     B2ERROR("fitTree does not contain an entry with a fit result for each channel. Found " << nEntries <<
             " instead of 8192. Perhaps you tried to run the commonT0 calculation before finishing the fitting?");
     return;
   }
 
-  // Create and fill the TOPCalChannelT0 object.
-  // This part is mostly copy-pasted from the DB importer used up to Jan 2020
+  // Create and fill the TOPCalChannelT0 object
   auto* channelT0 = new TOPCalChannelT0();
   short nCal[16] = {0};
-  for (int i = 0; i < nEntries; i++) {
+  for (Long64_t i = 0; i < nEntries; i++) {
     m_fitTree->GetEntry(i);
     channelT0->setT0(m_slot, m_channel, m_peakTime - m_peakTimeMC, m_peakTimeErr);
     if (m_fitStatus == 0) {
@@ -512,7 +616,6 @@ void TOPLocalCalFitter::calculateChennelT0()
 
   B2RESULT("Channel T0 calibration constants imported to database, calibrated channels: " << nCalTot << "/ 8192");
 
-
   // Loop again on the output tree to save the constants there too, adding two more branches.
   TBranch* channelT0Branch = m_fitTree->Branch<float>("channelT0", &m_channelT0);
   TBranch* channelT0ErrBranch = m_fitTree->Branch<float>("channelT0Err", &m_channelT0Err);
@@ -524,127 +627,453 @@ void TOPLocalCalFitter::calculateChennelT0()
     channelT0Branch->Fill();
     channelT0ErrBranch->Fill();
   }
-  return ;
+
+  return;
 
 }
 
-
-
-CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
+// Main fitter function
+Belle2::CalibrationAlgorithm::EResult Belle2::TOP::TOPLocalCalFitter::calibrate()
 {
+
   gROOT->SetBatch();
 
+  // Load MC constraints
   loadMCInfoTrees();
 
-
+  // Prepare output
   setupOutputTreeAndFile();
 
-  // Loads the tree with the hits
+  // Load the tree with the hits (output of TOPLaserCalibratorCollector)
   auto hitTree = getObjectPtr<TTree>("hitTree");
-  TH2F* h_hitTime = new TH2F("h_hitTime", " ", 512 * 16, 0., 512 * 16, 22000, -70, 40.); // 5 ps bins
-
-  float amplitude, hitTime;
-  short channel, slot;
+  int event;
+  float amplitude, width, hitTime;
+  short channel, slot; //, row, col;
   bool refTimeValid;
+  hitTree->SetBranchAddress("event", &event);
   hitTree->SetBranchAddress("amplitude", &amplitude);
+  hitTree->SetBranchAddress("width", &width);
   hitTree->SetBranchAddress("hitTime", &hitTime);
   hitTree->SetBranchAddress("channel", &channel);
+  //hitTree->SetBranchAddress("row", &row);
+  //hitTree->SetBranchAddress("col", &col);
   hitTree->SetBranchAddress("slot", &slot);
   hitTree->SetBranchAddress("refTimeValid", &refTimeValid);
 
-  // An attempt to speed things up looping over the tree only once.
+  // Prepare histogram to save interesting features of each channel
+  TH2F* h_hitTime = new TH2F("h_hitTime", " ", 512 * 16, 0., 512 * 16, 22000, -70, 40.); // 5 ps bins
+  TH2F* h_amplitude2D = new TH2F("h_amplitude", " ", 512 * 16, 0., 512 * 16, 600, 0, 2200.);
+  TH2F* h_width2D = new TH2F("h_width", " ", 512 * 16, 0., 512 * 16, 1000, 0, 2.);
+
+  // Prepare vector of hitTime vs channel histograms for fits in amplitude bins
+  // (attempt to speed things up looping over the hitTree only once).
+
   std::vector<TH2F*> h_hitTimeLaserHistos = {};
   for (int iLowerEdge = 0; iLowerEdge < (int)m_binEdges.size() - 1; iLowerEdge++) {
-    TH2F* h_hitTimeLaser = new TH2F(("h_hitTimeLaser_" + std::to_string(iLowerEdge + 1)).c_str(), " ", 512 * 16, 0., 512 * 16, 14000,
-                                    -70, 0.); // 5 ps bins
+    TH2F* h_hitTimeLaser = new TH2F(("h_hitTimeLaser_" + std::to_string(iLowerEdge + 1)).c_str(), " ",
+                                    512 * 16, 0., 512 * 16, 14000, -70, 0.); // 5 ps bins
     h_hitTimeLaserHistos.push_back(h_hitTimeLaser);
   }
 
-  for (unsigned int i = 0; i < hitTree->GetEntries(); i++) {
-    auto onepc = (unsigned int)(hitTree->GetEntries() / 100);
-    if (i % onepc == 0)
-      std::cout << "processing hit " << i << " of " << hitTree->GetEntries() << " (" << i / (onepc * 10) << " %)" << std::endl;
-    hitTree->GetEntry(i);
-    auto it = std::lower_bound(m_binEdges.cbegin(),  m_binEdges.cend(), amplitude);
-    int iLowerEdge = std::distance(m_binEdges.cbegin(), it) - 1;
+  // Per-event accumulator for crosstalk logic
+  struct Hit {
+    short slot;
+    short ch;
+    float t;   // hitTime
+    float a;   // amplitude
+    float w;   // width
+    float q;   // charge proxy = conv * a * w
+  };
+  std::vector<Hit> evtHits;
+  //evtHits.reserve(64);  // typical multiplicity in laser runs?
 
-    if (iLowerEdge >= 0 && iLowerEdge < static_cast<int>(m_binEdges.size()) - 1 && refTimeValid)
-      h_hitTimeLaserHistos[iLowerEdge]->Fill(channel + (slot - 1) * 512, hitTime);
-    if (amplitude > 80. &&  refTimeValid)
-      h_hitTime->Fill(channel + (slot - 1) * 512, hitTime);
-  }
+  // Track current event id we are accumulating
+  int prev_evt = std::numeric_limits<int>::min();
 
-  m_histFile->cd();
-  h_hitTime->Write();
+  // Conversion factor to compute approximate integrated charge (ADC·ns)
+  const float conv = 1.f / (0.3989f * 2.35f);
 
-  for (short iSlot = 0; iSlot < 16; iSlot++) {
-    std::cout << "fitting slot " << iSlot + 1 << std::endl;
-    for (short iChannel = 0; iChannel < 512; iChannel++) {
-      TH1D* h_profile = h_hitTime->ProjectionY(("profile_" + std::to_string(iSlot + 1) + "_" + std::to_string(iChannel)).c_str(),
-                                               iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1);
-      if (m_fitterMode == "MC")
-        h_profile->GetXaxis()->SetRangeUser(-10, -10);
-      else
-        h_profile->GetXaxis()->SetRangeUser(-65,
-                                            -5); // if you will even change it, make sure not to include the h_hitTime overflow bins in this range
-      fitChannel(iSlot, iChannel, h_profile);
+  // Crosstalk tunables (consider moving to members with setters)
+  const float fracMin = 0.25f;  // f_q0 < fracMin or > 1-fracMin => crosstalk
+  const float dtMax   = 0.30f;  // ns, time-coincidence window for pair
+  const float epsQ    = 1e-6f;  // guard against zero-sum charges
 
-      determineFitStatus();
+  // Prepares histogram to store features of each channel (if no crosstalk detected)
+  // which will be fit later
+  TH2F* h_hitTime_noXtalk = new TH2F("h_hitTime_noXtalk", " ", 512 * 16, 0., 512 * 16, 22000, -70, 40.); // 5 ps bins
+  TH2F* h_amplitude2D_noXtalk = new TH2F("h_amplitude2D_noXtalk", " ", 512 * 16, 0., 512 * 16, 600, 0, 2200.);
+  TH2F* h_width2D_noXtalk = new TH2F("h_width2D_noXtalk", " ", 512 * 16, 0., 512 * 16, 1000, 0, 2.);
 
-      // Now let's fit the pulser
-      TH1D* h_profileFirstPulser = h_hitTime->ProjectionY(("profileFirstPulser_" + std::to_string(iSlot + 1) + "_" + std::to_string(
-                                                             iChannel)).c_str(),  iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1);
-      TH1D* h_profileSecondPulser = h_hitTime->ProjectionY(("profileSecondPulser_" + std::to_string(iSlot + 1) + "_" + std::to_string(
-                                                              iChannel)).c_str(),  iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1);
-      h_profileFirstPulser->GetXaxis()->SetRangeUser(-10, 10);
-      h_profileSecondPulser->GetXaxis()->SetRangeUser(10, 40);
+  // Get number of entries in hitTree
+  Long64_t nhits = hitTree->GetEntries();
+  const Long64_t step = std::max<Long64_t>(1, nhits / 100); // for progress bar
 
-      fitPulser(h_profileFirstPulser, h_profileSecondPulser);
+  // Loop on all hits to retrieve information
+  for (Long64_t i = 0; i < nhits; i++) {
 
-      m_fitTree->Fill();
-
-      h_profile->Write();
-      h_profileFirstPulser->Write();
-      h_profileSecondPulser->Write();
+    // Print percentage of completion
+    if (i % step == 0) {
+      std::cout << "Processing hit " << i << " of " << nhits << " ("
+                << std::setprecision(3) << (100. * i) / nhits << " %)" << std::endl;
     }
 
-    h_hitTime->Write();
-  }
+    // Process entry
+    hitTree->GetEntry(i);
 
-  calculateChennelT0();
+    // Fill hit time histograms for each bin of pulse heigth (if activated)
+    if (m_isFitInAmplitudeBins) {
+      auto it = std::lower_bound(m_binEdges.cbegin(),  m_binEdges.cend(), amplitude); // std::vector iterator
+      int iLowerEdge = std::distance(m_binEdges.cbegin(), it) - 1;
+      if (iLowerEdge >= 0 && iLowerEdge < static_cast<int>(m_binEdges.size()) - 1 && refTimeValid)
+        h_hitTimeLaserHistos[iLowerEdge]->Fill(channel + (slot - 1) * 512, hitTime);
+    }
 
-  m_fitTree->Write();
+    // Check if pulse is at least 80 ADC and has valid reference time (suppress noise)
+    if (amplitude > 80. &&  refTimeValid) {
 
+      // Fill the hitTime vs channel histogram
+      h_hitTime->Fill(channel + (slot - 1) * 512, hitTime);
 
-  if (m_isFitInAmplitudeBins) {
-    std::cout << "Fitting in bins" << std::endl;
-    for (int iLowerEdge = 0; iLowerEdge < (int)m_binEdges.size() - 1; iLowerEdge++) {
-      m_binLowerEdge = m_binEdges[iLowerEdge];
-      m_binUpperEdge = m_binEdges[iLowerEdge + 1];
-      std::cout << "Fitting the amplitude interval (" <<  m_binLowerEdge << ", " << m_binUpperEdge << " )" << std::endl;
+      // If entry is found with -65 < hitTime < -10 (laser pulse), fill amplitude and width histograms
+      if ((hitTime > -65) && (hitTime < -10)) {  // use logical &&
 
-      for (short iSlot = 0; iSlot < 16; iSlot++) {
-        std::cout << "   Fitting slot " << iSlot + 1 << std::endl;
-        for (short iChannel = 0; iChannel < 512; iChannel++) {
-          TH1D* h_profile = h_hitTimeLaserHistos[iLowerEdge]->ProjectionY(("profile_" + std::to_string(iSlot + 1) + "_" + std::to_string(
-                              iChannel) + "_"  + std::to_string(iLowerEdge)).c_str(),
-                            iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1);
-          if (m_fitterMode == "MC")
-            h_profile->GetXaxis()->SetRangeUser(-10, -10);
-          else
-            h_profile->GetXaxis()->SetRangeUser(-65,
-                                                -5); // if you will even change it, make sure not to include the h_hitTime overflow bins in this range
-          fitChannel(iSlot, iChannel, h_profile);
-          m_histoIntegral = h_profile->Integral();
-          determineFitStatus();
+        // Fill amplitude and width histograms
+        h_amplitude2D->Fill(channel + (slot - 1) * 512, amplitude);
+        h_width2D->Fill(channel + (slot - 1) * 512, width);
 
-          m_timewalkTree->Fill();
-          h_profile->Write();
+        // Crosstalk finder algorithm (only on laser pulses)
+        if (m_detectCrosstalk) {
+
+          const int curr_evt = event;
+
+          // If this entry belongs to a NEW event, process the accumulated previous event
+          if (curr_evt != prev_evt && !evtHits.empty()) {
+
+            // ---- step 1: find crosstalk pairs and mark involved hits ----
+            std::vector<char> isXtalk(evtHits.size(), 0);
+            for (size_t ii = 0; ii + 1 < evtHits.size(); ++ii) {
+              const auto& hi = evtHits[ii];
+              for (size_t jj = ii + 1; jj < evtHits.size(); ++jj) {
+                const auto& hj = evtHits[jj];
+
+                // same slot and neighboring pixels
+                if (hi.slot != hj.slot) continue;
+                if (!areNeighbors(hi.slot, hi.ch, hj.ch)) continue;
+
+                // near-coincident in time (laser)
+                if (std::fabs(hi.t - hj.t) > dtMax) continue;
+
+                // robust fraction of shared charge
+                const float qsum = hi.q + hj.q;
+                if (qsum <= epsQ) continue;
+                const float f_q0 = hi.q / qsum;
+
+                if (f_q0 < fracMin || f_q0 > (1.f - fracMin)) {
+                  isXtalk[ii] = 1;
+                  isXtalk[jj] = 1;
+
+                  // save diagnostics once per pair
+                  if (m_crosstalkTree) {
+                    m_sl0 = hi.slot;  m_sl1 = hj.slot;
+                    m_ch0 = hi.ch;    m_ch1 = hj.ch;
+                    m_ht0 = hi.t;     m_ht1 = hj.t;
+                    m_a0  = hi.a;     m_a1  = hj.a;
+                    m_w0  = hi.w;     m_w1  = hj.w;
+                    m_q0  = hi.q;     m_q1  = hj.q;
+                    m_f_q0 = f_q0;
+                    m_crosstalkTree->Fill();
+                  }
+                }
+              }
+            }
+
+            // ---- step 2: fill "no-crosstalk" histograms exactly once per clean hit ----
+            for (size_t kk = 0; kk < evtHits.size(); ++kk) {
+              if (isXtalk[kk]) continue;
+              const auto& h = evtHits[kk];
+              const int gch = h.ch + (h.slot - 1) * 512;
+              h_hitTime_noXtalk->Fill(gch, h.t);
+              h_amplitude2D_noXtalk->Fill(gch, h.a);
+              h_width2D_noXtalk->Fill(gch, h.w);
+            }
+
+            // clear for next event
+            evtHits.clear();
+          }
+          // accumulate the current hit for the (possibly new) event
+          evtHits.push_back(Hit{slot, channel, hitTime, amplitude, width, conv* amplitude * width});
+
+          // update current event id
+          prev_evt = curr_evt;
         }
       }
     }
+  }
 
+  // Final flush for the last accumulated event (if any)
+  if (m_detectCrosstalk && !evtHits.empty()) {
+    std::vector<char> isXtalk(evtHits.size(), 0);
+    for (size_t ll = 0; ll + 1 < evtHits.size(); ++ll) {
+      const auto& hi = evtHits[ll];
+      for (size_t mm = ll + 1; mm < evtHits.size(); ++mm) {
+        const auto& hj = evtHits[mm];
+        if (hi.slot != hj.slot) continue;
+        if (!areNeighbors(hi.slot, hi.ch, hj.ch)) continue;
+        if (std::fabs(hi.t - hj.t) > dtMax) continue;
+        const float qsum = hi.q + hj.q;
+        if (qsum <= epsQ) continue;
+        const float f_q0 = hi.q / qsum;
+        if (f_q0 < fracMin || f_q0 > (1.f - fracMin)) {
+          isXtalk[ll] = 1;
+          isXtalk[mm] = 1;
+          if (m_crosstalkTree) {
+            m_sl0 = hi.slot;  m_sl1 = hj.slot;
+            m_ch0 = hi.ch;    m_ch1 = hj.ch;
+            m_ht0 = hi.t;     m_ht1 = hj.t;
+            m_a0  = hi.a;     m_a1  = hj.a;
+            m_w0  = hi.w;     m_w1  = hj.w;
+            m_q0  = hi.q;     m_q1  = hj.q;
+            m_f_q0 = f_q0;
+            m_crosstalkTree->Fill();
+          }
+        }
+      }
+    }
+    for (size_t nn = 0; nn < evtHits.size(); ++nn) {
+      if (isXtalk[nn]) continue;
+      const auto& h = evtHits[nn];
+      const int gch = h.ch + (h.slot - 1) * 512;
+      h_hitTime_noXtalk->Fill(gch, h.t);
+      h_amplitude2D_noXtalk->Fill(gch, h.a);
+      h_width2D_noXtalk->Fill(gch, h.w);
+    }
+    evtHits.clear();
+  }
+
+  // Save tree filled with candidate crosstalks => useful for further studies
+  if (m_detectCrosstalk) {
+    std::cout << "Writing crosstalkTree (candidate crosstalk channel pairs) to output file" << std::endl;
+    m_histFile->cd();
+    m_crosstalkTree->Write();
+  }
+
+  // Write hitTime histograms to file
+  m_histFile->cd();
+  h_hitTime->Write();
+
+  // After filling hitTime, amplitude, width vs. channel histograms,
+  // loop on each slot and channel to perform channelT0 fits on hitTime profiles
+  for (short iSlot = 0; iSlot < 16; iSlot++) {
+    std::cout << "fitting slot " << iSlot + 1 << std::endl;
+    for (short iChannel = 0; iChannel < 512; iChannel++) {
+
+      // Project to 1-d hitTime distribution
+      TH1D* h_profile = h_hitTime->ProjectionY(
+                          ("profile_" + std::to_string(iSlot + 1) + "_" + std::to_string(iChannel)).c_str(),
+                          iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1
+                        );
+
+      // Set hitTime range based on fitter mode
+      if (m_fitterMode == "MC")
+        //h_profile->GetXaxis()->SetRangeUser(-10, -10);
+        h_profile->GetXaxis()->SetRangeUser(-65, -1);
+      else // if you will even change the limits, make sure not to include the h_hitTime overflow bins in this range
+        h_profile->GetXaxis()->SetRangeUser(-65, -5);
+
+      // Run fit and determine status
+      fitChannel(iSlot, iChannel, h_profile);
+      determineFitStatus();
+
+      // Now let's fit the pulser
+      TH1D* h_profileFirstPulser = h_hitTime->ProjectionY(
+                                     ("profileFirstPulser_" + std::to_string(iSlot + 1) + "_" + std::to_string(
+                                        iChannel)).c_str(),  iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1
+                                   );
+      TH1D* h_profileSecondPulser = h_hitTime->ProjectionY(
+                                      ("profileSecondPulser_" + std::to_string(iSlot + 1) + "_" + std::to_string(
+                                         iChannel)).c_str(),  iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1
+                                    );
+      h_profileFirstPulser->GetXaxis()->SetRangeUser(-10, 10);
+      h_profileSecondPulser->GetXaxis()->SetRangeUser(10, 40);
+      fitPulser(h_profileFirstPulser, h_profileSecondPulser);
+
+
+      // Get pulse heigth [ADC] and width [ns]
+      TH1D* h_amplitude = h_amplitude2D->ProjectionY(
+                            ("AmpProfile_" + std::to_string(iSlot + 1) + "_" + std::to_string(iChannel)).c_str(),
+                            iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1
+                          );
+      TH1D* h_width = h_width2D->ProjectionY(
+                        ("WidthProfile_" + std::to_string(iSlot + 1) + "_" + std::to_string(iChannel)).c_str(),
+                        iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1
+                      );
+
+      // Set values for pulse amplitude and width (mean)
+      Double_t q = 0.5; // quantile for median
+      h_amplitude->GetQuantiles(1, &m_amplitude, &q);
+      h_width->GetQuantiles(1, &m_width, &q);
+
+      m_fitTree->Fill();
+      h_profile->Write();
+      h_profileFirstPulser->Write();
+      h_profileSecondPulser->Write();
+      h_amplitude->Write();
+      h_width->Write();
+
+      // Free memory: TH2D::ProjectionY allocates memory dynamically
+      delete h_profile;
+      delete h_profileFirstPulser;
+      delete h_profileSecondPulser;
+      delete h_amplitude;
+      delete h_width;
+
+    }
+
+    // Write hitTime histogram to output tree
+    h_hitTime->Write();
+
+  }
+
+  // Compute calibration constants (w/ error) and add corresponding branches to output fitTree
+  calculateChannelT0();
+
+  // Write fit results to tree
+  m_fitTree->Write();
+
+  // ChannelT0 fits in bins of pulse heigth
+  if (m_isFitInAmplitudeBins) {
+
+    std::cout << "Fitting in bins of pulse heigth" << std::endl;
+
+    for (short iSlot = 0; iSlot < 16; iSlot++) {
+      std::cout << "   Fitting slot " << iSlot + 1 << std::endl;
+      for (short iChannel = 0; iChannel < 512; iChannel++) {
+
+        // The fraction parameter should not depend on amplitude ==> let's fix it
+        // to the value we get from the fit integrated on all amplitudes
+        TH1D* h_profile_full = h_hitTime->ProjectionY(
+                                 ("profile_" + std::to_string(iSlot + 1) + "_" + std::to_string(iChannel)).c_str(),
+                                 iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1
+                               );
+        fitChannel(iSlot, iChannel, h_profile_full);
+        float ff = m_fraction;
+        // Fit done, free the memory
+        delete h_profile_full;
+
+        // Loop on the amplitude bins
+        for (int iLowerEdge = 0; iLowerEdge < (int)m_binEdges.size() - 1; iLowerEdge++) {
+
+          // Get current bin edges
+          m_binLowerEdge = m_binEdges[iLowerEdge];
+          m_binUpperEdge = m_binEdges[iLowerEdge + 1];
+          std::cout << "Fitting the amplitude interval (" <<  m_binLowerEdge << ", " << m_binUpperEdge << " )" << std::endl;
+
+          // Get profile for current amplitude bin
+          TH1D* h_profile = h_hitTimeLaserHistos[iLowerEdge]->ProjectionY(
+                              ("profile_" + std::to_string(iSlot + 1) + "_" + std::to_string(
+                                 iChannel) + "_"  + std::to_string(iLowerEdge)).c_str(),
+                              iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1
+                            );
+          // Set range of fit based on fitter mode
+          if (m_fitterMode == "MC")
+            h_profile->GetXaxis()->SetRangeUser(-10, -10);
+          else // if you will even change it, make sure not to include the h_hitTime overflow bins in this range
+            h_profile->GetXaxis()->SetRangeUser(-65, -5);
+
+
+          // Fit the hitTime distribution
+          fitChannel(iSlot, iChannel, h_profile, true, ff);
+          m_histoIntegral = h_profile->Integral();
+          determineFitStatus();
+
+          // Get amplitude and width profiles in order to get median amp and width of the channel
+          TH1D* h_amplitude = h_amplitude2D->ProjectionY(
+                                ("AmpProfile_" + std::to_string(iSlot + 1) +
+                                 "_" + std::to_string(iChannel) +
+                                 "_" +  std::to_string(iLowerEdge)).c_str(),
+                                iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1
+                              );
+          TH1D* h_width = h_width2D->ProjectionY(
+                            ("WidthProfile_" + std::to_string(iSlot + 1) +
+                             "_" + std::to_string(iChannel) +
+                             "_" +  std::to_string(iLowerEdge)).c_str(),
+                            iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1
+                          );
+
+          // Measure the *median* amplitude and widths => less sensitive to outliers
+          Double_t q = 0.5; // quantile for median
+          h_amplitude->GetQuantiles(1, &m_amplitude, &q);
+          h_width->GetQuantiles(1, &m_width, &q);
+
+          // Fill tree and write histograms to output file
+          m_timewalkTree->Fill();
+          h_profile->Write();
+          h_amplitude->Write();
+          h_width->Write();
+
+          // Try to avoid memory leaks
+          delete h_profile;
+          delete h_amplitude;
+          delete h_width;
+
+        }
+      }
+    }
     m_timewalkTree->Write();
+  }
+
+  // Run fits on channels that didn't have cross-talk
+  if (m_detectCrosstalk) {
+    std::cout << "Fitting channels with no crosstalk detected" << std::endl;
+    for (short iSlot = 0; iSlot < 16; iSlot++) {
+      std::cout << "   Fitting slot " << iSlot + 1 << std::endl;
+      for (short iChannel = 0; iChannel < 512; iChannel++) {
+        // Project to 1-d hitTime distribution
+        TH1D* h_profile = h_hitTime_noXtalk->ProjectionY(
+                            ("profile_" + std::to_string(iSlot + 1) + "_" + std::to_string(iChannel)).c_str(),
+                            iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1
+                          );
+
+        // Set hitTime range based on fitter mode
+        if (m_fitterMode == "MC")
+          //h_profile->GetXaxis()->SetRangeUser(-10, -10);
+          h_profile->GetXaxis()->SetRangeUser(-65, -1);
+        else // if you will even change the limits, make sure not to include the h_hitTime overflow bins in this range
+          h_profile->GetXaxis()->SetRangeUser(-65, -5);
+
+        // Run fit and determine status
+        fitChannel(iSlot, iChannel, h_profile);
+        determineFitStatus();
+
+        // Get pulse heigth [ADC] and width [ns]
+        TH1D* h_amplitude = h_amplitude2D_noXtalk->ProjectionY(
+                              ("AmpProfile_" + std::to_string(iSlot + 1) + "_" + std::to_string(iChannel)).c_str(),
+                              iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1
+                            );
+        TH1D* h_width = h_width2D_noXtalk->ProjectionY(
+                          ("WidthProfile_" + std::to_string(iSlot + 1) + "_" + std::to_string(iChannel)).c_str(),
+                          iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1
+                        );
+
+        // Set values for pulse amplitude and width (mean)
+        Double_t q = 0.5; // quantile for median
+        h_amplitude->GetQuantiles(1, &m_amplitude, &q);
+        h_width->GetQuantiles(1, &m_width, &q);
+
+        m_fitTree_noXtalk->Fill();
+        h_profile->Write();
+        h_amplitude->Write();
+        h_width->Write();
+
+        // Free memory: TH2D::ProjectionY allocates memory dynamically
+        delete h_profile;
+        delete h_amplitude;
+        delete h_width;
+      }
+    }
+    // Write fitTree with no crosstalk (after computing calibration constants)
+    calculateChannelT0();
+    m_fitTree_noXtalk->Write();
   }
 
   m_histFile->Close();

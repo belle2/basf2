@@ -15,6 +15,7 @@
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dbobjects/KLMTimeConstants.h>
 #include <klm/dbobjects/KLMTimeResolution.h>
+#include <klm/dbobjects/KLMEventT0HitResolution.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Basf2 headers. */
@@ -31,10 +32,9 @@
 
 /* C++ STL headers. */
 #include <functional>
-#include <map>     // For std::map in readCalibrationDataCounts
-#include <utility> // For std::pair in readCalibrationDataFor2DFit
-#include <vector>  // For std::vector in readCalibrationDataFor2DFit
-#include <functional>  // ADD THIS - needed for std::function in readCalibrationDataBatch
+#include <map>
+#include <utility>
+#include <vector>
 
 class TFile;  // forward declaration
 
@@ -52,8 +52,23 @@ namespace Belle2 {
      */
     struct Event {
 
+      /** Run number. */
+      double Run = 0;
+
+      /** Event number. */
+      double Events = 0;
+
+      /** Track index. */
+      double nTrack = 0;
+
+      /** Track charge. */
+      double Track_Charge = 0;
+
       /** EventT0 for the digit. */
       double t0 = 0;
+
+      /** Event T0 resolution. */
+      double t0_uc = 0;
 
       /** Particle flying time. */
       double flyTime = 0;
@@ -87,6 +102,12 @@ namespace Belle2 {
 
       /** If phi and z plane flipped, used for testing and not necessary. */
       bool isFlipped = 0;
+
+      /** Flag the good and bad hits. */
+      bool isGood = 0;
+
+      /** ADC count. */
+      uint16_t getADCcount = 0;
 
       /**
        * Get propagation time + cableDelay time.
@@ -166,6 +187,17 @@ namespace Belle2 {
     void setLowerLimit(int counts)
     {
       m_lower_limit_counts = counts;
+    }
+
+    /**
+     * Enable or disable ADC/charge restriction cuts for scintillators.
+     * When enabled (default), BKLM scintillator requires 30 < ADC < 320
+     * and EKLM requires 40 < ADC < 350.
+     * @param[in] apply True to apply charge cuts (default), false to disable.
+     */
+    void setApplyChargeRestriction(bool apply)
+    {
+      m_applyChargeRestriction = apply;
     }
 
     /**
@@ -280,11 +312,23 @@ namespace Belle2 {
     /**
      * Optionally write a histogram, then delete it to free memory.
      * Used for on-the-fly per-channel hists in minimal mode.
+     * @param h Histogram to write and delete.
+     * @param write Whether to write the histogram.
+     * @param dir Optional directory to write the histogram to.
      */
-    void writeThenDelete_(TH1* h, bool write);
+    void writeThenDelete_(TH1* h, bool write, TDirectory* dir = nullptr);
 
     /** Same as above, but for 2D histograms. */
-    void writeThenDelete_(TH2* h, bool write);
+    void writeThenDelete_(TH2* h, bool write, TDirectory* dir = nullptr);
+
+    /**
+     * Check if event passes ADC count cuts for quality selection
+     * @param event The event to check
+     * @param subdetector KLM subdetector (BKLM or EKLM)
+     * @param layer Layer number (to distinguish RPC from scintillator in BKLM)
+     * @return true if event passes ADC cuts, false otherwise
+     */
+    bool passesADCCut(const Event& event, int subdetector, int layer) const;
 
     /**
      * Fill profiles of time versus distance.
@@ -380,6 +424,22 @@ namespace Belle2 {
     /** Upper time boundary for RPC (calibrated data). */
     double m_UpperTimeBoundaryCalibratedRPC = 40.0;
 
+    /**
+     * Whether to use fixed propagation delay for RPCs.
+     * Technical note BELLE2-NOTE-TE-2021-015 states that c_eff estimation
+     * for RPC is "meaningless" and should be fixed at 0.5c.
+     * Default is false to allow extraction from data (now that the
+     * propagation distance calculation is fixed for RPCs).
+     */
+    bool m_useFixedRPCDelay = false;
+
+    /**
+     * Fixed propagation delay for RPCs (ns/cm).
+     * Default value corresponds to c_eff = 0.5c = 15 cm/ns → delay = 0.0667 ns/cm.
+     * Used when m_useFixedRPCDelay is true.
+     */
+    double m_fixedRPCDelay = 0.0667;
+
     /** Lower time boundary for BKLM scintillators (calibrated data). */
     double m_LowerTimeBoundaryCalibratedScintillatorsBKLM = -40.0;
 
@@ -469,6 +529,9 @@ namespace Belle2 {
     /** DBObject of time resolution. */
     KLMTimeResolution* m_timeResolution = nullptr;
 
+    /** DBObject of per-hit time resolution for EventT0. */
+    KLMEventT0HitResolution* m_eventT0HitResolution = nullptr;
+
     /** Debug mode. */
     bool m_debug = false;
 
@@ -477,6 +540,9 @@ namespace Belle2 {
 
     /** Whether to use event T0 from CDC. */
     bool m_useEventT0 = true;
+
+    /** Whether to apply ADC/charge restriction cuts for scintillators. */
+    bool m_applyChargeRestriction = false;
 
     /** Calibration statistics for each channel. */
     TH1I* h_calibrated = nullptr;
@@ -761,6 +827,124 @@ namespace Belle2 {
     /** EKLM part. */
     TH2F* h2c_timeFSLP_end[2][4][14][2] = {{{{nullptr}}}};
 
+    /* Histograms of time distribution of each channel before calibration. */
+
+    /** BKLM part, used for effective light speed estimation. */
+    TH1F* h_timeFSLPC_tc[2][8][15][2][54] = {{{{{nullptr}}}}};
+
+    /** BKLM part. */
+    TH1F* h_timeFSLPC[2][8][15][2][54] = {{{{{nullptr}}}}};
+
+    /** Two-dimensional distributions of time versus propagation length. */
+    TH2F* m_HistTimeLengthBKLM[2][8][15][2][54] = {{{{{nullptr}}}}};
+
+    /** EKLM part, used for effective light speed estimation. */
+    TH1F* h_timeFSLPC_tc_end[2][4][14][2][75] = {{{{{nullptr}}}}};
+
+    /** EKLM part. */
+    TH1F* h_timeFSLPC_end[2][4][14][2][75] = {{{{{nullptr}}}}};
+
+    /** Two-dimensional distributions of time versus propagation length. */
+    TH2F* m_HistTimeLengthEKLM[2][4][14][2][75] = {{{{{nullptr}}}}};
+
+    /* Histograms of time distribution of each channel after calibration. */
+
+    /** BKLM part. */
+    TH1F* hc_timeFSLPC[2][8][15][2][54] = {{{{{nullptr}}}}};
+
+    /** EKLM part. */
+    TH1F* hc_timeFSLPC_end[2][4][14][2][75] = {{{{{nullptr}}}}};
+
+    /** EventT0 seen by RPC hits. */
+    TH1F* h_eventT0_rpc = nullptr;
+
+    /** EventT0 seen by BKLM scintillator hits. */
+    TH1F* h_eventT0_scint = nullptr;
+
+    /** EventT0 seen by EKLM scintillator hits. */
+    TH1F* h_eventT0_scint_end = nullptr;
+
+    /** Corrected EventT0 for RPC hits. */
+    TH1F* hc_eventT0_rpc = nullptr;
+
+    /** Corrected EventT0 for BKLM scintillator hits. */
+    TH1F* hc_eventT0_scint = nullptr;
+
+    /** Corrected EventT0 for EKLM scintillator hits. */
+    TH1F* hc_eventT0_scint_end = nullptr;
+
+    /** Number of RPC hits per mu+ track. */
+    TH1F* h_nHits_plus_rpc;
+
+    /** Number of RPC hits per mu- track. */
+    TH1F* h_nHits_minus_rpc;
+
+    /** Number of BKLM scintillator hits per mu+ track. */
+    TH1F* h_nHits_plus_scint;
+
+    /** Number of BKLM scintillator hits per mu- track. */
+    TH1F* h_nHits_minus_scint;
+
+    /** Number of EKLM scintillator hits per mu+ track. */
+    TH1F* h_nHits_plus_scint_end;
+
+    /** Number of EKLM scintillator hits per mu- track. */
+    TH1F* h_nHits_minus_scint_end;
+
+    /** DeltaT0 vs inverse hit count for RPC. */
+    TH2F* h2_deltaT0_vs_v_rpc;
+
+    /** DeltaT0 vs inverse hit count for BKLM scintillator. */
+    TH2F* h2_deltaT0_vs_v_scint;
+
+    /** DeltaT0 vs inverse hit count for EKLM scintillator. */
+    TH2F* h2_deltaT0_vs_v_scint_end;
+
+    /** DeltaT0 RMS vs inverse hit count profile for RPC. */
+    TProfile* prof_deltaT0_rms_vs_v_rpc;
+
+    /** DeltaT0 RMS vs inverse hit count profile for BKLM scintillator. */
+    TProfile* prof_deltaT0_rms_vs_v_scint;
+
+    /** DeltaT0 RMS vs inverse hit count profile for EKLM scintillator. */
+    TProfile* prof_deltaT0_rms_vs_v_scint_end;
+
+    /** DeltaT0 vs total hit count for RPC. */
+    TH2F* h2_deltaT0_vs_nhits_rpc;
+
+    /** DeltaT0 vs total hit count for BKLM scintillator. */
+    TH2F* h2_deltaT0_vs_nhits_scint;
+
+    /** DeltaT0 vs total hit count for EKLM scintillator. */
+    TH2F* h2_deltaT0_vs_nhits_scint_end;
+
+    /** Corrected EventT0 for RPC with low hit count. */
+    TH1F* hc_eventT0_rpc_lowN;
+
+    /** Corrected EventT0 for RPC with medium hit count. */
+    TH1F* hc_eventT0_rpc_midN;
+
+    /** Corrected EventT0 for RPC with high hit count. */
+    TH1F* hc_eventT0_rpc_highN;
+
+    /** Corrected EventT0 for BKLM scintillator with low hit count. */
+    TH1F* hc_eventT0_scint_lowN;
+
+    /** Corrected EventT0 for BKLM scintillator with medium hit count. */
+    TH1F* hc_eventT0_scint_midN;
+
+    /** Corrected EventT0 for BKLM scintillator with high hit count. */
+    TH1F* hc_eventT0_scint_highN;
+
+    /** Corrected EventT0 for EKLM scintillator with low hit count. */
+    TH1F* hc_eventT0_scint_end_lowN;
+
+    /** Corrected EventT0 for EKLM scintillator with medium hit count. */
+    TH1F* hc_eventT0_scint_end_midN;
+
+    /** Corrected EventT0 for EKLM scintillator with high hit count. */
+    TH1F* hc_eventT0_scint_end_highN;
+
     /* Formulas used for fitting. */
 
     /** Pol1 function. Effective light speed fitting. */
@@ -783,6 +967,18 @@ namespace Belle2 {
 
     /** Write per-channel temporary histograms (_tc/raw/hc_) in minimal mode. */
     bool m_saveChannelHists = false;
+
+    /**
+     * Directory structure for per-channel histograms (BKLM).
+     * Indexed as [forward/backward][sector][layer][plane].
+     */
+    TDirectory* m_channelHistDir_BKLM[2][8][15][2] = {};
+
+    /**
+     * Directory structure for per-channel histograms (EKLM).
+     * Indexed as [forward/backward][sector][layer][plane].
+     */
+    TDirectory* m_channelHistDir_EKLM[2][4][14][2] = {};
 
   };
 

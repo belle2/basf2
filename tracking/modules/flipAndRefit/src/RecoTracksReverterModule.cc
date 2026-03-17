@@ -38,14 +38,14 @@ void RecoTracksReverterModule::initialize()
 
 }
 
+void RecoTracksReverterModule::beginRun()
+{
+  if (!m_flipCutsFromDB.isValid())
+    B2FATAL("TRKTrackFlipAndRefit_MVA_cuts payload is not available");
+}
+
 void RecoTracksReverterModule::event()
 {
-  // get the cut from DB
-  if (!m_flipCutsFromDB.isValid()) {
-    B2WARNING("DBobjects : TrackFlippingCuts not found!");
-    return;
-  }
-
   // check if the flip&refit is switched on (or off)
   if (!(*m_flipCutsFromDB).getOnOffInfo()) return;
 

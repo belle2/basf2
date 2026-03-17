@@ -41,6 +41,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
 
     collector_output_dir = Path(job_path) / 'SVDTimeValidation/0/collector_output/default/'
     output_dir = Path(kwargs.get('output_dir', 'SVDTimeValidation_output'))
+    shift_detailed = kwargs.get('shift_detailed', False)
     plots_per_run = output_dir / 'runs'
 
     plots_per_run.mkdir(parents=True, exist_ok=True)
@@ -104,19 +105,20 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                         entries_onTracks[algo][run] = {key: val.GetEntries() for key, val in histos['onTracks'].items()}
                         entries_eventT0[algo][run] = entries_eventT0_
 
-                        for key, hShift in histos['timeShifter'].items():
-                            if key in shift_histos[algo]:
-                                shift_histos[algo][key].Add(hShift)
-                            else:
-                                shift_histos[algo][key] = hShift.Clone()
-                                shift_histos[algo][key].SetDirectory(0)
-                            sensor_id = re.findall(r'\d+', key) + [key[-1]]
-                            keyGroup = f'L{sensor_id[0]}S{sensor_id[2]}{sensor_id[3]}'
-                            if keyGroup in shift_histos_merged_over_ladder[algo]:
-                                shift_histos_merged_over_ladder[algo][keyGroup].Add(hShift)
-                            else:
-                                shift_histos_merged_over_ladder[algo][keyGroup] = hShift.Clone()
-                                shift_histos_merged_over_ladder[algo][keyGroup].SetDirectory(0)
+                        if shift_detailed:
+                            for key, hShift in histos['timeShifter'].items():
+                                if key in shift_histos[algo]:
+                                    shift_histos[algo][key].Add(hShift)
+                                else:
+                                    shift_histos[algo][key] = hShift.Clone()
+                                    shift_histos[algo][key].SetDirectory(0)
+                                sensor_id = re.findall(r'\d+', key) + [key[-1]]
+                                keyGroup = f'L{sensor_id[0]}S{sensor_id[2]}{sensor_id[3]}'
+                                if keyGroup in shift_histos_merged_over_ladder[algo]:
+                                    shift_histos_merged_over_ladder[algo][keyGroup].Add(hShift)
+                                else:
+                                    shift_histos_merged_over_ladder[algo][keyGroup] = hShift.Clone()
+                                    shift_histos_merged_over_ladder[algo][keyGroup].SetDirectory(0)
 
                         vu.make_combined_plot('*U', histos,
                                               title=f'exp {exp} run {run} U {algo}')
@@ -135,51 +137,65 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                 except AttributeError:
                     print(f'Skipping file algo {algo} exp {exp} run {run}')
                     continue
+
+                # Free-up memory manually as I used `SetDirectory(0)`
+                histos['eventT0'].Delete()
+                del histos['eventT0']
+                for histo_dict in histos.values():
+                    for hh in histo_dict.values():
+                        hh.Delete()
+                del histos
+
+                for key, hh in CollectorHistograms[algo][exp][run].items():
+                    if key != 'hEventT0':
+                        hh.Delete()
+
                 vu.progress(count + 1, total_item)
                 count += 1
 
     print()
 
-    for algo, KeyHisto in shift_histos.items():
-        c2 = r.TCanvas("c2", "c2", 640, 480)
-        outPDF = f"{output_dir}/shift_histograms_{algo}.pdf"
-        c2.Print(outPDF + "[")
-        onePad = r.TPad("onePad", "onePad", 0, 0, 1, 1)
-        onePad.SetMargin(0.1, 0.2, 0.1, 0.1)
-        onePad.SetNumber(1)
-        onePad.Draw()
-        onePad.cd()
-        hShiftHisto = vu.get_shift_plot(shift_histos_merged_over_ladder[algo])
-        hShiftHisto.Draw('COLZ')
-        c2.Print(outPDF, "Title:" + hShiftHisto.GetName())
+    if shift_detailed:
+        for algo, KeyHisto in shift_histos.items():
+            c2 = r.TCanvas("c2", "c2", 640, 480)
+            outPDF = f"{output_dir}/shift_histograms_{algo}.pdf"
+            c2.Print(outPDF + "[")
+            onePad = r.TPad("onePad", "onePad", 0, 0, 1, 1)
+            onePad.SetMargin(0.1, 0.2, 0.1, 0.1)
+            onePad.SetNumber(1)
+            onePad.Draw()
+            onePad.cd()
+            hShiftHisto = vu.get_shift_plot(shift_histos_merged_over_ladder[algo])
+            hShiftHisto.Draw('COLZ')
+            c2.Print(outPDF, "Title:" + hShiftHisto.GetName())
 
-        c1 = r.TCanvas("c1", "c1", 640, 480)
-        topPad = r.TPad("topPad", "topPad", 0, 0.5, 1, 1)
-        btmPad = r.TPad("btmPad", "btmPad", 0, 0, 1, 0.5)
-        topPad.SetMargin(0.1, 0.1, 0, 0.149)
-        btmPad.SetMargin(0.1, 0.1, 0.303, 0)
-        topPad.SetNumber(1)
-        btmPad.SetNumber(2)
-        topPad.Draw()
-        btmPad.Draw()
-        isOdd = True
-        for key, hShift in KeyHisto.items():
-            hShift.SetStats(0)
-            for yn in range(hShift.GetNbinsY()):
-                norm = (hShift.ProjectionX("tmp", yn + 1, yn + 1, "")).GetMaximum()
-                if norm <= 0:
-                    continue
-                for xn in range(hShift.GetNbinsX()):
-                    hShift.SetBinContent(xn + 1, yn + 1, hShift.GetBinContent(xn + 1, yn + 1) / norm)
-            if isOdd:
-                topPad.cd()
-                hShift.Draw("colz")
-            else:
-                btmPad.cd()
-                hShift.Draw("colz")
-                c1.Print(outPDF, "Title:" + hShift.GetName())
-            isOdd = not isOdd
-        c1.Print(outPDF + "]")
+            c1 = r.TCanvas("c1", "c1", 640, 480)
+            topPad = r.TPad("topPad", "topPad", 0, 0.5, 1, 1)
+            btmPad = r.TPad("btmPad", "btmPad", 0, 0, 1, 0.5)
+            topPad.SetMargin(0.1, 0.1, 0, 0.149)
+            btmPad.SetMargin(0.1, 0.1, 0.303, 0)
+            topPad.SetNumber(1)
+            btmPad.SetNumber(2)
+            topPad.Draw()
+            btmPad.Draw()
+            isOdd = True
+            for key, hShift in KeyHisto.items():
+                hShift.SetStats(0)
+                for yn in range(hShift.GetNbinsY()):
+                    norm = (hShift.ProjectionX("tmp", yn + 1, yn + 1, "")).GetMaximum()
+                    if norm <= 0:
+                        continue
+                    for xn in range(hShift.GetNbinsX()):
+                        hShift.SetBinContent(xn + 1, yn + 1, hShift.GetBinContent(xn + 1, yn + 1) / norm)
+                if isOdd:
+                    topPad.cd()
+                    hShift.Draw("colz")
+                else:
+                    btmPad.cd()
+                    hShift.Draw("colz")
+                    c1.Print(outPDF, "Title:" + hShift.GetName())
+                isOdd = not isOdd
+            c1.Print(outPDF + "]")
 
     dd = {}
     runs = sorted(agreements[vu.time_algorithms[0]])
@@ -302,6 +318,9 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output_dir',
                         help='The directory where all the output will be saved',
                         default='SVDTimeValidation_output')
+    parser.add_argument('-l',
+                        help='Make additional pdf with details cluster size vs shift',
+                        action='store_true')
     args = parser.parse_args()
 
-    run_validation(args.calibration_results_dir[0], output_dir=args.output_dir)
+    run_validation(args.calibration_results_dir[0], output_dir=args.output_dir, shift_detailed=args.l)

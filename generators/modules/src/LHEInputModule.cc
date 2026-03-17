@@ -12,8 +12,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <TF1.h>
-
 using namespace std;
 using namespace Belle2;
 
@@ -41,11 +39,6 @@ LHEInputModule::LHEInputModule() : Module(),
   addParam("nVirtualParticles", m_nVirtual,
            "Number of MCParticles at the beginning of the events that should be flagged c_IsVirtual.", 0);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", true);
-  addParam("meanDecayLength", m_meanDecayLength,
-           "Mean decay length(mean lifetime * c) between displaced vertex to IP in the CM frame, default to be zero, unit in cm", 0.);
-  addParam("Rmin", m_Rmin, "Minimum of distance between displaced vertex to IP in CM frame", 0.);
-  addParam("Rmax", m_Rmax, "Maximum of distance between displaced vertex to IP in CM frame", 1000000.);
-  addParam("pdg_displaced", m_pdg_displaced, "PDG code of the displaced particle being studied", 9000008);
 }
 
 void LHEInputModule::initialize()
@@ -76,20 +69,6 @@ void LHEInputModule::initialize()
   m_lhe.setInitialIndex(m_nInitial);
   m_lhe.setVirtualIndex(m_nInitial + m_nVirtual);
   m_lhe.m_wrongSignPz = m_wrongSignPz;
-
-  //pass displaced vertex to LHEReader
-  m_lhe.m_meanDecayLength = m_meanDecayLength;
-  m_lhe.m_Rmin = m_Rmin;
-  m_lhe.m_Rmax = m_Rmax;
-  m_lhe.m_pdgDisplaced = m_pdg_displaced;
-  //print out warning information if default R range is change
-  if (m_Rmin != 0 || m_Rmax != 1000000) {
-    TF1 fr("fr", "exp(-x/[0])", 0, 1000000);
-    double factor;
-    factor = fr.Integral(m_Rmin, m_Rmax) / fr.Integral(0, 1000000);
-    B2WARNING("Default range of R is changed, new range is from " << m_Rmin << "cm to " << m_Rmax <<
-              " cm. This will change the cross section by a factor of " << factor);
-  }
 
   //Initialize MCParticle collection
   StoreArray<MCParticle> mcparticle;

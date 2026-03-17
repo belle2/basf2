@@ -41,7 +41,7 @@
       </ZBound>
       <ZBound id="2">
         <Z unit="mm">-930.0</Z>
-        <Rmin unit="mm">250.0</Rmin>
+        <Rmin unit="mm">285.0</Rmin>
         <Rmax unit="mm">1140.0</Rmax>
       </ZBound>
       <ZBound id="3">

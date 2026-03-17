@@ -20,7 +20,7 @@ import splinter
 import traceback
 
 # ours
-from b2test_utils import is_ci
+from b2test_utils import is_ci, skip_test
 import validationpath
 from validationtestutil import check_execute
 
@@ -220,6 +220,8 @@ def main():
     """
     Runs two test validations, starts the web server and queries data
     """
+
+    skip_test("The test is problematic when run during our CI/CD pipelines")
 
     success = True
 

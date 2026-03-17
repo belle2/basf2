@@ -132,7 +132,7 @@ TCanvas*  DQMHistAnalysisEcmsMonObjModule::plotArgusFit(RooDataHist* dataE, RooA
 
 
   TLine* ll = new TLine;
-  double mRev = 10579.4e-3 / 2; // Optimal collision energy
+  double mRev = 10578e-3 / 2; // Optimal collision energy (measured by Roman and Radek)
   ll->SetLineColor(kGreen);
   ll->DrawLine(mRev, 0, mRev,  frame->GetMaximum());
 

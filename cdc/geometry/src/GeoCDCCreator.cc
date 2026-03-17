@@ -988,20 +988,23 @@ namespace Belle2 {
     void GeoCDCCreator::createNeutronShields(const GearDir& content)
     {
 
-      G4Material* C2H4 = geometry::Materials::get("G4_POLYETHYLENE");
-      G4Material* elB   = geometry::Materials::get("G4_B");
+      // G4Material* C2H4 = geometry::Materials::get("G4_POLYETHYLENE");
+      // G4Material* elB   = geometry::Materials::get("G4_B");
 
       // 5% borated polyethylene = SWX201
       // http://www.deqtech.com/Shieldwerx/Products/swx201hd.htm
-      G4Material* boratedpoly05 = new G4Material("BoratedPoly05", 1.06 * CLHEP::g / CLHEP::cm3, 2);
-      boratedpoly05->AddMaterial(elB, 0.05);
-      boratedpoly05->AddMaterial(C2H4, 0.95);
+      // G4Material* boratedpoly05 = new G4Material("BoratedPoly05", 1.06 * CLHEP::g / CLHEP::cm3, 2);
+      // boratedpoly05->AddMaterial(elB, 0.05);
+      // boratedpoly05->AddMaterial(C2H4, 0.95);
       // 30% borated polyethylene = SWX210
-      G4Material* boratedpoly30 = new G4Material("BoratedPoly30", 1.19 * CLHEP::g / CLHEP::cm3, 2);
-      boratedpoly30->AddMaterial(elB, 0.30);
-      boratedpoly30->AddMaterial(C2H4, 0.70);
+      // G4Material* boratedpoly30 = new G4Material("BoratedPoly30", 1.19 * CLHEP::g / CLHEP::cm3, 2);
+      // boratedpoly30->AddMaterial(elB, 0.30);
+      // boratedpoly30->AddMaterial(C2H4, 0.70);
 
-      G4Material* shieldMat = C2H4;
+      // G4Material* shieldMat = C2H4;
+
+      G4Material* SWX238 = geometry::Materials::get("CDC-SWX-238");
+      G4Material* shieldMat = SWX238;
 
       const int nShields = content.getNumberNodes("Shields/Shield");
 
@@ -1017,6 +1020,7 @@ namespace Belle2 {
         const double shieldOuterR2 = shieldContent.getLength("OuterR2");
         const double shieldThick = shieldContent.getLength("Thickness");
         const double shieldPosZ = shieldContent.getLength("PosZ");
+        const int enableShield = shieldContent.getInt("Enable");
 
         G4Cons* shieldConsShape = new G4Cons((boost::format("solidShield%1%") % shieldID).str().c_str(),
                                              shieldInnerR1 * CLHEP::cm, shieldOuterR1 * CLHEP::cm,
@@ -1028,8 +1032,13 @@ namespace Belle2 {
                                                           (boost::format("logicalShield%1%") % shieldID).str().c_str(),
                                                           0, 0, 0);
         shieldCons->SetVisAttributes(m_VisAttributes.back());
-        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (shieldPosZ - shieldThick / 2.0) * CLHEP::cm), shieldCons,
-                          (boost::format("physicalShield%1%") % shieldID).str().c_str(), m_logicalCDC, false, 0);
+
+        if (enableShield) {
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (shieldPosZ - shieldThick / 2.0) * CLHEP::cm), shieldCons,
+                            (boost::format("physicalShield%1%") % shieldID).str().c_str(), m_logicalCDC, false, 0);
+          G4cout << "_____________" << G4endl << shieldCons->GetName() << " (Shield) : mass = " << shieldCons->GetMass() / CLHEP::kg <<
+                 " | materials : " << shieldCons->GetMaterial() << G4endl << "_____________" << G4endl;
+        }
 
       }
 
@@ -1039,8 +1048,11 @@ namespace Belle2 {
     void GeoCDCCreator::createNeutronShields(const CDCGeometry& geom)
     {
 
-      G4Material* C2H4 = geometry::Materials::get("G4_POLYETHYLENE");
-      G4Material* shieldMat = C2H4;
+      // G4Material* C2H4 = geometry::Materials::get("G4_POLYETHYLENE");
+      // G4Material* shieldMat = C2H4;
+
+      G4Material* SWX238 = geometry::Materials::get("CDC-SWX-238");
+      G4Material* shieldMat = SWX238;
 
       for (const auto& shield : geom.getNeutronShields()) {
         const int shieldID = shield.getId();
@@ -1050,6 +1062,7 @@ namespace Belle2 {
         const double shieldOuterR2 = shield.getRmax2();
         const double shieldThick = shield.getThick();
         const double shieldPosZ = shield.getZ();
+        const int enableShield = shield.getEna();
 
         G4Cons* shieldConsShape = new G4Cons("solidShield" + to_string(shieldID),
                                              shieldInnerR1 * CLHEP::cm, shieldOuterR1 * CLHEP::cm,
@@ -1060,8 +1073,13 @@ namespace Belle2 {
         G4LogicalVolume* shieldCons = new G4LogicalVolume(shieldConsShape, shieldMat, "logicalShield" + to_string(shieldID),
                                                           0, 0, 0);
         shieldCons->SetVisAttributes(m_VisAttributes.back());
-        new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (shieldPosZ - shieldThick / 2.0) * CLHEP::cm), shieldCons,
-                          "physicalShield" + to_string(shieldID), m_logicalCDC, false, 0);
+
+        if (enableShield) {
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (shieldPosZ - shieldThick / 2.0) * CLHEP::cm), shieldCons,
+                            "physicalShield" + to_string(shieldID), m_logicalCDC, false, 0);
+          G4cout << "_____________" << G4endl << shieldCons->GetName() << " (Shield) : mass = " << shieldCons->GetMass() / CLHEP::kg <<
+                 " | materials : " << shieldCons->GetMaterial() << G4endl << "_____________" << G4endl;
+        }
 
       }
 

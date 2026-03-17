@@ -83,8 +83,7 @@ Full Event Interpretation corrections
 
 Similarly to PID weights, the FEI tables are provided as files in CSV format.
 The corrections are binned in FEI decay mode ID and they are provided for several thresholds of FEI probability.
-Because of the high cross-feed rates between the FEI modes, a covariance matrix must be provided either as a separate ``.npy`` file or
-as columns within the table.
+Because of the high cross-feed rates between the FEI modes, a covariance matrix must be provided.
 
 .. code-block:: python
 
@@ -99,8 +98,8 @@ as columns within the table.
                            show_plots=True)
 
 In the snippet above, the reweighting is performed for ``Btag`` particle in ``user_df`` DataFrame.
-The FEI correction table is loaded as ``table`` DataFrame via the ``pandas.from_csv()`` function and the covariance matrix ``cov``
-is loaded as a separate ``numpy.ndarray`` via the ``numpy.load()`` method.
+The FEI correction table is loaded as ``table`` DataFrame via the ``pandas.read_csv()`` function and the covariance matrix ``cov``
+is loaded as a separate ``numpy.ndarray`` via the ``numpy.load()`` (``.npy`` files) or the ``numpy.loadtxt()`` (``.tsv`` files) method.
 The `add_weights_to_dataframe <sysvar.add_weights_to_dataframe>` function expects that the FEI decay mode ID is provided 
 in the ``{prefix}_dec_mode`` column of the ``user_df``, but if this is not the case, one can provide a variable alias 
 to point the object to the existing column.

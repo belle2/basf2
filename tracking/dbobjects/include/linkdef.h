@@ -20,5 +20,5 @@
 
 #pragma link C++ class Belle2::WireHitFilterSettings+; // checksum=0xb2e21a93, version=1
 
-#pragma link C++ class Belle2::SVDToCDCCKFParameters+; // version=1
+#pragma link C++ class Belle2::SVDToCDCCKFParameters+; // checksum=0xab7e8696, version=1
 #endif

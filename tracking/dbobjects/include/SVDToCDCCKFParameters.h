@@ -7,13 +7,15 @@
  **************************************************************************/
 #pragma once
 
+#include <framework/gearbox/Const.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 
-#include <TObject.h>
 #include <map>
 #include <string>
-// #include <variant>  // TODO: re-enable once a custom ROOT streamer for std::variant is implemented
 #include <vector>
+
+#include <TObject.h>
 
 namespace Belle2 {
 
@@ -24,16 +26,32 @@ namespace Belle2 {
 
     /** Default constructor */
     SVDToCDCCKFParameters()
-      : m_maximalDeltaPhi(0.0f),
-        m_maximalLayerJump(0),
-        m_maximalLayerJumpBackwardSeed(0),
+      : m_maximalDeltaPhi(0.39269908169872414f),
+        m_maximalLayerJump(2),
+        m_maximalLayerJumpBackwardSeed(3),
         m_minimalPtRequirement(0.0f),
-        m_pathMaximalCandidatesInFlight(0),
-        m_stateMaximalHitCandidates(0),
+        m_pathMaximalCandidatesInFlight(3),
+        m_stateMaximalHitCandidates(4),
         m_exportAllTracks(false),
-        m_exportTracks(false),
+        m_exportTracks(true),
         m_ignoreTracksWithCDChits(false),
-        m_setTakenFlag(false)
+        m_setTakenFlag(true),
+        m_filter("size"),
+        m_hitFindingDirection("forward"),
+        m_inputRecoTrackStoreArrayName("SVDPlusCDCStandaloneRecoTrack"),
+        m_inputWireHits("CDCWireHitVector"),
+        m_outputRecoTrackStoreArrayName("CKFCDCRecoTracks"),
+        m_outputRelationRecoTrackStoreArrayName("SVDPlusCDCStandaloneRecoTrack"),
+        m_pathFilter("arc_length"),  // or "distance"
+        m_relatedRecoTrackStoreArrayName("CKFCDCRecoTracks"),  // or "RecoTracks"
+        m_relationCheckForDirection("backward"),
+        m_seedComponent("SVD"),
+        m_stateBasicFilter("rough"),
+        m_stateExtrapolationFilter("extrapolate_and_update"),
+        m_stateFinalFilter("distance"),
+        m_statePreFilter("all"),
+        m_trackFindingDirection("forward"),
+        m_writeOutDirection("backward")  // or "both"
     {}
 
     /** Destructor */
@@ -236,7 +254,7 @@ namespace Belle2 {
     /** Boolean variables */
     bool m_exportAllTracks;
     bool m_exportTracks;
-    bool m_ignoreTracksWithCDChits;  /**< Original name preserved; setter/getter updated to match */
+    bool m_ignoreTracksWithCDChits;
     bool m_setTakenFlag;
 
     /** String variables — all stored by value for correct ROOT I/O serialisation. */
@@ -259,15 +277,16 @@ namespace Belle2 {
 
     /** FILTER PARAMETERS MAPS
      *
-     * TODO: Once a custom ROOT streamer for std::variant is available, replace the five
-     *       separate maps per filter with a single FilterParamMap using FilterParamVariant:
+     * TODO: Once a custom ROOT streamer for std::variant or boost::variant is available, replace the
+     *       five separate maps per filter with a single FilterParamMap using FilterParamVariant:
      *
+     *   // std::variant approach (requires C++17 and custom ROOT streamer)
      *   using FilterParamVariant = std::variant<bool, int, float, std::string, std::vector<std::string>>;
-     *   using FilterParamMap     = std::map<std::string, FilterParamVariant>;
      *
-     *   void setFilterParameters(const FilterParamMap& params);
-     *   const FilterParamMap& getFilterParameters() const;
-     *   ... (same for other parameters.)
+     *   // boost::variant approach (still fails in ROOT DB payloads as of 2026)
+     *   using FilterParamVariant = boost::variant<bool, int, double, std::string, std::vector<std::string>>;
+     *
+     *   using FilterParamMap     = std::map<std::string, FilterParamVariant>;
      *
      *   FilterParamMap m_filterParameters;
      *   FilterParamMap m_pathFilterParameters;
@@ -275,8 +294,11 @@ namespace Belle2 {
      *   FilterParamMap m_stateExtrapolationFilterParameters;
      *   FilterParamMap m_stateFinalFilterParameters;
      *   FilterParamMap m_statePreFilterParameters;
+     *
+     *   void setFilterParameters(const FilterParamMap& params);
+     *   const FilterParamMap& getFilterParameters() const;
+     *   ... (same for other parameters, see SVDToCDCCKFParameters.cc for examples)
      */
-
 
     /** ALTERNATIVE to the FilterParamMap could be implemented as follows: */
     std::map<std::string, bool>                     m_filterParametersBool;

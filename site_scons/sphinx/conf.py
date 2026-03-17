@@ -442,7 +442,7 @@ intersphinx_mapping = {
         None,
     ),
     "pandas": (
-        f"https://pandas.pydata.org/pandas-docs/version/{get_package_version('pandas')}/",
+        f"https://pandas.pydata.org/pandas-docs/version/{get_package_version('pandas', major_minor_only=True)}/",
         None,
     ),
     "matplotlib": (

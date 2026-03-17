@@ -50,9 +50,7 @@ PythiaBothParam StringZ:rFactC=1.0
 #PythiaBothParam StringFlav:probQQbarToB=0.0
 
 Decay vpho
-# Pythia6 definition "32" for "vpho -> q qbar" should be used.
-#   (this is automatically converted to Pythia8 definition "91")
-1.000 p+ anti-p- p+ anti-p- PYTHIA 91;
+1.000 p+ anti-p- p+ anti-p- PHSP;
 Enddecay
 
 

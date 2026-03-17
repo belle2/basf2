@@ -27,7 +27,7 @@ Changes since release-10
       * - package
         - old version
         - new version
-      * - `BELLE_FLC`
+      * - ``BELLE_FLC``
         - ?
         -
       * - Boost C++ Libraries

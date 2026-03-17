@@ -176,7 +176,6 @@ void PXDDQMBowingModule::defineHisto()
   }
   const VXD::GeoCache& vxdGeometry(VXD::GeoCache::getInstance());
   std::vector<VxdID> sensors = vxdGeometry.getListOfSensors();
-  std::sort(sensors.begin(), sensors.end());  // make sure it is our natural order
   for (VxdID& avxdid : sensors) {
     const VXD::SensorInfoBase& info = vxdGeometry.getSensorInfo(avxdid);
     if (info.getType() != VXD::SensorInfoBase::PXD

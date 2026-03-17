@@ -73,14 +73,11 @@ void DQMHistAnalysisPXDBowModule::initialize()
     registerEpicsPV("PXD:sagitta:" + buff, "sagitta:" + (std::string)aVxdID);
   }
 
-
   if (validModule == 0 and m_moduleName != "") {
-    B2WARNING("Invalid moduleName, only PXD forward module are acceptable, nameModule parameter set to default (2.2.1)");
+    B2WARNING("Invalid moduleName, only empty value or PXD forward modules are acceptable, nameModule parameter set to default (2.2.1)");
     m_moduleName = "2.2.1";
   } else if (m_moduleName == "") B2INFO("Plotting the histogram for all forward sensors");
   else B2INFO("Plotting histogram for module " << m_moduleName);
-
-  std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
   if (m_PXDModules.size() == 0) {
     B2WARNING("No PXDModules in Geometry found!");

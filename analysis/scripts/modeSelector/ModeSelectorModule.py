@@ -532,7 +532,7 @@ class ModeSelectorModule(b2.Module):
                 "ModeSelector: missing top mode among event candidates "
                 "(excluding events with no predicted-sector candidate): "
                 f"{self._missing_top_mode_count}/{missing_base_count} event(s) "
-                f"({100.0 * missing_frac:.3f}%), high-confidence "
+                f"({100.0 * missing_frac:.3f}%), high-confidence (>{config.HIGH_CONF_BPLUSSCORE_ABS}) "
                 f"{self._missing_top_mode_high_conf_count}/{high_conf_missing_base_count} event(s) "
                 f"({100.0 * high_conf_missing_frac:.3f}%)."
             )
@@ -550,7 +550,7 @@ class ModeSelectorModule(b2.Module):
             b2.B2INFO(
                 "ModeSelector: predicted sector had no candidate in "
                 f"{self._empty_predicted_sector_count}/{self._inference_event_count} event(s) "
-                f"({100.0 * fallback_frac:.3f}%), high-confidence "
+                f"({100.0 * fallback_frac:.3f}%), high-confidence (>{config.HIGH_CONF_BPLUSSCORE_ABS}) "
                 f"{self._empty_predicted_sector_high_conf_count}/{self._high_conf_event_count} event(s) "
                 f"({100.0 * high_conf_fallback_frac:.3f}%); used score fallback."
             )
@@ -961,11 +961,12 @@ class ModeSelectorModule(b2.Module):
         if predicted_input_ids:
             max_mode_prob = max(float(main_output[iid]) for iid in predicted_input_ids)
         else:
-            # Defensive fallback. This path is not expected in normal workflows.
+            # fallback to the best predicted-sector mode output, also considering bad_tag
+            bad_tag_prob = float(main_output[config.N_INPUT_IDS])
             if charged_cat:
-                max_mode_prob = float(np.max(main_output[:bp_threshold]))
+                max_mode_prob = max(float(np.max(main_output[:bp_threshold])), bad_tag_prob)
             else:
-                max_mode_prob = float(np.max(main_output[bp_threshold:config.N_INPUT_IDS]))
+                max_mode_prob = max(float(np.max(main_output[bp_threshold:config.N_INPUT_IDS])), bad_tag_prob)
             self._empty_predicted_sector_count += 1
         bp_score = sign * max_mode_prob
         is_high_conf = abs(bp_score) > config.HIGH_CONF_BPLUSSCORE_ABS

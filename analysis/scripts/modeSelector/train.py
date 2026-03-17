@@ -302,16 +302,25 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     nonzero_cols = set(np.unique(features.nonzero()[1]))
     all_zero_cols = set(range(n_total)) - nonzero_cols
 
-    # Stage 2: Add Mbc block (block i=10, indices 1360-1495)
+    # Stage 2: Exclude blocks that should not be active network inputs.
+    # Mbc is excluded to avoid output correlation. With skipTreeFit=True,
+    # Dst0_chiProb and Dstp_chiProb do not add independent information beyond
+    # Bdaughter_chiProb, so they are excluded as well.
     n_input_ids = config.N_INPUT_IDS  # 136
-    mbc_start = n_input_ids * 10
-    mbc_end = n_input_ids * 11
-    mbc_cols = set(range(mbc_start, mbc_end))
+    excluded_block_ranges = {
+        'Dst0_chiProb': (n_input_ids * 7, n_input_ids * 8),
+        'Dstp_chiProb': (n_input_ids * 8, n_input_ids * 9),
+        'Mbc': (n_input_ids * 10, n_input_ids * 11),
+    }
+    excluded_cols = set()
+    for start, end in excluded_block_ranges.values():
+        excluded_cols.update(range(start, end))
 
-    computed_has_inputs = sorted(set(range(n_total)) - (all_zero_cols | mbc_cols))
+    computed_has_inputs = sorted(set(range(n_total)) - (all_zero_cols | excluded_cols))
     n_computed_remove = n_total - len(computed_has_inputs)
     print(f"  All-zero columns:  {len(all_zero_cols)}")
-    print(f"  Mbc block [{mbc_start}, {mbc_end}): {len(mbc_cols)} columns")
+    for block_name, (start, end) in excluded_block_ranges.items():
+        print(f"  {block_name} block [{start}, {end}): {end - start} columns")
     print(f"  Total to remove:   {n_computed_remove}")
 
     # Verify against hardcoded list in config
@@ -671,7 +680,6 @@ def distance_corr(var_1, var_2, normedweight=None, power=1):
 
 
 def build_mode_labels(mc_truth_cand, sig_truth, charged_cat, is_cont, gen_pdg,
-                      best_bp_sigprob_iid, best_b0_sigprob_iid,
                       delta_p_thresh=0.15):
     """
     Build mode-prediction labels (0 to N_INPUT_IDS+2) from MC truth.
@@ -706,10 +714,6 @@ def build_mode_labels(mc_truth_cand, sig_truth, charged_cat, is_cont, gen_pdg,
         1 if continuum event (from best overall candidate), else 0
     gen_pdg : ndarray of int16
         mostcommonBTagPDG of best overall candidate (0 for continuum)
-    best_bp_sigprob_iid : ndarray of int16
-        input_id of best-sigProb B+ candidate; -1 if absent
-    best_b0_sigprob_iid : ndarray of int16
-        input_id of best-sigProb B0 candidate; -1 if absent
     delta_p_thresh : float
         Threshold for mostcommonBTagDeltaP. Default: 0.15
 
@@ -718,7 +722,7 @@ def build_mode_labels(mc_truth_cand, sig_truth, charged_cat, is_cont, gen_pdg,
     labels : ndarray of int64
         Mode labels (0 to N_INPUT_IDS+2)
     train_selection : ndarray of bool
-        True for events where the category-selected sector has a valid candidate
+        True for events kept for main-network training after label assignment
     stats : dict
         Counters for how labels were assigned.
     """
@@ -811,10 +815,9 @@ def build_mode_labels(mc_truth_cand, sig_truth, charged_cat, is_cont, gen_pdg,
         labels[cross_dc1] = MAIN_BG_CROSS_DC1
         # remaining no_target events keep bad_tag (set as default above)
 
-    # train_selection: keep events where the predicted sector has a valid candidate
-    train_selection = np.where(charged_cat,
-                               best_bp_sigprob_iid >= 0,
-                               best_b0_sigprob_iid >= 0)
+    # Keep all preselected events. Predicted-sector-empty events are retained and
+    # trained against the fallback background labels above.
+    train_selection = np.ones(n_events, dtype=bool)
 
     assert labels.min() >= 0 and labels.max() <= MAIN_BG_CONT, (
         f"Labels out of range [0, {MAIN_BG_CONT}]: "
@@ -1250,7 +1253,6 @@ def main():
             )
         labels, train_selection, label_stats = build_mode_labels(
             mc_truth_cand, sig_truth, charged_cat_bool, is_cont, gen_pdg,
-            best_bp_sigprob_iid, best_b0_sigprob_iid,
         )
         num_labels = MAIN_NUM_LABELS
         n_signal = int((labels < config.N_INPUT_IDS).sum())
@@ -1271,7 +1273,8 @@ def main():
 
         mbc_values = None
 
-        # Apply train_selection: drop events where the category-selected candidate type has no candidate
+        # Apply train_selection. The main network currently keeps all preselected
+        # events, including predicted-sector-empty fallback-background cases.
         n_before = len(labels)
         if features_dense is not None:
             features_dense = features_dense[train_selection]
@@ -1283,7 +1286,10 @@ def main():
         if mbc_values is not None:
             mbc_values = mbc_values[train_selection]
         n_dropped = n_before - int(train_selection.sum())
-        print(f"  train_selection: dropped {n_dropped} events ({n_dropped / n_before * 100:.1f}%)")
+        print(
+            f"  train_selection: dropped {n_dropped} events "
+            f"({n_dropped / n_before * 100:.1f}%); predicted-sector-empty events are kept"
+        )
 
     # Mbc values for DisCo loss (category network; main network handled above)
     if args.network == 'category':

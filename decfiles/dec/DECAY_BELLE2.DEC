@@ -8,7 +8,7 @@
 #   New Dalitz modes for eta and eta'
 #
 # Updates listed below are tabulated on https://xwiki.desy.de/xwiki/rest/p/4d75f
-# See individual pull requests for details.
+# See individual merge requests for details.
 #
 # December 2017, B. Oberhof (benjamin.oberhof@lnf.infn.it)
 #   Updated to new CPV models. See channels with #[w/CPV - BO 09/2017]

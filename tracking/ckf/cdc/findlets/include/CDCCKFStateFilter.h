@@ -52,6 +52,8 @@ namespace Belle2 {
       m_finalSelection.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "final"));
     }
 
+    void setMaximalHitCandidates(size_t maximalHitCandidates) { m_maximalHitCandidates = maximalHitCandidates; }
+
     /// Apply the findlet and do the state selection
     void apply(const CDCCKFPath& path, std::vector<CDCCKFState>& nextStates) override
     {

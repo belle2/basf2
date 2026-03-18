@@ -46,6 +46,10 @@ namespace Belle2 {
     /// Load in the reco tracks and the hits
     void apply(std::vector<RecoTrack*>& seeds) override;
 
+    void setMinimalPtRequirement(double minimalPtRequirement) { m_param_minimalPtRequirement = minimalPtRequirement; }
+
+    void setIgnoreTracksWithCDChits(bool ignoreTracksWithCDChits) { m_noCDChits = ignoreTracksWithCDChits; }
+
   private:
     // Findlets
     /// Findlet for fitting the tracks

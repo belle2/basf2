@@ -10,7 +10,10 @@
 
 #include <tracking/trackingUtilities/utilities/Algorithms.h>
 
+#include <framework/database/DBObjPtr.h>
 #include <framework/core/ModuleParamList.h>
+
+#include <tracking/dbobjects/SVDToCDCCKFParameters.h>
 
 using namespace Belle2;
 
@@ -35,10 +38,45 @@ void CKFToCDCFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   m_resultFinalizer.exposeParameters(moduleParamList, prefix);
   m_resultStorer.exposeParameters(moduleParamList, prefix);
 
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "DBPayloadName"),
+                                m_param_dbPayloadName,
+                                "Name of the DB payload containing ToCDCCKF parameters. If non-empty and the payload is valid, it will override the module parameters.",
+                                m_param_dbPayloadName);
+
   moduleParamList->getParameter<std::string>("statePreFilter").setDefaultValue("all");
   moduleParamList->getParameter<std::string>("stateBasicFilter").setDefaultValue("rough");
   moduleParamList->getParameter<std::string>("stateExtrapolationFilter").setDefaultValue("extrapolate_and_update");
   moduleParamList->getParameter<std::string>("stateFinalFilter").setDefaultValue("distance");
+}
+
+void CKFToCDCFindlet::beginRun()
+{
+  Super::beginRun();
+
+  if (m_param_dbPayloadName.empty()) {
+    return;
+  }
+
+  DBObjPtr<SVDToCDCCKFParameters> payload(m_param_dbPayloadName);
+  if (!payload.isValid()) {
+    B2FATAL("CKFToCDCFindlet: DB payload '" << m_param_dbPayloadName << "' not found or not valid for current run.");
+  }
+
+  m_trackHandler.setMinimalPtRequirement(payload->getMinimalPtRequirement());
+  m_trackHandler.setIgnoreTracksWithCDChits(payload->getIgnoreTracksWithCDChits());
+
+  m_treeSearcher.setMaximalDeltaPhi(payload->getMaximalDeltaPhi());
+  m_treeSearcher.setMaximalLayerJump(payload->getMaximalLayerJump());
+  m_treeSearcher.setMaximalLayerJumpBackwardSeed(payload->getMaximalLayerJumpBackwardSeed());
+  m_treeSearcher.setHitFindingDirection(payload->getHitFindingDirection());
+  m_treeSearcher.setPathMaximalCandidatesInFlight(payload->getPathMaximalCandidatesInFlight());
+  m_treeSearcher.setStateMaximalHitCandidates(payload->getStateMaximalHitCandidates());
+
+  m_resultStorer.setExportTracks(payload->getExportTracks());
+  m_resultStorer.setExportAllTracks(payload->getExportAllTracks());
+  m_resultStorer.setSetTakenFlag(payload->getTakenFlag());
+
+  B2DEBUG(20, "CKFToCDCFindlet: Loaded and applied parameters from DB payload '" << m_param_dbPayloadName << "'.");
 }
 
 void CKFToCDCFindlet::beginEvent()

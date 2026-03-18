@@ -43,6 +43,30 @@ namespace Belle2 {
       m_pathSelector.exposeParameters(moduleParamList, TrackingUtilities::prefixed("path", prefix));
     }
 
+    void setMaximalDeltaPhi(double maximalDeltaPhi) { m_stateCreator.setMaximalDeltaPhi(maximalDeltaPhi); }
+
+    void setMaximalLayerJump(int maximalLayerJump) { m_stateCreator.setMaximalLayerJump(maximalLayerJump); }
+
+    void setMaximalLayerJumpBackwardSeed(int maximalLayerJumpBackwardSeed)
+    {
+      m_stateCreator.setMaximalLayerJumpBackwardSeed(maximalLayerJumpBackwardSeed);
+    }
+
+    void setHitFindingDirection(const std::string& hitFindingDirection)
+    {
+      m_stateCreator.setHitFindingDirection(hitFindingDirection);
+    }
+
+    void setPathMaximalCandidatesInFlight(size_t pathMaximalCandidatesInFlight)
+    {
+      m_pathSelector.setMaximalCandidatesInFlight(pathMaximalCandidatesInFlight);
+    }
+
+    void setStateMaximalHitCandidates(size_t stateMaximalHitCandidates)
+    {
+      m_stateFilter.setMaximalHitCandidates(stateMaximalHitCandidates);
+    }
+
     /// Main method to update the paths. Input: vector of the selected paths and a vector of CDC wirehits to be considered.
     void apply(std::vector<CDCCKFPath>& paths,
                const std::vector<const TrackingUtilities::CDCWireHit*>& wireHits) override

@@ -35,6 +35,12 @@ namespace Belle2 {
     /// Register the store arrays
     void initialize() override;
 
+    void setExportTracks(bool exportTracks) { m_param_exportTracks = exportTracks; }
+
+    void setExportAllTracks(bool exportAllTracks) { m_param_exportAllTracks = exportAllTracks; }
+
+    void setSetTakenFlag(bool setTakenFlag) { m_param_setTakenFlag = setTakenFlag; }
+
   private:
     // Parameters
     /// Parameter for the distance given to the framework (can not handle EForwardBackward directly)

@@ -44,6 +44,20 @@ namespace Belle2 {
 
   public:
 
+    void setMaximalLayerJump(int maximalLayerJump) { m_maximalLayerJump = maximalLayerJump; }
+
+    void setMaximalLayerJumpBackwardSeed(int maximalLayerJumpBackwardSeed)
+    {
+      m_maximalLayerJump_backwardSeed = maximalLayerJumpBackwardSeed;
+    }
+
+    void setMaximalDeltaPhi(double maximalDeltaPhi) { m_maximalDeltaPhi = maximalDeltaPhi; }
+
+    void setHitFindingDirection(const std::string& hitFindingDirection)
+    {
+      m_param_writeOutDirectionAsString = hitFindingDirection;
+    }
+
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {

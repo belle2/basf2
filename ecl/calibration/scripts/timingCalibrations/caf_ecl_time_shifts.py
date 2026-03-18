@@ -27,8 +27,8 @@ settings = CalibrationSettings(name="ECL crystal time calibrations",
                                expert_username="ehill",
                                description=__doc__,
                                input_data_formats=["cdst", "mdst"],
-                               input_data_names=["bhabha_all_calib"],
-                               input_data_filters={"bhabha_all_calib": ["bhabha_all_calib"]},
+                               input_data_names=["bhabha_combined_calib"],
+                               input_data_filters={"bhabha_combined_calib": ["bhabha_combined_calib"]},
                                depends_on=[])
 
 
@@ -67,7 +67,7 @@ def get_calibrations(input_data, **kwargs):
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
     # The input data should be the bhabha skim
-    file_to_iov_physics = input_data["bhabha_all_calib"]
+    file_to_iov_physics = input_data["bhabha_combined_calib"]
 
     # Could remove this limit on the number of files per run but will just
     # set to a large number in case we want to introduce it later.

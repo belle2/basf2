@@ -208,7 +208,7 @@ void CDCUnpackerModule::event()
         setCDCPacketHeader(ibuf);
 
         // Skip invalid boardsIDs
-        if (m_boardId > 300) {
+        if (m_boardId <= 0 or m_boardId >= 300) {
           B2WARNING("Unrecoverable board " << std::hex << m_boardId);
           continue;
         }

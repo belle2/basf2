@@ -34,7 +34,7 @@ settings = CalibrationSettings(
     subsystem="cdc",
     description=__doc__,
     input_data_formats=["cdst"],
-    input_data_names=["bhabha_all_calib"],
+    input_data_names=["bhabha_combined_calib"],
     expert_config={
         "payload_boundaries": [],
         "calib_datamode": False,
@@ -46,9 +46,9 @@ settings = CalibrationSettings(
         "calibration_procedure": {"rungain0": 0, "rungain1": 0, "rungain2": 0}
          },
     input_data_filters={
-        "bhabha_all_calib": [
+        "bhabha_combined_calib": [
             INPUT_DATA_FILTERS['Run Type']['physics'],
-            INPUT_DATA_FILTERS['Data Tag']['bhabha_all_calib'],
+            INPUT_DATA_FILTERS['Data Tag']['bhabha_combined_calib'],
             INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable'],
             INPUT_DATA_FILTERS['Magnet']['On'],
             INPUT_DATA_FILTERS['Beam Energy']['4S'],
@@ -66,7 +66,7 @@ def get_calibrations(input_data, **kwargs):
     """
 
     import basf2
-    file_to_iov_physics = input_data["bhabha_all_calib"]
+    file_to_iov_physics = input_data["bhabha_combined_calib"]
 
     expert_config = kwargs.get("expert_config")
     calib_mode = expert_config["calib_mode"]

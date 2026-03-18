@@ -141,8 +141,8 @@ void ElectronValCollectorModule::collect()
 
   // Defining event trigger conditions
   const bool eBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha") == SoftwareTriggerCutResult::c_accept);
-  const bool eRadBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_radee")  == SoftwareTriggerCutResult::c_accept) ||
-                          (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha_cdc") == SoftwareTriggerCutResult::c_accept);
+  const bool eRadBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha_cdc") ==
+                           SoftwareTriggerCutResult::c_accept);
 
   // Handling different event types
   if (eBhabha) {

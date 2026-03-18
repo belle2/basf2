@@ -42,6 +42,11 @@ namespace Belle2 {
      */
     void event() override final;
 
+    /**
+     * Plot the histogram of the module with ID buff
+     * and colorize the canvas using the
+     * stat, error or warning flags.
+     */
     void plotCanvas(bool enough, bool errorflag, bool warnflag, std::string buff);
 
     //! Parameters accessible from basf2 scripts

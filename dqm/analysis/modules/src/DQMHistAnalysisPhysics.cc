@@ -129,9 +129,9 @@ void DQMHistAnalysisPhysicsModule::fitUpsilonFromHisto(TH1* histo, TPaveText* te
   model.fitTo(data, RooFit::Extended(kTRUE));
 
   RooPlot* frame = m.frame();
-  data.plotOn(frame, RooFit::DrawOption("B"), RooFit::FillColor(kGray), RooFit::LineWidth(2), RooFit::MarkerSize(0),
+  data.plotOn(frame, RooFit::DrawOption("B"), RooFit::FillColor(kGray), RooFit::LineWidth(1), RooFit::MarkerSize(0),
               RooFit::XErrorSize(0), RooFit::DataError(RooAbsData::None), RooFit::LineStyle(kSolid), RooFit::LineColor(kBlack));
-  model.plotOn(frame, RooFit::LineColor(kBlue));
+  model.plotOn(frame, RooFit::LineColor(kBlue), RooFit::LineWidth(1));
   frame->SetTitle("Upsilon(4S) Mass Fit");
   frame->GetXaxis()->SetTitle((parts).c_str());
   frame->Draw();
@@ -217,7 +217,7 @@ void DQMHistAnalysisPhysicsModule::event()
         m_cmUPSmumu->Update();
         UpdateCanvas(m_cmUPSmumu);
       } else {
-        hmUPSmumu = findHist("PhysicsObjects/mUPS");// even if not updated
+        hmUPSmumu = findHist("PhysicsObjects/mUPS", true);// only if updated
         if (hmUPSmumu and hmUPSmumu->GetEntries() < m_minEntriesUPSmumu) {
           // only if integral plot is below delta entries
           m_cmUPSmumu->cd();
@@ -235,7 +235,7 @@ void DQMHistAnalysisPhysicsModule::event()
         m_cmUPSee->Update();
         UpdateCanvas(m_cmUPSee);
       } else {
-        hmUPSee = findHist("PhysicsObjects/mUPSe");// even if not updated
+        hmUPSee = findHist("PhysicsObjects/mUPSe", true);// only if updated
         if (hmUPSee and hmUPSee->GetEntries() < m_minEntriesUPSee) {
           // only if integral plot is below delta entries
           m_cmUPSee->cd();

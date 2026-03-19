@@ -19,5 +19,5 @@ if __name__ == "__main__":
         test_folder(location=constants.Location.hlt,
                     run_type=constants.RunTypes.beam,
                     exp_number=1004,
-                    event_distribution=constants.EventDistributionModes.zmqbasf2,
+                    event_distribution="zmqbasf2",
                     simulate_events_of_doom_buster=True)

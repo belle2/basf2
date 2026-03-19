@@ -65,7 +65,7 @@ void CDCDQMModule::defineHisto()
   m_hTDC = new TH2F("hTDC", "hTDC", 300, 0, 300, 1000, 4200, 5200);
   m_hTDC->SetTitle("TDC vs CDC-Boards;Board index;TDC");
   m_hHit = new TH2F("hHit", "hHit", 56, 0, 56, 400, 0, 400);
-  m_hHit->SetTitle("CDC-hits;layer index;nhits");
+  m_hHit->SetTitle("CDC-hits;layer number;wire number");
   m_hPhi = new TH1F("hPhi", "", 360, -180.0, 180.0);
   m_hPhi->SetTitle("CDC-track-#phi;cdctrack #phi (IP tracks + all events);entries");
   m_hPhiIndex = new TH2F("hPhiIndex", "", 360, -180.0, 180.0, 8, 0, 8.0);

@@ -279,22 +279,16 @@ def injection_validation(path, suffix):
                 xlabel="injection time", ylabel="dE/dx mean",
                 space=3, ax=ax)
 
-        # --- LER corr ---
-        ax.errorbar(df_ler['bin'], df_ler['mean'], yerr=df_ler['mean_err'],
-                    fmt='o', markersize=6, rasterized=True, label='LER corr')
+        datasets = [
+            ("LER corr",    df_ler,        "o"),
+            ("HER corr",    df_her,        "s"),
+            ("LER no corr", df_ler_nocor,  "o"),
+            ("HER no corr", df_her_nocor,  "s"),
+        ]
 
-        # --- HER corr ---
-        ax.errorbar(df_her['bin'], df_her['mean'], yerr=df_her['mean_err'],
-                    fmt='s', markersize=6, rasterized=True, label='HER corr')
-
-        # --- LER no corr ---
-        ax.errorbar(df_ler_nocor['bin'], df_ler_nocor['mean'], yerr=df_ler_nocor['mean_err'],
-                    fmt='o', markersize=6, rasterized=True, label='LER no corr')
-
-        # --- HER no corr ---
-        ax.errorbar(df_her_nocor['bin'], df_her_nocor['mean'], yerr=df_her_nocor['mean_err'],
-                    fmt='s', markersize=6, rasterized=True, label='HER no corr')
-
+        for label, df, marker in datasets:
+            ax.errorbar(df['bin'], df['mean'], yerr=df['mean_err'],
+                        fmt=marker, markersize=6, rasterized=True, label=label)
         ax.legend(fontsize=19)
         fig.suptitle("dE/dx vs Injection time: corrected vs no correction", fontsize=20)
         save_to_pdf(pdf, fig)

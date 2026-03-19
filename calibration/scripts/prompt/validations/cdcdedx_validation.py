@@ -39,10 +39,10 @@ settings = ValidationSettings(name="CDC dedx",
                                   })
 
 
-def save_plot(filename):
-    """Saves the plot with tight layout."""
-    plt.tight_layout()
-    plt.savefig(filename)
+def save_to_pdf(pdf, fig):
+    fig.tight_layout()
+    pdf.savefig(fig)
+    plt.close(fig)
 
 
 def rungain_validation(path, suffix):
@@ -78,9 +78,7 @@ def rungain_validation(path, suffix):
         ax[1].set_title('dE/dx Resolution vs Run', fontsize=14)
 
         fig.suptitle("dE/dx vs Run", fontsize=20)
-        plt.tight_layout()
-        pdf.savefig(fig)
-        plt.close()
+        save_to_pdf(pdf, fig)
 
     print(f"Saved combined PDF: {pdf_path}")
 
@@ -137,9 +135,7 @@ def wiregain_validation(path, suffix):
         ax[1, 1].set_title('dE/dx Mean vs Layer (good wires)', fontsize=14)
 
         fig.suptitle("dE/dx vs #wire", fontsize=20)
-        plt.tight_layout()
-        pdf.savefig(fig)
-        plt.close()
+        save_to_pdf(pdf, fig)
 
     print(f"Saved combined PDF: {pdf_path}")
 
@@ -213,41 +209,95 @@ def cosgain_validation(path, suffix):
         ax[1].set_title('dE/dx Resolution vs cosine', fontsize=14)
 
         fig.suptitle(r"dE/dx vs cos$\theta$", fontsize=20)
-        plt.tight_layout()
-        pdf.savefig(fig)
-        plt.close()
+        save_to_pdf(pdf, fig)
 
 
 def injection_validation(path, suffix):
+
+    cols = ["var", "bin", "mean", "mean_err", "reso", "reso_err"]
+
     try:
+        # corrected files
         val_path_ler = os.path.join(path, "plots", "injection", f"dedx_vs_inj_ler_{suffix}.txt")
         val_path_her = os.path.join(path, "plots", "injection", f"dedx_vs_inj_her_{suffix}.txt")
-        df_ler = pd.read_csv(val_path_ler, sep=" ", header=None, names=["var", "bin", "mean", "mean_err", "reso", "reso_err"])
-        df_her = pd.read_csv(val_path_her, sep=" ", header=None, names=["var", "bin", "mean", "mean_err", "reso", "reso_err"])
-    except FileNotFoundError:
-        logger.error(f"Injection data files not found in {path}/plots/injection/")
+
+        df_ler = pd.read_csv(val_path_ler, sep=r"\s+", header=None, names=cols)
+        df_her = pd.read_csv(val_path_her, sep=r"\s+", header=None, names=cols)
+
+        # no-correction files
+        val_path_ler_nocor = os.path.join(path, "plots", "injection", f"dedx_vs_inj_nocor_ler_{suffix}.txt")
+        val_path_her_nocor = os.path.join(path, "plots", "injection", f"dedx_vs_inj_nocor_her_{suffix}.txt")
+
+        df_ler_nocor = pd.read_csv(val_path_ler_nocor, sep=r"\s+", header=None, names=cols)
+        df_her_nocor = pd.read_csv(val_path_her_nocor, sep=r"\s+", header=None, names=cols)
+
+    except FileNotFoundError as e:
+        logger.error(f"Injection data file not found: {e}")
         return
 
-    df_ler['bin'] = df_ler['bin'].astype(str)
+    for df in [df_ler, df_her, df_ler_nocor, df_her_nocor]:
+        df["bin"] = df["bin"].astype(str)
 
     pdf_path = os.path.join("plots", "validation", f"dedx_mean_inj_{suffix}.pdf")
     os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
 
     with PdfPages(pdf_path) as pdf:
+
         fig, ax = plt.subplots(1, 1, figsize=(20, 6))
 
         ymin = df_ler[df_ler['mean'] > 0]['mean'].min()
         ymax = df_ler['mean'].max()
 
-        pc.hist(y_min=ymin-0.01, y_max=ymax+0.01, xlabel="injection time", ylabel="dE/dx mean", space=3, ax=ax)
-        ax.errorbar(df_ler['bin'], df_ler['mean'], yerr=df_ler['mean_err'], fmt='*', markersize=10, rasterized=True, label='LER')
-        ax.errorbar(df_her['bin'], df_her['mean'], yerr=df_her['mean_err'], fmt='*', markersize=10, rasterized=True, label='HER')
+        pc.hist(y_min=ymin - 0.01, y_max=ymax + 0.01,
+                xlabel="injection time", ylabel="dE/dx mean",
+                space=3, ax=ax)
+
+        ax.errorbar(df_ler['bin'], df_ler['mean'], yerr=df_ler['mean_err'],
+                    fmt='*', markersize=10, rasterized=True, label='LER')
+        ax.errorbar(df_her['bin'], df_her['mean'], yerr=df_her['mean_err'],
+                    fmt='*', markersize=10, rasterized=True, label='HER')
         ax.legend(fontsize=19)
 
         fig.suptitle("dE/dx vs Injection time", fontsize=20)
-        plt.tight_layout()
-        pdf.savefig(fig)
-        plt.close()
+        save_to_pdf(pdf, fig)
+
+        # --------------------------------------------------
+        # Page 2: overlay corr and no corr
+        # --------------------------------------------------
+        fig, ax = plt.subplots(1, 1, figsize=(20, 6))
+
+        all_means = pd.concat([
+            df_ler["mean"], df_her["mean"],
+            df_ler_nocor["mean"], df_her_nocor["mean"]
+        ])
+        positive_means = all_means[all_means > 0]
+
+        ymin2 = positive_means.min() if not positive_means.empty else all_means.min()
+        ymax2 = all_means.max()
+
+        pc.hist(y_min=ymin2 - 0.01, y_max=ymax2 + 0.01,
+                xlabel="injection time", ylabel="dE/dx mean",
+                space=3, ax=ax)
+
+        # --- LER corr ---
+        ax.errorbar(df_ler['bin'], df_ler['mean'], yerr=df_ler['mean_err'],
+                    fmt='o', markersize=6, rasterized=True, label='LER corr')
+
+        # --- HER corr ---
+        ax.errorbar(df_her['bin'], df_her['mean'], yerr=df_her['mean_err'],
+                    fmt='s', markersize=6, rasterized=True, label='HER corr')
+
+        # --- LER no corr ---
+        ax.errorbar(df_ler_nocor['bin'], df_ler_nocor['mean'], yerr=df_ler_nocor['mean_err'],
+                    fmt='o', markersize=6, rasterized=True, label='LER no corr')
+
+        # --- HER no corr ---
+        ax.errorbar(df_her_nocor['bin'], df_her_nocor['mean'], yerr=df_her_nocor['mean_err'],
+                    fmt='s', markersize=6, rasterized=True, label='HER no corr')
+
+        ax.legend(fontsize=19)
+        fig.suptitle("dE/dx vs Injection time: corrected vs no correction", fontsize=20)
+        save_to_pdf(pdf, fig)
 
 
 def mom_validation(path, suffix):
@@ -378,9 +428,7 @@ def oneDcell_validation(path, suffix):
         ax[1, 1].set_title('dE/dx Mean vs entaRS (OL) zoom', fontsize=14)
 
         fig.suptitle("dE/dx vs entaRS", fontsize=20)
-        plt.tight_layout()
-        pdf.savefig(fig)
-        plt.close()
+        save_to_pdf(pdf, fig)
 
 
 def run_validation(job_path, input_data_path, requested_iov, expert_config, **kwargs):
@@ -421,26 +469,21 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     logger.info("Generating validation plots...")
     val_path = os.path.join(job_path, 'validation0', '0', 'algorithm_output')
 
+    validators = [
+        ("rungain validation plots", rungain_validation),
+        ("wire gain validation plots", wiregain_validation),
+        ("cosine correction validation plots", cosgain_validation),
+        ("injection time validation plots", injection_validation),
+        ("momentum validation plots", mom_validation),
+        ("1D validation plots", oneDcell_validation),
+    ]
+
     for exp, run_list in exp_run_dict.items():
         for run in run_list:
-            logger.info("Processing rungain validation plots...")
-            suffix = f'e{exp}'
-            rungain_validation(val_path, suffix)
-
-            logger.info("Processing wire gain validation plots...")
-            wiregain_validation(val_path, suffix)
-
-            logger.info("Processing cosine correction validation plots...")
-            cosgain_validation(val_path, suffix)
-
-            logger.info("Processing injection time validation plots...")
-            injection_validation(val_path, suffix)
-
-            logger.info("Processing momentum validation plots...")
-            mom_validation(val_path, suffix)
-
-            logger.info("Processing 1D validation plots...")
-            oneDcell_validation(val_path, suffix)
+            suffix = f"e{exp}_r{run}"
+            for msg, func in validators:
+                logger.info(f"Processing {msg}...")
+                func(val_path, suffix)
 
             source_path = os.path.join(job_path, 'validation0', '0', 'algorithm_output', 'plots')
             shutil.copy(source_path+f"/costh/dedxpeaks_vs_cos_{suffix}.pdf", 'plots/validation/')

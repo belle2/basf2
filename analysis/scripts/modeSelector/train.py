@@ -8,18 +8,18 @@ This script trains the two-stage ModeSelector:
 
 Usage:
     # Train category network (single file)
-    python train.py --input modeSelector_training.npz --network category --output networks/
+    python3 train.py --input modeSelector_training.npz --network category --output networks/
 
     # Train category network (multiple files)
-    python train.py --input modeSelector_training_*.npz --network category --output networks/
+    python3 train.py --input modeSelector_training_*.npz --network category --output networks/
 
     # Train main network (requires trained category network)
-    python train.py --input modeSelector_training.npz --network main --cat_model networks/net_cat.pt --output networks/
+    python3 train.py --input modeSelector_training.npz --network main --cat_model networks/net_cat.pt --output networks/
 
 The script implements:
-- loading pre-produced training inputs
-- optional global downsampling (uniform for BB, scaled by cont_fraction for continuum)
-- sigProb preselection (applied to all events including continuum)
+- loading the sparse ModeSelector training inputs and selecting the active features
+- event sampling and sigProb preselection before network training
+- category-label and main-label construction from the stored MC truth arrays
 """
 
 import argparse

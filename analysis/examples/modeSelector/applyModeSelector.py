@@ -10,8 +10,8 @@
 
 ##########################################################################
 #                                                                        #
-# This tutorial demonstrates how to apply ModeSelector to FEI B meson   #
-# candidates for improved signal probability estimation.                 #
+# This script applies ModeSelector to FEI B meson candidates and writes  #
+# candidate-level and event-level output variables to parquet.           #
 #                                                                        #
 # Usage:                                                                 #
 #   basf2 applyModeSelector.py -- [options]                              #
@@ -38,12 +38,12 @@ parser.add_argument('--input', nargs='+',
 parser.add_argument('--output', default='modeSelector_output',
                     help='Output parquet filename or stem (default: modeSelector_output)')
 parser.add_argument('--cat-model', default=None,
-                    help='Path to category ONNX model (omit to load from conditions DB)')
+                    help='Path to category ONNX model (omit to use payloads)')
 parser.add_argument('--main-model', default=None,
-                    help='Path to main ONNX model (omit to load from conditions DB)')
-parser.add_argument('--cat-payload-name', default='modeSelector_cat_model_v0',
+                    help='Path to main ONNX model (omit to use payloads)')
+parser.add_argument('--cat-payload-name', default='modeSelector_cat_model_v2',
                     help='Conditions DB payload name for the category model')
-parser.add_argument('--main-payload-name', default='modeSelector_main_model_v0',
+parser.add_argument('--main-payload-name', default='modeSelector_main_model_v2',
                     help='Conditions DB payload name for the main model')
 parser.add_argument('--data', action='store_true',
                     help='Run in data mode: keep 10% of events with eventRandom and drop MC-only output variables')
@@ -112,6 +112,9 @@ for b in ['B+', 'B0']:
     # Apply cosTBTO cut
     ma.applyCuts(f'{b}:{fei_identifier}', 'cosTBTO < 0.9', path=my_path)
 
+    # rank by sigProb, do not cut yet
+    ma.rankByHighest(f'{b}:{fei_identifier}', 'sigProb', outputVariable='sigProb_rank', path=my_path)
+
 # Build event shape variables (sphericity, thrust, etc.) only for kept events.
 ma.buildEventShape(
     allMoments=False,
@@ -125,8 +128,7 @@ ma.buildEventShape(
     path=my_path
 )
 
-# Apply ModeSelector using local ONNX files when provided, otherwise load from
-# the configured conditions DB globaltags or testing payloads.
+# Apply ModeSelector using local ONNX files when provided, otherwise use payloads.
 # Set debug=True to print feature values for comparison.
 modeSelector.modeSelector(
     bp_list=f'B+:{fei_identifier}',
@@ -141,29 +143,11 @@ modeSelector.modeSelector(
     path=my_path
 )
 
-# only AFTER running modeSelector
-# Rank candidates by two criteria stored for offline comparison:
-# 1. sigProb_rank: pure sigProb ranking (all sigProb>0.001 candidates kept)
+# Candidates are ranked by two criteria stored for offline comparison:
+# 1. sigProb_rank: pure sigProb ranking
 # 2. modeSelector_rank: ModeSelector-based rank written by the module
-for b in ['B+', 'B0']:
-    # rank by sigProb (pure), keep all candidates for offline comparison
-    ma.rankByHighest(f'{b}:{fei_identifier}', 'sigProb',
-                     numBest=0, outputVariable='sigProb_rank', path=my_path)
 
-# sigProb of rank-1 candidate in each list (for cross-sector comparison)
-vm.addAlias('BpSigProb_rank1', 'ifNANgiveX(getVariableByRank(B+:feiHadronic, sigProb, sigProb, 1), -1)')
-vm.addAlias('B0SigProb_rank1', 'ifNANgiveX(getVariableByRank(B0:feiHadronic, sigProb, sigProb, 1), -1)')
-
-# isBestCandidate_sigProb: pure sigProb; rank-1 in the sector with the higher sigProb
-vm.addAlias('sigProbOfBpGTB0', 'conditionalVariableSelector(BpSigProb_rank1 > B0SigProb_rank1, 1, 0)')
-vm.addAlias('sigProbOfB0GTBp', 'conditionalVariableSelector(B0SigProb_rank1 > BpSigProb_rank1, 1, 0)')
-vm.addAlias(
-    'isBestCandidate_sigProb', 'conditionalVariableSelector( \
-    [[sigProbOfBpGTB0 == 1] and [abs(PDG) == 521] and [sigProb_rank == 1]] or \
-    [[sigProbOfB0GTBp == 1] and [abs(PDG) == 511] and [sigProb_rank == 1]], \
-    1, 0)'
-)
-
+# cut only AFTER running modeSelector
 # Keep at most 2 candidates per list: rank-1 by sigProb and rank-1 by eqSigProb.
 # isBestCandidate_sigProb stored in output for offline selection.
 for b in ['B+', 'B0']:
@@ -176,6 +160,20 @@ if not args.data:
         store_btag_candidate_signature=True,
         path=my_path
     )
+
+# sigProb of rank-1 candidate in each list (for cross-sector comparison)
+vm.addAlias('BpSigProb_rank1', f'ifNANgiveX(getVariableByRank(B+:{fei_identifier}, sigProb, sigProb, 1), -1)')
+vm.addAlias('B0SigProb_rank1', f'ifNANgiveX(getVariableByRank(B0:{fei_identifier}, sigProb, sigProb, 1), -1)')
+
+# isBestCandidate_sigProb: pure sigProb; rank-1 in the sector with the higher sigProb
+vm.addAlias('sigProbOfBpGTB0', 'conditionalVariableSelector(BpSigProb_rank1 > B0SigProb_rank1, 1, 0)')
+vm.addAlias('sigProbOfB0GTBp', 'conditionalVariableSelector(B0SigProb_rank1 > BpSigProb_rank1, 1, 0)')
+vm.addAlias(
+    'isBestCandidate_sigProb', 'conditionalVariableSelector( \
+    [[sigProbOfBpGTB0 == 1] and [abs(PDG) == 521] and [sigProb_rank == 1]] or \
+    [[sigProbOfB0GTBp == 1] and [abs(PDG) == 511] and [sigProb_rank == 1]], \
+    1, 0)'
+)
 
 # Create aliases for cleaner branch names in output ntuple
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
@@ -199,7 +197,6 @@ event_output_variables = [
     'modeSelector_catB0',
     'modeSelector_catBp',
     'modeSelector_catCont',
-    'modeSelector_feiCalibWeight',
 ]
 vu.create_aliases(event_output_variables, wrapper='eventExtraInfo({variable})')
 
@@ -234,6 +231,7 @@ output_variables = [
 ]
 
 if not args.data:
+    vm.addAlias('modeSelector_feiCalibWeight', 'eventExtraInfo(modeSelector_feiCalibWeight)')
     output_variables.extend([
         'genDecayModeID',
         'genFEICalibWeight',
@@ -241,6 +239,7 @@ if not args.data:
         'isContinuumEvent',
         'mostcommonBTagDeltaP',
         'mostcommonBTagPDG',
+        'modeSelector_feiCalibWeight',
     ])
 
 # Wrap B+ and B0 in a common Upsilon(4S) candidate and merge lists

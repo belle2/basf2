@@ -27,7 +27,7 @@ def plot_loss_curves(ckpt, name, ax_loss, ax_lr):
     history = ckpt.get('history')
 
     if history is None:
-        # Checkpoint predates history tracking -- show only final point
+        # Show only the best-epoch point when per-epoch history is unavailable.
         best_epoch = ckpt['epoch']
         ax_loss.scatter([best_epoch + 1], [ckpt['train_loss']], marker='o',
                         label='train (best epoch only)')
@@ -128,7 +128,7 @@ def summarise(ckpt, name):
     print(f"  Num labels:    {cfg.get('num_labels', '?')}")
     print(f"  Network type:  {cfg.get('network_type', '?')}")
     print(f"  has_inputs:    {len(ckpt.get('has_inputs', []))} features")
-    print(f"  History:       {'yes' if 'history' in ckpt else 'no (old checkpoint)'}")
+    print(f"  History:       {'yes' if 'history' in ckpt else 'no'}")
 
 
 def main():

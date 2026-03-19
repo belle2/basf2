@@ -10,7 +10,7 @@
 """Convert ModeSelector PyTorch checkpoints to ONNX format for basf2 inference.
 
 Usage:
-    python convert_to_onnx.py --input-dir networks/ --output-dir onnx/
+    python3 convert_to_onnx.py --input-dir networks/ --output-dir onnx/
 """
 
 import argparse
@@ -88,9 +88,9 @@ def main():
                         help='Directory for output ONNX files')
     parser.add_argument('--add-payloads', action='store_true',
                         help='Copy the exported ONNX files into localdb/database.txt')
-    parser.add_argument('--cat-payload-name', default='modeSelector_cat_model_v0',
+    parser.add_argument('--cat-payload-name', default='modeSelector_cat_model_v2',
                         help='Payload name for the category model')
-    parser.add_argument('--main-payload-name', default='modeSelector_main_model_v0',
+    parser.add_argument('--main-payload-name', default='modeSelector_main_model_v2',
                         help='Payload name for the main model')
     parser.add_argument('--first-exp', type=int, default=0,
                         help='First experiment of the interval of validity')

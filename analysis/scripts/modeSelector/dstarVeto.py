@@ -156,11 +156,11 @@ def addDstarVeto(
 
     # Create pi0 list for D* veto reconstruction
 
-    # old
+    # Current default pi0 list and photon-MVA configuration.
     pi0_list = 'eff50_May2020Fit'
     usePhotonMVA = True
 
-    # new TODO
+    # Optional alternative configuration kept here for future studies.
     # pi0_list = 'eff40_May2020Fit'
     # usePhotonMVA = False
 

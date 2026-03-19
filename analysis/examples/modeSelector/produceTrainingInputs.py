@@ -17,7 +17,7 @@
 # The output can be used directly for offline training.                  #
 #                                                                        #
 # Usage:                                                                 #
-#   basf2 B2A921-ProduceTrainingInputs.py -- \                           #
+#   basf2 produceTrainingInputs.py -- \                                  #
 #       --input <input_file.root> --output <output_prefix>               #
 #                                                                        #
 # Output files:                                                          #

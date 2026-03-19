@@ -86,8 +86,8 @@ def truth_tag_matches_pdg(pdg, tag_pdg, dm_id):
 #  4: Bdaughter_chiProb  (2.0 + val)
 #  5: Dst0_deltaMassDiff (1.0 + val * 20 + 0.5)
 #  6: Dstp_deltaMassDiff (1.0 + val * 20 + 0.5)
-#  7: Dst0_chiProb       (2.0 + val)
-#  8: Dstp_chiProb       (2.0 + val)
+#  7: Dst0_chiProb       (2.0 + val)  - EXCLUDED from training via has_inputs
+#  8: Dstp_chiProb       (2.0 + val)  - EXCLUDED from training via has_inputs
 #  9: deltaE             (1.0 + val * 5 + 0.75)
 # 10: Mbc                (1.0 + (val - 5.23) * 20)  - EXCLUDED from training via has_inputs
 # 11: cosTBTO            (1.0 + val)
@@ -214,8 +214,10 @@ def get_fei_calibration_rest(pdg):
     )
 
 
-# Indices to KEEP from the full 1644-feature array (all-zero columns removed,
-# Dst0_chiProb block 7 excluded, Dstp_chiProb block 8 excluded, Mbc block 10 excluded).
+# Indices to KEEP from the full 1644-feature array. Remove all-zero columns,
+# exclude Dst0_chiProb (block 7) and Dstp_chiProb (block 8) because with
+# skipTreeFit=True they do not add independent information beyond
+# Bdaughter_chiProb, and exclude Mbc (block 10).
 # train.py recomputes this dynamically and asserts equality -- update here
 # if it changes.
 HAS_INPUTS = [

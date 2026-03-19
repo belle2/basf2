@@ -211,7 +211,9 @@ def test_script(script_location, input_file_name, temp_dir):
         "--histo-output-file", os.path.join(temp_dir, f"{histos_file_name}"),
         "--output-file", os.path.abspath(output_file_name),
         "--number-processes", str(num_processes),
-        input_buffer, output_buffer, str(histo_port)
+        "--input", input_buffer,
+        "--output", output_buffer,
+        "--dqm", str(histo_port)
     ]
     subprocess.check_call(cmd1)
 

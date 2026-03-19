@@ -138,7 +138,7 @@ void CDCDedxElectronCollectorModule::collect()
     //release05: bhabha_all is grand skim = bhabha+bhabhaecl+radee
     const std::map<std::string, int>& fresults = m_trgResult->getResults();
     if (fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end() and
-        fresults.find("software_trigger_cut&skim&accept_radee") == fresults.end()) {
+        fresults.find("software_trigger_cut&skim&accept_bhabha_cdc") == fresults.end()) {
       B2WARNING("Can't find required bhabha/radee trigger identifiers");
       hestats->Fill(2);
       return;
@@ -147,7 +147,7 @@ void CDCDedxElectronCollectorModule::collect()
     const bool eBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha") ==
                           SoftwareTriggerCutResult::c_accept);
 
-    const bool eRadBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_radee") ==
+    const bool eRadBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha_cdc") ==
                              SoftwareTriggerCutResult::c_accept);
 
     if (!m_isBhabha && !m_isRadee) {

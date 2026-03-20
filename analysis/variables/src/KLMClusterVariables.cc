@@ -371,6 +371,8 @@ namespace Belle2::Variable {
   double klmClusterTrackDistance_helix_extrapolation(const Particle* particle)
   {
     const KLMCluster* cluster = particle->getKLMCluster();
+    if (!cluster)
+      return Const::doubleNaN;
     double min_dist = ClusterTrackDistance_usingHelixExtrapolate(cluster);
     return min_dist;
   }

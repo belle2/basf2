@@ -110,6 +110,8 @@ void ECLCRFinderModule::initialize()
   m_cellIdToTempCRIdVec.resize(8737); /**< cellid -> CR. */
   m_calDigitStoreArrPosition.resize(8737);
 
+  m_adj.resize(8737);
+  m_visited.resize(8737);
 }
 
 void ECLCRFinderModule::beginRun()
@@ -270,12 +272,13 @@ std::vector<std::set<int>> ECLCRFinderModule::mergeVectorsUsingBFSTraversal(std:
 
   // 1. Data Structures for lookup
   // We use a fixed-size adjacency list for all crystals (Max ID 8736)
-  std::vector<std::vector<int>> adj(8737);
-  std::vector<bool> visited(8737, false);
   std::vector<int> relevantNodes;
-
-  // Reserve memory to prevent reallocations
   relevantNodes.reserve(A.size() * 4);
+
+  for (int node = 0; node < 8737; ++node) {
+    m_adj[node].clear();
+    m_visited[node] = false;
+  }
 
   // 2. Build the Graph
   // If a vector contains {1, 2, 3}, we mark them as connected neighbors.
@@ -290,21 +293,21 @@ std::vector<std::set<int>> ECLCRFinderModule::mergeVectorsUsingBFSTraversal(std:
       relevantNodes.push_back(neighbor);
 
       // Add bi-directional edges
-      adj[root].push_back(neighbor);
-      adj[neighbor].push_back(root);
+      m_adj[root].push_back(neighbor);
+      m_adj[neighbor].push_back(root);
     }
   }
 
   // 3. Find Connected Components (BFS)
   // We only iterate over nodes that actually appeared in the event.
   for (int startNode : relevantNodes) {
-    if (visited[startNode]) continue;
+    if (m_visited[startNode]) continue;
 
     // Start a new cluster
     std::set<int> component;
     std::vector<int> q; // BFS Queue
 
-    visited[startNode] = true;
+    m_visited[startNode] = true;
     q.push_back(startNode);
     component.insert(startNode);
 
@@ -312,9 +315,9 @@ std::vector<std::set<int>> ECLCRFinderModule::mergeVectorsUsingBFSTraversal(std:
     while (head < static_cast<int>(q.size())) {
       int u = q[head++];
 
-      for (int v : adj[u]) {
-        if (!visited[v]) {
-          visited[v] = true;
+      for (int v : m_adj[u]) {
+        if (!m_visited[v]) {
+          m_visited[v] = true;
           component.insert(v);
           q.push_back(v);
         }

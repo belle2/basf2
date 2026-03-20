@@ -97,6 +97,10 @@ namespace Belle2 {
     /** Neighbour maps. */
     std::vector<ECL::ECLNeighbours*> m_neighbourMaps;
 
+    /** Vectors for BFS search. */
+    std::vector<std::vector<int>> m_adj; /**< Adjacency list for all crystals. */
+    std::vector<bool> m_visited; /**< Vector to keep track in BFS */
+
     /** Convert vector of cell ids to 0/1 vectors from 1-8737. */
     std::vector<int> oneHotVector(std::vector<int>& A, const int n);
 

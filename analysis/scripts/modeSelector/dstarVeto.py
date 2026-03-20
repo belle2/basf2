@@ -23,6 +23,7 @@ import math
 
 import basf2 as b2
 import modularAnalysis as ma
+from ROOT import Belle2
 from variables import variables as vm
 
 
@@ -40,7 +41,6 @@ class _SetDstarVetoDefaults(b2.Module):
         self._keys = keys
 
     def event(self):
-        from ROOT import Belle2
         for list_name in self._particle_lists:
             plist = Belle2.PyStoreObj(list_name)
             if not plist.isValid():

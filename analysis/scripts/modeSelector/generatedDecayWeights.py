@@ -530,6 +530,13 @@ class GeneratedDecayWeightModule(b2.Module):
                     self._set_extra_info(particle, key, float(value))
 
     def event(self):
+        bp_plist = Belle2.PyStoreObj(self.bp_list)
+        b0_plist = Belle2.PyStoreObj(self.b0_list)
+        bp_empty = not bp_plist.isValid() or bp_plist.getListSize() == 0
+        b0_empty = not b0_plist.isValid() or b0_plist.getListSize() == 0
+        if bp_empty and b0_empty:
+            return
+
         mc_particles = Belle2.PyStoreArray('MCParticles')
         particles = [mc_particles[index] for index in range(mc_particles.getEntries())]
         truth_cache = _build_event_truth_cache(

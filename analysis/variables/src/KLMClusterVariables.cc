@@ -494,7 +494,7 @@ Returns the number of Tracks matched to the KLMCluster associated to this Partic
                      Returns the number of ECLClusters matched to the KLMCluster associated to this Particle.
               )DOC");
   REGISTER_VARIABLE("klmClusterTrackDistance_helix_extrapolation", klmClusterTrackDistance_helix_extrapolation, R"DOC(
-This also returns the distance between KLM cluster and its closes track, but calculated using helix extrapolation. This variable returns :math:`NAN` if there is no Track-to-KLMCluster relationship.
+This also returns the distance between KLM cluster and its closes track, but calculated using helix extrapolation. This variable returns `NAN` if there is no Track-to-KLMCluster relationship.
 
 .. note::
   This is only an approximation of the cluster-track distance that is intended to be used for mDSTs processed with release-09 or earlier. For mDSTs created using release-10 or later please use `klmClusterTrackDistance`.

@@ -12,22 +12,17 @@ Decay vpho
 Enddecay
 
 Alias Myanti-D0 anti-D0
-Alias Myeta_1 eta
-Alias Myeta_2 eta
+Alias Myeta eta
 
 Decay D*-sig
 1.000 Myanti-D0 pi-  VSS;
 Enddecay
 
 Decay Myanti-D0
-1.000 Myeta_1 Myeta_2    PHSP;
+1.000 Myeta Myeta    PHSP;
 Enddecay
 
-Decay Myeta_1
-1.000 gamma gamma       PHSP;
-Enddecay
-
-Decay Myeta_2
+Decay Myeta
 1.000 gamma gamma       PHSP;
 Enddecay
 

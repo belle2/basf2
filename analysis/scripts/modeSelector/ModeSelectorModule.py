@@ -144,22 +144,29 @@ class ModeSelectorModule(b2.Module):
         self.has_inputs = list(config.HAS_INPUTS)
         b2.B2INFO(f"ModeSelector: Using config.HAS_INPUTS ({len(self.has_inputs)} features kept)")
 
+        # Use single-threaded execution to avoid thread pool contention with
+        # other ONNX sessions in the same basf2 path (e.g. MVAMultipleExperts).
+        sess_opts = ort.SessionOptions()
+        sess_opts.intra_op_num_threads = 1
+        sess_opts.inter_op_num_threads = 1
+        sess_opts.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+
         # Load models from files or database
         if self.cat_model_path:
-            self.cat_session = ort.InferenceSession(self.cat_model_path)
+            self.cat_session = ort.InferenceSession(self.cat_model_path, sess_opts)
         else:
             db_accessor = Belle2.DBAccessorBase(
                 Belle2.DBStoreEntry.c_RawFile, self.payload_cat_model, True
             )
-            self.cat_session = ort.InferenceSession(db_accessor.getFilename())
+            self.cat_session = ort.InferenceSession(db_accessor.getFilename(), sess_opts)
 
         if self.main_model_path:
-            self.main_session = ort.InferenceSession(self.main_model_path)
+            self.main_session = ort.InferenceSession(self.main_model_path, sess_opts)
         else:
             db_accessor = Belle2.DBAccessorBase(
                 Belle2.DBStoreEntry.c_RawFile, self.payload_main_model, True
             )
-            self.main_session = ort.InferenceSession(db_accessor.getFilename())
+            self.main_session = ort.InferenceSession(db_accessor.getFilename(), sess_opts)
 
         #: Category model input name
         self.cat_input_name = self.cat_session.get_inputs()[0].name

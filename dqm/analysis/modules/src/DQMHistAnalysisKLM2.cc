@@ -267,7 +267,7 @@ void DQMHistAnalysisKLM2Module::endRun()
     else
       name += "F";
     name += std::to_string(bin % bklmMaxSector);
-    m_monObj->setVariable(name, m_eff_bklm_sector->GetBinContent(bin + 1));
+    m_monObj->setVariable(name, m_eff_bklm_sector->GetBinContent(bin + 1), m_eff_bklm_sector->GetBinError(bin + 1));
   }
 
   for (int bin = 0; bin < m_eff_eklm_sector->GetXaxis()->GetNbins(); bin++) {
@@ -277,7 +277,7 @@ void DQMHistAnalysisKLM2Module::endRun()
     else
       name += "F";
     name += std::to_string(bin % eklmLocalMaxSector);
-    m_monObj->setVariable(name, m_eff_eklm_sector->GetBinContent(bin + 1));
+    m_monObj->setVariable(name, m_eff_eklm_sector->GetBinContent(bin + 1), m_eff_eklm_sector->GetBinError(bin + 1));
   }
 
   // Looping over the planes
@@ -290,7 +290,7 @@ void DQMHistAnalysisKLM2Module::endRun()
       name += "F";
     }
     name += std::to_string(int(layer / bklmMaxLayer) % bklmMaxSector) + "_layer" + std::to_string(1 + (layer % bklmMaxLayer));
-    m_monObj->setVariable(name, m_eff_bklm->GetBinContent(layer + 1));
+    m_monObj->setVariable(name, m_eff_bklm->GetBinContent(layer + 1), m_eff_bklm->GetBinError(layer + 1));
   }
   for (int layer = 0; layer < m_eff_eklm->GetXaxis()->GetNbins(); layer++) {
     name = "eff_E";
@@ -299,7 +299,7 @@ void DQMHistAnalysisKLM2Module::endRun()
     else
       name += "F" + std::to_string(layer / eklmGlobalMaxSector - eklmBLayerCount + 1);
     name +=  + "_num" + std::to_string(((layer) % eklmGlobalMaxSector) + 1);
-    m_monObj->setVariable(name, m_eff_eklm->GetBinContent(layer + 1));
+    m_monObj->setVariable(name, m_eff_eklm->GetBinContent(layer + 1), m_eff_eklm->GetBinError(layer + 1));
 
   }
 }

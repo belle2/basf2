@@ -9,7 +9,7 @@
 ##########################################################################
 
 import basf2 as b2
-from geometry import check_components
+from geometry import check_components, is_detector_present
 from pxd import add_pxd_packer, add_pxd_unpacker
 from svd import add_svd_packer, add_svd_unpacker
 from neurotrigger import add_neuro_2d_unpackers
@@ -31,35 +31,35 @@ def add_packers(path, components=None):
         path.add_module("Geometry")
 
     # PXD
-    if components is None or 'PXD' in components:
+    if is_detector_present("PXD", components):
         add_pxd_packer(path)
 
     # SVD
-    if components is None or 'SVD' in components:
+    if is_detector_present("SVD", components):
         add_svd_packer(path)
 
     # CDC
-    if components is None or 'CDC' in components:
+    if is_detector_present("CDC", components):
         cdcpacker = b2.register_module('CDCPacker')
         path.add_module(cdcpacker)
 
     # ECL
-    if components is None or 'ECL' in components:
+    if is_detector_present("ECL", components):
         eclpacker = b2.register_module('ECLPacker')
         path.add_module(eclpacker)
 
     # TOP
-    if components is None or 'TOP' in components:
+    if is_detector_present("TOP", components):
         toppacker = b2.register_module('TOPPacker')
         path.add_module(toppacker)
 
     # ARICH
-    if components is None or 'ARICH' in components:
+    if is_detector_present("ARICH", components):
         arichpacker = b2.register_module('ARICHPacker')
         path.add_module(arichpacker)
 
     # KLM
-    if components is None or 'KLM' in components:
+    if is_detector_present("KLM", components):
         klmpacker = b2.register_module('KLMPacker')
         path.add_module(klmpacker)
 
@@ -89,28 +89,28 @@ def add_unpackers(path, components=None, writeKLMDigitRaws=False, addTOPRelation
         path.add_module('TTDUnpacker')
 
     # PXD
-    if components is None or 'PXD' in components:
+    if is_detector_present("PXD", components):
         add_pxd_unpacker(path)
 
     # SVD
-    if components is None or 'SVD' in components:
+    if is_detector_present("SVD", components):
         add_svd_unpacker(path)
 
     # CDC
-    if components is None or 'CDC' in components:
+    if is_detector_present("CDC", components):
         cdcunpacker = b2.register_module('CDCUnpacker')
         cdcunpacker.param('enableStoreCDCRawHit', True)
         cdcunpacker.param('enablePrintOut', False)
         path.add_module(cdcunpacker)
 
     # ECL
-    if components is None or 'ECL' in components:
+    if is_detector_present("ECL", components):
         eclunpacker = b2.register_module('ECLUnpacker')
         eclunpacker.param("storeTrigTime", True)
         path.add_module(eclunpacker)
 
     # TOP
-    if components is None or 'TOP' in components:
+    if is_detector_present("TOP", components):
         topunpacker = b2.register_module('TOPUnpacker')
         topunpacker.param('addRelations', addTOPRelations)
         path.add_module(topunpacker)
@@ -119,18 +119,18 @@ def add_unpackers(path, components=None, writeKLMDigitRaws=False, addTOPRelation
         path.add_module(topconverter)
 
     # ARICH
-    if components is None or 'ARICH' in components:
+    if is_detector_present("ARICH", components):
         arichunpacker = b2.register_module('ARICHUnpacker')
         path.add_module(arichunpacker)
 
     # KLM
-    if components is None or 'KLM' in components:
+    if is_detector_present("KLM", components):
         klmunpacker = b2.register_module('KLMUnpacker')
         klmunpacker.param('WriteDigitRaws', writeKLMDigitRaws)
         path.add_module(klmunpacker)
 
     # TRG
-    if components is None or 'TRG' in components:
+    if is_detector_present("TRG", components):
 
         trggdlunpacker = b2.register_module('TRGGDLUnpacker')
         path.add_module(trggdlunpacker)

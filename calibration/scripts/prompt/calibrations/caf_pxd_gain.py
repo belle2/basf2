@@ -29,7 +29,7 @@ settings = CalibrationSettings(name="PXD gain calibration",
                                input_data_names=["physics"],
                                input_data_filters={
                                    "physics": [
-                                       INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
+                                       INPUT_DATA_FILTERS["Data Tag"]["bhabha_combined_calib"],
                                        INPUT_DATA_FILTERS["Beam Energy"]["4S"],
                                        INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
                                        INPUT_DATA_FILTERS["Beam Energy"]["Scan"],

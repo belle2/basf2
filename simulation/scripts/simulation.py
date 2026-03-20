@@ -9,7 +9,7 @@
 ##########################################################################
 
 import basf2 as b2
-from geometry import check_components
+from geometry import check_components, is_detector_present
 from L1trigger import add_trigger_simulation
 from pxd import add_pxd_simulation
 from svd import add_svd_simulation
@@ -172,7 +172,7 @@ def add_simulation(
                 bkgmixer.param('components', components)
             path.add_module(bkgmixer)
             if usePXDGatedMode:
-                if components is None or 'PXD' in components:
+                if is_detector_present("PXD", components):
                     # PXD is sensitive to hits in interval -20us to +20us
                     bkgmixer.param('minTimePXD', -20000.0)
                     bkgmixer.param('maxTimePXD', 20000.0)
@@ -214,30 +214,30 @@ def add_simulation(
     # have them in the path more than once
 
     # CDC digitization
-    if components is None or 'CDC' in components:
+    if is_detector_present("CDC", components):
         cdc_digitizer = b2.register_module('CDCDigitizer')
         cdc_digitizer.param("Output2ndHit", generate_2nd_cdc_hits)
         path.add_module(cdc_digitizer)
 
     # TOP digitization
-    if components is None or 'TOP' in components:
+    if is_detector_present("TOP", components):
         top_digitizer = b2.register_module('TOPDigitizer')
         path.add_module(top_digitizer)
 
     # ARICH digitization
-    if components is None or 'ARICH' in components:
+    if is_detector_present("ARICH", components):
         arich_digitizer = b2.register_module('ARICHDigitizer')
         path.add_module(arich_digitizer)
 
     # ECL digitization
-    if components is None or 'ECL' in components:
+    if is_detector_present("ECL", components):
         ecl_digitizer = b2.register_module('ECLDigitizer')
         if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
     # KLM digitization
-    if components is None or 'KLM' in components:
+    if is_detector_present("KLM", components):
         klm_digitizer = b2.register_module('KLMDigitizer')
         path.add_module(klm_digitizer)
 
@@ -246,7 +246,7 @@ def add_simulation(
         m = path.add_module('BGOverlayExecutor', components=['CDC', 'TOP', 'ARICH', 'KLM'])
         m.set_name('BGOverlayExecutor_CDC...KLM')
 
-    if components is None or 'TRG' in components:
+    if is_detector_present("TRG", components):
         if bkgfiles is not None and bkgOverlay:
             # BG Overlay for CDCTRG. That for KLMTRG is already covered by BG Overlay
             # for KLM. ECL and ECLTRG are already covered independently.
@@ -255,7 +255,7 @@ def add_simulation(
         add_trigger_simulation(path, simulateT0jitter=simulateT0jitter, FilterEvents=FilterEvents)
 
     # SVD digitization, BG Overlay, sorting and zero suppression
-    if components is None or 'SVD' in components:
+    if is_detector_present("SVD", components):
         add_svd_simulation(path)
         if bkgfiles is not None and bkgOverlay:
             m = path.add_module('BGOverlayExecutor', components=['SVD'])
@@ -264,7 +264,7 @@ def add_simulation(
         path.add_module('SVDZeroSuppressionEmulator')
 
     # PXD digitization, BG overlay, sorting and data reduction
-    if components is None or 'PXD' in components:
+    if is_detector_present("PXD", components):
         if forceSetPXDDataReduction:
             pxd_digits_name = ''
             if usePXDDataReduction:

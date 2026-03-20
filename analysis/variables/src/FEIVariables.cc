@@ -13,6 +13,8 @@
 #include <analysis/VariableManager/Manager.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
 #include <map>
@@ -125,6 +127,27 @@ namespace Belle2 {
         return double(wrong_FEI) / double(truthFSPTag(index).size());
       }
     }
+    double mostcommonBTagDeltaP(const Particle* part)
+    {
+      int idx = mostcommonBTagIndex(part);
+      if (idx < 0) return Const::doubleNaN;
+
+      StoreArray<MCParticle> mcParticles;
+      PCmsLabTransform T;
+      ROOT::Math::XYZVector recoP3 = (T.rotateLabToCms() * part->get4Vector()).Vect();
+      ROOT::Math::XYZVector genP3 = (T.rotateLabToCms() * mcParticles[idx]->get4Vector()).Vect();
+      return (recoP3 - genP3).R();
+    }
+
+    double mostcommonBTagPDG(const Particle* part)
+    {
+      int idx = mostcommonBTagIndex(part);
+      if (idx < 0) return Const::doubleNaN;
+
+      StoreArray<MCParticle> mcParticles;
+      return mcParticles[idx]->getPDG();
+    }
+
     VARIABLE_GROUP("FEIVariables");
     REGISTER_VARIABLE("mostcommonBTagIndex", mostcommonBTagIndex,
                       "By giving e.g. a FEI B meson candidate the B meson index on generator level is determined, where most reconstructed particles can be assigned to. If no B meson found on generator level -1 is returned.");
@@ -132,5 +155,14 @@ namespace Belle2 {
                       "Get the percentage of missing particles by using the mostcommonBTagIndex. So the number of particles not reconstructed by e.g. the FEI are determined and divided by the number of generated particles using the given index of the B meson. If no B meson found on generator level -1 is returned.");
     REGISTER_VARIABLE("percentageWrongParticlesBTag", percentageWrongParticlesBTag,
                       "Get the percentage of wrong particles by using the mostcommonBTagIndex. In this context wrong means that the reconstructed particles originated from the other B meson. The absolute number is divided by the total number of generated FSP from the given B meson index. If no B meson found on generator level -1 is returned.");
+    REGISTER_VARIABLE("mostcommonBTagDeltaP", mostcommonBTagDeltaP,
+                      "Returns the magnitude of the 3-momentum difference in CMS frame between the "
+                      "reconstructed particle and the generated B meson identified by mostcommonBTagIndex. "
+                      "Returns NaN if no B meson is found on generator level.", "GeV/c");
+    REGISTER_VARIABLE("mostcommonBTagPDG", mostcommonBTagPDG,
+                      "Returns the PDG code of the generated B meson identified by mostcommonBTagIndex. "
+                      "Returns NaN if no B meson is found on generator level. "
+                      "Note: this is equivalent to ``genParticle(mostcommonBTagIndex, PDG)``. "
+                      "Other variables can be accessed the same way by replacing ``PDG`` with any variable.");
   }
 }

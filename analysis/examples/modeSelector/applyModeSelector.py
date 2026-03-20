@@ -216,7 +216,6 @@ output_variables = [
     'modeSelector_catB0',
     'modeSelector_catBp',
     'modeSelector_catCont',
-    'modeSelector_feiCalibWeight',
     'PDG',
     # D* veto variables
     'Dstp_deltaMassDiff',

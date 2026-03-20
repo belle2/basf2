@@ -57,6 +57,7 @@ class ModeSelectorModule(b2.Module):
         payload_cat_model='modeSelector_cat_model_v2',
         payload_main_model='modeSelector_main_model_v2',
         training_mode=False,
+        skip_nn_evaluation=False,
         training_output='modeSelector_training.npz',
         debug=False,
         debug_max_events=10,
@@ -76,6 +77,8 @@ class ModeSelectorModule(b2.Module):
         self.payload_main_model = payload_main_model
         #: Training mode (save features + MC truth, skip NN inference)
         self.training_mode = training_mode
+        #: Skip NN inference and fill deterministic placeholder outputs
+        self.skip_nn_evaluation = skip_nn_evaluation
         #: Output file for training mode
         self.training_output = training_output
         #: Training storage (columnar buffers)
@@ -124,6 +127,16 @@ class ModeSelectorModule(b2.Module):
         if self.training_mode:
             b2.B2INFO("ModeSelector: Running in TRAINING mode (saving features, no NN inference)")
             self.has_inputs = None
+            return
+
+        if self.skip_nn_evaluation:
+            self.has_inputs = list(config.HAS_INPUTS)
+            self.cat_input_size = len(self.has_inputs)
+            self.main_input_size = self.cat_input_size + 4
+            b2.B2INFO("ModeSelector: Running with NN evaluation disabled")
+            b2.B2INFO(
+                f"ModeSelector: Using placeholder outputs with {self.cat_input_size} selected features"
+            )
             return
 
         import onnxruntime as ort
@@ -433,6 +446,15 @@ class ModeSelectorModule(b2.Module):
                 return calib_map.get(int(gen_dm_v), calib_rest)
             return np.nan
         return np.nan
+
+    def _get_placeholder_outputs(self, features):
+        """Return deterministic placeholder category and main-network outputs."""
+        cat_output = np.array([0.2, 0.7, 0.1], dtype=np.float32)
+        main_output = np.full(config.N_INPUT_IDS + 3, 0.01, dtype=np.float32)
+        main_output[config.N_INPUT_IDS] = 0.005
+        main_output[config.N_INPUT_IDS + 1] = 0.002
+        main_output[config.N_INPUT_IDS + 2] = 0.001
+        return cat_output, main_output
 
     def _extract_mc_truth_scalars(self, particle):
         """Extract compact MC truth scalars used by training output."""
@@ -917,25 +939,29 @@ class ModeSelectorModule(b2.Module):
                 f"The ONNX model and current config must match."
             )
 
-        # Run category network
-        cat_input = features.reshape(1, -1).astype(np.float32)
-        cat_output = self.cat_session.run(None, {self.cat_input_name: cat_input})[0][0]
+        if self.skip_nn_evaluation:
+            cat_output, main_output = self._get_placeholder_outputs(features)
+            charged_cat = 1.0 if cat_output[1] > cat_output[0] else 0.0
+        else:
+            # Run category network
+            cat_input = features.reshape(1, -1).astype(np.float32)
+            cat_output = self.cat_session.run(None, {self.cat_input_name: cat_input})[0][0]
 
-        # Determine predicted category (0=B0, 1=B+, 2=continuum)
-        charged_cat = 1.0 if cat_output[1] > cat_output[0] else 0.0
+            # Determine predicted category (0=B0, 1=B+, 2=continuum)
+            charged_cat = 1.0 if cat_output[1] > cat_output[0] else 0.0
 
-        # Build main network input (features + cat_output + charged_cat)
-        main_features = np.concatenate([features, cat_output, [charged_cat]])
+            # Build main network input (features + cat_output + charged_cat)
+            main_features = np.concatenate([features, cat_output, [charged_cat]])
 
-        if len(main_features) != self.main_input_size:
-            b2.B2FATAL(
-                f"ModeSelector: main model input size mismatch: "
-                f"got {len(main_features)} features, model expects {self.main_input_size}. "
-                f"The ONNX model and current config must match."
-            )
+            if len(main_features) != self.main_input_size:
+                b2.B2FATAL(
+                    f"ModeSelector: main model input size mismatch: "
+                    f"got {len(main_features)} features, model expects {self.main_input_size}. "
+                    f"The ONNX model and current config must match."
+                )
 
-        main_input = main_features.reshape(1, -1).astype(np.float32)
-        main_output = self.main_session.run(None, {self.main_input_name: main_input})[0][0]
+            main_input = main_features.reshape(1, -1).astype(np.float32)
+            main_output = self.main_session.run(None, {self.main_input_name: main_input})[0][0]
         self._inference_event_count += 1
 
         # Extract scores
@@ -961,12 +987,15 @@ class ModeSelectorModule(b2.Module):
         if predicted_input_ids:
             max_mode_prob = max(float(main_output[iid]) for iid in predicted_input_ids)
         else:
-            # fallback to the best predicted-sector mode output, also considering bad_tag
+            # fallback to the sum of predicted-sector mode outputs + bad_tag
+            # transforming to 2 * (sum_mode_prob - 0.5) if sum_mode_prob > 0.5, else 0.0
+            # this is to ensure low values for events when the overall predicted-sector confidence is low
             bad_tag_prob = float(main_output[config.N_INPUT_IDS])
             if charged_cat:
-                max_mode_prob = max(float(np.max(main_output[:bp_threshold])), bad_tag_prob)
+                sum_mode_prob = np.sum(main_output[:bp_threshold]) + bad_tag_prob
             else:
-                max_mode_prob = max(float(np.max(main_output[bp_threshold:config.N_INPUT_IDS])), bad_tag_prob)
+                sum_mode_prob = np.sum(main_output[bp_threshold:config.N_INPUT_IDS]) + bad_tag_prob
+            max_mode_prob = np.clip(2 * (sum_mode_prob - 0.5), 0.0, None)
             self._empty_predicted_sector_count += 1
         bp_score = sign * max_mode_prob
         is_high_conf = abs(bp_score) > config.HIGH_CONF_BPLUSSCORE_ABS

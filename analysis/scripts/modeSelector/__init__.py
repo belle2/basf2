@@ -63,6 +63,7 @@ def modeSelector(
     output_variable='BplusScore',
     addDstarVetoReco=True,
     training_mode=False,
+    skip_nn_evaluation=False,
     training_output='modeSelector_training.npz',
     debug=False,
     debug_max_events=10,
@@ -105,6 +106,10 @@ def modeSelector(
     output_variable : str
         Name of the ExtraInfo variable for the output score.
         Default: 'BplusScore'
+    skip_nn_evaluation : bool
+        If True, skip loading and evaluating the neural networks and fill
+        deterministic placeholder outputs instead. Intended for debugging or
+        timing studies and emits a warning at module initialization.
     addDstarVetoReco : bool
         Whether to add D* veto reconstruction before the NN.
         Default: True
@@ -192,6 +197,7 @@ def modeSelector(
         payload_main_model=payload_main_model,
         output_variable=output_variable,
         training_mode=training_mode,
+        skip_nn_evaluation=skip_nn_evaluation,
         training_output=training_output,
         debug=debug,
         debug_max_events=debug_max_events,

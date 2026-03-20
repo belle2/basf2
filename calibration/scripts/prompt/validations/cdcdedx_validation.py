@@ -13,23 +13,18 @@ Validation plots for CDC dedx calibration.
 import sys
 import os
 import json
-import logging
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 import shutil
-
+import basf2
 import process_wiregain as pw
 import process_cosgain as pc
 import process_onedcell as oned
 import process_rungain as rg
 
 from prompt import ValidationSettings
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 settings = ValidationSettings(name="CDC dedx",
                               description=__doc__,
@@ -45,33 +40,48 @@ def save_to_pdf(pdf, fig):
     plt.close(fig)
 
 
+def read_txt(filepath, columns, sep=r"\s+"):
+    if not os.path.exists(filepath):
+        basf2.B2ERROR(f"File not found: {filepath}")
+        return None
+    return pd.read_csv(filepath, sep=sep, header=None, names=columns)
+
+
+def make_pdf_path(prefix, suffix):
+    pdf_path = os.path.join("plots", "validation", f"{prefix}_{suffix}.pdf")
+    os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+    return pdf_path
+
+
+def get_positive_minmax(series):
+    positive = series[series > 0]
+    ymin = positive.min() if not positive.empty else series.min()
+    ymax = series.max()
+    return ymin, ymax
+
+
 def rungain_validation(path, suffix):
-    try:
-        val_path = os.path.join(path, "plots", "run", f"dedx_vs_run_{suffix}.txt")
-        df = pd.read_csv(val_path, sep=" ", header=None, names=["run", "mean", "mean_err", "reso", "reso_err"])
-    except FileNotFoundError:
-        logger.error(f"File {val_path} not found!")
+    val_path = os.path.join(path, "plots", "run", f"dedx_vs_run_{suffix}.txt")
+    df = read_txt(val_path, ["run", "mean", "mean_err", "reso", "reso_err"])
+    if df is None:
         return
 
     df['run'] = df['run'].astype(str)
 
-    pdf_path = os.path.join("plots", "validation", f"dedx_vs_run_{suffix}.pdf")
-    os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+    pdf_path = make_pdf_path("dedx_vs_run", suffix)
 
     with PdfPages(pdf_path) as pdf:
         fig, ax = plt.subplots(1, 2, figsize=(20, 6))
 
         # Mean plot
-        ymin = df[df['mean'] > 0]['mean'].min()
-        ymax = df['mean'].max()
+        ymin, ymax = get_positive_minmax(df['mean'])
         pc.hist(y_min=ymin-0.02, y_max=ymax+0.02, xlabel="Run range", ylabel="dE/dx mean", space=30, ax=ax[0])
         ax[0].errorbar(df['run'], df['mean'], yerr=df['mean_err'], fmt='*', markersize=8, rasterized=True, label='Bhabha mean')
         ax[0].legend(fontsize=12)
         ax[0].set_title('dE/dx Mean vs Run', fontsize=14)
 
         # Reso plot
-        ymin = df[df['reso'] > 0]['reso'].min()
-        ymax = df['reso'].max()
+        ymin, ymax = get_positive_minmax(df['reso'])
         pc.hist(y_min=ymin-0.01, y_max=ymax+0.01, xlabel="Run range", ylabel="dE/dx reso", space=30, ax=ax[1])
         ax[1].errorbar(df['run'], df['reso'], yerr=df['reso_err'], fmt='*', markersize=8, rasterized=True, label='Bhabha reso')
         ax[1].legend(fontsize=12)
@@ -80,56 +90,44 @@ def rungain_validation(path, suffix):
         fig.suptitle("dE/dx vs Run", fontsize=20)
         save_to_pdf(pdf, fig)
 
-    print(f"Saved combined PDF: {pdf_path}")
-
 
 def wiregain_validation(path, suffix):
-    pdf_path = os.path.join("plots", "validation", f"dedx_vs_wire_layer_{suffix}.pdf")
-    os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+
+    val_path_gwire = os.path.join(path, "plots", "wire", f"dedx_mean_gwire_{suffix}.txt")
+    val_path_bwire = os.path.join(path, "plots", "wire", f"dedx_mean_badwire_{suffix}.txt")
+    val_path_layer = os.path.join(path, "plots", "wire", f"dedx_mean_layer_{suffix}.txt")
+
+    df_gwire = read_txt(val_path_gwire, ["wire", "mean"])
+    df_bwire = read_txt(val_path_bwire, ["wire", "mean"])
+    df_layer = read_txt(val_path_layer, ["layer", "mean", "gmean"])
+
+    if df_gwire is None or df_bwire is None or df_layer is None:
+        return
+
+    pdf_path = make_pdf_path("dedx_vs_wire_layer", suffix)
 
     with PdfPages(pdf_path) as pdf:
         fig, ax = plt.subplots(2, 2, figsize=(20, 12))
 
-        # Wire plot
-        try:
-            val_path_gwire = os.path.join(path, "plots", "wire", f"dedx_mean_gwire_{suffix}.txt")
-            df_gwire = pd.read_csv(val_path_gwire, sep=" ", header=None, names=["wire", "mean"])
-            val_path_bwire = os.path.join(path, "plots", "wire", f"dedx_mean_badwire_{suffix}.txt")
-            df_bwire = pd.read_csv(val_path_bwire, sep=" ", header=None, names=["wire", "mean"])
-        except FileNotFoundError:
-            print(f"File not found: {val_path_gwire}")
-            return
-
-        ymin = df_gwire['mean'].min()
-        ymax = df_gwire['mean'].max()
+        ymin, ymax = get_positive_minmax(df_gwire['mean'])
 
         pc.hist(y_min=ymin-0.05, y_max=ymax+0.05, xlabel="Wire", ylabel="dE/dx mean", space=1000, ax=ax[0, 0])
         ax[0, 0].plot(df_gwire['wire'], df_gwire['mean'], '*', markersize=5, rasterized=True)
         ax[0, 0].set_title('dE/dx Mean vs good Wire', fontsize=14)
 
-        ymin = df_bwire['mean'].min()
-        ymax = df_bwire['mean'].max()
+        ymin, ymax = get_positive_minmax(df_bwire['mean'])
+
         pc.hist(y_min=ymin-0.05, y_max=ymax+0.05, xlabel="Wire", ylabel="dE/dx mean", space=1000, ax=ax[1, 0])
         ax[1, 0].plot(df_bwire['wire'], df_bwire['mean'], '*', markersize=5, rasterized=True)
         ax[1, 0].set_title('dE/dx Mean vs bad Wire', fontsize=14)
 
-        # Layer plot
-        try:
-            val_path_layer = os.path.join(path, "plots", "wire", f"dedx_mean_layer_{suffix}.txt")
-            df_layer = pd.read_csv(val_path_layer, sep=" ", header=None, names=["layer", "mean", "gmean"])
-        except FileNotFoundError:
-            print(f"File not found: {val_path_layer}")
-            return
-
-        ymin = df_layer['mean'].min()
-        ymax = df_layer['mean'].max()
+        ymin, ymax = get_positive_minmax(df_layer['mean'])
 
         pc.hist(x_min=0, x_max=56, y_min=ymin-0.05, y_max=ymax+0.05, xlabel="Layer", ylabel="dE/dx mean", space=3, ax=ax[0, 1])
         ax[0, 1].plot(df_layer['layer'], df_layer['mean'], '*', markersize=10, rasterized=True)
         ax[0, 1].set_title('dE/dx Mean vs Layer', fontsize=14)
 
-        ymin = df_layer['gmean'].min()
-        ymax = df_layer['gmean'].max()
+        ymin, ymax = get_positive_minmax(df_layer['gmean'])
         pc.hist(x_min=0, x_max=56, y_min=ymin-0.02, y_max=ymax+0.02, xlabel="Layer", ylabel="dE/dx mean", space=3, ax=ax[1, 1])
         ax[1, 1].plot(df_layer['layer'], df_layer['gmean'], '*', markersize=10, rasterized=True)
         ax[1, 1].set_title('dE/dx Mean vs Layer (good wires)', fontsize=14)
@@ -137,17 +135,15 @@ def wiregain_validation(path, suffix):
         fig.suptitle("dE/dx vs #wire", fontsize=20)
         save_to_pdf(pdf, fig)
 
-    print(f"Saved combined PDF: {pdf_path}")
-
 
 def cosgain_validation(path, suffix):
-    try:
-        val_path_el = os.path.join(path, "plots", "costh", f"dedx_vs_cos_electrons_{suffix}.txt")
-        val_path_po = os.path.join(path, "plots", "costh", f"dedx_vs_cos_positrons_{suffix}.txt")
-        df_el = pd.read_csv(val_path_el, sep=" ", header=None, names=["cos", "mean", "mean_err", "reso", "reso_err"])
-        df_po = pd.read_csv(val_path_po, sep=" ", header=None, names=["cos", "mean", "mean_err", "reso", "reso_err"])
-    except FileNotFoundError:
-        logger.error(f"Cosine data files not found in {path}/plots/costh/")
+    val_path_el = os.path.join(path, "plots", "costh", f"dedx_vs_cos_electrons_{suffix}.txt")
+    val_path_po = os.path.join(path, "plots", "costh", f"dedx_vs_cos_positrons_{suffix}.txt")
+
+    df_el = read_txt(val_path_el, ["cos", "mean", "mean_err", "reso", "reso_err"])
+    df_po = read_txt(val_path_po, ["cos", "mean", "mean_err", "reso", "reso_err"])
+
+    if df_el is None or df_po is None:
         return
 
     # Ensure both dataframes are sorted by 'cos' so addition is element-wise correct
@@ -156,11 +152,10 @@ def cosgain_validation(path, suffix):
 
     # New DataFrame with summed means
     mean_avg = (df_el['mean'] + df_po['mean']) / 2
-    err_avg = err_avg = 0.5 * np.sqrt(df_el['mean_err']**2 + df_po['mean_err']**2)
+    err_avg = 0.5 * np.sqrt(df_el['mean_err']**2 + df_po['mean_err']**2)
     df_sum = pd.DataFrame({'cos': df_el['cos'],  'mean_sum': mean_avg, 'err_avg': err_avg})
 
-    pdf_path = os.path.join("plots", "validation", f"dedx_vs_cosine_{suffix}.pdf")
-    os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+    pdf_path = make_pdf_path("dedx_vs_cosine", suffix)
 
     with PdfPages(pdf_path) as pdf:
         fig, ax = plt.subplots(1, 2, figsize=(20, 6))  # Two plots side-by-side
@@ -183,7 +178,7 @@ def cosgain_validation(path, suffix):
             rasterized=True,
             label='positrons')
         ax[0].errorbar(df_sum['cos'], df_sum['mean_sum'], yerr=df_sum['err_avg'], fmt='*',
-                       markersize=10, rasterized=True, label=r'avergae of e^{+} and e^{-}')
+                       markersize=10, rasterized=True, label=r'average of e^{+} and e^{-}')
         ax[0].legend(fontsize=17)
         ax[0].set_title('dE/dx Mean vs cosine', fontsize=14)
 
@@ -215,38 +210,33 @@ def cosgain_validation(path, suffix):
 def injection_validation(path, suffix):
 
     cols = ["var", "bin", "mean", "mean_err", "reso", "reso_err"]
+    # corrected files
+    val_path_ler = os.path.join(path, "plots", "injection", f"dedx_vs_inj_ler_{suffix}.txt")
+    val_path_her = os.path.join(path, "plots", "injection", f"dedx_vs_inj_her_{suffix}.txt")
 
-    try:
-        # corrected files
-        val_path_ler = os.path.join(path, "plots", "injection", f"dedx_vs_inj_ler_{suffix}.txt")
-        val_path_her = os.path.join(path, "plots", "injection", f"dedx_vs_inj_her_{suffix}.txt")
+    df_ler = read_txt(val_path_ler, cols)
+    df_her = read_txt(val_path_her, cols)
 
-        df_ler = pd.read_csv(val_path_ler, sep=r"\s+", header=None, names=cols)
-        df_her = pd.read_csv(val_path_her, sep=r"\s+", header=None, names=cols)
+    # no-correction files
+    val_path_ler_nocor = os.path.join(path, "plots", "injection", f"dedx_vs_inj_nocor_ler_{suffix}.txt")
+    val_path_her_nocor = os.path.join(path, "plots", "injection", f"dedx_vs_inj_nocor_her_{suffix}.txt")
 
-        # no-correction files
-        val_path_ler_nocor = os.path.join(path, "plots", "injection", f"dedx_vs_inj_nocor_ler_{suffix}.txt")
-        val_path_her_nocor = os.path.join(path, "plots", "injection", f"dedx_vs_inj_nocor_her_{suffix}.txt")
+    df_ler_nocor = read_txt(val_path_ler_nocor, cols)
+    df_her_nocor = read_txt(val_path_her_nocor, cols)
 
-        df_ler_nocor = pd.read_csv(val_path_ler_nocor, sep=r"\s+", header=None, names=cols)
-        df_her_nocor = pd.read_csv(val_path_her_nocor, sep=r"\s+", header=None, names=cols)
-
-    except FileNotFoundError as e:
-        logger.error(f"Injection data file not found: {e}")
+    if df_ler is None or df_her is None or df_ler_nocor is None or df_her_nocor is None:
         return
 
     for df in [df_ler, df_her, df_ler_nocor, df_her_nocor]:
         df["bin"] = df["bin"].astype(str)
 
-    pdf_path = os.path.join("plots", "validation", f"dedx_mean_inj_{suffix}.pdf")
-    os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+    pdf_path = make_pdf_path("dedx_mean_inj", suffix)
 
     with PdfPages(pdf_path) as pdf:
 
         fig, ax = plt.subplots(1, 1, figsize=(20, 6))
 
-        ymin = df_ler[df_ler['mean'] > 0]['mean'].min()
-        ymax = df_ler['mean'].max()
+        ymin, ymax = get_positive_minmax(df_ler['mean'])
 
         pc.hist(y_min=ymin - 0.01, y_max=ymax + 0.01,
                 xlabel="injection time", ylabel="dE/dx mean",
@@ -261,9 +251,7 @@ def injection_validation(path, suffix):
         fig.suptitle("dE/dx vs Injection time", fontsize=20)
         save_to_pdf(pdf, fig)
 
-        # --------------------------------------------------
         # Page 2: overlay corr and no corr
-        # --------------------------------------------------
         fig, ax = plt.subplots(1, 1, figsize=(20, 6))
 
         all_means = pd.concat([
@@ -314,33 +302,27 @@ def mom_validation(path, suffix):
 
     # Define output PDFs
     pdf_paths = {
-        "low": os.path.join("plots", "validation", f"dedx_vs_mom_{suffix}.pdf"),
-        "high": os.path.join("plots", "validation", f"dedx_vs_mom_{suffix}_cosbins.pdf"),
+        "low": make_pdf_path("dedx_vs_mom", suffix),
+        "high": make_pdf_path("dedx_vs_mom", f"{suffix}_cosbins"),
     }
-    os.makedirs(os.path.dirname(pdf_paths["low"]), exist_ok=True)
 
     with PdfPages(pdf_paths["low"]) as pdf_low, PdfPages(pdf_paths["high"]) as pdf_high:
         for i in range(13):
-            try:
-                val_path_el = os.path.join(path, "plots", "mom",
-                                           f"dedx_vs_mom_{i}_elec_{suffix}.txt")
-                val_path_po = os.path.join(path, "plots", "mom",
-                                           f"dedx_vs_mom_{i}_posi_{suffix}.txt")
+            cols = ["mom", "mean", "mean_err", "reso", "reso_err"]
+            val_path_el = os.path.join(path, "plots", "mom", f"dedx_vs_mom_{i}_elec_{suffix}.txt")
+            val_path_po = os.path.join(path, "plots", "mom", f"dedx_vs_mom_{i}_posi_{suffix}.txt")
 
-                df_el = pd.read_csv(val_path_el, sep=" ", header=None,
-                                    names=["mom", "mean", "mean_err", "reso", "reso_err"])
-                df_po = pd.read_csv(val_path_po, sep=" ", header=None,
-                                    names=["mom", "mean", "mean_err", "reso", "reso_err"])
-            except FileNotFoundError:
-                logger.error(f"Missing momentum data for bin {i} (suffix={suffix})")
+            df_el = read_txt(val_path_el, cols)
+            df_po = read_txt(val_path_po, cols)
+
+            if df_el is None or df_po is None:
                 continue
 
             df_el['mom'] *= -1  # flip electron momentum
 
             fig, ax = plt.subplots(2, 2, figsize=(20, 12))
 
-            ymin = df_el[df_el['mean'] > 0]['mean'].min()
-            ymax = df_el['mean'].max()
+            ymin, ymax = get_positive_minmax(df_el['mean'])
 
             panels = [
                 {"xlim": (-7, 7), "ylim": (ymin-0.01, ymax+0.01),
@@ -380,24 +362,24 @@ def mom_validation(path, suffix):
 
             # Save to correct PDF
             if i <= 2:
-                pdf_low.savefig(fig)
+                save_to_pdf(pdf_low, fig)
             else:
-                pdf_high.savefig(fig)
-            plt.close()
+                save_to_pdf(pdf_high, fig)
 
 
 def oneDcell_validation(path, suffix):
-    try:
-        val_path_il = os.path.join(path, "plots", "oneD", f"dedx_vs_1D_IL_{suffix}.txt")
-        val_path_ol = os.path.join(path, "plots", "oneD", f"dedx_vs_1D_OL_{suffix}.txt")
-        df_il = pd.read_csv(val_path_il, sep=" ", header=None, names=["enta", "mean"])
-        df_ol = pd.read_csv(val_path_ol, sep=" ", header=None, names=["enta", "mean"])
-    except FileNotFoundError:
-        logger.error(f"1D data files not found in {path}/plots/oneD/")
+
+    val_path_il = os.path.join(path, "plots", "oneD", f"dedx_vs_1D_IL_{suffix}.txt")
+    val_path_ol = os.path.join(path, "plots", "oneD", f"dedx_vs_1D_OL_{suffix}.txt")
+
+    df_il = read_txt(val_path_il, ["enta", "mean"])
+    df_ol = read_txt(val_path_ol, ["enta", "mean"])
+
+    if df_il is None or df_ol is None:
         return
 
-    pdf_path = os.path.join("plots", "validation", f"dedx_vs_enta_{suffix}.pdf")
-    os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+    pdf_path = make_pdf_path("dedx_vs_enta", suffix)
+
     with PdfPages(pdf_path) as pdf:
         fig, ax = plt.subplots(2, 2, figsize=(20, 12))
 
@@ -433,34 +415,31 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     :requested_iov: required argument but not used
     :expert_config: required argument
     '''
-    if not os.path.exists('plots/validation'):
-        os.makedirs('plots/validation')
-
-    if not os.path.exists('plots/constant'):
-        os.makedirs('plots/constant')
+    os.makedirs('plots/validation', exist_ok=True)
+    os.makedirs('plots/constant', exist_ok=True)
 
     expert_config = json.loads(expert_config)
     GT = expert_config["GT"]
 
-    logger.info("Starting validation...")
+    basf2.B2INFO("Starting validation...")
 
-    logger.info("Processing run gain payloads...")
+    basf2.B2INFO("Processing run gain payloads...")
     gtpath = os.path.join(job_path, 'rungain2', 'outputdb')
     rg.getRunGain(gtpath, GT)
 
-    logger.info("Processing coscorr payloads...")
+    basf2.B2INFO("Processing coscorr payloads...")
     ccpath = os.path.join(job_path, 'coscorr1', 'outputdb')
     pc.process_cosgain(ccpath, GT)
 
-    logger.info("Processing wire gain payloads...")
+    basf2.B2INFO("Processing wire gain payloads...")
     wgpath = os.path.join(job_path, 'wiregain0', 'outputdb')
     exp_run_dict = pw.process_wiregain(wgpath, GT)
 
-    logger.info("Processing 1D gain payloads...")
-    ccpath = os.path.join(job_path, 'onedcell0', 'outputdb')
-    oned.process_onedgain(ccpath, GT)
+    basf2.B2INFO("Processing 1D gain payloads...")
+    onedpath = os.path.join(job_path, 'onedcell0', 'outputdb')
+    oned.process_onedgain(onedpath, GT)
 
-    logger.info("Generating validation plots...")
+    basf2.B2INFO("Generating validation plots...")
     val_path = os.path.join(job_path, 'validation0', '0', 'algorithm_output')
 
     validators = [
@@ -476,7 +455,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
         for run in run_list:
             suffix = f"e{exp}_r{run}"
             for msg, func in validators:
-                logger.info(f"Processing {msg}...")
+                basf2.B2INFO(f"Processing {msg} for {suffix}...")
                 func(val_path, suffix)
 
             source_path = os.path.join(job_path, 'validation0', '0', 'algorithm_output', 'plots')

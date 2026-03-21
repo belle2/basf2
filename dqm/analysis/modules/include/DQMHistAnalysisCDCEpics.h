@@ -173,15 +173,15 @@ namespace Belle2 {
     int m_minevt;/**< min events for single intra-run point */
     double m_minphibinsfrac;/**< min phi diff fraction for alarms */
 
-    double m_minadc_sl01;/**< min adc median thershold accepted for SL0-1 */
-    double m_maxadc_sl01;/**< max adc median thershold accepted for SL0-1 */
-    double m_mintdc_sl01;/**< min tdc median thershold accepted for SL0-1 */
-    double m_maxtdc_sl01;/**< max tdc median thershold accepted for SL0-1 */
+    double m_minadc_sl01 = 20.0;  /**< min adc median threshold accepted for SL0-1 */
+    double m_maxadc_sl01 = 40.0;  /**< max adc median threshold accepted for SL0-1 */
+    double m_mintdc_sl01 = 4700.0;/**< min tdc median threshold accepted for SL0-1 */
+    double m_maxtdc_sl01 = 5200.0;/**< max tdc median threshold accepted for SL0-1 */
 
-    double m_minadc_sl28;/**< min adc median thershold accepted for SL2-8 */
-    double m_maxadc_sl28;/**< max adc median thershold accepted for SL2-8 */
-    double m_mintdc_sl28;/**< min tdc median thershold accepted for SL2-8 */
-    double m_maxtdc_sl28;/**< max tdc median thershold accepted for SL2-8 */
+    double m_minadc_sl28 = 40.0;  /**< min adc median threshold accepted for SL2-8 */
+    double m_maxadc_sl28 = 180.0; /**< max adc median threshold accepted for SL2-8 */
+    double m_mintdc_sl28 = 4600.0;/**< min tdc median threshold accepted for SL2-8 */
+    double m_maxtdc_sl28 = 5000.0;/**< max tdc median threshold accepted for SL2-8 */
 
     double m_phistop;/**< stop thershold for phi differences */
     double m_phialarm;/**< alarm thershold for phi differences */

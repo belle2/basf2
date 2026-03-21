@@ -23,6 +23,17 @@ def reconstructB2nunubar(path):
     ma.reconstructMCDecay('B0:sig -> nu_tau:MC anti-nu_tau:MC', '', writeOut=True, path=path)
 
 
+def reconstructB2jpsiks(path):
+    """
+    Defines the procedure to create a B0 list for the benchmark channel 'B0 -> Jpsi KS'
+    """
+    ma.fillParticleListFromMC('pi+:MC', '', path=path)
+    ma.fillParticleListFromMC('mu+:MC', '', path=path)
+    ma.reconstructMCDecay('K_S0:pipi -> pi+:MC pi-:MC', '', writeOut=True, path=path)
+    ma.reconstructMCDecay('J/psi:mumu -> mu+:MC mu-:MC', '', writeOut=True, path=path)
+    ma.reconstructMCDecay('B0:sig -> J/psi:mumu K_S0:pipi', '', writeOut=True, path=path)
+
+
 def buildROE(path):
     """
     Creates the rest of event for the signal particle list.'
@@ -34,7 +45,7 @@ def buildROE(path):
     ma.buildRestOfEvent(target_list_name='B0:sig', path=path)
 
 
-def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False, sampler_id=0):
+def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False, sampler_id=0, channel='nunu'):
     '''
     Samples a chunk of training data for TFlat
     '''
@@ -61,7 +72,13 @@ def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False, sampler
         ma.setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path=path)
         b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltagB2BII())
 
-    reconstructB2nunubar(path)
+    if channel == 'nunu':
+        reconstructB2nunubar(path)
+    elif channel == 'jpsiks':
+        reconstructB2jpsiks(path)
+    else:
+        raise ValueError("Unknown sampler channel!")
+
     buildROE(path)
 
     flavorTagger(
@@ -121,6 +138,14 @@ if __name__ == '__main__':
         default=0,
         help='sampler_id'
     )
+    parser.add_argument(
+        '--channel',
+        metavar='channel',
+        dest='channel',
+        type=str,
+        default='nunu',
+        help='Sampler channel: nunu or jpsiks'
+    )
 
     args = parser.parse_args()
     uniqueIdentifier = args.uniqueIdentifier
@@ -128,5 +153,6 @@ if __name__ == '__main__':
     working_dir = args.working_dir
     is_belle = args.BELLE
     sampler_id = args.sampler_id
+    channel = args.channel
 
-    main(uniqueIdentifier, inputfile, working_dir, is_belle, sampler_id)
+    main(uniqueIdentifier, inputfile, working_dir, is_belle, sampler_id, channel)

@@ -30,12 +30,21 @@ if __name__ == "__main__":
         default=False,
         help='If True, sample .mdst files with Belle MC'
     )
+    parser.add_argument(
+        '--channel',
+        metavar='channel',
+        dest='channel',
+        type=str,
+        default='nunu',
+        help='Sampler channel: nunu or jpsiks'
+    )
 
     args, _ = parser.parse_known_args()
     output_dir = args.output_dir
     input_dir = args.input_dir
     uniqueIdentifier = args.uniqueIdentifier
     is_belle = args.is_belle
+    channel = args.channel
 
     # Make a list of input files
     if is_belle:
@@ -71,7 +80,8 @@ if __name__ == "__main__":
         # Submit job to create output file
         os.system(
             f'bsub -q s -o {log_file_name} python3 sampler.py --uniqueIdentifier {uniqueIdentifier}'
-            f' --inputfile {file} --working_dir {output_dir} --BELLE {str(is_belle)} --sampler_id {sampler_id}')
+            f' --inputfile {file} --working_dir {output_dir} --BELLE {str(is_belle)} --sampler_id {sampler_id}'
+            f' --channel {channel}')
 
         njobs += 1
 

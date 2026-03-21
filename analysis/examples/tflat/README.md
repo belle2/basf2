@@ -42,7 +42,7 @@ The parameters set in the yaml config file are optimized for a A100 GPU and 120G
    **Alternatively, sample Belle/Belle2 training data on KEKCC**
    - Go to folder `analysis/examples/tflat` in your basf2 installation
    ```bash
-    python3 submit_sampler_kekcc.py --input_dir /path/to/input_files/ --output_dir /path/to/output_root/ --uniqueIdentifier {uniqueIdentifier} --is_belle {True/False}
+    python3 submit_sampler_kekcc.py --input_dir /path/to/input_files/ --output_dir /path/to/output_root/ --uniqueIdentifier {uniqueIdentifier} --is_belle {True/False} --channel {nunu/jpsiks}
     ```
    - The folder `/path/to/output_root/` will contain all sampled root files needed for the next step.
 

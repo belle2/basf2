@@ -192,8 +192,10 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   registerEpicsPV(m_name_pvpfx + "cdcboards_wadc", "adcboards");
   registerEpicsPV(m_name_pvpfx + "cdcboards_wtdc", "tdcboards");
 
-  registerEpicsPV(m_name_pvpfx + "adc_median_window", "adcmedianwindow");
-  registerEpicsPV(m_name_pvpfx + "tdc_median_window", "tdcmedianwindow");
+  registerEpicsPV(m_name_pvpfx + "adc_median_window_sl10", "adcmedianwindow_sl01");
+  registerEpicsPV(m_name_pvpfx + "tdc_median_window_sl10", "tdcmedianwindow_sl01");
+  registerEpicsPV(m_name_pvpfx + "adc_median_window_sl28", "adcmedianwindow_sl28");
+  registerEpicsPV(m_name_pvpfx + "tdc_median_window_sl28", "tdcmedianwindow_sl28");
 
   registerEpicsPV(m_name_pvpfx + "phi_compare_window", "phicomparewindow");
 

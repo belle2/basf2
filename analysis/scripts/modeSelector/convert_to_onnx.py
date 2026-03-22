@@ -18,6 +18,7 @@ import os
 
 import torch
 import torch.nn as nn
+from modeSelector import config
 from modeSelector.train import MultiClassNet
 from ROOT import Belle2
 
@@ -58,8 +59,24 @@ def convert_network_to_onnx(pt_path, onnx_path):
     print(f"Exported {pt_path} -> {onnx_path} (input={input_size}, labels={num_labels})")
 
 
+def package_as_mva_weightfile(onnx_path, root_path, n_features, n_classes):
+    """Wrap an ONNX file in a basf2 MVA weightfile, aved as .root file.
+
+    The variable names are placeholders; ModeSelectorModule fills the feature
+    vector manually rather than via the VariableManager.
+    """
+    from basf2_mva_util import create_onnx_mva_weightfile
+    wf = create_onnx_mva_weightfile(
+        onnx_path,
+        variables=[f"f{i}" for i in range(n_features)],
+        nClasses=n_classes,
+    )
+    wf.save(root_path)
+    print(f"Packaged {onnx_path} -> {root_path} ({n_features} features, {n_classes} classes)")
+
+
 def add_onnx_payloads(cat_model, main_model, cat_payload_name, main_payload_name, iov):
-    """Copy the ModeSelector ONNX files into localdb/database.txt."""
+    """Copy the ModeSelector MVA weightfiles into localdb/database.txt."""
     database = Belle2.Database.Instance()
 
     if not database.addPayload(cat_payload_name, cat_model, iov):
@@ -104,27 +121,38 @@ def main():
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    exported_models = {}
-    for pt_name, onnx_name in [
-        ('net_category.pt', 'modeSelector_cat.onnx'),
-        ('net_main.pt', 'modeSelector_main.onnx'),
-    ]:
+    cat_n_features = len(config.HAS_INPUTS)
+    cat_n_classes = 3
+    main_n_features = len(config.HAS_INPUTS) + 4
+    main_n_classes = config.N_INPUT_IDS + 3
+
+    model_specs = [
+        ('net_category.pt', 'modeSelector_cat.onnx', 'modeSelector_cat.root',
+         cat_n_features, cat_n_classes),
+        ('net_main.pt', 'modeSelector_main.onnx', 'modeSelector_main.root',
+         main_n_features, main_n_classes),
+    ]
+
+    exported_root = {}
+    for pt_name, onnx_name, root_name, n_features, n_classes in model_specs:
         pt_path = os.path.join(args.input_dir, pt_name)
         onnx_path = os.path.join(args.output_dir, onnx_name)
+        root_path = os.path.join(args.output_dir, root_name)
         if os.path.exists(pt_path):
             convert_network_to_onnx(pt_path, onnx_path)
-            exported_models[onnx_name] = onnx_path
+            package_as_mva_weightfile(onnx_path, root_path, n_features, n_classes)
+            exported_root[root_name] = root_path
         else:
             print(f"Warning: {pt_path} not found")
 
     if args.add_payloads:
         missing_files = [
-            model_name for model_name in ('modeSelector_cat.onnx', 'modeSelector_main.onnx')
-            if model_name not in exported_models
+            name for name in ('modeSelector_cat.root', 'modeSelector_main.root')
+            if name not in exported_root
         ]
         if missing_files:
             raise RuntimeError(
-                'Cannot add payloads because these ONNX files were not created: '
+                'Cannot add payloads because these weightfiles were not created: '
                 + ', '.join(missing_files)
             )
 
@@ -135,8 +163,8 @@ def main():
             args.final_run,
         )
         add_onnx_payloads(
-            exported_models['modeSelector_cat.onnx'],
-            exported_models['modeSelector_main.onnx'],
+            exported_root['modeSelector_cat.root'],
+            exported_root['modeSelector_main.root'],
             args.cat_payload_name,
             args.main_payload_name,
             iov,

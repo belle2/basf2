@@ -139,43 +139,53 @@ class ModeSelectorModule(b2.Module):
             )
             return
 
-        import onnxruntime as ort
+        import basf2_mva
 
         self.has_inputs = list(config.HAS_INPUTS)
         b2.B2INFO(f"ModeSelector: Using config.HAS_INPUTS ({len(self.has_inputs)} features kept)")
 
-        # Use single-threaded execution to avoid thread pool contention with
-        # other ONNX sessions in the same basf2 path (e.g. MVAMultipleExperts).
-        sess_opts = ort.SessionOptions()
-        sess_opts.intra_op_num_threads = 1
-        sess_opts.inter_op_num_threads = 1
-        sess_opts.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+        # Load models through the basf2 MVA Expert framework.
+        # Single-threaded ONNX execution is enforced by the framework in mva/methods/src/ONNX.cc.
+        Belle2.MVA.AbstractInterface.initSupportedInterfaces()
+        supported = Belle2.MVA.AbstractInterface.getSupportedInterfaces()
 
-        # Load models from files or database
         if self.cat_model_path:
-            self.cat_session = ort.InferenceSession(self.cat_model_path, sess_opts)
+            cat_wf = Belle2.MVA.Weightfile.loadFromFile(self.cat_model_path)
         else:
             db_accessor = Belle2.DBAccessorBase(
                 Belle2.DBStoreEntry.c_RawFile, self.payload_cat_model, True
             )
-            self.cat_session = ort.InferenceSession(db_accessor.getFilename(), sess_opts)
+            cat_wf = Belle2.MVA.Weightfile.loadFromFile(db_accessor.getFilename())
 
         if self.main_model_path:
-            self.main_session = ort.InferenceSession(self.main_model_path, sess_opts)
+            main_wf = Belle2.MVA.Weightfile.loadFromFile(self.main_model_path)
         else:
             db_accessor = Belle2.DBAccessorBase(
                 Belle2.DBStoreEntry.c_RawFile, self.payload_main_model, True
             )
-            self.main_session = ort.InferenceSession(db_accessor.getFilename(), sess_opts)
+            main_wf = Belle2.MVA.Weightfile.loadFromFile(db_accessor.getFilename())
 
-        #: Category model input name
-        self.cat_input_name = self.cat_session.get_inputs()[0].name
-        #: Main model input name
-        self.main_input_name = self.main_session.get_inputs()[0].name
+        #: Category network expert
+        self.cat_expert = supported["ONNX"].getExpert()
+        self.cat_expert.load(cat_wf)
+        #: Main network expert
+        self.main_expert = supported["ONNX"].getExpert()
+        self.main_expert.load(main_wf)
 
-        # Get input sizes from models
-        self.cat_input_size = self.cat_session.get_inputs()[0].shape[1]
-        self.main_input_size = self.main_session.get_inputs()[0].shape[1]
+        cat_opts = basf2_mva.GeneralOptions()
+        cat_wf.getOptions(cat_opts)
+        main_opts = basf2_mva.GeneralOptions()
+        main_wf.getOptions(main_opts)
+
+        # Input sizes derived from the weightfile variable list
+        self.cat_input_size = len(cat_opts.m_variables)
+        self.main_input_size = len(main_opts.m_variables)
+
+        # Pre-allocate datasets; m_input elements are overwritten per event
+        #: SingleDataset for category network inference
+        self.cat_dataset = Belle2.MVA.SingleDataset(cat_opts, [0.0] * self.cat_input_size, 1.0)
+        #: SingleDataset for main network inference
+        self.main_dataset = Belle2.MVA.SingleDataset(main_opts, [0.0] * self.main_input_size, 1.0)
 
         b2.B2INFO(f"ModeSelector: Loaded category model (input size: {self.cat_input_size})")
         b2.B2INFO(f"ModeSelector: Loaded main model (input size: {self.main_input_size})")
@@ -951,24 +961,26 @@ class ModeSelectorModule(b2.Module):
             charged_cat = 1.0 if cat_output[1] > cat_output[0] else 0.0
         else:
             # Run category network
-            cat_input = features.reshape(1, -1).astype(np.float32)
-            cat_output = self.cat_session.run(None, {self.cat_input_name: cat_input})[0][0]
+            for i, v in enumerate(features.tolist()):
+                self.cat_dataset.m_input[i] = v
+            cat_output = list(self.cat_expert.applyMulticlass(self.cat_dataset)[0])
 
             # Determine predicted category (0=B0, 1=B+, 2=continuum)
             charged_cat = 1.0 if cat_output[1] > cat_output[0] else 0.0
 
             # Build main network input (features + cat_output + charged_cat)
-            main_features = np.concatenate([features, cat_output, [charged_cat]])
+            main_vals = features.tolist() + cat_output + [charged_cat]
 
-            if len(main_features) != self.main_input_size:
+            if len(main_vals) != self.main_input_size:
                 b2.B2FATAL(
                     f"ModeSelector: main model input size mismatch: "
-                    f"got {len(main_features)} features, model expects {self.main_input_size}. "
+                    f"got {len(main_vals)} features, model expects {self.main_input_size}. "
                     f"The ONNX model and current config must match."
                 )
 
-            main_input = main_features.reshape(1, -1).astype(np.float32)
-            main_output = self.main_session.run(None, {self.main_input_name: main_input})[0][0]
+            for i, v in enumerate(main_vals):
+                self.main_dataset.m_input[i] = v
+            main_output = list(self.main_expert.applyMulticlass(self.main_dataset)[0])
         self._inference_event_count += 1
 
         # Extract scores

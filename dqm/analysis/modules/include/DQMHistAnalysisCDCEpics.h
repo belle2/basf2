@@ -184,8 +184,8 @@ namespace Belle2 {
     double m_maxtdc_sl28 = 5000.0;/**< max tdc median threshold accepted for SL2-8 */
 
     double m_phistop;/**< stop thershold for phi differences */
-    double m_phialarm;/**< alarm thershold for phi differences */
-    double m_phiwarn;/**< warn thershold for phi differences */
+    double m_phiwarn = 0.05;/**< 5% warn thershold for phi differences */
+    double m_phialarm = 0.15;/**< 15% alarm thershold for phi differences */
     std::vector<TLine*> m_lines;/**< number of CDC layer lines */
 
     TH1D* m_hists_lADC[kNumLayers]; /**< ADC histograms with track associated hits for each board (0-299) */

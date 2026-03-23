@@ -29,9 +29,9 @@ def reconstructB2jpsiks(path):
     """
     ma.fillParticleListFromMC('pi+:MC', '', path=path)
     ma.fillParticleListFromMC('mu+:MC', '', path=path)
-    ma.reconstructMCDecay('K_S0:pipi -> pi+:MC pi-:MC', '', writeOut=True, path=path)
-    ma.reconstructMCDecay('J/psi:mumu -> mu+:MC mu-:MC', '', writeOut=True, path=path)
-    ma.reconstructMCDecay('B0:sig -> J/psi:mumu K_S0:pipi', '', writeOut=True, path=path)
+    ma.reconstructMCDecay('K_S0:pipi -> pi+:MC pi-:MC ?gamma', cut='', path=path, chargeConjugation=True)
+    ma.reconstructMCDecay('J/psi:mumu -> mu+:MC mu-:MC ?gamma', cut='', path=path, chargeConjugation=True)
+    ma.reconstructMCDecay('B0:sig -> J/psi:mumu K_S0:pipi ?gamma', cut='', writeOut=True, path=path, chargeConjugation=True)
 
 
 def buildROE(path):

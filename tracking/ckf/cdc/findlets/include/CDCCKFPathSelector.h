@@ -34,6 +34,10 @@ namespace Belle2 {
       m_filter.exposeParameters(moduleParamList, prefix);
     }
 
+    /** Set maximal candidates in flight
+     *
+     *  @param maximalCandidatesInFlight Maximum number of candidates to keep in flight
+     */
     void setMaximalCandidatesInFlight(size_t maximalCandidatesInFlight)
     {
       m_maximalCandidatesInFlight = maximalCandidatesInFlight;

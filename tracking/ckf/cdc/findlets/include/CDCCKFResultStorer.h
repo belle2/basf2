@@ -35,10 +35,22 @@ namespace Belle2 {
     /// Register the store arrays
     void initialize() override;
 
+    /** Set whether to export tracks
+     *
+     *  @param exportTracks True to export tracks
+     */
     void setExportTracks(bool exportTracks) { m_param_exportTracks = exportTracks; }
 
+    /** Set whether to export all tracks
+     *
+     *  @param exportAllTracks True to export all tracks, even if they did not reach the center of the CDC
+     */
     void setExportAllTracks(bool exportAllTracks) { m_param_exportAllTracks = exportAllTracks; }
 
+    /** Set whether to set the taken flag
+     *
+     *  @param setTakenFlag True to set the taken flag on tracks
+     */
     void setSetTakenFlag(bool setTakenFlag) { m_param_setTakenFlag = setTakenFlag; }
 
   private:

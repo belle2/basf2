@@ -72,6 +72,7 @@ namespace Belle2 {
     /// Current list of results
     std::vector<CDCCKFResult> m_results;
 
+    /** Database payload name for loading SVDToCDCCKFParameters */
     std::string m_param_dbPayloadName;
   };
 }

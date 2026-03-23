@@ -145,6 +145,47 @@ def merge_files(*args, output="output.root", filter_modified=False):
     return process.returncode
 
 
+#: Minimal steering file to create a histogram output file like VariablesToHistogram
+testfile_histogram_steering = """
+import basf2
+basf2.set_log_level(basf2.LogLevel.ERROR)
+main = basf2.create_path()
+main.add_module('RootInput')
+main.add_module('VariablesToHistogram',
+                variables=[('expNum', 10, -0.5, 9.5), ('runNum', 10, -0.5, 9.5)])
+basf2.process(main)
+"""
+
+
+def create_testfile_histogram(input_file, output_file, seed="default"):
+    """Create a histogram file using VariablesToHistogram and add required metadata.
+
+    VariablesToHistogram does not write a persistent tree, so we add one manually
+    to make the file compatible with b2file-merge (same pattern as create_testfile_ntuple).
+    """
+    steering_file = "steering-histogram.py"
+    with open(steering_file, "w") as f:
+        f.write(testfile_histogram_steering)
+    subprocess.call(["basf2", "-i", input_file, "-o", output_file, steering_file])
+    # VariablesToHistogram doesn't write FileMetaData, so add a persistent tree manually.
+    # Use isNtupleMetaData="True" so that b2file-merge (via RootFileInfo) does not
+    # require a standard basf2 event tree (histogram files don't have one).
+    meta = FileMetaData()
+    meta.setCreationData(
+        "the most auspicious of days for testing", "test_site", "test_user", "test_release"
+    )
+    meta.setDatabaseGlobalTag("test_globaltag")
+    meta.setSteering("test_steering")
+    meta.setDataDescription("isNtupleMetaData", "True")
+    meta.setRandomSeed(seed)
+    f = ROOT.TFile(output_file, "UPDATE")
+    t = ROOT.TTree("persistent", "persistent")
+    t.Branch("FileMetaData", meta)
+    t.Fill()
+    t.Write("", ROOT.TObject.kOverwrite)
+    f.Close()
+
+
 #: Minimal steering file to create an output root file we can merge
 testfile_steering = """
 import os
@@ -536,6 +577,23 @@ def check_29_parent_release():
     merge_files("test1.root", "test2.root", output="output.root")
     meta = basf2.get_file_metadata("output.root")
     return meta.getRelease() == "abcd"
+
+
+def check_30_histogram_merge():
+    """Check that we can merge two histogram output files (as produced by VariablesToHistogram)"""
+    create_testfile("test1.root", exp=0, run=0, events=100)
+    create_testfile("test2.root", exp=0, run=1, events=200)
+    create_testfile_histogram("test1.root", "hist1.root", seed="seed1")
+    create_testfile_histogram("test2.root", "hist2.root", seed="seed2")
+    if merge_files("hist1.root", "hist2.root", filter_modified=True) != 0:
+        return False
+    out = ROOT.TFile("output.root")
+    h = out.Get("expNum")
+    if not h:
+        print("expNum histogram not found in merged output")
+        return False
+    # Each input had 100 and 200 events respectively, so 300 entries total
+    return h.GetEntries() == 300
 
 
 def check_XX_filemetaversion():

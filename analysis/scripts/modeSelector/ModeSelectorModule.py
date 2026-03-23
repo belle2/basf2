@@ -63,6 +63,7 @@ class ModeSelectorModule(b2.Module):
         training_mode=False,
         skip_nn_evaluation=False,
         training_output='modeSelector_training.npz',
+        store_fei_calib_weight=False,
         debug=False,
         debug_max_events=10,
     ):
@@ -86,6 +87,10 @@ class ModeSelectorModule(b2.Module):
         self.skip_nn_evaluation = skip_nn_evaluation
         #: Output file for training mode
         self.training_output = training_output
+        #: Store modeSelector_feiCalibWeight in EventExtraInfo (MC only)
+        self.store_fei_calib_weight = store_fei_calib_weight
+        #: Flag to emit the gen-calib-weight missing warning at most once
+        self._gen_calib_weight_missing_warned = False
         #: Training storage (columnar buffers)
         self._tr_event = {name: [] for name in self.TR_EVENT_FIELDS}
         #: Per-event best-candidate MC truth fields
@@ -432,16 +437,10 @@ class ModeSelectorModule(b2.Module):
         """
         Compute event-level FEI calibration weight from the best candidates.
 
-        Uses the reco path (truth-compatible tag PDG and DeltaP < DELTA_P_THRESH)
-        when applicable, falling back to the gen path (generated decay mode ID)
-        and finally the sector rest weight. Returns FEI_CALIB_CONT for continuum
-        events or when generated-decay annotation marked the candidate as
-        continuum or missing generated B truth.
-
-        Requires extraInfo(genDecayModeID) to be available on candidates;
-        add addGeneratedDecayWeights before ModeSelector in the basf2 path.
-        If genDecayModeID is unavailable at this point, the function returns
-        NaN to distinguish that case from the explicit sentinel value -1.
+        Based on the reconstructed candidate, checking for truth-compatible tag PDG
+        and DeltaP < DELTA_P_THRESH. Returns FEI_CALIB_CONT for continuum events.
+        Returns NaN when reco conditions are not met (non-continuum events where
+        tag PDG does not match or DeltaP is above threshold).
         """
         bp_sig = -1.0
         b0_sig = -1.0
@@ -466,7 +465,6 @@ class ModeSelectorModule(b2.Module):
         dm_v = vm.evaluate('extraInfo(decayModeID)', best)
         tag_pdg_v = vm.evaluate('mostcommonBTagPDG', best)
         dp_v = vm.evaluate('mostcommonBTagDeltaP', best)
-        gen_dm_v = vm.evaluate('extraInfo(genDecayModeID)', best)
 
         if np.isnan(pdg_v) or np.isnan(dm_v):
             return config.FEI_CALIB_CONT
@@ -489,14 +487,6 @@ class ModeSelectorModule(b2.Module):
                 dm = max(0, min((iid - config.N_BP_MODES * 2) // 2, config.N_B0_MODES - 1))
             return calib_map.get(dm, calib_rest)
 
-        # Gen path: use generated decay mode ID if available.
-        # -1 is the explicit sentinel for continuum or missing generated B truth.
-        if not np.isnan(gen_dm_v):
-            if int(gen_dm_v) == -1:
-                return config.FEI_CALIB_CONT
-            if int(gen_dm_v) > 0:
-                return calib_map.get(int(gen_dm_v), calib_rest)
-            return np.nan
         return np.nan
 
     def _get_placeholder_outputs(self, features):
@@ -686,6 +676,20 @@ class ModeSelectorModule(b2.Module):
         b0_gen_pdg = b0['tag_pdg']
         bp_gen_dm_id = np.nan_to_num(bp['gen_dm_id'], nan=-1).astype(np.int16)
         b0_gen_dm_id = np.nan_to_num(b0['gen_dm_id'], nan=-1).astype(np.int16)
+
+        if not self._gen_calib_weight_missing_warned:
+            has_bp = bp_sig > -1.0
+            has_b0 = b0_sig > -1.0
+            bp_gen_nan = np.isnan(bp['gen_calib_weight'])
+            b0_gen_nan = np.isnan(b0['gen_calib_weight'])
+            if ((has_bp & bp_gen_nan) | (has_b0 & b0_gen_nan)).any():
+                b2.B2WARNING(
+                    'ModeSelector training: extraInfo(genFEICalibWeight) is missing for some '
+                    'candidates with a reconstructed B meson. '
+                    'Add addGeneratedDecayWeights before ModeSelector in the basf2 path.'
+                )
+                self._gen_calib_weight_missing_warned = True
+
         bp_gen_calib_weight = np.nan_to_num(bp['gen_calib_weight'], nan=1.0).astype(np.float32)
         b0_gen_calib_weight = np.nan_to_num(b0['gen_calib_weight'], nan=1.0).astype(np.float32)
 
@@ -1102,9 +1106,10 @@ class ModeSelectorModule(b2.Module):
         if not event_extra_info.isValid():
             event_extra_info.create()
         event_extra_info.addExtraInfo(self.output_variable, bp_score)
-        event_extra_info.addExtraInfo(
-            'modeSelector_feiCalibWeight', self._compute_fei_calib_weight(best_bp, best_b0)
-        )
+        if self.store_fei_calib_weight:
+            event_extra_info.addExtraInfo(
+                'modeSelector_feiCalibWeight', self._compute_fei_calib_weight(best_bp, best_b0)
+            )
         event_extra_info.addExtraInfo(f'{self.AUXILIARY_OUTPUT_PREFIX}_catB0', float(cat_output[0]))
         event_extra_info.addExtraInfo(f'{self.AUXILIARY_OUTPUT_PREFIX}_catBp', float(cat_output[1]))
         event_extra_info.addExtraInfo(f'{self.AUXILIARY_OUTPUT_PREFIX}_catCont', float(cat_output[2]))

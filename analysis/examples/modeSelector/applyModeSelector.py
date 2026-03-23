@@ -138,6 +138,7 @@ modeSelector.modeSelector(
     payload_cat_model=args.cat_payload_name,
     payload_main_model=args.main_payload_name,
     output_variable='BplusScore',
+    store_fei_calib_weight=not args.data,
     debug=False,  # Enable debug output
     debug_max_events=10,  # Print info for first 10 events, if debug is enabled
     path=my_path

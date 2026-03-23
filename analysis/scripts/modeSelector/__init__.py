@@ -53,6 +53,7 @@ def modeSelector(
     training_mode=False,
     skip_nn_evaluation=False,
     training_output='modeSelector_training.npz',
+    store_fei_calib_weight=False,
     debug=False,
     debug_max_events=10,
     path=None
@@ -86,6 +87,11 @@ def modeSelector(
             timing studies and emits a warning at module initialization.
         addDstarVetoReco (bool): Whether to add D* veto reconstruction before the NN.
             Default: True
+        store_fei_calib_weight (bool): If True, compute and store modeSelector_feiCalibWeight
+            in EventExtraInfo using the reco path (truth-compatible tag PDG and
+            DeltaP < DELTA_P_THRESH). Returns NaN when reco conditions are not met.
+            Requires mostcommonBTagPDG and mostcommonBTagDeltaP to be defined.
+            Meaningful only on MC. Default: False.
         path (basf2.Path): The basf2 path to add the module to.
 
     Notes:
@@ -136,6 +142,7 @@ def modeSelector(
         training_mode=training_mode,
         skip_nn_evaluation=skip_nn_evaluation,
         training_output=training_output,
+        store_fei_calib_weight=store_fei_calib_weight,
         debug=debug,
         debug_max_events=debug_max_events,
     )

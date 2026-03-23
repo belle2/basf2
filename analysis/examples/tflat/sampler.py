@@ -23,15 +23,22 @@ def reconstructB2nunubar(path):
     ma.reconstructMCDecay('B0:sig -> nu_tau:MC anti-nu_tau:MC', '', writeOut=True, path=path)
 
 
-def reconstructB2jpsiks(path):
+def reconstructB2jpsiks(path, is_belle=False):
     """
     Defines the procedure to create a B0 list for the benchmark channel 'B0 -> Jpsi KS'
     """
-    ma.fillParticleListFromMC('pi+:MC', '', path=path)
-    ma.fillParticleListFromMC('mu+:MC', '', path=path)
-    ma.reconstructMCDecay('K_S0:pipi -> pi+:MC pi-:MC ?gamma', cut='', path=path, chargeConjugation=True)
-    ma.reconstructMCDecay('J/psi:mumu -> mu+:MC mu-:MC ?gamma', cut='', path=path, chargeConjugation=True)
-    ma.reconstructMCDecay('B0:sig -> J/psi:mumu K_S0:pipi ?gamma', cut='', writeOut=True, path=path, chargeConjugation=True)
+    ma.fillParticleList('mu+:all', cut='', path=path)
+    ma.reconstructDecay('J/psi:mumu -> mu+:all mu-:all', cut='abs(dM) < 0.11', path=path)
+    ma.matchMCTruth('J/psi:mumu', path=path)
+
+    if is_belle:
+        ma.matchMCTruth('K_S0:mdst', path=path)
+        ma.reconstructDecay('B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.25 and abs(deltaE) < 0.15', path=path)
+    else:
+        ma.fillParticleList('pi+:all', cut='', path=path)
+        ma.reconstructDecay('K_S0:pipi -> pi+:all pi-:all', cut='abs(dM) < 0.25', path=path)
+        ma.matchMCTruth('K_S0:pipi', path=path)
+        ma.reconstructDecay('B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.25 and abs(deltaE) < 0.15', path=path)
 
 
 def buildROE(path):
@@ -40,6 +47,9 @@ def buildROE(path):
     """
     # perform MC matching (MC truth association).
     ma.matchMCTruth(list_name='B0:sig', path=path)
+
+    # keep only signal
+    ma.applyCuts(list_name='B0:sig', cut='isSignal == 1', path=path)
 
     # build the rest of the event associated to the B0
     ma.buildRestOfEvent(target_list_name='B0:sig', path=path)
@@ -75,7 +85,7 @@ def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False, sampler
     if channel == 'nunu':
         reconstructB2nunubar(path)
     elif channel == 'jpsiks':
-        reconstructB2jpsiks(path)
+        reconstructB2jpsiks(path, is_belle)
     else:
         raise ValueError("Unknown sampler channel!")
 

@@ -36,11 +36,15 @@ class _SetDstarVetoDefaults(b2.Module):
     """
 
     def __init__(self, particle_lists, keys):
+        """Set up with lists of particle list names and ExtraInfo key names."""
         super().__init__()
+        #: Particle list names to iterate over
         self._particle_lists = particle_lists
+        #: ExtraInfo key names to set to NaN if missing
         self._keys = keys
 
     def event(self):
+        """Set missing ExtraInfo keys to NaN for every candidate in each list."""
         for list_name in self._particle_lists:
             plist = Belle2.PyStoreObj(list_name)
             if not plist.isValid():
@@ -89,24 +93,17 @@ def addDstarVeto(
     For B candidates with D+ as first daughter:
         - D*+ -> D+ pi0 (from ROE)
 
-    Parameters
-    ----------
-    particleLists : str or list
-        Name(s) of B meson particle list(s) (e.g., 'B+:feiHadronic'
-        or ['B+:feiHadronic', 'B0:feiHadronic'])
-    path : basf2.Path
-        The basf2 path to add modules to
-    deltaMassDiffCut : tuple
-        Cut on deltaMassDiff (D* mass diff - true mass diff) in GeV
-    dMassCut : tuple
-        Cut on D and D* mass deviation (dM) in GeV
-    writeExtraInfo : bool
-        Whether to write ExtraInfo to particles
-    skipTreeFit : bool
-        If True, skip the vertex TreeFit (significant speedup). The deltaMassDiff
-        will use InvM-based computation instead of fit-based, and chiProb will not
-        be available (stored as NaN). Candidates are ranked by abs(deltaMassDiffInvM)
-        instead of chiProb. Default: True
+    Parameters:
+        particleLists (str or list): Name(s) of B meson particle list(s)
+            (e.g., 'B+:feiHadronic' or ['B+:feiHadronic', 'B0:feiHadronic'])
+        path (basf2.Path): The basf2 path to add modules to.
+        deltaMassDiffCut (tuple): Cut on deltaMassDiff (D* mass diff - true mass diff) in GeV.
+        dMassCut (tuple): Cut on D and D* mass deviation (dM) in GeV.
+        writeExtraInfo (bool): Whether to write ExtraInfo to particles.
+        skipTreeFit (bool): If True, skip the vertex TreeFit (significant speedup). The
+            deltaMassDiff will use InvM-based computation instead of fit-based, and chiProb
+            will not be available (stored as NaN). Candidates are ranked by
+            abs(deltaMassDiffInvM) instead of chiProb. Default: True
 
     The following ExtraInfo fields are added to B candidates:
 

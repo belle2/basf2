@@ -98,6 +98,7 @@ def add_onnx_payloads(cat_model, main_model, cat_payload_name, main_payload_name
 
 
 def main():
+    """Convert net_category.pt and net_main.pt to ONNX, package as MVA weightfiles, and optionally upload to localdb."""
     parser = argparse.ArgumentParser(description='Convert ModeSelector networks to ONNX')
     parser.add_argument('--input-dir', required=True,
                         help='Directory containing net_category.pt and net_main.pt')

@@ -43,9 +43,13 @@ class ModeSelectorModule(b2.Module):
         output_variable (str): Name of ExtraInfo variable for output score
         store_event_info (bool): Whether to store event-level info
     """
+    #: Training output fields for the full event feature array
     TR_EVENT_FIELDS = ('all_features',)
+    #: Training output fields for the best-candidate MC truth per charge
     TR_EVENT_BEST_FIELDS = ('best_bp_iid', 'best_bp_dp', 'best_b0_iid', 'best_b0_dp')
+    #: Training output fields stored for the best B+ and best B0 candidates
     TR_BEST_FIELDS = ('pdg', 'dm', 'sigprob', 'is_cont', 'tag_pdg', 'gen_dm_id', 'gen_calib_weight')
+    #: Prefix used for auxiliary ExtraInfo output variables
     AUXILIARY_OUTPUT_PREFIX = 'modeSelector'
 
     def __init__(
@@ -62,6 +66,7 @@ class ModeSelectorModule(b2.Module):
         debug=False,
         debug_max_events=10,
     ):
+        """Initialise module parameters and training data buffers."""
         super().__init__()
         #: Input particle lists
         self.particle_lists = particle_lists if isinstance(particle_lists, list) else [particle_lists]
@@ -83,12 +88,19 @@ class ModeSelectorModule(b2.Module):
         self.training_output = training_output
         #: Training storage (columnar buffers)
         self._tr_event = {name: [] for name in self.TR_EVENT_FIELDS}
+        #: Per-event best-candidate MC truth fields
         self._tr_event_best = {name: [] for name in self.TR_EVENT_BEST_FIELDS}
+        #: Best B+ candidate truth fields per event
         self._tr_bp = {name: [] for name in self.TR_BEST_FIELDS}
+        #: Best B0 candidate truth fields per event
         self._tr_b0 = {name: [] for name in self.TR_BEST_FIELDS}
+        #: Signal input_id values (CSR values array)
         self._tr_sig_input_ids = []
+        #: Signal btag index values (CSR values array)
         self._tr_sig_btag_index = []
+        #: Signal delta_p values (CSR values array)
         self._tr_sig_delta_p = []
+        #: Signal sigprob values (CSR values array)
         self._tr_sig_sigprob = []
         #: Debug mode
         self.debug = debug
@@ -126,12 +138,15 @@ class ModeSelectorModule(b2.Module):
 
         if self.training_mode:
             b2.B2INFO("ModeSelector: Running in TRAINING mode (saving features, no NN inference)")
+            #: Indices of non-zero features kept after sparsity filtering (None in training mode)
             self.has_inputs = None
             return
 
         if self.skip_nn_evaluation:
             self.has_inputs = list(config.HAS_INPUTS)
+            #: Category network input size (number of selected features)
             self.cat_input_size = len(self.has_inputs)
+            #: Main network input size (cat features + cat output + charged flag)
             self.main_input_size = self.cat_input_size + 4
             b2.B2INFO("ModeSelector: Running with NN evaluation disabled")
             b2.B2INFO(
@@ -267,7 +282,7 @@ class ModeSelectorModule(b2.Module):
         """
         Build the feature array for neural network input.
 
-        Args:
+        Parameters:
             candidates_data: List of (input_id, features) tuples
             event_features: Dict of event-level features
 

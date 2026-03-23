@@ -83,91 +83,72 @@ def modeSelector(
     modeSelector_feiCalibWeight uses them on the gen path and interprets
     genDecayModeID = -1 as continuum or missing generated B truth.
 
-    Parameters
-    ----------
-    bp_list : str
-        B+ meson particle list name to process.
-        Example: 'B+:feiHadronic'
-    b0_list : str
-        B0 meson particle list name to process.
-        Example: 'B0:feiHadronic'
-    cat_model_path : str, optional
-        Path to the category network ONNX model file.
-        If None, loads from conditions database.
-    main_model_path : str, optional
-        Path to the main network ONNX model file.
-        If None, loads from conditions database.
-    payload_cat_model : str, optional
-        Conditions DB payload name for the category model.
-        Used only when cat_model_path is None.
-    payload_main_model : str, optional
-        Conditions DB payload name for the main model.
-        Used only when main_model_path is None.
-    output_variable : str
-        Name of the ExtraInfo variable for the output score.
-        Default: 'BplusScore'
-    skip_nn_evaluation : bool
-        If True, skip loading and evaluating the neural networks and fill
-        deterministic placeholder outputs instead. Intended for debugging or
-        timing studies and emits a warning at module initialization.
-    addDstarVetoReco : bool
-        Whether to add D* veto reconstruction before the NN.
-        Default: True
-    path : basf2.Path
-        The basf2 path to add the module to.
+    Parameters:
+        bp_list (str): B+ meson particle list name to process. Example: 'B+:feiHadronic'
+        b0_list (str): B0 meson particle list name to process. Example: 'B0:feiHadronic'
+        cat_model_path (str, optional): Path to the category network ONNX model file.
+            If None, loads from conditions database.
+        main_model_path (str, optional): Path to the main network ONNX model file.
+            If None, loads from conditions database.
+        payload_cat_model (str, optional): Conditions DB payload name for the category model.
+            Used only when cat_model_path is None.
+        payload_main_model (str, optional): Conditions DB payload name for the main model.
+            Used only when main_model_path is None.
+        output_variable (str): Name of the ExtraInfo variable for the output score.
+            Default: 'BplusScore'
+        skip_nn_evaluation (bool): If True, skip loading and evaluating the neural networks
+            and fill deterministic placeholder outputs instead. Intended for debugging or
+            timing studies and emits a warning at module initialization.
+        addDstarVetoReco (bool): Whether to add D* veto reconstruction before the NN.
+            Default: True
+        path (basf2.Path): The basf2 path to add the module to.
 
-    Returns
-    -------
-    None
+    Notes:
+        The ModeSelector neural network outputs:
 
-    Notes
-    -----
-    The ModeSelector neural network outputs:
+        Candidate-level (ExtraInfo on best B+ and best B0):
+        - modeSelector_eqSigProb: Probability assigned to a candidate's input_id
+          in the predicted sector
 
-    Candidate-level (ExtraInfo on best B+ and best B0):
-    - modeSelector_eqSigProb: Probability assigned to a candidate's input_id
-      in the predicted sector
+        Event-level (EventExtraInfo):
+        - {output_variable}: signed main score
+        - modeSelector_catB0: Category network B0 probability
+        - modeSelector_catBp: Category network B+ probability
+        - modeSelector_catCont: Category network continuum probability
 
-    Event-level (EventExtraInfo):
-    - {output_variable}: signed main score
-    - modeSelector_catB0: Category network B0 probability
-    - modeSelector_catBp: Category network B+ probability
-    - modeSelector_catCont: Category network continuum probability
+        Candidate-level ranking (ExtraInfo on deduplicated representatives):
+        - modeSelector_rank: predicted sector ranked by modeSelector_eqSigProb,
+          non-predicted sector ranked by sigProb
 
-    Candidate-level ranking (ExtraInfo on deduplicated representatives):
-    - modeSelector_rank: predicted sector ranked by modeSelector_eqSigProb,
-      non-predicted sector ranked by sigProb
+        For best performance, run addDstarVeto() before modeSelector() to
+        provide D* veto features to the network.
 
-    For best performance, run addDstarVeto() before modeSelector() to
-    provide D* veto features to the network.
-
-    Example
-    -------
-    >>> import basf2 as b2
-    >>> import modularAnalysis as ma
-    >>> import modeSelector
-    >>>
-    >>> path = b2.create_path()
-    >>> ma.inputMdstList('default', path=path)
-    >>>
-    >>> # Assume FEI B lists are available
-    >>> # Add D* veto reconstruction
-    >>> modeSelector.addDstarVeto(['B+:fei', 'B0:fei'], path=path)
-    >>>
-    >>> # Add ModeSelector
-    >>> modeSelector.modeSelector(
-    ...     bp_list='B+:fei',
-    ...     b0_list='B0:fei',
-    ...     path=path
-    ... )
-    >>>
-    >>> # Write to ntuple
-    >>> ma.variablesToNtuple(
-    ...     'B+:fei',
-    ...     ['extraInfo(BplusScore)', 'extraInfo(SignalProbability)'],
-    ...     filename='output.root',
-    ...     path=path
-    ... )
+    Example:
+        >>> import basf2 as b2
+        >>> import modularAnalysis as ma
+        >>> import modeSelector
+        >>>
+        >>> path = b2.create_path()
+        >>> ma.inputMdstList('default', path=path)
+        >>>
+        >>> # Assume FEI B lists are available
+        >>> # Add D* veto reconstruction
+        >>> modeSelector.addDstarVeto(['B+:fei', 'B0:fei'], path=path)
+        >>>
+        >>> # Add ModeSelector
+        >>> modeSelector.modeSelector(
+        ...     bp_list='B+:fei',
+        ...     b0_list='B0:fei',
+        ...     path=path
+        ... )
+        >>>
+        >>> # Write to ntuple
+        >>> ma.variablesToNtuple(
+        ...     'B+:fei',
+        ...     ['extraInfo(BplusScore)', 'extraInfo(SignalProbability)'],
+        ...     filename='output.root',
+        ...     path=path
+        ... )
     """
     import basf2 as b2
 

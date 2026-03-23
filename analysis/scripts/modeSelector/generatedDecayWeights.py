@@ -202,10 +202,12 @@ def get_generated_calibration_weight(pdg, gen_dm_id, rest_dmid=REST_DMID):
 
 
 def _abs_pdg(particle):
+    """Return the absolute value of a particle's PDG code."""
     return abs(int(particle.getPDG()))
 
 
 def _is_primary_particle(particle):
+    """Return True if particle is a generator-level primary particle."""
     if hasattr(particle, 'isPrimaryParticle'):
         return bool(particle.isPrimaryParticle())
     if hasattr(particle, 'hasStatus') and hasattr(Belle2, 'MCParticle'):
@@ -216,6 +218,7 @@ def _is_primary_particle(particle):
 
 
 def _belongs_to_root(particle, root_index):
+    """Return True if particle is a descendant of the MCParticle with the given array index."""
     mother = particle.getMother()
     while mother:
         if int(mother.getArrayIndex()) == root_index:
@@ -225,6 +228,7 @@ def _belongs_to_root(particle, root_index):
 
 
 def _ancestor_distance(particle, target_abs_pdg):
+    """Return the number of steps to the nearest ancestor with the given absolute PDG code, or 0 if none."""
     distance = 1
     mother = particle.getMother()
     while mother:
@@ -236,6 +240,7 @@ def _ancestor_distance(particle, target_abs_pdg):
 
 
 def _has_any_abs_ancestor(particle, abs_pdgs):
+    """Return True if any ancestor of particle has an absolute PDG code in abs_pdgs."""
     mother = particle.getMother()
     while mother:
         if _abs_pdg(mother) in abs_pdgs:
@@ -245,10 +250,12 @@ def _has_any_abs_ancestor(particle, abs_pdgs):
 
 
 def _count_descendants(descendants, predicate):
+    """Count the number of particles in descendants for which predicate returns True."""
     return sum(1 for particle in descendants if predicate(particle))
 
 
 def _build_mode_signature(root_particle, descendants):
+    """Build the decay-mode signature tuple for a B meson and its generator-level descendants."""
     root_pdg = int(root_particle.getPDG())
     expand_dsp = False
 
@@ -348,6 +355,7 @@ def _build_mode_signature(root_particle, descendants):
 
 
 def _signature_to_dict(signature):
+    """Convert a signature tuple to a dict keyed by SIGNATURE_EXTRA_INFO_KEYS."""
     return dict(zip(SIGNATURE_EXTRA_INFO_KEYS, signature))
 
 
@@ -362,6 +370,7 @@ def get_exact_dmid_from_signature(signature):
 
 
 def _match_generated_mode(root_particle, descendants, use_calibrated_dmids_only=True):
+    """Match a B meson's decay to a known FEI mode and return a dict with pdg, dm IDs, weight, and signature."""
     signature = _build_mode_signature(root_particle, descendants)
     pdg, exact_dm_id = get_exact_dmid_from_signature(signature)
     if exact_dm_id is None:
@@ -387,6 +396,7 @@ def _match_generated_mode(root_particle, descendants, use_calibrated_dmids_only=
 
 
 def _build_event_truth_cache(particles, use_calibrated_dmids_only=True):
+    """Build a map from B meson array index to its generated-mode match dict for all B mesons in the event."""
     cache = {}
     primary_particles = [particle for particle in particles if _is_primary_particle(particle)]
     roots = [particle for particle in primary_particles if _abs_pdg(particle) in (511, 521)]
@@ -419,20 +429,31 @@ class GeneratedDecayWeightModule(b2.Module):
         use_calibrated_dmids_only=True,
         store_btag_candidate_signature=False,
     ):
+        """Initialise module parameters."""
         super().__init__()
+        #: B+ particle list name
         self.bp_list = bp_list
+        #: B0 particle list name
         self.b0_list = b0_list
+        #: ExtraInfo key name for the generated decay mode ID
         self.gen_dmid_variable = gen_dmid_variable
+        #: ExtraInfo key name for the calibration weight
         self.weight_variable = weight_variable
+        #: Decay mode ID used for the rest (non-calibrated) category
         self.rest_dmid = rest_dmid
+        #: Whether to restrict to calibrated decay mode IDs only
         self.use_calibrated_dmids_only = use_calibrated_dmids_only
+        #: Whether to store the full btag candidate signature as ExtraInfo
         self.store_btag_candidate_signature = store_btag_candidate_signature
+        #: Internal flag: True after configuration has been validated
         self._validated = False
 
     def initialize(self):
+        """Validate configuration once at the start of processing."""
         self._validate_configuration()
 
     def _validate_configuration(self):
+        """Raise a fatal error if any module parameter is invalid."""
         if self._validated:
             return
         if not isinstance(self.bp_list, str) or not self.bp_list.startswith('B+:'):
@@ -457,10 +478,12 @@ class GeneratedDecayWeightModule(b2.Module):
 
     @staticmethod
     def _normalize_int(value):
+        """Return int(value), or None if value is NaN."""
         return None if value != value else int(value)
 
     @staticmethod
     def _set_extra_info(particle, key, value):
+        """Set or add an ExtraInfo entry on a particle."""
         if particle.hasExtraInfo(key):
             particle.setExtraInfo(key, value)
         else:
@@ -468,17 +491,20 @@ class GeneratedDecayWeightModule(b2.Module):
 
     @staticmethod
     def _is_non_continuum_event(particle):
+        """Return True if the event is not a continuum event."""
         is_cont = vm.evaluate('isContinuumEvent', particle)
         return int(is_cont) != 1
 
     @staticmethod
     def _report_missing_truth_annotation(list_name, particle, reason):
+        """Emit a B2ERROR for a non-continuum candidate missing its truth annotation."""
         b2.B2ERROR(
             "ModeSelector generated weights: non-continuum candidate missing generated "
             f"B truth annotation in {list_name} (array index {particle.getArrayIndex()}): {reason}"
         )
 
     def _annotate_list(self, list_name, truth_cache):
+        """Annotate all candidates in list_name using the pre-built truth_cache."""
         plist = Belle2.PyStoreObj(list_name)
         if not plist.isValid():
             return
@@ -530,6 +556,7 @@ class GeneratedDecayWeightModule(b2.Module):
                     self._set_extra_info(particle, key, float(value))
 
     def event(self):
+        """Annotate all B candidates with generated decay mode IDs and calibration weights."""
         bp_plist = Belle2.PyStoreObj(self.bp_list)
         b0_plist = Belle2.PyStoreObj(self.b0_list)
         bp_empty = not bp_plist.isValid() or bp_plist.getListSize() == 0

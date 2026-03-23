@@ -37,9 +37,13 @@ from scipy import sparse
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 
+#: Main network label index for bad-tag background
 MAIN_BG_BAD_TAG = config.N_INPUT_IDS
+#: Main network label index for cross-deltaC1 background
 MAIN_BG_CROSS_DC1 = config.N_INPUT_IDS + 1
+#: Main network label index for continuum background
 MAIN_BG_CONT = config.N_INPUT_IDS + 2
+#: Total number of main network output labels
 MAIN_NUM_LABELS = config.N_INPUT_IDS + 3
 
 
@@ -49,44 +53,35 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     """
     Load training data and apply optional global downsampling.
 
-    Parameters
-    ----------
-    input_files : str or list of str
-        Path(s) to modeSelector_training.npz file(s)
-    fraction : float
-        Uniform BB sampling fraction applied after loading (default 1.0)
-    cont_fraction : float
-        Additional continuum downscale relative to fraction (default 1.0)
-    sigprob_thresh : float
-        Minimum signal probability threshold. Default: 0.001.
-    random_state : int
-        Random seed
+    Parameters:
+        input_files (str or list of str): Path(s) to modeSelector_training.npz file(s).
+        fraction (float): Uniform BB sampling fraction applied after loading (default 1.0).
+        cont_fraction (float): Additional continuum downscale relative to fraction (default 1.0).
+        sigprob_thresh (float): Minimum signal probability threshold. Default: 0.001.
+        random_state (int): Random seed.
 
-    Returns
-    -------
-    features : sparse matrix
-        Sampled and filtered feature matrix (only has_inputs columns)
-    event_scalars : tuple (is_cont, gen_pdg, bp_is_best, best_sigprob,
-                           best_bp_sigprob_iid, best_b0_sigprob_iid)
-        Per-event compact MC truth scalars; int8/int16/float32 arrays of shape (n_events,).
-    has_inputs : list of int
-        Selected feature indices (non-zero features, excluding Mbc)
-    mc_truth_cand : tuple (best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp)
-        Per-event arrays of shape (n_events,). best_bp_iid/b0_iid are int16 with
-        sentinel -1 when no qualifying candidate exists; best_bp_dp/b0_dp are float32
-        with sentinel inf. Pre-filtered: truth-compatible tag PDG and is_cont != 1.
-    sig_truth : tuple (sig_input_ids_values, sig_input_ids_offsets,
-                       sig_btag_index_values, sig_delta_p_values, sig_sigprob_values)
-        Packed ragged arrays of per-event isSignal==1 candidates on deduplicated
-        input_ids. Event i slice is values[offsets[i]:offsets[i+1]] and aligned
-        across all *_values arrays.
-    calib_inputs : tuple (bp_tag_is_gen, b0_tag_is_gen, bp_gen_dm_id, b0_gen_dm_id,
-                          bp_gen_calib_w, b0_gen_calib_w, stored_fei_calib_w)
-        Per-event arrays for FEI calibration weight computation. bp/b0_gen_dm_id
-        are int16 with sentinel -1 (missing) or 999 (rest calibration).
-        stored_fei_calib_w is the pre-computed event-level weight from the npz,
-        used to verify the recomputed weights in compute_event_weights.
-        bp/b0_gen_calib_w are float32 stored calibration weights from generatedDecayWeights.
+    Returns:
+        features (sparse matrix): Sampled and filtered feature matrix (only has_inputs columns).
+        event_scalars (tuple): (is_cont, gen_pdg, bp_is_best, best_sigprob,
+            best_bp_sigprob_iid, best_b0_sigprob_iid) -- per-event compact MC truth scalars;
+            int8/int16/float32 arrays of shape (n_events,).
+        has_inputs (list of int): Selected feature indices (non-zero features, excluding Mbc).
+        mc_truth_cand (tuple): (best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp) --
+            per-event arrays of shape (n_events,). best_bp_iid/b0_iid are int16 with
+            sentinel -1 when no qualifying candidate exists; best_bp_dp/b0_dp are float32
+            with sentinel inf. Pre-filtered: truth-compatible tag PDG and is_cont != 1.
+        sig_truth (tuple): (sig_input_ids_values, sig_input_ids_offsets,
+            sig_btag_index_values, sig_delta_p_values, sig_sigprob_values) --
+            packed ragged arrays of per-event isSignal==1 candidates on deduplicated
+            input_ids. Event i slice is values[offsets[i]:offsets[i+1]] and aligned
+            across all *_values arrays.
+        calib_inputs (tuple): (bp_tag_is_gen, b0_tag_is_gen, bp_gen_dm_id, b0_gen_dm_id,
+            bp_gen_calib_w, b0_gen_calib_w, stored_fei_calib_w) -- per-event arrays for FEI
+            calibration weight computation. bp/b0_gen_dm_id are int16 with sentinel -1
+            (missing) or 999 (rest calibration). stored_fei_calib_w is the pre-computed
+            event-level weight from the npz, used to verify recomputed weights in
+            compute_event_weights. bp/b0_gen_calib_w are float32 stored calibration weights
+            from generatedDecayWeights.
     """
 
     if isinstance(input_files, str):
@@ -431,11 +426,14 @@ class MultiClassNet(nn.Module):
     """
 
     def __init__(self, input_size, num_labels=3):
+        """Build the network graph for the given input size and number of output classes."""
         super().__init__()
 
+        #: Activation function applied between all linear layers
         self.activation = nn.ReLU()
 
         if num_labels <= 10:
+            #: Fully connected network layers
             self.network = nn.Sequential(
                 nn.Linear(input_size, 128),
                 self.activation,
@@ -478,6 +476,7 @@ class MultiClassNet(nn.Module):
                 nn.init.constant_(m.bias, 0.01)
 
     def forward(self, x):
+        """Run a forward pass through the network."""
         return self.network(x)
 
 
@@ -485,30 +484,20 @@ def train_epoch(model, train_loader, criterion, optimizer, device, disco_lambda=
     """
     Train for one epoch with optional distance correlation penalty.
 
-    Parameters
-    ----------
-    model : nn.Module
-        Model to train
-    train_loader : DataLoader
-        Training data loader. Batch tuple formats supported:
-        - 2-tuple (features, labels): no weights, no DisCo
-        - 3-tuple (features, labels, weights): weighted loss, no DisCo
-        - 4-tuple (features, labels, mbc, weights): weighted loss + DisCo
-    criterion : nn.Module
-        Loss function with reduction='none' (per-sample losses required)
-    optimizer : torch.optim.Optimizer
-        Optimizer
-    device : torch.device
-        Device to use
-    disco_lambda : float
-        Coefficient for distance correlation loss (0 = disabled)
+    Parameters:
+        model (nn.Module): Model to train.
+        train_loader (DataLoader): Training data loader. Batch tuple formats supported:
+            2-tuple (features, labels): no weights, no DisCo;
+            3-tuple (features, labels, weights): weighted loss, no DisCo;
+            4-tuple (features, labels, mbc, weights): weighted loss + DisCo.
+        criterion (nn.Module): Loss function with reduction='none' (per-sample losses required).
+        optimizer (torch.optim.Optimizer): Optimizer.
+        device (torch.device): Device to use.
+        disco_lambda (float): Coefficient for distance correlation loss (0 = disabled).
 
-    Returns
-    -------
-    train_loss : float
-        Average (weighted) classification loss
-    disco_loss : float
-        Average distance correlation loss (0.0 if disabled)
+    Returns:
+        tuple: (train_loss, disco_loss) -- average (weighted) classification loss and
+            average distance correlation loss (0.0 if disabled).
     """
     model.train()
     total_loss = 0
@@ -614,21 +603,15 @@ def distance_corr(var_1, var_2, normedweight=None, power=1):
     The distance correlation is a measure of dependence between two random variables.
     It is zero if and only if the variables are independent.
 
-    Parameters
-    ----------
-    var_1 : torch.Tensor, shape (n,)
-        First variable (e.g., Mbc)
-    var_2 : torch.Tensor, shape (n,)
-        Second variable (e.g., classifier output)
-    normedweight : torch.Tensor, optional, shape (n,)
-        Per-example weight (should sum to n). If None, uses uniform weights.
-    power : int
-        Exponent for distance correlation (default 1)
+    Parameters:
+        var_1 (torch.Tensor): First variable, shape (n,) (e.g., Mbc).
+        var_2 (torch.Tensor): Second variable, shape (n,) (e.g., classifier output).
+        normedweight (torch.Tensor, optional): Per-example weight, shape (n,), should sum to n.
+            If None, uses uniform weights.
+        power (int): Exponent for distance correlation (default 1).
 
-    Returns
-    -------
-    torch.Tensor (scalar)
-        Distance correlation coefficient
+    Returns:
+        torch.Tensor: Distance correlation coefficient (scalar).
     """
     n = len(var_1)
 
@@ -700,31 +683,22 @@ def build_mode_labels(mc_truth_cand, sig_truth, charged_cat, is_cont, gen_pdg,
     4. If no isSignal==1 candidate in predicted sector, fall back to current
        deltaP-based logic from compact truth scalars.
 
-    Parameters
-    ----------
-    mc_truth_cand : tuple (best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp)
-        Per-event arrays from load_and_sample_data. best_bp_iid/b0_iid are int16
-        with sentinel -1; best_bp_dp/b0_dp are float32 with sentinel inf.
-    sig_truth : tuple (sig_input_ids_values, sig_input_ids_offsets,
-                       sig_btag_index_values, sig_delta_p_values, sig_sigprob_values)
-        Packed ragged isSignal==1 candidate metadata.
-    charged_cat : ndarray of bool
-        True if category network predicts B+, False for B0
-    is_cont : ndarray of int8
-        1 if continuum event (from best overall candidate), else 0
-    gen_pdg : ndarray of int16
-        mostcommonBTagPDG of best overall candidate (0 for continuum)
-    delta_p_thresh : float
-        Threshold for mostcommonBTagDeltaP. Default: 0.15
+    Parameters:
+        mc_truth_cand (tuple): (best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp) --
+            per-event arrays from load_and_sample_data. best_bp_iid/b0_iid are int16
+            with sentinel -1; best_bp_dp/b0_dp are float32 with sentinel inf.
+        sig_truth (tuple): (sig_input_ids_values, sig_input_ids_offsets,
+            sig_btag_index_values, sig_delta_p_values, sig_sigprob_values) --
+            packed ragged isSignal==1 candidate metadata.
+        charged_cat (ndarray of bool): True if category network predicts B+, False for B0.
+        is_cont (ndarray of int8): 1 if continuum event (from best overall candidate), else 0.
+        gen_pdg (ndarray of int16): mostcommonBTagPDG of best overall candidate (0 for continuum).
+        delta_p_thresh (float): Threshold for mostcommonBTagDeltaP. Default: 0.15.
 
-    Returns
-    -------
-    labels : ndarray of int64
-        Mode labels (0 to N_INPUT_IDS+2)
-    train_selection : ndarray of bool
-        True for events kept for main-network training after label assignment
-    stats : dict
-        Counters for how labels were assigned.
+    Returns:
+        tuple: (labels, train_selection, stats) where labels is ndarray of int64 with mode
+            labels (0 to N_INPUT_IDS+2), train_selection is ndarray of bool for events kept
+            for main-network training, and stats is a dict of label assignment counters.
     """
     n_events = len(is_cont)
     bp_threshold = config.N_BP_MODES * 2
@@ -836,29 +810,34 @@ class SparseDataset(torch.utils.data.Dataset):
     def __init__(self, features_sparse, labels, mbc_values=None, extra_features=None,
                  weights=None):
         """
-        Parameters
-        ----------
-        features_sparse : scipy.sparse matrix, shape (n_samples, n_features)
-            Sparse feature matrix (CSR format recommended)
-        labels : np.ndarray, shape (n_samples,)
-            Target labels
-        mbc_values : np.ndarray, optional, shape (n_samples,)
-            Mbc values per event (for DisCo loss)
-        extra_features : np.ndarray, optional, shape (n_samples, n_extra)
-            Additional dense features concatenated per sample
-        weights : np.ndarray, optional, shape (n_samples,)
-            Per-event loss weights (e.g. FEI calibration weights)
+        Parameters:
+            features_sparse (scipy.sparse matrix): Sparse feature matrix of shape
+                (n_samples, n_features). CSR format recommended.
+            labels (np.ndarray): Target labels, shape (n_samples,).
+            mbc_values (np.ndarray, optional): Mbc values per event for DisCo loss,
+                shape (n_samples,).
+            extra_features (np.ndarray, optional): Additional dense features concatenated
+                per sample, shape (n_samples, n_extra).
+            weights (np.ndarray, optional): Per-event loss weights, shape (n_samples,)
+                (e.g. FEI calibration weights).
         """
+        #: Feature matrix in CSR format
         self.features = features_sparse.tocsr()
+        #: Target class labels
         self.labels = labels
+        #: Mbc values per event for DisCo loss, or None
         self.mbc_values = mbc_values
+        #: Additional dense features concatenated at retrieval time, or None
         self.extra_features = extra_features
+        #: Per-event loss weights, or None
         self.weights = weights
 
     def __len__(self):
+        """Return the number of samples in the dataset."""
         return self.features.shape[0]
 
     def __getitem__(self, idx):
+        """Return one sample (features, label, [mbc, [weight]]) for the given index."""
         # Convert sparse row to dense 1D tensor
         feature_row = self.features[idx].toarray().astype(np.float32).squeeze()
         if self.extra_features is not None:
@@ -897,17 +876,13 @@ def build_category_labels(is_cont, gen_pdg):
     """
     Build category labels (B0=0, B+=1, continuum=2) from compact MC truth scalars.
 
-    Parameters
-    ----------
-    is_cont : ndarray of int8
-        1 if continuum event, 0 otherwise
-    gen_pdg : ndarray of int16
-        mostcommonBTagPDG of the best-sigProb candidate (0 for continuum)
+    Parameters:
+        is_cont (ndarray of int8): 1 if continuum event, 0 otherwise.
+        gen_pdg (ndarray of int16): mostcommonBTagPDG of the best-sigProb candidate
+            (0 for continuum).
 
-    Returns
-    -------
-    labels : ndarray of int64
-        Category labels (0=B0, 1=B+, 2=continuum)
+    Returns:
+        ndarray of int64: Category labels (0=B0, 1=B+, 2=continuum).
     """
     abs_gen_pdg = np.abs(gen_pdg.astype(np.int32))
     known_tag = (abs_gen_pdg == 511) | (abs_gen_pdg == 521)
@@ -928,23 +903,17 @@ def compute_event_weights(event_scalars, mc_truth_cand, calib_inputs,
     delta_p_thresh; falls back to the generated decay mode weight otherwise.
     Continuum events always receive weight config.FEI_CALIB_CONT.
 
-    Parameters
-    ----------
-    event_scalars : tuple
-        From load_and_sample_data: (is_cont, gen_pdg, bp_is_best, best_sigprob,
-        best_bp_sigprob_iid, best_b0_sigprob_iid)
-    mc_truth_cand : tuple
-        From load_and_sample_data: (best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp)
-    calib_inputs : tuple
-        From load_and_sample_data: (bp_tag_is_gen, b0_tag_is_gen, bp_gen_dm_id,
-        b0_gen_dm_id, bp_gen_calib_w, b0_gen_calib_w, stored_fei_calib_w)
-    delta_p_thresh : float
-        DeltaP threshold for tag quality (default: config.DELTA_P_THRESH)
+    Parameters:
+        event_scalars (tuple): From load_and_sample_data: (is_cont, gen_pdg, bp_is_best,
+            best_sigprob, best_bp_sigprob_iid, best_b0_sigprob_iid).
+        mc_truth_cand (tuple): From load_and_sample_data: (best_bp_iid, best_bp_dp,
+            best_b0_iid, best_b0_dp).
+        calib_inputs (tuple): From load_and_sample_data: (bp_tag_is_gen, b0_tag_is_gen,
+            bp_gen_dm_id, b0_gen_dm_id, bp_gen_calib_w, b0_gen_calib_w, stored_fei_calib_w).
+        delta_p_thresh (float): DeltaP threshold for tag quality (default: config.DELTA_P_THRESH).
 
-    Returns
-    -------
-    weights : ndarray of float32, shape (n_events,)
-        Per-event FEI calibration weights.
+    Returns:
+        ndarray of float32: Per-event FEI calibration weights, shape (n_events,).
     """
     is_cont, gen_pdg, bp_is_best, _, best_bp_sigprob_iid, best_b0_sigprob_iid = event_scalars
     _, best_bp_dp, _, best_b0_dp = mc_truth_cand
@@ -1068,23 +1037,15 @@ def generate_category_outputs(cat_model, features, batch_size, device, use_spars
     """
     Generate category softmax outputs for all samples.
 
-    Parameters
-    ----------
-    cat_model : nn.Module
-        Trained category model in eval mode
-    features : scipy.sparse matrix or np.ndarray
-        Input feature matrix
-    batch_size : int
-        Batch size for inference
-    device : torch.device
-        Device to use
-    use_sparse : bool
-        Whether features is sparse and should be densified batch-wise
+    Parameters:
+        cat_model (nn.Module): Trained category model in eval mode.
+        features (scipy.sparse matrix or np.ndarray): Input feature matrix.
+        batch_size (int): Batch size for inference.
+        device (torch.device): Device to use.
+        use_sparse (bool): Whether features is sparse and should be densified batch-wise.
 
-    Returns
-    -------
-    np.ndarray
-        Category softmax outputs with shape (n_samples, 3)
+    Returns:
+        np.ndarray: Category softmax outputs with shape (n_samples, 3).
     """
     print("\nGenerating category outputs...")
     n_samples = features.shape[0]
@@ -1103,6 +1064,7 @@ def generate_category_outputs(cat_model, features, batch_size, device, use_spars
 
 
 def main():
+    """Parse command-line arguments and run the requested training."""
     parser = argparse.ArgumentParser(description='Train ModeSelector networks')
     parser.add_argument('--input', required=True, nargs='+',
                         help='One or more modeSelector_training.npz paths (shell glob or space-separated list)')

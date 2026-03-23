@@ -17,6 +17,7 @@ import torch
 
 
 def load_checkpoint(path):
+    """Load a PyTorch checkpoint and derive a display name from the filename."""
     ckpt = torch.load(path, map_location='cpu')
     name = os.path.splitext(os.path.basename(path))[0]
     return ckpt, name
@@ -115,6 +116,7 @@ def plot_input_importance(ckpt, name, ax):
 
 
 def summarise(ckpt, name):
+    """Print a summary of checkpoint metadata to stdout."""
     sd = ckpt['model_state_dict']
     n_params = sum(v.numel() for v in sd.values())
     cfg = ckpt.get('config', {})
@@ -132,6 +134,7 @@ def summarise(ckpt, name):
 
 
 def main():
+    """Parse command-line arguments and produce diagnostic plots for each checkpoint."""
     parser = argparse.ArgumentParser(description='Plot ModeSelector training diagnostics')
     parser.add_argument('checkpoints', nargs='+', help='Path(s) to .pt checkpoint file(s)')
     parser.add_argument('--output', default=None,

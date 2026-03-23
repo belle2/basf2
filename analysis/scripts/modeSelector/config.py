@@ -39,12 +39,20 @@ NUM_MAIN_LABELS = N_INPUT_IDS + 3  # signal input_id classes + bad_tag + cross_d
 # Warn if a monitored high-confidence fraction exceeds this value.
 MONITOR_WARN_FRACTION = 1e-3  # 0.1%
 
-# High-confidence definition for monitoring warnings.
-HIGH_CONF_BPLUSSCORE_ABS = 0.01
+# Minimum best-candidate sigProb to count an event as high-confidence for monitoring.
+HIGH_CONF_SIGPROB_MIN = 0.01
 
 # Default sigProb working point used for FEI calibration lookup and training
 # preselection.
 DEFAULT_FEI_SIGPROB_THRESHOLD = 0.001
+
+# Candidate preselections applied during training and required by the FEI calibration.
+# These must be reproduced at inference time. ModeSelectorModule checks compliance
+# and issues a B2WARNING at the end of the job if violations are found.
+PRESELECTION_MBC_MIN = 5.23      # Mbc > this value
+PRESELECTION_DELTAE_MIN = -0.15  # deltaE lower bound (exclusive)
+PRESELECTION_DELTAE_MAX = 0.1    # deltaE upper bound (exclusive)
+PRESELECTION_COSTBTO_MAX = 0.9   # cosTBTO upper bound (exclusive)
 
 # Default calibration weight assigned to continuum events.
 FEI_CALIB_CONT = 1.0

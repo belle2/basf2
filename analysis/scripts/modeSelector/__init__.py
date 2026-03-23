@@ -10,29 +10,17 @@
 """
 ModeSelector - Event-level B meson classification using neural networks.
 
-This module provides tools for improving FEI B meson signal probability
-by leveraging information from all candidates in an event.
+The FEI assigns a signal probability (sigProb) to each B candidate independently.
+ModeSelector uses the full set of FEI B candidates with sigProb > 0.001 simultaneously
+to classify the event and produce a refined score (BplusScore).
 
 Main components:
-- modeSelector(): Main function to add ModeSelector to a path
-- addDstarVeto(): Add D* veto reconstruction
-- ModeSelectorModule: The basf2 Python module for NN evaluation
 
-Example usage:
-    import modeSelector
+- modeSelector(): main function to add ModeSelector to a basf2 path
+- addDstarVeto(): D* veto reconstruction (called automatically by modeSelector)
 
-    # Add D* veto reconstruction (optional, improves performance)
-    modeSelector.addDstarVeto(['B+:fei', 'B0:fei'], path=my_path)
-
-    # Add ModeSelector NN evaluation
-    modeSelector.modeSelector(
-        bp_list='B+:fei',
-        b0_list='B0:fei',
-        path=my_path
-    )
-
-    # Access the score in ntuples
-    variables = ['extraInfo(BplusScore)']
+See ``analysis/doc/ModeSelector.rst`` for usage instructions and
+``analysis/scripts/modeSelector/README.md`` for implementation details.
 """
 
 from modeSelector import config
@@ -79,20 +67,17 @@ def modeSelector(
     The main output score is stored in EventExtraInfo using output_variable.
     Auxiliary category and per-candidate mode outputs are stored with the
     fixed modeSelector_* names.
-    If generated-decay annotations are already present, the event-level
-    modeSelector_feiCalibWeight uses them on the gen path and interprets
-    genDecayModeID = -1 as continuum or missing generated B truth.
 
     Parameters:
         bp_list (str): B+ meson particle list name to process. Example: 'B+:feiHadronic'
         b0_list (str): B0 meson particle list name to process. Example: 'B0:feiHadronic'
-        cat_model_path (str, optional): Path to the category network ONNX model file.
+        cat_model_path (str): Path to the category network ONNX model file.
             If None, loads from conditions database.
-        main_model_path (str, optional): Path to the main network ONNX model file.
+        main_model_path (str): Path to the main network ONNX model file.
             If None, loads from conditions database.
-        payload_cat_model (str, optional): Conditions DB payload name for the category model.
+        payload_cat_model (str): Conditions DB payload name for the category model.
             Used only when cat_model_path is None.
-        payload_main_model (str, optional): Conditions DB payload name for the main model.
+        payload_main_model (str): Conditions DB payload name for the main model.
             Used only when main_model_path is None.
         output_variable (str): Name of the ExtraInfo variable for the output score.
             Default: 'BplusScore'
@@ -104,51 +89,22 @@ def modeSelector(
         path (basf2.Path): The basf2 path to add the module to.
 
     Notes:
-        The ModeSelector neural network outputs:
+        Candidate-level ``ExtraInfo`` (predicted sector only):
 
-        Candidate-level (ExtraInfo on best B+ and best B0):
-        - modeSelector_eqSigProb: Probability assigned to a candidate's input_id
-          in the predicted sector
+        - ``modeSelector_eqSigProb``: main-network probability for the candidate's
+          specific decay mode.
+        - ``modeSelector_rank``: sector-local rank. Predicted sector ranked by
+          ``modeSelector_eqSigProb``; non-predicted sector ranked by ``sigProb``.
 
-        Event-level (EventExtraInfo):
-        - {output_variable}: signed main score
-        - modeSelector_catB0: Category network B0 probability
-        - modeSelector_catBp: Category network B+ probability
-        - modeSelector_catCont: Category network continuum probability
+        Event-level ``EventExtraInfo``:
 
-        Candidate-level ranking (ExtraInfo on deduplicated representatives):
-        - modeSelector_rank: predicted sector ranked by modeSelector_eqSigProb,
-          non-predicted sector ranked by sigProb
+        - ``BplusScore`` (or the name given by ``output_variable``): signed score,
+          positive for B+ prediction, negative for B0.
+        - ``modeSelector_catB0``, ``modeSelector_catBp``, ``modeSelector_catCont``:
+          category network probabilities.
 
-        For best performance, run addDstarVeto() before modeSelector() to
-        provide D* veto features to the network.
-
-    Example:
-        >>> import basf2 as b2
-        >>> import modularAnalysis as ma
-        >>> import modeSelector
-        >>>
-        >>> path = b2.create_path()
-        >>> ma.inputMdstList('default', path=path)
-        >>>
-        >>> # Assume FEI B lists are available
-        >>> # Add D* veto reconstruction
-        >>> modeSelector.addDstarVeto(['B+:fei', 'B0:fei'], path=path)
-        >>>
-        >>> # Add ModeSelector
-        >>> modeSelector.modeSelector(
-        ...     bp_list='B+:fei',
-        ...     b0_list='B0:fei',
-        ...     path=path
-        ... )
-        >>>
-        >>> # Write to ntuple
-        >>> ma.variablesToNtuple(
-        ...     'B+:fei',
-        ...     ['extraInfo(BplusScore)', 'extraInfo(SignalProbability)'],
-        ...     filename='output.root',
-        ...     path=path
-        ... )
+        The D* veto reconstruction is added automatically (``addDstarVetoReco=True``).
+        Pass ``addDstarVetoReco=False`` to skip it if already added separately.
     """
     import basf2 as b2
 

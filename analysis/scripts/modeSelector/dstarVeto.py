@@ -294,11 +294,13 @@ def addDstarVeto(
             # Create dummy particles to transfer ExtraInfo back to signal side
             if dstp_lists:
                 ma.reconstructDecay('Xsd:dstp -> D*+:veto', '', allowChargeViolation=True, path=roe_path)
+                roe_path.modules()[-1].set_log_level(b2.LogLevel.ERROR)
                 if writeExtraInfo:
                     ma.variableToSignalSideExtraInfo('Xsd:dstp', extra_info_veto_dstp, path=roe_path)
 
             if dst0_lists:
                 ma.reconstructDecay('Xsd:dst0 -> D*0:veto', '', allowChargeViolation=True, path=roe_path)
+                roe_path.modules()[-1].set_log_level(b2.LogLevel.ERROR)
                 if writeExtraInfo:
                     ma.variableToSignalSideExtraInfo('Xsd:dst0', extra_info_veto_dst0, path=roe_path)
 

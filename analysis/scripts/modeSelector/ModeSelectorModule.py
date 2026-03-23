@@ -124,6 +124,10 @@ class ModeSelectorModule(b2.Module):
         self._missing_top_mode_high_conf_count = 0
         #: Number of high-confidence events where fallback was used
         self._empty_predicted_sector_high_conf_count = 0
+        #: Number of candidates checked for preselection compliance
+        self._presel_total_candidates = 0
+        #: Number of candidates failing at least one preselection cut
+        self._presel_violation_count = 0
 
         # Feature configuration (from modeSelector.config)
         #: Number of input_id slots (B+ sector + B0 sector, each split by particle/antiparticle)
@@ -170,7 +174,15 @@ class ModeSelectorModule(b2.Module):
             db_accessor = Belle2.DBAccessorBase(
                 Belle2.DBStoreEntry.c_RawFile, self.payload_cat_model, True
             )
-            cat_wf = Belle2.MVA.Weightfile.loadFromFile(db_accessor.getFilename())
+            cat_filename = db_accessor.getFilename()
+            if not cat_filename:
+                b2.B2FATAL(
+                    "ModeSelector: category model payload '"
+                    + self.payload_cat_model
+                    + "' not found in the conditions database. "
+                    "Make sure the correct global tag is configured."
+                )
+            cat_wf = Belle2.MVA.Weightfile.loadFromFile(cat_filename)
 
         if self.main_model_path:
             main_wf = Belle2.MVA.Weightfile.loadFromFile(self.main_model_path)
@@ -178,7 +190,15 @@ class ModeSelectorModule(b2.Module):
             db_accessor = Belle2.DBAccessorBase(
                 Belle2.DBStoreEntry.c_RawFile, self.payload_main_model, True
             )
-            main_wf = Belle2.MVA.Weightfile.loadFromFile(db_accessor.getFilename())
+            main_filename = db_accessor.getFilename()
+            if not main_filename:
+                b2.B2FATAL(
+                    "ModeSelector: main model payload '"
+                    + self.payload_main_model
+                    + "' not found in the conditions database. "
+                    "Make sure the correct global tag is configured."
+                )
+            main_wf = Belle2.MVA.Weightfile.loadFromFile(main_filename)
 
         #: Category network expert
         self.cat_expert = supported["ONNX"].getExpert()
@@ -529,23 +549,23 @@ class ModeSelectorModule(b2.Module):
         else:
             event_id_str = "unknown"
 
-        print(f"\n{'='*60}")
-        print(f"DEBUG Event {self.event_count} ({event_id_str})")
-        print(f"{'='*60}")
-        print(f"Number of candidates: {len(candidates_data)}")
-        print(f"Max input_id (best candidate): {max_input_id}")
+        b2.B2DEBUG(10, f"{'='*60}")
+        b2.B2DEBUG(10, f"DEBUG Event {self.event_count} ({event_id_str})")
+        b2.B2DEBUG(10, f"{'='*60}")
+        b2.B2DEBUG(10, f"Number of candidates: {len(candidates_data)}")
+        b2.B2DEBUG(10, f"Max input_id (best candidate): {max_input_id}")
 
-        print("\n--- Candidates ---")
+        b2.B2DEBUG(10, "--- Candidates ---")
         for i, (input_id, features) in enumerate(candidates_data):
-            print(f"  Candidate {i}: input_id={input_id}")
+            b2.B2DEBUG(10, f"  Candidate {i}: input_id={input_id}")
             for key, val in features.items():
-                print(f"    {key}: {val}")
+                b2.B2DEBUG(10, f"    {key}: {val}")
 
-        print("\n--- Event Features ---")
+        b2.B2DEBUG(10, "--- Event Features ---")
         for key, val in event_features.items():
-            print(f"  {key}: {val}")
+            b2.B2DEBUG(10, f"  {key}: {val}")
 
-        print("\n--- Feature Array (non-zero, first 5 blocks) ---")
+        b2.B2DEBUG(10, "--- Feature Array (non-zero, first 5 blocks) ---")
         n_blocks = len(self.feature_blocks)
         for block_idx in range(min(5, n_blocks)):
             block_name = self.feature_blocks[block_idx][0]
@@ -554,24 +574,37 @@ class ModeSelectorModule(b2.Module):
             block_data = all_features[start:end]
             non_zero = [(j, v) for j, v in enumerate(block_data) if v != 0]
             if non_zero:
-                print(f"  {block_name}: {non_zero[:10]}...")
+                b2.B2DEBUG(10, f"  {block_name}: {non_zero[:10]}...")
 
-        # Print last few features (event-level)
+        # Log last few features (event-level)
         n_candidate_features = n_blocks * self.n_input_ids
         event_feat_start = n_candidate_features
-        print(f"\n--- Event-level features (indices {event_feat_start}+) ---")
+        b2.B2DEBUG(10, f"--- Event-level features (indices {event_feat_start}+) ---")
         event_feat_names = self.event_features + ['ncandidates/10', 'max_input_id/50', 'scnd_max_input_id/50', '__experiment__/10']
         for i, name in enumerate(event_feat_names):
             idx = event_feat_start + i
             if idx < len(all_features):
-                print(f"  {name}: {all_features[idx]}")
+                b2.B2DEBUG(10, f"  {name}: {all_features[idx]}")
 
-        print(f"\n--- Total feature array shape: {len(all_features)} ---")
+        b2.B2DEBUG(10, f"--- Total feature array shape: {len(all_features)} ---")
 
     def terminate(self):
         """Called at the end of processing."""
         if self.training_mode and self._tr_event['all_features']:
             self._save_training_data()
+
+        if self._presel_violation_count > 0:
+            frac = self._presel_violation_count / max(self._presel_total_candidates, 1)
+            _sep = "=" * 70
+            b2.B2WARNING(
+                f"\n{_sep}\n"
+                f"ModeSelector: {self._presel_violation_count}/{self._presel_total_candidates} "
+                f"candidates ({100.0 * frac:.2f}%) did not pass the required preselections "
+                f"(Mbc > {config.PRESELECTION_MBC_MIN}, "
+                f"{config.PRESELECTION_DELTAE_MIN} < deltaE < {config.PRESELECTION_DELTAE_MAX}, "
+                f"cosTBTO < {config.PRESELECTION_COSTBTO_MAX}). "
+                f"Apply these cuts before running ModeSelector to match the training setup.\n{_sep}"
+            )
 
         if self._inference_event_count > 0:
             missing_base_count = self._inference_event_count - self._empty_predicted_sector_count
@@ -586,7 +619,7 @@ class ModeSelectorModule(b2.Module):
                 "ModeSelector: missing top mode among event candidates "
                 "(excluding events with no predicted-sector candidate): "
                 f"{self._missing_top_mode_count}/{missing_base_count} event(s) "
-                f"({100.0 * missing_frac:.3f}%), high-confidence (>{config.HIGH_CONF_BPLUSSCORE_ABS}) "
+                f"({100.0 * missing_frac:.3f}%), high-confidence (sigProb>{config.HIGH_CONF_SIGPROB_MIN}) "
                 f"{self._missing_top_mode_high_conf_count}/{high_conf_missing_base_count} event(s) "
                 f"({100.0 * high_conf_missing_frac:.3f}%)."
             )
@@ -604,15 +637,10 @@ class ModeSelectorModule(b2.Module):
             b2.B2INFO(
                 "ModeSelector: predicted sector had no candidate in "
                 f"{self._empty_predicted_sector_count}/{self._inference_event_count} event(s) "
-                f"({100.0 * fallback_frac:.3f}%), high-confidence (>{config.HIGH_CONF_BPLUSSCORE_ABS}) "
+                f"({100.0 * fallback_frac:.3f}%), high-confidence (sigProb>{config.HIGH_CONF_SIGPROB_MIN}) "
                 f"{self._empty_predicted_sector_high_conf_count}/{self._high_conf_event_count} event(s) "
                 f"({100.0 * high_conf_fallback_frac:.3f}%); used score fallback."
             )
-            if high_conf_fallback_frac > config.MONITOR_WARN_FRACTION:
-                b2.B2WARNING(
-                    "ModeSelector: predicted-sector-empty high-confidence fraction exceeds threshold "
-                    f"({100.0 * high_conf_fallback_frac:.3f}% > {100.0 * config.MONITOR_WARN_FRACTION:.3f}%)."
-                )
 
     def _save_training_data(self):
         """Save collected training data to npz."""
@@ -816,10 +844,10 @@ class ModeSelectorModule(b2.Module):
 
         n_bp_signal = int((best_bp_iid >= 0).sum())
         n_b0_signal = int((best_b0_iid >= 0).sum())
-        print(f"\n[TRAINING] Saved {n_events} events to {self.training_output}")
-        print(f"[TRAINING] Sparse features: {self.training_output.replace('.npz', '_features.npz')}")
-        print(f"[TRAINING] is_target found: B+ sector {n_bp_signal} events, B0 sector {n_b0_signal} events")
-        print(f"[TRAINING] Mean best sigProb: {best_sigprob.mean():.4f}")
+        b2.B2INFO(f"Saved {n_events} events to {self.training_output}")
+        b2.B2INFO(f"Sparse features: {self.training_output.replace('.npz', '_features.npz')}")
+        b2.B2INFO(f"is_target found: B+ sector {n_bp_signal} events, B0 sector {n_b0_signal} events")
+        b2.B2INFO(f"Mean best sigProb: {best_sigprob.mean():.4f}")
 
     def event(self):
         """Called for each event."""
@@ -861,6 +889,18 @@ class ModeSelectorModule(b2.Module):
 
                 input_id, features = self._extract_particle_features(particle)
                 candidates_data.append((input_id, features))
+
+                # Check preselection compliance (negligible overhead; values already extracted)
+                self._presel_total_candidates += 1
+                _mbc = features.get('Mbc')
+                _de = features.get('deltaE')
+                _cos = features.get('cosTBTO')
+                if (
+                    (_mbc is None or _mbc <= config.PRESELECTION_MBC_MIN)
+                    or (_de is None or not (config.PRESELECTION_DELTAE_MIN < _de < config.PRESELECTION_DELTAE_MAX))
+                    or (_cos is None or _cos >= config.PRESELECTION_COSTBTO_MAX)
+                ):
+                    self._presel_violation_count += 1
 
                 # Track best B+ and B0 by sigProb
                 sig_prob = features.get('sigProb', -1) or -1
@@ -1032,7 +1072,8 @@ class ModeSelectorModule(b2.Module):
             max_mode_prob = np.clip(2 * (sum_mode_prob - 0.5), 0.0, None)
             self._empty_predicted_sector_count += 1
         bp_score = sign * max_mode_prob
-        is_high_conf = abs(bp_score) > config.HIGH_CONF_BPLUSSCORE_ABS
+        best_sigprob = max(best_bp_sig, best_b0_sig)
+        is_high_conf = best_sigprob > config.HIGH_CONF_SIGPROB_MIN
         if is_high_conf:
             self._high_conf_event_count += 1
         if has_predicted_candidate and predicted_top_iid not in particle_by_input_id and is_high_conf:

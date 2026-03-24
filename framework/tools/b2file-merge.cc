@@ -471,7 +471,7 @@ The following restrictions apply:
     writeHistograms(*output, mergedHistograms);
     for (const auto& [name, histCount] : mergedHistograms) {
       if (histCount.second != inputfilenames.size()) {
-        B2WARNING("Histogram " << std::quoted(name) << " only present in "
+        B2ERROR("Histogram " << std::quoted(name) << " only present in "
                   << histCount.second << " out of " << inputfilenames.size() << " files");
       }
     }

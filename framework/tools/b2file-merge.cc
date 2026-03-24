@@ -63,14 +63,10 @@ namespace {
       auto* key = dynamic_cast<TKey*>(keyObj);
       if (!key) continue;
       const std::string name{key->GetName()};
-      if (name == "persistent") continue;
       const std::string path = prefix.empty() ? name : (prefix + "/" + name);
       TClass* cls = TClass::GetClass(key->GetClassName());
       if (!cls) continue;
-      if (cls->InheritsFrom(TTree::Class())) {
-        // Trees are handled separately
-        continue;
-      } else if (cls->InheritsFrom(TDirectory::Class())) {
+      if (cls->InheritsFrom(TDirectory::Class())) {
         auto* subdir = dynamic_cast<TDirectory*>(key->ReadObj());
         if (subdir) collectHistograms(*subdir, path, histograms);
       } else if (cls->InheritsFrom(TH1::Class())) {

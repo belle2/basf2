@@ -152,6 +152,7 @@ main = basf2.create_path()
 main.add_module('RootInput')
 main.add_module('VariablesToHistogram',
                 variables=[('expNum', 10, -0.5, 9.5), ('runNum', 10, -0.5, 9.5)])
+main.add_module('VariablesToNtuple', variables=['expNum', 'runNum'])
 basf2.process(main)
 """
 
@@ -166,23 +167,16 @@ def create_testfile_histogram(input_file, output_file, seed="default"):
     with open(steering_file, "w") as f:
         f.write(testfile_histogram_steering)
     subprocess.call(["basf2", "-i", input_file, "-o", output_file, steering_file])
-    # VariablesToHistogram doesn't write FileMetaData, so add a persistent tree manually.
-    # Use isNtupleMetaData="True" so that b2file-merge (via RootFileInfo) does not
-    # require a standard basf2 event tree (histogram files don't have one).
-    meta = FileMetaData()
-    meta.setCreationData(
-        "the most auspicious of days for testing", "test_site", "test_user", "test_release"
+    # update release in metadata to avoid 'modified-xxx' warnings
+    metadata = basf2.get_file_metadata(output_file)
+    metadata.setCreationData(
+        metadata.getDate(), metadata.getSite(), metadata.getUser(), "test-release"
     )
-    meta.setDatabaseGlobalTag("test_globaltag")
-    meta.setSteering("test_steering")
-    meta.setDataDescription("isNtupleMetaData", "True")
-    meta.setRandomSeed(seed)
-    f = ROOT.TFile(output_file, "UPDATE")
-    t = ROOT.TTree("persistent", "persistent")
-    t.Branch("FileMetaData", meta)
-    t.Fill()
-    t.Write("", ROOT.TObject.kOverwrite)
-    f.Close()
+    with ROOT.TFile(output_file, "UPDATE") as f:
+        t = ROOT.TTree("persistent", "persistent")
+        t.Branch("FileMetaData", metadata)
+        t.Fill()
+        t.Write("", ROOT.TObject.kOverwrite)
 
 
 #: Minimal steering file to create an output root file we can merge

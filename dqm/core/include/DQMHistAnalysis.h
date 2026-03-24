@@ -433,7 +433,7 @@ namespace Belle2 {
      * @param keyname key name for easier access
      * @return an index which can be used to access the PV instead of key name, -1 if failure
      */
-    int registerEpicsPV(const std::string& pvname, const std::string keyname = "");
+    int registerEpicsPV(const std::string& pvname, const std::string& keyname = "");
 
     /**
      * Register a PV with its name and a key name
@@ -441,7 +441,7 @@ namespace Belle2 {
      * @param keyname key name for easier access
      * @return an index which can be used to access the PV instead of key name, -1 if failure
      */
-    int registerExternalEpicsPV(const std::string& pvname, const std::string keyname = "");
+    int registerExternalEpicsPV(const std::string& pvname, const std::string& keyname = "");
 
     /**
      * Write value to a EPICS PV

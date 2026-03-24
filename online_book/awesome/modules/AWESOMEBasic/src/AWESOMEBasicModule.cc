@@ -89,7 +89,7 @@ void AWESOMEBasicModule::event()
     int mcArrayIndex = -1;
     int pdgCode = 0;
     /* We assume there is only a single MCParticle related to the hit. */
-    MCParticle* mcParticle = hit.getRelated<MCParticle>();
+    const MCParticle* mcParticle = hit.getRelated<MCParticle>();
     if (mcParticle) {
       mcArrayIndex = mcParticle->getArrayIndex();
       pdgCode = mcParticle->getPDG();

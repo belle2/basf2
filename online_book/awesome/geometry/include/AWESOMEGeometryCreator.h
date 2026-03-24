@@ -45,7 +45,7 @@ namespace Belle2::AWESOME {
     /**
      * Default destructor.
      */
-    virtual ~AWESOMEGeometryCreator();
+    ~AWESOMEGeometryCreator() override;
 
     /**
      * Create the AWESOME detector geometry in the world volume.

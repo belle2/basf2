@@ -351,7 +351,7 @@ void DQMHistAnalysisModule::resetDeltaList(void)
   }
 }
 
-void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
+void DQMHistAnalysisModule::UpdateCanvas(std::string& name, bool updated)
 {
   s_canvasUpdatedList[name] = updated;
 }
@@ -385,17 +385,18 @@ void DQMHistAnalysisModule::ExtractNEvent(std::vector <TH1*>& hs)
   B2ERROR("ExtractEvent: Histogram \"DAQ/Nevent\" missing");
 }
 
-int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname)
+int DQMHistAnalysisModule::registerEpicsPV(const std::string& pvname, std::string& keyname)
 {
   return registerEpicsPVwithPrefix(m_PVPrefix, pvname, keyname);
 }
 
-int DQMHistAnalysisModule::registerExternalEpicsPV(std::string pvname, std::string keyname)
+int DQMHistAnalysisModule::registerExternalEpicsPV(const std::string& pvname, std::string& keyname)
 {
   return registerEpicsPVwithPrefix(std::string(""), pvname, keyname);
 }
 
-int DQMHistAnalysisModule::registerEpicsPVwithPrefix(std::string prefix, std::string pvname, std::string keyname)
+int DQMHistAnalysisModule::registerEpicsPVwithPrefix(const std::string& prefix, const std::string& pvname,
+                                                     const std::string& keyname)
 {
   if (!m_useEpics) return -1;
 #ifdef _BELLE2_EPICS
@@ -422,7 +423,7 @@ int DQMHistAnalysisModule::registerEpicsPVwithPrefix(std::string prefix, std::st
 #endif
 }
 
-void DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value)
+void DQMHistAnalysisModule::setEpicsPV(const std::string& keyname, double value)
 {
   if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS
@@ -434,7 +435,7 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value)
 #endif
 }
 
-void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value)
+void DQMHistAnalysisModule::setEpicsPV(const std::string& keyname, int value)
 {
   if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS
@@ -446,7 +447,7 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value)
 #endif
 }
 
-void DQMHistAnalysisModule::setEpicsStringPV(std::string keyname, std::string value)
+void DQMHistAnalysisModule::setEpicsStringPV(const std::string& keyname, std::string value)
 {
   if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS
@@ -503,7 +504,7 @@ void DQMHistAnalysisModule::setEpicsStringPV(int index, std::string value)
 #endif
 }
 
-double DQMHistAnalysisModule::getEpicsPV(std::string keyname)
+double DQMHistAnalysisModule::getEpicsPV(const std::string& keyname)
 {
   double value{NAN};
   if (!m_useEpics) return value;
@@ -549,7 +550,7 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
   return NAN;
 }
 
-std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname, bool& status)
+std::string DQMHistAnalysisModule::getEpicsStringPV(const std::string& keyname, bool& status)
 {
   status = false;
   char value[40] = "";
@@ -599,7 +600,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(int index, bool& status)
   return std::string(value);
 }
 
-chid DQMHistAnalysisModule::getEpicsPVChID(std::string keyname)
+chid DQMHistAnalysisModule::getEpicsPVChID(const std::string& keyname)
 {
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
@@ -654,8 +655,8 @@ void DQMHistAnalysisModule::cleanupEpicsPVs(void)
 #endif
 }
 
-bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(std::string name, double& lowerAlarm, double& lowerWarn, double& upperWarn,
-                                                      double& upperAlarm)
+bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(const std::string& name, double& lowerAlarm, double& lowerWarn,
+                                                      double& upperWarn, double& upperAlarm)
 {
   return requestLimitsFromEpicsPVs(getEpicsPVChID(name), lowerAlarm, lowerWarn, upperWarn, upperAlarm);
 }

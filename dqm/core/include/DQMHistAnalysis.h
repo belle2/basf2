@@ -170,7 +170,7 @@ namespace Belle2 {
      * @param keyname key name for easier access
      * @return an index which can be used to access the PV instead of key name, -1 if failure
      */
-    int registerEpicsPVwithPrefix(std::string prefix, std::string pvname, std::string keyname = "");
+    int registerEpicsPVwithPrefix(const std::string& prefix, const std::string& pvname, const std::string& keyname = "");
 
   public:
     /**
@@ -406,7 +406,7 @@ namespace Belle2 {
      * @param name name of Canvas
      * @param updated was updated
      */
-    static void UpdateCanvas(std::string name, bool updated = true);
+    static void UpdateCanvas(const std::string& name, bool updated = true);
 
     /**
      * Mark canvas as updated (or not)
@@ -433,7 +433,7 @@ namespace Belle2 {
      * @param keyname key name for easier access
      * @return an index which can be used to access the PV instead of key name, -1 if failure
      */
-    int registerEpicsPV(std::string pvname, std::string keyname = "");
+    int registerEpicsPV(const std::string& pvname, std::string keyname = "");
 
     /**
      * Register a PV with its name and a key name
@@ -441,28 +441,28 @@ namespace Belle2 {
      * @param keyname key name for easier access
      * @return an index which can be used to access the PV instead of key name, -1 if failure
      */
-    int registerExternalEpicsPV(std::string pvname, std::string keyname = "");
+    int registerExternalEpicsPV(const std::string& pvname, std::string keyname = "");
 
     /**
      * Write value to a EPICS PV
      * @param keyname key name (or full PV name) of PV
      * @param value value to write
      */
-    void setEpicsPV(std::string keyname, double value);
+    void setEpicsPV(const std::string& keyname, double value);
 
     /**
      * Write value to a EPICS PV
      * @param keyname key name (or full PV name) of PV
      * @param value value to write
      */
-    void setEpicsPV(std::string keyname, int value);
+    void setEpicsPV(const std::string& keyname, int value);
 
     /**
      * Write string to a EPICS PV
      * @param keyname key name (or full PV name) of PV
      * @param value string to write
      */
-    void setEpicsStringPV(std::string keyname, std::string value);
+    void setEpicsStringPV(const std::string& keyname, std::string value);
 
     /**
      * Write value to a EPICS PV
@@ -490,7 +490,7 @@ namespace Belle2 {
      * @param keyname key name (or full PV name) of PV
      * @return value or NAN if not existing
      */
-    double getEpicsPV(std::string keyname);
+    double getEpicsPV(const std::string& keyname);
 
     /**
      * Read value from a EPICS PV
@@ -505,7 +505,7 @@ namespace Belle2 {
      * @param status return status (true on success)
      * @return string value (empty string if non existing)
      */
-    std::string getEpicsStringPV(std::string keyname, bool& status);
+    std::string getEpicsStringPV(const std::string& keyname, bool& status);
 
     /**
      * Read value from a EPICS PV
@@ -527,7 +527,7 @@ namespace Belle2 {
      * @param keyname key name (or full PV name) of PV
      * @return Channel ID is written on success, otherwise nullptr
      */
-    chid getEpicsPVChID(std::string keyname);
+    chid getEpicsPVChID(const std::string& keyname);
 
     /**
      * Get EPICS PV Channel Id
@@ -556,7 +556,8 @@ namespace Belle2 {
      * @param &upperAlarm return upper Alarm limit (hihi) if set, not changed otherwise
      * @return true if limits could be read (even if there are none set)
      */
-    bool requestLimitsFromEpicsPVs(std::string keyname, double& lowerAlarm, double& lowerWarn, double& upperWarn, double& upperAlarm);
+    bool requestLimitsFromEpicsPVs(const std::string& keyname, double& lowerAlarm, double& lowerWarn, double& upperWarn,
+                                   double& upperAlarm);
 
     /**
      * Get Alarm Limits from EPICS PV

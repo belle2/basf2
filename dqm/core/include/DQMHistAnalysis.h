@@ -625,7 +625,7 @@ namespace Belle2 {
      * @param canvas Canvas to change
      * @param status status to color
      */
-    void colorizeCanvas(TCanvas* canvas, EStatus status);
+    static void colorizeCanvas(TCanvas* canvas, EStatus status);
 
     /**
      * Return color for canvas state

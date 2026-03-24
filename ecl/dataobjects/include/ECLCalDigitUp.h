@@ -48,7 +48,7 @@ namespace Belle2 {
       m_TwoComponentSavedChi2[0] = -1;          /**< Offline two component chi2 FT=0*/
       m_TwoComponentSavedChi2[1] = -1;          /**< Offline two component chi2 FT=1*/
       m_TwoComponentSavedChi2[2] = -1;          /**< Offline two component chi2 FT=2*/
-      m_TwoComponentFitType = ECLDsp::poorChi2; /**< Offline Two Component fit type*/
+      m_TwoComponentFitType = ECLDspUp::poorChi2; /**< Offline Two Component fit type*/
     }
 
     /*! Set  Cell ID
@@ -76,9 +76,9 @@ namespace Belle2 {
     void setTwoComponentChi2(double chi) { m_TwoComponentChi2 = chi; }
 
     /*! Set two comp chi2 for a fit type
-     *  see enum TwoComponentFitType in ECLDsp.h for description of fit types.
+     *  see enum TwoComponentFitType in ECLDspUp.h for description of fit types.
      */
-    void setTwoComponentSavedChi2(ECLDsp::TwoComponentFitType FitTypeIn, double input)
+    void setTwoComponentSavedChi2(ECLDspUp::TwoComponentFitType FitTypeIn, double input)
     {
       unsigned int index = FitTypeIn;
       m_TwoComponentSavedChi2[index] = input;
@@ -86,7 +86,7 @@ namespace Belle2 {
 
     /*! Set two component fit type
      */
-    void setTwoComponentFitType(ECLDsp::TwoComponentFitType ft) { m_TwoComponentFitType = ft; }
+    void setTwoComponentFitType(ECLDspUp::TwoComponentFitType ft) { m_TwoComponentFitType = ft; }
 
     /*! Set Calibrated Time
      */
@@ -139,10 +139,10 @@ namespace Belle2 {
     double getTwoComponentChi2() const { return m_TwoComponentChi2; }
 
     /*! get two comp chi2 for a fit type
-     *  see enum TwoComponentFitType in ECLDsp.h for description of fit types.
+     *  see enum TwoComponentFitType in ECLDspUp.h for description of fit types.
      * @return two comp chi2 for fit type
      */
-    double getTwoComponentSavedChi2(ECLDsp::TwoComponentFitType FitTypeIn) const
+    double getTwoComponentSavedChi2(ECLDspUp::TwoComponentFitType FitTypeIn) const
     {
       unsigned int index = FitTypeIn;
       return m_TwoComponentSavedChi2[index];
@@ -151,7 +151,7 @@ namespace Belle2 {
     /*! Get two component fit type
      * @return two component fit type
      */
-    ECLDsp::TwoComponentFitType getTwoComponentFitType() const { return m_TwoComponentFitType; }
+    ECLDspUp::TwoComponentFitType getTwoComponentFitType() const { return m_TwoComponentFitType; }
 
     /*! Get Calibrated Time
      * @return Calibrated Time
@@ -229,7 +229,7 @@ namespace Belle2 {
     double m_TwoComponentDiodeEnergy;                  /**< Calibrated Diode Component Energy */
     double m_TwoComponentChi2;                         /**< Two Component chi2*/
     double m_TwoComponentSavedChi2[3];                 /**< Two comp chi2 for each fit tried in reconstruction */
-    ECLDsp::TwoComponentFitType m_TwoComponentFitType; /**< offline fit hypothesis.*/
+    ECLDspUp::TwoComponentFitType m_TwoComponentFitType; /**< offline fit hypothesis.*/
 
     // 1: first version (TF)
     // 2: added m_TimeResolution (TF)

@@ -12,7 +12,7 @@
 /* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigitUp.h>
 #include <ecl/dataobjects/ECLDigitUp.h>
-#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLDspUp.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/digitization/EclConfigurationUp.h>
 #include <ecl/geometry/ECLGeometryPar.h>
@@ -217,7 +217,7 @@ void ECLDigitCalibratorUpModule::event()
     const int quality = aECLDigit.getQuality();
     double calibratedTime = c_timeForFitFailed;
     if (quality == 1) {
-      aECLCalDigit->addStatus(ECLCalDigit::c_IsFailedFit); // this is used to flag failed fits
+      aECLCalDigit->addStatus(ECLCalDigitUp::c_IsFailedFit); // this is used to flag failed fits
     } else {
       // only calibrate digit time if we have a good waveform fit
       calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
@@ -244,24 +244,24 @@ void ECLDigitCalibratorUpModule::event()
     B2DEBUG(35, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
 
     // Calibrating offline fit results
-    ECLDsp* aECLDsp = ECLDsp::getByCellID(cellid);
+    ECLDspUp* aECLDsp = ECLDspUp::getByCellID(cellid);
     aECLCalDigit->setTwoComponentChi2(-1);
-    aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, -1);
-    aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, -1);
-    aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, -1);
+    aECLCalDigit->setTwoComponentSavedChi2(ECLDspUp::photonHadron, -1);
+    aECLCalDigit->setTwoComponentSavedChi2(ECLDspUp::photonHadronBackgroundPhoton, -1);
+    aECLCalDigit->setTwoComponentSavedChi2(ECLDspUp::photonDiodeCrossing, -1);
     aECLCalDigit->setTwoComponentTotalEnergy(-1);
     aECLCalDigit->setTwoComponentHadronEnergy(-1);
     aECLCalDigit->setTwoComponentDiodeEnergy(-1);
     // copy online fit quality from ECLDigit
     const int online_quality = aECLDigit.getQuality();
     if (online_quality == 1) {
-      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality1);
+      aECLCalDigit->addStatus(ECLCalDigitUp::c_OnlineFitQuality1);
     } else if (online_quality == 2) {
-      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality2);
+      aECLCalDigit->addStatus(ECLCalDigitUp::c_OnlineFitQuality2);
     } else if (online_quality == 3) {
-      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality3);
+      aECLCalDigit->addStatus(ECLCalDigitUp::c_OnlineFitQuality3);
     } else if (online_quality == 0) {
-      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality0);
+      aECLCalDigit->addStatus(ECLCalDigitUp::c_OnlineFitQuality0);
     }
 
     if (aECLDsp) {
@@ -277,16 +277,17 @@ void ECLDigitCalibratorUpModule::event()
         const double calibratedTwoComponentDiodeEnergy = aECLDsp->getTwoComponentDiodeAmp() * v_calibrationCrystalElectronics[cellid - 1] *
                                                          v_calibrationCrystalEnergy[cellid - 1];
         const double twoComponentChi2 = aECLDsp->getTwoComponentChi2();
-        const ECLDsp::TwoComponentFitType twoComponentFitType = aECLDsp->getTwoComponentFitType();
+        const ECLDspUp::TwoComponentFitType twoComponentFitType = aECLDsp->getTwoComponentFitType();
 
         aECLCalDigit->setTwoComponentTotalEnergy(calibratedTwoComponentTotalEnergy);
         aECLCalDigit->setTwoComponentHadronEnergy(calibratedTwoComponentHadronEnergy);
         aECLCalDigit->setTwoComponentDiodeEnergy(calibratedTwoComponentDiodeEnergy);
         aECLCalDigit->setTwoComponentChi2(twoComponentChi2);
-        aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonHadron));
-        aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton,
-                                               aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton));
-        aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing));
+        aECLCalDigit->setTwoComponentSavedChi2(ECLDspUp::photonHadron, aECLDsp->getTwoComponentSavedChi2(ECLDspUp::photonHadron));
+        aECLCalDigit->setTwoComponentSavedChi2(ECLDspUp::photonHadronBackgroundPhoton,
+                                               aECLDsp->getTwoComponentSavedChi2(ECLDspUp::photonHadronBackgroundPhoton));
+        aECLCalDigit->setTwoComponentSavedChi2(ECLDspUp::photonDiodeCrossing,
+                                               aECLDsp->getTwoComponentSavedChi2(ECLDspUp::photonDiodeCrossing));
         aECLCalDigit->setTwoComponentFitType(twoComponentFitType);
       }
     }
@@ -295,10 +296,10 @@ void ECLDigitCalibratorUpModule::event()
     aECLCalDigit->setCellId(cellid);
 
     aECLCalDigit->setEnergy(calibratedEnergy);
-    aECLCalDigit->addStatus(ECLCalDigit::c_IsEnergyCalibrated);
+    aECLCalDigit->addStatus(ECLCalDigitUp::c_IsEnergyCalibrated);
 
     aECLCalDigit->setTime(calibratedTime);
-    aECLCalDigit->addStatus(ECLCalDigit::c_IsTimeCalibrated);
+    aECLCalDigit->addStatus(ECLCalDigitUp::c_IsTimeCalibrated);
 
     // set a relation to the ECLDigit
     aECLCalDigit->addRelationTo(&aECLDigit);
@@ -313,15 +314,15 @@ void ECLDigitCalibratorUpModule::event()
     // perform the time resolution calibration
     const double t99 = getT99(aECLCalDigit.getCellId(),
                               aECLCalDigit.getEnergy(),
-                              aECLCalDigit.hasStatus(ECLCalDigit::c_IsFailedFit),
+                              aECLCalDigit.hasStatus(ECLCalDigitUp::c_IsFailedFit),
                               bgCount); // calibrated time resolution
     aECLCalDigit.setTimeResolution(t99);
 
     if (t99 == c_timeResolutionForFitFailed) {
-      aECLCalDigit.addStatus(ECLCalDigit::c_IsFailedTimeResolution);
+      aECLCalDigit.addStatus(ECLCalDigitUp::c_IsFailedTimeResolution);
     }
 
-    aECLCalDigit.addStatus(ECLCalDigit::c_IsTimeResolutionCalibrated);
+    aECLCalDigit.addStatus(ECLCalDigitUp::c_IsTimeResolutionCalibrated);
   }
 }
 

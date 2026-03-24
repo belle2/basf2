@@ -13,10 +13,12 @@
 #include <analysis/VariableManager/Manager.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <map>
 #include <algorithm>
 #include <iterator>
@@ -148,6 +150,43 @@ namespace Belle2 {
       return mcParticles[idx]->getPDG();
     }
 
+    Manager::FunctionPtr isMaxSigProbInLists(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 2)
+        B2FATAL("isMaxSigProbInLists requires exactly 2 arguments: bp_list, b0_list");
+
+      std::string bpListName = arguments[0];
+      std::string b0ListName = arguments[1];
+
+      auto func = [bpListName, b0ListName](const Particle * particle) -> bool {
+        StoreObjPtr<ParticleList> bpList(bpListName);
+        StoreObjPtr<ParticleList> b0List(b0ListName);
+        if (!bpList.isValid() || !b0List.isValid()) return false;
+
+        auto bestInList = [](const StoreObjPtr<ParticleList>& list)
+        -> std::pair<double, const Particle*> {
+          double best = -1.0;
+          const Particle* cand = nullptr;
+          for (unsigned int i = 0; i < list->getListSize(); ++i)
+          {
+            const Particle* p = list->getParticle(i);
+            if (!p->hasExtraInfo("SignalProbability")) continue;
+            double sp = p->getExtraInfo("SignalProbability");
+            if (sp > best) { best = sp; cand = p; }
+          }
+          return {best, cand};
+        };
+
+        auto [bpBest, bpCand] = bestInList(bpList);
+        auto [b0Best, b0Cand] = bestInList(b0List);
+
+        if (bpBest > b0Best) return particle == bpCand;
+        if (b0Best > bpBest) return particle == b0Cand;
+        return false;
+      };
+      return func;
+    }
+
     VARIABLE_GROUP("FEIVariables");
     REGISTER_VARIABLE("mostcommonBTagIndex", mostcommonBTagIndex,
                       "By giving e.g. a FEI B meson candidate the B meson index on generator level is determined, where most reconstructed particles can be assigned to. If no B meson found on generator level -1 is returned.");
@@ -164,5 +203,9 @@ namespace Belle2 {
                       "Returns NaN if no B meson is found on generator level. "
                       "Note: this is equivalent to ``genParticle(mostcommonBTagIndex, PDG)``. "
                       "Other variables can be accessed the same way by replacing ``PDG`` with any variable.");
+    REGISTER_METAVARIABLE("isMaxSigProbInLists(bp_list, b0_list)", isMaxSigProbInLists,
+                          "Returns 1 for the candidate with the highest ``extraInfo(SignalProbability)`` "
+                          "across both the B+ list (bp_list) and B0 list (b0_list). "
+                          "Returns 0 for all other candidates.", Manager::VariableDataType::c_bool);
   }
 }

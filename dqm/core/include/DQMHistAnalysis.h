@@ -310,7 +310,7 @@ namespace Belle2 {
      * @param h histogram
      * @return Half of the central interval covering 68% of a distribution.
      */
-    static double getSigma68(TH1* h) const;
+    static double getSigma68(TH1* h);
 
   public:
     /**

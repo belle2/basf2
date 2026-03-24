@@ -290,7 +290,7 @@ MonitoringObject* DQMHistAnalysisModule::findMonitoringObject(const std::string&
   return nullptr;
 }
 
-double DQMHistAnalysisModule::getSigma68(TH1* h) const
+double DQMHistAnalysisModule::getSigma68(TH1* h)
 {
   double probs[2] = {0.16, 1 - 0.16};
   double quant[2] = {0, 0};

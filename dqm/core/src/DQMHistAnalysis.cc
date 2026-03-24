@@ -315,7 +315,7 @@ void DQMHistAnalysisModule::clearCanvases(void)
     if (cobj->IsA()->InheritsFrom("TCanvas")) {
       TCanvas* cnv = dynamic_cast<TCanvas*>(cobj);
       cnv->Clear();
-      colorizeCanvas(cnv, c_StatusDefault);
+      DQMHistAnalysisModule::colorizeCanvas(cnv, c_StatusDefault);
     }
   }
 }

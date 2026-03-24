@@ -447,7 +447,7 @@ void DQMHistAnalysisModule::setEpicsPV(const std::string& keyname, int value)
 #endif
 }
 
-void DQMHistAnalysisModule::setEpicsStringPV(const std::string& keyname, std::string value)
+void DQMHistAnalysisModule::setEpicsStringPV(const std::string& keyname, const std::string& value)
 {
   if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS

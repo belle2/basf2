@@ -32,6 +32,9 @@
 #include <Math/Vector4D.h>
 #include <Math/VectorUtil.h>
 
+/* C++ headers. */
+#include <cmath>
+
 using namespace std;
 
 namespace Belle2::Variable {
@@ -292,6 +295,7 @@ namespace Belle2::Variable {
 
   double ClusterTrackDistance_usingHelixExtrapolate(const KLMCluster* cluster, const Belle2::Track* specificTrack = nullptr)
   {
+    // Set the boundaries of KLM surface as in DetectorSurface.cc
     double r_BKLM = 201.6;
     double z_EFWD = 283.9;
     double z_EBWD = -189.9;
@@ -330,16 +334,21 @@ namespace Belle2::Variable {
         helixExtR_surface = z_EBWD / cos(ext_helix.Theta());
       }
 
+      // Safety Check
+      if (!std::isfinite(helixExtR_surface)) return vecNaN;
+
       ROOT::Math::XYZVector helixExt_surface_position(0, 0, 0);
       VectorUtil::setMagThetaPhi(helixExt_surface_position, helixExtR_surface, ext_helix.Theta(), ext_helix.Phi());
 
       return helixExt_surface_position;
     };
 
-    bool isEFWD = (cluster->getClusterPosition().Z() > 275);
-    bool isEBWD = (cluster->getClusterPosition().Z() < -180);
+    bool isEFWD = (cluster->getClusterPosition().Z() >
+                   275);        // condition used for classifying as Forward EKLM in klmClusterIsForwardEKLM() above
+    bool isEBWD = (cluster->getClusterPosition().Z() <
+                   -180);     // condition used for classifying as Backward EKLM in klmClusterIsBackwardEKLM() above
 
-    float klmClusterR_surface = r_BKLM / sin(cluster->getClusterPosition().Theta());
+    double klmClusterR_surface = r_BKLM / sin(cluster->getClusterPosition().Theta());
     if (isEFWD) { klmClusterR_surface = z_EFWD / cos(cluster->getClusterPosition().Theta()); }
     else if (isEBWD) { klmClusterR_surface = z_EBWD / cos(cluster->getClusterPosition().Theta()); }
 
@@ -352,13 +361,17 @@ namespace Belle2::Variable {
     if (specificTrack != nullptr) {
       const TrackFitResult* trackfit = specificTrack->getTrackFitResultWithBestPValue();
       ROOT::Math::XYZVector helixPos = getPositionOnHelix_trackfit(trackfit);
-      if (helixPos != vecNaN) min_dist = (klmCluster_surface_position - helixPos).R();
+      // Check if all components are valid (NOT NaN)
+      if (!std::isnan(helixPos.X()) && !std::isnan(helixPos.Y()) && !std::isnan(helixPos.Z())) {
+        min_dist = (klmCluster_surface_position - helixPos).R();
+      }
     } else {
       StoreArray<Track> tracks;
       for (const Track& track : tracks) {
         const TrackFitResult* trackfit = track.getTrackFitResultWithBestPValue();
         ROOT::Math::XYZVector helixPos = getPositionOnHelix_trackfit(trackfit);
-        if (helixPos == vecNaN) continue;
+        // Check if all components are valid (NOT NaN)
+        if (std::isnan(helixPos.X()) || std::isnan(helixPos.Y()) || std::isnan(helixPos.Z())) continue;
 
         double dist = (klmCluster_surface_position - helixPos).R();
         if (dist < min_dist) min_dist = dist;

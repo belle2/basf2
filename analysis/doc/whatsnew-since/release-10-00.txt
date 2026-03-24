@@ -1,6 +1,13 @@
 Changes in the analysis package in light-2601-hyperion
 ------------------------------------------------------
 
+Variables
++++++++++
+* As a substitute for `klmClusterTrackDistance` which is only available for release-10 mDSTs, a new variable `klmClusterTrackDistance_helix_extrapolation` is provided for analysts to be used with release-09 or ealier mDSTs.
+
+Changes in the analysis package in light-2601-hyperion
+------------------------------------------------------
+
 FlavorTagger
 ++++++++++++
 * Introduced a new end to end Flavor Tagger TFlaT based on the transformer architecture.

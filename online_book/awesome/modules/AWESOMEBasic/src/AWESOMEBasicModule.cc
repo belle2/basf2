@@ -25,7 +25,7 @@ using namespace Belle2::AWESOME;
 /**
  * We have to register the module to the Framework. The "Module" part of the
  * class name will be appended automatically so every module has to be named
- * <NAME>Module.
+ * "<NAME>Module".
  */
 REG_MODULE(AWESOMEBasic);
 

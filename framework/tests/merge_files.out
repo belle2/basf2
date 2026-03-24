@@ -142,7 +142,16 @@ running check_29_parent_release: Check that merging files does not modify the re
 [WARNING] File "test2.root" is empty.
 [WARNING] All Files were empty
 check_29_parent_release passed
-running check_XX_filemetaversion: Check that the Version of the FileMetaData hasn't changed.
+running check_30_histogram_merge: Check that we can merge two histogram output files (as produced by VariablesToHistogram)
+[INFO] Steering file: steering-test1.root.py
+[INFO] Steering file: steering-test2.root.py
+[INFO] Steering file: steering-histogram.py
+[INFO] Steering file: steering-histogram.py
+[WARNING] File "hist1.root" is empty.
+[WARNING] File "hist2.root" is empty.
+[WARNING] All Files were empty
+check_30_histogram_merge passed
+running check_31_filemetaversion: Check that the Version of the FileMetaData hasn't changed.
     If this check fails please check that the changes to FileMetaData don't
     affect b2file-merge and adapt the correct version number here.
-check_XX_filemetaversion passed
+check_31_filemetaversion passed

@@ -147,9 +147,6 @@ running check_30_histogram_merge: Check that we can merge two histogram output f
 [INFO] Steering file: steering-test2.root.py
 [INFO] Steering file: steering-histogram.py
 [INFO] Steering file: steering-histogram.py
-[WARNING] File "hist1.root" is empty.
-[WARNING] File "hist2.root" is empty.
-[WARNING] All Files were empty
 check_30_histogram_merge passed
 running check_31_filemetaversion: Check that the Version of the FileMetaData hasn't changed.
     If this check fails please check that the changes to FileMetaData don't

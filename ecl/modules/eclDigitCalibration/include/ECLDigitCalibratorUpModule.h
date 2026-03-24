@@ -32,7 +32,6 @@ namespace Belle2 {
   class ECLDigitUp;
   class ECLDspUp;
   class ECLCalDigitUp;
-  class ECLPureCsIInfo;
 
   /** Class to find calibrate digits and convert waveform fit information to physics quantities */
   class ECLDigitCalibratorUpModule : public Module {
@@ -79,10 +78,6 @@ namespace Belle2 {
     virtual const char* eventLevelClusteringInfoName() const
     { return "EventLevelClusteringInfo" ; }
 
-    /** Name of the ECL pure CsI Information.*/
-    virtual const char* eclPureCsIInfoArrayName() const
-    { return "ECLPureCsIInfo" ; }
-
   protected:
 
   private:
@@ -123,13 +118,8 @@ namespace Belle2 {
     StoreArray<ECLDigitUp> m_eclDigits; /**< storearray ECLDigit */
     StoreArray<ECLCalDigitUp> m_eclCalDigits; /**< storearray ECLCalDigit */
     StoreArray<ECLDspUp> m_eclDspUps; /**< storearray ECLDsp */
-    StoreArray<ECLPureCsIInfo> m_eclPureCsIInfo; /**< storearray ECLPureCsIInfo - Special information for pure CsI simulation */
 
     double m_timeInverseSlope; /**< Time calibration inverse slope "a". */
-
-    double m_pureCsIEnergyCalib = 0.00005; /**< conversion factor from ADC counts to GeV. */
-    double m_pureCsITimeCalib = 10.; /**< conversion factor from eclPureCsIDigitizer to ns. */
-    double m_pureCsITimeOffset = 0.31; /**< ad-hoc offset correction for pureCsI timing/ */
 
     void initializeCalibration(); /**< reads calibration constants, performs checks, put them into a vector */
     void callbackCalibration(DBObjPtr<ECLCrystalCalib>& cal, std::vector<float>& constants,
@@ -154,32 +144,8 @@ namespace Belle2 {
     double m_averageBG; /**< Average dose per crystal calculated from m_th1dBackground */
     const double c_minT99 = 3.5; /**< The minimum t99 */
 
-    bool m_simulatePure = 0; /**< Flag to set pure CsI simulation option */
-
-
     std::unique_ptr< Belle2::ECL::ECLTimingUtilities > ECLTimeUtil =
       std::make_unique<Belle2::ECL::ECLTimingUtilities>(); /**< ECL timing tools */
-
-  };
-
-  /** Class derived from ECLDigitCalibratorUpModule, only difference are the names */
-  class ECLDigitCalibratorPureCsIModule : public ECLDigitCalibratorModule {
-  public:
-    /** PureCsI Name of the ECLDigitsPureCsI.*/
-    virtual const char* eclDigitArrayName() const override
-    { return "ECLDigitsPureCsI" ; }
-
-    /** PureCsI Name of the ECLCalDigitsPureCsI.*/
-    virtual const char* eclCalDigitArrayName() const override
-    { return "ECLCalDigitsPureCsI" ; }
-
-    /** Name of the ECLDspPureCsI.*/
-    virtual const char* eclDspArrayName() const override
-    { return "ECLDspsPureCsI" ; }
-
-    /** PureCsI Name of the EventLevelClusteringInfoPureCsI.*/
-    virtual const char* eventLevelClusteringInfoName() const override
-    { return "EventLevelClusteringInfoPureCsI" ; }
 
   };
 

@@ -13,7 +13,6 @@
 #include <ecl/dataobjects/ECLCalDigitUp.h>
 #include <ecl/dataobjects/ECLDigitUp.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLPureCsIInfo.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/digitization/EclConfigurationUp.h>
 #include <ecl/geometry/ECLGeometryPar.h>
@@ -42,7 +41,6 @@ using namespace ECL;
 //                 Register the Modules
 //-----------------------------------------------------------------
 REG_MODULE(ECLDigitCalibratorUp);
-REG_MODULE(ECLDigitCalibratorPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -64,7 +62,6 @@ ECLDigitCalibratorUpModule::ECLDigitCalibratorUpModule() : m_calibrationCrystalE
   addParam("backgroundTimingCut", m_backgroundTimingCut, "Timing cut used to count background digits", 110.0 * Belle2::Unit::ns);
   addParam("fileBackgroundName", m_fileBackgroundName, "Background filename.",
            FileSystem::findFile("/data/ecl/background_norm.root"));
-  addParam("simulatePure", m_simulatePure, "Flag to simulate pure CsI option", false);
 
   // Parallel processing certification
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -85,9 +82,6 @@ void ECLDigitCalibratorUpModule::initializeCalibration()
 
   // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency. Same for all crystals:
   m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
-  m_pureCsIEnergyCalib = 0.00005; // conversion factor from ADC counts to GeV
-  m_pureCsITimeCalib = 0.1;       // conversion factor from eclPureCsIDigitizer to ns
-  m_pureCsITimeOffset = 0.31;     // ad-hoc offset correction for pureCsI timing
 
   callbackCalibration(m_calibrationCrystalElectronics, v_calibrationCrystalElectronics, v_calibrationCrystalElectronicsUnc);
   callbackCalibration(m_calibrationCrystalEnergy, v_calibrationCrystalEnergy, v_calibrationCrystalEnergyUnc);
@@ -199,8 +193,6 @@ void ECLDigitCalibratorUpModule::event()
   // Loop over the input array
   for (auto& aECLDigit : m_eclDigits) {
 
-    bool is_pure_csi = 0;
-
     // append an ECLCalDigit to the storearray
     const auto aECLCalDigit = m_eclCalDigits.appendNew();
 
@@ -216,18 +208,7 @@ void ECLDigitCalibratorUpModule::event()
     const int amplitude = aECLDigit.getAmp();
     double calibratedEnergy = 0;
 
-    if (m_simulatePure) {
-      if (aECLDigit.getRelated<ECLPureCsIInfo>(eclPureCsIInfoArrayName()) != nullptr) {
-        if (aECLDigit.getRelated<ECLPureCsIInfo>(eclPureCsIInfoArrayName())->getPureCsI())
-          is_pure_csi = 1;
-      }
-    }
-
-    if (is_pure_csi) {
-      calibratedEnergy = amplitude * m_pureCsIEnergyCalib;
-    } else {
-      calibratedEnergy = amplitude * v_calibrationCrystalElectronics[cellid - 1] * v_calibrationCrystalEnergy[cellid - 1];
-    }
+    calibratedEnergy = amplitude * v_calibrationCrystalElectronics[cellid - 1] * v_calibrationCrystalEnergy[cellid - 1];
     if (calibratedEnergy < 0.0)
       calibratedEnergy = 0.0;
 
@@ -239,16 +220,10 @@ void ECLDigitCalibratorUpModule::event()
       aECLCalDigit->addStatus(ECLCalDigit::c_IsFailedFit); // this is used to flag failed fits
     } else {
       // only calibrate digit time if we have a good waveform fit
-      if (is_pure_csi) {
-        calibratedTime = m_pureCsITimeCalib * m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
-                                                                    v_calibrationCrystalTimeOffset[cellid - 1] - v_calibrationCrateTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1]
-                         + m_pureCsITimeOffset;
-      } else {
-        calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
-                                               v_calibrationCrystalTimeOffset[cellid - 1] -
-                                               v_calibrationCrateTimeOffset[cellid - 1]) -
-                         v_calibrationCrystalFlightTime[cellid - 1];
-      }
+      calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
+                                             v_calibrationCrystalTimeOffset[cellid - 1] -
+                                             v_calibrationCrateTimeOffset[cellid - 1]) -
+                       v_calibrationCrystalFlightTime[cellid - 1];
 
       // For data, apply a correction to the time as a function of the signal amplitude.  Correction determined from a fit.
       // No correction for MC

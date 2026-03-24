@@ -764,7 +764,7 @@ void DQMHistAnalysisModule::checkPVStatus(void)
 {
   B2INFO("Check PV Connections");
 
-  for (auto& it : m_epicsChID) {
+  for (const auto& it : m_epicsChID) {
     printPVStatus(it);
   }
   B2INFO("Check PVs done");

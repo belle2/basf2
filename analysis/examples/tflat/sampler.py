@@ -49,7 +49,7 @@ def buildROE(path):
     ma.matchMCTruth(list_name='B0:sig', path=path)
 
     # keep only signal
-    ma.applyCuts(list_name='B0:sig', cut='isSignal == 1', path=path)
+    ma.applyCuts(list_name='B0:sig', cut='[isSignal == 1]', path=path)
 
     # build the rest of the event associated to the B0
     ma.buildRestOfEvent(target_list_name='B0:sig', path=path)

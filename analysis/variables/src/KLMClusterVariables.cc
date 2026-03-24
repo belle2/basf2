@@ -15,6 +15,7 @@
 /* Analysis headers. */
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/utility/DetectorSurface.h>
 
 /* Basf2 headers. */
 #include <framework/datastore/StoreArray.h>
@@ -295,10 +296,11 @@ namespace Belle2::Variable {
 
   double ClusterTrackDistance_usingHelixExtrapolate(const KLMCluster* cluster, const Belle2::Track* specificTrack = nullptr)
   {
-    // Set the boundaries of KLM surface
-    double r_BKLM = 201.6;
-    double z_EFWD = 283.9;
-    double z_EBWD = -189.9;
+    // Get a reference to the KLM boundaries and set the values
+    const auto& klmBounds = DetectorSurface::detToSurfBoundaries.at("KLM");
+    const double r_BKLM = klmBounds.m_rho;
+    const double z_EFWD = klmBounds.m_zfwd;
+    const double z_EBWD = klmBounds.m_zbwd;
     static const ROOT::Math::XYZVector vecNaN(Const::doubleNaN, Const::doubleNaN, Const::doubleNaN);
 
     // Define the Lambda function
@@ -343,10 +345,8 @@ namespace Belle2::Variable {
       return helixExt_surface_position;
     };
 
-    bool isEFWD = (cluster->getClusterPosition().Z() >
-                   283.9);
-    bool isEBWD = (cluster->getClusterPosition().Z() <
-                   -189.9);
+    bool isEFWD = (cluster->getClusterPosition().Z() > klmBounds.m_zfwd);
+    bool isEBWD = (cluster->getClusterPosition().Z() < klmBounds.m_zbwd);
 
     double klmClusterR_surface = r_BKLM / sin(cluster->getClusterPosition().Theta());
     if (isEFWD) { klmClusterR_surface = z_EFWD / cos(cluster->getClusterPosition().Theta()); }

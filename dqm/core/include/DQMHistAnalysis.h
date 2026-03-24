@@ -233,7 +233,7 @@ namespace Belle2 {
      * @param cname Name of the canvas
      * @return The pointer to the canvas, or nullptr if not found.
      */
-    TCanvas* findCanvas(TString cname);
+    static TCanvas* findCanvas(TString cname);
 
     /**
      * Get histogram from list (no other search).
@@ -310,7 +310,7 @@ namespace Belle2 {
      * @param h histogram
      * @return Half of the central interval covering 68% of a distribution.
      */
-    double getSigma68(TH1* h) const;
+    static double getSigma68(TH1* h) const;
 
   public:
     /**
@@ -328,7 +328,7 @@ namespace Belle2 {
      * @param dirname The name of the directory.
      * @param hist The TH1 pointer for the reference.
     */
-    void addRefHist(const std::string& dirname, TH1* hist);
+    static void addRefHist(const std::string& dirname, TH1* hist);
 
 
     /**
@@ -341,7 +341,7 @@ namespace Belle2 {
     /**
      * Clear content of all Canvases
      */
-    void clearCanvases(void);
+    static void clearCanvases(void);
 
     /**
      * Reset the list of histograms.
@@ -361,7 +361,7 @@ namespace Belle2 {
     /**
      * Reset Delta
      */
-    void resetDeltaList(void);
+    static void resetDeltaList(void);
 
     /**
      * Get Delta histogram.
@@ -390,7 +390,8 @@ namespace Belle2 {
      * @param p numerical parameter depending on type, e.g. number of entries
      * @param a amount of histograms in the past
      */
-    void addDeltaPar(const std::string& dirname, const std::string& histname,  HistDelta::EDeltaType t, int p, unsigned int a = 1);
+    static void addDeltaPar(const std::string& dirname, const std::string& histname,  HistDelta::EDeltaType t, int p,
+                            unsigned int a = 1);
 
     /**
      * Check if Delta histogram parameters exist for histogram.
@@ -398,31 +399,31 @@ namespace Belle2 {
      * @param histname name of histogram
      * @return true if parameters have been set already
      */
-    bool hasDeltaPar(const std::string& dirname, const std::string& histname);
+    static bool hasDeltaPar(const std::string& dirname, const std::string& histname);
 
     /**
      * Mark canvas as updated (or not)
      * @param name name of Canvas
      * @param updated was updated
      */
-    void UpdateCanvas(std::string name, bool updated = true);
+    static void UpdateCanvas(std::string name, bool updated = true);
 
     /**
      * Mark canvas as updated (or not)
      * @param canvas Canvas from which to take the name for update
      * @param updated was updated
      */
-    void UpdateCanvas(TCanvas* canvas, bool updated = true);
+    static void UpdateCanvas(TCanvas* canvas, bool updated = true);
 
     /**
      * Extract Run Type from histogram title, called from input module
      */
-    void ExtractRunType(std::vector <TH1*>& hs);
+    static void ExtractRunType(std::vector <TH1*>& hs);
 
     /**
      * Extract event processed from daq histogram, called from input module
      */
-    void ExtractNEvent(std::vector <TH1*>& hs);
+    static void ExtractNEvent(std::vector <TH1*>& hs);
 
     /// EPICS related Functions
 
@@ -616,7 +617,7 @@ namespace Belle2 {
      * @param error_flag outside of warning range
      * @return the status
      */
-    EStatus makeStatus(bool enough, bool warn_flag, bool error_flag);
+    static EStatus makeStatus(bool enough, bool warn_flag, bool error_flag);
 
     /**
      * Helper function for Canvas colorization
@@ -630,7 +631,7 @@ namespace Belle2 {
      * @param status canvas status
      * @return alarm color
      */
-    EStatusColor getStatusColor(EStatus status);
+    static EStatusColor getStatusColor(EStatus status);
 
     /**
      * Check the status of all PVs and report if disconnected or not found
@@ -642,7 +643,7 @@ namespace Belle2 {
      * @param pv the chid of the PV to check
      * @param onlyError print only if in error condition (default)
      */
-    void printPVStatus(chid pv, bool onlyError = true);
+    static void printPVStatus(chid pv, bool onlyError = true);
 
     /**
      * check the return status and check PV in case of error
@@ -674,7 +675,7 @@ namespace Belle2 {
      * @param delim delimiter
      * @return vector of strings
      */
-    std::vector <std::string> StringSplit(const std::string& s, const char delim);
+    static std::vector <std::string> StringSplit(const std::string& s, const char delim);
 
     // Data members
   private:

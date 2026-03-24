@@ -81,7 +81,7 @@ void ECLDigitCalibratorUpModule::initializeCalibration()
 {
 
   // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency. Same for all crystals:
-  m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
+  m_timeInverseSlope = 1.0 / (4.0 * EclConfigurationUp::getRF()) * 1e3;
 
   callbackCalibration(m_calibrationCrystalElectronics, v_calibrationCrystalElectronics, v_calibrationCrystalElectronicsUnc);
   callbackCalibration(m_calibrationCrystalEnergy, v_calibrationCrystalEnergy, v_calibrationCrystalEnergyUnc);

@@ -117,7 +117,7 @@ namespace Belle2 {
 
     StoreArray<ECLDigitUp> m_eclDigits; /**< storearray ECLDigit */
     StoreArray<ECLCalDigitUp> m_eclCalDigits; /**< storearray ECLCalDigit */
-    StoreArray<ECLDspUp> m_eclDspUps; /**< storearray ECLDsp */
+    StoreArray<ECLDspUp> m_eclDspUps; /**< storearray ECLDspUp */
 
     double m_timeInverseSlope; /**< Time calibration inverse slope "a". */
 

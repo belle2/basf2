@@ -108,12 +108,11 @@ def create_testfile_ntuple(input, output, treeNames=["tree", "anotherTree"], **a
     metadata.setCreationData(
         metadata.getDate(), metadata.getSite(), metadata.getUser(), "test-release"
     )
-    f = ROOT.TFile(output, "UPDATE")
-    t = ROOT.TTree("persistent", "persistent")
-    t.Branch("FileMetaData", metadata)
-    t.Fill()
-    t.Write()
-    f.Close()
+    with ROOT.TFile(output, "UPDATE") as f:
+        t = ROOT.TTree("persistent", "persistent")
+        t.Branch("FileMetaData", metadata)
+        t.Fill()
+        t.Write()
 
 
 def merge_files(*args, output="output.root", filter_modified=False):

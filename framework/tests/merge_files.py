@@ -596,7 +596,7 @@ def check_30_histogram_merge():
     return h.GetEntries() == 300
 
 
-def check_XX_filemetaversion():
+def check_31_filemetaversion():
     """Check that the Version of the FileMetaData hasn't changed.
     If this check fails please check that the changes to FileMetaData don't
     affect b2file-merge and adapt the correct version number here."""

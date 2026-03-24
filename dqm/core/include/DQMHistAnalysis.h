@@ -220,7 +220,7 @@ namespace Belle2 {
      * Set the Run Type.
      * @par t Run type string.
      */
-    static void setRunType(std::string& t) {s_runType = t;};
+    static void setRunType(const std::string& t) {s_runType = t;};
 
     /**
      * Set the number of processed events. (Attention, asynch histogram updates!)
@@ -607,7 +607,7 @@ namespace Belle2 {
      * set global prefix for EPICS PVs
      * @param prefix Prefix to set
      */
-    static void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
+    static void setPVPrefix(const std::string& prefix) { m_PVPrefix = prefix;};
 
     /**
      * Helper function to judge the status for coloring and EPICS

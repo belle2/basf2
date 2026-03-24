@@ -295,7 +295,7 @@ namespace Belle2::Variable {
 
   double ClusterTrackDistance_usingHelixExtrapolate(const KLMCluster* cluster, const Belle2::Track* specificTrack = nullptr)
   {
-    // Set the boundaries of KLM surface as in DetectorSurface.cc
+    // Set the boundaries of KLM surface
     double r_BKLM = 201.6;
     double z_EFWD = 283.9;
     double z_EBWD = -189.9;
@@ -344,9 +344,9 @@ namespace Belle2::Variable {
     };
 
     bool isEFWD = (cluster->getClusterPosition().Z() >
-                   275);        // condition used for classifying as Forward EKLM in klmClusterIsForwardEKLM() above
+                   283.9);
     bool isEBWD = (cluster->getClusterPosition().Z() <
-                   -180);     // condition used for classifying as Backward EKLM in klmClusterIsBackwardEKLM() above
+                   -189.9);
 
     double klmClusterR_surface = r_BKLM / sin(cluster->getClusterPosition().Theta());
     if (isEFWD) { klmClusterR_surface = z_EFWD / cos(cluster->getClusterPosition().Theta()); }

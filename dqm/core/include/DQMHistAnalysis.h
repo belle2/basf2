@@ -220,13 +220,13 @@ namespace Belle2 {
      * Set the Run Type.
      * @par t Run type string.
      */
-    void setRunType(std::string& t) {s_runType = t;};
+    static void setRunType(std::string& t) {s_runType = t;};
 
     /**
      * Set the number of processed events. (Attention, asynch histogram updates!)
      * @par e Processed events.
      */
-    void setEventProcessed(int e) {s_eventProcessed = e;};
+    static void setEventProcessed(int e) {s_eventProcessed = e;};
 
     /**
      * Find canvas by name
@@ -578,19 +578,19 @@ namespace Belle2 {
      * Setter EPICS flag in read only mode
      * @param flag set read only
      */
-    void setUseEpicsReadOnly(bool flag) {m_epicsReadOnly = flag;};
+    static void setUseEpicsReadOnly(bool flag) {m_epicsReadOnly = flag;};
 
     /**
      * Getter for EPICS usage
      * @return flag is in use
      */
-    bool getUseEpics(void) {return m_useEpics;};
+    static bool getUseEpics(void) {return m_useEpics;};
 
     /**
      * Getter EPICS flag in read only mode
      * @return flag if read only
      */
-    bool getUseEpicsReadOnly(void) {return m_epicsReadOnly;};
+    static bool getUseEpicsReadOnly(void) {return m_epicsReadOnly;};
 
     /**
      * Unsubscribe from EPICS PVs on terminate
@@ -601,13 +601,13 @@ namespace Belle2 {
      * get global prefix for EPICS PVs
      * @return prefix in use
      */
-    std::string& getPVPrefix(void) {return m_PVPrefix;};
+    static std::string& getPVPrefix(void) {return m_PVPrefix;};
 
     /**
      * set global prefix for EPICS PVs
      * @param prefix Prefix to set
      */
-    void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
+    static void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
 
     /**
      * Helper function to judge the status for coloring and EPICS

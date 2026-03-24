@@ -385,12 +385,12 @@ void DQMHistAnalysisModule::ExtractNEvent(std::vector <TH1*>& hs)
   B2ERROR("ExtractEvent: Histogram \"DAQ/Nevent\" missing");
 }
 
-int DQMHistAnalysisModule::registerEpicsPV(const std::string& pvname, std::string& keyname)
+int DQMHistAnalysisModule::registerEpicsPV(const std::string& pvname, const std::string& keyname)
 {
   return registerEpicsPVwithPrefix(m_PVPrefix, pvname, keyname);
 }
 
-int DQMHistAnalysisModule::registerExternalEpicsPV(const std::string& pvname, std::string& keyname)
+int DQMHistAnalysisModule::registerExternalEpicsPV(const std::string& pvname, const std::string& keyname)
 {
   return registerEpicsPVwithPrefix(std::string(""), pvname, keyname);
 }

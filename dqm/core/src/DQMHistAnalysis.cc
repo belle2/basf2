@@ -750,7 +750,7 @@ DQMHistAnalysisModule::EStatusColor DQMHistAnalysisModule::getStatusColor(EStatu
 void DQMHistAnalysisModule::colorizeCanvas(TCanvas* canvas, EStatus stat)
 {
   if (!canvas) return;
-  auto color = getStatusColor(stat);
+  auto color = DQMHistAnalysisModule::getStatusColor(stat);
 
   canvas->Pad()->SetFillColor(color);
 

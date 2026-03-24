@@ -351,7 +351,7 @@ void DQMHistAnalysisModule::resetDeltaList(void)
   }
 }
 
-void DQMHistAnalysisModule::UpdateCanvas(std::string& name, bool updated)
+void DQMHistAnalysisModule::UpdateCanvas(const std::string& name, bool updated)
 {
   s_canvasUpdatedList[name] = updated;
 }

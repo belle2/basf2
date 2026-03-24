@@ -577,62 +577,88 @@ namespace Belle2 {
   private:
 
     /** Float variables */
+
     /** Maximal delta phi for CKF state creation (radians) */
     float m_maximalDeltaPhi;
+
     /** Minimal pT requirement for tracks (GeV/c) */
     float m_minimalPtRequirement;
 
     /** Integer variables — layer indices are discrete, so int not float */
+
     /** Maximal layer jump for CKF state creation */
     int m_maximalLayerJump;
+
     /** Maximal layer jump for backward seed tracks */
     int m_maximalLayerJumpBackwardSeed;
+
     /** Maximal number of candidates in flight for path selection */
     unsigned int m_pathMaximalCandidatesInFlight;
+
     /** Maximal number of hit candidates for state filtering */
     unsigned int m_stateMaximalHitCandidates;
 
     /** Boolean variables */
+
     /** Whether to export all tracks */
     bool m_exportAllTracks;
+
     /** Whether to export tracks */
     bool m_exportTracks;
+
     /** Whether to ignore tracks with CDC hits */
     bool m_ignoreTracksWithCDChits;
+
     /** Whether to set the taken flag */
     bool m_setTakenFlag;
 
     /** String variables — all stored by value for correct ROOT I/O serialisation. */
+
     /** Filter name */
     std::string m_filter;
+
     /** Hit finding direction ("forward" or "backward") */
     std::string m_hitFindingDirection;
+
     /** Input RecoTrack store array name */
     std::string m_inputRecoTrackStoreArrayName;
+
     /** Input wire hits name */
     std::string m_inputWireHits;
+
     /** Output RecoTrack store array name */
     std::string m_outputRecoTrackStoreArrayName;
+
     /** Output relation RecoTrack store array name */
     std::string m_outputRelationRecoTrackStoreArrayName;
+
     /** Path filter name */
     std::string m_pathFilter;
+
     /** Related RecoTrack store array name */
     std::string m_relatedRecoTrackStoreArrayName;
+
     /** Relation check direction */
     std::string m_relationCheckForDirection;
+
     /** Seed component name */
     std::string m_seedComponent;
+
     /** State basic filter name */
     std::string m_stateBasicFilter;
+
     /** State extrapolation filter name */
     std::string m_stateExtrapolationFilter;
+
     /** State final filter name */
     std::string m_stateFinalFilter;
+
     /** State pre-filter name */
     std::string m_statePreFilter;
+
     /** Track finding direction */
     std::string m_trackFindingDirection;
+
     /** Write out direction */
     std::string m_writeOutDirection;
 
@@ -660,10 +686,11 @@ namespace Belle2 {
      *   FilterParamMap m_stateFinalFilterParameters;
      *   FilterParamMap m_statePreFilterParameters;
      *
-     *   void setFilterParameters(const FilterParamMap& params);
-     *   const FilterParamMap& getFilterParameters() const;
-     *   ... (same for other parameters, see SVDToCDCCKFParameters.cc for examples)
      */
+
+
+    /** ALTERNATIVE TO FILTER PARAMETERS MAPS */
+
 
     /** Filter parameters — bool */
     std::map<std::string, bool>                     m_filterParametersBool;

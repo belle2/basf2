@@ -12,8 +12,6 @@
 #pragma link C++ class Belle2::ECLPureCsIInfo+; // checksum=0x2710b222, version=2
 #pragma link C++ class Belle2::ECLDigit+; // checksum=0x93164e6c, version=2
 #pragma link C++ class Belle2::ECLCalDigit+; // checksum=0x2beba43a, version=8
-#pragma link C++ class Belle2::ECLDigitUp+; // 
-#pragma link C++ class Belle2::ECLCalDigitUp+; // 
 #pragma link C++ class Belle2::ECLDsp+; // checksum=0x2a74d1c2, version=7
 #pragma link C++ class Belle2::ECLDspWithExtraMCInfo+; // checksum=0xaf5bfaae, version=2
 #pragma link C++ class Belle2::ECLTrig+; // checksum=0x79e09991, version=4

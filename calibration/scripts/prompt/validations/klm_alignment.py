@@ -11,7 +11,6 @@
 from prompt import ValidationSettings
 import os
 import basf2
-from ROOT.Belle2 import KLMCalibrationChecker
 import uproot
 import numpy as np
 import matplotlib.pyplot as plt
@@ -29,7 +28,9 @@ basf2.conditions.override_globaltags()
 
 
 def get_result(job_path, tmp_dir, suffix=''):
-    basf2.B2INFO(f'Getting result from {job_path}')
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
+    from ROOT.Belle2 import KLMCalibrationChecker
+
     database_file = f'{job_path}/outputdb/database.txt'
     exp_run_list = []
     with open(database_file) as f:

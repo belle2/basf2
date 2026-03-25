@@ -1,0 +1,193 @@
+# ModeSelector example scripts
+
+Example basf2 steering scripts for the ModeSelector neural network module.
+These scripts demonstrate how to run ModeSelector in inference mode and how to
+produce training inputs from simulation data.
+Both scripts expect FEI-skimmed uDST files as inputs, where the B meson candidate lists are present.
+
+For a complete description of the ModeSelector module and all configuration
+options, see `analysis/scripts/modeSelector/README.md`.
+
+---
+
+## Scripts
+
+### `produceTrainingInputs.py` -- training data collection
+
+Runs the ModeSelector in `training_mode=True` to extract feature arrays and MC
+truth variables from simulation, without performing NN inference. The output
+is used for offline training with `train.py`.
+
+**Usage:**
+
+```bash
+basf2 produceTrainingInputs.py -- \
+    --input <input_file.root> \
+    --output <output_prefix> \
+    [--cont-fraction 0.25]
+```
+
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `--input` | local MC file | Input ROOT file(s) |
+| `--output` | `modeSelector_training` | Output prefix for `.npz` files |
+| `--cont-fraction` | `0.25` | Continuum keep fraction relative to the 30% BB base band |
+
+Random seed is fixed to 1337 for reproducible `eventRandom` cuts. 
+The training inputs keep the low `eventRandom` region with
+`eventRandom < 0.3` for BB events and `eventRandom < 0.3 * cont_fraction` for
+continuum events. The inference example uses the complementary high band
+`eventRandom > 0.95`.
+The same seed should be set to retain independent samples.
+
+**Output files:**
+
+**`<output_prefix>.npz`** -- per-event truth and label data (compressed numpy archive, load with `np.load`):
+- **Event flags**: `is_cont` (continuum flag), `gen_pdg` (generated tag-B PDG), `bp_is_best` (B+ candidate has highest overall sigProb), `best_sigprob` (highest sigProb across all candidates)
+- **Generated decay**: `bp/b0_gen_decay_mode_id` (generated FEI mode index), `bp/b0_gen_fei_calib_weight` (FEI calibration weight from generated decay), `bp/b0_tag_is_gen` (truth-compatible tag PDG flag)
+- **Correctly reconstructed candidates** (`isSignal==1`, primary label source for `train.build_mode_labels()`): packed ragged arrays with CSR-style offsets (`sig_input_ids_offsets`) -- `sig_input_ids`, `sig_btag_index` (`mostcommonBTagIndex`), `sig_delta_p` (`mostcommonBTagDeltaP`), `sig_sigprob` (`SignalProbability`)
+- **Best-candidate truth** (pre-filtered for truth-compatible tag PDG; fallback labels when no `isSignal==1` candidate passes `DeltaP < 0.15`): `best_bp/b0_iid` (input_id), `best_bp/b0_dp` (DeltaP), `best_bp/b0_sigprob_iid` (input_id of highest-sigProb candidate per sector)
+- **Calibration weight**: `fei_calib_weight` (event-level FEI calibration weight: reco-based when a truth-compatible candidate with `DeltaP < threshold` exists, generated-decay-based otherwise)
+
+**`<output_prefix>_features.npz`** -- sparse feature matrix in scipy CSR format, shape `N x 1644` (load with `scipy.sparse.load_npz`):
+- Columns 0-1631: flat feature matrix (12 feature blocks x 136 input_ids); zero where candidate is absent
+- Columns 1632-1643: event-level scalars (event shape variables, `ncandidates`, `max_input_id`, `scnd_max_input_id`, `__experiment__`)
+- `config.HAS_INPUTS` (952 indices) selects the non-trivially-zero columns used for training
+
+---
+
+### `plot_training.py` -- training diagnostics
+
+Plots training diagnostics from one or more `.pt` checkpoints.
+
+**Usage:**
+
+```bash
+python3 plot_training.py networks/net_category.pt networks/net_main.pt --output plots/
+```
+
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `checkpoints` | required | One or more `.pt` checkpoint paths |
+| `--output` | (interactive) | Directory to save PDF plots; omit to show interactively |
+
+**Plots produced per checkpoint:**
+
+| File | Contents |
+|------|----------|
+| `<name>_loss.pdf` | Train/val loss curves and learning rate schedule per epoch |
+| `<name>_weights.pdf` | Weight value histograms per layer |
+| `<name>_importance.pdf` | L2 norm of first-layer weights per input feature (top 10 annotated with global feature index) |
+
+---
+
+### `applyModeSelector.py` -- inference
+
+Applies the trained ModeSelector neural network to FEI hadronic tag output and
+saves candidate-level and event-level scores to parquet tables.
+
+**Usage:**
+
+```bash
+basf2 applyModeSelector.py -- [options]
+```
+
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `--input` | local MC file | Input ROOT file(s) |
+| `--output` | `modeSelector_output` | Output file prefix |
+| `--cat-model` | unset | Category ONNX model. Omit to use payloads |
+| `--main-model` | unset | Main ONNX model. Omit to use payloads |
+| `--cat-payload-name` | `modeSelector_cat_model_v2` | Conditions DB payload name for the category model |
+| `--main-payload-name` | `modeSelector_main_model_v2` | Conditions DB payload name for the main model |
+| `--data` | off | Run on data: keep a fixed 10% `eventRandom` sample and drop MC-only output columns |
+
+**Output files:** `<output>.pq`, written via `VariablesToTable` from
+`b2pandas_utils`. The table stores merged B+ and B0 candidates as the daughter
+of `Upsilon(4S):all`, so output columns are prefixed with `B_`.
+
+| Column | MC only | Description |
+|--------|---------|-------------|
+| `Mbc`, `deltaE`, `M` | no | Basic kinematics |
+| `cosTBTO` | no | Continuum suppression variable |
+| `sigProb` | no | FEI signal probability (`extraInfo(SignalProbability)`) |
+| `dmID` | no | FEI decay mode ID (`extraInfo(decayModeID)`) |
+| `modeSelector_eqSigProb` | no | Mode probability `main_output[input_id]` (predicted sector only) |
+| `BplusScore` | no | Event-level score = `sign * score`, where `score` is the max predicted-sector candidate probability if a candidate exists, else `max(0, 2 * (sum(predicted-sector signal outputs + bad_tag) - 0.5))` |
+| `modeSelector_catB0` | no | Category network B0 probability |
+| `modeSelector_catBp` | no | Category network B+ probability |
+| `modeSelector_catCont` | no | Category network continuum probability |
+| `PDG` | no | PDG code of reconstructed B candidate (511=B0, 521=B+) |
+| `Dstp_deltaMassDiff`, `Dst0_deltaMassDiff` | no | D* veto mass difference |
+| `Dstp_chiProb`, `Dst0_chiProb` | no | D* veto vertex fit quality |
+| `sigProb_rank` | no | Rank within list by sigProb (1 = best; all sigProb>0.001 candidates kept) |
+| `modeSelector_rank` | no | Sector-local rank: 1 for highest `modeSelector_eqSigProb` in predicted sector; 1 for highest `sigProb` in non-predicted sector (crossfeed-enhanced control sample) |
+| `isBestCandidate_sigProb` | no | 1 for the rank-1 sigProb candidate in the sector with the highest sigProb |
+| `eventRandom` | no | Event-level random variable (for reproducible sampling) |
+| `genDecayModeID` | yes | Generated FEI decay mode ID, `999` for rest, and `-1` for continuum or missing generated `B` truth; calibrated-only by default |
+| `genFEICalibWeight` | yes | FEI calibration weight from the generated decay identified by `mostcommonBTagIndex` |
+| `modeSelector_feiCalibWeight` | yes | FEI calibration weight from the reco path (truth-compatible tag PDG and DeltaP < threshold); `NaN` when reco conditions are not met; only written when `store_fei_calib_weight=True` |
+| `isSignal` | yes | MC truth match flag |
+| `isContinuumEvent` | yes | 1 for continuum events, 0 for BB |
+| `mostcommonBTagDeltaP`, `mostcommonBTagPDG` | yes | MC B-tag truth variables |
+
+**Selection and ranking**
+
+`modeSelector_eqSigProb` is written only on candidates in the predicted sector
+(B+ if `BplusScore > 0`, B0 if `BplusScore < 0`). `sigProb_rank` is the pure
+sigProb ranking, while `modeSelector_rank` is written by the module on the
+deduplicated candidates. The example then keeps at most 2 candidates per list:
+`[sigProb_rank == 1] or [modeSelector_rank == 1]`.
+`isBestCandidate_sigProb` is 1 for the rank-1 sigProb candidate in whichever
+sector (B+ or B0) has the higher rank-1 sigProb; it is stored for offline
+global best candidate selection based purely on sigProb.
+
+The signed category choice can be reconstructed offline from
+`modeSelector_catBp > modeSelector_catB0`. If the predicted sector has no
+candidate, `BplusScore` falls back to the normalized sum of the
+predicted-sector signal classes plus `bad_tag`:
+`max(0, 2 * (sum_mode_prob - 0.5))`.
+To restrict to the predicted sector only, require `BplusScore > 0` (B+ analyses)
+or `BplusScore < 0` (B0 analyses).
+
+**Sampling**
+
+Random seed is fixed to 1337 for reproducible `eventRandom` cuts. In MC mode the
+script keeps events `eventRandom > 0.95`, disjoint from the low `eventRandom`
+training sample. After candidate selection, `addGeneratedDecayWeights(...)` stores
+`genDecayModeID` and `genFEICalibWeight`. With `--data`, MC truth matching and
+MC-only output columns are skipped, and `eventRandom < 0.1` is applied instead.
+
+**Model loading**
+
+Omit `--cat-model` and `--main-model` to load models from the conditions database. Pass local MVA ONNX weightfile paths to override.
+
+---
+
+## End-to-end training workflow
+
+```
+1. Produce training inputs:
+   basf2 analysis/examples/modeSelector/produceTrainingInputs.py
+
+2. Train category network:
+   python3 analysis/scripts/modeSelector/train.py \
+           --input training_data/*.npz --network category --use_sparse
+
+3. Train main network:
+   python3 analysis/scripts/modeSelector/train.py \
+           --input training_data/*.npz --network main --cat_model networks/net_category.pt --use_sparse
+           
+4. Plot training diagnostics
+   python3 analysis/examples/modeSelector/plot_training.py networks/net_category.pt networks/net_main.pt
+
+5. Export to ONNX and produce payloads:
+   python3 analysis/scripts/modeSelector/convert_to_onnx.py \
+           --input-dir networks/ --output-dir onnx/ --add-payloads
+
+6. Apply to MC/data for testing:
+   basf2 analysis/examples/modeSelector/applyModeSelector.py
+```
+
+See `analysis/scripts/modeSelector/README.md` for detailed documentation of
+the module behavior and the supporting scripts.

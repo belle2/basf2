@@ -61,7 +61,7 @@ void EveGeometry::addGeometry(EType visMode)
     setVolumeColor("Endcap_1", getTColorID("Chameleon", 1));
     setVolumeColor("Endcap_2", getTColorID("Chameleon", 1));
 
-    for (auto& volume : s_hideVolumes)
+    for (const auto& volume : s_hideVolumes)
       disableVolume(volume.c_str(), false);
 
     TGeoNode* top_node = gGeoManager->GetTopNode();
@@ -95,7 +95,7 @@ void EveGeometry::addGeometry(EType visMode)
 
   // Allow deletion only for full geometry
   if (s_eveTopNode) {
-    for (auto& volumeRegExp : s_deleteVolumes) {
+    for (const auto& volumeRegExp : s_deleteVolumes) {
       removeChildrenByRegExp(s_eveTopNode, volumeRegExp);
     }
   }

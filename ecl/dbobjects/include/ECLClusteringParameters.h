@@ -13,7 +13,7 @@
 
 namespace Belle2 {
 
-  /** DB object to parameters that store clustering behaviour in ECLCRFinder and ECLLocalMaximumFinder  */
+  /** DB object to parameters that store clustering behaviour in ECLCRFinder, ECLLocalMaximumFinder, and ECLFinalizer  */
   class ECLClusteringParameters: public TObject {
 
 
@@ -25,7 +25,8 @@ namespace Belle2 {
       m_LM_energyCut(),
       m_CRF_energyCut(),
       m_CRF_timeCut(),
-      m_CRF_timeCutMaxEnergy()
+      m_CRF_timeCutMaxEnergy(),
+      m_F_clusterEnergyCutMin()
     { };
 
 
@@ -44,6 +45,9 @@ namespace Belle2 {
     /** Get the three max energies for time cuts for ECLCRFinder [GeV]*/
     const std::array<double, 3>& getCRFTimeCutMaxEnergy() const {return m_CRF_timeCutMaxEnergy;}
 
+    /** Get the energy threshold for clusters in ECLFinalizer [GeV]*/
+    double getFClusterEnergyCutMin() const {return m_F_clusterEnergyCutMin;}
+
 
     //---------------------------------------------------
     //..Setters for the parmeters
@@ -60,6 +64,11 @@ namespace Belle2 {
     /** Set the three time cuts in ECLCRFinder [ns]*/
     void setCRFTimeCutMaxEnergy(const std::array<double, 3>& CRF_timeCutMaxEnergy) {m_CRF_timeCutMaxEnergy = CRF_timeCutMaxEnergy;}
 
+    void setFClusterEnergyCutMin(const double F_clusterEnergyCutMin)
+    {
+      m_F_clusterEnergyCutMin = F_clusterEnergyCutMin;
+    }
+
 
     //---------------------------------------------------
   private:
@@ -67,7 +76,8 @@ namespace Belle2 {
     std::array<double, 3> m_CRF_energyCut; /**< energy cuts for ECLCRFinder [GeV] */
     std::array<double, 3> m_CRF_timeCut; /**< time cuts for ECLCRFinder [ns] */
     std::array<double, 3> m_CRF_timeCutMaxEnergy; /**< time cuts are only applied below these energies [GeV] */
+    double m_F_clusterEnergyCutMin; /**< minimum cluster energy in ECLFinalizer [GeV] */
 
-    ClassDef(ECLClusteringParameters, 1); /**< ClassDef */
+    ClassDef(ECLClusteringParameters, 2); /**< ClassDef */
   };
 }

@@ -14,7 +14,7 @@ Usage:
     python3 train.py --input modeSelector_training_*.npz --network category --output networks/
 
     # Train main network (requires trained category network)
-    python3 train.py --input modeSelector_training.npz --network main --cat_model networks/net_cat.pt --output networks/
+    python3 train.py --input modeSelector_training.npz --network main --cat_model networks/net_category.pt --output networks/
 
 The script implements:
 - loading the sparse ModeSelector training inputs and selecting the active features

@@ -16,6 +16,7 @@ Usage:
 import argparse
 import os
 
+import numpy as np
 import torch
 import torch.nn as nn
 from modeSelector import config
@@ -45,6 +46,7 @@ def convert_network_to_onnx(pt_path, onnx_path):
 
     # Wrap with softmax: train.py outputs raw logits, basf2 inference expects probabilities
     model_with_softmax = nn.Sequential(model, nn.Softmax(dim=1))
+    model_with_softmax.eval()
 
     dummy_input = torch.randn(1, input_size)
     torch.onnx.export(
@@ -57,6 +59,27 @@ def convert_network_to_onnx(pt_path, onnx_path):
         opset_version=14,
     )
     print(f"Exported {pt_path} -> {onnx_path} (input={input_size}, labels={num_labels})")
+    _validate_onnx_export(model_with_softmax, onnx_path, input_size)
+
+
+def _validate_onnx_export(model_with_softmax, onnx_path, input_size):
+    """Check that the exported ONNX model produces the same output as the PyTorch model.
+
+    Uses a batch of 4 random inputs to exercise the dynamic batch dimension.
+    Raises RuntimeError if outputs do not match within default numpy tolerances.
+    """
+    import onnxruntime as ort
+
+    dummy = torch.randn(4, input_size)
+    with torch.no_grad():
+        pt_out = model_with_softmax(dummy).numpy()
+    session = ort.InferenceSession(onnx_path)
+    onnx_out = session.run(['output'], {'input': dummy.numpy()})[0]
+    if not np.allclose(pt_out, onnx_out):
+        raise RuntimeError(
+            'ONNX validation failed for ' + onnx_path + ': outputs do not match PyTorch model'
+        )
+    print(f"ONNX validation passed for {onnx_path}")
 
 
 def package_as_mva_weightfile(onnx_path, root_path, n_features, n_classes):

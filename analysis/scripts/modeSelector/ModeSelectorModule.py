@@ -11,8 +11,7 @@
 ModeSelector Module for event-level B meson classification.
 
 This module evaluates a two-stage neural network on FEI B meson candidates
-to provide an improved signal probability score (BplusScore) that considers
-information from all candidates in the event.
+to compute BplusScore, an event-level score based on all candidates.
 
 The module:
 1. Collects features from all B candidates in the event
@@ -32,14 +31,17 @@ class ModeSelectorModule(b2.Module):
     """
     Event-level B meson classifier using neural networks.
 
-    This module processes FEI B meson candidates and computes an improved
-    signal probability score that leverages information from multiple
-    candidates in the event.
+    This module processes FEI B meson candidates and computes a score using
+    information from all candidates in the event.
 
     Args:
         particle_lists (list): List of B meson particle list names
-        cat_model_path (str): Path to category network ONNX model
-        main_model_path (str): Path to main network ONNX model
+        cat_model_path (str): Path to the basf2 MVA weightfile for the category network,
+            as produced by convert_to_onnx.py. Pass None to load from the conditions
+            database via payload_cat_model.
+        main_model_path (str): Path to the basf2 MVA weightfile for the main network,
+            as produced by convert_to_onnx.py. Pass None to load from the conditions
+            database via payload_main_model.
         output_variable (str): Name of ExtraInfo variable for output score
         store_event_info (bool): Whether to store event-level info
     """
@@ -55,11 +57,11 @@ class ModeSelectorModule(b2.Module):
     def __init__(
         self,
         particle_lists,
-        cat_model_path=None,
-        main_model_path=None,
-        output_variable='BplusScore',
         payload_cat_model='modeSelector_cat_model_v2',
         payload_main_model='modeSelector_main_model_v2',
+        output_variable='BplusScore',
+        cat_model_path=None,
+        main_model_path=None,
         training_mode=False,
         skip_nn_evaluation=False,
         training_output='modeSelector_training.npz',
@@ -140,6 +142,16 @@ class ModeSelectorModule(b2.Module):
         #: Event-level feature names
         self.event_features = config.EVENT_FEATURES
 
+    def _load_weightfile(self, path, label):
+        """Load a basf2 MVA weightfile, raises error for unsupported extensions."""
+        if not path.endswith('.root'):
+            b2.B2FATAL(
+                "ModeSelector: " + label + " model path '" + path + "' is not a basf2 MVA "
+                "weightfile. Pass the file produced by convert_to_onnx.py "
+                "(must have a .root extension), not a raw ONNX file."
+            )
+        return Belle2.MVA.Weightfile.loadFromFile(path)
+
     def initialize(self):
         """Called at the beginning of processing."""
         # Build feature index mapping (needed for both inference and training)
@@ -174,7 +186,7 @@ class ModeSelectorModule(b2.Module):
         supported = Belle2.MVA.AbstractInterface.getSupportedInterfaces()
 
         if self.cat_model_path:
-            cat_wf = Belle2.MVA.Weightfile.loadFromFile(self.cat_model_path)
+            cat_wf = self._load_weightfile(self.cat_model_path, 'category')
         else:
             db_accessor = Belle2.DBAccessorBase(
                 Belle2.DBStoreEntry.c_RawFile, self.payload_cat_model, True
@@ -190,7 +202,7 @@ class ModeSelectorModule(b2.Module):
             cat_wf = Belle2.MVA.Weightfile.loadFromFile(cat_filename)
 
         if self.main_model_path:
-            main_wf = Belle2.MVA.Weightfile.loadFromFile(self.main_model_path)
+            main_wf = self._load_weightfile(self.main_model_path, 'main')
         else:
             db_accessor = Belle2.DBAccessorBase(
                 Belle2.DBStoreEntry.c_RawFile, self.payload_main_model, True

@@ -16,7 +16,7 @@ D* mass difference (deltaMassDiff) and vertex fit chi2 probability are stored
 as ExtraInfo on the B candidates.
 
 This helps identify B -> D* X decays that were reconstructed as B -> D X
-by the FEI, which is important for the ModeSelector neural network.
+by the FEI, which the ModeSelector uses as input features (feature blocks 5-8).
 """
 
 import math
@@ -82,9 +82,8 @@ def addDstarVeto(
     Add D* veto reconstruction to the path for B meson particle lists.
 
     This function reconstructs D* candidates by combining D mesons (first daughter
-    of B candidates) with soft pions or pi0s from the Rest of Event. The goal is
-    to identify cases where the FEI reconstructed B -> D X but the true decay
-    was B -> D* X.
+    of B candidates) with soft pions or pi0s from the Rest of Event, to identify
+    cases where the FEI reconstructed B -> D X but the true decay was B -> D* X.
 
     For B candidates with D0 as first daughter:
         - D*+ -> D0 pi+ (from ROE)

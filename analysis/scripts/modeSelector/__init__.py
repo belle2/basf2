@@ -44,11 +44,11 @@ __all__ = [
 def modeSelector(
     bp_list,
     b0_list,
-    cat_model_path=None,
-    main_model_path=None,
     payload_cat_model='modeSelector_cat_model_v2',
     payload_main_model='modeSelector_main_model_v2',
     output_variable='BplusScore',
+    cat_model_path=None,
+    main_model_path=None,
     addDstarVetoReco=True,
     training_mode=False,
     skip_nn_evaluation=False,
@@ -72,16 +72,16 @@ def modeSelector(
     Parameters:
         bp_list (str): B+ meson particle list name to process. Example: 'B+:feiHadronic'
         b0_list (str): B0 meson particle list name to process. Example: 'B0:feiHadronic'
-        cat_model_path (str): Path to the category network ONNX model file.
-            If None, loads from conditions database.
-        main_model_path (str): Path to the main network ONNX model file.
-            If None, loads from conditions database.
         payload_cat_model (str): Conditions DB payload name for the category model.
             Used only when cat_model_path is None.
         payload_main_model (str): Conditions DB payload name for the main model.
             Used only when main_model_path is None.
         output_variable (str): Name of the ExtraInfo variable for the output score.
             Default: 'BplusScore'
+        cat_model_path (str): Path to the category network ONNX model file.
+            If None, loads from conditions database.
+        main_model_path (str): Path to the main network ONNX model file.
+            If None, loads from conditions database.
         skip_nn_evaluation (bool): If True, skip loading and evaluating the neural networks
             and fill deterministic placeholder outputs instead. Intended for debugging or
             timing studies and emits a warning at module initialization.
@@ -134,11 +134,11 @@ def modeSelector(
     # Add the ModeSelector module
     module = ModeSelectorModule(
         particle_lists=particle_lists,
-        cat_model_path=cat_model_path,
-        main_model_path=main_model_path,
         payload_cat_model=payload_cat_model,
         payload_main_model=payload_main_model,
         output_variable=output_variable,
+        cat_model_path=cat_model_path,
+        main_model_path=main_model_path,
         training_mode=training_mode,
         skip_nn_evaluation=skip_nn_evaluation,
         training_output=training_output,

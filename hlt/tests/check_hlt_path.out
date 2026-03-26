@@ -1019,6 +1019,7 @@
       clusterEnergyCutMin=0.02
       clusterLossyFraction=0.0001
       clusterTimeCutMaxEnergy=0.05
+      useParametersFromDatabase=True
   99. MCMatcherECLClusters
   100. KLMReconstructor
       CheckSegmentIntersection=True
@@ -3937,6 +3938,7 @@
       clusterEnergyCutMin=0.02
       clusterLossyFraction=0.0001
       clusterTimeCutMaxEnergy=0.05
+      useParametersFromDatabase=True
   99. MCMatcherECLClusters
   100. KLMReconstructor
       CheckSegmentIntersection=True

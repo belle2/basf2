@@ -64,6 +64,7 @@ namespace Belle2 {
     /** Set the three time cuts in ECLCRFinder [ns]*/
     void setCRFTimeCutMaxEnergy(const std::array<double, 3>& CRF_timeCutMaxEnergy) {m_CRF_timeCutMaxEnergy = CRF_timeCutMaxEnergy;}
 
+    /** Set the minimum cluster energy in ECLFinalizer [GeV] */
     void setFClusterEnergyCutMin(const double F_clusterEnergyCutMin)
     {
       m_F_clusterEnergyCutMin = F_clusterEnergyCutMin;

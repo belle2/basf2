@@ -41,6 +41,13 @@ void SVDClusterAbsoluteTimeShifterCollectorModule::prepare()
   }
   m_eventT0.isRequired(m_eventT0Name);
 
+  //temporary histogram for checks: adding cdceventt0 to the histos
+  TH1F* __CDCEventT0__ = new TH1F("hCDCEventT0_",
+                                  "CDC Event T0",
+                                  300, -150., 150.);
+  __CDCEventT0__->GetXaxis()->SetTitle("CDC Event T0 (ns)");
+  registerObject<TH1F>(__CDCEventT0__->GetName(), __CDCEventT0__);
+
   // getting all the svd sensors
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
   std::vector<Belle2::VxdID> allSensors;
@@ -70,6 +77,12 @@ void SVDClusterAbsoluteTimeShifterCollectorModule::startRun()
   for (auto alg : m_timeAlgorithms) {
     getObjectPtr<TH2F>(("hClsTimeOnTracks_" + alg).data())->Reset();
   }
+  //temp
+  getObjectPtr<TH1F>("hCDCEventT0_")->Reset();
+
+  // Open the calibration output file to read the shift and the resolution value from the fits
+  //
+
 }
 
 void SVDClusterAbsoluteTimeShifterCollectorModule::collect()
@@ -102,4 +115,6 @@ void SVDClusterAbsoluteTimeShifterCollectorModule::collect()
 
     }
   } // loop over alg
+
+  getObjectPtr<TH1F>("hCDCEventT0_")->Fill(eventT0);
 }

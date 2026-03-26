@@ -77,7 +77,7 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
 
     auto __hClsOnTrack__ = getObjectPtr<TH2F>(("hClsTimeOnTracks_" + alg).Data());
 
-
+    auto __CDCEventT0__ = getObjectPtr<TH1F>("hCDCEventT0_");
     // map : shift values
     std::map< TString, Double_t > shiftValues;
 
@@ -85,6 +85,9 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
 
     std::unique_ptr<TFile> f(new TFile(Form("algorithm_svdClusterAbsoluteTimeShifter_%s_output_rev_%d.root", alg.Data(), cal_rev),
                                        "RECREATE"));
+
+    B2INFO("ROOT file created at: " << f->GetName());
+    B2INFO("Full path: " << gSystem->WorkingDirectory() << "/" << f->GetName());
 
     TString outPDF = Form("algorithm_svdClusterAbsoluteTimeShifter_%s_output_rev_%d.pdf", alg.Data(), cal_rev);
     TCanvas c1("c1", "c1", 640, 480);
@@ -138,6 +141,20 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
         onePad.Clear();
         onePad.cd();
         hist->Draw();
+
+        // Overlay CDCEventT0 histogram
+        if (__CDCEventT0__) {
+          TH1F* cdcOverlay = (TH1F*)__CDCEventT0__->Clone(Form("cdc_%s", binLabel.Data()));
+          cdcOverlay->SetLineColor(kMagenta);
+          cdcOverlay->SetLineWidth(2);
+          cdcOverlay->SetLineStyle(2);
+          cdcOverlay->SetDirectory(0);
+
+          // Scale to match histogram height
+          double scale = hist->GetMaximum() / cdcOverlay->GetMaximum() * 0.8;
+          // cdcOverlay->Scale(scale);
+          // cdcOverlay->Draw("SAME");
+        }
 
         if (hist->GetMaximum() < 200.) {
           int rebinValue = 200. / hist->GetMaximum() + 1.;
@@ -250,6 +267,11 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
 
         shiftValues[binLabel] = 1. * int(1000. * fillShiftVal) / 1000.;
 
+        // Ensure the plot is visually restricted to [-50, 50] after all fitting and drawing
+        hist->GetXaxis()->SetRangeUser(-50, 50);
+        gPad->Range(-50, 0, 50, hist->GetMaximum() * 1.2);
+        gPad->Update();
+
         c1.Print(outPDF, TString("Title:") + hist->GetName());
         f->cd();
         hist->Write();
@@ -268,6 +290,8 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
       B2INFO("  " << item.first << " : " << item.second);
 
     }
+
+
 
     onePad.cd();
 

@@ -36,7 +36,7 @@ random.seed(42)
 now = datetime.datetime.now()
 
 settings = CalibrationSettings(name="caf_svd_time",
-                               expert_username="gdujany",
+                               expert_username="gdujany",  # ID theft is a serious matter
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["hadron_calib"],
@@ -606,93 +606,143 @@ def get_calibrations(input_data, **kwargs):
         algorithm.params = {"apply_iov": output_iov}
 
     if "AbsoluteTimeShiftCalibration" not in listOfMutedCalibrations:
+        # # Configure databases before adding to list
+        # print(f'TRYING TO SET MY OWN LOCAL DB FOR ABSOLUTE SHIFT CALIBRATION')
+        # local_db_path = "/home/belle2/athaller/calibration_scripts/test_gt_dl/revision_039"
+        # absolute_shift_calibration.reset_database()
+        # absolute_shift_calibration.use_local_database(
+        #     f"{local_db_path}/database.txt",
+        #     local_db_path
+        # )
+
+        # gt_global_db = ["patch_main_release-09", "data_prompt_rel08", "online","temp_casarosa_TEST_DAFConfiguration_v1",
+        # "temp_glazov_20250617-084555","user_casarosa_SVDAbsoluteClusterTimeShift_allZeros"]
+
+        # for db in gt_global_db:
+        #     absolute_shift_calibration.use_central_database(db)
+        #     print(f'Added central database: {db}')
+
         list_of_calibrations.append(absolute_shift_calibration)
 
     #########################################################
     # Add new fake calibration to run validation collectors #
     #########################################################
 
-    val_cog6 = create_svd_clusterizer(
-        name=f"ClusterReconstruction{cog6_suffix}",
-        clusters=f"SVDClusters{cog6_suffix}",
-        time_algorithm="CoG6")
+    validation_collector = {
+    }
+    clusteriser = {}
+    validation_algorithm = {}
+    for alg in ["CoG3", "ELS3", "CoG6"]:
+        for tracks in ["", "_onTracks"]:
+            cluster_name = f"SVDClusters_{alg}{tracks}"
+            clusteriser[cluster_name] = create_svd_clusterizer(
+                name=f"ClusterReconstruction_{alg}{tracks}",
+                clusters=cluster_name,
+                reco_digits=NEW_RECO_DIGITS_NAME if tracks else None,
+                shaper_digits=NEW_SHAPER_DIGITS_NAME if tracks else None,
+                time_algorithm=alg
+            )
+        validation_collector[alg] = create_validation_collector(
+            name=f"SVDTimeValidationCollector_{alg}",
+            clusters=f"SVDClusters_{alg}",
+            clusters_onTracks=f"SVDClusters_{alg}_onTracks",
+            event_t0="EventT0"
+        )
 
-    val_cog6_onTracks = create_svd_clusterizer(
-        name=f"ClusterReconstruction{cog6_suffix}_onTracks",
-        clusters=f"SVDClusters{cog6_suffix}_onTracks",
-        reco_digits=NEW_RECO_DIGITS_NAME,
-        shaper_digits=NEW_SHAPER_DIGITS_NAME,
-        time_algorithm="CoG6")
+        validation_algorithm[alg] = create_validation_algorithm(
+            prefix=validation_collector[alg].name(),
+            min_entries=10000
+        )
 
-    val_cog3 = create_svd_clusterizer(
-        name=f"ClusterReconstruction{cog3_suffix}",
-        clusters=f"SVDClusters{cog3_suffix}",
-        time_algorithm="CoG3")
+    # val_cog6 = create_svd_clusterizer(
+    #     name=f"ClusterReconstruction{cog6_suffix}",
+    #     clusters=f"SVDClusters{cog6_suffix}",
+    #     time_algorithm="CoG6")
 
-    val_cog3_onTracks = create_svd_clusterizer(
-        name=f"ClusterReconstruction{cog3_suffix}_onTracks",
-        clusters=f"SVDClusters{cog3_suffix}_onTracks",
-        reco_digits=NEW_RECO_DIGITS_NAME,
-        shaper_digits=NEW_SHAPER_DIGITS_NAME,
-        time_algorithm="CoG3")
+    # val_cog6_onTracks = create_svd_clusterizer(
+    #     name=f"ClusterReconstruction{cog6_suffix}_onTracks",
+    #     clusters=f"SVDClusters{cog6_suffix}_onTracks",
+    #     reco_digits=NEW_RECO_DIGITS_NAME,
+    #     shaper_digits=NEW_SHAPER_DIGITS_NAME,
+    #     time_algorithm="CoG6")
 
-    val_els3 = create_svd_clusterizer(
-        name=f"ClusterReconstruction{els3_suffix}",
-        clusters=f"SVDClusters{els3_suffix}",
-        time_algorithm="ELS3")
+    # val_cog3 = create_svd_clusterizer(
+    #     name=f"ClusterReconstruction{cog3_suffix}",
+    #     clusters=f"SVDClusters{cog3_suffix}",
+    #     time_algorithm="CoG3")
 
-    val_els3_onTracks = create_svd_clusterizer(
-        name=f"ClusterReconstruction{els3_suffix}_onTracks",
-        clusters=f"SVDClusters{els3_suffix}_onTracks",
-        reco_digits=NEW_RECO_DIGITS_NAME,
-        shaper_digits=NEW_SHAPER_DIGITS_NAME,
-        time_algorithm="ELS3")
+    # val_cog3_onTracks = create_svd_clusterizer(
+    #     name=f"ClusterReconstruction{cog3_suffix}_onTracks",
+    #     clusters=f"SVDClusters{cog3_suffix}_onTracks",
+    #     reco_digits=NEW_RECO_DIGITS_NAME,
+    #     shaper_digits=NEW_SHAPER_DIGITS_NAME,
+    #     time_algorithm="CoG3")
 
-    val_coll_cog6 = create_validation_collector(
-        name=f"SVDTimeValidationCollector{cog6_suffix}",
-        clusters=f"SVDClusters{cog6_suffix}",
-        clusters_onTracks=f"SVDClusters{cog6_suffix}_onTracks",
-        event_t0="EventT0")
+    # val_els3 = create_svd_clusterizer(
+    #     name=f"ClusterReconstruction{els3_suffix}",
+    #     clusters=f"SVDClusters{els3_suffix}",
+    #     time_algorithm="ELS3")
 
-    val_algo_cog6 = create_validation_algorithm(
-        prefix=val_coll_cog6.name(),
-        min_entries=10000)
+    # val_els3_onTracks = create_svd_clusterizer(
+    #     name=f"ClusterReconstruction{els3_suffix}_onTracks",
+    #     clusters=f"SVDClusters{els3_suffix}_onTracks",
+    #     reco_digits=NEW_RECO_DIGITS_NAME,
+    #     shaper_digits=NEW_SHAPER_DIGITS_NAME,
+    #     time_algorithm="ELS3")
 
-    val_coll_cog3 = create_validation_collector(
-        name=f"SVDTimeValidationCollector{cog3_suffix}",
-        clusters=f"SVDClusters{cog3_suffix}",
-        clusters_onTracks=f"SVDClusters{cog3_suffix}_onTracks",
-        event_t0="EventT0")
+    # val_coll_cog6 = create_validation_collector(
+    #     name=f"SVDTimeValidationCollector{cog6_suffix}",
+    #     clusters=f"SVDClusters{cog6_suffix}",
+    #     clusters_onTracks=f"SVDClusters{cog6_suffix}_onTracks",
+    #     event_t0="EventT0")
 
-    val_algo_cog3 = create_validation_algorithm(
-        prefix=val_coll_cog3.name(),
-        min_entries=10000)
+    # val_algo_cog6 = create_validation_algorithm(
+    #     prefix=val_coll_cog6.name(),
+    #     min_entries=10000)
 
-    val_coll_els3 = create_validation_collector(
-        name=f"SVDTimeValidationCollector{els3_suffix}",
-        clusters=f"SVDClusters{els3_suffix}",
-        clusters_onTracks=f"SVDClusters{els3_suffix}_onTracks",
-        event_t0="EventT0")
+    # val_coll_cog3 = create_validation_collector(
+    #     name=f"SVDTimeValidationCollector{cog3_suffix}",
+    #     clusters=f"SVDClusters{cog3_suffix}",
+    #     clusters_onTracks=f"SVDClusters{cog3_suffix}_onTracks",
+    #     event_t0="EventT0")
 
-    val_algo_els3 = create_validation_algorithm(
-        prefix=val_coll_els3.name(),
-        min_entries=10000)
+    # val_algo_cog3 = create_validation_algorithm(
+    #     prefix=val_coll_cog3.name(),
+    #     min_entries=10000)
+
+    # val_coll_els3 = create_validation_collector(
+    #     name=f"SVDTimeValidationCollector{els3_suffix}",
+    #     clusters=f"SVDClusters{els3_suffix}",
+    #     clusters_onTracks=f"SVDClusters{els3_suffix}_onTracks",
+    #     event_t0="EventT0")
+
+    # val_algo_els3 = create_validation_algorithm(
+    #     prefix=val_coll_els3.name(),
+    #     min_entries=10000)
 
     list_of_val_clusterizers = []
     list_of_val_algorithms = []
     for a in timeAlgorithms:
-        if a == "CoG3":
-            list_of_val_clusterizers.append(val_cog3)
-            list_of_val_clusterizers.append(val_cog3_onTracks)
-            list_of_val_algorithms.append(val_algo_cog3)
-        if a == "CoG6":
-            list_of_val_clusterizers.append(val_cog6)
-            list_of_val_clusterizers.append(val_cog6_onTracks)
-            list_of_val_algorithms.append(val_algo_cog6)
-        if a == "ELS3":
-            list_of_val_clusterizers.append(val_els3)
-            list_of_val_clusterizers.append(val_els3_onTracks)
-            list_of_val_algorithms.append(val_algo_els3)
+
+        # could add a check that the entries of the dict indeed exist for
+        # corresponding algs, but in principle they all are created in the loop
+        # above
+        list_of_val_clusterizers.append(clusteriser[f"SVDClusters_{a}"])
+        list_of_val_clusterizers.append(clusteriser[f"SVDClusters_{a}_onTracks"])
+        list_of_val_algorithms.append(validation_algorithm[a])
+
+        # if a == "CoG3":
+        #     list_of_val_clusterizers.append(val_cog3)
+        #     list_of_val_clusterizers.append(val_cog3_onTracks)
+        #     list_of_val_algorithms.append(val_algo_cog3)
+        # if a == "CoG6":
+        #     list_of_val_clusterizers.append(val_cog6)
+        #     list_of_val_clusterizers.append(val_cog6_onTracks)
+        #     list_of_val_algorithms.append(val_algo_cog6)
+        # if a == "ELS3":
+        #     list_of_val_clusterizers.append(val_els3)
+        #     list_of_val_clusterizers.append(val_els3_onTracks)
+        #     list_of_val_algorithms.append(val_algo_els3)
 
     val_pre_collector_path = create_pre_collector_path(
         clusterizers=list_of_val_clusterizers,
@@ -701,19 +751,25 @@ def get_calibrations(input_data, **kwargs):
         useSVDGrouping=useSVDGrouping, useRawtimeForTracking=useRawtimeForTracking,
         is_validation=True)
 
-    val_collector_managed_by_CAF = val_coll_els3
-    if "ELS3" in timeAlgorithms:
-        val_collector_managed_by_CAF = val_coll_els3
-        if "CoG6" in timeAlgorithms:
-            val_pre_collector_path.add_module(val_coll_cog6)
-        if "CoG3" in timeAlgorithms:
-            val_pre_collector_path.add_module(val_coll_cog3)
-    elif "CoG3" in timeAlgorithms:
-        val_collector_managed_by_CAF = val_coll_cog3
-        if "CoG6" in timeAlgorithms:
-            val_pre_collector_path.add_module(val_coll_cog6)
-    else:
-        val_collector_managed_by_CAF = val_coll_cog6
+    # val_collector_managed_by_CAF = val_coll_els3
+    # if "ELS3" in timeAlgorithms:
+    #     val_collector_managed_by_CAF = val_coll_els3
+    #     if "CoG6" in timeAlgorithms:
+    #         val_pre_collector_path.add_module(val_coll_cog6)
+    #     if "CoG3" in timeAlgorithms:
+    #         val_pre_collector_path.add_module(val_coll_cog3)
+    # elif "CoG3" in timeAlgorithms:
+    #     val_collector_managed_by_CAF = val_coll_cog3
+    #     if "CoG6" in timeAlgorithms:
+    #         val_pre_collector_path.add_module(val_coll_cog6)
+    # else:
+    #     val_collector_managed_by_CAF = val_coll_cog6
+
+    if len(timeAlgorithms) == 1:
+        val_collector_managed_by_CAF = validation_collector[timeAlgorithms[0]]
+    elif len(timeAlgorithms) > 1:
+        for i in range(1, len(timeAlgorithms)):
+            val_pre_collector_path.add_module(validation_collector[timeAlgorithms[i]])
 
     val_calibration = Calibration("SVDTimeValidation",
                                   collector=val_collector_managed_by_CAF,

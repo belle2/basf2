@@ -38,11 +38,6 @@ void CKFToCDCFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   m_resultFinalizer.exposeParameters(moduleParamList, prefix);
   m_resultStorer.exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "DBPayloadName"),
-                                m_param_dbPayloadName,
-                                "Name of the DB payload containing ToCDCCKF parameters. If non-empty and the payload is valid, it will override the module parameters.",
-                                m_param_dbPayloadName);
-
   moduleParamList->getParameter<std::string>("statePreFilter").setDefaultValue("all");
   moduleParamList->getParameter<std::string>("stateBasicFilter").setDefaultValue("rough");
   moduleParamList->getParameter<std::string>("stateExtrapolationFilter").setDefaultValue("extrapolate_and_update");
@@ -53,13 +48,9 @@ void CKFToCDCFindlet::beginRun()
 {
   Super::beginRun();
 
-  if (m_param_dbPayloadName.empty()) {
-    return;
-  }
-
-  DBObjPtr<SVDToCDCCKFParameters> payload(m_param_dbPayloadName);
+  DBObjPtr<SVDToCDCCKFParameters> payload("SVDToCDCCKFParameters");
   if (!payload.isValid()) {
-    B2FATAL("CKFToCDCFindlet: DB payload '" << m_param_dbPayloadName << "' not found or not valid for current run.");
+    B2FATAL("CKFToCDCFindlet: DB payload 'SVDToCDCCKFParameters' not found or not valid for current run.");
   }
 
   m_trackHandler.setMinimalPtRequirement(payload->getMinimalPtRequirement());
@@ -76,7 +67,7 @@ void CKFToCDCFindlet::beginRun()
   m_resultStorer.setExportAllTracks(payload->getExportAllTracks());
   m_resultStorer.setSetTakenFlag(payload->getTakenFlag());
 
-  B2DEBUG(20, "CKFToCDCFindlet: Loaded and applied parameters from DB payload '" << m_param_dbPayloadName << "'.");
+  B2DEBUG(20, "CKFToCDCFindlet: Loaded and applied parameters from DB payload 'SVDToCDCCKFParameters'.");
 }
 
 void CKFToCDCFindlet::beginEvent()

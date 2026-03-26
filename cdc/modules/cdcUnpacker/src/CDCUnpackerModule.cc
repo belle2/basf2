@@ -399,8 +399,12 @@ void CDCUnpackerModule::event()
             }
 
             if (it + 2 >= bufSize) {
-              B2ERROR("Buffer overrun it + 2, length " << length);
-              break; // crash otherwise below
+              B2ERROR("CDCUnpacker : buffer overrun it + 2"
+                      << LogVar("data length from header", length)
+                      << LogVar("actual data length", bufSize)
+                      << LogVar("board id", board)
+                      << LogVar("channel", ch));
+              break; // exception below otherwise below
             }
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.
             unsigned short fadcSum = m_buffer.at(it + 2);  // FADC sum.
@@ -419,14 +423,22 @@ void CDCUnpackerModule::event()
 
             if (length == 4) {
               if (it + 3 >= bufSize) {
-                B2ERROR("Buffer overrun it + 3");
-                break;
+                B2ERROR("CDCUnpacker : buffer overrun it + 3"
+                        << LogVar("data length from header", length)
+                        << LogVar("actual data length", bufSize)
+                        << LogVar("board id", board)
+                        << LogVar("channel", ch));
+                break; // exception below otherwise below
               }
               tdc1 = m_buffer.at(it + 3);
             } else if (length == 5) {
               if (it + 4 >= bufSize) {
-                B2ERROR("Buffer overrun it + 4");
-                break;
+                B2ERROR("CDCUnpacker : buffer overrun it + 4"
+                        << LogVar("data length from header", length)
+                        << LogVar("actual data length", bufSize)
+                        << LogVar("board id", board)
+                        << LogVar("channel", ch));
+                break; // exception below otherwise below
               }
               tdc1 = m_buffer.at(it + 3);
               tdc2 = m_buffer.at(it + 4) & 0x7fff;

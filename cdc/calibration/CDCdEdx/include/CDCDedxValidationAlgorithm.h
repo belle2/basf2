@@ -15,6 +15,8 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeometryParConstants.h>
 
+#include <cdc/dbobjects/CDCDedxInjectionTime.h>
+
 #include <vector>
 #include <string>
 
@@ -314,5 +316,6 @@ namespace Belle2 {
     /** Event metadata. */
     StoreObjPtr<EventMetaData> m_EventMetaData;
 
+    DBObjPtr<CDCDedxInjectionTime> m_DBInjectTime; /**< Injection time DB object */
   };
 } // namespace Belle2

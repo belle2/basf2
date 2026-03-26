@@ -20,6 +20,8 @@
 #include <TStyle.h>
 #include <TLine.h>
 #include <TEllipse.h>
+#include <TLatex.h>
+#include <TPad.h>
 #include <numeric>
 #include <iostream>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -137,10 +139,15 @@ namespace Belle2 {
     TH1F* m_hist_wire_attach_eff_1d = nullptr; /**< for above*/
     double m_lbinEdges[kNumLayers + 1] = {0.0}; /**< vector for radius edge 56*/
 
-    TLine* m_line_ladc  = nullptr; /**< line for lower ADC window */
-    TLine* m_line_hadc  = nullptr; /**< line for higher ADC window */
-    TLine* m_line_ltdc  = nullptr; /**< line for lower TDC window */
-    TLine* m_line_htdc  = nullptr; /**< line for higher TDC window */
+    TLine* m_line_ladc_sl01  = nullptr; /**< line for lower ADC window for SL0-1 */
+    TLine* m_line_hadc_sl01  = nullptr; /**< line for higher ADC window for SL0-1 */
+    TLine* m_line_ltdc_sl01  = nullptr; /**< line for lower TDC window for SL0-1 */
+    TLine* m_line_htdc_sl01  = nullptr; /**< line for higher TDC window for SL0-1 */
+
+    TLine* m_line_ladc_sl28  = nullptr; /**< line for lower ADC window for SL2-8 */
+    TLine* m_line_hadc_sl28  = nullptr; /**< line for higher ADC window for SL2-8 */
+    TLine* m_line_ltdc_sl28  = nullptr; /**< line for lower TDC window for SL2-8 */
+    TLine* m_line_htdc_sl28  = nullptr; /**< line for higher TDC window for SL2-8 */
 
     std::string m_name_dir = ""; /**< histogram dir*/
     std::string m_name_refdir = ""; /**< reference histogram dir*/
@@ -164,13 +171,21 @@ namespace Belle2 {
     TH1D* m_hist_refphi = nullptr; /**< for above*/
 
     int m_minevt;/**< min events for single intra-run point */
-    double m_minadc;/**< min adc median thershold accepted */
-    double m_maxadc;/**< max adc median thershold accepted */
-    double m_mintdc;/**< min tdc median thershold accepted */
-    double m_maxtdc;/**< max tdc median thershold accepted */
+    double m_minphibinsfrac;/**< min phi diff fraction for alarms */
+
+    double m_minadc_sl01 = 20.0;  /**< min adc median threshold accepted for SL0-1 */
+    double m_maxadc_sl01 = 40.0;  /**< max adc median threshold accepted for SL0-1 */
+    double m_mintdc_sl01 = 4700.0;/**< min tdc median threshold accepted for SL0-1 */
+    double m_maxtdc_sl01 = 5200.0;/**< max tdc median threshold accepted for SL0-1 */
+
+    double m_minadc_sl28 = 40.0;  /**< min adc median threshold accepted for SL2-8 */
+    double m_maxadc_sl28 = 180.0; /**< max adc median threshold accepted for SL2-8 */
+    double m_mintdc_sl28 = 4600.0;/**< min tdc median threshold accepted for SL2-8 */
+    double m_maxtdc_sl28 = 5000.0;/**< max tdc median threshold accepted for SL2-8 */
+
     double m_phistop;/**< stop thershold for phi differences */
-    double m_phialarm;/**< alarm thershold for phi differences */
-    double m_phiwarn;/**< warn thershold for phi differences */
+    double m_phiwarn = 0.05;/**< 5% warn thershold for phi differences */
+    double m_phialarm = 0.15;/**< 15% alarm thershold for phi differences */
     std::vector<TLine*> m_lines;/**< number of CDC layer lines */
 
     TH1D* m_hists_lADC[kNumLayers]; /**< ADC histograms with track associated hits for each board (0-299) */

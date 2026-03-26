@@ -108,12 +108,11 @@ def create_testfile_ntuple(input, output, treeNames=["tree", "anotherTree"], **a
     metadata.setCreationData(
         metadata.getDate(), metadata.getSite(), metadata.getUser(), "test-release"
     )
-    f = ROOT.TFile(output, "UPDATE")
-    t = ROOT.TTree("persistent", "persistent")
-    t.Branch("FileMetaData", metadata)
-    t.Fill()
-    t.Write()
-    f.Close()
+    with ROOT.TFile(output, "UPDATE") as f:
+        t = ROOT.TTree("persistent", "persistent")
+        t.Branch("FileMetaData", metadata)
+        t.Fill()
+        t.Write()
 
 
 def merge_files(*args, output="output.root", filter_modified=False):
@@ -143,6 +142,41 @@ def merge_files(*args, output="output.root", filter_modified=False):
     sys.stdout.buffer.flush()
     # and return exitcode
     return process.returncode
+
+
+#: Minimal steering file to create a histogram output file like VariablesToHistogram
+testfile_histogram_steering = """
+import basf2
+basf2.set_log_level(basf2.LogLevel.ERROR)
+main = basf2.create_path()
+main.add_module('RootInput')
+main.add_module('VariablesToHistogram',
+                variables=[('expNum', 10, -0.5, 9.5), ('runNum', 10, -0.5, 9.5)])
+main.add_module('VariablesToNtuple', variables=['expNum', 'runNum'])
+basf2.process(main)
+"""
+
+
+def create_testfile_histogram(input_file, output_file, seed="default"):
+    """Create a histogram file using VariablesToHistogram and add required metadata.
+
+    VariablesToHistogram does not write a persistent tree, so we add one manually
+    to make the file compatible with b2file-merge (same pattern as create_testfile_ntuple).
+    """
+    steering_file = "steering-histogram.py"
+    with open(steering_file, "w") as f:
+        f.write(testfile_histogram_steering)
+    subprocess.call(["basf2", "-i", input_file, "-o", output_file, steering_file])
+    # update release in metadata to avoid 'modified-xxx' warnings
+    metadata = basf2.get_file_metadata(output_file)
+    metadata.setCreationData(
+        metadata.getDate(), metadata.getSite(), metadata.getUser(), "test-release"
+    )
+    with ROOT.TFile(output_file, "UPDATE") as f:
+        t = ROOT.TTree("persistent", "persistent")
+        t.Branch("FileMetaData", metadata)
+        t.Fill()
+        t.Write("", ROOT.TObject.kOverwrite)
 
 
 #: Minimal steering file to create an output root file we can merge
@@ -538,7 +572,24 @@ def check_29_parent_release():
     return meta.getRelease() == "abcd"
 
 
-def check_XX_filemetaversion():
+def check_30_histogram_merge():
+    """Check that we can merge two histogram output files (as produced by VariablesToHistogram)"""
+    create_testfile("test1.root", exp=0, run=0, events=100)
+    create_testfile("test2.root", exp=0, run=1, events=200)
+    create_testfile_histogram("test1.root", "hist1.root", seed="seed1")
+    create_testfile_histogram("test2.root", "hist2.root", seed="seed2")
+    if merge_files("hist1.root", "hist2.root", filter_modified=True) != 0:
+        return False
+    out = ROOT.TFile("output.root")
+    h = out.Get("expNum")
+    if not h:
+        print("expNum histogram not found in merged output")
+        return False
+    # Each input had 100 and 200 events respectively, so 300 entries total
+    return h.GetEntries() == 300
+
+
+def check_31_filemetaversion():
     """Check that the Version of the FileMetaData hasn't changed.
     If this check fails please check that the changes to FileMetaData don't
     affect b2file-merge and adapt the correct version number here."""

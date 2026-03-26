@@ -298,9 +298,6 @@ TTree* SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselT
       B2FATAL("Lambda: sPlot error: sum of weights not equal to 1");
   }
 
-  // RooDataSet* LambdaDatasetSWeighted = new RooDataSet(LambdaDataset->GetName(), LambdaDataset->GetTitle(), LambdaDataset,
-  // *LambdaDataset->get());
-
   TTree* treeLambdaSWeighted = LambdaDataset->GetClonedTree();
   treeLambdaSWeighted->SetName("treeLambdaSWeighted");
 
@@ -509,9 +506,6 @@ TTree* SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTr
     if (TMath::Abs(sPlotDatasetDstar->GetSWeight(iEvt, "nSignalDstar") + sPlotDatasetDstar->GetSWeight(iEvt, "nBkgDstar") - 1) > 5.e-3)
       B2FATAL("Dstar: sPlot error: sum of weights not equal to 1");
   }
-
-  // RooDataSet* DstarDatasetSWeighted = new RooDataSet(DstarDataset->GetName(), DstarDataset->GetTitle(), DstarDataset,
-  //                                                    *DstarDataset->get());
 
   TTree* treeDstarSWeighted = DstarDataset->GetClonedTree();
   treeDstarSWeighted->SetName("treeDstarSWeighted");

@@ -1,0 +1,31 @@
+# EventType: 2613040560
+# Descriptor: [ccbar Xic02Lambda0Ks0, Lambda02PpPim, Ks02PipPim]
+# NickName: Xic02Lambda0Ks0_Lambda02PpPim_Ks02PipPim
+# PhysicsWG: Charm
+# Responsible: Rishav Kumar Jaiswal 
+# Date: 20260324 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+# Pythia6 definition "32" for "vpho -> q qbar" should be used.
+#   (this is automatically converted to Pythia8 definition "91")
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Alias MyLambda0 Lambda0
+Alias MyKs0 K_S0
+
+Decay Xi_c0
+1.000 MyLambda0 MyKs0       PHSP;
+Enddecay
+
+Decay MyLambda0
+1.000   p+  pi-           HypNonLepton 0.748 -6.5;
+Enddecay
+
+Decay MyKs0
+1.000 pi+ pi-             PHSP;
+Enddecay
+
+End

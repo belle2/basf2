@@ -35,12 +35,10 @@ def merge_root_to_parquet(root_dir, parquet_dir, mask_value, uniqueIdentifier, t
         n_rows += len(df)
 
         # Rescale target variable from [-1,1] to [0,1]
-        m = df["qrCombined"].min()
-        if m != 0:
-            df["qrCombined"] = df["qrCombined"].where(df["qrCombined"] != m, 0)
+        df["qrCombined"] = df["qrCombined"].where(df["qrCombined"] != -1, 0)
 
         # verify two-class output
-        assert len(df["qrCombined"].unique()) == 2
+        assert set(df["qrCombined"].unique()).issubset([0, 1])
 
         # Mask NaN values
         df = df.fillna(mask_value)

@@ -28,7 +28,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
     """
     __authors__ = "Xing-Yu Zhou"
     __description__ = "Skim list for two track lepton (e+e- to e+e- and e+e- to mu+mu-) events for luminosity measurements."
-    __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
+    __contact__ = __liaison__
     __category__ = "physics, low multiplicity"
 
     TestSampleProcess = "mumu"
@@ -128,7 +128,7 @@ class LowMassTwoTrack(BaseSkim):
     __authors__ = ["Xing-Yu Zhou", "Guanda Gong"]
     __description__ = "Skim list for low mass events with at least two tracks and one hard photon" \
                       " in final state."
-    __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
+    __contact__ = __liaison__
     __category__ = "physics, low multiplicity"
 
     TestSampleProcess = "mumu"
@@ -184,8 +184,6 @@ class LowMassTwoTrack(BaseSkim):
         return ParticleLists
 
     def validation_histograms(self, path):
-        if path is None:
-            return
         from ROOT import Belle2
         vm.addAlias('pip_p_cms', 'daughter(0, useCMSFrame(p))')
         vm.addAlias('pim_p_cms', 'daughter(1, useCMSFrame(p))')
@@ -232,7 +230,7 @@ class SingleTagPseudoScalar(BaseSkim):
     """
 
     __authors__ = ["Hisaki Hayashii"]
-    __contact__ = "Hisaki Hayashii <hisaki.hayashii@desy.de>"
+    __contact__ = __liaison__
     __description__ = "A skim script to select events with one high-energy electron and one or more pi0/eta/eta mesons."
     __category__ = "physics, low multiplicity"
     ApplyHLTHadronCut = False
@@ -295,7 +293,7 @@ class LowMassOneTrack(BaseSkim):
     """
     __authors__ = ["Gaurav Sharma", "Qingyuan Liu"]
     __description__ = "Skim list for low mass events with one track and one hard photon in final state."
-    __contact__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
+    __contact__ = __liaison__
     __category__ = "physics, low multiplicity"
 
     TestSampleProcess = "mumu"

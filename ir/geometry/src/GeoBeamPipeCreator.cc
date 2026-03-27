@@ -25,7 +25,7 @@
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Polycone.hh>
-#include "G4EllipticalTube.hh"
+#include <G4EllipticalTube.hh>
 #include <G4UnionSolid.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
@@ -146,7 +146,7 @@ namespace Belle2 {
       AreaTubeFwd_Z[1] = m_config.getParameter(prep + "D2") * unitFactor;
 
       double AreaTubeFwd_rI[AreaTubeFwd_num];
-      for (int i = 0; i < AreaTubeFwd_num; i++) {
+      for (int i = 0; i < AreaTubeFwd_num; ++i) {
         AreaTubeFwd_rI[i] = 0.0;
       }
 
@@ -171,7 +171,7 @@ namespace Belle2 {
       AreaTubeBwd_Z[1] = m_config.getParameter(prep + "D2") * unitFactor;
 
       double AreaTubeBwd_rI[AreaTubeBwd_num];
-      for (int i = 0; i < AreaTubeBwd_num; i++) {
+      for (int i = 0; i < AreaTubeBwd_num; ++i) {
         AreaTubeBwd_rI[i] = 0.0;
       }
 
@@ -195,7 +195,7 @@ namespace Belle2 {
       vector<double> Lv1TaLERUp_Z(Lv1TaLERUp_num);
       vector<double> Lv1TaLERUp_rI(Lv1TaLERUp_num);
       vector<double> Lv1TaLERUp_rO(Lv1TaLERUp_num);
-      for (int i = 0; i < Lv1TaLERUp_num; i++) {
+      for (int i = 0; i < Lv1TaLERUp_num; ++i) {
         ostringstream ossZ_Lv1TaLERUp;
         ossZ_Lv1TaLERUp << "L" << i;
 
@@ -205,7 +205,7 @@ namespace Belle2 {
         Lv1TaLERUp_Z[i] = m_config.getParameter(prep + ossZ_Lv1TaLERUp.str()) * unitFactor;
         Lv1TaLERUp_rO[i] = m_config.getParameter(prep + ossR_Lv1TaLERUp.str()) * unitFactor;
       }
-      for (int i = 0; i < Lv1TaLERUp_num; i++) {
+      for (int i = 0; i < Lv1TaLERUp_num; ++i) {
         Lv1TaLERUp_rI[i] = 0.0;
       }
 
@@ -241,7 +241,7 @@ namespace Belle2 {
       vector<double> Lv1TaHERUp_Z(Lv1TaHERUp_num);
       vector<double> Lv1TaHERUp_rI(Lv1TaHERUp_num);
       vector<double> Lv1TaHERUp_rO(Lv1TaHERUp_num);
-      for (int i = 0; i < Lv1TaHERUp_num; i++) {
+      for (int i = 0; i < Lv1TaHERUp_num; ++i) {
         ostringstream ossZ_Lv1TaHERUp;
         ossZ_Lv1TaHERUp << "L" << i;
 
@@ -251,7 +251,7 @@ namespace Belle2 {
         Lv1TaHERUp_Z[i] = m_config.getParameter(prep + ossZ_Lv1TaHERUp.str()) * unitFactor;
         Lv1TaHERUp_rO[i] = m_config.getParameter(prep + ossR_Lv1TaHERUp.str()) * unitFactor;
       }
-      for (int i = 0; i < Lv1TaHERUp_num; i++) {
+      for (int i = 0; i < Lv1TaHERUp_num; ++i) {
         Lv1TaHERUp_rI[i] = 0.0;
       }
 
@@ -287,7 +287,7 @@ namespace Belle2 {
       vector<double> Lv1TaLERDwn_Z(Lv1TaLERDwn_num);
       vector<double> Lv1TaLERDwn_rI(Lv1TaLERDwn_num);
       vector<double> Lv1TaLERDwn_rO(Lv1TaLERDwn_num);
-      for (int i = 0; i < Lv1TaLERDwn_num; i++) {
+      for (int i = 0; i < Lv1TaLERDwn_num; ++i) {
         ostringstream ossZ_Lv1TaLERDwn;
         ossZ_Lv1TaLERDwn << "L" << i;
 
@@ -297,7 +297,7 @@ namespace Belle2 {
         Lv1TaLERDwn_Z[i] = m_config.getParameter(prep + ossZ_Lv1TaLERDwn.str()) * unitFactor;
         Lv1TaLERDwn_rO[i] = m_config.getParameter(prep + ossR_Lv1TaLERDwn.str()) * unitFactor;
       }
-      for (int i = 0; i < Lv1TaLERDwn_num; i++) {
+      for (int i = 0; i < Lv1TaLERDwn_num; ++i) {
         Lv1TaLERDwn_rI[i] = 0.0;
       }
 
@@ -332,7 +332,7 @@ namespace Belle2 {
       vector<double> Lv1TaHERDwn_Z(Lv1TaHERDwn_num);
       vector<double> Lv1TaHERDwn_rI(Lv1TaHERDwn_num);
       vector<double> Lv1TaHERDwn_rO(Lv1TaHERDwn_num);
-      for (int i = 0; i < Lv1TaHERDwn_num; i++) {
+      for (int i = 0; i < Lv1TaHERDwn_num; ++i) {
         ostringstream ossZ_Lv1TaHERDwn;
         ossZ_Lv1TaHERDwn << "L" << i;
 
@@ -342,7 +342,7 @@ namespace Belle2 {
         Lv1TaHERDwn_Z[i] = m_config.getParameter(prep + ossZ_Lv1TaHERDwn.str()) * unitFactor;
         Lv1TaHERDwn_rO[i] = m_config.getParameter(prep + ossR_Lv1TaHERDwn.str()) * unitFactor;
       }
-      for (int i = 0; i < Lv1TaHERDwn_num; i++) {
+      for (int i = 0; i < Lv1TaHERDwn_num; ++i) {
         Lv1TaHERDwn_rI[i] = 0.0;
       }
 
@@ -475,7 +475,7 @@ namespace Belle2 {
       //----------
       //- Lv2Vacuum
       prep = "Lv2Vacuum.";
-      G4UnionSolid* geo_Lv2Vacuumx = 0;
+      G4UnionSolid* geo_Lv2Vacuumx = NULL;
       if (phase2 || earlyPhase3) {
         // Get parameters from .xml file
         double Lv2Vacuum_L1 = m_config.getParameter(prep + "L1") * unitFactor;
@@ -495,7 +495,7 @@ namespace Belle2 {
         Lv2Vacuum1_Z[0] = Lv2Vacuum_L1;
         Lv2Vacuum1_Z[1] = Lv2Vacuum_L2;
         double Lv2Vacuum1_rI[Lv2Vacuum1_num];
-        for (int tmpn = 0; tmpn < Lv2Vacuum1_num; tmpn++) {
+        for (int tmpn = 0; tmpn < Lv2Vacuum1_num; ++tmpn) {
           Lv2Vacuum1_rI[tmpn] = 0.0;
         }
         double Lv2Vacuum1_rO[Lv2Vacuum1_num];
@@ -516,7 +516,7 @@ namespace Belle2 {
         Lv2Vacuum3_Z[0] = 0.0;
         Lv2Vacuum3_Z[1] = Lv2Vacuum_L4;
         double Lv2Vacuum3_rI[Lv2Vacuum3_num];
-        for (int tmpn = 0; tmpn < Lv2Vacuum3_num; tmpn++) {
+        for (int tmpn = 0; tmpn < Lv2Vacuum3_num; ++tmpn) {
           Lv2Vacuum3_rI[tmpn] = 0.0;
         }
         double Lv2Vacuum3_rO[Lv2Vacuum3_num];
@@ -577,7 +577,7 @@ namespace Belle2 {
         Lv2Vacuum1_Z[0] = Lv2Vacuum_L1;
         Lv2Vacuum1_Z[1] = Lv2Vacuum_L2;
         double Lv2Vacuum1_rI[Lv2Vacuum1_num];
-        for (int tmpn = 0; tmpn < Lv2Vacuum1_num; tmpn++) {
+        for (int tmpn = 0; tmpn < Lv2Vacuum1_num; ++tmpn) {
           Lv2Vacuum1_rI[tmpn] = 0.0;
         }
         double Lv2Vacuum1_rO[Lv2Vacuum1_num];
@@ -599,7 +599,7 @@ namespace Belle2 {
         // Lv2Vacuum3_Z[0] = 0.0;
         // Lv2Vacuum3_Z[1] = Lv2Vacuum_L4;
         // double Lv2Vacuum3_rI[Lv2Vacuum3_num];
-        // for (int tmpn = 0; tmpn < Lv2Vacuum3_num; tmpn++) {
+        // for (int tmpn = 0; tmpn < Lv2Vacuum3_num; ++tmpn) {
         //   Lv2Vacuum3_rI[tmpn] = 0.0;
         // }
         // double Lv2Vacuum3_rO[Lv2Vacuum3_num];
@@ -646,7 +646,8 @@ namespace Belle2 {
         G4UnionSolid* geo_Lv2VacuumPart3x = new G4UnionSolid("geo_Lv2VacuumPart3x_name", geo_Lv2VacuumPart3xx, geo_Lv2VacuumPart3_2,
                                                              transform_Lv2VacuumPart3_2);
 
-        G4Transform3D transform_Lv2VacuumPart2_3 = G4Translate3D(0., 0., 0.);
+        // This variable is unused
+        //G4Transform3D transform_Lv2VacuumPart2_3 = G4Translate3D(0., 0., 0.);
         G4IntersectionSolid* geo_Lv2VacuumPart3 = new G4IntersectionSolid("geo_Lv2VacuumPart3_name", geo_Lv2VacuumPart3x,
             geo_Lv2VacuumPart3_3);
         // Part1+2+3
@@ -839,9 +840,9 @@ namespace Belle2 {
       double Lv1TaFwd_aL1 = m_config.getParameter(prep + "aL1", 0.0) * unitFactor;
       double Lv1TaFwd_aL2 = m_config.getParameter(prep + "aL2", 0.0) * unitFactor;
       double Lv1TaFwd_aL3 = m_config.getParameter(prep + "aL3", 0.0) * unitFactor;
-      G4SubtractionSolid* geo_Lv1TaFwd;
-      G4VSolid* geo_Lv1TaFwd_d;
-      G4LogicalVolume* logi_Lv1TaFwd;
+      G4SubtractionSolid* geo_Lv1TaFwd = NULL;
+      G4VSolid* geo_Lv1TaFwd_d = NULL;
+      G4LogicalVolume* logi_Lv1TaFwd = NULL;
       if (phase2) {
         // Get parameters from .xml file
         double Lv1TaFwd_L2 = m_config.getParameter(prep + "L2") * unitFactor;
@@ -962,7 +963,7 @@ namespace Belle2 {
 //      Lv2VacFwd_Z1[1] = Lv2VacFwd_D3 - Lv2VacFwd_L2;
       Lv2VacFwd_Z1[1] = Lv2VacFwd_D3 - Lv2VacFwd_L2 + 0.03 * SafetyLength;
       double Lv2VacFwd_rI1[Lv2VacFwd3_num1];
-      for (int tmpn = 0; tmpn < Lv2VacFwd3_num1; tmpn++) {
+      for (int tmpn = 0; tmpn < Lv2VacFwd3_num1; ++tmpn) {
         Lv2VacFwd_rI1[tmpn] = 0.0;
       }
       double Lv2VacFwd_rO1[Lv2VacFwd3_num1];
@@ -975,7 +976,7 @@ namespace Belle2 {
       Lv2VacFwd_Z2[1] = Lv2VacFwd_D3;
       Lv2VacFwd_Z2[2] = Lv2VacFwd_D3 + Lv2VacFwd_L3;
       double Lv2VacFwd_rI2[Lv2VacFwd3_num2];
-      for (int tmpn = 0; tmpn < Lv2VacFwd3_num2; tmpn++) {
+      for (int tmpn = 0; tmpn < Lv2VacFwd3_num2; ++tmpn) {
         Lv2VacFwd_rI2[tmpn] = 0.0;
       }
       double Lv2VacFwd_rO2[Lv2VacFwd3_num2];
@@ -1066,9 +1067,9 @@ namespace Belle2 {
       double Lv1TaBwd_aL1 = m_config.getParameter(prep + "aL1", 0.0) * unitFactor;
       double Lv1TaBwd_aL2 = m_config.getParameter(prep + "aL2", 0.0) * unitFactor;
       double Lv1TaBwd_aL3 = m_config.getParameter(prep + "aL3", 0.0) * unitFactor;
-      G4UnionSolid* geo_Lv1TaBwd;
-      G4VSolid* geo_Lv1TaBwd_d;
-      G4LogicalVolume* logi_Lv1TaBwd;
+      G4UnionSolid* geo_Lv1TaBwd = NULL;
+      G4VSolid* geo_Lv1TaBwd_d  = NULL;
+      G4LogicalVolume* logi_Lv1TaBwd = NULL;
       if (phase2) {
         // Get parameters from .xml file
         double Lv1TaBwd_L2 = m_config.getParameter(prep + "L2") * unitFactor;
@@ -1177,7 +1178,7 @@ namespace Belle2 {
       Lv2VacBwd_Z1[0] = 0.0;
       Lv2VacBwd_Z1[1] = -Lv2VacBwd_D3 + Lv2VacBwd_L2 - 0.03 * SafetyLength;
       double Lv2VacBwd_rI1[Lv2VacBwd3_num1];
-      for (int tmpn = 0; tmpn < Lv2VacBwd3_num1; tmpn++) {
+      for (int tmpn = 0; tmpn < Lv2VacBwd3_num1; ++tmpn) {
         Lv2VacBwd_rI1[tmpn] = 0.0;
       }
       double Lv2VacBwd_rO1[Lv2VacBwd3_num1];
@@ -1190,7 +1191,7 @@ namespace Belle2 {
       Lv2VacBwd_Z2[1] = -Lv2VacBwd_D3;
       Lv2VacBwd_Z2[2] = -Lv2VacBwd_D3 - Lv2VacBwd_L3;
       double Lv2VacBwd_rI2[Lv2VacBwd3_num2];
-      for (int tmpn = 0; tmpn < Lv2VacBwd3_num2; tmpn++) {
+      for (int tmpn = 0; tmpn < Lv2VacBwd3_num2; ++tmpn) {
         Lv2VacBwd_rI2[tmpn] = 0.0;
       }
       double Lv2VacBwd_rO2[Lv2VacBwd3_num2];
@@ -1266,8 +1267,9 @@ namespace Belle2 {
       // Get parameters from .xml file
       prep = "Lv2VacLERUp.";
 
-      double Lv2VacLERUp_rO[Lv1TaLERUp_num];
-      for (int i = 0; i < Lv1TaLERUp_num; i++) {
+      //double Lv2VacLERUp_rO[Lv1TaLERUp_num];
+      vector<double> Lv2VacLERUp_rO(Lv1TaLERUp_num);
+      for (int i = 0; i < Lv1TaLERUp_num; ++i) {
         Lv2VacLERUp_rO[i] = m_config.getParameter(prep + "R1") * unitFactor;
       }
 
@@ -1294,8 +1296,9 @@ namespace Belle2 {
       // Get parameters from .xml file
       prep = "Lv2VacHERDwn.";
 
-      double Lv2VacHERDwn_rO[Lv1TaHERDwn_num];
-      for (int i = 0; i < Lv1TaHERDwn_num; i++) {
+      //double Lv2VacHERDwn_rO[Lv1TaHERDwn_num];
+      vector<double> Lv2VacHERDwn_rO(Lv1TaHERDwn_num);
+      for (int i = 0; i < Lv1TaHERDwn_num; ++i) {
         Lv2VacHERDwn_rO[i] = m_config.getParameter(prep + "R1") * unitFactor;
       }
 
@@ -1321,8 +1324,9 @@ namespace Belle2 {
       // Get parameters from .xml file
       prep =  "Lv2VacHERUp.";
 
-      double Lv2VacHERUp_rO[Lv1TaHERUp_num];
-      for (int i = 0; i < Lv1TaHERUp_num; i++) {
+      //double Lv2VacHERUp_rO[Lv1TaHERUp_num];
+      vector<double> Lv2VacHERUp_rO(Lv1TaHERUp_num);
+      for (int i = 0; i < Lv1TaHERUp_num; ++i) {
         Lv2VacHERUp_rO[i] = m_config.getParameter(prep + "R1") * unitFactor;
       }
 
@@ -1348,8 +1352,9 @@ namespace Belle2 {
       // Get parameters from .xml file
       prep = "Lv2VacLERDwn.";
 
-      double Lv2VacLERDwn_rO[Lv1TaLERDwn_num];
-      for (int i = 0; i < Lv1TaLERDwn_num; i++) {
+      //double Lv2VacLERDwn_rO[Lv1TaLERDwn_num];
+      vector<double> Lv2VacLERDwn_rO(Lv1TaLERDwn_num);
+      for (int i = 0; i < Lv1TaLERDwn_num; ++i) {
         Lv2VacLERDwn_rO[i] = m_config.getParameter(prep + "R1") * unitFactor;
       }
 
@@ -1442,7 +1447,7 @@ namespace Belle2 {
         vector<double> Lv1SUSLERUp_rI(Lv1SUSLERUp_num);
         vector<double> Lv1SUSLERUp_rO(Lv1SUSLERUp_num);
 
-        for (int i = 0; i < Lv1SUSLERUp_num; i++) {
+        for (int i = 0; i < Lv1SUSLERUp_num; ++i) {
           ostringstream ossZ_Lv1SUSLERUp;
           ossZ_Lv1SUSLERUp << "Z" << i;
           ostringstream ossRI_Lv1SUSLERUp;
@@ -1477,7 +1482,7 @@ namespace Belle2 {
         vector<double> Lv1SUSHERDwn_rI(Lv1SUSHERDwn_num);
         vector<double> Lv1SUSHERDwn_rO(Lv1SUSHERDwn_num);
 
-        for (int i = 0; i < Lv1SUSHERDwn_num; i++) {
+        for (int i = 0; i < Lv1SUSHERDwn_num; ++i) {
           ostringstream ossZ_Lv1SUSHERDwn;
           ossZ_Lv1SUSHERDwn << "Z" << i;
           ostringstream ossRI_Lv1SUSHERDwn;
@@ -1513,7 +1518,7 @@ namespace Belle2 {
         vector<double> Lv1SUSHERUp_rI(Lv1SUSHERUp_num);
         vector<double> Lv1SUSHERUp_rO(Lv1SUSHERUp_num);
 
-        for (int i = 0; i < Lv1SUSHERUp_num; i++) {
+        for (int i = 0; i < Lv1SUSHERUp_num; ++i) {
           ostringstream ossZ_Lv1SUSHERUp;
           ossZ_Lv1SUSHERUp << "Z" << i;
           ostringstream ossRI_Lv1SUSHERUp;
@@ -1548,7 +1553,7 @@ namespace Belle2 {
         vector<double> Lv1SUSLERDwn_rI(Lv1SUSLERDwn_num);
         vector<double> Lv1SUSLERDwn_rO(Lv1SUSLERDwn_num);
 
-        for (int i = 0; i < Lv1SUSLERDwn_num; i++) {
+        for (int i = 0; i < Lv1SUSLERDwn_num; ++i) {
           ostringstream ossZ_Lv1SUSLERDwn;
           ossZ_Lv1SUSLERDwn << "Z" << i;
           ostringstream ossRI_Lv1SUSLERDwn;

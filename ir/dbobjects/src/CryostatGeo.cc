@@ -22,7 +22,7 @@ void CryostatGeo::initialize(const GearDir& content)
 
   std::vector<std::string> names = {"CrossingAngle", "TubeR", "TubeR2", "TubeL", "A1spc1", "A1spc2", "B1spc1", "B1spc2", "D1spc1", "E1spc1", "C1wal1", "F1wal1", "BellowsShield"};
 
-  for (auto name : names) {
+  for (const auto& name : names) {
     GearDir sect(content, name + "/");
     addParameters(sect, name);
   }

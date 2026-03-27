@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <pxd/dbobjects/PXDPixelThresholdPar.h>
 #include <pxd/dbobjects/PXDMaskedPixelPar.h>
 #include <pxd/dbobjects/PXDDeadPixelPar.h>
 #include <framework/database/DBObjPtr.h>
@@ -27,6 +28,12 @@ namespace Belle2 {
       /** Initialize the PXDPixelMasker */
       void initialize();
 
+      /** Set pixel threshold from DB. */
+      void setPixelThresholds();
+
+      /** Set pixel threshold from masked pixels from DB. */
+      void setPixelThresholds(PXDMaskedPixelPar maskedPixels);
+
       /** Set masked pixels from DB. */
       void setMaskedPixels();
 
@@ -36,6 +43,15 @@ namespace Belle2 {
       /** Main (and only) way to access the PXDPixelMasker. */
       static PXDPixelMasker& getInstance();
 
+      /** Set threshold for single pixel
+       *
+       * @param id VxdID of the required sensor
+       * @param uid uCell of single pixel to mask
+       * @param vid vCell of single pixel to mask
+       * @param pixThr charge threshold of the single pixel
+       */
+      void setSinglePixelThreshold(VxdID id, unsigned int uid, unsigned int vid, unsigned short pixThr);
+
       /** Mask single pixel
        *
        * @param id VxdID of the required sensor
@@ -44,6 +60,13 @@ namespace Belle2 {
        */
       void maskSinglePixel(VxdID id, unsigned int uid, unsigned int vid);
 
+      /** Check whether a pixel on a given sensor is OK or not and get threshold.
+       * @param id VxdID of the sensor
+       * @param uid uCell of single pixel
+       * @param vid vCell of single pixel
+       * @return charge threshold of the single pixel.
+       */
+      unsigned short getPixelThreshold(VxdID id, unsigned int uid, unsigned int vid) const;
 
       /** Check whether a pixel on a given sensor is OK or not.
        * @param id VxdID of the sensor
@@ -62,6 +85,9 @@ namespace Belle2 {
       bool pixelDead(VxdID id, unsigned int uid, unsigned int vid) const;
 
       /** Return masked pixel payload */
+      const PXDPixelThresholdPar& getPixelThresholdParameters() const {return m_pixelThresholds;}
+
+      /** Return masked pixel payload */
       const PXDMaskedPixelPar& getMaskedPixelParameters() const {return m_maskedPixels;}
 
       /** Return dead pixel payload */
@@ -76,11 +102,17 @@ namespace Belle2 {
       /** Singleton class, forbidden assignment operator */
       PXDPixelMasker& operator=(const PXDPixelMasker&) = delete;
 
+      /** Pixel thresholds from DB. */
+      std::unique_ptr<DBObjPtr<PXDPixelThresholdPar>> m_pixelThresholdsFromDB;
+
       /** Masked pixels retrieved from DB. */
       std::unique_ptr<DBObjPtr<PXDMaskedPixelPar>> m_maskedPixelsFromDB;
 
       /** Dead pixels retrieved from DB. */
       std::unique_ptr<DBObjPtr<PXDDeadPixelPar>> m_deadPixelsFromDB;
+
+      /** List of pixel threshold. */
+      PXDPixelThresholdPar m_pixelThresholds;
 
       /** List of masked pixels. */
       PXDMaskedPixelPar m_maskedPixels;

@@ -1,11 +1,12 @@
 # Description:
-#   Decay of Upsilon(4S) -> B+ B-, with B+ -> K+ eta (PHSP).
+#   Decay of Upsilon(4S) -> B+ B-, with B+ -> K+ eta' (PHSP).
+#   Signal B decays to K+ eta', other B decays generically.
 #
-# EventType: 1210001202
+# EventType: 1210010001
 #
-# Nickname: B+_K+eta
+# Nickname: B+_K+etap
 #
-# Candidates: B+ -> K+ eta
+# Candidates: B+ -> K+ eta'
 #
 # Responsible:
 #    - Hyuna Kim 
@@ -22,11 +23,11 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay MyB+
-  1.000   K+    eta    PHSP;
+  1.000   K+    eta'   PHSP;
 Enddecay
 
 Decay MyB-
-  1.000   K-    eta    PHSP;
+  1.000   K-    eta'   PHSP;
 Enddecay
 
 End

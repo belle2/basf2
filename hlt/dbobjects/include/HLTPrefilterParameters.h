@@ -70,6 +70,8 @@ namespace Belle2 {
       m_LERtimeInBeamCycleMax = LERtimeInBeamCycleMax;
       m_HERtimeInBeamCycleMin = HERtimeInBeamCycleMin;
       m_HERtimeInBeamCycleMax = HERtimeInBeamCycleMax;
+      m_cdcHitsMax = 1e9;
+      m_eclDigitsMax = 1e9;
       m_HLTPrefilterState = static_cast<HLTPrefilterState>(State);
       m_HLTPrefilterPrescale = HLTPrefilterPrescale;
     }
@@ -83,6 +85,14 @@ namespace Belle2 {
      */
     HLTPrefilterParameters(uint32_t cdcHitsMax, uint32_t eclDigitsMax, unsigned short State, unsigned int HLTPrefilterPrescale)
     {
+      m_LERtimeSinceLastInjectionMin = 0;
+      m_LERtimeSinceLastInjectionMax = 0;
+      m_HERtimeSinceLastInjectionMin = 0;
+      m_HERtimeSinceLastInjectionMax = 0;
+      m_LERtimeInBeamCycleMin = 0;
+      m_LERtimeInBeamCycleMax = 0;
+      m_HERtimeInBeamCycleMin = 0;
+      m_HERtimeInBeamCycleMax = 0;
       m_cdcHitsMax = cdcHitsMax;
       m_eclDigitsMax = eclDigitsMax;
       m_HLTPrefilterState = static_cast<HLTPrefilterState>(State);

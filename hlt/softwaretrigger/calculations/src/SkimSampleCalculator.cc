@@ -449,7 +449,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
       const TrackFitResult* trackFit1 = track1->getTrackFitResultWithClosestMass(Const::pion);
       if (!trackFit1) continue;
-      if (trackFit1->getHitPatternCDC().getNHits() <= 0) continue;
+      if (trackFit1->getHitPatternCDC().getNHits() == 0) continue;
 
       //------------Second track variables----------------
       for (unsigned int j = i + 1; j < m_pionParticles->getListSize(); j++) {
@@ -473,7 +473,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
         const TrackFitResult* trackFit2 = track2->getTrackFitResultWithClosestMass(Const::pion);
         if (!trackFit2) continue;
-        if (trackFit2->getHitPatternCDC().getNHits() <= 0) continue;
+        if (trackFit2->getHitPatternCDC().getNHits() == 0) continue;
 
         BhabhaCDC = 1;
 

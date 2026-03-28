@@ -66,7 +66,7 @@ void SoftwareTriggerResultPrinterModule::terminate()
   prescaled = true;
   accepted = true;
   unsigned int counter = 0;
-  for (auto& cutResult : m_passedEventsPerTrigger) {
+  for (const auto& cutResult : m_passedEventsPerTrigger) {
     std::string cutName = cutResult.first;
     boost::replace_all(cutName, "&", "_");
     debugTTree->Branch(cutName.c_str(), &value.at(counter));
@@ -83,7 +83,7 @@ void SoftwareTriggerResultPrinterModule::terminate()
   // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
-  for (auto& cutResult : m_passedEventsPerTrigger) {
+  for (const auto& cutResult : m_passedEventsPerTrigger) {
     // cppcheck-suppress unreadVariable
     value[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_reject]);
     counter++;
@@ -97,7 +97,7 @@ void SoftwareTriggerResultPrinterModule::terminate()
   // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = true;
   counter = 0;
-  for (auto& cutResult : m_passedEventsPerTrigger) {
+  for (const auto& cutResult : m_passedEventsPerTrigger) {
     const auto& cutName = cutResult.first;
     if (m_passedEventsPerTriggerNonPrescaled.find(cutName) == m_passedEventsPerTriggerNonPrescaled.end()) {
       // cppcheck-suppress unreadVariable
@@ -117,7 +117,7 @@ void SoftwareTriggerResultPrinterModule::terminate()
   // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
-  for (auto& cutResult : m_passedEventsPerTrigger) {
+  for (const auto& cutResult : m_passedEventsPerTrigger) {
     const auto& cutName = cutResult.first;
     if (m_passedEventsPerTriggerNonPrescaled.find(cutName) == m_passedEventsPerTriggerNonPrescaled.end()) {
       // cppcheck-suppress unreadVariable
@@ -137,7 +137,7 @@ void SoftwareTriggerResultPrinterModule::terminate()
   // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
-  for (auto& cutResult : m_passedEventsPerTrigger) {
+  for (const auto& cutResult : m_passedEventsPerTrigger) {
     const auto& cutName = cutResult.first;
     if (m_prescales.find(cutName) == m_prescales.end()) {
       // cppcheck-suppress unreadVariable

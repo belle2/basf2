@@ -77,11 +77,8 @@ void SoftwareTriggerResultPrinterModule::terminate()
   }
   debugTTree->Fill();
 
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   cut = true;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   prescaled = true;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
   for (const auto& cutResult : m_passedEventsPerTrigger) {
@@ -92,11 +89,8 @@ void SoftwareTriggerResultPrinterModule::terminate()
   }
   debugTTree->Fill();
 
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   cut = true;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   prescaled = false;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = true;
   counter = 0;
   for (const auto& cutResult : m_passedEventsPerTrigger) {
@@ -112,11 +106,8 @@ void SoftwareTriggerResultPrinterModule::terminate()
   }
   debugTTree->Fill();
 
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   cut = true;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   prescaled = false;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
   for (const auto& cutResult : m_passedEventsPerTrigger) {
@@ -132,11 +123,8 @@ void SoftwareTriggerResultPrinterModule::terminate()
   }
   debugTTree->Fill();
 
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   cut = false;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   prescaled = false;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
   for (const auto& cutResult : m_passedEventsPerTrigger) {

@@ -30,7 +30,7 @@ namespace Belle2 {
 
       //! Constructor / Destructor
       CosmicRayHLTDQMModule();
-      virtual ~CosmicRayHLTDQMModule();
+      virtual ~CosmicRayHLTDQMModule() override;
 
       //! Module functions to be called from main process
       virtual void initialize() override;

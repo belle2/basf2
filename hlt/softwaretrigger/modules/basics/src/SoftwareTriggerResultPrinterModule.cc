@@ -71,7 +71,8 @@ void SoftwareTriggerResultPrinterModule::terminate()
     boost::replace_all(cutName, "&", "_");
     debugTTree->Branch(cutName.c_str(), &value.at(counter));
 
-    value[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_accept]);
+    auto it = cutResult.second.find(SoftwareTriggerCutResult::c_accept);
+    value[counter] = (it != cutResult.second.end()) ? static_cast<double>(it->second) : 0;
     counter++;
   }
   debugTTree->Fill();
@@ -84,8 +85,9 @@ void SoftwareTriggerResultPrinterModule::terminate()
   accepted = false;
   counter = 0;
   for (const auto& cutResult : m_passedEventsPerTrigger) {
+    auto itReject = cutResult.second.find(SoftwareTriggerCutResult::c_reject);
     // cppcheck-suppress unreadVariable
-    value[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_reject]);
+    value[counter] = (itReject != cutResult.second.end()) ? static_cast<double>(itReject->second) : 0;
     counter++;
   }
   debugTTree->Fill();

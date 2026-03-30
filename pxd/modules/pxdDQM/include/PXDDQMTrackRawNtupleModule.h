@@ -12,21 +12,18 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <pxd/dataobjects/PXDRawHit.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
-
 #include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
-
-#include <tracking/dataobjects/PXDIntercept.h>
 
 #include "TFile.h"
 #include "TNtuple.h"
 
 
 namespace Belle2 {
+  class PXDRawHit;
+  class Track;
+  class RecoTrack;
+  class PXDIntercept;
+  class PXDDAQStatus;
 
   /**
    * Creates Ntuples for PXD Trigger analysis

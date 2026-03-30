@@ -175,7 +175,7 @@ The polar angle is computed using only the initial particle momentum.
 )DOC");
     REGISTER_VARIABLE("thetaInTOPAcceptance",   thetaInTOPAcceptance, R"DOC(
 Returns true if particle is within TOP angular acceptance, false otherwise.
-This variable checks if the particle polar angle :math:`\theta` is within the range :math:`31^\circ < \theta < 128^\circ`.
+This variable checks if the particle polar angle :math:`\theta` is within the range :math:`32.2^\circ < \theta < 123.86^\circ`.
 The polar angle is computed using only the initial particle momentum.
 )DOC");
     REGISTER_VARIABLE("thetaInARICHAcceptance", thetaInARICHAcceptance, R"DOC(
@@ -213,7 +213,7 @@ Checks if particle is within KLM angular acceptance.
 This variable checks if the particle polar angle :math:`\theta` is within certain ranges.
 Return values and the corresponding :math:`\theta` ranges are the following:
 
-* 0: Outside of KLM acceptance, :math:`\theta < 18^\circ` or :math:`\theta < 155^\circ`.
+* 0: Outside of KLM acceptance, :math:`\theta < 18^\circ` or :math:`\theta > 155^\circ`.
 * 1: Forward endcap,   :math:`18^\circ < \theta < 37^\circ`; 
 * 2: Forward overlap,  :math:`37^\circ < \theta < 47^\circ`; 
 * 3: Barrel,           :math:`47^\circ < \theta < 122^\circ`; 

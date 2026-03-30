@@ -827,10 +827,12 @@ class ConditionsDB:
                     existing_payloads.update(payloads.result())
                     B2INFO(f"Found {len(existing_payloads)} existing payloads")
 
+                # \cond false positive doxygen warning
                 create_future(self.get_iovs, global_tag, update_iovs)
                 # checking existing payloads should not be done with too many at once
                 for chunk in chunks(payloads.keys(), 1000):
                     create_future(self.check_payloads, chunk, update_payloads)
+                # \endcond
 
                 futures_wait(futures)
 

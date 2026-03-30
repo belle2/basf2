@@ -8,9 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Doxygen should skip this script
-# @cond
-
 """
 Example script to calculate isolation variables per particle.
 
@@ -153,7 +150,7 @@ if __name__ == "__main__":
                                                   exclude_pid_det_weights=not args.use_pid_det_weights)
 
     # Variables and aliases for the J/psi candidates.
-    variables_jpsi = vc.kinematics + ["daughterDiffOfPhi(0, 1)"]
+    variables_jpsi = vc.kinematics + ["daughterDiffOf(0, 1, phi)"]
     variables_jpsi += vu.create_aliases(variables_jpsi, "useCMSFrame({variable})", "CMS")
     variables_jpsi += vc.inv_mass
     aliases_jpsi = vu.create_aliases_for_selected(variables_jpsi,
@@ -201,7 +198,7 @@ if __name__ == "__main__":
                                                     exclude_pid_det_weights=not args.use_pid_det_weights)
 
     # Variables and aliases for the Lambda0 candidates.
-    variables_lambda0 = vc.kinematics + ["daughterDiffOfPhi(0, 1)"]
+    variables_lambda0 = vc.kinematics + ["daughterDiffOf(0, 1, phi)"]
     variables_lambda0 += vu.create_aliases(variables_lambda0, "useCMSFrame({variable})", "CMS")
     variables_lambda0 += vc.inv_mass
     aliases_lambda0 = vu.create_aliases_for_selected(variables_lambda0,
@@ -246,5 +243,3 @@ if __name__ == "__main__":
 
     # Process the data.
     b2.process(path)
-
-# @endcond

@@ -20,9 +20,9 @@
 
 
 namespace Belle2 {
-  //! TOP backgound module.
+  //! TOP background module.
   /*
-   * This module analyses the data for beam backgound studies
+   * This module analyses the data for beam background studies
    */
   class TOPBackgroundModule : public Module {
 

@@ -6,12 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/pxd/filters/results/PXDResultTruthVarSet.h>
+#include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool PXDResultTruthVarSet::extract(const CKFToPXDResult* result)
 {

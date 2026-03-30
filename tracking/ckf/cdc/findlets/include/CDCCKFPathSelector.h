@@ -7,18 +7,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
 #include <tracking/ckf/cdc/filters/pathPairs/CDCPathPairFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
   /// Select the m_maximalCandidatesInFlight paths for further processing
-  class CDCCKFPathSelector : public TrackFindingCDC::Findlet<CDCCKFPath> {
+  class CDCCKFPathSelector : public TrackingUtilities::Findlet<CDCCKFPath> {
   public:
     CDCCKFPathSelector()
     {
@@ -28,7 +28,7 @@ namespace Belle2 {
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalCandidatesInFlight"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maximalCandidatesInFlight"),
                                     m_maximalCandidatesInFlight,
                                     "Maximal candidates in flight", m_maximalCandidatesInFlight);
       m_filter.exposeParameters(moduleParamList, prefix);
@@ -42,13 +42,13 @@ namespace Belle2 {
       };
       std::sort(newPaths.begin(), newPaths.end(), pathComparison);
 
-      TrackFindingCDC::only_best_N(newPaths, m_maximalCandidatesInFlight);
+      TrackingUtilities::only_best_N(newPaths, m_maximalCandidatesInFlight);
     }
 
   private:
     /// Maximum number of paths to select
     size_t m_maximalCandidatesInFlight = 3;
     /// Filter to order paths
-    TrackFindingCDC::ChooseableFilter<CDCPathPairFilterFactory> m_filter;
+    TrackingUtilities::ChooseableFilter<CDCPathPairFilterFactory> m_filter;
   };
 }

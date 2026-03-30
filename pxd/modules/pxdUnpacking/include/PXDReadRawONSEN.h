@@ -12,14 +12,13 @@
 #include <framework/pcore/MsgHandler.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <framework/dataobjects/EventMetaData.h>
-#include <rawdata/dataobjects/RawPXD.h>
-
 #include <string>
 #include <stdlib.h>
 
 
 namespace Belle2 {
+  class EventMetaData;
+  class RawPXD;
 
   namespace PXD {
 

@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdReconstruction/PXDRawHitSorterModule.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <pxd/dataobjects/PXDDigit.h>
 
 #include <framework/logging/Logger.h>
 

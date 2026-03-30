@@ -13,7 +13,7 @@
 namespace Belle2 {
 
   /**
-   * Class to store debugging information about the event headers in the  by the TOP production debugging raw data format one of these should be available per boardstack per event
+   * Class to store debugging information about the event headers
    */
   class TOPProductionEventDebug : public RelationsObject {
   public:
@@ -30,6 +30,8 @@ namespace Belle2 {
      * @param formatVersion format version
      * @param scrodID hardware SCROD ID
      * @param skipProcessingFlag flag for skip processing
+     * @param injVetoFlag injection veto flag
+     * @param PSBypass PS-bypass mode information
      * @param ctime CTime
      * @param phase phase
      * @param asicMask ASIC mask
@@ -40,6 +42,8 @@ namespace Belle2 {
                             unsigned short formatVersion,
                             unsigned scrodID,
                             bool skipProcessingFlag,
+                            bool injVetoFlag,
+                            unsigned short PSBypass,
                             unsigned short ctime,
                             unsigned short phase,
                             unsigned short asicMask,
@@ -49,6 +53,8 @@ namespace Belle2 {
       m_formatVersion(formatVersion),
       m_scrodID(scrodID),
       m_skipProcessingFlag(skipProcessingFlag),
+      m_injVetoFlag(injVetoFlag),
+      m_PSBypass(PSBypass),
       m_ctime(ctime),
       m_phase(phase),
       m_asicMask(asicMask),
@@ -83,6 +89,17 @@ namespace Belle2 {
      */
     bool getSkipProcessingFlag() const { return m_skipProcessingFlag; }
 
+    /**
+     * Returns injection veto flag
+     * @return injection veto flag
+     */
+    bool getInjectionVetoFlag() const {return m_injVetoFlag; }
+
+    /**
+     * Returns PS-bypass mode information
+     * @return PS-bypass mode information
+     */
+    unsigned short getPSBypassMode() const {return m_PSBypass; }
 
     /**
      * Returns event header ctime
@@ -116,18 +133,20 @@ namespace Belle2 {
 
 
   private:
+
     unsigned short m_formatType = 0;      /**<data format type specifier */
     unsigned short m_formatVersion = 0;      /**<data format version specifier */
     unsigned short m_scrodID = 0;       /**< hardware SCROD ID */
     bool m_skipProcessingFlag = false;      /**< skip processing bit, set if hit processing skipped due to queueDepth too high */
+    bool m_injVetoFlag = false;  /**< injection veto flag, set if TOP vetoed the event */
+    unsigned short m_PSBypass = 0; /**< PS-bypass mode information */
     unsigned short m_ctime = 0;       /**< event header ctime */
     unsigned short m_phase = 0;      /**< hardware phase */
     unsigned short m_asicMask = 0;       /**< bit field of masked ASICs (timeoutMask | setMask) */
     unsigned short m_eventQueueDepth = 0;       /**< trigger FIFO queue depth */
     unsigned short m_eventNumberByte = 0;       /**< frontend internal event number (8LSB) */
 
-
-    ClassDef(TOPProductionEventDebug, 1); /**< ClassDef */
+    ClassDef(TOPProductionEventDebug, 2); /**< ClassDef */
 
   };
 

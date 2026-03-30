@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 namespace Belle2 {
   class RecoTrack;
@@ -15,10 +15,10 @@ namespace Belle2 {
   /**
    * Select the tracks for the event time extraction.
    */
-  class TrackSelector final : public TrackFindingCDC::Findlet<RecoTrack*> {
+  class TrackSelector final : public TrackingUtilities::Findlet<RecoTrack*> {
   private:
     /// Type of the base class
-    using Super = TrackFindingCDC::Findlet<RecoTrack*>;
+    using Super = TrackingUtilities::Findlet<RecoTrack*>;
 
   public:
     /// Timing extraction for this findlet

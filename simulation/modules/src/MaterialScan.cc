@@ -118,7 +118,7 @@ bool MaterialScan2D::createNext(G4ThreeVector& origin, G4ThreeVector& direction)
   //Get the origin and direction of the ray
   getRay(origin, direction);
 
-  //Check wether we are finished
+  //Check whether we are finished
   return (m_curV <= m_params.maxV);
 }
 

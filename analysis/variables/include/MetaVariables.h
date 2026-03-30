@@ -166,57 +166,6 @@ namespace Belle2 {
     Manager::FunctionPtr grandDaughterDiffOf(const std::vector<std::string>& arguments);
 
     /**
-     * Returns function which returns the difference of the angular variable phi between the two given daughters
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable phi between the matched MC particles of the two given daughters
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr mcDaughterDiffOfPhi(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable phi between the first daughters of the two given daughters
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr grandDaughterDiffOfPhi(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable clusterPhi between the two given daughters
-     * If (at least) one of the daughters does not have a (matched) ECLCluster, the function returns NaN
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable clusterPhi between the first daughters of the two given daughters
-     * If (at least) one of the daughters does not have a (matched) ECLCluster, the function returns NaN
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr grandDaughterDiffOfClusterPhi(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable phi between the two given daughters in the CMS frame
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr daughterDiffOfPhiCMS(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable phi between the matched MC particles of two given daughters in the CMS frame
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr mcDaughterDiffOfPhiCMS(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable clusterPhi between the two given daughters in the CMS frame
-     * If (at least) one of the daughters does not have a (matched) ECLCluster, the function returns NaN
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr daughterDiffOfClusterPhiCMS(const std::vector<std::string>& arguments);
-
-    /**
      * Returns function which returns the normalized difference of the given variable between the two given daughters
      * First two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
      * Third argument the name of the variable.
@@ -594,6 +543,12 @@ namespace Belle2 {
      * Second argument is the value for NaN replacement
      */
     Manager::FunctionPtr convertToInt(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which converts a variable of the given particle into an
+     * integer and returns if it is a valid daughter index, else -1 is returned.
+     */
+    Manager::FunctionPtr convertToDaughterIndex(const std::vector<std::string>& arguments);
 
   }
 }

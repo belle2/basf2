@@ -165,9 +165,9 @@
   
   <Glue>
     <GlueMaterial>TOPglueNOA61</GlueMaterial>
-    <Thicknes1 desc="glue thicknes quartz-wedge" unit="mm">0.05</Thicknes1>
-    <Thicknes2 desc="glue thicknes quartz-quartz" unit="mm">0.05</Thicknes2>
-    <Thicknes3 desc="glue thicknes quartz-mirror section" unit="mm">0.05</Thicknes3>
+    <Thicknes1 desc="glue thickness quartz-wedge" unit="mm">0.05</Thicknes1>
+    <Thicknes2 desc="glue thickness quartz-quartz" unit="mm">0.05</Thicknes2>
+    <Thicknes3 desc="glue thickness quartz-mirror section" unit="mm">0.05</Thicknes3>
   </Glue>
   
   <Surface name="QuartzSurface_17" descr="slot1">

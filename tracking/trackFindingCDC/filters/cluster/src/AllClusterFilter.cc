@@ -7,10 +7,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/cluster/AllClusterFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 Weight AllClusterFilter::operator()(const CDCWireHitCluster& cluster)
 {

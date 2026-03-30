@@ -49,6 +49,16 @@ def setup_basf2_and_db(event_distribution_mode=constants.EventDistributionModes.
         parser.add_argument("--input", required=True, type=str, help="ZMQ Address of the distributor process")
         parser.add_argument("--output", required=True, type=str, help="ZMQ Address of the collector process")
         parser.add_argument("--dqm", required=True, type=str, help="ZMQ Address of the histoserver process")
+        if event_distribution_mode == constants.EventDistributionModes.zmqbasf2:
+            parser.add_argument('--input-file', type=str,
+                                help="Input (s)root file, ZMQ input address is ignored if this is set",
+                                default=None)
+            parser.add_argument('--output-file', type=str,
+                                help="Filename for (s)root output, ZMQ input address is ignored if this is set",
+                                default=None)
+            parser.add_argument('--histo-output-file', type=str,
+                                help="Filename for histogram output, ZMQ histoserver address is ignored if this is set",
+                                default=None)
 
     parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count() - 5,
                         help='Number of parallel processes to use')
@@ -137,22 +147,33 @@ def start_zmq_path(args, location, event_distribution_mode):
     path = basf2.Path()
     reco_path = basf2.Path()
 
-    if location == constants.Location.expressreco:
-        input_module = path.add_module("HLTZMQ2Ds", input=args.input, addExpressRecoObjects=True)
-    elif location == constants.Location.hlt:
-        input_module = path.add_module("HLTZMQ2Ds", input=args.input)
+    if not args.input_file:
+        if location == constants.Location.expressreco:
+            input_module = path.add_module("HLTZMQ2Ds", input=args.input, addExpressRecoObjects=True)
+        elif location == constants.Location.hlt:
+            input_module = path.add_module("HLTZMQ2Ds", input=args.input)
+        else:
+            basf2.B2FATAL(f"Does not know location {location}")
     else:
-        basf2.B2FATAL(f"Does not know location {location}")
+        if args.input_file.endswith(".sroot"):
+            path.add_module('SeqRootInput', inputFileName=args.input_file)
+        else:
+            path.add_module('RootInput', inputFileName=args.input_file)
 
     # zmq needs to discard the first event from HLTZMQ2Ds level
-    if event_distribution_mode == constants.EventDistributionModes.zmq:
-        input_module.if_value("==0", reco_path, basf2.AfterConditionPath.CONTINUE)
-        reco_path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
-    # zmqbasf2 needs to pass the first event to the remaining path
-    elif event_distribution_mode == constants.EventDistributionModes.zmqbasf2:
-        path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
+    if not args.histo_output_file:
+        if event_distribution_mode == constants.EventDistributionModes.zmq:
+            input_module.if_value("==0", reco_path, basf2.AfterConditionPath.CONTINUE)
+            reco_path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
+        # zmqbasf2 needs to pass the first event to the remaining path
+        elif event_distribution_mode == constants.EventDistributionModes.zmqbasf2:
+            path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
+        else:
+            basf2.B2FATAL(f"Does not know event_distribution_mode {event_distribution_mode}")
     else:
-        basf2.B2FATAL(f"Does not know event_distribution_mode {event_distribution_mode}")
+        workdir = os.path.dirname(args.histo_output_file)
+        filename = os.path.basename(args.histo_output_file)
+        path.add_module('HistoManager', histoFileName=filename, workDirName=workdir)
 
     return path, reco_path
 
@@ -166,6 +187,8 @@ def add_hlt_processing(path,
                        reco_components=None,
                        create_hlt_unit_histograms=True,
                        switch_off_slow_modules_for_online=True,
+                       hlt_prefilter_mode=constants.HLTPrefilterModes.monitor,
+                       dqm_run_type=None,
                        **kwargs):
     """
     Add all modules for processing on HLT filter machines
@@ -178,6 +201,9 @@ def add_hlt_processing(path,
     # Check if the run is beam and set the Environment accordingly
     if run_type == constants.RunTypes.beam:
         basf2.declare_beam()
+
+    if dqm_run_type is None:
+        dqm_run_type = run_type
 
     # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
@@ -206,6 +232,9 @@ def add_hlt_processing(path,
     add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
     path.add_module('StatisticsSummary').set_name('Sum_Unpackers')
 
+    # HLT prefilter
+    path_utils.add_prefilter_module(path, mode=hlt_prefilter_mode)
+
     # Build one path for all accepted events...
     accept_path = basf2.Path()
 
@@ -222,7 +251,7 @@ def add_hlt_processing(path,
     path_utils.add_filter_software_trigger(path, store_array_debug_prescale=1)
 
     # Add the part of the dqm modules, which should run after every reconstruction
-    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter,
+    path_utils.add_hlt_dqm(path, run_type=dqm_run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter,
                            create_hlt_unit_histograms=create_hlt_unit_histograms)
 
     # Only turn on the filtering (by branching the path) if filtering is turned on
@@ -256,7 +285,7 @@ def add_hlt_processing(path,
     # Add the HLT DQM modules only in case the event is accepted
     path_utils.add_hlt_dqm(
         accept_path,
-        run_type=run_type,
+        run_type=dqm_run_type,
         components=reco_components,
         dqm_mode=constants.DQMModes.filtered,
         create_hlt_unit_histograms=create_hlt_unit_histograms)
@@ -271,7 +300,7 @@ def add_hlt_processing(path,
     path.add_module('StatisticsSummary').set_name('Sum_ROI_Payload_Assembler')
 
     # Add the part of the dqm modules, which should run on all events, not only on the accepted ones
-    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events,
+    path_utils.add_hlt_dqm(path, run_type=dqm_run_type, components=reco_components, dqm_mode=constants.DQMModes.all_events,
                            create_hlt_unit_histograms=create_hlt_unit_histograms)
 
     if prune_output:
@@ -297,6 +326,7 @@ def add_expressreco_processing(path,
                                reco_components=None,
                                do_reconstruction=True,
                                switch_off_slow_modules_for_online=True,
+                               dqm_run_type=None,
                                **kwargs):
     """
     Add all modules for processing on the ExpressReco machines
@@ -309,6 +339,9 @@ def add_expressreco_processing(path,
     # Check if the run is beam and set the Environment accordingly
     if run_type == constants.RunTypes.beam:
         basf2.declare_beam()
+
+    if dqm_run_type is None:
+        dqm_run_type = run_type
 
     if unpacker_components is None:
         unpacker_components = constants.DEFAULT_EXPRESSRECO_COMPONENTS
@@ -355,7 +388,7 @@ def add_expressreco_processing(path,
         basf2.set_module_parameters(path, "SVDTimeGrouping", forceGroupingFromDB=False,
                                     isEnabledIn6Samples=True, isEnabledIn3Samples=True)
 
-    path_utils.add_expressreco_dqm(path, run_type, components=reco_components)
+    path_utils.add_expressreco_dqm(path, dqm_run_type, components=reco_components)
 
     if prune_output:
         path.add_module("PruneDataStore", matchEntries=constants.ALWAYS_SAVE_OBJECTS + constants.RAWDATA_OBJECTS +
@@ -409,9 +442,16 @@ def finalize_zmq_path(path, args, location):
     # Limit streaming objects for parallel processing
     basf2.set_streamobjs(save_objects)
 
-    if location == constants.Location.expressreco:
-        path.add_module("HLTDs2ZMQ", output=args.output, raw=False, outputConfirmation=False)
-    elif location == constants.Location.hlt:
-        path.add_module("HLTDs2ZMQ", output=args.output, raw=True, outputConfirmation=True)
+    if not args.output_file:
+        if location == constants.Location.expressreco:
+            path.add_module("HLTDs2ZMQ", output=args.output, raw=False, outputConfirmation=False)
+        elif location == constants.Location.hlt:
+            path.add_module("HLTDs2ZMQ", output=args.output, raw=True, outputConfirmation=True)
+        else:
+            basf2.B2FATAL(f"Does not know location {location}")
     else:
-        basf2.B2FATAL(f"Does not know location {location}")
+        if args.output_file.endswith(".sroot"):
+            path.add_module("SeqRootOutput", saveObjs=save_objects, outputFileName=args.output_file)
+        else:
+            # We are storing everything on purpose!
+            path.add_module("RootOutput", outputFileName=args.output_file)

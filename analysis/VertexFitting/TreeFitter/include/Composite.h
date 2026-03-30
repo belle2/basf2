@@ -10,6 +10,8 @@
 
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 
+#include <Eigen/Core>
+
 namespace TreeFitter {
 
   /** A class for composite particles, where the daughters must be ignored by the fitter */

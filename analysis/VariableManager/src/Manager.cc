@@ -331,7 +331,7 @@ bool Variable::Manager::createVariable(const std::string& fullname, const std::s
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::FunctionPtr& f,
                                          const std::string& description, const Variable::Manager::VariableDataType& variabletype,
-                                         const std::string& unit)
+                                         const std::string& unit, const std::string& fName)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -342,7 +342,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
 
-    auto var = std::make_shared<Var>(name, f, description, m_currentGroup, variabletype);
+    auto var = std::make_shared<Var>(name, f, description, m_currentGroup, variabletype, fName);
     B2DEBUG(19, "Registered Variable " << name);
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
@@ -356,7 +356,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::ParameterFunctionPtr& f,
                                          const std::string& description, const Variable::Manager::VariableDataType& variabletype,
-                                         const std::string& unit)
+                                         const std::string& unit, const std::string& fName)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -364,7 +364,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 
   auto mapIter = m_parameter_variables.find(name);
   if (mapIter == m_parameter_variables.end()) {
-    auto var = std::make_shared<ParameterVar>(name, f, description, m_currentGroup, variabletype);
+    auto var = std::make_shared<ParameterVar>(name, f, description, m_currentGroup, variabletype, fName);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
     B2DEBUG(19, "Registered parameter Variable " << rawName);
@@ -379,7 +379,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 }
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::MetaFunctionPtr& f,
-                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype)
+                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype, const std::string& fName)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -387,7 +387,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 
   auto mapIter = m_meta_variables.find(name);
   if (mapIter == m_meta_variables.end()) {
-    auto var = std::make_shared<MetaVar>(name, f, description, m_currentGroup, variabletype);
+    auto var = std::make_shared<MetaVar>(name, f, description, m_currentGroup, variabletype, fName);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
     B2DEBUG(19, "Registered meta Variable " << rawName);
@@ -410,29 +410,26 @@ void Variable::Manager::deprecateVariable(const std::string& name, bool make_fat
   auto mapIter = m_variables.find(name);
   if (mapIter != m_variables.end()) {
     if (make_fatal) {
-      mapIter->second.get()->extendDescriptionString("\n\n.. warning:: ");
+      mapIter->second.get()->extendDescriptionString("\n\n.. deprecated:: " + version + "\n " + description);
     } else {
       mapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
     }
-    mapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
   } else {
     auto parMapIter = m_parameter_variables.find(name);
     if (parMapIter != m_parameter_variables.end()) {
       if (make_fatal) {
-        parMapIter->second.get()->extendDescriptionString("\n\n.. warning:: ");
+        parMapIter->second.get()->extendDescriptionString("\n\n.. deprecated:: " + version + "\n " + description);
       } else {
         parMapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
       }
-      parMapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
     } else {
       auto metaMapIter = m_meta_variables.find(name);
       if (metaMapIter != m_meta_variables.end()) {
         if (make_fatal) {
-          metaMapIter->second.get()->extendDescriptionString("\n\n.. warning:: ");
+          metaMapIter->second.get()->extendDescriptionString("\n\n.. deprecated:: " + version + "\n " + description);
         } else {
           metaMapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
         }
-        metaMapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
       } else {
         B2FATAL("The variable '" << name << "' is not registered so it makes no sense to try to deprecate it.");
       }

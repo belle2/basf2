@@ -8,7 +8,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/mclookup/ITrackType.h>
-#include <tracking/trackFindingCDC/numerics/Index.h>
+#include <tracking/trackingUtilities/numerics/Index.h>
 
 #include <map>
 #include <vector>
@@ -90,16 +90,16 @@ namespace Belle2 {
 
     public:
       /// Getter for the index of the hit within its track.
-      Index getInTrackId(const CDCHit* ptrHit) const;
+      TrackingUtilities::Index getInTrackId(const CDCHit* ptrHit) const;
 
       /// Getter for the index of the segment of the hit within its track.
-      Index getInTrackSegmentId(const CDCHit* ptrHit) const;
+      TrackingUtilities::Index getInTrackSegmentId(const CDCHit* ptrHit) const;
 
       /// Getter for the number of super layers traversed until this hit.
-      Index getNPassedSuperLayers(const CDCHit* ptrHit) const;
+      TrackingUtilities::Index getNPassedSuperLayers(const CDCHit* ptrHit) const;
 
       /// Getter for the number of traversed loops until this hit.
-      Index getNLoops(const CDCHit* ptrHit) const;
+      TrackingUtilities::Index getNLoops(const CDCHit* ptrHit) const;
 
     private:
       /// Reference to the MC map of the current event

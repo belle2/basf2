@@ -19,6 +19,7 @@
 #include <G4SolidStore.hh>
 #include <G4RegionStore.hh>
 #include <G4GeometryManager.hh>
+#include <G4AssemblyVolume.hh>
 
 using namespace std;
 using namespace Belle2;

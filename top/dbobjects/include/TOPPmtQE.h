@@ -32,7 +32,7 @@ namespace Belle2 {
     /**
      * Useful constructor
      * @param serialNumber serial number
-     * @param lambdaFirst wavelenght of the first data point [nm]
+     * @param lambdaFirst wavelength of the first data point [nm]
      * @param lambdaStep wavelength step [nm]
      * @param CE0 collection efficiency at B = 0T
      * @param CE collection efficiency at B = 1.5T
@@ -101,26 +101,26 @@ namespace Belle2 {
     double getEfficiency(unsigned pmtPixel, double lambda, bool BfieldOn) const;
 
     /**
-     * Returns wavelenght of the first data point
+     * Returns wavelength of the first data point
      * @return wavelength in [nm]
      */
     double getLambdaFirst() const {return m_lambdaFirst;}
 
     /**
-     * Returns wavelenght of the last data point (maximal of pixels)
+     * Returns wavelength of the last data point (maximal of pixels)
      * @return wavelength in [nm]
      */
     double getLambdaLast() const;
 
     /**
-     * Returns wavelenght of the last data point for a given pixel
+     * Returns wavelength of the last data point for a given pixel
      * @param pmtPixel pmtPixel number (1-based)
      * @return wavelength in [nm]
      */
     double getLambdaLast(unsigned pmtPixel) const;
 
     /**
-     * Returns wavelenght step
+     * Returns wavelength step
      * @return wavelength step in [nm]
      */
     double getLambdaStep() const {return m_lambdaStep;}

@@ -27,7 +27,7 @@ namespace Belle2 {
   public:
 
     /// Define names of variables that get extracted
-    explicit RecoTrackExtractor(std::vector<Named<float*>>& variableSet, const std::string& prefix = ""):
+    explicit RecoTrackExtractor(std::vector<TrackingUtilities::Named<float*>>& variableSet, const std::string& prefix = ""):
       VariableExtractor(), m_prefix(prefix)
     {
       addVariable(prefix + "pdg_ID", variableSet);

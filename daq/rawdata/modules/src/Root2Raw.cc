@@ -22,6 +22,7 @@
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <rawdata/dataobjects/RawTOP.h>
+#include <rawdata/dataobjects/RawTRG.h>
 
 #include <fcntl.h>
 
@@ -183,6 +184,18 @@ void Root2RawModule::event()
     nblock++;
   }
 
+  // Fill TRG
+  StoreArray<RawTRG> trgarray;
+  for (int i = 0; i < trgarray.getEntries(); i++) {
+    //  for ( int i=0; i< 1; i++ ) {
+    RawTRG* trg = trgarray[i];
+    //    printf  ( "SVD COPPER %d to be filled\n", i );
+    memcpy(databuf, trg->GetBuffer(0), trg->GetBlockNwords(0)*sizeof(int));
+    nwords += trg->GetBlockNwords(0);
+    databuf += trg->GetBlockNwords(0);
+    nblock++;
+  }
+
   // Fill FTSW
   StoreArray<RawFTSW> ftswarray;
   for (int i = 0; i < ftswarray.getEntries(); i++) {
@@ -211,7 +224,8 @@ void Root2RawModule::event()
       toparray.getEntries() < 1 &&
       aricharray.getEntries() < 1 &&
       eclarray.getEntries() < 1 &&
-      klmarray.getEntries() < 1) {
+      klmarray.getEntries() < 1 &&
+      trgarray.getEntries() < 1) {
     return;
   }
 

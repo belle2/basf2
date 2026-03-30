@@ -8,17 +8,17 @@
 
 #include <tracking/trackFindingCDC/sim/CDCSimpleSimulation.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWire.h>
+#include <cdc/topology/CDCWireLayer.h>
+#include <cdc/topology/CDCWireTopology.h>
 
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/trackingUtilities/utilities/VectorRange.h>
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
@@ -28,7 +28,9 @@
 #include <algorithm>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 ConstVectorRange<CDCWireHit> CDCSimpleSimulation::getWireHits() const
 {

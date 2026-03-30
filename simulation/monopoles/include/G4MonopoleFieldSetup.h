@@ -10,8 +10,9 @@
 
 #pragma once
 
-#include <G4MagneticField.hh>
+#include <G4Types.hh>
 
+class G4MagneticField;
 class G4FieldManager;
 class G4ChordFinder;
 class G4MagIntegratorStepper;

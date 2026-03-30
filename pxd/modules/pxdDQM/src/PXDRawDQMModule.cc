@@ -7,6 +7,10 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDRawDQMModule.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDRawAdc.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <rawdata/dataobjects/RawPXD.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <TDirectory.h>

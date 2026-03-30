@@ -53,7 +53,7 @@ namespace Belle2 {
   public:
 
     /**
-     * G4VProcess::PostStepDoIt() implemention
+     * G4VProcess::PostStepDoIt() implementation
      * @param aTrack
      * @param aStep
      *
@@ -80,7 +80,7 @@ namespace Belle2 {
     /**< In G4Decay, thePhysicsTable stores values of
          beta * std::sqrt( 1 - beta*beta)
          as a function of normalized kinetic enregy (=Ekin/mass),
-         becasuse this table is universal for all particle types*/
+         because this table is universal for all particle types*/
 
 
     virtual G4bool IsApplicable(const G4ParticleDefinition&) override;
@@ -90,7 +90,7 @@ namespace Belle2 {
   protected:
 
     /**
-     * G4Decay::DecayIt() implemention
+     * G4Decay::DecayIt() implementation
      * @param aTrack
      * @param aStep
      *
@@ -105,7 +105,7 @@ namespace Belle2 {
   public:
 
     /**
-     * G4VProcess::AtRestGetPhysicalInteractionLength() implemention
+     * G4VProcess::AtRestGetPhysicalInteractionLength() implementation
      * @param track
      * @param condition
      *
@@ -117,7 +117,7 @@ namespace Belle2 {
     ) override;
 
     /**
-     * G4VProcess::PostStepGetPhysicalInteractionLength() implemention
+     * G4VProcess::PostStepGetPhysicalInteractionLength() implementation
      * @param track This argument of base function is ignored
      * @param previousStepSize This argument of base function is ignored
      * @param condition
@@ -162,7 +162,7 @@ namespace Belle2 {
 
   protected:
     G4int verboseLevel;
-    /**< controle flag for output message
+    /**< control flag for output message
      *   0: Silent
      *   1: Warning message
      *   2: More */

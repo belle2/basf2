@@ -6,8 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/AsicBackgroundDetector.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <framework/logging/Logger.h>
@@ -15,10 +15,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using std::vector;
-using std::map;
-using std::pair;
-using std::sort;
+using namespace TrackingUtilities;
 
 void AsicBackgroundDetector::initialize()
 {
@@ -57,13 +54,13 @@ std::string AsicBackgroundDetector::getDescription()
 void AsicBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
 {
 
-  map< pair<int, int>, vector<CDCWireHit*>> groupedByAsic;
+  std::map< std::pair<int, int>, std::vector<CDCWireHit*>> groupedByAsic;
   for (CDCWireHit& wireHit : wireHits) {
     auto eWire = wireHit.getWireID().getEWire();
     B2ASSERT("Channel map NOT found for the channel", m_map.count(eWire) > 0);
     auto board = m_map[eWire].first;
     auto channel = m_map[eWire].second;
-    auto asicID = pair<int, int>(board, channel / 8);  // ASIC are groups of 8 channels
+    auto asicID = std::pair<int, int>(board, channel / 8);  // ASIC are groups of 8 channels
     groupedByAsic[asicID].push_back(&wireHit);
   };
   for (auto& asicList :  groupedByAsic) {
@@ -76,15 +73,15 @@ void AsicBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
 void AsicBackgroundDetector::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimalHitNumberASIC"),
+  moduleParamList->addParameter(prefixed(prefix, "minimalHitNumberASIC"),
                                 m_minimal_hit_number,
                                 "Required number of hits per ASIC for background check",
                                 m_minimal_hit_number);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "deviationFromMedianTDCinASIC"),
+  moduleParamList->addParameter(prefixed(prefix, "deviationFromMedianTDCinASIC"),
                                 m_deviation_from_median,
                                 "Flag hits as cross talk if TDC does not deviate from median more than this value",
                                 m_deviation_from_median);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimalNSignalASIC"),
+  moduleParamList->addParameter(prefixed(prefix, "minimalNSignalASIC"),
                                 m_nsignal_max,
                                 "Flag background hits only when ASIC contains no more than this number of signal hits",
                                 m_nsignal_max);
@@ -122,12 +119,12 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
   }
 
   // compute median time:
-  vector<short> times;
+  std::vector<short> times;
   for (auto& hit : wireHits) {
     short tdc = hit->getHit()->getTDCCount();
     times.push_back(tdc);
   }
-  sort(times.begin(), times.end());
+  std::sort(times.begin(), times.end());
   int mid = times.size() / 2;
   double median = times.size() % 2 == 0 ? (times[mid] + times[mid - 1]) / 2 : times[mid];
 

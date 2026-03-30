@@ -11,10 +11,9 @@
 
 #include <framework/database/DBObjPtr.h>
 
-#include <simulation/dbobjects/ROISimulationParameters.h>
-
-
 namespace Belle2 {
+  class ROISimulationParameters;
+
   /// Module which sets its return value based on the payload whether ROI-finding was enabled for the given run/exp interval or not
   class ROIfindingConditionFromDBModule : public Module {
   public:

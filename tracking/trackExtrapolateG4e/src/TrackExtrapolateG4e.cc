@@ -16,14 +16,22 @@
 #include <framework/geometry/BFieldManager.h>
 #include <framework/logging/Logger.h>
 #include <genfit/Exception.h>
+#include <ir/dbobjects/BeamPipeGeo.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMStatus.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
+#include <klm/dataobjects/KLMHit2d.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/KLMMuidHit.h>
 #include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/KLMStripEfficiency.h>
+#include <klm/dbobjects/KLMLikelihoodParameters.h>
+#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 #include <klm/muid/MuidBuilder.h>
 #include <klm/muid/MuidElementNumbers.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -31,6 +39,9 @@
 #include <mdst/dataobjects/Track.h>
 #include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <simulation/kernel/ExtManager.h>
+#include <structure/dbobjects/COILGeometryPar.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/TrackClusterSeparation.h>
 
 /* CLHEP headers. */
 #include <CLHEP/Matrix/Vector.h>
@@ -48,12 +59,14 @@
 #include <G4StateManager.hh>
 #include <G4Step.hh>
 #include <G4StepPoint.hh>
-#include <G4ThreeVector.hh>
-#include <G4TouchableHandle.hh>
 #include <G4Track.hh>
 #include <G4UImanager.hh>
 #include <G4VPhysicalVolume.hh>
 #include <G4VTouchable.hh>
+#include <G4ErrorSymMatrix.hh>
+
+/* ROOT headers. */
+#include <TVector3.h>
 
 /* C++ headers. */
 #include <algorithm>
@@ -1210,7 +1223,7 @@ void TrackExtrapolateG4e::fromPhasespaceToG4e(const G4ThreeVector& momentum, con
 }
 
 // write another volume-entry or volume-exit point on extrapolated track
-void TrackExtrapolateG4e::createExtHit(ExtHitStatus status, const ExtState& extState,
+void TrackExtrapolateG4e::createExtHit(const ExtHitStatus status, const ExtState& extState,
                                        const G4ErrorFreeTrajState& g4eState,
                                        const G4StepPoint* stepPoint, const G4TouchableHandle& touch)
 {

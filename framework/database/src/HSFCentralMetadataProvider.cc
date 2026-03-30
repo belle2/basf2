@@ -109,15 +109,15 @@ namespace Belle2::Conditions {
                        iov.getRunHigh(),
                        1                              // revision (not provided for now, use default)
                      ));
-          B2INFO("Conditions Database: added payload from new central server"
-                 << LogVar("Payload type name", payload.at("payload_type_name"))
-                 << LogVar("url", payload.at("payload_url"))
-                 << LogVar("checksum", payload.at("checksum")));
+          B2DEBUG(31, "Conditions Database: added payload from new central server"
+                  << LogVar("Payload type name", payload.at("payload_type_name"))
+                  << LogVar("url", payload.at("payload_url"))
+                  << LogVar("checksum", payload.at("checksum")));
         }
       }
 
-      B2INFO("Conditions Database: fetched " << payloads.size() << " payloads for globaltag"
-             << LogVar("globaltag", globaltag) << LogVar("exp", exp) << LogVar("run", run));
+      B2DEBUG(31, "Conditions Database: fetched " << payloads.size() << " payloads for globaltag"
+              << LogVar("globaltag", globaltag) << LogVar("exp", exp) << LogVar("run", run));
     } catch (std::exception& e) {
       B2WARNING("Conditions Database: Problem while fetching the list of payloads"
                 << LogVar("globaltag", globaltag) << LogVar("server url", m_baseUrl) << LogVar("query", url) << LogVar("error", e.what()));

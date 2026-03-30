@@ -21,10 +21,10 @@ void RefHistObject::makeReferenceCopy(void)
   } else {
     // is orgref is nullptr, just make a copy
     if (orgref && (orgref->InheritsFrom("TH1C") or orgref->InheritsFrom("TH1S"))) {
-      m_refCopy = std::unique_ptr<TH1> (new TH1F()); // we want it a float for better scaling
+      m_refCopy = std::make_unique<TH1F>();  // we want it a float for better scaling
       orgref->Copy(*m_refCopy.get());
     } else if (orgref && (orgref->InheritsFrom("TH1I") or orgref->InheritsFrom("TH1L"))) {
-      m_refCopy = std::unique_ptr<TH1> (new TH1D()); // we want it a float for better scaling
+      m_refCopy = std::make_unique<TH1D>();  // we want it a float for better scaling
       orgref->Copy(*m_refCopy.get());
     } else {
       // keep TProfile, TH1F or TH1D

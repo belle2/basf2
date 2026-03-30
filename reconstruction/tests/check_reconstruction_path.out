@@ -37,6 +37,7 @@
       timeCut1maxEnergy=99.999
       timeCut2=99999.0
       timeCut2maxEnergy=0.0
+      useParametersFromDatabase=True
   7. ECLLocalMaximumFinder
       cutOffset=2.5
       cutRatioCorrection=0.0
@@ -46,6 +47,7 @@
       method=none
       outfileName=ECLLocalMaximumFinderOutput.root
       truthFraction=0.51
+      useParametersFromDatabase=True
   8. ECLSplitterN1
       cutDigitEnergyForEnergy=0.0005
       cutDigitTimeResidualForEnergy=5.0
@@ -209,9 +211,11 @@
       SpacePoints=PXDSpacePoints
   26. TFCDC_WireHitPreparer
       UseNLoops=inf
+      badADCaverageMin=1000
+      badTOTaverageMin=15
       blockNegativeDriftLength=False
       deviationFromMedianTDCinASIC=10.0
-      filter=mva
+      filter=combined
       filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'}
       flightTimeEstimation=outwards
       ignoreLayers=[]
@@ -1191,13 +1195,8 @@
       indexOfFlippingMVA=2
       recoTracksStoreArrayName=RecoTracks
   97. FlippedRecoTracksMerger
-      bklmHitsStoreArrayName=
-      cdcHitsStoreArrayName=
-      eklmHitsStoreArrayName=
       inputStoreArrayName=RecoTracks
       inputStoreArrayNameFlipped=RecoTracks_flipped
-      pxdHitsStoreArrayName=
-      svdHitsStoreArrayName=
   98. V0Finder
       CopiedRecoTracks=CopiedRecoTracks
       RecoTracks=RecoTracks
@@ -1281,9 +1280,6 @@
   107. Sum_Postfilter_Tracking
   108. CDCDedxHitSaver
   109. CDCDedxPIDCreator
-      dedxTracksName=
-      enableDebugOutput=True
-      likelihoodsName=
       removeHighest=0.25
       removeLowest=0.05
       trackLevel=True
@@ -2073,7 +2069,7 @@
       useMissing=False
       useOnlyMostEnergeticECLCluster=True
       useROEs=False
-      writeOut=True
+      writeOut=False
   196. PListCopy_gamma:GoodPi0ForHLT
       cut=
       ignoreMotherFlavor=False
@@ -2081,7 +2077,7 @@
       outputListName=gamma:GoodPi0ForHLT
       preferLowest=True
       variable=mdstIndex
-      writeOut=True
+      writeOut=False
   197. ParticleSelector_applyCuts_gamma:GoodPi0ForHLT
       cut=[clusterReg == 1 and E > 0.02250] or                                                 [clusterReg == 2 and E > 0.020] or                                                 [clusterReg == 3 and E > 0.020]
       decayString=gamma:GoodPi0ForHLT
@@ -2092,12 +2088,12 @@
       allowChargeViolation=False
       chargeConjugation=True
       cut=0.105 < M < 0.150
-      decayMode=1
+      decayMode=0
       decayString=pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT
       ignoreIfTooManyCandidates=True
       maximumNumberOfCandidates=10000
       recoilParticleType=0
-      writeOut=True
+      writeOut=False
   200. ParticleCombiner_D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT
       allowChargeViolation=False
       chargeConjugation=True

@@ -7,19 +7,21 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.dcl.h>
 
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
+  namespace TrackFindingCDC {
 
     // Guard to prevent repeated instantiations
-    extern template class RelationFilter<const CDCTrack>;
+    // extern template class TrackingUtilities::RelationFilter<const TrackingUtilities::CDCTrack>;
 
     /// Base class for filtering the neighborhood of tracks
-    class BaseTrackRelationFilter : public RelationFilter<const CDCTrack> {
+    class BaseTrackRelationFilter : public TrackingUtilities::RelationFilter<const TrackingUtilities::CDCTrack> {
 
     public:
       /// Default constructor
@@ -29,9 +31,9 @@ namespace Belle2 {
       ~BaseTrackRelationFilter();
 
       /// Reinforce that the full range of tracks is possible as no particular default is applicable.
-      std::vector<const CDCTrack*> getPossibleTos(
-        const CDCTrack* from,
-        const std::vector<const CDCTrack*>& tracks) const final;
+      std::vector<const TrackingUtilities::CDCTrack*> getPossibleTos(
+        const TrackingUtilities::CDCTrack* from,
+        const std::vector<const TrackingUtilities::CDCTrack*>& tracks) const final;
     };
   }
 }

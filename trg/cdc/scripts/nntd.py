@@ -5,13 +5,11 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 import basf2
-from ROOT import Belle2
-from ROOT import TVector3
-from ROOT.Math import XYZVector
-import numpy as np
-import pickle
+
 import os
+import pickle
 
 
 class nntd(basf2.Module):
@@ -88,12 +86,13 @@ class nntd(basf2.Module):
             setattr(self, key, value)
 
     def initialize(self):
+        from ROOT import Belle2  # noqa
         # TODO:
         # check if folder is present or create it
         # initialize all plots somehow
         # initialize filters somehow, so they can be looped over in the evetn function
         # setup histograms
-        self.data = None  # np.array([[[]]])
+        self.data = None
         self.eventlist = []
         self.networkname = "unspecified net"
         self.dataname = "unspecified runs"
@@ -148,6 +147,7 @@ class nntd(basf2.Module):
 #        if not self.filename: self.filename = "default.pkl"
 
     def costotheta(self, x):
+        import numpy as np  # noqa
         if isinstance(x, list):
             ret = []
             for y in x:
@@ -181,6 +181,8 @@ class nntd(basf2.Module):
         return evlist
 
     def getneurovals(self, evlist, neuro, status=""):
+        from ROOT import Belle2  # noqa
+        import numpy as np  # noqa
         pre = status
         if neuro:
 
@@ -233,6 +235,7 @@ class nntd(basf2.Module):
         return evlist
 
     def event(self):
+        from ROOT import Belle2, TVector3, XYZVector  # noqa
         # TODO: update the plots every nth time
         # if self.showplots != 0:
         #     if eventnumber % self.showplots = 0:
@@ -448,5 +451,6 @@ class nntd(basf2.Module):
         self.makearray(self.eventlist)
 
     def makearray(self, evlist):
+        import numpy as np  # noqa
         # TODO: apply filters
         self.data = np.array(evlist)

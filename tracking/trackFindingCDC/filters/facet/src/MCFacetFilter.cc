@@ -9,9 +9,9 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHitTriple.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
 
@@ -19,6 +19,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 template class TrackFindingCDC::MCSymmetric<BaseFacetFilter>;
 

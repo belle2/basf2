@@ -10,17 +10,19 @@
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <cdc/topology/CDCWire.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   CDCSegment3D reconstruct(const CDCSegment2D& segment2D,
@@ -181,7 +183,7 @@ PerigeeHelixAmbiguity CDCAxialStereoFusion::calcAmbiguity(const CDCSegment3D& se
     const Vector2D localRecoPos2D = recoPos2D - localOrigin2D;
     const Vector2D normal = localCircle->normal(localRecoPos2D);
     const CDCWire& wire = recoHit3D.getWire();
-    zeta += wire.getWireLine().sagMovePerZ(recoHit3D.getRecoZ()).dot(normal);
+    zeta += wire.getWireLine().sagMovePerZ(recoHit3D.getRecoZ()).Dot(normal);
   }
   zeta /= nHits;
 

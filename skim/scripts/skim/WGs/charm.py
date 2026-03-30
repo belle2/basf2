@@ -40,7 +40,7 @@ from stdV0s import stdKshorts, stdLambdas
 from variables import variables as vm
 
 
-__liaison__ = "Jaeyoung Kim <jaeyoung_kim@yonsei.ac.kr>"
+__liaison__ = "Rishav Kumar Jaiswal <rishav@korea.ac.kr>"
 _VALIDATION_SAMPLE = "mdst16.root"
 
 
@@ -1455,7 +1455,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         * 19 hadronic channels for tag :math:`\\Lambda_{c}^{+}` reconstruction
 
     **Selection Criteria**:
-        * Cut on :math:`\\pi^{+}, K^{+}` : charm_skim_std_charged pion and kaon with PIDNN > 0.1
+        * Cut on :math:`\\pi^{+}, K^{+}` : charm_skim_std_charged pion and kaon with pionID > 0.01 and kaonID > 0.1
         * Cut on :math:`p^{+}` : abs(dr) < 1.0 and abs(dz) < 3.0 and protonID > 0.1
         * Cut on :math:`\\gamma` : E > 0.05
         * Cut on :math:`\\pi^{0}\\to \\gamma \\gamma` : 0.115 < M < 0.160
@@ -1812,7 +1812,7 @@ class DpToEtaHp(BaseSkim):
     """
     **Decay Modes**:
         * :math:`D^{+}\\to \\eta \\pi^+` (and CC)
-        * :math:`D^{+}\\to \\eta \\K^+` (and CC)
+        * :math:`D^{+}\\to \\eta K^{+}` (and CC)
 
     **Selection Criteria**:
         * Track cuts are `charm_skim_std_charged` pion and Kaon

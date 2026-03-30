@@ -12,7 +12,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawTRG.h>
 
-#include <string.h>
+#include <string>
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;

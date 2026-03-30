@@ -9,10 +9,12 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 WireHitPreparer::WireHitPreparer()
 {
   this->addProcessingSignalListener(&m_wireHitCreator);
+  this->addProcessingSignalListener(&m_badBoardADCDetector);
   this->addProcessingSignalListener(&m_wireHitBackgroundBlocker);
   this->addProcessingSignalListener(&m_wireHitBackgroundDetector);
   this->addProcessingSignalListener(&m_wireHitMCMultiLoopBlocker);
@@ -27,6 +29,7 @@ std::string WireHitPreparer::getDescription()
 void WireHitPreparer::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   m_wireHitCreator.exposeParameters(moduleParamList, prefix);
+  m_badBoardADCDetector.exposeParameters(moduleParamList, prefix);
   m_wireHitBackgroundBlocker.exposeParameters(moduleParamList, prefix);
   m_wireHitBackgroundDetector.exposeParameters(moduleParamList, prefix);
   m_wireHitMCMultiLoopBlocker.exposeParameters(moduleParamList, prefix);
@@ -36,6 +39,7 @@ void WireHitPreparer::exposeParameters(ModuleParamList* moduleParamList, const s
 void WireHitPreparer::apply(std::vector<CDCWireHit>& outputWireHits)
 {
   m_wireHitCreator.apply(outputWireHits);
+  m_badBoardADCDetector.apply(outputWireHits);
   m_wireHitBackgroundBlocker.apply(outputWireHits);
   m_wireHitBackgroundDetector.apply(outputWireHits);
   m_wireHitMCMultiLoopBlocker.apply(outputWireHits);

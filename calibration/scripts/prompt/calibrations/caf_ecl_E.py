@@ -19,12 +19,12 @@ settings = CalibrationSettings(
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=[
-        "bhabha_all_calib",
+        "bhabha_combined_calib",
         "gamma_gamma_calib",
         "mumu_tight_or_highm_calib"],
     input_data_filters={
-        "bhabha_all_calib": [
-            INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
+        "bhabha_combined_calib": [
+            INPUT_DATA_FILTERS["Data Tag"]["bhabha_combined_calib"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
             INPUT_DATA_FILTERS["Beam Energy"]["4S"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
@@ -44,9 +44,7 @@ settings = CalibrationSettings(
     depends_on=[],
     expert_config={"eCmsScale": 1.0,  # Ecms/10.58, typically 0.9943 for offpeak
                    "ee5x5_min_entries": 100},
-    produced_payloads=["ECLCrystalEnergy", "ECLExpMuMuE", "ECLCrystalEnergyMuMu", "ECLExpGammaGammaE",
-                       "ECLCrystalEnergyGammaGamma", "ECLExpee5x5E", "ECLCrystalEnergyee5x5", "ECLeedPhiData",
-                       "ECLeedPhiMC"])
+    produced_payloads=["ECLCrystalEnergy", "ECLCrystalEnergyMuMu", "ECLCrystalEnergyGammaGamma", "ECLCrystalEnergyee5x5"])
 
 # --------------------------------------------------------------
 # ..Raise clustering seed threshold in ECLCRFinder
@@ -111,7 +109,7 @@ def get_calibrations(input_data, **kwargs):
     # ..Bhabha
 
     # ..Input data
-    file_to_iov_bhabha = input_data["bhabha_all_calib"]
+    file_to_iov_bhabha = input_data["bhabha_combined_calib"]
     input_files_bhabha = list(file_to_iov_bhabha.keys())
 
     # ..Algorithm

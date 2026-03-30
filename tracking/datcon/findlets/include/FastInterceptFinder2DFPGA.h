@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/datcon/utilities/DATCONHelpers.h>
 
 #include <algorithm>
@@ -27,9 +27,9 @@ namespace Belle2 {
    * fastInterceptFinder2d.
    */
   class FastInterceptFinder2DFPGA : public
-    TrackFindingCDC::Findlet<const std::pair<VxdID, std::pair<long, long>>, std::pair<double, double>> {
+    TrackingUtilities::Findlet<const std::pair<VxdID, std::pair<long, long>>, std::pair<double, double>> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const std::pair<VxdID, std::pair<long, long>>, std::pair<double, double>>;
+    using Super = TrackingUtilities::Findlet<const std::pair<VxdID, std::pair<long, long>>, std::pair<double, double>>;
 
   public:
     /// Find intercepts in the 2D Hough space

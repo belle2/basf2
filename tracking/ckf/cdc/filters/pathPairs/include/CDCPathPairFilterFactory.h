@@ -8,15 +8,15 @@
 #pragma once
 
 #include <tracking/ckf/cdc/filters/pathPairs/BaseCDCPathPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   /// Factory that can create appropriate cluster filters from associated names.
-  class CDCPathPairFilterFactory : public TrackFindingCDC::FilterFactory<BaseCDCPathPairFilter> {
+  class CDCPathPairFilterFactory : public TrackingUtilities::FilterFactory<BaseCDCPathPairFilter> {
 
   private:
     /// Type of the base class
-    using Super = TrackFindingCDC::FilterFactory<BaseCDCPathPairFilter>;
+    using Super = TrackingUtilities::FilterFactory<BaseCDCPathPairFilter>;
 
   public:
     /// Constructor forwarding the default filter name

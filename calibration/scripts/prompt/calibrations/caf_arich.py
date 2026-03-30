@@ -18,10 +18,10 @@ settings = CalibrationSettings(
     subsystem="arich",
     description=__doc__,
     input_data_formats=["raw"],
-    input_data_names=["bhabha_all_calib"],
+    input_data_names=["bhabha_combined_calib"],
     input_data_filters={
-        "bhabha_all_calib": [
-            INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
+        "bhabha_combined_calib": [
+            INPUT_DATA_FILTERS["Data Tag"]["bhabha_combined_calib"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"]]},
     depends_on=[],
@@ -52,7 +52,7 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    file_to_iov_physics = input_data["bhabha_all_calib"]
+    file_to_iov_physics = input_data["bhabha_combined_calib"]
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
@@ -83,6 +83,13 @@ def get_calibrations(input_data, **kwargs):
     from ROOT.Belle2 import ARICHChannelMaskMaker
 
     alg_arich = ARICHChannelMaskMaker()
+    expert_config = kwargs.get("expert_config", {})
+    if "arich_min_frac" in expert_config:
+        alg_arich.setMinFrac(expert_config["arich_min_frac"])
+    if "arich_min_s2n" in expert_config:
+        alg_arich.setMinS2N(expert_config["arich_min_s2n"])
+    if "arich_min_hit_per_chn" in expert_config:
+        alg_arich.setMinHitPerChn(expert_config["arich_min_hit_per_chn"])
 
     ###################################################
     # Calibration setup

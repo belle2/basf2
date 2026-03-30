@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorHitLegendre.h>
 
@@ -17,9 +17,11 @@
 namespace Belle2 {
 
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
     class CDCWireHit;
+  }
+  namespace TrackFindingCDC {
     enum class LegendreFindingPass;
 
     /**
@@ -35,11 +37,12 @@ namespace Belle2 {
      *   - search for strictly straight tracks (q=0.00) without quadtree
      *   - axial track postprocessing
      */
-    class MonopoleAxialTrackFinderLegendre : public Findlet<const CDCWireHit, CDCTrack> {
+    class MonopoleAxialTrackFinderLegendre : public
+      TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit, TrackingUtilities::CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHit, CDCTrack>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit, TrackingUtilities::CDCTrack>;
 
     public:
       /// Constructor
@@ -52,7 +55,7 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main method to apply the track finding.
-      void apply(const std::vector<CDCWireHit>& wireHits, std::vector<CDCTrack>& tracks);
+      void apply(const std::vector<TrackingUtilities::CDCWireHit>& wireHits, std::vector<TrackingUtilities::CDCTrack>& tracks);
 
     private: // findlets
       /// Class of Pass keys

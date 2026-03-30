@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <Math/Vector3D.h>
@@ -33,7 +33,7 @@ namespace Belle2 {
 
     /// Constructor from the path of the result and the final mSoP, which defines the track position of the resulting track
     template <class AState>
-    CKFResult(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& path, const genfit::MeasuredStateOnPlane& mSoP)
+    CKFResult(const std::vector<TrackingUtilities::WithWeight<const AState*>>& path, const genfit::MeasuredStateOnPlane& mSoP)
       : m_seed(path.front()->getSeed()),
         m_trackPosition(mSoP.getPos()),
         m_trackMomentum(mSoP.getMom()),
@@ -43,7 +43,7 @@ namespace Belle2 {
     {
       m_hits.reserve(path.size());
 
-      for (const TrackFindingCDC::WithWeight<const AState*> state : path) {
+      for (const TrackingUtilities::WithWeight<const AState*> state : path) {
         const Hit* hit = state->getHit();
         if (hit) {
           m_hits.push_back(hit);
@@ -151,7 +151,7 @@ namespace Belle2 {
     /// The charge of the track
     short m_trackCharge = 0;
     /// The stored sum of weights
-    TrackFindingCDC::Weight m_weightSum = 0;
+    TrackingUtilities::Weight m_weightSum = 0;
     /// The measured state on plane, which was used from the seed
     genfit::MeasuredStateOnPlane m_seedMSoP;
     /// The measured state on plane, which this result was initialized with

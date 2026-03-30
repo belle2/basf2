@@ -191,10 +191,11 @@ std::tuple<bool, std::optional<double>> DQMHistAnalysisEventT0TriggerJitterModul
   //SETUP gSTYLE - all plots
   gStyle->SetOptFit(1111);
 
+  gPad->Clear();// better clear before to get rid of all fit lines drawn before
   h->Draw();
-  fitf.DrawClone("same");
-  gauss1.DrawClone("same");
-  gauss2.DrawClone("same");
+  fitf.DrawCopy("same");// Do not use DrawClone, it result in meory leak (even so unclear why)
+  gauss1.DrawCopy("same");
+  gauss2.DrawCopy("same");
 
   if (retrieveMeanT0) {
     // return mean of the core Gaussian

@@ -7,9 +7,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/track/BaseTrackFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::Filter<CDCTrack>;
+template class TrackingUtilities::Filter<CDCTrack>;

@@ -28,7 +28,7 @@ namespace Belle2 {
      * Destructor
      */
 
-    virtual ~SVDdEdxValidationAlgorithm() {}
+    virtual ~SVDdEdxValidationAlgorithm() override {}
 
     /**
      * decide between full or basic validation mode. full validation also produces global PID performance plots.
@@ -82,9 +82,9 @@ namespace Belle2 {
     /**
      * a generic function to produce efficiency plots
      */
-    void PlotEfficiencyPlots(const TString& PIDDetectorsName, TTree* SignalTree, TString SignalWeightName, TString SignalVarName,
-                             TString SignalVarNameFull, TTree* FakeTree, TString FakeWeightName, TString FakeVarName, TString FakeVarNameFull,
-                             TString PIDVarName, TString PIDCut, unsigned int nbins, double MomLow, double MomHigh);
+    static void PlotEfficiencyPlots(const TString& PIDDetectorsName, TTree* SignalTree, TString SignalWeightName, TString SignalVarName,
+                                    TString SignalVarNameFull, TTree* FakeTree, TString FakeWeightName, TString FakeVarName, TString FakeVarNameFull,
+                                    TString PIDVarName, TString PIDCut, unsigned int nbins, double MomLow, double MomHigh);
 
     /**
      * a generic function to produce ROC curves

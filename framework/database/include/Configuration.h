@@ -349,7 +349,7 @@ namespace Belle2::Conditions {
     size_t m_downloadLockTimeout{120};
     /** the tag states accepted for processing, including states from new HSF CDB */
     std::set<std::string> m_usableTagStates{"TESTING", "VALIDATED", "PUBLISHED", "RUNNING",
-      "locked", "unlocked", "frozen"};
+      "locked", "frozen"};
     /** the callback function to determine the final final list of globaltags */
     std::optional<boost::python::object> m_callback;
     /** bool indicating whether the database has been initialized, in which case any changes to the configuration object

@@ -53,6 +53,9 @@ namespace Belle2::Conditions {
     /** base url of the server */
     std::string m_baseUrl;
 
+    /** base url of the payload server */
+    std::string m_payloadBaseUrl;
+
     /** Default new central server base URL */
     static constexpr const char* s_defaultNewCentralUrl = "http://belle2-cdb-hsf.apps.sdcc.bnl.gov/api/cdb_rest/";
   };

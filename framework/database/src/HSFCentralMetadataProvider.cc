@@ -31,6 +31,10 @@ namespace Belle2::Conditions {
         invalidStates += status;
       }
     }
+
+    // TODO: get m_payloadBaseUrl from the API
+    m_payloadBaseUrl = "http://belle2db-files.sdcc.bnl.gov/";
+
     printInfoMessage(m_baseUrl);
     B2DEBUG(31, "Conditions Database: unusable globaltag states: " << invalidStates);
     for (const auto& status : validStates) {
@@ -86,13 +90,13 @@ namespace Belle2::Conditions {
                      row.at(0).get<std::string>(),  // payload_type_name (module name)
                      globaltag,
                      row.at(1).get<std::string>(),  // payload_url
-                     "http://belle2db-files.sdcc.bnl.gov/",   // baseUrl (harcoded for now)
+                     m_payloadBaseUrl,
                      row.at(2).get<std::string>(),  // checksum
-                     0, // row.at(4).get<int>(),          // major_iov (expStart)
-                     0, // row.at(5).get<int>(),          // minor_iov (runStart)
+                     row.at(4).get<int>(),          // major_iov (expStart)
+                     row.at(5).get<int>(),          // minor_iov (runStart)
                      row.at(6).get<int>(),          // major_iov_end (expEnd)
                      row.at(7).get<int>(),          // minor_iov_end (runEnd)
-                     1                               // revision (not provided, use default)
+                     1                              // revision (not provided, use default)
                    ));
         B2INFO("Conditions Database: added payload from new central server"
                << LogVar("module", row.at(0).get<std::string>())

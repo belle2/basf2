@@ -97,13 +97,26 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module(eventT0DQMmodule)
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "before_filter"]):
+        # Add DQM for HLTPrefilter decision
+        cutResultIdentifiers = {}
+        hlt_prefilter_lines_in_plot = []
+        from softwaretrigger import prefilter_categories
+        prefilter_cat = [method for method in dir(prefilter_categories) if method.startswith('__') is False if method != 'RESULTS']
+
+        def read_lines(category):
+            return [i.split(" ", 1)[1].replace(" ", "_") for i in category]
+        for i in prefilter_cat:
+            hlt_prefilter_lines_in_plot += read_lines(getattr(prefilter_categories, i))
+
+        cutResultIdentifiers["prefilter"] = {"prefilter": hlt_prefilter_lines_in_plot}
+
         path.add_module(
             "SoftwareTriggerHLTDQM",
             createHLTUnitHistograms=create_hlt_unit_histograms,
             createTotalResultHistograms=False,
             createExpRunEventHistograms=False,
             createErrorFlagHistograms=True,
-            cutResultIdentifiers={},
+            cutResultIdentifiers=cutResultIdentifiers,
             histogramDirectoryName="softwaretrigger_before_filter",
             pathLocation="before filter",
         ).set_name("SoftwareTriggerHLTDQM_before_filter")

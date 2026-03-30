@@ -464,6 +464,8 @@ void SoftwareTriggerHLTDQMModule::event()
                                             (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_HLTCrash));
     m_runInfoHistograms["error_flag"]->Fill("ReconstructionAbort",
                                             (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_ReconstructionAbort));
+    m_runInfoHistograms["error_flag"]->Fill("HLTPrefilterAbort",
+                                            (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_HLTPrefilterDiscard));
   }
 
   if (m_param_create_hlt_unit_histograms) {
@@ -484,4 +486,5 @@ void SoftwareTriggerHLTDQMModule::beginRun()
   std::for_each(m_runInfoHistograms.begin(), m_runInfoHistograms.end(),
   [](auto & it) { it.second->Reset(); });
 }
+
 

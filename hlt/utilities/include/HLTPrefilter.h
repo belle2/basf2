@@ -11,6 +11,7 @@
 #include <hlt/softwaretrigger/core/utilities.h>
 
 /* basf2 headers */
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <framework/database/DBObjPtr.h>
@@ -123,6 +124,42 @@ namespace Belle2::HLTPrefilter {
 
       // Tag events having a large CDC and ECL occupancy with a prescale
       return (nCDCHits > nCDCHitsMax && nECLDigits > nECLDigitsMax) && !SoftwareTrigger::makePreScale(prescale);
+    }
+
+  };
+
+  /**
+  * Helper for EventsOfDoomBuster state
+  */
+  class EventsOfDoomBusterState {
+  private:
+    /// CDCHits StoreArray
+    StoreArray<CDCHit> m_cdcHits;
+
+    /// SVDShaperDigits StoreArray
+    StoreArray<SVDShaperDigit> m_svdShaperDigits;
+
+  public:
+    /**
+    * The max number of CDC hits for an event to be kept for reconstruction.
+    * By default, no events are skipped based upon this requirement.
+    */
+    uint32_t nCDCHitsMax = 1e9;
+    /**
+     * The max number of SVD shaper digits for an event to be kept for reconstruction.
+     * By default, no events are skipped based upon this requirement.
+     */
+    uint32_t nSVDShaperDigitsMax = 1e9;
+
+    bool computeDecision()
+    {
+      /// Get NCDCHits for the event
+      const uint32_t nCDCHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
+      /// Get NSVDShaperDigits for the event
+      const uint32_t nsvdShaperDigits = m_svdShaperDigits.isOptional() ? m_svdShaperDigits.getEntries() : 0;
+
+      // Tag events having a large SVD and CDC occupancy
+      return (nCDCHits > nCDCHitsMax && nsvdShaperDigits > nSVDShaperDigitsMax);
     }
 
   };

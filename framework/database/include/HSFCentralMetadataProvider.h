@@ -18,16 +18,16 @@ namespace Belle2::Conditions {
    * the main Belle II conditions database server. It provides the same functionality
    * as CentralMetadataProvider but uses a different base URL.
    */
-  class NewCentralMetadataProvider: public MetadataProvider {
+  class HSFCentralMetadataProvider: public MetadataProvider {
   public:
     /** Create using the default new central base URL and given usable tag states */
-    explicit NewCentralMetadataProvider(const std::set<std::string>& usableTagStates);
+    explicit HSFCentralMetadataProvider(const std::set<std::string>& usableTagStates);
 
     /** Create using a custom base URL for the new central server */
-    NewCentralMetadataProvider(std::string baseUrl, const std::set<std::string>& usableTagStates);
+    HSFCentralMetadataProvider(std::string baseUrl, const std::set<std::string>& usableTagStates);
 
     /** default destructor */
-    virtual ~NewCentralMetadataProvider() = default;
+    virtual ~HSFCentralMetadataProvider() = default;
 
     /** Check the status of a given globaltag
      * @returns the status of the globaltag (like "OPEN", "INVALID", "PUBLISHED").

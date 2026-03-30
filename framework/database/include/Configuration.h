@@ -235,7 +235,7 @@ namespace Belle2::Conditions {
     /** Get the default local path for the local metadata provider */
     std::string getDefaultLocalMetadataProviderPath() { return m_defaultLocalMetadataProviderPath; }
     /** Get the default server URL for the new central metadata provider */
-    std::string getDefaultNewCentralMetadataProviderServer() { return m_defaultNewCentralMetadataProviderServer; }
+    std::string getDefaultHSFCentralMetadataProviderServer() { return m_defaultHSFCentralMetadataProviderServer; }
     ///@}
 
     /** @name Payload Location Configuration
@@ -340,15 +340,16 @@ namespace Belle2::Conditions {
     /** default local path for the local metadata provider */
     std::string m_defaultLocalMetadataProviderPath{"/cvmfs/belle.cern.ch/conditions"};
     /** default server URL for the new central metadata provider */
-    std::string m_defaultNewCentralMetadataProviderServer{"http://belle2-cdb-hsf.apps.sdcc.bnl.gov/api/cdb_rest/"};
+    std::string m_defaultHSFCentralMetadataProviderServer{"http://belle2-cdb-hsf.apps.sdcc.bnl.gov/api/cdb_rest/"};
     /** the file to put the newly created payload information */
     std::string m_newPayloadFile{"localdb/database.txt"};
     /** the directory to put newly downloaded payloads */
     std::string m_downloadCacheDirectory{""};
     /** the timeout when trying to lock files in the download directory */
     size_t m_downloadLockTimeout{120};
-    /** the tag states accepted for processing */
-    std::set<std::string> m_usableTagStates{"TESTING", "VALIDATED", "PUBLISHED", "RUNNING"};
+    /** the tag states accepted for processing, including states from new HSF CDB */
+    std::set<std::string> m_usableTagStates{"TESTING", "VALIDATED", "PUBLISHED", "RUNNING",
+      "locked", "unlocked", "frozen"};
     /** the callback function to determine the final final list of globaltags */
     std::optional<boost::python::object> m_callback;
     /** bool indicating whether the database has been initialized, in which case any changes to the configuration object

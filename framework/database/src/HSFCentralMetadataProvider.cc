@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <framework/database/NewCentralMetadataProvider.h>
+#include <framework/database/HSFCentralMetadataProvider.h>
 #include <framework/database/MetadataProvider.h>
 #include <framework/database/Downloader.h>
 #include <framework/logging/Logger.h>
@@ -15,7 +15,7 @@ using json = nlohmann::json;
 
 namespace Belle2::Conditions {
 
-  NewCentralMetadataProvider::NewCentralMetadataProvider(std::string baseUrl, const std::set<std::string>& usableTagStates):
+  HSFCentralMetadataProvider::HSFCentralMetadataProvider(std::string baseUrl, const std::set<std::string>& usableTagStates):
     MetadataProvider(usableTagStates), m_baseUrl(std::move(baseUrl))
   {
     // We want to be sure on construction that the server is working. So let's
@@ -40,7 +40,7 @@ namespace Belle2::Conditions {
     }
   }
 
-  json NewCentralMetadataProvider::get(const std::string& url)
+  json HSFCentralMetadataProvider::get(const std::string& url)
   {
     std::stringstream stream;
     const auto fullUrl = m_downloader.joinWithSlash(m_baseUrl, url);
@@ -50,7 +50,7 @@ namespace Belle2::Conditions {
     return json::parse(stream);
   }
 
-  std::string NewCentralMetadataProvider::getGlobaltagStatus(const std::string& name)
+  std::string HSFCentralMetadataProvider::getGlobaltagStatus(const std::string& name)
   {
     auto escaped = m_downloader.escapeString(name);
     const std::string url = "/globalTag/" + escaped;
@@ -68,7 +68,7 @@ namespace Belle2::Conditions {
     return "";
   }
 
-  bool NewCentralMetadataProvider::updatePayloads(const std::string& globaltag, int exp, int run)
+  bool HSFCentralMetadataProvider::updatePayloads(const std::string& globaltag, int exp, int run)
   {
     auto escaped = m_downloader.escapeString(globaltag);
     const std::string url =  "payloadiovs/?gtName=" + escaped +
@@ -90,8 +90,8 @@ namespace Belle2::Conditions {
                      row.at(2).get<std::string>(),  // checksum
                      0, // row.at(4).get<int>(),          // major_iov (expStart)
                      0, // row.at(5).get<int>(),          // minor_iov (runStart)
-                     1000, // row.at(6).get<int>(),          // major_iov_end (expEnd)
-                     9999999, /// row.at(7).get<int>(),          // minor_iov_end (runEnd)
+                     row.at(6).get<int>(),          // major_iov_end (expEnd)
+                     row.at(7).get<int>(),          // minor_iov_end (runEnd)
                      1                               // revision (not provided, use default)
                    ));
         B2INFO("Conditions Database: added payload from new central server"

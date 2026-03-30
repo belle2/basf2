@@ -27,7 +27,7 @@
 #include <framework/database/MetadataProvider.h>
 #include <framework/database/LocalMetadataProvider.h>
 #include <framework/database/CentralMetadataProvider.h>
-#include <framework/database/NewCentralMetadataProvider.h>
+#include <framework/database/HSFCentralMetadataProvider.h>
 #include <framework/database/Configuration.h>
 
 #include <algorithm>
@@ -177,7 +177,7 @@ namespace Belle2 {
       if (remote) {
         // Check if this is the new central server by looking for the new central URL pattern
         if (m_currentProvider.find("belle2-cdb-hsf.apps.sdcc.bnl.gov") != std::string::npos) {
-          m_metadataProvider = std::make_unique<Conditions::NewCentralMetadataProvider>(m_currentProvider, m_usableTagStates);
+          m_metadataProvider = std::make_unique<Conditions::HSFCentralMetadataProvider>(m_currentProvider, m_usableTagStates);
         } else {
           m_metadataProvider = std::make_unique<Conditions::CentralMetadataProvider>(m_currentProvider, m_usableTagStates);
         }

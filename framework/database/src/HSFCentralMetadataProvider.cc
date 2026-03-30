@@ -35,6 +35,7 @@ namespace Belle2::Conditions {
     // TODO: get m_payloadBaseUrl from the API
     m_payloadBaseUrl = "http://belle2db-files.sdcc.bnl.gov/";
 
+    B2DEBUG(31, "Infinite IoV value is set to " << m_maxIoV);
     printInfoMessage(m_baseUrl);
     B2DEBUG(31, "Conditions Database: unusable globaltag states: " << invalidStates);
     for (const auto& status : validStates) {
@@ -77,35 +78,41 @@ namespace Belle2::Conditions {
     auto escaped = m_downloader.escapeString(globaltag);
     const std::string url =  "payloadiovs/?gtName=" + escaped +
                              "&majorIOV=" + std::to_string(exp) +
-                             "&minorIOV=" + std::to_string(run);
+                             "&minorIOV=" + std::to_string(run) +
+                             "&shape=dict";
     try {
       const auto payloads = get(url);
       if (!payloads.is_array()) throw std::runtime_error("expected array");
-      for (const auto& row : payloads) {
-        if (!row.is_array()) throw std::runtime_error("expected row array");
-        // Column indices from nopayloaddb SQL query:
-        // 0: payload_type_name, 1: payload_url, 2: checksum, 3: size,
-        // 4: major_iov, 5: minor_iov, 6: major_iov_end, 7: minor_iov_end
-        // Also: check if the current (exp, run) falls into the payload IoV:
+      for (const auto& payload : payloads) {
+        if (!payload.is_object()) throw std::runtime_error("expected payload object");
+
+        const long long int experimentHighFromServer = payload.at("major_iov_end");
+        const long long int runHighFromServer = payload.at("minor_iov_end");
+
+        // The infinite IoV is represented by m_maxIoV; in basf2 we replace it for -1 for historical reasons
+        const long long int experimentHigh = (experimentHighFromServer == m_maxIoV) ? -1 : experimentHighFromServer;
+        const long long int runHigh = (runHighFromServer == m_maxIoV) ? -1 : runHighFromServer;
+
+        // Check if the current (exp, run) falls into the payload IoV:
         // if yes, let's keep the payload, otherwise skip it.
-        const IntervalOfValidity iov{row.at(4).get<int>(), row.at(5).get<int>(), row.at(6).get<int>(), row.at(7).get<int>()};
+        const IntervalOfValidity iov{payload.at("major_iov"), payload.at("minor_iov"), experimentHigh, runHigh};
         if (iov.contains(exp, run)) {
           addPayload(PayloadMetadata(
-                       row.at(0).get<std::string>(),  // payload_type_name (module name)
+                       payload.at("payload_type_name"),
                        globaltag,
-                       row.at(1).get<std::string>(),  // payload_url
+                       payload.at("payload_url"),
                        m_payloadBaseUrl,
-                       row.at(2).get<std::string>(),  // checksum
-                       iov.getExperimentLow(),        // major_iov (expStart)
-                       iov.getRunLow(),               // minor_iov (runStart)
-                       iov.getExperimentHigh(),       // major_iov_end (expEnd)
-                       iov.getRunHigh(),              // minor_iov_end (runEnd)
-                       1                              // revision (not provided, use default)
+                       payload.at("checksum"),
+                       iov.getExperimentLow(),
+                       iov.getRunLow(),
+                       iov.getExperimentHigh(),
+                       iov.getRunHigh(),
+                       1                              // revision (not provided for now, use default)
                      ));
           B2INFO("Conditions Database: added payload from new central server"
-                 << LogVar("module", row.at(0).get<std::string>())
-                 << LogVar("url", row.at(1).get<std::string>())
-                 << LogVar("checksum", row.at(2).get<std::string>()));
+                 << LogVar("Payload type name", payload.at("payload_type_name"))
+                 << LogVar("url", payload.at("payload_url"))
+                 << LogVar("checksum", payload.at("checksum")));
         }
       }
 

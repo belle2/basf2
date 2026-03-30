@@ -56,6 +56,9 @@ namespace Belle2::Conditions {
     /** base url of the payload server */
     std::string m_payloadBaseUrl;
 
+    /** Max IoV value, representing infinite end of validity */
+    static constexpr long long m_maxIoV = 9223372036854775807;
+
     /** Default new central server base URL */
     static constexpr const char* s_defaultNewCentralUrl = "http://belle2-cdb-hsf.apps.sdcc.bnl.gov/api/cdb_rest/";
   };

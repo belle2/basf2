@@ -108,17 +108,17 @@
     <xi:include href="../structure/ServiceGaps-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
 
-  <!-- early phase 3 Service Gaps -->
-  <DetectorComponent name="ServiceGapsMaterial-earlyPhase3" isDefault="false">
-    <xi:include href="../structure/ServiceGaps-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
+  <!-- Run 1 Service Gaps -->
+  <DetectorComponent name="ServiceGapsMaterial-Run1" isDefault="false">
+    <xi:include href="../structure/ServiceGaps-Run1.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
 
-  <!-- early phase 3 PXD -->
-  <DetectorComponent name="PXD-earlyPhase3" isDefault="false">
-    <xi:include href="../pxd/PXD-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
+  <!-- Run 1 PXD -->
+  <DetectorComponent name="PXD-Run1" isDefault="false">
+    <xi:include href="../pxd/PXD-Run1.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
 
-  <!-- early phase 3 and phase3 Beast system -->
+  <!-- Run 1 and Run 2 Beast system -->
   <DetectorComponent name="MICROTPC" isDefault="false">
     <xi:include href="../beast/microtpc/MICROTPC-phase3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
@@ -142,19 +142,19 @@
     <xi:include href="../klm/MuidParameters.xml"/>
   </Muid>
 
-  <!-- early phase 3 beam pipe -->
-  <DetectorComponent name="BeamPipe-earlyPhase3" isDefault="false">
-    <xi:include href="../ir/BeamPipe-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  <!-- Run 1 beam pipe -->
+  <DetectorComponent name="BeamPipe-Run1" isDefault="false">
+    <xi:include href="../ir/BeamPipe-Run1.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
 
-  <!-- early phase 3 cryostat -->
-  <DetectorComponent name="Cryostat-earlyPhase3" isDefault="false">
-    <xi:include href="../ir/Cryostat-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  <!-- Run 1 cryostat -->
+  <DetectorComponent name="Cryostat-Run1" isDefault="false">
+    <xi:include href="../ir/Cryostat-Run1.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
 
-  <!-- early phase 3 far beam line -->
-  <DetectorComponent name="FarBeamLine-earlyPhase3" isDefault="false">
-    <xi:include href="../ir/FarBeamLine-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  <!-- Run 1 far beam line -->
+  <DetectorComponent name="FarBeamLine-Run1" isDefault="false">
+    <xi:include href="../ir/FarBeamLine-Run1.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
 
 </Detector>

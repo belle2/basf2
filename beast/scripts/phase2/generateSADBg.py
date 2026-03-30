@@ -21,7 +21,7 @@
 #    equivTime_us   equivalent SuperKEKB running time in micro-seconds
 #    num            output file number
 #    sampleType     one of: study, usual, PXD, ECL
-#    phase          2, 31 (= early phase 3) or 3
+#    phase          2, 31 (= Run 1, early phase 3) or 3
 #    sad            SAD file name from /home/belle/luka/public/SAD without bg type and ".root"
 #    outdir         output directory path
 # -------------------------------------------------------------------------------------

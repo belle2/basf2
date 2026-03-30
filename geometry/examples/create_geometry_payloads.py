@@ -9,8 +9,8 @@
 ##########################################################################
 
 """
-Create a full set of consistent geometry payloads for nominal geometry, phase 2
-geometry, and early phase 3 geometry from XML files.
+Create a full set of consistent geometry payloads for nominal geometry, run 0 (phase 2)
+geometry, and run 1 (early phase 3) geometry from XML files.
 
 Optionally one can give a list of payload names to keep only a subset of payloads
 """
@@ -54,11 +54,13 @@ phase2.add_module("Geometry", createPayloads=True, payloadIov=[1002, 0, 1002, -1
                   additionalComponents=[e + "-phase2" for e in phase2_detectors])
 b2test_utils.safe_process(phase2)
 
-# create early phase3 geometry: same as phase 3 but different PXD configuration
-early3 = basf2.Path()
-early3.add_module("EventInfoSetter")
-early3.add_module("Gearbox")
-early3.add_module(
+# create run 1 (early phase3) geometry: same as run 2 (phase 3) but
+# different PXD, ServiceGapsMaterial, BeamPipe, Cryostat, FarBeamLine
+# configuration
+run1 = basf2.Path()
+run1.add_module("EventInfoSetter")
+run1.add_module("Gearbox")
+run1.add_module(
     "Geometry",
     createPayloads=True,
     payloadIov=[
@@ -69,16 +71,16 @@ early3.add_module(
     excludedComponents=[
         'PXD',
         'ServiceGapsMaterial',
-        'Cryostat',
         'BeamPipe',
+        'Cryostat',
         'FarBeamLine'],
     additionalComponents=[
-        'PXD-earlyPhase3',
-        'ServiceGapsMaterial-earlyPhase3',
-        'BeamPipe-earlyPhase3',
-        'Cryostat-earlyPhase3',
-    ])
-b2test_utils.safe_process(early3)
+        'PXD-Run1',
+        'ServiceGapsMaterial-Run1',
+        'BeamPipe-Run1',
+        'Cryostat-Run1',
+        ])
+b2test_utils.safe_process(run1)
 
 # most of the components are identical so we avoid uploading two
 # revisions so we remove most of them. We only need separate payloads for the
@@ -86,13 +88,12 @@ b2test_utils.safe_process(early3)
 phase2_comp_list = ["GeoConfiguration", "PXDGeometryPar", "SVDGeometryPar", "BeamPipeGeo", "ServiceGapsMaterialsPar"]
 # once we have a different ServiceGapsMaterial configuration for phase 3 we
 # want to put that here as well
-early3_comp_list = [
+run1_comp_list = [
     "GeoConfiguration",
     "PXDGeometryPar",
     "BeamabortGeo",
     "BeamPipeGeo",
     "CryostatGeo",
-    "FarBeamLineGeo",
     "ServiceGapsMaterialsPar"]
 database_content = []
 line_match = re.compile(r"^dbstore/(.*?) ([0-9a-f]+) ([0-9\-,]*)$")
@@ -110,15 +111,15 @@ with open("localdb/database.txt") as dbfile:
             if name in phase2_comp_list:
                 keep.add((name, str(revision)))  # we keep all revision one payloads somehow
                 database_content.append(f'dbstore/{name} {revision} 0,0,0,-1\n')
-                if name not in early3_comp_list:
+                if name not in run1_comp_list:
                     database_content.append(f'dbstore/{name} {revision} 1003,0,1003,-1\n')
-                # luckily nothing we have in early phase 3 is identical between
-                # phase 3 and phase 2 so need for extra checks if in early3 but
-                # not phase2
+                # luckily nothing we have in run 1 (early phase 3) is identical between
+                # run 0 and run 1 so need for extra checks if in run 1 but
+                # not run 0
                 continue
         elif iov[0] == 1002 and name not in phase2_comp_list:
             continue
-        elif iov[0] == 1003 and name not in early3_comp_list:
+        elif iov[0] == 1003 and name not in run1_comp_list:
             continue
 
         # otherwise keep as it is ...

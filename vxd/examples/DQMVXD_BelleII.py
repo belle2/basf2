@@ -17,10 +17,16 @@ import PXDROIUnpackerModule
 
 import argparse
 parser = argparse.ArgumentParser(
-    description="VXD DQM Belle II for Phase 2 (Exp=1), Phase 3 Early (Exp=2) and Phase 3 regular (Exp=3), show all possible histos")
-parser.add_argument('--experiment-type', dest='ExperimentType', action='store',
-                    default=2, type=int,
-                    help='Set which experiment you want: 1 (Phase 2), 2 (Phase 3 Early) or 3 (Phase 3 regular), default = 2')
+    description=("VXD DQM Belle II for Run 0 (Phase 2, Exp=1), Run 1 (Phase 3 Early, Exp=2) "
+                 "and Run 2 (Phase 3 regular, Exp=3), show all possible histos")
+    )
+parser.add_argument(
+    '--experiment-type',
+    dest='ExperimentType',
+    action='store',
+    default=2,
+    type=int,
+    help='Set which experiment you want: 1 (Run 0, Phase 2), 2 (Run 1, Phase 3 Early) or 3 (Run 2, Phase 3 regular), default = 2')
 
 args = parser.parse_args()
 
@@ -46,13 +52,15 @@ if (args.ExperimentType == 3):
 main = b2.create_path()
 
 if (args.ExperimentType == 1):
-    # the experiment number for phase2 MC has to be 1002, otherwise the wrong payloads (for VXDTF2 the SectorMap) are loaded
+    # the experiment number for run 0 (phase2) MC has to be 1002,
+    # otherwise the wrong payloads (for VXDTF2 the SectorMap) are loaded
     main.add_module("EventInfoSetter", expList=1002, runList=1, evtNumList=num_events)
 if (args.ExperimentType == 2):
-    # the experiment number for early phase3 MC has to be 1003, otherwise the wrong payloads for this faze are loaded
+    # the experiment number for run 1 (early phase3) MC has to be 1003,
+    # otherwise the wrong payloads for this faze are loaded
     main.add_module("EventInfoSetter", expList=1003, runList=1, evtNumList=num_events)
 if (args.ExperimentType == 3):
-    # the experiment number for regular phase3 MC has no need to set, it is default
+    # the experiment number for run 2 (regular phase3) MC has no need to set, it is default
     main.add_module("EventInfoSetter", evtNumList=num_events)
 
 # in case you need to fix seed of random numbers

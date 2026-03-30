@@ -86,22 +86,27 @@ namespace Belle2::Conditions {
         // Column indices from nopayloaddb SQL query:
         // 0: payload_type_name, 1: payload_url, 2: checksum, 3: size,
         // 4: major_iov, 5: minor_iov, 6: major_iov_end, 7: minor_iov_end
-        addPayload(PayloadMetadata(
-                     row.at(0).get<std::string>(),  // payload_type_name (module name)
-                     globaltag,
-                     row.at(1).get<std::string>(),  // payload_url
-                     m_payloadBaseUrl,
-                     row.at(2).get<std::string>(),  // checksum
-                     row.at(4).get<int>(),          // major_iov (expStart)
-                     row.at(5).get<int>(),          // minor_iov (runStart)
-                     row.at(6).get<int>(),          // major_iov_end (expEnd)
-                     row.at(7).get<int>(),          // minor_iov_end (runEnd)
-                     1                              // revision (not provided, use default)
-                   ));
-        B2INFO("Conditions Database: added payload from new central server"
-               << LogVar("module", row.at(0).get<std::string>())
-               << LogVar("url", row.at(1).get<std::string>())
-               << LogVar("checksum", row.at(2).get<std::string>()));
+        // Also: check if the current (exp, run) falls into the payload IoV:
+        // if yes, let's keep the payload, otherwise skip it.
+        const IntervalOfValidity iov{row.at(4).get<int>(), row.at(5).get<int>(), row.at(6).get<int>(), row.at(7).get<int>()};
+        if (iov.contains(exp, run)) {
+          addPayload(PayloadMetadata(
+                       row.at(0).get<std::string>(),  // payload_type_name (module name)
+                       globaltag,
+                       row.at(1).get<std::string>(),  // payload_url
+                       m_payloadBaseUrl,
+                       row.at(2).get<std::string>(),  // checksum
+                       iov.getExperimentLow(),        // major_iov (expStart)
+                       iov.getRunLow(),               // minor_iov (runStart)
+                       iov.getExperimentHigh(),       // major_iov_end (expEnd)
+                       iov.getRunHigh(),              // minor_iov_end (runEnd)
+                       1                              // revision (not provided, use default)
+                     ));
+          B2INFO("Conditions Database: added payload from new central server"
+                 << LogVar("module", row.at(0).get<std::string>())
+                 << LogVar("url", row.at(1).get<std::string>())
+                 << LogVar("checksum", row.at(2).get<std::string>()));
+        }
       }
 
       B2INFO("Conditions Database: fetched " << payloads.size() << " payloads for globaltag"

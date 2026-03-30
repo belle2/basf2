@@ -34,8 +34,8 @@ namespace Belle2::Conditions {
     printInfoMessage(m_baseUrl);
     B2DEBUG(31, "Conditions Database: unusable globaltag states: " << invalidStates);
     for (const auto& status : validStates) {
-      B2WARNING("Conditions Database: status marked as usable for global tags is not known to the database"
-                << LogVar("status", status));
+      B2DEBUG(31, "Conditions Database: status marked as usable for global tags is not known to the database"
+              << LogVar("status", status));
 
     }
   }

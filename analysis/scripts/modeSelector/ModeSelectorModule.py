@@ -135,6 +135,10 @@ class ModeSelectorModule(b2.Module):
         self._presel_total_candidates = 0
         #: Number of candidates failing at least one preselection cut
         self._presel_violation_count = 0
+        #: Number of inference events where unsupported experiment ids were replaced
+        self._unsupported_experiment_event_count = 0
+        #: Counts of unsupported raw experiment ids seen during inference
+        self._unsupported_experiment_counts = {}
 
         # Feature configuration (from modeSelector.config)
         #: Number of input_id slots (B+ sector + B0 sector, each split by particle/antiparticle)
@@ -384,14 +388,27 @@ class ModeSelectorModule(b2.Module):
         event_feat_values.append(scnd_max_input_id / 50.0)
 
         # Add experiment number (from EventMetaData)
-        event_meta = Belle2.PyStoreObj('EventMetaData')
-        experiment = int(event_meta.getExperiment()) if event_meta.isValid() else 0
+        experiment = self._get_inference_experiment_feature_value()
         event_feat_values.append(experiment / 10.0)
 
         # Concatenate all features
         all_features = np.concatenate([flat_features, np.array(event_feat_values, dtype=np.float32)])
 
         return all_features, max_input_id, n_candidates
+
+    def _get_inference_experiment_feature_value(self):
+        """Return the raw experiment id."""
+        event_meta = Belle2.PyStoreObj('EventMetaData')
+        experiment = int(event_meta.getExperiment()) if event_meta.isValid() else 0
+
+        if self.training_mode or experiment in config.ALLOWED_EXPERIMENTS:
+            return experiment
+
+        self._unsupported_experiment_event_count += 1
+        self._unsupported_experiment_counts[experiment] = (
+            self._unsupported_experiment_counts.get(experiment, 0) + 1
+        )
+        return config.DEFAULT_EXPERIMENT
 
     def _get_event_features(self):
         """Extract event-level features from EventShapeContainer."""
@@ -606,6 +623,18 @@ class ModeSelectorModule(b2.Module):
                 f"{config.PRESELECTION_DELTAE_MIN} < deltaE < {config.PRESELECTION_DELTAE_MAX}, "
                 f"cosTBTO < {config.PRESELECTION_COSTBTO_MAX}). "
                 f"Apply these cuts before running ModeSelector to match the training setup.\n{_sep}"
+            )
+
+        if self._unsupported_experiment_event_count > 0:
+            unsupported_summary = ", ".join(
+                f"{exp} ({count} event(s))"
+                for exp, count in sorted(self._unsupported_experiment_counts.items())
+            )
+            b2.B2WARNING(
+                "ModeSelector: unsupported EventMetaData experiment ids encountered in "
+                f"{self._unsupported_experiment_event_count} event(s); replaced with default "
+                f"experiment {config.DEFAULT_EXPERIMENT}. Observed unsupported values: "
+                f"{unsupported_summary}."
             )
 
         if self._inference_event_count > 0:

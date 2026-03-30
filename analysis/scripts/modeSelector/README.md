@@ -131,6 +131,10 @@ to prevent correlation with the output.
 | 1642 | `scnd_max_input_id` | best input_id from the other B type; -10 if absent | `val / 50` |
 | 1643 | `__experiment__` | `EventMetaData` | `val / 10` |
 
+In inference mode, the raw `EventMetaData` experiment id is accepted only for
+values present in the training sample. Any other value (such as `1003`), 
+is replaced with a default value. Both accepted and default value are defined in `config.py`.
+
 **`HAS_INPUTS`** - Hardcoded list of feature indices to keep (all-zero columns
 removed, blocks 7-8 and 10 excluded). To update, recompute with `train.py`
 (writes `has_inputs_recomputed.txt` on mismatch) and paste the result into `config.py`.

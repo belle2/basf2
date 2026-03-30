@@ -15,11 +15,6 @@ Usage:
 
     # Train main network (requires trained category network)
     python3 train.py --input modeSelector_training.npz --network main --cat_model networks/net_category.pt --output networks/
-
-The script implements:
-- loading the sparse ModeSelector training inputs and selecting the active features
-- event sampling and sigProb preselection before network training
-- category-label and main-label construction from the stored MC truth arrays
 """
 
 import argparse

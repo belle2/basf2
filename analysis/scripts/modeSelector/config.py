@@ -42,6 +42,12 @@ MONITOR_WARN_FRACTION = 1e-3  # 0.1%
 # Minimum best-candidate sigProb to count an event as high-confidence for monitoring.
 HIGH_CONF_SIGPROB_MIN = 0.01
 
+# Supported experiment ids for inference, based on training sample.
+ALLOWED_EXPERIMENTS = frozenset((12, 14, 16, 17, 18, 20, 22, 24, 26, 30, 33, 35))
+
+# Default experiment id used when inference sees an unsupported value (such as for run-independent MC).
+DEFAULT_EXPERIMENT = 18
+
 # Default sigProb working point used for FEI calibration lookup and training
 # preselection.
 DEFAULT_FEI_SIGPROB_THRESHOLD = 0.001

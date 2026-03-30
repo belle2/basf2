@@ -1,0 +1,75 @@
+# EventType: 1211010311
+# Descriptor: [B+ --> J/psi K_1(1400)+]
+# NickName: B+_J/psi_K_1(1400)+
+# Documentation:
+# Tested: Yes
+# Physics WG: Quarkonium WG
+# Responsible: Eunji Jang
+# Email: jej6744@gnu.ac.kr
+# Cuts: None
+# Date: 20250119
+# Comments:
+
+# K_1(1400) is replaced by usual K_1 here.
+
+Alias myB+ B+
+Alias myB- B-
+ChargeConj myB+ myB-
+#
+Alias myK'_1+ K'_1+
+Alias myK'_1- K'_1-
+ChargeConj myK'_1+ myK'_1-
+#
+#
+Alias myJ/psi J/psi
+#
+Alias myrho0 rho0
+#
+Alias myK*0 K*0
+Alias myanti-K*0 anti-K*0
+ChargeConj myK*0 myanti-K*0
+#
+Alias myomega omega
+#
+
+Decay Upsilon(4S)
+0.5    myB+  B-   VSS;
+0.5    B+  myB-   VSS;
+Enddecay
+
+#
+Decay myB+
+1.0   myJ/psi  myK'_1+                                 SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
+Enddecay
+CDecay myB-
+
+#
+Decay myK'_1+
+0.630000000   myK*0  pi+                                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.010000000   myrho0  K+                                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.010000000   myomega  K+                                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+CDecay myK'_1-
+
+
+#
+Decay myrho0
+1.0         pi+ pi-                        VSS;
+Enddecay
+
+#
+Decay myK*0
+1.0         K+  pi-                        VSS;
+Enddecay
+
+#
+Decay myJ/psi
+0.5         mu+  mu-                       VLL;
+0.5         e+  e-                         VLL;
+Enddecay
+
+Decay myomega
+1.0        pi+  pi-                        VSS;
+Enddecay
+#
+End

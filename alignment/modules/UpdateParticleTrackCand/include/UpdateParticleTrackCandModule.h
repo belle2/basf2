@@ -26,9 +26,6 @@ namespace Belle2 {
      */
     UpdateParticleTrackCandModule();
 
-    /** init */
-    virtual void initialize() override;
-
     /** update candidates */
     virtual void event() override;
 

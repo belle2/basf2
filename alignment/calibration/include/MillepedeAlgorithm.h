@@ -25,7 +25,7 @@ namespace Belle2 {
     MillepedeAlgorithm();
 
     /// Destructor
-    virtual ~MillepedeAlgorithm() {}
+    ~MillepedeAlgorithm() override {}
 
     /// Get the steering to set commands etc.
     PedeSteering& steering() {return m_steering;}
@@ -126,5 +126,4 @@ namespace Belle2 {
 
   };
 } // namespace Belle2
-
 

@@ -10,6 +10,7 @@
 #include <framework/database/MetadataProvider.h>
 #include <framework/database/Downloader.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/Conversion.h>
 
 using json = nlohmann::json;
 
@@ -95,7 +96,7 @@ namespace Belle2::Conditions {
 
         // Check if the current (exp, run) falls into the payload IoV:
         // if yes, let's keep the payload, otherwise skip it.
-        const IntervalOfValidity iov{payload.at("major_iov"), payload.at("minor_iov"), experimentHigh, runHigh};
+        const IntervalOfValidity iov{payload.at("major_iov"), payload.at("minor_iov"), static_cast<int>(experimentHigh), static_cast<int>(runHigh)};
         if (iov.contains(exp, run)) {
           addPayload(PayloadMetadata(
                        payload.at("payload_type_name"),
@@ -107,7 +108,7 @@ namespace Belle2::Conditions {
                        iov.getRunLow(),
                        iov.getExperimentHigh(),
                        iov.getRunHigh(),
-                       1                              // revision (not provided for now, use default)
+                       convertString<unsigned long int>(payload.at("revision"))
                      ));
           B2DEBUG(31, "Conditions Database: added payload from new central server"
                   << LogVar("Payload type name", payload.at("payload_type_name"))

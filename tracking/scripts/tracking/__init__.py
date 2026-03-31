@@ -208,7 +208,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
-    :param fit_tracks: If false, the final track fitting and the TrackCreator module will not be executed
+    :param fit_tracks: If false, the track fitting and the TrackCreator module will not be executed
     :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
         after the global algorithm (Legendre).
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
@@ -326,7 +326,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param pruneTracks: Delete all hits except the first and the last in the found tracks.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
-    :param fit_tracks: If false, the track find and the TrackCreator module will not be executed
+    :param fit_tracks: If false, the final track fitting and the TrackCreator module will not be executed
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.

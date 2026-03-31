@@ -3,7 +3,7 @@
 1                               * switch for KKMC-JETSET (1:on, 0:off)
 ********** Above is for basf *********
 
-* MCEventType: 3410930006 Descriptor: tau- -> pi-nu, tau+ -> mu+alpha + C.C (TauolaBelle2)
+* MCEventType: 3410930006 Descriptor: tau+ -> mu+alpha + C.C (TauolaBelle2)
 * alpha -> mu- mu+ [alpha: pseudoscalar, mass 1.5 GeV, width 1 MeV, ctau = 0.01 cm]
 
 BeginX
@@ -28,7 +28,7 @@ BeginX
 ********************************************************************************
   901              4      Ihvp  ! =1,2,3,4
 ********************************************************************************
- 2001          303e0      Jak1   =xpar(71)  First  Tau decay mask (tau-)
+ 2001            0e0      Jak1   =xpar(71)  First  Tau decay mask (tau-)
  2002          373e0      Jak2   =xpar(72)  Second Tau decay mask (tau+)
 ********************************************************************************
  2900            1e0      BBB    0: ORIG  1: BBB

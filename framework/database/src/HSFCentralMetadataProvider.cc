@@ -32,10 +32,6 @@ namespace Belle2::Conditions {
         invalidStates += status;
       }
     }
-
-    // TODO: get m_payloadBaseUrl from the API
-    m_payloadBaseUrl = "http://belle2db-files.sdcc.bnl.gov/";
-
     B2DEBUG(31, "Infinite IoV value is set to " << m_maxIoV);
     printInfoMessage(m_baseUrl);
     B2DEBUG(31, "Conditions Database: unusable globaltag states: " << invalidStates);
@@ -44,6 +40,9 @@ namespace Belle2::Conditions {
               << LogVar("status", status));
 
     }
+    const auto payloadUrl = get("user_settings/CDB_PAYLOAD_BASE_URL");
+    m_payloadBaseUrl = payloadUrl.at("CDB_PAYLOAD_BASE_URL");
+    B2DEBUG(31, "Fetched payload location" << LogVar("URL", m_payloadBaseUrl));
   }
 
   json HSFCentralMetadataProvider::get(const std::string& url)

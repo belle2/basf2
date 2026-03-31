@@ -18,8 +18,6 @@
 #include <mva/interface/Weightfile.h>
 #include <mva/interface/Expert.h>
 
-#include <boost/algorithm/string/predicate.hpp>
-
 // here's where the functions are hidden
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"
 
@@ -56,7 +54,7 @@ void KLMExpertModule::initialize()
   m_klmClusters.registerRelationTo(m_klids);
 
 
-  if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
+  if (not(m_identifier.ends_with(".root") or m_identifier.ends_with(".xml"))) {
     m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
                                   DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifier));
   }

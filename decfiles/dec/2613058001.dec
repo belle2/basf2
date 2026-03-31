@@ -1,0 +1,35 @@
+# EventType: 2613058001
+# Descriptor: [ccbar Dstm2anti-D0Pim anti-D02PimPipanti-Etap anti-Etap2PimPipanti-Eta anti-Eta2GammaGamma]
+# NickName: Dstm2anti-D0Pim_anti-D02PimPipanti-Etap_anti-Etap2PimPipanti-Eta_anti-Eta2GammaGamma
+# PhysicsWG: Charm
+# Responsible: Young Jun Kim 
+# Date: 20251222 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Alias Myanti-D0 anti-D0
+Alias Myetaprime eta'
+Alias Myeta eta
+
+Decay D*-
+1.000 Myanti-D0 pi-       VSS;
+Enddecay
+
+Decay Myanti-D0
+1.000 pi- pi+ Myetaprime       PHSP;
+Enddecay
+
+Decay Myetaprime
+1.000 pi+ pi- Myeta       ETAPRIME_DALITZ  -0.047  -0.069  0.0  0.073;
+Enddecay
+
+Decay Myeta
+1.000 gamma gamma       PHSP;
+Enddecay
+
+End
+

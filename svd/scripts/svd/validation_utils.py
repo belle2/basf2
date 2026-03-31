@@ -235,18 +235,18 @@ def get_histos(CollectorHistograms):
 
     histos = {}
 
-    histos['eventT0'] = CollectorHistograms['hEventT0'][0]
+    histos['eventT0'] = CollectorHistograms['hEventT0']
 
     histos_all = {}
     histos['onTracks'] = {}
     histos['diff'] = {}
     histos['timeShifter'] = {}
 
-    __hClsTimeOnTracks__ = CollectorHistograms['hClsTimeOnTracks'][0]
-    __hClsTimeAll__ = CollectorHistograms['hClsTimeAll'][0]
-    __hClsDiffTimeOnTracks__ = CollectorHistograms['hClsDiffTimeOnTracks'][0]
-    __hClusterSizeVsTimeResidual__ = CollectorHistograms['hClusterSizeVsTimeResidual'][0]
-    __hBinToSensorMap__ = CollectorHistograms['hBinToSensorMap'][0]
+    __hClsTimeOnTracks__ = CollectorHistograms['hClsTimeOnTracks']
+    __hClsTimeAll__ = CollectorHistograms['hClsTimeAll']
+    __hClsDiffTimeOnTracks__ = CollectorHistograms['hClsDiffTimeOnTracks']
+    __hClusterSizeVsTimeResidual__ = CollectorHistograms['hClusterSizeVsTimeResidual']
+    __hBinToSensorMap__ = CollectorHistograms['hBinToSensorMap']
 
     for name_side in names_sides:
         sensorBin = __hBinToSensorMap__.GetXaxis().FindBin(name_side)
@@ -352,5 +352,6 @@ def get_merged_collector_histograms(files):
                 for key in CollectorHistograms[algo][exp][run]:
                     for hist in CollectorHistograms[algo][exp][run][key][1:]:
                         CollectorHistograms[algo][exp][run][key][0].Add(hist)
+                    CollectorHistograms[algo][exp][run][key] = CollectorHistograms[algo][exp][run][key][0]
 
     return CollectorHistograms

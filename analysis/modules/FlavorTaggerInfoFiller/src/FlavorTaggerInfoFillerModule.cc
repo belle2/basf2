@@ -32,6 +32,7 @@ FlavorTaggerInfoFillerModule::FlavorTaggerInfoFillerModule() : Module()
   addParam("FANNmlp", m_FANNmlp, "Sets if FANN Combiner output will be saved or not", false);
   addParam("TMVAfbdt", m_TMVAfbdt, "Sets if FANN Combiner output will be saved or not", false);
   addParam("DNNmlp", m_DNNmlp, "Sets if DNN Tagger output will be saved or not", false);
+  addParam("TFLATnn", m_TFLATnn, "Sets if TFLAT Tagger output will be saved or not", false);
   addParam("qpCategories", m_qpCategories, "Sets if individual categories output will be saved or not", false);
   addParam("istrueCategories", m_istrueCategories, "Sets if individual MC truth for each category is saved or not", false);
   addParam("targetProb", m_targetProb, "Sets if individual Categories output will be saved or not", false);
@@ -95,6 +96,19 @@ void FlavorTaggerInfoFillerModule::event()
     infoMapsDNN->setQrCombined(qrCombined);
     infoMapsDNN->setB0Probability(B0Probability);
     infoMapsDNN->setB0barProbability(B0barProbability);
+  }
+
+  if (m_TFLATnn) {
+    FlavorTaggerInfoMap* infoMapsTFLAT = flavorTaggerInfo -> getMethodMap("TFLAT");
+    const Particle* particle = m_roe->getRelatedFrom<Particle>();
+    float B0Probability = particle->getExtraInfo("tflat_output");
+    float B0barProbability = 1 - B0Probability;
+    float qrCombined = 2 * (B0Probability - 0.5);
+    if (qrCombined < 1.1 && qrCombined > 1.0) qrCombined = 1.0;
+    if (qrCombined > - 1.1 && qrCombined < -1.0) qrCombined = -1.0;
+    infoMapsTFLAT->setQrCombined(qrCombined);
+    infoMapsTFLAT->setB0Probability(B0Probability);
+    infoMapsTFLAT->setB0barProbability(B0barProbability);
   }
 
 

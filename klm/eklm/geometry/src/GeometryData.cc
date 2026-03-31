@@ -719,3 +719,22 @@ EKLM::GeometryData::getSheetTransform(HepGeom::Transform3D* t, int n) const
   *t = HepGeom::Translate3D(m_StripPosition[n].getX(), y, 0.0);
 }
 
+
+double EKLM::GeometryData::getEKLMLayerArea() const
+{
+  // EKLM: all layers have the same area per sector
+  // Read strip parameters from EKLMGeometry (inherited)
+  const EKLMGeometry::StripGeometry* stripGeom = getStripGeometry();
+  double stripWidth = stripGeom->getWidth() / 10.0; // Convert mm to cm
+  int nStrips = getNStrips();
+
+  // Calculate total area per sector by summing strip areas
+  double layerArea = 0.0;
+  for (int stripId = 1; stripId <= nStrips; ++stripId) {
+    double stripLength = getStripLength(stripId) / 10.0; // Convert mm to cm
+    layerArea += stripLength * stripWidth;
+  }
+
+  return layerArea;
+}
+

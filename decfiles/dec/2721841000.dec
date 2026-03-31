@@ -1,0 +1,36 @@
+# EventType: 2721841000
+# Descriptor: [e+e- -> K+ K- (chi_c1 -> (J/psi -> mu+ mu- / e+ e-) gamma)]
+# NickName: ee_K+K-_chi_c1
+# Documentation: Study of ee -> K+ K- chi_c1
+# Tested: Yes
+# PhysicsWG: Quarkonium
+# Responsible: Yijia Chen
+# Email: 2411020002@m.fudan.edu.cn
+# Cuts: None
+# Date: 202601017
+#
+#
+
+
+Alias myJ/psi J/psi
+Alias mychic1 chi_c1
+
+Decay vpho
+1.0  K+ K- mychic1 PHSP;
+Enddecay
+
+Decay mychic1
+1.0 myJ/psi   gamma                                   VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; #[Reconstructed PDG2011]
+Enddecay
+
+Decay myJ/psi
+0.5 e+ e- PHOTOS VLL;
+0.5 mu+ mu- PHOTOS VLL;
+Enddecay
+
+
+
+
+
+End
+

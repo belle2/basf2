@@ -923,7 +923,7 @@
          <sec name="r7" unit="cm">21.00</sec-->
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C1wal1</MotherVolume>
-         <Material>W</Material>
+         <Material>SUS316L</Material>
          <Desc>Tungsten shield forward</Desc>
       </Straight>
       <Straight name="C2spc1">
@@ -2658,7 +2658,7 @@
          <sec name="R1" unit="cm">12.71</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F1wal1</MotherVolume>
-         <Material>W</Material>
+         <Material>SUS316L</Material>
          <Desc>Tungsten shield backward</Desc>
       </Straight>
       <Straight name="F2spc1">
@@ -3494,6 +3494,637 @@
          <Material>SUS316L</Material>
          <Desc>Right support mount</Desc>
       </Shield>
+
+      <!--   2023 QCS shielding -->
+
+      <PolyBlock name="polyBlock-R-L1">
+         <sec name="L" unit="mm">450</sec>
+         <sec name="R" unit="mm">283.80</sec>
+         <sec name="r0" unit="mm">265.00</sec>
+         <sec name="r" unit="mm">265.50</sec>
+         <sec name="W" unit="mm">49.408</sec>
+         <sec name="w" unit="mm">46.109</sec>
+         <sec name="t" unit="mm">16.8</sec>
+         <sec name="Z0" unit="mm">1401.0</sec>
+         <N desc="Number of instances">10</N>
+         <sec name="PHI0" unit="rad">0.2095</sec>
+         <sec name="PHI1" unit="rad">0.3840</sec>
+         <sec name="PHI2" unit="rad">2.5657</sec>
+         <sec name="PHI3" unit="rad">2.7402</sec>
+         <sec name="PHI4" unit="rad">2.9147</sec>
+         <sec name="PHI5" unit="rad">-0.2269</sec>
+         <sec name="PHI6" unit="rad">-0.4014</sec>
+         <sec name="PHI7" unit="rad">-0.5760</sec>
+         <sec name="PHI8" unit="rad">-2.7576</sec>
+         <sec name="PHI9" unit="rad">-2.9322</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Right polyethylene QCS shield, type L1</Desc>
+      </PolyBlock>
+
+      <PolyBlock name="polyBlock-R-L2">
+         <sec name="L" unit="mm">450</sec>
+         <sec name="R" unit="mm">283.80</sec>
+         <sec name="r0" unit="mm">265.00</sec>
+         <sec name="r" unit="mm">265.50</sec>
+         <sec name="W" unit="mm">44.509</sec>
+         <sec name="w" unit="mm">41.508</sec>
+         <sec name="t" unit="mm">16.8</sec>
+         <sec name="Z0" unit="mm">1401.0</sec>
+         <N desc="Number of instances">12</N>
+         <sec name="PHI0" unit="rad">0.9949</sec>
+         <sec name="PHI1" unit="rad">1.1519</sec>
+         <sec name="PHI2" unit="rad">1.3091</sec>
+         <sec name="PHI3" unit="rad">1.6756</sec>
+         <sec name="PHI4" unit="rad">1.8326</sec>
+         <sec name="PHI5" unit="rad">1.9897</sec>
+         <sec name="PHI6" unit="rad">-1.1607</sec>
+         <sec name="PHI7" unit="rad">-1.3178</sec>
+         <sec name="PHI8" unit="rad">-1.4748</sec>
+         <sec name="PHI9" unit="rad">-1.8239</sec>
+         <sec name="PHI10" unit="rad">-1.9810</sec>
+         <sec name="PHI11" unit="rad">-2.1381</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Right polyethylene QCS shield, type L2</Desc>
+      </PolyBlock>
+
+      <PolyBlock name="polyBlock-R-L2s">
+         <sec name="L" unit="mm">230</sec>
+         <sec name="R" unit="mm">283.80</sec>
+         <sec name="r0" unit="mm">265.00</sec>
+         <sec name="r" unit="mm">265.50</sec>
+         <sec name="W" unit="mm">44.59</sec>
+         <sec name="w" unit="mm">41.58</sec>
+         <sec name="t" unit="mm">16.8</sec>
+         <sec name="Z0" unit="mm">1516.0</sec>
+         <N desc="Number of instances">1</N>
+         <sec name="PHI0" unit="rad">-1.6494</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Right polyethylene QCS shield, type L2 short</Desc>
+      </PolyBlock>
+
+      <PolyBlock name="polyBlock-R-S1">
+         <sec name="L" unit="mm">230</sec>
+         <sec name="R" unit="mm">283.80</sec>
+         <sec name="r0" unit="mm">265.00</sec>
+         <sec name="r" unit="mm">265.50</sec>
+         <sec name="W0" unit="mm">54.40</sec>
+         <sec name="W" unit="mm">54.30</sec>
+         <sec name="w0" unit="mm">50.80</sec>
+         <sec name="w" unit="mm">50.70</sec>
+         <sec name="t" unit="mm">16.8</sec>
+         <sec name="Z0" unit="mm">1516.0</sec>
+         <N desc="Number of instances">8</N>
+         <sec name="PHI0" unit="rad">0.5934</sec>
+         <sec name="PHI1" unit="rad">0.7854</sec>
+         <sec name="PHI2" unit="rad">2.1642</sec>
+         <sec name="PHI3" unit="rad">2.3562</sec>
+         <sec name="PHI4" unit="rad">-0.7854</sec>
+         <sec name="PHI5" unit="rad">-0.9774</sec>
+         <sec name="PHI6" unit="rad">-2.3562</sec>
+         <sec name="PHI7" unit="rad">-2.5482</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Right polyethylene QCS shield, type S1</Desc>
+      </PolyBlock>
+
+      <PolyBlock name="polyBlock-L-T">
+         <sec name="L" unit="mm">75</sec>
+         <sec name="R" unit="mm">182.20</sec>
+         <sec name="r" unit="mm">153.50</sec>
+         <sec name="W" unit="mm">31.70</sec>
+         <sec name="w" unit="mm">26.70</sec>
+         <sec name="t" unit="mm">27.50</sec>
+         <sec name="Z0" unit="mm">-679.50</sec>
+         <sec name="cutL0" unit="mm">50.0</sec>
+         <sec name="cutW0" unit="mm">20.0</sec>
+         <sec name="cutH0" unit="mm">35.0</sec>
+         <sec name="cutX00" unit="mm">-30.35</sec>
+         <sec name="cutY00" unit="mm">15.85</sec>
+         <sec name="cutZ00" unit="mm">-19.43</sec>
+         <sec name="cutPHI0" unit="rad">-0.3467</sec>
+         <N desc="Number of instances">32</N>
+         <sec name="PHI0" unit="rad">0.1745</sec>
+         <sec name="PHI1" unit="rad">0.3491</sec>
+         <sec name="PHI2" unit="rad">0.5236</sec>
+         <sec name="PHI3" unit="rad">0.6981</sec>
+         <sec name="PHI4" unit="rad">0.8727</sec>
+         <sec name="PHI5" unit="rad">1.0472</sec>
+         <sec name="PHI6" unit="rad">1.2217</sec>
+         <sec name="PHI7" unit="rad">1.3962</sec>
+         <sec name="PHI8" unit="rad">1.5708</sec>
+         <sec name="PHI9" unit="rad">1.7453</sec>
+         <sec name="PHI10" unit="rad">1.9198</sec>
+         <sec name="PHI11" unit="rad">2.0944</sec>
+         <sec name="PHI12" unit="rad">2.2689</sec>
+         <sec name="PHI13" unit="rad">2.4434</sec>
+         <sec name="PHI14" unit="rad">2.6180</sec>
+         <sec name="PHI15" unit="rad">2.7925</sec>
+         <sec name="PHI16" unit="rad">-2.9670</sec>
+         <sec name="PHI17" unit="rad">-2.7925</sec>
+         <sec name="PHI18" unit="rad">-2.6180</sec>
+         <sec name="PHI19" unit="rad">-2.4434</sec>
+         <sec name="PHI20" unit="rad">-2.2689</sec>
+         <sec name="PHI21" unit="rad">-2.0944</sec>
+         <sec name="PHI22" unit="rad">-1.9198</sec>
+         <sec name="PHI23" unit="rad">-1.7453</sec>
+         <sec name="PHI24" unit="rad">-1.5708</sec>
+         <sec name="PHI25" unit="rad">-1.3962</sec>
+         <sec name="PHI26" unit="rad">-1.2217</sec>
+         <sec name="PHI27" unit="rad">-1.0472</sec>
+         <sec name="PHI28" unit="rad">-0.8727</sec>
+         <sec name="PHI29" unit="rad">-0.6981</sec>
+         <sec name="PHI30" unit="rad">-0.5236</sec>
+         <sec name="PHI31" unit="rad">-0.3491</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Left polyethylene QCS shield, type T</Desc>
+      </PolyBlock>
+
+      <PolyBlock name="polyBlock-L-M1">
+         <sec name="L" unit="mm">245.0</sec>
+         <sec name="R" unit="mm">255.9</sec>
+         <sec name="r0" unit="mm">202.5</sec>
+         <sec name="r" unit="mm">203.0</sec>
+         <sec name="W0" unit="mm">35.70</sec>
+         <sec name="W" unit="mm">35.60</sec>
+         <sec name="w0" unit="mm">28.25</sec>
+         <sec name="w" unit="mm">28.15</sec>
+         <sec name="t" unit="mm">52.08</sec>
+         <sec name="Z0" unit="mm">-865.5</sec>
+         <sec name="cutL0" unit="mm">150.0</sec>
+         <sec name="cutW0" unit="mm">20.0</sec>
+         <sec name="cutH0" unit="mm">40.0</sec>
+         <sec name="cutX000" unit="mm">-55.98</sec>
+         <sec name="cutX00" unit="mm">-55.30</sec>
+         <sec name="cutY00" unit="mm">17.86</sec>
+         <sec name="cutZ00" unit="mm">-51.99</sec>
+         <sec name="cutPHI0" unit="rad">-0.1020</sec>
+         <N desc="Number of instances">6</N>
+         <sec name="PHI0" unit="rad">-1.2915</sec>
+         <sec name="PHI1" unit="rad">-1.4311</sec>
+         <sec name="PHI2" unit="rad">-1.5708</sec>
+         <sec name="PHI3" unit="rad">-1.7104</sec>
+         <sec name="PHI4" unit="rad">-1.8500</sec>
+         <sec name="PHI5" unit="rad">-1.9897</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Left polyethylene QCS shield, type M1</Desc>
+      </PolyBlock>
+
+      <PolyBlock name="polyBlock-L-M2">
+         <sec name="L" unit="mm">180.0</sec>
+         <sec name="R0" unit="mm">256.6</sec>
+         <sec name="R" unit="mm">256.3</sec>
+         <sec name="r0" unit="mm">202.5</sec>
+         <sec name="r" unit="mm">203.0</sec>
+         <sec name="W" unit="mm">35.80</sec>
+         <sec name="w" unit="mm">28.25</sec>
+         <sec name="t" unit="mm">52.77</sec>
+         <sec name="Z0" unit="mm">-833.0</sec>
+         <sec name="cutL0" unit="mm">90.0</sec>
+         <sec name="cutW0" unit="mm">12.0</sec>
+         <sec name="cutH0" unit="mm">40.0</sec>
+         <sec name="cutX000" unit="mm">-56.02</sec>
+         <sec name="cutX00" unit="mm">-55.30</sec>
+         <sec name="cutY00" unit="mm">17.90</sec>
+         <sec name="cutZ00" unit="mm">-50.54</sec>
+         <sec name="cutPHI0" unit="rad">-0.1015</sec>
+         <N desc="Number of instances">2</N>
+         <sec name="PHI0" unit="rad">-2.8274</sec>
+         <sec name="PHI1" unit="rad">-0.4538</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Left polyethylene QCS shield, type M2</Desc>
+      </PolyBlock>
+
+      <PolyBlock name="polyBlock-L-M3">
+         <sec name="L" unit="mm">245.0</sec>
+         <sec name="R" unit="mm">256.0</sec>
+         <sec name="r0" unit="mm">202.5</sec>
+         <sec name="r" unit="mm">203.0</sec>
+         <sec name="W" unit="mm">35.71</sec>
+         <sec name="w" unit="mm">28.25</sec>
+         <sec name="t" unit="mm">52.08</sec>
+         <sec name="Z0" unit="mm">-865.5</sec>
+         <sec name="cutL0" unit="mm">150.0</sec>
+         <sec name="cutW0" unit="mm">20.0</sec>
+         <sec name="cutH0" unit="mm">40.0</sec>
+         <sec name="cutX000" unit="mm">-55.98</sec>
+         <sec name="cutX00" unit="mm">-55.30</sec>
+         <sec name="cutY00" unit="mm">17.86</sec>
+         <sec name="cutZ00" unit="mm">-51.99</sec>
+         <sec name="cutPHI0" unit="rad">-0.1020</sec>
+         <sec name="cutL1" unit="mm">30.0</sec>
+         <sec name="cutW1" unit="mm">20.0</sec>
+         <sec name="cutH1" unit="mm">40.0</sec>
+         <sec name="cutX01" unit="mm">-50.07</sec>
+         <sec name="cutY01" unit="mm">17.86</sec>
+         <sec name="cutZ01" unit="mm">117.50</sec>
+         <sec name="cutPHI1" unit="rad">0.0</sec>
+         <N desc="Number of instances">2</N>
+         <sec name="PHI0" unit="rad">1.0995</sec>
+         <sec name="PHI1" unit="rad">1.9024</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Left polyethylene QCS shield, type M3</Desc>
+      </PolyBlock>
+
+      <PolyBlock name="polyBlock-L-0">
+         <sec name="L" unit="mm">268.62</sec>
+         <sec name="R" unit="mm">226.76</sec>
+         <sec name="r" unit="mm">218.78</sec>
+         <sec name="W" unit="mm">39.10</sec>
+         <sec name="w" unit="mm">37.73</sec>
+         <sec name="t" unit="mm">6.35</sec>
+         <sec name="Z0" unit="mm">-1142.22</sec>
+         <sec name="TH" unit="rad">-0.1012</sec>
+         <sec name="dr" unit="mm">27.20</sec>
+         <N desc="Number of instances">27</N>
+         <sec name="PHI0" unit="rad">0.2451</sec>
+         <sec name="PHI1" unit="rad">0.4196</sec>
+         <sec name="PHI2" unit="rad">0.5941</sec>
+         <sec name="PHI3" unit="rad">0.7687</sec>
+         <sec name="PHI4" unit="rad">0.9432</sec>
+         <sec name="PHI5" unit="rad">1.1177</sec>
+         <sec name="PHI6" unit="rad">1.8856</sec>
+         <sec name="PHI7" unit="rad">2.0602</sec>
+         <sec name="PHI8" unit="rad">2.2347</sec>
+         <sec name="PHI9" unit="rad">2.4093</sec>
+         <sec name="PHI10" unit="rad">2.5838</sec>
+         <sec name="PHI11" unit="rad">2.7583</sec>
+         <sec name="PHI12" unit="rad">-0.3134</sec>
+         <sec name="PHI13" unit="rad">-0.4879</sec>
+         <sec name="PHI14" unit="rad">-0.6625</sec>
+         <sec name="PHI15" unit="rad">-0.8370</sec>
+         <sec name="PHI16" unit="rad">-1.0115</sec>
+         <sec name="PHI17" unit="rad">-1.1861</sec>
+         <sec name="PHI18" unit="rad">-1.3606</sec>
+         <sec name="PHI19" unit="rad">-1.7446</sec>
+         <sec name="PHI20" unit="rad">-1.9191</sec>
+         <sec name="PHI21" unit="rad">-2.0936</sec>
+         <sec name="PHI22" unit="rad">-2.2682</sec>
+         <sec name="PHI23" unit="rad">-2.4427</sec>
+         <sec name="PHI24" unit="rad">-2.6173</sec>
+         <sec name="PHI25" unit="rad">-2.7918</sec>
+         <sec name="PHI26" unit="rad">-2.9660</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Left polyethylene QCS shield, type QCS2-0</Desc>
+      </PolyBlock>
+
+      <PolyBlock name="polyBlock-L-S">
+         <sec name="L" unit="mm">169.13</sec>
+         <sec name="R" unit="mm">236.86</sec>
+         <sec name="r" unit="mm">226.86</sec>
+         <sec name="W" unit="mm">40.75</sec>
+         <sec name="w" unit="mm">39.00</sec>
+         <sec name="t" unit="mm">10.00</sec>
+         <sec name="Z0" unit="mm">-1092.14</sec>
+         <sec name="TH" unit="rad">-0.1012</sec>
+         <sec name="dr" unit="mm">17.11</sec>
+         <N desc="Number of instances">27</N>
+         <sec name="PHI0" unit="rad">0.2454</sec>
+         <sec name="PHI1" unit="rad">0.4200</sec>
+         <sec name="PHI2" unit="rad">0.5945</sec>
+         <sec name="PHI3" unit="rad">0.7690</sec>
+         <sec name="PHI4" unit="rad">0.9436</sec>
+         <sec name="PHI5" unit="rad">1.1181</sec>
+         <sec name="PHI6" unit="rad">1.8860</sec>
+         <sec name="PHI7" unit="rad">2.0606</sec>
+         <sec name="PHI8" unit="rad">2.2351</sec>
+         <sec name="PHI9" unit="rad">2.4096</sec>
+         <sec name="PHI10" unit="rad">2.5842</sec>
+         <sec name="PHI11" unit="rad">2.7587</sec>
+         <sec name="PHI12" unit="rad">-0.3130</sec>
+         <sec name="PHI13" unit="rad">-0.4876</sec>
+         <sec name="PHI14" unit="rad">-0.6621</sec>
+         <sec name="PHI15" unit="rad">-0.8367</sec>
+         <sec name="PHI16" unit="rad">-1.0112</sec>
+         <sec name="PHI17" unit="rad">-1.1857</sec>
+         <sec name="PHI18" unit="rad">-1.3602</sec>
+         <sec name="PHI19" unit="rad">-1.7442</sec>
+         <sec name="PHI20" unit="rad">-1.9188</sec>
+         <sec name="PHI21" unit="rad">-2.0933</sec>
+         <sec name="PHI22" unit="rad">-2.2678</sec>
+         <sec name="PHI23" unit="rad">-2.4424</sec>
+         <sec name="PHI24" unit="rad">-2.6169</sec>
+         <sec name="PHI25" unit="rad">-2.7914</sec>
+         <sec name="PHI26" unit="rad">-2.9660</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Left polyethylene QCS shield, type SHIELD-S</Desc>
+      </PolyBlock>
+
+      <SWXLayer name="SWX-238-R-1">
+         <sec name="L" unit="mm">490.0</sec>
+         <sec name="r1" unit="mm">284.3</sec>
+         <sec name="r2" unit="mm">284.3</sec>
+         <sec name="t" unit="mm">3.2</sec>
+         <sec name="Z0" unit="mm">1385.0</sec>
+         <N desc="Number of cuts">8</N>
+         <!--cut 0 box-->
+         <sec name="cutType0" unit="mm">0</sec>
+         <sec name="cutL0" unit="mm">20.0</sec>
+         <sec name="cutW0" unit="mm">200.0</sec>
+         <sec name="cutH0" unit="mm">82.0</sec>
+         <sec name="cutX00" unit="mm">-200.0</sec>
+         <sec name="cutY00" unit="mm">200.0</sec>
+         <sec name="cutZ00" unit="mm">1234.5</sec>
+         <sec name="cutPHI0" unit="rad">-1.5708</sec>
+         <sec name="cutTH0" unit="rad">-0.7854</sec>
+         <!--cut 1 box-->
+         <sec name="cutType1" unit="mm">0</sec>
+         <sec name="cutL1" unit="mm">20.0</sec>
+         <sec name="cutW1" unit="mm">200.0</sec>
+         <sec name="cutH1" unit="mm">82.0</sec>
+         <sec name="cutX01" unit="mm">200.0</sec>
+         <sec name="cutY01" unit="mm">200.0</sec>
+         <sec name="cutZ01" unit="mm">1234.5</sec>
+         <sec name="cutPHI1" unit="rad">1.5708</sec>
+         <sec name="cutTH1" unit="rad">-0.7854</sec>
+         <!--cut 2 box-->
+         <sec name="cutType2" unit="mm">0</sec>
+         <sec name="cutL2" unit="mm">20.0</sec>
+         <sec name="cutW2" unit="mm">200.0</sec>
+         <sec name="cutH2" unit="mm">82.0</sec>
+         <sec name="cutX02" unit="mm">200.0</sec>
+         <sec name="cutY02" unit="mm">-200.0</sec>
+         <sec name="cutZ02" unit="mm">1234.5</sec>
+         <sec name="cutPHI2" unit="rad">1.5708</sec>
+         <sec name="cutTH2" unit="rad">0.7854</sec>
+         <!--cut 3 box-->
+         <sec name="cutType3" unit="mm">0</sec>
+         <sec name="cutL3" unit="mm">20.0</sec>
+         <sec name="cutW3" unit="mm">200.0</sec>
+         <sec name="cutH3" unit="mm">82.0</sec>
+         <sec name="cutX03" unit="mm">-200.0</sec>
+         <sec name="cutY03" unit="mm">-200.0</sec>
+         <sec name="cutZ03" unit="mm">1234.5</sec>
+         <sec name="cutPHI3" unit="rad">-1.5708</sec>
+         <sec name="cutTH3" unit="rad">0.7854</sec>
+         <!--cut 4 tubs-->
+         <sec name="cutType4" unit="mm">1</sec>
+         <sec name="cutL4" unit="mm">20.0</sec>
+         <sec name="cutR4" unit="mm">41.0</sec>
+         <sec name="cutX04" unit="mm">-200.0</sec>
+         <sec name="cutY04" unit="mm">200.0</sec>
+         <sec name="cutZ04" unit="mm">1334.5</sec>
+         <sec name="cutPHI4" unit="rad">-1.5708</sec>
+         <sec name="cutTH4" unit="rad">-0.7854</sec>
+         <!--cut 5 tubs-->
+         <sec name="cutType5" unit="mm">1</sec>
+         <sec name="cutL5" unit="mm">20.0</sec>
+         <sec name="cutR5" unit="mm">41.0</sec>
+         <sec name="cutX05" unit="mm">200.0</sec>
+         <sec name="cutY05" unit="mm">200.0</sec>
+         <sec name="cutZ05" unit="mm">1334.5</sec>
+         <sec name="cutPHI5" unit="rad">1.5708</sec>
+         <sec name="cutTH5" unit="rad">-0.7854</sec>
+         <!--cut 6 tubs-->
+         <sec name="cutType6" unit="mm">1</sec>
+         <sec name="cutL6" unit="mm">20.0</sec>
+         <sec name="cutR6" unit="mm">41.0</sec>
+         <sec name="cutX06" unit="mm">200.0</sec>
+         <sec name="cutY06" unit="mm">-200.0</sec>
+         <sec name="cutZ06" unit="mm">1334.5</sec>
+         <sec name="cutPHI6" unit="rad">1.5708</sec>
+         <sec name="cutTH6" unit="rad">0.7854</sec>
+         <!--cut 7 tubs-->
+         <sec name="cutType7" unit="mm">1</sec>
+         <sec name="cutL7" unit="mm">20.0</sec>
+         <sec name="cutR7" unit="mm">41.0</sec>
+         <sec name="cutX07" unit="mm">-200.0</sec>
+         <sec name="cutY07" unit="mm">-200.0</sec>
+         <sec name="cutZ07" unit="mm">1334.5</sec>
+         <sec name="cutPHI7" unit="rad">-1.5708</sec>
+         <sec name="cutTH7" unit="rad">0.7854</sec>
+         <Material>SWX-238</Material>
+         <Desc>Right SWX layer 1</Desc>
+      </SWXLayer>
+
+      <SWXLayer name="SWX-238-R-2">
+         <sec name="L" unit="mm">640.0</sec>
+         <sec name="r10" unit="mm">300.3</sec>
+         <sec name="r20" unit="mm">300.3</sec>
+         <sec name="r1" unit="mm">296.5</sec>
+         <sec name="r2" unit="mm">296.5</sec>
+         <sec name="t" unit="mm">3.2</sec>
+         <sec name="Z0" unit="mm">1980.0</sec>
+         <Material>SWX-238</Material>
+         <Desc>Right SWX layer 2</Desc>
+      </SWXLayer>
+
+      <SWXLayer name="SWX-238-L-1">
+         <sec name="L0" unit="mm">267.0</sec>
+         <sec name="L" unit="mm">265.5</sec>
+         <sec name="r1" unit="mm">256.3</sec>
+         <sec name="r2" unit="mm">256.3</sec>
+         <sec name="t" unit="mm">3.2</sec>
+         <sec name="Z00" unit="mm">-858.22</sec>
+         <sec name="Z0" unit="mm">-858.92</sec>
+         <N desc="Number of cuts">8</N>
+         <!--cut 0 box-->
+         <sec name="cutType0" unit="mm">0</sec>
+         <sec name="cutL0" unit="mm">20.0</sec>
+         <sec name="cutW0" unit="mm">220.0</sec>
+         <sec name="cutH0" unit="mm">80.0</sec>
+         <sec name="cutX00" unit="mm">-179.0</sec>
+         <sec name="cutY00" unit="mm">179.0</sec>
+         <sec name="cutZ00" unit="mm">-829.83</sec>
+         <sec name="cutPHI0" unit="rad">-1.5708</sec>
+         <sec name="cutTH0" unit="rad">-0.7854</sec>
+         <!--cut 1 box-->
+         <sec name="cutType1" unit="mm">0</sec>
+         <sec name="cutL1" unit="mm">20.0</sec>
+         <sec name="cutW1" unit="mm">220.0</sec>
+         <sec name="cutH1" unit="mm">80.0</sec>
+         <sec name="cutX01" unit="mm">179.0</sec>
+         <sec name="cutY01" unit="mm">179.0</sec>
+         <sec name="cutZ01" unit="mm">-829.83</sec>
+         <sec name="cutPHI1" unit="rad">1.5708</sec>
+         <sec name="cutTH1" unit="rad">-0.7854</sec>
+         <!--cut 2 box-->
+         <sec name="cutType2" unit="mm">0</sec>
+         <sec name="cutL2" unit="mm">20.0</sec>
+         <sec name="cutW2" unit="mm">220.0</sec>
+         <sec name="cutH2" unit="mm">80.0</sec>
+         <sec name="cutX02" unit="mm">179.0</sec>
+         <sec name="cutY02" unit="mm">-179.0</sec>
+         <sec name="cutZ02" unit="mm">-829.83</sec>
+         <sec name="cutPHI2" unit="rad">1.5708</sec>
+         <sec name="cutTH2" unit="rad">0.7854</sec>
+         <!--cut 3 box-->
+         <sec name="cutType3" unit="mm">0</sec>
+         <sec name="cutL3" unit="mm">20.0</sec>
+         <sec name="cutW3" unit="mm">220.0</sec>
+         <sec name="cutH3" unit="mm">80.0</sec>
+         <sec name="cutX03" unit="mm">-179.0</sec>
+         <sec name="cutY03" unit="mm">-179.0</sec>
+         <sec name="cutZ03" unit="mm">-829.83</sec>
+         <sec name="cutPHI3" unit="rad">-1.5708</sec>
+         <sec name="cutTH3" unit="rad">0.7854</sec>
+         <!--cut 4 tubs-->
+         <sec name="cutType4" unit="mm">1</sec>
+         <sec name="cutL4" unit="mm">20.0</sec>
+         <sec name="cutR4" unit="mm">40.0</sec>
+         <sec name="cutX04" unit="mm">-179.0</sec>
+         <sec name="cutY04" unit="mm">179.0</sec>
+         <sec name="cutZ04" unit="mm">-939.83</sec>
+         <sec name="cutPHI4" unit="rad">-1.5708</sec>
+         <sec name="cutTH4" unit="rad">-0.7854</sec>
+         <!--cut 5 tubs-->
+         <sec name="cutType5" unit="mm">1</sec>
+         <sec name="cutL5" unit="mm">20.0</sec>
+         <sec name="cutR5" unit="mm">40.0</sec>
+         <sec name="cutX05" unit="mm">179.0</sec>
+         <sec name="cutY05" unit="mm">179.0</sec>
+         <sec name="cutZ05" unit="mm">-939.83</sec>
+         <sec name="cutPHI5" unit="rad">1.5708</sec>
+         <sec name="cutTH5" unit="rad">-0.7854</sec>
+         <!--cut 6 tubs-->
+         <sec name="cutType6" unit="mm">1</sec>
+         <sec name="cutL6" unit="mm">20.0</sec>
+         <sec name="cutR6" unit="mm">40.0</sec>
+         <sec name="cutX06" unit="mm">179.0</sec>
+         <sec name="cutY06" unit="mm">-179.0</sec>
+         <sec name="cutZ06" unit="mm">-939.83</sec>
+         <sec name="cutPHI6" unit="rad">1.5708</sec>
+         <sec name="cutTH6" unit="rad">0.7854</sec>
+         <!--cut 7 tubs-->
+         <sec name="cutType7" unit="mm">1</sec>
+         <sec name="cutL7" unit="mm">20.0</sec>
+         <sec name="cutR7" unit="mm">40.0</sec>
+         <sec name="cutX07" unit="mm">-179.0</sec>
+         <sec name="cutY07" unit="mm">-179.0</sec>
+         <sec name="cutZ07" unit="mm">-939.83</sec>
+         <sec name="cutPHI7" unit="rad">-1.5708</sec>
+         <sec name="cutTH7" unit="rad">0.7854</sec>
+         <Material>SWX-238</Material>
+         <Desc>Left SWX layer 1</Desc>
+      </SWXLayer>
+
+      <SWXLayer name="SWX-238-L-2">
+         <sec name="L" unit="mm">101.4</sec>
+         <sec name="r1" unit="mm">256.0</sec>
+         <sec name="r2" unit="mm">174.9</sec>
+         <sec name="t" unit="mm">3.2</sec>
+         <sec name="Z0" unit="mm">-675.2</sec>
+         <N desc="Number of cuts">4</N>
+         <!--cut 0 box-->
+         <sec name="cutType0" unit="mm">0</sec>
+         <sec name="cutL0" unit="mm">50.0</sec>
+         <sec name="cutW0" unit="mm">50.0</sec>
+         <sec name="cutH0" unit="mm">80.0</sec>
+         <sec name="cutX00" unit="mm">-175.45</sec>
+         <sec name="cutY00" unit="mm">175.45</sec>
+         <sec name="cutZ00" unit="mm">-717.06</sec>
+         <sec name="cutPHI00" unit="rad">-1.0561</sec>
+         <sec name="cutTH00" unit="rad">-0.7854</sec>
+         <sec name="cutPHI0" unit="rad">-1.5708</sec>
+         <sec name="cutTH0" unit="rad">-0.7854</sec>
+         <!--cut 1 box-->
+         <sec name="cutType1" unit="mm">0</sec>
+         <sec name="cutL1" unit="mm">50.0</sec>
+         <sec name="cutW1" unit="mm">50.0</sec>
+         <sec name="cutH1" unit="mm">80.0</sec>
+         <sec name="cutX01" unit="mm">175.45</sec>
+         <sec name="cutY01" unit="mm">175.45</sec>
+         <sec name="cutZ01" unit="mm">-717.06</sec>
+         <sec name="cutPHI10" unit="rad">1.0561</sec>
+         <sec name="cutTH10" unit="rad">-0.7854</sec>
+         <sec name="cutPHI1" unit="rad">1.5708</sec>
+         <sec name="cutTH1" unit="rad">-0.7854</sec>
+         <!--cut 2 box-->
+         <sec name="cutType2" unit="mm">0</sec>
+         <sec name="cutL2" unit="mm">50.0</sec>
+         <sec name="cutW2" unit="mm">50.0</sec>
+         <sec name="cutH2" unit="mm">80.0</sec>
+         <sec name="cutX02" unit="mm">175.45</sec>
+         <sec name="cutY02" unit="mm">-175.45</sec>
+         <sec name="cutZ02" unit="mm">-717.06</sec>
+         <sec name="cutPHI20" unit="rad">1.0561</sec>
+         <sec name="cutTH20" unit="rad">0.7854</sec>
+         <sec name="cutPHI2" unit="rad">1.5708</sec>
+         <sec name="cutTH2" unit="rad">0.7854</sec>
+         <!--cut 3 box-->
+         <sec name="cutType3" unit="mm">0</sec>
+         <sec name="cutL3" unit="mm">50.0</sec>
+         <sec name="cutW3" unit="mm">50.0</sec>
+         <sec name="cutH3" unit="mm">80.0</sec>
+         <sec name="cutX03" unit="mm">-175.45</sec>
+         <sec name="cutY03" unit="mm">-175.45</sec>
+         <sec name="cutZ03" unit="mm">-717.06</sec>
+         <sec name="cutPHI30" unit="rad">-1.0561</sec>
+         <sec name="cutTH30" unit="rad">0.7854</sec>
+         <sec name="cutPHI3" unit="rad">-1.5708</sec>
+         <sec name="cutTH3" unit="rad">0.7854</sec>
+         <Material>SWX-238</Material>
+         <Desc>Left SWX layer 2</Desc>
+      </SWXLayer>
+
+      <SWXLayer name="SWX-238-L-3">
+         <sec name="L" unit="mm">400.0</sec>
+         <sec name="r1" unit="mm">254.0</sec>
+         <sec name="r2" unit="mm">254.0</sec>
+         <sec name="t" unit="mm">3.2</sec>
+         <sec name="Z0" unit="mm">-1211.8</sec>
+         <Material>SWX-238</Material>
+         <Desc>Left SWX layer 3</Desc>
+      </SWXLayer>
+
+      <BellowsShield>
+        <!-- Parameters for Base10/11 (FWD) -->
+        <sec name="fwdZ0" unit="mm">480</sec>
+        <sec name="fwdZ1" unit="mm">496</sec>
+        <sec name="fwdP0_R" unit="mm">73</sec>
+        <sec name="fwdP0_Yout" unit="mm">62</sec>
+        <sec name="fwdP0_Yin" unit="mm">47</sec>
+        <sec name="fwdP0_Xin" unit="mm">16</sec>
+        <sec name="fwdP0_Yedge" unit="mm">40</sec>
+        <sec name="fwdP0_Xedge" unit="mm">57</sec>
+        <sec name="fwdP0_Yside" unit="mm">23</sec>
+        <sec name="fwdP0_Xside" unit="mm">57</sec>
+        <!-- Parameters for Base20/21 (BWD) -->
+        <sec name="bwdZ0" unit="mm">-410</sec>
+        <sec name="bwdZ1" unit="mm">-420</sec>
+        <sec name="bwdP0_R0" unit="mm">72</sec>
+        <sec name="bwdP0_R1" unit="mm">56</sec>
+        <sec name="bwdP0_Yin" unit="mm">41</sec>
+        <sec name="bwdP0_Xin" unit="mm">16</sec>
+        <!-- Parameters for Base5/6 -->
+        <sec name="fwdZ2" unit="mm">504</sec> <!-- fwdZ0 + 24mm -->
+        <sec name="bwdZ2" unit="mm">-504</sec> <!-- bwdZ0 - 94mm -->
+        <sec name="P1_Yout" unit="mm">47</sec>
+        <sec name="P1_Yin" unit="mm">32</sec>
+        <sec name="P1_Rout" unit="mm">56.5</sec>
+        <sec name="P1_Rin" unit="mm">41.5</sec>
+        <sec name="P1_Aout" unit="rad">0.982</sec>
+        <sec name="P1_Ain" unit="rad">0.881</sec>
+        <sec name="P1_RX" unit="mm">8.5</sec>
+        <sec name="fwdZhole" unit="mm">528</sec> <!-- fwdZ2 + 24mm -->
+        <sec name="bwdZhole" unit="mm">-528</sec> <!-- bwdZ2 - 24mm -->
+        <sec name="P1_Rhole" unit="mm">7.75</sec>
+        <sec name="P1_Rbump" unit="mm">14.5</sec>
+        <sec name="P1_Yhole" unit="mm">40</sec>
+        <sec name="P1_MillD1" unit="mm">19</sec> <!-- -X -->
+        <sec name="P1_MillD2" unit="mm">34</sec> <!-- +X -->
+        <sec name="P1_MillX" unit="mm">22</sec>
+        <sec name="P1_MillW" unit="mm">7</sec>
+        <sec name="fwdZcut" unit="mm">545</sec> <!-- fwdZ2 + 41mm -->
+        <sec name="bwdZcut" unit="mm">-545</sec> <!-- bwdZ2 - 41mm -->
+        <sec name="P1_XcutTL" unit="mm">-40</sec> <!-- Top Left -->
+        <sec name="P1_XcutTR" unit="mm">35</sec> <!-- Top Right -->
+        <sec name="P1_XcutBL" unit="mm">-7</sec> <!-- Bottom Left -->
+        <sec name="P1_XcutBR" unit="mm">35</sec> <!-- Bottom Right -->
+        <!-- Parameters for Base7/8 (FWD) Base23/24 (BWD) -->
+        <sec name="fwdZ3" unit="mm">558</sec> <!-- fwdZ2 + 54mm -->
+        <sec name="bwdZ3" unit="mm">-560</sec> <!-- bwdZ2 - 56mm -->
+        <sec name="P2_Rout" unit="mm">57.5</sec>
+        <sec name="P2_Rin" unit="mm">25.5</sec>
+        <sec name="P2_Xin" unit="mm">25</sec>
+        <sec name="P2_Rhole" unit="mm">10.5</sec>
+        <sec name="P2_Yhole" unit="mm">40</sec>
+        <sec name="P2_XcutTL" unit="mm">-40</sec> <!-- Top Left -->
+        <sec name="P2_XcutTR" unit="mm">10.5</sec> <!-- Top Right -->
+        <sec name="P2_XcutBL" unit="mm">-5.5</sec> <!-- Bottom Left -->
+        <sec name="P2_XcutBR" unit="mm">36.5</sec> <!-- Bottom Right -->
+        <sec name="fwdZ4" unit="mm">567.5</sec> <!-- fwdZ3 + 9.5mm -->
+        <sec name="bwdZ4" unit="mm">-597</sec> <!-- (Not Used) bwdZ3 - 39mm  -->
+        <Material>W</Material>
+      </BellowsShield>
 
    </Content>
 </DetectorComponent>

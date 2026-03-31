@@ -13,13 +13,14 @@
 #include <framework/utilities/IOIntercept.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 #include <TDatabasePDG.h>
 #include <TRandom3.h>
 
 #include <VecGeom/volumes/UnplacedBox.h>
 #include <VecGeom/volumes/UnplacedOrb.h>
 #include <VecGeom/volumes/UnplacedTube.h>
-#include <VecGeom/base/LorentzVector.h>
 #include <geometry/GeometryManager.h>
 #include "G4VPhysicalVolume.hh"
 #include "G4LogicalVolume.hh"
@@ -142,28 +143,31 @@ namespace Belle2 {
         double time = 0;
 
         vecgeom::Vector3D<double> pos(vx, vy, vz);
-        vecgeom::LorentzVector<double> mom(px, py, pz, etot);
+        const ROOT::Math::PxPyPzEVector mom(px, py, pz, etot);
+        const ROOT::Math::XYZVector momVec(mom.Px(), mom.Py(), mom.Pz());
+        const auto momDir = momVec.Unit();
         const double speed = (mass == 0 ? 1 : mom.Beta()) * Const::speedOfLight;
 
         // Project on the boundary of the world box
         auto inside = m_world->Inside(pos);
         if (inside == vecgeom::kInside) {
           // inside the world volume, go backwards in time to the world box
-          const auto dir = -mom.vect().Unit();
+          const vecgeom::Vector3D<double> dir(-momDir.X(), -momDir.Y(), -momDir.Z());
           double dist = m_world->DistanceToOut(pos, dir);
           pos += dist * dir;
           time -= dist / speed;
         } else if (inside == vecgeom::kOutside) {
           // outside the world volume, go forwards in time to the world box
           // this should not happen but better safe then sorry ...
-          const auto dir = mom.vect().Unit();
+          const vecgeom::Vector3D<double> dir(momDir.X(), momDir.Y(), momDir.Z());
           double dist = m_world->DistanceToIn(pos, dir);
           if (dist == vecgeom::InfinityLength<double>()) continue;
           pos += dist * dir;
           time += dist / speed;
         }
         // Intersect with the acceptance box
-        double dist = m_acceptance->DistanceToIn(pos, mom.vect().Unit());
+        const vecgeom::Vector3D<double> dir(momDir.X(), momDir.Y(), momDir.Z());
+        double dist = m_acceptance->DistanceToIn(pos, dir);
         if (dist == vecgeom::InfinityLength<double>()) continue;
 
         // We want to keep this one
@@ -175,9 +179,9 @@ namespace Belle2 {
         particle.setPDG(pdg);
         particle.setFirstDaughter(0);
         particle.setLastDaughter(0);
-        particle.setMomentum(ROOT::Math::XYZVector(mom.x(), mom.y(), mom.z()));
+        particle.setMomentum(momVec);
         particle.setMass(mass);
-        particle.setEnergy(mom.e());
+        particle.setEnergy(mom.E());
         particle.setProductionVertex(ROOT::Math::XYZVector(pos.x(), pos.y(), pos.z()));
         particle.setProductionTime(time);
         eventInAcceptance = true;

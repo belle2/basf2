@@ -267,36 +267,15 @@ def add_prefilter_module(path, mode):
     Only the calculation of the cuts is implemented here - the cut logic has to be done
     using the module return value.
     Save the result of HLTPrefilter lines to HLTDQM.
-    Discard events tagged by HLTPrefilter as injection background or high occupancy
-    if the HLTPrefilter is operated in filter mode
+    Discard events tagged by HLTPrefilter as injection background or high occupancy.
     """
 
     # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
 
-    path.add_module("SoftwareTrigger", baseIdentifier="prefilter")
-    '''
-    hlt_prefilter_lines = []
-    from softwaretrigger import prefilter_categories
-    prefilter_cat = [method for method in dir(prefilter_categories) if method.startswith('__') is False  if method != 'RESULTS']
-
-    def read_lines(category):
-            return [i.split(" ", 1)[1].strip().replace(" ", "_") for i in category]
-
-    for i in prefilter_cat:
-        hlt_prefilter_lines += read_lines(getattr(prefilter_categories, i))
-
-    path.add_module(
-            "SoftwareTriggerHLTDQM",
-            cutResultIdentifiers={
-                "prefilter": {"prefilter": hlt_prefilter_lines},
-            },
-            histogramDirectoryName="softwaretrigger_before_prefilter",
-            pathLocation="before prefilter",
-        ).set_name("SoftwareTriggerHLTDQM_before_prefilter")
-    '''
-    hlt_prefilter_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&prefilter&total_result"])
-
+    # Only execute HLTPrefilter if operated in filter mode
     if mode == constants.HLTPrefilterModes.filter:
+        path.add_module("SoftwareTrigger", baseIdentifier="prefilter")
+        hlt_prefilter_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&prefilter&total_result"])
         hlt_event_abort(hlt_prefilter_module, "<1", ROOT.Belle2.EventMetaData.c_HLTPrefilterDiscard)
-    path.add_module('StatisticsSummary').set_name('Sum_HLTPrefilter')
+        path.add_module('StatisticsSummary').set_name('Sum_HLTPrefilter')

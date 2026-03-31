@@ -427,6 +427,7 @@ def get_package_version(package_name, major_minor_only=False):
     return version
 
 
+intersphinx_timeout = 30
 inv_cache_dir = os.path.join(os.path.dirname(__file__), "intersphinx_cache")
 
 # allow to have links to python documentation

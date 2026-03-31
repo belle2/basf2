@@ -150,39 +150,75 @@ namespace Belle2 {
       return mcParticles[idx]->getPDG();
     }
 
-    Manager::FunctionPtr isMaxSigProbInLists(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr sigProbRank(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() != 2)
-        B2FATAL("isMaxSigProbInLists requires exactly 2 arguments: bp_list, b0_list");
+      if (arguments.size() != 2) {
+        B2FATAL("sigProbRank requires exactly 2 arguments: bp_list and b0_list. "
+                "Received " << arguments.size() << " arguments.");
+      }
 
       std::string bpListName = arguments[0];
       std::string b0ListName = arguments[1];
 
-      auto func = [bpListName, b0ListName](const Particle * particle) -> bool {
+      auto func = [bpListName, b0ListName](const Particle * particle) -> int {
         StoreObjPtr<ParticleList> bpList(bpListName);
         StoreObjPtr<ParticleList> b0List(b0ListName);
-        if (!bpList.isValid() || !b0List.isValid()) return false;
 
-        auto bestInList = [](const StoreObjPtr<ParticleList>& list)
-        -> std::pair<double, const Particle*> {
-          double best = -1.0;
-          const Particle* cand = nullptr;
-          for (unsigned int i = 0; i < list->getListSize(); ++i)
-          {
-            const Particle* p = list->getParticle(i);
-            if (!p->hasExtraInfo("SignalProbability")) continue;
-            double sp = p->getExtraInfo("SignalProbability");
-            if (sp > best) { best = sp; cand = p; }
-          }
-          return {best, cand};
+        if (!bpList.isValid() && !b0List.isValid())
+          B2FATAL("sigProbRank could not find either input list: bp_list='" << bpListName
+                  << "', b0_list='" << b0ListName << "'");
+        if (!bpList.isValid())
+          B2FATAL("sigProbRank could not find the required bp_list: '" << bpListName << "'");
+        if (!b0List.isValid())
+          B2FATAL("sigProbRank could not find the required b0_list: '" << b0ListName << "'");
+
+        struct RankedCandidate {
+          double signalProbability;
+          int listPriority;
+          int decayModeID;
+          const Particle* particle;
         };
 
-        auto [bpBest, bpCand] = bestInList(bpList);
-        auto [b0Best, b0Cand] = bestInList(b0List);
+        auto collectCandidates = [](const StoreObjPtr<ParticleList>& list,
+                                    const std::string & listLabel,
+                                    int listPriority,
+                                    std::vector<RankedCandidate>& rankedCandidates)
+        {
+          for (unsigned int i = 0; i < list->getListSize(); ++i) {
+            const Particle* p = list->getParticle(i);
+            if (!p->hasExtraInfo("SignalProbability")) {
+              B2FATAL("sigProbRank requires every candidate in " << listLabel
+                      << " to provide extraInfo('SignalProbability')");
+            }
+            rankedCandidates.push_back({p->getExtraInfo("SignalProbability"), listPriority, static_cast<int>(p->getExtraInfo("decayModeID")), p});
+          }
+        };
 
-        if (bpBest > b0Best) return particle == bpCand;
-        if (b0Best > bpBest) return particle == b0Cand;
-        return false;
+        std::vector<RankedCandidate> rankedCandidates;
+        rankedCandidates.reserve(bpList->getListSize() + b0List->getListSize());
+        collectCandidates(bpList, "bp_list", 0, rankedCandidates);
+        collectCandidates(b0List, "b0_list", 1, rankedCandidates);
+
+        std::sort(rankedCandidates.begin(), rankedCandidates.end(),
+                  [](const RankedCandidate & lhs, const RankedCandidate & rhs)
+        {
+          if (lhs.signalProbability != rhs.signalProbability)
+            return lhs.signalProbability > rhs.signalProbability;
+          if (lhs.listPriority != rhs.listPriority)
+            return lhs.listPriority < rhs.listPriority;
+          return lhs.decayModeID > rhs.decayModeID;
+        });
+
+        for (unsigned int i = 0; i < rankedCandidates.size(); ++i)
+        {
+          if (rankedCandidates[i].particle == particle) {
+            return static_cast<int>(i) + 1;
+          }
+        }
+
+        B2WARNING("sigProbRank: particle not found in either input list: "
+                  "bp_list='" << bpListName << "', b0_list='" << b0ListName << "'");
+        return -1;
       };
       return func;
     }
@@ -203,9 +239,10 @@ namespace Belle2 {
                       "Returns NaN if no B meson is found on generator level. "
                       "Note: this is equivalent to ``genParticle(mostcommonBTagIndex, PDG)``. "
                       "Other variables can be accessed the same way by replacing ``PDG`` with any variable.");
-    REGISTER_METAVARIABLE("isMaxSigProbInLists(bp_list, b0_list)", isMaxSigProbInLists,
-                          "Returns 1 for the candidate with the highest ``extraInfo(SignalProbability)`` "
-                          "across both the B+ list (bp_list) and B0 list (b0_list). "
-                          "Returns 0 for all other candidates.", Manager::VariableDataType::c_bool);
+    REGISTER_METAVARIABLE("sigProbRank(bp_list, b0_list)", sigProbRank,
+                          "Returns the rank (starting at 1) of the candidate when all candidates from the B+ list (bp_list) "
+                          "and B0 list (b0_list) are ordered together by descending ``extraInfo(SignalProbability)``. "
+                          "Exact ties are broken first in favor of ``bp_list``, then by higher FEI decay mode ID. "
+                          "Returns -1 if the particle is not found in either list.", Manager::VariableDataType::c_int);
   }
 }

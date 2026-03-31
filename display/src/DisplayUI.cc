@@ -167,7 +167,7 @@ void DisplayUI::updateUI()
     char date[30] = "<Invalid time>";
     if (secondsSinceEpoch == 0)
       strcpy(date, "");
-    else if (auto gmt = gmtime(&secondsSinceEpoch))
+    else if (const auto* gmt = gmtime(&secondsSinceEpoch))
       strftime(date, 30, "<%Y-%m-%d %H:%M:%S UTC>", gmt);
     m_eventLabel->SetText(TString::Format("Event: \t\t%u\nRun: \t\t%d\nExperiment: \t%d\n\n%s",
                                           eventMetaData->getEvent(),
@@ -373,7 +373,7 @@ bool DisplayUI::startDisplay()
   m_eventData->AddElement(getViewPane()->getRPhiMgr()->ImportElements(gEve->GetEventScene()));
   m_eventData->AddElement(getViewPane()->getRhoZMgr()->ImportElements(gEve->GetEventScene()));
 
-  for (std::string name : m_hideObjects) {
+  for (const std::string& name : m_hideObjects) {
     TGListTreeItem* eventItem = gEve->GetListTree()->FindItemByPathname("Event");
     TGListTreeItem* item = gEve->GetListTree()->FindChildByName(eventItem, name.c_str());
     if (item) {
@@ -673,7 +673,7 @@ void DisplayUI::toggleColorScheme()
 
 void DisplayUI::toggleUndock()
 {
-  TGLViewer* activeGLviewer = getViewPane()->getActiveGLViewer();
+  const TGLViewer* activeGLviewer = getViewPane()->getActiveGLViewer();
   TEveViewerList* viewers = gEve->GetViewers();
   TEveElement::List_ci end_it = viewers->EndChildren();
   TEveViewer* activeViewer = nullptr;

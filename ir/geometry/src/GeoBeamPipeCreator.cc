@@ -1267,7 +1267,6 @@ namespace Belle2 {
       // Get parameters from .xml file
       prep = "Lv2VacLERUp.";
 
-      //double Lv2VacLERUp_rO[Lv1TaLERUp_num];
       vector<double> Lv2VacLERUp_rO(Lv1TaLERUp_num);
       for (int i = 0; i < Lv1TaLERUp_num; ++i) {
         Lv2VacLERUp_rO[i] = m_config.getParameter(prep + "R1") * unitFactor;
@@ -1296,7 +1295,6 @@ namespace Belle2 {
       // Get parameters from .xml file
       prep = "Lv2VacHERDwn.";
 
-      //double Lv2VacHERDwn_rO[Lv1TaHERDwn_num];
       vector<double> Lv2VacHERDwn_rO(Lv1TaHERDwn_num);
       for (int i = 0; i < Lv1TaHERDwn_num; ++i) {
         Lv2VacHERDwn_rO[i] = m_config.getParameter(prep + "R1") * unitFactor;
@@ -1324,7 +1322,6 @@ namespace Belle2 {
       // Get parameters from .xml file
       prep =  "Lv2VacHERUp.";
 
-      //double Lv2VacHERUp_rO[Lv1TaHERUp_num];
       vector<double> Lv2VacHERUp_rO(Lv1TaHERUp_num);
       for (int i = 0; i < Lv1TaHERUp_num; ++i) {
         Lv2VacHERUp_rO[i] = m_config.getParameter(prep + "R1") * unitFactor;
@@ -1352,7 +1349,6 @@ namespace Belle2 {
       // Get parameters from .xml file
       prep = "Lv2VacLERDwn.";
 
-      //double Lv2VacLERDwn_rO[Lv1TaLERDwn_num];
       vector<double> Lv2VacLERDwn_rO(Lv1TaLERDwn_num);
       for (int i = 0; i < Lv1TaLERDwn_num; ++i) {
         Lv2VacLERDwn_rO[i] = m_config.getParameter(prep + "R1") * unitFactor;

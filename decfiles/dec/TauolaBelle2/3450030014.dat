@@ -3,7 +3,7 @@
 1                               * switch for KKMC-JETSET (1:on, 0:off)
 ********** Above is for basf *********
 
-* MCEventType: 3450030014 Descriptor: tau+ -> pi+ K+ K- nubar_tau (TauolaBelle2)
+* MCEventType: 3450030014 Descriptor: tau+ -> pi+ K+ K- nu_tau + C.C (TauolaBelle2)
 
 BeginX
 ********************************************************************************
@@ -35,5 +35,6 @@ BeginX
  2903            1e0      IRCHL3PI
  2904            0e0      IFKPIPI
  2905            0e0      IFCURR4PI
+ 2909            1e0      CHCONJUGATE = 1: swap JAK1/JAK2 for alternate events
 ********************************************************************************
 EndX

@@ -62,9 +62,12 @@ Tools
 Disclaimers for development
 ----------------------------
 
-Charge or Pulse Height from Feature Extraction: 
-- Due to (scintillator) firmware anamolies, there are unphysical peaks near 0 and ``> 400`` ADC counts. 
-   - Recommended action is to suppress these peaks or replace them with NaNs. 
-- The peaks at charge ``> 400`` ADC counts have been a result overlapping ramps negatively shifting the output voltages (lower Wilkinson ADC counts). 
-   - The KLM firmware was updated on Exp 40 Run 858 to properly address this bug. 
-   - Details are outlined `here <https://indico.belle2.org/event/17965/contributions/109456/attachments/40138/59714/cketter_klm_weekly_260330.pdf>`.
+Charge or Pulse Height from Feature Extraction:
+* Due to (scintillator) firmware anamolies, there are unphysical peaks near 0 and :math:`> 400` ADC counts.
+
+   * Recommended action is to suppress these peaks or replace them with NaNs.
+
+* The peaks at charge :math:`> 400` ADC counts have been a result overlapping ramps negatively shifting the output voltages (lower Wilkinson ADC counts).
+
+   * The KLM firmware was updated on Exp 40 Run 858 to properly address this bug.
+   * Details are outlined `here <https://indico.belle2.org/event/17965/contributions/109456/attachments/40138/59714/cketter_klm_weekly_260330.pdf>`.

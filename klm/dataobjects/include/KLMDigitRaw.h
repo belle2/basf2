@@ -159,8 +159,8 @@ namespace Belle2 {
 
     /**
      * Get charge.
-     * Developers should note that there might be unphysical peaks near 0 and >400 ADC counts.
-     * Recommendation is to cut and treat as NaN.
+     * Developers should note that there might be peaks near 0 and >400 ADC counts.
+     * These values are unreliable and should be treated with care.
      * @return Charge.
      */
     uint16_t getCharge()

@@ -63,9 +63,9 @@ Disclaimers for development
 ----------------------------
 
 Charge or Pulse Height from Feature Extraction:
-* Due to (scintillator) firmware anamolies, there are unphysical peaks near 0 and :math:`> 400` ADC counts.
+* Due to (scintillator) firmware anamolies, there are peaks near 0 and :math:`> 400` ADC counts; these values are unreliable.
 
-   * Recommended action is to suppress these peaks or replace them with NaNs.
+   * The performance with and without the cuts should be evaluated before suppressing these peaks or replacing them with NaNs. 
 
 * The peaks at charge :math:`> 400` ADC counts have been a result overlapping ramps negatively shifting the output voltages (lower Wilkinson ADC counts).
 

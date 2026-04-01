@@ -9,8 +9,8 @@
 ##########################################################################
 
 """
-Create a full set of consistent geometry payloads for nominal geometry, run 0 (phase 2)
-geometry, and run 1 (early phase 3) geometry from XML files.
+Create a full set of consistent geometry payloads for nominal geometry, Run 0 (phase 2)
+geometry, and Run 1 (early phase 3) geometry from XML files.
 
 Optionally one can give a list of payload names to keep only a subset of payloads
 """
@@ -54,7 +54,7 @@ phase2.add_module("Geometry", createPayloads=True, payloadIov=[1002, 0, 1002, -1
                   additionalComponents=[e + "-phase2" for e in phase2_detectors])
 b2test_utils.safe_process(phase2)
 
-# create run 1 (early phase3) geometry: same as run 2 (phase 3) but
+# create Run 1 (early phase3) geometry: same as Run 2 (phase 3) but
 # different PXD, ServiceGapsMaterial, BeamPipe, Cryostat, FarBeamLine
 # configuration
 run1 = basf2.Path()
@@ -113,9 +113,9 @@ with open("localdb/database.txt") as dbfile:
                 database_content.append(f'dbstore/{name} {revision} 0,0,0,-1\n')
                 if name not in run1_comp_list:
                     database_content.append(f'dbstore/{name} {revision} 1003,0,1003,-1\n')
-                # luckily nothing we have in run 1 (early phase 3) is identical between
-                # run 0 and run 1 so need for extra checks if in run 1 but
-                # not run 0
+                # luckily nothing we have in Run 1 (early phase 3) is identical between
+                # Run 0 (phase 2) and Run 1 so need for extra checks if in Run 1 but
+                # not Run 0 (phase 2)
                 continue
         elif iov[0] == 1002 and name not in phase2_comp_list:
             continue

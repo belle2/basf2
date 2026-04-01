@@ -10,7 +10,7 @@
 
 #############################################################
 # Simple steering file to demonstrate how to run Track DQM on BelleII geometry
-# Valid for Run 1 (early phase 3) and nominal phase 3
+# Valid for Run 1 (early phase 3) and Run 2 (nominal phase 3)
 #############################################################
 
 import basf2 as b2
@@ -19,10 +19,10 @@ from reconstruction import add_reconstruction
 
 import argparse
 parser = argparse.ArgumentParser(
-    description="Tracking DQM Belle II for Run  1 (early phase 3) (Exp=1) and nominal phase 3 (Exp=2)")
+    description="Tracking DQM Belle II for Run  1 (early phase 3) (Exp=1) and Run 2 (nominal phase 3) (Exp=2)")
 parser.add_argument('--experiment-type', dest='ExperimentType', action='store',
                     default=2, type=int,
-                    help='Set which experiment you want: 1 (Run 1, early phase 3) or 2 (nominal phase 3), default = 2')
+                    help='Set which experiment you want: 1 (Run 1, early phase 3) or 2 (Run 2, nominal phase 3), default = 2')
 
 args = parser.parse_args()
 

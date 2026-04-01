@@ -52,15 +52,15 @@ if (args.ExperimentType == 3):
 main = b2.create_path()
 
 if (args.ExperimentType == 1):
-    # the experiment number for run 0 (phase2) MC has to be 1002,
+    # the experiment number for Run 0 (phase2) MC has to be 1002,
     # otherwise the wrong payloads (for VXDTF2 the SectorMap) are loaded
     main.add_module("EventInfoSetter", expList=1002, runList=1, evtNumList=num_events)
 if (args.ExperimentType == 2):
-    # the experiment number for run 1 (early phase3) MC has to be 1003,
+    # the experiment number for Run 1 (early phase3) MC has to be 1003,
     # otherwise the wrong payloads for this faze are loaded
     main.add_module("EventInfoSetter", expList=1003, runList=1, evtNumList=num_events)
 if (args.ExperimentType == 3):
-    # the experiment number for run 2 (regular phase3) MC has no need to set, it is default
+    # the experiment number for Run 2 (regular phase3) MC has no need to set, it is default
     main.add_module("EventInfoSetter", evtNumList=num_events)
 
 # in case you need to fix seed of random numbers

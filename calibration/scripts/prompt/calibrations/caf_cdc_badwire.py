@@ -25,8 +25,9 @@ settings = CalibrationSettings(name="CDC badwire",
                                expert_config={
                                    "min_events_per_file": 500,
                                    "components": ["CDC", "ECL", "KLM"],
-                                    "payload_boundaries": [],
-                                   "backend_args": {"request_memory": "4 GB"}
+                                   "payload_boundaries": [],
+                                   "backend_args": {"request_memory": "4 GB"},
+                                   "average_occupancy_threshold": 4000.0
                                },
                                produced_payloads=["CDCBadWires"])
 
@@ -36,6 +37,7 @@ def get_calibrations(input_data, **kwargs):
     expert_config = kwargs.get("expert_config")
     min_events_per_file = expert_config["min_events_per_file"]
     components = expert_config["components"]
+    average_occupancy_threshold = expert_config["average_occupancy_threshold"]
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
@@ -66,6 +68,7 @@ def get_calibrations(input_data, **kwargs):
     # call algorighm
     algo = Belle2.CDC.WireEfficiencyAlgorithm()
     algo.setInputFileNames("histo_badwire.root")
+    algo.setAverageOccupancyThreshold(average_occupancy_threshold)
     # Calibration setup
     from caf.framework import Calibration
     badwire_calib = Calibration("CDC_Badwire",

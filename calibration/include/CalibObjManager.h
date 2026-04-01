@@ -26,7 +26,7 @@ namespace Belle2 {
 
   public:
     /// Constructor
-    CalibObjManager(TDirectory* dir = nullptr) : m_dir(dir) {};
+    explicit CalibObjManager(TDirectory* dir = nullptr) : m_dir(dir) {};
 
     /** Destructor: Every object we are managing is ultimately either saved into a file to write out,
       * or was read in from an open file, or was created via merging objects together and passed out.
@@ -112,7 +112,7 @@ namespace Belle2 {
 
     /// Clone object
     template<class T>
-    T* cloneObj(T* source, const std::string& newName) const
+    static T* cloneObj(T* source, const std::string& newName)
     {
       B2DEBUG(100, "Held object " << source->GetName() << " will be treated as a generic TNamed and have Clone(newname) called.");
       return dynamic_cast<T*>(source->Clone(newName.c_str()));
@@ -128,18 +128,18 @@ namespace Belle2 {
     std::map<std::string, std::shared_ptr<TNamed>> m_templateObjects;
 
     /// We rename objects based on the Exp,Run that they contain so we need to generate a nice naming convention
-    std::string getSuffix(const Calibration::ExpRun& key) const;
+    static std::string getSuffix(const Calibration::ExpRun& key);
 
     /// Sometimes it's nice to just pass in the EventMetaData instead of converting manually
-    std::string getSuffix(const EventMetaData& emd) const;
+    static std::string getSuffix(const EventMetaData& emd);
 
     /// Get object experiment and run name
     std::string getObjectExpRunName(const std::string& name, const Calibration::ExpRun& expRun) const;
 
     /// Extract key index
-    unsigned int extractKeyIndex(const std::string& keyName) const;
+    static unsigned int extractKeyIndex(const std::string& keyName);
   };
   /// Template specialization for TTree needs to be defined here to prevent automatic specialization being created
   template<>
-  TTree* CalibObjManager::cloneObj(TTree* source, const std::string& newName) const;
+  TTree* CalibObjManager::cloneObj(TTree* source, const std::string& newName);
 }

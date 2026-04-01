@@ -25,7 +25,7 @@ namespace Belle2 {
     RunRange() : TNamed() {};
 
     /// Constructor from vector of ExpRun objects
-    explicit RunRange(std::vector<Calibration::ExpRun> expRuns) : TNamed()
+    explicit RunRange(const std::vector<Calibration::ExpRun>& expRuns) : TNamed()
     {
       for (auto expRun : expRuns) {
         this->add(expRun.first, expRun.second);
@@ -103,7 +103,7 @@ namespace Belle2 {
     }
 
     /// Gets the m_granularity
-    std::string getGranularity() const {return m_granularity;}
+    const std::string& getGranularity() const {return m_granularity;}
     /** Root-like Reset function for "template compatibility" with ROOT objects. Alias for clear(). */
     void Reset() {clear();}
     /// Root-like SetDirectory function for "template compatibility" with ROOT objects. Does nothing.

@@ -174,14 +174,11 @@ namespace Belle2 {
 
         struct RankedCandidate {
           double signalProbability;
-          int listPriority;
-          int decayModeID;
           const Particle* particle;
         };
 
         auto collectCandidates = [](const StoreObjPtr<ParticleList>& list,
                                     const std::string & listLabel,
-                                    int listPriority,
                                     std::vector<RankedCandidate>& rankedCandidates)
         {
           for (unsigned int i = 0; i < list->getListSize(); ++i) {
@@ -190,23 +187,19 @@ namespace Belle2 {
               B2FATAL("sigProbRank requires every candidate in " << listLabel
                       << " to provide extraInfo('SignalProbability')");
             }
-            rankedCandidates.push_back({p->getExtraInfo("SignalProbability"), listPriority, static_cast<int>(p->getExtraInfo("decayModeID")), p});
+            rankedCandidates.push_back({p->getExtraInfo("SignalProbability"), p});
           }
         };
 
         std::vector<RankedCandidate> rankedCandidates;
         rankedCandidates.reserve(bpList->getListSize() + b0List->getListSize());
-        collectCandidates(bpList, "bp_list", 0, rankedCandidates);
-        collectCandidates(b0List, "b0_list", 1, rankedCandidates);
+        collectCandidates(bpList, "bp_list", rankedCandidates);
+        collectCandidates(b0List, "b0_list", rankedCandidates);
 
-        std::sort(rankedCandidates.begin(), rankedCandidates.end(),
-                  [](const RankedCandidate & lhs, const RankedCandidate & rhs)
+        std::stable_sort(rankedCandidates.begin(), rankedCandidates.end(),
+                         [](const RankedCandidate & lhs, const RankedCandidate & rhs)
         {
-          if (lhs.signalProbability != rhs.signalProbability)
-            return lhs.signalProbability > rhs.signalProbability;
-          if (lhs.listPriority != rhs.listPriority)
-            return lhs.listPriority < rhs.listPriority;
-          return lhs.decayModeID > rhs.decayModeID;
+          return lhs.signalProbability > rhs.signalProbability;
         });
 
         for (unsigned int i = 0; i < rankedCandidates.size(); ++i)
@@ -216,9 +209,9 @@ namespace Belle2 {
           }
         }
 
-        B2WARNING("sigProbRank: particle not found in either input list: "
-                  "bp_list='" << bpListName << "', b0_list='" << b0ListName << "'");
-        return -1;
+        B2FATAL("sigProbRank: particle not found in either input list: "
+                "bp_list='" << bpListName << "', b0_list='" << b0ListName << "'");
+        return 0;
       };
       return func;
     }
@@ -241,8 +234,6 @@ namespace Belle2 {
                       "Other variables can be accessed the same way by replacing ``PDG`` with any variable.");
     REGISTER_METAVARIABLE("sigProbRank(bp_list, b0_list)", sigProbRank,
                           "Returns the rank (starting at 1) of the candidate when all candidates from the B+ list (bp_list) "
-                          "and B0 list (b0_list) are ordered together by descending ``extraInfo(SignalProbability)``. "
-                          "Exact ties are broken first in favor of ``bp_list``, then by higher FEI decay mode ID. "
-                          "Returns -1 if the particle is not found in either list.", Manager::VariableDataType::c_int);
+                          "and B0 list (b0_list) are ordered together by descending ``extraInfo(SignalProbability)``.", Manager::VariableDataType::c_int);
   }
 }

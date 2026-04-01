@@ -76,9 +76,9 @@ bool WireEfficiencyAlgorithm::hasEnoughData()
 
   bool enoughData = (averageOccupancy > m_averageOccupancyThreshold);
   if (enoughData)
-    B2INFO("Average number of hits per wire in this run: " << averageOccupancy);
+    B2INFO("Will run the calibration for this run with enough hits per wire: " << averageOccupancy);
   else
-    B2WARNING("Average number of hits per wire in this run: " << averageOccupancy);
+    B2WARNING("Not enough hits per wire in this run: " << averageOccupancy);
   return enoughData;
 }
 
@@ -178,7 +178,8 @@ void WireEfficiencyAlgorithm::detectBadWires()
       }
     }
     // safeguard in case all wires are 0
-    nonZeroWires > 0 ? totalAverage /= nonZeroWires : totalAverage == 0;
+    if (nonZeroWires > 0) totalAverage /= nonZeroWires;
+    else totalAverage = 0;
 
     TGraphAsymmErrors* graphEfficiencyProjected = efficiencyProjectedX->CreateGraph();
 
@@ -234,13 +235,12 @@ double WireEfficiencyAlgorithm::chiTest(TGraphAsymmErrors* graph1, TGraphAsymmEr
   int numOfEntries2 = graph2->GetN();
 
   // loop over entries in both graphs, index by index.
-
   for (int index1 = 0; index1 < numOfEntries1; ++index1) {
     // TGraph values are usually not listed in increasing order. Need to check that they are within min/max range for comparison.
     if (graph1->GetX()[index1] < minValue) continue;
     if (graph1->GetX()[index1] > maxValue) continue;
     for (int index2 = 0; index2 < numOfEntries2; ++index2) {
-      if (graph1->GetX()[index1] == graph2->GetX()[index2]) {
+      if (std::abs(graph1->GetX()[index1] - graph2->GetX()[index2]) < 1e-6) {
         // this is broken up just for readability
         double chiNumerator = std::pow(graph1->GetY()[index1] - graph2->GetY()[index2], 2);
         double err1 = 0.5 * (graph1->GetErrorYhigh(index1) + graph1->GetErrorYlow(index1));

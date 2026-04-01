@@ -662,9 +662,8 @@ namespace Belle2 {
           oss_block_num << i;
 
           double cut_type = m_config.getParameter(prep + "cutType" + oss_block_num.str());
-          string geo_supx_name;
           if (i == sup_cut_N - 1) {
-            geo_supx_name = "geo_" + name + "_name";
+            geo_sup_name = "geo_" + name + "_name";
           } else {
             geo_sup_name = "geo_" + name + "_x" + oss_block_num.str() + "_name";
           }

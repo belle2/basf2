@@ -4,7 +4,7 @@ Changes in the analysis package in light-2603-ina
 Variables
 +++++++++
 * As a substitute for `klmClusterTrackDistance` which is only available for release-10 mDSTs, a new variable `klmClusterTrackDistance_helix_extrapolation` is provided for analysts to be used with release-09 or ealier mDSTs.
-* Added FEI-related variable `sigProbRank(bp_list, b0_list)` to rank candidates across both B+ and B0 lists by descending `extraInfo(SignalProbability)`.
+* Added FEI-related variable :b2:var:`sigProbRank(bp_list, b0_list) <sigProbRank>` to rank candidates across both B+ and B0 lists by descending ``extraInfo(SignalProbability)``.
 * Added FEI-related variables `mostcommonBTagDeltaP` and `mostcommonBTagPDG` for accessing the generated B meson momentum difference and PDG code identified by `mostcommonBTagIndex`.
 
 Changes in the analysis package in light-2601-hyperion

@@ -1,0 +1,81 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+#pragma once
+
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+
+#include <analysis/ClusterUtility/ClusterUtils.h>
+
+#include <Math/Vector4D.h>
+
+
+namespace Belle2 {
+
+  /**
+   * MdstRounder module
+   * Rounds all Double32_t members of all ECLClusters and TrackFitResults to precision as if read from mdst
+   */
+  class MdstRounderModule : public Module {
+
+  public:
+
+    /**
+     * Constructor.
+     */
+    MdstRounderModule();
+
+    /**
+     * Initialization.
+     */
+    void initialize() override;
+
+    /**
+     * Event handling.
+     */
+    void event() override;
+
+  private:
+
+    /**
+     * Clamps value to range [min, max] and rounds to precision corresponding to nBits number of bits
+     */
+    double roundToPrecision(Double32_t value, double min, double max, int nBits) const;
+
+    /**
+     * Round Double32_t members of all ECLClusters to appropriate precision
+     */
+    void roundECLClusters() const;
+
+    /**
+     * Rounds Double32_t members of all TrackFitResults to appropriate precision
+     */
+    void roundTrackFitResults() const;
+
+    /**
+     * StoreArray of ECLClusters
+     */
+    StoreArray<ECLCluster> m_eclclusters;
+
+    /**
+     * StoreArray of TrackFitResults
+     */
+    StoreArray<TrackFitResult> m_trackfitresults;
+
+    /**
+     * ClusterUtils to compute four-momentum from ECLClusters
+     */
+    ClusterUtils m_C;
+
+  };
+
+}

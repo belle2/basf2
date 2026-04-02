@@ -1,6 +1,6 @@
-# EventType: 2513530000
-# Descriptor: [ccbar Lambdacp2PmEpEp]
-# NickName: Lambdacp2PmEpEp
+# EventType: 2513930004
+# Descriptor: [ccbar Lambdacp2PmEpMup]
+# NickName:  Lambdacp2PmEpMup
 # PhysicsWG: Charm
 # Responsible: Rishav Kumar Jaiswal 
 # Date: 20260327 (YYYYMMDD)
@@ -14,8 +14,7 @@ Decay vpho
 Enddecay
 
 Decay Lambda_c+
-1.000 anti-p-  e+  e+          PHOTOS  PHSP;
+1.000 anti-p-  e+  mu+          PHOTOS  PHSP;
 Enddecay
-
 
 End

@@ -1,6 +1,6 @@
-# EventType: 2113530001
-# Descriptor: [ccbar Dm2KpEmEm]
-# NickName: Dm2KpEmEm
+# EventType: 2113930007
+# Descriptor: [ccbar Dm2PipEmEm]
+# NickName: Dm2PipEmEm
 # PhysicsWG: Charm
 # Responsible: Rishav Kumar Jaiswal 
 # Date: 20260327 (YYYYMMDD)
@@ -14,8 +14,7 @@ Decay vpho
 Enddecay
 
 Decay D-
-1.000 K+  e-  e-          PHOTOS  PHSP;
+1.000 pi+  e-  e-          PHOTOS  PHSP;
 Enddecay
-
 
 End

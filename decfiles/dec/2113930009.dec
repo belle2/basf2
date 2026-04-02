@@ -1,6 +1,6 @@
-# EventType: 2313530011
-# Descriptor: [ccbar Dsm2PipEmEm]
-# NickName: Dsm2PipEmEm
+# EventType: 2113930009
+# Descriptor: [ccbar Dm2KpEmMum]
+# NickName: Dm2KpEmMum
 # PhysicsWG: Charm
 # Responsible: Rishav Kumar Jaiswal 
 # Date: 20260327 (YYYYMMDD)
@@ -13,8 +13,8 @@ Decay vpho
 1.000 c    anti-c      PYTHIA 91;
 Enddecay
 
-Decay D_s-
-1.000 pi+  e-  e-          PHOTOS  PHSP;
+Decay D-
+1.000 K+  e-  mu-          PHOTOS  PHSP;
 Enddecay
 
 End

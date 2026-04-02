@@ -39,11 +39,16 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"]]},
     depends_on=[top_pretracking],
     expert_config={
-        "max_files_per_run": 20,
-        "payload_boundaries": None,
-        "request_memory": "8 GB"
-    },
-    produced_payloads=["TOPCalModuleT0", "TOPCalCommonT0", "TOPCalEventT0Offset"])
+                "max_files_per_run": 20,
+                "payload_boundaries": None,
+                "request_memory": "8 GB"},
+    produced_payloads=[
+                    "TOPCalModuleT0",
+                    "TOPCalCommonT0",
+                    "TOPCalEventT0Offset",
+                    "TOPCalFillPatternOffset",
+                    "TOPCalPhotonYields",
+        "TOPCalChannelRQE"])
 
 
 # Required function

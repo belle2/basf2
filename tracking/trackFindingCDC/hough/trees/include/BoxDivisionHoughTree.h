@@ -9,9 +9,9 @@
 #include <tracking/trackFindingCDC/hough/trees/WeightedFastHoughTree.h>
 #include <tracking/trackFindingCDC/hough/baseelements/SectoredLinearDivision.h>
 
-#include <tracking/trackFindingCDC/numerics/LookupTable.h>
+#include <tracking/trackingUtilities/numerics/LookupTable.h>
 
-#include <tracking/trackFindingCDC/utilities/TupleGenerate.h>
+#include <tracking/trackingUtilities/utilities/TupleGenerate.h>
 
 #include <type_traits>
 #include <utility>
@@ -73,7 +73,7 @@ namespace Belle2 {
       using Array = typename Type<I>::Array;
 
       /// Tuple type of the discrete value arrays
-      using Arrays = TupleGenerateN<Array, sizeof...(divisions)>;
+      using Arrays = TrackingUtilities::TupleGenerateN<Array, sizeof...(divisions)>;
 
     public:
       /// Getter the number of divisions at each level for coordinate index I.
@@ -115,7 +115,7 @@ namespace Belle2 {
                  nBinOverlap < nBinWidth);
 
         const auto nPositions = (nBinWidth - nBinOverlap) * nBins + nBinOverlap + 1;
-        std::get<I>(m_arrays) = linspace<float>(lowerBound, upperBound, nPositions);
+        std::get<I>(m_arrays) = TrackingUtilities::linspace<float>(lowerBound, upperBound, nPositions);
         std::get<I>(m_overlaps) = nBinOverlap;
       }
 

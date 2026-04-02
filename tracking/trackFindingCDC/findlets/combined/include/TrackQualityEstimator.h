@@ -10,22 +10,24 @@
 #include <tracking/trackFindingCDC/findlets/minimal/CDCMCCloneLookUpFiller.h>
 
 #include <tracking/trackFindingCDC/filters/track/TrackQualityFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
+  namespace TrackFindingCDC {
 
     /// Deletes fake tracks that have been rejected by a filter
-    class TrackQualityEstimator : public Findlet<CDCTrack&> {
+    class TrackQualityEstimator : public TrackingUtilities::Findlet<TrackingUtilities::CDCTrack&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCTrack&>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCTrack&>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -41,7 +43,7 @@ namespace Belle2 {
       void initialize() override;
 
       /// Main algorithm
-      void apply(std::vector<CDCTrack>& tracks) final;
+      void apply(std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
     private:
       /// Findlet to fill CDCTracks into lookup table (singleton) with clone information
@@ -57,7 +59,7 @@ namespace Belle2 {
       bool m_param_resetTakenFlag = false;
 
       /// Reference to the filter to be used to filter
-      ChooseableFilter<TrackQualityFilterFactory> m_trackQualityFilter;
+      TrackingUtilities::ChooseableFilter<TrackQualityFilterFactory> m_trackQualityFilter;
     };
   }
 }

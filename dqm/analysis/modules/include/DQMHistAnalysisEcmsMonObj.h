@@ -80,6 +80,11 @@ namespace Belle2 {
      */
     std::unordered_map<std::string, double>  fitEcmsBB(TH1D* hB0, TH1D* hBp);
 
+    /**
+     * Reads first exp.run number and integrated lumi from merged histogram title
+     */
+    std::unordered_map<std::string, double>  parseTitle(const std::string& title);
+
   protected:
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
     TCanvas* m_canvas = nullptr; /**< Canvas to keep plots of the fit */

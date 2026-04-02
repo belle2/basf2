@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
 
 #include <tracking/ckf/cdc/filters/paths/BaseCDCPathFilter.h>
 
@@ -80,11 +80,11 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class CDCPathBasicVarNames : public TrackFindingCDC::VarNames<BaseCDCPathFilter::Object> {
+  class CDCPathBasicVarNames : public TrackingUtilities::VarNames<BaseCDCPathFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(cdcPathBasicVarNames);
+    static const size_t nVars = TrackingUtilities::size(cdcPathBasicVarNames);
 
     /// Get the name of the column.
     constexpr
@@ -97,7 +97,7 @@ namespace Belle2 {
   /**
    * Var set to store basic quantities related to CDC CKF
    */
-  class CDCPathBasicVarSet : public TrackFindingCDC::VarSet<CDCPathBasicVarNames> {
+  class CDCPathBasicVarSet : public TrackingUtilities::VarSet<CDCPathBasicVarNames> {
 
   public:
     /// Generate and assign the variables from the object.

@@ -19,5 +19,6 @@
 #pragma link C++ class Belle2::PIDNeuralNetworkParameters+;                     // checksum=0x1bd6b119, version=1
 #pragma link C++ class Belle2::ECLPhotonEnergyResolution+; // checksum=0xa8d0e09d, version=2
 #pragma link C++ class Belle2::BellePi0EtaProbParameters+;                      // checksum=0xbb573549, version=1
+#pragma link C++ class Belle2::ECLTimingNormalization+; // checksum=0xbbbec096, version=1
 
 #endif

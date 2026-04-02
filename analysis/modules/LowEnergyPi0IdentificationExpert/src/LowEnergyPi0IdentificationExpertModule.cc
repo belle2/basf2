@@ -16,9 +16,6 @@
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mva/interface/Interface.h>
 
-/* Boost headers. */
-#include <boost/algorithm/string/predicate.hpp>
-
 using namespace Belle2;
 
 REG_MODULE(LowEnergyPi0IdentificationExpert);
@@ -42,7 +39,7 @@ LowEnergyPi0IdentificationExpertModule::~LowEnergyPi0IdentificationExpertModule(
 void LowEnergyPi0IdentificationExpertModule::initialize()
 {
   m_ListPi0.isRequired(m_Pi0ListName);
-  if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
+  if (not(m_identifier.ends_with(".root") or m_identifier.ends_with(".xml"))) {
     m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
                                   DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifier));
   }

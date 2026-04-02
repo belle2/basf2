@@ -7,16 +7,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/Filter.dcl.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
+  namespace TrackFindingCDC {
 
     // Guard to prevent repeated instantiations
-    extern template class Filter<CDCTrack>;
+    // extern template class TrackingUtilities::Filter<TrackingUtilities::CDCTrack>;
 
     /// Base class for track filters
-    using BaseTrackFilter = Filter<CDCTrack>;
+    using BaseTrackFilter = TrackingUtilities::Filter<TrackingUtilities::CDCTrack>;
   }
 }

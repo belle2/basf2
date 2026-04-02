@@ -9,13 +9,13 @@
 #include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.icc.h>
 #include <tracking/eventTimeExtraction/findlets/GridEventTimeExtractor.icc.h>
 #include <tracking/eventTimeExtraction/findlets/IterativeEventTimeExtractor.icc.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 template class Belle2::GridEventTimeExtractor<DriftLengthBasedEventTimeExtractor>;
 

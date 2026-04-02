@@ -7,13 +7,13 @@
  **************************************************************************/
 #include <tracking/datcon/findlets/DATCONSVDClusterLoaderAndPreparer.h>
 #include <tracking/datcon/utilities/DATCONHelpers.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 DATCONSVDClusterLoaderAndPreparer::DATCONSVDClusterLoaderAndPreparer() : Super()
 {
@@ -23,7 +23,7 @@ void DATCONSVDClusterLoaderAndPreparer::exposeParameters(ModuleParamList* module
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxClustersPerLayer"), m_param_maxClustersPerLayer,
+  moduleParamList->addParameter(prefixed(prefix, "maxClustersPerLayer"), m_param_maxClustersPerLayer,
                                 "Maximum number of clusters on one layer before aborting tracking.", m_param_maxClustersPerLayer);
 }
 

@@ -124,8 +124,14 @@ void FragmentationModule::initialize()
     B2FATAL("Cannot read Pythia parameter file.");
 
   // Set framework generator
+  // Switch between raw and smart pointers depending on the Pythia version
+#if PYTHIA_VERSION_INTEGER < 8301
   FragmentationRndm* fragRndm = new FragmentationRndm();
   m_Pythia->setRndmEnginePtr(fragRndm);
+#else
+  std::shared_ptr<FragmentationRndm> fragRndm = std::make_shared<FragmentationRndm>();
+  m_Pythia->setRndmEnginePtr(fragRndm);
+#endif
 
   // Initialize PYTHIA
   m_Pythia->init();

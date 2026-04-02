@@ -1221,8 +1221,8 @@ namespace Belle2 {
         // --------------  Is the Hadron a descendant of a Meson that conserves flavor  --------------------------
 
         bool isB0DaughterConservingFlavor = false;
-        if (std::find(flavorConservingMesons.begin(), flavorConservingMesons.end(),
-                      mothersPDG.rbegin()[1]) != flavorConservingMesons.end())
+        if (mothersPDG.size() > 1 && std::find(flavorConservingMesons.begin(), flavorConservingMesons.end(),
+                                               mothersPDG.rbegin()[1]) != flavorConservingMesons.end())
         {
           isB0DaughterConservingFlavor = true;
         }

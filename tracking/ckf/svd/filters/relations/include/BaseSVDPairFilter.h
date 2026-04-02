@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/Filter.dcl.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 
 namespace Belle2 {
   /// Base filter for CKF SVD states
-  using BaseSVDPairFilter = TrackFindingCDC::Filter<std::pair<const CKFToSVDState*, const CKFToSVDState*>>;
+  using BaseSVDPairFilter = TrackingUtilities::Filter<std::pair<const CKFToSVDState*, const CKFToSVDState*>>;
 }

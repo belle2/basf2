@@ -9,13 +9,13 @@
 
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/AxialSegmentPairFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/BaseAxialSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     // Guard to prevent repeated instantiations
-    extern template class Chooseable<BaseAxialSegmentPairFilter>;
-    extern template class ChooseableFilter<AxialSegmentPairFilterFactory>;
-    using ChooseableAxialSegmentPairFilter = ChooseableFilter<AxialSegmentPairFilterFactory>;
+    // extern template class TrackingUtilities::Chooseable<BaseAxialSegmentPairFilter>;
+    // extern template class TrackingUtilities::ChooseableFilter<AxialSegmentPairFilterFactory>;
+    using ChooseableAxialSegmentPairFilter = TrackingUtilities::ChooseableFilter<AxialSegmentPairFilterFactory>;
   }
 }

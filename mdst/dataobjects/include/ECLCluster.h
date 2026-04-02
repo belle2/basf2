@@ -221,11 +221,20 @@ namespace Belle2 {
     /** Set Corrected Energy (GeV). */
     void setEnergy(double energy) { m_logEnergy = log(energy); }
 
-    /** Set Uncorrect Energy deposited (GeV). */
+    /** Set Corrected log Energy (log(GeV)). */
+    void setLogEnergy(double logenergy) { m_logEnergy = logenergy; }
+
+    /** Set Incorrect Energy deposited (GeV). */
     void setEnergyRaw(double energyraw) { m_logEnergyRaw = log(energyraw); }
+
+    /** Set Incorrect log Energy deposited (log(GeV)). */
+    void setLogEnergyRaw(double logenergyraw) { m_logEnergyRaw = logenergyraw; }
 
     /** Set energy of highest energetic crystal (GeV). */
     void setEnergyHighestCrystal(double energyhighestcrystal) { m_logEnergyHighestCrystal = log(energyhighestcrystal); }
+
+    /** Set log energy of highest energetic crystal (log(GeV)). */
+    void setLogEnergyHighestCrystal(double logenergyhighestcrystal) { m_logEnergyHighestCrystal = logenergyhighestcrystal; }
 
     /** Return true if the cluster matches with track. */
     bool isTrack() const { return m_isTrack; }

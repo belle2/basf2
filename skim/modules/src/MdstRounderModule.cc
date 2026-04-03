@@ -32,8 +32,6 @@ MdstRounderModule::MdstRounderModule() : Module()
                  "event generation/simulation/reconstruction.");
 }
 
-void MdstRounderModule::initialize() { }
-
 void MdstRounderModule::event()
 {
   roundECLClusters();
@@ -108,7 +106,7 @@ void MdstRounderModule::roundTrackFitResults() const
   }
 }
 
-double MdstRounderModule::roundToPrecision(Double32_t value, double min, double max, int nBits) const
+double MdstRounderModule::roundToPrecision(Double32_t value, double min, double max, int nBits)
 {
   const double range = max - min;
   const double scale = (1 << nBits) / range;

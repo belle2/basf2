@@ -21,9 +21,6 @@ from skim.WGs.fei import feiHadronic
 from skim import smartbkg as sbg
 from variables import variables as var
 
-# For this example, load SmartBkg model and config from local database
-b2.conditions.prepend_testing_payloads("localdb/database.txt")
-
 # Initialize path and set event info (100 events for this example)
 path = b2.Path()
 path.add_module("EventInfoSetter", evtNumList=[100], expList=[0], runList=[0])
@@ -33,11 +30,13 @@ path.add_module("EventInfoSetter", evtNumList=[100], expList=[0], runList=[0])
 finalstate = "charged"
 gen.add_evtgen_generator(finalstate=finalstate, path=path, eventType=finalstate)
 
-# Define skim (all 51 skims defined as of August 2025 work with the standard SmartBkg model)
+# Define skim (all 51 skims defined as of August 2025 work with the standard SmartBkg model, see documentation)
 # Here we disable udst output because we only want the skim flags
+# Since we generate and skim in the same steering file, we need to simulate mDST rounding (roundToMdstPrecision=True)
 fei_skim = feiHadronic(
     analysisGlobaltag=ma.getAnalysisGlobaltag(),
-    udstOutput=False
+    udstOutput=False,
+    roundToMdstPrecision=True
 )
 
 # Add SmartBkg filtering by providing the skim

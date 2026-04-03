@@ -27,7 +27,7 @@ def add_smartbkg_filtering(
     """
         Adds event preselection based on the SmartBkg neural network.
         Should be used only for directly skimmed MC productions.
-        Must be added to the path after the generator.add_abc_generator but before simulation.add_simulation modules.
+        Must be added to the path after generator.add_abc_generator but before simulation.add_simulation.
         Given one or multiple skims, the model predicts the probability of each event passing each of the skims.
         Events are then sampled for each skim according to this probability.
         An event weight is stored for each skim in the event extra info as 'weight_<SkimName>',
@@ -45,7 +45,7 @@ def add_smartbkg_filtering(
             payload_config (str): name of the payload storing the SmartBackgroundConfig object
             event_type (str or None): type of events that are generated, allowed values are
                                       'charged', 'mixed', 'uubar', 'ddbar', 'ssbar', 'ccbar', 'taupair';
-                                      if None, automatially determined from the event extra info
+                                      if None, automatically determined from the event extra info
             activation_params (tuple(float, float) or None): custom parameters (a, b) for the activation function
                                                              (useful for testing/validation);
                                                              if None, prefitted values for the chosen skims are used

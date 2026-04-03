@@ -20,6 +20,11 @@ an event and, if it is kept, weighting it with the inverse neural network output
 .. note:: Datasets produced using Smart Background are weighted and must be treated as such when analyzed! The weights 
   are stored in the event extra info as ``weight_<SkimName>``.
 
+.. warning:: If you are running event generation and skimming in the same steering file, you have to pass 
+  ``roundToMdstPrecision=True`` to the skim. This is mandatory for the FEI skims (as large discrepancies have been observed there) 
+  and recommended for all other skims. If in doubt, check explicitly that your skim produces identical results when run in the 
+  same vs. a seperate steering file.
+
 Usage
 ^^^^^
 

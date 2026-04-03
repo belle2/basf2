@@ -91,6 +91,7 @@ SKIMCODES_MAPPING = {
     18530200: 45, 18570600: 46, 18570700: 47, 19120100: 48, 19130201: 49,
     19130300: 50}
 
+# Mapping of skim codes to skim names
 SKIMNAMES_MAPPING = {
     10601300: 'SystematicsCombinedHadronic', 10601400: 'SystematicsCombinedLowMulti',
     11640100: 'SystematicsPhiGamma', 11180500: 'feiHadronic', 11180600: 'feiSL', 13160200: 'TDCPV_ccs',
@@ -111,7 +112,7 @@ SKIMNAMES_MAPPING = {
     15440100: 'BottomoniumUpsilon', 16460200: 'CharmoniumPsi', 15410300: 'InclusiveLambda', 12160100: 'BToXgamma',
     12160200: 'BtoXll', 12160300: 'BtoXll_LFV', 12160400: 'inclusiveBplusToKplusNuNu'}
 
-# Mapping of scim codes to lists of parameters for the activation function (clipped exponential) optimized for speedup
+# Mapping of skim codes to lists of parameters for the activation function (clipped exponential) optimized for speedup
 PARAMETER_MAPPING = {
     11180500: [0.46, 1.392], 11180600: [0.468, 1.708], 11640100: [0.502, 2.982], 12160100: [0.463, 2.281],
     12160200: [0.467, 1.753], 12160300: [0.468, 1.788], 12160400: [0.472, 2.115], 13160200: [0.477, 2.098],

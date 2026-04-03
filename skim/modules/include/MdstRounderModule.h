@@ -35,11 +35,6 @@ namespace Belle2 {
     MdstRounderModule();
 
     /**
-     * Initialization.
-     */
-    void initialize() override;
-
-    /**
      * Event handling.
      */
     void event() override;
@@ -49,7 +44,7 @@ namespace Belle2 {
     /**
      * Clamps value to range [min, max] and rounds to precision corresponding to nBits number of bits
      */
-    double roundToPrecision(Double32_t value, double min, double max, int nBits) const;
+    static double roundToPrecision(Double32_t value, double min, double max, int nBits);
 
     /**
      * Round Double32_t members of all ECLClusters to appropriate precision

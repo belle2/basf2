@@ -15,13 +15,17 @@
 namespace Belle2 {
 
   /**
-   * ARICH merger histogram (72 bins).
+   * ARICH merger histogram (72 blocks).
    *
-   * Numbering:
-   * - TH1 bin i (1..72) corresponds directly to merger number i.
-   * - Sector base is (X-1)*12, X=1..6.
-   * - Within each sector: ring1 (3 blocks), ring2 (4), ring3 (4), ring4 (1),
-   *   with right-to-left numbering inside each ring.
+   * Two numbering systems exist:
+   *
+   * 1) Internal position (1..72)
+   *    - This is the drawing / geometry order.
+   *    - Used by fillFromTH1().
+   *    - Bins correspond to 1_1, 2_1, 12_1,...,6_12 merger positions
+   *
+   * 2) Real ARICH hardware MergerID
+   *    - Used by setBinContent(mergerID, value).
    */
   class ARICHMergerHist : public TH2Poly {
 
@@ -42,6 +46,9 @@ namespace Belle2 {
     /// Fill from TH1. Histogram must have exactly 72 bins.
     /// @param hist Input TH1 with 72 bins
     void fillFromTH1(TH1* hist);
+
+    /// Set content using the real ARICH hardware MergerID
+    void setBinContent(unsigned mergerID, double value);
 
     /// Draw with sector lines and labels.
     /// @param option ROOT draw option string

@@ -12,6 +12,7 @@
 #include <TGraph.h>
 #include <TAxis.h>
 #include <TLatex.h>
+#include <map>
 
 #include <cmath>
 
@@ -20,6 +21,18 @@
 #endif
 
 using namespace Belle2;
+
+// Map: MergerID -> internal index (1..72)
+static const std::map<int, int> MERGER_TO_INTERNAL = {
+  {53, 1}, {24, 2}, {22, 3}, {11, 4}, {2, 5}, {12, 6}, {76, 7}, {34, 8}, {32, 9}, {72, 10},
+  {7, 11}, {66, 12}, {97, 13}, {63, 14}, {19, 15}, {57, 16}, {5, 17}, {79, 18}, {6, 19}, {80, 20},
+  {10, 21}, {37, 22}, {60, 23}, {35, 24}, {30, 25}, {41, 26}, {69, 27}, {20, 28}, {55, 29}, {47, 30},
+  {71, 31}, {15, 32}, {14, 33}, {74, 34}, {77, 35}, {64, 36}, {62, 37}, {67, 38}, {82, 39}, {56, 40},
+  {68, 41}, {78, 42}, {46, 43}, {81, 44}, {27, 45}, {39, 46}, {18, 47}, {44, 48}, {17, 49}, {25, 50},
+  {16, 51}, {51, 52}, {1, 53}, {61, 54}, {54, 55}, {48, 56}, {8, 57}, {29, 58}, {3, 59}, {73, 60},
+  {93, 61}, {38, 62}, {58, 63}, {59, 64}, {50, 65}, {26, 66}, {31, 67}, {33, 68}, {49, 69}, {65, 70},
+  {52, 71}, {75, 72}
+};
 
 // --------------------------------------------------
 // Geometry
@@ -131,6 +144,9 @@ ARICHMergerHist::ARICHMergerHist(const char* name,
   GetYaxis()->SetLimits(-140., 140.);
 }
 
+// --------------------------------------------------
+// Using 1..72 Merger position (1_1,...,1_12,...,6_12)
+// --------------------------------------------------
 void ARICHMergerHist::fillFromTH1(TH1* hist)
 {
   if (!hist) return;
@@ -147,12 +163,25 @@ void ARICHMergerHist::fillFromTH1(TH1* hist)
   }
 }
 
+// --------------------------------------------------
+// Using MergerID numbering
+// --------------------------------------------------
+void ARICHMergerHist::setBinContent(unsigned mergerID, double value)
+{
+  if (mergerID < 1 || mergerID > 100) return;
+
+  int internal = MERGER_TO_INTERNAL.at(mergerID);
+  int polybin  = m_merger2bin[internal - 1];
+
+  SetBinContent(polybin, value);
+}
+
 void ARICHMergerHist::Draw(Option_t* option)
 {
   TH2Poly::Draw(option);
 
   // -------------------------------------------------
-  // Sector lines (shorter + gray)
+  // Sector lines
   // -------------------------------------------------
   const double rInner = 50.0;
   const double rOuter = 130.0;

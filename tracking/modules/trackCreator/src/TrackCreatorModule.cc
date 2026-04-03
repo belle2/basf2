@@ -52,8 +52,6 @@ TrackCreatorModule::TrackCreatorModule() :
            m_useBFieldAtHit);
   addParam("useSeedForTrackFitMomentumRange", m_useSeedForTrackFitMomentumRange, "Flag to use the momentum seed of the RecoTrack "
            "for the TrackFitMomentumRange selection. By default the fitted value is used",  m_useSeedForTrackFitMomentumRange);
-  addParam("firstCall", m_firstCall, "Flag to declare that the module is called for the first time.",
-           m_firstCall);
   addParam("stopOnSuccessfulTrackFit", m_stopOnSuccessfulTrackFit, "Flag to stop creating new tracks when a particle hypothesis "
            "leads to a successful track fit. Switched off by default (fit all given pdg codes) but turned on before HLT filter for optimzation",
            m_stopOnSuccessfulTrackFit);
@@ -64,29 +62,20 @@ void TrackCreatorModule::initialize()
 {
   m_RecoTracks.isRequired(m_recoTrackColName);
 
-  if (m_firstCall) {
-    StoreArray<Track> tracks(m_trackColName);
+  StoreArray<Track> tracks(m_trackColName);
+  if (!tracks.isOptional()) {
     const bool tracksRegistered = tracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
-    StoreArray<TrackFitResult> trackFitResults(m_trackFitResultColName);
-    const bool trackFitResultsRegistered = trackFitResults.registerInDataStore();
-
     B2ASSERT("Could not register output store arrays for tracks.", tracksRegistered);
+  }
+  StoreArray<TrackFitResult> trackFitResults(m_trackFitResultColName);
+  if (!trackFitResults.isOptional()) {
+    const bool trackFitResultsRegistered = trackFitResults.registerInDataStore();
     B2ASSERT("Could not register output store arrays for track fit results.", trackFitResultsRegistered);
-
-    tracks.registerRelationTo(m_RecoTracks);
-  } else {
-    StoreArray<Track> tracks;
-    const bool tracksRegistered = tracks.isRequired(m_trackColName);
-    StoreArray<TrackFitResult> trackFitResults;
-    const bool trackFitResultsRegistered = trackFitResults.isRequired(m_trackFitResultColName);
-
-    B2ASSERT("Could not find output store arrays for tracks.", tracksRegistered);
-    B2ASSERT("Could not find output store arrays for track fit results.", trackFitResultsRegistered);
-
-    const bool hasRelation = tracks.hasRelationTo(m_RecoTracks);
-    B2ASSERT("RecoTracks are not related to the tracks.", hasRelation);
   }
 
+  if (!tracks.hasRelationTo(m_RecoTracks)) {
+    tracks.registerRelationTo(m_RecoTracks);
+  }
 
 
   B2ASSERT("BeamSpot should have exactly 3 parameters", m_beamSpot.size() == 3);

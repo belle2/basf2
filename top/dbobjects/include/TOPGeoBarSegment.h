@@ -19,6 +19,11 @@ namespace Belle2 {
 
   /**
    * Geometry parameters of a quartz bar segment
+   *
+   * Note about sigmaAlpha:
+   * in order to keep the current payload revision usable (TOPGeometry, rev.18)
+   * but this parameter must be two times larger, from release-11 on the getter returns the stored value multiplied by two
+   * and the setter stores half the value read from the xml files (now containing two times larger sigmaAlpha).
    */
   class TOPGeoBarSegment: public TOPGeoBase {
   public:
@@ -76,7 +81,7 @@ namespace Belle2 {
     void setSurface(const GeoOpticalSurface& surface, double sigmaAlpha)
     {
       m_surface = surface;
-      m_sigmaAlpha = sigmaAlpha;
+      m_sigmaAlpha = sigmaAlpha / 2;  // store half-value
     }
 
     /**
@@ -175,7 +180,7 @@ namespace Belle2 {
      * Returns geant4 parameter describing surface roughness
      * @return surface roughness
      */
-    double getSigmaAlpha() const {return m_sigmaAlpha;}
+    double getSigmaAlpha() const {return m_sigmaAlpha * 2;}  // multiply by 2 since half-value stored
 
     /**
      * Returns vendor's name
@@ -222,7 +227,7 @@ namespace Belle2 {
     float m_glueThickness = 0; /**< glue thickness */
     std::string m_glueMaterial; /**< glue material name */
     GeoOpticalSurface m_surface; /**< optical surface */
-    float m_sigmaAlpha = 0; /**< geant4 parameter for surface roughness */
+    float m_sigmaAlpha = 0; /**< geant4 parameter for surface roughness (half-value) */
     float m_brokenFraction = 0; /**< fraction of broken (delaminated) glue */
     float m_brokenAngle = 0; /**< angle of broken (delaminated) glue */
     std::string m_brokenGlueMaterial; /**< broken glue material name */

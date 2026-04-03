@@ -71,6 +71,7 @@ namespace Belle2 {
     m_extHits.isRequired();
     m_barHits.isOptional();
     m_recBunch.isOptional();
+    m_initialParticles.isOptional();
 
     // output
 
@@ -103,12 +104,17 @@ namespace Belle2 {
 
     TOPRecoManager::setTimeWindow(m_minTime, m_maxTime);
 
+    // is MC ?
+
+    bool isMC = m_initialParticles.isValid();
+
     // sort tracks by module ID
 
     std::unordered_multimap<int, const TOPTrack*> topTracks; // tracks sorted by top modules
     for (const auto& track : m_tracks) {
       auto* trk = new TOPTrack(track, m_topDigitCollectionName);
       if (trk->isValid() and trk->getTransverseMomentum() > m_pTCut) {
+        if (not isMC) trk->setTOFCorrection(m_tofCorrections);
         topTracks.emplace(trk->getModuleID(), trk);
       } else {
         delete trk;

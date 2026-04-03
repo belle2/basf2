@@ -74,7 +74,7 @@ namespace Belle2 {
     void OneDCorrection(int layer, double enta, double& dedx) const;
 
     /** Perform the cosine correction */
-    void CosineCorrection(double costheta, double& dedx) const;
+    void CosineCorrection(unsigned int superlayer, double costheta, double& dedx) const;
 
     /** Perform the cosine edge correction */
     void CosineEdgeCorrection(double costh, double& dedx) const;

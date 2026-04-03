@@ -16,7 +16,7 @@
 namespace Belle2 {
 
   /**
-   *   dE/dx wire gain calibration constants
+   *   dE/dx 1D cell correction calibration constants
    */
 
   class CDCDedx1DCell: public TObject {
@@ -26,12 +26,17 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCDedx1DCell(): m_version(0), m_onedgains() {};
+    CDCDedx1DCell(): m_version(0), m_onedgains(), m_layerToGroup() {};
 
     /**
-     * Constructor
-     */
-    CDCDedx1DCell(short version, const std::vector<std::vector<double>>& onedgains): m_version(version), m_onedgains(onedgains) {};
+    * Constructor keep this untill we modfity CDCDedx1DCellAlgorithm.cc code
+    */
+    CDCDedx1DCell(short version, const std::vector<std::vector<double>>& onedgains);
+
+    /** Constructor with grouped constants */
+    CDCDedx1DCell(short version,
+                  const std::vector<std::vector<double>>& groupGains,
+                  const std::vector<unsigned int>& layerToGroup);
 
     /**
      * Destructor
@@ -41,125 +46,110 @@ namespace Belle2 {
     /**
      * Combine payloads
      **/
-    CDCDedx1DCell& operator*=(CDCDedx1DCell const& rhs)
-    {
-      if (m_version != rhs.getVersion()) {
-        B2WARNING("1D cell gain parameters do not match, cannot merge!");
-        return *this;
-      }
-      for (unsigned int layer = 0; layer < getSize(); ++layer) {
-        double tempLayer = -1; //out of bound layer
-        if (getSize() == 2)tempLayer = layer * 20; // 20 to make <8 and >=8 difference
-        else if (getSize() == 56)tempLayer = layer;
-        else B2ERROR("ERROR! Wrong # of constants vector array");
-        for (unsigned int bin = 0; bin < getNBins(layer); ++bin) {
-          m_onedgains[layer][bin] *= rhs.getMean(tempLayer, bin);
-        }
-      }
-      return *this;
-    }
+    CDCDedx1DCell& operator*=(CDCDedx1DCell const& rhs);
 
-    /** Get the version for the 1D cleanup
+    /**
+    * Get the version for the 1D cleanup
      */
     short getVersion() const { return m_version; };
 
-    /** Get the number of bins for the entrance angle correction
-     */
-    unsigned int getSize() const { return m_onedgains.size(); };
+    /** Number of groups */
+    unsigned int getNGroups() const {return m_onedgains.size();};
 
-    /** Get the number of bins for the entrance angle correction
-     */
-    unsigned int getNBins(unsigned int layer) const
+    /** Number of layers */
+    unsigned int getNLayers() const
     {
-      if (m_onedgains.size() == 0) {
-        B2ERROR("ERROR!");
-        return 0;
+      if (!m_layerToGroup.empty()) return m_layerToGroup.size();
+
+      if (m_onedgains.size() == 2) return 56;
+
+      return 0;
+    };
+
+    /** Get group index for layer */
+    unsigned int getGroup(unsigned int layer) const
+    {
+      if (layer >= getNLayers()) {
+        B2ERROR("Layer out of range");
+        return std::numeric_limits<unsigned int>::max();
+      }
+
+      if (!m_layerToGroup.empty()) {
+        return m_layerToGroup[layer];
       }
 
       if (m_onedgains.size() == 2) {
-        if (layer == 0) return m_onedgains[0].size();
-        else if (layer == 1) return m_onedgains[1].size();
-        else {
-          B2ERROR("ERROR! const vector not found");
-          return 0;
-        }
-      } else if (m_onedgains.size() == 56) {
-        if (layer < m_onedgains.size()) return m_onedgains[layer].size();
-      } else {
-        B2ERROR("ERROR! Wrong # of constants vector array: getNBins()");
-        return 0;
+        return (layer < 8) ? 0 : 1;
       }
-      return 0;
+
+      B2ERROR("Invalid 1DCell payload state");
+      return std::numeric_limits<unsigned int>::max();
     };
+
+    /** Get the number of bins for the entrance angle correction
+    */
+    unsigned int getNBins(unsigned int layer) const
+    {
+      const unsigned int group = getGroup(layer);
+
+      if (group >= m_onedgains.size()) return 0;
+
+      return m_onedgains[group].size();
+    };
+
+    /**
+        * Get the grouped calibration constants
+        * @return grouped calibration constants
+        */
+    const std::vector<std::vector<double>>& getOneDCell() const
+    {
+      return m_onedgains;
+    }
+
+    /**
+       * Get the Layer-to-group map
+       * @return layer map
+       */
+
+    const std::vector<unsigned int>& getLayerMap() const
+    {
+      return m_layerToGroup;
+    }
 
     /** Return dE/dx mean value for the given bin
      * @param layer is layer number between 0-55
      * @param bin is enta bin number
      */
-    double getMean(unsigned int layer, unsigned int bin) const
-    {
-      unsigned int mylayer = 0;
-      if (layer >= 8 && m_onedgains.size() == 2) mylayer = 1;
-      else if (m_onedgains.size() == 56) mylayer = layer;
+    double getMean(unsigned int layer, unsigned int bin) const;
 
-      if (mylayer < m_onedgains.size() and bin < m_onedgains[mylayer].size()) return m_onedgains[mylayer][bin];
-
-      return 1.0;
-    };
 
     /** Reset dE/dx mean value for the given bin
      * @param layer is layer number between 0-55
      * @param bin is enta bin number
      * @param value is constant for requested entabin and layer
     */
-    void setMean(unsigned int layer, unsigned int bin, double value)
-    {
-      unsigned int mylayer = 0;
-      if (layer >= 8 && m_onedgains.size() == 2) mylayer = 1;
-      else if (m_onedgains.size() == 56) mylayer = layer;
+    void setMean(unsigned int layer, unsigned int bin, double value);
 
-      if (mylayer < m_onedgains.size() and bin < m_onedgains[mylayer].size()) m_onedgains[mylayer][bin] = value;
-    };
 
     /** Return dE/dx mean value for given entrance angle
      * @param layer continuous layer number
      * @param enta entrance angle (-pi/2 to pi/2)
      */
-    double getMean(unsigned int layer, double enta) const
-    {
-      if (layer > 56) {
-        B2ERROR("No such layer!");
-        return 0;
-      }
+    double getMean(unsigned int layer, double enta) const;
 
-      unsigned int mylayer = 0;
-      if (layer >= 8 && m_onedgains.size() == 2) mylayer = 1;
-      else if (m_onedgains.size() == 56) mylayer = layer;
-
-      if (mylayer >= m_onedgains.size()) return 1.0;
-
-      double piby2 =  M_PI / 2.0;
-      // assume rotational symmetry
-      if (enta < -piby2) enta += piby2;
-      if (enta > piby2) enta -= piby2;
-
-      double binsize = (m_onedgains[mylayer].size() != 0) ? 2.0 * piby2 / m_onedgains[mylayer].size() : 0.0;
-      int bin = (binsize != 0.0) ? std::floor((enta + piby2) / binsize) : -1;
-      if (bin < 0 || (unsigned)bin >= m_onedgains[mylayer].size()) {
-        B2WARNING("Problem with CDC dE/dx 1D binning!");
-        return 1.0;
-      }
-
-      return m_onedgains[mylayer][bin];
-    };
 
   private:
+
+    /** Payload validation */
+    bool isValidGroupedPayload() const;
+
     /** dE/dx cleanup correction versus entrance angle
     may be different for different layers, so store as a vector of vectors
     keep a version number to identify which layers are valid */
     short m_version; /**< version number for 1D cleanup correction */
     std::vector<std::vector<double>> m_onedgains; /**< dE/dx means in entrance angle bins */
+    std::vector<unsigned int> m_layerToGroup;  /** layer to group map */
 
-    ClassDef(CDCDedx1DCell, 5); /**< ClassDef */
+    ClassDef(CDCDedx1DCell, 6); /**< ClassDef */
   };
 } // end namespace Belle2

@@ -165,8 +165,14 @@ namespace Belle2 {
     double m_amean; /**< average mean of dedx for all wires */
     double m_arms; /**< average rms of dedx for all wires */
 
+    double m_amean_IL; /**< average mean of dedx for all wires */
+    double m_arms_IL; /**< average rms of dedx for all wires */
+    double m_amean_OL; /**< average mean of dedx for all wires */
+    double m_arms_OL; /**< average rms of dedx for all wires */
     std::string m_varName; /**< std::string to set var name (adc or dedx) */
     std::string m_suffix; /**< suffix std::string for naming plots */
+
+    int m_exp;   /**< exp no to set SL boundaries */
 
     DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Badwire DB object */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wiregain DB object */

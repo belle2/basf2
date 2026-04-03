@@ -202,6 +202,10 @@ def get_calibrations(input_data, **kwargs):
                     algorithm.params = {"iov_coverage": output_iov}
                 if calib_keys[i] == "rungain0" or calib_keys[i] == "rungain1" or calib_keys[i] == "timegain0":
                     cals[i].save_payloads = False
+            elif cal_name == "onedcell":
+                cals[i].strategies = None
+                for algorithm in cals[i].algorithms:
+                    algorithm.params = {"apply_iov": output_iov}
             else:
                 cals[i].strategies = SequentialBoundaries
                 for algorithm in cals[i].algorithms:

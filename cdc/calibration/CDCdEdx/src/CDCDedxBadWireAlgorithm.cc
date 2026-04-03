@@ -67,22 +67,34 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
   if (m_isADC) m_varName = "hitadc";
   m_suffix = Form("%s_%s", m_varName.data(), m_suffix.data());
 
-  TH1D hvarall(Form("hvarall_%s", m_suffix.data()), "", m_varBins, m_varMin, m_varMax);
-  hvarall.SetTitle(Form("dist %s; %s; %s", m_suffix.data(), m_varName.data(), "entries"));
+  //IL = Inner Layer and OL = Outer Layer
+  array<TH1D*, 2> hvarL;
+  string label[2] = {"IL", "OL"};
+  for (int il = 0; il < 2; il++) {
+    hvarL[il] = new TH1D(Form("hvar%s_%s", label[il].data(), m_suffix.data()), "", m_varBins, m_varMin, m_varMax);
+    hvarL[il]->SetTitle(Form("dist (%s) %s; %s; %s", label[il].data(), m_suffix.data(), m_varName.data(), "entries"));
+  }
 
   map<int, vector<double>> vhitvar;
+
+  int slWireBoundary = (m_exp < 40) ? 1280 : 2240; // Boundary between inner layers: SL0 (<40), SL0+SL1 (>=40)
 
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
     for (unsigned int ih = 0; ih < wire->size(); ++ih) {
+      int jwire = wire->at(ih);
       double ivalue = hitvar->at(ih);
       vhitvar[wire->at(ih)].push_back(ivalue);
-      hvarall.Fill(ivalue);
+
+      if (jwire < slWireBoundary) hvarL[0]->Fill(ivalue);
+      else hvarL[1]->Fill(ivalue);
     }
   }
 
-  m_amean = hvarall.GetMean();
-  m_arms = hvarall.GetRMS();
+  m_amean_IL = hvarL[0]->GetMean();
+  m_arms_IL = hvarL[0]->GetRMS();
+  m_amean_OL = hvarL[1]->GetMean();
+  m_arms_OL = hvarL[1]->GetRMS();
 
   // Commenting minstat cut on March 2024,
   //it is not worth to skip the calibration if there is more than 5% bad/dead wires
@@ -93,7 +105,7 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
   //   if (vhitvar[jw].size() <= 100) minstat++;
   // if (minstat > 0.05 * c_nwireCDC) return c_NotEnoughData;
 
-  if (m_amean == 0 || m_arms == 0)  return c_NotEnoughData;
+  if (m_amean_IL == 0 || m_arms_IL == 0 || m_amean_OL == 0 || m_arms_OL == 0)  return c_NotEnoughData;
 
   map<int, vector<double>> qapars;
   vector<double> vdefectwires, vbadwires, vdeadwires;
@@ -117,7 +129,10 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
       badwire = true; //partial dead
     } else {
       nmean = nmean / ncount;
-      if (abs(nmean - m_amean) / m_amean > m_meanThres) badwire = true;
+      if (int(jw) < slWireBoundary) {
+        if (abs(nmean - m_amean_IL) / m_amean_IL > m_meanThres) badwire = true;
+      } else
+      {if (abs(nmean - m_amean_OL) / m_amean_OL > m_meanThres) badwire = true;}
 
       double nrms = 0.;
       for (unsigned int kh = 0; kh < vhitvar[jw].size(); ++kh) {
@@ -126,7 +141,10 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
       }
 
       nrms = sqrt(nrms / ncount);
-      if (abs(nrms - m_arms) / m_arms > m_rmsThres) badwire = true;
+      if (int(jw) < slWireBoundary)
+      {if (abs(nrms - m_arms_IL) / m_arms_IL > m_rmsThres) badwire = true;}
+      else
+      {if (abs(nrms - m_arms_OL) / m_arms_OL > m_rmsThres) badwire = true;}
 
       double badfrac = 0.0;
       if (tcount > 0) badfrac = (1.0 * tcount) / (tcount + ncount);
@@ -185,6 +203,8 @@ void CDCDedxBadWireAlgorithm::getExpRunInfo()
 
   const auto erEnd = getRunList()[cruns - 1];
   int rend = erEnd.second;
+
+  m_exp = estart;
 
   updateDBObjPtrs(1, rstart, estart);
 
@@ -401,8 +421,11 @@ void CDCDedxBadWireAlgorithm::plotQaPars(map<int, vector<double>>& qapars)
 
   string qaname[3] = {"mean", "rms", "high_fraction"};
 
-  double linemin[3] = {m_amean* (1 - m_meanThres), m_arms* (1 - m_rmsThres), m_fracThres * 100};
-  double linemax[3] = {m_amean* (1 + m_meanThres), m_arms* (1 + m_rmsThres), m_fracThres * 100};
+  double lineminIL[3] = {m_amean_IL* (1 - m_meanThres), m_arms_IL* (1 - m_rmsThres), m_fracThres * 100};
+  double linemaxIL[3] = {m_amean_IL* (1 + m_meanThres), m_arms_IL* (1 + m_rmsThres), m_fracThres * 100};
+
+  double lineminOL[3] = {m_amean_OL* (1 - m_meanThres), m_arms_OL* (1 - m_rmsThres), m_fracThres * 100};
+  double linemaxOL[3] = {m_amean_OL* (1 + m_meanThres), m_arms_OL* (1 + m_rmsThres), m_fracThres * 100};
 
   for (int iqa = 0; iqa < 3; iqa++) {
 
@@ -421,18 +444,24 @@ void CDCDedxBadWireAlgorithm::plotQaPars(map<int, vector<double>>& qapars)
     histqa.SetStats(0);
     histqa.Draw();
 
-    TLine* lmin = new TLine(-0.5, linemin[iqa], 14335.5, linemin[iqa]);
-    lmin->SetLineColor(kRed);
-    lmin->Draw("same");
-    TLine* lmax = new TLine(-0.5, linemax[iqa], 14335.5, linemax[iqa]);
-    lmax->SetLineColor(kRed);
-    lmax->Draw("same");
+    TLine* lminIL = new TLine(-0.5, lineminIL[iqa], 2239.5, lineminIL[iqa]);
+    lminIL->SetLineColor(kRed);
+    lminIL->Draw("same");
+    TLine* lmaxIL = new TLine(-0.5, linemaxIL[iqa], 2239.5, linemaxIL[iqa]);
+    lmaxIL->SetLineColor(kRed);
+    lmaxIL->Draw("same");
+    TLine* lminOL = new TLine(2239.5, lineminOL[iqa], 14335.5, lineminOL[iqa]);
+    lminOL->SetLineColor(kRed);
+    lminOL->Draw("same");
+    TLine* lmaxOL = new TLine(2239.5, linemaxOL[iqa], 14335.5, linemaxOL[iqa]);
+    lmaxOL->SetLineColor(kRed);
+    lmaxOL->Draw("same");
 
     c_pars.Print(Form("cdcdedx_bdcal_%s_%s.root", qaname[iqa].data(), m_suffix.data()));
     c_pars.Print(Form("cdcdedx_bdcal_%s_%s.pdf", qaname[iqa].data(), m_suffix.data()));
 
-    delete lmax;
-    delete lmin;
+    delete lmaxIL;
+    delete lminIL;
   }
 }
 

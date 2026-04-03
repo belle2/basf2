@@ -16,117 +16,197 @@
 namespace Belle2 {
 
   /**
-   *   dE/dx wire gain calibration constants
-   */
+  *   dE/dx cosine gain calibration constants
+  */
 
   class CDCDedxCosineCor: public TObject {
 
   public:
 
     /**
-     * Default constructor
-     */
-    CDCDedxCosineCor(): m_cosgains() {};
+    * Default constructor
+    */
+    CDCDedxCosineCor(): m_cosgains(), m_groupCosgains(), m_layerToGroup() {};
 
     /**
-     * Constructor
-     * @param cosgains vector of calibration constants
-     */
-    explicit CDCDedxCosineCor(const std::vector<double>& cosgains): m_cosgains(cosgains) {};
+    * Old payloads Constructor
+    * @param cosgains vector of calibration constants
+    */
+    explicit CDCDedxCosineCor(const std::vector<double>& cosgains): m_cosgains(cosgains), m_groupCosgains(),
+      m_layerToGroup() {};
 
     /**
-     * Destructor
-     */
+    * New-style constructor:
+    * grouped cosine corrections with layer-to-group mapping
+    * @param groupCosgains grouped calibration constants [group][bin]
+    * @param layerToGroup map from layer index to group index
+    */
+
+    CDCDedxCosineCor(const std::vector<std::vector<double>>& groupCosgains,
+                     const std::vector<unsigned int>& layerToGroup);
+
+    /**
+    * Destructor
+    */
     ~CDCDedxCosineCor() {};
 
     /**
-     * Combine payloads
-     **/
-    CDCDedxCosineCor& operator*=(CDCDedxCosineCor const& rhs)
+    * Combine payloads
+    **/
+    CDCDedxCosineCor& operator*=(const CDCDedxCosineCor& rhs);
+
+    /**
+    * Check whether grouped mode is used
+    * @return true if grouped constants are available
+    */
+    bool isGrouped() const
     {
-      if (m_cosgains.size() % rhs.getSize() != 0) {
-        B2WARNING("Cosine gain parameters do not match, cannot merge!");
-        return *this;
-      }
-      std::vector<double> rhsgains = rhs.getCosCor();
-      int scale = std::floor(m_cosgains.size() / rhs.getSize() + 0.001);
-      for (unsigned int bin = 0; bin < m_cosgains.size(); ++bin) {
-        m_cosgains[bin] *= rhsgains[std::floor(bin / scale + 0.001)];
-      }
-      return *this;
+      return !m_groupCosgains.empty();
     }
 
     /**
-     * Get the number of bins for the cosine correction
-     * @return number of bins
-     */
-    unsigned int getSize() const { return m_cosgains.size(); };
-
-    /**
-     * Get the calibration constants
-     * @return calibration constants
-     */
-    const std::vector<double>& getCosCor() const {return m_cosgains; };
-
-    /**
-     * Set the cosine correction
-     * @param bin bin number
-     * @param value value to be set
-     */
-    void setCosCor(unsigned int bin, double value)
+    * Get number of groups in grouped mode
+    * @return number of groups
+    */
+    unsigned int getNGroups() const
     {
-      if (bin < m_cosgains.size()) m_cosgains[bin] = value;
-      else B2ERROR("CDCDedxCosineCor: invalid bin number, value not set");
+      if (isGrouped()) return m_groupCosgains.size();
+      return (m_cosgains.empty() ? 0 : 1);
     }
 
-    /**
-     * Return dE/dx mean value for the given bin
-     * @param bin for const with cosine bin
-     * @return mean value
-     */
-    double getMean(unsigned int bin) const
+    /** Number of layers */
+    unsigned int getNLayers() const
     {
-      if (bin < m_cosgains.size()) return m_cosgains[bin];
-      return 1.0;
-    }
+      if (!m_layerToGroup.empty()) return m_layerToGroup.size();
 
-    /**
-     * Return dE/dx mean value for given cos(theta)
-     * @param costh for const with costh theta value
-     * @return mean value
-     */
-    double getMean(double costh) const
-    {
-      if (std::abs(costh) > 1) return 0;
-
-      // gains are stored at the center of the bins
-      // find the bin center immediately preceding this value of costh
-      double binsize = 2.0 / m_cosgains.size();
-      int bin = std::floor((costh - 0.5 * binsize + 1.0) / binsize);
-
-      // extrapolation
-      // extrapolate backward for lowest half-bin and center positive half-bin
-      // extrapolate forward for highest half-bin and center negative half-bin
-      int thisbin = bin, nextbin = bin + 1;
-      if ((costh + 1) < (binsize / 2) || (costh > 0 && std::fabs(costh) < (binsize / 2))) {
-        thisbin = bin + 1; nextbin = bin + 2;
-      } else {
-        if ((costh - 1) > -1.0 * (binsize / 2) || (costh < 0 && std::fabs(costh) < (binsize / 2))) {
-          thisbin = bin - 1; nextbin = bin;
-        }
-      }
-      double frac = ((costh - 0.5 * binsize + 1.0) / binsize) - thisbin;
-
-      if (thisbin < 0 || (unsigned)nextbin >= m_cosgains.size()) {
-        B2WARNING("Problem with extrapolation of CDC dE/dx cosine correction");
-        return 1.0;
-      }
-      return ((m_cosgains[nextbin] - m_cosgains[thisbin]) * frac + m_cosgains[thisbin]);
+      return 0;
     };
 
-  private:
-    std::vector<double> m_cosgains; /**< dE/dx gains in cos(theta) bins */
+    /** Get group index for layer */
+    unsigned int getGroup(unsigned int layer) const
+    {
+      if (layer >= getNLayers()) {
+        B2ERROR("Layer out of range");
+        return std::numeric_limits<unsigned int>::max();
+      }
 
-    ClassDef(CDCDedxCosineCor, 8); /**< ClassDef */
+      if (!m_layerToGroup.empty()) {
+        return m_layerToGroup[layer];
+      }
+
+      B2INFO("Invalid cosine correction payload state");
+      return std::numeric_limits<unsigned int>::max();
+    };
+
+    /**
+    * Get the number of bins
+    * @return number of bins
+    */
+    unsigned int getSize(unsigned int layer) const
+    {
+      if (isGrouped()) {
+        const unsigned int group = getGroup(layer);
+        return m_groupCosgains[group].size();
+      }
+
+      return m_cosgains.size();
+    }
+
+    /**
+    * Get the old-style calibration constants
+    * @return calibration constants
+    */
+    const std::vector<double>& getCosCor() const
+    {
+      return m_cosgains;
+    }
+
+    /**
+    * Get the grouped calibration constants
+    * @return grouped calibration constants
+    */
+    const std::vector<std::vector<double>>& getGroupCosCor() const
+    {
+      return m_groupCosgains;
+    }
+
+    /**
+    * Get the Layer-to-group map
+    * @return layer map
+    */
+    const std::vector<unsigned int>& getLayerMap() const
+    {
+      return m_layerToGroup;
+    }
+
+    /**
+    * Set old-style cosine correction
+    * @param bin bin number
+    * @param value value to be set
+    */
+    void setCosCor(unsigned int bin, double value);
+
+    /**
+    * Set grouped cosine correction
+    * @param group group number
+    * @param bin bin number
+    * @param value value to be set
+    */
+    void setCosCor(unsigned int group, unsigned int bin, double value);
+
+    /**
+    * Return dE/dx mean value for the given bin in old mode
+    * @param bin cosine bin
+    * @return mean value
+    */
+    double getMean(unsigned int bin) const;
+
+    /**
+    * Return dE/dx mean value for given cos(theta) in old mode
+    * @param costh cos(theta)
+    * @return mean value
+    */
+    double getMean(double costh) const;
+
+    /**
+    * Return dE/dx mean value for the given layer and bin
+    * @param layer layer index
+    * @param bin cosine bin
+    * @return mean value
+    */
+    double getMean(unsigned int layer, unsigned int bin) const;
+
+    /**
+    * Return dE/dx mean value for given layer and cos(theta)
+    * @param layer layer index
+    * @param costh cos(theta)
+    * @return mean value
+    */
+    double getMean(unsigned int layer, double costh) const;
+
+  private:
+
+    /**
+    * Helper to interpolate/extrapolate from one vector of gains
+    * @param gains vector of gains
+    * @param costh cos(theta)
+    * @return interpolated mean value
+    */
+    double getMeanFromVector(const std::vector<double>& gains, double costh) const;
+
+    /**
+    * Validate grouped payload content
+    * @return true if grouped payload is consistent
+    */
+    bool isValidGroupedPayload() const;
+
+    /** Element-wise multiplication of gain vectors. */
+    bool multiplyGains(std::vector<double>& lhs, const std::vector<double>& rhs) const;
+
+    std::vector<double> m_cosgains; /**< old-style dE/dx gains in cos(theta) bins */
+    std::vector<std::vector<double>> m_groupCosgains; /**< grouped dE/dx gains [group][bin] */
+    std::vector<unsigned int> m_layerToGroup; /**< map from layer index to group index */
+
+    ClassDef(CDCDedxCosineCor, 9); /**< ClassDef */
   };
 } // end namespace Belle2

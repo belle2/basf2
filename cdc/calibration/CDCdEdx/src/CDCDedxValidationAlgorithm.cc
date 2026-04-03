@@ -912,18 +912,31 @@ CosGainData CDCDedxValidationAlgorithm::getcosgain(int experiment, int run)
 
   DatabaseIN(experiment, run);
 
-  std::vector<double> cosgain, cos;
+  std::array<std::vector<double>, 3> cosgain;
+  std::vector<double> cos;
 
   DBObjPtr<CDCDedxCosineCor> DBCosineCor;
-  if (!DBCosineCor.isValid())  B2FATAL("Cosine gain data are not valid.");
+  if (!DBCosineCor.isValid()) {
+    B2FATAL("Cosine gain data are not valid.");
+  }
 
-  unsigned int nCosBins = DBCosineCor->getSize();
+  // representative layer index for each group
+  const std::array<unsigned int, 3> layerIndex = {0, 1, 17};
 
-  for (unsigned int il = 0; il < nCosBins; ++il) {
-    double costh = -1.0 + (il + 0.5) * 2.0 / nCosBins;
-    costh += .000001;
-    cosgain.push_back(DBCosineCor->getMean(il));
-    cos.push_back(costh);
+  for (int igroup = 0; igroup < 3; ++igroup) {
+    unsigned int nCosBins = DBCosineCor->getSize(layerIndex[igroup]);
+
+    for (unsigned int ibin = 0; ibin < nCosBins; ++ibin) {
+
+      double costh = -1.0 + (ibin + 0.5) * 2.0 / nCosBins;
+      costh += 1e-6;
+
+      if (igroup == 0) {
+        cos.push_back(costh);
+      }
+
+      cosgain[igroup].push_back(DBCosineCor->getMean(igroup, ibin));
+    }
   }
 
   resetDatabase();
@@ -935,31 +948,38 @@ OnedData CDCDedxValidationAlgorithm::getonedgain(int experiment, int run)
 
   DatabaseIN(experiment, run);
 
-  std::vector<double> inner1D, outer1D, Enta;
+  std::array<std::vector<double>, 3> oneDcorr;
+  std::vector<double> enta;
 
   DBObjPtr<CDCDedx1DCell> DBOneDCell;
-  if (!DBOneDCell.isValid())  B2FATAL("OneD cell gain data are not valid.");
+  if (!DBOneDCell.isValid()) {
+    B2FATAL("OneD cell gain data are not valid.");
+  }
 
-  for (int i = 0; i < 2; i++) {
+  // representative layer index for each group
+  const std::array<unsigned int, 3> layerIndex = {0, 1, 17};
 
-    unsigned int nBins = DBOneDCell->getNBins(i);
+  for (int igroup = 0; igroup < 3; igroup++) {
+
+    unsigned int nBins = DBOneDCell->getNBins(layerIndex[igroup]);
     double binSize = TMath::Pi() / nBins;
 
     for (unsigned int nbin = 0; nbin < nBins; nbin++) {
 
-      double enta = (-1 * TMath::Pi() / 2.0) + binSize * nbin;
-      if (i == 0) {
-        Enta.push_back(enta);
-        inner1D.push_back(DBOneDCell->getMean(0, nbin));
-      } else
-        outer1D.push_back(DBOneDCell->getMean(17, nbin));
+      double eta = (-1.0 * TMath::Pi() / 2.0) + binSize * nbin;
+
+      if (igroup == 0) {
+        enta.push_back(eta);
+      }
+
+      oneDcorr[igroup].push_back(DBOneDCell->getMean(layerIndex[igroup], nbin));
     }
   }
+
   resetDatabase();
-  return {inner1D, outer1D, Enta};
+  return {oneDcorr, enta};
 
 }
-
 double CDCDedxValidationAlgorithm::getrungain(int experiment, int run)
 {
 

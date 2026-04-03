@@ -76,7 +76,7 @@ void ECLFinalizerModule::initialize()
 void ECLFinalizerModule::beginRun()
 {
   //..Get m_clusterEnergyCutMin from the payload by default
-  if (m_useParametersFromDatabase and m_eclClusteringParameters.hasChanged()) {
+  if (m_useParametersFromDatabase) {
     m_clusterEnergyCutMin = m_eclClusteringParameters->getFClusterEnergyCutMin();
   }
 }

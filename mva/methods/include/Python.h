@@ -125,13 +125,6 @@ namespace Belle2 {
       virtual std::vector<float> apply(Dataset& test_data) const override;
 
       /**
-       * Apply this expert onto a dataset where the number of output features may vary in each event (e.g. if algorithms like object condensation are used).
-       * @param test_data dataset
-       * @param output_size the size of the vector holding the output features
-       */
-      std::vector<float> applyArbitrarySize(Dataset& test_data, const unsigned int output_size) const override;
-
-      /**
        * Apply this expert onto a dataset for multiclass problem
        * @param test_data dataset
        */
@@ -143,7 +136,6 @@ namespace Belle2 {
       boost::python::object m_state; /**< current state object of method */
       std::vector<float> m_means; /**< Means of all features for normalization */
       std::vector<float> m_stds; /**< Stds of all features for normalization */
-
     };
 
   }

@@ -187,15 +187,16 @@ namespace Belle2::CATFinderUtils {
     /**
      * @brief Sorts CDC hits spatially based on proximity to a starting position.
      *
-     * Builds a KD-tree from the input 2D hit positions and performs an iterative
+     * Builds a KD-tree from the input position and performs an iterative
      * nearest-neighbor traversal to generate a spatially ordered list of hit indices.
      *
-     * @param position Starting 2D position (e.g., from condensation point) as {x, y}.
-     * @param nodes List of 2D hit positions as {x, y} pairs.
-     * @param CDCHitIndices Indices of hits corresponding to the `nodes` vector.
+     * @param positionX Starting X position
+     * @param positionY Starting Y position
+     * @param kdtHits Vector of hits to order
      * @return Vector of hit indices sorted by spatial proximity to the start position.
      */
-    std::vector<int> orderHits(std::vector<double> position, std::vector<std::vector<double>> nodes, std::vector<int>& CDCHitIndices);
+    std::vector<int> orderHits(const double startingX, const double startingY,
+                               std::vector<KDTHit> kdtHits);
 
     /**
      * @brief Constructor.

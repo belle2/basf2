@@ -57,7 +57,6 @@ inline void HitOrderer::insertionSort(Iterator begin, Iterator end, Compare cmp)
 KDTNode* HitOrderer::buildKDTree(std::vector<KDTHit>::iterator begin, std::vector<KDTHit>::iterator end, int depth,
                                  KDTNodePool& pool, const size_t INSERTION_SORT_THRESHOLD)
 {
-
   if (begin >= end)
     return nullptr;
 
@@ -149,24 +148,19 @@ void HitOrderer::freeKDTree(KDTNode* node)
   delete node;
 }
 
-std::vector<int> HitOrderer::orderHits(std::vector<double> startPosition, std::vector<std::vector<double>> nodes,
-                                       std::vector<int>& CDCHitIndices)
+std::vector<int> HitOrderer::orderHits(const double startingX, const double startingY,
+                                       std::vector<KDTHit> kdtHits)
 {
-
-  std::vector<KDTHit> kdtHits;
-  kdtHits.reserve(CDCHitIndices.size());
-  for (size_t i = 0; i < CDCHitIndices.size(); ++i) {
-    kdtHits.push_back({nodes[i][0], nodes[i][1], CDCHitIndices[i]});
-  }
-
   KDTNodePool pool(kdtHits.size());
-
   KDTNode* root = buildKDTree(kdtHits.begin(), kdtHits.end(), 0, pool);
 
+  // Define the starting hit
+  const KDTHit startingHit{startingX, startingY, -1};
+  // Find the hit closest to the seed position
   KDTHit currentHit = kdtHits[0];
   double bestDist = std::numeric_limits<double>::max();
   for (const auto& kdtHit : kdtHits) {
-    const double d = kdtHit.squaredDistanceTo({startPosition[0], startPosition[1], -1});
+    const double d = kdtHit.squaredDistanceTo(startingHit);
     if (d < bestDist) {
       bestDist = d;
       currentHit = kdtHit;
@@ -175,9 +169,9 @@ std::vector<int> HitOrderer::orderHits(std::vector<double> startPosition, std::v
 
   markUsed(root, currentHit);
 
-  std::vector<KDTHit> sortedHits;
-  sortedHits.reserve(kdtHits.size());
-  sortedHits.push_back(currentHit);
+  std::vector<int> sortedIndices;
+  sortedIndices.reserve(kdtHits.size());
+  sortedIndices.push_back(currentHit.hitIndex);
 
   for (size_t i = 1; i < kdtHits.size(); ++i) {
     KDTHit bestNeighbor;
@@ -187,16 +181,9 @@ std::vector<int> HitOrderer::orderHits(std::vector<double> startPosition, std::v
     if (bestNeighborDist == std::numeric_limits<double>::max()) break;
 
     currentHit = bestNeighbor;
-    sortedHits.push_back(currentHit);
+    sortedIndices.push_back(currentHit.hitIndex);
     markUsed(root, currentHit);
   }
 
-  std::vector<int> sortedIndices;
-  sortedIndices.reserve(sortedHits.size());
-  for (KDTHit hit : sortedHits) {
-    sortedIndices.push_back(hit.hitIndex);
-  }
-
   return sortedIndices;
-
 }

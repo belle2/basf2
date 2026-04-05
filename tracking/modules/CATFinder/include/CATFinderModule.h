@@ -115,106 +115,10 @@ namespace Belle2 {
     /** Scale factor for the spatial coordinates (from basf2 units to internal GNN units). */
     static constexpr double SPATIAL_COORDINATES_SCALE = 100.;
 
-    // GNN inputs
-    /** X coordinate of the middle point between the wire ends of a CDC hit. */
-    std::vector<double> m_CDCHitMiddleX;
-    /** Y coordinate of the middle point between the wire ends of a CDC hit. */
-    std::vector<double> m_CDCHitMiddleY;
-    /** X coordinate of a CDC hit. */
-    std::vector<double> m_CDCHitX;
-    /** Y coordinate of a CDC hit. */
-    std::vector<double> m_CDCHitY;
-    /** Drift time associated with a CDC hit. */
-    std::vector<double> m_CDCHitDriftTime;
-    /** Drift length associated with a CDC hit. */
-    std::vector<double> m_CDCHitDriftLength;
-    /** Charge deposit measured for a CDC hit. */
-    std::vector<double> m_CDCHitChargeDeposit;
-
-    /** Superlayer index of the CDC hit. */
-    std::vector<unsigned short> m_CDCHitSuperlayer;
-    /** Layer index of the CDC hit. */
-    std::vector<unsigned short> m_CDCHitLayer;
-    /** Cell layer index of the CDC hit. */
-    std::vector<unsigned short> m_CDCHitCLayer;
-    /** Time-over-threshold (TOT) value of the CDC hit. */
-    std::vector<unsigned short> m_CDCHitTOT;
-    /** ADC (charge) value of the CDC hit. */
-    std::vector<unsigned short> m_CDCHitADC;
-
-    /** Intermediate storage for CDC hit TDC (Time-to-Digital Converter) values. */
-    std::vector<short> m_CDCHitTDC;
-
-    /** Raw output buffer from the GNN model. */
-    std::vector<double> m_outputs;
-
-    // GNN output
-    /** Predicted beta values for each node from the GNN output. */
-    std::vector<double> m_predBetas;
-    /** Predicted electric charge values for each node from the GNN output. */
-    std::vector<double> m_predQs;
-    /** Predicted electric charge values for selected condensation points. */
-    std::vector<double> m_conPointQs;
-
-    /** Predicted momentum vectors for each node from the GNN output. */
-    std::vector<std::vector<double>> m_predPs;
-    /** Predicted vertex position vectors for each node from the GNN output. */
-    std::vector<std::vector<double>> m_predVs;
-    /** Latent space coordinates for each node from the GNN output. */
-    std::vector<std::vector<double>> m_coords;
-    /** Coordinates of selected condensation points in latent space. */
-    std::vector<std::vector<double>> m_conPoints;
-    /** Predicted momentum vectors for selected condensation points. */
-    std::vector<std::vector<double>> m_conPointPs;
-    /** Predicted vertex position vectors for selected condensation points. */
-    std::vector<std::vector<double>> m_conPointVs;
-
-    /** Indices of nodes sorted by descending beta value. */
-    std::vector<int> m_betaIndices;
-    /** Flags indicating which nodes passed the beta threshold selection. */
-    std::vector<int> m_selectedBetas;
-
-    // MVA
     /** Identifier used to locate or reference the CATFinder weight file. */
     const std::string m_identifier = "CATFinderWeightfile";
 
     Belle2::MVA::ONNX::Session m_session;
-
-    // Methods
-
-    /**
-     * @brief Clears all intermediate vectors used in GNN processing.
-     *
-     * Empties prediction buffers, coordinate storage, beta indices, selection flags,
-     * and condensation point containers to prepare for processing a new event.
-     */
-    void prepareVectors();
-
-    /**
-     * @brief Filters and collects distinct condensation points based on spatial separation.
-     *
-     * Iterates over GNN output nodes sorted by beta value and selects those with beta above the threshold.
-     * A node is accepted as a condensation point if it is sufficiently distant from previously selected points.
-     * Updates the `selectedBetas` vector to mark rejected candidates.
-     *
-     * @param betaIndices Indices of nodes sorted by descending beta value.
-     * @param coords Latent space coordinates of the nodes.
-     * @param selectedBetas Vector indicating whether each node is initially above the beta threshold.
-     */
-    void collectOverThreshold(const std::vector<unsigned int>& betaIndices, const std::vector<std::vector<double>>& coords,
-                              std::vector<uint8_t>& selectedBetas);
-
-    /**
-     * @brief Checks whether a condensation point candidate is sufficiently distant from existing points.
-     *
-     * Computes the Euclidean distance between the given candidate point and each point in the list.
-     * Returns `false` if the candidate is within `T_DISTANCE` of any existing point; otherwise, returns `true`.
-     *
-     * @param pointCandidate The coordinate vector of the candidate point.
-     * @param points A list of previously accepted condensation points.
-     * @return `true` if the candidate is outside the defined radius from all existing points, `false` otherwise.
-     */
-    bool isConPointOutOfRadius(const std::vector<double>& pointCandidate, const std::vector<std::vector<double>>& selectedBetas);
 
     /**
      * Calculates the intersection with the CDC wall if the point is inside.

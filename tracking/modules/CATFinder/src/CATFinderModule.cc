@@ -53,241 +53,153 @@ void CATFinderModule::event()
 {
   const std::vector<TrackingUtilities::CDCWireHit>& wireHitVector = *m_wireHitVector;
 
-  // Ugly solution, I know
   unsigned int nHits = 0;
-  for (const auto& wireHit : wireHitVector) {
-    if (wireHit.getAutomatonCell().hasMaskedFlag())
-      continue;
-    nHits++;
-  }
+  for (const auto& wireHit : wireHitVector)
+    if (!wireHit.getAutomatonCell().hasMaskedFlag()) nHits++;
 
-  // Nothing to do: let's return
-  if (nHits == 0)
-    return;
+  if (nHits == 0) return;
 
-  auto input = Tensor<float>::make_shared({nHits, 7});
-  auto beta = Tensor<float>::make_shared({nHits, 1});
-  auto coord = Tensor<float>::make_shared({nHits, 3});
-  auto p = Tensor<float>::make_shared({nHits, 3});
-  auto vertex = Tensor<float>::make_shared({nHits, 3});
-  auto charge = Tensor<float>::make_shared({nHits, 1});
+  auto input_t    = Tensor<float>::make_shared({nHits, 7});
+  auto beta_t     = Tensor<float>::make_shared({nHits, 1});
+  auto coord_t    = Tensor<float>::make_shared({nHits, 3});
+  auto momentum_t = Tensor<float>::make_shared({nHits, 3});
+  auto vertex_t   = Tensor<float>::make_shared({nHits, 3});
+  auto charge_t   = Tensor<float>::make_shared({nHits, 1});
 
   std::vector<unsigned int> tensorIndexToHitIndex;
   tensorIndexToHitIndex.reserve(nHits);
 
   unsigned int iHit = 0;
-  for (unsigned int iWireHit = 0; iWireHit < wireHitVector.size(); ++iWireHit) {
-
-    if (wireHitVector[iWireHit].getAutomatonCell().hasMaskedFlag())
-      continue;
+  for (size_t iWireHit = 0; iWireHit < wireHitVector.size(); ++iWireHit) {
+    if (wireHitVector[iWireHit].getAutomatonCell().hasMaskedFlag()) continue;
 
     const CDCHit* cdcHit = wireHitVector[iWireHit].getHit();
-
     const unsigned short clayer = cdcHit->getICLayer();
-    const unsigned short wire = cdcHit->getIWire();
+    const unsigned short wire   = cdcHit->getIWire();
     const auto wirePos = m_CDCGeometryPar->c_Aligned;
 
-    const double tdc_scaled = (static_cast<double>(cdcHit->getTDCCount()) - TDC_OFFSET) / TDC_SCALE;
-    const double adc_clipped = cdcHit->getADCCount() > ADC_CLIP ? 1. : static_cast<double>(cdcHit->getADCCount()) / ADC_CLIP;
+    const double tdc_scaled  = (static_cast<double>(cdcHit->getTDCCount()) - TDC_OFFSET) / TDC_SCALE;
+    const double adc_clipped = cdcHit->getADCCount() > ADC_CLIP
+                               ? 1.
+                               : static_cast<double>(cdcHit->getADCCount()) / ADC_CLIP;
 
-    const B2Vector3D posForward = m_CDCGeometryPar->wireForwardPosition(clayer, wire, wirePos);
+    const B2Vector3D posForward  = m_CDCGeometryPar->wireForwardPosition(clayer, wire, wirePos);
     const B2Vector3D posBackward = m_CDCGeometryPar->wireBackwardPosition(clayer, wire, wirePos);
 
-    const double x = 0.5 * (posForward.x() + posBackward.x()) / SPATIAL_COORDINATES_SCALE;
-    const double y = 0.5 * (posForward.y() + posBackward.y()) / SPATIAL_COORDINATES_SCALE;
-
-    const double superlayer_scaled = static_cast<double>(cdcHit->getISuperLayer()) / SLAYER_SCALE;
-    const double clayer_scaled = static_cast<double>(clayer) / CLAYER_SCALE;
-    const double layer_scaled = static_cast<double>(cdcHit->getILayer()) / LAYER_SCALE;
-
-    input->at({iHit, 0}) = x;
-    input->at({iHit, 1}) = y;
-    input->at({iHit, 2}) = tdc_scaled;
-    input->at({iHit, 3}) = adc_clipped;
-    input->at({iHit, 4}) = superlayer_scaled;
-    input->at({iHit, 5}) = clayer_scaled;
-    input->at({iHit, 6}) = layer_scaled;
-    ++iHit;
+    input_t->at({iHit, 0}) = 0.5 * (posForward.x() + posBackward.x()) / SPATIAL_COORDINATES_SCALE;
+    input_t->at({iHit, 1}) = 0.5 * (posForward.y() + posBackward.y()) / SPATIAL_COORDINATES_SCALE;
+    input_t->at({iHit, 2}) = tdc_scaled;
+    input_t->at({iHit, 3}) = adc_clipped;
+    input_t->at({iHit, 4}) = static_cast<double>(cdcHit->getISuperLayer()) / SLAYER_SCALE;
+    input_t->at({iHit, 5}) = static_cast<double>(clayer)                   / CLAYER_SCALE;
+    input_t->at({iHit, 6}) = static_cast<double>(cdcHit->getILayer())      / LAYER_SCALE;
 
     tensorIndexToHitIndex.push_back(iWireHit);
+    ++iHit;
   }
 
+  B2DEBUG(29, "CDCWireHits in the event: " << nHits);
   if (nHits != iHit)
     B2ERROR("Different number of hits: something went wrong...");
 
-  // Final step: let's prepare the vectors for the GNN output and the post-processing.
-  prepareVectors();
-
   m_session.run(
-  {{"input", input}}, {
-    {"beta", beta},
-    {"ccoords", coord},
-    {"p", p},
-    {"vertex", vertex},
-    {"charge", charge}
-  }
+  {{"input", input_t}},
+  {{"beta", beta_t}, {"ccoords", coord_t}, {"p", momentum_t}, {"vertex", vertex_t}, {"charge", charge_t}}
   );
 
-  // Extracting the GNN outputs
-  for (size_t i = 0; i < iHit; ++i) {
-    m_predBetas.push_back(beta->at({i, 0}));
-    m_coords.push_back({coord->at({i, 0}), coord->at({i, 1}), coord->at({i, 2})});
-    m_predPs.push_back({p->at({i, 0}), p->at({i, 1}), p->at({i, 2})});
-    m_predVs.push_back({vertex->at({i, 0}), vertex->at({i, 1}), vertex->at({i, 2})});
-    m_predQs.push_back(charge->at({i, 0}));
-  }
-
-  // Creating the beta mask
-  std::vector<unsigned int> betaIndices(m_predBetas.size());
-  std::vector<uint8_t> selectedBetas(m_predBetas.size());
-
+  // Sort indices by descending beta, build selection mask
+  std::vector<unsigned int> betaIndices(nHits);
   std::iota(betaIndices.begin(), betaIndices.end(), 0);
   std::sort(betaIndices.begin(), betaIndices.end(),
-  [&](int i1, int i2) {
-    return m_predBetas[i1] > m_predBetas[i2];
-  });
+  [&](unsigned int i1, unsigned int i2) { return beta_t->at({i1, 0}) > beta_t->at({i2, 0}); });
 
-  for (size_t i = 0; i < m_predBetas.size(); ++i) {
-    selectedBetas[i] = static_cast<uint8_t>(m_predBetas[i] > T_BETA);
-  }
+  std::vector<uint8_t> selectedBetas(nHits);
+  for (size_t i = 0; i < nHits; ++i)
+    selectedBetas[i] = static_cast<uint8_t>(beta_t->at({i, 0}) > T_BETA);
 
-  collectOverThreshold(betaIndices, m_coords, selectedBetas);
+  // Collect condensation point indices via object condensation
+  std::vector<size_t> conPointIndices;
+  constexpr double thresholdSquared = T_DISTANCE * T_DISTANCE;
 
-
-  // Apply beta mask to GNN outputs
-  const size_t betasCount = std::count(selectedBetas.begin(), selectedBetas.end(), 1);
-  m_conPoints.resize(betasCount);
-  m_conPointPs.resize(betasCount);
-  m_conPointVs.resize(betasCount);
-  m_conPointQs.resize(betasCount);
-
-  size_t j = 0;
-  for (size_t i = 0; i < selectedBetas.size(); ++i) {
-    if (selectedBetas[i]) {
-      m_conPoints[j] = m_coords[i];
-      m_conPointPs[j] = m_predPs[i];
-      m_conPointVs[j] = m_predVs[i];
-      m_conPointQs[j] = m_predQs[i];
-      ++j;
+  auto isOutOfRadius = [&](unsigned int i) {
+    for (unsigned int iConPoint : conPointIndices) {
+      double d = 0.0;
+      d += (coord_t->at({i, 0}) - coord_t->at({iConPoint, 0})) * (coord_t->at({i, 0}) - coord_t->at({iConPoint, 0}));
+      d += (coord_t->at({i, 1}) - coord_t->at({iConPoint, 1})) * (coord_t->at({i, 1}) - coord_t->at({iConPoint, 1}));
+      d += (coord_t->at({i, 2}) - coord_t->at({iConPoint, 2})) * (coord_t->at({i, 2}) - coord_t->at({iConPoint, 2}));
+      if (d <= thresholdSquared)
+        return false;
     }
-  }
+    return true;
+  };
 
-  // Loop over the condensation points
-  for (size_t conPoint = 0; conPoint < m_conPoints.size(); ++conPoint) {
-
-    // Calculate distances of the condensation point to all other points
-    const size_t coordSize = m_coords.size();
-    std::vector<double> r(coordSize);
-
-    for (size_t i = 0; i < coordSize; ++i) {
-      r[i] = std::hypot(m_conPoints[conPoint][0] - m_coords[i][0],
-                        m_conPoints[conPoint][1] - m_coords[i][1],
-                        m_conPoints[conPoint][2] - m_coords[i][2]);
-    }
-
-    // Calculate CDCHits and GNN nodes assigned to the condensation point
-    std::vector<int> indices;
-    indices.reserve(r.size());
-    std::vector<std::vector<double>> gnnNodes;
-    gnnNodes.reserve(r.size());
-
-    for (size_t i = 0; i < r.size(); ++i) {
-      if (r[i] < HIT_DISTANCE) {
-        indices.push_back(i);
-        gnnNodes.push_back({input->at({i, 0}), input->at({i, 1})}); // x, y
-      }
-    }
-
-    // Cut on the amount of CDC hits assigned to the condensation point
-    if (indices.size() < CDC_HIT_INDICES_CUT) {
+  for (unsigned int i = 0; i < betaIndices.size(); ++i) {
+    unsigned int iBeta = betaIndices[i];
+    if (!selectedBetas[iBeta])
       continue;
+    if (conPointIndices.empty() or isOutOfRadius(iBeta))
+      conPointIndices.push_back(iBeta);
+    else
+      selectedBetas[iBeta] = 0;
+  }
+  B2DEBUG(29, "Condensation points in the event: " << conPointIndices.size());
+
+  // Loop over condensation points
+  for (size_t iConPoint : conPointIndices) {
+
+    std::vector<CATFinderUtils::KDTHit> kdtHits;
+    kdtHits.reserve(nHits);
+
+    for (size_t i = 0; i < nHits; ++i) {
+      const double dx = coord_t->at({iConPoint, 0}) - coord_t->at({i, 0});
+      const double dy = coord_t->at({iConPoint, 1}) - coord_t->at({i, 1});
+      const double dz = coord_t->at({iConPoint, 2}) - coord_t->at({i, 2});
+      if (std::hypot(dx, dy, dz) < HIT_DISTANCE)
+        kdtHits.push_back({input_t->at({i, 0}), input_t->at({i, 1}), static_cast<int>(i)});
     }
 
-    // Get the momentum and position of the condensation point
-    const ROOT::Math::XYZVector momentum(m_conPointPs[conPoint][0],
-                                         m_conPointPs[conPoint][1],
-                                         m_conPointPs[conPoint][2]
-                                        );
+    if (kdtHits.size() < CDC_HIT_INDICES_CUT)
+      continue;
 
-    const ROOT::Math::XYZVector position(m_conPointVs[conPoint][0] * SPATIAL_COORDINATES_SCALE,
-                                         m_conPointVs[conPoint][1] * SPATIAL_COORDINATES_SCALE,
-                                         m_conPointVs[conPoint][2] * SPATIAL_COORDINATES_SCALE
-                                        );
+    const ROOT::Math::XYZVector momentum(
+      momentum_t->at({iConPoint, 0}), momentum_t->at({iConPoint, 1}), momentum_t->at({iConPoint, 2}));
+    const ROOT::Math::XYZVector position(
+      vertex_t->at({iConPoint, 0}) * SPATIAL_COORDINATES_SCALE,
+      vertex_t->at({iConPoint, 1}) * SPATIAL_COORDINATES_SCALE,
+      vertex_t->at({iConPoint, 2}) * SPATIAL_COORDINATES_SCALE);
 
-    if (std::isnan(position.X()) || std::isnan(momentum.X())) {
+    if (std::isnan(position.X()) or std::isnan(momentum.X())) {
       B2WARNING("Skipping track with NaN values.");
       continue;
     }
 
-    // Get the charge of the condensation point
-    auto tCharge = m_conPointQs[conPoint];
-    const short ccharge = (tCharge >= 0.5) ? 1 : -1;
+    const int charge = (charge_t->at({iConPoint, 0}) >= 0.5) ? 1 : -1;
 
-    // Order the hits with KDT
+    B2DEBUG(29, LogVar("Condensation point", iConPoint) << LogVar("Attached hits", kdtHits.size())
+            << LogVar("Momentum", std::sqrt(momentum.Mag2())) << LogVar("Vertex", std::sqrt(position.Mag2()))
+            << LogVar("Charge", charge));
+
     CATFinderUtils::HitOrderer hitOrderer;
     auto [startingX, startingY] = projectToCDCWall(position, momentum, 16);
-    std::vector<int> sortedIndices = hitOrderer.orderHits(std::vector<double>(startingX, startingY), gnnNodes, indices);
+    std::vector<int> sortedIndices =
+      hitOrderer.orderHits(startingX, startingY, std::move(kdtHits));
 
-    // Create a new RecoTrack and fill it with position, momentum and charge information
     RecoTrack* cdcRecotrack = m_CDCRecoTracks.appendNew();
     cdcRecotrack->setPositionAndMomentum(position, momentum);
-    cdcRecotrack->setChargeSeed(ccharge);
+    cdcRecotrack->setChargeSeed(charge);
 
-    // Create a covatiance matrix and add it to the RecoTrack
-    auto seed_cov = TMatrixDSym(6);
-    for (int i = 0; i < 6; ++i) {
-      for (int k = 0; k < 6; ++k) {
-        seed_cov[i][k] = 1e-1;
-      }
-    }
-    cdcRecotrack->setSeedCovariance(seed_cov);
+    auto seedCovariance = TMatrixDSym(6);
+    for (int j = 0; j < 6; ++j)
+      for (int k = 0; k < 6; ++k)
+        seedCovariance[j][k] = 1e-1;
+    cdcRecotrack->setSeedCovariance(seedCovariance);
 
-    // Add the sorted CDCHits to the RecoTrack
-    int k = 0;
+    int iRecoTrackHit = 0;
     for (int tensorIndex : sortedIndices) {
-      unsigned int hitIndex = tensorIndexToHitIndex[tensorIndex];
-      cdcRecotrack->addCDCHit(wireHitVector[hitIndex].getHit(), k);
-      ++k;
+      cdcRecotrack->addCDCHit(wireHitVector[tensorIndexToHitIndex[tensorIndex]].getHit(), iRecoTrackHit);
+      ++iRecoTrackHit;
     }
   }
-}
-
-void CATFinderModule::collectOverThreshold(const std::vector<unsigned int>& betaIndices,
-                                           const std::vector<std::vector<double>>& coords,
-                                           std::vector<uint8_t>& selectedBetas)
-{
-  if (!betaIndices.empty() && betaIndices[0] < coords.size()) {
-    m_conPoints.push_back(coords[betaIndices[0]]);
-  }
-
-  for (size_t i = 1; i < betaIndices.size(); ++i) {
-    int id = betaIndices[i];
-    if (selectedBetas[id] > 0) {
-      const std::vector<double>& conCandidate = coords[id];
-      if (isConPointOutOfRadius(conCandidate, m_conPoints)) {
-        m_conPoints.push_back(conCandidate);
-      } else {
-        selectedBetas[id] = 0;
-      }
-    }
-  }
-}
-
-bool CATFinderModule::isConPointOutOfRadius(const std::vector<double>& pointCandidate,
-                                            const std::vector<std::vector<double>>& points)
-{
-  constexpr double thresholdSquared = T_DISTANCE * T_DISTANCE;
-  for (const auto& point : points) {
-    double distanceSquared = 0.0;
-    for (size_t i = 0; i < point.size(); ++i) {
-      const double diff = pointCandidate[i] - point[i];
-      distanceSquared += diff * diff;
-    }
-    if (distanceSquared <= thresholdSquared) {
-      return false;
-    }
-  }
-  return true;
 }
 
 std::pair<double, double> CATFinderModule::projectToCDCWall(const ROOT::Math::XYZVector& pos,
@@ -318,20 +230,4 @@ std::pair<double, double> CATFinderModule::projectToCDCWall(const ROOT::Math::XY
   if (t > 0)
     return {pos.X() + t * mom.X(), pos.Y() + t * mom.Y()};
   return {pos.X(), pos.Y()};
-}
-
-void CATFinderModule::prepareVectors()
-{
-  // Clearing vectors from previous event
-  m_predBetas.clear();
-  m_predQs.clear();
-  m_conPointQs.clear();
-  m_predPs.clear();
-  m_predVs.clear();
-  m_coords.clear();
-  m_conPointPs.clear();
-  m_conPointVs.clear();
-  m_betaIndices.clear();
-  m_selectedBetas.clear();
-  m_conPoints.clear();
 }

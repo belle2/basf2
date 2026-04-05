@@ -215,6 +215,12 @@ namespace Belle2 {
      * @return `true` if the candidate is outside the defined radius from all existing points, `false` otherwise.
      */
     bool isConPointOutOfRadius(const std::vector<double>& pointCandidate, const std::vector<std::vector<double>>& selectedBetas);
+
+    /**
+     * Calculates the intersection with the CDC wall if the point is inside.
+     */
+    std::pair<double, double> projectToCDCWall(const ROOT::Math::XYZVector& pos, const ROOT::Math::XYZVector& mom, double targetR);
+
   };
 
 }

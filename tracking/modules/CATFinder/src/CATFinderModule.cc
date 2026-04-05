@@ -16,6 +16,7 @@
 #include <cmath>
 #include <cstdint>
 #include <numeric>
+#include <utility>
 #include <vector>
 
 #include <TMatrixDSym.h>
@@ -222,7 +223,8 @@ void CATFinderModule::event()
 
     // Order the hits with KDT
     CATFinderUtils::HitOrderer hitOrderer;
-    std::vector<int> sortedIndices = hitOrderer.orderHits({position.X(), position.Y()}, gnnNodes, indices);
+    auto [startingX, startingY] = projectToCDCWall(position, momentum, 16);
+    std::vector<int> sortedIndices = hitOrderer.orderHits(std::vector<double>(startingX, startingY), gnnNodes, indices);
 
     // Create a new RecoTrack and fill it with position, momentum and charge information
     RecoTrack* cdcRecotrack = m_CDCRecoTracks.appendNew();
@@ -284,6 +286,36 @@ bool CATFinderModule::isConPointOutOfRadius(const std::vector<double>& pointCand
     }
   }
   return true;
+}
+
+std::pair<double, double> projectToCDCWall(const ROOT::Math::XYZVector& pos,
+                                           const ROOT::Math::XYZVector& mom,
+                                           double targetR = 16.0)
+{
+  // Check if we are already outside or at the boundary
+  double rSq = pos.X() * pos.X() + pos.Y() * pos.Y();
+  if (rSq >= targetR * targetR)
+    return {pos.X(), pos.Y()};
+  // Coefficients for a*t^2 + b*t + c = 0
+  // Solving for |(pos + t*mom).xy| = targetR
+  double a = mom.X() * mom.X() + mom.Y() * mom.Y();
+  double b = 2.0 * (pos.X() * mom.X() + pos.Y() * mom.Y());
+  double c = rSq - (targetR * targetR);
+  double discriminant = b * b - 4.0 * a * c;
+  if (discriminant < 0 or a == 0)
+    return {pos.X(), pos.Y()};
+  double sqrtD = std::sqrt(discriminant);
+  double invA = 1.0 / a;
+  double t1 = 0.5 * (-b + sqrtD) * invA;
+  double t2 = 0.5 * (-b - sqrtD) * invA;
+  // Get the first positive intersection point
+  double t = -1.0;
+  if (t1 > 0 && t2 > 0) t = std::min(t1, t2);
+  else if (t1 > 0)      t = t1;
+  else if (t2 > 0)      t = t2;
+  if (t > 0)
+    return {pos.X() + t * mom.X(), pos.Y() + t * mom.Y()};
+  return {pos.X(), pos.Y()};
 }
 
 void CATFinderModule::prepareVectors()

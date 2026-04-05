@@ -81,7 +81,7 @@ namespace Belle2::CATFinderUtils {
      *
      * @param capacity Maximum number of KDTNodes to allocate.
      */
-    KDTNodePool(size_t capacity);
+    explicit KDTNodePool(size_t capacity);
 
     /**
      * @brief Destructor. Frees all allocated KDTNode objects.
@@ -135,8 +135,8 @@ namespace Belle2::CATFinderUtils {
      * @param INSERTION_SORT_THRESHOLD Switch to insertion sort for small ranges.
      * @return Pointer to the root node of the constructed KD-tree.
      */
-    KDTNode* buildKDTree(std::vector<KDTHit>::iterator begin, std::vector<KDTHit>::iterator end, int depth, KDTNodePool& pool,
-                         const size_t INSERTION_SORT_THRESHOLD = 10);
+    static KDTNode* buildKDTree(std::vector<KDTHit>::iterator begin, std::vector<KDTHit>::iterator end, int depth, KDTNodePool& pool,
+                                const size_t INSERTION_SORT_THRESHOLD = 10);
 
     /**
      * @brief Sorts a small range using insertion sort for performance.
@@ -148,7 +148,7 @@ namespace Belle2::CATFinderUtils {
      * @param cmp Comparator function for sorting.
      */
     template<typename Iterator, typename Compare>
-    inline void insertionSort(Iterator begin, Iterator end, Compare cmp);
+    static inline void insertionSort(Iterator begin, Iterator end, Compare cmp);
 
 
     /**
@@ -156,7 +156,7 @@ namespace Belle2::CATFinderUtils {
      *
      * @param node Root node of the KD-tree to deallocate.
      */
-    void freeKDTree(KDTNode* node);
+    static void freeKDTree(KDTNode* node);
 
     /**
      * @brief Finds the closest unused neighbor to a query hit in the KD-tree.
@@ -169,7 +169,7 @@ namespace Belle2::CATFinderUtils {
      * @param best Best match found so far (output).
      * @param bestDist Squared distance to the best match (output).
      */
-    void nearestNeighbor(KDTNode* node, const KDTHit& query, KDTHit& best, double& bestDist);
+    static void nearestNeighbor(KDTNode* node, const KDTHit& query, KDTHit& best, double& bestDist);
 
     /**
      * @brief Marks a KD-tree node as used if its hit index matches the given hit.
@@ -180,7 +180,7 @@ namespace Belle2::CATFinderUtils {
      * @param hit Hit to match by index.
      * @return True if a matching node was found and marked as used.
      */
-    bool markUsed(KDTNode* node, const KDTHit& hit);
+    static bool markUsed(KDTNode* node, const KDTHit& hit);
 
 
   public:
@@ -195,8 +195,8 @@ namespace Belle2::CATFinderUtils {
      * @param kdtHits Vector of hits to order
      * @return Vector of hit indices sorted by spatial proximity to the start position.
      */
-    std::vector<int> orderHits(const double startingX, const double startingY,
-                               std::vector<KDTHit> kdtHits);
+    static std::vector<int> orderHits(const double startingX, const double startingY,
+                                      std::vector<KDTHit> kdtHits);
 
     /**
      * @brief Constructor.

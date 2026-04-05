@@ -160,6 +160,7 @@ void HitOrderer::freeKDTree(KDTNode* node)
 }
 
 std::vector<int> HitOrderer::orderHits(const double startingX, const double startingY,
+                                       // cppcheck-suppress passedByValue
                                        std::vector<KDTHit> kdtHits)
 {
   // Build a KD-tree over the hits; pool size equals number of hits (one node per hit)

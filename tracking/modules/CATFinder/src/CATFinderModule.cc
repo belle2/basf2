@@ -8,9 +8,9 @@
 
 #include <tracking/modules/CATFinder/CATFinderModule.h>
 
+#include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>
 #include <tracking/modules/CATFinder/CATFinderUtils.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <algorithm>
 #include <cmath>
@@ -42,7 +42,6 @@ void CATFinderModule::initialize()
   m_CDCHits.registerRelationTo(m_CDCRecoTracks);
   m_recoHitInformations.registerRelationTo(m_CDCHits);
   m_CDCRecoTracks.registerRelationTo(m_recoHitInformations);
-  m_CDCGeometryPar = &CDC::CDCGeometryPar::Instance();
 }
 
 void CATFinderModule::beginRun()
@@ -51,6 +50,8 @@ void CATFinderModule::beginRun()
 
 void CATFinderModule::event()
 {
+  CDC::CDCGeometryPar& cdcGeometryPar = CDC::CDCGeometryPar::Instance();
+
   const std::vector<TrackingUtilities::CDCWireHit>& wireHitVector = *m_wireHitVector;
 
   // Use only "unmasked" hits
@@ -93,15 +94,15 @@ void CATFinderModule::event()
     const CDCHit* cdcHit = wireHitVector[iWireHit].getHit();
     const unsigned short clayer = cdcHit->getICLayer();
     const unsigned short wire   = cdcHit->getIWire();
-    const auto wirePos = m_CDCGeometryPar->c_Aligned;
+    const auto wirePos = cdcGeometryPar.c_Aligned;
 
     const double tdc_scaled  = (static_cast<double>(cdcHit->getTDCCount()) - TDC_OFFSET) / TDC_SCALE;
     const double adc_clipped = cdcHit->getADCCount() > ADC_CLIP
                                ? 1.
                                : static_cast<double>(cdcHit->getADCCount()) / ADC_CLIP;
 
-    const B2Vector3D posForward  = m_CDCGeometryPar->wireForwardPosition(clayer, wire, wirePos);
-    const B2Vector3D posBackward = m_CDCGeometryPar->wireBackwardPosition(clayer, wire, wirePos);
+    const B2Vector3D posForward  = cdcGeometryPar.wireForwardPosition(clayer, wire, wirePos);
+    const B2Vector3D posBackward = cdcGeometryPar.wireBackwardPosition(clayer, wire, wirePos);
 
     // Prepare the tensor
     input_t->at({iHit, 0}) = 0.5 * (posForward.x() + posBackward.x()) / SPATIAL_COORDINATES_SCALE;

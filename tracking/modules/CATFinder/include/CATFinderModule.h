@@ -10,7 +10,6 @@
 #include <framework/core/Module.h>
 
 #include <cdc/dataobjects/CDCHit.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/datastore/StoreArray.h>
 #include <mva/methods/ONNX.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -37,7 +36,6 @@ namespace Belle2 {
 
   public:
     CATFinderModule();
-    virtual ~CATFinderModule() {}
 
     /**
      * @brief Initializes the CATFinderModule and registers required data structures and relations.
@@ -79,9 +77,6 @@ namespace Belle2 {
     /** Output store array of hit information for reconstructed tracks. */
     StoreArray<RecoHitInformation> m_recoHitInformations{"RecoHitInformations"};
 
-    /** Pointer to CDC geometry parameters singleton instance. */
-    CDC::CDCGeometryPar* m_CDCGeometryPar;
-
     /** Maximum distance in latent space to associate hits with a condensation point. */
     static constexpr double HIT_DISTANCE = 0.3;
     /** Minimum number of associated CDC hits required to form a valid track. */
@@ -121,9 +116,11 @@ namespace Belle2 {
     Belle2::MVA::ONNX::Session m_session;
 
     /**
-     * Calculates the intersection with the CDC wall if the point is inside.
+     * Project the position along the momentum direction (straight-line approximation)
+     * until it reaches the cylinder of radius targetR in the transverse plane.
      */
-    std::pair<double, double> projectToCDCWall(const ROOT::Math::XYZVector& pos, const ROOT::Math::XYZVector& mom, double targetR);
+    static std::pair<double, double> projectToCDCWall(const ROOT::Math::XYZVector& pos, const ROOT::Math::XYZVector& mom,
+                                                      double targetR);
 
   };
 

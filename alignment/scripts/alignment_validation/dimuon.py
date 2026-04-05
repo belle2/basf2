@@ -403,19 +403,21 @@ def run_validation(filenames: list, output_dir: str, file_format: str = "pdf",
         resolutions_labels[d] = r"$\Sigma$" + d.latex + d.unit.dname
         resolutions_data[f][z] = (data[f][z.name1][mask] - data[f][z.name2][mask]) / 2**0.5 * z.unit.convert
         resolutions_labels[z] = r"$\Delta$" + z.latex + z.unit.dname
+        resolutions_data[f][pt] = (data[f][pt.name1][mask] - data[f][pt.name2][mask]) / 2**0.5 * pt.unit.convert
+        resolutions_labels[pt] = r"$\Delta$" + pt.latex + pt.unit.dname
 
         plot_resolutions_hist(
             f"Resolutions {Path(f).stem}",
             resolutions_data[f], resolutions_labels,
             nbins=40, vars_to_fit=resolutions_data[f].keys(),
-            shape=(1, 2), figsize=(11.0, 5.0),
+            shape=(1, 3), figsize=(14.0, 5.0),
         )
 
     plot_resolution_comparison(
         "Resolutions",
         [resolutions_data[f] for f in filenames],
         labels, resolutions_labels,
-        nbins=40, shape=(1, 2), figsize=(11.0, 5.0),
+        nbins=40, shape=(1, 3), figsize=(14.0, 5.0),
     )
 
     # -----------------------------------------------------------------------

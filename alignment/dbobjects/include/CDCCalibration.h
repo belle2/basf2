@@ -82,7 +82,7 @@ namespace Belle2 {
     /// Direct getter to Y shift of layer
     double getLayerShiftY(int ICLayer) {return get(WireID(ICLayer, Wire4Layers), layerY);}
     /// Destructor
-    ~CDCCalibration() {}
+    ~CDCCalibration() override {}
 
     // ------------- Interface to global Millepede calibration ----------------
     /// Get global unique id
@@ -104,4 +104,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-

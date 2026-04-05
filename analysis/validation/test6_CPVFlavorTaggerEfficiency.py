@@ -342,7 +342,7 @@ for methodName, methodVariable in methods:
     # produce a pdf
     ROOT.gStyle.SetOptStat(0)
     with Quiet(ROOT.kError):
-        Canvas1 = ROOT.TCanvas('Bla', 'Final Output', 1200, 800)
+        Canvas1 = ROOT.TCanvas(f'Bla_{methodName}', 'Final Output', 1200, 800)
     Canvas1.cd()  # activate
     Canvas1.SetLeftMargin(0.13)
     Canvas1.SetRightMargin(0.04)
@@ -485,7 +485,7 @@ for methodName, methodVariable in methods:
 
     # produce the nice calibration plot
     with Quiet(ROOT.kError):
-        Canvas2 = ROOT.TCanvas('Bla2', 'Calibration plot for true B0', 1200, 800)
+        Canvas2 = ROOT.TCanvas(f'Bla2_{methodName}', 'Calibration plot for true B0', 1200, 800)
     Canvas2.cd()  # activate
     Canvas2.SetLeftMargin(0.13)
     Canvas2.SetRightMargin(0.04)
@@ -738,7 +738,7 @@ for category in usedCategories:
 
     ROOT.gStyle.SetOptStat(0)
     with Quiet(ROOT.kError):
-        Canvas = ROOT.TCanvas('Bla', 'TITEL BLA', 1200, 800)
+        Canvas = ROOT.TCanvas(f'Bla_{category}', 'TITEL BLA', 1200, 800)
     Canvas.cd()  # activate
     Canvas.SetLogy()
     Canvas.SetLeftMargin(0.13)

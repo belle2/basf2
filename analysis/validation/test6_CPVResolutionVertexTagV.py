@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -125,7 +125,7 @@ for VXDReq in VXDReqs:
         cut = cut + "&& Jpsi_mu_0_nSVDHits> 0 && Jpsi_mu_1_nSVDHits> 0 "
 
     ROOT.gROOT.SetBatch(True)
-    c1 = ROOT.TCanvas("c1", "c1", 1400, 1100)
+    c1 = ROOT.TCanvas(f"c1_{VXDReq}", "c1", 1400, 1100)
 
     tdat.Draw("DeltaT - mcDeltaT >> B0_DeltaT_" + VXDReq, cut)
     tdat.Draw("DeltaTErr >> B0_DeltaTErr_" + VXDReq, cut)
@@ -236,21 +236,31 @@ for VXDReq in VXDReqs:
     data = ROOT.RooDataSet(
         "data",
         "data",
-        tdat,
         argSet,
-        cut)
+        Import=tdat,
+        Cut=cut)
 
     if VXDReq == 'PXD1' or VXDReq == 'PXD2':
-        fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
-            B0_isSignal, B0_Jpsi_mu0_nPXDHits, B0_Jpsi_mu1_nPXDHits, deltaTErr),
-            f'{cut} && DeltaTErr >= {deltaTErr.getMin()} && DeltaTErr <= {deltaTErr.getMax()}')
+        fitDataDTErr = ROOT.RooDataSet(
+            "data",
+            "data",
+            ROOT.RooArgSet(B0_isSignal, B0_Jpsi_mu0_nPXDHits, B0_Jpsi_mu1_nPXDHits, deltaTErr),
+            Import=tdat,
+            Cut=f'{cut} && DeltaTErr >= {deltaTErr.getMin()} && DeltaTErr <= {deltaTErr.getMax()}')
     elif VXDReq == 'SVD1' or VXDReq == 'SVD2':
-        fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
-            B0_isSignal, B0_Jpsi_mu0_nSVDHits, B0_Jpsi_mu1_nSVDHits, deltaTErr),
-            f'{cut} && DeltaTErr >= {deltaTErr.getMin()} && DeltaTErr <= {deltaTErr.getMax()}')
+        fitDataDTErr = ROOT.RooDataSet(
+            "data",
+            "data",
+            ROOT.RooArgSet(B0_isSignal, B0_Jpsi_mu0_nSVDHits, B0_Jpsi_mu1_nSVDHits, deltaTErr),
+            Import=tdat,
+            Cut=f'{cut} && DeltaTErr >= {deltaTErr.getMin()} && DeltaTErr <= {deltaTErr.getMax()}')
     else:
-        fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(B0_isSignal, deltaTErr),
-                                       f'{cut} && DeltaTErr >= {deltaTErr.getMin()} && DeltaTErr <= {deltaTErr.getMax()}')
+        fitDataDTErr = ROOT.RooDataSet(
+            "data",
+            "data",
+            ROOT.RooArgSet(B0_isSignal, deltaTErr),
+            Import=tdat,
+            Cut=f'{cut} && DeltaTErr >= {deltaTErr.getMin()} && DeltaTErr <= {deltaTErr.getMax()}')
 
     # fitData.append(data)
 

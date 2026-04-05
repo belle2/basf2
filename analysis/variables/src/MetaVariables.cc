@@ -48,6 +48,19 @@
 
 namespace Belle2 {
   namespace Variable {
+    double requireDoubleForFrameVariable(const Variable::Manager::Var* var,
+                                         const Variable::Manager::VarVariant& value,
+                                         const std::string& frameFunction)
+    {
+      if (std::holds_alternative<double>(value)) {
+        return std::get<double>(value);
+      }
+
+      const char* returnedType = std::holds_alternative<int>(value) ? "int" : "bool";
+      B2ERROR("Meta function " << frameFunction << " expects a double variable, but '" << var->name
+              << "' returned " << returnedType << ". Returning NaN.");
+      return Const::doubleNaN;
+    }
 
     Manager::FunctionPtr useRestFrame(const std::vector<std::string>& arguments)
     {
@@ -55,8 +68,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           UseReferenceFrame<RestFrame> frame(particle);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useRestFrame");
         };
         return func;
       } else {
@@ -70,8 +82,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           UseReferenceFrame<CMSFrame> frame;
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useCMSFrame");
         };
         return func;
       } else {
@@ -85,8 +96,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           UseReferenceFrame<LabFrame> frame;
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useLabFrame");
         };
         return func;
       } else {
@@ -115,8 +125,7 @@ namespace Belle2 {
           Particle tmp(pSigB, -particle->getDaughter(daughterIndexTagB)->getPDGCode());
 
           UseReferenceFrame<RestFrame> frame(&tmp);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useTagSideRecoilRestFrame");
         };
 
         return func;
@@ -141,8 +150,7 @@ namespace Belle2 {
                       << LogVar("Number of candidates in the list", listSize));
           const Particle* p = list->getParticle(0);
           UseReferenceFrame<RestFrame> frame(p);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useParticleRestFrame");
         };
         return func;
       } else {
@@ -171,8 +179,7 @@ namespace Belle2 {
           Particle pRecoil(recoil, 0);
           pRecoil.setVertex(particle->getVertex());
           UseReferenceFrame<RestFrame> frame(&pRecoil);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useRecoilParticleRestFrame");
         };
         return func;
       } else {
@@ -200,8 +207,7 @@ namespace Belle2 {
           }
           Particle tmp(pSum, 0);
           UseReferenceFrame<RestFrame> frame(&tmp);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useDaughterRestFrame");
         };
         return func;
       } else {
@@ -232,8 +238,7 @@ namespace Belle2 {
           /* Let's use 0 as PDG code to avoid wrong assumptions. */
           Particle pRecoil(recoil, 0);
           UseReferenceFrame<RestFrame> frame(&pRecoil);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useDaughterRecoilRestFrame");
         };
         return func;
       } else {
@@ -251,8 +256,7 @@ namespace Belle2 {
           StoreArray<MCParticle> mcparticles;
           Particle temp(mcparticles[index]);
           UseReferenceFrame<RestFrame> frame(&temp);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useMCancestorBRestFrame");
         };
         return func;
       } else {
@@ -3463,14 +3467,21 @@ namespace Belle2 {
       }
 
       std::string arg = arguments[0];
-      TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(arg.c_str());
-      int absPdg;
+      TDatabasePDG* pdgDatabase = TDatabasePDG::Instance();
+      TParticlePDG* part = pdgDatabase->GetParticle(arg.c_str());
+      int absPdg = 0;
       if (part != nullptr) {
         absPdg = std::abs(part->PdgCode());
       } else {
         try {
-          absPdg = convertString<int>(arg);
-        } catch (std::exception& e) {}
+          absPdg = std::abs(convertString<int>(arg));
+        } catch (const std::exception&) {
+          absPdg = 0;
+        }
+
+        if (absPdg == 0 || pdgDatabase->GetParticle(absPdg) == nullptr) {
+          B2FATAL("nTrackFitResults: argument '" << arg << "' is neither a valid particle name nor a PDG code");
+        }
       }
 
       auto func = [absPdg](const Particle*) -> int {

@@ -1,0 +1,37 @@
+# EventType: 1110022200
+# Descriptor: [B0 -> (omega -> pi+ pi- pi0) K_L0]cc
+# NickName: Bd_omegaKL
+# Documentation: Signal MC for B0 -> omega K_L0 for TDCPV_klong skim
+# PhysicsWG: TDCPV
+# Tested: Yes
+# Responsible: Ravinder Dhayal
+# Email: ravinder.dhayal@matfyz.cuni.cz
+# Date: 2026-03-06
+#B0 -> (omega -> pi+ pi- pi0) K_L0
+
+Alias omegasig omega
+Alias K_L0sig K_L0
+Alias pi0sig pi0
+
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0 omegasig K_L0sig SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+Enddecay
+CDecay anti-B0sig
+
+# omega -> pi+ pi- pi0
+Decay omegasig
+1.000 pi+ pi- pi0sig     OMEGA_DALITZ;
+Enddecay
+
+# pi0 -> gamma gamma
+Decay pi0sig
+1.0  gamma  gamma  PHSP;
+Enddecay
+
+End
+

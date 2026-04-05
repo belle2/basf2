@@ -101,7 +101,7 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
     return c_Failure;
   }
 
-  for (auto& fileName : mille->getFiles()) {
+  for (const auto& fileName : mille->getFiles()) {
     B2INFO("Stored Mille binary file: " << fileName);
   }
 

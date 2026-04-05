@@ -123,7 +123,7 @@ namespace Belle2 {
         return payloadsTable;
       }
 
-      TimeTable makeInitialTimeTable(std::vector< EventMetaData > events, GlobalLabel& label)
+      TimeTable makeInitialTimeTable(const std::vector< EventMetaData >& events, GlobalLabel& label)
       {
         TimeTable table;
         std::vector<int> nullRow(events.size(), 0);
@@ -133,7 +133,7 @@ namespace Belle2 {
 
         // run header
         RunHeader runs;
-        for (auto event : events) {
+        for (const auto& event : events) {
           runs.push_back({event.getExperiment(), event.getRun()});
         }
         std::get<RunHeader>(table) = runs;
@@ -321,22 +321,22 @@ namespace Belle2 {
 
 
       std::vector<EventMetaData> setupTimedepGlobalLabels(
-        std::vector< std::tuple< std::vector< int >, std::vector< std::tuple< int, int, int > > > >& config)
+        const std::vector< std::tuple< std::vector< int >, std::vector< std::tuple< int, int, int > > > >& config)
       {
         std::vector< std::tuple< std::set< int >, std::set< std::tuple< int, int, int > > > > myConfig = {};
         std::set<std::tuple<int, int, int>> events;
-        for (auto& params_events : config) {
+        for (const auto& params_events : config) {
           auto myRow = std::make_tuple(std::set<int>(), std::set<std::tuple< int, int, int>>());
 
-          for (auto& param : std::get<0>(params_events))
+          for (const auto& param : std::get<0>(params_events))
             std::get<0>(myRow).insert(param);
-          for (auto& event : std::get<1>(params_events)) {
+          for (const auto& event : std::get<1>(params_events)) {
             // WARNING: The function expect event metadata tuple in form (event, run, exp) while the implementation internally
             // reverses this for proper sorting of event metadata in sets!
             std::get<1>(myRow).insert(std::make_tuple(std::get<2>(event), std::get<1>(event), std::get<0>(event)));
           }
 
-          for (auto& event : std::get<1>(params_events)) {
+          for (const auto& event : std::get<1>(params_events)) {
             int eventNum = std::get<0>(event);
             int runNum = std::get<1>(event);
             int expNum = std::get<2>(event);
@@ -368,7 +368,7 @@ namespace Belle2 {
         std::map<std::tuple<int, int, int>, int> eventIndices;
 
 
-        for (auto& event : events) {
+        for (const auto& event : events) {
           // WARNING: here we reverse order of exp,run,event back to "normal"
           eventIndices[event] = eventsVect.size();
           eventsVect.push_back(EventMetaData(std::get<2>(event), std::get<1>(event), std::get<0>(event)));
@@ -376,11 +376,11 @@ namespace Belle2 {
 
         GlobalLabel::clearTimeDependentParamaters();
 
-        for (auto& params_events : myConfig) {
-          for (auto& param : std::get<0>(params_events)) {
+        for (const auto& params_events : myConfig) {
+          for (const auto& param : std::get<0>(params_events)) {
             GlobalLabel label(param);
 
-            for (auto& event : std::get<1>(params_events)) {
+            for (const auto& event : std::get<1>(params_events)) {
               auto eventIndex = eventIndices[event];
               //if (eventIndex > 0)
               label.registerTimeDependent(eventIndex);

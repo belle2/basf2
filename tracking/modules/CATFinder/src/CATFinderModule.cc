@@ -76,12 +76,12 @@ void CATFinderModule::event()
   tensorIndexToHitIndex.reserve(nHits);
 
   unsigned int iHit = 0;
+  for (unsigned int iWireHit = 0; iWireHit < wireHitVector.size(); ++iWireHit) {
 
-  for (const auto& wireHit : wireHitVector) {
-    if (wireHit.getAutomatonCell().hasMaskedFlag())
+    if (wireHitVector[iWireHit].getAutomatonCell().hasMaskedFlag())
       continue;
 
-    const CDCHit* cdcHit = wireHit.getHit();
+    const CDCHit* cdcHit = wireHitVector[iWireHit].getHit();
 
     const unsigned short clayer = cdcHit->getICLayer();
     const unsigned short wire = cdcHit->getIWire();
@@ -107,11 +107,13 @@ void CATFinderModule::event()
     input->at({iHit, 4}) = superlayer_scaled;
     input->at({iHit, 5}) = clayer_scaled;
     input->at({iHit, 6}) = layer_scaled;
-
-    tensorIndexToHitIndex.push_back(iHit);
-
     ++iHit;
+
+    tensorIndexToHitIndex.push_back(iWireHit);
   }
+
+  if (nHits != iHit)
+    B2ERROR("Different number of hits: something went wrong...");
 
   // Final step: let's prepare the vectors for the GNN output and the post-processing.
   prepareVectors();
@@ -288,9 +290,9 @@ bool CATFinderModule::isConPointOutOfRadius(const std::vector<double>& pointCand
   return true;
 }
 
-std::pair<double, double> projectToCDCWall(const ROOT::Math::XYZVector& pos,
-                                           const ROOT::Math::XYZVector& mom,
-                                           double targetR = 16.0)
+std::pair<double, double> CATFinderModule::projectToCDCWall(const ROOT::Math::XYZVector& pos,
+                                                            const ROOT::Math::XYZVector& mom,
+                                                            double targetR = 16.0)
 {
   // Check if we are already outside or at the boundary
   double rSq = pos.X() * pos.X() + pos.Y() * pos.Y();

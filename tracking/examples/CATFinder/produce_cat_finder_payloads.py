@@ -6,211 +6,19 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import numpy as np
-import os
-
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-
-from torch_geometric.nn import GravNetConv, BatchNorm, global_mean_pool
+import yaml
+from gnn_tracking import CDCNet
 
 
-class CDCNet(nn.Module):
-    """
-    Modular GNN architecture for object condensation on CDC hits.
+def produce_onnx_model():
+    model_path = '/path/to/model.pt'
+    config_path = '/path/to/config.yaml'
 
-    This model processes spatial and detector-related features using
-    a stack of GravNet-based convolutional blocks to predict:
-      - condensation scores (beta values),
-      - latent space coordinates for clustering,
-      - track parameters (momentum, vertex, charge).
+    with open(config_path) as f:
+        config = yaml.safe_load(f)
 
-    The network is designed to be flexible with respect to the number
-    of layers, feature dimensions, and GravNet configuration.
-
-    Reference:
-    Learning Representations of Irregular Particle-detector Geometry
-    with Distance-weighted Graph Networks (https://arxiv.org/abs/1902.07987)
-    """
-
-    def __init__(
-        self,
-        input_dim,
-        k=10,
-        dim1=64,
-        dim2=32,
-        nblocks=4,
-        coord_dim=2,
-        space_dimensions=4,
-        momentum=0.6,
-    ):
-        """
-        Initializes the CDCNet with the specified architecture parameters.
-
-        :param input_dim: Number of input features per node.
-        :param k: Number of nearest neighbors for GravNetConv layers.
-        :param dim1: Hidden feature dimension in GravNet blocks.
-        :param dim2: Output feature dimension per GravNet block.
-        :param nblocks: Number of GravNetConv blocks in the network.
-        :param coord_dim: Number of output dimensions for condensation coordinates.
-        :param space_dimensions: Number of spatial dimensions learned by GravNet.
-        :param momentum: Momentum factor for BatchNorm layers.
-        """
-        super().__init__()
-
-        self.batch_norm_0 = BatchNorm(input_dim, momentum=0.6)
-
-        # First block to start with input dimension
-        self.blocks = nn.ModuleList(
-            [
-                # Start with the first block according to input dimension
-                nn.ModuleList(
-                    [
-                        nn.Linear(2 * input_dim, dim1),
-                        nn.Linear(dim1, dim1),
-                        BatchNorm(dim1, momentum=momentum),
-                        nn.Linear(dim1, dim1),
-                        GravNetConv(
-                            in_channels=dim1,
-                            out_channels=dim1 * 2,
-                            space_dimensions=space_dimensions,
-                            k=k,
-                            propagate_dimensions=dim1,
-                        ),
-                        BatchNorm(dim1 * 2, momentum=momentum),
-                        nn.Linear(dim1 * 2, dim2),
-                    ]
-                )
-            ]
-        )
-
-        # Loop over remaining blocks as they are currently built the same
-        self.blocks.extend(
-            nn.ModuleList(
-                [
-                    # Add according to number of blocks
-                    nn.ModuleList(
-                        [
-                            nn.Linear(4 * dim1, dim1),
-                            nn.Linear(dim1, dim1),
-                            BatchNorm(dim1, momentum=momentum),
-                            nn.Linear(dim1, dim1),
-                            GravNetConv(
-                                in_channels=dim1,
-                                out_channels=dim1 * 2,
-                                space_dimensions=space_dimensions,
-                                k=k,
-                                propagate_dimensions=dim1,
-                            ),
-                            # Edges, so need dim1 times 2
-                            BatchNorm(dim1 * 2, momentum=momentum),
-                            nn.Linear(dim1 * 2, dim2),
-                        ]
-                    )
-                    for _ in range(nblocks - 1)
-                ]
-            )
-        )
-
-        # There are skip connections between the blocks,
-        # this layer combines them, therefore scales with nblocks
-        self.dense_cat = nn.Linear(dim2 * (nblocks), dim1)
-
-        # These are the output layers for object condensation
-        self.p_beta_layer = nn.Linear(dim1, 1)  # predict condensation point
-        self.p_ccoords_layer = nn.Linear(dim1, coord_dim)  # predict latent space coordinates
-
-        # These are the output layers for the track parameters
-        self.p_p_layer = nn.Linear(dim1, 3)  # predict track momentum
-        self.p_vertex_layer = nn.Linear(dim1, 3)  # predict track starting point
-        self.p_charge_layer = nn.Linear(dim1, 1)  # predict track charge
-
-    def forward(self, x, batch):
-        """
-        Forward pass through the CDCNet.
-
-        Applies the GravNetConv blocks and computes predictions for object condensation
-        and track parameters.
-
-        :param x: Node feature tensor of shape [N, input_dim].
-        :param batch: Batch vector assigning each node to a graph [N].
-        :return: Tensor of shape [N, 1 + coord_dim + 3 + 3 + 1] containing:
-                 beta, coordinates, momentum (px, py, pz),
-                 vertex (vx, vy, vz), and charge.
-        """
-
-        features = []
-        x = self.batch_norm_0(x)
-
-        # Global exchange
-        out = global_mean_pool(x, batch)
-        x = torch.cat([x, out[batch]], dim=-1)
-
-        # Apply Grav Net Blocks
-        for i, block in enumerate(self.blocks):
-            if i > 0:
-                # Do this for every block except input
-                out = global_mean_pool(x, batch)
-                x = torch.cat([x, out[batch]], dim=-1)
-            x = F.elu(block[0](x))
-            x = F.elu(block[1](x))
-            # First batch normalization
-            x = block[2](x)
-            x = F.elu(block[3](x))
-            # Grav Net block
-            x = block[4](x, batch)
-            # Second batch normalization
-            x = block[5](x)
-            # Append output
-            features.append(F.elu(block[6](x)))  # skip connections
-
-        # Concatenate features and put through final dense neural network
-        x = torch.cat(features, dim=1)
-        x = F.elu(self.dense_cat(x))
-
-        # Here are the networks for object condensation predictions
-        p_beta = torch.sigmoid(self.p_beta_layer(x))
-        p_ccoords = self.p_ccoords_layer(x)
-
-        # Here are the networks for track parameters predictions
-        p_p = self.p_p_layer(x)
-        p_vertex = self.p_vertex_layer(x)
-        p_charge = torch.sigmoid(self.p_charge_layer(x))
-
-        # Concatenate all the predictions and return them
-        predictions = torch.cat(
-            (
-                p_beta,
-                p_ccoords,
-                p_p,
-                p_vertex,
-                p_charge,
-            ),
-            dim=1,
-        )
-        return predictions
-
-
-class GNNWrapper:
-    """
-    Wrapper class for inference with a trained CDCNet model.
-
-    Handles model loading from disk and preprocessing inputs for evaluation.
-    Designed for integration with basf2's Python MVA interface.
-    """
-
-    def __init__(self, model_path, config, device='cpu'):
-        """
-        Loads a trained CDCNet from file and prepares it for inference.
-
-        :param model_path: Path to the `.pt` file containing the model weights.
-        :param config: Configuration dictionary used to define the model architecture.
-        :param device: Torch device to run the model on ('cpu' or 'cuda').
-        """
-        self._device = device
-        self._config = config
-        self._net = CDCNet(
+    _net = CDCNet(
             input_dim=len(config['dataset']['input_features']),
             k=config['model']['k'],
             nblocks=config['model']['blocks'],
@@ -219,178 +27,75 @@ class GNNWrapper:
             dim2=config['model']['dim2'],
             space_dimensions=config['model'].get('space_dimensions', 4),
             momentum=config['model'].get('momentum', 0.6),
-        ).to(self._device)
+        ).to('cpu')
 
-        loaded_model = torch.load(model_path, map_location=self._device)
+    loaded_model = torch.load(model_path, map_location='cpu')
 
-        state_dict = loaded_model['model_state_dict']
-        keys = list(state_dict.keys())
-        new_state_dict = {}
-        for i in range(len(keys)):
-            key = keys[i]
-            if key.startswith('module.'):
-                key = key.replace('module.', '', 1)
-            new_state_dict[key] = state_dict[keys[i]]
+    state_dict = loaded_model['model_state_dict']
+    keys = list(state_dict.keys())
+    new_state_dict = {}
+    for i in range(len(keys)):
+        key = keys[i]
+        if key.startswith('module.'):
+            key = key.replace('module.', '', 1)
+        # Remap old checkpoint name to new attribute name
+        if key.startswith('p_ccoords_layer'):
+            key = key.replace('p_ccoords_layer', 'p_coords_layer', 1)
+        new_state_dict[key] = state_dict[keys[i]]
 
-        self._net.load_state_dict(new_state_dict)
-        self._net.eval()
+    _net.load_state_dict(new_state_dict)
+    _net.eval()
 
-    def predict(self, X):
-        """
-        Runs the trained CDCNet model on input data.
+    torch.save(_net.state_dict(), "cdcnet.pt")
 
-        :param X: Numpy array of shape [N, 7] containing preprocessed features.
-        :return: Flattened prediction array containing outputs from the forward pass.
-        """
-        with torch.no_grad():
-            features = torch.tensor(X, dtype=torch.float32).to(self._device).reshape(-1, 7)
-            batch = torch.zeros(len(features), dtype=torch.int64).to(self._device)
-            predictions = self._net(features, batch).numpy().flatten()
-            return predictions
-
-
-def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
-    """
-    Placeholder for model initialization in the MVA interface.
-
-    Currently unused in this setup.
-    """
-    return None
+    with torch.no_grad():
+        x = torch.rand(1000, 7)
+        torch.onnx.export(
+            _net,
+            (x,),
+            "cdcnet.onnx",
+            input_names=["input"],
+            output_names=["beta", "coordinates", "momentum", "vertex", "charge"],
+            dynamic_shapes=[{0: "hits"}],
+            dynamo=True,
+            external_data=False,
+        )
 
 
-def feature_importance(state):
-    """
-    Returns a list of features ranked by importance.
+def produce_payloads():
+    import ROOT  # noqa
 
-    Currently unimplemented — returns an empty list.
+    iov = ROOT.Belle2.IntervalOfValidity(0, 0, -1, -1)
+    database = ROOT.Belle2.Database.Instance()
 
-    :param state: Internal model state (ignored).
-    :return: Empty list.
-    """
-    return []
+    onnx_path = '/path/to/cdcnet.onnx'
 
+    database.addPayload('CATFinderWeightFile', onnx_path, iov)
 
-def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
-    """
-    Hook called before model training begins.
+    parameters = ROOT.Belle2.CATFinderParameters()
+    parameters.setTDCOffset(4100)
+    parameters.setTDCScale(1100)
+    parameters.setADCClip(600)
+    parameters.setSLayerScale(10)
+    parameters.setCLayerScale(56)
+    parameters.setLayerScale(10)
+    parameters.setSpatialCoordinatesScale(100)
+    parameters.setNInputFeatures(7)
+    parameters.setLatentSpaceNDim(3)
+    parameters.setTBeta(0.7)
+    parameters.setTDistance(0.7)
+    parameters.setMaxRadius(0.3)
+    parameters.setMinNumberHits(7)
+    parameters.setInputTFeaturesName('input')
+    parameters.setOutputTBetaName('beta')
+    parameters.setOutputTCoordinatesName('coordinates')
+    parameters.setOutputTMomentumName('momentum')
+    parameters.setOutputTVertexName('vertex')
+    parameters.setOutputTChargeName('charge')
 
-    Currently unused.
-    """
-    return None
-
-
-def partial_fit(state, X, S, y, w, epoch, batch):
-    """
-    Performs a single training step.
-
-    Not implemented — training is not supported in this interface.
-
-    :return: False
-    """
-    return False
-
-
-def end_fit(state):
-    """
-    Finalizes the model for inference after training.
-
-    Loads configuration and weights from disk, returning a GNNWrapper.
-
-    :param state: Placeholder state object (ignored).
-    :return: A GNNWrapper instance ready for inference.
-    """
-    import yaml
-
-    model_path = r'/work/lreuter/CAT_event_generation/models/train_bucket36/run_bucket_36_training_mix_pretrained/best_model.pt'
-    config_path = r'/work/lreuter/CAT_event_generation/models/train_bucket36/run_bucket_36_training_mix_pretrained/config.yaml'
-
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
-
-    return GNNWrapper(model_path, config)
-
-
-def load(state):
-    """
-    Reloads a previously saved model state.
-
-    :param state: The previously saved model state.
-    :return: The unmodified state.
-    """
-    return state
-
-
-def apply(state, X):
-    """
-    Applies the trained model to the given input features.
-
-    :param state: A GNNWrapper instance.
-    :param X: Input features as a NumPy array.
-    :return: Model predictions as a contiguous float32 NumPy array.
-    """
-    p = state.predict(X)
-    return np.require(p, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
-
-
-def produce_dummy_file(file_name):
-    """
-    Produces a dummy ROOT file containing fake training data.
-
-    This is used for testing the MVA integration pipeline. The file includes
-    three float variables ('a', 'b', 'c') and an integer prediction target.
-
-    :param file_name: Path to the output ROOT file.
-    """
-    import ROOT
-
-    tfile = ROOT.TFile(file_name, 'RECREATE')
-    ttree = ROOT.TTree('dummy', 'dummy')
-
-    variables = ['a', 'b', 'c']
-    data = {var: np.zeros(1, dtype=np.float32) for var in variables}
-    for var, arr in data.items():
-        ttree.Branch(var, arr, f'{var}/F')
-    target = np.zeros(1, dtype=np.int32)
-    ttree.Branch('prediction', target, 'prediction/I')
-
-    for _ in range(10):
-        for var in variables:
-            data[var][0] = 1.
-        target[0] = 1
-        ttree.Fill()
-
-    ttree.Write()
-    tfile.Close()
+    database.storeData('CATFinderParameters', parameters, iov)
 
 
 if __name__ == '__main__':
-    """
-    Creates a dummy dataset and exports a placeholder CATFinder model.
-
-    NOTE: This is only for testing the MVA export process and should not
-    be used in production.
-    """
-    import basf2
-    import basf2_mva
-
-    # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
-    basf2.conditions.testing_payloads = ['localdb/database.txt']
-
-    produce_dummy_file('dummy.root')
-
-    # Configuration for fake training
-    general_options = basf2_mva.GeneralOptions()
-    general_options.m_identifier = 'CATFinderWeightfile'
-    # These options here are useless, but we need to make basf2 happy, so...
-    general_options.m_datafiles = basf2_mva.vector('dummy.root')
-    general_options.m_treename = 'dummy'
-    general_options.m_variables = basf2_mva.vector(*['a', 'b', 'c'])
-    general_options.m_target_variable = 'prediction'
-
-    python_options = basf2_mva.PythonOptions()
-    python_options.m_framework = 'torch'
-    python_options.m_steering_file = os.path.abspath(__file__)
-
-    basf2_mva.teacher(general_options, python_options)
-
-    print(f'CATFinder model correctly exported into {general_options.m_identifier} payload')
+    produce_onnx_model()
+    produce_payloads()

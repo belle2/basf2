@@ -227,7 +227,7 @@ namespace Belle2 {
     std::string m_outputTCoordinatesName;
 
     /** Name of the output tensor carrying the predicted momenta. */
-    std::string m_outputTMomentunName;  // typo preserved to match ClassDef layout
+    std::string m_outputTMomentumName;
 
     /** Name of the output tensor carrying the predicted vertices. */
     std::string m_outputTVertexName;

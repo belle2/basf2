@@ -8,9 +8,16 @@
 
 #include <tracking/modules/CATFinder/CATFinderModule.h>
 
-#include <cdc/geometry/CDCGeometryPar.h>
-#include <framework/logging/Logger.h>
+#include <tracking/dbobjects/CATFinderParameters.h>
 #include <tracking/gnnFinder/Utils.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
+#include <tracking/dataobjects/RecoTrack.h>
+
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <framework/database/DBAccessorBase.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/logging/Logger.h>
 
 #include <algorithm>
 #include <cmath>
@@ -27,11 +34,14 @@ using Belle2::MVA::ONNX::Tensor;
 
 REG_MODULE(CATFinder);
 
-CATFinderModule::CATFinderModule() : Module(), m_session("/work/gdepietro/cat-finder-cpp/cdcnet.onnx")
+CATFinderModule::CATFinderModule() : Module()
 {
-  setDescription("GNN based CDC track finding.");
-  addParam("recoTracksStoreArrayName", m_CDCRecoTracksName, "StoreArray name of the output CDC reco tracks.",
+  setDescription("The GNN-based CDC AI Track Finder, also known as CATFinder.");
+  addParam("recoTracksStoreArrayName", m_CDCRecoTracksName, "Name of the output store array of CDC RecoTrack.",
            m_CDCRecoTracksName);
+  addParam("catFinderWeightfileName", m_catFinderWeightfileName,
+           "Name of the CATFinder weightfile as stored in the conditions database.",
+           m_catFinderWeightfileName);
 }
 
 void CATFinderModule::initialize()
@@ -47,6 +57,38 @@ void CATFinderModule::initialize()
 
 void CATFinderModule::beginRun()
 {
+  DBObjPtr<CATFinderParameters> parameters;
+  if (not parameters.isValid())
+    B2FATAL("CATFinderParameters is not valid");
+
+  auto weightfile = DBAccessorBase(DBStoreEntry::c_RawFile, m_catFinderWeightfileName, true);
+  if (not weightfile.isValid())
+    B2FATAL(m_catFinderWeightfileName << " is not valid");
+
+  // Get the relevant parameters
+  m_tdcOffset               = parameters->getTDCOffset();
+  m_tdcScale                = parameters->getTDCScale();
+  m_adcClip                 = parameters->getADCClip();
+  m_slayerScale             = parameters->getSLayerScale();
+  m_clayerScale             = parameters->getCLayerScale();
+  m_layerScale              = parameters->getLayerScale();
+  m_spatialCoordinatesScale = parameters->getSpatialCoordinatesScale();
+  m_nInputFeatures          = parameters->getNInputFeatures();
+  m_latentSpaceNDim         = parameters->getLatentSpaceNDim();
+  m_tBeta                   = parameters->getTBeta();
+  m_tDistance               = parameters->getTDistance();
+  m_maxRadius               = parameters->getMaxRadius();
+  m_minNumberHits           = parameters->getMinNumberHits();
+  m_inputTFeaturesName      = parameters->getInputTFeaturesName();
+  m_outputTBetaName         = parameters->getOutputTBetaName();
+  m_outputTCoordinatesName  = parameters->getOutputTCoordinatesName();
+  m_outputTMomentumName     = parameters->getOutputTMomentumName();
+  m_outputTVertexName       = parameters->getOutputTVertexName();
+  m_outputTChargeName       = parameters->getOutputTChargeName();
+
+  // Get the weightfile and initialize the ONNX session
+  const std::string filename = weightfile.getFilename();
+  m_session = std::make_unique<MVA::ONNX::Session>(filename.c_str());
 }
 
 void CATFinderModule::event()
@@ -67,7 +109,7 @@ void CATFinderModule::event()
     return;
 
   // Input tensore: features per hit
-  auto input_t    = Tensor<float>::make_shared({nHits, 7});
+  auto input_t    = Tensor<float>::make_shared({nHits, m_nInputFeatures});
   // Output tensor: condensation score
   auto beta_t     = Tensor<float>::make_shared({nHits, 1});
   // Output tensor: predicted coordinates in the latent space
@@ -97,22 +139,22 @@ void CATFinderModule::event()
     const unsigned short wire   = cdcHit->getIWire();
     const auto wirePos = cdcGeometryPar.c_Aligned;
 
-    const double tdc_scaled  = (static_cast<double>(cdcHit->getTDCCount()) - TDC_OFFSET) / TDC_SCALE;
-    const double adc_clipped = cdcHit->getADCCount() > ADC_CLIP
+    const double tdc_scaled  = (static_cast<double>(cdcHit->getTDCCount()) - m_tdcOffset) / m_tdcScale;
+    const double adc_clipped = cdcHit->getADCCount() > m_adcClip
                                ? 1.
-                               : static_cast<double>(cdcHit->getADCCount()) / ADC_CLIP;
+                               : static_cast<double>(cdcHit->getADCCount()) / m_adcClip;
 
     const B2Vector3D posForward  = cdcGeometryPar.wireForwardPosition(clayer, wire, wirePos);
     const B2Vector3D posBackward = cdcGeometryPar.wireBackwardPosition(clayer, wire, wirePos);
 
     // Prepare the tensor
-    input_t->at({iHit, 0}) = 0.5 * (posForward.x() + posBackward.x()) / SPATIAL_COORDINATES_SCALE;
-    input_t->at({iHit, 1}) = 0.5 * (posForward.y() + posBackward.y()) / SPATIAL_COORDINATES_SCALE;
+    input_t->at({iHit, 0}) = 0.5 * (posForward.x() + posBackward.x()) / m_spatialCoordinatesScale;
+    input_t->at({iHit, 1}) = 0.5 * (posForward.y() + posBackward.y()) / m_spatialCoordinatesScale;
     input_t->at({iHit, 2}) = tdc_scaled;
     input_t->at({iHit, 3}) = adc_clipped;
-    input_t->at({iHit, 4}) = static_cast<double>(cdcHit->getISuperLayer()) / SLAYER_SCALE;
-    input_t->at({iHit, 5}) = static_cast<double>(clayer)                   / CLAYER_SCALE;
-    input_t->at({iHit, 6}) = static_cast<double>(cdcHit->getILayer())      / LAYER_SCALE;
+    input_t->at({iHit, 4}) = static_cast<double>(cdcHit->getISuperLayer()) / m_slayerScale;
+    input_t->at({iHit, 5}) = static_cast<double>(clayer)                   / m_clayerScale;
+    input_t->at({iHit, 6}) = static_cast<double>(cdcHit->getILayer())      / m_layerScale;
 
     tensorIndexToHitIndex.push_back(iWireHit);
     ++iHit;
@@ -123,9 +165,9 @@ void CATFinderModule::event()
     B2ERROR("Different number of hits: something went wrong...");
 
   // Run the GNN inference
-  m_session.run(
-  {{"input", input_t}},
-  {{"beta", beta_t}, {"ccoords", coord_t}, {"p", momentum_t}, {"vertex", vertex_t}, {"charge", charge_t}}
+  m_session->run(
+  {{m_inputTFeaturesName, input_t}},
+  {{m_outputTBetaName, beta_t}, {m_outputTCoordinatesName, coord_t}, {m_outputTMomentumName, momentum_t}, {m_outputTVertexName, vertex_t}, {m_outputTChargeName, charge_t}}
   );
 
   // Build an index array sorted by descending beta so we process the most probable condensation points first
@@ -137,12 +179,12 @@ void CATFinderModule::event()
   // A hit is a candidate condensation point only if its beta exceeds the threshold
   std::vector<uint8_t> selectedBetas(nHits);
   for (unsigned int i = 0; i < nHits; ++i)
-    selectedBetas[i] = static_cast<uint8_t>(beta_t->at({i, 0}) > T_BETA);
+    selectedBetas[i] = static_cast<uint8_t>(beta_t->at({i, 0}) > m_tBeta);
 
-  // A new condensation point is accepted only if it lies farther than T_DISTANCE
+  // A new condensation point is accepted only if it lies farther than m_tDistance
   // from every already-accepted point in latent coordinate space
   std::vector<unsigned int> conPointIndices;
-  constexpr double thresholdSquared = T_DISTANCE * T_DISTANCE;
+  const float thresholdSquared = m_tDistance * m_tDistance;
 
   // Returns true if hit i is outside the exclusion radius of every accepted condensation point
   auto isOutOfRadius = [&](unsigned int i) {
@@ -174,28 +216,28 @@ void CATFinderModule::event()
     std::vector<GNNFinder::Utils::KDTHit> kdtHits;
     kdtHits.reserve(nHits);
 
-    // Collect all hits whose clustering coordinates fall within HIT_DISTANCE of this seed
+    // Collect all hits whose clustering coordinates fall within m_maxRadius of this seed
     for (unsigned int i = 0; i < nHits; ++i) {
       const double dx = coord_t->at({iConPoint, 0}) - coord_t->at({i, 0});
       const double dy = coord_t->at({iConPoint, 1}) - coord_t->at({i, 1});
       const double dz = coord_t->at({iConPoint, 2}) - coord_t->at({i, 2});
-      if (std::hypot(dx, dy, dz) < HIT_DISTANCE) {
+      if (std::hypot(dx, dy, dz) < m_maxRadius) {
         // Store the wire X and Y coordinatres together with the tensor row index for later lookup
         kdtHits.push_back({input_t->at({i, 0}), input_t->at({i, 1}), static_cast<int>(i)});
       }
     }
 
     // Reject tracks with too few hits
-    if (kdtHits.size() < CDC_HIT_INDICES_CUT)
+    if (kdtHits.size() < m_minNumberHits)
       continue;
 
     // Retrieve predicted momentum, vertex and charge from the condensation point's output
     const ROOT::Math::XYZVector momentum(
       momentum_t->at({iConPoint, 0}), momentum_t->at({iConPoint, 1}), momentum_t->at({iConPoint, 2}));
     const ROOT::Math::XYZVector position(
-      vertex_t->at({iConPoint, 0}) * SPATIAL_COORDINATES_SCALE,
-      vertex_t->at({iConPoint, 1}) * SPATIAL_COORDINATES_SCALE,
-      vertex_t->at({iConPoint, 2}) * SPATIAL_COORDINATES_SCALE);
+      vertex_t->at({iConPoint, 0}) * m_spatialCoordinatesScale,
+      vertex_t->at({iConPoint, 1}) * m_spatialCoordinatesScale,
+      vertex_t->at({iConPoint, 2}) * m_spatialCoordinatesScale);
     const int charge = (charge_t->at({iConPoint, 0}) >= 0.5) ? 1 : -1;
 
     B2DEBUG(29, LogVar("Condensation point", iConPoint) << LogVar("Attached hits", kdtHits.size())
@@ -210,7 +252,8 @@ void CATFinderModule::event()
     // Order hits along the helix from the innermost CDC wall outward,
     // starting from where the predicted trajectory intersects the inner wall
     GNNFinder::Utils::HitOrderer hitOrderer;
-    auto [startingX, startingY] = GNNFinder::Utils::intersectCylinderXY(position, momentum, 16);
+    auto [startingX, startingY] = GNNFinder::Utils::intersectCylinderXY(position, momentum,
+                                  16);  // TODO: find a better way to represent 16...
     std::vector<int> sortedIndices =
       hitOrderer.orderHits(startingX, startingY, std::move(kdtHits));
 

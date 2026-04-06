@@ -9,14 +9,16 @@
 
 #include <framework/core/Module.h>
 
-#include <cdc/dataobjects/CDCHit.h>
 #include <framework/datastore/StoreArray.h>
 #include <mva/methods/ONNX.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
 
 namespace Belle2 {
+
+  class CDCHit;
+  class RecoHitInformation;
+  class RecoTrack;
 
   /**
    * @class CATFinderModule
@@ -66,55 +68,83 @@ namespace Belle2 {
 
   private:
 
-    /** Input store array of CDC hits used for track finding. */
+    /** Name of the output store array of CDC RecoTrack. */
+    std::string m_CDCRecoTracksName;
+
+    /** Name of the CATFinder weightfile as stored in the conditions database. */
+    std::string m_catFinderWeightfileName = "CATFinderWeightFile";
+
+    /** Input store array of CDCHit. */
     StoreArray<CDCHit> m_CDCHits;
-    /** Input vector of CDC wire hits for the current event. */
+
+    /** Input vector of CDCWireHit. */
     TrackingUtilities::StoreWrappedObjPtr<std::vector<TrackingUtilities::CDCWireHit>> m_wireHitVector{"CDCWireHitVector"};
-    /** Name of the output store array of reconstructted CDC tracks. */
-    std::string m_CDCRecoTracksName = "";
-    /** Output store array of reconstructed CDC tracks. */
+
+    /** Output store array of RecoTrack. */
     StoreArray<RecoTrack> m_CDCRecoTracks;
-    /** Output store array of hit information for reconstructed tracks. */
-    StoreArray<RecoHitInformation> m_recoHitInformations{"RecoHitInformations"};
 
-    /** Maximum distance in latent space to associate hits with a condensation point. */
-    static constexpr double HIT_DISTANCE = 0.3;
-    /** Minimum number of associated CDC hits required to form a valid track. */
-    static constexpr int CDC_HIT_CUT = 10;
-    /** Minimum number of CDC hits required for a condensation point to be considered. */
-    static constexpr long unsigned int CDC_HIT_INDICES_CUT = 7;
-    /** Target distance used for spatial hit ordering or clustering. */
-    static constexpr int TARGET_DISTANCE = 16;
-    /** Number of input features per node for the GNN model. */
-    static constexpr unsigned int N_INPUT_FEATURES = 7;
-    /** Number of output features per node produced by the GNN model. */
-    static constexpr unsigned int N_OUTPUT_FEATURES = 11;
-    /** Threshold for the beta value to select candidate condensation points. */
-    static constexpr float T_BETA = 0.7;
-    /** Minimum distance required between condensation points in latent space. */
-    static constexpr double T_DISTANCE = 0.7;
-    /** Offset applied to TDC counts for time calibration. */
-    static constexpr double TDC_OFFSET = 4100;
-    /** Scale factor applied to TDC counts to convert to time units. */
-    static constexpr double TDC_SCALE = 1100;
+    /** Output store array of RecoHitInformation. */
+    StoreArray<RecoHitInformation> m_recoHitInformations;
+
+    /** Offset applied to TDC counts. */
+    float m_tdcOffset = 0.;
+
+    /** Scale factor for TDC normalization. */
+    float m_tdcScale = 0.;
+
     /** Maximum ADC value used for normalization; values above are clipped. */
-    static constexpr double ADC_CLIP = 600;
+    float m_adcClip = 0.;
+
     /** Scale factor for normalizing superlayer indices. */
-    static constexpr double SLAYER_SCALE = 10;
+    float m_slayerScale = 0.;
+
     /** Scale factor for normalizing cell layer indices. */
-    static constexpr double CLAYER_SCALE = 56;
+    float m_clayerScale = 0.;
+
     /** Scale factor for normalizing layer indices. */
-    static constexpr double LAYER_SCALE = 10;
+    float m_layerScale = 0.;
+
+    /** Scale factor for spatial coordinates (from basf2 units to internal GNN units). */
+    float m_spatialCoordinatesScale = 0.;
+
+    /** Number of input features per node for the GNN model. */
+    unsigned int m_nInputFeatures = 0;
+
     /** Dimensionality of the latent space used by the GNN. */
-    static constexpr int LATENT_SPACE_N_DIM = 3;
-    /** Scale factor for the spatial coordinates (from basf2 units to internal GNN units). */
-    static constexpr double SPATIAL_COORDINATES_SCALE = 100.;
+    unsigned int m_latentSpaceNDim = 0;
 
-    /** Identifier used to locate or reference the CATFinder weight file. */
-    const std::string m_identifier = "CATFinderWeightfile";
+    /** Threshold for the beta value to select candidate condensation points. */
+    float m_tBeta = 0.;
 
-    Belle2::MVA::ONNX::Session m_session;
+    /** Minimum distance required between condensation points in latent space. */
+    float m_tDistance = 0.;
 
+    /** Maximum radius in latent space to associate hits with a condensation point. */
+    float m_maxRadius = 0.;
+
+    /** Minimum number of associated CDC hits required to form a valid track. */
+    unsigned int m_minNumberHits = 0.;
+
+    /** Name of the input tensor carrying the per-hit features. */
+    std::string m_inputTFeaturesName;
+
+    /** Name of the output tensor carrying the per-hit beta (condensation score) values. */
+    std::string m_outputTBetaName;
+
+    /** Name of the output tensor carrying the per-hit condensation coordinates. */
+    std::string m_outputTCoordinatesName;
+
+    /** Name of the output tensor carrying the predicted momenta. */
+    std::string m_outputTMomentumName;
+
+    /** Name of the output tensor carrying the predicted vertices. */
+    std::string m_outputTVertexName;
+
+    /** Name of the output tensor carrying the predicted charges. */
+    std::string m_outputTChargeName;
+
+    /** ONNX inference session. */
+    std::unique_ptr<MVA::ONNX::Session> m_session;
   };
 
 }

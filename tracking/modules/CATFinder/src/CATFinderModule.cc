@@ -85,7 +85,7 @@ void CATFinderModule::event()
   tensorIndexToHitIndex.reserve(nHits);
 
   unsigned int iHit = 0;
-  for (size_t iWireHit = 0; iWireHit < wireHitVector.size(); ++iWireHit) {
+  for (unsigned int iWireHit = 0; iWireHit < wireHitVector.size(); ++iWireHit) {
 
     // Again: skip the already masked hits
     if (wireHitVector[iWireHit].getAutomatonCell().hasMaskedFlag())
@@ -136,12 +136,12 @@ void CATFinderModule::event()
 
   // A hit is a candidate condensation point only if its beta exceeds the threshold
   std::vector<uint8_t> selectedBetas(nHits);
-  for (size_t i = 0; i < nHits; ++i)
+  for (unsigned int i = 0; i < nHits; ++i)
     selectedBetas[i] = static_cast<uint8_t>(beta_t->at({i, 0}) > T_BETA);
 
   // A new condensation point is accepted only if it lies farther than T_DISTANCE
   // from every already-accepted point in latent coordinate space
-  std::vector<size_t> conPointIndices;
+  std::vector<unsigned int> conPointIndices;
   constexpr double thresholdSquared = T_DISTANCE * T_DISTANCE;
 
   // Returns true if hit i is outside the exclusion radius of every accepted condensation point
@@ -169,13 +169,13 @@ void CATFinderModule::event()
   B2DEBUG(29, "Condensation points in the event: " << conPointIndices.size());
 
   // Convert the condensation points into RecoTracks: one condensation point -> one RecoTrack
-  for (size_t iConPoint : conPointIndices) {
+  for (unsigned int iConPoint : conPointIndices) {
 
     std::vector<GNNFinder::Utils::KDTHit> kdtHits;
     kdtHits.reserve(nHits);
 
     // Collect all hits whose clustering coordinates fall within HIT_DISTANCE of this seed
-    for (size_t i = 0; i < nHits; ++i) {
+    for (unsigned int i = 0; i < nHits; ++i) {
       const double dx = coord_t->at({iConPoint, 0}) - coord_t->at({i, 0});
       const double dy = coord_t->at({iConPoint, 1}) - coord_t->at({i, 1});
       const double dz = coord_t->at({iConPoint, 2}) - coord_t->at({i, 2});

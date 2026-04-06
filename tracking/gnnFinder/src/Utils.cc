@@ -164,6 +164,10 @@ std::vector<int> HitOrderer::orderHits(const double startingX, const double star
                                        // cppcheck-suppress passedByValue
                                        std::vector<KDTHit> kdtHits)
 {
+  // Return an empty vector if kdtHits is empty
+  if (kdtHits.empty())
+    return std::vector<int> {};
+
   // Build a KD-tree over the hits; pool size equals number of hits (one node per hit)
   KDTNodePool pool(kdtHits.size());
   KDTNode* root = buildKDTree(kdtHits.begin(), kdtHits.end(), 0, pool);

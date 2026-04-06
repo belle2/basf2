@@ -17,6 +17,17 @@ using namespace Belle2;
 
 namespace Belle2::GNNFinder::Utils {
 
+  TEST(HitOrdererTest, OrderNoHits)
+  {
+    HitOrderer orderer;
+
+    std::vector<KDTHit> hits = {};
+
+    auto result = orderer.orderHits(2.0, 1.0, hits);
+
+    EXPECT_TRUE(result.empty());
+  }
+
   TEST(HitOrdererTest, OrderSingleHit)
   {
     HitOrderer orderer;

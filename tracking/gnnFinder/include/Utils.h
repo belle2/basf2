@@ -7,9 +7,10 @@
  **************************************************************************/
 #pragma once
 
+#include <Math/Vector3D.h>
+
 #include <cstddef>
 #include <vector>
-
 
 namespace Belle2::GNNFinder::Utils {
 
@@ -185,7 +186,7 @@ namespace Belle2::GNNFinder::Utils {
 
   public:
     /**
-     * @brief Sorts CDC hits spatially based on proximity to a starting position.
+     * @brief Sort hits spatially based on proximity to a starting position.
      *
      * Builds a KD-tree from the input position and performs an iterative
      * nearest-neighbor traversal to generate a spatially ordered list of hit indices.
@@ -208,5 +209,22 @@ namespace Belle2::GNNFinder::Utils {
      */
     ~HitOrderer() = default;
   };
+
+  /**
+   * @brief Finds the first intersection of a straight-line ray with a cylinder of given radius.
+   *
+   * Propagates the ray defined by @p pos and @p mom in the transverse (xy) plane until it
+   * reaches the cylinder |(x,y)| = @p targetR. The z component is ignored.
+   * If the starting point is already outside or on the cylinder, or no forward intersection
+   * exists, the original transverse position is returned unchanged.
+   *
+   * @param pos     Starting position of the ray.
+   * @param mom     Direction of the ray (does not need to be normalised).
+   * @param targetR Radius of the target cylinder in the same units as @p pos.
+   * @return        (x, y) of the first forward intersection, or (pos.X(), pos.Y()) as fallback.
+   */
+  std::pair<double, double> intersectCylinderXY(const ROOT::Math::XYZVector& pos,
+                                                const ROOT::Math::XYZVector& mom,
+                                                const double targetR);
 
 }

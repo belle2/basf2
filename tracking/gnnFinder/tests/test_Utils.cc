@@ -42,7 +42,7 @@ namespace Belle2::GNNFinder::Utils {
     EXPECT_EQ(result[0], 5);
   }
 
-  TEST(HitOrdererTest, OrderMultipleHits)
+  TEST(HitOrdererTest, OrderTrivialPath)
   {
     HitOrderer orderer;
 

@@ -3,6 +3,6 @@ Import('env')
 # Mark this folder a sub-library
 env.Dictionary()['SUBLIB'] = True
 
-env['LIBS'] = ['framework']
+env['LIBS'] = ['framework', '$ROOT_LIBS']
 
 Return('env')

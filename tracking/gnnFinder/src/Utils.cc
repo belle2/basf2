@@ -15,13 +15,10 @@
 
 using namespace Belle2::GNNFinder::Utils;
 
-
 KDTNodePool::KDTNodePool(size_t capacity) : index(0)
 {
   pool.resize(capacity);
-  for (size_t i = 0; i < capacity; ++i) {
-    pool[i] = new KDTNode();
-  }
+  std::generate(pool.begin(), pool.end(), [] { return new KDTNode(); });
 }
 
 KDTNodePool::~KDTNodePool()
@@ -33,9 +30,8 @@ KDTNodePool::~KDTNodePool()
 
 KDTNode* KDTNodePool::allocate()
 {
-  if (index >= pool.size()) {
+  if (index >= pool.size())
     B2ERROR("KDTNodePool:allocate() exceeded pool capacity.");
-  }
   // Hand out the next pre-allocated slot and advance the cursor
   return pool[index++];
 }
@@ -65,13 +61,13 @@ KDTNode* HitOrderer::buildKDTree(std::vector<KDTHit>::iterator begin, std::vecto
     return nullptr;
 
   // Alternate splitting dimension with each level of recursion
-  int dim = depth % 2;
-  auto cmp = [dim](const KDTHit & a, const KDTHit & b) {
+  const int dim = depth % 2;
+  const auto cmp = [dim](const KDTHit & a, const KDTHit & b) {
     return (dim == 0) ? a.x < b.x : a.y < b.y;
   };
 
-  size_t n = std::distance(begin, end);
-  auto mid  = begin + n / 2;  // Median element becomes the node's pivot
+  const size_t n = std::distance(begin, end);
+  const auto mid  = begin + n / 2;  // Median element becomes the node's pivot
 
   if (n < INSERTION_SORT_THRESHOLD) {
     // Full sort for small ranges: cheaper than nth_element + recursion overhead
@@ -101,7 +97,7 @@ void HitOrderer::nearestNeighbor(KDTNode* node, const KDTHit& query, KDTHit& bes
 
   // Evaluate the current node if it hasn't been assigned to the track yet
   if (!node->used) {
-    double d = query.squaredDistanceTo(node->hit);
+    const double d = query.squaredDistanceTo(node->hit);
     if (d < bestDist) {
       bestDist = d;
       best = node->hit;
@@ -109,9 +105,9 @@ void HitOrderer::nearestNeighbor(KDTNode* node, const KDTHit& query, KDTHit& bes
   }
 
   // Determine which child subtree lies on the same side as the query point
-  int dim = node->dim;
-  double qVal = (dim == 0) ? query.x : query.y;
-  double nVal = (dim == 0) ? node->hit.x : node->hit.y;
+  const int dim = node->dim;
+  const double qVal = (dim == 0) ? query.x : query.y;
+  const double nVal = (dim == 0) ? node->hit.x : node->hit.y;
 
   KDTNode* near = (qVal < nVal) ? node->left : node->right;
   KDTNode* far  = (qVal < nVal) ? node->right : node->left;
@@ -121,7 +117,7 @@ void HitOrderer::nearestNeighbor(KDTNode* node, const KDTHit& query, KDTHit& bes
 
   // Pruning: search only the "far" side if the distance to the
   // splitting plane is less than the best distance found so far
-  double diff = qVal - nVal;
+  const double diff = qVal - nVal;
   if ((diff * diff) < bestDist) {
     nearestNeighbor(far, query, best, bestDist);
   }
@@ -174,27 +170,25 @@ std::vector<int> HitOrderer::orderHits(const double startingX, const double star
 
   // Define the starting hit (-1 here means it's not a real hit)
   const KDTHit startingHit{startingX, startingY, -1};
+
   // Linear scan to find the real hit closest to the starting position.
   // A KD-tree query is not used here because the starting position is not in the tree,
   // and the list is typically short enough that a scan is negligible.
-  KDTHit currentHit = kdtHits[0];
-  double bestDist = std::numeric_limits<double>::max();
-  for (const auto& kdtHit : kdtHits) {
-    const double d = kdtHit.squaredDistanceTo(startingHit);
-    if (d < bestDist) {
-      bestDist = d;
-      currentHit = kdtHit;
-    }
-  }
+  const KDTHit& firstHit = *std::min_element(kdtHits.begin(), kdtHits.end(),
+  [&startingHit](const KDTHit & a, const KDTHit & b) {
+    return a.squaredDistanceTo(startingHit) < b.squaredDistanceTo(startingHit);
+  });
 
   // Mark the first hit as consumed so it won't be returned by nearestNeighbor
-  markUsed(root, currentHit);
+  markUsed(root, firstHit);
 
+  // Prepare the output
   std::vector<int> sortedIndices;
   sortedIndices.reserve(kdtHits.size());
-  sortedIndices.push_back(currentHit.hitIndex);
+  sortedIndices.push_back(firstHit.hitIndex);
 
   // Greedy chain: at each step find the nearest unused hit to the current one
+  KDTHit currentHit = firstHit;
   for (size_t i = 1; i < kdtHits.size(); ++i) {
     KDTHit bestNeighbor;
     double bestNeighborDist = std::numeric_limits<double>::max();
@@ -210,4 +204,34 @@ std::vector<int> HitOrderer::orderHits(const double startingX, const double star
   }
 
   return sortedIndices;
+}
+
+std::pair<double, double> Belle2::GNNFinder::Utils::intersectCylinderXY(const ROOT::Math::XYZVector& pos,
+    const ROOT::Math::XYZVector& mom,
+    const double targetR)
+{
+  // Check if we are already outside or at the boundary
+  double rSq = pos.X() * pos.X() + pos.Y() * pos.Y();
+  if (rSq >= targetR * targetR)
+    return {pos.X(), pos.Y()};
+  // Coefficients for a*t^2 + b*t + c = 0
+  // Solving for |(pos + t*mom).xy| = targetR
+  double a = mom.X() * mom.X() + mom.Y() * mom.Y();
+  double b = 2.0 * (pos.X() * mom.X() + pos.Y() * mom.Y());
+  double c = rSq - (targetR * targetR);
+  double discriminant = b * b - 4.0 * a * c;
+  if (discriminant < 0 or a == 0)
+    return {pos.X(), pos.Y()};
+  double sqrtD = std::sqrt(discriminant);
+  double invA = 1.0 / a;
+  double t1 = 0.5 * (-b + sqrtD) * invA;
+  double t2 = 0.5 * (-b - sqrtD) * invA;
+  // Get the first positive intersection point
+  double t = -1.0;
+  if (t1 > 0 && t2 > 0) t = std::min(t1, t2);
+  else if (t1 > 0)      t = t1;
+  else if (t2 > 0)      t = t2;
+  if (t > 0)
+    return {pos.X() + t * mom.X(), pos.Y() + t * mom.Y()};
+  return {pos.X(), pos.Y()};
 }

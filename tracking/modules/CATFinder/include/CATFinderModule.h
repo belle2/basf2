@@ -115,13 +115,6 @@ namespace Belle2 {
 
     Belle2::MVA::ONNX::Session m_session;
 
-    /**
-     * Project the position along the momentum direction (straight-line approximation)
-     * until it reaches the cylinder of radius targetR in the transverse plane.
-     */
-    static std::pair<double, double> projectToCDCWall(const ROOT::Math::XYZVector& pos, const ROOT::Math::XYZVector& mom,
-                                                      double targetR);
-
   };
 
 }

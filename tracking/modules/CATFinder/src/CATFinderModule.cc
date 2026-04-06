@@ -62,7 +62,8 @@ void CATFinderModule::beginRun()
     B2FATAL("CATFinderParameters is not valid");
 
   auto weightfile = DBAccessorBase(DBStoreEntry::c_RawFile, m_catFinderWeightfileName, true);
-  if (not weightfile.isValid())
+  const std::string filename = weightfile.getFilename();
+  if (filename == "")
     B2FATAL(m_catFinderWeightfileName << " is not valid");
 
   // Get the relevant parameters
@@ -87,7 +88,7 @@ void CATFinderModule::beginRun()
   m_outputTChargeName       = parameters->getOutputTChargeName();
 
   // Get the weightfile and initialize the ONNX session
-  const std::string filename = weightfile.getFilename();
+
   m_session = std::make_unique<MVA::ONNX::Session>(filename.c_str());
 }
 

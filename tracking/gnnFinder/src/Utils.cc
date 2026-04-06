@@ -139,15 +139,16 @@ bool HitOrderer::markUsed(KDTNode* node, const KDTHit& hit)
   }
 
   // Descend into the child whose partition contains the hit's coordinate
-  int dim = node->dim;
-  double hVal = (dim == 0) ? hit.x : hit.y;
-  double nVal = (dim == 0) ? node->hit.x : node->hit.y;
+  const int    dim  = node->dim;
+  const double hVal = (dim == 0) ? hit.x      : hit.y;
+  const double nVal = (dim == 0) ? node->hit.x : node->hit.y;
 
-  if (hVal < nVal) {
-    return markUsed(node->left, hit);
-  } else {
-    return markUsed(node->right, hit);
-  }
+  KDTNode* first  = (hVal < nVal) ? node->left  : node->right;
+  KDTNode* second = (hVal < nVal) ? node->right : node->left;
+
+  // If the primary branch fails (e.g. due to equal coordinates on the
+  // splitting axis), fall back to the other child rather than giving up
+  return markUsed(first, hit) or markUsed(second, hit);
 }
 
 void HitOrderer::freeKDTree(KDTNode* node)

@@ -99,7 +99,7 @@ namespace Belle2 {
 
     /** Set the name of the output tensor for predicted momenta.
      *  @param[in] outputTMomentumName Output momentum tensor name. */
-    void setOutputTMomentumName(const std::string& outputTMomentumName) { m_outputTMomentunName = outputTMomentumName; }
+    void setOutputTMomentumName(const std::string& outputTMomentumName) { m_outputTMomentumName = outputTMomentumName; }
 
     /** Set the name of the output tensor for predicted vertices.
      *  @param[in] outputTVertexName Output vertex tensor name. */
@@ -158,7 +158,7 @@ namespace Belle2 {
     const std::string& getOutputTCoordinatesName() const { return m_outputTCoordinatesName; }
 
     /** Get the name of the output tensor for predicted momenta. */
-    const std::string& getOutputTMomentumName() const { return m_outputTMomentunName; }
+    const std::string& getOutputTMomentumName() const { return m_outputTMomentumName; }
 
     /** Get the name of the output tensor for predicted vertices. */
     const std::string& getOutputTVertexName() const { return m_outputTVertexName; }

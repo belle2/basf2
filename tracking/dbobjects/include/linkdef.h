@@ -16,6 +16,6 @@
 #pragma link C++ class Belle2::KinkFinderParameters+; // checksum=0x6ba64774, version=1
 #pragma link C++ class Belle2::TrackingMVAFilterParameters+; // checksum=0xd0221a33, version=1
 #pragma link C++ class Belle2::WireHitFilterSettings+; // checksum=0xb2e21a93, version=1
-#pragma link C++ class Belle2::CATFinderParameters+; // checksum=0x5eafa0f6, version=1
+#pragma link C++ class Belle2::CATFinderParameters+; // checksum=0xcbcdab45, version=1
 
 #endif

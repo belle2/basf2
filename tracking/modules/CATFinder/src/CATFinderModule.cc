@@ -10,7 +10,7 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>
-#include <tracking/modules/CATFinder/CATFinderUtils.h>
+#include <tracking/gnnFinder/Utils.h>
 
 #include <algorithm>
 #include <cmath>
@@ -170,7 +170,7 @@ void CATFinderModule::event()
   // Convert the condensation points into RecoTracks: one condensation point -> one RecoTrack
   for (size_t iConPoint : conPointIndices) {
 
-    std::vector<CATFinderUtils::KDTHit> kdtHits;
+    std::vector<GNNFinder::Utils::KDTHit> kdtHits;
     kdtHits.reserve(nHits);
 
     // Collect all hits whose clustering coordinates fall within HIT_DISTANCE of this seed
@@ -208,7 +208,7 @@ void CATFinderModule::event()
 
     // Order hits along the helix from the innermost CDC wall outward,
     // starting from where the predicted trajectory intersects the inner wall
-    CATFinderUtils::HitOrderer hitOrderer;
+    GNNFinder::Utils::HitOrderer hitOrderer;
     auto [startingX, startingY] = projectToCDCWall(position, momentum, 16);
     std::vector<int> sortedIndices =
       hitOrderer.orderHits(startingX, startingY, std::move(kdtHits));

@@ -11,7 +11,7 @@
 #include <vector>
 
 
-namespace Belle2::CATFinderUtils {
+namespace Belle2::GNNFinder::Utils {
 
   /**
   * @struct KDTHit

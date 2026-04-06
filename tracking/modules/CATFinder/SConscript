@@ -5,6 +5,8 @@ env['LIBS'] = [
   'framework',
   'mva',
   'tracking',
+  'tracking_dataobjects',
+  'tracking_gnnFinder',
   '$ROOT_LIBS'
 ]
 

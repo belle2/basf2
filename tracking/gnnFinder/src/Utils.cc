@@ -6,14 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/CATFinder/CATFinderUtils.h>
+#include <tracking/gnnFinder/Utils.h>
 #include <framework/logging/Logger.h>
 
 #include <algorithm>
 #include <limits>
 
 
-using namespace Belle2::CATFinderUtils;
+using namespace Belle2::GNNFinder::Utils;
 
 
 KDTNodePool::KDTNodePool(size_t capacity) : index(0)

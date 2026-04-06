@@ -11,7 +11,6 @@ This test checks that the CATFinder module wrks.
 In case of changes in the simulation, the parameters of the MCParticles might need to be adapted.
 '''
 
-
 import basf2 as b2
 import simulation as si
 from tracking.path_utils import add_cdc_track_finding
@@ -111,6 +110,7 @@ main.add_module(AddMCParticle())
 si.add_simulation(main)
 
 add_cdc_track_finding(main, use_cat_finder=True)
+
 main.add_module('StatisticsSummary').set_name('Sum_CATFinder')
 
 main.add_module('SetupGenfitExtrapolation')

@@ -10,13 +10,13 @@
 # Date: 20260403
 #
 
+Alias rho_prime+ rho(2S)+
+Alias rho_prime- rho(2S)-
+ChargeConj rho_prime+ rho_prime-
+
 # New particles
 # pdg.add_particle(’rho_mm+’,     700213, mass=2000e-3, width=1000e-3, max_width=1700e-3  ,charge=1,    spin=1)
 # pdg.add_particle(’rho_mm-’,    -700213, mass=2000e-3, width=1000e-3, max_width=1700e-3  ,charge=-1,   spin=1)
-# pdg.add_particle(’rho_mm0’,     700113, mass=2000e-3, width=1000e-3, max_width=1700e-3  ,charge=0,    spin=1)
-# pdg.add_particle(’rho_prime+’,  800213, mass=1465e-3, width=400e-3,  max_width=1000e-3  ,charge=1,    spin=1)
-# pdg.add_particle(’rho_prime-’, -800213, mass=1465e-3, width=400e-3,  max_width=1000e-3  ,charge=-1,   spin=1)
-# pdg.add_particle(’rho_prime0’,  800113, mass=1465e-3, width=400e-3,  max_width=1000e-3  ,charge=0,    spin=1)
 
 Decay Upsilon(4S)
 1.0     B0sig anti-B0sig B0 anti-B0	             	VSS_BMIX dm;

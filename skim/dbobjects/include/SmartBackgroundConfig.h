@@ -45,7 +45,7 @@ namespace Belle2 {
     /**
      * Return pdg mapping.
      */
-    std::unordered_map<int, int> getPdgMapping() const
+    const std::unordered_map<int, int>& getPdgMapping() const
     {
       return m_pdgMapping;
     }
@@ -53,7 +53,7 @@ namespace Belle2 {
     /**
      * Return skimcodes mapping.
      */
-    std::unordered_map<int, uint16_t> getSkimcodesMapping() const
+    const std::unordered_map<int, uint16_t>& getSkimcodesMapping() const
     {
       return m_skimcodesMapping;
     }
@@ -61,7 +61,7 @@ namespace Belle2 {
     /**
      * Return parameter mapping.
      */
-    std::unordered_map<int, std::vector<float>> getParameterMapping() const
+    const std::unordered_map<int, std::vector<float>>& getParameterMapping() const
     {
       return m_paramMapping;
     }
@@ -69,7 +69,7 @@ namespace Belle2 {
     /**
      * Return skim names mapping
      */
-    std::unordered_map<int, std::string> getSkimnamesMapping() const
+    const std::unordered_map<int, std::string>& getSkimnamesMapping() const
     {
       return m_skimnamesMapping;
     }
@@ -77,7 +77,7 @@ namespace Belle2 {
     /**
      * Return event type mapping
      */
-    std::unordered_map<std::string, int32_t> getEventtypeMapping() const
+    const std::unordered_map<std::string, int32_t>& getEventtypeMapping() const
     {
       return m_eventtypeMapping;
     }

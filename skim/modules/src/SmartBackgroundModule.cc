@@ -17,7 +17,6 @@
 #include <framework/database/DBAccessorBase.h>
 #include <framework/database/DBStoreEntry.h>
 #include <framework/database/DBObjPtr.h>
-#include <mva/methods/ONNX.h>
 
 #include <string>
 #include <vector>
@@ -61,6 +60,8 @@ SmartBackgroundModule::SmartBackgroundModule() : Module()
            false);
   addParam("activationOverrideParams", m_activationOverrideParams,
            "Parameters (a, b) of the activation function (clipped exponential)", std::vector<float>({0.5, 0.0}));
+  m_minProb = 1;
+  m_minLogProb = 0;
 
 }
 
@@ -178,7 +179,7 @@ void SmartBackgroundModule::event()
     const MCParticle& p = *mcparticles[particleIndex];
     const ROOT::Math::XYZVector vertex = p.getVertex();
     const int pdg = p.getPDG();
-    MCParticle* mother = p.getMother();
+    const MCParticle* mother = p.getMother();
     int motherIndex = 0;
     if (mother) {
       motherIndex = mother->getArrayIndex();

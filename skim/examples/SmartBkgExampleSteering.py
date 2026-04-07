@@ -19,6 +19,8 @@ import modularAnalysis as ma
 from skim.WGs.fei import feiHadronic
 from skim import smartbkg as sbg
 
+b2.set_random_seed(18052001)
+
 # Initialize path and set event info (100 events for this example)
 path = b2.Path()
 path.add_module("EventInfoSetter", evtNumList=[100], expList=[0], runList=[0])

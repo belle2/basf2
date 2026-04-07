@@ -110,7 +110,7 @@ namespace Belle2 {
     double getDedxMean() const { return m_dedxAvg; }
 
     /** Return the vector of dE/dx values for this track */
-    std::vector< double > getDedxList() const { return m_hDedx; }
+    const std::vector<double>& getDedxList() const { return m_hDedx; }
 
     /** Return the track momentum valid in the CDC */
     double getMomentum() const { return m_pCDC; }

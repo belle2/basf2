@@ -23,7 +23,7 @@ namespace Belle2 {
 
   public:
 
-    static constexpr int m_kNGroups = 3;
+    static constexpr int m_kNGroups = 3; /**< SL grouping: inner (SL0), middle (SL1), outer (SL2–8) */
 
     /**
     * Constructor: Sets the description, the properties and the parameters of the algorithm.
@@ -174,21 +174,14 @@ namespace Belle2 {
     *
     * Stores the extracted fit parameters along with their uncertainties
     * and a status flag indicating the success or failure of the fit.
-    *
-    * Members:
-    *  - mean      : fitted mean value
-    *  - meanErr   : uncertainty on the mean
-    *  - sigma     : fitted width
-    *  - sigmaErr  : uncertainty on the width
-    *  - status    : fit status flag (e.g. "FitOK", "FitFailed")
     */
 
     struct FitValues {
-      double mean = 1.0;
-      double meanErr = 0.0;
-      double sigma = 0.0;
-      double sigmaErr = 0.0;
-      TString status;
+      double mean = 1.0;  /**< mean      : fitted mean value */
+      double meanErr = 0.0;  /**< meanErr   : uncertainty on the mean */
+      double sigma = 0.0;  /**< sigma     : fitted width */
+      double sigmaErr = 0.0;  /**< sigmaErr  : uncertainty on the width */
+      TString status;  /**< status    : fit status flag (e.g. "FitOK", "FitFailed") */
     };
 
     /**

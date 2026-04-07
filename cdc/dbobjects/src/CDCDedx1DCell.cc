@@ -52,35 +52,6 @@ CDCDedx1DCell::CDCDedx1DCell(short version,
   m_layerToGroup = layerToGroup;
 }
 
-CDCDedx1DCell::CDCDedx1DCell(short version,
-                             const std::vector<std::vector<double>>& onedgains)
-  : m_version(version)
-{
-  if (onedgains.size() == 2) {
-
-    m_onedgains = onedgains;
-
-    m_layerToGroup.resize(56, 1);
-
-    for (unsigned int layer = 0; layer < 8; ++layer) {
-      m_layerToGroup[layer] = 0;
-    }
-
-  } else if (onedgains.size() == 56) {
-
-    m_onedgains = onedgains;
-
-    m_layerToGroup.resize(56);
-
-    for (unsigned int layer = 0; layer < 56; ++layer) {
-      m_layerToGroup[layer] = layer;
-    }
-
-  } else {
-    B2ERROR("CDCDedx1DCell: wrong number of constant vectors");
-  }
-}
-
 bool CDCDedx1DCell::isValidGroupedPayload() const
 {
   if (m_onedgains.empty()) {

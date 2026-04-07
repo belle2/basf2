@@ -77,7 +77,7 @@ void CDCDedxCorrectionModule::initialize()
 
   int jwire = -1;
   B2INFO("Creating CDCGeometryPar object");
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   for (unsigned int il = 0; il < c_maxNSenseLayers; il++) {
     int activewires = 0;

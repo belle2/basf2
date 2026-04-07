@@ -28,11 +28,6 @@ namespace Belle2 {
      */
     CDCDedx1DCell(): m_version(0), m_onedgains(), m_layerToGroup() {};
 
-    /**
-    * Constructor keep this untill we modfity CDCDedx1DCellAlgorithm.cc code
-    */
-    CDCDedx1DCell(short version, const std::vector<std::vector<double>>& onedgains);
-
     /** Constructor with grouped constants */
     CDCDedx1DCell(short version,
                   const std::vector<std::vector<double>>& groupGains,
@@ -98,18 +93,18 @@ namespace Belle2 {
     };
 
     /**
-        * Get the grouped calibration constants
-        * @return grouped calibration constants
-        */
+    * Get the grouped calibration constants
+    * @return grouped calibration constants
+    */
     const std::vector<std::vector<double>>& getOneDCell() const
     {
       return m_onedgains;
     }
 
     /**
-       * Get the Layer-to-group map
-       * @return layer map
-       */
+    * Get the Layer-to-group map
+    * @return layer map
+    */
 
     const std::vector<unsigned int>& getLayerMap() const
     {

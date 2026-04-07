@@ -124,7 +124,6 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
       FitValues fitAll = fitHistogram(hDedxCos_all[i]);
 
       meanDedx = fitAll.mean;
-      meanDedxErr = fitAll.meanErr;
 
       dedxAll[0].push_back(fitAll.mean);
       dedxAll[1].push_back(fitAll.meanErr);
@@ -319,14 +318,13 @@ void CDCDedxCosineAlgorithm::createPayload(std::vector<double> cosine)
 
   for (unsigned int il = 0; il < m_kNGroups; il++) {
 
-    unsigned int nbins = m_DBCosineCor->getSize(getRepresentativeLayer(il));;
-
+    unsigned int nbins = m_DBCosineCor->getSize(getRepresentativeLayer(il));
 
     if (nbins != m_cosBin)
       B2ERROR("merging failed because of unmatch bins (old "
               << nbins << " new " << m_cosBin << ")");
 
-    m_coscors[il].reserve(nbins);  // avoids reallocations
+    m_coscors[il].reserve(nbins);
 
     for (unsigned int ibin = 0; ibin < nbins; ibin++) {
 

@@ -24,7 +24,8 @@ namespace Belle2 {
   class CDCDedx1DCellAlgorithm : public CalibrationAlgorithm {
 
   public:
-    static constexpr int m_kNGroups = 3;
+
+    static constexpr int m_kNGroups = 3; // SL grouping: inner (SL0), middle (SL1), outer (SL2–8)
 
     /**
     * Constructor: Sets the description, the properties and the parameters of the algorithm.
@@ -47,12 +48,12 @@ namespace Belle2 {
     void setEntaBins(unsigned int value = 316) {m_eaB = value;}
 
     /**
-    * function to set nbins of dedx dist calibration
+    * function to set nbins of dedx dist for calibration
     */
     void setHistBins(int value = 250) {m_dedxBin = value;}
 
     /**
-    * function to set min/max range of dedx dist calibration
+    * function to set min/max range of dedx dist for calibration
     */
     void setHistRange(double min = 0.0, double max = 5.0) {m_dedxMin = min; m_dedxMax = max;}
 
@@ -62,12 +63,12 @@ namespace Belle2 {
     void setPtLimit(double value) {m_ptMax = value;}
 
     /**
-    * function to set cos \f$\theta\f$ limit
+    * function to set costheta limit
     */
     void setCosLimit(double value) {m_cosMax = value;}
 
     /**
-     * function to set bins of truncation from histogram
+    * function to set bins of truncation from histogram
     */
     void setTrucationBins(double lowedge, double upedge)
     {
@@ -163,7 +164,7 @@ namespace Belle2 {
     }
 
     /**
-    * function to get extract calibration run/exp
+    * function to extract calibration run/exp
     */
     void getExpRunInfo();
 
@@ -188,13 +189,13 @@ namespace Belle2 {
     double getTruncationMean(TH1D* hist, int binlow, int binhigh);
 
     /**
-     * function to generate final constants
-     */
+    * function to generate final constants
+    */
     void createPayload();
 
     /**
-     * function to plot merging factor
-     */
+    * function to plot merging factor
+    */
     void plotMergeFactor(std::map<int, std::vector<double>> bounds, const std::array<int, 2> nDev,
                          std::map<int, std::vector<int>> steps);
 
@@ -224,14 +225,15 @@ namespace Belle2 {
     void plotConstants();
 
     /**
-     * function to draw the stats plots
-     */
+    * function to draw the stats plots
+    */
     void plotEventStats();
 
   protected:
+
     /**
-     * 1D cell algorithm
-     */
+    * 1D cell algorithm
+    */
     virtual EResult calibrate() override;
 
 

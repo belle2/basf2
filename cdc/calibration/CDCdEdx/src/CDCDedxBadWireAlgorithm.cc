@@ -77,7 +77,7 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
 
   map<int, vector<double>> vhitvar;
 
-  int slWireBoundary = (m_exp < 40) ? 1280 : 2240; // Boundary between inner layers: SL0 (<40), SL0+SL1 (>=40)
+  m_slWireBoundary = (m_exp < 40) ? 1280 : 2240;
 
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
@@ -86,7 +86,7 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
       double ivalue = hitvar->at(ih);
       vhitvar[wire->at(ih)].push_back(ivalue);
 
-      if (jwire < slWireBoundary) hvarL[0]->Fill(ivalue);
+      if (jwire < m_slWireBoundary) hvarL[0]->Fill(ivalue);
       else hvarL[1]->Fill(ivalue);
     }
   }
@@ -129,7 +129,7 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
       badwire = true; //partial dead
     } else {
       nmean = nmean / ncount;
-      if (int(jw) < slWireBoundary) {
+      if (int(jw) < m_slWireBoundary) {
         if (abs(nmean - m_amean_IL) / m_amean_IL > m_meanThres) badwire = true;
       } else
       {if (abs(nmean - m_amean_OL) / m_amean_OL > m_meanThres) badwire = true;}
@@ -141,7 +141,7 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
       }
 
       nrms = sqrt(nrms / ncount);
-      if (int(jw) < slWireBoundary)
+      if (int(jw) < m_slWireBoundary)
       {if (abs(nrms - m_arms_IL) / m_arms_IL > m_rmsThres) badwire = true;}
       else
       {if (abs(nrms - m_arms_OL) / m_arms_OL > m_rmsThres) badwire = true;}
@@ -230,8 +230,10 @@ void CDCDedxBadWireAlgorithm::plotWireDist(const vector<double>& inwires,
   for (unsigned int jw = 0; jw < c_nwireCDC; ++jw) {
 
     TH1D* hvar = new TH1D(Form("%s_wire%d", m_suffix.data(), jw), "", m_varBins, m_varMin, m_varMax);
+    hvar->SetUniqueID(jw);
 
     TH1D* hvarhf = new TH1D(Form("hf%s_wire%d", m_suffix.data(), jw), "", m_varBins, m_varMin, m_varMax);
+    hvarhf->SetUniqueID(jw);
     hvarhf->SetTitle(Form("%s, wire = %d; %s; entries", m_suffix.data(), jw, m_varName.data()));
 
     int ncount = 0, tcount = 0;
@@ -296,12 +298,17 @@ void CDCDedxBadWireAlgorithm::printCanvas(TList* list, TList* hflist, Color_t co
   for (int ih = 0; ih < list->GetSize(); ih++) {
 
     TH1D* hist = (TH1D*)list->At(ih);
+    int jw = hist->GetUniqueID();
 
     double frac = stod(hist->GetYaxis()->GetTitle());
 
+    double amean     = (jw < m_slWireBoundary) ? m_amean_IL     : m_amean_OL;
+    double arms      = (jw < m_slWireBoundary) ? m_arms_IL      : m_arms_OL;
+
     TPaveText* pinfo = new TPaveText(0.40, 0.63, 0.89, 0.89, "NBNDC");
-    pinfo->AddText(Form("#mu: %0.2f(%0.2f#pm%0.2f)", hist->GetMean(), m_amean, m_meanThres * m_amean));
-    pinfo->AddText(Form("#sigma: %0.2f(%0.2f#pm%0.2f)", hist->GetRMS(), m_arms, m_rmsThres * m_arms));
+
+    pinfo->AddText(Form("#mu: %0.2f(%0.2f#pm%0.2f)", hist->GetMean(), amean, m_meanThres * amean));
+    pinfo->AddText(Form("#sigma: %0.2f(%0.2f#pm%0.2f)", hist->GetRMS(), arms, m_rmsThres * arms));
     pinfo->AddText(Form("N: %0.00f", hist->Integral()));
     pinfo->AddText(Form("hf: %0.00f%%(%0.00f%%)", frac, m_fracThres * 100));
     setTextCosmetics(pinfo, 0.04258064);

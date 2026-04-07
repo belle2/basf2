@@ -214,12 +214,10 @@ void CDCDedxCosineAlgorithm::getExpRunInfo()
   int rstart = erStart.second;
 
   const auto erEnd = getRunList()[cruns - 1];
-  int eend = erEnd.first;
   int rend = erEnd.second;
 
   updateDBObjPtrs(1, rstart, estart);
 
-  m_runExp = Form("Range (%d:%d,%d:%d)", estart, rstart, eend, rend);
   if (m_suffix.length() > 0) m_suffix = Form("%s_e%d_r%dr%d", m_suffix.data(), estart, rstart, rend);
   else  m_suffix = Form("e%d_r%dr%d", estart, rstart, rend);
 }

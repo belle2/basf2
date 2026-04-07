@@ -51,7 +51,7 @@ namespace Belle2 {
     void setMergePayload(bool value = true) {isMergePayload = value;}
 
     /**
-    * set sigma to restrict fir range around mean
+    * set sigma to restrict fit range around mean
     */
     void setFitWidth(double value = 2.5) {m_sigLim = value;}
 
@@ -66,12 +66,12 @@ namespace Belle2 {
     void setCosineRange(double min = -1.0, double max = 1.0) {m_cosMin = min; m_cosMax = max;}
 
     /**
-    * function to set nbins of dedx dist calibration
+    * function to set nbins of dedx dist for calibration
     */
     void setHistBins(int value = 250) {m_dedxBin = value;}
 
     /**
-    * function to set min/max range of dedx dist calibration
+    * function to set min/max range of dedx dist for calibration
     */
     void setHistRange(double min = 0.0, double max = 5.0) {m_dedxMin = min; m_dedxMax = max;}
 
@@ -81,7 +81,7 @@ namespace Belle2 {
     void setSuffix(const std::string& value) {m_suffix = value;}
 
     /**
-    * function to get extract calibration run/exp
+    * function to extract calibration run/exp
     */
     void getExpRunInfo();
 
@@ -178,7 +178,7 @@ namespace Belle2 {
     * Members:
     *  - mean      : fitted mean value
     *  - meanErr   : uncertainty on the mean
-    *  - sigma     : fitted width (standard deviation)
+    *  - sigma     : fitted width
     *  - sigmaErr  : uncertainty on the width
     *  - status    : fit status flag (e.g. "FitOK", "FitFailed")
     */
@@ -196,11 +196,10 @@ namespace Belle2 {
     */
     FitValues fitHistogram(TH1D*& hist);
 
-    bool isMethodSep; /**< if e+e- need to be consider sep */
+    bool isMethodSep; /**< if e+ e- need to be consider sep */
     bool isMakePlots; /**< produce plots for status */
-    bool isMergePayload; /**< merge payload at the of calibration */
+    bool isMergePayload; /**< merge payload at the time of calibration */
     double m_sigLim; /**< gaussian fit sigma limit */
-    unsigned int fCosbins; /**< number of bins across cosine range */
     unsigned int m_cosBin; /**< number of bins across cosine range */
     double m_cosMin; /**< min cosine angle for cal */
     double m_cosMax; /**< max cosine angle for cal */
@@ -210,7 +209,6 @@ namespace Belle2 {
     double m_dedxMax; /**< max dedx range for gain cal */
 
     std::string m_suffix; /**< add suffix to all plot name  */
-    std::string m_runExp; /**< add run and exp to title of plot  */
 
     std::vector<std::vector<double>> m_coscors; /**< final vectors of calibration  */
 

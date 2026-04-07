@@ -242,14 +242,6 @@ void ECLCRFinderModule::terminate()
 
 }
 
-bool ECLCRFinderModule::areNeighbours(const int cellid1, const int cellid2, const int maptype)
-{
-  for (const auto& neighbour : m_neighbourMaps[maptype]->getNeighbours(cellid1)) {
-    if (neighbour == cellid2) return true;
-  }
-  return false;
-}
-
 std::vector<int> ECLCRFinderModule::flattenVector(std::vector<std::vector<int>>& A)
 {
   std::vector<int> C;
@@ -303,19 +295,27 @@ std::vector<std::vector<int>> ECLCRFinderModule::getConnectedRegions(const std::
 {
   std::vector<std::vector<int>> connectedRegions;
 
+  // We iterate 0..8737 for the seeds (A), as A is a sparse vector mapped to cellID
   for (unsigned int i = 0; i < A.size(); ++i) {
     if (A[i] > 0) {
       std::vector<int> region;
+      // Reserve with neighbor count to prevent reallocations
+      region.reserve(21);
       region.push_back(i);
 
-      for (unsigned int j = 0; j < B.size(); ++j) {
-        if (B[j] > 0 && areNeighbours(i, j, maptype)) {
-          region.push_back(j);
+      // Instead of looping j = 0 to 8737, we only loop over actual geometric neighbors.
+      const auto& neighbors = m_neighbourMaps[maptype]->getNeighbours(i);
+
+      for (int neighborID : neighbors) {
+        // We only care if this specific neighbor is active in vector B
+        if (neighborID < static_cast<int>(B.size()) && B[neighborID] > 0) {
+          region.push_back(neighborID);
         }
       }
 
       std::sort(region.begin(), region.end());
-      region.erase(unique(region.begin(), region.end()), region.end());
+      region.erase(std::unique(region.begin(), region.end()), region.end());
+
       connectedRegions.push_back(region);
     }
   }

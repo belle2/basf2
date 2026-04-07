@@ -299,7 +299,7 @@ std::vector<std::vector<int>> ECLCRFinderModule::getConnectedRegions(const std::
   for (unsigned int i = 0; i < A.size(); ++i) {
     if (A[i] > 0) {
       std::vector<int> region;
-      // Reserve with max neighbor count to prevent reallocations
+      // Reserve with neighbor count to prevent reallocations
       region.reserve(21);
       region.push_back(i);
 

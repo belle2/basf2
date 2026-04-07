@@ -11,7 +11,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/MCInitialParticles.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPDigit.h>
@@ -160,7 +159,6 @@ namespace Belle2 {
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
     StoreArray<TOPLikelihood> m_likelihoods; /**< collection of likelihoods */
     StoreArray<TOPPull> m_topPulls; /**< collection of pulls */
-    StoreObjPtr<MCInitialParticles> m_initialParticles; /**< simulated beam particles */
 
     // database
 

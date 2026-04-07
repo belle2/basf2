@@ -14,6 +14,7 @@
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework aux
+#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 #include <set>
 #include <map>
@@ -71,7 +72,6 @@ namespace Belle2 {
     m_extHits.isRequired();
     m_barHits.isOptional();
     m_recBunch.isOptional();
-    m_initialParticles.isOptional();
 
     // output
 
@@ -106,7 +106,7 @@ namespace Belle2 {
 
     // is MC ?
 
-    bool isMC = m_initialParticles.isValid();
+    bool isMC = Environment::Instance().isMC();
 
     // sort tracks by module ID
 
@@ -114,7 +114,7 @@ namespace Belle2 {
     for (const auto& track : m_tracks) {
       auto* trk = new TOPTrack(track, m_topDigitCollectionName);
       if (trk->isValid() and trk->getTransverseMomentum() > m_pTCut) {
-        if (not isMC) trk->setTOFCorrection(m_tofCorrections);
+        if (not isMC) trk->setTOFCorrection(m_tofCorrections); // TOF corrections only for data
         topTracks.emplace(trk->getModuleID(), trk);
       } else {
         delete trk;

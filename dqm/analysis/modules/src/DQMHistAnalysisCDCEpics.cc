@@ -261,14 +261,14 @@ void DQMHistAnalysisCDCEpicsModule::event()
       m_hists_lADC[il] = m_delta_ladc->ProjectionY(Form("histmd_adc_layer%d", il + 1), il + 1, il + 1, "");
       m_hists_lADC[il]->SetTitle(Form("histmd_adc_layer%d", il));
       float md_ladc = getHistMedian(m_hists_lADC[il]);
+      if (!std::isfinite(md_ladc) || md_ladc < 0) md_ladc = 0;
       m_histmd_ladc->SetBinContent(il + 1, md_ladc);
     }
     // Draw canvas
     c_histmd_ladc->Clear();
     c_histmd_ladc->cd();
-    getHistStyle(m_histmd_ladc, "layeradc", 0);
     double y_max = m_histmd_ladc->GetMaximum();
-    if (!std::isfinite(y_max) || y_max <= 0) y_max = 1;
+    if (!std::isfinite(y_max) || y_max <= 0 || y_max > 1e3)y_max = 1;
     m_histmd_ladc->SetFillColor(kYellow);
     m_histmd_ladc->SetMinimum(0);
     m_histmd_ladc->SetMaximum(y_max * 1.20);

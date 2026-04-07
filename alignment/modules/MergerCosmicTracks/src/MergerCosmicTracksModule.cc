@@ -61,8 +61,8 @@ void MergerCosmicTracksModule::MergingTracks(RecoTrack* firstRecoTrack, RecoTrac
   const float fittedValuesOfFunctions[3] = {50.2380, 21.9203, 19.8463}; // {p0, p1, p2}
 
   // Definition of upper and lower part of CosmicRecoTrack
-  RecoTrack* upperTrack;
-  RecoTrack* lowerTrack;
+  const RecoTrack* upperTrack;
+  const RecoTrack* lowerTrack;
 
   // The RecoTrack with smaller timeSeed is upper
   if (firstRecoTrack->getTimeSeed() < secondRecoTrack->getTimeSeed()) {

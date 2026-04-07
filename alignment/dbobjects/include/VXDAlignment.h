@@ -36,7 +36,7 @@ namespace Belle2 {
     /// Constructor
     VXDAlignment() : DBObjCalibrationConstMapBase() {}
     /// Destructor
-    ~VXDAlignment() {}
+    ~VXDAlignment() override {}
 
     // ------------- Interface to global Millepede calibration ----------------
     /// Get global unique id
@@ -55,4 +55,3 @@ namespace Belle2 {
     ClassDef(VXDAlignment, 2); /**< VXD alignment and calibration constants */
   };
 } // end namespace Belle2
-

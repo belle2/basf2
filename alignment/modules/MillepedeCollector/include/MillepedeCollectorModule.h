@@ -98,7 +98,7 @@ namespace Belle2 {
     ///
     /// Reference: Widl, Edmund ; Frühwirth R;  "Representation and Estimation of Trajectories from Two-body Decays", CMS-NOTE-2007-032, http://cds.cern.ch/record/1073690
     ///
-    std::pair<TMatrixD, TMatrixD> getTwoBodyToLocalTransform(Particle& mother, double motherMass);
+    std::pair<TMatrixD, TMatrixD> getTwoBodyToLocalTransform(const Particle& mother, double motherMass);
 
     /** Write down a GBL trajectory (to TTree or binary file) */
     void storeTrajectory(gbl::GblTrajectory& trajectory);

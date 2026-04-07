@@ -17,4 +17,10 @@ add  p Particle  anti-P_Lambda_psis0         -9432142           4.3382          
 add  p Particle  P_Lambda_psi+                9421142           4.03517208      0.007   0.0           3      1              0   9421142
 add  p Particle  anti-P_Lambda_psi-          -9421142           4.03517208      0.007   0.0          -3      1              0  -9421142
 add  p Particle  Xinv                         900000            1.0             0.0     0.0           0      0              0         0
+add  p Particle  rho_mm+                      700213        2000e-3         1000e-3       1700e-3     3     2              0          0
+add  p Particle  rho_mm-                     -700213        2000e-3         1000e-3       1700e-3    -3     2              0          0
+add  p Particle  rho_mm0                      700113        2000e-3         1000e-3       1700e-3     0     2              0          0
+add  p Particle  rho_prime+                     800213        1465e-3         400e-3        1000e-3     3     2              0          0
+add  p Particle  rho_prime-                    -800213        1465e-3         400e-3        1000e-3    -3     2              0          0
+add  p Particle  rho_prime0                     800113        1465e-3         400e-3        1000e-3     0     2              0          0
 * No 'end' needed here as the default pdl is concatenated with this file.

@@ -1,0 +1,45 @@
+# EventType: 1233032001 
+# Descriptor: [B+ -> anti-D*0 pi+ pi+ pi- pi0]cc
+# NickName: Bp_Dst03pipi0
+# Documentation: Remodelling of Dstar3pipi0 through resonances to recover the Pythia model change (v6 to v8) for B->DX_had
+# Tested: Yes
+# PhysicsWG: Bhad
+# Responsible: Mattia MARFOLI
+# Email: marfoli@cppm.in2p3.fr
+# Cuts: None
+# Date: 20260403
+#
+
+# New particles
+# pdg.add_particle(’rho_mm+’,     700213, mass=2000e-3, width=1000e-3, max_width=1700e-3  ,charge=1,    spin=1)
+# pdg.add_particle(’rho_mm-’,    -700213, mass=2000e-3, width=1000e-3, max_width=1700e-3  ,charge=-1,   spin=1)
+# pdg.add_particle(’rho_mm0’,     700113, mass=2000e-3, width=1000e-3, max_width=1700e-3  ,charge=0,    spin=1)
+# pdg.add_particle(’rho_prime+’,  800213, mass=1465e-3, width=400e-3,  max_width=1000e-3  ,charge=1,    spin=1)
+# pdg.add_particle(’rho_prime-’, -800213, mass=1465e-3, width=400e-3,  max_width=1000e-3  ,charge=-1,   spin=1)
+# pdg.add_particle(’rho_prime0’,  800113, mass=1465e-3, width=400e-3,  max_width=1000e-3  ,charge=0,    spin=1)
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B+sig
+0.238267       anti-D*0  rho_prime+               SVV_HELAMP 0.283 1.13 0.932 0.0 0.228 0.95; 
+0.030180       anti-D*0  eta  pi+                 PHSP;
+0.731553       anti-D*0  rho_mm+                  SVV_HELAMP 0.283 1.13 0.932 0.0 0.228 0.95;
+Enddecay
+CDecay B-sig
+
+Decay rho_prime+
+1.0           omega  pi+                          VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;                                    
+Enddecay
+CDecay rho_prime-
+
+Decay rho_mm+
+0.400000       rho0  pi+  pi0                     PHSP;
+0.400000       rho+  pi+  pi-                     PHSP;
+0.200000       rho-  pi+  pi+                     PHSP;
+Enddecay
+CDecay rho_mm-
+
+End

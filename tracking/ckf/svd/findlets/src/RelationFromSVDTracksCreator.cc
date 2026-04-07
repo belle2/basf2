@@ -52,11 +52,19 @@ void RelationFromSVDTracksCreator::apply(std::vector<CKFToSVDState>& seedStates,
     }
 
     CKFToSVDState* currentState = nullptr;
+    const SpacePointTrackCand* spacePointTrackCand = [&]() -> const SpacePointTrackCand* {
+      for (const auto& suffix : {"", "Hough", "VXDTF2"})
+      {
+        if (auto* p = vxdRecoTrack.getRelated<SpacePointTrackCand>(m_param_spacePointTrackCandidateName + suffix))
+          return p;
+      }
+      return vxdRecoTrack.getRelated<SpacePointTrackCand>();
+    }();
 
-    const SpacePointTrackCand* spacePointTrackCand =
-      vxdRecoTrack.getRelated<SpacePointTrackCand>(m_param_spacePointTrackCandidateName);
+//const SpacePointTrackCand* spacePointTrackCand =
+//     vxdRecoTrack.getRelated<SpacePointTrackCand>(m_param_spacePointTrackCandidateName);
 
-    B2ASSERT("There should be a related SPTC!", spacePointTrackCand);
+    B2ASSERT("There should be a related SPTC!",  spacePointTrackCand);
     const std::vector<const SpacePoint*> spacePoints = spacePointTrackCand->getSortedHits();
 
     for (const SpacePoint* spacePoint : TrackingUtilities::reversedRange(spacePoints)) {

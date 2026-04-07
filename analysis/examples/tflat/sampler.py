@@ -15,12 +15,15 @@ from b2biiConversion import convertBelleMdstToBelleIIMdst
 import os
 
 
-def reconstructB2nunubar(path):
+def reconstructMCB2nunubar(path):
     """
     Defines the procedure to create a B0 list for the benchmark channel 'B0 -> nu_tau anti-nu_tau'
     """
     ma.fillParticleListFromMC('nu_tau:MC', '', path=path)
     ma.reconstructMCDecay('B0:sig -> nu_tau:MC anti-nu_tau:MC', '', writeOut=True, path=path)
+
+    # perform MC matching (MC truth association).
+    ma.matchMCTruth(list_name='B0:sig', path=path)
 
 
 def reconstructB2jpsiks(path, is_belle=False):
@@ -40,19 +43,11 @@ def reconstructB2jpsiks(path, is_belle=False):
         ma.matchMCTruth('K_S0:pipi', path=path)
         ma.reconstructDecay('B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.25 and abs(deltaE) < 0.15', path=path)
 
-
-def buildROE(path):
-    """
-    Creates the rest of event for the signal particle list.'
-    """
     # perform MC matching (MC truth association).
     ma.matchMCTruth(list_name='B0:sig', path=path)
 
     # keep only signal
     ma.applyCuts(list_name='B0:sig', cut='[isSignal == 1]', path=path)
-
-    # build the rest of the event associated to the B0
-    ma.buildRestOfEvent(target_list_name='B0:sig', path=path)
 
 
 def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False, sampler_id=0, channel='nunu'):
@@ -83,13 +78,14 @@ def main(uniqueIdentifier, inputfile='', working_dir='', is_belle=False, sampler
         b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltagB2BII())
 
     if channel == 'nunu':
-        reconstructB2nunubar(path)
+        reconstructMCB2nunubar(path)
     elif channel == 'jpsiks':
         reconstructB2jpsiks(path, is_belle)
     else:
         raise ValueError("Unknown sampler channel!")
 
-    buildROE(path)
+    # build the rest of the event associated to the B0
+    ma.buildRestOfEvent(target_list_name='B0:sig', path=path)
 
     flavorTagger(
         'B0:sig',

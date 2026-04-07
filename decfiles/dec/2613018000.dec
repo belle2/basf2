@@ -1,0 +1,29 @@
+# EventType: 2613018000
+# Descriptor: [ccbar Dstarp2D0Pip D02EtaEta both Eta2GamaGamma]
+# NickName: Dstarp2D0Pip_D02EtaEta_Eta2GamaGamma
+# PhysicsWG: Charm
+# Responsible: Jaeyoung Kim 
+# Date: 20260317 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Alias MyD0 D0
+Alias Myeta eta
+
+Decay D*+sig
+1.000 MyD0 pi+  VSS;
+Enddecay
+
+Decay MyD0
+1.000 Myeta Myeta    PHSP;
+Enddecay
+
+Decay Myeta
+1.000 gamma gamma       PHSP;
+Enddecay
+
+End

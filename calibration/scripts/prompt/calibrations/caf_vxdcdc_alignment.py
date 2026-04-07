@@ -603,7 +603,7 @@ def get_calibrations(input_data, **kwargs):
             algorithm.params = {"apply_iov": output_iov}
 
     # Bugfix for Condor:
-    for cal in [prompt, stage1, stage2]:
+    for cal in [prompt, stage1, stage2, validation]:
         from alignment.prompt_utils import fix_mille_paths_for_algo
         fix_mille_paths_for_algo(cal.algorithms[0])
 

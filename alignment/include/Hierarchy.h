@@ -111,7 +111,7 @@ namespace Belle2 {
 
       /// Template function to get globals for given db object and its element (and the rest of hierarchy)
       template<class LowestLevelDBObject>
-      GlobalDerivativeSet getGlobalDerivatives(unsigned short sensor, const genfit::StateOnPlane* sop, B2Vector3D bField)
+      GlobalDerivativeSet getGlobalDerivatives(unsigned short sensor, const genfit::StateOnPlane* sop, const B2Vector3D& bField)
       {
         if (bField.Mag() < 1.e-10)
           return std::make_pair(std::vector<int>(), TMatrixD());
@@ -124,7 +124,7 @@ namespace Belle2 {
       }
 
       /// Derivatives for Lorentz shift in sensor plane
-      TMatrixD getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, B2Vector3D bField);
+      TMatrixD getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, const B2Vector3D& bField);
 
       /// Template function to insert hierarchy relation between two DB objects and their elements
       template<class ChildDBObjectType, class MotherDBObjectType>
@@ -145,7 +145,7 @@ namespace Belle2 {
       RigidBodyHierarchy() : GlobalDerivativesHierarchy() {}
 
       // Destructor
-      ~RigidBodyHierarchy() {}
+      ~RigidBodyHierarchy() override {}
 
       /// Rigid body labels
       std::vector<int> getElementLabels(DetectorLevelElement element) override;

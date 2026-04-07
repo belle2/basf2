@@ -33,7 +33,7 @@ namespace {
   template<int UID>
   class MockDBObj {
   public:
-    MockDBObj(double value = 0.) : m_param(value) {}
+    explicit MockDBObj(double value = 0.) : m_param(value) {}
     // ------------- Interface to global Millepede calibration ----------------
     /// Get global unique id
     static unsigned short getGlobalUniqueID()
@@ -454,7 +454,7 @@ namespace {
       ASSERT_FALSE(payloadInfo.filename.empty());
       TFile file(payloadInfo.filename.c_str());
       ASSERT_TRUE(file.IsOpen());
-      auto evdep = (EventDependency*) file.Get("EventDependency");
+      auto evdep = static_cast<EventDependency*>(file.Get("EventDependency"));
       ASSERT_TRUE(evdep);
 
       auto beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532, 2, 0)));
@@ -477,7 +477,7 @@ namespace {
       TFile file(payloadInfo.filename.c_str());
       ASSERT_TRUE(file.IsOpen());
 
-      auto beam2 = (BeamSpot*) file.Get("BeamSpot");
+      auto beam2 = static_cast<BeamSpot*>(file.Get("BeamSpot"));
       ASSERT_TRUE(beam2);
       std::cout << "beam2 IP position(" << beam2->getIPPosition().X() << ", " << beam2->getIPPosition().Y() << ", " <<
                 beam2->getIPPosition().Z() << ")" << std::endl;
@@ -491,7 +491,7 @@ namespace {
       TFile file(payloadInfo.filename.c_str());
       ASSERT_TRUE(file.IsOpen());
 
-      auto vxd = (VXDAlignment*) file.Get("VXDAlignment");
+      auto vxd = static_cast<VXDAlignment*>(file.Get("VXDAlignment"));
       ASSERT_TRUE(vxd);
       EXPECT_EQ(vxd->getGlobalParam(VxdID(1, 0, 0, 1).getID(), 3), 44.);
     }

@@ -22,7 +22,7 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    TRGGRLConfig(): m_ecltaunn_threshold{-1} {}
+    TRGGRLConfig(): m_ecltaunn_threshold{-1.5} {}
 
     /** Getter functions*/
     float get_ecltaunn_threshold() const
@@ -65,6 +65,115 @@ namespace Belle2 {
     {
       return m_ecltaunn_bias;
     }
+    std::vector<std::vector<int>> get_ecltaunn_total_bit_bias() const
+    {
+      return m_ecltaunn_total_bit_bias;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_int_bit_bias() const
+    {
+      return m_ecltaunn_int_bit_bias;
+    }
+    std::vector<std::vector<bool>> get_ecltaunn_is_signed_bias() const
+    {
+      return m_ecltaunn_is_signed_bias;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_rounding_bias() const
+    {
+      return m_ecltaunn_rounding_bias;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_saturation_bias() const
+    {
+      return m_ecltaunn_saturation_bias;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_total_bit_accum() const
+    {
+      return m_ecltaunn_total_bit_accum;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_int_bit_accum() const
+    {
+      return m_ecltaunn_int_bit_accum;
+    }
+    std::vector<std::vector<bool>> get_ecltaunn_is_signed_accum() const
+    {
+      return m_ecltaunn_is_signed_accum;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_rounding_accum() const
+    {
+      return m_ecltaunn_rounding_accum;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_saturation_accum() const
+    {
+      return m_ecltaunn_saturation_accum;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_total_bit_weight() const
+    {
+      return m_ecltaunn_total_bit_weight;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_int_bit_weight() const
+    {
+      return m_ecltaunn_int_bit_weight;
+    }
+    std::vector<std::vector<bool>> get_ecltaunn_is_signed_weight() const
+    {
+      return m_ecltaunn_is_signed_weight;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_rounding_weight() const
+    {
+      return m_ecltaunn_rounding_weight;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_saturation_weight() const
+    {
+      return m_ecltaunn_saturation_weight;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_total_bit_relu() const
+    {
+      return m_ecltaunn_total_bit_relu;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_int_bit_relu() const
+    {
+      return m_ecltaunn_int_bit_relu;
+    }
+    std::vector<std::vector<bool>> get_ecltaunn_is_signed_relu() const
+    {
+      return m_ecltaunn_is_signed_relu;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_rounding_relu() const
+    {
+      return m_ecltaunn_rounding_relu;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_saturation_relu() const
+    {
+      return m_ecltaunn_saturation_relu;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_total_bit() const
+    {
+      return m_ecltaunn_total_bit;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_int_bit() const
+    {
+      return m_ecltaunn_int_bit;
+    }
+    std::vector<std::vector<bool>> get_ecltaunn_is_signed() const
+    {
+      return m_ecltaunn_is_signed;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_rounding() const
+    {
+      return m_ecltaunn_rounding;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_saturation() const
+    {
+      return m_ecltaunn_saturation;
+    }
+    std::vector<std::vector<std::vector<int>>> get_ecltaunn_W_input() const
+    {
+      return m_ecltaunn_W_input;
+    }
+    std::vector<std::vector<std::vector<int>>> get_ecltaunn_I_input() const
+    {
+      return m_ecltaunn_I_input;
+    }
+
 
     /** Setter functions*/
     void set_ecltaunn_threshold(float i)
@@ -107,6 +216,116 @@ namespace Belle2 {
     {
       m_ecltaunn_bias = i;
     };
+    void set_ecltaunn_total_bit_bias(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_total_bit_bias = i;
+    };
+    void set_ecltaunn_int_bit_bias(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_int_bit_bias = i;
+    };
+    void set_ecltaunn_is_signed_bias(std::vector<std::vector<bool>> i)
+    {
+      m_ecltaunn_is_signed_bias = i;
+    };
+    void set_ecltaunn_rounding_bias(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_rounding_bias = i;
+    };
+    void set_ecltaunn_saturation_bias(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_saturation_bias = i;
+    };
+    void set_ecltaunn_total_bit_accum(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_total_bit_accum = i;
+    };
+    void set_ecltaunn_int_bit_accum(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_int_bit_accum = i;
+    };
+    void set_ecltaunn_is_signed_accum(std::vector<std::vector<bool>> i)
+    {
+      m_ecltaunn_is_signed_accum = i;
+    };
+    void set_ecltaunn_rounding_accum(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_rounding_accum = i;
+    };
+    void set_ecltaunn_saturation_accum(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_saturation_accum = i;
+    };
+    void set_ecltaunn_total_bit_weight(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_total_bit_weight = i;
+    };
+    void set_ecltaunn_int_bit_weight(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_int_bit_weight = i;
+    };
+    void set_ecltaunn_is_signed_weight(std::vector<std::vector<bool>> i)
+    {
+      m_ecltaunn_is_signed_weight = i;
+    };
+    void set_ecltaunn_rounding_weight(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_rounding_weight = i;
+    };
+    void set_ecltaunn_saturation_weight(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_saturation_weight = i;
+    };
+    void set_ecltaunn_total_bit_relu(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_total_bit_relu = i;
+    };
+    void set_ecltaunn_int_bit_relu(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_int_bit_relu = i;
+    };
+    void set_ecltaunn_is_signed_relu(std::vector<std::vector<bool>> i)
+    {
+      m_ecltaunn_is_signed_relu = i;
+    };
+    void set_ecltaunn_rounding_relu(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_rounding_relu = i;
+    };
+    void set_ecltaunn_saturation_relu(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_saturation_relu = i;
+    };
+    void set_ecltaunn_total_bit(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_total_bit = i;
+    };
+    void set_ecltaunn_int_bit(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_int_bit = i;
+    };
+    void set_ecltaunn_is_signed(std::vector<std::vector<bool>> i)
+    {
+      m_ecltaunn_is_signed = i;
+    };
+    void set_ecltaunn_rounding(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_rounding = i;
+    };
+    void set_ecltaunn_saturation(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_saturation = i;
+    };
+    void set_ecltaunn_W_input(std::vector<std::vector<std::vector<int>>> i)
+    {
+      m_ecltaunn_W_input = i;
+    };
+    void set_ecltaunn_I_input(std::vector<std::vector<std::vector<int>>> i)
+    {
+      m_ecltaunn_I_input = i;
+    };
+
+
 
   private:
 
@@ -140,8 +359,37 @@ namespace Belle2 {
     /** weight and bias data in each nMLP*/
     std::vector<std::vector<float>> m_ecltaunn_weight;
     std::vector<std::vector<float>> m_ecltaunn_bias;
+    /** bit width etc. constant in each node */
+    std::vector<std::vector<int>> m_ecltaunn_total_bit_bias;
+    std::vector<std::vector<int>> m_ecltaunn_int_bit_bias;
+    std::vector<std::vector<bool>> m_ecltaunn_is_signed_bias;
+    std::vector<std::vector<int>> m_ecltaunn_rounding_bias;
+    std::vector<std::vector<int>> m_ecltaunn_saturation_bias;
+    std::vector<std::vector<int>> m_ecltaunn_total_bit_accum;
+    std::vector<std::vector<int>> m_ecltaunn_int_bit_accum;
+    std::vector<std::vector<bool>> m_ecltaunn_is_signed_accum;
+    std::vector<std::vector<int>> m_ecltaunn_rounding_accum;
+    std::vector<std::vector<int>> m_ecltaunn_saturation_accum;
+    std::vector<std::vector<int>> m_ecltaunn_total_bit_weight;
+    std::vector<std::vector<int>> m_ecltaunn_int_bit_weight;
+    std::vector<std::vector<bool>> m_ecltaunn_is_signed_weight;
+    std::vector<std::vector<int>> m_ecltaunn_rounding_weight;
+    std::vector<std::vector<int>> m_ecltaunn_saturation_weight;
+    std::vector<std::vector<int>> m_ecltaunn_total_bit_relu;
+    std::vector<std::vector<int>> m_ecltaunn_int_bit_relu;
+    std::vector<std::vector<bool>> m_ecltaunn_is_signed_relu;
+    std::vector<std::vector<int>> m_ecltaunn_rounding_relu;
+    std::vector<std::vector<int>> m_ecltaunn_saturation_relu;
+    std::vector<std::vector<int>> m_ecltaunn_total_bit;
+    std::vector<std::vector<int>> m_ecltaunn_int_bit;
+    std::vector<std::vector<bool>> m_ecltaunn_is_signed;
+    std::vector<std::vector<int>> m_ecltaunn_rounding;
+    std::vector<std::vector<int>> m_ecltaunn_saturation;
+    std::vector<std::vector<std::vector<int>>> m_ecltaunn_W_input;
+    std::vector<std::vector<std::vector<int>>> m_ecltaunn_I_input;
 
-    ClassDef(TRGGRLConfig, 4);  /**< ClassDef, must be the last term before the closing {}*/
+
+    ClassDef(TRGGRLConfig, 6);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
 } // end of namespace Belle2

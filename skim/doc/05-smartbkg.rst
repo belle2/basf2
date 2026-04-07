@@ -46,7 +46,8 @@ A part of your steering file might then look like this (for a full example see `
   # Define skim
   fei_skim = feiHadronic(
       analysisGlobaltag=ma.getAnalysisGlobaltag(),
-      OutputFileName="your_output_file_name.udst.root"
+      OutputFileName="your_output_file_name.udst.root",
+      roundToMdstPrecision=True
   )
 
   # Add SmartBkg filtering by providing the skim

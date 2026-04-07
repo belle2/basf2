@@ -133,6 +133,7 @@ void SmartBackgroundModule::event()
 
   // Set correct event type
   StoreObjPtr<EventExtraInfo> eventExtraInfo;
+  if (not eventExtraInfo.isValid()) eventExtraInfo.create();
   std::string detectedEventType = eventExtraInfo->getEventType();
   if (detectedEventType == "") {
     if (!m_overrideEventType) {

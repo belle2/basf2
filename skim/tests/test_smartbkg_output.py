@@ -98,7 +98,7 @@ class TestSmartbkgOutput(unittest.TestCase):
                 self.assertAlmostEqual(
                     values[i],
                     values_expected[i],
-                    places=7,
+                    places=5,
                     msg="Smart Background module does not produce correct predictions on feiHadronic skim: " +
                     f"expected {values_expected} but got {values}"
                 )

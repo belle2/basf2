@@ -191,8 +191,8 @@ namespace Belle2::GNNFinder::Utils {
      * Builds a KD-tree from the input position and performs an iterative
      * nearest-neighbor traversal to generate a spatially ordered list of hit indices.
      *
-     * @param positionX Starting X position
-     * @param positionY Starting Y position
+     * @param startingX Starting X position
+     * @param startingY Starting Y position
      * @param kdtHits Vector of hits to order
      * @return Vector of hit indices sorted by spatial proximity to the start position.
      */

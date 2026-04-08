@@ -22,17 +22,17 @@ namespace Belle2 {
 
   /**
    * @class CATFinderModule
-   * @brief Belle II module for CDC track finding using a Graph Neural Network (GNN) and condensation clustering.
+   * @brief Belle II module for the CDC AI Track Finder (CATFinder) using a Graph Neural Network (GNN) and condensation clustering.
    *
    * The CATFinderModule processes Central Drift Chamber (CDC) wire hits and reconstructs charged particle tracks
    * by applying a Graph Neural Network (GNN) followed by condensation-based clustering and spatial hit ordering.
    *
    * The module workflow consists of:
-   * - **Preprocessing** raw CDC wire hits to construct input feature tensor.
+   * - **Preprocessing** ``CDCWireHit`` objects to construct the input feature tensor.
    * - **GNN inference** using a trained model loaded from a weight file.
    * - **Postprocessing** GNN outputs to extract condensation points, assign hits, and build `RecoTrack` objects.
    *
-   * The GNN is run via the basf2 ONNX interface.
+   * The GNN is run via the ONNX interface.
    */
   class CATFinderModule : public Module {
 
@@ -40,21 +40,16 @@ namespace Belle2 {
     CATFinderModule();
 
     /**
-     * @brief Initializes the CATFinderModule and registers required data structures and relations.
+     * @brief Initializes the module and registers required store arrays and relations.
      *
-     * This method sets up the required input data collections (`m_CDCHits`, `m_wireHitVector`)
-     * and registers output collections (`m_recoHitInformations`, `m_CDCRecoTracks`) to the data store.
-     * It also defines the relationships between these collections for the event processing pipeline.
-     * Additionally, it retrieves a singleton instance of the CDC geometry parameters and resets the
-     * event counter to zero.
-     */
+     * This method sets up the required input data collections and registers output collections to
+     * the data store.  It also defines the relationships between these collections for the event processing.
     void initialize() override;
 
     /**
-     * @brief Prepares the CATFinderModule for a new run by initializing the MVA from the weight file.
+     * @brief Prepares the CATFinderModule for a new run by initializing the ONNX session from the weight file.
      *
-     * If a valid MVA weight file representation (`m_weightfileRepresentation`) is available, the method
-     * loads it from a stream and uses it to initialize the MVA model.
+     * If a valid weight file is available, the ONNX session is initialized using such model.
      */
     void beginRun() override;
 

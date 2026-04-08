@@ -65,11 +65,6 @@ namespace Belle2 {
     std::unordered_map<int, uint16_t> m_skimcodesMapping;
 
     /**
-     * Mapping of skim codes to skim names
-     */
-    std::unordered_map<int, std::string> m_skimnamesMapping;
-
-    /**
      * Mapping of skimcodes to activation function parameters optimized for speedup
      */
     std::unordered_map<int, std::vector<float>> m_paramsMapping;
@@ -78,6 +73,11 @@ namespace Belle2 {
      * Mapping of event type names to integers
      */
     std::unordered_map<std::string, int32_t> m_eventtypeMapping;
+
+    /**
+     * Skim names (module parameter)
+     */
+    std::vector<std::string> m_skimNames;
 
     /**
      * Event type (module parameter)

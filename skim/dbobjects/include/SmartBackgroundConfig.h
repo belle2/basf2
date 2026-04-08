@@ -36,11 +36,9 @@ namespace Belle2 {
     SmartBackgroundConfig(const std::unordered_map<int, int>& pdgMapping,
                           const std::unordered_map<int, uint16_t>& skimcodesMapping,
                           const std::unordered_map<int, std::vector<float>>& paramMapping,
-                          const std::unordered_map<int, std::string>& skimnamesMapping,
                           const std::unordered_map<std::string, int32_t>& eventtypeMapping,
                           const float maxWeight) : m_pdgMapping(pdgMapping), m_skimcodesMapping(skimcodesMapping),
-      m_paramMapping(paramMapping), m_skimnamesMapping(skimnamesMapping), m_eventtypeMapping(eventtypeMapping),
-      m_maxWeight(maxWeight) { }
+      m_paramMapping(paramMapping), m_eventtypeMapping(eventtypeMapping), m_maxWeight(maxWeight) { }
 
     /**
      * Return pdg mapping.
@@ -64,14 +62,6 @@ namespace Belle2 {
     const std::unordered_map<int, std::vector<float>>& getParameterMapping() const
     {
       return m_paramMapping;
-    }
-
-    /**
-     * Return skim names mapping
-     */
-    const std::unordered_map<int, std::string>& getSkimnamesMapping() const
-    {
-      return m_skimnamesMapping;
     }
 
     /**
@@ -108,11 +98,6 @@ namespace Belle2 {
     std::unordered_map<int, std::vector<float>> m_paramMapping;
 
     /**
-     * Mapping of skimcodes to skim names
-     */
-    std::unordered_map<int, std::string> m_skimnamesMapping;
-
-    /**
      * Mapping of event type names to integers
      */
     std::unordered_map<std::string, int32_t> m_eventtypeMapping;
@@ -124,8 +109,9 @@ namespace Belle2 {
 
     /**
      * Classdef
+     * Version 2: removed skimnamesMapping
      */
-    ClassDef(SmartBackgroundConfig, 1);
+    ClassDef(SmartBackgroundConfig, 2);
   };
 
 }

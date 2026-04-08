@@ -81,7 +81,7 @@ model outputs will be saved to the event extra info as ``SmartBKG_Prediction_<Sk
 predictions as well as the skim flags is provided under ``skim/examples/SmartBkgDebugMode.py``. 
 
 For greater customisability you may also use the :b2:mod:`SmartBackground` module directly. It requires as 
-mandatory input the skim LFN codes of all used skims, and can also be put into debug mode. It performs the reweighting, 
+mandatory input the skim LFN codes and names of all used skims, and can also be put into debug mode. It performs the reweighting, 
 but no filtering on its own (instead it returns 1 as a return value if an event is sampled for at least one skim, otherwise 0).
 
 The code for the entire Smart Background project including the model setup, training script and data preparation 

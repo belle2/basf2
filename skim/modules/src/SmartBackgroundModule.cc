@@ -44,6 +44,7 @@ SmartBackgroundModule::SmartBackgroundModule() : Module()
                  "If an event is sampled for none of the provided skims, the module returns 0, otherwise 1. "
                  "Use case is the reduction of simulation time for directly skimmed MC productions.");
   addParam("skimCodes", m_skimCodes, "Skim LFN codes");
+  addParam("skimNames", m_skimNames, "Skim names");
   addParam("overrideEventType", m_overrideEventType,
            "Override automatically determined event type", false);
   addParam("eventType", m_eventType,
@@ -77,7 +78,6 @@ void SmartBackgroundModule::initialize()
   m_pdgMapping = config->getPdgMapping();
   m_skimcodesMapping = config->getSkimcodesMapping();
   m_paramsMapping = config->getParameterMapping();
-  m_skimnamesMapping = config->getSkimnamesMapping();
   m_eventtypeMapping = config->getEventtypeMapping();
   m_minProb = 1 / config->getMaxWeight();
   m_minLogProb = TMath::Log(m_minProb);
@@ -260,10 +260,11 @@ void SmartBackgroundModule::event()
   // For each skim a seperate weight is saved to the event extra info (0 if event is not sampled for that skim)
   // If event is sampled for no skim, return value is false
   bool returnValue = false;
-  for (int skimCode : m_skimCodes) {
+  for (unsigned i = 0; i < m_skimCodes.size(); ++i) {
+    const int skimCode = m_skimCodes[i];
+    const std::string skimName = m_skimNames[i];
     float prediction;
     const uint16_t skimIndex = m_skimcodesMapping[skimCode];
-    const std::string skimName = m_skimnamesMapping[skimCode];
     if (m_activationOverride) {
       prediction = this->activation(outputTensor->at({skimIndex}), m_activationOverrideParams[0], m_activationOverrideParams[1]);
     } else {

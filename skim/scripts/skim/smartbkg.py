@@ -13,6 +13,7 @@ and handle event selection/rejection.
 
 import basf2 as b2
 from skim.core import BaseSkim, CombinedSkim
+from skim.registry import Registry
 
 
 def add_smartbkg_filtering(
@@ -59,7 +60,9 @@ def add_smartbkg_filtering(
     else:
         b2.B2FATAL("add_smartbkg_filtering: skim argument must be instance of either" +
                    " CombinedSkim or BaseSkim, received " + str(type(skim)))
+    skim_names = [Registry.decode_skim_code(str(code)) for code in skim_codes]
     sbkg.param("skimCodes", skim_codes)
+    sbkg.param("skimNames", skim_names)
     sbkg.param("debugMode", debug_mode)
     sbkg.param("payloadWeights", payload_weights)
     sbkg.param("payloadConfig", payload_config)

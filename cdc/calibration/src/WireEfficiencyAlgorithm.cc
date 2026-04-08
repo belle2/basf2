@@ -109,7 +109,7 @@ void WireEfficiencyAlgorithm::buildEfficiencies()
 
     TEfficiency* effInLayer = new TEfficiency(
       Form("effLayer_%d", layerNo),
-      Form("Hit efficiency pf L%d ; z (cm) ; IWire ", layerNo),
+      Form("Hit efficiency of L%d ; z (cm) ; IWire ", layerNo),
       nzbins, zbins[0], zbins[1], nwidbins, widbins[0], widbins[1]);
 
     m_efficiencyList->Add(effInLayer);

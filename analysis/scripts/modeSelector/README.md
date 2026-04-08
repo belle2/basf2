@@ -326,7 +326,7 @@ modeSelector.modeSelector(
 | `modeSelector_catB0` | `EventExtraInfo` | Category network prob B0 |
 | `modeSelector_catBp` | `EventExtraInfo` | Category network prob B+ |
 | `modeSelector_catCont` | `EventExtraInfo` | Category network prob continuum |
-| `modeSelector_feiCalibWeight` | `EventExtraInfo` | FEI calibration weight from the best candidate (truth-compatible tag PDG and DeltaP < threshold); `FEI_CALIB_CONT` for continuum; `NaN` when reco conditions are not met; only written when `store_fei_calib_weight=True` |
+| `modeSelector_feiCalibWeight` | `EventExtraInfo` | FEI calibration weight from the reco path of the overall highest-sigProb candidate in the event, chosen by comparing the best B+ and best B0 candidates; stored only when that candidate has truth-compatible tag PDG and DeltaP < threshold; `FEI_CALIB_CONT` for continuum; `NaN` when reco conditions are not met; only written when `store_fei_calib_weight=True` |
 | `modeSelector_eqSigProb` | `ExtraInfo` on predicted-sector candidates | Mode probability `main_output[input_id]` |
 | `modeSelector_rank` | `ExtraInfo` on deduplicated candidates | Sector-local rank: predicted uses `modeSelector_eqSigProb`, else `sigProb` |
 

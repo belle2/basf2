@@ -17,7 +17,7 @@
 #   basf2 applyModeSelector.py -- [options]                              #
 #                                                                        #
 # Output files:                                                          #
-#   <output>.pq  - parquet table with merged B+ and B0 candidates      #
+#   <output>.pq  - parquet table with merged B+ and B0 candidates        #
 #                                                                        #
 ##########################################################################
 
@@ -33,14 +33,14 @@ from variables import variables as vm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', nargs='+',
-                    default=['/home/pf/dataframes/MC16rd_skim/udst_000001_prod00051442_task230000001.root'],
+                    default=[b2.find_file('udst16_fei.root', 'validation')],
                     help='Input ROOT file(s) with FEI B meson candidates')
 parser.add_argument('--output', default='modeSelector_output',
                     help='Output parquet filename or stem (default: modeSelector_output)')
 parser.add_argument('--cat-model', default=None,
-                    help='Path to category ONNX model (omit to use payloads)')
+                    help='Path to category MVA ONNX weightfile (omit to use payloads)')
 parser.add_argument('--main-model', default=None,
-                    help='Path to main ONNX model (omit to use payloads)')
+                    help='Path to main MVA ONNX weightfile (omit to use payloads)')
 parser.add_argument('--cat-payload-name', default='modeSelector_cat_model_v2',
                     help='Conditions DB payload name for the category model')
 parser.add_argument('--main-payload-name', default='modeSelector_main_model_v2',
@@ -58,7 +58,6 @@ else:
     final_output = args.output + '.pq'
 
 # Set up logging
-b2.set_log_level(b2.LogLevel.INFO)
 b2.set_random_seed(1337)
 
 # Create path
@@ -69,10 +68,7 @@ ma.inputMdstList(
     path=my_path
 )
 
-# b2.conditions.prepend_globaltag('user_feichtip_modeSelector')
-b2.conditions.prepend_testing_payloads('localdb/database.txt')
-
-# Prepend the analysis globaltag for accessing payloads
+# analysis globaltag for accessing payloads
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # FEI list identifier
@@ -128,7 +124,6 @@ ma.buildEventShape(
     path=my_path
 )
 
-# Apply ModeSelector using local ONNX files when provided, otherwise use payloads.
 # Set debug=True to print feature values for comparison.
 modeSelector.modeSelector(
     bp_list=f'B+:{fei_identifier}',
@@ -158,23 +153,16 @@ if not args.data:
     modeSelector.addGeneratedDecayWeights(
         bp_list=f'B+:{fei_identifier}',
         b0_list=f'B0:{fei_identifier}',
-        store_btag_candidate_signature=True,
+        # store_btag_candidate_signature=True,
         path=my_path
     )
 
-# sigProb of rank-1 candidate in each list (for cross-sector comparison)
-vm.addAlias('BpSigProb_rank1', f'ifNANgiveX(getVariableByRank(B+:{fei_identifier}, sigProb, sigProb, 1), -1)')
-vm.addAlias('B0SigProb_rank1', f'ifNANgiveX(getVariableByRank(B0:{fei_identifier}, sigProb, sigProb, 1), -1)')
+ma.fillParticleList(decayString="pi+:test", cut='', path=my_path)
 
-# isBestCandidate_sigProb: pure sigProb; rank-1 in the sector with the higher sigProb
-vm.addAlias('sigProbOfBpGTB0', 'conditionalVariableSelector(BpSigProb_rank1 > B0SigProb_rank1, 1, 0)')
-vm.addAlias('sigProbOfB0GTBp', 'conditionalVariableSelector(B0SigProb_rank1 > BpSigProb_rank1, 1, 0)')
-vm.addAlias(
-    'isBestCandidate_sigProb', 'conditionalVariableSelector( \
-    [[sigProbOfBpGTB0 == 1] and [abs(PDG) == 521] and [sigProb_rank == 1]] or \
-    [[sigProbOfB0GTBp == 1] and [abs(PDG) == 511] and [sigProb_rank == 1]], \
-    1, 0)'
-)
+# global rank
+vm.addAlias('sigProbRank_global', f'sigProbRank(B+:{fei_identifier}, B0:{fei_identifier})')
+# isBestCandidate_sigProb: rank-1 sigProb candidate in the sector with the higher rank-1 sigProb
+vm.addAlias('isBestCandidate_sigProb', 'conditionalVariableSelector(sigProbRank_global == 1, 1, 0)')
 
 # Create aliases for cleaner branch names in output ntuple
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
@@ -226,6 +214,7 @@ output_variables = [
     # ranking variables
     'sigProb_rank',
     'modeSelector_rank',
+    'sigProbRank_global',
     'isBestCandidate_sigProb',
     'eventRandom',
 ]

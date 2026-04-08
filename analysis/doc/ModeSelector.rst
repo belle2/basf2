@@ -178,6 +178,12 @@ calibration. They must be reproduced at inference time::
     import modularAnalysis as ma
     import modeSelector
 
+    track_mask = "[[dr < 2] and [abs(dz) < 4] and [pt > 0.2] and [thetaInCDCAcceptance==1]]"
+    ecl_mask = ("[[[[clusterReg==1] and [E>0.080]] or [[clusterReg==2] and [E > 0.03]] "
+                "or [[clusterReg==3] and [E > 0.06]]] and [clusterNHits > 1.5] "
+                "and [abs(clusterTiming) < 200] and [thetaInCDCAcceptance==1]]")
+    roe_mask = ("cleanMask", track_mask, ecl_mask)
+
     for b in ['B+:feiHadronic', 'B0:feiHadronic']:
         # Preselections must match the training setup and FEI calibration
         ma.applyCuts(b, '[Mbc > 5.23] and [-0.15 < deltaE < 0.1]', path=my_path)

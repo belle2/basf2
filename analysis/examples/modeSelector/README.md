@@ -126,7 +126,7 @@ of `Upsilon(4S):all`, so output columns are prefixed with `B_`.
 | `eventRandom` | no | Event-level random variable (for reproducible sampling) |
 | `genDecayModeID` | yes | Generated FEI decay mode ID, `999` for rest, and `-1` for continuum or missing generated `B` truth; calibrated-only by default |
 | `genFEICalibWeight` | yes | FEI calibration weight from the generated decay identified by `mostcommonBTagIndex` |
-| `modeSelector_feiCalibWeight` | yes | FEI calibration weight from the reco path (truth-compatible tag PDG and DeltaP < threshold); `NaN` when reco conditions are not met; only written when `store_fei_calib_weight=True` |
+| `modeSelector_feiCalibWeight` | yes | Event-level FEI calibration weight from the reco path of the overall highest-sigProb candidate, chosen by comparing the best B+ and best B0 candidates; stored only when that candidate has truth-compatible tag PDG and DeltaP < threshold; `NaN` when reco conditions are not met; only written when `store_fei_calib_weight=True` |
 | `isSignal` | yes | MC truth match flag |
 | `isContinuumEvent` | yes | 1 for continuum events, 0 for BB |
 | `mostcommonBTagDeltaP`, `mostcommonBTagPDG` | yes | MC B-tag truth variables |

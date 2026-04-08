@@ -61,9 +61,6 @@ void RelationFromSVDTracksCreator::apply(std::vector<CKFToSVDState>& seedStates,
       return vxdRecoTrack.getRelated<SpacePointTrackCand>();
     }();
 
-//const SpacePointTrackCand* spacePointTrackCand =
-//     vxdRecoTrack.getRelated<SpacePointTrackCand>(m_param_spacePointTrackCandidateName);
-
     B2ASSERT("There should be a related SPTC!",  spacePointTrackCand);
     const std::vector<const SpacePoint*> spacePoints = spacePointTrackCand->getSortedHits();
 

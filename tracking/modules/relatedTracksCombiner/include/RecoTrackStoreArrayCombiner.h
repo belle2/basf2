@@ -8,15 +8,15 @@
 #pragma once
 
 #include <framework/core/Module.h>
-
 #include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
+
 
 /**
  * Combine two collections of tracks without additional checks.
  */
 namespace Belle2 {
+  class RecoTrack;
+  class SpacePointTrackCand;
   /// Module to combine RecoTracks.
   class RecoTrackStoreArrayCombinerModule : public Module {
 

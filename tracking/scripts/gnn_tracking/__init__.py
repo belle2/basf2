@@ -12,6 +12,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+# \cond suppress doxygen warning
+
 def manual_knn(x, k):
     """
     Compute k-nearest neighbours for each node using a full pairwise distance matrix.
@@ -322,3 +324,5 @@ class CDCNet(nn.Module):
             p_vertex,
             p_charge,
         )
+
+# \endcond

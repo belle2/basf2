@@ -66,6 +66,11 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
       continue;
     }
 
+    // Skip hypotheses already stored by a previous TrackBuilder call (e.g. from a prior TrackCreator module).
+    if (not newTrackCreated && relatedTrack->getTrackFitResult(particleType)) {
+      continue;
+    }
+
     if (not repAlreadySet) {
       RecoTrackGenfitAccess::getGenfitTrack(recoTrack).setCardinalRep(repIDPlusOne - 1);
       repAlreadySet = true;

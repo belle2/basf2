@@ -23,505 +23,536 @@
 #include <iomanip>
 #include <iostream>
 #include <vector>
-
+#include <array>
+#include <cstdint>
+#include <utility>
 using namespace Belle2;
 using namespace CDC;
 using namespace std;
 
-// ==========  ap_fixed<Total, Int, AP_TRN, AP_SAT> ==========
 
-float sim_fixed(float val, int total_bits, int int_bits,
-                bool is_signed = true,
-                int rounding = 0,
-                int saturation = 1)
+
+// ========== ap_(u)fixed  ========
+
+/**
+ * Simulates Xilinx ap_fixed/ap_ufixed behavior with configurable quantization and overflow modes.
+ *
+ * Key Features:
+ * - Supports all Vivado HLS quantization/overflow modes
+ * - Handles cases where total_bits < int_bits (effective bit truncation)
+ * - Optimized with bit shifts and lookup tables
+ * - Explicit integer/fractional bit separation
+ *
+ * @param val            Input floating-point value
+ * @param total_bits     Total bit width (W)
+ * @param int_bits       Integer bits (I)
+ * @param is_signed      true=ap_fixed (signed), false=ap_ufixed (unsigned)
+ * @param quant_mode     Quantization mode:
+ *                       0=AP_TRN (truncate), 1=AP_RND (round),
+ *                       2=AP_RND_ZERO, 3=AP_RND_MIN_INF, 4=AP_RND_INF, 5=AP_RND_CONV
+ * @param overflow_mode  Overflow mode:
+ *                       0=AP_SAT (saturate), 1=AP_SAT_ZERO,
+ *                       2=AP_WRAP (wrap), 3=AP_WRAP_SM (sign-magnitude wrap),4=AP_SAT_SYM
+ * @param saturation_bits Saturation bit width (0=use total_bits)
+ * @return               Simulated fixed-point value
+ */
+inline float sim_ap_fixed(float val, int total_bits, int int_bits,
+                          bool is_signed = true,
+                          int quant_mode = 0,
+                          int overflow_mode = 0,
+                          int saturation_bits = 0)
 {
-  int frac_bits = total_bits - int_bits;
-  float scale = std::pow(2.0f, frac_bits);
-  float scaled_val = val * scale;
+  //for normal ap_types
+  if (total_bits >= int_bits) {
 
-  int64_t fixed_val;
-  if (rounding == 1)
-    fixed_val = static_cast<int64_t>(std::round(scaled_val));
-  else
-    fixed_val = static_cast<int64_t>(std::trunc(scaled_val));
-
-  int64_t max_val, min_val;
-
-  if (is_signed) {
-    max_val = (1LL << (total_bits - 1)) - 1;
-    min_val = -(1LL << (total_bits - 1));
-  } else {
-    max_val = (1LL << total_bits) - 1;
-    min_val = 0;
-  }
-
-  //  wrap
-  if (fixed_val > max_val || fixed_val < min_val) {
-    switch (saturation) {
-      case 1:
-        fixed_val = std::min(std::max(fixed_val, min_val), max_val);
-        break;
-      case 2:
-        if (is_signed) {
-          int64_t mod = 1LL << total_bits;
-          fixed_val = (fixed_val + mod) % mod;
-          if (fixed_val >= (1LL << (total_bits - 1)))
-            fixed_val -= (1LL << total_bits);
-        } else {
-          fixed_val = fixed_val % (1LL << total_bits);
-        }
-        break;
-      case 3:
-        if (val >= 0)
-          fixed_val = std::min(fixed_val, max_val);
-        else
-          fixed_val = std::max(fixed_val, min_val);
-        break;
-      case 0:
-      default:
-        break;
+    // Effective bits (handle saturation_bits and total_bits < int_bits cases)
+    int effective_total = (saturation_bits > 0) ?
+                          std::min(saturation_bits, total_bits) : total_bits;
+    int effective_I = std::min(int_bits, effective_total);
+    int F = effective_total - effective_I;  // Fractional bits ≥ 0
+    if (int_bits == 0 && is_signed == true) {
+      F = total_bits ;
+      effective_I = total_bits + 1;
     }
+
+    // --- 2. Fast Scale Calculation (2^F) ---
+    const float scale = [F]() {
+      if (F <= 0) {return 1.0f;}  // No fractional bits
+      else {
+        // Bit-shift is faster than std::pow(2, F)
+        const uint32_t scale_int = 1U << F;
+        return 1.0f / static_cast<float>(scale_int);
+      }
+    }();
+
+    // --- 3. Quantization (Mode-Specific Rounding) ---
+    const auto quantize = [](float scaled_val, int mode) -> int64_t {
+      using QuantizerFuncPtr = int64_t(*)(float);
+      static constexpr QuantizerFuncPtr quantizers[] = {
+        [](float x) -> int64_t { return static_cast<int64_t>(std::trunc(x)); },
+        [](float x) -> int64_t { return static_cast<int64_t>(std::round(x)); },
+        [](float x) -> int64_t {
+          return (x >= 0) ? static_cast<int64_t>(std::floor(x))
+          : static_cast<int64_t>(std::ceil(x));
+        },
+        [](float x) -> int64_t { return static_cast<int64_t>(std::floor(x)); },
+        [](float x) -> int64_t { return static_cast<int64_t>(std::ceil(x)); },
+        [](float x) -> int64_t { return llrint(x); }
+      };
+      const int clamped_mode = std::clamp(mode, 0, static_cast<int>(sizeof(quantizers) / sizeof(quantizers[0]) - 1));
+      return quantizers[clamped_mode](scaled_val);
+    };
+
+    int64_t fixed_val = quantize(val / scale, quant_mode);
+
+    // --- 4. Dynamic Range Calculation ---
+    const auto [min_val, max_val] = [ = ]() -> std::pair<int64_t, int64_t> {
+      if (is_signed)
+      {
+        const int64_t int_max = (1LL << (effective_I - 1)) - 1;
+        const int64_t int_min = -(1LL << (effective_I - 1));
+        const int64_t frac_mask = (F > 0) ? ((1LL << F) - 1) : 0;
+        return {int_min << F, (int_max << F) | frac_mask};
+      } else
+      {
+        const int64_t int_max = (1LL << effective_I) - 1;
+        const int64_t frac_mask = (F > 0) ? ((1LL << F) - 1) : 0;
+        return {0, (int_max << F) | frac_mask};
+      }
+    }();
+
+
+    // --- 5. Overflow Handling ---
+    const auto handle_overflow = [&]() {
+      const int64_t bit_mask = (1LL << effective_total) - 1;
+      const int64_t sign_bit = 1LL << (effective_total - 1);
+
+      switch (overflow_mode) {
+        case 0:  // AP_SAT: Clamp to [min_val, max_val]
+          fixed_val = std::clamp(fixed_val, min_val, max_val);
+          break;
+
+        case 1:  // AP_SAT_ZERO: Set to 0 on overflow
+          if (fixed_val > max_val || fixed_val < min_val) fixed_val = 0;
+          break;
+
+        case 2:  // AP_WRAP: Modular wrap-around
+          if (is_signed) {
+            fixed_val = (fixed_val & bit_mask);
+            if (fixed_val & sign_bit) {
+              fixed_val -= (1LL << effective_total);
+            }
+          } else {
+            fixed_val &= bit_mask;
+          }
+          break;
+
+        case 3:  // AP_WRAP_SM: Sign-magnitude wrap
+          if (is_signed) {
+            const int64_t magnitude_mask = (1LL << (effective_total - 1)) - 1;
+            const bool is_negative = (fixed_val < 0);
+            fixed_val = std::abs(fixed_val) & magnitude_mask;
+            if (is_negative) fixed_val = -fixed_val;
+          } else {
+            fixed_val &= bit_mask;
+          }
+          break;
+
+        case 4:  // AP_SAT_SYM: Symmetric saturation
+          if (is_signed) {
+            const int64_t sym_limit = std::min(max_val, -min_val);
+            fixed_val = std::clamp(fixed_val, -sym_limit, sym_limit);
+          } else {
+            fixed_val = std::min(fixed_val, max_val);
+          }
+          break;
+
+        default:  // Default to AP_WRAP
+          fixed_val &= bit_mask;
+          if (is_signed && (fixed_val & sign_bit)) {
+            fixed_val -= (1LL << effective_total);
+          }
+      }
+    };
+    handle_overflow();
+
+    // --- 6. Final Conversion ---
+    return static_cast<float>(fixed_val) * scale;
+  }
+  //for sperical case with total_bits < int-bits (only used to this code, need modify for generic using)
+  else {
+    // 1. calculate the bits
+    const int zero_bits = std::max(int_bits - total_bits, 0);//So called negative fraction bits
+    const int useful_bits = total_bits - 1;
+
+    // 2. value collections
+    std::vector<float> legal_values;
+    for (int64_t i = 0; i < (1LL << useful_bits); ++i) {
+      int64_t value = i << zero_bits;
+      legal_values.push_back(static_cast<float>(value));
+      legal_values.push_back(static_cast<float>(-1 * value)); //need confirm
+    }
+    std::sort(legal_values.begin(), legal_values.end());
+
+    // 3. find the closest values in legal_values
+    auto closest = std::min_element(legal_values.begin(), legal_values.end(),
+    [val](float a, float b) {
+      float dist_a = std::abs(a - val);
+      float dist_b = std::abs(b - val);
+
+      if (std::abs(dist_a - dist_b) < 1e-6f) {
+        return a > b;
+      }
+      return dist_a < dist_b;
+    });
+
+    return *closest;
   }
 
-  return static_cast<float>(fixed_val) / scale;
 }
 
-// dense_0
-inline float sim_fix_dense_0_accum_t(float x)  { return sim_fixed(x, 24, 16); }
-inline float sim_fix_dense_0_t(float x)        { return sim_fixed(x, 20, 16); }
-inline float sim_fix_dense_0_weight_t(float x) { return sim_fixed(x, 10, 2); }
-inline float sim_fix_dense_0_bias_t(float x)   { return sim_fixed(x, 5, 1); }
+// ---  Wrappers for this code---
 
-// dense_0_relu
-inline float sim_fix_dense_0_relu_t(float x)        { return sim_fixed(x, 15, 11, false); }
-inline float sim_fix_dense_0_relu_table_t(float x)  { return sim_fixed(x, 18, 8); }
-
-// dense_1
-inline float sim_fix_dense_1_iq_t(float x)          { return sim_fixed(x, 14, 11, false); }
-inline float sim_fix_dense_1_accum_t(float x)       { return sim_fixed(x, 23, 14); }
-inline float sim_fix_dense_1_t(float x)             { return sim_fixed(x, 19, 14); }
-inline float sim_fix_dense_1_weight_t(float x)      { return sim_fixed(x, 8, 2); }
-inline float sim_fix_dense_1_bias_t(float x)        { return sim_fixed(x, 5, 1); }
-
-// dense_1_relu
-inline float sim_fix_dense_1_relu_t(float x)        { return sim_fixed(x, 15, 10, false); }
-inline float sim_fix_dense_1_relu_table_t(float x)  { return sim_fixed(x, 18, 8); }
-
-// dense_2
-inline float sim_fix_dense_2_iq_t(float x)          { return sim_fixed(x, 14, 10, false); }
-inline float sim_fix_dense_2_accum_t(float x)       { return sim_fixed(x, 19, 10); }
-inline float sim_fix_dense_2_weight_t(float x)      { return sim_fixed(x, 8, 1); }
-inline float sim_fix_dense_2_bias_t(float x)        { return sim_fixed(x, 1, 0, false); }
-
-// dense_2  result_t，RND + 2 + UNSIGNED = false
-inline float sim_fix_result_t(float x)
+//=== for input layer ===//
+inline float sim_input_layer_t(float val)
 {
-  return sim_fixed(x, 15, 8, true, 1, 2);
+  return sim_ap_fixed(val, 13, 12, false, 0, 4, 0); // AP_TRN,AP_SAT
 }
 
-
-float sim_float_to_ufixed(float val, int W, int I)
+inline float sim_dense_0_iq_t(float val)
 {
-  int F = W - I;
-  float scale = std::pow(2.0f, F);
-  float rounded = std::round(val * scale) / scale;
-
-  //  [0, 2^I - 1 - 1/scale]
-  float max_val = std::pow(2.0f, I) - 1.0f / scale;
-  float min_val = 0.0f;
-
-  if (rounded > max_val) return max_val;
-  if (rounded < min_val) return min_val;
-
-  return rounded;
+  return sim_ap_fixed(val, 12, 12, false, 1, 2, 0); // AP_RND,AP_WAP
 }
 
-float sim_dense_1_input_quant(unsigned index, float val)
+inline float sim_ap_dense_0_iq(float val, int w, int i)
 {
-  switch (index) {
-    case 0:  return sim_float_to_ufixed(val, 7, 8);
-    case 1:  return sim_float_to_ufixed(val, 12, 9);
-    case 2:  return sim_float_to_ufixed(val, 14, 11);
-    case 3:  return sim_float_to_ufixed(val, 11, 9);
-    case 4:  return sim_float_to_ufixed(val, 7, 7);
-    case 5:  return sim_float_to_ufixed(val, 4, 9);
-    case 6:  return sim_float_to_ufixed(val, 13, 10);
-    case 7:  return sim_float_to_ufixed(val, 10, 8);
-    case 8:  return sim_float_to_ufixed(val, 9, 8);
-    case 9:  return sim_float_to_ufixed(val, 8, 8);
-    case 10: return sim_float_to_ufixed(val, 8, 7);
-    case 11: return sim_float_to_ufixed(val, 12, 10);
-    case 12: return sim_float_to_ufixed(val, 7, 7);
-    case 13: return sim_float_to_ufixed(val, 6, 9);
-    case 14: return sim_float_to_ufixed(val, 11, 10);
-    case 15: return sim_float_to_ufixed(val, 9, 7);
-    case 16: return sim_float_to_ufixed(val, 14, 11);
-    case 17: return sim_float_to_ufixed(val, 13, 10);
-    case 18: return sim_float_to_ufixed(val, 8, 11);
-    case 19: return sim_float_to_ufixed(val, 10, 8);
-    case 20: return sim_float_to_ufixed(val, 7, 7);
-    case 21: return sim_float_to_ufixed(val, 12, 10);
-    case 22: return sim_float_to_ufixed(val, 7, 8);
-    case 23: return sim_float_to_ufixed(val, 4, 7);
-    case 24: return sim_float_to_ufixed(val, 13, 10);
-    case 25: return sim_float_to_ufixed(val, 6, 5);
-    case 26: return sim_float_to_ufixed(val, 12, 10);
-    case 27: return sim_float_to_ufixed(val, 7, 9);
-    case 28: return sim_float_to_ufixed(val, 11, 10);
-    case 29: return sim_float_to_ufixed(val, 12, 10);
-    case 30: return sim_float_to_ufixed(val, 13, 10);
-    case 31: return sim_float_to_ufixed(val, 11, 10);
-    case 32: return sim_float_to_ufixed(val, 12, 10);
-    case 33: return sim_float_to_ufixed(val, 12, 9);
-    case 34: return sim_float_to_ufixed(val, 14, 11);
-    case 35: return sim_float_to_ufixed(val, 12, 10);
-    case 36: return sim_float_to_ufixed(val, 12, 10);
-    case 37: return sim_float_to_ufixed(val, 10, 10);
-    case 38: return sim_float_to_ufixed(val, 11, 10);
-    case 39: return sim_float_to_ufixed(val, 13, 10);
-    case 40: return sim_float_to_ufixed(val, 10, 10);
-    case 41: return sim_float_to_ufixed(val, 7, 9);
-    case 42: return sim_float_to_ufixed(val, 11, 10);
-    case 43: return sim_float_to_ufixed(val, 7, 8);
-    case 44: return sim_float_to_ufixed(val, 10, 8);
-    case 45: return 0.0f;
-    case 46: return sim_float_to_ufixed(val, 7, 8);
-    case 47: return sim_float_to_ufixed(val, 5, 7);
-    case 48: return 0.0f;
-    case 49: return sim_float_to_ufixed(val, 11, 11);
-    case 50: return sim_float_to_ufixed(val, 13, 10);
-    case 51: return sim_float_to_ufixed(val, 7, 8);
-    case 52: return sim_float_to_ufixed(val, 11, 11);
-    case 53: return sim_float_to_ufixed(val, 14, 11);
-    case 54: return sim_float_to_ufixed(val, 7, 7);
-    case 55: return sim_float_to_ufixed(val, 3, 7);
-    case 56: return sim_float_to_ufixed(val, 8, 9);
-    case 57: return sim_float_to_ufixed(val, 8, 8);
-    case 58: return sim_float_to_ufixed(val, 13, 10);
-    case 59: return sim_float_to_ufixed(val, 11, 9);
-    case 60: return sim_float_to_ufixed(val, 11, 9);
-    case 61: return sim_float_to_ufixed(val, 11, 8);
-    case 62: return sim_float_to_ufixed(val, 10, 9);
-    case 63: return sim_float_to_ufixed(val, 7, 9);
-    default: return val;
-  }
+  return sim_ap_fixed(val, w, i, false, 1, 4, 0);  // AP_RND, AP_SAT_SYM
 }
 
-float sim_dense_2_input_quant(unsigned index, float val)
+// === for weights, bias and hiden layers ===
+inline float sim_fixed(float val, int total_bits, int int_bits,  bool is_signed = true,
+                       int rounding = 0,     // 0: trunc, 1: round
+                       int saturation = 2)   // 2: wrap
 {
-  switch (index) {
-    case 0:  return sim_float_to_ufixed(val, 3, -1);
-    case 1:  return sim_float_to_ufixed(val, 13, 9);
-    case 2:  return 0.0f;
-    case 3:  return sim_float_to_ufixed(val, 10, 6);
-    case 4:  return sim_float_to_ufixed(val, 9, 5);
-    case 5:  return sim_float_to_ufixed(val, 10, 6);
-    case 6:  return sim_float_to_ufixed(val, 8, 6);
-    case 7:  return sim_float_to_ufixed(val, 14, 10);
-    case 8:  return 0.0f;
-    case 9:  return 0.0f;
-    case 10: return 0.0f;
-    case 11: return sim_float_to_ufixed(val, 10, 6);
-    case 12: return sim_float_to_ufixed(val, 9, 5);
-    case 13: return sim_float_to_ufixed(val, 1, 5);
-    case 14: return sim_float_to_ufixed(val, 8, 5);
-    case 15: return 0.0f;
-    case 16: return sim_float_to_ufixed(val, 9, 5);
-    case 17: return sim_float_to_ufixed(val, 13, 9);
-    case 18: return sim_float_to_ufixed(val, 10, 6);
-    case 19: return sim_float_to_ufixed(val, 10, 7);
-    case 20: return sim_float_to_ufixed(val, 7, 3);
-    case 21: return 0.0f;
-    case 22: return sim_float_to_ufixed(val, 11, 7);
-    case 23: return sim_float_to_ufixed(val, 10, 6);
-    case 24: return sim_float_to_ufixed(val, 11, 7);
-    case 25: return 0.0f;
-    case 26: return sim_float_to_ufixed(val, 10, 6);
-    case 27: return 0.0f;
-    case 28: return 0.0f;
-    case 29: return sim_float_to_ufixed(val, 9, 5);
-    case 30: return sim_float_to_ufixed(val, 3, 4);
-    case 31: return sim_float_to_ufixed(val, 10, 7);
-    case 32: return 0.0f;
-    case 33: return sim_float_to_ufixed(val, 10, 7);
-    case 34: return 0.0f;
-    case 35: return sim_float_to_ufixed(val, 8, 7);
-    case 36: return sim_float_to_ufixed(val, 7, 3);
-    case 37: return sim_float_to_ufixed(val, 9, 5);
-    case 38: return sim_float_to_ufixed(val, 11, 7);
-    case 39: return sim_float_to_ufixed(val, 4, 5);
-    case 40: return sim_float_to_ufixed(val, 10, 6);
-    case 41: return sim_float_to_ufixed(val, 10, 6);
-    case 42: return sim_float_to_ufixed(val, 12, 9);
-    case 43: return sim_float_to_ufixed(val, 10, 6);
-    case 44: return sim_float_to_ufixed(val, 6, 6);
-    case 45: return sim_float_to_ufixed(val, 7, 3);
-    case 46: return sim_float_to_ufixed(val, 10, 6);
-    case 47: return sim_float_to_ufixed(val, 9, 5);
-    case 48: return sim_float_to_ufixed(val, 7, 4);
-    case 49: return sim_float_to_ufixed(val, 10, 6);
-    case 50: return sim_float_to_ufixed(val, 13, 9);
-    case 51: return 0.0f;
-    case 52: return sim_float_to_ufixed(val, 9, 5);
-    case 53: return sim_float_to_ufixed(val, 10, 8);
-    case 54: return 0.0f;
-    case 55: return sim_float_to_ufixed(val, 9, 5);
-    case 56: return sim_float_to_ufixed(val, 9, 5);
-    case 57: return sim_float_to_ufixed(val, 13, 9);
-    case 58: return 0.0f;
-    case 59: return sim_float_to_ufixed(val, 10, 7);
-    case 60: return sim_float_to_ufixed(val, 10, 6);
-    case 61: return sim_float_to_ufixed(val, 8, 4);
-    case 62: return sim_float_to_ufixed(val, 10, 6);
-    case 63: return 0.0f;
-    default: return val;
-  }
+  return sim_ap_fixed(val, total_bits, int_bits, is_signed, rounding, saturation, 0);  // AP_TRN, AP_SAT_SYM
 }
 
+// === unsign for result ===
+inline float sim_result_t(float val)
+{
+  return sim_ap_fixed(val, 25, 9, true, 0, 2, 0);  // AP_RND, AP_SAT_SYM
+}
 
 
 void
 GRLNeuro::initialize(const Parameters& p)
 {
-  // check parameters
-  bool okay = true;
-  // ensure that length of lists matches number of sectors
+  using std::vector;
+
+  B2DEBUG(10, "GRLNeuro::initialize: nMLP=" << p.nMLP
+          << " nHidden.size=" << p.nHidden.size()
+          << " outputScale.size=" << p.outputScale.size());
+
+  // ------------------------------------------------------------------
+  // Basic parameter validation (fatal in initialize)
+  // ------------------------------------------------------------------
+
   if (p.nHidden.size() != 1 && p.nHidden.size() != p.nMLP) {
-    B2ERROR("Number of nHidden lists should be 1 or " << p.nMLP);
-    okay = false;
+    B2FATAL("Number of nHidden lists should be 1 or " << p.nMLP);
   }
+
   if (p.outputScale.size() != 1 && p.outputScale.size() != p.nMLP) {
-    B2ERROR("Number of outputScale lists should be 1 or " << p.nMLP);
-    okay = false;
+    B2FATAL("Number of outputScale lists should be 1 or " << p.nMLP);
   }
-  // ensure that number of target nodes is valid
-  unsigned short nTarget = int(p.targetresult);
+
+  unsigned short nTarget = static_cast<unsigned short>(p.targetresult);
   if (nTarget < 1) {
-    B2ERROR("No outputs! Turn on targetresult.");
-    okay = false;
+    B2FATAL("No outputs! Turn on targetresult.");
   }
+
   for (unsigned iScale = 0; iScale < p.outputScale.size(); ++iScale) {
     if (p.outputScale[iScale].size() != 2 * nTarget) {
-      B2ERROR("outputScale should be exactly " << 2 * nTarget << " values");
-      okay = false;
+      B2FATAL("outputScale should be exactly " << 2 * nTarget << " values");
     }
   }
 
-  if (!okay) return;
-  // initialize MLPs
-  m_MLPs.clear();
-  for (unsigned iMLP = 0; iMLP < p.nMLP; ++iMLP) {
-    //get indices for sector parameters
-    unsigned short nInput = p.i_cdc_sector[iMLP] + p.i_ecl_sector[iMLP];
-    vector<float> nhidden =  p.nHidden[iMLP];
-    vector<unsigned short> nNodes = {nInput};
-    for (unsigned iHid = 0; iHid < nhidden.size(); ++iHid) {
-      if (p.multiplyHidden) {
-        nNodes.push_back(nhidden[iHid] * nNodes[0]);
-      } else {
-        nNodes.push_back(nhidden[iHid]);
-      }
+  // ------------------------------------------------------------------
+  // Comprehensive parameter-size validation
+  // ------------------------------------------------------------------
+
+  auto check_size = [&](const auto & v, const char* name) {
+    const size_t s = v.size();
+    if (s != 1 && s != static_cast<size_t>(p.nMLP)) {
+      B2FATAL(std::string(name) + " size (" + std::to_string(s)
+              + ") != 1 and != nMLP (" + std::to_string(p.nMLP) + ")");
     }
-    nNodes.push_back(nTarget);
-    unsigned short targetVars = int(p.targetresult);
-    vector<float> outputScale = (p.outputScale.size() == 1) ? p.outputScale[0] : p.outputScale[iMLP];
-    m_MLPs.push_back(GRLMLP(nNodes, targetVars, outputScale));
-  }
-}
-
-
-float sim_ap_fixed(float val, int total_bits = 12, int int_bits = 12,
-                   bool round = true, bool wrap = true)
-{
-  int frac_bits = total_bits - int_bits;  //
-  float scale = std::pow(2, frac_bits);   // scale = 1
-
-  // Apply rounding if needed
-  float scaled_val = val * scale;
-  int fixed_val = round ? std::round(scaled_val) : std::floor(scaled_val);
-
-  int max_int = std::pow(2, total_bits) - 1;  // For 12-bit unsigned, max = 4095
-  int raw_val;
-
-  if (wrap) {
-    //
-    raw_val = fixed_val & max_int;  // == fixed_val % (1 << total_bits)
-  } else {
-    //
-    raw_val = std::min(std::max(fixed_val, 0), max_int);
-  }
-
-  return raw_val / scale;
-}
-
-//
-float sim_fix_input_layer_t(float val)
-{
-  return sim_ap_fixed(val, 12, 12, true, true);  // AP_RND + AP_WRAP
-}
-
-std::vector<float> sim_dense_0_iq(const std::vector<float>& input)
-{
-  const std::vector<std::pair<int, int>> dense_0_iq_config = {
-    {12, 5}, {12, 4}, {10, 6}, {8, 4}, {8, 4}, {9, 5},
-    {6, 2}, {8, 3}, {6, 3}, {5, 4}, {7, 4}, {9, 5},
-    {8, 2}, {8, 2}, {6, 3}, {5, 3}, {8, 4}, {6, 2}
   };
 
-  std::vector<float> output;
-  output.reserve(input.size());
-  for (size_t i = 0; i < input.size(); ++i) {
-    int total_bits = dense_0_iq_config[i].first;
-    int int_bits = dense_0_iq_config[i].second;
-    output.push_back(sim_ap_fixed(input[i], total_bits, int_bits, true, true));
+  // sector / structure parameters
+  check_size(p.i_cdc_sector, "i_cdc_sector");
+  check_size(p.i_ecl_sector, "i_ecl_sector");
+  check_size(p.nHidden, "nHidden");
+  check_size(p.outputScale, "outputScale");
 
+  // bias
+  check_size(p.total_bit_bias, "total_bit_bias");
+  check_size(p.int_bit_bias, "int_bit_bias");
+  check_size(p.is_signed_bias, "is_signed_bias");
+  check_size(p.rounding_bias, "rounding_bias");
+  check_size(p.saturation_bias, "saturation_bias");
+
+  // accumulator
+  check_size(p.total_bit_accum, "total_bit_accum");
+  check_size(p.int_bit_accum, "int_bit_accum");
+  check_size(p.is_signed_accum, "is_signed_accum");
+  check_size(p.rounding_accum, "rounding_accum");
+  check_size(p.saturation_accum, "saturation_accum");
+
+  // weights
+  check_size(p.total_bit_weight, "total_bit_weight");
+  check_size(p.int_bit_weight, "int_bit_weight");
+  check_size(p.is_signed_weight, "is_signed_weight");
+  check_size(p.rounding_weight, "rounding_weight");
+  check_size(p.saturation_weight, "saturation_weight");
+
+  // relu
+  check_size(p.total_bit_relu, "total_bit_relu");
+  check_size(p.int_bit_relu, "int_bit_relu");
+  check_size(p.is_signed_relu, "is_signed_relu");
+  check_size(p.rounding_relu, "rounding_relu");
+  check_size(p.saturation_relu, "saturation_relu");
+
+  // generic
+  check_size(p.total_bit, "total_bit");
+  check_size(p.int_bit, "int_bit");
+  check_size(p.is_signed, "is_signed");
+  check_size(p.rounding, "rounding");
+  check_size(p.saturation, "saturation");
+
+  // inputs
+  check_size(p.W_input, "W_input");
+  check_size(p.I_input, "I_input");
+
+  // ------------------------------------------------------------------
+  // Initialize MLPs
+  // ------------------------------------------------------------------
+
+  m_MLPs.clear();
+  m_MLPs.reserve(p.nMLP);
+
+  for (unsigned iMLP = 0; iMLP < p.nMLP; ++iMLP) {
+
+    // helper: broadcast if size == 1
+    auto pick = [&](const auto & container) -> const auto& {
+      return (container.size() == 1) ? container[0] : container[iMLP];
+    };
+
+    unsigned short i_cdc = static_cast<unsigned short>(pick(p.i_cdc_sector));
+    unsigned short i_ecl = static_cast<unsigned short>(pick(p.i_ecl_sector));
+    unsigned short nInput = static_cast<unsigned short>(i_cdc + i_ecl);
+
+    // nHidden: vector<vector<float>>
+    const vector<float>& nhidden = pick(p.nHidden);
+    vector<unsigned short> nNodes = { nInput };
+
+    for (unsigned iHid = 0; iHid < nhidden.size(); ++iHid) {
+      if (p.multiplyHidden) {
+        nNodes.push_back(static_cast<unsigned short>(nhidden[iHid] * nNodes[0]));
+      } else {
+        nNodes.push_back(static_cast<unsigned short>(nhidden[iHid]));
+      }
+    }
+
+    nNodes.push_back(nTarget);
+    unsigned short targetVars = static_cast<unsigned short>(p.targetresult);
+
+    const vector<float>& outputScale = pick(p.outputScale);
+
+    GRLMLP grlmlp_temp(nNodes, targetVars, outputScale);
+
+    // bias
+    grlmlp_temp.set_total_bit_bias(pick(p.total_bit_bias));
+    grlmlp_temp.set_int_bit_bias(pick(p.int_bit_bias));
+    grlmlp_temp.set_is_signed_bias(pick(p.is_signed_bias));
+    grlmlp_temp.set_rounding_bias(pick(p.rounding_bias));
+    grlmlp_temp.set_saturation_bias(pick(p.saturation_bias));
+
+    // accumulator
+    grlmlp_temp.set_total_bit_accum(pick(p.total_bit_accum));
+    grlmlp_temp.set_int_bit_accum(pick(p.int_bit_accum));
+    grlmlp_temp.set_is_signed_accum(pick(p.is_signed_accum));
+    grlmlp_temp.set_rounding_accum(pick(p.rounding_accum));
+    grlmlp_temp.set_saturation_accum(pick(p.saturation_accum));
+
+    // weights
+    grlmlp_temp.set_total_bit_weight(pick(p.total_bit_weight));
+    grlmlp_temp.set_int_bit_weight(pick(p.int_bit_weight));
+    grlmlp_temp.set_is_signed_weight(pick(p.is_signed_weight));
+    grlmlp_temp.set_rounding_weight(pick(p.rounding_weight));
+    grlmlp_temp.set_saturation_weight(pick(p.saturation_weight));
+
+    // relu
+    grlmlp_temp.set_total_bit_relu(pick(p.total_bit_relu));
+    grlmlp_temp.set_int_bit_relu(pick(p.int_bit_relu));
+    grlmlp_temp.set_is_signed_relu(pick(p.is_signed_relu));
+    grlmlp_temp.set_rounding_relu(pick(p.rounding_relu));
+    grlmlp_temp.set_saturation_relu(pick(p.saturation_relu));
+
+    // generic
+    grlmlp_temp.set_total_bit(pick(p.total_bit));
+    grlmlp_temp.set_int_bit(pick(p.int_bit));
+    grlmlp_temp.set_is_signed(pick(p.is_signed));
+    grlmlp_temp.set_rounding(pick(p.rounding));
+    grlmlp_temp.set_saturation(pick(p.saturation));
+
+    // inputs
+    grlmlp_temp.set_W_input(pick(p.W_input));
+    grlmlp_temp.set_I_input(pick(p.I_input));
+
+    m_MLPs.push_back(std::move(grlmlp_temp));
   }
-  return output;
+
+  B2DEBUG(10, "GRLNeuro::initialize finished. created "
+          << m_MLPs.size() << " MLP(s).");
 }
-///////////////////////////////////////////////////////////////
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
 float
 GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
 {
-
-
   const GRLMLP& expert = m_MLPs[isector];
-  vector<float> weights = expert.getWeights();
-  vector<float> bias = expert.getBias();
+  vector<float> weights = expert.get_weights();
+  vector<float> bias = expert.get_bias();
+  vector<int> total_bit_bias = expert.get_total_bit_bias();
+  vector<int> int_bit_bias = expert.get_int_bit_bias();
+  vector<bool> is_signed_bias = expert.get_is_signed_bias();
+  vector<int> rounding_bias = expert.get_rounding_bias();
+  vector<int> saturation_bias = expert.get_saturation_bias();
+  vector<int> total_bit_accum = expert.get_total_bit_accum();
+  vector<int> int_bit_accum = expert.get_int_bit_accum();
+  vector<bool> is_signed_accum = expert.get_is_signed_accum();
+  vector<int> rounding_accum = expert.get_rounding_accum();
+  vector<int> saturation_accum = expert.get_saturation_accum();
+  vector<int> total_bit_weight = expert.get_total_bit_weight();
+  vector<int> int_bit_weight = expert.get_int_bit_weight();
+  vector<bool> is_signed_weight = expert.get_is_signed_weight();
+  vector<int> rounding_weight = expert.get_rounding_weight();
+  vector<int> saturation_weight = expert.get_saturation_weight();
+  vector<int> total_bit_relu = expert.get_total_bit_relu();
+  vector<int> int_bit_relu = expert.get_int_bit_relu();
+  vector<bool> is_signed_relu = expert.get_is_signed_relu();
+  vector<int> rounding_relu = expert.get_rounding_relu();
+  vector<int> saturation_relu = expert.get_saturation_relu();
+  vector<int> total_bit = expert.get_total_bit();
+  vector<int> int_bit = expert.get_int_bit();
+  vector<bool> is_signed = expert.get_is_signed();
+  vector<int> rounding = expert.get_rounding();
+  vector<int> saturation = expert.get_saturation();
+  vector<vector<int>> W_input = expert.get_W_input();
+  vector<vector<int>> I_input = expert.get_I_input();
+
+
+  //input layer
   vector<float> layerinput = input;
 
-  vector<float> layeroutput2 = {};
-  vector<float> layeroutput3 = {};
-  vector<float> layeroutput4 = {};
-
-  /////////////////////////////////////////////////////////////
+  // quantizer the inputs
   for (size_t i = 0; i < layerinput.size(); ++i) {
-    layerinput[i] = sim_fix_input_layer_t(layerinput[i]);
-  }
-  layeroutput2.clear();
-  layeroutput2.assign(expert.getNumberOfNodesLayer(2), 0.);
 
-  unsigned num_inputs = layerinput.size();
-  unsigned num_neurons = expert.getNumberOfNodesLayer(2);  // 64
-  for (unsigned io = 0; io < num_neurons; ++io) {
-    float bias_raw = bias[io];
-    float bias_fixed = sim_fix_dense_0_bias_t(bias_raw);
-    float bias_contrib = sim_fix_dense_0_accum_t(bias_fixed);
-    layeroutput2[io] = bias_contrib;
+    int W_arr[24] = { 12, 12, 11, 11, 8, 8, 7, 7, 5, 6, 6, 6, 8, 8, 6, 5, 4, 5, 7, 7, 6, 4, 5, 5 };
+    int I_arr[24] = { 12, 12, 11, 11, 10, 9, 7, 7, 7, 7, 7, 7, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };
+    if (i != 23) {
+      layerinput[i] = sim_input_layer_t(layerinput[i]);
+      layerinput[i] = sim_ap_dense_0_iq(layerinput[i], W_arr[i], I_arr[i]);
+
+    } else layerinput[i] = 0;
   }
 
+  //hidden layer and output layer
+  vector<float> layeroutput = {};
+  unsigned num_layers = expert.get_number_of_layers();
+
+  unsigned num_total_neurons = 0;
   unsigned iw = 0;
-//  input*weight
-  for (unsigned ii = 0; ii < num_inputs; ++ii) {
-    float input_val = layerinput[ii];
+  for (unsigned i_layer = 0; i_layer < num_layers - 1; i_layer++) {
+    //read bias
+    unsigned num_neurons = expert.get_number_of_nodes_layer(i_layer + 1);
+    layeroutput.clear();
+    layeroutput.assign(num_neurons, 0.);
+    layeroutput.shrink_to_fit();
+
     for (unsigned io = 0; io < num_neurons; ++io) {
-      float weight_raw = weights[iw];
-      float weight_fixed = sim_fix_dense_0_weight_t(weight_raw);
-      float product = input_val * weight_fixed;
-      float contrib = sim_fix_dense_0_accum_t(product);
+      float bias_raw = bias[io + num_total_neurons];
+      float bias_fixed   = sim_fixed(bias_raw, total_bit_bias[i_layer], int_bit_bias[i_layer], is_signed_bias[i_layer],
+                                     rounding_bias[i_layer], saturation_bias[i_layer]);
+      float bias_contrib = sim_fixed(bias_fixed, total_bit_accum[i_layer], int_bit_accum[i_layer], is_signed_accum[i_layer],
+                                     rounding_accum[i_layer], saturation_accum[i_layer]);
+      layeroutput[io] = bias_contrib;
 
-      layeroutput2[io] += contrib;
+    }
+    num_total_neurons += num_neurons;
 
-      ++iw;
+    //input*weight
+    unsigned num_inputs = layerinput.size();
+    for (unsigned ii = 0; ii < num_inputs; ++ii) {
+      float input_val = layerinput[ii];
+      for (unsigned io = 0; io < num_neurons; ++io) {
+        float weight_raw = weights[iw];
+        float weight_fixed = sim_fixed(weight_raw, total_bit_weight[i_layer], int_bit_weight[i_layer], is_signed_weight[i_layer],
+                                       rounding_weight[i_layer], saturation_weight[i_layer]);
+        float product = input_val * weight_fixed;
+        float contrib = sim_fixed(product, total_bit_accum[i_layer], int_bit_accum[i_layer], is_signed_accum[i_layer],
+                                  rounding_accum[i_layer], saturation_accum[i_layer]);
+        layeroutput[io] += contrib;
+        ++iw;
+      }
+    }
+    //     input*weight done
+    if (i_layer < num_layers - 2) {
+      //relu
+      for (unsigned io = 0; io < num_neurons; ++io) {
+        float fixed_val = sim_fixed(layeroutput[io], total_bit[i_layer], int_bit[i_layer], is_signed[i_layer], rounding[i_layer],
+                                    saturation[i_layer]);
+        float relu_val = (fixed_val > 0) ? fixed_val : 0;
+        layeroutput[io] = sim_fixed(relu_val, total_bit_relu[i_layer], int_bit_relu[i_layer], is_signed_relu[i_layer],
+                                    rounding_relu[i_layer], saturation_relu[i_layer]);
+      }
+
+
+      //input to next layer
+      layerinput.clear();
+      layerinput.assign(num_neurons, 0);
+      layerinput.shrink_to_fit();
+
+      for (unsigned i = 0; i < num_neurons; ++i) {
+
+        layerinput[i] = sim_ap_fixed(layeroutput[i], W_input[i_layer][i], I_input[i_layer][i], false, 1, 4, 0);
+
+      }
+      if (i_layer == 0) {}
+      else if (i_layer == 1) {
+
+        layerinput[1] = 0;
+        layerinput[10] = 0;
+        layerinput[18] = 0;
+
+      } else if (i_layer == 2) {
+        layerinput[2] = 0;
+        layerinput[16] = 0;
+
+      }
+
+
+    } else {
+
+
+      // ===  HLS result_t: ap_fixed<19,5,AP_RND,AP_SAT_SYM,0> ===
+      float final_fixed = sim_result_t(layeroutput[0]);
+
+      return final_fixed;
     }
   }
-
-
-//apply activation function, ReLU for hidden layer and output layer
-// === dense_0_t + ReLU  ===
-  std::vector<float> layeroutput2_fixed_relu(num_neurons);
-
-  for (unsigned io = 0; io < num_neurons; ++io) {
-    // dense_0_t）
-    float fixed_val = sim_fix_dense_0_t(layeroutput2[io]);
-
-    // ReLU
-    float relu_val = (fixed_val > 0) ? fixed_val : 0;
-
-    layeroutput2_fixed_relu[io] = relu_val;
-
-  }
-
-  std::vector<float> dense1_input(64);
-  for (unsigned i = 0; i < 64; ++i) {
-    dense1_input[i] = sim_dense_1_input_quant(i, layeroutput2_fixed_relu[i]);
-  }
-
-  layeroutput3.clear();
-  layeroutput3.assign(expert.getNumberOfNodesLayer(1), 0.);
-  unsigned num_inputs_1 = layeroutput2_fixed_relu.size();
-  unsigned num_neurons_1 = expert.getNumberOfNodesLayer(2);
-  for (unsigned io = 64; io < num_neurons_1 + 64; ++io) {
-    float bias_raw = bias[io];
-    float bias_fixed = sim_fix_dense_1_bias_t(bias_raw);
-    float bias_contrib = sim_fix_dense_1_accum_t(bias_fixed);
-    layeroutput3[io - 64] = bias_contrib;
-
-  }
-
-
-  for (unsigned ii = 0; ii < num_inputs_1; ++ii) {
-    float input_val = dense1_input[ii];
-    for (unsigned io = 0; io < num_neurons_1; ++io) {
-
-      float weight_raw = weights[iw];
-
-      float weight_fixed = sim_fix_dense_1_weight_t(weight_raw);
-      float product = input_val * weight_fixed;
-      float contrib = sim_fix_dense_1_accum_t(product);
-
-      layeroutput3[io] += contrib;
-      ++iw;
-    }
-  }
-
-
-  std::vector<float> layeroutput3_fixed_relu(num_neurons);
-
-
-  for (unsigned io = 0; io < num_neurons_1; ++io) {
-    float fixed_val = sim_fix_dense_1_t(layeroutput3[io]);
-    // ReLU
-    float relu_val = (fixed_val > 0) ? fixed_val : 0;
-
-    layeroutput3_fixed_relu[io] = relu_val;
-
-  }
-  std::vector<float> dense2_input(64);
-  for (unsigned i = 0; i < 64; ++i) {
-    dense2_input[i] = sim_dense_2_input_quant(i, layeroutput3_fixed_relu[i]);
-  }
-  layeroutput4.clear();
-  layeroutput4.assign(expert.getNumberOfNodesLayer(3), 0.);
-
-  unsigned num_inputs_2 = layeroutput2_fixed_relu.size();
-  unsigned num_neurons_2 = expert.getNumberOfNodesLayer(3);
-  for (unsigned io = 128; io < num_neurons_2 + 128; ++io) {
-    float bias_raw = bias[io];
-    float bias_fixed = sim_fix_dense_2_bias_t(bias_raw);
-    float bias_contrib = sim_fix_dense_2_accum_t(bias_fixed);
-    layeroutput4[io - 128] = bias_contrib;
-
-  }
-
-  for (unsigned ii = 0; ii < num_inputs_2; ++ii) {
-    float input_val = dense2_input[ii];
-    for (unsigned io = 0; io < num_neurons_2; ++io) {
-      float weight_raw = weights[iw];
-      float weight_fixed = sim_fix_dense_2_weight_t(weight_raw);
-      float product = input_val * weight_fixed;
-      float contrib = sim_fix_dense_2_accum_t(product);
-
-      layeroutput4[io] += contrib;
-
-      ++iw;
-    }
-  }
-  return layeroutput4[0];
-
+  return 0;
 }
 
 
@@ -558,17 +589,17 @@ bool GRLNeuro::load(unsigned isector, const string& weightfilename, const string
           barray.push_back(element);
         }
 
-        if (warray.size() != expert.nWeightsCal()) {
+        if (warray.size() != expert.n_weights_cal()) {
           B2ERROR("Number of weights is not equal to registered architecture!");
           return false;
-        } else expert.setWeights(warray);
-        if (barray.size() != expert.nBiasCal()) {
+        } else expert.set_weights(warray);
+        if (barray.size() != expert.n_bias_cal()) {
           B2ERROR("Number of bias is not equal to registered architecture!");
           return false;
         }
 
-        expert.setWeights(warray);
-        expert.setBias(barray);
+        expert.set_weights(warray);
+        expert.set_bias(barray);
         return true;
       }
     }
@@ -578,7 +609,7 @@ bool GRLNeuro::load(unsigned isector, const string& weightfilename, const string
 bool GRLNeuro::load(unsigned isector, std::vector<float> warray, std::vector<float> barray)
 {
   GRLMLP& expert = m_MLPs[isector];
-  expert.setWeights(warray);
-  expert.setBias(barray);
+  expert.set_weights(warray);
+  expert.set_bias(barray);
   return true;
 }

@@ -26,8 +26,8 @@ def bToCharmHLTSkim(path):
     ma.fillParticleList('gamma:GoodPi0ForHLT', '[clusterReg == 1 and E > 0.02250] or \
                                                 [clusterReg == 2 and E > 0.020] or \
                                                 [clusterReg == 3 and E > 0.020]',
-                        writeOut=True, path=path)
-    ma.reconstructDecay('pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT', '0.105 < M < 0.150', 1, True, path)
+                        path=path)
+    ma.reconstructDecay('pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT', '0.105 < M < 0.150', path=path)
 
     # D0 lists
     ma.reconstructDecay(decayString='D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT', cut='1.7 < M < 2.0', path=path)

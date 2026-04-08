@@ -83,8 +83,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     #. If the reconstruction uses PXD, we finally look for tracks with a wrong charge,\
     flip and refit them to fix the charge, see :ref:`Flip&Refit<trk_flipNrefit>`.
 
-
-
     :param path: the path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: if true, delete all hits except the first and the last in the found tracks.
@@ -162,7 +160,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
         skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
-        inverted_tracking=inverted_tracking)
+        inverted_tracking=inverted_tracking,
+        use_cat_finder=use_cat_finder)
 
     add_postfilter_tracking_reconstruction(path,
                                            components=components,

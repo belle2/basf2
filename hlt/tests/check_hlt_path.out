@@ -2826,7 +2826,7 @@
       KS0PListName=K_S0:merged_TreeFit
       PI0PListName=pi0:physDQM
       TriggerIdentifier=software_trigger_cut&skim&accept_hadron
-      TriggerIdentifierBhabha=software_trigger_cut&skim&accept_bhabha_all
+      TriggerIdentifierBhabha=software_trigger_cut&skim&accept_bhabha_trk_ecl
       TriggerIdentifierHLT=software_trigger_cut&filter&total_result
       TriggerIdentifierHadronb2=software_trigger_cut&skim&accept_hadronb2
       TriggerIdentifierMuMu=software_trigger_cut&skim&accept_mumutight
@@ -5762,7 +5762,7 @@
             KS0PListName=K_S0:merged_TreeFit
             PI0PListName=pi0:physDQM
             TriggerIdentifier=software_trigger_cut&skim&accept_hadron
-            TriggerIdentifierBhabha=software_trigger_cut&skim&accept_bhabha_all
+            TriggerIdentifierBhabha=software_trigger_cut&skim&accept_bhabha_trk_ecl
             TriggerIdentifierHLT=software_trigger_cut&filter&total_result
             TriggerIdentifierHadronb2=software_trigger_cut&skim&accept_hadronb2
             TriggerIdentifierMuMu=software_trigger_cut&skim&accept_mumutight

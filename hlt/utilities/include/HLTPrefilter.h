@@ -9,6 +9,7 @@
 
 /* HLT headers */
 #include <hlt/softwaretrigger/core/utilities.h>
+#include <hlt/dbobjects/HLTPrefilterParameters.h>
 
 /* basf2 headers */
 #include <svd/dataobjects/SVDShaperDigit.h>
@@ -20,6 +21,8 @@
 #include <framework/dbobjects/BunchStructure.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+#include <mdst/dataobjects/TRGSummary.h>
+#include <reconstruction/dbobjects/EventsOfDoomParameters.h>
 
 /* C++ headers */
 #include <cstdint>
@@ -32,6 +35,12 @@ namespace Belle2::HLTPrefilter {
   class TimingCutState {
   private:
 
+    /// Store Object with the trigger result
+    StoreObjPtr<TRGSummary> m_l1Trigger;
+
+    /// HLTprefilterParameters Database OjbPtr
+    DBObjPtr<HLTPrefilterParameters> m_hltPrefilterParameters; /**< HLT prefilter parameters */
+
     /// Store array object for injection time info.
     StoreObjPtr<EventLevelTriggerTimeInfo> m_TTDInfo;
 
@@ -42,29 +51,31 @@ namespace Belle2::HLTPrefilter {
     DBObjPtr<HardwareClockSettings> m_clockSettings; /**< hardware clock settings */
 
   public:
-    /// Define thresholds for variables. By default, no events are skipped based upon these requirements.
-    /// Minimum threshold of timeSinceLastInjection for LER injection
-    double LERtimeSinceLastInjectionMin = 0.0;
-    /// Maximum threshold of timeSinceLastInjection for LER injection
-    double LERtimeSinceLastInjectionMax = 0.0;
-    /// Minimum threshold of timeSinceLastInjection for HER injection
-    double HERtimeSinceLastInjectionMin = 0.0;
-    /// Maximum threshold of timeSinceLastInjection for HER injection
-    double HERtimeSinceLastInjectionMax = 0.0;
-    /// Minimum threshold of timeInBeamCycle for LER injection
-    double LERtimeInBeamCycleMin        = 0.0;
-    /// Maximum threshold of timeInBeamCycle for LER injection
-    double LERtimeInBeamCycleMax        = 0.0;
-    /// Minimum threshold of timeInBeamCycle for HER injection
-    double HERtimeInBeamCycleMin        = 0.0;
-    /// Maximum threshold of timeInBeamCycle for LER injection
-    double HERtimeInBeamCycleMax        = 0.0;
-    /// Prescale for accepting HLTPrefilter lines, by default we randomly accept 1 out of every 1000 events
-    unsigned int prescale = 1000;
 
     bool computeDecision()
     {
-      if (m_TTDInfo.isValid()) {
+      if (m_TTDInfo.isValid() && m_hltPrefilterParameters.isValid() && m_l1Trigger.isValid()) {
+
+        // Injection Timing mode thresholds
+        /// Minimum threshold of timeSinceLastInjection for LER injection
+        const double LERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMin();
+        /// Maximum threshold of timeSinceLastInjection for LER injection
+        const double LERtimeSinceLastInjectionMax = m_hltPrefilterParameters->getLERtimeSinceLastInjectionMax();
+        /// Minimum threshold of timeSinceLastInjection for HER injection
+        const double HERtimeSinceLastInjectionMin = m_hltPrefilterParameters->getHERtimeSinceLastInjectionMin();
+        /// Maximum threshold of timeSinceLastInjection for HER injection
+        const double HERtimeSinceLastInjectionMax = m_hltPrefilterParameters->getHERtimeSinceLastInjectionMax();
+        /// Minimum threshold of timeInBeamCycle for LER injection
+        const double LERtimeInBeamCycleMin        = m_hltPrefilterParameters->getLERtimeInBeamCycleMin();
+        /// Maximum threshold of timeInBeamCycle for LER injection
+        const double LERtimeInBeamCycleMax        = m_hltPrefilterParameters->getLERtimeInBeamCycleMax();
+        /// Minimum threshold of timeInBeamCycle for HER injection
+        const double HERtimeInBeamCycleMin        = m_hltPrefilterParameters->getHERtimeInBeamCycleMin();
+        /// Maximum threshold of timeInBeamCycle for LER injection
+        const double HERtimeInBeamCycleMax        = m_hltPrefilterParameters->getHERtimeInBeamCycleMax();
+        /// Prescale for accepting HLTPrefilter lines, by default we randomly accept 1 out of every 1000 events
+        const unsigned int prescale = m_hltPrefilterParameters->getHLTPrefilterPrescale();
+
         /// Calculate revolution time of beam
         const double revolutionTime = m_bunchStructure->getRFBucketsPerRevolution() * 1e-3 /
                                       m_clockSettings->getAcceleratorRF(); // [microsecond]
@@ -87,8 +98,16 @@ namespace Belle2::HLTPrefilter {
                                 HERtimeInBeamCycleMin < timeInBeamCycle &&
                                 timeInBeamCycle < HERtimeInBeamCycleMax);
 
-        // Tag events inside injection strip with a prescale
-        return (LER_strip || HER_strip) && !SoftwareTrigger::makePreScale(prescale);
+        //find out if we are in the passive veto or in the active veto window
+        bool inActiveInjectionVeto = false; //events accepted in the passive veto window but not in the active
+        try {
+          if (m_l1Trigger->testInput("passive_veto") == 1 &&  m_l1Trigger->testInput("cdcecl_veto") == 0)
+            inActiveInjectionVeto = true; //events in active veto
+        } catch (const std::exception&) {
+        }
+
+        // Tag events from active veto inside injection strip with a prescale
+        return inActiveInjectionVeto && (LER_strip || HER_strip) && !SoftwareTrigger::makePreScale(prescale);
       } else
         return false;
     }
@@ -100,6 +119,12 @@ namespace Belle2::HLTPrefilter {
   class CDCECLCutState {
   private:
 
+    /// Store Object with the trigger result
+    StoreObjPtr<TRGSummary> m_l1Trigger;
+
+    /// HLTprefilterParameters Database OjbPtr
+    DBObjPtr<HLTPrefilterParameters> m_hltPrefilterParameters; /**< HLT prefilter parameters */
+
     /// CDChits StoreArray
     StoreArray<CDCHit> m_cdcHits;
 
@@ -107,23 +132,36 @@ namespace Belle2::HLTPrefilter {
     StoreArray<ECLDigit> m_eclDigits;
 
   public:
-    /// Define thresholds for variables. By default, no events are skipped based upon these requirements.
-    /// Maximum threshold for CDC Hits
-    uint32_t nCDCHitsMax   = 0.0;
-    /// Maximum threshold for ECL Digits
-    uint32_t nECLDigitsMax = 0.0;
-    /// Prescale for accepting HLTPrefilter lines, by default we randomly accept 1 out of every 1000 events
-    unsigned int prescale = 1000;
 
     bool computeDecision()
     {
-      /// Get NCDCHits for the event
-      const uint32_t nCDCHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
-      /// Get NECLDigits for the event
-      const uint32_t nECLDigits = m_eclDigits.isOptional() ? m_eclDigits.getEntries() : 0;
+      if (m_hltPrefilterParameters.isValid() && m_l1Trigger.isValid()) {
 
-      // Tag events having a large CDC and ECL occupancy with a prescale
-      return (nCDCHits > nCDCHitsMax && nECLDigits > nECLDigitsMax) && !SoftwareTrigger::makePreScale(prescale);
+        // CDC-ECL mode thresholds
+        /// Maximum threshold for CDC Hits
+        const uint32_t nCDCHitsMax = m_hltPrefilterParameters->getCDCHitsMax();
+        /// Maximum threshold for ECL Digits
+        const uint32_t nECLDigitsMax = m_hltPrefilterParameters->getECLDigitsMax();
+        /// Prescale for accepting HLTPrefilter lines, by default we randomly accept 1 out of every 1000 events
+        const unsigned int prescale = m_hltPrefilterParameters->getHLTPrefilterPrescale();
+
+        /// Get NCDCHits for the event
+        const uint32_t nCDCHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
+        /// Get NECLDigits for the event
+        const uint32_t nECLDigits = m_eclDigits.isOptional() ? m_eclDigits.getEntries() : 0;
+
+        //find out if we are in the passive veto or in the active veto window
+        bool inActiveInjectionVeto = false; //events accepted in the passive veto window but not in the active
+        try {
+          if (m_l1Trigger->testInput("passive_veto") == 1 &&  m_l1Trigger->testInput("cdcecl_veto") == 0)
+            inActiveInjectionVeto = true; //events in active veto
+        } catch (const std::exception&) {
+        }
+
+        // Tag events having a large CDC and ECL occupancy with a prescale
+        return inActiveInjectionVeto && (nCDCHits > nCDCHitsMax && nECLDigits > nECLDigitsMax) && !SoftwareTrigger::makePreScale(prescale);
+      } else
+        return false;
     }
 
   };
@@ -135,31 +173,32 @@ namespace Belle2::HLTPrefilter {
   private:
     /// CDCHits StoreArray
     StoreArray<CDCHit> m_cdcHits;
-
     /// SVDShaperDigits StoreArray
     StoreArray<SVDShaperDigit> m_svdShaperDigits;
+    /// EventsOfDoomParameters Database OjbPtr
+    DBObjPtr<EventsOfDoomParameters> m_eventsOfDoomParameters;
 
   public:
-    /**
-    * The max number of CDC hits for an event to be kept for reconstruction.
-    * By default, no events are skipped based upon this requirement.
-    */
-    uint32_t nCDCHitsMax = 1e9;
-    /**
-     * The max number of SVD shaper digits for an event to be kept for reconstruction.
-     * By default, no events are skipped based upon this requirement.
-     */
-    uint32_t nSVDShaperDigitsMax = 1e9;
 
     bool computeDecision()
     {
-      /// Get NCDCHits for the event
-      const uint32_t nCDCHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
-      /// Get NSVDShaperDigits for the event
-      const uint32_t nsvdShaperDigits = m_svdShaperDigits.isOptional() ? m_svdShaperDigits.getEntries() : 0;
+      if (m_eventsOfDoomParameters.isValid()) {
 
-      // Tag events having a large SVD and CDC occupancy
-      return (nCDCHits > nCDCHitsMax && nsvdShaperDigits > nSVDShaperDigitsMax);
+        // EventsOfDoomBuster mode thresholds
+        /// The max number of CDC hits for an event to be kept for reconstruction
+        const uint32_t nCDCHitsMax = m_eventsOfDoomParameters->getNCDCHitsMax();
+        /// The max number of SVD shaper digits for an event to be kept for reconstruction
+        const uint32_t nSVDShaperDigitsMax = m_eventsOfDoomParameters->getNSVDShaperDigitsMax();
+
+        /// Get NCDCHits for the event
+        const uint32_t nCDCHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
+        /// Get NSVDShaperDigits for the event
+        const uint32_t nsvdShaperDigits = m_svdShaperDigits.isOptional() ? m_svdShaperDigits.getEntries() : 0;
+
+        // Tag events having a large SVD and CDC occupancy
+        return (nCDCHits > nCDCHitsMax && nsvdShaperDigits > nSVDShaperDigitsMax);
+      } else
+        return false;
     }
 
   };

@@ -9,13 +9,7 @@
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
-#include <reconstruction/dbobjects/EventsOfDoomParameters.h>
-#include <hlt/dbobjects/HLTPrefilterParameters.h>
 #include <hlt/utilities/HLTPrefilter.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <mdst/dataobjects/TRGSummary.h>
 
 namespace Belle2::SoftwareTrigger {
   /**
@@ -40,13 +34,6 @@ namespace Belle2::SoftwareTrigger {
     void doCalculation(SoftwareTriggerObject& calculationResult) override;
 
   private:
-    /// Store Object with the trigger result
-    StoreObjPtr<TRGSummary> m_l1Trigger;
-
-    /// HLTprefilterParameters Database OjbPtr
-    DBObjPtr<HLTPrefilterParameters> m_hltPrefilterParameters; /**< HLT prefilter parameters */
-    /// EventsOfDoomParameters Database OjbPtr
-    DBObjPtr<EventsOfDoomParameters> m_eventsOfDoomParameters;
     /// Helper instance for EventsOfDoom prefilter
     HLTPrefilter::EventsOfDoomBusterState m_eodbPrefilter;
     /// Helper instance for timing based prefilter

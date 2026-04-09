@@ -1,4 +1,4 @@
-[INFO] Steering file: mdst_compatibility-v06-00-00.py
+[INFO] Steering file: mdst/tests/mdst_compatibility-v06-00-00.py
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/mdst/tests/mdst-v06-00-00.root
@@ -48,10 +48,12 @@ Untested method EventLevelTrackingInfo::setSVDSpacePointCreatorAbortionFlag
 Untested method EventLevelTrackingInfo::setUnspecifiedTrackFindingFailure
 Untested method EventLevelTrackingInfo::setVXDTF2AbortionFlag
 Untested method PIDLikelihood::addPreOfficialLikelihood
+Untested method PIDLikelihood::getCDCnLayerHitsUsed
 Untested method PIDLikelihood::getDeltaLogL
 Untested method PIDLikelihood::getInfoHTML
 Untested method PIDLikelihood::getPreOfficialLikelihood
 Untested method PIDLikelihood::printArray
+Untested method PIDLikelihood::setCDCnLayerHitsUsed
 Untested method PIDLikelihood::setLogLikelihood
 Untested method PIDLikelihood::subtractMaximum
 Untested method ECLCluster::addHypothesis

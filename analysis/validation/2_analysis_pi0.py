@@ -38,7 +38,7 @@ cutAndCopyList('pi0:rec', 'pi0:all', 'daughter(0, E)>0.05 and daughter(1, E)>0.0
 cutAndCopyList('pi0:mc', 'pi0:all', 'mcErrors<1', path=main)
 
 vm.addAlias('Mreco', 'M')
-
+vm.addAlias('Mmc', 'M')
 
 create_validation_histograms(
     main, OUTPUT_FILENAME, "pi0:rec",
@@ -51,16 +51,6 @@ create_validation_histograms(
             r"Distribution should be peaking at the nominal $\pi^0$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
         ),
-    ],
-    description=r"$\pi^0$ reconstructed mass distribution",
-)
-
-
-vm.addAlias('Mmc', 'M')
-
-create_validation_histograms(
-    main, OUTPUT_FILENAME, "pi0:mc",
-    variables_1d=[
         (
             "Mmc", 40, 0.08, 0.18,
             "#pi^{0} MC candidates, invariant mass",
@@ -69,8 +59,7 @@ create_validation_histograms(
             r"Distribution should be peaking at the nominal $\pi^0$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
         ),
-    ],
-    description=r"$\pi^0$ MC mass distribution",
+    ], description="$\\pi^0$ reconstructed and MC mass distributions",
 )
 
 main.add_module('Progress')

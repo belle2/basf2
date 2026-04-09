@@ -3,7 +3,9 @@ Import('env')
 env['LIBS'] = [
     'mdst_dataobjects',
     'framework',
-    'top_dataobjects'
+    'top_dataobjects',
+    'libRooFit',
+    'libRooFitCore',
 ]
 
 Return('env')

@@ -1064,6 +1064,13 @@ namespace Belle2 {
       return klmMuonIDDNNvalue;
     }
 
+    double nCDCDedxLayers(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getPIDLikelihood();
+      if (!pid) return Const::doubleNaN;
+      return pid->getCDCnLayerHitsUsed();
+    }
+
     //*************
     // B2BII
     //*************
@@ -1358,6 +1365,8 @@ following the order shown in the metavariable's declaration. Flat priors are ass
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("klmMuonIDDNN", klmMuonIDDNN,
                       "Muon probability calculated from Neural Network with KLM information (expert use only)");
+    REGISTER_VARIABLE("nCDCDedxLayers", nCDCDedxLayers,
+                      "Number of layers with measurements used in the CDC dEdX Likelihood");
 
     // B2BII PID
     VARIABLE_GROUP("Belle PID variables");

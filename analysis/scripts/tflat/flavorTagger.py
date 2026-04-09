@@ -29,9 +29,12 @@ def fill_particle_lists(config, maskName='TFLATDefaultMask', path=None):
     ma.fillParticleList('pi+:tflat', trk_cut, path=path)
 
     if b2bii.isB2BII():
-        # Copy standard K_S0 particles to ROE list
-        ma.copyParticles('K_S0:inRoe', 'K_S0:mdst', path=path)
-        ma.applyCuts('K_S0:inRoe', trk_cut, path=path)
+        # build a list of K_S0 candidates in the rest of event
+        ma.cutAndCopyList(
+            'K_S0:inRoe',
+            'K_S0:mdst',
+            'daughter(0, isInRestOfEvent) > 0.5 and daughter(1, isInRestOfEvent) > 0.5',
+            path=path)
 
         # load MVA's for gammas
         ma.getBeamBackgroundProbability(particleList=['gamma:mdst'], weight=config['VersionBeamBackgroundMVA'], path=path)

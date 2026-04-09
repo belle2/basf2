@@ -46,6 +46,8 @@ namespace Belle2 {
     int getTCADCThreshold() const
     { return m_TCADCThreshold ; }
 
+  private :
+
     //! TCId
     int m_TCId;
     //! TC ADC Threshold (ADC)

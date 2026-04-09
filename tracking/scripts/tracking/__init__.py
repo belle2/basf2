@@ -214,7 +214,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param trackFitHypotheses: Which pdg hypotheses to fit. Defaults to [211, 321, 2212].
     :param stopOnSuccessfulTrackFit: If true (default), the TrackCreator will stop when a fit is successful
-        among the listed "trackFitHypotheses"
+        among the listed "trackFitHypotheses". Otherwise, all listed hypotheses are attempted.
     :param svd_standalone_mode: Which SVD standalone tracking is used.
            Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
            Defaults to "VXDTF2"

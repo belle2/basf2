@@ -120,7 +120,7 @@ def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHyp
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param trackFitHypotheses: Which pdg hypotheses to fit. Defaults to [211, 321, 2212].
     :param stopOnSuccessfulTrackFit: If true (default), the TrackCreator will stop when a fit is successful
-        among the listed "trackFitHypotheses"
+        among the listed "trackFitHypotheses". Otherwise, all listed hypotheses are attempted.
     :param add_mva_quality_indicator: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found tracks.
     """

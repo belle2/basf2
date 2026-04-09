@@ -16,7 +16,6 @@ trk_variable_list: # Input lists
 - muIDBelle
 - muIDBelleQuality
 - atcPIDBelle(3,2)
-- pionID
 - atcPIDBelle(4,2)
 - atcPIDBelle(4,3)
 - pidPairProbabilityExpert(321, 211, CDC)

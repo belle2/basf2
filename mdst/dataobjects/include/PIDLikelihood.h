@@ -164,7 +164,7 @@ namespace Belle2 {
     std::string getInfoHTML() const override;
 
     /**
-     * Add the pre-official likelihood
+     * Add the pre-official likelihood (additional KLM likelihood from CNN)
      * @param preOfficialIdentifier Name of the pre-official likelihood
      * @param preOfficialLikelihood Value of the pre-official likelihood
      */
@@ -172,11 +172,24 @@ namespace Belle2 {
                                   const double preOfficialLikelihood);
 
     /**
-     * Get the pre-official likelihood
+     * Get the pre-official likelihood (additional KLM likelihood from CNN)
      * @param preOfficialIdentifier Name of the pre-official likelihood
      * @return Value of the pre-official likelihood
      */
     double getPreOfficialLikelihood(const std::string& preOfficialIdentifier) const;
+
+    /**
+     * Set the number of layers with measurements used in the CDC likelihood
+     * @param nLayerHitsUsed number of layers with measurements used in the CDC likelihood
+     */
+    void setCDCnLayerHitsUsed(int nLayerHitsUsed);
+
+    /**
+     * Get the number of layers with measurements used in the CDC likelihood
+     * @return number of layers with measurements used in the CDC likelihood
+     */
+    int getCDCnLayerHitsUsed() const;
+
 
   private:
 
@@ -190,14 +203,15 @@ namespace Belle2 {
                      const double* fractions,
                      Const::PIDDetectorSet detSet) const;
 
-    /// Internal storage of pre-official likelihood.
+    /// Internal storage of pre-official likelihood (additional KLM likelihood from CNN).
     std::map<std::string, double> m_preOfficialLikelihoods;
 
     float m_logl[Const::PIDDetectors::c_size][Const::ChargedStable::c_SetSize]; /**< log likelihoods */
     Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
+    int m_CDCnLayerHitsUsed; /**< number of layers with measurements used in the CDC likelihood */
 
-    ClassDefOverride(PIDLikelihood, 5); /**< Collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM. */
-    // version 5: reorder class members to improve memory layout
+    ClassDefOverride(PIDLikelihood, 6); /**< Collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM. */
+    // version 6: add m_CDCnLayerHitsUsed
 
   };
 

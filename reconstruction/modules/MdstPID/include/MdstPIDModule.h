@@ -169,6 +169,8 @@ namespace Belle2 {
     // other
     PIDLikelihood* m_pid; /**< pointer to the object to be filled */
     std::map<Const::ChargedStable, std::string> m_chargedNames; /**< names of charged particles (used in error messages) */
+    int m_CDCnLayerHitsUsed =
+      std::numeric_limits<int>::quiet_NaN(); /**< number of layers with measurements used in the CDC likelihood */
 
   };
 

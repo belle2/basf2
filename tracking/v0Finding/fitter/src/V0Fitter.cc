@@ -143,8 +143,8 @@ bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit:
   try {
     /// extrapolate the first (innermost) hit to the V0 vertex position
     /// the value will be positive (negative) if the direction of the extrapolation is (counter)momentum-wise
-    double extralengthPlus  =  stPlus.extrapolateToPoint(XYZToTVector(vertexPosition));
-    double extralengthMinus = stMinus.extrapolateToPoint(XYZToTVector(vertexPosition));
+    const double extralengthPlus  =  stPlus.extrapolateToPoint(XYZToTVector(vertexPosition));
+    const double extralengthMinus = stMinus.extrapolateToPoint(XYZToTVector(vertexPosition));
     if (extralengthPlus  > 0) hasInnerHitStatus |= 0x1; ///  plus track has hits inside the V0 vertex.
     if (extralengthMinus > 0) hasInnerHitStatus |= 0x2; /// minus track has hits inside the V0 vertex.
     B2DEBUG(22, "extralengthPlus=" << extralengthPlus << ", extralengthMinus=" << extralengthMinus);
@@ -236,7 +236,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   /// Repeat until all the inner hits are removed or the vertex fit fails.
   bool failflag = false;
   /// PDG code (positive number) used as the track hypothesis in the track fitting.
-  const auto trackHypotheses = getTrackHypotheses(v0Hypothesis);
+  const auto& trackHypotheses = getTrackHypotheses(v0Hypothesis);
   const int pdg_trackPlus   = trackPlus->getTrackFitResultWithClosestMass(
                                 trackHypotheses.first)->getParticleType().getPDGCode();/// positive number
   const int pdg_trackMinus  = trackMinus->getTrackFitResultWithClosestMass(
@@ -347,7 +347,7 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
                                        unsigned int& hasInnerHitStatus, ROOT::Math::XYZVector& vertexPos,
                                        const bool forceStore)
 {
-  const auto trackHypotheses = getTrackHypotheses(v0Hypothesis);
+  const auto& trackHypotheses = getTrackHypotheses(v0Hypothesis);
 
   // make a clone, not use the reference so that the genfit::Track and its TrackReps will not be altered.
   genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
@@ -368,8 +368,8 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   }
 
   /// If existing, pass to the genfit::Track the correct cardinal representation
-  std::vector<genfit::AbsTrackRep*> repsPlus = gfTrackPlus.getTrackReps();
-  std::vector<genfit::AbsTrackRep*> repsMinus = gfTrackMinus.getTrackReps();
+  const std::vector<genfit::AbsTrackRep*>& repsPlus = gfTrackPlus.getTrackReps();
+  const std::vector<genfit::AbsTrackRep*>& repsMinus = gfTrackMinus.getTrackReps();
   if (repsPlus.size() == repsMinus.size()) {
     for (unsigned int id = 0; id < repsPlus.size(); id++) {
       if (abs(repsPlus[id]->getPDG()) == pdgTrackPlus)

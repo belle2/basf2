@@ -1,0 +1,8 @@
+Changes in the framework package
+--------------------------------
+
+Command line Tools
+++++++++++++++++++
+
+* :ref:`b2file-merge <b2file-merge>` now lets you merrge output files
+  containing histograms  produced by `VariablesToHistogram`.

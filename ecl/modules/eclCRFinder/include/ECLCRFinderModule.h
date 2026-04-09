@@ -105,9 +105,9 @@ namespace Belle2 {
     /** Neighbour maps. */
     std::vector<ECL::ECLNeighbours*> m_neighbourMaps;
 
-    /** Check if two crystals are neighbours. */
-    // void checkNeighbours(const int cellid, const int tempcrid, const int type);
-    bool areNeighbours(const int cellid1, const int cellid2, const int maptype);
+    /** Vectors for BFS search. */
+    std::vector<std::vector<int>> m_adj; /**< Adjacency list for all crystals. */
+    std::vector<bool> m_visited; /**< Vector to keep track in BFS */
 
     /** Convert vector of cell ids to 0/1 vectors from 1-8737. */
     std::vector<int> oneHotVector(std::vector<int>& A, const int n);
@@ -115,8 +115,8 @@ namespace Belle2 {
     /** Convert vector of vectors to one long vector. */
     std::vector<int> flattenVector(std::vector<std::vector<int>>& A);
 
-    /** Find all lists of cell-ids that share at least one cell. */
-    std::vector<std::set<int>> mergeVectorsUsingSets(std::vector<std::vector<int>>& A);
+    /** Find all lists of cell-ids that share at least one cell using Breadth First Search (BFS) graph traversal algorithm. */
+    std::vector<std::set<int>> mergeVectorsUsingBFSTraversal(std::vector<std::vector<int>>& A);
 
     /** Get all connected regions. */
     std::vector<std::vector<int>> getConnectedRegions(const std::vector<int>& A, const std::vector<int>& B, const int maptype);

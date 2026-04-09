@@ -17,8 +17,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
-#include <TF1.h>
-
 using namespace std;
 using namespace Belle2;
 
@@ -44,7 +42,6 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     graph.addParticle();
   }
 
-  double r, x = 0, y = 0, z = 0, t = 0;
   //Read particles from file
   for (int i = 0; i < nparticles; ++i) {
     MCParticleGraph::GraphParticle& p = graph[first + i];
@@ -64,32 +61,6 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
       p.set4Vector(p4);
     }
 
-    //move vertex position of selected particle and its daughters
-    if (m_meanDecayLength > 0) {
-      if (p.getPDG() == m_pdgDisplaced) {
-        TF1 fr("fr", "exp(-x/[0])", 0, 1000000);
-        ROOT::Math::PxPyPzEVector p4 = p.get4Vector();
-        fr.SetRange(m_Rmin, m_Rmax);
-        fr.SetParameter(0, m_meanDecayLength * p4.Gamma());
-        r = fr.GetRandom();
-        x = r * p4.Px() / p4.P();
-        y = r * p4.Py() / p4.P();
-        z = r * p4.Pz() / p4.P();
-        p.setDecayVertex(x, y, z);
-        t = (r / Const::speedOfLight) * (p4.E() / p4.P());
-        p.setDecayTime(t);
-        p.setValidVertex(true);
-      }
-
-      if (mother > 0) {
-        if (graph[mother - 1].getPDG() == m_pdgDisplaced) {
-          p.setProductionVertex(x, y, z);
-          p.setProductionTime(t);
-          p.setValidVertex(true);
-        }
-      }
-    }
-
     // initial 2 (e+/e-), virtual 3 (Z/gamma*)
     // check if particle should be made virtual according to steering options:
     if (i < m_indexVirtual && i >= m_indexInitial)
@@ -101,17 +72,14 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     if (m_indexVirtual < m_indexInitial) B2WARNING("IsVirtual particle requested but is overwritten by Initial");
 
   }
-//   return eventID;
   return -1;
 }
 
 
 bool LHEReader::skipEvents(int n)
 {
-//   int eventID;
   double weight;
   for (int i = 0; i < n; i++) {
-//     int nparticles = readEventHeader(eventID, weight);
     int nparticles = readEventHeader(weight);
     if (nparticles < 0) return false;
     for (int j = 0; j < nparticles; j++) getLine();

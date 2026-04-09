@@ -9,9 +9,6 @@
 # Cuts: None
 # Date: 20240718
 
-# Need to define B0 mass eigenstates for VSS_BMIX model
-Define dm 0.510e12
-
 Decay Upsilon(4S)
 1.00 B0sig anti-B0sig B0 anti-B0         VSS_BMIX dm;
 Enddecay

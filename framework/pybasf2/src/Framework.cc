@@ -467,9 +467,15 @@ Processes up to max_events events by starting with the first module in the speci
       2. relative to the current working directory
 
   ``validation``
-      Data for Validation purposes. Will try to find the file in
+      Data for validation purposes. Will try to find the file in
 
       1. in ``$BELLE2_VALIDATION_DATA_DIR``
+      2. relative to the current working directory
+
+  ``starterkit``
+      Data for starterkit purposes. Will try to find the file in
+
+      1. in ``$BELLE2_STARTERKIT_DATA_DIR``
       2. relative to the current working directory
 
   .. versionadded:: release-03-00-00
@@ -478,7 +484,7 @@ Processes up to max_events events by starting with the first module in the speci
     filename (str): relative filename to look for, either in a central place or
         in the current working directory
     data_type (str): case insensitive data type to find. Either empty string or
-        one of ``"examples"`` or ``"validation"``
+        one of ``"examples"``, ``"validation"`` or "``starterkit``".
     silent (bool): If True don't print any errors and just return an empty
         string if the file cannot be found
   )DOC");

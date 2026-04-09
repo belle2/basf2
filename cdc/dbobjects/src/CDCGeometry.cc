@@ -183,7 +183,9 @@ void CDCGeometry::read(const GearDir& content)
     const double rmax2 = neuContent.getLength("OuterR2");
     const double thick = neuContent.getLength("Thickness");
     const double z = neuContent.getLength("PosZ");
-    NeutronShield shield(i, rmin1, rmin2, rmax1, rmax2, thick, z);
+    const int ena = neuContent.getInt("Enable");
+
+    NeutronShield shield(i, rmin1, rmin2, rmax1, rmax2, thick, z, ena);
     m_neutronShields.push_back(shield);
   }
 

@@ -42,6 +42,8 @@ The default payloads are created using scripts in the directory
      - ``KLMTimeConversion``
    * - ``ImportTimeResolution.py``
      - ``KLMTimeResolution``
+   * - ``ImportEventT0HitResolution.py``
+     - ``KLMEventT0HitResolution``
    * - ``ImportTimeWindow.py``
      - ``ImportTimeWindow``
 

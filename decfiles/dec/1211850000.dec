@@ -1,0 +1,42 @@
+# EventType: 1211850000
+# Descriptor: [B+ --> J/psi K+ pi+ pi-]
+# NickName: B+_J/psi_K+_pi+_pi-
+# Documentation:
+# Tested: Yes
+# Physics WG: Quarkonium WG
+# Responsible: Eunji Jang
+# Email: jej6744@gnu.ac.kr
+# Cuts: None
+# Date: 20250119
+# Comments:
+
+Alias myB+ B+
+Alias myB- B-
+ChargeConj myB+ myB-
+#
+#
+#
+Alias myJ/psi J/psi
+#
+#
+#
+
+Decay Upsilon(4S)
+0.5    myB+  B-   VSS;
+0.5    B+  myB-   VSS;
+Enddecay
+
+#
+Decay myB+
+1.0   myJ/psi K+ pi+ pi-	 PHSP;
+Enddecay
+CDecay myB-
+
+#
+Decay myJ/psi
+0.5         mu+  mu-                       VLL;
+0.5 	    e+  e- 			   VLL;
+Enddecay
+
+#
+End

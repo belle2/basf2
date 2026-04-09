@@ -26,7 +26,7 @@ namespace Belle2 {
     /// @brief Constructor
     GblMultipleScatteringController() : GblTrackSegmentController() {;}
     /// @brief Destructor
-    virtual ~GblMultipleScatteringController() {;}
+    ~GblMultipleScatteringController() override {;}
 
     /**
      * @brief Change fitter options to not use scatterers
@@ -45,4 +45,3 @@ namespace Belle2 {
   };
 
 } /* End of namespace Belle2 */
-

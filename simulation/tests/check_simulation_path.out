@@ -416,21 +416,20 @@
       hitCollectionName=
   26. GRLNeuro
       HistFileName=hist.root
-      MVACut=[-1.0]
+      MVACut=[0.0]
       SaveHist=False
       TRGECLClusters=TRGECLClusters
       TrgGrlInformation=TRGGRLObjects
-      biasFiles=['']
+      csvThetaPhiFile=${BELLE2_SOFTWARE_DIR}/data/trg/grl/tcid_correct_theta_phi.csv
       i_cdc_sector=[0.0]
       i_ecl_sector=[24.0]
       multiplyHidden=False
-      nHidden=[[64.0, 64.0]]
+      nHidden=[[24.0, 24.0, 24.0]]
       nMLP=1
       n_cdc_sector=0
       n_ecl_sector=1
       outputScale=[[-1.0, 1.0]]
       useDB=True
-      weightFiles=['']
   27. TRGGRLProjects
       2DfinderCollection=TRGCDC2DFinderTracks
       2DmatchCollection=TRG2DMatchTracks

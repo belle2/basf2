@@ -427,31 +427,34 @@ def get_package_version(package_name, major_minor_only=False):
     return version
 
 
+intersphinx_timeout = 30
+inv_cache_dir = os.path.join(os.path.dirname(__file__), "intersphinx_cache")
+
 # allow to have links to python documentation
 intersphinx_mapping = {
     "python": (
         f"https://docs.python.org/{get_package_version('python', major_minor_only=True)}/",
-        None,
+        f"{inv_cache_dir}/python.inv",
     ),
     "numpy": (
         f"https://numpy.org/doc/{get_package_version('numpy', major_minor_only=True)}/",
-        None,
+        f"{inv_cache_dir}/numpy.inv",
     ),
     "scipy": (
         f"https://docs.scipy.org/doc/scipy-{get_package_version('scipy')}/",
-        None,
+        f"{inv_cache_dir}/scipy.inv",
     ),
     "pandas": (
         f"https://pandas.pydata.org/pandas-docs/version/{get_package_version('pandas', major_minor_only=True)}/",
-        None,
+        f"{inv_cache_dir}/pandas.inv",
     ),
     "matplotlib": (
         f"https://matplotlib.org/{get_package_version('matplotlib')}/",
-        None,
+        f"{inv_cache_dir}/matplotlib.inv",
     ),
-    "b2luigi": ("https://b2luigi.belle2.org/", None),
-    "gbasf2": ("https://gbasf2.belle2.org/", None),
-    "uproot": ("https://uproot.readthedocs.io/en/stable/", None),
+    "b2luigi": ("https://b2luigi.belle2.org/", f"{inv_cache_dir}/b2luigi.inv"),
+    "gbasf2": ("https://gbasf2.belle2.org/", f"{inv_cache_dir}/gbasf2.inv"),
+    "uproot": ("https://uproot.readthedocs.io/en/stable/", f"{inv_cache_dir}/uproot.inv"),
 }
 
 

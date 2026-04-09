@@ -232,7 +232,9 @@ def pre_collector(name='rg'):
     if (name == "validation"):
         basf2.B2INFO("no trigger skim")
     elif (name == "timegain" or name == "onedcell"):
-        trg_bhabhaskim = reco_path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_radee"])
+        trg_bhabhaskim = reco_path.add_module(
+            "TriggerSkim",
+            triggerLines=["software_trigger_cut&skim&accept_bhabha_cdc"])
         trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
         ps_bhabhaskim = reco_path.add_module("Prescale", prescale=0.80)
         ps_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
@@ -284,7 +286,7 @@ def collector(granularity='all', name=''):
     else:
         col = register_module('CDCDedxElectronCollector', cleanupCuts=True)
         if name == "timegain":
-            CollParam = {'isRun': True, 'isInjTime': True, 'granularity': 'run'}
+            CollParam = {'isRun': True, 'isInjTime': True, 'isRadee': True, 'granularity': 'run'}
 
         elif name == "coscorr" or name == "cosedge":
             CollParam = {'isCharge': True, 'isCosth': True, 'granularity': granularity}
@@ -303,6 +305,7 @@ def collector(granularity='all', name=''):
                 'isLayer': True,
                 'isDedxhit': True,
                 'isEntaRS': True,
+                'isRadee': True,
                 'granularity': granularity}
 
         else:
@@ -399,7 +402,7 @@ def wiregain_algo():
 
 def onedcell_algo():
     """
-    Create oned cell calibration algorithm.
+    Create oned cell calibration algorithim.
     Returns:
         algo : oned cell correction algorithm
     """
@@ -434,10 +437,10 @@ class CDCDedxCalibration(Calibration):
         '''
         parameters:
             name: name of calibration
-            algorithms: algorithm of calibration
+            algorithims: algorithm of calibration
             input_file_dict: input files list
             max_iterations: maximum number of iterations
-            dependencies: depends on the previous calibration
+            dependenices: depends on the previous calibration
             collector_granularity: granularity : all or run
         '''
         super().__init__(name=name,

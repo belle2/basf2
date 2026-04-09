@@ -44,6 +44,7 @@ ECLFinalizerModule::ECLFinalizerModule() : Module()
 
   addParam("clusterEnergyCutMin", m_clusterEnergyCutMin, "Min value for the cluster energy cut.",
            20.0 * Belle2::Unit::MeV);
+  addParam("useParametersFromDatabase", m_useParametersFromDatabase, "get clusterEnergyCutMin from payload", true);
   addParam("clusterTimeCutMaxEnergy", m_clusterTimeCutMaxEnergy, "All clusters above this energy are kept.",
            50.0 * Belle2::Unit::MeV);
   addParam("clusterLossyFraction", m_clusterLossyFraction,
@@ -74,8 +75,10 @@ void ECLFinalizerModule::initialize()
 
 void ECLFinalizerModule::beginRun()
 {
-  // Do not use this blindly for database updates, they will probably not follow the concept of a "run"
-  ;
+  //..Get m_clusterEnergyCutMin from the payload by default
+  if (m_useParametersFromDatabase) {
+    m_clusterEnergyCutMin = m_eclClusteringParameters->getFClusterEnergyCutMin();
+  }
 }
 
 void ECLFinalizerModule::event()

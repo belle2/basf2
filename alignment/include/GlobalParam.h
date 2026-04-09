@@ -192,7 +192,7 @@ namespace Belle2 {
         //  construct();
       }
       /// Destructor
-      ~GlobalParamSet() {m_object.reset();}
+      ~GlobalParamSet() override {m_object.reset();}
 
       /// The DB object unique id in global calibration
       virtual unsigned short getGlobalUniqueID() const override final {return DBObjType::getGlobalUniqueID();}

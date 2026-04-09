@@ -20,6 +20,10 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TBranchElement.h>
+#include <TDirectory.h>
+#include <TH1.h>
+#include <TKey.h>
+#include <TClass.h>
 
 #include <filesystem>
 #include <iostream>
@@ -44,6 +48,77 @@ namespace {
   {
     std::regex legacy_gt(",?Legacy_IP_Information");
     return std::regex_replace(globaltags, legacy_gt, "");
+  }
+
+  /** Recursively collect TH1 histograms from a TDirectory, merging with any already in the map.
+   * Trees and the persistent tree are skipped. Subdirectories are traversed recursively.
+   * @param dir  directory to search
+   * @param prefix  path prefix for this level (empty for the top-level file)
+   * @param histograms  map from histogram path to (accumulated TH1*, count of files merged so far)
+   */
+  void collectHistograms(TDirectory& dir, const std::string& prefix,
+                         std::map<std::string, std::pair<TH1*, size_t>>& histograms)
+  {
+    for (TObject* keyObj : *dir.GetListOfKeys()) {
+      auto* key = dynamic_cast<TKey*>(keyObj);
+      if (!key) continue;
+      const std::string name{key->GetName()};
+      const std::string path = prefix.empty() ? name : (prefix + "/" + name);
+      TClass* cls = TClass::GetClass(key->GetClassName());
+      if (!cls) continue;
+      if (cls->InheritsFrom(TDirectory::Class())) {
+        auto* subdir = dynamic_cast<TDirectory*>(key->ReadObj());
+        if (subdir) collectHistograms(*subdir, path, histograms);
+      } else if (cls->InheritsFrom(TH1::Class())) {
+        auto* hist = dynamic_cast<TH1*>(key->ReadObj());
+        if (!hist) continue;
+        auto it = histograms.find(path);
+        if (it == histograms.end()) {
+          hist->SetDirectory(nullptr); // detach from input file so we own it
+          histograms.emplace(path, std::make_pair(hist, size_t{1}));
+        } else {
+          it->second.first->Add(hist);
+          it->second.second++;
+          delete hist;
+        }
+      }
+    }
+  }
+
+  /** Write all histograms to the output file, recreating any subdirectory structure.
+   * @param output  output ROOT file to write into
+   * @param histograms  map from histogram path to (TH1*, count) as produced by collectHistograms
+   */
+  void writeHistograms(TFile& output,
+                       const std::map<std::string, std::pair<TH1*, size_t>>& histograms)
+  {
+    for (const auto& [path, histCount] : histograms) {
+      output.cd();
+      const auto slash = path.rfind('/');
+      if (slash != std::string::npos) {
+        // Create intermediate directories level by level
+        TDirectory* dir = &output;
+        size_t start = 0;
+        const std::string dirpath = path.substr(0, slash);
+        while (start < dirpath.size()) {
+          const size_t end = dirpath.find('/', start);
+          const std::string part = (end == std::string::npos)
+                                   ? dirpath.substr(start) : dirpath.substr(start, end - start);
+          TDirectory* sub = dir->GetDirectory(part.c_str());
+          if (!sub) {
+            dir->mkdir(part.c_str());
+            sub = dir->GetDirectory(part.c_str());
+          }
+          if (!sub) break;
+          dir = sub;
+          if (end == std::string::npos) break;
+          start = end + 1;
+        }
+        dir->cd();
+      }
+      histCount.first->Write();
+    }
+    output.cd();
   }
 }
 
@@ -131,6 +206,8 @@ The following restrictions apply:
   // set of all ntuple trees names to compare against to make sure
   // that they're the same in all files (if they exist)
   std::set<std::string> allEventTrees;
+  // map from histogram path to (accumulated TH1*, count of files where it was found)
+  std::map<std::string, std::pair<TH1*, size_t>> mergedHistograms;
   // Release version to compare against. Same as FileMetaData::getRelease() but with the optional -modified removed
   std::string outputRelease;
 
@@ -174,6 +251,9 @@ The following restrictions apply:
           }
         }
       }
+      // Collect and accumulate any histograms stored directly in this file
+      collectHistograms(fileInfo.getFile(), "", mergedHistograms);
+
       // File looks good so far, now fix the persistent stuff, i.e. merge all
       // objects in persistent tree
       for(TObject* brObj: *fileInfo.getPersistentTree().GetListOfBranches()){
@@ -384,6 +464,22 @@ The following restrictions apply:
   }
 
   B2INFO("Done processing events");
+
+  // Write merged histograms to output and check consistency
+  if (!mergedHistograms.empty()) {
+    B2INFO("Writing histograms");
+    writeHistograms(*output, mergedHistograms);
+    for (const auto& [name, histCount] : mergedHistograms) {
+      if (histCount.second != inputfilenames.size()) {
+        B2ERROR("Histogram " << std::quoted(name) << " only present in "
+                  << histCount.second << " out of " << inputfilenames.size() << " files");
+      }
+    }
+    for (auto& [name, histCount] : mergedHistograms) {
+      delete histCount.first;
+    }
+    mergedHistograms.clear();
+  }
 
   // we need to set the LFN to the absolute path name
   outputMetaData->setLfn(fs::absolute(outputfilename).string());

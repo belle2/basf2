@@ -494,9 +494,9 @@ GRLNeuroTrainerModule::terminate()
   // do training for all sectors with sufficient training samples
   for (unsigned isector = 0; isector < m_GRLNeuro.nSectors(); ++isector) {
     // skip sectors that have already been trained
-    if (m_GRLNeuro[isector].isTrained())
+    if (m_GRLNeuro[isector].is_trained())
       continue;
-    float nTrainMin = m_multiplyNTrain ? m_nTrainMin * m_GRLNeuro[isector].getNumberOfWeights() : m_nTrainMin;
+    float nTrainMin = m_multiplyNTrain ? m_nTrainMin * m_GRLNeuro[isector].get_number_of_weights() : m_nTrainMin;
     std::cout << m_nTrainMin << " " << m_nValid << " " << m_nTest << std::endl;
     if (m_trainSets[isector].getNumberOfSamples() < (nTrainMin + m_nValid + m_nTest)) {
       B2WARNING("Not enough training samples for sector " << isector << " (" << (nTrainMin + m_nValid + m_nTest)
@@ -524,10 +524,10 @@ GRLNeuroTrainerModule::train(unsigned isector)
   B2INFO("Training network for sector " << isector << " without OpenMP");
 #endif
   // initialize network
-  unsigned nLayers = m_GRLNeuro[isector].getNumberOfLayers();
+  unsigned nLayers = m_GRLNeuro[isector].get_number_of_layers();
   unsigned* nNodes = new unsigned[nLayers];
   for (unsigned il = 0; il < nLayers; ++il) {
-    nNodes[il] = m_GRLNeuro[isector].getNumberOfNodesLayer(il);
+    nNodes[il] = m_GRLNeuro[isector].get_number_of_nodes_layer(il);
   }
   struct fann* ann = fann_create_standard_array(nLayers, nNodes);
   // initialize training and validation data
@@ -576,7 +576,7 @@ GRLNeuroTrainerModule::train(unsigned isector)
     int breakEpoch = 0;
     int bestEpoch = 0;
     vector<fann_type> bestWeights = {};
-    bestWeights.assign(m_GRLNeuro[isector].getNumberOfWeights(), 0.);
+    bestWeights.assign(m_GRLNeuro[isector].get_number_of_weights(), 0.);
     fann_randomize_weights(ann, -0.1, 0.1);
     // train and save the network
     for (int epoch = 1; epoch <= m_maxEpochs; ++epoch) {
@@ -629,7 +629,7 @@ GRLNeuroTrainerModule::train(unsigned isector)
     }
     trainOptLog.push_back(trainLog[bestEpoch - 1]);
     validOptLog.push_back(validLog[bestEpoch - 1]);
-    vector<float> oldWeights = m_GRLNeuro[isector].getWeights();
+    vector<float> oldWeights = m_GRLNeuro[isector].get_weights();
     m_GRLNeuro[isector].m_weights = bestWeights;
   }
   if (m_saveDebug) {

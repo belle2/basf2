@@ -84,7 +84,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
-    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param trackFitHypotheses: Which pdg hypotheses to fit. Defaults to [211, 321, 2212].
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param v0_finding: if false, the V0Finder module is not executed
     :param add_mva_quality_indicator: If true, add the MVA track quality estimation
@@ -118,7 +118,7 @@ def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHyp
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
-    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param trackFitHypotheses: Which pdg hypotheses to fit. Defaults to [211, 321, 2212].
     :param stopOnSuccessfulTrackFit: If true (default), the TrackCreator will stop when a fit is successful
         among the listed "trackFitHypotheses"
     :param add_mva_quality_indicator: If true, add the MVA track quality estimation
@@ -137,7 +137,7 @@ def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHyp
     if add_mva_quality_indicator:
         path.add_module("TrackQualityEstimatorMVA", collectEventFeatures=True)
     # create Belle2 tracks from the RecoTrack objects (which have genfit tracks)
-    # By default, stops creating Belle2 tracks when a successful fit is found among given hypothesis,
+    # By default, stops creating Belle2 tracks when a successful fit is found among given hypotheses,
     # rest will be fitted in the postfilter
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
                     pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses,
@@ -151,11 +151,11 @@ def add_postfilter_track_fit_and_track_creator(path,
     """
     Helper function to add the modules not required to calculate HLT filter decision,
     and ran after the HLT decision calculation.
-    It performs track fit and creates Belle II tracks with additional mass hypothesis.
+    It performs track fit and creates Belle II tracks with additional mass hypotheses.
 
     :param path: The path to add the tracking reconstruction modules to
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
-    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param trackFitHypotheses: Which pdg hypotheses to fit. Defaults to [211, 321, 2212].
     """
 
     # By default, some hypotheses are already fitted until a successful fit is found in the prefilter
@@ -333,7 +333,7 @@ def add_flipping_of_recoTracks(
     :param path: The path to add the tracking reconstruction modules to
     :param fit_tracks: fit the flipped recotracks or not
     :param reco_tracks: Name of the StoreArray where the reco tracks should be flipped
-    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param trackFitHypotheses: Which pdg hypotheses to fit. Defaults to [211, 321, 2212].
     :param reco_tracks_flipped: Name of the temporary StoreArray for the flipped RecoTracks
     """
 

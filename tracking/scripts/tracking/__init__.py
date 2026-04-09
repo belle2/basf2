@@ -101,7 +101,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
         after the global algorithm (Legendre).
     :param use_second_cdc_hits: if true, the second hit information will be used in the CDC track finding.
-    :param trackFitHypotheses: which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param trackFitHypotheses: which pdg hypotheses to fit. Defaults to [211, 321, 2212].
     :param svd_standalone_mode: Which SVD standalone tracking is used.
            Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
            Defaults to "VXDTF2"
@@ -212,7 +212,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
         after the global algorithm (Legendre).
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
-    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param trackFitHypotheses: Which pdg hypotheses to fit. Defaults to [211, 321, 2212].
     :param stopOnSuccessfulTrackFit: If true (default), the TrackCreator will stop when a fit is successful
         among the listed "trackFitHypotheses"
     :param svd_standalone_mode: Which SVD standalone tracking is used.
@@ -327,7 +327,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param fit_tracks: If false, the final track fitting and the TrackCreator module will not be executed
-    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param trackFitHypotheses: Which pdg hypotheses to fit. Defaults to [211, 321, 2212].
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
     :param v0_finding: If false, the V0 module will not be executed

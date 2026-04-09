@@ -34,7 +34,7 @@ settings = CalibrationSettings(
     subsystem="cdc",
     description=__doc__,
     input_data_formats=["cdst"],
-    input_data_names=["bhabha_all_calib"],
+    input_data_names=["bhabha_combined_calib"],
     expert_config={
         "payload_boundaries": [],
         "calib_datamode": False,
@@ -46,9 +46,9 @@ settings = CalibrationSettings(
         "calibration_procedure": {"rungain0": 0, "rungain1": 0, "rungain2": 0}
          },
     input_data_filters={
-        "bhabha_all_calib": [
+        "bhabha_combined_calib": [
             INPUT_DATA_FILTERS['Run Type']['physics'],
-            INPUT_DATA_FILTERS['Data Tag']['bhabha_all_calib'],
+            INPUT_DATA_FILTERS['Data Tag']['bhabha_combined_calib'],
             INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable'],
             INPUT_DATA_FILTERS['Magnet']['On'],
             INPUT_DATA_FILTERS['Beam Energy']['4S'],
@@ -66,7 +66,7 @@ def get_calibrations(input_data, **kwargs):
     """
 
     import basf2
-    file_to_iov_physics = input_data["bhabha_all_calib"]
+    file_to_iov_physics = input_data["bhabha_combined_calib"]
 
     expert_config = kwargs.get("expert_config")
     calib_mode = expert_config["calib_mode"]
@@ -228,11 +228,13 @@ def pre_collector(name='rg'):
     """
 
     reco_path = basf2.create_path()
-    recon.prepare_cdst_analysis(path=reco_path)
+
     if (name == "validation"):
         basf2.B2INFO("no trigger skim")
     elif (name == "timegain" or name == "onedcell"):
-        trg_bhabhaskim = reco_path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_radee"])
+        trg_bhabhaskim = reco_path.add_module(
+            "TriggerSkim",
+            triggerLines=["software_trigger_cut&skim&accept_bhabha_cdc"])
         trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
         ps_bhabhaskim = reco_path.add_module("Prescale", prescale=0.80)
         ps_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
@@ -248,6 +250,8 @@ def pre_collector(name='rg'):
     else:
         trg_bhabhaskim = reco_path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
         trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
+
+    recon.prepare_cdst_analysis(path=reco_path)
 
     reco_path.add_module(
         'CDCDedxCorrection',
@@ -282,7 +286,7 @@ def collector(granularity='all', name=''):
     else:
         col = register_module('CDCDedxElectronCollector', cleanupCuts=True)
         if name == "timegain":
-            CollParam = {'isRun': True, 'isInjTime': True, 'granularity': 'run'}
+            CollParam = {'isRun': True, 'isInjTime': True, 'isRadee': True, 'granularity': 'run'}
 
         elif name == "coscorr" or name == "cosedge":
             CollParam = {'isCharge': True, 'isCosth': True, 'granularity': granularity}
@@ -301,6 +305,7 @@ def collector(granularity='all', name=''):
                 'isLayer': True,
                 'isDedxhit': True,
                 'isEntaRS': True,
+                'isRadee': True,
                 'granularity': granularity}
 
         else:

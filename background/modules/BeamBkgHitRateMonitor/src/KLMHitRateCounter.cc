@@ -53,7 +53,8 @@ void KLMHitRateCounter::accumulate(unsigned timeStamp)
         klmDigit.getSubdetector(), klmDigit.getSection(), klmDigit.getSector(),
         klmDigit.getLayer());
     int module = m_ModuleArrayIndex->getIndex(moduleNumber);
-    if (module >= 0 and module < KLMElementNumbers::getTotalModuleNumber()) {
+    // if (module >= 0 and module < KLMElementNumbers::getTotalModuleNumber()) {
+    if (module < KLMElementNumbers::getTotalModuleNumber()) {
       rates.moduleRates[module] += 1;
     } else {
       B2ERROR("KLMHitRateCounter: module number out of range"

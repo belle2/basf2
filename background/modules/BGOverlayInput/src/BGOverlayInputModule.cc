@@ -62,10 +62,6 @@ BGOverlayInputModule::BGOverlayInputModule() : Module()
            false);
 }
 
-BGOverlayInputModule::~BGOverlayInputModule()
-{
-}
-
 void BGOverlayInputModule::initialize()
 {
   if (m_skipExperimentCheck) {
@@ -230,10 +226,6 @@ void BGOverlayInputModule::event()
 
 }
 
-
-void BGOverlayInputModule::endRun()
-{
-}
 
 void BGOverlayInputModule::terminate()
 {

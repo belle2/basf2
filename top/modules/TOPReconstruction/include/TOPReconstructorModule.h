@@ -20,6 +20,7 @@
 #include <top/dataobjects/TOPPull.h>
 #include <top/reconstruction_cpp/PDFConstructor.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
+#include <top/dbobjects/TOPCalTOFCorrection.h>
 #include <framework/gearbox/Const.h>
 #include <vector>
 #include <string>
@@ -158,6 +159,10 @@ namespace Belle2 {
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
     StoreArray<TOPLikelihood> m_likelihoods; /**< collection of likelihoods */
     StoreArray<TOPPull> m_topPulls; /**< collection of pulls */
+
+    // database
+
+    DBObjPtr<TOPCalTOFCorrection> m_tofCorrections; /**< time-of-flight corrections */
 
   };
 

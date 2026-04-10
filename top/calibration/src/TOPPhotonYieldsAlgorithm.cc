@@ -10,6 +10,7 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/dbobjects/TOPCalPhotonYields.h>
 #include <top/dbobjects/TOPCalChannelRQE.h>
+#include <top/dbobjects/TOPCalTOFCorrection.h>
 #include <TROOT.h>
 #include <TFile.h>
 #include <TProfile.h>
@@ -210,13 +211,26 @@ namespace Belle2 {
         delete bkgYields;
         delete alphaRatio;
       }
-
       h_rqe->Write();
       h_err->Write();
+
+      auto tofCorrections = getObjectPtr<TProfile>("tofCorrections");
+      if (not tofCorrections) {
+        B2ERROR("TOPPhotonYieldsAlgorithm: histogram 'tofCorrections' not found");
+        file->Close();
+        delete dbPhotonYields;
+        delete dbRQE;
+        return c_Failure;
+      }
+      tofCorrections->Write();
       file->Close();
+
+      auto* dbTOFCorrections = new TOPCalTOFCorrection();
+      dbTOFCorrections->set(tofCorrections.get());
 
       saveCalibration(dbPhotonYields);
       saveCalibration(dbRQE);
+      saveCalibration(dbTOFCorrections);
 
       return c_OK;
     }

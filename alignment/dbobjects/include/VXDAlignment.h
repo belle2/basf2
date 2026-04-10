@@ -52,6 +52,6 @@ namespace Belle2 {
     // ------------------------------------------------------------------------
 
   private:
-    ClassDef(VXDAlignment, 2); /**< VXD alignment and calibration constants */
+    ClassDefOverride(VXDAlignment, 2); /**< VXD alignment and calibration constants */
   };
 } // end namespace Belle2

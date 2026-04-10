@@ -11,6 +11,14 @@ import yaml
 from gnn_tracking import CDCNet
 
 
+_tInput = 'input'
+_tBeta = 'beta'
+_tCoordinates = 'coordinates'
+_tMomentum = 'momentum'
+_tVertex = 'vertex'
+_tCharge = 'charge'
+
+
 def produce_onnx_model():
     model_path = '/path/to/model.pt'
     config_path = '/path/to/config.yaml'
@@ -54,8 +62,8 @@ def produce_onnx_model():
             _net,
             (x,),
             "cdcnet.onnx",
-            input_names=["input"],
-            output_names=["beta", "coordinates", "momentum", "vertex", "charge"],
+            input_names=[_tInput],
+            output_names=[_tBeta, _tCoordinates, _tMomentum, _tVertex, _tCharge],
             dynamic_shapes=[{0: "hits"}],
             dynamo=True,
             external_data=False,
@@ -82,16 +90,16 @@ def produce_payloads():
     parameters.setSpatialCoordinatesScale(100)
     parameters.setNInputFeatures(7)
     parameters.setLatentSpaceNDim(3)
-    parameters.setTBeta(0.7)
-    parameters.setTDistance(0.7)
-    parameters.setMaxRadius(0.3)
+    parameters.setTBeta(0.3)
+    parameters.setTDistance(0.3)
+    parameters.setMaxRadius(0.15)
     parameters.setMinNumberHits(7)
-    parameters.setInputTFeaturesName('input')
-    parameters.setOutputTBetaName('beta')
-    parameters.setOutputTCoordinatesName('coordinates')
-    parameters.setOutputTMomentumName('momentum')
-    parameters.setOutputTVertexName('vertex')
-    parameters.setOutputTChargeName('charge')
+    parameters.setInputTFeaturesName(_tInput)
+    parameters.setOutputTBetaName(_tBeta)
+    parameters.setOutputTCoordinatesName(_tCoordinates)
+    parameters.setOutputTMomentumName(_tMomentum)
+    parameters.setOutputTVertexName(_tVertex)
+    parameters.setOutputTChargeName(_tCharge)
 
     database.storeData('CATFinderParameters', parameters, iov)
 

@@ -212,7 +212,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             },
             cutResultIdentifiersIgnored={
                 "skim": [
-                    "accept_bhabha_all",
+                    "accept_bhabha_trk_ecl",
                 ]
             },
             createTotalResultHistograms=False,

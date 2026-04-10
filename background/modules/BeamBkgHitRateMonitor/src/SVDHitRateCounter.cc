@@ -330,8 +330,8 @@ namespace Belle2 {
 
       // Take the correct active strips counter
       const auto& activeStrips = isU ? m_activeStripsU : (isV ? m_activeStripsV : m_activeStrips);
-      const auto& layerActiveStrips = isU ? m_layerActiveStripsU : (isV ? m_layerActiveStripsV :
-                                      m_layerActiveStrips); // cppcheck-suppress constVariableReference
+      // cppcheck-suppress constVariableReference
+      const auto& layerActiveStrips = isU ? m_layerActiveStripsU : (isV ? m_layerActiveStripsV : m_layerActiveStrips);
       const auto& layerLadderActiveStrips = isU ? m_layerLadderActiveStripsU
                                             : (isV ? m_layerLadderActiveStripsV : m_layerLadderActiveStrips);
       const auto& layerSensorActiveStrips = isU ? m_layerSensorActiveStripsU

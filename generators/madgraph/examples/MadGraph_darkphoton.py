@@ -15,6 +15,18 @@ import beamparameters as bp
 import pdg
 
 
+class CheckMCParticle(b2.Module):
+    def initialize(self):
+        import ROOT
+        self.mcps = ROOT.Belle2.PyStoreArray('MCParticles')
+        self.mcps.isRequired()
+
+    def event(self):
+        for mcp in self.mcps:
+            if mcp.getPDG() == 4900023:
+                assert (0.995 < mcp.getMass() < 1.005)
+
+
 # Check the basf2 location
 basf2_dir = os.environ.get('BELLE2_LOCAL_DIR', os.environ.get('BELLE2_RELEASE_DIR'))
 
@@ -100,6 +112,8 @@ main.add_module('BoostMCParticles')
 main.add_module('SmearPrimaryVertex')
 
 main.add_module('Progress')
+
+main.add_module(CheckMCParticle())
 
 main.add_module('RootOutput',
                 outputFileName=f'Dark_photon_mass_{int(mAp)}.root')

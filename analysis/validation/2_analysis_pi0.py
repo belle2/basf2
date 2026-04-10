@@ -28,9 +28,11 @@ from validation_tools.metadata import validation_metadata_update
 from variables import variables as vm
 
 INPUT_FILENAME = "../GenericB_GENSIMRECtoDST.dst.root"
-OUTPUT_FILENAME = "Pi0_Validation.root"
+OUTPUT_FILENAME_reco = "Pi0_Validation_reco.root"
+OUTPUT_FILENAME_mc = "Pi0_Validation_mc.root"
 
-main = basf2.Path()
+# main = basf2.Path()
+main = basf2.create_path()
 inputMdst(INPUT_FILENAME, path=main)
 
 stdPi0s('all', path=main)
@@ -38,10 +40,8 @@ cutAndCopyList('pi0:rec', 'pi0:all', 'daughter(0, E)>0.05 and daughter(1, E)>0.0
 cutAndCopyList('pi0:mc', 'pi0:all', 'mcErrors<1', path=main)
 
 vm.addAlias('Mreco', 'M')
-vm.addAlias('Mmc', 'M')
-
 create_validation_histograms(
-    main, OUTPUT_FILENAME, "pi0:rec",
+    main, OUTPUT_FILENAME_reco, "pi0:rec",
     variables_1d=[
         (
             "Mreco", 40, 0.08, 0.18,
@@ -51,6 +51,14 @@ create_validation_histograms(
             r"Distribution should be peaking at the nominal $\pi^0$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
         ),
+    ],
+    description=r"$\pi^0$ reconstructed mass distribution"
+)
+
+vm.addAlias('Mmc', 'M')
+create_validation_histograms(
+    main, OUTPUT_FILENAME_mc, "pi0:mc",
+    variables_1d=[
         (
             "Mmc", 40, 0.08, 0.18,
             "#pi^{0} MC candidates, invariant mass",
@@ -59,16 +67,18 @@ create_validation_histograms(
             r"Distribution should be peaking at the nominal $\pi^0$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
         ),
-    ], description="$\\pi^0$ reconstructed and MC mass distributions",
+    ],
+    description=r"$\pi^0$ MC mass distribution"
 )
 
 main.add_module('Progress')
 basf2.process(main)
 
 
-f = ROOT.TFile(OUTPUT_FILENAME)
-Mrecohist = f.Get('Mreco')
-Mmchist = f.Get('Mmc')
+f_reco = ROOT.TFile(OUTPUT_FILENAME_reco)
+Mrecohist = f_reco.Get('Mreco')
+f_mc = ROOT.TFile(OUTPUT_FILENAME_mc)
+Mmchist = f_mc.Get('Mmc')
 
 
 mass = ROOT.RooRealVar("recomass", "m_{#gamma#gamma} [GeV/c^{2}]", 0.11, 0.15)
@@ -180,3 +190,5 @@ validation_metadata_update(
 
 
 output.Close()
+f_reco.Close()
+f_mc.Close()

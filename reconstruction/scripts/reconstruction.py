@@ -730,13 +730,12 @@ def add_top_modules(path, components=None, cosmics=False):
 
 def add_cluster_expert_modules(path, components=None):
     """
-    Add the KLMExpert and ClusterMatcher modules to the path.
+    Add the ClusterMatcher module to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
     if are_detectors_present(["KLM", "ECL"], components):
-        path.add_module('KLMExpert')
         path.add_module('ClusterMatcher')
 
 

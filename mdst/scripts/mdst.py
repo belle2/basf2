@@ -19,7 +19,6 @@ MDST_OBJECTS = (
     'EventLevelTriggerTimeInfo',
     'KLMClusters',
     'Kinks',
-    'KlIds',
     'PIDLikelihoods',
     'SoftwareTriggerResult',
     'TrackFitResults',

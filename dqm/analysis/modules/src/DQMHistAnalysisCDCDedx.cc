@@ -7,6 +7,9 @@
  **************************************************************************/
 
 #include <dqm/analysis/modules/DQMHistAnalysisCDCDedx.h>
+
+#include <boost/format.hpp>
+
 #include <vector>
 
 using namespace std;

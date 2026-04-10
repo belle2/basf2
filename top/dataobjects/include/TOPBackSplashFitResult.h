@@ -9,9 +9,9 @@ namespace Belle2 {
     //TOPBackSplashFitResult() = default;
     //~TOPBackSplashFitResult() override = default;
     TOPBackSplashFitResult() :
-      m_time{0.0},
-      m_chisqdof{0.0},
-      m_nPhotons{0}
+      m_time{-1.0},
+      m_chisqdof{-1.0},
+      m_nPhotons{-1}
     {}
 
     void setTime(double t) { m_time = t; }

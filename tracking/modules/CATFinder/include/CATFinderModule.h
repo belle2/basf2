@@ -44,6 +44,7 @@ namespace Belle2 {
      *
      * This method sets up the required input data collections and registers output collections to
      * the data store.  It also defines the relationships between these collections for the event processing.
+     */
     void initialize() override;
 
     /**

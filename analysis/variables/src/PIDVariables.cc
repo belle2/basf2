@@ -1067,8 +1067,9 @@ namespace Belle2 {
     double nCDCDedxLayers(const Particle* part)
     {
       const PIDLikelihood* pid = part->getPIDLikelihood();
+      if (!pid) return Const::doubleNaN;
       int nCDCDedxLayers = pid->getCDCnLayerHitsUsed();
-      if (!pid || nCDCDedxLayers == -1) return Const::doubleNaN;
+      if (nCDCDedxLayers == -1) return Const::doubleNaN;
       return nCDCDedxLayers;
     }
 

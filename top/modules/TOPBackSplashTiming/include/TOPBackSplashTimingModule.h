@@ -8,6 +8,10 @@
 #include <top/dataobjects/TOPBackSplashFitResult.h>
 #include <top/dataobjects/TOPDigit.h>
 
+#include <RooAbsPdf.h>
+#include <RooRealVar.h>
+#include <RooDataSet.h>
+#include <RooFitResult.h>
 #include <RooWorkspace.h>
 
 namespace Belle2 {
@@ -27,16 +31,15 @@ namespace Belle2 {
     std::vector<RooWorkspace> m_wss;
     int convertCosThetaToIndex(float);
     int getModuleFromPhi(double);
-    void fitTimingDigits(TOPBackSplashFitResult*, int, std::vector<int>, float, int);
+    TOPBackSplashFitResult* fitTimingDigits(int, std::vector<int>, float, int);
     //void makePlot();
     //void getMCNbar();
     StoreArray<ECLCluster> m_eclClusters;
     StoreArray<TOPDigit> m_digits;
     StoreArray<MCParticle> m_MCParticles; // for debugging nbar
     StoreArray<TOPBackSplashFitResult> m_fitresult;
-    //DBObjPtr<TObject> m_fitPdfCosTheta0p0;
-    //std::map<float,DBObjPtr<TObject>> m_fitPdfs;
-    //std::map<float,DBObjPtr<TObject>> m_fitPdfXs;
+    bool m_debug = false; // Debug mode: save fits to TOP timing and print generated nbar info
+    void makePlot(float, int, int, RooAbsPdf*, RooAbsPdf*, RooAbsPdf*, RooRealVar*, RooDataSet, double, RooFitResult*);
   };
 
 } // namespace Belle2

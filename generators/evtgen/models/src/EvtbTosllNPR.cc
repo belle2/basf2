@@ -427,6 +427,7 @@ static std::vector<double> getgrid(const std::vector<BW_t*>& reso)
   const double m_c = 1.3, m_s = 0.2;
 
   static const double m_e = Belle2::EvtGenDatabasePDG::Instance()->GetParticle("e-")->Mass(); // electron mass
+  static const double m_mu = Belle2::EvtGenDatabasePDG::Instance()->GetParticle("mu-")->Mass(); // muon mass
   static const double MD0 = Belle2::EvtGenDatabasePDG::Instance()->GetParticle("D0")->Mass(); // D0 mass
 
   std::vector<double> en;
@@ -448,10 +449,19 @@ static std::vector<double> getgrid(const std::vector<BW_t*>& reso)
     en.push_back(s);
   }
 
-  double t0;
-  for (t0 = 4 * m_e * m_e; t0 < 0.15; t0 *= 1.5) {
-    en.push_back(t0);
-  }
+  double t0, q0 = 4 * m_e * m_e;
+  for (t0 = q0; t0 < 1.004 * q0; t0 *= 1.0008) en.push_back(t0);
+  for (t0 = q0; t0 < 1.020 * q0; t0 *= 1.004) en.push_back(t0);
+  for (t0 = q0; t0 < 1.100 * q0; t0 *= 1.02) en.push_back(t0);
+  for (t0 = q0; t0 < 1.500 * q0; t0 *= 1.10) en.push_back(t0);
+  for (t0 = q0; t0 < 0.150; t0 *= 1.5) en.push_back(t0);
+
+  double q1 = 4 * m_mu * m_mu;
+  for (t0 = q1; t0 < 1.004 * q1; t0 *= 1.0008) en.push_back(t0);
+  for (t0 = q1; t0 < 1.020 * q1; t0 *= 1.004) en.push_back(t0);
+  for (t0 = q1; t0 < 1.100 * q1; t0 *= 1.02) en.push_back(t0);
+  for (t0 = q1; t0 < 1.500 * q1; t0 *= 1.1) en.push_back(t0);
+
 
   for (t0 = 4 * m_e * m_e; t0 < 0.5; t0 *= 1.5) {
     en.push_back(4 * MD0 * MD0 + t0);
@@ -478,6 +488,8 @@ static std::vector<double> getgrid(const std::vector<BW_t*>& reso)
       break;
     }
   }
+
+  en.erase(std::unique(en.begin(), en.end()), en.end());
   return en;
 }
 

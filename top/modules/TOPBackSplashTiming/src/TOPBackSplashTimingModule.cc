@@ -349,8 +349,10 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
   fitresult->setChisqdof(0); //TODO add chi2
   fitresult->setNphotons(data.sumEntries());
 
-  makePlot(nearestClusterCosTheta, iClusterToFit, moduleIDindex,  model,
-           peak1_fit,  peak2_fit, x, data, peak1_rising_edge,  res);
+  if (m_debug == true) {
+    makePlot(nearestClusterCosTheta, iClusterToFit, moduleIDindex,  model,
+             peak1_fit,  peak2_fit, x, data, peak1_rising_edge,  res);
+  }
   return fitresult;
 }
 

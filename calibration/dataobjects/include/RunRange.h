@@ -107,7 +107,7 @@ namespace Belle2 {
     /** Root-like Reset function for "template compatibility" with ROOT objects. Alias for clear(). */
     void Reset() {clear();}
     /// Root-like SetDirectory function for "template compatibility" with ROOT objects. Does nothing.
-    void SetDirectory(TDirectory*) {}
+    static void SetDirectory(TDirectory*) {}
 
     /// Comparison operator so that we can use RunRange in a map as a key
     bool operator<(const RunRange& other) const

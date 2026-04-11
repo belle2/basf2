@@ -154,8 +154,8 @@ void PhysicsObjectsMiraBelleTauModule::event()
         // Reference: CDC bits (fff||ffo), Target: ECL bits
         // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of ECL bit in x>1 bin = N(x>1)/N(x=1)]
         if (m_CDC_ref)
-          m_h_L1ECL1x1->Fill(1);
-        int bin = 2;
+          m_h_L1ECL1x1->Fill(0);
+        int bin = 1;
         // Loop over ECL bits
         for (const auto& bit : m_ECLTrgBit) {
           if (m_trgSummary.isValid()) {
@@ -176,8 +176,8 @@ void PhysicsObjectsMiraBelleTauModule::event()
         // Reference: ECL bits (hie||c4||eclmumu), Target: CDC bits
         // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of CDC bit in x>1 bin = N(x>1)/N(x=1)]
         if (m_ECL_ref)
-          m_h_L1CDC1x1->Fill(1);
-        bin = 2;
+          m_h_L1CDC1x1->Fill(0);
+        bin = 1;
         // Loop over CDC bits
         for (const auto& bit : m_CDCTrgBit) {
           if (m_trgSummary.isValid()) {
@@ -198,8 +198,8 @@ void PhysicsObjectsMiraBelleTauModule::event()
         // Reference: ECL bits (hie||c4||eclmumu), Target: CDC-KLM bits
         // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of CDC-KLM bit in x>1 bin = N(x>1)/N(x=1)]
         if (m_ECL_ref)
-          m_h_L1CDCKLM1x1->Fill(1);
-        bin = 2;
+          m_h_L1CDCKLM1x1->Fill(0);
+        bin = 1;
         // Loop over CDC bits
         for (const auto& bit : m_CDCKLMTrgBit) {
           if (m_trgSummary.isValid()) {
@@ -235,8 +235,8 @@ void PhysicsObjectsMiraBelleTauModule::event()
         // Reference: CDC bits (fff||ffo), Target: ECL bits
         // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of ECL bit in x>1 bin = N(x>1)/N(x=1)]
         if (m_CDC_ref)
-          m_h_L1ECL1x3->Fill(1);
-        int bin = 2;
+          m_h_L1ECL1x3->Fill(0);
+        int bin = 1;
         // Loop over ECL bits
         for (const auto& bit : m_ECLTrgBit) {
           if (m_trgSummary.isValid()) {
@@ -256,8 +256,8 @@ void PhysicsObjectsMiraBelleTauModule::event()
         // Reference: ECL bits (hie||c4||eclmumu), Target: CDC bits
         // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of CDC bit in x>1 bin = N(x>1)/N(x=1)]
         if (m_ECL_ref)
-          m_h_L1CDC1x3->Fill(1);
-        bin = 2;
+          m_h_L1CDC1x3->Fill(0);
+        bin = 1;
         // Loop over CDC bits
         for (const auto& bit : m_CDCTrgBit) {
           if (m_trgSummary.isValid()) {
@@ -277,8 +277,8 @@ void PhysicsObjectsMiraBelleTauModule::event()
         // Reference: ECL bits (hie||c4||eclmumu), Target: CDC-KLM bits
         // Bin x=1: N(reference), Bin x>1: N(reference&&target) [Efficiency of CDC-KLM bit in x>1 bin = N(x>1)/N(x=1)]
         if (m_ECL_ref)
-          m_h_L1CDCKLM1x3->Fill(1);
-        bin = 2;
+          m_h_L1CDCKLM1x3->Fill(0);
+        bin = 1;
         // Loop over CDC bits
         for (const auto& bit : m_CDCKLMTrgBit) {
           if (m_trgSummary.isValid()) {

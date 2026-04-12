@@ -184,8 +184,8 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
       Crate_time_unc_ns_tree[crateID_temp - 1] = m_crateTimeUnc * TICKS_TO_NS ;
 
       if (m_crystalID == m_refCrystalID) {
-        B2INFO("m_exp_perCrystal, m_run_perCrystal, cell ID (0..8735), m_crateID, m_crateTimeConst = " << m_exp_perCrystal << ", " <<
-               m_run_perCrystal << ", " << tree_crys_j << ", " << m_crateID << ", " << m_crateTimeConst << " ticks") ;
+        B2INFO("exp, run, cell ID (0..8735), m_crateID, m_crateTimeConst = " << m_exp_perCrystal << ", " <<
+               m_run_perCrystal << ", " << tree_crys_j << ", " << m_crateID << ", " << m_crateTimeConst << " +/- " << m_crateTimeUnc << " ticks") ;
         crystalCrate_time_ns_tree[crateID_temp - 1] = (m_crystalTimeConst + m_crateTimeConst) * TICKS_TO_NS;
 
         crystalCrate_time_unc_ns_tree[crateID_temp - 1] = TICKS_TO_NS * sqrt(

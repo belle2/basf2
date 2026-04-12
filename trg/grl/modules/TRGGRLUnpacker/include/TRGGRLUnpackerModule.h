@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace TRGGRLUNPACKERSPACE {
 
     /** num of leafs in data_b2l **/
-    const int nLeafs = 128 + 7 + 32 + 7;
+    const int nLeafs = 139 + 7 + 32 + 7;
     /** num of leafs for others **/
     const int nLeafsExtra = 7;
     /** num of clk time window **/
@@ -74,6 +74,17 @@ namespace Belle2 {
       "wirecnt_tsf2",
       "wirecnt_tsf1",
       "wirecnt_tsf0",
+      "ml_tau_nn_output_0",
+      "ml_tau_nn_output_1",
+      "ml_tau_nn_output_2",
+      "ml_tau_nn_output_3",
+      "ml_tau_nn_output_4",
+      "ml_tau_nn_output_5",
+      "ml_tau_nn_output_6",
+      "ml_tau_nn_output_7",
+      "ml_tau_nn_output_8",
+      "ml_tau_nn_output_9",
+      "ml_tau_nn_input",
       "theta_11",
       "phi_11",
       "t_11",
@@ -252,6 +263,13 @@ namespace Belle2 {
       e_wirecnt_tsf2,
       e_wirecnt_tsf1,
       e_wirecnt_tsf0,
+      e_ml_tau_nn_output_0,
+      e_ml_tau_nn_output_9,
+      e_ml_tau_nn_output_8,
+      e_ml_tau_nn_output_7,
+      e_ml_tau_nn_output_6,
+      e_ml_tau_nn_output_5,
+      e_ml_tau_nn_input,
       e_theta_11,
       e_phi_11,
       e_t_11,
@@ -362,15 +380,14 @@ namespace Belle2 {
       e_N_g_1GeV_1,
       e_N_g_2GeV_1,
       e_TSFL1_count,
-      e_slot64b_TOP_int_1,
-      e_slot64b_TOP_int_0,
+      e_ml_tau_nn_output_4,
+      e_ml_tau_nn_output_3,
       e_map_TSF3_int_1,
       e_map_TSF3_int_0,
       e_map_TSF1_int_1,
       e_map_TSF1_int_0,
-      e_N_ST,
-      e_map_ST2_int_1,
-      e_map_ST2_int_0,
+      e_ml_tau_nn_output_2,
+      e_ml_tau_nn_output_1,
       e_map_ST_int_1,
       e_map_ST_int_0,
       e_map_veto_int_1,
@@ -433,6 +450,14 @@ namespace Belle2 {
       {1491, 11}, // wirecnt_tsf2
       {1479, 11}, // wirecnt_tsf1
       {1467, 11}, // wirecnt_tsf0
+
+      {1980, 0}, // ml_tau_nn_output_0
+      {1966, 22}, // ml_tau_nn_output_9
+      {1943, 22}, // ml_tau_nn_output_8
+      {1920, 22}, // ml_tau_nn_output_7
+      {1897, 22}, // ml_tau_nn_output_6
+      {1874, 22}, // ml_tau_nn_output_5
+      {1851, 287}, // ml_tau_nn_input
 
       {1671 - 216, 6}, // theta_11
       {1664 - 216, 7}, // phi_11
@@ -559,15 +584,15 @@ namespace Belle2 {
       {755, 2}, // N_g_1GeV_1
       {752, 2}, // N_g_2GeV_1
       {749, 9}, // TSFL1_count
-      {739, 31}, // slot64b_TOP_int_1
-      {708, 31}, // slot64b_TOP_int_0
+      {739, 22}, // ml_tau_nn_output_4
+      {716, 22}, // ml_tau_nn_output_3
       {546, 31}, // map_TSF3_int_1 (63 downto 32)
       {514, 31}, // map_TSF3_int_0 (31 downto 0)
       {482, 31}, // map_TSF1_int_1 (63 downto 32)
       {450, 31}, // map_TSF1_int_0 (31 downto 0)
       {418, 2}, // N_ST
-      {415, 31}, // map_ST2_int_1 (63 downto 32)
-      {383, 31}, // map_ST2_int_0 (31 downto 0)
+      {415, 22}, // ml_tau_nn_output_2
+      {392, 22}, // ml_tau_nn_output_1
       {351, 31}, // map_ST_int_1 (63 downto 32)
       {319, 31}, // map_ST_int_0 (31 downto 0)
       {287, 31}, // map_veto_int_1 (63 downto 32)
@@ -631,6 +656,18 @@ namespace Belle2 {
       if (leafID == e_wirecnt_tsf6) return store->get_wirecnt_tsf6();
       if (leafID == e_wirecnt_tsf7) return store->get_wirecnt_tsf7();
       if (leafID == e_wirecnt_tsf8) return store->get_wirecnt_tsf8();
+
+      if (leafID == e_ml_tau_nn_output_0) return store->get_ml_tau_nn_output_0();
+      if (leafID == e_ml_tau_nn_output_1) return store->get_ml_tau_nn_output_1();
+      if (leafID == e_ml_tau_nn_output_2) return store->get_ml_tau_nn_output_2();
+      if (leafID == e_ml_tau_nn_output_3) return store->get_ml_tau_nn_output_3();
+      if (leafID == e_ml_tau_nn_output_4) return store->get_ml_tau_nn_output_4();
+      if (leafID == e_ml_tau_nn_output_5) return store->get_ml_tau_nn_output_5();
+      if (leafID == e_ml_tau_nn_output_6) return store->get_ml_tau_nn_output_6();
+      if (leafID == e_ml_tau_nn_output_7) return store->get_ml_tau_nn_output_7();
+      if (leafID == e_ml_tau_nn_output_8) return store->get_ml_tau_nn_output_8();
+      if (leafID == e_ml_tau_nn_output_9) return store->get_ml_tau_nn_output_9();
+      if (leafID == e_ml_tau_nn_input)  return store->get_ml_tau_nn_input();
 
       if (leafID == e_theta_11) return store->get_theta_ECL(11);
       if (leafID == e_phi_11) return store->get_phi_ECL(11);
@@ -823,6 +860,18 @@ namespace Belle2 {
       if (leafID == e_wirecnt_tsf6) store->set_wirecnt_tsf6(value);
       if (leafID == e_wirecnt_tsf7) store->set_wirecnt_tsf7(value);
       if (leafID == e_wirecnt_tsf8) store->set_wirecnt_tsf8(value);
+
+      if (leafID == e_ml_tau_nn_output_0) store->set_ml_tau_nn_output_0(value);
+      if (leafID == e_ml_tau_nn_output_1) store->set_ml_tau_nn_output_1(value);
+      if (leafID == e_ml_tau_nn_output_2) store->set_ml_tau_nn_output_2(value);
+      if (leafID == e_ml_tau_nn_output_3) store->set_ml_tau_nn_output_3(value);
+      if (leafID == e_ml_tau_nn_output_4) store->set_ml_tau_nn_output_4(value);
+      if (leafID == e_ml_tau_nn_output_5) store->set_ml_tau_nn_output_5(value);
+      if (leafID == e_ml_tau_nn_output_6) store->set_ml_tau_nn_output_6(value);
+      if (leafID == e_ml_tau_nn_output_7) store->set_ml_tau_nn_output_7(value);
+      if (leafID == e_ml_tau_nn_output_8) store->set_ml_tau_nn_output_8(value);
+      if (leafID == e_ml_tau_nn_output_9) store->set_ml_tau_nn_output_9(value);
+      if (leafID == e_ml_tau_nn_input)  store->set_ml_tau_nn_input(value);
 
       if (leafID == e_theta_11) store->set_theta_ECL(11, value);
       if (leafID == e_phi_11) store->set_phi_ECL(11, value);

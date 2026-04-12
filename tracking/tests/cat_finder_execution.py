@@ -33,17 +33,17 @@ class AddMCParticle(b2.Module):
         import ROOT  # noqa
         mc_particle = self.mc_particles.appendNew()
         if self.event_number == 0:
-            # 4 GeV positive muon, phi=90, theta=80 degrees
+            # 4 GeV positive muon, phi=20, theta=80 degrees
             pdg = -13
             p = 4.0
-            phi = math.radians(90.0)
+            phi = math.radians(20)
             theta = math.radians(80)
         else:
-            # 2 GeV negative pion, phi=270, theta=105 degrees
+            # 2 GeV negative pion, phi=90, theta=105 degrees
             pdg = -211
             p = 2.0
-            phi = math.radians(270)
-            theta = math.radians(65)
+            phi = math.radians(90)
+            theta = math.radians(105)
         momentum = ROOT.Math.XYZVector(
             p * math.sin(theta) * math.cos(phi),
             p * math.sin(theta) * math.sin(phi),

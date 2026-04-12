@@ -16,12 +16,16 @@ import pdg
 
 
 class CheckMCParticle(b2.Module):
+    '''Module to check the mass of the dark photon.'''
     def initialize(self):
+        '''Initialize.'''
         import ROOT
+        #: MCParticles
         self.mcps = ROOT.Belle2.PyStoreArray('MCParticles')
         self.mcps.isRequired()
 
     def event(self):
+        '''Event.'''
         for mcp in self.mcps:
             if mcp.getPDG() == 4900023:
                 assert (0.995 < mcp.getMass() < 1.005)

@@ -308,6 +308,7 @@ bool CalibrationAlgorithm::commit()
   return Database::Instance().storeData(payloads);
 }
 
+// cppcheck-suppress functionStatic
 bool CalibrationAlgorithm::commit(list<Database::DBImportQuery> payloads)
 {
   if (payloads.empty())

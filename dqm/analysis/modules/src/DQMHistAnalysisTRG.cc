@@ -548,345 +548,347 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
           B2DEBUG(1, "hadronb2_over_bhabha_all:" << hadronb2_over_bhabha_all);
           setEpicsPV("hadronb2_over_bhabha_all", hadronb2_over_bhabha_all);
+        }
+        // update #mumu2trk/#bhabha_all
+        if (hist_software_trigger->GetBinContent(
+              hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+          double mumu2trk_over_bhabha_all = 0.0;
+          mumu2trk_over_bhabha_all = hist_software_trigger->GetBinContent(
+                                       hist_software_trigger->GetXaxis()->FindBin("accept_mumu_2trk")) / hist_software_trigger->GetBinContent(
+                                       hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all"));
+          B2DEBUG(1, "mumu2trk_over_bhabha_all:" << mumu2trk_over_bhabha_all);
+          setEpicsPV("mumu2trk_over_bhabha_all", mumu2trk_over_bhabha_all);
+        }
+        // update #hadronb2/#bhabha_trk_ecl
+        if (hist_software_trigger->GetBinContent(
+              hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl")) != 0) {
+          double hadronb2_over_bhabha_trk_ecl = 0.0;
+          hadronb2_over_bhabha_trk_ecl = hist_software_trigger->GetBinContent(
+                                           hist_software_trigger->GetXaxis()->FindBin("accept_hadronb2")) / hist_software_trigger->GetBinContent(
+                                           hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl"));
 
-          // update #mumu2trk/#bhabha_all
-          if (hist_software_trigger->GetBinContent(
-                hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
-            double mumu2trk_over_bhabha_all = 0.0;
-            mumu2trk_over_bhabha_all = hist_software_trigger->GetBinContent(
-                                         hist_software_trigger->GetXaxis()->FindBin("accept_mumu_2trk")) / hist_software_trigger->GetBinContent(
+          B2DEBUG(1, "hadronb2_over_bhabha_trk_ecl:" << hadronb2_over_bhabha_trk_ecl);
+          setEpicsPV("hadronb2_over_bhabha_trk_ecl", hadronb2_over_bhabha_trk_ecl);
+        }
+        // update #mumu2trk/#bhabha_trk_ecl
+        if (hist_software_trigger->GetBinContent(
+              hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl")) != 0) {
+          double mumu2trk_over_bhabha_trk_ecl = 0.0;
+          mumu2trk_over_bhabha_trk_ecl = hist_software_trigger->GetBinContent(
+                                           hist_software_trigger->GetXaxis()->FindBin("accept_mumu_2trk")) / hist_software_trigger->GetBinContent(
+                                           hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl"));
+          B2DEBUG(1, "mumu2trk_over_bhabha_trk_ecl:" << mumu2trk_over_bhabha_trk_ecl);
+          setEpicsPV("mumu2trk_over_bhabha_trk_ecl", mumu2trk_over_bhabha_trk_ecl);
+        }
+        // update #hadronb2/#mumu2trk
+        if (hist_software_trigger->GetBinContent(
+              hist_software_trigger->GetXaxis()->FindBin("accept_mumu_2trk")) != 0) {
+          double hadronb2_over_mumu2trk = 0.0;
+          hadronb2_over_mumu2trk = hist_software_trigger->GetBinContent(
+                                     hist_software_trigger->GetXaxis()->FindBin("accept_hadronb2")) / hist_software_trigger->GetBinContent(
+                                     hist_software_trigger->GetXaxis()->FindBin("accept_mumu_2trk"));
+          B2DEBUG(1, "hadronb2_over_mumu2trk:" << hadronb2_over_mumu2trk);
+          setEpicsPV("hadronb2_over_mumu2trk", hadronb2_over_mumu2trk);
+        }
+        // update #mumu_tight/#bhabha_all
+        if (hist_software_trigger->GetBinContent(
+              hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+          double mumu_tight_over_bhabha_all = 0.0;
+          mumu_tight_over_bhabha_all = hist_software_trigger->GetBinContent(
+                                         hist_software_trigger->GetXaxis()->FindBin("accept_mumutight")) / hist_software_trigger->GetBinContent(
                                          hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all"));
-            B2DEBUG(1, "mumu2trk_over_bhabha_all:" << mumu2trk_over_bhabha_all);
-            setEpicsPV("mumu2trk_over_bhabha_all", mumu2trk_over_bhabha_all);
+          B2DEBUG(1, "mumu_tight_over_bhabha_all:" << mumu_tight_over_bhabha_all);
+          setEpicsPV("mumu_tight_over_bhabha_all", mumu_tight_over_bhabha_all);
+        }
+        // update #gammagamma/#bhabha_all
 
-            // update #hadronb2/#bhabha_trk_ecl
-            if (hist_software_trigger->GetBinContent(
-                  hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl")) != 0) {
-              double hadronb2_over_bhabha_trk_ecl = 0.0;
-              hadronb2_over_bhabha_trk_ecl = hist_software_trigger->GetBinContent(
-                                               hist_software_trigger->GetXaxis()->FindBin("accept_hadronb2")) / hist_software_trigger->GetBinContent(
-                                               hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl"));
+        if (hist_software_trigger->GetBinContent(
+              hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+          double gammagamma_over_bhabha_all = 0.0;
+          gammagamma_over_bhabha_all = hist_software_trigger->GetBinContent(
+                                         hist_software_trigger->GetXaxis()->FindBin("accept_gamma_gamma")) /
+                                       hist_software_trigger->GetBinContent(
+                                         hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all"));
+          B2DEBUG(1, "gammagamma_over_bhabha_all:" << gammagamma_over_bhabha_all);
+          setEpicsPV("gammagamma_over_bhabha_all", gammagamma_over_bhabha_all);
+        }
+        // update #tautau2trk/#bhabha_all
 
-              B2DEBUG(1, "hadronb2_over_bhabha_trk_ecl:" << hadronb2_over_bhabha_trk_ecl);
-              setEpicsPV("hadronb2_over_bhabha_trk_ecl", hadronb2_over_bhabha_trk_ecl);
+        if (hist_software_trigger->GetBinContent(
+              hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+          double tautau2trk_over_bhabha_all = 0.0;
+          tautau2trk_over_bhabha_all = hist_software_trigger->GetBinContent(
+                                         hist_software_trigger->GetXaxis()->FindBin("accept_tau_2trk")) / hist_software_trigger->GetBinContent(
+                                         hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all"));
+          B2DEBUG(1, "tautau2trk_over_bhabha_all:" << tautau2trk_over_bhabha_all);
+          setEpicsPV("tautau2trk_over_bhabha_all", tautau2trk_over_bhabha_all);
+        }
+        // update #hadron/#bhabha_all
+        if (hist_software_trigger->GetBinContent(
+              hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+          double hadron_over_bhabha_all = 0.0;
+          hadron_over_bhabha_all = hist_software_trigger->GetBinContent(
+                                     hist_software_trigger->GetXaxis()->FindBin("accept_hadron")) / hist_software_trigger->GetBinContent(
+                                     hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all"));
+          B2DEBUG(1, "hadron_over_bhabha_all:" << hadron_over_bhabha_all);
+          setEpicsPV("hadron_over_bhabha_all", hadron_over_bhabha_all);
+        }
+        // update #mumu_tight/#bhabha_trk_ecl
+        if (hist_software_trigger->GetBinContent(
+              hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl")) != 0) {
+          double mumu_tight_over_bhabha_trk_ecl = 0.0;
+          mumu_tight_over_bhabha_trk_ecl = hist_software_trigger->GetBinContent(
+                                             hist_software_trigger->GetXaxis()->FindBin("accept_mumutight")) / hist_software_trigger->GetBinContent(
+                                             hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl"));
+          B2DEBUG(1, "mumu_tight_over_bhabha_trk_ecl:" << mumu_tight_over_bhabha_trk_ecl);
+          setEpicsPV("mumu_tight_over_bhabha_trk_ecl", mumu_tight_over_bhabha_trk_ecl);
+        }
+        // update #gammagamma/#bhabha_trk_ecl
+        if (hist_software_trigger->GetBinContent(
+              hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl")) != 0) {
+          double gammagamma_over_bhabha_trk_ecl = 0.0;
+          gammagamma_over_bhabha_trk_ecl = hist_software_trigger->GetBinContent(
+                                             hist_software_trigger->GetXaxis()->FindBin("accept_gamma_gamma")) /
+                                           hist_software_trigger->GetBinContent(
+                                             hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl"));
+          B2DEBUG(1, "gammagamma_over_bhabha_trk_ecl:" << gammagamma_over_bhabha_trk_ecl);
+          setEpicsPV("gammagamma_over_bhabha_trk_ecl", gammagamma_over_bhabha_trk_ecl);
+        }
+        // update #tautau2trk/#bhabha_trk_ecl
 
-              // update #mumu2trk/#bhabha_trk_ecl
-              if (hist_software_trigger->GetBinContent(
-                    hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl")) != 0) {
-                double mumu2trk_over_bhabha_trk_ecl = 0.0;
-                mumu2trk_over_bhabha_trk_ecl = hist_software_trigger->GetBinContent(
-                                                 hist_software_trigger->GetXaxis()->FindBin("accept_mumu_2trk")) / hist_software_trigger->GetBinContent(
-                                                 hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl"));
-                B2DEBUG(1, "mumu2trk_over_bhabha_trk_ecl:" << mumu2trk_over_bhabha_trk_ecl);
-                setEpicsPV("mumu2trk_over_bhabha_trk_ecl", mumu2trk_over_bhabha_trk_ecl);
+        if (hist_software_trigger->GetBinContent(
+              hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl")) != 0) {
+          double tautau2trk_over_bhabha_trk_ecl = 0.0;
+          tautau2trk_over_bhabha_trk_ecl = hist_software_trigger->GetBinContent(
+                                             hist_software_trigger->GetXaxis()->FindBin("accept_tau_2trk")) / hist_software_trigger->GetBinContent(
+                                             hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl"));
+          B2DEBUG(1, "tautau2trk_over_bhabha_trk_ecl:" << tautau2trk_over_bhabha_trk_ecl);
+          setEpicsPV("tautau2trk_over_bhabha_trk_ecl", tautau2trk_over_bhabha_trk_ecl);
+        }
+        // update #hadron/#bhabha_trk_ecl
 
-                // update #hadronb2/#mumu2trk
-                if (hist_software_trigger->GetBinContent(
-                      hist_software_trigger->GetXaxis()->FindBin("accept_mumu_2trk")) != 0) {
-                  double hadronb2_over_mumu2trk = 0.0;
-                  hadronb2_over_mumu2trk = hist_software_trigger->GetBinContent(
-                                             hist_software_trigger->GetXaxis()->FindBin("accept_hadronb2")) / hist_software_trigger->GetBinContent(
-                                             hist_software_trigger->GetXaxis()->FindBin("accept_mumu_2trk"));
-                  B2DEBUG(1, "hadronb2_over_mumu2trk:" << hadronb2_over_mumu2trk);
-                  setEpicsPV("hadronb2_over_mumu2trk", hadronb2_over_mumu2trk);
-                  // update #mumu_tight/#bhabha_all
+        if (hist_software_trigger->GetBinContent(
+              hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl")) != 0) {
+          double hadron_over_bhabha_trk_ecl = 0.0;
+          hadron_over_bhabha_trk_ecl = hist_software_trigger->GetBinContent(
+                                         hist_software_trigger->GetXaxis()->FindBin("accept_hadron")) / hist_software_trigger->GetBinContent(
+                                         hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl"));
+          B2DEBUG(1, "hadron_over_bhabha_trk_ecl:" << hadron_over_bhabha_trk_ecl);
+          setEpicsPV("hadron_over_bhabha_trk_ecl", hadron_over_bhabha_trk_ecl);
+        }
 
-                  if (hist_software_trigger->GetBinContent(
-                        hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
-                    double mumu_tight_over_bhabha_all = 0.0;
-                    mumu_tight_over_bhabha_all = hist_software_trigger->GetBinContent(
-                                                   hist_software_trigger->GetXaxis()->FindBin("accept_mumutight")) / hist_software_trigger->GetBinContent(
-                                                   hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all"));
-                    B2DEBUG(1, "mumu_tight_over_bhabha_all:" << mumu_tight_over_bhabha_all);
-                    setEpicsPV("mumu_tight_over_bhabha_all", mumu_tight_over_bhabha_all);
+      }
 
-                    // update #gammagamma/#bhabha_all
+    }
 
-                    if (hist_software_trigger->GetBinContent(
-                          hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
-                      double gammagamma_over_bhabha_all = 0.0;
-                      gammagamma_over_bhabha_all = hist_software_trigger->GetBinContent(
-                                                     hist_software_trigger->GetXaxis()->FindBin("accept_gamma_gamma")) /
-                                                   hist_software_trigger->GetBinContent(
-                                                     hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all"));
-                      B2DEBUG(1, "gammagamma_over_bhabha_all:" << gammagamma_over_bhabha_all);
-                      setEpicsPV("gammagamma_over_bhabha_all", gammagamma_over_bhabha_all);
+    auto hist_nTSFHits_total = getDelta("TRGGRL", "h_wirecnt_sum", 0, true);
+    if (hist_nTSFHits_total) {
+      double mean = hist_nTSFHits_total->GetMean();
+      B2DEBUG(1, "CDCTRG_meanTSFHits_total:" << mean);
+      setEpicsPV("CDCTRG_meanTSFHits_total", mean);
+    }
 
-                      // update #tautau2trk/#bhabha_all
+    auto hist_nTSFHits_clean = getDelta("TRGGRL", "h_wirecnt_sum_clean", 0, true);
+    if (hist_nTSFHits_clean) {
+      double mean = hist_nTSFHits_clean->GetMean();
+      B2DEBUG(1, "CDCTRG_meanTSFHits_clean:" << mean);
+      setEpicsPV("CDCTRG_meanTSFHits_clean", mean);
 
-                      if (hist_software_trigger->GetBinContent(
-                            hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
-                        double tautau2trk_over_bhabha_all = 0.0;
-                        tautau2trk_over_bhabha_all = hist_software_trigger->GetBinContent(
-                                                       hist_software_trigger->GetXaxis()->FindBin("accept_tau_2trk")) / hist_software_trigger->GetBinContent(
-                                                       hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all"));
-                        B2DEBUG(1, "tautau2trk_over_bhabha_all:" << tautau2trk_over_bhabha_all);
-                        setEpicsPV("tautau2trk_over_bhabha_all", tautau2trk_over_bhabha_all);
+      double tail = getThreshold(hist_nTSFHits_clean, 0.5, 0.02);
+      B2DEBUG(1, "CDCTRG_tailTSFHits_clean:" << tail);
+      setEpicsPV("CDCTRG_tailTSFHits_clean", tail);
+    }
 
-                        // update #hadron/#bhabha_all
-                        if (hist_software_trigger->GetBinContent(
-                              hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
-                          double hadron_over_bhabha_all = 0.0;
-                          hadron_over_bhabha_all = hist_software_trigger->GetBinContent(
-                                                     hist_software_trigger->GetXaxis()->FindBin("accept_hadron")) / hist_software_trigger->GetBinContent(
-                                                     hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_all"));
-                          B2DEBUG(1, "hadron_over_bhabha_all:" << hadron_over_bhabha_all);
-                          setEpicsPV("hadron_over_bhabha_all", hadron_over_bhabha_all);
+    auto hist_nTSFHits_injHER = getDelta("TRGGRL", "h_wirecnt_sum_injHER", 0, true);
+    if (hist_nTSFHits_injHER) {
+      double mean = hist_nTSFHits_injHER->GetMean();
+      B2DEBUG(1, "CDCTRG_meanTSFHits_injHER:" << mean);
+      setEpicsPV("CDCTRG_meanTSFHits_injHER", mean);
+    }
 
-                          // update #mumu_tight/#bhabha_trk_ecl
-                          if (hist_software_trigger->GetBinContent(
-                                hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl")) != 0) {
-                            double mumu_tight_over_bhabha_trk_ecl = 0.0;
-                            mumu_tight_over_bhabha_trk_ecl = hist_software_trigger->GetBinContent(
-                                                               hist_software_trigger->GetXaxis()->FindBin("accept_mumutight")) / hist_software_trigger->GetBinContent(
-                                                               hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl"));
-                            B2DEBUG(1, "mumu_tight_over_bhabha_trk_ecl:" << mumu_tight_over_bhabha_trk_ecl);
-                            setEpicsPV("mumu_tight_over_bhabha_trk_ecl", mumu_tight_over_bhabha_trk_ecl);
+    auto hist_nTSFHits_injLER = getDelta("TRGGRL", "h_wirecnt_sum_injLER", 0, true);
+    if (hist_nTSFHits_injLER) {
+      double mean = hist_nTSFHits_injLER->GetMean();
+      B2DEBUG(1, "CDCTRG_meanTSFHits_injLER:" << mean);
+      setEpicsPV("CDCTRG_meanTSFHits_injLER", mean);
+    }
 
-                            // update #gammagamma/#bhabha_trk_ecl
-                            if (hist_software_trigger->GetBinContent(
-                                  hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl")) != 0) {
-                              double gammagamma_over_bhabha_trk_ecl = 0.0;
-                              gammagamma_over_bhabha_trk_ecl = hist_software_trigger->GetBinContent(
-                                                                 hist_software_trigger->GetXaxis()->FindBin("accept_gamma_gamma")) /
-                                                               hist_software_trigger->GetBinContent(
-                                                                 hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl"));
-                              B2DEBUG(1, "gammagamma_over_bhabha_trk_ecl:" << gammagamma_over_bhabha_trk_ecl);
-                              setEpicsPV("gammagamma_over_bhabha_trk_ecl", gammagamma_over_bhabha_trk_ecl);
+    auto hist_nTC_total = getDelta("TRG", "h_n_TChit_event_clkgrp", 0, true);
+    if (hist_nTC_total) {
+      double mean = hist_nTC_total->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_total:" << mean);
+      setEpicsPV("ECLTRG_meanTC_total", mean);
+    }
 
-                              // update #tautau2trk/#bhabha_trk_ecl
+    auto hist_nTC_clean = getDelta("TRG", "h_n_TChit_clean_clkgrp", 0, true);
+    if (hist_nTC_clean) {
+      double mean = hist_nTC_clean->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_clean:" << mean);
+      setEpicsPV("ECLTRG_meanTC_clean", mean);
 
-                              if (hist_software_trigger->GetBinContent(
-                                    hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl")) != 0) {
-                                double tautau2trk_over_bhabha_trk_ecl = 0.0;
-                                tautau2trk_over_bhabha_trk_ecl = hist_software_trigger->GetBinContent(
-                                                                   hist_software_trigger->GetXaxis()->FindBin("accept_tau_2trk")) / hist_software_trigger->GetBinContent(
-                                                                   hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl"));
-                                B2DEBUG(1, "tautau2trk_over_bhabha_trk_ecl:" << tautau2trk_over_bhabha_trk_ecl);
-                                setEpicsPV("tautau2trk_over_bhabha_trk_ecl", tautau2trk_over_bhabha_trk_ecl);
+      double tail = getThreshold(hist_nTC_clean, 0.5);
+      B2DEBUG(1, "ECLTRG_tailTC_clean:" << tail);
+      setEpicsPV("ECLTRG_tailTC_clean", tail);
+    }
 
-                                // update #hadron/#bhabha_trk_ecl
+    auto hist_nTC_injHER = getDelta("TRG", "h_n_TChit_injHER_clkgrp", 0, true);
+    if (hist_nTC_injHER) {
+      double mean = hist_nTC_injHER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_injHER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_injHER", mean);
+    }
 
-                                if (hist_software_trigger->GetBinContent(
-                                      hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl")) != 0) {
-                                  double hadron_over_bhabha_trk_ecl = 0.0;
-                                  hadron_over_bhabha_trk_ecl = hist_software_trigger->GetBinContent(
-                                                                 hist_software_trigger->GetXaxis()->FindBin("accept_hadron")) / hist_software_trigger->GetBinContent(
-                                                                 hist_software_trigger->GetXaxis()->FindBin("accept_bhabha_trk_ecl"));
-                                  B2DEBUG(1, "hadron_over_bhabha_trk_ecl:" << hadron_over_bhabha_trk_ecl);
-                                  setEpicsPV("hadron_over_bhabha_trk_ecl", hadron_over_bhabha_trk_ecl);
-                                }
+    auto hist_nTC_injLER = getDelta("TRG", "h_n_TChit_injLER_clkgrp", 0, true);
+    if (hist_nTC_injLER) {
+      double mean = hist_nTC_injLER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_injLER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_injLER", mean);
+    }
 
-                              }
+    auto hist_nTC_FWD_total = getDelta("TRG", "h_n_TChit_FWD_event_clkgrp", 0, true);
+    if (hist_nTC_FWD_total) {
+      double mean = hist_nTC_FWD_total->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_FWD_total:" << mean);
+      setEpicsPV("ECLTRG_meanTC_FWD_total", mean);
+    }
 
-                            }
+    auto hist_nTC_FWD_clean = getDelta("TRG", "h_n_TChit_FWD_clean_clkgrp", 0, true);
+    if (hist_nTC_FWD_clean) {
+      double mean = hist_nTC_FWD_clean->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_FWD_clean:" << mean);
+      setEpicsPV("ECLTRG_meanTC_FWD_clean", mean);
 
-                            auto hist_nTSFHits_total = getDelta("TRGGRL", "h_wirecnt_sum", 0, true);
-                            if (hist_nTSFHits_total) {
-                              double mean = hist_nTSFHits_total->GetMean();
-                              B2DEBUG(1, "CDCTRG_meanTSFHits_total:" << mean);
-                              setEpicsPV("CDCTRG_meanTSFHits_total", mean);
-                            }
+      double tail = getThreshold(hist_nTC_FWD_clean, 0.5);
+      B2DEBUG(1, "ECLTRG_tailTC_FWD_clean:" << tail);
+      setEpicsPV("ECLTRG_tailTC_FWD_clean", tail);
+    }
 
-                            auto hist_nTSFHits_clean = getDelta("TRGGRL", "h_wirecnt_sum_clean", 0, true);
-                            if (hist_nTSFHits_clean) {
-                              double mean = hist_nTSFHits_clean->GetMean();
-                              B2DEBUG(1, "CDCTRG_meanTSFHits_clean:" << mean);
-                              setEpicsPV("CDCTRG_meanTSFHits_clean", mean);
+    auto hist_nTC_FWD_injHER = getDelta("TRG", "h_n_TChit_FWD_injHER_clkgrp", 0, true);
+    if (hist_nTC_FWD_injHER) {
+      double mean = hist_nTC_FWD_injHER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_FWD_injHER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_FWD_injHER", mean);
+    }
 
-                              double tail = getThreshold(hist_nTSFHits_clean, 0.5, 0.02);
-                              B2DEBUG(1, "CDCTRG_tailTSFHits_clean:" << tail);
-                              setEpicsPV("CDCTRG_tailTSFHits_clean", tail);
-                            }
+    auto hist_nTC_FWD_injLER = getDelta("TRG", "h_n_TChit_FWD_injLER_clkgrp", 0, true);
+    if (hist_nTC_FWD_injLER) {
+      double mean = hist_nTC_FWD_injLER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_FWD_injLER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_FWD_injLER", mean);
+    }
 
-                            auto hist_nTSFHits_injHER = getDelta("TRGGRL", "h_wirecnt_sum_injHER", 0, true);
-                            if (hist_nTSFHits_injHER) {
-                              double mean = hist_nTSFHits_injHER->GetMean();
-                              B2DEBUG(1, "CDCTRG_meanTSFHits_injHER:" << mean);
-                              setEpicsPV("CDCTRG_meanTSFHits_injHER", mean);
-                            }
+    auto hist_nTC_BRL_total = getDelta("TRG", "h_n_TChit_BRL_event_clkgrp", 0, true);
+    if (hist_nTC_BRL_total) {
+      double mean = hist_nTC_BRL_total->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BRL_total:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BRL_total", mean);
+    }
 
-                            auto hist_nTSFHits_injLER = getDelta("TRGGRL", "h_wirecnt_sum_injLER", 0, true);
-                            if (hist_nTSFHits_injLER) {
-                              double mean = hist_nTSFHits_injLER->GetMean();
-                              B2DEBUG(1, "CDCTRG_meanTSFHits_injLER:" << mean);
-                              setEpicsPV("CDCTRG_meanTSFHits_injLER", mean);
-                            }
+    auto hist_nTC_BRL_clean = getDelta("TRG", "h_n_TChit_BRL_clean_clkgrp", 0, true);
+    if (hist_nTC_BRL_clean) {
+      double mean = hist_nTC_BRL_clean->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BRL_clean:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BRL_clean", mean);
 
-                            auto hist_nTC_total = getDelta("TRG", "h_n_TChit_event_clkgrp", 0, true);
-                            if (hist_nTC_total) {
-                              double mean = hist_nTC_total->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_total:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_total", mean);
-                            }
+      double tail = getThreshold(hist_nTC_BRL_clean, 0.5);
+      B2DEBUG(1, "ECLTRG_tailTC_BRL_clean:" << tail);
+      setEpicsPV("ECLTRG_tailTC_BRL_clean", tail);
+    }
 
-                            auto hist_nTC_clean = getDelta("TRG", "h_n_TChit_clean_clkgrp", 0, true);
-                            if (hist_nTC_clean) {
-                              double mean = hist_nTC_clean->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_clean:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_clean", mean);
+    auto hist_nTC_BRL_injHER = getDelta("TRG", "h_n_TChit_BRL_injHER_clkgrp", 0, true);
+    if (hist_nTC_BRL_injHER) {
+      double mean = hist_nTC_BRL_injHER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BRL_injHER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BRL_injHER", mean);
+    }
 
-                              double tail = getThreshold(hist_nTC_clean, 0.5);
-                              B2DEBUG(1, "ECLTRG_tailTC_clean:" << tail);
-                              setEpicsPV("ECLTRG_tailTC_clean", tail);
-                            }
+    auto hist_nTC_BRL_injLER = getDelta("TRG", "h_n_TChit_BRL_injLER_clkgrp", 0, true);
+    if (hist_nTC_BRL_injLER) {
+      double mean = hist_nTC_BRL_injLER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BRL_injLER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BRL_injLER", mean);
+    }
 
-                            auto hist_nTC_injHER = getDelta("TRG", "h_n_TChit_injHER_clkgrp", 0, true);
-                            if (hist_nTC_injHER) {
-                              double mean = hist_nTC_injHER->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_injHER:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_injHER", mean);
-                            }
+    auto hist_nTC_BWD_total = getDelta("TRG", "h_n_TChit_BWD_event_clkgrp", 0, true);
+    if (hist_nTC_BWD_total) {
+      double mean = hist_nTC_BWD_total->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BWD_total:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BWD_total", mean);
+    }
 
-                            auto hist_nTC_injLER = getDelta("TRG", "h_n_TChit_injLER_clkgrp", 0, true);
-                            if (hist_nTC_injLER) {
-                              double mean = hist_nTC_injLER->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_injLER:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_injLER", mean);
-                            }
+    auto hist_nTC_BWD_clean = getDelta("TRG", "h_n_TChit_BWD_clean_clkgrp", 0, true);
+    if (hist_nTC_BWD_clean) {
+      double mean = hist_nTC_BWD_clean->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BWD_clean:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BWD_clean", mean);
 
-                            auto hist_nTC_FWD_total = getDelta("TRG", "h_n_TChit_FWD_event_clkgrp", 0, true);
-                            if (hist_nTC_FWD_total) {
-                              double mean = hist_nTC_FWD_total->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_FWD_total:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_FWD_total", mean);
-                            }
+      double tail = getThreshold(hist_nTC_BWD_clean, 0.5);
+      B2DEBUG(1, "ECLTRG_tailTC_BWD_clean:" << tail);
+      setEpicsPV("ECLTRG_tailTC_BWD_clean", tail);
+    }
 
-                            auto hist_nTC_FWD_clean = getDelta("TRG", "h_n_TChit_FWD_clean_clkgrp", 0, true);
-                            if (hist_nTC_FWD_clean) {
-                              double mean = hist_nTC_FWD_clean->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_FWD_clean:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_FWD_clean", mean);
+    auto hist_nTC_BWD_injHER = getDelta("TRG", "h_n_TChit_BWD_injHER_clkgrp", 0, true);
+    if (hist_nTC_BWD_injHER) {
+      double mean = hist_nTC_BWD_injHER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BWD_injHER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BWD_injHER", mean);
+    }
 
-                              double tail = getThreshold(hist_nTC_FWD_clean, 0.5);
-                              B2DEBUG(1, "ECLTRG_tailTC_FWD_clean:" << tail);
-                              setEpicsPV("ECLTRG_tailTC_FWD_clean", tail);
-                            }
-
-                            auto hist_nTC_FWD_injHER = getDelta("TRG", "h_n_TChit_FWD_injHER_clkgrp", 0, true);
-                            if (hist_nTC_FWD_injHER) {
-                              double mean = hist_nTC_FWD_injHER->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_FWD_injHER:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_FWD_injHER", mean);
-                            }
-
-                            auto hist_nTC_FWD_injLER = getDelta("TRG", "h_n_TChit_FWD_injLER_clkgrp", 0, true);
-                            if (hist_nTC_FWD_injLER) {
-                              double mean = hist_nTC_FWD_injLER->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_FWD_injLER:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_FWD_injLER", mean);
-                            }
-
-                            auto hist_nTC_BRL_total = getDelta("TRG", "h_n_TChit_BRL_event_clkgrp", 0, true);
-                            if (hist_nTC_BRL_total) {
-                              double mean = hist_nTC_BRL_total->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_BRL_total:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_BRL_total", mean);
-                            }
-
-                            auto hist_nTC_BRL_clean = getDelta("TRG", "h_n_TChit_BRL_clean_clkgrp", 0, true);
-                            if (hist_nTC_BRL_clean) {
-                              double mean = hist_nTC_BRL_clean->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_BRL_clean:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_BRL_clean", mean);
-
-                              double tail = getThreshold(hist_nTC_BRL_clean, 0.5);
-                              B2DEBUG(1, "ECLTRG_tailTC_BRL_clean:" << tail);
-                              setEpicsPV("ECLTRG_tailTC_BRL_clean", tail);
-                            }
-
-                            auto hist_nTC_BRL_injHER = getDelta("TRG", "h_n_TChit_BRL_injHER_clkgrp", 0, true);
-                            if (hist_nTC_BRL_injHER) {
-                              double mean = hist_nTC_BRL_injHER->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_BRL_injHER:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_BRL_injHER", mean);
-                            }
-
-                            auto hist_nTC_BRL_injLER = getDelta("TRG", "h_n_TChit_BRL_injLER_clkgrp", 0, true);
-                            if (hist_nTC_BRL_injLER) {
-                              double mean = hist_nTC_BRL_injLER->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_BRL_injLER:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_BRL_injLER", mean);
-                            }
-
-                            auto hist_nTC_BWD_total = getDelta("TRG", "h_n_TChit_BWD_event_clkgrp", 0, true);
-                            if (hist_nTC_BWD_total) {
-                              double mean = hist_nTC_BWD_total->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_BWD_total:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_BWD_total", mean);
-                            }
-
-                            auto hist_nTC_BWD_clean = getDelta("TRG", "h_n_TChit_BWD_clean_clkgrp", 0, true);
-                            if (hist_nTC_BWD_clean) {
-                              double mean = hist_nTC_BWD_clean->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_BWD_clean:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_BWD_clean", mean);
-
-                              double tail = getThreshold(hist_nTC_BWD_clean, 0.5);
-                              B2DEBUG(1, "ECLTRG_tailTC_BWD_clean:" << tail);
-                              setEpicsPV("ECLTRG_tailTC_BWD_clean", tail);
-                            }
-
-                            auto hist_nTC_BWD_injHER = getDelta("TRG", "h_n_TChit_BWD_injHER_clkgrp", 0, true);
-                            if (hist_nTC_BWD_injHER) {
-                              double mean = hist_nTC_BWD_injHER->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_BWD_injHER:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_BWD_injHER", mean);
-                            }
-
-                            auto hist_nTC_BWD_injLER = getDelta("TRG", "h_n_TChit_BWD_injLER_clkgrp", 0, true);
-                            if (hist_nTC_BWD_injLER) {
-                              double mean = hist_nTC_BWD_injLER->GetMean();
-                              B2DEBUG(1, "ECLTRG_meanTC_BWD_injLER:" << mean);
-                              setEpicsPV("ECLTRG_meanTC_BWD_injLER", mean);
-                            }
+    auto hist_nTC_BWD_injLER = getDelta("TRG", "h_n_TChit_BWD_injLER_clkgrp", 0, true);
+    if (hist_nTC_BWD_injLER) {
+      double mean = hist_nTC_BWD_injLER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BWD_injLER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BWD_injLER", mean);
+    }
 
 
-                            // Tag canvas as updated ONLY if things have changed.
-                            UpdateCanvas(m_canvas->GetName(), hist != nullptr);
+    // Tag canvas as updated ONLY if things have changed.
+    UpdateCanvas(m_canvas->GetName(), hist != nullptr);
 
-                            // this if left over from jsroot, may not be needed anymore (to check)
-                            m_canvas->Update();
-                          }
+    // this if left over from jsroot, may not be needed anymore (to check)
+    m_canvas->Update();
+  }
 
-                        }
+}
 
-                        void DQMHistAnalysisTRGModule::terminate() {
-                          B2DEBUG(1, "DQMHistAnalysisTRGModule: terminate called");
-                        }
+void DQMHistAnalysisTRGModule::terminate()
+{
+  B2DEBUG(1, "DQMHistAnalysisTRGModule: terminate called");
+}
 
 
-                        double DQMHistAnalysisTRGModule::getThreshold(const TH1 * hist, const double lower_bound, const double widthFraction) {
-                          if (hist == nullptr) return 0.;
+double DQMHistAnalysisTRGModule::getThreshold(const TH1* hist, const double lower_bound, const double widthFraction)
+{
+  if (hist == nullptr) return 0.;
 
-                          double movsum = 0;
-                          int nbins     = hist->GetNbinsX();
-                          int width     = nbins * widthFraction;
-                          int num       = 0;
+  double movsum = 0;
+  int nbins     = hist->GetNbinsX();
+  int width     = nbins * widthFraction;
+  int num       = 0;
 
-                          if (width <= 1) width = 2;
+  if (width <= 1) width = 2;
 
-                          int meanbin = hist->GetXaxis()->FindBin(hist->GetMean());
+  int meanbin = hist->GetXaxis()->FindBin(hist->GetMean());
 
-                          for (int i = meanbin - 1; 1 <= i && i <= meanbin - width; i--) {
-                            num++;
-                            movsum += hist->GetBinContent(i);
-                          }
+  for (int i = meanbin - 1; 1 <= i && i <= meanbin - width; i--) {
+    num++;
+    movsum += hist->GetBinContent(i);
+  }
 
-                          for (int i = meanbin; i < nbins; i++) {
-                            int binIdx = i + 1;
+  for (int i = meanbin; i < nbins; i++) {
+    int binIdx = i + 1;
 
-                            if (num < width) {
-                              movsum += hist->GetBinContent(binIdx);
-                              num++;
-                            } else {
-                              movsum += hist->GetBinContent(binIdx);
-                              movsum -= hist->GetBinContent(binIdx - width);
-                            }
+    if (num < width) {
+      movsum += hist->GetBinContent(binIdx);
+      num++;
+    } else {
+      movsum += hist->GetBinContent(binIdx);
+      movsum -= hist->GetBinContent(binIdx - width);
+    }
 
-                            if (movsum / num < lower_bound) {
-                              return hist->GetBinCenter(binIdx);
-                            }
-                          }
-                          return hist->GetXaxis()->GetBinCenter(nbins);
-                        }
+    if (movsum / num < lower_bound) {
+      return hist->GetBinCenter(binIdx);
+    }
+  }
+  return hist->GetXaxis()->GetBinCenter(nbins);
+}

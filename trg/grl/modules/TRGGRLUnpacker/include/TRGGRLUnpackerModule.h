@@ -200,8 +200,6 @@ namespace Belle2 {
       "map_TSF1_int_1",
       "map_TSF1_int_0",
       "map_N_ST",
-      "map_ST2_int_1",
-      "map_ST2_int_0",
       "map_ST_int_1",
       "map_ST_int_0",
       "map_veto_int_1",
@@ -389,6 +387,8 @@ namespace Belle2 {
       e_N_ST,
       e_ml_tau_nn_output_2,
       e_ml_tau_nn_output_1,
+      map_ST_int_1,
+      map_ST_int_0,
       e_map_veto_int_1,
       e_map_veto_int_0,
       e_map_TSF4_int_1,
@@ -978,15 +978,11 @@ namespace Belle2 {
       if (leafID == e_N_g_1GeV_1) store->set_N_g_1GeV(1, value);
       if (leafID == e_N_g_2GeV_1) store->set_N_g_2GeV(1, value);
       if (leafID == e_TSFL1_count) store->set_TSFL1_count(value);
-      if (leafID == e_slot64b_TOP_int_1) store->set_slot64b_TOP_int_1(value);
-      if (leafID == e_slot64b_TOP_int_0) store->set_slot64b_TOP_int_0(value);
       if (leafID == e_map_TSF3_int_1) store->set_map_TSF3_int(1, value);
       if (leafID == e_map_TSF3_int_0) store->set_map_TSF3_int(0, value);
       if (leafID == e_map_TSF1_int_1) store->set_map_TSF1_int(1, value);
       if (leafID == e_map_TSF1_int_0) store->set_map_TSF1_int(0, value);
       if (leafID == e_N_ST) store->set_N_ST(value);
-      if (leafID == e_map_ST2_int_1) store->set_map_ST2_int(1, value);
-      if (leafID == e_map_ST2_int_0) store->set_map_ST2_int(0, value);
       if (leafID == e_map_ST_int_1) store->set_map_ST_int(1, value);
       if (leafID == e_map_ST_int_0) store->set_map_ST_int(0, value);
       if (leafID == e_map_veto_int_1) store->set_map_veto_int(1, value);

@@ -921,7 +921,7 @@ CosGainData CDCDedxValidationAlgorithm::getcosgain(int experiment, int run)
   }
 
   // representative layer index for each group
-  const std::array<unsigned int, 3> layerIndex = {0, 1, 17};
+  const std::array<unsigned int, 3> layerIndex = {1, 9, 17};
 
   for (int igroup = 0; igroup < 3; ++igroup) {
     unsigned int nCosBins = DBCosineCor->getSize(layerIndex[igroup]);
@@ -935,7 +935,7 @@ CosGainData CDCDedxValidationAlgorithm::getcosgain(int experiment, int run)
         cos.push_back(costh);
       }
 
-      cosgain[igroup].push_back(DBCosineCor->getMean(igroup, ibin));
+      cosgain[igroup].push_back(DBCosineCor->getMean(layerIndex[igroup], ibin));
     }
   }
 
@@ -957,7 +957,7 @@ OnedData CDCDedxValidationAlgorithm::getonedgain(int experiment, int run)
   }
 
   // representative layer index for each group
-  const std::array<unsigned int, 3> layerIndex = {0, 1, 17};
+  const std::array<unsigned int, 3> layerIndex = {1, 9, 17};
 
   for (int igroup = 0; igroup < 3; igroup++) {
 

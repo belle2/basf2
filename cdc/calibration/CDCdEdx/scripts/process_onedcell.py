@@ -59,13 +59,13 @@ def process_onedgain(onedpath, gt):
                     df_new = pd.DataFrame([[x] for x in new_vals], columns=['oned'])
 
                     # constants
-                    cg.hist(0.7, 1.12, xlabel="entrance angle", ylabel=f"{glabel} constants", ax=ax[igroup, 0])
+                    cg.hist(0.7, 1.5, xlabel="entrance angle", ylabel=f"{glabel} constants", ax=ax[igroup, 0])
                     ax[igroup, 0].plot(df_enta['enta'], df_new['oned'], '-', rasterized=True, label=f"{glabel} (new)")
                     ax[igroup, 0].plot(df_enta['enta'], df_prev['oned'], '-', rasterized=True, label=f"{glabel} (prev)")
                     ax[igroup, 0].legend(fontsize=12)
 
                     # ratio
-                    cg.hist(0.94, 1.06, xlabel="entrance angle",  ylabel="Ratio (new/prev)", ax=ax[igroup, 1])
+                    cg.hist(0.9, 1.4, xlabel="entrance angle",  ylabel="Ratio (new/prev)", ax=ax[igroup, 1])
                     if len(df_prev) > 0 and len(df_new) > 0:
                         ratio = df_new['oned'] / df_prev['oned']
                         ax[igroup, 1].plot(df_enta['enta'], ratio, '-', rasterized=True, label=f"{glabel} ratio")

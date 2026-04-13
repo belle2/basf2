@@ -127,7 +127,7 @@ def process_cosgain(ccpath, gt):
                     df_new = pd.DataFrame([[x] for x in new_vals], columns=['cosgain'])
 
                     # Left column: constants
-                    hist(0.7, 1.3,
+                    hist(0.7, 1.5,
                          xlabel=r"$\cos\theta$",
                          ylabel=f"{glabel} dE/dx mean",
                          ax=axes[igroup, 0])
@@ -136,7 +136,7 @@ def process_cosgain(ccpath, gt):
                     axes[igroup, 0].legend()
 
                     # Right column: ratio
-                    hist(0.99, 1.01,
+                    hist(0.7, 1.8,
                          xlabel=r"$\cos\theta$",
                          ylabel="Gain Ratio (new/prev)",
                          ax=axes[igroup, 1])

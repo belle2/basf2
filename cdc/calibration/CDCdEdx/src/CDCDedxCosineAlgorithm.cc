@@ -385,7 +385,7 @@ void CDCDedxCosineAlgorithm::plotdedxHist(std::vector<TH1D*>& hDedxCos_all,
       ctmp.cd(ic % nPads + 1);
       hDedxCos_all[ic]->SetStats(0);
       hDedxCos_all[ic]->SetFillColorAlpha(kYellow, 0.25);
-      hDedxCos_all[ic]->DrawClone("hist");
+      hDedxCos_all[ic]->DrawCopy();
 
       if (ic % nPads == nPads - 1 || ic == m_cosBin - 1) {
         ctmp.Print(psname.str().c_str());
@@ -397,13 +397,13 @@ void CDCDedxCosineAlgorithm::plotdedxHist(std::vector<TH1D*>& hDedxCos_all,
       // left: electron
       ctmp.cd(1);
       hDedxCos_neg[ic]->SetFillColorAlpha(kRed, 0.25);
-      hDedxCos_neg[ic]->DrawClone("hist");
+      hDedxCos_neg[ic]->DrawCopy();
 
 
       // right: positron
       ctmp.cd(2);
       hDedxCos_pos[ic]->SetFillColorAlpha(kBlue, 0.25);
-      hDedxCos_pos[ic]->DrawClone("hist");
+      hDedxCos_pos[ic]->DrawCopy();
 
       ctmp.Print(psname.str().c_str());
       ctmp.Clear();
@@ -525,12 +525,12 @@ void CDCDedxCosineAlgorithm::plotFitResults(const std::vector<std::vector<double
   ctmp->cd(2);
   gPad->SetGridy(1);
 
-  setHist(hSig_all, kBlack, "dedx rel(#sigma_{fit}) for e- and e+ combined", 0.12, 0.4);
+  setHist(hSig_all, kBlack, "dedx rel(#sigma_{fit}) for e- and e+ combined", 0.05, 0.23);
 
   if (isMethodSep) {
 
-    setHist(hSig_el, kRed, "comparison of dedx #sigma_{fit}^{rel}", 0.12, 0.4, 24);
-    setHist(hSig_po, kBlue, "", 0.12, 0.4, 25);
+    setHist(hSig_el, kRed, "comparison of dedx #sigma_{fit}^{rel}", 0.05, 0.23, 24);
+    setHist(hSig_po, kBlue, "", 0.05, 0.23, 25);
 
     hSig_el->Draw("E1");
     hSig_po->Draw("E1 same");
@@ -610,7 +610,7 @@ void CDCDedxCosineAlgorithm::plotConstants()
     hratio->SetLineColor(kBlue);
     hratio->SetStats(0);
     hratio->SetTitle(Form("Ratio: new/old, %s;cos(#theta); New / Old", m_label[il].data()));
-    hratio->GetYaxis()->SetRangeUser(0.2, 1.2);
+    hratio->GetYaxis()->SetRangeUser(0.8, 1.2);
     hratio->Draw("hist");
 
     TLine* line = new TLine(m_cosMin, 1.0, m_cosMax, 1.0);

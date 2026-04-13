@@ -1,0 +1,421 @@
+
+[32mIntegrated Luminosity[0m
+=====================
+
+[1;36mDescription[0m
+-----------
+Values for Run1 and Run2 are reported below. If you need the luminosity for smaller chunks of data, get in touch with the Trigger & Event Properties conveners
+
+[1;36mRecommendation[0m
+--------------
++ **[1mRun1 luminosity[0m** - See BELLE2-NOTE-PH-2022-056 v16.1 for more details (note that experiments 7 to 10 are _not_ present in proc16 Run1)
++ **[1mRun1 all[0m** - 421.19 ± 1.98 /fb
++ **[1mRun1 4S[0m** - 359.45 ± 1.67 /fb
++ **[1mRun1 offres[0m** - 41.93 ± 0.20 /fb
++ **[1mRun1 5S scan[0m** - 19.81 ± 0.09 /fb (detailed values per Ecms in the note)
++ **[1mRun2 luminosity[0m** - Preliminary values for exp30 to exp35 measured with the digamma process.
++ **[1mRun2 all[0m** - 150.98 ± 0.90 /fb
++ **[1mRun2 4S[0m** - 132.90 ± 0.80 /fb
++ **[1mRun2 offres[0m** - 18.08 ± 0.11 /fb
+:Status: READY
+[35m[0m
+[35m+-------+----+-----------+---------------+[0m
+[35m| Tags: |Data|Systematics|EventProperties|[0m
+[35m+-------+----+-----------+---------------+[0m
+[35m[0m
+
+[32mTotal number of produced B0 and B+ mesons[0m
+=========================================
+
+[1;36mDescription[0m
+-----------
+Use the formula NB0 = 2*f00*NY4S or NB+ = 2*f+-*NY4S,
+where NY4S is indicated below, f00 = 0.4861+0.0074-0.0080, f+- = 0.5113+0.0073-0.0108.
+The f00 and f+- probability distributions can be considered as double-sided Gaussian. For measurements, where f is not the dominant systematics (notice that f+- is more asymmetric), consider the symmetrized values:
+f00 = 0.4861 ± 0.0080,  f+- = 0.5113 ± 0.0108.
+
+[1;36mRecommendation[0m
+--------------
++ **[1mRun1 Y4S counting[0m** - See BELLE2-NOTE-PH-2023-011 (luminosity dependent method) for more details (note that experiments 7 to 10 are _not_ present in proc16 Run1)
++ **[1mRun1 NY4S[0m** - (380.9 ± 5.5) x 1e6
++ **[1mRun2 Y4S counting[0m** - Preliminary values for NY4S in exp30 to exp35
++ **[1mRun2 NY4S[0m** - (139.7 ± 2.1) x 1e6
++ **[1mcombined Run1 + Run2 NY4S[0m** - (520.6 ± 7.6) x 1e6, assuming 100% correlation between Run1 and Run2 uncertainties
+:Status: READY
+[35m[0m
+[35m+-------+----+---------------+-----------+--+--+[0m
+[35m| Tags: |Data|EventProperties|Systematics|B0|B+|[0m
+[35m+-------+----+---------------+-----------+--+--+[0m
+[35m[0m
+
+[32mSlow Pion Efficiency[0m
+====================
+
+[1;36mDescription[0m
+-----------
+accounts for the different reconstruction efficiency in data and in MC. Efficiency correction for low-momentum tracks, to be applied on MC. The correction is provided separately for Run1 and Run2.
+The per-track-correction should be applied according to the track momentum, the track momentum range between 50 and 200 MeV/c is split in three bins. For each bin the following quantities are provided: central value and three uncertainties (stat uncorrelated, stat correlated, systematics).
+The central value is the correction to be applied to the MC efficiency to better reproduce the efficiency on data, the uncertainties should be used to evaluate the systematic impact of the correction on your observable.
+To evaluate the systematic uncertainty due to the correction you should evaluate two contributions, one is uncorrelated among momentum bins (1) and the other is correlated among momentum bins (2):
+(1): estimate the impact on your observable with ToyMC, varying the central value of the correction in each bin by randomly drawing from a gaussian with mean = central_value and width = stat_uncorr;
+(2): vary the central_value of the correction by +-1sigma at the same time in all bins and see how the central value of your observable changes.
+The total systematic uncertainty is the sum in quadrature of what obtained in (1) and (2)
+
+[1;36mRecommendation[0m
+--------------
++ **[1mbinning[0m** - The track momentum range between 50 and 200 MeV/c is split in three bins: (1) 0.05 < p < 0.12 GeV, (2) 0.12-0.16 GeV, (3) 0.16-0.20 GeV
++ **[1mcorrections Run1 and Run2[0m** - https://gitlab.desy.de/belle2/performance/correction-tables/-/tree/main/MC16/tracking/slow-pion?ref_type=heads
+:Status: READY
+[35m[0m
+[35m+-------+--+-----------+----------+--------+----+[0m
+[35m| Tags: |MC|Systematics|Correction|Tracking|pion|[0m
+[35m+-------+--+-----------+----------+--------+----+[0m
+[35m[0m
+
+[32mMid-to-High Momentum Track Efficiency[0m
+=====================================
+
+[1;36mDescription[0m
+-----------
+Accounts for the different reconstruction efficiency in data and in MC. Note that this is PRELIMINARY, for Run1 and Run2, and usable only in specific cases (see below).
+
+[1;36mRecommendation[0m
+--------------
++ **[1msystematic per track for Run1[0m** - 0.375%. This is computed as the sum in quadrature of the correction and the uncertainties: delta* =(0.317 ± 0.037 (stat) ± 0.197 (syst)) %
++ **[1msystematic per track for Run2[0m** - 0.375%. Chosen conservatively to be the same value as for Run1 as initial studies indicate a lower systematic for Run2 but need to be confirmed.
++ **[1mcases in which it can be used[0m** - this is NOT recommended but can be used for analyses that (1) can't wait for the improved value (see below) _and_ that (2) have a weak dependence on the tracking efficiency.
++ **[1mreference[0m** - https://indico.belle2.org/event/16849/#63-update-on-tau-3-1-tracking
++ **[1mplans[0m** - a theta-dependent correction with reduced systematics will be provided.
+:Status: READY
+[35m[0m
+[35m+-------+--+-----------+--------+--------+----+----+----+------+--------+[0m
+[35m| Tags: |MC|Systematics|Tracking|electron|muon|pion|kaon|proton|deuteron|[0m
+[35m+-------+--+-----------+--------+--------+----+----+----+------+--------+[0m
+[35m[0m
+
+[32mKShort corrections & systematics[0m
+================================
+
+[1;36mDescription[0m
+-----------
+Accounts for the different reconstruction efficiency in data and in MC. Ks efficiency correction to be applied on MC. Please follow instructions in section 10 of BELLE2-NOTE-TE-2023-23 v2.1, which are briefly summarized below.
+Please note that the actual numbers in the note refer to an older dataset (MC15).
+
+[1;36mRecommendation[0m
+--------------
++ **[1mbinning[0m** - the corrections and their uncertainties (a statistical component and a systematic component) are computed in 84 bins in the (momentum, cosTheta, 2d-vertex distance) 3D space of the Ks.
++ **[1mcorrections Run1 and Run2[0m** - https://gitlab.desy.de/belle2/performance/correction-tables/-/tree/20260122/MC16/tracking/Ks?ref_type=tags
++ **[1mnote[0m** - for Ks with 2d-vertex distance < 0.5 cm use the efficiency corrections for the two Ks daughters based on their momentum: for tracks with p<0.2 GeV, use the slow-pion corrections; for tracks with p>0.2 GeV, use the mid-to-high momentum per-track systematic.
+:Status: READY
+[35m[0m
+[35m+-------+--+-----------+----------+--------+----+[0m
+[35m| Tags: |MC|Systematics|Correction|Tracking|K_S0|[0m
+[35m+-------+--+-----------+----------+--------+----+[0m
+[35m[0m
+
+[32mDifferential Track Momentum Scale and Energy Loss Corrections[0m
+=============================================================
+
+[1;36mDescription[0m
+-----------
+Imperfections in the B-field map and in the detector material description on basf2 require (small) corrections for the track momenta and the energy loss of the track in the material. We provide polar-angle-dependent corrections for the track momentum, and momentum-dependent energy-loss corrections for Run1 and Run2 2025 data and run-dependent MC16rd (see BELLE2-NOTE-PH-2023-069 V7 for full documentation). If your analysis is sensitive to this correction, it is recommended to re-run your analysis twice using the weights "total_up" and  "total_down", respectively, instead of the "central" weight, and assign the difference in the result as systematic uncertainty. Note: The given global tag (GT) is valid for MC and data, as well for both Run1 and Run2 (exp 12 - 26 and exp 30 - 35). Corresponding payloads will be picked automatically, so no need to change the GT. You still need to specify the correct payloads (contained in the GT) depending on if you run over data or MC (also see snippet)!
+
+[1;36mSnippet[0m
+-------
+.. code-block:: python
+
+    [34mimport[39;49;00m [04m[36mmodularAnalysis[39;49;00m [34mas[39;49;00m [04m[36mma[39;49;00m[37m[39;49;00m
+    [34mimport[39;49;00m [04m[36mvariables[39;49;00m [34mas[39;49;00m [04m[36mva[39;49;00m[37m[39;49;00m
+    [37m[39;49;00m
+    [37m## Choose the GT, payload, particle lists and SF name[39;49;00m[37m[39;49;00m
+    [37m[39;49;00m
+    [37m# global tag containing the payloads. Valid for both MC16rd and data (Run1 + Run2 2025). [39;49;00m[37m[39;49;00m
+    gt_name = [33m"[39;49;00m[33mtracking_release08_20260119_EnergyMomentumScale[39;49;00m[33m"[39;49;00m[37m[39;49;00m
+    [37m# For more information on this separation see appendix C of BELLE2-NOTE-PH-2023-069 V7.[39;49;00m[37m[39;49;00m
+    [37m[39;49;00m
+    [37m# !!! Important: There are different payloads to be used for Data and MC, so you need to pick the correct payloads corresponding to the dataset you running over![39;49;00m[37m[39;49;00m
+    data_or_mc = [33m"[39;49;00m[33mMC[39;49;00m[33m"[39;49;00m [37m# "MC" or "Data" [39;49;00m[37m[39;49;00m
+    [37m[39;49;00m
+    payload_name_cosTheta = [33m"[39;49;00m[33mtracking_MomentumScaling_Data[39;49;00m[33m"[39;49;00m[37m[39;49;00m
+    payload_name_Eloss = [33m"[39;49;00m[33mtracking_EnergyLoss_Data[39;49;00m[33m"[39;49;00m[37m[39;49;00m
+    [37m[39;49;00m
+    [34mif[39;49;00m data_or_mc == [33m"[39;49;00m[33mMC[39;49;00m[33m"[39;49;00m:[37m[39;49;00m
+      payload_name_cosTheta = [33m"[39;49;00m[33mtracking_MomentumScaling_MC[39;49;00m[33m"[39;49;00m[37m[39;49;00m
+      payload_name_Eloss = [33m"[39;49;00m[33mtracking_EnergyLoss_MC[39;49;00m[33m"[39;49;00m[37m[39;49;00m
+    [37m[39;49;00m
+    [37m[39;49;00m
+    particle_lists = [[33m"[39;49;00m[33mpi+:all[39;49;00m[33m"[39;49;00m] [37m#choose your lists[39;49;00m[37m[39;49;00m
+    sf_name = [33m"[39;49;00m[33mcentral[39;49;00m[33m"[39;49;00m[37m[39;49;00m
+    [37m[39;49;00m
+    sf_keys = [[33m"[39;49;00m[33mcentral[39;49;00m[33m"[39;49;00m,[37m[39;49;00m
+            [33m"[39;49;00m[33mmisAl_down[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mmisAl_up[39;49;00m[33m"[39;49;00m,[37m[39;49;00m
+            [33m"[39;49;00m[33mbias_corr_down[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mbias_corr_up[39;49;00m[33m"[39;49;00m,[37m[39;49;00m
+            [33m"[39;49;00m[33mpdg_down[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mpdg_up[39;49;00m[33m"[39;49;00m,[37m[39;49;00m
+            [33m"[39;49;00m[33mstat_down[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mstat_up[39;49;00m[33m"[39;49;00m,[37m[39;49;00m
+            [33m"[39;49;00m[33mtotal_down[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mtotal_up[39;49;00m[33m"[39;49;00m][37m[39;49;00m
+    [37m[39;49;00m
+    [37m## scale track momenta according to SFs given in the payload[39;49;00m[37m[39;49;00m
+    basf2.conditions.prepend_globaltag(gt_name)[37m[39;49;00m
+    ma.scaleTrackMomenta(inputListNames=particle_lists,[37m[39;49;00m
+        payloadName=payload_name_cosTheta,[37m[39;49;00m
+        scalingFactorName=sf_name,[37m[39;49;00m
+        path=my_path)[37m[39;49;00m
+    ma.correctTrackEnergy(inputListNames=particle_lists,[37m[39;49;00m
+        payloadName=payload_name_Eloss,[37m[39;49;00m
+        correctionName=sf_name,[37m[39;49;00m
+        path=my_path)[37m[39;49;00m
+    [37m##[39;49;00m[37m[39;49;00m
+    [37m## Add aliases for the corrections to store as new variables.[39;49;00m[37m[39;49;00m
+    [37m## Here the tracks are scaled according to "central" but the variations[39;49;00m[37m[39;49;00m
+    [37m## could still be included as extra variables in the tuples to be used[39;49;00m[37m[39;49;00m
+    [37m## offline.[39;49;00m[37m[39;49;00m
+    [37m##[39;49;00m[37m[39;49;00m
+    var_names = [][37m[39;49;00m
+    [34mfor[39;49;00m sf_key [35min[39;49;00m sf_keys:[37m[39;49;00m
+      va.variables.addAlias([33mf[39;49;00m[33m"[39;49;00m[33m{[39;49;00msf_key[33m}[39;49;00m[33m_momScale[39;49;00m[33m"[39;49;00m, [33mf[39;49;00m[33m"[39;49;00m[33mextraInfo([39;49;00m[33m{[39;49;00mpayload_name_cosTheta[33m}[39;49;00m[33m_[39;49;00m[33m{[39;49;00msf_key[33m}[39;49;00m[33m)[39;49;00m[33m"[39;49;00m)[37m[39;49;00m
+      va.variables.addAlias([33mf[39;49;00m[33m"[39;49;00m[33m{[39;49;00msf_key[33m}[39;49;00m[33m_Ecorrection[39;49;00m[33m"[39;49;00m, [33mf[39;49;00m[33m"[39;49;00m[33mextraInfo([39;49;00m[33m{[39;49;00mpayload_name_Eloss[33m}[39;49;00m[33m_[39;49;00m[33m{[39;49;00msf_key[33m}[39;49;00m[33m)[39;49;00m[33m"[39;49;00m)[37m[39;49;00m
+      var_names += [[33mf[39;49;00m[33m"[39;49;00m[33m{[39;49;00msf_key[33m}[39;49;00m[33m_momScale[39;49;00m[33m"[39;49;00m, [33mf[39;49;00m[33m"[39;49;00m[33m{[39;49;00msf_key[33m}[39;49;00m[33m_Ecorrection[39;49;00m[33m"[39;49;00m][37m[39;49;00m
+    track_variables += var_names[37m[39;49;00m
+    
+
+[1;36mRecommendation[0m
+--------------
++ **[1mGlobalTag[0m** - tracking_release08_20260119_EnergyMomentumScale
++ **[1mpayloadNames[0m** - tracking_EnergyLoss_Data, tracking_EnergyLoss_MC, tracking_MomentumScaling_Data, tracking_MomentumScaling_MC
++ **[1mscalingFactorName[0m** - central
++ **[1mscalingFactorName to evaluate systematic uncertainties[0m** - total_up, total_down
++ **[1mRun1[0m** - ready
++ **[1mRun2[0m** - ready
+:Status: READY
+[35m[0m
+[35m+-------+----+--+-----------+----------+--------+[0m
+[35m| Tags: |Data|MC|Systematics|Correction|Tracking|[0m
+[35m+-------+----+--+-----------+----------+--------+[0m
+[35m[0m
+
+[32mGlobal Track Momentum Scale (deprecated)[0m
+========================================
+
+[1;36mDescription[0m
+-----------
+not supported after release-06, use the Differential Track Momentum Scale and Energy Loss Corrections.
+
+[1;36mRecommendation[0m
+--------------
++ **[1mdo not use it[0m** - 
+:Status: DEPRECATED
+[35m[0m
+[35m+-------+----+-----------+----------+--------+--------+[0m
+[35m| Tags: |Data|Systematics|Correction|Steering|Tracking|[0m
+[35m+-------+----+-----------+----------+--------+--------+[0m
+[35m[0m
+
+[32mPID data/MC Corrections[0m
+=======================
+
+[1;36mDescription[0m
+-----------
+Account for the different PID performance in data and in MC. The corrections should be applied to the MC. The correction tables and their uncertainties are computed via the Systematics Framework and they can be applied via the SysVar tool. The correction tables are determined without any other corrections, such as Bremsstrahlung corrections, applied to the tracks. Therefore, the track kinematics without other corrections should be used when applying the PID correction tables.
+
+[1;36mRecommendation[0m
+--------------
++ **[1mSystematics Framework[0m** - https://syscorrfw.readthedocs.io/en/latest/
++ **[1mSysVar[0m** - https://software.belle2.org/development/sphinx/analysis/doc/OfflineReweighting.html#charged-particle-identification-corrections
+:Status: ONGOING
+[35m[0m
+[35m+-------+--+---+----------+-----------+--------+----+----+----+------+[0m
+[35m| Tags: |MC|PID|Correction|Systematics|electron|muon|pion|kaon|proton|[0m
+[35m+-------+--+---+----------+-----------+--------+----+----+----+------+[0m
+[35m[0m
+
+[32mGFlaT Correction[0m
+================
+
+[1;36mDescription[0m
+-----------
+Preliminary calibration parameters with statistical errors are available, systematic uncertainties and correlations will be provided at a later stage.
+
+[1;36mRecommendation[0m
+--------------
++ **[1mCorrection tables[0m** - https://gitlab.desy.de/belle2/performance/correction-tables/-/tree/20260205/MC16/GFlaT?ref_type=tags
+:Status: ONGOING
+[35m[0m
+[35m+-------+--+----+----------+-----------+--+-------------+[0m
+[35m| Tags: |MC|Data|Correction|Systematics|B0|AnalysisTools|[0m
+[35m+-------+--+----+----------+-----------+--+-------------+[0m
+[35m[0m
+
+[33mTFlaT Correction[0m
+================
+
+[1;36mDescription[0m
+-----------
+calibrations are WORK IN PROGRESS
+
+[1;36mRecommendation[0m
+--------------
+:Status: ONGOING
+[35m[0m
+[35m+-------+--+----+----------+-----------+--+-------------+[0m
+[35m| Tags: |MC|Data|Correction|Systematics|B0|AnalysisTools|[0m
+[35m+-------+--+----+----------+-----------+--+-------------+[0m
+[35m[0m
+
+[32mHadronic FEI Correction[0m
+=======================
+
+[1;36mDescription[0m
+-----------
+Tag-side mode-dependent calibration factors that account for differences in FEI efficiency between data and MC. Must be applied to MC. 
+Calibration factors for Run2 are preliminary.
+
+[1;36mSnippet[0m
+-------
+.. code-block:: python
+
+    [34mimport[39;49;00m [04m[36mmodularAnalysis[39;49;00m [34mas[39;49;00m [04m[36mma[39;49;00m[37m[39;49;00m
+    [37m[39;49;00m
+    [37m# ROE mask for continuum suppression[39;49;00m[37m[39;49;00m
+    track_selection = [33m"[39;49;00m[33m and [39;49;00m[33m"[39;49;00m.join([[37m[39;49;00m
+        [33m"[39;49;00m[33m[dr < 2][39;49;00m[33m"[39;49;00m,[37m[39;49;00m
+        [33m"[39;49;00m[33m[abs(dz) < 4][39;49;00m[33m"[39;49;00m,[37m[39;49;00m
+        [33m"[39;49;00m[33m[pt > 0.2][39;49;00m[33m"[39;49;00m,[37m[39;49;00m
+        [33m"[39;49;00m[33m[thetaInCDCAcceptance==1][39;49;00m[33m"[39;49;00m[37m[39;49;00m
+    ])[37m[39;49;00m
+    ecl_selection = [33m"[39;49;00m[33m'[39;49;00m[33m[[[clusterReg==1] and [E>0.080]] or [[clusterReg==2] and [E > 0.03]] or [[clusterReg==3] and [E > 0.06]]] [39;49;00m[33m"[39;49;00m[37m[39;49;00m
+    ecl_selection += [33m"[39;49;00m[33mand [clusterNHits > 1.5] and [0.2967 < clusterTheta < 2.6180] and [abs(clusterTiming) < 200][39;49;00m[33m"[39;49;00m[37m[39;49;00m
+    roe_mask = (track_selection, ecl_selection)[37m[39;49;00m
+    [37m[39;49;00m
+    ma.buildRestOfEvent([33m'[39;49;00m[33mB+:feiHadronic[39;49;00m[33m'[39;49;00m, path=path)[37m[39;49;00m
+    ma.appendROEMask([33m'[39;49;00m[33mB+:feiHadronic[39;49;00m[33m'[39;49;00m, [33m'[39;49;00m[33mfei_mask[39;49;00m[33m'[39;49;00m, *roe_mask, path=path)[37m[39;49;00m
+    ma.buildContinuumSuppression([33m'[39;49;00m[33mB+:feiHadronic[39;49;00m[33m'[39;49;00m, [33m'[39;49;00m[33mfei_mask[39;49;00m[33m'[39;49;00m, path=path)[37m[39;49;00m
+    [37m[39;49;00m
+    [37m# Required selections on tag candidates[39;49;00m[37m[39;49;00m
+    ma.applyCuts([33m'[39;49;00m[33mB+:feiHadronic[39;49;00m[33m'[39;49;00m, [33m'[39;49;00m[33mMbc > 5.27 and -0.15 < deltaE < 0.1 and cosTBTO(fei_mask) < 0.9[39;49;00m[33m'[39;49;00m, path=path)[37m[39;49;00m
+    [37m[39;49;00m
+    [37m# Best candidate selection[39;49;00m[37m[39;49;00m
+    ma.rankByHighest([33m'[39;49;00m[33mB+:feiHadronic[39;49;00m[33m'[39;49;00m, [33m'[39;49;00m[33mextraInfo(SignalProbability)[39;49;00m[33m'[39;49;00m, outputVariable=[33m'[39;49;00m[33msigProb_rank[39;49;00m[33m'[39;49;00m, path=path)[37m[39;49;00m
+    ma.cutAndCopyList([33m'[39;49;00m[33mB+:BestCandidate[39;49;00m[33m'[39;49;00m, [33m'[39;49;00m[33mB+:feiHadronic[39;49;00m[33m'[39;49;00m, [33m'[39;49;00m[33msigProb_rank == 1[39;49;00m[33m'[39;49;00m, path=path)[37m[39;49;00m
+    
+
+[1;36mRecommendation[0m
+--------------
++ **[1mCorrection tables[0m** - https://gitlab.desy.de/belle2/performance/correction-tables/-/tree/20260126/MC16/FEI/hadronic?ref_type=tags
++ **[1mRequired selections[0m** - see code snippet below
+:Status: READY
+[35m[0m
+[35m+-------+--+---+----------+-----------+--+--+-------------+[0m
+[35m| Tags: |MC|FEI|Correction|Systematics|B0|B+|AnalysisTools|[0m
+[35m+-------+--+---+----------+-----------+--+--+-------------+[0m
+[35m[0m
+
+[33mSemileptonic FEI Correction[0m
+===========================
+
+[1;36mDescription[0m
+-----------
+accounts for the different FEI performance in data and in MC. It must be applied to MC. WORK IN PROGRESS
+
+[1;36mRecommendation[0m
+--------------
+:Status: ONGOING
+[35m[0m
+[35m+-------+--+---+----------+-----------+--+--+-------------+[0m
+[35m| Tags: |MC|FEI|Correction|Systematics|B0|B+|AnalysisTools|[0m
+[35m+-------+--+---+----------+-----------+--+--+-------------+[0m
+[35m[0m
+
+[32mPhoton-Energy Bias Correction[0m
+=============================
+
+[1;36mDescription[0m
+-----------
+The correction of the photon-energy bias is extracted as a function of energy and polar angle of the photon from symmetric pi0 decays, see BELLE2-NOTE-TE-2025-019 for more details. It should be applied on data to the gamma:all list before filling gamma, pi0, eta particle lists.
+
+[1;36mSnippet[0m
+-------
+.. code-block:: python
+
+    [34mimport[39;49;00m [04m[36mbasf2[39;49;00m [34mas[39;49;00m [04m[36mb2[39;49;00m[37m[39;49;00m
+    [34mimport[39;49;00m [04m[36mmodularAnalysis[39;49;00m [34mas[39;49;00m [04m[36mma[39;49;00m[37m[39;49;00m
+    b2.conditions.prepend_globaltag([33m"[39;49;00m[33mneutrals_release08_20250922[39;49;00m[33m"[39;49;00m)[37m[39;49;00m
+    ma.fillParticleList([33m'[39;49;00m[33mgamma:all[39;49;00m[33m'[39;49;00m,path=my_path)[37m[39;49;00m
+    table_name=[33m"[39;49;00m[33mPhotonEnergyBiasCorrection_MC16rd_September2025[39;49;00m[33m"[39;49;00m[37m[39;49;00m
+    ma.correctEnergyBias(inputListNames=[[33m'[39;49;00m[33mgamma:all[39;49;00m[33m'[39;49;00m], tableName=table_name , path=my_path)[37m[39;49;00m
+    [37m# optional[39;49;00m[37m[39;49;00m
+    [37m# vm.addAlias('PhotonEnergyBiasCorrection_MC16rd_September2025_Weight', 'extraInfo(PhotonEnergyBiasCorrection_MC16rd_September2025_Weight)')[39;49;00m[37m[39;49;00m
+    [37m# vm.addAlias('PhotonEnergyBiasCorrection_MC16rd_September2025_StatErr', 'extraInfo(PhotonEnergyBiasCorrection_MC16rd_September2025_StatErr)')[39;49;00m[37m[39;49;00m
+    [37m# photon_extravars = ['PhotonEnergyBiasCorrection_MC16rd_September2025_Weight', 'PhotonEnergyBiasCorrection_MC16rd_September2025_StatErr'][39;49;00m[37m[39;49;00m
+    
+
+[1;36mRecommendation[0m
+--------------
++ **[1mglobal tag name[0m** - neutrals_release08_20260202
++ **[1mpayloadName[0m** - PhotonEnergyBiasCorrection_MC16rd_September2025
++ **[1mscalingFactorName[0m** - PhotonEnergyBiasCorrection_MC16rd_September2025_Weight
++ **[1msystematics[0m** - to calculate systematic uncertainty, re-process data by using PhotonEnergyBiasCorrection_MC16rd_September2025_upper and PhotonEnergyBiasCorrection_MC16rd_September2025_lower tables. Calculate the impact on the result by comparing the up and down variations to the central values.
+:Status: READY
+[35m[0m
+[35m+-------+----+--------+-----------+----------+-----+---+---+[0m
+[35m| Tags: |Data|Neutrals|Systematics|Correction|gamma|pi0|eta|[0m
+[35m+-------+----+--------+-----------+----------+-----+---+---+[0m
+[35m[0m
+
+[32mPhoton Detection Efficiency Correction[0m
+======================================
+
+[1;36mDescription[0m
+-----------
+accounts for the different photon reconstruction efficiency in data and MC. The correction to be applied to the MC is extracted from the radiative dimuon sample as a function of momentum and polar angle. See  BELLE2-NOTE-TE-2025-021 for more details. The correction covers photons with energy > 200 MeV (the coverage od the region below 200 MeV is WORK IN PROGRESS). The corrections are extracted for photons satisfying abs(clusterTiming)<200 criterion, hence, this requirement should be applied in the analysis too. Note that the corrections for Run1 and Run2 are different: there are two payloads that are anyway automatically selected by basf2. The correction must be applied to MC only.
+
+[1;36mSnippet[0m
+-------
+.. code-block:: python
+
+    [34mimport[39;49;00m [04m[36mbasf2[39;49;00m [34mas[39;49;00m [04m[36mb2[39;49;00m[37m[39;49;00m
+    [34mimport[39;49;00m [04m[36mmodularAnalysis[39;49;00m [34mas[39;49;00m [04m[36mma[39;49;00m[37m[39;49;00m
+    [34mimport[39;49;00m [04m[36mvariables[39;49;00m [34mas[39;49;00m [04m[36mva[39;49;00m[37m[39;49;00m
+    b2.conditions.prepend_globaltag([33m"[39;49;00m[33mneutrals_release08_20250922[39;49;00m[33m"[39;49;00m)[37m[39;49;00m
+    weight_table_id = [33m"[39;49;00m[33mPhotonEfficiencyDataMCRatio_Proc16_Sept2025[39;49;00m[33m"[39;49;00m [37m# or PhotonEfficiencyDataMCRatio_Prompt_Sept2025[39;49;00m[37m[39;49;00m
+    va.variables.addAlias([33m'[39;49;00m[33mWeight[39;49;00m[33m'[39;49;00m, [33mf[39;49;00m[33m'[39;49;00m[33mextraInfo([39;49;00m[33m{[39;49;00mweight_table_id[33m}[39;49;00m[33m_Weight)[39;49;00m[33m'[39;49;00m)[37m[39;49;00m
+    va.variables.addAlias([33m'[39;49;00m[33mTotalErrUp[39;49;00m[33m'[39;49;00m, [33mf[39;49;00m[33m'[39;49;00m[33mextraInfo([39;49;00m[33m{[39;49;00mweight_table_id[33m}[39;49;00m[33m_TotalErrUp)[39;49;00m[33m'[39;49;00m)[37m[39;49;00m
+    va.variables.addAlias([33m'[39;49;00m[33mTotalErrDown[39;49;00m[33m'[39;49;00m, [33mf[39;49;00m[33m'[39;49;00m[33mextraInfo([39;49;00m[33m{[39;49;00mweight_table_id[33m}[39;49;00m[33m_TotalErrDown)[39;49;00m[33m'[39;49;00m)[37m[39;49;00m
+    mandatory_selection = [33m"[39;49;00m[33mabs(clusterTiming)<200[39;49;00m[33m"[39;49;00m[37m[39;49;00m
+    ma.fillParticleList(decayString=[33m'[39;49;00m[33mgamma:signal[39;49;00m[33m'[39;49;00m,cut=mandatory_selection, path=path)[37m[39;49;00m
+    ma.addPhotonEfficiencyRatioVariables([[33m'[39;49;00m[33mgamma:signal[39;49;00m[33m'[39;49;00m], weight_table_id, path=path)[37m[39;49;00m
+    weight_vars = [[33m'[39;49;00m[33mWeight[39;49;00m[33m'[39;49;00m, [33m'[39;49;00m[33mTotalErrUp[39;49;00m[33m'[39;49;00m, [33m'[39;49;00m[33mTotalErrDown[39;49;00m[33m'[39;49;00m] [37m# to be saved then for the photons in the variablesToNtuple[39;49;00m[37m[39;49;00m
+    
+
+[1;36mRecommendation[0m
+--------------
++ **[1mglobal tag[0m** - neutrals_release08_20260202
++ **[1mpayloadName[0m** - PhotonEfficiencyDataMCRatio
++ **[1mscalingFactorName[0m** - PhotonEfficiencyDataMCRatio_Weight
++ **[1mpreliminary[0m** - These corrections are only applied to photons with E>200 MeV. Low-E corrections are not ready yet.
++ **[1mhow to calculate systematic uncertainty[0m** - Calculate up and down variations by adding to/subtracting from the central value, PhotonEfficiencyDataMCRatio_Weight, corresponding uncertainty PhotonEfficiencyDataMCRatio_totalErrUp or PhotonEfficiencyDataMCRatio_totalErrDown. Calculate impact on the result by comparing up and down variations to the central values.
++ **[1mcomment[0m** - If you produced your ntuples using the global tag neutrals_release08_20250922, they are still valid. The correction names in this case are PhotonEfficiencyDataMCRatio_Proc16_Sept2025_Weight and PhotonEfficiencyDataMCRatio_Prompt_Sept2025_Weight.
+:Status: READY
+[35m[0m
+[35m+-------+--+--------+----------+-----------+-----+[0m
+[35m| Tags: |MC|Neutrals|Correction|Systematics|gamma|[0m
+[35m+-------+--+--------+----------+-----------+-----+[0m
+[35m[0m
+
+[32mpi0 Efficiency Correction[0m
+=========================
+
+[1;36mDescription[0m
+-----------
+accounts for the different reconstruction efficiency in data and in MC. This is PRELIMINARY, but usable for analyses on Run1 and Run2 data.
+
+[1;36mRecommendation[0m
+--------------
++ **[1mpreliminary[0m** - these are the same corrections provided for release-06 sample, can be applied to Run1 and Run2 data, **but only using one of the supported pi0 lists**
++ **[1mhow to use it[0m** - Correction with total uncertainty (stat and syst are summed in quadrature) provided in bins of pi0 momentum and cosine of pi0 polar angle. Do not apply the photon efficiency correction to the pi0 daughters.
++ **[1mwhere to find the corrections[0m** - https://gitlab.desy.de/belle2/performance/correction-tables/-/tree/main/MC15/run_dependent/neutrals/pi0efficiency
+:Status: READY
+[35m[0m
+[35m+-------+--+--------+----------+-----------+---+[0m
+[35m| Tags: |MC|Neutrals|Correction|Systematics|pi0|[0m
+[35m+-------+--+--------+----------+-----------+---+[0m
+[35m[0m

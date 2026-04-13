@@ -1,25 +1,19 @@
-// Model: EvtD0TopipiEta
-// This file is an amplitude model for D0 -> pi- pi+ eta.
-// The model is from the BESIII Collaboration in arXiv:2404.09219 (2024). DOI:&nbsp; https://doi.org/10.48550/arXiv.2404.09219
-//
-// Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
-//
-// Please cite the original reference for any public/published results where this model was used.
-
-#pragma once
+#ifndef EVTDTOPIPI0ETA_HH
+#define EVTDTOPIPI0ETA_HH
 
 #include "EvtGenBase/EvtDecayProb.hh"
 
-
 namespace Belle2 {
 
-  class EvtD0TopipiEta: public EvtDecayProb {
+  class EvtDTopipi0Eta: public EvtDecayProb {
 
   public:
-    EvtD0TopipiEta() {}
-    virtual ~EvtD0TopipiEta();
+    EvtDTopipi0Eta() {}
+    virtual ~EvtDTopipi0Eta();
+
     std::string getName();
     EvtDecayBase* clone();
+
     void init();
     void initProbMax();
     void decay(EvtParticle* p);
@@ -57,4 +51,6 @@ namespace Belle2 {
     int G[4][4];
   };
 
-} // Belle 2 Namespace
+} // Belle2 namespace
+
+#endif

@@ -1,6 +1,6 @@
 // Model: EvtD0Topippim2pi0
 // This file is an amplitude model for D0 -> pi+ pi- pi0 pi0.
-// The model is from the BESIII Collaboration in Chin. Phys. C 48, 083001 (2024). DOI:&nbsp;https://doi.org/10.1088/1674-1137/ad3d4d
+// The model is from the BESIII Collaboration in Chin. Phys. C 48, 083001 (2024). DOI:&nbsp; https://doi.org/10.1088/1674-1137/ad3d4d
 //
 // Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
 //

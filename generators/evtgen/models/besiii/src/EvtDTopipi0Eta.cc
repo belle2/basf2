@@ -1,30 +1,17 @@
-// Model: EvtD0TopipiEta
-// This file is an amplitude model for D0 -> pi- pi+ eta.
-// The model is from the BESIII Collaboration in arXiv:2404.09219 (2024). DOI:&nbsp; https://doi.org/10.48550/arXiv.2404.09219
-//
-// Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
-//
-// Please cite the original reference for any public/published results where this model was used.
-
 //--------------------------------------------------------------------------
 //
-// Environment:
-//      This software is part of the EvtGen package developed jointly
-//      for the BaBar and CLEO collaborations.  If you use all or part
-//      of it, please give an appropriate acknowledgement.
+// Model: EvtDTopipi0Eta
+// This file is an amplitude model for D+ -> pi+ pi0 eta.
+// The model is from Phys.Rev.D.110.L111102 (2024). DOI: https://doi.org/10.1103/PhysRevD.110.L111102
 //
-// Copyright Information: See EvtGen/COPYRIGHT
-//      Copyright (C) 1998      Caltech, UCSB
+// Permission to use these files in basf2 was generously granted by the BESIII Collaboration.
 //
-// Module: EvtD0TopipiEta.cc
+// Please cite the original reference for any public/published results where this model was used.
 //
-// Description: https://arxiv.org/abs/2404.09219
+// Modified by : Jiyuan Zhang
 //
-// Modification history:
-//
-//    Liaoyuan Dong    Jan 12 2024    Module created
-//
-//------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+
 #include "EvtGenBase/EvtPatches.hh"
 #include "EvtGenBase/EvtParticle.hh"
 #include "EvtGenBase/EvtGenKine.hh"
@@ -32,33 +19,33 @@
 #include "EvtGenBase/EvtReport.hh"
 #include "EvtGenBase/EvtVector4R.hh"
 #include "EvtGenBase/EvtComplex.hh"
+#include "generators/evtgen/models/besiii/EvtDTopipi0Eta.h"
 #include "EvtGenBase/EvtDecayTable.hh"
 #include <stdlib.h>
 
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include "generators/evtgen/models/besiii/EvtD0TopipiEta.h"
+
+using namespace std;
 
 namespace Belle2 {
 
-  using namespace std;
+  /** register the model in EvtGen */
+  B2_EVTGEN_REGISTER_MODEL(EvtDTopipi0Eta);
 
-  B2_EVTGEN_REGISTER_MODEL(EvtD0TopipiEta);
+  EvtDTopipi0Eta::~EvtDTopipi0Eta() {}
 
-  EvtD0TopipiEta::~EvtD0TopipiEta() {}
-
-  std::string EvtD0TopipiEta::getName()
+  std::string EvtDTopipi0Eta::getName()
   {
-    return "D0TopipiEta";
+    return "DTopipi0Eta";
   }
 
-  EvtDecayBase* EvtD0TopipiEta::clone()
+  EvtDecayBase* EvtDTopipi0Eta::clone()
   {
-    return new EvtD0TopipiEta;
+    return new EvtDTopipi0Eta;
   }
 
-  void EvtD0TopipiEta::init()
+  void EvtDTopipi0Eta::init()
   {
-    // check that there are 0 arguments
     checkNArg(0);
     checkNDaug(3);
     checkSpinParent(EvtSpinType::SCALAR);
@@ -66,16 +53,10 @@ namespace Belle2 {
     checkSpinDaughter(1, EvtSpinType::SCALAR);
     checkSpinDaughter(2, EvtSpinType::SCALAR);
 
-    phi[0] =  0;         rho[0] =  1;        //rho eta
-    phi[1] = -0.98109;   rho[1] = -0.02447;  //omega eta (rho-omega mixing)
-    phi[2] =  0.71358;   rho[2] =  1.0848;   //a0- pi+
-    phi[3] = -0.83115;   rho[3] =  2.6444;   //a0+ pi-
-    phi[4] = -0.058521;  rho[4] =  7.0274;   //(pi+ eta)_{2+} pi-
+    phi[0] = -3.3276; rho[0] =  0.31478; //rho eta
+    phi[1] =  0.0;    rho[1] =  1.0;     //a0+ pi0
+    phi[2] =  0.0;    rho[2] = -1.0;     //a00 pi+
 
-    //cout << "Initializing D0TopipiEta" << endl;
-    //for (int i=0; i<5; i++) {
-    //   cout << i << " rho= " << rho[i] << " phi= " << phi[i] << endl;
-    //}
     mrho = 0.77511;
     ma0 = 0.99;
     Grho = 0.1491;
@@ -87,7 +68,7 @@ namespace Belle2 {
     const double mass_Pi0 = 0.1349766;
     const double meta = 0.547862;
     mpi = 0.13957;
-    mD = 1.86483;
+    mD = 1.86966;
     sD = mD * mD;
     spi = mpi * mpi;
     snk = mk0 * mk0;
@@ -108,43 +89,15 @@ namespace Belle2 {
       }
     }
 
-
   }
 
-  void EvtD0TopipiEta::initProbMax()
+  void EvtDTopipi0Eta::initProbMax()
   {
-    setProbMax(476.5);
+    setProbMax(20.0);
   }
 
-  void EvtD0TopipiEta::decay(EvtParticle* p)
+  void EvtDTopipi0Eta::decay(EvtParticle* p)
   {
-    /*
-       // This piece of code could in principle be used to calculate maximum
-       // probablity on fly. But as it uses high number of points and model
-       // deals with single final state, we keep hardcoded number for now rather
-       // than adapting code to work here.
-
-       double maxprob = 0.0;
-       for(int ir=0;ir<=60000000;ir++){
-          p->initializePhaseSpace(getNDaug(),getDaugs());
-          EvtVector4R D1 = p->getDaug(0)->getP4();
-          EvtVector4R D2 = p->getDaug(1)->getP4();
-          EvtVector4R D3 = p->getDaug(2)->getP4();
-
-          double P1[4], P2[4], P3[4];
-          P1[0] = D1.get(0); P1[1] = D1.get(1); P1[2] = D1.get(2); P1[3] = D1.get(3);
-          P2[0] = D2.get(0); P2[1] = D2.get(1); P2[2] = D2.get(2); P2[3] = D2.get(3);
-          P3[0] = D3.get(0); P3[1] = D3.get(1); P3[2] = D3.get(2); P3[3] = D3.get(3);
-
-          double value;
-          value = calDalEva(P1, P2, P3);
-          if(value>maxprob) {
-             maxprob=value;
-             cout << "ir = " << ir << " maxProb= " << value << endl;
-          }
-       }
-       cout << "maxProb = " << maxprob << endl;
-    */
     p->initializePhaseSpace(getNDaug(), getDaugs());
     EvtVector4R D1 = p->getDaug(0)->getP4();
     EvtVector4R D2 = p->getDaug(1)->getP4();
@@ -158,29 +111,27 @@ namespace Belle2 {
     double value;
     value = calDalEva(P1, P2, P3);
     setProb(value);
+    return;
 
-    return ;
   }
 
-  double EvtD0TopipiEta::calDalEva(double P1[], double P2[], double P3[])
+  double EvtDTopipi0Eta::calDalEva(double P1[], double P2[], double P3[])
   {
-    //pi- pi+ eta
+    //pi+ pi0 eta
     //0: non-resonance
     //1: resonance, RBW
     //2: resonance, GS
     //3: resonance, Flatte
     //4: rho-omega mxing for omega
-    EvtComplex PDF[6];
+    EvtComplex PDF[3];
     EvtComplex cof, pdf, module;
     double value;
-    PDF[0] = Spin_factor(P1, P2, P3, 1, 2, mrho, Grho); // rho eta
-    PDF[1] = Spin_factor(P1, P2, P3, 1, 4, mrho, Grho); // rho-omega mixing
-    PDF[2] = Spin_factor(P1, P3, P2, 0, 3, ma0,  Ga0);  // a0- pi+
-    PDF[3] = Spin_factor(P2, P3, P1, 0, 3, ma0,  Ga0);  // a0+ pi-
-    PDF[4] = Spin_factor(P2, P3, P1, 2, 0, 1.698,  0.265);  // pi+ eta 2+ non-res
+    PDF[0] = Spin_factor(P1, P2, P3, 1, 2, mrho, Grho); // rho+ eta
+    PDF[1] = Spin_factor(P1, P3, P2, 0, 30, ma0,  Ga0);  // a0+ pi0
+    PDF[2] = Spin_factor(P2, P3, P1, 0, 31, ma0,  Ga0);  // a00 pi+
 
     pdf = EvtComplex(0.0, 0.0);
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 3; i++) {
       cof = EvtComplex(rho[i] * cos(phi[i]), rho[i] * sin(phi[i]));
       pdf = pdf + cof * PDF[i];
     }
@@ -189,7 +140,7 @@ namespace Belle2 {
     return (value <= 0) ? 1e-20 : value;
   }
 
-  EvtComplex EvtD0TopipiEta::Spin_factor(double P1[], double P2[], double P3[], int spin, int flag, double mass_R, double width_R)
+  EvtComplex EvtDTopipi0Eta::Spin_factor(double P1[], double P2[], double P3[], int spin, int flag, double mass_R, double width_R)
   {
     //D-> R P3, R->P1 P2, 0: non-resonance 1: resonance, RBW 2: resonance, GS 3: resonance, Flatte 4: rho-omega mxing for omega
     double R[4], s[3], sp2, B[2];
@@ -203,15 +154,21 @@ namespace Belle2 {
     sp2 = dot(P3, P3);
 
     EvtComplex amp, prop, prop1, prop2;
-
-    //-----------for prop-------------------------
     EvtComplex rhokk, rhopieta;
     if (spin == 0) {
       if (flag == 0) prop = one;
       if (flag == 1) prop = propagatorRBW(mass_R, width_R, s[0], s[1], s[2], 3.0, 0);
-      if (flag == 3) {
+      if (flag == 30) {
         rhokk = Flatte_rhoab(s[0], snk, sck);
         rhopieta = Flatte_rhoab(s[0], scpi, seta);
+        prop = 1.0 / (mass_R * mass_R - s[0] - ci * (0.341 * rhopieta + 0.341 * 0.892 * rhokk));
+      }
+      if (flag == 31) {
+        double qKsK;
+        qKsK = 0.25 * (s[0] + 3.899750596e-03) * (s[0] + 3.899750596e-03) / s[0] - 0.497614 * 0.497614;
+        if (qKsK > 0) rhokk = 2.0 * sqrt(qKsK / s[0]) * one;
+        if (qKsK < 0) rhokk = 2.0 * sqrt(qKsK / s[0]) * ci;
+        rhopieta = Flatte_rhoab(s[0], snpi, seta);
         prop = 1.0 / (mass_R * mass_R - s[0] - ci * (0.341 * rhopieta + 0.341 * 0.892 * rhokk));
       }
       amp = prop;
@@ -261,7 +218,7 @@ namespace Belle2 {
     return amp;
   }
 
-  double EvtD0TopipiEta::dot(double* a1, double* a2)
+  double EvtDTopipi0Eta::dot(double* a1, double* a2)
   {
     double Dot = 0;
     for (int i = 0; i != 4; i++) {
@@ -270,14 +227,14 @@ namespace Belle2 {
     return Dot;
   }
 
-  double EvtD0TopipiEta::Qabcs(double sa, double sb, double sc)
+  double EvtDTopipi0Eta::Qabcs(double sa, double sb, double sc)
   {
     double Qabcs = (sa + sb - sc) * (sa + sb - sc) / (4 * sa) - sb;
     if (Qabcs < 0) Qabcs = 1e-16;
     return Qabcs;
   }
 
-  double EvtD0TopipiEta::barrier(double l, double sa, double sb, double sc, double r, double mass)
+  double EvtDTopipi0Eta::barrier(double l, double sa, double sb, double sc, double r, double mass)
   {
     double sa0 = mass * mass;
     double q0 = Qabcs(sa0, sb, sc);
@@ -294,7 +251,7 @@ namespace Belle2 {
     return F;
   }
 
-  void EvtD0TopipiEta::calt1(double daug1[], double daug2[], double t1[])
+  void EvtDTopipi0Eta::calt1(double daug1[], double daug2[], double t1[])
   {
     double p, pq;
     double pa[4], qa[4];
@@ -309,7 +266,7 @@ namespace Belle2 {
     }
   }
 
-  void EvtD0TopipiEta::calt2(double daug1[], double daug2[], double t2[][4])
+  void EvtDTopipi0Eta::calt2(double daug1[], double daug2[], double t2[][4])
   {
     double p, r;
     double pa[4], t1[4];
@@ -326,7 +283,7 @@ namespace Belle2 {
     }
   }
 
-  double EvtD0TopipiEta::wid(double mass, double sa, double sb, double sc, double r, int l)
+  double EvtDTopipi0Eta::wid(double mass, double sa, double sb, double sc, double r, int l)
   {
     double widm(0.), q(0.), q0(0.);
     double sa0 = mass * mass;
@@ -345,39 +302,41 @@ namespace Belle2 {
     return widm;
   }
 
-  EvtComplex EvtD0TopipiEta::propagatorRBW(double mass, double width, double sa, double sb, double sc, double r, int l)
+  EvtComplex EvtDTopipi0Eta::propagatorRBW(double mass, double width, double sa, double sb, double sc, double r, int l)
   {
     EvtComplex prop = 1.0 / (mass * mass - sa - ci * mass * width * wid(mass, sa, sb, sc, r, l));
     return prop;
   }
 
-  double EvtD0TopipiEta::h(double m, double q)
+  double EvtDTopipi0Eta::h(double m, double q)
   {
-    double h(0.);
-    h = 2 / pi * q / m * log((m + 2 * q) / (2 * mpi));
+    double h = 2.0 / pi * q / m * log((m + 2 * q) / (0.13957 + 0.134976));
     return h;
   }
 
-  double EvtD0TopipiEta::dh(double mass, double q0)
+  double EvtDTopipi0Eta::dh(double mass, double q0)
   {
     double dh = h(mass, q0) * (1.0 / (8 * q0 * q0) - 1.0 / (2 * mass * mass)) + 1.0 / (2 * pi * mass * mass);
     return dh;
   }
 
-  double EvtD0TopipiEta::f(double mass, double sx, double q0, double q)
+  double EvtDTopipi0Eta::f(double mass, double sx, double q0, double q)
   {
     double m = sqrt(sx);
     double f = mass * mass / (pow(q0, 3)) * (q * q * (h(m, q) - h(mass, q0)) + (mass * mass - sx) * q0 * q0 * dh(mass, q0));
     return f;
   }
 
-  double EvtD0TopipiEta::d(double mass, double q0)
+  double EvtDTopipi0Eta::d(double mass, double q0)
   {
-    double d = 3.0 / pi * spi / (q0 * q0) * log((mass + 2 * q0) / (2 * mpi)) + mass / (2 * pi * q0) - (spi * mass) / (pi * pow(q0, 3));
+    double cmpi = 0.5 * (0.13957 + 0.134976);
+    double mpi2 = cmpi * cmpi;
+    double d = 3.0 / pi * mpi2 / (q0 * q0) * log((mass + 2 * q0) / (2 * cmpi)) + mass / (2 * pi * q0) - (mpi2 * mass) / (pi * pow(q0,
+               3));
     return d;
   }
 
-  EvtComplex EvtD0TopipiEta::propagatorGS(double mass, double width, double sa, double sb, double sc, double r, int l)
+  EvtComplex EvtDTopipi0Eta::propagatorGS(double mass, double width, double sa, double sb, double sc, double r, int l)
   {
     double q = Qabcs(sa, sb, sc);
     double sa0 = mass * mass;
@@ -389,22 +348,21 @@ namespace Belle2 {
     return prop;
   }
 
-  EvtComplex EvtD0TopipiEta::Flatte_rhoab(double sa, double sb, double sc)
+  EvtComplex EvtDTopipi0Eta::Flatte_rhoab(double sa, double sb, double sc)
   {
     double q = (sa + sb - sc) * (sa + sb - sc) / (4 * sa) - sb;
-    EvtComplex rhoo;
+    EvtComplex rho_val;
     if (q > 0) {
-      rhoo = 2.0 * sqrt(q / sa) * one;
+      rho_val = 2.0 * sqrt(q / sa) * one;
     }
     if (q < 0) {
-      rhoo = 2.0 * sqrt(-q / sa) * ci;
+      rho_val = 2.0 * sqrt(-q / sa) * ci;
     }
-    return rhoo;
+    return rho_val;
   }
 
-  EvtComplex EvtD0TopipiEta::propagatorFlatte(double mass, double width, double sx, double* sb, double* sc)
+  EvtComplex EvtDTopipi0Eta::propagatorFlatte(double mass, double width __attribute__((unused)), double sx, double* sb, double* sc)
   {
-    (void)width;
     const double g1sq = 0.5468 * 0.5468;
     const double g2sq = 0.23 * 0.23;
     EvtComplex rho1 = Flatte_rhoab(sx, sb[0], sc[0]);
@@ -412,4 +370,5 @@ namespace Belle2 {
     EvtComplex prop = 1.0 / (mass * mass - sx - ci * (g1sq * rho1 + g2sq * rho2));
     return prop;
   }
-} // Belle 2 Namespace
+
+} // Belle2 namespace

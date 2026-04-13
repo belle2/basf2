@@ -1,6 +1,6 @@
 // Model: EvtD0Topippim2pi0
 // This file is an amplitude model for D0 -> pi+ pi- pi0 pi0.
-// The model is from the BESIII Collaboration in Chin. Phys. C 48, 083001 (2024). DOI:&nbsp;https://doi.org/10.1088/1674-1137/ad3d4d
+// The model is from the BESIII Collaboration in Chin. Phys. C 48, 083001 (2024). DOI:&nbsp; https://doi.org/10.1088/1674-1137/ad3d4d
 //
 // Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
 //
@@ -273,12 +273,13 @@ namespace Belle2 {
 
   std::vector<double> EvtD0Topippim2pi0::sum_tensor(std::vector<double> pa, std::vector<double> pb)
   {
-    if (pa.size() != pb.size()) {
-      std::cout << "error sum tensor" << std::endl;
-      exit(0);
-    }
+    //if (pa.size() != pb.size()) {
+    //  std::cout << "error sum tensor" << std::endl;
+    //  exit(0);
+    //}
+
     std::vector<double> temp; temp.clear();
-    for (int i = 0; i < pa.size(); i++) {
+    for (size_t i = 0; i < pa.size(); i++) {
       double sum = pa[i] + pb[i];
       temp.push_back(sum);
     }
@@ -507,6 +508,7 @@ namespace Belle2 {
       std::cout << "rank>2: please add it by yourself!!!" << std::endl;
       exit(0);
     }
+    return std::vector<double>();
   }
 
 // projection Tensor
@@ -632,7 +634,6 @@ namespace Belle2 {
 
   double EvtD0Topippim2pi0::fundecaymomentum2(double mr2, double m1_2, double m2_2)
   {
-    double mr = sqrt(mr2);
     double poly = mr2 * mr2 + m1_2 * m1_2 + m2_2 * m2_2 - 2 * m1_2 * mr2 - 2 * m2_2 * mr2 - 2 * m1_2 * m2_2;
     double ret = poly / (4.0f * mr2);
     if (poly < 0)
@@ -660,7 +661,7 @@ namespace Belle2 {
     double t = sqrt(q / q0);
     //printf("sa0 = %f, sb = %f, sc = %f, q = %f, q0 = %0.15f, qq0 = %f, t = %f \n",sa0,sb,sc,q,q0,q/q0,t);
     uint i = 0;
-    for (i = 0; i < (2 * l + 1); i++) {
+    for (i = 0; i < static_cast<uint>(2 * l + 1); i++) {
       widm *= t;
     }
     widm *= (mass / m * F * F);
@@ -688,7 +689,6 @@ namespace Belle2 {
 
   std::complex<double> EvtD0Topippim2pi0::irho(double mr2, double m1_2, double m2_2)
   {
-    double mr = sqrt(mr2);
     double poly = mr2 * mr2 + m1_2 * m1_2 + m2_2 * m2_2 - 2 * m1_2 * mr2 - 2 * m2_2 * mr2 - 2 * m1_2 * m2_2;
     double ret_real = 0;
     double ret_imag = 0;
@@ -728,7 +728,6 @@ namespace Belle2 {
 
   std::complex<double> EvtD0Topippim2pi0::RBW(double mx2, double mr, double wr, double m1_2, double m2_2, double r, int l)
   {
-    double mx  = sqrt(mx2);
     double mr2 = mr * mr;
     double denom_real = mr2 - mx2;
     double denom_imag = 0;
@@ -1183,8 +1182,7 @@ namespace Belle2 {
   {
 
     double rhoijx;
-    double rhoijy;
-    double mpi = 0.13957;
+    double rhoijy = 0.0;
     if (i == j && i == 0) {
       double m2 = 0.13957 * 0.13957;
       if ((1 - (4 * m2) / s) > 0) {
@@ -1223,7 +1221,6 @@ namespace Belle2 {
       double m_1 = 0.547862;
       double m_2 = 0.95778;
       double mp2 = (m_1 + m_2) * (m_1 + m_2);
-      double mm2 = (m_1 - m_2) * (m_1 - m_2);
       if ((1 - mp2 / s) > 0) {
         rhoijx = sqrt(1.0f - mp2 / s);
         rhoijy = 0;
@@ -1260,7 +1257,6 @@ namespace Belle2 {
 
     double eps   = 1e-11;
 
-    double down[5]   = { 0, 0, 0, 0, 0};
     double upreal[5] = { 0, 0, 0, 0, 0};
     double upimag[5] = { 0, 0, 0, 0, 0};
 
@@ -1561,8 +1557,6 @@ namespace Belle2 {
     double FINVx[5] = {0, 0, 0, 0, 0};
     double FINVy[5] = {0, 0, 0, 0, 0};
 
-    double tmpFLAG = FINVMTX(sa, FINVx, FINVy);
-
     if (l < 5) {
       double g[5][5] = {{ 0.22889, -0.55377, 0.00000, -0.39899, -0.34639},
         { 0.94128, 0.55095, 0.00000, 0.39065, 0.31503},
@@ -1666,7 +1660,6 @@ namespace Belle2 {
     double M2_PipPimPi02 = contract_11_0(PipPimPi02, PipPimPi02);
     double M2_PipPi01Pi02 = contract_11_0(PipPi01Pi02, PipPi01Pi02);
     double M2_PimPi01Pi02 = contract_11_0(PimPi01Pi02, PimPi01Pi02);
-    double M2_D0 = contract_11_0(D0, D0);
 
     std::complex<double> GS_rho770_pm = GS(M2_PipPim,  m0_rho7700, w0_rho7700, m2_Pi, m2_Pi, rRes, 1);
     std::complex<double> GS_rho770_p1 = GS(M2_PipPi01, m0_rho770p, w0_rho770p, m2_Pi, m2_Pi0, rRes, 1);
@@ -1676,7 +1669,6 @@ namespace Belle2 {
     std::complex<double> GS_rho1450_m1 = GS(M2_PimPi01, m0_rho1450, w0_rho1450, m2_Pi, m2_Pi0, rRes, 1);
     std::complex<double> GS_rho1450_m2 = GS(M2_PimPi02, m0_rho1450, w0_rho1450, m2_Pi, m2_Pi0, rRes, 1);
 
-    std::complex<double> FT_f0980_pm = Flatte(M2_PipPim, m0_f0980, g1_f0980, g2_f0980, m_Pi, m_Pi, m_Ka, m_Ka);
     std::complex<double> FT_f0980_00 = Flatte(M2_Pi01Pi02, m0_f0980, g1_f0980, g2_f0980, m_Pi, m_Pi, m_Ka, m_Ka);
     std::complex<double> RBW_f21270_pm = RBW(M2_PipPim, m0_f21270, w0_f21270, m2_Pi, m2_Pi, rRes, 2);
     std::complex<double> RBW_f21270_00 = RBW(M2_Pi01Pi02, m0_f21270, w0_f21270, m2_Pi0, m2_Pi0, rRes, 2);
@@ -1699,12 +1691,9 @@ namespace Belle2 {
     std::complex<double> RBW_a11260_02 = RBWa1260(M2_PipPimPi02, m0_a11260, g1_a11260, g2_a11260);
 
     std::complex<double> RBW_a11420_p = RBW(M2_PipPi01Pi02, m0_a11420, w0_a11420, -1, -1, -1, -1);
-    std::complex<double> RBW_a11420_m = RBW(M2_PimPi01Pi02, m0_a11420, w0_a11420, -1, -1, -1, -1);
 
     std::complex<double> RBW_a11640_p = RBWa1640(M2_PipPi01Pi02, m0_a11640, w0_a11640);
     std::complex<double> RBW_a11640_m = RBWa1640(M2_PimPi01Pi02, m0_a11640, w0_a11640);
-    std::complex<double> RBW_a11420_01 = RBWa1640(M2_PipPimPi01, m0_a11420, w0_a11420);
-    std::complex<double> RBW_a11420_02 = RBWa1640(M2_PipPimPi02, m0_a11420, w0_a11420);
 
     std::complex<double> RBW_omega_01 = RBW(M2_PipPimPi01, m0_omega, w0_omega, -1, -1, -1, -1);
     std::complex<double> RBW_omega_02 = RBW(M2_PipPimPi02, m0_omega, w0_omega, -1, -1, -1, -1);
@@ -2135,7 +2124,7 @@ namespace Belle2 {
     return temp;
   }
 
-  double EvtD0Topippim2pi0::AmplitudeSquare(int charm, int tagmode)
+  double EvtD0Topippim2pi0::AmplitudeSquare(int Charm, int Tagmode)
   {
 
     EvtVector4R dp1 = GetDaugMomLab(0), dp2 = GetDaugMomLab(1), dp3 = GetDaugMomLab(2), dp4 = GetDaugMomLab(3); // pi+ pi- pi0 pi0
@@ -2164,7 +2153,7 @@ namespace Belle2 {
     setInput(p4pip, p4pim, p4pi01, p4pi02);
     CalAmp();
     std::complex<double> ampD0, ampDb;
-    if (charm > 0) {
+    if (Charm > 0) {
       ampD0 = Get_AmpD0();
       ampDb = Get_AmpDb();
     } else {
@@ -2175,16 +2164,16 @@ namespace Belle2 {
     double ampsq = 1e-20;
     double r_tag = 0, R_tag = 0, delta_tag = 0;
 
-    if (tagmode == 1 || tagmode == 2 || tagmode == 3) {
-      if (tagmode == 1) { // Kpi
+    if (Tagmode == 1 || Tagmode == 2 || Tagmode == 3) {
+      if (Tagmode == 1) { // Kpi
         r_tag = 0.0586;
         R_tag = 1;
         delta_tag = 192.1 / 180.0 * 3.1415926;
-      } else if (tagmode == 2) { // Kpipi0
+      } else if (Tagmode == 2) { // Kpipi0
         r_tag = 0.0441;
         R_tag = 0.79;
         delta_tag = 196.0 / 180.0 * 3.1415926;
-      } else if (tagmode == 3) { // K3pi
+      } else if (Tagmode == 3) { // K3pi
         r_tag = 0.0550;
         R_tag = 0.44;
         delta_tag = 161.0 / 180.0 * 3.1415926;

@@ -1,21 +1,8 @@
-// Model: EvtDsToKKpi
-// This file is an amplitude model for Ds+ -> K- K+ pi+.
-// The model is from the BESIII Collaboration in PRD 104, 012016 (2021). DOI:&nbsp;https://doi.org/10.1103/PhysRevD.104.012016
-//
-// Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
-//
-// Please cite the original reference for any public/published results where this model was used.
 
-//#ifndef EVTD0TOKPIPIPI_HH
-//#define EVTD0TOKPIPIPI_HH
 #pragma once
-
 #include "EvtGenBase/EvtDecayProb.hh"
-
-// Added by Jiyuan Zhang
 #include "EvtGenBase/EvtDecayAmp.hh"
 #include "EvtGenBase/EvtParticle.hh"
-//class EvtParticle;
 #include <fstream>
 
 namespace Belle2 {
@@ -25,7 +12,6 @@ namespace Belle2 {
 
     EvtDsToKKpi() {}
     virtual ~EvtDsToKKpi();
-    //void getName(std::string& name);
     std::string getName();
     EvtDecayBase* clone();
     void init();

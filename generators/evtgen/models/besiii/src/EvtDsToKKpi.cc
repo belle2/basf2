@@ -1,36 +1,23 @@
-// Model: EvtDsToKKpi
-// This file is an amplitude model for Ds+ -> K- K+ pi+.
-// The model is from the BESIII Collaboration in PRD 104, 012016 (2021). DOI:&nbsp;https://doi.org/10.1103/PhysRevD.104.012016
+//--------------------------------------------------------------------------
 //
-// Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
+// Model: EvtDsToKKpi
+// This file is an amplitude model for Ds+ -> K+ K- pi+.
+// The model is from PRD 104, 012016 (2021). DOI: https://doi.org/10.1103/PhysRevD.104.012016
+//
+// Permission to use these files in basf2 was generously granted by the BESIII Collaboration.
 //
 // Please cite the original reference for any public/published results where this model was used.
-
+//
+// Modified by : Jiyuan Zhang
+//
 //--------------------------------------------------------------------------
-// Environment:
-//      This software is part of the EvtGen package developed jointly
-//      for the BaBar and CLEO collaborations.  If you use all or part
-//      of it, please give an appropriate acknowledgement.
-//
-// Copyright Information: See EvtGen/COPYRIGHT
-//      Copyright (C) 1998      Caltech, UCSB
-//
-// Module: EvtDsToKKpi.cc
-//
-// Description: PRD 104, 012016 (2021)
-//
-// Modification history:
-//    Liaoyuan Dong    Sun Jun 02 01:23:25 2024    Module created
-//------------------------------------------------------------------------
 
-//Added by Jiyuan Zhang
 #include <iomanip>
 #include <cmath>
 #include <string>
 #include "EvtGenBase/EvtCPUtil.hh"
 #include "EvtGenBase/EvtTensor4C.hh"
 
-// Already present
 #include "EvtGenBase/EvtPatches.hh"
 #include <fstream>
 #include <stdlib.h>
@@ -45,7 +32,6 @@
 #include "EvtGenBase/EvtFlatte.hh"
 #include "EvtGenBase/EvtDecayTable.hh"
 
-// Added by Jiyuan Zhang
 #include <generators/evtgen/EvtGenModelRegister.h>
 #include "generators/evtgen/models/besiii/EvtDsToKKpi.h"
 
@@ -56,9 +42,6 @@ namespace Belle2 {
 
   EvtDsToKKpi::~EvtDsToKKpi() {}
 
-// void EvtDsToKKpi::getName(std::string& model_name){
-//    model_name="DsToKKpi";
-// }
   std::string EvtDsToKKpi::getName()
   {
     return "DsToKKpi";
@@ -71,7 +54,6 @@ namespace Belle2 {
 
   void EvtDsToKKpi::init()
   {
-    // check that there are 0 arguments
     checkNArg(0);
     checkNDaug(3);
     checkSpinParent(EvtSpinType::SCALAR);
@@ -79,7 +61,6 @@ namespace Belle2 {
     checkSpinDaughter(1, EvtSpinType::SCALAR);
     checkSpinDaughter(2, EvtSpinType::SCALAR);
 
-    //std::cout << "Initializing EvtDsToKKpi" << std::endl;
 
     phi[0] = 0;
     phi[1] = 6.1944e+00;
@@ -117,11 +98,6 @@ namespace Belle2 {
     modetype[5] = 5;
 
 
-    ////std::cout << "DsToKKpi :"<< std::endl;
-    ////for (int i=0; i<6; i++) {
-    ////   std::cout << i << " rho= " << rho[i] << " phi= " << phi[i] << std::endl;
-    ////}
-
     mD = 1.86484;
     mDs = 1.96835;
     rRes = 1.5;
@@ -150,29 +126,6 @@ namespace Belle2 {
 
   void EvtDsToKKpi::decay(EvtParticle* p)
   {
-    /*
-       double maxprob = 0.0;
-       //std::cout<<" calculate maxprob for DsToKKpi: "<<std::endl;
-       for(int ir=0;ir<=60000000;ir++){
-          p->initializePhaseSpace(getNDaug(),getDaugs());
-          EvtVector4R D1 = p->getDaug(0)->getP4();
-          EvtVector4R D2 = p->getDaug(1)->getP4();
-          EvtVector4R D3 = p->getDaug(2)->getP4();
-          double P1[4], P2[4], P3[4];
-          P1[1] = D1.get(1); P1[2] = D1.get(2); P1[3] = D1.get(3);
-          P2[1] = D2.get(1); P2[2] = D2.get(2); P2[3] = D2.get(3);
-          P3[1] = D3.get(1); P3[2] = D3.get(2); P3[3] = D3.get(3);
-          double value;
-          int g0[6]={1,1,1,1,1,1};
-          int nstates=6;
-          calEvaMy( P1, P2, P3, mass, width, rho, phi, g0, modetype, nstates, value);
-          if(value>maxprob) {
-              maxprob=value;
-              //std::cout << "Max PDF = " << ir << " " << maxprob << std::endl;
-          }
-       }
-       //printf("MAXprob = %.10f\n",maxprob);
-    */
     p->initializePhaseSpace(getNDaug(), getDaugs());
     EvtVector4R D1 = p->getDaug(0)->getP4();
     EvtVector4R D2 = p->getDaug(1)->getP4();
@@ -211,14 +164,12 @@ namespace Belle2 {
       p23[u] = pKp[u] + pPi[u];
       pD[u] = pKp[u] + pKm[u] + pPi[u];
     }
-    double cof[2], amp_tmp1[2], amp_tmp[2], amp_PDF[2], PDF[2]; // Removed unused amp_tmp2[2]
-    // Removed unused variables: rrho = 3.0, ra1 = 3.0
-    //----------------------------------------------------
+    double cof[2], amp_tmp1[2], amp_tmp[2], amp_PDF[2], PDF[2];
     amp_PDF[0] = 0;
     amp_PDF[1] = 0;
     PDF[0] = 0;
     PDF[1] = 0;
-    double temp_PDF, tmp1; // Removed unused: tmp2, temp[2], pro0[2], pro1[2], t1D[4], t2D[4][4], t1Tm[4]
+    double temp_PDF, tmp1;
     double pro[2], B[3];
     double t1kstr1[4], t1phi1020[4], t1D1[4], t1D2[4];
 
@@ -239,15 +190,12 @@ namespace Belle2 {
     calt1(pKstr, pKp, t1D1);
     calt1(pPhi1020, pPi, t1D2);
 
-    // Removed unused: double mDs_local=sqrt(sD);
     for (int i = 0; i < nstates; i++) {
-      // Removed unused: int d=0;
       amp_tmp[0] = 0;
       amp_tmp[1] = 0;
       amp_tmp1[0] = 0;
       amp_tmp1[1] = 0;
       tmp1 = 0;
-      // Removed unused: tmp2 = 0;
       temp_PDF = 0;
       cof[0] = amp[i] * cos(phase[i]);
       cof[1] = amp[i] * sin(phase[i]);
@@ -255,8 +203,6 @@ namespace Belle2 {
         //a0(980) and f0(980) mixture
         double amp_a0[2] = {0};
         double sa0_980 = sF0_980;
-        // Removed unused: sKp2[2]={sKp,mass_Pion*mass_Pion}, sKma2[2]={sKm,mass_Eta*mass_Eta}
-        //propagatora0980(mass1[i],sa0_980,sKp2,sKma2,pro);
         MIP_LineShape(sa0_980, pro);
         B[0] = barrier(0, sa0_980, sKp, sKm, rRes);
         temp_PDF = 1;
@@ -274,14 +220,12 @@ namespace Belle2 {
         bool neo = true;
         if (neo) {
           double sBC = SCADot(p23, p23);
-          //if(g0[i] == 1) propagatorRBW(mass1[i],width1[i],sKstr,sKm,sPi,rRes,1,pro);
           if (g0[i] == 1) propagatorRBWNeoKstr892(mass1[i], width1[i], sKstr, sPi, sKm, rRes, 1, pro);
           B[0] = barrierNeo(1, sKstr, sPi, sKm, rRes, mass1[i]);
           B[1] = barrierNeoDs(1, sD, sKstr, sKp, rD, mDs, mass1[i]);
           temp_PDF = (sBC - sPhi1020 + ((sD - sKp) * (sKm - sPi) / (sKstr)));
         } else {
           if (g0[i] == 1) propagatorRBW(mass1[i], width1[i], sKstr, sKm, sPi, rRes, 1, pro);
-          //Com_Multi(pro0,pro1,pro);
           B[0] = barrier(1, sKstr, sKm, sPi, rRes);
           B[1] = barrier(1, sD, sKstr, sKp, rD);
           for (int m = 0; m < 4; m++) {
@@ -294,20 +238,10 @@ namespace Belle2 {
         amp_tmp1[0] = tmp1 * pro[0];
         amp_tmp1[1] = tmp1 * pro[1];
       } else if (modetype_param[i] == 1) {
-        //Phi1020 Pi v
         if (g0[i] == 0) {
           pro[0] = 1;
           pro[1] = 0;
         }
-        /*if(g0[i] == 1) propagatorRBW(mass1[i],width1[i],sPhi1020,sKm,sKp,rRes,1,pro);
-          B[0]=barrier(1,sPhi1020,sKp,sKm,rRes);
-          B[1]=barrier(1,sD,sPhi1020,sPi,rD);
-          for(int i=0; i<4; i++){
-          for(int j=0; j<4; j++){
-          temp_PDF += t1D2[i]*t1phi1020[j]*G[i][j];
-          }
-          }
-          tmp1 = temp_PDF*B[0]*B[1];*/
         bool neo = true;
         if (neo) {
           if (g0[i] == 1) propagatorRBWNeo(mass1[i], width1[i], sPhi1020, sKm, sKp, rRes, 1, pro);
@@ -325,60 +259,38 @@ namespace Belle2 {
             }
           }
         }
-        //Com_Multi(pro0,pro1,pro);
 
         tmp1 = temp_PDF * B[0] * B[1];
         amp_tmp1[0] = tmp1 * pro[0];
         amp_tmp1[1] = tmp1 * pro[1];
       } else if (modetype_param[i] == 3) {
         //Kstr1430 K S
-        /**
-         * Normal Model
-         * */
-        //if(g0[i] == 1) propagatorRBW(mass1[i],width1[i],sKstr1430,sKm,sPi,rRes,0,pro);
-        //propagatorRBWNeo(mass1[i],width1[i],sKstr1430,sKm,sPi,rRes,0,pro);
         double sKm2[2] = {sKm, mass_EtaP * mass_EtaP};
         double sPi2[2] = {sPi, mass_Kaon * mass_Kaon};
         propagatorKstr1430(mass1[i], sKstr1430, sKm2, sPi2, pro);
-        //Com_Multi(pro0,pro1,pro);
         B[0] = barrier(0, sPhi1020, sKp, sKm, rRes);
         tmp1 = 1 * B[0];
         amp_tmp1[0] = tmp1 * pro[0];
         amp_tmp1[1] = tmp1 * pro[1];
 
-        /**
-         * KPi-S wave LASS
-         * */
-        /*amp_tmp1[0]=Amp_KPiS1[0];
-          amp_tmp1[1]=Amp_KPiS1[1];*/
-
-
       } else if (modetype_param[i] == 4) {
-        //f0(1710) Pi+  S
         if (g0[i] == 1) propagatorRBWNeo(mass1[i], width1[i], sF0_1710, sKp, sKm, rRes, 0, pro);
-        //if(g0[i] == 1) propagatorRBW(mass1[i],width1[i],sF0_1710,sKp,sKm,rRes,0,pro);
         if (g0[i] == 0) {
           pro[0] = 1;
           pro[1] = 0;
         }
-        //Com_Multi(pro0,pro1,pro);
         B[0] = barrier(0, sF0_1710, sKp, sKm, rRes);
         temp_PDF = 1;
         tmp1 = temp_PDF * B[0];
         amp_tmp1[0] = tmp1 * pro[0];
         amp_tmp1[1] = tmp1 * pro[1];
-        /*amp_tmp1[0]=Amp_KPiS1[0];
-          amp_tmp1[1]=Amp_KPiS1[1];*/
-        // Removed unused: const bool debug89=false;
       } else if (modetype_param[i] == 5) {
         //f0(1370) Pi+  S
         if (g0[i] == 1) propagatorRBWNeo(mass1[i], width1[i], sF0_1370, sKp, sKm, rRes, 0, pro);
-        //if(g0[i] == 1) propagatorRBW(mass1[i],width1[i],sF0_1370,sKp,sKm,rRes,0,pro);
         if (g0[i] == 0) {
           pro[0] = 1;
           pro[1] = 0;
         }
-        //Com_Multi(pro0,pro1,pro);
         B[0] = barrier(0, sF0_1370, sKp, sKm, rRes);
         tmp1 = 1 * B[0];
         amp_tmp1[0] = tmp1 * pro[0];
@@ -387,17 +299,14 @@ namespace Belle2 {
       amp_tmp[0] = amp_tmp1[0];
       amp_tmp[1] = amp_tmp1[1];
       Com_Multi(amp_tmp, cof, amp_PDF);
-      //printf("Line: %u @ %u modetype[%d]=%d amp_tmp[0]=%f amp_tmp[1]=%f cof[0]=%f cof[1]=%f \n",__LINE__,__FILE__,i,modetype_param[i],amp_tmp[0],amp_tmp[1],cof[0],cof[1]);
       PDF[0] += amp_PDF[0];
       PDF[1] += amp_PDF[1];
-      // Removed unused: double valTmp=amp_PDF[0] * amp_PDF[0] + amp_PDF[1] * amp_PDF[1];
     }
 
     double value = PDF[0] * PDF[0] + PDF[1] * PDF[1];
     if (value <= 0) {
       value = 1e-20;
     }
-    //printf("Line: %u @ %u value=%f\n",__LINE__,__FILE__,value);
     Result = value;
   }
 
@@ -434,7 +343,6 @@ namespace Belle2 {
   {
     double pAB = ((sa - sb - sc) * (sa - sb - sc) / 4.0 - (sb * sc)) / sa;
     double pR = ((mR * mR - sb - sc) * (mR * mR - sb - sc) / 4.0 - (sb * sc)) / (mR * mR);
-    // Removed unused: double q = (sa+sb-sc)*(sa+sb-sc)/(4*sa)-sb;
     double zAB = pAB * r * r;
     double zR = pR * r * r;
     double F = 0.0;
@@ -447,7 +355,6 @@ namespace Belle2 {
   {
     double pAB = ((sa - sb - sc) * (sa - sb - sc) / 4.0 - (sb * sc)) / sa;
     double pR = ((sa - mb * mb - sc) * (sa - mb * mb - sc) / 4.0 - (mb * mb * sc)) / (mR * mR);
-    // Removed unused: double q = (sa+sb-sc)*(sa+sb-sc)/(4*sa)-sb;
     double zAB = pAB * r * r;
     double zR = pR * r * r;
     double F = 0.0;
@@ -488,8 +395,7 @@ namespace Belle2 {
     }
   }
 //-------------------prop--------------------------------------------
-  void EvtDsToKKpi::propagator(double mass_param, double width_param, double sx,
-                               double prop[2])  // Renamed mass->mass_param, width->width_param to avoid shadowing member variables
+  void EvtDsToKKpi::propagator(double mass_param, double width_param, double sx, double prop[2])
   {
     double a[2], b[2];
     a[0] = 1;
@@ -498,8 +404,7 @@ namespace Belle2 {
     b[1] = -mass_param * width_param;
     Com_Divide(a, b, prop);
   }
-  double EvtDsToKKpi::wid(double mass_param, double sa, double sb, double sc, double r,
-                          int l)  // Renamed mass->mass_param to avoid shadowing member variable
+  double EvtDsToKKpi::wid(double mass_param, double sa, double sb, double sc, double r, int l)
   {
     double widm = 0.;
     double q = 0.;
@@ -510,7 +415,6 @@ namespace Belle2 {
     if (q < 0) q = 1e-16;
     q0 = (sa0 + sb - sc) * (sa0 + sb - sc) / (4 * sa0) - sb;
     if (q0 < 0) q0 = 1e-16;
-    //  double F = barrier(l,sa,sb,sc,r);
     double z = q * r * r;
     double z0 = q0 * r * r;
     double F = 0;
@@ -522,11 +426,9 @@ namespace Belle2 {
     return widm;
   }
 
-  void  EvtDsToKKpi::Flatte_rhoab(double sa, double sb, double sc,
-                                  double rho_param[2]) // Renamed rho->rho_param to avoid shadowing member variable
+  void  EvtDsToKKpi::Flatte_rhoab(double sa, double sb, double sc, double rho_param[2])
   {
     double q = (sa + sb - sc) * (sa + sb - sc) / (4 * sa) - sb;
-    // Removed unused: double b[2];
     if (q > 0) {
       rho_param[0] = 2 * sqrt(q / sa);
       rho_param[1] = 0;
@@ -537,7 +439,7 @@ namespace Belle2 {
   }
 
   void EvtDsToKKpi::propagatorFlatte(double mass_param, double width_param __attribute__((unused)), double sx, double* sb, double* sc,
-                                     double prop[2]) // Renamed mass->mass_param, width->width_param to avoid shadowing member variables
+                                     double prop[2])
   {
     double unit[2] = {1.0};
     double ci[2] = {0, 1};
@@ -558,8 +460,7 @@ namespace Belle2 {
     double tmp4[2] = {mass_param* mass_param - sx - tmp31[0], -1.0 * tmp3[1]};
     Com_Divide(unit, tmp4, prop);
   }
-  void EvtDsToKKpi::propagator980(double mass_param, double sx, double* sb, double* sc,
-                                  double prop[2]) // Renamed mass->mass_param to avoid shadowing member variable
+  void EvtDsToKKpi::propagator980(double mass_param, double sx, double* sb, double* sc, double prop[2])
   {
     double unit[2] = {1.0};
     double ci[2] = {0, 1};
@@ -581,8 +482,7 @@ namespace Belle2 {
     Com_Divide(unit, tmp4, prop);
   }
 
-  void EvtDsToKKpi::propagatora0980(double mass_param, double sx, double* sb, double* sc,
-                                    double prop[2]) // Renamed mass->mass_param to avoid shadowing member variable
+  void EvtDsToKKpi::propagatora0980(double mass_param, double sx, double* sb, double* sc, double prop[2])
   {
     double unit[2] = {1.0};
     double ci[2] = {0, 1};
@@ -604,8 +504,7 @@ namespace Belle2 {
     Com_Divide(unit, tmp4, prop);
   }
 
-  void EvtDsToKKpi::propagatorKstr1430(double mass_param, double sx, double* sb, double* sc,
-                                       double prop[2]) // Renamed mass->mass_param to avoid shadowing member variable
+  void EvtDsToKKpi::propagatorKstr1430(double mass_param, double sx, double* sb, double* sc, double prop[2])
   {
     double unit[2] = {1.0};
     double ci[2] = {0, 1};
@@ -628,7 +527,7 @@ namespace Belle2 {
   }
 
   void EvtDsToKKpi::propagatorRBW(double mass_param, double width_param, double sa, double sb, double sc, double r, int l,
-                                  double prop[2])  // Renamed mass->mass_param, width->width_param to avoid shadowing member variables
+                                  double prop[2])
   {
     double a[2], b[2];
     a[0] = 1;
@@ -639,7 +538,7 @@ namespace Belle2 {
   }
 
   void EvtDsToKKpi::propagatorRBWNeo(double mass_param, double width_param, double sa, double sb, double sc,
-                                     double r __attribute__((unused)), int l, double prop[2])  // Renamed mass->mass_param, width->width_param; marked r as unused
+                                     double r __attribute__((unused)), int l, double prop[2])
   {
     double a[2], b[2];
     a[0] = 1;
@@ -651,7 +550,7 @@ namespace Belle2 {
     double pR = sqrt(((mass_param * mass_param - sb - sc) * (mass_param * mass_param - sb - sc) / 4.0 - (sb * sc)) /
                      (mass_param * mass_param));
     double fR = sqrt(1.0 + 1.5 * 1.5 * pR * pR) / sqrt(1.0 + 1.5 * 1.5 * pAB * pAB);
-    double power = 1; // 默认值
+    double power = 1;
     if (!l) {
       power = 1;
       fR = 1;
@@ -664,7 +563,7 @@ namespace Belle2 {
   }
 
   void EvtDsToKKpi::propagatorRBWNeoKstr892(double mass_param, double width_param, double sa, double sb, double sc,
-                                            double r __attribute__((unused)), int l, double prop[2])  // Renamed mass->mass_param, width->width_param; marked r as unused
+                                            double r __attribute__((unused)), int l, double prop[2])
   {
     double a[2], b[2];
     a[0] = 1;
@@ -676,7 +575,7 @@ namespace Belle2 {
     double pR = sqrt(((mass_param * mass_param - sb - sc) * (mass_param * mass_param - sb - sc) / 4.0 - (sb * sc)) /
                      (mass_param * mass_param));
     double fR = sqrt(1.0 + 1.5 * 1.5 * pR * pR) / sqrt(1.0 + 1.5 * 1.5 * pAB * pAB);
-    double power = 1; // 默认值
+    double power = 1;
     if (!l) {
       power = 1;
     } else if (l == 1) {
@@ -693,21 +592,20 @@ namespace Belle2 {
     double h = 2 / math_pi * q / m * log((m + 2 * q) / (2 * mass_Pion));
     return h;
   }
-  double EvtDsToKKpi::dh(double mass_param, double q0)  // Renamed mass->mass_param to avoid shadowing member variable
+  double EvtDsToKKpi::dh(double mass_param, double q0)
   {
     double dh = h(mass_param, q0) * (1.0 / (8 * q0 * q0) - 1.0 / (2 * mass_param * mass_param)) + 1.0 /
                 (2 * math_pi * mass_param * mass_param);
     return dh;
   }
-  double EvtDsToKKpi::f(double mass_param, double sx, double q0,
-                        double q)  // Renamed mass->mass_param to avoid shadowing member variable
+  double EvtDsToKKpi::f(double mass_param, double sx, double q0, double q)
   {
     double m = sqrt(sx);
     double f = mass_param * mass_param / (pow(q0, 3)) * (q * q * (h(m, q) - h(mass_param,
                                                          q0)) + (mass_param * mass_param - sx) * q0 * q0 * dh(mass_param, q0));
     return f;
   }
-  double EvtDsToKKpi::d(double mass_param, double q0)  // Renamed mass->mass_param to avoid shadowing member variable
+  double EvtDsToKKpi::d(double mass_param, double q0)
   {
     double d = 3.0 / math_pi * mass_Pion * mass_Pion / (q0 * q0) * log((mass_param + 2 * q0) / (2 * mass_Pion)) + mass_param /
                (2 * math_pi * q0)
@@ -717,7 +615,7 @@ namespace Belle2 {
 
 //rho
   void EvtDsToKKpi::propagatorGS(double mass_param, double width_param, double sa, double sb, double sc, double r, int l,
-                                 double prop[2])  // Renamed mass->mass_param, width->width_param to avoid shadowing member variables
+                                 double prop[2])
   {
     double a[2], b[2];
     double q = (sa + sb - sc) * (sa + sb - sc) / (4 * sa) - sb;

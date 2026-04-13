@@ -101,7 +101,7 @@ namespace Belle2 {
     }
   }
 
-  unsigned int CalibObjManager::getHighestIndexObject(const string& name, const TDirectory* dir) const
+  unsigned int CalibObjManager::getHighestIndexObject(const string& name, const TDirectory* dir)
   {
     unsigned int index = 0;
     // Try from the list of objects

@@ -193,8 +193,6 @@ namespace Belle2 {
       "N_g_1GeV_1",
       "N_g_2GeV_1",
       "TSFL1_count",
-      "slot64b_TOP_int_1",
-      "slot64b_TOP_int_0",
       "map_TSF3_int_1",
       "map_TSF3_int_0",
       "map_TSF1_int_1",

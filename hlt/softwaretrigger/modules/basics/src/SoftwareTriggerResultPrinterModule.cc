@@ -48,6 +48,7 @@ void SoftwareTriggerResultPrinterModule::terminate()
     B2FATAL("Could not open debug output file. Aborting.");
   }
   auto debugTTree = std::make_unique<TTree>("software_trigger_results", "software_trigger_results");
+  // cppcheck-suppress knownConditionTrueFalse
   if (not debugTTree) {
     B2FATAL("Could not create debug output tree. Aborting.");
   }

@@ -10,6 +10,7 @@
 #include <klm/modules/KLMClustersReconstructor/KLMClustersReconstructorModule.h>
 
 /* KLM headers. */
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
@@ -25,18 +26,38 @@ REG_MODULE(KLMClustersReconstructor);
 
 KLMClustersReconstructorModule::KLMClustersReconstructorModule() : Module(),
   m_PositionMode(c_FirstLayer),
-  m_ClusterMode(c_AnyHit)
+  m_ClusterMode(c_AnyHit),
+  m_RemoveOutlierHits(false),
+  m_OutlierRemovalMethod(c_OutlierTrim),
+  m_OutlierTrimAngle(0.12),
+  m_OutlierRemovalMaxIterations(5)
 {
   setDescription("Unified BKLM/EKLM module for the reconstruction of KLMClusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("ClusteringAngle", m_ClusteringAngle, "Clustering angle (rad).",
            0.26);
   addParam("PositionMode", m_PositionModeString,
-           "Vertex position calculation mode ('FullAverage' or 'FirstLayer').",
+           "Vertex position mode: 'FullAverage', 'FirstLayer', 'FirstTwoLayers', "
+           "or 'SuccessiveTwoLayers'.",
            std::string("FirstLayer"));
   addParam("ClusterMode", m_ClusterModeString,
            "Clusterization mode ('AnyHit' or 'FirstHit').",
            std::string("AnyHit"));
+  addParam("RemoveOutlierHits", m_RemoveOutlierHits,
+           "If true, remove angular outliers after clustering (hits re-enter the pool). "
+           "If false, behavior matches the original algorithm.",
+           false);
+  addParam("OutlierRemovalMethod", m_OutlierRemovalMethodString,
+           "Used only if removeOutlierHits: 'Trim' (one pass vs innermost hit) or "
+           "'Iterative' (trim vs centroid, repeated).",
+           std::string("Trim"));
+  addParam("OutlierTrimAngle", m_OutlierTrimAngle,
+           "Used only if removeOutlierHits: keep hits with opening angle to the "
+           "reference direction below this value (rad).",
+           0.12);
+  addParam("OutlierRemovalMaxIterations", m_OutlierRemovalMaxIterations,
+           "Used only if removeOutlierHits and OutlierRemovalMethod is 'Iterative'.",
+           5);
 }
 
 KLMClustersReconstructorModule::~KLMClustersReconstructorModule()
@@ -52,6 +73,10 @@ void KLMClustersReconstructorModule::initialize()
     m_PositionMode = c_FullAverage;
   else if (m_PositionModeString == "FirstLayer")
     m_PositionMode = c_FirstLayer;
+  else if (m_PositionModeString == "FirstTwoLayers")
+    m_PositionMode = c_FirstTwoLayers;
+  else if (m_PositionModeString == "SuccessiveTwoLayers")
+    m_PositionMode = c_SuccessiveTwoLayers;
   else
     B2FATAL("Incorrect PositionMode argument.");
   if (m_ClusterModeString == "AnyHit")
@@ -60,6 +85,14 @@ void KLMClustersReconstructorModule::initialize()
     m_ClusterMode = c_FirstHit;
   else
     B2FATAL("Incorrect ClusterMode argument.");
+  if (m_RemoveOutlierHits) {
+    if (m_OutlierRemovalMethodString == "Trim")
+      m_OutlierRemovalMethod = c_OutlierTrim;
+    else if (m_OutlierRemovalMethodString == "Iterative")
+      m_OutlierRemovalMethod = c_OutlierIterative;
+    else
+      B2FATAL("Incorrect OutlierRemovalMethod (use 'Trim' or 'Iterative').");
+  }
 }
 
 void KLMClustersReconstructorModule::beginRun()
@@ -69,6 +102,85 @@ void KLMClustersReconstructorModule::beginRun()
 static bool compareDistance(const KLMHit2d* hit1, const KLMHit2d* hit2)
 {
   return hit1->getPosition().R() < hit2->getPosition().R();
+}
+
+static KLMHit2d* hitWithMinR(const std::vector<KLMHit2d*>& hits)
+{
+  KLMHit2d* best = hits[0];
+  double bestR = best->getPosition().R();
+  for (size_t k = 1; k < hits.size(); k++) {
+    double r = hits[k]->getPosition().R();
+    if (r < bestR) {
+      bestR = r;
+      best = hits[k];
+    }
+  }
+  return best;
+}
+
+void KLMClustersReconstructorModule::applyOutlierRemoval(std::vector<KLMHit2d*>& clusterHits,
+                                                         std::vector<KLMHit2d*>& poolHits)
+{
+  if (!m_RemoveOutlierHits || clusterHits.size() <= 1)
+    return;
+
+  const std::vector<KLMHit2d*> before = clusterHits;
+  std::vector<KLMHit2d*> inliers;
+
+  if (m_OutlierRemovalMethod == c_OutlierTrim) {
+    const ROOT::Math::XYZVector ref = hitWithMinR(clusterHits)->getPosition();
+    for (KLMHit2d* h : clusterHits) {
+      if (ROOT::Math::VectorUtil::Angle(h->getPosition(), ref) <= m_OutlierTrimAngle)
+        inliers.push_back(h);
+    }
+  } else {
+    inliers = clusterHits;
+    const std::vector<KLMHit2d*> originalBackup = inliers;
+    for (int iter = 0; iter < m_OutlierRemovalMaxIterations; iter++) {
+      ROOT::Math::XYZVector ref;
+      if (iter == 0) {
+        ref = hitWithMinR(inliers)->getPosition();
+      } else {
+        ROOT::Math::XYZVector sum{0, 0, 0};
+        for (KLMHit2d* h : inliers)
+          sum = sum + h->getPosition();
+        ref = sum * (1.0 / inliers.size());
+      }
+      std::vector<KLMHit2d*> next;
+      for (KLMHit2d* h : inliers) {
+        if (ROOT::Math::VectorUtil::Angle(h->getPosition(), ref) <= m_OutlierTrimAngle)
+          next.push_back(h);
+      }
+      if (next.empty()) {
+        inliers = originalBackup;
+        break;
+      }
+      if (next.size() == inliers.size())
+        break;
+      inliers = std::move(next);
+    }
+  }
+
+  if (inliers.size() == before.size())
+    return;
+  if (inliers.empty())
+    return;
+
+  std::vector<KLMHit2d*> outliers;
+  for (KLMHit2d* h : before) {
+    bool keep = false;
+    for (KLMHit2d* k : inliers) {
+      if (h == k) {
+        keep = true;
+        break;
+      }
+    }
+    if (!keep)
+      outliers.push_back(h);
+  }
+  clusterHits.swap(inliers);
+  poolHits.insert(poolHits.end(), outliers.begin(), outliers.end());
+  sort(poolHits.begin(), poolHits.end(), compareDistance);
 }
 
 void KLMClustersReconstructorModule::event()
@@ -128,27 +240,107 @@ void KLMClustersReconstructorModule::event()
       ++it;
 clusterFound:;
     }
+    if (m_RemoveOutlierHits)
+      applyOutlierRemoval(klmClusterHits, klmHit2ds);
     ROOT::Math::XYZVector clusterPosition{0, 0, 0};
     for (i = 0; i < nLayersBKLM; i++)
       layerHitsBKLM[i] = 0;
     for (i = 0; i < nLayersEKLM; i++)
       layerHitsEKLM[i] = 0;
-    /* Find minimal time, fill layer array, find hit position. */
-    it0 = klmClusterHits.begin();
-    nHits = 0;
+    minTime = -1;
+    /* Minimal time and per-layer hit counts. */
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
-      if (((*it)->getSubdetector() == (*it0)->getSubdetector() &&
-           (*it)->getLayer() == (*it0)->getLayer()) ||
-          m_PositionMode == c_FullAverage) {
-        clusterPosition = clusterPosition + (*it)->getPosition();
-        nHits++;
-      }
       if (minTime < 0 || (*it)->getTime() < minTime)
         minTime = (*it)->getTime();
       if ((*it)->getSubdetector() == KLMElementNumbers::c_BKLM)
         layerHitsBKLM[(*it)->getLayer() - 1]++;
       else
         layerHitsEKLM[(*it)->getLayer() - 1]++;
+    }
+    it0 = klmClusterHits.begin();
+    nHits = 0;
+    if (m_PositionMode == c_FullAverage) {
+      for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
+        clusterPosition = clusterPosition + (*it)->getPosition();
+        nHits++;
+      }
+    } else {
+      int selSubdet[2];
+      int selLayer[2];
+      int selCount = 0;
+      if (m_PositionMode == c_FirstLayer) {
+        selSubdet[0] = (*it0)->getSubdetector();
+        selLayer[0] = (*it0)->getLayer();
+        selCount = 1;
+      } else if (m_PositionMode == c_FirstTwoLayers) {
+        for (i = 0; i < nLayersBKLM && selCount < 2; i++) {
+          if (layerHitsBKLM[i] > 0) {
+            selSubdet[selCount] = KLMElementNumbers::c_BKLM;
+            selLayer[selCount] = i + 1;
+            selCount++;
+          }
+        }
+        for (i = 0; i < nLayersEKLM && selCount < 2; i++) {
+          if (layerHitsEKLM[i] > 0) {
+            selSubdet[selCount] = KLMElementNumbers::c_EKLM;
+            selLayer[selCount] = i + 1;
+            selCount++;
+          }
+        }
+        if (selCount == 0) {
+          selSubdet[0] = (*it0)->getSubdetector();
+          selLayer[0] = (*it0)->getLayer();
+          selCount = 1;
+        }
+      } else if (m_PositionMode == c_SuccessiveTwoLayers) {
+        bool foundPair = false;
+        for (i = 0; i < nLayersBKLM - 1; i++) {
+          if (layerHitsBKLM[i] > 0 && layerHitsBKLM[i + 1] > 0) {
+            selSubdet[0] = KLMElementNumbers::c_BKLM;
+            selLayer[0] = i + 1;
+            selSubdet[1] = KLMElementNumbers::c_BKLM;
+            selLayer[1] = i + 2;
+            selCount = 2;
+            foundPair = true;
+            break;
+          }
+        }
+        if (!foundPair) {
+          for (i = 0; i < nLayersEKLM - 1; i++) {
+            if (layerHitsEKLM[i] > 0 && layerHitsEKLM[i + 1] > 0) {
+              selSubdet[0] = KLMElementNumbers::c_EKLM;
+              selLayer[0] = i + 1;
+              selSubdet[1] = KLMElementNumbers::c_EKLM;
+              selLayer[1] = i + 2;
+              selCount = 2;
+              foundPair = true;
+              break;
+            }
+          }
+        }
+        if (!foundPair) {
+          selSubdet[0] = (*it0)->getSubdetector();
+          selLayer[0] = (*it0)->getLayer();
+          selCount = 1;
+        }
+      }
+      for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
+        int sd = (*it)->getSubdetector();
+        int ly = (*it)->getLayer();
+        bool use = false;
+        for (i = 0; i < selCount; i++) {
+          if (sd == selSubdet[i] && ly == selLayer[i]) {
+            use = true;
+            break;
+          }
+        }
+        if (use) {
+          clusterPosition = clusterPosition + (*it)->getPosition();
+          nHits++;
+        }
+      }
+      if (nHits == 0)
+        B2FATAL("KLMClustersReconstructor: no hits for vertex position.");
     }
     clusterPosition = clusterPosition * (1.0 / nHits);
     /* Find innermost layer. */

@@ -385,6 +385,8 @@ namespace Belle2 {
       e_map_TSF1_int_1,
       e_map_TSF1_int_0,
       e_N_ST,
+      e_map_ST_int_1,
+      e_map_ST_int_0,
       e_ml_tau_nn_output_2,
       e_ml_tau_nn_output_1,
       map_ST_int_1,

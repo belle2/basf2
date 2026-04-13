@@ -25,7 +25,7 @@ namespace Belle2 {
 
   public:
 
-    static constexpr int m_kNGroups = 3;
+    static constexpr int m_kNGroups = 3; /**< SL grouping: inner (SL0), middle (SL1), outer (SL2–8) */
 
     /**
     * Constructor: Sets the description, the properties and the parameters of the algorithm.

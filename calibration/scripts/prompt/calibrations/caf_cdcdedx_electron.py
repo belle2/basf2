@@ -128,6 +128,7 @@ def get_calibrations(input_data, **kwargs):
     if calib_mode == "full":
         calibration_procedure = {
             "rungain0": 0,  # Run Gain trail (No Payload saving and take of effect of previous rungains)
+            "wiregain0": 0,  # WireGain Gain Pre (No Payload saving)
             "timegain0": 0,  # Injection time gain Pre (No payload saving)
             "timegain1": 0,  # Injection time gain
             "rungain1": 0,  # Run Gain Pre (No Payload saving)
@@ -135,7 +136,7 @@ def get_calibrations(input_data, **kwargs):
             "coscorr0": 0,  # Cosine Corr Gain Pre (No Payload saving)
             "cosedge0": 0,  # Cosine edge Corr Gain
             "badwire0": 0,  # Bad wire
-            "wiregain0": 0,  # WireGain Gain
+            "wiregain1": 0,  # WireGain Gain
             "onedcell0": 0,  # OneD cell correction
             "coslayer1": 0,  # Cosine Corr Gain layer dependent (No Payload saving)
             "coscorr1": 0,  # Cosine Corr Gain
@@ -151,7 +152,7 @@ def get_calibrations(input_data, **kwargs):
             "coscorr1": 0,
             "cosedge0": 0,
             "badwire0": 0,
-            "wiregain0": 0,
+            "wiregain1": 0,
             "rungain2": 0,
             "validation0": 0
         }
@@ -215,7 +216,8 @@ def get_calibrations(input_data, **kwargs):
                 cals[i].strategies = SequentialBoundaries
                 for algorithm in cals[i].algorithms:
                     algorithm.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
-                if calib_keys[i] == "coscorr0" or calib_keys[i] == "coslayer0" or calib_keys[i] == "coslayer1":
+                if (calib_keys[i] == "coscorr0" or calib_keys[i] == "coslayer0" or calib_keys[i] == "coslayer1"
+                        or calib_keys[i] == "wiregain0"):
                     cals[i].save_payloads = False
 
         else:

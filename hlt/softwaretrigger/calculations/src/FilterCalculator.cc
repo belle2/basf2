@@ -401,7 +401,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   //------------------------------------------------------------
   //..Store the "C" track calculations
   for (short charge : { -1, 1}) {
-    auto& maximumPcmsTrackC = maximumPCmsTracksC.at(charge);
+    const auto& maximumPcmsTrackC = maximumPCmsTracksC.at(charge);
     if (not maximumPcmsTrackC) {
       continue;
     }
@@ -583,7 +583,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
 
   // -- Bhabha and two-photon lepton preparation -- //
   for (short charge : { -1, 1}) {
-    auto& maximumPtTrack = maximumPtTracks.at(charge);
+    const auto& maximumPtTrack = maximumPtTracks.at(charge);
     if (not maximumPtTrack) {
       continue;
     }

@@ -386,10 +386,9 @@ namespace Belle2 {
       e_map_TSF3_int_0,
       e_map_TSF1_int_1,
       e_map_TSF1_int_0,
+      e_N_ST,
       e_ml_tau_nn_output_2,
       e_ml_tau_nn_output_1,
-      e_map_ST_int_1,
-      e_map_ST_int_0,
       e_map_veto_int_1,
       e_map_veto_int_0,
       e_map_TSF4_int_1,
@@ -779,15 +778,11 @@ namespace Belle2 {
       if (leafID == e_N_g_1GeV_1) return store->get_N_g_1GeV(1);
       if (leafID == e_N_g_2GeV_1) return store->get_N_g_2GeV(1);
       if (leafID == e_TSFL1_count) return store->get_TSFL1_count();
-      if (leafID == e_slot64b_TOP_int_1) return store->get_slot64b_TOP_int_1();
-      if (leafID == e_slot64b_TOP_int_0) return store->get_slot64b_TOP_int_0();
       if (leafID == e_map_TSF3_int_1) return store->get_map_TSF3_int(1);
       if (leafID == e_map_TSF3_int_0) return store->get_map_TSF3_int(0);
       if (leafID == e_map_TSF1_int_1) return store->get_map_TSF1_int(1);
       if (leafID == e_map_TSF1_int_0) return store->get_map_TSF1_int(0);
       if (leafID == e_N_ST) return store->get_N_ST();
-      if (leafID == e_map_ST2_int_1) return store->get_map_ST2_int(1);
-      if (leafID == e_map_ST2_int_0) return store->get_map_ST2_int(0);
       if (leafID == e_map_ST_int_1) return store->get_map_ST_int(1);
       if (leafID == e_map_ST_int_0) return store->get_map_ST_int(0);
       if (leafID == e_map_veto_int_1) return store->get_map_veto_int(1);

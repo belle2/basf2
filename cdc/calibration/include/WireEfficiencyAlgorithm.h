@@ -27,24 +27,28 @@ namespace Belle2 {
       /// Constructor.
       WireEfficiencyAlgorithm();
       /// Destructor.
-      ~WireEfficiencyAlgorithm() {}
-
+      ~WireEfficiencyAlgorithm() { delete m_efficiencyList; }
       /// Set name for histogram output
       void setHistFileName(const std::string& name) {m_outputFileName = "histWireEff_" + name + ".root";}
+      /// Set the average occupancy threshold
+      void setAverageOccupancyThreshold(const float threshold) { m_averageOccupancyThreshold = threshold; };
     protected:
       /// Run algo on data.
       EResult calibrate() override;
-      ///create 2D TEfficiency for each wire and return True if more than 1000 entries
-      bool buildEfficiencies();
+      /// check if there is enough data to run the calibration
+      bool hasEnoughData();
+      /// create 2D TEfficiency for each wire
+      void buildEfficiencies();
       /// detects bad wires.
       void detectBadWires();
       /// chitest
       double chiTest(TGraphAsymmErrors* graph1, TGraphAsymmErrors* graph2, double minVale, double maxValue);
     private:
+      float m_averageOccupancyThreshold = 4000.0; /**< Threshold for the average layer occupancy to run the calibration */
       TList* m_efficiencyList = new TList(); /**< TList of efficiencies */
       std::string m_outputFileName = "wire_efficiencies.root"; /**< name of the output file */
       DBObjPtr<CDCGeometry> m_cdcGeo; /**< Geometry of CDC */
-      CDCBadWires* m_badWireList = new CDCBadWires(); /**< BadWireList that willbe built */
+      CDCBadWires* m_badWireList = nullptr; /**< BadWireList that willbe built */
     };
 
 

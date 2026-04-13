@@ -475,7 +475,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     const bool electron = zmva > 0.5 and selectedCluster.isTrack;
 
     //..For 1 track radiative Bhabha control sample
-    if (selectedCluster.energyCMS > 2. and selectedCluster.isTrack) {
+    if (selectedCluster.energyCMS > 2. && selectedCluster.isTrack) {
       calculationResult["chrgClust2GeV"] += 1;
     }
     if (selectedCluster.energyCMS > 0.45 and not selectedCluster.isTrack) {
@@ -594,7 +594,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     }
 
     // single muon
-    if (maximumPtTrack->pCMS > 3 and maximumPtTrack->clusterEnergySumLab > 0. and maximumPtTrack->clusterEnergySumLab < 1.) {
+    if (maximumPtTrack->pCMS > 3 && maximumPtTrack->clusterEnergySumLab > 0. && maximumPtTrack->clusterEnergySumLab < 1.) {
       calculationResult["singleMuon"] = 1;
     }
   }
@@ -661,9 +661,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     }
 
     //..Veto two photon fusion lepton pairs
-    if ((pmissTheta < 20. or pmissTheta > 160.) and
-        ((calculationResult["maximumPCMS"] < 1.2 and dphi > 150.) or
-         (calculationResult["maximumPCMS"] < 2. and 175. < dphi))) {
+    if ((pmissTheta < 20. || pmissTheta > 160.) &&
+        ((calculationResult["maximumPCMS"] < 1.2 && dphi > 150.) ||
+         (calculationResult["maximumPCMS"] < 2. && 175. < dphi))) {
       calculationResult["eexx"] = 1;
     }
 
@@ -892,7 +892,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       const ROOT::Math::PxPyPzEVector trackP4CMS = track.p4CMS;
       const ROOT::Math::PxPyPzEVector pi0P4CMS = firstCluster.p4CMS + secondCluster.p4CMS;
 
-      const bool passPi0ECMS = pi0P4CMS.E() > 1. and pi0P4CMS.E() < 0.525 * p4ofCOM.M();
+      const bool passPi0ECMS = pi0P4CMS.E() > 1. && pi0P4CMS.E() < 0.525 * p4ofCOM.M();
       const double thetaSumCMS = (pi0P4CMS.Theta() + trackP4CMS.Theta()) * TMath::RadToDeg();
       const bool passThetaSum = thetaSumCMS < 170. or thetaSumCMS > 190.;
 
@@ -902,16 +902,16 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       }
       const bool passdPhi = dphiCMS > 160.;
 
-      if (passPi0ECMS and passThetaSum and passdPhi and pi0P4CMS.M() < 0.7) {
+      if (passPi0ECMS && passThetaSum && passdPhi && pi0P4CMS.M() < 0.7) {
         calculationResult["singleTagLowMass"] = 1;
-      } else if (passPi0ECMS and passThetaSum and passdPhi and pi0P4CMS.M() > 0.7) {
+      } else if (passPi0ECMS && passThetaSum && passdPhi && pi0P4CMS.M() > 0.7) {
         calculationResult["singleTagHighMass"] = 1;
       }
     }
   }
 
   //..Updated to use new track definitions
-  if (calculationResult["nTrkLooseB"] == 1 and calculationResult["maximumPCMSB"] > 0.8 and selectedClusters.size() >= 2) {
+  if (calculationResult["nTrkLooseB"] == 1 && calculationResult["maximumPCMSB"] > 0.8 && selectedClusters.size() >= 2) {
 
     decltype(selectedClusters) selectedSingleTagClusters(selectedClusters.size());
     auto lastItem = std::copy_if(selectedClusters.begin(), selectedClusters.end(), selectedSingleTagClusters.begin(),
@@ -934,7 +934,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       const ROOT::Math::PxPyPzEVector trackP4CMS = track.p4CMS;
       const ROOT::Math::PxPyPzEVector pi0P4CMS = firstCluster.p4CMS + secondCluster.p4CMS;
 
-      const bool passPi0ECMS = pi0P4CMS.E() > 1. and pi0P4CMS.E() < 0.525 * p4ofCOM.M();
+      const bool passPi0ECMS = pi0P4CMS.E() > 1. && pi0P4CMS.E() < 0.525 * p4ofCOM.M();
       const double thetaSumCMS = (pi0P4CMS.Theta() + trackP4CMS.Theta()) * TMath::RadToDeg();
       const bool passThetaSum = thetaSumCMS < 170. or thetaSumCMS > 190.;
 
@@ -944,9 +944,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       }
       const bool passdPhi = dphiCMS > 160.;
 
-      if (passPi0ECMS and passThetaSum and passdPhi and pi0P4CMS.M() < 0.7) {
+      if (passPi0ECMS && passThetaSum && passdPhi && pi0P4CMS.M() < 0.7) {
         calculationResult["singleTagLowMassB"] = 1;
-      } else if (passPi0ECMS and passThetaSum and passdPhi and pi0P4CMS.M() > 0.7) {
+      } else if (passPi0ECMS && passThetaSum && passdPhi && pi0P4CMS.M() > 0.7) {
         calculationResult["singleTagHighMassB"] = 1;
       }
     }

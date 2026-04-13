@@ -39,7 +39,7 @@ void TestingModule::initialize()
 
   std::cout << "initialize" << std::endl;
 
-  Belle2::TrackingUtilities::StoreWrappedObjPtr< std::vector<unsigned int> > storeVector("TestBadBoardsVector");
+  Belle2::TrackingUtilities::StoreWrappedObjPtr< std::vector<unsigned int> > storeVector("BadBoardsVector");
   storeVector.registerInDataStore();
 }
 
@@ -49,7 +49,7 @@ void TestingModule::beginRun()
 
 void TestingModule::event()
 {
-  Belle2::TrackingUtilities::StoreWrappedObjPtr< std::vector<unsigned int> > storeVector("TestBadBoardsVector");
+  Belle2::TrackingUtilities::StoreWrappedObjPtr< std::vector<unsigned int> > storeVector("BadBoardsVector");
 
   storeVector.create();
 

@@ -1,5 +1,5 @@
 /**************************************************************************
- * basf2 (Belle II Analysis oftware Framework)                           *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
  *                                                                        *
  * See git log for contributors and copyright holders.                    *
@@ -46,13 +46,6 @@ namespace Belle2 {
       void apply(std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
     private:
-      /// Helper function to identify jumps in the Super layer
-      // @param aCDCTrack reference to CDCTrack to be tested
-      // @param minJump minimum number of layers to be jumped to land in the list
-      // @return : list of SuperLayer jumps, where a jump is described by start and end board
-      std::vector< std::pair<unsigned short, unsigned short> > getListOfBadBoardCands(const TrackingUtilities::CDCTrack& aCDCTrack,
-          int minJump);
-
       /// Findlet to fill CDCTracks into lookup table (singleton) with clone information
       CDCMCCloneLookUpFiller m_mcCloneLookUpFiller;
 

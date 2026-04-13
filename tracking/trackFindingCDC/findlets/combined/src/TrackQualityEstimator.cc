@@ -20,6 +20,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/topology/CDCWire.h>
+#include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
 
 
 using namespace Belle2;
@@ -76,7 +77,13 @@ void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
       auto list = getListOfBadBoardCands(track, 5);
 
       // debug: dummy vector with bad boards. Simulation did use 62 and 63 as bad boards
-      std::vector<unsigned int> badBoardList = {62, 63};
+      //std::vector<unsigned int> badBoardList = {62, 63};
+
+      Belle2::TrackingUtilities::StoreWrappedObjPtr< std::vector<unsigned int> > storeVector("TestBadBoardsVector");
+      std::vector<unsigned int>& badBoardList = *storeVector;
+
+      std::cout << "storevector " << std::endl;
+      for (auto i : badBoardList) std::cout << i << std::endl;
 
       std::cout << "list of layer jumps" << std::endl;
       for (auto& li : list) {
@@ -133,8 +140,8 @@ TrackQualityEstimator::getListOfBadBoardCands(const TrackingUtilities::CDCTrack&
       continue;
     }
 
-    int iclayerPrev = ((const CDCHit*)*prevHitPtr)->getICLayer();
-    int iclayerThis = ((const CDCHit*)thisHit)->getICLayer();
+    Belle2::CDC::ILayer iclayerPrev = ((const CDCHit*)*prevHitPtr)->getICLayer(); // signed short
+    Belle2::CDC::ILayer iclayerThis = ((const CDCHit*)thisHit)->getICLayer();
 
     if (abs(iclayerPrev - iclayerThis) >= minJump) {
       double sPrevious = prevHitPtr->getArcLength2D();
@@ -145,13 +152,16 @@ TrackQualityEstimator::getListOfBadBoardCands(const TrackingUtilities::CDCTrack&
       Vector3D pos3DThis = localHelix.atArcLength2D(sCurrent - arcLengthShift) + localOrigin;
 
       // direction in case of backcurling tracks
-      int dir = (iclayerThis - iclayerPrev) / abs(iclayerThis - iclayerPrev);
-      int newlayerThis = iclayerThis - dir * 2;
-      int newlayerPrev = iclayerPrev + dir * 2;
+      int dir = (iclayerThis - iclayerPrev) < 0 ? -1 : 1;
+      // jump 3 layers to get the onto next board
+      unsigned int newlayerThis = iclayerThis - dir * 3;
+      unsigned int newlayerPrev = iclayerPrev + dir * 3;
 
+      // find the wire number
       Belle2::CDC::IWire iWireThis = geometryPar.cellId(newlayerThis, pos3DThis);
       Belle2::CDC::IWire iWirePrev = geometryPar.cellId(newlayerPrev, pos3DPrev);
 
+      // get the board number
       auto boardThis = geometryPar.getBoardID(WireID(newlayerThis, iWireThis));
       auto boardPrev = geometryPar.getBoardID(WireID(newlayerPrev, iWirePrev));
 

@@ -3950,7 +3950,7 @@ Decay anti-B0
 
 0.27430729    anti-u  d  c  anti-d                         PYTHIA 23;
 0.04675983    anti-u  d  c  anti-d                         PYTHIA 65;
-0.02134689    anti-u  s  c  anti-d                         PYTHIA 63;
+0.02134689    anti-u  s  c  anti-d                         PYTHIA 63; # Need to update to PYTHIA 65
 0.01829735    anti-u  c  d  anti-d                         PYTHIA 23;
 0.00091486    anti-u  c  s  anti-d                         PYTHIA 23;
 # Try to crank up the psi production (Lange).

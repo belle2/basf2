@@ -208,7 +208,7 @@ namespace Belle2 {
 
     float m_logl[Const::PIDDetectors::c_size][Const::ChargedStable::c_SetSize]; /**< log likelihoods */
     Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
-    int m_CDCnLayerHitsUsed; /**< number of layers with measurements used in the CDC likelihood */
+    int m_CDCnLayerHitsUsed = -1; /**< number of layers with measurements used in the CDC likelihood */
 
     ClassDefOverride(PIDLikelihood, 6); /**< Collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM. */
     // version 6: add m_CDCnLayerHitsUsed

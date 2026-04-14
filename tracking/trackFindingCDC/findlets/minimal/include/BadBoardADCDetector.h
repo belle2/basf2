@@ -35,6 +35,9 @@ namespace Belle2 {
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
+      /// Initialization
+      void initialize() final;
+
       /// Main algorithm marking hit as background
       void apply(std::vector<TrackingUtilities::CDCWireHit>& wireHits) final;
 
@@ -42,6 +45,9 @@ namespace Belle2 {
 
       /// Min ADC value for the average
       int m_badADCaverageMin = 1000;
+
+      /// Max ADC value for the average
+      int m_badADCaverageMax = 0;
 
       /// Min TOT value for the average
       int m_badTOTaverageMin = 15;

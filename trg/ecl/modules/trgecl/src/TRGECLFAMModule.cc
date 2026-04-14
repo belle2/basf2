@@ -12,9 +12,9 @@
 #include <framework/logging/Logger.h>
 
 //trg package headers
-#include "trg/ecl/modules/trgecl/TRGECLFAMModule.h"
-#include "trg/ecl/TrgEclDigitizer.h"
-#include "trg/ecl/TrgEclFAMFit.h"
+#include <trg/ecl/modules/trgecl/TRGECLFAMModule.h>
+#include <trg/ecl/TrgEclDigitizer.h>
+#include <trg/ecl/TrgEclFAMFit.h>
 
 #include <iostream>
 

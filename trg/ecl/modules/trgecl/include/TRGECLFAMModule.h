@@ -17,13 +17,13 @@
 
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
-#include "trg/ecl/dataobjects/TRGECLFAMAna.h"
-#include "trg/ecl/dataobjects/TRGECLDigi0.h"
-#include "trg/ecl/dataobjects/TRGECLHit.h"
-#include "trg/ecl/dataobjects/TRGECLWaveform.h"
+#include <trg/ecl/dataobjects/TRGECLFAMAna.h>
+#include <trg/ecl/dataobjects/TRGECLDigi0.h>
+#include <trg/ecl/dataobjects/TRGECLHit.h>
+#include <trg/ecl/dataobjects/TRGECLWaveform.h>
 
-#include "trg/ecl/dbobjects/TRGECLFAMTCADCThreshold.h"
-#include "trg/ecl/dbobjects/TRGECLETMParameters.h"
+#include <trg/ecl/dbobjects/TRGECLFAMTCADCThreshold.h>
+#include <trg/ecl/dbobjects/TRGECLETMParameters.h>
 
 namespace Belle2 {
 

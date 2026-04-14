@@ -89,6 +89,17 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
     B2INFO("ROOT file created at: " << f->GetName());
     B2INFO("Full path: " << gSystem->WorkingDirectory() << "/" << f->GetName());
 
+    TH1D* hShiftMean  = new TH1D("hShiftMean",
+                                 Form("Fitted shift mean (%s);Bin;Mean (ns)", alg.Data()), 8, 0.5, 8.5);
+    TH1D* hShiftSigma = new TH1D("hShiftSigma",
+                                 Form("Fitted shift sigma (%s);Bin;Sigma (ns)", alg.Data()), 8, 0.5, 8.5);
+    for (int l = 3; l <= 6; l++)
+      for (int s = 0; s < 2; s++) {
+        int b = 2 * (l - 3) + s + 1;
+        hShiftMean ->GetXaxis()->SetBinLabel(b, TString::Format("L%dS%c", l, s == 0 ? 'U' : 'V'));
+        hShiftSigma->GetXaxis()->SetBinLabel(b, TString::Format("L%dS%c", l, s == 0 ? 'U' : 'V'));
+      }
+
     TString outPDF = Form("algorithm_svdClusterAbsoluteTimeShifter_%s_output_rev_%d.pdf", alg.Data(), cal_rev);
     TCanvas c1("c1", "c1", 640, 480);
     c1.Print(outPDF + "[");
@@ -267,6 +278,19 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
 
         shiftValues[binLabel] = 1. * int(1000. * fillShiftVal) / 1000.;
 
+        double fillSigmaVal;
+        if (isDoubleGausFitValid)
+          fillSigmaVal = (fn_doubleGaus->GetParameter(1) > 0.5 ?
+                          fn_doubleGaus->GetParameter(3) : fn_doubleGaus->GetParameter(5));
+        else if (isSingleGausFitValid)
+          fillSigmaVal = fn_singleGaus->GetParameter(2);
+        else
+          fillSigmaVal = hist->GetStdDev();
+
+        int binIdx = 2 * (layer - 3) + side + 1;
+        hShiftMean ->SetBinContent(binIdx, fillShiftVal);
+        hShiftSigma->SetBinContent(binIdx, fillSigmaVal);
+
         // Ensure the plot is visually restricted to [-50, 50] after all fitting and drawing
         hist->GetXaxis()->SetRangeUser(-50, 50);
         gPad->Range(-50, 0, 50, hist->GetMaximum() * 1.2);
@@ -298,6 +322,11 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
     f->cd();
 
     c1.Print(outPDF + "]");
+    f->cd();
+    hShiftMean->Write();
+    hShiftSigma->Write();
+    delete hShiftMean;
+    delete hShiftSigma;
     f->Close();
   } // loop over algorithms
 

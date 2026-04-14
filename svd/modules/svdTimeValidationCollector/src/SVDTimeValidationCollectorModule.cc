@@ -39,6 +39,11 @@ void SVDTimeValidationCollectorModule::prepare()
   auto hEventT0 = new TH1F("hEventT0", "EventT0", 300, -150, 150);
   registerObject<TH1F>("hEventT0", hEventT0);
 
+  auto hEventT0FromCDC = new TH1F("hEventT0FromCDC", "EventT0FromCDC", 300, -150, 150);
+  registerObject<TH1F>("hEventT0FromCDC", hEventT0FromCDC);
+  auto hEventT0FromSVD = new TH1F("hEventT0FromSVD", "EventT0FromSVD", 300, -150, 150);
+  registerObject<TH1F>("hEventT0FromSVD", hEventT0FromSVD);
+
   m_svdCls.isRequired(m_svdClusters);
   m_svdClsOnTrk.isRequired(m_svdClustersOnTracks);
   m_eventT0.isRequired(m_eventTime);
@@ -102,6 +107,8 @@ void SVDTimeValidationCollectorModule::prepare()
 void SVDTimeValidationCollectorModule::startRun()
 {
   getObjectPtr<TH1F>("hEventT0")->Reset();
+  getObjectPtr<TH1F>("hEventT0FromCDC")->Reset();
+  getObjectPtr<TH1F>("hEventT0FromSVD")->Reset();
   getObjectPtr<TH2F>("__hClsTimeOnTracks__")->Reset();
   getObjectPtr<TH2F>("__hClsTimeAll__")->Reset();
   getObjectPtr<TH2F>("__hClsDiffTimeOnTracks__")->Reset();
@@ -114,6 +121,18 @@ void SVDTimeValidationCollectorModule::collect()
   if (m_eventT0->hasEventT0()) {
     float eventT0 = m_eventT0->getEventT0();
     getObjectPtr<TH1F>("hEventT0")->Fill(eventT0);
+
+    // also get CDC and SVD T0
+    if (m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
+      auto evtT0CDC = m_eventT0->getBestCDCTemporaryEventT0();
+      getObjectPtr<TH1F>("hEventT0FromCDC")->Fill(evtT0CDC->eventT0);
+    } else {B2WARNING("Found no CDC event T0");}
+    if (m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD)) {
+      auto evtT0SVD = m_eventT0->getBestSVDTemporaryEventT0();
+      getObjectPtr<TH1F>("hEventT0FromSVD")->Fill(evtT0SVD->eventT0);
+    } else {B2WARNING("Found no SVD event T0");}
+
+
 
     // Fill histograms clusters on tracks
     for (const auto& svdCluster : m_svdClsOnTrk) {

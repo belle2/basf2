@@ -47,12 +47,19 @@ def run_validation(job_path, input_data_path=None, **kwargs):
 
     files = list(collector_output_dir.glob('**/CollectorOutput.root'))
 
+    print(f'Found {len(files)} files in {collector_output_dir}')
+    print(f'files: {[str(f) for f in files]}')
+
     agreements = {algo: {} for algo in vu.time_algorithms}
     precisions = {algo: {} for algo in vu.time_algorithms}
     discriminations = {algo: {} for algo in vu.time_algorithms}
     shift_agreements = {algo: {} for algo in vu.time_algorithms}
     entries_onTracks = {algo: {} for algo in vu.time_algorithms}
     entries_eventT0 = {algo: {} for algo in vu.time_algorithms}
+
+    #  agreements between cdc and svd t0
+    t0_agreements = {algo: {} for algo in vu.time_algorithms}
+    t0_differences = {algo: {} for algo in vu.time_algorithms}
 
     roc_U = {algo: {} for algo in vu.time_algorithms}
     roc_V = {algo: {} for algo in vu.time_algorithms}
@@ -92,9 +99,14 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                 # if some histogram is empty (too little stat) do not crash but skip that file for that calibration
                 try:
                     entries_eventT0_ = histos['eventT0'].GetEntries()
+
                     if run not in entries_eventT0[algo] or entries_eventT0_ > entries_eventT0[algo][run]:
                         agreements[algo][run] = {key: vu.get_agreement(histos['eventT0'], h_diff)
                                                  for key, h_diff in histos['diff'].items()}
+
+                        t0_agreements[algo][run] = vu.get_agreement2(histos['CDCeventT0'], histos['SVDeventT0'], min_entries=10)
+                        t0_differences[algo][run] = vu.get_difference(histos['SVDeventT0'], histos['CDCeventT0'], min_entries=10)
+
                         precisions[algo][run] = {key: vu.get_precision(h_diff)
                                                  for key, h_diff in histos['diff'].items()}
                         discriminations[algo][run] = {key: vu.get_roc_auc(histos['onTracks'][key], histos['offTracks'][key])
@@ -194,6 +206,8 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         dd[f'shift_agreement_{algo}'] = [shift_agreements[algo][run][side] for run, side in zip(dd['run'], dd['name'])]
         dd[f'entries_onTracks_{algo}'] = [entries_onTracks[algo][run][side] for run, side in zip(dd['run'], dd['name'])]
         dd[f'entries_eventT0_{algo}'] = [entries_eventT0[algo][run] for run, side in zip(dd['run'], dd['name'])]
+        dd[f'T0_agreement_{algo}'] = [t0_agreements[algo][run] for run, side in zip(dd['run'], dd['name'])]
+        dd[f'T0_difference_{algo}'] = [t0_differences[algo][run] for run, side in zip(dd['run'], dd['name'])]
 
     # Make ROC plots
     for run in runs:
@@ -216,7 +230,6 @@ def run_validation(job_path, input_data_path=None, **kwargs):
 
     df = pd.DataFrame(dd)
     df.to_pickle(output_dir / 'df.pkl')
-
     # df = pd.read_pickle('df.pkl')
 
     print('Making combined plots')
@@ -285,6 +298,19 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         plt.savefig(output_dir / f'entries_eventT0_{algo}.pdf')
         plt.close()
 
+        for metric in ['agreement', 'difference']:
+            plt.figure(figsize=(6.4*max(2, total_length/30), 4.8*2))
+            ax = sns.violinplot(x='run', y=f'T0_{metric}_{algo}', data=df, split=True)
+            ax.set_ylim([-2, 2])
+            ax.xaxis.set_minor_locator(ticker.NullLocator())
+            plt.axhline(0, color='black', linestyle='--')
+            plt.axhline(0.5, color='black', linestyle=':')
+            plt.axhline(-0.5, color='black', linestyle=':')
+            plt.setp(ax.get_xticklabels(), rotation=90)
+            plt.tight_layout()
+            plt.savefig(output_dir / f'T0_{metric}_{algo}.pdf')
+            plt.close()
+
 
 if __name__ == '__main__':
 
@@ -304,4 +330,5 @@ if __name__ == '__main__':
                         default='SVDTimeValidation_output')
     args = parser.parse_args()
 
-    run_validation(args.calibration_results_dir[0], output_dir=args.output_dir)
+    # run_validation(args.calibration_results_dir[0], output_dir=args.output_dir)
+    run_validation('/home/belle2/athaller/calibration_scripts/calibration_results', output_dir=args.output_dir)

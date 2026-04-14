@@ -86,6 +86,17 @@ def get_agreement(histo_eventT0, histo_diff, min_entries=100):
         return np.nan
 
 
+def get_difference(histo1, histo2, min_entries=100):
+    '''
+    Get the difference between mean of two histograms, e.g. between CDC and SVD event T0
+    Not sure yet i need this, maybe get_agreement() is enough.
+    '''
+    if histo1.GetEntries() > min_entries and histo2.GetEntries() > min_entries:
+        return histo1.GetMean() - histo2.GetMean()
+    else:
+        return np.nan
+
+
 def get_precision(histo_diff, min_entries=100):
     '''
     Get the RMS of the difference between the mean time of the clusters on tracks
@@ -236,6 +247,13 @@ def get_histos(CollectorHistograms):
     histos = {}
 
     histos['eventT0'] = CollectorHistograms['hEventT0'][0]
+    for det in ['CDC', 'SVD']:
+        try:
+            histos[f'{det}eventT0'] = CollectorHistograms[f'hEventT0From{det}'][0]
+        except KeyError:
+            print(f'No eventT0 histogram for {det}, creating empty histogram')
+            #  empty histos
+            histos[f'{det}eventT0'] = r.TH1F(f'{det}eventT0', f'{det}eventT0', 300, -150, 150)
 
     histos_all = {}
     histos['onTracks'] = {}
@@ -313,9 +331,13 @@ def get_merged_collector_histograms(files):
                                                        "hClsTimeAll": [],
                                                        "hClsDiffTimeOnTracks": [],
                                                        "hClusterSizeVsTimeResidual": [],
-                                                       "hBinToSensorMap": []}
+                                                       "hBinToSensorMap": [],
+                                                       "hEventT0FromCDC": [],
+                                                       "hEventT0FromSVD": []}
 
             __hEventT0__ = in_file.Get(get_full_path('hEventT0', exp, run, base_dir))
+            __hEventT0FromCDC__ = in_file.Get(get_full_path('hEventT0FromCDC', exp, run, base_dir))
+            __hEventT0FromSVD__ = in_file.Get(get_full_path('hEventT0FromSVD', exp, run, base_dir))
             __hClsTimeOnTracks__ = in_file.Get(get_full_path('__hClsTimeOnTracks__',
                                                              exp, run, base_dir))
             __hClsTimeAll__ = in_file.Get(get_full_path('__hClsTimeAll__',
@@ -327,6 +349,8 @@ def get_merged_collector_histograms(files):
             __hBinToSensorMap__ = in_file.Get(get_full_path('__hBinToSensorMap__',
                                                             exp, run, base_dir))
             __hEventT0__.SetDirectory(0)
+            __hEventT0FromCDC__.SetDirectory(0)
+            __hEventT0FromSVD__.SetDirectory(0)
             __hClsTimeOnTracks__.SetDirectory(0)
             __hClsTimeAll__.SetDirectory(0)
             __hClsDiffTimeOnTracks__.SetDirectory(0)
@@ -338,6 +362,8 @@ def get_merged_collector_histograms(files):
             CollectorHistograms[algo][exp][run]["hClsDiffTimeOnTracks"].append(__hClsDiffTimeOnTracks__)
             CollectorHistograms[algo][exp][run]["hClusterSizeVsTimeResidual"].append(__hClusterSizeVsTimeResidual__)
             CollectorHistograms[algo][exp][run]["hBinToSensorMap"].append(__hBinToSensorMap__)
+            CollectorHistograms[algo][exp][run]["hEventT0FromCDC"].append(__hEventT0FromCDC__)
+            CollectorHistograms[algo][exp][run]["hEventT0FromSVD"].append(__hEventT0FromSVD__)
 
         in_file.Close()
 

@@ -151,7 +151,6 @@ void DQMHistAnalysisPXDBowModule::event()
 
 void DQMHistAnalysisPXDBowModule::plotCanvas(bool enough, bool errorflag, bool warnflag, std::string buff)
 {
-  EStatus status = makeStatus(enough, errorflag, warnflag);
   TH1* h = findHist(m_histogramDirectoryName + "resV_" + buff, true);
   if (h != NULL) {
     m_hResV.Clear();
@@ -161,6 +160,7 @@ void DQMHistAnalysisPXDBowModule::plotCanvas(bool enough, bool errorflag, bool w
     m_cResV[buff]->Clear();
     m_cResV[buff]->cd();
     m_hResV.Draw();
+    EStatus status = makeStatus(enough, errorflag, warnflag);
     colorizeCanvas(m_cResV[buff], status);
   }
 }

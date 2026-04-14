@@ -55,8 +55,8 @@ namespace Belle2 {
     std::string m_histogramDirectoryName{""};
 
     //! Data members
-    /** The final drawing canvas. */
-    TCanvas* m_cResV = nullptr;
+    /** The final drawing canvases. */
+    std::map<std::string, TCanvas*> m_cResV;
 
     /** The final histogram*/
     TH1F m_hResV;

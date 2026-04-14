@@ -55,22 +55,33 @@ void DQMHistAnalysisPXDBowModule::initialize()
 
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
-  // collect the list of all PXD Modules in the geometry here
+  /// collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
   int validModule = 0;
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
-    if (info.getType() != VXD::SensorInfoBase::PXD || aVxdID.getSensorNumber() != 1) continue;
-    m_PXDModules.push_back(aVxdID); // reorder
+    if (info.getType() != VXD::SensorInfoBase::PXD || aVxdID.getSensorNumber() != 1) continue;/// only forward PXD modules
+    m_PXDModules.push_back(aVxdID);
 
-    if (VxdID(m_moduleName) == aVxdID) validModule++;
-
-    // Epics for all the forward PXD module
     auto buff = (std::string)aVxdID;
+    /// register delta
+    if (!hasDeltaPar(m_histogramDirectoryName, "resV_" + buff))
+      addDeltaPar(m_histogramDirectoryName, "resV_" + buff, HistDelta::c_Entries, m_statThreshold, 1);
+    if (!hasDeltaPar(m_histogramDirectoryName, "sagitta_" + buff))
+      addDeltaPar(m_histogramDirectoryName, "sagitta_" + buff, HistDelta::c_Entries, m_statThreshold, 1);
+    /// Epics for all the forward PXD module
     replace(buff.begin(), buff.end(), '.', '_');
     registerEpicsPV("PXD:meanResV:" + buff, "meanResV:" + (std::string)aVxdID);
     registerEpicsPV("PXD:sigmaResV:" + buff, "sigmaResV:" + (std::string)aVxdID);
     registerEpicsPV("PXD:sagitta:" + buff, "sagitta:" + (std::string)aVxdID);
+    /// list of canvases
+    if (m_moduleName == "") { /// one canvas for each forward PXD module
+      m_cResV[buff] = new TCanvas((std::string("c_resV_") + buff).c_str());
+    } else if (VxdID(m_moduleName) == aVxdID) { ///only one canvas
+      m_cResV[buff] = new TCanvas((std::string("c_resV_") + buff).c_str());
+      validModule++;
+    }
+
   }
 
   if (validModule == 0 and m_moduleName != "") {
@@ -83,15 +94,15 @@ void DQMHistAnalysisPXDBowModule::initialize()
     B2WARNING("No PXDModules in Geometry found!");
   }
 
-  m_cResV = new TCanvas("c_resV");
-
 }
 
 void DQMHistAnalysisPXDBowModule::beginRun()
 {
   B2DEBUG(20, "DQMHistAnalysisPXDBow : beginRun called");
 
-  m_cResV->Clear();
+  for (auto& pair : m_cResV) {
+    pair.second->Clear();
+  }
 
   /// get RoI size in the v coordinate
   DBObjPtr<ROICalculationParameters> roiParams;
@@ -105,7 +116,7 @@ void DQMHistAnalysisPXDBowModule::event()
     auto buff = (std::string)aPXDModule;
     std::replace(buff.begin(), buff.end(), '.', '_');
 
-    TH1* hV = getDelta(m_histogramDirectoryName + "resV_" + buff, true);
+    TH1* hV = getDelta(m_histogramDirectoryName + "resV_" + buff, 0, true);
     TH1* hS = getDelta(m_histogramDirectoryName + "sagitta_" + buff, true);
     if (hS != NULL && hV != NULL) {
       bool enough = false, warnflag = false, errorflag = false;
@@ -113,7 +124,7 @@ void DQMHistAnalysisPXDBowModule::event()
       if (hS->GetEntries() > m_statThreshold) {
         enough = true;
 
-        // Epics PVs
+        /// Epics PVs
         double meanResV = hV->GetMean();
         double stdResV = hV->GetStdDev();
         double resV = std::abs(meanResV) + 3 * stdResV;
@@ -145,11 +156,11 @@ void DQMHistAnalysisPXDBowModule::plotCanvas(bool enough, bool errorflag, bool w
   if (h != NULL) {
     m_hResV.Clear();
     h->Copy(m_hResV);
-    m_hResV.SetName("ResV");
-    m_hResV.SetTitle("v residuals");
-    m_cResV->Clear();
-    m_cResV->cd();
+    m_hResV.SetName((std::string("ResV_") + buff).c_str());
+    m_hResV.SetTitle((std::string("v residuals ") + buff).c_str());
+    m_cResV[buff]->Clear();
+    m_cResV[buff]->cd();
     m_hResV.Draw();
-    colorizeCanvas(m_cResV, status);
+    colorizeCanvas(m_cResV[buff], status);
   }
 }

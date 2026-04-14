@@ -89,7 +89,7 @@ def create_testfile_direct(
     f.Close()
 
 
-def create_testfile_ntuple(input, output, treeNames=["tree", "anotherTree"], **argk):
+def create_testfile_ntuple(input, output, treeNames=["aTree", "anotherTree"], **argk):
     """Create a test ntuple file from a steering string"""
     global testfile_ntuple_steering
     env = dict(os.environ)
@@ -551,7 +551,7 @@ def check_27_ntuple_trees():
     create_testfile("test2.root")
     create_testfile_ntuple(input="test1.root", output="ntuple1.root")
     create_testfile_ntuple(
-        input="test2.root", output="ntuple2.root", treeNames=["differentTree", "tree"]
+        input="test2.root", output="ntuple2.root", treeNames=["differentTree", "anotherDifferentTree"]
     )
     return merge_files("ntuple1.root", "ntuple2.root") != 0
 

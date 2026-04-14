@@ -14,12 +14,14 @@
 #include <analysis/VariableManager/Utility.h>
 
 // framework
+#include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/RootFileCreationManager.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/core/Environment.h>
+#include <framework/io/RootIOUtilities.h>
 
 #include <cmath>
 
@@ -94,9 +96,11 @@ void VariablesToEventBasedTreeModule::initialize()
 
   m_file->cd();
 
-  // check if TTree with that name already exists
-  if (m_file->Get(m_treeName.c_str())) {
-    B2FATAL("Tree with the name " << m_treeName << " already exists in the file " << m_fileName);
+  // check if TTree with that name already exists or if the name is reserved
+  if (m_file->Get(m_treeName.c_str()) || RootIOUtilities::isReservedTreeName(m_treeName)) {
+    B2FATAL("Tree with the name \"" << m_treeName
+            << "\" already exists in the file \"" << m_fileName << "\"\n"
+            << "or is reserved for basf2 TTrees.\n");
     return;
   }
 

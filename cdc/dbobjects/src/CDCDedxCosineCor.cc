@@ -115,6 +115,7 @@ bool CDCDedxCosineCor::isValidGroupedPayload() const
 double CDCDedxCosineCor::getMean(unsigned int bin) const
 {
   if (bin < m_cosgains.size()) return m_cosgains[bin];
+  B2WARNING("CDCDedxCosineCor: bin out of range, returning value (1.0)");
   return 1.0;
 }
 
@@ -181,10 +182,11 @@ double CDCDedxCosineCor::getMeanFromVector(const std::vector<double>& gains, dou
   // extrapolation
   // extrapolate backward for lowest half-bin and center positive half-bin
   // extrapolate forward for highest half-bin and center negative half-bin
-  if ((costh + 1.0) < (binsize / 2.0) || (costh > 0.0 && std::fabs(costh) < (binsize / 2.0))) {
+  double halfBin = binsize / 2.0;
+  if ((costh + 1.0) < halfBin || (costh > 0.0 && costh < halfBin)) {
     thisbin = bin + 1;
     nextbin = bin + 2;
-  } else if ((costh - 1.0) > -1.0 * (binsize / 2.0) || (costh < 0.0 && std::fabs(costh) < (binsize / 2.0))) {
+  } else if ((costh - 1.0) > -1.0 * halfBin || (costh < 0.0 && costh > -1.0 * halfBin)) {
     thisbin = bin - 1;
     nextbin = bin;
   }

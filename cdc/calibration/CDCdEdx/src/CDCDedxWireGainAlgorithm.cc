@@ -72,7 +72,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   for (int il = 0; il < 2; il++)
     hdedxL[il] = new TH1D(Form("hdedx%s_%s", label[il].data(), m_suffix.data()), "", m_dedxBins, m_dedxMin, m_dedxMax);
 
-  int slWireBoundary = (m_exp < 40) ? 1280 : 2240; // Boundary between inner layers: SL0 (<40), SL0+SL1 (>=40)
+  int slWireBoundary = 2240; // Outer layers (used for normalization) start here
 
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
@@ -168,7 +168,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     else layermean[il] = 1.0;
 
     //calculate outer layer average for active layer
-    unsigned int layerBoundary = (m_exp < 40) ? 8 : 14; // Boundary between inner layers: SL0 (<40), SL0+SL1 (>=40)
+    unsigned int layerBoundary = 14; // Outer layers (used for normalization) start here
     if (il >= layerBoundary && layermean[il] > 0) {
       layeravg += layermean[il];
       activelayers++;

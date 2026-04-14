@@ -143,7 +143,7 @@ namespace Belle2 {
     keep a version number to identify which layers are valid */
     short m_version; /**< version number for 1D cleanup correction */
     std::vector<std::vector<double>> m_onedgains; /**< dE/dx means in entrance angle bins */
-    std::vector<unsigned int> m_layerToGroup;  /** layer to group map */
+    std::vector<unsigned int> m_layerToGroup;  /**< layer to group map */
 
     ClassDef(CDCDedx1DCell, 6); /**< ClassDef */
   };

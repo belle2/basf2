@@ -200,7 +200,11 @@ namespace Belle2 {
     */
     bool isValidGroupedPayload() const;
 
-    /** Element-wise multiplication of gain vectors. */
+    /**
+    * Multiply lhs by rhs with possible rebinning.
+    * If rhs has fewer bins, each rhs bin is applied to a block of lhs bins.
+    * This allows combining payloads with different binning (e.g. coarse => fine).
+    */
     bool multiplyGains(std::vector<double>& lhs, const std::vector<double>& rhs) const;
 
     std::vector<double> m_cosgains; /**< old-style dE/dx gains in cos(theta) bins */

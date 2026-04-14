@@ -445,12 +445,12 @@ void CDCDedx1DCellAlgorithm::createPayload()
       return std::make_pair(avg_new, avg_prev);
     };
 
-    double negLow = -0.75, negHigh = -0.25;
-    double posLow = 0.25, posHigh = 0.75;
+    double negLow = -0.5, negHigh = -0.2;
+    double posLow = 0.2, posHigh = 0.5;
 
-    if (il == 0) {
-      negLow = -0.5; negHigh = -0.2;
-      posLow = 0.2; posHigh = 0.5;
+    if (il == 2) {
+      negLow = -0.75; negHigh = -0.25;
+      posLow = 0.25; posHigh = 0.75;
     }
 
     auto [avgNewNeg, avgPrevNeg] = computeAverages(negLow, negHigh);

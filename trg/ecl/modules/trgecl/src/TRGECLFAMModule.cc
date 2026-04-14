@@ -16,8 +16,6 @@
 #include "trg/ecl/TrgEclDigitizer.h"
 #include "trg/ecl/TrgEclFAMFit.h"
 
-#include "trg/ecl/dbobjects/TRGECLFAMPara.h"
-
 #include <iostream>
 
 using namespace std;
@@ -48,7 +46,7 @@ namespace Belle2 {
       m_famana(0),
       m_SetTCEThreshold(100.0),
       m_FADC(1),
-      m_ConditionDB(false),
+      m_ConditionDBFAM(true),
       m_SourceOfTC(3)
   {
 
@@ -69,14 +67,11 @@ namespace Belle2 {
     addParam("TCThreshold", m_SetTCEThreshold, "Set FAM TC threshold ",
              m_SetTCEThreshold);
     addParam("ShapingFunction", m_FADC, "Set function of shaper ",  m_FADC);
-    addParam("ConditionDB", m_ConditionDB, "Use conditionDB ",  m_ConditionDB);
+    addParam("ConditionDBFAM", m_ConditionDBFAM, "Use conditionDB for FAM",  m_ConditionDBFAM);
     addParam("SourceOfTC", m_SourceOfTC,
              "Select source of TC data(1:=ECLHit or 2:=ECLSimHit or 3:=ECLHit+TRGECLBGTCHit)",
              m_SourceOfTC);
 
-    if (m_ConditionDB) { //Use global tag
-      m_FAMPara.addCallback(this, &TRGECLFAMModule::beginRun);
-    }
     B2DEBUG(100, "TRGECLFAMModule ... created");
     m_TCEThreshold.clear();
 
@@ -96,7 +91,6 @@ namespace Belle2 {
   void
   TRGECLFAMModule::initialize()
   {
-
     B2DEBUG(100, "TRGECLFAMModule::initialize ... options");
     B2DEBUG(100, "TRGECLFAMModule::initialize> FAM Fit Method = " << m_famMethod
             << "  ; Bin of Time Interval = " << m_binTimeInterval
@@ -118,7 +112,6 @@ namespace Belle2 {
     m_eventLevelClusteringInfo.isOptional() ? m_eventLevelClusteringInfo.isRequired() :
     m_eventLevelClusteringInfo.registerInDataStore();
 
-    //    m_FAMPara = new DBObjPtr<TRGECLFAMPara>;
   }
 //
 //
@@ -126,12 +119,18 @@ namespace Belle2 {
   void
   TRGECLFAMModule::beginRun()
   {
-    if (!m_ConditionDB) {
+    if (!m_ConditionDBFAM) {
       m_TCEThreshold.resize(576, m_SetTCEThreshold);
-    } else { //Use global tag
+    } else {
+      //Use global tag
+      // get TC ADC-to-Eneryg converion factor from conditionDB
+      const auto& dbParmap = m_ETMParameters->getparMap();
+      m_TCADCtoEnergy = getDBparmap(dbParmap, "adc2energy", 0) * 1000; // (MeV)
+      // get TC Energy Threshold from TC ADC Threshold and ADC-to-Energy conversion factor
       m_TCEThreshold.resize(576, 0);
-      for (const auto& para : m_FAMPara) {
-        m_TCEThreshold[para.getTCId() - 1] = (int)((para.getThreshold()) * (para.getConversionFactor()));
+      for (const auto& para : m_FAMTCADCThreshold) {
+        int tc_id = (int) para.getTCId();
+        m_TCEThreshold[tc_id - 1] = floor(para.getTCADCThreshold() * m_TCADCtoEnergy);
       }
     }
 
@@ -216,10 +215,31 @@ namespace Belle2 {
 //
 //
 //
+  double
+  TRGECLFAMModule::getDBparmap(const std::map<std::string, double> dbParmap,
+                               std::string parName,
+                               double parAlternativeValue)
+  {
+    double par;
+    if (dbParmap.count(parName)) {
+      par = dbParmap.at(parName);
+    } else {
+      par = parAlternativeValue;
+      B2WARNING("No key(\"" + parName +
+                "\") for map in DB and set alternative value(" + parAlternativeValue +
+                ")");
+    }
+
+    return par;
+  }
+  //
+  //
+  //
   void
   TRGECLFAMModule::endRun()
   {
     B2DEBUG(200, "TRGECLFAMModule ... endRun called ");
+    //    m_TCEThreshold.clear();
   }
 //
 //

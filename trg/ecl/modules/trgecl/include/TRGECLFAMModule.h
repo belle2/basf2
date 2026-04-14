@@ -22,7 +22,8 @@
 #include "trg/ecl/dataobjects/TRGECLHit.h"
 #include "trg/ecl/dataobjects/TRGECLWaveform.h"
 
-#include "trg/ecl/dbobjects/TRGECLFAMPara.h"
+#include "trg/ecl/dbobjects/TRGECLFAMTCADCThreshold.h"
+#include "trg/ecl/dbobjects/TRGECLETMParameters.h"
 
 namespace Belle2 {
 
@@ -70,7 +71,7 @@ namespace Belle2 {
     /** Set Shaping Function */
     int m_FADC;
     /** Use Condition DB*/
-    bool m_ConditionDB;
+    bool m_ConditionDBFAM;
     /** Set source of TC data (1:=ECLHit or 2:=ECLSimHit or 3:=ECLHit+TRGECLBGTCHit) */
     /** ("1:=ECLHit" is used for signal w/o bkg, and real time background monitor) */
     int m_SourceOfTC;
@@ -84,6 +85,9 @@ namespace Belle2 {
 
   private:
 
+    //! get payload from conditionDB (TRGECLETMParameters)
+    double getDBparmap(const std::map<std::string, double>, std::string, double);
+
     /**  Run number */
     int m_nRun;
     /**  Event number */
@@ -96,14 +100,19 @@ namespace Belle2 {
     std::vector<std::vector<double>> m_TCFitE;
     /** Fit TC T [ns] */
     std::vector<std::vector<double>> m_TCFitT;
-    /** Threshold */
+    /** TC Energy Threshold [MeV] */
     std::vector<int> m_TCEThreshold;
+    /** TC ADC Energy conversion factor [MeV] */
+    double m_TCADCtoEnergy;
 
     StoreArray<TRGECLDigi0>    m_TRGECLDigi0; /**< output for TRGECLDigi0 */
     StoreArray<TRGECLWaveform> m_TRGECLWaveform; /**< output for TRGECLWaveform */
     StoreArray<TRGECLHit>      m_TRGECLHit; /**< output for TRGECLHit */
     StoreArray<TRGECLFAMAna>   m_TRGECLFAMAna; /**< output for TRGECLFAMAna */
-    DBArray<TRGECLFAMPara>     m_FAMPara; /**< FAM Parameters */
+    /** FAM TC ADC Thresholds */
+    DBArray<TRGECLFAMTCADCThreshold> m_FAMTCADCThreshold;
+    /** ETM Parameters */
+    DBObjPtr<TRGECLETMParameters> m_ETMParameters;
 
     /** EventLevelClusteringInfo. */
     StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;

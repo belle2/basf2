@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcCalibrationCollector/CDCDeadBoardDetectorModule.h>
+#include <TH1F.h>
 #include <iostream>
 
 using namespace std;
@@ -34,6 +35,8 @@ void CDCDeadBoardDetectorModule::prepare()
   for (int i = 0; i < 300; i += 1) {
     nReadsPerBoard[i] = 0;
   }
+  auto m_BoardIDs = new TH1F("CDCboardIDs", "CDC board IDs", 300, 0, 300);
+  registerObject<TH1F>("CDCboardIDs", m_BoardIDs);
 }
 
 void CDCDeadBoardDetectorModule::collect()
@@ -63,6 +66,7 @@ void CDCDeadBoardDetectorModule::collect()
         unsigned int boardID = (ibuf[0] & 0x01ff);
         if ((boardID > 0) && (boardID < 300)) {
           nReadsPerBoard[boardID] += 1;
+          getObjectPtr<TH1F>("CDCboardIDs")->Fill(boardID);
         }
       }
     }

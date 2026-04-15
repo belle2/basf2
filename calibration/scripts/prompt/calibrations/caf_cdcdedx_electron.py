@@ -16,10 +16,10 @@ import ROOT
 from ROOT import gSystem
 from ROOT.Belle2 import CDCDedxRunGainAlgorithm, CDCDedxCosineAlgorithm, CDCDedxWireGainAlgorithm
 from ROOT.Belle2 import CDCDedxCosEdgeAlgorithm, CDCDedxBadWireAlgorithm, CDCDedxInjectTimeAlgorithm
-from ROOT.Belle2 import CDCDedx1DCellAlgorithm, CDCDedxValidationAlgorithm
+from ROOT.Belle2 import CDCDedx1DCellAlgorithm, CDCDedxValidationAlgorithm, CDCDedxCosLayerAlgorithm
 
 from caf.framework import Calibration
-from caf.strategies import SequentialRunByRun, SequentialBoundaries, SingleIOV
+from caf.strategies import SingleIOV, SequentialRunByRun, SequentialBoundaries
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 import reconstruction as recon
 from random import seed
@@ -128,9 +128,11 @@ def get_calibrations(input_data, **kwargs):
     if calib_mode == "full":
         calibration_procedure = {
             "rungain0": 0,  # Run Gain trail (No Payload saving and take of effect of previous rungains)
+            "wiregain0": 0,  # WireGain Gain Pre (No Payload saving)
             "timegain0": 0,  # Injection time gain Pre (No payload saving)
             "timegain1": 0,  # Injection time gain
             "rungain1": 0,  # Run Gain Pre (No Payload saving)
+            "coslayer0": 0,  # Cosine Corr Gain layer dependent (No Payload saving)
             "coscorr0": 0,  # Cosine Corr Gain Pre (No Payload saving)
             "cosedge0": 0,  # Cosine edge Corr Gain
             "badwire0": 0,  # Bad wire
@@ -145,12 +147,13 @@ def get_calibrations(input_data, **kwargs):
     elif calib_mode == "quick":
         calibration_procedure = {
             "rungain0": 0,
-            "timegain0": 0,
+            "timegain1": 0,
             "rungain1": 0,
-            "coscorr0": 0,
+            "coslayer1": 0,
+            "coscorr1": 0,
             "cosedge0": 0,
             "badwire0": 0,
-            "wiregain0": 0,
+            "wiregain1": 0,
             "rungain2": 0,
             "validation0": 0
         }
@@ -170,6 +173,8 @@ def get_calibrations(input_data, **kwargs):
         cal_name = ''.join([i for i in calib_keys[i] if not i.isdigit()])
         if cal_name == "rungain":
             alg = [rungain_algo(calib_keys[i], adjustment)]
+        elif cal_name == "coslayer":
+            alg = [coslayer_algo()]
         elif cal_name == "coscorr":
             alg = [cos_algo()]
         elif cal_name == "cosedge":
@@ -214,7 +219,8 @@ def get_calibrations(input_data, **kwargs):
                 cals[i].strategies = SequentialBoundaries
                 for algorithm in cals[i].algorithms:
                     algorithm.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
-                if calib_keys[i] == "coscorr0":
+                if (calib_keys[i] == "coscorr0" or calib_keys[i] == "coslayer0" or calib_keys[i] == "coslayer1"
+                        or calib_keys[i] == "wiregain0"):
                     cals[i].save_payloads = False
 
         else:
@@ -230,7 +236,7 @@ def pre_collector(name='rg'):
     Define pre collection.
     Parameters:
         name : name of the calibration
-                           rungain rungain0 by Default.
+        rungain rungain0 by Default.
     Returns:
         path : path for pre collection
     """
@@ -296,6 +302,9 @@ def collector(granularity='all', name=''):
         if name == "timegain":
             CollParam = {'isRun': True, 'isInjTime': True, 'isRadee': True, 'granularity': 'run'}
 
+        elif name == "coslayer":
+            CollParam = {'isCharge': True, 'isCosth': True, 'islLayer': True, 'islDedx': True, 'granularity': granularity}
+
         elif name == "coscorr" or name == "cosedge":
             CollParam = {'isCharge': True, 'isCosth': True, 'granularity': granularity}
 
@@ -304,7 +313,7 @@ def collector(granularity='all', name=''):
             CollParam = {'isWire': True, 'isDedxhit': isHit, 'isADCcorr': not isHit, 'granularity': granularity}
 
         elif name == "wiregain":
-            CollParam = {'isWire': True, 'isDedxhit': True, 'granularity': granularity}
+            CollParam = {'isWire': True, 'isDedxhit': True, 'isCosth': True, 'granularity': granularity}
 
         elif name == "onedcell":
             CollParam = {
@@ -349,6 +358,20 @@ def injection_time_algo():
     algo = CDCDedxInjectTimeAlgorithm()
     algo.setMonitoringPlots(True)
     return algo
+
+# Cosine layer dependent Algorithm setup
+
+
+def coslayer_algo():
+    """
+    Create a cosine calibration algorithm.
+    Returns:
+        algo : cosine algorithm
+    """
+    algo = CDCDedxCosLayerAlgorithm()
+    algo.setMonitoringPlots(True)
+    return algo
+
 
 # Cosine Algorithm setup
 

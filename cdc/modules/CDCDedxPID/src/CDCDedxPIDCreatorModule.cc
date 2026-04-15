@@ -143,7 +143,6 @@ namespace Belle2 {
       double sinTheta = std::sin(theta);
 
       // track dependent calibration constants
-      double cosCor = isData ? m_DBCosineCor->getMean(cosTheta) : 1.0;
       bool isEdge = std::abs(cosTheta + 0.860) < 0.010 or std::abs(cosTheta - 0.955) <= 0.005;
       double cosEdgeCor = (isData and isEdge) ? m_DBCosEdgeCor->getMean(cosTheta) : 1.0;
 
@@ -171,7 +170,6 @@ namespace Belle2 {
           dedxTrack->m_cosThetaTrue = std::cos(trueMom.Theta());
         }
         dedxTrack->m_scale = scale;
-        dedxTrack->m_cosCor = cosCor;
         dedxTrack->m_cosEdgeCor = cosEdgeCor;
         dedxTrack->m_runGain = runGain;
         dedxTrack->m_timeGain = timeGain;
@@ -186,7 +184,7 @@ namespace Belle2 {
         // wire numbering: layer and superlayer
         const auto& wireID = hit.getWireID();
         int layer = wireID.getILayer(); // layer within superlayer
-        int superlayer = wireID.getISuperLayer();
+        unsigned int superlayer = wireID.getISuperLayer();
         int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer); // continuous layer number
         if (not m_useBackHalfCurlers and currentLayer < lastLayer) break;
         lastLayer = currentLayer;
@@ -214,6 +212,9 @@ namespace Belle2 {
         double entAng = hit.getEntranceAngle();
         double celldx = cell.dx(doca, entAng) / sinTheta; // length of a track in the cell
         if (not cell.isValid()) continue;
+
+        //cos correction
+        double cosCor = isData ? m_DBCosineCor->getMean(currentLayer, cosTheta) : 1.0;
 
         // wire gain calibration (iwire is a continuous wire number)
         int wire = wireID.getIWire();
@@ -257,7 +258,7 @@ namespace Belle2 {
 
           dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS,
                             adcCount, hit.getADCCount(), hitCharge, celldx * sinTheta, cellDedx, cellHeight, cellHalfWidth,
-                            hit.getTDCCount(), driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
+                            hit.getTDCCount(), driftDRealistic, driftDRealisticRes, cosCor, wiregain, twodcor, onedcor,
                             hit.getFoundByTrackFinder(), hit.getWeightPionHypo(), hit.getWeightKaonHypo(), hit.getWeightProtonHypo());
         }
 

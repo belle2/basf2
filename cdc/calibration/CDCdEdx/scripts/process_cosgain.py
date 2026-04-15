@@ -73,7 +73,7 @@ def parse_database(database_file, calib_key):
 
 
 def process_cosgain(ccpath, gt):
-    """Main function to process wiregain data and generate plots."""
+    """Main function to process cosine gain data and generate plots."""
     import os
     os.makedirs('plots/constant', exist_ok=True)
 
@@ -82,49 +82,69 @@ def process_cosgain(ccpath, gt):
     # Parse the database to get exp -> [runs] mapping
     exp_run_dict = parse_database(database_file, 'dbstore/CDCDedxCosineCor')
 
+    group_labels = ["SL0", "SL1", "SL2-8"]
+
     # Process each exp-run pair
     for exp, run_list in exp_run_dict.items():
         for run in run_list:
             print(f"[INFO] Processing exp={exp}, run={run}")
+
             cal = CDCDedxValidationAlgorithm()
             cal.setGlobalTag(gt)
             prev_data = cal.getcosgain(exp, run)
+
             cal.setGlobalTag("")
             cal.setTestingPayload(database_file)
             new_data = cal.getcosgain(exp, run)
             cal.setTestingPayload("")
 
-            # Extract wiregain vectors
-            prev_cc = prev_data.cosgain if prev_data else []
-            new_cc = new_data.cosgain if new_data else []
+            # Extract grouped cosine vectors
+            prev_cc = prev_data.cosgain if prev_data else [[], [], []]
+            new_cc = new_data.cosgain if new_data else [[], [], []]
             costh = new_data.costh if new_data else []
 
             # Skip empty payloads
-            if not prev_cc or not new_cc:
-                print(f"[WARNING] Empty cosgain data for exp={exp}, run={run}. Skipping.")
-                return None, None
+            if not costh:
+                print(f"[WARNING] Empty cos(theta) bins for exp={exp}, run={run}. Skipping.")
+                continue
 
-            # Convert to DataFrames
-            df_prev = pd.DataFrame([[x] for x in prev_cc], columns=['cosgain'])
-            df_new = pd.DataFrame([[x] for x in new_cc], columns=['cosgain'])
-            df_costh = pd.DataFrame([[x] for x in costh], columns=['costh'])
+            costh = list(costh) if costh is not None else []
+            df_costh = pd.DataFrame(costh, columns=['costh'])
 
             pdf_path = f'plots/constant/cosgain_e{exp}_r{run}.pdf'
             with PdfPages(pdf_path) as pdf:
-                fig, axes = plt.subplots(1, 2, figsize=(20, 6))
+                fig, axes = plt.subplots(3, 2, figsize=(18, 16))
 
-                # Left plot
-                hist(0.7, 1.3, xlabel=r"$\cos\theta$", ylabel="dE/dx avg. mean ($e^{+}e^{-}$)", ax=axes[0])
-                axes[0].plot(df_costh['costh'], df_new['cosgain'], '*', label='new')
-                axes[0].plot(df_costh['costh'], df_prev['cosgain'], '*', label='prev')
-                axes[0].legend()
+                for igroup, glabel in enumerate(group_labels):
+                    prev_vals = list(prev_cc[igroup]) if len(prev_cc) > igroup else []
+                    new_vals = list(new_cc[igroup]) if len(new_cc) > igroup else []
 
-                # Right plot
-                hist(0.99, 1.01, xlabel=r"$\cos\theta$", ylabel="Gain Ratio (new/prev)", ax=axes[1])
-                axes[1].plot(df_costh['costh'], df_new['cosgain']/df_prev['cosgain'], '*', label='ratio')
-                axes[1].legend()
+                    if len(prev_vals) == 0 or len(new_vals) == 0:
+                        print(f"[WARNING] Empty cosgain data for {glabel}, exp={exp}, run={run}.")
+                        continue
 
-                fig.suptitle(f"CosGain Calibration - Experiment {exp}", fontsize=20)
+                    df_prev = pd.DataFrame([[x] for x in prev_vals], columns=['cosgain'])
+                    df_new = pd.DataFrame([[x] for x in new_vals], columns=['cosgain'])
+
+                    # Left column: constants
+                    hist(0.7, 1.5,
+                         xlabel=r"$\cos\theta$",
+                         ylabel=f"{glabel} dE/dx mean",
+                         ax=axes[igroup, 0])
+                    axes[igroup, 0].plot(df_costh['costh'], df_new['cosgain'], '*', label='new')
+                    axes[igroup, 0].plot(df_costh['costh'], df_prev['cosgain'], '*', label='prev')
+                    axes[igroup, 0].legend()
+
+                    # Right column: ratio
+                    hist(0.7, 1.8,
+                         xlabel=r"$\cos\theta$",
+                         ylabel="Gain Ratio (new/prev)",
+                         ax=axes[igroup, 1])
+                    ratio = df_new['cosgain'] / df_prev['cosgain']
+                    axes[igroup, 1].plot(df_costh['costh'], ratio, '*', label='ratio')
+                    axes[igroup, 1].legend()
+
+                fig.suptitle(f"CosGain Calibration - Experiment {exp}, Run {run}", fontsize=20)
                 fig.tight_layout()
                 pdf.savefig(fig)
                 plt.close(fig)

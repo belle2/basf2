@@ -270,9 +270,6 @@ void CDCDedxPIDModule::event()
     if (m_usePrediction && numMCParticles == 0)isData = true;
     dedxTrack->m_runGain = (m_DBRunGain && isData) ? m_DBRunGain->getRunGain() : 1.0;
 
-    // get the cosine correction only for data!
-    dedxTrack->m_cosCor = (m_DBCosineCor && isData) ? m_DBCosineCor->getMean(costh) : 1.0;
-
     // get the cosine edge correction only for data!
     bool isEdge = false;
     if ((abs(costh + 0.860) < 0.010) || (abs(costh - 0.955) <= 0.005))isEdge = true;
@@ -471,6 +468,9 @@ void CDCDedxPIDModule::event()
         // now calculate the path length for this hit
         double celldx = c.dx(doca, entAng);
         if (c.isValid()) {
+          // get the cosine correction only for data!
+          double cosCor = (m_DBCosineCor && isData) ? m_DBCosineCor->getMean(currentLayer, costh) : 1.0;
+
           // get the wire gain constant
           double wiregain = (m_DBWireGains && m_usePrediction && numMCParticles == 0) ? m_DBWireGains->getWireGain(iwire) : 1.0;
 
@@ -485,7 +485,7 @@ void CDCDedxPIDModule::event()
           // apply the calibration to dE to propagate to both hit and layer measurements
           // Note: could move the sin(theta) here since it is common accross the track
           //       It is applied in two places below (hit level and layer level)
-          double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * dedxTrack->m_cosEdgeCor * dedxTrack->m_timeGain * wiregain *
+          double correction = dedxTrack->m_runGain * cosCor * dedxTrack->m_cosEdgeCor * dedxTrack->m_timeGain * wiregain *
                               twodcor * onedcor;
 
           // --------------------
@@ -503,7 +503,7 @@ void CDCDedxPIDModule::event()
           if (m_enableDebugOutput)
             dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS,
                               adcCount, adcbaseCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
-                              driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
+                              driftDRealistic, driftDRealisticRes, cosCor, wiregain, twodcor, onedcor,
                               foundByTrackFinder, weightPionHypo, weightKaonHypo, weightProtHypo);
 
           // --------------------

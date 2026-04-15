@@ -116,13 +116,13 @@ namespace Belle2 {
       // Check xml file to see geometry of which run period we use
       // Lv2OutTi added for Phase 3
       // Lv2AuCoat added during LS1
-      // Default is Run2 (phase 3 after LS1, not phase2 and not early phase 3 before LS1)
+      // Default is Run2 (phase 3 after LS1, not phase2 and not Run 1 (early phase 3 before LS1))
       bool phase2 = false;
-      bool earlyPhase3 = false; // aka Run1
+      bool Run1 = false; // aka early phase 3
       if (m_config.getParameter("Lv2OutTi.R1", -1.0) < 0.0) {
         phase2 = true;
       } else if (m_config.getParameter("Lv2AuCoat.R1", -1.0) < 0.0) {
-        earlyPhase3 = true;
+        Run1 = true;
       }
 
 
@@ -476,7 +476,7 @@ namespace Belle2 {
       //- Lv2Vacuum
       prep = "Lv2Vacuum.";
       G4UnionSolid* geo_Lv2Vacuumx = NULL;
-      if (phase2 || earlyPhase3) {
+      if (phase2 || Run1) {
         // Get parameters from .xml file
         double Lv2Vacuum_L1 = m_config.getParameter(prep + "L1") * unitFactor;
         double Lv2Vacuum_L2 = m_config.getParameter(prep + "L2") * unitFactor;
@@ -1926,7 +1926,7 @@ namespace Belle2 {
 
 
       // Components installed after LS1
-      if (!(phase2 || earlyPhase3)) {
+      if (!(phase2 || Run1)) {
         //- Lv2AuCoat
         prep = "Lv2AuCoat.";
 

@@ -60,7 +60,7 @@ namespace Belle2 {
     void createExpRunDirectories(Calibration::ExpRun& expRun) const;
 
     /// Scans the directory to get the highest "_i" index of an object with this name
-    unsigned int getHighestIndexObject(const std::string& name, const TDirectory* dir) const;
+    static unsigned int getHighestIndexObject(const std::string& name, const TDirectory* dir);
 
     /// Clears the map of templated objects -> causing their destruction
     void deleteHeldObjects();

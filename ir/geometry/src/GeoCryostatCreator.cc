@@ -1236,7 +1236,7 @@ namespace Belle2 {
       //-   2023 QCS shielding
 
       if (m_config.getParameter("polyBlock-R-L1.L", -1) > 0) {
-        // earlyPhase3 = false; post LS1
+        // Run1 = false; post LS1
 
         std::vector<std::string> polyBlocks;
         boost::split(polyBlocks, m_config.getParameterStr("PolyBlock"), boost::is_any_of(" "));

@@ -14,6 +14,7 @@
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework aux
+#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 #include <set>
 #include <map>
@@ -103,12 +104,17 @@ namespace Belle2 {
 
     TOPRecoManager::setTimeWindow(m_minTime, m_maxTime);
 
+    // is MC ?
+
+    bool isMC = Environment::Instance().isMC();
+
     // sort tracks by module ID
 
     std::unordered_multimap<int, const TOPTrack*> topTracks; // tracks sorted by top modules
     for (const auto& track : m_tracks) {
       auto* trk = new TOPTrack(track, m_topDigitCollectionName);
       if (trk->isValid() and trk->getTransverseMomentum() > m_pTCut) {
+        if (not isMC) trk->setTOFCorrection(m_tofCorrections); // TOF corrections only for data
         topTracks.emplace(trk->getModuleID(), trk);
       } else {
         delete trk;

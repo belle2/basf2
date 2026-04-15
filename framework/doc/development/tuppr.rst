@@ -17,8 +17,8 @@ are a few requirements for this globaltag:
 - The globaltag should not contain run-dependent calibrations for data.
 
 - The globaltag should clearly fail when running on data. Running with wrong calibrations is worse than not running
-  at all. The main globaltag only contains payloads for experiment 0 (nominal Phase 3), 1003 (early
-  Phase 3, pre LS1) and 1004 (early Phase 3, post LS1).
+  at all. The main globaltag only contains payloads for experiment 0 (nominal Phase 3), 1003 (Run 1, early
+  Phase 3, pre LS1) and 1004 (Run 2, Phase 3, post LS1).
 
 .. tip::
    If you want to know who is the manager of the main globaltag, please browse
@@ -67,8 +67,8 @@ Valid values for IoVs to be included in the main globaltag are listed in the fol
 IoV             Valid for
 ==============  ======================================
 0,0,0,-1        Valid only for nominal Phase 3
-1003,0,1003,-1  Valid only for early Phase 3, pre LS1
-1004,0,1004,-1  Valid only for early Phase 3, post LS1
+1003,0,1003,-1  Valid only for Run 1, early Phase 3, pre LS1
+1004,0,1004,-1  Valid only for Run 2, Phase 3, post LS1
 0,0,-1,-1       Valid for all the phases
 ==============  ======================================
 

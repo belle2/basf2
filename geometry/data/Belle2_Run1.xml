@@ -57,13 +57,13 @@
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>
   <xi:include href="../structure/STR.xml"/>
-  <xi:include href="../structure/ServiceGaps-earlyPhase3.xml"/> 
-  <xi:include href="../ir/BeamPipe-earlyPhase3.xml"/>
-  <xi:include href="../ir/Cryostat-earlyPhase3.xml"/>
-  <xi:include href="../ir/FarBeamLine-earlyPhase3.xml"/>
+  <xi:include href="../structure/ServiceGaps-Run1.xml"/> 
+  <xi:include href="../ir/BeamPipe-Run1.xml"/>
+  <xi:include href="../ir/Cryostat-Run1.xml"/>
+  <xi:include href="../ir/FarBeamLine-Run1.xml"/>
   <xi:include href="../vxd/HeavyMetalShield.xml"/>
   <xi:include href="../vxd/Service.xml"/>
-  <xi:include href="../pxd/PXD-earlyPhase3.xml"/>
+  <xi:include href="../pxd/PXD-Run1.xml"/>
   <xi:include href="../svd/SVD.xml"/>
   <xi:include href="../cdc/CDC.xml"/>
   <xi:include href="../top/TOP.xml"/>

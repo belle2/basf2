@@ -1,8 +1,15 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #include <Math/Vector3D.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
-#include <map>
 #include <math.h>
 #include <string>
 #include <top/modules/TOPBackSplashTiming/TOPBackSplashTimingModule.h>
@@ -16,23 +23,20 @@
 #include <RooJohnson.h>
 #include <RooPlot.h>
 #include <RooProdPdf.h>
+#include <RooMsgService.h>
 #include <TCanvas.h>
 #include <TF1.h>
-#include <TH1F.h>
 #include <TLine.h>
-#include <TPad.h>
 #include <TPaveText.h>
 
 using namespace Belle2;
 
-// Register module so basf2 can find it
 REG_MODULE(TOPBackSplashTiming);
 
 TOPBackSplashTimingModule::TOPBackSplashTimingModule()
   : Module(),
     m_eclClusters("ECLClusters"),   // DataStore name
     m_digits("TOPDigits"),
-    m_MCParticles("MCParticles"),
     m_fitparams{{{  -0.6,   4,  52,  -0.145075,  0.885072,  0.386489,  -1.361947,   0.662144,   7.134312,  0.449013,  27.397423},
     {  -0.5,   4,  51,  -0.082732,  0.795969,  0.674888,  -1.281492,   0.232786,   6.784821,  0.452656,  26.333126},
     {  -0.4,   5,  50,  -0.071727,  0.828312,  0.657696,  -1.228757,   0.297860,   7.371104,  0.514466,  24.651866},
@@ -51,15 +55,16 @@ TOPBackSplashTimingModule::TOPBackSplashTimingModule()
 // Fit params for combined pdf (See initialise for definition)
 // Params:  0-cosTheta, 1-fit start, 2-fit end, 3-coeff, 4-delta, 5-frac, 6-gamma, 7-lambda, 8-mu,  9-w, 10-shift-mu
 {
-  setDescription("A module to save timing of neutral cluster events derived from nearby TOP interactions");
+  setDescription(R"DOC(A module to save timing of neutral cluster events derived from nearby TOP interactions)DOC");
 
-  addParam("debug", m_debug,
+  addParam("saveFits", m_saveFits,
            "Set to true to save RooPlot of fit to TOP signal, from which the timing is extracted, as well as print truth anti-neutron information.",
            false);
 }
 
 std::vector<RooWorkspace> TOPBackSplashTimingModule::prepareFitModels()
 {
+  RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
   std::vector<RooWorkspace> wss;
   for (auto row : m_fitparams) {
     std::string xname = "x_" + std::to_string(row[0]);
@@ -110,64 +115,36 @@ int TOPBackSplashTimingModule::getModuleFromPhi(double phi)
 }
 
 void TOPBackSplashTimingModule::makePlot(float nearestClusterCosTheta, int iClusterToFit, int moduleIDindex, RooAbsPdf* model,
-                                         RooAbsPdf* john, RooAbsPdf* smoothedexp, RooRealVar* x, RooDataSet data, double peak1_rising_edge, RooFitResult* res)
+                                         RooRealVar* x, RooDataSet data, double peak1_rising_edge, RooFitResult* res)
 {
   // For debugging
   int cosThetaClusterIndex = convertCosThetaToIndex(nearestClusterCosTheta);
   int binning = (m_fitparams[cosThetaClusterIndex][2] - m_fitparams[cosThetaClusterIndex][1]);
 
   // Create RooPlot
+  TCanvas* c = new TCanvas("c", "Johnson SU fit", 900, 900);
   StoreObjPtr<EventMetaData> eventMetaData;
   std::string rooPlotTitle = "evtNo: " + std::to_string(eventMetaData->getEvent()) + " clusterNo: " + std::to_string(
                                iClusterToFit) + " slot: " + std::to_string(moduleIDindex + 1) + " fitted cosTheta: " + std::to_string(nearestClusterCosTheta);
 
   RooPlot* frame = x->frame(RooFit::Title(rooPlotTitle.c_str()));
   data.plotOn(frame, RooFit::Binning(binning));
+  model->plotOn(frame);
 
-  john->plotOn(frame);
-  smoothedexp->plotOn(frame);
-  //model->plotOn(frame,
-  //             RooFit::Components(john),
-  //             RooFit::LineColor(kCyan),
-  //             RooFit::LineStyle(kDashed));
+  model->plotOn(frame,
+                RooFit::MoveToBack(),
+                RooFit::Components("john"),
+                RooFit::LineColor(kCyan));
 
-  //model->plotOn(frame,
-  //             RooFit::Components(smoothedexp),
-  //             RooFit::LineColor(kSpring),
-  //             RooFit::LineStyle(kDashed));
+  model->plotOn(frame,
+                RooFit::MoveToBack(),
+                RooFit::Components("smoothedexp"),
+                RooFit::LineColor(kSpring));
 
-  model->plotOn(frame);//, RooFit::Range("fit"));
-//
-//  // Reduced chi-square
-//  double redchisq = frame->chiSquare(res->floatParsFinal().getSize());
-//
-//  //// Pulls
-//  //RooHist* pulls = frame->pullHist();
-//  //RooPlot* pull_frame = x.frame(RooFit::Title(" "));
-//  //pull_frame->addPlotable((RooPlotable*)pulls, "P");
-//
-//  // Guide lines
-//  TLine* l0 = new TLine(x.getMin(), 0, x.getMax(), 0);
-//  l0->SetLineStyle(2);
-//
-//  TLine* l3u = new TLine(x.getMin(), 3, x.getMax(), 3);
-//  l3u->SetLineStyle(2);
-//  l3u->SetLineColor(kRed);
-//
-//  TLine* l3d = new TLine(x.getMin(), -3, x.getMax(), -3);
-//  l3d->SetLineStyle(2);
-//  l3d->SetLineColor(kRed);
-//
+  // reduced chi-square, 1 fit param
+  double redchisq = frame->chiSquare(1);
+
   // Canvas
-  TCanvas* c = new TCanvas("c", "Johnson SU fit", 900, 900);
-//
-// Upper pad (main plot)
-//  TPad* pad1 = new TPad("pad1", "pad1", 0, 0.30, 0.7, 1);
-//  pad1->SetBottomMargin(0.02);
-//  pad1->SetRightMargin(0.02);
-//  pad1->Draw();
-//  pad1->cd();
-
   frame->Draw();
 
   // Half-maximum lines
@@ -176,40 +153,8 @@ void TOPBackSplashTimingModule::makePlot(float nearestClusterCosTheta, int iClus
   peak1_rising_edgeline->SetLineColor(kRed);
   peak1_rising_edgeline->SetLineWidth(5);
   peak1_rising_edgeline->Draw();
-//
-//  TLine* halfpeak2xline = new TLine(halfpeak2x, 0, halfpeak2x, 1e6);
-//  halfpeak2xline->SetLineStyle(2);
-//  halfpeak2xline->SetLineColor(kRed);
-//  halfpeak2xline->SetLineWidth(5);
-//  halfpeak2xline->Draw();
-//
-//  c->cd();
-//
-//  //// Lower pad (pulls)
-//  //TPad* pad2 = new TPad("pad2", "pad2", 0, 0.00, 0.7, 0.30);
-//  //pad2->SetTopMargin(0);
-//  //pad2->SetBottomMargin(0.30);
-//  //pad2->SetRightMargin(0.02);
-//  //pad2->Draw();
-//  //pad2->cd();
-//  //
-//  //pull_frame->SetXTitle("Calibrated calibrated time of Cherenkov photon detection (ns)");
-//  //pull_frame->SetYTitle("Pulls");
-//  //
-//  //pull_frame->GetXaxis()->SetTitleSize(0.08);
-//  //pull_frame->GetYaxis()->SetTitleSize(0.08);
-//  //pull_frame->GetYaxis()->SetLabelSize(0.08);
-//  //pull_frame->GetXaxis()->SetLabelSize(0.08);
-//  //pull_frame->GetYaxis()->SetTitleOffset(0.5);
-//  //
-//  //pull_frame->Draw();
-//  l0->Draw("same");
-//  l3u->Draw("same");
-//  l3d->Draw("same");
-//
-  // Stat box
-  c->cd();
 
+  // Stat box
   TPaveText* box = new TPaveText(0.7, 0.65, 0.98, 0.92, "NDC");
   box->SetFillColor(0);
   box->SetBorderSize(1);
@@ -226,52 +171,23 @@ void TOPBackSplashTimingModule::makePlot(float nearestClusterCosTheta, int iClus
                       p->getVal(),
                       p->getError()));
   }
-//
+
   // Extra info
   box->AddText("Rising edge");
   box->AddText(Form("forward peak: %.2f ns", peak1_rising_edge));
-//
-//  if (peak1x < peak2x) {
-//    box->AddText(Form("reflected peak: %.2f ns", halfpeak2x));
-//  }
-//
-//  box->AddText(Form("redchisq = %.4f", redchisq));
-//
+  box->AddText(Form("redchisq = %.4f", redchisq));
+
   box->SetTextSizePixels(50);
   box->Draw();
-//
-//  // Save canvas
-  std::string roofitname = "fit_evtNo_" + std::to_string(eventMetaData->getEvent()) + "_clusterNo_" + std::to_string(
+
+  // Save canvas
+  std::string roofitname = "TOPBackSplashFit_evtNo_" + std::to_string(eventMetaData->getEvent()) + "_fittedcluster_" + std::to_string(
                              iClusterToFit) + "_slot_" + std::to_string(moduleIDindex + 1) + "_cosTheta_" + std::to_string(
                              nearestClusterCosTheta) + ".png";
   c->SaveAs(roofitname.c_str());
+
   return;
 }
-
-//void TOPBackSplashTimingModule::getMCNbar()
-//{
-//  for (const auto& part : m_MCParticles) {
-//    if (part.getPDG() == int(-2112)) {
-//      ROOT::Math::XYZVector nbar_mom = part.getMomentum();
-//      float nbar_phi = nbar_mom.Phi();
-//      float nbar_theta = nbar_mom.Theta();
-//      ROOT::Math::XYZVector decayVertex = part.getDecayVertex();
-//      float decayRho = decayVertex.Rho();
-//
-//      int nbar_slot;
-//      if (nbar_phi > 0) { // nbar_phi will be between -pi and pi
-//        nbar_slot = int(std::floor(nbar_phi / (2 * M_PI / 16)) + 1);
-//      } else {
-//        nbar_slot = int(std::floor((nbar_phi + 2 * M_PI) / (2 * M_PI / 16)) + 1);
-//      }
-//      float nbarCosTheta = std::cos(nbar_theta);
-//      float nearestNbarCosTheta = std::round(nbarCosTheta * 10) / 10; //i.e. round to 0.1
-//      B2INFO("Anti-neutron has theta / phi  / slot / nearest cosTheta / transverse dist:" << nbar_theta << " / " << nbar_phi << " / " <<
-//             nbar_slot << " / " << nearestNbarCosTheta << " / " << decayRho);
-//    }
-//  }
-//  return;
-//}
 
 int TOPBackSplashTimingModule::convertCosThetaToIndex(float nearestClusterCosTheta)
 {
@@ -287,16 +203,6 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
   int cosThetaIndex = convertCosThetaToIndex(nearestClusterCosTheta);
   RooRealVar* x =  m_wss[cosThetaIndex].var("x");
 
-  //if (!x) {
-  //    B2FATAL("RooRealVar x not found in workspace!");
-  //}
-  //if (!model) {
-  //    B2FATAL("Model PDF not found!");
-  //}
-  //if (cosThetaIndex < 0 || cosThetaIndex >= m_wss.size()) {
-  //B2FATAL("Invalid cosThetaIndex!");
-  //}
-  // TODO Get RooRealVar from cdb
   RooDataSet data("data", "unbinned", RooArgSet(*x));
   for (auto digitIndexInSlot : digitIndiciesInSlot) {
     double v = m_digits[digitIndexInSlot]->getTime();
@@ -311,51 +217,34 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
   }
 
   RooAbsPdf* model =  m_wss[cosThetaIndex].pdf("model");
-  RooFitResult* res = model->fitTo(data, RooFit::Save());//, RooFit::Range("fit"));
+  RooFitResult* res = model->fitTo(data, RooFit::Save(), RooFit::PrintLevel(0));
 
-  //B2INFO("evtno: " << eventMetaData->getEvent() << " cluster no.: " << iClusterToFit << " slot: " << moduleIDindex + 1 << " nDigits: "
-  //       << digitIndiciesInSlot.size() << " fitted cosTheta: " << nearestClusterCosTheta << " ith cluster: " << iClusterToFit);
-  //for (int i = 0; i < res->floatParsFinal().getSize(); i++) {
-  //    auto & p= (RooRealVar &) res->floatParsFinal()[i];
-  //    B2INFO("param: " << p.GetName()<<".");
-  //    B2INFO(typeid(p.GetName()).name());
-  //    if ( std::string(p.GetName()) == "mu"){
-  //        double mu_val = p.getVal();
-  //        fitresult.setTime(mu_val);
-  //        B2INFO("mu found");
-  //    }
-  //}
-
-  //if (!john_arg || !smoothedexp_arg) {
-  //    B2ERROR("Could not find PDF components 'john' or 'smoothedexp'");
-  //    return;
-  //}
-
-
+  // First peak
   RooAbsArg* john_arg = model->getComponents()->find("john");
   RooAbsPdf* peak1_fit = static_cast<RooAbsPdf*>(john_arg);
   TF1* peak1_tf1 = peak1_fit->asTF(RooArgList(*x));
   double peak1_max = peak1_tf1->GetMaximum(x->getMin(), x->getMax());
   double peak1_rising_edge = peak1_tf1->GetX(0.5 * peak1_max, x->getMin(), x->getMax());
 
-  // Second peak?
-  RooAbsArg* smoothedexp_arg = model->getComponents()->find("smoothedexp");
-  RooAbsPdf* peak2_fit = static_cast<RooAbsPdf*>(smoothedexp_arg);
-  //TF1* peak2_tf1= peak2_fit->asTF(RooArgList(*x_model));
-  //double peak2_rising_edge = peak2_tf1->GetX(0.5 * peak2_max, x->getMin(), x->getMax());
+  // Deriving chi2: Need to bin but not Draw
+  int binning = (m_fitparams[cosThetaIndex][2] - m_fitparams[cosThetaIndex][1]);
+  RooPlot* frame = x->frame();
+  data.plotOn(frame, RooFit::Binning(binning));
+  model->plotOn(frame);
+  double redchisq = frame->chiSquare(1);
 
+  // Saving results & plotting
   TOPBackSplashFitResult* fitresult = m_fitresult.appendNew();
   fitresult->setTime(peak1_rising_edge);
-  fitresult->setChisqdof(0); //TODO add chi2
+  fitresult->setChisqdof(redchisq);
   fitresult->setNphotons(data.sumEntries());
 
-  if (m_debug == true) {
+  if (m_saveFits == true) {
     makePlot(nearestClusterCosTheta, iClusterToFit, moduleIDindex,  model,
-             peak1_fit,  peak2_fit, x, data, peak1_rising_edge,  res);
+             x, data, peak1_rising_edge,  res);
   }
   return fitresult;
 }
-
 
 
 void TOPBackSplashTimingModule::initialize()
@@ -370,12 +259,12 @@ void TOPBackSplashTimingModule::initialize()
 
 void TOPBackSplashTimingModule::event()
 {
-  // 1st: Sort digit indicies into slots (TODO pointer or indicies)
+  // 1st: Sort digit indicies into slots
   std::array<std::vector<int>, 16> digitIndiciesPerSlots;
   int nCleanDigits = 0;
   for (int i = 0; i < m_digits.getEntries(); i++) {
     const TOPDigit* digi = m_digits[i];
-    if (digi->getTime() > 0) { //digitQuality cut??
+    if (digi->getTime() > 1) {
       digitIndiciesPerSlots[ int(digi->getModuleID()) - 1].push_back(i);
       nCleanDigits++;
     }
@@ -386,14 +275,18 @@ void TOPBackSplashTimingModule::event()
   for (int iCluster = 0; iCluster < m_eclClusters.getEntries(); iCluster++) {
     const ECLCluster*  cluster = m_eclClusters[iCluster];
 
-    //Barrel and neutral hadron treatment of clusters only, with gt 100 MeV, no tracks
-    // TODO: cosTheta outside of -0.8 to 0.6
-    if (cluster->getDetectorRegion() == 2 && cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)
-        && cluster->getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron) > 0.1 && cluster-> isTrack() == false) {
+    // Clusters in barrel and within TOP acceptance,
+    // Must have neutral hadron treatment of clusters only
+    // with gt 100 MeV, and no tracks
+    if (cluster->getTheta() > 31.0 * M_PI / 180.0 && cluster->getTheta() < 128.0 * M_PI / 180.0 &&
+        cluster->getDetectorRegion() == 2 &&
+        cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron) &&
+        cluster->getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron) > 0.1 &&
+        cluster-> isTrack() == false) {
 
       // Derive module in front of cluster
       double phi = cluster->getPhi();
-      int moduleID = TOPBackSplashTimingModule::getModuleFromPhi(phi); // Put this func back
+      int moduleID = TOPBackSplashTimingModule::getModuleFromPhi(phi);
 
       if (digitIndiciesPerSlots[moduleID - 1].size() == 0) {
         continue;
@@ -401,6 +294,11 @@ void TOPBackSplashTimingModule::event()
 
       nClustersToFit++;
       float nearestClusterCosTheta = (float)std::round(std::cos(cluster->getTheta()) * 10) / 10;
+      if (nearestClusterCosTheta == 0.9) {
+        // Treat rare edge case of nearestClusterCosTheta = 0.9
+        // (TOP acceptance is 31 < theta < 128, -0.616 < cosTheta < 0.857)
+        nearestClusterCosTheta = 0.8;
+      }
 
       // 3rd: Fit clusters
       TOPBackSplashFitResult* fitresult = fitTimingDigits(moduleID - 1, digitIndiciesPerSlots[moduleID - 1], nearestClusterCosTheta,
@@ -408,7 +306,7 @@ void TOPBackSplashTimingModule::event()
       if (fitresult->getTime() == -1.0 && fitresult->getChisqdof() == -1.0 && fitresult->getNphotons() == -1) {
         continue;
       }
-      //// 4th: Setting up ECL relation to fit
+      // 4th: Setting up ECL relation to fit
       fitresult->addRelationTo(cluster);
     }
   }

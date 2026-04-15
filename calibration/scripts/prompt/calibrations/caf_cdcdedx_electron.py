@@ -19,7 +19,7 @@ from ROOT.Belle2 import CDCDedxCosEdgeAlgorithm, CDCDedxBadWireAlgorithm, CDCDed
 from ROOT.Belle2 import CDCDedx1DCellAlgorithm, CDCDedxValidationAlgorithm
 
 from caf.framework import Calibration
-from caf.strategies import SequentialRunByRun, SequentialBoundaries
+from caf.strategies import SequentialRunByRun, SequentialBoundaries, SingleIOV
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 import reconstruction as recon
 from random import seed
@@ -134,8 +134,10 @@ def get_calibrations(input_data, **kwargs):
             "coscorr0": 0,  # Cosine Corr Gain Pre (No Payload saving)
             "cosedge0": 0,  # Cosine edge Corr Gain
             "badwire0": 0,  # Bad wire
-            "wiregain0": 0,  # WireGain Gain
-            "onedcell0": 0,  # OneD cell correction
+            "wiregain1": 0,  # WireGain Gain
+            "onedcell0": 0,  # OneD cell correction Pre (No payload saving)
+            "onedcell1": 0,  # OneD cell correction
+            "coslayer1": 0,  # Cosine Corr Gain layer dependent (No Payload saving)
             "coscorr1": 0,  # Cosine Corr Gain
             "rungain2": 0,  # Final Run Gain to take Wire and Cosine correction in effect
             "validation0": 0  # get data for validation
@@ -201,6 +203,12 @@ def get_calibrations(input_data, **kwargs):
                 for algorithm in cals[i].algorithms:
                     algorithm.params = {"iov_coverage": output_iov}
                 if calib_keys[i] == "rungain0" or calib_keys[i] == "rungain1" or calib_keys[i] == "timegain0":
+                    cals[i].save_payloads = False
+            elif cal_name == "onedcell":
+                cals[i].strategies = SingleIOV
+                for algorithm in cals[i].algorithms:
+                    algorithm.params = {"apply_iov": output_iov}
+                if calib_keys[i] == "onedcell0":
                     cals[i].save_payloads = False
             else:
                 cals[i].strategies = SequentialBoundaries

@@ -7,12 +7,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/BadBoardADCDetector.h>
 
-#include <cdc/dataobjects/CDCHit.h>
 #include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackingUtilities/rootification/StoreWrapper.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 #include <map>
 
@@ -27,6 +27,12 @@ void BadBoardADCDetector::initialize()
 {
   Belle2::TrackingUtilities::StoreWrappedObjPtr< std::vector<unsigned int> > storeVector("CDCDeadBoardsVector");
   storeVector.registerInDataStore();
+}
+
+void BadBoardADCDetector::beginRun()
+{
+  // checking validity once per run should be sufficient
+  if (not m_badBoardsFromDB.isValid()) B2FATAL("CDCBadBoards payload not found!");
 }
 
 std::string BadBoardADCDetector::getDescription()
@@ -85,9 +91,11 @@ void BadBoardADCDetector::apply(std::vector<TrackingUtilities::CDCWireHit>& wire
 
   storeVector.create();
 
+  // TODO: decide if need the dead boards from the payload. Should be not possible that this method fails to detect those!?
+  double dummyEff = 0; // needed by isDeadBoard function else unused
   // Note that board 0 is absent, the loop starts from 1.
   for (unsigned int iBoard = 1; iBoard < c_nBoards; iBoard += 1) {
-    if (BoardCount.find(iBoard) == BoardCount.end()) {
+    if (BoardCount.find(iBoard) == BoardCount.end() || m_badBoardsFromDB->isDeadBoard(iBoard, dummyEff)) {
       storeVector->push_back(iBoard);
     }
   }

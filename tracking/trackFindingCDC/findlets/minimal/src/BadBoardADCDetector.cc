@@ -25,7 +25,7 @@ BadBoardADCDetector::BadBoardADCDetector()
 
 void BadBoardADCDetector::initialize()
 {
-  Belle2::TrackingUtilities::StoreWrappedObjPtr< std::vector<unsigned int> > storeVector("BadBoardsVector");
+  Belle2::TrackingUtilities::StoreWrappedObjPtr< std::vector<unsigned int> > storeVector("CDCDeadBoardsVector");
   storeVector.registerInDataStore();
 }
 
@@ -81,7 +81,7 @@ void BadBoardADCDetector::apply(std::vector<TrackingUtilities::CDCWireHit>& wire
   }
 
   // 3rd loop, over all boards, update list of them. Include boards with no hits at all
-  Belle2::TrackingUtilities::StoreWrappedObjPtr< std::vector<unsigned int> > storeVector("BadBoardsVector");
+  Belle2::TrackingUtilities::StoreWrappedObjPtr< std::vector<unsigned int> > storeVector("CDCDeadBoardsVector");
 
   storeVector.create();
 

@@ -8,13 +8,20 @@
 #pragma once
 
 namespace Belle2 {
+
+  // forward declaration
   namespace TrackingUtilities {
-
     class CDCTrack;
+  }
 
-    // helper function to filter CDCTracks which have bad CDC boards where holes
-    // in the track are detected
-    bool trackBadBoardFilter(const TrackingUtilities::CDCTrack& aCDCTrack);
+  namespace TrackFindingCDC {
+
+    /** Helper function to filter CDCTracks which have bad CDC boards where holes
+       in the track are detected
+       @param: aCDCTrack CDC track to be checked
+       @return: returns true if bad board has been detected
+    */
+    bool cdcTrackDeadBoardFilter(const Belle2::TrackingUtilities::CDCTrack& aCDCTrack);
 
   }
 }

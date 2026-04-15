@@ -16,7 +16,7 @@
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
-#include <tracking/trackFindingCDC/filters/track/TrackBadBoardFilter.h>
+#include <tracking/trackFindingCDC/filters/track/CDCTrackDeadBoardFilter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -71,7 +71,7 @@ void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
     if (std::isnan(qualityIndicator)) {
       // set dummy QI to prevent deleting
       // WARNING: will screw up the tracks QI provided to analysts
-      if (trackBadBoardFilter(track)) track.setQualityIndicator(0.5);
+      if (cdcTrackDeadBoardFilter(track)) track.setQualityIndicator(0.5);
     }
   }
 

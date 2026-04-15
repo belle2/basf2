@@ -34,7 +34,7 @@
          from the sides. We follow this scheme in the simulation geometry for
          alignment purposes. Each shell consists of a number of ladders for
          each layer. -->
-    <!-- Early phase three is identical to the nominal PXD but in layer two only two
+    <!-- Run 1 (early phase 3) is identical to the nominal PXD but in layer two only two
          ladders are installed. -->
     <HalfShell name="Ying">
       <!-- For this shell we place the support without any rotation -->

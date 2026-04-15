@@ -21,7 +21,7 @@ out_dir = "./"
 # create path
 main = b2.create_path()
 
-# default to early phase 3 (exp=1003), run 0
+# default to Run 1 (early phase 3) (exp=1003), run 0
 main.add_module("EventInfoSetter", expList=1003, runList=0, evtNumList=num_events)
 
 # generate BBbar (or Continuum) events

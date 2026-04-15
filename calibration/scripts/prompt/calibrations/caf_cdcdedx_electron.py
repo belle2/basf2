@@ -137,7 +137,8 @@ def get_calibrations(input_data, **kwargs):
             "cosedge0": 0,  # Cosine edge Corr Gain
             "badwire0": 0,  # Bad wire
             "wiregain1": 0,  # WireGain Gain
-            "onedcell0": 0,  # OneD cell correction
+            "onedcell0": 0,  # OneD cell correction Pre (No payload saving)
+            "onedcell1": 0,  # OneD cell correction
             "coslayer1": 0,  # Cosine Corr Gain layer dependent (No Payload saving)
             "coscorr1": 0,  # Cosine Corr Gain
             "rungain2": 0,  # Final Run Gain to take Wire and Cosine correction in effect
@@ -212,6 +213,8 @@ def get_calibrations(input_data, **kwargs):
                 cals[i].strategies = SingleIOV
                 for algorithm in cals[i].algorithms:
                     algorithm.params = {"apply_iov": output_iov}
+                if calib_keys[i] == "onedcell0":
+                    cals[i].save_payloads = False
             else:
                 cals[i].strategies = SequentialBoundaries
                 for algorithm in cals[i].algorithms:

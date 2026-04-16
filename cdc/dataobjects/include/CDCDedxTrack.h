@@ -306,23 +306,13 @@ namespace Belle2 {
     double m_simDedx;    /**< track level MC dE/dx truncated mean */
 
     // calibration constants
-    <<< <<< < HEAD
-    == == == =
-      double m_predmean[Const::ChargedStable::c_SetSize]; /**< predicted dE/dx truncated mean */
-    double m_predres[Const::ChargedStable::c_SetSize];  /**< predicted dE/dx resolution */
-
-    std::vector<double> m_hCosCor;  /**< calibration cosine correction (indexed on number of hits) */
-    std::vector<double> m_hWireGain; /**< calibration hit gain (indexed on number of hits) */
-    std::vector<double> m_hTwodCor;  /**< calibration 2-D correction (indexed on number of hits) */
-    std::vector<double> m_hOnedCor;  /**< calibration 1-D correction (indexed on number of hits) */
-
-    >>> >>> > 5dbd5a459(Merge branch 'feature/cdcdedx_lowHV_calib_main' into 'main')
     double m_scale; /**< scale factor to make electrons ~1 */
     double m_cosEdgeCor;  /**< calibration cosine edge correction */
     double m_runGain; /**< calibration run gain */
     double m_timeGain; /**< calibration injection time gain */
     double m_timeReso; /**< calibration injection time gain */
 
+    std::vector<double> m_hCosCor;  /**< calibration cosine correction (indexed on number of hits) */
     std::vector<double> m_hWireGain; /**< calibration hit gain (indexed on number of hits) */
     std::vector<double> m_hTwodCor;  /**< calibration 2-D correction (indexed on number of hits) */
     std::vector<double> m_hOnedCor;  /**< calibration 1-D correction (indexed on number of hits) */
@@ -346,7 +336,6 @@ namespace Belle2 {
     std::vector<double> m_lPath;   /**< distance flown through active medium in current segment */
     std::vector<double> m_lDedx;   /**< extracted dE/dx (arb. units, detector dependent) */
 
-    <<< <<< < HEAD
     // hit level information
     std::vector<int> m_hLWire;     /**< wire ID within the layer */
     std::vector<int> m_hWire;     /**< continuous wire ID in the CDC */
@@ -371,9 +360,6 @@ namespace Belle2 {
     std::vector<double> m_hCellHeight;    /**< height of the CDC cell */
     std::vector<double> m_hCellHalfWidth; /**< half-width of the CDC cell */
 
-    ClassDef(CDCDedxTrack, 17); /**< Debug output for CDCDedxPID module. */
-    == == == =
-      ClassDef(CDCDedxTrack, 19); /**< Debug output for CDCDedxPID module. */
-    >>> >>> > 5dbd5a459(Merge branch 'feature/cdcdedx_lowHV_calib_main' into 'main')
+    ClassDef(CDCDedxTrack, 19); /**< Debug output for CDCDedxPID module. */
   };
 }

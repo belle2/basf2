@@ -13,7 +13,7 @@
 #pragma link C++ class Belle2::WireID+; // checksum=0x2d06587f, version=2
 
 #pragma link C++ class Belle2::CDCDedxHit+; // checksum=0xfb665330, version=1
-#pragma link C++ class Belle2::CDCDedxTrack+; // checksum=0x1ae91b6a, version=19
+#pragma link C++ class Belle2::CDCDedxTrack+; // checksum=0xaea5dec8, version=19
 #pragma link C++ class Belle2::CDCDedxLikelihood+; // checksum=0x6c4f61c2, version=1
 
 #endif

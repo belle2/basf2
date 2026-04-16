@@ -155,20 +155,11 @@ namespace Belle2 {
         return Vector2D(0.0, 0.0);
       }
 
-      /// Checks if the vector is the null vector.
-      bool isNull() const
-      {
-        return x() == 0.0 and y() == 0.0;
-      }
-
       /// Checks if one of the coordinates is NAN
       bool hasNAN() const
       {
         return std::isnan(x()) or std::isnan(y());
       }
-
-      /// Output operator for python
-      std::string __str__() const;
 
       /// Calculates the two dimensional dot product.
       double dot(const Vector2D& rhs) const
@@ -215,11 +206,7 @@ namespace Belle2 {
       {
         return dot(rhs) / (norm() * rhs.norm());
       }
-      /// Sine of the angle between this and rhs
-      double sinWith(const Vector2D& rhs) const
-      {
-        return cross(rhs) / (norm() * rhs.norm());
-      }
+
       /// The angle between this and rhs
       double angleWith(const Vector2D& rhs) const
       {
@@ -347,7 +334,7 @@ namespace Belle2 {
       /// Returns a unit vector colaligned with this
       Vector2D unit() const
       {
-        return isNull() ? Vector2D(0.0, 0.0) : divided(norm());
+        return (x() == 0.0 and y() == 0.0) ? Vector2D(0.0, 0.0) : divided(norm());
       }
 
       /// Reverses the direction of the vector in place
@@ -595,7 +582,7 @@ namespace Belle2 {
       /// Gives the azimuth angle being the angle to the x axes ( range -M_PI to M_PI )
       double phi() const
       {
-        return isNull() ? NAN : atan2(y(), x());
+        return (x() == 0.0 and y() == 0.0) ? NAN : atan2(y(), x());
       }
 
       /// Passivelly moves the vector inplace by the given vector
@@ -660,27 +647,6 @@ namespace Belle2 {
       {
         m_x = xy.x();
         m_y = xy.y();
-      }
-
-      /// Getter for the first coordinate
-      double first() const
-      {
-        return m_x;
-      }
-      /// Setter for the first coordinate
-      void setFirst(const double first)
-      {
-        m_x = first;
-      }
-      /// Getter for the second coordinate
-      double second() const
-      {
-        return m_y;
-      }
-      /// Setter for the second coordinate
-      void setSecond(const double second)
-      {
-        m_y = second;
       }
 
       /// Setter for both  coordinate

@@ -8,6 +8,7 @@
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
@@ -49,7 +50,7 @@ double CDCBFieldUtil::getBFieldZ(const Vector3D& pos3D)
   // The BFieldMap can not handle positions with not a number coordinates
   // which can occur if fits fail.
   // Return NAN to the caller and let him decide what to do next.
-  if (pos3D.hasNAN()) return NAN;
+  if (VectorUtil::hasNAN(pos3D)) return NAN;
   auto mag3D = BFieldManager::getField(pos3D.x(), pos3D.y(), pos3D.z());
   return mag3D.Z() / Unit::T;
 }

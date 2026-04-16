@@ -19,8 +19,8 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHitPair.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
-
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <cdc/topology/CDCWire.h>
 
@@ -173,7 +173,7 @@ std::size_t CDCObservations2D::append(const CDCRecoHit2D& recoHit2D)
     signedDriftLength = 0;
 
     // Fall back to the rl circle in case position is not setup
-    if (fitPos2D.hasNAN()) {
+    if (VectorUtil::hasNAN(fitPos2D)) {
       fitPos2D = recoHit2D.getWire().getRefPos2D();
       signedDriftLength = recoHit2D.getSignedRefDriftLength();
     }

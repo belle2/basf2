@@ -8,6 +8,7 @@
 #pragma once
 
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
@@ -100,13 +101,13 @@ namespace Belle2 {
       /// Getter for the second line parameter
       double n1() const
       {
-        return m_n12.first();
+        return m_n12.X();
       }
 
       /// Getter for the third line parameter
       double n2() const
       {
-        return m_n12.second();
+        return m_n12.Y();
       }
 
       /// Getter for the unit normal vector to the line
@@ -131,13 +132,13 @@ namespace Belle2 {
       /// Setter for the second line parameter. May violate the normalization.
       void setN1(const double n1)
       {
-        m_n12.setFirst(n1);
+        m_n12.setX(n1);
       }
 
       /// Setter for the third line parameter. May violate the normalization.
       void setN2(const double n2)
       {
-        m_n12.setSecond(n2);
+        m_n12.setY(n2);
       }
 
       /// Setter for the normal vector by its coordinates.
@@ -313,7 +314,7 @@ namespace Belle2 {
       /// Indicates if all circle parameters are zero
       bool isInvalid() const
       {
-        return n0() == 0.0 and n12().isNull();
+        return n0() == 0.0 and VectorUtil::isNull(n12());
       }
 
       /// Gives the tangential vector in the direction of positive advance on the line

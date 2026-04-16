@@ -9,6 +9,7 @@
 
 #include <tracking/trackingUtilities/geometry/Line2D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
@@ -295,7 +296,7 @@ namespace Belle2 {
       /// Indicates if all circle parameters are zero
       bool isInvalid() const
       {
-        return n0() == 0 and n12().isNull() and n3() == 0;
+        return n0() == 0 and VectorUtil::isNull(n12()) and n3() == 0;
       }
 
       /// Indicates if the combination of the circle parameters makes up a valid circle

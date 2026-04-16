@@ -78,10 +78,3 @@ std::ostream& TrackingUtilities::operator<<(std::ostream& output, const Vector3D
 {
   return output << "Vector3D(" << vector3D.x() << "," << vector3D.y() << "," << vector3D.z() << ")";
 }
-
-std::string Vector3D::__str__() const
-{
-  std::stringstream sstream;
-  sstream << *this;
-  return sstream.str();
-}

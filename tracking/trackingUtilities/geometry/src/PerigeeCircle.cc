@@ -11,6 +11,7 @@
 
 #include <tracking/trackingUtilities/geometry/Circle2D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
@@ -163,7 +164,7 @@ void PerigeeCircle::invalidate()
 bool PerigeeCircle::isInvalid() const
 {
   return (not std::isfinite(phi0()) or not std::isfinite(curvature()) or
-          not std::isfinite(impact()) or phi0Vec().isNull());
+          not std::isfinite(impact()) or VectorUtil::isNull(phi0Vec()));
 }
 
 void PerigeeCircle::passiveMoveBy(const Vector2D& by)

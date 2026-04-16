@@ -23,6 +23,7 @@
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/ESign.h>
 #include <tracking/trackingUtilities/numerics/Quadratic.h>
@@ -272,7 +273,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
   ESign charge = getChargeSign();
 
   // Do not propagate invalid fits, signal that the fit is invalid to the caller.
-  if (not ESignUtil::isValid(charge) or momentum.hasNAN() or position.hasNAN()) {
+  if (not ESignUtil::isValid(charge) or VectorUtil::hasNAN(momentum) or VectorUtil::hasNAN(position)) {
     return false;
   }
 

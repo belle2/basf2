@@ -94,28 +94,6 @@ namespace Belle2 {
         }
       }
 
-      /// Constructs the average of three vectors
-      /** Computes the average of three vectors. In case one of the three dimensional vectors
-       *contains an NAN,
-       *  it is not considered a valid value for the average and is therefore left out.
-       *  The average() of the other two vectors is then returned.
-       **/
-      static Vector3D average(const Vector3D& one, const Vector3D& two, const Vector3D& three)
-      {
-
-        if (one.hasNAN()) {
-          return average(two, three);
-        } else if (two.hasNAN()) {
-          return average(one, three);
-        } else if (three.hasNAN()) {
-          return average(one, two);
-        } else {
-          return Vector3D((one.x() + two.x() + three.x()) / 3.0,
-                          (one.y() + two.y() + three.y()) / 3.0,
-                          (one.z() + two.z() + three.z()) / 3.0);
-        }
-      }
-
       /// Casting the back to TVector3 seamlessly
       operator const TVector3() const;
 
@@ -145,27 +123,11 @@ namespace Belle2 {
                                        (z() < rhs.z() or (z() == rhs.z() and (phi() < rhs.phi()))));
       }
 
-      /// Getter for the lowest possible vector
-      /** The lowest possible vector according to the comparison is the null vector */
-      static Vector3D getLowest()
-      {
-        return Vector3D(0.0, 0.0, 0.0);
-      }
-
-      /// Checks if the vector is the null vector.
-      bool isNull() const
-      {
-        return x() == 0.0 and y() == 0.0 and z() == 0.0;
-      }
-
       /// Checks if one of the coordinates is NAN
       bool hasNAN() const
       {
         return std::isnan(x()) or std::isnan(y()) or std::isnan(z());
       }
-
-      /// Output operator for python
-      std::string __str__() const;
 
       /// Calculates the three dimensional dot product.
       double dot(const Vector3D& rhs) const
@@ -365,7 +327,7 @@ namespace Belle2 {
       /// Returns a unit vector colaligned with this
       Vector3D unit() const
       {
-        return isNull() ? Vector3D(0.0, 0.0, 0.0) : divided(norm());
+        return (x() == 0.0 and y() == 0.0 and z() == 0.0)  ? Vector3D(0.0, 0.0, 0.0) : divided(norm());
       }
 
       /// Normalizes the vector to unit length

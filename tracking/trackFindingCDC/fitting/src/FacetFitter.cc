@@ -12,7 +12,7 @@
 #include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
-
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <tracking/trackingUtilities/numerics/EigenView.h>
 
 #include <Eigen/Core>
@@ -111,7 +111,7 @@ namespace {
     Vector2D coordinate = getTangentialForwardDirection(xylIn);
     // Sometimes the calculation of the tangent fails due to misestimated dirft lengths
     // Make best effort the continue the calculation
-    if (coordinate.hasNAN()) {
+    if (VectorUtil::hasNAN(coordinate)) {
       coordinate = getCenterForwardDirection(xylIn);
     }
 

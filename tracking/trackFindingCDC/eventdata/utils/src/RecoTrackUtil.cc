@@ -21,6 +21,7 @@
 
 #include <tracking/trackingUtilities/numerics/TMatrixConversion.h>
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
@@ -111,7 +112,7 @@ RecoTrack* RecoTrackUtil::storeInto(const CDCTrajectory3D& traj3D,
   ESign charge = traj3D.getChargeSign();
 
   // Do not propagate invalid fits, signal that the fit is invalid to the caller.
-  if (not ESignUtil::isValid(charge) or momentum.hasNAN() or position.hasNAN()) {
+  if (not ESignUtil::isValid(charge) or VectorUtil::hasNAN(momentum) or VectorUtil::hasNAN(position)) {
     return nullptr;
   }
 

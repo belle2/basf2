@@ -11,6 +11,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
@@ -236,9 +237,9 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
   var<named("stereo_quad_tree_distance")>() = toFinite(stereo_quad_tree_distance, 0);
 
   var<named("pt_of_track")>() = toFinite(std::isnan(trajectoryTrack2D.getAbsMom2D()) ? 0.0 : trajectoryTrack2D.getAbsMom2D(), 0);
-  var<named("track_is_curler")>() = trajectoryTrack2D.getExit().hasNAN();
+  var<named("track_is_curler")>() = VectorUtil::hasNAN(trajectoryTrack2D.getExit());
 
-  var<named("superlayer_already_full")>() = not trajectoryTrack2D.getOuterExit().hasNAN() and hitsInSameRegion > 5;
+  var<named("superlayer_already_full")>() = not VectorUtil::hasNAN(trajectoryTrack2D.getOuterExit()) and hitsInSameRegion > 5;
 
   var<named("maxmimum_trajectory_distance_front")>() = toFinite(maxmimumTrajectoryDistanceFront, 999);
   var<named("maxmimum_trajectory_distance_back")>() = toFinite(maxmimumTrajectoryDistanceBack, 999);

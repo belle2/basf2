@@ -35,10 +35,3 @@ std::ostream& TrackingUtilities::operator<<(std::ostream& output, const Vector2D
   output << "Vector2D(" << vector2D.x() << "," << vector2D.y() << ")";
   return output;
 }
-
-std::string Vector2D::__str__() const
-{
-  std::stringstream sstream;
-  sstream << *this;
-  return sstream.str();
-}

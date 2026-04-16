@@ -27,6 +27,7 @@
 #include <cdc/topology/CDCWireTopology.h>
 
 #include <tracking/trackingUtilities/geometry/Circle2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
@@ -407,7 +408,7 @@ void EventDataPlotter::draw(const CDCRecoHit2D& recoHit2D, const AttributeMap& a
   float radius = wireHit.getRefDriftLength();
   primitivePlotter.drawCircle(x, y, radius, attributeMap);
 
-  if (not recoPos2D.hasNAN()) {
+  if (not VectorUtil::hasNAN(recoPos2D)) {
     float supportPointRadius = 0.2;
     Circle2D supportPoint(recoPos2D, supportPointRadius);
     draw(supportPoint, attributeMap);
@@ -468,7 +469,7 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
   attributeMap.insert(defaultAttributeMap.begin(), defaultAttributeMap.end());
 
   Vector2D trajectoryExit = trajectory2D.getOuterExit();
-  if (trajectoryExit.hasNAN()) {
+  if (VectorUtil::hasNAN(trajectoryExit)) {
     // Curlers do not leave the CDC
     // Stop the trajectory at the inner wall to be able to
     // see the start point
@@ -476,7 +477,7 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
   }
 
   if (trajectory2D.getLocalCircle()->isCircle()) {
-    if (trajectoryExit.hasNAN()) {
+    if (VectorUtil::hasNAN(trajectoryExit)) {
       // No exit point out of the cdc could be detected.
       // Draw full circle
       const float radius = trajectory2D.getLocalCircle()->absRadius();
@@ -512,7 +513,7 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
     }
   } else {
     // trajectory is a straight line
-    if (trajectoryExit.hasNAN()) {
+    if (VectorUtil::hasNAN(trajectoryExit)) {
       B2WARNING("Could not compute point off exit in a straight line case.");
     } else {
       const Vector2D start = trajectory2D.getSupport();
@@ -566,12 +567,12 @@ void EventDataPlotter::draw(const CDCAxialSegmentPair& axialSegmentPair,
   const Vector2D& fromPos = fromSegment.back().getWire().getRefPos2D();
   const Vector2D& toPos = toSegment.front().getWire().getRefPos2D();
 
-  if (fromPos.hasNAN()) {
+  if (VectorUtil::hasNAN(fromPos)) {
     B2WARNING("Center of mass of first segment in a pair contains NAN values.");
     return;
   }
 
-  if (toPos.hasNAN()) {
+  if (VectorUtil::hasNAN(toPos)) {
     B2WARNING("Center of mass of second segment in a pair contains NAN values.");
     return;
   }
@@ -601,12 +602,12 @@ void EventDataPlotter::draw(const CDCSegmentPair& segmentPair, const AttributeMa
   const Vector2D& fromPos = fromSegment.back().getWire().getRefPos2D();
   const Vector2D& toPos = toSegment.front().getWire().getRefPos2D();
 
-  if (fromPos.hasNAN()) {
+  if (VectorUtil::hasNAN(fromPos)) {
     B2WARNING("Center of mass of first segment in a pair contains NAN values.");
     return;
   }
 
-  if (toPos.hasNAN()) {
+  if (VectorUtil::hasNAN(toPos)) {
     B2WARNING("Center of mass of second segment in a pair contains NAN values.");
     return;
   }
@@ -640,22 +641,22 @@ void EventDataPlotter::draw(const CDCSegmentTriple& segmentTriple, const Attribu
   const Vector2D& middleBackPos2D = middleSegment.back().getRefPos2D();
   const Vector2D& endFrontPos2D = endSegment.front().getRefPos2D();
 
-  if (startBackPos2D.hasNAN()) {
+  if (VectorUtil::hasNAN(startBackPos2D)) {
     B2WARNING("Back position of start segment in a triple contains NAN values.");
     return;
   }
 
-  if (middleFrontPos2D.hasNAN()) {
+  if (VectorUtil::hasNAN(middleFrontPos2D)) {
     B2WARNING("Front position of middle segment in a triple contains NAN values.");
     return;
   }
 
-  if (middleBackPos2D.hasNAN()) {
+  if (VectorUtil::hasNAN(middleBackPos2D)) {
     B2WARNING("Back position of middle segment in a triple contains NAN values.");
     return;
   }
 
-  if (endFrontPos2D.hasNAN()) {
+  if (VectorUtil::hasNAN(endFrontPos2D)) {
     B2WARNING("Front position of end segment in a triple contains NAN values.");
     return;
   }

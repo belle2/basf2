@@ -17,6 +17,7 @@
 #include <cdc/topology/CDCWireTopology.h>
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/utilities/VectorRange.h>
 
@@ -225,7 +226,7 @@ void CDCSimHitLookUp::fillRLInfo()
     const CDCSimHit& simHit = *ptrSimHit;
 
     Vector3D directionOfFlight = getDirectionOfFlight(ptrHit);
-    if (directionOfFlight.isNull()) continue;
+    if (VectorUtil::isNull(directionOfFlight)) continue;
 
     // find out if the wire is right or left of the track ( view in flight direction )
     Vector3D trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};

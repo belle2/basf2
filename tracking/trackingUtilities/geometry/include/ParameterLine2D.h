@@ -10,6 +10,7 @@
 #include <tracking/trackingUtilities/geometry/GeneralizedCircle.h>
 #include <tracking/trackingUtilities/geometry/Line2D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/Quadratic.h>
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
@@ -144,14 +145,14 @@ namespace Belle2 {
       /// axes
       EForwardBackward alignedWithFirst() const
       {
-        return static_cast<EForwardBackward>(sign(tangential().first()));
+        return static_cast<EForwardBackward>(sign(tangential().X()));
       }
 
       /// Indicates if the tangential vector point in a common direction with the second coordinate
       /// axes
       EForwardBackward alignedWithSecond() const
       {
-        return static_cast<EForwardBackward>(sign(tangential().second()));
+        return static_cast<EForwardBackward>(sign(tangential().Y()));
       }
 
       /// Normalizes the tangential vector inplace
@@ -175,7 +176,7 @@ namespace Belle2 {
       /// Check it the line is in an invalid state.
       bool isInvalid() const
       {
-        return m_tangential.isNull();
+        return VectorUtil::isNull(m_tangential);
       }
 
       /// Reverses the tangential vector inplace
@@ -331,14 +332,14 @@ namespace Belle2 {
       /// transformation.
       void moveAlongFirst(const double first)
       {
-        m_support.setFirst(m_support.first() + first);
+        m_support.setX(m_support.X() + first);
       }
 
       /// Moves the line along the second coordinate axes in place. Corresponds to an active
       /// transformation.
       void moveAlongSecond(const double second)
       {
-        m_support.setSecond(m_support.second() + second);
+        m_support.setY(m_support.Y() + second);
       }
 
       /// Moves the coordinate system in the given direction  in place. Corresponds to a passive
@@ -352,14 +353,14 @@ namespace Belle2 {
       /// passive transformation.
       void passiveMoveAlongFirst(const double first)
       {
-        m_support.setFirst(m_support.first() - first);
+        m_support.setX(m_support.X() - first);
       }
 
       /// Moves the coordinate system along the second coordinate axes in place. Corresponds to a
       /// passive transformation.
       void passiveMoveAlongSecond(const double second)
       {
-        m_support.setSecond(m_support.second() - second);
+        m_support.setY(m_support.Y() - second);
       }
       /**@}*/
 
@@ -371,31 +372,31 @@ namespace Belle2 {
       /// The line slope
       double slope() const
       {
-        return tangential().second() / tangential().first();
+        return tangential().Y() / tangential().X();
       }
 
       /// The inverse line slope
       double inverseSlope() const
       {
-        return tangential().first() / tangential().second();
+        return tangential().X() / tangential().Y();
       }
 
       /// Second coordinate for first being zero
       double intercept() const
       {
-        return support().second() - slope() * support().first();
+        return support().Y() - slope() * support().X();
       }
 
       /// First coordinate for second being zero
       double zero() const
       {
-        return support().first() - inverseSlope() * support().second();
+        return support().X() - inverseSlope() * support().Y();
       }
 
       /// Method mapping the first coordinate to the second according to the line
       double map(const double first) const
       {
-        return support().second() + slope() * (first - support().first());
+        return support().Y() + slope() * (first - support().X());
       }
 
       /// Operator mapping the first coordinate to the second according to the line
@@ -407,7 +408,7 @@ namespace Belle2 {
       /// Method for the inverse mapping the second coordinate to the first according to the line
       double inverseMap(const double second) const
       {
-        return support().first() + inverseSlope() * (second - support().second());
+        return support().X() + inverseSlope() * (second - support().Y());
       }
 
       /// Turns the line into its inverse function in place. Orientation will be flipped as well
@@ -420,8 +421,8 @@ namespace Belle2 {
       /// Gives the line associated with the inverse function as a copy.
       ParameterLine2D inverted() const
       {
-        return ParameterLine2D(Vector2D(support().second(), support().first()),
-                               Vector2D(tangential().second(), tangential().first()));
+        return ParameterLine2D(Vector2D(support().Y(), support().X()),
+                               Vector2D(tangential().Y(), tangential().X()));
       }
       ///@}
 

@@ -11,6 +11,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
@@ -260,7 +261,7 @@ int AxialTrackUtil::getArmSignVote(const CDCTrack& track, const Vector2D& center
   int votePos = 0;
   int voteNeg = 0;
 
-  if (center.hasNAN()) {
+  if (VectorUtil::hasNAN(center)) {
     B2WARNING("Trajectory is not set or wrong!");
     return 0;
   }

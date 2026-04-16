@@ -45,7 +45,7 @@ settings = CalibrationSettings(name="CDC Tracking",
                                    "max_events_per_file_hadron_for_tz_tw": 5000,
                                    "max_events_per_file_hadron_for_xt_sr": 12000,
                                    "min_events_for_tz_tw_calibration": 500000,
-                                   "max_events_for_tz_tw_calibration": 1000000,
+                                   "max_events_for_tz_tw_calibration": 15000000,
                                    "min_events_for_xt_sr_calibration": 1000000,  # 1M
                                    "max_events_for_xt_sr_calibration": 10000000,  # 10M
                                    "fractions_for_each_type": [0.5, 1, 0.5],  # [mumu, hadron, cosmic]

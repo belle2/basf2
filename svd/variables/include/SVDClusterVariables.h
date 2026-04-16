@@ -23,6 +23,9 @@ namespace Belle2::Variable {
   double SVDResidual(const Particle*, const std::vector<double>& indices);
   double SVDClusterChargeNormTrkLength(const Particle*, const std::vector<double>& indices);
   double SVDClusterTimeMinusEventT0(const Particle*, const std::vector<double>& indices);
+  double SVDClusterTimeMinusCDCEventT0(const Particle*, const std::vector<double>& indices);
+  double CDCEventT0(const Particle*, const std::vector<double>& indices);
+  double SVDEventT0(const Particle*, const std::vector<double>& indices);
   int SVDLayer(const Particle*, const std::vector<double>& indices);
   int SVDLadder(const Particle*, const std::vector<double>& indices);
   int SVDSensor(const Particle*, const std::vector<double>& indices);

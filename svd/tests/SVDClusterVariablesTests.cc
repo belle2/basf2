@@ -209,4 +209,66 @@ namespace Belle2::SVD {
     m_eventT0->setEventT0(eventT0Value, 1.0, Const::SVD);
     EXPECT_DOUBLE_EQ(Variable::SVDClusterTimeMinusEventT0(m_particles[0], {0}), defaultClsTime - eventT0Value);
   }
+
+  /** Test SVDClusterTimeMinusCDCEventT0 */
+  TEST_F(SVDVariableTest, SVDClusterTimeMinusCDCEventT0)
+  {
+    // nullptr particle or out-of-range cluster -> NaN
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterTimeMinusCDCEventT0(nullptr,        {0})));
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterTimeMinusCDCEventT0(m_particles[0], {1})));
+
+    // EventT0 not yet created -> NaN
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterTimeMinusCDCEventT0(m_particles[0], {0})));
+
+    // EventT0 created but no CDC temporary T0 -> NaN
+    m_eventT0.create();
+    EXPECT_TRUE(std::isnan(Variable::SVDClusterTimeMinusCDCEventT0(m_particles[0], {0})));
+
+    // CDC temporary T0 added -> clsTime - cdcT0
+    const double cdcT0Value = 8.0;
+    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(cdcT0Value, 1.0, Const::CDC));
+    EXPECT_DOUBLE_EQ(Variable::SVDClusterTimeMinusCDCEventT0(m_particles[0], {0}), defaultClsTime - cdcT0Value);
+  }
+
+  /** Test CDCEventT0 */
+  TEST_F(SVDVariableTest, CDCEventT0)
+  {
+    // EventT0 not yet created -> NaN
+    EXPECT_TRUE(std::isnan(Variable::CDCEventT0(m_particles[0], {})));
+
+    // EventT0 created but no CDC temporary T0 -> NaN
+    m_eventT0.create();
+    EXPECT_TRUE(std::isnan(Variable::CDCEventT0(m_particles[0], {})));
+
+    // CDC temporary T0 added -> correct value returned
+    const double cdcT0Value = 12.0;
+    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(cdcT0Value, 1.0, Const::CDC));
+    EXPECT_DOUBLE_EQ(Variable::CDCEventT0(m_particles[0], {}), cdcT0Value);
+
+    // Last entry wins when multiple are present
+    const double cdcT0Value2 = 15.0;
+    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(cdcT0Value2, 0.5, Const::CDC));
+    EXPECT_DOUBLE_EQ(Variable::CDCEventT0(m_particles[0], {}), cdcT0Value2);
+  }
+
+  /** Test SVDEventT0 */
+  TEST_F(SVDVariableTest, SVDEventT0)
+  {
+    // EventT0 not yet created -> NaN
+    EXPECT_TRUE(std::isnan(Variable::SVDEventT0(m_particles[0], {})));
+
+    // EventT0 created but no SVD temporary T0 -> NaN
+    m_eventT0.create();
+    EXPECT_TRUE(std::isnan(Variable::SVDEventT0(m_particles[0], {})));
+
+    // SVD temporary T0 added -> correct value returned
+    const double svdT0Value = 3.0;
+    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(svdT0Value, 0.8, Const::SVD));
+    EXPECT_DOUBLE_EQ(Variable::SVDEventT0(m_particles[0], {}), svdT0Value);
+
+    // Last entry wins when multiple are present
+    const double svdT0Value2 = 6.0;
+    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(svdT0Value2, 0.4, Const::SVD));
+    EXPECT_DOUBLE_EQ(Variable::SVDEventT0(m_particles[0], {}), svdT0Value2);
+  }
 } // namespace Belle2::SVD

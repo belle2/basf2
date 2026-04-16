@@ -392,6 +392,62 @@ namespace Belle2::Variable {
     }
   }
 
+  double SVDClusterTimeMinusCDCEventT0(const Particle* particle, const std::vector<double>& indices)
+  {
+    if (!particle) {
+      return Const::doubleNaN;
+    }
+    if (indices.size() != 1) {
+      B2FATAL("Exactly one parameter (cluster index) is required.");
+    }
+    const auto clusterIndex = static_cast<unsigned int>(indices[0]);
+
+    SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+    if (!svdCluster) {
+      return Const::doubleNaN;
+    }
+
+    StoreObjPtr<EventT0> evtT0;
+    if (!evtT0.isValid()) {
+      B2WARNING("StoreObjPtr<EventT0> does not exist, are you running over cDST data?");
+      return Const::doubleNaN;
+    }
+    auto cdcT0 = evtT0->getBestCDCTemporaryEventT0();
+    if (!cdcT0) {
+      return Const::doubleNaN;
+    }
+
+    return svdCluster->getClsTime() - cdcT0->eventT0;
+  }
+
+  double CDCEventT0(const Particle* /*particle*/, const std::vector<double>& /*indices*/)
+  {
+    StoreObjPtr<EventT0> evtT0;
+    if (!evtT0.isValid()) {
+      B2WARNING("StoreObjPtr<EventT0> does not exist, are you running over cDST data?");
+      return Const::doubleNaN;
+    }
+    auto cdcT0 = evtT0->getBestCDCTemporaryEventT0();
+    if (!cdcT0) {
+      return Const::doubleNaN;
+    }
+    return cdcT0->eventT0;
+  }
+
+  double SVDEventT0(const Particle* /*particle*/, const std::vector<double>& /*indices*/)
+  {
+    StoreObjPtr<EventT0> evtT0;
+    if (!evtT0.isValid()) {
+      B2WARNING("StoreObjPtr<EventT0> does not exist, are you running over cDST data?");
+      return Const::doubleNaN;
+    }
+    auto svdT0 = evtT0->getBestSVDTemporaryEventT0();
+    if (!svdT0) {
+      return Const::doubleNaN;
+    }
+    return svdT0->eventT0;
+  }
+
   VARIABLE_GROUP("SVD Validation");
 
   REGISTER_VARIABLE("SVDClusterCharge(i)", SVDClusterCharge,
@@ -422,4 +478,10 @@ namespace Belle2::Variable {
                     "Returns the sensor number of the i-th SVD cluster related to the Particle. If no SVD cluster is found, returns -1.");
   REGISTER_VARIABLE("SVDSide(i)", SVDSide,
                     "Returns true if the i-th SVD cluster related to the Particle is a U cluster.");
+  REGISTER_VARIABLE("SVDClusterTimeMinusCDCEventT0(i)", SVDClusterTimeMinusCDCEventT0,
+                    "Returns the cluster time minus the best CDC-based event T0 for the i-th SVD cluster related to the Particle.");
+  REGISTER_VARIABLE("CDCEventT0", CDCEventT0,
+                    "Returns the best CDC-based event T0.");
+  REGISTER_VARIABLE("SVDEventT0", SVDEventT0,
+                    "Returns the best SVD-based event T0.");
 }

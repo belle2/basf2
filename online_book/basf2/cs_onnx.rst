@@ -63,7 +63,7 @@ First, we load our ntuple into a pandas DataFrame:
 
     import uproot
 
-    with uproot.open({"ContinuumSuppression.root": "tree"}) as tree:
+    with uproot.open({"ContinuumSuppression.root": "ntuple"}) as tree:
         df = tree.arrays(library="pd")
         # undo the replacement for the brackets in variable names
         df.columns = [col.replace("__bo", "(").replace("__bc", ")") for col in df.columns]
@@ -252,7 +252,7 @@ We can now cross check the result in our notebook:
 
 .. code:: python
 
-    with uproot.open({"ContinuumSuppression_applied.root": "tree"}) as tree:
+    with uproot.open({"ContinuumSuppression_applied.root": "ntuple"}) as tree:
         df = tree.arrays(library="pd")
 
     np.allclose(df["ContProb"].to_numpy(), bdt.predict_proba(X)[:, 1], atol=1e-4)
@@ -288,7 +288,7 @@ We can also run the ``basf2_mva_evaluate.py`` script. To do so we first create n
         df = pd.DataFrame(X, columns=root_variables)
         df["isContinuumEvent"] = y
         with uproot.recreate(filename) as f:
-            f["tree"] = df
+            f["ntuple"] = df
 
     write_rootfile(X_train, y_train, "train.root")
     write_rootfile(X_test, y_test, "test.root")

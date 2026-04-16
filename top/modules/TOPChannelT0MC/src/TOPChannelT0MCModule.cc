@@ -45,19 +45,9 @@ namespace Belle2 {
 
   }
 
-  TOPChannelT0MCModule::~TOPChannelT0MCModule()
-  {
-  }
-
   void TOPChannelT0MCModule::initialize()
   {
-
     m_digits.isRequired();
-
-  }
-
-  void TOPChannelT0MCModule::beginRun()
-  {
   }
 
   void TOPChannelT0MCModule::event()
@@ -80,10 +70,6 @@ namespace Belle2 {
         histo->Fill(digit.getTime());
       }
     }
-  }
-
-  void TOPChannelT0MCModule::endRun()
-  {
   }
 
   void TOPChannelT0MCModule::terminate()

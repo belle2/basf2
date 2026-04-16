@@ -53,7 +53,7 @@ VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
 
   addParam("fileName", m_fileName, "Name of ROOT file for output. Can be overridden using the -o argument of basf2.",
            string("VariablesToEventBasedTree.root"));
-  addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("tree"));
+  addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
   addParam("maxCandidates", m_maxCandidates, "The maximum number of candidates in the ParticleList per entry of the Tree.", 100u);
 
   std::tuple<std::string, std::map<int, unsigned int>> default_sampling{"", {}};

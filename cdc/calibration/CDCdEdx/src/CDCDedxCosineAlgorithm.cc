@@ -118,7 +118,6 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   for (unsigned int i = 0; i < m_cosBin; ++i) {
 
     double meanDedx = 1.0; //This is what we need for calibration
-    double meanDedxErr = 0.0;
 
     if (!isMethodSep) {
       FitValues fitAll = fitHistogram(hDedxCos_all[i]);
@@ -162,8 +161,8 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
       meanDedx = 0.5 * (fitNeg.mean + fitPos.mean);
       if (meanDedx <= 0.0) meanDedx = 1.0;
 
-      meanDedxErr = 0.5 * TMath::Sqrt(fitNeg.meanErr * fitNeg.meanErr +
-                                      fitPos.meanErr * fitPos.meanErr);
+      double meanDedxErr = 0.5 * TMath::Sqrt(fitNeg.meanErr * fitNeg.meanErr +
+                                             fitPos.meanErr * fitPos.meanErr);
 
       dedxAll[0].push_back(meanDedx);
       dedxAll[1].push_back(meanDedxErr);
@@ -368,7 +367,7 @@ void CDCDedxCosineAlgorithm::plotdedxHist(std::vector<TH1D*>& hDedxCos_all,
 {
 
   TCanvas ctmp("tmp", "tmp", 1200, 1200);
-  int nx = isMethodSep ? 2 : 2;
+  int nx = 2;
   int ny = isMethodSep ? 1 : 2;
   unsigned int nPads = nx * ny;
   if (isMethodSep) ctmp.SetCanvasSize(1200, 600);

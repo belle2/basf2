@@ -200,6 +200,15 @@ namespace Belle2 {
         return m_values[I];
       }
 
+      // Reference getter for the ith value. This is needed since the template version does
+      // not work for the [] operator, once made the base [] virtual
+      Float_t& var(int i)
+      {
+        assert(i < (int)nVars);
+        assert(i >= 0);
+        return m_values[i];
+      }
+
       /// Reference getter for the ith value.
       Float_t& operator[](int iValue) final
       {
@@ -209,7 +218,7 @@ namespace Belle2 {
       }
 
       /// Reference getter for the value with the given name.
-      Float_t& operator[](const char* name)
+      Float_t& operator[](const char* const name)
       {
         return this->var(named(name));
       }

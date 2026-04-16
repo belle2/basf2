@@ -46,19 +46,13 @@ namespace Belle2 {
       virtual void set(int iValue, Float_t value) = 0;
 
       /// Setter for the value with the given name.
-      void set(const char* const name, Float_t value)
-      {
-        set(getNameIndex(name), value);
-      }
+      virtual void set(const char* const name, Float_t value) = 0;
 
       /// Getter for the value of the ith part.
       virtual Float_t get(int iValue) const = 0;
 
       /// Getter for the value with the given name.
-      Float_t get(const char* const name) const
-      {
-        return get(getNameIndex(name));
-      }
+      virtual Float_t get(const char* const name) const = 0;
 
       /**
        *  Getter for a pointer to the value with the given name.
@@ -74,10 +68,7 @@ namespace Belle2 {
       virtual Float_t& operator[](int iValue) = 0;
 
       /// Reference getter for the value with the given name.
-      Float_t& operator[](const char* const name)
-      {
-        return operator[](getNameIndex(name));
-      }
+      virtual Float_t& operator[](const char* const name) = 0;
 
       /// Getter for a map of all name and value pairs in this tuple
       std::map<std::string, Float_t> getNamedValues(std::string prefix = "") const;

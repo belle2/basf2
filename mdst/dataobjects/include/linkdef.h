@@ -29,6 +29,7 @@
 #pragma link C++ class Belle2::TRGSummary+; // checksum=0x4ef2176b, version=8
 #pragma link C++ class Belle2::SoftwareTriggerResult+; // checksum=0xe5e47e9, version=5
 #pragma link C++ class Belle2::EventLevelTriggerTimeInfo+; // checksum=0x1d9e5f4f, version=2
+#pragma link C++ class Belle2::TOPBackSplashFitResult+;
 
 // ----------------------------------------------------------------------------
 // SoftwareTriggerResult

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <top/dataobjects/TOPBackSplashFitResult.h>
+#include <mdst/dataobjects/TOPBackSplashFitResult.h>
 
 using namespace Belle2;
 

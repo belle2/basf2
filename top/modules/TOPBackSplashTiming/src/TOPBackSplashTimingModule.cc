@@ -235,8 +235,8 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
 
   // Saving results & plotting
   TOPBackSplashFitResult* fitresult = m_fitresult.appendNew();
-  fitresult->setTime(peak1_rising_edge);
-  fitresult->setChisqdof(redchisq);
+  fitresult->setTime((float)peak1_rising_edge);
+  fitresult->setChisqdof((float)redchisq);
   fitresult->setNphotons(data.sumEntries());
 
   if (m_saveFits == true) {

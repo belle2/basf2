@@ -22,18 +22,18 @@ namespace Belle2 {
       m_nPhotons{-1}
     {}
 
-    void setTime(double t) { m_time = t; }
-    double getTime() const { return m_time; }
+    void setTime(float t) { m_time = t; }
+    float getTime() const { return m_time; }
 
-    void setChisqdof(double chisqdof) { m_chisqdof = chisqdof; }
-    double getChisqdof() const { return m_chisqdof; }
+    void setChisqdof(float chisqdof) { m_chisqdof = chisqdof; }
+    float getChisqdof() const { return m_chisqdof; }
 
     void setNphotons(int nPhotons) { m_nPhotons = nPhotons; }
     int getNphotons() const { return m_nPhotons; }
 
   private:
-    double m_time;
-    double m_chisqdof;
+    float m_time;
+    float m_chisqdof;
     int m_nPhotons;
 
     ClassDef(TOPBackSplashFitResult, 1);

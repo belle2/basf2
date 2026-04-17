@@ -150,7 +150,7 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit3D& recoHit3D,
   double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);
 
   if (std::isnan(tanLambda)) {
-    tanLambda = recoPos3D.z() / recoPos3D.cylindricalR();
+    tanLambda = recoPos3D.z() / recoPos3D.Rho();
   }
   const double theta = M_PI / 2 - std::atan(tanLambda);
   flightTimeEstimate *= hypot2(1, tanLambda);

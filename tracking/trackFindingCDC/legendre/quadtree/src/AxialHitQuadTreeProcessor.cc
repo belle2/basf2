@@ -294,7 +294,7 @@ bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* 
   if (not pos2D.isBetween(thetaVecMin, thetaVecMax)) return false;
 
   // compute sinograms at the position
-  double r = pos2D.norm();
+  double r = pos2D.R();
   float rRight = r - l;
   float rLeft = r + l;
 

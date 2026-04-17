@@ -23,7 +23,7 @@ namespace {
   /// Helper function to extract the numbered pt-range out of a momentum vector
   unsigned int getPTRange(const TrackingUtilities::Vector3D& momentum)
   {
-    const double pT = momentum.xy().norm();
+    const double pT = momentum.xy().R();
     if (pT > 0.4) {
       return 0;
     } else if (pT > 0.2) {
@@ -85,7 +85,7 @@ Weight SimpleSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
     const Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
     const Vector3D differenceHelix = trackPositionAtHit - hitPosition;
 
-    valueToCheck = differenceHelix.norm();
+    valueToCheck = differenceHelix.R();
     maximumValues = &m_param_maximumHelixDistance;
   } else {
     // Filter 2 + 3

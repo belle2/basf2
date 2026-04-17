@@ -115,7 +115,7 @@ namespace Belle2 {
       operator Line2D()
       {
         return Line2D(distanceToOrigin(), normal().unit());
-      } // not optimal yet. tangential.norm() is getting calculated two times.
+      } // not optimal yet. tangential.R() is getting calculated two times.
 
     public:
       /// Gives the tangential vector of the line.
@@ -269,7 +269,7 @@ namespace Belle2 {
       /// Denotes the length on the line between the two points
       double lengthOnCurve(const Vector2D& from, const Vector2D& to) const
       {
-        return (to.dot(tangential()) - from.dot(tangential())) / tangential().norm();
+        return (to.dot(tangential()) - from.dot(tangential())) / tangential().R();
       }
 
       /// Gives the line parameter where the two lines meet. Infinity for parallels.

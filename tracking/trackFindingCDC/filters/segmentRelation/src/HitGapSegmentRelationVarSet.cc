@@ -44,8 +44,8 @@ bool HitGapSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* pt
   const Vector2D hitPosGap = toFirstHitPos - fromLastHitPos;
   const Vector2D longHitPosGap = toLastHitPos - fromFirstHitPos;
 
-  const double hitDistance = hitPosGap.norm();
-  const double longHitDistance = longHitPosGap.norm();
+  const double hitDistance = hitPosGap.R();
+  const double longHitDistance = longHitPosGap.R();
 
   const Vector2D fromLastHitMom = fromLastHit.getFlightDirection2D();
   const Vector2D toFirstHitMom = toFirstHit.getFlightDirection2D();
@@ -69,14 +69,14 @@ bool HitGapSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* pt
   const Vector2D fromStretch = fromLastHitPos - fromFirstHitPos;
   const Vector2D toStretch = toLastHitPos - toFirstHitPos;
 
-  const double fromLength = fromStretch.norm();
-  const double toLength = toStretch.norm();
+  const double fromLength = fromStretch.R();
+  const double toLength = toStretch.R();
 
   const Vector2D firstPosGap = toFirstHitPos - fromFirstHitPos;
   const Vector2D lastPosGap = toLastHitPos - fromLastHitPos;
 
-  const double firstOffset = firstPosGap.norm();
-  const double lastOffset = lastPosGap.norm();
+  const double firstOffset = firstPosGap.R();
+  const double lastOffset = lastPosGap.R();
 
   finitevar<named("hit_ptolemy")>() =
     firstOffset * lastOffset - longHitDistance * hitDistance - fromLength * toLength;

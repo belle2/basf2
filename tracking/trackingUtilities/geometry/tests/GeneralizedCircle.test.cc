@@ -116,8 +116,8 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_arcLengthFactor)
   double smallAngle = M_PI / 100;
   Vector2D near(1.0 - cos(smallAngle), sin(smallAngle));
 
-  double expectedArcLengthFactor = smallAngle / near.cylindricalR();
-  EXPECT_NEAR(expectedArcLengthFactor, circle.arcLengthFactor(near.cylindricalR()), 10e-7);
+  double expectedArcLengthFactor = smallAngle / near.R();
+  EXPECT_NEAR(expectedArcLengthFactor, circle.arcLengthFactor(near.R()), 10e-7);
 }
 
 TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_arcLengthBetween)

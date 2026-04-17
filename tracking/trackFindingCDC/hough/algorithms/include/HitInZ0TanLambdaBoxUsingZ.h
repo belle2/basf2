@@ -58,7 +58,7 @@ namespace Belle2 {
 
         TrackingUtilities::Vector2D pos2D = wireLine.nominalPos2DAtZ(hitZ);
 
-        float distanceToRecoPosition = (pos2D - recoPosition).norm();
+        float distanceToRecoPosition = (pos2D - recoPosition).R();
 
         return exp(-distanceToRecoPosition);
       }

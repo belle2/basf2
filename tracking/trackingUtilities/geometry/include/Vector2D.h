@@ -116,7 +116,7 @@ namespace Belle2 {
       }
 
       /// Calculates the length of the vector.
-      double norm() const
+      double R() const
       {
         return hypot2(x(), y());
       }
@@ -223,7 +223,7 @@ namespace Belle2 {
        *  The null vector is not transformed. */
       double normalize()
       {
-        double originalLength = norm();
+        double originalLength = R();
         if (originalLength != 0.0) divide(originalLength);
         return originalLength;
       }
@@ -233,7 +233,7 @@ namespace Belle2 {
        *  The null vector is not transformed. */
       double normalizeTo(const double toLength)
       {
-        double originalLength = norm();
+        double originalLength = R();
         if (originalLength != 0.0) scale(toLength / originalLength);
         return originalLength;
       }
@@ -241,7 +241,7 @@ namespace Belle2 {
       /// Returns a unit vector colaligned with this
       Vector2D unit() const
       {
-        return (x() == 0.0 and y() == 0.0) ? Vector2D(0.0, 0.0) : divided(norm());
+        return (x() == 0.0 and y() == 0.0) ? Vector2D(0.0, 0.0) : divided(R());
       }
 
       /// Reverses the direction of the vector in place
@@ -311,12 +311,12 @@ namespace Belle2 {
       /// Calculates the component parallel to the given vector
       double parallelComp(const Vector2D& relativTo) const
       {
-        return relativTo.dot(*this) / relativTo.norm();
+        return relativTo.dot(*this) / relativTo.R();
       }
 
       /// Same as parallelComp() but assumes the given vector to be of unit length.
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
-       *  a costly computation of the vector norm()*/
+       *  a costly computation of the vector R()*/
       double unnormalizedParallelComp(const Vector2D& relativTo) const
       {
         return relativTo.dot(*this);
@@ -326,7 +326,7 @@ namespace Belle2 {
       /** The orthogonal component is the component parallel to relativeTo.orthogonal() */
       double orthogonalComp(const Vector2D& relativTo) const
       {
-        return relativTo.cross(*this) / relativTo.norm();
+        return relativTo.cross(*this) / relativTo.R();
       }
 
       /// Calculates the part of this vector that is parallel to the given vector
@@ -337,7 +337,7 @@ namespace Belle2 {
 
       /// Same as orthogonalComp() but assumes the given vector to be of unit length
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
-       *  a costly computation of the vector norm()*/
+       *  a costly computation of the vector R()*/
       double unnormalizedOrthogonalComp(const Vector2D& relativTo) const
       {
         return relativTo.cross(*this);
@@ -448,16 +448,10 @@ namespace Belle2 {
         std::swap(m_x, m_y);
       }
 
-      /// Gives the cylindrical radius of the vector. Same as norm()
-      double cylindricalR() const
-      {
-        return hypot2(x(), y());
-      }
-
       /// Set the cylindrical radius while keeping the azimuth angle phi the same
       void setCylindricalR(const double cylindricalR)
       {
-        scale(cylindricalR / norm());
+        scale(cylindricalR / R());
       }
 
       /// Gives the azimuth angle being the angle to the x axes ( range -M_PI to M_PI )

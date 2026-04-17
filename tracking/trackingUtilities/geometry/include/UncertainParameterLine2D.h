@@ -158,7 +158,7 @@ namespace Belle2 {
       {
         using namespace NLineParameterIndices;
         LineJacobian result = LineUtil::identity();
-        result(c_I, c_Phi0) = -byAt * m_parameterLine2D.tangential().norm();
+        result(c_I, c_Phi0) = -byAt * m_parameterLine2D.tangential().R();
         return result;
       }
 

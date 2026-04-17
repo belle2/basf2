@@ -51,7 +51,7 @@ namespace Belle2 {
       double getFlightTime2D(const TrackingUtilities::Vector2D& pos2D, double alpha, double beta = 1) const override
       {
         double absAlpha = std::fabs(alpha);
-        double directDist2D = pos2D.cylindricalR();
+        double directDist2D = pos2D.R();
         return directDist2D * m_firstPeriodAlphaFlightTimeFactor(absAlpha) / beta;
       }
 
@@ -74,7 +74,7 @@ namespace Belle2 {
         double deltaAlpha = VectorUtil::Angle(pos2D, relPos2D);
         alpha += deltaAlpha;
         double absAlpha = std::fabs(alpha);
-        double directDist2D = relPos2D.cylindricalR();
+        double directDist2D = relPos2D.R();
         return directDist2D * m_halfPeriodAlphaFlightTimeFactor(absAlpha) / beta;
       }
 

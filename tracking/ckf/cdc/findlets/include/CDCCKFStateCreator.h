@@ -121,7 +121,7 @@ namespace Belle2 {
             TrackingUtilities::Vector3D seedMomZOne(lastState.getSeed()->getMomentumSeed());
             seedMomZOne = seedMomZOne / seedMomZOne.z();
             // const float maxZ = seedPosZ > 0 ? maxForwardZ : maxBackwardZ;
-            // const TrackingUtilities::Vector3D extrapolatedPos = seedPos - seedMom / seedMom.norm() * (seedPosZ - maxZ);
+            // const TrackingUtilities::Vector3D extrapolatedPos = seedPos - seedMom / seedMom.R() * (seedPosZ - maxZ);
 
             // find closest iCLayer
             float minDist = 99999;

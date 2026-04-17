@@ -128,7 +128,7 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
   Vector2D coordinateSystem = gradientAtPoint.unit();
 
   // component of closest approach orthogonal to coordinateSystem
-  double closestOrthogonal = n12().cross(point) / gradientAtPoint.norm();
+  double closestOrthogonal = n12().cross(point) / gradientAtPoint.R();
 
   // component of closest approach parallel to coordinateSystem - two solutions expected
   double nOrthogonal = n12().unnormalizedOrthogonalComp(coordinateSystem);
@@ -218,7 +218,7 @@ std::pair<Vector2D, Vector2D> GeneralizedCircle::atCylindricalR(const double cyl
   const Vector2D nUnit = n12().unit();
 
   // parallel component
-  const double sameCylindricalRParallel = -(n0() + n3() * square(cylindricalR)) / n12().norm();
+  const double sameCylindricalRParallel = -(n0() + n3() * square(cylindricalR)) / n12().R();
 
   // orthogonal component
   const double sameCylindricalROrthogonal = sqrt(square(cylindricalR) - square(sameCylindricalRParallel));

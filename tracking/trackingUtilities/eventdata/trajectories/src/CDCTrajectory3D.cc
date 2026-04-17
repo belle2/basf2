@@ -65,7 +65,7 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
                                  const double charge,
                                  const double bZ)
   : m_localOrigin(pos3D)
-  , m_localHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.xy().norm(), charge, bZ),
+  , m_localHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.xy().R(), charge, bZ),
                  mom3D.xy().unit(),
                  0.0,
                  mom3D.cotTheta(),
@@ -221,9 +221,9 @@ namespace {
     // Momentum
     if (bZ == 0) {
       jacobianInflate(iPx, c_Curv) = 0;
-      jacobianInflate(iPy, c_Phi0) = momentum.cylindricalR();
+      jacobianInflate(iPy, c_Phi0) = momentum.Rho();
       jacobianInflate(iPz, c_Curv) = 0;
-      jacobianInflate(iPz, c_TanL) = momentum.cylindricalR();
+      jacobianInflate(iPz, c_TanL) = momentum.Rho();
     } else {
       jacobianInflate(iPx, c_Curv) = invChargeAlphaCurv2;
       jacobianInflate(iPy, c_Phi0) = - invChargeAlphaCurv;

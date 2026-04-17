@@ -101,8 +101,8 @@ namespace Belle2 {
        **/
       bool operator<(const Vector3D& rhs) const
       {
-        return norm() < rhs.norm() or (norm() == rhs.norm() and
-                                       (z() < rhs.z() or (z() == rhs.z() and (phi() < rhs.phi()))));
+        return R() < rhs.R() or (R() == rhs.R() and
+                                 (z() < rhs.z() or (z() == rhs.z() and (phi() < rhs.phi()))));
       }
 
       /// Calculates the three dimensional dot product.
@@ -154,7 +154,7 @@ namespace Belle2 {
       }
 
       /// Calculates the length of the vector
-      double norm() const
+      double R() const
       {
         return hypot3(x(), y(), z());
       }
@@ -277,7 +277,7 @@ namespace Belle2 {
       /// Returns a unit vector colaligned with this
       Vector3D unit() const
       {
-        return (x() == 0.0 and y() == 0.0 and z() == 0.0)  ? Vector3D(0.0, 0.0, 0.0) : divided(norm());
+        return (x() == 0.0 and y() == 0.0 and z() == 0.0)  ? Vector3D(0.0, 0.0, 0.0) : divided(R());
       }
 
       /// Normalizes the vector to unit length
@@ -285,7 +285,7 @@ namespace Belle2 {
        *  The null vector is not transformed. */
       double normalize()
       {
-        double result = norm();
+        double result = R();
         if (result != 0.0) divide(result);
         return result;
       }
@@ -295,7 +295,7 @@ namespace Belle2 {
        *  The null vector is not transformed. */
       double normalizeTo(const double toLength)
       {
-        double result = norm();
+        double result = R();
         if (result != 0.0) scale(toLength / result);
         return result;
       }
@@ -334,12 +334,12 @@ namespace Belle2 {
       /// Calculates the component parallel to the given vector
       double parallelComp(const Vector3D& relativTo) const
       {
-        return relativTo.dot(*this) / relativTo.norm();
+        return relativTo.dot(*this) / relativTo.R();
       }
 
       /// Same as parallelComp() but assumes the given vector to be of unit length.
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
-       *  a costly computation of the vector norm()*/
+       *  a costly computation of the vector R()*/
       double unnormalizedParallelComp(const Vector3D& relativTo) const
       {
         return relativTo.dot(*this);
@@ -352,7 +352,7 @@ namespace Belle2 {
        *  component is meaningless and is always set to positive */
       double orthogonalComp(const Vector3D& relativTo) const
       {
-        return relativTo.cross(*this).norm() / relativTo.norm();
+        return relativTo.cross(*this).R() / relativTo.R();
       }
 
       /// Calculates the part of this vector that is orthogonal to the given vector
@@ -363,10 +363,10 @@ namespace Belle2 {
 
       /// Same as orthogonalComp() but assumes the given vector to be of unit length
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
-       *  a costly computation of the vector norm()*/
+       *  a costly computation of the vector R()*/
       double unnormalizedOrthogonalComp(const Vector3D& relativTo) const
       {
-        return relativTo.cross(*this).norm();
+        return relativTo.cross(*this).R();
       }
 
       /// Passively moves the vector inplace by the given vector
@@ -437,16 +437,10 @@ namespace Belle2 {
         setZ(third);
       }
 
-      /// Getter for the squared cylindrical radius ( xy projected squared norm )
-      double cylindricalRSquared() const
-      {
-        return xy().normSquared();
-      }
-
       /// Getter for the cylindrical radius ( xy projected norm )
-      double cylindricalR() const
+      double Rho() const
       {
-        return xy().norm();
+        return xy().R();
       }
 
       /// Getter for the azimuth angle
@@ -458,25 +452,25 @@ namespace Belle2 {
       /// Getter for the polar angle
       double theta() const
       {
-        return atan2(cylindricalR(), z());
+        return atan2(Rho(), z());
       }
 
       /// Getter for lambda
       double lambda() const
       {
-        return atan2(z(), cylindricalR());
+        return atan2(z(), Rho());
       }
 
       /// Getter for the cotangent of the polar angle
       double cotTheta() const
       {
-        return z() / cylindricalR();
+        return z() / Rho();
       }
 
       /// Getter for the tangent of lambda equivalent to cotTheta()
       double tanLambda() const
       {
-        return z() / cylindricalR();
+        return z() / Rho();
       }
 
     private:

@@ -56,11 +56,11 @@ std::size_t CDCSZObservations::append(const CDCRecoHit3D& recoHit3D)
     const Vector2D disp2D = recoHit3D.getRecoDisp2D();
     const double driftlengthVariance = recoHit3D.getRecoDriftLengthVariance();
 
-    double dispNorm = disp2D.norm();
+    double dispNorm = disp2D.R();
 
     double zeta = 1.0;
     if (dispNorm == 0.0) {
-      zeta = wireVector.xy().norm() / wireVector.z();
+      zeta = wireVector.xy().R() / wireVector.z();
     } else {
       zeta = wireVector.xy().dot(disp2D) / wireVector.z() / dispNorm;
     }

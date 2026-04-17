@@ -186,13 +186,13 @@ PerigeeJacobian PerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
 void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& jacobian) const
 {
   Vector2D deltaVec = by - perigee();
-  double delta = deltaVec.norm();
+  double delta = deltaVec.R();
   double deltaParallel = phi0Vec().dot(deltaVec);
   // double deltaOrthogonal = phi0Vec().cross(deltaVec);
   // double zeta = deltaVec.normSquared();
 
   Vector2D UVec = gradient(by);
-  double U = UVec.norm();
+  double U = UVec.R();
   double USquared = UVec.normSquared();
   double UOrthogonal = phi0Vec().cross(UVec);
   // double UParallel = phi0Vec().dot(UVec);
@@ -212,8 +212,8 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& j
   double dr = distance(by);
 
   // Vector2D uVec = gradient(Vector2D(0.0, 0.0));
-  // double u = uVec.norm();
-  double u = 1 + curvature() * impact(); //= n12().cylindricalR()
+  // double u = uVec.R();
+  double u = 1 + curvature() * impact(); //= n12().R()
 
   using namespace NPerigeeParameterIndices;
   jacobian(c_Curv, c_Curv) = 1;
@@ -335,7 +335,7 @@ void PerigeeCircle::setCenterAndRadius(const Vector2D& center,
   m_phi0Vec = center.orthogonal(NRotation::reversed(orientation));
   m_phi0Vec.normalize();
   m_phi0 = m_phi0Vec.phi();
-  m_impact = (center.norm() - std::fabs(absRadius)) * static_cast<double>(orientation);
+  m_impact = (center.R() - std::fabs(absRadius)) * static_cast<double>(orientation);
 }
 
 void PerigeeCircle::setN(double n0, const Vector2D& n12, double n3)

@@ -117,11 +117,11 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
     if (recoHit.getISuperLayer() == segment->getISuperLayer()) {
       hitsInSameRegion++;
     } else if (abs(recoHit.getISuperLayer() - segment->getISuperLayer()) == 1) {
-      double distanceFront = (front.getWireHit().getRefPos2D() - recoHit.getRecoPos2D()).norm();
+      double distanceFront = (front.getWireHit().getRefPos2D() - recoHit.getRecoPos2D()).R();
       if (distanceFront > maxmimumHitDistanceFront) {
         maxmimumHitDistanceFront = distanceFront;
       }
-      double distanceBack = (back.getWireHit().getRefPos2D() - recoHit.getRecoPos2D()).norm();
+      double distanceBack = (back.getWireHit().getRefPos2D() - recoHit.getRecoPos2D()).R();
       if (distanceBack > maxmimumHitDistanceBack) {
         maxmimumHitDistanceBack = distanceBack;
       }

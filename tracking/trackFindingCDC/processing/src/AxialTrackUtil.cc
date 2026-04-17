@@ -240,7 +240,7 @@ bool AxialTrackUtil::isBack2BackTrack(CDCTrack& track)
 {
   Vector2D center = track.getStartTrajectory3D().getGlobalCenter();
   int armSignVote = getArmSignVote(track, center);
-  if (std::abs(armSignVote) < int(track.size()) and std::fabs(center.cylindricalR()) > 60.) {
+  if (std::abs(armSignVote) < int(track.size()) and center.Mag2() > 3600.) {
     return true;
   }
   return false;

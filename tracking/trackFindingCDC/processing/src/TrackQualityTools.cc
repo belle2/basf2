@@ -180,7 +180,7 @@ void TrackQualityTools::removeHitsAfterLayerBreak2(CDCTrack& track)
     const Vector2D& currentPosition = recoHit.getRecoPos2D();
     if (lastLayer != -1) {
       const ILayer delta = currentLayer - lastLayer;
-      const double distance = (currentPosition - lastWirePosition).norm();
+      const double distance = (currentPosition - lastWirePosition).R();
       if (abs(delta) > 4 or distance > 50) {
         trackletList.emplace_back();
         currentTracklet = &(trackletList.back());

@@ -84,7 +84,7 @@ void ReattachCDCWireHitsToRecoTracksModule::findHits()
     const CDCTrajectory3D trajectory(trackPosition, recoTrack.getTimeSeed(), trackMomentum, recoTrack.getChargeSeed());
     const CDCTrajectory2D& trajectory2D(trajectory.getTrajectory2D());
     const CDCTrajectorySZ& trajectorySZ(trajectory.getTrajectorySZ());
-    const double d0Estimate((trajectory2D.getClosest(Vector2D(0, 0))).norm());
+    const double d0Estimate((trajectory2D.getClosest(Vector2D(0, 0))).R());
     const double z0Estimate(trajectorySZ.getZ0());
     if (abs(d0Estimate) < m_maximumAbsD0 and abs(z0Estimate) < m_maximumAbsZ0) {
       if (trackFitter.fit(recoTrack)) {

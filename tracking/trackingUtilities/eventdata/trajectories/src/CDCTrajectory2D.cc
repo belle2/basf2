@@ -62,7 +62,7 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const double charge,
                                  const double bZ)
   : m_localOrigin(pos2D)
-  , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, bZ),
+  , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.R(), charge, bZ),
                          mom2D.unit(),
                          0.0)
   , m_flightTime(time)
@@ -74,7 +74,7 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const Vector2D& mom2D,
                                  const double charge)
   : m_localOrigin(pos2D)
-  , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D),
+  , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.R(), charge, pos2D),
                          mom2D.unit(),
                          0.0)
   , m_flightTime(time)
@@ -253,7 +253,7 @@ ISuperLayer CDCTrajectory2D::getMaximalISuperLayer() const
 
 ISuperLayer CDCTrajectory2D::getStartISuperLayer() const
 {
-  double startCylindricalR = getLocalOrigin().cylindricalR();
+  double startCylindricalR = getLocalOrigin().R();
   return CDCWireTopology::getInstance().getISuperLayerAtCylindricalR(startCylindricalR);
 }
 
@@ -300,7 +300,7 @@ Vector2D CDCTrajectory2D::getInnerExit() const
 
   const Vector2D support = getSupport();
   const PerigeeCircle globalCircle = getGlobalCircle();
-  if (support.cylindricalR() < innerCylindricalR) {
+  if (support.Mag2() < innerCylindricalR * innerCylindricalR) {
     // If we start within the inner volume of the CDC we want the trajectory to enter the CDC
     // and not stop at first intersection with the inner wall.
     // Therefore we take the inner exit that comes after the apogee (far point of the circle).
@@ -320,7 +320,7 @@ Vector2D CDCTrajectory2D::getOuterExit(double factor) const
 
   const Vector2D support = getSupport();
   const PerigeeCircle globalCircle = getGlobalCircle();
-  if (support.cylindricalR() > outerCylindricalR) {
+  if (support.Mag2() > outerCylindricalR * outerCylindricalR) {
     // If we start outside of the volume of the CDC we want the trajectory to enter the CDC
     // and not stop at first intersection with the outer wall.
     // Therefore we take the outer exit that comes after the perigee.
@@ -347,7 +347,7 @@ void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
                                   const double charge)
 {
   m_localOrigin = pos2D;
-  double curvature = CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D);
+  double curvature = CDCBFieldUtil::absMom2DToCurvature(mom2D.R(), charge, pos2D);
   Vector2D phiVec = mom2D.unit();
   double impact = 0.0;
   m_localPerigeeCircle = UncertainPerigeeCircle(curvature, phiVec, impact);

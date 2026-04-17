@@ -67,9 +67,9 @@ Weight RealisticFacetFilter::operator()(const CDCFacet& facet)
   const Vector2D& startToEndTangentialVector = startToEndLine.tangential();
   const Vector2D& middleToEndTangentialVector = middleToEndLine.tangential();
 
-  const double startToMiddleLength = startToMiddleTangentialVector.norm();
-  const double startToEndLength = startToEndTangentialVector.norm();
-  const double middleToEndLength = middleToEndTangentialVector.norm();
+  const double startToMiddleLength = startToMiddleTangentialVector.R();
+  const double startToEndLength = startToEndTangentialVector.R();
+  const double middleToEndLength = middleToEndTangentialVector.R();
 
   const double startCos = VectorUtil::CosTheta(startToMiddleTangentialVector, startToEndTangentialVector);
   const double middleCos = VectorUtil::CosTheta(startToMiddleTangentialVector, middleToEndTangentialVector);

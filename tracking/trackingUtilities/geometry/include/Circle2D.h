@@ -103,7 +103,7 @@ namespace Belle2 {
       /// Returns the signed distance to the origin
       double impact() const
       {
-        return copysign(center().norm(), radius()) - radius();
+        return copysign(center().R(), radius()) - radius();
       }
 
       /// Returns the euclidean distance of the point to the circle line

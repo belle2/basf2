@@ -159,7 +159,7 @@ class LegendreBinningValidationModule(harvesting.HarvestingModule):
         for recoHit3D in track:
             wire_ref_pos = recoHit3D.getRefPos2D()
             drift_length = recoHit3D.getSignedRecoDriftLength()
-            r = wire_ref_pos.norm()
+            r = wire_ref_pos.R()
             cross_curv = -2 * (n12.dot(wire_ref_pos) - drift_length) / (r * r - drift_length * drift_length)
             cross_curvs.append(cross_curv)
 

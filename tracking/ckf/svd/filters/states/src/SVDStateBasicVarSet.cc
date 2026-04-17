@@ -52,14 +52,14 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
   Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
   Vector3D distance = trackPositionAtHit - hitPosition;
 
-  var<named("distance")>() = static_cast<Float_t>(distance.norm());
-  var<named("xy_distance")>() = static_cast<Float_t>(distance.xy().norm());
+  var<named("distance")>() = static_cast<Float_t>(distance.R());
+  var<named("xy_distance")>() = static_cast<Float_t>(distance.xy().R());
   var<named("z_distance")>() = static_cast<Float_t>(distance.z());
 
   Vector3D mSoP_distance = position - hitPosition;
 
-  var<named("mSoP_distance")>() = static_cast<Float_t>(mSoP_distance.norm());
-  var<named("mSoP_xy_distance")>() = static_cast<Float_t>(mSoP_distance.xy().norm());
+  var<named("mSoP_distance")>() = static_cast<Float_t>(mSoP_distance.R());
+  var<named("mSoP_xy_distance")>() = static_cast<Float_t>(mSoP_distance.xy().R());
   var<named("mSoP_z_distance")>() = static_cast<Float_t>(mSoP_distance.z());
 
   var<named("same_hemisphere")>() = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
@@ -67,7 +67,7 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
   var<named("arcLengthOfHitPosition")>() = static_cast<Float_t>(trajectory.calcArcLength2D(hitPosition));
   var<named("arcLengthOfCenterPosition")>() = static_cast<Float_t>(trajectory.calcArcLength2D(Vector3D(0, 0, 0)));
 
-  var<named("pt")>() = static_cast<Float_t>(momentum.xy().norm());
+  var<named("pt")>() = static_cast<Float_t>(momentum.xy().R());
   var<named("tan_lambda")>() = static_cast<Float_t>(trajectory.getTanLambda());
   var<named("phi")>() = static_cast<Float_t>(momentum.phi());
 

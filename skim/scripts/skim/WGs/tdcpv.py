@@ -278,7 +278,7 @@ class TDCPV_klong(BaseSkim):
     * clusterE>0.150 for loose ECL KL
     * klmClusterInnermostLayer<=10 and klmClusterLayers<=10 for loose KLM KL
     * clusterPulseShapeDiscriminationMVA<0.15 and clusterE>0.25 for tight ECL KL
-    * klmClusterInnermostLayer<=10 and klmClusterLayers<=10 for tight KLM KL
+    * klmClusterKlId>0.1 and klmClusterInnermostLayer<=10 and klmClusterLayers<=10 for tight KLM KL
     * abs(deltaE) < 0.1
     * nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1,
     * E_ECL_TDCPV < 9
@@ -351,7 +351,7 @@ class TDCPV_klong(BaseSkim):
         ma.cutAndCopyList(
             'K_L0:klm_tight_TDCPV_klong',
             'K_L0:allklm',
-            '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]',
+            '[klmClusterKlId>0.1] and [klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]',
             path=path)
 
         ma.copyLists('K_L0:eclklm_qqs_0', ['K_L0:ecl_loose_TDCPV_klong', 'K_L0:klm_loose_TDCPV_klong'], path=path)  # phi(KK)KL
@@ -511,7 +511,7 @@ class TDCPV_ccs(BaseSkim):
         ma.cutAndCopyList(
             'K_L0:klmLayers_ccs',
             'K_L0:allklm',
-            '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=7]',
+            '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=7] and [klmClusterKlId>0.001]',
             path=path)
         ma.copyLists('K_L0:all_klmecl_ccs_0', ['K_L0:klmLayers_ccs', 'K_L0:alleclEcut_ccs'], writeOut=True, path=path)
         ma.copyLists('K_L0:all_klmecl_ccs_1', ['K_L0:klmLayers_ccs', 'K_L0:alleclEcut_ccs'], writeOut=True, path=path)

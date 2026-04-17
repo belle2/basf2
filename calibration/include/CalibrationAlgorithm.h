@@ -206,7 +206,7 @@ namespace Belle2 {
     bool commit();
 
     /// Submit constants from a (potentially previous) set of payloads
-    static bool commit(std::list<Database::DBImportQuery> payloads);
+    bool commit(std::list<Database::DBImportQuery> payloads);
 
     /// Get the description of the algorithm (set by developers in constructor)
     const std::string& getDescription() const {return m_description;}

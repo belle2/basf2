@@ -61,10 +61,6 @@ BeamBkgGeneratorModule::BeamBkgGeneratorModule() : Module()
            "equivalent superKEKB running time to generate sample [ns].");
 }
 
-BeamBkgGeneratorModule::~BeamBkgGeneratorModule()
-{
-}
-
 void BeamBkgGeneratorModule::initialize()
 {
   // register MCParticles
@@ -74,7 +70,6 @@ void BeamBkgGeneratorModule::initialize()
 
   StoreArray<SADMetaHit> sadHits;
   sadHits.registerInDataStore();
-
 
   // check steering parameters
 
@@ -92,7 +87,7 @@ void BeamBkgGeneratorModule::initialize()
     B2ERROR(m_fileName << ": can't open file");
     return;
   }
-  m_tree = (TTree*) m_file->Get(m_treeName.c_str());
+  m_tree = static_cast<TTree*>(m_file->Get(m_treeName.c_str()));
   if (!m_tree) {
     B2ERROR(m_treeName << ": no such TTree in the SAD file");
     return;
@@ -152,10 +147,6 @@ void BeamBkgGeneratorModule::initialize()
   B2RESULT("BG rate: " << m_rates.back() / 1e6 << " MHz, events to generate: "
            << m_numEvents);
 
-}
-
-void BeamBkgGeneratorModule::beginRun()
-{
 }
 
 void BeamBkgGeneratorModule::event()
@@ -245,10 +236,6 @@ void BeamBkgGeneratorModule::event()
     part->setMomentum(ROOT::Math::XYZVector(particleMomGeant4[0], particleMomGeant4[1], particleMomGeant4[2]));
     part->setProductionVertex(ROOT::Math::XYZVector(particlePosGeant4[0], particlePosGeant4[1], particlePosGeant4[2]));
   }
-}
-
-void BeamBkgGeneratorModule::endRun()
-{
 }
 
 void BeamBkgGeneratorModule::terminate()

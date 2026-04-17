@@ -46,7 +46,7 @@ namespace {
     /// Set global parameter
     void setGlobalParam(double value, unsigned short element, unsigned short param) {m_param = value;}
     /// TODO: list stored global parameters
-    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {{0, 0}};}
+    static std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {{0, 0}};}
   private:
     double m_param{0.};
   };

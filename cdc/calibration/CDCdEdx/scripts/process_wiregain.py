@@ -19,18 +19,18 @@ ROOT.gROOT.SetBatch(True)
 
 
 def remove_nowg(df):
-    # Inner layers: index < 1280 and wiregain != 0
-    il = df.loc[(df.index < 1280) & (df['wiregain'] != 0)].copy()
+    # Inner layers: index < 2240 and wiregain != 0
+    il = df.loc[(df.index < 2240) & (df['wiregain'] != 0)].copy()
 
-    # Outer layers: index >= 1280 and wiregain != 0
-    ol = df.loc[(df.index >= 1280) & (df['wiregain'] != 0)].copy()
+    # Outer layers: index >= 2240 and wiregain != 0
+    ol = df.loc[(df.index >= 2240) & (df['wiregain'] != 0)].copy()
 
     return il, ol
 
 
 def sep_inout(df):
-    il = df[df.index < 8].copy()
-    ol = df[df.index >= 8].copy()
+    il = df[df.index < 14].copy()
+    ol = df[df.index >= 14].copy()
     return il, ol
 
 
@@ -132,10 +132,10 @@ def plot_wiregain_all(il_prev, ol_prev, il_new, ol_new, exp, run, pdf):
     ol_r = (ol_new["wiregain"] / ol_prev["wiregain"]).dropna()
 
     ratio_panels = [
-        (ax[0, 0], il_r, "Inner Wiregain Ratio",        0.7, 1.5, 100,  "Inner Layer"),
-        (ax[0, 1], ol_r, "Outer Wiregain Ratio",        0.7, 1.5, 1000, "Outer Layer"),
-        (ax[1, 0], il_r, "Inner Wiregain Ratio (zoom)", 0.92, 1.05, 100,  "Inner Layer"),
-        (ax[1, 1], ol_r, "Outer Wiregain Ratio (zoom)", 0.92, 1.05, 1000, "Outer Layer"),
+        (ax[0, 0], il_r, "Inner Wiregain Ratio",        0.0, 1.5, 100,  "Inner Layer"),
+        (ax[0, 1], ol_r, "Outer Wiregain Ratio",        0.5, 2.0, 1000, "Outer Layer"),
+        (ax[1, 0], il_r, "Inner Wiregain Ratio (zoom)", 0.3, 0.7, 100,  "Inner Layer"),
+        (ax[1, 1], ol_r, "Outer Wiregain Ratio (zoom)", 0.92, 1.2, 1000, "Outer Layer"),
     ]
 
     for axi, series, title, ymin, ymax, space, label in ratio_panels:
@@ -153,7 +153,7 @@ def plot_wiregain_all(il_prev, ol_prev, il_new, ol_new, exp, run, pdf):
     # 5. Ratio Histogram  (bottom -left)
     # 5. Ratio Histogram (filled)
     ax[0].set_title("Wiregain Ratio histo")
-    cg.hist(x_min=0.7, x_max=1.5, xlabel=r"$\Delta$ wiregains", ylabel="Normalized count", fs1=10, fs2=6, ax=ax[0])
+    cg.hist(x_min=0.0, x_max=2.0, xlabel=r"$\Delta$ wiregains", ylabel="Normalized count", fs1=10, fs2=6, ax=ax[0])
 
     scale1 = 1 / il_r.shape[0] if il_r.shape[0] > 0 else 1
     scale2 = 1 / ol_r.shape[0] if ol_r.shape[0] > 0 else 1
@@ -182,7 +182,7 @@ def plot_layergain(il_lm_prev, ol_lm_prev, il_lm_new, ol_lm_new, exp, run, pdf):
     ]
 
     # --- Overlay ---
-    cg.hist(0.5, 1.9, xlabel="#layer", ylabel="layer gain", fs1=10, fs2=6, space=2, ax=ax[0])
+    cg.hist(0.2, 1.9, xlabel="#layer", ylabel="layer gain", fs1=10, fs2=6, space=2, ax=ax[0])
     ax[0].set_title("Layer Mean")
 
     for label, df, color, marker in data:
@@ -191,7 +191,7 @@ def plot_layergain(il_lm_prev, ol_lm_prev, il_lm_new, ol_lm_new, exp, run, pdf):
     ax[0].legend(fontsize=10)
 
     # --- Ratio ---
-    cg.hist(0.9, 1.1, xlabel="#layer", ylabel="ratio", fs1=10, fs2=6, space=2, ax=ax[1])
+    cg.hist(0.0, 2.4, xlabel="#layer", ylabel="ratio", fs1=10, fs2=6, space=2, ax=ax[1])
     ax[1].set_title("Layer Ratio")
 
     ratios = [

@@ -39,7 +39,7 @@ namespace Belle2 {
      * @param scatTheta Total MS variance accumulated in segment
      * @param fitter Pointer to the fitter
      */
-    virtual void controlTrackSegment(TVector3, TVector3, double scatTheta, genfit::GblFitter* fitter);
+    virtual void controlTrackSegment(TVector3, TVector3, double scatTheta, genfit::GblFitter* fitter) override;
 //     virtual void controlTrackSegment(B2Vector3D, B2Vector3D, double scatTheta, genfit::GblFitter* fitter);
 
   };

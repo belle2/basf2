@@ -195,6 +195,7 @@ int TOPBackSplashTimingModule::convertCosThetaToIndex(float nearestClusterCosThe
   return cosThetaIndex;
 }
 
+
 TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDindex,
     std::vector<int> digitIndiciesInSlot,
     float nearestClusterCosTheta, int iClusterToFit)
@@ -211,13 +212,13 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
       data.add(RooArgSet(*x));
     }
   }
-  if (data.numEntries() == 0) {
+  if (data.numEntries() < 2) {
     TOPBackSplashFitResult* emptyresult = new TOPBackSplashFitResult();
     return emptyresult;
   }
 
   RooAbsPdf* model =  m_wss[cosThetaIndex].pdf("model");
-  RooFitResult* res = model->fitTo(data, RooFit::Save(), RooFit::PrintLevel(0));
+  RooFitResult* res = model->fitTo(data, RooFit::Save(), RooFit::PrintLevel(0), RooFit::Strategy(0));
 
   // First peak
   RooAbsArg* john_arg = model->getComponents()->find("john");

@@ -87,8 +87,8 @@ double SinEqLine::computeRootInInterval(double lowerX, double upperX) const
   Vector2D current(upper);
 
   Vector2D next;
-  next.setX(secantX(last, current));
-  next.setY(map(next.x()));
+  next.SetX(secantX(last, current));
+  next.SetY(map(next.x()));
 
   // Should  always succeed since we checked everything before
   bool updatedBound = updateBounds(lower, upper, next);
@@ -99,23 +99,23 @@ double SinEqLine::computeRootInInterval(double lowerX, double upperX) const
     last.set(current);
     current.set(next);
 
-    next.setX(newtonX(current));
-    next.setY(map(next.x()));
+    next.SetX(newtonX(current));
+    next.SetY(map(next.x()));
 
     updatedBound = updateBounds(lower, upper, next);
 
     if (not updatedBound) {
 
       // fall back to secant.
-      next.setX(secantX(last, current));
-      next.setY(map(next.x()));
+      next.SetX(secantX(last, current));
+      next.SetY(map(next.x()));
 
       updatedBound = updateBounds(lower, upper, next);
 
       if (not updatedBound) {
         // fallback to interval division.
-        next.setX(middleX(lower, upper));
-        next.setY(map(next.x()));
+        next.SetX(middleX(lower, upper));
+        next.SetY(map(next.x()));
         updatedBound = updateBounds(lower, upper, next);
 
         if (not updatedBound) break;

@@ -491,11 +491,6 @@ namespace Belle2 {
         return m_x;
       }
       /// Setter for the x coordinate
-      void setX(const double x)
-      {
-        m_x = x;
-      }
-      /// Setter for the x coordinate
       void SetX(const double x)
       {
         m_x = x;
@@ -511,11 +506,6 @@ namespace Belle2 {
         return m_y;
       }
       /// Setter for the y coordinate
-      void setY(const double y)
-      {
-        m_y = y;
-      }
-      /// Setter for the y coordinate
       void SetY(const double y)
       {
         m_y = y;
@@ -524,21 +514,22 @@ namespace Belle2 {
       /// Setter for both coordinate
       void setXY(const double x, const double y)
       {
-        setX(x);
-        setY(y);
+        SetX(x);
+        SetY(y);
       }
-      /// Setter for both coordinate by an other vector
-      void setXY(const Vector2D& xy)
+
+      /// Setter for both coordinate
+      void SetXY(const double x, const double y)
       {
-        m_x = xy.x();
-        m_y = xy.y();
+        SetX(x);
+        SetY(y);
       }
 
       /// Setter for both  coordinate
       void set(const double first, const double second)
       {
-        setX(first);
-        setY(second);
+        SetX(first);
+        SetY(second);
       }
       /// Setter for both coordinate by an other vector
       void set(const Vector2D& both)

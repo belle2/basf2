@@ -132,25 +132,25 @@ namespace Belle2 {
       /// Setter for the second line parameter. May violate the normalization.
       void setN1(const double n1)
       {
-        m_n12.setX(n1);
+        m_n12.SetX(n1);
       }
 
       /// Setter for the third line parameter. May violate the normalization.
       void setN2(const double n2)
       {
-        m_n12.setY(n2);
+        m_n12.SetY(n2);
       }
 
       /// Setter for the normal vector by its coordinates.
       void setN12(const double n1, const double n2)
       {
-        m_n12.set(n1, n2);
+        m_n12.SetXY(n1, n2);
       }
 
       /// Setter for the normal vector.
       void setN12(const Vector2D& n12)
       {
-        m_n12.set(n12);
+        m_n12.SetXY(n12.X(), n12.Y());
       }
 
     public:

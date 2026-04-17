@@ -108,7 +108,7 @@ namespace Belle2 {
        */
       void setN1(const double n1)
       {
-        m_n12.setX(n1);
+        m_n12.SetX(n1);
       }
 
       /**
@@ -118,7 +118,7 @@ namespace Belle2 {
        */
       void setN2(const double n2)
       {
-        m_n12.setY(n2);
+        m_n12.SetY(n2);
       }
 
       /**
@@ -138,7 +138,7 @@ namespace Belle2 {
        */
       void setN12(const Vector2D& n12)
       {
-        m_n12.setXY(n12);
+        m_n12.setXY(n12.X(), n12.Y());
       }
 
       /**

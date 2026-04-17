@@ -126,7 +126,7 @@ namespace Belle2 {
       /// Clears all information from this trajectoy
       void clear()
       {
-        m_localOrigin.set(0.0, 0.0, 0.0);
+        m_localOrigin.SetXYZ(0.0, 0.0, 0.0);
         m_localHelix.invalidate();
         m_flightTime = NAN;
       }

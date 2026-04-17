@@ -232,13 +232,13 @@ namespace Belle2 {
       /// Actively moves the circle in the direction given in place along the first coordinate
       void moveAlongFirst(const double first)
       {
-        m_center.setX(m_center.X() + first);
+        m_center.SetX(m_center.X() + first);
       }
 
       /// Actively moves the circle in the direction given in place along the second coordinate
       void moveAlongSecond(const double second)
       {
-        m_center.setY(m_center.Y() + second);
+        m_center.SetY(m_center.Y() + second);
       }
 
       /// Passively move the coordinate system  in place by the given vector
@@ -250,13 +250,13 @@ namespace Belle2 {
       /// Passively move the coordinate system in place along the first coordinate
       void passiveMoveAlongFirst(const double first)
       {
-        m_center.setX(m_center.X() - first);
+        m_center.SetX(m_center.X() - first);
       }
 
       /// Passively move the coordinate system in place along the second coordinate
       void passiveMoveAlongSecond(const double second)
       {
-        m_center.setY(m_center.Y() - second);
+        m_center.SetY(m_center.Y() - second);
       }
       /**@}*/
 

@@ -388,9 +388,9 @@ namespace Belle2 {
       }
 
       /// Setter for the x coordinate
-      void setX(const double x)
+      void SetX(const double x)
       {
-        m_xy.setX(x);
+        m_xy.SetX(x);
       }
 
       /// Getter for the y coordinate
@@ -400,9 +400,9 @@ namespace Belle2 {
       }
 
       /// Setter for the y coordinate
-      void setY(const double y)
+      void SetY(const double y)
       {
-        m_xy.setY(y);
+        m_xy.SetY(y);
       }
 
       /// Getter for the z coordinate
@@ -412,7 +412,7 @@ namespace Belle2 {
       }
 
       /// Setter for the z coordinate
-      void setZ(const double z)
+      void SetZ(const double z)
       {
         m_z = z;
       }
@@ -423,18 +423,20 @@ namespace Belle2 {
         return m_xy;
       }
 
-      /// Setter for the xy projected vector
-      void setXY(const Vector2D& xy)
-      {
-        m_xy = xy;
-      }
-
       /// Setter for all three coordinates.
       void set(const double first, const double second, const double third)
       {
-        setX(first);
-        setY(second);
-        setZ(third);
+        SetX(first);
+        SetY(second);
+        SetZ(third);
+      }
+
+      /// Setter for all three coordinates.
+      void SetXYZ(const double x, const double y, const double z)
+      {
+        SetX(x);
+        SetY(y);
+        SetZ(z);
       }
 
       /// Getter for the cylindrical radius ( xy projected norm )

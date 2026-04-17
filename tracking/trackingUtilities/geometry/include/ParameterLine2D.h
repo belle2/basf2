@@ -169,8 +169,8 @@ namespace Belle2 {
       /// Clear all information from the line
       void invalidate()
       {
-        m_support.set(0, 0);
-        m_tangential.set(0, 0);
+        m_support.SetXY(0, 0);
+        m_tangential.SetXY(0, 0);
       }
 
       /// Check it the line is in an invalid state.
@@ -332,14 +332,14 @@ namespace Belle2 {
       /// transformation.
       void moveAlongFirst(const double first)
       {
-        m_support.setX(m_support.X() + first);
+        m_support.SetX(m_support.X() + first);
       }
 
       /// Moves the line along the second coordinate axes in place. Corresponds to an active
       /// transformation.
       void moveAlongSecond(const double second)
       {
-        m_support.setY(m_support.Y() + second);
+        m_support.SetY(m_support.Y() + second);
       }
 
       /// Moves the coordinate system in the given direction  in place. Corresponds to a passive
@@ -353,14 +353,14 @@ namespace Belle2 {
       /// passive transformation.
       void passiveMoveAlongFirst(const double first)
       {
-        m_support.setX(m_support.X() - first);
+        m_support.SetX(m_support.X() - first);
       }
 
       /// Moves the coordinate system along the second coordinate axes in place. Corresponds to a
       /// passive transformation.
       void passiveMoveAlongSecond(const double second)
       {
-        m_support.setY(m_support.Y() - second);
+        m_support.SetY(m_support.Y() - second);
       }
       /**@}*/
 

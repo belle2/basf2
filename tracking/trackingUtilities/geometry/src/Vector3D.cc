@@ -37,24 +37,24 @@ Vector3D::Vector3D(const ROOT::Math::XYZVector& xyzVector)
 
 Vector3D& Vector3D::operator=(const TVector3& tVector3)
 {
-  m_xy.setX(tVector3.X());
-  m_xy.setY(tVector3.Y());
+  m_xy.SetX(tVector3.X());
+  m_xy.SetY(tVector3.Y());
   m_z = tVector3.Z();
   return *this;
 }
 
 Vector3D& Vector3D::operator=(const B2Vector3D& b2Vector3)
 {
-  m_xy.setX(b2Vector3.X());
-  m_xy.setY(b2Vector3.Y());
+  m_xy.SetX(b2Vector3.X());
+  m_xy.SetY(b2Vector3.Y());
   m_z = b2Vector3.Z();
   return *this;
 }
 
 Vector3D& Vector3D::operator=(const ROOT::Math::XYZVector& xyzVector)
 {
-  m_xy.setX(xyzVector.X());
-  m_xy.setY(xyzVector.Y());
+  m_xy.SetX(xyzVector.X());
+  m_xy.SetY(xyzVector.Y());
   m_z = xyzVector.Z();
   return *this;
 }

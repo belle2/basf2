@@ -88,7 +88,7 @@ bool CDCTrajectory2D::isFitted() const
 
 void CDCTrajectory2D::clear()
 {
-  m_localOrigin.set(0.0, 0.0);
+  m_localOrigin.SetXY(0.0, 0.0);
   m_localPerigeeCircle.invalidate();
   m_flightTime = NAN;
 }

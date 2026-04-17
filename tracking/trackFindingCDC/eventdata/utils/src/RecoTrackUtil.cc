@@ -62,7 +62,7 @@ RecoTrack* RecoTrackUtil::storeInto(const CDCTrack& track, StoreArray<RecoTrack>
   const double z0 = szTrajectory.getZ0();
   const double lambda = std::atan(szTrajectory.getTanLambda());
   momentum.scale(std::cos(lambda));
-  momentum.setZ(std::sin(lambda));
+  momentum.SetZ(std::sin(lambda));
   momentum *= momentumSeedMagnitude;
 
   ESign charge;

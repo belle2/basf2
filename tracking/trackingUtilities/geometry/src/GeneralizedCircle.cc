@@ -155,7 +155,7 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
 
     closestParallel = criterion1 < criterion2 ? closestParallel12.first : closestParallel12.second;
   }
-  return Vector2D::compose(coordinateSystem, closestParallel, closestOrthogonal);
+  return VectorUtil::compose(coordinateSystem, closestParallel, closestOrthogonal);
 }
 
 Vector2D GeneralizedCircle::perigee() const
@@ -225,10 +225,10 @@ std::pair<Vector2D, Vector2D> GeneralizedCircle::atCylindricalR(const double cyl
 
   /// Two versions in this case
   Vector2D sameCylindricalR1 =
-    Vector2D::compose(nUnit, sameCylindricalRParallel, -sameCylindricalROrthogonal);
+    VectorUtil::compose(nUnit, sameCylindricalRParallel, -sameCylindricalROrthogonal);
 
   Vector2D sameCylindricalR2 =
-    Vector2D::compose(nUnit, sameCylindricalRParallel, sameCylindricalROrthogonal);
+    VectorUtil::compose(nUnit, sameCylindricalRParallel, sameCylindricalROrthogonal);
 
   std::pair<Vector2D, Vector2D> result(sameCylindricalR1, sameCylindricalR2);
   return result;
@@ -345,8 +345,8 @@ GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) con
 
   std::pair<double, double> xOrthogonal = solveQuadraticABC(a, b, c);
 
-  return std::make_pair(Vector2D::compose(unitC, xParallel, xOrthogonal.first),
-                        Vector2D::compose(unitC, xParallel, xOrthogonal.second));
+  return std::make_pair(VectorUtil::compose(unitC, xParallel, xOrthogonal.first),
+                        VectorUtil::compose(unitC, xParallel, xOrthogonal.second));
 }
 
 Vector2D GeneralizedCircle::atArcLength(const double arcLength) const
@@ -356,7 +356,7 @@ Vector2D GeneralizedCircle::atArcLength(const double arcLength) const
 
   double atX = arcLength * sinc(chiHalf) * sin(chiHalf) + impact();
   double atY = -arcLength * sinc(chi);
-  return Vector2D::compose(-n12().unit(), atX, atY);
+  return VectorUtil::compose(-n12().unit(), atX, atY);
 }
 
 std::ostream& TrackingUtilities::operator<<(std::ostream& output, const GeneralizedCircle& circle)

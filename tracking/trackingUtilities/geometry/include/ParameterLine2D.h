@@ -242,9 +242,9 @@ namespace Belle2 {
       Vector2D closest(const Vector2D& point) const
       {
         double norm_squared = tangential().normSquared();
-        return Vector2D(tangential(),
-                        tangential().dot(point) / norm_squared,
-                        tangential().cross(support()) / norm_squared);
+        return VectorUtil::compose(tangential(),
+                                   tangential().dot(point) / norm_squared,
+                                   tangential().cross(support()) / norm_squared);
       }
 
       /// Gives the line parameter at the closest approach to point

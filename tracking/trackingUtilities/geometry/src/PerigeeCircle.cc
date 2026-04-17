@@ -116,7 +116,7 @@ Vector2D PerigeeCircle::atArcLength(double arcLength) const
 
   double atX = arcLength * sinc(chi);
   double atY = arcLength * sinc(chiHalf) * sin(chiHalf) + impact();
-  return Vector2D::compose(phi0Vec(), atX, atY);
+  return VectorUtil::compose(phi0Vec(), atX, atY);
 }
 
 void PerigeeCircle::reverse()
@@ -278,8 +278,8 @@ std::pair<Vector2D, Vector2D> PerigeeCircle::atCylindricalR(const double cylindr
   const double u = (1 + curvature() * impact());
   const double orthogonal = ((square(impact()) + square(cylindricalR)) * curvature() / 2.0 + impact()) / u;
   const double parallel = sqrt(square(cylindricalR) - square(orthogonal));
-  Vector2D atCylindricalR1 = Vector2D::compose(phi0Vec(), -parallel, orthogonal);
-  Vector2D atCylindricalR2 = Vector2D::compose(phi0Vec(), parallel, orthogonal);
+  Vector2D atCylindricalR1 = VectorUtil::compose(phi0Vec(), -parallel, orthogonal);
+  Vector2D atCylindricalR2 = VectorUtil::compose(phi0Vec(), parallel, orthogonal);
   std::pair<Vector2D, Vector2D> result(atCylindricalR1, atCylindricalR2);
   return result;
 }

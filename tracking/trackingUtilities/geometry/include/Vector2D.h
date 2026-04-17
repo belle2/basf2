@@ -62,36 +62,11 @@ namespace Belle2 {
       /// Casting the back to ROOT::Math::XYVector seamlessly
       operator const ROOT::Math::XYVector() const;
 
-      /**
-       * Constructs a vector from a unit coordinate system vector and the coordinates in that
-       * system.
-       * Same as compose()
-       * See compose() for details.
-       */
-      Vector2D(const Vector2D& coordinateVec, const double parallelCoor, const double orthoCoor)
-        : m_x(coordinateVec.x() * parallelCoor - coordinateVec.y() * orthoCoor)
-        , m_y(coordinateVec.y() * parallelCoor + coordinateVec.x() * orthoCoor)
-      {
-      }
-
       /// Constructs a unit vector with azimuth angle equal to phi
       static Vector2D Phi(const double phi)
       {
         return std::isnan(phi) ? Vector2D(0.0, 0.0) : Vector2D(cos(phi), sin(phi));
       }
-
-      /// Constructs a vector from a unit coordinate system vector and the coordinates in that
-      /// system
-      /** Combines a coordinate system vector expressed in laboratory coordinates \n
-       *  with the parallel and orthogonal components in the coordinate system \n
-       *  to a vector in laboratory coordinates. The coordinate system vector \n
-       *  is assumed the unit of the coordinate system */
-      static Vector2D
-      compose(const Vector2D& coordinateVec, const double parallelCoor, const double orthoCoor)
-      {
-        return Vector2D(coordinateVec, parallelCoor, orthoCoor);
-      }
-
 
       /// Equality comparison with both coordinates
       bool operator==(const Vector2D& rhs) const
@@ -110,13 +85,6 @@ namespace Belle2 {
       {
         return normSquared() < rhs.normSquared() or
                (normSquared() == rhs.normSquared() and (phi() < rhs.phi()));
-      }
-
-      /// Getter for the lowest possible vector
-      /** The lowest possible vector according to the comparison is the null vector */
-      static Vector2D getLowest()
-      {
-        return Vector2D(0.0, 0.0);
       }
 
       /// Checks if one of the coordinates is NAN

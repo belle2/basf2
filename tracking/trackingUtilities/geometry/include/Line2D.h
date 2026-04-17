@@ -290,7 +290,7 @@ namespace Belle2 {
       {
         const double closestParallel = -n0();
         const double closestOrthgonal = point.unnormalizedOrthogonalComp(n12());
-        return Vector2D(n12(), closestParallel, closestOrthgonal);
+        return VectorUtil::compose(n12(), closestParallel, closestOrthgonal);
       }
 
       /// Returns the point closest to the origin

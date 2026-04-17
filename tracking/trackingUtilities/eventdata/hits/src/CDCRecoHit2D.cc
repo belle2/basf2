@@ -24,7 +24,7 @@ using namespace TrackingUtilities;
 
 CDCRecoHit2D::CDCRecoHit2D(const CDCRLWireHit& rlWireHit) :
   m_rlWireHit(rlWireHit),
-  m_recoDisp2D(Vector2D::getLowest())
+  m_recoDisp2D(0.0, 0.0)
 {}
 
 CDCRecoHit2D::CDCRecoHit2D(const CDCRLWireHit& rlWireHit,

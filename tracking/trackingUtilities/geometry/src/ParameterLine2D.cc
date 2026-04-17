@@ -8,6 +8,7 @@
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
 
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <ostream>
 
@@ -27,10 +28,10 @@ ParameterLine2D ParameterLine2D::touchingCircles(const Vector2D& fromCenter,
   double kappa = (fromSignedRadius - toSignedRadius) / norm;
   double cokappa = sqrt(1 - kappa * kappa);
 
-  Vector2D fromPos = Vector2D(connecting, kappa * fromSignedRadius, cokappa * fromSignedRadius);
+  Vector2D fromPos = VectorUtil::compose(connecting, kappa * fromSignedRadius, cokappa * fromSignedRadius);
   fromPos += fromCenter;
 
-  Vector2D toPos = Vector2D(connecting, kappa * toSignedRadius, cokappa * toSignedRadius);
+  Vector2D toPos = VectorUtil::compose(connecting, kappa * toSignedRadius, cokappa * toSignedRadius);
   toPos += toCenter;
 
   return ParameterLine2D::throughPoints(fromPos, toPos);

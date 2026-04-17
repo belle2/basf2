@@ -90,6 +90,18 @@ namespace Belle2 {
       }
     }
 
+    /// Constructs a vector from a unit coordinate system vector and the coordinates in that
+    /// system
+    /** Combines a coordinate system vector expressed in laboratory coordinates \n
+     *  with the parallel and orthogonal components in the coordinate system \n
+     *  to a vector in laboratory coordinates. The coordinate system vector \n
+     *  is assumed the unit of the coordinate system */
+    inline ROOT::Math::XYVector compose(const ROOT::Math::XYVector& coordinateVec, const double parallelCoor, const double orthoCoor)
+    {
+      return ROOT::Math::XYVector(coordinateVec.x() * parallelCoor - coordinateVec.y() * orthoCoor,
+                                  coordinateVec.y() * parallelCoor + coordinateVec.x() * orthoCoor);
+    }
+
 
   } // namespace VectorUtil
 

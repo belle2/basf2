@@ -28,6 +28,7 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
+#include <mdst/dataobjects/TOPBackSplashFitResult.h>
 
 #include <Math/Vector4D.h>
 #include <TRandom.h>
@@ -1146,6 +1147,46 @@ namespace Belle2 {
       return func;
     }
 
+
+    double topBackSplashTime(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster)
+        return Const::doubleNaN;
+
+      const TOPBackSplashFitResult* backsplash = cluster->getRelatedTo<TOPBackSplashFitResult>();
+      if (!backsplash)
+        return Const::doubleNaN;
+
+      return backsplash->getTime();
+    }
+
+    double topBackSplashChi2(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster)
+        return Const::doubleNaN;
+
+      const TOPBackSplashFitResult* backsplash = cluster->getRelatedTo<TOPBackSplashFitResult>();
+      if (!backsplash)
+        return Const::doubleNaN;
+
+      return backsplash->getChisqdof();
+    }
+
+    double topBackSplashNphotons(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster)
+        return Const::doubleNaN;
+
+      const TOPBackSplashFitResult* backsplash = cluster->getRelatedTo<TOPBackSplashFitResult>();
+      if (!backsplash)
+        return Const::doubleNaN;
+
+      return backsplash->getNphotons();
+    }
+
     VARIABLE_GROUP("ECL cluster related");
     REGISTER_VARIABLE("clusterEoP", eclClusterEoP, R"DOC(
 Returns ratio of the cluster energy `clusterE` over momentum :math:`p`. 
@@ -1963,6 +2004,7 @@ during the calculation of the `distanceToMcKl` variable.
 .. warning::
     This requires the `getNeutralHadronGeomMatches` function to be used.
 )DOC");
+
   REGISTER_VARIABLE("clusterTimeNorm90", eclClusterTimeNorm90,R"DOC(
 Returns a normalised version of `clusterTiming` such that :math:`90\%` of real photons will 
 have :math:`|\text{timing normalised}| < 1`. 
@@ -1980,5 +2022,19 @@ energy, beam background level and cell ID. It also differs for data and MC.
 
 )DOC", "dimensionless");
 
+    
+  REGISTER_VARIABLE("topBackSplashTime", topBackSplashTime,R"DOC(
+Returns the timing of the backsplash signal in the TOP detector. 
+)DOC", "ns");
+
+  REGISTER_VARIABLE("topBackSplashNphotons", topBackSplashNphotons,R"DOC(
+Returns the number of photoelectrons in the TOP detector associate to the cluster backsplash. 
+)DOC", "dimensionless");
+
+  REGISTER_VARIABLE("topBackSplashChi2", topBackSplashChi2,R"DOC(
+Returns the reduced chi square of the fit to the backsplash signal in the TOP
+)DOC", "dimensionless");
+
+    
   }
 }

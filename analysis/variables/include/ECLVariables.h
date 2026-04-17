@@ -449,5 +449,20 @@ namespace Belle2 {
      */
     double eclClusterTimeNorm90(const Particle* particle);
 
+    /**
+     * returns the cluster timing measured by the backsplash in the TOP [ns]
+     */
+    double topBackSplashTime(const Particle* particle);
+
+    /**
+     * returns the number of cherenkov photons associated to the backsplash
+     */
+    double topBackSplashNphotons(const Particle* particle);
+
+    /**
+     * returns the chi2/nfd of the fit of the backsplash timing distribution in the TOP
+     */
+    double topBackSplashChi2(const Particle* particle);
+
   }
 } // Belle2 namespace

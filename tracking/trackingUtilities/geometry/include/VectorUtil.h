@@ -37,6 +37,11 @@ namespace Belle2 {
       return a.X() == 0.0 and a.Y() == 0.0 and a.Z() == 0.0;
     }
 
+    /// Constructs the average of two vectors
+    /** Computes the average of two vectors
+     *  If one vector contains NAN the average is the other vector, since the former is not
+     * considered a valid value.
+     **/
     inline ROOT::Math::XYVector average(const ROOT::Math::XYVector& a, const ROOT::Math::XYVector& b)
     {
       if (hasNAN(a)) {
@@ -48,6 +53,11 @@ namespace Belle2 {
       }
     }
 
+    /// Constructs the average of three vectors
+    /** Computes the average of three vectors. In case one of the two dimensional vectors contains a NAN,
+      *  it is not considered a valid value for the average and is therefore left out.
+      *  The average() of the other two vectors is then returned.
+      **/
     inline ROOT::Math::XYVector average(const ROOT::Math::XYVector& a, const ROOT::Math::XYVector& b, const ROOT::Math::XYVector& c)
     {
       if (hasNAN(a)) {
@@ -62,6 +72,25 @@ namespace Belle2 {
       }
     }
 
-  }
+    /// Constructs the average of two vectors
+    /** Computes the average of two vectors.
+     *  If one vector contains NAN the average is the other vector, since the former is not
+     *  considered a valid value.
+     **/
+    inline ROOT::Math::XYZVector average(const ROOT::Math::XYZVector& a, const ROOT::Math::XYZVector& b)
+    {
+      if (hasNAN(a)) {
+        return b;
+      } else if (hasNAN(b)) {
+        return a;
+      } else {
+        return ROOT::Math::XYZVector((a.x() + b.x()) / 2.0,
+                                     (a.y() + b.y()) / 2.0,
+                                     (a.z() + b.z()) / 2.0);
+      }
+    }
 
-}
+
+  } // namespace VectorUtil
+
+} // namespace Belle2

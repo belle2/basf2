@@ -8,6 +8,7 @@
 #include <tracking/trackFindingCDC/filters/trackRelation/HitGapTrackRelationVarSet.h>
 
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/Angle.h>
 
@@ -64,7 +65,7 @@ bool HitGapTrackRelationVarSet::extract(const Relation<const CDCTrack>* ptrTrack
 
   finitevar<named("from_hit_forward")>() = hitPosGap.xy().dot(fromLastHitMom);
   finitevar<named("to_hit_forward")>() = hitPosGap.xy().dot(toFirstHitMom);
-  finitevar<named("hit_forward")>() = hitPosGap.xy().dot(Vector2D::average(fromLastHitMom, toFirstHitMom));
+  finitevar<named("hit_forward")>() = hitPosGap.xy().dot(VectorUtil::average(fromLastHitMom, toFirstHitMom));
 
   const Vector3D fromStretch = fromLastHitPos - fromFirstHitPos;
   const Vector3D toStretch = toLastHitPos - toFirstHitPos;

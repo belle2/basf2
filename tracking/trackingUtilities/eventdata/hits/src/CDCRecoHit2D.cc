@@ -11,6 +11,7 @@
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
@@ -52,8 +53,8 @@ CDCRecoHit2D CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
                           recoHit2.getRLWireHit());
 
   Vector2D displacement =
-    Vector2D::average(recoHit1.getRecoDisp2D(),
-                      recoHit2.getRecoDisp2D());
+    VectorUtil::average(recoHit1.getRecoDisp2D(),
+                        recoHit2.getRecoDisp2D());
 
   CDCRecoHit2D result(rlWireHit, displacement);
   result.snapToDriftCircle();
@@ -71,9 +72,9 @@ CDCRecoHit2D CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
                           recoHit3.getRLWireHit());
 
   Vector2D displacement =
-    Vector2D::average(recoHit1.getRecoDisp2D(),
-                      recoHit2.getRecoDisp2D(),
-                      recoHit3.getRecoDisp2D());
+    VectorUtil::average(recoHit1.getRecoDisp2D(),
+                        recoHit2.getRecoDisp2D(),
+                        recoHit3.getRecoDisp2D());
 
   CDCRecoHit2D result(rlWireHit, displacement);
   result.snapToDriftCircle();

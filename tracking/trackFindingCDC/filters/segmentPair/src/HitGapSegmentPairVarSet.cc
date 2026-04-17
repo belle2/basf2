@@ -9,6 +9,7 @@
 
 #include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <cdc/topology/CDCWire.h>
 
@@ -66,7 +67,7 @@ bool HitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 
   finitevar<named("from_hit_forward")>() = hitPosGap.dot(fromLastHitMom);
   finitevar<named("to_hit_forward")>() = hitPosGap.dot(toFirstHitMom);
-  finitevar<named("hit_forward")>() = hitPosGap.dot(Vector2D::average(fromLastHitMom, toFirstHitMom));
+  finitevar<named("hit_forward")>() = hitPosGap.dot(VectorUtil::average(fromLastHitMom, toFirstHitMom));
 
   const CDCRecoHit2D& axialHit = toFirstHit.isAxial() ? toFirstHit : fromLastHit;
   const CDCRecoHit2D& stereoHit = not toFirstHit.isAxial() ? toFirstHit : fromLastHit;

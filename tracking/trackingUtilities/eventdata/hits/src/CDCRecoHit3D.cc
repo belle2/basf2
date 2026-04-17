@@ -20,6 +20,7 @@
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 
@@ -141,7 +142,7 @@ CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first, const CDCRecoHit3D
 {
   if (first.getRLWireHit() == second.getRLWireHit()) {
     return CDCRecoHit3D(first.getRLWireHit(),
-                        Vector3D::average(first.getRecoPos3D(), second.getRecoPos3D()),
+                        VectorUtil::average(first.getRecoPos3D(), second.getRecoPos3D()),
                         (first.getArcLength2D() + second.getArcLength2D()) / 2);
   } else {
     B2ERROR("Averaging three dimensional hits which are on different oriented wire hits. Return "

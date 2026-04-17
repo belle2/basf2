@@ -18,6 +18,7 @@
 #include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/LineParameters.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/Angle.h>
 
@@ -44,7 +45,7 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
   Vector2D fromTangential = fromFacet->getStartToEndLine().tangential();
   Vector2D toTangential   = toFacet->getStartToEndLine().tangential();
 
-  Vector2D tangential = Vector2D::average(fromTangential, toTangential);
+  Vector2D tangential = VectorUtil::average(fromTangential, toTangential);
 
   double fromMiddleCos = fromFacet->getStartToMiddleLine().tangential().cosWith(toTangential);
   double toMiddleCos = fromTangential.cosWith(toFacet->getMiddleToEndLine().tangential());

@@ -10,6 +10,7 @@
 #include <tracking/trackingUtilities/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/Angle.h>
 
@@ -64,7 +65,7 @@ bool HitGapAxialSegmentPairVarSet::extract(const CDCAxialSegmentPair* ptrAxialSe
 
   finitevar<named("from_hit_forward")>() = hitPosGap.dot(fromLastHitMom);
   finitevar<named("to_hit_forward")>() = hitPosGap.dot(toFirstHitMom);
-  finitevar<named("hit_forward")>() = hitPosGap.dot(Vector2D::average(fromLastHitMom, toFirstHitMom));
+  finitevar<named("hit_forward")>() = hitPosGap.dot(VectorUtil::average(fromLastHitMom, toFirstHitMom));
 
   const Vector2D fromStretch = fromLastHitPos - fromFirstHitPos;
   const Vector2D toStretch = toLastHitPos - toFirstHitPos;

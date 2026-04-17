@@ -216,8 +216,8 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
   // Weight matrix
   Matrix<double, 6, 1> w = Matrix<double, 6, 1>::Zero();
 
-  const Vector2D support = Vector2D::average(fromFacet.getMiddleWireHit().getRefPos2D(),
-                                             toFacet.getMiddleWireHit().getRefPos2D());
+  const Vector2D support = VectorUtil::average(fromFacet.getMiddleWireHit().getRefPos2D(),
+                                               toFacet.getMiddleWireHit().getRefPos2D());
   {
     const CDCRLWireHit& startRLWireHit = fromFacet.getStartRLWireHit();
     const CDCRLWireHit& middleRLWireHit = fromFacet.getMiddleRLWireHit();

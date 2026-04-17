@@ -92,42 +92,6 @@ namespace Belle2 {
         return Vector2D(coordinateVec, parallelCoor, orthoCoor);
       }
 
-      /// Constructs the average of two vectors
-      /** Computes the average of two vectors
-       *  If one vector contains NAN the average is the other vector, since the former is not
-       *considered a valid value.
-       **/
-      static Vector2D average(const Vector2D& one, const Vector2D& two)
-      {
-        if (one.hasNAN()) {
-          return two;
-        } else if (two.hasNAN()) {
-          return one;
-        } else {
-          return Vector2D((one.x() + two.x()) / 2.0, (one.y() + two.y()) / 2.0);
-        }
-      }
-
-      /// Constructs the average of three vectors
-      /** Computes the average of three vectors. In case one of the two dimensional vectors contains
-       *an NAN,
-       *  it is not considered a valid value for the average and is therefore left out.
-       *  The average() of the other two vectors is then returned.
-       **/
-      static Vector2D average(const Vector2D& one, const Vector2D& two, const Vector2D& three)
-      {
-
-        if (one.hasNAN()) {
-          return average(two, three);
-        } else if (two.hasNAN()) {
-          return average(one, three);
-        } else if (three.hasNAN()) {
-          return average(one, two);
-        } else {
-          return Vector2D((one.x() + two.x() + three.x()) / 3.0,
-                          (one.y() + two.y() + three.y()) / 3.0);
-        }
-      }
 
       /// Equality comparison with both coordinates
       bool operator==(const Vector2D& rhs) const

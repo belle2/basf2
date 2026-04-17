@@ -76,24 +76,6 @@ namespace Belle2 {
       /// Assignment translating from a ROOT::Math::XYZVector instance
       Vector3D& operator=(const ROOT::Math::XYZVector& xyzVector);
 
-      /// Constructs the average of two vectors
-      /** Computes the average of two vectors.
-       *  If one vector contains NAN the average is the other vector, since the former is not
-       *considered a valid value.
-       **/
-      static Vector3D average(const Vector3D& one, const Vector3D& two)
-      {
-        if (one.hasNAN()) {
-          return two;
-        } else if (two.hasNAN()) {
-          return one;
-        } else {
-          return Vector3D((one.x() + two.x()) / 2.0,
-                          (one.y() + two.y()) / 2.0,
-                          (one.z() + two.z()) / 2.0);
-        }
-      }
-
       /// Casting the back to TVector3 seamlessly
       operator const TVector3() const;
 

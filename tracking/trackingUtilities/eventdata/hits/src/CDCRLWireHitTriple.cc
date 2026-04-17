@@ -20,8 +20,8 @@ using namespace CDC;
 using namespace TrackingUtilities;
 
 CDCRLWireHitTriple::Shape::Shape()
-  : m_startToMiddleCellDistance(CHAR_MAX / 2)
-  , m_middleToEndCellDistance(CHAR_MAX / 2)
+  : m_startToMiddleCellDistance(static_cast<char>(CHAR_MAX / 2))
+  , m_middleToEndCellDistance(static_cast<char>(CHAR_MAX / 2))
   , m_oClockDelta(SHRT_MIN)
 {
 }
@@ -29,8 +29,8 @@ CDCRLWireHitTriple::Shape::Shape()
 CDCRLWireHitTriple::Shape::Shape(const short startToMiddleCellDistance,
                                  const short middleToEndCellDistance,
                                  const short oClockDelta)
-  : m_startToMiddleCellDistance(startToMiddleCellDistance)
-  , m_middleToEndCellDistance(middleToEndCellDistance)
+  : m_startToMiddleCellDistance(static_cast<char>(startToMiddleCellDistance))
+  , m_middleToEndCellDistance(static_cast<char>(middleToEndCellDistance))
   , m_oClockDelta(oClockDelta)
 {
 }

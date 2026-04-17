@@ -35,10 +35,10 @@ namespace Belle2 {
 
     public:
       /// Follow paths from all start cells marked with the start flag
-      std::vector<Path<ACellHolder>> followAll(
-                                    const std::vector<ACellHolder*>& cellHolders,
-                                    const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations,
-                                    Weight minStateToFollow = -INFINITY) const
+      static std::vector<Path<ACellHolder>> followAll(
+                                           const std::vector<ACellHolder*>& cellHolders,
+                                           const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations,
+                                           Weight minStateToFollow = -INFINITY)
       {
         B2ASSERT("Expected the relations to be sorted",
                  std::is_sorted(cellHolderRelations.begin(), cellHolderRelations.end()));
@@ -74,9 +74,9 @@ namespace Belle2 {
        *  If the start cell is nullptr or has a state lower than the minimum state to follow
        *  an empty vector is returned.
        */
-      Path<ACellHolder> followSingle(ACellHolder* startCellHolder,
-                                     const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations,
-                                     Weight minStateToFollow = -INFINITY) const
+      static Path<ACellHolder> followSingle(ACellHolder* startCellHolder,
+                                            const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations,
+                                            Weight minStateToFollow = -INFINITY)
       {
         assert(std::is_sorted(cellHolderRelations.begin(), cellHolderRelations.end()));
 
@@ -119,15 +119,15 @@ namespace Belle2 {
        *  @param[in]  cellHolderRelations     Considered relations to follow to extend the path
        *  @param[out] paths                   Longest paths generated
        */
-      void growAllPaths(Path<ACellHolder>& path,
-                        const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations,
-                        std::vector<Path<ACellHolder> >& paths) const
+      static void growAllPaths(Path<ACellHolder>& path,
+                               const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations,
+                               std::vector<Path<ACellHolder> >& paths)
       {
         auto growPathByRelation = [&](const WeightedRelation<ACellHolder>& neighborRelation) {
-          if (not this->isHighestContinuation(neighborRelation)) return false;
+          if (!isHighestContinuation(neighborRelation)) return false;
           ACellHolder* neighbor(neighborRelation.getTo());
           path.push_back(neighbor);
-          this->growAllPaths(path, cellHolderRelations, paths);
+          growAllPaths(path, cellHolderRelations, paths);
           path.pop_back();
           return true;
         };
@@ -183,9 +183,9 @@ namespace Belle2 {
        *  Helper function determining if the given neighbor is one of the best to be followed.
        *  Since this is an algebraic property no comparison to the other alternatives is necessary.
        */
-      static bool isHighestContinuation(ACellHolder& cellHolder,
+      static bool isHighestContinuation(const ACellHolder& cellHolder,
                                         Weight relationWeight,
-                                        ACellHolder& neighborCellHolder)
+                                        const ACellHolder& neighborCellHolder)
       {
         const AutomatonCell& automatonCell = cellHolder.getAutomatonCell();
         const AutomatonCell& neighborAutomatonCell = neighborCellHolder.getAutomatonCell();

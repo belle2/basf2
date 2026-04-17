@@ -99,7 +99,10 @@ namespace Belle2 {
       mutable CDCTrajectory2D m_trajectory2D;
 
       /// Boolean flag to indicate that this segment has a valid alias version
-      double m_aliasScore;
+      // Stefano S: this was not initialized, I was not sure if to use 0 was safe
+      // then I set the default value to NaN to solve a warning.
+      // Not clear to me why the comment says "boolen" if the variable is "double"
+      double m_aliasScore = std::numeric_limits<double>::quiet_NaN();
 
     };
 

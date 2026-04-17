@@ -44,7 +44,7 @@ namespace Belle2 {
       }
 
       /// Getter for the name
-      std::string getName() const
+      const std::string& getName() const
       {
         return m_name;
       }

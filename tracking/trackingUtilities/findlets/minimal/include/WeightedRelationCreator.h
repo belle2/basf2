@@ -58,7 +58,7 @@ namespace Belle2 {
       std::string getDescription() final
       {
         return "Constructs geometrically constrained relations between " +
-               getClassMnemomicParameterDescription((AObject*)nullptr) +
+               getClassMnemomicParameterDescription(static_cast<AObject*>(nullptr)) +
                " filter by some acceptance criterion.";
       }
 
@@ -69,7 +69,7 @@ namespace Belle2 {
         moduleParamList->addParameter(prefixed(prefix, "onlyBest"),
                                       m_param_onlyBest,
                                       "Maximal number of the best relation to keep from each " +
-                                      getClassMnemomicParameterDescription((AObject*)nullptr),
+                                      getClassMnemomicParameterDescription(static_cast<AObject*>(nullptr)),
                                       m_param_onlyBest);
       }
 

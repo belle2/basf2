@@ -142,21 +142,21 @@ namespace Belle2 {
       }
 
       /// Setter for the cell state of a pointed object that holds an AutomatonCell
-      void setCellState(ACellHolder* cellHolder, Weight cellState) const
+      static void setCellState(ACellHolder* cellHolder, Weight cellState)
       {
         AutomatonCell& automatonCell = cellHolder->getAutomatonCell();
         automatonCell.setCellState(cellState);
       }
 
       /// Getter for the cell state of a pointed object that holds an AutomatonCell
-      Weight getCellState(ACellHolder* cellHolder) const
+      static Weight getCellState(ACellHolder* cellHolder)
       {
         const AutomatonCell& automatonCell = cellHolder->getAutomatonCell();
         return automatonCell.getCellState();
       }
 
       /// Setter for the cell weight of a pointed object that holds an AutomatonCell
-      void setCellWeight(ACellHolder* cellHolder, Weight cellWeight) const
+      static void setCellWeight(ACellHolder* cellHolder, Weight cellWeight)
       {
         AutomatonCell& automatonCell = cellHolder->getAutomatonCell();
         automatonCell.setCellWeight(cellWeight);

@@ -375,12 +375,6 @@ namespace Belle2 {
         subtract(by);
       }
 
-      /// Passively moves the vector inplace by the given vector
-      Vector3D passiveMovedBy(const Vector3D& by)
-      {
-        return *this - by;
-      }
-
       /// Getter for the x coordinate
       double x() const
       {

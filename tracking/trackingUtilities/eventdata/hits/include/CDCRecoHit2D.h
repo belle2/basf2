@@ -16,6 +16,7 @@
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <iosfwd>
 
@@ -261,7 +262,7 @@ namespace Belle2 {
       /// Getter for the direction of flight relative to the position
       double getAlpha() const
       {
-        return getRecoPos2D().angleWith(getFlightDirection2D());
+        return VectorUtil::Angle(getRecoPos2D(), getFlightDirection2D());
       }
 
       /// Scales the displacement vector in place to lie on the drift circle.

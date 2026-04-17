@@ -11,12 +11,13 @@
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/ERotation.h>
 
 #include <cdc/topology/EStereoKind.h>
 #include <cdc/topology/ISuperLayer.h>
 
-#include <tracking/trackingUtilities/numerics/ERightLeft.h>
-#include <tracking/trackingUtilities/numerics/ERotation.h>
+#include <framework/geometry/VectorUtil.h>
 
 namespace Belle2 {
   class CDCSimHit;
@@ -317,7 +318,7 @@ namespace Belle2 {
       /// Getter for the direction of flight relative to the position
       double getAlpha() const
       {
-        return getRecoPos2D().angleWith(getFlightDirection2D());
+        return VectorUtil::Angle(getRecoPos2D(), getFlightDirection2D());
       }
 
       /**

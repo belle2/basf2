@@ -20,6 +20,8 @@
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
+#include <framework/geometry/VectorUtil.h>
+
 #include <tracking/trackingUtilities/numerics/Angle.h>
 
 using namespace Belle2;
@@ -47,10 +49,10 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
 
   Vector2D tangential = VectorUtil::average(fromTangential, toTangential);
 
-  double fromMiddleCos = fromFacet->getStartToMiddleLine().tangential().cosWith(toTangential);
-  double toMiddleCos = fromTangential.cosWith(toFacet->getMiddleToEndLine().tangential());
+  double fromMiddleCos = VectorUtil::CosTheta(fromFacet->getStartToMiddleLine().tangential(), toTangential);
+  double toMiddleCos = VectorUtil::CosTheta(fromTangential, toFacet->getMiddleToEndLine().tangential());
 
-  var<named("cos_delta")>() = fromTangential.cosWith(toTangential);
+  var<named("cos_delta")>() = VectorUtil::CosTheta(fromTangential, toTangential);
 
   var<named("from_middle_cos_delta")>() = fromMiddleCos;
   var<named("to_middle_cos_delta")>() = toMiddleCos;
@@ -61,13 +63,13 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     int nSteps = 0;
     UncertainParameterLine2D fitLine = FacetFitter::fit(*fromFacet, *toFacet, nSteps);
     double s = fitLine->lengthOnCurve(frontWirePos2D, backWirePos2D);
-    double alpha = fitLine->support().angleWith(fitLine->tangential());
+    double alpha = VectorUtil::Angle(fitLine->support(), fitLine->tangential());
     var<named("alpha_0")>() = alpha;
     var<named("chi2_0")>() = fitLine.chi2();
     var<named("chi2_0_per_s")>() = fitLine.chi2() / s;
     var<named("erf_0")>() = std::erf(fitLine.chi2() / 800);
     var<named("fit_0_phi0")>() = fitLine->tangential().phi();
-    var<named("fit_0_cos_delta")>() = fitLine->tangential().cosWith(tangential);
+    var<named("fit_0_cos_delta")>() = VectorUtil::CosTheta(fitLine->tangential(), tangential);
   }
 
   {
@@ -77,7 +79,7 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     var<named("chi2_1")>() = fitLine.chi2();
     var<named("chi2_1_per_s")>() = fitLine.chi2() / s;
     var<named("fit_1_phi0")>() = fitLine->tangential().phi();
-    var<named("fit_1_cos_delta")>() = fitLine->tangential().cosWith(tangential);
+    var<named("fit_1_cos_delta")>() = VectorUtil::CosTheta(fitLine->tangential(), tangential);
   }
 
   {
@@ -86,7 +88,7 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     var<named("chi2")>() = fitLine.chi2();
     var<named("chi2_per_s")>() = fitLine.chi2() / s;
     var<named("fit_phi0")>() = fitLine->tangential().phi();
-    var<named("fit_cos_delta")>() = fitLine->tangential().cosWith(tangential);
+    var<named("fit_cos_delta")>() = VectorUtil::CosTheta(fitLine->tangential(), tangential);
   }
 
   // Combination fit

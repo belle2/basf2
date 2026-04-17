@@ -159,32 +159,6 @@ namespace Belle2 {
         return hypot3(x(), y(), z());
       }
 
-      /** @name Angle functions
-       *  These functions measure the angle between two vectors from *this* to rhs. \n
-       *  Because the three dimensional space does not have a unique orientation available, \n
-       *  the sign of the angle is not well defined. Therefore angles between three dimensional \n
-       *  vectors are always positive and so is the sine of the angle. The angle is bound by M_PI.
-       */
-      ///@{
-      /// Cosine of the angle between this and rhs
-      double cosWith(const Vector3D& rhs) const
-      {
-        return dot(rhs) / (norm() * rhs.norm());
-      }
-
-      /// Sine of the angle between this and rhs
-      double sinWith(const Vector3D& rhs) const
-      {
-        return cross(rhs).norm() / (norm() * rhs.norm());
-      }
-
-      /// The angle between this and rhs
-      double angleWith(const Vector3D& rhs) const
-      {
-        return atan2(sinWith(rhs), cosWith(rhs));
-      }
-      ///@}
-
       /// Calculates the distance of this point to the rhs
       double distance(const Vector3D& rhs = Vector3D(0.0, 0.0, 0.0)) const
       {

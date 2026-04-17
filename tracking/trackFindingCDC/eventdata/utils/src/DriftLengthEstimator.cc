@@ -30,11 +30,13 @@
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/Quadratic.h>
 
-#include <framework/core/ModuleParamList.templateDetails.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/dataobjects/CDCHit.h>
+
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/geometry/VectorUtil.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -61,7 +63,7 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit2D& recoHit2D)
 
   Vector2D flightDirection = recoHit2D.getFlightDirection2D();
   Vector2D recoPos2D = recoHit2D.getRecoPos2D();
-  double alpha = recoPos2D.angleWith(flightDirection);
+  double alpha = VectorUtil::Angle(recoPos2D, flightDirection);
   const double beta = 1;
   double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);
 
@@ -93,7 +95,7 @@ void DriftLengthEstimator::updateDriftLength(CDCFacet& facet)
   const UncertainParameterLine2D& line = facet.getFitLine();
   Vector2D flightDirection = line->tangential();
   Vector2D centralPos2D = line->closest(facet.getMiddleWire().getRefPos2D());
-  double alpha = centralPos2D.angleWith(flightDirection);
+  double alpha = VectorUtil::Angle(centralPos2D, flightDirection);
   if (not m_param_useAlphaInDriftLength) {
     alpha = 0;
   }
@@ -143,7 +145,7 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit3D& recoHit3D,
   Vector2D flightDirection = recoHit3D.getFlightDirection2D();
   const Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
   const Vector2D& recoPos2D = recoPos3D.xy();
-  double alpha = recoPos2D.angleWith(flightDirection);
+  double alpha = VectorUtil::Angle(recoPos2D, flightDirection);
   const double beta = 1;
   double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);
 

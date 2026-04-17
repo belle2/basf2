@@ -20,10 +20,11 @@
 #include <cdc/topology/CDCWire.h>
 
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
-#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <TRandom.h>
 
@@ -106,7 +107,7 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
     for (CDCRecoHit2D& recoHit2D : segment) {
       Vector2D flightDirection = recoHit2D.getFlightDirection2D();
       Vector2D recoPos2D = recoHit2D.getRecoPos2D();
-      double alpha = recoPos2D.angleWith(flightDirection);
+      double alpha = VectorUtil::Angle(recoPos2D, flightDirection);
 
       const CDCWire& wire = recoHit2D.getWire();
       const CDCHit* hit = recoHit2D.getWireHit().getHit();

@@ -12,6 +12,7 @@
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <cmath>
 
@@ -48,9 +49,9 @@ Weight SimpleFacetFilter::operator()(const CDCFacet& facet)
   const ParameterLine2D& startToEnd = facet.getStartToEndLine();
   const ParameterLine2D& middleToEnd = facet.getMiddleToEndLine();
 
-  const double startCos  = startToMiddle.tangential().cosWith(startToEnd.tangential());
-  // const double middleCos = startToMiddle.tangential().cosWith(middleToEnd.tangential());
-  const double endCos = startToEnd.tangential().cosWith(middleToEnd.tangential());
+  const double startCos  = VectorUtil::CosTheta(startToMiddle.tangential(), startToEnd.tangential());
+  // const double middleCos = VectorUtil::CosTheta(startToMiddle.tangential(), middleToEnd.tangential());
+  const double endCos = VectorUtil::CosTheta(startToEnd.tangential(), middleToEnd.tangential());
 
   // cut on the angle of
   if (startCos > m_param_deviationCosCut and endCos > m_param_deviationCosCut) {

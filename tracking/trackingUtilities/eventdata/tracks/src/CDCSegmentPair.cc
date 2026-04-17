@@ -23,6 +23,7 @@
 #include  <tracking/trackingUtilities/numerics/EForwardBackward.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <memory>
 #include <cmath>
@@ -150,7 +151,7 @@ double CDCSegmentPair::computeDeltaPhiAtSuperLayerBound() const
   const Vector2D lastPos2D_fromSegment = lastRecoHit_fromSegment.getRecoPos2D();
   const Vector2D firstPos2D_toSegment = firstRecoHit_toSegment.getRecoPos2D();
 
-  return lastPos2D_fromSegment.angleWith(firstPos2D_toSegment);
+  return VectorUtil::Angle(lastPos2D_fromSegment, firstPos2D_toSegment);
 }
 
 double CDCSegmentPair::computeFromIsBeforeToFitless() const
@@ -185,7 +186,7 @@ double CDCSegmentPair::computeFromIsBeforeToFitless() const
   Vector2D firstToLast_fromSegment = lastPos2D_fromSegment - firstPos2D_fromSegment;
   Vector2D firstToFirst = firstPos2D_toSegment - firstPos2D_fromSegment;
 
-  return firstToLast_fromSegment.angleWith(firstToFirst);
+  return VectorUtil::Angle(firstToLast_fromSegment, firstToFirst);
 }
 
 double CDCSegmentPair::computeToIsAfterFromFitless() const
@@ -220,7 +221,7 @@ double CDCSegmentPair::computeToIsAfterFromFitless() const
   Vector2D firstToLast_toSegment = lastPos2D_toSegment - firstPos2D_toSegment;
   Vector2D lastToLast = lastPos2D_toSegment - lastPos2D_fromSegment;
 
-  return firstToLast_toSegment.angleWith(lastToLast);
+  return VectorUtil::Angle(firstToLast_toSegment, lastToLast);
 }
 
 double CDCSegmentPair::computeIsCoalignedFitless() const
@@ -258,7 +259,7 @@ double CDCSegmentPair::computeIsCoalignedFitless() const
   Vector2D firstToLast_fromSegment = lastPos2D_fromSegment - firstPos2D_fromSegment;
   Vector2D firstToLast_toSegment = lastPos2D_toSegment - firstPos2D_toSegment;
 
-  return firstToLast_fromSegment.angleWith(firstToLast_toSegment);
+  return VectorUtil::Angle(firstToLast_fromSegment, firstToLast_toSegment);
 }
 
 EForwardBackward CDCSegmentPair::isCoaligned(const CDCTrajectory2D& trajectory2D) const

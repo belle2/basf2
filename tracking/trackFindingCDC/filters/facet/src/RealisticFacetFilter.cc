@@ -14,6 +14,7 @@
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <cmath>
 
@@ -70,9 +71,9 @@ Weight RealisticFacetFilter::operator()(const CDCFacet& facet)
   const double startToEndLength = startToEndTangentialVector.norm();
   const double middleToEndLength = middleToEndTangentialVector.norm();
 
-  const double startCos = startToMiddleTangentialVector.cosWith(startToEndTangentialVector);
-  const double middleCos = startToMiddleTangentialVector.cosWith(middleToEndTangentialVector);
-  const double endCos = startToEndTangentialVector.cosWith(middleToEndTangentialVector);
+  const double startCos = VectorUtil::CosTheta(startToMiddleTangentialVector, startToEndTangentialVector);
+  const double middleCos = VectorUtil::CosTheta(startToMiddleTangentialVector, middleToEndTangentialVector);
+  const double endCos = VectorUtil::CosTheta(startToEndTangentialVector, middleToEndTangentialVector);
 
   const double startPhi = acos(startCos);
   const double middlePhi = acos(middleCos);

@@ -10,6 +10,7 @@
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/numerics/LookupTable.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <memory>
 #include <cmath>
@@ -70,7 +71,7 @@ namespace Belle2 {
       double getFlightTime2D(const TrackingUtilities::Vector2D& pos2D, double alpha, double beta = 1) const override
       {
         TrackingUtilities::Vector2D relPos2D = pos2D - m_triggerPoint.xy();
-        double deltaAlpha = pos2D.angleWith(relPos2D);
+        double deltaAlpha = VectorUtil::Angle(pos2D, relPos2D);
         alpha += deltaAlpha;
         double absAlpha = std::fabs(alpha);
         double directDist2D = relPos2D.cylindricalR();

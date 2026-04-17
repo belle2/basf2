@@ -11,6 +11,7 @@
 
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <iosfwd>
 
@@ -75,7 +76,7 @@ namespace Belle2 {
 
       /// Returns the cosine of the angle between the two flight directions of the tangents.
       double getCosFlightDifference(const CDCTangent& tangent) const
-      { return getFlightVec2D().cosWith(tangent.getFlightVec2D()); }
+      { return VectorUtil::CosTheta(getFlightVec2D(), tangent.getFlightVec2D()); }
 
       /// Getter for the reconstructed hit on the first oriented wire hit using reconstructed touch point as position.
       CDCRecoHit2D getFromRecoHit2D() const;

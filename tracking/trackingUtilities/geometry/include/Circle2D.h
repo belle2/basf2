@@ -12,6 +12,8 @@
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
+#include <framework/geometry/VectorUtil.h>
+
 #include <cmath>
 
 namespace Belle2 {
@@ -180,7 +182,7 @@ namespace Belle2 {
       /// Calculates the angle between two points as seen from the center of the circle
       double openingAngle(const Vector2D& from, const Vector2D& to) const
       {
-        return gradient(from).angleWith(gradient(to));
+        return VectorUtil::Angle(gradient(from), gradient(to));
       } // can be optimized in the number of computations
 
       /// Calculates the arc length between two points of closest approach on the circle.

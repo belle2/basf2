@@ -13,6 +13,7 @@
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/geometry/VectorUtil.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -54,8 +55,8 @@ Weight SimpleFacetRelationFilter::operator()(const CDCFacet& fromFacet,
   const ParameterLine2D& toStartToEnd = toFacet.getStartToEndLine();
   const ParameterLine2D& toMiddleToEnd = toFacet.getMiddleToEndLine();
 
-  const double fromMiddleCos = fromStartToMiddle.tangential().cosWith(toStartToEnd.tangential());
-  const double toMiddleCos = fromStartToEnd.tangential().cosWith(toMiddleToEnd.tangential());
+  const double fromMiddleCos = VectorUtil::CosTheta(fromStartToMiddle.tangential(), toStartToEnd.tangential());
+  const double toMiddleCos = VectorUtil::CosTheta(fromStartToEnd.tangential(), toMiddleToEnd.tangential());
 
   // check both
   if (fromMiddleCos > m_param_deviationCosCut and toMiddleCos > m_param_deviationCosCut) {

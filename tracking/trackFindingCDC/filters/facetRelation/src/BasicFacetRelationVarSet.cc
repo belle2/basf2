@@ -9,6 +9,7 @@
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
+#include <framework/geometry/VectorUtil.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -30,8 +31,8 @@ bool BasicFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetR
   const ParameterLine2D& toStartToEnd   = toFacet.getStartToEndLine();
   const ParameterLine2D& toMiddleToEnd  = toFacet.getMiddleToEndLine();
 
-  const double fromMiddleCos = fromStartToMiddle.tangential().cosWith(toStartToEnd.tangential());
-  const double toMiddleCos = fromStartToEnd.tangential().cosWith(toMiddleToEnd.tangential());
+  const double fromMiddleCos = VectorUtil::CosTheta(fromStartToMiddle.tangential(), toStartToEnd.tangential());
+  const double toMiddleCos = VectorUtil::CosTheta(fromStartToEnd.tangential(), toMiddleToEnd.tangential());
 
   const double fromMiddlePhi = acos(fromMiddleCos);
   const double toMiddlePhi = acos(toMiddleCos);

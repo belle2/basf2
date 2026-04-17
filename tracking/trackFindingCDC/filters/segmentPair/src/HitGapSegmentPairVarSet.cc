@@ -10,10 +10,11 @@
 #include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
+#include <tracking/trackingUtilities/numerics/Angle.h>
 
 #include <cdc/topology/CDCWire.h>
 
-#include <tracking/trackingUtilities/numerics/Angle.h>
+#include <framework/geometry/VectorUtil.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -53,8 +54,8 @@ bool HitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const Vector2D fromLastHitMom = fromLastHit.getFlightDirection2D();
   const Vector2D toFirstHitMom = toFirstHit.getFlightDirection2D();
 
-  finitevar<named("delta_hit_pos_phi")>() = fromLastHitPos.angleWith(toFirstHitPos);
-  finitevar<named("delta_hit_mom_phi")>() = fromLastHitMom.angleWith(toFirstHitMom);
+  finitevar<named("delta_hit_pos_phi")>() = VectorUtil::Angle(fromLastHitPos, toFirstHitPos);
+  finitevar<named("delta_hit_mom_phi")>() = VectorUtil::Angle(fromLastHitMom, toFirstHitMom);
 
   double fromLastHitAlpha = fromLastHit.getAlpha();
   double toFirstHitAlpha = toFirstHit.getAlpha();

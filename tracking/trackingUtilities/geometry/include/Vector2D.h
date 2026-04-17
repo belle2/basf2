@@ -121,25 +121,6 @@ namespace Belle2 {
         return hypot2(x(), y());
       }
 
-      /** @name Angle functions
-       *  These functions measure the angle between two vectors from *this* to rhs
-       *  in the mathematical positive counterclockwise direction. So a positive angle means
-       *  rhs is more counterclockwise than this.
-       */
-      ///@{
-      /// Cosine of the angle between this and rhs
-      double cosWith(const Vector2D& rhs) const
-      {
-        return dot(rhs) / (norm() * rhs.norm());
-      }
-
-      /// The angle between this and rhs
-      double angleWith(const Vector2D& rhs) const
-      {
-        return atan2(cross(rhs), dot(rhs));
-      }
-      ///@}
-
       /// Calculates the distance of this point to the rhs
       double distance(const Vector2D& rhs = Vector2D(0.0, 0.0)) const
       {

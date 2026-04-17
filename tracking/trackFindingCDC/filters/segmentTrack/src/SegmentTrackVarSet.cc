@@ -21,6 +21,8 @@
 
 #include <tracking/trackingUtilities/numerics/ToFinite.h>
 
+#include <framework/geometry/VectorUtil.h>
+
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
@@ -254,7 +256,7 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
 
   var<named("segment_super_layer")>() = segment->getISuperLayer();
 
-  double phiBetweenTrackAndSegment = trajectoryTrack2D.getMom2DAtSupport().angleWith(segment->front().getRecoPos2D());
+  double phiBetweenTrackAndSegment = VectorUtil::Angle(trajectoryTrack2D.getMom2DAtSupport(), segment->front().getRecoPos2D());
 
   var<named("phi_between_track_and_segment")>() = toFinite(phiBetweenTrackAndSegment, 0);
   var<named("perp_s_of_front")>() = toFinite(perpSOfFront / radius, 0);

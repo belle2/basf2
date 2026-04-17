@@ -10,8 +10,6 @@
 
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
-
-#include <cdc/dbobjects/CDCGeometry.h>
 #include <cdc/dbobjects/CDCBadBoards.h>
 
 #include <string>
@@ -44,10 +42,8 @@ namespace Belle2 {
       void detectDeadBoards();
 
     private:
-      std::string m_histName = "CDCboardIDs_1"; /**< input histogram name */
+      std::string m_histName = "CDCboardIDs";   /**< input histogram name */
       float m_threshold = 0.0;                  /**< dead-board threshold */
-
-      DBObjPtr<CDCGeometry> m_cdcGeo;           /**< Geometry of CDC */
       CDCBadBoards* m_badBoardList = nullptr;   /**< bad-board list to be saved */
     };
 

@@ -7,15 +7,8 @@
  **************************************************************************/
 
 #include <cdc/calibration/DeadBoardAlgorithm.h>
-#include <calibration/CalibrationAlgorithm.h>
-
-#include <cdc/geometry/CDCGeometryPar.h>
-
 #include <framework/logging/Logger.h>
-
 #include <TH1F.h>
-
-#include <cmath>
 
 using namespace Belle2;
 using namespace CDC;
@@ -70,8 +63,6 @@ CalibrationAlgorithm::EResult DeadBoardAlgorithm::calibrate()
   const auto exprun = getRunList()[0];
   B2INFO("ExpRun used for DB Geometry : " << exprun.first << " " << exprun.second);
   updateDBObjPtrs(1, exprun.second, exprun.first);
-
-  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   detectDeadBoards();
 

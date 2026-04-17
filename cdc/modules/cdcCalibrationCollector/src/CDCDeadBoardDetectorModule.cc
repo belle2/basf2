@@ -35,7 +35,7 @@ void CDCDeadBoardDetectorModule::prepare()
   for (int i = 0; i < 300; i += 1) {
     nReadsPerBoard[i] = 0;
   }
-  auto m_BoardIDs = new TH1F("CDCboardIDs", "CDC board IDs", 300, 0, 300);
+  auto m_BoardIDs = new TH1F("CDCboardIDs", "CDC board IDs", 300, -0.5, 299.5);
   registerObject<TH1F>("CDCboardIDs", m_BoardIDs);
 }
 

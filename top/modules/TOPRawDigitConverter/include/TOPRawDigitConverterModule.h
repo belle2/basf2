@@ -44,11 +44,6 @@ namespace Belle2 {
     TOPRawDigitConverterModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TOPRawDigitConverterModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
@@ -64,18 +59,6 @@ namespace Belle2 {
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
 
   private:
 

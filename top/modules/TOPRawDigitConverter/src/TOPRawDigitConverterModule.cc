@@ -102,11 +102,6 @@ namespace Belle2 {
   }
 
 
-  TOPRawDigitConverterModule::~TOPRawDigitConverterModule()
-  {
-  }
-
-
   void TOPRawDigitConverterModule::initialize()
   {
 
@@ -473,15 +468,6 @@ namespace Belle2 {
       }
     }
 
-  }
-
-
-  void TOPRawDigitConverterModule::endRun()
-  {
-  }
-
-  void TOPRawDigitConverterModule::terminate()
-  {
   }
 
 

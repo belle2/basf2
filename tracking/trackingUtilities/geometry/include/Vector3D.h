@@ -105,12 +105,6 @@ namespace Belle2 {
                                        (z() < rhs.z() or (z() == rhs.z() and (phi() < rhs.phi()))));
       }
 
-      /// Checks if one of the coordinates is NAN
-      bool hasNAN() const
-      {
-        return std::isnan(x()) or std::isnan(y()) or std::isnan(z());
-      }
-
       /// Calculates the three dimensional dot product.
       double dot(const Vector3D& rhs) const
       {

@@ -87,12 +87,6 @@ namespace Belle2 {
                (normSquared() == rhs.normSquared() and (phi() < rhs.phi()));
       }
 
-      /// Checks if one of the coordinates is NAN
-      bool hasNAN() const
-      {
-        return std::isnan(x()) or std::isnan(y());
-      }
-
       /// Calculates the two dimensional dot product.
       double dot(const Vector2D& rhs) const
       {

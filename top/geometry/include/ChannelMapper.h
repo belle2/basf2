@@ -96,7 +96,7 @@ namespace Belle2 {
       static bool isPixelIDValid(int pixel)
       {
         unsigned pix = pixel - 1;
-        return pix < c_numPixels;
+        return pix < c_numPixels; // cppcheck-suppress knownConditionTrueFalse
       }
 
       /**

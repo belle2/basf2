@@ -141,9 +141,9 @@ namespace Belle2 {
                 << " of experiment " << evtMetaData->getExperiment());
       }
       if (not m_calPrecision.isValid()) {
-        B2FATAL("Calibration precision requested but not available for run "
-                << evtMetaData->getRun()
-                << " of experiment " << evtMetaData->getExperiment());
+        B2WARNING("Calibration precision requested but not available for run "
+                  << evtMetaData->getRun()
+                  << " of experiment " << evtMetaData->getExperiment());
       }
     }
     if (m_useAsicShiftCalibration) {
@@ -394,7 +394,7 @@ namespace Belle2 {
           if (cal->isCalibrated(moduleID, channel)) {
             time -= cal->getT0(moduleID, channel);
             double err = cal->getT0Error(moduleID, channel); // statistical, from laser data fit
-            double sys = m_calPrecision->get(moduleID); // systematical, from di-muon events
+            double sys = m_calPrecision.isValid() ? m_calPrecision->get(moduleID) : 0; // systematical, from di-muon events
             timeErrorSq += err * err + sys * sys;
             statusBits |= TOPDigit::c_ChannelT0Calibrated;
           }

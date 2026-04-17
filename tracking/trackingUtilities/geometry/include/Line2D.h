@@ -423,27 +423,27 @@ namespace Belle2 {
       /// Flips the first coordinate inplace (no difference between active and passive)
       void flipFirst()
       {
-        m_n12.flipFirst();
+        m_n12.SetX(-m_n12.X());
       }
 
       /// Flips the first coordinate inplace (no difference between active and passive)
       void flipSecond()
       {
-        m_n12.flipSecond();
+        m_n12.SetY(-m_n12.Y());
       }
 
       /// Makes a copy of the line with the first coordinate flipped (no difference between active
       /// and passive)
       Line2D flippedFirst() const
       {
-        return Line2D(n0(), n12().flippedFirst());
+        return Line2D(n0(), Vector2D(-n12().X(), n12().Y()));
       }
 
       /// Makes a copy of the line with the second coordinate flipped (no difference between active
       /// and passive)
       Line2D flippedSecond() const
       {
-        return Line2D(n0(), n12().flippedSecond());
+        return Line2D(n0(), Vector2D(n12().X(), -n12().Y()));
       }
       /**@}*/
 

@@ -65,7 +65,7 @@ namespace {
   {
     // Inverse rotation is accomblished by taking the angle to the opposite
     // which is equivalent to flipping the second coordinate.
-    vec = vec.passiveRotatedBy(coordinate.flippedSecond());
+    vec = vec.passiveRotatedBy(Vector2D(coordinate.X(), -coordinate.Y()));
   }
 
   Eigen::Vector2d fitPhiVecZeroSteps(const Eigen::Matrix<double, 3, 3>& xylCov, double& chi2)

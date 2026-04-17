@@ -262,32 +262,6 @@ namespace Belle2 {
         return reversed();
       }
 
-      /// Flips the first coordinate inplace (no difference between active and passive)
-      void flipFirst()
-      {
-        m_x = -x();
-      }
-
-      /// Flips the first coordinate inplace (no difference between active and passive)
-      void flipSecond()
-      {
-        m_y = -y();
-      }
-
-      /// Makes a copy of the vector with the first coordinate flipped (no difference between active
-      /// and passive)
-      Vector2D flippedFirst() const
-      {
-        return Vector2D(-x(), y());
-      }
-
-      /// Makes a copy of the vector with the second coordinate flipped (no difference between
-      /// active and passive)
-      Vector2D flippedSecond() const
-      {
-        return Vector2D(x(), -y());
-      }
-
       /// Reflects this vector over line designated by the given vector.
       Vector2D flippedOver(const Vector2D& reflectionLine) const
       {
@@ -527,6 +501,11 @@ namespace Belle2 {
       {
         m_x = x;
       }
+      /// Setter for the x coordinate
+      void SetX(const double x)
+      {
+        m_x = x;
+      }
       /// Getter for the y coordinate
       double y() const
       {
@@ -539,6 +518,11 @@ namespace Belle2 {
       }
       /// Setter for the y coordinate
       void setY(const double y)
+      {
+        m_y = y;
+      }
+      /// Setter for the y coordinate
+      void SetY(const double y)
       {
         m_y = y;
       }

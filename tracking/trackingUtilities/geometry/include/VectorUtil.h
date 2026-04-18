@@ -119,6 +119,12 @@ namespace Belle2 {
       return std::isnan(phi) ? ROOT::Math::XYVector(0.0, 0.0) : ROOT::Math::XYVector(std::cos(phi), std::sin(phi));
     }
 
+    /// Calculated the two dimensional cross product.
+    inline double Cross(const ROOT::Math::XYVector& lhs, const ROOT::Math::XYVector& rhs)
+    {
+      return lhs.X() * rhs.Y() - lhs.Y() * rhs.X();
+    }
+
   } // namespace VectorUtil
 
 } // namespace Belle2

@@ -62,7 +62,7 @@ std::size_t CDCSZObservations::append(const CDCRecoHit3D& recoHit3D)
     if (dispNorm == 0.0) {
       zeta = wireVector.xy().R() / wireVector.z();
     } else {
-      zeta = wireVector.xy().dot(disp2D) / wireVector.z() / dispNorm;
+      zeta = wireVector.xy().Dot(disp2D) / wireVector.z() / dispNorm;
     }
 
     weight = zeta * zeta / driftlengthVariance;

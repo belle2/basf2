@@ -186,15 +186,15 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& j
 {
   Vector2D deltaVec = by - perigee();
   double delta = deltaVec.R();
-  double deltaParallel = phi0Vec().dot(deltaVec);
-  // double deltaOrthogonal = phi0Vec().cross(deltaVec);
+  double deltaParallel = phi0Vec().Dot(deltaVec);
+  // double deltaOrthogonal = VectorUtil::Cross(phi0Vec(), deltaVec);
   // double zeta = deltaVec.Mag2();
 
   Vector2D UVec = gradient(by);
   double U = UVec.R();
   double USquared = UVec.Mag2();
-  double UOrthogonal = phi0Vec().cross(UVec);
-  // double UParallel = phi0Vec().dot(UVec);
+  double UOrthogonal = VectorUtil::Cross(phi0Vec(), UVec);
+  // double UParallel = phi0Vec().Dot(UVec);
 
   // Vector2D CB = gradient(by).orthogonal();
   // double U = sqrt(1 + curvature() * A);
@@ -232,7 +232,7 @@ double PerigeeCircle::arcLengthTo(const Vector2D& point) const
 {
   Vector2D closestToPoint = closest(point);
   double secantLength = perigee().distance(closestToPoint);
-  double deltaParallel = phi0Vec().dot(point);
+  double deltaParallel = phi0Vec().Dot(point);
   return copysign(arcLengthAtSecantLength(secantLength), deltaParallel);
 }
 
@@ -322,7 +322,7 @@ double PerigeeCircle::distance(double fastDistance) const
 double PerigeeCircle::fastDistance(const Vector2D& point) const
 {
   Vector2D delta = point - perigee();
-  double deltaOrthogonal = phi0Vec().cross(delta);
+  double deltaOrthogonal = VectorUtil::Cross(phi0Vec(), delta);
   return -deltaOrthogonal + curvature() * delta.Mag2() / 2;
 }
 

@@ -455,7 +455,7 @@ namespace Belle2 {
        */
       double fastDistance(const Vector2D& point) const
       {
-        return n0() + point.dot(n12()) + point.Mag2() * n3();
+        return n0() + point.Dot(n12()) + point.Mag2() * n3();
       }
 
       /// Approximate distance to the origin

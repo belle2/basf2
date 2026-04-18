@@ -88,7 +88,7 @@ namespace Belle2 {
       /// Constructs a line through the two given points
       static Line2D throughPoints(const Vector2D& start, const Vector2D& end)
       {
-        return Line2D(end.cross(start), (start - end).orthogonal());
+        return Line2D(VectorUtil::Cross(end, start), (start - end).orthogonal());
       }
 
     public:
@@ -239,7 +239,7 @@ namespace Belle2 {
        */
       double distance(const Vector2D& point) const
       {
-        return n0() + point.dot(n12());
+        return n0() + point.Dot(n12());
       }
 
       /**

@@ -219,8 +219,8 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
   const Vector2D& thetaVecMin = m_cosSinLookupTable->at(thetaMin);
   const Vector2D& thetaVecMax = m_cosSinLookupTable->at(thetaMax);
 
-  float rHitMin = thetaVecMin.dot(pos2D);
-  float rHitMax = thetaVecMax.dot(pos2D);
+  float rHitMin = thetaVecMin.Dot(pos2D);
+  float rHitMax = thetaVecMax.Dot(pos2D);
 
   // compute sinograms at the left and right borders of the node
   float rHitMinRight = rHitMin - l;
@@ -252,8 +252,8 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
   }
 
   // Check the extremum
-  float rHitMinExtr = thetaVecMin.cross(pos2D);
-  float rHitMaxExtr = thetaVecMax.cross(pos2D);
+  float rHitMinExtr = VectorUtil::Cross(thetaVecMin, pos2D);
+  float rHitMaxExtr = VectorUtil::Cross(thetaVecMax, pos2D);
   if (rHitMinExtr * rHitMaxExtr < 0.) return checkExtremum(node, wireHit);
 
   // Not contained
@@ -270,8 +270,8 @@ bool AxialHitQuadTreeProcessor::checkDerivative(QuadTree* node, const CDCWireHit
   const Vector2D& thetaVecMin = m_cosSinLookupTable->at(thetaMin);
   const Vector2D& thetaVecMax = m_cosSinLookupTable->at(thetaMax);
 
-  float rMinD = thetaVecMin.cross(pos2D);
-  float rMaxD = thetaVecMax.cross(pos2D);
+  float rMinD = VectorUtil::Cross(thetaVecMin, pos2D);
+  float rMaxD = VectorUtil::Cross(thetaVecMax, pos2D);
 
   // Does not really make sense...
   if ((rMinD > 0) && (rMaxD * rMinD >= 0)) return true;

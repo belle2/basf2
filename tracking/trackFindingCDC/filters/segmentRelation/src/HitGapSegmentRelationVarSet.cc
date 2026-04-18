@@ -62,9 +62,9 @@ bool HitGapSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* pt
 
   finitevar<named("delta_hit_distance")>() = longHitDistance - hitDistance;
 
-  finitevar<named("from_hit_forward")>() = hitPosGap.dot(fromLastHitMom);
-  finitevar<named("to_hit_forward")>() = hitPosGap.dot(toFirstHitMom);
-  finitevar<named("hit_forward")>() = hitPosGap.dot(VectorUtil::average(fromLastHitMom, toFirstHitMom));
+  finitevar<named("from_hit_forward")>() = hitPosGap.Dot(fromLastHitMom);
+  finitevar<named("to_hit_forward")>() = hitPosGap.Dot(toFirstHitMom);
+  finitevar<named("hit_forward")>() = hitPosGap.Dot(VectorUtil::average(fromLastHitMom, toFirstHitMom));
 
   const Vector2D fromStretch = fromLastHitPos - fromFirstHitPos;
   const Vector2D toStretch = toLastHitPos - toFirstHitPos;

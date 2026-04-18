@@ -243,46 +243,46 @@ namespace Belle2 {
       {
         double norm_squared = tangential().Mag2();
         return VectorUtil::compose(tangential(),
-                                   tangential().dot(point) / norm_squared,
-                                   tangential().cross(support()) / norm_squared);
+                                   tangential().Dot(point) / norm_squared,
+                                   VectorUtil::Cross(tangential(), support()) / norm_squared);
       }
 
       /// Gives the line parameter at the closest approach to point
       double closestAt(const Vector2D& point) const
       {
-        return (tangential().dot(point) - tangential().dot(support())) / tangential().Mag2();
+        return (tangential().Dot(point) - tangential().Dot(support())) / tangential().Mag2();
       }
 
       /// Gives the position of closest approach to the origin
       Vector2D closestToOrigin() const
       {
         return tangential().orthogonal() *=
-                 (tangential().cross(support()) / tangential().Mag2());
+                 (VectorUtil::Cross(tangential(), support()) / tangential().Mag2());
       }
 
       /// Gives the line parameter at the closest approach to the origin
       double closestToOriginAt() const
       {
-        return -tangential().dot(support()) / tangential().Mag2();
+        return -tangential().Dot(support()) / tangential().Mag2();
       }
 
       /// Denotes the length on the line between the two points
       double lengthOnCurve(const Vector2D& from, const Vector2D& to) const
       {
-        return (to.dot(tangential()) - from.dot(tangential())) / tangential().R();
+        return (to.Dot(tangential()) - from.Dot(tangential())) / tangential().R();
       }
 
       /// Gives the line parameter where the two lines meet. Infinity for parallels.
       double intersectionAt(const Line2D& line) const
       {
-        return -(line.n0() + support().dot(line.normal())) / tangential().dot(line.normal());
+        return -(line.n0() + support().Dot(line.normal())) / tangential().Dot(line.normal());
       }
 
       /// Gives the line parameter of this line where the two lines meet. Infinity for parallels.
       double intersectionAt(const ParameterLine2D& line) const
       {
-        return (line.tangential().cross(support()) - line.tangential().cross(line.support())) /
-               tangential().cross(line.tangential());
+        return (VectorUtil::Cross(line.tangential(), support()) - VectorUtil::Cross(line.tangential(), line.support())) /
+               VectorUtil::Cross(tangential(), line.tangential());
       }
 
       /// Gives the line parameters of this line, where it intersects with the generalized circle
@@ -293,7 +293,7 @@ namespace Belle2 {
       std::pair<double, double> intersectionsAt(const GeneralizedCircle& genCircle) const
       {
         double a = genCircle.n3() * tangential().Mag2();
-        double b = tangential().dot(genCircle.gradient(support()));
+        double b = tangential().Dot(genCircle.gradient(support()));
         double c = genCircle.fastDistance(support());
 
         return solveQuadraticABC(a, b, c);

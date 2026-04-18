@@ -14,6 +14,7 @@
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <framework/geometry/VectorUtil.h>
 
 #include <Math/Vector2D.h>
@@ -82,14 +83,9 @@ namespace Belle2 {
       }
 
       /// Calculates the two dimensional dot product.
-      double dot(const Vector2D& rhs) const
-      {
-        return x() * rhs.x() + y() * rhs.y();
-      }
-      /// Calculates the two dimensional dot product.
       double Dot(const Vector2D& rhs) const
       {
-        return dot(rhs);
+        return x() * rhs.x() + y() * rhs.y();
       }
 
       /// Calculated the two dimensional cross product.
@@ -262,7 +258,7 @@ namespace Belle2 {
       /// Calculates the component parallel to the given vector
       double parallelComp(const Vector2D& relativTo) const
       {
-        return relativTo.dot(*this) / relativTo.R();
+        return relativTo.Dot(*this) / relativTo.R();
       }
 
       /// Same as parallelComp() but assumes the given vector to be of unit length.
@@ -270,20 +266,20 @@ namespace Belle2 {
        *  a costly computation of the vector R()*/
       double unnormalizedParallelComp(const Vector2D& relativTo) const
       {
-        return relativTo.dot(*this);
+        return relativTo.Dot(*this);
       }
 
       /// Calculates the component orthogonal to the given vector
       /** The orthogonal component is the component parallel to relativeTo.orthogonal() */
       double orthogonalComp(const Vector2D& relativTo) const
       {
-        return relativTo.cross(*this) / relativTo.R();
+        return VectorUtil::Cross(relativTo, *this) / relativTo.R();
       }
 
       /// Calculates the part of this vector that is parallel to the given vector
       Vector2D orthogonalVector(const Vector2D& relativTo) const
       {
-        return relativTo.scaled(relativTo.cross(*this) / relativTo.Mag2()).orthogonal();
+        return relativTo.scaled(VectorUtil::Cross(relativTo, *this) / relativTo.Mag2()).orthogonal();
       }
 
       /// Same as orthogonalComp() but assumes the given vector to be of unit length
@@ -291,7 +287,7 @@ namespace Belle2 {
        *  a costly computation of the vector R()*/
       double unnormalizedOrthogonalComp(const Vector2D& relativTo) const
       {
-        return relativTo.cross(*this);
+        return VectorUtil::Cross(relativTo, *this);
       }
 
       /// Indicates if the given vector is more left or more right if you looked in the direction of
@@ -376,7 +372,7 @@ namespace Belle2 {
         // Check whether this transformation is orientation conserving
         // If yes this vector must lie in the first quadrant to be between lower and upper
         // If no it must lie in some other quadrant.
-        double det = lower.cross(upper);
+        double det = VectorUtil::Cross(lower, upper);
         if (det == 0) {
           // lower and upper are coaligned
           return isRightOf(lower) and isLeftOf(upper);

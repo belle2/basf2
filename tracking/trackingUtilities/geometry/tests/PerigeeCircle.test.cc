@@ -386,7 +386,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_OriginCircleFromPointDirectio
   Vector2D pos2D = perigeeCircle.atArcLength(randomArcLength);
   Vector2D phiVec = perigeeCircle.tangential(pos2D);
 
-  double curvature = 2 * pos2D.cross(phiVec) / pos2D.Mag2();
+  double curvature = 2 * VectorUtil::Cross(pos2D, phiVec) / pos2D.Mag2();
   Vector2D phi0Vec = phiVec.flippedOver(pos2D);
 
   EXPECT_NEAR(expectedCurvature, curvature, 10e-7);

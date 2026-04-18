@@ -66,9 +66,9 @@ bool HitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 
   finitevar<named("delta_hit_distance")>() = longHitDistance - hitDistance;
 
-  finitevar<named("from_hit_forward")>() = hitPosGap.dot(fromLastHitMom);
-  finitevar<named("to_hit_forward")>() = hitPosGap.dot(toFirstHitMom);
-  finitevar<named("hit_forward")>() = hitPosGap.dot(VectorUtil::average(fromLastHitMom, toFirstHitMom));
+  finitevar<named("from_hit_forward")>() = hitPosGap.Dot(fromLastHitMom);
+  finitevar<named("to_hit_forward")>() = hitPosGap.Dot(toFirstHitMom);
+  finitevar<named("hit_forward")>() = hitPosGap.Dot(VectorUtil::average(fromLastHitMom, toFirstHitMom));
 
   const CDCRecoHit2D& axialHit = toFirstHit.isAxial() ? toFirstHit : fromLastHit;
   const CDCRecoHit2D& stereoHit = not toFirstHit.isAxial() ? toFirstHit : fromLastHit;
@@ -83,12 +83,12 @@ bool HitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   Vector2D relRefPos = wireLine.refPos2D() - axialHitPos;
   Vector2D movePerZ = wireLine.nominalMovePerZ();
 
-  double z = -relRefPos.cross(axialHitMom) / movePerZ.cross(axialHitMom);
+  double z = VectorUtil::Cross(-relRefPos, axialHitMom) / VectorUtil::Cross(movePerZ, axialHitMom);
   Vector2D stereoHitPos = stereoHit.getRecoPos2D() + movePerZ * z;
 
   finitevar<named("hit_reco_z")>() = z;
   finitevar<named("hit_z_bound_factor")>() = wireLine.outOfZBoundsFactor(z);
-  double arcLengthGap = (stereoHitPos - axialHitPos).dot(axialHitMom);
+  double arcLengthGap = (stereoHitPos - axialHitPos).Dot(axialHitMom);
   finitevar<named("hit_arclength_gap")>() = toFirstHit.isAxial() ? -arcLengthGap : arcLengthGap;
 
   // const Vector2D fromStretch = fromLastHitPos - fromFirstHitPos;

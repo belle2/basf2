@@ -320,7 +320,7 @@ namespace Belle2 {
       /// from the start point on
       bool isMovingOutward() const
       {
-        return getFlightDirection2DAtSupport().dot(getSupport()) > 0;
+        return getFlightDirection2DAtSupport().Dot(getSupport()) > 0;
       }
 
       /// Getter for the position at a given two dimensional arc length

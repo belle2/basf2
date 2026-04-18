@@ -128,7 +128,7 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
   Vector2D coordinateSystem = VectorUtil::unit(gradientAtPoint);
 
   // component of closest approach orthogonal to coordinateSystem
-  double closestOrthogonal = n12().cross(point) / gradientAtPoint.R();
+  double closestOrthogonal = VectorUtil::Cross(n12(), point) / gradientAtPoint.R();
 
   // component of closest approach parallel to coordinateSystem - two solutions expected
   double nOrthogonal = n12().unnormalizedOrthogonalComp(coordinateSystem);

@@ -64,9 +64,9 @@ bool HitGapTrackRelationVarSet::extract(const Relation<const CDCTrack>* ptrTrack
 
   finitevar<named("delta_hit_distance")>() = longHitDistance - hitDistance;
 
-  finitevar<named("from_hit_forward")>() = hitPosGap.xy().dot(fromLastHitMom);
-  finitevar<named("to_hit_forward")>() = hitPosGap.xy().dot(toFirstHitMom);
-  finitevar<named("hit_forward")>() = hitPosGap.xy().dot(VectorUtil::average(fromLastHitMom, toFirstHitMom));
+  finitevar<named("from_hit_forward")>() = hitPosGap.xy().Dot(fromLastHitMom);
+  finitevar<named("to_hit_forward")>() = hitPosGap.xy().Dot(toFirstHitMom);
+  finitevar<named("hit_forward")>() = hitPosGap.xy().Dot(VectorUtil::average(fromLastHitMom, toFirstHitMom));
 
   const Vector3D fromStretch = fromLastHitPos - fromFirstHitPos;
   const Vector3D toStretch = toLastHitPos - toFirstHitPos;

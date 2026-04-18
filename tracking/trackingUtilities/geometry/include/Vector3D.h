@@ -11,6 +11,7 @@
 #include <tracking/trackingUtilities/numerics/Quadratic.h>
 
 #include <framework/geometry/B2Vector3.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <framework/geometry/VectorUtil.h>
 #include <Math/Vector3D.h>
 
@@ -105,15 +106,10 @@ namespace Belle2 {
                                  (z() < rhs.z() or (z() == rhs.z() and (phi() < rhs.phi()))));
       }
 
-      /// Calculates the three dimensional dot product.
-      double dot(const Vector3D& rhs) const
-      {
-        return x() * rhs.x() + y() * rhs.y() + z() * rhs.z();
-      }
       /// Calculates the three dimensional dot product, ROOT::Math compatible
       double Dot(const Vector3D& rhs) const
       {
-        return dot(rhs);
+        return x() * rhs.x() + y() * rhs.y() + z() * rhs.z();
       }
 
       /// Calculates the two dimensional dot product in xy projection.
@@ -133,13 +129,13 @@ namespace Belle2 {
       /// Calculates the two dimensional cross product in xy projection.
       double crossXY(const Vector3D& rhs) const
       {
-        return xy().cross(rhs.xy());
+        return VectorUtil::Cross(xy(), rhs.xy());
       }
 
       /// Calculates the two dimensional cross product in xy projection.
       double crossXY(const Vector2D& rhs) const
       {
-        return xy().cross(rhs);
+        return VectorUtil::Cross(xy(), rhs);
       }
 
       /// Calculates the squared length of the vector
@@ -300,7 +296,7 @@ namespace Belle2 {
       /// Calculates the component parallel to the given vector
       double parallelComp(const Vector3D& relativTo) const
       {
-        return relativTo.dot(*this) / relativTo.R();
+        return relativTo.Dot(*this) / relativTo.R();
       }
 
       /// Same as parallelComp() but assumes the given vector to be of unit length.
@@ -308,7 +304,7 @@ namespace Belle2 {
        *  a costly computation of the vector R()*/
       double unnormalizedParallelComp(const Vector3D& relativTo) const
       {
-        return relativTo.dot(*this);
+        return relativTo.Dot(*this);
       }
 
       /// Same as orthogonalComp() but assumes the given vector to be of unit length

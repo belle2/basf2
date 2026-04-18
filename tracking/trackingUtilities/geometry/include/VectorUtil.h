@@ -102,6 +102,16 @@ namespace Belle2 {
                                   coordinateVec.y() * parallelCoor + coordinateVec.x() * orthoCoor);
     }
 
+    /// Returns a unit vector colaligned with this
+    template<class Vector>
+    inline Vector unit(const Vector& a)
+    {
+      if (isNull(a)) {
+        return Vector();
+      }
+      Vector tmp(a);
+      return tmp.Scale(1. / tmp.R());
+    }
 
   } // namespace VectorUtil
 

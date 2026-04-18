@@ -18,6 +18,7 @@
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
@@ -63,7 +64,7 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const double bZ)
   : m_localOrigin(pos2D)
   , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.R(), charge, bZ),
-                         mom2D.unit(),
+                         VectorUtil::unit(mom2D),
                          0.0)
   , m_flightTime(time)
 {
@@ -75,7 +76,7 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const double charge)
   : m_localOrigin(pos2D)
   , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.R(), charge, pos2D),
-                         mom2D.unit(),
+                         VectorUtil::unit(mom2D),
                          0.0)
   , m_flightTime(time)
 {
@@ -348,7 +349,7 @@ void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
 {
   m_localOrigin = pos2D;
   double curvature = CDCBFieldUtil::absMom2DToCurvature(mom2D.R(), charge, pos2D);
-  Vector2D phiVec = mom2D.unit();
+  Vector2D phiVec = VectorUtil::unit(mom2D);
   double impact = 0.0;
   m_localPerigeeCircle = UncertainPerigeeCircle(curvature, phiVec, impact);
 }

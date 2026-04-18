@@ -171,7 +171,7 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_intersections)
 {
 
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(Vector2D(1.0, 1.0), 1);
-  GeneralizedCircle line = GeneralizedCircle(sqrt(2.0), -Vector2D(1.0, 1.0).unit());
+  GeneralizedCircle line = GeneralizedCircle(sqrt(2.0), VectorUtil::unit(-Vector2D(1.0, 1.0)));
 
   std::pair<Vector2D, Vector2D> intersections = circle.intersections(line);
 

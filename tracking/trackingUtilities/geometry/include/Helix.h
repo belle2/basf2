@@ -284,7 +284,7 @@ namespace Belle2 {
       /// Getter for the unit three dimensional tangential vector at the perigee point of the helix.
       Vector3D tangential() const
       {
-        return Vector3D(phi0Vec(), tanLambda()).unit();
+        return VectorUtil::unit(Vector3D(phi0Vec(), tanLambda()));
       }
 
       /// Getter for the direction vector in the xy projection at the perigee of the helix.

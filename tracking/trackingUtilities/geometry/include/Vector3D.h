@@ -269,12 +269,6 @@ namespace Belle2 {
         return subtract(rhs);
       }
 
-      /// Returns a unit vector colaligned with this
-      Vector3D unit() const
-      {
-        return (x() == 0.0 and y() == 0.0 and z() == 0.0)  ? Vector3D(0.0, 0.0, 0.0) : divided(R());
-      }
-
       /// Normalizes the vector to unit length
       /** Normalizes the vector to unit length and returns the length the vector had before. \n
        *  The null vector is not transformed. */

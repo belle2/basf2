@@ -11,6 +11,7 @@
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -62,7 +63,7 @@ namespace Belle2 {
         const ParameterLine2D& line = facet->getStartToEndLine();
 
         const TrackingUtilities::Vector2D pos2D = facet->getMiddleRecoPos2D();
-        const TrackingUtilities::Vector2D phiVec = line.tangential().unit();
+        const TrackingUtilities::Vector2D phiVec = VectorUtil::unit(line.tangential());
 
         // Calculate the curvature and phi0 of the circle through the origin
         // that touches the position pos2D under the angle phiVec.

@@ -201,6 +201,11 @@ namespace Belle2 {
       {
         return subtract(rhs);
       }
+      /// Orthogonal vector to the counterclockwise direction
+      void Negate()
+      {
+        SetXY(-X(), -Y());
+      }
 
       /// Orthogonal vector to the counterclockwise direction
       Vector2D orthogonal() const
@@ -222,12 +227,6 @@ namespace Belle2 {
         double originalLength = R();
         if (originalLength != 0.0) divide(originalLength);
         return originalLength;
-      }
-
-      /// Returns a unit vector colaligned with this
-      Vector2D unit() const
-      {
-        return (x() == 0.0 and y() == 0.0) ? Vector2D(0.0, 0.0) : divided(R());
       }
 
       /// Same as reversed()

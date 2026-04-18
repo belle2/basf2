@@ -66,7 +66,7 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
                                  const double bZ)
   : m_localOrigin(pos3D)
   , m_localHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.xy().R(), charge, bZ),
-                 mom3D.xy().unit(),
+                 VectorUtil::unit(mom3D.xy()),
                  0.0,
                  mom3D.cotTheta(),
                  0.0)

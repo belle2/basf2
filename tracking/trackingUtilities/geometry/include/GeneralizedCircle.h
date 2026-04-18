@@ -357,7 +357,7 @@ namespace Belle2 {
        */
       Vector2D normal(const Vector2D& point) const
       {
-        return gradient(point).unit();
+        return VectorUtil::unit(gradient(point));
       }
 
       /**
@@ -501,7 +501,7 @@ namespace Belle2 {
       /// Gives the tangential vector at the closest approach to the origin / at the perigee
       Vector2D tangential() const
       {
-        return tangential(Vector2D(0.0, 0.0)).unit();
+        return VectorUtil::unit(tangential(Vector2D(0.0, 0.0)));
       }
 
       /// Gives to azimuth angle phi of the direction of flight at the perigee
@@ -591,7 +591,8 @@ namespace Belle2 {
       /// Gives the center of the circle. If it was a line both components will be infinity
       Vector2D center() const
       {
-        return n12().divided(-2 * n3());
+        Vector2D tmp = n12();
+        return tmp.Scale(-0.5 / n3());
       }
 
       /// Gives the perimeter of the circle.

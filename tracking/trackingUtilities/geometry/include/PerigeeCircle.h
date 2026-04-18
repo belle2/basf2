@@ -269,7 +269,7 @@ namespace Belle2 {
       /// Unit normal vector from the circle to the given point.
       Vector2D normal(const Vector2D& point) const
       {
-        return gradient(point).unit();
+        return VectorUtil::unit(gradient(point));
       }
 
       /// Tangential vector to the circle near the given position.
@@ -460,7 +460,7 @@ namespace Belle2 {
       void setPhi0(const Vector2D& phi0Vec)
       {
         m_phi0 = phi0Vec.phi();
-        m_phi0Vec = phi0Vec.unit();
+        m_phi0Vec = VectorUtil::unit(phi0Vec);
       }
 
       /// Sets the impact parameter of the circle.
@@ -474,7 +474,7 @@ namespace Belle2 {
       {
         m_impact = impact;
         m_phi0 = phi0Vec.phi();
-        m_phi0Vec = phi0Vec.unit();
+        m_phi0Vec = VectorUtil::unit(phi0Vec);
         m_curvature = curvature;
       }
 

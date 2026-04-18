@@ -125,7 +125,7 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
   // solved with a Lagrangian multiplicator for the constraint
 
   Vector2D gradientAtPoint = gradient(point);
-  Vector2D coordinateSystem = gradientAtPoint.unit();
+  Vector2D coordinateSystem = VectorUtil::unit(gradientAtPoint);
 
   // component of closest approach orthogonal to coordinateSystem
   double closestOrthogonal = n12().cross(point) / gradientAtPoint.R();
@@ -215,7 +215,7 @@ std::pair<Vector2D, Vector2D> GeneralizedCircle::atCylindricalR(const double cyl
   // search for x and y
 
   // solve the equation in a coordinate system parallel and orthogonal to the reduced circle center
-  const Vector2D nUnit = n12().unit();
+  const Vector2D nUnit = VectorUtil::unit(n12());
 
   // parallel component
   const double sameCylindricalRParallel = -(n0() + n3() * square(cylindricalR)) / n12().R();
@@ -356,7 +356,7 @@ Vector2D GeneralizedCircle::atArcLength(const double arcLength) const
 
   double atX = arcLength * sinc(chiHalf) * sin(chiHalf) + impact();
   double atY = -arcLength * sinc(chi);
-  return VectorUtil::compose(-n12().unit(), atX, atY);
+  return VectorUtil::compose(VectorUtil::unit(-n12()), atX, atY);
 }
 
 std::ostream& TrackingUtilities::operator<<(std::ostream& output, const GeneralizedCircle& circle)

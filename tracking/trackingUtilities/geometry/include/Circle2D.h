@@ -7,6 +7,7 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
@@ -155,7 +156,7 @@ namespace Belle2 {
       /// Gives the tangential vector at the closest approach to the origin / at the perigee
       Vector2D tangential() const
       {
-        return tangential(Vector2D(0.0, 0.0)).unit();
+        return VectorUtil::unit(tangential(Vector2D(0.0, 0.0)));
       }
 
       /// Gives to azimuth phi of the direction of flight at the perigee
@@ -168,13 +169,13 @@ namespace Belle2 {
       Vector2D gradient(const Vector2D& point) const
       {
         Vector2D connection = (point - center()) * orientation();
-        return connection.unit();
+        return VectorUtil::unit(connection);
       }
 
       /// Normal vector to the circle near the given position
       Vector2D normal(const Vector2D& point) const
       {
-        return gradient(point).unit();
+        return VectorUtil::unit(gradient(point));
       }
 
       /// Tangential vector to the circle near the given position

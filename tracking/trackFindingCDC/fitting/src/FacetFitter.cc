@@ -31,7 +31,7 @@ namespace {
   {
     /// Rotate in forward direction
     Vector2D coordinate(xyl(N - 1, 0) - xyl(0, 0), xyl(N - 1, 1) - xyl(0, 1));
-    return coordinate.unit();
+    return VectorUtil::unit(coordinate);
   }
 
   template<int N>
@@ -46,7 +46,7 @@ namespace {
 
     ParameterLine2D tangentLine = ParameterLine2D::touchingCircles(fromPos, fromL, toPos, toL);
     Vector2D coordinate = tangentLine.tangential();
-    return coordinate.unit();
+    return VectorUtil::unit(coordinate);
   }
 
   template<int N>

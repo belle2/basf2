@@ -114,7 +114,7 @@ namespace Belle2 {
        */
       operator Line2D()
       {
-        return Line2D(distanceToOrigin(), normal().unit());
+        return Line2D(distanceToOrigin(), VectorUtil::unit(normal()));
       } // not optimal yet. tangential.R() is getting calculated two times.
 
     public:
@@ -182,7 +182,7 @@ namespace Belle2 {
       /// Reverses the tangential vector inplace
       void reverse()
       {
-        m_tangential.Scale(-1.0);
+        m_tangential.Negate();
       }
 
       /// Makes a copy line which has the opposite tangential vector but same support point.

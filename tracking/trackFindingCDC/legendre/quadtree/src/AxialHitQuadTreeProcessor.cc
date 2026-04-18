@@ -201,7 +201,7 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
 
   const double& l = wireHit->getRefDriftLength();
   const Vector2D& pos2D = wireHit->getRefPos2D() - m_localOrigin;
-  double r2 = pos2D.normSquared() - l * l;
+  double r2 = pos2D.Mag2() - l * l;
 
   using Quadlet = std::array<std::array<float, 2>, 2>;
   Quadlet distRight{};
@@ -282,7 +282,7 @@ bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* 
 {
   const double& l = wireHit->getRefDriftLength();
   const Vector2D& pos2D = wireHit->getRefPos2D() - m_localOrigin;
-  double r2 = pos2D.normSquared() - l * l;
+  double r2 = pos2D.Mag2() - l * l;
 
   // get left and right borders of the node
   long thetaMin = node->getXMin();
@@ -327,7 +327,7 @@ void AxialHitQuadTreeProcessor::drawHits(std::vector<const CDCWireHit*> hits, un
     const Vector2D& pos2D = wireHit->getRefPos2D() - m_localOrigin;
     double x = pos2D.x();
     double y = pos2D.y();
-    double r2 = pos2D.normSquared() - l * l;
+    double r2 = pos2D.Mag2() - l * l;
 
     TF1* concaveHitLegendre = new TF1("concaveHitLegendre", "2*([0]/[3])*cos(x) + 2*([1]/[3])*sin(x) + 2*([2]/[3])", -M_PI, M_PI);
     TF1* convexHitLegendre = new TF1("convexHitLegendre", "2*([0]/[3])*cos(x) + 2*([1]/[3])*sin(x) - 2*([2]/[3])", -M_PI, M_PI);

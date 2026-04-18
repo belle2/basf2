@@ -189,17 +189,17 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& j
   double delta = deltaVec.R();
   double deltaParallel = phi0Vec().dot(deltaVec);
   // double deltaOrthogonal = phi0Vec().cross(deltaVec);
-  // double zeta = deltaVec.normSquared();
+  // double zeta = deltaVec.Mag2();
 
   Vector2D UVec = gradient(by);
   double U = UVec.R();
-  double USquared = UVec.normSquared();
+  double USquared = UVec.Mag2();
   double UOrthogonal = phi0Vec().cross(UVec);
   // double UParallel = phi0Vec().dot(UVec);
 
   // Vector2D CB = gradient(by).orthogonal();
   // double U = sqrt(1 + curvature() * A);
-  // double xi = 1.0 / CB.normSquared();
+  // double xi = 1.0 / CB.Mag2();
   // double nu = 1 - curvature() * deltaOrthogonal;
   // double mu = 1.0 / (U * (U + 1)) + curvature() * lambda;
   // double mu = 1.0 / U / 2.0;
@@ -324,7 +324,7 @@ double PerigeeCircle::fastDistance(const Vector2D& point) const
 {
   Vector2D delta = point - perigee();
   double deltaOrthogonal = phi0Vec().cross(delta);
-  return -deltaOrthogonal + curvature() * delta.normSquared() / 2;
+  return -deltaOrthogonal + curvature() * delta.Mag2() / 2;
 }
 
 void PerigeeCircle::setCenterAndRadius(const Vector2D& center,
@@ -340,7 +340,7 @@ void PerigeeCircle::setCenterAndRadius(const Vector2D& center,
 
 void PerigeeCircle::setN(double n0, const Vector2D& n12, double n3)
 {
-  double normalization = sqrt(n12.normSquared() - 4 * n0 * n3);
+  double normalization = sqrt(n12.Mag2() - 4 * n0 * n3);
   m_curvature = 2 * n3 / normalization;
   m_phi0Vec = n12.orthogonal();
   m_phi0Vec.normalize();

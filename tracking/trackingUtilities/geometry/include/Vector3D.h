@@ -143,14 +143,9 @@ namespace Belle2 {
       }
 
       /// Calculates the squared length of the vector
-      double normSquared() const
-      {
-        return x() * x() + y() * y() + z() * z();
-      }
-      /// Alias for normSquared
       double Mag2() const
       {
-        return normSquared();
+        return x() * x() + y() * y() + z() * z();
       }
 
       /// Calculates the length of the vector

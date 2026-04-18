@@ -222,7 +222,7 @@ namespace Belle2 {
       /// Calculates the squared normalization. Helper for normalize.
       double normalizationSquared() const
       {
-        return n12().normSquared();
+        return n12().Mag2();
       }
 
       /// Calculates the normalization. Helper for normalize.

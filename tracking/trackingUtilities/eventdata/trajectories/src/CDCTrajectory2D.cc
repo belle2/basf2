@@ -121,7 +121,7 @@ std::array<double, 2> CDCTrajectory2D::reconstructBothZ(const WireLine& wireLine
 
   double c = localCircle.fastDistance(localPos2D) - fastDistance;
   double b = localCircle.gradient(localPos2D).dot(movePerZ);
-  double a = localCircle.n3() * movePerZ.normSquared();
+  double a = localCircle.n3() * movePerZ.Mag2();
 
   const std::pair<double, double> solutionsDeltaZ = solveQuadraticABC(a, b, c);
 

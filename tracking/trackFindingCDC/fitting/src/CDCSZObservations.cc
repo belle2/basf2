@@ -103,7 +103,7 @@ Vector2D CDCSZObservations::getCentralPoint() const
     // For even number of observations use the middle one with the bigger distance from IP
     Vector2D center1(getS(i), getZ(i));
     Vector2D center2(getS(i - 1), getZ(i - 1));
-    return center1.normSquared() > center2.normSquared() ? center1 : center2;
+    return center1.Mag2() > center2.Mag2() ? center1 : center2;
   } else {
     Vector2D center1(getS(i), getZ(i));
     return center1;

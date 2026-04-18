@@ -241,7 +241,7 @@ namespace Belle2 {
       /// Gives the position at the closest approach on the line to point
       Vector2D closest(const Vector2D& point) const
       {
-        double norm_squared = tangential().normSquared();
+        double norm_squared = tangential().Mag2();
         return VectorUtil::compose(tangential(),
                                    tangential().dot(point) / norm_squared,
                                    tangential().cross(support()) / norm_squared);
@@ -250,20 +250,20 @@ namespace Belle2 {
       /// Gives the line parameter at the closest approach to point
       double closestAt(const Vector2D& point) const
       {
-        return (tangential().dot(point) - tangential().dot(support())) / tangential().normSquared();
+        return (tangential().dot(point) - tangential().dot(support())) / tangential().Mag2();
       }
 
       /// Gives the position of closest approach to the origin
       Vector2D closestToOrigin() const
       {
         return tangential().orthogonal() *=
-                 (tangential().cross(support()) / tangential().normSquared());
+                 (tangential().cross(support()) / tangential().Mag2());
       }
 
       /// Gives the line parameter at the closest approach to the origin
       double closestToOriginAt() const
       {
-        return -tangential().dot(support()) / tangential().normSquared();
+        return -tangential().dot(support()) / tangential().Mag2();
       }
 
       /// Denotes the length on the line between the two points
@@ -292,7 +292,7 @@ namespace Belle2 {
       */
       std::pair<double, double> intersectionsAt(const GeneralizedCircle& genCircle) const
       {
-        double a = genCircle.n3() * tangential().normSquared();
+        double a = genCircle.n3() * tangential().Mag2();
         double b = tangential().dot(genCircle.gradient(support()));
         double c = genCircle.fastDistance(support());
 

@@ -60,7 +60,7 @@ GeneralizedCircle::GeneralizedCircle(const Line2D& n012)
 GeneralizedCircle::GeneralizedCircle(const Circle2D& circle)
   : m_n3(1.0 / 2.0 / circle.radius())
   , m_n12(-circle.center().x() * (m_n3 * 2.0), -circle.center().y() * (m_n3 * 2.0))
-  , m_n0((circle.center().normSquared() - circle.radiusSquared()) * m_n3)
+  , m_n0((circle.center().Mag2() - circle.radiusSquared()) * m_n3)
 {
 }
 
@@ -96,7 +96,7 @@ void GeneralizedCircle::setCenterAndRadius(const Vector2D& center,
                                            const ERotation orientation)
 {
   double curvature = static_cast<double>(orientation) / fabs(absRadius);
-  setN0((center.normSquared() - absRadius * absRadius) * curvature / 2.0);
+  setN0((center.Mag2() - absRadius * absRadius) * curvature / 2.0);
   setN1(-center.x() * curvature);
   setN2(-center.y() * curvature);
   setN3(curvature / 2.0);

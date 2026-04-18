@@ -83,8 +83,8 @@ namespace Belle2 {
        */
       bool operator<(const Vector2D& rhs) const
       {
-        return normSquared() < rhs.normSquared() or
-               (normSquared() == rhs.normSquared() and (phi() < rhs.phi()));
+        return Mag2() < rhs.Mag2() or
+               (Mag2() == rhs.Mag2() and (phi() < rhs.phi()));
       }
 
       /// Calculates the two dimensional dot product.
@@ -105,14 +105,9 @@ namespace Belle2 {
       }
 
       /// Calculates \f$ x^2 + y^2 \f$ .
-      double normSquared() const
-      {
-        return x() * x() + y() * y();
-      }
-      /// Alias for normSquared
       double Mag2() const
       {
-        return normSquared();
+        return x() * x() + y() * y();
       }
 
       /// Calculates the length of the vector.
@@ -295,7 +290,7 @@ namespace Belle2 {
       /// Calculates the part of this vector that is parallel to the given vector
       Vector2D orthogonalVector(const Vector2D& relativTo) const
       {
-        return relativTo.scaled(relativTo.cross(*this) / relativTo.normSquared()).orthogonal();
+        return relativTo.scaled(relativTo.cross(*this) / relativTo.Mag2()).orthogonal();
       }
 
       /// Same as orthogonalComp() but assumes the given vector to be of unit length

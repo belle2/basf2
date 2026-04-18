@@ -66,7 +66,7 @@ namespace Belle2 {
 
         // Calculate the curvature and phi0 of the circle through the origin
         // that touches the position pos2D under the angle phiVec.
-        double curvature = 2 * pos2D.cross(phiVec) / pos2D.normSquared();
+        double curvature = 2 * pos2D.cross(phiVec) / pos2D.Mag2();
         Vector2D phi0Vec = phiVec.flippedOver(pos2D);
 
         bool in = isPhi0CurvPointIn(phi0Vec, curvature, phi0CurvBox);

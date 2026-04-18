@@ -70,8 +70,9 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_conformalTranform)
   EXPECT_NEAR(0.0, circle.distance(secondPos), 10e-7);
 
   circle.conformalTransform();
-  firstPos.conformalTransform();
-  secondPos.conformalTransform();
+  const auto conformalTransform = [](Vector2D & a) { return a.Scale(1. / a.Mag2()); };
+  conformalTransform(firstPos);
+  conformalTransform(secondPos);
 
   EXPECT_NEAR(0.0, circle.curvature(), 10e-7);
   EXPECT_NEAR(M_PI / 2.0, circle.tangentialPhi(), 10e-7);

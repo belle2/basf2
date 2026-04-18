@@ -130,16 +130,17 @@ namespace Belle2 {
       }
 
       /// Scales the vector in place by the given factor
-      Vector2D& scale(const double factor)
+      Vector2D& Scale(const double factor)
       {
         m_x *= factor;
         m_y *= factor;
         return *this;
       }
-      /// Same as scale()
+
+      /// Same as Scale()
       Vector2D& operator*=(const double factor)
       {
-        return scale(factor);
+        return Scale(factor);
       }
 
       /// Returns a scaled copy of the vector
@@ -228,38 +229,16 @@ namespace Belle2 {
         return originalLength;
       }
 
-      /// Normalizes the vector to the given length
-      /** Normalizes the vector to the given length and returns the length the vector had before. \n
-       *  The null vector is not transformed. */
-      double normalizeTo(const double toLength)
-      {
-        double originalLength = R();
-        if (originalLength != 0.0) scale(toLength / originalLength);
-        return originalLength;
-      }
-
       /// Returns a unit vector colaligned with this
       Vector2D unit() const
       {
         return (x() == 0.0 and y() == 0.0) ? Vector2D(0.0, 0.0) : divided(R());
       }
 
-      /// Reverses the direction of the vector in place
-      Vector2D& reverse()
-      {
-        scale(-1.0);
-        return *this;
-      }
-
-      /// Returns a vector pointing in the opposite direction
-      Vector2D reversed() const
-      {
-        return scaled(-1.0);
-      }
       /// Same as reversed()
       Vector2D operator-() const
       {
-        return reversed();
+        return scaled(-1.0);
       }
 
       /// Reflects this vector over line designated by the given vector.
@@ -446,12 +425,6 @@ namespace Belle2 {
       void swapCoordinates()
       {
         std::swap(m_x, m_y);
-      }
-
-      /// Set the cylindrical radius while keeping the azimuth angle phi the same
-      void setCylindricalR(const double cylindricalR)
-      {
-        scale(cylindricalR / R());
       }
 
       /// Gives the azimuth angle being the angle to the x axes ( range -M_PI to M_PI )

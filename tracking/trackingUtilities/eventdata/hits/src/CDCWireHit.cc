@@ -174,7 +174,9 @@ Vector2D CDCWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
   Vector2D disp2D = recoPos2D - wirePos2D;
 
   // Fix the displacement to lie on the drift circle.
-  disp2D.normalizeTo(driftLength);
+  if (disp2D.R() != 0.0) {
+    disp2D.Scale(driftLength / disp2D.R());
+  }
   return wirePos2D + disp2D;
 }
 

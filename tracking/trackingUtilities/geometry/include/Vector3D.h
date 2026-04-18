@@ -169,17 +169,17 @@ namespace Belle2 {
       }
 
       /// Scales the vector in place by the given factor
-      Vector3D& scale(const double factor)
+      Vector3D& Scale(const double factor)
       {
-        m_xy.scale(factor);
+        m_xy.Scale(factor);
         m_z *= factor;
         return *this;
       }
 
-      /// Same as scale()
+      /// Same as Scale()
       Vector3D& operator*=(const double factor)
       {
-        return scale(factor);
+        return Scale(factor);
       }
 
       /// Returns a scaled copy of the vector
@@ -290,33 +290,10 @@ namespace Belle2 {
         return result;
       }
 
-      /// Normalizes the vector to the given length
-      /** Normalizes the vector to the given length and returns the length the vector had before. \n
-       *  The null vector is not transformed. */
-      double normalizeTo(const double toLength)
-      {
-        double result = R();
-        if (result != 0.0) scale(toLength / result);
-        return result;
-      }
-
-      /// Reverses the direction of the vector in place
-      Vector3D& reverse()
-      {
-        scale(-1.0);
-        return *this;
-      }
-
-      /// Returns a vector pointing in the opposite direction
-      Vector3D reversed() const
-      {
-        return scaled(-1.0);
-      }
-
       /// Same as reversed()
       Vector3D operator-() const
       {
-        return reversed();
+        return scaled(-1.0);
       }
 
       /// Returns a new vector as sum of this and rhs
@@ -343,22 +320,6 @@ namespace Belle2 {
       double unnormalizedParallelComp(const Vector3D& relativTo) const
       {
         return relativTo.dot(*this);
-      }
-
-      /// Calculates the component orthogonal to the given vector
-      /** The orthogonal component is the rest of the vector not parallel to \n
-       *  relative to. Since the three dimensional space does not have a unique \n
-       *  orientation given by the vector relative to, the sign of the orthogonal \n
-       *  component is meaningless and is always set to positive */
-      double orthogonalComp(const Vector3D& relativTo) const
-      {
-        return relativTo.cross(*this).R() / relativTo.R();
-      }
-
-      /// Calculates the part of this vector that is orthogonal to the given vector
-      Vector3D orthogonalVector(const Vector3D& relativTo) const
-      {
-        return *this - Belle2::VectorUtil::parallelVector(*this, relativTo);
       }
 
       /// Same as orthogonalComp() but assumes the given vector to be of unit length

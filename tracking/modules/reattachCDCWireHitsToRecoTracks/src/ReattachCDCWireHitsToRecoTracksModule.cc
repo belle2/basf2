@@ -256,7 +256,9 @@ ReattachCDCWireHitsToRecoTracksModule::ReconstructionResults ReattachCDCWireHits
       const Vector2D& recoPosOnTrajectory(trajectory2D.getClosest(wirePos2DAtZ));
       const double driftLength(wireHit.getRefDriftLength());
       Vector2D disp2D(recoPosOnTrajectory - wirePos2DAtZ);
-      disp2D.normalizeTo(driftLength);
+      if (disp2D.R() != 0.0) {
+        disp2D.Scale(driftLength / disp2D.R());
+      }
       recoPos2D = wirePos2DAtZ + disp2D;
     }
 

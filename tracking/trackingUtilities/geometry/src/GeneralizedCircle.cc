@@ -161,14 +161,14 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
 Vector2D GeneralizedCircle::perigee() const
 {
   Vector2D result(n12());
-  result.setCylindricalR(-impact());
+  result.Scale(-impact() / result.R());
   return result;
 }
 
 Vector2D GeneralizedCircle::apogee() const
 {
   Vector2D result(n12());
-  result.setCylindricalR(-impact() - 2 * radius());
+  result.Scale((-impact() - 2 * radius()) / result.R());
   return result;
 }
 

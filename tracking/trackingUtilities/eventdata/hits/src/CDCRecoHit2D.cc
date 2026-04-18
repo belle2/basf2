@@ -121,7 +121,9 @@ void CDCRecoHit2D::setRefDriftLength(double driftLength, bool snapRecoPos)
 
 void CDCRecoHit2D::snapToDriftCircle(bool switchSide)
 {
-  m_recoDisp2D.normalizeTo(getRLWireHit().getRefDriftLength());
+  if (m_recoDisp2D.R() != 0.0) {
+    m_recoDisp2D.Scale(getRLWireHit().getRefDriftLength() / m_recoDisp2D.R());
+  }
   if (switchSide) {
     m_recoDisp2D = -m_recoDisp2D;
   }

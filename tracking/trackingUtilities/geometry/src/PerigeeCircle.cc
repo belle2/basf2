@@ -123,7 +123,7 @@ void PerigeeCircle::reverse()
 {
   m_curvature = -m_curvature;
   m_phi0 = AngleUtil::reversed(m_phi0);
-  m_phi0Vec.reverse();
+  m_phi0Vec.Scale(-1.0);
   m_impact = -m_impact;
 }
 

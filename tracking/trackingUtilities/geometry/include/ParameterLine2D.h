@@ -182,7 +182,7 @@ namespace Belle2 {
       /// Reverses the tangential vector inplace
       void reverse()
       {
-        m_tangential.reverse();
+        m_tangential.Scale(-1.0);
       }
 
       /// Makes a copy line which has the opposite tangential vector but same support point.

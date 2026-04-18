@@ -179,7 +179,9 @@ void CDCRecoHit3D::snapToDriftCircle(bool switchSide)
   Vector2D wirePos = wire.getWirePos2DAtZ(recoPosZ);
   Vector2D disp2D = getRecoPos3D().xy() - wirePos;
 
-  disp2D.normalizeTo(fabs(getSignedRecoDriftLength()));
+  if (disp2D.R() != 0.0) {
+    disp2D.Scale(std::fabs(getSignedRecoDriftLength()) / disp2D.R());
+  }
   if (switchSide) {
     disp2D = -disp2D;
   }

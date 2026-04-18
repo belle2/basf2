@@ -134,7 +134,9 @@ namespace Belle2 {
       Vector2D closest(const Vector2D& point) const
       {
         Vector2D connection = point - center();
-        connection.normalizeTo(absRadius());
+        if (connection.R() != 0.0) {
+          connection.Scale(absRadius() / connection.R());
+        }
         connection += center();
         return connection;
       }
@@ -143,7 +145,9 @@ namespace Belle2 {
       Vector2D perigee() const
       {
         Vector2D connection = center();
-        connection.normalizeTo(-absRadius());
+        if (connection.R() != 0.0) {
+          connection.Scale(-absRadius() / connection.R());
+        }
         connection += center();
         return connection;
       }

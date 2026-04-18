@@ -9,6 +9,7 @@
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/GeneralizedCircle.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <gtest/gtest.h>
 
@@ -88,7 +89,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_isCircle)
 TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_orientation)
 {
   double curvature = 1;
-  Vector2D phi0 = Vector2D::Phi(1);
+  Vector2D phi0 = VectorUtil::Phi(1);
   double impact = 1;
 
   PerigeeCircle circle(curvature, phi0, impact);

@@ -113,6 +113,12 @@ namespace Belle2 {
       return tmp.Scale(1. / tmp.R());
     }
 
+    /// Constructs a unit vector with azimuth angle equal to phi
+    inline ROOT::Math::XYVector Phi(const double phi)
+    {
+      return std::isnan(phi) ? ROOT::Math::XYVector(0.0, 0.0) : ROOT::Math::XYVector(std::cos(phi), std::sin(phi));
+    }
+
   } // namespace VectorUtil
 
 } // namespace Belle2

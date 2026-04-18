@@ -11,7 +11,6 @@
 
 #include <tracking/trackingUtilities/geometry/Circle2D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
-#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
@@ -51,7 +50,7 @@ PerigeeCircle::PerigeeCircle(double curvature, const Vector2D& phi0Vec, double i
 PerigeeCircle::PerigeeCircle(double curvature, double phi0, double impact)
   : m_curvature(curvature)
   , m_phi0(phi0)
-  , m_phi0Vec(Vector2D::Phi(phi0))
+  , m_phi0Vec(VectorUtil::Phi(phi0))
   , m_impact(impact)
 {
 }
@@ -173,7 +172,7 @@ void PerigeeCircle::passiveMoveBy(const Vector2D& by)
   m_impact = distance(by);
   m_phi0 = m_phi0 + curvature() * arcLength;
   AngleUtil::normalise(m_phi0);
-  m_phi0Vec = Vector2D::Phi(m_phi0);
+  m_phi0Vec = VectorUtil::Phi(m_phi0);
 }
 
 PerigeeJacobian PerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const

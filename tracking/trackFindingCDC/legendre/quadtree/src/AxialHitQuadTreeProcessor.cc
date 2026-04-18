@@ -8,6 +8,7 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <array>
 #include <vector>
@@ -90,7 +91,7 @@ const LookupTable<Vector2D>& AxialHitQuadTreeProcessor::getCosSinLookupTable()
 {
   static const int maxLevel = PrecisionUtil::getLookupGridLevel();
   static const int nBins = std::pow(2, maxLevel);
-  static LookupTable<Vector2D> trigonometricLookUpTable(&Vector2D::Phi, nBins, -M_PI, M_PI);
+  static LookupTable<Vector2D> trigonometricLookUpTable(&VectorUtil::Phi, nBins, -M_PI, M_PI);
   return trigonometricLookUpTable;
 }
 

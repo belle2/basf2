@@ -10,6 +10,7 @@
 
 #include <mdst/dataobjects/ECLCluster.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
@@ -62,7 +63,7 @@ void AxialStraightTrackCreator::apply(const std::vector<const ECLCluster*>& eclC
     if (!cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
     if (cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) < m_param_minEnergy) continue;
     float phi = cluster->getPhi();
-    UncertainPerigeeCircle circle(0, Vector2D::Phi(phi), 0); //no covariance matrix (yet?)
+    UncertainPerigeeCircle circle(0, VectorUtil::Phi(phi), 0); //no covariance matrix (yet?)
     CDCTrajectory2D guidingTrajectory2D(circle);
     CDCTrack track;
     guidingTrajectory2D.setLocalOrigin(Vector2D(0, 0));

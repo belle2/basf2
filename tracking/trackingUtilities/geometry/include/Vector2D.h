@@ -62,12 +62,6 @@ namespace Belle2 {
       /// Casting the back to ROOT::Math::XYVector seamlessly
       operator const ROOT::Math::XYVector() const;
 
-      /// Constructs a unit vector with azimuth angle equal to phi
-      static Vector2D Phi(const double phi)
-      {
-        return std::isnan(phi) ? Vector2D(0.0, 0.0) : Vector2D(cos(phi), sin(phi));
-      }
-
       /// Equality comparison with both coordinates
       bool operator==(const Vector2D& rhs) const
       {

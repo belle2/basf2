@@ -453,7 +453,7 @@ namespace Belle2 {
       void setPhi0(double phi0)
       {
         m_phi0 = phi0;
-        m_phi0Vec = Vector2D::Phi(phi0);
+        m_phi0Vec = VectorUtil::Phi(phi0);
       }
 
       /// Sets the unit direction of flight at the perigee
@@ -483,7 +483,7 @@ namespace Belle2 {
       {
         m_impact = impact;
         m_phi0 = phi0;
-        m_phi0Vec = Vector2D::Phi(phi0);
+        m_phi0Vec = VectorUtil::Phi(phi0);
         m_curvature = curvature;
       }
 

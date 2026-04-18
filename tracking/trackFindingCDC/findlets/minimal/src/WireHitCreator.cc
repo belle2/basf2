@@ -8,6 +8,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
@@ -197,8 +198,8 @@ void WireHitCreator::initialize()
   }
 
   if (std::isfinite(std::get<0>(m_param_useDegreeSector))) {
-    m_useSector[0] = Vector2D::Phi(std::get<0>(m_param_useDegreeSector) * Unit::deg);
-    m_useSector[1] = Vector2D::Phi(std::get<1>(m_param_useDegreeSector) * Unit::deg);
+    m_useSector[0] = VectorUtil::Phi(std::get<0>(m_param_useDegreeSector) * Unit::deg);
+    m_useSector[1] = VectorUtil::Phi(std::get<1>(m_param_useDegreeSector) * Unit::deg);
   }
 
   Super::initialize();

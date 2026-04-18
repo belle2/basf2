@@ -103,7 +103,7 @@ OffOriginExtension::getHitsWRTtoRefPos(const Vector2D& refPos, float curv, float
 
   using YSpan = AxialHitQuadTreeProcessor::YSpan;
   YSpan curvSpan{curv - curvPrecision, curv + curvPrecision};
-  LookupTable<Vector2D> thetaSpan(&Vector2D::Phi, 1, theta - thetaPrecision, theta + thetaPrecision);
+  LookupTable<Vector2D> thetaSpan(&VectorUtil::Phi, 1, theta - thetaPrecision, theta + thetaPrecision);
 
   AxialHitQuadTreeProcessor qtProcessor(refPos, curvSpan, &thetaSpan);
   qtProcessor.seed(m_allAxialWireHits);

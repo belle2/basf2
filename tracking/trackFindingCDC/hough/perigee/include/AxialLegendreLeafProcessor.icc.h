@@ -19,6 +19,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>
 
@@ -140,7 +141,7 @@ namespace Belle2 {
 
       DiscreteCurv::Array curvBounds{{curv - curvPrecision, curv + curvPrecision}};
       ContinuousImpact::Array impactBounds{{ -impactPrecision, impactPrecision}};
-      DiscretePhi0::Array phi0Bounds{{TrackingUtilities::Vector2D::Phi(phi0 - phi0Precision), TrackingUtilities::Vector2D::Phi(phi0 + phi0Precision)}};
+      DiscretePhi0::Array phi0Bounds{{VectorUtil::Phi(phi0 - phi0Precision), VectorUtil::Phi(phi0 + phi0Precision)}};
       RoadHoughBox precisionPhi0CurvBox(DiscretePhi0::getRange(phi0Bounds),
                                         ContinuousImpact::getRange(impactBounds),
                                         DiscreteCurv::getRange(curvBounds));

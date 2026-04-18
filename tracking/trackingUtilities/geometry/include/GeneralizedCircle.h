@@ -164,7 +164,7 @@ namespace Belle2 {
       void
       setPerigeeParameters(const double curvature, const double tangentialPhi, const double impact)
       {
-        setPerigeeParameters(curvature, Vector2D::Phi(tangentialPhi), impact);
+        setPerigeeParameters(curvature, VectorUtil::Phi(tangentialPhi), impact);
       }
 
       /**

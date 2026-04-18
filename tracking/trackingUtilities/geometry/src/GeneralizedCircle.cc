@@ -251,7 +251,7 @@ double GeneralizedCircle::arcLengthBetween(const Vector2D& from, const Vector2D&
 
   Vector2D closestAtFrom = closest(from);
   Vector2D closestAtTo = closest(to);
-  double directDistance = closestAtFrom.distance(closestAtTo);
+  double directDistance = VectorUtil::Distance(closestAtFrom, closestAtTo);
 
   return static_cast<double>(lengthSign) * arcLengthFactor(directDistance) * directDistance;
 }
@@ -268,7 +268,7 @@ double GeneralizedCircle::arcLengthTo(const Vector2D& to) const
 
   const Vector2D& closestAtFrom = from;
   Vector2D closestAtTo = closest(to);
-  double directDistance = closestAtFrom.distance(closestAtTo);
+  double directDistance = VectorUtil::Distance(closestAtFrom, closestAtTo);
 
   return static_cast<double>(lengthSign) * arcLengthFactor(directDistance) * directDistance;
 }

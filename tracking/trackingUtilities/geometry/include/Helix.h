@@ -13,6 +13,7 @@
 #include <tracking/trackingUtilities/geometry/HelixParameters.h>
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <iosfwd>
 #include <cmath>
@@ -127,7 +128,7 @@ namespace Belle2 {
       /// Calculates the distance of the point to the point of closest approach on the helix.
       double distance(const Vector3D& point) const
       {
-        return point.distance(closest(point));
+        return VectorUtil::Distance(point, closest(point));
       }
 
       /// Calculates the distance of the line parallel to the z axes through the given point

@@ -98,7 +98,7 @@ namespace Belle2 {
       /// Calculates the signed distance of the point to the circle line.
       double distance(const Vector2D& point) const
       {
-        return copysign(center().distance(point), radius()) - radius();
+        return copysign(VectorUtil::Distance(center(), point), radius()) - radius();
       }
 
       /// Returns the signed distance to the origin
@@ -110,7 +110,7 @@ namespace Belle2 {
       /// Returns the euclidean distance of the point to the circle line
       double absDistance(const Vector2D& point) const
       {
-        return fabs(center().distance(point) - absRadius());
+        return fabs(VectorUtil::Distance(center(), point) - absRadius());
       }
 
       /// Return if the point given is right or left of the line

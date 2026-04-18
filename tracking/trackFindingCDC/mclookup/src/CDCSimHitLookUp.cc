@@ -141,7 +141,7 @@ MayBePtr<const CDCSimHit> CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimH
       Vector3D primaryHitPos(primarySimHit->getPosTrack());
       Vector3D otherPrimaryHitPos(otherPrimarySimHit->getPosTrack());
       Vector3D secondaryHitPos(simHit.getPosTrack());
-      return primaryHitPos.distance(secondaryHitPos) < otherPrimaryHitPos.distance(secondaryHitPos);
+      return VectorUtil::Distance(primaryHitPos, secondaryHitPos) < VectorUtil::Distance(otherPrimaryHitPos, secondaryHitPos);
     };
 
     auto itClosestPrimarySimHit = std::min_element(primarySimHitsOnSameOrNeighborWire.begin(),

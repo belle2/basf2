@@ -14,6 +14,7 @@
 #include <tracking/trackingUtilities/geometry/SZParameters.h>
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <boost/math/tools/minima.hpp>
 
@@ -62,7 +63,7 @@ double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) cons
 
   auto distance3D = [this, &point](const double & s) -> double {
     Vector3D pos = atArcLength2D(s);
-    return pos.distance(point);
+    return VectorUtil::Distance(pos, point);
   };
 
   double searchWidth = std::fmin(perimeterXY(), 2 * deltaZ / tanLambda());

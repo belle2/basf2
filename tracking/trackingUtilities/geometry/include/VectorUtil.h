@@ -125,6 +125,19 @@ namespace Belle2 {
       return lhs.X() * rhs.Y() - lhs.Y() * rhs.X();
     }
 
+    /// Calculates the distance of this point to the rhs
+    inline double Distance(const ROOT::Math::XYVector& from, const ROOT::Math::XYVector& to = ROOT::Math::XYVector(0.0, 0.0))
+    {
+      return (from - to).R();
+    }
+
+    /// Calculates the distance of this point to the rhs
+    inline double Distance(const ROOT::Math::XYZVector& from, const ROOT::Math::XYZVector& to = ROOT::Math::XYZVector(0.0, 0.0, 0.0))
+    {
+      return (from - to).R();
+    }
+
+
   } // namespace VectorUtil
 
 } // namespace Belle2

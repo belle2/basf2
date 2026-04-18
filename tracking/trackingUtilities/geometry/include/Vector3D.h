@@ -150,15 +150,6 @@ namespace Belle2 {
         return hypot3(x(), y(), z());
       }
 
-      /// Calculates the distance of this point to the rhs
-      double distance(const Vector3D& rhs = Vector3D(0.0, 0.0, 0.0)) const
-      {
-        double deltaX = x() - rhs.x();
-        double deltaY = y() - rhs.y();
-        double deltaZ = z() - rhs.z();
-        return hypot3(deltaX, deltaY, deltaZ);
-      }
-
       /// Scales the vector in place by the given factor
       Vector3D& Scale(const double factor)
       {

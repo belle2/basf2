@@ -106,14 +106,6 @@ namespace Belle2 {
         return hypot2(x(), y());
       }
 
-      /// Calculates the distance of this point to the rhs
-      double distance(const Vector2D& rhs = Vector2D(0.0, 0.0)) const
-      {
-        double deltaX = x() - rhs.x();
-        double deltaY = y() - rhs.y();
-        return hypot2(deltaX, deltaY);
-      }
-
       /// Scales the vector in place by the given factor
       Vector2D& Scale(const double factor)
       {

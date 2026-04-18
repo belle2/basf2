@@ -231,7 +231,7 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& j
 double PerigeeCircle::arcLengthTo(const Vector2D& point) const
 {
   Vector2D closestToPoint = closest(point);
-  double secantLength = perigee().distance(closestToPoint);
+  double secantLength = VectorUtil::Distance(perigee(), closestToPoint);
   double deltaParallel = phi0Vec().Dot(point);
   return copysign(arcLengthAtSecantLength(secantLength), deltaParallel);
 }
@@ -244,7 +244,7 @@ double PerigeeCircle::arcLengthBetween(const Vector2D& from, const Vector2D& to)
   if (lengthSign == EForwardBackward::c_Unknown) lengthSign = EForwardBackward::c_Forward;
   Vector2D closestAtFrom = closest(from);
   Vector2D closestAtTo = closest(to);
-  double secantLength = closestAtFrom.distance(closestAtTo);
+  double secantLength = VectorUtil::Distance(closestAtFrom, closestAtTo);
   return static_cast<double>(lengthSign) * arcLengthAtSecantLength(secantLength);
 }
 

@@ -149,7 +149,7 @@ namespace {
     LineCovariance lineCovariance = LineUtil::covarianceFromFullPrecision(linePrecision);
 
     Vector2D tangential(phiVec(0), phiVec(1));
-    Vector2D n12 = tangential.orthogonal(ERotation::c_Clockwise);
+    Vector2D n12 = VectorUtil::Orthogonal(tangential, ERotation::c_Clockwise);
     double n0 = averages(2) - averages(0) * n12.x() - averages(1) * n12.y();
     Vector2D support = -n12 * n0;
 

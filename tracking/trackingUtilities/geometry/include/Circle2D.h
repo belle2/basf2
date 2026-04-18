@@ -181,7 +181,7 @@ namespace Belle2 {
       /// Tangential vector to the circle near the given position
       Vector2D tangential(const Vector2D& point) const
       {
-        return normal(point).orthogonal();
+        return VectorUtil::Orthogonal(normal(point));
       }
 
       /// Calculates the angle between two points as seen from the center of the circle

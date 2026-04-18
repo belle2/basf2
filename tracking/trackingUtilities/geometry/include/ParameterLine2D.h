@@ -126,7 +126,7 @@ namespace Belle2 {
       /// Gives the normal vector of the line.
       Vector2D normal() const
       {
-        return tangential().orthogonal(ERotation::c_Clockwise);
+        return VectorUtil::Orthogonal(tangential(), ERotation::c_Clockwise);
       }
 
       /// Gives the support vector of the line.
@@ -256,8 +256,8 @@ namespace Belle2 {
       /// Gives the position of closest approach to the origin
       Vector2D closestToOrigin() const
       {
-        return tangential().orthogonal() *=
-                 (VectorUtil::Cross(tangential(), support()) / tangential().Mag2());
+        return VectorUtil::Orthogonal(tangential()) *
+               (VectorUtil::Cross(tangential(), support()) / tangential().Mag2());
       }
 
       /// Gives the line parameter at the closest approach to the origin

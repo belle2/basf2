@@ -264,7 +264,7 @@ namespace Belle2 {
       /// Gradient of the distance field, hence indicates the direction of increasing distance.
       Vector2D gradient(const Vector2D& point) const
       {
-        return (point - perigee()) * curvature() - phi0Vec().orthogonal();
+        return (point - perigee()) * curvature() - VectorUtil::Orthogonal(phi0Vec());
       }
 
       /// Unit normal vector from the circle to the given point.
@@ -276,7 +276,7 @@ namespace Belle2 {
       /// Tangential vector to the circle near the given position.
       Vector2D tangential(const Vector2D& point) const
       {
-        return normal(point).orthogonal();
+        return VectorUtil::Orthogonal(normal(point));
       }
 
       /// Getter for the tangtial vector at the perigee
@@ -288,19 +288,19 @@ namespace Belle2 {
       /// Getter for the perigee point
       Vector2D perigee() const
       {
-        return phi0Vec().orthogonal() * impact();
+        return VectorUtil::Orthogonal(phi0Vec()) * impact();
       }
 
       /// Getter for the center of the circle. If it was a line both components will be infinity.
       Vector2D center() const
       {
-        return phi0Vec().orthogonal() * (impact() + radius());
+        return VectorUtil::Orthogonal(phi0Vec()) * (impact() + radius());
       }
 
       /// Getter for the apogee of the circle. If it was a line both components will be infinity.
       Vector2D apogee() const
       {
-        return phi0Vec().orthogonal() * (impact() + 2 * radius());
+        return VectorUtil::Orthogonal(phi0Vec()) * (impact() + 2 * radius());
       }
 
       /// Gives the minimal cylindrical radius the circle reaches (unsigned)
@@ -353,7 +353,7 @@ namespace Belle2 {
       /// Getter for the generalised circle parameters n1 and n2
       Vector2D n12() const
       {
-        return -phi0Vec().orthogonal() * (1 + curvature() * impact());
+        return -VectorUtil::Orthogonal(phi0Vec()) * (1 + curvature() * impact());
       }
 
       /// Getter for the generalised circle parameters n1

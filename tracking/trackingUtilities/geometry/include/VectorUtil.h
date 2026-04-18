@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <tracking/trackingUtilities/numerics/ERotation.h>
+
 /* ROOT headers. */
 #include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
@@ -123,6 +125,19 @@ namespace Belle2 {
     inline double Cross(const ROOT::Math::XYVector& lhs, const ROOT::Math::XYVector& rhs)
     {
       return lhs.X() * rhs.Y() - lhs.Y() * rhs.X();
+    }
+
+    /// Calculated the two dimensional cross product.
+    inline ROOT::Math::XYVector Orthogonal(const ROOT::Math::XYVector& a)
+    {
+      return ROOT::Math::XYVector(-a.Y(), a.X());
+    }
+
+    /// Calculated the two dimensional cross product.
+    inline ROOT::Math::XYVector Orthogonal(const ROOT::Math::XYVector& a, const TrackingUtilities::ERotation ccwInfo)
+    {
+      return isValid(ccwInfo) ? ROOT::Math::XYVector(-static_cast<double>(ccwInfo) * a.Y(),
+                                                     static_cast<double>(ccwInfo) * a.X()) : ROOT::Math::XYVector();
     }
 
     /// Calculates the distance of this point to the rhs

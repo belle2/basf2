@@ -88,7 +88,7 @@ namespace Belle2 {
       /// Constructs a line through the two given points
       static Line2D throughPoints(const Vector2D& start, const Vector2D& end)
       {
-        return Line2D(VectorUtil::Cross(end, start), (start - end).orthogonal());
+        return Line2D(VectorUtil::Cross(end, start), VectorUtil::Orthogonal(start - end));
       }
 
     public:
@@ -320,7 +320,7 @@ namespace Belle2 {
       /// Gives the tangential vector in the direction of positive advance on the line
       Vector2D tangential() const
       {
-        return normal().orthogonal();
+        return VectorUtil::Orthogonal(normal());
       }
 
       /// Getter for the unit normal vector of the line

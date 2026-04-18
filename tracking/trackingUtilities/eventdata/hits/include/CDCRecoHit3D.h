@@ -312,7 +312,7 @@ namespace Belle2 {
       Vector2D getFlightDirection2D() const
       {
         ERotation rotation = static_cast<ERotation>(-getRLInfo());
-        return getRecoDisp2D().orthogonal(rotation);
+        return VectorUtil::Orthogonal(getRecoDisp2D(), rotation);
       }
 
       /// Getter for the direction of flight relative to the position

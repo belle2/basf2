@@ -189,18 +189,6 @@ namespace Belle2 {
         SetXY(-X(), -Y());
       }
 
-      /// Orthogonal vector to the counterclockwise direction
-      Vector2D orthogonal() const
-      {
-        return Vector2D(-y(), x());
-      }
-
-      /// Orthogonal vector to the direction given by the counterclockwise info
-      Vector2D orthogonal(const ERotation ccwInfo) const
-      {
-        return isValid(ccwInfo) ? Vector2D(-static_cast<double>(ccwInfo) * y(), static_cast<double>(ccwInfo) * x()) : Vector2D();
-      }
-
       /// Normalizes the vector to unit length
       /** Normalizes the vector to unit length and returns the length the vector had before. \n
        *  The null vector is not transformed. */
@@ -271,7 +259,7 @@ namespace Belle2 {
       /// Calculates the part of this vector that is parallel to the given vector
       Vector2D orthogonalVector(const Vector2D& relativTo) const
       {
-        return relativTo.scaled(VectorUtil::Cross(relativTo, *this) / relativTo.Mag2()).orthogonal();
+        return VectorUtil::Orthogonal(relativTo.scaled(VectorUtil::Cross(relativTo, *this) / relativTo.Mag2()));
       }
 
       /// Same as orthogonalComp() but assumes the given vector to be of unit length

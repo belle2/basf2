@@ -108,7 +108,7 @@ void GeneralizedCircle::setPerigeeParameters(const double curvature,
                                              const double impact)
 {
   double n0 = impact * (impact * curvature / 2.0 + 1.0);
-  Vector2D n12 = -tangential.orthogonal() * (1 + curvature * impact);
+  Vector2D n12 = VectorUtil::Orthogonal(-tangential) * (1 + curvature * impact);
   double n3 = curvature / 2.0;
   setN(n0, n12, n3);
 }

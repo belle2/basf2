@@ -196,7 +196,7 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& j
   double UOrthogonal = VectorUtil::Cross(phi0Vec(), UVec);
   // double UParallel = phi0Vec().Dot(UVec);
 
-  // Vector2D CB = gradient(by).orthogonal();
+  // Vector2D CB = VectorUtil::Orthogonal(gradient(by));
   // double U = sqrt(1 + curvature() * A);
   // double xi = 1.0 / CB.Mag2();
   // double nu = 1 - curvature() * deltaOrthogonal;
@@ -331,7 +331,7 @@ void PerigeeCircle::setCenterAndRadius(const Vector2D& center,
                                        ERotation orientation)
 {
   m_curvature = static_cast<double>(orientation) / std::fabs(absRadius);
-  m_phi0Vec = center.orthogonal(NRotation::reversed(orientation));
+  m_phi0Vec = VectorUtil::Orthogonal(center, NRotation::reversed(orientation));
   m_phi0Vec.normalize();
   m_phi0 = m_phi0Vec.phi();
   m_impact = (center.R() - std::fabs(absRadius)) * static_cast<double>(orientation);
@@ -341,7 +341,7 @@ void PerigeeCircle::setN(double n0, const Vector2D& n12, double n3)
 {
   double normalization = sqrt(n12.Mag2() - 4 * n0 * n3);
   m_curvature = 2 * n3 / normalization;
-  m_phi0Vec = n12.orthogonal();
+  m_phi0Vec = VectorUtil::Orthogonal(n12);
   m_phi0Vec.normalize();
   m_phi0 = m_phi0Vec.phi();
   m_impact = distance(n0 / normalization); // Uses the new curvature

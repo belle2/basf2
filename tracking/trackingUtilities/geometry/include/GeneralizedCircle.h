@@ -370,7 +370,7 @@ namespace Belle2 {
        */
       Vector2D tangential(const Vector2D& point) const
       {
-        return normal(point).orthogonal();
+        return VectorUtil::Orthogonal(normal(point));
       }
 
       /**

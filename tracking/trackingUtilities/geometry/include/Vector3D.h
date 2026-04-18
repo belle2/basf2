@@ -256,16 +256,6 @@ namespace Belle2 {
         return subtract(rhs);
       }
 
-      /// Normalizes the vector to unit length
-      /** Normalizes the vector to unit length and returns the length the vector had before. \n
-       *  The null vector is not transformed. */
-      double normalize()
-      {
-        double result = R();
-        if (result != 0.0) divide(result);
-        return result;
-      }
-
       /// Same as reversed()
       Vector3D operator-() const
       {

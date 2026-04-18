@@ -330,7 +330,10 @@ GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) con
   const double n3 = this->n3();
 
   Vector2D unitC = n12 * m3 - m12 * n3;
-  double absC = unitC.normalize();
+  double absC = unitC.R();
+  if (absC != 0.0) {
+    unitC.Scale(1. / absC);
+  }
 
   double xParallel = (m0 * n3 - m3 * n0) / absC;
 

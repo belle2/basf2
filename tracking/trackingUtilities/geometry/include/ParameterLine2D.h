@@ -163,7 +163,9 @@ namespace Belle2 {
        */
       void normalize()
       {
-        m_tangential.normalize();
+        if (m_tangential.R() != 0.0) {
+          m_tangential.Scale(1. / m_tangential.R());
+        }
       }
 
       /// Clear all information from the line

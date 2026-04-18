@@ -189,16 +189,6 @@ namespace Belle2 {
         SetXY(-X(), -Y());
       }
 
-      /// Normalizes the vector to unit length
-      /** Normalizes the vector to unit length and returns the length the vector had before. \n
-       *  The null vector is not transformed. */
-      double normalize()
-      {
-        double originalLength = R();
-        if (originalLength != 0.0) divide(originalLength);
-        return originalLength;
-      }
-
       /// Same as reversed()
       Vector2D operator-() const
       {

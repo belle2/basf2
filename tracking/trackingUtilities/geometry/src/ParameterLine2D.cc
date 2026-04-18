@@ -23,7 +23,10 @@ ParameterLine2D ParameterLine2D::touchingCircles(const Vector2D& fromCenter,
   Vector2D connecting = toCenter - fromCenter;
 
   // Normalize to the coordinate system vector, but keep the original norm
-  const double norm = connecting.normalize();
+  const double norm = connecting.R();
+  if (norm != 0.0) {
+    connecting.Scale(1. / norm);
+  }
 
   double kappa = (fromSignedRadius - toSignedRadius) / norm;
   double cokappa = sqrt(1 - kappa * kappa);

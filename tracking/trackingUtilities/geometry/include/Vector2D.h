@@ -253,22 +253,6 @@ namespace Belle2 {
         return *this - Belle2::VectorUtil::parallelVector(*this, flippingDirection) * 2;
       }
 
-      // /// Transforms the vector to conformal space inplace
-      // /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2
-      //  * +y^2) inplace */
-      // void conformalTransform()
-      // {
-      //   divide(normSquared());
-      // }
-
-      // /// Returns a copy of the vector transformed in conformal space
-      // /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2
-      //  * +y^2) and returns the result as a new Vector2D */
-      // Vector2D conformalTransformed() const
-      // {
-      //   return divided(normSquared());
-      // }
-
       /// Returns a new vector as sum of this and rhs
       Vector2D operator+(const Vector2D& rhs) const
       {

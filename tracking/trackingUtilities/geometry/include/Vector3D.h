@@ -126,18 +126,6 @@ namespace Belle2 {
                         x() * rhs.y() - y() * rhs.x());
       }
 
-      /// Calculates the two dimensional cross product in xy projection.
-      double crossXY(const Vector3D& rhs) const
-      {
-        return VectorUtil::Cross(xy(), rhs.xy());
-      }
-
-      /// Calculates the two dimensional cross product in xy projection.
-      double crossXY(const Vector2D& rhs) const
-      {
-        return VectorUtil::Cross(xy(), rhs);
-      }
-
       /// Calculates the squared length of the vector
       double Mag2() const
       {

@@ -15,6 +15,8 @@
 #include <cdc/topology/CDCWire.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 
+#include <Math/Vector3D.h>
+
 namespace Belle2 {
 
   /// Define states for CKF algorithm, which can be seed track or CDC wire hit.
@@ -144,8 +146,8 @@ namespace Belle2 {
     TrackingUtilities::CDCTrajectory3D getTrajectory() const
     {
       const auto& trackState = getTrackState();
-      const TrackingUtilities::Vector3D trackPosition(trackState.getPos());
-      const TrackingUtilities::Vector3D trackMomentum(trackState.getMom());
+      const ROOT::Math::XYZVector trackPosition(trackState.getPos());
+      const ROOT::Math::XYZVector trackMomentum(trackState.getMom());
       return TrackingUtilities::CDCTrajectory3D(trackPosition, trackState.getTime(),
                                                 trackMomentum, trackState.getCharge());
     }

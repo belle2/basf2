@@ -24,8 +24,6 @@
 #include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-
 #include <tracking/trackingUtilities/utilities/ReversedRange.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
@@ -36,6 +34,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
+
+#include <Math/Vector3D.h>
 
 #include <cmath>
 
@@ -362,8 +362,8 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
       CDCRLWireHit fromRLWireHit(&fromWireHit);
       CDCRLWireHit toRLWireHit(&toWireHit);
 
-      Vector3D fromDisplacement(fromSimHit->getPosTrack() - fromSimHit->getPosWire());
-      Vector3D toDisplacement(toSimHit->getPosTrack() - toSimHit->getPosWire());
+      ROOT::Math::XYZVector fromDisplacement(fromSimHit->getPosTrack() - fromSimHit->getPosWire());
+      ROOT::Math::XYZVector toDisplacement(toSimHit->getPosTrack() - toSimHit->getPosWire());
 
       CDCRecoHit2D fromRecoHit2D(fromRLWireHit, VectorUtil::get2DVector(fromDisplacement));
       CDCRecoHit2D toRecoHit2D(toRLWireHit, VectorUtil::get2DVector(toDisplacement));

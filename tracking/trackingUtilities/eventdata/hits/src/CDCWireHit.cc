@@ -14,7 +14,6 @@
 #include <cdc/topology/EStereoKind.h>
 
 #include <tracking/trackingUtilities/geometry/Circle2D.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/Index.h>
@@ -179,9 +178,9 @@ ROOT::Math::XYVector CDCWireHit::reconstruct2D(const CDCTrajectory2D& trajectory
   return wirePos2D + disp2D;
 }
 
-Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D,
-                                   const ERightLeft rlInfo,
-                                   const double z) const
+ROOT::Math::XYZVector CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D,
+                                                const ERightLeft rlInfo,
+                                                const double z) const
 {
   const EStereoKind stereoType = getStereoKind();
 
@@ -194,7 +193,7 @@ Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D,
     const ROOT::Math::XYVector recoPos2D = reconstruct2D(trajectory2D);
     // for axial wire we can not determine the z coordinate by looking at the xy projection only
     // we set it the basic assumption.
-    return Vector3D(recoPos2D, z);
+    return ROOT::Math::XYZVector(recoPos2D.X(), recoPos2D.Y(), z);
   }
 }
 

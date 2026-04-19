@@ -68,7 +68,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   CDCTrajectory3D trajectory3D = track.getStartTrajectory3D();
 
   // We reset the trajectory here to start (later) at the newStartPosition of the first hit
-  const Vector3D startPosition(0, 0, 0);
+  const ROOT::Math::XYZVector startPosition(0, 0, 0);
   trajectory3D.setLocalOrigin(startPosition);
   trajectory3D.setFlightTime(0);
 
@@ -107,7 +107,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   track.sortByArcLength2D();
 
   // Set the position to the first hit and let the hits start at arc length of 0
-  Vector3D frontPosition = track.front().getRLWireHit().reconstruct3D(trajectory2D);
+  ROOT::Math::XYZVector frontPosition = track.front().getRLWireHit().reconstruct3D(trajectory2D);
   double arcLengthOffset = trajectory3D.setLocalOrigin(frontPosition);
   track.setStartTrajectory3D(trajectory3D);
   for (CDCRecoHit3D& recoHit : track) {
@@ -115,7 +115,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   }
 
   // Set the back trajectory to start at the last hit position (and shift if necessary)
-  Vector3D backPosition = track.back().getRLWireHit().reconstruct3D(trajectory2D);
+  ROOT::Math::XYZVector backPosition = track.back().getRLWireHit().reconstruct3D(trajectory2D);
   double backArcLength2D = trajectory3D.setLocalOrigin(backPosition);
   if (backArcLength2D < 0) {
     trajectory3D.shiftPeriod(1);

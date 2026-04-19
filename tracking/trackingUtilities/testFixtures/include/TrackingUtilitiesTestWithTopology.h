@@ -9,7 +9,7 @@
 
 #include <framework/utilities/TestHelpers.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   namespace TrackingUtilities {
@@ -54,9 +54,9 @@ namespace Belle2 {
   namespace TestHelpers {
     /** Predicate checking that all three components of Vector3D are close by a maximal error of tolerance. */
     template<>
-    bool allNear<TrackingUtilities::Vector3D>(const TrackingUtilities::Vector3D& expected,
-                                              const TrackingUtilities::Vector3D& actual,
-                                              double tolerance);
+    bool allNear<ROOT::Math::XYZVector>(const ROOT::Math::XYZVector& expected,
+                                        const ROOT::Math::XYZVector& actual,
+                                        double tolerance);
   }
 
 }

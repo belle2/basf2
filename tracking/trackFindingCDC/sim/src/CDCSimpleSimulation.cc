@@ -23,6 +23,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 #include <TRandom.h>
 
@@ -57,7 +58,7 @@ std::vector<CDCTrack> CDCSimpleSimulation::simulate(const std::vector<CDCTraject
     const CDCTrajectory3D& trajectory3D = trajectories3D[iMCTrack];
 
     const UncertainHelix& localHelix = trajectory3D.getLocalHelix();
-    const Vector3D& localOrigin = trajectory3D.getLocalOrigin();
+    const ROOT::Math::XYZVector& localOrigin = trajectory3D.getLocalOrigin();
 
     Helix globalHelix = localHelix;
     const double arcLength2DOffset = globalHelix.passiveMoveBy(-localOrigin);
@@ -218,7 +219,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
     std::vector<SimpleSimHit> simpleSimHitsInLayer;
     if (localArcLength2D > 0 and localArcLength2D < maxArcLength2D) {
 
-      Vector3D pos3DAtLayer = globalHelix.atArcLength2D(globalArcLength2D);
+      ROOT::Math::XYZVector pos3DAtLayer = globalHelix.atArcLength2D(globalArcLength2D);
       const CDCWire& closestWire =  wireLayer.getClosestWire(pos3DAtLayer);
 
       simpleSimHitsInLayer = createHitsForLayer(closestWire, globalHelix, arcLength2DOffset);
@@ -247,7 +248,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
       }
 
       if (secondLocalArcLength2D > 0 and secondLocalArcLength2D < maxArcLength2D) {
-        Vector3D pos3DAtLayer = globalHelix.atArcLength2D(secondGlobalArcLength2D);
+        ROOT::Math::XYZVector pos3DAtLayer = globalHelix.atArcLength2D(secondGlobalArcLength2D);
         const CDCWire& closestWire =  wireLayer.getClosestWire(pos3DAtLayer);
 
         // Check again if the wire has been hit before
@@ -324,9 +325,9 @@ CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
     arcLength2D += globalHelix.perimeterXY();
   }
 
-  Vector3D pos3D = globalHelix.atArcLength2D(arcLength2D);
+  ROOT::Math::XYZVector pos3D = globalHelix.atArcLength2D(arcLength2D);
 
-  Vector3D correctedPos3D = pos3D;
+  ROOT::Math::XYZVector correctedPos3D = pos3D;
   ROOT::Math::XYVector correctedWirePos(wire.getWirePos2DAtZ(correctedPos3D.z()));
   double correctedArcLength2D = arcLength2D;
 
@@ -353,7 +354,7 @@ CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
   if (m_addInWireSignalDelay) {
     double backwardZ = wire.getBackwardZ();
     // Position where wire has been hit
-    Vector3D wirePos = wire.getClosest(correctedPos3D);
+    ROOT::Math::XYZVector wirePos = wire.getClosest(correctedPos3D);
     double distanceToBack = (wirePos.z() - backwardZ) * hypot2(1, wire.getTanStereoAngle());
 
     delayTime += distanceToBack / m_propSpeed;

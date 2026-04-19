@@ -11,6 +11,7 @@
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/Index.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 namespace Belle2 {
@@ -18,9 +19,6 @@ namespace Belle2 {
   class CDCSimHit;
   class CDCHit;
 
-  namespace TrackingUtilities {
-    class Vector3D;
-  }
   namespace TrackFindingCDC {
 
     /// Interface class to the Monte Carlo information for individual hits
@@ -59,10 +57,10 @@ namespace Belle2 {
       float getRefDriftLength(const CDCHit* ptrHit) const;
 
       /// Getter for the three dimensional position of the primary ionisation for the hit.
-      const TrackingUtilities::Vector3D getRecoPos3D(const CDCHit* ptrHit) const;
+      const ROOT::Math::XYZVector getRecoPos3D(const CDCHit* ptrHit) const;
 
       /// Getter for the three dimensional position of the ionisation of the primary simulated hit for the hit.
-      const TrackingUtilities::Vector3D getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const;
+      const ROOT::Math::XYZVector getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const;
 
     public:
       /// Indicates if the hit was reassigned to a different mc particle because it was caused by a secondary.

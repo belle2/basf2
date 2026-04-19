@@ -56,7 +56,7 @@ void TrackInspector::apply(std::vector<CDCTrack>& tracks)
     grS->SetLineWidth(2);
     grS->SetLineColor(9);
     for (CDCRecoHit3D& hit : track) {
-      Vector3D pos = hit.getRecoPos3D();
+      ROOT::Math::XYZVector pos = hit.getRecoPos3D();
       const double R = std::sqrt(pos.x() * pos.x() + pos.y() * pos.y());
       const double X = pos.x();
       const double Y = pos.y();

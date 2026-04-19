@@ -24,7 +24,6 @@
 
 #include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/Quadratic.h>
@@ -37,6 +36,7 @@
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/VectorUtil.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 using namespace Belle2;
@@ -144,7 +144,7 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit3D& recoHit3D,
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
 
   ROOT::Math::XYVector flightDirection = recoHit3D.getFlightDirection2D();
-  const Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
+  const ROOT::Math::XYZVector& recoPos3D = recoHit3D.getRecoPos3D();
   const ROOT::Math::XYVector& recoPos2D = VectorUtil::get2DVector(recoPos3D);
   double alpha = VectorUtil::Angle(recoPos2D, flightDirection);
   const double beta = 1;

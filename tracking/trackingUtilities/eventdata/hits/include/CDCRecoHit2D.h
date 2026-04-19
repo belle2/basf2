@@ -17,6 +17,7 @@
 
 #include <framework/geometry/VectorUtil.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 #include <iosfwd>
@@ -32,7 +33,6 @@ namespace Belle2 {
   namespace TrackingUtilities {
     class CDCTrajectory2D;
     class CDCWireHit;
-    class Vector3D;
 
     /**
      *  Class representing a two dimensional reconstructed hit in the central drift chamber.
@@ -276,7 +276,7 @@ namespace Belle2 {
        *  moved parallel to the stereo wire.
        *  For axial hits the point of closest approach on the trajectory is returned.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, const double z = 0) const;
+      ROOT::Math::XYZVector reconstruct3D(const CDCTrajectory2D& trajectory2D, const double z = 0) const;
 
       /// Getter for the oriented wire hit associated with the reconstructed hit.
       const CDCRLWireHit& getRLWireHit() const

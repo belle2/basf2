@@ -13,6 +13,7 @@
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 #include <iosfwd>
@@ -30,7 +31,6 @@ namespace Belle2 {
   namespace TrackingUtilities {
     class CDCTrajectory2D;
     class CDCWireHit;
-    class Vector3D;
 
     /**
      *  Class representing an oriented hit wire including a hypotheses
@@ -268,7 +268,7 @@ namespace Belle2 {
        *    yield the closest approach of the drift circle to the trajectory
        *    in the reference plane.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, double z = 0) const;
+      ROOT::Math::XYZVector reconstruct3D(const CDCTrajectory2D& trajectory2D, double z = 0) const;
 
     private:
       /// Memory for the reference to the assiziated wire hit.

@@ -28,6 +28,7 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 using namespace Belle2;
@@ -149,9 +150,9 @@ void WireHitCreator::initialize()
     }
   }
 
-  m_triggerPoint = Vector3D(std::get<0>(m_param_triggerPoint),
-                            std::get<1>(m_param_triggerPoint),
-                            std::get<2>(m_param_triggerPoint));
+  m_triggerPoint = ROOT::Math::XYZVector(std::get<0>(m_param_triggerPoint),
+                                         std::get<1>(m_param_triggerPoint),
+                                         std::get<2>(m_param_triggerPoint));
 
   if (m_flightTimeEstimation == EPreferredDirection::c_Symmetric) {
     B2ERROR("Unexpected 'flightTimeEstimation' parameter : '" << m_param_flightTimeEstimation);

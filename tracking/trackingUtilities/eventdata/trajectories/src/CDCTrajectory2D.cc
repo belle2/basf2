@@ -16,7 +16,6 @@
 
 #include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
@@ -147,26 +146,29 @@ double CDCTrajectory2D::reconstructZ(const WireLine& wireLine,
   return recoZ;
 }
 
-std::array<Vector3D, 2> CDCTrajectory2D::reconstructBoth3D(const WireLine& wireLine,
-                                                           const double distance,
-                                                           const double z) const
+std::array<ROOT::Math::XYZVector, 2> CDCTrajectory2D::reconstructBoth3D(const WireLine& wireLine,
+    const double distance,
+    const double z) const
 {
   const std::array<double, 2> solutionsZ = reconstructBothZ(wireLine, distance, z);
 
-  const Vector3D firstRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[0]);
-  const Vector3D secondRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[1]);
-  return {{{getClosest(VectorUtil::get2DVector(firstRecoWirePos3D)), firstRecoWirePos3D.z()},
-      {getClosest(VectorUtil::get2DVector(secondRecoWirePos3D)), secondRecoWirePos3D.z()}
+  const ROOT::Math::XYZVector firstRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[0]);
+  const ROOT::Math::XYZVector secondRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[1]);
+  const auto& tmp1 = getClosest(VectorUtil::get2DVector(firstRecoWirePos3D));
+  const auto& tmp2 = getClosest(VectorUtil::get2DVector(secondRecoWirePos3D));
+  return {{{tmp1.X(), tmp1.Y(), firstRecoWirePos3D.z()},
+      {tmp2.X(), tmp2.Y(), secondRecoWirePos3D.z()}
     }};
 }
 
-Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
-                                        const double distance,
-                                        const double z) const
+ROOT::Math::XYZVector CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
+                                                     const double distance,
+                                                     const double z) const
 {
   const double recoZ = reconstructZ(wireLine, distance, z);
-  const Vector3D recoWirePos2D = wireLine.sagPos3DAtZ(recoZ);
-  return Vector3D(getClosest(VectorUtil::get2DVector(recoWirePos2D)), recoZ);
+  const ROOT::Math::XYZVector recoWirePos2D = wireLine.sagPos3DAtZ(recoZ);
+  const auto& tmp = getClosest(VectorUtil::get2DVector(recoWirePos2D));
+  return ROOT::Math::XYZVector(tmp.X(), tmp.Y(), recoZ);
 }
 
 ROOT::Math::XYVector CDCTrajectory2D::getClosest(const ROOT::Math::XYVector& point) const

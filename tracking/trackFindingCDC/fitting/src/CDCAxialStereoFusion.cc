@@ -19,6 +19,7 @@
 
 #include <cdc/topology/CDCWire.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 using namespace Belle2;
@@ -128,7 +129,7 @@ CDCTrajectory3D CDCAxialStereoFusion::fusePreliminary(const CDCSegment2D& fromSe
   }
 
   CDCTrajectory3D preliminaryTrajectory3D(axialTrajectory2D, trajectorySZ);
-  Vector3D localOrigin3D(localOrigin2D, 0.0);
+  ROOT::Math::XYZVector localOrigin3D(localOrigin2D.X(), localOrigin2D.Y(), 0.0);
   preliminaryTrajectory3D.setLocalOrigin(localOrigin3D);
   return preliminaryTrajectory3D;
 }
@@ -137,7 +138,7 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCSegme
     const CDCSegment2D& toSegment2D,
     const CDCTrajectory3D& preliminaryTrajectory3D)
 {
-  Vector3D localOrigin3D = preliminaryTrajectory3D.getLocalOrigin();
+  ROOT::Math::XYZVector localOrigin3D = preliminaryTrajectory3D.getLocalOrigin();
   ROOT::Math::XYVector localOrigin2D = VectorUtil::get2DVector(localOrigin3D);
 
   CDCRiemannFitter riemannFitter;

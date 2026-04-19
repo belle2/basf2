@@ -211,7 +211,8 @@ void AxialTrackMerger::mergeTracks(CDCTrack& track1,
   AxialTrackUtil::normalizeTrack(track1);
 
   for (CDCRecoHit3D& recoHit3D : track2) {
-    recoHit3D.setRecoPos3D({recoHit3D.getRefPos2D(), 0});
+    const auto& tmp = recoHit3D.getRefPos2D();
+    recoHit3D.setRecoPos3D({tmp.X(), tmp.Y(), 0});
     recoHit3D.setRLInfo(ERightLeft::c_Unknown);
   }
 

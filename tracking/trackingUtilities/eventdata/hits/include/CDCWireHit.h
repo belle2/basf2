@@ -38,7 +38,6 @@ namespace Belle2 {
   namespace TrackingUtilities {
     class CDCTrajectory2D;
     class Circle2D;
-    class Vector3D;
 
     /**
      *  Class representing a hit wire in the central drift chamber.
@@ -266,7 +265,7 @@ namespace Belle2 {
        *    yield the closest approach of the drift circle to the trajectory
        *    in the reference plane.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, ERightLeft rlInfo, double z = 0) const;
+      ROOT::Math::XYZVector reconstruct3D(const CDCTrajectory2D& trajectory2D, ERightLeft rlInfo, double z = 0) const;
 
       /**
        *  Applies the conformal transformation to the drift circle this hit represents.

@@ -7,7 +7,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/numerics/LookupTable.h>
 #include <framework/geometry/VectorUtil.h>
 
@@ -66,7 +65,7 @@ namespace Belle2 {
 
     public:
       /// Constructor also setting up the flight time lookup table
-      explicit CosmicRayFlightTimeEstimator(TrackingUtilities::Vector3D triggerPoint = TrackingUtilities::Vector3D(0, 0, 0));
+      explicit CosmicRayFlightTimeEstimator(ROOT::Math::XYZVector triggerPoint = ROOT::Math::XYZVector(0, 0, 0));
 
       /// Flight time estimator for cosmic ray events
       double getFlightTime2D(const ROOT::Math::XYVector& pos2D, double alpha, double beta = 1) const override
@@ -84,7 +83,7 @@ namespace Belle2 {
       TrackingUtilities::LookupTable<float> m_halfPeriodAlphaFlightTimeFactor;
 
       /// Trigger point of the cosmic ray setup
-      TrackingUtilities::Vector3D m_triggerPoint;
+      ROOT::Math::XYZVector m_triggerPoint;
     };
 
   }

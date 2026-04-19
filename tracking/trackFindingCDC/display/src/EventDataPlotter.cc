@@ -37,6 +37,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/MCParticle.h>
 
+#include <Math/Vector3D.h>
 #include <TMatrixDSym.h>
 
 #include <cmath>
@@ -705,8 +706,8 @@ void EventDataPlotter::draw(const RecoTrack& recoTrack, const AttributeMap& attr
 void EventDataPlotter::drawTrajectory(const MCParticle& mcParticle, const AttributeMap& attributeMap)
 {
   if (not mcParticle.isPrimaryParticle()) return;
-  Vector3D pos(mcParticle.getVertex());
-  Vector3D mom(mcParticle.getMomentum());
+  ROOT::Math::XYZVector pos(mcParticle.getVertex());
+  ROOT::Math::XYZVector mom(mcParticle.getMomentum());
   double charge = mcParticle.getCharge();
   double time = mcParticle.getProductionTime();
   CDCTrajectory2D trajectory2D(VectorUtil::get2DVector(pos), time, VectorUtil::get2DVector(mom), charge);

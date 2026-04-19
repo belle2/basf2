@@ -18,7 +18,6 @@
 #include <cdc/topology/CDCWire.h>
 #include <cdc/topology/EStereoKind.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
@@ -36,7 +35,7 @@ using namespace CDC;
 using namespace TrackingUtilities;
 
 CDCRecoHit3D::CDCRecoHit3D(const CDCRLWireHit& rlWireHit,
-                           const Vector3D& recoPos3D,
+                           const ROOT::Math::XYZVector& recoPos3D,
                            double arcLength2D)
   : m_rlWireHit(rlWireHit)
   , m_recoPos3D(recoPos3D)
@@ -50,14 +49,14 @@ CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit, const CDCSimHit
   double arcLength2D = std::numeric_limits<double>::quiet_NaN();
 
   return CDCRecoHit3D(CDCRLWireHit::fromSimHit(wireHit, simHit),
-                      Vector3D{simHit.getPosTrack()},
+                      ROOT::Math::XYZVector{simHit.getPosTrack()},
                       arcLength2D);
 }
 
 CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit2D,
                                        const CDCTrajectory2D& trajectory2D)
 {
-  Vector3D recoPos3D = recoHit2D.reconstruct3D(trajectory2D);
+  ROOT::Math::XYZVector recoPos3D = recoHit2D.reconstruct3D(trajectory2D);
   double arcLength2D = trajectory2D.calcArcLength2D(VectorUtil::get2DVector(recoPos3D));
   return CDCRecoHit3D(recoHit2D.getRLWireHit(), recoPos3D, arcLength2D);
 }
@@ -66,7 +65,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCWireHit* wireHit,
                                        ERightLeft rlInfo,
                                        const CDCTrajectory2D& trajectory2D)
 {
-  Vector3D recoPos3D = wireHit->reconstruct3D(trajectory2D, rlInfo);
+  ROOT::Math::XYZVector recoPos3D = wireHit->reconstruct3D(trajectory2D, rlInfo);
   double arcLength2D = trajectory2D.calcArcLength2D(VectorUtil::get2DVector(recoPos3D));
   CDCRLWireHit rlWireHit(wireHit, rlInfo);
   return CDCRecoHit3D(rlWireHit, recoPos3D, arcLength2D);
@@ -75,7 +74,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCWireHit* wireHit,
 CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRLWireHit& rlWireHit,
                                        const CDCTrajectory2D& trajectory2D)
 {
-  Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
+  ROOT::Math::XYZVector recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
   double arcLength2D = trajectory2D.calcArcLength2D(VectorUtil::get2DVector(recoPos3D));
   return CDCRecoHit3D(rlWireHit, recoPos3D, arcLength2D);
 }
@@ -104,7 +103,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit2D,
     //in the common case the z fit has been derived from the reconstructed points generated
     //with the reconstruct method above in the other reconstruct method.
     //sticking to that method but using the average z from the sz fit
-    Vector3D recoPos3D = recoHit2D.reconstruct3D(trajectory2D);
+    ROOT::Math::XYZVector recoPos3D = recoHit2D.reconstruct3D(trajectory2D);
     arcLength2D = trajectory2D.calcArcLength2D(VectorUtil::get2DVector(recoPos3D));
 
   } else { /* if (stereoKind == EStereoKind::c_Axial)*/
@@ -121,7 +120,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit2D,
   const ROOT::Math::XYVector correctedRecoPos2D = trajectory2D.getClosest(recoWirePos2D);
   const double correctedPerpS = trajectory2D.calcArcLength2D(correctedRecoPos2D);
   const double correctedZ = trajectorySZ.mapSToZ(correctedPerpS);
-  const Vector3D correctedRecoPos3D(correctedRecoPos2D, correctedZ);
+  const ROOT::Math::XYZVector correctedRecoPos3D(correctedRecoPos2D.X(), correctedRecoPos2D.Y(), correctedZ);
 
   CDCRecoHit3D result(recoHit2D.getRLWireHit(), correctedRecoPos3D, correctedPerpS);
   result.snapToDriftCircle();
@@ -184,7 +183,8 @@ void CDCRecoHit3D::snapToDriftCircle(bool switchSide)
   if (switchSide) {
     disp2D = -disp2D;
   }
-  m_recoPos3D = Vector3D(wirePos + disp2D, recoPosZ);
+  const auto& tmp = wirePos + disp2D;
+  m_recoPos3D = ROOT::Math::XYZVector(tmp.X(), tmp.Y(), recoPosZ);
 }
 
 void CDCRecoHit3D::setRecoDriftLength(double driftLength, bool snapRecoPos)

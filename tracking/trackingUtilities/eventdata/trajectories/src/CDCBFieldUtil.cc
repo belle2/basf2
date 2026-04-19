@@ -7,7 +7,6 @@
  **************************************************************************/
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/ERotation.h>
@@ -17,6 +16,7 @@
 
 #include <framework/geometry/B2Vector3.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 #include <TMath.h>
 #include <cmath>
@@ -38,15 +38,15 @@ ESign CDCBFieldUtil::getBFieldZSign()
 
 double CDCBFieldUtil::getBFieldZ()
 {
-  return getBFieldZ(Vector3D(0, 0, 0));
+  return getBFieldZ(ROOT::Math::XYZVector(0, 0, 0));
 }
 
 double CDCBFieldUtil::getBFieldZ(const ROOT::Math::XYVector& pos2D)
 {
-  return getBFieldZ(Vector3D(pos2D, 0));
+  return getBFieldZ(ROOT::Math::XYZVector(pos2D.X(), pos2D.Y(), 0));
 }
 
-double CDCBFieldUtil::getBFieldZ(const Vector3D& pos3D)
+double CDCBFieldUtil::getBFieldZ(const ROOT::Math::XYZVector& pos3D)
 {
   // The BFieldMap can not handle positions with not a number coordinates
   // which can occur if fits fail.
@@ -68,7 +68,7 @@ double CDCBFieldUtil::getAlphaZ(const ROOT::Math::XYVector& pos2D)
   return getAlphaFromBField(getBFieldZ(pos2D));
 }
 
-double CDCBFieldUtil::getAlphaZ(const Vector3D& pos3D)
+double CDCBFieldUtil::getAlphaZ(const ROOT::Math::XYZVector& pos3D)
 {
   return getAlphaFromBField(getBFieldZ(pos3D));
 }
@@ -102,7 +102,7 @@ double CDCBFieldUtil::absMom2DToBendRadius(double absMom2D,
 }
 
 double CDCBFieldUtil::absMom2DToBendRadius(double absMom2D,
-                                           const Vector3D& pos3D)
+                                           const ROOT::Math::XYZVector& pos3D)
 {
   return absMom2DToBendRadius(absMom2D, getBFieldZ(pos3D));
 }
@@ -123,7 +123,7 @@ double CDCBFieldUtil::absMom2DToCurvature(double absMom2D,
 
 double CDCBFieldUtil::absMom2DToCurvature(double absMom2D,
                                           double charge,
-                                          const Vector3D& pos3D)
+                                          const ROOT::Math::XYZVector& pos3D)
 {
   return absMom2DToCurvature(absMom2D, charge, getBFieldZ(pos3D));
 }
@@ -141,7 +141,7 @@ double CDCBFieldUtil::curvatureToAbsMom2D(double curvature,
 }
 
 double CDCBFieldUtil::curvatureToAbsMom2D(double curvature,
-                                          const Vector3D& pos3D)
+                                          const ROOT::Math::XYZVector& pos3D)
 {
   return curvatureToAbsMom2D(curvature, getBFieldZ(pos3D));
 }

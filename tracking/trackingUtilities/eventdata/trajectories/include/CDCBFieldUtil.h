@@ -10,11 +10,11 @@
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 namespace Belle2 {
   namespace TrackingUtilities {
-    class Vector3D;
 
     /// Helper functions to interact with the magnetic field
     class CDCBFieldUtil {
@@ -32,7 +32,7 @@ namespace Belle2 {
       static double getBFieldZ(const ROOT::Math::XYVector& pos2D);
 
       /// Getter for the signed magnetic field strength in z direction ( in Tesla )
-      static double getBFieldZ(const Vector3D& pos3D);
+      static double getBFieldZ(const ROOT::Math::XYZVector& pos3D);
 
       /// Translator from magnetic field strength in Tesla to the alpha value.
       static double getAlphaFromBField(double bField);
@@ -41,7 +41,7 @@ namespace Belle2 {
       static double getAlphaZ(const ROOT::Math::XYVector& pos2D);
 
       /// Getter for the signed alpha of the magnetic field in z direction
-      static double getAlphaZ(const Vector3D& pos3D);
+      static double getAlphaZ(const ROOT::Math::XYZVector& pos3D);
 
       /**
        *  Conversion helper from clockwise or counterclockwise travel to the charge sign.
@@ -73,7 +73,7 @@ namespace Belle2 {
 
       /// Conversion helper for momenta to two dimensional (absolute) bend radius
       static double absMom2DToBendRadius(double absMom2D,
-                                         const Vector3D& pos3D);
+                                         const ROOT::Math::XYZVector& pos3D);
 
       /// Conversion helper for momenta to two dimensional curvature
       static double absMom2DToCurvature(double absMom2D,
@@ -88,7 +88,7 @@ namespace Belle2 {
       /// Conversion helper for momenta to two dimensional curvature
       static double absMom2DToCurvature(double absMom2D,
                                         double charge,
-                                        const Vector3D& pos3D);
+                                        const ROOT::Math::XYZVector& pos3D);
 
       /// Conversion helper for two dimensional curvature to momenta
       static double curvatureToAbsMom2D(double curvature,
@@ -100,7 +100,7 @@ namespace Belle2 {
 
       /// Conversion helper for two dimensional curvature to momenta
       static double curvatureToAbsMom2D(double curvature,
-                                        const Vector3D& pos3D);
+                                        const ROOT::Math::XYZVector& pos3D);
     };
   }
 }

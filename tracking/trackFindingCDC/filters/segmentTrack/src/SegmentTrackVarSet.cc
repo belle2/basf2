@@ -23,6 +23,7 @@
 
 #include <framework/geometry/VectorUtil.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 using namespace Belle2;
@@ -90,8 +91,8 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
   }
 
   // Calculate if it is out of the CDC
-  Vector3D frontRecoPos3D = front.reconstruct3D(trajectoryTrack2D);
-  Vector3D backRecoPos3D = back.reconstruct3D(trajectoryTrack2D);
+  const ROOT::Math::XYZVector& frontRecoPos3D = front.reconstruct3D(trajectoryTrack2D);
+  const ROOT::Math::XYZVector& backRecoPos3D = back.reconstruct3D(trajectoryTrack2D);
 
   if (segment->getStereoKind() != EStereoKind::c_Axial) {
     double forwardZ = front.getWire().getWireLine().forwardZ();
@@ -174,7 +175,7 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
     double thetaFirstSegmentHit = -10;
 
     for (const CDCRecoHit2D& recoHit2D : *segment) {
-      Vector3D reconstructedPosition = recoHit2D.reconstruct3D(trajectoryTrack2D);
+      ROOT::Math::XYZVector reconstructedPosition = recoHit2D.reconstruct3D(trajectoryTrack2D);
       const ROOT::Math::XYVector& recoPos2D = recoHit2D.getRecoPos2D();
       double perpS = trajectoryTrack2D.calcArcLength2D(recoPos2D);
 

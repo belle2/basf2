@@ -7,10 +7,11 @@
  **************************************************************************/
 #include <tracking/ckf/svd/filters/states/ResidualSVDStateFilter.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/core/ModuleParamList.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
+
+#include <Math/Vector3D.h>
 
 using namespace Belle2;
 using namespace TrackingUtilities;
@@ -36,8 +37,8 @@ Weight ResidualSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair
     firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 
-  Vector3D position = Vector3D(firstMeasurement.getPos());
-  const Vector3D hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
+  ROOT::Math::XYZVector position = ROOT::Math::XYZVector(firstMeasurement.getPos());
+  const ROOT::Math::XYZVector hitPosition = spacePoint->getPosition();
 
   const bool sameHemisphere = fabs(position.Phi() - hitPosition.Phi()) < TMath::PiOver2();
   if (not sameHemisphere) {

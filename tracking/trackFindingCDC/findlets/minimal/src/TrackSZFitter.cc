@@ -68,7 +68,7 @@ void TrackSZFitter::apply(std::vector<CDCTrack>& tracks)
 
     CDCTrajectory3D trajectory3D =
       axialStereoFusionFitter.reconstructFuseTrajectories(axialSegment2D, stereoSegment2D, preliminaryTrajectory3D);
-    trajectory3D.setLocalOrigin({localOrigin, 0});
+    trajectory3D.setLocalOrigin({localOrigin.X(), localOrigin.Y(), 0});
 
     // Copy only the covariance matrix, chi2 and ndf over for a conservative introduction for the moment.
     UncertainHelix preliminaryUncertainHelix = preliminaryTrajectory3D.getLocalHelix();

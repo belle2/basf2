@@ -21,7 +21,6 @@
 #include <tracking/trackingUtilities/geometry/UncertainSZLine.h>
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/ESign.h>
@@ -36,6 +35,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <TMatrixDSym.h>
 
@@ -47,10 +47,11 @@ using namespace TrackingUtilities;
 
 CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
                                  const CDCTrajectorySZ& trajectorySZ)
-  : m_localOrigin(trajectory2D.getLocalOrigin())
-  , m_localHelix(trajectory2D.getLocalCircle(), trajectorySZ.getSZLine())
+  : m_localHelix(trajectory2D.getLocalCircle(), trajectorySZ.getSZLine())
   , m_flightTime(trajectory2D.getFlightTime())
 {
+  const auto& tmp = trajectory2D.getLocalOrigin();
+  m_localOrigin = ROOT::Math::XYZVector(tmp.X(), tmp.Y(), 0.0);
 }
 
 CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D)
@@ -58,50 +59,50 @@ CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D)
 {
 }
 
-CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
+CDCTrajectory3D::CDCTrajectory3D(const ROOT::Math::XYZVector& pos3D,
                                  const double time,
-                                 const Vector3D& mom3D,
+                                 const ROOT::Math::XYZVector& mom3D,
                                  const double charge,
                                  const double bZ)
   : m_localOrigin(pos3D)
   , m_localHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.Rho(), charge, bZ),
                  VectorUtil::unit(VectorUtil::get2DVector(mom3D)),
                  0.0,
-                 mom3D.cotTheta(),
+                 (mom3D.Z() / mom3D.Rho()), // double cotTheta() const { return z() / Rho(); }
                  0.0)
   , m_flightTime(time)
 {
 }
 
-CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
+CDCTrajectory3D::CDCTrajectory3D(const ROOT::Math::XYZVector& pos3D,
                                  const double time,
-                                 const Vector3D& mom3D,
+                                 const ROOT::Math::XYZVector& mom3D,
                                  const double charge)
   : CDCTrajectory3D(pos3D, time, mom3D, charge, CDCBFieldUtil::getBFieldZ(pos3D))
 {
 }
 
 CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle, const double bZ)
-  : CDCTrajectory3D(Vector3D{mcParticle.getProductionVertex()},
+  : CDCTrajectory3D(ROOT::Math::XYZVector{mcParticle.getProductionVertex()},
                     mcParticle.getProductionTime(),
-                    Vector3D{mcParticle.getMomentum()},
+                    ROOT::Math::XYZVector{mcParticle.getMomentum()},
                     mcParticle.getCharge(),
                     bZ)
 {
 }
 
 CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle)
-  : CDCTrajectory3D(Vector3D{mcParticle.getProductionVertex()},
+  : CDCTrajectory3D(ROOT::Math::XYZVector{mcParticle.getProductionVertex()},
                     mcParticle.getProductionTime(),
-                    Vector3D{mcParticle.getMomentum()},
+                    ROOT::Math::XYZVector{mcParticle.getMomentum()},
                     mcParticle.getCharge())
 {
 }
 
 CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const double bZ)
-  : CDCTrajectory3D(Vector3D{gfTrackCand.getPosSeed()},
+  : CDCTrajectory3D(ROOT::Math::XYZVector{gfTrackCand.getPosSeed()},
                     gfTrackCand.getTimeSeed(),
-                    Vector3D{gfTrackCand.getMomSeed()},
+                    ROOT::Math::XYZVector{gfTrackCand.getMomSeed()},
                     gfTrackCand.getChargeSeed(),
                     bZ)
 {
@@ -169,13 +170,13 @@ CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const dou
 }
 
 CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand)
-  : CDCTrajectory3D(gfTrackCand, CDCBFieldUtil::getBFieldZ(Vector3D{gfTrackCand.getPosSeed()}))
+  : CDCTrajectory3D(gfTrackCand, CDCBFieldUtil::getBFieldZ(ROOT::Math::XYZVector{gfTrackCand.getPosSeed()}))
 {
 }
 
 namespace {
   CovarianceMatrix<6> calculateCovarianceMatrix(const UncertainHelix& localHelix,
-                                                const Vector3D& momentum,
+                                                const ROOT::Math::XYZVector& momentum,
                                                 const ESign charge,
                                                 const double bZ)
   {
@@ -260,15 +261,15 @@ namespace {
 
 bool CDCTrajectory3D::fillInto(genfit::TrackCand& trackCand) const
 {
-  Vector3D position = getSupport();
+  ROOT::Math::XYZVector position = getSupport();
   return fillInto(trackCand, CDCBFieldUtil::getBFieldZ(position));
 }
 
 bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) const
 {
   // Set the start parameters
-  Vector3D position = getSupport();
-  Vector3D momentum = bZ == 0 ? getFlightDirection3DAtSupport() : getMom3DAtSupport(bZ);
+  ROOT::Math::XYZVector position = getSupport();
+  ROOT::Math::XYZVector momentum = bZ == 0 ? getFlightDirection3DAtSupport() : getMom3DAtSupport(bZ);
   ESign charge = getChargeSign();
 
   // Do not propagate invalid fits, signal that the fit is invalid to the caller.
@@ -276,7 +277,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
     return false;
   }
 
-  gfTrackCand.setPosMomSeed(position, momentum, charge);
+  gfTrackCand.setPosMomSeed(XYZToTVector(position), XYZToTVector(momentum), charge);
 
   const CovarianceMatrix<6> cov6 = calculateCovarianceMatrix(getLocalHelix(), momentum, charge, bZ);
   TMatrixDSym covSeed = TMatrixConversion::toTMatrix(cov6);
@@ -289,7 +290,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
 CovarianceMatrix<6> CDCTrajectory3D::getCartesianCovariance(double bZ) const
 {
   // Set the start parameters
-  Vector3D momentum = bZ == 0 ? getFlightDirection3DAtSupport() : getMom3DAtSupport(bZ);
+  ROOT::Math::XYZVector momentum = bZ == 0 ? getFlightDirection3DAtSupport() : getMom3DAtSupport(bZ);
   ESign charge = getChargeSign();
   return calculateCovarianceMatrix(getLocalHelix(), momentum, charge, bZ);
 }
@@ -316,7 +317,7 @@ double CDCTrajectory3D::getAbsMom3D(const double bZ) const
 
 double CDCTrajectory3D::getAbsMom3D() const
 {
-  Vector3D position = getSupport();
+  ROOT::Math::XYZVector position = getSupport();
   double tanLambda = getLocalHelix()->tanLambda();
   double factor2DTo3D = hypot2(1, tanLambda);
   double curvatureXY = getLocalHelix()->curvatureXY();
@@ -364,7 +365,7 @@ UncertainSZLine CDCTrajectory3D::getLocalSZLine() const
   return getLocalHelix().uncertainSZLine();
 }
 
-double CDCTrajectory3D::setLocalOrigin(const Vector3D& localOrigin)
+double CDCTrajectory3D::setLocalOrigin(const ROOT::Math::XYZVector& localOrigin)
 {
   double arcLength2D = calcArcLength2D(localOrigin);
   double factor2DTo3D = hypot2(1, getTanLambda());

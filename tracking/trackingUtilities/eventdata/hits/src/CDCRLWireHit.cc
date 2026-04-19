@@ -15,8 +15,6 @@
 #include <cdc/topology/EStereoKind.h>
 #include <cdc/topology/ISuperLayer.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>
@@ -106,8 +104,8 @@ CDCRLWireHit CDCRLWireHit::fromSimHit(const CDCWireHit* wirehit,
                                       const CDCSimHit& simhit)
 {
   // find out if the wire is right or left of the track ( view in flight direction )
-  Vector3D trackPosToWire{simhit.getPosWire() - simhit.getPosTrack()};
-  Vector3D directionOfFlight{simhit.getMomentum()};
+  ROOT::Math::XYZVector trackPosToWire{simhit.getPosWire() - simhit.getPosTrack()};
+  ROOT::Math::XYZVector directionOfFlight{simhit.getMomentum()};
 
   ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(VectorUtil::get2DVector(trackPosToWire),
                                                   VectorUtil::get2DVector(directionOfFlight));
@@ -174,7 +172,7 @@ ROOT::Math::XYVector CDCRLWireHit::reconstruct2D(const CDCTrajectory2D& trajecto
   return wirePos2D + disp2D;
 }
 
-Vector3D CDCRLWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const double z) const
+ROOT::Math::XYZVector CDCRLWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const double z) const
 {
   const EStereoKind stereoType = getStereoKind();
   const ERightLeft rlInfo = getRLInfo();
@@ -188,7 +186,7 @@ Vector3D CDCRLWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const 
     const ROOT::Math::XYVector recoPos2D = reconstruct2D(trajectory2D);
     // for axial wire we can not determine the z coordinate by looking at the xy projection only
     // we set it the basic assumption.
-    return Vector3D(recoPos2D, z);
+    return ROOT::Math::XYZVector(recoPos2D.X(), recoPos2D.Y(), z);
   }
 }
 

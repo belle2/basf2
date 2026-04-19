@@ -13,6 +13,7 @@
 
 #include <framework/geometry/VectorUtil.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 using namespace Belle2;
@@ -37,14 +38,14 @@ bool HitGapTrackRelationVarSet::extract(const Relation<const CDCTrack>* ptrTrack
   const CDCRecoHit3D& toFirstHit = toTrack.front();
   const CDCRecoHit3D& toLastHit = toTrack.back();
 
-  const Vector3D fromLastHitPos = fromLastHit.getRecoPos3D();
-  const Vector3D fromFirstHitPos = fromFirstHit.getRecoPos3D();
+  const ROOT::Math::XYZVector& fromLastHitPos = fromLastHit.getRecoPos3D();
+  const ROOT::Math::XYZVector& fromFirstHitPos = fromFirstHit.getRecoPos3D();
 
-  const Vector3D toFirstHitPos = toFirstHit.getRecoPos3D();
-  const Vector3D toLastHitPos = toLastHit.getRecoPos3D();
+  const ROOT::Math::XYZVector& toFirstHitPos = toFirstHit.getRecoPos3D();
+  const ROOT::Math::XYZVector& toLastHitPos = toLastHit.getRecoPos3D();
 
-  const Vector3D hitPosGap = toFirstHitPos - fromLastHitPos;
-  const Vector3D longHitPosGap = toLastHitPos - fromFirstHitPos;
+  const ROOT::Math::XYZVector hitPosGap = toFirstHitPos - fromLastHitPos;
+  const ROOT::Math::XYZVector longHitPosGap = toLastHitPos - fromFirstHitPos;
 
   const double hitDistance = hitPosGap.R();
   const double longHitDistance = longHitPosGap.R();
@@ -70,14 +71,14 @@ bool HitGapTrackRelationVarSet::extract(const Relation<const CDCTrack>* ptrTrack
   finitevar<named("to_hit_forward")>() = VectorUtil::get2DVector(hitPosGap).Dot(toFirstHitMom);
   finitevar<named("hit_forward")>() = VectorUtil::get2DVector(hitPosGap).Dot(VectorUtil::average(fromLastHitMom, toFirstHitMom));
 
-  const Vector3D fromStretch = fromLastHitPos - fromFirstHitPos;
-  const Vector3D toStretch = toLastHitPos - toFirstHitPos;
+  const ROOT::Math::XYZVector fromStretch = fromLastHitPos - fromFirstHitPos;
+  const ROOT::Math::XYZVector toStretch = toLastHitPos - toFirstHitPos;
 
   const double fromLength = fromStretch.R();
   const double toLength = toStretch.R();
 
-  const Vector3D firstPosGap = toFirstHitPos - fromFirstHitPos;
-  const Vector3D lastPosGap = toLastHitPos - fromLastHitPos;
+  const ROOT::Math::XYZVector firstPosGap = toFirstHitPos - fromFirstHitPos;
+  const ROOT::Math::XYZVector lastPosGap = toLastHitPos - fromLastHitPos;
 
   const double firstOffset = firstPosGap.R();
   const double lastOffset = lastPosGap.R();

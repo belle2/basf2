@@ -9,6 +9,7 @@
 #include <tracking/trackFindingCDC/hough/trees/BoxDivisionHoughTree.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
 
+#include <Math/Vector3D.h>
 #include <TGraph.h>
 #include <TF1.h>
 #include <TCanvas.h>
@@ -100,7 +101,7 @@ namespace Belle2 {
         allHitsGraph->SetLineColor(9);
 
         for (const TrackingUtilities::CDCRecoHit3D& recoHit3D : allHits) {
-          const TrackingUtilities::Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
+          const ROOT::Math::XYZVector& recoPos3D = recoHit3D.getRecoPos3D();
           const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
           const double Z = recoPos3D.z();
           allHitsGraph->SetPoint(allHitsGraph->GetN(), R, Z);
@@ -118,7 +119,7 @@ namespace Belle2 {
         foundHitsGraph->SetMarkerColor(2);
 
         for (const TrackingUtilities::CDCRecoHit3D& recoHit3D : foundHits) {
-          const TrackingUtilities::Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
+          const ROOT::Math::XYZVector& recoPos3D = recoHit3D.getRecoPos3D();
           const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
           const double Z = recoPos3D.z();
           foundHitsGraph->SetPoint(foundHitsGraph->GetN(), R, Z);

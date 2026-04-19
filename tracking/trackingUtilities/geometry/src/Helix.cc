@@ -13,8 +13,9 @@
 #include <tracking/trackingUtilities/geometry/SZLine.h>
 #include <tracking/trackingUtilities/geometry/SZParameters.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
+
+#include <Math/Vector3D.h>
 
 #include <boost/math/tools/minima.hpp>
 
@@ -27,7 +28,7 @@
 using namespace Belle2;
 using namespace TrackingUtilities;
 
-double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) const
+double Helix::arcLength2DToClosest(const ROOT::Math::XYZVector& point, bool firstPeriod) const
 {
   // The point may happen to lie in the center of the helix.
   double d0 = circleXY().distance(VectorUtil::get2DVector(point));
@@ -62,7 +63,7 @@ double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) cons
   using boost::math::tools::brent_find_minima;
 
   auto distance3D = [this, &point](const double & s) -> double {
-    Vector3D pos = atArcLength2D(s);
+    ROOT::Math::XYZVector pos = atArcLength2D(s);
     return VectorUtil::Distance(pos, point);
   };
 
@@ -72,7 +73,7 @@ double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) cons
   double upperS = arcLength2D + searchWidth;
 
   int bits = std::numeric_limits<double>::digits;
-  boost::uintmax_t nMaxIter = 100;
+  size_t nMaxIter = 100;
 
   std::pair<double, double> sBounds = brent_find_minima(distance3D, lowerS, upperS, bits, nMaxIter);
 
@@ -88,7 +89,7 @@ double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) cons
   }
 }
 
-HelixJacobian Helix::passiveMoveByJacobian(const Vector3D& by) const
+HelixJacobian Helix::passiveMoveByJacobian(const ROOT::Math::XYZVector& by) const
 {
   // Fills the upper left 3x3 corner.
   PerigeeJacobian perigeeJacobian = circleXY().passiveMoveByJacobian(VectorUtil::get2DVector(by));

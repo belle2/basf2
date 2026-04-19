@@ -11,10 +11,9 @@
 #include <tracking/trackingUtilities/geometry/Helix.h>
 #include <tracking/trackingUtilities/geometry/HelixParameters.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 #include <TMath.h>
@@ -64,7 +63,7 @@ namespace Belle2 {
       }
 
       /// Constructs a trajectory from a local helix taken as relative to the given origin.
-      CDCTrajectory3D(const Vector3D& localOrigin,
+      CDCTrajectory3D(const ROOT::Math::XYZVector& localOrigin,
                       const UncertainHelix& localHelix,
                       double flightTime = NAN)
         : m_localOrigin(localOrigin)
@@ -89,15 +88,15 @@ namespace Belle2 {
        *  Additionally this can takes an explicit bZ value instead of a field value from the
        * instance BFieldMap.
        */
-      CDCTrajectory3D(const Vector3D& pos3D,
+      CDCTrajectory3D(const ROOT::Math::XYZVector& pos3D,
                       double time,
-                      const Vector3D& mom3D,
+                      const ROOT::Math::XYZVector& mom3D,
                       double charge,
                       double bZ);
 
       /// Construct a trajectory with given start point, momentum at the start point and given
       /// charge.
-      CDCTrajectory3D(const Vector3D& pos3D, double time, const Vector3D& mom3D, double charge);
+      CDCTrajectory3D(const ROOT::Math::XYZVector& pos3D, double time, const ROOT::Math::XYZVector& mom3D, double charge);
 
       /// Construct a trajectory from the MCParticles vertex and momentum.
       CDCTrajectory3D(const MCParticle& mcParticle, double bZ);
@@ -163,7 +162,7 @@ namespace Belle2 {
        *  stereo layer of the stereo wires.  The point is determined such that it is at the (signed)
        *  distance to  the wire line.
        */
-      Vector3D reconstruct3D(const CDC::WireLine& wireLine, double distance = 0.0) const;
+      ROOT::Math::XYZVector reconstruct3D(const CDC::WireLine& wireLine, double distance = 0.0) const;
 
       /**
        *  Calculate the travel distance from the start position of the trajectory.
@@ -173,7 +172,7 @@ namespace Belle2 {
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation.
        */
-      double calcArcLength2D(const Vector3D& point) const
+      double calcArcLength2D(const ROOT::Math::XYZVector& point) const
       {
         return getLocalHelix()->circleXY().arcLengthTo(VectorUtil::get2DVector(point - getLocalOrigin()));
       }
@@ -203,32 +202,32 @@ namespace Belle2 {
       double getAbsMom3D() const;
 
       /// Get the momentum at the start point of the trajectory
-      Vector3D getMom3DAtSupport(const double bZ) const
+      ROOT::Math::XYZVector getMom3DAtSupport(const double bZ) const
       {
         return getFlightDirection3DAtSupport() *= getAbsMom3D(bZ);
       }
 
       /// Get the momentum at the start point of the trajectory
-      Vector3D getMom3DAtSupport() const
+      ROOT::Math::XYZVector getMom3DAtSupport() const
       {
         return getFlightDirection3DAtSupport() *= getAbsMom3D();
       }
 
       /// Get the unit momentum at the start point of the trajectory
-      Vector3D getFlightDirection3DAtSupport() const
+      ROOT::Math::XYZVector getFlightDirection3DAtSupport() const
       {
         return getLocalHelix()->tangential();
       }
 
       /// Getter for the support point of the trajectory in global coordinates, where arcLength2D =
       /// 0
-      Vector3D getSupport() const
+      ROOT::Math::XYZVector getSupport() const
       {
         return getLocalHelix()->perigee() + getLocalOrigin();
       }
 
       /// Getter for the closest approach on the trajectory to the global origin
-      Vector3D getGlobalPerigee() const
+      ROOT::Math::XYZVector getGlobalPerigee() const
       {
         return getLocalHelix()->closestXY(-VectorUtil::get2DVector(m_localOrigin)) + m_localOrigin;
       }
@@ -346,7 +345,7 @@ namespace Belle2 {
       }
 
       /// Getter for the origin of the local coordinate system
-      const Vector3D& getLocalOrigin() const
+      const ROOT::Math::XYZVector& getLocalOrigin() const
       {
         return m_localOrigin;
       }
@@ -356,7 +355,7 @@ namespace Belle2 {
        *  This sets the origin point the local helix representation is subjected.
        *  The local helix is changed such that the set of points in global space is not changed.
        */
-      double setLocalOrigin(const Vector3D& localOrigin);
+      double setLocalOrigin(const ROOT::Math::XYZVector& localOrigin);
 
       /// Getter for the time when the particle reached the support point position.
       double getFlightTime() const
@@ -372,7 +371,7 @@ namespace Belle2 {
     private:
       /// Memory for local coordinate origin of the circle representing the trajectory in global
       /// coordinates
-      Vector3D m_localOrigin;
+      ROOT::Math::XYZVector m_localOrigin;
 
       /// Memory for the generalized circle describing the trajectory in coordinates from the local
       /// origin

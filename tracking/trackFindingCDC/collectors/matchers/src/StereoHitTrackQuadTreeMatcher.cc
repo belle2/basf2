@@ -23,6 +23,8 @@
 
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
+#include <Math/Vector3D.h>
+
 #include <utility>
 
 using namespace Belle2;
@@ -107,7 +109,7 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
     const CDCWire& wire = rlWireHit.getWire();
     const WireLine& wireLine = wire.getWireLine();
     double signedDriftLength = rlWireHit.getSignedRefDriftLength();
-    for (const Vector3D& recoPos3D : trajectory2D.reconstructBoth3D(wireLine, signedDriftLength)) {
+    for (const ROOT::Math::XYZVector& recoPos3D : trajectory2D.reconstructBoth3D(wireLine, signedDriftLength)) {
       // Skip hits out of CDC
       if (not wire.isInCellZBounds(recoPos3D, m_param_checkForInWireBoundsFactor)) {
         continue;

@@ -18,6 +18,7 @@
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
+#include <Math/Vector3D.h>
 #include <TDatabasePDG.h>
 
 namespace Belle2 {
@@ -367,8 +368,8 @@ namespace Belle2 {
 
       const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
 
-      TrackingUtilities::Vector3D mom3D{primarySimHit.getMomentum()};
-      TrackingUtilities::Vector3D pos3D{primarySimHit.getPosTrack()};
+      ROOT::Math::XYZVector mom3D{primarySimHit.getMomentum()};
+      ROOT::Math::XYZVector pos3D{primarySimHit.getPosTrack()};
       double time{primarySimHit.getFlightTime()};
 
       int pdgCode = primarySimHit.getPDGCode();

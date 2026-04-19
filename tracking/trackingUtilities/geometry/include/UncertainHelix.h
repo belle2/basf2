@@ -17,6 +17,7 @@
 #include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
 #include <tracking/trackingUtilities/geometry/SZParameters.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 #include <cstddef>
@@ -25,7 +26,6 @@
 namespace Belle2 {
 
   namespace TrackingUtilities {
-    class Vector3D;
 
     /// A general helix class including a covariance matrix.
     class UncertainHelix {
@@ -309,7 +309,7 @@ namespace Belle2 {
     public:
       /// Moves the coordinate system by the vector by and calculates the new perigee and its
       /// covariance matrix. Change is inplace.
-      void passiveMoveBy(const Vector3D& by)
+      void passiveMoveBy(const ROOT::Math::XYZVector& by)
       {
         // Move the covariance matrix first to have access to the original parameters
         HelixJacobian jacobian = m_helix.passiveMoveByJacobian(by);

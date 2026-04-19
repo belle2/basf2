@@ -9,7 +9,6 @@
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/ESign.h>
@@ -36,7 +35,7 @@ CDCRecoHit2D CDCRecoHit2D::fromSimHit(const CDCWireHit* wireHit,
                                       const CDCSimHit& simHit)
 {
   // find out if the wire is right or left of the track ( view in flight direction )
-  Vector3D trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};
+  ROOT::Math::XYZVector trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};
   CDCRecoHit2D recoHit2D(CDCRLWireHit::fromSimHit(wireHit, simHit),
                          ROOT::Math::XYVector(-trackPosToWire.x(), -trackPosToWire.y()));
 
@@ -128,7 +127,7 @@ void CDCRecoHit2D::snapToDriftCircle(bool switchSide)
   }
 }
 
-Vector3D CDCRecoHit2D::reconstruct3D(const CDCTrajectory2D& trajectory2D, double z) const
+ROOT::Math::XYZVector CDCRecoHit2D::reconstruct3D(const CDCTrajectory2D& trajectory2D, double z) const
 {
   return getRLWireHit().reconstruct3D(trajectory2D, z);
 }

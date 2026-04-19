@@ -9,7 +9,6 @@
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 
@@ -19,6 +18,7 @@
 #include <framework/geometry/VectorUtil.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 namespace Belle2 {
@@ -57,7 +57,7 @@ namespace Belle2 {
       CDCRecoHit3D() = default;
 
       /// Constructor taking all stored variables of the reconstructed hit.
-      CDCRecoHit3D(const CDCRLWireHit& rlWireHit, const Vector3D& recoPos3D, double arcLength2D = 0);
+      CDCRecoHit3D(const CDCRLWireHit& rlWireHit, const ROOT::Math::XYZVector& recoPos3D, double arcLength2D = 0);
 
       /**
        *  Constructs a three dimensional reconstructed hit from a sim hit and the associated wirehit.
@@ -284,13 +284,13 @@ namespace Belle2 {
       }
 
       /// Getter for the 3d position of the hit.
-      const Vector3D& getRecoPos3D() const
+      const ROOT::Math::XYZVector& getRecoPos3D() const
       {
         return m_recoPos3D;
       }
 
       /// Setter for the 3d position of the hit.
-      void setRecoPos3D(const Vector3D& recoPos3D)
+      void setRecoPos3D(const ROOT::Math::XYZVector& recoPos3D)
       {
         m_recoPos3D = recoPos3D;
       }
@@ -393,7 +393,7 @@ namespace Belle2 {
       CDCRLWireHit m_rlWireHit;
 
       /// Memory for the reconstructed hit position.
-      Vector3D m_recoPos3D;
+      ROOT::Math::XYZVector m_recoPos3D;
 
       /// Memory for the travel distance as see in the xy projection.
       double m_arcLength2D = 0;

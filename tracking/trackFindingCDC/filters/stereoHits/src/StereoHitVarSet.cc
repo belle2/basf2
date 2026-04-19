@@ -19,6 +19,7 @@
 
 #include <cdc/dataobjects/CDCHit.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 #include <numeric>
@@ -43,7 +44,7 @@ bool StereoHitVarSet::extract(const BaseStereoHitFilter::Object* testPair)
   const ROOT::Math::XYVector& startMomentum = trajectory2D.getMom2DAtSupport();
   const double radius = trajectory2D.getLocalCircle()->radius();
   const double size = track->size();
-  const Vector3D& reconstructedPosition = recoHit3D.getRecoPos3D();
+  const ROOT::Math::XYZVector& reconstructedPosition = recoHit3D.getRecoPos3D();
   const double reconstructedDriftLength = recoHit3D.getSignedRecoDriftLength();
   const double reconstructedS = recoHit3D.getArcLength2D();
   const unsigned short int adcCount = rlWireHit->getWireHit().getHit()->getADCCount();

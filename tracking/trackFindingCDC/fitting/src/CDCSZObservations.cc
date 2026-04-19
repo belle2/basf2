@@ -17,6 +17,7 @@
 
 #include <framework/logging/Logger.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 using namespace Belle2;
@@ -54,7 +55,7 @@ std::size_t CDCSZObservations::append(const CDCRecoHit3D& recoHit3D)
     // by the taking the projected wire vector part parallel to the displacement
     // as a proportionality factor to the z direction.
     const CDCWire& wire = recoHit3D.getWire();
-    const Vector3D& wireVector = wire.getWireVector();
+    const ROOT::Math::XYZVector& wireVector = wire.getWireVector();
     const ROOT::Math::XYVector disp2D = recoHit3D.getRecoDisp2D();
     const double driftlengthVariance = recoHit3D.getRecoDriftLengthVariance();
 

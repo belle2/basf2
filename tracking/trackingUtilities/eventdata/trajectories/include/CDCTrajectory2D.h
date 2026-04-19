@@ -12,12 +12,12 @@
 #include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 #include <TMath.h>
@@ -117,7 +117,7 @@ namespace Belle2 {
        *  @param distance  The desired distance from the wire line a.k.a. drift length
        *  @param z         The expected value of z to which to closest solution should be selected.
        */
-      std::array<Vector3D, 2> reconstructBoth3D(const CDC::WireLine& wireLine, double distance = 0.0, double z = 0) const;
+      std::array<ROOT::Math::XYZVector, 2> reconstructBoth3D(const CDC::WireLine& wireLine, double distance = 0.0, double z = 0) const;
 
       /**
        *  Gives the one three dimensional positions within the CDC  closest to the given z
@@ -131,7 +131,7 @@ namespace Belle2 {
        *  @param distance  The desired distance from the wire line a.k.a. drift length
        *  @param z         The expected value of z to which to closest solution should be selected.
        */
-      Vector3D reconstruct3D(const CDC::WireLine& wireLine, double distance = 0.0, double z = 0) const;
+      ROOT::Math::XYZVector reconstruct3D(const CDC::WireLine& wireLine, double distance = 0.0, double z = 0) const;
 
       /// Calculates the closest approach on the trajectory to the given point
       ROOT::Math::XYVector getClosest(const ROOT::Math::XYVector& point) const;

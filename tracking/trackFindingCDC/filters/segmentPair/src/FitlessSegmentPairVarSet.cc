@@ -16,6 +16,7 @@
 
 #include <framework/geometry/VectorUtil.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 using namespace Belle2;
@@ -114,11 +115,11 @@ bool FitlessSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const CDCWire& nearStereoWire = nearStereoHit.getWire();
   const WireLine& nearWireLine = nearStereoWire.getWireLine();
 
-  const Vector3D nearAxialRecoPos = nearAxialHit.reconstruct3D(axialFit);
-  const Vector3D farStereoRecoPos = farStereoHit.reconstruct3D(axialFit);
+  const ROOT::Math::XYZVector nearAxialRecoPos = nearAxialHit.reconstruct3D(axialFit);
+  const ROOT::Math::XYZVector farStereoRecoPos = farStereoHit.reconstruct3D(axialFit);
   const double farZ = farStereoRecoPos.z();
 
-  const Vector3D nearStereoRecoPos = nearStereoHit.reconstruct3D(axialFit);
+  const ROOT::Math::XYZVector nearStereoRecoPos = nearStereoHit.reconstruct3D(axialFit);
   const double nearZ = nearStereoRecoPos.z();
 
   const double stereoArcLength2D =

@@ -8,7 +8,6 @@
 #include <tracking/ckf/general/filters/NonIPCrossingStateFilter.dcl.h>
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
@@ -20,6 +19,7 @@
 #include <framework/core/ModuleParamList.h>
 
 #include <Math/Vector2D.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   template <class AllStateFilter>
@@ -47,13 +47,13 @@ namespace Belle2 {
       }
     }();
 
-    const TrackingUtilities::Vector3D& position = static_cast<TrackingUtilities::Vector3D>(firstMeasurement.getPos());
-    const TrackingUtilities::Vector3D& momentum = static_cast<TrackingUtilities::Vector3D>(firstMeasurement.getMom());
+    const ROOT::Math::XYZVector& position = static_cast<ROOT::Math::XYZVector>(firstMeasurement.getPos());
+    const ROOT::Math::XYZVector& momentum = static_cast<ROOT::Math::XYZVector>(firstMeasurement.getMom());
 
     const TrackingUtilities::CDCTrajectory2D trajectory2D(VectorUtil::get2DVector(position), 0, VectorUtil::get2DVector(momentum),
                                                           cdcTrack->getChargeSeed());
 
-    const TrackingUtilities::Vector3D& hitPosition = static_cast<TrackingUtilities::Vector3D>(spacePoint->getPosition());
+    const ROOT::Math::XYZVector& hitPosition = spacePoint->getPosition();
     const ROOT::Math::XYVector origin(0, 0);
 
     const double deltaArcLengthHitOrigin = trajectory2D.calcArcLength2DBetween(VectorUtil::get2DVector(hitPosition), origin);

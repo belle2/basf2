@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 
 #include <Math/Vector2D.h>
+#include <Math/Vector3D.h>
 
 #include <gtest/gtest.h>
 
@@ -46,17 +47,17 @@ TEST(TrackingUtilitiesTest, eventdata_trajectories_CDCTrajectory2D_constructorPo
 
 TEST(TrackingUtilitiesTest, eventdata_trajectories_CDCTrajectory2D_reconstruct)
 {
-  Vector3D forward(-1.0, 1.0, 10.0);
-  Vector3D backward(1.0, 1.0, -10.0);
+  ROOT::Math::XYZVector forward(-1.0, 1.0, 10.0);
+  ROOT::Math::XYZVector backward(1.0, 1.0, -10.0);
   WireLine wireLine(forward, backward, 0);
 
   double localPhi0 = M_PI / 3;
   double localCurv = -2.0;
   double localImpact = 0.0;
   UncertainPerigeeCircle localPerigeeCircle(localCurv, localPhi0, localImpact);
-  Vector3D localOrigin(0.5, 1, -5);
+  ROOT::Math::XYZVector localOrigin(0.5, 1, -5);
 
-  Vector3D positionOnWire = wireLine.nominalPos3DAtZ(localOrigin.z());
+  ROOT::Math::XYZVector positionOnWire = wireLine.nominalPos3DAtZ(localOrigin.z());
   EXPECT_NEAR(localOrigin.x(), positionOnWire.x(), 10e-7);
   EXPECT_NEAR(localOrigin.y(), positionOnWire.y(), 10e-7);
   EXPECT_NEAR(localOrigin.z(), positionOnWire.z(), 10e-7);
@@ -73,7 +74,7 @@ TEST(TrackingUtilitiesTest, eventdata_trajectories_CDCTrajectory2D_reconstruct)
   EXPECT_NEAR(localOrigin.x(), extrapolation2D.x(), 10e-7);
   EXPECT_NEAR(localOrigin.y(), extrapolation2D.y(), 10e-7);
 
-  Vector3D recoPos3D = trajectory2D.reconstruct3D(wireLine);
+  ROOT::Math::XYZVector recoPos3D = trajectory2D.reconstruct3D(wireLine);
   B2INFO(trajectory2D);
   B2INFO(recoPos3D);
 

@@ -127,7 +127,8 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
       CDCRecoHit2D recoHit2D = simHitLookUp.getClosestPrimaryRecoHit2D(ptrHit, inputWireHits);
       if (not recoHit2D.isAxial()) continue;
 
-      CDCRecoHit3D recoHit3D(recoHit2D.getRLWireHit(), {recoHit2D.getRecoPos2D(), 0}, NAN);
+      const auto& tmp = recoHit2D.getRecoPos2D();
+      CDCRecoHit3D recoHit3D(recoHit2D.getRLWireHit(), {tmp.X(), tmp.Y(), 0}, NAN);
       axialTrack.push_back(recoHit3D);
     }
 

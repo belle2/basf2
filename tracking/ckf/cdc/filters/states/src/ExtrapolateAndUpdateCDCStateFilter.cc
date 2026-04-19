@@ -18,18 +18,20 @@
 
 #include <framework/core/ModuleParamList.h>
 
+#include <Math/Vector3D.h>
+
 using namespace Belle2;
 
 namespace {
   TrackingUtilities::ERightLeft setRLInfo(const genfit::MeasuredStateOnPlane& mSoP, CDCCKFState& state)
   {
-    const auto& mom = TrackingUtilities::Vector3D(mSoP.getMom());
+    const auto& mom = ROOT::Math::XYZVector(mSoP.getMom());
     const auto& wire = state.getWireHit()->getWire();
 
-    const auto& trackPosition = TrackingUtilities::Vector3D(mSoP.getPos());
+    const auto& trackPosition = ROOT::Math::XYZVector(mSoP.getPos());
     const auto& hitPosition = wire.getWirePos3DAtZ(trackPosition.z());
 
-    TrackingUtilities::Vector3D trackPosToWire{hitPosition - trackPosition};
+    ROOT::Math::XYZVector trackPosToWire{hitPosition - trackPosition};
     TrackingUtilities::ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(VectorUtil::get2DVector(trackPosToWire),
                                            VectorUtil::get2DVector(mom));
 

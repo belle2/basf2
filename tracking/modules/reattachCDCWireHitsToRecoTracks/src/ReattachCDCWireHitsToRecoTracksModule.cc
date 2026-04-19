@@ -8,7 +8,6 @@
 #include <tracking/modules/reattachCDCWireHitsToRecoTracks/ReattachCDCWireHitsToRecoTracksModule.h>
 
 #include <cdc/topology/CDCWire.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
@@ -16,6 +15,7 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <tracking/dbobjects/DAFConfiguration.h>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
 
 using namespace Belle2;
@@ -80,8 +80,8 @@ void ReattachCDCWireHitsToRecoTracksModule::findHits()
 
   for (RecoTrack& recoTrack : m_inputRecoTracks) {
     // only fit tracks coming from the IP (d0 and z0 from Helix)
-    const Vector3D trackPosition(recoTrack.getPositionSeed());
-    const Vector3D trackMomentum(recoTrack.getMomentumSeed());
+    const ROOT::Math::XYZVector trackPosition(recoTrack.getPositionSeed());
+    const ROOT::Math::XYZVector trackMomentum(recoTrack.getMomentumSeed());
     const CDCTrajectory3D trajectory(trackPosition, recoTrack.getTimeSeed(), trackMomentum, recoTrack.getChargeSeed());
     const CDCTrajectory2D& trajectory2D(trajectory.getTrajectory2D());
     const CDCTrajectorySZ& trajectorySZ(trajectory.getTrajectorySZ());
@@ -235,8 +235,8 @@ ReattachCDCWireHitsToRecoTracksModule::ReconstructionResults ReattachCDCWireHits
   try {
 
     const genfit::MeasuredStateOnPlane& mSoP(recoTrack.getMeasuredStateOnPlaneFromRecoHit(recoHitInformation));
-    const Vector3D trackPosition(mSoP.getPos());
-    const Vector3D trackMomentum(mSoP.getMom());
+    const ROOT::Math::XYZVector trackPosition(mSoP.getPos());
+    const ROOT::Math::XYZVector trackMomentum(mSoP.getMom());
     const CDCTrajectory3D trajectory(trackPosition, mSoP.getTime(), trackMomentum, mSoP.getCharge());
 
     const CDCTrajectory2D& trajectory2D(trajectory.getTrajectory2D());
@@ -268,9 +268,9 @@ ReattachCDCWireHitsToRecoTracksModule::ReconstructionResults ReattachCDCWireHits
     results.z =  trajectorySZ.mapSToZ(results.arcLength);
     results.distanceToTrack = trajectory2D.getDist2D(recoPos2D);
 
-    const Vector3D hitPosition(wireHit.getWire().getWirePos3DAtZ(trackPosition.z()));
+    const ROOT::Math::XYZVector hitPosition(wireHit.getWire().getWirePos3DAtZ(trackPosition.z()));
 
-    Vector3D trackPosToWire{hitPosition - trackPosition};
+    ROOT::Math::XYZVector trackPosToWire{hitPosition - trackPosition};
     results.rlInfo =  VectorUtil::isRightOrLeftOf(VectorUtil::get2DVector(trackPosToWire), VectorUtil::get2DVector(trackMomentum));
 
     results.isValid = true;

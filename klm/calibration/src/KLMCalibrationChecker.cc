@@ -601,8 +601,11 @@ void KLMCalibrationChecker::checkEventT0HitResolution()
     KLMEventT0HitResolution::c_RPCZ,
   };
   for (int cat : categories) {
+    // cppcheck-suppress unreadVariable; bound to TTree branch above
     category = cat;
+    // cppcheck-suppress unreadVariable; bound to TTree branch above
     sigma = eventT0HitResolution->getSigma(cat);
+    // cppcheck-suppress unreadVariable; bound to TTree branch above
     sigmaErr = eventT0HitResolution->getSigmaErr(cat);
     resolutionTree->Fill();
   }

@@ -131,8 +131,8 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
   double closestOrthogonal = VectorUtil::Cross(n12(), point) / gradientAtPoint.R();
 
   // component of closest approach parallel to coordinateSystem - two solutions expected
-  double nOrthogonal = n12().unnormalizedOrthogonalComp(coordinateSystem);
-  double nParallel = n12().unnormalizedParallelComp(coordinateSystem);
+  double nOrthogonal = VectorUtil::unnormalizedOrthogonalComp(n12(), coordinateSystem);
+  double nParallel = VectorUtil::unnormalizedParallelComp(n12(), coordinateSystem);
 
   double closestParallel = 0.0;
   if (isLine()) {
@@ -146,7 +146,7 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
     const std::pair<double, double> closestParallel12 = solveQuadraticABC(a, b, c);
 
     // take the solution with smaller distance to point
-    const double pointParallel = point.unnormalizedParallelComp(coordinateSystem);
+    const double pointParallel = VectorUtil::unnormalizedParallelComp(point, coordinateSystem);
 
     const double criterion1 =
       closestParallel12.first * (closestParallel12.first - 2 * pointParallel);
@@ -339,8 +339,8 @@ GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) con
 
   // Use symmetric solution and use all input parameters
   Vector2D mn12 = n12 + m12;
-  double mn12Parallel = unitC.unnormalizedParallelComp(mn12);
-  double mn12Orthogonal = unitC.unnormalizedOrthogonalComp(mn12);
+  double mn12Parallel = VectorUtil::unnormalizedParallelComp(unitC, mn12);
+  double mn12Orthogonal = VectorUtil::unnormalizedOrthogonalComp(unitC, mn12);
 
   double a = m3 + n3;
   double b = mn12Orthogonal;

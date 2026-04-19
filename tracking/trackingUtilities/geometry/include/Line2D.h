@@ -289,7 +289,7 @@ namespace Belle2 {
       Vector2D closest(const Vector2D& point) const
       {
         const double closestParallel = -n0();
-        const double closestOrthgonal = point.unnormalizedOrthogonalComp(n12());
+        const double closestOrthgonal = VectorUtil::unnormalizedOrthogonalComp(point, n12());
         return VectorUtil::compose(n12(), closestParallel, closestOrthgonal);
       }
 
@@ -308,7 +308,7 @@ namespace Belle2 {
        */
       double lengthOnCurve(const Vector2D& from, const Vector2D& to) const
       {
-        return to.unnormalizedOrthogonalComp(n12()) - from.unnormalizedOrthogonalComp(n12());
+        return VectorUtil::unnormalizedOrthogonalComp(to, n12()) - VectorUtil::unnormalizedOrthogonalComp(from, n12());
       }
 
       /// Indicates if all circle parameters are zero
@@ -363,7 +363,7 @@ namespace Belle2 {
       /// Actively moves the line in the direction given in place by the vector given
       void moveBy(const Vector2D& by)
       {
-        m_n0 -= by.unnormalizedParallelComp(n12());
+        m_n0 -= VectorUtil::unnormalizedParallelComp(by, n12());
       }
 
       /// Actively moves the line in the direction given in place along the first coordinate
@@ -393,7 +393,7 @@ namespace Belle2 {
       /// Passively move the coordinate system  in place by the given vector
       void passiveMoveBy(const Vector2D& by)
       {
-        m_n0 += by.unnormalizedParallelComp(n12());
+        m_n0 += VectorUtil::unnormalizedParallelComp(by, n12());
       }
 
       /// Passively move the coordinate system in place along the first coordinate

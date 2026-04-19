@@ -274,26 +274,12 @@ namespace Belle2 {
         return Vector3D(xy() - rhs.xy(), z() - rhs.z());
       }
 
-      /// Calculates the component parallel to the given vector
-      double parallelComp(const Vector3D& relativTo) const
-      {
-        return relativTo.Dot(*this) / relativTo.R();
-      }
-
       /// Same as parallelComp() but assumes the given vector to be of unit length.
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
        *  a costly computation of the vector R()*/
       double unnormalizedParallelComp(const Vector3D& relativTo) const
       {
         return relativTo.Dot(*this);
-      }
-
-      /// Same as orthogonalComp() but assumes the given vector to be of unit length
-      /** This assumes the given vector relativeTo to be of unit length and avoids \n
-       *  a costly computation of the vector R()*/
-      double unnormalizedOrthogonalComp(const Vector3D& relativTo) const
-      {
-        return relativTo.cross(*this).R();
       }
 
       /// Passively moves the vector inplace by the given vector

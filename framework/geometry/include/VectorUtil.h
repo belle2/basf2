@@ -153,13 +153,14 @@ namespace Belle2 {
      * {
      *   return relativTo.scaled(relativTo.cross(*this) / relativTo.normSquared()).orthogonal();
      * }
-     * with v2 = relativTo and v1 = *this.
+     * with v1 = *this.
      */
-    inline ROOT::Math::XYVector orthogonalVector(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& v2)
+    inline ROOT::Math::XYVector orthogonalVector(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& relativTo)
     {
-      const double cross = Cross(v2, v1);                         // = relativTo.cross(*this)
-      const ROOT::Math::XYVector tmp = v2 * (cross / v2.Mag2());  // = relativTo.scaled(cross / relativTo.normSquared())
-      return Orthogonal(tmp);                                     // = .orthogonal()
+      const double cross = Cross(relativTo, v1);                                // = relativTo.cross(*this)
+      const ROOT::Math::XYVector tmp = relativTo * (cross / relativTo.Mag2());  // = relativTo.scaled(cross / relativTo.normSquared())
+      return Orthogonal(tmp);                                                   // = .orthogonal()
+
     }
 
     /**

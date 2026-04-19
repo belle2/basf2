@@ -152,6 +152,42 @@ namespace Belle2 {
       return (from - to).R();
     }
 
+    /** This assumes the given vector relativeTo to be of unit length and avoids \n
+     *  a costly computation of the vector R()
+     *  The previous implementation was
+     *     relativTo.Dot(*this)
+     *  Setting v1 = *this
+     */
+    template<class Vector>
+    inline double unnormalizedParallelComp(const Vector& v1, const Vector& relativTo)
+    {
+      return relativTo.Dot(v1);
+    }
+
+    /// Calculates the component orthogonal to the given vector
+    /** The orthogonal component is the component parallel to relativeTo.orthogonal()
+     *  The previous implementation was
+     *    relativeTo.cross(*this) / relativTo.R()
+     *  with v1 = *this
+     */
+    template<class Vector>
+    inline double orthogonalComp(const Vector& v1, const Vector& relativTo)
+    {
+      return Cross(relativTo, v1) / relativTo.R();
+    }
+
+    /// Same as orthogonalComp() but assumes the given vector to be of unit length
+    /** This assumes the given vector relativeTo to be of unit length and avoids \n
+     *  a costly computation of the vector R()
+     *  The previous implementation was
+     *    relativeTo.cross(*this) / relativTo.R()
+     *  with v1 = *this
+     */
+    inline double unnormalizedOrthogonalComp(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& relativTo)
+    {
+      return Cross(relativTo, v1);
+    }
+
   } // namespace VectorUtil
 
 } // namespace Belle2

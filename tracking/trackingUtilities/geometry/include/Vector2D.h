@@ -213,46 +213,11 @@ namespace Belle2 {
         return Vector2D(x() - rhs.X(), y() - rhs.Y());
       }
 
-      /// Calculates the component parallel to the given vector
-      double parallelComp(const Vector2D& relativTo) const
-      {
-        return relativTo.Dot(*this) / relativTo.R();
-      }
-
-      /// Same as parallelComp() but assumes the given vector to be of unit length.
-      /** This assumes the given vector relativeTo to be of unit length and avoids \n
-       *  a costly computation of the vector R()*/
-      double unnormalizedParallelComp(const Vector2D& relativTo) const
-      {
-        return relativTo.Dot(*this);
-      }
-
-      /// Calculates the component orthogonal to the given vector
-      /** The orthogonal component is the component parallel to relativeTo.orthogonal() */
-      double orthogonalComp(const Vector2D& relativTo) const
-      {
-        return VectorUtil::Cross(relativTo, *this) / relativTo.R();
-      }
-
-      /// Calculates the part of this vector that is parallel to the given vector
-      Vector2D orthogonalVector(const Vector2D& relativTo) const
-      {
-        return VectorUtil::Orthogonal(relativTo.scaled(VectorUtil::Cross(relativTo, *this) / relativTo.Mag2()));
-      }
-
-      /// Same as orthogonalComp() but assumes the given vector to be of unit length
-      /** This assumes the given vector relativeTo to be of unit length and avoids \n
-       *  a costly computation of the vector R()*/
-      double unnormalizedOrthogonalComp(const Vector2D& relativTo) const
-      {
-        return VectorUtil::Cross(relativTo, *this);
-      }
-
       /// Indicates if the given vector is more left or more right if you looked in the direction of
       /// this vector.
       ERightLeft isRightOrLeftOf(const Vector2D& rhs) const
       {
-        return static_cast<ERightLeft>(-sign(unnormalizedOrthogonalComp(rhs)));
+        return static_cast<ERightLeft>(-sign(VectorUtil::unnormalizedOrthogonalComp(*this, rhs)));
       }
 
       /// Indicates if the given vector is more left if you looked in the direction of this vector.
@@ -271,7 +236,7 @@ namespace Belle2 {
       /// the direction of this vector.
       ERotation isCCWOrCWOf(const Vector2D& rhs) const
       {
-        return static_cast<ERotation>(sign(unnormalizedOrthogonalComp(rhs)));
+        return static_cast<ERotation>(sign(VectorUtil::unnormalizedOrthogonalComp(*this, rhs)));
       }
 
       /// Indicates if the given vector is more counterclockwise if you looked in the direction of
@@ -292,7 +257,7 @@ namespace Belle2 {
       /// of this vector.
       EForwardBackward isForwardOrBackwardOf(const Vector2D& rhs) const
       {
-        return static_cast<EForwardBackward>(sign(unnormalizedParallelComp(rhs)));
+        return static_cast<EForwardBackward>(sign(VectorUtil::unnormalizedParallelComp(*this, rhs)));
       }
 
       /// Indicates if the given vector is more coaligned if you looked in the direction of this
@@ -370,7 +335,7 @@ namespace Belle2 {
        *  @param phiVec *Unit* vector marking the x axes of the new rotated coordinate system*/
       Vector2D passiveRotatedBy(const Vector2D& phiVec) const
       {
-        return Vector2D(unnormalizedParallelComp(phiVec), unnormalizedOrthogonalComp(phiVec));
+        return Vector2D(VectorUtil::unnormalizedParallelComp(*this, phiVec), VectorUtil::unnormalizedOrthogonalComp(*this, phiVec));
       }
 
       /// Getter for the x coordinate

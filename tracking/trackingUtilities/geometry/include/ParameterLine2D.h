@@ -199,7 +199,7 @@ namespace Belle2 {
        *  for the right side of the line and negative for the left side. */
       double distance(const Vector2D& point) const
       {
-        return distanceToOrigin() - point.orthogonalComp(tangential());
+        return distanceToOrigin() - VectorUtil::orthogonalComp(point, tangential());
       }
 
       /// Calculates the signed distance of the point given by its to coordinates to the line.
@@ -213,7 +213,7 @@ namespace Belle2 {
       /// Gives the signed distance of the origin
       double distanceToOrigin() const
       {
-        return support().orthogonalComp(tangential());
+        return VectorUtil::orthogonalComp(support(), tangential());
       }
 
       /// Gives the unsigned distance of a point to the line

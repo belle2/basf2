@@ -118,14 +118,6 @@ namespace Belle2 {
         return x() * rhs.x() + y() * rhs.y();
       }
 
-      /// Calculated the three dimensional cross product.
-      Vector3D cross(const Vector3D& rhs) const
-      {
-        return Vector3D(y() * rhs.z() - z() * rhs.y(),
-                        z() * rhs.x() - x() * rhs.z(),
-                        x() * rhs.y() - y() * rhs.x());
-      }
-
       /// Calculates the squared length of the vector
       double Mag2() const
       {

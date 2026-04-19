@@ -8,6 +8,7 @@
 #include <tracking/ckf/cdc/filters/states/ExtrapolateAndUpdateCDCStateFilter.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
@@ -29,7 +30,7 @@ namespace {
     const auto& hitPosition = wire.getWirePos3DAtZ(trackPosition.z());
 
     TrackingUtilities::Vector3D trackPosToWire{hitPosition - trackPosition};
-    TrackingUtilities::ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(mom.xy());
+    TrackingUtilities::ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(trackPosToWire.xy(), mom.xy());
 
     state.setRLinfo(rlInfo);
     return rlInfo;

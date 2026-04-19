@@ -110,7 +110,7 @@ CDCRLWireHit CDCRLWireHit::fromSimHit(const CDCWireHit* wirehit,
   Vector3D trackPosToWire{simhit.getPosWire() - simhit.getPosTrack()};
   Vector3D directionOfFlight{simhit.getMomentum()};
 
-  ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
+  ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(trackPosToWire.xy(), directionOfFlight.xy());
 
   CDCRLWireHit rlWireHit(wirehit, rlInfo, simhit.getDriftLength(), CDCWireHit::c_simpleDriftLengthVariance);
 

@@ -89,10 +89,10 @@ namespace Belle2 {
 
         // Allow containment to keep the reversal symmetry
         if (phi0CurvBox->isIn<1>(curvature)) {
-          return phi0Vec.isBetween(lowerPhi0Vec, upperPhi0Vec);
+          return VectorUtil::isBetween(phi0Vec, lowerPhi0Vec, upperPhi0Vec);
 
         } else if (phi0CurvBox->isIn<1>(-curvature)) {
-          return (-phi0Vec).isBetween(lowerPhi0Vec, upperPhi0Vec);
+          return VectorUtil::isBetween(-phi0Vec, lowerPhi0Vec, upperPhi0Vec);
 
         } else {
           return false;

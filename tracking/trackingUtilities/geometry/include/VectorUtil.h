@@ -8,7 +8,9 @@
 
 #pragma once
 
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
+#include <tracking/trackingUtilities/numerics/ESign.h>
 
 /* ROOT headers. */
 #include <Math/Vector3D.h>
@@ -196,6 +198,59 @@ namespace Belle2 {
       return ROOT::Math::XYVector(unnormalizedParallelComp(v1, phiVec), unnormalizedOrthogonalComp(v1, phiVec));
     }
 
+    /// Indicates if the given vector rhs is more left or more right if you looked in the direction of
+    /// this vector toCheck.
+    inline TrackingUtilities::ERightLeft isRightOrLeftOf(const ROOT::Math::XYVector& toCheck, const ROOT::Math::XYVector& rhs)
+    {
+      return static_cast<TrackingUtilities::ERightLeft>(-TrackingUtilities::sign(unnormalizedOrthogonalComp(toCheck, rhs)));
+    }
+
+    /// Indicates if the given vector rhs is more left if you looked in the direction of this vector .
+    inline bool isLeftOf(const ROOT::Math::XYVector& toCheck, const ROOT::Math::XYVector& rhs)
+    {
+      return isRightOrLeftOf(toCheck, rhs) == TrackingUtilities::ERightLeft::c_Left;
+    }
+
+    /// Indicates if the given vector rhs is more right if you looked in the direction of this vector toCheck.
+    inline bool isRightOf(const ROOT::Math::XYVector& toCheck, const ROOT::Math::XYVector& rhs)
+    {
+      return isRightOrLeftOf(toCheck, rhs) == TrackingUtilities::ERightLeft::c_Right;
+    }
+
+    /// Check if three values have the same sign.
+    inline bool sameSign(float n1, float n2, float n3)
+    {
+      return ((n1 > 0 and n2 > 0 and n3 > 0) or (n1 < 0 and n2 < 0 and n3 < 0));
+    }
+
+    /** Checks if this vector is between two other vectors
+     *  Between means here that when rotating the lower vector (first argument)
+     *  mathematically positively it becomes coaligned with this vector before
+     *  it becomes coalgined with the other vector.
+     */
+    inline bool isBetween(const ROOT::Math::XYVector& toCheck, const ROOT::Math::XYVector& lower, const ROOT::Math::XYVector& upper)
+    {
+      // Set up a linear (nonorthogonal) transformation that maps
+      // lower -> (1, 0)
+      // upper -> (0, 1)
+      // Check whether this transformation is orientation conserving
+      // If yes this vector must lie in the first quadrant to be between lower and upper
+      // If no it must lie in some other quadrant.
+      const double det = Cross(lower, upper);
+      if (det == 0) {
+        // lower and upper are coaligned
+        return isRightOf(toCheck, lower) and isLeftOf(toCheck, upper);
+      } else {
+        const bool flipsOrientation = det < 0;
+        const double transformedX = Cross(toCheck, upper);
+        const double transformedY = -Cross(toCheck, lower);
+        bool inFirstQuadrant = sameSign(det, transformedX, transformedY);
+        if (flipsOrientation) {
+          inFirstQuadrant = not inFirstQuadrant;
+        }
+        return inFirstQuadrant;
+      }
+    }
   } // namespace VectorUtil
 
 } // namespace Belle2

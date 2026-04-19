@@ -10,7 +10,6 @@
 #include <tracking/trackingUtilities/numerics/Quadratic.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
-#include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
@@ -213,25 +212,6 @@ namespace Belle2 {
         return Vector2D(x() - rhs.X(), y() - rhs.Y());
       }
 
-      /// Indicates if the given vector is more left or more right if you looked in the direction of
-      /// this vector.
-      ERightLeft isRightOrLeftOf(const Vector2D& rhs) const
-      {
-        return static_cast<ERightLeft>(-sign(VectorUtil::unnormalizedOrthogonalComp(*this, rhs)));
-      }
-
-      /// Indicates if the given vector is more left if you looked in the direction of this vector.
-      bool isLeftOf(const Vector2D& rhs) const
-      {
-        return isRightOrLeftOf(rhs) == ERightLeft::c_Left;
-      }
-
-      /// Indicates if the given vector is more right if you looked in the direction of this vector.
-      bool isRightOf(const Vector2D& rhs) const
-      {
-        return isRightOrLeftOf(rhs) == ERightLeft::c_Right;
-      }
-
       /// Indicates if the given vector is more counterclockwise or more clockwise if you looked in
       /// the direction of this vector.
       ERotation isCCWOrCWOf(const Vector2D& rhs) const
@@ -274,44 +254,7 @@ namespace Belle2 {
         return isForwardOrBackwardOf(rhs) == EForwardBackward::c_Backward;
       }
 
-    private:
-      /// Check if three values have the same sign.
-      static bool sameSign(float n1, float n2, float n3)
-      {
-        return ((n1 > 0 and n2 > 0 and n3 > 0) or (n1 < 0 and n2 < 0 and n3 < 0));
-      }
-
     public:
-      /** Checks if this vector is between two other vectors
-       *  Between means here that when rotating the lower vector (first argument)
-       *  mathematically positively it becomes coaligned with this vector before
-       *  it becomes coalgined with the other vector.
-       */
-      bool isBetween(const Vector2D& lower, const Vector2D& upper) const
-      {
-        // Set up a linear (nonorthogonal) transformation that maps
-        // lower -> (1, 0)
-        // upper -> (0, 1)
-        // Check whether this transformation is orientation conserving
-        // If yes this vector must lie in the first quadrant to be between lower and upper
-        // If no it must lie in some other quadrant.
-        double det = VectorUtil::Cross(lower, upper);
-        if (det == 0) {
-          // lower and upper are coaligned
-          return isRightOf(lower) and isLeftOf(upper);
-        } else {
-          bool flipsOrientation = det < 0;
-
-          double transformedX = cross(upper);
-          double transformedY = -cross(lower);
-          bool inFirstQuadrant = sameSign(det, transformedX, transformedY);
-          if (flipsOrientation) {
-            inFirstQuadrant = not inFirstQuadrant;
-          }
-          return inFirstQuadrant;
-        }
-      }
-
       /// Gives the azimuth angle being the angle to the x axes ( range -M_PI to M_PI )
       double phi() const
       {

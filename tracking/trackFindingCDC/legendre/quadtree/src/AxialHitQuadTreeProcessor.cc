@@ -292,7 +292,7 @@ bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* 
   const Vector2D& thetaVecMin = m_cosSinLookupTable->at(thetaMin);
   const Vector2D& thetaVecMax = m_cosSinLookupTable->at(thetaMax);
 
-  if (not pos2D.isBetween(thetaVecMin, thetaVecMax)) return false;
+  if (not VectorUtil::isBetween(pos2D, thetaVecMin, thetaVecMax)) return false;
 
   // compute sinograms at the position
   double r = pos2D.R();

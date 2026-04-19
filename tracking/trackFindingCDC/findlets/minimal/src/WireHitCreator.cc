@@ -296,7 +296,7 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     const Vector2D& pos2D = wire.getRefPos2D();
 
     // Check whether the position is outside the selected sector
-    if (pos2D.isBetween(m_useSector[1], m_useSector[0])) continue;
+    if (VectorUtil::isBetween(pos2D, m_useSector[1], m_useSector[0])) continue;
 
     // Only use some MCParticles if request - mostly for debug
     if (not m_param_useMCParticleIds.empty()) {

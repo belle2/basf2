@@ -230,7 +230,7 @@ void CDCSimHitLookUp::fillRLInfo()
 
     // find out if the wire is right or left of the track ( view in flight direction )
     Vector3D trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};
-    ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
+    ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(trackPosToWire.xy(), directionOfFlight.xy());
     m_rightLeftInfos[ptrHit] = rlInfo;
   }
 }

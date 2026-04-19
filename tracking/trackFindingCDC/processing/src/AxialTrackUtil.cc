@@ -283,7 +283,7 @@ int AxialTrackUtil::getArmSignVote(const CDCTrack& track, const Vector2D& center
 
 ESign AxialTrackUtil::getArmSign(const CDCRecoHit3D& hit, const Vector2D& center)
 {
-  return sign(center.isRightOrLeftOf(hit.getRecoPos2D()));
+  return sign(VectorUtil::isRightOrLeftOf(center, hit.getRecoPos2D()));
 }
 
 void AxialTrackUtil::removeHitsAfterSuperLayerBreak(CDCTrack& track)

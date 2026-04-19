@@ -25,7 +25,6 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <tracking/trackingUtilities/utilities/ReversedRange.h>
 
@@ -386,11 +385,11 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
       draw(fromRecoHit2D, attributeMap);
       draw(toRecoHit2D, attributeMap);
 
-      const Vector2D fromPos = fromRecoHit2D.getRecoPos2D();
+      const ROOT::Math::XYVector fromPos = fromRecoHit2D.getRecoPos2D();
       const float fromX = fromPos.x();
       const float fromY = fromPos.y();
 
-      const Vector2D toPos = toRecoHit2D.getRecoPos2D();
+      const ROOT::Math::XYVector toPos = toRecoHit2D.getRecoPos2D();
       const float toX = toPos.x();
       const float toY = toPos.y();
 

@@ -16,6 +16,8 @@
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/VectorUtil.h>
 
+#include <Math/Vector2D.h>
+
 #include <cmath>
 
 using namespace Belle2;
@@ -63,9 +65,9 @@ Weight RealisticFacetFilter::operator()(const CDCFacet& facet)
   const ParameterLine2D& startToEndLine = facet.getStartToEndLine();
   const ParameterLine2D& middleToEndLine = facet.getMiddleToEndLine();
 
-  const Vector2D& startToMiddleTangentialVector = startToMiddleLine.tangential();
-  const Vector2D& startToEndTangentialVector = startToEndLine.tangential();
-  const Vector2D& middleToEndTangentialVector = middleToEndLine.tangential();
+  const ROOT::Math::XYVector& startToMiddleTangentialVector = startToMiddleLine.tangential();
+  const ROOT::Math::XYVector& startToEndTangentialVector = startToEndLine.tangential();
+  const ROOT::Math::XYVector& middleToEndTangentialVector = middleToEndLine.tangential();
 
   const double startToMiddleLength = startToMiddleTangentialVector.R();
   const double startToEndLength = startToEndTangentialVector.R();

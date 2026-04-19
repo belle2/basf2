@@ -13,6 +13,8 @@
 
 #include <framework/geometry/VectorUtil.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -35,20 +37,20 @@ bool HitGapSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* pt
   const CDCRecoHit2D& toFirstHit = toSegment.front();
   const CDCRecoHit2D& toLastHit = toSegment.back();
 
-  const Vector2D fromLastHitPos = fromLastHit.getRecoPos2D();
-  const Vector2D fromFirstHitPos = fromFirstHit.getRecoPos2D();
+  const ROOT::Math::XYVector fromLastHitPos = fromLastHit.getRecoPos2D();
+  const ROOT::Math::XYVector fromFirstHitPos = fromFirstHit.getRecoPos2D();
 
-  const Vector2D toFirstHitPos = toFirstHit.getRecoPos2D();
-  const Vector2D toLastHitPos = toLastHit.getRecoPos2D();
+  const ROOT::Math::XYVector toFirstHitPos = toFirstHit.getRecoPos2D();
+  const ROOT::Math::XYVector toLastHitPos = toLastHit.getRecoPos2D();
 
-  const Vector2D hitPosGap = toFirstHitPos - fromLastHitPos;
-  const Vector2D longHitPosGap = toLastHitPos - fromFirstHitPos;
+  const ROOT::Math::XYVector hitPosGap = toFirstHitPos - fromLastHitPos;
+  const ROOT::Math::XYVector longHitPosGap = toLastHitPos - fromFirstHitPos;
 
   const double hitDistance = hitPosGap.R();
   const double longHitDistance = longHitPosGap.R();
 
-  const Vector2D fromLastHitMom = fromLastHit.getFlightDirection2D();
-  const Vector2D toFirstHitMom = toFirstHit.getFlightDirection2D();
+  const ROOT::Math::XYVector fromLastHitMom = fromLastHit.getFlightDirection2D();
+  const ROOT::Math::XYVector toFirstHitMom = toFirstHit.getFlightDirection2D();
 
   finitevar<named("delta_hit_pos_phi")>() = VectorUtil::Angle(fromLastHitPos, toFirstHitPos);
   finitevar<named("delta_hit_mom_phi")>() = VectorUtil::Angle(fromLastHitMom, toFirstHitMom);
@@ -66,14 +68,14 @@ bool HitGapSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* pt
   finitevar<named("to_hit_forward")>() = hitPosGap.Dot(toFirstHitMom);
   finitevar<named("hit_forward")>() = hitPosGap.Dot(VectorUtil::average(fromLastHitMom, toFirstHitMom));
 
-  const Vector2D fromStretch = fromLastHitPos - fromFirstHitPos;
-  const Vector2D toStretch = toLastHitPos - toFirstHitPos;
+  const ROOT::Math::XYVector fromStretch = fromLastHitPos - fromFirstHitPos;
+  const ROOT::Math::XYVector toStretch = toLastHitPos - toFirstHitPos;
 
   const double fromLength = fromStretch.R();
   const double toLength = toStretch.R();
 
-  const Vector2D firstPosGap = toFirstHitPos - fromFirstHitPos;
-  const Vector2D lastPosGap = toLastHitPos - fromLastHitPos;
+  const ROOT::Math::XYVector firstPosGap = toFirstHitPos - fromFirstHitPos;
+  const ROOT::Math::XYVector lastPosGap = toLastHitPos - fromLastHitPos;
 
   const double firstOffset = firstPosGap.R();
   const double lastOffset = lastPosGap.R();

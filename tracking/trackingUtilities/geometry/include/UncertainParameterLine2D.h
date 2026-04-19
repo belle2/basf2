@@ -9,7 +9,9 @@
 
 #include <tracking/trackingUtilities/geometry/LineParameters.h>
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+
+#include <Math/Vector2D.h>
+
 #include <cstddef>
 
 namespace Belle2 {
@@ -148,7 +150,7 @@ namespace Belle2 {
        *  Because the covariance matrix is pinned in the support point
        *  it does not change in this move operation
        */
-      void passiveMoveBy(const Vector2D& by)
+      void passiveMoveBy(const ROOT::Math::XYVector& by)
       {
         m_parameterLine2D.passiveMoveBy(by);
       }

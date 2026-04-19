@@ -13,6 +13,7 @@
 #include <array>
 #include <vector>
 
+#include <Math/Vector2D.h>
 #include <TF1.h>
 #include <TCanvas.h>
 #include <TGraph.h>
@@ -87,11 +88,11 @@ std::vector<float> AxialHitQuadTreeProcessor::createCurvBound(YSpan curvSpan, in
   return bounds;
 }
 
-const LookupTable<Vector2D>& AxialHitQuadTreeProcessor::getCosSinLookupTable()
+const LookupTable<ROOT::Math::XYVector>& AxialHitQuadTreeProcessor::getCosSinLookupTable()
 {
   static const int maxLevel = PrecisionUtil::getLookupGridLevel();
   static const int nBins = std::pow(2, maxLevel);
-  static LookupTable<Vector2D> trigonometricLookUpTable(&VectorUtil::Phi, nBins, -M_PI, M_PI);
+  static LookupTable<ROOT::Math::XYVector> trigonometricLookUpTable(&VectorUtil::Phi, nBins, -M_PI, M_PI);
   return trigonometricLookUpTable;
 }
 
@@ -107,9 +108,9 @@ AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(int lastLevel,
   m_twoSidedPhaseSpace = m_quadTree->getYMin() * m_quadTree->getYMax() < 0;
 }
 
-AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(const Vector2D& localOrigin,
+AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(const ROOT::Math::XYVector& localOrigin,
                                                      const YSpan& curvSpan,
-                                                     const LookupTable<Vector2D>* cosSinLookupTable)
+                                                     const LookupTable<ROOT::Math::XYVector>* cosSinLookupTable)
   : QuadTreeProcessor(0, 0, { {0, cosSinLookupTable->getNPoints() - 1}, curvSpan})
 , m_localOrigin(localOrigin)
 , m_cosSinLookupTable(cosSinLookupTable)
@@ -201,7 +202,7 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
   }
 
   const double& l = wireHit->getRefDriftLength();
-  const Vector2D& pos2D = wireHit->getRefPos2D() - m_localOrigin;
+  const ROOT::Math::XYVector& pos2D = wireHit->getRefPos2D() - m_localOrigin;
   double r2 = pos2D.Mag2() - l * l;
 
   using Quadlet = std::array<std::array<float, 2>, 2>;
@@ -216,8 +217,8 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
   long thetaMin = node->getXMin();
   long thetaMax = node->getXMax();
 
-  const Vector2D& thetaVecMin = m_cosSinLookupTable->at(thetaMin);
-  const Vector2D& thetaVecMax = m_cosSinLookupTable->at(thetaMax);
+  const ROOT::Math::XYVector& thetaVecMin = m_cosSinLookupTable->at(thetaMin);
+  const ROOT::Math::XYVector& thetaVecMax = m_cosSinLookupTable->at(thetaMax);
 
   float rHitMin = thetaVecMin.Dot(pos2D);
   float rHitMax = thetaVecMax.Dot(pos2D);
@@ -262,13 +263,13 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
 
 bool AxialHitQuadTreeProcessor::checkDerivative(QuadTree* node, const CDCWireHit* wireHit) const
 {
-  const Vector2D& pos2D = wireHit->getRefPos2D() - m_localOrigin;
+  const ROOT::Math::XYVector& pos2D = wireHit->getRefPos2D() - m_localOrigin;
 
   long thetaMin = node->getXMin();
   long thetaMax = node->getXMax();
 
-  const Vector2D& thetaVecMin = m_cosSinLookupTable->at(thetaMin);
-  const Vector2D& thetaVecMax = m_cosSinLookupTable->at(thetaMax);
+  const ROOT::Math::XYVector& thetaVecMin = m_cosSinLookupTable->at(thetaMin);
+  const ROOT::Math::XYVector& thetaVecMax = m_cosSinLookupTable->at(thetaMax);
 
   float rMinD = VectorUtil::Cross(thetaVecMin, pos2D);
   float rMaxD = VectorUtil::Cross(thetaVecMax, pos2D);
@@ -282,15 +283,15 @@ bool AxialHitQuadTreeProcessor::checkDerivative(QuadTree* node, const CDCWireHit
 bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* wireHit) const
 {
   const double& l = wireHit->getRefDriftLength();
-  const Vector2D& pos2D = wireHit->getRefPos2D() - m_localOrigin;
+  const ROOT::Math::XYVector& pos2D = wireHit->getRefPos2D() - m_localOrigin;
   double r2 = pos2D.Mag2() - l * l;
 
   // get left and right borders of the node
   long thetaMin = node->getXMin();
   long thetaMax = node->getXMax();
 
-  const Vector2D& thetaVecMin = m_cosSinLookupTable->at(thetaMin);
-  const Vector2D& thetaVecMax = m_cosSinLookupTable->at(thetaMax);
+  const ROOT::Math::XYVector& thetaVecMin = m_cosSinLookupTable->at(thetaMin);
+  const ROOT::Math::XYVector& thetaVecMax = m_cosSinLookupTable->at(thetaMax);
 
   if (not VectorUtil::isBetween(pos2D, thetaVecMin, thetaVecMax)) return false;
 
@@ -325,7 +326,7 @@ void AxialHitQuadTreeProcessor::drawHits(std::vector<const CDCWireHit*> hits, un
 
   for (const CDCWireHit* wireHit : hits) {
     const double& l = wireHit->getRefDriftLength();
-    const Vector2D& pos2D = wireHit->getRefPos2D() - m_localOrigin;
+    const ROOT::Math::XYVector& pos2D = wireHit->getRefPos2D() - m_localOrigin;
     double x = pos2D.x();
     double y = pos2D.y();
     double r2 = pos2D.Mag2() - l * l;

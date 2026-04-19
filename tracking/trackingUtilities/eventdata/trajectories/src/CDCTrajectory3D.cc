@@ -22,7 +22,6 @@
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/ESign.h>
@@ -181,7 +180,7 @@ namespace {
                                                 const double bZ)
   {
     const double impactXY = localHelix->impactXY();
-    const Vector2D& phi0Vec = localHelix->phi0Vec();
+    const ROOT::Math::XYVector& phi0Vec = localHelix->phi0Vec();
 
     const double cosPhi0 = phi0Vec.x();
     const double sinPhi0 = phi0Vec.y();
@@ -342,7 +341,7 @@ CDCTrajectory2D CDCTrajectory3D::getTrajectory2D() const
 CDCTrajectorySZ CDCTrajectory3D::getTrajectorySZ() const
 {
   UncertainSZLine globalSZLine = getLocalHelix().uncertainSZLine();
-  globalSZLine.passiveMoveBy(Vector2D(0, -getLocalOrigin().z()));
+  globalSZLine.passiveMoveBy(ROOT::Math::XYVector(0, -getLocalOrigin().z()));
   return CDCTrajectorySZ(globalSZLine);
 }
 

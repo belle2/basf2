@@ -39,7 +39,6 @@ namespace Belle2 {
     class CDCTrajectory2D;
     class Circle2D;
     class Vector3D;
-    class Vector2D;
 
     /**
      *  Class representing a hit wire in the central drift chamber.
@@ -252,7 +251,7 @@ namespace Belle2 {
        *  Also the right left passage hypotheses does not play a role in
        *  the reconstruction in any way.
        */
-      Vector2D reconstruct2D(const CDCTrajectory2D& trajectory2D) const;
+      ROOT::Math::XYVector reconstruct2D(const CDCTrajectory2D& trajectory2D) const;
 
       /**
        *  Attempts to reconstruct a three dimensional position (especially of stereo hits).
@@ -279,7 +278,7 @@ namespace Belle2 {
        *  - \f$Y = y / (x^2 + y^2 - r^2)\f$
        *  - \f$R = r / (x^2 + y^2 - r^2)\f$
        */
-      Circle2D conformalTransformed(const Vector2D& relativeTo) const;
+      Circle2D conformalTransformed(const ROOT::Math::XYVector& relativeTo) const;
 
       /// Mutable getter for the automaton cell.
       AutomatonCell& getAutomatonCell() const

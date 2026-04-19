@@ -10,8 +10,9 @@
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
+
+#include <Math/Vector2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -46,7 +47,7 @@ namespace Belle2 {
                                            const Phi0CurvBox* phi0CurvBox)
       {
         double curvature = trajectory2D->getCurvature();
-        const TrackingUtilities::Vector2D& phi0Vec = trajectory2D->getStartUnitMom2D();
+        const ROOT::Math::XYVector& phi0Vec = trajectory2D->getStartUnitMom2D();
 
         bool in = isPhi0CurvPointIn(phi0Vec, curvature, phi0CurvBox);
         return in ? 1 : NAN;
@@ -62,13 +63,13 @@ namespace Belle2 {
       {
         const ParameterLine2D& line = facet->getStartToEndLine();
 
-        const TrackingUtilities::Vector2D pos2D = facet->getMiddleRecoPos2D();
-        const TrackingUtilities::Vector2D phiVec = VectorUtil::unit(line.tangential());
+        const ROOT::Math::XYVector pos2D = facet->getMiddleRecoPos2D();
+        const ROOT::Math::XYVector phiVec = VectorUtil::unit(line.tangential());
 
         // Calculate the curvature and phi0 of the circle through the origin
         // that touches the position pos2D under the angle phiVec.
         double curvature = 2 * VectorUtil::Cross(pos2D, phiVec) / pos2D.Mag2();
-        Vector2D phi0Vec = VectorUtil::flippedOver(phiVec, pos2D);
+        ROOT::Math::XYVector phi0Vec = VectorUtil::flippedOver(phiVec, pos2D);
 
         bool in = isPhi0CurvPointIn(phi0Vec, curvature, phi0CurvBox);
         return in ? 1 : NAN;
@@ -79,13 +80,13 @@ namespace Belle2 {
       }
 
       /// Predicate checking if the phi0 vector and curvature are contained in the given box.
-      bool isPhi0CurvPointIn(const TrackingUtilities::Vector2D& phi0Vec,
+      bool isPhi0CurvPointIn(const ROOT::Math::XYVector& phi0Vec,
                              const double curvature,
                              const Phi0CurvBox* phi0CurvBox)
       {
 
-        const TrackingUtilities::Vector2D& lowerPhi0Vec = phi0CurvBox->getLowerPhi0Vec();
-        const TrackingUtilities::Vector2D& upperPhi0Vec = phi0CurvBox->getUpperPhi0Vec();
+        const ROOT::Math::XYVector& lowerPhi0Vec = phi0CurvBox->getLowerPhi0Vec();
+        const ROOT::Math::XYVector& upperPhi0Vec = phi0CurvBox->getUpperPhi0Vec();
 
         // Allow containment to keep the reversal symmetry
         if (phi0CurvBox->isIn<1>(curvature)) {

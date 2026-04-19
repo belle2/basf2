@@ -24,7 +24,6 @@
 namespace Belle2 {
   namespace TrackingUtilities {
     class CDCWireHit;
-    class Vector2D;
     class Vector3D;
     class CDCSegment2D;
     class CDCSegment3D;

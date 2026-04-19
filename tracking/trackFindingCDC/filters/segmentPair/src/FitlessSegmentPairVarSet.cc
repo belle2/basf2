@@ -16,6 +16,8 @@
 
 #include <framework/geometry/VectorUtil.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
@@ -77,17 +79,17 @@ bool FitlessSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const CDCRecoHit2D& toFirstHit = toSegment.front();
   const CDCRecoHit2D& toLastHit = toSegment.back();
 
-  const Vector2D fromHitPos = fromLastHit.getRecoPos2D();
-  const Vector2D toHitPos = toFirstHit.getRecoPos2D();
+  const ROOT::Math::XYVector fromHitPos = fromLastHit.getRecoPos2D();
+  const ROOT::Math::XYVector toHitPos = toFirstHit.getRecoPos2D();
 
   // Fit
-  const Vector2D fromFitPos = fromFit.getClosest(fromHitPos);
-  const Vector2D toFitPos = toFit.getClosest(toHitPos);
-  const Vector2D fromFitMom = fromFit.getFlightDirection2D(fromHitPos);
-  const Vector2D toFitMom = toFit.getFlightDirection2D(toHitPos);
+  const ROOT::Math::XYVector fromFitPos = fromFit.getClosest(fromHitPos);
+  const ROOT::Math::XYVector toFitPos = toFit.getClosest(toHitPos);
+  const ROOT::Math::XYVector fromFitMom = fromFit.getFlightDirection2D(fromHitPos);
+  const ROOT::Math::XYVector toFitMom = toFit.getFlightDirection2D(toHitPos);
 
-  const Vector2D fromOtherFitMom = toFit.getFlightDirection2D(fromHitPos);
-  const Vector2D toOtherFitMom = fromFit.getFlightDirection2D(toHitPos);
+  const ROOT::Math::XYVector fromOtherFitMom = toFit.getFlightDirection2D(fromHitPos);
+  const ROOT::Math::XYVector toOtherFitMom = fromFit.getFlightDirection2D(toHitPos);
 
   const double deltaPosPhi = VectorUtil::Angle(fromFitPos, toFitPos);
   const double deltaMomPhi = VectorUtil::Angle(fromFitMom, toFitMom);

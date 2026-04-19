@@ -21,6 +21,8 @@
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -181,7 +183,7 @@ void AxialTrackMerger::removeStrangeHits(double factor,
                                          CDCTrajectory2D& trajectory2D)
 {
   auto farFromTrajectory = [&trajectory2D, &factor](const CDCWireHit * wireHit) {
-    Vector2D pos2D = wireHit->getRefPos2D();
+    ROOT::Math::XYVector pos2D = wireHit->getRefPos2D();
     double driftLength = wireHit->getRefDriftLength();
     double dist = std::fabs(trajectory2D.getDist2D(pos2D)) - driftLength;
     return std::fabs(dist) > driftLength * factor;

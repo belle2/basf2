@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
@@ -14,6 +14,8 @@
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
 #include <framework/geometry/VectorUtil.h>
+
+#include <Math/Vector2D.h>
 
 #include <cmath>
 
@@ -33,14 +35,14 @@ namespace Belle2 {
       }
 
       /// Constructs a circle with given center and radius/ orientation as given by the signedRadius
-      Circle2D(const Vector2D& center, const double radius)
+      Circle2D(const ROOT::Math::XYVector& center, const double radius)
         : m_center(center)
         , m_radius(radius)
       {
       }
 
       /// Constructs a circle with given center, absolute value of the radius and orientation
-      Circle2D(const Vector2D& center, const double absRadius, const ERotation ccwInfo)
+      Circle2D(const ROOT::Math::XYVector& center, const double absRadius, const ERotation ccwInfo)
         : m_center(center)
         , m_radius(fabs(absRadius) * static_cast<double>(ccwInfo))
       {
@@ -96,7 +98,7 @@ namespace Belle2 {
 
     public:
       /// Calculates the signed distance of the point to the circle line.
-      double distance(const Vector2D& point) const
+      double distance(const ROOT::Math::XYVector& point) const
       {
         return copysign(VectorUtil::Distance(center(), point), radius()) - radius();
       }
@@ -108,55 +110,55 @@ namespace Belle2 {
       }
 
       /// Returns the euclidean distance of the point to the circle line
-      double absDistance(const Vector2D& point) const
+      double absDistance(const ROOT::Math::XYVector& point) const
       {
         return fabs(VectorUtil::Distance(center(), point) - absRadius());
       }
 
       /// Return if the point given is right or left of the line
-      ERightLeft isRightOrLeft(const Vector2D& point) const
+      ERightLeft isRightOrLeft(const ROOT::Math::XYVector& point) const
       {
         return static_cast<ERightLeft>(sign(distance(point)));
       }
 
       /// Return if the point given is left of the circle line
-      bool isLeft(const Vector2D& rhs) const
+      bool isLeft(const ROOT::Math::XYVector& rhs) const
       {
         return isRightOrLeft(rhs) == ERightLeft::c_Left;
       }
 
       /// Return if the point given is right of the circle line
-      bool isRight(const Vector2D& rhs) const
+      bool isRight(const ROOT::Math::XYVector& rhs) const
       {
         return isRightOrLeft(rhs) == ERightLeft::c_Right;
       }
 
       /// Calculates the point of closest approach on the line to the point
-      Vector2D closest(const Vector2D& point) const
+      ROOT::Math::XYVector closest(const ROOT::Math::XYVector& point) const
       {
-        Vector2D connection = point - center();
+        ROOT::Math::XYVector connection = point - center();
         if (connection.R() != 0.0) {
-          connection.Scale(absRadius() / connection.R());
+          connection *= (absRadius() / connection.R());
         }
         connection += center();
         return connection;
       }
 
       /// Returns the point closest to the origin
-      Vector2D perigee() const
+      ROOT::Math::XYVector perigee() const
       {
-        Vector2D connection = center();
+        ROOT::Math::XYVector connection = center();
         if (connection.R() != 0.0) {
-          connection.Scale(-absRadius() / connection.R());
+          connection *= (-absRadius() / connection.R());
         }
         connection += center();
         return connection;
       }
 
       /// Gives the tangential vector at the closest approach to the origin / at the perigee
-      Vector2D tangential() const
+      ROOT::Math::XYVector tangential() const
       {
-        return VectorUtil::unit(tangential(Vector2D(0.0, 0.0)));
+        return VectorUtil::unit(tangential(ROOT::Math::XYVector(0.0, 0.0)));
       }
 
       /// Gives to azimuth phi of the direction of flight at the perigee
@@ -166,32 +168,32 @@ namespace Belle2 {
       }
 
       /// Gradient of the distance field
-      Vector2D gradient(const Vector2D& point) const
+      ROOT::Math::XYVector gradient(const ROOT::Math::XYVector& point) const
       {
-        Vector2D connection = (point - center()) * orientation();
+        ROOT::Math::XYVector connection = (point - center()) * orientation();
         return VectorUtil::unit(connection);
       }
 
       /// Normal vector to the circle near the given position
-      Vector2D normal(const Vector2D& point) const
+      ROOT::Math::XYVector normal(const ROOT::Math::XYVector& point) const
       {
         return VectorUtil::unit(gradient(point));
       }
 
       /// Tangential vector to the circle near the given position
-      Vector2D tangential(const Vector2D& point) const
+      ROOT::Math::XYVector tangential(const ROOT::Math::XYVector& point) const
       {
         return VectorUtil::Orthogonal(normal(point));
       }
 
       /// Calculates the angle between two points as seen from the center of the circle
-      double openingAngle(const Vector2D& from, const Vector2D& to) const
+      double openingAngle(const ROOT::Math::XYVector& from, const ROOT::Math::XYVector& to) const
       {
         return VectorUtil::Angle(gradient(from), gradient(to));
       } // can be optimized in the number of computations
 
       /// Calculates the arc length between two points of closest approach on the circle.
-      double arcLengthBetween(const Vector2D& from, const Vector2D& to) const
+      double arcLengthBetween(const ROOT::Math::XYVector& from, const ROOT::Math::XYVector& to) const
       {
         return openingAngle(from, to) * radius();
       }
@@ -221,7 +223,7 @@ namespace Belle2 {
       }
 
       /// Getter for the central point of the circle
-      Vector2D center() const
+      ROOT::Math::XYVector center() const
       {
         return m_center;
       }
@@ -229,7 +231,7 @@ namespace Belle2 {
       /** @name Transformations of the circle */
       /**@{*/
       /// Actively moves the circle in the direction given in place by the vector given
-      void moveBy(const Vector2D& by)
+      void moveBy(const ROOT::Math::XYVector& by)
       {
         m_center += by;
       }
@@ -247,7 +249,7 @@ namespace Belle2 {
       }
 
       /// Passively move the coordinate system  in place by the given vector
-      void passiveMoveBy(const Vector2D& by)
+      void passiveMoveBy(const ROOT::Math::XYVector& by)
       {
         m_center -= by;
       }
@@ -267,7 +269,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the central point
-      Vector2D m_center;
+      ROOT::Math::XYVector m_center;
 
       /// Memory for the signed radius
       double m_radius;

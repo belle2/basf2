@@ -31,7 +31,6 @@ namespace Belle2 {
     class CDCTrajectory2D;
     class CDCWireHit;
     class Vector3D;
-    class Vector2D;
 
     /**
      *  Class representing an oriented hit wire including a hypotheses
@@ -254,7 +253,7 @@ namespace Belle2 {
        *  Also the right left passage hypotheses does not play a role in
        *  the reconstruction in any way.
        */
-      Vector2D reconstruct2D(const CDCTrajectory2D& trajectory2D) const;
+      ROOT::Math::XYVector reconstruct2D(const CDCTrajectory2D& trajectory2D) const;
 
       /**
        *  Attempts to reconstruct a three dimensional position (especially of stereo hits).

@@ -105,7 +105,7 @@ void AxialTrackUtil::normalizeTrack(CDCTrack& track)
 
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
   CDCTrajectory2D trackTrajectory2D = fitter.fit(observations2D);
-  Vector2D center = trackTrajectory2D.getGlobalCenter();
+  ROOT::Math::XYVector center = trackTrajectory2D.getGlobalCenter();
 
   // Arm used as a proxy for the charge of the track
   // Correct if the track originates close to the origin
@@ -144,7 +144,7 @@ void AxialTrackUtil::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double max
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   auto farFromTrajectory = [&trajectory2D, &maximumDistance](CDCRecoHit3D & recoHit3D) {
-    Vector2D refPos2D = recoHit3D.getRefPos2D();
+    ROOT::Math::XYVector refPos2D = recoHit3D.getRefPos2D();
     double distance = trajectory2D.getDist2D(refPos2D) - recoHit3D.getSignedRecoDriftLength();
     if (std::fabs(distance) > maximumDistance) {
       recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(false);
@@ -187,7 +187,7 @@ void AxialTrackUtil::assignNewHitsToTrack(CDCTrack& track,
     if (wireHit->getAutomatonCell().hasTakenFlag()) continue;
 
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trackTrajectory2D);
-    const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
+    const ROOT::Math::XYVector& recoPos2D = recoHit3D.getRecoPos2D();
 
     if (fabs(trackTrajectory2D.getDist2D(recoPos2D)) < minimalDistance) {
       track.push_back(std::move(recoHit3D));
@@ -216,7 +216,7 @@ std::vector<CDCRecoHit3D> AxialTrackUtil::splitBack2BackTrack(CDCTrack& track)
   if (track.size() < 5) return removedHits;
   if (not isBack2BackTrack(track)) return removedHits;
 
-  Vector2D center = track.getStartTrajectory3D().getGlobalCenter();
+  ROOT::Math::XYVector center = track.getStartTrajectory3D().getGlobalCenter();
   ESign majorArmSign = getMajorArmSign(track, center);
 
   auto isOnMajorArm = [&center, &majorArmSign](const CDCRecoHit3D & hit) {
@@ -238,7 +238,7 @@ std::vector<CDCRecoHit3D> AxialTrackUtil::splitBack2BackTrack(CDCTrack& track)
 
 bool AxialTrackUtil::isBack2BackTrack(CDCTrack& track)
 {
-  Vector2D center = track.getStartTrajectory3D().getGlobalCenter();
+  ROOT::Math::XYVector center = track.getStartTrajectory3D().getGlobalCenter();
   int armSignVote = getArmSignVote(track, center);
   if (std::abs(armSignVote) < int(track.size()) and center.Mag2() > 3600.) {
     return true;
@@ -246,7 +246,7 @@ bool AxialTrackUtil::isBack2BackTrack(CDCTrack& track)
   return false;
 }
 
-ESign AxialTrackUtil::getMajorArmSign(const CDCTrack& track, const Vector2D& center)
+ESign AxialTrackUtil::getMajorArmSign(const CDCTrack& track, const ROOT::Math::XYVector& center)
 {
   int armSignVote = getArmSignVote(track, center);
   if (armSignVote > 0) {
@@ -256,7 +256,7 @@ ESign AxialTrackUtil::getMajorArmSign(const CDCTrack& track, const Vector2D& cen
   }
 }
 
-int AxialTrackUtil::getArmSignVote(const CDCTrack& track, const Vector2D& center)
+int AxialTrackUtil::getArmSignVote(const CDCTrack& track, const ROOT::Math::XYVector& center)
 {
   int votePos = 0;
   int voteNeg = 0;
@@ -281,7 +281,7 @@ int AxialTrackUtil::getArmSignVote(const CDCTrack& track, const Vector2D& center
   return armSignVote;
 }
 
-ESign AxialTrackUtil::getArmSign(const CDCRecoHit3D& hit, const Vector2D& center)
+ESign AxialTrackUtil::getArmSign(const CDCRecoHit3D& hit, const ROOT::Math::XYVector& center)
 {
   return sign(VectorUtil::isRightOrLeftOf(center, hit.getRecoPos2D()));
 }

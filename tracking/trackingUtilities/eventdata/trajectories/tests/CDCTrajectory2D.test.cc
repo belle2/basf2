@@ -11,6 +11,8 @@
 
 #include <framework/logging/Logger.h>
 
+#include <Math/Vector2D.h>
+
 #include <gtest/gtest.h>
 
 using namespace Belle2;
@@ -20,16 +22,16 @@ using namespace TrackingUtilities;
 
 TEST(TrackingUtilitiesTest, eventdata_trajectories_CDCTrajectory2D_constructorPosMomCharge)
 {
-  Vector2D newMom2D(1.0, 2.0);
-  Vector2D newPos2D(1.0, 2.0);
+  ROOT::Math::XYVector newMom2D(1.0, 2.0);
+  ROOT::Math::XYVector newPos2D(1.0, 2.0);
   double newTime = 0.0;
   ESign newChargeSign = ESign::c_Plus;
   double bZ = 2.0;
 
   CDCTrajectory2D trajectory(newPos2D, newTime, newMom2D, newChargeSign, bZ);
 
-  Vector2D mom2D = trajectory.getMom2DAtSupport(bZ);
-  Vector2D pos2D = trajectory.getSupport();
+  ROOT::Math::XYVector mom2D = trajectory.getMom2DAtSupport(bZ);
+  ROOT::Math::XYVector pos2D = trajectory.getSupport();
   ESign chargeSign = trajectory.getChargeSign();
 
   EXPECT_NEAR(newMom2D.x(), mom2D.x(), 10e-7);
@@ -60,14 +62,14 @@ TEST(TrackingUtilitiesTest, eventdata_trajectories_CDCTrajectory2D_reconstruct)
   EXPECT_NEAR(localOrigin.z(), positionOnWire.z(), 10e-7);
 
   CDCTrajectory2D trajectory2D(VectorUtil::get2DVector(localOrigin), localPerigeeCircle);
-  double arcLength2D = trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
+  double arcLength2D = trajectory2D.setLocalOrigin(ROOT::Math::XYVector(0.0, 0.0));
 
   // Check that the old origin is still on the line
   double distance = trajectory2D.getDist2D(VectorUtil::get2DVector(localOrigin));
   EXPECT_NEAR(0, distance, 10e-7);
 
   // Extrapolate back to the local origin
-  Vector2D extrapolation2D = trajectory2D.getPos2DAtArcLength2D(-arcLength2D);
+  ROOT::Math::XYVector extrapolation2D = trajectory2D.getPos2DAtArcLength2D(-arcLength2D);
   EXPECT_NEAR(localOrigin.x(), extrapolation2D.x(), 10e-7);
   EXPECT_NEAR(localOrigin.y(), extrapolation2D.y(), 10e-7);
 

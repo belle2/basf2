@@ -11,6 +11,8 @@
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 #include <framework/geometry/VectorUtil.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -58,15 +60,15 @@ Weight SimpleAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axial
     return NAN;
   }
 
-  Vector2D startBackRecoPos2D = startSegment.back().getRecoPos2D();
-  Vector2D endFrontRecoPos2D = endSegment.front().getRecoPos2D();
+  ROOT::Math::XYVector startBackRecoPos2D = startSegment.back().getRecoPos2D();
+  ROOT::Math::XYVector endFrontRecoPos2D = endSegment.front().getRecoPos2D();
 
   // Momentum agreement cut
-  Vector2D startMom2DAtStartBack = startFit.getFlightDirection2D(startBackRecoPos2D);
-  Vector2D endMom2DAtEndFront = endFit.getFlightDirection2D(endFrontRecoPos2D);
+  ROOT::Math::XYVector startMom2DAtStartBack = startFit.getFlightDirection2D(startBackRecoPos2D);
+  ROOT::Math::XYVector endMom2DAtEndFront = endFit.getFlightDirection2D(endFrontRecoPos2D);
 
-  Vector2D startMom2DAtEndFront = startFit.getFlightDirection2D(endFrontRecoPos2D);
-  Vector2D endMom2DAtStartBack = endFit.getFlightDirection2D(startBackRecoPos2D);
+  ROOT::Math::XYVector startMom2DAtEndFront = startFit.getFlightDirection2D(endFrontRecoPos2D);
+  ROOT::Math::XYVector endMom2DAtStartBack = endFit.getFlightDirection2D(startBackRecoPos2D);
 
   double momAngleAtStartBack = VectorUtil::Angle(startMom2DAtStartBack, endMom2DAtStartBack);
   double momAngleAtEndFront = VectorUtil::Angle(endMom2DAtEndFront, startMom2DAtEndFront);

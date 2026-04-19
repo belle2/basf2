@@ -8,6 +8,8 @@
 
 #include <tracking/trackingUtilities/geometry/Helix.h>
 
+#include <Math/Vector2D.h>
+
 #include <gtest/gtest.h>
 
 
@@ -97,16 +99,16 @@ TEST(TrackingUtilitiesTest, geometry_Helix_arcLength2DToXY)
 
   Helix helix(curvature, phi0, impact, tanLambda, z0);
 
-  Vector2D origin(0.0, 0.0);
+  ROOT::Math::XYVector origin(0.0, 0.0);
   double closestArcLength2D = helix.arcLength2DToXY(origin);
   EXPECT_NEAR(0, closestArcLength2D, 10e-7);
 
-  double widestArcLength2D = helix.arcLength2DToXY(Vector2D(5.0, 0.0));
+  double widestArcLength2D = helix.arcLength2DToXY(ROOT::Math::XYVector(5.0, 0.0));
   EXPECT_NEAR(M_PI, widestArcLength2D, 10e-7);
 
-  double halfArcLength2D = helix.arcLength2DToXY(Vector2D(2.0, 5.0));
+  double halfArcLength2D = helix.arcLength2DToXY(ROOT::Math::XYVector(2.0, 5.0));
   EXPECT_NEAR(M_PI / 2, halfArcLength2D, 10e-7);
 
-  double otherHalfArcLength2D = helix.arcLength2DToXY(Vector2D(2.0, -5.0));
+  double otherHalfArcLength2D = helix.arcLength2DToXY(ROOT::Math::XYVector(2.0, -5.0));
   EXPECT_NEAR(-M_PI / 2, otherHalfArcLength2D, 10e-7);
 }

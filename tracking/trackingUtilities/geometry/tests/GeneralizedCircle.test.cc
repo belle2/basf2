@@ -7,7 +7,8 @@
  **************************************************************************/
 
 #include <tracking/trackingUtilities/geometry/GeneralizedCircle.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+
+#include <Math/Vector2D.h>
 
 #include <gtest/gtest.h>
 
@@ -55,13 +56,13 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_orientation)
 
 TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_conformalTranform)
 {
-  Vector2D center(1.0, 0.0);
+  ROOT::Math::XYVector center(1.0, 0.0);
   double radius = 1.0;
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
 
   // Get two points on the circle to check for the orientation to be correct
-  Vector2D firstPos = circle.atArcLength(1);
-  Vector2D secondPos = circle.atArcLength(2);
+  ROOT::Math::XYVector firstPos = circle.atArcLength(1);
+  ROOT::Math::XYVector secondPos = circle.atArcLength(2);
 
   EXPECT_NEAR(1.0, circle.curvature(), 10e-7);
   EXPECT_NEAR(-M_PI / 2.0, circle.tangentialPhi(), 10e-7);
@@ -70,7 +71,7 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_conformalTranform)
   EXPECT_NEAR(0.0, circle.distance(secondPos), 10e-7);
 
   circle.conformalTransform();
-  const auto conformalTransform = [](Vector2D & a) { return a.Scale(1. / a.Mag2()); };
+  const auto conformalTransform = [](ROOT::Math::XYVector & a) { return a *= (1. / a.Mag2()); };
   conformalTransform(firstPos);
   conformalTransform(secondPos);
 
@@ -96,17 +97,17 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_conformalTranform)
 TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_closest)
 {
   GeneralizedCircle circle(0.0, -1.0, 0.0, 1.0 / 2.0);
-  Vector2D up(1.0, 2.0);
-  Vector2D far(4.0, 0.0);
+  ROOT::Math::XYVector up(1.0, 2.0);
+  ROOT::Math::XYVector far(4.0, 0.0);
 
-  EXPECT_EQ(Vector2D(1.0, 1.0), circle.closest(up));
-  EXPECT_EQ(Vector2D(2.0, 0.0), circle.closest(far));
+  EXPECT_EQ(ROOT::Math::XYVector(1.0, 1.0), circle.closest(up));
+  EXPECT_EQ(ROOT::Math::XYVector(2.0, 0.0), circle.closest(far));
 
   // This tests for point which is on the circle
   double smallAngle = M_PI / 100;
-  Vector2D near(1.0 - cos(smallAngle), sin(smallAngle));
+  ROOT::Math::XYVector near(1.0 - cos(smallAngle), sin(smallAngle));
 
-  Vector2D closestOfNear = circle.closest(near);
+  ROOT::Math::XYVector closestOfNear = circle.closest(near);
   EXPECT_NEAR(near.x(), closestOfNear.x(), 10e-7);
   EXPECT_NEAR(near.y(), closestOfNear.y(), 10e-7);
 }
@@ -115,7 +116,7 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_arcLengthFactor)
 {
   GeneralizedCircle circle(0.0, -1.0, 0.0, 1.0 / 2.0);
   double smallAngle = M_PI / 100;
-  Vector2D near(1.0 - cos(smallAngle), sin(smallAngle));
+  ROOT::Math::XYVector near(1.0 - cos(smallAngle), sin(smallAngle));
 
   double expectedArcLengthFactor = smallAngle / near.R();
   EXPECT_NEAR(expectedArcLengthFactor, circle.arcLengthFactor(near.R()), 10e-7);
@@ -124,13 +125,13 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_arcLengthFactor)
 TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_arcLengthBetween)
 {
   GeneralizedCircle circle(0.0, -1.0, 0.0, 1.0 / 2.0);
-  Vector2D origin(0.0, 0.0);
-  Vector2D up(1.0, 2.0);
-  Vector2D down(1.0, -2.0);
-  Vector2D far(4.0, 0.0);
+  ROOT::Math::XYVector origin(0.0, 0.0);
+  ROOT::Math::XYVector up(1.0, 2.0);
+  ROOT::Math::XYVector down(1.0, -2.0);
+  ROOT::Math::XYVector far(4.0, 0.0);
 
   double smallAngle = M_PI / 100;
-  Vector2D close(1.0 - cos(smallAngle), sin(smallAngle));
+  ROOT::Math::XYVector close(1.0 - cos(smallAngle), sin(smallAngle));
 
   EXPECT_NEAR(-M_PI / 2.0, circle.arcLengthBetween(origin, up), 10e-7);
   EXPECT_NEAR(M_PI / 2.0, circle.arcLengthBetween(origin, down), 10e-7);
@@ -156,11 +157,11 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_arcLengthBetween)
 
 TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_passiveMoveBy)
 {
-  Vector2D center(4.0, 2.0);
+  ROOT::Math::XYVector center(4.0, 2.0);
   double radius = 5.0;
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
 
-  circle.passiveMoveBy(Vector2D(3.0, 3.0));
+  circle.passiveMoveBy(ROOT::Math::XYVector(3.0, 3.0));
 
   EXPECT_NEAR(5.0, circle.radius(), 10e-7);
   EXPECT_NEAR(1.0, circle.center().x(), 10e-7);
@@ -170,13 +171,13 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_passiveMoveBy)
 TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_intersections)
 {
 
-  GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(Vector2D(1.0, 1.0), 1);
-  GeneralizedCircle line = GeneralizedCircle(sqrt(2.0), VectorUtil::unit(-Vector2D(1.0, 1.0)));
+  GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(ROOT::Math::XYVector(1.0, 1.0), 1);
+  GeneralizedCircle line = GeneralizedCircle(sqrt(2.0), VectorUtil::unit(-ROOT::Math::XYVector(1.0, 1.0)));
 
-  std::pair<Vector2D, Vector2D> intersections = circle.intersections(line);
+  std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> intersections = circle.intersections(line);
 
-  const Vector2D& intersection1 = intersections.first;
-  const Vector2D& intersection2 = intersections.second;
+  const ROOT::Math::XYVector& intersection1 = intersections.first;
+  const ROOT::Math::XYVector& intersection2 = intersections.second;
 
   EXPECT_NEAR(1 - sqrt(2.0) / 2.0, intersection1.x(), 10e-7);
   EXPECT_NEAR(1 + sqrt(2.0) / 2.0, intersection1.y(), 10e-7);
@@ -188,26 +189,26 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_intersections)
 TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_atArcLength)
 {
   double radius = 1;
-  Vector2D center = Vector2D(2.0, 0.0);
+  ROOT::Math::XYVector center = ROOT::Math::XYVector(2.0, 0.0);
 
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
 
   double smallAngle = M_PI / 100;
-  Vector2D near(2.0 - cos(smallAngle), sin(smallAngle));
+  ROOT::Math::XYVector near(2.0 - cos(smallAngle), sin(smallAngle));
 
   double nearArcLength =
     -smallAngle * radius; // Minus because of default counterclockwise orientation
 
-  Vector2D atNear = circle.atArcLength(nearArcLength);
+  ROOT::Math::XYVector atNear = circle.atArcLength(nearArcLength);
 
   EXPECT_NEAR(near.x(), atNear.x(), 10e-7);
   EXPECT_NEAR(near.y(), atNear.y(), 10e-7);
 
-  Vector2D down(2.0, -1.0);
+  ROOT::Math::XYVector down(2.0, -1.0);
   double downArcLength =
     +M_PI / 2.0 * radius; // Plus because of default counterclockwise orientation
 
-  Vector2D atDown = circle.atArcLength(downArcLength);
+  ROOT::Math::XYVector atDown = circle.atArcLength(downArcLength);
 
   EXPECT_NEAR(down.x(), atDown.x(), 10e-7);
   EXPECT_NEAR(down.y(), atDown.y(), 10e-7);
@@ -216,7 +217,7 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_atArcLength)
 TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_arcLengthToCylindricalR)
 {
   double radius = 1;
-  Vector2D center = Vector2D(2.0, 0.0);
+  ROOT::Math::XYVector center = ROOT::Math::XYVector(2.0, 0.0);
 
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
   {
@@ -258,10 +259,10 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_arcLengthToCylindricalR)
 TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_atCylindricalR)
 {
   double radius = 1;
-  Vector2D center = Vector2D(2.0, 0.0);
+  ROOT::Math::XYVector center = ROOT::Math::XYVector(2.0, 0.0);
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
 
-  std::pair<Vector2D, Vector2D> solutions = circle.atCylindricalR(sqrt(5.0));
+  std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> solutions = circle.atCylindricalR(sqrt(5.0));
 
   EXPECT_NEAR(2, solutions.first.x(), 10e-7);
   EXPECT_NEAR(1, solutions.first.y(), 10e-7);
@@ -273,7 +274,7 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_atCylindricalR)
 TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_isLine)
 {
   double radius = 1;
-  Vector2D center = Vector2D(2.0, 0.0);
+  ROOT::Math::XYVector center = ROOT::Math::XYVector(2.0, 0.0);
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
 
   EXPECT_FALSE(circle.isLine());
@@ -289,7 +290,7 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_isLine)
 TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_isCircle)
 {
   double radius = 1;
-  Vector2D center = Vector2D(2.0, 0.0);
+  ROOT::Math::XYVector center = ROOT::Math::XYVector(2.0, 0.0);
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
 
   EXPECT_TRUE(circle.isCircle());
@@ -319,11 +320,11 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_distance)
   float absError = 10e-6;
 
   float radius = 1.5;
-  Vector2D center = Vector2D(0.5, 0.0);
+  ROOT::Math::XYVector center = ROOT::Math::XYVector(0.5, 0.0);
 
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
 
-  Vector2D testPoint(3, 0);
+  ROOT::Math::XYVector testPoint(3, 0);
 
   EXPECT_NEAR(1, circle.distance(testPoint), absError);
   EXPECT_NEAR(1, circle.absDistance(testPoint), absError);

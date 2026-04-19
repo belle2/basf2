@@ -10,7 +10,6 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 
@@ -19,6 +18,8 @@
 
 #include <framework/geometry/VectorUtil.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
+
+#include <Math/Vector2D.h>
 
 namespace Belle2 {
   class CDCSimHit;
@@ -297,7 +298,7 @@ namespace Belle2 {
       /// Getter for the 2d position of the hit.
       /// This used to return a reference, but that's not possible when creating the vector on the fly
       /// after moving to ROOT::Math::Vector(2/3)D
-      const Vector2D getRecoPos2D() const
+      const ROOT::Math::XYVector getRecoPos2D() const
       {
         return VectorUtil::get2DVector(getRecoPos3D());
       }
@@ -309,10 +310,10 @@ namespace Belle2 {
       }
 
       /// Gets the displacement from the wire position in the xy plain at the reconstructed position.
-      Vector2D getRecoDisp2D() const;
+      ROOT::Math::XYVector getRecoDisp2D() const;
 
       /// Getter for the direction of flight
-      Vector2D getFlightDirection2D() const
+      ROOT::Math::XYVector getFlightDirection2D() const
       {
         ERotation rotation = static_cast<ERotation>(-getRLInfo());
         return VectorUtil::Orthogonal(getRecoDisp2D(), rotation);
@@ -337,7 +338,7 @@ namespace Belle2 {
       CDCRecoHit2D stereoProjectToRef() const;
 
       /// Returns the position of the wire in the xy plain the reconstructed position is located in.
-      Vector2D getRecoWirePos2D() const;
+      ROOT::Math::XYVector getRecoWirePos2D() const;
 
       /// Scales the displacement vector in place to lie on the drift circle.
       void snapToDriftCircle(bool switchSide = false);

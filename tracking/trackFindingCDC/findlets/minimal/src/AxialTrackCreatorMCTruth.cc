@@ -33,6 +33,7 @@
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
+#include <Math/Vector2D.h>
 #include <TRandom.h>
 
 using namespace Belle2;
@@ -137,8 +138,8 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
   for (CDCTrack& track : outputAxialTracks) {
     for (CDCRecoHit3D& recoHit3D : track) {
-      Vector2D recoPos2D = recoHit3D.getRecoPos2D();
-      Vector2D flightDirection = recoHit3D.getFlightDirection2D();
+      ROOT::Math::XYVector recoPos2D = recoHit3D.getRecoPos2D();
+      ROOT::Math::XYVector flightDirection = recoHit3D.getFlightDirection2D();
       double alpha = VectorUtil::Angle(recoPos2D, flightDirection);
 
       const CDCWire& wire = recoHit3D.getWire();
@@ -188,7 +189,7 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
     CDCKarimakiFitter fitter;
     for (CDCTrack& track : outputAxialTracks) {
       CDCTrajectory2D trajectory2D = fitter.fit(track);
-      trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
+      trajectory2D.setLocalOrigin(ROOT::Math::XYVector(0.0, 0.0));
       track.setStartTrajectory3D({trajectory2D, CDCTrajectorySZ::basicAssumption()});
     }
   } else {

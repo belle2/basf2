@@ -7,12 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
+
+#include <Math/Vector2D.h>
 
 #include <cmath>
 
@@ -50,7 +51,7 @@ namespace Belle2 {
       }
 
       /// Constructs taking the distance to the origin ( n0 ) and the normal vector
-      Line2D(const double n0, const Vector2D& n12)
+      Line2D(const double n0, const ROOT::Math::XYVector& n12)
         : m_n0(n0)
         , m_n12(n12)
       {
@@ -86,7 +87,7 @@ namespace Belle2 {
       }
 
       /// Constructs a line through the two given points
-      static Line2D throughPoints(const Vector2D& start, const Vector2D& end)
+      static Line2D throughPoints(const ROOT::Math::XYVector& start, const ROOT::Math::XYVector& end)
       {
         return Line2D(VectorUtil::Cross(end, start), VectorUtil::Orthogonal(start - end));
       }
@@ -111,7 +112,7 @@ namespace Belle2 {
       }
 
       /// Getter for the unit normal vector to the line
-      const Vector2D& n12() const
+      const ROOT::Math::XYVector& n12() const
       {
         return m_n12;
       }
@@ -148,7 +149,7 @@ namespace Belle2 {
       }
 
       /// Setter for the normal vector.
-      void setN12(const Vector2D& n12)
+      void setN12(const ROOT::Math::XYVector& n12)
       {
         m_n12.SetXY(n12.X(), n12.Y());
       }
@@ -237,7 +238,7 @@ namespace Belle2 {
        *  Returns the signed distance of the point to the line. The sign is positive \n
        *  for the right side of the line and negative for the left side.
        */
-      double distance(const Vector2D& point) const
+      double distance(const ROOT::Math::XYVector& point) const
       {
         return n0() + point.Dot(n12());
       }
@@ -262,31 +263,31 @@ namespace Belle2 {
       }
 
       /// Returns the absolute value of distance(point)
-      double absoluteDistance(const Vector2D& point) const
+      double absoluteDistance(const ROOT::Math::XYVector& point) const
       {
         return fabs(distance(point));
       }
 
       /// Return if the point given is right or left of the line
-      ERightLeft isRightOrLeft(const Vector2D& point) const
+      ERightLeft isRightOrLeft(const ROOT::Math::XYVector& point) const
       {
         return static_cast<ERightLeft>(sign(distance(point)));
       }
 
       /// Return if the point given is left of the line
-      bool isLeft(const Vector2D& rhs) const
+      bool isLeft(const ROOT::Math::XYVector& rhs) const
       {
         return isRightOrLeft(rhs) == ERightLeft::c_Left;
       }
 
       /// Return if the point given is right of the line
-      bool isRight(const Vector2D& rhs) const
+      bool isRight(const ROOT::Math::XYVector& rhs) const
       {
         return isRightOrLeft(rhs) == ERightLeft::c_Right;
       }
 
       /// Calculates the point of closest approach on the line to the point
-      Vector2D closest(const Vector2D& point) const
+      ROOT::Math::XYVector closest(const ROOT::Math::XYVector& point) const
       {
         const double closestParallel = -n0();
         const double closestOrthgonal = VectorUtil::unnormalizedOrthogonalComp(point, n12());
@@ -294,7 +295,7 @@ namespace Belle2 {
       }
 
       /// Returns the point closest to the origin
-      Vector2D closestToOrigin() const
+      ROOT::Math::XYVector closestToOrigin() const
       {
         return n12() * (-n0());
       }
@@ -306,7 +307,7 @@ namespace Belle2 {
        *  and calculates the distance between them. The length is signed
        *  taken relative to the direction of positive advance.
        */
-      double lengthOnCurve(const Vector2D& from, const Vector2D& to) const
+      double lengthOnCurve(const ROOT::Math::XYVector& from, const ROOT::Math::XYVector& to) const
       {
         return VectorUtil::unnormalizedOrthogonalComp(to, n12()) - VectorUtil::unnormalizedOrthogonalComp(from, n12());
       }
@@ -318,25 +319,25 @@ namespace Belle2 {
       }
 
       /// Gives the tangential vector in the direction of positive advance on the line
-      Vector2D tangential() const
+      ROOT::Math::XYVector tangential() const
       {
         return VectorUtil::Orthogonal(normal());
       }
 
       /// Getter for the unit normal vector of the line
-      const Vector2D& normal() const
+      const ROOT::Math::XYVector& normal() const
       {
         return n12();
       }
 
       /// Getter for the gradient of the distance field
-      const Vector2D& gradient() const
+      const ROOT::Math::XYVector& gradient() const
       {
         return n12();
       }
 
       /// Getter for the support point of the line being the point closest to the origin
-      Vector2D support() const
+      ROOT::Math::XYVector support() const
       {
         return closestToOrigin();
       }
@@ -356,12 +357,12 @@ namespace Belle2 {
       }
 
       /// Calculates the intersection point of two line. Infinity for parallels
-      Vector2D intersection(const Line2D& line) const;
+      ROOT::Math::XYVector intersection(const Line2D& line) const;
 
       /** @name Transformations of the line */
       /**@{*/
       /// Actively moves the line in the direction given in place by the vector given
-      void moveBy(const Vector2D& by)
+      void moveBy(const ROOT::Math::XYVector& by)
       {
         m_n0 -= VectorUtil::unnormalizedParallelComp(by, n12());
       }
@@ -391,7 +392,7 @@ namespace Belle2 {
       }
 
       /// Passively move the coordinate system  in place by the given vector
-      void passiveMoveBy(const Vector2D& by)
+      void passiveMoveBy(const ROOT::Math::XYVector& by)
       {
         m_n0 += VectorUtil::unnormalizedParallelComp(by, n12());
       }
@@ -436,14 +437,14 @@ namespace Belle2 {
       /// and passive)
       Line2D flippedFirst() const
       {
-        return Line2D(n0(), Vector2D(-n12().X(), n12().Y()));
+        return Line2D(n0(), ROOT::Math::XYVector(-n12().X(), n12().Y()));
       }
 
       /// Makes a copy of the line with the second coordinate flipped (no difference between active
       /// and passive)
       Line2D flippedSecond() const
       {
-        return Line2D(n0(), Vector2D(n12().X(), -n12().Y()));
+        return Line2D(n0(), ROOT::Math::XYVector(n12().X(), -n12().Y()));
       }
       /**@}*/
 
@@ -510,7 +511,7 @@ namespace Belle2 {
       double m_n0;
 
       /// Memory for the second line parameter
-      Vector2D m_n12;
+      ROOT::Math::XYVector m_n12;
 
     };
   }

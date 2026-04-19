@@ -10,7 +10,6 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/ESign.h>
@@ -28,7 +27,7 @@ CDCRecoHit2D::CDCRecoHit2D(const CDCRLWireHit& rlWireHit) :
 {}
 
 CDCRecoHit2D::CDCRecoHit2D(const CDCRLWireHit& rlWireHit,
-                           const Vector2D& recoDisp2D) :
+                           const ROOT::Math::XYVector& recoDisp2D) :
   m_rlWireHit(rlWireHit),
   m_recoDisp2D(recoDisp2D)
 {}
@@ -39,7 +38,7 @@ CDCRecoHit2D CDCRecoHit2D::fromSimHit(const CDCWireHit* wireHit,
   // find out if the wire is right or left of the track ( view in flight direction )
   Vector3D trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};
   CDCRecoHit2D recoHit2D(CDCRLWireHit::fromSimHit(wireHit, simHit),
-                         Vector2D(-trackPosToWire.x(), -trackPosToWire.y()));
+                         ROOT::Math::XYVector(-trackPosToWire.x(), -trackPosToWire.y()));
 
   recoHit2D.snapToDriftCircle();
   return recoHit2D;
@@ -52,7 +51,7 @@ CDCRecoHit2D CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
     CDCRLWireHit::average(recoHit1.getRLWireHit(),
                           recoHit2.getRLWireHit());
 
-  Vector2D displacement =
+  ROOT::Math::XYVector displacement =
     VectorUtil::average(recoHit1.getRecoDisp2D(),
                         recoHit2.getRecoDisp2D());
 
@@ -71,7 +70,7 @@ CDCRecoHit2D CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
                           recoHit2.getRLWireHit(),
                           recoHit3.getRLWireHit());
 
-  Vector2D displacement =
+  ROOT::Math::XYVector displacement =
     VectorUtil::average(recoHit1.getRecoDisp2D(),
                         recoHit2.getRecoDisp2D(),
                         recoHit3.getRecoDisp2D());
@@ -83,7 +82,7 @@ CDCRecoHit2D CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
 }
 
 CDCRecoHit2D CDCRecoHit2D::fromRecoPos2D(const CDCRLWireHit& rlWireHit,
-                                         const Vector2D& recoPos2D,
+                                         const ROOT::Math::XYVector& recoPos2D,
                                          bool snap)
 {
   CDCRecoHit2D result(rlWireHit, recoPos2D - rlWireHit.getRefPos2D());
@@ -122,7 +121,7 @@ void CDCRecoHit2D::setRefDriftLength(double driftLength, bool snapRecoPos)
 void CDCRecoHit2D::snapToDriftCircle(bool switchSide)
 {
   if (m_recoDisp2D.R() != 0.0) {
-    m_recoDisp2D.Scale(getRLWireHit().getRefDriftLength() / m_recoDisp2D.R());
+    m_recoDisp2D *= (getRLWireHit().getRefDriftLength() / m_recoDisp2D.R());
   }
   if (switchSide) {
     m_recoDisp2D = -m_recoDisp2D;

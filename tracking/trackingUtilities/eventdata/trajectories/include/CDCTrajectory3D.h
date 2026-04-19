@@ -12,9 +12,10 @@
 #include <tracking/trackingUtilities/geometry/HelixParameters.h>
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <tracking/trackingUtilities/numerics/ESign.h>
+
+#include <Math/Vector2D.h>
 
 #include <TMath.h>
 #include <cmath>
@@ -233,7 +234,7 @@ namespace Belle2 {
       }
 
       /// Getter for the center of the helix in global coordinates
-      Vector2D getGlobalCenter() const
+      ROOT::Math::XYVector getGlobalCenter() const
       {
         return getLocalHelix()->centerXY() + VectorUtil::get2DVector(m_localOrigin);
       }

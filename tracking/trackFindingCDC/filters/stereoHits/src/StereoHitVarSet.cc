@@ -19,6 +19,8 @@
 
 #include <cdc/dataobjects/CDCHit.h>
 
+#include <Math/Vector2D.h>
+
 #include <numeric>
 
 using namespace Belle2;
@@ -38,7 +40,7 @@ bool StereoHitVarSet::extract(const BaseStereoHitFilter::Object* testPair)
 
   const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trajectory2D);
 
-  const Vector2D& startMomentum = trajectory2D.getMom2DAtSupport();
+  const ROOT::Math::XYVector& startMomentum = trajectory2D.getMom2DAtSupport();
   const double radius = trajectory2D.getLocalCircle()->radius();
   const double size = track->size();
   const Vector3D& reconstructedPosition = recoHit3D.getRecoPos3D();
@@ -52,8 +54,8 @@ bool StereoHitVarSet::extract(const BaseStereoHitFilter::Object* testPair)
   const CDCRecoHit3D & listRecoHit) { return sum + listRecoHit.getArcLength2D();});
 
   const CDCWire& wire = rlWireHit->getWire();
-  Vector2D wirePos = wire.getWirePos2DAtZ(reconstructedPosition.z());
-  Vector2D disp2D = VectorUtil::get2DVector(reconstructedPosition) - wirePos;
+  ROOT::Math::XYVector wirePos = wire.getWirePos2DAtZ(reconstructedPosition.z());
+  ROOT::Math::XYVector disp2D = VectorUtil::get2DVector(reconstructedPosition) - wirePos;
   const double xyDistance = disp2D.R();
 
   const auto nearestAxialHit = std::min_element(track->begin(), track->end(), [&reconstructedS](const CDCRecoHit3D & lhs,

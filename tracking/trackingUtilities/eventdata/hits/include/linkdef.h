@@ -8,7 +8,7 @@
 #pragma link C++ class Belle2::TrackingUtilities::CDCWireHit+; // checksum=0xa11ee4bb, version=-1
 #pragma link C++ class Belle2::TrackingUtilities::CDCRLWireHit+; // checksum=0xd30b83b9, version=-1
 
-#pragma link C++ class Belle2::TrackingUtilities::CDCRecoHit2D+; // checksum=0x9b12c4d, version=-1
+#pragma link C++ class Belle2::TrackingUtilities::CDCRecoHit2D+; // checksum=0xd5510c04, version=-1
 #pragma link C++ class Belle2::TrackingUtilities::CDCRecoHit3D+; // checksum=0x1c170e75, version=-1
 
 #pragma link C++ class Belle2::TrackingUtilities::CDCRLWireHitPair+; // checksum=0xe371b5e6, version=-1

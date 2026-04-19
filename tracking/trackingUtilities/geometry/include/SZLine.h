@@ -8,7 +8,9 @@
 #pragma once
 
 #include <tracking/trackingUtilities/geometry/SZParameters.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/numerics/Quadratic.h>
+
+#include <Math/Vector2D.h>
 
 namespace Belle2 {
   namespace TrackingUtilities {
@@ -158,7 +160,7 @@ namespace Belle2 {
        *  Returns the signed distance of the point to the line. The sign is positive \n
        *  below the curve and negative above it.
        */
-      double distance(const Vector2D& szPoint) const
+      double distance(const ROOT::Math::XYVector& szPoint) const
       {
         return distance(szPoint.X(), szPoint.Y());
       }
@@ -174,10 +176,10 @@ namespace Belle2 {
       }
 
       /// Calculates the intersection point of two line. Infinity for parallels
-      Vector2D intersection(const SZLine& szLine) const;
+      ROOT::Math::XYVector intersection(const SZLine& szLine) const;
 
       /// Passively move the coordinate system in place by the given sz vector
-      void passiveMoveBy(const Vector2D& bySZ)
+      void passiveMoveBy(const ROOT::Math::XYVector& bySZ)
       {
         passiveMoveBy(bySZ.X(), bySZ.Y());
       }
@@ -189,7 +191,7 @@ namespace Belle2 {
       }
 
       /// Return a line passively move by the given vector as a copy
-      SZLine passiveMovedBy(const Vector2D& bySZ) const
+      SZLine passiveMovedBy(const ROOT::Math::XYVector& bySZ) const
       {
         return passiveMovedBy(bySZ.X(), bySZ.Y());
       }
@@ -201,7 +203,7 @@ namespace Belle2 {
       }
 
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
-      SZJacobian passiveMoveByJacobian(const Vector2D& bySZ) const
+      SZJacobian passiveMoveByJacobian(const ROOT::Math::XYVector& bySZ) const
       {
         using namespace NSZParameterIndices;
         SZJacobian result = SZUtil::identity();

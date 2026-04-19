@@ -17,6 +17,7 @@
 
 #include <framework/geometry/B2Vector3.h>
 
+#include <Math/Vector2D.h>
 #include <TMath.h>
 #include <cmath>
 
@@ -40,7 +41,7 @@ double CDCBFieldUtil::getBFieldZ()
   return getBFieldZ(Vector3D(0, 0, 0));
 }
 
-double CDCBFieldUtil::getBFieldZ(const Vector2D& pos2D)
+double CDCBFieldUtil::getBFieldZ(const ROOT::Math::XYVector& pos2D)
 {
   return getBFieldZ(Vector3D(pos2D, 0));
 }
@@ -62,7 +63,7 @@ double CDCBFieldUtil::getAlphaFromBField(double bField)
   return 1.0 / (bField * TMath::C()) * 1E11;
 }
 
-double CDCBFieldUtil::getAlphaZ(const Vector2D& pos2D)
+double CDCBFieldUtil::getAlphaZ(const ROOT::Math::XYVector& pos2D)
 {
   return getAlphaFromBField(getBFieldZ(pos2D));
 }
@@ -95,7 +96,7 @@ double CDCBFieldUtil::absMom2DToBendRadius(double absMom2D,
 }
 
 double CDCBFieldUtil::absMom2DToBendRadius(double absMom2D,
-                                           const Vector2D& pos2D)
+                                           const ROOT::Math::XYVector& pos2D)
 {
   return absMom2DToBendRadius(absMom2D, getBFieldZ(pos2D));
 }
@@ -115,7 +116,7 @@ double CDCBFieldUtil::absMom2DToCurvature(double absMom2D,
 
 double CDCBFieldUtil::absMom2DToCurvature(double absMom2D,
                                           double charge,
-                                          const Vector2D& pos2D)
+                                          const ROOT::Math::XYVector& pos2D)
 {
   return absMom2DToCurvature(absMom2D, charge, getBFieldZ(pos2D));
 }
@@ -134,7 +135,7 @@ double CDCBFieldUtil::curvatureToAbsMom2D(double curvature,
 }
 
 double CDCBFieldUtil::curvatureToAbsMom2D(double curvature,
-                                          const Vector2D& pos2D)
+                                          const ROOT::Math::XYVector& pos2D)
 {
   return curvatureToAbsMom2D(curvature, getBFieldZ(pos2D));
 }

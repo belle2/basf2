@@ -61,7 +61,7 @@ RecoTrack* RecoTrackUtil::storeInto(const CDCTrack& track, StoreArray<RecoTrack>
   Vector3D momentum(track.getStartTrajectory3D().getFlightDirection3DAtSupport());
   const double z0 = szTrajectory.getZ0();
   const double lambda = std::atan(szTrajectory.getTanLambda());
-  momentum.Scale(std::cos(lambda));
+  momentum *= (std::cos(lambda));
   momentum.SetZ(std::sin(lambda));
   momentum *= momentumSeedMagnitude;
 

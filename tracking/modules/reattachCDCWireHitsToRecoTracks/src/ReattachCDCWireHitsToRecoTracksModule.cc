@@ -9,13 +9,14 @@
 
 #include <cdc/topology/CDCWire.h>
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <tracking/dbobjects/DAFConfiguration.h>
+
+#include <Math/Vector2D.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -84,7 +85,7 @@ void ReattachCDCWireHitsToRecoTracksModule::findHits()
     const CDCTrajectory3D trajectory(trackPosition, recoTrack.getTimeSeed(), trackMomentum, recoTrack.getChargeSeed());
     const CDCTrajectory2D& trajectory2D(trajectory.getTrajectory2D());
     const CDCTrajectorySZ& trajectorySZ(trajectory.getTrajectorySZ());
-    const double d0Estimate((trajectory2D.getClosest(Vector2D(0, 0))).R());
+    const double d0Estimate((trajectory2D.getClosest(ROOT::Math::XYVector(0, 0))).R());
     const double z0Estimate(trajectorySZ.getZ0());
     if (abs(d0Estimate) < m_maximumAbsD0 and abs(z0Estimate) < m_maximumAbsZ0) {
       if (trackFitter.fit(recoTrack)) {
@@ -241,23 +242,23 @@ ReattachCDCWireHitsToRecoTracksModule::ReconstructionResults ReattachCDCWireHits
     const CDCTrajectory2D& trajectory2D(trajectory.getTrajectory2D());
     const CDCTrajectorySZ& trajectorySZ(trajectory.getTrajectorySZ());
 
-    Vector2D recoPos2D;
+    ROOT::Math::XYVector recoPos2D;
     if (wireHit.isAxial()) {
       recoPos2D = wireHit.reconstruct2D(trajectory2D);
     } else {
       const CDCWire& wire(wireHit.getWire());
-      const Vector2D& posOnXYPlane(wireHit.reconstruct2D(trajectory2D));
+      const ROOT::Math::XYVector& posOnXYPlane(wireHit.reconstruct2D(trajectory2D));
 
       const double arcLength(trajectory2D.calcArcLength2D(posOnXYPlane));
       const double z(trajectorySZ.mapSToZ(arcLength));
 
-      const Vector2D& wirePos2DAtZ(wire.getWirePos2DAtZ(z));
+      const ROOT::Math::XYVector& wirePos2DAtZ(wire.getWirePos2DAtZ(z));
 
-      const Vector2D& recoPosOnTrajectory(trajectory2D.getClosest(wirePos2DAtZ));
+      const ROOT::Math::XYVector& recoPosOnTrajectory(trajectory2D.getClosest(wirePos2DAtZ));
       const double driftLength(wireHit.getRefDriftLength());
-      Vector2D disp2D(recoPosOnTrajectory - wirePos2DAtZ);
+      ROOT::Math::XYVector disp2D(recoPosOnTrajectory - wirePos2DAtZ);
       if (disp2D.R() != 0.0) {
-        disp2D.Scale(driftLength / disp2D.R());
+        disp2D *= (driftLength / disp2D.R());
       }
       recoPos2D = wirePos2DAtZ + disp2D;
     }

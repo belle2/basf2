@@ -16,6 +16,8 @@
 
 #include <tracking/trackingUtilities/numerics/Weight.h>
 
+#include <Math/Vector2D.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -52,11 +54,11 @@ namespace Belle2 {
         const float centerTanLambda = 0.5 * (lowerTanLambda + upperTanLambda);
 
         float perpS = recoHit.getArcLength2D();
-        const TrackingUtilities::Vector2D& recoPosition = recoHit.getRecoPos2D();
+        const ROOT::Math::XYVector& recoPosition = recoHit.getRecoPos2D();
 
         float hitZ = centerTanLambda * perpS + centerZ0;
 
-        TrackingUtilities::Vector2D pos2D = wireLine.nominalPos2DAtZ(hitZ);
+        ROOT::Math::XYVector pos2D = wireLine.nominalPos2DAtZ(hitZ);
 
         float distanceToRecoPosition = (pos2D - recoPosition).R();
 

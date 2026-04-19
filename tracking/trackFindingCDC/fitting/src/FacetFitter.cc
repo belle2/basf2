@@ -11,12 +11,12 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <tracking/trackingUtilities/numerics/EigenView.h>
 
 #include <Eigen/Core>
 
+#include <Math/Vector2D.h>
 #include <Math/Functor.h>
 #include <Math/BrentMinimizer1D.h>
 
@@ -27,30 +27,30 @@ using namespace TrackingUtilities;
 namespace {
 
   template<int N>
-  Vector2D getCenterForwardDirection(const Matrix<double, N, 3>& xyl)
+  ROOT::Math::XYVector getCenterForwardDirection(const Matrix<double, N, 3>& xyl)
   {
     /// Rotate in forward direction
-    Vector2D coordinate(xyl(N - 1, 0) - xyl(0, 0), xyl(N - 1, 1) - xyl(0, 1));
+    ROOT::Math::XYVector coordinate(xyl(N - 1, 0) - xyl(0, 0), xyl(N - 1, 1) - xyl(0, 1));
     return VectorUtil::unit(coordinate);
   }
 
   template<int N>
-  Vector2D getTangentialForwardDirection(const Matrix<double, N, 3>& xyl)
+  ROOT::Math::XYVector getTangentialForwardDirection(const Matrix<double, N, 3>& xyl)
   {
     /// Rotate in forward direction
-    Vector2D fromPos(xyl(0, 0), xyl(0, 1));
+    ROOT::Math::XYVector fromPos(xyl(0, 0), xyl(0, 1));
     double fromL = xyl(0, 2);
 
-    Vector2D toPos(xyl(N - 1, 0), xyl(N - 1, 1));
+    ROOT::Math::XYVector toPos(xyl(N - 1, 0), xyl(N - 1, 1));
     double toL = xyl(N - 1, 2);
 
     ParameterLine2D tangentLine = ParameterLine2D::touchingCircles(fromPos, fromL, toPos, toL);
-    Vector2D coordinate = tangentLine.tangential();
+    ROOT::Math::XYVector coordinate = tangentLine.tangential();
     return VectorUtil::unit(coordinate);
   }
 
   template<int N>
-  void rotate(Vector2D coordinate, Matrix<double, N, 3>& xyl)
+  void rotate(ROOT::Math::XYVector coordinate, Matrix<double, N, 3>& xyl)
   {
     Matrix<double, 3, 3> rot = Matrix<double, 3, 3>::Identity();
     rot(0, 0) = coordinate.x();
@@ -61,11 +61,11 @@ namespace {
     xyl =  xyl * rot;
   }
 
-  void unrotate(Vector2D coordinate, Vector2D& vec)
+  void unrotate(ROOT::Math::XYVector coordinate, ROOT::Math::XYVector& vec)
   {
     // Inverse rotation is accomblished by taking the angle to the opposite
     // which is equivalent to flipping the second coordinate.
-    vec = VectorUtil::passiveRotatedBy(vec, Vector2D(coordinate.X(), -coordinate.Y()));
+    vec = VectorUtil::passiveRotatedBy(vec, ROOT::Math::XYVector(coordinate.X(), -coordinate.Y()));
   }
 
   Eigen::Vector2d fitPhiVecZeroSteps(const Eigen::Matrix<double, 3, 3>& xylCov, double& chi2)
@@ -108,7 +108,7 @@ namespace {
                                int nSteps)
   {
     /// Rotate in forward direction
-    Vector2D coordinate = getTangentialForwardDirection(xylIn);
+    ROOT::Math::XYVector coordinate = getTangentialForwardDirection(xylIn);
     // Sometimes the calculation of the tangent fails due to misestimated dirft lengths
     // Make best effort the continue the calculation
     if (VectorUtil::hasNAN(coordinate)) {
@@ -148,10 +148,10 @@ namespace {
     linePrecision(c_I, c_I) = p;
     LineCovariance lineCovariance = LineUtil::covarianceFromFullPrecision(linePrecision);
 
-    Vector2D tangential(phiVec(0), phiVec(1));
-    Vector2D n12 = VectorUtil::Orthogonal(tangential, ERotation::c_Clockwise);
+    ROOT::Math::XYVector tangential(phiVec(0), phiVec(1));
+    ROOT::Math::XYVector n12 = VectorUtil::Orthogonal(tangential, ERotation::c_Clockwise);
     double n0 = averages(2) - averages(0) * n12.x() - averages(1) * n12.y();
-    Vector2D support = -n12 * n0;
+    ROOT::Math::XYVector support = -n12 * n0;
 
     // Transform the normal vector back into the original coordinate system.
     unrotate(coordinate, support);
@@ -176,24 +176,24 @@ double FacetFitter::fit(const CDCFacet& facet, int nSteps)
   const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
   const CDCRLWireHit& endRLWireHit = facet.getEndRLWireHit();
 
-  const Vector2D support = middleRLWireHit.getWireHit().getRefPos2D();
+  const ROOT::Math::XYVector support = middleRLWireHit.getWireHit().getRefPos2D();
 
   const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
-  const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
+  const ROOT::Math::XYVector startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
   xyl(0, 0) = startWirePos2D.x() - support.x();
   xyl(0, 1) = startWirePos2D.y() - support.y();
   xyl(0, 2) = startRLWireHit.getSignedRefDriftLength();
   w(0) = 1.0 / startDriftLengthVar;
 
   const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
-  const Vector2D middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
+  const ROOT::Math::XYVector middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
   xyl(1, 0) = middleWirePos2D.x() - support.x();
   xyl(1, 1) = middleWirePos2D.y() - support.y();
   xyl(1, 2) = middleRLWireHit.getSignedRefDriftLength();
   w(1) = 1.0 / middleDriftLengthVar;
 
   const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
-  const Vector2D endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
+  const ROOT::Math::XYVector endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
   xyl(2, 0) = endWirePos2D.x() - support.x();
   xyl(2, 1) = endWirePos2D.y() - support.y();
   xyl(2, 2) = endRLWireHit.getSignedRefDriftLength();
@@ -216,29 +216,29 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
   // Weight matrix
   Matrix<double, 6, 1> w = Matrix<double, 6, 1>::Zero();
 
-  const Vector2D support = VectorUtil::average(fromFacet.getMiddleWireHit().getRefPos2D(),
-                                               toFacet.getMiddleWireHit().getRefPos2D());
+  const ROOT::Math::XYVector support = VectorUtil::average(fromFacet.getMiddleWireHit().getRefPos2D(),
+                                                           toFacet.getMiddleWireHit().getRefPos2D());
   {
     const CDCRLWireHit& startRLWireHit = fromFacet.getStartRLWireHit();
     const CDCRLWireHit& middleRLWireHit = fromFacet.getMiddleRLWireHit();
     const CDCRLWireHit& endRLWireHit = fromFacet.getEndRLWireHit();
 
     const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
-    const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
+    const ROOT::Math::XYVector startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
     xyl(0, 0) = startWirePos2D.x() - support.x();
     xyl(0, 1) = startWirePos2D.y() - support.y();
     xyl(0, 2) = startRLWireHit.getSignedRefDriftLength();
     w(0) = 1.0 / startDriftLengthVar;
 
     const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
-    const Vector2D middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
+    const ROOT::Math::XYVector middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
     xyl(1, 0) = middleWirePos2D.x() - support.x();
     xyl(1, 1) = middleWirePos2D.y() - support.y();
     xyl(1, 2) = middleRLWireHit.getSignedRefDriftLength();
     w(1) = 1.0 / middleDriftLengthVar;
 
     const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
-    const Vector2D endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
+    const ROOT::Math::XYVector endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
     xyl(2, 0) = endWirePos2D.x() - support.x();
     xyl(2, 1) = endWirePos2D.y() - support.y();
     xyl(2, 2) = endRLWireHit.getSignedRefDriftLength();
@@ -251,21 +251,21 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
     const CDCRLWireHit& endRLWireHit = toFacet.getEndRLWireHit();
 
     const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
-    const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
+    const ROOT::Math::XYVector startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
     xyl(3, 0) = startWirePos2D.x() - support.x();
     xyl(3, 1) = startWirePos2D.y() - support.y();
     xyl(3, 2) = startRLWireHit.getSignedRefDriftLength();
     w(3) = 1.0 / startDriftLengthVar;
 
     const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
-    const Vector2D middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
+    const ROOT::Math::XYVector middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
     xyl(4, 0) = middleWirePos2D.x() - support.x();
     xyl(4, 1) = middleWirePos2D.y() - support.y();
     xyl(4, 2) = middleRLWireHit.getSignedRefDriftLength();
     w(4) = 1.0 / middleDriftLengthVar;
 
     const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
-    const Vector2D endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
+    const ROOT::Math::XYVector endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
     xyl(5, 0) = endWirePos2D.x() - support.x();
     xyl(5, 1) = endWirePos2D.y() - support.y();
     xyl(5, 2) = endRLWireHit.getSignedRefDriftLength();

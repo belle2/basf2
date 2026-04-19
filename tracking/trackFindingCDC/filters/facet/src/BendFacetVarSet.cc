@@ -11,6 +11,8 @@
 
 #include <framework/geometry/VectorUtil.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -56,9 +58,9 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   const double middleChi2 = middleDistance * (middleDistance - middleOptimalStep) * middleWeight;
   const double endChi2 = endDistance * (endDistance - endOptimalStep) * endWeight;
 
-  const Vector2D& startToMiddleTangentialVector = startToMiddleLine.tangential();
-  const Vector2D& startToEndTangentialVector = startToEndLine.tangential();
-  const Vector2D& middleToEndTangentialVector = middleToEndLine.tangential();
+  const ROOT::Math::XYVector& startToMiddleTangentialVector = startToMiddleLine.tangential();
+  const ROOT::Math::XYVector& startToEndTangentialVector = startToEndLine.tangential();
+  const ROOT::Math::XYVector& middleToEndTangentialVector = middleToEndLine.tangential();
 
   const double startToMiddleLength = startToMiddleTangentialVector.R();
   const double startToEndLength = startToEndTangentialVector.R();

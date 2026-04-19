@@ -19,6 +19,8 @@
 
 #include <cdc/topology/CDCWire.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
@@ -110,7 +112,7 @@ CDCTrajectory3D CDCAxialStereoFusion::fusePreliminary(const CDCSegment2D& fromSe
 
   CDCTrajectory2D axialTrajectory2D = axialSegment2D.getTrajectory2D();
 
-  Vector2D localOrigin2D = (fromIsAxial ? fromSegment2D.back() : toSegment2D.front()).getRecoPos2D();
+  ROOT::Math::XYVector localOrigin2D = (fromIsAxial ? fromSegment2D.back() : toSegment2D.front()).getRecoPos2D();
   axialTrajectory2D.setLocalOrigin(localOrigin2D);
 
   CDCSegment3D stereoSegment3D = CDCSegment3D::reconstruct(stereoSegment2D, axialTrajectory2D);
@@ -136,7 +138,7 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCSegme
     const CDCTrajectory3D& preliminaryTrajectory3D)
 {
   Vector3D localOrigin3D = preliminaryTrajectory3D.getLocalOrigin();
-  Vector2D localOrigin2D = VectorUtil::get2DVector(localOrigin3D);
+  ROOT::Math::XYVector localOrigin2D = VectorUtil::get2DVector(localOrigin3D);
 
   CDCRiemannFitter riemannFitter;
   //riemannFitter.useOnlyOrientation();
@@ -174,14 +176,14 @@ PerigeeHelixAmbiguity CDCAxialStereoFusion::calcAmbiguity(const CDCSegment3D& se
 {
   size_t nHits = segment3D.size();
 
-  const Vector2D& localOrigin2D = trajectory2D.getLocalOrigin();
+  const ROOT::Math::XYVector& localOrigin2D = trajectory2D.getLocalOrigin();
   const UncertainPerigeeCircle& localCircle = trajectory2D.getLocalCircle();
 
   double zeta = 0;
   for (const CDCRecoHit3D& recoHit3D : segment3D) {
-    const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
-    const Vector2D localRecoPos2D = recoPos2D - localOrigin2D;
-    const Vector2D normal = localCircle->normal(localRecoPos2D);
+    const ROOT::Math::XYVector& recoPos2D = recoHit3D.getRecoPos2D();
+    const ROOT::Math::XYVector localRecoPos2D = recoPos2D - localOrigin2D;
+    const ROOT::Math::XYVector normal = localCircle->normal(localRecoPos2D);
     const CDCWire& wire = recoHit3D.getWire();
     zeta += wire.getWireLine().sagMovePerZ(recoHit3D.getRecoZ()).Dot(normal);
   }

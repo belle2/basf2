@@ -14,6 +14,8 @@
 
 #include <tracking/trackingUtilities/numerics/Quadratic.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -23,9 +25,9 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
   if (not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 
-  const Vector2D startWirePos2D = facet.getStartWireHit().getRefPos2D();
-  const Vector2D middleWirePos2D = facet.getMiddleWireHit().getRefPos2D();
-  const Vector2D endWirePos2D = facet.getEndWireHit().getRefPos2D();
+  const ROOT::Math::XYVector startWirePos2D = facet.getStartWireHit().getRefPos2D();
+  const ROOT::Math::XYVector middleWirePos2D = facet.getMiddleWireHit().getRefPos2D();
+  const ROOT::Math::XYVector endWirePos2D = facet.getEndWireHit().getRefPos2D();
 
   // 0 step fit
   {

@@ -23,6 +23,8 @@
 
 #include <framework/geometry/VectorUtil.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
@@ -173,7 +175,7 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
 
     for (const CDCRecoHit2D& recoHit2D : *segment) {
       Vector3D reconstructedPosition = recoHit2D.reconstruct3D(trajectoryTrack2D);
-      const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
+      const ROOT::Math::XYVector& recoPos2D = recoHit2D.getRecoPos2D();
       double perpS = trajectoryTrack2D.calcArcLength2D(recoPos2D);
 
 

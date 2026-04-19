@@ -17,12 +17,13 @@
 
 #include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/LineParameters.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <framework/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/Angle.h>
+
+#include <Math/Vector2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -44,10 +45,10 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
   LineCovariance toCov   = toFitLine.lineCovariance();
   LineParameters toPar   = toFitLine.lineParameters();
 
-  Vector2D fromTangential = fromFacet->getStartToEndLine().tangential();
-  Vector2D toTangential   = toFacet->getStartToEndLine().tangential();
+  ROOT::Math::XYVector fromTangential = fromFacet->getStartToEndLine().tangential();
+  ROOT::Math::XYVector toTangential   = toFacet->getStartToEndLine().tangential();
 
-  Vector2D tangential = VectorUtil::average(fromTangential, toTangential);
+  ROOT::Math::XYVector tangential = VectorUtil::average(fromTangential, toTangential);
 
   double fromMiddleCos = VectorUtil::CosTheta(fromFacet->getStartToMiddleLine().tangential(), toTangential);
   double toMiddleCos = VectorUtil::CosTheta(fromTangential, toFacet->getMiddleToEndLine().tangential());
@@ -57,8 +58,8 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
   var<named("from_middle_cos_delta")>() = fromMiddleCos;
   var<named("to_middle_cos_delta")>() = toMiddleCos;
 
-  Vector2D frontWirePos2D = fromFacet->getStartWireHit().getRefPos2D();
-  Vector2D backWirePos2D  = toFacet->getEndWireHit().getRefPos2D();
+  ROOT::Math::XYVector frontWirePos2D = fromFacet->getStartWireHit().getRefPos2D();
+  ROOT::Math::XYVector backWirePos2D  = toFacet->getEndWireHit().getRefPos2D();
   {
     int nSteps = 0;
     UncertainParameterLine2D fitLine = FacetFitter::fit(*fromFacet, *toFacet, nSteps);

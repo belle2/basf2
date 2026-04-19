@@ -13,6 +13,8 @@
 
 #include <framework/geometry/VectorUtil.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -47,8 +49,8 @@ bool HitGapTrackRelationVarSet::extract(const Relation<const CDCTrack>* ptrTrack
   const double hitDistance = hitPosGap.R();
   const double longHitDistance = longHitPosGap.R();
 
-  const Vector2D fromLastHitMom = fromLastHit.getFlightDirection2D();
-  const Vector2D toFirstHitMom = toFirstHit.getFlightDirection2D();
+  const ROOT::Math::XYVector fromLastHitMom = fromLastHit.getFlightDirection2D();
+  const ROOT::Math::XYVector toFirstHitMom = toFirstHit.getFlightDirection2D();
 
   finitevar<named("delta_hit_pos_phi")>() = VectorUtil::Angle(fromLastHitPos, toFirstHitPos);
   finitevar<named("delta_hit_mom_phi")>() = VectorUtil::Angle(fromLastHitMom, toFirstHitMom);

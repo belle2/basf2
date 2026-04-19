@@ -24,7 +24,6 @@
 
 #include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
@@ -37,6 +36,8 @@
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/VectorUtil.h>
+
+#include <Math/Vector2D.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -61,8 +62,8 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit2D& recoHit2D)
 {
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
 
-  Vector2D flightDirection = recoHit2D.getFlightDirection2D();
-  Vector2D recoPos2D = recoHit2D.getRecoPos2D();
+  ROOT::Math::XYVector flightDirection = recoHit2D.getFlightDirection2D();
+  ROOT::Math::XYVector recoPos2D = recoHit2D.getRecoPos2D();
   double alpha = VectorUtil::Angle(recoPos2D, flightDirection);
   const double beta = 1;
   double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);
@@ -93,14 +94,14 @@ void DriftLengthEstimator::updateDriftLength(CDCFacet& facet)
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
 
   const UncertainParameterLine2D& line = facet.getFitLine();
-  Vector2D flightDirection = line->tangential();
-  Vector2D centralPos2D = line->closest(facet.getMiddleWire().getRefPos2D());
+  ROOT::Math::XYVector flightDirection = line->tangential();
+  ROOT::Math::XYVector centralPos2D = line->closest(facet.getMiddleWire().getRefPos2D());
   double alpha = VectorUtil::Angle(centralPos2D, flightDirection);
   if (not m_param_useAlphaInDriftLength) {
     alpha = 0;
   }
 
-  auto doUpdate = [&](CDCRLWireHit & rlWireHit, Vector2D recoPos2D) {
+  auto doUpdate = [&](CDCRLWireHit & rlWireHit, ROOT::Math::XYVector recoPos2D) {
     const CDCWire& wire = rlWireHit.getWire();
     const CDCHit* hit = rlWireHit.getWireHit().getHit();
     const bool rl = rlWireHit.getRLInfo() == ERightLeft::c_Right;
@@ -142,9 +143,9 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit3D& recoHit3D,
 {
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
 
-  Vector2D flightDirection = recoHit3D.getFlightDirection2D();
+  ROOT::Math::XYVector flightDirection = recoHit3D.getFlightDirection2D();
   const Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
-  const Vector2D& recoPos2D = VectorUtil::get2DVector(recoPos3D);
+  const ROOT::Math::XYVector& recoPos2D = VectorUtil::get2DVector(recoPos3D);
   double alpha = VectorUtil::Angle(recoPos2D, flightDirection);
   const double beta = 1;
   double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);

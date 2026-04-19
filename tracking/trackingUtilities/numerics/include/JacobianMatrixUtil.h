@@ -10,10 +10,11 @@
 #include <tracking/trackingUtilities/numerics/JacobianMatrix.h>
 #include <tracking/trackingUtilities/numerics/ParameterVector.h>
 
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/EigenView.h>
+
+#include <Math/Vector2D.h>
 
 #include <Eigen/Core>
 
@@ -46,7 +47,7 @@ namespace Belle2 {
 
       /// Construct a passive rotation matrix around coordinates i and j
       template <int N>
-      static JacobianMatrix<N, N> passiveRotation(int i, int j, const Vector2D& phiVec)
+      static JacobianMatrix<N, N> passiveRotation(int i, int j, const ROOT::Math::XYVector& phiVec)
       {
         assert(i < N);
         assert(j < N);

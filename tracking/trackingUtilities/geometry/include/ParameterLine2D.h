@@ -9,7 +9,6 @@
 
 #include <tracking/trackingUtilities/geometry/GeneralizedCircle.h>
 #include <tracking/trackingUtilities/geometry/Line2D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/Quadratic.h>
@@ -17,6 +16,8 @@
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
+
+#include <Math/Vector2D.h>
 
 #include <utility>
 #include <cmath>
@@ -43,7 +44,7 @@ namespace Belle2 {
       }
 
       /// Standard constructor taking the support point and the tangential vector
-      ParameterLine2D(const Vector2D& support, const Vector2D& tangential)
+      ParameterLine2D(const ROOT::Math::XYVector& support, const ROOT::Math::XYVector& tangential)
         : m_support(support)
         , m_tangential(tangential)
       {
@@ -55,7 +56,7 @@ namespace Belle2 {
        */
       static ParameterLine2D fromSlopeIntercept(const double slope, const double intercept)
       {
-        return ParameterLine2D(Vector2D(0.0, intercept), Vector2D(1.0, slope));
+        return ParameterLine2D(ROOT::Math::XYVector(0.0, intercept), ROOT::Math::XYVector(1.0, slope));
       }
 
       /// Constructs a line with slope and intercept. Orientation means the alignment with the first
@@ -67,8 +68,8 @@ namespace Belle2 {
                                                 const double intercept,
                                                 const EForwardBackward orientation)
       {
-        return ParameterLine2D(Vector2D(0.0, intercept),
-                               Vector2D(orientation, static_cast<double>(orientation) * slope));
+        return ParameterLine2D(ROOT::Math::XYVector(0.0, intercept),
+                               ROOT::Math::XYVector(orientation, static_cast<double>(orientation) * slope));
       }
 
       /// Static constructor for a line between to points
@@ -76,7 +77,7 @@ namespace Belle2 {
        * end and start.
        *  Hence at(0) == start and at(1) == end for the constructed line.
        */
-      static ParameterLine2D throughPoints(const Vector2D& start, const Vector2D& end)
+      static ParameterLine2D throughPoints(const ROOT::Math::XYVector& start, const ROOT::Math::XYVector& end)
       {
         return ParameterLine2D(start, end - start);
       }
@@ -102,9 +103,9 @@ namespace Belle2 {
        * passage information.
        *  @return the line being tangential to both circles.
        *  Note : the touch points reside at(0) for the first and at(1) for the second */
-      static ParameterLine2D touchingCircles(const Vector2D& fromCenter,
+      static ParameterLine2D touchingCircles(const ROOT::Math::XYVector& fromCenter,
                                              double fromSignedRadius,
-                                             const Vector2D& toCenter,
+                                             const ROOT::Math::XYVector& toCenter,
                                              double toSignedRadius);
 
       /// Downcast the line to the normal representation.
@@ -119,24 +120,24 @@ namespace Belle2 {
 
     public:
       /// Gives the tangential vector of the line.
-      const Vector2D& tangential() const
+      const ROOT::Math::XYVector& tangential() const
       {
         return m_tangential;
       }
       /// Gives the normal vector of the line.
-      Vector2D normal() const
+      ROOT::Math::XYVector normal() const
       {
         return VectorUtil::Orthogonal(tangential(), ERotation::c_Clockwise);
       }
 
       /// Gives the support vector of the line.
-      const Vector2D& support() const
+      const ROOT::Math::XYVector& support() const
       {
         return m_support;
       }
 
       /// Evaluates the line formula at the parameter given
-      Vector2D at(const double parameter) const
+      ROOT::Math::XYVector at(const double parameter) const
       {
         return tangential() * parameter += support();
       }
@@ -164,7 +165,7 @@ namespace Belle2 {
       void normalize()
       {
         if (m_tangential.R() != 0.0) {
-          m_tangential.Scale(1. / m_tangential.R());
+          m_tangential *= (1. / m_tangential.R());
         }
       }
 
@@ -184,7 +185,7 @@ namespace Belle2 {
       /// Reverses the tangential vector inplace
       void reverse()
       {
-        m_tangential.Negate();
+        m_tangential = -m_tangential;
       }
 
       /// Makes a copy line which has the opposite tangential vector but same support point.
@@ -197,7 +198,7 @@ namespace Belle2 {
       /// Gives the signed distance of a point to the line
       /** Returns the signed distance of the point to the line. The sign is positive \n
        *  for the right side of the line and negative for the left side. */
-      double distance(const Vector2D& point) const
+      double distance(const ROOT::Math::XYVector& point) const
       {
         return distanceToOrigin() - VectorUtil::orthogonalComp(point, tangential());
       }
@@ -207,7 +208,7 @@ namespace Belle2 {
        *  for the right side of the line and negative for the left side. */
       double distance(const double first, const double second) const
       {
-        return distance(Vector2D(first, second));
+        return distance(ROOT::Math::XYVector(first, second));
       }
 
       /// Gives the signed distance of the origin
@@ -217,31 +218,31 @@ namespace Belle2 {
       }
 
       /// Gives the unsigned distance of a point to the line
-      double absoluteDistance(const Vector2D& point) const
+      double absoluteDistance(const ROOT::Math::XYVector& point) const
       {
         return fabs(distance(point));
       }
 
       /// Return if the point given is right or left of the line
-      ERightLeft isRightOrLeft(const Vector2D& point) const
+      ERightLeft isRightOrLeft(const ROOT::Math::XYVector& point) const
       {
         return static_cast<ERightLeft>(sign(distance(point)));
       }
 
       /// Return if the point given is left of the line
-      bool isLeft(const Vector2D& rhs) const
+      bool isLeft(const ROOT::Math::XYVector& rhs) const
       {
         return isRightOrLeft(rhs) == ERightLeft::c_Left;
       }
 
       /// Return if the point given is right of the line
-      bool isRight(const Vector2D& rhs) const
+      bool isRight(const ROOT::Math::XYVector& rhs) const
       {
         return isRightOrLeft(rhs) == ERightLeft::c_Right;
       }
 
       /// Gives the position at the closest approach on the line to point
-      Vector2D closest(const Vector2D& point) const
+      ROOT::Math::XYVector closest(const ROOT::Math::XYVector& point) const
       {
         double norm_squared = tangential().Mag2();
         return VectorUtil::compose(tangential(),
@@ -250,13 +251,13 @@ namespace Belle2 {
       }
 
       /// Gives the line parameter at the closest approach to point
-      double closestAt(const Vector2D& point) const
+      double closestAt(const ROOT::Math::XYVector& point) const
       {
         return (tangential().Dot(point) - tangential().Dot(support())) / tangential().Mag2();
       }
 
       /// Gives the position of closest approach to the origin
-      Vector2D closestToOrigin() const
+      ROOT::Math::XYVector closestToOrigin() const
       {
         return VectorUtil::Orthogonal(tangential()) *
                (VectorUtil::Cross(tangential(), support()) / tangential().Mag2());
@@ -269,7 +270,7 @@ namespace Belle2 {
       }
 
       /// Denotes the length on the line between the two points
-      double lengthOnCurve(const Vector2D& from, const Vector2D& to) const
+      double lengthOnCurve(const ROOT::Math::XYVector& from, const ROOT::Math::XYVector& to) const
       {
         return (to.Dot(tangential()) - from.Dot(tangential())) / tangential().R();
       }
@@ -302,13 +303,13 @@ namespace Belle2 {
       }
 
       /// Gives the point where the two lines meet. Infinities for parallels.
-      Vector2D intersection(const Line2D& line) const
+      ROOT::Math::XYVector intersection(const Line2D& line) const
       {
         return at(intersectionAt(line));
       }
 
       /// Gives the point where the two lines meet. Infinities for parallels.
-      Vector2D intersection(const ParameterLine2D& line) const
+      ROOT::Math::XYVector intersection(const ParameterLine2D& line) const
       {
         return at(intersectionAt(line));
       }
@@ -325,7 +326,7 @@ namespace Belle2 {
       }
 
       /// Moves the line in the given direction in place. Corresponds to an active transformation.
-      void moveBy(const Vector2D& by)
+      void moveBy(const ROOT::Math::XYVector& by)
       {
         m_support += by;
       }
@@ -346,7 +347,7 @@ namespace Belle2 {
 
       /// Moves the coordinate system in the given direction  in place. Corresponds to a passive
       /// transformation.
-      void passiveMoveBy(const Vector2D& by)
+      void passiveMoveBy(const ROOT::Math::XYVector& by)
       {
         m_support -= by;
       }
@@ -423,17 +424,17 @@ namespace Belle2 {
       /// Gives the line associated with the inverse function as a copy.
       ParameterLine2D inverted() const
       {
-        return ParameterLine2D(Vector2D(support().Y(), support().X()),
-                               Vector2D(tangential().Y(), tangential().X()));
+        return ParameterLine2D(ROOT::Math::XYVector(support().Y(), support().X()),
+                               ROOT::Math::XYVector(tangential().Y(), tangential().X()));
       }
       ///@}
 
     private:
       /// Support vector of the line
-      Vector2D m_support;
+      ROOT::Math::XYVector m_support;
 
       /// Tangential vector of the line
-      Vector2D m_tangential;
+      ROOT::Math::XYVector m_tangential;
     };
 
     /// Output operate helping debugging.

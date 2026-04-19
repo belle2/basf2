@@ -9,7 +9,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/AxialStraightTrackCreator.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
@@ -21,6 +20,8 @@
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
+
+#include <Math/Vector2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -66,7 +67,7 @@ void AxialStraightTrackCreator::apply(const std::vector<const ECLCluster*>& eclC
     UncertainPerigeeCircle circle(0, VectorUtil::Phi(phi), 0); //no covariance matrix (yet?)
     CDCTrajectory2D guidingTrajectory2D(circle);
     CDCTrack track;
-    guidingTrajectory2D.setLocalOrigin(Vector2D(0, 0));
+    guidingTrajectory2D.setLocalOrigin(ROOT::Math::XYVector(0, 0));
     std::vector<const CDCWireHit*> foundHits = search(axialWireHits, guidingTrajectory2D);
     if (foundHits.size() < m_param_minNHits) continue;
     // Fit trajectory
@@ -89,7 +90,7 @@ std::vector<const CDCWireHit*> AxialStraightTrackCreator::search(const std::vect
 {
   std::vector<const CDCWireHit*> foundHits;
   for (const CDCWireHit* hit : axialWireHits) {
-    const Vector2D point = hit->reconstruct2D(guidingTrajectory2D);
+    const ROOT::Math::XYVector point = hit->reconstruct2D(guidingTrajectory2D);
     float arc = guidingTrajectory2D.calcArcLength2D(point);
     if (arc < 0) continue; // No b2b tracks
     float distance = guidingTrajectory2D.getDist2D(point);

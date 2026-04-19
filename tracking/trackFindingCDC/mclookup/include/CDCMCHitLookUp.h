@@ -11,6 +11,8 @@
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/Index.h>
 
+#include <Math/Vector2D.h>
+
 namespace Belle2 {
   class MCParticle;
   class CDCSimHit;
@@ -18,7 +20,6 @@ namespace Belle2 {
 
   namespace TrackingUtilities {
     class Vector3D;
-    class Vector2D;
   }
   namespace TrackFindingCDC {
 
@@ -52,7 +53,7 @@ namespace Belle2 {
 
 
       /// Getter for the two dimensional reference position of the wire the given hit is located on - mainly for the python event display
-      const TrackingUtilities::Vector2D getRefPos2D(const CDCHit* ptrHit) const;
+      const ROOT::Math::XYVector getRefPos2D(const CDCHit* ptrHit) const;
 
       /// Getter for the reference drift length in the two dimensional projection
       float getRefDriftLength(const CDCHit* ptrHit) const;

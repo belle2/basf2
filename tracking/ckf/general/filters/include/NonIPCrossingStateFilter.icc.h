@@ -19,6 +19,8 @@
 
 #include <framework/core/ModuleParamList.h>
 
+#include <Math/Vector2D.h>
+
 namespace Belle2 {
   template <class AllStateFilter>
   TrackingUtilities::Weight NonIPCrossingStateFilter<AllStateFilter>::operator()(const Object& pair)
@@ -52,7 +54,7 @@ namespace Belle2 {
                                                           cdcTrack->getChargeSeed());
 
     const TrackingUtilities::Vector3D& hitPosition = static_cast<TrackingUtilities::Vector3D>(spacePoint->getPosition());
-    const TrackingUtilities::Vector2D origin(0, 0);
+    const ROOT::Math::XYVector origin(0, 0);
 
     const double deltaArcLengthHitOrigin = trajectory2D.calcArcLength2DBetween(VectorUtil::get2DVector(hitPosition), origin);
     const double deltaArcLengthTrackHit = trajectory2D.calcArcLength2D(VectorUtil::get2DVector(hitPosition));

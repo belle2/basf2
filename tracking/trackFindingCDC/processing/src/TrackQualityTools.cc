@@ -38,7 +38,7 @@ void TrackQualityTools::splitSecondHalfOfTrack(CDCTrack& track, std::vector<CDCT
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
   const double radius = trajectory2D.getLocalCircle()->absRadius();
-  const Vector2D& apogee = trajectory2D.getGlobalCircle().apogee();
+  const ROOT::Math::XYVector& apogee = trajectory2D.getGlobalCircle().apogee();
   double arcLength2DOfApogee = trajectory2D.calcArcLength2D(apogee);
   if (arcLength2DOfApogee < 0) {
     arcLength2DOfApogee += 2 * TMath::Pi() * radius;
@@ -92,7 +92,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 
   double arcLength2DPeriod = trajectory2D.getArcLength2DPeriod();
   for (CDCRecoHit3D& recoHit : track) {
-    Vector2D recoPos2D = VectorUtil::get2DVector(recoHit.getRLWireHit().reconstruct3D(trajectory2D));
+    ROOT::Math::XYVector recoPos2D = VectorUtil::get2DVector(recoHit.getRLWireHit().reconstruct3D(trajectory2D));
     double arcLength2D = trajectory2D.calcArcLength2D(recoPos2D);
 
     if (arcLength2D < 0) {
@@ -134,7 +134,7 @@ void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double outerCyli
     return;
   }
 
-  const Vector2D& outerExitWithFactor = trajectory2D.getOuterExit(outerCylindricalRFactor);
+  const ROOT::Math::XYVector& outerExitWithFactor = trajectory2D.getOuterExit(outerCylindricalRFactor);
 
   double arcLength2DOfExitWithFactor = trajectory2D.calcArcLength2D(outerExitWithFactor);
   if (arcLength2DOfExitWithFactor < 0) {
@@ -163,7 +163,7 @@ void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double outerCyli
 void TrackQualityTools::removeHitsAfterLayerBreak2(CDCTrack& track)
 {
   ILayer lastLayer = -1;
-  Vector2D lastWirePosition;
+  ROOT::Math::XYVector lastWirePosition;
 
   std::vector<std::vector<const CDCRecoHit3D*>> trackletList;
   trackletList.reserve(3);
@@ -177,7 +177,7 @@ void TrackQualityTools::removeHitsAfterLayerBreak2(CDCTrack& track)
     }
 
     const ILayer currentLayer = recoHit.getWire().getICLayer();
-    const Vector2D& currentPosition = recoHit.getRecoPos2D();
+    const ROOT::Math::XYVector& currentPosition = recoHit.getRecoPos2D();
     if (lastLayer != -1) {
       const ILayer delta = currentLayer - lastLayer;
       const double distance = (currentPosition - lastWirePosition).R();

@@ -8,9 +8,10 @@
 #pragma once
 
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/numerics/LookupTable.h>
 #include <framework/geometry/VectorUtil.h>
+
+#include <Math/Vector2D.h>
 
 #include <memory>
 #include <cmath>
@@ -29,7 +30,7 @@ namespace Belle2 {
 
       /// Default estimator for the flight time
       virtual double
-      getFlightTime2D(const TrackingUtilities::Vector2D& /*pos2D*/, double /*alpha*/, double /*beta */ = 1) const
+      getFlightTime2D(const ROOT::Math::XYVector& /*pos2D*/, double /*alpha*/, double /*beta */ = 1) const
       {
         return 0;
       }
@@ -48,7 +49,7 @@ namespace Belle2 {
       BeamEventFlightTimeEstimator();
 
       /// Flight time estimator for regular beam events
-      double getFlightTime2D(const TrackingUtilities::Vector2D& pos2D, double alpha, double beta = 1) const override
+      double getFlightTime2D(const ROOT::Math::XYVector& pos2D, double alpha, double beta = 1) const override
       {
         double absAlpha = std::fabs(alpha);
         double directDist2D = pos2D.R();
@@ -68,9 +69,9 @@ namespace Belle2 {
       explicit CosmicRayFlightTimeEstimator(TrackingUtilities::Vector3D triggerPoint = TrackingUtilities::Vector3D(0, 0, 0));
 
       /// Flight time estimator for cosmic ray events
-      double getFlightTime2D(const TrackingUtilities::Vector2D& pos2D, double alpha, double beta = 1) const override
+      double getFlightTime2D(const ROOT::Math::XYVector& pos2D, double alpha, double beta = 1) const override
       {
-        TrackingUtilities::Vector2D relPos2D = pos2D - VectorUtil::get2DVector(m_triggerPoint);
+        ROOT::Math::XYVector relPos2D = pos2D - VectorUtil::get2DVector(m_triggerPoint);
         double deltaAlpha = VectorUtil::Angle(pos2D, relPos2D);
         alpha += deltaAlpha;
         double absAlpha = std::fabs(alpha);

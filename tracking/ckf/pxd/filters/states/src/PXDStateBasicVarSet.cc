@@ -18,6 +18,8 @@
 
 #include <pxd/dataobjects/PXDCluster.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackingUtilities;
 
@@ -47,7 +49,7 @@ bool PXDStateBasicVarSet::extract(const BasePXDStateFilter::Object* pair)
   const Vector3D& hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
 
   const double arcLength = trajectory.calcArcLength2D(hitPosition);
-  const Vector2D& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
+  const ROOT::Math::XYVector& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
   double trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
 
   Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);

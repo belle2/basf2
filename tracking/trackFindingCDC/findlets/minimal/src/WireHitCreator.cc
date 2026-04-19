@@ -28,6 +28,8 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
@@ -293,7 +295,7 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
 
     const CDCWire& wire = wireTopology.getWire(wireID);
 
-    const Vector2D& pos2D = wire.getRefPos2D();
+    const ROOT::Math::XYVector& pos2D = wire.getRefPos2D();
 
     // Check whether the position is outside the selected sector
     if (VectorUtil::isBetween(pos2D, m_useSector[1], m_useSector[0])) continue;

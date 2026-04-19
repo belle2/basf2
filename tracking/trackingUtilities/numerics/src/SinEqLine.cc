@@ -68,8 +68,8 @@ double SinEqLine::computeRootInInterval(double lowerX, double upperX) const
 {
   if (not(lowerX < upperX)) return NAN;
 
-  Vector2D lower(lowerX, map(lowerX));
-  Vector2D upper(upperX, map(upperX));
+  ROOT::Math::XYVector lower(lowerX, map(lowerX));
+  ROOT::Math::XYVector upper(upperX, map(upperX));
 
   /// Checks if convergence criterium has been met. For instance if one bound is already exactly at
   /// the root.
@@ -83,10 +83,10 @@ double SinEqLine::computeRootInInterval(double lowerX, double upperX) const
     return NAN;
   }
 
-  Vector2D last(lower);
-  Vector2D current(upper);
+  ROOT::Math::XYVector last(lower);
+  ROOT::Math::XYVector current(upper);
 
-  Vector2D next;
+  ROOT::Math::XYVector next;
   next.SetX(secantX(last, current));
   next.SetY(map(next.x()));
 
@@ -96,8 +96,8 @@ double SinEqLine::computeRootInInterval(double lowerX, double upperX) const
 
   while (not isConverged(lower, upper)) {
     // swap accepted values
-    last.set(current);
-    current.set(next);
+    last.SetXY(current.X(), current.Y());
+    current.SetXY(next.X(), next.Y());
 
     next.SetX(newtonX(current));
     next.SetY(map(next.x()));
@@ -131,22 +131,22 @@ double SinEqLine::computeRootInInterval(double lowerX, double upperX) const
   }
 }
 
-double SinEqLine::middleX(const Vector2D& lower, const Vector2D& upper)
+double SinEqLine::middleX(const ROOT::Math::XYVector& lower, const ROOT::Math::XYVector& upper)
 {
   return (lower.x() + upper.x()) / 2.0;
 }
 
-double SinEqLine::secantX(const Vector2D& lower, const Vector2D& upper)
+double SinEqLine::secantX(const ROOT::Math::XYVector& lower, const ROOT::Math::XYVector& upper)
 {
   return (lower.x() * upper.y() - upper.x() * lower.y()) / (upper.y() - lower.y());
 }
 
-double SinEqLine::newtonX(const Vector2D& pos) const
+double SinEqLine::newtonX(const ROOT::Math::XYVector& pos) const
 {
   return pos.x() - pos.y() / gradient(pos.x());
 }
 
-bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& next)
+bool SinEqLine::updateBounds(ROOT::Math::XYVector& lower, ROOT::Math::XYVector& upper, const ROOT::Math::XYVector& next)
 {
   /// Only update if the next point is in-between the lower and upper bound
   if (not isBetween(lower, next, upper)) return false;
@@ -154,11 +154,11 @@ bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& n
   EIncDec incDecInfo = getEIncDec(lower, upper);
   if (incDecInfo == EIncDec::c_Increasing) {
     if (next.y() > 0.0 and upper.y() > 0.0) {
-      upper.set(next);
+      upper.SetXY(next.X(), next.Y());
       return true;
 
     } else if (next.y() <= 0.0 and lower.y() <= 0.0) {
-      lower.set(next);
+      lower.SetXY(next.X(), next.Y());
       return true;
 
     } else {
@@ -167,11 +167,11 @@ bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& n
 
   } else if (incDecInfo == EIncDec::c_Decreasing) {
     if (next.y() >= 0 and lower.y() >= 0.0) {
-      lower.set(next);
+      lower.SetXY(next.X(), next.Y());
       return true;
 
     } else if (next.y() < 0 and upper.y() < 0) {
-      upper.set(next);
+      upper.SetXY(next.X(), next.Y());
       return true;
 
     } else {

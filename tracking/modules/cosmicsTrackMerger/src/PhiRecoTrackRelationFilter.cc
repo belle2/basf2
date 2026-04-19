@@ -15,6 +15,8 @@
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackingUtilities;
 
@@ -39,7 +41,7 @@ Weight PhiRecoTrackRelationFilter::operator()(const CellularRecoTrack& fromTrack
   const CDCTrajectory2D toTrajectory(VectorUtil::get2DVector(toTrack->getPositionSeed()), 0,
                                      VectorUtil::get2DVector(toTrack->getMomentumSeed()), toTrack->getChargeSeed());
 
-  const Vector2D origin;
+  const ROOT::Math::XYVector origin;
 
   const double fromPhi = fromTrajectory.getFlightDirection2D(origin).Phi();
   const double toPhi = toTrajectory.getFlightDirection2D(origin).Phi();

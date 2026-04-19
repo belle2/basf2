@@ -23,6 +23,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <Math/Vector2D.h>
 #include <TRandom.h>
 
 #include <algorithm>
@@ -326,7 +327,7 @@ CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
   Vector3D pos3D = globalHelix.atArcLength2D(arcLength2D);
 
   Vector3D correctedPos3D = pos3D;
-  Vector2D correctedWirePos(wire.getWirePos2DAtZ(correctedPos3D.z()));
+  ROOT::Math::XYVector correctedWirePos(wire.getWirePos2DAtZ(correctedPos3D.z()));
   double correctedArcLength2D = arcLength2D;
 
   for (int c_Iter = 0; c_Iter < 2; c_Iter++) {

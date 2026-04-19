@@ -294,7 +294,7 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
 
             def f(segment):
                 trajectory = fitter.fit(segment)
-                momentum = trajectory.getUnitMom2D(Belle2.TrackingUtilities.Vector2D(0, 0)).Scale(trajectory.getAbsMom2D())
+                momentum = trajectory.getUnitMom2D(Belle2.TrackingUtilities.Vector2D(0, 0)) * (trajectory.getAbsMom2D())
                 theta, r = self.convertToQuadTreePicture(momentum.Phi(), momentum.R(), trajectory.getChargeSign())
                 plt.plot(theta, r, color=list(map(0, segment)), marker="o")
 

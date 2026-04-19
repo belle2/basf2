@@ -12,10 +12,11 @@
 
 #include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
+#include <Math/Vector2D.h>
+
 namespace Belle2 {
   namespace TrackingUtilities {
     class ParameterLine2D;
-    class Vector2D;
     class CDCRLWireHit;
     class CDCRecoHit2D;
     class CDCTangent;
@@ -87,13 +88,13 @@ namespace Belle2 {
       ParameterLine2D getMiddleToEndLine() const;
 
       /// Getter for the reconstructed position at the first hit on the fit line
-      Vector2D getStartRecoPos2D() const;
+      ROOT::Math::XYVector getStartRecoPos2D() const;
 
       /// Getter for the reconstructed position at the second hit on the fit line
-      Vector2D getMiddleRecoPos2D() const;
+      ROOT::Math::XYVector getMiddleRecoPos2D() const;
 
       /// Getter for the reconstructed position at the third hit on the fit line
-      Vector2D getEndRecoPos2D() const;
+      ROOT::Math::XYVector getEndRecoPos2D() const;
 
       /// Getter for the first reconstructed hit
       CDCRecoHit2D getStartRecoHit2D() const;

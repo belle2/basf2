@@ -16,6 +16,8 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackingUtilities;
 
@@ -80,7 +82,7 @@ Weight SimpleSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
     const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed(), m_cachedBField);
 
     const double arcLength = trajectory.calcArcLength2D(hitPosition);
-    const Vector2D& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
+    const ROOT::Math::XYVector& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
     const double trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
     const Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
     const Vector3D differenceHelix = trackPositionAtHit - hitPosition;

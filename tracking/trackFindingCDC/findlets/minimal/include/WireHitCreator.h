@@ -20,6 +20,8 @@
 #include <framework/database/DBObjPtr.h>
 #include <cdc/dbobjects/CDClayerTimeCut.h>
 
+#include <Math/Vector2D.h>
+
 #include <vector>
 #include <tuple>
 #include <string>
@@ -125,7 +127,7 @@ namespace Belle2 {
       std::array<bool, c_maxNSenseLayers> m_useLayers{};
 
       /// Unit vectors denoting the sector for which hits should be created
-      std::array<TrackingUtilities::Vector2D, 2> m_useSector{};
+      std::array<ROOT::Math::XYVector, 2> m_useSector{};
 
     private: // Translators
       /// TDC Count translator to be used to calculate the initial dirft length estiamtes

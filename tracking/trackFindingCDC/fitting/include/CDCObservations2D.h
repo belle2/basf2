@@ -10,10 +10,11 @@
 #include <tracking/trackFindingCDC/fitting/EFitPos.h>
 #include <tracking/trackFindingCDC/fitting/EFitVariance.h>
 
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
-
+#include <tracking/trackingUtilities/numerics/ESign.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
+
+#include <Math/Vector2D.h>
 
 #include <vector>
 #include <iterator>
@@ -156,7 +157,7 @@ namespace Belle2 {
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.
        */
-      std::size_t fill(const TrackingUtilities::Vector2D& pos2D, double signedRadius = 0.0, double weight = 1.0);
+      std::size_t fill(const ROOT::Math::XYVector& pos2D, double signedRadius = 0.0, double weight = 1.0);
 
       /**
        *  Appends the hit circle at wire reference position without a right left passage hypotheses.
@@ -264,15 +265,15 @@ namespace Belle2 {
       }
 
       /// Get the position of the first observation.
-      TrackingUtilities::Vector2D getFrontPos2D() const
+      ROOT::Math::XYVector getFrontPos2D() const
       {
-        return empty() ? TrackingUtilities::Vector2D() : TrackingUtilities::Vector2D(getX(0), getY(0));
+        return empty() ? ROOT::Math::XYVector() : ROOT::Math::XYVector(getX(0), getY(0));
       }
 
       /// Get the position of the first observation.
-      TrackingUtilities::Vector2D getBackPos2D() const
+      ROOT::Math::XYVector getBackPos2D() const
       {
-        return empty() ? TrackingUtilities::Vector2D() : TrackingUtilities::Vector2D(getX(size() - 1), getY(size() - 1));
+        return empty() ? ROOT::Math::XYVector() : ROOT::Math::XYVector(getX(size() - 1), getY(size() - 1));
       }
 
       /**
@@ -301,13 +302,13 @@ namespace Belle2 {
       }
 
       /// Extracts the observation center that is at the index in the middle.
-      TrackingUtilities::Vector2D getCentralPoint() const;
+      ROOT::Math::XYVector getCentralPoint() const;
 
       /// Moves all observations passively such that the given vector becomes to origin of the new coordinate system
-      void passiveMoveBy(const TrackingUtilities::Vector2D& origin);
+      void passiveMoveBy(const ROOT::Math::XYVector& origin);
 
       /// Picks one observation as a reference point and transform all observations to that new origin
-      TrackingUtilities::Vector2D centralize();
+      ROOT::Math::XYVector centralize();
 
       /// Returns the number of observations having a drift radius radius
       std::size_t getNObservationsWithDriftRadius() const;

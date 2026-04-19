@@ -13,11 +13,12 @@
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
+
+#include <Math/Vector2D.h>
 
 #include <TMath.h>
 #include <cmath>
@@ -51,7 +52,7 @@ namespace Belle2 {
        *  starts in the given point. The point is taken to be the closest approach
        *  to the circle.
        */
-      CDCTrajectory2D(const Vector2D& localOrigin,
+      CDCTrajectory2D(const ROOT::Math::XYVector& localOrigin,
                       const UncertainPerigeeCircle& localPerigeeCircle,
                       double flightTime = NAN);
 
@@ -59,15 +60,15 @@ namespace Belle2 {
        *  Construct a trajectory with given start point, transverse momentum at the start point,
        *  the given charge and the magnetic field value in z direction.
        */
-      CDCTrajectory2D(const Vector2D& pos2D,
+      CDCTrajectory2D(const ROOT::Math::XYVector& pos2D,
                       double time,
-                      const Vector2D& mom2D,
+                      const ROOT::Math::XYVector& mom2D,
                       double charge,
                       double bZ);
 
       /// Construct a trajectory with given start point, transverse momentum at the start point and
       /// given charge.
-      CDCTrajectory2D(const Vector2D& pos2D, double time, const Vector2D& mom2D, double charge);
+      CDCTrajectory2D(const ROOT::Math::XYVector& pos2D, double time, const ROOT::Math::XYVector& mom2D, double charge);
 
     public:
       /// Checks if the circle is already set to a valid value.
@@ -133,7 +134,7 @@ namespace Belle2 {
       Vector3D reconstruct3D(const CDC::WireLine& wireLine, double distance = 0.0, double z = 0) const;
 
       /// Calculates the closest approach on the trajectory to the given point
-      Vector2D getClosest(const Vector2D& point) const;
+      ROOT::Math::XYVector getClosest(const ROOT::Math::XYVector& point) const;
 
     private:
       /**
@@ -207,8 +208,8 @@ namespace Belle2 {
       template <class AFromHits, class AToHits>
       double getArcLength2DGap(const AFromHits& fromHits, const AToHits& toHits) const
       {
-        const Vector2D& fromRecoPos2D = fromHits.back().getRecoPos2D();
-        const Vector2D& toRecoPos2D = toHits.front().getRecoPos2D();
+        const ROOT::Math::XYVector& fromRecoPos2D = fromHits.back().getRecoPos2D();
+        const ROOT::Math::XYVector& toRecoPos2D = toHits.front().getRecoPos2D();
         return calcArcLength2DBetween(fromRecoPos2D, toRecoPos2D);
       }
 
@@ -219,8 +220,8 @@ namespace Belle2 {
       template <class AFromHits, class AToHits>
       double getArcLength2DFrontOffset(const AFromHits& fromHits, const AToHits& toHits) const
       {
-        const Vector2D& fromRecoPos2D = fromHits.front().getRecoPos2D();
-        const Vector2D& toRecoPos2D = toHits.front().getRecoPos2D();
+        const ROOT::Math::XYVector& fromRecoPos2D = fromHits.front().getRecoPos2D();
+        const ROOT::Math::XYVector& toRecoPos2D = toHits.front().getRecoPos2D();
         return calcArcLength2DBetween(fromRecoPos2D, toRecoPos2D);
       }
 
@@ -231,8 +232,8 @@ namespace Belle2 {
       template <class AFromHits, class AToHits>
       double getArcLength2DBackOffset(const AFromHits& fromHits, const AToHits& toHits) const
       {
-        const Vector2D& fromRecoPos2D = fromHits.back().getRecoPos2D();
-        const Vector2D& toRecoPos2D = toHits.back().getRecoPos2D();
+        const ROOT::Math::XYVector& fromRecoPos2D = fromHits.back().getRecoPos2D();
+        const ROOT::Math::XYVector& toRecoPos2D = toHits.back().getRecoPos2D();
         return calcArcLength2DBetween(fromRecoPos2D, toRecoPos2D);
       }
 
@@ -241,8 +242,8 @@ namespace Belle2 {
       template <class AHits>
       double getTotalArcLength2D(const AHits& hits) const
       {
-        Vector2D frontRecoPos2D = hits.front().getRecoPos2D();
-        Vector2D backRecoPos2D = hits.back().getRecoPos2D();
+        ROOT::Math::XYVector frontRecoPos2D = hits.front().getRecoPos2D();
+        ROOT::Math::XYVector backRecoPos2D = hits.back().getRecoPos2D();
         return calcArcLength2DBetween(frontRecoPos2D, backRecoPos2D);
       }
 
@@ -255,9 +256,9 @@ namespace Belle2 {
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation.
        */
-      double calcArcLength2D(const Vector2D& point) const
+      double calcArcLength2D(const ROOT::Math::XYVector& point) const
       {
-        return getLocalCircle()->arcLengthBetween(Vector2D(0.0, 0.0), point - getLocalOrigin());
+        return getLocalCircle()->arcLengthBetween(ROOT::Math::XYVector(0.0, 0.0), point - getLocalOrigin());
       }
 
       /**
@@ -268,7 +269,7 @@ namespace Belle2 {
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation.
        */
-      double calcArcLength2DBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const
+      double calcArcLength2DBetween(const ROOT::Math::XYVector& fromPoint, const ROOT::Math::XYVector& toPoint) const
       {
         return getLocalCircle()->arcLengthBetween(fromPoint - getLocalOrigin(),
                                                   toPoint - getLocalOrigin());
@@ -281,7 +282,7 @@ namespace Belle2 {
 
     public:
       /// Setter for start point and momentum at the start point subjected to the charge sign.
-      void setPosMom2D(const Vector2D& pos2D, const Vector2D& mom2D, double charge);
+      void setPosMom2D(const ROOT::Math::XYVector& pos2D, const ROOT::Math::XYVector& mom2D, double charge);
 
       /// Gets the charge sign of the trajectory
       ESign getChargeSign() const;
@@ -293,25 +294,25 @@ namespace Belle2 {
       double getAbsMom2D() const;
 
       /// Get the momentum at the support point of the trajectory
-      Vector2D getMom2DAtSupport(const double bZ) const
+      ROOT::Math::XYVector getMom2DAtSupport(const double bZ) const
       {
         return getFlightDirection2DAtSupport() *= getAbsMom2D(bZ);
       }
 
       /// Get the momentum at the support point of the trajectory
-      Vector2D getMom2DAtSupport() const
+      ROOT::Math::XYVector getMom2DAtSupport() const
       {
         return getFlightDirection2DAtSupport() *= getAbsMom2D();
       }
 
       /// Get the unit direction of flight at the given point, where arcLength2D = 0.
-      Vector2D getFlightDirection2D(const Vector2D& point) const
+      ROOT::Math::XYVector getFlightDirection2D(const ROOT::Math::XYVector& point) const
       {
         return getLocalCircle()->tangential(point - getLocalOrigin());
       }
 
       /// Get the unit direction of flight at the support point, where arcLength2D = 0.
-      Vector2D getFlightDirection2DAtSupport() const
+      ROOT::Math::XYVector getFlightDirection2DAtSupport() const
       {
         return getLocalCircle()->tangential();
       }
@@ -324,25 +325,25 @@ namespace Belle2 {
       }
 
       /// Getter for the position at a given two dimensional arc length
-      Vector2D getPos2DAtArcLength2D(double arcLength2D)
+      ROOT::Math::XYVector getPos2DAtArcLength2D(double arcLength2D)
       {
         return getLocalOrigin() + getLocalCircle()->atArcLength(arcLength2D);
       }
 
       /// Get the support point of the trajectory in global coordinates
-      Vector2D getSupport() const
+      ROOT::Math::XYVector getSupport() const
       {
         return getLocalCircle()->perigee() + getLocalOrigin();
       }
 
       /// Getter for the closest approach on the trajectory to the global origin
-      Vector2D getGlobalPerigee() const
+      ROOT::Math::XYVector getGlobalPerigee() const
       {
         return getLocalCircle()->closest(-m_localOrigin) + m_localOrigin;
       }
 
       /// Getter for the center of the trajectory in global coordinates
-      Vector2D getGlobalCenter() const
+      ROOT::Math::XYVector getGlobalCenter() const
       {
         return getLocalCircle()->center() + m_localOrigin;
       }
@@ -352,19 +353,19 @@ namespace Belle2 {
        *  This method returns the first point in forward flight direction from the start
        *  point of the trajectory where it meets the outer radius of the outer most layer.
        *  If the trajectory does not meet the CDC by the outer wall this will return
-       * Vector2D(nan,nan)
+       * ROOT::Math::XYVector(nan,nan)
        *  The factor can be used to virtually resize the CDC.
        */
-      Vector2D getOuterExit(double factor = 1) const;
+      ROOT::Math::XYVector getOuterExit(double factor = 1) const;
 
       /**
        *  Calculates the point where the trajectory meets the inner wall of the CDC.
        *  This method returns the first point in forward flight direction from the start
        *  point of the trajectory where it meets the inner radius of the inner most layer.
        *  If the trajectory does not meet the CDC by the inner wall this will return
-       * Vector2D(nan,nan)
+       * ROOT::Math::XYVector(nan,nan)
        */
-      Vector2D getInnerExit() const;
+      ROOT::Math::XYVector getInnerExit() const;
 
       /**
        *  Calculates the point where the trajectory leaves the CDC.
@@ -372,9 +373,9 @@ namespace Belle2 {
        *  point of the trajectory where it meets either the radius of the inner most layer
        *  or the outer radius of the outer most wall.
        *  If the trajectory does not leave the CDC by the inner or outer wall this will return
-       * Vector2D(nan,nan).
+       * ROOT::Math::XYVector(nan,nan).
        */
-      Vector2D getExit() const;
+      ROOT::Math::XYVector getExit() const;
 
       /// Checks if the trajectory leaves the outer radius of the CDC times the given tolerance
       /// factor
@@ -404,13 +405,13 @@ namespace Belle2 {
       }
 
       /// Calculates the distance from the point to the trajectory as seen from the xy projection.
-      double getDist2D(const Vector2D& point) const
+      double getDist2D(const ROOT::Math::XYVector& point) const
       {
         return getLocalCircle()->distance(point - getLocalOrigin());
       }
 
       /// Checks if the given point is to the right or to the left of the trajectory
-      ERightLeft isRightOrLeft(const Vector2D& point) const
+      ERightLeft isRightOrLeft(const ROOT::Math::XYVector& point) const
       {
         return getLocalCircle()->isRightOrLeft(point - getLocalOrigin());
       }
@@ -493,7 +494,7 @@ namespace Belle2 {
       }
 
       /// Getter for the origin of the local coordinate system
-      const Vector2D& getLocalOrigin() const
+      const ROOT::Math::XYVector& getLocalOrigin() const
       {
         return m_localOrigin;
       }
@@ -514,7 +515,7 @@ namespace Belle2 {
        *  @param localOrigin  New local reference point in the global coordinate system
        *  @return             Travel distance from the old to the new origin point
        */
-      double setLocalOrigin(const Vector2D& localOrigin);
+      double setLocalOrigin(const ROOT::Math::XYVector& localOrigin);
 
       /// Getter for the time when the particle reached the support point position.
       double getFlightTime() const
@@ -530,7 +531,7 @@ namespace Belle2 {
 
     private:
       /// Memory for local coordinate origin of the circle representing the trajectory in global coordinates
-      Vector2D m_localOrigin;
+      ROOT::Math::XYVector m_localOrigin;
 
       /// Memory for the generalized circle describing the trajectory in coordinates from the local origin
       UncertainPerigeeCircle m_localPerigeeCircle;

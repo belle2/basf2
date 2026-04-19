@@ -10,6 +10,8 @@
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <framework/logging/Logger.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -29,7 +31,7 @@ DiscretePhi0::Array Phi0BinsSpec::constructArray() const
   // Adjust the angle bounds such that overlap occurs at the wrap around as well
   const double lowerBound = -M_PI - overlap / 2;
   const double upperBound = +M_PI + overlap / 2;
-  return linspace<Vector2D>(lowerBound, upperBound, nPositions, &(VectorUtil::Phi));
+  return linspace<ROOT::Math::XYVector>(lowerBound, upperBound, nPositions, &(VectorUtil::Phi));
 }
 
 long Phi0BinsSpec::getNPositions() const

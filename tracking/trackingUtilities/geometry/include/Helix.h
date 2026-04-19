@@ -12,8 +12,9 @@
 
 #include <tracking/trackingUtilities/geometry/HelixParameters.h>
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
+
+#include <Math/Vector2D.h>
 
 #include <iosfwd>
 #include <cmath>
@@ -54,7 +55,7 @@ namespace Belle2 {
       }
 
       /// Constructor from all helix parameter, phi given as a unit vector
-      Helix(double curvature, const Vector2D& phi0Vec, double impact, double tanLambda, double z0)
+      Helix(double curvature, const ROOT::Math::XYVector& phi0Vec, double impact, double tanLambda, double z0)
         : m_circleXY(curvature, phi0Vec, impact)
         , m_szLine(tanLambda, z0)
       {
@@ -96,7 +97,7 @@ namespace Belle2 {
        *  in the xy projection.
        *  Always gives a solution in the first half period in the positive or negative direction
        */
-      double arcLength2DToXY(const Vector2D& point) const
+      double arcLength2DToXY(const ROOT::Math::XYVector& point) const
       {
         return circleXY().arcLengthTo(point);
       }
@@ -119,7 +120,7 @@ namespace Belle2 {
       }
 
       /// Calculates the point on the helix with the smallest perpendicular (xy) distance
-      Vector3D closestXY(const Vector2D& pointXY) const
+      Vector3D closestXY(const ROOT::Math::XYVector& pointXY) const
       {
         double arcLength2D = arcLength2DToXY(pointXY);
         return atArcLength2D(arcLength2D);
@@ -132,7 +133,7 @@ namespace Belle2 {
       }
 
       /// Calculates the distance of the line parallel to the z axes through the given point
-      double distanceXY(const Vector2D& point) const
+      double distanceXY(const ROOT::Math::XYVector& point) const
       {
         return m_circleXY.distance(point);
       }
@@ -147,7 +148,7 @@ namespace Belle2 {
         // point.
         double byS = circleXY().arcLengthTo(VectorUtil::get2DVector(by));
         m_circleXY.passiveMoveBy(VectorUtil::get2DVector(by));
-        Vector2D bySZ(byS, by.z());
+        ROOT::Math::XYVector bySZ(byS, by.z());
         m_szLine.passiveMoveBy(bySZ);
         return byS;
       }
@@ -162,7 +163,7 @@ namespace Belle2 {
       double shiftPeriod(int nPeriods)
       {
         double arcLength2D = nPeriods * fabs(perimeterXY());
-        m_szLine.passiveMoveBy(Vector2D(arcLength2D, 0.0));
+        m_szLine.passiveMoveBy(ROOT::Math::XYVector(arcLength2D, 0.0));
         return arcLength2D;
       }
 
@@ -180,9 +181,9 @@ namespace Belle2 {
       }
 
       /// Calculates the point, which lies at the given z coordinate
-      Vector2D xyAtZ(double z) const
+      ROOT::Math::XYVector xyAtZ(double z) const
       {
-        return Vector2D(circleXY().atArcLength(szLine().inverseMap(z)));
+        return ROOT::Math::XYVector(circleXY().atArcLength(szLine().inverseMap(z)));
       }
 
       /// Gives the minimal cylindrical radius the circle reaches (unsigned)
@@ -222,7 +223,7 @@ namespace Belle2 {
       }
 
       /// Getter for the perigee point in the xy projection.
-      Vector2D perigeeXY() const
+      ROOT::Math::XYVector perigeeXY() const
       {
         return circleXY().perigee();
       }
@@ -277,7 +278,7 @@ namespace Belle2 {
       }
 
       /// Getter for the central point of the helix
-      Vector2D centerXY() const
+      ROOT::Math::XYVector centerXY() const
       {
         return circleXY().center();
       }
@@ -289,7 +290,7 @@ namespace Belle2 {
       }
 
       /// Getter for the direction vector in the xy projection at the perigee of the helix.
-      const Vector2D& phi0Vec() const
+      const ROOT::Math::XYVector& phi0Vec() const
       {
         return circleXY().phi0Vec();
       }

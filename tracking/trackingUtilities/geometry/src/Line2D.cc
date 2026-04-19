@@ -7,16 +7,14 @@
  **************************************************************************/
 #include <tracking/trackingUtilities/geometry/Line2D.h>
 
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
-
 using namespace Belle2;
 using namespace TrackingUtilities;
 
-Vector2D Line2D::intersection(const Line2D& line) const
+ROOT::Math::XYVector Line2D::intersection(const Line2D& line) const
 {
 
   double determinant = VectorUtil::Cross(n12(), line.n12());
-  Vector2D result(-n0() * line.n2() + line.n0() * n2(), n0() * line.n1() - line.n0() * n1());
+  ROOT::Math::XYVector result(-n0() * line.n2() + line.n0() * n2(), n0() * line.n1() - line.n0() * n1());
 
   result /= determinant;
   return result;

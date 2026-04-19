@@ -26,6 +26,7 @@
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/VectorUtil.h>
 
+#include <Math/Vector2D.h>
 #include <TRandom.h>
 
 using namespace Belle2;
@@ -105,8 +106,8 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
   for (CDCSegment2D& segment : outputSegments) {
     for (CDCRecoHit2D& recoHit2D : segment) {
-      Vector2D flightDirection = recoHit2D.getFlightDirection2D();
-      Vector2D recoPos2D = recoHit2D.getRecoPos2D();
+      ROOT::Math::XYVector flightDirection = recoHit2D.getFlightDirection2D();
+      ROOT::Math::XYVector recoPos2D = recoHit2D.getRecoPos2D();
       double alpha = VectorUtil::Angle(recoPos2D, flightDirection);
 
       const CDCWire& wire = recoHit2D.getWire();

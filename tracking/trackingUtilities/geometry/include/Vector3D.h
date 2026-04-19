@@ -274,14 +274,6 @@ namespace Belle2 {
         return Vector3D(xy() - rhs.xy(), z() - rhs.z());
       }
 
-      /// Same as parallelComp() but assumes the given vector to be of unit length.
-      /** This assumes the given vector relativeTo to be of unit length and avoids \n
-       *  a costly computation of the vector R()*/
-      double unnormalizedParallelComp(const Vector3D& relativTo) const
-      {
-        return relativTo.Dot(*this);
-      }
-
       /// Getter for the x coordinate
       double x() const
       {

@@ -180,7 +180,7 @@ namespace Belle2 {
     /** This assumes the given vector relativeTo to be of unit length and avoids \n
      *  a costly computation of the vector R()
      *  The previous implementation was
-     *    relativeTo.cross(*this) / relativTo.R()
+     *    relativeTo.cross(*this)
      *  with v1 = *this
      */
     inline double unnormalizedOrthogonalComp(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& relativTo)

@@ -41,8 +41,8 @@ TEST(TrackingUtilitiesTest, geometry_Helix_closest)
     Vector3D expectedClosest = helix.perigee();
 
     helix.passiveMoveBy(by);
-    expectedClosest.passiveMoveBy(by);
-    point.passiveMoveBy(by);
+    expectedClosest -= by;
+    point -= by;
     {
       Vector3D realClosest = helix.closest(point, true);
       EXPECT_NEAR(expectedClosest.x(), realClosest.x(), 10e-7) << "Test for displacement by " << by;

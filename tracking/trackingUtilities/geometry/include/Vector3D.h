@@ -282,12 +282,6 @@ namespace Belle2 {
         return relativTo.Dot(*this);
       }
 
-      /// Passively moves the vector inplace by the given vector
-      void passiveMoveBy(const Vector3D& by)
-      {
-        subtract(by);
-      }
-
       /// Getter for the x coordinate
       double x() const
       {

@@ -188,6 +188,14 @@ namespace Belle2 {
       return Cross(relativTo, v1);
     }
 
+    /** Returns a transformed vector version rotated  by the given vector.
+     *  The rotated coordinates are such that the given phiVec becomes the new x axes.
+     *  @param phiVec *Unit* vector marking the x axes of the new rotated coordinate system*/
+    inline ROOT::Math::XYVector passiveRotatedBy(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& phiVec)
+    {
+      return ROOT::Math::XYVector(unnormalizedParallelComp(v1, phiVec), unnormalizedOrthogonalComp(v1, phiVec));
+    }
+
   } // namespace VectorUtil
 
 } // namespace Belle2

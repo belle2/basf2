@@ -318,20 +318,6 @@ namespace Belle2 {
         return (x() == 0.0 and y() == 0.0) ? NAN : atan2(y(), x());
       }
 
-      /// Passivelly moves the vector inplace by the given vector
-      void passiveMoveBy(const Vector2D& by)
-      {
-        subtract(by);
-      }
-
-      /** Returns a transformed vector version rotated  by the given vector.
-       *  The rotated coordinates are such that the given phiVec becomes the new x axes.
-       *  @param phiVec *Unit* vector marking the x axes of the new rotated coordinate system*/
-      Vector2D passiveRotatedBy(const Vector2D& phiVec) const
-      {
-        return Vector2D(VectorUtil::unnormalizedParallelComp(*this, phiVec), VectorUtil::unnormalizedOrthogonalComp(*this, phiVec));
-      }
-
       /// Getter for the x coordinate
       double x() const
       {

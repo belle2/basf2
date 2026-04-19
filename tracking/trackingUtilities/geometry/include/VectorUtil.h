@@ -152,7 +152,6 @@ namespace Belle2 {
       return (from - to).R();
     }
 
-
   } // namespace VectorUtil
 
 } // namespace Belle2

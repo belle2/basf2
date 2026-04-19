@@ -157,7 +157,7 @@ namespace Belle2 {
      */
     inline ROOT::Math::XYVector orthogonalVector(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& v2)
     {
-      const double cross = Cross(v1, v2);                         // = relativTo.cross(*this)
+      const double cross = Cross(v2, v1);                         // = relativTo.cross(*this)
       const ROOT::Math::XYVector tmp = v2 * (cross / v2.Mag2());  // = relativTo.scaled(cross / relativTo.normSquared())
       return Orthogonal(tmp);                                     // = .orthogonal()
     }
@@ -186,6 +186,12 @@ namespace Belle2 {
       const double dotp = v1.Dot(v2);           // = relativTo.dot(*this)
       const aVector tmp = v2 * (dotp / v2Mag2); // = relativTo.scaled(dotp / relativTo.normSquared())
       return tmp;
+    }
+
+    /// Reflects this vector over line designated by the given vector.
+    inline ROOT::Math::XYVector flippedOver(const ROOT::Math::XYVector& inVec, const ROOT::Math::XYVector& reflectionLine)
+    {
+      return inVec - orthogonalVector(inVec, reflectionLine) * 2;
     }
 
   }

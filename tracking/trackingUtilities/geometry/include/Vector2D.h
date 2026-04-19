@@ -195,18 +195,6 @@ namespace Belle2 {
         return scaled(-1.0);
       }
 
-      /// Reflects this vector over line designated by the given vector.
-      Vector2D flippedOver(const Vector2D& reflectionLine) const
-      {
-        return *this - orthogonalVector(reflectionLine) * 2;
-      }
-
-      /// Reflects this vector along line designated by the given vector.
-      Vector2D flippedAlong(const Vector2D& flippingDirection) const
-      {
-        return *this - Belle2::VectorUtil::parallelVector(*this, flippingDirection) * 2;
-      }
-
       /// Returns a new vector as sum of this and rhs
       Vector2D operator+(const Vector2D& rhs) const
       {

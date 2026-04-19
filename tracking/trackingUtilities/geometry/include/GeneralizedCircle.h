@@ -406,7 +406,7 @@ namespace Belle2 {
       {
         Vector2D difference = to - from;
         Vector2D tangentialAtFrom = tangential(from);
-        return tangentialAtFrom.isForwardOrBackwardOf(difference);
+        return VectorUtil::isForwardOrBackwardOf(tangentialAtFrom, difference);
       }
 
       /**

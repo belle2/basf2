@@ -9,10 +9,6 @@
 
 #include <tracking/trackingUtilities/numerics/Quadratic.h>
 
-#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
-#include <tracking/trackingUtilities/numerics/ERotation.h>
-#include <tracking/trackingUtilities/numerics/ESign.h>
-
 #include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <framework/geometry/VectorUtil.h>
 
@@ -204,27 +200,6 @@ namespace Belle2 {
       Vector2D operator-(const ROOT::Math::XYVector& rhs) const
       {
         return Vector2D(x() - rhs.X(), y() - rhs.Y());
-      }
-
-      /// Indicates if the given vector is more coaligned or reverse if you looked in the direction
-      /// of this vector.
-      EForwardBackward isForwardOrBackwardOf(const Vector2D& rhs) const
-      {
-        return static_cast<EForwardBackward>(sign(VectorUtil::unnormalizedParallelComp(*this, rhs)));
-      }
-
-      /// Indicates if the given vector is more coaligned if you looked in the direction of this
-      /// vector.
-      bool isForwardOf(const Vector2D& rhs) const
-      {
-        return isForwardOrBackwardOf(rhs) == EForwardBackward::c_Forward;
-      }
-
-      /// Indicates if the given vector is more Reverse if you looked in the direction of this
-      /// vector.
-      bool isBackwardOf(const Vector2D& rhs) const
-      {
-        return isForwardOrBackwardOf(rhs) == EForwardBackward::c_Backward;
       }
 
     public:

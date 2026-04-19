@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
@@ -251,6 +252,15 @@ namespace Belle2 {
         return inFirstQuadrant;
       }
     }
+
+    /// Indicates if the given vector is more coaligned or reverse if you looked in the direction
+    /// of this vector.
+    inline TrackingUtilities::EForwardBackward isForwardOrBackwardOf(const ROOT::Math::XYVector& toCheck,
+        const ROOT::Math::XYVector& rhs)
+    {
+      return static_cast<TrackingUtilities::EForwardBackward>(TrackingUtilities::sign(unnormalizedParallelComp(toCheck, rhs)));
+    }
+
   } // namespace VectorUtil
 
 } // namespace Belle2

@@ -176,13 +176,13 @@ namespace Belle2 {
       /// Indicates whether to given point lies in the forward direction from the perigee
       EForwardBackward isForwardOrBackwardOf(const Vector2D& from, const Vector2D& to) const
       {
-        return tangential(from).isForwardOrBackwardOf(to - from);
+        return VectorUtil::isForwardOrBackwardOf(tangential(from), (to - from));
       }
 
       /// Indicates whether to given point lies in the forward direction from the perigee
       EForwardBackward isForwardOrBackward(const Vector2D& to) const
       {
-        return tangential().isForwardOrBackwardOf(to);
+        return VectorUtil::isForwardOrBackwardOf(tangential(), to);
       }
 
       /**

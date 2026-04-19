@@ -2211,48 +2211,103 @@ class LambdacToGeneric(BaseSkim):
 
 
 @fancy_skim_header
-class DstToD0Pi_D0ToEtaEta(BaseSkim):
+class XcpToHmellpellp(BaseSkim):
     """
     **Decay Modes**:
-        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\eta \\eta` (and CC)
+        * :math:`D^+ \\to \\K^- e^+ e^+`
+        * :math:`D^+ \\to \\K^- e^+ \\mu^+`
+        * :math:`D^+ \\to \\K^- \\mu^+ \\mu^+`
+        * :math:`D^+ \\to \\pi^- \\e^+ \\e^+`
+        * :math:`D^+ \\to \\pi^- \\e^+ \\mu^+`
+        * :math:`D^+ \\to \\pi^- \\mu^+ \\mu^+`
+        * :math:`D_s^+ \\to \\K^- \\e^+ \\e^+`
+        * :math:`D_s^+ \\to \\K^- \\e^+ \\mu^+`
+        * :math:`D_s^+ \\to \\K^- \\mu^+ \\mu^+`
+        * :math:`D_s^+ \\to \\pi^- \\e^+ \\e^+`
+        * :math:`D_s^+ \\to \\pi^- \\e^+ \\mu^+`
+        * :math:`D_s^+ \\to \\pi^- \\mu^+ \\mu^+`
+        * :math:`\\Lambda_c^+ \\to p^- \\e^+ \\e^+`
+        * :math:`\\Lambda_c^+ \\to p^- \\e^+ \\mu^+`
+        * :math:`\\Lambda_c^+ \\to p^- \\mu^+ \\mu^+`
 
     **Selection Criteria**:
-        * Track cuts are `charm_skim_std_charged` pion
-        * Use photons from `stdPhotons.loadStdSkimPhoton`
-        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
-        * :math:`0.4 < M(\\eta_{\\gamma\\gamma}) < 0.6`
-        * :math:`0.4 < M(\\eta_{\\pi^{+}\\pi^{-}\\pi^{0}}) < 0.6`
-        * :math:`1.6 < M(D^0) < 2.1`
-        * :math:`p^{*}(D^{*+})>2.0` and :math:`M(D^{*+})-M(D^{0})<0.160`
-    """
+        * Use tracks from the charm lists in `charm_skim_std_charged`
+        * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0`` and loose cuts for ll
+        *
+        *
+        * For more details, please check the source code of this skim.
 
-    __authors__ = ["Jaeyoung Kim"]
-    __description__ = "Skim list for D*+ to pi+ D0, D0 to eta eta."
+    """
+    __authors__ = ["Seunghak Lee"]
+    __description__ = "Skim list for X_c+ to h- l+ l(')+."
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
-    ApplyHLTHadronCut = False
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
-        charm_skim_std_charged('pi', path=path)
-        loadStdSkimPhoton(path=path)
-        loadStdSkimPi0(path=path)
+        charm_skim_std_charged('K', path=path)
+        charm_skim_std_charged("pi", path=path)
+        charm_skim_std_charged("e", path=path)
+        charm_skim_std_charged("p", path=path)
+        charm_skim_std_charged("mu", path=path)
 
     def build_lists(self, path):
-        ma.reconstructDecay('eta:D0ToEtaEta_2Gam -> gamma:skim gamma:skim', '[0.4 < M < 0.6]', path=path)
-        ma.reconstructDecay('eta:D0ToEtaEta_3Pi -> pi+:charmSkim pi-:charmSkim pi0:skim', '[0.4 < M < 0.6]', path=path)
+        Dp_cuts = "1.6 < M < 2.1 and useCMSFrame(p) > 2.5 and abs(daughterSumOf(charge)) == 1"
+        Dsp_cuts = "1.7 < M < 2.2 and useCMSFrame(p) > 2.5 and abs(daughterSumOf(charge)) == 1"
+        Lambda_cuts = "2.0 < M < 2.5 and useCMSFrame(p) > 2.5 and abs(daughterSumOf(charge)) == 1"
+        eventcuts = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2.0 and thetaInCDCAcceptance) >= 3"
 
-        D0cuts = "1.6 < M < 2.1"
-        ma.reconstructDecay('D0:D0ToEtaEta_2Gam_2Gam -> eta:D0ToEtaEta_2Gam eta:D0ToEtaEta_2Gam', D0cuts, path=path)
-        ma.reconstructDecay('D0:D0ToEtaEta_2Gam_3Pi -> eta:D0ToEtaEta_2Gam eta:D0ToEtaEta_3Pi', D0cuts, path=path)
+        e_pid_cut = "electronID > 0.01"
+        mu_pid_cut = "muonID > 0.01"  # "binaryPID(-13, 211) > 0.6"
+        pi_pid_cut = "pionID > 0.01"  # "binaryPID(211, -13) > 0.6"
+        p_pid_cut = "protonID > 0.01"
+        K_pid_cut = "kaonID > 0.1"
 
-        Dstcuts = "massDifference(0) < 0.160 and useCMSFrame(p)>2.0"
-        ma.reconstructDecay('D*+:D0ToEtaEta_2Gam_2Gam -> D0:D0ToEtaEta_2Gam_2Gam pi+:charmSkim', Dstcuts, path=path)
-        ma.reconstructDecay('D*+:D0ToEtaEta_2Gam_3Pi -> D0:D0ToEtaEta_2Gam_3Pi pi+:charmSkim', Dstcuts, path=path)
+        path = self.skim_event_cuts(eventcuts, path=path)
 
-        DstList = []
-        DstList.append("D*+:D0ToEtaEta_2Gam_2Gam")
-        DstList.append("D*+:D0ToEtaEta_2Gam_3Pi")
+        ma.cutAndCopyList('pi-:mypions', 'pi-:charmSkim', pi_pid_cut, path=path)
+        ma.cutAndCopyList('K-:myK', 'K-:charmSkim', K_pid_cut, path=path)
+        ma.cutAndCopyList('e+:myelectrons', 'e+:charmSkim', e_pid_cut, path=path)
+        ma.cutAndCopyList('anti-p-:myprotons', 'anti-p-:charmSkim', p_pid_cut, path=path)
+        ma.cutAndCopyList('mu+:mymuons', 'mu+:charmSkim', mu_pid_cut, path=path)
 
-        return DstList
+        XcpList = []
+
+        ma.reconstructDecay("Lambda_c+:pee -> anti-p-:myprotons e+:myelectrons e+:myelectrons", cut=Lambda_cuts, path=path)
+        XcpList.append("Lambda_c+:pee")
+        ma.reconstructDecay("Lambda_c+:pemu -> anti-p-:myprotons e+:myelectrons mu+:mymuons", cut=Lambda_cuts, path=path)
+        XcpList.append("Lambda_c+:pemu")
+        ma.reconstructDecay("Lambda_c+:pmumu -> anti-p-:myprotons mu+:mymuons mu+:mymuons", cut=Lambda_cuts, path=path)
+        XcpList.append("Lambda_c+:pmumu")
+
+        # for D_s+ 6 decay modes
+        ma.reconstructDecay("D_s+:Dsp_Kee -> K-:myK e+:myelectrons e+:myelectrons", cut=Dsp_cuts, path=path)
+        XcpList.append("D_s+:Dsp_Kee")
+        ma.reconstructDecay("D_s+:Dsp_Kemu -> K-:myK e+:myelectrons mu+:mymuons", cut=Dsp_cuts, path=path)
+        XcpList.append("D_s+:Dsp_Kemu")
+        ma.reconstructDecay("D_s+:Dsp_Kmumu -> K-:myK mu+:mymuons mu+:mymuons", cut=Dsp_cuts, path=path)
+        XcpList.append("D_s+:Dsp_Kmumu")
+        ma.reconstructDecay("D_s+:Dsp_piee -> pi-:mypions e+:myelectrons e+:myelectrons", cut=Dsp_cuts, path=path)
+        XcpList.append("D_s+:Dsp_piee")
+        ma.reconstructDecay("D_s+:Dsp_piemu -> pi-:mypions e+:myelectrons mu+:mymuons", cut=Dsp_cuts, path=path)
+        XcpList.append("D_s+:Dsp_piemu")
+        ma.reconstructDecay("D_s+:Dsp_pimumu -> pi-:mypions mu+:mymuons mu+:mymuons", cut=Dsp_cuts, path=path)
+        XcpList.append("D_s+:Dsp_pimumu")
+
+        # for D+ 6 decay modes
+        ma.reconstructDecay("D+:Dp_Kee -> K-:myK e+:myelectrons e+:myelectrons", cut=Dp_cuts, path=path)
+        XcpList.append("D+:Dp_Kee")
+        ma.reconstructDecay("D+:Dp_Kemu -> K-:myK e+:myelectrons mu+:mymuons", cut=Dp_cuts, path=path)
+        XcpList.append("D+:Dp_Kemu")
+        ma.reconstructDecay("D+:Dp_Kmumu -> K-:myK mu+:mymuons mu+:mymuons", cut=Dp_cuts, path=path)
+        XcpList.append("D+:Dp_Kmumu")
+        ma.reconstructDecay("D+:Dp_piee -> pi-:mypions e+:myelectrons e+:myelectrons", cut=Dp_cuts, path=path)
+        XcpList.append("D+:Dp_piee")
+        ma.reconstructDecay("D+:Dp_piemu -> pi-:mypions e+:myelectrons mu+:mymuons", cut=Dp_cuts, path=path)
+        XcpList.append("D+:Dp_piemu")
+        ma.reconstructDecay("D+:Dp_pimumu -> pi-:mypions mu+:mymuons mu+:mymuons", cut=Dp_cuts, path=path)
+        XcpList.append("D+:Dp_pimumu")
+
+        return XcpList

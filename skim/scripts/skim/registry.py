@@ -200,6 +200,7 @@ _RegisteredSkims = [
     ("17241300", "charm", "DpToEtaHp"),  # D+ -> eta h+
     ("17241400", "charm", "LambdacToGeneric"),  # Lambda_c+ -> X
     ("17241500", "charm", "DstToD0Pi_D0ToEtaEta"),  # D* -> D0 -> eta eta
+    ("17241234", "charm", "XcpToHmellpellp"),  # charm -> LNV
 
     # --- WG8: Dark matter searches and tau physics ---
     ("18000000", "dark", "InelasticDarkMatter"),

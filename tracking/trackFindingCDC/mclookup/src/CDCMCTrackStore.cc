@@ -364,9 +364,10 @@ bool CDCMCTrackStore::changedSuperLayer(const CDCHitVector& mcSegment, const CDC
     Vector3D nextMom(ptrNextSimHit->getMomentum());
     Vector3D nextPos(ptrNextSimHit->getPosTrack());
 
-    if (pos.dotXY(nextPos) < 0) return true;
-    if ((nextPos - pos).dotXY(nextMom) < 0) return true;
-    if ((nextPos - pos).dotXY(mom) < 0) return true;
+    const auto dotXY = [](const ROOT::Math::XYZVector & lhs, const ROOT::Math::XYZVector & rhs) { return lhs.X() * rhs.X() + lhs.Y() * rhs.Y(); };
+    if (dotXY(pos, nextPos) < 0) return true;
+    if (dotXY(nextPos - pos, nextMom) < 0) return true;
+    if (dotXY(nextPos - pos, mom) < 0) return true;
 
     // TODO introduce a smarter check here
     return false;

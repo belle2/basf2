@@ -112,12 +112,6 @@ namespace Belle2 {
         return x() * rhs.x() + y() * rhs.y() + z() * rhs.z();
       }
 
-      /// Calculates the two dimensional dot product in xy projection.
-      double dotXY(const Vector3D& rhs) const
-      {
-        return x() * rhs.x() + y() * rhs.y();
-      }
-
       /// Calculates the squared length of the vector
       double Mag2() const
       {

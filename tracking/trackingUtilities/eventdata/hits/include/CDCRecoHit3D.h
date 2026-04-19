@@ -295,9 +295,11 @@ namespace Belle2 {
       }
 
       /// Getter for the 2d position of the hit.
-      const Vector2D& getRecoPos2D() const
+      /// This used to return a reference, but that's not possible when creating the vector on the fly
+      /// after moving to ROOT::Math::Vector(2/3)D
+      const Vector2D getRecoPos2D() const
       {
-        return getRecoPos3D().xy();
+        return VectorUtil::get2DVector(getRecoPos3D());
       }
 
       /// Getter for the z coordinate of the reconstructed position.

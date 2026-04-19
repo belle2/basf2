@@ -92,7 +92,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 
   double arcLength2DPeriod = trajectory2D.getArcLength2DPeriod();
   for (CDCRecoHit3D& recoHit : track) {
-    Vector2D recoPos2D = recoHit.getRLWireHit().reconstruct3D(trajectory2D).xy();
+    Vector2D recoPos2D = VectorUtil::get2DVector(recoHit.getRLWireHit().reconstruct3D(trajectory2D));
     double arcLength2D = trajectory2D.calcArcLength2D(recoPos2D);
 
     if (arcLength2D < 0) {

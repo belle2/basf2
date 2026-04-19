@@ -23,7 +23,7 @@ namespace {
   /// Helper function to extract the numbered pt-range out of a momentum vector
   unsigned int getPTRange(const TrackingUtilities::Vector3D& momentum)
   {
-    const double pT = momentum.xy().R();
+    const double pT = momentum.Rho();
     if (pT > 0.4) {
       return 0;
     } else if (pT > 0.2) {

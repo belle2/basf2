@@ -120,12 +120,12 @@ bool FitlessSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const double nearZ = nearStereoRecoPos.z();
 
   const double stereoArcLength2D =
-    axialFit.calcArcLength2DBetween(nearStereoRecoPos.xy(),
-                                    farStereoRecoPos.xy());
+    axialFit.calcArcLength2DBetween(VectorUtil::get2DVector(nearStereoRecoPos),
+                                    VectorUtil::get2DVector(farStereoRecoPos));
 
   const double arcLength2DGap =
-    axialFit.calcArcLength2DBetween(nearAxialRecoPos.xy(),
-                                    nearStereoRecoPos.xy());
+    axialFit.calcArcLength2DBetween(VectorUtil::get2DVector(nearAxialRecoPos),
+                                    VectorUtil::get2DVector(nearStereoRecoPos));
 
   finitevar<named("reco_arc_length_gap")>() = fabs(arcLength2DGap);
   finitevar<named("stereo_arc_length")>() = fabs(stereoArcLength2D);

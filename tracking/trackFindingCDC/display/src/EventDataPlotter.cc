@@ -709,7 +709,7 @@ void EventDataPlotter::drawTrajectory(const MCParticle& mcParticle, const Attrib
   Vector3D mom(mcParticle.getMomentum());
   double charge = mcParticle.getCharge();
   double time = mcParticle.getProductionTime();
-  CDCTrajectory2D trajectory2D(pos.xy(), time, mom.xy(), charge);
+  CDCTrajectory2D trajectory2D(VectorUtil::get2DVector(pos), time, VectorUtil::get2DVector(mom), charge);
   draw(trajectory2D, attributeMap);
 }
 

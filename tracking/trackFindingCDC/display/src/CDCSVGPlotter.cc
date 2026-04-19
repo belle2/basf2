@@ -366,8 +366,8 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
       Vector3D fromDisplacement(fromSimHit->getPosTrack() - fromSimHit->getPosWire());
       Vector3D toDisplacement(toSimHit->getPosTrack() - toSimHit->getPosWire());
 
-      CDCRecoHit2D fromRecoHit2D(fromRLWireHit, fromDisplacement.xy());
-      CDCRecoHit2D toRecoHit2D(toRLWireHit, toDisplacement.xy());
+      CDCRecoHit2D fromRecoHit2D(fromRLWireHit, VectorUtil::get2DVector(fromDisplacement));
+      CDCRecoHit2D toRecoHit2D(toRLWireHit, VectorUtil::get2DVector(toDisplacement));
 
       bool falseOrder = false;
       if (fromSimHit->getArrayIndex() > toSimHit->getArrayIndex()) {

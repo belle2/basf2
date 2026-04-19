@@ -9,6 +9,7 @@
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <tracking/ckf/general/utilities/SearchDirection.h>
@@ -47,13 +48,14 @@ namespace Belle2 {
     const TrackingUtilities::Vector3D& position = static_cast<TrackingUtilities::Vector3D>(firstMeasurement.getPos());
     const TrackingUtilities::Vector3D& momentum = static_cast<TrackingUtilities::Vector3D>(firstMeasurement.getMom());
 
-    const TrackingUtilities::CDCTrajectory2D trajectory2D(position.xy(), 0, momentum.xy(), cdcTrack->getChargeSeed());
+    const TrackingUtilities::CDCTrajectory2D trajectory2D(VectorUtil::get2DVector(position), 0, VectorUtil::get2DVector(momentum),
+                                                          cdcTrack->getChargeSeed());
 
     const TrackingUtilities::Vector3D& hitPosition = static_cast<TrackingUtilities::Vector3D>(spacePoint->getPosition());
     const TrackingUtilities::Vector2D origin(0, 0);
 
-    const double deltaArcLengthHitOrigin = trajectory2D.calcArcLength2DBetween(hitPosition.xy(), origin);
-    const double deltaArcLengthTrackHit = trajectory2D.calcArcLength2D(hitPosition.xy());
+    const double deltaArcLengthHitOrigin = trajectory2D.calcArcLength2DBetween(VectorUtil::get2DVector(hitPosition), origin);
+    const double deltaArcLengthTrackHit = trajectory2D.calcArcLength2D(VectorUtil::get2DVector(hitPosition));
 
     if (not arcLengthInRightDirection(deltaArcLengthTrackHit, m_param_direction) or
         not arcLengthInRightDirection(deltaArcLengthHitOrigin, m_param_direction)) {

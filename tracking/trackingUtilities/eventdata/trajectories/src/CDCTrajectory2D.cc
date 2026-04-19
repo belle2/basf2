@@ -156,8 +156,8 @@ std::array<Vector3D, 2> CDCTrajectory2D::reconstructBoth3D(const WireLine& wireL
 
   const Vector3D firstRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[0]);
   const Vector3D secondRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[1]);
-  return {{{getClosest(firstRecoWirePos3D.xy()), firstRecoWirePos3D.z()},
-      {getClosest(secondRecoWirePos3D.xy()), secondRecoWirePos3D.z()}
+  return {{{getClosest(VectorUtil::get2DVector(firstRecoWirePos3D)), firstRecoWirePos3D.z()},
+      {getClosest(VectorUtil::get2DVector(secondRecoWirePos3D)), secondRecoWirePos3D.z()}
     }};
 }
 
@@ -167,7 +167,7 @@ Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
 {
   const double recoZ = reconstructZ(wireLine, distance, z);
   const Vector3D recoWirePos2D = wireLine.sagPos3DAtZ(recoZ);
-  return Vector3D(getClosest(recoWirePos2D.xy()), recoZ);
+  return Vector3D(getClosest(VectorUtil::get2DVector(recoWirePos2D)), recoZ);
 }
 
 Vector2D CDCTrajectory2D::getClosest(const Vector2D& point) const

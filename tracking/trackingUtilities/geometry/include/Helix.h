@@ -145,8 +145,8 @@ namespace Belle2 {
       {
         // First keep the necessary shift of the perpendicular travel distance to the new perigee
         // point.
-        double byS = circleXY().arcLengthTo(by.xy());
-        m_circleXY.passiveMoveBy(by.xy());
+        double byS = circleXY().arcLengthTo(VectorUtil::get2DVector(by));
+        m_circleXY.passiveMoveBy(VectorUtil::get2DVector(by));
         Vector2D bySZ(byS, by.z());
         m_szLine.passiveMoveBy(bySZ);
         return byS;

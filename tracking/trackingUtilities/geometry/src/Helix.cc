@@ -30,7 +30,7 @@ using namespace TrackingUtilities;
 double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) const
 {
   // The point may happen to lie in the center of the helix.
-  double d0 = circleXY().distance(point.xy());
+  double d0 = circleXY().distance(VectorUtil::get2DVector(point));
   double denominator = 1 + curvatureXY() * d0;
   if (denominator == 0) {
     // When this happens we can optimise the z distance for the closest point
@@ -43,7 +43,7 @@ double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) cons
   }
 
   // First approximation optimising the xy distance.
-  double arcLength2D = circleXY().arcLengthTo(point.xy());
+  double arcLength2D = circleXY().arcLengthTo(VectorUtil::get2DVector(point));
   // In case the helix is a flat circle with no extend into z this is the actual solution
   if (tanLambda() == 0) {
     return arcLength2D;
@@ -91,13 +91,13 @@ double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) cons
 HelixJacobian Helix::passiveMoveByJacobian(const Vector3D& by) const
 {
   // Fills the upper left 3x3 corner.
-  PerigeeJacobian perigeeJacobian = circleXY().passiveMoveByJacobian(by.xy());
+  PerigeeJacobian perigeeJacobian = circleXY().passiveMoveByJacobian(VectorUtil::get2DVector(by));
   SZJacobian szJacobian = SZUtil::identity();
   HelixJacobian jacobian = HelixUtil::stackBlocks(perigeeJacobian, szJacobian);
 
   double curv = curvatureXY();
   double tanL = tanLambda();
-  double sArc = circleXY().arcLengthTo(by.xy());
+  double sArc = circleXY().arcLengthTo(VectorUtil::get2DVector(by));
 
   using namespace NHelixParameterIndices;
   jacobian(c_Z0, c_Curv) = tanL * (jacobian(c_Phi0, c_Curv) - sArc) / curv;

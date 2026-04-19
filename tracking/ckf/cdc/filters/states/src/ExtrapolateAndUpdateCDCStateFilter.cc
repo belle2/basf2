@@ -30,7 +30,8 @@ namespace {
     const auto& hitPosition = wire.getWirePos3DAtZ(trackPosition.z());
 
     TrackingUtilities::Vector3D trackPosToWire{hitPosition - trackPosition};
-    TrackingUtilities::ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(trackPosToWire.xy(), mom.xy());
+    TrackingUtilities::ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(VectorUtil::get2DVector(trackPosToWire),
+                                           VectorUtil::get2DVector(mom));
 
     state.setRLinfo(rlInfo);
     return rlInfo;

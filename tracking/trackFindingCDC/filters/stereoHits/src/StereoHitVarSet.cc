@@ -53,7 +53,7 @@ bool StereoHitVarSet::extract(const BaseStereoHitFilter::Object* testPair)
 
   const CDCWire& wire = rlWireHit->getWire();
   Vector2D wirePos = wire.getWirePos2DAtZ(reconstructedPosition.z());
-  Vector2D disp2D = reconstructedPosition.xy() - wirePos;
+  Vector2D disp2D = VectorUtil::get2DVector(reconstructedPosition) - wirePos;
   const double xyDistance = disp2D.R();
 
   const auto nearestAxialHit = std::min_element(track->begin(), track->end(), [&reconstructedS](const CDCRecoHit3D & lhs,

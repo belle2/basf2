@@ -70,7 +70,7 @@ namespace Belle2 {
       /// Flight time estimator for cosmic ray events
       double getFlightTime2D(const TrackingUtilities::Vector2D& pos2D, double alpha, double beta = 1) const override
       {
-        TrackingUtilities::Vector2D relPos2D = pos2D - m_triggerPoint.xy();
+        TrackingUtilities::Vector2D relPos2D = pos2D - VectorUtil::get2DVector(m_triggerPoint);
         double deltaAlpha = VectorUtil::Angle(pos2D, relPos2D);
         alpha += deltaAlpha;
         double absAlpha = std::fabs(alpha);

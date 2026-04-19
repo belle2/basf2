@@ -29,8 +29,8 @@ void TrackFlightTimeAdjuster::apply(std::vector<CDCTrack>& tracks)
 {
   for (CDCTrack& track : tracks) {
     CDCTrajectory3D startTrajectory3D = track.getStartTrajectory3D();
-    const Vector2D pos2D = startTrajectory3D.getSupport().xy();
-    const Vector2D dir2D = startTrajectory3D.getFlightDirection3DAtSupport().xy();
+    const Vector2D pos2D = VectorUtil::get2DVector(startTrajectory3D.getSupport());
+    const Vector2D dir2D = VectorUtil::get2DVector(startTrajectory3D.getFlightDirection3DAtSupport());
     const double alpha = VectorUtil::Angle(pos2D, dir2D);
     const double beta = 1;
     const double flightTime2D =

@@ -59,11 +59,11 @@ TEST(TrackingUtilitiesTest, eventdata_trajectories_CDCTrajectory2D_reconstruct)
   EXPECT_NEAR(localOrigin.y(), positionOnWire.y(), 10e-7);
   EXPECT_NEAR(localOrigin.z(), positionOnWire.z(), 10e-7);
 
-  CDCTrajectory2D trajectory2D(localOrigin.xy(), localPerigeeCircle);
+  CDCTrajectory2D trajectory2D(VectorUtil::get2DVector(localOrigin), localPerigeeCircle);
   double arcLength2D = trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
 
   // Check that the old origin is still on the line
-  double distance = trajectory2D.getDist2D(localOrigin.xy());
+  double distance = trajectory2D.getDist2D(VectorUtil::get2DVector(localOrigin));
   EXPECT_NEAR(0, distance, 10e-7);
 
   // Extrapolate back to the local origin

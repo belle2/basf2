@@ -65,8 +65,8 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
                                  const double charge,
                                  const double bZ)
   : m_localOrigin(pos3D)
-  , m_localHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.xy().R(), charge, bZ),
-                 VectorUtil::unit(mom3D.xy()),
+  , m_localHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.Rho(), charge, bZ),
+                 VectorUtil::unit(VectorUtil::get2DVector(mom3D)),
                  0.0,
                  mom3D.cotTheta(),
                  0.0)
@@ -334,7 +334,7 @@ double CDCTrajectory3D::shiftPeriod(int nPeriods)
 
 CDCTrajectory2D CDCTrajectory3D::getTrajectory2D() const
 {
-  return CDCTrajectory2D(getLocalOrigin().xy(),
+  return CDCTrajectory2D(VectorUtil::get2DVector(getLocalOrigin()),
                          getLocalHelix().uncertainCircleXY(),
                          getFlightTime());
 }
@@ -351,7 +351,7 @@ PerigeeCircle CDCTrajectory3D::getGlobalCircle() const
 {
   // Down cast since we do not necessarily won't the covariance matrix transformed as well
   PerigeeCircle result(getLocalHelix()->circleXY());
-  result.passiveMoveBy(-getLocalOrigin().xy());
+  result.passiveMoveBy(-VectorUtil::get2DVector(getLocalOrigin()));
   return result;
 }
 

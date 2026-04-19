@@ -174,7 +174,7 @@ namespace Belle2 {
        */
       double calcArcLength2D(const Vector3D& point) const
       {
-        return getLocalHelix()->circleXY().arcLengthTo((point - getLocalOrigin()).xy());
+        return getLocalHelix()->circleXY().arcLengthTo(VectorUtil::get2DVector(point - getLocalOrigin()));
       }
 
       /// Getter for the arc length for one round trip around the trajectory.
@@ -229,13 +229,13 @@ namespace Belle2 {
       /// Getter for the closest approach on the trajectory to the global origin
       Vector3D getGlobalPerigee() const
       {
-        return getLocalHelix()->closestXY(-m_localOrigin.xy()) + m_localOrigin;
+        return getLocalHelix()->closestXY(-VectorUtil::get2DVector(m_localOrigin)) + m_localOrigin;
       }
 
       /// Getter for the center of the helix in global coordinates
       Vector2D getGlobalCenter() const
       {
-        return getLocalHelix()->centerXY() + m_localOrigin.xy();
+        return getLocalHelix()->centerXY() + VectorUtil::get2DVector(m_localOrigin);
       }
 
     public:
@@ -258,7 +258,7 @@ namespace Belle2 {
       /// Getter for the signed impact parameter of the trajectory
       double getGlobalImpact() const
       {
-        return getLocalHelix()->distanceXY(-m_localOrigin.xy());
+        return getLocalHelix()->distanceXY(-VectorUtil::get2DVector(m_localOrigin));
       }
 
     public:

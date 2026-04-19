@@ -115,7 +115,10 @@ namespace Belle2 {
         return Vector();
       }
       Vector tmp(a);
-      return tmp.Scale(1. / tmp.R());
+      // Somehow, the Cartesion2D vector knows Scale, but DisplacementVector2D does not, and as DisplacementVector2D<Cartesion2D.....
+      // So can't use Scale, and perform plain math operations instead... ¯\_(ツ)_/¯
+      // return tmp.Scale(1. / tmp.R());
+      return tmp / tmp.R();
     }
 
     /// Constructs a unit vector with azimuth angle equal to phi
@@ -286,6 +289,12 @@ namespace Belle2 {
     {
       return lhs.R() < rhs.R() or (lhs.R() == rhs.R() and
                                    (lhs.z() < rhs.z() or (lhs.z() == rhs.z() and (lhs.Phi() < rhs.Phi()))));
+    }
+
+    /// Get 2D Vector from 3D Vector
+    inline ROOT::Math::XYVector get2DVector(const ROOT::Math::XYZVector& a)
+    {
+      return ROOT::Math::XYVector(a.X(), a.Y());
     }
 
   } // namespace VectorUtil

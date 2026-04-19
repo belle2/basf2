@@ -64,19 +64,6 @@ namespace Belle2 {
         return x() == rhs.x() and y() == rhs.y();
       }
 
-      /// Total ordering based on cylindrical radius first and azimuth angle second
-      /** Total order achieving a absolute lower bound Vector2D(0.0, 0.0). By first taking the
-       * cylindrical radius \n
-       *  for comparison the null vector is smaller than all other possible \n
-       *  vectors. Secondly the azimuth angle is considered to have a total ordering \n
-       *  for all vectors.\n
-       */
-      bool operator<(const Vector2D& rhs) const
-      {
-        return Mag2() < rhs.Mag2() or
-               (Mag2() == rhs.Mag2() and (Phi() < rhs.Phi()));
-      }
-
       /// Calculates the two dimensional dot product.
       double Dot(const Vector2D& rhs) const
       {

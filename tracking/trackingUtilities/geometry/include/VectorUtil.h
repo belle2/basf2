@@ -261,6 +261,33 @@ namespace Belle2 {
       return static_cast<TrackingUtilities::EForwardBackward>(TrackingUtilities::sign(unnormalizedParallelComp(toCheck, rhs)));
     }
 
+    /// Total ordering based on cylindrical radius first and azimuth angle second
+    /** Total order achieving a absolute lower bound Vector2D(0.0, 0.0). By first taking the
+     * cylindrical radius \n
+     *  for comparison the null vector is smaller than all other possible \n
+     *  vectors. Secondly the azimuth angle is considered to have a total ordering \n
+     *  for all vectors.\n
+     */
+    inline bool smaller(const ROOT::Math::XYVector& lhs, const ROOT::Math::XYVector& rhs)
+    {
+      return lhs.Mag2() < rhs.Mag2() or
+             (lhs.Mag2() == rhs.Mag2() and (lhs.Phi() < rhs.Phi()));
+    }
+
+    /// Total ordering based on cylindrical radius first the z component second and azimuth angle
+    /// third.
+    /** Total order achieving a lower bound Vector3D(0.0, 0.0, 0.0). By first taking the norm \n
+     *  for comparison the null vector is smaller than all other possible \n
+     *  vectors. Secondly the polar angle theta ( equivalently z ) and finally the azimuth \n
+     *  angle phi is considered to have a total ordering for all vectors. \n
+     *  Note does not commute with the projection to xy space.
+     **/
+    inline bool smaller(const ROOT::Math::XYZVector& lhs, const ROOT::Math::XYZVector& rhs)
+    {
+      return lhs.R() < rhs.R() or (lhs.R() == rhs.R() and
+                                   (lhs.z() < rhs.z() or (lhs.z() == rhs.z() and (lhs.Phi() < rhs.Phi()))));
+    }
+
   } // namespace VectorUtil
 
 } // namespace Belle2

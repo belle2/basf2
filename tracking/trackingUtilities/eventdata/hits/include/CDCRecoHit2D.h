@@ -134,7 +134,7 @@ namespace Belle2 {
       {
         return getRLWireHit() <  other.getRLWireHit() or (
                  getRLWireHit() == other.getRLWireHit() and
-                 getRecoDisp2D() < other.getRecoDisp2D());
+                 VectorUtil::smaller(getRecoDisp2D(), getRecoDisp2D()));
       }
 
       /// Defines wires and the two dimensional reconstructed hits as coaligned.

@@ -18,6 +18,7 @@
 #include <cdc/topology/ISuperLayer.h>
 
 #include <framework/geometry/VectorUtil.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 namespace Belle2 {
   class CDCSimHit;
@@ -177,7 +178,7 @@ namespace Belle2 {
       {
         return (getRLWireHit() < other.getRLWireHit() or
                 (getRLWireHit() == other.getRLWireHit() and
-                 getRecoPos3D() < other.getRecoPos3D()));
+                 VectorUtil::smaller(getRecoPos3D(), other.getRecoPos3D())));
       }
 
       /// Defines wires and the three dimensional reconstructed hits as coaligned.

@@ -92,20 +92,6 @@ namespace Belle2 {
         return x() == rhs.x() and y() == rhs.y() and z() == rhs.z();
       }
 
-      /// Total ordering based on cylindrical radius first the z component second and azimuth angle
-      /// third.
-      /** Total order achieving a lower bound Vector3D(0.0, 0.0, 0.0). By first taking the norm \n
-       *  for comparison the null vector is smaller than all other possible \n
-       *  vectors. Secondly the polar angle theta ( equivalently z ) and finally the azimuth \n
-       *  angle phi is considered to have a total ordering for all vectors. \n
-       *  Note does not commute with the projection to xy space.
-       **/
-      bool operator<(const Vector3D& rhs) const
-      {
-        return R() < rhs.R() or (R() == rhs.R() and
-                                 (z() < rhs.z() or (z() == rhs.z() and (Phi() < rhs.Phi()))));
-      }
-
       /// Calculates the three dimensional dot product, ROOT::Math compatible
       double Dot(const Vector3D& rhs) const
       {

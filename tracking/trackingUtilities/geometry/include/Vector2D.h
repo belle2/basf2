@@ -206,27 +206,6 @@ namespace Belle2 {
         return Vector2D(x() - rhs.X(), y() - rhs.Y());
       }
 
-      /// Indicates if the given vector is more counterclockwise or more clockwise if you looked in
-      /// the direction of this vector.
-      ERotation isCCWOrCWOf(const Vector2D& rhs) const
-      {
-        return static_cast<ERotation>(sign(VectorUtil::unnormalizedOrthogonalComp(*this, rhs)));
-      }
-
-      /// Indicates if the given vector is more counterclockwise if you looked in the direction of
-      /// this vector.
-      bool isCCWOf(const Vector2D& rhs) const
-      {
-        return isCCWOrCWOf(rhs) == ERotation::c_CounterClockwise;
-      }
-
-      /// Indicates if the given vector is more clockwise if you looked in the direction of this
-      /// vector.
-      bool isCWOf(const Vector2D& rhs) const
-      {
-        return isCCWOrCWOf(rhs) == ERotation::c_Clockwise;
-      }
-
       /// Indicates if the given vector is more coaligned or reverse if you looked in the direction
       /// of this vector.
       EForwardBackward isForwardOrBackwardOf(const Vector2D& rhs) const

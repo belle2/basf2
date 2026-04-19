@@ -87,12 +87,6 @@ namespace Belle2 {
         return x() * rhs.x() + y() * rhs.y();
       }
 
-      /// Calculated the two dimensional cross product.
-      double cross(const Vector2D& rhs) const
-      {
-        return x() * rhs.y() - y() * rhs.x();
-      }
-
       /// Calculates \f$ x^2 + y^2 \f$ .
       double Mag2() const
       {

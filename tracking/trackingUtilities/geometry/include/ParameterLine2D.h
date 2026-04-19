@@ -416,8 +416,8 @@ namespace Belle2 {
       /// Turns the line into its inverse function in place. Orientation will be flipped as well
       void invert()
       {
-        m_tangential.swapCoordinates();
-        m_support.swapCoordinates();
+        m_tangential.SetXY(m_tangential.Y(), m_tangential.X());
+        m_support.SetXY(m_support.Y(), m_support.X());
       }
 
       /// Gives the line associated with the inverse function as a copy.

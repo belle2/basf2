@@ -494,7 +494,7 @@ namespace Belle2 {
       /// Turns the line function into its inverse function in place
       void invert()
       {
-        m_n12.swapCoordinates();
+        m_n12.SetXY(m_n12.Y(), m_n12.X());
         reverse();
       }
 

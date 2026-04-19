@@ -312,12 +312,6 @@ namespace Belle2 {
         }
       }
 
-      /// Swaps the coordinates in place
-      void swapCoordinates()
-      {
-        std::swap(m_x, m_y);
-      }
-
       /// Gives the azimuth angle being the angle to the x axes ( range -M_PI to M_PI )
       double phi() const
       {

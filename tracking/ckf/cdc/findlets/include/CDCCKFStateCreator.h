@@ -93,7 +93,7 @@ namespace Belle2 {
           if (hitPtr->getAutomatonCell().hasBackgroundFlag() || hitPtr->getAutomatonCell().hasTakenFlag()) {
             m_wireHitCache.push_back(CDCCKFWireHitCache{99999, 0.});
           } else {
-            m_wireHitCache.push_back(CDCCKFWireHitCache{hitPtr->getWire().getICLayer(), hitPtr->getRefPos2D().phi()});
+            m_wireHitCache.push_back(CDCCKFWireHitCache{hitPtr->getWire().getICLayer(), hitPtr->getRefPos2D().Phi()});
           }
         }
       }
@@ -139,7 +139,7 @@ namespace Belle2 {
           }
         }
       } else {
-        lastPhi = lastState.getWireHit()->getRefPos2D().phi();
+        lastPhi = lastState.getWireHit()->getRefPos2D().Phi();
         lastICLayer = lastState.getWireHit()->getWire().getICLayer();
       }
 

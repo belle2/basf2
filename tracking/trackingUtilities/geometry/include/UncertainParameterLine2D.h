@@ -63,7 +63,7 @@ namespace Belle2 {
       {
         using namespace NLineParameterIndices;
         LineParameters result;
-        result(c_Phi0) = m_parameterLine2D.tangential().phi();
+        result(c_Phi0) = m_parameterLine2D.tangential().Phi();
         result(c_I) = 0;
         return result;
       }

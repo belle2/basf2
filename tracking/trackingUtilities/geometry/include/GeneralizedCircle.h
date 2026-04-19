@@ -507,7 +507,7 @@ namespace Belle2 {
       /// Gives to azimuth angle phi of the direction of flight at the perigee
       double tangentialPhi() const
       {
-        return tangential().phi();
+        return tangential().Phi();
       }
 
       /// Gives the minimal cylindrical radius the circle reaches (unsigned)

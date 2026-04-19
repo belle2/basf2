@@ -292,7 +292,7 @@ void TrackQualityTools::removeHitsInTheBeginningIfAngleLarge(CDCTrack& track, do
       continue;
     }
 
-    const double currentAngle = recoHit.getRecoPos2D().phi();
+    const double currentAngle = recoHit.getRecoPos2D().Phi();
     if (not std::isnan(lastAngle)) {
       const double delta = currentAngle - lastAngle;
       const double normalizedDelta =

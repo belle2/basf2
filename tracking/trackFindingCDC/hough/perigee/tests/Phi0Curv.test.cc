@@ -84,7 +84,7 @@ namespace {
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
-      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Curv " << houghBox.getLowerBound<DiscreteCurv>());
       B2DEBUG(100, "Tags of the hits");
 
@@ -176,7 +176,7 @@ namespace {
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << segments.size());
-      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Curv " << houghBox.getLowerBound<DiscreteCurv>());
 
       for (const CDCSegment2D* segment2D : segments) {
@@ -471,7 +471,7 @@ namespace {
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
-      B2DEBUG(100, "Phi0 " << phi0CurvBox.getLowerBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Phi0 " << phi0CurvBox.getLowerBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Curv " << phi0CurvBox.getLowerBound<DiscreteCurv>());
       B2DEBUG(100, "Tags of the hits");
 

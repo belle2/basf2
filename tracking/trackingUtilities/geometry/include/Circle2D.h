@@ -162,7 +162,7 @@ namespace Belle2 {
       /// Gives to azimuth phi of the direction of flight at the perigee
       double tangentialPhi() const
       {
-        return tangential().phi();
+        return tangential().Phi();
       }
 
       /// Gradient of the distance field

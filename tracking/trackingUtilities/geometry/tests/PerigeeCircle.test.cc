@@ -392,6 +392,6 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_OriginCircleFromPointDirectio
   EXPECT_NEAR(expectedCurvature, curvature, 10e-7);
   EXPECT_NEAR(expectedPhi0Vec.x(), phi0Vec.x(), 10e-7);
   EXPECT_NEAR(expectedPhi0Vec.y(), phi0Vec.y(), 10e-7);
-  EXPECT_NEAR(expectedPhi0, phi0Vec.phi(), 10e-7);
+  EXPECT_NEAR(expectedPhi0, phi0Vec.Phi(), 10e-7);
   EXPECT_NEAR(1, phi0Vec.R(), 10e-7);
 }

@@ -68,7 +68,7 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     var<named("chi2_0")>() = fitLine.chi2();
     var<named("chi2_0_per_s")>() = fitLine.chi2() / s;
     var<named("erf_0")>() = std::erf(fitLine.chi2() / 800);
-    var<named("fit_0_phi0")>() = fitLine->tangential().phi();
+    var<named("fit_0_phi0")>() = fitLine->tangential().Phi();
     var<named("fit_0_cos_delta")>() = VectorUtil::CosTheta(fitLine->tangential(), tangential);
   }
 
@@ -78,7 +78,7 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     double s = fitLine->lengthOnCurve(frontWirePos2D, backWirePos2D);
     var<named("chi2_1")>() = fitLine.chi2();
     var<named("chi2_1_per_s")>() = fitLine.chi2() / s;
-    var<named("fit_1_phi0")>() = fitLine->tangential().phi();
+    var<named("fit_1_phi0")>() = fitLine->tangential().Phi();
     var<named("fit_1_cos_delta")>() = VectorUtil::CosTheta(fitLine->tangential(), tangential);
   }
 
@@ -87,7 +87,7 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     double s = fitLine->lengthOnCurve(frontWirePos2D, backWirePos2D);
     var<named("chi2")>() = fitLine.chi2();
     var<named("chi2_per_s")>() = fitLine.chi2() / s;
-    var<named("fit_phi0")>() = fitLine->tangential().phi();
+    var<named("fit_phi0")>() = fitLine->tangential().Phi();
     var<named("fit_cos_delta")>() = VectorUtil::CosTheta(fitLine->tangential(), tangential);
   }
 

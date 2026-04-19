@@ -41,7 +41,7 @@ PerigeeCircle::PerigeeCircle()
 
 PerigeeCircle::PerigeeCircle(double curvature, const Vector2D& phi0Vec, double impact)
   : m_curvature(curvature)
-  , m_phi0(phi0Vec.phi())
+  , m_phi0(phi0Vec.Phi())
   , m_phi0Vec(phi0Vec)
   , m_impact(impact)
 {
@@ -335,7 +335,7 @@ void PerigeeCircle::setCenterAndRadius(const Vector2D& center,
   if (m_phi0Vec.R() != 0.0) {
     m_phi0Vec.Scale(1. / m_phi0Vec.R());
   }
-  m_phi0 = m_phi0Vec.phi();
+  m_phi0 = m_phi0Vec.Phi();
   m_impact = (center.R() - std::fabs(absRadius)) * static_cast<double>(orientation);
 }
 
@@ -347,7 +347,7 @@ void PerigeeCircle::setN(double n0, const Vector2D& n12, double n3)
   if (m_phi0Vec.R() != 0.0) {
     m_phi0Vec.Scale(1. / m_phi0Vec.R());
   }
-  m_phi0 = m_phi0Vec.phi();
+  m_phi0 = m_phi0Vec.Phi();
   m_impact = distance(n0 / normalization); // Uses the new curvature
 }
 

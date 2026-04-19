@@ -74,7 +74,7 @@ namespace Belle2 {
       bool operator<(const Vector2D& rhs) const
       {
         return Mag2() < rhs.Mag2() or
-               (Mag2() == rhs.Mag2() and (phi() < rhs.phi()));
+               (Mag2() == rhs.Mag2() and (Phi() < rhs.Phi()));
       }
 
       /// Calculates the two dimensional dot product.
@@ -204,7 +204,7 @@ namespace Belle2 {
 
     public:
       /// Gives the azimuth angle being the angle to the x axes ( range -M_PI to M_PI )
-      double phi() const
+      double Phi() const
       {
         return (x() == 0.0 and y() == 0.0) ? NAN : atan2(y(), x());
       }

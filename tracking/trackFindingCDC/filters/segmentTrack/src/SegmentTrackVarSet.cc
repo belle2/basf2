@@ -183,7 +183,7 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
       }
 
       if (thetaFirstSegmentHit == -10) {
-        thetaFirstSegmentHit = reconstructedPosition.theta();
+        thetaFirstSegmentHit = reconstructedPosition.Theta();
       }
       sum_hit_z_distance += current_z_distance;
       if (current_z_distance > max_hit_z_distance) {
@@ -191,7 +191,7 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
       }
     }
 
-    double thetaTrack = trajectoryTrack3D.getFlightDirection3DAtSupport().theta();
+    double thetaTrack = trajectoryTrack3D.getFlightDirection3DAtSupport().Theta();
     stereo_quad_tree_distance = thetaTrack - thetaFirstSegmentHit;
   }
 

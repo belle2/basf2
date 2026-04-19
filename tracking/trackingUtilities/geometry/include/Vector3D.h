@@ -103,7 +103,7 @@ namespace Belle2 {
       bool operator<(const Vector3D& rhs) const
       {
         return R() < rhs.R() or (R() == rhs.R() and
-                                 (z() < rhs.z() or (z() == rhs.z() and (phi() < rhs.phi()))));
+                                 (z() < rhs.z() or (z() == rhs.z() and (Phi() < rhs.Phi()))));
       }
 
       /// Calculates the three dimensional dot product, ROOT::Math compatible
@@ -313,13 +313,13 @@ namespace Belle2 {
       }
 
       /// Getter for the azimuth angle
-      double phi() const
+      double Phi() const
       {
-        return xy().phi();
+        return xy().Phi();
       }
 
       /// Getter for the polar angle
-      double theta() const
+      double Theta() const
       {
         return atan2(Rho(), z());
       }

@@ -65,9 +65,9 @@ bool StereoHitVarSet::extract(const BaseStereoHitFilter::Object* testPair)
   var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
   var<named("reco_s")>() = toFinite(reconstructedS, 0);
   var<named("reco_z")>() = toFinite(reconstructedPosition.z(), 0);
-  var<named("phi_track")>() = toFinite(startMomentum.phi(), 0);
-  var<named("phi_hit")>() = reconstructedPosition.phi();
-  var<named("theta_hit")>() = reconstructedPosition.theta();
+  var<named("phi_track")>() = toFinite(startMomentum.Phi(), 0);
+  var<named("phi_hit")>() = reconstructedPosition.Phi();
+  var<named("theta_hit")>() = reconstructedPosition.Theta();
   var<named("drift_length")>() = reconstructedDriftLength;
   var<named("adc_count")>() = adcCount;
   var<named("xy_distance_zero_z")>() = toFinite(xyDistance, 0);

@@ -41,8 +41,8 @@ Weight PhiRecoTrackRelationFilter::operator()(const CellularRecoTrack& fromTrack
 
   const Vector2D origin;
 
-  const double fromPhi = fromTrajectory.getFlightDirection2D(origin).phi();
-  const double toPhi = toTrajectory.getFlightDirection2D(origin).phi();
+  const double fromPhi = fromTrajectory.getFlightDirection2D(origin).Phi();
+  const double toPhi = toTrajectory.getFlightDirection2D(origin).Phi();
 
   const double phiDistance = std::fabs(AngleUtil::normalised(fromPhi - toPhi));
 

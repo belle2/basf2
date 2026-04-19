@@ -39,7 +39,7 @@ Weight ResidualSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair
   Vector3D position = Vector3D(firstMeasurement.getPos());
   const Vector3D hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
 
-  const bool sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
+  const bool sameHemisphere = fabs(position.Phi() - hitPosition.Phi()) < TMath::PiOver2();
   if (not sameHemisphere) {
     return NAN;
   }

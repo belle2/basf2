@@ -15,7 +15,7 @@
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 
-#include <framework/geometry/VectorUtil.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <Math/Vector3D.h>
 #include <Math/Vector2D.h>

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <framework/geometry/VectorUtil.h>
+
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
@@ -125,18 +127,6 @@ namespace Belle2 {
     inline ROOT::Math::XYVector Phi(const double phi)
     {
       return std::isnan(phi) ? ROOT::Math::XYVector(0.0, 0.0) : ROOT::Math::XYVector(std::cos(phi), std::sin(phi));
-    }
-
-    /// Calculated the two dimensional cross product.
-    inline double Cross(const ROOT::Math::XYVector& lhs, const ROOT::Math::XYVector& rhs)
-    {
-      return lhs.X() * rhs.Y() - lhs.Y() * rhs.X();
-    }
-
-    /// Calculated one of the two possible orthogonal vectors.
-    inline ROOT::Math::XYVector Orthogonal(const ROOT::Math::XYVector& a)
-    {
-      return ROOT::Math::XYVector(-a.Y(), a.X());
     }
 
     /// Calculated one of the two possible orthogonal vectors, given a rotation direction.

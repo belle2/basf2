@@ -8,7 +8,7 @@
 #pragma once
 
 #include <tracking/trackingUtilities/numerics/LookupTable.h>
-#include <framework/geometry/VectorUtil.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <Math/Vector2D.h>
 

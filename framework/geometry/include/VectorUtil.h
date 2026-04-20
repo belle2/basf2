@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <tracking/trackingUtilities/geometry/VectorUtil.h>
-
 /* ROOT headers. */
 #include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
@@ -141,6 +139,18 @@ namespace Belle2 {
       return std::acos(CosTheta(v1, v2));
     }
 
+    /// Calculated the two dimensional cross product.
+    inline double Cross(const ROOT::Math::XYVector& lhs, const ROOT::Math::XYVector& rhs)
+    {
+      return lhs.X() * rhs.Y() - lhs.Y() * rhs.X();
+    }
+
+    /// Calculated one of the two possible orthogonal vectors.
+    inline ROOT::Math::XYVector Orthogonal(const ROOT::Math::XYVector& a)
+    {
+      return ROOT::Math::XYVector(-a.Y(), a.X());
+    }
+
     /**
      * Calculates the part of vector v1 that is orthogonal to the vector v2
      * @param[in] v1  Vector v1
@@ -158,7 +168,6 @@ namespace Belle2 {
       const double cross = Cross(relativeTo, v1);                                 // = relativeTo.cross(*this)
       const ROOT::Math::XYVector tmp = relativeTo * (cross / relativeTo.Mag2());  // = relativeTo.scaled(cross / relativeTo.normSquared())
       return Orthogonal(tmp);                                                     // = .orthogonal()
-
     }
 
     /**

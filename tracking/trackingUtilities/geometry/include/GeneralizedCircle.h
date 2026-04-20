@@ -593,7 +593,7 @@ namespace Belle2 {
       ROOT::Math::XYVector center() const
       {
         ROOT::Math::XYVector tmp = n12();
-        return tmp / (2. * n3());
+        return tmp / (-2. * n3());
       }
 
       /// Gives the perimeter of the circle.

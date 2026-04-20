@@ -887,7 +887,7 @@ void ECLBhabhaTCollectorModule::collect()
     if (fabs(time) > m_timeAbsMax) continue;
 
     // Fit quality flag -- choose only events with best fit quality
-    if (ecl_dig->getQuality() != 0) continue;
+    if (ecl_dig->getQuality() != 0 and ecl_dig->getQuality() != 3) continue;
 
     //== Save time and crystal information.  Fill plot after both electrons are tested
     crystalIDs[iCharge] = cid;

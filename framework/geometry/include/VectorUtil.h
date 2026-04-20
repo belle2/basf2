@@ -144,11 +144,9 @@ namespace Belle2 {
     /**
      * Calculates the part of vector v1 that is orthogonal to the vector v2
      * @param[in] v1  Vector v1
-     * @param[in] v2  Vector v2
+     * @param[in] relativeTo Vector v2
      * \return    Part of v1 that is orthogonal to v2
-     * Adapted from tracking/trackingUtilities/geometry/Vector2D:
-     * https://gitlab.desy.de/belle2/software/basf2/-/blob/main/tracking/trackingUtilities/geometry/include/Vector2D.h?ref_type=heads#L445
-     *
+     * Original implementation:
      * Vector2D orthogonalVector(const Vector2D& relativTo) const
      * {
      *   return relativTo.scaled(relativTo.cross(*this) / relativTo.normSquared()).orthogonal();

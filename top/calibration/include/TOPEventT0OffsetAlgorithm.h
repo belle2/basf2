@@ -21,9 +21,6 @@ namespace Belle2 {
       /** Constructor */
       TOPEventT0OffsetAlgorithm();
 
-      /** Destructor */
-      virtual ~TOPEventT0OffsetAlgorithm() {}
-
       /**
        * Sets minimal number of histogram entries to perform a fit
        * @param minEntries minimal number of histogram entries

@@ -71,10 +71,6 @@ namespace Belle2 {
 
   }
 
-  TOPUnpackerModule::~TOPUnpackerModule()
-  {
-  }
-
   void TOPUnpackerModule::initialize()
   {
 
@@ -220,7 +216,7 @@ namespace Belle2 {
   }
 
 
-  std::string TOPUnpackerModule::getFrontEndName(RawTOP& raw, int finesse) const
+  std::string TOPUnpackerModule::getFrontEndName(RawTOP& raw, int finesse)
   {
     std::string name;
     if (raw.GetMaxNumOfCh(0) <= 4) { // COPPER
@@ -756,7 +752,7 @@ namespace Belle2 {
       info->incrementWaveformsCount();
 
       // create relations btw. raw digits and waveform
-      for (auto& digit : digits) digit->addRelationTo(waveform);
+      for (const auto* digit : digits) digit->addRelationTo(waveform);
 
     }
 
@@ -793,12 +789,11 @@ namespace Belle2 {
       }
       nChannels += it;
 
-      int channelID = channelIndex;
-      int carrier = channelID / 32;
-      int asic = (channelID % 32) / 8;
-      int chn = channelID % 8;
-
       if (it != 1) {
+        int channelID = channelIndex;
+        int carrier = channelID / 32;
+        int asic = (channelID % 32) / 8;
+        int chn = channelID % 8;
         channelOutputString += "carrier: " + std::to_string(carrier) + " asic: " + std::to_string(asic) + " chn: " + std::to_string(
                                  chn) + " occurrence: " + std::to_string(it) + "\n";
         B2WARNING("TOPUnpacker: interim FE - ASIC channel seen more than once"
@@ -1258,13 +1253,9 @@ namespace Belle2 {
   {
     B2INFO("TOPUnpacker: Channels seen per event statistics:");
     B2INFO("TOPUnpacker: nChn\tcount");
-    for (auto& entry : m_channelStatistics) {
+    for (const auto& entry : m_channelStatistics) {
       B2INFO("TOPUnpacker: " << entry.first << "\t\t" << entry.second);
     }
-  }
-
-  void TOPUnpackerModule::terminate()
-  {
   }
 
 

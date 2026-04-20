@@ -97,11 +97,6 @@ GRLNeuroTrainerModule::GRLNeuroTrainerModule() : Module()
   addParam("multiplyHidden", m_parameters.multiplyHidden,
            "If true, multiply nHidden with number of input nodes.",
            m_parameters.multiplyHidden);
-  addParam("outputScale", m_parameters.outputScale,
-           "Output scale for all networks (1 value list or nMLP value lists). "
-           "Output[i] of the MLP is scaled from [-1, 1] "
-           "to [outputScale[2*i], outputScale[2*i+1]]. "
-           "(units: z[cm] / theta[degree])", m_parameters.outputScale);
   addParam("nTrainMin", m_nTrainMin,
            "Minimal number of training samples "
            "or factor to multiply with number of weights. "
@@ -634,12 +629,7 @@ GRLNeuroTrainerModule::train(unsigned isector)
   }
   if (m_saveDebug) {
     for (unsigned i = nTrain + m_nValid; i < m_trainSets[isector].getNumberOfSamples(); ++i) {
-      float output = m_GRLNeuro.runMLP(isector, m_trainSets[isector].getInput(i));
-      vector<float> target = m_trainSets[isector].getTarget(i);
-      //for (unsigned iout = 0; iout < output.size(); ++iout) {
-      if (((int)target[0]) == 1)h_result_sig[isector]->Fill(output);
-      else                    h_result_bg[isector]->Fill(output);
-      //}
+      vector<float> output = m_GRLNeuro.runMLP(isector, m_trainSets[isector].getInput(i));
     }
   }
   // free memory

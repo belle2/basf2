@@ -78,12 +78,6 @@ GRLNeuroModule::GRLNeuroModule() : Module()
   {{24, 24, 24}});
   addParam("multiplyHidden", m_parameters.multiplyHidden,
            "If true, multiply nHidden with number of input nodes.", false);
-  addParam("outputScale", m_parameters.outputScale,
-           "Output scale for all networks (1 value list or nMLP value lists). "
-           "Output[i] of the MLP is scaled from [-1, 1] "
-           "to [outputScale[2*i], outputScale[2*i+1]]. "
-           "(units: z[cm] / theta[degree])",
-  {{ -1., 1.}});
 
   addParam("csvThetaPhiFile", m_csvThetaPhiFile,
            "CSV file for theta/phi correction per tcid.",
@@ -183,6 +177,7 @@ GRLNeuroModule::beginRun()
       m_parameters.nMLP           = m_db_trggrlconfig->get_ecltaunn_nMLP();
       m_parameters.multiplyHidden = m_db_trggrlconfig->get_ecltaunn_multiplyHidden();
       m_parameters.nHidden        = m_db_trggrlconfig->get_ecltaunn_nHidden();
+      m_parameters.nOutput        = m_db_trggrlconfig->get_ecltaunn_nOutput();
       m_parameters.n_cdc_sector   = m_db_trggrlconfig->get_ecltaunn_n_cdc_sector();
       m_parameters.n_ecl_sector   = m_db_trggrlconfig->get_ecltaunn_n_ecl_sector();
       m_parameters.i_cdc_sector   = m_db_trggrlconfig->get_ecltaunn_i_cdc_sector();
@@ -304,15 +299,23 @@ void GRLNeuroModule::event()
   }
 
   // Run MLP
-  float target = m_GRLNeuro.runMLP(0, MLPinput);
-  if (m_saveHist) {
-    h_target[0]->Fill(target);
+  std::vector<float> target = m_GRLNeuro.runMLP(0, MLPinput);
+  unsigned num_target = target.size();
+
+  //fill 0th output for debugging
+  if (m_saveHist && num_target > 0) {
+    h_target[0]->Fill(target[0]);
   }
-  if (target > m_nn_thres[0]) {
-    trgInfo->setTauNN(true);
-  } else {
-    trgInfo->setTauNN(false);
+
+  //if one of output exceed threshold, put true
+  bool target_output = false;
+  for (unsigned io = 0; io < num_target; io++) {
+    if (target[io] > m_nn_thres[io]) {
+      target_output = true;
+      break;
+    }
   }
+  trgInfo->setTauNN(target_output);
 }
 
 

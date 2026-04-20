@@ -7,6 +7,6 @@
 
 // ROOT dictionaries will be build for all classes mentioned this way
 
-#pragma link C++ class Belle2::TRGGRLConfig+; // checksum=0x5ee6976, version=6
+#pragma link C++ class Belle2::TRGGRLConfig+; // checksum=0x338b7e5e, version=7
 
 #endif

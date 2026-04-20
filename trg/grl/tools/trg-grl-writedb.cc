@@ -36,6 +36,9 @@ void setgrlconfig()
   std::vector<std::vector<float>> ecltaunn_nHidden[N_config];
   std::vector<float> eclaunn_nHidden_0 = {24, 24, 24};
   ecltaunn_nHidden[0].push_back(eclaunn_nHidden_0);
+  unsigned ecltaunn_nOutput[N_config] = {
+    1
+  };
   unsigned ecltaunn_n_cdc_sector[N_config] = {
     0
   };
@@ -219,6 +222,7 @@ void setgrlconfig()
       db_grlconfig->set_ecltaunn_nMLP(ecltaunn_nMLP[i]);
       db_grlconfig->set_ecltaunn_multiplyHidden(ecltaunn_multiplyHidden[i]);
       db_grlconfig->set_ecltaunn_nHidden(ecltaunn_nHidden[i]);
+      db_grlconfig->set_ecltaunn_nOutput(ecltaunn_nOutput[i]);
       db_grlconfig->set_ecltaunn_n_cdc_sector(ecltaunn_n_cdc_sector[i]);
       db_grlconfig->set_ecltaunn_n_ecl_sector(ecltaunn_n_ecl_sector[i]);
       db_grlconfig->set_ecltaunn_i_cdc_sector(ecltaunn_i_cdc_sector[i]);
@@ -262,6 +266,7 @@ void setgrlconfig()
       db_grlconfig->set_ecltaunn_nMLP(ecltaunn_nMLP[i]);
       db_grlconfig->set_ecltaunn_multiplyHidden(ecltaunn_multiplyHidden[i]);
       db_grlconfig->set_ecltaunn_nHidden(ecltaunn_nHidden[i]);
+      db_grlconfig->set_ecltaunn_nOutput(ecltaunn_nOutput[i]);
       db_grlconfig->set_ecltaunn_n_cdc_sector(ecltaunn_n_cdc_sector[i]);
       db_grlconfig->set_ecltaunn_n_ecl_sector(ecltaunn_n_ecl_sector[i]);
       db_grlconfig->set_ecltaunn_i_cdc_sector(ecltaunn_i_cdc_sector[i]);

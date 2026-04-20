@@ -155,9 +155,9 @@ namespace Belle2 {
      */
     inline ROOT::Math::XYVector orthogonalVector(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& relativeTo)
     {
-      const double cross = Cross(relativeTo, v1);                                // = relativeTo.cross(*this)
+      const double cross = Cross(relativeTo, v1);                                 // = relativeTo.cross(*this)
       const ROOT::Math::XYVector tmp = relativeTo * (cross / relativeTo.Mag2());  // = relativeTo.scaled(cross / relativeTo.normSquared())
-      return Orthogonal(tmp);                                                   // = .orthogonal()
+      return Orthogonal(tmp);                                                     // = .orthogonal()
 
     }
 

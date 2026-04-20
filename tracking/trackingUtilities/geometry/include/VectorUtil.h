@@ -133,13 +133,13 @@ namespace Belle2 {
       return lhs.X() * rhs.Y() - lhs.Y() * rhs.X();
     }
 
-    /// Calculated the two dimensional cross product.
+    /// Calculated one of the two possible orthogonal vectors.
     inline ROOT::Math::XYVector Orthogonal(const ROOT::Math::XYVector& a)
     {
       return ROOT::Math::XYVector(-a.Y(), a.X());
     }
 
-    /// Calculated the two dimensional cross product.
+    /// Calculated one of the two possible orthogonal vectors, given a rotation direction.
     inline ROOT::Math::XYVector Orthogonal(const ROOT::Math::XYVector& a, const TrackingUtilities::ERotation ccwInfo)
     {
       return isValid(ccwInfo) ? ROOT::Math::XYVector(-static_cast<double>(ccwInfo) * a.Y(),

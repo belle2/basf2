@@ -196,6 +196,7 @@ namespace Belle2 {
 
     /** Returns a transformed vector version rotated  by the given vector.
      *  The rotated coordinates are such that the given phiVec becomes the new x axes.
+     *  @param v1 the vector to be rotated (passively)
      *  @param phiVec *Unit* vector marking the x axes of the new rotated coordinate system*/
     inline ROOT::Math::XYVector passiveRotatedBy(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& phiVec)
     {

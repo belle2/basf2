@@ -5,7 +5,6 @@
 
 
 #pragma link C++ class Belle2::TrackingUtilities::Vector2D+; // checksum=0x7bbf4729, version=-1
-#pragma link C++ class Belle2::TrackingUtilities::Vector3D+; // checksum=0xada1ad63, version=-1
 
 #pragma link C++ class Belle2::TrackingUtilities::Line2D+; // checksum=0xe97a7bd4, version=-1
 #pragma link C++ class Belle2::TrackingUtilities::Circle2D+; // checksum=0xe5ade3ba, version=-1

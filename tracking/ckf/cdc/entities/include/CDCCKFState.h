@@ -10,7 +10,6 @@
 #include <genfit/MeasuredStateOnPlane.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <cdc/topology/CDCWire.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>

@@ -8,7 +8,6 @@
 #include <tracking/modules/cosmicsTrackMerger/PhiRecoTrackRelationFilter.h>
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <tracking/trackingUtilities/numerics/Angle.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>

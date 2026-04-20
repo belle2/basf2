@@ -147,16 +147,16 @@ namespace Belle2 {
      * @param[in] relativeTo Vector v2
      * \return    Part of v1 that is orthogonal to v2
      * Original implementation:
-     * Vector2D orthogonalVector(const Vector2D& relativTo) const
+     * Vector2D orthogonalVector(const Vector2D& relativeTo) const
      * {
-     *   return relativTo.scaled(relativTo.cross(*this) / relativTo.normSquared()).orthogonal();
+     *   return relativeTo.scaled(relativeTo.cross(*this) / relativeTo.normSquared()).orthogonal();
      * }
      * with v1 = *this.
      */
-    inline ROOT::Math::XYVector orthogonalVector(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& relativTo)
+    inline ROOT::Math::XYVector orthogonalVector(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& relativeTo)
     {
-      const double cross = Cross(relativTo, v1);                                // = relativTo.cross(*this)
-      const ROOT::Math::XYVector tmp = relativTo * (cross / relativTo.Mag2());  // = relativTo.scaled(cross / relativTo.normSquared())
+      const double cross = Cross(relativeTo, v1);                                // = relativeTo.cross(*this)
+      const ROOT::Math::XYVector tmp = relativeTo * (cross / relativeTo.Mag2());  // = relativeTo.scaled(cross / relativeTo.normSquared())
       return Orthogonal(tmp);                                                   // = .orthogonal()
 
     }
@@ -166,9 +166,9 @@ namespace Belle2 {
      *
      * Functions with the same name exist in both the Vector2D and Vector3D classes in
      * tracking/trackingUtilities/geometry, and the implementation for both is
-     * VectorXD parallelVector(const VectorXD& relativTo) const
+     * VectorXD parallelVector(const VectorXD& relativeTo) const
      * {
-     *   return relativTo.scaled(relativTo.dot(*this) / relativTo.normSquared());
+     *   return relativeTo.scaled(relativeTo.dot(*this) / relativeTo.normSquared());
      * }
      *
      * There exists a similar function called ProjVector in ROOT::Math::VectorUtil, but that only works for 3D vectors,
@@ -182,8 +182,8 @@ namespace Belle2 {
       const double v2Mag2 = v2.Mag2();
       if (v2Mag2 == 0)
         return aVector();
-      const double dotp = v1.Dot(v2);           // = relativTo.dot(*this)
-      const aVector tmp = v2 * (dotp / v2Mag2); // = relativTo.scaled(dotp / relativTo.normSquared())
+      const double dotp = v1.Dot(v2);           // = relativeTo.dot(*this)
+      const aVector tmp = v2 * (dotp / v2Mag2); // = relativeTo.scaled(dotp / relativeTo.normSquared())
       return tmp;
     }
 

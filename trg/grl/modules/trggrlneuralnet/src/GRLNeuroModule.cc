@@ -86,9 +86,9 @@ GRLNeuroModule::GRLNeuroModule() : Module()
   addParam("TRGECLClusters", m_TrgECLClusterName,
            "Name of the StoreArray holding the information of trigger ecl clusters ",
            string("TRGECLClusters"));
-  addParam("MVACut", m_nn_thres,
+  addParam("MVACut", m_parameters.nn_thres,
            "Cut value applied to the MLP output",
-  {0});
+  {{0}});
   addParam("useDB", m_useDB,
            "Flag to use database to set config", true);
 
@@ -182,7 +182,7 @@ GRLNeuroModule::beginRun()
       m_parameters.n_ecl_sector   = m_db_trggrlconfig->get_ecltaunn_n_ecl_sector();
       m_parameters.i_cdc_sector   = m_db_trggrlconfig->get_ecltaunn_i_cdc_sector();
       m_parameters.i_ecl_sector   = m_db_trggrlconfig->get_ecltaunn_i_ecl_sector();
-      m_nn_thres[0]               = m_db_trggrlconfig->get_ecltaunn_threshold();
+      m_parameters.nn_thres       = m_db_trggrlconfig->get_ecltaunn_threshold();
       m_parameters.total_bit_bias  = m_db_trggrlconfig->get_ecltaunn_total_bit_bias();
       m_parameters.int_bit_bias    = m_db_trggrlconfig->get_ecltaunn_int_bit_bias();
       m_parameters.is_signed_bias  = m_db_trggrlconfig->get_ecltaunn_is_signed_bias();
@@ -299,23 +299,21 @@ void GRLNeuroModule::event()
   }
 
   // Run MLP
-  std::vector<float> target = m_GRLNeuro.runMLP(0, MLPinput);
-  unsigned num_target = target.size();
+  for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {
+    std::vector<float> target = m_GRLNeuro.runMLP(isector, MLPinput);
+    unsigned num_target = target.size();
+    std::vector<float> nn_thres = m_parameters.nn_thres[isector];
 
-  //fill 0th output for debugging
-  if (m_saveHist && num_target > 0) {
-    h_target[0]->Fill(target[0]);
-  }
-
-  //if one of output exceed threshold, put true
-  bool target_output = false;
-  for (unsigned io = 0; io < num_target; io++) {
-    if (target[io] > m_nn_thres[io]) {
-      target_output = true;
-      break;
+    //if one of output exceed threshold, put true
+    bool target_output = false;
+    for (unsigned io = 0; io < num_target; io++) {
+      if (target[io] > nn_thres[io]) {
+        target_output = true;
+        break;
+      }
     }
+    trgInfo->setTauNN(isector, target_output);
   }
-  trgInfo->setTauNN(target_output);
 }
 
 

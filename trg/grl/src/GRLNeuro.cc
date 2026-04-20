@@ -249,9 +249,7 @@ GRLNeuro::initialize(const Parameters& p)
 {
   using std::vector;
 
-  B2DEBUG(10, "GRLNeuro::initialize: nMLP=" << p.nMLP
-          << " nHidden.size=" << p.nHidden.size()
-          << " nOutput=" << p.nOutput);
+  B2DEBUG(10, "GRLNeuro::initialize: nMLP=" << p.nMLP);
 
   // ------------------------------------------------------------------
   // Basic parameter validation (fatal in initialize)
@@ -259,11 +257,6 @@ GRLNeuro::initialize(const Parameters& p)
 
   if (p.nHidden.size() != 1 && p.nHidden.size() != p.nMLP) {
     B2FATAL("Number of nHidden lists should be 1 or " << p.nMLP);
-  }
-
-  unsigned short nOutput = static_cast<unsigned short>(p.nOutput);
-  if (nOutput < 1) {
-    B2FATAL("No outputs! Set nOutput>0");
   }
 
   // ------------------------------------------------------------------
@@ -282,6 +275,7 @@ GRLNeuro::initialize(const Parameters& p)
   check_size(p.i_cdc_sector, "i_cdc_sector");
   check_size(p.i_ecl_sector, "i_ecl_sector");
   check_size(p.nHidden, "nHidden");
+  check_size(p.nn_thres, "nn_thres");
 
   // bias
   check_size(p.total_bit_bias, "total_bit_bias");
@@ -351,10 +345,9 @@ GRLNeuro::initialize(const Parameters& p)
         nNodes.push_back(static_cast<unsigned short>(nhidden[iHid]));
       }
     }
+    nNodes.push_back(static_cast<float>(pick(p.nOutput)));
 
-    nNodes.push_back(nOutput);
-
-    GRLMLP grlmlp_temp(nNodes, nOutput);
+    GRLMLP grlmlp_temp(nNodes);
 
     // bias
     grlmlp_temp.set_total_bit_bias(pick(p.total_bit_bias));
@@ -394,6 +387,9 @@ GRLNeuro::initialize(const Parameters& p)
     // inputs
     grlmlp_temp.set_W_input(pick(p.W_input));
     grlmlp_temp.set_I_input(pick(p.I_input));
+
+    //threshold
+    grlmlp_temp.set_nn_thres(pick(p.nn_thres));
 
     m_MLPs.push_back(std::move(grlmlp_temp));
   }

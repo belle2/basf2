@@ -18,15 +18,21 @@ using namespace Belle2;
 void setgrlconfig()
 {
 
+  //number of network. now it is 1, tauNN only. Maximum 10.
   const int N_config = 1;
 
   const int run[N_config][4] = { //itnitial exp, initial run, end exp, end run
     {0,    0,   -1,   -1}  // 0
   };
 
-  float ecltaunn_threshold[N_config] = {
-    -1.5
-    };
+  //number of MVA output and its threshold
+  std::vector<unsigned> ecltaunn_nOutput[N_config];
+  ecltaunn_nOutput[0].push_back(1);
+
+  std::vector<std::vector<float>> ecltaunn_threshold[N_config];
+  std::vector<float> ecltaunn_threshold_0 = {-1.5};
+  ecltaunn_threshold[0].push_back(ecltaunn_threshold_0);
+
   unsigned ecltaunn_nMLP[N_config] = {
     1
   };
@@ -36,9 +42,6 @@ void setgrlconfig()
   std::vector<std::vector<float>> ecltaunn_nHidden[N_config];
   std::vector<float> eclaunn_nHidden_0 = {24, 24, 24};
   ecltaunn_nHidden[0].push_back(eclaunn_nHidden_0);
-  unsigned ecltaunn_nOutput[N_config] = {
-    1
-  };
   unsigned ecltaunn_n_cdc_sector[N_config] = {
     0
   };

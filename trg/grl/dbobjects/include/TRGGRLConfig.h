@@ -22,10 +22,10 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    TRGGRLConfig(): m_ecltaunn_threshold{-1.5} {}
+    TRGGRLConfig() {}
 
     /** Getter functions*/
-    float get_ecltaunn_threshold() const
+    std::vector<std::vector<float>> get_ecltaunn_threshold() const
     {
       return m_ecltaunn_threshold;
     }
@@ -41,7 +41,7 @@ namespace Belle2 {
     {
       return m_ecltaunn_nHidden;
     }
-    unsigned get_ecltaunn_nOutput() const
+    std::vector<unsigned> get_ecltaunn_nOutput() const
     {
       return m_ecltaunn_nOutput;
     }
@@ -180,7 +180,7 @@ namespace Belle2 {
 
 
     /** Setter functions*/
-    void set_ecltaunn_threshold(float i)
+    void set_ecltaunn_threshold(std::vector<std::vector<float>> i)
     {
       m_ecltaunn_threshold = i;
     }
@@ -196,7 +196,7 @@ namespace Belle2 {
     {
       m_ecltaunn_nHidden = i;
     };
-    void set_ecltaunn_nOutput(unsigned i)
+    void set_ecltaunn_nOutput(std::vector<unsigned> i)
     {
       m_ecltaunn_nOutput = i;
     };
@@ -338,7 +338,7 @@ namespace Belle2 {
   private:
 
     /** MVA Threshold of ecltaunn bit */
-    float m_ecltaunn_threshold;
+    std::vector<std::vector<float>> m_ecltaunn_threshold;
 
     /** Number of networks.
       For network specific parameters you can give either a list with
@@ -357,7 +357,7 @@ namespace Belle2 {
     std::vector<std::vector<float>> m_ecltaunn_nHidden;
 
     /** Number of output node */
-    unsigned m_ecltaunn_nOutput;
+    std::vector<unsigned> m_ecltaunn_nOutput;
 
     /** Number of CDC sectors. */
     unsigned m_ecltaunn_n_cdc_sector;
@@ -400,7 +400,7 @@ namespace Belle2 {
     std::vector<std::vector<std::vector<int>>> m_ecltaunn_I_input;
 
 
-    ClassDef(TRGGRLConfig, 7);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(TRGGRLConfig, 8);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
 } // end of namespace Belle2

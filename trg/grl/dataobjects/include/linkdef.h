@@ -9,10 +9,10 @@
 #pragma link C++ class Belle2::TRGGRLMATCHKLM+; // checksum=0x21a9fbba, version=3
 #pragma link C++ class Belle2::TRGGRLPHOTON+; // checksum=0x79f9c705, version=2
 #pragma link C++ class Belle2::TRGGRLShortTrack+; // checksum=0xd13040ac, version=1
-#pragma link C++ class Belle2::TRGGRLInfo+; // checksum=0x296ce6b6, version=7
+#pragma link C++ class Belle2::TRGGRLInfo+; // checksum=0xb0347fd7, version=8
 #pragma link C++ class Belle2::TRGGRLInnerTrack+; // checksum=0xfd2849ce, version=1
 #pragma link C++ class Belle2::TRGGRLUnpackerStore+; // checksum=0xce0493d7, version=4
-#pragma link C++ class Belle2::GRLMLP+; // checksum=0xe9a679b1, version=5
+#pragma link C++ class Belle2::GRLMLP+; // checksum=0xce42dd18, version=6
 #pragma link C++ class Belle2::GRLMLPData+; // checksum=0x1bae3955, version=1
 
 #endif

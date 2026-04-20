@@ -12,16 +12,15 @@
 using namespace Belle2;
 
 GRLMLP::GRLMLP():
-  m_n_nodes{24, 24, 24, 24, 1}, m_trained(false), m_target_vars(1)
+  m_n_nodes{24, 24, 24, 24, 1}, m_trained(false)
 {
   m_weights.assign(n_weights_cal(), 0.);
   m_bias.assign(n_bias_cal(), 0.);
 }
 
-GRLMLP::GRLMLP(std::vector<unsigned short>& nodes,
-               unsigned short targets
+GRLMLP::GRLMLP(std::vector<unsigned short>& nodes
               ):
-  m_n_nodes(nodes), m_trained(false), m_target_vars(targets)
+  m_n_nodes(nodes), m_trained(false)
 {
   m_weights.assign(n_weights_cal(), 0.);
   m_bias.assign(n_bias_cal(), 0.);

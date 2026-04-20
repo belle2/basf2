@@ -46,7 +46,9 @@ namespace Belle2 {
        */
       std::vector<std::vector<float>> nHidden;
       /** Number of output nodes */
-      unsigned nOutput;
+      std::vector<unsigned> nOutput;
+      /** Threshold of output nodes */
+      std::vector<std::vector<float>> nn_thres;
       /** If true, multiply nHidden with number of input nodes. */
       bool multiplyHidden = false;
 

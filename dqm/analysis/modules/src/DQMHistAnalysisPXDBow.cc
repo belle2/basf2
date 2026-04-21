@@ -32,7 +32,7 @@ DQMHistAnalysisPXDBowModule::DQMHistAnalysisPXDBowModule()
            std::string("PXDBow/"));
   addParam("moduleName", m_moduleName,
            "Layer_ladder_sensor numbers of the module which residual histogram will be plotted on the DQM, if empty all histogram are plotted",
-           std::string("2.2.1"));
+           std::string(""));
   addParam("statThreshold", m_statThreshold,
            "minimum number of entries needed to calculate the mean in the delta distribution of the sagitta",
            m_statThreshold);
@@ -76,24 +76,23 @@ void DQMHistAnalysisPXDBowModule::initialize()
     registerEpicsPV("PXD:sagitta:" + buff, "sagitta:" + (std::string)aVxdID);
     /// list of canvases
     if (m_moduleName == "") { /// one canvas for each forward PXD module
-      m_cResV[buff] = new TCanvas((std::string("c_resV_") + buff).c_str());
+      m_cResV[buff] = new TCanvas((m_histogramDirectoryName + std::string("c_resV_") + buff).c_str());
     } else if (VxdID(m_moduleName) == aVxdID) { ///only one canvas
-      m_cResV[buff] = new TCanvas((std::string("c_resV_") + buff).c_str());
+      m_cResV[buff] = new TCanvas((m_histogramDirectoryName + std::string("c_resV_") + buff).c_str());
       validModule++;
     }
-
   }
 
   if (validModule == 0 and m_moduleName != "") {
-    B2WARNING("Invalid moduleName, only empty value or PXD forward modules are acceptable, nameModule parameter set to default (2.2.1)");
-    m_moduleName = "2.2.1";
+    B2WARNING("Invalid moduleName, only empty value or PXD forward modules (eg \"2.2.1\") are acceptable, nameModule parameter set to default (empty)");
+    m_moduleName = "";
+    B2INFO("Plotting the histogram for all forward sensors");
   } else if (m_moduleName == "") B2INFO("Plotting the histogram for all forward sensors");
   else B2INFO("Plotting histogram for module " << m_moduleName);
 
   if (m_PXDModules.size() == 0) {
     B2WARNING("No PXDModules in Geometry found!");
   }
-
 }
 
 void DQMHistAnalysisPXDBowModule::beginRun()
@@ -120,7 +119,7 @@ void DQMHistAnalysisPXDBowModule::event()
     TH1* hS = getDelta(m_histogramDirectoryName + "sagitta_" + buff, true);
     if (hS != NULL && hV != NULL) {
       bool enough = false, warnflag = false, errorflag = false;
-      B2DEBUG(20, "Histos resS_" << buff << " and resV_" << buff << " found");
+      B2DEBUG(20, "Histos sagitta" << buff << " and resV_" << buff << " found");
       if (hS->GetEntries() > m_statThreshold) {
         enough = true;
 
@@ -145,7 +144,7 @@ void DQMHistAnalysisPXDBowModule::event()
       } else if (aPXDModule == VxdID(m_moduleName)) {
         plotCanvas(enough, errorflag, warnflag, buff);
       } else B2WARNING("Invalid input for the parameter m_moduleName");
-    } else B2DEBUG(20, "Histo resV_" << buff << " not found");
+    } else B2DEBUG(20, "Histo sagitta/resV_" << buff << " not found");
   }
 }
 
@@ -153,13 +152,13 @@ void DQMHistAnalysisPXDBowModule::plotCanvas(bool enough, bool errorflag, bool w
 {
   TH1* h = findHist(m_histogramDirectoryName + "resV_" + buff, true);
   if (h != NULL) {
-    m_hResV.Clear();
-    h->Copy(m_hResV);
-    m_hResV.SetName((std::string("ResV_") + buff).c_str());
-    m_hResV.SetTitle((std::string("v residuals ") + buff).c_str());
+    m_hResV[buff].Clear();
+    h->Copy(m_hResV[buff]);
+    m_hResV[buff].SetName((std::string("ResV_") + buff).c_str());
+    m_hResV[buff].SetTitle((std::string("v residuals ") + buff).c_str());
     m_cResV[buff]->Clear();
     m_cResV[buff]->cd();
-    m_hResV.Draw();
+    m_hResV[buff].Draw();
     EStatus status = makeStatus(enough, errorflag, warnflag);
     colorizeCanvas(m_cResV[buff], status);
   }

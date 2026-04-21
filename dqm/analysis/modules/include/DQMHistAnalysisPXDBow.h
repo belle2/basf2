@@ -58,8 +58,8 @@ namespace Belle2 {
     /** The final drawing canvases. */
     std::map<std::string, TCanvas*> m_cResV;
 
-    /** The final histogram*/
-    TH1F m_hResV;
+    /** The final histograms*/
+    std::map<std::string, TH1F> m_hResV;
 
     //! vector for the IDs of all forward PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -68,7 +68,7 @@ namespace Belle2 {
     float m_statThreshold{300}; /**< Threshold values for statistic flag on the plotted histograms*/
     float m_sagittaThreshold{0.06}; /**< Threshold values for warning flag on the sagitta*/
     float m_sagittaErrorThreshold{0.1}; /**< Threshold values for error flag on the sagitta*/
-    std::string m_moduleName{"2.2.1"}; /**< name of the module which distribution will be plotted on the dqm*/
+    std::string m_moduleName{"2.2.1"}; /**< name of the module which distribution will be plotted on the dqm, if empty all forward modules will be plotted*/
   };
 } // end namespace Belle2
 

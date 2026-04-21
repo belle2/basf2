@@ -167,14 +167,14 @@ namespace Belle2 {
        */
       static bool isHighestContinuation(const WeightedRelation<ACellHolder>& relation)
       {
-        ACellHolder* cellHolderPtr(relation.getFrom());
-        ACellHolder* neighborCellHolderPtr(relation.getTo());
+        const ACellHolder* cellHolderPtr(relation.getFrom());
+        const ACellHolder* neighborCellHolderPtr(relation.getTo());
 
         if (not cellHolderPtr or not neighborCellHolderPtr) return false;
 
-        ACellHolder& cellHolder = *cellHolderPtr;
+        const ACellHolder& cellHolder = *cellHolderPtr;
         Weight relationWeight = relation.getWeight();
-        ACellHolder& neighborCellHolder = *neighborCellHolderPtr;
+        const ACellHolder& neighborCellHolder = *neighborCellHolderPtr;
 
         return isHighestContinuation(cellHolder, relationWeight, neighborCellHolder);
       }

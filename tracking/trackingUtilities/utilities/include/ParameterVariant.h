@@ -52,10 +52,10 @@ namespace Belle2 {
 
     private:
       /// Parameter list which contains the parameter to be set
-      ModuleParamList* m_moduleParamList;
+      ModuleParamList* m_moduleParamList  = nullptr;
 
       /// Name of the parameter to be set.
-      std::string m_paramName;
+      std::string m_paramName = "";
     };
 
   }

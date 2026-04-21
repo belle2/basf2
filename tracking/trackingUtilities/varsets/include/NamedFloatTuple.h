@@ -71,7 +71,7 @@ namespace Belle2 {
       virtual Float_t& operator[](const char* const name) = 0;
 
       /// Getter for a map of all name and value pairs in this tuple
-      std::map<std::string, Float_t> getNamedValues(std::string prefix = "") const;
+      std::map<std::string, Float_t> getNamedValues(const std::string& prefix = "") const;
 
       /// Getter for named references to the variables in this tuple
       std::vector<Named<Float_t*>> getNamedVariables(std::string prefix = "");

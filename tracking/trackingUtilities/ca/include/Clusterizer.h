@@ -86,8 +86,8 @@ namespace Belle2 {
 
     private:
       /// Helper function. Starting a new cluster and iteratively expands it.
-      void expandCluster(std::vector<WeightedRelation<ACellHolder>> const& cellHolderRelations,
-                         std::vector<ACellHolder*>& cluster) const
+      static void expandCluster(std::vector<WeightedRelation<ACellHolder>> const& cellHolderRelations,
+                                std::vector<ACellHolder*>& cluster)
       {
         ACellHolder* seedCellHolder = cluster.front();
         int iCluster = getCellState(seedCellHolder);

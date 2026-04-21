@@ -13,18 +13,10 @@
 #include <tracking/trackingUtilities/numerics/Modulo.h>
 
 #include <iostream>
-#include <limits.h>
 
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackingUtilities;
-
-CDCRLWireHitTriple::Shape::Shape()
-  : m_startToMiddleCellDistance(static_cast<char>(CHAR_MAX / 2))
-  , m_middleToEndCellDistance(static_cast<char>(CHAR_MAX / 2))
-  , m_oClockDelta(SHRT_MIN)
-{
-}
 
 CDCRLWireHitTriple::Shape::Shape(const short startToMiddleCellDistance,
                                  const short middleToEndCellDistance,

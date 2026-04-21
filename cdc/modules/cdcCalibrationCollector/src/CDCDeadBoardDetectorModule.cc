@@ -21,7 +21,6 @@ CDCDeadBoardDetectorModule::CDCDeadBoardDetectorModule() : CalibrationCollectorM
   //Set module properties
   setDescription("CDCDeadBoardDetector detects dead boards.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("minimalCountsGood", m_minimalCounts, "A board is considered bad if called less or eaqual times.", 0);
 }
 
 CDCDeadBoardDetectorModule::~CDCDeadBoardDetectorModule()
@@ -31,10 +30,6 @@ CDCDeadBoardDetectorModule::~CDCDeadBoardDetectorModule()
 void CDCDeadBoardDetectorModule::prepare()
 {
   m_rawCDCs.isRequired();
-  // reset counts:
-  for (int i = 0; i < 300; i += 1) {
-    nReadsPerBoard[i] = 0;
-  }
   auto m_BoardIDs = new TH1F("CDCboardIDs", "CDC board IDs", 300, -0.5, 299.5);
   registerObject<TH1F>("CDCboardIDs", m_BoardIDs);
 }
@@ -48,8 +43,6 @@ void CDCDeadBoardDetectorModule::collect()
 
   const int nEntries = m_rawCDCs.getEntries();
 
-  // event count:
-  nReadsPerBoard[0] += 1;
   for (int i = 0; i < nEntries; ++i) {
     const int nEntriesRawCDC = m_rawCDCs[i]->GetNumEntries();
     for (int j = 0; j < nEntriesRawCDC; ++j) {
@@ -62,10 +55,8 @@ void CDCDeadBoardDetectorModule::collect()
         if (nWord < c_headearWords) {
           continue;
         }
-
         unsigned int boardID = (ibuf[0] & 0x01ff);
         if ((boardID > 0) && (boardID < 300)) {
-          nReadsPerBoard[boardID] += 1;
           getObjectPtr<TH1F>("CDCboardIDs")->Fill(boardID);
         }
       }
@@ -73,17 +64,3 @@ void CDCDeadBoardDetectorModule::collect()
   }
 }
 
-void CDCDeadBoardDetectorModule::finish()
-{
-  reportBadBoards();
-}
-
-void CDCDeadBoardDetectorModule::reportBadBoards()
-{
-  // detect sub-threshold boards:
-  for (int i = 1; i < 300; i += 1) {
-    if (nReadsPerBoard[i] <= m_minimalCounts) {
-      std::cout << "Bad board " << i << "\n";
-    }
-  }
-}

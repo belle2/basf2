@@ -44,27 +44,11 @@ namespace Belle2 {
        */
       void collect() override;
 
-      /**
-       * Termination action.
-       */
-      void finish() override;
     private:
       /**
        * Input array for CDC Raw.
        */
       StoreArray<RawCDC> m_rawCDCs;
-      /**
-       * Counts of board presense. Note that there is no boardID=0, use the first entry to count events
-       */
-      int nReadsPerBoard[300];
-      /**
-       * Minimal threshold of calls for a good board
-       */
-      int m_minimalCounts{0};
-      /**
-       *  Report bad boards at the end of the run/at terminate
-       */
-      void reportBadBoards();
     };
   }
 }

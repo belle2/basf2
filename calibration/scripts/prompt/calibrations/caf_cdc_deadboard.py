@@ -12,7 +12,7 @@ from prompt.calibrations.caf_cdc import settings as cdc_tracking_calibration
 from ROOT import Belle2
 
 settings = CalibrationSettings(name="CDC deadboard",
-                               expert_username="ttmanh",
+                               expert_username="Alexander Glazov, Meihong Liu",
                                subsystem="cdc",
                                description=__doc__,
                                input_data_formats=["raw"],

@@ -433,8 +433,13 @@ namespace Belle2::Variable {
 
   VARIABLE_GROUP("KLM Cluster and KlongID");
 
-  REGISTER_VARIABLE("klmClusterKlId", klmClusterKlId,
-                    "Returns the KlId classifier output associated to the KLMCluster.");
+  REGISTER_VARIABLE("klmClusterKlId", klmClusterKlId, R"DOC(
+Returns the KlId classifier output associated to the KLMCluster.
+
+.. attention::
+    This variable returns ``NaN`` when datasets produced with
+    release-11 or a newer major release are analysed.
+)DOC");
   REGISTER_VARIABLE("klmClusterBelleTrackFlag", klmClusterBelleTrackFlag,
                     "Returns the Belle-style Track flag.");
   REGISTER_VARIABLE("klmClusterBelleECLFlag", klmClusterBelleECLFlag,

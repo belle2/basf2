@@ -1,10 +1,10 @@
 /**************************************************************************
- * basf2 (Belle II Analysis Software Framework)                           *
- * Author: The Belle II Collaboration                                     *
- *                                                                        *
- * See git log for contributors and copyright holders.                    *
- * This file is licensed under LGPL-3.0, see LICENSE.md.                 *
- **************************************************************************/
+* basf2 (Belle II Analysis Software Framework)                            *
+* Author: The Belle II Collaboration                                      *
+*                                                                         *
+* See git log for contributors and copyright holders.                     *
+* This file is licensed under LGPL-3.0, see LICENSE.md.                   *
+***************************************************************************/
 #pragma once
 
 #include <framework/gearbox/Const.h>
@@ -14,52 +14,58 @@
 #include <map>
 #include <string>
 #include <vector>
-
+#include <variant>
+#include <boost/variant.hpp>
+#include <TMath.h>
 #include <TObject.h>
 
 namespace Belle2 {
 
   /** The payload containing all parameters for the SVD and CDC CKF.
-     *
-     * This payload stores scalar, string, and filter parameters used by the ToCDCCKF algorithm.
-     * It is designed to be ROOT-serializable for storage in the Conditions Database.
-     *
-     * The payload includes:
-     * - Scalar parameters (float, int, unsigned int, bool) for algorithm configuration
-     * - String parameters for store array names, filter names, and directions
-     * - Filter parameter maps separated by data type to ensure ROOT compatibility
-     *
-     * Usage:
-     * - Load via DBObjPtr<SVDToCDCCKFParameters> in CKFToCDCFindlet::beginRun()
-     * - Apply parameters to sub-findlets using the provided setters
-     */
+   *
+   * This payload stores scalar, string, and filter parameters used by the ToCDCCKF algorithm.
+   * It is designed to be ROOT-serializable for storage in the Conditions Database.
+   *
+   * The payload includes:
+   * - Scalar parameters (float, int, unsigned int, bool) for algorithm configuration
+   * - String parameters for store array names, filter names, and directions
+   * - Filter parameter maps separated by data type to ensure ROOT compatibility
+   *
+   * Usage:
+   * - Load via DBObjPtr<SVDToCDCCKFParameters> in CKFToCDCFindlet::beginRun()
+   * - Apply parameters to sub-findlets using the provided setters
+   */
+
   class SVDToCDCCKFParameters : public TObject {
 
   public:
+
+    /** Map type for filter parameters - all numeric values stored as double.
+     *  This avoids ROOT dictionary issues with variant types while maintaining
+     *  a unified interface for filter parameter access.
+     */
+
+    // TODO: Filter Parameters require std::variant or boost::variant container to support
+    // mixed types passed to FilterParamVariant, and subsequently to FilterParamMap.
+    using FilterParamVariant = std::variant<bool, int, float, std::string, std::vector<std::string>>;
+    using FilterParamMap = std::map<std::string, FilterParamVariant>;
+
+    // TODO: Perhaps we can assume all filter parameters are doubles, but we need to be sure.
+    // using FilterParamMap = std::map<std::string, double>;
 
     /** Default constructor
      *
      *  Initializes all parameters to their default values matching the ToCDCCKF module defaults.
      */
     SVDToCDCCKFParameters()
-      : m_maximalDeltaPhi(0.39269908169872414f),
-        m_maximalLayerJump(2),
-        m_maximalLayerJumpBackwardSeed(3),
-        m_minimalPtRequirement(0.0f),
-        m_pathMaximalCandidatesInFlight(3),
-        m_stateMaximalHitCandidates(4),
-        m_exportAllTracks(false),
-        m_exportTracks(true),
-        m_ignoreTracksWithCDChits(false),
-        m_setTakenFlag(true),
-        m_filter("size"),
+      : m_filter("size"),
         m_hitFindingDirection("forward"),
         m_inputRecoTrackStoreArrayName("SVDPlusCDCStandaloneRecoTrack"),
         m_inputWireHits("CDCWireHitVector"),
         m_outputRecoTrackStoreArrayName("CKFCDCRecoTracks"),
         m_outputRelationRecoTrackStoreArrayName("SVDPlusCDCStandaloneRecoTrack"),
-        m_pathFilter("arc_length"),  // or "distance"
-        m_relatedRecoTrackStoreArrayName("CKFCDCRecoTracks"),  // or "RecoTracks"
+        m_pathFilter("arc_length"),
+        m_relatedRecoTrackStoreArrayName("CKFCDCRecoTracks"),
         m_relationCheckForDirection("backward"),
         m_seedComponent("SVD"),
         m_stateBasicFilter("rough"),
@@ -67,143 +73,26 @@ namespace Belle2 {
         m_stateFinalFilter("distance"),
         m_statePreFilter("all"),
         m_trackFindingDirection("forward"),
-        m_writeOutDirection("backward")  // or "both"
+        m_writeOutDirection("backward"),
+        m_maximalDeltaPhi(TMath::Pi() / 8),
+        m_minimalPtRequirement(0.0f),
+        m_maximalLayerJump(2),
+        m_maximalLayerJumpBackwardSeed(3),
+        m_pathMaximalCandidatesInFlight(3),
+        m_stateMaximalHitCandidates(4),
+        m_exportAllTracks(false),
+        m_exportTracks(true),
+        m_ignoreTracksWithCDChits(false),
+        m_setTakenFlag(true)
     {}
 
     /** Destructor */
     virtual ~SVDToCDCCKFParameters() {}
 
-    /** Set maximal delta phi for CKF state creation
+    /** STRING PARAMETERS
      *
-     *  @param phi Maximal delta phi in radians
+     * Getter & setter methods for string parameters
      */
-    void setMaximalDeltaPhi(float phi);
-
-    /** Get maximal delta phi for CKF state creation
-     *
-     *  @return Maximal delta phi in radians
-     */
-    float getMaximalDeltaPhi() const;
-
-    /** Set minimal pT requirement for tracks
-     *
-     *  @param pt Minimal pT in GeV/c
-     */
-    void setMinimalPtRequirement(float pt);
-
-    /** Get minimal pT requirement for tracks
-     *
-     *  @return Minimal pT in GeV/c
-     */
-    float getMinimalPtRequirement() const;
-
-    /** Set maximal layer jump for CKF state creation
-     *
-     *  @param layer Maximal number of layers to jump
-     */
-    void setMaximalLayerJump(int layer);
-
-    /** Get maximal layer jump for CKF state creation
-     *
-     *  @return Maximal number of layers to jump
-     */
-    int getMaximalLayerJump() const;
-
-    /** Set maximal layer jump for backward seed tracks
-     *
-     *  @param layer Maximal number of layers to jump for backward seeds
-     */
-    void setMaximalLayerJumpBackwardSeed(int layer);
-
-    /** Get maximal layer jump for backward seed tracks
-     *
-     *  @return Maximal number of layers to jump for backward seeds
-     */
-    int getMaximalLayerJumpBackwardSeed() const;
-
-    /** Set maximal number of candidates in flight for path selection
-     *
-     *  @param max Maximum number of candidates in flight
-     */
-    void setPathMaximalCandidatesInFlight(unsigned int max);
-
-    /** Get maximal number of candidates in flight for path selection
-     *
-     *  @return Maximum number of candidates in flight
-     */
-    unsigned int getPathMaximalCandidatesInFlight() const;
-
-    /** Set maximal number of hit candidates for state filtering
-     *
-     *  @param max Maximum number of hit candidates
-     */
-    void setStateMaximalHitCandidates(unsigned int max);
-
-    /** Get maximal number of hit candidates for state filtering
-     *
-     *  @return Maximum number of hit candidates
-     */
-    unsigned int getStateMaximalHitCandidates() const;
-
-    /** Set whether to export all tracks
-     *
-     *  @param value True to export all tracks
-     */
-    void setExportAllTracks(bool value);
-
-    /** Get whether to export all tracks
-     *
-     *  @return True if all tracks are exported
-     */
-    bool getExportAllTracks() const;
-
-    /** Set whether to export tracks
-     *
-     *  @param value True to export tracks
-     */
-    void setExportTracks(bool value);
-
-    /** Get whether to export tracks
-     *
-     *  @return True if tracks are exported
-     */
-    bool getExportTracks() const;
-
-    /** Set whether to ignore tracks with CDC hits
-     *
-     *  @param value True to ignore tracks with CDC hits
-     */
-    void setIgnoreTracksWithCDChits(bool value);
-
-    /** Get whether to ignore tracks with CDC hits
-     *
-     *  @return True if tracks with CDC hits are ignored
-     */
-    bool getIgnoreTracksWithCDChits() const;
-
-    /** Set whether to set the taken flag
-     *
-     *  @param value True to set the taken flag
-     */
-    void setTakenFlag(bool value);
-
-    /** Get whether to set the taken flag
-     *
-     *  @return True if the taken flag is set
-     */
-    bool getTakenFlag() const;
-
-    /** Set hit finding direction
-     *
-     *  @param direction Hit finding direction ("forward" or "backward")
-     */
-    void setHitFindingDirection(const std::string& direction);
-
-    /** Get hit finding direction
-     *
-     *  @return Hit finding direction
-     */
-    const std::string& getHitFindingDirection() const;
 
     /** Set filter name
      *
@@ -216,6 +105,18 @@ namespace Belle2 {
      *  @return Filter name
      */
     const std::string& getFilter() const;
+
+    /** Set hit finding direction
+     *
+     *  @param direction Hit finding direction ("forward" or "backward")
+     */
+    void setHitFindingDirection(const std::string& direction);
+
+    /** Get hit finding direction
+     *
+     *  @return Hit finding direction
+     */
+    const std::string& getHitFindingDirection() const;
 
     /** Set input RecoTrack store array name
      *
@@ -386,233 +287,193 @@ namespace Belle2 {
     const std::string& getWriteOutDirection() const;
 
 
-    /** ALTERNATIVE TO FILTER PARAMETERS MAPS */
+    /** FLOAT PARAMETERS
+     *
+     * Getter & setter methods for float parameters
+     */
+
+    /** Set maximal delta phi for CKF state creation
+     *
+     *  @param phi Maximal delta phi in radians
+     */
+    void setMaximalDeltaPhi(float phi);
+
+    /** Get maximal delta phi for CKF state creation
+     *
+     *  @return Maximal delta phi in radians
+     */
+    float getMaximalDeltaPhi() const;
+
+    /** Set minimal pT requirement for tracks
+     *
+     *  @param pt Minimal pT in GeV/c
+     */
+    void setMinimalPtRequirement(float pt);
+
+    /** Get minimal pT requirement for tracks
+     *
+     *  @return Minimal pT in GeV/c
+     */
+    float getMinimalPtRequirement() const;
+
+
+    /** INT PARAMETERS
+     *
+     * Getter & setter methods for int parameters
+     */
+
+    /** Set maximal layer jump for CKF state creation
+     *
+     *  @param layer Maximal number of layers to jump
+     */
+    void setMaximalLayerJump(int layer);
+
+    /** Get maximal layer jump for CKF state creation
+     *
+     *  @return Maximal number of layers to jump
+     */
+    int getMaximalLayerJump() const;
+
+    /** Set maximal layer jump for backward seed tracks
+     *
+     *  @param layer Maximal number of layers to jump for backward seeds
+     */
+    void setMaximalLayerJumpBackwardSeed(int layer);
+
+    /** Get maximal layer jump for backward seed tracks
+     *
+     *  @return Maximal number of layers to jump for backward seeds
+     */
+    int getMaximalLayerJumpBackwardSeed() const;
+
+    /** Set maximal number of candidates in flight for path selection
+     *
+     *  @param max Maximum number of candidates in flight
+     */
+    void setPathMaximalCandidatesInFlight(unsigned int max);
+
+    /** Get maximal number of candidates in flight for path selection
+     *
+     *  @return Maximum number of candidates in flight
+     */
+    unsigned int getPathMaximalCandidatesInFlight() const;
+
+    /** Set maximal number of hit candidates for state filtering
+     *
+     *  @param max Maximum number of hit candidates
+     */
+    void setStateMaximalHitCandidates(unsigned int max);
+
+    /** Get maximal number of hit candidates for state filtering
+     *
+     *  @return Maximum number of hit candidates
+     */
+    unsigned int getStateMaximalHitCandidates() const;
+
+
+    /** BOOLEAN PARAMETERS
+     *
+     * Getter & setter methods for boolean parameters
+     */
+
+    /** Set whether to export all tracks
+     *
+     *  @param value True to export all tracks
+     */
+    void setExportAllTracks(bool value);
+
+    /** Get whether to export all tracks
+     *
+     *  @return True if all tracks are exported
+     */
+    bool getExportAllTracks() const;
+
+    /** Set whether to export tracks
+     *
+     *  @param value True to export tracks
+     */
+    void setExportTracks(bool value);
 
+    /** Get whether to export tracks
+     *
+     *  @return True if tracks are exported
+     */
+    bool getExportTracks() const;
 
-    /** Setters and getters for filter parameters — bool */
-    void setFilterParametersBool(const std::map<std::string, bool>& p);
+    /** Set whether to ignore tracks with CDC hits
+     *
+     *  @param value True to ignore tracks with CDC hits
+     */
+    void setIgnoreTracksWithCDChits(bool value);
 
-    /** Get filter parameters — bool */
-    const std::map<std::string, bool>& getFilterParametersBool() const;
+    /** Get whether to ignore tracks with CDC hits
+     *
+     *  @return True if tracks with CDC hits are ignored
+     */
+    bool getIgnoreTracksWithCDChits() const;
 
-    /** Set path filter parameters — bool */
-    void setPathFilterParametersBool(const std::map<std::string, bool>& p);
+    /** Set whether to set the taken flag
+     *
+     *  @param value True to set the taken flag
+     */
+    void setTakenFlag(bool value);
 
-    /** Get path filter parameters — bool */
-    const std::map<std::string, bool>& getPathFilterParametersBool() const;
+    /** Get whether to set the taken flag
+     *
+     *  @return True if the taken flag is set
+     */
+    bool getTakenFlag() const;
 
-    /** Set state basic filter parameters — bool */
-    void setStateBasicFilterParametersBool(const std::map<std::string, bool>& p);
 
-    /** Get state basic filter parameters — bool */
-    const std::map<std::string, bool>& getStateBasicFilterParametersBool() const;
+    /** FILTER PARAMETERS MAPS
+     *
+     * These maps store filter parameters as a single map<string, double>.
+     * All numeric values are stored as double for ROOT I/O compatibility.
+     */
 
-    /** Set state extrapolation filter parameters — bool */
-    void setStateExtrapolationFilterParametersBool(const std::map<std::string, bool>& p);
+    /** Set filter parameters */
+    void setFilterParameters(const FilterParamMap& p);
 
-    /** Get state extrapolation filter parameters — bool */
-    const std::map<std::string, bool>& getStateExtrapolationFilterParametersBool() const;
+    /** Get filter parameters */
+    const FilterParamMap& getFilterParameters() const;
 
-    /** Set state final filter parameters — bool */
-    void setStateFinalFilterParametersBool(const std::map<std::string, bool>& p);
+    /** Set path filter parameters */
+    void setPathFilterParameters(const FilterParamMap& p);
 
-    /** Get state final filter parameters — bool */
-    const std::map<std::string, bool>& getStateFinalFilterParametersBool() const;
+    /** Get path filter parameters */
+    const FilterParamMap& getPathFilterParameters() const;
 
-    /** Set state pre-filter parameters — bool */
-    void setStatePreFilterParametersBool(const std::map<std::string, bool>& p);
+    /** Set state basic filter parameters */
+    void setStateBasicFilterParameters(const FilterParamMap& p);
 
-    /** Get state pre-filter parameters — bool */
-    const std::map<std::string, bool>& getStatePreFilterParametersBool() const;
+    /** Get state basic filter parameters */
+    const FilterParamMap& getStateBasicFilterParameters() const;
 
+    /** Set state extrapolation filter parameters */
+    void setStateExtrapolationFilterParameters(const FilterParamMap& p);
 
-    /** Setters and getters for filter parameters — int */
-    void setFilterParametersInt(const std::map<std::string, int>& p);
+    /** Get state extrapolation filter parameters */
+    const FilterParamMap& getStateExtrapolationFilterParameters() const;
 
-    /** Get filter parameters — int */
-    const std::map<std::string, int>& getFilterParametersInt() const;
+    /** Set state final filter parameters */
+    void setStateFinalFilterParameters(const FilterParamMap& p);
 
-    /** Set path filter parameters — int */
-    void setPathFilterParametersInt(const std::map<std::string, int>& p);
+    /** Get state final filter parameters */
+    const FilterParamMap& getStateFinalFilterParameters() const;
 
-    /** Get path filter parameters — int */
-    const std::map<std::string, int>& getPathFilterParametersInt() const;
+    /** Set state pre-filter parameters */
+    void setStatePreFilterParameters(const FilterParamMap& p);
 
-    /** Set state basic filter parameters — int */
-    void setStateBasicFilterParametersInt(const std::map<std::string, int>& p);
-
-    /** Get state basic filter parameters — int */
-    const std::map<std::string, int>& getStateBasicFilterParametersInt() const;
-
-    /** Set state extrapolation filter parameters — int */
-    void setStateExtrapolationFilterParametersInt(const std::map<std::string, int>& p);
-
-    /** Get state extrapolation filter parameters — int */
-    const std::map<std::string, int>& getStateExtrapolationFilterParametersInt() const;
-
-    /** Set state final filter parameters — int */
-    void setStateFinalFilterParametersInt(const std::map<std::string, int>& p);
-
-    /** Get state final filter parameters — int */
-    const std::map<std::string, int>& getStateFinalFilterParametersInt() const;
-
-    /** Set state pre-filter parameters — int */
-    void setStatePreFilterParametersInt(const std::map<std::string, int>& p);
-
-    /** Get state pre-filter parameters — int */
-    const std::map<std::string, int>& getStatePreFilterParametersInt() const;
-
-
-    /** Setters and getters for filter parameters — float */
-    void setFilterParametersFloat(const std::map<std::string, float>& p);
-
-    /** Get filter parameters — float */
-    const std::map<std::string, float>& getFilterParametersFloat() const;
-
-    /** Set path filter parameters — float */
-    void setPathFilterParametersFloat(const std::map<std::string, float>& p);
-
-    /** Get path filter parameters — float */
-    const std::map<std::string, float>& getPathFilterParametersFloat() const;
-
-    /** Set state basic filter parameters — float */
-    void setStateBasicFilterParametersFloat(const std::map<std::string, float>& p);
-
-    /** Get state basic filter parameters — float */
-    const std::map<std::string, float>& getStateBasicFilterParametersFloat() const;
-
-    /** Set state extrapolation filter parameters — float */
-    void setStateExtrapolationFilterParametersFloat(const std::map<std::string, float>& p);
-
-    /** Get state extrapolation filter parameters — float */
-    const std::map<std::string, float>& getStateExtrapolationFilterParametersFloat() const;
-
-    /** Set state final filter parameters — float */
-    void setStateFinalFilterParametersFloat(const std::map<std::string, float>& p);
-
-    /** Get state final filter parameters — float */
-    const std::map<std::string, float>& getStateFinalFilterParametersFloat() const;
-
-    /** Set state pre-filter parameters — float */
-    void setStatePreFilterParametersFloat(const std::map<std::string, float>& p);
-
-    /** Get state pre-filter parameters — float */
-    const std::map<std::string, float>& getStatePreFilterParametersFloat() const;
-
-
-    /** Setters and getters for filter parameters — string */
-    void setFilterParametersStr(const std::map<std::string, std::string>& p);
-
-    /** Get filter parameters — string */
-    const std::map<std::string, std::string>& getFilterParametersStr() const;
-
-    /** Set path filter parameters — string */
-    void setPathFilterParametersStr(const std::map<std::string, std::string>& p);
-
-    /** Get path filter parameters — string */
-    const std::map<std::string, std::string>& getPathFilterParametersStr() const;
-
-    /** Set state basic filter parameters — string */
-    void setStateBasicFilterParametersStr(const std::map<std::string, std::string>& p);
-
-    /** Get state basic filter parameters — string */
-    const std::map<std::string, std::string>& getStateBasicFilterParametersStr() const;
-
-    /** Set state extrapolation filter parameters — string */
-    void setStateExtrapolationFilterParametersStr(const std::map<std::string, std::string>& p);
-
-    /** Get state extrapolation filter parameters — string */
-    const std::map<std::string, std::string>& getStateExtrapolationFilterParametersStr() const;
-
-    /** Set state final filter parameters — string */
-    void setStateFinalFilterParametersStr(const std::map<std::string, std::string>& p);
-
-    /** Get state final filter parameters — string */
-    const std::map<std::string, std::string>& getStateFinalFilterParametersStr() const;
-
-    /** Set state pre-filter parameters — string */
-    void setStatePreFilterParametersStr(const std::map<std::string, std::string>& p);
-
-    /** Get state pre-filter parameters — string */
-    const std::map<std::string, std::string>& getStatePreFilterParametersStr() const;
-
-
-    /** Setters and getters for filter parameters — vector<string> */
-    void setFilterParametersVecStr(const std::map<std::string, std::vector<std::string>>& p);
-
-    /** Get filter parameters — vector<string> */
-    const std::map<std::string, std::vector<std::string>>& getFilterParametersVecStr() const;
-
-    /** Set path filter parameters — vector<string> */
-    void setPathFilterParametersVecStr(const std::map<std::string, std::vector<std::string>>& p);
-
-    /** Get path filter parameters — vector<string> */
-    const std::map<std::string, std::vector<std::string>>& getPathFilterParametersVecStr() const;
-
-    /** Set state basic filter parameters — vector<string> */
-    void setStateBasicFilterParametersVecStr(const std::map<std::string, std::vector<std::string>>& p);
-
-    /** Get state basic filter parameters — vector<string> */
-    const std::map<std::string, std::vector<std::string>>& getStateBasicFilterParametersVecStr() const;
-
-    /** Set state extrapolation filter parameters — vector<string> */
-    void setStateExtrapolationFilterParametersVecStr(const std::map<std::string, std::vector<std::string>>& p);
-
-    /** Get state extrapolation filter parameters — vector<string> */
-    const std::map<std::string, std::vector<std::string>>& getStateExtrapolationFilterParametersVecStr() const;
-
-    /** Set state final filter parameters — vector<string> */
-    void setStateFinalFilterParametersVecStr(const std::map<std::string, std::vector<std::string>>& p);
-
-    /** Get state final filter parameters — vector<string> */
-    const std::map<std::string, std::vector<std::string>>& getStateFinalFilterParametersVecStr() const;
-
-    /** Set state pre-filter parameters — vector<string> */
-    void setStatePreFilterParametersVecStr(const std::map<std::string, std::vector<std::string>>& p);
-
-    /** Get state pre-filter parameters — vector<string> */
-    const std::map<std::string, std::vector<std::string>>& getStatePreFilterParametersVecStr() const;
+    /** Get state pre-filter parameters */
+    const FilterParamMap& getStatePreFilterParameters() const;
 
 
   private:
 
-    /** Float variables */
-
-    /** Maximal delta phi for CKF state creation (radians) */
-    float m_maximalDeltaPhi;
-
-    /** Minimal pT requirement for tracks (GeV/c) */
-    float m_minimalPtRequirement;
-
-    /** Integer variables — layer indices are discrete, so int not float */
-
-    /** Maximal layer jump for CKF state creation */
-    int m_maximalLayerJump;
-
-    /** Maximal layer jump for backward seed tracks */
-    int m_maximalLayerJumpBackwardSeed;
-
-    /** Maximal number of candidates in flight for path selection */
-    unsigned int m_pathMaximalCandidatesInFlight;
-
-    /** Maximal number of hit candidates for state filtering */
-    unsigned int m_stateMaximalHitCandidates;
-
-    /** Boolean variables */
-
-    /** Whether to export all tracks */
-    bool m_exportAllTracks;
-
-    /** Whether to export tracks */
-    bool m_exportTracks;
-
-    /** Whether to ignore tracks with CDC hits */
-    bool m_ignoreTracksWithCDChits;
-
-    /** Whether to set the taken flag */
-    bool m_setTakenFlag;
-
-    /** String variables — all stored by value for correct ROOT I/O serialisation. */
+    /** STRING PARAMETERS
+     *
+     * Set of String variables (32 bytes).
+     */
 
     /** Filter name */
     std::string m_filter;
@@ -662,128 +523,81 @@ namespace Belle2 {
     /** Write out direction */
     std::string m_writeOutDirection;
 
-    /** FILTER PARAMETERS MAPS
+    /** FLOAT PARAMETERS
      *
-     * These maps store filter parameters separated by data type to ensure ROOT compatibility.
-     * Each filter category (filter, pathFilter, stateBasicFilter, etc.) has five maps:
-     * - Bool, Int, Float, String, Vector<string>
-     *
-     * TODO: Once a custom ROOT streamer for std::variant or boost::variant is available, replace the
-     *       five separate maps per filter with a single FilterParamMap using FilterParamVariant:
-     *
-     *   // std::variant approach (requires C++17 and custom ROOT streamer)
-     *   using FilterParamVariant = std::variant<bool, int, float, std::string, std::vector<std::string>>;
-     *
-     *   // boost::variant approach (still fails in ROOT DB payloads as of 2026)
-     *   using FilterParamVariant = boost::variant<bool, int, double, std::string, std::vector<std::string>>;
-     *
-     *   using FilterParamMap     = std::map<std::string, FilterParamVariant>;
-     *
-     *   FilterParamMap m_filterParameters;
-     *   FilterParamMap m_pathFilterParameters;
-     *   FilterParamMap m_stateBasicFilterParameters;
-     *   FilterParamMap m_stateExtrapolationFilterParameters;
-     *   FilterParamMap m_stateFinalFilterParameters;
-     *   FilterParamMap m_statePreFilterParameters;
-     *
+     * Set of Float variables (4 bytes).
      */
 
+    /** Maximal delta phi for CKF state creation (radians) */
+    float m_maximalDeltaPhi;
 
-    /** ALTERNATIVE TO FILTER PARAMETERS MAPS */
+    /** Minimal pT requirement for tracks (GeV/c) */
+    float m_minimalPtRequirement;
 
+    /** INTEGER PARAMETERS
+     *
+     * Set of Integer variables (4 bytes) — layer indices are discrete, so int not float.
+     */
 
-    /** Filter parameters — bool */
-    std::map<std::string, bool>                     m_filterParametersBool;
+    /** Maximal layer jump for CKF state creation */
+    int m_maximalLayerJump;
 
-    /** Filter parameters — int */
-    std::map<std::string, int>                      m_filterParametersInt;
+    /** Maximal layer jump for backward seed tracks */
+    int m_maximalLayerJumpBackwardSeed;
 
-    /** Filter parameters — float */
-    std::map<std::string, float>                    m_filterParametersFloat;
+    /** Maximal number of candidates in flight for path selection */
+    unsigned int m_pathMaximalCandidatesInFlight;
 
-    /** Filter parameters — string */
-    std::map<std::string, std::string>              m_filterParametersStr;
+    /** Maximal number of hit candidates for state filtering */
+    unsigned int m_stateMaximalHitCandidates;
 
-    /** Filter parameters — vector<string> */
-    std::map<std::string, std::vector<std::string>> m_filterParametersVecStr;
+    /** BOOLEAN PARAMETERS
+     *
+     * Set of Boolean variables (1 byte).
+     */
 
-    /** Path filter parameters — bool */
-    std::map<std::string, bool>                     m_pathFilterParametersBool;
+    /** Whether to export all tracks */
+    bool m_exportAllTracks;
 
-    /** Path filter parameters — int */
-    std::map<std::string, int>                      m_pathFilterParametersInt;
+    /** Whether to export tracks */
+    bool m_exportTracks;
 
-    /** Path filter parameters — float */
-    std::map<std::string, float>                    m_pathFilterParametersFloat;
+    /** Whether to ignore tracks with CDC hits */
+    bool m_ignoreTracksWithCDChits;
 
-    /** Path filter parameters — string */
-    std::map<std::string, std::string>              m_pathFilterParametersStr;
+    /** Whether to set the taken flag */
+    bool m_setTakenFlag;
 
-    /** Path filter parameters — vector<string> */
-    std::map<std::string, std::vector<std::string>> m_pathFilterParametersVecStr;
+    /** FILTER PARAMETERS MAPS
+     *
+     * These maps store filter parameters as double values for ROOT compatibility.
+     * Each filter category (filter, pathFilter, stateBasicFilter, etc.) has a single
+     * unified map<string, double> accessible via setStateFinalFilterParameters() etc.
+     *
+     * Note: bool and int values are stored as 1.0/0.0 and cast to double. The findlet
+     *       must cast back to the appropriate type when reading parameters.
+     *       String values are not supported in this approach.
+     */
 
-    /** State basic filter parameters — bool */
-    std::map<std::string, bool>                     m_stateBasicFilterParametersBool;
+    /** Filter parameters */
+    FilterParamMap m_filterParameters;
 
-    /** State basic filter parameters — int */
-    std::map<std::string, int>                      m_stateBasicFilterParametersInt;
+    /** Path filter parameters */
+    FilterParamMap m_pathFilterParameters;
 
-    /** State basic filter parameters — float */
-    std::map<std::string, float>                    m_stateBasicFilterParametersFloat;
+    /** State basic filter parameters */
+    FilterParamMap m_stateBasicFilterParameters;
 
-    /** State basic filter parameters — string */
-    std::map<std::string, std::string>              m_stateBasicFilterParametersStr;
+    /** State extrapolation filter parameters */
+    FilterParamMap m_stateExtrapolationFilterParameters;
 
-    /** State basic filter parameters — vector<string> */
-    std::map<std::string, std::vector<std::string>> m_stateBasicFilterParametersVecStr;
+    /** State final filter parameters */
+    FilterParamMap m_stateFinalFilterParameters;
 
-    /** State extrapolation filter parameters — bool */
-    std::map<std::string, bool>                     m_stateExtrapolationFilterParametersBool;
+    /** State pre-filter parameters */
+    FilterParamMap m_statePreFilterParameters;
 
-    /** State extrapolation filter parameters — int */
-    std::map<std::string, int>                      m_stateExtrapolationFilterParametersInt;
-
-    /** State extrapolation filter parameters — float */
-    std::map<std::string, float>                    m_stateExtrapolationFilterParametersFloat;
-
-    /** State extrapolation filter parameters — string */
-    std::map<std::string, std::string>              m_stateExtrapolationFilterParametersStr;
-
-    /** State extrapolation filter parameters — vector<string> */
-    std::map<std::string, std::vector<std::string>> m_stateExtrapolationFilterParametersVecStr;
-
-    /** State final filter parameters — bool */
-    std::map<std::string, bool>                     m_stateFinalFilterParametersBool;
-
-    /** State final filter parameters — int */
-    std::map<std::string, int>                      m_stateFinalFilterParametersInt;
-
-    /** State final filter parameters — float */
-    std::map<std::string, float>                    m_stateFinalFilterParametersFloat;
-
-    /** State final filter parameters — string */
-    std::map<std::string, std::string>              m_stateFinalFilterParametersStr;
-
-    /** State final filter parameters — vector<string> */
-    std::map<std::string, std::vector<std::string>> m_stateFinalFilterParametersVecStr;
-
-    /** State pre-filter parameters — bool */
-    std::map<std::string, bool>                     m_statePreFilterParametersBool;
-
-    /** State pre-filter parameters — int */
-    std::map<std::string, int>                      m_statePreFilterParametersInt;
-
-    /** State pre-filter parameters — float */
-    std::map<std::string, float>                    m_statePreFilterParametersFloat;
-
-    /** State pre-filter parameters — string */
-    std::map<std::string, std::string>              m_statePreFilterParametersStr;
-
-    /** State pre-filter parameters — vector<string> */
-    std::map<std::string, std::vector<std::string>> m_statePreFilterParametersVecStr;
-
-    ClassDef(SVDToCDCCKFParameters, 1);  /**< ROOT macro */
-
+    ClassDef(SVDToCDCCKFParameters, 2);  /**< ClassDef, necessary for ROOT */
   };
 
 }

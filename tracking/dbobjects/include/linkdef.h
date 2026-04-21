@@ -20,5 +20,8 @@
 
 #pragma link C++ class Belle2::WireHitFilterSettings+; // checksum=0xb2e21a93, version=1
 
-#pragma link C++ class Belle2::SVDToCDCCKFParameters+; // checksum=0xab7e8696, version=1
+// SVDToCDCCKF Parameters Payload
+#pragma link C++ class std::variant<bool,int,float,std::string,std::vector<std::string>>+;
+#pragma link C++ class std::map<std::string,std::variant<bool,int,float,std::string,std::vector<std::string>>>+;
+#pragma link C++ class Belle2::SVDToCDCCKFParameters+; // checksum=0xfad20caa, version=2
 #endif

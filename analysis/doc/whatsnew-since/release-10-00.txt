@@ -1,3 +1,9 @@
+Changes in the analysis package in light-2604-jellyfish
+
+Modules and Modular Analysis
+++++++++++++++++++++++++++++
+* It is no longer possible to use ``tree`` as the name for a ``TTree`` saved with the `VariablesToNtuple` and `VariablesToEventBasedTree` modules. In particular, this affects the argument ``treeName`` of the function `modularAnalysis.variablesToNtuple`: ``variablesToNtuple(treeName='tree')`` will now result in a ``FATAL`` message from basf2.
+
 Changes in the analysis package in light-2603-ina
 ------------------------------------------------------
 

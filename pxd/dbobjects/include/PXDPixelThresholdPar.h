@@ -9,9 +9,6 @@
 
 #include <TObject.h>
 #include <unordered_map>
-#include <unordered_set>
-
-//#include <pxd/dbobjects/PXDMaskedPixelPar.h>
 
 namespace Belle2 {
 
@@ -23,11 +20,10 @@ namespace Belle2 {
     /** Structure to hold set of single pixels indexed by their unique id (unsigned int), stored in hash table,
      * together with corresponding charge threshold
      */
-    //typedef std::unordered_set< std::pair <unsigned int, unsigned short> > SinglePixelThresholdsSet;
     typedef std::unordered_map<unsigned int, unsigned short> SinglePixelThresholdsSet;
 
     /** Default constructor */
-    PXDPixelThresholdPar() : m_defaultThreshold(7), m_MapSingleThresholds() {}
+    PXDPixelThresholdPar(unsigned short defaultThr = 7) : m_defaultThreshold(defaultThr), m_MapSingleThresholds() {}
 
     /** Destructor */
     ~PXDPixelThresholdPar() {}
@@ -48,7 +44,7 @@ namespace Belle2 {
       } else {
         // Create an empty set of thresholds for single pixels
         PXDPixelThresholdPar::SinglePixelThresholdsSet singleThresholds;
-        // pixID will be used to generate hash in unordered_set for quick access
+        // pixID will be used to generate hash in unordered_map for quick access
         singleThresholds.insert(std::pair <unsigned int, unsigned short>(pixID, pixThr));
         m_MapSingleThresholds[sensorID] = singleThresholds;
       }
@@ -58,7 +54,7 @@ namespace Belle2 {
      * @param sensorID unique ID of the sensor
      * @param pixID unique ID of single pixel to set threshold
      * @param pixThr charge threshold of the single pixel
-     * @return true if pixel does not have explicit threshold set, otherwise false.
+     * @return charge threshold of the single pixel.
      */
     unsigned short getPixelThreshold(unsigned short sensorID, unsigned int pixID) const
     {
@@ -87,6 +83,6 @@ namespace Belle2 {
     /** Structure holding sets of masked single pixels for all sensors by sensor id (unsigned short). */
     std::unordered_map<unsigned short, SinglePixelThresholdsSet> m_MapSingleThresholds;
 
-    ClassDef(PXDPixelThresholdPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(PXDPixelThresholdPar, 1);
   };
 } // end of namespace Belle2

@@ -103,13 +103,13 @@ namespace Belle2 {
       PXDPixelMasker& operator=(const PXDPixelMasker&) = delete;
 
       /** Pixel thresholds from DB. */
-      std::unique_ptr<DBObjPtr<PXDPixelThresholdPar>> m_pixelThresholdsFromDB;
+      DBObjPtr<PXDPixelThresholdPar> m_pixelThresholdsFromDB;
 
       /** Masked pixels retrieved from DB. */
-      std::unique_ptr<DBObjPtr<PXDMaskedPixelPar>> m_maskedPixelsFromDB;
+      DBObjPtr<PXDMaskedPixelPar> m_maskedPixelsFromDB;
 
       /** Dead pixels retrieved from DB. */
-      std::unique_ptr<DBObjPtr<PXDDeadPixelPar>> m_deadPixelsFromDB;
+      DBObjPtr<PXDDeadPixelPar> m_deadPixelsFromDB;
 
       /** List of pixel threshold. */
       PXDPixelThresholdPar m_pixelThresholds;

@@ -30,26 +30,38 @@ namespace Belle2 {
   class TOPBackSplashTimingModule : public Module {
 
   public:
+    /**
+     * Constructor
+     */
     TOPBackSplashTimingModule();
-    virtual ~TOPBackSplashTimingModule() = default;
 
+    /**
+     * Initialize the Module.
+     * This method is called at the beginning of data processing.
+     */
     void initialize() override;
+
+    /**
+     * Event processor.
+     */
     void event() override;
 
   private:
-    StoreArray<ECLCluster> m_eclClusters;
-    StoreArray<TOPBackSplashFitResult> m_fitresult;
-    StoreArray<TOPDigit> m_digits;
+    StoreArray<ECLCluster> m_eclClusters; /**< StoreArray of ECLCluster */
+    StoreArray<TOPBackSplashFitResult> m_fitresult; /**< StoreArray of TOPBackSplashFitResult */
+    StoreArray<TOPDigit> m_digits; /**< StoreArray of TOPDigit */
 
-    TOPBackSplashFitResult* fitTimingDigits(int, std::vector<int>, float, int, float);
-    std::array<std::array<double, 11>, 15> m_fitparams;
-    std::vector<RooWorkspace> m_wss;
-    std::vector<RooWorkspace> prepareFitModels();
+    /** Perform fitting of TOP timing in nearby slot  */
+    TOPBackSplashFitResult fitTimingDigits(int, std::vector<int>, double, int, double);
+    std::array<std::array<double, 11>, 15> m_fitparams; // container of 11 TOP timing fit params per cosTheta
+    std::vector<RooWorkspace> m_wss; // container of RooWorkSpaces, containing fit funcs per cosTheta
+    std::vector<RooWorkspace> prepareFitModels(); // constructs RooFit objects for fitting
 
-    bool m_saveFits = false; // Debug mode: save fits to TOP timing and print generated nbar info
-    int convertCosThetaToIndex(float);
-    int getModuleFromPhi(double);
-    void makePlot(float, int, int, RooAbsPdf*, RooRealVar*, RooDataSet, double, RooFitResult*);
+    bool m_saveFits = false; // Debug mode: plot and save fits of TOP timing
+    int convertCosThetaToIndex(double); // maps rounded cosTheta to appropriate row index of fit parameters
+    int getModuleFromPhi(double); // maps azimuthal angle to corresponding TOP slot no.
+    /** Function to create and save RooPlots of fitted TOP timing */
+    void makePlot(double, int, int, RooAbsPdf*, RooRealVar*, RooDataSet, double, RooFitResult*);
   };
 
 } // namespace Belle2

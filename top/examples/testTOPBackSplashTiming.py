@@ -19,7 +19,8 @@ import reconstruction as re
 import argparse
 
 parser = argparse.ArgumentParser(description="Choose anti-neutron momentum")
-parser.add_argument('--mom', default=1, help='')
+parser.add_argument('--mom', default=1, help='Momentum of nbars to generate [GeV/c]')
+parser.add_argument('--saveFits', type=bool, default=True, help='Flag to save plots of RooFits')
 args = parser.parse_args()
 
 path = b2.create_path()

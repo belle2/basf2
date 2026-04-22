@@ -22,11 +22,7 @@ namespace Belle2 {
   class TOPBackSplashFitResult : public RelationsObject {
 
   public:
-    /**
-     * Default constructor
-     */
-    TOPBackSplashFitResults() = default;
-
+    TOPBackSplashFitResult() = default;
     /**
      * Useful constructor
      * @param time      extracted TOP timing from fit

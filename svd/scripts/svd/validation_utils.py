@@ -380,3 +380,26 @@ def get_merged_collector_histograms(files):
                         CollectorHistograms[algo][exp][run][key][0].Add(hist)
 
     return CollectorHistograms
+
+
+def get_absolute_shifts(files):
+    '''
+    For the absolute shift, the value of the payload is written into the collector and is the same in every single file
+    so we can just take the value from the first file and ignore the rest.
+    '''
+    absolute_shifts = {}
+    in_file_name = files[0]
+    in_file = r.TFile(str(in_file_name))
+    for algo in time_algorithms:
+        base_dir = f'SVDTimeValidationCollector_{algo}'
+        iov = in_file.Get(f'{base_dir}/RunRange').getIntervalOfValidity()
+        exp, run = iov.getExperimentLow(), iov.getRunLow()
+        absolute_shifts[algo] = {}
+        this_histo = in_file.Get((get_full_path("hAbsoluteShiftValues", exp, run, base_dir)))
+        for layer in range(3, 7):
+            absolute_shifts[algo][layer] = {}
+            for side in [True, False]:
+                absolute_shifts[algo][f'L{layer}S{"U" if side else "V"}'] = this_histo.GetBinContent(
+                    this_histo.GetXaxis().FindBin(f'L{layer}S{"U" if side else "V"}'))
+    in_file.Close()
+    return absolute_shifts

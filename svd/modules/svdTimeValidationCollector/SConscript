@@ -6,6 +6,7 @@ env['LIBS'] = [
     'mdst_dataobjects',
     'vxd',
     'svd_dataobjects',
+    'svd_dbobjects',
     '$ROOT_LIBS',
     'calibration'
     ]

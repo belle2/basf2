@@ -330,7 +330,7 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
     f->Close();
   } // loop over algorithms
 
-  saveCalibration(payload, "SVDClusterAbsoluteTimeShifter");
+  saveCalibration(payload, "SVDAbsoluteClusterTimeShift");
 
   return c_OK;
 }

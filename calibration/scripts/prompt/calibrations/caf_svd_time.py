@@ -50,7 +50,9 @@ settings = CalibrationSettings(name="caf_svd_time",
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
                                    # AbsoluteTimeShiftCalibration
                                    #  , "timeValidation",],
-                                   "listOfMutedCalibrations": ["rawTimeCalibration", "timeShiftCalibration"],
+                                   "listOfMutedCalibrations": ["rawTimeCalibration",
+                                                               "timeShiftCalibration",
+                                                               "AbsoluteTimeShiftCalibration"],
                                    "max_events_per_run":  10000,
                                    "max_events_per_file": 5000,
                                    "isMC": False,
@@ -116,6 +118,7 @@ def create_validation_collector(name="SVDTimeValidationCollector",
                                 event_t0="EventT0",
                                 collector_module="SVDTimeValidationCollector",
                                 absolute_shift_calib_output_file=None,
+                                time_algorithm="CoG6",
                                 granularity="run"):
     """
     Simply creates a SVDTimeCalibrationCollector module with some options.
@@ -130,6 +133,7 @@ def create_validation_collector(name="SVDTimeValidationCollector",
     collector.param("SVDClustersOnTracksName", clusters_onTracks)
     collector.param("EventT0Name", event_t0)
     collector.param("granularity", granularity)
+    collector.param("TimeAlgorithm", time_algorithm)
     if absolute_shift_calib_output_file is not None:
         collector.param("AbsoluteShiftCalibOutputFileName", absolute_shift_calib_output_file)
         # os.path.abspath(os.path.expanduser(absolute_shift_calib_output_file)))
@@ -182,14 +186,10 @@ def create_validation_algorithm(prefix="", min_entries=10000, is_absolute_shift_
         ROOT.Belle2.SVDCoGTimeValidationAlgorithm
     """
     from ROOT import Belle2  # noqa: make the Belle2 namespace available
-    from ROOT.Belle2 import SVDTimeValidationAlgorithm, SVDAbsoluteTimeShiftValidationAlgorithm
+    from ROOT.Belle2 import SVDTimeValidationAlgorithm
 
-    if not is_absolute_shift_validation:
-        algorithm = SVDTimeValidationAlgorithm()
-    elif is_absolute_shift_validation:
-        algorithm = SVDAbsoluteTimeShiftValidationAlgorithm()
-    else:
-        raise ValueError(f"is_absolute_shift_validation should be a boolean variable, but got {is_absolute_shift_validation}")
+    algorithm = SVDTimeValidationAlgorithm()
+
     if prefix:
         algorithm.setPrefix(prefix)
     algorithm.setMinEntries(min_entries)
@@ -605,7 +605,7 @@ def get_calibrations(input_data, **kwargs):
     shift_algo.setMaximumAllowedShift(15.)
     shift_algo.setTimeAlgorithm(timeAlgorithms)
     print(f'Time algorithms for absolute shift: {timeAlgorithms}')
-    absolute_shift_calibration = Calibration("SVDClusterAbsoluteTimeShifter",
+    absolute_shift_calibration = Calibration("SVDClusterAbsoluteTimeShift",
                                              collector=absolute_shift_collector,
                                              algorithms=absolute_shift_algo,
                                              input_files=good_input_files,
@@ -615,25 +615,8 @@ def get_calibrations(input_data, **kwargs):
 
     for algorithm in absolute_shift_calibration.algorithms:
         algorithm.params = {"apply_iov": output_iov}
-
-    if "AbsoluteTimeShiftCalibration" not in listOfMutedCalibrations:
-        # # Configure databases before adding to list
-        # print(f'TRYING TO SET MY OWN LOCAL DB FOR ABSOLUTE SHIFT CALIBRATION')
-        # local_db_path = "/home/belle2/athaller/calibration_scripts/test_gt_dl/revision_039"
-        # absolute_shift_calibration.reset_database()
-        # absolute_shift_calibration.use_local_database(
-        #     f"{local_db_path}/database.txt",
-        #     local_db_path
-        # )
-
-        # gt_global_db = ["patch_main_release-09", "data_prompt_rel08", "online","temp_casarosa_TEST_DAFConfiguration_v1",
-        # "temp_glazov_20250617-084555","user_casarosa_SVDAbsoluteClusterTimeShift_allZeros"]
-
-        # for db in gt_global_db:
-        #     absolute_shift_calibration.use_central_database(db)
-        #     print(f'Added central database: {db}')
-
-        list_of_calibrations.append(absolute_shift_calibration)
+        if "AbsoluteTimeShiftCalibration" not in listOfMutedCalibrations:
+            list_of_calibrations.append(absolute_shift_calibration)
 
     #########################################################
     # Add new fake calibration to run validation collectors #
@@ -679,7 +662,8 @@ def get_calibrations(input_data, **kwargs):
         name=f"SVDTimeValidationCollector{cog6_suffix}",
         clusters=f"SVDClusters{cog6_suffix}",
         clusters_onTracks=f"SVDClusters{cog6_suffix}_onTracks",
-        event_t0="EventT0")
+        event_t0="EventT0",
+        time_algorithm="CoG6")
 
     val_algo_cog6 = create_validation_algorithm(
         prefix=val_coll_cog6.name(),
@@ -689,7 +673,8 @@ def get_calibrations(input_data, **kwargs):
         name=f"SVDTimeValidationCollector{cog3_suffix}",
         clusters=f"SVDClusters{cog3_suffix}",
         clusters_onTracks=f"SVDClusters{cog3_suffix}_onTracks",
-        event_t0="EventT0")
+        event_t0="EventT0",
+        time_algorithm="CoG3")
 
     val_algo_cog3 = create_validation_algorithm(
         prefix=val_coll_cog3.name(),
@@ -699,7 +684,8 @@ def get_calibrations(input_data, **kwargs):
         name=f"SVDTimeValidationCollector{els3_suffix}",
         clusters=f"SVDClusters{els3_suffix}",
         clusters_onTracks=f"SVDClusters{els3_suffix}_onTracks",
-        event_t0="EventT0")
+        event_t0="EventT0",
+        time_algorithm="ELS3")
 
     val_algo_els3 = create_validation_algorithm(
         prefix=val_coll_els3.name(),
@@ -754,11 +740,6 @@ def get_calibrations(input_data, **kwargs):
     if "timeValidation" not in listOfMutedCalibrations:
         list_of_calibrations.append(val_calibration)
 
-    # forcing validation of time shift for test purpose
-    # list_of_calibrations.append(val_calibration_abs_shift)
-
-    #  dont remember exactly what this is accomplishing. needs to check the logic here
-    # most likely the val of the calib needs to depend on
     print(f'List of calib: {list_of_calibrations}')
     for item in range(len(list_of_calibrations) - 1):
         # Absolute time shift calibration does not depend on any other calibration

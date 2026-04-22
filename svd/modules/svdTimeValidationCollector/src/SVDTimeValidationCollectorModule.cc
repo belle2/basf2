@@ -31,6 +31,7 @@ SVDTimeValidationCollectorModule::SVDTimeValidationCollectorModule() : Calibrati
   addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", m_eventTime);
   addParam("RecoTracksName", m_recotrack, "Name of the RecoTracks list", m_recotrack);
   addParam("TracksName", m_track, "Name of the Tracks list", m_track);
+  addParam("TimeAlgorithm", m_timeAlgo, "Time algorithm being validated (CoG6, CoG3, ELS3)", m_timeAlgo);
 }
 
 void SVDTimeValidationCollectorModule::prepare()
@@ -43,6 +44,19 @@ void SVDTimeValidationCollectorModule::prepare()
   registerObject<TH1F>("hEventT0FromCDC", hEventT0FromCDC);
   auto hEventT0FromSVD = new TH1F("hEventT0FromSVD", "EventT0FromSVD", 300, -150, 150);
   registerObject<TH1F>("hEventT0FromSVD", hEventT0FromSVD);
+
+  // Register absolute time shift values for each layer and side
+  for (int layer : {3, 4, 5, 6}) {
+    for (auto side : {'U', 'V'}) {
+      TString this_sensorType = TString::Format("m_AbsoluteShift_L%iS%c", layer, side);
+      auto this_shift = new TH1F(this_sensorType.Data(), TString::Format("Absolute Time Shift for Layer %i %c side", layer, side), 300,
+                                 -150, 150);
+      registerObject<TH1F>(this_sensorType.Data(), this_shift);
+      // registerObject<Double_t>(TString::Format("m_AbsoluteShift_L%i%c", layer, view).Data(), 0.0);
+    }
+  }
+  auto hAbsoluteShiftValues = new TH1D("hAbsoluteShiftValues", "Fitted shift values ;Bin;Mean (ns)", 8, 0.5, 8.5);
+  registerObject<TH1D>("hAbsoluteShiftValues", hAbsoluteShiftValues);
 
   m_svdCls.isRequired(m_svdClusters);
   m_svdClsOnTrk.isRequired(m_svdClustersOnTracks);
@@ -114,6 +128,31 @@ void SVDTimeValidationCollectorModule::startRun()
   getObjectPtr<TH2F>("__hClsDiffTimeOnTracks__")->Reset();
   getObjectPtr<TH3F>("__hClusterSizeVsTimeResidual__")->Reset();
   getObjectPtr<TH1F>("__hBinToSensorMap__")->Reset();
+  getObjectPtr<TH1D>("hAbsoluteShiftValues")->Reset();
+
+  // Load absolute time shifts from payload
+  if (m_svdAbsTimeShift.isValid()) {
+    const TString alg = TString(m_timeAlgo.c_str());
+
+    for (int layer : {3, 4, 5, 6})
+      for (bool side : {true, false}) {
+        TString this_shift = TString::Format("m_AbsoluteShift_L%iS%c", layer, side ? 'U' : 'V');
+        B2INFO("Filling histogram " << this_shift << " with shift value from payload for algorithm " << alg <<
+               ", layer " << layer << " and side " << (side ? 'U' : 'V'));
+        getObjectPtr<TH1F>(this_shift.Data())->Reset();
+        getObjectPtr<TH1F>(this_shift.Data())->Fill(m_svdAbsTimeShift->getAbsTimeShift(alg, layer, side));
+
+        const int binIdx = 2 * (layer - 3) + side + 1;
+        const TString binLabel = TString::Format("L%dS%c", layer, side ? 'U' : 'V');
+        getObjectPtr<TH1D>("hAbsoluteShiftValues")->GetXaxis()->SetBinLabel(binIdx, binLabel);
+        getObjectPtr<TH1D>("hAbsoluteShiftValues")->SetBinContent(binIdx, m_svdAbsTimeShift->getAbsTimeShift(alg, layer, side));
+
+
+      }
+
+  } else {
+    B2WARNING("SVD Absolute Cluster Time Shift object not found in database");
+  }
 }
 
 void SVDTimeValidationCollectorModule::collect()

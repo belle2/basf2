@@ -82,6 +82,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
 
     shift_histos = {}
     shift_histos_merged_over_ladder = {}
+    absolute_shifts_values = vu.get_absolute_shifts(files)
 
     for algo in CollectorHistograms:
         shift_histos[algo] = {}
@@ -232,6 +233,14 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     df.to_pickle(output_dir / 'df.pkl')
     # df = pd.read_pickle('df.pkl')
 
+    absolute_shifts = {"sensor": [f"L{layer}S{'U' if side else 'V'}" for layer in range(3, 7) for side in [True, False]]}
+    for algo in vu.time_algorithms:
+        absolute_shifts[f"absolute_shift_{algo}"] = [absolute_shifts_values[algo][
+            f'L{layer}S{"U" if side else "V"}'] for layer in range(3, 7) for side in [True, False]]
+    # Not sure if this one needs to be pickled
+    absolute_shifts_df = pd.DataFrame(absolute_shifts)
+
+    print(f'Absolute shifts:\n{absolute_shifts_df}')
     print('Making combined plots')
 
     for algo in vu.time_algorithms:
@@ -310,6 +319,18 @@ def run_validation(job_path, input_data_path=None, **kwargs):
             plt.tight_layout()
             plt.savefig(output_dir / f'T0_{metric}_{algo}.pdf')
             plt.close()
+
+        plt.figure(figsize=(6.4*max(2, total_length/30), 4.8*2))
+        ax = sns.violinplot(x='sensor', y=f'absolute_shift_{algo}', data=absolute_shifts_df, split=True)
+        ax.set_ylim([-15, 15])
+        ax.xaxis.set_minor_locator(ticker.NullLocator())
+        plt.axhline(0, color='black', linestyle='--')
+        plt.axhline(10, color='black', linestyle=':')
+        plt.axhline(-10, color='black', linestyle=':')
+        plt.setp(ax.get_xticklabels(), rotation=90)
+        plt.tight_layout()
+        plt.savefig(output_dir / f'absolute_shift_{algo}.pdf')
+        plt.close()
 
 
 if __name__ == '__main__':

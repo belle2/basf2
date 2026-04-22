@@ -9,7 +9,6 @@
 #pragma once
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventT0.h>
 
 #include <TFile.h>
 #include <TH1F.h>
@@ -18,6 +17,7 @@
 #include <TDirectory.h>
 
 namespace Belle2 {
+  class EventT0;
 
   /**
    * This module to design collect the event t0 values base on different detectors and physics processes.

@@ -135,6 +135,6 @@ path.add_module(create_plots_TRK)
 path.add_module(create_plots_V0)
 path.add_module(create_plots_FTFNT)
 
-b2.process(path)
+b2.process(path, calculateStatistics=True)
 
 print(b2.statistics)

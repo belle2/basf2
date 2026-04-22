@@ -11,7 +11,6 @@ Tools which will provide you help
     :func: get_argument_parser
     :prog: b2help-modules
     :nodefault:
-    :nogroupsections:
 
 
 .. _b2help-particles:
@@ -24,7 +23,6 @@ Tools which will provide you help
     :func: get_argument_parser
     :prog: b2help-particles
     :nodefault:
-    :nogroupsections:
 
 
 .. _b2help-recommendation:
@@ -37,7 +35,6 @@ Tools which will provide you help
     :func: get_argument_parser
     :prog: b2help-recommendation
     :nodefault:
-    :nogroupsections:
 
 .. _b2help-variables:
 
@@ -49,7 +46,6 @@ Tools which will provide you help
     :func: get_argument_parser
     :prog: b2help-variables
     :nodefault:
-    :nogroupsections:
 
 
 .. _b2help-print-fei-mode-names:
@@ -62,7 +58,6 @@ Tools which will provide you help
     :func: get_argument_parser
     :prog: b2help-print-fei-mode-names
     :nodefault:
-    :nogroupsections:
 
 
 .. include:: ../../../decfiles/doc/decfiles-tools.rstinclude

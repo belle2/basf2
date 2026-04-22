@@ -119,7 +119,7 @@ ma.variablesToNtuple('B+:D0pi', variables, filename='B2BII_ConvertAndReconstruct
 # progress
 mypath.add_module('Progress')
 
-basf2.process(mypath)
+basf2.process(mypath, calculateStatistics=True)
 
 # Print call statistics
 print(basf2.statistics)

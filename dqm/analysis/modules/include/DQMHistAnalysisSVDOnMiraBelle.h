@@ -11,6 +11,8 @@
 #include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoTools.h>
+#include <svd/dbobjects/SVDDQMPlotsConfiguration.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <vector>
 
@@ -53,6 +55,8 @@ namespace Belle2 {
       nullptr; /**< average number of the APV sample which corresponds to the maximum amplitude for clusters on track */
     TCanvas* m_c_MeanSVDEventT0 = nullptr; /**< Mean Event T0 from SVD */
 
+    DBObjPtr<SVDDQMPlotsConfiguration> m_svdPlotsConfig; /**< SVD DQM plots configuration */
+
     /** Monitoring Object to be produced by this module, which contain defined canvases and monitoring variables */
     MonitoringObject* m_monObj = nullptr;
 
@@ -61,6 +65,9 @@ namespace Belle2 {
 
     //! geometrical tool pointer
     const VXD::GeoTools* m_gTools = nullptr;
+
+    /** list of sensor  to monitor (Charge, SNR, time; U/V)  taken from DB (payload)*/
+    std::vector<std::string> m_listOfSensorsToMonitor;
 
     /**
      * Calculate avg offline occupancy for one specific sensor, especially
@@ -71,7 +78,7 @@ namespace Belle2 {
      * @param nEvents number of events
      * @return vector with values for U and V sides
      */
-    std::vector<float> avgOccupancyUV(TH1F* hU, TH1F* hV, int nEvents, int layer = -1, int ladder = -1, int sensor = -1) const;
+    std::pair<float, float> avgOccupancyUV(TH1F* hU, TH1F* hV, int nEvents, int layer = -1, int ladder = -1, int sensor = -1) const;
 
     /**
      * Calculate avg offline occupancy for specified layer for time group id = 0
@@ -79,7 +86,7 @@ namespace Belle2 {
      * @param nEvents number of events
      * @return vector with values for U and V sides
      */
-    std::vector<float>  avgOccupancyGrpId0UV(int iLayer, int nEvents) const;
+    std::pair<float, float>  avgOccupancyGrpId0UV(int iLayer, int nEvents) const;
 
     /**
      * Calculate avg efficiency for specified sensors
@@ -88,8 +95,8 @@ namespace Belle2 {
      * @param ladder ladder index
      * @param sensor sensor index     * @return vector with values for U and V sides
      */
-    std::vector<float> avgEfficiencyUV(TH2F* hMCU, TH2F* hMCV, TH2F* hFTU, TH2F* hFTV, int layer = -1, int ladder = -1,
-                                       int sensor = -1) const;
+    std::pair<float, float> avgEfficiencyUV(TH2F* hMCU, TH2F* hMCV, TH2F* hFTU, TH2F* hFTV, int layer = -1, int ladder = -1,
+                                            int sensor = -1) const;
 
     /**
     * Calculate abscissa of max Y bin
@@ -110,7 +117,7 @@ namespace Belle2 {
      * @param name name of variable
      * @param varUV variable vector U/V
      */
-    void addVariable(std::string name, std::vector<float>& varUV);
+    void addVariable(std::string name, std::pair<float, float>& varUV);
 
     /** find the Y bin given the layer and sensor number */
     Int_t findBinY(Int_t layer, Int_t sensor) const

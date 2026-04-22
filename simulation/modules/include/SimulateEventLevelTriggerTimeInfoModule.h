@@ -10,10 +10,10 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 
 namespace Belle2 {
+  class EventLevelTriggerTimeInfo;
 
   /**
    * Module to create the EventLevelTriggerTimeInfo that stores information from the Trigger Timing Distribution (TTD)

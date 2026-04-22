@@ -52,7 +52,7 @@ int b2nsm_wait(float timeout);
 NSMcontext* b2nsm_init2(const char* nodename, int usesig, const char* host,
                         int port, int shmkey);
 NSMcontext* b2nsm_init(const char* nodename);
-int b2nsm_term();
+int b2nsm_term(const char* nodename);
 
 void nsmlib_log(const char* fmt, ...);
 #define b2nsm_printf nsmlib_log

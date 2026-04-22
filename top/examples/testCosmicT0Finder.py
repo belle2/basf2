@@ -188,7 +188,7 @@ main.add_module(Ntuple())
 main.add_module('Progress')
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print statistics
 print(b2.statistics)

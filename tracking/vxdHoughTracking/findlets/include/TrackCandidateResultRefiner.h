@@ -7,24 +7,21 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/vxdHoughTracking/findlets/TrackCandidateOverlapResolver.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-
-#include <string>
-#include <vector>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
 namespace Belle2 {
   class SpacePointTrackCand;
   class ModuleParamList;
+  class QualityEstimatorBase;
 
   namespace vxdHoughTracking {
 
     /// Findlet for rejecting wrong SpacePointTrackCands and for removing bad hits.
-    class TrackCandidateResultRefiner : public TrackFindingCDC::Findlet<SpacePointTrackCand, SpacePointTrackCand> {
+    class TrackCandidateResultRefiner : public TrackingUtilities::Findlet<SpacePointTrackCand, SpacePointTrackCand> {
       /// Parent class
-      using Super = TrackFindingCDC::Findlet<SpacePointTrackCand, SpacePointTrackCand>;
+      using Super = TrackingUtilities::Findlet<SpacePointTrackCand, SpacePointTrackCand>;
 
     public:
       /// Find intercepts in the 2D Hough space

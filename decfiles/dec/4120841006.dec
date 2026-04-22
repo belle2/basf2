@@ -1,0 +1,36 @@
+#########################################################################################
+# EventType: 4120841006
+# Descriptor: [e+e-->pi+ pi- Upsilon_3(1D)[->gamma chi_b2[->gamma Upsilon(1S)->[l+l-]]]] are generated via ISR
+# NickName: vpho_pipiY1D_gammachib2
+# Tested: Yes
+# Documentation: MC15rd signal request
+# Physics WG: Quarkonium
+# Responsible: Yong Xie
+# Email: xieyong@mail.sdu.edu.cn
+# Cuts: None
+# Date: 2024/11/12
+##########################################################################################
+
+Alias      Upsilon_3(1D)sig        Upsilon_3(1D)
+ChargeConj Upsilon_3(1D)sig        Upsilon_3(1D)sig
+Alias      chi_b2sig        chi_b2
+ChargeConj chi_b2sig        chi_b2sig
+
+Decay vpho
+1.0 pi+ pi- Upsilon_3(1D)sig PHSP;
+Enddecay
+
+Decay Upsilon_3(1D)sig
+1.0 gamma chi_b2sig PHSP;
+Enddecay
+
+Decay chi_b2sig
+1.0 gamma   Upsilonsig   HELAMP 1. 0. 1.7320508 0. 2.4494897 0.          2.4494897 0. 1.7320508 0. 1. 0.;
+Enddecay
+
+Decay Upsilonsig
+0.5 e+ e- VLL;
+0.5 mu+ mu- VLL;
+Enddecay
+
+End

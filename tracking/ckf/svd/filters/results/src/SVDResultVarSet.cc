@@ -6,13 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/svd/filters/results/SVDResultVarSet.h>
+#include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 SVDResultVarSet::SVDResultVarSet() : Super()
 {

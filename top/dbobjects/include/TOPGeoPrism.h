@@ -205,7 +205,7 @@ namespace Belle2 {
 
     /**
      * Returns unfolded exit windows.
-     * Exit window position is defined where the slanted surface is cutted off.
+     * Exit window position is defined where the slanted surface is cut off.
      * @return vector of unfolded exit windows
      */
     const std::vector<UnfoldedWindow>& getUnfoldedWindows() const

@@ -9,8 +9,6 @@
 #include <cdc/modules/cdcCosmicSelector/CDCCosmicSelectorModule.h>
 #include <framework/logging/Logger.h>
 
-#include <iostream>
-
 using namespace std;
 using namespace Belle2;
 

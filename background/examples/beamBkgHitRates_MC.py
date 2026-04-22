@@ -20,7 +20,7 @@ import sys
 # Example of producing summary ntuple of beam background hit rates on MC using BG overlay
 #
 # This example is for nominal phase-3.
-# For phase-2 or early phase-3 one should replace 'expList' with 1002 or 1003, resp.,
+# For phase-2 or Run 1 (early phase-3) one should replace 'expList' with 1002 or 1003, resp.,
 # and use the corresponding BG overlay samples (e.g. redefine BELLE2_BACKGROUND_DIR)
 #
 # usage: basf2 beamBkgHitRates_MC.py
@@ -66,7 +66,7 @@ main.add_module('BeamBkgHitRateMonitor',
 main.add_module('Progress')
 
 # Process events
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(basf2.statistics)

@@ -10,7 +10,6 @@
 Test the tool b2file-mix and make sure it works.
 '''
 
-import contextlib
 import subprocess
 
 import basf2 as b2
@@ -41,18 +40,6 @@ def path_for_test_file(events, output_name, seed):
     main.add_module(PopulateEvents())
     main.add_module('RootOutput', outputFileName=output_name)
     b2.process(main)
-
-
-@contextlib.contextmanager
-def open_root(filename, mode='READ'):
-    # Context manager for handling root files
-    import ROOT
-    f = ROOT.TFile.Open(filename, mode)
-    try:
-        yield f
-    finally:
-        if f:
-            f.Close()
 
 
 if __name__ == '__main__':
@@ -96,14 +83,15 @@ if __name__ == '__main__':
         # Since b2file-mix keep the relative ordering between the events in a file: For checking test6
         # is different, let's count how many times the entries differ and ask this number is large enough.
         # Because of the same reason, let's skip the first and last few events.
+        import ROOT  # noqa
         counts = 0
-        with open_root(file_name_ab) as fileab:
+        with ROOT.TFile.Open(file_name_ab) as fileab:
             treeab = fileab.Get('tree')
-            with open_root('test4.root') as file4:
+            with ROOT.TFile.Open('test4.root') as file4:
                 tree4 = file4.Get('tree')
-                with open_root('test5.root') as file5:
+                with ROOT.TFile.Open('test5.root') as file5:
                     tree5 = file5.Get('tree')
-                    with open_root('test6.root') as file6:
+                    with ROOT.TFile.Open('test6.root') as file6:
                         tree6 = file6.Get('tree')
                         for i, (eventab, event4, event5, event6) in enumerate(zip(treeab, tree4, tree5, tree6)):
                             if i < 10 or i > 1990:

@@ -8,15 +8,17 @@
  **************************************************************************/
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
 #include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
+
+namespace Belle2 {
+  class Particle;
+}
 
 namespace TreeFitter {
   class DecayChain;
   class FitParams;
   class ParticleBase;
-  class ConstraintConfiguration;
 
   /** this class */
   class FitManager {

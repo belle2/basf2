@@ -24,7 +24,7 @@ to each trigger bit. Details of the trigger bit definitions could be
 found on `the dedicated XWiki page
 <https://xwiki.desy.de/xwiki/rest/p/2471f>`__
 or `the dedicated Belle II notes
-<https://docs.belle2.org/search?ln=en&p=%22Trigger+Summary%22&f=&action_search=Search&c=Belle+II+Notes>`__.
+<https://docs.belle2.org/pub_data/documents/?title=Trigger+Summary>`__.
 
 There are three kinds of trigger bits: input trigger bits (L1Input),
 output trigger bits (L1FTDL), and prescaled trigger bits (L1PSNM). They

@@ -15,7 +15,6 @@
 //cdc package headers
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCCrossTalkLibrary.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
 

@@ -30,12 +30,6 @@ namespace Belle2 {
     BGOverlayExecutorModule();
 
     /**
-     * Destructor
-     */
-    virtual ~BGOverlayExecutorModule()
-    {}
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
@@ -130,11 +124,10 @@ namespace Belle2 {
       }
 
       // debug printout
-      int diff = size + bgDigits.getEntries() - digits.getEntries();
       B2DEBUG(20, digits.getName() << ": before " << size
               << " + " << bgDigits.getEntries() << "(BG)"
               << ", after " << digits.getEntries()
-              << ", merged " << diff);
+              << ", merged " << size + bgDigits.getEntries() - digits.getEntries());
 
     }
 

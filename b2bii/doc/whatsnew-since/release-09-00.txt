@@ -1,0 +1,9 @@
+Changes in the b2bii package since release-09-00
+------------------------------------------------
+
+convertBelleMdstToBelleIIMdst
++++++++++++++++++++++++++++++
+
+* Added a switch ``evtgenProcessing`` to read the .gen file produced by mcproduzh's evtgen step
+  and convert to Belle2 MC Particles.
+ 

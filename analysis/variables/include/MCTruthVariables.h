@@ -379,6 +379,7 @@ namespace Belle2 {
      * returns array index of B ancestor, or -1 if no B ancestor or no MC-matching is found.
      */
     int ancestorBIndex(const Particle*);
+
   }
 }
 

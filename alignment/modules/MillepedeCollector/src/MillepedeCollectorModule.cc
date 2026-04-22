@@ -169,12 +169,6 @@ void MillepedeCollectorModule::prepare()
       m_primaryMassVertexTwoBodyDecays.empty())
     B2ERROR("You have to specify either arrays of single tracks or particle lists of single single particles or mothers with vertex constrained daughters.");
 
-  if (!m_tracks.empty()) {
-    for (auto arrayName : m_tracks)
-      continue;
-    // StoreArray<RecoTrack>::required(arrayName);
-  }
-
   if (!m_particles.empty() || !m_vertices.empty() || !m_primaryVertices.empty()) {
     // StoreArray<RecoTrack> recoTracks;
     // StoreArray<Track> tracks;
@@ -185,17 +179,17 @@ void MillepedeCollectorModule::prepare()
     //trackFitResults.isRequired();
   }
 
-  for (auto listName : m_particles) {
+  for (const auto& listName : m_particles) {
     StoreObjPtr<ParticleList> list(listName);
     //list.isRequired();
   }
 
-  for (auto listName : m_vertices) {
+  for (const auto& listName : m_vertices) {
     StoreObjPtr<ParticleList> list(listName);
     //list.isRequired();
   }
 
-  for (auto listName : m_primaryVertices) {
+  for (const auto& listName : m_primaryVertices) {
     StoreObjPtr<ParticleList> list(listName);
     //list.isRequired();
   }
@@ -268,7 +262,7 @@ void MillepedeCollectorModule::collect()
   int ndf = -1;
   float evt0 = -9999.;
 
-  for (auto arrayName : m_tracks) {
+  for (const auto& arrayName : m_tracks) {
     StoreArray<RecoTrack> recoTracks(arrayName);
     if (!recoTracks.isValid())
       continue;
@@ -306,7 +300,7 @@ void MillepedeCollectorModule::collect()
 
   }
 
-  for (auto listName : m_particles) {
+  for (const auto& listName : m_particles) {
     StoreObjPtr<ParticleList> list(listName);
     if (!list.isValid())
       continue;
@@ -332,7 +326,7 @@ void MillepedeCollectorModule::collect()
     }
   }
 
-  for (auto listName : m_vertices) {
+  for (const auto& listName : m_vertices) {
     StoreObjPtr<ParticleList> list(listName);
     if (!list.isValid())
       continue;
@@ -368,7 +362,7 @@ void MillepedeCollectorModule::collect()
     }
   }
 
-  for (auto listName : m_primaryVertices) {
+  for (const auto& listName : m_primaryVertices) {
     StoreObjPtr<ParticleList> list(listName);
     if (!list.isValid())
       continue;
@@ -381,8 +375,9 @@ void MillepedeCollectorModule::collect()
       TMatrixD locProjection(3, 5);
 
       // geometric constaint: 3 common (position) parameters + 3 external (curv., directions) per daughter
-      TMatrixD innerTrafo(5, 3 + 3 * mother->getDaughters().size());
-      unsigned int iCol(3);
+      //TODO: revert due to alignment issues in rel9 (!5184)
+      //TMatrixD innerTrafo(5, 3 + 3 * mother->getDaughters().size());
+      //unsigned int iCol(3);
 
       bool first(true);
       for (auto& track : getParticlesTracks(mother->getDaughters())) {
@@ -393,16 +388,19 @@ void MillepedeCollectorModule::collect()
           first = false;
         }
 
-        innerTrafo.Zero();
-        innerTrafo.SetSub(3, 0, getGlobalToLocalTransform(track->getFittedState()).GetSub(3, 4, 0, 2));
-        innerTrafo[0][iCol++] = 1.;
-        innerTrafo[1][iCol++] = 1.;
-        innerTrafo[2][iCol++] = 1.;
+        //TODO: revert due to alignment issues in rel9 (!5184)
+        //innerTrafo.Zero();
+        //innerTrafo.SetSub(3, 0, getGlobalToLocalTransform(track->getFittedState()).GetSub(3, 4, 0, 2));
+        //innerTrafo[0][iCol++] = 1.;
+        //innerTrafo[1][iCol++] = 1.;
+        //innerTrafo[2][iCol++] = 1.;
 
 
         daughters.push_back({
           gbl->collectGblPoints(track, track->getCardinalRep()),
-          innerTrafo
+          //TODO: revert due to alignment issues in rel9 (!5184)
+          //innerTrafo
+          getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2)
         });
       }
 
@@ -418,7 +416,9 @@ void MillepedeCollectorModule::collect()
         extMeasurements[1] = vertexResidual[1];
         extMeasurements[2] = vertexResidual[2];
 
-        TMatrixD extDeriv(3, 9);
+        //TODO: revert due to alignment issues in rel9 (!5184)
+        //TMatrixD extDeriv(3, 9);
+        TMatrixD extDeriv(3, 3);
         extDeriv.Zero();
         // beam vertex constraint
         extDeriv(0, 0) = 1.;
@@ -533,7 +533,7 @@ void MillepedeCollectorModule::collect()
     }
   }
 
-  for (auto listName : m_twoBodyDecays) {
+  for (const auto& listName : m_twoBodyDecays) {
     StoreObjPtr<ParticleList> list(listName);
     if (!list.isValid())
       continue;
@@ -596,7 +596,7 @@ void MillepedeCollectorModule::collect()
     }
   }
 
-  for (auto listName : m_primaryMassTwoBodyDecays) {
+  for (const auto& listName : m_primaryMassTwoBodyDecays) {
     StoreObjPtr<ParticleList> list(listName);
     if (!list.isValid())
       continue;
@@ -652,7 +652,7 @@ void MillepedeCollectorModule::collect()
     }
   }
 
-  for (auto listName : m_primaryMassVertexTwoBodyDecays) {
+  for (const auto& listName : m_primaryMassVertexTwoBodyDecays) {
     StoreObjPtr<ParticleList> list(listName);
     if (!list.isValid())
       continue;
@@ -721,7 +721,7 @@ void MillepedeCollectorModule::collect()
     }
   }
 
-  for (auto listName : m_primaryTwoBodyDecays) {
+  for (const auto& listName : m_primaryTwoBodyDecays) {
     B2WARNING("This should NOT be used for production of calibration constants for the real detector (yet)!");
 
     StoreObjPtr<ParticleList> list(listName);
@@ -1068,7 +1068,7 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
         if (trackPoint) {
           if (not trackPoint->hasFitterInfo(recoTrack.getCardinalRepresentation()))
             continue;
-          auto kalmanFitterInfo = dynamic_cast<genfit::KalmanFitterInfo*>(trackPoint->getFitterInfo());
+          const auto* kalmanFitterInfo = dynamic_cast<genfit::KalmanFitterInfo*>(trackPoint->getFitterInfo());
           if (not kalmanFitterInfo) {
             continue;
           } else {
@@ -1298,7 +1298,7 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
   return tracks;
 }
 
-std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransform(Particle& mother,
+std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransform(const Particle& mother,
     double motherMass)
 {
   std::vector<TMatrixD> result;
@@ -1578,7 +1578,7 @@ TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(const genfit::Measu
 
 }
 
-tuple<B2Vector3D, TMatrixDSym> MillepedeCollectorModule::getPrimaryVertexAndCov() const
+tuple<B2Vector3D, TMatrixDSym> MillepedeCollectorModule::getPrimaryVertexAndCov()
 {
   DBObjPtr<BeamSpot> beam;
   return {beam->getIPPosition(), beam->getSizeCovMatrix()};
@@ -1592,4 +1592,3 @@ void MillepedeCollectorModule::updateMassWidthIfSet(string listName, double& mas
     width = std::get<1>(massWidth);
   }
 }
-

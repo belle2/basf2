@@ -6,12 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/svd/filters/results/SVDResultTruthVarSet.h>
+#include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <framework/dataobjects/EventMetaData.h>
+
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool SVDResultTruthVarSet::extract(const CKFToSVDResult* result)
 {

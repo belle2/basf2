@@ -13,10 +13,10 @@
 
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
 #include <framework/database/DBObjPtr.h>
-#include <analysis/dataobjects/Particle.h>
 #include <string>
 
 namespace Belle2 {
+  class Particle;
 
   /**
   * Energy bias correction

@@ -6,13 +6,19 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <pxd/modules/pxdUnpacking/PXDUnpackerModule.h>
 #include <pxd/unpacking/PXDRawDataDefinitions.h>
 #include <pxd/unpacking/PXDRawDataStructs.h>
 #include <pxd/unpacking/PXDMappingLookup.h>
-#include <pxd/modules/pxdUnpacking/PXDUnpackerModule.h>
-#include <framework/datastore/DataStore.h>
+#include <rawdata/dataobjects/RawPXD.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDRawAdc.h>
+#include <pxd/dataobjects/PXDRawROIs.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <pxd/dbobjects/PXDDHHFirmwareVersionPar.h>
+#include <vxd/dataobjects/VxdID.h>
+
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 using namespace std;
 using namespace Belle2;

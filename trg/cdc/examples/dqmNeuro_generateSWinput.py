@@ -79,5 +79,5 @@ add_reconstruction(main)
 
 main.add_module('RootOutput', outputFileName="phase3bckg-0-reco_sim.root")
 main.add_module('Progress')
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

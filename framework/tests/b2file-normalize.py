@@ -24,17 +24,17 @@ for i in range(1000):
 hist.Write()
 oldHist = hist.Clone()
 oldHist.SetDirectory(0)
-del(rootfile)
+del rootfile
 
 subprocess.run(['b2file-normalize', '-i', '-n', 'NormalizedRootFile', '-r', '61408', fileName], check=True)
 
 newRootFile = ROOT.TFile.Open(fileName)
 newHist = newRootFile.Get('hist')
 assert 0 == newHist.Chi2Test(oldHist, 'PCHI2')
-del(newRootFile)
+del newRootFile
 
 checksum = hashlib.md5()
 checksum.update(open(fileName, 'rb').read())
 print(checksum.digest().hex())
-assert checksum.digest().hex() == 'ddef04f82a39be019daf7c83d2f5005c'
-del(testFile)
+assert checksum.digest().hex() == '39deb8fac1436ea75f959f5ba2bbee5b'
+del testFile

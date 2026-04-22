@@ -87,6 +87,11 @@ LogConfig& LogPythonInterface::getPackageLogConfig(const std::string& package)
   return LogSystem::Instance().getPackageLogConfig(package);
 }
 
+LogConfig& LogPythonInterface::getModuleLogConfig(const std::string& module)
+{
+  return LogSystem::Instance().getModuleLogConfig(module);
+}
+
 unsigned LogPythonInterface::getMaxMessageRepetitions() const
 {
   return LogSystem::Instance().getMaxMessageRepetitions();
@@ -390,6 +395,12 @@ these will be suppressed after the given amount of repetitions.
        "Set `basf2.LogConfig` for given package, see also `package() <basf2.LogPythonInterface.package>`.")
   .def("package", &LogPythonInterface::getPackageLogConfig, return_value_policy<reference_existing_object>(), args("package"),
        R"(Get the `LogConfig` for given package to set detailed logging pararameters for this package.
+
+  >>> logging.package('svd').debug_level = 10
+  >>> logging.package('svd').set_info(LogLevel.INFO, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.FILE)
+      )")
+  .def("module", &LogPythonInterface::getModuleLogConfig, return_value_policy<reference_existing_object>(), args("module"),
+       R"(Get the `LogConfig` for given package to set detailed logging pararameters for this module.
 
   >>> logging.package('svd').debug_level = 10
   >>> logging.package('svd').set_info(LogLevel.INFO, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.FILE)

@@ -267,7 +267,7 @@ main.add_module(rootoutput)
 # he3tube.param('sampleTime', sampletime);
 # main.add_module(he3tube)
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print some basic event statistics
 print('Event Statistics:')

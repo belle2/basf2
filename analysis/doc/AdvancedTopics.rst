@@ -7,7 +7,11 @@ Advanced Topics
 
 .. toctree:: FlavorTagger
 
+.. toctree:: TransformerFlavorTagger
+
 .. toctree:: DeepFlavorTagger
+
+.. toctree:: CharmFlavorTagger
 
 .. toctree:: FullEventInterpretation
 

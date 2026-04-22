@@ -16,9 +16,6 @@ Execute script with:
   $> basf2 printMCParticleArray.py -i [input_ROOT_file]
 """
 
-# Doxygen should skip this script
-# @cond
-
 import basf2
 import modularAnalysis as ma
 
@@ -32,5 +29,3 @@ ma.printMCParticles(path=path)
 ma.variablesToNtuple(decayString="", variables=[], path=path)
 
 basf2.process(path)
-
-# @endcond

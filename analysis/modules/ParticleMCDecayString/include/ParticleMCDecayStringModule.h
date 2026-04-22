@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/StringWrapper.h>
 

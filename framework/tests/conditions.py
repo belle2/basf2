@@ -8,9 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# this is a test executable, not a module so we don't need doxygen warnings
-# @cond SUPPRESS_DOXYGEN
-
 """
 Script to make sure the conditions database interface is behaving as expected.
 
@@ -214,7 +211,7 @@ def dbprocess(host, path, lastChangeCallback=lambda: None, *, globaltag="localte
     # Run the path in a child process inside of a clean working directory
     with clean_working_directory():
         # make logging more reproducible by replacing some strings
-        configure_logging_for_tests()
+        configure_logging_for_tests(replace_cdb_provider=False)
         basf2.logging.log_level = basf2.LogLevel.DEBUG
         basf2.logging.debug_level = 30
         basf2.conditions.reset()
@@ -335,5 +332,3 @@ if "ssl" in sys.argv:
     # available
     for hostname in ("expired", "wrong.host", "self-signed", "untrusted-root"):
         dbprocess(f"https://{hostname}.badssl.com/", main)
-
-# @endcond

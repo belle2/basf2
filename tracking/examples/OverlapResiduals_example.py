@@ -44,7 +44,7 @@ main.add_module('OverlapResiduals')
 main.add_module('ProgressBar')
 
 # Process events
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(basf2.statistics)

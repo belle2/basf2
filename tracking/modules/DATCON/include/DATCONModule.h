@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 #include <tracking/datcon/findlets/DATCONFPGAFindlet.h>
 
 namespace Belle2 {
   /**
    * DATCON module which implementation is close to the one actually used on the FPGA.
    */
-  class DATCONModule : public TrackFindingCDC::FindletModule<DATCONFPGAFindlet> {
+  class DATCONModule : public TrackingUtilities::FindletModule<DATCONFPGAFindlet> {
 
   public:
     /// Set description

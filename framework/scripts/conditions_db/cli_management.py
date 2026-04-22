@@ -130,7 +130,7 @@ def command_tag_merge(args, db=None):
         payload1, rev 3, valid from 1,20 to 1,21
         payload2, rev 1, valid from 1,0 to 1,21
 
-    .. versionadded:: release-05-01-00
+    .. note:: Version added: release-05-01-00
     """
 
     if db is None:

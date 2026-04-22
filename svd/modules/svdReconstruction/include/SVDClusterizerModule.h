@@ -29,6 +29,7 @@
 #include <svd/calibration/SVDMCClusterTimeFudgeFactor.h>
 #include <svd/dbobjects/SVDRecoConfiguration.h>
 #include <svd/dbobjects/SVDClusterTimeShifter.h>
+#include <svd/dbobjects/SVDAbsoluteClusterTimeShift.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <TMath.h>
@@ -61,6 +62,9 @@ namespace Belle2 {
       void endRun() override;
 
     protected:
+
+      /** true if we are reconstructing MC*/
+      bool m_isMC = false;
 
       //1. Collections and relations Names
       /** Name of the collection to use for the SVDEventInfo */
@@ -147,6 +151,7 @@ namespace Belle2 {
       SVDMCClusterPositionFudgeFactor m_mcPositionFudgeFactor; /**<SVDMCClusterPositionFudgeFactor db object*/
       SVDMCClusterTimeFudgeFactor m_mcTimeFudgeFactor; /**<SVDMCClusterTimeFudgeFactor db object*/
       DBObjPtr<SVDClusterTimeShifter> m_svdClusterTimeShifter; /**< SVDCluster time shift*/
+      DBObjPtr<SVDAbsoluteClusterTimeShift> m_svdAbsTimeShift; /**< SVDCluster absolute time shift*/
 
       /**
        * returns the position of the cluster after
@@ -168,7 +173,7 @@ namespace Belle2 {
       /**
        * alter the cluster position (applied on MC to match resolution measured on data)
        */
-      void alterClusterPosition();
+      void alterClusterPosition(Belle2::SVDTrueHit* trueHit);
 
       /**
        * alter the cluster time (applied on MC to match resolution measured on data)

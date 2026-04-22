@@ -21,8 +21,10 @@
 #include <framework/datastore/RelationIndex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
+#include <pxd/dataobjects/PXDSimHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDInjectionBGTiming.h>
 #include <cmath>
 
 #include <TRandom.h>

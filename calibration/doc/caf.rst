@@ -125,7 +125,6 @@ This could be useful if a Collector step succeeded previously, but now needs to 
     :func: get_argparser
     :prog: b2caf-status
     :nodefaultconst:
-    :nogroupsections:
 
 
 The b2caf-filemap Tool
@@ -144,7 +143,6 @@ containing the dictionary.
     :func: get_argparser
     :prog: b2caf-filemap
     :nodefaultconst:
-    :nogroupsections:
 
 
 Job Submission Backends

@@ -9,6 +9,7 @@
 #include <top/modules/collectors/TOPPhotonYieldsCollectorModule.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
 #include <top/geometry/TOPGeometryPar.h>
+#include <top/dataobjects/TOPTimeZero.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -46,7 +47,6 @@ namespace Belle2 {
     addParam("deltaEcms", m_deltaEcms, "c.m.s energy window (half size) if sample is dimuon or bhabha", 0.1);
     addParam("dr", m_dr, "cut on POCA in r", 2.0);
     addParam("dz", m_dz, "cut on POCA in abs(z)", 4.0);
-    addParam("minThresholdEffi", m_minThresholdEffi, "threshold efficiency cut to suppress unreliable calibrations", 0.7);
 
   }
 
@@ -66,7 +66,7 @@ namespace Belle2 {
       m_selector = TrackSelector(m_sample);
       m_selector.setDeltaEcms(m_deltaEcms);
       m_selector.setCutOnPOCA(m_dr, m_dz);
-      m_selector.setCutOnLocalZ(m_minZ, m_maxZ);
+      m_selector.setCutOnLocalZ(m_minZprism, m_maxZ);
     } else {
       B2ERROR("Invalid sample type '" << m_sample << "'");
     }
@@ -75,6 +75,10 @@ namespace Belle2 {
 
     const int numModules = 16;
     const int numPixels = 512;
+
+    // TOF corrections
+    auto* tofCorrections = new TProfile("tofCorrections", "TOF corrections; local z [cm]; t0 [ns]", 1000, m_minZprism, m_maxZ, -1, 1);
+    registerObject<TProfile>("tofCorrections", tofCorrections);
 
     // time stamp (average unix time and its standard deviation)
     auto* timeStamp = new TProfile("timeStamp", "Time stamp; ; unix time", 1, 0, 1, 0, 1.0e10, "S");
@@ -115,6 +119,17 @@ namespace Belle2 {
       h->SetYTitle("track count");
       registerObject<TH1F>(name, h);
       m_activeNames.push_back(name);
+    }
+
+    // number of effective signal hits in pixels
+    for (int slot = 1; slot <= numModules; slot++) {
+      string name = (slot < 10) ? "effectiveSignalHits_0" + to_string(slot) : "effectiveSignalHits_" + to_string(slot);
+      string title = "Effective signal hits for slot " + to_string(slot);
+      auto h = new TH1F(name.c_str(), title.c_str(), numPixels, 0.5, numPixels + 0.5);
+      h->SetXTitle("pixel number");
+      h->SetYTitle("hit count");
+      registerObject<TH1F>(name, h);
+      m_effectiveSignalNames.push_back(name);
     }
 
     // number of pixel hits with low impact angle on photo cathode
@@ -178,7 +193,16 @@ namespace Belle2 {
       if (not trk.isValid()) continue;
       if (not m_selector.isSelected(trk)) continue;
 
-      // fill histograms
+      // fill TOF corrections
+      double localZ = m_selector.getLocalPosition().Z();
+      const auto* timeZero = trk.getExtHit()->getRelated<TOPTimeZero>();
+      if (timeZero and timeZero->isValid()) {
+        auto tofCorrections = getObjectPtr<TProfile>("tofCorrections");
+        tofCorrections->Fill(localZ, timeZero->getTime());
+      }
+      if (localZ < m_minZ) continue;
+
+      // fill all the other histograms
       auto timeStamp = getObjectPtr<TProfile>("timeStamp");
       timeStamp->Fill(0.5, m_eventMetaData->getTime() / 1000000000);
 
@@ -195,16 +219,12 @@ namespace Belle2 {
       for (const auto& digit : m_digits) {
         if (digit.getModuleID() != slot) continue;
         if (digit.getHitQuality() != TOPDigit::c_Good) continue;  // junk hit or pixel masked-out
-        if (not m_thresholdEff->isCalibrated(slot, digit.getChannel())) continue;  // threshold effi. not calibrated
-        double effi = m_thresholdEff->getThrEff(slot, digit.getChannel());
-        if (effi < m_minThresholdEffi) continue; // to suppress possibly unreliable calibration
         if (std::abs(digit.getTime()) > m_timeWindow) continue;
-        // fill signal and background hits with weight=1/effi to correct for threshold efficiency
         if (digit.getTime() > 0) {
-          signalHits->Fill(digit.getPixelID(), 1 / effi);
+          signalHits->Fill(digit.getPixelID());
           pulseHeight->Fill(digit.getPixelID(), digit.getPulseHeight());
         } else {
-          bkgHits->Fill(digit.getPixelID(), 1 / effi);
+          bkgHits->Fill(digit.getPixelID());
         }
       }
 
@@ -212,30 +232,30 @@ namespace Belle2 {
       const auto& chMapper = TOPGeometryPar::Instance()->getChannelMapper();
       for (int pixel = 1; pixel <= activePixels->GetNbinsX(); pixel++) {
         unsigned channel = chMapper.getChannel(pixel);
-        if (not m_thresholdEff->isCalibrated(slot, channel)) continue; // pixel excluded in counting hits
-        if (m_thresholdEff->getThrEff(slot, channel) < m_minThresholdEffi) continue; // pixel excluded in counting hits
         if (m_channelMask->isActive(slot, channel) and m_asicMask->isActive(slot, channel)) activePixels->Fill(pixel);
       }
 
-      if (std::abs(m_selector.getLocalPosition().Z()) > m_excludedZ) {
-        auto alphaLow = getObjectPtr<TH1F>(m_alphaLowNames[slot - 1]);
-        auto alphaHigh = getObjectPtr<TH1F>(m_alphaHighNames[slot - 1]);
-        for (const auto& digit : m_digits) {
-          if (digit.getModuleID() != slot) continue;
-          if (digit.getHitQuality() != TOPDigit::c_Good) continue;  // junk hit or pixel masked-out
-          const auto* pdf = digit.getRelated<TOPAssociatedPDF>();
-          if (not pdf) continue;
-          const auto* peak = pdf->getSinglePeak();
-          if (not peak) continue;  // hit associated with background
+      auto alphaLow = getObjectPtr<TH1F>(m_alphaLowNames[slot - 1]);
+      auto alphaHigh = getObjectPtr<TH1F>(m_alphaHighNames[slot - 1]);
+      auto effectiveSignalHits = getObjectPtr<TH1F>(m_effectiveSignalNames[slot - 1]);
+      for (const auto& digit : m_digits) {
+        if (digit.getModuleID() != slot) continue;
+        if (digit.getHitQuality() != TOPDigit::c_Good) continue;  // junk hit or pixel masked-out
+        const auto* pdf = digit.getRelated<TOPAssociatedPDF>();
+        if (not pdf) continue;
+        const auto* peak = pdf->getSinglePeak();
+        if (not peak) continue;  // hit associated with background
+        effectiveSignalHits->Fill(digit.getPixelID());
+        if (std::abs(m_selector.getLocalPosition().Z()) > m_excludedZ) {
           double alpha = acos(std::abs(peak->kzd)) / Unit::deg;
           if (alpha > 60) continue;
           if (alpha < 30) alphaLow->Fill(digit.getPixelID());
           else alphaHigh->Fill(digit.getPixelID());
         }
       }
-    }
+    } // loop over tracks
 
   }
 
 
-}
+} // end namespace Belle2

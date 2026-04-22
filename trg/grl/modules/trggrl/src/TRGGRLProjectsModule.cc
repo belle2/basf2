@@ -78,7 +78,6 @@ TRGGRLProjectsModule::TRGGRLProjectsModule() : Module()
   setDescription("TRGGRLProjectsModule");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("DebugLevel", _debugLevel, "TRGGRL debug level", _debugLevel);
   addParam("ConfigFile",
            m_configFilename,
            "The filename of CDC trigger config file",
@@ -87,14 +86,6 @@ TRGGRLProjectsModule::TRGGRLProjectsModule() : Module()
            m_simulationMode,
            "TRGGRL simulation switch",
            1);
-  addParam("FastSimulationMode",
-           m_fastSimulationMode,
-           "TRGGRL fast simulation mode",
-           m_fastSimulationMode);
-  addParam("FirmwareSimulationMode",
-           m_firmwareSimulationMode,
-           "TRGGRL firmware simulation mode",
-           m_firmwareSimulationMode);
   addParam("2DfinderCollection", m_2DfinderCollectionName,
            "Name of the StoreArray holding the tracks made by the 2D finder to be used as input.",
            string("TRGCDC2DFinderTracks"));
@@ -579,10 +570,13 @@ void TRGGRLProjectsModule::event()
   // bha_type13: 33
   bool bha_type13 = (ECLtoGDL[1] & (1 << (33 - 32 * 1))) != 0;
 
-  bool nclst_0 = (eclTrgClusterArray.getEntries() & (1 << 0)) != 0;
-  bool nclst_1 = (eclTrgClusterArray.getEntries() & (1 << 1)) != 0;
-  bool nclst_2 = (eclTrgClusterArray.getEntries() & (1 << 2)) != 0;
-  bool nclst_3 = (eclTrgClusterArray.getEntries() & (1 << 3)) != 0;
+  unsigned int icn = (ECLtoGDL[1] >> (50 - 32 * 1)) & 0x7F;
+  if (icn > 14)
+    icn = 15;
+  bool nclst_0 = (icn >> 0) & 0x1;
+  bool nclst_1 = (icn >> 1) & 0x1;
+  bool nclst_2 = (icn >> 2) & 0x1;
+  bool nclst_3 = (icn >> 3) & 0x1;
 
   // ecl_bg_0: 57
   bool ecl_bg_0 = (ECLtoGDL[1] & (1 << (57 - 32 * 1))) != 0;

@@ -66,5 +66,5 @@ gearbox.param({
 # })
 
 # Process all events
-process(main)
+process(main, calculateStatistics=True)
 print(statistics(statistics.BEGIN_RUN))

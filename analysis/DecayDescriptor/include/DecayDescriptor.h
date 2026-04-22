@@ -61,8 +61,6 @@ namespace Belle2 {
     bool m_isInitOK;
 
   public:
-    /** Singleton object representing NULL. */
-    const static DecayDescriptor& s_NULL;
 
     /** Dereference operator. */
     operator DecayDescriptor* ()

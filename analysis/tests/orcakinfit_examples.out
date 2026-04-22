@@ -580,7 +580,7 @@ TBranch: eta_mcErrors, 0
 TBranch: eta_mcPDG, 221
 TBranch: Upsilon_M, 9.476
 TBranch: Upsilon_ErrM, 0.006925
-TBranch: Upsilon_SigM, 2.317
+TBranch: Upsilon_SigM, 2.302
 TBranch: Upsilon_InvM, 9.476
 TBranch: Upsilon_px, -0.0228
 TBranch: Upsilon_py, -0.1258

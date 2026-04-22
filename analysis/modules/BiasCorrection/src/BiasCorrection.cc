@@ -8,6 +8,7 @@
 
 // Own header.
 #include <analysis/modules/BiasCorrection/BiasCorrection.h>
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 

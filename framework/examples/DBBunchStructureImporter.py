@@ -13,7 +13,7 @@
 # Usage: basf2 DBBunchStructureImporter.py <minexp> <minrun> <maxexp> <maxrun>
 #
 # if minexp is 0 the designed filling pattern will be created. Meaning 10101010...
-# if minexp is 1003 the early phase 3 pattern will be created. Take the most used filling pattern.
+# if minexp is 1003 the Run 1 (early phase 3) pattern will be created. Take the most used filling pattern.
 
 
 from ROOT import Belle2
@@ -112,7 +112,7 @@ if __name__ == "__main__":
             12,
             1859],
         type=int,
-        help='Change run and experiment of the filling pattern to be used for early phase 3 \
+        help='Change run and experiment of the filling pattern to be used for Run 1 (early phase 3) \
         run-independent MC (exp 1003). (default: %(default)s)')
 
     parser.add_argument(
@@ -165,7 +165,7 @@ if __name__ == "__main__":
             username = input("Enter your DESY username:")
             rundb = RunDB(username=username)
 
-            basf2.B2INFO(f"Use exp {args.exprun1003[0]} and run {args.exprun1003[1]} for early phase 3 run-independent MC")
+            basf2.B2INFO(f"Use exp {args.exprun1003[0]} and run {args.exprun1003[1]} for Run 1 (early phase 3) run-independent MC")
 
             runInfo = rundb.get_run_info(
                 min_experiment=args.exprun1003[0],

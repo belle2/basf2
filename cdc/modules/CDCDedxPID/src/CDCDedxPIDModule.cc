@@ -8,10 +8,7 @@
 
 #include <cdc/modules/CDCDedxPID/CDCDedxPIDModule.h>
 
-#include <reconstruction/dataobjects/DedxConstants.h>
 #include <cdc/modules/CDCDedxPID/LineHelper.h>
-
-#include <framework/gearbox/Const.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
@@ -20,6 +17,10 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
+
+#include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+#include <reconstruction/dataobjects/DedxConstants.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 
 #include <genfit/AbsTrackRep.h>
@@ -56,8 +57,6 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module()
            "Portion of events with high dE/dx that should be discarded", double(0.25));
   addParam("useBackHalfCurlers", m_backHalfCurlers,
            "Whether to use the back half of curlers", false);
-  addParam("enableDebugOutput", m_enableDebugOutput,
-           "Option to write out debugging information to CDCDedxTracks (DataStore objects).", true);
   addParam("useIndividualHits", m_useIndividualHits,
            "If using lookup table PDFs, include PDF value for each hit in likelihood. If false, the truncated mean of dedx values will be used.",
            true);
@@ -120,11 +119,8 @@ void CDCDedxPIDModule::initialize()
   m_mcparticles.isOptional();
   m_tracks.optionalRelationTo(m_mcparticles);
 
-  // register optional outputs
-  if (m_enableDebugOutput) {
-    m_dedxTracks.registerInDataStore();
-    m_tracks.registerRelationTo(m_dedxTracks);
-  }
+  m_dedxTracks.registerInDataStore();
+  m_tracks.registerRelationTo(m_dedxTracks);
 
   // register outputs
   m_dedxLikelihoods.registerInDataStore();
@@ -204,7 +200,7 @@ void CDCDedxPIDModule::event()
       continue;
     }
 
-    if ((m_enableDebugOutput or m_onlyPrimaryParticles) and numMCParticles != 0) {
+    if (m_onlyPrimaryParticles and numMCParticles != 0) {
       // find MCParticle corresponding to this track
       const MCParticle* mcpart = track.getRelatedTo<MCParticle>();
 
@@ -269,9 +265,6 @@ void CDCDedxPIDModule::event()
     bool isData = false;
     if (m_usePrediction && numMCParticles == 0)isData = true;
     dedxTrack->m_runGain = (m_DBRunGain && isData) ? m_DBRunGain->getRunGain() : 1.0;
-
-    // get the cosine correction only for data!
-    dedxTrack->m_cosCor = (m_DBCosineCor && isData) ? m_DBCosineCor->getMean(costh) : 1.0;
 
     // get the cosine edge correction only for data!
     bool isEdge = false;
@@ -406,10 +399,10 @@ void CDCDedxPIDModule::event()
         const genfit::MeasuredStateOnPlane& mop = fi->getFittedState();
 
         // use the MOP to determine the DOCA and entrance angle
-        B2Vector3D fittedPoca = mop.getPos();
-        const TVector3& pocaMom = mop.getMom();
+        ROOT::Math::XYZVector fittedPoca = ROOT::Math::XYZVector(mop.getPos());
+        const ROOT::Math::XYZVector& pocaMom = ROOT::Math::XYZVector(mop.getMom());
         if (tp == gftrackPoints.begin() || cdcMom == 0) {
-          cdcMom = pocaMom.Mag();
+          cdcMom = pocaMom.R();
           dedxTrack->m_pCDC = cdcMom;
         }
         if (nomom)
@@ -422,13 +415,13 @@ void CDCDedxPIDModule::event()
         //  B2Vector3D pocaOnWire = cdcRecoHit->constructPlane(mop)->getO();
 
         // uses the plane determined by the track fit.
-        B2Vector3D pocaOnWire = mop.getPlane()->getO(); // DOUBLE CHECK THIS --\/
+        ROOT::Math::XYZVector pocaOnWire = ROOT::Math::XYZVector(mop.getPlane()->getO()); // DOUBLE CHECK THIS --\/
 
         // The vector from the wire to the track.
-        B2Vector3D B2WireDoca = fittedPoca - pocaOnWire;
+        ROOT::Math::XYZVector B2WireDoca = fittedPoca - pocaOnWire;
 
         // the sign of the doca is defined here to be positive in the +x dir in the cell
-        double doca = B2WireDoca.Perp();
+        double doca = B2WireDoca.Rho();
         double phidiff = fittedPoca.Phi() - pocaOnWire.Phi();
         // be careful about "wrap around" cases when the poca and wire are close, but
         // the difference in phi is largy
@@ -471,6 +464,9 @@ void CDCDedxPIDModule::event()
         // now calculate the path length for this hit
         double celldx = c.dx(doca, entAng);
         if (c.isValid()) {
+          // get the cosine correction only for data!
+          double cosCor = (m_DBCosineCor && isData) ? m_DBCosineCor->getMean(currentLayer, costh) : 1.0;
+
           // get the wire gain constant
           double wiregain = (m_DBWireGains && m_usePrediction && numMCParticles == 0) ? m_DBWireGains->getWireGain(iwire) : 1.0;
 
@@ -485,7 +481,7 @@ void CDCDedxPIDModule::event()
           // apply the calibration to dE to propagate to both hit and layer measurements
           // Note: could move the sin(theta) here since it is common across the track
           //       It is applied in two places below (hit level and layer level)
-          double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * dedxTrack->m_cosEdgeCor * dedxTrack->m_timeGain * wiregain *
+          double correction = dedxTrack->m_runGain * cosCor * dedxTrack->m_cosEdgeCor * dedxTrack->m_timeGain * wiregain *
                               twodcor * onedcor;
 
           // --------------------
@@ -500,11 +496,10 @@ void CDCDedxPIDModule::event()
           if (nomom) cellDedx *= std::sin(std::atan(1 / fitResult->getCotTheta()));
           else cellDedx *= std::sin(trackMom.Theta());
 
-          if (m_enableDebugOutput)
-            dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS,
-                              adcCount, adcbaseCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
-                              driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
-                              foundByTrackFinder, weightPionHypo, weightKaonHypo, weightProtHypo);
+          dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS,
+                            adcCount, adcbaseCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
+                            driftDRealistic, driftDRealisticRes, cosCor, wiregain, twodcor, onedcor,
+                            foundByTrackFinder, weightPionHypo, weightKaonHypo, weightProtHypo);
 
           // --------------------
           // save layer hits only with active wires
@@ -574,7 +569,7 @@ void CDCDedxPIDModule::event()
     // If using track-level MC, get the predicted mean and resolution and throw a random
     // number to get the simulated dE/dx truncated mean. Otherwise, calculate the truncated
     // mean from the simulated hits (hit-level MC).
-    if (!m_useIndividualHits or m_enableDebugOutput) {
+    if (!m_useIndividualHits) {
       calculateMeans(&(dedxTrack->m_dedxAvg),
                      &(dedxTrack->m_dedxAvgTruncatedNoSat),
                      &(dedxTrack->m_dedxAvgTruncatedErr),
@@ -622,11 +617,9 @@ void CDCDedxPIDModule::event()
     CDCDedxLikelihood* likelihoodObj = m_dedxLikelihoods.appendNew(pidvalues);
     track.addRelationTo(likelihoodObj);
 
-    if (m_enableDebugOutput) {
-      // book the information for this track
-      CDCDedxTrack* newCDCDedxTrack = m_dedxTracks.appendNew(*dedxTrack);
-      track.addRelationTo(newCDCDedxTrack);
-    }
+    // book the information for this track
+    CDCDedxTrack* newCDCDedxTrack = m_dedxTracks.appendNew(*dedxTrack);
+    track.addRelationTo(newCDCDedxTrack);
 
   } // end of loop over tracks
 }

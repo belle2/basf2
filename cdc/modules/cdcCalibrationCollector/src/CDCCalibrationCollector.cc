@@ -10,8 +10,8 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <cdc/topology/CDCWireTopology.h>
 
 #include <genfit/TrackPoint.h>
 #include <genfit/KalmanFitterInfo.h>
@@ -31,7 +31,7 @@
 using namespace Belle2;
 using namespace CDC;
 using namespace genfit;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 REG_MODULE(CDCCalibrationCollector);
@@ -42,7 +42,7 @@ CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationColl
   setDescription("Collector module for cdc calibration");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("recoTracksColName", m_recoTrackArrayName, "Name of collection hold genfit::Track", std::string(""));
-  addParam("bField", m_bField, "If true -> #Params ==5 else #params ==4 for calculate P-Val", false);
+  //addParam("bField", m_bField, "If true -> #Params ==5 else #params ==4 for calculate P-Val", false);
   addParam("calExpectedDriftTime", m_calExpectedDriftTime, "if true module will calculate expected drift time, it take a time",
            true);
   addParam("storeTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", false);
@@ -118,6 +118,18 @@ void CDCCalibrationCollectorModule::prepare()
   registerObject<TH1F>("hEventT0", m_hEventT0);
   registerObject<TH1F>("hNTracks", m_hNTracks);
   registerObject<TH1F>("hOccupancy", m_hOccupancy);
+
+  ROOT::Math::XYZVector pos(0, 0, 0);
+  ROOT::Math::XYZVector bfield = BFieldManager::getFieldInTesla(pos);
+  if (bfield.Z() > 0.5) {
+    m_bField = true;
+    B2INFO("CDCCalibrationCollector: Magnetic field is ON");
+  } else {
+    m_bField = false;
+    B2INFO("CDCCalibrationCollector: Magnetic field is OFF");
+  }
+  B2INFO("BField at (0,0,0)  = " << bfield.R());
+
 }
 
 void CDCCalibrationCollectorModule::collect()
@@ -151,28 +163,10 @@ void CDCCalibrationCollectorModule::collect()
   // WireID collection finished
 
   const int nTr = m_Tracks.getEntries();
-  // Skip events which have number of charged tracks <= 1.
-  int nCTracks  = 0;
-  for (int i = 0; i < nTr; ++i) {
-    const Belle2::Track* b2track = m_Tracks[i];
-    const Belle2::TrackFitResult* fitresult = b2track->getTrackFitResultWithClosestMass(Const::muon);
-    if (!fitresult) continue;
-
-    short charge = fitresult->getChargeSign();
-    if (std::abs(charge) > 0) {
-      nCTracks++;
-    }
-  }
-
-  if (nCTracks <= 1) {
-    return ;
-  } else {
-    getObjectPtr<TH1F>("hNTracks")->Fill(nCTracks);
-  }
-
   const int nHits = m_CDCHits.getEntries();
   const int nWires = 14336;
   float oc = static_cast<float>(nHits) / static_cast<float>(nWires);
+  getObjectPtr<TH1F>("hNTracks")->Fill(nTr);
   getObjectPtr<TH1F>("hOccupancy")->Fill(oc);
 
   for (int i = 0; i < nTr; ++i) {
@@ -298,15 +292,14 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
 const CDCWire& CDCCalibrationCollectorModule::getIntersectingWire(const ROOT::Math::XYZVector& xyz, const CDCWireLayer& layer,
     const Helix& helixFit) const
 {
-  Vector3D crosspoint;
+  ROOT::Math::XYZVector crosspoint;
   if (layer.isAxial())
-    crosspoint = Vector3D(xyz);
+    crosspoint = xyz;
   else {
     const CDCWire& oneWire = layer.getWire(1);
-    double newR = oneWire.getWirePos2DAtZ(xyz.Z()).norm();
+    double newR = oneWire.getWirePos2DAtZ(xyz.Z()).R();
     double arcLength = helixFit.getArcLength2DAtCylindricalR(newR);
-    ROOT::Math::XYZVector xyzOnWire = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
-    crosspoint = Vector3D(xyzOnWire);
+    crosspoint = helixFit.getPositionAtArcLength2D(arcLength);
   }
 
   const CDCWire& wire = layer.getClosestWire(crosspoint);
@@ -316,7 +309,7 @@ const CDCWire& CDCCalibrationCollectorModule::getIntersectingWire(const ROOT::Ma
 
 void CDCCalibrationCollectorModule::buildEfficiencies(std::vector<unsigned short> wireHits, const Helix helixFit)
 {
-  static const TrackFindingCDC::CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+  static const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
     const double radiusofLayer = wireLayer.getRefCylindricalR();
     //simple extrapolation of fit

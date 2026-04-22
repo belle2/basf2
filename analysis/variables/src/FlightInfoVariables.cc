@@ -19,7 +19,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dbobjects/BeamSpot.h>
 
-#include <TMatrixFSym.h>
+#include <TMatrixF.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -96,9 +96,11 @@ namespace Belle2 {
         } else {
           //if no production vertex assume the particle originated at the ip
           static DBObjPtr<BeamSpot> beamSpotDB;
-          mumvtxX = (beamSpotDB->getIPPosition()).X();
-          mumvtxY = (beamSpotDB->getIPPosition()).Y();
-          mumvtxZ = (beamSpotDB->getIPPosition()).Z();
+          if (beamSpotDB.isValid()) {
+            mumvtxX = (beamSpotDB->getIPPosition()).X();
+            mumvtxY = (beamSpotDB->getIPPosition()).Y();
+            mumvtxZ = (beamSpotDB->getIPPosition()).Z();
+          }
         }
       }
       //daughter vertex
@@ -139,7 +141,8 @@ namespace Belle2 {
           }
         } else {
           static DBObjPtr<BeamSpot> beamSpotDB;
-          mumCov = beamSpotDB->getCovVertex();
+          if (beamSpotDB.isValid())
+            mumCov = beamSpotDB->getCovVertex();
         }
       }
       //compute total covariance matrix

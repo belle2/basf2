@@ -25,6 +25,8 @@ import trackfindingcdc.harvest.cdc_peelers as cdc_peelers
 
 import logging
 
+# @cond internal_test
+
 
 def get_logger():
     return logging.getLogger(__name__)
@@ -411,3 +413,5 @@ def main():
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
     main()
+
+# @endcond

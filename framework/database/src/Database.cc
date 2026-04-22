@@ -183,9 +183,10 @@ namespace Belle2 {
                 << LogVar("provider", m_currentProvider) << LogVar("error", e.what()));
       return nextMetadataProvider();
     }
-    // and check the tags are usable
+    // and check the tags are usable: if not, fallback to the next metadata provider
     if (!m_metadataProvider->setTags(m_globalTags)) {
-      B2FATAL("Conditions data: Problems with globaltag configuration, cannot continue");
+      B2WARNING("Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...");
+      return nextMetadataProvider();
     }
   }
 

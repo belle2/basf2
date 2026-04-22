@@ -6,17 +6,16 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef GAMMALEPTONUCLEARPHYSICS_H
-#define GAMMALEPTONUCLEARPHYSICS_H
+#pragma once
 
 #include "G4VPhysicsConstructor.hh"
-#include "G4GammaParticipants.hh"
-#include "G4QGSModel.hh"
 
 class G4TheoFSGenerator;
 class G4ExcitedStringDecay;
 class G4QGSMFragmentation;
 class G4GeneratorPrecompoundInterface;
+class G4GammaParticipants;
+template<class T> class G4QGSModel;
 
 namespace Belle2 {
 
@@ -63,5 +62,3 @@ namespace Belle2 {
   } // end of namespace Simulation
 
 } // end of namespace Belle2
-
-#endif // GAMMALEPTONUCLEARPHYSICS_H

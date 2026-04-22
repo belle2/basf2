@@ -9,7 +9,6 @@ Tools to help with debugging and checking code quality
     :func: get_argument_parser
     :prog: b2code-module
     :nodefault:
-    :nogroupsections:
 
 ``b2code-memoryusage``: Show memory usage of a program
 ------------------------------------------------------
@@ -19,7 +18,6 @@ Tools to help with debugging and checking code quality
     :func: get_argument_parser
     :prog: b2code-memoryusage
     :nodefault:
-    :nogroupsections:
 
 ``b2code-findsymbol``: Look for a given C++ symbol
 --------------------------------------------------
@@ -66,7 +64,6 @@ To run on the full release directory run it without any arguments::
     :func: get_argument_parser
     :prog: b2code-classversion-check
     :nodefault:
-    :nogroupsections:
 
 
 ``b2code-classversion-update``: Update linkdef information for sanity checks
@@ -77,7 +74,6 @@ To run on the full release directory run it without any arguments::
     :func: get_argument_parser
     :prog: b2code-classversion-update
     :nodefault:
-    :nogroupsections:
 
 
 
@@ -132,7 +128,6 @@ Possible inputs for OPTION:
     :func: get_argument_parser
     :prog: b2code-parallel_processing-benchmark
     :nodefault:
-    :nogroupsections:
 
 ``b2code-sphinx-build``: Build the sphinx documentation
 -------------------------------------------------------

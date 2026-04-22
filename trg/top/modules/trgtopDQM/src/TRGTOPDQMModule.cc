@@ -23,9 +23,13 @@
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 
-#include "trg/top/dataobjects/TRGTOPUnpackerStore.h"
+#include <trg/ecl/dataobjects/TRGECLUnpackerStore.h>
+#include <trg/top/dataobjects/TRGTOPUnpackerStore.h>
+#include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
+#include <trg/grl/dataobjects/TRGGRLUnpackerStore.h>
+#include <trg/gdl/dataobjects/TRGGDLUnpackerStore.h>
+#include <trg/ecl/TrgEclMapping.h>
 
 #include <TDirectory.h>
 #include <TPostScript.h>

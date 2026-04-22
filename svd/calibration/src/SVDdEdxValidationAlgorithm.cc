@@ -20,8 +20,8 @@
 #include <TLegend.h>
 #include <TCanvas.h>
 #include <TH1D.h>
-#include <TH1F.h>
-#include <TH2F.h>
+#include <TH1D.h>
+#include <TH2D.h>
 #include <TAxis.h>
 #include <TGraph.h>
 #include <TMultiGraph.h>
@@ -45,7 +45,7 @@ using namespace RooFit;
 using namespace Belle2;
 
 SVDdEdxValidationAlgorithm::SVDdEdxValidationAlgorithm() : CalibrationAlgorithm("SVDdEdxValidationCollector"),
-  m_isMakePlots(true)
+  m_isMakePlots(true), m_fullValidation(true)
 {
   setDescription("SVD dE/dx validation algorithm");
 }
@@ -167,7 +167,7 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
     SignalTree->Draw(Form("%s%s%s>>hSignalPIDDistribution(100,0.,1.)", SignalVarName.Data(), PIDVarName.Data(),
                           PIDDetectorsName.Data()),
                      SignalWeightName + Form("* (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), MomLow, SignalVarName.Data(), MomHigh), "goff");
-    TH1F* hSignalPIDDistribution = (TH1F*)gDirectory->Get("hSignalPIDDistribution");
+    TH1D* hSignalPIDDistribution = static_cast<TH1D*>(gDirectory->Get("hSignalPIDDistribution"));
     hSignalPIDDistribution->Scale(1. / hSignalPIDDistribution->Integral());
     hSignalPIDDistribution->GetXaxis()->SetTitle(PIDVarName + PIDDetectorsName + " for " + SignalVarNameFull);
     hSignalPIDDistribution->GetYaxis()->SetTitle("Candidates, normalised");
@@ -175,34 +175,34 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
 
     SignalTree->Draw(Form("%sElectronLLSVDonly>>hSignalElectronLLDistribution(100,-17.,3.)", SignalVarName.Data()),
                      SignalWeightName + Form("* (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), MomLow, SignalVarName.Data(), MomHigh), "goff");
-    TH1F* hSignalElectronLLDistribution = (TH1F*)gDirectory->Get("hSignalElectronLLDistribution");
+    TH1D* hSignalElectronLLDistribution = static_cast<TH1D*>(gDirectory->Get("hSignalElectronLLDistribution"));
     SignalTree->Draw(Form("%sPionLLSVDonly>>hSignalPionLLDistribution(100,-17.,3.)", SignalVarName.Data()),
                      SignalWeightName + Form("* (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), MomLow, SignalVarName.Data(), MomHigh), "goff");
-    TH1F* hSignalPionLLDistribution = (TH1F*)gDirectory->Get("hSignalPionLLDistribution");
+    TH1D* hSignalPionLLDistribution = static_cast<TH1D*>(gDirectory->Get("hSignalPionLLDistribution"));
     SignalTree->Draw(Form("%sKaonLLSVDonly>>hSignalKaonLLDistribution(100,-17.,3.)", SignalVarName.Data()),
                      SignalWeightName + Form("* (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), MomLow, SignalVarName.Data(), MomHigh), "goff");
-    TH1F* hSignalKaonLLDistribution = (TH1F*)gDirectory->Get("hSignalKaonLLDistribution");
+    TH1D* hSignalKaonLLDistribution = static_cast<TH1D*>(gDirectory->Get("hSignalKaonLLDistribution"));
     SignalTree->Draw(Form("%sProtonLLSVDonly>>hSignalProtonLLDistribution(100,-17.,3.)", SignalVarName.Data()),
                      SignalWeightName + Form("* (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), MomLow, SignalVarName.Data(), MomHigh), "goff");
-    TH1F* hSignalProtonLLDistribution = (TH1F*)gDirectory->Get("hSignalProtonLLDistribution");
+    TH1D* hSignalProtonLLDistribution = static_cast<TH1D*>(gDirectory->Get("hSignalProtonLLDistribution"));
 
     // same but only for tracks that are expected to actually have SVD dEdx info
     SignalTree->Draw(Form("%sElectronLLSVDonly>>hSignalElectronLLDistributionGood(100,-17.,3.)", SignalVarName.Data()),
                      SignalWeightName + Form("* (%sSVDdEdx>0) * (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), SignalVarName.Data(), MomLow,
                                              SignalVarName.Data(), MomHigh), "goff");
-    TH1F* hSignalElectronLLDistributionGood = (TH1F*)gDirectory->Get("hSignalElectronLLDistributionGood");
+    TH1D* hSignalElectronLLDistributionGood = static_cast<TH1D*>(gDirectory->Get("hSignalElectronLLDistributionGood"));
     SignalTree->Draw(Form("%sPionLLSVDonly>>hSignalPionLLDistributionGood(100,-17.,3.)", SignalVarName.Data()),
                      SignalWeightName + Form("* (%sSVDdEdx>0) * (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), SignalVarName.Data(), MomLow,
                                              SignalVarName.Data(), MomHigh), "goff");
-    TH1F* hSignalPionLLDistributionGood = (TH1F*)gDirectory->Get("hSignalPionLLDistributionGood");
+    TH1D* hSignalPionLLDistributionGood = static_cast<TH1D*>(gDirectory->Get("hSignalPionLLDistributionGood"));
     SignalTree->Draw(Form("%sKaonLLSVDonly>>hSignalKaonLLDistributionGood(100,-17.,3.)", SignalVarName.Data()),
                      SignalWeightName + Form("* (%sSVDdEdx>0) * (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), SignalVarName.Data(), MomLow,
                                              SignalVarName.Data(), MomHigh), "goff");
-    TH1F* hSignalKaonLLDistributionGood = (TH1F*)gDirectory->Get("hSignalKaonLLDistributionGood");
+    TH1D* hSignalKaonLLDistributionGood = static_cast<TH1D*>(gDirectory->Get("hSignalKaonLLDistributionGood"));
     SignalTree->Draw(Form("%sProtonLLSVDonly>>hSignalProtonLLDistributionGood(100,-17.,3.)", SignalVarName.Data()),
                      SignalWeightName + Form("* (%sSVDdEdx>0) * (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), SignalVarName.Data(), MomLow,
                                              SignalVarName.Data(), MomHigh), "goff");
-    TH1F* hSignalProtonLLDistributionGood = (TH1F*)gDirectory->Get("hSignalProtonLLDistributionGood");
+    TH1D* hSignalProtonLLDistributionGood = static_cast<TH1D*>(gDirectory->Get("hSignalProtonLLDistributionGood"));
 
 
     hSignalElectronLLDistribution->Scale(1. / hSignalElectronLLDistribution->Integral());
@@ -215,35 +215,35 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
     hSignalKaonLLDistributionGood->Scale(1. / hSignalKaonLLDistributionGood->Integral());
     hSignalProtonLLDistributionGood->Scale(1. / hSignalProtonLLDistributionGood->Integral());
 
-    hSignalElectronLLDistribution->GetXaxis()->SetTitle(PIDVarName + "ElectronLLSVDonly");
+    hSignalElectronLLDistribution->GetXaxis()->SetTitle("ElectronLL (SVD only) for " + SignalVarNameFull);
     hSignalElectronLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalElectronLLDistribution->SetMaximum(1.35 * hSignalElectronLLDistribution->GetMaximum());
 
-    hSignalPionLLDistribution->GetXaxis()->SetTitle(PIDVarName + "PionLLSVDonly");
+    hSignalPionLLDistribution->GetXaxis()->SetTitle("PionLL (SVD only) for " + SignalVarNameFull);
     hSignalPionLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalPionLLDistribution->SetMaximum(1.35 * hSignalPionLLDistribution->GetMaximum());
 
-    hSignalKaonLLDistribution->GetXaxis()->SetTitle(PIDVarName + "KaonLLSVDonly");
+    hSignalKaonLLDistribution->GetXaxis()->SetTitle("KaonLL (SVD only) for " + SignalVarNameFull);
     hSignalKaonLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalKaonLLDistribution->SetMaximum(1.35 * hSignalKaonLLDistribution->GetMaximum());
 
-    hSignalProtonLLDistribution->GetXaxis()->SetTitle(PIDVarName + "ProtonLLSVDonly");
+    hSignalProtonLLDistribution->GetXaxis()->SetTitle("ProtonLL (SVD only) for " + SignalVarNameFull);
     hSignalProtonLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalProtonLLDistribution->SetMaximum(1.35 * hSignalProtonLLDistribution->GetMaximum());
 
-    hSignalElectronLLDistributionGood->GetXaxis()->SetTitle(PIDVarName + "ElectronLLSVDonly");
+    hSignalElectronLLDistributionGood->GetXaxis()->SetTitle("ElectronLL (SVD only) for " + SignalVarNameFull);
     hSignalElectronLLDistributionGood->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalElectronLLDistributionGood->SetMaximum(1.35 * hSignalElectronLLDistributionGood->GetMaximum());
 
-    hSignalPionLLDistributionGood->GetXaxis()->SetTitle(PIDVarName + "PionLLSVDonly");
+    hSignalPionLLDistributionGood->GetXaxis()->SetTitle("PionLL (SVD only) for " + SignalVarNameFull);
     hSignalPionLLDistributionGood->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalPionLLDistributionGood->SetMaximum(1.35 * hSignalPionLLDistributionGood->GetMaximum());
 
-    hSignalKaonLLDistributionGood->GetXaxis()->SetTitle(PIDVarName + "KaonLLSVDonly");
+    hSignalKaonLLDistributionGood->GetXaxis()->SetTitle("KaonLL (SVD only) for " + SignalVarNameFull);
     hSignalKaonLLDistributionGood->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalKaonLLDistributionGood->SetMaximum(1.35 * hSignalKaonLLDistributionGood->GetMaximum());
 
-    hSignalProtonLLDistributionGood->GetXaxis()->SetTitle(PIDVarName + "ProtonLLSVDonly");
+    hSignalProtonLLDistributionGood->GetXaxis()->SetTitle("ProtonLL (SVD only) for " + SignalVarNameFull);
     hSignalProtonLLDistributionGood->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalProtonLLDistributionGood->SetMaximum(1.35 * hSignalProtonLLDistributionGood->GetMaximum());
 
@@ -407,10 +407,10 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
                  FakeWeightName + " * (" + FakeVarName + PIDVarName + PIDDetectorsName + ">" + PIDCut + "&&" + FakesFiducialCut + ")",
                  "goff");
 
-  TH1F* hAllSignal = (TH1F*)gDirectory->Get("hAllSignal");
-  TH1F* hSelectedSignal = (TH1F*)gDirectory->Get("hSelectedSignal");
-  TH1F* hAllFakes = (TH1F*)gDirectory->Get("hAllFakes");
-  TH1F* hSelectedFakes = (TH1F*)gDirectory->Get("hSelectedFakes");
+  TH1D* hAllSignal = static_cast<TH1D*>(gDirectory->Get("hAllSignal"));
+  TH1D* hSelectedSignal = static_cast<TH1D*>(gDirectory->Get("hSelectedSignal"));
+  TH1D* hAllFakes = static_cast<TH1D*>(gDirectory->Get("hAllFakes"));
+  TH1D* hSelectedFakes = static_cast<TH1D*>(gDirectory->Get("hSelectedFakes"));
 
   // ---------- Add slow pions to the pion dataset ----------
   if (strncmp(SignalVarName.Data(), "PionD", 5) == 0) {
@@ -418,8 +418,8 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
                      SignalWeightName + " * (" + SignalFiducialCut + ")", "goff");
     SignalTree->Draw(Form("SlowPionMomentum>>hSelectedSignalSlow(%i,%f,%f)", nbins, MomLow, MomHigh),
                      SignalWeightName + " * (SlowPion" + PIDVarName + PIDDetectorsName + ">" + PIDCut + "&&" + SignalFiducialCut + ")", "goff");
-    TH1F* hAllSignalSlow = (TH1F*)gDirectory->Get("hAllSignalSlow");
-    TH1F* hSelectedSignalSlow = (TH1F*)gDirectory->Get("hSelectedSignalSlow");
+    TH1D* hAllSignalSlow = static_cast<TH1D*>(gDirectory->Get("hAllSignalSlow"));
+    TH1D* hSelectedSignalSlow = static_cast<TH1D*>(gDirectory->Get("hSelectedSignalSlow"));
     hAllSignal->Add(hAllSignalSlow);
     hSelectedSignal->Add(hSelectedSignalSlow);
   }
@@ -430,20 +430,20 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
                    "goff");
     FakeTree->Draw(Form("SlowPionMomentum>>hSelectedFakesSlow(%i,%f,%f)", nbins, MomLow, MomHigh),
                    FakeWeightName + " * (SlowPion" + PIDVarName + PIDDetectorsName + ">" + PIDCut + "&&" + FakesFiducialCut + ")", "goff");
-    TH1F* hAllFakesSlow = (TH1F*)gDirectory->Get("hAllFakesSlow");
-    TH1F* hSelectedFakesSlow = (TH1F*)gDirectory->Get("hSelectedFakesSlow");
+    TH1D* hAllFakesSlow = static_cast<TH1D*>(gDirectory->Get("hAllFakesSlow"));
+    TH1D* hSelectedFakesSlow = static_cast<TH1D*>(gDirectory->Get("hSelectedFakesSlow"));
     hAllFakes->Add(hAllFakesSlow);
     hSelectedFakes->Add(hSelectedFakesSlow);
   }
 
-  TH1F* EffHistoSig = (TH1F*)hAllSignal->Clone("EffHistoSig");   // signal efficiency
-  TH1F* EffHistoFake = (TH1F*)hAllFakes->Clone("EffHistoFake");  // fakes efficiency
+  TH1D* EffHistoSig = static_cast<TH1D*>(hAllSignal->Clone("EffHistoSig"));   // signal efficiency
+  TH1D* EffHistoFake = static_cast<TH1D*>(hAllFakes->Clone("EffHistoFake"));  // fakes efficiency
 
   EffHistoSig->Divide(hSelectedSignal, hAllSignal);//, 1, 1, "B");
   EffHistoFake->Divide(hSelectedFakes, hAllFakes);//, 1, 1, "B");
 
   // PID plots
-  TH1F* hBase = new TH1F("hBase", "", 100, 0.0, MomHigh);
+  TH1D* hBase = new TH1D("hBase", "", 100, 0.0, MomHigh);
   hBase->SetTitle(";Momentum [GeV];Efficiency");
   hBase->SetMaximum(1.20);
   hBase->SetMinimum(0.0);
@@ -801,7 +801,7 @@ TTree* SVDdEdxValidationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTr
   variables->add(ProtonBinaryElectronProtonIDSVDonly);
   variables->add(ProtonBinaryElectronProtonIDnoSVD);
 
-  RooDataSet* LambdaDataset = new RooDataSet("LambdaDataset", "LambdaDataset", preselTree.get(), *variables);
+  RooDataSet* LambdaDataset = new RooDataSet("LambdaDataset", "LambdaDataset", *variables, Import(*preselTree));
 
   if (LambdaDataset->sumEntries() == 0) {
     B2FATAL("The Lambda dataset is empty, stopping here");
@@ -908,10 +908,7 @@ TTree* SVDdEdxValidationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTr
       B2FATAL("Lambda: sPlot error: sum of weights not equal to 1");
   }
 
-  RooDataSet* LambdaDatasetSWeighted = new RooDataSet(LambdaDataset->GetName(), LambdaDataset->GetTitle(), LambdaDataset,
-                                                      *LambdaDataset->get());
-
-  TTree* treeLambda_sw = LambdaDatasetSWeighted->GetClonedTree();
+  TTree* treeLambda_sw = LambdaDataset->GetClonedTree();
   treeLambda_sw->SetName("treeLambda_sw");
 
   B2INFO("Lambda: sPlot done. ");
@@ -1152,7 +1149,7 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
   variables->add(SlowPionBinaryElectronPionIDSVDonly);
   variables->add(SlowPionBinaryElectronPionIDnoSVD);
 
-  RooDataSet* DstarDataset = new RooDataSet("DstarDataset", "DstarDataset", preselTree.get(), *variables);
+  RooDataSet* DstarDataset = new RooDataSet("DstarDataset", "DstarDataset", *variables, Import(*preselTree));
 
   if (DstarDataset->sumEntries() == 0) {
     B2FATAL("The Dstar dataset is empty, stopping here");
@@ -1239,10 +1236,7 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
       B2FATAL("Dstar: sPlot error: sum of weights not equal to 1");
   }
 
-  RooDataSet* DstarDatasetSWeighted = new RooDataSet(DstarDataset->GetName(), DstarDataset->GetTitle(), DstarDataset,
-                                                     *DstarDataset->get());
-
-  TTree* treeDstar_sw = DstarDatasetSWeighted->GetClonedTree();
+  TTree* treeDstar_sw = DstarDataset->GetClonedTree();
   treeDstar_sw->SetName("treeDstar_sw");
 
   B2INFO("Dstar: sPlot done. ");

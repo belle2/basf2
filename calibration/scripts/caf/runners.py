@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-# disable doxygen check for this file
-# @cond
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -66,7 +63,9 @@ class AlgorithmsRunner(Runner):
     But you have freedom to not call this at all in `run`, or to implement a different method to deal with this.
     """
 
+    #: failed
     FAILED = "FAILED"
+    #: completed
     COMPLETED = "COMPLETED"
 
     def __init__(self, name):
@@ -196,5 +195,3 @@ class RunnerError(Exception):
     """
     Base exception class for Runners
     """
-
-# @endcond

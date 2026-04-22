@@ -8,6 +8,7 @@
  **************************************************************************/
 
 #include <cdc/modules/CDCDedxHadronCollector/CDCDedxHadronCollectorModule.h>
+#include <cmath>
 
 using namespace Belle2;
 //-----------------------------------------------------------------
@@ -141,9 +142,10 @@ void CDCDedxHadronCollectorModule::collect()
       { if (m_p < 0.05) continue;}
 
       if (ptype == "p+") {
-        if (((m_dedx - 0.45) * abs(m_p) * abs(m_p) > m_maxCut) || ((m_dedx - 0.45)*abs(m_p) * abs(m_p) < m_minCut)) continue;
+        if (((m_dedx - 0.45) * std::abs(m_p) * std::abs(m_p) > m_maxCut)
+            || ((m_dedx - 0.45)*std::abs(m_p) * std::abs(m_p) < m_minCut)) continue;
         if (m_dedx < 1.00) continue;
-        if (abs(m_p) > 1.0) continue;
+        if (std::abs(m_p) > 1.0) continue;
       }
 
       if (ptype == "pi+") {

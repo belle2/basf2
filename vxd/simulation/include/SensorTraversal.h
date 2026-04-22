@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef VXD_SIMULATION_SENSORTRAVERSAL_H
-#define VXD_SIMULATION_SENSORTRAVERSAL_H
 
 #include <G4ThreeVector.hh>
 #include <vector>
@@ -122,4 +120,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif // VXD_SIMULATION_SENSORTRAVERSAL_H

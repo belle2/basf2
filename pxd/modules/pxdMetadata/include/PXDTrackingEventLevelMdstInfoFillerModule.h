@@ -12,12 +12,10 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <pxd/dataobjects/PXDCluster.h>
-
-#include <mdst/dataobjects/EventLevelTrackingInfo.h>
-
 
 namespace Belle2 {
+  class PXDCluster;
+  class EventLevelTrackingInfo;
 
   /**
    * This module adds additional global event level information about PXD track finding

@@ -30,7 +30,6 @@
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string/predicate.hpp> //for iequals()
 
-#include <csignal>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -62,13 +61,6 @@ namespace {
 
 int main(int argc, char* argv[])
 {
-  //remove SIGPIPE handler set by ROOT which sometimes caused infinite loops
-  //See https://savannah.cern.ch/bugs/?97991
-  //default action is to abort
-  if (signal(SIGPIPE, SIG_DFL) == SIG_ERR) {
-    B2FATAL("Cannot remove SIGPIPE signal handler");
-  }
-
   //Initialize metadata service
   MetadataService::Instance();
 
@@ -108,6 +100,8 @@ int main(int argc, char* argv[])
      "Set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
     ("package_log_level", prog::value<vector<string> >(),
      "Set package log level. Can be specified multiple times to use more than one package. (Examples: 'klm:INFO or cdc:DEBUG:10') ")
+    ("module_log_level", prog::value<vector<string> >(),
+     "Set module log level. Can be specified multiple times to use more than one package. (Examples: 'EventInfoSetter:INFO or CDCDigitizer:DEBUG:10') ")
     ("random-seed", prog::value<string>(),
      "Set the default initial seed for the random number generator. "
      "This does not take precedence over calls to set_random_seed() in the steering file, but just changes the default. "
@@ -134,8 +128,8 @@ int main(int argc, char* argv[])
     ("module-io", prog::value<string>(),
      "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
     ("visualize-dataflow", "Generate data flow diagram (dataflow.dot) for the executed steering file.")
-    ("no-stats",
-     "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print(statistics)'.")
+    ("stats",
+     "Enable collection of statistics during event processing (fills table called via 'print(statistics)). Useful for debugging, but adds extra processing time.")
     ("dry-run",
      "Read steering file, but do not start any event processing when process(path) is called. Prints information on input/output files that would be used during normal execution.")
     ("dump-path", prog::value<string>(),
@@ -385,6 +379,49 @@ int main(int argc, char* argv[])
       }
     }
 
+    // --module_log_level
+    if (varMap.count("module_log_level")) {
+      const auto& moduleLogList = varMap["module_log_level"].as<vector<string>>();
+      const std::string delimiter = ":";
+      for (const std::string& moduleLog : moduleLogList) {
+        if (moduleLog.find(delimiter) == std::string::npos) {
+          B2FATAL("In --module_log_level input " << moduleLog << ", no colon detected. ");
+          break;
+        }
+        /* string parsing for packageName:LOGLEVEL or packageName:DEBUG:LEVEL*/
+        auto moduleName = moduleLog.substr(0, moduleLog.find(delimiter));
+        std::string moduleLogName = moduleLog.substr(moduleLog.find(delimiter) + delimiter.length(), moduleLog.length());
+        int moduleDebugLevel = -1;
+        if ((moduleLogName.find("DEBUG") != std::string::npos) && moduleLogName.length() > 5) {
+          try {
+            moduleDebugLevel = std::stoi(moduleLogName.substr(moduleLogName.find(delimiter) + delimiter.length(), moduleLogName.length()));
+          } catch (std::exception& e) {
+            B2WARNING("In --module_log_level, issue parsing debugLevel. Still setting log level to DEBUG.");
+          }
+          moduleLogName = "DEBUG";
+        }
+
+        int module_level = -1;
+        /* determine log level for module */
+        for (int i = LogConfig::c_Debug; i < LogConfig::c_Fatal; i++) {
+          std::string moduleThisLevel = LogConfig::logLevelToString((LogConfig::ELogLevel)i);
+          if (boost::iequals(moduleLogName, moduleThisLevel)) { //case-insensitive
+            module_level = i;
+            break;
+          }
+        }
+        if (module_level < 0) {
+          B2FATAL("Invalid log level! Needs to be one of DEBUG, INFO, RESULT, WARNING, or ERROR.");
+        }
+        /* set package log level*/
+        if ((moduleLogName == "DEBUG") && (moduleDebugLevel >= 0)) {
+          LogSystem::Instance().getModuleLogConfig(moduleName).setDebugLevel(moduleDebugLevel);
+        }
+        LogSystem::Instance().getModuleLogConfig(moduleName).setLogLevel((LogConfig::ELogLevel)module_level);
+
+      }
+    }
+
     // -d
     if (varMap.count("debug_level")) {
       unsigned int level = varMap["debug_level"].as<unsigned int>();
@@ -399,8 +436,8 @@ int main(int argc, char* argv[])
       }
     }
 
-    if (varMap.count("no-stats")) {
-      Environment::Instance().setNoStats(true);
+    if (varMap.count("stats")) {
+      Environment::Instance().setStats(true);
     }
 
     if (varMap.count("dry-run")) {

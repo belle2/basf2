@@ -9,7 +9,10 @@
 
 from pybasf2 import B2WARNING, B2FATAL
 
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
+
 from basf2 import register_module
+from geometry import is_detector_present, are_detectors_present, is_any_detector_present
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, add_cosmics_pxd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
@@ -64,11 +67,11 @@ def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=Fal
     """
 
     # Preparation of the SVD clusters
-    if is_svd_used(components):
+    if is_detector_present("SVD", components):
         add_svd_reconstruction(path)
 
     # Preparation of the PXD clusters
-    if is_pxd_used(components) and not pxd_filtering_offline and not create_intercepts_for_pxd_ckf:
+    if is_detector_present("PXD", components) and not pxd_filtering_offline and not create_intercepts_for_pxd_ckf:
         add_pxd_reconstruction(path)
 
 
@@ -87,7 +90,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
         to the path that sets the quality indicator property of the found tracks.
     """
 
-    add_prefilter_track_fit_and_track_creator(path,
+    add_prefilter_track_fit_and_track_creator(path, components=components,
                                               trackFitHypotheses=trackFitHypotheses,
                                               reco_tracks=reco_tracks,
                                               add_mva_quality_indicator=add_mva_quality_indicator)
@@ -100,13 +103,14 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
         add_prune_tracks(path, components=components, reco_tracks=reco_tracks)
 
 
-def add_prefilter_track_fit_and_track_creator(path, trackFitHypotheses=None,
+def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHypotheses=None,
                                               reco_tracks="RecoTracks", add_mva_quality_indicator=False):
     """
     Helper function to add only the modules required to calculate HLT filter decision:
     performing the track fit and the Belle2 track creation to the path.
 
     :param path: The path to add the tracking reconstruction modules to
+    :param components: the list of geometry components in use or None for all components.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param add_mva_quality_indicator: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found tracks.
@@ -210,6 +214,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
 def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                    reco_tracks="RecoTracks", use_second_cdc_hits=False,
                    split_after_delta_t=-1.0, matching_method="hit",
+                   relate_tracks_to_mcparticles=True,
                    chi2_cutoffs=[128024, 95, 173, 424, 90, 424],
                    chi2_linalg=False):
     """
@@ -227,6 +232,9 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                                 distance between two adjacent SimHits is more than the given value
     :param matching_method:     hit: uses the hit-matching
                                 chi2: uses the chi2-matching
+    :param relate_tracks_to_mcparticles:    If True (default), Tracks are related to MCParticles. Only works
+                                            if the TrackCreator is in the path before. Needs to be set to False
+                                            if only track finding is performed, but no Tracks are created.
     :param chi2_cutoffs:        If chi2 matching method is used, this list defines the individual cut-off values
                                 for the chi2 values. Thereby each charged stable particle gets its cut-off
                                 value. The order of the pdgs is [11,13,211,2212,321,1000010020]. The default
@@ -241,19 +249,20 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                         RecoTracksStoreArrayName=mc_reco_tracks,
                         WhichParticles=[],
                         UseSecondCDCHits=use_second_cdc_hits,
-                        UsePXDHits=is_pxd_used(components),
-                        UseSVDHits=is_svd_used(components),
-                        UseCDCHits=is_cdc_used(components),
+                        UsePXDHits=is_detector_present("PXD", components),
+                        UseSVDHits=is_detector_present("SVD", components),
+                        UseCDCHits=is_detector_present("CDC", components),
                         SplitAfterDeltaT=split_after_delta_t)
 
         path.add_module('MCRecoTracksMatcher',
                         mcRecoTracksStoreArrayName=mc_reco_tracks,
                         prRecoTracksStoreArrayName=reco_tracks,
-                        UsePXDHits=is_pxd_used(components),
-                        UseSVDHits=is_svd_used(components),
-                        UseCDCHits=is_cdc_used(components))
+                        UsePXDHits=is_detector_present("PXD", components),
+                        UseSVDHits=is_detector_present("SVD", components),
+                        UseCDCHits=is_detector_present("CDC", components))
 
-        path.add_module('TrackToMCParticleRelator')
+        if relate_tracks_to_mcparticles:
+            path.add_module('TrackToMCParticleRelator')
 
     elif (matching_method == "chi2"):
         print("Warning: The Chi2MCTrackMatcherModule is currently not fully developed and tested!")
@@ -272,7 +281,7 @@ def add_prune_tracks(path, components=None, reco_tracks="RecoTracks"):
     """
 
     # do not add any pruning, if no tracking detectors are in the components
-    if components and not ('SVD' in components or 'CDC' in components):
+    if components and not is_any_detector_present(["SVD", "CDC"], components):
         return
 
     path.add_module('PruneRecoTracks', storeArrayName=reco_tracks).set_name("PruneRecoTracks " + reco_tracks)
@@ -323,13 +332,13 @@ def add_flipping_of_recoTracks(
 def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_tracks, use_mc_truth=False,
                           add_both_directions=False, temporary_reco_tracks="PXDRecoTracks", **kwargs):
     """Add the pxd track finding to the path"""
-    if not is_pxd_used(components):
+    if not is_detector_present("PXD", components):
         return
 
     if use_mc_truth:
         # MC CKF needs MC matching information
         path.add_module("MCRecoTracksMatcher", UsePXDHits=False,
-                        UseSVDHits=is_svd_used(components), UseCDCHits=is_cdc_used(components),
+                        UseSVDHits=is_detector_present("SVD", components), UseCDCHits=is_detector_present("CDC", components),
                         mcRecoTracksStoreArrayName="MCRecoTracks",
                         prRecoTracksStoreArrayName=input_reco_tracks)
 
@@ -347,13 +356,13 @@ def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_track
 def add_pxd_cr_track_finding(path, components, input_reco_tracks, output_reco_tracks, use_mc_truth=False,
                              add_both_directions=False, temporary_reco_tracks="PXDRecoTracks", **kwargs):
     """Add the pxd track finding to the path"""
-    if not is_pxd_used(components):
+    if not is_detector_present("PXD", components):
         return
 
     if use_mc_truth:
         # MC CKF needs MC matching information
         path.add_module("MCRecoTracksMatcher", UsePXDHits=False,
-                        UseSVDHits=is_svd_used(components), UseCDCHits=is_cdc_used(components),
+                        UseSVDHits=is_detector_present("SVD", components), UseCDCHits=is_detector_present("CDC", components),
                         mcRecoTracksStoreArrayName="MCRecoTracks",
                         prRecoTracksStoreArrayName=input_reco_tracks)
 
@@ -417,7 +426,7 @@ def add_svd_track_finding(
            Defaults to "VXDTF2"
     """
 
-    if not is_svd_used(components):
+    if not is_detector_present("SVD", components):
         return
 
     if not input_reco_tracks or input_reco_tracks == "":
@@ -431,7 +440,7 @@ def add_svd_track_finding(
     if use_mc_truth:
         # MC CKF needs MC matching information
         path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=False,
-                        UseCDCHits=is_cdc_used(components),
+                        UseCDCHits=is_detector_present("CDC", components),
                         mcRecoTracksStoreArrayName="MCRecoTracks",
                         prRecoTracksStoreArrayName=input_reco_tracks)
 
@@ -629,7 +638,7 @@ def add_svd_standalone_tracking(path,
         raise ValueError(f"Do not understand the svd_standalone_mode {svd_standalone_mode}")
 
 
-def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
+def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_cdc_cellular_automaton=False,
                           use_second_hits=False, add_mva_quality_indicator=True,
                           reattach_hits=False, skip_WireHitPreparer=False):
     """
@@ -641,6 +650,8 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
 
     :param path: basf2 path
     :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
+    :param with_cdc_cellular_automaton: If true, the cellular automaton track finder algorithm will be used too,
+        after the global algorithm (Legendre)
     :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_mva_quality_indicator: Add the TFCDC_TrackQualityEstimator module to set the CDC quality
            indicator property of the CDC ``output_reco_tracks``
@@ -661,7 +672,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                         wirePosition="aligned",
                         useSecondHits=use_second_hits,
                         flightTimeEstimation="outwards",
-                        filter="mva",
+                        filter="combined",
                         filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
 
     # Constructs clusters
@@ -692,7 +703,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
 
     output_tracks = "CDCTrackVector"
 
-    if with_ca:
+    if with_cdc_cellular_automaton:
         output_tracks = "CombinedCDCTrackVector"
         path.add_module("TFCDC_TrackFinderSegmentPairAutomaton",
                         tracks="CDCTrackVector2")
@@ -712,7 +723,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                         "Small",
                     ])
 
-    if with_ca:
+    if with_cdc_cellular_automaton:
         # Add curlers in the axial inner most superlayer
         path.add_module("TFCDC_TrackCreatorSingleSegments",
                         inputTracks=output_tracks,
@@ -770,12 +781,12 @@ def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", 
     :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     """
-    if not is_cdc_used(components) or not is_ecl_used(components):
+    if not are_detectors_present(["CDC", "ECL"], components):
         return
 
     ecl_cdc_reco_tracks = "ECLCDCRecoTracks"
 
-    if not is_svd_used(components):
+    if not is_detector_present("SVD", components):
         ecl_cdc_reco_tracks = output_reco_tracks
 
     # collections that will be pruned
@@ -829,7 +840,7 @@ def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", 
     # prepare mdst event level info
     # path.add_module("CDCTrackingEventLevelMdstInfoFiller")
 
-    if is_svd_used(components):
+    if is_detector_present("SVD", components):
         add_svd_track_finding(path, components=components, input_reco_tracks=ecl_cdc_reco_tracks,
                               output_reco_tracks=output_reco_tracks, use_mc_truth=False,
                               svd_ckf_mode="only_ckf", add_both_directions=False,
@@ -995,7 +1006,7 @@ def add_vxd_track_finding_vxdtf2(
     ##########################
 
     # setting different for pxd and svd:
-    if is_pxd_used(components):
+    if is_detector_present("PXD", components):
         setup_name = "SVDPXDDefault"
         db_sec_map_file = "VXDSectorMap_v000.root"
         use_pxd = True
@@ -1190,6 +1201,7 @@ def add_default_cdc_svd_tracking_chain(path,
                                        svd_reco_tracks,
                                        cdc_reco_tracks,
                                        output_reco_tracks,
+                                       with_cdc_cellular_automaton=False,
                                        use_second_cdc_hits=False,
                                        add_cdcTrack_QI=True,
                                        use_mc_truth=False,
@@ -1209,6 +1221,8 @@ def add_default_cdc_svd_tracking_chain(path,
     :param svd_reco_tracks: name of the SVD standalone RecoTracks StoreArray
     :param cdc_reco_tracks: name of the CDC standalone RecoTracks StoreArray
     :param output_reco_tracks: name of the combined CDC+SVD RecoTracks StoreArray that is the final result of this tracking path
+    :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
+        after the global algorithm (Legendre)
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found CDC standalone tracks
@@ -1234,13 +1248,17 @@ def add_default_cdc_svd_tracking_chain(path,
     # the name of the most recent track collection
     latest_reco_tracks = None
 
-    if is_cdc_used(components):
-        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
-                              add_mva_quality_indicator=add_cdcTrack_QI)
+    if is_detector_present("CDC", components):
+        add_cdc_track_finding(
+            path,
+            with_cdc_cellular_automaton=with_cdc_cellular_automaton,
+            use_second_hits=use_second_cdc_hits,
+            output_reco_tracks=cdc_reco_tracks,
+            add_mva_quality_indicator=add_cdcTrack_QI)
         temporary_reco_track_list.append(cdc_reco_tracks)
         latest_reco_tracks = cdc_reco_tracks
 
-    if is_svd_used(components):
+    if is_detector_present("SVD", components):
         add_svd_track_finding(path,
                               components=components,
                               input_reco_tracks=latest_reco_tracks,
@@ -1269,6 +1287,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
                                         output_reco_tracks="CombinedSVDCDCRecoTracks",
                                         add_vxdTrack_QI=True,
                                         svd_standalone_mode="VXDTF2",
+                                        with_cdc_cellular_automaton=False,
                                         use_second_cdc_hits=False,
                                         add_cdcTrack_QI=True,
                                         use_mc_truth=False,
@@ -1297,6 +1316,8 @@ def add_inverted_svd_cdc_tracking_chain(path,
     :param svd_standalone_mode: Which SVD standalone tracking is used.
            Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
            Defaults to "VXDTF2"
+    :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
+        after the global algorithm (Legendre)
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found CDC standalone tracks
@@ -1323,7 +1344,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
     # the name of the most recent track collection
     latest_reco_tracks = None
 
-    if is_svd_used(components):
+    if is_detector_present("SVD", components):
         add_svd_track_finding(path,
                               components=components,
                               input_reco_tracks="",
@@ -1335,12 +1356,12 @@ def add_inverted_svd_cdc_tracking_chain(path,
 
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks).set_name(f"DAFRecoFitter {svd_reco_tracks}")
 
-    if is_cdc_used(components):
+    if is_detector_present("CDC", components):
         path.add_module("TFCDC_WireHitPreparer",
                         wirePosition="aligned",
                         useSecondHits=use_second_cdc_hits,
                         flightTimeEstimation="outwards",
-                        filter="mva",
+                        filter="combined",
                         filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
 
         path.add_module("ToCDCCKF",
@@ -1366,6 +1387,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
         latest_reco_tracks = svd_cdc_reco_tracks
 
         add_cdc_track_finding(path,
+                              with_cdc_cellular_automaton=with_cdc_cellular_automaton,
                               use_second_hits=use_second_cdc_hits,
                               output_reco_tracks=cdc_reco_tracks,
                               add_mva_quality_indicator=add_cdcTrack_QI,
@@ -1381,7 +1403,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
         temporary_reco_track_list.append("CombinedCDCSVDRecoTracks")
         latest_reco_tracks = "CombinedCDCSVDRecoTracks"
 
-    if is_svd_used(components):
+    if is_detector_present("SVD", components):
         # combined_reco_tracks_name is only relevant in the 'after_ToCDCCKF' option
         combined_reco_tracks_name = "CDCSVDRecoTracks"
 
@@ -1415,23 +1437,3 @@ def add_inverted_svd_cdc_tracking_chain(path,
         latest_reco_tracks = output_reco_tracks
 
     return (latest_reco_tracks, temporary_reco_track_list)
-
-
-def is_svd_used(components):
-    """Return true, if the SVD is present in the components list"""
-    return components is None or 'SVD' in components
-
-
-def is_pxd_used(components):
-    """Return true, if the PXD is present in the components list"""
-    return components is None or 'PXD' in components
-
-
-def is_cdc_used(components):
-    """Return true, if the CDC is present in the components list"""
-    return components is None or 'CDC' in components
-
-
-def is_ecl_used(components):
-    """Return true, if the ECL is present in the components list"""
-    return components is None or 'ECL' in components

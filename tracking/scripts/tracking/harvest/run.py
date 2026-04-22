@@ -11,6 +11,7 @@ import pickle
 
 from tracking.run.event_generation import StandardEventGenerationRun
 from tracking.run.mixins import BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin
+# @cond internal_test
 
 
 class HarvestingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
@@ -76,3 +77,5 @@ class HarvestingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin)
 
 class HarvestingRun(HarvestingRunMixin, StandardEventGenerationRun):
     """Harvester to generate MC events followed by crop selection, postprocessing, inspection"""
+
+# @endcond

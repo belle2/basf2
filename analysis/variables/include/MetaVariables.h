@@ -166,57 +166,6 @@ namespace Belle2 {
     Manager::FunctionPtr grandDaughterDiffOf(const std::vector<std::string>& arguments);
 
     /**
-     * Returns function which returns the difference of the angular variable phi between the two given daughters
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable phi between the matched MC particles of the two given daughters
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr mcDaughterDiffOfPhi(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable phi between the first daughters of the two given daughters
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr grandDaughterDiffOfPhi(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable clusterPhi between the two given daughters
-     * If (at least) one of the daughters does not have a (matched) ECLCluster, the function returns NaN
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable clusterPhi between the first daughters of the two given daughters
-     * If (at least) one of the daughters does not have a (matched) ECLCluster, the function returns NaN
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr grandDaughterDiffOfClusterPhi(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable phi between the two given daughters in the CMS frame
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr daughterDiffOfPhiCMS(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable phi between the matched MC particles of two given daughters in the CMS frame
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr mcDaughterDiffOfPhiCMS(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the difference of the angular variable clusterPhi between the two given daughters in the CMS frame
-     * If (at least) one of the daughters does not have a (matched) ECLCluster, the function returns NaN
-     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     */
-    Manager::FunctionPtr daughterDiffOfClusterPhiCMS(const std::vector<std::string>& arguments);
-
-    /**
      * Returns function which returns the normalized difference of the given variable between the two given daughters
      * First two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
      * Third argument the name of the variable.
@@ -237,6 +186,18 @@ namespace Belle2 {
      * Second argument the name of the variable.
      */
     Manager::FunctionPtr daughterMotherNormDiffOf(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the angle between the sum of the momenta of the two given daughters and the momentum recoiling against the particle.
+     * The arguments in the argument vector must be generalized daughter indices.
+     */
+    Manager::FunctionPtr angleBetweenDaughterAndRecoil(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the angle between the sum of the momenta of the two given daughters and the missing momentum in the event.
+     * The arguments in the argument vector must be generalized daughter indices.
+     */
+    Manager::FunctionPtr angleBetweenDaughterAndMissingMomentum(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the angle between daughters:
@@ -316,6 +277,12 @@ namespace Belle2 {
      * All arguments should be p-values in the range 0 to 1.
      */
     Manager::FunctionPtr pValueCombination(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the combined p-value of the daughter p-values
+     * All arguments should be p-values in the range 0 to 1.
+     */
+    Manager::FunctionPtr pValueCombinationOfDaughters(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the absolute value of a variable of the given particle
@@ -546,6 +513,11 @@ namespace Belle2 {
     Manager::FunctionPtr useDaughterRestFrame(const std::vector<std::string>& arguments);
 
     /**
+     * Returns the value of the variable in the rest frame of the recoil of the daughter identified via generalized index.
+     */
+    Manager::FunctionPtr useDaughterRecoilRestFrame(const std::vector<std::string>& arguments);
+
+    /**
     * Returns a  function that returns the value of a variable calculated using new mass assumptions for the daughters' masses.
     */
     Manager::FunctionPtr  useAlternativeDaughterHypothesis(const std::vector<std::string>& arguments);
@@ -571,6 +543,12 @@ namespace Belle2 {
      * Second argument is the value for NaN replacement
      */
     Manager::FunctionPtr convertToInt(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which converts a variable of the given particle into an
+     * integer and returns if it is a valid daughter index, else -1 is returned.
+     */
+    Manager::FunctionPtr convertToDaughterIndex(const std::vector<std::string>& arguments);
 
   }
 }

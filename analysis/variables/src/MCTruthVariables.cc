@@ -31,6 +31,8 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/BeamParameters.h>
 
+#include <Math/VectorUtil.h>
+
 #include <cmath>
 #include <queue>
 
@@ -729,12 +731,16 @@ namespace Belle2 {
     double getHEREnergy(const Particle*)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
       return (beamParamsDB->getHER()).E();
     }
 
     double getLEREnergy(const Particle*)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
       return (beamParamsDB->getLER()).E();
     }
 
@@ -742,30 +748,30 @@ namespace Belle2 {
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      B2Vector3D herVec = beamParamsDB->getHER().Vect();
-      B2Vector3D lerVec = beamParamsDB->getLER().Vect();
-
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
+      ROOT::Math::PxPyPzEVector herVec = beamParamsDB->getHER();
+      ROOT::Math::PxPyPzEVector lerVec = beamParamsDB->getLER();
       // only looking at the horizontal (XZ plane) -> set y-coordinates to zero
-      herVec.SetY(0);
-      lerVec.SetY(0);
-
-      //calculate the crossing angle
-      return herVec.Angle(-lerVec);
+      herVec.SetPy(0);
+      lerVec.SetPy(0);
+      // calculate the crossing angle
+      return ROOT::Math::VectorUtil::Angle(herVec, -lerVec);
     }
 
     double getCrossingAngleY(const Particle*)
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      B2Vector3D herVec = beamParamsDB->getHER().Vect();
-      B2Vector3D lerVec = beamParamsDB->getLER().Vect();
-
+      if (!beamParamsDB.isValid())
+        return Const::doubleNaN;
+      ROOT::Math::PxPyPzEVector herVec = beamParamsDB->getHER();
+      ROOT::Math::PxPyPzEVector lerVec = beamParamsDB->getLER();
       // only looking at the vertical (YZ plane) -> set x-coordinates to zero
-      herVec.SetX(0);
-      lerVec.SetX(0);
-
-      //calculate the crossing angle
-      return herVec.Angle(-lerVec);
+      herVec.SetPx(0);
+      lerVec.SetPx(0);
+      // calculate the crossing angle
+      return ROOT::Math::VectorUtil::Angle(herVec, -lerVec);
     }
 
 
@@ -984,6 +990,7 @@ namespace Belle2 {
 
       return -1;
     }
+
 
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
@@ -1241,8 +1248,6 @@ List of possible values (taken from the Geant4 source of
                       "Returns 1.0 if the MC particle was seen in the ARICH, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInKLM", seenInKLM,
                       "Returns 1.0 if the MC particle was seen in the KLM, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
-
-    VARIABLE_GROUP("MC Matching for ECLClusters");
     REGISTER_VARIABLE("clusterMCMatchWeight", particleClusterMatchWeight,
                       "Returns the weight of the ECLCluster -> MCParticle relation for the MCParticle matched to the particle. "
                       "Returns NaN if: no cluster is related to the particle, the particle is not MC matched, or if there are no mcmatches for the cluster. "
@@ -1253,7 +1258,6 @@ List of possible values (taken from the Geant4 source of
                       "Returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
     REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight,
                       "Returns the sum of all weights of the ECLCluster -> MCParticles relations.");
-
     REGISTER_VARIABLE("clusterTotalMCMatchWeightForKlong", particleClusterTotalMCMatchWeightForKlong,
                       "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is a Klong or daughter of a Klong");
     REGISTER_VARIABLE("clusterTotalMCMatchWeightForBestKlong", particleClusterTotalMCMatchWeightForBestKlong,

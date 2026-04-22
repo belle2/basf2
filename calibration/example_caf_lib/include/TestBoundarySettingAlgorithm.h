@@ -21,7 +21,7 @@ namespace Belle2 {
     TestBoundarySettingAlgorithm();
 
     /// Destructor
-    virtual ~TestBoundarySettingAlgorithm() {}
+    ~TestBoundarySettingAlgorithm() override {}
 
     /// setter for m_minEntries
     void setMinEntries(const int minEntries) {m_minEntries = minEntries;}
@@ -33,19 +33,19 @@ namespace Belle2 {
     void setBoundaries(const std::vector<Calibration::ExpRun>& boundaries) {m_requestedBoundaries = boundaries;}
 
     /// getter for current boundaries
-    std::vector<Calibration::ExpRun> getBoundaries() const {return m_requestedBoundaries;}
+    const std::vector<Calibration::ExpRun>& getBoundaries() const {return m_requestedBoundaries;}
 
   protected:
 
     /// Run algo on data
-    virtual EResult calibrate() override;
+    EResult calibrate() override;
 
     /// Decide if a run should be a payload boundary. Only used in certain Python Algorithm Starategies.
-    virtual bool isBoundaryRequired(const Calibration::ExpRun& /*currentRun*/) override;
+    bool isBoundaryRequired(const Calibration::ExpRun& /*currentRun*/) override;
 
     /// What we do before isBoundaryRequired gets called.
     //  We reset the temporary boundaries list to be the same as the requested one.
-    virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) override
+    void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) override
     {
       m_boundaries = m_requestedBoundaries;
     };

@@ -70,3 +70,4 @@ ln -sfT ${BELLE2_TOOLS}/doc build/tools_doc
 ln -sfT ${BELLE2_TOOLS} build/belle2_tools
 # and run sphinx and forward all extra arguments
 sphinx-build -ENT -b ${TARGET} -c site_scons/sphinx -d ${OUTPUT}/doctrees . ${OUTPUT}/${TARGET} ${EXTRA_SPHINX_ARGS} "$@"
+exit $?

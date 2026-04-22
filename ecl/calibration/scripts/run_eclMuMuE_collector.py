@@ -29,7 +29,7 @@ main.add_module('RootInput', inputFileNames=[DR2])
 
 narg = len(sys.argv)
 outputName = "eclMuMuECollectorOutput.root"
-if(narg >= 2):
+if (narg >= 2):
     outputName = sys.argv[1]
 main.add_module("HistoManager", histoFileName=outputName)
 
@@ -70,5 +70,3 @@ b2.use_central_database("development")
 b2.use_local_database("localdb/database.txt")
 
 b2.process(main)
-
-print(b2.statistics)

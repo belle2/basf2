@@ -7,13 +7,13 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
-#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
+#include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/EigenView.h>
+#include <tracking/trackingUtilities/numerics/EigenView.h>
 
 #include <Eigen/Core>
 
@@ -22,6 +22,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
 
@@ -277,8 +278,8 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
 }
 
 
-UncertainParameterLine2D FacetFitter::fit(Matrix<double, 3, 3> xyl,
-                                          Matrix<double, 3, 1> w,
+UncertainParameterLine2D FacetFitter::fit(TrackingUtilities::Matrix<double, 3, 3> xyl,
+                                          TrackingUtilities::Matrix<double, 3, 1> w,
                                           int nSteps)
 {
   return ::fit(std::move(xyl), std::move(w), nSteps);

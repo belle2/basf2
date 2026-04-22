@@ -56,7 +56,7 @@ output.param("outputFileName", "TRGECLRawdataAnalysis_Cluster.root")
 main.add_module(output, branchNames=["TRGECLUnpackerStores", "TRGECLClusters", "TRGECLTimings"])
 
 # Process all events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 #
 #
 print(b2.statistics)

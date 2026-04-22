@@ -104,7 +104,7 @@ void IPDQMModule::event()
     const auto& frame = ReferenceFrame::GetCurrent();
     for (unsigned int i = 0; i < Y4SParticles->getListSize(); i++) {
       Particle* Y4S = Y4SParticles->getParticle(i);
-      B2Vector3D IPVertex = frame.getVertex(Y4S);
+      ROOT::Math::XYZVector IPVertex = frame.getVertex(Y4S);
       double IPX{IPVertex.X()};
       double IPY{IPVertex.Y()};
       double IPZ{IPVertex.Z()};

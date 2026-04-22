@@ -6,9 +6,7 @@ Event display
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 5 min
-
-    **Exercises**: 5 min
+    **Length**: 15 min
 
     **Prerequisites**:
 

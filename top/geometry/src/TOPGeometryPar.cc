@@ -31,7 +31,6 @@ namespace Belle2 {
     TOPGeometryPar::~TOPGeometryPar()
     {
       if (m_geo) delete m_geo;
-      if (m_geoDB) delete m_geoDB;
       s_instance = 0;
     }
 
@@ -87,26 +86,23 @@ namespace Belle2 {
       m_fromDB = true;
       m_valid = false;
 
-      if (m_geoDB) delete m_geoDB;
-      m_geoDB = new DBObjPtr<TOPGeometry>();
-
-      if (!m_geoDB->isValid()) {
+      if (!m_geoDB.isValid()) {
         B2ERROR("TOPGeometry: no payload found in database");
         return;
       }
-      if ((*m_geoDB)->getWavelengthFilter().getName().empty()) {
+      if (m_geoDB->getWavelengthFilter().getName().empty()) {
         m_oldPayload = true;
-        B2WARNING("TOPGeometry: obsolete payload revision (pixel independent PDE) - please, check global tag");
+        B2WARNING("TOPGeometry: obsolete payload revision (pixel independent PDE) - please, check global tags");
       }
-      if ((*m_geoDB)->getTTSes().empty()) {
-        B2WARNING("TOPGeometry: obsolete payload revision (nominal TTS only) - please, check global tag");
+      if (m_geoDB->getTTSes().empty()) {
+        B2WARNING("TOPGeometry: obsolete payload revision (nominal TTS only) - please, check global tags");
       }
-      if ((*m_geoDB)->arePDETuningFactorsEmpty()) {
-        B2WARNING("TOPGeometry: old payload revision (before bugfix and update of optical properties)");
+      if (m_geoDB->arePDETuningFactorsEmpty()) {
+        B2WARNING("TOPGeometry: obsolete payload revision (before bugfix and update of optical properties) - please, check global tags");
       }
 
       // Make sure that we abort as soon as the geometry changes
-      m_geoDB->addCallback([]() {
+      m_geoDB.addCallback([]() {
         B2FATAL("Geometry cannot change during processing, "
                 "aborting (component TOP)");
       });
@@ -136,6 +132,7 @@ namespace Belle2 {
       // add call backs for PMT data
       m_pmtInstalled.addCallback(this, &TOPGeometryPar::clearCache);
       m_pmtQEData.addCallback(this, &TOPGeometryPar::clearCache);
+      m_pulseHeights.addCallback(this, &TOPGeometryPar::clearCache);
 
       // print geometry if the debug level for 'top' is set 10000
       const auto& logSystem = LogSystem::Instance();
@@ -155,6 +152,7 @@ namespace Belle2 {
       m_envelopeQE.clear();
       m_pmts.clear();
       m_relEfficiencies.clear();
+      m_relPDEonMC.clear();
       m_pmtTypes.clear();
     }
 
@@ -164,7 +162,7 @@ namespace Belle2 {
 
       TOPGeometry::useBasf2Units();
       if (m_fromDB) {
-        return &(**m_geoDB);
+        return &(*m_geoDB);
       } else {
         return m_geo;
       }
@@ -236,6 +234,20 @@ namespace Belle2 {
 
       int id = getUniquePixelID(moduleID, pixelID);
       return m_relEfficiencies[id] * RQE * thrEffi;
+    }
+
+
+    double TOPGeometryPar::getRelativePDEonMC(int moduleID, int pixelID) const
+    {
+      if (m_oldPayload) {
+        B2ERROR("TOPGeometryPar::getRelativePDEonMC: called using obsolete TOPGeometry payload revision - please, check global tags");
+        return 0; // to prevent wrong RQE calibration - see TOPPhotonYieldsAlgorithm.cc
+      }
+
+      if (m_relPDEonMC.empty()) prepareRelPDEonMC();
+
+      int id = getUniquePixelID(moduleID, pixelID);
+      return m_relPDEonMC[id];
     }
 
 
@@ -411,18 +423,50 @@ namespace Belle2 {
              << m_relEfficiencies.size());
     }
 
+    void TOPGeometryPar::prepareRelPDEonMC() const
+    {
+      m_relPDEonMC.clear();
+      if (m_relEfficiencies.empty()) prepareRelEfficiencies();
+
+      const auto* geo = getGeometry();
+
+      for (const auto& module : geo->getModules()) {
+        auto moduleID = module.getModuleID();
+        const auto& pmtArray = module.getPMTArray();
+        int numPMTs = pmtArray.getSize();
+        int numPMTPixels = pmtArray.getPMT().getNumPixels();
+        for (int pmtID = 1; pmtID <= numPMTs; pmtID++) {
+          double tuneFactor = getGeometry()->getPDETuningFactor(getPMTType(moduleID, pmtID));
+          for (int pmtPixel = 1; pmtPixel <= numPMTPixels; pmtPixel++) {
+            auto pixelID = pmtArray.getPixelID(pmtID, pmtPixel);
+            auto channel = getChannelMapper().getChannel(pixelID);
+            double thrEffi = 0.973; //TODO(rel-10) get rid of hard coding
+            if (m_pulseHeights->isCalibrated(moduleID, channel)) {
+              thrEffi = m_pulseHeights->getParameters(moduleID, channel).getThresholdEffi(40, 9.7); //TODO(rel-10) get rid of hard coding
+            }
+            int id = getUniquePixelID(moduleID, pixelID);
+            m_relPDEonMC[id] = m_relEfficiencies[id] * tuneFactor * thrEffi;
+          }
+        }
+      }
+
+      B2INFO("TOPGeometryPar: pixel relative PDE on MC have been set, size = " << m_relPDEonMC.size());
+    }
 
     double TOPGeometryPar::integralOfQE(const std::vector<float>& qe, double ce,
                                         double lambdaFirst, double lambdaStep) const
     {
       if (qe.empty()) return 0;
 
+      const auto* geo = getGeometry();
+      const auto& filter = geo->getWavelengthFilter();
+
       double s = 0;
       double lambda = lambdaFirst;
-      double f1 = qe[0] / (lambda * lambda);
+      double f1 = qe[0] * filter.getBulkTransmittance(lambda) / (lambda * lambda);
       for (size_t i = 1; i < qe.size(); i++) {
         lambda += lambdaStep;
-        double f2 = qe[i] / (lambda * lambda);
+        double f2 = qe[i] * filter.getBulkTransmittance(lambda) / (lambda * lambda);
         s += (f1 + f2) / 2;
         f1 = f2;
       }
@@ -952,7 +996,7 @@ namespace Belle2 {
       return out;
     }
 
-    double TOPGeometryPar::refractiveIndex(double lambda) const
+    double TOPGeometryPar::refractiveIndex(double lambda)
     {
       // parameters of SellMeier equation (Matsuoka-san, 24.11.2018)
       // from the specs of Corning HPFS 7980
@@ -968,13 +1012,13 @@ namespace Belle2 {
       return sqrt(y);
     }
 
-    double TOPGeometryPar::getPhaseIndex(double energy) const
+    double TOPGeometryPar::getPhaseIndex(double energy)
     {
       double lambda = c_hc / energy;
       return refractiveIndex(lambda);
     }
 
-    double TOPGeometryPar::getGroupIndex(double energy) const
+    double TOPGeometryPar::getGroupIndex(double energy)
     {
       double lambda = c_hc / energy;
       double dl = 1.0; // [nm]

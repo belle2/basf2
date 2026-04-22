@@ -12,7 +12,7 @@
 <header>
 <input>../DSTtoMDST.mdst.root</input>
 <output>../MDSTtoUDST.udst.root</output>
-<contact>Frank Meier; frank.meier@duke.edu</contact>
+<contact>Paul Feichtinger; paul.feichtinger@ijs.si</contact>
 </header>
 """
 
@@ -33,6 +33,3 @@ outputUdst('../MDSTtoUDST.udst.root', path=main)
 
 main.add_module('Progress')
 basf2.process(main)
-
-# Print call statistics
-print(basf2.statistics)

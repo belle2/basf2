@@ -10,24 +10,14 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-//#include <framework/database/DBObjPtr.h>
 
-#include <pxd/dataobjects/PXDCluster.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/PXDIntercept.h>
-
-#include <pxd/utilities/PXD2TrackEvent.h>
-
-//#include <vxd/dataobjects/VxdID.h>
-//#include <vxd/geometry/SensorInfoBase.h>
-//#include <pxd/geometry/SensorInfo.h>
-//#include <vxd/geometry/GeoCache.h>
-//#include <string>
 
 namespace Belle2 {
-
-  //class PXD2TrackEvent;
+  class PXD2TrackEvent;
+  class PXDCluster;
+  class Track;
+  class RecoTrack;
+  class PXDIntercept;
 
   //namespace PXD {
 
@@ -66,8 +56,6 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_recoTracks;
     /** Required input PXDIntercepts */
     StoreArray<PXDIntercept> m_pxdIntercepts;
-    //[>* Required input EventMetaData <]
-    //StoreObjPtr<EventMetaData> m_evtMetaData;
     /** Output PXD2TrackEvent */
     StoreArray<PXD2TrackEvent> m_pxd2TrackEvents;
 

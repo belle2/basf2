@@ -122,7 +122,7 @@ namespace Belle2 {
       std::cout << "#entries= " << m_wires.size() << std::endl;
       std::cout << "in order of ICLayer and IWire and EWire" << std::endl;
 
-      for (auto const ent : m_wires) {
+      for (auto const& ent : m_wires) {
         std::cout << WireID(ent.first).getICLayer() << " " << WireID(ent.first).getIWire() << " " << ent.second << std::endl;
       }
     }
@@ -137,7 +137,7 @@ namespace Belle2 {
       if (fout.bad()) {
         B2ERROR("Specified output file could not be opened!");
       } else {
-        for (auto const ent : m_wires) {
+        for (auto const& ent : m_wires) {
           fout << std::setw(2) << std::right << WireID(ent.first).getICLayer() << "  " << std::setw(3) << WireID(
                  ent.first).getIWire() << " " << ent.second << std::endl;
         }

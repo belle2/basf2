@@ -27,7 +27,7 @@
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CKFToPXDFindlet::~CKFToPXDFindlet() = default;
 
@@ -100,7 +100,7 @@ void CKFToPXDFindlet::beginEvent()
   m_seedStates.clear();
   checkResizeClear<CKFToPXDState>(m_states, 2000);
 
-  checkResizeClear<TrackFindingCDC::WeightedRelation<CKFToPXDState>>(m_relations, 2000);
+  checkResizeClear<TrackingUtilities::WeightedRelation<CKFToPXDState>>(m_relations, 2000);
 
   m_results.clear();
   m_filteredResults.clear();
@@ -119,7 +119,11 @@ void CKFToPXDFindlet::apply()
   const auto notFromPXD = [](const SpacePoint * spacePoint) {
     return spacePoint->getType() != VXD::SensorInfoBase::PXD;
   };
-  TrackFindingCDC::erase_remove_if(m_spacePointVector, notFromPXD);
+  TrackingUtilities::erase_remove_if(m_spacePointVector, notFromPXD);
+
+  if (m_spacePointVector.empty()) {
+    return;
+  }
 
   if (m_param_onlyUseTracksWithSVD) {
     const auto hasNoSVD = [this](const RecoTrack * recoTrack) {
@@ -129,25 +133,67 @@ void CKFToPXDFindlet::apply()
       return m_param_reverseSeed ? svdHitList.back()->getSensorID().getLayerNumber() > 4
              : svdHitList.front()->getSensorID().getLayerNumber() > 4;
     };
-    TrackFindingCDC::erase_remove_if(m_recoTracksVector, hasNoSVD);
+    TrackingUtilities::erase_remove_if(m_recoTracksVector, hasNoSVD);
+
+    if (m_recoTracksVector.empty()) {
+      return;
+    }
   }
 
   B2DEBUG(29, "Now have " << m_spacePointVector.size() << " hits.");
 
   m_stateCreatorFromTracks.apply(m_recoTracksVector, m_seedStates);
-  m_stateCreatorFromHits.apply(m_spacePointVector, m_states);
-  m_relationCreator.apply(m_seedStates, m_states, m_relations);
 
-  B2DEBUG(29, "Created " << m_relations.size() << " relations.");
+  for (const uint layer : {2, 1}) {
+    B2DEBUG(29, "layer" << layer);
+    std::vector<CKFToPXDState> usedStates;
+    std::vector<const SpacePoint*> usedSpacePoints = m_spacePointVector;
 
-  m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
+    // Remove all hits that are not on the layer we are interested in
+    const auto notOnLayer = [layer](const SpacePoint * spacePoint) {
+      return spacePoint->getVxdID().getLayerNumber() != layer;
+    };
+    TrackingUtilities::erase_remove_if(usedSpacePoints, notOnLayer);
+
+    // Only use subset of hit SpacePoints for inter hit state relation creation if they were used in the previous iteration
+    if (layer == 1 and m_results.size() > 0) {
+      std::vector<const SpacePoint*> toSpacePoints;
+      toSpacePoints.reserve(m_spacePointVector.size());
+
+      for (const auto& result : m_results) {
+        for (const auto hit : result.getHits()) {
+          if (hit->getType() == VXD::SensorInfoBase::PXD) {
+            if (std::find(toSpacePoints.begin(), toSpacePoints.end(), hit) == toSpacePoints.end()) {
+              toSpacePoints.push_back(hit);
+            }
+          }
+        }
+      }
+      m_results.clear();
+
+      // add SpacePoints used in previous iteration to the set of SpacePoints to be used in next step
+      usedSpacePoints.reserve(usedSpacePoints.size() + toSpacePoints.size());
+      for (const auto sp : toSpacePoints) {
+        usedSpacePoints.push_back(sp);
+      }
+    }
+
+    m_stateCreatorFromHits.apply(usedSpacePoints, usedStates);
+    // Clear relation vector as we don't want to build up on the previous relations but start fresh
+    checkResizeClear<TrackingUtilities::WeightedRelation<CKFToPXDState>>(m_relations, 2000);
+    m_relationCreator.apply(m_seedStates, usedStates, m_relations);
+
+    B2DEBUG(29, "Created " << m_relations.size() << " relations.");
+
+    m_treeSearchFindlet.apply(m_seedStates, usedStates, m_relations, m_results);
+  }
 
   B2DEBUG(29, "Having found " << m_results.size() << " results before overlap check");
 
   const auto hasLowHitNumber = [this](const CKFResult<RecoTrack, SpacePoint>& result) {
     return result.getHits().size() < m_param_minimalHitRequirement;
   };
-  TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
+  TrackingUtilities::erase_remove_if(m_results, hasLowHitNumber);
 
   m_overlapResolver.apply(m_results, m_filteredResults);
 

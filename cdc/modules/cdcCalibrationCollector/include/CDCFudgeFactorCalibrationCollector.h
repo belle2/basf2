@@ -12,14 +12,10 @@
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreArray.h>
 #include <string>
-#include <TH1F.h>
-#include <TTree.h>
 
 namespace Belle2 {
   namespace CDC {

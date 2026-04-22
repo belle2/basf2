@@ -261,8 +261,11 @@ void SoftwareTriggerHLTDQMModule::initialize()
 
       pclose(pipe);
 
-      if (host.length() == 5) {
-        m_hlt_unit = atoi(host.substr(3, 2).c_str());
+      // Trim space and new line
+      host.erase(std::remove_if(host.begin(), host.end(), ::isspace), host.end());
+
+      if (host.rfind("hlt", 0) == 0 && host.length() == 5) {
+        m_hlt_unit = std::atoi(host.substr(3, 2).c_str());
       } else {
         B2WARNING("HLT unit number not found");
       }
@@ -337,9 +340,12 @@ void SoftwareTriggerHLTDQMModule::event()
       if (m_param_create_total_result_histograms) {
         if (title == baseIdentifier) {
           const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalResultName(baseIdentifier);
-          const int cutResult = static_cast<int>(m_triggerResult->getResult(totalCutIdentifier));
-
-          m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult > 0);
+          // check if the cutResult is in the list, be graceful when not available
+          auto const cutEntry = results.find(totalCutIdentifier);
+          if (cutEntry != results.end()) {
+            const int cutResult = cutEntry->second;
+            m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult > 0);
+          }
         }
       }
     }

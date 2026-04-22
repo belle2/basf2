@@ -786,21 +786,21 @@ namespace Belle2 {
      * Returns a vector of pointers to daughter particles
      * @return vector of pointers to daughter particles
      */
-    std::vector<Belle2::Particle*> getDaughters() const;
+    std::vector<Particle*> getDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
      * Returns a vector of pointers to Final State daughter particles
      * @return vector of pointers to final state daughter particles
      */
-    std::vector<const Belle2::Particle*> getFinalStateDaughters() const;
+    std::vector<const Particle*> getFinalStateDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
      * Returns a vector of pointers to all generations' daughter particles
      * @return vector of pointers to all generations' daughter particles
      */
-    std::vector<const Belle2::Particle*> getAllDaughters() const;
+    std::vector<const Particle*> getAllDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
@@ -1061,7 +1061,7 @@ namespace Belle2 {
      * Function is called recursively
      * @param fspDaughters vector of daughter particles
      */
-    void fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const;
+    void fillFSPDaughters(std::vector<const Particle*>& fspDaughters) const;
 
     /**
      * Fill all generations' daughters into a vector
@@ -1069,7 +1069,7 @@ namespace Belle2 {
      * Function is called recursively
      * @param allDaughters vector of daughter particles
      */
-    void fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const;
+    void fillAllDaughters(std::vector<const Particle*>& allDaughters) const;
 
 
   private:

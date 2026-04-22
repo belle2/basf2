@@ -30,10 +30,16 @@ public:
    *          convert to a string.
    */
   template<class TVarType>
-  LogVar(const std::string& name, const TVarType& v) :
-    m_name(name),
-    m_value(boost::lexical_cast<std::string>(v))
+  LogVar(const std::string& name, const TVarType& v) : m_name(name)
   {
+    if constexpr(std::is_enum_v<TVarType>) {
+      // Convert an enum to its underlying integer type (int, short, etc.).
+      // This avoids problematic boost::is_signed checks on the enum itself.
+      auto underlying_value = static_cast<typename std::underlying_type_t<TVarType>>(v);
+      m_value = std::to_string(underlying_value);
+    } else {
+      m_value = boost::lexical_cast<std::string>(v);
+    }
   }
 
   /**

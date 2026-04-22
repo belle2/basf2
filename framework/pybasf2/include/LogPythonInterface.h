@@ -124,6 +124,14 @@ namespace Belle2 {
     LogConfig& getPackageLogConfig(const std::string& package);
 
     /**
+     * Get the LogConfig for the given module
+     *
+     * @param module The module name
+     * @return The log configuration object
+     */
+    LogConfig& getModuleLogConfig(const std::string& module);
+
+    /**
      * Get maximum number of repetitions before silencing "identical" log messages
      *
      * Identity only checks for log level and message content (excluding variables)

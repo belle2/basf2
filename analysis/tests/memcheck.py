@@ -110,7 +110,7 @@ buildContinuumSuppression('B0:jpsiks', 'all', path=main)
 matchMCTruth('B0:jpsiks', path=main)
 
 # do flavor tagging
-flavorTagger('B0:jpsiks', path=main)
+flavorTagger('B0:jpsiks', useGNN=False, path=main)
 
 # calculate the Tag Vertex and Delta t (in ps), breco: type of MC association.
 TagV('B0:jpsiks', 'breco', path=main)
@@ -135,7 +135,7 @@ for module in main.modules():
 main.add_module('Profile', outputFileName='vmem_profile.png', rssOutputFileName='rss_profile.png').set_log_level(LogLevel.INFO)
 
 # execute all
-process(main)
+process(main, calculateStatistics=True)
 
 # Print and store call statistics
 print(statistics)

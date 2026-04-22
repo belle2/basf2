@@ -86,7 +86,6 @@ found as a parent file independent of the local name or folder structure::
     :func: get_argument_parser
     :prog: check_basf2_file
     :nodefaultconst:
-    :nogroupsections:
 
 .. rubric:: Examples
 
@@ -187,7 +186,6 @@ restrictions apply:
     :func: create_argumentparser
     :prog: b2file-mix
     :nodefaultconst:
-    :nogroupsections:
 
 .. _b2file-remove-branches:
 
@@ -199,7 +197,6 @@ restrictions apply:
     :func: create_argumentparser
     :prog: b2file-remove-branches
     :nodefaultconst:
-    :nogroupsections:
 
 .. versionadded:: release-04-00-00
 
@@ -211,7 +208,6 @@ restrictions apply:
     :func: get_argument_parser
     :prog: b2file-size
     :nodefault:
-    :nogroupsections:
 
 .. _b2file-normalize:
 
@@ -223,7 +219,6 @@ restrictions apply:
     :func: get_argument_parser
     :prog: b2file-normalize
     :nodefaultconst:
-    :nogroupsections:
 
 .. versionadded:: release-04-00-00
 
@@ -235,7 +230,6 @@ restrictions apply:
     :func: get_argument_parser
     :prog: b2file-md5sum
     :nodefaultconst:
-    :nogroupsections:
 
 .. versionadded:: release-04-00-00
 

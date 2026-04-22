@@ -72,17 +72,17 @@ namespace Belle2 {
     */
     TCanvas* getCanvas(void) { return m_canvas.get();};
 
+#if 0 // Unused
     /** Get ref hist pointer
     * @return ref hist ptr
     */
-    // Unused:
-    // TH1* getRefHist(void) { return m_refHist.get();};
+    TH1* getRefHist(void) { return m_refHist.get();};
 
     /** Get scaled ref hist pointer
     * @return scaled ref hist ptr
     */
-    // Unused:
-    // TH1* getRefCopy(void) { return m_refCopy.get();};
+    TH1* getRefCopy(void) { return m_refCopy.get();};
+#endif
 
     /** Set canvas pointer
     * @param canvas input TCanvas pointer

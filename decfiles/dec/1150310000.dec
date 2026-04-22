@@ -18,7 +18,7 @@ Enddecay
 #
 
 Decay B0sig
-1.0     pi-     tau+sig      nu_tau     BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
+1.0     pi-     tau+sig      nu_tau     BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[FF values from HFLAV 2023]
 Enddecay
 CDecay anti-B0sig
 #

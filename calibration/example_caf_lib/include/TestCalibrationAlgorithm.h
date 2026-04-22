@@ -21,7 +21,7 @@ namespace Belle2 {
     TestCalibrationAlgorithm();
 
     /// Destructor
-    virtual ~TestCalibrationAlgorithm() {}
+    ~TestCalibrationAlgorithm() override {}
 
     /// setter for m_willFail
     void setForceFail(bool forceFail) {m_forceFail = forceFail;}
@@ -47,14 +47,14 @@ namespace Belle2 {
   protected:
 
     /// Run algo on data
-    virtual EResult calibrate() override;
+    EResult calibrate() override;
 
     /// Decide if a run should be a payload boundary. Only used in certain Python Algorithm Starategies.
-    virtual bool isBoundaryRequired(const Calibration::ExpRun& currentRun) override;
+    bool isBoundaryRequired(const Calibration::ExpRun& currentRun) override;
 
     /// Start boundary finding mode, we simply set the previous mean to be a silly amount.
     //  Notice that we comment out the argument names because we want to avoid compiler warnings about not using them.
-    virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) override
+    void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) override
     {
       m_previousMean.reset();
     };

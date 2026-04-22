@@ -115,7 +115,7 @@ contVars = [
     'thrustOm',
     'cosTBTO',
     'cosTBz',
-    'KSFWVariables(et)',
+    'KSFWVariables(pt_sum)',
     'KSFWVariables(mm2)',
     'KSFWVariables(hso00)',
     'KSFWVariables(hso02)',
@@ -183,9 +183,8 @@ roe_path.add_module('MVAExpert', listNames=['B0'], extraInfoName='Deep_CS', iden
 expertVars = ['extraInfo(Deep_CS)', 'transformedNetworkOutput(Deep_CS,0.1,1.0)']
 
 # Create output file with all sets of variables.
-ma.variablesToNtuple('B0', variables + expertVars, treename='tree', filename=outfile, path=roe_path)
+ma.variablesToNtuple('B0', variables + expertVars, treename='B0', filename=outfile, path=roe_path)
 
 main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 basf2.process(main)
-print(basf2.statistics)

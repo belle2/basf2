@@ -74,4 +74,3 @@ ma.variablesToNtuple('B0:tag', variables=BvariableList, filename='ROE_BtagBsig.r
 ma.variablesToNtuple('Upsilon(4S):all', variables=Y4SvariableList, filename='ROE_BtagBsig.root', treename='btagbsig', path=myMain)
 
 basf2.process(myMain)
-print(basf2.statistics)

@@ -143,9 +143,12 @@ namespace Belle2::SVD {
     /** implementation of FADC Trailer */
     struct FADCTrailer {
       unsigned int FTBFlags: 16; /**< FTB Flags Field */
-      unsigned int dataSizeCut: 1; /**< APV data-size cut flag  */
-      unsigned int nullDigits: 7; /**< "0000000" */
-      unsigned int apvErrOR  : 4; /**< APV Errors Field OR*/
+      unsigned int APVdataSizeCut: 1; /**< APV data-size cut flag  */
+      unsigned int FADCdataSizeCut: 1; /**< FADC data-size cut flag  */
+      unsigned int DummyAPVHeader: 1; /**< Dummy APV Header included flag */
+      unsigned int PiplAddrMismatch: 1; /**< Pipeline address mismatch detection flag */
+      unsigned int nullDigits: 4; /**< "0000" */
+      unsigned int apvErrOR  : 4; /**< APV Errors Field OR */
       unsigned int check : 4; /**<  MSB "1110" - for FADC Trailer identification */
     };
 
@@ -219,6 +222,7 @@ namespace Belle2::SVD {
     int nTriggerMatchErrors; /**< counter of Trigger match errors */
     int nEventMatchErrors; /**< counter of Event match errors */
     int nUpsetAPVsErrors; /**< counter of upset APV errors */
+    int nSEURecoveryCase; /**< counter of SEU Special Recovery data cases */
     int nErrorFieldErrors; /**< counter of event mismatch errors in FTB's ErrorField */
     int nMissingAPVsErrors; /**< counter of missing APVs errors*/
     int nFADCMatchErrors; /**< counter of FADC boards =/= n of RawData objects errors */
@@ -231,6 +235,11 @@ namespace Belle2::SVD {
 
     /** Map to store a list of upset APVs */
     std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_upsetAPVs;
+    /** Map to store a list of APVs for special data for SEU recovery */
+    std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_seuRecMap;
+
+
+
 
     int m_relativeTimeShift; /**< latency difference between the 3- and 6-sample acquired events in usint of APV clock / 4, read from SVDGlobalConfigParameters and filled into SVDEventInfo */
 

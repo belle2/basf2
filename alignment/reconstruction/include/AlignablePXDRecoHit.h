@@ -31,7 +31,7 @@ namespace Belle2 {
     using PXDRecoHit::PXDRecoHit;
 
     /** Destructor. */
-    virtual ~AlignablePXDRecoHit() {}
+    ~AlignablePXDRecoHit() override {}
 
     /** Creating a deep copy of this hit. */
     genfit::AbsMeasurement* clone() const override

@@ -7,19 +7,21 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.dcl.h>
 
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegmentPair;
+  }
+  namespace TrackFindingCDC {
 
     // Guard to prevent repeated instantiations
-    extern template class RelationFilter<const CDCSegmentPair>;
+    // extern template class TrackingUtilities::RelationFilter<const CDCSegmentPair>;
 
     /// Base class for filtering the neighborhood of axial stereo segment pairs
-    class BaseSegmentPairRelationFilter : public RelationFilter<const CDCSegmentPair> {
+    class BaseSegmentPairRelationFilter : public TrackingUtilities::RelationFilter<const TrackingUtilities::CDCSegmentPair> {
 
     public:
       /// Default constructor
@@ -29,9 +31,9 @@ namespace Belle2 {
       ~BaseSegmentPairRelationFilter();
 
       /// Returns the segment pairs form the range that continue on the to site of the given segment pair.
-      std::vector<const CDCSegmentPair*> getPossibleTos(
-        const CDCSegmentPair* from,
-        const std::vector<const CDCSegmentPair*>& segmentPairs) const final;
+      std::vector<const TrackingUtilities::CDCSegmentPair*> getPossibleTos(
+        const TrackingUtilities::CDCSegmentPair* from,
+        const std::vector<const TrackingUtilities::CDCSegmentPair*>& segmentPairs) const final;
     };
   }
 }

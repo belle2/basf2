@@ -55,7 +55,7 @@ void DQMHistAnalysisExampleModule::beginRun()
 
 void DQMHistAnalysisExampleModule::event()
 {
-  TH1* h = findHist(m_histogramName);
+  auto h = findHist(m_histogramName);
   if (h != NULL) {
     m_canvas->Clear();
     m_canvas->cd();

@@ -51,12 +51,6 @@ namespace Belle2 {
     addParam("trackLevel", m_trackLevel,
              "ONLY USEFUL FOR MC: Use track-level MC (generate truncated mean from predicted mean and sigma using MC truth). "
              "If false, use hit-level MC (use truncated mean determined from hits)", true);
-    addParam("enableDebugOutput", m_enableDebugOutput,
-             "Option to write out debugging information to CDCDedxTracks", true);
-    addParam("likelihoodsName", m_likelihoodsName,
-             "name of CDCDedxLikelihood collection", string(""));
-    addParam("dedxTracksName", m_dedxTracksName,
-             "name of CDCDedxTrack collection", string(""));
   }
 
   CDCDedxPIDCreatorModule::~CDCDedxPIDCreatorModule()
@@ -69,9 +63,9 @@ namespace Belle2 {
     m_hits.isOptional(); // in order to run also with old cdst's where this collection doesn't exist
     m_mcParticles.isOptional();
     m_TTDInfo.isOptional();
-    m_likelihoods.registerInDataStore(m_likelihoodsName);
+    m_likelihoods.registerInDataStore();
     m_tracks.registerRelationTo(m_likelihoods);
-    m_dedxTracks.registerInDataStore(m_dedxTracksName);
+    m_dedxTracks.registerInDataStore();
     m_tracks.registerRelationTo(m_dedxTracks);
 
     m_nLayerWires[0] = 1280;
@@ -143,7 +137,6 @@ namespace Belle2 {
       double sinTheta = std::sin(theta);
 
       // track dependent calibration constants
-      double cosCor = isData ? m_DBCosineCor->getMean(cosTheta) : 1.0;
       bool isEdge = std::abs(cosTheta + 0.860) < 0.010 or std::abs(cosTheta - 0.955) <= 0.005;
       double cosEdgeCor = (isData and isEdge) ? m_DBCosEdgeCor->getMean(cosTheta) : 1.0;
 
@@ -151,7 +144,7 @@ namespace Belle2 {
       const auto* mcParticle = isData ? nullptr : track.getRelated<MCParticle>();
 
       // debug output
-      CDCDedxTrack* dedxTrack = m_enableDebugOutput ? m_dedxTracks.appendNew() : nullptr;
+      CDCDedxTrack* dedxTrack = m_dedxTracks.appendNew();
       if (dedxTrack) {
         dedxTrack->m_track = track.getArrayIndex();
         dedxTrack->m_charge = fitResult->getChargeSign();
@@ -171,7 +164,6 @@ namespace Belle2 {
           dedxTrack->m_cosThetaTrue = std::cos(trueMom.Theta());
         }
         dedxTrack->m_scale = scale;
-        dedxTrack->m_cosCor = cosCor;
         dedxTrack->m_cosEdgeCor = cosEdgeCor;
         dedxTrack->m_runGain = runGain;
         dedxTrack->m_timeGain = timeGain;
@@ -186,7 +178,7 @@ namespace Belle2 {
         // wire numbering: layer and superlayer
         const auto& wireID = hit.getWireID();
         int layer = wireID.getILayer(); // layer within superlayer
-        int superlayer = wireID.getISuperLayer();
+        unsigned int superlayer = wireID.getISuperLayer();
         int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer); // continuous layer number
         if (not m_useBackHalfCurlers and currentLayer < lastLayer) break;
         lastLayer = currentLayer;
@@ -214,6 +206,9 @@ namespace Belle2 {
         double entAng = hit.getEntranceAngle();
         double celldx = cell.dx(doca, entAng) / sinTheta; // length of a track in the cell
         if (not cell.isValid()) continue;
+
+        //cos correction
+        double cosCor = isData ? m_DBCosineCor->getMean(currentLayer, cosTheta) : 1.0;
 
         // wire gain calibration (iwire is a continuous wire number)
         int wire = wireID.getIWire();
@@ -257,7 +252,7 @@ namespace Belle2 {
 
           dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS,
                             adcCount, hit.getADCCount(), hitCharge, celldx * sinTheta, cellDedx, cellHeight, cellHalfWidth,
-                            hit.getTDCCount(), driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
+                            hit.getTDCCount(), driftDRealistic, driftDRealisticRes, cosCor, wiregain, twodcor, onedcor,
                             hit.getFoundByTrackFinder(), hit.getWeightPionHypo(), hit.getWeightKaonHypo(), hit.getWeightProtonHypo());
         }
 

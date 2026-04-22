@@ -40,12 +40,6 @@ namespace Belle2 {
     TOPAlignerModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TOPAlignerModule()
-    {}
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
@@ -64,7 +58,7 @@ namespace Belle2 {
 
   private:
 
-    // module paramenets
+    // module parameters
     int m_targetMid; /**< target module to align. Must be 1 <= Mid <= 16 */
     int m_maxFails; /**< maximum allowed number of failed iterations */
     std::string m_sample; /**< sample type */

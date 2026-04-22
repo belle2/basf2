@@ -10,7 +10,9 @@
 #include <TH1F.h>
 #include <cdc/dbobjects/CDCGeometry.h>
 #include <framework/database/DBObjPtr.h>
-#include "string"
+
+#include <string>
+
 namespace Belle2 {
   namespace CDC {
     /**

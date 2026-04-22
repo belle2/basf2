@@ -16,42 +16,31 @@ kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
 
 #: Cluster-related variables
 cluster = [
-    'clusterKlId',
-    'clusterPulseShapeDiscriminationMVA',
-    'clusterHasPulseShapeDiscrimination',
-    'clusterNumberOfHadronDigits',
-    'clusterDeltaLTemp',
-    'minC2TDist',
-    'nECLClusterTrackMatches',
-    'clusterZernikeMVA',
-    'clusterReg',
     'clusterAbsZernikeMoment40',
     'clusterAbsZernikeMoment51',
-    'clusterBelleQuality',
     'clusterClusterID',
     'clusterConnectedRegionID',
+    'clusterE',
     'clusterE1E9',
     'clusterE9E21',
-    'clusterE9E25',
     'clusterEoP',
-    'clusterErrorE',
-    'clusterErrorPhi',
-    'clusterErrorTheta',
-    'clusterErrorTiming',
-    'clusterHighestE',
     'clusterHasFailedErrorTiming',
     'clusterHasFailedTiming',
     'clusterHasNPhotons',
     'clusterHasNeutralHadron',
+    'clusterHasPulseShapeDiscrimination',
     'clusterLAT',
     'clusterNHits',
     'clusterPhi',
-    'clusterR',
+    'clusterPulseShapeDiscriminationMVA',
+    'clusterReg',
     'clusterSecondMoment',
     'clusterTheta',
     'clusterTiming',
     'clusterTrackMatch',
-    'goodBelleGamma',
+    'clusterZernikeMVA',
+    'minC2TDist',
+    'nECLClusterTrackMatches'
 ]
 
 #: Cluster-related event variables
@@ -82,12 +71,6 @@ event_level_cluster = [
     'nECLTriggerCellsFWDEndcap'
 ]
 
-#: Cluster averages
-cluster_average = [
-    'maxWeightedDistanceFromAverageECLTime',
-    'weightedAverageECLTime'
-]
-
 #: KLM cluster information
 klm_cluster = [
     'klmClusterKlId',
@@ -97,14 +80,18 @@ klm_cluster = [
     'klmClusterPositionZ',
     'klmClusterInnermostLayer',
     'klmClusterLayers',
-    'klmClusterEnergy',
-    'klmClusterMomentum',
     'klmClusterIsBKLM',
     'klmClusterIsEKLM',
     'klmClusterIsForwardEKLM',
     'klmClusterIsBackwardEKLM',
     'klmClusterTheta',
     'klmClusterPhi',
+    'klmClusterTrackDistance',
+    'klmClusterTrackSeparationAngle',
+    'klmClusterTrackRotationAngle',
+    'klmClusterShapeStdDev1',
+    'klmClusterShapeStdDev2',
+    'klmClusterShapeStdDev3',
     'nKLMClusterTrackMatches',
     'nMatchedKLMClusters',
 ]
@@ -383,4 +370,11 @@ belle_track_hit = [
     "BelleLastCDCHitX",
     "BelleLastCDCHitY",
     "BelleLastCDCHitZ"
+]
+
+#: EventT0 sources
+eventT0_sources = [
+    "eventT0CalculatedWithSVDInfo",
+    "eventT0CalculatedWithCDCInfo",
+    "eventT0CalculatedWithECLInfo"
 ]

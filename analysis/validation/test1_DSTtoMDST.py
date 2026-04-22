@@ -12,7 +12,7 @@
 <header>
   <input>../GenericB_GENSIMRECtoDST.dst.root</input>
   <output>../DSTtoMDST.mdst.root</output>
-  <contact>Frank Meier; frank.meier@duke.edu</contact>
+  <contact>Paul Feichtinger; paul.feichtinger@ijs.si</contact>
 </header>
 """
 
@@ -33,6 +33,3 @@ add_mdst_output(main, True, '../DSTtoMDST.mdst.root')
 
 main.add_module('Progress')
 basf2.process(main)
-
-# Print call statistics
-print(basf2.statistics)

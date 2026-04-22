@@ -33,7 +33,6 @@ namespace Belle2 {
 
   }
 
-
   void TOPOffsetCollectorModule::prepare()
   {
     m_recBunch.isRequired();
@@ -54,19 +53,20 @@ namespace Belle2 {
   }
 
 
-  void TOPOffsetCollectorModule::collect()
+  void TOPOffsetCollectorModule::startRun()
   {
-    if (m_firstEvent) {
-      m_firstEvent = false;
-      if (m_bunchStructure->isSet()) {
-        auto h = getObjectPtr<TH1F>("fillPattern");
-        int RFBuckets = m_bunchStructure->getRFBucketsPerRevolution();
-        for (int i = 0; i < RFBuckets; i++) {
-          if (m_bunchStructure->getBucket(i)) h->SetBinContent(i + 1, 1);
-        }
+    auto h = getObjectPtr<TH1F>("fillPattern");
+    if (m_bunchStructure->isSet()) {
+      int RFBuckets = m_bunchStructure->getRFBucketsPerRevolution();
+      for (int i = 0; i < RFBuckets; i++) {
+        if (m_bunchStructure->getBucket(i)) h->SetBinContent(i + 1, 1);
       }
     }
+  }
 
+
+  void TOPOffsetCollectorModule::collect()
+  {
     if (not m_recBunch->isReconstructed()) return;
 
     for (const auto& x : m_names) {

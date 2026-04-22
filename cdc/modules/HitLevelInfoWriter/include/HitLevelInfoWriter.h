@@ -12,13 +12,8 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
-#include <genfit/Track.h>
-
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
@@ -30,24 +25,17 @@
 #include <cdc/dbobjects/CDCDedxWireGain.h>
 #include <cdc/dbobjects/CDCDedxRunGain.h>
 #include <cdc/dbobjects/CDCDedxCosineCor.h>
-#include <cdc/dbobjects/CDCDedxInjectionTime.h>
 #include <cdc/dbobjects/CDCDedx2DCell.h>
 #include <cdc/dbobjects/CDCDedx1DCell.h>
 #include <cdc/dbobjects/CDCDedxInjectionTime.h>
 #include <cdc/dbobjects/CDCDedxADCNonLinearity.h>
 #include <cdc/dbobjects/CDCDedxCosineEdge.h>
 #include <cdc/dbobjects/CDCDedxHadronCor.h>
-#include <reconstruction/dataobjects/DedxConstants.h>
-
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/utility/ReferenceFrame.h>
 
 #include <vector>
 
 #include <TFile.h>
 #include <TTree.h>
-#include <TString.h>
 
 class TH2F;
 
@@ -200,7 +188,6 @@ namespace Belle2 {
 
     // calibration constants
     double m_scale{ -1.};   /**< calibration scale factor */
-    double m_cosCor{ -1.};  /**< calibration cosine correction */
     double m_cosEdgeCor{ -1.};  /**< calibration cosine edge correction */
     double m_runGain{ -1.}; /**< calibration run gain */
     double m_timeGain{ -1.}; /**< calibration injection time gain */
@@ -244,6 +231,7 @@ namespace Belle2 {
     int l_layer[kMaxHits] = {};          /**< layer number */
     double l_path[kMaxHits] = {};        /**< distance travelled in this layer */
     double l_dedx[kMaxHits] = {};        /**< dE/dx for this layer */
+    double l_cosCor[kMaxHits] = {};  /**< calibration cosine correction */
 
     // hit level information (references on nhits)
     int h_nhits{ -1};           /**< the number of good hits for this Track */
@@ -263,6 +251,7 @@ namespace Belle2 {
     double h_driftT[kMaxHits] = {};   /**< drift time */
     double h_driftD[kMaxHits] = {};   /**< drift distance */
     double h_facnladc[kMaxHits] = {}; /**< calibration hit gain */
+    double h_cosCor[kMaxHits] = {};  /**< calibration cosine correction */
     double h_wireGain[kMaxHits] = {}; /**< calibration hit gain */
     double h_twodCor[kMaxHits] = {};  /**< calibration 2D correction */
     double h_onedCor[kMaxHits] = {};  /**< calibration 1D cleanup correction */

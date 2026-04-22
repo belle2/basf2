@@ -6,7 +6,7 @@ Reconstruction
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 30 minutes
+    **Length**: 30-60 min
 
     **Prerequisites**:
 
@@ -133,7 +133,7 @@ reconstruction takes about twice as long as the simulation of an event.
     *fakes*?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     Take a good look at the left event display on the left side in
     :numref:`fig:reconstruction-trackfinding`. This is a relatively clean event
@@ -141,7 +141,7 @@ reconstruction takes about twice as long as the simulation of an event.
     <backgrounds>`.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     With high numbers of hits from beam-induced backgrounds and resulting high
     occupancies, the track finding faces a combinatorial challenge: Of the
@@ -175,7 +175,7 @@ reconstruction takes about twice as long as the simulation of an event.
     reconstruct an equivalent amount of MC in one year? And what will it cost?
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     It's basically the same question as above but we now have a cross section of
     20 nb we want to simulate.
@@ -184,7 +184,7 @@ reconstruction takes about twice as long as the simulation of an event.
     reconstruct twice.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     Now all together we will have 1 trillion events from the detector. We have
     to simulate the same amount of events. And reconstruct both.

@@ -40,7 +40,7 @@ namespace Belle2 {
     /** Make sure that we only have floating point vectors */
     static_assert(std::is_floating_point<DataType>::value, "B2Vector3 only works with floating point types");
     /** contains the coordinates in given data type */
-    DataType m_coordinates[3];
+    DataType m_coordinates[3] {};
   public:
     /** storage type of the vector */
     typedef DataType value_type;
@@ -690,7 +690,15 @@ namespace Belle2 {
   }
 
   template< typename DataType >
-  void B2Vector3<DataType>::GetXYZ(double* carray) const
+  void B2Vector3<DataType>::GetXYZ(Double_t* carray) const
+  {
+    carray[0] = X();
+    carray[1] = Y();
+    carray[2] = Z();
+  }
+
+  template< typename DataType >
+  void B2Vector3<DataType>::GetXYZ(Float_t* carray) const
   {
     carray[0] = X();
     carray[1] = Y();

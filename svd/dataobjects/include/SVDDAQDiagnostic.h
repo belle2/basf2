@@ -45,6 +45,8 @@ namespace Belle2 {
       APVMatchBits = 1,
       /** Number of bits available to represent an upset APV code */
       UpsetAPVBits = 1,
+      /** Number of bits available to represent an SEU Recovery Data code */
+      SEURecoDataBits = 1,
       /** Number of bits available to represent bad mapping */
       BadMappingBits = 1,
       /** Number of Bits available to represent bad header */
@@ -58,7 +60,7 @@ namespace Belle2 {
 
 
       /** Total bit size of the SVDDAQDiagnostic */
-      Bits = TriggerTypeBits + TriggerNumberBits + PipelineAddressBits + CMC1Bits + CMC2Bits + APVErrorBits + FTBErrorBits + FTBFlagsBits + EMUPipelineAddressBits + APVErrorORBits + FADCMatchBits + APVMatchBits + UpsetAPVBits + BadMappingBits + BadHeaderBits + BadTrailerBits + MissedHeaderBits + MissedTrailerBits
+      Bits = TriggerTypeBits + TriggerNumberBits + PipelineAddressBits + CMC1Bits + CMC2Bits + APVErrorBits + FTBErrorBits + FTBFlagsBits + EMUPipelineAddressBits + APVErrorORBits + FADCMatchBits + APVMatchBits + UpsetAPVBits + SEURecoDataBits + BadMappingBits + BadHeaderBits + BadTrailerBits + MissedHeaderBits + MissedTrailerBits
     };
 
 
@@ -102,6 +104,7 @@ namespace Belle2 {
       m_fadcNo = fadcNo;
       m_apvNo = apvNo;
       m_upsetApv = 0;
+      m_seuRecoData = 0;
       m_badMapping = 0;
       m_badTrailer = 0;
     }
@@ -135,6 +138,8 @@ namespace Belle2 {
     bool getFADCMatch() const {return m_fadcMatch; }
     /** Get the UpsetAPV code */
     bool getUpsetAPV() const {return m_upsetApv; }
+    /** Get the SEURecoData code */
+    bool getSEURecoData() const {return m_seuRecoData; }
     /** Get the Bad Mapping code */
     bool getBadMapping() const {return m_badMapping; }
     /** Get the Bad Trailer code */
@@ -171,6 +176,9 @@ namespace Belle2 {
     /** functions for setting values for
      * - Upset APVs*/
     void setUpsetAPV(bool UpsetAPV) { m_upsetApv = UpsetAPV; }
+    /** functions for setting values for
+     * - SEU Reco Data*/
+    void setSEURecoData(bool SEURecoData) { m_seuRecoData = SEURecoData; }
     /** functions for setting values for
      * - Bad Mapping*/
     void setBadMapping(bool BadMapping) { m_badMapping = BadMapping; }
@@ -211,6 +219,8 @@ namespace Belle2 {
     bool m_apvMatch;
     /**Upset APV */
     bool m_upsetApv;
+    /**SEU Special Data */
+    bool m_seuRecoData;
     /**Bad mapping */
     bool m_badMapping;
     /**Bad fadc Header */
@@ -227,7 +237,7 @@ namespace Belle2 {
     /**APV # */
     uint8_t m_apvNo;
 
-    ClassDef(SVDDAQDiagnostic, 5)
+    ClassDef(SVDDAQDiagnostic, 6)
 
   }; // class SVDDAQDiagnostic
 } // namespace Belle2

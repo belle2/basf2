@@ -11,13 +11,9 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <cdc/utilities/CDCDedxWidgetSigma.h>
-#include <cdc/dbobjects/CDCDedxMeanPars.h>
 #include <cdc/dbobjects/CDCDedxSigmaPars.h>
 
 #include <vector>
-
-#include <memory>
-#include <cmath>
 
 #include <string>
 #include <iostream>

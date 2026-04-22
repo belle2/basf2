@@ -31,6 +31,7 @@ ma.matchMCTruth('D0', path=mypath)
 # you can use this to write out candidate independent information (aka event-based variables)
 mypath.add_module('VariablesToEventBasedTree',
                   particleList='D0',
+                  treeName='d_meson',
                   variables=['dM', 'isSignal', 'mcErrors', 'p', 'E',
                              'daughter(0, kaonID)', 'daughter(1, pionID)'],
                   event_variables=['nTracks', 'isMC'])
@@ -44,4 +45,3 @@ mypath.add_module('VariablesToEventBasedTree',
 
 # process the data
 basf2.process(mypath)
-print(basf2.statistics)

@@ -29,7 +29,7 @@ main.add_module(gearbox)
 main.add_module(eklmdatachecker)
 
 # Process the data
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # show call statistics
 print(basf2.statistics)

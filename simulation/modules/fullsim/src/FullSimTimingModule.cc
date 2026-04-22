@@ -8,6 +8,7 @@
 
 #include <simulation/modules/fullsim/FullSimTimingModule.h>
 #include <simulation/kernel/RunManager.h>
+#include <simulation/kernel/StepTiming.h>
 #include <framework/gearbox/Unit.h>
 #include <G4EventManager.hh>
 #include <G4VSteppingVerbose.hh>
@@ -64,7 +65,7 @@ void FullSimTimingModule::initialize()
   //if we are before
 
   Simulation::RunManager& runManager = Simulation::RunManager::Instance();
-  //So, we check if the Simulation has been intialized already. If so we can
+  //So, we check if the Simulation has been initialized already. If so we can
   //initialize the StepTiming now, otherwise we do it in the first call to the
   //event function. For this we just check if the PrimaryGeneratorAction has
   //been set
@@ -93,7 +94,7 @@ void FullSimTimingModule::event()
     //to map from region to index in the store
     int index {0};
     for (G4Region* region : * (G4RegionStore::GetInstance())) {
-      //We don't care about regions wihtout volumes
+      //We don't care about regions without volumes
       if (region->GetNumberOfRootVolumes() == 0) continue;
       //Increase the index otherwise
       m_regionIndices[region] = index++;

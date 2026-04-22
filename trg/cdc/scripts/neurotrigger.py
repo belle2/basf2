@@ -7,7 +7,6 @@
 ##########################################################################
 
 import basf2
-from ROOT import Belle2
 import nntd
 
 ################################################################################
@@ -56,16 +55,10 @@ class casefilter(basf2.Module):
             setattr(self, key, value)
 
     def event(self):
+        from ROOT import Belle2  # noqa
         lower = self.lowerthan == 0 or bool(len(Belle2.PyStoreArray(self.filterarrayname)) < self.lowerthan)
         higher = bool(len(Belle2.PyStoreArray(self.filterarrayname)) > self.higherthan)
         self.return_value(lower and higher)
-
-
-lt2reco = basf2.register_module(casefilter())
-lt2reco.param({"filterarrayname": "RecoTracks", "lowerthan": 2})
-
-lt4reco = basf2.register_module(casefilter())
-lt4reco.param({"filterarrayname": "RecoTracks", "lowerthan": 4})
 
 
 class nnt_eventfilter(basf2.Module):
@@ -81,9 +74,11 @@ class nnt_eventfilter(basf2.Module):
         self.if_false(self.nullpath)
 
     def hastrginfo(self):
+        from ROOT import Belle2  # noqa
         return bool(Belle2.PyStoreArray(self.twodtracksname).getEntries() > 0)
 
     def neurotrack_allgoodquality(self):
+        from ROOT import Belle2  # noqa
         isgoodquality = True
         for tr in Belle2.PyStoreArray("CDCTriggerNeuroTracks"):
             if tr.getQualityVector() > 0:
@@ -339,6 +334,54 @@ def add_neuro_2d_unpackers(path, debug_level=4, debugout=False, **kwargs):
     unpacker.param('decodeNeuro', True)
     path.add_module(unpacker)
 
+    if (('unpackDNN' in kwargs) and (kwargs['unpackDNN'])):
+        # DNN unpacker, using same module
+        DNN_unpacker = basf2.register_module('CDCTriggerUnpacker')
+        if debugout:
+            DNN_unpacker.logging.log_level = basf2.LogLevel.DEBUG
+            DNN_unpacker.logging.debug_level = debug_level
+            DNN_unpacker.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
+
+        # size (number of words) of the Belle2Link header
+        DNN_unpacker.param('headerSize', 3)
+        # always use DB for DNNT
+        DNN_unpacker.param('useDB', True)
+        # sim 13 bit drift time if required
+        if 'sim13dt' in kwargs:
+            DNN_unpacker.param('sim13dt', kwargs['sim13dt'])
+        else:
+            DNN_unpacker.param('sim13dt', False)
+        # DNN board ID
+        DNN_unpacker.param('NeuroNodeId_pcie40', [
+            # UT4 3D
+            [0x10000001, 4],
+            [0x10000001, 5],
+            [0x10000001, 6],
+            [0x10000001, 7]])
+        # unpack DNN track, decodeing and related 2D track
+        DNN_unpacker.param('unpackNeuro', True)
+        DNN_unpacker.param('decodeNeuro', True)
+        DNN_unpacker.param('unpackMerger', True)
+        DNN_unpacker.param('unpackTracker2D', True)
+        DNN_unpacker.param('decode2DFinderTrack', True)
+        # DNN track default name
+        DNN_unpacker.param("NNTrackName", "CDCTriggerDNNTracks")
+        # DNN relate TS default name
+        DNN_unpacker.param("NNInStereoTS", "CDCTriggerDNNInputAllStereoSegmentHits")
+        # DNN select TS default name
+        DNN_unpacker.param("NNInSelectTS", "CDCTriggerDNNInputSegmentHits")
+        # DNN 2D input
+        DNN_unpacker.param("NNIn2DTrack", "CDCTriggerDNNInput2DFinderTracks")
+        # DNN ETF input
+        DNN_unpacker.param("NNInETFT0", "CDCTriggerDNNETFT0")
+        # DNN scaled input
+        DNN_unpacker.param("NNScaledInput", "CDCTriggerDNNTracksInput")
+        # DNNT bit map
+        DNN_unpacker.param("configName", "DNNT_Config")
+        # flag to use DNN unpacker
+        DNN_unpacker.param("isDNN", True)
+        path.add_module(DNN_unpacker)
+
 
 def add_neurotrigger_sim(path, nntweightfile=None, debug_level=4, debugout=False, **kwargs):
     nnt = basf2.register_module('CDCTriggerNeuro')
@@ -363,7 +406,7 @@ def add_neurotrigger_sim(path, nntweightfile=None, debug_level=4, debugout=False
     else:
         nnt.param('fixedPoint', True)
     if nntweightfile is not None:
-        nnt.param('filename', Belle2.FileSystem.findFile(nntweightfile))
+        nnt.param('filename', basf2.find_file(nntweightfile))
 
     if 'et_option' in kwargs:
         nnt.param('et_option', kwargs['et_option'])
@@ -403,7 +446,7 @@ def add_neurotrigger_hw(path, nntweightfile=None, debug_level=4, debugout=False,
         nnt.param('realinputCollectionName', hwneuroinput2dfindertracks)
 
     if nntweightfile is not None:
-        nnt.param('filename', Belle2.FileSystem.findFile(nntweightfile))
+        nnt.param('filename', basf2.find_file(nntweightfile))
     nnt.param('NeuroHWTrackInputMode', True)
     if 'et_option' in kwargs:
         nnt.param('et_option', kwargs['et_option'])
@@ -426,11 +469,11 @@ def add_neuro_simulation(path, nntweightfile=None, **kwargs):
     if "InnerTSLUTFile" in kwargs:
         tsf.param("InnerTSLUTFile", kwargs["InnerTSLUTFile"])
     else:
-        tsf.param("InnerTSLUTFile", Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe"))
+        tsf.param("InnerTSLUTFile", basf2.find_file("data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe"))
     if "OuterTSLUTFile" in kwargs:
         tsf.param("OuterTSLUTFile", kwargs["OuterTSLUTFile"])
     else:
-        tsf.param("OuterTSLUTFile", Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe"))
+        tsf.param("OuterTSLUTFile", basf2.find_file("data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe"))
     tsf.param("TSHitCollectionName", simsegmenthits)
     tsf.param("CDCHitCollectionName", "CDCHits")
     if "relateAllHits" in kwargs:
@@ -449,7 +492,7 @@ def add_neuro_simulation(path, nntweightfile=None, **kwargs):
                     hitCollectionName=simsegmenthits,
                     outputCollectionName=sim2dtracks_swts)
     if nntweightfile is not None:
-        nnt.param('filename', Belle2.FileSystem.findFile(nntweightfile))
+        nnt.param('filename', basf2.find_file(nntweightfile))
     if 'et_option' in kwargs:
         nnt.param('et_option', kwargs['et_option'])
     nnt.param('inputCollectionName', sim2dtracks_swts)

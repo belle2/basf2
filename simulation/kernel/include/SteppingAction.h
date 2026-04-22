@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef STEPPINGACTION_H_
-#define STEPPINGACTION_H_
+#pragma once
 
 #include <globals.hh>
 #include <G4UserSteppingAction.hh>
@@ -78,5 +77,3 @@ namespace Belle2 {
   } // end namespace Simulation
 
 } // end namespace Belle2
-
-#endif /* STEPPINGACTION_H_ */

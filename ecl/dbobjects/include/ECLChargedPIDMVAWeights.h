@@ -20,9 +20,6 @@
 #include <TH1.h>
 #include <TParameter.h>
 
-//BOOST
-#include <boost/algorithm/string/predicate.hpp>
-
 // C++
 #include <unordered_map>
 #include <algorithm>
@@ -170,9 +167,9 @@ namespace Belle2 {
       // Load and serialize the MVA::Weightfile object into a string for storage in the database,
       // otherwise there are issues w/ dictionary generation for the payload class...
       Belle2::MVA::Weightfile weightfile;
-      if (boost::ends_with(weightfilePath, ".root")) {
+      if (weightfilePath.ends_with(".root")) {
         weightfile = Belle2::MVA::Weightfile::loadFromROOTFile(weightfilePath);
-      } else  if (boost::ends_with(weightfilePath, ".xml")) {
+      } else if (weightfilePath.ends_with(".xml")) {
         weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(weightfilePath);
       } else {
         B2WARNING("Unknown file extension for file: " << weightfilePath << ", fallback to xml...");
@@ -196,6 +193,11 @@ namespace Belle2 {
      * Getter for serialised weightfile.
      */
     const std::string getSerialisedWeight() const {return m_weight;}
+
+    /**
+     * Setter for serialised weightfile.
+     */
+    void setSerialisedWeight(std::string weight) { m_weight = weight; }
 
     /**
      * Getter for the MVA transform mode.

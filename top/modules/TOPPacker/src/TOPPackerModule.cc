@@ -59,10 +59,6 @@ namespace Belle2 {
 
   }
 
-  TOPPackerModule::~TOPPackerModule()
-  {
-  }
-
   void TOPPackerModule::initialize()
   {
 
@@ -92,10 +88,6 @@ namespace Belle2 {
 
   }
 
-  void TOPPackerModule::beginRun()
-  {
-  }
-
   void TOPPackerModule::event()
   {
 
@@ -116,15 +108,6 @@ namespace Belle2 {
   }
 
 
-  void TOPPackerModule::endRun()
-  {
-  }
-
-  void TOPPackerModule::terminate()
-  {
-  }
-
-
   void TOPPackerModule::packProductionDraft()
   {
     StoreObjPtr<EventMetaData> evtMetaData;
@@ -133,7 +116,7 @@ namespace Belle2 {
 
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
-    if (mapSize == 0) return;
+    if (mapSize <= 0) return;
 
     vector<const TOPDigit*>* sortedDigits = new vector<const TOPDigit*>[mapSize];
 
@@ -202,7 +185,7 @@ namespace Belle2 {
 
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
-    if (mapSize == 0) return;
+    if (mapSize <= 0) return;
 
     auto* sortedDigits = new vector<const TOPRawDigit*>[mapSize];
 
@@ -296,7 +279,7 @@ namespace Belle2 {
 
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
-    if (mapSize == 0) return;
+    if (mapSize <= 0) return;
 
     auto* sortedDigits = new vector<const TOPRawDigit*>[mapSize];
 

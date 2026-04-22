@@ -12,17 +12,19 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/KlId.h>
-
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-#include <mva/interface/Weightfile.h>
-#include <mva/interface/Expert.h>
-
 #include <string>
 
 
 namespace Belle2 {
+  class KLMCluster;
+  class KlId;
+  class DatabaseRepresentationOfWeightfile;
+
+  namespace MVA {
+    class Weightfile;
+    class Expert;
+    class SingleDataset;
+  }
 
 
   /** Module to perform the KLM KlId classification. This module only classifies KLM clusters.

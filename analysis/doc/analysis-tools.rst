@@ -11,7 +11,6 @@ Tools for luminosity
     :func: argparser
     :prog: b2info-luminosity
     :nodefaultconst:
-    :nogroupsections:
 
 
 Tools for ParticleStats

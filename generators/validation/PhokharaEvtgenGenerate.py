@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 <header>
     <output>PhokharaEvtgenData.root</output>
@@ -18,8 +26,6 @@ basf2.set_log_level(basf2.LogLevel.INFO)
 # Random seed.
 basf2.set_random_seed(12345)
 
-#: \cond Doxygen_suppress
-
 # Create the main path.
 main = basf2.create_path()
 
@@ -37,13 +43,8 @@ output = basf2.register_module('RootOutput')
 output.param('outputFileName', 'PhokharaEvtgenData.root')
 main.add_module(output)
 
-#: \endcond
-
 # Progress.
 main.add_module('Progress')
 
 # Generate events.
 basf2.process(main)
-
-# Show call statistics.
-print(basf2.statistics)

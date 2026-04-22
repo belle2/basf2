@@ -14,7 +14,16 @@ from dataclasses import dataclass
 import matplotlib.pyplot as plt
 import pdg
 import warnings
+import ast
 from pandas.errors import PerformanceWarning
+
+warnings.warn(
+    "This module will soon be deprecated and eventually removed in a future release. "
+    "Its functionality is being taken over by the standalone SysVar package: "
+    "https://gitlab.desy.de/belle2/software/sysvar",
+    FutureWarning,
+    stacklevel=2
+)
 
 """
 A module that adds corrections to analysis dataframe.
@@ -37,6 +46,7 @@ class ReweighterParticle:
     """
     Class that stores the information of a particle.
     """
+    #: @var prefix
     #: Prefix of the particle in the ntuple
     prefix: str
 
@@ -46,12 +56,15 @@ class ReweighterParticle:
     #: Merged table of the weights
     merged_table: pd.DataFrame
 
+    #: @var pdg_binning
     #: Kinematic binning of the weight table per particle
     pdg_binning: dict
 
+    #: @var variable_aliases
     #: Variable aliases of the weight table
     variable_aliases: dict
 
+    #: @var weight_name
     #: Weight column name that will be added to the ntuple
     weight_name: str
 
@@ -476,6 +489,18 @@ class Reweighter:
             result['data_MC_uncertainty_sys_dn'] = 0
             result['data_MC_uncertainty_sys_up'] = 0
             result[_fei_mode_col] = table['mode']
+        elif 'dmID' in table.columns:
+            result = pd.DataFrame(index=table.index)
+            result['data_MC_ratio'] = table['central_value']
+            result['PDG'] = table['PDG'].apply(ast.literal_eval).str[0].abs()
+            result['mcPDG'] = result['PDG']
+            result['threshold'] = table['sigProb']
+            # Assign the total error to the stat uncertainty and set syst. one to 0
+            result['data_MC_uncertainty_stat_dn'] = table['total_error']
+            result['data_MC_uncertainty_stat_up'] = table['total_error']
+            result['data_MC_uncertainty_sys_dn'] = 0
+            result['data_MC_uncertainty_sys_up'] = 0
+            result[_fei_mode_col] = ('mode' + table['dmID'].astype(str)).replace('mode999', 'rest')
         else:
             result = table
         result = result.query(f'threshold == {threshold}')

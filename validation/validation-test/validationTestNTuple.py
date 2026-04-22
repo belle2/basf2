@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# @cond SUPPRESS_DOXYGEN
-
 """
 <header>
 <output>validationTestNTuple.root</output>
@@ -88,5 +86,3 @@ if __name__ == "__main__":
     # Closing
 
     tfile.Close()
-
-# @endcond

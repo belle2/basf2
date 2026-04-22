@@ -153,6 +153,7 @@ class MCSample(Sample):
         location,
         process,
         campaign,
+        generator="default",
         beam_energy="4S",
         beam_background="BGx1",
         **kwargs,
@@ -163,6 +164,7 @@ class MCSample(Sample):
         self.location = self.resolve_path(location)
         self.process = process
         self.beam_energy = beam_energy
+        self.generator = generator
 
         if isinstance(campaign, int) or not campaign.startswith("MC"):
             campaign = f"MC{campaign}"
@@ -179,7 +181,8 @@ class MCSample(Sample):
             f"process={repr(self.process)}, "
             f"campaign={repr(self.campaign)}, "
             f"beam_energy={repr(self.beam_energy)}, "
-            f"beam_background={repr(self.beam_background)})"
+            f"beam_background={repr(self.beam_background)}), "
+            f"generator={repr(self.generator)})"
         )
 
     @property
@@ -187,6 +190,7 @@ class MCSample(Sample):
         return {
             "location": str(self.location),
             "process": self.process,
+            "generator": self.generator,
             "campaign": self.campaign,
             "beam_energy": self.beam_energy,
             "beam_background": self.beam_background,
@@ -195,7 +199,7 @@ class MCSample(Sample):
     @property
     def encodeable_name(self):
         return "-".join(
-            ("MC", self.campaign, self.beam_energy, self.process, self.beam_background)
+            ("MC", self.campaign, self.beam_energy, self.process, self.generator, self.beam_background)
         )
 
     @property
@@ -206,6 +210,8 @@ class MCSample(Sample):
             name += f" {self.beam_background}"
         if self.beam_energy != "4S":
             name += f", {self.beam_energy}"
+        if self.generator != "default":
+            name += f", {self.generator}"
         return name
 
 
@@ -384,6 +390,7 @@ class TestSampleList:
         campaign=None,
         beam_energy=None,
         beam_background=None,
+        generator=None,
         exact_match=False,
         inplace=False,
     ):
@@ -412,6 +419,7 @@ class TestSampleList:
             and (campaign is None or s.campaign == campaign)
             and (beam_energy is None or s.beam_energy == beam_energy)
             and (beam_background is None or s.beam_background == beam_background)
+            and (generator is None or s.generator == generator)
         ]
         if exact_match:
             if len(samples) == 1:

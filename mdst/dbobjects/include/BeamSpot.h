@@ -9,7 +9,7 @@
 #pragma once
 
 #include <TMatrixDSym.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   /** This class contains the beam spot position and size modeled as a
@@ -52,14 +52,14 @@ namespace Belle2 {
      * @param ipPosition position in basf2 units: cm
      * @param covariance covariance matrix of the vertex position.
      */
-    void setIP(const TVector3& ipPosition, const TMatrixDSym& covariance)
+    void setIP(const ROOT::Math::XYZVector& ipPosition, const TMatrixDSym& covariance)
     {
       m_IPPosition = ipPosition;
       m_IPPositionCovMatrix = covariance;
     }
 
     /** Get the IP position */
-    const TVector3& getIPPosition() const
+    const ROOT::Math::XYZVector& getIPPosition() const
     {
       return m_IPPosition;
     }
@@ -90,7 +90,7 @@ namespace Belle2 {
 
     /** Beam spot position
      * defined as the average position of the primary vertex */
-    TVector3 m_IPPosition;
+    ROOT::Math::XYZVector m_IPPosition;
 
     /** CovMatrix of the measured beam spot position*/
     TMatrixDSym m_IPPositionCovMatrix;
@@ -99,7 +99,7 @@ namespace Belle2 {
      * three dimensional gaussian. Covariance matrix */
     TMatrixDSym m_sizeCovMatrix;
 
-    ClassDef(BeamSpot, 2); /**<  beam spot position and size **/
+    ClassDef(BeamSpot, 3); /**<  beam spot position and size **/
   };
 
 } //Belle2 namespace

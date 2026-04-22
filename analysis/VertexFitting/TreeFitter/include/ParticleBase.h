@@ -9,10 +9,6 @@
 #pragma once
 
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
-#include <analysis/VertexFitting/TreeFitter/Projection.h>
-#include <analysis/VertexFitting/TreeFitter/ErrCode.h>
-#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
-#include <Eigen/Core>
 
 #include <analysis/dataobjects/Particle.h>
 
@@ -20,6 +16,7 @@ namespace TreeFitter {
 
   class FitParams;
   class ConstraintConfiguration;
+  class Projection;
 
   /** base class for all particles */
   class ParticleBase {
@@ -34,8 +31,7 @@ namespace TreeFitter {
                          kInternalParticle,
                          kRecoTrack,
                          kResonance,
-                         kRecoPhoton,
-                         kRecoKlong,
+                         kRecoNeutral,
                          kMissingParticle
                         };
 

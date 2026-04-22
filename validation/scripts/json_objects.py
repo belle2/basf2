@@ -127,9 +127,9 @@ class Script(JsonBase):
         #: output files produced by the script as declared in
         #  the header
         self.output = output
-        #: linked issues
         if not issues:
             issues = []
+        #: linked issues
         self.issues = issues
 
 
@@ -191,9 +191,9 @@ class Plot(JsonBase):
         self.width = width
         #: height of the plot in pixels
         self.height = height
-        #: linked issues
         if not issue:
             issue = []
+        #: linked issues
         self.issue = issue
 
 
@@ -441,9 +441,9 @@ class ComparisonPlot(Plot):
         #: directory; has to end with trailing '/'!)
         self.plot_path = plot_path
 
-        #: Warnings ("no contact" person etc.)
         if warnings is None:
             warnings = []
+        #: Warnings ("no contact" person etc.)
         self.warnings = warnings
 
 

@@ -31,15 +31,16 @@ def add_analysis_dqm(path):
 
     # muons, Kshorts and pi0s
     ma.fillParticleList('mu+:KLMDQM', 'p>1.5', path=path)
+    ma.fillParticleList('mu+:KLMDQM2', 'p>1.5 and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.fillParticleList('gamma:physDQM', 'E > 0.15', path=path)
     ma.fillParticleList('mu+:physDQM', 'pt>2. and abs(d0) < 2 and abs(z0) < 4', path=path)
-    ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, True, path)
+    ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, writeOut=False, path=path)
     # std Kshorts-TreeFit
-    stdV0s.stdKshorts(path=path, updateAllDaughters=True, writeOut=True)
-    ma.reconstructDecay('Upsilon:physDQM -> mu-:physDQM mu+:physDQM', '9 < M < 12', 1, True, path)
+    stdV0s.stdKshorts(path=path, fitter='TreeFit', updateAllDaughters=True, writeOut=False, addSuffix=True)
+    ma.reconstructDecay('Upsilon:physDQM -> mu-:physDQM mu+:physDQM', '9 < M < 12', 1, writeOut=False, path=path)
     # bhabha,hadrons
     ma.fillParticleList('e+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)
-    ma.reconstructDecay('Upsilon:ephysDQM -> e-:physDQM e+:physDQM', '4 < M < 12', 1, True, path)
+    ma.reconstructDecay('Upsilon:ephysDQM -> e-:physDQM e+:physDQM', '4 < M < 12', 1, writeOut=False, path=path)
     ma.fillParticleList('pi+:hadbphysDQM', 'p>0.1 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)
 
     # have to manually create "all" lists of pi+ and photons to use inside buildEventShape
@@ -60,7 +61,7 @@ def add_analysis_dqm(path):
 
     dqm = b2.register_module('PhysicsObjectsDQM')
     dqm.param('PI0PListName', 'pi0:physDQM')
-    dqm.param('KS0PListName', 'K_S0:merged')
+    dqm.param('KS0PListName', 'K_S0:merged_TreeFit')
     dqm.param('UpsPListName', 'Upsilon:physDQM')
     # bhabha,hadrons
     dqm.param('UpsBhabhaPListName', 'Upsilon:ephysDQM')
@@ -79,6 +80,7 @@ def add_mirabelle_dqm(path):
     """
     # Software Trigger to divert the path
     MiraBelleMumu_path = b2.create_path()
+    MiraBelleZ0_path = b2.create_path()
     MiraBelleDst1_path = b2.create_path()
     MiraBelleNotDst1_path = b2.create_path()
     MiraBelleDst2_path = b2.create_path()
@@ -92,6 +94,13 @@ def add_mirabelle_dqm(path):
         resultOnMissing=0,
     )
     trigger_skim_mumutight.if_value("==1", MiraBelleMumu_path, b2.AfterConditionPath.CONTINUE)
+
+    trigger_skim_singlemuon = path.add_module(
+        "TriggerSkim",
+        triggerLines=["software_trigger_cut&filter&single_muon"],
+        resultOnMissing=0,
+    )
+    trigger_skim_singlemuon.if_value("==1", MiraBelleZ0_path, b2.AfterConditionPath.CONTINUE)
 
     trigger_skim_dstar_1 = path.add_module(
         "TriggerSkim",
@@ -135,6 +144,14 @@ def add_mirabelle_dqm(path):
     MiraBelleMumu.param('MuMuPListName', 'Upsilon:physMiraBelle')
     MiraBelleMumu_path.add_module(MiraBelleMumu)
 
+    # MiraBelle Z0 path
+    ma.fillParticleList('mu+:physMiraBelleZ0', 'abs(dr) < 2 and abs(dz) < 5', path=MiraBelleZ0_path)
+    ma.reconstructDecay('Z0:physMiraBelle -> mu+:physMiraBelleZ0 mu-:physMiraBelleZ0',
+                        'nCleanedTracks(abs(dr) < 2 and abs(dz) < 5) and 9 < M and M < 12', path=MiraBelleZ0_path)
+    MiraBelleModule = b2.register_module('PhysicsObjectsMiraBelle')
+    MiraBelleModule.param('Z0PListName', 'Z0:physMiraBelle')
+    MiraBelleZ0_path.add_module(MiraBelleModule)
+
     # MiraBelle D* (followed by D0 -> K pi) path
     ma.fillParticleList('pi+:MiraBelleDst1', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst1_path)
     ma.fillParticleList('K+:MiraBelleDst1', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst1_path)
@@ -148,7 +165,7 @@ def add_mirabelle_dqm(path):
     # MiraBelle D* (followed by D0 -> K pi pi0) path
     ma.fillParticleList('pi+:MiraBelleDst2', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
     ma.fillParticleList('K+:MiraBelleDst2', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
-    stdPi0s(listtype='eff60_May2020', path=MiraBelleDst2_path)
+    stdPi0s(listtype='eff60_May2020', writeOut=False, path=MiraBelleDst2_path)
     ma.reconstructDecay(
         'D0:MiraBelleDst2_kpipi0 -> K-:MiraBelleDst2 pi+:MiraBelleDst2 pi0:eff60_May2020',
         '1.7 < M < 2.1',

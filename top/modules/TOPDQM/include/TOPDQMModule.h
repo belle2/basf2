@@ -12,6 +12,7 @@
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRecBunch.h>
 #include <top/dataobjects/TOPTimeZero.h>
+#include <top/dataobjects/TOPProductionEventDebug.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
 
 // Basf2 headers.
@@ -45,11 +46,6 @@ namespace Belle2 {
      * Constructor
      */
     TOPDQMModule();
-
-    /**
-     * Destructor
-     */
-    virtual ~TOPDQMModule();
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
@@ -130,6 +126,11 @@ namespace Belle2 {
     std::vector<TH1F*> m_badChannelHits; /**< Histograms for bad channel hits */
     std::vector<TProfile*> m_pulseHeights; /**< Pulse heights of good hits */
 
+    TH2F* m_skipProcFlag = 0; /**< skip processing flag vs. boardstack */
+    TH2F* m_injVetoFlag = 0; /**< injection veto flag vs. boardstack */
+    TH1F* m_injVetoFlagDiff = 0; /**< check if injection veto flags differ in the event */
+    TH2F* m_PSBypassMode = 0; /**< PS-bypass mode vs. boardstack */
+
     // other
     int m_numModules = 0; /**< number of TOP modules */
     double m_bunchTimeSep = 0; /**< bunch separation time */
@@ -140,6 +141,7 @@ namespace Belle2 {
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch and event T0 */
     StoreArray<TOPTimeZero> m_timeZeros; /**< reconstructed event T0 in case of cosmics */
     StoreArray<Track> m_tracks;    /**< collection of tracks */
+    StoreArray<TOPProductionEventDebug> m_productionEventDebugs;   /**< collection of event debug data */
 
     // dbobjects
     DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */

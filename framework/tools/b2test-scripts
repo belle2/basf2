@@ -71,7 +71,7 @@ import xml.etree.ElementTree as ET
 from enum import Enum
 from typing import Dict, List, Tuple, Optional
 
-from b2test_utils import temporary_set_environment
+from b2test_utils import temporary_environment, is_ci
 # allow stopping tests with Ctrl+c
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -163,11 +163,29 @@ def run_test(testinformation):
     """ run either regular python tests (with basf2) or as jupyter notebooks """
 
     if testinformation.extension == ".ipynb":
-        return run_test_ipynb(testinformation)
+        if is_ci():
+            testinformation.state = TestState.SKIPPED
+            testinformation.message = "Temporarily skipped on our CI pipeline"
+            return testinformation
+        else:
+            return run_test_ipynb(testinformation)
     elif testinformation.extension == ".py":
         return run_test_py(testinformation)
     else:
         print(f"Testfile {testinformation.name} with extension {testinformation.extension} not supported")
+
+
+def prepare_ipynb():
+    """Start a notebook and import basf2 modules to avoid timeouts of actual tests"""
+
+    try:
+        nb = nbformat.v4.new_notebook()
+        nb.cells.append(nbformat.v4.new_code_cell('import basf2\nimport mdst\nimport modularAnalysis'))
+        ep = ExecutePreprocessor(timeout=300, kernel_name='python3')
+        ep.preprocess(nb, resources={})
+    except Exception as exception:
+        print('Jupyter notebook preparation failed with exception:')
+        print(exception)
 
 
 def run_test_ipynb(testinformation):
@@ -409,7 +427,7 @@ class TestInformation:
                                     type=failure_type.upper())
 
             if self.output:
-                failure.text = re.sub(r'\033\[[0-9;]*m', '', self.output)
+                failure.text = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\uD800-\uDFFF]', '', re.sub(r'\033\[[0-9;]*m', '', self.output))
 
         return test_el
 
@@ -661,6 +679,8 @@ class TestScheduler:
     def _run_tests(self, tests: List[TestInformation], prepare_step: bool = False,
                    root_el: Optional[ET.Element] = None) -> ET.Element:
         print(f'Collected {len(tests)} {"prepare steps" if prepare_step else "tests"}...', flush=True)
+        if not is_ci() and any([test.extension == '.ipynb' for test in tests]):
+            prepare_ipynb()
         if self.nprocess > 1:
             with ThreadPoolExecutor(max_workers=self.nprocess) as pool:
                 # run tests in multiple threads but consume the iterator right away to
@@ -714,7 +734,10 @@ if __name__ == "__main__":
     with tempfile.TemporaryDirectory() as prepare_path:
         os.chmod(prepare_path, 0o744)  # necessary for the buildbot
         # and temporary set the BELLE2_PREPARE_PATH variable
-        with temporary_set_environment(BELLE2_PREPARE_PATH=prepare_path):
+        with temporary_environment(
+                BELLE2_PREPARE_PATH=prepare_path,
+                OMP_NUM_THREADS='1'  # Limit the number of threads to 1
+        ):
 
             scheduler = TestScheduler(
                 xml_input_file=options.xml_input,

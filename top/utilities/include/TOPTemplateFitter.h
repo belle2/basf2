@@ -21,7 +21,7 @@ namespace Belle2 {
 
     /**
      * @brief Class to perform template fit on TOP waveform data
-     * Minimzation method is described here http://wwwa1.kph.uni-mainz.de/Vorlesungen/SS11/Statistik/
+     * Minimization method is described here http://wwwa1.kph.uni-mainz.de/Vorlesungen/SS11/Statistik/
      */
     class TOPTemplateFitter {
 
@@ -165,7 +165,7 @@ namespace Belle2 {
       static void setUseParabola(bool use) {s_useParabola = use;}
 
       /**
-       * @brief Intializes the template fit using default values
+       * @brief Initializes the template fit using default values
        */
       static void InitializeTemplateFit();
 
@@ -197,7 +197,7 @@ namespace Belle2 {
        * @param result minimized parameters
        * @return chi square
        */
-      double ComputeMinimizedParametersAndChisq(const MinimizationSums& sums, FitResult& result);
+      static double ComputeMinimizedParametersAndChisq(const MinimizationSums& sums, FitResult& result);
 
       /**
        * @brief Calculate vertex coordinates of parabola given three data points
@@ -206,8 +206,8 @@ namespace Belle2 {
        * @param p3 data point 3
        * @param vertex vertex position
        */
-      void CalculateParabolaVertex(const Point& p1, const Point& p2, const Point& p3,
-                                   Point& vertex);
+      static void CalculateParabolaVertex(const Point& p1, const Point& p2, const Point& p3,
+                                          Point& vertex);
 
       const TOPRawWaveform m_wf; /**< raw sampled waveforms */
       const TOPSampleTimes m_sampleTimes; /**< provides timing correction */

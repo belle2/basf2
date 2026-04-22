@@ -1,0 +1,52 @@
+# EventType: 1223052000 
+# Descriptor: B+ -> anti-D0 rho+
+# NickName: Bu_D0rho
+# Documentation: B -> D(*) eta pi studies
+# Responsible: Vismaya Vs
+# Email: ph20resch11010@iith.ac.in
+# Tested: yes
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 2025/04/30
+
+Alias rho+sig rho+
+Alias rho-sig rho-
+ChargeConj rho+sig rho-sig
+
+Alias pi0sig pi0
+
+
+Decay Upsilon(4S)
+0.5 B-sig   B+ VSS;
+0.5 B+sig   B- VSS;
+Enddecay
+
+
+Decay B+sig
+1.0000 rho+sig anti-D0sig PHOTOS SVS;
+Enddecay
+CDecay B-sig
+
+Decay anti-D0sig
+0.078000000   a_1-  K+                                     SVS;
+0.015800000   K*0  rho0                                    SVV_HELAMP 1.0 0.0 1.0 0.0 1.0 0.0;
+0.011000000   K*0  omega                                   SVV_HELAMP 1.0 0.0 1.0 0.0 1.0 0.0;
+0.016000000   K_1+  pi-                                    SVS;
+0.024000000   K*0  pi+  pi-                                PHSP;
+0.005328000   K+  rho0  pi-                                PHSP;
+0.019000000   K+  omega  pi-                               PHSP;
+0.008800000   K+  pi-  pi+  pi-                            PHSP;
+Enddecay
+CDecay D0sig
+
+
+Decay rho+sig
+1.0000 pi+ pi0sig PHOTOS VSS;
+Enddecay
+CDecay rho-sig
+
+Decay pi0sig
+1.0000 gamma gamma PHSP;
+Enddecay
+
+End

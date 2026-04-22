@@ -9,11 +9,11 @@
 #define GRLNEUROMODULE_H
 
 #include <framework/core/Module.h>
-
 #include <trg/grl/GRLNeuro.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <trg/grl/dataobjects/GRLMLPData.h>
-
+#include <framework/database/DBObjPtr.h>
+#include <trg/grl/dbobjects/TRGGRLConfig.h>
 #include <TH1D.h>
 
 namespace Belle2 {
@@ -32,6 +32,9 @@ namespace Belle2 {
      */
     virtual void initialize() override;
 
+    /** Register run-dependent DataStore arrays. */
+    virtual void beginRun() override;
+
     /** Called once for each event.
      * Prepare input and target for each track and store it.
      */
@@ -49,6 +52,10 @@ namespace Belle2 {
   protected:
     //module parameters
     /** Parameters for the NeuroTrigger. */
+    //  //add
+    //   std::vector<double> TCThetaLab;
+    //   std::vector<double> TCPhiLab;
+    // //add
     GRLNeuro::Parameters m_parameters;
     /** Name of file where network weights etc. are stored. */
     std::vector<std::string> m_weightFileNames;
@@ -70,7 +77,7 @@ namespace Belle2 {
     int trainMode;
     /** Name of the StoreArray containing the ECL clusters. */
     std::string m_TrgECLClusterName;
-    /** Number of nodes in all layers. */
+    /** Number of nodes in all laysers. */
     std::vector<float> m_nNodes;
     /** cut on MVA to separate signal */
     std::vector<float> m_nn_thres;
@@ -81,15 +88,30 @@ namespace Belle2 {
     /** name of TRG GRL information object */
     std::string m_TrgGrlInformationName;
 
+    /** dbobject to store grl config */
+    DBObjPtr<TRGGRLConfig> m_db_trggrlconfig;
+
     /** TCID of a given TRGcluster */
     std::vector<int> TCThetaID;
-    /** Azimuth angle  of a given TRGcluster */
-    std::vector<float> TCPhiCOM;
-    /** Polar angle  of a given TRGcluster */
-    std::vector<float> TCThetaCOM;
+    /** Polar angle of a given TRGcluster */
+    std::vector<double> TCThetaLab;
+    /** Azimuthal angle of a given TRGcluster */
+    std::vector<double> TCPhiLab;
+//////new add
+    std::vector<float> TCEnergy;
+    std::vector<float> TCTime;
+
     /** Histograms to save the NN classifiers */
     std::vector<TH1D*> h_target;
 
+    std::string m_csvThetaPhiFile;
+    /**save the  ThetaPhi */
+
+
+    /** flag to use database to load config */
+    bool m_useDB;
+    std::unordered_map<int, double> thetaMap;
+    std::unordered_map<int, double> phiMap;
   };
 }
 

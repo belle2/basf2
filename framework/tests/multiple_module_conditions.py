@@ -7,8 +7,6 @@
 ##########################################################################
 import basf2
 
-# @cond internal_test
-
 
 class ReturnTrueFalse(basf2.Module):
 
@@ -61,5 +59,3 @@ assert counter_0.counter == 1
 assert counter_1.counter == 1
 assert counter_2.counter == 1
 assert counter_end.counter == 1
-
-# @endcond

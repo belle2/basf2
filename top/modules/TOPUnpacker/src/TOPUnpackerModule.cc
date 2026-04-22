@@ -71,10 +71,6 @@ namespace Belle2 {
 
   }
 
-  TOPUnpackerModule::~TOPUnpackerModule()
-  {
-  }
-
   void TOPUnpackerModule::initialize()
   {
 
@@ -92,6 +88,7 @@ namespace Belle2 {
     m_productionEventDebugs.registerInDataStore(DataStore::c_DontWriteOut);
     m_productionHitDebugs.registerInDataStore(DataStore::c_DontWriteOut);
     m_templateFitResults.registerInDataStore(m_templateFitResultName, DataStore::c_DontWriteOut);
+    m_injectionVeto.registerInDataStore();
 
     m_rawDigits.registerRelationTo(m_waveforms, DataStore::c_Event, DataStore::c_DontWriteOut);
     m_rawDigits.registerRelationTo(m_templateFitResults, DataStore::c_Event, DataStore::c_DontWriteOut);
@@ -130,6 +127,9 @@ namespace Belle2 {
     m_templateFitResults.clear();
     m_slowData.clear();
     m_interimFEInfos.clear();
+
+    // create injection veto object
+    m_injectionVeto.create();
 
     StoreObjPtr<EventMetaData> evtMetaData;
     for (auto& raw : m_rawData) {
@@ -184,15 +184,17 @@ namespace Belle2 {
             unpackProductionDraft(buffer, bufferSize);
             break;
           case static_cast<int>(TOP::RawDataType::c_ProductionDebug01):
-            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug01, true);
+            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug01, true, evtMetaData->getExperiment());
             break;
           case static_cast<int>(TOP::RawDataType::c_ProductionDebug02):
-            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug02, true);
+            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug02, true, evtMetaData->getExperiment());
             break;
 
           default:
             if (printTheError()) {
-              B2ERROR("TOPUnpacker: unknown data format, " << getFrontEndName(raw, finesse)
+              auto boardstackName = getFrontEndName(raw, finesse);
+              B2ERROR("TOPUnpacker: unknown data format from " << boardstackName
+                      << LogVar("boardstack name", boardstackName)
                       << LogVar("Type", (dataFormat >> 8))
                       << LogVar("Version", (dataFormat & 0xFF)));
             }
@@ -201,7 +203,9 @@ namespace Belle2 {
 
         if (err != 0) {
           if (printTheError()) {
-            B2ERROR("TOPUnpacker: error in unpacking data from " << getFrontEndName(raw, finesse)
+            auto boardstackName = getFrontEndName(raw, finesse);
+            B2ERROR("TOPUnpacker: error in unpacking data from " << boardstackName
+                    << LogVar("boardstack name", boardstackName)
                     << LogVar("words unused", err));
           }
         }
@@ -212,7 +216,7 @@ namespace Belle2 {
   }
 
 
-  std::string TOPUnpackerModule::getFrontEndName(RawTOP& raw, int finesse) const
+  std::string TOPUnpackerModule::getFrontEndName(RawTOP& raw, int finesse)
   {
     std::string name;
     if (raw.GetMaxNumOfCh(0) <= 4) { // COPPER
@@ -420,8 +424,8 @@ namespace Belle2 {
 
     DataArray array(buffer, bufferSize, m_swapBytes);
 
-    map<unsigned short, int> evtNumCounter; //counts the occurence of carrier-generated event numbers.
-    std::vector<unsigned short> channelCounter(128, 0); //counts occurence of carrier/asic/channel combinations
+    map<unsigned short, int> evtNumCounter; //counts the occurrence of carrier-generated event numbers.
+    std::vector<unsigned short> channelCounter(128, 0); //counts occurrence of carrier/asic/channel combinations
 
     unsigned word = array.getWord(); // header word 0
     unsigned short scrodID = word & 0x0FFF;
@@ -748,7 +752,7 @@ namespace Belle2 {
       info->incrementWaveformsCount();
 
       // create relations btw. raw digits and waveform
-      for (auto& digit : digits) digit->addRelationTo(waveform);
+      for (const auto* digit : digits) digit->addRelationTo(waveform);
 
     }
 
@@ -785,14 +789,13 @@ namespace Belle2 {
       }
       nChannels += it;
 
-      int channelID = channelIndex;
-      int carrier = channelID / 32;
-      int asic = (channelID % 32) / 8;
-      int chn = channelID % 8;
-
       if (it != 1) {
+        int channelID = channelIndex;
+        int carrier = channelID / 32;
+        int asic = (channelID % 32) / 8;
+        int chn = channelID % 8;
         channelOutputString += "carrier: " + std::to_string(carrier) + " asic: " + std::to_string(asic) + " chn: " + std::to_string(
-                                 chn) + " occurence: " + std::to_string(it) + "\n";
+                                 chn) + " occurrence: " + std::to_string(it) + "\n";
         B2WARNING("TOPUnpacker: interim FE - ASIC channel seen more than once"
                   << LogVar("ScrodID", scrodID)
                   << LogVar("carrier", carrier)
@@ -815,7 +818,7 @@ namespace Belle2 {
 
 
   int TOPUnpackerModule::unpackProdDebug(const int* buffer, int bufferSize, TOP::RawDataType dataFormat,
-                                         bool pedestalSubtracted)
+                                         bool pedestalSubtracted, int expNo)
   {
 
     B2DEBUG(22, "Unpacking Production firmware debug data format to TOPRawDigits "
@@ -869,14 +872,20 @@ namespace Belle2 {
             << ", evtPhase = " << evtPhase
             << ", numWordsCore = " << evtNumWordsCore);
 
-    word = array.getWord(); // word 2, skipHit(1)/reserved(4)/ctime LSBs(11)/revo9counter(16)
-    bool         evtSkipHit = word >> 29;
+    word = array.getWord(); // word 2, skipHit(1)/injVetoFlag(1)/PSBypass(3)/ctime LSBs(11)/revo9counter(16)
+    bool         evtSkipHit = word >> 31;
+    bool         injVetoFlag = (word >> 30) & 0x1;
+    unsigned int PSBypass = (word >> 27) & 0x7;
     unsigned int evtCtime = (word >> 16) & 0x7FF;
     unsigned int evtRevo9Counter = word & 0xFFFF;
+
+    if (expNo > 36) m_injectionVeto->set(injVetoFlag); // before this experiment the bit field is not used and may not be correctly set
 
     B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
             << "\tevtSkipHit = " << evtSkipHit
+            << ", injVetoFlag = " << injVetoFlag
+            << ", PSBypass = " << PSBypass
             << ", evtCtime = " << evtCtime
             << ", evtRevo9Counter = " << evtRevo9Counter);
 
@@ -895,6 +904,8 @@ namespace Belle2 {
                                       evtVersion,
                                       evtScrodID,
                                       evtSkipHit,
+                                      injVetoFlag,
+                                      PSBypass,
                                       evtCtime,
                                       evtPhase,
                                       evtAsicMask,
@@ -1242,13 +1253,9 @@ namespace Belle2 {
   {
     B2INFO("TOPUnpacker: Channels seen per event statistics:");
     B2INFO("TOPUnpacker: nChn\tcount");
-    for (auto& entry : m_channelStatistics) {
+    for (const auto& entry : m_channelStatistics) {
       B2INFO("TOPUnpacker: " << entry.first << "\t\t" << entry.second);
     }
-  }
-
-  void TOPUnpackerModule::terminate()
-  {
   }
 
 

@@ -41,7 +41,7 @@ namespace Belle2 {
     StoreArray<TOPBackSplashFitResult> m_fitresult;
     StoreArray<TOPDigit> m_digits;
 
-    TOPBackSplashFitResult* fitTimingDigits(int, std::vector<int>, float, int);
+    TOPBackSplashFitResult* fitTimingDigits(int, std::vector<int>, float, int, float);
     std::array<std::array<double, 11>, 15> m_fitparams;
     std::vector<RooWorkspace> m_wss;
     std::vector<RooWorkspace> prepareFitModels();

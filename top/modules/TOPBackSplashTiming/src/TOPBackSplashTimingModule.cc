@@ -21,6 +21,7 @@
 #include <RooFormulaVar.h>
 #include <RooGenericPdf.h>
 #include <RooJohnson.h>
+#include <RooPolynomial.h>
 #include <RooPlot.h>
 #include <RooProdPdf.h>
 #include <RooMsgService.h>
@@ -68,8 +69,8 @@ std::vector<RooWorkspace> TOPBackSplashTimingModule::prepareFitModels()
   std::vector<RooWorkspace> wss;
   for (auto row : m_fitparams) {
     std::string xname = "x_" + std::to_string(row[0]);
-    RooRealVar x("x", xname.c_str(), row[1], row[2]);
-    RooRealVar mu("mu", "mu", row[8], row[1], row[2]);
+    RooRealVar x("x", xname.c_str(), -10, 80); // row[1], row[2]);
+    RooRealVar mu("mu", "mu", row[8], -9, 80);//row[1], row[2]);
     RooRealVar gamma("gamma", "gamma", row[6], row[6], row[6]);
     RooRealVar lambda("lambda", "lambda", row[7], row[7], row[7]);
     RooRealVar delta("delta", "delta", row[4], row[4], row[4]);
@@ -77,10 +78,17 @@ std::vector<RooWorkspace> TOPBackSplashTimingModule::prepareFitModels()
     // Forward pulse timing model
     RooJohnson john("john", "john", x, mu, lambda, gamma, delta, 0);
 
-    RooRealVar shift_minus_mu("shift_minus_mu", "shift_minus_mu", row[10], row[10], row[10]);
+    RooRealVar shift_minus_mu("shift_minus_mu", "shift_minus_mu", row[10], 0., 30.);
     RooRealVar coeff("coeff", "coeff", row[3], row[3], row[3]);
     RooRealVar w("w", "w", row[9], row[9], row[9]);
-    RooRealVar frac("frac", "frac", row[5], row[5], row[5]);
+    RooRealVar frac("frac", "frac", row[5], 0.4, 0.98);
+
+    gamma.setConstant(true);
+    lambda.setConstant(true);
+    delta.setConstant(true);
+    coeff.setConstant(true);
+    w.setConstant(true);
+    shift_minus_mu.setConstant(true);
 
     RooFormulaVar shift("shift", "@0+@1", RooArgList(mu, shift_minus_mu));
     RooFormulaVar xshifted("xshifted", "@0-@1", RooArgList(x, shift));
@@ -90,9 +98,17 @@ std::vector<RooWorkspace> TOPBackSplashTimingModule::prepareFitModels()
     // Secondary pulse timing model
     RooProdPdf smoothedexp("smoothedexp", "exp * smooth_step", RooArgList(exp, smooth_step));
 
+    RooRealVar sigPhotons("sigPhotons", "sigPhotons", 50, 0, 500);
+    RooRealVar bkgPhotons("bkgPhotons", "bkgPhotons", 50, 0, 500);
+    RooRealVar slope("slope", "slope", 0);
+    slope.setConstant(true);
+
+    RooPolynomial bkgModel("bkgModel", "bkgModel", x, RooArgList(slope));
+    RooAddPdf sgnModel("sgnModel", "signal model", john, smoothedexp, frac);
+
     // Combined model
     std::string modelname = "model_" + std::to_string(row[0]);
-    RooAddPdf model("model", modelname.c_str(), john, smoothedexp, frac);
+    RooAddPdf model("model", modelname.c_str(), RooArgList(sgnModel, bkgModel), RooArgList(sigPhotons, bkgPhotons));
 
     std::string wsname = "ws_" + std::to_string(row[0]);
     RooWorkspace ws("ws", wsname.c_str());
@@ -198,7 +214,7 @@ int TOPBackSplashTimingModule::convertCosThetaToIndex(float nearestClusterCosThe
 
 TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDindex,
     std::vector<int> digitIndiciesInSlot,
-    float nearestClusterCosTheta, int iClusterToFit)
+    float nearestClusterCosTheta, int iClusterToFit, float clusterCosTheta)
 {
   // Get cosTheta pdf
   int cosThetaIndex = convertCosThetaToIndex(nearestClusterCosTheta);
@@ -207,26 +223,37 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
   RooDataSet data("data", "unbinned", RooArgSet(*x));
   for (auto digitIndexInSlot : digitIndiciesInSlot) {
     double v = m_digits[digitIndexInSlot]->getTime();
-    if (v >= m_fitparams[cosThetaIndex][1] && v <= m_fitparams[cosThetaIndex][2]) {
-      x->setVal(v);
-      data.add(RooArgSet(*x));
-    }
+    x->setVal(v);
+    data.add(RooArgSet(*x));
   }
   if (data.numEntries() < 2) {
     TOPBackSplashFitResult* emptyresult = new TOPBackSplashFitResult();
     return emptyresult;
   }
 
+  double clusterSinTheta = TMath::Sqrt(1 - clusterCosTheta * clusterCosTheta);
+  double zeta = 119 * (clusterCosTheta / clusterSinTheta) + 83.;
+
+  //Range for the main peak position.
+  // minTim calculated with beta = 1 and direct propagation in the bar (no reflections)
+  // maxTime calculate for a p=200 MeV neutron with reflections in the bar
+  double minTime =  120 / (30 * clusterSinTheta) + zeta / 20.;
+  double maxTime =  120 / (6 * clusterSinTheta) + 1.4 * zeta / 20.;
+
+  double shift = 2 * (270 - zeta) / 20;
+  m_wss[cosThetaIndex].var("shift_minus_mu")->setVal(shift);
+  m_wss[cosThetaIndex].var("shift_minus_mu")->setMin(shift - 1.);
+  m_wss[cosThetaIndex].var("shift_minus_mu")->setMax(shift * 1.4 + 2.);
+  m_wss[cosThetaIndex].var("shift_minus_mu")->setConstant(false);
+  m_wss[cosThetaIndex].var("mu")->setVal(minTime + 5.);
+  m_wss[cosThetaIndex].var("mu")->setMin(minTime);
+  m_wss[cosThetaIndex].var("mu")->setMax(maxTime);
+
   RooAbsPdf* model =  m_wss[cosThetaIndex].pdf("model");
-  RooFitResult* res = model->fitTo(data, RooFit::Save(), RooFit::PrintLevel(0), RooFit::Strategy(0));
+  RooFitResult* res = model->fitTo(data, RooFit::Save(), RooFit::PrintLevel(-1), RooFit::Strategy(0), RooFit::Extended());
 
   // First peak
-  RooAbsArg* john_arg = model->getComponents()->find("john");
-  RooAbsPdf* peak1_fit = static_cast<RooAbsPdf*>(john_arg);
-  TF1* peak1_tf1 = peak1_fit->asTF(RooArgList(*x));
-  double peak1_max = peak1_tf1->GetMaximum(x->getMin(), x->getMax());
-  double peak1_rising_edge = peak1_tf1->GetX(0.5 * peak1_max, x->getMin(), x->getMax());
-
+  double peak1_rising_edge = m_wss[cosThetaIndex].var("mu")->getValV();
   // Deriving chi2: Need to bin but not Draw
   int binning = (m_fitparams[cosThetaIndex][2] - m_fitparams[cosThetaIndex][1]);
   RooPlot* frame = x->frame();
@@ -235,6 +262,7 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
   double redchisq = frame->chiSquare(1);
 
   // Saving results & plotting
+
   TOPBackSplashFitResult* fitresult = m_fitresult.appendNew();
   fitresult->setTime((float)peak1_rising_edge);
   fitresult->setChisqdof((float)redchisq);
@@ -278,11 +306,11 @@ void TOPBackSplashTimingModule::event()
 
     // Clusters in barrel and within TOP acceptance,
     // Must have neutral hadron treatment of clusters only
-    // with gt 100 MeV, and no tracks
+    // with gt 500 MeV, and no tracks
     if (cluster->getTheta() > 31.0 * M_PI / 180.0 && cluster->getTheta() < 128.0 * M_PI / 180.0 &&
         cluster->getDetectorRegion() == 2 &&
         cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron) &&
-        cluster->getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron) > 0.1 &&
+        cluster->getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron) > 0.5 &&
         cluster-> isTrack() == false) {
 
       // Derive module in front of cluster
@@ -303,7 +331,7 @@ void TOPBackSplashTimingModule::event()
 
       // 3rd: Fit clusters
       TOPBackSplashFitResult* fitresult = fitTimingDigits(moduleID - 1, digitIndiciesPerSlots[moduleID - 1], nearestClusterCosTheta,
-                                                          nClustersToFit);
+                                                          nClustersToFit, std::cos(cluster->getTheta()));
       if (fitresult->getTime() == -1.0 && fitresult->getChisqdof() == -1.0 && fitresult->getNphotons() == -1) {
         continue;
       }

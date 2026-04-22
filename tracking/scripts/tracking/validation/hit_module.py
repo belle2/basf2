@@ -135,9 +135,8 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         self.pr_number_of_hits = collections.deque()
         #: list of the number of pattern-reconstructed hits matched to MC track
         self.pr_number_of_matched_hits = collections.deque()
-
-        if self.plotTrackQualityIndicator:
-            self.pr_track_QI = collections.deque()
+        #: list of the quality indicator of tracks
+        self.pr_track_QI = collections.deque()
 
     def event(self):
         """Event method"""

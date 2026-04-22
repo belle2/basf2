@@ -61,6 +61,9 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
     #: List of parameters which should be used as shifter plots (all plots with these x-labels)
     non_expert_parameters = ['p_{t}']
 
+    #: Draw validation plots for track quality indicator
+    plotTrackQualityIndicator = False
+
     def preparePathValidation(self, path):
         """The default way to add the validation module to the path.
 
@@ -90,7 +93,8 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
                 output_file_name=self.output_file_name,
                 use_expert_folder=self.use_expert_folder,
                 exclude_profile_mc_parameter=self.exclude_profile_mc_parameter,
-                exclude_profile_pr_parameter=self.exclude_profile_pr_parameter
+                exclude_profile_pr_parameter=self.exclude_profile_pr_parameter,
+                plotTrackQualityIndicator=self.plotTrackQualityIndicator
             )
             trackingValidationModule.trackCandidatesColumnName = "RecoTracks"
 

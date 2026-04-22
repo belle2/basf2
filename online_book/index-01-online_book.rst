@@ -56,8 +56,8 @@ If you need to cite this online book, please use the following citation:
    welcome
    fundamentals
    prerequisites
+   computing
    basf2
    analysis
-   computing
    workflowmanagement
    join_us

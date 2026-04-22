@@ -16,30 +16,24 @@ using namespace std;
 
 void Belle2::PXD::PXDPixelMasker::initialize()
 {
-  m_pixelThresholdsFromDB = unique_ptr<Belle2::DBObjPtr<Belle2::PXDPixelThresholdPar>>(new
-                            Belle2::DBObjPtr<Belle2::PXDPixelThresholdPar>());
 
-  if ((*m_pixelThresholdsFromDB).isValid()) {
+  if ((m_pixelThresholdsFromDB).isValid()) {
     setPixelThresholds();
-    (*m_pixelThresholdsFromDB).addCallback(this, &Belle2::PXD::PXDPixelMasker::setPixelThresholds);
+    (m_pixelThresholdsFromDB).addCallback(this, &Belle2::PXD::PXDPixelMasker::setPixelThresholds);
   }
 
-  m_maskedPixelsFromDB = unique_ptr<Belle2::DBObjPtr<Belle2::PXDMaskedPixelPar>>(new Belle2::DBObjPtr<Belle2::PXDMaskedPixelPar>());
-
-  if ((*m_maskedPixelsFromDB).isValid()) {
+  if ((m_maskedPixelsFromDB).isValid()) {
     setMaskedPixels();
-    (*m_maskedPixelsFromDB).addCallback(this, &Belle2::PXD::PXDPixelMasker::setMaskedPixels);
-    if (!(*m_pixelThresholdsFromDB).isValid() or !(**m_pixelThresholdsFromDB).getPixelThresholdMap().size()) {
+    (m_maskedPixelsFromDB).addCallback(this, &Belle2::PXD::PXDPixelMasker::setMaskedPixels);
+    if (!(m_pixelThresholdsFromDB).isValid() or !(m_pixelThresholdsFromDB)->getPixelThresholdMap().size()) {
       setPixelThresholds(m_maskedPixels);
-      (*m_pixelThresholdsFromDB).addCallback(this, &Belle2::PXD::PXDPixelMasker::setPixelThresholds);
+      (m_pixelThresholdsFromDB).addCallback(this, &Belle2::PXD::PXDPixelMasker::setPixelThresholds);
     }
   }
 
-  m_deadPixelsFromDB = unique_ptr<Belle2::DBObjPtr<Belle2::PXDDeadPixelPar>>(new Belle2::DBObjPtr<Belle2::PXDDeadPixelPar>());
-
-  if ((*m_deadPixelsFromDB).isValid()) {
+  if ((m_deadPixelsFromDB).isValid()) {
     setDeadPixels();
-    (*m_deadPixelsFromDB).addCallback(this, &Belle2::PXD::PXDPixelMasker::setDeadPixels);
+    (m_deadPixelsFromDB).addCallback(this, &Belle2::PXD::PXDPixelMasker::setDeadPixels);
   }
 }
 
@@ -73,7 +67,6 @@ bool Belle2::PXD::PXDPixelMasker::pixelOK(Belle2::VxdID id, unsigned int uid, un
 {
   auto vCells = Belle2::VXD::GeoCache::getInstance().getSensorInfo(id).getVCells();
   return (m_pixelThresholds.getPixelThreshold(id.getID(), uid * vCells + vid) < 255);
-  //return m_maskedPixels.pixelOK(id.getID(), uid * vCells + vid);
 }
 
 bool Belle2::PXD::PXDPixelMasker::pixelDead(Belle2::VxdID id, unsigned int uid, unsigned int vid) const
@@ -99,27 +92,27 @@ void Belle2::PXD::PXDPixelMasker::setPixelThresholds(PXDMaskedPixelPar maskedPix
 {
   auto maskedPixelMap = maskedPixels.getMaskedPixelMap();
   for (auto maskedSingles = maskedPixelMap.begin(); maskedSingles != maskedPixelMap.end(); maskedSingles++) {
-    auto sensorID = maskedSingles->first;
-    auto singles = maskedSingles->second;
-    for (auto single = singles.begin(); single != singles.end(); single++) {
-      m_pixelThresholds.setSinglePixelThreshold(sensorID, *single, 255);
+    const auto& sensorID = maskedSingles->first;
+    const auto& singles = maskedSingles->second;
+    for (const auto& single : singles) {
+      m_pixelThresholds.setSinglePixelThreshold(sensorID, single, 255);
     }
   }
 }
 
 void Belle2::PXD::PXDPixelMasker::setPixelThresholds()
 {
-  m_pixelThresholds = **m_pixelThresholdsFromDB;
+  m_pixelThresholds = *m_pixelThresholdsFromDB;
 }
 
 void Belle2::PXD::PXDPixelMasker::setMaskedPixels()
 {
-  m_maskedPixels = **m_maskedPixelsFromDB;
+  m_maskedPixels = *m_maskedPixelsFromDB;
 }
 
 void Belle2::PXD::PXDPixelMasker::setDeadPixels()
 {
-  m_deadPixels = **m_deadPixelsFromDB;
+  m_deadPixels = *m_deadPixelsFromDB;
 }
 
 

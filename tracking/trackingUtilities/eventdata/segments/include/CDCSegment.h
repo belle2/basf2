@@ -97,10 +97,10 @@ namespace Belle2 {
       /// Memory for the two dimensional trajectory fitted to this segment
       mutable CDCTrajectory2D m_trajectory2D;
 
-      /// Boolean flag to indicate that this segment has a valid alias version
+      /// Flag to indicate that this segment has a valid alias version
       // Stefano S: this was not initialized, I was not sure if to use 0 was safe
       // then I set the default value to NaN to solve a warning.
-      // Not clear to me why the comment says "boolen" if the variable is "double"
+      // Not clear to me why the variable is "double" and not boolean
       double m_aliasScore = std::numeric_limits<double>::quiet_NaN();
 
     };

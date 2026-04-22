@@ -58,6 +58,9 @@ namespace Belle2 {
       /// Reset taken flag for deleted tracks so that hits can be used by subsequent TFs
       bool m_param_resetTakenFlag = false;
 
+      /// If true the filter will be deactivated in case a bad CDC board is detected at a position where a hole in the track is found.
+      bool m_param_deactivateIfBadBoard = true;
+
       /// Reference to the filter to be used to filter
       TrackingUtilities::ChooseableFilter<TrackQualityFilterFactory> m_trackQualityFilter;
     };

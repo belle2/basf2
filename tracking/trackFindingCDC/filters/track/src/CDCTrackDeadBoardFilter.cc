@@ -10,22 +10,44 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/topology/CDCWire.h>
+#include <cdc/topology/CDCWireLayer.h>
 
 #include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
 
+// TODO: decide if this is the correct place to put this function
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    // TODO: decide if this is the correct place to put this function
+
+    void addBoardCandsAtLayer(std::vector<unsigned int>& boardCands, const Belle2::TrackingUtilities::Helix& globalHelix,
+                              Belle2::CDC::ILayer iclayer, const CDC::CDCGeometryPar& geometryPar)
+    {
+
+      double rLayer = Belle2::CDC::CDCWireLayer::getInstance(iclayer)->getRefCylindricalR();
+      if (rLayer <= 0) return;
+
+      double arcLength = globalHelix.arcLength2DToCylindricalR(rLayer);
+
+      TVector3 pos3D = globalHelix.atArcLength2D(arcLength);
+
+      // +/- deltaPhi corresponding to 5cm left and right (on circle)
+      double deltaPhi = 5. / rLayer;
+
+      for (int i = -1; i <= 1; i++) {
+        TVector3 thisPos = pos3D;
+        thisPos.SetPhi(pos3D.Phi() + i * deltaPhi);
+        const Belle2::CDC::IWire iWire = geometryPar.cellId(iclayer, thisPos);
+        const auto board = geometryPar.getBoardID(WireID(iclayer, iWire));
+        boardCands.push_back(board);
+      }
+    }
+
 
     bool cdcTrackDeadBoardFilter(const Belle2::TrackingUtilities::CDCTrack& aCDCTrack)
     {
       // tunable parameters.
-      // TODO: decide if should be put into list of input parameters
-      double arcLengthShift =
-        4.5; // arclength to extrapolate to find the bad board, unit cm, correcponding to around 2.25 drift cells (if passing pendicular)
       int minJump = 5;  // minimum layers to be jumped between two hits to trigger search for bad boards (one board covers 3 layers)
 
       // first check if bad wires are present
@@ -33,16 +55,16 @@ namespace Belle2 {
 
       // nothing to do if no dead boards have been assigned
       if (not deadBoardsVectorPtr.isValid() || (*deadBoardsVectorPtr).size() == 0) return false;
-
       // for better readability
       const std::vector<unsigned int>& deadBoardsVector = *deadBoardsVectorPtr;
 
       const CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
 
-      auto trajectory = aCDCTrack.getStartTrajectory3D();
+      auto& trajectory = aCDCTrack.getStartTrajectory3D();
 
-      Belle2::TrackingUtilities::Helix localHelix = trajectory.getLocalHelix().helix();
+      Belle2::TrackingUtilities::Helix globalHelix = trajectory.getLocalHelix().helix();
       auto localOrigin = trajectory.getLocalOrigin();
+      double arcLengthOffset = globalHelix.passiveMoveBy(-localOrigin);
 
       // detect layer jumps jumping at least minJump layers
       // Assumes hits are ordered! Need check if that is always true, or sorting without check (PS: TrackQualityEstimator also assumes hits are ordered for its filter)
@@ -57,30 +79,24 @@ namespace Belle2 {
         Belle2::CDC::ILayer iclayerThis = ((const CDCHit*)thisHit)->getICLayer();
 
         if (abs(iclayerPrev - iclayerThis) >= minJump) {
-          double sPrevious = prevHitPtr->getArcLength2D();
-          double sCurrent = thisHit.getArcLength2D();
 
-          // may want to filter for too high arclength??? observed up to 45cm arclength differences
-          auto pos3DPrev = localHelix.atArcLength2D(sPrevious + arcLengthShift) + localOrigin;
-          auto pos3DThis = localHelix.atArcLength2D(sCurrent - arcLengthShift) + localOrigin;
+          // TODO: check for max radius
 
           // direction in case of backcurling tracks
           int dir = (iclayerThis - iclayerPrev) < 0 ? -1 : 1;
-          // jump 3 layers to get the onto next board
+          // jump 3 layers to get the onto next board (1 board covers 3 layers)
           unsigned int newlayerThis = iclayerThis - dir * 3;
           unsigned int newlayerPrev = iclayerPrev + dir * 3;
 
-          // find the wire number
-          const Belle2::CDC::IWire iWireThis = geometryPar.cellId(newlayerThis, pos3DThis);
-          const Belle2::CDC::IWire iWirePrev = geometryPar.cellId(newlayerPrev, pos3DPrev);
+          std::vector<unsigned int> boardCands;
+          boardCands.reserve(6);
+          addBoardCandsAtLayer(boardCands, globalHelix, newlayerThis, geometryPar);
+          addBoardCandsAtLayer(boardCands, globalHelix, newlayerPrev, geometryPar);
 
-          // get the board number
-          const auto boardThis = geometryPar.getBoardID(WireID(newlayerThis, iWireThis));
-          const auto boardPrev = geometryPar.getBoardID(WireID(newlayerPrev, iWirePrev));
-
-          if (std::find(deadBoardsVector.begin(), deadBoardsVector.end(), boardThis) != deadBoardsVector.end()) return true;
-          if (std::find(deadBoardsVector.begin(), deadBoardsVector.end(), boardPrev) != deadBoardsVector.end()) return true;
-
+          for (auto iboard : boardCands) {
+            //std::cout << iboard << std::endl;
+            if (std::find(deadBoardsVector.begin(), deadBoardsVector.end(), iboard) != deadBoardsVector.end()) return true;
+          }
         }
 
         prevHitPtr = &thisHit;

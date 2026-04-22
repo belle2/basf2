@@ -57,6 +57,11 @@ void TrackQualityEstimator::exposeParameters(ModuleParamList* moduleParamList, c
                                 m_param_resetTakenFlag,
                                 "Reset taken flag for deleted tracks so that hits can be used by subsequent TFs.",
                                 m_param_resetTakenFlag);
+
+  moduleParamList->addParameter(prefixed(prefix, "deactivateIfBadBoard"),
+                                m_param_deactivateIfBadBoard,
+                                "If true the filter will be deactivated in case a bad CDC board is detected at a position where a hole in the track is found.",
+                                m_param_deactivateIfBadBoard);
 }
 
 void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
@@ -67,11 +72,10 @@ void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
     const double qualityIndicator = m_trackQualityFilter(track);
     track.setQualityIndicator(qualityIndicator);
 
-    //TODO:  put option to turn off by module parameter if it is kept here
-    if (std::isnan(qualityIndicator)) {
-      // set dummy QI to prevent deleting
-      // WARNING: will screw up the tracks QI provided to analysts
-      if (cdcTrackDeadBoardFilter(track)) track.setQualityIndicator(0.5);
+    // check for dead boards in case of rejected tracks
+    if (m_param_deactivateIfBadBoard && std::isnan(qualityIndicator)) {
+      // set QI to infinity temporarily to prevent deletion if dead board found, will be set back to NAN later (after deletion step)
+      if (cdcTrackDeadBoardFilter(track)) track.setQualityIndicator(std::numeric_limits<float>::infinity());
     }
   }
 
@@ -86,4 +90,10 @@ void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
     };
     erase_remove_if(tracks, reject);
   }
+
+  // reset NaN for the tracks where the filter has been deactivated
+  for (auto& track : tracks) {
+    if (std::isinf(track.getQualityIndicator())) track.setQualityIndicator(NAN);
+  }
+
 }

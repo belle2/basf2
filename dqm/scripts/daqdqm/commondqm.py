@@ -56,7 +56,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             # path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
             path.add_module('PXDTrackClusterDQM', histogramDirectoryName='PXDER')
             path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ', eachModule=True)
-            path.add_module("PXDDQMBowing", particleList='pi+:all')
+            path.add_module("PXDDQMBowing")
 
         # SVD
         if components is None or 'SVD' in components:

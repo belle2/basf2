@@ -75,11 +75,11 @@ void DQMHistAnalysisPXDBowModule::initialize()
     registerEpicsPV("PXD:sigmaResV:" + buff, "sigmaResV:" + (std::string)aVxdID);
     registerEpicsPV("PXD:sagitta:" + buff, "sagitta:" + (std::string)aVxdID);
     /// list of canvases
-    if (m_moduleName == "") { /// one canvas for each forward PXD module
+    if (m_moduleName == "" or VxdID(m_moduleName) == aVxdID) {
       m_cResV[buff] = new TCanvas((m_histogramDirectoryName + std::string("c_resV_") + buff).c_str());
-    } else if (VxdID(m_moduleName) == aVxdID) { ///only one canvas
-      m_cResV[buff] = new TCanvas((m_histogramDirectoryName + std::string("c_resV_") + buff).c_str());
-      validModule++;
+      if (VxdID(m_moduleName) == aVxdID) {
+        validModule++;
+      }
     }
   }
 
@@ -139,11 +139,9 @@ void DQMHistAnalysisPXDBowModule::event()
       } else
         enough = false;
 
-      if (m_moduleName == "") {
+      if (m_moduleName == "" or aPXDModule == VxdID(m_moduleName)) {
         plotCanvas(enough, errorflag, warnflag, buff);
-      } else if (aPXDModule == VxdID(m_moduleName)) {
-        plotCanvas(enough, errorflag, warnflag, buff);
-      } else B2WARNING("Invalid input for the parameter m_moduleName");
+      }
     } else B2DEBUG(20, "Histo sagitta/resV_" << buff << " not found");
   }
 }

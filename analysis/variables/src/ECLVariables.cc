@@ -1154,7 +1154,7 @@ namespace Belle2 {
       if (!cluster)
         return Const::doubleNaN;
 
-      const TOPBackSplashFitResult* backsplash = cluster->getRelatedTo<TOPBackSplashFitResult>();
+      const TOPBackSplashFitResult* backsplash = cluster->getRelated<TOPBackSplashFitResult>();
       if (!backsplash)
         return Const::doubleNaN;
 
@@ -1167,7 +1167,7 @@ namespace Belle2 {
       if (!cluster)
         return Const::doubleNaN;
 
-      const TOPBackSplashFitResult* backsplash = cluster->getRelatedTo<TOPBackSplashFitResult>();
+      const TOPBackSplashFitResult* backsplash = cluster->getRelated<TOPBackSplashFitResult>();
       if (!backsplash)
         return Const::doubleNaN;
 
@@ -1180,7 +1180,7 @@ namespace Belle2 {
       if (!cluster)
         return Const::doubleNaN;
 
-      const TOPBackSplashFitResult* backsplash = cluster->getRelatedTo<TOPBackSplashFitResult>();
+      const TOPBackSplashFitResult* backsplash = cluster->getRelated<TOPBackSplashFitResult>();
       if (!backsplash)
         return Const::doubleNaN;
 

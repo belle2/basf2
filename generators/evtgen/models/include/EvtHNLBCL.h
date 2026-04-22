@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include "EvtGenBase/EvtDecayAmp.hh"
-#include "EvtGenBase/EvtSemiLeptonicFF.hh"
-#include "EvtGenBase/EvtSemiLeptonicAmp.hh"
+#include <EvtGenBase/EvtDecayAmp.hh>
+#include <EvtGenBase/EvtSemiLeptonicFF.hh>
+#include <EvtGenBase/EvtSemiLeptonicAmp.hh>
 
 class EvtParticle;
 

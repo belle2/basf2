@@ -7,19 +7,16 @@
  **************************************************************************/
 #pragma once
 
-#include "EvtGenBase/EvtSemiLeptonicAmp.hh"
+#include <EvtGenBase/EvtSemiLeptonicAmp.hh>
 
 class EvtParticle;
 class EvtAmp;
 class EvtSemiLeptonicFF;
 
-/** Amplitude calculator for semileptonic HNL Vector decays.*/
 class EvtHNLSemiLeptonicVectorAmp : public EvtSemiLeptonicAmp {
 public:
-  /**
-   * Daughters are initialized and have been added to the parent.
-   * No need to carry around the daughters seperately!
-  */
+  //Daughters are initialized and have been added to the parent.
+  //No need to carry around the daughters seperately!
   void CalcAmp(EvtParticle* parent, EvtAmp& amp,
                EvtSemiLeptonicFF* FormFactors) override;
 };

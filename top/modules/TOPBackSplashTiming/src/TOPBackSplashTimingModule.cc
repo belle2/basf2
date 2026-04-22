@@ -83,12 +83,13 @@ std::vector<RooWorkspace> TOPBackSplashTimingModule::prepareFitModels()
     RooRealVar w("w", "w", row[9], row[9], row[9]);
     RooRealVar frac("frac", "frac", row[5], 0.4, 0.98);
 
+    // Constants of fit
     gamma.setConstant(true);
     lambda.setConstant(true);
     delta.setConstant(true);
+    shift_minus_mu.setConstant(true);
     coeff.setConstant(true);
     w.setConstant(true);
-    shift_minus_mu.setConstant(true);
 
     RooFormulaVar shift("shift", "@0+@1", RooArgList(mu, shift_minus_mu));
     RooFormulaVar xshifted("xshifted", "@0-@1", RooArgList(x, shift));
@@ -98,15 +99,17 @@ std::vector<RooWorkspace> TOPBackSplashTimingModule::prepareFitModels()
     // Secondary pulse timing model
     RooProdPdf smoothedexp("smoothedexp", "exp * smooth_step", RooArgList(exp, smooth_step));
 
-    RooRealVar sigPhotons("sigPhotons", "sigPhotons", 50, 0, 500);
-    RooRealVar bkgPhotons("bkgPhotons", "bkgPhotons", 50, 0, 500);
-    RooRealVar slope("slope", "slope", 0);
-    slope.setConstant(true);
-
-    RooPolynomial bkgModel("bkgModel", "bkgModel", x, RooArgList(slope));
+    // Signal pulse model
     RooAddPdf sgnModel("sgnModel", "signal model", john, smoothedexp, frac);
 
-    // Combined model
+    RooRealVar slope("slope", "slope", 0);
+    slope.setConstant(true);
+    RooPolynomial bkgModel("bkgModel", "bkgModel", x, RooArgList(slope));
+
+    RooRealVar sigPhotons("sigPhotons", "sigPhotons", 50, 0, 500);
+    RooRealVar bkgPhotons("bkgPhotons", "bkgPhotons", 50, 0, 500);
+
+    // Combined signal (dual pulse) with flat background noise
     std::string modelname = "model_" + std::to_string(row[0]);
     RooAddPdf model("model", modelname.c_str(), RooArgList(sgnModel, bkgModel), RooArgList(sigPhotons, bkgPhotons));
 

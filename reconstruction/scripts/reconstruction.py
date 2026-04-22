@@ -142,7 +142,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
         to true in order to speed up the reconstruction.
     :param enable_top_cluster_timing: if True switches on the measurement of the cluster time done using the backsplash in the
-        TOP (false).
+        TOP.
     """
 
     # Set the run for beam data

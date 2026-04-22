@@ -13,9 +13,12 @@ class EvtAmp;
 class EvtParticle;
 class EvtSemiLeptonicFF;
 
+/** Amplitude calculator for semileptonic HNL scalar decays.*/
 class EvtHNLSemiLeptonicScalarAmp : public EvtSemiLeptonicAmp {
-  //Daughters are initialized and have been added to the parent.
-  //No need to carry around the daughters seperately!
+  /**
+   * Daughters are initialized and have been added to the parent.
+   * No need to carry around the daughters seperately!
+  */
   void CalcAmp(EvtParticle* parent, EvtAmp& amp,
                EvtSemiLeptonicFF* FormFactors) override;
 };

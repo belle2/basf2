@@ -12,31 +12,57 @@
 
 namespace Belle2 {
 
+  /**
+   * Class to store the quantities determined in the `TOPBackSplashTiming` module
+   * and relate to corresponding ECL clusters, namely the fitted peak timing of
+   * TOP digits closest neutral hadron ECL clusters, the number of recorded
+   * Cherenkov photons used in the fit and the fit quality
+   */
+
   class TOPBackSplashFitResult : public RelationsObject {
+
   public:
-    //TOPBackSplashFitResult() = default;
-    //~TOPBackSplashFitResult() override = default;
-    TOPBackSplashFitResult() :
-      m_time{-1.0},
-      m_chisqdof{-1.0},
-      m_nPhotons{-1}
+    /**
+     * Default constructor
+     */
+    TOPBackSplashFitResults() = default;
+
+    /**
+     * Useful constructor
+     * @param time      extracted TOP timing from fit
+     * @param chisqdof  chi2 per degrees of freedom associated with fit
+     * @param nPhotons  no. of Cherenkov photons recorded by TOP and used in fit
+     */
+    TOPBackSplashFitResult(double time, double chisqdof, short nPhotons)
+      : m_time(time),
+        m_chisqdof(chisqdof),
+        m_nPhotons(nPhotons)
     {}
 
-    void setTime(float t) { m_time = t; }
-    float getTime() const { return m_time; }
+    /**
+     * Return time of extracted fit time
+     * @return extracted fit time to TOP digits in slot nearest to cluster [ns]
+     */
+    double getTime() const { return m_time; }
 
-    void setChisqdof(float chisqdof) { m_chisqdof = chisqdof; }
-    float getChisqdof() const { return m_chisqdof; }
+    /**
+     * Return chi/d.o.f
+     * @return chi2 per degree of freedom resulting from fit to TOP digits
+     */
+    double getChisqdof() const { return m_chisqdof; }
 
-    void setNphotons(int nPhotons) { m_nPhotons = nPhotons; }
-    int getNphotons() const { return m_nPhotons; }
+    /**
+     * Return no. of Cherenkov photons in fit
+     * @return no. of recorded photons used to extract TOP timing nearest to clusters
+     */
+    short getNphotons() const { return m_nPhotons; }
 
   private:
-    float m_time;
-    float m_chisqdof;
-    int m_nPhotons;
+    double m_time{0.0};      /** fitted timing from TOP*/
+    double m_chisqdof{0.0};  /** chi2 per d.o.f. of timing fit */
+    short m_nPhotons{0};     /** no. of recorded Cherenkov photons used in fit */
 
     ClassDef(TOPBackSplashFitResult, 1);
   };
 
-}
+} // end namespace Belle2

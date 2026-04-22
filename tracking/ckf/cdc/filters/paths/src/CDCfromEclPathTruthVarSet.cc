@@ -26,10 +26,6 @@ bool CDCfromEclPathTruthVarSet::extract(const BaseCDCPathFilter::Object* path)
   const auto* seedMCTrack = seedRecoTrack->getRelated<RecoTrack>("MCRecoTracks");
 
   int daughters = 0;
-  if (seedMCParticle->getNDaughters() > 0) {
-    std::vector<MCParticle*> daughterMCParticles = seedMCParticle->getDaughters();
-  }
-
   int matched = 0;
 
   for (auto const& state : *path) {

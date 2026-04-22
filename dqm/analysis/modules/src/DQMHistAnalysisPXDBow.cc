@@ -64,35 +64,44 @@ void DQMHistAnalysisPXDBowModule::initialize()
     m_PXDModules.push_back(aVxdID);
 
     auto buff = (std::string)aVxdID;
+    replace(buff.begin(), buff.end(), '.', '_');
     /// register delta
     if (!hasDeltaPar(m_histogramDirectoryName, "resV_" + buff))
       addDeltaPar(m_histogramDirectoryName, "resV_" + buff, HistDelta::c_Entries, m_statThreshold, 1);
     if (!hasDeltaPar(m_histogramDirectoryName, "sagitta_" + buff))
       addDeltaPar(m_histogramDirectoryName, "sagitta_" + buff, HistDelta::c_Entries, m_statThreshold, 1);
     /// Epics for all the forward PXD module
-    replace(buff.begin(), buff.end(), '.', '_');
     registerEpicsPV("PXD:meanResV:" + buff, "meanResV:" + (std::string)aVxdID);
     registerEpicsPV("PXD:sigmaResV:" + buff, "sigmaResV:" + (std::string)aVxdID);
     registerEpicsPV("PXD:sagitta:" + buff, "sagitta:" + (std::string)aVxdID);
-    /// list of canvases
-    if (m_moduleName == "" or VxdID(m_moduleName) == aVxdID) {
-      m_cResV[buff] = new TCanvas((m_histogramDirectoryName + std::string("c_resV_") + buff).c_str());
-      if (VxdID(m_moduleName) == aVxdID) {
-        validModule++;
-      }
+    if (VxdID(m_moduleName) == aVxdID) {
+      validModule++;
     }
+  }
+
+  if (m_PXDModules.size() == 0) {
+    B2WARNING("No PXDModules in Geometry found!");
   }
 
   if (validModule == 0 and m_moduleName != "") {
     B2WARNING("Invalid moduleName, only empty value or PXD forward modules (eg \"2.2.1\") are acceptable, nameModule parameter set to default (empty)");
     m_moduleName = "";
-    B2INFO("Plotting the histogram for all forward sensors");
-  } else if (m_moduleName == "") B2INFO("Plotting the histogram for all forward sensors");
-  else B2INFO("Plotting histogram for module " << m_moduleName);
-
-  if (m_PXDModules.size() == 0) {
-    B2WARNING("No PXDModules in Geometry found!");
   }
+  if (m_moduleName == "") {
+    B2INFO("Plotting the histogram for all forward sensors");
+    for (VxdID& aPXDModule : m_PXDModules) {/// list of canvases
+      auto buff = (std::string)aPXDModule;
+      replace(buff.begin(), buff.end(), '.', '_');
+      m_cResV[buff] = new TCanvas((m_histogramDirectoryName + std::string("c_resV_") + buff).c_str());
+    }
+  } else {
+    B2INFO("Plotting histogram for module " << m_moduleName);
+    auto buff = m_moduleName;
+    replace(buff.begin(), buff.end(), '.', '_');
+    m_cResV[buff] = new TCanvas((m_histogramDirectoryName + std::string("c_resV_") + buff).c_str());/// one canvas
+  }
+
+
 }
 
 void DQMHistAnalysisPXDBowModule::beginRun()

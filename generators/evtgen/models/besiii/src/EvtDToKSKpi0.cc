@@ -1,32 +1,18 @@
-//--------------------------------------------------------------------------
-//
-// Model: EvtDToKSKpi0
-// This file is an amplitude model for D+ -> KS K+ pi0.
-// The model is from Phys. Rev. D 104, 012006 (2021). DOI: https://doi.org/10.1103/PhysRevD.104.012006
-//
-// Permission to use these files in basf2 was generously granted by the BESIII Collaboration.
-//
-// Please cite the original reference for any public/published results where this model was used.
-//
-// Modified by : Jiyuan Zhang
-//
-//--------------------------------------------------------------------------
-
 #include <iostream>
 #include <cmath>
 #include <string>
-#include "EvtGenBase/EvtCPUtil.hh"
-#include "EvtGenBase/EvtTensor4C.hh"
-#include "EvtGenBase/EvtPatches.hh"
+#include <EvtGenBase/EvtCPUtil.hh>
+#include <EvtGenBase/EvtTensor4C.hh>
+#include <EvtGenBase/EvtPatches.hh>
 #include <stdlib.h>
-#include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
-#include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtVector4R.hh"
-#include "EvtGenBase/EvtReport.hh"
+#include <EvtGenBase/EvtParticle.hh>
+#include <EvtGenBase/EvtGenKine.hh>
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtVector4R.hh>
+#include <EvtGenBase/EvtReport.hh>
 
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include "generators/evtgen/models/besiii/EvtDToKSKpi0.h"
+#include <generators/evtgen/models/besiii/EvtDToKSKpi0.h>
 #include <string>
 
 using namespace std;

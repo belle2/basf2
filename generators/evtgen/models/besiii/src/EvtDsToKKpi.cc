@@ -1,39 +1,25 @@
-//--------------------------------------------------------------------------
-//
-// Model: EvtDsToKKpi
-// This file is an amplitude model for Ds+ -> K+ K- pi+.
-// The model is from PRD 104, 012016 (2021). DOI: https://doi.org/10.1103/PhysRevD.104.012016
-//
-// Permission to use these files in basf2 was generously granted by the BESIII Collaboration.
-//
-// Please cite the original reference for any public/published results where this model was used.
-//
-// Modified by : Jiyuan Zhang
-//
-//--------------------------------------------------------------------------
-
 #include <iomanip>
 #include <cmath>
 #include <string>
-#include "EvtGenBase/EvtCPUtil.hh"
-#include "EvtGenBase/EvtTensor4C.hh"
+#include <EvtGenBase/EvtCPUtil.hh>
+#include <EvtGenBase/EvtTensor4C.hh>
 
-#include "EvtGenBase/EvtPatches.hh"
+#include <EvtGenBase/EvtPatches.hh>
 #include <fstream>
 #include <stdlib.h>
-#include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
-#include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtReport.hh"
-#include "EvtGenBase/EvtResonance.hh"
-#include "EvtGenBase/EvtResonance2.hh"
+#include <EvtGenBase/EvtParticle.hh>
+#include <EvtGenBase/EvtGenKine.hh>
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtReport.hh>
+#include <EvtGenBase/EvtResonance.hh>
+#include <EvtGenBase/EvtResonance2.hh>
 #include <string>
-#include "EvtGenBase/EvtConst.hh"
-#include "EvtGenBase/EvtFlatte.hh"
-#include "EvtGenBase/EvtDecayTable.hh"
+#include <EvtGenBase/EvtConst.hh>
+#include <EvtGenBase/EvtFlatte.hh>
+#include <EvtGenBase/EvtDecayTable.hh>
 
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include "generators/evtgen/models/besiii/EvtDsToKKpi.h"
+#include <generators/evtgen/models/besiii/EvtDsToKKpi.h>
 
 namespace Belle2 {
 

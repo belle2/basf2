@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include "EvtGenBase/EvtDecayProb.hh"
+#include <EvtGenBase/EvtDecayProb.hh>
 #include <vector>
 #include <complex>
 
-#include "EvtGenBase/EvtParticle.hh"
+#include <EvtGenBase/EvtParticle.hh>
 
 namespace Belle2 {
   class EvtD0Topippim2pi0: public EvtDecayProb {

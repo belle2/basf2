@@ -1,7 +1,14 @@
-#ifndef EVTDTOKSKPI0_HH
-#define EVTDTOKSKPI0_HH
+// Model: EvtDToKSKpi0
+// This file is an amplitude model for D+ -> K_S0 K+ pi0.
+// The model is from the BESIII Collaboration in PRD 104, 012006 (2021). DOI:&nbsp; https://doi.org/10.1103/PhysRevD.104.012006
+//
+// Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
+//
+// Please cite the original reference for any public/published results where this model was used.
 
-#include "EvtGenBase/EvtDecayProb.hh"
+#pragma once
+
+#include <EvtGenBase/EvtDecayProb.hh>
 
 namespace Belle2 {
 
@@ -55,5 +62,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

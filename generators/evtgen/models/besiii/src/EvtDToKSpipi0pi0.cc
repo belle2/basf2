@@ -1,44 +1,17 @@
-// Model: EvtDToKSpipi0pi0
-// This file is an amplitude model for D+ -> K_S0 pi- pi0 pi0.
-// The model is from the BESIII Collaboration in JHEP09 (2023) 077. DOI:&nbsp; https://doi.org/10.1007/JHEP09(2023)077
-//
-// Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
-//
-// Please cite the original reference for any public/published results where this model was used.
-
-//--------------------------------------------------------------------------
-// Environment:
-//      This software is part of models developed at BES collaboration
-//      based on the EvtGen framework.  If you use all or part
-//      of it, please give an appropriate acknowledgement.
-//
-// Copyright Information: See EvtGen/BesCopyright
-//      Copyright (A) 2006      Ping Rong-Gang @IHEP
-//
-// Module: EvtDToKSpipi0pi0.cc
-//         the necessary file: EvtDToKSpipi0pi0.hh
-//
-// Description: JHEP09 (2023) 077
-//
-// Modification history:
-//
-//    Liaoyuan Dong    Jan. 12, 2023       Module created
-//
-//------------------------------------------------------------------------
-#include "EvtGenBase/EvtPatches.hh"
-#include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
-#include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtReport.hh"
-#include "EvtGenBase/EvtComplex.hh"
-#include "EvtGenBase/EvtDecayTable.hh"
+#include <EvtGenBase/EvtPatches.hh>
+#include <EvtGenBase/EvtParticle.hh>
+#include <EvtGenBase/EvtGenKine.hh>
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtReport.hh>
+#include <EvtGenBase/EvtComplex.hh>
+#include <EvtGenBase/EvtDecayTable.hh>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include <cmath>
 
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include "generators/evtgen/models/besiii/EvtDToKSpipi0pi0.h"
+#include <generators/evtgen/models/besiii/EvtDToKSpipi0pi0.h>
 
 using namespace std;
 
@@ -108,11 +81,6 @@ namespace Belle2 {
     modetype[6] = 2;
     modetype[7] = 2;
 
-    //cout << "Initializing DToKSpipi0pi0" << endl;
-    //for (int i=0; i<8; i++) {
-    //  cout << i << " rho,phi = " << rho[i] << ", "<< phi[i] << endl;
-    //}
-
     int GG[4][4] = { {1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, -1, 0}, {0, 0, 0, -1} };
     int EE[4][4][4][4] = {
       { {{0, 0, 0, 0},  {0, 0, 0, 0},  {0, 0, 0, 0},  {0, 0, 0, 0} },
@@ -166,7 +134,6 @@ namespace Belle2 {
            double value;
            double Ks[4],Pip[4],Pi01[4],Pi02[4];
            mother_c=EvtPDL::getStdHep(p->getId());
-    //cout<<"mother: "<<mother_c<<endl;
     if(mother_c==411){
     Ks[0] = Ks0.get(0); Pip[0] = pi1.get(0); Pi01[0] = pi2.get(0); Pi02[0] = pi3.get(0);
     Ks[1] = Ks0.get(1); Pip[1] = pi1.get(1); Pi01[1] = pi2.get(1); Pi02[1] = pi3.get(1);
@@ -180,10 +147,8 @@ namespace Belle2 {
     calPDF(Ks, Pip, Pi01, Pi02, value);
     if(value>maxprob) {
     maxprob=value;
-    std::cout << "Max PDF = " << ir << " prob= " << value << std::endl;
     }
     }
-    std::cout << "Max!!!!!!!!!!! " << maxprob<< std::endl;
     return;*/
     //-----------------------------------------------
     p->initializePhaseSpace(getNDaug(), getDaugs());
@@ -213,7 +178,6 @@ namespace Belle2 {
 
     double value;
     calPDF(Ks, Pip, Pi01, Pi02, value);
-    //std::cout<<"Prob: "<<value<<std::endl;
     setProb(value);
     return;
   }

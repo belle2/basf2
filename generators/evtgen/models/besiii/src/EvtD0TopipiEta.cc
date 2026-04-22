@@ -1,42 +1,15 @@
-// Model: EvtD0TopipiEta
-// This file is an amplitude model for D0 -> pi- pi+ eta.
-// The model is from the BESIII Collaboration in arXiv:2404.09219 (2024). DOI:&nbsp; https://doi.org/10.48550/arXiv.2404.09219
-//
-// Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
-//
-// Please cite the original reference for any public/published results where this model was used.
-
-//--------------------------------------------------------------------------
-//
-// Environment:
-//      This software is part of the EvtGen package developed jointly
-//      for the BaBar and CLEO collaborations.  If you use all or part
-//      of it, please give an appropriate acknowledgement.
-//
-// Copyright Information: See EvtGen/COPYRIGHT
-//      Copyright (C) 1998      Caltech, UCSB
-//
-// Module: EvtD0TopipiEta.cc
-//
-// Description: https://arxiv.org/abs/2404.09219
-//
-// Modification history:
-//
-//    Liaoyuan Dong    Jan 12 2024    Module created
-//
-//------------------------------------------------------------------------
-#include "EvtGenBase/EvtPatches.hh"
-#include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
-#include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtReport.hh"
-#include "EvtGenBase/EvtVector4R.hh"
-#include "EvtGenBase/EvtComplex.hh"
-#include "EvtGenBase/EvtDecayTable.hh"
+#include <EvtGenBase/EvtPatches.hh>
+#include <EvtGenBase/EvtParticle.hh>
+#include <EvtGenBase/EvtGenKine.hh>
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtReport.hh>
+#include <EvtGenBase/EvtVector4R.hh>
+#include <EvtGenBase/EvtComplex.hh>
+#include <EvtGenBase/EvtDecayTable.hh>
 #include <stdlib.h>
 
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include "generators/evtgen/models/besiii/EvtD0TopipiEta.h"
+#include <generators/evtgen/models/besiii/EvtD0TopipiEta.h>
 
 namespace Belle2 {
 
@@ -72,10 +45,6 @@ namespace Belle2 {
     phi[3] = -0.83115;   rho[3] =  2.6444;   //a0+ pi-
     phi[4] = -0.058521;  rho[4] =  7.0274;   //(pi+ eta)_{2+} pi-
 
-    //cout << "Initializing D0TopipiEta" << endl;
-    //for (int i=0; i<5; i++) {
-    //   cout << i << " rho= " << rho[i] << " phi= " << phi[i] << endl;
-    //}
     mrho = 0.77511;
     ma0 = 0.99;
     Grho = 0.1491;
@@ -140,10 +109,8 @@ namespace Belle2 {
           value = calDalEva(P1, P2, P3);
           if(value>maxprob) {
              maxprob=value;
-             cout << "ir = " << ir << " maxProb= " << value << endl;
           }
        }
-       cout << "maxProb = " << maxprob << endl;
     */
     p->initializePhaseSpace(getNDaug(), getDaugs());
     EvtVector4R D1 = p->getDaug(0)->getP4();
@@ -255,8 +222,6 @@ namespace Belle2 {
       if (flag == 0) prop = one;
       if (flag == 1) prop = propagatorRBW(mass_R, width_R, s[0], s[1], s[2], 3.0, 2);
       amp = tmp * prop * B[0] * B[1];
-    } else {
-      cout << "Only S, P, D wave allowed" << endl;
     }
     return amp;
   }

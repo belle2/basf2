@@ -1,46 +1,20 @@
-// Model: EvtD0Topippim2pi0
-// This file is an amplitude model for D0 -> pi+ pi- pi0 pi0.
-// The model is from the BESIII Collaboration in Chin. Phys. C 48, 083001 (2024). DOI:&nbsp; https://doi.org/10.1088/1674-1137/ad3d4d
-//
-// Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
-//
-// Please cite the original reference for any public/published results where this model was used.
-
-//--------------------------------------------------------------------------
-//
-// Environment:
-//      This software is part of models developed at BES collaboration
-//      based on the EvtGen framework.  If you use all or part
-//      of it, please give an appropriate acknowledgement.
-//
-// Copyright Information: See EvtGen/BesCopyright
-//      Copyright (A) 2006      Ping Rong-Gang @IHEP
-//
-// Module:  EvtD0Topippim2pi0.cc
-//
-// Description: Chin. Phys. C 48, 083001 (2024)
-//
-// Modification history:
-//
-//    Liaoyuan Dong   Aug. 22, 2024 Module updated
-//------------------------------------------------------------------------
-#include "EvtGenBase/EvtPatches.hh"
-#include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
-#include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtVector4R.hh"
-#include "EvtGenBase/EvtVector3R.hh"
-#include "EvtGenBase/EvtReport.hh"
+#include <EvtGenBase/EvtPatches.hh>
+#include <EvtGenBase/EvtParticle.hh>
+#include <EvtGenBase/EvtGenKine.hh>
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtVector4R.hh>
+#include <EvtGenBase/EvtVector3R.hh>
+#include <EvtGenBase/EvtReport.hh>
 #include <stdlib.h>
 #include <iostream>
 #include <string>
 #include <complex>
 #include <vector>
 #include <math.h>
-#include "TMath.h"
+#include <TMath.h>
 
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include "generators/evtgen/models/besiii/EvtD0Topippim2pi0.h"
+#include <generators/evtgen/models/besiii/EvtD0Topippim2pi0.h>
 
 namespace Belle2 {
 
@@ -65,7 +39,6 @@ namespace Belle2 {
     checkNDaug(4);
     charm   = getArg(0);
     tagmode = getArg(1);
-    //std::cout<<"Initializing EvtD0Topippim2pi0: charm="<<charm<<" tagmode= "<<tagmode<<std::endl;
 
     double mag[36], pha[36];
     mag[0] = 100; pha[0] = 0;
@@ -105,14 +78,11 @@ namespace Belle2 {
     mag[34] = 1.57835; pha[34] = -0.497796;
     mag[35] = 0.439629; pha[35] = 2.50596;
 
-
-    fitpara.clear();
     for (int i = 0; i < 36; i++) {
       std::complex<double> ctemp(mag[i]*cos(pha[i]), mag[i]*sin(pha[i]));
       fitpara.push_back(ctemp);
     }
 
-    g_uv.clear();
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         if (i != j) {
@@ -125,7 +95,6 @@ namespace Belle2 {
       }
     }
 
-    epsilon_uvmn.clear();
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         for (int k = 0; k < 4; k++) {
@@ -246,10 +215,8 @@ namespace Belle2 {
        double Prob = AmplitudeSquare(charm, tagmode);
        if(Prob>maxprob) {
        maxprob=Prob;
-       std::cout << "Max PDF = " << ir << " prob= " << Prob << std::endl;
        }
        }
-       std::cout << "Max!!!!!!!!!!! " << maxprob<< std::endl;
        */
     p->initializePhaseSpace(getNDaug(), getDaugs());
     for (int i = 0; i < _nd; i++) {
@@ -257,14 +224,12 @@ namespace Belle2 {
       _p4CM[i] = p->getDaug(i)->getP4();
     }
     double prob = AmplitudeSquare(charm, tagmode);
-//  std::cout<<"Amplitude in EvtGen: "<<prob<<std::endl;
     setProb(prob);
     return;
   }
 
   void EvtD0Topippim2pi0::setInput(double* pip, double* pim, double* pi01, double* pi02)
   {
-    m_Pip.clear(); m_Pim.clear(); m_Pi01.clear(); m_Pi02.clear();
     m_Pip.push_back(pip[0]); m_Pim.push_back(pim[0]); m_Pi01.push_back(pi01[0]); m_Pi02.push_back(pi02[0]);
     m_Pip.push_back(pip[1]); m_Pim.push_back(pim[1]); m_Pi01.push_back(pi01[1]); m_Pi02.push_back(pi02[1]);
     m_Pip.push_back(pip[2]); m_Pim.push_back(pim[2]); m_Pi01.push_back(pi01[2]); m_Pi02.push_back(pi02[2]);
@@ -273,12 +238,8 @@ namespace Belle2 {
 
   std::vector<double> EvtD0Topippim2pi0::sum_tensor(std::vector<double> pa, std::vector<double> pb)
   {
-    //if (pa.size() != pb.size()) {
-    //  std::cout << "error sum tensor" << std::endl;
-    //  exit(0);
-    //}
 
-    std::vector<double> temp; temp.clear();
+    std::vector<double> temp;
     for (size_t i = 0; i < pa.size(); i++) {
       double sum = pa[i] + pb[i];
       temp.push_back(sum);
@@ -288,10 +249,6 @@ namespace Belle2 {
 
   double EvtD0Topippim2pi0::contract_11_0(std::vector<double> pa, std::vector<double> pb)
   {
-    if (pa.size() != pb.size() || pa.size() != 4) {
-      std::cout << "error contract 11->0" << std::endl;
-      exit(0);
-    }
     double temp = pa[3] * pb[3] - pa[0] * pb[0] - pa[1] * pb[1] - pa[2] * pb[2];
     return temp;
 
@@ -299,11 +256,7 @@ namespace Belle2 {
 
   std::vector<double> EvtD0Topippim2pi0::contract_21_1(std::vector<double> pa, std::vector<double> pb)
   {
-    if (pa.size() != 16 || pb.size() != 4) {
-      std::cout << "error contract 21->1" << std::endl;
-      exit(0);
-    }
-    std::vector<double> temp; temp.clear();
+    std::vector<double> temp;
     for (int i = 0; i < 4; i++) {
       double sum = 0;
       for (int j = 0; j < 4; j++) {
@@ -318,10 +271,6 @@ namespace Belle2 {
 
   double EvtD0Topippim2pi0::contract_22_0(std::vector<double> pa, std::vector<double> pb)
   {
-    if (pa.size() != pb.size() || pa.size() != 16) {
-      std::cout << "error contract 22->0" << std::endl;
-      exit(0);
-    }
     double temp = 0;
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
@@ -335,11 +284,7 @@ namespace Belle2 {
 
   std::vector<double> EvtD0Topippim2pi0::contract_31_2(std::vector<double> pa, std::vector<double> pb)
   {
-    if (pa.size() != 64 || pb.size() != 4) {
-      std::cout << "error contract 31->2" << std::endl;
-      exit(0);
-    }
-    std::vector<double> temp; temp.clear();
+    std::vector<double> temp;
     for (int i = 0; i < 16; i++) {
       double sum = 0;
       for (int j = 0; j < 4; j++) {
@@ -354,11 +299,7 @@ namespace Belle2 {
 
   std::vector<double> EvtD0Topippim2pi0::contract_41_3(std::vector<double> pa, std::vector<double> pb)
   {
-    if (pa.size() != 256 || pb.size() != 4) {
-      std::cout << "error contract 41->3" << std::endl;
-      exit(0);
-    }
-    std::vector<double> temp; temp.clear();
+    std::vector<double> temp;
     for (int i = 0; i < 64; i++) {
       double sum = 0;
       for (int j = 0; j < 4; j++) {
@@ -373,11 +314,7 @@ namespace Belle2 {
 
   std::vector<double> EvtD0Topippim2pi0::contract_42_2(std::vector<double> pa, std::vector<double> pb)
   {
-    if (pa.size() != 256 || pb.size() != 16) {
-      std::cout << "error contract 42->2" << std::endl;
-      exit(0);
-    }
-    std::vector<double> temp; temp.clear();
+    std::vector<double> temp;
     for (int i = 0; i < 16; i++) {
       double sum = 0;
       for (int j = 0; j < 4; j++) {
@@ -395,11 +332,7 @@ namespace Belle2 {
   }
   std::vector<double> EvtD0Topippim2pi0::contract_22_2(std::vector<double> pa, std::vector<double> pb)
   {
-    if (pa.size() != 16 || pb.size() != 16) {
-      std::cout << "error contract 42->2" << std::endl;
-      exit(0);
-    }
-    std::vector<double> temp; temp.clear();
+    std::vector<double> temp;
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         double sum = 0;
@@ -420,17 +353,8 @@ namespace Belle2 {
   std::vector<double> EvtD0Topippim2pi0::OrbitalTensors(std::vector<double> pa, std::vector<double> pb, std::vector<double> pc,
                                                         double r, int rank)
   {
-    if (pa.size() != 4 || pb.size() != 4 || pc.size() != 4) {
-      std::cout << "Error: pa, pb, pc" << std::endl;
-      exit(0);
-    }
-    if (rank < 0) {
-      std::cout << "Error: L<0 !!!" << std::endl;
-      exit(0);
-    }
-
     // relative momentum
-    std::vector<double> mr; mr.clear();
+    std::vector<double> mr;
 
     for (int i = 0; i < 4; i++) {
       double temp = pb[i] - pc[i];
@@ -463,7 +387,7 @@ namespace Belle2 {
     //  mB4 = &sqrt(12746.0f/(Q8abc + (10.0f*Q_02)*Q6abc + (135.0f*Q_04)*Q4abc + (1575.0f*Q_06)*Q2abc + 11025.0f*Q_08));
 
     // Projection Operator 2-rank
-    std::vector<double> proj_uv; proj_uv.clear();
+    std::vector<double> proj_uv;
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         int idx = i * 4 + j;
@@ -474,13 +398,13 @@ namespace Belle2 {
 
     // Orbital Tensors
     if (rank == 0) {
-      std::vector<double> t; t.clear();
+      std::vector<double> t;
       t.push_back(1.0);
       return t;
 
     } else if (rank < 3) {
-      std::vector<double> t_u; t_u.clear();
-      std::vector<double> Bt_u; Bt_u.clear();
+      std::vector<double> t_u;
+      std::vector<double> Bt_u;
       for (int i = 0; i < 4; i++) {
         double temp = 0;
         for (int j = 0; j < 4; j++) {
@@ -494,7 +418,7 @@ namespace Belle2 {
 
       double t_u2 = contract_11_0(t_u, t_u);
 
-      std::vector<double> Bt_uv; Bt_uv.clear();
+      std::vector<double> Bt_uv;
       for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
           int idx = 4 * i + j;
@@ -504,9 +428,6 @@ namespace Belle2 {
       }
       if (rank == 2) return Bt_uv;
 
-    } else {
-      std::cout << "rank>2: please add it by yourself!!!" << std::endl;
-      exit(0);
     }
     return std::vector<double>();
   }
@@ -514,19 +435,10 @@ namespace Belle2 {
 // projection Tensor
   std::vector<double> EvtD0Topippim2pi0::ProjectionTensors(std::vector<double> pa, int rank)
   {
-    if (pa.size() != 4) {
-      std::cout << "Error: pa" << std::endl;
-      exit(0);
-    }
-    if (rank < 0) {
-      std::cout << "Error: L<0 !!!" << std::endl;
-      exit(0);
-    }
-
     double msa = contract_11_0(pa, pa);
 
     // Projection Operator 2-rank
-    std::vector<double> proj_uv; proj_uv.clear();
+    std::vector<double> proj_uv;
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         int idx = i * 4 + j;
@@ -537,14 +449,14 @@ namespace Belle2 {
 
     // Orbital Tensors
     if (rank == 0) {
-      std::vector<double> t; t.clear();
+      std::vector<double> t;
       t.push_back(1.0);
       return t;
 
     } else if (rank == 1) {
       return  proj_uv;
     } else if (rank == 2) {
-      std::vector<double> proj_uvmn; proj_uvmn.clear();
+      std::vector<double> proj_uvmn;
       for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
           for (int k = 0; k < 4; k++) {
@@ -567,10 +479,8 @@ namespace Belle2 {
       }
       return proj_uvmn;
 
-    } else {
-      std::cout << "rank>2: please add it by yourself!!!" << std::endl;
-      exit(0);
     }
+    return std::vector<double>();
   }
   double EvtD0Topippim2pi0::fundecaymomentum(double mr2, double m1_2, double m2_2)
   {
@@ -1605,10 +1515,10 @@ namespace Belle2 {
   std::complex<double> EvtD0Topippim2pi0::CalDbAmp()
   {
 
-    std::vector<double> cpPip;  cpPip.clear();
-    std::vector<double> cpPim;  cpPim.clear();
-    std::vector<double> cpPi01; cpPi01.clear();
-    std::vector<double> cpPi02; cpPi02.clear();
+    std::vector<double> cpPip;
+    std::vector<double> cpPim;
+    std::vector<double> cpPi01;
+    std::vector<double> cpPi02;
 
     cpPip.push_back(-m_Pim[0]); cpPim.push_back(-m_Pip[0]); cpPi01.push_back(-m_Pi01[0]); cpPi02.push_back(-m_Pi02[0]);
     cpPip.push_back(-m_Pim[1]); cpPim.push_back(-m_Pip[1]); cpPi01.push_back(-m_Pi01[1]); cpPi02.push_back(-m_Pi02[1]);
@@ -1622,32 +1532,19 @@ namespace Belle2 {
                                               std::vector<double> Pi02)
   {
 
-    std::vector<double> PipPim; PipPim.clear();
-    std::vector<double> PipPi01; PipPi01.clear();
-    std::vector<double> PipPi02; PipPi02.clear();
-    std::vector<double> PimPi01; PimPi01.clear();
-    std::vector<double> PimPi02; PimPi02.clear();
-    std::vector<double> Pi01Pi02; Pi01Pi02.clear();
+    auto PipPim   = sum_tensor(Pip, Pim);
+    auto PipPi01  = sum_tensor(Pip, Pi01);
+    auto PipPi02  = sum_tensor(Pip, Pi02);
+    auto PimPi01  = sum_tensor(Pim, Pi01);
+    auto PimPi02  = sum_tensor(Pim, Pi02);
+    auto Pi01Pi02 = sum_tensor(Pi01, Pi02);
 
-    PipPim   = sum_tensor(Pip, Pim);
-    PipPi01  = sum_tensor(Pip, Pi01);
-    PipPi02  = sum_tensor(Pip, Pi02);
-    PimPi01  = sum_tensor(Pim, Pi01);
-    PimPi02  = sum_tensor(Pim, Pi02);
-    Pi01Pi02 = sum_tensor(Pi01, Pi02);
+    auto PipPimPi01 = sum_tensor(PipPim, Pi01);
+    auto PipPimPi02 = sum_tensor(PipPim, Pi02);
+    auto PipPi01Pi02 = sum_tensor(PipPi01, Pi02);
+    auto PimPi01Pi02 = sum_tensor(PimPi01, Pi02);
 
-    std::vector<double> PipPimPi01; PipPimPi01.clear();
-    std::vector<double> PipPimPi02; PipPimPi02.clear();
-    std::vector<double> PipPi01Pi02; PipPi01Pi02.clear();
-    std::vector<double> PimPi01Pi02; PimPi01Pi02.clear();
-
-    PipPimPi01 = sum_tensor(PipPim, Pi01);
-    PipPimPi02 = sum_tensor(PipPim, Pi02);
-    PipPi01Pi02 = sum_tensor(PipPi01, Pi02);
-    PimPi01Pi02 = sum_tensor(PimPi01, Pi02);
-
-    std::vector<double> D0; D0.clear();
-    D0 = sum_tensor(PipPimPi01, Pi02);
+    auto D0 = sum_tensor(PipPimPi01, Pi02);
 
     double M2_PipPim  = contract_11_0(PipPim, PipPim);
     double M2_PipPi01 = contract_11_0(PipPi01, PipPi01);
@@ -1716,137 +1613,76 @@ namespace Belle2 {
     std::complex<double> RBW_pi21670_02 = RBW(M2_PipPimPi02, m0_pi21670, w0_pi21670, -1, -1, -1, -1);
 
     // D->XX Projection
-    std::vector<double> Proj1_3p; Proj1_3p.clear();
-    std::vector<double> Proj1_3m; Proj1_3m.clear();
-    std::vector<double> Proj1_3z1; Proj1_3z1.clear();
-    std::vector<double> Proj1_3z2; Proj1_3z2.clear();
+    auto Proj1_3p  = ProjectionTensors(PipPi01Pi02, 1);
+    auto Proj1_3m  = ProjectionTensors(PimPi01Pi02, 1);
+    auto Proj1_3z1 = ProjectionTensors(PipPimPi01, 1);
+    auto Proj1_3z2 = ProjectionTensors(PipPimPi02, 1);
 
-    Proj1_3p  = ProjectionTensors(PipPi01Pi02, 1);
-    Proj1_3m  = ProjectionTensors(PimPi01Pi02, 1);
-    Proj1_3z1 = ProjectionTensors(PipPimPi01, 1);
-    Proj1_3z2 = ProjectionTensors(PipPimPi02, 1);
-
-    std::vector<double> Proj2_3p; Proj2_3p.clear();
-    std::vector<double> Proj2_3m; Proj2_3m.clear();
-    std::vector<double> Proj2_3z1; Proj2_3z1.clear();
-    std::vector<double> Proj2_3z2; Proj2_3z2.clear();
-
-    Proj2_3p  = ProjectionTensors(PipPi01Pi02, 2);
-    Proj2_3m  = ProjectionTensors(PimPi01Pi02, 2);
-    Proj2_3z1 = ProjectionTensors(PipPimPi01, 2);
-    Proj2_3z2 = ProjectionTensors(PipPimPi02, 2);
+    auto Proj2_3p  = ProjectionTensors(PipPi01Pi02, 2);
+    auto Proj2_3m  = ProjectionTensors(PimPi01Pi02, 2);
+    auto Proj2_3z1 = ProjectionTensors(PipPimPi01, 2);
+    auto Proj2_3z2 = ProjectionTensors(PipPimPi02, 2);
 
     // X->PP Orbital
-    std::vector<double> T1_PipPim; T1_PipPim.clear();
-    std::vector<double> T1_PipPi01; T1_PipPi01.clear();
-    std::vector<double> T1_PipPi02; T1_PipPi02.clear();
-    std::vector<double> T1_PimPi01; T1_PimPi01.clear();
-    std::vector<double> T1_PimPi02; T1_PimPi02.clear();
-    std::vector<double> T1_Pi01Pi02; T1_Pi01Pi02.clear();
+    auto T1_PipPim = OrbitalTensors(PipPim, Pip, Pim, rRes, 1);
+    auto T1_PipPi01 = OrbitalTensors(PipPi01, Pip, Pi01, rRes, 1);
+    auto T1_PipPi02 = OrbitalTensors(PipPi02, Pip, Pi02, rRes, 1);
+    auto T1_PimPi01 = OrbitalTensors(PimPi01, Pim, Pi01, rRes, 1);
+    auto T1_PimPi02 = OrbitalTensors(PimPi02, Pim, Pi02, rRes, 1);
+    auto T1_Pi01Pi02 = OrbitalTensors(Pi01Pi02, Pi01, Pi02, rRes, 1);
 
-    T1_PipPim = OrbitalTensors(PipPim, Pip, Pim, rRes, 1);
-    T1_PipPi01 = OrbitalTensors(PipPi01, Pip, Pi01, rRes, 1);
-    T1_PipPi02 = OrbitalTensors(PipPi02, Pip, Pi02, rRes, 1);
-    T1_PimPi01 = OrbitalTensors(PimPi01, Pim, Pi01, rRes, 1);
-    T1_PimPi02 = OrbitalTensors(PimPi02, Pim, Pi02, rRes, 1);
-    T1_Pi01Pi02 = OrbitalTensors(Pi01Pi02, Pi01, Pi02, rRes, 1);
-
-    std::vector<double> T2_PipPim; T2_PipPim.clear();
-    std::vector<double> T2_Pi01Pi02; T2_Pi01Pi02.clear();
+    std::vector<double> T2_PipPim;
+    std::vector<double> T2_Pi01Pi02;
 
     T2_PipPim = OrbitalTensors(PipPim, Pip, Pim, rRes, 2);
     T2_Pi01Pi02 = OrbitalTensors(Pi01Pi02, Pi01, Pi02, rRes, 2);
 
     // X->YP Orbital
-    std::vector<double> T1_PipPimPi01; T1_PipPimPi01.clear();
-    std::vector<double> T1_PipPimPi02; T1_PipPimPi02.clear();
-    std::vector<double> T1_PipPi01Pi02; T1_PipPi01Pi02.clear();
-    std::vector<double> T1_PipPi02Pi01; T1_PipPi02Pi01.clear();
-    std::vector<double> T1_PimPi01Pi02; T1_PimPi01Pi02.clear();
-    std::vector<double> T1_PimPi02Pi01; T1_PimPi02Pi01.clear();
-    std::vector<double> T1_PipPi01Pim; T1_PipPi01Pim.clear();
-    std::vector<double> T1_PipPi02Pim; T1_PipPi02Pim.clear();
-    std::vector<double> T1_PimPi01Pip; T1_PimPi01Pip.clear();
-    std::vector<double> T1_PimPi02Pip; T1_PimPi02Pip.clear();
-    std::vector<double> T1_Pi01Pi02Pip; T1_Pi01Pi02Pip.clear();
-    std::vector<double> T1_Pi01Pi02Pim; T1_Pi01Pi02Pim.clear();
+    auto T1_PipPimPi01 = OrbitalTensors(PipPimPi01, PipPim, Pi01, rRes, 1);
+    auto T1_PipPimPi02 = OrbitalTensors(PipPimPi02, PipPim, Pi02, rRes, 1);
+    auto T1_PipPi01Pi02 = OrbitalTensors(PipPi01Pi02, PipPi01, Pi02, rRes, 1);
+    auto T1_PipPi02Pi01 = OrbitalTensors(PipPi01Pi02, PipPi02, Pi01, rRes, 1);
+    auto T1_PimPi01Pi02 = OrbitalTensors(PimPi01Pi02, PimPi01, Pi02, rRes, 1);
+    auto T1_PimPi02Pi01 = OrbitalTensors(PimPi01Pi02, PimPi02, Pi01, rRes, 1);
+    auto T1_PipPi01Pim = OrbitalTensors(PipPimPi01, PipPi01, Pim, rRes, 1);
+    auto T1_PipPi02Pim = OrbitalTensors(PipPimPi02, PipPi02, Pim, rRes, 1);
+    auto T1_PimPi01Pip = OrbitalTensors(PipPimPi01, PimPi01, Pip, rRes, 1);
+    auto T1_PimPi02Pip = OrbitalTensors(PipPimPi02, PimPi02, Pip, rRes, 1);
+    auto T1_Pi01Pi02Pip = OrbitalTensors(PipPi01Pi02, Pi01Pi02, Pip, rRes, 1);
+    auto T1_Pi01Pi02Pim = OrbitalTensors(PimPi01Pi02, Pi01Pi02, Pim, rRes, 1);
 
-    T1_PipPimPi01 = OrbitalTensors(PipPimPi01, PipPim, Pi01, rRes, 1);
-    T1_PipPimPi02 = OrbitalTensors(PipPimPi02, PipPim, Pi02, rRes, 1);
-    T1_PipPi01Pi02 = OrbitalTensors(PipPi01Pi02, PipPi01, Pi02, rRes, 1);
-    T1_PipPi02Pi01 = OrbitalTensors(PipPi01Pi02, PipPi02, Pi01, rRes, 1);
-    T1_PimPi01Pi02 = OrbitalTensors(PimPi01Pi02, PimPi01, Pi02, rRes, 1);
-    T1_PimPi02Pi01 = OrbitalTensors(PimPi01Pi02, PimPi02, Pi01, rRes, 1);
-    T1_PipPi01Pim = OrbitalTensors(PipPimPi01, PipPi01, Pim, rRes, 1);
-    T1_PipPi02Pim = OrbitalTensors(PipPimPi02, PipPi02, Pim, rRes, 1);
-    T1_PimPi01Pip = OrbitalTensors(PipPimPi01, PimPi01, Pip, rRes, 1);
-    T1_PimPi02Pip = OrbitalTensors(PipPimPi02, PimPi02, Pip, rRes, 1);
-    T1_Pi01Pi02Pip = OrbitalTensors(PipPi01Pi02, Pi01Pi02, Pip, rRes, 1);
-    T1_Pi01Pi02Pim = OrbitalTensors(PimPi01Pi02, Pi01Pi02, Pim, rRes, 1);
-
-    std::vector<double> T2_PipPimPi01; T2_PipPimPi01.clear();
-    std::vector<double> T2_PipPimPi02; T2_PipPimPi02.clear();
-    std::vector<double> T2_PipPi01Pi02; T2_PipPi01Pi02.clear();
-    std::vector<double> T2_PipPi02Pi01; T2_PipPi02Pi01.clear();
-    std::vector<double> T2_PimPi01Pi02; T2_PimPi01Pi02.clear();
-    std::vector<double> T2_PimPi02Pi01; T2_PimPi02Pi01.clear();
-    std::vector<double> T2_PipPi01Pim; T2_PipPi01Pim.clear();
-    std::vector<double> T2_PipPi02Pim; T2_PipPi02Pim.clear();
-    std::vector<double> T2_PimPi01Pip; T2_PimPi01Pip.clear();
-    std::vector<double> T2_PimPi02Pip; T2_PimPi02Pip.clear();
-    std::vector<double> T2_Pi01Pi02Pip; T2_Pi01Pi02Pip.clear();
-    std::vector<double> T2_Pi01Pi02Pim; T2_Pi01Pi02Pim.clear();
-
-    T2_PipPimPi01 = OrbitalTensors(PipPimPi01, PipPim, Pi01, rRes, 2);
-    T2_PipPimPi02 = OrbitalTensors(PipPimPi02, PipPim, Pi02, rRes, 2);
-    T2_PipPi01Pi02 = OrbitalTensors(PipPi01Pi02, PipPi01, Pi02, rRes, 2);
-    T2_PipPi02Pi01 = OrbitalTensors(PipPi01Pi02, PipPi02, Pi01, rRes, 2);
-    T2_PimPi01Pi02 = OrbitalTensors(PimPi01Pi02, PimPi01, Pi02, rRes, 2);
-    T2_PimPi02Pi01 = OrbitalTensors(PimPi01Pi02, PimPi02, Pi01, rRes, 2);
-    T2_PipPi01Pim = OrbitalTensors(PipPimPi01, PipPi01, Pim, rRes, 2);
-    T2_PipPi02Pim = OrbitalTensors(PipPimPi02, PipPi02, Pim, rRes, 2);
-    T2_PimPi01Pip = OrbitalTensors(PipPimPi01, PimPi01, Pip, rRes, 2);
-    T2_PimPi02Pip = OrbitalTensors(PipPimPi02, PimPi02, Pip, rRes, 2);
-    T2_Pi01Pi02Pip = OrbitalTensors(PipPi01Pi02, Pi01Pi02, Pip, rRes, 2);
-    T2_Pi01Pi02Pim = OrbitalTensors(PimPi01Pi02, Pi01Pi02, Pim, rRes, 2);
+    auto T2_PipPimPi01 = OrbitalTensors(PipPimPi01, PipPim, Pi01, rRes, 2);
+    auto T2_PipPimPi02 = OrbitalTensors(PipPimPi02, PipPim, Pi02, rRes, 2);
+    auto T2_PipPi01Pi02 = OrbitalTensors(PipPi01Pi02, PipPi01, Pi02, rRes, 2);
+    auto T2_PipPi02Pi01 = OrbitalTensors(PipPi01Pi02, PipPi02, Pi01, rRes, 2);
+    auto T2_PimPi01Pi02 = OrbitalTensors(PimPi01Pi02, PimPi01, Pi02, rRes, 2);
+    auto T2_PimPi02Pi01 = OrbitalTensors(PimPi01Pi02, PimPi02, Pi01, rRes, 2);
+    auto T2_PipPi01Pim = OrbitalTensors(PipPimPi01, PipPi01, Pim, rRes, 2);
+    auto T2_PipPi02Pim = OrbitalTensors(PipPimPi02, PipPi02, Pim, rRes, 2);
+    auto T2_PimPi01Pip = OrbitalTensors(PipPimPi01, PimPi01, Pip, rRes, 2);
+    auto T2_PimPi02Pip = OrbitalTensors(PipPimPi02, PimPi02, Pip, rRes, 2);
+    auto T2_Pi01Pi02Pip = OrbitalTensors(PipPi01Pi02, Pi01Pi02, Pip, rRes, 2);
+    auto T2_Pi01Pi02Pim = OrbitalTensors(PimPi01Pi02, Pi01Pi02, Pim, rRes, 2);
 
     // D->XX Orbital
-    std::vector<double> T1_2pm12; T1_2pm12.clear();
-    std::vector<double> T1_2p1m2; T1_2p1m2.clear();
-    std::vector<double> T1_2p2m1; T1_2p2m1.clear();
+    auto T1_2pm12 = OrbitalTensors(D0, PipPim, Pi01Pi02, rD, 1);
+    auto T1_2p1m2 = OrbitalTensors(D0, PipPi01, PimPi02, rD, 1);
+    auto T1_2p2m1 = OrbitalTensors(D0, PipPi02, PimPi01, rD, 1);
 
-    T1_2pm12 = OrbitalTensors(D0, PipPim, Pi01Pi02, rD, 1);
-    T1_2p1m2 = OrbitalTensors(D0, PipPi01, PimPi02, rD, 1);
-    T1_2p2m1 = OrbitalTensors(D0, PipPi02, PimPi01, rD, 1);
-
-    std::vector<double> T2_2pm12; T2_2pm12.clear();
-    std::vector<double> T2_2p1m2; T2_2p1m2.clear();
-    std::vector<double> T2_2p2m1; T2_2p2m1.clear();
-
-    T2_2pm12 = OrbitalTensors(D0, PipPim, Pi01Pi02, rD, 2);
-    T2_2p1m2 = OrbitalTensors(D0, PipPi01, PimPi02, rD, 2);
-    T2_2p2m1 = OrbitalTensors(D0, PipPi02, PimPi01, rD, 2);
+    auto T2_2pm12 = OrbitalTensors(D0, PipPim, Pi01Pi02, rD, 2);
+    auto T2_2p1m2 = OrbitalTensors(D0, PipPi01, PimPi02, rD, 2);
+    auto T2_2p2m1 = OrbitalTensors(D0, PipPi02, PimPi01, rD, 2);
 
     // D->XP Orbital
-    std::vector<double> T1_3pm; T1_3pm.clear();
-    std::vector<double> T1_3mp; T1_3mp.clear();
-    std::vector<double> T1_3z12; T1_3z12.clear();
-    std::vector<double> T1_3z21; T1_3z21.clear();
+    auto T1_3pm  = OrbitalTensors(D0, PipPi01Pi02, Pim, rD, 1);
+    auto T1_3mp  = OrbitalTensors(D0, PimPi01Pi02, Pip, rD, 1);
+    auto T1_3z12 = OrbitalTensors(D0, PipPimPi01, Pi02, rD, 1);
+    auto T1_3z21 = OrbitalTensors(D0, PipPimPi02, Pi01, rD, 1);
 
-    T1_3pm  = OrbitalTensors(D0, PipPi01Pi02, Pim, rD, 1);
-    T1_3mp  = OrbitalTensors(D0, PimPi01Pi02, Pip, rD, 1);
-    T1_3z12 = OrbitalTensors(D0, PipPimPi01, Pi02, rD, 1);
-    T1_3z21 = OrbitalTensors(D0, PipPimPi02, Pi01, rD, 1);
-
-    std::vector<double> T2_3pm;  T2_3pm.clear();
-    std::vector<double> T2_3mp;  T2_3mp.clear();
-    std::vector<double> T2_3z12; T2_3z12.clear();
-    std::vector<double> T2_3z21; T2_3z21.clear();
-
-    T2_3pm  = OrbitalTensors(D0, PipPi01Pi02, Pim, rD, 2);
-    T2_3mp  = OrbitalTensors(D0, PimPi01Pi02, Pip, rD, 2);
-    T2_3z12 = OrbitalTensors(D0, PipPimPi01, Pi02, rD, 2);
-    T2_3z21 = OrbitalTensors(D0, PipPimPi02, Pi01, rD, 2);
+    auto T2_3pm  = OrbitalTensors(D0, PipPi01Pi02, Pim, rD, 2);
+    auto T2_3mp  = OrbitalTensors(D0, PimPi01Pi02, Pip, rD, 2);
+    auto T2_3z12 = OrbitalTensors(D0, PipPimPi01, Pi02, rD, 2);
+    auto T2_3z21 = OrbitalTensors(D0, PipPimPi02, Pi01, rD, 2);
 
     std::complex<double> amplitude(0, 0);
 
@@ -1860,8 +1696,6 @@ namespace Belle2 {
     double SF_Ap_D_Vp1P = contract_11_0(contract_21_1(T2_PipPi01Pi02, T1_PipPi01), T1_3pm);
     double SF_Ap_D_Vp2P = contract_11_0(contract_21_1(T2_PipPi02Pi01, T1_PipPi02), T1_3pm);
 
-//  std::cout<<SF_Ap_D_VP_1<<","<<SF_Ap_D_VP_2<<","<<SF_Ap_D_VP_3<<","<<SF_Ap_D_VP_4<<","<<std::endl;
-//  std::cout<<"-------"<<std::endl;
     amplitude += fitpara[1] * (SF_Ap_D_Vp1P * RBW_a11260_p * GS_rho770_p1 + SF_Ap_D_Vp2P * RBW_a11260_p * GS_rho770_p2);
 
     // D0 -> a1(1260)+ {f2(1270) pi+ [P]} pi-

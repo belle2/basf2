@@ -1,8 +1,15 @@
+// Model: EvtDsToKKpi
+// This file is an amplitude model for Ds+ -> K- K+ pi+.
+// The model is from PRD 104, 012016 (2021). DOI: https://doi.org/10.1103/PhysRevD.104.012016
+//
+// Permission to use these files in basf2 was generously granted by the BESIII Collaboration.
+//
+// Please cite the original reference for any public/published results where this model was used.
 
 #pragma once
-#include "EvtGenBase/EvtDecayProb.hh"
-#include "EvtGenBase/EvtDecayAmp.hh"
-#include "EvtGenBase/EvtParticle.hh"
+#include <EvtGenBase/EvtDecayProb.hh>
+#include <EvtGenBase/EvtDecayAmp.hh>
+#include <EvtGenBase/EvtParticle.hh>
 #include <fstream>
 
 namespace Belle2 {

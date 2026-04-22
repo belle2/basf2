@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "EvtGenBase/EvtDecayProb.hh"
+#include <EvtGenBase/EvtDecayProb.hh>
 
 
 namespace Belle2 {

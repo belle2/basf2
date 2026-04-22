@@ -1,39 +1,14 @@
-// Model: EvtD0ToKpipi0pi0
-// This file is an amplitude model for D0 -> K- pi+ pi0 pi0.
-// The model is from the BESIII Collaboration in PRD 99, 092008 (2019). DOI:&nbsp; https://doi.org/10.1103/PhysRevD.99.092008
-//
-// Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
-//
-// Please cite the original reference for any public/published results where this model was used.
-
-//--------------------------------------------------------------------------
-// Environment:
-//      This software is part of models developed at BES collaboration
-//      based on the EvtGen framework.  If you use all or part
-//      of it, please give an appropriate acknowledgement.
-//
-// Module: EvtD0ToKpipi0pi0.cc
-//         the necessary file: EvtD0ToKpipi0pi0.hh
-//
-// Description: D0 -> K- pi+ pi0 pi0,
-//              see PHYSICAL REVIEW D 99, 092008 (2019)
-//
-// Modification history:
-//
-//    Liaoyuan Dong    Jan.15, 2020       Module created
-//
-//------------------------------------------------------------------------
-#include "EvtGenBase/EvtPatches.hh"
-#include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
-#include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtReport.hh"
-#include "EvtGenBase/EvtComplex.hh"
-#include "EvtGenBase/EvtDecayTable.hh"
+#include <EvtGenBase/EvtPatches.hh>
+#include <EvtGenBase/EvtParticle.hh>
+#include <EvtGenBase/EvtGenKine.hh>
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtReport.hh>
+#include <EvtGenBase/EvtComplex.hh>
+#include <EvtGenBase/EvtDecayTable.hh>
 #include <stdlib.h>
 
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include "generators/evtgen/models/besiii/EvtD0ToKpipi0pi0.h"
+#include <generators/evtgen/models/besiii/EvtD0ToKpipi0pi0.h>
 
 namespace Belle2 {
 
@@ -63,7 +38,6 @@ namespace Belle2 {
        checkSpinDaughter(3,EvtSpinType::SCALAR);
        checkSpinDaughter(4,EvtSpinType::SCALAR);
     */
-    //std::cout << "Initializing EvtD0ToKpipi0pi0" << std::endl;
 
     mod[0] = 1; rho[0] = 2.02; phi[0] = -0.75;
     mod[1] = 1; rho[1] = 1.66; phi[1] = -2.90;
@@ -140,9 +114,6 @@ namespace Belle2 {
     mass[3] = 0.89581; width[3] = 0.0474;
     mass[4] = 0.77511; width[4] = 0.1491;
 
-    //for (int i=0; i<68; i++) {
-    //   cout << i << " rho,phi = " << rho[i] << ", "<< phi[i] << endl;
-    //}
     mD = 1.86486;
     rRes = 3.0;
     rD = 5.0;
@@ -218,10 +189,8 @@ namespace Belle2 {
           double Prob = calPDF(Km, Pip, Pi01, Pi02);
           if(Prob>maxprob) {
              maxprob=Prob;
-             std::cout << "Max PDF = " << ir << " prob= " << Prob << std::endl;
           }
        }
-       std::cout << "Max!!!!!!!!!!! " << maxprob<< std::endl;
     */
     p->initializePhaseSpace(getNDaug(), getDaugs());
     EvtVector4R Km0 = p->getDaug(0)->getP4();

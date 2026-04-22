@@ -1,26 +1,12 @@
-//--------------------------------------------------------------------------
-//
-// Model: EvtDTopipi0Eta
-// This file is an amplitude model for D+ -> pi+ pi0 eta.
-// The model is from Phys.Rev.D.110.L111102 (2024). DOI: https://doi.org/10.1103/PhysRevD.110.L111102
-//
-// Permission to use these files in basf2 was generously granted by the BESIII Collaboration.
-//
-// Please cite the original reference for any public/published results where this model was used.
-//
-// Modified by : Jiyuan Zhang
-//
-//--------------------------------------------------------------------------
-
-#include "EvtGenBase/EvtPatches.hh"
-#include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
-#include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtReport.hh"
-#include "EvtGenBase/EvtVector4R.hh"
-#include "EvtGenBase/EvtComplex.hh"
-#include "generators/evtgen/models/besiii/EvtDTopipi0Eta.h"
-#include "EvtGenBase/EvtDecayTable.hh"
+#include <EvtGenBase/EvtPatches.hh>
+#include <EvtGenBase/EvtParticle.hh>
+#include <EvtGenBase/EvtGenKine.hh>
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtReport.hh>
+#include <EvtGenBase/EvtVector4R.hh>
+#include <EvtGenBase/EvtComplex.hh>
+#include <generators/evtgen/models/besiii/EvtDTopipi0Eta.h>
+#include <EvtGenBase/EvtDecayTable.hh>
 #include <stdlib.h>
 
 #include <generators/evtgen/EvtGenModelRegister.h>
@@ -212,8 +198,6 @@ namespace Belle2 {
       if (flag == 0) prop = one;
       if (flag == 1) prop = propagatorRBW(mass_R, width_R, s[0], s[1], s[2], 3.0, 2);
       amp = tmp * prop * B[0] * B[1];
-    } else {
-      cout << "Only S, P, D wave allowed" << endl;
     }
     return amp;
   }

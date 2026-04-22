@@ -1,42 +1,14 @@
-// Model: EvtD0ToKpipipi
-// This file is an amplitude model for D0 -> K- pi+ pi+ pi-.
-// The model is from the BESIII Collaboration in PRD 95, 072010 (2017). DOI:&nbsp; https://doi.org/10.1103/PhysRevD.95.072010
-//
-// Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
-//
-// Please cite the original reference for any public/published results where this model was used.
-
-//--------------------------------------------------------------------------
-// Environment:
-//      This software is part of models developed at BES collaboration
-//      based on the EvtGen framework.  If you use all or part
-//      of it, please give an appropriate acknowledgement.
-//
-// Copyright Information: See EvtGen/BesCopyright
-//      Copyright (A) 2006      Ping Rong-Gang @IHEP
-//
-// Module: EvtD0ToKpipipi.cc
-//         the necessary file: EvtD0ToKpipipi.hh
-//
-// Description: D0 -> K- pi+ pi+ pi-,
-//              see PHYSICAL REVIEW D 95, 072010 (2017)
-//
-// Modification history:
-//
-//    Liaoyuan Dong    Jan.15, 2020       Module created
-//
-//------------------------------------------------------------------------
-#include "EvtGenBase/EvtPatches.hh"
-#include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
-#include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtReport.hh"
-#include "EvtGenBase/EvtComplex.hh"
-#include "EvtGenBase/EvtDecayTable.hh"
+#include <EvtGenBase/EvtPatches.hh>
+#include <EvtGenBase/EvtParticle.hh>
+#include <EvtGenBase/EvtGenKine.hh>
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtReport.hh>
+#include <EvtGenBase/EvtComplex.hh>
+#include <EvtGenBase/EvtDecayTable.hh>
 #include <stdlib.h>
 
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include "generators/evtgen/models/besiii/EvtD0ToKpipipi.h"
+#include <generators/evtgen/models/besiii/EvtD0ToKpipipi.h>
 
 namespace Belle2 {
 
@@ -65,7 +37,6 @@ namespace Belle2 {
        checkSpinDaughter(3,EvtSpinType::SCALAR);
        checkSpinDaughter(4,EvtSpinType::SCALAR);
     */
-    //std::cout << "Initializing EvtD0ToKpipipi" << std::endl;
 
     width[0] = 0.09;
     width[1] = 0.044183653178315;
@@ -128,10 +99,6 @@ namespace Belle2 {
     rho[22] =  1.4017194038459;
     phi[23] = -2.23388390670423;
     rho[23] =  4.11110400629068;
-
-    //for (int i=0; i<24; i++) {
-    //   cout << i << " rho,phi = " << rho[i] << ", "<< phi[i] << endl;
-    //}
 
     mD = 1.86486;
     rRes = 3.0;
@@ -207,10 +174,8 @@ namespace Belle2 {
           double Prob = calPDF(Km, Pip1, Pip2, Pim);
           if(Prob>maxprob) {
              maxprob=Prob;
-             std::cout << "Max PDF = " << ir << " prob= " << Prob << std::endl;
           }
        }
-       std::cout << "Max!!!!!!!!!!! " << maxprob<< std::endl;
     */
     p->initializePhaseSpace(getNDaug(), getDaugs());
     EvtVector4R Km0 = p->getDaug(0)->getP4();
@@ -304,7 +269,6 @@ namespace Belle2 {
     pdf = EvtComplex(0, 0);
     for (int i = 0; i != 24; i++) {
       cof = EvtComplex(rho[i] * cos(phi[i]), rho[i] * sin(phi[i]));
-      //cout<<i << " " << (cof*PDF[i])<<" : "<<cof<<" "<<PDF[i]<<endl;
       pdf = pdf + cof * PDF[i];
     }
     module = conj(pdf) * pdf;

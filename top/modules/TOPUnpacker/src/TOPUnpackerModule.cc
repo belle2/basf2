@@ -61,7 +61,7 @@ namespace Belle2 {
              "name of TOPRawDigit store array", string(""));
     addParam("outputTemplateFitResultName", m_templateFitResultName,
              "name of TOPTemplateFitResult", string(""));
-    addParam("swapBytes", m_swapBytes, "if true, swap bytes", false);
+    addParam("swapBytes", m_swapBytesDefault, "if true, swap bytes", false);
     addParam("dataFormat", m_dataFormat,
              "data format as defined in top/include/RawDataTypes.h, 0 = auto detect", 0);
     addParam("addRelations", m_addRelations,
@@ -139,7 +139,7 @@ namespace Belle2 {
         if (bufferSize < 1) continue;
 
         int err = 0;
-
+        m_swapBytes = m_swapBytesDefault;
         int dataFormat = m_dataFormat;
         if (dataFormat == 0) { // auto detect data format
           DataArray array(buffer, bufferSize, m_swapBytes);
@@ -163,8 +163,7 @@ namespace Belle2 {
                 dataFormat = 0x0301; //assume it's interim format
                 m_swapBytes = true;
               } else {
-                B2WARNING("TOPUnpacker: Could not establish data format.");
-                err = bufferSize;
+                B2DEBUG(22, "TOPUnpacker: Could not establish data format.");
               }
             }
           }
@@ -194,18 +193,17 @@ namespace Belle2 {
             if (printTheError()) {
               auto boardstackName = getFrontEndName(raw, finesse);
               B2ERROR("TOPUnpacker: unknown data format from " << boardstackName
-                      << LogVar("boardstack name", boardstackName)
                       << LogVar("Type", (dataFormat >> 8))
-                      << LogVar("Version", (dataFormat & 0xFF)));
+                      << LogVar("Version", (dataFormat & 0xFF))
+                      << LogVar("Buffer size", bufferSize));
             }
-            return;
+            continue;
         }
 
         if (err != 0) {
           if (printTheError()) {
             auto boardstackName = getFrontEndName(raw, finesse);
             B2ERROR("TOPUnpacker: error in unpacking data from " << boardstackName
-                    << LogVar("boardstack name", boardstackName)
                     << LogVar("words unused", err));
           }
         }

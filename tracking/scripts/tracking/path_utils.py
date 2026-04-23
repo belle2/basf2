@@ -76,7 +76,7 @@ def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=Fal
 
 
 def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, trackFitHypotheses=None,
-                                    reco_tracks="RecoTracks", add_mva_quality_indicator=False, v0_finding=True):
+                                    reco_tracks="RecoTracks", add_mva_quality_indicator=True, v0_finding=True):
     """
     Helper function to add the modules performing the
     track fit, the V0 fit and the Belle2 track creation to the path.
@@ -104,7 +104,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
 
 
 def add_prefilter_track_fit_and_track_creator(path, components=None, trackFitHypotheses=None,
-                                              reco_tracks="RecoTracks", add_mva_quality_indicator=False):
+                                              reco_tracks="RecoTracks", add_mva_quality_indicator=True):
     """
     Helper function to add only the modules required to calculate HLT filter decision:
     performing the track fit and the Belle2 track creation to the path.

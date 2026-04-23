@@ -53,7 +53,6 @@ namespace Belle2 {
     /** Check whether a pixel on a given sensor is OK or not and get threshold.
      * @param sensorID unique ID of the sensor
      * @param pixID unique ID of single pixel to set threshold
-     * @param pixThr charge threshold of the single pixel
      * @return charge threshold of the single pixel.
      */
     unsigned short getPixelThreshold(unsigned short sensorID, unsigned int pixID) const
@@ -83,6 +82,6 @@ namespace Belle2 {
     /** Structure holding sets of masked single pixels for all sensors by sensor id (unsigned short). */
     std::unordered_map<unsigned short, SinglePixelThresholdsSet> m_MapSingleThresholds;
 
-    ClassDef(PXDPixelThresholdPar, 1);
+    ClassDef(PXDPixelThresholdPar, 1);  /**< ClassDef */
   };
 } // end of namespace Belle2

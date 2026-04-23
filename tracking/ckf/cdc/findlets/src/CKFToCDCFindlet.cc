@@ -53,19 +53,14 @@ void CKFToCDCFindlet::beginRun()
     B2FATAL("CKFToCDCFindlet: DB payload 'SVDToCDCCKFParameters' not found or not valid for current run.");
   }
 
+  // Payload parameters (INTs, FLOATs)
   m_trackHandler.setMinimalPtRequirement(payload->getMinimalPtRequirement());
-  m_trackHandler.setIgnoreTracksWithCDChits(payload->getIgnoreTracksWithCDChits());
 
   m_treeSearcher.setMaximalDeltaPhi(payload->getMaximalDeltaPhi());
   m_treeSearcher.setMaximalLayerJump(payload->getMaximalLayerJump());
   m_treeSearcher.setMaximalLayerJumpBackwardSeed(payload->getMaximalLayerJumpBackwardSeed());
-  m_treeSearcher.setHitFindingDirection(payload->getHitFindingDirection());
   m_treeSearcher.setPathMaximalCandidatesInFlight(payload->getPathMaximalCandidatesInFlight());
   m_treeSearcher.setStateMaximalHitCandidates(payload->getStateMaximalHitCandidates());
-
-  m_resultStorer.setExportTracks(payload->getExportTracks());
-  m_resultStorer.setExportAllTracks(payload->getExportAllTracks());
-  m_resultStorer.setSetTakenFlag(payload->getTakenFlag());
 
   B2DEBUG(20, "CKFToCDCFindlet: Loaded and applied parameters from DB payload 'SVDToCDCCKFParameters'.");
 }

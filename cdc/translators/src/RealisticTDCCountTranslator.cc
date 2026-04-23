@@ -69,8 +69,22 @@ double RealisticTDCCountTranslator::getDriftTime(unsigned short tdcCount,
   }
 
   // Second: correct for event time. If this wasn't simulated, m_eventTime can just be set to 0.
-  if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
-    driftTime -= m_eventTimeStoreObject->getEventT0();
+  // Use SVD temporary T0 preferentially, falling back to CDC T0, then getEventT0().
+  // SVD and CDC temporary entries are set before any TrackCreator runs and remain stable across
+  // multiple fitting passes, unlike getEventT0() which can change when EventT0Combiner runs between
+  // passes. The fallback to getEventT0() is there in case neither SVD nor CDC proved event T0.
+  if (m_eventTimeStoreObject.isValid()) {
+    const auto svdT0 = m_eventTimeStoreObject->getBestSVDTemporaryEventT0();
+    if (svdT0) {
+      driftTime -= svdT0->eventT0;
+    } else {
+      const auto cdcT0 = m_eventTimeStoreObject->getBestCDCTemporaryEventT0();
+      if (cdcT0) {
+        driftTime -= cdcT0->eventT0;
+      } else if (m_eventTimeStoreObject->hasEventT0()) {
+        driftTime -= m_eventTimeStoreObject->getEventT0();
+      }
+    }
   }
 
   //Third: If time of flight was simulated, this has to be undone, too. If it wasn't timeOfFlightEstimator should be taken as 0.

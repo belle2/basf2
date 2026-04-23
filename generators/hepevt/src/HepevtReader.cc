@@ -87,6 +87,24 @@ bool HepevtReader::skipEvents(int n)
   return true;
 }
 
+int HepevtReader::countEvents(const std::string& filename)
+{
+  open(filename);
+
+  int count = 0;
+  int eventID;
+  double weight;
+
+  int nparticles;
+  while ((nparticles = readEventHeader(eventID, weight)) >= 0) {
+    count++;
+    for (int j = 0; j < nparticles; j++) getLine();
+  }
+
+  B2INFO("Counted " << count << " events in " << filename << ".");
+  return count;
+}
+
 
 //===================================================================
 //                  Protected methods

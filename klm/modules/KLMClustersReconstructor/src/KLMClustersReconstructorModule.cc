@@ -30,7 +30,6 @@ KLMClustersReconstructorModule::KLMClustersReconstructorModule() : Module(),
   m_PositionMode(c_FirstLayer),
   m_ClusterMode(c_AnyHit),
   m_RemoveOutlierHits(false),
-  m_OutlierRemovalMethod(c_OutlierTrim),
   m_OutlierTrimAngle(0.12),
   m_OutlierRemovalMaxIterations(5),
   m_OutlierMADFactor(3.0),
@@ -48,19 +47,17 @@ KLMClustersReconstructorModule::KLMClustersReconstructorModule() : Module(),
            "Clusterization mode ('AnyHit' or 'FirstHit').",
            std::string("AnyHit"));
   addParam("RemoveOutlierHits", m_RemoveOutlierHits,
-           "If true, remove angular outliers after clustering (hits re-enter the pool). "
-           "If false, behavior matches the original algorithm.",
+           "If true, iteratively remove angular outliers after clustering "
+           "(dropped hits re-enter the pool). If false, behavior matches the "
+           "original algorithm.",
            false);
-  addParam("OutlierRemovalMethod", m_OutlierRemovalMethodString,
-           "Used only if removeOutlierHits: 'Trim' (one pass vs innermost hit) or "
-           "'Iterative' (trim vs centroid, repeated).",
-           std::string("Trim"));
   addParam("OutlierTrimAngle", m_OutlierTrimAngle,
            "Used only if removeOutlierHits: floor (minimum) angular threshold (rad). "
            "Effective cut is max(OutlierTrimAngle, OutlierMADFactor * MAD(residuals)).",
            0.12);
   addParam("OutlierRemovalMaxIterations", m_OutlierRemovalMaxIterations,
-           "Used only if removeOutlierHits and OutlierRemovalMethod is 'Iterative'.",
+           "Used only if removeOutlierHits: maximum number of iterations for the "
+           "adaptive centroid-based trim (algorithm stops early at a fixed point).",
            5);
   addParam("OutlierMADFactor", m_OutlierMADFactor,
            "Used only if removeOutlierHits: multiplier k for adaptive k*MAD angular cut.",
@@ -96,14 +93,6 @@ void KLMClustersReconstructorModule::initialize()
     m_ClusterMode = c_FirstHit;
   else
     B2FATAL("Incorrect ClusterMode argument.");
-  if (m_RemoveOutlierHits) {
-    if (m_OutlierRemovalMethodString == "Trim")
-      m_OutlierRemovalMethod = c_OutlierTrim;
-    else if (m_OutlierRemovalMethodString == "Iterative")
-      m_OutlierRemovalMethod = c_OutlierIterative;
-    else
-      B2FATAL("Incorrect OutlierRemovalMethod (use 'Trim' or 'Iterative').");
-  }
 }
 
 void KLMClustersReconstructorModule::beginRun()
@@ -184,49 +173,34 @@ void KLMClustersReconstructorModule::applyOutlierRemoval(std::vector<KLMHit2d*>&
   const std::size_t minInliers = std::max<std::size_t>(
                                    2, static_cast<std::size_t>(std::ceil(m_OutlierMinInlierFraction * before.size())));
 
-  std::vector<KLMHit2d*> inliers;
-
-  if (m_OutlierRemovalMethod == c_OutlierTrim) {
+  std::vector<KLMHit2d*> inliers = before;
+  for (int iter = 0; iter < m_OutlierRemovalMaxIterations; iter++) {
     const ROOT::Math::XYZVector ref =
-      unitDirection(hitWithMinR(clusterHits)->getPosition());
+      referenceDirection(inliers, /*seedByInnermost=*/iter == 0);
     const double threshold =
       adaptiveThreshold(ref, before, m_OutlierTrimAngle, m_OutlierMADFactor);
-    for (KLMHit2d* h : clusterHits) {
+    std::vector<KLMHit2d*> next;
+    next.reserve(before.size());
+    for (KLMHit2d* h : before) {
       if (ROOT::Math::VectorUtil::Angle(h->getPosition(), ref) <= threshold)
-        inliers.push_back(h);
+        next.push_back(h);
     }
-    if (inliers.size() < minInliers)
-      return;
-  } else {
-    inliers = before;
-    for (int iter = 0; iter < m_OutlierRemovalMaxIterations; iter++) {
-      const ROOT::Math::XYZVector ref =
-        referenceDirection(inliers, /*seedByInnermost=*/iter == 0);
-      const double threshold =
-        adaptiveThreshold(ref, before, m_OutlierTrimAngle, m_OutlierMADFactor);
-      std::vector<KLMHit2d*> next;
-      next.reserve(before.size());
-      for (KLMHit2d* h : before) {
-        if (ROOT::Math::VectorUtil::Angle(h->getPosition(), ref) <= threshold)
-          next.push_back(h);
-      }
-      if (next.size() < minInliers)
+    if (next.size() < minInliers)
+      break;
+    if (next.size() == inliers.size()) {
+      std::vector<KLMHit2d*> a = next, b = inliers;
+      std::sort(a.begin(), a.end());
+      std::sort(b.begin(), b.end());
+      if (a == b) {
+        inliers = std::move(next);
         break;
-      if (next.size() == inliers.size()) {
-        std::vector<KLMHit2d*> a = next, b = inliers;
-        std::sort(a.begin(), a.end());
-        std::sort(b.begin(), b.end());
-        if (a == b) {
-          inliers = std::move(next);
-          break;
-        }
       }
-      inliers = std::move(next);
     }
-    if (inliers.size() < minInliers)
-      return;
+    inliers = std::move(next);
   }
 
+  if (inliers.size() < minInliers)
+    return;
   if (inliers.size() == before.size())
     return;
   if (inliers.empty())

@@ -47,14 +47,6 @@ namespace Belle2 {
       c_FirstHit, /**< Angle from first hit. */
     };
 
-    /**
-     * Post-cluster outlier removal (optional).
-     */
-    enum OutlierRemovalMethod {
-      c_OutlierTrim,       /**< One pass vs innermost-hit direction. */
-      c_OutlierIterative,  /**< Repeated trim vs centroid direction. */
-    };
-
   public:
 
     /**
@@ -112,16 +104,10 @@ namespace Belle2 {
     /** If true, drop angular outliers after clustering and re-queue them for other clusters. */
     bool m_RemoveOutlierHits;
 
-    /** Outlier removal algorithm (used only if m_RemoveOutlierHits). */
-    std::string m_OutlierRemovalMethodString;
-
-    /** Outlier removal algorithm. */
-    enum OutlierRemovalMethod m_OutlierRemovalMethod;
-
-    /** Max opening angle (rad) between hit and reference direction to keep a hit. */
+    /** Floor (minimum) angular threshold in rad; effective cut is max(floor, k*MAD). */
     double m_OutlierTrimAngle;
 
-    /** Max iterations for iterative centroid outlier removal. */
+    /** Maximum number of iterations for the iterative centroid trim. */
     int m_OutlierRemovalMaxIterations;
 
     /** Multiplier k for k*MAD adaptive angular threshold (scale factor). */

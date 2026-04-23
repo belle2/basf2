@@ -734,7 +734,12 @@ def add_klm_modules(path, components=None):
     """
     if is_detector_present("KLM", components):
         path.add_module('KLMReconstructor')
-        path.add_module('KLMClustersReconstructor')
+        path.add_module('KLMClustersReconstructor',
+                        PositionMode="FirstTwoLayers",
+                        ClusterMode="AnyHit",
+                        RemoveOutlierHits=True,
+                        OutlierTrimAngle=0.12,
+                        OutlierRemovalMaxIterations=5)
         path.add_module('KLMClusterAna')
 
 

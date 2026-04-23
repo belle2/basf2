@@ -95,7 +95,7 @@ void PXDDQMBowingModule::event()
     auto particle = m_ParticleList->getParticle(iParticle);
     auto b2track = particle->getTrack();
     if (!b2track) {
-      B2ERROR("No Track for particle.");
+      B2WARNING("No Track for particle.");
       continue;
     }
 
@@ -111,7 +111,7 @@ void PXDDQMBowingModule::event()
 
     auto recoTrack = b2track->getRelatedTo<RecoTrack>();
     if (!recoTrack) {
-      B2ERROR("No RecoTrack for Track");
+      B2WARNING("No RecoTrack for Track");
       continue;
     }
 

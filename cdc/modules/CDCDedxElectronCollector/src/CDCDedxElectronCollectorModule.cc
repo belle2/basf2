@@ -49,6 +49,8 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
   addParam("isEntaRS", m_isEntaRS, "true for adding enta tree branch. ", false);
   addParam("isDedxhit", m_isDedxhit, "true for adding dedxhit tree branch. ", false);
   addParam("isADCcorr", m_isADCcorr, "true for adding adc tree branch. ", false);
+  addParam("islLayer", m_islLayer, "true for adding layers for ldedx tree branch. ", false);
+  addParam("islDedx", m_islDedx, "true for adding layer dedx tree branch. ", false);
   addParam("isBhabha", m_isBhabha, "true for bhabha events", true);
   addParam("isRadee", m_isRadee, "true for radee events", false);
   addParam("isTrgSel", m_isTrgSel, "true to enable trigger sel inside module", false);
@@ -112,6 +114,9 @@ void CDCDedxElectronCollectorModule::prepare()
   if (m_isDedxhit)ttree->Branch("dedxhit", &m_dedxhit);
   if (m_isADCcorr)ttree->Branch("adccorr", &m_adccorr);
 
+  if (m_islLayer)ttree->Branch("lLayer", &m_lLayer);
+  if (m_islDedx)ttree->Branch("ldedx", &m_ldedx);
+
   // Collector object registration
   registerObject<TH1D>("means", means);
   registerObject<TTree>("tree", ttree);
@@ -138,7 +143,7 @@ void CDCDedxElectronCollectorModule::collect()
     //release05: bhabha_all is grand skim = bhabha+bhabhaecl+radee
     const std::map<std::string, int>& fresults = m_trgResult->getResults();
     if (fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end() and
-        fresults.find("software_trigger_cut&skim&accept_radee") == fresults.end()) {
+        fresults.find("software_trigger_cut&skim&accept_bhabha_cdc") == fresults.end()) {
       B2WARNING("Can't find required bhabha/radee trigger identifiers");
       hestats->Fill(2);
       return;
@@ -147,7 +152,7 @@ void CDCDedxElectronCollectorModule::collect()
     const bool eBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha") ==
                           SoftwareTriggerCutResult::c_accept);
 
-    const bool eRadBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_radee") ==
+    const bool eRadBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha_cdc") ==
                              SoftwareTriggerCutResult::c_accept);
 
     if (!m_isBhabha && !m_isRadee) {
@@ -214,6 +219,7 @@ void CDCDedxElectronCollectorModule::collect()
     m_injTime = dedxTrack->getInjectionTime();
     m_injRing = dedxTrack->getInjectionRing();
     m_nhits = dedxTrack->size();
+    m_nlhits = dedxTrack->getNLayerHits();
 
     htstats->Fill(0);
 
@@ -294,6 +300,14 @@ void CDCDedxElectronCollectorModule::collect()
       if (m_isADCcorr)m_adccorr.push_back(dedxTrack->getADCCount(i));
     }
 
+    // Make sure to remove all the data in vectors from the previous track
+    if (m_islLayer)m_lLayer.clear();
+    if (m_islDedx)m_ldedx.clear();
+
+    for (int i = 0; i < m_nlhits; ++i) {
+      if (m_islLayer)m_lLayer.push_back(dedxTrack->getLayer(i));
+      if (m_islDedx)m_ldedx.push_back(dedxTrack->getLayerDedx(i));
+    }
     // Track and/or hit information filled as per config
     htstats->Fill(6);
     hmeans->Fill(m_dedx);

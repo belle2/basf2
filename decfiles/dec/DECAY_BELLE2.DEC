@@ -8,55 +8,55 @@
 #   New Dalitz modes for eta and eta'
 #
 # Updates listed below are tabulated on https://xwiki.desy.de/xwiki/rest/p/4d75f
-# See individual pull requests for details.
+# See individual merge requests for details.
 #
 # December 2017, B. Oberhof (benjamin.oberhof@lnf.infn.it)
 #   Updated to new CPV models. See channels with #[w/CPV - BO 09/2017]
-#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1240/overview
+#   https://gitlab.desy.de/belle2/software/software/-/merge_requests/1240
 #
 # March 2018, A. Ermakov (ermakov@physik.uni-bonn.de)
 #   Updated charmless semileptonic BFs to PDG 2017 values
-#   https://stash.desy.de/projects/B2/repos/software/pull-requests/2087/overview
+#   https://gitlab.desy.de/belle2/software/software/-/merge_requests/2087
 #
 # March 2018, M. Merola (mario.merola@na.infn.it)
 #   Updated B -> tau nu BR to PDG2018 values
-#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1711/overview
+#   https://gitlab.desy.de/belle2/software/software/-/merge_requests/1711
 #
 # March 2018, R. Godang (godang@southalabama.edu)
 #   Updated the BRs of the semitauonic decays: B0, anti-B0, B-, B+ decays including pi+ tau- anti-nu_tau
-#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1769/overview
+#   https://gitlab.desy.de/belle2/software/software/-/merge_requests/1769
 #   https://github.com/belle2/basf2/blob/629dc58140ef04e18106dc7a7df9fff27974c98c/generators/evtgen/decayfiles/DECAY_BELLE2.DEC
 #
 # March 2018, T. Lueck (lueck@pi.infn.it)
 #   Updated B -> X_c l nu BR to PDG2018 values
-#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1739/overview
+#   https://gitlab.desy.de/belle2/software/software/-/merge_requests/1739
 #
 # March 2018, W. Sutcliffe (william.sutcliffe@desy.de)
 #   Updated B -> s gamma and B -> s l l
-#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1712/overview#
+#   https://gitlab.desy.de/belle2/software/software/-/merge_requests/1712
 #
 # March 2018, S. Jia & Y. Li (jiasen@buaa.edu.cn, liyubo@buaa.edu.cn)
 #   Updated BR of charmonium modes in B_s0/anti-B_s0 decays and chi_cJ decays to PDG2017
 #   Added new charmonium modes in B_s0/anti-B_s0 decays and chi_cJ decays
-#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1816/overview
+#   https://gitlab.desy.de/belle2/software/software/-/merge_requests/1816
 #
 # April 2018, B. Oberhof (benjamin.oberhof@lnf.infn.it)
 #   Updated CP-violating decays to charmonium + X and CP-violating decays to D mesons. See channels with #[w/CPV - BO 09/2017]
-#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1932/overview
+#   https://gitlab.desy.de/belle2/software/software/-/merge_requests/1932
 #
 # April 2018, P. Goldenzweig (pablo.goldenzweig@kit.edu)
 #   Corrected unwanted asymmetries and ordered decays to be symmetric between Decay X and Decay anti-X
-#   https://stash.desy.de/projects/B2/repos/software/pull-requests/2024/overview
+#   https://gitlab.desy.de/belle2/software/software/-/merge_requests/2024
 #
 # May 2018, S. Duell (s.duell@physik.uni-bonn.de)
 #   Updated B->D(*) Form Factor parameters to HFLAV 2016 values (1612.07233)
-#   https://stash.desy.de/projects/B2/repos/software/pull-requests/2147/overview
+#   https://gitlab.desy.de/belle2/software/software/-/merge_requests/2147
 #
 # March 2019, L. Cao (lu.cao@desy.de)
 #   Updated B -> D l nu form factor and parameters to the latest Belle measurement (1510.03657)
 #   Updated B -> pi l nu form factor to BCL with parameters based on HFLAV 2016 (1612.07233) from M. Prim (markus.prim@kit.edu)
 #   Updated B - > rho/omega l nu from factor to BCL with parameters from M. Prim
-#   https://stash.desy.de/projects/B2/repos/software/pull-requests/3721/overview
+#   https://gitlab.desy.de/belle2/software/software/-/merge_requests/3721
 #
 # March 2020, E. R. Oxford (emma.oxford@desy.de)
 # **All changes are documented in BELLE2-NOTE-PH-2020-008 on the Belle II Document Server**
@@ -71,9 +71,9 @@
 #
 # Sept.-Dec. 2020, P. Goldenzweig (pablo.goldenzweig@kit.edu)
 #   Updated hundreds of B0 and B+ BFs and some FFs as described in https://gitlab.desy.de/belle2/software/basf2/-/issues/7124.
-#   Further updates and corrections applied in https://stash.desy.de/projects/B2/repos/software/pull-requests/7501/overview.
+#   Further updates and corrections applied in https://gitlab.desy.de/belle2/software/software/-/merge_requests/7501.
 #   Added the remaining rare decays from the Belle mixedrare.dec and chargedrare.dec files.
-#   Pythia hadron contributions rescaled by S. Duell (https://stash.desy.de/projects/B2/repos/software/pull-requests/6690/overview)
+#   Pythia hadron contributions rescaled by S. Duell (https://gitlab.desy.de/belle2/software/software/-/merge_requests/6690)
 #   All Decay B0 & Decay anti-B0 channels have symmetric values. Same for B+ / B-. I.e., no Acp included.
 #   Updates flagged with #[BF update - PG 09/2020].
 #

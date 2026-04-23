@@ -125,7 +125,7 @@ if __name__ == "__main__":
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector(train_data)
-    general_options.m_treename = "tree"
+    general_options.m_treename = "ntuple"
     general_options.m_identifier = "Deep_Feed_Forward.xml"
     general_options.m_variables = basf2_mva.vector(*choose_input_features(True, False, 1))
     general_options.m_spectators = basf2_mva.vector('Mbc', 'DeltaZ')
@@ -166,6 +166,6 @@ if __name__ == "__main__":
     # comment these in to apply the trained methods on train and test sample
     #
     # basf2_mva.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
-    #                                basf2_mva.vector(train_data), 'tree', 'MVAExpert_train.root')
+    #                                basf2_mva.vector(train_data), 'ntuple', 'MVAExpert_train.root')
     # basf2_mva.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
-    #                                basf2_mva.vector(test_data), 'tree', 'MVAExpert_test.root')
+    #                                basf2_mva.vector(test_data), 'ntuple', 'MVAExpert_test.root')

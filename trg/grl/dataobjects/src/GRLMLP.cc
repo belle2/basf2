@@ -12,42 +12,42 @@
 using namespace Belle2;
 
 GRLMLP::GRLMLP():
-  m_nNodes{19, 20, 20, 1}, m_trained(false), m_targetVars(1), m_outputScale{  0., 1.}
+  m_n_nodes{24, 24, 24, 24, 1}, m_trained(false), m_target_vars(1), m_output_scale{  0., 1.}
 {
-  m_weights.assign(nWeightsCal(), 0.);
-  m_bias.assign(nBiasCal(), 0.);
+  m_weights.assign(n_weights_cal(), 0.);
+  m_bias.assign(n_bias_cal(), 0.);
 }
 
 GRLMLP::GRLMLP(std::vector<unsigned short>& nodes,
                unsigned short targets,
                const std::vector<float>& outputscale
               ):
-  m_nNodes(nodes), m_trained(false), m_targetVars(targets), m_outputScale(outputscale)
+  m_n_nodes(nodes), m_trained(false), m_target_vars(targets), m_output_scale(outputscale)
 {
-  m_weights.assign(nWeightsCal(), 0.);
-  m_bias.assign(nBiasCal(), 0.);
+  m_weights.assign(n_weights_cal(), 0.);
+  m_bias.assign(n_bias_cal(), 0.);
 }
 
 unsigned
-GRLMLP::nWeightsCal() const
+GRLMLP::n_weights_cal() const
 {
-  unsigned nWeights = 0;
-  if (getNumberOfLayers() > 1) {
-    nWeights = m_nNodes[0] * m_nNodes[1];
-    for (unsigned il = 1; il < getNumberOfLayers() - 1; ++il) {
-      nWeights += m_nNodes[il] * m_nNodes[il + 1];
+  unsigned n_weights = 0;
+  if (get_number_of_layers() > 1) {
+    n_weights = m_n_nodes[0] * m_n_nodes[1];
+    for (unsigned il = 1; il < get_number_of_layers() - 1; ++il) {
+      n_weights += m_n_nodes[il] * m_n_nodes[il + 1];
     }
   }
-  return nWeights;
+  return n_weights;
 }
 
 unsigned
-GRLMLP::nBiasCal() const
+GRLMLP::n_bias_cal() const
 {
   unsigned nbias = 0;
-  if (getNumberOfLayers() > 1) {
-    for (unsigned il = 1; il < getNumberOfLayers(); ++il) {
-      nbias += m_nNodes[il] ;
+  if (get_number_of_layers() > 1) {
+    for (unsigned il = 1; il < get_number_of_layers(); ++il) {
+      nbias += m_n_nodes[il] ;
     }
   }
   return nbias;

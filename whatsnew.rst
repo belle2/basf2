@@ -17,22 +17,172 @@ be adapted when changing to the new release.
 Changes since release-10
 ========================
 
-.. admonition:: New and updated packages in externals
+.. admonition:: New, removed and updated packages in externals
    :class: dropdown
 
-   .. list-table:: New and updated packages in externals from v02-03-02 to v02-03-03
+   .. list-table:: New, removed and updated packages in externals from v02-03-02 to v02-04-00
       :widths: 50 25 25
       :header-rows: 1
 
       * - package
         - old version
         - new version
+      * - ``BELLE_FLC``
+        - ?
+        -
+      * - Boost C++ Libraries
+        - 1.88
+        - 1.90
+      * - CMake
+        - 3.28.3
+        - 3.31.8
+      * - Cppcheck
+        - 2.6
+        - 2.19.0
+      * - EPICS
+        - 7.0.5
+        - 7.0.10
       * - FastBDT
         - 5.2
-        - 5.3
+        - 5.4
+      * - GCC, the GNU Compiler Collection
+        - 14.2.0
+        - 15.2.0
+      * - GDB: The GNU Project Debugger
+        - 14.2
+        - 17.1
+      * - git
+        - 2.31.0
+        - 2.52.0
+      * - git-lfs
+        - 2.13.2
+        - 3.7.1
+      * - GMP, The GNU Multiple Precision Arithmetic Library
+        - 6.2.1
+        - 6.3.0
+      * - GNU Binutils
+        - 2.41
+        - 2.45
+      * - Google Test
+        - 1.10.0
+        - 1.17.0
+      * - Herwig
+        -
+        - 7.2.0
+      * - Integer Set Library
+        - 0.26
+        - 0.27
+      * - LHAPDF
+        -
+        - 6.5.5
+      * - LHAPDF - CT14lo PDF set
+        -
+        - 1
+      * - LHAPDF - CT14nlo PDF set
+        -
+        - 1
+      * - Libbsd, included only for EL7
+        - 0.12.2
+        -
+      * - libffi
+        - 3.3
+        - 3.5.2
+      * - Libmd, included only for EL7
+        - 1.1.0
+        -
+      * - Libxml2
+        - 2.9.13
+        - 2.15.1
+      * - Libxslt
+        - 1.1.35
+        - 1.1.45
+      * - LLVM/Clang, including libcxx and sanitizer tools
+        - 18.1.6
+        - 21.1.8
+      * - LZ4
+        - 1.9.3
+        - 1.10.0
+      * - Madgraph MG5\_aMC
+        - 3.4.0
+        - 3.7.0
+      * - ONNX Runtime
+        - 1.22.0
+        - 1.23.2
+      * - OpenSSL, included only for EL7
+        - 3.0.14
+        -
+      * - packaging
+        - 24.1
+        - 26.0
+      * - pip
+        - 24.1
+        - 26.0.1
+      * - PostgreSQL interface
+        - 13.2
+        - 13.23
+      * - pyhepmc
+        - 2.13.4
+        - 2.16.1
+      * - pypmc
+        - 1.2.3
+        - 1.2.5
+      * - PYTHIA
+        - 8.215
+        - 8.316
+      * - Python
+        - 3.11.9
+        - 3.12.13
+      * - ROOT
+        - 6.32/14
+        - 6.36/06
+      * - RooUnfold
+        - 3.0.2
+        - 3.1.0
+      * - setuptools
+        - 70.1.0
+        - 82.0.0
       * - sphinx-togglebutton
         -
         - 0.3.2
+      * - tensorflow-io-gcs-filesystem
+        - 0.37.0
+        - 0.37.1
+      * - The GNU MPFR Library
+        - 4.1.0
+        - 4.2.2
+      * - Theano
+        - 1.0.5
+        -
+      * - ThePEG
+        -
+        - 2.2.3
+      * - uproot3
+        - 3.14.4
+        -
+      * - uproot3-methods
+        - 0.10.1
+        -
+      * - Valgrind
+        - 3.17.0
+        - 3.26.0
+      * - VecGeom Vectorized Geometry
+        - 1.2.8
+        - 2.0.0
+      * - wheel
+        - 0.43.0
+        - 0.46.3
+      * - WHIZARD
+        - 3.1.2
+        - 3.1.7
+      * - XRootD
+        - 5.6.1
+        - 5.9.1
+      * - xz
+        - 5.2.5
+        - 5.8.2
+      * - zlib
+        - 1.2.12
+        - 1.3.1
 
 .. rubric:: Calculation and printing of processing statistics
 

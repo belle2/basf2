@@ -39,11 +39,18 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"]]},
     depends_on=[top_pretracking],
     expert_config={
-        "max_files_per_run": 20,
-        "payload_boundaries": None,
-        "request_memory": "8 GB"
-    },
-    produced_payloads=["TOPCalModuleT0", "TOPCalCommonT0", "TOPCalEventT0Offset"])
+                "max_files_per_run": 20,
+                "payload_boundaries": None,
+                "request_memory": "8 GB"},
+    produced_payloads=[
+                    "TOPCalModuleT0",
+                    "TOPCalCommonT0",
+                    "TOPCalEventT0Offset",
+                    "TOPCalFillPatternOffset",
+                    "TOPCalPhotonYields",
+                    "TOPCalChannelRQE",
+                    "TOPCalPrecision",
+                    "TOPCalTOFCorrection"])
 
 
 # Required function
@@ -76,7 +83,6 @@ def get_calibrations(input_data, **kwargs):
                photonYields_calibration(inputFiles, sample),  # this cal cannot span across experiments
                calibration_validation(inputFiles, sample)]  # this is run-dep
         cal[0].save_payloads = False  # don't save the rough moduleT0 result
-        cal[5].save_payloads = False  # in fact it does not make any payloads, but produces histograms for validation
     else:
         basf2.B2INFO("Running Run 1 calibration chain for TOP")
         cal = [BS13d_calibration_cdst(inputFiles),  # this is run-dep
@@ -87,7 +93,6 @@ def get_calibrations(input_data, **kwargs):
                photonYields_calibration(inputFiles, sample),  # this cal cannot span across experiments
                calibration_validation(inputFiles, sample)]  # this is run-dep
         cal[1].save_payloads = False  # don't save the rough moduleT0 result
-        cal[6].save_payloads = False  # in fact it does not make any payloads, but produces histograms for validation
 
     for c in cal:
         # If it's a SequentialBoundary calibration, check if there is any boundary in the config file

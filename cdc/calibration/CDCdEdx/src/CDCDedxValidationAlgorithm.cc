@@ -84,6 +84,9 @@ CalibrationAlgorithm::EResult CDCDedxValidationAlgorithm::calibrate()
   bhabhaValidation();
   radeeValidation();
   plotEventStats();
+
+  m_suffix.clear();
+
   return c_OK;
 }
 
@@ -103,8 +106,8 @@ void CDCDedxValidationAlgorithm::getExpRunInfo()
 
   updateDBObjPtrs(1, rstart, estart);
 
-  if (m_suffix.length() > 0) m_suffix = Form("%s_e%d", m_suffix.data(), estart);
-  else  m_suffix = Form("e%d", estart);
+  if (m_suffix.length() > 0) m_suffix = Form("%s_e%d_r%d", m_suffix.data(), estart, rstart);
+  else  m_suffix = Form("e%d_r%d", estart, rstart);
 }
 
 
@@ -134,8 +137,8 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   m_tedges = &vtlocaledges[0];
 
   std::array<std::array<std::vector<TH1D*>, 2>, 13> hdedx_mom;
-  std::array<std::vector<TH1D*>, 2> hdedx_mom_peaks, hdedx_inj, hdedx_oned;
-  TH1D* htimes = new TH1D("htimes", "", m_tbins, m_tedges);
+  std::array<std::vector<TH1D*>, 2> hdedx_mom_peaks, hdedx_inj, hdedx_inj_nocor, hdedx_oned;
+  TH1D* htimes = new TH1D(Form("htimes_%s", m_suffix.data()), "", m_tbins, m_tedges);
 
   const double momBinWidth = (m_momMax - m_momMin) / m_momBins;
   const double momBinW = (4.0 - m_momMin) / 4;
@@ -161,10 +164,12 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   // Define histograms for injection time bins and rings
   for (unsigned int ir = 0; ir < 2; ir++) {
     hdedx_inj[ir].resize(m_tbins);
+    hdedx_inj_nocor[ir].resize(m_tbins);
     hdedx_mom_peaks[ir].resize(4);
     hdedx_oned[ir].resize(m_eaBin);
 
     defineHisto(hdedx_inj[ir], "inj", m_sring[ir].data());
+    defineHisto(hdedx_inj_nocor[ir], "inj", Form("nocor_%s", m_sring[ir].data()));
     defineHisto(hdedx_mom_peaks[ir], "mom_peaks", Form("%s", stype[ir].data()));
     defineHisto(hdedx_oned[ir], "oned", Form("%s", sLayer[ir].data()));
   }
@@ -206,6 +211,8 @@ void CDCDedxValidationAlgorithm::radeeValidation()
     // Injection ring type
     int wr = (injring > 0.5) ? 1 : 0;
 
+    double timeGain = m_DBInjectTime->getCorrection("mean", injring, injtime);
+
     // Injection time bin
     unsigned int tb = htimes->GetXaxis()->FindBin(injtime);
     tb = std::min(tb, static_cast<unsigned int>(m_tbins)) - 1;
@@ -213,6 +220,7 @@ void CDCDedxValidationAlgorithm::radeeValidation()
     // Fill injection time and dE/dx histograms
     htimes->Fill(injtime);
     hdedx_inj[wr][tb]->Fill(dedx);
+    hdedx_inj_nocor[wr][tb]->Fill(dedx * timeGain);
 
     // Fill hdedx_mom_peaks with its own binning
     int binI = static_cast<int>((abs(p) - m_momMin) / momBinW);
@@ -241,6 +249,7 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   }
   for (int it = 0; it < 2; ++it) {
     printCanvas(hdedx_inj[it], Form("plots/injection/dedx_vs_inj_%s_%s", m_sring[it].data(), m_suffix.data()), "inj");
+    printCanvas(hdedx_inj_nocor[it], Form("plots/injection/dedx_vs_inj_nocor_%s_%s", m_sring[it].data(), m_suffix.data()), "inj");
     printCanvas(hdedx_oned[it], Form("plots/oneD/dedx_vs_1D_%s_%s", sLayer[it].data(), m_suffix.data()), "oned");
   }
 
@@ -368,17 +377,17 @@ void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, std::str
 
   for (int ic = 0; ic < xbins; ic++) {
     std::string title = Form("dedxhit-dist, wire:%d", ic);
-    std::string name = Form("hdedx_%s_%d", var.data(), ic);
+    std::string name = Form("hdedx_%s_%s_%d", m_suffix.data(), var.data(), ic);
 
     if (var == "costh" || var == "mom" || var == "mom_peaks" || var == "cos_peaks" || var == "oned") {
       double min = ic * binWidth + xmin;
       double max = min + binWidth;
       title = Form("%s: (%0.02f, %0.02f) %s", var.data(), min, max, stype.data());
-      name = Form("hdedx_%s_%s_%d", var.data(), stype.data(), ic);
+      name = Form("hdedx_%s_%s_%s_%d",  m_suffix.data(), var.data(), stype.data(), ic);
     } else if (var == "inj") {
       std::string label = getTimeBinLabel(m_tedges[ic], ic);
       title = Form("%s, time(%s)", stype.data(), label.data());
-      name = Form("h%s_%s_t%d", var.data(), stype.data(), ic);
+      name = Form("h%s_%s_%s_t%d", var.data(),  m_suffix.data(), stype.data(), ic);
     }
     htemp[ic] = new TH1D(name.data(), "", m_dedxBins, m_dedxMin, m_dedxMax);
     htemp[ic]->SetTitle(Form("%s;dedx;entries", title.data()));
@@ -903,18 +912,31 @@ CosGainData CDCDedxValidationAlgorithm::getcosgain(int experiment, int run)
 
   DatabaseIN(experiment, run);
 
-  std::vector<double> cosgain, cos;
+  std::array<std::vector<double>, 3> cosgain;
+  std::vector<double> cos;
 
   DBObjPtr<CDCDedxCosineCor> DBCosineCor;
-  if (!DBCosineCor.isValid())  B2FATAL("Cosine gain data are not valid.");
+  if (!DBCosineCor.isValid()) {
+    B2FATAL("Cosine gain data are not valid.");
+  }
 
-  unsigned int nCosBins = DBCosineCor->getSize();
+  // representative layer index for each group
+  const std::array<unsigned int, 3> layerIndex = {1, 9, 17};
 
-  for (unsigned int il = 0; il < nCosBins; ++il) {
-    double costh = -1.0 + (il + 0.5) * 2.0 / nCosBins;
-    costh += .000001;
-    cosgain.push_back(DBCosineCor->getMean(il));
-    cos.push_back(costh);
+  for (int igroup = 0; igroup < 3; ++igroup) {
+    unsigned int nCosBins = DBCosineCor->getSize(layerIndex[igroup]);
+
+    for (unsigned int ibin = 0; ibin < nCosBins; ++ibin) {
+
+      double costh = -1.0 + (ibin + 0.5) * 2.0 / nCosBins;
+      costh += 1e-6;
+
+      if (igroup == 0) {
+        cos.push_back(costh);
+      }
+
+      cosgain[igroup].push_back(DBCosineCor->getMean(layerIndex[igroup], ibin));
+    }
   }
 
   resetDatabase();
@@ -926,31 +948,38 @@ OnedData CDCDedxValidationAlgorithm::getonedgain(int experiment, int run)
 
   DatabaseIN(experiment, run);
 
-  std::vector<double> inner1D, outer1D, Enta;
+  std::array<std::vector<double>, 3> oneDcorr;
+  std::vector<double> enta;
 
   DBObjPtr<CDCDedx1DCell> DBOneDCell;
-  if (!DBOneDCell.isValid())  B2FATAL("OneD cell gain data are not valid.");
+  if (!DBOneDCell.isValid()) {
+    B2FATAL("OneD cell gain data are not valid.");
+  }
 
-  for (int i = 0; i < 2; i++) {
+  // representative layer index for each group
+  const std::array<unsigned int, 3> layerIndex = {1, 9, 17};
 
-    unsigned int nBins = DBOneDCell->getNBins(i);
+  for (int igroup = 0; igroup < 3; igroup++) {
+
+    unsigned int nBins = DBOneDCell->getNBins(layerIndex[igroup]);
     double binSize = TMath::Pi() / nBins;
 
     for (unsigned int nbin = 0; nbin < nBins; nbin++) {
 
-      double enta = (-1 * TMath::Pi() / 2.0) + binSize * nbin;
-      if (i == 0) {
-        Enta.push_back(enta);
-        inner1D.push_back(DBOneDCell->getMean(0, nbin));
-      } else
-        outer1D.push_back(DBOneDCell->getMean(17, nbin));
+      double eta = (-1.0 * TMath::Pi() / 2.0) + binSize * nbin;
+
+      if (igroup == 0) {
+        enta.push_back(eta);
+      }
+
+      oneDcorr[igroup].push_back(DBOneDCell->getMean(layerIndex[igroup], nbin));
     }
   }
+
   resetDatabase();
-  return {inner1D, outer1D, Enta};
+  return {oneDcorr, enta};
 
 }
-
 double CDCDedxValidationAlgorithm::getrungain(int experiment, int run)
 {
 

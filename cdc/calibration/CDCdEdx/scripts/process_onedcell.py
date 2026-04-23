@@ -23,67 +23,55 @@ def process_onedgain(onedpath, gt):
     os.makedirs('plots/constant', exist_ok=True)
 
     database_file = f'{onedpath}/database.txt'
-
-    # Parse the database to get exp -> [runs] mapping
     exp_run_dict = cg.parse_database(database_file, 'dbstore/CDCDedx1DCell')
 
-    # Process each exp-run pair
+    group_labels = ["SL0", "SL1", "SL2-8"]
+
     for exp, run_list in exp_run_dict.items():
         for run in run_list:
             print(f"[INFO] Processing exp={exp}, run={run}")
+
             cal = CDCDedxValidationAlgorithm()
             cal.setGlobalTag(gt)
             prev_data = cal.getonedgain(exp, run)
+
             cal.setGlobalTag("")
             cal.setTestingPayload(database_file)
             new_data = cal.getonedgain(exp, run)
             cal.setTestingPayload("")
 
-            # Extract vectors
-            prev_inner = prev_data.inner1D if prev_data else []
-            new_inner = new_data.inner1D if new_data else []
-            prev_outer = prev_data.outer1D if prev_data else []
-            new_outer = new_data.outer1D if new_data else []
-            enta = new_data.Enta if new_data else []
+            prev_corr = prev_data.oneDcorr if prev_data else [[], [], []]
+            new_corr = new_data.oneDcorr if new_data else [[], [], []]
+            enta = new_data.enta if new_data else []
 
-            # Convert to DataFrames
-            df_prev_in = pd.DataFrame([[x] for x in prev_inner], columns=['oned'])
-            df_new_in = pd.DataFrame([[x] for x in new_inner], columns=['oned'])
-            df_prev_out = pd.DataFrame([[x] for x in prev_outer], columns=['oned'])
-            df_new_out = pd.DataFrame([[x] for x in new_outer], columns=['oned'])
-            df_enta = pd.DataFrame([[x] for x in enta], columns=['enta'])
+            enta = list(enta) if enta is not None else []
+            df_enta = pd.DataFrame(enta, columns=['enta'])
 
-            # Create a PDF file to save the plots
             pdf_path = f'plots/constant/onedgain_e{exp}_r{run}.pdf'
             with PdfPages(pdf_path) as pdf:
-                # Create 2x2 subplots
-                fig, ax = plt.subplots(2, 2, figsize=(20, 12))
+                fig, ax = plt.subplots(3, 2, figsize=(18, 16))
 
-                # Top-left: Inner 1D
-                cg.hist(0.85, 1.12, xlabel="entrance angle", ylabel="Inner 1D constants", ax=ax[0, 0])
-                ax[0, 0].plot(df_enta['enta'], df_new_in['oned'], '-', rasterized=True, label="inner 1D (new)")
-                ax[0, 0].plot(df_enta['enta'], df_prev_in['oned'], '-', rasterized=True, label="inner 1D (prev)")
-                ax[0, 0].legend(fontsize=15)
+                for igroup, glabel in enumerate(group_labels):
+                    prev_vals = prev_corr[igroup] if len(prev_corr) > igroup else []
+                    new_vals = new_corr[igroup] if len(new_corr) > igroup else []
 
-                # Top-right: Outer 1D
-                cg.hist(0.7, 1.12, xlabel="entrance angle", ylabel="Outer 1D constants", ax=ax[0, 1])
-                ax[0, 1].plot(df_enta['enta'], df_new_out['oned'], '-', rasterized=True, label="outer 1D (new)")
-                ax[0, 1].plot(df_enta['enta'], df_prev_out['oned'], '-', rasterized=True, label="outer 1D (prev)")
-                ax[0, 1].legend(fontsize=15)
+                    df_prev = pd.DataFrame([[x] for x in prev_vals], columns=['oned'])
+                    df_new = pd.DataFrame([[x] for x in new_vals], columns=['oned'])
 
-                # Bottom-left: Inner ratio
-                cg.hist(0.94, 1.06, xlabel="entrance angle", ylabel="Ratio (new/prev)", ax=ax[1, 0])
-                ratio_inner = df_new_in['oned'] / df_prev_in['oned']
-                ax[1, 0].plot(df_enta['enta'], ratio_inner, '-', rasterized=True, label="inner ratio")
-                ax[1, 0].legend(fontsize=15)
+                    # constants
+                    cg.hist(0.7, 1.5, xlabel="entrance angle", ylabel=f"{glabel} constants", ax=ax[igroup, 0])
+                    ax[igroup, 0].plot(df_enta['enta'], df_new['oned'], '-', rasterized=True, label=f"{glabel} (new)")
+                    ax[igroup, 0].plot(df_enta['enta'], df_prev['oned'], '-', rasterized=True, label=f"{glabel} (prev)")
+                    ax[igroup, 0].legend(fontsize=12)
 
-                # Bottom-right: Outer ratio
-                cg.hist(0.96, 1.04, xlabel="entrance angle", ylabel="Ratio (new/prev)", ax=ax[1, 1])
-                ratio_outer = df_new_out['oned'] / df_prev_out['oned']
-                ax[1, 1].plot(df_enta['enta'], ratio_outer, '-', rasterized=True, label="outer ratio")
-                ax[1, 1].legend(fontsize=15)
+                    # ratio
+                    cg.hist(0.9, 1.4, xlabel="entrance angle",  ylabel="Ratio (new/prev)", ax=ax[igroup, 1])
+                    if len(df_prev) > 0 and len(df_new) > 0:
+                        ratio = df_new['oned'] / df_prev['oned']
+                        ax[igroup, 1].plot(df_enta['enta'], ratio, '-', rasterized=True, label=f"{glabel} ratio")
+                    ax[igroup, 1].legend(fontsize=12)
 
-                fig.suptitle(f"OneD Gain Calibration - Experiment {exp}", fontsize=20)
+                fig.suptitle(f"OneD Gain Calibration - Experiment {exp}, Run {run}", fontsize=20)
                 plt.tight_layout()
                 pdf.savefig(fig)
-                plt.close()
+                plt.close(fig)

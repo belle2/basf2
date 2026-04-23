@@ -13,10 +13,12 @@
 #include <analysis/VariableManager/Manager.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <map>
 #include <algorithm>
 #include <iterator>
@@ -148,6 +150,72 @@ namespace Belle2 {
       return mcParticles[idx]->getPDG();
     }
 
+    Manager::FunctionPtr sigProbRank(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 2) {
+        B2FATAL("sigProbRank requires exactly 2 arguments: bp_list and b0_list. "
+                "Received " << arguments.size() << " arguments.");
+      }
+
+      std::string bpListName = arguments[0];
+      std::string b0ListName = arguments[1];
+
+      auto func = [bpListName, b0ListName](const Particle * particle) -> int {
+        StoreObjPtr<ParticleList> bpList(bpListName);
+        StoreObjPtr<ParticleList> b0List(b0ListName);
+
+        if (!bpList.isValid() && !b0List.isValid())
+          B2FATAL("sigProbRank could not find either input list: bp_list='" << bpListName
+                  << "', b0_list='" << b0ListName << "'");
+        if (!bpList.isValid())
+          B2FATAL("sigProbRank could not find the required bp_list: '" << bpListName << "'");
+        if (!b0List.isValid())
+          B2FATAL("sigProbRank could not find the required b0_list: '" << b0ListName << "'");
+
+        struct RankedCandidate {
+          double signalProbability;
+          const Particle* particle;
+        };
+
+        auto collectCandidates = [](const StoreObjPtr<ParticleList>& list,
+                                    const std::string & listLabel,
+                                    std::vector<RankedCandidate>& rankedCandidates)
+        {
+          for (unsigned int i = 0; i < list->getListSize(); ++i) {
+            const Particle* p = list->getParticle(i);
+            if (!p->hasExtraInfo("SignalProbability")) {
+              B2FATAL("sigProbRank requires every candidate in " << listLabel
+                      << " to provide extraInfo('SignalProbability')");
+            }
+            rankedCandidates.push_back({p->getExtraInfo("SignalProbability"), p});
+          }
+        };
+
+        std::vector<RankedCandidate> rankedCandidates;
+        rankedCandidates.reserve(bpList->getListSize() + b0List->getListSize());
+        collectCandidates(bpList, "bp_list", rankedCandidates);
+        collectCandidates(b0List, "b0_list", rankedCandidates);
+
+        std::stable_sort(rankedCandidates.begin(), rankedCandidates.end(),
+                         [](const RankedCandidate & lhs, const RankedCandidate & rhs)
+        {
+          return lhs.signalProbability > rhs.signalProbability;
+        });
+
+        for (unsigned int i = 0; i < rankedCandidates.size(); ++i)
+        {
+          if (rankedCandidates[i].particle == particle) {
+            return static_cast<int>(i) + 1;
+          }
+        }
+
+        B2FATAL("sigProbRank: particle not found in either input list: "
+                "bp_list='" << bpListName << "', b0_list='" << b0ListName << "'");
+        return 0;
+      };
+      return func;
+    }
+
     VARIABLE_GROUP("FEIVariables");
     REGISTER_VARIABLE("mostcommonBTagIndex", mostcommonBTagIndex,
                       "By giving e.g. a FEI B meson candidate the B meson index on generator level is determined, where most reconstructed particles can be assigned to. If no B meson found on generator level -1 is returned.");
@@ -164,5 +232,8 @@ namespace Belle2 {
                       "Returns NaN if no B meson is found on generator level. "
                       "Note: this is equivalent to ``genParticle(mostcommonBTagIndex, PDG)``. "
                       "Other variables can be accessed the same way by replacing ``PDG`` with any variable.");
+    REGISTER_METAVARIABLE("sigProbRank(bp_list, b0_list)", sigProbRank,
+                          "Returns the rank (starting at 1) of the candidate when all candidates from the B+ list (bp_list) "
+                          "and B0 list (b0_list) are ordered together by descending ``extraInfo(SignalProbability)``.", Manager::VariableDataType::c_int);
   }
 }

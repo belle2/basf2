@@ -179,7 +179,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                           svd_standalone_mode="VXDTF2",
                                           use_svd_to_cdc_ckf=True, svd_ckf_mode="SVD_after", use_ecl_to_cdc_ckf=False,
-                                          add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
+                                          add_cdcTrack_QI=True, add_vxdTrack_QI=True, add_recoTrack_QI=True,
                                           pxd_filtering_offline=False,
                                           create_intercepts_for_pxd_ckf=False,
                                           append_full_grid_cdc_eventt0=True,

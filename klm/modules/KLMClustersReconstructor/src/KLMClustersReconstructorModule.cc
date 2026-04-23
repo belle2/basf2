@@ -19,6 +19,8 @@
 
 /* C++ headers. */
 #include <algorithm>
+#include <cmath>
+#include <unordered_set>
 
 using namespace Belle2;
 
@@ -30,7 +32,9 @@ KLMClustersReconstructorModule::KLMClustersReconstructorModule() : Module(),
   m_RemoveOutlierHits(false),
   m_OutlierRemovalMethod(c_OutlierTrim),
   m_OutlierTrimAngle(0.12),
-  m_OutlierRemovalMaxIterations(5)
+  m_OutlierRemovalMaxIterations(5),
+  m_OutlierMADFactor(3.0),
+  m_OutlierMinInlierFraction(0.5)
 {
   setDescription("Unified BKLM/EKLM module for the reconstruction of KLMClusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -52,12 +56,19 @@ KLMClustersReconstructorModule::KLMClustersReconstructorModule() : Module(),
            "'Iterative' (trim vs centroid, repeated).",
            std::string("Trim"));
   addParam("OutlierTrimAngle", m_OutlierTrimAngle,
-           "Used only if removeOutlierHits: keep hits with opening angle to the "
-           "reference direction below this value (rad).",
+           "Used only if removeOutlierHits: floor (minimum) angular threshold (rad). "
+           "Effective cut is max(OutlierTrimAngle, OutlierMADFactor * MAD(residuals)).",
            0.12);
   addParam("OutlierRemovalMaxIterations", m_OutlierRemovalMaxIterations,
            "Used only if removeOutlierHits and OutlierRemovalMethod is 'Iterative'.",
            5);
+  addParam("OutlierMADFactor", m_OutlierMADFactor,
+           "Used only if removeOutlierHits: multiplier k for adaptive k*MAD angular cut.",
+           3.0);
+  addParam("OutlierMinInlierFraction", m_OutlierMinInlierFraction,
+           "Used only if removeOutlierHits: minimum fraction of original hits that must "
+           "survive trimming; otherwise the cluster is kept untrimmed.",
+           0.5);
 }
 
 KLMClustersReconstructorModule::~KLMClustersReconstructorModule()
@@ -118,6 +129,51 @@ static KLMHit2d* hitWithMinR(const std::vector<KLMHit2d*>& hits)
   return best;
 }
 
+/* Unit vector from origin to the hit position (zero if hit is at origin). */
+static ROOT::Math::XYZVector unitDirection(const ROOT::Math::XYZVector& v)
+{
+  double r = v.R();
+  if (r <= 0)
+    return ROOT::Math::XYZVector{0, 0, 0};
+  return v * (1.0 / r);
+}
+
+/* Reference direction: innermost-R hit direction on first iteration,
+ * otherwise the normalized sum of unit directions of the current inliers. */
+static ROOT::Math::XYZVector referenceDirection(const std::vector<KLMHit2d*>& inliers,
+                                                bool seedByInnermost)
+{
+  if (seedByInnermost)
+    return unitDirection(hitWithMinR(inliers)->getPosition());
+  ROOT::Math::XYZVector sum{0, 0, 0};
+  for (KLMHit2d* h : inliers)
+    sum = sum + unitDirection(h->getPosition());
+  if (sum.R() <= 0)
+    return unitDirection(hitWithMinR(inliers)->getPosition());
+  return sum * (1.0 / sum.R());
+}
+
+/* Adaptive angular threshold: max(floor, k * MAD of angular residuals to ref). */
+static double adaptiveThreshold(const ROOT::Math::XYZVector& ref,
+                                const std::vector<KLMHit2d*>& hits,
+                                double floorAngle, double madFactor)
+{
+  std::vector<double> residuals;
+  residuals.reserve(hits.size());
+  for (KLMHit2d* h : hits)
+    residuals.push_back(ROOT::Math::VectorUtil::Angle(h->getPosition(), ref));
+  std::vector<double> sorted = residuals;
+  std::sort(sorted.begin(), sorted.end());
+  double median = sorted[sorted.size() / 2];
+  std::vector<double> absDev;
+  absDev.reserve(residuals.size());
+  for (double r : residuals)
+    absDev.push_back(std::fabs(r - median));
+  std::sort(absDev.begin(), absDev.end());
+  double mad = absDev[absDev.size() / 2];
+  return std::max(floorAngle, madFactor * mad);
+}
+
 void KLMClustersReconstructorModule::applyOutlierRemoval(std::vector<KLMHit2d*>& clusterHits,
                                                          std::vector<KLMHit2d*>& poolHits)
 {
@@ -125,40 +181,50 @@ void KLMClustersReconstructorModule::applyOutlierRemoval(std::vector<KLMHit2d*>&
     return;
 
   const std::vector<KLMHit2d*> before = clusterHits;
+  const std::size_t minInliers = std::max<std::size_t>(
+                                   2, static_cast<std::size_t>(std::ceil(m_OutlierMinInlierFraction * before.size())));
+
   std::vector<KLMHit2d*> inliers;
 
   if (m_OutlierRemovalMethod == c_OutlierTrim) {
-    const ROOT::Math::XYZVector ref = hitWithMinR(clusterHits)->getPosition();
+    const ROOT::Math::XYZVector ref =
+      unitDirection(hitWithMinR(clusterHits)->getPosition());
+    const double threshold =
+      adaptiveThreshold(ref, before, m_OutlierTrimAngle, m_OutlierMADFactor);
     for (KLMHit2d* h : clusterHits) {
-      if (ROOT::Math::VectorUtil::Angle(h->getPosition(), ref) <= m_OutlierTrimAngle)
+      if (ROOT::Math::VectorUtil::Angle(h->getPosition(), ref) <= threshold)
         inliers.push_back(h);
     }
+    if (inliers.size() < minInliers)
+      return;
   } else {
-    inliers = clusterHits;
-    const std::vector<KLMHit2d*> originalBackup = inliers;
+    inliers = before;
     for (int iter = 0; iter < m_OutlierRemovalMaxIterations; iter++) {
-      ROOT::Math::XYZVector ref;
-      if (iter == 0) {
-        ref = hitWithMinR(inliers)->getPosition();
-      } else {
-        ROOT::Math::XYZVector sum{0, 0, 0};
-        for (KLMHit2d* h : inliers)
-          sum = sum + h->getPosition();
-        ref = sum * (1.0 / inliers.size());
-      }
+      const ROOT::Math::XYZVector ref =
+        referenceDirection(inliers, /*seedByInnermost=*/iter == 0);
+      const double threshold =
+        adaptiveThreshold(ref, before, m_OutlierTrimAngle, m_OutlierMADFactor);
       std::vector<KLMHit2d*> next;
-      for (KLMHit2d* h : inliers) {
-        if (ROOT::Math::VectorUtil::Angle(h->getPosition(), ref) <= m_OutlierTrimAngle)
+      next.reserve(before.size());
+      for (KLMHit2d* h : before) {
+        if (ROOT::Math::VectorUtil::Angle(h->getPosition(), ref) <= threshold)
           next.push_back(h);
       }
-      if (next.empty()) {
-        inliers = originalBackup;
+      if (next.size() < minInliers)
         break;
+      if (next.size() == inliers.size()) {
+        std::vector<KLMHit2d*> a = next, b = inliers;
+        std::sort(a.begin(), a.end());
+        std::sort(b.begin(), b.end());
+        if (a == b) {
+          inliers = std::move(next);
+          break;
+        }
       }
-      if (next.size() == inliers.size())
-        break;
       inliers = std::move(next);
     }
+    if (inliers.size() < minInliers)
+      return;
   }
 
   if (inliers.size() == before.size())
@@ -166,16 +232,11 @@ void KLMClustersReconstructorModule::applyOutlierRemoval(std::vector<KLMHit2d*>&
   if (inliers.empty())
     return;
 
+  std::unordered_set<KLMHit2d*> inlierSet(inliers.begin(), inliers.end());
   std::vector<KLMHit2d*> outliers;
+  outliers.reserve(before.size() - inliers.size());
   for (KLMHit2d* h : before) {
-    bool keep = false;
-    for (KLMHit2d* k : inliers) {
-      if (h == k) {
-        keep = true;
-        break;
-      }
-    }
-    if (!keep)
+    if (inlierSet.find(h) == inlierSet.end())
       outliers.push_back(h);
   }
   clusterHits.swap(inliers);

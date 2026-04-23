@@ -124,6 +124,12 @@ namespace Belle2 {
     /** Max iterations for iterative centroid outlier removal. */
     int m_OutlierRemovalMaxIterations;
 
+    /** Multiplier k for k*MAD adaptive angular threshold (scale factor). */
+    double m_OutlierMADFactor;
+
+    /** Minimum fraction of original hits that must survive; otherwise cluster is kept untrimmed. */
+    double m_OutlierMinInlierFraction;
+
     /**
      * Optional post-cluster hit filtering. No-op when m_RemoveOutlierHits is false.
      * Outliers are appended to poolHits and poolHits is re-sorted by R.

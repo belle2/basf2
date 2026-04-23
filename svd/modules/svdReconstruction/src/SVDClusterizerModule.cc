@@ -580,9 +580,10 @@ void SVDClusterizerModule::shiftSVDClusterTime()
                                                           m_storeClusters[clsIndex]->isUCluster(),
                                                           m_storeClusters[clsIndex]->getSize());
   //absolute shift
-  clsTime -= m_svdAbsTimeShift->getAbsTimeShift(algo,
-                                                m_storeClusters[clsIndex]->getSensorID().getLayerNumber(),
-                                                m_storeClusters[clsIndex]->isUCluster());
+  if (m_absoluteShiftSVDClusterTime)
+    clsTime -= m_svdAbsTimeShift->getAbsTimeShift(algo,
+                                                  m_storeClusters[clsIndex]->getSensorID().getLayerNumber(),
+                                                  m_storeClusters[clsIndex]->isUCluster());
 
   m_storeClusters[clsIndex]->setClsTime(clsTime);
 

@@ -45,16 +45,6 @@ void SVDTimeValidationCollectorModule::prepare()
   auto hEventT0FromSVD = new TH1F("hEventT0FromSVD", "EventT0FromSVD", 300, -150, 150);
   registerObject<TH1F>("hEventT0FromSVD", hEventT0FromSVD);
 
-  // Register absolute time shift values for each layer and side
-  for (int layer : {3, 4, 5, 6}) {
-    for (auto side : {'U', 'V'}) {
-      TString this_sensorType = TString::Format("m_AbsoluteShift_L%iS%c", layer, side);
-      auto this_shift = new TH1F(this_sensorType.Data(), TString::Format("Absolute Time Shift for Layer %i %c side", layer, side), 300,
-                                 -150, 150);
-      registerObject<TH1F>(this_sensorType.Data(), this_shift);
-      // registerObject<Double_t>(TString::Format("m_AbsoluteShift_L%i%c", layer, view).Data(), 0.0);
-    }
-  }
   auto hAbsoluteShiftValues = new TH1D("hAbsoluteShiftValues", "Fitted shift values ;Bin;Mean (ns)", 8, 0.5, 8.5);
   registerObject<TH1D>("hAbsoluteShiftValues", hAbsoluteShiftValues);
 
@@ -133,21 +123,12 @@ void SVDTimeValidationCollectorModule::startRun()
   // Load absolute time shifts from payload
   if (m_svdAbsTimeShift.isValid()) {
     const TString alg = TString(m_timeAlgo.c_str());
-
     for (int layer : {3, 4, 5, 6})
       for (bool side : {true, false}) {
-        TString this_shift = TString::Format("m_AbsoluteShift_L%iS%c", layer, side ? 'U' : 'V');
-        B2INFO("Filling histogram " << this_shift << " with shift value from payload for algorithm " << alg <<
-               ", layer " << layer << " and side " << (side ? 'U' : 'V'));
-        getObjectPtr<TH1F>(this_shift.Data())->Reset();
-        getObjectPtr<TH1F>(this_shift.Data())->Fill(m_svdAbsTimeShift->getAbsTimeShift(alg, layer, side));
-
         const int binIdx = 2 * (layer - 3) + side + 1;
         const TString binLabel = TString::Format("L%dS%c", layer, side ? 'U' : 'V');
         getObjectPtr<TH1D>("hAbsoluteShiftValues")->GetXaxis()->SetBinLabel(binIdx, binLabel);
         getObjectPtr<TH1D>("hAbsoluteShiftValues")->SetBinContent(binIdx, m_svdAbsTimeShift->getAbsTimeShift(alg, layer, side));
-
-
       }
 
   } else {

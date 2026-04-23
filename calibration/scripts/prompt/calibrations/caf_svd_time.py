@@ -48,11 +48,9 @@ settings = CalibrationSettings(name="caf_svd_time",
                                depends_on=[cdc_tracking_calibration],  # SVD time depends on CDC tracking calibration
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
-                                   # AbsoluteTimeShiftCalibration
-                                   #  , "timeValidation",],
                                    "listOfMutedCalibrations": ["rawTimeCalibration",
                                                                "timeShiftCalibration",
-                                                               "AbsoluteTimeShiftCalibration"],
+                                                               "AbsoluteTimeShiftCalibration"],  # "timeValidation"
                                    "max_events_per_run":  10000,
                                    "max_events_per_file": 5000,
                                    "isMC": False,
@@ -117,7 +115,6 @@ def create_validation_collector(name="SVDTimeValidationCollector",
                                 clusters_onTracks="SVDClustersOnTracks",
                                 event_t0="EventT0",
                                 collector_module="SVDTimeValidationCollector",
-                                absolute_shift_calib_output_file=None,
                                 time_algorithm="CoG6",
                                 granularity="run"):
     """
@@ -134,9 +131,6 @@ def create_validation_collector(name="SVDTimeValidationCollector",
     collector.param("EventT0Name", event_t0)
     collector.param("granularity", granularity)
     collector.param("TimeAlgorithm", time_algorithm)
-    if absolute_shift_calib_output_file is not None:
-        collector.param("AbsoluteShiftCalibOutputFileName", absolute_shift_calib_output_file)
-        # os.path.abspath(os.path.expanduser(absolute_shift_calib_output_file)))
     return collector
 
 
@@ -178,7 +172,7 @@ def create_algorithm(
     return algorithm
 
 
-def create_validation_algorithm(prefix="", min_entries=10000, is_absolute_shift_validation=False):
+def create_validation_algorithm(prefix="", min_entries=10000):
     """
     Simply creates a SVDCoGTimeValidationAlgorithm class with some options.
 
@@ -203,7 +197,9 @@ def create_svd_clusterizer(name="ClusterReconstruction",
                            shaper_digits=None,
                            time_algorithm="CoG6",
                            get_3sample_raw_time=False,
-                           shiftSVDClusterTime=None):
+                           shiftSVDClusterTime=None,
+                           absoluteShiftSVDClusterTime=None,
+                           ):
     """
     Simply creates a SVDClusterizer module with some options.
 
@@ -222,6 +218,8 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     cluster.param("useDB", False)
     if get_3sample_raw_time:
         cluster.param("returnClusterRawTime", True)
+    if absoluteShiftSVDClusterTime is not None:
+        cluster.param("absoluteShiftSVDClusterTime", absoluteShiftSVDClusterTime)
     return cluster
 
 
@@ -583,7 +581,7 @@ def get_calibrations(input_data, **kwargs):
             clusters=f"{SVDClustersOnTrackPrefix}_{alg}",
             shaper_digits=NEW_SHAPER_DIGITS_NAME,
             time_algorithm=alg,
-            # shiftSVDClusterTime=None # leave this one as None (default), it's the shift based on size
+            absoluteShiftSVDClusterTime=False,
             )
         absolute_shift_clusterizers_onTracks.append(cluster)
 

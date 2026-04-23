@@ -82,15 +82,15 @@ def run_validation(job_path, input_data_path=None, **kwargs):
 
     shift_histos = {}
     shift_histos_merged_over_ladder = {}
-    absolute_shifts_values = vu.get_absolute_shifts(files)
+    absolute_shifts_values = {}
 
     for algo in CollectorHistograms:
         shift_histos[algo] = {}
         shift_histos_merged_over_ladder[algo] = {}
+        absolute_shifts_values[algo] = {}
         for exp in CollectorHistograms[algo]:
             for run in CollectorHistograms[algo][exp]:
                 # print(f"working with : algo {algo} exp {exp} run {run}")
-
                 histos = vu.get_histos(CollectorHistograms[algo][exp][run])
 
                 if histos is None:
@@ -116,6 +116,9 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                                                        for key, hShift in histos['timeShifter'].items()}
                         entries_onTracks[algo][run] = {key: val.GetEntries() for key, val in histos['onTracks'].items()}
                         entries_eventT0[algo][run] = entries_eventT0_
+                        # {key: val.GetEntries() for key, val in histos['absoluteShift'].items()}
+                        absolute_shifts_values[algo][run] = histos["absoluteShift"]
+                        # histos.pop('absoluteShift') # causing issues with a plotting function below
 
                         for key, hShift in histos['timeShifter'].items():
                             if key in shift_histos[algo]:
@@ -200,6 +203,8 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     dd['name'] = vu.names_sides*len(runs)
     dd['side'] = [i[-1] for i in dd['name']]
 
+    print(f'dd: {dd}')
+
     for algo in vu.time_algorithms:
         dd[f'agreement_{algo}'] = [agreements[algo][run][side] for run, side in zip(dd['run'], dd['name'])]
         dd[f'precision_{algo}'] = [precisions[algo][run][side] for run, side in zip(dd['run'], dd['name'])]
@@ -233,14 +238,15 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     df.to_pickle(output_dir / 'df.pkl')
     # df = pd.read_pickle('df.pkl')
 
-    absolute_shifts = {"sensor": [f"L{layer}S{'U' if side else 'V'}" for layer in range(3, 7) for side in [True, False]]}
+    absolute_shifts_dict = {}
+    absolute_shifts_dict['run'] = sum([[i]*len(vu.names_layer_sides) for i in runs], [])  # 4 layers * 2 sides
+    absolute_shifts_dict['name'] = vu.names_layer_sides*len(runs)
     for algo in vu.time_algorithms:
-        absolute_shifts[f"absolute_shift_{algo}"] = [absolute_shifts_values[algo][
-            f'L{layer}S{"U" if side else "V"}'] for layer in range(3, 7) for side in [True, False]]
-    # Not sure if this one needs to be pickled
-    absolute_shifts_df = pd.DataFrame(absolute_shifts)
+        absolute_shifts_dict[f'absolute_shift_values_{algo}'] = [
+            absolute_shifts_values[algo][run][layer_side] for run, layer_side in zip(
+                absolute_shifts_dict['run'], absolute_shifts_dict['name'])]
+    absolute_shifts_df = pd.DataFrame(absolute_shifts_dict)
 
-    print(f'Absolute shifts:\n{absolute_shifts_df}')
     print('Making combined plots')
 
     for algo in vu.time_algorithms:
@@ -321,13 +327,22 @@ def run_validation(job_path, input_data_path=None, **kwargs):
             plt.close()
 
         plt.figure(figsize=(6.4*max(2, total_length/30), 4.8*2))
-        ax = sns.violinplot(x='sensor', y=f'absolute_shift_{algo}', data=absolute_shifts_df, split=True)
-        ax.set_ylim([-15, 15])
+        ax = sns.scatterplot(
+            x='run', y=f'absolute_shift_values_{algo}',
+            hue='name', data=absolute_shifts_df,
+            marker='o', s=40,
+        )
+        ax.set_ylim([-5, 5])
+        run_values = sorted(absolute_shifts_df['run'].unique())
+        ax.set_xticks(run_values)
+        ax.set_xticklabels([str(r) for r in run_values])
         ax.xaxis.set_minor_locator(ticker.NullLocator())
         plt.axhline(0, color='black', linestyle='--')
-        plt.axhline(10, color='black', linestyle=':')
-        plt.axhline(-10, color='black', linestyle=':')
+        plt.axhline(2, color='black', linestyle=':')
+        plt.axhline(-2, color='black', linestyle=':')
         plt.setp(ax.get_xticklabels(), rotation=90)
+        plt.ylabel(f'absolute shift ({algo}) (ns)')
+        ax.legend(title='layer/side', ncol=2)
         plt.tight_layout()
         plt.savefig(output_dir / f'absolute_shift_{algo}.pdf')
         plt.close()

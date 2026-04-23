@@ -20,7 +20,7 @@ namespace Belle2 {
     /// Define names of variables that get extracted
     QEResultsExtractor(const std::string& method, std::vector<TrackingUtilities::Named<float*>>& variableSet,
                        const std::string& prefix = ""):
-      VariableExtractor(), m_method(method), m_prefix(prefix + method)
+      VariableExtractor(), m_prefix(prefix + method)
     {
       addVariable(m_prefix + "_QI", variableSet);
       addVariable(m_prefix + "_Chi2", variableSet);
@@ -67,9 +67,8 @@ namespace Belle2 {
     }
 
   protected:
-    /// name of estimation method
-    std::string m_method;
-    /// prefix that will be added before the variable names. Includes the name of method.
+    /// prefix that will be added before the variable names.
+    /// Includes user-defined prefix and the name of estimation method.
     std::string m_prefix;
   };
 }

@@ -17,7 +17,7 @@
 #include <pxd/reconstruction/PXDPixelMasker.h>
 #include <framework/gearbox/Const.h>
 
-#include "TMatrixDSym.h"
+#include <TMatrixDSym.h>
 using namespace Belle2;
 
 //-----------------------------------------------------------------

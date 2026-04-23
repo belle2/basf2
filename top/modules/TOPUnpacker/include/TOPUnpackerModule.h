@@ -279,7 +279,7 @@ namespace Belle2 {
     std::string m_outputRawDigitsName;  /**< name of TOPRawDigit store array */
     std::string m_outputWaveformsName;  /**< name of TOPRawWaveform store array */
     std::string m_templateFitResultName; /**< name of TOPTemplateFitResult store array */
-    bool m_swapBytes;  /**< if true, swap bytes */
+    bool m_swapBytesDefault;  /**< if true, swap bytes (default by module parameter) */
     int m_dataFormat;  /**< data format */
     bool m_addRelations;  /**< switch ON/OFF relations to TOPProductionHitDebugs */
     unsigned m_errorSuppressFactor; /**< error messages suppression factor */
@@ -299,6 +299,7 @@ namespace Belle2 {
 
     // other
 
+    bool m_swapBytes = false;  /**< if true, swap bytes (used in unpacking) */
     unsigned m_eventCount = 0;    /**< event count since last printed error message */
     unsigned m_errorCount = 0;    /**< error messages count within single event */
     bool m_resetEventCount = false; /**< request for event count reset */

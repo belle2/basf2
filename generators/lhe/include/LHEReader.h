@@ -84,6 +84,13 @@ namespace Belle2 {
     bool skipEvents(int n);
 
     /**
+     * Count events in the file by reading through it.
+     * @param filename The filename of the file to count events in.
+     * @return The number of events in the file.
+     */
+    int countEvents(const std::string& filename);
+
+    /**
      * Set the maximum index of particles in each event that must be set as c_Initial (1-based).
      * @param[in] index Maximum index for c_Initial.
      */

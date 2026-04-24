@@ -26,6 +26,8 @@ const boost::char_separator<char> HepevtReader::sep(",; \t");
 void HepevtReader::open(const string& filename)
 {
   m_lineNr = 0;
+  if (m_input.is_open()) m_input.close();
+  m_input.clear();
   m_input.open(filename.c_str());
   if (!m_input) throw(HepEvtCouldNotOpenFileError() << filename);
 }

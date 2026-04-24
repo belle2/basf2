@@ -14,6 +14,7 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/dbobjects/SVDHoughParameters.h>
 
 using namespace Belle2;
 using namespace TrackingUtilities;

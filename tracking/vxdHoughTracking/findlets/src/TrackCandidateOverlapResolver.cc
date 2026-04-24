@@ -14,6 +14,7 @@
 #include <tracking/trackFindingVXD/trackSetEvaluator/Scrooge.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapResolverNodeInfo.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/dbobjects/SVDHoughParameters.h>
 #include <svd/dataobjects/SVDCluster.h>
 
 using namespace Belle2;
@@ -57,16 +58,15 @@ void TrackCandidateOverlapResolver::initialize()
 
 void TrackCandidateOverlapResolver::beginRun()
 {
-
   if (!m_SVDHoughParameters.isValid()) {
     B2DEBUG(20, "SVDHough - TrackCandidateOverlapResolver: SVDHoughParameter dbobject not found, using default parameters.");
-    return;
+  } else {
+    if (m_prefix == "finalOverlapResolver") {
+      m_minActivityState = m_SVDHoughParameters->getFinalOverlapResolverMinActivityState();
+    } else if (m_prefix == "refinerOverlapResolver") {
+      m_minActivityState = m_SVDHoughParameters->getRefinerOverlapResolverMinActivityState();
+    }
   }
-
-  if (m_prefix == "finalOverlapResolver") m_minActivityState = m_SVDHoughParameters->getFinalOverlapResolverMinActivityState();
-
-  if (m_prefix == "refinerOverlapResolver") m_minActivityState = m_SVDHoughParameters->getRefinerOverlapResolverMinActivityState();
-
 }
 
 void TrackCandidateOverlapResolver::apply(std::vector<SpacePointTrackCand>& spacePointTrackCandsToResolve)

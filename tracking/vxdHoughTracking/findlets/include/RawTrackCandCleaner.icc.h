@@ -16,6 +16,7 @@
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <tracking/trackingUtilities/utilities/Algorithms.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <tracking/dbobjects/SVDHoughParameters.h>
 
 namespace Belle2::vxdHoughTracking {
 
@@ -54,9 +55,11 @@ namespace Belle2::vxdHoughTracking {
 
     Super::beginRun();
 
-    if (!m_SVDHoughParameters.isValid())
+    if (!m_SVDHoughParameters.isValid()) {
       B2DEBUG(20, "SVDHough - RawTrackCandCleaner: SVDHoughParameter dbobject not found, using default parameters.");
-    else m_maxRelations = m_SVDHoughParameters->getMaxRelations();
+    } else {
+      m_maxRelations = m_SVDHoughParameters->getMaxRelations();
+    }
 
   }
 

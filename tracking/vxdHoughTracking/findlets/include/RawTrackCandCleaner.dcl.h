@@ -14,12 +14,12 @@
 #include <tracking/vxdHoughTracking/filters/relations/ChooseableRelationFilter.h>
 #include <tracking/vxdHoughTracking/filters/pathFilters/ChooseablePathFilter.h>
 #include <framework/database/DBObjPtr.h>
-#include <tracking/dbobjects/SVDHoughParameters.h>
 
 namespace Belle2 {
   class ModuleParamList;
   class SpacePointTrackCand;
   class VxdID;
+  class SVDHoughParameters;
 
   namespace vxdHoughTracking {
 

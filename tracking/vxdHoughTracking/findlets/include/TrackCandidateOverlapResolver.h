@@ -10,12 +10,12 @@
 #include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
-#include <tracking/dbobjects/SVDHoughParameters.h>
 
 namespace Belle2 {
   class ModuleParamList;
   class SpacePointTrackCand;
   class SVDCluster;
+  class SVDHoughParameters;
 
   namespace vxdHoughTracking {
 

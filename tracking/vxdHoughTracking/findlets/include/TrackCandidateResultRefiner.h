@@ -11,12 +11,12 @@
 #include <tracking/vxdHoughTracking/findlets/TrackCandidateOverlapResolver.h>
 #include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 #include <framework/database/DBObjPtr.h>
-#include <tracking/dbobjects/SVDHoughParameters.h>
 
 namespace Belle2 {
   class SpacePointTrackCand;
   class ModuleParamList;
   class QualityEstimatorBase;
+  class SVDHoughParameters;
 
   namespace vxdHoughTracking {
 
@@ -38,7 +38,7 @@ namespace Belle2 {
       /// Create the store arrays
       void initialize() override;
 
-      /// End run and write Root file
+      /// Check dbobject validity
       void beginRun() override;
 
       /// Reject bad SpacePointTrackCands and bad hits inside the remaining

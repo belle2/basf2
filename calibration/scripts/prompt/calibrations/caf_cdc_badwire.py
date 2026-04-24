@@ -107,13 +107,12 @@ def pre_collector(components=["CDC", "ECL", "KLM"]):
     # Print some progress messages
     path.add_module("Progress")
 
-    from reconstruction import default_event_abort, add_prefilter_pretracking_reconstruction
+    from reconstruction import add_prefilter_pretracking_reconstruction
     from tracking import add_prefilter_tracking_reconstruction
+    from hlt import add_prefilter_module
 
-    # Do not even attempt at reconstructing events w/ abnormally large occupancy.
-    doom = path.add_module("EventsOfDoomBuster")
-    default_event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
-    path.add_module('StatisticsSummary').set_name('Sum_EventsofDoomBuster')
+    # Add HLTPrefilter module to the path.
+    add_prefilter_module(path)
 
     Components = ["CDC"]
     # Add modules that have to be run BEFORE track reconstruction

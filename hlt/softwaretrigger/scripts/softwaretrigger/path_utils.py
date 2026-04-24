@@ -261,7 +261,7 @@ def hlt_event_abort(module, condition, error_flag):
         p.add_module('StatisticsSummary').set_name('Sum_HLTPrefilter_Discard')
 
 
-def add_prefilter_module(path, mode):
+def add_prefilter_module(path):
     """
     Add the SoftwareTrigger for the HLT prefilter cuts to the given path.
     Only the calculation of the cuts is implemented here - the cut logic has to be done
@@ -273,9 +273,7 @@ def add_prefilter_module(path, mode):
     # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
 
-    # Only execute HLTPrefilter if operated in filter mode
-    if mode == constants.HLTPrefilterModes.filter:
-        path.add_module("SoftwareTrigger", baseIdentifier="prefilter")
-        hlt_prefilter_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&prefilter&total_result"])
-        hlt_event_abort(hlt_prefilter_module, "<1", ROOT.Belle2.EventMetaData.c_HLTPrefilterDiscard)
-        path.add_module('StatisticsSummary').set_name('Sum_HLTPrefilter')
+    path.add_module("SoftwareTrigger", baseIdentifier="prefilter")
+    hlt_prefilter_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&prefilter&total_result"])
+    hlt_event_abort(hlt_prefilter_module, "<1", ROOT.Belle2.EventMetaData.c_HLTPrefilterDiscard)
+    path.add_module('StatisticsSummary').set_name('Sum_HLTPrefilter')

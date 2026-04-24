@@ -18,6 +18,7 @@ from geometry import check_components, is_detector_present, are_detectors_presen
 
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
+from hlt import add_prefilter_module
 
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 
@@ -274,10 +275,8 @@ def add_prefilter_reconstruction(path,
     # Check components.
     check_components(components)
 
-    # Do not even attempt at reconstructing events w/ abnormally large occupancy.
-    doom = path.add_module("EventsOfDoomBuster")
-    event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
-    path.add_module('StatisticsSummary').set_name('Sum_EventsofDoomBuster')
+    # Add HLTPrefilter module to the path.
+    add_prefilter_module(path)
 
     # Add modules that have to be run BEFORE track reconstruction
     add_prefilter_pretracking_reconstruction(path, components=components)

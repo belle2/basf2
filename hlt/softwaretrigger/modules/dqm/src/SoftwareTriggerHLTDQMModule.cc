@@ -462,8 +462,6 @@ void SoftwareTriggerHLTDQMModule::event()
                                             (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_B2LinkEventCRCError));
     m_runInfoHistograms["error_flag"]->Fill("HLTCrash",
                                             (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_HLTCrash));
-    m_runInfoHistograms["error_flag"]->Fill("ReconstructionAbort",
-                                            (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_ReconstructionAbort));
     m_runInfoHistograms["error_flag"]->Fill("HLTPrefilterAbort",
                                             (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_HLTPrefilterDiscard));
   }

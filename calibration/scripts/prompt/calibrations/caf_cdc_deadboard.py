@@ -8,11 +8,10 @@
 """CDC deadboard calibration."""
 import basf2
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
-from prompt.calibrations.caf_cdc import settings as cdc_tracking_calibration
 from ROOT import Belle2
 
 settings = CalibrationSettings(name="CDC deadboard",
-                               expert_username="Alexander Glazov, Meihong Liu",
+                               expert_username="liumh",
                                subsystem="cdc",
                                description=__doc__,
                                input_data_formats=["raw"],
@@ -21,13 +20,13 @@ settings = CalibrationSettings(name="CDC deadboard",
                                                    [INPUT_DATA_FILTERS["Data Tag"]["mumu_tight_or_highm_calib"],
                                                     INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
-                               depends_on=[cdc_tracking_calibration],
+                               depends_on=[],
                                expert_config={
-                                   "min_events_per_file": 500,
-                                   "components": ["CDC", "ECL", "KLM"],
+                                   "min_events_per_file": 100,
+                                   "components": ["CDC"],
                                    "payload_boundaries": [],
-                                   "backend_args": {"request_memory": "4 GB"},
-                                   "dead_board_threshold": 4000.0
+                                   "backend_args": {"request_memory": "2 GB"},
+                                   "dead_board_threshold": 0.0
                                },
                                produced_payloads=["CDCBadBoards"])
 
@@ -43,7 +42,7 @@ def get_calibrations(input_data, **kwargs):
     # Get the input files  from the input_data variable
     file_to_iov_mumu = input_data["mumu_tight_or_highm_calib"]
     from prompt.utils import filter_by_max_files_per_run
-    reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, 100, min_events_per_file)
+    reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, 1, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
     basf2.B2INFO("Complete input data selection.")
     basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_mumu)}")
@@ -67,7 +66,7 @@ def get_calibrations(input_data, **kwargs):
 
     # call algorighm
     algo = Belle2.CDC.DeadBoardAlgorithm()
-    algo.setHistName("CDCboardIDs_1")
+    algo.setHistName("CDCboardIDs")
     algo.setThreshold(dead_board_threshold)
     # Calibration setup
     from caf.framework import Calibration
@@ -91,54 +90,15 @@ def get_calibrations(input_data, **kwargs):
     return [deadboard_calib]
 
 
-# MH: need to be modified
-def pre_collector(components=["CDC", "ECL", "KLM"]):
-    from rawdata import add_unpackers
+def pre_collector(components=["CDC"]):
     # Create an execution path
     path = basf2.create_path()
     branches = ['EventMetaData', 'RawCDCs', 'RawFTSWs']
-    unpackers = ['CDC']
-    path.add_module("RootInput", branchNames=branches)
-    path.add_module("Gearbox")
-    path.add_module("Geometry", useDB=True)
-    path.add_module("SetupGenfitExtrapolation",
-                    energyLossBrems=False, noiseBrems=False)
-    add_unpackers(path, components=unpackers)
 
+    # Only rootInput is required with RawCDCs included:
+    path.add_module("RootInput", branchNames=branches)
     # Print some progress messages
     path.add_module("Progress")
 
-    from reconstruction import default_event_abort, add_prefilter_pretracking_reconstruction
-    from tracking import add_prefilter_tracking_reconstruction
-
-    # Do not even attempt at reconstructing events w/ abnormally large occupancy.
-    doom = path.add_module("EventsOfDoomBuster")
-    default_event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
-    path.add_module('StatisticsSummary').set_name('Sum_EventsofDoomBuster')
-
-    Components = ["CDC"]
-    # Add modules that have to be run BEFORE track reconstruction
-    add_prefilter_pretracking_reconstruction(path, components=Components)
-
-    # Add tracking reconstruction modules
-    add_prefilter_tracking_reconstruction(path=path,
-                                          components=Components,
-                                          trackFitHypotheses=[211],
-                                          prune_temporary_tracks=False,
-                                          fit_tracks=True,
-                                          append_full_grid_cdc_eventt0=True,
-                                          skip_full_grid_cdc_eventt0_if_svd_time_present=False)
-    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
-
-    # Making sure CDC Raw Hits are stored
-    for module in path.modules():
-        if module.name() == 'CDCUnpacker':
-            print('Enabling Raw CDC hits')
-            module.param({'enableStoreCDCRawHit': True})
-        if module.name() == 'TFCDC_WireHitPreparer':
-            print('Enabling bad wires')
-            module.param({'useBadWires': True})
-
-    # Print a textual representation of what was just put together
     basf2.print_path(path)
     return path

@@ -102,6 +102,9 @@
 # In mode: 0.04675983 anti-u d c anti-d, PYTHIA 65 changed to PYTHIA 43 to match corresponding B0 Pythia code
 # In mode: 0.02134689 anti-u s c anti-d, PYTHIA 63 changed to PYTHIA 43 to match corresponding B0 Pythia code
 
+# April 2026, Vitalii Lisovskyi (lisovskyi@cppm.in2p3.fr)
+# Updated the decay modes of the Xi_c* baryons to latest knowledge.
+
 Define qoverp_incohMix_B_s0 1.0
 Define dm_incohMix_B_s0 17.8e12
 Define qoverp_incohMix_B0 1.0

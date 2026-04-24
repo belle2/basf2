@@ -1139,6 +1139,16 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.5707963267948966);
 
+    // atan2(1, 1) = 45 degrees = pi/4
+    var = Manager::Instance().getVariable("atan2(py, px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -1.3258176636684826);
+
+    // atan2(1, 0) = 90 degrees = pi/2
+    var = Manager::Instance().getVariable("atan2(pz, px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.4464413322481353);
+
   }
 
   TEST_F(MetaVariableTest, formula)

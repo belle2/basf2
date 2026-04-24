@@ -54,11 +54,11 @@ namespace Belle2 {
     short getNphotons() const { return m_nPhotons; }
 
   private:
-    double m_time{0.0};      /** fitted timing from TOP*/
-    double m_chisqdof{0.0};  /** chi2 per d.o.f. of timing fit */
-    short m_nPhotons{0};     /** no. of recorded Cherenkov photons used in fit */
+    double m_time{0.0};      /**< fitted timing from TOP */
+    double m_chisqdof{0.0};  /**< chi2 per d.o.f. of timing fit */
+    short m_nPhotons{0};     /**< no. of recorded Cherenkov photons used in fit */
 
-    ClassDef(TOPBackSplashFitResult, 1);
+    ClassDef(TOPBackSplashFitResult, 1); /**< ClassDef  */
   };
 
 } // end namespace Belle2

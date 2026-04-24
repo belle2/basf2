@@ -61,6 +61,15 @@ TOPBackSplashTimingModule::TOPBackSplashTimingModule()
   addParam("saveFits", m_saveFits,
            "Set to true to save RooPlot of fit to TOP signal, from which the timing is extracted, as well as print truth anti-neutron information.",
            false);
+  addParam("minClusterE", m_minClusterE,
+           "Minimum (incl.) cluster energy to be considered in adding relation to TOP time extraction [GeV]",
+           0.5);
+  addParam("minNphotons", m_minNphotons,
+           "Minimum (incl.) no. of Cherenkov photons measured in TOP slot for which time extraction will take place",
+           2);
+  addParam("minClusterNHits", m_minClusterNHits,
+           "Minimum (incl.) no. of crystals in cluster required for adding relation to TOP time extraction",
+           1.0);
 }
 
 void TOPBackSplashTimingModule::prepareFitModels()
@@ -164,7 +173,7 @@ void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, int iClu
                 RooFit::LineColor(kSpring));
 
   // reduced chi-square, 1 fit param
-  double redchisq = frame->chiSquare(1);
+  double redchisq = frame->chiSquare(res->floatParsFinal().getSize());
 
   // Canvas
   frame->Draw();
@@ -292,7 +301,7 @@ void TOPBackSplashTimingModule::initialize()
 
 void TOPBackSplashTimingModule::event()
 {
-  // 1st: Sort digit indicies into slots
+  // Step 1: Sort digit indicies into slots with cleaning
   std::array<std::vector<int>, 16> digitIndiciesPerSlots;
   int nCleanDigits = 0;
   for (int i = 0; i < m_digits.getEntries(); i++) {
@@ -303,19 +312,21 @@ void TOPBackSplashTimingModule::event()
     }
   }
 
-  // 2nd: Iterate over clusters
+  // Step 2: Iterate over clusters with cleaning
   int nClustersToFit = 0;
   for (int iCluster = 0; iCluster < m_eclClusters.getEntries(); iCluster++) {
     const ECLCluster*  cluster = m_eclClusters[iCluster];
 
     // Clusters in barrel and within TOP acceptance,
     // Must have neutral hadron treatment of clusters only
-    // with gt 500 MeV, and no tracks
+    // No tracks matched to clusters
+    // Min cluster energy, min clusterNHits (values passed to module)
     if (cluster->getTheta() > 31.0 * M_PI / 180.0 && cluster->getTheta() < 128.0 * M_PI / 180.0 &&
         cluster->getDetectorRegion() == 2 &&
         cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron) &&
-        cluster->getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron) > 0.5 &&
-        cluster-> isTrack() == false) {
+        cluster->isTrack() == false &&
+        cluster->getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron) >= m_minClusterE &&
+        cluster->getNumberOfCrystals() >= m_minClusterNHits) {
 
       // Derive module in front of cluster
       double phi = cluster->getPhi();
@@ -333,10 +344,11 @@ void TOPBackSplashTimingModule::event()
         nearestClusterCosTheta = 0.8;
       }
 
-      // 3rd: Fit clusters
+      // Step 3: Perform fit on digits nearest to cluster
       auto* fitresult = fitTimingDigits(moduleID - 1, digitIndiciesPerSlots[moduleID - 1], nearestClusterCosTheta,
                                         nClustersToFit, std::cos(cluster->getTheta()));
-      // 4th: Setting up ECL relation to fit
+
+      // Step 4: Setting up ECL relation to fit
       if (fitresult) {
         fitresult->addRelationTo(cluster);
       }

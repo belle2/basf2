@@ -21,6 +21,9 @@ import argparse
 parser = argparse.ArgumentParser(description="Choose anti-neutron momentum")
 parser.add_argument('--mom', default=1, help='Momentum of nbars to generate [GeV/c]')
 parser.add_argument('--saveFits', type=bool, default=True, help='Flag to save plots of RooFits')
+parser.add_argument('--minClusterE', type=float, default=0.5, help='Minimum (incl.) clusterE to be considered for timing')
+parser.add_argument('--minNphotons', type=int, default=2, help='Minimum (incl.) no. of Cherenkov photons for fit')
+parser.add_argument('--minClusterNHits', type=float, default=1, help='Minimum (incl.) no. of crystals in cluster required')
 args = parser.parse_args()
 
 path = b2.create_path()
@@ -69,7 +72,8 @@ si.add_simulation(path=path)
 re.add_reconstruction(path=path)
 
 # call module and plot timing fits
-path.add_module("TOPBackSplashTiming", saveFits=True)
+path.add_module("TOPBackSplashTiming", saveFits=True, minClusterE=args.minClusterE,
+                minNphotons=args.minNphotons, minClusterNHits=args.minClusterNHits)
 
 # Save mdst with timing, no. of fitted photons and chi-2/dof
 path.add_module("RootOutput",

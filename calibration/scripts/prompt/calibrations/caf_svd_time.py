@@ -36,7 +36,8 @@ random.seed(42)
 now = datetime.datetime.now()
 
 settings = CalibrationSettings(name="caf_svd_time",
-                               expert_username="gdujany",  # ID theft is a serious matter
+                               expert_username="giulio.dujany",
+                               subsystem="svd",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["hadron_calib"],
@@ -48,9 +49,8 @@ settings = CalibrationSettings(name="caf_svd_time",
                                depends_on=[cdc_tracking_calibration],  # SVD time depends on CDC tracking calibration
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
-                                   "listOfMutedCalibrations": ["rawTimeCalibration",
-                                                               "timeShiftCalibration",
-                                                               "AbsoluteTimeShiftCalibration"],  # "timeValidation"
+                                   "listOfMutedCalibrations": [],  # "rawTimeCalibration", "timeShiftCalibration",
+                                    # "AbsoluteTimeShiftCalibration", "timeValidation"
                                    "max_events_per_run":  10000,
                                    "max_events_per_file": 5000,
                                    "isMC": False,
@@ -62,7 +62,11 @@ settings = CalibrationSettings(name="caf_svd_time",
                                    "rangeRawTimeForIoVELS3": [20., 80.],
                                    "useRawtimeForTracking": False,
                                    "useSVDGrouping": True
-                               })
+                               },
+                               produced_payloads=["SVD3SampleCoGTimeCalibrations",
+                                                  "SVD3SampleELSTimeCalibrations",
+                                                  "SVDCoGTimeCalibrations",
+                                                  "SVDClusterTimeShifter"])
 
 ##################################################################
 # Remove Module from the Path

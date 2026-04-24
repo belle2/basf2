@@ -18,7 +18,7 @@ using namespace Belle2;
 REG_MODULE(HLTPrefilter);
 
 // -------------------- HLTPrefilterModule --------------------
-HLTPrefilterModule::HLTPrefilterModule() : Module()
+HLTPrefilterModule::HLTPrefilterModule() : Module(), m_HLTPrefilterState(TimingCut)
 {
   // Set module properties
   setDescription(R"DOC(

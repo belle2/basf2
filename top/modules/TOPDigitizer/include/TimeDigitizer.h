@@ -149,7 +149,7 @@ namespace Belle2 {
        * Returns ASIC storage window number
        * @return window number
        */
-      unsigned getASICWindow() const {return s_window;}
+      static unsigned getASICWindow() {return s_window;}
 
       /**
        * Returns hardware channel number
@@ -234,7 +234,7 @@ namespace Belle2 {
        * @param sigma sigma
        * @return value
        */
-      double gauss(double x, double mean, double sigma) const
+      static double gauss(double x, double mean, double sigma)
       {
         double xx = (x - mean) / sigma;
         return exp(-0.5 * xx * xx);

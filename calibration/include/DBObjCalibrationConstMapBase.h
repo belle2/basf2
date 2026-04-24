@@ -53,7 +53,7 @@ namespace Belle2 {
     virtual double get(baseType id, baseType param) const;
 
     /// Set parameter correction for given WireID and parameter number
-    virtual void set(baseType id, baseType param, double value);;
+    virtual void set(baseType id, baseType param, double value);
 
     /// Add correction to already stored (or to 0. if not set yet) constant value (optionally with minus sign)
     virtual double add(baseType id, baseType param, double value, bool subtractInsteadOfAdd = false);

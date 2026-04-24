@@ -47,7 +47,7 @@ struct CosGainData {
   /**
    * @brief Gain correction factors for cos(theta) bins
    */
-  std::vector<double> cosgain;
+  std::array<std::vector<double>, 3> cosgain;
 
   /**
    * @brief cos(theta) bin centers
@@ -60,19 +60,14 @@ struct CosGainData {
 */
 struct OnedData {
   /**
-   * @brief Inner cell dE/dx values
+   * @brief 1D cell dE/dx values
    */
-  std::vector<double> inner1D;
-
-  /**
-   * @brief Outer cell dE/dx values
-   */
-  std::vector<double> outer1D;
+  std::array<std::vector<double>, 3> oneDcorr;
 
   /**
    * @brief Entrance angle values
    */
-  std::vector<double> Enta;
+  std::vector<double> enta;
 };
 
 namespace Belle2 {

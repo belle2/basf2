@@ -109,38 +109,38 @@ namespace Belle2 {
      * Return a std::vector containing the mass points used for the coarse LL scane
      * @return coarseScanMassPoints the scan points
      */
-    std::vector<float> getCoarseScanMassPoints() const {return m_coarseScanMassPoints;}
+    const std::vector<float>& getCoarseScanMassPoints() const {return m_coarseScanMassPoints;}
 
     /**
      * Return a std::vector containing the mass points used for the fine LL scane
      * @return fineScanMassPoints the scan points
      */
-    std::vector<float> getFineScanMassPoints() const {return m_fineScanMassPoints;}
+    const std::vector<float>& getFineScanMassPoints() const {return m_fineScanMassPoints;}
 
 
     /**
      * Return a std::vector containing the LL values of the coarse scan
      * @return coarseScanLLValues the scan points
      */
-    std::vector<float> getCoarseScanLLValues() const {return m_coarseScanLLValues;}
+    const std::vector<float>& getCoarseScanLLValues() const {return m_coarseScanLLValues;}
 
     /**
      * Return a std::vector containing the LL values of the fine scan
      * @return fineScanLLValues the scan points
      */
-    std::vector<float> getFineScanLLValues() const {return m_fineScanLLValues;}
+    const std::vector<float>& getFineScanLLValues() const {return m_fineScanLLValues;}
 
     /**
      * Return a std::vector containing the number of expected photons of the coarse scan
      * @return coarseScanExpectedPhotons the scan points
      */
-    std::vector<float> getCoarseScanExpectedPhotons() const {return m_coarseScanExpectedPhotons;}
+    const std::vector<float>& getCoarseScanExpectedPhotons() const {return m_coarseScanExpectedPhotons;}
 
     /**
      * Return a std::vector containing the number of expected photons of the fine scan
      * @return fineScanExpectedPhotons the scan points
      */
-    std::vector<float> getFineScanExpectedPhotons() const {return m_fineScanExpectedPhotons;}
+    const std::vector<float>& getFineScanExpectedPhotons() const {return m_fineScanExpectedPhotons;}
 
   private:
     float m_mostLikelyMass = 0;     /**< mass that maximizes the LL  */

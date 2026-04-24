@@ -416,7 +416,7 @@
       hitCollectionName=
   26. GRLNeuro
       HistFileName=hist.root
-      MVACut=[0.0]
+      MVACut=[[0.0]]
       SaveHist=False
       TRGECLClusters=TRGECLClusters
       TrgGrlInformation=TRGGRLObjects
@@ -428,7 +428,6 @@
       nMLP=1
       n_cdc_sector=0
       n_ecl_sector=1
-      outputScale=[[-1.0, 1.0]]
       useDB=True
   27. TRGGRLProjects
       2DfinderCollection=TRGCDC2DFinderTracks

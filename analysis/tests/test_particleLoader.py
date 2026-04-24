@@ -53,13 +53,13 @@ class TestParticleLoader(unittest.TestCase):
                               'nParticlesInList(Lambda0:V0)',
                               'nParticlesInList(gamma:V0)'],
                              filename=testFile.name,
-                             treename='tree',
+                             treename='eventVariables',
                              path=main)
 
         basf2.process(main)
 
         ntuplefile = TFile(testFile.name)
-        ntuple = ntuplefile.Get('tree')
+        ntuple = ntuplefile.Get('eventVariables')
         totalEvents = ntuple.GetEntries()
         self.assertFalse(totalEvents == 0, "Ntuple is empty.")
 

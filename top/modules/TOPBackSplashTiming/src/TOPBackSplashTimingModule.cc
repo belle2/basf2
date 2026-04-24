@@ -241,7 +241,8 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
     x->setVal(v);
     data.add(RooArgSet(*x));
   }
-  if (data.numEntries() < 2) {
+  // Second check no. of photons (if enough digits in fit boundaries)
+  if (data.numEntries() < m_minNphotons) {
     return nullptr;
   }
 
@@ -270,7 +271,7 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
 
   // First peak
   double xpeak1 = m_wss[cosThetaIndex].var("mu")->getValV();
-  // Deriving chi2: Need to bin but not Draw
+  // Deriving chi2/dof: Need to bin but not Draw
   int binning = (m_fitparams[cosThetaIndex][2] - m_fitparams[cosThetaIndex][1]);
   RooPlot* frame = x->frame();
   data.plotOn(frame, RooFit::Binning(binning));
@@ -306,7 +307,10 @@ void TOPBackSplashTimingModule::event()
   int nCleanDigits = 0;
   for (int i = 0; i < m_digits.getEntries(); i++) {
     const TOPDigit* digi = m_digits[i];
-    if (digi->getTime() > 1) {
+    if (digi->getHitQuality() != TOPDigit::c_Good) {
+      continue;
+    }
+    if (digi->getTime() > 0 && digi->getTime() < 80) {
       digitIndiciesPerSlots[ int(digi->getModuleID()) - 1].push_back(i);
       nCleanDigits++;
     }
@@ -332,7 +336,9 @@ void TOPBackSplashTimingModule::event()
       double phi = cluster->getPhi();
       int moduleID = TOPBackSplashTimingModule::getModuleFromPhi(phi);
 
-      if (digitIndiciesPerSlots[moduleID - 1].size() == 0) {
+      // First check minNphotons check: are there enough photons to fit?
+      // Second check is in fit func (enough digits in fit boundaries
+      if (int(digitIndiciesPerSlots[moduleID - 1].size()) < m_minNphotons) {
         continue;
       }
 

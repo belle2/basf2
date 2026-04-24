@@ -52,10 +52,10 @@ namespace Belle2 {
     StoreArray<TOPDigit> m_digits; /**< StoreArray of TOPDigit */
 
     /** Perform fitting of TOP timing in nearby slot  */
-    TOPBackSplashFitResult fitTimingDigits(int, std::vector<int>, double, int, double);
+    TOPBackSplashFitResult* fitTimingDigits(int, std::vector<int>, double, int, double);
     std::array<std::array<double, 11>, 15> m_fitparams; // container of 11 TOP timing fit params per cosTheta
     std::vector<RooWorkspace> m_wss; // container of RooWorkSpaces, containing fit funcs per cosTheta
-    std::vector<RooWorkspace> prepareFitModels(); // constructs RooFit objects for fitting
+    void prepareFitModels(); // constructs RooFit objects for fitting
 
     bool m_saveFits = false; // Debug mode: plot and save fits of TOP timing
     int convertCosThetaToIndex(double); // maps rounded cosTheta to appropriate row index of fit parameters

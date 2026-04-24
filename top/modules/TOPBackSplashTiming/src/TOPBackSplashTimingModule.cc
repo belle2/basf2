@@ -63,10 +63,13 @@ TOPBackSplashTimingModule::TOPBackSplashTimingModule()
            false);
 }
 
-std::vector<RooWorkspace> TOPBackSplashTimingModule::prepareFitModels()
+void TOPBackSplashTimingModule::prepareFitModels()
 {
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
-  std::vector<RooWorkspace> wss;
+
+  // Container for RooWorkspaces
+  m_wss.clear();
+
   for (auto row : m_fitparams) {
     std::string xname = "x_" + std::to_string(row[0]);
     RooRealVar x("x", xname.c_str(), -10, 80); // row[1], row[2]);
@@ -118,10 +121,10 @@ std::vector<RooWorkspace> TOPBackSplashTimingModule::prepareFitModels()
 
     ws.import(model);
 
-    wss.push_back(ws);
+    m_wss.push_back(ws);
   }
 
-  return wss;
+  return;
 }
 
 int TOPBackSplashTimingModule::getModuleFromPhi(double phi)
@@ -134,7 +137,7 @@ int TOPBackSplashTimingModule::getModuleFromPhi(double phi)
 }
 
 void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, int iClusterToFit, int moduleIDindex, RooAbsPdf* model,
-                                         RooRealVar* x, RooDataSet data, double peak1_rising_edge, RooFitResult* res)
+                                         RooRealVar* x, RooDataSet data, double xpeak1, RooFitResult* res)
 {
   // For debugging
   int cosThetaClusterIndex = convertCosThetaToIndex(nearestClusterCosTheta);
@@ -167,11 +170,11 @@ void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, int iClu
   frame->Draw();
 
   // Half-maximum lines
-  TLine* peak1_rising_edgeline = new TLine(peak1_rising_edge, 0, peak1_rising_edge, 1e6);
-  peak1_rising_edgeline->SetLineStyle(2);
-  peak1_rising_edgeline->SetLineColor(kRed);
-  peak1_rising_edgeline->SetLineWidth(5);
-  peak1_rising_edgeline->Draw();
+  TLine* xpeak1line = new TLine(xpeak1, 0, xpeak1, 1e6);
+  xpeak1line->SetLineStyle(2);
+  xpeak1line->SetLineColor(kRed);
+  xpeak1line->SetLineWidth(5);
+  xpeak1line->Draw();
 
   // Stat box
   TPaveText* box = new TPaveText(0.7, 0.65, 0.98, 0.92, "NDC");
@@ -192,8 +195,8 @@ void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, int iClu
   }
 
   // Extra info
-  box->AddText("Rising edge");
-  box->AddText(Form("forward peak: %.2f ns", peak1_rising_edge));
+  box->AddText("Results");
+  box->AddText(Form("forward peak: %.2f ns", xpeak1));
   box->AddText(Form("redchisq = %.4f", redchisq));
 
   box->SetTextSizePixels(50);
@@ -215,7 +218,7 @@ int TOPBackSplashTimingModule::convertCosThetaToIndex(double nearestClusterCosTh
 }
 
 
-TOPBackSplashFitResult TOPBackSplashTimingModule::fitTimingDigits(int moduleIDindex,
+TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDindex,
     std::vector<int> digitIndiciesInSlot,
     double nearestClusterCosTheta, int iClusterToFit, double clusterCosTheta)
 {
@@ -230,8 +233,7 @@ TOPBackSplashFitResult TOPBackSplashTimingModule::fitTimingDigits(int moduleIDin
     data.add(RooArgSet(*x));
   }
   if (data.numEntries() < 2) {
-    TOPBackSplashFitResult emptyresult = TOPBackSplashFitResult();
-    return emptyresult;
+    return nullptr;
   }
 
   double clusterSinTheta = TMath::Sqrt(1 - clusterCosTheta * clusterCosTheta);
@@ -255,24 +257,24 @@ TOPBackSplashFitResult TOPBackSplashTimingModule::fitTimingDigits(int moduleIDin
   RooAbsPdf* model =  m_wss[cosThetaIndex].pdf("model");
   RooFitResult* res = model->fitTo(data, RooFit::Save(), RooFit::PrintLevel(-1), RooFit::Strategy(0), RooFit::Extended());
 
+  //TODO add check to model failing and break statement
+
   // First peak
-  double peak1_rising_edge = m_wss[cosThetaIndex].var("mu")->getValV();
+  double xpeak1 = m_wss[cosThetaIndex].var("mu")->getValV();
   // Deriving chi2: Need to bin but not Draw
   int binning = (m_fitparams[cosThetaIndex][2] - m_fitparams[cosThetaIndex][1]);
   RooPlot* frame = x->frame();
   data.plotOn(frame, RooFit::Binning(binning));
   model->plotOn(frame);
-  double redchisq = frame->chiSquare(1);
+  int nfloatParsFinal = res->floatParsFinal().getSize();
+  double redchisq = frame->chiSquare(nfloatParsFinal);
 
   // Saving results & plotting (time, chi2/dof, no. photons)
-  TOPBackSplashFitResult fitresult = TOPBackSplashFitResult(peak1_rising_edge, redchisq, data.sumEntries());
-  //fitresult->setTime((double)peak1_rising_edge);
-  //fitresult->setChisqdof((double)redchisq);
-  //fitresult->setNphotons(data.sumEntries());
+  TOPBackSplashFitResult* fitresult = m_fitresult.appendNew(xpeak1, redchisq, data.sumEntries());
 
   if (m_saveFits == true) {
     makePlot(nearestClusterCosTheta, iClusterToFit, moduleIDindex,  model,
-             x, data, peak1_rising_edge,  res);
+             x, data, xpeak1,  res);
   }
   return fitresult;
 }
@@ -285,7 +287,7 @@ void TOPBackSplashTimingModule::initialize()
   m_digits.isRequired();
   m_fitresult.registerInDataStore();
   m_fitresult.registerRelationTo(m_eclClusters);
-  m_wss = prepareFitModels();
+  prepareFitModels();
 }
 
 void TOPBackSplashTimingModule::event()
@@ -332,13 +334,12 @@ void TOPBackSplashTimingModule::event()
       }
 
       // 3rd: Fit clusters
-      TOPBackSplashFitResult fitresult = fitTimingDigits(moduleID - 1, digitIndiciesPerSlots[moduleID - 1], nearestClusterCosTheta,
-                                                         nClustersToFit, std::cos(cluster->getTheta()));
-      if (fitresult.getTime() == 0.0 && fitresult.getChisqdof() == 0.0 && fitresult.getNphotons() == 0) {
-        continue;
-      }
+      auto* fitresult = fitTimingDigits(moduleID - 1, digitIndiciesPerSlots[moduleID - 1], nearestClusterCosTheta,
+                                        nClustersToFit, std::cos(cluster->getTheta()));
       // 4th: Setting up ECL relation to fit
-      fitresult.addRelationTo(cluster);
+      if (fitresult) {
+        fitresult->addRelationTo(cluster);
+      }
     }
   }
 }

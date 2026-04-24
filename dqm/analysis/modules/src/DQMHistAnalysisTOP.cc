@@ -71,9 +71,6 @@ DQMHistAnalysisTOPModule::DQMHistAnalysisTOPModule(): DQMHistAnalysisModule()
 }
 
 
-DQMHistAnalysisTOPModule::~DQMHistAnalysisTOPModule() { }
-
-
 void DQMHistAnalysisTOPModule::initialize()
 {
 
@@ -280,7 +277,7 @@ void DQMHistAnalysisTOPModule::event()
 
   // Background subtracted time distributions (only for physics runs)
   if (m_runType == "physics") {
-    auto* trackHits = (TH2F*) findHist("TOP/trackHits");
+    const auto* trackHits = static_cast<TH2F*>(findHist("TOP/trackHits"));
     makeBGSubtractedTimingPlot("goodHitTimes", trackHits, 0);
     for (int slot = 1; slot <= 16; slot++) {
       makeBGSubtractedTimingPlot("good_timing_" + to_string(slot), trackHits, slot);
@@ -297,7 +294,7 @@ void DQMHistAnalysisTOPModule::event()
   makeInjectionBGPlots();
 
   // normalize histogram for injection veto flags check
-  auto* injVetoFlagDiff = (TH1F*) findHist("TOP/injVetoFlagDiff");
+  auto* injVetoFlagDiff = static_cast<TH1F*>(findHist("TOP/injVetoFlagDiff"));
   if (injVetoFlagDiff) injVetoFlagDiff->Scale(1 / injVetoFlagDiff->Integral(), "nosw2");
 
   // make flag fraction plots
@@ -335,7 +332,7 @@ void DQMHistAnalysisTOPModule::updateWindowVsSlotCanvas()
   int alarmState = c_Gray;
   m_text1->Clear();
 
-  auto* hraw = (TH2F*) findHist("TOP/window_vs_slot");
+  auto* hraw = static_cast<TH2F*>(findHist("TOP/window_vs_slot"));
   if (hraw) {
     auto* px = hraw->ProjectionX("tmp_px");
     auto* band = hraw->ProjectionX("TOP/windowFractions", m_asicWindowsBand[0], m_asicWindowsBand[1]);
@@ -374,7 +371,7 @@ void DQMHistAnalysisTOPModule::updateEventMonitorCanvas()
   int alarmState = c_Gray;
   m_text2->Clear();
 
-  auto* evtMonitor = (TH1F*) findHist("TOP/BoolEvtMonitor");
+  auto* evtMonitor = static_cast<TH1F*>(findHist("TOP/BoolEvtMonitor"));
   if (evtMonitor) {
     double totalEvts = evtMonitor->Integral();
     double badEvts = evtMonitor->GetBinContent(2);
@@ -406,7 +403,7 @@ void DQMHistAnalysisTOPModule::updateNGoodHitsCanvas()
   double fract = 0;
   double xcut = 0;
   double ymax = 0;
-  auto* h = (TH1F*) findHist("TOP/goodHitsPerEventAll");
+  auto* h = static_cast<TH1F*>(findHist("TOP/goodHitsPerEventAll"));
   if (h) {
     double totalEvts = h->GetEntries();
     if (totalEvts > 1000) {
@@ -447,7 +444,7 @@ void DQMHistAnalysisTOPModule::updateEventT0Canvas()
 {
   int alarmState = c_Gray;
 
-  auto* h = (TH1F*) findHist("TOP/eventT0");
+  auto* h = static_cast<TH1F*>(findHist("TOP/eventT0"));
   if (h) {
     double totalEvts = h->GetEntries();
     if (totalEvts > 100) {
@@ -473,7 +470,7 @@ void DQMHistAnalysisTOPModule::updateBunchOffsetCanvas()
 {
   int alarmState = c_Gray;
 
-  auto* h = (TH1F*) findHist("TOP/bunchOffset");
+  auto* h = static_cast<TH1F*>(findHist("TOP/bunchOffset"));
   if (h) {
     double totalEvts = h->GetEntries();
     if (totalEvts > 100) {
@@ -499,14 +496,14 @@ void DQMHistAnalysisTOPModule::updateTimingCanvas()
 {
   int alarmState = c_Gray;
 
-  auto* h = (TH1F*) findHist("TOP/goodHitTimes");
-  auto* href = (TH1F*) findRefHist("TOP/goodHitTimes");
+  auto* h = static_cast<TH1F*>(findHist("TOP/goodHitTimes"));
+  auto* href = static_cast<TH1F*>(findRefHist("TOP/goodHitTimes"));
   if (h and href) {
     double n = h->Integral();
     double nref = href->Integral();
     if (n > 0 and nref > 0 and sameHistDefinition(h, href)) {
-      auto* h_clone = (TH1F*) h->Clone("tmp");
-      auto* href_clone = (TH1F*) href->Clone("tmpref");
+      auto* h_clone = static_cast<TH1F*>(h->Clone("tmp"));
+      auto* href_clone = static_cast<TH1F*>(href->Clone("tmpref"));
       h_clone->Scale(1 / n);
       href_clone->Scale(1 / nref);
       h_clone->Add(h_clone, href_clone, 1, -1);
@@ -552,7 +549,7 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
   double inactiveFract = 0; // max inactive channel fraction when some boardstacks are excluded from alarming
 
   for (int slot = 1; slot <= 16; slot++) {
-    auto* h = (TH1F*) findHist("TOP/good_channel_hits_" + std::to_string(slot));
+    auto* h = static_cast<TH1F*>(findHist("TOP/good_channel_hits_" + std::to_string(slot)));
     if (not h) continue;
 
     auto cuts = getDeadAndHotCuts(h);
@@ -649,17 +646,17 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
   }
   m_averageRate = 0;
 
-  auto* signalHits = (TProfile*) findHist("TOP/signalHits");
+  auto* signalHits = static_cast<TProfile*>(findHist("TOP/signalHits"));
   if (not signalHits) return;
 
-  auto* backgroundHits = (TProfile*) findHist("TOP/backgroundHits");
+  auto* backgroundHits = static_cast<TProfile*>(findHist("TOP/backgroundHits"));
   if (not backgroundHits) return;
 
   if (m_photonYields) delete m_photonYields;
   m_photonYields = signalHits->ProjectionX("TOP/photonYields");
   if (m_backgroundRates) delete m_backgroundRates;
   m_backgroundRates = backgroundHits->ProjectionX("TOP/backgroundRates");
-  auto* activeFract = (TH1F*) activeFraction->Clone("tmp");
+  auto* activeFract = static_cast<TH1F*>(activeFraction->Clone("tmp"));
   for (int i = 1; i <= activeFract->GetNbinsX(); i++) activeFract->SetBinError(i, 0);
 
   m_photonYields->Add(m_photonYields, m_backgroundRates, 1, -1);
@@ -732,11 +729,11 @@ void DQMHistAnalysisTOPModule::makeJunkFractionPlot()
 {
   m_junkFraction->Reset();
   m_excludedBSHisto->Reset();
-  auto* allHits = (TH1D*) m_junkFraction->Clone("tmp");
+  auto* allHits = static_cast<TH1D*>(m_junkFraction->Clone("tmp"));
   for (int slot = 1; slot <= 16; slot++) {
-    auto* good = (TH1F*) findHist("TOP/good_channel_hits_" + std::to_string(slot));
+    auto* good = static_cast<TH1F*>(findHist("TOP/good_channel_hits_" + std::to_string(slot)));
     if (not good) continue;
-    auto* bad = (TH1F*) findHist("TOP/bad_channel_hits_" + std::to_string(slot));
+    auto* bad = static_cast<TH1F*>(findHist("TOP/bad_channel_hits_" + std::to_string(slot)));
     if (not bad) continue;
     for (int i = 0; i < 512; i++) {
       int bs = i / 128;
@@ -784,7 +781,7 @@ void DQMHistAnalysisTOPModule::setZAxisRange(const std::string& name, double sca
   double totalHits = 0;
   std::vector<TH2F*> histos;
   for (int slot = 1; slot <= 16; slot++) {
-    TH2F* h = (TH2F*) findHist(name + std::to_string(slot));
+    TH2F* h = static_cast<TH2F*>(findHist(name + std::to_string(slot)));
     if (not h) continue;
     histos.push_back(h);
     totalHits += h->Integral();
@@ -801,10 +798,10 @@ void DQMHistAnalysisTOPModule::makeBGSubtractedTimingPlot(const std::string& nam
   auto* canvas = findCanvas("TOP/c_" + name);
   if (not canvas) return;
 
-  auto* h = (TH1F*) findHist("TOP/" + name);
+  auto* h = static_cast<TH1F*>(findHist("TOP/" + name));
   if (not h) return;
 
-  auto* hb = (TH1F*) findHist("TOP/" + name + "BG");
+  auto* hb = static_cast<TH1F*>(findHist("TOP/" + name + "BG"));
   if (not hb) return;
 
   if (trackHits) {
@@ -837,7 +834,7 @@ void DQMHistAnalysisTOPModule::makeBGSubtractedTimingPlot(const std::string& nam
 
 void DQMHistAnalysisTOPModule::makePMTHitRatesPlots()
 {
-  auto* h0 = (TH1F*) findHist("TOP/goodHitsPerEventAll");
+  auto* h0 = static_cast<TH1F*>(findHist("TOP/goodHitsPerEventAll"));
   if (not h0) return;
   double numEvents = h0->GetEntries();
   if (numEvents == 0) return;
@@ -845,7 +842,7 @@ void DQMHistAnalysisTOPModule::makePMTHitRatesPlots()
   int numSlots = m_pmtHitRates.size();
   for (int slot = 1; slot <= numSlots; slot++) {
     string name = "TOP/good_hits_xy_" + to_string(slot);
-    auto* hxy = (TH2F*) findHist(name);
+    auto* hxy = static_cast<TH2F*>(findHist(name));
     if (not hxy) continue;
     std::vector<double> pmts(32, 0);
     for (int row = 0; row < 8; row++) {
@@ -872,7 +869,7 @@ void DQMHistAnalysisTOPModule::makeInjectionBGPlots()
 {
   for (std::string name : {"nhitInjLER", "nhitInjHER", "nhitInjLERcut", "nhitInjHERcut"}) {
     std::string hname = "TOP/" + name;
-    auto* h = (TProfile2D*) findHist(hname);
+    auto* h = static_cast<TProfile2D*>(findHist(hname));
     if (not h) continue;
     for (std::string proj : {"_px", "_py"}) {
       std::string cname = "TOP/c_" + name + proj;
@@ -894,7 +891,7 @@ void DQMHistAnalysisTOPModule::makeInjectionBGPlots()
 
   for (std::string name : {"eventInjLER", "eventInjHER", "eventInjLERcut", "eventInjHERcut"}) {
     std::string hname = "TOP/" + name;
-    auto* h = (TH2F*) findHist(hname);
+    auto* h = static_cast<TH2F*>(findHist(hname));
     if (not h) continue;
     for (std::string proj : {"_px", "_py"}) {
       std::string cname = "TOP/c_" + name + proj;
@@ -919,7 +916,7 @@ void DQMHistAnalysisTOPModule::makeInjectionBGPlots()
 void DQMHistAnalysisTOPModule::makeFlagFractPlot(const std::string& hname, TH1* histogram, TCanvas* canvas)
 {
   if (histogram) delete histogram;
-  auto* h = (TH2F*) findHist(hname);
+  auto* h = static_cast<TH2F*>(findHist(hname));
   if (not h) return;
 
   histogram = h->ProjectionX((hname + "Fract").c_str(), 2, 2);
@@ -1047,7 +1044,7 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
   int badAsics = 0;
   for (int slot = 1; slot <= 16; slot++) {
     std::string hname = "TOP/good_hits_asics_" + to_string(slot);
-    auto* h = (TH2F*) findHist(hname);
+    auto* h = static_cast<TH2F*>(findHist(hname));
     if (not h) continue;
 
     auto cuts = getDeadAndHotCuts(h);
@@ -1078,7 +1075,7 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
   int badPMTs = 0;
   for (int slot = 1; slot <= 16; slot++) {
     std::string hname = "TOP/good_hits_xy_" + to_string(slot);
-    auto* h = (TH2F*) findHist(hname);
+    auto* h = static_cast<TH2F*>(findHist(hname));
     if (not h) continue;
 
     auto cuts = getDeadAndHotCuts(h);
@@ -1087,9 +1084,11 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
     std::vector<int> pmts(32, 0);
     for (int row = 0; row < 8; row++) {
       for (int col = 0; col < 64; col++) {
-        int pmt = col / 4 + (row / 4) * 16;
         double y = h->GetBinContent(col + 1, row + 1);
-        if (y > deadCut and y <= hotCut) pmts[pmt]++;
+        if (y > deadCut and y <= hotCut) {
+          int pmt = col / 4 + (row / 4) * 16;
+          pmts[pmt]++;
+        }
       }
     }
     for (int n : pmts) if (n == 0) badPMTs++;

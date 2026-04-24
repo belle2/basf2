@@ -106,7 +106,7 @@ namespace Belle2::Conditions {
     // The list of the metadata providers we are going to query:
     const std::string metatadaProviders = serverList + " " + // First, the list of servers provided via env. variable
                                           m_defaultLocalMetadataProviderPath + "/database.sqlite" + " " +  // Then the default local provider (CVMFS)
-                                          m_defaultRemoteMetadataProviderServer + " " + // Then the Java-based legacy central provider
+                                          m_defaultLegacyRemoteMetadataProviderServer + " " + // Then the Java-based legacy central provider
                                           m_defaultHSFRemoteMetadataProviderServer;  // Finally the HSF central provider
     fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", metatadaProviders);
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", m_defaultLocalMetadataProviderPath);

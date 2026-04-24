@@ -231,11 +231,12 @@ namespace Belle2::Conditions {
     /** Get the list of metadata providers in python */
     boost::python::list getMetadataProvidersPy() { return m_metadataProviders.ensurePy(); }
     /** Get the default server URL for the remote metadata provider */
-    std::string getDefaultRemoteMetadataProviderServer() { return m_defaultRemoteMetadataProviderServer; }
-    /** Get the default local path for the local metadata provider */
-    std::string getDefaultLocalMetadataProviderPath() { return m_defaultLocalMetadataProviderPath; }
+    std::string getDefaultRemoteMetadataProviderServer() { return m_defaultLegacyRemoteMetadataProviderServer; }
     /** Get the default server URL for the new central metadata provider */
     std::string getDefaultHSFRemoteMetadataProviderServer() { return m_defaultHSFRemoteMetadataProviderServer; }
+    /** Get the default local path for the local metadata provider */
+    std::string getDefaultLocalMetadataProviderPath() { return m_defaultLocalMetadataProviderPath; }
+
     ///@}
 
     /** @name Payload Location Configuration
@@ -335,12 +336,12 @@ namespace Belle2::Conditions {
     CppOrPyList m_metadataProviders;
     /** the list with all the payload locations */
     CppOrPyList m_payloadLocations;
-    /** default server URL for the remote metadata provider */
-    std::string m_defaultRemoteMetadataProviderServer{"http://belle2db.sdcc.bnl.gov/b2s/rest/"};
-    /** default local path for the local metadata provider */
-    std::string m_defaultLocalMetadataProviderPath{"/cvmfs/belle.cern.ch/conditions"};
+    /** default server URL for the (legacy) remote metadata provider */
+    std::string m_defaultLegacyRemoteMetadataProviderServer{"http://belle2db.sdcc.bnl.gov/b2s/rest/"};
     /** default server URL for the HSF remote metadata provider */
     std::string m_defaultHSFRemoteMetadataProviderServer{"http://belle2-cdb-hsf.apps.sdcc.bnl.gov/api/cdb_rest/"};
+    /** default local path for the local metadata provider */
+    std::string m_defaultLocalMetadataProviderPath{"/cvmfs/belle.cern.ch/conditions"};
     /** the file to put the newly created payload information */
     std::string m_newPayloadFile{"localdb/database.txt"};
     /** the directory to put newly downloaded payloads */

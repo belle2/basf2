@@ -31,6 +31,8 @@ void TrackCandidateOverlapResolver::exposeParameters(ModuleParamList* modulePara
 {
   Super::exposeParameters(moduleParamList, prefix);
 
+  m_prefix = prefix;
+
   moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "ResolveMethod"), m_resolveMethod,
                                 "Strategy used to resolve overlaps. Currently implemented are \"greedy\" and \"hopfield\".",
                                 m_resolveMethod);
@@ -41,6 +43,7 @@ void TrackCandidateOverlapResolver::exposeParameters(ModuleParamList* modulePara
                                 "Sets the minimal value of activity for acceptance. [0,1]", m_minActivityState);
 }
 
+
 void TrackCandidateOverlapResolver::initialize()
 {
   Super::initialize();
@@ -49,6 +52,20 @@ void TrackCandidateOverlapResolver::initialize()
 
   B2ASSERT("ResolveMethod has to be either 'greedy' or 'hopfield'. Selected ResolveMethod: " << m_resolveMethod,
            m_resolveMethod == "greedy" || m_resolveMethod == "hopfield");
+
+}
+
+void TrackCandidateOverlapResolver::beginRun()
+{
+
+  if (!m_SVDHoughParameters.isValid()) {
+    B2DEBUG(20, "SVDHough - TrackCandidateOverlapResolver: SVDHoughParameter dbobject not found, using default parameters.");
+    return;
+  }
+
+  if (m_prefix == "finalOverlapResolver") m_minActivityState = m_SVDHoughParameters->getFinalOverlapResolverMinActivityState();
+
+  if (m_prefix == "refinerOverlapResolver") m_minActivityState = m_SVDHoughParameters->getRefinerOverlapResolverMinActivityState();
 
 }
 

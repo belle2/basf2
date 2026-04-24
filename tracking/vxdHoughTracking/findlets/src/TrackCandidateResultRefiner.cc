@@ -89,6 +89,14 @@ void TrackCandidateResultRefiner::beginRun()
     QualityEstimatorMC* MCestimator = static_cast<QualityEstimatorMC*>(m_estimator.get());
     MCestimator->forceUpdateClusterNames();
   }
+  if (!m_SVDHoughParameters.isValid())
+    B2DEBUG(20, "SVDHough - TrackCandidateResultRefiner: SVDHoughParameter dbobject not found, using default parameters.");
+  else {
+    m_minQualitiyIndicatorSize3 = m_SVDHoughParameters->getMinQualitiyIndicatorSize3();
+    m_minQualitiyIndicatorSize4 = m_SVDHoughParameters->getMinQualitiyIndicatorSize4();
+    m_minQualitiyIndicatorSize5 = m_SVDHoughParameters->getMinQualitiyIndicatorSize5();
+  }
+
 }
 
 void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unrefinedResults,

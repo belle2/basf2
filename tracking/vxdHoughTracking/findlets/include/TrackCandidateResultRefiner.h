@@ -10,6 +10,8 @@
 #include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/vxdHoughTracking/findlets/TrackCandidateOverlapResolver.h>
 #include <tracking/trackingUtilities/utilities/WeightedRelation.h>
+#include <framework/database/DBObjPtr.h>
+#include <tracking/dbobjects/SVDHoughParameters.h>
 
 namespace Belle2 {
   class SpacePointTrackCand;
@@ -65,6 +67,9 @@ namespace Belle2 {
 
       /// Accept nHits for each size at maximum
       uint m_maxNumberOfEachPathLength = 15;
+
+      /// DB object containing the SVDHough parameters
+      DBObjPtr<SVDHoughParameters> m_SVDHoughParameters;
     };
 
   }

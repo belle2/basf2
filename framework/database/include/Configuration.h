@@ -235,7 +235,7 @@ namespace Belle2::Conditions {
     /** Get the default local path for the local metadata provider */
     std::string getDefaultLocalMetadataProviderPath() { return m_defaultLocalMetadataProviderPath; }
     /** Get the default server URL for the new central metadata provider */
-    std::string getDefaultHSFCentralMetadataProviderServer() { return m_defaultHSFCentralMetadataProviderServer; }
+    std::string getDefaultHSFRemoteMetadataProviderServer() { return m_defaultHSFRemoteMetadataProviderServer; }
     ///@}
 
     /** @name Payload Location Configuration
@@ -339,8 +339,8 @@ namespace Belle2::Conditions {
     std::string m_defaultRemoteMetadataProviderServer{"http://belle2db.sdcc.bnl.gov/b2s/rest/"};
     /** default local path for the local metadata provider */
     std::string m_defaultLocalMetadataProviderPath{"/cvmfs/belle.cern.ch/conditions"};
-    /** default server URL for the new central metadata provider */
-    std::string m_defaultHSFCentralMetadataProviderServer{"http://belle2-cdb-hsf.apps.sdcc.bnl.gov/api/cdb_rest/"};
+    /** default server URL for the HSF remote metadata provider */
+    std::string m_defaultHSFRemoteMetadataProviderServer{"http://belle2-cdb-hsf.apps.sdcc.bnl.gov/api/cdb_rest/"};
     /** the file to put the newly created payload information */
     std::string m_newPayloadFile{"localdb/database.txt"};
     /** the directory to put newly downloaded payloads */

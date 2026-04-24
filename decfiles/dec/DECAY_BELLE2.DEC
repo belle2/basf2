@@ -12380,7 +12380,23 @@ CDecay anti-Xi_c*-
 
 # Omega_c0
 Decay   Omega_c0
-1.000000000                                                PYTHIA 42;
+0.065         Omega- pi+                                   PHSP; #[PDG2025 with the assumption of sum(BF)=1]
+0.085         Omega- rho+                                  PHSP; #[PDG2025 with the assumption of sum(BF)=1. Lower limit.]
+0.033         Omega- pi+ pi0                               PHSP; #[PDG2025 with the assumption of sum(BF)=1. rho+ subtracted.]
+0.020         Omega- pi+ pi- pi+                           PHSP; #[PDG2025 with the assumption of sum(BF)=1]
+0.126         Omega- e+ nu_e                               PHSP; #[PDG2025 with the assumption of sum(BF)=1]
+0.129         Omega- mu+ nu_mu                             PHSP; #[PDG2025 with the assumption of sum(BF)=1]
+0.107         Xi0 anti-K0                                  PHSP; #[PDG2025 with the assumption of sum(BF)=1]
+0.067         Xi0 anti-K*0                                 PHSP; #[PDG2025 with the assumption of sum(BF)=1]
+0.034         Xi0 K- pi+                                   PHSP; #[PDG2025 with the assumption of sum(BF)=1. K*0 subtracted.]
+0.138         Xi0 anti-K0 pi+                              PHSP; #[PDG2025 with the assumption of sum(BF)=1]
+0.020         Xi*0 K- pi+                                  PHSP; #[PDG2025 with the assumption of sum(BF)=1]
+0.033         Xi- anti-K*0 pi+                             PHSP; #[PDG2025 with the assumption of sum(BF)=1]
+0.005         Xi- K- pi+ pi+                               PHSP; #[PDG2025 with the assumption of sum(BF)=1. Xi*0 and K*0 subtracted.]
+0.112         Lambda anti-K0 anti-K0                       PHSP; #[PDG2025 with the assumption of sum(BF)=1]
+0.010         Xi- pi+                                      PHSP; #[PDG2025 with the assumption of sum(BF)=1]
+0.004         Omega- K+                                    PHSP; #[PDG2025 with the assumption of sum(BF)=1]
+0.010         p K- K- pi+                                  PHSP; #[Assumed to be equal to a similar Cabibbo-suppressed mode Xi- pi+]
 Enddecay
 
 CDecay  anti-Omega_c0
@@ -13221,21 +13237,11 @@ Enddecay
 
 # Excited charmed Baryons   LHCb PR 3-05-2006
 Decay Xi_cc*++
-  0.08 e+  nu_e     Xi_c+   PHSP ;
-  0.08 mu+ nu_mu    Xi_c+   PHSP ;
-  0.51  u   anti-d  s  cu_0  PYTHIA 42 ;
-  0.25  u   anti-d  s  cu_1  PYTHIA 42 ;
-  0.05 u   anti-s  s  cu_0 PYTHIA 42 ;
-  0.03 u   anti-s  s  cu_1 PYTHIA 42 ;
+  1.0  Xi_cc++ gamma   PHSP ;
 Enddecay
 
 Decay anti-Xi_cc*--
-  0.08 e-  anti-nu_e  anti-Xi_c-   PHSP;
-  0.08 mu- anti-nu_mu anti-Xi_c-   PHSP;
-  0.51 anti-u  d   anti-s  anti-cu_0  PYTHIA 42 ;
-  0.25 anti-u  d   anti-s  anti-cu_0  PYTHIA 42 ;
-  0.05 anti-u  s   anti-s  anti-cu_1  PYTHIA 42 ;
-  0.03 anti-u  s   anti-s  anti-cu_1  PYTHIA 42 ;
+  1.0  anti-Xi_cc-- gamma   PHSP ;
 Enddecay
 
 Decay Xi_cc++
@@ -13257,21 +13263,11 @@ Decay anti-Xi_cc--
 Enddecay
 
 Decay Xi_cc*+
-  0.08 e+  nu_e    Xi_c0    PHSP;
-  0.08 mu+ nu_mu   Xi_c0    PHSP;
-  0.51 u anti-d  s   cd_0   PYTHIA 42 ;
-  0.25 u anti-d  s   cd_1   PYTHIA 42 ;
-  0.05 u anti-s  s   cd_0   PYTHIA 42 ;
-  0.03 u anti-s  s   cd_1   PYTHIA 42 ;
+  1.0  Xi_cc+ gamma   PHSP ;
 Enddecay
 
 Decay anti-Xi_cc*-
-  0.08 e-  anti-nu_e    anti-Xi_c0    PHSP;
-  0.08 mu- anti-nu_mu   anti-Xi_c0    PHSP;
-  0.51 anti-u d  anti-s  anti-cd_0   PYTHIA 42 ;
-  0.25 anti-u d  anti-s  anti-cd_1   PYTHIA 42 ;
-  0.05 anti-u s  anti-s  anti-cd_0   PYTHIA 42 ;
-  0.03 anti-u s  anti-s  anti-cd_1   PYTHIA 42 ;
+  1.0  anti-Xi_cc- gamma   PHSP ;
 Enddecay
 
 Decay Xi_cc+
@@ -13311,21 +13307,11 @@ Decay anti-Omega_cc-
 Enddecay
 
 Decay Omega_cc*+
-  0.08 e+  nu_e   Omega_c0   PHSP;
-  0.08 mu+ nu_mu  Omega_c0   PHSP;
-  0.51 u   anti-d   s     cs_0    PYTHIA 42;
-  0.25 u   anti-d   s     cs_1    PYTHIA 42;
-  0.05 u   anti-s   s     cs_0    PYTHIA 42;
-  0.03 u   anti-s   s     cs_1    PYTHIA 42;
+  1.0  Omega_cc+ gamma   PHSP ;
 Enddecay
 
 Decay anti-Omega_cc*-
-  0.08 e-  anti-nu_e   anti-Omega_c0   PHSP;
-  0.08 mu- anti-nu_mu  anti-Omega_c0   PHSP;
-  0.51 anti-u   d   anti-s     anti-cs_0    PYTHIA 42;
-  0.25 anti-u   d   anti-s     anti-cs_1    PYTHIA 42;
-  0.05 anti-u   s   anti-s     anti-cs_0    PYTHIA 42;
-  0.03 anti-u   s   anti-s     anti-cs_1    PYTHIA 42;
+  1.0  anti-Omega_cc- gamma   PHSP ;
 Enddecay
 
 End

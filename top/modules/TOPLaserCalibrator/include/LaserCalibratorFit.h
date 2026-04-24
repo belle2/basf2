@@ -95,12 +95,12 @@ namespace Belle2 {
       /**
        * get the fit method used in recent module
        */
-      std::string getFitMethod() const {return m_fitMethod;}
+      const std::string& getFitMethod() const {return m_fitMethod;}
 
       /**
        * get the center position of hist max bin
        */
-      std::vector<double> getMaxPos()  {return m_maxpos;}
+      const std::vector<double>& getMaxPos()  {return m_maxpos;}
 
       /**
        * get mean position after fit

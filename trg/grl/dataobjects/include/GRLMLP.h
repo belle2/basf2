@@ -24,7 +24,7 @@ namespace Belle2 {
     GRLMLP();
 
     /** constructor to set all parameters (not weights and relevantID ranges). */
-    GRLMLP(std::vector<unsigned short>& nodes, unsigned short targets, const std::vector<float>& outputscale);
+    GRLMLP(std::vector<unsigned short>& nodes);
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~GRLMLP() { }
@@ -49,6 +49,11 @@ namespace Belle2 {
     void set_weights(std::vector<float>& weights) { m_weights = weights; }
     /** set bias vector */
     void set_bias(std::vector<float>& bias) { m_bias = bias; }
+
+    /** get output threshold vector */
+    std::vector<float> get_nn_thres() const { return m_nn_thres; }
+    /** set output threshold vector */
+    void set_nn_thres(const std::vector<float>& nn_thres) { m_nn_thres = nn_thres; }
 
     /** get bit width etc. constant in each node */
     std::vector<int> get_total_bit_bias() const { return m_total_bit_bias; }
@@ -114,6 +119,8 @@ namespace Belle2 {
   private:
     /** Number of nodes in each layer, not including bias nodes. */
     std::vector<unsigned short> m_n_nodes;
+    /** threshold of output */
+    std::vector<float> m_nn_thres;
     /** Weights of the network. */
     std::vector<float> m_weights;
     /** bias of the network. */
@@ -151,14 +158,8 @@ namespace Belle2 {
      *  been set by some trainer (set to true when setWeights() is first called). */
     bool m_trained;
 
-    /** output variables: 1: z, 2: theta, 3: (z, theta) */
-    unsigned short m_target_vars;
-    /** Output[i] of the MLP is scaled from [-1, 1]
-     *  to [outputScale[2i], outputScale[2i+1]]. */
-    std::vector<float> m_output_scale;
-
     //! Needed to make the ROOT object storable
-    ClassDef(GRLMLP, 4);
+    ClassDef(GRLMLP, 6);
   };
 }
 #endif

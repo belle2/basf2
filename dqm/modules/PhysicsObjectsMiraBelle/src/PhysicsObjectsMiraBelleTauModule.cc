@@ -48,9 +48,9 @@ void PhysicsObjectsMiraBelleTauModule::defineHisto()
 
   // Create histograms for efficiency of ECL bits
   m_h_L1ECL1x1 = new TH1F("hist_L1ECL1x1", "hist_L1ECL1x1", 30, 0, 30);
-  m_h_L1ECL1x1->GetXaxis()->SetBinLabel(1, "Reference(fff||ffo)");
+  m_h_L1ECL1x1->GetXaxis()->SetBinLabel(1, "fff_or_ffo");
   m_h_L1ECL1x3 = new TH1F("hist_L1ECL1x3", "hist_L1ECL1x3", 30, 0, 30);
-  m_h_L1ECL1x3->GetXaxis()->SetBinLabel(1, "Reference(fff||ffo)");
+  m_h_L1ECL1x3->GetXaxis()->SetBinLabel(1, "fff_or_ffo");
 
   int bin = 2;
 
@@ -63,9 +63,9 @@ void PhysicsObjectsMiraBelleTauModule::defineHisto()
 
   // Create histograms for efficiency of CDC bits
   m_h_L1CDC1x1 = new TH1F("hist_L1CDC1x1", "hist_L1CDC1x1", 30, 0, 30);
-  m_h_L1CDC1x1->GetXaxis()->SetBinLabel(1, "Reference(hie||c4||eclmumu)");
+  m_h_L1CDC1x1->GetXaxis()->SetBinLabel(1, "hie_or_c4_or_eclmumu");
   m_h_L1CDC1x3 = new TH1F("hist_L1CDC1x3", "hist_L1CDC1x3", 30, 0, 30);
-  m_h_L1CDC1x3->GetXaxis()->SetBinLabel(1, "Reference(hie||c4||eclmumu)");
+  m_h_L1CDC1x3->GetXaxis()->SetBinLabel(1, "hie_or_c4_or_eclmumu");
 
   bin = 2;
 
@@ -78,9 +78,9 @@ void PhysicsObjectsMiraBelleTauModule::defineHisto()
 
   // Create histograms for efficiency of CDC-KLM bits
   m_h_L1CDCKLM1x1 = new TH1F("hist_L1CDCKLM1x1", "hist_L1CDCKLM1x1", 30, 0, 30);
-  m_h_L1CDCKLM1x1->GetXaxis()->SetBinLabel(1, "Reference(hie||c4||eclmumu)");
+  m_h_L1CDCKLM1x1->GetXaxis()->SetBinLabel(1, "hie_or_c4_or_eclmumu");
   m_h_L1CDCKLM1x3 = new TH1F("hist_L1CDCKLM1x3", "hist_L1CDCKLM1x3", 30, 0, 30);
-  m_h_L1CDCKLM1x3->GetXaxis()->SetBinLabel(1, "Reference(hie||c4||eclmumu)");
+  m_h_L1CDCKLM1x3->GetXaxis()->SetBinLabel(1, "hie_or_c4_or_eclmumu");
 
   bin = 2;
 

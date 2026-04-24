@@ -12,7 +12,7 @@
 from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import Database, IntervalOfValidity, SVDHoughParameters
 
-# Optimisation 2023 #
+# initial values, to be optimized #
 parameters = SVDHoughParameters()
 parameters.setFinalOverlapResolverMinActivityState(0.7)
 parameters.setMaxRelations(100)

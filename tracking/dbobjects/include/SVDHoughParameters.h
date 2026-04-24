@@ -16,8 +16,7 @@ namespace Belle2 {
   class SVDHoughParameters: public TObject {
   public:
     /** Default constructor */
-    SVDHoughParameters() : m_finalOverlapResolverMinActivityState(0.7), m_maxRelations(100), m_minQualitiyIndicatorSize3(0.5),
-      m_minQualitiyIndicatorSize4(0.5), m_minQualitiyIndicatorSize5(0.5), m_refinerOverlapResolverMinActivityState(0.7) {}
+    SVDHoughParameters() = default;
 
     /** Destructor */
     ~SVDHoughParameters() {}
@@ -34,16 +33,16 @@ namespace Belle2 {
       return m_finalOverlapResolverMinActivityState;
     }
 
-    /** Set Maximum number of relations allowed for entering tree search */
-    void setMaxRelations(int maxRelations)
+    /** Set minimal value of activity for acceptance**/
+    void setRefinerOverlapResolverMinActivityState(float refinerOverlapResolverMinActivityState)
     {
-      m_maxRelations = maxRelations;
+      m_refinerOverlapResolverMinActivityState = refinerOverlapResolverMinActivityState;
     }
 
-    /** Get Maximum number of relations allowed for entering tree search */
-    int getMaxRelations() const
+    /** Get minimal value of activity for acceptance* */
+    float getRefinerOverlapResolverMinActivityState() const
     {
-      return m_maxRelations;
+      return m_refinerOverlapResolverMinActivityState;
     }
 
     /** Set the minimum QI for SpacePointTrackCands of size 3 */
@@ -82,31 +81,31 @@ namespace Belle2 {
       return m_minQualitiyIndicatorSize5;
     }
 
-    /** Set minimal value of activity for acceptance**/
-    void setRefinerOverlapResolverMinActivityState(float refinerOverlapResolverMinActivityState)
+    /** Set Maximum number of relations allowed for entering tree search */
+    void setMaxRelations(int maxRelations)
     {
-      m_refinerOverlapResolverMinActivityState = refinerOverlapResolverMinActivityState;
+      m_maxRelations = maxRelations;
     }
 
-    /** Get minimal value of activity for acceptance* */
-    float getRefinerOverlapResolverMinActivityState() const
+    /** Get Maximum number of relations allowed for entering tree search */
+    int getMaxRelations() const
     {
-      return m_refinerOverlapResolverMinActivityState;
+      return m_maxRelations;
     }
 
   private:
     /** minimal value of activity for acceptance */
-    float m_finalOverlapResolverMinActivityState;
-    /** Maximum number of relations allowed for entering tree search */
-    unsigned int m_maxRelations;
-    /** minimum QI for SpacePointTrackCands of size 3*/
-    float m_minQualitiyIndicatorSize3;
-    /** minimum QI for SpacePointTrackCands of size 4*/
-    float m_minQualitiyIndicatorSize4;
-    /** minimum QI for SpacePointTrackCands of size 5*/
-    float m_minQualitiyIndicatorSize5;
+    float m_finalOverlapResolverMinActivityState = 0.7;
     /** minimal value of activity for acceptance*/
-    float m_refinerOverlapResolverMinActivityState;
+    float m_refinerOverlapResolverMinActivityState = 0.7;
+    /** minimum QI for SpacePointTrackCands of size 3*/
+    float m_minQualitiyIndicatorSize3 = 0.5;
+    /** minimum QI for SpacePointTrackCands of size 4*/
+    float m_minQualitiyIndicatorSize4 = 0.5;
+    /** minimum QI for SpacePointTrackCands of size 5*/
+    float m_minQualitiyIndicatorSize5 = 0.5;
+    /** Maximum number of relations allowed for entering tree search */
+    unsigned int m_maxRelations = 100;
 
     ClassDef(SVDHoughParameters, 1);  /**< ClassDef, necessary for ROOT */
   };

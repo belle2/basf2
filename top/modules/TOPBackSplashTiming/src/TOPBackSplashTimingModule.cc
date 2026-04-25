@@ -220,7 +220,6 @@ void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, double c
                              clusterE) + "_slot_" + std::to_string(moduleIDindex + 1) + "_cosTheta_" + std::to_string(
                              nearestClusterCosTheta) + ".png";
   c->SaveAs(roofitname.c_str());
-
   return;
 }
 
@@ -232,7 +231,7 @@ int TOPBackSplashTimingModule::convertCosThetaToIndex(double nearestClusterCosTh
 
 
 TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDindex,
-    std::vector<int> digitIndiciesInSlot, double clusterE, double clusterCosTheta)
+    std::vector<const TOPDigit*> digitsPerSlot, double clusterE, double clusterCosTheta)
 {
   // Derive cosTheta bin nearest to cluster cosTheta
   double nearestClusterCosTheta = (double)std::round(clusterCosTheta * 10) / 10;
@@ -246,8 +245,8 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
   RooRealVar* x =  m_wss[cosThetaIndex].var("x");
 
   RooDataSet data("data", "unbinned", RooArgSet(*x));
-  for (auto digitIndexInSlot : digitIndiciesInSlot) {
-    double v = m_digits[digitIndexInSlot]->getTime();
+  for (auto digit : digitsPerSlot) {
+    double v = digit->getTime();
     x->setVal(v);
     data.add(RooArgSet(*x));
   }
@@ -311,14 +310,23 @@ void TOPBackSplashTimingModule::initialize()
 void TOPBackSplashTimingModule::event()
 {
   // Step 1: Sort digit indicies into slots with cleaning
-  std::array<std::vector<int>, 16> digitIndiciesPerSlots;
-  for (int i = 0; i < m_digits.getEntries(); i++) {
-    const TOPDigit* digi = m_digits[i];
-    if (digi->getHitQuality() != TOPDigit::c_Good) {
+  //std::array<std::vector<int>, 16> digitIndiciesPerSlots;
+  //for (int i = 0; i < m_digits.getEntries(); i++) {
+  //  const TOPDigit* digi = m_digits[i];
+  //  if (digi->getHitQuality() != TOPDigit::c_Good) {
+  //    continue;
+  //  }
+  //  if (digi->getTime() > 0 && digi->getTime() < 80) {
+  //    digitIndiciesPerSlots[ int(digi->getModuleID()) - 1].push_back(i);
+  //  }
+  //}
+  std::array<std::vector<const TOPDigit*>, 16> digitsPerSlots;
+  for (const auto& digi : m_digits) {
+    if (digi.getHitQuality() != TOPDigit::c_Good) {
       continue;
     }
-    if (digi->getTime() > 0 && digi->getTime() < 80) {
-      digitIndiciesPerSlots[ int(digi->getModuleID()) - 1].push_back(i);
+    if (digi.getTime() > 0 && digi.getTime() < 80) {
+      digitsPerSlots[ int(digi.getModuleID()) - 1].push_back(&digi);
     }
   }
   // Step 2: Iterate over clusters with cleaning
@@ -341,15 +349,15 @@ void TOPBackSplashTimingModule::event()
 
       // First check minNphotons check: are there enough photons to fit?
       // Second check is in fit func (enough digits in fit boundaries
-      if (int(digitIndiciesPerSlots[moduleID - 1].size()) < m_minNphotons) {
+      if (int(digitsPerSlots[moduleID - 1].size()) < m_minNphotons) {
         continue;
       }
 
-      // For labelling fit plot
+      // For labelling plot file
       double clusterE = cluster.getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron);
 
       // Step 3: Perform fit on digits nearest to cluster
-      auto* fitresult = fitTimingDigits(moduleID - 1, digitIndiciesPerSlots[moduleID - 1],
+      auto* fitresult = fitTimingDigits(moduleID - 1, digitsPerSlots[moduleID - 1],
                                         clusterE, std::cos(cluster.getTheta()));
       // Step 4: Setting up ECL relation to fit
       if (fitresult) {

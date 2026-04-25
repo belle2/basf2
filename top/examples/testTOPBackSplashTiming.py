@@ -72,7 +72,7 @@ si.add_simulation(path=path)
 re.add_reconstruction(path=path)
 
 # call module and plot timing fits
-path.add_module("TOPBackSplashTiming", saveFits=True, minClusterE=args.minClusterE,
+path.add_module("TOPBackSplashTiming", saveFits=args.saveFits, minClusterE=args.minClusterE,
                 minNphotons=args.minNphotons, minClusterNHits=args.minClusterNHits)
 
 # Save mdst with timing, no. of fitted photons and chi-2/dof

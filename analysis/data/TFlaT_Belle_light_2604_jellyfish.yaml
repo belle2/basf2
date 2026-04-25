@@ -1,23 +1,22 @@
 TFLAT_Mask: !!python/tuple # ROE Mask
 - TFLATDefaultMask
 - thetaInCDCAcceptance and p<infinity and p >= 0 and dr<1 and abs(dz)<3
-- thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.06
-  and clusterReg==2] or                     [E>0.06 and clusterReg==3]] and abs(clusterTiming)
-  < 200
+- thetaInCDCAcceptance and clusterNHits>1.5 and goodBelleGamma > 0.5
 
 trk_cut: isInRestOfEvent > 0.5 and passesROEMask(TFLATDefaultMask) > 0.5 and p >= 0
-gamma_cut: isInRestOfEvent > 0.5 and passesROEMask(TFLATDefaultMask) > 0.5 and beamBackgroundSuppression > 0.4 and fakePhotonSuppression > 0.3
+gamma_cut: isInRestOfEvent > 0.5 and passesROEMask(TFLATDefaultMask) > 0.5 and beamBackgroundSuppression > 0.1 and fakePhotonSuppression > 0.1
 
 trk_variable_list: # Input lists
 - charge
 - useCMSFrame(p)
 - useCMSFrame(cosTheta)
 - useCMSFrame(phi)
-- electronID
-- muonID
-- kaonID
-- pionID
-- protonID
+- eIDBelle
+- muIDBelle
+- muIDBelleQuality
+- atcPIDBelle(3,2)
+- atcPIDBelle(4,2)
+- atcPIDBelle(4,3)
 - pidPairProbabilityExpert(321, 211, CDC)
 - pidPairProbabilityExpert(321, 211, TOP)
 - pidPairProbabilityExpert(321, 211, ARICH)
@@ -29,20 +28,22 @@ trk_variable_list: # Input lists
 - pidPairProbabilityExpert(13, 211, KLM)
 - pidPairProbabilityExpert(211, 321, TOP)
 - pidPairProbabilityExpert(211, 321, ARICH)
-- nPXDHits/2
+- pidPairProbabilityExpert(11, 211, CDC, SVD)
+- pidPairProbabilityExpert(13, 211, CDC, SVD)
+- pidPairProbabilityExpert(211, 321, CDC, SVD)
+- BelledEdx
 - nSVDHits/8
 - dxdiff
 - dydiff
 - dzdiff
 - clusterEoP
-- clusterLAT
+- clusterLAT/10
 ecl_variable_list:
 - useCMSFrame(p)
 - useCMSFrame(cosTheta)
 - useCMSFrame(phi)
-- clusterE1E9
 - clusterE9E21
-- clusterLAT
+- clusterLAT/10
 roe_variable_list:
 - countInList(gamma:tflat)/8
 - countInList(pi+:tflat)/6
@@ -76,5 +77,5 @@ train_valid_fraction: 0.92
 chunk_size: 3072000 # This should be multiple of batch size
 
 # Miscellaneous parameters
-VersionBeamBackgroundMVA: MC15ri
-VersionFakePhotonMVA: MC15ri
+VersionBeamBackgroundMVA: Belle
+VersionFakePhotonMVA: Belle

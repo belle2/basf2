@@ -70,10 +70,10 @@ initial_learning_rate: 0.0001
 decay_steps: 2000000
 alpha: 0.1
 patience: 20
-batch_size: 2048
+batch_size: 512
 epochs: 200
-train_valid_fraction: 0.92
-chunk_size: 3072000 # This should be multiple of batch size
+train_valid_fraction: 0.90909090909
+chunk_size: 102400 # This should be multiple of batch size
 
 # Miscellaneous parameters
 VersionBeamBackgroundMVA: MC15ri

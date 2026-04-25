@@ -12393,10 +12393,10 @@ Decay   Omega_c0
 0.020         Xi*0 K- pi+                                  PHSP; #[PDG2025 with the assumption of sum(BF)=1]
 0.033         Xi- anti-K*0 pi+                             PHSP; #[PDG2025 with the assumption of sum(BF)=1]
 0.005         Xi- K- pi+ pi+                               PHSP; #[PDG2025 with the assumption of sum(BF)=1. Xi*0 and K*0 subtracted.]
-0.112         Lambda anti-K0 anti-K0                       PHSP; #[PDG2025 with the assumption of sum(BF)=1]
+0.112         Lambda0 anti-K0 anti-K0                       PHSP; #[PDG2025 with the assumption of sum(BF)=1]
 0.010         Xi- pi+                                      PHSP; #[PDG2025 with the assumption of sum(BF)=1]
 0.004         Omega- K+                                    PHSP; #[PDG2025 with the assumption of sum(BF)=1]
-0.010         p K- K- pi+                                  PHSP; #[Assumed to be equal to a similar Cabibbo-suppressed mode Xi- pi+]
+0.010         p+ K- K- pi+                                  PHSP; #[Assumed to be equal to a similar Cabibbo-suppressed mode Xi- pi+]
 Enddecay
 
 CDecay  anti-Omega_c0

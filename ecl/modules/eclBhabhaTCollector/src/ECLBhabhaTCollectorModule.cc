@@ -886,7 +886,7 @@ void ECLBhabhaTCollectorModule::collect()
     // Absolute time should be in specified range condition.
     if (fabs(time) > m_timeAbsMax) continue;
 
-    // Fit quality flag -- choose only events with best fit quality
+    // Fit quality flag -- choose valid fit results with E > ~2 MeV
     if (ecl_dig->getQuality() != 0 and ecl_dig->getQuality() != 3) continue;
 
     //== Save time and crystal information.  Fill plot after both electrons are tested

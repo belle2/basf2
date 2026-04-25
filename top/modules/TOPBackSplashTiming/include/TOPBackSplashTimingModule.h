@@ -51,7 +51,7 @@ namespace Belle2 {
     StoreArray<TOPBackSplashFitResult> m_fitresult; /**< StoreArray of TOPBackSplashFitResult */
     StoreArray<TOPDigit> m_digits; /**< StoreArray of TOPDigit */
 
-    TOPBackSplashFitResult* fitTimingDigits(int, std::vector<int>, double, int,
+    TOPBackSplashFitResult* fitTimingDigits(int, std::vector<int>, double,
                                             double); /**< Perform fitting of TOP timing in nearby slot  */
     std::array<std::array<double, 11>, 15> m_fitparams; /**< container of 11 TOP timing fit params per cosTheta */
     std::vector<RooWorkspace> m_wss; /**< container of RooWorkSpaces, containing fit funcs per cosTheta */
@@ -65,7 +65,7 @@ namespace Belle2 {
     int convertCosThetaToIndex(double); /**< maps rounded cosTheta to appropriate row index of fit parameters */
     int getModuleFromPhi(double); /**< maps azimuthal angle to corresponding TOP slot no. */
     /** Function to create and save RooPlots of fitted TOP timing */
-    void makePlot(double, int, int, RooAbsPdf*, RooRealVar*, RooDataSet, double, RooFitResult*);
+    void makePlot(double, double, int, RooAbsPdf*, RooRealVar*, RooDataSet, RooFitResult*);
   };
 
 } // namespace Belle2

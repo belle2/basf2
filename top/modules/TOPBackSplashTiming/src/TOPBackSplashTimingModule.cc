@@ -145,8 +145,8 @@ int TOPBackSplashTimingModule::getModuleFromPhi(double phi)
   return int(phi / (M_PI / 8) + 1);
 }
 
-void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, int iClusterToFit, int moduleIDindex, RooAbsPdf* model,
-                                         RooRealVar* x, RooDataSet data, double xpeak1, RooFitResult* res)
+void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, double clusterE, int moduleIDindex, RooAbsPdf* model,
+                                         RooRealVar* x, RooDataSet data, RooFitResult* res)
 {
   // For debugging
   int cosThetaClusterIndex = convertCosThetaToIndex(nearestClusterCosTheta);
@@ -155,8 +155,8 @@ void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, int iClu
   // Create RooPlot
   TCanvas* c = new TCanvas("c", "Johnson SU fit", 900, 900);
   StoreObjPtr<EventMetaData> eventMetaData;
-  std::string rooPlotTitle = "evtNo: " + std::to_string(eventMetaData->getEvent()) + " clusterNo: " + std::to_string(
-                               iClusterToFit) + " slot: " + std::to_string(moduleIDindex + 1) + " fitted cosTheta: " + std::to_string(nearestClusterCosTheta);
+  std::string rooPlotTitle = "evtNo: " + std::to_string(eventMetaData->getEvent()) + " clusterE: " + std::to_string(
+                               clusterE) + " slot: " + std::to_string(moduleIDindex + 1) + " fitted cosTheta: " + std::to_string(nearestClusterCosTheta);
 
   RooPlot* frame = x->frame(RooFit::Title(rooPlotTitle.c_str()));
   data.plotOn(frame, RooFit::Binning(binning));
@@ -178,13 +178,6 @@ void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, int iClu
   // Canvas
   frame->Draw();
 
-  // Half-maximum lines
-  TLine* xpeak1line = new TLine(xpeak1, 0, xpeak1, 1e6);
-  xpeak1line->SetLineStyle(2);
-  xpeak1line->SetLineColor(kRed);
-  xpeak1line->SetLineWidth(5);
-  xpeak1line->Draw();
-
   // Stat box
   TPaveText* box = new TPaveText(0.7, 0.65, 0.98, 0.92, "NDC");
   box->SetFillColor(0);
@@ -195,13 +188,24 @@ void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, int iClu
   box->AddText(Form("nPhotons=%d", nPhotons));
 
   // Parameters
+  double xpeak1 = 0;
   for (int i = 0; i < res->floatParsFinal().getSize(); ++i) {
     RooRealVar* p = (RooRealVar*)res->floatParsFinal().at(i);
     box->AddText(Form("%s = %.3f ± %.3f",
                       p->GetName(),
                       p->getVal(),
                       p->getError()));
+    if ((std::string)p->GetName() == "mu") {
+      xpeak1 = p->getVal();
+      B2WARNING(xpeak1);
+    }
   }
+  // Johnson mu (used as extracted time)
+  TLine* xpeak1line = new TLine(xpeak1, 0, xpeak1, 1e6);
+  xpeak1line->SetLineStyle(2);
+  xpeak1line->SetLineColor(kRed);
+  xpeak1line->SetLineWidth(5);
+  xpeak1line->Draw();
 
   // Extra info
   box->AddText("Results");
@@ -212,8 +216,8 @@ void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, int iClu
   box->Draw();
 
   // Save canvas
-  std::string roofitname = "TOPBackSplashFit_evtNo_" + std::to_string(eventMetaData->getEvent()) + "_fittedcluster_" + std::to_string(
-                             iClusterToFit) + "_slot_" + std::to_string(moduleIDindex + 1) + "_cosTheta_" + std::to_string(
+  std::string roofitname = "TOPBackSplashFit_evtNo_" + std::to_string(eventMetaData->getEvent()) + "_clusterE_" + std::to_string(
+                             clusterE) + "_slot_" + std::to_string(moduleIDindex + 1) + "_cosTheta_" + std::to_string(
                              nearestClusterCosTheta) + ".png";
   c->SaveAs(roofitname.c_str());
 
@@ -228,9 +232,15 @@ int TOPBackSplashTimingModule::convertCosThetaToIndex(double nearestClusterCosTh
 
 
 TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDindex,
-    std::vector<int> digitIndiciesInSlot,
-    double nearestClusterCosTheta, int iClusterToFit, double clusterCosTheta)
+    std::vector<int> digitIndiciesInSlot, double clusterE, double clusterCosTheta)
 {
+  // Derive cosTheta bin nearest to cluster cosTheta
+  double nearestClusterCosTheta = (double)std::round(clusterCosTheta * 10) / 10;
+  if (nearestClusterCosTheta == 0.9) {
+    // Treat rare edge case of nearestClusterCosTheta = 0.9
+    // (TOP acceptance is 31 < theta < 128, -0.616 < cosTheta < 0.857)
+    nearestClusterCosTheta = 0.8;
+  }
   // Get cosTheta pdf
   int cosThetaIndex = convertCosThetaToIndex(nearestClusterCosTheta);
   RooRealVar* x =  m_wss[cosThetaIndex].var("x");
@@ -254,8 +264,8 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
   // maxTime calculate for a p=200 MeV neutron with reflections in the bar
   double minTime =  120 / (30 * clusterSinTheta) + zeta / 20.;
   double maxTime =  120 / (6 * clusterSinTheta) + 1.4 * zeta / 20.;
-
   double shift = 2 * (270 - zeta) / 20;
+
   m_wss[cosThetaIndex].var("shift_minus_mu")->setVal(shift);
   m_wss[cosThetaIndex].var("shift_minus_mu")->setMin(shift - 1.);
   m_wss[cosThetaIndex].var("shift_minus_mu")->setMax(shift * 1.4 + 2.);
@@ -266,7 +276,6 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
 
   RooAbsPdf* model =  m_wss[cosThetaIndex].pdf("model");
   RooFitResult* res = model->fitTo(data, RooFit::Save(), RooFit::PrintLevel(-1), RooFit::Strategy(0), RooFit::Extended());
-
   //TODO add check to model failing and break statement
 
   // First peak
@@ -283,8 +292,7 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
   TOPBackSplashFitResult* fitresult = m_fitresult.appendNew(xpeak1, redchisq, data.sumEntries());
 
   if (m_saveFits == true) {
-    makePlot(nearestClusterCosTheta, iClusterToFit, moduleIDindex,  model,
-             x, data, xpeak1,  res);
+    makePlot(nearestClusterCosTheta, clusterE, moduleIDindex,  model, x, data, res);
   }
   return fitresult;
 }
@@ -304,7 +312,6 @@ void TOPBackSplashTimingModule::event()
 {
   // Step 1: Sort digit indicies into slots with cleaning
   std::array<std::vector<int>, 16> digitIndiciesPerSlots;
-  int nCleanDigits = 0;
   for (int i = 0; i < m_digits.getEntries(); i++) {
     const TOPDigit* digi = m_digits[i];
     if (digi->getHitQuality() != TOPDigit::c_Good) {
@@ -312,28 +319,24 @@ void TOPBackSplashTimingModule::event()
     }
     if (digi->getTime() > 0 && digi->getTime() < 80) {
       digitIndiciesPerSlots[ int(digi->getModuleID()) - 1].push_back(i);
-      nCleanDigits++;
     }
   }
-
   // Step 2: Iterate over clusters with cleaning
-  int nClustersToFit = 0;
-  for (int iCluster = 0; iCluster < m_eclClusters.getEntries(); iCluster++) {
-    const ECLCluster*  cluster = m_eclClusters[iCluster];
+  for (const auto& cluster : m_eclClusters) {
 
     // Clusters in barrel and within TOP acceptance,
     // Must have neutral hadron treatment of clusters only
     // No tracks matched to clusters
     // Min cluster energy, min clusterNHits (values passed to module)
-    if (cluster->getTheta() > 31.0 * M_PI / 180.0 && cluster->getTheta() < 128.0 * M_PI / 180.0 &&
-        cluster->getDetectorRegion() == 2 &&
-        cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron) &&
-        cluster->isTrack() == false &&
-        cluster->getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron) >= m_minClusterE &&
-        cluster->getNumberOfCrystals() >= m_minClusterNHits) {
+    if (cluster.getTheta() > 31.0 * M_PI / 180.0 && cluster.getTheta() < 128.0 * M_PI / 180.0 &&
+        cluster.getDetectorRegion() == 2 &&
+        cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron) &&
+        cluster.isTrack() == false &&
+        cluster.getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron) >= m_minClusterE &&
+        cluster.getNumberOfCrystals() >= m_minClusterNHits) {
 
       // Derive module in front of cluster
-      double phi = cluster->getPhi();
+      double phi = cluster.getPhi();
       int moduleID = TOPBackSplashTimingModule::getModuleFromPhi(phi);
 
       // First check minNphotons check: are there enough photons to fit?
@@ -342,21 +345,15 @@ void TOPBackSplashTimingModule::event()
         continue;
       }
 
-      nClustersToFit++;
-      double nearestClusterCosTheta = (double)std::round(std::cos(cluster->getTheta()) * 10) / 10;
-      if (nearestClusterCosTheta == 0.9) {
-        // Treat rare edge case of nearestClusterCosTheta = 0.9
-        // (TOP acceptance is 31 < theta < 128, -0.616 < cosTheta < 0.857)
-        nearestClusterCosTheta = 0.8;
-      }
+      // For labelling fit plot
+      double clusterE = cluster.getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron);
 
       // Step 3: Perform fit on digits nearest to cluster
-      auto* fitresult = fitTimingDigits(moduleID - 1, digitIndiciesPerSlots[moduleID - 1], nearestClusterCosTheta,
-                                        nClustersToFit, std::cos(cluster->getTheta()));
-
+      auto* fitresult = fitTimingDigits(moduleID - 1, digitIndiciesPerSlots[moduleID - 1],
+                                        clusterE, std::cos(cluster.getTheta()));
       // Step 4: Setting up ECL relation to fit
       if (fitresult) {
-        fitresult->addRelationTo(cluster);
+        fitresult->addRelationTo(&cluster);
       }
     }
   }

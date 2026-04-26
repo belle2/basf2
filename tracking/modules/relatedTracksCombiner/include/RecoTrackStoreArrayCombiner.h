@@ -8,14 +8,15 @@
 #pragma once
 
 #include <framework/core/Module.h>
-
 #include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/RecoTrack.h>
+
 
 /**
  * Combine two collections of tracks without additional checks.
  */
 namespace Belle2 {
+  class RecoTrack;
+  class SpacePointTrackCand;
   /// Module to combine RecoTracks.
   class RecoTrackStoreArrayCombinerModule : public Module {
 
@@ -34,6 +35,10 @@ namespace Belle2 {
     std::string m_temp1RecoTracksStoreArrayName;
     /// Name of the input VXD StoreArray
     std::string m_temp2RecoTracksStoreArrayName;
+    /// Name of the input CDC SPTrackCands
+    std::string m_temp1SPTrackCandsStoreArrayName;
+    /// Name of the input VXD SPTrackCands
+    std::string m_temp2SPTrackCandsStoreArrayName;
     /// Name of the output StoreArray
     std::string m_recoTracksStoreArrayName;
 
@@ -41,6 +46,10 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_temp1RecoTracks;
     /// Store Array of the input tracks
     StoreArray<RecoTrack> m_temp2RecoTracks;
+    /// Store Array of the input SPTrackCands
+    StoreArray<SpacePointTrackCand> m_temp1SPTrackCands;
+    /// Store Array of the input SPTrackCands
+    StoreArray<SpacePointTrackCand> m_temp2SPTrackCands;
     /// Store Array of the output tracks
     StoreArray<RecoTrack> m_recoTracks;
   };

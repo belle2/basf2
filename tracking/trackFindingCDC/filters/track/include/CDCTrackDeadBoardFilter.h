@@ -7,11 +7,20 @@
  **************************************************************************/
 #pragma once
 
+#include <vector>
+
+#include <cdc/topology/ILayer.h>
+
 namespace Belle2 {
 
   // forward declaration
   namespace TrackingUtilities {
     class CDCTrack;
+    class Helix;
+  }
+
+  namespace CDC {
+    class CDCGeometryPar;
   }
 
   namespace TrackFindingCDC {

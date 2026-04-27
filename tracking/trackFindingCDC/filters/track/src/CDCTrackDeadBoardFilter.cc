@@ -64,7 +64,7 @@ namespace Belle2 {
 
       Belle2::TrackingUtilities::Helix globalHelix = trajectory.getLocalHelix().helix();
       auto localOrigin = trajectory.getLocalOrigin();
-      double arcLengthOffset = globalHelix.passiveMoveBy(-localOrigin);
+      globalHelix.passiveMoveBy(-localOrigin);
 
       // detect layer jumps jumping at least minJump layers
       // Assumes hits are ordered! Need check if that is always true, or sorting without check (PS: TrackQualityEstimator also assumes hits are ordered for its filter)

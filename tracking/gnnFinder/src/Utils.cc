@@ -15,32 +15,32 @@
 
 using namespace Belle2::GNNFinder::Utils;
 
-KDTNodePool::KDTNodePool(size_t capacity) : index(0)
+KDTNodePool::KDTNodePool(size_t capacity) : m_index(0)
 {
-  pool.resize(capacity);
-  std::generate(pool.begin(), pool.end(), [] { return new KDTNode(); });
+  m_pool.resize(capacity);
+  std::generate(m_pool.begin(), m_pool.end(), [] { return new KDTNode(); });
 }
 
 KDTNodePool::~KDTNodePool()
 {
-  for (KDTNode* node : pool) {
+  for (KDTNode* node : m_pool) {
     delete node;
   }
 }
 
 KDTNode* KDTNodePool::allocate()
 {
-  if (index >= pool.size())
+  if (m_index >= m_pool.size())
     B2ERROR("KDTNodePool:allocate() exceeded pool capacity.");
   // Hand out the next pre-allocated slot and advance the cursor
-  return pool[index++];
+  return m_pool[m_index++];
 }
 
 void KDTNodePool::reset()
 {
   // Rewind the cursor so all slots can be reused in the next event
   // without freeing / reallocating memory
-  index = 0;
+  m_index = 0;
 }
 
 template<typename Iterator, typename Compare>
@@ -55,7 +55,7 @@ inline void HitOrderer::insertionSort(Iterator begin, Iterator end, Compare cmp)
 }
 
 KDTNode* HitOrderer::buildKDTree(std::vector<KDTHit>::iterator begin, std::vector<KDTHit>::iterator end, int depth,
-                                 KDTNodePool& pool, const size_t INSERTION_SORT_THRESHOLD)
+                                 KDTNodePool& pool, const size_t insertionSortThreshold)
 {
   if (begin >= end)
     return nullptr;
@@ -69,7 +69,7 @@ KDTNode* HitOrderer::buildKDTree(std::vector<KDTHit>::iterator begin, std::vecto
   const size_t n = std::distance(begin, end);
   const auto mid  = begin + n / 2;  // Median element becomes the node's pivot
 
-  if (n < INSERTION_SORT_THRESHOLD) {
+  if (n < insertionSortThreshold) {
     // Full sort for small ranges: cheaper than nth_element + recursion overhead
     HitOrderer::insertionSort(begin, end, cmp);
   } else {
@@ -211,21 +211,21 @@ std::pair<double, double> Belle2::GNNFinder::Utils::intersectCylinderXY(const RO
     const double targetR)
 {
   // Check if we are already outside or at the boundary
-  double rSq = pos.X() * pos.X() + pos.Y() * pos.Y();
+  const double rSq = pos.X() * pos.X() + pos.Y() * pos.Y();
   if (rSq >= targetR * targetR)
     return {pos.X(), pos.Y()};
   // Coefficients for a*t^2 + b*t + c = 0
   // Solving for |(pos + t*mom).xy| = targetR
-  double a = mom.X() * mom.X() + mom.Y() * mom.Y();
-  double b = 2.0 * (pos.X() * mom.X() + pos.Y() * mom.Y());
-  double c = rSq - (targetR * targetR);
-  double discriminant = b * b - 4.0 * a * c;
+  const double a = mom.X() * mom.X() + mom.Y() * mom.Y();
+  const double b = 2.0 * (pos.X() * mom.X() + pos.Y() * mom.Y());
+  const double c = rSq - (targetR * targetR);
+  const double discriminant = b * b - 4.0 * a * c;
   if (discriminant < 0 or a == 0)
     return {pos.X(), pos.Y()};
-  double sqrtD = std::sqrt(discriminant);
-  double invA = 1.0 / a;
-  double t1 = 0.5 * (-b + sqrtD) * invA;
-  double t2 = 0.5 * (-b - sqrtD) * invA;
+  const double sqrtD = std::sqrt(discriminant);
+  const double invA = 1.0 / a;
+  const double t1 = 0.5 * (-b + sqrtD) * invA;
+  const double t2 = 0.5 * (-b - sqrtD) * invA;
   // Get the first positive intersection point
   double t = -1.0;
   if (t1 > 0 && t2 > 0) t = std::min(t1, t2);

@@ -70,9 +70,9 @@ namespace Belle2::GNNFinder::Utils {
   class KDTNodePool {
   private:
     /** Internal storage for preallocated KD-tree nodes. */
-    std::vector<KDTNode*> pool;
+    std::vector<KDTNode*> m_pool;
     /** Current index for the next available node in the pool. */
-    size_t index;
+    size_t m_index;
 
   public:
     /**
@@ -133,11 +133,11 @@ namespace Belle2::GNNFinder::Utils {
      * @param end Iterator to the end of the KDTHit range.
      * @param depth Current tree depth, used to alternate axis.
      * @param pool Object pool used to allocate KD-tree nodes.
-     * @param INSERTION_SORT_THRESHOLD Switch to insertion sort for small ranges.
+     * @param insertionSortThreshold Switch to insertion sort for small ranges.
      * @return Pointer to the root node of the constructed KD-tree.
      */
     static KDTNode* buildKDTree(std::vector<KDTHit>::iterator begin, std::vector<KDTHit>::iterator end, int depth, KDTNodePool& pool,
-                                const size_t INSERTION_SORT_THRESHOLD = 10);
+                                const size_t insertionSortThreshold = 10);
 
     /**
      * @brief Sorts a small range using insertion sort for performance.
@@ -150,7 +150,6 @@ namespace Belle2::GNNFinder::Utils {
      */
     template<typename Iterator, typename Compare>
     static inline void insertionSort(Iterator begin, Iterator end, Compare cmp);
-
 
     /**
      * @brief Recursively frees all nodes in a KD-tree.

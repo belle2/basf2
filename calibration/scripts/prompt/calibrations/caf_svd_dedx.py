@@ -84,7 +84,8 @@ def create_path(rerun_reco, rerun_pid, isMC, expert_config):
                 branchNames=HLT_INPUT_OBJECTS,
                 entrySequences=[f'0:{max_events_per_file - 1}'],
                 logLevel=b2.LogLevel.ERROR)
-            re.add_unpackers(path=rec_path)
+            from rawdata import add_unpackers
+            add_unpackers(path=rec_path)
         else:
             rec_path.add_module('RootInput', branchNames=list(DIGITS_OBJECTS) + [
                 'MCParticles',

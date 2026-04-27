@@ -44,7 +44,7 @@ namespace Belle2 {
     /** Constructor */
     CDCDedxCorrectionModule();
     /** Destructor */
-    virtual ~CDCDedxCorrectionModule();
+    ~CDCDedxCorrectionModule() override;
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing
@@ -74,7 +74,7 @@ namespace Belle2 {
     void OneDCorrection(int layer, double enta, double& dedx) const;
 
     /** Perform the cosine correction */
-    void CosineCorrection(double costheta, double& dedx) const;
+    void CosineCorrection(unsigned int superlayer, double costheta, double& dedx) const;
 
     /** Perform the cosine edge correction */
     void CosineEdgeCorrection(double costh, double& dedx) const;
@@ -130,7 +130,7 @@ namespace Belle2 {
     DBObjPtr<CDCDedxADCNonLinearity> m_DBNonlADC; /**< hadron saturation non linearity */
     DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< cosine edge calibration */
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */
-    std::array<double, 56> m_lgainavg; /**< average calibration factor for the layer */
+    std::array<double, 56> m_lgainavg{}; /**< average calibration factor for the layer */
 
     /** Recalculate the dE/dx mean values after corrections */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;

@@ -59,24 +59,32 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   vector<double>* dedxhit = 0;
   ttree->SetBranchAddress("dedxhit", &dedxhit);
 
+  double costh;
+  ttree->SetBranchAddress("costh", &costh);
+
   // dedxhit vector to store dE/dx values for each wire
   map<int, vector<double>> wirededx;
 
   //IL = Inner Layer and OL = Outer Layer
   array<TH1D*, 2> hdedxL;
   string label[2] = {"IL", "OL"};
+
   for (int il = 0; il < 2; il++)
     hdedxL[il] = new TH1D(Form("hdedx%s_%s", label[il].data(), m_suffix.data()), "", m_dedxBins, m_dedxMin, m_dedxMax);
 
+  int slWireBoundary = 2240; // Outer layers (used for normalization) start here
+
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
-    for (unsigned int j = 0; j < wire->size(); ++j) {
-      int jwire = wire->at(j);
-      double jhitdedx = dedxhit->at(j);
-      wirededx[jwire].push_back(jhitdedx);
-      //wire # 1279 end of inner layers
-      if (jwire < 1280) hdedxL[0]->Fill(jhitdedx);
-      else hdedxL[1]->Fill(jhitdedx);
+    if (costh > -0.55 && costh < 0.82) {
+      for (unsigned int j = 0; j < wire->size(); ++j) {
+        int jwire = wire->at(j);
+        double jhitdedx = dedxhit->at(j);
+        wirededx[jwire].push_back(jhitdedx);
+
+        if (jwire < slWireBoundary) hdedxL[0]->Fill(jhitdedx);
+        else hdedxL[1]->Fill(jhitdedx);
+      }
     }
   }
 
@@ -87,7 +95,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
   if (minstat > 0.10 * c_nwireCDC) return c_NotEnoughData;
 
-  //25-75 is average bin # for truncation
+  //25-75 is average bin # for trunction
   array<unsigned int, 2> minbinL, maxbinL;
   for (int il = 0; il < 2; il++) {
     getTruncatedBins(hdedxL[il], minbinL[il], maxbinL[il]);
@@ -126,7 +134,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
       if (!m_isWireTruc) {
         getTruncatedBins(hdedxhit[jwire], minbin, maxbin);
       } else {
-        if (jwire < 1280) {
+        if (jwire < slWireBoundary) {
           minbin = minbinL[0];
           maxbin =  maxbinL[0];
         } else {
@@ -160,7 +168,8 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     else layermean[il] = 1.0;
 
     //calculate outer layer average for active layer
-    if (il >= 8 && layermean[il] > 0) {
+    unsigned int layerBoundary = 14; // Outer layers (used for normalization) start here
+    if (il >= layerBoundary && layermean[il] > 0) {
       layeravg += layermean[il];
       activelayers++;
     }
@@ -217,6 +226,8 @@ void CDCDedxWireGainAlgorithm::getExpRunInfo()
 
   const auto erEnd = getRunList()[cruns - 1];
   int rend = erEnd.second;
+
+  m_exp = estart;
 
   updateDBObjPtrs(1, rstart, estart);
 

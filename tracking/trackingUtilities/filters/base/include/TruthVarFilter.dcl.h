@@ -28,7 +28,7 @@ namespace Belle2 {
       TruthVarFilter();
 
       /// Default destructor
-      ~TruthVarFilter();
+      ~TruthVarFilter() override;
 
     public:
       /// Reject an item if the truth variable is 0, else accept it.

@@ -23,13 +23,6 @@
 using namespace Belle2;
 using namespace TrackingUtilities;
 
-GeneralizedCircle::GeneralizedCircle()
-  : m_n3(0.0)
-  , m_n12(0.0, 0.0)
-  , m_n0(0.0)
-{
-}
-
 GeneralizedCircle::GeneralizedCircle(const double n0,
                                      const double n1,
                                      const double n2,
@@ -107,10 +100,10 @@ void GeneralizedCircle::setPerigeeParameters(const double curvature,
                                              const Vector2D& tangential,
                                              const double impact)
 {
-  double n0 = impact * (impact * curvature / 2.0 + 1.0);
-  Vector2D n12 = -tangential.orthogonal() * (1 + curvature * impact);
-  double n3 = curvature / 2.0;
-  setN(n0, n12, n3);
+  double loc_n0 = impact * (impact * curvature / 2.0 + 1.0);
+  Vector2D loc_n12 = -tangential.orthogonal() * (1 + curvature * impact);
+  double loc_n3 = curvature / 2.0;
+  setN(loc_n0, loc_n12, loc_n3);
 }
 
 Vector2D GeneralizedCircle::closest(const Vector2D& point) const
@@ -325,23 +318,23 @@ GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) con
   const Vector2D& m12 = generalizedCircle.n12();
   const double m3 = generalizedCircle.n3();
 
-  const double n0 = this->n0();
-  const Vector2D& n12 = this->n12();
-  const double n3 = this->n3();
+  const double loc_n0 = this->n0();
+  const Vector2D& loc_n12 = this->n12();
+  const double loc_n3 = this->n3();
 
-  Vector2D unitC = n12 * m3 - m12 * n3;
+  Vector2D unitC = loc_n12 * m3 - m12 * loc_n3;
   double absC = unitC.normalize();
 
-  double xParallel = (m0 * n3 - m3 * n0) / absC;
+  double xParallel = (m0 * loc_n3 - m3 * loc_n0) / absC;
 
   // Use symmetric solution and use all input parameters
-  Vector2D mn12 = n12 + m12;
+  Vector2D mn12 = loc_n12 + m12;
   double mn12Parallel = unitC.unnormalizedParallelComp(mn12);
   double mn12Orthogonal = unitC.unnormalizedOrthogonalComp(mn12);
 
-  double a = m3 + n3;
+  double a = m3 + loc_n3;
   double b = mn12Orthogonal;
-  double c = (a * xParallel + mn12Parallel) * xParallel + m0 + n0;
+  double c = (a * xParallel + mn12Parallel) * xParallel + m0 + loc_n0;
 
   std::pair<double, double> xOrthogonal = solveQuadraticABC(a, b, c);
 

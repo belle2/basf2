@@ -31,12 +31,6 @@ using namespace Belle2;
 using namespace CDC;
 using namespace TrackingUtilities;
 
-CDCSegmentPair::CDCSegmentPair()
-  : m_fromSegment(nullptr)
-  , m_toSegment(nullptr)
-{
-}
-
 CDCSegmentPair::CDCSegmentPair(const CDCSegment2D* fromSegment, const CDCSegment2D* toSegment)
   : m_fromSegment(fromSegment)
   , m_toSegment(toSegment)

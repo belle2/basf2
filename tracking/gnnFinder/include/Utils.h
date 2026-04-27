@@ -136,8 +136,8 @@ namespace Belle2::GNNFinder::Utils {
      * @param insertionSortThreshold Switch to insertion sort for small ranges.
      * @return Pointer to the root node of the constructed KD-tree.
      */
-    static KDTNode* buildKDTree(std::vector<KDTHit>::iterator begin, std::vector<KDTHit>::iterator end, int depth, KDTNodePool& pool,
-                                const size_t insertionSortThreshold = 10);
+    static KDTNode* buildKDTree(std::vector<KDTHit>::iterator begin, std::vector<KDTHit>::iterator end, const int depth,
+                                KDTNodePool& pool, const size_t insertionSortThreshold = 10);
 
     /**
      * @brief Sorts a small range using insertion sort for performance.
@@ -169,7 +169,7 @@ namespace Belle2::GNNFinder::Utils {
      * @param best Best match found so far (output).
      * @param bestDist Squared distance to the best match (output).
      */
-    static void nearestNeighbor(KDTNode* node, const KDTHit& query, KDTHit& best, double& bestDist);
+    static void nearestNeighbor(const KDTNode* node, const KDTHit& query, KDTHit& best, double& bestDist);
 
     /**
      * @brief Marks a KD-tree node as used if its hit index matches the given hit.

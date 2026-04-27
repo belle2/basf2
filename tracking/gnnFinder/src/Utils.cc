@@ -54,7 +54,7 @@ inline void HitOrderer::insertionSort(Iterator begin, Iterator end, Compare cmp)
   }
 }
 
-KDTNode* HitOrderer::buildKDTree(std::vector<KDTHit>::iterator begin, std::vector<KDTHit>::iterator end, int depth,
+KDTNode* HitOrderer::buildKDTree(std::vector<KDTHit>::iterator begin, std::vector<KDTHit>::iterator end, const int depth,
                                  KDTNodePool& pool, const size_t insertionSortThreshold)
 {
   if (begin >= end)
@@ -90,7 +90,7 @@ KDTNode* HitOrderer::buildKDTree(std::vector<KDTHit>::iterator begin, std::vecto
   return node;
 }
 
-void HitOrderer::nearestNeighbor(KDTNode* node, const KDTHit& query, KDTHit& best, double& bestDist)
+void HitOrderer::nearestNeighbor(const KDTNode* node, const KDTHit& query, KDTHit& best, double& bestDist)
 {
   if (!node)
     return;

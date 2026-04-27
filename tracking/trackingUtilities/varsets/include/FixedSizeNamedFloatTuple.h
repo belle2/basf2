@@ -200,7 +200,7 @@ namespace Belle2 {
         return m_values[I];
       }
 
-      // Reference getter for the ith value. This is needed since the template version does
+      /// Reference getter for the ith value. This is needed since the template version does
       // not work for the [] operator, once made the base [] virtual
       Float_t& var(int i)
       {

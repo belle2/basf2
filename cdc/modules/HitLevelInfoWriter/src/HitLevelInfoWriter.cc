@@ -103,16 +103,6 @@ void HitLevelInfoWriterModule::event()
       m_injring = dedxTrack->getInjectionRing();
       m_injtime = dedxTrack->getInjectionTime();
 
-      //--------REMOVEBAL--------
-      //when CDST are reproduced with injection time
-      if (m_injtime == -1 || m_injring == -1) {
-        if (m_TTDInfo.isValid() && m_TTDInfo->hasInjection()) {
-          m_injring = m_TTDInfo->isHER();
-          m_injtime =  m_TTDInfo->getTimeSinceLastInjectionInMicroSeconds();
-        }
-      }
-      //--------REMOVEBAL--------
-
       // fill the E/P
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
       if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
@@ -202,16 +192,6 @@ void HitLevelInfoWriterModule::event()
 
       m_injring = dedxTrack->getInjectionRing();
       m_injtime = dedxTrack->getInjectionTime();
-
-      //--------REMOVEBAL--------
-      //when CDST are reproduced with injection time
-      if (m_injtime == -1 || m_injring == -1) {
-        if (m_TTDInfo.isValid() && m_TTDInfo->hasInjection()) {
-          m_injring = m_TTDInfo->isHER();
-          m_injtime =  m_TTDInfo->getTimeSinceLastInjectionInMicroSeconds();
-        }
-      }
-      //--------REMOVEBAL--------
 
       // fill the E/P
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
@@ -315,7 +295,6 @@ void HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   // Get the calibration constants
   m_scale = m_DBScaleFactor->getScaleFactor();
   m_runGain = m_DBRunGain->getRunGain();
-  m_cosCor = m_DBCosineCor->getMean(m_cosTheta);
   m_timeGain = m_DBInjectTime->getCorrection("mean", m_injring, m_injtime);
   m_timeReso = m_DBInjectTime->getCorrection("reso", m_injring, m_injtime);
 
@@ -394,6 +373,8 @@ void HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
       l_path[il] = dedxTrack->getLayerPath(il);
       l_dedx[il] = dedxTrack->getLayerDedx(il);
     }
+    l_cosCor[il] = m_DBCosineCor->getMean(l_layer[il], m_cosTheta);
+
     if (l_layer[il] > lastlayer) lout++;
     else if (l_layer[il] < lastlayer) lin++;
     else continue;
@@ -432,6 +413,8 @@ void HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
         h_foundByTrackFinder[ihit] = dedxTrack->getFoundByTrackFinder(ihit);
       }
       // Get the calibration constants
+      h_cosCor[ihit] = m_DBCosineCor->getMean(h_layer[ihit], m_cosTheta);
+
       h_facnladc[ihit] = dedxTrack->getNonLADCCorrection(ihit);
       h_wireGain[ihit] = m_DBWireGains->getWireGain(h_wire[ihit]);
       h_twodCor[ihit] = m_DB2DCell->getMean(h_layer[ihit], h_ndocaRS[ihit], h_entaRS[ihit]);
@@ -460,7 +443,7 @@ void HitLevelInfoWriterModule::recalculateDedx(CDCDedxTrack* dedxTrack, map<int,
     double jPath = dedxTrack->getPath(ihit);
 
     double correction = dedxTrack->getScaleFactor() * dedxTrack->getRunGain() * dedxTrack->getTimeMean() *
-                        dedxTrack->getCosineCorrection() * dedxTrack->getCosEdgeCorrection() *
+                        dedxTrack->getCosineCorrection(ihit) * dedxTrack->getCosEdgeCorrection() *
                         dedxTrack->getTwoDCorrection(ihit) * dedxTrack->getOneDCorrection(ihit) *
                         dedxTrack->getNonLADCCorrection(ihit);
     if (dedxTrack->getWireGain(ihit) > 0) correction *= dedxTrack->getWireGain(ihit); //also keep dead wire
@@ -541,7 +524,7 @@ double HitLevelInfoWriterModule::GetCorrection(int& adc, int layer, int wireID, 
   correction *= m_DBRunGain->getRunGain();
   correction *= m_DB2DCell->getMean(layer, doca, enta);
   correction *= m_DB1DCell->getMean(layer, enta);
-  correction *= m_DBCosineCor->getMean(costheta);
+  correction *= m_DBCosineCor->getMean(layer, costheta);
   correction *= m_DBInjectTime->getCorrection("mean", ring, time);
   if (costheta <= -0.850 || costheta >= 0.950) correction *= m_DBCosEdgeCor->getMean(costheta);
   if (m_DBWireGains->getWireGain(wireID) > 0)  correction *= m_DBWireGains->getWireGain(wireID);
@@ -687,6 +670,7 @@ void HitLevelInfoWriterModule::clearEntries()
     l_layer[il] = 0;
     l_path[il] = 0;
     l_dedx[il] = 0;
+    l_cosCor[il] = 0;
   }
 
   if (m_isHitLevel) {
@@ -706,6 +690,7 @@ void HitLevelInfoWriterModule::clearEntries()
       h_driftT[ihit] = 0;
       // h_driftD[ihit] = 0;
       h_facnladc[ihit] = 0;
+      h_cosCor[ihit] = 0;
       h_wireGain[ihit] = 0;
       h_twodCor[ihit] = 0;
       h_onedCor[ihit] = 0;
@@ -779,7 +764,6 @@ void HitLevelInfoWriterModule::bookOutput(string filename)
 
   // calibration constants
   m_tree[i]->Branch("scale", &m_scale, "scale/D");
-  m_tree[i]->Branch("coscor", &m_cosCor, "coscor/D");
   m_tree[i]->Branch("cosedgecor", &m_cosEdgeCor, "cosedgecor/D");
   m_tree[i]->Branch("rungain", &m_runGain, "rungain/D");
   m_tree[i]->Branch("timegain", &m_timeGain, "timegain/D");
@@ -822,6 +806,7 @@ void HitLevelInfoWriterModule::bookOutput(string filename)
   m_tree[i]->Branch("lLayer", l_layer, "lLayer[lNHits]/I");
   m_tree[i]->Branch("lPath", l_path, "lPath[lNHits]/D");
   m_tree[i]->Branch("lDedx", l_dedx, "lDedx[lNHits]/D");
+  m_tree[i]->Branch("lCosCor", l_cosCor, "lCosCor[lNHits]/D");
 
   // hit level information
   if (m_isHitLevel) {
@@ -841,6 +826,7 @@ void HitLevelInfoWriterModule::bookOutput(string filename)
     m_tree[i]->Branch("hDriftT", h_driftT, "hDriftT[hNHits]/D");
     m_tree[i]->Branch("hDriftD", h_driftD, "hDriftD[hNHits]/D");
     m_tree[i]->Branch("hFacnlADC", h_facnladc, "hFacnlADC[hNHits]/D");
+    m_tree[i]->Branch("hCosCor", &h_cosCor, "hcosCor[hNHits]/D");
     m_tree[i]->Branch("hWireGain", h_wireGain, "hWireGain[hNHits]/D");
     m_tree[i]->Branch("hTwodcor", h_twodCor, "hTwodcor[hNHits]/D");
     m_tree[i]->Branch("hOnedcor", h_onedCor, "hOnedcor[hNHits]/D");

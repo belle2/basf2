@@ -144,7 +144,8 @@ namespace Belle2 {
     double m_truncMin; /**< min trunc range for mean */
     double m_truncMax; /**< max trunc range for mean */
 
-    std::string m_suffix; /**< suffix string to seperate plots */
+    std::string m_suffix; /**< suffix string to separate plots */
+    int m_exp;   /**< exp no to set SL boundaries */
 
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Bad wire DB object */

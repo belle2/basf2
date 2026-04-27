@@ -72,17 +72,19 @@ def rungain_validation(path, suffix):
 
     with PdfPages(pdf_path) as pdf:
         fig, ax = plt.subplots(1, 2, figsize=(20, 6))
+        n = len(df)
+        space = max(10, min(50, int(200 / max(n, 1))))
 
         # Mean plot
         ymin, ymax = get_positive_minmax(df['mean'])
-        pc.hist(y_min=ymin-0.02, y_max=ymax+0.02, xlabel="Run range", ylabel="dE/dx mean", space=30, ax=ax[0])
+        pc.hist(y_min=ymin-0.02, y_max=ymax+0.02, xlabel="Run range", ylabel="dE/dx mean", space=space, ax=ax[0])
         ax[0].errorbar(df['run'], df['mean'], yerr=df['mean_err'], fmt='*', markersize=8, rasterized=True, label='Bhabha mean')
         ax[0].legend(fontsize=12)
         ax[0].set_title('dE/dx Mean vs Run', fontsize=14)
 
         # Reso plot
         ymin, ymax = get_positive_minmax(df['reso'])
-        pc.hist(y_min=ymin-0.01, y_max=ymax+0.01, xlabel="Run range", ylabel="dE/dx reso", space=30, ax=ax[1])
+        pc.hist(y_min=ymin-0.01, y_max=ymax+0.01, xlabel="Run range", ylabel="dE/dx reso", space=space, ax=ax[1])
         ax[1].errorbar(df['run'], df['reso'], yerr=df['reso_err'], fmt='*', markersize=8, rasterized=True, label='Bhabha reso')
         ax[1].legend(fontsize=12)
         ax[1].set_title('dE/dx Resolution vs Run', fontsize=14)
@@ -132,7 +134,7 @@ def wiregain_validation(path, suffix):
         ax[1, 1].plot(df_layer['layer'], df_layer['gmean'], '*', markersize=10, rasterized=True)
         ax[1, 1].set_title('dE/dx Mean vs Layer (good wires)', fontsize=14)
 
-        fig.suptitle("dE/dx vs #wire", fontsize=20)
+        fig.suptitle(f"dE/dx vs #wire {suffix}", fontsize=20)
         save_to_pdf(pdf, fig)
 
 
@@ -203,7 +205,7 @@ def cosgain_validation(path, suffix):
         ax[1].legend(fontsize=17)
         ax[1].set_title('dE/dx Resolution vs cosine', fontsize=14)
 
-        fig.suptitle(r"dE/dx vs cos$\theta$", fontsize=20)
+        fig.suptitle(fr"dE/dx vs cos$\theta$ {suffix}", fontsize=20)
         save_to_pdf(pdf, fig)
 
 
@@ -234,51 +236,54 @@ def injection_validation(path, suffix):
 
     with PdfPages(pdf_path) as pdf:
 
-        fig, ax = plt.subplots(1, 1, figsize=(20, 6))
+        fig, ax = plt.subplots(2, 1, figsize=(18, 10), sharex=True)
 
-        ymin, ymax = get_positive_minmax(df_ler['mean'])
+        ymin, ymax = get_positive_minmax(
+            pd.concat([df_ler["mean"], df_her["mean"]])
+        )
 
         pc.hist(y_min=ymin - 0.01, y_max=ymax + 0.01,
-                xlabel="injection time", ylabel="dE/dx mean",
-                space=3, ax=ax)
+                xlabel="", ylabel="dE/dx mean",
+                space=3, ax=ax[0])
 
-        ax.errorbar(df_ler['bin'], df_ler['mean'], yerr=df_ler['mean_err'],
-                    fmt='*', markersize=10, rasterized=True, label='LER')
-        ax.errorbar(df_her['bin'], df_her['mean'], yerr=df_her['mean_err'],
-                    fmt='*', markersize=10, rasterized=True, label='HER')
-        ax.legend(fontsize=19)
+        ax[0].errorbar(df_ler['bin'], df_ler['mean'], yerr=df_ler['mean_err'],
+                       fmt='*', markersize=10, rasterized=True, label='LER')
+        ax[0].errorbar(df_her['bin'], df_her['mean'], yerr=df_her['mean_err'],
+                       fmt='*', markersize=10, rasterized=True, label='HER')
 
-        fig.suptitle("dE/dx vs Injection time", fontsize=20)
-        save_to_pdf(pdf, fig)
-
-        # Page 2: overlay corr and no corr
-        fig, ax = plt.subplots(1, 1, figsize=(20, 6))
+        ax[0].legend(fontsize=14)
+        ax[0].set_title("Corrected", fontsize=16)
 
         all_means = pd.concat([
             df_ler["mean"], df_her["mean"],
             df_ler_nocor["mean"], df_her_nocor["mean"]
         ])
-        positive_means = all_means[all_means > 0]
 
+        positive_means = all_means[all_means > 0]
         ymin2 = positive_means.min() if not positive_means.empty else all_means.min()
         ymax2 = all_means.max()
 
         pc.hist(y_min=ymin2 - 0.01, y_max=ymax2 + 0.01,
                 xlabel="injection time", ylabel="dE/dx mean",
-                space=3, ax=ax)
+                space=3, ax=ax[1])
 
         datasets = [
-            ("LER corr",    df_ler,        "o"),
-            ("HER corr",    df_her,        "s"),
-            ("LER no corr", df_ler_nocor,  "o"),
-            ("HER no corr", df_her_nocor,  "s"),
+            ("LER corr",    df_ler,       "o"),
+            ("HER corr",    df_her,       "s"),
+            ("LER no corr", df_ler_nocor, "^"),
+            ("HER no corr", df_her_nocor, "D"),
         ]
 
         for label, df, marker in datasets:
-            ax.errorbar(df['bin'], df['mean'], yerr=df['mean_err'],
-                        fmt=marker, markersize=6, rasterized=True, label=label)
-        ax.legend(fontsize=19)
-        fig.suptitle("dE/dx vs Injection time: corrected vs no correction", fontsize=20)
+            ax[1].errorbar(df['bin'], df['mean'], yerr=df['mean_err'],
+                           fmt=marker, markersize=6, rasterized=True, label=label)
+
+        ax[1].legend(fontsize=12)
+        ax[1].set_title("Corrected vs No correction", fontsize=16)
+
+        fig.suptitle(f"dE/dx vs Injection time {suffix}", fontsize=20)
+
+        plt.tight_layout(rect=[0, 0, 1, 0.96])  # important to avoid overlap
         save_to_pdf(pdf, fig)
 
 
@@ -357,7 +362,7 @@ def mom_validation(path, suffix):
                     ymin, ymax = ax_i.get_ylim()
                     ax_i.set_ylim(ymin, ymax * 1.5)
 
-            fig.suptitle(f"dE/dx vs Momentum ({cos_labels[i]})", fontsize=20)
+            fig.suptitle(f"dE/dx vs Momentum ({cos_labels[i]}) {suffix}", fontsize=20)
             plt.tight_layout()
 
             # Save to correct PDF
@@ -403,7 +408,7 @@ def oneDcell_validation(path, suffix):
         ax[1, 1].legend(fontsize=17)
         ax[1, 1].set_title('dE/dx Mean vs entaRS (OL) zoom', fontsize=14)
 
-        fig.suptitle("dE/dx vs entaRS", fontsize=20)
+        fig.suptitle(f"dE/dx vs entaRS {suffix}", fontsize=20)
         save_to_pdf(pdf, fig)
 
 

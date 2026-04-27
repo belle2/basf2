@@ -93,6 +93,7 @@ namespace Belle2 {
     m_productionHitDebugs.registerInDataStore(DataStore::c_DontWriteOut);
     m_templateFitResults.registerInDataStore(m_templateFitResultName, DataStore::c_DontWriteOut);
     m_injectionVeto.registerInDataStore();
+    m_unpackerErrors.registerInDataStore();
 
     m_rawDigits.registerRelationTo(m_waveforms, DataStore::c_Event, DataStore::c_DontWriteOut);
     m_rawDigits.registerRelationTo(m_templateFitResults, DataStore::c_Event, DataStore::c_DontWriteOut);
@@ -132,8 +133,9 @@ namespace Belle2 {
     m_slowData.clear();
     m_interimFEInfos.clear();
 
-    // create injection veto object
+    // create injection veto and unpacker errors objects
     m_injectionVeto.create();
+    m_unpackerErrors.create();
 
     StoreObjPtr<EventMetaData> evtMetaData;
     for (auto& raw : m_rawData) {
@@ -142,6 +144,7 @@ namespace Belle2 {
         int bufferSize = raw.GetDetectorNwords(0, finesse);
         if (bufferSize < 1) continue;
 
+        m_BS = getFrontEndNumber(raw, finesse);
         int err = 0;
         m_swapBytes = m_swapBytesDefault;
         int dataFormat = m_dataFormat;
@@ -194,6 +197,7 @@ namespace Belle2 {
             break;
 
           default:
+            m_unpackerErrors->setErrorFlag(m_BS);
             if (printTheError()) {
               auto boardstackName = getFrontEndName(raw, finesse);
               B2ERROR("TOPUnpacker: unknown data format from " << boardstackName
@@ -205,6 +209,7 @@ namespace Belle2 {
         }
 
         if (err != 0) {
+          m_unpackerErrors->setErrorFlag(m_BS);
           if (printTheError()) {
             auto boardstackName = getFrontEndName(raw, finesse);
             B2ERROR("TOPUnpacker: error in unpacking data from " << boardstackName
@@ -230,6 +235,19 @@ namespace Belle2 {
       name += std::to_string(slot) + char('a' + finesse % 4);
     }
     return name;
+  }
+
+
+  unsigned TOPUnpackerModule::getFrontEndNumber(RawTOP& raw, int finesse)
+  {
+    if (raw.GetMaxNumOfCh(0) <= 4) { // COPPER
+      int copper = ((raw.GetNodeID(0) >> 24) * 1000 + (raw.GetNodeID(0) & 0x3FF));
+      return (copper - 3001) * 4 + finesse;
+    } else { // PCIe40
+      int slot = (raw.GetNodeID(0) & 0xF) * 8 - 7 + finesse / 4;
+      int bs = finesse % 4;
+      return (slot - 1) * 4 + bs;
+    }
   }
 
 
@@ -843,11 +861,13 @@ namespace Belle2 {
     if (feemap) {
       moduleID = feemap->getModuleID();
       boardstack = feemap->getBoardstackNumber();
+      m_BS = (moduleID - 1) * 4 + boardstack;
     } else {
+      m_unpackerErrors->setErrorFlag(m_BS);
       B2WARNING("TOPUnpacker: no front-end map available."
-                << LogVar("SCROD ID", evtScrodID));
+                << LogVar("SCROD ID", evtScrodID)
+                << LogVar("front-end number", m_BS));
     }
-
 
     B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
@@ -857,6 +877,7 @@ namespace Belle2 {
             << ", evtScrodID = " << evtScrodID);
 
     if (evtMagicHeader != 0xA) {
+      m_unpackerErrors->setErrorFlag(m_BS);
       B2WARNING("TOPUnpacker: event header magic word mismatch. should be 0xA."
                 << LogVar("Magic word", evtMagicHeader));
       return array.getRemainingWords();
@@ -1021,6 +1042,7 @@ namespace Belle2 {
                 << ", hitIsOnHeap = " << hitIsOnHeap
                 << ", hitHeapWindow = " << hitHeapWindow);
       } else { //could not match the data format
+        m_unpackerErrors->setErrorFlag(m_BS);
         B2WARNING("TOPUnpacker: could not match data type inside unpackProdDebug()"
                   << LogVar("evtType", evtType) << LogVar("evtVersion", evtVersion));
         return array.getRemainingWords();
@@ -1032,6 +1054,7 @@ namespace Belle2 {
       }
 
       if (hitMagicHeader != 0xB) {
+        m_unpackerErrors->setErrorFlag(m_BS);
         B2WARNING("TOPUnpacker: hit header magic word mismatch. should be 0xB."
                   << LogVar("Magic word", hitMagicHeader));
         return array.getRemainingWords();
@@ -1067,6 +1090,7 @@ namespace Belle2 {
               << ", checksum " << (array.validateChecksum() ? "OK" : "NOT OK"));
 
       if (!array.validateChecksum()) {
+        m_unpackerErrors->setErrorFlag(m_BS);
         B2WARNING("TOPUnpacker: hit checksum invalid.");
         return array.getRemainingWords();
       }
@@ -1147,6 +1171,7 @@ namespace Belle2 {
     }
 
     if (evtMagicFooter != 0x5) {
+      m_unpackerErrors->setErrorFlag(m_BS);
       B2WARNING("TOPUnpacker: event footer magic word mismatch. should be 0x5."
                 << LogVar("Magic word", evtMagicFooter));
       return array.getRemainingWords();
@@ -1179,6 +1204,7 @@ namespace Belle2 {
               << ", wfChannel " << wfChannel);
 
       if (wfNSamples != 32 && wfNSamples != 16) {
+        m_unpackerErrors->setErrorFlag(m_BS);
         B2WARNING("TOPUnpacker: suspicious value for wfNSamples."
                   << LogVar("wfNSamples", wfNSamples));
         return array.getRemainingWords();
@@ -1233,6 +1259,7 @@ namespace Belle2 {
         if (digit->getScrodChannel() == channel % 128) {
           digit->addRelationTo(waveform);
         } else {
+          m_unpackerErrors->setErrorFlag(m_BS);
           B2WARNING("TOPUnpacker: hit and its waveform have different channel number."
                     << LogVar("channel (hit)", digit->getScrodChannel())
                     << LogVar("channel (waveform)", channel % 128));
@@ -1243,6 +1270,7 @@ namespace Belle2 {
     } // end of waveform segments loop
 
     if (numExpectedWaveforms != numParsedWaveforms) {
+      m_unpackerErrors->setErrorFlag(m_BS);
       B2WARNING("TOPUnpacker: number of expected and parsed waveforms does not match."
                 << LogVar("expected", numExpectedWaveforms)
                 << LogVar("parsed", numParsedWaveforms));

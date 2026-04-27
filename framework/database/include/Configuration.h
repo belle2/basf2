@@ -339,7 +339,7 @@ namespace Belle2::Conditions {
     /** default server URL for the (legacy) remote metadata provider */
     std::string m_defaultLegacyRemoteMetadataProviderServer{"http://belle2db.sdcc.bnl.gov/b2s/rest/"};
     /** default server URL for the HSF remote metadata provider */
-    std::string m_defaultHSFRemoteMetadataProviderServer{"http://belle2-cdb-hsf.apps.sdcc.bnl.gov/api/cdb_rest/"};
+    std::string m_defaultHSFRemoteMetadataProviderServer{"http://blcdb.sdcc.bnl.gov/api/cdb_rest/"};
     /** default local path for the local metadata provider */
     std::string m_defaultLocalMetadataProviderPath{"/cvmfs/belle.cern.ch/conditions"};
     /** the file to put the newly created payload information */

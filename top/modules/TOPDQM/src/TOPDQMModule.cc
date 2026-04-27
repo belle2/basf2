@@ -12,7 +12,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include "TDirectory.h"
+#include <TDirectory.h>
 #include <boost/format.hpp>
 #include <algorithm>
 #include <cmath>
@@ -47,10 +47,6 @@ namespace Belle2 {
              "momentum cut used to histogram number of photons per track", 0.5);
   }
 
-
-  TOPDQMModule::~TOPDQMModule()
-  {
-  }
 
   void TOPDQMModule::defineHisto()
   {

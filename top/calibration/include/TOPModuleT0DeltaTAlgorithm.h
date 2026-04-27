@@ -28,9 +28,6 @@ namespace Belle2 {
       /** Constructor */
       TOPModuleT0DeltaTAlgorithm();
 
-      /** Destructor */
-      virtual ~TOPModuleT0DeltaTAlgorithm() {}
-
       /**
        * Sets minimal number of histogram entries to perform a fit
        */

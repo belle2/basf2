@@ -608,8 +608,8 @@ def add_svd_standalone_tracking(path,
                                suffix=suffix)
 
         path.add_module('RecoTrackStoreArrayCombiner',
-                        Temp1RecoTracksStoreArrayName=reco_tracks+"VXDTF2",
-                        Temp2RecoTracksStoreArrayName=reco_tracks+"Hough",
+                        Temp1RecoTracksStoreArrayName=reco_tracks+"VXDTF2", Temp1SPTrackCandsStoreArrayName="SPTrackCands"+"VXDTF2",
+                        Temp2RecoTracksStoreArrayName=reco_tracks+"Hough",  Temp2SPTrackCandsStoreArrayName="SPTrackCands"+"Hough",
                         recoTracksStoreArrayName=reco_tracks)
         path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"VXDTF2").set_name("PruneRecoTracks " + reco_tracks+"VXDTF2")
         path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"Hough").set_name("PruneRecoTracks " + reco_tracks+"Hough")
@@ -628,8 +628,8 @@ def add_svd_standalone_tracking(path,
                                      suffix=suffix)
 
         path.add_module('RecoTrackStoreArrayCombiner',
-                        Temp1RecoTracksStoreArrayName=reco_tracks+"Hough",
-                        Temp2RecoTracksStoreArrayName=reco_tracks+"VXDTF2",
+                        Temp1RecoTracksStoreArrayName=reco_tracks+"Hough", Temp1SPTrackCandsStoreArrayName="SPTrackCands"+"Hough",
+                        Temp2RecoTracksStoreArrayName=reco_tracks+"VXDTF2", Temp2SPTrackCandsStoreArrayName="SPTrackCands"+"VXDTF2",
                         recoTracksStoreArrayName=reco_tracks)
         path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"Hough").set_name("PruneRecoTracks " + reco_tracks+"Hough")
         path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"VXDTF2").set_name("PruneRecoTracks " + reco_tracks+"VXDTF2")

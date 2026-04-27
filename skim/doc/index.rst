@@ -33,3 +33,4 @@ These files actually contain more information but fewer events.
     02-physics
     03-lists
     04-experts
+    05-smartbkg

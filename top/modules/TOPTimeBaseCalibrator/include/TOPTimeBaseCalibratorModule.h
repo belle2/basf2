@@ -80,32 +80,15 @@ namespace Belle2 {
     TOPTimeBaseCalibratorModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TOPTimeBaseCalibratorModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
 
     /**
      * Termination action.
@@ -195,11 +178,11 @@ namespace Belle2 {
      * @param xTitle x-axis title
      * @param yTitle y-axis title
      */
-    void saveAsHistogram(const std::vector<double>& vec,
-                         const std::string& name,
-                         const std::string& title,
-                         const std::string& xTitle = "",
-                         const std::string& yTitle = "") const;
+    static void saveAsHistogram(const std::vector<double>& vec,
+                                const std::string& name,
+                                const std::string& title,
+                                const std::string& xTitle = "",
+                                const std::string& yTitle = "");
 
     /**
      * Save vector and errors to histogram and write it out
@@ -210,12 +193,12 @@ namespace Belle2 {
      * @param xTitle x-axis title
      * @param yTitle y-axis title
      */
-    void saveAsHistogram(const std::vector<double>& vec,
-                         const std::vector<double>& err,
-                         const std::string& name,
-                         const std::string& title,
-                         const std::string& xTitle = "",
-                         const std::string& yTitle = "") const;
+    static void saveAsHistogram(const std::vector<double>& vec,
+                                const std::vector<double>& err,
+                                const std::string& name,
+                                const std::string& title,
+                                const std::string& xTitle = "",
+                                const std::string& yTitle = "");
 
     /**
      * Save matrix to histogram and write it out
@@ -223,9 +206,9 @@ namespace Belle2 {
      * @param name histogram name
      * @param title histogram title
      */
-    void saveAsHistogram(const TMatrixDSym& M,
-                         const std::string& name,
-                         const std::string& title) const;
+    static void saveAsHistogram(const TMatrixDSym& M,
+                                const std::string& name,
+                                const std::string& title);
 
 
     int m_moduleID = 0;    /**< slot ID */

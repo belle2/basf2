@@ -13,7 +13,7 @@ Decay vpho
 1.000 c    anti-c      PYTHIA 91;
 Enddecay
 
-Decay D+
+Decay D_s+
 1.000 pi-  mu+  mu+          PHOTOS  PHSP;
 Enddecay
 

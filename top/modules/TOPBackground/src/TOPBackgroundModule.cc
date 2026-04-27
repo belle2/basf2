@@ -103,11 +103,6 @@ namespace Belle2 {
              "Real time in micro seconds that corresponds to simulated data", 5.);
   }
 
-  TOPBackgroundModule::~TOPBackgroundModule()
-  {
-
-  }
-
   void TOPBackgroundModule::initialize()
   {
 
@@ -203,7 +198,7 @@ namespace Belle2 {
 
     int nHits = topDigits.getEntries();
     for (int i = 0; i < nHits; i++) {
-      TOPDigit* aDigit = topDigits[i];
+      const TOPDigit* aDigit = topDigits[i];
       int barID = aDigit->getModuleID();
 
       peflux->AddBinContent(barID * 2, 1. / m_TimeOfSimulation / 32.0);
@@ -252,7 +247,7 @@ namespace Belle2 {
     nHits = beamBackHits.getEntries();
 
     for (int iHit = 0; iHit < nHits; ++iHit) {
-      BeamBackHit* tophit = beamBackHits[iHit];
+      const BeamBackHit* tophit = beamBackHits[iHit];
       int subdet = tophit->getSubDet();
       if (subdet != 5) continue;
 
@@ -279,7 +274,7 @@ namespace Belle2 {
 
     nHits = topTracks.getEntries();
     for (int iHit = 0; iHit < nHits; ++iHit) {
-      TOPBarHit* toptrk = topTracks[iHit];
+      const TOPBarHit* toptrk = topTracks[iHit];
 
       int PDG = toptrk->getPDG();
       int barID = toptrk->getModuleID();
@@ -429,11 +424,6 @@ namespace Belle2 {
     // Announce
     B2INFO("TOPBackground finished");
 
-
-  }
-
-  void TOPBackgroundModule::printModuleParams() const
-  {
 
   }
 

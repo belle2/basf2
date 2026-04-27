@@ -22,9 +22,6 @@ namespace Belle2 {
       /** Constructor */
       TOPValidationAlgorithm();
 
-      /** Destructor */
-      virtual ~TOPValidationAlgorithm() {}
-
     private:
 
       /**

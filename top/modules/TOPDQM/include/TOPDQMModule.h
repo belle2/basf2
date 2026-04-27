@@ -48,11 +48,6 @@ namespace Belle2 {
     TOPDQMModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TOPDQMModule();
-
-    /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
      * to be placed in this function.
     */

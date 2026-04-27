@@ -75,7 +75,8 @@ def default_event_abort(module, condition, error_flag):
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        with_cdc_cellular_automaton=False,
-                       use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
+                       use_second_cdc_hits=False, svd_standalone_mode="VXDTF2",
+                       add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
                        pxd_filtering_offline=False,
                        create_intercepts_for_pxd_ckf=False,
@@ -113,6 +114,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
         after the global algorithm (Legendre).
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param svd_standalone_mode: Which SVD standalone tracking is used.
+           Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
+           Defaults to "VXDTF2"
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param add_trigger_calculation: add the software trigger modules for monitoring (do not make any cut)
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
@@ -169,6 +173,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  trackFitHypotheses=trackFitHypotheses,
                                  with_cdc_cellular_automaton=with_cdc_cellular_automaton,
                                  use_second_cdc_hits=use_second_cdc_hits,
+                                 svd_standalone_mode=svd_standalone_mode,
                                  add_muid_hits=add_muid_hits,
                                  reconstruct_cdst=reconstruct_cdst,
                                  event_abort=event_abort,
@@ -205,6 +210,7 @@ def add_prefilter_reconstruction(path,
                                  trackFitHypotheses=None,
                                  with_cdc_cellular_automaton=False,
                                  use_second_cdc_hits=False,
+                                 svd_standalone_mode="VXDTF2",
                                  add_muid_hits=False,
                                  reconstruct_cdst=None,
                                  event_abort=default_event_abort,
@@ -231,6 +237,9 @@ def add_prefilter_reconstruction(path,
     :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
         after the global algorithm (Legendre).
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param svd_standalone_mode: Which SVD standalone tracking is used.
+           Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
+           Defaults to "VXDTF2"
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
@@ -283,6 +292,7 @@ def add_prefilter_reconstruction(path,
         trackFitHypotheses=trackFitHypotheses,
         with_cdc_cellular_automaton=with_cdc_cellular_automaton,
         use_second_cdc_hits=use_second_cdc_hits,
+        svd_standalone_mode=svd_standalone_mode,
         pxd_filtering_offline=pxd_filtering_offline,
         create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,

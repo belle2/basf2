@@ -847,50 +847,27 @@ void DQMHistAnalysisMiraBelleModule::endRun()
     return;
   }
 
-  // variables needed for L1 efficiency using tau pairs
-  double Ntautau_ECL1x1[15];
-  double Ntautau_ECL1x3[15];
-  double Ntautau_CDC1x1[18];
-  double Ntautau_CDC1x3[18];
-  double Ntautau_CDCKLM1x1[7];
-  double Ntautau_CDCKLM1x3[7];
-
-  // read values of monitoring variables
-  for (int bin = 1; bin < 15; bin++) {
-    Ntautau_ECL1x1[bin] = hist_tau_L1ECL1x1->GetBinContent(bin);
-    Ntautau_ECL1x3[bin] = hist_tau_L1ECL1x3->GetBinContent(bin);
-  }
-  for (int bin = 1; bin < 18; bin++) {
-    Ntautau_CDC1x1[bin] = hist_tau_L1CDC1x1->GetBinContent(bin);
-    Ntautau_CDC1x3[bin] = hist_tau_L1CDC1x3->GetBinContent(bin);
-  }
-  for (int bin = 1; bin < 7; bin++) {
-    Ntautau_CDCKLM1x1[bin] = hist_tau_L1CDCKLM1x1->GetBinContent(bin);
-    Ntautau_CDCKLM1x3[bin] = hist_tau_L1CDCKLM1x3->GetBinContent(bin);
-  }
-
-
   // set values
   for (int bin = 1; bin < 15; bin++) {
     std::string label = std::string("ECL_1_1_") + hist_tau_L1ECL1x1->GetXaxis()->GetBinLabel(bin);
-    mon_tautau->setVariable(label, Ntautau_ECL1x1[bin]);
+    mon_tautau->setVariable(label, hist_tau_L1ECL1x1->GetBinContent(bin));
 
     label = std::string("ECL_1_3_") + hist_tau_L1ECL1x3->GetXaxis()->GetBinLabel(bin);
-    mon_tautau->setVariable(label, Ntautau_ECL1x3[bin]);
+    mon_tautau->setVariable(label, hist_tau_L1ECL1x3->GetBinContent(bin));
   }
   for (int bin = 1; bin < 18; bin++) {
     std::string label = std::string("CDC_1_1_") + hist_tau_L1CDC1x1->GetXaxis()->GetBinLabel(bin);
-    mon_tautau->setVariable(label, Ntautau_CDC1x1[bin]);
+    mon_tautau->setVariable(label, hist_tau_L1CDC1x1->GetBinContent(bin));
 
     label = std::string("CDC_1_3_") + hist_tau_L1CDC1x3->GetXaxis()->GetBinLabel(bin);
-    mon_tautau->setVariable(label, Ntautau_CDC1x3[bin]);
+    mon_tautau->setVariable(label, hist_tau_L1CDC1x3->GetBinContent(bin));
   }
   for (int bin = 1; bin < 7; bin++) {
     std::string label = std::string("CDCKLM_1_1_") + hist_tau_L1CDCKLM1x1->GetXaxis()->GetBinLabel(bin);
-    mon_tautau->setVariable(label, Ntautau_CDCKLM1x1[bin]);
+    mon_tautau->setVariable(label, hist_tau_L1CDCKLM1x1->GetBinContent(bin));
 
     label = std::string("CDCKLM_1_3_") + hist_tau_L1CDCKLM1x3->GetXaxis()->GetBinLabel(bin);
-    mon_tautau->setVariable(label, Ntautau_CDCKLM1x3[bin]);
+    mon_tautau->setVariable(label, hist_tau_L1CDCKLM1x3->GetBinContent(bin));
   }
 
   //bhabha,hadrons

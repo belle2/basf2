@@ -283,10 +283,10 @@ namespace Belle2 {
     }
 
     //! Helper to compose element id & param id
-    gidTYPE makeEIDPID(gidTYPE eid_, gidTYPE pid_) {return pid_ * pidOffset + eid_ * eidOffest;}
+    static gidTYPE makeEIDPID(gidTYPE eid_, gidTYPE pid_) {return pid_ * pidOffset + eid_ * eidOffest;}
 
     //! Helper to compose time element id & param id
-    gidTYPE makeTEIDPID(gidTYPE teid_, gidTYPE pid_) {return pid_ * pidOffset + teid_ * teidOffset;}
+    static gidTYPE makeTEIDPID(gidTYPE teid_, gidTYPE pid_) {return pid_ * pidOffset + teid_ * teidOffset;}
   private:
     //! global id
     gidTYPE gid {0};

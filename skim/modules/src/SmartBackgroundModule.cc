@@ -266,10 +266,10 @@ void SmartBackgroundModule::event()
     float prediction;
     const uint16_t skimIndex = m_skimcodesMapping[skimCode];
     if (m_activationOverride) {
-      prediction = this->activation(outputTensor->at({skimIndex}), m_activationOverrideParams[0], m_activationOverrideParams[1]);
+      prediction = this->activation(outputTensor->at(skimIndex), m_activationOverrideParams[0], m_activationOverrideParams[1]);
     } else {
       std::vector<float> params = m_paramsMapping[skimCode];
-      prediction = this->activation(outputTensor->at({skimIndex}), params[0], params[1]);
+      prediction = this->activation(outputTensor->at(skimIndex), params[0], params[1]);
     }
     if (!m_debugMode) {
       const double randomNum = gRandom->Uniform(0, 1);

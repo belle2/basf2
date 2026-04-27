@@ -52,32 +52,10 @@ namespace Belle2 {
     TOPGainEfficiencyCalculatorModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TOPGainEfficiencyCalculatorModule();
-
-    /**
      * Load time vs charge 2D histogram from a given input file (parameter "inputFile")
      * and prepare hit timing and pulse charge distribution for each channel.
      */
     virtual void initialize() override;
-
-    /**
-     * The main processes, fitting charge distribution and calculating gain/efficiency,
-     * are done in this function.
-     */
-    virtual void beginRun() override;
-
-    /**
-     * This will be empty as the all the processes are done in beginRun() function
-     * thus input file can be a dummy file.
-     */
-    virtual void event() override;
-
-    /**
-     * Draw plots to show fitting results for each channel and save them into a given PDF file (outputPDFFile).
-     */
-    virtual void endRun() override;
 
     /**
      * Termination action.

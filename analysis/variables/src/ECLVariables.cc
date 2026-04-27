@@ -1773,7 +1773,7 @@ Returns MVA classifier that uses ECL clusters variables to discriminate Klong cl
 - 0 for background
 
 )DOC");
-    MAKE_DEPRECATED("clusterKlId", true, "light-2603-i", R"DOC(
+    MAKE_DEPRECATED("clusterKlId", true, "light-2603-ina", R"DOC(
                      
 )DOC");
     REGISTER_VARIABLE("clusterPulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA, R"DOC(

@@ -66,10 +66,10 @@ TOPBackSplashTimingModule::TOPBackSplashTimingModule()
            0.5);
   addParam("minNphotons", m_minNphotons,
            "Minimum (incl.) no. of Cherenkov photons measured in TOP slot for which time extraction will take place",
-           2);
+           50);
   addParam("minClusterNHits", m_minClusterNHits,
            "Minimum (incl.) no. of crystals in cluster required for adding relation to TOP time extraction",
-           1.0);
+           10.0);
 }
 
 void TOPBackSplashTimingModule::prepareFitModels()

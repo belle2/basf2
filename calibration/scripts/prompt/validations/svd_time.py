@@ -47,9 +47,6 @@ def run_validation(job_path, input_data_path=None, **kwargs):
 
     files = list(collector_output_dir.glob('**/CollectorOutput.root'))
 
-    print(f'Found {len(files)} files in {collector_output_dir}')
-    print(f'files: {[str(f) for f in files]}')
-
     agreements = {algo: {} for algo in vu.time_algorithms}
     precisions = {algo: {} for algo in vu.time_algorithms}
     discriminations = {algo: {} for algo in vu.time_algorithms}
@@ -366,5 +363,4 @@ if __name__ == '__main__':
                         default='SVDTimeValidation_output')
     args = parser.parse_args()
 
-    # run_validation(args.calibration_results_dir[0], output_dir=args.output_dir)
-    run_validation('/home/belle2/athaller/calibration_scripts/calibration_results', output_dir=args.output_dir)
+    run_validation(args.calibration_results_dir[0], output_dir=args.output_dir)

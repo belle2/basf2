@@ -196,7 +196,6 @@ void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, double c
                       p->getError()));
     if ((std::string)p->GetName() == "mu") {
       xpeak1 = p->getVal();
-      B2WARNING(xpeak1);
     }
   }
   // Johnson mu (used as extracted time)

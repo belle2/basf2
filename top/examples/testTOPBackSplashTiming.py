@@ -20,7 +20,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description="Choose anti-neutron momentum")
 parser.add_argument('--mom', default=1, help='Momentum of nbars to generate [GeV/c]')
-parser.add_argument('--saveFits', type=bool, default=True, help='Flag to save plots of RooFits')
+parser.add_argument('--saveFits', action='store_true', default=False, help='Flag to save plots of RooFits')
 parser.add_argument('--minClusterE', type=float, default=0.5, help='Minimum (incl.) clusterE to be considered for timing')
 parser.add_argument('--minNphotons', type=int, default=2, help='Minimum (incl.) no. of Cherenkov photons for fit')
 parser.add_argument('--minClusterNHits', type=float, default=1, help='Minimum (incl.) no. of crystals in cluster required')

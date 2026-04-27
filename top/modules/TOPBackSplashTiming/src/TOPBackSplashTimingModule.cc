@@ -132,8 +132,6 @@ void TOPBackSplashTimingModule::prepareFitModels()
 
     m_wss.push_back(ws);
   }
-
-  return;
 }
 
 int TOPBackSplashTimingModule::getModuleFromPhi(double phi)
@@ -155,7 +153,8 @@ void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, double c
   // Create RooPlot
   TCanvas* c = new TCanvas("c", "Johnson SU fit", 900, 900);
   StoreObjPtr<EventMetaData> eventMetaData;
-  std::string rooPlotTitle = "evtNo: " + std::to_string(eventMetaData->getEvent()) + " clusterE: " + std::to_string(
+  std::string rooPlotTitle = "evtNo: " + std::to_string(eventMetaData->getEvent()) + " runNo.: " + std::to_string(
+                               eventMetaData->getRun()) + " clusterE: " + std::to_string(
                                clusterE) + " slot: " + std::to_string(moduleIDindex + 1) + " fitted cosTheta: " + std::to_string(nearestClusterCosTheta);
 
   RooPlot* frame = x->frame(RooFit::Title(rooPlotTitle.c_str()));
@@ -216,22 +215,23 @@ void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, double c
   box->Draw();
 
   // Save canvas
-  std::string roofitname = "TOPBackSplashFit_evtNo_" + std::to_string(eventMetaData->getEvent()) + "_clusterE_" + std::to_string(
+  std::string roofitname = "TOPBackSplashFit_evtNo_" + std::to_string(eventMetaData->getEvent()) + "_runNo_" + std::to_string(
+                             eventMetaData->getRun()) + "_clusterE_" + std::to_string(
                              clusterE) + "_slot_" + std::to_string(moduleIDindex + 1) + "_cosTheta_" + std::to_string(
                              nearestClusterCosTheta) + ".png";
   c->SaveAs(roofitname.c_str());
-  return;
 }
 
 int TOPBackSplashTimingModule::convertCosThetaToIndex(double nearestClusterCosTheta)
 {
-  int cosThetaIndex = int(nearestClusterCosTheta * 10) + 6;
+  // Index needs to match m_wss
+  int cosThetaIndex = int(std::round(nearestClusterCosTheta * 10)) + 6;
   return cosThetaIndex;
 }
 
 
 TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDindex,
-    std::vector<const TOPDigit*> digitsPerSlot, double clusterE, double clusterCosTheta)
+    std::vector<const TOPDigit*>& digitsPerSlot, double clusterE, double clusterCosTheta)
 {
   // Derive cosTheta bin nearest to cluster cosTheta
   double nearestClusterCosTheta = (double)std::round(clusterCosTheta * 10) / 10;
@@ -240,8 +240,12 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
     // (TOP acceptance is 31 < theta < 128, -0.616 < cosTheta < 0.857)
     nearestClusterCosTheta = 0.8;
   }
-  // Get cosTheta pdf
+  // Get pdf according to cosTheta
   int cosThetaIndex = convertCosThetaToIndex(nearestClusterCosTheta);
+  if (cosThetaIndex >= int(m_wss.size())) {
+    return nullptr;
+  }
+
   RooRealVar* x =  m_wss[cosThetaIndex].var("x");
 
   RooDataSet data("data", "unbinned", RooArgSet(*x));

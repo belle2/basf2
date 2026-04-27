@@ -6,9 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef TOP_BACK_SPLASH_TIMING_MODULE_H
-#define TOP_BACK_SPLASH_TIMING_MODULE_H
-
+# pragma once
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -51,7 +49,7 @@ namespace Belle2 {
     StoreArray<TOPBackSplashFitResult> m_fitresult; /**< StoreArray of TOPBackSplashFitResult */
     StoreArray<TOPDigit> m_digits; /**< StoreArray of TOPDigit */
 
-    TOPBackSplashFitResult* fitTimingDigits(int, std::vector<const TOPDigit*>, double,
+    TOPBackSplashFitResult* fitTimingDigits(int, std::vector<const TOPDigit*>&, double,
                                             double); /**< Perform fitting of TOP timing in nearby slot  */
     std::array<std::array<double, 11>, 15> m_fitparams; /**< container of 11 TOP timing fit params per cosTheta */
     std::vector<RooWorkspace> m_wss; /**< container of RooWorkSpaces, containing fit funcs per cosTheta */
@@ -68,6 +66,4 @@ namespace Belle2 {
     void makePlot(double, double, int, RooAbsPdf*, RooRealVar*, RooDataSet, RooFitResult*);
   };
 
-} // namespace Belle2
-
-#endif
+} //end namespace Belle2

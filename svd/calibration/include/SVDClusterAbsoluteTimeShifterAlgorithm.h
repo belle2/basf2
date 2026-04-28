@@ -47,6 +47,8 @@ namespace Belle2 {
     float m_maximumAllowedShift = 15; /**< Allowed deviation of clsOnTracks histo wrt EventT0 histo */
     int m_minEntries = 0; /**< Set the minimum number of entries required in the histograms*/
     std::vector<TString> m_timeAlgorithms = {"CoG3", "ELS3", "CoG6"}; /**< Hardcoded list of time algorithms to calibrate */
+    int m_innerLayer = 3; /**< Inner layer of the SVD */
+    int m_outerLayer = 6; /**< Outer layer of the SVD */
   };
 
   /** Single gauss function, where

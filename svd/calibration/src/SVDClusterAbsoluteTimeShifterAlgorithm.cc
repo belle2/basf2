@@ -70,32 +70,30 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
   fn_doubleGaus->SetParLimits(3, 0.5, 25.);
   fn_doubleGaus->SetParLimits(5, 0.5, 25.);
 
+  int nBins = (m_outerLayer - m_innerLayer + 1) * 2;
 
   for (auto alg : m_timeAlgorithms) {
 
     B2INFO("Calculating shift for algorithm " << alg);
 
-    auto __hClsOnTrack__ = getObjectPtr<TH2F>(("hClsTimeOnTracks_" + alg).Data());
+    auto h_ClustersOnTrack = getObjectPtr<TH2F>(("hClsTimeOnTracks_" + alg).Data());  // __hClsOnTrack__
 
-    auto __CDCEventT0__ = getObjectPtr<TH1F>("hCDCEventT0_");
+    // auto __CDCEventT0__ = getObjectPtr<TH1F>("hCDCEventT0_");
     // map : shift values
     std::map< TString, Double_t > shiftValues;
-
-
 
     std::unique_ptr<TFile> f(new TFile(Form("algorithm_svdClusterAbsoluteTimeShifter_%s_output_rev_%d.root", alg.Data(), cal_rev),
                                        "RECREATE"));
 
-    B2INFO("ROOT file created at: " << f->GetName());
-    B2INFO("Full path: " << gSystem->WorkingDirectory() << "/" << f->GetName());
+    B2INFO("ROOT file created at: " << gSystem->WorkingDirectory() << "/" << f->GetName());
 
     TH1D* hShiftMean  = new TH1D("hShiftMean",
-                                 Form("Fitted shift mean (%s);Bin;Mean (ns)", alg.Data()), 8, 0.5, 8.5);
+                                 Form("Fitted shift mean (%s);Bin;Mean (ns)", alg.Data()), nBins, 0.5, nBins + 0.5);
     TH1D* hShiftSigma = new TH1D("hShiftSigma",
-                                 Form("Fitted shift sigma (%s);Bin;Sigma (ns)", alg.Data()), 8, 0.5, 8.5);
-    for (int l = 3; l <= 6; l++)
+                                 Form("Fitted shift sigma (%s);Bin;Sigma (ns)", alg.Data()), nBins, 0.5, nBins + 0.5);
+    for (int l = m_innerLayer; l <= m_outerLayer; l++)
       for (int s = 0; s < 2; s++) {
-        int b = 2 * (l - 3) + s + 1;
+        int b = 2 * (l - m_innerLayer) + s + 1;
         hShiftMean ->GetXaxis()->SetBinLabel(b, TString::Format("L%dS%c", l, s == 0 ? 'U' : 'V'));
         hShiftSigma->GetXaxis()->SetBinLabel(b, TString::Format("L%dS%c", l, s == 0 ? 'U' : 'V'));
       }
@@ -115,16 +113,15 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
     onePad.Draw();
 
 
-    for (int layer = 3; layer <= 6; layer++) {
+    for (int layer = m_innerLayer; layer <= m_outerLayer; layer++) {
       for (int side = 0; side < 2; side++) { // 0 for U, 1 for V
         int LayerSensorID = 2 * layer - side; // 1-based index
 
 
 
         TString binLabel = TString::Format("L%iS%c", layer, (side == 0 ? 'U' : 'V'));
-        TH1F* hist = (TH1F*)__hClsOnTrack__->ProjectionX(Form("hClsTimeOnTracks_L%dS%c", layer, (side == 0 ? 'U' : 'V')), LayerSensorID,
-                                                         LayerSensorID, "");
-        B2INFO('doing bin label: ' << binLabel);
+        TH1F* hist = (TH1F*)h_ClustersOnTrack->ProjectionX(Form("hClsTimeOnTracks_L%dS%c", layer, (side == 0 ? 'U' : 'V')), LayerSensorID,
+                                                           LayerSensorID, "");
         hist->SetTitle(Form("Cluster Time in L%dS%c", layer, (side == 0 ? 'U' : 'V')));
         hist->SetDirectory(0);
 
@@ -153,19 +150,19 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
         onePad.cd();
         hist->Draw();
 
-        // Overlay CDCEventT0 histogram
-        if (__CDCEventT0__) {
-          TH1F* cdcOverlay = (TH1F*)__CDCEventT0__->Clone(Form("cdc_%s", binLabel.Data()));
-          cdcOverlay->SetLineColor(kMagenta);
-          cdcOverlay->SetLineWidth(2);
-          cdcOverlay->SetLineStyle(2);
-          cdcOverlay->SetDirectory(0);
+        // // Overlay CDCEventT0 histogram
+        // if (__CDCEventT0__) {
+        //   TH1F* cdcOverlay = (TH1F*)__CDCEventT0__->Clone(Form("cdc_%s", binLabel.Data()));
+        //   cdcOverlay->SetLineColor(kMagenta);
+        //   cdcOverlay->SetLineWidth(2);
+        //   cdcOverlay->SetLineStyle(2);
+        //   cdcOverlay->SetDirectory(0);
 
-          // Scale to match histogram height
-          double scale = hist->GetMaximum() / cdcOverlay->GetMaximum() * 0.8;
-          // cdcOverlay->Scale(scale);
-          // cdcOverlay->Draw("SAME");
-        }
+        //   // Scale to match histogram height
+        //   double scale = hist->GetMaximum() / cdcOverlay->GetMaximum() * 0.8;
+        //   // cdcOverlay->Scale(scale);
+        //   // cdcOverlay->Draw("SAME");
+        // }
 
         if (hist->GetMaximum() < 200.) {
           int rebinValue = 200. / hist->GetMaximum() + 1.;
@@ -314,8 +311,6 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
       B2INFO("  " << item.first << " : " << item.second);
 
     }
-
-
 
     onePad.cd();
 

@@ -98,7 +98,8 @@ int main(int argc, char** argv)
   TString htitle = payloadTitle;
   htitle += " values;cellID";
   TH1F* existingPayload = new TH1F("existingPayload", htitle, ECLElementNumbers::c_NCrystals, 1, 8737);
-  htitle += " uncertainty";
+  htitle = payloadTitle;
+  htitle += " uncertainties;cellID";
   TH1F* existingUncertainty = new TH1F("existingUncertainty", htitle, ECLElementNumbers::c_NCrystals, 1, 8737);
 
   for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {

@@ -48,7 +48,8 @@ void CKFToCDCFindlet::beginRun()
 {
   Super::beginRun();
 
-  DBObjPtr<SVDToCDCCKFParameters> payload("SVDToCDCCKFParameters");
+  DBObjPtr<SVDToCDCCKFParameters> payload;
+
   if (!payload.isValid()) {
     B2FATAL("CKFToCDCFindlet: DB payload 'SVDToCDCCKFParameters' not found or not valid for current run.");
   }

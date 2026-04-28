@@ -12,6 +12,7 @@
 Run with: basf2 TestSVDToCDCCKFParametersPayload.py
 """
 
+import ROOT
 from ROOT import Belle2
 
 
@@ -19,15 +20,15 @@ PAYLOAD_NAME = "SVDToCDCCKFParameters"
 LOCAL_DB_FILE = "localdb/database.txt"
 
 
-def default_payload():
-    """Function to create a default SVDToCDCCKFParameters payload.
-    Default values match those in SVDToCDCCKFParameters.h constructor.
-    """
-    import ROOT
-    p = Belle2.SVDToCDCCKFParameters()
+def default_payload(p):
+    """Create and return a default SVDToCDCCKFParameters payload.
+    Values match those in SVDToCDCCKFParameters.h constructor."""
 
+    # Float parameters
     p.setMaximalDeltaPhi(ROOT.TMath.Pi() / 8)
     p.setMinimalPtRequirement(0.0)
+
+    # Integer parameters
     p.setMaximalLayerJump(2)
     p.setMaximalLayerJumpBackwardSeed(3)
     p.setPathMaximalCandidatesInFlight(3)
@@ -36,44 +37,37 @@ def default_payload():
     return p
 
 
-def test_payload():
-    """Function to create a test SVDToCDCCKFParameters payload."""
+def print_payload(p):
+    """Print the payload values."""
 
-    p = Belle2.SVDToCDCCKFParameters()
-
-    p.setMaximalDeltaPhi(0.5)
-    p.setMinimalPtRequirement(0.5)
-    p.setMaximalLayerJump(9)
-    p.setMaximalLayerJumpBackwardSeed(9)
-    p.setPathMaximalCandidatesInFlight(9)
-    p.setStateMaximalHitCandidates(9)
-
-    return p
-
-
-def print_payload(tag, p):
-    print(f"\n{'='*50}\n  Start of {tag}\n{'='*50}")
+    print(f"\n{PAYLOAD_NAME} payload values:")
+    print()
     print(f"  maximalDeltaPhi                = {p.getMaximalDeltaPhi()}")
     print(f"  minimalPtRequirement           = {p.getMinimalPtRequirement()}")
     print(f"  maximalLayerJump               = {p.getMaximalLayerJump()}")
     print(f"  maximalLayerJumpBackwardSeed   = {p.getMaximalLayerJumpBackwardSeed()}")
     print(f"  pathMaximalCandidatesInFlight  = {p.getPathMaximalCandidatesInFlight()}")
     print(f"  stateMaximalHitCandidates      = {p.getStateMaximalHitCandidates()}")
-
-    print(f"{'='*50}\n  End of {tag}\n{'='*50}\n")
+    print()
 
 
 def main():
 
-    p = default_payload()
-    print_payload("payload to be stored", p)
+    # Create a test/default payload
+    p = Belle2.SVDToCDCCKFParameters()
+    p = default_payload(p)
 
+    # Print the payload
+    print_payload(p)
+
+    # Store the payload to local conditions DB
     iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
     Belle2.Database.Instance().storeData(PAYLOAD_NAME, p, iov)
 
-    print(f"\n  Payload '{PAYLOAD_NAME}' stored.")
-    print(f"  Metadata : {LOCAL_DB_FILE}")
-    print("  Files    : localdb/")
+    # Print storage info
+    print(f"\n{PAYLOAD_NAME} payload stored.")
+    print(f"Metadata : {LOCAL_DB_FILE}")
+    print("Files    : localdb/")
 
 
 if __name__ == "__main__":

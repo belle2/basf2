@@ -7,9 +7,6 @@
 ***************************************************************************/
 #pragma once
 
-#include <framework/gearbox/Const.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/logging/Logger.h>
 #include <TMath.h>
 #include <TObject.h>
 
@@ -163,7 +160,7 @@ namespace Belle2 {
     /** Maximal number of hit candidates for state filtering */
     unsigned int m_stateMaximalHitCandidates;
 
-    ClassDef(SVDToCDCCKFParameters, 3);  /**< ClassDef, necessary for ROOT */
+    ClassDef(SVDToCDCCKFParameters, 1);  /**< ClassDef, necessary for ROOT */
   };
 }
 

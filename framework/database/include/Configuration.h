@@ -232,7 +232,7 @@ namespace Belle2::Conditions {
     boost::python::list getMetadataProvidersPy() { return m_metadataProviders.ensurePy(); }
     /** Get the default server URL for the remote metadata provider */
     std::string getDefaultRemoteMetadataProviderServer() { return m_defaultLegacyRemoteMetadataProviderServer; }
-    /** Get the default server URL for the new central metadata provider */
+    /** Get the default server URL for the HSF central metadata provider */
     std::string getDefaultHSFRemoteMetadataProviderServer() { return m_defaultHSFRemoteMetadataProviderServer; }
     /** Get the default local path for the local metadata provider */
     std::string getDefaultLocalMetadataProviderPath() { return m_defaultLocalMetadataProviderPath; }
@@ -348,7 +348,7 @@ namespace Belle2::Conditions {
     std::string m_downloadCacheDirectory{""};
     /** the timeout when trying to lock files in the download directory */
     size_t m_downloadLockTimeout{120};
-    /** the tag states accepted for processing, including states from new HSF CDB */
+    /** the tag states accepted for processing, including states from the HSF CDB */
     std::set<std::string> m_usableTagStates{"TESTING", "VALIDATED", "PUBLISHED", "RUNNING",
       "locked", "frozen"};
     /** the callback function to determine the final final list of globaltags */

@@ -12,18 +12,18 @@
 #include <nlohmann/json.hpp>
 
 namespace Belle2::Conditions {
-  /** Class to obtain payload metadata from the new central server via REST requests.
+  /** Class to obtain payload metadata from the HSF central server via REST requests.
    *
-   * This class connects to the Belle II new central server instead of
+   * This class connects to the Belle II HSF central server instead of
    * the main Belle II conditions database server. It provides the same functionality
-   * as CentralMetadataProvider but uses a different base URL.
+   * as CentralMetadataProvider but uses a different base URL and a different API.
    */
   class HSFCentralMetadataProvider: public MetadataProvider {
   public:
-    /** Create using the default new central base URL and given usable tag states */
+    /** Create using the default HSF central base URL and given usable tag states */
     explicit HSFCentralMetadataProvider(const std::set<std::string>& usableTagStates);
 
-    /** Create using a custom base URL for the new central server */
+    /** Create using a custom base URL for the HSF central server */
     HSFCentralMetadataProvider(std::string baseUrl, const std::set<std::string>& usableTagStates);
 
     /** default destructor */

@@ -24,10 +24,10 @@ settings = CalibrationSettings(name="CDC badwire",
                                depends_on=[cdc_tracking_calibration],
                                expert_config={
                                    "min_events_per_file": 500,
-                                   "max_events_per_file": 10000,
                                    "components": ["CDC", "ECL", "KLM"],
-                                    "payload_boundaries": [],
-                                   "backend_args": {"request_memory": "4 GB"}
+                                   "payload_boundaries": [],
+                                   "backend_args": {"request_memory": "4 GB"},
+                                   "average_occupancy_threshold": 4000.0
                                },
                                produced_payloads=["CDCBadWires"])
 
@@ -36,8 +36,8 @@ settings = CalibrationSettings(name="CDC badwire",
 def get_calibrations(input_data, **kwargs):
     expert_config = kwargs.get("expert_config")
     min_events_per_file = expert_config["min_events_per_file"]
-    max_events_per_file = expert_config["max_events_per_file"]
     components = expert_config["components"]
+    average_occupancy_threshold = expert_config["average_occupancy_threshold"]
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
@@ -68,14 +68,14 @@ def get_calibrations(input_data, **kwargs):
     # call algorighm
     algo = Belle2.CDC.WireEfficiencyAlgorithm()
     algo.setInputFileNames("histo_badwire.root")
+    algo.setAverageOccupancyThreshold(average_occupancy_threshold)
     # Calibration setup
     from caf.framework import Calibration
     badwire_calib = Calibration("CDC_Badwire",
                                 collector=col,
                                 algorithms=algo,
                                 input_files=input_files_mumu,
-                                pre_collector_path=pre_collector(max_events_per_file,
-                                                                 components=components))
+                                pre_collector_path=pre_collector(components=components))
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun
     if payload_boundaries:
@@ -84,13 +84,14 @@ def get_calibrations(input_data, **kwargs):
         for alg in badwire_calib.algorithms:
             alg.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
     else:
+        badwire_calib.strategies = strategies.SequentialRunByRun
         for alg in badwire_calib.algorithms:
-            alg.params = {"apply_iov": output_iov}
+            alg.params = {"iov_coverage": output_iov}
 
     return [badwire_calib]
 
 
-def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"]):
+def pre_collector(components=["CDC", "ECL", "KLM"]):
     from rawdata import add_unpackers
     # Create an execution path
     path = basf2.create_path()

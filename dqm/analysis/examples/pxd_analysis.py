@@ -42,7 +42,7 @@ main.add_module(input)
 # input.param('InputRootFile', argv[1])
 # main.add_module(input)
 
-main.add_module(gearbox, fileName="/geometry/Belle2_earlyPhase3.xml")
+main.add_module(gearbox, fileName="/geometry/Belle2_Run1.xml")
 main.add_module(geometry)  # , useDB=True)
 
 pxd_charge = b2.register_module('DQMHistAnalysisPXDCharge')

@@ -27,6 +27,7 @@
 #include <top/dbobjects/TOPCalChannelNoise.h>
 #include <top/dbobjects/TOPFrontEndSetting.h>
 #include <top/dbobjects/TOPCalTimeWalk.h>
+#include <top/dbobjects/TOPCalPrecision.h>
 
 namespace Belle2 {
 
@@ -114,7 +115,8 @@ namespace Belle2 {
     DBObjPtr<TOPCalAsicShift> m_asicShift; /**< ASIC shifts calibration constants */
     DBObjPtr<TOPCalModuleT0> m_moduleT0;   /**< module T0 calibration constants */
     DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */
-    OptionalDBObjPtr<TOPCalTimeWalk> m_timeWalk;   /**< time-walk calibration constants */
+    DBObjPtr<TOPCalTimeWalk> m_timeWalk;   /**< time-walk calibration constants */
+    DBObjPtr<TOPCalPrecision> m_calPrecision;   /**< calibration precision constants (systematics of channel T0) */
     TOPSampleTimes m_sampleTimes; /**< equidistant in case no calibration required */
 
     // r.m.s of pedestals (noise) of individual channels

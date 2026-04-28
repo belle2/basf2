@@ -518,7 +518,7 @@ namespace Belle2 {
         double hTime = hit.first;
         const auto* pulseShape = hit.second.shape;
         if (not pulseShape) continue;
-        pulseHeight += hit.second.pulseHeight * pulseShape->getValue(hTime - hitTime + peakTime);
+        pulseHeight += hit.second.pulseHeight * pulseShape->getValue(hitTime - hTime + peakTime);
       }
 
       double t = (*s_timeWalk)->getTimeWalk(pulseHeight);

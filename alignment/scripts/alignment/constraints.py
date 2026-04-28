@@ -709,7 +709,7 @@ if __name__ == '__main__':
 
     # phase 2
     # timedep = [([], [(0, 0, 1002)])]
-    # early phase 3
+    # Run 1 (early phase 3)
     # timedep = [([], [(0, 0, 1003)])]
 
     # final detector (phase 3)

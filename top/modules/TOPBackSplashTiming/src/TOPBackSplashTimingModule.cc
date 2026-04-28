@@ -93,7 +93,7 @@ void TOPBackSplashTimingModule::prepareFitModels()
     RooRealVar shift_minus_mu("shift_minus_mu", "shift_minus_mu", row[10], 0., 30.);
     RooRealVar coeff("coeff", "coeff", row[3], row[3], row[3]);
     RooRealVar w("w", "w", row[9], row[9], row[9]);
-    RooRealVar frac("frac", "frac", row[5], 0.4, 0.98);
+    RooRealVar frac("frac", "frac", row[5], 0.1, 1.);
 
     // Constants of fit
     gamma.setConstant(true);
@@ -265,14 +265,22 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
   // minTim calculated with beta = 1 and direct propagation in the bar (no reflections)
   // maxTime calculate for a p=200 MeV neutron with reflections in the bar
   double minTime =  120 / (30 * clusterSinTheta) + zeta / 20.;
-  double maxTime =  120 / (6 * clusterSinTheta) + 1.4 * zeta / 20.;
+  double maxTime =  120 / (3 * clusterSinTheta) + 1.4 * zeta / 20.;
   double shift = 2 * (270 - zeta) / 20;
 
+  m_wss[cosThetaIndex].var("sigPhotons")->setVal(data.numEntries() * 0.8);
+  m_wss[cosThetaIndex].var("sigPhotons")->setMin(data.numEntries() * 0.2);
+  m_wss[cosThetaIndex].var("sigPhotons")->setMax(data.numEntries() * 1.1);
+
+  m_wss[cosThetaIndex].var("bkgPhotons")->setVal(data.numEntries() * 0.2);
+  m_wss[cosThetaIndex].var("bkgPhotons")->setMin(data.numEntries() * 0.);
+  m_wss[cosThetaIndex].var("bkgPhotons")->setMax(data.numEntries() * 1.1);
+
   m_wss[cosThetaIndex].var("shift_minus_mu")->setVal(shift);
-  m_wss[cosThetaIndex].var("shift_minus_mu")->setMin(shift - 1.);
-  m_wss[cosThetaIndex].var("shift_minus_mu")->setMax(shift * 1.4 + 2.);
+  m_wss[cosThetaIndex].var("shift_minus_mu")->setMin(0.);
+  m_wss[cosThetaIndex].var("shift_minus_mu")->setMax(shift * 1.3);
   m_wss[cosThetaIndex].var("shift_minus_mu")->setConstant(false);
-  m_wss[cosThetaIndex].var("mu")->setVal(minTime + 5.);
+  m_wss[cosThetaIndex].var("mu")->setVal(0.5 * (minTime + maxTime));
   m_wss[cosThetaIndex].var("mu")->setMin(minTime);
   m_wss[cosThetaIndex].var("mu")->setMax(maxTime);
 

@@ -24,12 +24,6 @@ using namespace Belle2;
 using namespace CDC;
 using namespace TrackingUtilities;
 
-CDCAxialSegmentPair::CDCAxialSegmentPair()
-  : m_startSegment(nullptr)
-  , m_endSegment(nullptr)
-{
-}
-
 CDCAxialSegmentPair::CDCAxialSegmentPair(const CDCAxialSegment2D* startSegment,
                                          const CDCAxialSegment2D* endSegment)
   : m_startSegment(startSegment)

@@ -22,10 +22,10 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    TRGGRLConfig(): m_ecltaunn_threshold{-1.5} {}
+    TRGGRLConfig() {}
 
     /** Getter functions*/
-    float get_ecltaunn_threshold() const
+    std::vector<std::vector<float>> get_ecltaunn_threshold() const
     {
       return m_ecltaunn_threshold;
     }
@@ -40,6 +40,10 @@ namespace Belle2 {
     std::vector<std::vector<float>> get_ecltaunn_nHidden() const
     {
       return m_ecltaunn_nHidden;
+    }
+    std::vector<unsigned> get_ecltaunn_nOutput() const
+    {
+      return m_ecltaunn_nOutput;
     }
     unsigned get_ecltaunn_n_cdc_sector() const
     {
@@ -176,7 +180,7 @@ namespace Belle2 {
 
 
     /** Setter functions*/
-    void set_ecltaunn_threshold(float i)
+    void set_ecltaunn_threshold(std::vector<std::vector<float>> i)
     {
       m_ecltaunn_threshold = i;
     }
@@ -191,6 +195,10 @@ namespace Belle2 {
     void set_ecltaunn_nHidden(std::vector<std::vector<float>> i)
     {
       m_ecltaunn_nHidden = i;
+    };
+    void set_ecltaunn_nOutput(std::vector<unsigned> i)
+    {
+      m_ecltaunn_nOutput = i;
     };
     void set_ecltaunn_n_cdc_sector(unsigned i)
     {
@@ -330,7 +338,7 @@ namespace Belle2 {
   private:
 
     /** MVA Threshold of ecltaunn bit */
-    float m_ecltaunn_threshold;
+    std::vector<std::vector<float>> m_ecltaunn_threshold;
 
     /** Number of networks.
       For network specific parameters you can give either a list with
@@ -347,6 +355,9 @@ namespace Belle2 {
      * The number of layers is derived from the shape.
      */
     std::vector<std::vector<float>> m_ecltaunn_nHidden;
+
+    /** Number of output node */
+    std::vector<unsigned> m_ecltaunn_nOutput;
 
     /** Number of CDC sectors. */
     unsigned m_ecltaunn_n_cdc_sector;
@@ -389,7 +400,7 @@ namespace Belle2 {
     std::vector<std::vector<std::vector<int>>> m_ecltaunn_I_input;
 
 
-    ClassDef(TRGGRLConfig, 6);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(TRGGRLConfig, 8);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
 } // end of namespace Belle2

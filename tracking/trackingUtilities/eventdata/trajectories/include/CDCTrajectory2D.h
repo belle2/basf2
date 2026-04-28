@@ -295,13 +295,13 @@ namespace Belle2 {
       /// Get the momentum at the support point of the trajectory
       Vector2D getMom2DAtSupport(const double bZ) const
       {
-        return getFlightDirection2DAtSupport() *= getAbsMom2D(bZ);
+        return getFlightDirection2DAtSupport() * getAbsMom2D(bZ);
       }
 
       /// Get the momentum at the support point of the trajectory
       Vector2D getMom2DAtSupport() const
       {
-        return getFlightDirection2DAtSupport() *= getAbsMom2D();
+        return getFlightDirection2DAtSupport() * getAbsMom2D();
       }
 
       /// Get the unit direction of flight at the given point, where arcLength2D = 0.

@@ -6,17 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtSemiLeptonicVectorAmp.hh"
-#include "EvtGenBase/EvtSemiLeptonicScalarAmp.hh"
+#include <EvtGenBase/EvtParticle.hh>
+#include <EvtGenBase/EvtPDL.hh>
 #include <string>
 
-#include "generators/evtgen/EvtGenModelRegister.h"
-#include "generators/evtgen/models/EvtHNLBCL.h"
-#include "generators/evtgen/models/EvtBCLFF.h"
-#include "generators/evtgen/models/EvtHNLSemiLeptonicScalarAmp.h"
-#include "generators/evtgen/models/EvtHNLSemiLeptonicVectorAmp.h"
+#include <generators/evtgen/EvtGenModelRegister.h>
+#include <generators/evtgen/models/EvtHNLBCL.h>
+#include <generators/evtgen/models/EvtBCLFF.h>
+#include <generators/evtgen/models/EvtHNLSemiLeptonicScalarAmp.h>
+#include <generators/evtgen/models/EvtHNLSemiLeptonicVectorAmp.h>
 
 
 namespace Belle2 {

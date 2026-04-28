@@ -57,8 +57,7 @@ settings = CalibrationSettings(
         # Fix one of the parameters in the dEdx:beta*gamma fit, which makes the fit much more stable.
         "FixUnstableFitParameter": True,
         # In case of large changes in dEdx:beta*gamma trend with time, might need to set to False.
-        "NEventsToGenerate": 5e5,  # how many events to generate in each momentum bin, for the new payloads?
-        "UsePionBGFunctionForEverything": False,  # if the dEdx:beta*gamma fit is unstable, use the pion fit for all hadrons?
+        "UsePionBGFunctionForEverything": True,  # if the dEdx:beta*gamma fit is unstable, use the pion fit for all hadrons?
         # (This can save us if the calibration failed due to e.g. kaon fit issue.)
         "UseProtonBGFunctionForEverything": False,  # if the dEdx:beta*gamma fit is unstable, use the proton fit for all hadrons?
         "NumROCpoints": 175,  # only for full validation: number of pionts for the ROC scan
@@ -85,7 +84,8 @@ def create_path(rerun_reco, rerun_pid, isMC, expert_config):
                 branchNames=HLT_INPUT_OBJECTS,
                 entrySequences=[f'0:{max_events_per_file - 1}'],
                 logLevel=b2.LogLevel.ERROR)
-            re.add_unpackers(path=rec_path)
+            from rawdata import add_unpackers
+            add_unpackers(path=rec_path)
         else:
             rec_path.add_module('RootInput', branchNames=list(DIGITS_OBJECTS) + [
                 'MCParticles',
@@ -271,7 +271,6 @@ def get_calibrations(input_data, **kwargs):
     algo.setNumDEdxBins(expert_config['NBinsdEdx'])
     algo.setDEdxCutoff(expert_config['dedxCutoff'])
     algo.setMinEvtsPerTree(expert_config['MinEvtsPerTree'])
-    algo.setNEventsToGenerate(int(expert_config['NEventsToGenerate']))
     algo.setUsePionBGFunctionForEverything(expert_config['UsePionBGFunctionForEverything'])
     algo.setUseProtonBGFunctionForEverything(expert_config['UseProtonBGFunctionForEverything'])
     algo.setCustomProfile(expert_config['CustomProfile'])

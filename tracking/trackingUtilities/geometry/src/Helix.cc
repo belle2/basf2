@@ -29,8 +29,8 @@ using namespace TrackingUtilities;
 double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) const
 {
   // The point may happen to lie in the center of the helix.
-  double d0 = circleXY().distance(point.xy());
-  double denominator = 1 + curvatureXY() * d0;
+  double loc_d0 = circleXY().distance(point.xy());
+  double denominator = 1 + curvatureXY() * loc_d0;
   if (denominator == 0) {
     // When this happens we can optimise the z distance for the closest point
     double arcLength2D = (point.z() - z0()) / tanLambda();

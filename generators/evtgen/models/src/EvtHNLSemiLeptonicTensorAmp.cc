@@ -6,26 +6,16 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "generators/evtgen/models/EvtHNLSemiLeptonicTensorAmp.h"
+#include <generators/evtgen/models/EvtHNLSemiLeptonicTensorAmp.h>
 
-#include "EvtGenBase/EvtAmp.hh"
-#include "EvtGenBase/EvtDiracSpinor.hh"
-#include "EvtGenBase/EvtGenKine.hh"
-#include "EvtGenBase/EvtId.hh"
-#include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtPatches.hh"
-#include "EvtGenBase/EvtReport.hh"
-#include "EvtGenBase/EvtSemiLeptonicFF.hh"
-#include "EvtGenBase/EvtTensor4C.hh"
-#include "EvtGenBase/EvtVector4C.hh"
-
-#include <iostream>
-#include <fstream>
-#include <random>
-#include <vector>
-#include <sstream>
-using std::endl;
+#include <EvtGenBase/EvtAmp.hh>
+#include <EvtGenBase/EvtDiracSpinor.hh>
+#include <EvtGenBase/EvtId.hh>
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtParticle.hh>
+#include <EvtGenBase/EvtSemiLeptonicFF.hh>
+#include <EvtGenBase/EvtTensor4C.hh>
+#include <EvtGenBase/EvtVector4C.hh>
 
 void EvtHNLSemiLeptonicTensorAmp::CalcAmp(EvtParticle* parent, EvtAmp& amp,
                                           EvtSemiLeptonicFF* FormFactors)
@@ -174,7 +164,7 @@ void EvtHNLSemiLeptonicTensorAmp::CalcAmp(EvtParticle* parent, EvtAmp& amp,
                                parent->getDaug(1)->spParent(1));
     } else {
       EvtGenReport(EVTGEN_ERROR, "EvtGen")
-          << "dfnb89agngri wrong lepton number\n";
+          << "Wrong lepton number\n";
     }
   }
 

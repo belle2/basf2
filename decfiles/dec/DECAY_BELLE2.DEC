@@ -97,6 +97,14 @@
 # June 2023, Meihong Liu (liumh19@fudan.edu.cn)
 # Updated the B0 -> D+(**)npi BFs according to latest PDG/paper measurements.
 
+# April 2026, Jyotirmoi Borah (borah@fudan.edu.cn)
+# Changed PYTHIA codes for the following; Work Item: https://gitlab.desy.de/belle2/software/basf2/-/work_items/10855
+# In mode: 0.04675983 anti-u d c anti-d, PYTHIA 65 changed to PYTHIA 43 to match corresponding B0 Pythia code
+# In mode: 0.02134689 anti-u s c anti-d, PYTHIA 63 changed to PYTHIA 43 to match corresponding B0 Pythia code
+
+# April 2026, Vitalii Lisovskyi (lisovskyi@cppm.in2p3.fr)
+# Updated the decay modes of the Xi_c* baryons to latest knowledge.
+
 Define qoverp_incohMix_B_s0 1.0
 Define dm_incohMix_B_s0 17.8e12
 Define qoverp_incohMix_B0 1.0
@@ -3949,8 +3957,8 @@ Decay anti-B0
 0.00609912    cs_1  anti-ud_1                              PYTHIA 63;
 
 0.27430729    anti-u  d  c  anti-d                         PYTHIA 23;
-0.04675983    anti-u  d  c  anti-d                         PYTHIA 65;
-0.02134689    anti-u  s  c  anti-d                         PYTHIA 63;
+0.04675983    anti-u  d  c  anti-d                         PYTHIA 43; # PYTHIA 65 changed to PYTHIA 43 to match corresponding B0 PYTHIA decay
+0.02134689    anti-u  s  c  anti-d                         PYTHIA 43; # PYTHIA 63 changed to PYTHIA 43 to match corresponding B0 PYTHIA decay
 0.01829735    anti-u  c  d  anti-d                         PYTHIA 23;
 0.00091486    anti-u  c  s  anti-d                         PYTHIA 23;
 # Try to crank up the psi production (Lange).
@@ -12364,16 +12372,18 @@ CDecay anti-Sigma_c*--
 
 # Xi_c(2645)*0
 Decay Xi_c*0
-0.500000000   Xi_c0  pi0                                   PHSP;
-0.500000000   Xi_c0  gamma                                 PHSP;
+0.333500000   Xi_c0  pi0                                   PHSP;
+0.666000000   Xi_c+  pi-                                   PHSP;
+0.000500000   Xi_c0  gamma                                 PHSP; # [theory estimate from 2109.01216]
 Enddecay
 
 CDecay anti-Xi_c*0
 
 # Xi_c(2645)*+
 Decay Xi_c*+
-0.500000000   Xi_c+  pi0                                   PHSP;
-0.500000000   Xi_c+  gamma                                 PHSP;
+0.325000000   Xi_c+  pi0                                   PHSP;
+0.650000000   Xi_c0  pi+                                   PHSP;
+0.025000000   Xi_c+  gamma                                 PHSP; # [theory estimate from 2109.01216]
 Enddecay
 
 CDecay anti-Xi_c*-

@@ -31,11 +31,7 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility.
-      Vector3D()
-        : m_xy(0.0, 0.0)
-        , m_z(0.0)
-      {
-      }
+      Vector3D() = default;
 
       /// Constructor translating from a TVector3 instance
       explicit Vector3D(const TVector3& tVector3);
@@ -569,10 +565,10 @@ namespace Belle2 {
 
     private:
       /// Memory for the first and second coordinate available as a vector
-      Vector2D m_xy;
+      Vector2D m_xy{0.0, 0.0};
 
       /// Memory for the third coordinate
-      double m_z;
+      double m_z = 0.0;
     };
 
     /// non-memberfunction for subtracting a Vector2D from any generic Vector that implements .X(), .Y(), and Z()

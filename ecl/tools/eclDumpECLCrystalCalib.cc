@@ -98,10 +98,13 @@ int main(int argc, char** argv)
   TString htitle = payloadTitle;
   htitle += " values;cellID";
   TH1F* existingPayload = new TH1F("existingPayload", htitle, ECLElementNumbers::c_NCrystals, 1, 8737);
+  htitle += " uncertainty";
+  TH1F* existingUncertainty = new TH1F("existingUncertainty", htitle, ECLElementNumbers::c_NCrystals, 1, 8737);
 
   for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
     existingPayload->SetBinContent(cellID, currentValues[cellID - 1]);
     existingPayload->SetBinError(cellID, currentUnc[cellID - 1]);
+    existingUncertainty->SetBinContent(cellID, currentUnc[cellID - 1]);
   }
 
   hfile.cd();

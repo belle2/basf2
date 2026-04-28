@@ -6,18 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <stdlib.h>
-#include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
-#include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtReport.hh"
+#include <EvtGenBase/EvtParticle.hh>
+#include <EvtGenBase/EvtPDL.hh>
 #include <string>
 
-#include "generators/evtgen/EvtGenModelRegister.h"
-#include "generators/evtgen/models/EvtHNLBGL.h"
-#include "generators/evtgen/models/EvtBGLFF.h"
-#include "generators/evtgen/models/EvtHNLSemiLeptonicScalarAmp.h"
-#include "generators/evtgen/models/EvtHNLSemiLeptonicVectorAmp.h"
+#include <generators/evtgen/EvtGenModelRegister.h>
+#include <generators/evtgen/models/EvtHNLBGL.h>
+#include <generators/evtgen/models/EvtBGLFF.h>
+#include <generators/evtgen/models/EvtHNLSemiLeptonicScalarAmp.h>
+#include <generators/evtgen/models/EvtHNLSemiLeptonicVectorAmp.h>
 
 B2_EVTGEN_REGISTER_MODEL(EvtHNLBGL);
 

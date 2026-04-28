@@ -8,9 +8,12 @@
 
 #include <cdc/dbobjects/CDCDedxInjectionTime.h>
 
+#include <TCanvas.h>
+#include <TH1F.h>
+
 using namespace Belle2;
 
-void CDCDedxInjectionTime::printCorrection(std::string svar, std::string sfx) const
+void CDCDedxInjectionTime::printCorrection(const std::string& svar, const std::string& sfx) const
 {
 
   if (svar != "mean" && svar != "reso") {
@@ -76,8 +79,7 @@ void CDCDedxInjectionTime::printCorrection(std::string svar, std::string sfx) co
 
 }
 
-
-double CDCDedxInjectionTime::getCorrection(std::string svar, unsigned int ring, unsigned int time) const
+double CDCDedxInjectionTime::getCorrection(const std::string& svar, unsigned int ring, unsigned int time) const
 {
   if (svar != "mean" && svar != "reso") {
     B2ERROR("wrong var input, choose mean or reso");

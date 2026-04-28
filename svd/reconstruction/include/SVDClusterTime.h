@@ -84,7 +84,7 @@ namespace Belle2::SVD {
     double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
 
     /** trigger bin */
-    int m_triggerBin = std::numeric_limits<int>::quiet_NaN();
+    int m_triggerBin = 0;
 
     /** to be used for time calibration  */
     bool m_returnRawClusterTime = false;

@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-# disable doxygen check for this file
-# @cond
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -51,6 +48,7 @@ class TestJob(TestCase):
         job1.output_dir = Path(test_dir, job1.name, "output_dir").absolute().as_posix()
         job1.cmd = ["bash", test_script.name]
         job1.input_sandbox_files = [test_script.as_posix()]
+        #: first job
         self.job1 = job1
 
         name2 = 'TestJob2'
@@ -66,14 +64,20 @@ class TestJob(TestCase):
         job_dict["setup_cmds"] = []
         job_dict["backend_args"] = {}
         job_dict["subjobs"] = [{"id": i, "input_files": [], "args": [str(i)]} for i in range(4)]
+        #: job dictionary
         self.job2_dict = job_dict
-        self.job2 = Job(name2, job_dict=job_dict)  # Set up this one from a dictionary
+        #: Set up job from a dictionary
+        self.job2 = Job(name2, job_dict=job_dict)
 
         # Create a directory just in case we need it for each test so that we can delete everything easily at the end
         test_dir.mkdir(parents=True, exist_ok=False)
 
     def test_dict_setup(self):
-        self.maxDiff = None  # If this test fails you will need to see the diff of a large dictionary
+        """
+        Test dictionary setup
+        """
+        #: If this test fails you will need to see the diff of a large dictionary
+        self.maxDiff = None
         self.assertEqual(len(self.job2.subjobs), 4)
         self.assertEqual(self.job2_dict, self.job2.job_dict)
         self.job2_dict["subjobs"].pop()
@@ -81,6 +85,9 @@ class TestJob(TestCase):
         self.assertEqual(self.job2_dict, self.job2.job_dict)
 
     def test_job_json_serialise(self):
+        """
+        Test job with json serialisation
+        """
         json_path = Path(test_dir, "job2.json")
         self.job2.dump_to_json(json_path)
         job2_copy = Job.from_json(json_path)
@@ -214,5 +221,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# @endcond

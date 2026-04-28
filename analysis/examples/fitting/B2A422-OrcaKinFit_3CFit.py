@@ -77,6 +77,3 @@ variablesToNtuple('beam:kinfit', Auvars,
 
 # Process the events
 b2.process(mypath)
-
-# print out the summary
-print(b2.statistics)

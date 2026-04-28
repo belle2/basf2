@@ -114,6 +114,9 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
 
 void SVDClusterizerModule::beginRun()
 {
+  // False by default, reset in endRun()
+  m_isMC = Environment::Instance().isMC();
+
   if (m_useDB) {
     if (!m_recoConfig.isValid())
       B2FATAL("no valid configuration found for SVD reconstruction");
@@ -359,7 +362,7 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   //--------------
   double time = std::numeric_limits<double>::quiet_NaN();
   double timeError = std::numeric_limits<double>::quiet_NaN();
-  int firstFrame = std::numeric_limits<int>::quiet_NaN();
+  int firstFrame = 0;
 
   double charge = std::numeric_limits<double>::quiet_NaN();
   double seedCharge = std::numeric_limits<float>::quiet_NaN();
@@ -411,18 +414,20 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
     writeClusterRelations(rawCluster);
 
     //alter cluster position and time on MC to match resolution measured on data
-    bool isMC = Environment::Instance().isMC();
-    if (isMC) {
-      alterClusterPosition();
-      alterClusterTime();
+    if (m_isMC) {
+      // if no truehit associated to the cluster there is nothing to fudge
+      int clsIndex = m_storeClusters.getEntries() - 1;
+      SVDTrueHit* trueHit = m_storeClusters[clsIndex]->getRelatedTo<SVDTrueHit>(m_storeTrueHitsName);
+      if (trueHit) {
+        alterClusterPosition(trueHit);
+        alterClusterTime();
+      }
     }
-
     //shift cluster time:
     //1. by cluster size
     //2. by absolute value
     if (!m_returnRawClusterTime &&  m_shiftSVDClusterTime)
-      if (m_svdClusterTimeShifter.isValid() &&
-          m_svdAbsTimeShift.isValid()) {
+      if (m_svdClusterTimeShifter.isValid() && m_svdAbsTimeShift.isValid()) {
         shiftSVDClusterTime();
       }
   }
@@ -496,9 +501,7 @@ double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID 
 
   const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(vxdID));
 
-  bool isMC = Environment::Instance().isMC();
-
-  if ((vxdID.getLayerNumber() == 3) && ! isMC)
+  if ((vxdID.getLayerNumber() == 3) && ! m_isMC)
     position += sensorInfo.getLorentzShift(isU, position);
   else
     position -= sensorInfo.getLorentzShift(isU, position);
@@ -506,7 +509,7 @@ double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID 
   return position;
 }
 
-void SVDClusterizerModule::alterClusterPosition()
+void SVDClusterizerModule::alterClusterPosition(SVDTrueHit* trueHit)
 {
   // alter the position of the last cluster in the array
   int clsIndex = m_storeClusters.getEntries() - 1;
@@ -517,18 +520,12 @@ void SVDClusterizerModule::alterClusterPosition()
   bool isU = m_storeClusters[clsIndex]->isUCluster();
   int layerNum = sensorID.getLayerNumber();
 
-  // get the first true hit in the array
-  SVDTrueHit* trueHit = m_storeClusters[clsIndex]->getRelatedTo<SVDTrueHit>(m_storeTrueHitsName);
-
   // get the track's incident angle
   double trkAngle = 0.;
 
-  // check if cluster has associated true hit
-  if (trueHit) {
-    double trkLength = isU ? trueHit->getExitU() - trueHit->getEntryU() : trueHit->getExitV() - trueHit->getEntryV();
-    double trkHeight = std::abs(trueHit->getExitW() - trueHit->getEntryW());
-    trkAngle = atan2(trkLength, trkHeight);
-  }
+  double trkLength = isU ? trueHit->getExitU() - trueHit->getEntryU() : trueHit->getExitV() - trueHit->getEntryV();
+  double trkHeight = std::abs(trueHit->getExitW() - trueHit->getEntryW());
+  trkAngle = atan2(trkLength, trkHeight);
 
   // get the appropriate sigma to alter the position
   double sigma = m_mcPositionFudgeFactor.getFudgeFactor(sensorID, isU, trkAngle);
@@ -599,4 +596,6 @@ void SVDClusterizerModule::endRun()
   delete m_position6SampleClass;
   delete m_position3SampleClass;
 
+  //reset m_isMC, re-check at the next beginRun
+  m_isMC = false;
 }

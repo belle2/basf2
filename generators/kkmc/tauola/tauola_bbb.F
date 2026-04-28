@@ -1785,6 +1785,8 @@ C
       IF (MNUM.GE.31.AND.MNUM.LE.34) MNUM=7 
       IF (MNUM.GE.35.AND.MNUM.LE.38) MNUM=13 
       IF (MNUM.GE.39.AND.MNUM.LE.46) MNUM=14 
+      IF (MNUM.GE.49.AND.MNUM.LE.51) MNUM=13
+      IF (MNUM.GE.52.AND.MNUM.LE.57) MNUM=14
       IF ((MNUM.EQ.9.OR.MNUM.EQ.0).AND.IRCHL3PI.EQ.1) THEN ! so far rchl only for 3pi modes
          FPI=GETFPIRPT(1) ! GET  defined in in ffwid3pi.f  of RChL-currents
        ELSE
@@ -1908,7 +1910,7 @@ C
        BRAK= (GV**2+GA**2)*PT(4)*PIVEC(4) +2.*GV*GA*PT(4)*PIAKS(4)
      &      +2.*(GV**2-GA**2)*AMNUTA*AMTAU*BRAKM
        AMPLIT=(GFERMI)**2*BRAK/2.
-       IF (MNUM.GE.49) THEN   ! dead code under this if ! 20->31->47 (May 2020) -> 49 (Oct 2020) [SwB]
+       IF (MNUM.GT.58) THEN   ! dead code under this if ! 20->31->47 (May 2020) -> 49 (Oct 2020) -> 58 (Apr 2026) [SwB]
          PRINT *, 'MNUM=',MNUM
          ZNAK=-1.0
          XM1=0.0
@@ -3564,6 +3566,9 @@ C       PRINT *, 'DWLNEW: I, JNPI, -ISGN, KFPI = ',I,JNPI,-ISGN,KFPI
      c       (MODE.EQ.45.OR.MODE.EQ.46.OR.MODE.EQ.47.OR.
      c        MODE.EQ.48.OR.MODE.EQ.49.OR.MODE.EQ.50.OR.
      c        MODE.EQ.130.OR.MODE.EQ.131.OR.MODE.EQ.132.OR.
+     c        MODE.EQ.151.OR.MODE.EQ.152.OR.MODE.EQ.153.OR.
+     c        MODE.EQ.154.OR.MODE.EQ.155.OR.MODE.EQ.156.OR.
+     c        MODE.EQ.157.OR.MODE.EQ.158.OR.MODE.EQ.159.OR.
      c        MODE.EQ.236.OR.MODE.EQ.237.OR.MODE.EQ.238.OR.
      c        MODE.EQ.239.OR.MODE.EQ.240.OR.MODE.EQ.241.OR.
      c        MODE.EQ.250.OR.MODE.EQ.251.OR.MODE.EQ.252.OR.
@@ -3692,6 +3697,9 @@ C
       ELSE IF (MODE.EQ.45.OR.
      c        MODE.EQ.48.OR.
      c        MODE.EQ.130.OR.
+     c        MODE.EQ.151.OR.
+     c        MODE.EQ.154.OR.
+     c        MODE.EQ.157.OR.
      c        MODE.EQ.236.OR.
      c        MODE.EQ.239.OR.
      c        MODE.EQ.250.OR.
@@ -3703,6 +3711,9 @@ C
       ELSE IF (MODE.EQ.46.OR.
      c         MODE.EQ.49.OR.
      c         MODE.EQ.131.OR.
+     c         MODE.EQ.152.OR.
+     c         MODE.EQ.155.OR.
+     c         MODE.EQ.158.OR.
      c         MODE.EQ.237.OR.
      c         MODE.EQ.240.OR.
      c         MODE.EQ.251.OR.
@@ -3714,6 +3725,9 @@ C
       ELSE IF (MODE.EQ.47.OR.
      c         MODE.EQ.50.OR.
      c         MODE.EQ.132.OR.
+     c         MODE.EQ.153.OR.
+     c         MODE.EQ.156.OR.
+     c         MODE.EQ.159.OR.
      c         MODE.EQ.238.OR.
      c         MODE.EQ.241.OR.
      c         MODE.EQ.252.OR.
@@ -4150,7 +4164,7 @@ c
      +   WRITE (6,'(''Mass(P4(nutau)) = '',F14.7,'' MeV'')') MS*1000.0
         CALL PYNAME(IDHEP(I),CHAP)
         IF (IDHEP(I).EQ.94144) CHAP = 'alpha'
-        IF (IDHEP(I).EQ.53) CHAP = 'hl'
+        IF (IDHEP(I).EQ.53) CHAP = 'ds'
         IF (IDHEP(I).EQ.26) CHAP = 'zp'
         IF (IFL.EQ.0) THEN
           WRITE (6,'(2I6,I8,1X,A10,1X,4I6,6(1X,F10.5))')

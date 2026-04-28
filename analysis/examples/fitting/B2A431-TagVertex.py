@@ -103,6 +103,3 @@ variablesToNtuple('B0:jpsiks', bvars,
 
 # Process the events
 b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)

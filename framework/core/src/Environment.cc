@@ -93,7 +93,7 @@ Environment::Environment() :
   m_numberProcessesOverride(-1),
   m_logLevelOverride(LogConfig::c_Default),
   m_visualizeDataFlow(false),
-  m_noStats(false),
+  m_stats(false),
   m_dryRun(false),
   m_mcEvents(0),
   m_run(-1),
@@ -102,23 +102,23 @@ Environment::Environment() :
   m_skipNEvents(0),
   m_writeSimSteps(false)
 {
-  // Check for environment variables set by setuprel
+  // Check for environment variables set by b2setup
   const char* envarReleaseDir = getenv("BELLE2_RELEASE_DIR");
   const char* envarLocalDir = getenv("BELLE2_LOCAL_DIR");
   const char* envarAnalysisDir = getenv("BELLE2_ANALYSIS_DIR");
   if (!envarReleaseDir and !envarLocalDir) {
-    B2FATAL("The basf2 environment is not set up. Please execute the 'setuprel' script first.");
+    B2FATAL("The basf2 environment is not set up. Please execute the 'b2setup' script first.");
   }
 
   //also set when just sourcing setup_belle2.sh (which is why we also check for local/release dir)
   const char* envarSubDir = getenv("BELLE2_SUBDIR");
   if (!envarSubDir) {
-    B2FATAL("The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first.");
+    B2FATAL("The environment variable BELLE2_SUBDIR is not set. Please execute the 'b2setup' script first.");
   }
 
   const char* envarExtDir = getenv("BELLE2_EXTERNALS_DIR");
   if (!envarExtDir) {
-    B2FATAL("The environment variable BELLE2_EXTERNALS_DIR is not set. Please execute the 'setuprel' script first.");
+    B2FATAL("The environment variable BELLE2_EXTERNALS_DIR is not set. Please execute the 'b2setup' script first.");
   }
 
   // add module directories for current build options, starting with the working directory on program startup

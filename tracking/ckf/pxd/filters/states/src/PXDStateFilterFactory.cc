@@ -7,18 +7,18 @@
  **************************************************************************/
 #include <tracking/ckf/pxd/filters/states/PXDStateFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NegativeFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/SloppyFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AndFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NegativeFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/SloppyFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/TruthVarFilter.icc.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/ckf/general/filters/AdvanceFilter.h>
 #include <tracking/ckf/general/filters/KalmanFilter.h>
@@ -32,7 +32,7 @@
 #include <tracking/ckf/pxd/filters/states/NonIPCrossingPXDStateFilter.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// MC filter for VXD - CDC relations.
@@ -106,7 +106,7 @@ std::unique_ptr<BasePXDStateFilter>
 PXDStateFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BasePXDStateFilter>>();
+    return std::make_unique<TrackingUtilities::NoneFilter<BasePXDStateFilter>>();
   } else if (filterName == "all") {
     return std::make_unique<AllPXDStateFilter>();
   } else if (filterName == "advance") {

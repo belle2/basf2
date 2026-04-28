@@ -23,7 +23,7 @@ b2.set_random_seed('mixed')
 # create path
 main = b2.create_path()
 
-# default to early phase 3 (exp=1003), run 0, number of events = 100000
+# default to Run 1 (early phase 3) (exp=1003), run 0, number of events = 100000
 main.add_module("EventInfoSetter", expList=1003, runList=0, evtNumList=100000)
 
 # generate BBbar events
@@ -33,6 +33,5 @@ ge.add_evtgen_generator(path=main, finalstate='mixed')
 main.add_module('RootOutput', outputFileName='../mixed.cdst.root')
 
 main.add_module('Progress')
-# process events and print call statistics
+# process events
 b2.process(path=main)
-print(b2.statistics)

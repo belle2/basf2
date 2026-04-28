@@ -9,8 +9,6 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <pxd/dataobjects/PXDCluster.h>
 
 // ROOT includes
 #include <TMatrixD.h>
@@ -18,9 +16,15 @@
 // GenFit includes
 #include <genfit/PlanarMeasurement.h>
 #include <genfit/HMatrixUV.h>
-#include <genfit/TrackCandHit.h>
+
+namespace genfit {
+  class TrackCandHit;
+}
 
 namespace Belle2 {
+  class PXDTrueHit;
+  class PXDCluster;
+
   /**
    * PXDRecoHit - an extended form of PXDCluster containing geometry information.
    *

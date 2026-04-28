@@ -66,7 +66,6 @@ cdcdedx_params = {  # 'pdfFile': 'YourPDFFile.root',
     'removeLowest': 0.05,
     'removeHighest': 0.25,
     'onlyPrimaryParticles': False,
-    'enableDebugOutput': True,
     'ignoreMissingParticles': False,
 }
 cdcdedx.param(cdcdedx_params)
@@ -119,5 +118,5 @@ main.add_module(svddedx)
 main.add_module(output)
 
 # process events and print call statistics
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

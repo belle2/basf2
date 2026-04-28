@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/filters/wireHit/ChooseableWireHitFilter.h>
 #include <vector>
 #include <string>
@@ -15,15 +15,18 @@
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
+  }
+
+  namespace TrackFindingCDC {
 
     /// Marks hits as background based on the result of a filter
-    class WireHitBackgroundDetector : public Findlet<CDCWireHit&> {
+    class WireHitBackgroundDetector : public TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHit&>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&>;
 
     public:
       /// Default constructor
@@ -36,7 +39,7 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main algorithm marking hit as background
-      void apply(std::vector<CDCWireHit>& wireHits) final;
+      void apply(std::vector<TrackingUtilities::CDCWireHit>& wireHits) final;
 
     private:
 

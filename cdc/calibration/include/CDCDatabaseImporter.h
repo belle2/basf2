@@ -8,7 +8,6 @@
 #pragma once
 
 #include <string>
-#include <TObject.h>
 
 namespace Belle2 {
 

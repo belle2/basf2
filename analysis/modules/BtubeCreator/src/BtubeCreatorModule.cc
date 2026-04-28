@@ -21,6 +21,10 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
 
+// rave
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
+
 // Magnetic field
 #include <framework/geometry/BFieldManager.h>
 

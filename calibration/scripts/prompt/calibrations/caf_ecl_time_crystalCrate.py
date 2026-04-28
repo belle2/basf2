@@ -24,22 +24,23 @@ import copy
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script.
-#     Default is to read in "bhabha_all_calib" since we want to
-#     run over cdst bhabha_all_calib skim files.  Also load in
+#     Default is to read in "bhabha_combined_calib" since we want to
+#     run over cdst bhabha_combined_calib skim files.  Also load in
 #     the hadron skim for validations.
 settings = CalibrationSettings(
     name="ECL crystal and crate time calibrations and validations",
     expert_username="hearty",
+    subsystem="ecl",
     description=__doc__,
     input_data_formats=["cdst"],
-    input_data_names=["bhabha_all_calib", "hadron_calib"],
-    input_data_filters={"bhabha_all_calib": [INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
-                                             INPUT_DATA_FILTERS["Beam Energy"]["4S"],
-                                             INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
-                                             INPUT_DATA_FILTERS["Beam Energy"]["Scan"],
-                                             INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
-                                             INPUT_DATA_FILTERS["Run Type"]["physics"],
-                                             INPUT_DATA_FILTERS["Magnet"]["On"]],
+    input_data_names=["bhabha_combined_calib", "hadron_calib"],
+    input_data_filters={"bhabha_combined_calib": [INPUT_DATA_FILTERS["Data Tag"]["bhabha_combined_calib"],
+                                                  INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+                                                  INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
+                                                  INPUT_DATA_FILTERS["Beam Energy"]["Scan"],
+                                                  INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                                  INPUT_DATA_FILTERS["Run Type"]["physics"],
+                                                  INPUT_DATA_FILTERS["Magnet"]["On"]],
                         "hadron_calib": [INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
                                          INPUT_DATA_FILTERS["Beam Energy"]["4S"],
                                          INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
@@ -51,7 +52,8 @@ settings = CalibrationSettings(
     expert_config={"numCrysCrateIterations": 1,
                    "maxNumberEvents": 50000000,
                    "payload_boundaries": [],
-                   "t0_bhabhaToHadron_correction": 0})
+                   "t0_bhabhaToHadron_correction": 0},
+    produced_payloads=["ECLCrateTimeOffset", "ECLCrystalTimeOffset", "ECLCrystalTimeOffsetBhabha"])
 
 
 ##############################
@@ -123,7 +125,7 @@ def get_calibrations(input_data, **kwargs):
     # Get the input files from the input_data variable
     # The input data should be the bhabha skim for the calibrations
     # and the hadron skim for the validations.
-    file_to_iov_bhabha = input_data["bhabha_all_calib"]
+    file_to_iov_bhabha = input_data["bhabha_combined_calib"]
     file_to_iov_hadron = input_data["hadron_calib"]
 
     # Set the maximum limits on the number of files/events per run.

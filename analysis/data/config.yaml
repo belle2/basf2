@@ -1,0 +1,9 @@
+---
+# database i/o parameters
+database_io:
+  download_folder: FlavorTagging/TrainedMethods
+  download_from_database: False # download from db if weight files not found
+# signal_fraction
+# For smooth output set to -1, this will break the calibration.
+# For correct calibration set to -2, leads to peaky combiner output.
+signal_fraction: -2

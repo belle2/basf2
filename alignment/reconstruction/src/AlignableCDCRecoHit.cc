@@ -14,7 +14,7 @@
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include "Math/ChebyshevPol.h"
+#include <Math/ChebyshevPol.h>
 
 using namespace std;
 using namespace Belle2;
@@ -34,7 +34,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
   const B2Vector3D& wirePositon = sop->getPlane()->getO();
   const unsigned short layer = getWireID().getICLayer();
 
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   double alpha = cdcgeo.getAlpha(wirePositon, mom);
   double theta = cdcgeo.getTheta(mom);
   const TVectorD& stateOnPlane = sop->getState();
@@ -256,7 +256,7 @@ TMatrixD AlignableCDCRecoHit::localDerivatives(const genfit::StateOnPlane* sop)
   const B2Vector3D& wirePositon = sop->getPlane()->getO();
   const unsigned short layer = getWireID().getICLayer();
 
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   const double alpha = cdcgeo.getAlpha(wirePositon, mom);
   const double theta = cdcgeo.getTheta(mom);
   const TVectorD& stateOnPlane = sop->getState();

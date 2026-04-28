@@ -9,19 +9,19 @@
 
 #include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     // Guard to prevent repeated instantiations
-    extern template class FilterFactory<BaseTrackRelationFilter>;
+    // extern template class TrackingUtilities::FilterFactory<BaseTrackRelationFilter>;
 
     /// Factory that can create appropriate track relation filters from associated names.
-    class TrackRelationFilterFactory : public FilterFactory<BaseTrackRelationFilter> {
+    class TrackRelationFilterFactory : public TrackingUtilities::FilterFactory<BaseTrackRelationFilter> {
 
     private:
       /// Type of the base class
-      using Super = FilterFactory<BaseTrackRelationFilter>;
+      using Super = TrackingUtilities::FilterFactory<BaseTrackRelationFilter>;
 
     public:
       /// Constructor forwarding the default filter name

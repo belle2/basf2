@@ -33,7 +33,7 @@ add_reconstruction(main)
 main.add_module(eklm_alignment_along_strips)
 
 # generate events
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # show call statistics
 print(basf2.statistics)

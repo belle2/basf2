@@ -11,7 +11,7 @@
 """
 <header>
   <output>../GenericB_GENSIMRECtoDST.dst.root</output>
-  <contact>Frank Meier; frank.meier@duke.edu</contact>
+  <contact>Paul Feichtinger; paul.feichtinger@ijs.si</contact>
 </header>
 """
 
@@ -19,6 +19,7 @@ import basf2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from beamparameters import add_beamparameters
+from validationgenerators import add_evtgen_for_validation
 
 basf2.set_random_seed(12345)
 
@@ -36,7 +37,7 @@ beamparameters = add_beamparameters(main, "Y4S")
 basf2.print_params(beamparameters)
 
 # generate BBbar events
-main.add_module('EvtGenInput')
+add_evtgen_for_validation(main)
 
 # detector simulation,  digitisers and clusterisers
 add_simulation(main)
@@ -52,6 +53,3 @@ main.add_module(output)
 main.add_module('Progress')
 # Go!
 basf2.process(main)
-
-# Print call statistics
-print(basf2.statistics)

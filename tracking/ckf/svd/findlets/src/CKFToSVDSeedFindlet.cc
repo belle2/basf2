@@ -13,14 +13,14 @@
 #include <tracking/ckf/general/findlets/StateRejecter.icc.h>
 #include <tracking/ckf/general/findlets/StateCreatorWithReversal.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
+#include <tracking/trackingUtilities/utilities/ParameterVariant.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CKFToSVDSeedFindlet::~CKFToSVDSeedFindlet() = default;
 
@@ -90,7 +90,7 @@ void CKFToSVDSeedFindlet::apply()
   const auto hasNoCDCHits = [](const RecoTrack * recoTrack) {
     return recoTrack->getNumberOfCDCHits() == 0;
   };
-  TrackFindingCDC::erase_remove_if(m_cdcRecoTrackVector, hasNoCDCHits);
+  TrackingUtilities::erase_remove_if(m_cdcRecoTrackVector, hasNoCDCHits);
 
   m_hitsLoader.apply(m_spacePointVector);
 
@@ -110,7 +110,7 @@ void CKFToSVDSeedFindlet::apply()
   const auto hasLowHitNumber = [this](const CKFResult<RecoTrack, SpacePoint>& result) {
     return result.getHits().size() < m_param_minimalHitRequirement;
   };
-  TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
+  TrackingUtilities::erase_remove_if(m_results, hasLowHitNumber);
   B2DEBUG(29, "After filtering: Having found " << m_results.size() << " results before overlap check");
 
   m_recoTrackRelator.apply(m_results, m_relationsCDCToSVD);

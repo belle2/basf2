@@ -9,19 +9,19 @@
 
 #include <tracking/trackFindingCDC/filters/wireHit/BaseWireHitFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Guard to prevent repeated instantiations
-    extern template class FilterFactory<BaseWireHitFilter>;
+    // extern template class TrackingUtilities::FilterFactory<BaseWireHitFilter>;
 
     /// Factory that can create appropriate wireHit filters from associated names.
-    class WireHitFilterFactory : public FilterFactory<BaseWireHitFilter> {
+    class WireHitFilterFactory : public TrackingUtilities::FilterFactory<BaseWireHitFilter> {
 
     private:
       /// Type of the base class
-      using Super = FilterFactory<BaseWireHitFilter>;
+      using Super = TrackingUtilities::FilterFactory<BaseWireHitFilter>;
 
     public:
       /// Constructor forwarding the default filter name

@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-# disable doxygen check for this file
-# @cond
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -88,13 +85,15 @@ def monitor_jobs(args, jobs):
 
 
 class ArgumentsGenerator():
+    """
+    Simple little class to hold a generator (uninitialised) and the necessary args/kwargs to
+    initialise it. This lets us reuse a generator by setting it up again fresh. This is not
+    optimal for expensive calculations, but it is nice for making large sequences of
+    Job input arguments on the fly.
+    """
+
     def __init__(self, generator_function, *args, **kwargs):
         """
-        Simple little class to hold a generator (uninitialised) and the necessary args/kwargs to
-        initialise it. This lets us reuse a generator by setting it up again fresh. This is not
-        optimal for expensive calculations, but it is nice for making large sequences of
-        Job input arguments on the fly.
-
         Parameters:
             generator_function (py:function): A function (callable) that contains a ``yield`` statement. This generator
                 should *not* be initialised i.e. you haven't called it with ``generator_function(*args, **kwargs)``
@@ -204,10 +203,15 @@ class SubjobSplitter(ABC):
                "won't automatically have arguments assigned.")
 
     def __repr__(self):
+        """
+        """
         return f"{self.__class__.__name__}"
 
 
 class MaxFilesSplitter(SubjobSplitter):
+    """
+
+    """
 
     def __init__(self, *, arguments_generator=None, max_files_per_subjob=1):
         """
@@ -237,6 +241,9 @@ class MaxFilesSplitter(SubjobSplitter):
 
 
 class MaxSubjobsSplitter(SubjobSplitter):
+    """
+
+    """
 
     def __init__(self, *, arguments_generator=None, max_subjobs=1000):
         """
@@ -354,31 +361,30 @@ class Job:
         self.name = name
         #: The `SubjobSplitter` used to create subjobs if necessary
         self.splitter = None
+        #: Files to be copied directly into the working directory (`pathlib.Path`).
+        #  Not the input root files, those should be in `Job.input_files`.
+        self.input_sandbox_files = []
+        #: Working directory of the job (`pathlib.Path`). Default is '.', mostly used in Local() backend
+        self.working_dir = Path()
+        #: Output directory (`pathlib.Path`), where we will download our output_files to. Default is '.'
+        self.output_dir = Path()
+        #: Files that we produce during the job and want to be returned. Can use wildcard (*)
+        self.output_patterns = []
+        #: Command and arguments as a list that will be run by the job on the backend
+        self.cmd = []
+        #: The arguments that will be applied to the `cmd` (These are ignored by SubJobs as they have their own arguments)
+        self.args = []
+        #: Input files to job (`str`), a list of these is copied to the working directory.
+        self.input_files = []
+        #: Bash commands to run before the main self.cmd (mainly used for batch system setup)
+        self.setup_cmds = []
+        #: Config dictionary for the backend to use when submitting the job.
+        #: Saves us from having multiple attributes that may or may not be used.
+        self.backend_args = {}
+        #: dict of subjobs assigned to this job
+        self.subjobs = {}
 
-        if not job_dict:
-            #: Files to be copied directly into the working directory (`pathlib.Path`).
-            #  Not the input root files, those should be in `Job.input_files`.
-            self.input_sandbox_files = []
-            #: Working directory of the job (`pathlib.Path`). Default is '.', mostly used in Local() backend
-            self.working_dir = Path()
-            #: Output directory (`pathlib.Path`), where we will download our output_files to. Default is '.'
-            self.output_dir = Path()
-            #: Files that we produce during the job and want to be returned. Can use wildcard (*)
-            self.output_patterns = []
-            #: Command and arguments as a list that will be run by the job on the backend
-            self.cmd = []
-            #: The arguments that will be applied to the `cmd` (These are ignored by SubJobs as they have their own arguments)
-            self.args = []
-            #: Input files to job (`str`), a list of these is copied to the working directory.
-            self.input_files = []
-            #: Bash commands to run before the main self.cmd (mainly used for batch system setup)
-            self.setup_cmds = []
-            #: Config dictionary for the backend to use when submitting the job.
-            #: Saves us from having multiple attributes that may or may not be used.
-            self.backend_args = {}
-            #: dict of subjobs assigned to this job
-            self.subjobs = {}
-        elif job_dict:
+        if job_dict:
             self.input_sandbox_files = [Path(p) for p in job_dict["input_sandbox_files"]]
             self.working_dir = Path(job_dict["working_dir"])
             self.output_dir = Path(job_dict["output_dir"])
@@ -388,7 +394,6 @@ class Job:
             self.input_files = job_dict["input_files"]
             self.setup_cmds = job_dict["setup_cmds"]
             self.backend_args = job_dict["backend_args"]
-            self.subjobs = {}
             for subjob_dict in job_dict["subjobs"]:
                 self.create_subjob(subjob_dict["id"], input_files=subjob_dict["input_files"], args=subjob_dict["args"])
 
@@ -456,6 +461,8 @@ class Job:
         return self._status
 
     def _get_overall_status_from_subjobs(self):
+        """
+        """
         subjob_statuses = [subjob.status for subjob in self.subjobs.values()]
         status_level = min([self.statuses[status] for status in subjob_statuses])
         for status, level in self.statuses.items():
@@ -473,6 +480,8 @@ class Job:
         else:
             B2INFO(f"Setting {self.name} status to {status}")
         self._status = status
+
+    # \cond silence doxygen warnings
 
     @property
     def output_dir(self):
@@ -524,6 +533,8 @@ class Job:
         self.splitter = MaxFilesSplitter(max_files_per_subjob=value)
         B2DEBUG(29, f"Changed splitter to {self.splitter} for {self}.")
 
+    # \endcond
+
     def dump_to_json(self, file_path):
         """
         Dumps the Job object configuration to a JSON file so that it can be read in again later.
@@ -531,11 +542,15 @@ class Job:
         Parameters:
           file_path(`basf2.Path`): The filepath we'll dump to
         """
+        # \cond false positive doxygen warning about job_dict
         with open(file_path, mode="w") as job_file:
             json.dump(self.job_dict, job_file, indent=2)
+        # \endcond
 
     @classmethod
     def from_json(cls, file_path):
+        """
+        """
         with open(file_path) as job_file:
             job_dict = json.load(job_file)
         return cls(job_dict["name"], job_dict=job_dict)
@@ -946,6 +961,9 @@ class Local(Backend):
             self.result = result
 
         def _update_result_status(self):
+            """
+            Update result status
+            """
             if self.result.ready() and (self.job.status not in self.job.exit_statuses):
                 return_code = self.result.get()
                 if return_code:
@@ -1190,6 +1208,9 @@ class Batch(Backend):
         raise NotImplementedError("This is an abstract submit(job) method that shouldn't have been called. "
                                   "Did you submit a (Sub)Job?")
 
+    # Doxygen doesn't understand @method_dispatch overloads (def _) and emits
+    # "no uniquely matching class member found" warnings. Hide them from doxygen.
+    # @cond
     @submit.register(SubJob)
     def _(self, job, check_can_submit=True, jobs_per_check=100):
         """
@@ -1310,6 +1331,7 @@ class Batch(Backend):
                 for job in jobs_to_submit:
                     self.submit(job, check_can_submit, jobs_per_check)
         B2INFO(f"All {len(jobs)} requested jobs submitted")
+    # @endcond  # end hiding of @method_dispatch overloads
 
     def get_batch_submit_script_path(self, job):
         """
@@ -1354,6 +1376,8 @@ class PBS(Batch):
     default_backend_args = {"queue": "short"}
 
     def __init__(self, *, backend_args=None):
+        """
+        """
         super().__init__(backend_args=backend_args)
 
     def _add_batch_directives(self, job, batch_file):
@@ -1478,6 +1502,9 @@ class PBS(Batch):
                 self.job.status = new_job_status
 
         def _get_status_from_output(self, output):
+            """
+            Get status from output
+            """
             for job_info in output["JOBS"]:
                 if job_info["Job_Id"] == self.job_id:
                     return job_info["job_state"]
@@ -1617,6 +1644,8 @@ class LSF(Batch):
     default_backend_args = {"queue": "s"}
 
     def __init__(self, *, backend_args=None):
+        """
+        """
         super().__init__(backend_args=backend_args)
 
     def _add_batch_directives(self, job, batch_file):
@@ -1730,6 +1759,9 @@ class LSF(Batch):
                 self.job.status = new_job_status
 
         def _get_status_from_output(self, output):
+            """
+            Get status from output
+            """
             if output["JOBS"] and "ERROR" in output["JOBS"][0]:
                 if output["JOBS"][0]["ERROR"] == f"Job <{self.job_id}> is not found":
                     raise KeyError(f"No job record in the 'output' argument had the 'JOBID'=={self.job_id}")
@@ -2279,5 +2311,3 @@ class SplitterError(Exception):
     """
     Base exception class for SubjobSplitter objects.
     """
-
-# @endcond

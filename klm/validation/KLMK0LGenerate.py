@@ -19,8 +19,7 @@
 import basf2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-
-basf2.set_log_level(basf2.LogLevel.WARNING)
+from validationgenerators import add_evtgen_for_validation
 
 # Fixed random seed
 basf2.set_random_seed(123456)
@@ -28,33 +27,19 @@ basf2.set_random_seed(123456)
 # Create main path
 main = basf2.create_path()
 
-# Event data
-eventinfosetter = basf2.register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [2000])
-
-# Evtgen and beam parameters.
-evtgen = basf2.register_module('EvtGenInput')
-evtgen.param('userDECFile', basf2.find_file('klm/validation/btojpsikl0.dec'))
-
-# Add progress bars
-progress = basf2.register_module('Progress')
-progressBar = basf2.register_module('ProgressBar')
-
-# Output
-output = basf2.register_module('RootOutput')
-output.param('outputFileName', '../KLMK0LOutput.root')
-
 # Add modules to main path
-main.add_module(eventinfosetter)
-main.add_module(evtgen)
+main.add_module('EventInfoSetter', evtNumList=[2000])
+
+add_evtgen_for_validation(main)
+basf2.set_module_parameters(main, name='EvtGenInput', userDECFile=basf2.find_file('klm/validation/btojpsikl0.dec'))
 
 add_simulation(path=main)
 add_reconstruction(path=main)
 
-main.add_module(progress)
-main.add_module(progressBar)
+main.add_module('Progress')
+main.add_module('ProgressBar')
 
-main.add_module(output)
+main.add_module('RootOutput', outputFileName='../KLMK0LOutput.root')
 
 # Process the path
 basf2.process(main)

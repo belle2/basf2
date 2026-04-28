@@ -12,6 +12,9 @@
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.dcl.h>
 
 namespace Belle2 {
+  namespace TrackingUtilities {
+    class CDCTrack;
+  }
   namespace TrackFindingCDC {
 
     /// Filter for the construction of track relations based on MC information.
@@ -30,7 +33,8 @@ namespace Belle2 {
 
     public:
       /// Checks if a track relation is a good combination.
-      Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCTrack& fromTrack,
+                                           const TrackingUtilities::CDCTrack& toTrack) final;
     };
   }
 }

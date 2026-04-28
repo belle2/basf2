@@ -7,10 +7,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <TMatrixFSym.h>
+#include <analysis/VertexFitting/KFit/KFitBase.h>
 
 #include <analysis/utility/ROOTToCLHEP.h>
-#include <analysis/VertexFitting/KFit/KFitBase.h>
+#include <analysis/dataobjects/Particle.h>
 
 using namespace std;
 using namespace Belle2;

@@ -7,13 +7,15 @@
  **************************************************************************/
 
 #include <pxd/calibration/PXDClusterPositionCalibrationAlgorithm.h>
+#include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
+#include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
 
 #include <string>
 #include <tuple>
-#include "TH2F.h"
-#include "TMatrixDSym.h"
-#include "TVectorD.h"
-#include "TMatrixDSymEigen.h"
+#include <TH2F.h>
+#include <TMatrixDSym.h>
+#include <TVectorD.h>
+#include <TMatrixDSymEigen.h>
 
 #include <boost/format.hpp>
 #include <cmath>

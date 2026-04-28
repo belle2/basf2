@@ -12,13 +12,13 @@
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/DBObjPtr.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <string>
 
 namespace Belle2 {
+  template<class T> class OptionalDBObjPtr;
 
   /**
    * Module to append weights from the database into the extraInfo of Particles.

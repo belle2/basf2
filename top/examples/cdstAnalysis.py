@@ -92,7 +92,7 @@ ma.variablesToNtuple(decayString='pi+:all', variables=var_list, treename='tree',
 main.add_module('Progress')
 
 # process events
-process(main)
+process(main, calculateStatistics=True)
 
 # Print statistics
 print(statistics)

@@ -7,13 +7,14 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/cluster/BkgTruthClusterVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 void BkgTruthClusterVarSet::initialize()
 {

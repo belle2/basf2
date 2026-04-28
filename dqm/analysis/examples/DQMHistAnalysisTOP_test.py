@@ -55,7 +55,7 @@ main.add_module('DQMHistAnalysisOutputFile',
                 SaveCanvases=True)
 
 # Process all event at main path
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print modules' statistics
 print(b2.statistics)

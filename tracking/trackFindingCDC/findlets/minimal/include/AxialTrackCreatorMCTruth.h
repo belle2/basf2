@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <vector>
 #include <string>
@@ -15,16 +15,20 @@
 namespace Belle2 {
 
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
     class CDCWireHit;
+  }
+
+  namespace TrackFindingCDC {
 
     /// Findlet that generates tracks from wire hits using the mc truth information.
-    class AxialTrackCreatorMCTruth : public Findlet<const CDCWireHit, CDCTrack> {
+    class AxialTrackCreatorMCTruth : public
+      TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit, TrackingUtilities::CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHit, CDCTrack>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit, TrackingUtilities::CDCTrack>;
 
     public:
       /// Expose the parameters to a module
@@ -40,8 +44,8 @@ namespace Belle2 {
       void beginEvent() final;
 
       /// Main function of the track finding by the cellular automaton.
-      void apply(const std::vector<CDCWireHit>& inputWireHits,
-                 std::vector<CDCTrack>& outputAxialTracks) final;
+      void apply(const std::vector<TrackingUtilities::CDCWireHit>& inputWireHits,
+                 std::vector<TrackingUtilities::CDCTrack>& outputAxialTracks) final;
 
     private:
       /// Parameter : Setup the drift length as it can be estimated from two dimensional information

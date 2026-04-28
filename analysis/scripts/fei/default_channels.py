@@ -1080,7 +1080,7 @@ def get_ccbarLambdaC_channels(
     """
     returns list of Particle objects with all default channels for running
     FEI on ccbar to tag Lambda_c+ decays
-    These channel list has not been optimized yet and currenlty serves
+    These channel list has not been optimized yet and currently serves
     only as an example for FEI application on ccbar events.
     @param specific if True, this adds isInRestOfEvent cut to all FSP
     @param addPi0 if True, this adds pi0 to all channels
@@ -1578,7 +1578,7 @@ def get_ccbarLambdaC_channels(
     ]
 
     ccbarTag_user_cut = '1.8 < mRecoil < 2.6'
-    variables.addAlias('ccbarTagSignalBinary', 'conditionalVariableSelector(ccbarTagSignal==1,1,0)')
+    variables.addAlias('ccbarTagSignalBinary', 'conditionalVariableSelector(extraInfo(ccbarTagSignal)==1,1,0)')
 
     # region 6th stage
     LambdaCTag = Particle(

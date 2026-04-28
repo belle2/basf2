@@ -35,10 +35,10 @@ namespace Belle2 {
        * Constructor.
        *
        * @param mCharge Magnetic charge of the monopole, in e+ units
-       * @param nam Name of the ionisation process in GEANT4
+       * @param name Name of the ionisation process in GEANT4
        */
       explicit G4mplIonisationWithDeltaModel(G4double mCharge,
-                                             const G4String& nam = "mplIonisationWithDelta");
+                                             const G4String& name = "mplIonisationWithDelta");
 
       /**
        * Destructor.

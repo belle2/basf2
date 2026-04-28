@@ -32,7 +32,7 @@ namespace Belle2 {
     OnlineEventT0CreatorModule();
 
     /** Destructor */
-    virtual ~OnlineEventT0CreatorModule() = default;
+    virtual ~OnlineEventT0CreatorModule() override = default;
 
     /** Initialize: check DataStore content*/
     void initialize() override;

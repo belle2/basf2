@@ -74,7 +74,7 @@ void setdeadch()
 {
   const static int MAX_N_LAYERS = 8;
 
-  const int N_config = 82;
+  const int N_config = 96;
 
   const int run[N_config][4] = { //itnitial exp, initial run, end exp, end run
     {0,    0,    7,  3585}, // 0
@@ -158,7 +158,21 @@ void setdeadch()
     {30, 2980,   33,   85}, // 78 2024/4/11
     {33,   86,   33, 1010}, // 79 2024/5/18
     {33, 1011,   33, 1062}, // 80 2024/6/21
-    {33, 1063,   -1,   -1}  // 81 2024/6/23
+    {33, 1063,   34,   -1}, // 81 2024/6/23
+    {35,    0,   35,  307}, // 82 2024/10/2
+    {35,  308,   35,  344}, // 83 2024/10/11
+    {35,  345,   35,  414}, // 84 2024/10/13
+    {35,  415,   35,  777}, // 85 2024/10/16
+    {35,  778,   35, 1073}, // 86 2024/10/29
+    {35, 1074,   35, 1178}, // 87 2024/11/07
+    {35, 1179,   35, 1239}, // 88 2024/11/09
+    {35, 1240,   35, 1279}, // 89 2024/11/12
+    {35, 1280,   35, 1458}, // 90 2024/11/13
+    {35, 1459,   35, 1782}, // 91 2024/11/20
+    {35, 1783,   35, 1970}, // 92 2024/12/02
+    {35, 1971,   35, 2246}, // 93 2024/12/09
+    {35, 2247,   35, 2478}, // 94 2024/12/16
+    {35, 2479,   -1,  -1}   // 95 2024/12/20
   };
 
 
@@ -251,7 +265,20 @@ void setdeadch()
   mgr[79].push_back(3051);
   mgr[80].push_back(6070);
   //81 no mask
-
+  mgr[82].push_back(2001); mgr[82].push_back(4001); mgr[82].push_back(5080);
+  mgr[83].push_back(4010);
+  mgr[84].push_back(4010);
+  mgr[85].push_back(4010); mgr[85].push_back(3050);
+  mgr[86].push_back(4010); mgr[86].push_back(5081);
+  mgr[87].push_back(4010); mgr[87].push_back(3050);
+  mgr[88].push_back(4010); mgr[88].push_back(4020); mgr[88].push_back(4021);
+  //89 no mask
+  mgr[90].push_back(4011); mgr[90].push_back(5001); mgr[90].push_back(5060); mgr[90].push_back(5081);
+  mgr[91].push_back(4020); mgr[91].push_back(4021); mgr[91].push_back(5081);
+  mgr[92].push_back(4020); mgr[92].push_back(4021);
+  mgr[93].push_back(4020); mgr[93].push_back(4021); mgr[93].push_back(4010); mgr[93].push_back(4011);
+  mgr[94].push_back(4020); mgr[94].push_back(4021); mgr[94].push_back(4010); mgr[94].push_back(4011);
+  mgr[95].push_back(4020); mgr[95].push_back(4021); mgr[95].push_back(4010); mgr[95].push_back(4011);
 
   auto badch_map = new bool[N_config][9][8][384]; //sl layer ch
   for (int i = 0; i < N_config; i++) {

@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/hough/baseelements/LinearDivision.h>
 #include <tracking/trackFindingCDC/hough/boxes/Box.h>
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <framework/logging/Logger.h>
 
@@ -17,6 +17,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 TEST(TrackFindingCDCTest, SumInfinities)
@@ -45,7 +46,7 @@ TEST(TrackFindingCDCTest, LinearDivision_createBoxes)
     B2INFO("Lower bounds: " << subBox.getLowerBound<0>() << ", " << subBox.getLowerBound<1>());
     B2INFO("Upper bounds: " << subBox.getUpperBound<0>() << ", " << subBox.getUpperBound<1>());
 
-    EXPECT_EQ(i % 3 , subBox.getLowerBound<0>());
+    EXPECT_EQ(i % 3, subBox.getLowerBound<0>());
     EXPECT_EQ(i / 3, subBox.getLowerBound<1>());
 
     EXPECT_EQ(i % 3 + 1, subBox.getUpperBound<0>());

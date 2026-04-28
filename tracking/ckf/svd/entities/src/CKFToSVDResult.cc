@@ -8,7 +8,7 @@
 
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 
-#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
+#include <tracking/trackingUtilities/utilities/ReversedRange.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
@@ -16,12 +16,12 @@
 
 using namespace Belle2;
 
-CKFToSVDResult::CKFToSVDResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& path) :
+CKFToSVDResult::CKFToSVDResult(const std::vector<TrackingUtilities::WithWeight<const CKFToSVDState*>>& path) :
   Super(path, path.back()->getMeasuredStateOnPlane())
 {
   B2ASSERT("Path should not be empty", not path.empty());
 
-  for (const TrackFindingCDC::WithWeight<const CKFToSVDState*>& state : path) {
+  for (const TrackingUtilities::WithWeight<const CKFToSVDState*>& state : path) {
     const RecoTrack* relatedSVDTrack = state->getRelatedSVDTrack();
     if (m_relatedSVDRecoTrack) {
       B2ASSERT("There is a state with a different VXD track in it!", m_relatedSVDRecoTrack == relatedSVDTrack);
@@ -34,7 +34,7 @@ CKFToSVDResult::CKFToSVDResult(const std::vector<TrackFindingCDC::WithWeight<con
 void CKFToSVDResult::addToRecoTrack(RecoTrack& recoTrack) const
 {
   unsigned int sortingParameter = 0;
-  for (const SpacePoint* spacePoint : TrackFindingCDC::reversedRange(getHits())) {
+  for (const SpacePoint* spacePoint : TrackingUtilities::reversedRange(getHits())) {
     RelationVector<SVDCluster> relatedClusters = spacePoint->getRelationsTo<SVDCluster>();
     for (const SVDCluster& cluster : relatedClusters) {
       recoTrack.addSVDHit(&cluster, sortingParameter, Belle2::RecoHitInformation::c_CDCtoSVDCKF);

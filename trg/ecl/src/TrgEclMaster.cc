@@ -81,7 +81,7 @@ using namespace Belle2;
 //
 //
 TrgEclMaster::TrgEclMaster():
-  m_TimeWindow(250.0), m_OverlapWindow(0.0), m_Clustering(1), m_Bhabha(0),
+  m_TimeWindow(250.0), m_OverlapWindow(0.0), m_Clustering(1),
   m_EventTiming(1), m_NofTopTC(3), m_ClusterLimit(6), m_Triggerbit{0, 0, 0, 0},
   m_Lowmultibit(0), m_PrescaleFactor(0), m_PrescaleCounter(0)
 {

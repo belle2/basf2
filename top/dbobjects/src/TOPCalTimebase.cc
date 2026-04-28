@@ -14,7 +14,7 @@ using namespace std;
 
 namespace Belle2 {
 
-  typedef map<unsigned, size_t>::const_iterator Iterator; /**< Iteratior for m_map */
+  typedef map<unsigned, size_t>::const_iterator Iterator; /**< Iterator for m_map */
 
 
   void TOPCalTimebase::append(unsigned scrodID, unsigned channel,

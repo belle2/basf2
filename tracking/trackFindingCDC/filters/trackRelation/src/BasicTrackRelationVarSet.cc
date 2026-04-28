@@ -7,10 +7,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/trackRelation/BasicTrackRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool BasicTrackRelationVarSet::extract(const Relation<const CDCTrack>* ptrTrackRelation)
 {

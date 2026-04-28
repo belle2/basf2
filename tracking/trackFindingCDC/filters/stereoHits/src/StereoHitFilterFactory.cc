@@ -10,21 +10,22 @@
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitTruthVarSet.h>
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/RandomFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RandomFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   using AllStereoHitFilter = AllFilter<BaseStereoHitFilter>;
@@ -37,7 +38,7 @@ namespace {
   using MVAStereoHitFilter = MVAFilter<StereoHitVarSet>;
 }
 
-template class TrackFindingCDC::FilterFactory<BaseStereoHitFilter>;
+template class TrackingUtilities::FilterFactory<BaseStereoHitFilter>;
 
 StereoHitFilterFactory::StereoHitFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

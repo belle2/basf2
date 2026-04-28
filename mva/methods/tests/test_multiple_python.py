@@ -12,7 +12,9 @@ import basf2_mva_util
 
 
 def write_dummy_file(variables, size=10, target_variable="target"):
-    data = np.random.normal(size=[size, len(variables) + 1])
+    # Set a random seed and generate
+    rng = np.random.default_rng(42)
+    data = rng.normal(size=[size, len(variables) + 1])
     tree = {}
     for i, name in enumerate(variables):
         tree[name] = data[:, i]

@@ -62,4 +62,3 @@ if __name__ == "__main__":
 
     basf2.print_path(path)
     basf2.process(path)
-    print(basf2.statistics)

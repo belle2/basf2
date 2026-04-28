@@ -72,7 +72,7 @@ else:
 add_reconstruction(main)
 
 # process events, print call statistics, and write statistics to a csv file
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)
 if args.csv is not None:
     b2.statistics.csv(args.csv)

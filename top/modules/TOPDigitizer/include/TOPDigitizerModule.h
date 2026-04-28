@@ -31,6 +31,7 @@
 #include <top/dbobjects/TOPCalChannelNoise.h>
 #include <top/dbobjects/TOPFrontEndSetting.h>
 #include <top/dbobjects/TOPCalTimeWalk.h>
+#include <top/dbobjects/TOPCalPrecision.h>
 
 #include <top/modules/TOPDigitizer/PulseHeightGenerator.h>
 
@@ -91,9 +92,10 @@ namespace Belle2 {
      * @param trgOffset trigger related time offset
      * @param moduleID slot ID
      * @param pixelID pixel ID
+     * @param generate if true, generate additional time spread according to calibration systematics
      * @return time offset and its error squared
      */
-    TimeOffset getTimeOffset(double trgOffset, int moduleID, int pixelID);
+    TimeOffset getTimeOffset(double trgOffset, int moduleID, int pixelID, bool generate = false);
 
     /**
      * Generates and returns pulse height
@@ -124,8 +126,8 @@ namespace Belle2 {
     int m_lookBackWindows;     /**< number of "look back" windows */
 
     // datastore objects
-    StoreArray<TOPSimHit> m_simHits;        /**< collection of simuated hits */
-    StoreArray<TOPSimCalPulse> m_simCalPulses; /**< collection of simuated cal pulses */
+    StoreArray<TOPSimHit> m_simHits;        /**< collection of simulated hits */
+    StoreArray<TOPSimCalPulse> m_simCalPulses; /**< collection of simulated cal pulses */
     StoreArray<MCParticle> m_mcParticles;   /**< collection of MC particles */
     StoreObjPtr<SimClockState> m_simClockState; /**< generated hardware clock state */
     StoreArray<TOPRawWaveform> m_waveforms; /**< collection of waveforms */
@@ -141,7 +143,8 @@ namespace Belle2 {
     DBObjPtr<TOPCalChannelPulseHeight> m_pulseHeights; /**< pulse height param. */
     DBObjPtr<TOPCalChannelThreshold> m_thresholds; /**< channel thresholds */
     DBObjPtr<TOPCalChannelNoise> m_noises; /**< channel noise levels (r.m.s) */
-    OptionalDBObjPtr<TOPCalTimeWalk> m_timeWalk;   /**< time-walk calibration constants */
+    DBObjPtr<TOPCalTimeWalk> m_timeWalk;   /**< time-walk calibration constants */
+    DBObjPtr<TOPCalPrecision> m_calPrecision;   /**< calibration precision constants (systematics of channel T0) */
     DBObjPtr<TOPFrontEndSetting> m_feSetting;   /**< front-end settings */
 
     // default for no DB or calibration not available

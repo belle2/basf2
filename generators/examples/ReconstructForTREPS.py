@@ -27,7 +27,7 @@ reconstructDecay('gamma:Virtual -> pi+:MC pi-:MC', '', path=main)
 variablesToNtuple('gamma:Virtual', ['M', 'E', 'daughter(0, cosTheta)', 'daughter(1, cosTheta)'], path=main)
 
 # process
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # show call statistics
 print(basf2.statistics)

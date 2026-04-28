@@ -115,5 +115,5 @@ if __name__ == '__main__':
     main.add_module('HistoManager', histoFileName=histname)
 
     # Process all events
-    basf2.process(main)
+    basf2.process(main, calculateStatistics=True)
     print(basf2.statistics)

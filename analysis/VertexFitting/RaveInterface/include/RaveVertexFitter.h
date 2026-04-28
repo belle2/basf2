@@ -8,12 +8,11 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 
 //std
 #include <string>
-#include <iostream>
+#include <vector>
 
 //rave
 #include <rave/Track.h>
@@ -23,6 +22,7 @@
 #include <Math/Vector3D.h>
 
 namespace Belle2 {
+  class Particle;
   class TrackFitResult;
 
   namespace analysis {
@@ -42,10 +42,10 @@ namespace Belle2 {
       /** Destructor */
       ~RaveVertexFitter();
 
-      /** add a track (in the format of a Belle2::Particle) to set of tracks that should be fitted to a vertex */
+      /** add a track (in the format of a Particle) to set of tracks that should be fitted to a vertex */
       void addTrack(const Particle* const aParticlePtr);
 
-      /** add a track (in the format of a pointer to a Belle2::TrackFitResult) to set of tracks that should be fitted to a vertex */
+      /** add a track (in the format of a pointer to a TrackFitResult) to set of tracks that should be fitted to a vertex */
       void addTrack(const TrackFitResult* const aTrackPtr);
 
       /** All daughters of the argument of this function will be used as input for the vertex fit. */
@@ -123,7 +123,7 @@ namespace Belle2 {
       /** checks if the vertex the user requested via one of the getters it actually there*/
       void isVertexIdValid(const VecSize vertexId) const;
 
-      /** converts a track from Belle2::TrackFitResult format to rave::Track format*/
+      /** converts a track from TrackFitResult format to rave::Track format*/
       rave::Track TrackFitResultToRaveTrack(const TrackFitResult* const aTrackPtr) const;
       bool m_useBeamSpot; /**< flag determines if the beam spot will be used or not. Overwrites the global flag in RaveSetup */
 

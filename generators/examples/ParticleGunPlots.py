@@ -126,7 +126,7 @@ main.add_module(vertexsmear)
 main.add_module(showMCPart)
 
 # generate events
-process(main)
+process(main, calculateStatistics=True)
 
 # show call statistics
 print(statistics)

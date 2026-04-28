@@ -7,17 +7,17 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/SuperClusterCreator.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <cdc/topology/CDCWireLayer.h>
+#include <cdc/topology/CDCWire.h>
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilterUtil.h>
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
@@ -25,7 +25,9 @@
 #include <utility>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 SuperClusterCreator::SuperClusterCreator()
 {

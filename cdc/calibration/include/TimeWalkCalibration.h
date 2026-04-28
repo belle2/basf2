@@ -12,7 +12,6 @@
 
 #include <TH1D.h>
 #include <TH2D.h>
-#include "string"
 
 namespace Belle2 {
   namespace CDC {

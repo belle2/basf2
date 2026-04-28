@@ -75,7 +75,7 @@ namespace Belle2 {
       /// @return the initial TimeTable with only timedep payload rows and only 0s or 1s in rows
       /// - 0 means the payload is the same as in previous column
       /// - 1 means the payload can change at this column
-      TimeTable makeInitialTimeTable(std::vector<EventMetaData> events, GlobalLabel& label);
+      TimeTable makeInitialTimeTable(const std::vector< EventMetaData >& events, GlobalLabel& label);
 
       /// Convert the initial TimeTable (with 0s and 1s) to final table of payload indices
       /// @param table the initial table
@@ -90,6 +90,7 @@ namespace Belle2 {
           long unsigned int index);;
 
       /// Get cell (continuous index of payload) at given row and column
+      /// @param timeTable TimeTable
       /// @param uid of row
       /// @param timeid of column
       int getContinuousIndexByTimeID(const TimeTable& timeTable, int uid, int timeid);
@@ -133,7 +134,7 @@ namespace Belle2 {
       /// WARNING: The function expects event metadata tuple in form (event, run, exp) while the implementation internally
       /// reverses this for proper sorting of event metadata in sets!
       std::vector<EventMetaData> setupTimedepGlobalLabels(
-        std::vector< std::tuple< std::vector< int >, std::vector< std::tuple< int, int, int > > > >& config);
+        const std::vector< std::tuple< std::vector< int >, std::vector< std::tuple< int, int, int > > > >& config);
 
       /// Convenient class to automatically create payloads from allowed time
       /// dependence of parameter, load their value from database, update the constants one by one

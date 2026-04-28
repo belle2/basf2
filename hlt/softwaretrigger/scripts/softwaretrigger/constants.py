@@ -25,6 +25,14 @@ class SoftwareTriggerModes(Enum):
     filter = "filter"
 
 
+class HLTPrefilterModes(Enum):
+    """Enum of possible HLT prefilter modes"""
+    #: monitor (thank you documentation check)
+    monitor = "monitor"
+    #: filter (thank you documentation check)
+    filter = "filter"
+
+
 class Location(Enum):
     """Enum of possible run locations"""
     #: hlt (thank you documentation check)
@@ -43,6 +51,16 @@ class DQMModes(Enum):
     filtered = "filtered"
     #: If not in HLT, just all all DQM modules
     dont_care = "dont_care"
+
+
+class EventDistributionModes(Enum):
+    """Enum of event distribution modes inside the HLT farm"""
+    #: ringbuffer, also known as rfarm
+    ringbuffer = "ringbuffer"
+    #: zmq, also known as hbasf2
+    zmq = "zmq"
+    #: zmqbasf2
+    zmqbasf2 = "zmqbasf2"
 
 
 #: Always store those objects

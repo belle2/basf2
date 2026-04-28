@@ -202,6 +202,8 @@ def add_svd_ckf(
                     seedHitJumping=1,
                     hitHitJumping=1,
 
+                    trackFitType=DAFConfiguration.c_CDConly,
+
                     **module_parameters).set_name(f"CDCToSVDSpacePointCKF_{direction}")
 
 

@@ -12,6 +12,7 @@ from pybasf2 import B2WARNING, B2FATAL
 from ROOT import Belle2  # noqa: make the Belle2 namespace available
 
 from basf2 import register_module
+from geometry import is_detector_present, are_detectors_present, is_any_detector_present
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, add_cosmics_pxd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
@@ -66,11 +67,11 @@ def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=Fal
     """
 
     # Preparation of the SVD clusters
-    if is_svd_used(components):
+    if is_detector_present("SVD", components):
         add_svd_reconstruction(path)
 
     # Preparation of the PXD clusters
-    if is_pxd_used(components) and not pxd_filtering_offline and not create_intercepts_for_pxd_ckf:
+    if is_detector_present("PXD", components) and not pxd_filtering_offline and not create_intercepts_for_pxd_ckf:
         add_pxd_reconstruction(path)
 
 
@@ -248,17 +249,17 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                         RecoTracksStoreArrayName=mc_reco_tracks,
                         WhichParticles=[],
                         UseSecondCDCHits=use_second_cdc_hits,
-                        UsePXDHits=is_pxd_used(components),
-                        UseSVDHits=is_svd_used(components),
-                        UseCDCHits=is_cdc_used(components),
+                        UsePXDHits=is_detector_present("PXD", components),
+                        UseSVDHits=is_detector_present("SVD", components),
+                        UseCDCHits=is_detector_present("CDC", components),
                         SplitAfterDeltaT=split_after_delta_t)
 
         path.add_module('MCRecoTracksMatcher',
                         mcRecoTracksStoreArrayName=mc_reco_tracks,
                         prRecoTracksStoreArrayName=reco_tracks,
-                        UsePXDHits=is_pxd_used(components),
-                        UseSVDHits=is_svd_used(components),
-                        UseCDCHits=is_cdc_used(components))
+                        UsePXDHits=is_detector_present("PXD", components),
+                        UseSVDHits=is_detector_present("SVD", components),
+                        UseCDCHits=is_detector_present("CDC", components))
 
         if relate_tracks_to_mcparticles:
             path.add_module('TrackToMCParticleRelator')
@@ -280,7 +281,7 @@ def add_prune_tracks(path, components=None, reco_tracks="RecoTracks"):
     """
 
     # do not add any pruning, if no tracking detectors are in the components
-    if components and not ('SVD' in components or 'CDC' in components):
+    if components and not is_any_detector_present(["SVD", "CDC"], components):
         return
 
     path.add_module('PruneRecoTracks', storeArrayName=reco_tracks).set_name("PruneRecoTracks " + reco_tracks)
@@ -331,13 +332,13 @@ def add_flipping_of_recoTracks(
 def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_tracks, use_mc_truth=False,
                           add_both_directions=False, temporary_reco_tracks="PXDRecoTracks", **kwargs):
     """Add the pxd track finding to the path"""
-    if not is_pxd_used(components):
+    if not is_detector_present("PXD", components):
         return
 
     if use_mc_truth:
         # MC CKF needs MC matching information
         path.add_module("MCRecoTracksMatcher", UsePXDHits=False,
-                        UseSVDHits=is_svd_used(components), UseCDCHits=is_cdc_used(components),
+                        UseSVDHits=is_detector_present("SVD", components), UseCDCHits=is_detector_present("CDC", components),
                         mcRecoTracksStoreArrayName="MCRecoTracks",
                         prRecoTracksStoreArrayName=input_reco_tracks)
 
@@ -355,13 +356,13 @@ def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_track
 def add_pxd_cr_track_finding(path, components, input_reco_tracks, output_reco_tracks, use_mc_truth=False,
                              add_both_directions=False, temporary_reco_tracks="PXDRecoTracks", **kwargs):
     """Add the pxd track finding to the path"""
-    if not is_pxd_used(components):
+    if not is_detector_present("PXD", components):
         return
 
     if use_mc_truth:
         # MC CKF needs MC matching information
         path.add_module("MCRecoTracksMatcher", UsePXDHits=False,
-                        UseSVDHits=is_svd_used(components), UseCDCHits=is_cdc_used(components),
+                        UseSVDHits=is_detector_present("SVD", components), UseCDCHits=is_detector_present("CDC", components),
                         mcRecoTracksStoreArrayName="MCRecoTracks",
                         prRecoTracksStoreArrayName=input_reco_tracks)
 
@@ -425,7 +426,7 @@ def add_svd_track_finding(
            Defaults to "VXDTF2"
     """
 
-    if not is_svd_used(components):
+    if not is_detector_present("SVD", components):
         return
 
     if not input_reco_tracks or input_reco_tracks == "":
@@ -439,7 +440,7 @@ def add_svd_track_finding(
     if use_mc_truth:
         # MC CKF needs MC matching information
         path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=False,
-                        UseCDCHits=is_cdc_used(components),
+                        UseCDCHits=is_detector_present("CDC", components),
                         mcRecoTracksStoreArrayName="MCRecoTracks",
                         prRecoTracksStoreArrayName=input_reco_tracks)
 
@@ -607,8 +608,8 @@ def add_svd_standalone_tracking(path,
                                suffix=suffix)
 
         path.add_module('RecoTrackStoreArrayCombiner',
-                        Temp1RecoTracksStoreArrayName=reco_tracks+"VXDTF2",
-                        Temp2RecoTracksStoreArrayName=reco_tracks+"Hough",
+                        Temp1RecoTracksStoreArrayName=reco_tracks+"VXDTF2", Temp1SPTrackCandsStoreArrayName="SPTrackCands"+"VXDTF2",
+                        Temp2RecoTracksStoreArrayName=reco_tracks+"Hough",  Temp2SPTrackCandsStoreArrayName="SPTrackCands"+"Hough",
                         recoTracksStoreArrayName=reco_tracks)
         path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"VXDTF2").set_name("PruneRecoTracks " + reco_tracks+"VXDTF2")
         path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"Hough").set_name("PruneRecoTracks " + reco_tracks+"Hough")
@@ -627,8 +628,8 @@ def add_svd_standalone_tracking(path,
                                      suffix=suffix)
 
         path.add_module('RecoTrackStoreArrayCombiner',
-                        Temp1RecoTracksStoreArrayName=reco_tracks+"Hough",
-                        Temp2RecoTracksStoreArrayName=reco_tracks+"VXDTF2",
+                        Temp1RecoTracksStoreArrayName=reco_tracks+"Hough", Temp1SPTrackCandsStoreArrayName="SPTrackCands"+"Hough",
+                        Temp2RecoTracksStoreArrayName=reco_tracks+"VXDTF2", Temp2SPTrackCandsStoreArrayName="SPTrackCands"+"VXDTF2",
                         recoTracksStoreArrayName=reco_tracks)
         path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"Hough").set_name("PruneRecoTracks " + reco_tracks+"Hough")
         path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"VXDTF2").set_name("PruneRecoTracks " + reco_tracks+"VXDTF2")
@@ -639,7 +640,7 @@ def add_svd_standalone_tracking(path,
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_cdc_cellular_automaton=False,
                           use_second_hits=False, add_mva_quality_indicator=True,
-                          reattach_hits=False, skip_WireHitPreparer=False):
+                          reattach_hits=False, skip_WireHitPreparer=False, use_cat_finder=False):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -660,100 +661,117 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_cdc_cellul
     :param skip_WireHitPreparer: if True, the TFCDC_WireHitPreparer will be skipped. This is necessary if for instance
         the SVD tracking and the ToCDCCKF are run before the full CDC tracking, as the ToCDCCKF already reqires the WireHits
         to be present. Defaults to False, as for the default tracking chain it is required.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
     # add EventLevelTrackinginfo for logging errors
     if 'RegisterEventLevelTrackingInfo' not in path:
         path.add_module('RegisterEventLevelTrackingInfo')
 
-    # Init the geometry for cdc tracking and the hits and cut low ADC hits
-    if not skip_WireHitPreparer:
-        path.add_module("TFCDC_WireHitPreparer",
-                        wirePosition="aligned",
-                        useSecondHits=use_second_hits,
-                        flightTimeEstimation="outwards",
-                        filter="mva",
-                        filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
+    if not use_cat_finder:
+        if not skip_WireHitPreparer:
+            # Init the geometry for cdc tracking and the hits and cut low ADC hits
+            path.add_module("TFCDC_WireHitPreparer",
+                            wirePosition="aligned",
+                            useSecondHits=use_second_hits,
+                            flightTimeEstimation="outwards",
+                            filter="combined",
+                            filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
 
-    # Constructs clusters
-    path.add_module("TFCDC_ClusterPreparer",
-                    ClusterFilter="all",
-                    ClusterFilterParameters={})
+        # Constructs clusters
+        path.add_module("TFCDC_ClusterPreparer",
+                        ClusterFilter="all",
+                        ClusterFilterParameters={})
 
-    # Find segments within the clusters
-    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
-                    SegmentRelationFilterParameters={'DBPayloadName': 'trackfindingcdc_RealisticSegmentRelationFilterParameters'})
+        # Find segments within the clusters
+        path.add_module("TFCDC_SegmentFinderFacetAutomaton", SegmentRelationFilterParameters={
+                        'DBPayloadName': 'trackfindingcdc_RealisticSegmentRelationFilterParameters'})
 
-    # Find axial tracks
-    path.add_module("TFCDC_AxialTrackFinderLegendre")
+        # Find axial tracks
+        path.add_module("TFCDC_AxialTrackFinderLegendre")
 
-    # Improve the quality of the axial tracks
-    path.add_module("TFCDC_TrackQualityAsserter",
-                    corrections=["B2B"])
+        # Improve the quality of the axial tracks
+        path.add_module("TFCDC_TrackQualityAsserter",
+                        corrections=["B2B"])
 
-    # Find the stereo hits to those axial tracks
-    path.add_module('TFCDC_StereoHitFinder')
+        # Find the stereo hits to those axial tracks
+        path.add_module('TFCDC_StereoHitFinder')
 
-    # Combine segments with axial tracks
-    path.add_module('TFCDC_SegmentTrackCombiner',
-                    segmentTrackFilter="mva",
-                    segmentTrackFilterParameters={'DBPayloadName': 'trackfindingcdc_SegmentTrackFilterParameters'},
-                    trackFilter="mva",
-                    trackFilterParameters={'DBPayloadName': 'trackfindingcdc_TrackFilterParameters'})
+        # Combine segments with axial tracks
+        path.add_module('TFCDC_SegmentTrackCombiner',
+                        segmentTrackFilter="mva",
+                        segmentTrackFilterParameters={'DBPayloadName': 'trackfindingcdc_SegmentTrackFilterParameters'},
+                        trackFilter="mva",
+                        trackFilterParameters={'DBPayloadName': 'trackfindingcdc_TrackFilterParameters'})
 
-    output_tracks = "CDCTrackVector"
+        output_tracks = "CDCTrackVector"
 
-    if with_cdc_cellular_automaton:
-        output_tracks = "CombinedCDCTrackVector"
-        path.add_module("TFCDC_TrackFinderSegmentPairAutomaton",
-                        tracks="CDCTrackVector2")
+        if with_cdc_cellular_automaton:
+            output_tracks = "CombinedCDCTrackVector"
+            path.add_module("TFCDC_TrackFinderSegmentPairAutomaton",
+                            tracks="CDCTrackVector2")
 
-        # Overwrites the origin CDCTrackVector
-        path.add_module("TFCDC_TrackCombiner",
-                        inputTracks="CDCTrackVector",
-                        secondaryInputTracks="CDCTrackVector2",
-                        tracks=output_tracks)
+            # Overwrites the origin CDCTrackVector
+            path.add_module("TFCDC_TrackCombiner",
+                            inputTracks="CDCTrackVector",
+                            secondaryInputTracks="CDCTrackVector2",
+                            tracks=output_tracks)
 
-    # Improve the quality of all tracks and output
-    path.add_module("TFCDC_TrackQualityAsserter",
-                    inputTracks=output_tracks,
-                    corrections=[
-                        "LayerBreak",
-                        "OneSuperlayer",
-                        "Small",
-                    ])
-
-    if with_cdc_cellular_automaton:
-        # Add curlers in the axial inner most superlayer
-        path.add_module("TFCDC_TrackCreatorSingleSegments",
+        # Improve the quality of all tracks and output
+        path.add_module("TFCDC_TrackQualityAsserter",
                         inputTracks=output_tracks,
-                        MinimalHitsBySuperLayerId={0: 15})
+                        corrections=[
+                            "LayerBreak",
+                            "OneSuperlayer",
+                            "Small",
+                        ])
 
-    if add_mva_quality_indicator:
-        # Add CDC-specific mva method to set the quality indicator for the CDC tracks
+        if with_cdc_cellular_automaton:
+            # Add curlers in the axial inner most superlayer
+            path.add_module("TFCDC_TrackCreatorSingleSegments",
+                            inputTracks=output_tracks,
+                            MinimalHitsBySuperLayerId={0: 15})
+
+        if add_mva_quality_indicator:
+            # Add CDC-specific mva method to set the quality indicator for the CDC tracks
+            path.add_module(
+                "TFCDC_TrackQualityEstimator",
+                inputTracks=output_tracks,
+                filter='mva',
+                filterParameters={'DBPayloadName': 'trackfindingcdc_TrackQualityEstimatorParameters'},
+                deleteTracks=True,
+                resetTakenFlag=True
+            )
+
+        # Export CDCTracks to RecoTracks representation
+        path.add_module("TFCDC_TrackExporter",
+                        inputTracks=output_tracks,
+                        RecoTracksStoreArrayName="CDCRecoTracksBeforeReattaching" if reattach_hits else output_reco_tracks)
+
+        if reattach_hits:
+            # The ReattachCDCWireHitsToRecoTracks module (below) requires the SetupGenfitExtrapolation module
+            if 'SetupGenfitExtrapolation' not in path:
+                # Prepare Genfit extrapolation
+                path.add_module('SetupGenfitExtrapolation')
+
+                # Loop over low-ADC/TOT CDCWireHits and RecoTracks and reattach the hits to the tracks if they are close enough
+                path.add_module("ReattachCDCWireHitsToRecoTracks",
+                                inputRecoTracksStoreArrayName="CDCRecoTracksBeforeReattaching",
+                                outputRecoTracksStoreArrayName=output_reco_tracks)
+
+    else:
         path.add_module(
-            "TFCDC_TrackQualityEstimator",
-            inputTracks=output_tracks,
-            filter='mva',
-            filterParameters={'DBPayloadName': 'trackfindingcdc_TrackQualityEstimatorParameters'},
-            deleteTracks=True,
-            resetTakenFlag=True
+            "TFCDC_WireHitPreparer",
+            wirePosition="aligned",
+            useSecondHits=use_second_hits,
+            flightTimeEstimation="outwards",
+            filter="cuts_from_DB",
         )
 
-    # Export CDCTracks to RecoTracks representation
-    path.add_module("TFCDC_TrackExporter",
-                    inputTracks=output_tracks,
-                    RecoTracksStoreArrayName="CDCRecoTracksBeforeReattaching" if reattach_hits else output_reco_tracks)
-
-    if reattach_hits:
-        # The ReattachCDCWireHitsToRecoTracks module (below) requires the SetupGenfitExtrapolation module
-        if 'SetupGenfitExtrapolation' not in path:
-            # Prepare Genfit extrapolation
-            path.add_module('SetupGenfitExtrapolation')
-
-        # Loop over low-ADC/TOT CDCWireHits and RecoTracks and reattach the hits to the tracks if they are close enough
-        path.add_module("ReattachCDCWireHitsToRecoTracks",
-                        inputRecoTracksStoreArrayName="CDCRecoTracksBeforeReattaching",
-                        outputRecoTracksStoreArrayName=output_reco_tracks)
+        path.add_module(
+            "CATFinder",
+            recoTracksStoreArrayName=output_reco_tracks
+        )
 
     # Correct time seed (only necessary for the CDC tracks)
     path.add_module("IPTrackTimeEstimator",
@@ -765,7 +783,8 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_cdc_cellul
 
     # prepare mdst event level info
     path.add_module("CDCTrackingEventLevelMdstInfoFillerFromHits")
-    path.add_module("CDCTrackingEventLevelMdstInfoFillerFromSegments")
+    if not use_cat_finder:
+        path.add_module("CDCTrackingEventLevelMdstInfoFillerFromSegments")
 
 
 def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", prune_temporary_tracks=True):
@@ -780,12 +799,12 @@ def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", 
     :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     """
-    if not is_cdc_used(components) or not is_ecl_used(components):
+    if not are_detectors_present(["CDC", "ECL"], components):
         return
 
     ecl_cdc_reco_tracks = "ECLCDCRecoTracks"
 
-    if not is_svd_used(components):
+    if not is_detector_present("SVD", components):
         ecl_cdc_reco_tracks = output_reco_tracks
 
     # collections that will be pruned
@@ -839,7 +858,7 @@ def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", 
     # prepare mdst event level info
     # path.add_module("CDCTrackingEventLevelMdstInfoFiller")
 
-    if is_svd_used(components):
+    if is_detector_present("SVD", components):
         add_svd_track_finding(path, components=components, input_reco_tracks=ecl_cdc_reco_tracks,
                               output_reco_tracks=output_reco_tracks, use_mc_truth=False,
                               svd_ckf_mode="only_ckf", add_both_directions=False,
@@ -1005,7 +1024,7 @@ def add_vxd_track_finding_vxdtf2(
     ##########################
 
     # setting different for pxd and svd:
-    if is_pxd_used(components):
+    if is_detector_present("PXD", components):
         setup_name = "SVDPXDDefault"
         db_sec_map_file = "VXDSectorMap_v000.root"
         use_pxd = True
@@ -1210,6 +1229,7 @@ def add_default_cdc_svd_tracking_chain(path,
                                        svd_standalone_mode="VXDTF2",
                                        add_vxdTrack_QI=False,
                                        prune_temporary_tracks=True,
+                                       use_cat_finder=False
                                        ):
     """
     Add the default CDC based tracking chain to the path, i.e. CDC standalone followed by the ToSVDSpacePointCKF, the SVD standalone
@@ -1239,6 +1259,8 @@ def add_default_cdc_svd_tracking_chain(path,
         -> setting this option to 'True' will have some influence on the final track collection)
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
 
     # collections that will be pruned
@@ -1247,17 +1269,19 @@ def add_default_cdc_svd_tracking_chain(path,
     # the name of the most recent track collection
     latest_reco_tracks = None
 
-    if is_cdc_used(components):
+    if is_detector_present("CDC", components):
         add_cdc_track_finding(
             path,
             with_cdc_cellular_automaton=with_cdc_cellular_automaton,
             use_second_hits=use_second_cdc_hits,
             output_reco_tracks=cdc_reco_tracks,
-            add_mva_quality_indicator=add_cdcTrack_QI)
+            add_mva_quality_indicator=add_cdcTrack_QI,
+            use_cat_finder=use_cat_finder
+        )
         temporary_reco_track_list.append(cdc_reco_tracks)
         latest_reco_tracks = cdc_reco_tracks
 
-    if is_svd_used(components):
+    if is_detector_present("SVD", components):
         add_svd_track_finding(path,
                               components=components,
                               input_reco_tracks=latest_reco_tracks,
@@ -1343,7 +1367,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
     # the name of the most recent track collection
     latest_reco_tracks = None
 
-    if is_svd_used(components):
+    if is_detector_present("SVD", components):
         add_svd_track_finding(path,
                               components=components,
                               input_reco_tracks="",
@@ -1355,12 +1379,12 @@ def add_inverted_svd_cdc_tracking_chain(path,
 
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks).set_name(f"DAFRecoFitter {svd_reco_tracks}")
 
-    if is_cdc_used(components):
+    if is_detector_present("CDC", components):
         path.add_module("TFCDC_WireHitPreparer",
                         wirePosition="aligned",
                         useSecondHits=use_second_cdc_hits,
                         flightTimeEstimation="outwards",
-                        filter="mva",
+                        filter="combined",
                         filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
 
         path.add_module("ToCDCCKF",
@@ -1402,7 +1426,7 @@ def add_inverted_svd_cdc_tracking_chain(path,
         temporary_reco_track_list.append("CombinedCDCSVDRecoTracks")
         latest_reco_tracks = "CombinedCDCSVDRecoTracks"
 
-    if is_svd_used(components):
+    if is_detector_present("SVD", components):
         # combined_reco_tracks_name is only relevant in the 'after_ToCDCCKF' option
         combined_reco_tracks_name = "CDCSVDRecoTracks"
 
@@ -1436,23 +1460,3 @@ def add_inverted_svd_cdc_tracking_chain(path,
         latest_reco_tracks = output_reco_tracks
 
     return (latest_reco_tracks, temporary_reco_track_list)
-
-
-def is_svd_used(components):
-    """Return true, if the SVD is present in the components list"""
-    return components is None or 'SVD' in components
-
-
-def is_pxd_used(components):
-    """Return true, if the PXD is present in the components list"""
-    return components is None or 'PXD' in components
-
-
-def is_cdc_used(components):
-    """Return true, if the CDC is present in the components list"""
-    return components is None or 'CDC' in components
-
-
-def is_ecl_used(components):
-    """Return true, if the ECL is present in the components list"""
-    return components is None or 'ECL' in components

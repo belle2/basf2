@@ -11,6 +11,7 @@
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/RootFileCreationManager.h>
 #include <framework/pcore/ProcHandler.h>
+#include <framework/pcore/RootMergeable.h>
 
 namespace {
   using namespace Belle2::VariablePersistenceManager;

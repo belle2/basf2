@@ -11,6 +11,7 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/utility/MCMatching.h>
+#include <analysis/modules/MCDecayFinder/DecayTree.h>
 
 #include <string>
 #include <memory>

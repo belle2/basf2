@@ -56,7 +56,7 @@ namespace {
       const float pValueDaughterTrack = 0.6;
       const float ndfMotherTrack = 15;
       const float ndfDaughterTrack = 5;
-      const double bField = Belle2::BFieldManager::getFieldInTesla(XYZVector(0, 0, 0)).Z();
+      const double bField = BFieldManager::getFieldInTesla(XYZVector(0, 0, 0)).Z();
       const int charge = 1;
       TMatrixDSym cov6(6);
       cov6.Zero();

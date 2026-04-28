@@ -49,6 +49,7 @@ for use_pp in [False, True]:
         # read: for each  $objName   in $arrayName   run over $path
         path.for_each('MCParticle', 'MCParticles', subeventpath)
         path.add_module('PrintCollections', printForEvent=0)
+        Belle2.Environment.Instance().setStats(True)
         if use_pp:
             basf2.set_nprocesses(2)
             basf2.logging.log_level = basf2.LogLevel.WARNING  # suppress output
@@ -56,7 +57,6 @@ for use_pp in [False, True]:
         else:
             print(path)
             basf2.process(path)
-        # print(statistics)
         # initialize/terminate once
         assert basf2.statistics.get(pgun).calls(basf2.statistics.INIT) == 1
         assert basf2.statistics.get(testmod).calls(basf2.statistics.INIT) == 1

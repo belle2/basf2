@@ -17,6 +17,7 @@
 #include <vxd/geometry/SensorPlane.h>
 #include <vxd/geometry/GeoCache.h>
 
+#include <genfit/TrackCandHit.h>
 #include <genfit/DetPlane.h>
 #include <TRandom.h>
 

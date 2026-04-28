@@ -17,20 +17,13 @@
 
 #include <cdc/dataobjects/CDCDedxTrack.h>
 #include <cdc/dbobjects/CDCDedxRunGain.h>
+#include <cdc/dbobjects/CDCGeometry.h>
 
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
-#include <mdst/dbobjects/BeamSpot.h>
 
-#include <analysis/utility/ReferenceFrame.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeometryParConstants.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
-#include <cmath>
-#include <TMath.h>
 #include <TH1D.h>
 #include <TH2D.h>
 

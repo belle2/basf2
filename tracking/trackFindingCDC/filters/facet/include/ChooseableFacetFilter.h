@@ -10,13 +10,13 @@
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/FacetFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     // Guard to prevent repeated instantiations
-    extern template class Chooseable<BaseFacetFilter>;
-    extern template class ChooseableFilter<FacetFilterFactory>;
-    using ChooseableFacetFilter = ChooseableFilter<FacetFilterFactory>;
+    // extern template class TrackingUtilities::Chooseable<BaseFacetFilter>;
+    // extern template class TrackingUtilities::ChooseableFilter<FacetFilterFactory>;
+    using ChooseableFacetFilter = TrackingUtilities::ChooseableFilter<FacetFilterFactory>;
   }
 }

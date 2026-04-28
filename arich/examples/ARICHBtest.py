@@ -157,7 +157,7 @@ main.add_module(arichrec)
 # main.add_module(g4sim)
 main.add_module(geosaver)
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print basic event statistics to stdout
 print('Event Statistics:')

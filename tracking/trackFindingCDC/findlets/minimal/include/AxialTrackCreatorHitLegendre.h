@@ -7,15 +7,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
     class CDCWireHit;
+  }
+
+  namespace TrackFindingCDC {
 
     /**
      * Generates axial tracks from hit using special leaf postprocessing.
@@ -25,11 +28,12 @@ namespace Belle2 {
      * "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers"
      * by T. Alexopoulus, et al. NIM A592 456-462 (2008).
      */
-    class AxialTrackCreatorHitLegendre : public Findlet<const CDCWireHit* const, CDCTrack> {
+    class AxialTrackCreatorHitLegendre : public
+      TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit* const, TrackingUtilities::CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHit* const, CDCTrack>;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit* const, TrackingUtilities::CDCTrack>;
 
     public:
       /**
@@ -67,8 +71,8 @@ namespace Belle2 {
       void initialize() final;
 
       /// Execute one pass over a quad tree
-      void apply(const std::vector<const CDCWireHit*>& axialWireHits,
-                 std::vector<CDCTrack>& tracks) final;
+      void apply(const std::vector<const TrackingUtilities::CDCWireHit*>& axialWireHits,
+                 std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
     private:
       /// Method to create QTProcessor that performs the search

@@ -19,7 +19,7 @@
 #pragma link C++ class Belle2::CDCTriggerFinderClone+; // checksum=0x6581a3cf, version=1
 #pragma link C++ class Belle2::TRGCDCTSFUnpackerStore+; // checksum=0x8b9e5f2, version=1
 #pragma link C++ class Belle2::TRGCDCETFUnpackerStore+; // checksum=0x3723963b, version=2
-#pragma link C++ class Belle2::CDCTrigger3DFinderInfo+; // checksum=0xe8dd856e, version=1
+#pragma link C++ class Belle2::CDCTrigger3DFinderInfo+; // checksum=0x310d99ca, version=2
 
 #pragma link C++ class Belle2::Bitstream<array<array<array<char, 429>, 4>, 5> >+; // checksum=0xc26a7849, version=4
 #pragma link C++ class Belle2::Bitstream<array<array<array<char, TSF_TO_2D_WIDTH>, NUM_2D>, NUM_TSF> >+; // checksum=0xc3cfbe4d, version=4

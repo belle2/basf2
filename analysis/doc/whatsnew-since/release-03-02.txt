@@ -134,7 +134,7 @@ Variables
 
 * Added :b2:var:`eclClusterOnlyInvariantMass`, that returns the invariant mass of the particles, computed with cluster information
 
-* Added :b2:var:`grandDaughterDiffOf`,  :b2:var:`grandDaughterDiffOfPhi`, and  :b2:var:`grandDaughterDiffOfClusterPhi`.
+* Added :b2:var:`grandDaughterDiffOf`, ``grandDaughterDiffOfPhi``, and ``grandDaughterDiffOfClusterPhi``.
   They behave like :b2:var:`daughterDiffOf`, but use grandDaughters' information rather than daughters'.
 
 * Renamed ``ClusterHasPulseShapeDiscrimination`` to :b2:var:`clusterHasPulseShapeDiscrimination`, 

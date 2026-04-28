@@ -476,6 +476,17 @@ namespace Belle2 {
       return out;
     }
 
+    //  The number of PXD hits not assigned to any track
+    double nExtraPXDHits(const Particle*)
+    {
+      StoreObjPtr<EventLevelTrackingInfo> elti;
+      if (!elti) return Const::doubleNaN;
+      double out = 0.0;
+      for (uint16_t ilayer = 1; ilayer < 3; ++ilayer)
+        out += elti->getNVXDClustersInLayer(ilayer);
+      return out;
+    }
+
     // time of first SVD sample relative to event T0
     double svdFirstSampleTime(const Particle*)
     {
@@ -496,13 +507,13 @@ namespace Belle2 {
     }
 
     // Build a Helix from a MCParticle's kinematics. Does NOT check for null pointer!!!
-    Belle2::Helix getMCHelix(const MCParticle* mcparticle)
+    Helix getMCHelix(const MCParticle* mcparticle)
     {
       const ROOT::Math::XYZVector mcProdVertex = mcparticle->getVertex();
       const ROOT::Math::XYZVector mcMomentum = mcparticle->getMomentum();
-      const double BzAtProdVertex = Belle2::BFieldManager::getFieldInTesla(mcProdVertex).Z();
+      const double BzAtProdVertex = BFieldManager::getFieldInTesla(mcProdVertex).Z();
       const double mcParticleCharge = mcparticle->getCharge();
-      return Belle2::Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
+      return Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
     }
 
     double getMCHelixParameterAtIndex(const Particle* particle, const int index)
@@ -512,7 +523,7 @@ namespace Belle2 {
       const MCParticle* mcparticle = particle->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
 
-      const Belle2::Helix mcHelix(getMCHelix(mcparticle));
+      const Helix mcHelix(getMCHelix(mcparticle));
       const std::vector<double> mcHelixPars{mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(), mcHelix.getZ0(), mcHelix.getTanLambda()};
       return mcHelixPars.at(index);
     }
@@ -524,12 +535,12 @@ namespace Belle2 {
       const MCParticle* mcparticle = particle->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
 
-      const Belle2::TrackFitResult* trackfit =  particle->getTrackFitResult();
+      const TrackFitResult* trackfit =  particle->getTrackFitResult();
       if (!trackfit) return Const::doubleNaN;
 
-      const Belle2::UncertainHelix measHelix = trackfit->getUncertainHelix();
+      const UncertainHelix measHelix = trackfit->getUncertainHelix();
       const TMatrixDSym& measCovariance = measHelix.getCovariance();
-      const Belle2::Helix mcHelix(getMCHelix(mcparticle));
+      const Helix mcHelix(getMCHelix(mcparticle));
 
       const std::vector<double> mcHelixPars   = {mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(), mcHelix.getZ0(), mcHelix.getTanLambda()};
       const std::vector<double> measHelixPars = {measHelix.getD0(), measHelix.getPhi0(), measHelix.getOmega(), measHelix.getZ0(), measHelix.getTanLambda()};
@@ -917,8 +928,8 @@ always 0 or 1 with newer versions of ECL reconstruction.
 
 Returns NaN if called for something other than a track-based particle.
     )DOC");
-    REGISTER_VARIABLE("helixExtTheta(radius [cm], z fwd [cm], z bwd [cm], useHighestProbMass=0)", trackHelixExtTheta,
-                      R"DOC(Returns theta of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will
+    REGISTER_VARIABLE("helixExtTheta(radius [cm], z fwd [cm], z bwd [cm], useHighestProbMass=0)", trackHelixExtTheta, R"DOC(
+                      Returns theta of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will
                       use the track fit result for the mass hypothesis with the highest pValue.
 
                       )DOC", "rad");
@@ -926,21 +937,21 @@ Returns NaN if called for something other than a track-based particle.
                       "Returns phi of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.\n\n",
                       "rad");
 
-    REGISTER_METAVARIABLE("helixExtThetaOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtThetaOnDet,
-                          R"DOC(Returns theta of extrapolated helix parameters on the given detector surface. The unit of angle is ``rad``.
+    REGISTER_METAVARIABLE("helixExtThetaOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtThetaOnDet, R"DOC(
+                          Returns theta of extrapolated helix parameters on the given detector surface. The unit of angle is ``rad``.
                           If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.
                           The supported detector surface names are ``{'CDC', 'TOP', 'ARICH', 'ECL', 'KLM'}``.
                           Also, the detector name with number of meaningful-layer is supported, e.g. ``'CDC8'``: last superlayer of CDC, ``'ECL1'``: mid-point of ECL.
 
-                          ..note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
+                          .. note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
                           )DOC", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("helixExtPhiOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtPhiOnDet,
-                          R"DOC(Returns phi of extrapolated helix parameters on the given detector surface. The unit of angle is ``rad``.
+    REGISTER_METAVARIABLE("helixExtPhiOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtPhiOnDet, R"DOC(
+                          Returns phi of extrapolated helix parameters on the given detector surface. The unit of angle is ``rad``.
                           If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.
                           The supported detector surface names are ``{'CDC', 'TOP', 'ARICH', 'ECL', 'KLM'}``.
                           Also, the detector name with number of meaningful-layer is supported, e.g. ``'CDC8'``: last superlayer of CDC, ``'ECL1'``: mid-point of ECL.
 
-                          ..note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
+                          .. note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
                           )DOC", Manager::VariableDataType::c_double);
 
 
@@ -978,6 +989,7 @@ Returns NaN if there is no event-level tracking information available.
     //REGISTER_VARIABLE("nExtraVXDHitsInLayer(i)", nExtraVXDHitsInLayer,
     //"[Eventbased] The number VXD hits not assigned in the specified VXD layer");
     //REGISTER_VARIABLE("nExtraVXDHits", nExtraVXDHits, "[Eventbased] The number of VXD hits not assigned to any track");
+    REGISTER_VARIABLE("nExtraPXDHits", nExtraPXDHits, "[Eventbased] The number of PXD hits not assigned to any track");
     //REGISTER_VARIABLE("svdFirstSampleTime", svdFirstSampleTime, "[Eventbased] The time of first SVD sample relatvie to event T0");
     REGISTER_VARIABLE("trackFindingFailureFlag", trackFindingFailureFlag, R"DOC(
 [Eventbased] Returns a flag set by the tracking if there is reason to assume

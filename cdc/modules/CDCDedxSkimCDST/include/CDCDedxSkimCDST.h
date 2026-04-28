@@ -8,18 +8,11 @@
 
 #pragma once
 
-#include <reconstruction/dataobjects/DedxConstants.h>
 #include <cdc/dataobjects/CDCDedxTrack.h>
 
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>
-
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Particle.h>
 
 #include <string>
 #include <vector>

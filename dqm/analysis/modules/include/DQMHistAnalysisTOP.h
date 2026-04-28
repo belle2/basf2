@@ -36,11 +36,6 @@ namespace Belle2 {
     DQMHistAnalysisTOPModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisTOPModule();
-
-    /**
      * Initializer.
      */
     void initialize() override final;
@@ -114,7 +109,7 @@ namespace Belle2 {
      * @param h2 second histogram
      * @return true if (nbins, xmin, xmax) match
      */
-    bool sameHistDefinition(TH1* h1, TH1* h2);
+    static bool sameHistDefinition(TH1* h1, TH1* h2);
 
     /**
      * Makes a plot of dead and hot channel fractions per slot
@@ -138,7 +133,7 @@ namespace Belle2 {
      * @param name the name of histograms
      * @param scale scale factor for the histogram z-axis range (maximum = average * scale)
      */
-    void setZAxisRange(const std::string& name, double scale);
+    static void setZAxisRange(const std::string& name, double scale);
 
     /**
      * Makes background subtracted time distribution plot
@@ -146,7 +141,7 @@ namespace Belle2 {
      * @param trackHits histogram used to scale background in case it is available
      * @param slot slot number
      */
-    void makeBGSubtractedTimingPlot(const std::string& name, const TH2F* trackHits, int slot);
+    static void makeBGSubtractedTimingPlot(const std::string& name, const TH2F* trackHits, int slot);
 
     /**
      * Makes plots of the number of PMT hits per event
@@ -157,6 +152,14 @@ namespace Belle2 {
      * Makes projections of injection BG plots
      */
     void makeInjectionBGPlots();
+
+    /**
+     * Makes a plot of fraction of events with the flag is set
+     * @param hname name of 2D histogram (y-axis = flag value)
+     * @param histogram resulting histogram w/ fractions
+     * @param canvas canvas to plot
+     */
+    static void makeFlagFractPlot(const std::string& hname, TH1* histogram, TCanvas* canvas);
 
     /**
      * Sets MiraBelle variables from the histogram with bins corresponding to slot numbers.
@@ -204,8 +207,8 @@ namespace Belle2 {
      * @param alarmLines alarm lines [out]
      * @param bigRed on true red color for large values, else red color for small values
      */
-    void setAlarmLines(const std::vector<double>& alarmLevels, double xmin, double xmax, std::vector<TLine*>& alarmLines,
-                       bool bigRed = true);
+    static void setAlarmLines(const std::vector<double>& alarmLevels, double xmin, double xmax, std::vector<TLine*>& alarmLines,
+                              bool bigRed = true);
 
     /**
      * Sets all alarm lines.
@@ -217,7 +220,7 @@ namespace Belle2 {
      * @param h pixel or channel distribution of hits (1D or 2D histogram)
      * @return cut levels (first = dead, second = hot)
      */
-    std::pair<double, double> getDeadAndHotCuts(const TH1* h);
+    static std::pair<double, double> getDeadAndHotCuts(const TH1* h);
 
     /**
      * Calculates and sets epics variables
@@ -255,7 +258,7 @@ namespace Belle2 {
     std::vector<double> m_offsetMeanAlarmLevels = {0.2, 0.5}; /**< alarm levels for mean of bunch offset [ns] */
     std::vector<double> m_offsetRmsAlarmLevels = {0.25, 0.50}; /**< alarm levels for r.m.s. of bunch offset [ns] */
 
-    // other
+    // alarms etc.
 
     std::vector<int> m_alarmColors = {c_ColorTooFew, c_ColorGood, c_ColorWarning, c_ColorError}; /**< alarm colors (see base class) */
     std::vector<int> m_officialStates = {c_StatusTooFew, c_StatusGood, c_StatusWarning, c_StatusError}; /**< official alarm states */
@@ -267,6 +270,8 @@ namespace Belle2 {
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
     std::string m_runType; /**< Run type */
     double m_numEvents = 0; /**< number of events processed with TOPDQM module */
+
+    // new histogram and canvases
 
     TH1D* m_photonYields = nullptr; /**< photon yields per slot */
     TH1D* m_backgroundRates = nullptr; /**< background rates per slot */
@@ -292,6 +297,13 @@ namespace Belle2 {
     std::map<std::string, TProfile*> m_profiles; /**< profiles of injection BG */
     std::map<std::string, TH1D*> m_projections; /**< projections of injection BG */
 
+    TH1D* m_skipProcFlagFract = nullptr; /**< fraction of events w/ skip processing flag set vs. boardstack */
+    TH1D* m_injVetoFlagFract = nullptr;  /**< fraction of events w/ injection veto flag set vs. boardstack */
+    TCanvas* m_c_skipProcFlagFract = nullptr; /**< Canvas: fraction of events w/ skip processing flag set vs. boardstack */
+    TCanvas* m_c_injVetoFlagFract = nullptr;  /**< Canvas: fraction of events w/ injection veto flag set vs. boardstack */
+
+    // graphic primitives
+
     std::vector<TLine*> m_asicWindowsBandLines; /**< lines denoting a band of good windows */
     std::vector<TLine*> m_verticalLines; /**< vertical lines splitting slots */
     std::vector<TLine*> m_junkHitsAlarmLines; /**< lines representing alarm levels */
@@ -304,6 +316,8 @@ namespace Belle2 {
     TPaveText* m_text2 = nullptr; /**< text to be written to event desynchonization monitor */
     TPaveText* m_text3 = nullptr; /**< text to be written to background rates */
     TPaveText* m_text4 = nullptr; /**< text to be written to number of good hits per event */
+
+    // MiraBelle
 
     std::map<std::string, double> m_mirabelleVariables; /**< variables for MiraBelle */
     MonitoringObject* m_monObj = nullptr; /**< MiraBelle monitoring object */

@@ -65,7 +65,7 @@ namespace Belle2 {
     cout << ", flat surface length: " << getFlatLength() << " " << s_unitName << endl;
     cout << " Material: " << getMaterial() << endl;
     if (getFilterThickness() > 0) { // old payload
-      cout << " Wavelenght filter: " << getFilterMaterial()
+      cout << " Wavelength filter: " << getFilterMaterial()
            << ", thickness: " << getFilterThickness() << " " << s_unitName << endl;
     }
     if (!m_peelOffRegions.empty()) {
@@ -127,10 +127,10 @@ namespace Belle2 {
     double z = -(m_length - m_flatLength);
     double yUp = m_thickness / 2;
     double yDown = yUp - m_exitThickness;
-    XYVector points[2] = {XYVector(yUp, z), XYVector(yDown, z)}; // points on upper and slanted surfaces
+    const XYVector points[2] = {XYVector(yUp, z), XYVector(yDown, z)}; // points on upper and slanted surfaces
 
     double alpha = getAngle();
-    XYVector normals[2] = {XYVector(1, 0), XYVector(-cos(alpha), sin(alpha))}; // normals of upper and slanted surfaces
+    const XYVector normals[2] = {XYVector(1, 0), XYVector(-cos(alpha), sin(alpha))}; // normals of upper and slanted surfaces
 
     XYVector orig(0, z); // window origin
     XYVector surf(1, 0); // window surface direction (= upper surface normal)

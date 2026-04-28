@@ -59,7 +59,7 @@ namespace Belle2 {
      * Sets window shifts
      * @param shifts vector of size = 6 with window shifts according to revo9count
      */
-    void setWindowShifts(std::vector<int> shifts);
+    void setWindowShifts(const std::vector<int>& shifts);
 
     /**
      * Sets the offset of a photon peak within the readout window region.

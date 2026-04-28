@@ -38,7 +38,7 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDER"));
   addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 30.);
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 85.);
-  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)", std::vector<int>());
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: Constructor done.");
 }
 

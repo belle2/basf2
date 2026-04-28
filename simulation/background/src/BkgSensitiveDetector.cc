@@ -72,7 +72,7 @@ namespace Belle2 {
     G4Track& track  = *aStep->GetTrack();
 
     if (m_trackID != track.GetTrackID()) {
-      //TrackID changed, store track informations
+      //TrackID changed, store track information
       m_trackID = track.GetTrackID();
       //Get world position
       const G4ThreeVector& worldPosition = preStep.GetPosition();
@@ -88,7 +88,7 @@ namespace Belle2 {
       m_startEnergy =  preStep.GetKineticEnergy() * Unit::MeV;
       //Reset energy deposit;
       m_energyDeposit = 0;
-      //Reset track lenght;
+      //Reset track length;
       m_trackLength = 0;
     }
     //Update energy deposit

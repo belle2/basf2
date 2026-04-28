@@ -7,13 +7,14 @@
  **************************************************************************/
 
 #pragma once
-#include "string"
-#include "TH2D.h"
-#include "TH1D.h"
-#include "TF1.h"
+
 #include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dbobjects/CDCGeometry.h>
 #include <framework/database/DBObjPtr.h>
+
+#include <TF1.h>
+#include <TH1F.h>
+#include <TH2F.h>
 
 namespace Belle2 {
   namespace CDC {

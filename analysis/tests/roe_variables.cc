@@ -44,16 +44,13 @@ namespace {
       StoreArray<Particle> myParticles;
       StoreArray<RestOfEvent> myROEs;
       StoreObjPtr<RestOfEvent> roeobjptr;
-      StoreArray<PIDLikelihood> myPIDLikelihoods;
       myECLClusters.registerInDataStore();
       myKLMClusters.registerInDataStore();
       myTFRs.registerInDataStore();
       myTracks.registerInDataStore();
       myParticles.registerInDataStore();
       myROEs.registerInDataStore();
-      myPIDLikelihoods.registerInDataStore();
       myParticles.registerRelationTo(myROEs);
-      myTracks.registerRelationTo(myPIDLikelihoods);
       roeobjptr.registerInDataStore("RestOfEvent", DataStore::c_DontWriteOut);
       DataStore::Instance().setInitializeActive(false);
 

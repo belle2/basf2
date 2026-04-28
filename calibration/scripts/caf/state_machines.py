@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-# disable doxygen check for this file
-# @cond
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -72,6 +69,7 @@ class State():
     def on_enter(self, callbacks):
         """
         """
+        #: set state as empty list when entering it
         self._on_enter = []
         if callbacks:
             self._add_callbacks(callbacks, self._on_enter)
@@ -87,6 +85,7 @@ class State():
     def on_exit(self, callbacks):
         """
         """
+        #: set state as empty list when exiting it
         self._on_exit = []
         if callbacks:
             self._add_callbacks(callbacks, self._on_exit)
@@ -101,6 +100,9 @@ class State():
         else:
             B2ERROR(f"Something other than a function (callable) passed into State {self.name}.")
 
+    # Doxygen doesn't understand @method_dispatch overloads (def _) and emits
+    # "no uniquely matching class member found" warnings. Hide them from doxygen.
+    # @cond
     @_add_callbacks.register(tuple)
     @_add_callbacks.register(list)
     def _(self, callbacks, attribute):
@@ -113,6 +115,7 @@ class State():
                     attribute.append(function)
                 else:
                     B2ERROR(f"Something other than a function (callable) passed into State {self.name}.")
+    # @endcond
 
     def __str__(self):
         """
@@ -310,7 +313,9 @@ class Machine():
         if name not in possible_transitions:
             raise AttributeError(f"{name} does not exist in transitions for state {self.state}.")
         transition_dict = self.get_transition_dict(self.state, name)
+        # \cond silence doxygen warning about _trigger
         return partial(self._trigger, name, transition_dict, **kwargs)
+        # \endcond
 
     def _trigger(self, transition_name, transition_dict, **kwargs):
         """
@@ -385,8 +390,11 @@ class CalibrationMachine(Machine):
     processing for them.
     """
 
+    #: input directory of collector
     collector_input_dir = 'collector_input'
+    #: output directory of collector
     collector_output_dir = 'collector_output'
+    #: output directory of algorithm
     algorithm_output_dir = 'algorithm_output'
 
     def __init__(self, calibration, iov_to_calibrate=None, initial_state="init", iteration=0):
@@ -475,6 +483,7 @@ class CalibrationMachine(Machine):
         self.add_transition("fail_fully", "collector_failed", "failed")
 
     def _update_cal_state(self, **kwargs):
+        """update calibration state"""
         self.calibration.state = str(kwargs["new_state"])
 
     def files_containing_iov(self, file_paths, files_to_iovs, iov):
@@ -792,10 +801,12 @@ class CalibrationMachine(Machine):
             # Define the input files
             input_data_files = set(collection.input_files)
             # Reduce the input data files to only those that overlap with the optional requested IoV
-            if self.iov_to_calibrate:
+            # Local variable avoids doxygen "no uniquely matching class member" warning
+            iov_to_calibrate = self.iov_to_calibrate
+            if iov_to_calibrate:
                 input_data_files = self.files_containing_iov(input_data_files,
                                                              collection.files_to_iovs,
-                                                             self.iov_to_calibrate)
+                                                             iov_to_calibrate)
             # Remove any files that ONLY contain runs from our optional ignored_runs list
             files_to_ignore = set()
             for exprun in self.calibration.ignored_runs:
@@ -821,6 +832,7 @@ class CalibrationMachine(Machine):
             self._collector_jobs[collection_name] = job
 
     def _check_valid_collector_output(self):
+        """check that collector output is valid"""
         B2INFO("Checking that Collector output exists for all collector jobs "
                f"using {self.calibration.name}.output_patterns.")
         if not self._collector_jobs:
@@ -1027,7 +1039,9 @@ class AlgorithmMachine(Machine):
         b2conditions.override_globaltags()
 
         # Apply all the databases in order, starting with the user-set chain for this Calibration
-        for database in self.database_chain:
+        # Local variable avoids doxygen "no uniquely matching class member" warning
+        database_chain = self.database_chain
+        for database in database_chain:
             if database.db_type == 'local':
                 B2INFO(f"Adding Local Database {database.filepath.as_posix()} to head of chain of local databases, "
                        f"for {self.algorithm.name}.")
@@ -1097,6 +1111,7 @@ class AlgorithmMachine(Machine):
         self.result = IoV_Result(iov, alg_result)
 
     def _set_input_data(self, **kwargs):
+        """set input data"""
         self.algorithm.data_input(self.input_files)
 
 
@@ -1116,5 +1131,3 @@ class TransitionError(MachineError):
     """
     Exception for when transitions fail.
     """
-
-# @endcond

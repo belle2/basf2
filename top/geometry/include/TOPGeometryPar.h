@@ -145,35 +145,35 @@ namespace Belle2 {
        * @param energy photon energy [eV]
        * @return phase refractive index
        */
-      double getPhaseIndex(double energy) const;
+      static double getPhaseIndex(double energy);
 
       /**
        * Returns group refractive index of quartz at given photon energy
        * @param energy photon energy [eV]
        * @return group refractive index
        */
-      double getGroupIndex(double energy) const;
+      static double getGroupIndex(double energy);
 
       /**
        * Returns the derivative (dn/dE) of phase refractive index of quartz at given photon energy
        * @param energy photon energy [eV]
        * @return derivative of phase refractive index
        */
-      double getPhaseIndexDerivative(double energy) const;
+      static double getPhaseIndexDerivative(double energy);
 
       /**
        * Returns the derivative (dn_g/dE) of group refractive index of quartz at given photon energy
        * @param energy photon energy [eV]
        * @return group refractive index
        */
-      double getGroupIndexDerivative(double energy) const;
+      static double getGroupIndexDerivative(double energy);
 
       /**
-       * Returns bulk absorption lenght of quartz at given photon energy
+       * Returns bulk absorption length of quartz at given photon energy
        * @param energy photon energy [eV]
-       * @return bulk absorption lenght
+       * @return bulk absorption length
        */
-      double getAbsorptionLength(double energy) const;
+      static double getAbsorptionLength(double energy);
 
       static const double c_hc; /**< Planck constant times speed of light in [eV*nm] */
 
@@ -186,6 +186,16 @@ namespace Belle2 {
       {}
 
       /**
+       * Deleted copy constructor since it is a singleton class
+       */
+      TOPGeometryPar(const TOPGeometryPar&) = delete;
+
+      /**
+       * Deleted assignment operator since it is a singleton class
+       */
+      TOPGeometryPar& operator=(const TOPGeometryPar&) = delete;
+
+      /**
        * finalize initialization
        */
       void finalizeInitialization();
@@ -194,31 +204,31 @@ namespace Belle2 {
        * Create a parameter object from gearbox
        * @param content XML data directory
        */
-      TOPGeometry* createConfiguration(const GearDir& content);
+      static TOPGeometry* createConfiguration(const GearDir& content);
 
       /**
        * Create a parameter object from gearbox for bar segment
        * @param content XML data directory
        * @param serialNumber bar segment serial number
        */
-      TOPGeoBarSegment createBarSegment(const GearDir& content,
-                                        const std::string& serialNumber);
+      static TOPGeoBarSegment createBarSegment(const GearDir& content,
+                                               const std::string& serialNumber);
 
       /**
        * Create a parameter object from gearbox for mirror segment
        * @param content XML data directory
        * @param serialNumber mirror segment serial number
        */
-      TOPGeoMirrorSegment createMirrorSegment(const GearDir& content,
-                                              const std::string& serialNumber);
+      static TOPGeoMirrorSegment createMirrorSegment(const GearDir& content,
+                                                     const std::string& serialNumber);
 
       /**
        * Create a parameter object from gearbox for prism
        * @param content XML data directory
        * @param serialNumber prism serial number
        */
-      TOPGeoPrism createPrism(const GearDir& content,
-                              const std::string& serialNumber);
+      static TOPGeoPrism createPrism(const GearDir& content,
+                                     const std::string& serialNumber);
 
       /**
        * Adds number to string
@@ -226,7 +236,7 @@ namespace Belle2 {
        * @param number number to be added
        * @return string with a number
        */
-      std::string addNumber(const std::string& str, unsigned number);
+      static std::string addNumber(const std::string& str, unsigned number);
 
       /**
        * Clears cache for PMT dependent QE data - function is used in call backs
@@ -264,7 +274,7 @@ namespace Belle2 {
        * @param pmtID PMT ID
        * @return unique ID
        */
-      int getUniquePmtID(int moduleID, int pmtID) const
+      static int getUniquePmtID(int moduleID, int pmtID)
       {
         return (moduleID << 16) + pmtID;
       }
@@ -275,7 +285,7 @@ namespace Belle2 {
        * @param pixelID pixel ID
        * @return unique ID
        */
-      int getUniquePixelID(int moduleID, int pixelID) const
+      static int getUniquePixelID(int moduleID, int pixelID)
       {
         return (moduleID << 16) + pixelID;
       }
@@ -284,7 +294,7 @@ namespace Belle2 {
        * Returns integral of quantum efficiency over photon energies
        * @param qe quantum efficiency data points
        * @param ce collection efficiency data points
-       * @param lambdaFirst wavelenght of the first data point [nm]
+       * @param lambdaFirst wavelength of the first data point [nm]
        * @param lambdaStep wavelength step [nm]
        * @return integral [eV]
        */
@@ -297,12 +307,12 @@ namespace Belle2 {
        * @param lambda photon wavelength [nm]
        * @return refractive index
        */
-      double refractiveIndex(double lambda) const;
+      static double refractiveIndex(double lambda);
 
       // Geometry
 
       TOPGeometry* m_geo = 0;             /**< geometry parameters from Gearbox */
-      DBObjPtr<TOPGeometry>* m_geoDB = 0; /**< geometry parameters from database */
+      DBObjPtr<TOPGeometry> m_geoDB;      /**< geometry parameters from database */
       bool m_fromDB = false;              /**< parameters from database or Gearbox */
       bool m_valid = false;               /**< true if geometry is available */
       bool m_oldPayload = false;          /**< true if old payload found in DB */
@@ -335,22 +345,22 @@ namespace Belle2 {
 
     };
 
-    inline double TOPGeometryPar::getPhaseIndexDerivative(double energy) const
+    inline double TOPGeometryPar::getPhaseIndexDerivative(double energy)
     {
       double dE = 0.01; // [eV]
       return (getPhaseIndex(energy + dE / 2) - getPhaseIndex(energy - dE / 2)) / dE;
     }
 
-    inline double TOPGeometryPar::getGroupIndexDerivative(double energy) const
+    inline double TOPGeometryPar::getGroupIndexDerivative(double energy)
     {
       double dE = 0.01; // [eV]
       return (getGroupIndex(energy + dE / 2) - getGroupIndex(energy - dE / 2)) / dE;
     }
 
-    inline double TOPGeometryPar::getAbsorptionLength(double energy) const
+    inline double TOPGeometryPar::getAbsorptionLength(double energy)
     {
       double lambda = c_hc / energy;
-      return 15100 * pow(lambda / 405, 4); // Alan Schwartz, 2013 (private comunication)
+      return 15100 * pow(lambda / 405, 4); // Alan Schwartz, 2013 (private communication)
     }
 
   } // end of namespace TOP

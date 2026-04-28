@@ -330,7 +330,7 @@ namespace Belle2 {
       {return getPixelLogLs(t0, m_minTime, m_maxTime, sigt);}
 
       /**
-       * Returns extended log likelihoods in pixels for PDF shifted in time and using diferent time window
+       * Returns extended log likelihoods in pixels for PDF shifted in time and using different time window
        * @param t0 time shift
        * @param minTime time window lower edge
        * @param maxTime time window upper edge
@@ -580,8 +580,8 @@ namespace Belle2 {
        * @param mirror spherical mirror data
        * @return position of the extreme if exists or -A/2
        */
-      double findReflectionExtreme(double xE, double zE, double zD, int Nxm, double A,
-                                   const RaytracerBase::Mirror& mirror) const;
+      static double findReflectionExtreme(double xE, double zE, double zD, int Nxm, double A,
+                                          const RaytracerBase::Mirror& mirror);
 
       /**
        * Returns the derivative of reflected position at given x.
@@ -593,7 +593,7 @@ namespace Belle2 {
        * @param zd unfolded detection position in z
        * @return the derivative
        */
-      double derivativeOfReflectedX(double x, double xe, double ze, double zd) const;
+      static double derivativeOfReflectedX(double x, double xe, double ze, double zd);
 
       /**
        * Do forward raytracing of inverse raytracing solution in prism

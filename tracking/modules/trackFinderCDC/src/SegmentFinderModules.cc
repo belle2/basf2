@@ -7,10 +7,11 @@
  **************************************************************************/
 #include <tracking/modules/trackFinderCDC/SegmentFinderModules.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 REG_MODULE(TFCDC_SegmentFinderFacetAutomaton);
 

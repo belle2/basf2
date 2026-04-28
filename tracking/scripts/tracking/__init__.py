@@ -10,6 +10,8 @@
 
 import basf2 as b2
 
+from geometry import is_detector_present, is_any_detector_present
+
 # Many scripts import these functions from `tracking`, so leave these imports here
 from tracking.path_utils import (  # noqa
     add_default_cdc_svd_tracking_chain,
@@ -27,10 +29,6 @@ from tracking.path_utils import (  # noqa
     add_svd_track_finding,
     add_prefilter_track_fit_and_track_creator,
     add_svd_standalone_tracking,
-    is_cdc_used,
-    is_ecl_used,
-    is_pxd_used,
-    is_svd_used,
 )
 
 from pxd import add_pxd_reconstruction
@@ -49,7 +47,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 append_full_grid_cdc_eventt0=True,
                                 v0_finding=True, flip_recoTrack=True,
                                 skip_full_grid_cdc_eventt0_if_svd_time_present=True,
-                                inverted_tracking=False):
+                                inverted_tracking=False,
+                                use_cat_finder=False):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
@@ -83,8 +82,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
     #. If the reconstruction uses PXD, we finally look for tracks with a wrong charge,\
     flip and refit them to fix the charge, see :ref:`Flip&Refit<trk_flipNrefit>`.
-
-
 
     :param path: the path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
@@ -137,6 +134,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
         One known issue is a reduced hit efficiency when using the full chain.
         Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
 
     add_prefilter_tracking_reconstruction(
@@ -161,7 +160,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
         skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
-        inverted_tracking=inverted_tracking)
+        inverted_tracking=inverted_tracking,
+        use_cat_finder=use_cat_finder)
 
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
@@ -186,7 +186,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           create_intercepts_for_pxd_ckf=False,
                                           append_full_grid_cdc_eventt0=True,
                                           skip_full_grid_cdc_eventt0_if_svd_time_present=True,
-                                          inverted_tracking=False):
+                                          inverted_tracking=False,
+                                          use_cat_finder=False):
     """
     This function adds the tracking reconstruction modules required to calculate HLT filter decision
     to a path.
@@ -240,9 +241,11 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
         One known issue is a reduced hit efficiency when using the full chain.
         Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
 
-    if not is_svd_used(components) and not is_cdc_used(components):
+    if not is_any_detector_present(["SVD", "CDC"], components):
         return
 
     if (add_cdcTrack_QI or add_vxdTrack_QI or add_recoTrack_QI) and not fit_tracks:
@@ -287,7 +290,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                           add_vxdTrack_QI=add_vxdTrack_QI,
                           pxd_filtering_offline=pxd_filtering_offline,
                           create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
-                          inverted_tracking=inverted_tracking)
+                          inverted_tracking=inverted_tracking,
+                          use_cat_finder=use_cat_finder)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -326,7 +330,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     """
 
     # do not add any new modules if no tracking detectors are in the components
-    if components and not ('SVD' in components or 'CDC' in components):
+    if components and not is_any_detector_present(["SVD", "CDC"], components):
         return
 
     flip_and_refit_temporary_RecoTracks = "RecoTracks_flipped"
@@ -335,7 +339,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     temporary_reco_track_list = []
 
     # flip & refit to fix the charge of some tracks
-    if flip_recoTrack and not mcTrackFinding and is_pxd_used(components):
+    if flip_recoTrack and not mcTrackFinding and is_detector_present("PXD", components):
         add_flipping_of_recoTracks(path, reco_tracks="RecoTracks", reco_tracks_flipped=flip_and_refit_temporary_RecoTracks)
         temporary_reco_track_list.append(flip_and_refit_temporary_RecoTracks)
 
@@ -384,10 +388,10 @@ def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=Non
     """
 
     # Always run SVD EventT0 estimation first so that the CDC based method can check whether an SVD based EventT0 exists
-    if is_svd_used(components):
+    if is_detector_present("SVD", components):
         path.add_module("SVDEventT0Estimator")
 
-    if is_cdc_used(components) and append_full_grid_cdc_eventt0:
+    if is_detector_present("CDC", components) and append_full_grid_cdc_eventt0:
         path.add_module("FullGridChi2TrackTimeExtractor",
                         skipIfSVDEventT0Present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
@@ -417,7 +421,7 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
     b2.declare_cosmics()
 
     # make sure CDC is used
-    if not is_cdc_used(components):
+    if not is_detector_present("CDC", components):
         return
 
     if not skip_geometry_adding:
@@ -471,7 +475,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       add_cdcTrack_QI=True, add_vxdTrack_QI=False,
                       pxd_filtering_offline=False, use_HLT_ROIs=False,
                       create_intercepts_for_pxd_ckf=False,
-                      inverted_tracking=False):
+                      inverted_tracking=False, use_cat_finder=False):
     """
     Add the track finding chain to the path. Depending on the parameters, different tracking chains can be defined and attached.
     :param path: The path to add the tracking reconstruction modules to
@@ -509,15 +513,17 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
         One known issue is a reduced hit efficiency when using the full chain.
         Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
-    if not is_svd_used(components) and not is_cdc_used(components):
+    if not is_any_detector_present(["SVD", "CDC"], components):
         return
 
-    if use_ecl_to_cdc_ckf and not is_cdc_used(components):
+    if use_ecl_to_cdc_ckf and not is_detector_present("CDC", components):
         b2.B2WARNING("ECL CKF cannot be used without CDC. Turning it off.")
         use_ecl_to_cdc_ckf = False
 
-    if use_ecl_to_cdc_ckf and not is_ecl_used(components):
+    if use_ecl_to_cdc_ckf and not is_detector_present("ECL", components):
         b2.B2ERROR("ECL CKF cannot be used without ECL. Turning it off.")
         use_ecl_to_cdc_ckf = False
 
@@ -541,12 +547,12 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     # the name of the most recent track collection
     latest_reco_tracks = None
 
-    if not is_pxd_used(components):
-        if use_ecl_to_cdc_ckf and is_cdc_used(components):
+    if not is_detector_present("PXD", components):
+        if use_ecl_to_cdc_ckf and is_detector_present("CDC", components):
             combined_ecl_reco_tracks = reco_tracks
-        elif (not use_ecl_to_cdc_ckf) and is_svd_used(components):
+        elif (not use_ecl_to_cdc_ckf) and is_detector_present("SVD", components):
             svd_cdc_reco_tracks = reco_tracks
-        elif (not use_ecl_to_cdc_ckf) and (not is_svd_used(components)) and is_cdc_used(components):
+        elif (not use_ecl_to_cdc_ckf) and (not is_detector_present("SVD", components)) and is_detector_present("CDC", components):
             cdc_reco_tracks = reco_tracks
 
     # Default tracking with CDC first, followed by SVD tracking
@@ -566,7 +572,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                                                use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
                                                svd_standalone_mode=svd_standalone_mode,
                                                add_vxdTrack_QI=add_vxdTrack_QI,
-                                               prune_temporary_tracks=prune_temporary_tracks)
+                                               prune_temporary_tracks=prune_temporary_tracks,
+                                               use_cat_finder=use_cat_finder)
 
         temporary_reco_track_list.extend(tmp_reco_track_list)
     else:
@@ -593,7 +600,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
 
         temporary_reco_track_list.extend(tmp_reco_track_list)
 
-    if use_ecl_to_cdc_ckf and is_cdc_used(components):
+    if use_ecl_to_cdc_ckf and is_detector_present("CDC", components):
         add_eclcdc_track_finding(path, components=components, output_reco_tracks=ecl_reco_tracks,
                                  prune_temporary_tracks=prune_temporary_tracks)
 
@@ -607,7 +614,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         temporary_reco_track_list.append(combined_ecl_reco_tracks)
         latest_reco_tracks = combined_ecl_reco_tracks
 
-    if is_pxd_used(components):
+    if is_detector_present("PXD", components):
         """
         In case we want to use offline PXD hit filtering ('pxd_filtering_offline == True'), we can decide to either use ROIs
         created by HLT ('use_HLT_ROIs == True') or to create ROIs on the fly ('use_HLT_ROIs == False').
@@ -664,7 +671,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,
     if 'RegisterEventLevelTrackingInfo' not in path:
         path.add_module('RegisterEventLevelTrackingInfo')
 
-    if not is_cdc_used(components):
+    if not is_detector_present("CDC", components):
         b2.B2FATAL("CDC must be in components")
 
     reco_tracks_from_track_finding = reco_tracks
@@ -672,11 +679,11 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,
         reco_tracks_from_track_finding = "NonMergedRecoTracks"
 
     cdc_reco_tracks = "CDCRecoTracks"
-    if not is_pxd_used(components) and not is_svd_used(components):
+    if not is_any_detector_present(["PXD", "SVD"], components):
         cdc_reco_tracks = reco_tracks_from_track_finding
 
     svd_cdc_reco_tracks = "SVDCDCRecoTracks"
-    if not is_pxd_used(components):
+    if not is_detector_present("PXD", components):
         svd_cdc_reco_tracks = reco_tracks_from_track_finding
 
     full_reco_tracks = reco_tracks_from_track_finding
@@ -687,13 +694,13 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,
 
     latest_reco_tracks = cdc_reco_tracks
 
-    if is_svd_used(components):
+    if is_detector_present("SVD", components):
         add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                               output_reco_tracks=svd_cdc_reco_tracks,
                               svd_ckf_mode="cosmics", add_both_directions=True, svd_standalone_mode="VXDTF2")
         latest_reco_tracks = svd_cdc_reco_tracks
 
-    if is_pxd_used(components):
+    if is_detector_present("PXD", components):
         add_pxd_cr_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                                  output_reco_tracks=full_reco_tracks, add_both_directions=True)
 
@@ -712,14 +719,14 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
-    if is_cdc_used(components) or is_pxd_used(components) or is_svd_used(components):
+    if is_any_detector_present(["PXD", "SVD", "CDC"], components):
         # find MCTracks in CDC, SVD and PXD (or a subset of it)
         path.add_module('TrackFinderMCTruthRecoTracks',
                         RecoTracksStoreArrayName=reco_tracks,
                         UseSecondCDCHits=use_second_cdc_hits,
-                        UsePXDHits=is_pxd_used(components),
-                        UseSVDHits=is_svd_used(components),
-                        UseCDCHits=is_cdc_used(components))
+                        UsePXDHits=is_detector_present("PXD", components),
+                        UseSVDHits=is_detector_present("SVD", components),
+                        UseCDCHits=is_detector_present("CDC", components))
 
 
 def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='__ROIsvdClusters'):
@@ -731,7 +738,7 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
     :param components: the list of geometry components in use or None for all components, always exclude the PXD.
     """
 
-    if not is_svd_used(components):
+    if not is_detector_present("SVD", components):
         return
 
     # Material effects

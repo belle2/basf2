@@ -13,13 +13,13 @@
 // framework - DataStore
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <string>
 
 namespace Belle2 {
+  class Particle;
 
   /**
    * prints particle list to screen

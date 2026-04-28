@@ -7,7 +7,8 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDROIDQMModule.h>
-#include "TDirectory.h"
+#include <pxd/dataobjects/PXDRawROIs.h>
+#include <TDirectory.h>
 
 using namespace std;
 using namespace Belle2;

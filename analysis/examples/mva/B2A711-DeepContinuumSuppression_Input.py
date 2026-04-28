@@ -119,7 +119,7 @@ contVars = [
     'thrustOm',
     'cosTBTO',
     'cosTBz',
-    'KSFWVariables(et)',
+    'KSFWVariables(pt_sum)',
     'KSFWVariables(mm2)',
     'KSFWVariables(hso00)',
     'KSFWVariables(hso02)',
@@ -185,18 +185,17 @@ for rank in range(5):
             variables.append(f'{variable}_{shortcut}{rank}')
 
 # Create output file.
-ma.variablesToNtuple('B0', variables + contVars, treename='tree', filename=outfile, path=roe_path)
+ma.variablesToNtuple('B0', variables + contVars, treename='B0', filename=outfile, path=roe_path)
 
 # Loop over each possible ROE (1 for every B candidate) in every event
 firstpath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 basf2.process(firstpath)
-print(basf2.statistics)
 
 # Shuffle Data. Use only if enough Ram is available
 try:
     with uproot.open(outfile) as outf:
-        df = outf['tree'].arrays(library='pd')
+        df = outf['B0'].arrays(library='pd')
     df = df.sample(frac=1)
     df.to_csv(outfile+'.shuffled.csv')
 except OSError as e:

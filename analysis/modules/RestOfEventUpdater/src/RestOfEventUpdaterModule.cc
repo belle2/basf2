@@ -11,6 +11,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/dataobjects/Particle.h>
+
 #include <framework/logging/Logger.h>
 
 using namespace std;

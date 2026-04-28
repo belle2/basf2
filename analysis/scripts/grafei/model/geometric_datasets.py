@@ -205,7 +205,7 @@ def _process_graph(self, idx):
     # Get the LCA in the correct subset order
     # If we're not allowing secondaries this is all we need
     # If we are this will contain duplicates (since secondary locs are set to 0)
-    # We can't load the firs locs directly (i.e. y_item[locs, :]) because locs is (intentionally) unsorted
+    # We can't load the first locs directly (i.e. y_item[locs, :]) because locs is (intentionally) unsorted
     y_edge = y_item["LCA"][evt].reshape((n_LCA, n_LCA)).astype(int)
     # Get the true mcPDG pf FSPs
     y_mass = masses_to_classes(x_item["mc_pdg"][evt][x_rows])

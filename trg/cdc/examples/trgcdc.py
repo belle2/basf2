@@ -272,7 +272,7 @@ savedGeneratorMain.add_module(cdctrg)
 ##########################################################
 # Process events
 # Full simulation.
-b2.process(fullMain)
+b2.process(fullMain, calculateStatistics=True)
 # Only generator+G4Sim and save file. (To save time)
 # process(g4SimMain)
 # For TSIM with generator+G4Sim saved file. (To save time)

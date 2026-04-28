@@ -10,10 +10,15 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/BunchStructure.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <mdst/dataobjects/TRGSummary.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <vector>
 #include <string>
 
@@ -42,10 +47,10 @@ namespace Belle2 {
 
     private:
       /// Mean time of certain modules
-      TH1F* m_meanTimeHistogram;
+      TH1F* m_meanTimeHistogram = nullptr;
 
       /// Mean memory of certain modules
-      TH1F* m_meanMemoryHistogram;
+      TH1F* m_meanMemoryHistogram = nullptr;
 
       /// Time distribution of certain modules
       std::map<std::string, TH1F*> m_moduleTimeHistograms;
@@ -54,19 +59,19 @@ namespace Belle2 {
       std::map<std::string, TH1F*> m_moduleMemoryHistograms;
 
       /// Budget time distribution of all events
-      TH1F* m_fullTimeHistogram;
+      TH1F* m_fullTimeHistogram = nullptr;
 
       /// Processing time distribution of all events
-      TH1F* m_processingTimeHistogram;
+      TH1F* m_processingTimeHistogram = nullptr;
 
       /// Total memory usage distribution of all events
-      TH1F* m_fullMemoryHistogram;
+      TH1F* m_fullMemoryHistogram = nullptr;
 
       /// Mean budget time of events per unit
-      TH1F* m_fullTimeMeanPerUnitHistogram;
+      TH1F* m_fullTimeMeanPerUnitHistogram = nullptr;
 
       /// Mean processing time of events per unit
-      TH1F* m_processingTimeMeanPerUnitHistogram;
+      TH1F* m_processingTimeMeanPerUnitHistogram = nullptr;
 
       /// Budget time distribution of events per unit
       std::map<unsigned int, TH1F*> m_fullTimePerUnitHistograms;
@@ -78,31 +83,40 @@ namespace Belle2 {
       std::map<unsigned int, TH1F*> m_fullMemoryPerUnitHistograms;
 
       /// Number of processes per unit
-      TH1F* m_processesPerUnitHistogram;
+      TH1F* m_processesPerUnitHistogram = nullptr;
 
       /// Processing time distribution of events passing passive injection veto
-      TH1F* m_processingTimePassiveVeto;
+      TH1F* m_processingTimePassiveVeto = nullptr;
 
       /// Processing time distribution of events not passing passive injection veto
-      TH1F* m_processingTimeNotPassiveVeto;
+      TH1F* m_processingTimeNotPassiveVeto = nullptr;
+
+      /// Processing time distribution of events not passing passive injection veto and retained after HLTprefilter timing cuts
+      TH1F* m_processingTimeNotPassiveVetoTimingCut = nullptr;
+
+      /// Processing time distribution of events not passing passive injection veto and retained after HLTprefilter CDC-ECL cuts
+      TH1F* m_processingTimeNotPassiveVetoCDCECLCut = nullptr;
 
       /// Processing time vs nSVDShaperDigits distribution of events passing passive injection veto
-      TH2F* m_procTimeVsnSVDShaperDigitsPassiveVeto;
+      TH2F* m_procTimeVsnSVDShaperDigitsPassiveVeto = nullptr;
 
       /// Processing time vs nSVDShaperDigits distribution of events not passing passive injection veto
-      TH2F* m_procTimeVsnSVDShaperDigitsNotPassiveVeto;
+      TH2F* m_procTimeVsnSVDShaperDigitsNotPassiveVeto = nullptr;
 
       /// Processing time vs nCDCHits distribution of events passing passive injection veto
-      TH2F* m_procTimeVsnCDCHitsPassiveVeto;
+      TH2F* m_procTimeVsnCDCHitsPassiveVeto = nullptr;
 
       /// Processing time vs nCDCHits distribution of events not passing passive injection veto
-      TH2F* m_procTimeVsnCDCHitsNotPassiveVeto;
+      TH2F* m_procTimeVsnCDCHitsNotPassiveVeto = nullptr;
 
       /// Processing time vs nECLDigits distribution of events passing passive injection veto
-      TH2F* m_procTimeVsnECLDigitsPassiveVeto;
+      TH2F* m_procTimeVsnECLDigitsPassiveVeto = nullptr;
 
       /// Processing time vs nECLDigits distribution of events not passing passive injection veto
-      TH2F* m_procTimeVsnECLDigitsNotPassiveVeto;
+      TH2F* m_procTimeVsnECLDigitsNotPassiveVeto = nullptr;
+
+      /// Histogram to monitor injection strip
+      TH2F* m_TimeSinceLastInjectionVsTimeInBeamCycle = nullptr;
 
       /// Storage for the last full time sum
       double m_lastFullTimeSum = 0;
@@ -120,7 +134,7 @@ namespace Belle2 {
       std::map<std::string, double> m_lastModuleTimeSum;
 
       /// Parameter: Create HLT unit number histograms?
-      bool m_param_create_hlt_unit_histograms;
+      bool m_param_create_hlt_unit_histograms = false;
 
       /// Parameter: Directory to put the generated histograms
       std::string m_param_histogramDirectoryName = "timing_statistics";
@@ -141,10 +155,10 @@ namespace Belle2 {
       const double m_fullTimeNBins = 250;
 
       /// Maximum for the histograms of processingTime
-      const double m_processingTimeMax = 10000;
+      const double m_processingTimeMax = 15000;
 
       /// Number of bins for the histograms of processingTime
-      const double m_processingTimeNBins = 250;
+      const double m_processingTimeNBins = 375;
 
       /// Maximum for the histograms of fullMemory
       const double m_fullMemoryMax = 4000;
@@ -170,6 +184,9 @@ namespace Belle2 {
       /// Number of bins for the histograms of nECLDigits
       const double m_nECLDigitsNBins = 100;
 
+      /// TRG result
+      StoreObjPtr<SoftwareTriggerResult> m_triggerResult;
+
       /// TRG Summary
       StoreObjPtr<TRGSummary> m_trgSummary;
 
@@ -181,6 +198,17 @@ namespace Belle2 {
 
       /// ECL Digits
       StoreArray<ECLDigit> m_eclDigits;
+
+      /// Store array object for injection time info.
+      StoreObjPtr<EventLevelTriggerTimeInfo> m_TTDInfo;
+
+      /// Define object for BunchStructure class
+      DBObjPtr<BunchStructure> m_bunchStructure; /**< bunch structure (fill pattern) */
+
+      /// Define object for HardwareClockSettings class
+      DBObjPtr<HardwareClockSettings> m_clockSettings; /**< hardware clock settings */
+
+
     };
 
   }

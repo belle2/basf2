@@ -246,7 +246,6 @@ def get_histos(CollectorHistograms):
 
     histos = {}
 
-    histos['eventT0'] = CollectorHistograms['hEventT0'][0]
     for det in ['CDC', 'SVD']:
         try:
             histos[f'{det}eventT0'] = CollectorHistograms[f'hEventT0From{det}'][0]
@@ -254,6 +253,7 @@ def get_histos(CollectorHistograms):
             print(f'No eventT0 histogram for {det}, creating empty histogram')
             #  empty histos
             histos[f'{det}eventT0'] = r.TH1F(f'{det}eventT0', f'{det}eventT0', 300, -150, 150)
+    histos['eventT0'] = CollectorHistograms['hEventT0']
 
     histos_all = {}
     histos['onTracks'] = {}
@@ -261,11 +261,11 @@ def get_histos(CollectorHistograms):
     histos['timeShifter'] = {}
     histos['absoluteShift'] = {}
 
-    __hClsTimeOnTracks__ = CollectorHistograms['hClsTimeOnTracks'][0]
-    __hClsTimeAll__ = CollectorHistograms['hClsTimeAll'][0]
-    __hClsDiffTimeOnTracks__ = CollectorHistograms['hClsDiffTimeOnTracks'][0]
-    __hClusterSizeVsTimeResidual__ = CollectorHistograms['hClusterSizeVsTimeResidual'][0]
-    __hBinToSensorMap__ = CollectorHistograms['hBinToSensorMap'][0]
+    __hClsTimeOnTracks__ = CollectorHistograms['hClsTimeOnTracks']
+    __hClsTimeAll__ = CollectorHistograms['hClsTimeAll']
+    __hClsDiffTimeOnTracks__ = CollectorHistograms['hClsDiffTimeOnTracks']
+    __hClusterSizeVsTimeResidual__ = CollectorHistograms['hClusterSizeVsTimeResidual']
+    __hBinToSensorMap__ = CollectorHistograms['hBinToSensorMap']
     __hAbsoluteShiftValues__ = CollectorHistograms['hAbsoluteShiftValues'][0]
 
     for name_side in names_sides:
@@ -398,5 +398,6 @@ def get_merged_collector_histograms(files):
                 for key in CollectorHistograms[algo][exp][run]:
                     for hist in CollectorHistograms[algo][exp][run][key][1:]:
                         CollectorHistograms[algo][exp][run][key][0].Add(hist)
+                    CollectorHistograms[algo][exp][run][key] = CollectorHistograms[algo][exp][run][key][0]
 
     return CollectorHistograms

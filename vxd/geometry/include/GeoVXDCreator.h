@@ -6,14 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef GEOVXDCREATOR_H
-#define GEOVXDCREATOR_H
+#pragma once
 
 #include <vxd/geometry/GeoVXDComponents.h>
 #include <vxd/geometry/GeoVXDAssembly.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoVXDRadiationSensors.h>
-#include <vxd/simulation/SensitiveDetectorBase.h>
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -37,8 +35,12 @@ class G4Material;
 class G4UserLimits;
 
 namespace Belle2 {
+  namespace Simulation {
+    class SensitiveDetectorBase;
+  }
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the VXD */
   namespace VXD {
+    class SensitiveDetectorBase;
 
     /** The creator for the VXD geometry of the Belle II detector.   */
     class GeoVXDCreator : public geometry::CreatorBase {
@@ -226,5 +228,3 @@ namespace Belle2 {
 
   } // namespace VXD
 } //namespace Belle2
-
-#endif /* GEOVXDCREATOR_H */

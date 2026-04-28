@@ -10,14 +10,14 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <reconstruction/dataobjects/VXDDedxTrack.h>
-#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 #include <framework/database/DBObjPtr.h>
-#include <svd/dbobjects/SVDdEdxPDFs.h>
-#include <pxd/dbobjects/PXDdEdxPDFs.h>
 
 namespace Belle2 {
+  class Track;
+  class VXDDedxTrack;
+  class VXDDedxLikelihood;
+  class SVDdEdxPDFs;
+  class PXDdEdxPDFs;
 
   /**
    * Module that re-makes VXD PID likelihoods by taking dE/dx stored in VXDDedxTracks and lookup table PDF's from DB.

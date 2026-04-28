@@ -10,7 +10,7 @@
 
 """
 <header>
-  <contact>arul.prakash@physik.uni-muenchen.de</contact>
+  <contact>giacomo.pietro@kit.edu</contact>
   <output>EvtGenSimRecLarge.root</output>
   <description>
     This steering file produces 10000 generic BBbar events with
@@ -23,11 +23,11 @@
 </header>
 """
 
-from basf2 import set_random_seed, create_path, process, statistics
+from basf2 import set_random_seed, create_path, process
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-from beamparameters import add_beamparameters
 from validation import statistics_plots, event_timing_plot
+from validationgenerators import add_evtgen_for_validation
 from background import get_background_files
 
 set_random_seed(12345)
@@ -37,11 +37,8 @@ main = create_path()
 # specify number of events to be generated
 main.add_module("EventInfoSetter", evtNumList=[10000], runList=[1], expList=[0])
 
-# beam parameters
-add_beamparameters(main, "Y4S")
-
 # generate BBbar events
-main.add_module("EvtGenInput")
+add_evtgen_for_validation(main)
 
 # detector and L1 trigger simulation
 add_simulation(main, bkgfiles=get_background_files())
@@ -58,14 +55,11 @@ main.add_module("RootOutput",
                 outputFileName="../EvtGenSimRecLarge.root",
                 branchNames=["ProfileInfo"])
 
-process(main)
-
-# Print call statistics
-print(statistics)
+process(main, calculateStatistics=True)
 
 statistics_plots(
     "EvtGenSimRecLarge_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation and reconstruction job with generic "
     "EvtGen events",
     prefix="EvtGenSimRecLarge",
@@ -73,7 +67,7 @@ statistics_plots(
 event_timing_plot(
     "../EvtGenSimRecLarge.root",
     "EvtGenSimRecLarge_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation and reconstruction job with generic "
     "EvtGen events",
     prefix="EvtGenSimRecLarge",

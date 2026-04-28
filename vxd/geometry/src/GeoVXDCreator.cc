@@ -9,6 +9,7 @@
 #include <vxd/geometry/GeoVXDCreator.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/simulation/SensitiveDetector.h>
+#include <vxd/simulation/SensitiveDetectorBase.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 
 #include <geometry/CreatorFactory.h>

@@ -168,4 +168,3 @@ muid = main.add_module('Muid')
 main.add_module(eventDisplayer)
 
 basf2.process(main, max_event=maxCount)
-print(basf2.statistics)

@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
 
 #include <vector>
 #include <algorithm>
@@ -41,12 +41,12 @@ namespace Belle2 {
       }
 
       /// Cumulated weight of the contained items.
-      Weight getWeight() const
+      TrackingUtilities::Weight getWeight() const
       {
         return std::accumulate(begin(),
                                end(),
-                               static_cast<Weight>(0.0),
-        [](Weight accumulatedWeight, const WithWeight<AItem>& weightedItem) {
+                               static_cast<TrackingUtilities::Weight>(0.0),
+        [](TrackingUtilities::Weight accumulatedWeight, const TrackingUtilities::WithWeight<AItem>& weightedItem) {
           return accumulatedWeight + weightedItem.getWeight();
         });
       }
@@ -64,9 +64,9 @@ namespace Belle2 {
       }
 
       /// Add an item with weight.
-      void insert(const AItem& item, Weight weight = 1.0)
+      void insert(const AItem& item, TrackingUtilities::Weight weight = 1.0)
       {
-        m_itEnd = m_items.insert(end(), WithWeight<AItem>(item));
+        m_itEnd = m_items.insert(end(), TrackingUtilities::WithWeight<AItem>(item));
         m_itEnd->setWeight(weight);
         ++m_itEnd;
       }
@@ -76,7 +76,7 @@ namespace Belle2 {
       void insert(const This& items, AMeasure& measure)
       {
         for (AItem item : items.m_items) {
-          const Weight weight = measure(item);
+          const TrackingUtilities::Weight weight = measure(item);
           if (not std::isnan(weight)) {
             insert(item, weight);
           }
@@ -84,25 +84,25 @@ namespace Belle2 {
       }
 
       /// Begin iterator of the contained items.
-      typename std::vector<WithWeight<AItem>>::iterator begin()
+      typename std::vector<TrackingUtilities::WithWeight<AItem>>::iterator begin()
       {
         return m_items.begin();
       }
 
       /// Begin iterator of the contained items.
-      typename std::vector<WithWeight<AItem>>::const_iterator begin() const
+      typename std::vector<TrackingUtilities::WithWeight<AItem>>::const_iterator begin() const
       {
         return m_items.begin();
       }
 
       /// End iterator of the contained items.
-      typename std::vector<WithWeight<AItem>>::iterator end()
+      typename std::vector<TrackingUtilities::WithWeight<AItem>>::iterator end()
       {
         return m_itEnd;
       }
 
       /// End iterator of the contained items.
-      typename std::vector<WithWeight<AItem>>::const_iterator end() const
+      typename std::vector<TrackingUtilities::WithWeight<AItem>>::const_iterator end() const
       {
         return m_itEnd;
       }
@@ -120,15 +120,15 @@ namespace Belle2 {
         m_items.clear();
         m_itEnd = m_items.end();
         Super& super = *this;
-        clearIfApplicable(super);
+        TrackingUtilities::clearIfApplicable(super);
       }
 
     private:
       /// Memory for the weighted items.
-      std::vector<WithWeight<AItem>> m_items;
+      std::vector<TrackingUtilities::WithWeight<AItem>> m_items;
 
       /// Memory for the end of the items that are not erased.
-      typename std::vector<WithWeight<AItem>>::iterator m_itEnd{m_items.end()};
+      typename std::vector<TrackingUtilities::WithWeight<AItem>>::iterator m_itEnd{m_items.end()};
     };
   }
 }

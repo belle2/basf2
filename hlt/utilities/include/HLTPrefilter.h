@@ -73,8 +73,6 @@ namespace Belle2::HLTPrefilter {
         const double HERtimeInBeamCycleMin        = m_hltPrefilterParameters->getHERtimeInBeamCycleMin();
         /// Maximum threshold of timeInBeamCycle for LER injection
         const double HERtimeInBeamCycleMax        = m_hltPrefilterParameters->getHERtimeInBeamCycleMax();
-        /// Prescale for accepting HLTPrefilter lines, by default we randomly accept 1 out of every 1000 events
-        const unsigned int prescale = m_hltPrefilterParameters->getHLTPrefilterPrescale();
 
         /// Calculate revolution time of beam
         const double revolutionTime = m_bunchStructure->getRFBucketsPerRevolution() * 1e-3 /
@@ -107,7 +105,7 @@ namespace Belle2::HLTPrefilter {
         }
 
         // Tag events from active veto inside injection strip with a prescale
-        return inActiveInjectionVeto && (LER_strip || HER_strip) && !SoftwareTrigger::makePreScale(prescale);
+        return inActiveInjectionVeto && (LER_strip || HER_strip);
       } else
         return false;
     }
@@ -142,8 +140,6 @@ namespace Belle2::HLTPrefilter {
         const uint32_t nCDCHitsMax = m_hltPrefilterParameters->getCDCHitsMax();
         /// Maximum threshold for ECL Digits
         const uint32_t nECLDigitsMax = m_hltPrefilterParameters->getECLDigitsMax();
-        /// Prescale for accepting HLTPrefilter lines, by default we randomly accept 1 out of every 1000 events
-        const unsigned int prescale = m_hltPrefilterParameters->getHLTPrefilterPrescale();
 
         /// Get NCDCHits for the event
         const uint32_t nCDCHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
@@ -159,7 +155,7 @@ namespace Belle2::HLTPrefilter {
         }
 
         // Tag events having a large CDC and ECL occupancy with a prescale
-        return inActiveInjectionVeto && (nCDCHits > nCDCHitsMax && nECLDigits > nECLDigitsMax) && !SoftwareTrigger::makePreScale(prescale);
+        return inActiveInjectionVeto && (nCDCHits > nCDCHitsMax && nECLDigits > nECLDigitsMax);
       } else
         return false;
     }

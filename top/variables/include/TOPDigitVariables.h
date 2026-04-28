@@ -691,13 +691,19 @@ namespace Belle2 {
        */
       double TOPTracksInSlot(const Particle* particle);
 
-
       /**
        * returns the cluster timing measured by the backsplash in the TOP [ns]
        * @param particle pointer to Particle object (nullptr is also accepted)
        * @return backsplash time (NaN if N/A)
        */
       double topBackSplashTime(const Particle* particle);
+
+      /**
+       * returns the error on the cluster timing measured by the backsplash in the TOP [ns]
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return backsplash time error (NaN if N/A)
+       */
+      double topBackSplashTimeErr(const Particle* particle);
 
       /**
        * returns the number of cherenkov photons associated to the backsplash

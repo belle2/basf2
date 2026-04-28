@@ -56,7 +56,7 @@ namespace Belle2::vxdHoughTracking {
     Super::beginRun();
 
     if (!m_SVDHoughParameters.isValid()) {
-      B2ERROR("SVDHough - RawTrackCandCleaner: SVDHoughParameter dbobject not found, using default parameters.");
+      B2FATAL("SVDHough - RawTrackCandCleaner: SVDHoughParameter dbobject not found, using default parameters.");
     } else {
       m_maxRelations = m_SVDHoughParameters->getMaxRelations();
     }

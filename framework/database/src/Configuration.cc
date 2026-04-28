@@ -522,7 +522,7 @@ conditions database.
 )DOC")
     .add_property("default_hsf_metadata_provider_server", &Configuration::getDefaultHSFRemoteMetadataProviderServer, R"DOC(
 URL of the default HSF central metadata provider to look for payloads in the
-conditions database. This points to the new central server.
+conditions database.
 )DOC")
     .add_property("payload_locations", &Configuration::getPayloadLocationsPy, &Configuration::setPayloadLocationsPy, R"DOC(
 List of payload locations to search for payloads which have been found by any of

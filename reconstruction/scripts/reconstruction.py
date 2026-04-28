@@ -18,7 +18,6 @@ from geometry import check_components, is_detector_present, are_detectors_presen
 
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
-from hlt import add_prefilter_module
 
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 
@@ -30,6 +29,7 @@ from tracking import (
 )
 
 from softwaretrigger.path_utils import (
+    add_prefilter_module,
     add_filter_software_trigger,
     add_skim_software_trigger
 )

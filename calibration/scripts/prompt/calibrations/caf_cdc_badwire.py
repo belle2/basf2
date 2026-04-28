@@ -109,7 +109,7 @@ def pre_collector(components=["CDC", "ECL", "KLM"]):
 
     from reconstruction import add_prefilter_pretracking_reconstruction
     from tracking import add_prefilter_tracking_reconstruction
-    from hlt import add_prefilter_module
+    from softwaretrigger.path_utils import add_prefilter_module
 
     # Add HLTPrefilter module to the path.
     add_prefilter_module(path)

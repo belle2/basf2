@@ -103,7 +103,7 @@
 # In mode: 0.02134689 anti-u s c anti-d, PYTHIA 63 changed to PYTHIA 43 to match corresponding B0 Pythia code
 
 # April 2026, Vitalii Lisovskyi (lisovskyi@cppm.in2p3.fr)
-# Updated the decay modes of the Xi_c* baryons to latest knowledge.
+# Updated the decay modes of the Xi_c* and Omega_c baryons to latest knowledge.
 
 Define qoverp_incohMix_B_s0 1.0
 Define dm_incohMix_B_s0 17.8e12
@@ -13245,14 +13245,12 @@ Decay B'_c1-
   0.5000     B*-       anti-D0    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 
-# Excited charmed Baryons   LHCb PR 3-05-2006
+
 Decay Xi_cc*++
   1.00  Xi_cc++ gamma   PHSP ;
 Enddecay
 
-Decay anti-Xi_cc*--
-  1.00  anti-Xi_cc-- gamma   PHSP ;
-Enddecay
+CDecay anti-Xi_cc*--
 
 Decay Xi_cc++
   0.08 e+  nu_e     Xi_c+   PHSP ;
@@ -13276,9 +13274,7 @@ Decay Xi_cc*+
   1.00  Xi_cc+ gamma   PHSP ;
 Enddecay
 
-Decay anti-Xi_cc*-
-  1.00  anti-Xi_cc- gamma   PHSP ;
-Enddecay
+CDecay anti-Xi_cc*-
 
 Decay Xi_cc+
   0.08 e+  nu_e    Xi_c0    PHSP;
@@ -13320,8 +13316,6 @@ Decay Omega_cc*+
   1.00  Omega_cc+ gamma   PHSP ;
 Enddecay
 
-Decay anti-Omega_cc*-
-  1.00  anti-Omega_cc- gamma   PHSP ;
-Enddecay
+CDecay anti-Omega_cc*-
 
 End

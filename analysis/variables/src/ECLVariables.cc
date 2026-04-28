@@ -1146,7 +1146,6 @@ namespace Belle2 {
       return func;
     }
 
-
     VARIABLE_GROUP("ECL cluster related");
     REGISTER_VARIABLE("clusterEoP", eclClusterEoP, R"DOC(
 Returns ratio of the cluster energy `clusterE` over momentum :math:`p`. 
@@ -1964,7 +1963,6 @@ during the calculation of the `distanceToMcKl` variable.
 .. warning::
     This requires the `getNeutralHadronGeomMatches` function to be used.
 )DOC");
-
   REGISTER_VARIABLE("clusterTimeNorm90", eclClusterTimeNorm90,R"DOC(
 Returns a normalised version of `clusterTiming` such that :math:`90\%` of real photons will 
 have :math:`|\text{timing normalised}| < 1`. 
@@ -1981,5 +1979,6 @@ energy, beam background level and cell ID. It also differs for data and MC.
     found on the `Performance Recommendations Webpage <https://belle2.pages.desy.de/performance/recommendations/>`_.
 
 )DOC", "dimensionless");
+
   }
 }

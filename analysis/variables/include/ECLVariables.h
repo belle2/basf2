@@ -449,6 +449,5 @@ namespace Belle2 {
      */
     double eclClusterTimeNorm90(const Particle* particle);
 
-
   }
 } // Belle2 namespace

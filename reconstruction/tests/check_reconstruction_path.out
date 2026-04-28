@@ -211,6 +211,7 @@
       SpacePoints=PXDSpacePoints
   26. TFCDC_WireHitPreparer
       UseNLoops=inf
+      badADCaverageMax=0
       badADCaverageMin=1000
       badTOTaverageMin=15
       blockNegativeDriftLength=False
@@ -315,10 +316,12 @@
       inputTracks=CDCTrackVector
       onlyNotFittedTracks=False
   34. TFCDC_TrackQualityEstimator
+      deactivateIfDeadBoard=True
       deleteTracks=True
       filter=mva
       filterParameters={'DBPayloadName': 'trackfindingcdc_TrackQualityEstimatorParameters'}
       inputTracks=CDCTrackVector
+      minLayerJumpsForDeadBoards=4
       resetTakenFlag=True
   35. TFCDC_TrackExporter
       RecoTracksStoreArrayName=CDCRecoTracks

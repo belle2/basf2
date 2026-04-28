@@ -29,11 +29,12 @@ namespace Belle2 {
       if (rLayer <= 0) return;
 
       double arcLength = globalHelix.arcLength2DToCylindricalR(rLayer);
+      if (std::isnan(arcLength)) return;
 
       TVector3 pos3D = globalHelix.atArcLength2D(arcLength);
 
-      // +/- deltaPhi corresponding to 5cm left and right (on circle)
-      double deltaPhi = 5. / rLayer;
+      // +/- deltaPhi corresponding to 2cm left and right (on circle)
+      double deltaPhi = 2. / rLayer;
 
       for (int i = -1; i <= 1; i++) {
         TVector3 thisPos = pos3D;
@@ -45,14 +46,10 @@ namespace Belle2 {
     }
 
 
-    bool cdcTrackDeadBoardFilter(const Belle2::TrackingUtilities::CDCTrack& aCDCTrack)
+    bool cdcTrackDeadBoardFilter(const Belle2::TrackingUtilities::CDCTrack& aCDCTrack, int minJump)
     {
-      // tunable parameters.
-      int minJump = 5;  // minimum layers to be jumped between two hits to trigger search for bad boards (one board covers 3 layers)
-
-      // first check if bad wires are present
+      // first check if dead boards are present
       Belle2::TrackingUtilities::StoreWrappedObjPtr< std::vector<unsigned int> > deadBoardsVectorPtr("CDCDeadBoardsVector");
-
       // nothing to do if no dead boards have been assigned
       if (not deadBoardsVectorPtr.isValid() || (*deadBoardsVectorPtr).size() == 0) return false;
       // for better readability
@@ -66,8 +63,7 @@ namespace Belle2 {
       auto localOrigin = trajectory.getLocalOrigin();
       globalHelix.passiveMoveBy(-localOrigin);
 
-      // detect layer jumps jumping at least minJump layers
-      // Assumes hits are ordered! Need check if that is always true, or sorting without check (PS: TrackQualityEstimator also assumes hits are ordered for its filter)
+      // Detect if several layers are jumped. The minimum amount of wires jumped is defined by the minJump variable
       const Belle2::TrackingUtilities::CDCRecoHit3D* prevHitPtr = nullptr;
       for (const Belle2::TrackingUtilities::CDCRecoHit3D& thisHit : aCDCTrack) {
         if (not prevHitPtr) {
@@ -79,8 +75,6 @@ namespace Belle2 {
         Belle2::CDC::ILayer iclayerThis = ((const CDCHit*)thisHit)->getICLayer();
 
         if (abs(iclayerPrev - iclayerThis) >= minJump) {
-
-          // TODO: check for max radius
 
           // direction in case of backcurling tracks
           int dir = (iclayerThis - iclayerPrev) < 0 ? -1 : 1;
@@ -94,7 +88,6 @@ namespace Belle2 {
           addBoardCandsAtLayer(boardCands, globalHelix, newlayerPrev, geometryPar);
 
           for (auto iboard : boardCands) {
-            //std::cout << iboard << std::endl;
             if (std::find(deadBoardsVector.begin(), deadBoardsVector.end(), iboard) != deadBoardsVector.end()) return true;
           }
         }

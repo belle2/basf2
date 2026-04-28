@@ -58,10 +58,14 @@ void TrackQualityEstimator::exposeParameters(ModuleParamList* moduleParamList, c
                                 "Reset taken flag for deleted tracks so that hits can be used by subsequent TFs.",
                                 m_param_resetTakenFlag);
 
-  moduleParamList->addParameter(prefixed(prefix, "deactivateIfBadBoard"),
-                                m_param_deactivateIfBadBoard,
-                                "If true the filter will be deactivated in case a bad CDC board is detected at a position where a hole in the track is found.",
-                                m_param_deactivateIfBadBoard);
+  moduleParamList->addParameter(prefixed(prefix, "deactivateIfDeadBoard"),
+                                m_param_deactivateIfDeadBoard,
+                                "If true the filter will be deactivated for the track in case a dead CDC board is detected at a position where a hole in the track is found.",
+                                m_param_deactivateIfDeadBoard);
+  moduleParamList->addParameter(prefixed(prefix, "minLayerJumpsForDeadBoards"),
+                                m_param_minLayerJumpsForDeadBoards,
+                                "Minimal number of CDC layers to be jumped by the track to trigger the dead board detection. Not used if deactivateIfDeadBoard is false. Default 4 corresponding to potentially 1 SL jumped (3 wire layers).",
+                                m_param_minLayerJumpsForDeadBoards);
 }
 
 void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
@@ -73,9 +77,10 @@ void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
     track.setQualityIndicator(qualityIndicator);
 
     // check for dead boards in case of rejected tracks
-    if (m_param_deactivateIfBadBoard && std::isnan(qualityIndicator)) {
+    if (m_param_deactivateIfDeadBoard && std::isnan(qualityIndicator)) {
       // set QI to infinity temporarily to prevent deletion if dead board found, will be set back to NAN later (after deletion step)
-      if (cdcTrackDeadBoardFilter(track)) track.setQualityIndicator(std::numeric_limits<float>::infinity());
+      if (cdcTrackDeadBoardFilter(track, m_param_minLayerJumpsForDeadBoards)) track.setQualityIndicator(
+          std::numeric_limits<float>::infinity());
     }
   }
 

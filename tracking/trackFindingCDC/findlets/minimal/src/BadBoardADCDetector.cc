@@ -49,7 +49,7 @@ void BadBoardADCDetector::exposeParameters(ModuleParamList* moduleParamList,
                                 m_badADCaverageMin);
   moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "badADCaverageMax"),
                                 m_badADCaverageMax,
-                                "Maximal value of average ADC to consider board bad",
+                                "Maximal value of average ADC to consider a board as bad",
                                 m_badADCaverageMax);
   moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "badTOTaverageMin"),
                                 m_badTOTaverageMin,

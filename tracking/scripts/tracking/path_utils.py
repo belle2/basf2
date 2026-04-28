@@ -640,7 +640,8 @@ def add_svd_standalone_tracking(path,
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_cdc_cellular_automaton=False,
                           use_second_hits=False, add_mva_quality_indicator=True,
-                          reattach_hits=False, skip_WireHitPreparer=False):
+                          reattach_hits=False, skip_WireHitPreparer=False
+                          ):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -737,7 +738,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_cdc_cellul
             filter='mva',
             filterParameters={'DBPayloadName': 'trackfindingcdc_TrackQualityEstimatorParameters'},
             deleteTracks=True,
-            resetTakenFlag=True
+            resetTakenFlag=True,
+            deactivateIfDeadBoard=True,
+            minLayerJumpsForDeadBoards=4
         )
 
     # Export CDCTracks to RecoTracks representation

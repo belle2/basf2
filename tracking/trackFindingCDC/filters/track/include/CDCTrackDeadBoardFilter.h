@@ -28,9 +28,10 @@ namespace Belle2 {
     /** Helper function to filter CDCTracks which have bad CDC boards where holes
        in the track are detected
        @param aCDCTrack CDC track to be checked
+       @param minJump : minimal number of CDC wire layers to be jumped to trigger dead board detection
        @return returns true if bad board has been detected
     */
-    bool cdcTrackDeadBoardFilter(const Belle2::TrackingUtilities::CDCTrack& aCDCTrack);
+    bool cdcTrackDeadBoardFilter(const Belle2::TrackingUtilities::CDCTrack& aCDCTrack, int minJump);
 
 
     /** Helper function that determines position on the globalHelix where the CDC layer iclayer is crossed, and adds corresponding

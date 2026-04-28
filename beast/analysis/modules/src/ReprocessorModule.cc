@@ -14,9 +14,7 @@
 #include <Math/Vector3D.h>
 
 //c++
-#include <boost/foreach.hpp>
 #include <string>
-#include <fstream>
 
 using namespace std;
 using namespace Belle2;

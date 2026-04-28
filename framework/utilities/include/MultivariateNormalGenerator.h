@@ -43,7 +43,7 @@ namespace Belle2 {
    *
    * To ease this restriction a little we use the LDLT decomposition given as
    * \f$M = P^T L D L^T P\f$ where \f$P\f$ is a permutation matrix and D a diagonal matrix.
-   * We then can use \f$A = P^T L \sqrt(D)\f$ to caluclate the correlated values also
+   * We then can use \f$A = P^T L \sqrt(D)\f$ to calculate the correlated values also
    * for positive semi-definite covariance matrices if the elements of D are
    * positive.
    */
@@ -70,7 +70,7 @@ namespace Belle2 {
     {
       setMeanCov(mean, cov);
     }
-    /** Generate a set of correlated random numbers with the previouly set
+    /** Generate a set of correlated random numbers with the previously set
      * mean and covariance
      * @return Vector containing the generated random numbers
      */
@@ -90,7 +90,7 @@ namespace Belle2 {
     void reset();
     /** Return the number of elements to be generated on generate() */
     size_t size() const { return m_mean.rows(); }
-    /** Generate a set of correlated random numbers with the previouly set
+    /** Generate a set of correlated random numbers with the previously set
      * mean and covariance and store them in buffer output.
      * @param output pointer to array where generated values will be stored.
      */
@@ -116,7 +116,7 @@ namespace Belle2 {
       return ROOT::Math::XYZVector(tmp[0], tmp[1], tmp[2]);
     }
 
-    /** Generate a set of correlated random numbers with the previouly set
+    /** Generate a set of correlated random numbers with the previously set
      * mean and covariance and return a TVectorT<double>
      */
     TVectorD generateVecT() const
@@ -134,14 +134,14 @@ namespace Belle2 {
      * @param n dimensionality
      * @param mean pointer to the n mean values of the distribution
      * @param cov pointer to the n*n covariance values in row major layout
-     * @return true if covariance could be decomposited, false otherwise
+     * @return true if covariance could be decomposed, false otherwise
      */
     bool setMeanCov(int n, const double* mean, const double* cov);
 
     /** set the mean and covariance for the distribution.
      * @param mean Vector of mean values
      * @param cov Matrix containing the covariance values
-     * @return true if covariance could be decomposited, false otherwise
+     * @return true if covariance could be decomposed, false otherwise
      */
     bool setMeanCov(const Eigen::VectorXd& mean, const Eigen::MatrixXd& cov);
 
@@ -149,7 +149,7 @@ namespace Belle2 {
      * TMatrixD, TMatrixF, TMatrixDSym and so forth
      * @param mean Vector of mean values
      * @param cov Matrix containing the covariance values
-     * @return true if covariance could be decomposited, false otherwise
+     * @return true if covariance could be decomposed, false otherwise
      */
     template<class value_type> bool setMeanCov(const TVectorT<value_type>& mean,
                                                const TMatrixTBase<value_type>& cov);
@@ -157,7 +157,7 @@ namespace Belle2 {
     /** set the mean and covariance for the distribution.
      * @param mean Vector of mean values
      * @param cov Matrix containing the covariance values
-     * @return true if covariance could be decomposited, false otherwise
+     * @return true if covariance could be decomposed, false otherwise
      */
     template<class value_type> bool setMeanCov(const ROOT::Math::XYZVector& mean,
                                                const TMatrixTBase<value_type>& cov);

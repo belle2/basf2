@@ -9,6 +9,7 @@
 
 #include <framework/pcore/MsgHandler.h>
 #include <ctime>
+#include <unistd.h>
 
 using namespace Belle2;
 using namespace std;

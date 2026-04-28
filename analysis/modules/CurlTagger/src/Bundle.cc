@@ -7,6 +7,7 @@
  **************************************************************************/
 #include <analysis/modules/CurlTagger/Bundle.h>
 
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/variables/VertexVariables.h>
 
 #include <TMath.h>

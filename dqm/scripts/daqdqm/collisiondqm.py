@@ -9,6 +9,7 @@
 ##########################################################################
 
 
+from geometry import is_detector_present, are_detectors_present
 from daqdqm.commondqm import add_common_dqm
 from IPDQM import add_IP_dqm
 from V0DQM import add_V0_dqm
@@ -45,19 +46,26 @@ def add_collision_dqm(path, components=None, dqm_environment="expressreco", dqm_
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
 
         # PXD (not useful on HLT)
-        if components is None or 'PXD' in components:
+        if is_detector_present("PXD", components):
             # need to be behind add_common_dqm as intercepts are calculated there
             path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
 
     if dqm_mode in ["dont_care", "filtered"]:
 
         # IP DQM (when run on HLT, less plots are produced)
-        if components is None or ('CDC' in components and 'SVD' in components):
+        if are_detectors_present(["CDC", "SVD"], components):
             add_IP_dqm(path, dqm_environment=dqm_environment)
+
+        # KLM2 (requires mu+ particle list from add_analysis_dqm)
+        if is_detector_present("KLM", components):
+            path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM2',
+                            MinimalMatchingDigits=14,
+                            MinimalMatchingDigitsOuterLayers=4,
+                            MinimalMomentumNoOuterLayers=4.0)
 
     # the following makes only sense in collisions
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
 
         # V0 DQM
-        if components is None or 'CDC' in components:
+        if is_detector_present("CDC", components):
             add_V0_dqm(path)

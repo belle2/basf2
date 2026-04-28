@@ -105,7 +105,7 @@ short HitPatternCDC::getLastLayer() const
 {
   // m_pattern.size()-8 because the first 8 bits are not pattern
   for (unsigned int i = m_pattern.size() - 8; i > 0; --i) {
-    // -1 because of the index couting...
+    // -1 because of the index counting...
     if ((m_pattern & ~s_infoLayerMask).test(i - 1)) return i - 1;
   }
   return -1;

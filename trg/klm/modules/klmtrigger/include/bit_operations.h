@@ -22,13 +22,13 @@ namespace Belle2 {
 
 
 
-  template <typename AXIS_NAME_T, typename CONTAINER_T>
+  template <typename CONTAINER_T>
   uint64_t to_bit_mask(const CONTAINER_T& container)
   {
 
     return std::accumulate(container.begin(), container.end(), uint64_t(0),
     [](const auto & lhs, const auto & rhs) {
-      const auto bitshift = uint64_t(AXIS_NAME_T::get(rhs));
+      const auto bitshift = uint64_t(rhs);
       if (bitshift > 32) {
         throw std::runtime_error("from:\nuint64_t to_bit_mask(const CONTAINER_T& container)\ninput number to large.\n\n");
       }

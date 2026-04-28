@@ -14,14 +14,18 @@
 /* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-#include <mva/interface/Expert.h>
-#include <mva/interface/Weightfile.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 /* C++ headers. */
 #include <string>
 
 namespace Belle2 {
+  class DatabaseRepresentationOfWeightfile;
+  namespace MVA {
+    class Expert;
+    class SingleDataset;
+    class Weightfile;
+  }
 
   /**
    * Calculation of low-energy pi0 identification value.

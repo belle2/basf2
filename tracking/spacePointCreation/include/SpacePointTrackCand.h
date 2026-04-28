@@ -346,6 +346,16 @@ namespace Belle2 {
 
   protected:
     /**
+     * global momentum plus position state (seed) vector
+     */
+    TVectorD m_state6D = TVectorD(6);
+
+    /**
+     * global momentum plus position state (seed) covariance matrix
+     */
+    TMatrixDSym m_cov6D = TMatrixDSym(6);
+
+    /**
      * pointers to SpacePoints in the datastore
      */
     std::vector<const SpacePoint*> m_trackSpacePoints;
@@ -355,11 +365,18 @@ namespace Belle2 {
      */
     std::vector<double> m_sortingParameters;
 
+    /**
+     * charge of the particle in units of elementary charge
+     */
+    double m_q = 0;
 
     /**
-     * identifier for tracks that share at least two SpacePoints.
-     */
-    short m_family = -1;
+     * An estimation for the quality of the track.
+     *
+     * Normally defined between 0-1 to describe the probability that this track is real(istic).
+     * The quality of the track has to be determined by another function or module.
+     * */
+    double m_qualityIndicator = 0.5;
 
     /**
      * PDG code of particle
@@ -372,26 +389,6 @@ namespace Belle2 {
     int m_MCTrackID = -1;
 
     /**
-     * global momentum plus position state (seed) vector
-     */
-    TVectorD m_state6D = TVectorD(6);
-
-    /**
-     * global momentum plus position state (seed) covariance matrix
-     */
-    TMatrixDSym m_cov6D = TMatrixDSym(6);
-
-    /**
-     * charge of the particle in units of elementary charge
-     */
-    double m_q = 0;
-
-    /**
-     * direction of flight. true is outgoing, false is ingoing
-     */
-    bool m_flightDirection = true;
-
-    /**
      * Index of TrackStub in a curling Track Candidate.
      * + If the TrackCandidate is not curling this value is set to 0.
      * + If it is not yet checked if the TrackCand is curling it is set to -1.
@@ -401,19 +398,21 @@ namespace Belle2 {
     int m_iTrackStub = -1;
 
     /**
+     * identifier for tracks that share at least two SpacePoints.
+     */
+    short m_family = -1;
+
+    /**
      * bit-field to indicate different properties that are checked by the referee module
      */
     unsigned short int m_refereeStatus = c_isActive;
 
     /**
-     * An estimation for the quality of the track.
-     *
-     * Normally defined between 0-1 to describe the probability that this track is real(istic).
-     * The quality of the track has to be determined by another function or module.
-     * */
-    double m_qualityIndicator = 0.5;
+     * direction of flight. true is outgoing, false is ingoing
+     */
+    bool m_flightDirection = true;
 
     // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2), m_qualityIndicator
-    ClassDef(SpacePointTrackCand, 10)
+    ClassDef(SpacePointTrackCand, 11)
   };
 }

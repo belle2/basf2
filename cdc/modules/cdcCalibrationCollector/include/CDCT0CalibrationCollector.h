@@ -66,7 +66,7 @@ namespace Belle2 {
       StoreArray<CDCHit> m_CDCHits;                 /**< CDC hits. */
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_cdcHitArrayName ;         /**< Belle2::CDCHit StoreArray name. */
-      std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray nam.e */
+      std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray name.e */
       std::string m_trackFitResultArrayName;  /**< Belle2::TrackFitResult StoreArray name. */
       std::string m_relRecoTrackTrackName;    /**< Relation between RecoTrack and Belle2:Track. */
       double m_MinimumPt = 0;   /**< minimum pt required for track*/

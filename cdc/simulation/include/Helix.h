@@ -176,7 +176,7 @@ namespace Belle2 {
       /// Sets helix parameters.
       const HepVector& a(const HepVector& newA);
 
-      /// Sets helix paramters and error matrix.
+      /// Sets helix parameters and error matrix.
       const HepSymMatrix& Ea(const HepSymMatrix& newdA);
 
       /// Sets pivot position.
@@ -198,7 +198,7 @@ namespace Belle2 {
       void ignoreErrorMatrix(void);
 
       /**
-       * Sets/returns z componet of the magnetic field.
+       * Sets/returns z component of the magnetic field.
        *
        * @param[in] bz z-component of the magnetic field.
        * @attention Helix param. alpha is also stored.
@@ -207,7 +207,7 @@ namespace Belle2 {
       double bFieldZ(double bz);
 
       /**
-       * Returns z componet of the magnetic field.
+       * Returns z component of the magnetic field.
        *
        */
       double bFieldZ(void) const;
@@ -239,7 +239,7 @@ namespace Belle2 {
       //! Copy operator.
       Helix& operator = (const Helix&);
 
-    public: // Mathmatical functions
+    public: // Mathematical functions
 
       //! DAp/DA
       HepMatrix delApDelA(const HepVector& ap) const;

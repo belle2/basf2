@@ -14,8 +14,6 @@
 #include <vxd/geometry/GeoCache.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
-#include <boost/foreach.hpp>
-
 #include <TCanvas.h>
 #include <TSystem.h>
 #include <TLegend.h>
@@ -177,7 +175,7 @@ void SVDChargeSharingAnalysisModule::event()
     return;
   }
 
-  BOOST_FOREACH(Track & track, m_Tracks) {
+  for (Track& track : m_Tracks) {
 
     h_nTracks->Fill(m_Tracks.getEntries());
     // Obtaining track momentum, P value & SVD hits, track hypothesis made for pions(or electrons in case of TB)

@@ -155,7 +155,7 @@ namespace Belle2 {
         for (const auto& peak : signalPDF.getPDFPeaks()) {
           double numPhot = pdfConstructor.getExpectedSignalPhotons() * peak.nph;
           double sigma = sqrt(peak.wid);
-          for (int i = 0; i < gRandom->Poisson(numPhot); i++) {
+          for (ULong64_t i = 0; i < gRandom->Poisson(numPhot); i++) {
             double time = gRandom->Gaus(peak.t0, sigma);
             m_pdf->Fill(pixelID, time);
             int pixelCol = (pixelID - 1) % 64 + 1;

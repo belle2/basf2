@@ -8,16 +8,15 @@
 
 #pragma once
 
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <calibration/CalibrationCollectorModule.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
+#include <cdc/topology/CDCWire.h>
 
 #include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreArray.h>
@@ -76,20 +75,21 @@ namespace Belle2 {
       /**
        * extrapolates the helix fit to a given layer and finds the wire which it would be hitting
        */
-      const TrackFindingCDC::CDCWire& getIntersectingWire(const ROOT::Math::XYZVector& xyz, const TrackFindingCDC::CDCWireLayer& layer,
-                                                          const Helix& helixFit) const;
+      const CDCWire& getIntersectingWire(const ROOT::Math::XYZVector& xyz,
+                                         const CDCWireLayer& layer,
+                                         const Helix& helixFit) const;
 
       StoreObjPtr<EventT0> m_eventTimeStoreObject;  /**< Event t0 object */
       StoreArray<Track> m_Tracks;                   /**< Tracks. */
       StoreArray<RecoTrack> m_RecoTracks;           /**< Tracks. */
       StoreArray<TrackFitResult> m_TrackFitResults; /**< Track fit results. */
       StoreArray<CDCHit> m_CDCHits;                 /**< CDC hits. */
-      TrackFindingCDC::StoreWrappedObjPtr<std::vector<TrackFindingCDC::CDCTrack>> m_CDCTracks; /**< CDC tracks. */
+      TrackingUtilities::StoreWrappedObjPtr<std::vector<TrackingUtilities::CDCTrack>> m_CDCTracks; /**< CDC tracks. */
 
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_cdcHitArrayName;          /**< Belle2::CDCHit StoreArray name*/
       std::string m_cdcTrackVectorName = "CDCTrackVector";       /**< Belle2::CDCTrack vectorpointer name*/
-      std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray nam.e */
+      std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray name.e */
       std::string m_trackFitResultArrayName;  /**< Belle2::TrackFitResult StoreArray name. */
       std::string m_relRecoTrackTrackName;    /**< Relation between RecoTrack and Belle2:Track. */
       std::string m_treeName;                 /**< Name of tree for the output file. */
@@ -126,7 +126,7 @@ namespace Belle2 {
 
       unsigned short wireID;                   /**< wireID for hit-level wire monitoring */
       unsigned short layerID;                  /**< layerID for hit-level wire monitoring */
-      float z;                                 /**< z of hit fot hit-level wire monitoring */
+      float z;                                 /**< z of hit for hit-level wire monitoring */
       bool isFound;                            /**< flag for a hit that has been found near a track as expected by extrapolation */
     };
   }

@@ -14,7 +14,7 @@ import sys
 
 
 def CheckEnvVar(conf, var, text=None):
-    """check for the existance of an environment variable"""
+    """check for the existence of an environment variable"""
 
     if text:
         conf.Message(f'Checking for {text}...')
@@ -26,7 +26,7 @@ def CheckEnvVar(conf, var, text=None):
 
 
 def CheckConfigTool(conf, tool):
-    """check for the existance of a tool"""
+    """check for the existence of a tool"""
 
     conf.Message(f'Checking for {tool}...')
     (result, version) = conf.TryAction(f'{tool} --version')
@@ -35,7 +35,7 @@ def CheckConfigTool(conf, tool):
 
 
 def CheckPackage(conf, package, text=None):
-    """check for the existance of a package via the pkg-config tool"""
+    """check for the existence of a package via the pkg-config tool"""
 
     if not text:
         text = package
@@ -46,7 +46,7 @@ def CheckPackage(conf, package, text=None):
 
 
 def CheckFile(conf, dir, text=None):
-    """check for the existance a file"""
+    """check for the existence a file"""
 
     if text:
         conf.Message(f'Checking for {text}...')

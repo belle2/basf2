@@ -340,11 +340,6 @@ namespace Belle2 {
       //Open TFile
       TDirectory* dir = gDirectory;
       for (const auto& filename : filenames) {
-        if (not std::filesystem::exists(filename)) {
-          B2ERROR("Error given ROOT file does not exist " << filename);
-          throw std::runtime_error("Error during open of ROOT file named " + filename);
-        }
-
         TFile* f = TFile::Open(filename.c_str(), "READ");
         if (!f or f->IsZombie() or not f->IsOpen()) {
           B2ERROR("Error during open of ROOT file named " << filename);

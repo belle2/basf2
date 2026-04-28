@@ -52,17 +52,17 @@ namespace Belle2::SVD {
 
   protected:
 
-    /** Hardware Clocks*/
-    DBObjPtr<HardwareClockSettings> m_hwClock;
-
-    /** APV clock period*/
-    double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
-
     /**SVDPulseShaper calibration wrapper*/
     SVDPulseShapeCalibrations m_PulseShapeCal;
 
     /**SVDNoise calibration wrapper*/
     SVDNoiseCalibrations m_NoiseCal;
+
+    /** Hardware Clocks*/
+    DBObjPtr<HardwareClockSettings> m_hwClock;
+
+    /** APV clock period*/
+    double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
   };
 
 

@@ -10,8 +10,6 @@
 #include <framework/database/Database.h>
 #include <framework/logging/Logger.h>
 
-#include <boost/none.hpp>
-
 #include <TClass.h>
 
 namespace Belle2 {

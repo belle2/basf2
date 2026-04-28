@@ -19,7 +19,7 @@ namespace Belle2 {
   public:
 
     /**
-     * Constructor for event depenent conditions.
+     * Constructor for event dependent conditions.
      * @param object   the first valid object in the run.
      * @param owner    flag that indicates whether the EventDependency takes ownership of the payload objects or not.
      */

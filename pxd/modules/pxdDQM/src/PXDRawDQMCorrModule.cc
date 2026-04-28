@@ -6,18 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "pxd/modules/pxdDQM/PXDRawDQMCorrModule.h"
-
-#include <framework/core/HistoModule.h>
-
-#include <framework/datastore/StoreArray.h>
+#include <pxd/modules/pxdDQM/PXDRawDQMCorrModule.h>
+#include <pxd/dataobjects/PXDRawHit.h>
 
 #include <vector>
 #include <boost/format.hpp>
 
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TDirectory.h"
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TDirectory.h>
 
 using namespace std;
 using boost::format;

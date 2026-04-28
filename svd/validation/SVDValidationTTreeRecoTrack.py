@@ -75,7 +75,7 @@ class SVDValidationTTreeRecoTrack(b2.Module):
             clusters = track.getRelationsWith('SVDClusters')
             clusters_number = len(clusters)
             dict_cluster = OrderedDict({'L3': [], 'L4': [], 'L5': [], 'L6': []})  # keys: layers, values: list of dicts
-            # clusters are ordered acording layers and sides, so we can read two at once
+            # clusters are ordered according layers and sides, so we can read two at once
             for i in range(0, len(clusters), 2):
                 c_U, c_V = clusters[i], clusters[i + 1]  # read at once two clusters
                 cluster_U_truehits = c_U.getRelationsTo('SVDTrueHits')  # SVDClustersToSVDTrueHits

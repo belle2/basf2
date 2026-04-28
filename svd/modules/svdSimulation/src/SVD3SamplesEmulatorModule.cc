@@ -23,7 +23,7 @@ SVD3SamplesEmulatorModule::SVD3SamplesEmulatorModule() : Module()
 {
   B2DEBUG(1, "Constructor");
   // Set module properties
-  setDescription("This module takes the SVDShaperDigit as input and select three consecutive samples starting from the one choosen by the user. The modules creates a new StoreArray of the class ShaperDigit whit three samples only, selected from the original ShaperDigits. The three samples are stored in the first three positions of the APVSamples store array, and the last three are set to 0.");
+  setDescription("This module takes the SVDShaperDigit as input and select three consecutive samples starting from the one chosen by the user. The modules creates a new StoreArray of the class ShaperDigit with three samples only, selected from the original ShaperDigits. The three samples are stored in the first three positions of the APVSamples store array, and the last three are set to 0.");
 
   // Parameter definitions
   addParam("SVDShaperDigits", m_shaperDigitInputName, "StoreArray with the input shaperdigits", std::string("SVDShaperDigits"));
@@ -33,9 +33,9 @@ SVD3SamplesEmulatorModule::SVD3SamplesEmulatorModule() : Module()
            std::string("SVDShaperDigit3Samples"));
   addParam("outputSVDEventInfo", m_svdEventInfoOutName, "output SVDEventInfo name", std::string("SVDEventInfo3Samples"));
   addParam("chooseStartingSample", m_chooseStartingSample,
-           "If you want to choose the starting sample manually set this parameter to True. Defauls is False.", false);
+           "If you want to choose the starting sample manually set this parameter to True. Default is False.", false);
   addParam("chooseRelativeShift", m_chooseRelativeShift,
-           "If you want to choose the relative shift sample manually set this parameter to True. Defauls is False, so the relative shift is taken from the original SVDEventInfoSim. Set this True and choose the right relative shift, if you are using data.",
+           "If you want to choose the relative shift sample manually set this parameter to True. Default is False, so the relative shift is taken from the original SVDEventInfoSim. Set this True and choose the right relative shift, if you are using data.",
            false);
   addParam("relativeShift", m_relativeShift,
            "Set the relative shift manually. Default is 0", int(-1));

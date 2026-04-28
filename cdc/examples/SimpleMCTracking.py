@@ -10,7 +10,7 @@
 
 #############################################################################
 #
-# This steering file creates the Belle II detector geometry, and perfoms the
+# This steering file creates the Belle II detector geometry, and performs the
 # simulation and MC based track finding and fitting.
 #
 # EventInfoSetter and EventInfoPrinter generates and shows event meta data (see example
@@ -142,5 +142,5 @@ main.add_module(buildtrack)
 main.add_module(output)
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

@@ -15,8 +15,6 @@ import subprocess
 import json
 import os
 
-# @cond internal_test
-
 
 class CreateDummyData(basf2.Module):
     """Create some random data to have event size not be too small"""
@@ -110,7 +108,7 @@ if __name__ == "__main__":
         "test_noext": "test_noext.f00000.root",
         # any other extension: replace
         "test_otherext.foo": "test_otherext.f00000.root",
-        # but keep paremeters or anchors in urls untouched. TFile::Open ignores
+        # but keep parameters or anchors in urls untouched. TFile::Open ignores
         # them for file:// urls but they are printed on the command line
         "file://test_param?foo=bar": "test_param.f00000.root",
         "file://test_anchor#foo": "test_anchor.f00000.root",
@@ -125,5 +123,3 @@ if __name__ == "__main__":
             path.add_module("RootOutput", outputFileName=name, outputSplitSize=1, updateFileCatalog=False)
             safe_process(path)
             assert os.listdir() == [result], "wrong output file name"
-
-# @endcond

@@ -11,18 +11,17 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <vxd/geometry/GeoCache.h>
-#include <rawdata/dataobjects/RawSVD.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 #include <TH2.h>
 #include <TH1.h>
 #include <string>
-#include <vector>
 #include <map>
 
 namespace Belle2 {
+  class PXDDAQStatus;
+  class RawSVD;
+  class EventLevelTriggerTimeInfo;
 
   namespace PXD {
     /** The PXD DAQ DQM module.
@@ -55,8 +54,8 @@ namespace Belle2 {
       /// the very same DHE and DHC can show up in different packets (for different events)!
       /// but we will fill only one histogram
       TH1D* hDAQErrorEvent{};          /**< per event errors */
-      TH1D* hDAQUseableModule{};          /**< Count Useable/unuseable decision */
-      TH1D* hDAQNotUseableModule{};          /**< Count Useable/unuseable decision */
+      TH1D* hDAQUseableModule{};          /**< Count Usable/unusable decision */
+      TH1D* hDAQNotUseableModule{};          /**< Count Usable/unusable decision */
       TH1D* hDAQDHPDataMissing{};          /**< Count Missing DHP data */
       // TH1F* hDAQErrorPacket{};         /**< per packet (event builder input) errors  */
       TH2D* hDAQErrorDHC{};          /**< individual DHC errors  */

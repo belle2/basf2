@@ -17,8 +17,18 @@ using namespace Belle2;
 using namespace Calibration;
 
 namespace Belle2 {
+  /**
+   * @brief Template specialization of cloneObj for TTree.
+   *
+   * Clones a TTree by calling CloneTree(0) (which copies only
+   * the structure and branches) and sets its name to @p newName.
+   *
+   * @param source The TTree to clone (used only as a template).
+   * @param newName The name assigned to the cloned tree.
+   * @return A pointer to the newly created TTree.
+   */
   template<>
-  TTree* CalibObjManager::cloneObj(TTree* source, const std::string& newName) const
+  TTree* CalibObjManager::cloneObj(TTree* source, const std::string& newName)
   {
     B2DEBUG(100, "Held object is a TTree which will be have CloneTree() called.");
     // Construct the TTree by making a copy
@@ -91,7 +101,7 @@ namespace Belle2 {
     }
   }
 
-  unsigned int CalibObjManager::getHighestIndexObject(const string& name, const TDirectory* dir) const
+  unsigned int CalibObjManager::getHighestIndexObject(const string& name, const TDirectory* dir)
   {
     unsigned int index = 0;
     // Try from the list of objects
@@ -120,12 +130,12 @@ namespace Belle2 {
     return index;
   }
 
-  string CalibObjManager::getSuffix(const Calibration::ExpRun& expRun) const
+  string CalibObjManager::getSuffix(const Calibration::ExpRun& expRun)
   {
     return "_" + encodeExpRun(expRun);
   }
 
-  string CalibObjManager::getSuffix(const EventMetaData& emd) const
+  string CalibObjManager::getSuffix(const EventMetaData& emd)
   {
     const ExpRun key = make_pair(emd.getExperiment(), emd.getRun());
     return getSuffix(key);
@@ -136,7 +146,7 @@ namespace Belle2 {
     return name + getSuffix(expRun);
   }
 
-  unsigned int CalibObjManager::extractKeyIndex(const string& keyName) const
+  unsigned int CalibObjManager::extractKeyIndex(const string& keyName)
   {
     vector<string> strs;
     boost::split(strs, keyName, boost::is_any_of("_"));

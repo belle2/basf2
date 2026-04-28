@@ -8,11 +8,8 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/findlets/OnHitApplier.dcl.h>
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-
-#include <vector>
-#include <string>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -40,21 +37,21 @@ namespace Belle2 {
       LimitedOnHitApplier();
 
       /// Apply the filter to each pair of hits and current path and let only pass the best N hits.
-      void apply(const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& currentPath,
-                 std::vector<TrackFindingCDC::WithWeight<AHit*>>& childHits) override;
+      void apply(const std::vector<TrackingUtilities::WithWeight<const AHit*>>& currentPath,
+                 std::vector<TrackingUtilities::WithWeight<AHit*>>& childHits) override;
 
       /// Copy the filter operator to this method
-      TrackFindingCDC::Weight operator()(const Object& object) override;
+      TrackingUtilities::Weight operator()(const Object& object) override;
 
       /// Expose the parameters of the subfindlet
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override ;
 
     private:
-      /// Parameter how many objects should pass maximal
-      int m_useNHits = 0;
-
       /// Filter to decide on the hits
       AFilter m_filter;
+
+      /// Parameter how many objects should pass maximal
+      int m_useNHits = 0;
     };
 
   }

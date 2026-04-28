@@ -122,7 +122,7 @@ Build the Muid likelihoods starting from the hit pattern and the transverse scat
 * pdg (*int*): PDG code of the particle hypothesis.
   
 
-.. see also:: `"MuidElementNumber Class" <https://software.belle2.org/development/classBelle2_1_1MuidElementNumbers.html#abac5ea6b84578687bc483bb611738e35>`_
+.. seealso:: :doxygen:`"MuidElementNumber Class" <classBelle2_1_1MuidElementNumbers.html#abac5ea6b84578687bc483bb611738e35>`
 
 Muon efficiency and pion fake rate are shown in :numref:`MuonEffPionFakeRate` as a function of
 momentum,  polar angle, and azimuthal angle for three values of the log-likelihood-difference

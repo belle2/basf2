@@ -333,7 +333,7 @@ void SVDBackgroundModule::event()
     std::map<VxdID, std::multiset<unsigned short> > firedStrips;
     for (const SVDShaperDigit& digit : storeDigits) {
       // Filter out digits with signals below zero-suppression threshold
-      // ARE THRE SUCH DIGITS?
+      // ARE THERE SUCH DIGITS?
       VxdID sensorID = digit.getSensorID();
       if (sensorID != currentSensorID) {
         currentSensorID = sensorID;

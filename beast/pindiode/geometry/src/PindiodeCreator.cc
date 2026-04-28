@@ -17,9 +17,6 @@
 #include <TMath.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -35,7 +32,6 @@
 #include <G4VisAttributes.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -99,13 +95,13 @@ namespace Belle2 {
       //values will be automatically converted
       vector<double> bar = content.getArray("bar");
       B2INFO("Contents of bar: ");
-      BOOST_FOREACH(double value, bar) {
+      for (double value : bar) {
         B2INFO("value: " << value);
       }
       */
 
       //Lets loop over all the Active nodes
-      BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+      for (const GearDir& activeParams : content.getNodes("Active")) {
 
         int phase = activeParams.getInt("phase");
         G4double dx_pins = activeParams.getLength("dx_pins") / 2.*CLHEP::cm;
@@ -321,7 +317,7 @@ namespace Belle2 {
                                                   i).Data(), l_airbox, false, 0);
               }
         */
-        //Create PIN plastic subtrate
+        //Create PIN plastic substrate
         /*
         h_hole = 0.6 / 2.*CLHEP::cm;
         sA_hole = 0.*deg;

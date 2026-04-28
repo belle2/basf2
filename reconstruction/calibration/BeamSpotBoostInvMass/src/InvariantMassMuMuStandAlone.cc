@@ -188,7 +188,7 @@ namespace Belle2::InvariantMassMuMuCalib {
     double Const = 1. / (2 * M_PI) * 1. / (s * sK)  * exp(-1. / 2 * x * x / (s * s + sK * sK));
 
     double res = Const * gausInt(a, b, c, d);
-    assert(isfinite(res));
+    assert(std::isfinite(res));
     return res;
   }
 
@@ -210,7 +210,7 @@ namespace Belle2::InvariantMassMuMuCalib {
     } else {
       res = 1. / (2 * tau) * TMath::Erfc(A) * exp(B);
     }
-    assert(isfinite(res));
+    assert(std::isfinite(res));
     return res;
   }
 

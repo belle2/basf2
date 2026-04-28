@@ -46,7 +46,7 @@ namespace Belle2 {
       m_tubesDeltaPhi = geo.getTubesDeltaPhi();
       m_tubesMaterial = geo.getTubesMaterial();
     }
-    //! Assignemnt operator
+    //! Assignment operator
     PXDGeometryPar& operator=(PXDGeometryPar& geo)
     {
       VXDGeometryPar::operator=(geo);

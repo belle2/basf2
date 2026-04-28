@@ -64,7 +64,7 @@ main.add_module("RootOutput", outputFileName='parallel_processing_test.root')
 main.add_module("Progress")
 main.add_module(CheckEventNumbers(5))
 
-# test wether flags are what we expect
+# test whether flags are what we expect
 if particlegun.has_properties(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
     basf2.B2FATAL("ParticleGun has pp flag?")
 if not simulation.has_properties(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
@@ -74,7 +74,7 @@ if not simulation.has_properties(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFI
 # one of them doesn't get an event
 basf2.set_nprocesses(5)
 with clean_working_directory():
-    basf2.process(main)
+    basf2.process(main, calculateStatistics=True)
 
     print(basf2.statistics)
     print(basf2.statistics(basf2.statistics.TOTAL))
@@ -82,7 +82,7 @@ with clean_working_directory():
     # +1 because of extra call to master module
     assert basf2.statistics.get_global().calls(basf2.statistics.EVENT) == 6
 
-    # check wether output file contains correct number of events
+    # check whether output file contains correct number of events
     file = TFile('parallel_processing_test.root')
     tree = file.Get('tree')
     if tree.GetEntries() != 5:

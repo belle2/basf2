@@ -33,8 +33,6 @@ import variables.utils as vu
 # create path
 mypath = b2.create_path()
 
-b2.set_log_level(b2.LogLevel.WARNING)
-
 # Input file(s).
 inputMdst(filename=b2.find_file('B2A424-SimulateMuonPairs.root', 'examples', False),
           path=mypath)
@@ -72,6 +70,3 @@ variablesToNtuple('Z0:mm_kinfit', z0uvars,
 
 # Process the events
 b2.process(mypath)
-
-# print out the summary
-print(b2.statistics)

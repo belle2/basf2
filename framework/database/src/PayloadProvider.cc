@@ -92,7 +92,7 @@ namespace Belle2::Conditions {
 
   bool PayloadProvider::getRemoteFile(const PayloadLocation& loc, PayloadMetadata& metadata)
   {
-    // we want to download payloads in a hashed directory structure to keep amount of payloads per directory to a managable level
+    // we want to download payloads in a hashed directory structure to keep amount of payloads per directory to a manageable level
     const auto local = fs::path(m_cacheDir.base) / getFilename(EDirectoryLayout::c_hashed, metadata);
     // empty location: use the central server supplied baseUrl from payload metadata
     const bool fallback = loc.base.empty();

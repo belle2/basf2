@@ -11,24 +11,19 @@
 #include <framework/core/Module.h>
 #include <string>
 
+#include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+#include <TMatrix.h>
 
 // DataStore
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <framework/geometry/B2Vector3.h>
-
 // DataObjects
 #include <mdst/dbobjects/BeamSpot.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Btube.h>
-
-// rave
-#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
-#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
-#include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 namespace Belle2 {
@@ -59,7 +54,7 @@ namespace Belle2 {
     bool m_associateBtubeToBselected; /**< whether to associate the Btube with the selected B*/
     double m_confidenceLevel;     /**< required fit confidence level */
     double m_Bfield;              /**< magnetic field from data base */
-    B2Vector3D m_BeamSpotCenter;    /**< Beam spot position */
+    ROOT::Math::XYZVector m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
     StoreArray<Btube> m_tubeArray; /**< the (output) array of Btube objects */

@@ -25,8 +25,8 @@ REG_MODULE(AllParticleCombiner);
 AllParticleCombinerModule::AllParticleCombinerModule() : Module()
 {
   // Set module properties
-  setDescription(R"DOC(This module combines all particles of the provided list to one mother particle.
-  )DOC");
+  setDescription(R"DOC(This module combines all particles of the provided list to one mother particle.)DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("inputListNames", m_inputListNames, "List of ParticleLists which are supposed to be combined", std::vector<std::string>());

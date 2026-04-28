@@ -30,7 +30,7 @@ namespace Belle2 {
     TRGECLEventTimingDQMModule();
     /** Destructor */
     virtual ~TRGECLEventTimingDQMModule();
-    /** Defination of histograms */
+    /** Definition of histograms */
     virtual void defineHisto() override;
     /** Initialize the module */
     virtual void initialize() override;

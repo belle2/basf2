@@ -10,7 +10,6 @@
 #include <analysis/modules/BremsCorrection/BelleBremRecoveryModule.h>
 // framework aux
 #include <framework/logging/Logger.h>
-#include <framework/datastore/RelationArray.h>
 
 // dataobjects
 #include <mdst/dataobjects/Track.h>

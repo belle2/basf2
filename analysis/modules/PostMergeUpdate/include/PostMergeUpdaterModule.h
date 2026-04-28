@@ -16,9 +16,8 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <TRotation.h>
 
-#include <string>
+#include <Math/Rotation3D.h>
 
 namespace Belle2 {
 
@@ -49,12 +48,12 @@ namespace Belle2 {
     /**
      * Helper function to determine rotation matrix
      */
-    TRotation tag_vertex_rotation();
+    ROOT::Math::Rotation3D tag_vertex_rotation();
 
     /**
      * Rotate clusters
      */
-    void cluster_rotation(const TRotation& rot);
+    void cluster_rotation(const ROOT::Math::Rotation3D& rot);
 
     StoreArray<TrackFitResult> m_trackFits; /**< track fits */
     StoreArray<Track> m_tracks; /**< tracks */

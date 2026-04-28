@@ -9,6 +9,7 @@
 ##########################################################################
 
 from basf2 import B2INFO, B2FATAL
+from geometry import is_detector_present
 from cdctrigger import add_cdc_trigger
 from ecltrigger import add_ecl_trigger
 from klmtrigger import add_klm_trigger
@@ -29,7 +30,7 @@ def add_trigger_simulation(
     Add the L1 trigger simulation (TSIM) modules to path.
 
     @param path: Modules are added to this path.
-    @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algoritm simulation only,
+    @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algorithm simulation only,
         no firmware simulation; 2) full simulation, both trigger algorithm and firmware are simulated.
     @param shortTracks: The standard CDC track finding requires hits in 4 axial super layers. With the shortTracks
         option, tracks with hits in the 3 innermost super layers are also found.
@@ -70,18 +71,18 @@ def add_subdetector_tsim(
     Add subdetector modules to the TSIM with no GRL and no GDL.
 
     @param path: Modules are added to this path.
-    @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algoritm simulation only,
+    @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algorithm simulation only,
         no firmware simulation; 2) full simulation, both trigger algorithm and firmware are simulated.
     @param shortTracks: The standard CDC track finding requires hits in 4 axial super layers. With the shortTracks
         option, tracks with hits in the 3 innermost super layers are also found.
     @param components: List of subdetector components to be included in TSIM.
     '''
 
-    if ('CDC' in components):
+    if is_detector_present('CDC', components):
         add_cdc_trigger(path=path, SimulationMode=SimulationMode, shortTracks=shortTracks, thetaDef='avg', zDef='min')
-    if ('ECL' in components):
+    if is_detector_present('ECL', components):
         add_ecl_trigger(path=path)
-    if ('KLM' in components):
+    if is_detector_present('KLM', components):
         add_klm_trigger(path=path)
 
 
@@ -96,7 +97,7 @@ def add_grl_gdl_tsim(
     Add GRL and GDL modules to the TSIM with no subdetectors. The function have to applied based on the dataobjects
     produced by add_subdetector_tsim.
 
-    @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algoritm simulation only,
+    @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algorithm simulation only,
         no firmware simulation; 2) full simulation, both trigger algorithm and firmware are simulated.
     @param FilterEvents: if True only the events that pass the L1 trigger will survive simulation, the other are discarded.
         Make sure you do need to filter events before you set the value to True.

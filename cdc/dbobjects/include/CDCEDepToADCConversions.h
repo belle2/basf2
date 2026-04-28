@@ -153,7 +153,7 @@ namespace Belle2 {
     std::map<unsigned short, std::vector<float>> m_cvs; /**< cv list */
 
     ClassDef(CDCEDepToADCConversions, 3); /**< ClassDef */
-    // Version histroy:
+    // Version history:
     // v2: original: paramMode=0, nParams=6.
     // v3: paramMode=1, nParams=7; added sigma for gaussian smearing;
     //     main-factor is now of order(1), while was of order(10) before;

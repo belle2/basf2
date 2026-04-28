@@ -42,6 +42,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   convertBeamParameters=True,
                                   generatorLevelReconstruction=False,
                                   generatorLevelMCMatching=False,
+                                  evtgenProcessing=False,
                                   path=None, entrySequences=None,
                                   matchType2E9oE25Threshold=-1.1,
                                   enableNisKsFinder=True,
@@ -62,6 +63,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         generatorLevelReconstruction (bool): Enables to bypass skims and corrections applied in B2BIIFixMdst.
         generatorLevelMCMatching (bool): Enables to switch MCTruth matching to generator-level particles.
             This is recommended for analyses with gammas in the final state.
+        evtgenProcessing (bool): Enables to switch on only evtgen processing.
         path (basf2.Path): Path to add modules in.
         entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
             the entries which are processed for each inputFileName.
@@ -115,6 +117,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         input.param('inputFileNames', parse_process_url(inputBelleMDSTFile))
     if entrySequences is not None:
         input.param('entrySequences', entrySequences)
+    input.param('evtgenProcessing', evtgenProcessing)
     # input.logging.set_log_level(LogLevel.DEBUG)
     # input.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(input)
@@ -145,7 +148,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                 'However, its requirements are still applied since the HadronB(J) skim, which includes them, is turned on.')
         path.add_module(fix)
 
-        if(applySkim):
+        if (applySkim):
             emptypath = b2.create_path()
             # discard 'bad events' marked by fixmdst
             fix.if_value('<=0', emptypath)
@@ -165,6 +168,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     convert.param("RecTrg", enableRecTrg)
     convert.param("convertEvtcls", enableEvtcls)
     convert.param("convertNbar", convertNbar)
+    convert.param('evtgenProcessing', evtgenProcessing)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)

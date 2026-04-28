@@ -122,4 +122,3 @@ if args.play:
 main.add_module(display)
 
 b2.process(main)
-# print(statistics(statistics.INIT))

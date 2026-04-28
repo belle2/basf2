@@ -65,7 +65,7 @@ namespace Belle2 {
     StoreArray<CDCTriggerTrack> m_finderTracks;
     /** list of output tracks from fitter */
     StoreArray<CDCTriggerTrack> m_fitterTracks;
-    /** StoreObjPtr contraining the event time */
+    /** StoreObjPtr containing the event time */
     StoreObjPtr<BinnedEventT0> m_eventTime;
   };
 

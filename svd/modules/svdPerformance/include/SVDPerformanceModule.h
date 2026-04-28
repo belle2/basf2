@@ -86,7 +86,7 @@ namespace Belle2 {
     /** Name of the SVDEventInfo object */
     std::string m_svdEventInfoName;
 
-    int m_ntracks = 0; /**<numner of tracks*/
+    int m_ntracks = 0; /**<number of tracks*/
 
     static const int m_nLayers = 4; /**< max number of layers*/
     static const int m_nSensors = 5; /**<max number of sensors*/

@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
 
 #include <tracking/ckf/cdc/filters/states/BaseCDCStateFilter.h>
 
@@ -21,11 +21,11 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class CDCStateTruthVarNames : public TrackFindingCDC::VarNames<BaseCDCStateFilter::Object> {
+  class CDCStateTruthVarNames : public TrackingUtilities::VarNames<BaseCDCStateFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(cdcStateTruthVarNames);
+    static const size_t nVars = TrackingUtilities::size(cdcStateTruthVarNames);
 
     /// Get the name of the column.
     constexpr
@@ -38,7 +38,7 @@ namespace Belle2 {
   /**
    * Var set to store basic quantities related to CDC CKF (using truth information)
    */
-  class CDCStateTruthVarSet : public TrackFindingCDC::VarSet<CDCStateTruthVarNames> {
+  class CDCStateTruthVarSet : public TrackingUtilities::VarSet<CDCStateTruthVarNames> {
 
   public:
     /// Generate and assign the variables from the object.

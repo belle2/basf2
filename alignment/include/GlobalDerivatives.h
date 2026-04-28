@@ -18,7 +18,7 @@ namespace Belle2 {
     ///
     /// Allows to simply add, merge and pass global derivatives matrix and
     /// global label vector in RecoHit.
-    /// For lables = 0 removes given columns from derivative matrix
+    /// For labels = 0 removes given columns from derivative matrix
     /// (e.g. save disc space for parameters you do not want to calibrate)
     class GlobalDerivatives {
     public:
@@ -35,9 +35,9 @@ namespace Belle2 {
       operator std::pair<std::vector<int>, TMatrixD>() {return passGlobals(m_globals);}
       /// Convenient operator to pass only labels (non-zero)
       operator std::vector<int>() {return passGlobals(m_globals).first;}
-      /// Covenient operator to pass only derivatives (for non-zero labels)
+      /// Convenient operator to pass only derivatives (for non-zero labels)
       operator TMatrixD() {return passGlobals(m_globals).second;}
-      /// Get stored lables (includes zeros)
+      /// Get stored labels (includes zeros)
       const std::vector<int>& getLabels() const {return m_globals.first;}
       /// Return the derivative matrix (includes columns with zero labels)
       const TMatrixD& getDerivatives() const {return m_globals.second;}
@@ -46,7 +46,7 @@ namespace Belle2 {
       /// Add one parameter - label and the corresponding residual derivative
       /// @param paramLabel label of the global parameter to calibrate
       /// @param dResiduals_dParam vector od derivatives of local residual (U, v) versus global parameter
-      void add(int paramLabel, std::vector<double> dResiduals_dParam);
+      void add(int paramLabel, const std::vector<double>& dResiduals_dParam);
       /// Add derivative of local U residual w.r.t. global parameter
       /// Global derivative versus V residual is set to zero.
       /// For (u, v) measurement use add(p, {dru/dp, drv/dp}.

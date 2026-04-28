@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 
 #include <framework/core/Module.h>
 
@@ -53,8 +53,8 @@ namespace Belle2 {
 
 
     /**
-     * Turns the ParticleLists provided as inputs in std::vectors of PxPyPzEVector and B2Vector3D,
-     * boosting them in the CMS frame.
+     * Turns the ParticleLists provided as inputs into std::vector of PxPyPzEVector,
+     * after boosting them into the CMS frame.
      */
     int parseParticleLists(std::vector<std::string>);
 
@@ -66,10 +66,8 @@ namespace Belle2 {
     std::vector<std::string> m_particleListNames;  /**< Names of the ParticleLists (inputs). */
     std::vector<ROOT::Math::PxPyPzEVector>
     m_p4List; /**< vector containing all the 4-momenta of the particles contained in the input lists. */
-    std::vector<ROOT::Math::XYZVector>
-    m_p3List; /**< vector containing all the 3-momenta of the particles contained in the input lists. */
 
-    bool m_enableThrust = true; /**< Enables the calculation of thust-related quantities.  */
+    bool m_enableThrust = true; /**< Enables the calculation of thrust-related quantities.  */
     bool m_enableCollisionAxis = true; /**< Enables the calculation of the quantities related to the collision axis.  */
     bool m_enableFW = true; /**< Enables the calculation of the FW moments. */
     bool m_enableHarmonicMoments = true; /**< Enables the calculation of the Harmonic moments. */

@@ -8,6 +8,8 @@
 
 #include <pxd/unpacking/PXDRawDataDefinitions.h>
 #include <pxd/modules/pxdUnpacking/PXDPackerErrModule.h>
+#include <rawdata/dataobjects/RawPXD.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -75,7 +77,7 @@ std::vector <PXDErrorFlags> PXDPackerErrModule::m_errors =  {
    * 18 - Double DHC Start frame
    * 19 - Double DHC End frame
    * 20 - Double DHE Start frame*/
-  c_DHE_START_WO_END, // TODO if two DHE, another error condition shoudl trigger, too
+  c_DHE_START_WO_END, // TODO if two DHE, another error condition should trigger, too
   c_ONSEN_TRG_FIRST | c_DHC_START_SECOND | c_DHE_START_THIRD | c_EVENT_STRUCT, // TODO why data outside of ...
   c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO why data outside of ...
   c_DHC_END_DBL, // TODO
@@ -258,7 +260,7 @@ PXDPackerErrModule::PXDPackerErrModule() :
 
   addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of generated RawPXDs", std::string(""));
   addParam("dhe_to_dhc", m_dhe_to_dhc,  "DHE to DHC mapping (DHC_ID, DHE1, DHE2, ..., DHE5) ; -1 disable port");
-  addParam("InvertMapping",  m_InvertMapping, "Use invers mapping to DHP row/col instead of \"remapped\" coordinates", false);
+  addParam("InvertMapping",  m_InvertMapping, "Use inverse mapping to DHP row/col instead of \"remapped\" coordinates", false);
   addParam("Clusterize",  m_Clusterize, "Use clusterizer (FCE format)", false);
   addParam("Check",  m_Check, "Check the result of Unpacking", false);
   addParam("PXDDAQEvtStatsName", m_PXDDAQEvtStatsName, "The name of the StoreObjPtr of read PXDDAQEvtStats", std::string(""));
@@ -599,7 +601,7 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids, bool
       uint32_t ss = (unsigned int)(m_meta_time / 1000000000ull) ; // in seconds
       if (isErrorIn(70)) mm++;
       if (isErrorIn(70)) ss++;
-      append_int16(((mm << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
+      append_int16(((mm << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something useful TODO
       append_int16(((mm >> 12) & 0x7FFF) | ((ss & 1) ? 0x8000 : 0x0)); // TT 27-12 ... not clear if completely filled by DHC
       append_int16((ss >> 1) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
       if (!isErrorIn(7)) {
@@ -698,7 +700,7 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
 
   if (m_InvertMapping) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
-    // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
+    // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up table etc!)
     B2FATAL("Inverse Mapping not implemented in Packer");
   }
 
@@ -772,7 +774,7 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
     /// clear pixelmap
     bzero(halfladder_pixmap, sizeof(halfladder_pixmap));
 
-    /// refering to BelleII Note Nr 0010, the numbers run from ... to
+    /// referring to BelleII Note Nr 0010, the numbers run from ... to
     ///   unsigned int layer, ladder, sensor;
     ///   layer= vxdid.getLayerNumber();/// 1 ... 2
     ///   ladder= vxdid.getLadderNumber();/// 1 ... 8 and 1 ... 12
@@ -886,7 +888,7 @@ void PXDPackerErrModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped)
 
   if (dhe_has_remapped == 0) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
-    // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
+    // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up table etc!)
     B2FATAL("dhe_has_remapped == 0");
   }
 
@@ -931,7 +933,7 @@ void PXDPackerErrModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped)
           error_done = true;
         }
         if (isErrorIn(42) and row == PACKER_NUM_ROWS - 1 and col == PACKER_NUM_COLS - 1 and !error_done) {
-          col = PACKER_NUM_COLS; // masked out to modulo 64 anway
+          col = PACKER_NUM_COLS; // masked out to modulo 64 anyway
           error_done = true;
         }
         if (rowstart) {

@@ -159,6 +159,9 @@ void eclHadronTimeCalibrationValidationCollectorModule::prepare()
   auto eventT0 = new TH1F("eventT0", ";event t0 [ns]; number of events", nbins, min_t, max_t) ;
   registerObject<TH1F>("eventT0", eventT0) ;
 
+  auto eventT0Detector = new TH1F("eventT0Detector",
+                                  "detector used for eventT0 (SVD=2, CDC=4, TOP=8, ECL=32);detector number; number of events", 48, 0, 48) ;
+  registerObject<TH1F>("eventT0Detector", eventT0Detector) ;
 
   auto clusterTimeE0E1diff = new TH1F("clusterTimeE0E1diff",
                                       ";ECL cluster time of max E photon - ECL cluster time of 2nd max E photon [ns]; number of photon ECL cluster time differences",
@@ -188,10 +191,11 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
     m_EperCrys[tempCrysID] = eclCalDigit.getEnergy();
   }
 
-  // Getting the event t0 using the full event t0 rather than from the CDC specifically
+  // Getting the event t0 using the full event t0
 
   double evt_t0 = -1000 ;
   double evt_t0_unc = -1000 ;
+  int evt_t0_detector = 0;
 
   // Determine if there is an event t0 to use and then extract the information about it
   if (m_eventT0.isOptional()) {
@@ -204,6 +208,10 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
       // Overall event t0 (combination of multiple event t0s from different detectors)
       evt_t0 = m_eventT0->getEventT0() ;
       evt_t0_unc = m_eventT0->getEventT0Uncertainty() ;
+      if (m_eventT0->isSVDEventT0()) {evt_t0_detector += 2;}
+      if (m_eventT0->isCDCEventT0()) {evt_t0_detector += 4;}
+      if (m_eventT0->isTOPEventT0()) {evt_t0_detector += 8;}
+      if (m_eventT0->isECLEventT0()) {evt_t0_detector += 32;}
     }
     B2DEBUG(26, "Found event t0") ;
   }
@@ -400,17 +408,22 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
 
   // Fill the histogram for the event level variables
   getObjectPtr<TH1F>("eventT0")->Fill(evt_t0) ;
+  getObjectPtr<TH1F>("eventT0Detector")->Fill(evt_t0_detector + 0.00001) ;
 
+  bool isSVDt0 = m_eventT0->isSVDEventT0();
   bool isCDCt0 = m_eventT0->isCDCEventT0();
   bool isECLt0 = m_eventT0->isECLEventT0();
   string t0Detector = "UNKNOWN... WHY?";
-  if (isCDCt0) {
+  if (isSVDt0) {
+    t0Detector = "SVD" ;
+  } else if (isCDCt0) {
     t0Detector = "CDC" ;
   } else if (isECLt0) {
     t0Detector = "ECL" ;
   }
 
-  B2DEBUG(26, "t0 = " << evt_t0 << " ns.  t0 is from CDC?=" << isCDCt0 << ", t0 is from ECL?=" << isECLt0 << " t0 from " <<
+  B2DEBUG(26, "t0 = " << evt_t0 << " ns.  t0 is from SVD?=" << isSVDt0 << ", t0 is from CDC?=" << isCDCt0 << ", t0 is from ECL?=" <<
+          isECLt0 << " t0 from " <<
           t0Detector);
 
 

@@ -77,8 +77,7 @@ ma.reconstructDecay(decayString='B0   -> K_S0 pi0',
 ma.matchMCTruth(list_name='B0', path=main)
 ma.buildRestOfEvent(target_list_name='B0', path=main)
 
-# The momentum cuts used to be hard-coded in the continuum suppression module. They can now be applied
-# via this mask. The nCDCHits requirement is new, and is recommended to remove VXD-only fake tracks.
+# define mask with momentum cuts and requirement of at least one CDC hit to remove VXD-only fake tracks
 cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
 ma.appendROEMasks(list_name='B0',
                   mask_tuples=[cleanMask],
@@ -86,6 +85,7 @@ ma.appendROEMasks(list_name='B0',
 
 ma.buildContinuumSuppression(list_name='B0',
                              roe_mask='cleanMask',
+                             ipprofile_fit=False,
                              path=main)
 
 # Define the variables for training.
@@ -99,7 +99,7 @@ trainVars = [
     'thrustOm',
     'cosTBTO',
     'cosTBz',
-    'KSFWVariables(et)',
+    'KSFWVariables(pt_sum)',
     'KSFWVariables(mm2)',
     'KSFWVariables(hso00)',
     'KSFWVariables(hso01)',
@@ -140,9 +140,8 @@ expertVars = ['extraInfo(FastBDT)', 'transformedNetworkOutput(FastBDT,0.1,1.0)']
 # Create output file with all sets of variables.
 ma.variablesToNtuple(decayString='B0',
                      variables=trainVars + targetVar + expertVars,
-                     treename='tree',
+                     treename='B0',
                      filename=outfile,
                      path=main)
 
 b2.process(main)
-print(b2.statistics)

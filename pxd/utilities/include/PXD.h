@@ -8,7 +8,7 @@
 
 #pragma once
 
-/** Requied for linkdef.h */
+/** Required for linkdef.h */
 namespace Belle2 {
 
   namespace PXD {

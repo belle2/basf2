@@ -32,11 +32,11 @@ class ClusterBase:
         # Maybe there should be a special subfolder for them?
         self.path = os.getcwd()
 
-        #: Contains a reference to the logger-object from validate_basf2
+        #: Contains a reference to the logger-object from b2validation
         # Set up the logging functionality for the 'cluster execution'-Class,
-        # so we can log to validate_basf2.py's log what is going on in
+        # so we can log to b2validation's log what is going on in
         # .execute and .is_finished
-        self.logger = logging.getLogger("validate_basf2")
+        self.logger = logging.getLogger("b2validation")
 
         # We need to set up the same environment on the cluster like on the
         # local machine. The information can be extracted from $BELLE2_TOOLS,
@@ -65,7 +65,7 @@ class ClusterBase:
         self.logger.debug(f"Setting up the following release: {self.b2setup}")
 
         # Define the folder in which the log of the cluster messages will be
-        # stored (same folder like the log for validate_basf2.py)
+        # stored (same folder like the log for b2validation)
         clusterlog_dir = "./html/logs/__general__/"
         if not os.path.exists(clusterlog_dir):
             os.makedirs(clusterlog_dir)

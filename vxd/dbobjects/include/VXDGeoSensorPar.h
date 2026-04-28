@@ -10,14 +10,11 @@
 #include <string>
 #include <vector>
 
-
-#include <vxd/dbobjects/VXDSensorInfoBasePar.h>
 #include <vxd/dbobjects/VXDGeoComponentPar.h>
 #include <vxd/dbobjects/VXDGeoPlacementPar.h>
 
 namespace Belle2 {
-
-
+  class VXDSensorInfoBasePar;
 
   /**
   * The Class for VXD Sensor payload
@@ -50,9 +47,9 @@ namespace Belle2 {
     void setSensorInfo(VXDSensorInfoBasePar* info) { m_info = info; }
     /** get the pointer to the SensorInfo class */
     const VXDSensorInfoBasePar* getSensorInfo() const { return m_info; }
-    /** return wether or not the sensor is slanted (usually only the first sensor in layers 4-6) */
+    /** return whether or not the sensor is slanted (usually only the first sensor in layers 4-6) */
     bool getSlanted() const { return m_slanted; }
-    /** set wether or not the sensor is slanted (usually only the first sensor in layers 4-6) */
+    /** set whether or not the sensor is slanted (usually only the first sensor in layers 4-6) */
     void setSlanted(bool slanted) { m_slanted = slanted; }
   private:
     /** Paramerers of the active area */
@@ -61,7 +58,7 @@ namespace Belle2 {
     VXDGeoPlacementPar m_activePlacement;
     /** Sensor Information instance */
     VXDSensorInfoBasePar* m_info;
-    /** Indication wether this is a slanted sensor */
+    /** Indication whether this is a slanted sensor */
     bool m_slanted;
     /** list of all components to be placed */
     std::vector<VXDGeoPlacementPar> m_components;

@@ -1,0 +1,515 @@
+[INFO] Steering file: analysis/tests/base_examples.py
+TFile: loadNonStandardV0s.root
+TTree: lambda_rd
+TBranch: __experiment__, 0
+TBranch: __run__, 0
+TBranch: __event__, 2
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 7
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: px, -0.4553
+TBranch: py, 0.7808
+TBranch: pz, 0.1893
+TBranch: pt, 0.9039
+TBranch: p, 0.9235
+TBranch: E, 1.569
+TBranch: M, 1.269
+TBranch: ErrM, 0.0008634
+TBranch: SigM, 177.2
+TBranch: InvM, 1.269
+TBranch: distance, 0.06227
+TBranch: significanceOfDistance, 4.013
+TBranch: dx, -0.0211
+TBranch: dy, 0.02599
+TBranch: dz, 0.05251
+TBranch: x, -0.02108
+TBranch: y, 0.02606
+TBranch: z, 0.05181
+TBranch: x_uncertainty, 0.003684
+TBranch: y_uncertainty, 0.004812
+TBranch: z_uncertainty, 0.003011
+TBranch: dr, 0.03347
+TBranch: dphi, 2.253
+TBranch: dcosTheta, 0.8433
+TBranch: prodVertexX, nan
+TBranch: prodVertexY, nan
+TBranch: prodVertexZ, nan
+TBranch: prodVertexXErr, nan
+TBranch: prodVertexYErr, nan
+TBranch: prodVertexZErr, nan
+TBranch: chiProb, 0.3628
+TBranch: isSignal, nan
+TBranch: mcErrors, 512
+TBranch: mcPDG, nan
+TBranch: d0_px, -0.5128
+TBranch: d0_py, 0.4036
+TBranch: d0_pz, 0.0664
+TBranch: d0_pt, 0.6525
+TBranch: d0_p, 0.6559
+TBranch: d0_E, 1.145
+TBranch: d0_electronID, 2.195e-17
+TBranch: d0_muonID, 1.607e-06
+TBranch: d0_pionID, 1
+TBranch: d0_kaonID, 6.287e-38
+TBranch: d0_protonID, 2.622e-54
+TBranch: d0_deuteronID, 3.484e-66
+TBranch: d0_binaryPID_11_211, 2.195e-17
+TBranch: d0_binaryPID_13_211, 1.607e-06
+TBranch: d0_binaryPID_211_321, 1
+TBranch: d0_binaryPID_321_2212, 1
+TBranch: d0_binaryPID_211_2212, 1
+TBranch: d0_dr, 0.007946
+TBranch: d0_dx, 0.004915
+TBranch: d0_dy, 0.006244
+TBranch: d0_dz, 0.04716
+TBranch: d0_d0, 0.008018
+TBranch: d0_z0, 0.04645
+TBranch: d0_pValue, 0.3296
+TBranch: d0_ndf, -1
+TBranch: d0_nCDCHits, 54
+TBranch: d0_nPXDHits, 3
+TBranch: d0_nSVDHits, 8
+TBranch: d0_nVXDHits, 11
+TBranch: d0_isSignal, 0
+TBranch: d0_mcErrors, 128
+TBranch: d0_mcPDG, 211
+TBranch: d1_px, 0.05743
+TBranch: d1_py, 0.3771
+TBranch: d1_pz, 0.123
+TBranch: d1_pt, 0.3814
+TBranch: d1_p, 0.4008
+TBranch: d1_E, 0.4244
+TBranch: d1_electronID, 3.599e-13
+TBranch: d1_muonID, 3.832e-54
+TBranch: d1_pionID, 8.554e-48
+TBranch: d1_kaonID, 1
+TBranch: d1_protonID, 7.184e-12
+TBranch: d1_deuteronID, 4.181e-24
+TBranch: d1_binaryPID_11_211, 1
+TBranch: d1_binaryPID_13_211, 4.479e-07
+TBranch: d1_binaryPID_211_321, 8.554e-48
+TBranch: d1_binaryPID_321_2212, 1
+TBranch: d1_binaryPID_211_2212, 1.191e-36
+TBranch: d1_dr, 0.02496
+TBranch: d1_dx, -0.02468
+TBranch: d1_dy, 0.003758
+TBranch: d1_dz, 0.04855
+TBranch: d1_d0, -0.02496
+TBranch: d1_z0, 0.04782
+TBranch: d1_pValue, 0.07595
+TBranch: d1_ndf, -1
+TBranch: d1_nCDCHits, 65
+TBranch: d1_nPXDHits, 2
+TBranch: d1_nSVDHits, 8
+TBranch: d1_nVXDHits, 10
+TBranch: d1_isSignal, 0
+TBranch: d1_mcErrors, 128
+TBranch: d1_mcPDG, -321
+TTree: lambda_v0
+TBranch: __experiment__, 0
+TBranch: __run__, 0
+TBranch: __event__, 2
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: px, -0.002864
+TBranch: py, 0.0005992
+TBranch: pz, 0.003402
+TBranch: pt, 0.002926
+TBranch: p, 0.004487
+TBranch: E, 1.182
+TBranch: M, 1.182
+TBranch: ErrM, 0.0005391
+TBranch: SigM, 123.1
+TBranch: InvM, 1.188
+TBranch: distance, 97.98
+TBranch: significanceOfDistance, 109.9
+TBranch: dx, -71.07
+TBranch: dy, 61.62
+TBranch: dz, 27.43
+TBranch: x, -71.07
+TBranch: y, 61.62
+TBranch: z, 27.43
+TBranch: x_uncertainty, 0.5364
+TBranch: y_uncertainty, 0.6516
+TBranch: z_uncertainty, 0.4869
+TBranch: dr, 94.06
+TBranch: dphi, 2.427
+TBranch: dcosTheta, 0.2799
+TBranch: prodVertexX, nan
+TBranch: prodVertexY, nan
+TBranch: prodVertexZ, nan
+TBranch: prodVertexXErr, nan
+TBranch: prodVertexYErr, nan
+TBranch: prodVertexZErr, nan
+TBranch: chiProb, 0.01078
+TBranch: isSignal, nan
+TBranch: mcErrors, 512
+TBranch: mcPDG, nan
+TBranch: d0_px, -0.1534
+TBranch: d0_py, -0.07497
+TBranch: d0_pz, 0.07568
+TBranch: d0_pt, 0.1707
+TBranch: d0_p, 0.1868
+TBranch: d0_E, 0.9567
+TBranch: d0_electronID, 0.9969
+TBranch: d0_muonID, 8.189e-05
+TBranch: d0_pionID, 0.003043
+TBranch: d0_kaonID, 2.935e-28
+TBranch: d0_protonID, 3.785e-34
+TBranch: d0_deuteronID, 7.476e-37
+TBranch: d0_binaryPID_11_211, 0.997
+TBranch: d0_binaryPID_13_211, 0.02621
+TBranch: d0_binaryPID_211_321, 1
+TBranch: d0_binaryPID_321_2212, 1
+TBranch: d0_binaryPID_211_2212, 1
+TBranch: d0_dr, 57.65
+TBranch: d0_dx, -25.31
+TBranch: d0_dy, 51.79
+TBranch: d0_dz, 4.597
+TBranch: d0_d0, 57.65
+TBranch: d0_z0, 4.597
+TBranch: d0_pValue, 0.1469
+TBranch: d0_ndf, -1
+TBranch: d0_nCDCHits, 0
+TBranch: d0_nPXDHits, 0
+TBranch: d0_nSVDHits, 0
+TBranch: d0_nVXDHits, 0
+TBranch: d0_isSignal, 0
+TBranch: d0_mcErrors, 132
+TBranch: d0_mcPDG, 13
+TBranch: d1_px, 0.1482
+TBranch: d1_py, 0.07308
+TBranch: d1_pz, -0.07528
+TBranch: d1_pt, 0.1653
+TBranch: d1_p, 0.1816
+TBranch: d1_E, 0.2291
+TBranch: d1_electronID, 5.572e-11
+TBranch: d1_muonID, 0.04386
+TBranch: d1_pionID, 0.9561
+TBranch: d1_kaonID, 3.616e-17
+TBranch: d1_protonID, 1.648e-22
+TBranch: d1_deuteronID, 5.397e-25
+TBranch: d1_binaryPID_11_211, 5.827e-11
+TBranch: d1_binaryPID_13_211, 0.04386
+TBranch: d1_binaryPID_211_321, 1
+TBranch: d1_binaryPID_321_2212, 1
+TBranch: d1_binaryPID_211_2212, 1
+TBranch: d1_dr, 57.64
+TBranch: d1_dx, -25.49
+TBranch: d1_dy, 51.7
+TBranch: d1_dz, 5.634
+TBranch: d1_d0, -57.64
+TBranch: d1_z0, 5.633
+TBranch: d1_pValue, 9.774e-05
+TBranch: d1_ndf, -1
+TBranch: d1_nCDCHits, 0
+TBranch: d1_nPXDHits, 0
+TBranch: d1_nSVDHits, 0
+TBranch: d1_nVXDHits, 0
+TBranch: d1_isSignal, 0
+TBranch: d1_mcErrors, 132
+TBranch: d1_mcPDG, 13
+TTree: kshort_rd
+TBranch: __experiment__, 0
+TBranch: __run__, 0
+TBranch: __event__, 2
+TBranch: __production__, 0
+TBranch: __candidate__, 0
+TBranch: __ncandidates__, 5
+TBranch: __eventType__, 
+TBranch: __weight__, 1
+TBranch: px, -0.4474
+TBranch: py, 0.774
+TBranch: pz, 0.1877
+TBranch: pt, 0.894
+TBranch: p, 0.9135
+TBranch: E, 1.085
+TBranch: M, 0.5848
+TBranch: ErrM, 0.001469
+TBranch: SigM, 59.34
+TBranch: InvM, 0.585
+TBranch: distance, 0.06401
+TBranch: significanceOfDistance, 4.16
+TBranch: dx, -0.02099
+TBranch: dy, 0.02716
+TBranch: dz, 0.05403
+TBranch: x, -0.02097
+TBranch: y, 0.02724
+TBranch: z, 0.05333
+TBranch: x_uncertainty, 0.003654
+TBranch: y_uncertainty, 0.003966
+TBranch: z_uncertainty, 0.002385
+TBranch: dr, 0.03432
+TBranch: dphi, 2.229
+TBranch: dcosTheta, 0.8441
+TBranch: prodVertexX, nan
+TBranch: prodVertexY, nan
+TBranch: prodVertexZ, nan
+TBranch: prodVertexXErr, nan
+TBranch: prodVertexYErr, nan
+TBranch: prodVertexZErr, nan
+TBranch: chiProb, 0.5927
+TBranch: isSignal, nan
+TBranch: mcErrors, 512
+TBranch: mcPDG, nan
+TBranch: d0_px, -0.5048
+TBranch: d0_py, 0.3969
+TBranch: d0_pz, 0.06439
+TBranch: d0_pt, 0.6421
+TBranch: d0_p, 0.6453
+TBranch: d0_E, 0.6603
+TBranch: d0_electronID, 2.195e-17
+TBranch: d0_muonID, 1.607e-06
+TBranch: d0_pionID, 1
+TBranch: d0_kaonID, 6.287e-38
+TBranch: d0_protonID, 2.622e-54
+TBranch: d0_deuteronID, 3.484e-66
+TBranch: d0_binaryPID_11_211, 2.195e-17
+TBranch: d0_binaryPID_13_211, 1.607e-06
+TBranch: d0_binaryPID_211_321, 1
+TBranch: d0_binaryPID_321_2212, 1
+TBranch: d0_binaryPID_211_2212, 1
+TBranch: d0_dr, 0.00856
+TBranch: d0_dx, 0.005291
+TBranch: d0_dy, 0.006729
+TBranch: d0_dz, 0.05001
+TBranch: d0_d0, 0.008631
+TBranch: d0_z0, 0.0493
+TBranch: d0_pValue, 0.1093
+TBranch: d0_ndf, -1
+TBranch: d0_nCDCHits, 54
+TBranch: d0_nPXDHits, 3
+TBranch: d0_nSVDHits, 8
+TBranch: d0_nVXDHits, 11
+TBranch: d0_isSignal, 1
+TBranch: d0_mcErrors, 0
+TBranch: d0_mcPDG, 211
+TBranch: d1_px, 0.05743
+TBranch: d1_py, 0.3771
+TBranch: d1_pz, 0.123
+TBranch: d1_pt, 0.3814
+TBranch: d1_p, 0.4008
+TBranch: d1_E, 0.4244
+TBranch: d1_electronID, 3.599e-13
+TBranch: d1_muonID, 3.832e-54
+TBranch: d1_pionID, 8.554e-48
+TBranch: d1_kaonID, 1
+TBranch: d1_protonID, 7.184e-12
+TBranch: d1_deuteronID, 4.181e-24
+TBranch: d1_binaryPID_11_211, 1
+TBranch: d1_binaryPID_13_211, 4.479e-07
+TBranch: d1_binaryPID_211_321, 8.554e-48
+TBranch: d1_binaryPID_321_2212, 1
+TBranch: d1_binaryPID_211_2212, 1.191e-36
+TBranch: d1_dr, 0.02496
+TBranch: d1_dx, -0.02468
+TBranch: d1_dy, 0.003758
+TBranch: d1_dz, 0.04855
+TBranch: d1_d0, -0.02496
+TBranch: d1_z0, 0.04782
+TBranch: d1_pValue, 0.07595
+TBranch: d1_ndf, -1
+TBranch: d1_nCDCHits, 65
+TBranch: d1_nPXDHits, 2
+TBranch: d1_nSVDHits, 8
+TBranch: d1_nVXDHits, 10
+TBranch: d1_isSignal, 0
+TBranch: d1_mcErrors, 128
+TBranch: d1_mcPDG, -321
+TTree: kshort_v0
+No entry found
+TBranch: __experiment__
+TBranch: __run__
+TBranch: __event__
+TBranch: __production__
+TBranch: __candidate__
+TBranch: __ncandidates__
+TBranch: __eventType__
+TBranch: __weight__
+TBranch: px
+TBranch: py
+TBranch: pz
+TBranch: pt
+TBranch: p
+TBranch: E
+TBranch: M
+TBranch: ErrM
+TBranch: SigM
+TBranch: InvM
+TBranch: distance
+TBranch: significanceOfDistance
+TBranch: dx
+TBranch: dy
+TBranch: dz
+TBranch: x
+TBranch: y
+TBranch: z
+TBranch: x_uncertainty
+TBranch: y_uncertainty
+TBranch: z_uncertainty
+TBranch: dr
+TBranch: dphi
+TBranch: dcosTheta
+TBranch: prodVertexX
+TBranch: prodVertexY
+TBranch: prodVertexZ
+TBranch: prodVertexXErr
+TBranch: prodVertexYErr
+TBranch: prodVertexZErr
+TBranch: chiProb
+TBranch: isSignal
+TBranch: mcErrors
+TBranch: mcPDG
+TBranch: d0_px
+TBranch: d0_py
+TBranch: d0_pz
+TBranch: d0_pt
+TBranch: d0_p
+TBranch: d0_E
+TBranch: d0_electronID
+TBranch: d0_muonID
+TBranch: d0_pionID
+TBranch: d0_kaonID
+TBranch: d0_protonID
+TBranch: d0_deuteronID
+TBranch: d0_binaryPID_11_211
+TBranch: d0_binaryPID_13_211
+TBranch: d0_binaryPID_211_321
+TBranch: d0_binaryPID_321_2212
+TBranch: d0_binaryPID_211_2212
+TBranch: d0_dr
+TBranch: d0_dx
+TBranch: d0_dy
+TBranch: d0_dz
+TBranch: d0_d0
+TBranch: d0_z0
+TBranch: d0_pValue
+TBranch: d0_ndf
+TBranch: d0_nCDCHits
+TBranch: d0_nPXDHits
+TBranch: d0_nSVDHits
+TBranch: d0_nVXDHits
+TBranch: d0_isSignal
+TBranch: d0_mcErrors
+TBranch: d0_mcPDG
+TBranch: d1_px
+TBranch: d1_py
+TBranch: d1_pz
+TBranch: d1_pt
+TBranch: d1_p
+TBranch: d1_E
+TBranch: d1_electronID
+TBranch: d1_muonID
+TBranch: d1_pionID
+TBranch: d1_kaonID
+TBranch: d1_protonID
+TBranch: d1_deuteronID
+TBranch: d1_binaryPID_11_211
+TBranch: d1_binaryPID_13_211
+TBranch: d1_binaryPID_211_321
+TBranch: d1_binaryPID_321_2212
+TBranch: d1_binaryPID_211_2212
+TBranch: d1_dr
+TBranch: d1_dx
+TBranch: d1_dy
+TBranch: d1_dz
+TBranch: d1_d0
+TBranch: d1_z0
+TBranch: d1_pValue
+TBranch: d1_ndf
+TBranch: d1_nCDCHits
+TBranch: d1_nPXDHits
+TBranch: d1_nSVDHits
+TBranch: d1_nVXDHits
+TBranch: d1_isSignal
+TBranch: d1_mcErrors
+TBranch: d1_mcPDG
+TFile: printMCParticleArray.root
+TTree: variables
+TBranch: __experiment__, 1003
+TBranch: __run__, 0
+TBranch: __event__, 1
+TBranch: __production__, 0
+TBranch: __MCDecayString__, Content of MCParticle list
+├── e- (11)
+├── e+ (-11)
+╰── Upsilon(4S) (300553)
+    ├── anti-B0 (-511)
+    │   ├── Sigma_c+ (4212)
+    │   │   ├── Lambda_c+ (4122)
+    │   │   │   ├── mu+ (-13)
+    │   │   │   │   ├╶╶ anti-nu_mu (-14)
+    │   │   │   │   ├╶╶ nu_e (12)
+    │   │   │   │   ╰╶╶ e+ (-11)
+    │   │   │   ├── nu_mu (14)
+    │   │   │   ╰── Lambda0 (3122)
+    │   │   │       ├── p+ (2212)
+    │   │   │       ╰── pi- (-211)
+    │   │   │           ├╶╶ anti-nu_mu (-14)
+    │   │   │           ╰╶╶ mu- (13)
+    │   │   │               ├╶╶ nu_mu (14)
+    │   │   │               ├╶╶ anti-nu_e (-12)
+    │   │   │               ╰╶╶ e- (11)
+    │   │   ╰── pi0 (111)
+    │   │       ├── gamma (22)
+    │   │       ╰── gamma (22)
+    │   ├── K*- (-323)
+    │   │   ├── anti-K0 (-311)
+    │   │   │   ╰── K_L0 (130)
+    │   │   │       ├╶╶ gamma (22)
+    │   │   │       ╰╶╶ gamma (22)
+    │   │   ╰── pi- (-211)
+    │   │       ├╶╶ anti-nu_mu (-14)
+    │   │       ╰╶╶ mu- (13)
+    │   │           ├╶╶ nu_mu (14)
+    │   │           ├╶╶ anti-nu_e (-12)
+    │   │           ╰╶╶ e- (11)
+    │   ╰── anti-Lambda0 (-3122)
+    │       ├── anti-n0 (-2112)
+    │       │   ├╶╶ gamma (22)
+    │       │   ├╶╶ gamma (22)
+    │       │   ├╶╶ pi+ (211)
+    │       │   │   ├╶╶ nu_mu (14)
+    │       │   │   ╰╶╶ mu+ (-13)
+    │       │   │       ├╶╶ anti-nu_mu (-14)
+    │       │   │       ├╶╶ nu_e (12)
+    │       │   │       ╰╶╶ e+ (-11)
+    │       │   ├╶╶ pi- (-211)
+    │       │   ╰╶╶ pi0 (111)
+    │       │       ├╶╶ gamma (22)
+    │       │       ╰╶╶ gamma (22)
+    │       ╰── pi0 (111)
+    │           ├── gamma (22)
+    │           ╰── gamma (22)
+    ╰── B0 (511)
+        ├── D*- (-413)
+        │   ├── D- (-411)
+        │   │   ├── pi+ (211)
+        │   │   │   ├╶╶ nu_mu (14)
+        │   │   │   ├╶╶ mu+ (-13)
+        │   │   │   │   ├╶╶ anti-nu_mu (-14)
+        │   │   │   │   ├╶╶ nu_e (12)
+        │   │   │   │   ╰╶╶ e+ (-11)
+        │   │   │   ╰╶╶ n0 (2112)
+        │   │   ├── pi- (-211)
+        │   │   │   ╰╶╶ p+ (2212)
+        │   │   ├── pi- (-211)
+        │   │   │   ╰╶╶ n0 (2112)
+        │   │   ├── pi0 (111)
+        │   │   │   ├── gamma (22)
+        │   │   │   ╰── gamma (22)
+        │   │   ├── gamma (22)
+        │   │   ╰── gamma (22)
+        │   ╰── pi0 (111)
+        │       ├── gamma (22)
+        │       ╰── gamma (22)
+        ├── e+ (-11)
+        ╰── nu_e (12)
+
+TBranch: __eventType__, 
+TBranch: __weight__, 1

@@ -30,9 +30,6 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
-CONTACT = "oliver.frost@desy.de"
-
-
 class SegmentPairCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     """Generate, postprocess and inspect MC events for track segment-pair validation"""
     #: Use the SegmentFinderFacetAutomaton for track-segment creation with MC truth-matching

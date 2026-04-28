@@ -8,10 +8,10 @@
 
 #include <tracking/ckf/pxd/filters/states/PXDStateBasicVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -19,11 +19,11 @@
 #include <pxd/dataobjects/PXDCluster.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool PXDStateBasicVarSet::extract(const BasePXDStateFilter::Object* pair)
 {
-  const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& previousStates = pair->first;
+  const std::vector<TrackingUtilities::WithWeight<const CKFToPXDState*>>& previousStates = pair->first;
   CKFToPXDState* state = pair->second;
 
   const RecoTrack* seedTrack = previousStates.front()->getSeed();

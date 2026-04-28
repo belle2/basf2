@@ -14,7 +14,7 @@
 namespace Belle2 {
   /**
    * Class to handle storing SoftwareTriggerCuts in the database.
-   * As we do not want to upload cuts themselve (with all their dependencies and pointers),
+   * As we do not want to upload cuts themselves (with all their dependencies and pointers),
    * we decompile them back into a string and save only the string along with the
    * prescale factor. When using the cut, they are recompiled back into a cut
    * from the string representation.

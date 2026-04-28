@@ -68,7 +68,7 @@
 using namespace Belle2;
 using namespace ROOT::Math;
 
-XYZVector Thrust::calculateThrust(const std::vector<XYZVector>& momenta)
+XYZVector Thrust::calculateThrust(const std::vector<PxPyPzEVector>& momenta)
 {
 
   /* STEP 1: Initialization of Variables */
@@ -111,7 +111,7 @@ XYZVector Thrust::calculateThrust(const std::vector<XYZVector>& momenta)
 
       // Z-alignment of momenta and addition to trial axis
       for (auto const& momentum : momenta)
-        trial_axis += (momentum.Dot(base_axis) >= 0.) ? \
+        trial_axis += (momentum.Vect().Dot(base_axis) >= 0.) ? \
                       XYZVector(momentum) : XYZVector(-momentum);
 
       /*
@@ -119,7 +119,7 @@ XYZVector Thrust::calculateThrust(const std::vector<XYZVector>& momenta)
       */
 
       for (itr = begin; itr != end; itr++)
-        if ((*itr).Dot(trial_axis) * (*itr).Dot(base_axis) < 0.) break;
+        if ((*itr).Vect().Dot(trial_axis) * (*itr).Vect().Dot(base_axis) < 0.) break;
 
       /*
         STEP 6: While condition True:
@@ -141,7 +141,7 @@ XYZVector Thrust::calculateThrust(const std::vector<XYZVector>& momenta)
     */
     double trial_thrust(0.);
     for (auto const& momentum : momenta)
-      trial_thrust += std::fabs(momentum.Dot(trial_axis));
+      trial_thrust += std::fabs(momentum.Vect().Dot(trial_axis));
 
     trial_thrust /= (sum_magnitude_mom * trial_mag);
     // trial_thrust /= sum_magnitude_mom;

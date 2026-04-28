@@ -62,7 +62,7 @@ namespace Belle2 {
 
       inline int digitizeZ0(double z0) {return floor((maxZ0 - z0) / cellWidthZ0);}
       inline int digitizeCot(double cot) {return floor((cot - minCot) / cellWidthCot);}
-      // get value at the center of parameter cell
+      /// get value at the center of parameter cell
       inline double getZ0CellValue(double iZ0) {return maxZ0 - (iZ0 + 0.5) * cellWidthZ0;}
       inline double getCotCellValue(double iCot) {return minCot + (iCot + 0.5) * cellWidthCot;}
 
@@ -94,7 +94,7 @@ namespace Belle2 {
     /** Get the beginning wire ID of the preselection range(10 wires) for each layer. */
     std::vector<int> getIWireBegin(double phi0, double omega);
 
-    /** 1 cell is selected in each layer to reduce LUT comsumption.
+    /** 1 cell is selected in each layer to reduce LUT consumption.
     This functionality is implemented in the HitmapMaker module in firmware */
     std::vector<int> select5Cells(const CDCTriggerSegmentHit* TS);
 

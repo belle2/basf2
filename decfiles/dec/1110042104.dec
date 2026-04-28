@@ -1,0 +1,50 @@
+# EventType: 1110042104 
+# Descriptor: B0 -> omega [-> pi+ pi- pi0 (-> gamma gamma)] K_S0 (-> pi+ pi-)
+# NickName: Bd_omegaKS
+# Documentation: B0 -> omega K_S0
+# Responsible: Maedeh Farhoush
+# Email: farhoumh@mail.uc.edu
+# Tested: yes
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 2025/05/06
+
+
+Alias omegasig  omega
+Alias K_S0sig     K_S0
+Alias pi0sig     pi0
+
+# Upsilon(4S)
+
+Decay Upsilon(4S)
+1.0     B0sig  anti-B0sig  B0  anti-B0  VSS_BMIX dm;
+Enddecay
+
+# B0 -> omega K_S0
+
+Decay B0sig
+1.000   omegasig  K_S0sig      SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+Enddecay
+CDecay anti-B0sig
+
+# omega -> pi+ pi- pi0
+
+Decay omegasig
+1.000 pi+ pi- pi0sig     OMEGA_DALITZ;
+Enddecay
+
+# K_S0:pipi
+
+Decay K_S0sig
+1.000 pi+ pi- PHSP;
+Enddecay
+
+# pi0 -> gamma gamma
+
+Decay  pi0sig
+1.0  gamma  gamma  PHSP;
+Enddecay
+
+End
+
+

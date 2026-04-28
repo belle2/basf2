@@ -1,1 +1,0 @@
-dbstore/CDCFudgeFactorsForSigma 2 3,0,3,-1

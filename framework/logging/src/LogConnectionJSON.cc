@@ -8,7 +8,6 @@
 
 #include <framework/logging/LogConnectionJSON.h>
 #include <framework/logging/LogMessage.h>
-#include <boost/property_tree/json_parser.hpp>
 
 namespace Belle2 {
 

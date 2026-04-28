@@ -74,8 +74,8 @@ namespace Belle2 {
     /// returns a pointer to a neighbor wire. This function is expensive.
     const TRGCDCWire* neighbor(unsigned) const;
 
-    /// returns true if a given wire is consective in a layer.
-    bool consective(const TRGCDCWire&) const;
+    /// returns true if a given wire is consecutive in a layer.
+    bool consecutive(const TRGCDCWire&) const;
 
     /// returns true if a given wire is adjacent.
     bool adjacent(const TRGCDCWire&) const;
@@ -176,7 +176,7 @@ namespace Belle2 {
 
   inline
   bool
-  TRGCDCWire::consective(const TRGCDCWire& w) const
+  TRGCDCWire::consecutive(const TRGCDCWire& w) const
   {
     if (neighbor(2) == & w) return true;
     else if (neighbor(3) == & w) return true;

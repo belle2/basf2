@@ -10,10 +10,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <pxd/dbobjects/PXDClusterPositionErrorPar.h>
-#include <pxd/reconstruction/ClusterCache.h>
-#include <pxd/reconstruction/ClusterProjection.h>
 #include <pxd/reconstruction/NoiseMap.h>
 #include <string>
 #include <memory>
@@ -22,7 +18,14 @@ namespace Belle2 {
   class RelationArray;
   class RelationElement;
   class EventLevelTrackingInfo;
+  class PXDClusterPositionErrorPar;
+  class VxdID;
 
+  namespace PXD {
+    class ClusterCache;
+    class ClusterCandidate;
+    class ClusterProjection;
+  }
 
   namespace PXD {
 
@@ -149,13 +152,13 @@ namespace Belle2 {
 
       /** Flag to set cluster position error from DB (default = true) */
       bool m_errorFromDB;
-      /** Name of the DB payload containing cluster posotion errors in U */
+      /** Name of the DB payload containing cluster position errors in U */
       std::string m_positionErrorUName;
-      /** Name of the DB payload containing cluster posotion errors in V */
+      /** Name of the DB payload containing cluster position errors in V */
       std::string m_positionErrorVName;
-      /** DB object for cluster posotion errors in U */
+      /** DB object for cluster position errors in U */
       std::unique_ptr<DBObjPtr<PXDClusterPositionErrorPar>> m_clusterPositionErrorUPar;
-      /** DB object for cluster posotion errors in V */
+      /** DB object for cluster position errors in V */
       std::unique_ptr<DBObjPtr<PXDClusterPositionErrorPar>> m_clusterPositionErrorVPar;
       /** StoreObject to access the event level tracking information */
       StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;

@@ -50,7 +50,7 @@ namespace Belle2 {
       GeoBeamPipeCreator();
 
       /** The destructor of the GeoBeamPipeCreator class. */
-      virtual ~GeoBeamPipeCreator();
+      virtual ~GeoBeamPipeCreator() override;
 
       /**
       * Creates the ROOT Objects for the BeamPipe geometry.

@@ -390,7 +390,7 @@ void Helix::calcPassiveMoveByJacobian(const double& byX,
     dArcLength2D_dOmega = (f + x * df_dx) * dPrincipleArcLength2D_dOmega + principleArcLength2D * df_dx * principleArcLength2D;
   } else {
     // Far side of the circle
-    // If the far side of the circle is a well definied concept, omega is high enough that
+    // If the far side of the circle is a well defined concept, omega is high enough that
     // we can divide by it.
     // Otherwise nothing can rescue us since the far side of the circle is so far away that no reasonable extrapolation can be made.
     arcLength2D = - chi / omega;
@@ -573,7 +573,7 @@ void Helix::calcArcLength2DAndDrAtXY(const double& x, const double& y, double& a
     arcLength2D = principleArcLength2D * calcATanXDividedByX(principleArcLength2D * omega);
   } else {
     // Far side of the circle
-    // If the far side of the circle is a well definied concept meaning that we have big enough omega.
+    // If the far side of the circle is a well defined concept meaning that we have big enough omega.
     arcLength2D = -chi / omega;
   }
 }

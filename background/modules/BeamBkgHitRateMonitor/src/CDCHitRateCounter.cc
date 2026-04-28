@@ -10,12 +10,10 @@
 #include <background/modules/BeamBkgHitRateMonitor/CDCHitRateCounter.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/WireID.h>
@@ -24,8 +22,8 @@ using namespace std;
 
 namespace Belle2 {
 
-  using TrackFindingCDC::StoreWrappedObjPtr;
-  using TrackFindingCDC::CDCWireHit;
+  using TrackingUtilities::StoreWrappedObjPtr;
+  using TrackingUtilities::CDCWireHit;
 
   namespace Background {
 

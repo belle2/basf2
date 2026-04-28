@@ -62,7 +62,7 @@ namespace Belle2 {
       }
       \endcode
    *
-   *  Weigths are available when looping over the RelationVector returned by getRelations(),
+   *  Weights are available when looping over the RelationVector returned by getRelations(),
    *  as in this example:
       \code
       //retrieve all CDCSimHits for given particle

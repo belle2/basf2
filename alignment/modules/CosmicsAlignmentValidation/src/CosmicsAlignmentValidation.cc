@@ -14,8 +14,6 @@
 #include <root/TFile.h>
 #include <root/TTree.h>
 
-#include <boost/foreach.hpp>
-
 //avoid having to wrap everything in the namespace explicitly
 //only permissible in .cc files!
 using namespace Belle2;
@@ -88,10 +86,6 @@ void CosmicsAlignmentValidationModule::initialize()
 
 }
 
-void CosmicsAlignmentValidationModule::beginRun()
-{
-}
-
 void CosmicsAlignmentValidationModule::event()
 {
   B2DEBUG(99, "[CosmicsAlignmentValidationModule] begin event");
@@ -117,8 +111,8 @@ void CosmicsAlignmentValidationModule::event()
 
   else {
 
-    genfit::Track* tr1 = m_GenfitTracks[0];
-    genfit::Track* tr2 = m_GenfitTracks[1];
+    const genfit::Track* tr1 = m_GenfitTracks[0];
+    const genfit::Track* tr2 = m_GenfitTracks[1];
 
     const TrackFitResult* fitResult1 = findRelatedTrackFitResult(tr1);
     const TrackFitResult* fitResult2 = findRelatedTrackFitResult(tr2);
@@ -182,10 +176,6 @@ void CosmicsAlignmentValidationModule::event()
 
 }
 
-void CosmicsAlignmentValidationModule::endRun()
-{
-}
-
 void CosmicsAlignmentValidationModule::terminate()
 {
   B2INFO("[CosmicsAlignmentValidationModule] Saving tree.");
@@ -206,7 +196,7 @@ const TrackFitResult* CosmicsAlignmentValidationModule::findRelatedTrackFitResul
   typedef RelationIndex<genfit::Track, TrackFitResult>::Element relElement_t;
   std::vector<const TrackFitResult*> fitResults;
 
-  BOOST_FOREACH(const relElement_t& relGfTrackToTrackFitResult, relGfTracksToTrackFitResults.getElementsFrom(gfTrack)) {
+  for (const relElement_t& relGfTrackToTrackFitResult : relGfTracksToTrackFitResults.getElementsFrom(gfTrack)) {
     B2DEBUG(99, "----> Related TrackFitResult found!!!");
     fitResults.push_back(relGfTrackToTrackFitResult.to);
   }

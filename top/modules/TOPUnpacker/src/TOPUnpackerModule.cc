@@ -61,7 +61,7 @@ namespace Belle2 {
              "name of TOPRawDigit store array", string(""));
     addParam("outputTemplateFitResultName", m_templateFitResultName,
              "name of TOPTemplateFitResult", string(""));
-    addParam("swapBytes", m_swapBytes, "if true, swap bytes", false);
+    addParam("swapBytes", m_swapBytesDefault, "if true, swap bytes", false);
     addParam("dataFormat", m_dataFormat,
              "data format as defined in top/include/RawDataTypes.h, 0 = auto detect", 0);
     addParam("addRelations", m_addRelations,
@@ -69,10 +69,6 @@ namespace Belle2 {
     addParam("errorSuppressFactor", m_errorSuppressFactor,
              "error messages suppression factor (0 = no suppression)", (unsigned) 1000);
 
-  }
-
-  TOPUnpackerModule::~TOPUnpackerModule()
-  {
   }
 
   void TOPUnpackerModule::initialize()
@@ -92,6 +88,8 @@ namespace Belle2 {
     m_productionEventDebugs.registerInDataStore(DataStore::c_DontWriteOut);
     m_productionHitDebugs.registerInDataStore(DataStore::c_DontWriteOut);
     m_templateFitResults.registerInDataStore(m_templateFitResultName, DataStore::c_DontWriteOut);
+    m_injectionVeto.registerInDataStore();
+    m_unpackerErrors.registerInDataStore();
 
     m_rawDigits.registerRelationTo(m_waveforms, DataStore::c_Event, DataStore::c_DontWriteOut);
     m_rawDigits.registerRelationTo(m_templateFitResults, DataStore::c_Event, DataStore::c_DontWriteOut);
@@ -131,6 +129,10 @@ namespace Belle2 {
     m_slowData.clear();
     m_interimFEInfos.clear();
 
+    // create injection veto and unpacker errors objects
+    m_injectionVeto.create();
+    m_unpackerErrors.create();
+
     StoreObjPtr<EventMetaData> evtMetaData;
     for (auto& raw : m_rawData) {
       for (int finesse = 0; finesse < raw.GetMaxNumOfCh(0); finesse++) {
@@ -138,8 +140,9 @@ namespace Belle2 {
         int bufferSize = raw.GetDetectorNwords(0, finesse);
         if (bufferSize < 1) continue;
 
+        m_BS = getFrontEndNumber(raw, finesse);
         int err = 0;
-
+        m_swapBytes = m_swapBytesDefault;
         int dataFormat = m_dataFormat;
         if (dataFormat == 0) { // auto detect data format
           DataArray array(buffer, bufferSize, m_swapBytes);
@@ -163,8 +166,7 @@ namespace Belle2 {
                 dataFormat = 0x0301; //assume it's interim format
                 m_swapBytes = true;
               } else {
-                B2WARNING("TOPUnpacker: Could not establish data format.");
-                err = bufferSize;
+                B2DEBUG(22, "TOPUnpacker: Could not establish data format.");
               }
             }
           }
@@ -184,24 +186,29 @@ namespace Belle2 {
             unpackProductionDraft(buffer, bufferSize);
             break;
           case static_cast<int>(TOP::RawDataType::c_ProductionDebug01):
-            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug01, true);
+            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug01, true, evtMetaData->getExperiment());
             break;
           case static_cast<int>(TOP::RawDataType::c_ProductionDebug02):
-            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug02, true);
+            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug02, true, evtMetaData->getExperiment());
             break;
 
           default:
+            m_unpackerErrors->setErrorFlag(m_BS);
             if (printTheError()) {
-              B2ERROR("TOPUnpacker: unknown data format, " << getFrontEndName(raw, finesse)
+              auto boardstackName = getFrontEndName(raw, finesse);
+              B2ERROR("TOPUnpacker: unknown data format from " << boardstackName
                       << LogVar("Type", (dataFormat >> 8))
-                      << LogVar("Version", (dataFormat & 0xFF)));
+                      << LogVar("Version", (dataFormat & 0xFF))
+                      << LogVar("Buffer size", bufferSize));
             }
-            return;
+            continue;
         }
 
         if (err != 0) {
+          m_unpackerErrors->setErrorFlag(m_BS);
           if (printTheError()) {
-            B2ERROR("TOPUnpacker: error in unpacking data from " << getFrontEndName(raw, finesse)
+            auto boardstackName = getFrontEndName(raw, finesse);
+            B2ERROR("TOPUnpacker: error in unpacking data from " << boardstackName
                     << LogVar("words unused", err));
           }
         }
@@ -212,7 +219,7 @@ namespace Belle2 {
   }
 
 
-  std::string TOPUnpackerModule::getFrontEndName(RawTOP& raw, int finesse) const
+  std::string TOPUnpackerModule::getFrontEndName(RawTOP& raw, int finesse)
   {
     std::string name;
     if (raw.GetMaxNumOfCh(0) <= 4) { // COPPER
@@ -224,6 +231,19 @@ namespace Belle2 {
       name += std::to_string(slot) + char('a' + finesse % 4);
     }
     return name;
+  }
+
+
+  unsigned TOPUnpackerModule::getFrontEndNumber(RawTOP& raw, int finesse)
+  {
+    if (raw.GetMaxNumOfCh(0) <= 4) { // COPPER
+      int copper = ((raw.GetNodeID(0) >> 24) * 1000 + (raw.GetNodeID(0) & 0x3FF));
+      return (copper - 3001) * 4 + finesse;
+    } else { // PCIe40
+      int slot = (raw.GetNodeID(0) & 0xF) * 8 - 7 + finesse / 4;
+      int bs = finesse % 4;
+      return (slot - 1) * 4 + bs;
+    }
   }
 
 
@@ -420,8 +440,8 @@ namespace Belle2 {
 
     DataArray array(buffer, bufferSize, m_swapBytes);
 
-    map<unsigned short, int> evtNumCounter; //counts the occurence of carrier-generated event numbers.
-    std::vector<unsigned short> channelCounter(128, 0); //counts occurence of carrier/asic/channel combinations
+    map<unsigned short, int> evtNumCounter; //counts the occurrence of carrier-generated event numbers.
+    std::vector<unsigned short> channelCounter(128, 0); //counts occurrence of carrier/asic/channel combinations
 
     unsigned word = array.getWord(); // header word 0
     unsigned short scrodID = word & 0x0FFF;
@@ -748,7 +768,7 @@ namespace Belle2 {
       info->incrementWaveformsCount();
 
       // create relations btw. raw digits and waveform
-      for (auto& digit : digits) digit->addRelationTo(waveform);
+      for (const auto* digit : digits) digit->addRelationTo(waveform);
 
     }
 
@@ -785,14 +805,13 @@ namespace Belle2 {
       }
       nChannels += it;
 
-      int channelID = channelIndex;
-      int carrier = channelID / 32;
-      int asic = (channelID % 32) / 8;
-      int chn = channelID % 8;
-
       if (it != 1) {
+        int channelID = channelIndex;
+        int carrier = channelID / 32;
+        int asic = (channelID % 32) / 8;
+        int chn = channelID % 8;
         channelOutputString += "carrier: " + std::to_string(carrier) + " asic: " + std::to_string(asic) + " chn: " + std::to_string(
-                                 chn) + " occurence: " + std::to_string(it) + "\n";
+                                 chn) + " occurrence: " + std::to_string(it) + "\n";
         B2WARNING("TOPUnpacker: interim FE - ASIC channel seen more than once"
                   << LogVar("ScrodID", scrodID)
                   << LogVar("carrier", carrier)
@@ -815,7 +834,7 @@ namespace Belle2 {
 
 
   int TOPUnpackerModule::unpackProdDebug(const int* buffer, int bufferSize, TOP::RawDataType dataFormat,
-                                         bool pedestalSubtracted)
+                                         bool pedestalSubtracted, int expNo)
   {
 
     B2DEBUG(22, "Unpacking Production firmware debug data format to TOPRawDigits "
@@ -837,11 +856,13 @@ namespace Belle2 {
     if (feemap) {
       moduleID = feemap->getModuleID();
       boardstack = feemap->getBoardstackNumber();
+      m_BS = (moduleID - 1) * 4 + boardstack;
     } else {
+      m_unpackerErrors->setErrorFlag(m_BS);
       B2WARNING("TOPUnpacker: no front-end map available."
-                << LogVar("SCROD ID", evtScrodID));
+                << LogVar("SCROD ID", evtScrodID)
+                << LogVar("front-end number", m_BS));
     }
-
 
     B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
@@ -851,6 +872,7 @@ namespace Belle2 {
             << ", evtScrodID = " << evtScrodID);
 
     if (evtMagicHeader != 0xA) {
+      m_unpackerErrors->setErrorFlag(m_BS);
       B2WARNING("TOPUnpacker: event header magic word mismatch. should be 0xA."
                 << LogVar("Magic word", evtMagicHeader));
       return array.getRemainingWords();
@@ -869,14 +891,20 @@ namespace Belle2 {
             << ", evtPhase = " << evtPhase
             << ", numWordsCore = " << evtNumWordsCore);
 
-    word = array.getWord(); // word 2, skipHit(1)/reserved(4)/ctime LSBs(11)/revo9counter(16)
-    bool         evtSkipHit = word >> 29;
+    word = array.getWord(); // word 2, skipHit(1)/injVetoFlag(1)/PSBypass(3)/ctime LSBs(11)/revo9counter(16)
+    bool         evtSkipHit = word >> 31;
+    bool         injVetoFlag = (word >> 30) & 0x1;
+    unsigned int PSBypass = (word >> 27) & 0x7;
     unsigned int evtCtime = (word >> 16) & 0x7FF;
     unsigned int evtRevo9Counter = word & 0xFFFF;
+
+    if (expNo > 36) m_injectionVeto->set(injVetoFlag); // before this experiment the bit field is not used and may not be correctly set
 
     B2DEBUG(22, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
             << "\tevtSkipHit = " << evtSkipHit
+            << ", injVetoFlag = " << injVetoFlag
+            << ", PSBypass = " << PSBypass
             << ", evtCtime = " << evtCtime
             << ", evtRevo9Counter = " << evtRevo9Counter);
 
@@ -895,6 +923,8 @@ namespace Belle2 {
                                       evtVersion,
                                       evtScrodID,
                                       evtSkipHit,
+                                      injVetoFlag,
+                                      PSBypass,
                                       evtCtime,
                                       evtPhase,
                                       evtAsicMask,
@@ -1007,6 +1037,7 @@ namespace Belle2 {
                 << ", hitIsOnHeap = " << hitIsOnHeap
                 << ", hitHeapWindow = " << hitHeapWindow);
       } else { //could not match the data format
+        m_unpackerErrors->setErrorFlag(m_BS);
         B2WARNING("TOPUnpacker: could not match data type inside unpackProdDebug()"
                   << LogVar("evtType", evtType) << LogVar("evtVersion", evtVersion));
         return array.getRemainingWords();
@@ -1018,6 +1049,7 @@ namespace Belle2 {
       }
 
       if (hitMagicHeader != 0xB) {
+        m_unpackerErrors->setErrorFlag(m_BS);
         B2WARNING("TOPUnpacker: hit header magic word mismatch. should be 0xB."
                   << LogVar("Magic word", hitMagicHeader));
         return array.getRemainingWords();
@@ -1053,6 +1085,7 @@ namespace Belle2 {
               << ", checksum " << (array.validateChecksum() ? "OK" : "NOT OK"));
 
       if (!array.validateChecksum()) {
+        m_unpackerErrors->setErrorFlag(m_BS);
         B2WARNING("TOPUnpacker: hit checksum invalid.");
         return array.getRemainingWords();
       }
@@ -1133,6 +1166,7 @@ namespace Belle2 {
     }
 
     if (evtMagicFooter != 0x5) {
+      m_unpackerErrors->setErrorFlag(m_BS);
       B2WARNING("TOPUnpacker: event footer magic word mismatch. should be 0x5."
                 << LogVar("Magic word", evtMagicFooter));
       return array.getRemainingWords();
@@ -1165,6 +1199,7 @@ namespace Belle2 {
               << ", wfChannel " << wfChannel);
 
       if (wfNSamples != 32 && wfNSamples != 16) {
+        m_unpackerErrors->setErrorFlag(m_BS);
         B2WARNING("TOPUnpacker: suspicious value for wfNSamples."
                   << LogVar("wfNSamples", wfNSamples));
         return array.getRemainingWords();
@@ -1219,6 +1254,7 @@ namespace Belle2 {
         if (digit->getScrodChannel() == channel % 128) {
           digit->addRelationTo(waveform);
         } else {
+          m_unpackerErrors->setErrorFlag(m_BS);
           B2WARNING("TOPUnpacker: hit and its waveform have different channel number."
                     << LogVar("channel (hit)", digit->getScrodChannel())
                     << LogVar("channel (waveform)", channel % 128));
@@ -1229,6 +1265,7 @@ namespace Belle2 {
     } // end of waveform segments loop
 
     if (numExpectedWaveforms != numParsedWaveforms) {
+      m_unpackerErrors->setErrorFlag(m_BS);
       B2WARNING("TOPUnpacker: number of expected and parsed waveforms does not match."
                 << LogVar("expected", numExpectedWaveforms)
                 << LogVar("parsed", numParsedWaveforms));
@@ -1242,13 +1279,9 @@ namespace Belle2 {
   {
     B2INFO("TOPUnpacker: Channels seen per event statistics:");
     B2INFO("TOPUnpacker: nChn\tcount");
-    for (auto& entry : m_channelStatistics) {
+    for (const auto& entry : m_channelStatistics) {
       B2INFO("TOPUnpacker: " << entry.first << "\t\t" << entry.second);
     }
-  }
-
-  void TOPUnpackerModule::terminate()
-  {
   }
 
 

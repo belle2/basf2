@@ -10,20 +10,13 @@
 
 #################################################################
 #                                                               #
-#    script to simulate 10k Y(4S) events                        #
+#    script to simulate events and fill diagnostic isto/ntuple  #
+#    by default it runs particle gun, but it can be changed     #
 #                                                               #
-# USAGE 1:
+# USAGE:
 #
 # > mkdir test
-# > basf2 -n100 a0123_trackingEfficiency_oneshot.py 1 test noROI noBKG
-#
-# USAGE 2:
-# > mkdir release/workdir
-# > cd release/workdir
-# > mkdir /group/belle2/users/casarosa/trackingValidation/release
-# > ln -s /group/belle2/users/casarosa/trackingValidation/release .
-# > ln -s release/tracking/examples/TrackingPerformanceEvaluation_scripts/a*.py
-# > bsub -q s -o oneshot_release_1.out basf2 a0123_trackingEfficiency_oneshot.py roi bkg vxdtf
+# > basf2 -n1 a01234_trackingEfficiency_oneshot.py test noROI noBKG vxdtf2
 #
 #################################################################
 
@@ -49,8 +42,6 @@ roi = sys.argv[2]
 bkg = sys.argv[3]
 vxdtf = sys.argv[4]
 
-release = 'merged'
-
 print('Performance evaluated on: ')
 print('simulation: ' + roi + ' ' + bkg)
 print('reconstruction: ' + vxdtf)
@@ -58,6 +49,7 @@ print()
 
 root_file_name_TRK = './' + release + '/oneshotTV_TRK_analysis_' + roi + '_' + bkg + '_' + vxdtf + '_' + release + '.root'
 root_file_name_V0 = './' + release + '/oneshotTV_V0_analysis_' + roi + '_' + bkg + '_' + vxdtf + '_' + release + '.root'
+root_file_name_FTFNT = './' + release + '/oneshotTV_FTFNT_analysis_' + roi + '_' + bkg + '_' + vxdtf + '_' + release + '.root'
 
 bkgFiles = None
 usePXDDataReduction = True
@@ -98,6 +90,11 @@ create_plots_V0 = b2.register_module('V0findingPerformanceEvaluation')
 create_plots_V0.param('outputFileName', root_file_name_V0)
 create_plots_V0.logging.log_level = b2.LogLevel.INFO
 
+create_plots_FTFNT = b2.register_module('FillTrackFitNtuple')
+create_plots_FTFNT.param('outputFileName', root_file_name_FTFNT)
+create_plots_FTFNT.logging.log_level = b2.LogLevel.INFO
+
+
 if particleGun:
     particleGunModule = b2.register_module('ParticleGun')
     particleGunModule.param({
@@ -136,7 +133,8 @@ path.add_module(v0matcher)
 
 path.add_module(create_plots_TRK)
 path.add_module(create_plots_V0)
+path.add_module(create_plots_FTFNT)
 
-b2.process(path)
+b2.process(path, calculateStatistics=True)
 
 print(b2.statistics)

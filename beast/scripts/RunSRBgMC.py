@@ -57,7 +57,7 @@ hepevtreader = b2.register_module('HepevtInput')
 # Ph2_dt_4_8HER21445M.HEPEvt
 # Ph2_dt_4_8HER21445MK2M.HEPEvt
 # Ph2_dt_4_8LER35124M.HEPEvt
-# PHASE 2 -> HER 6148 repetitions = 1ROF = 20us | LER 3560 repet = 1ROF = 20us
+# PHASE 2 -> HER 6148 repetitions = 1ROF = 20us | LER 3560 repeat = 1ROF = 20us
 if name == "SynchRad_HER":
     realTime = 1.0e4  # 10us per file
     # data for HER Phase2  dt_4-8 6.6um -> 1.07 of bunch current 0.8A
@@ -108,7 +108,7 @@ geometry.set_log_level(b2.LogLevel.INFO)
 # simulation.param('PhysicsList', "QGSP_BERT_HP")
 simulation.param('PhysicsList', "QGSP_BERT_EMV")  # faster than QGSP_BERT_HP
 # simulation.param('PhysicsList', "FTFP_BERT_EMV")
-simulation.param('UICommandsAtIdle', ["/process/inactivate nKiller"])
+simulation.param('UICommandsAtIdle', ["/process/deactivate nKiller"])
 simulation.param("StoreAllSecondaries", True)
 # in MeV   we need this for CDC EB neutron flux simulation
 simulation.param("SecondariesEnergyCut", 0.000001)
@@ -194,6 +194,3 @@ main.add_module(rootoutput)
 
 # Process events
 b2.process(main)
-
-# Print call statistics
-print(b2.statistics)

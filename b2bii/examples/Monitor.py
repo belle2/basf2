@@ -44,6 +44,3 @@ addMCParticlesConversionMonitors(path=mypath)
 mypath.add_module('Progress')
 
 basf2.process(mypath)
-
-# Print call statistics
-print(basf2.statistics)

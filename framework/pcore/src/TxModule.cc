@@ -6,7 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <framework/pcore/ProcHelper.h>
 #include <framework/pcore/TxModule.h>
 
 #include <framework/pcore/EvtMessage.h>

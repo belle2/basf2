@@ -10,12 +10,12 @@
 #include <beast/pindiode/dataobjects/PindiodeSimHit.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/core/RandomNumbers.h>
+
+#include <TRandom.h>
 
 //c++
 #include <cmath>
 #include <string>
-#include <fstream>
 
 using namespace std;
 using namespace Belle2;

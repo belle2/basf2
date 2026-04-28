@@ -42,12 +42,12 @@
 [INFO] ParticleSelector: mu+:mostlikely_roe
 [INFO]    -> With cuts  : pidIsMostLikely() > 0 and thetaInCDCAcceptance and nCDCHits>20
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:all (gamma:all)
+[INFO]  o) creating ParticleList with name: gamma:all
 [INFO]    -> MDST source: ECLClusters and KLMClusters
 [INFO] ParticleSelector: gamma:all
 [INFO]    -> With cuts  : isFromECL
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_L0:all (K_L0:all)
+[INFO]  o) creating ParticleList with name: K_L0:all
 [INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO] ParticleSelector: K_L0:roe_default
 [INFO]    -> With cuts  : isFromKLM > 0

@@ -26,7 +26,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/utilities/Conversion.h>
 
 // boost
 #include <boost/algorithm/string.hpp>

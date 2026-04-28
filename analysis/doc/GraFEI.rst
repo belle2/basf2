@@ -201,7 +201,7 @@ Core modules
 
 If you want to use a custom steering file to create training data, you can import the `LCASaverModule <LCASaverModule.LCASaverModule>` with ``from grafei import lcaSaver``. 
 You can import the core `GraFEIModule <GraFEIModule.GraFEIModule>` in a steering file with ``from grafei import graFEI``. 
-These are wrapper functions that internally call the modules and add them to the basf2 path.
+These are wrapper functions that internally call the modules and add them to the `basf2.Path`.
 
 .. automodule:: grafei
    :members: graFEI, lcaSaver

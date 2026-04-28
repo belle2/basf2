@@ -140,7 +140,7 @@ namespace Belle2 {
      * Get the parameter path as string and also return the unit it was defined with.
      *
      * If no unit was defined, an empty string will be returned for the unit.
-     * No parsing of the unit is performed, this funtion is primarily used by
+     * No parsing of the unit is performed, this function is primarily used by
      * getWithUnit.
      *
      * @exception gearbox::PathEmptyError if path is empty or does not exist

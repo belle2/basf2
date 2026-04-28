@@ -152,7 +152,7 @@ namespace Belle2 {
  *
  *  The macro sets up for the following EXCEPTS and ASSERTS, hence it must be placed before the tests.
  *
- *  The message can be composed in a B2INFO style manner with addtional << between
+ *  The message can be composed in a B2INFO style manner with additional << between
  *  individual strings and values to be concatenated.
  *
  *  \code TEST_CONTEXT("for my value set to "  << myValue); \endcode
@@ -166,7 +166,7 @@ namespace Belle2 {
 #define EXPECT_ANGLE_NEAR(expected, actual, tolerance) EXPECT_PRED3(::Belle2::TestHelpers::angleNear, expected, actual, tolerance)
 
 /** \def ASSERT_ANGLE_NEAR(expected, actual, tolerance)
- *  Assertation macro for angle values that should not care for a multiple of 2 * PI difference between the values
+ *  Assertion macro for angle values that should not care for a multiple of 2 * PI difference between the values
  */
 #define ASSERT_ANGLE_NEAR(expected, actual, tolerance) ASSERT_PRED3(::Belle2::TestHelpers::angleNear, expected, actual, tolerance)
 
@@ -176,7 +176,7 @@ namespace Belle2 {
 #define EXPECT_SAME_SIGN(expected, actual) EXPECT_PRED2(::Belle2::TestHelpers::sameSign, expected, actual)
 
 /** \def ASSERT_SAME_SIGN(expected, actual)
- * Assertation macro that two values carry the same sign.
+ * Assertion macro that two values carry the same sign.
  */
 #define ASSERT_SAME_SIGN(expected, actual) ASSERT_PRED2(::Belle2::TestHelpers::sameSign, expected, actual)
 
@@ -187,7 +187,7 @@ namespace Belle2 {
 #define EXPECT_POSITIVE(expected) EXPECT_PRED1(::Belle2::TestHelpers::isPositive, expected)
 
 /** \def ASSERT_POSITIVE(expected, actual)
- *  Assertation macro that a value is bigger than zero.
+ *  Assertion macro that a value is bigger than zero.
  */
 #define ASSERT_POSITIVE(expected) ASSERT_PRED1(::Belle2::TestHelpers::isPositive, expected)
 
@@ -197,7 +197,7 @@ namespace Belle2 {
 #define EXPECT_NEGATIVE(expected) EXPECT_PRED1(::Belle2::TestHelpers::isNegative, expected)
 
 /** \def ASSERT_NEGATIVE(expected, actual)
- *  Assertation macro that a value is smaller than zero.
+ *  Assertion macro that a value is smaller than zero.
  */
 #define ASSERT_NEGATIVE(expected) ASSERT_PRED1(::Belle2::TestHelpers::isNegative, expected)
 
@@ -220,7 +220,7 @@ namespace Belle2 {
 #define EXPECT_ALL_NEAR(expected, actual, tolerance) EXPECT_PRED3(::Belle2::TestHelpers::allNear<decltype(expected)>, expected, actual, tolerance)
 
 /**
- * Assertation macro for combound structures containing floating point values like ROOT::Math::XYZVector, etc. to be close to each other.
+ * Assertion macro for combound structures containing floating point values like ROOT::Math::XYZVector, etc. to be close to each other.
  *
  * Generally it compares each contained floating point value to be no less than the tolerance apart.
  *

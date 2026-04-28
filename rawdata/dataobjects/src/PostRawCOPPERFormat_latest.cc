@@ -100,7 +100,7 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
 
   if (err_flag == 1) {
     printf("[DEBUG] %s\n", err_buf);
-    printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
+    printf("[DEBUG] ========== dump a data block : block # %d==========\n", n);
     PrintData(GetBuffer(n), GetBlockNwords(n));
     printf("Print out variables to reduce unused-variables-warnings : %u %u\n", prev_copper_ctr, *cur_copper_ctr);
     B2FATAL(err_buf);
@@ -209,7 +209,7 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
     // dump an event
     int copper_nwords = copper_buf[ tmp_header.POS_NWORDS ];
     PrintData(copper_buf, copper_nwords);
-    // Check whether packet-CRC error has occcured or not.
+    // Check whether packet-CRC error has occurred or not.
     if (copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ] & tmp_header.B2LINK_PACKET_CRC_ERROR) {
       //
       // Do not stop data
@@ -219,7 +219,7 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       GetNodeName(n, hostname, sizeof(hostname));
       if ((GetNodeID(n) & DETECTOR_MASK) == ARICH_ID) {
         sprintf(err_buf,
-                "[WARNING] %s ch=%d : ARICH : POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+                "[WARNING] %s ch=%d : ARICH : POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : This error is ignored and the error event will be recorded in .sroot file according to request from ARICH group: slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
                 hostname, finesse_num,
                 *buf, temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
                 65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),

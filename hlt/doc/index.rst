@@ -15,5 +15,4 @@ b2hlt_combine_results.py
         :func: get_parser
         :prog: b2hlt_combine_results.py
         :nodefaultconst:
-        :nogroupsections:
 

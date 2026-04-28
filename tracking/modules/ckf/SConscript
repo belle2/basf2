@@ -2,8 +2,8 @@ Import('env')
 
 env['LIBS'] = [
     'framework',
+    'tracking',
     'cdc_dataobjects',
-    'tracking_trackFindingCDC',
     'tracking_ckf',
     ]
 Return('env')

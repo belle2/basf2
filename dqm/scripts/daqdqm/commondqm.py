@@ -11,8 +11,8 @@
 import basf2 as b2
 from svd import add_svd_create_recodigits
 from svd.dqm_utils import add_svd_dqm_dose
-from geometry import check_components
-from analysisDQM import add_analysis_dqm, add_mirabelle_dqm
+from geometry import check_components, is_detector_present, is_any_detector_present
+from analysisDQM import add_analysis_dqm, add_mirabelle_dqm, get_hadB_path
 import neurotrigger
 
 
@@ -42,13 +42,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     # Check components.
     check_components(components)
 
-    if dqm_mode in ["dont_care", "filtered"]:
-        # TTD trigger and bunch injection monitoring
-        path.add_module('TTDDQM')
-
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         # PXD (not useful on HLT)
-        if components is None or 'PXD' in components:
+        if is_detector_present("PXD", components):
             path.add_module('PXDDAQDQM', histogramDirectoryName='PXDDAQ')
             path.add_module('PXDROIDQM', histogramDirectoryName='PXDROI')
             path.add_module('PXDDQMExpressReco', histogramDirectoryName='PXDER')
@@ -60,8 +56,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             # path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
             path.add_module('PXDTrackClusterDQM', histogramDirectoryName='PXDER')
             path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ', eachModule=True)
+            path.add_module("PXDDQMBowing")
+
         # SVD
-        if components is None or 'SVD' in components:
+        if is_detector_present("SVD", components):
             # reconstruct SVDRecoDigits first of all
             add_svd_create_recodigits(path)
 
@@ -94,7 +92,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             add_svd_dqm_dose(path, 'SVDShaperDigitsZS5')
 
         # Event time measuring detectors
-        if components is None or 'CDC' in components or 'ECL' in components or 'TOP' in components:
+        if is_any_detector_present(["CDC", "ECL", "TOP"], components):
             eventT0DQMmodule = b2.register_module('EventT0DQM')
             path.add_module(eventT0DQMmodule)
 
@@ -121,6 +119,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module("StatisticsTimingHLTDQM",
                         createHLTUnitHistograms=create_hlt_unit_histograms,
                         )
+        # TTD trigger and bunch injection monitoring
+        path.add_module('TTDDQM')
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # HLT
@@ -224,12 +224,12 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # SVD DATA FORMAT
-        if components is None or 'SVD' in components:
+        if is_detector_present("SVD", components):
             svdunpackerdqm = b2.register_module('SVDUnpackerDQM')
             path.add_module(svdunpackerdqm)
 
     # CDC
-    if (components is None or 'CDC' in components) and (dqm_mode in ["dont_care", "filtered"]):
+    if is_detector_present("CDC", components) and (dqm_mode in ["dont_care", "filtered"]):
         cdcdqm = b2.register_module('cdcDQM7')
         path.add_module(cdcdqm)
 
@@ -242,7 +242,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('CDCDQM')
 
     # ECL
-    if (components is None or 'ECL' in components) and (dqm_mode in ["dont_care", "filtered"]):
+    if is_detector_present("ECL", components) and (dqm_mode in ["dont_care", "filtered"]):
         ecldqm = b2.register_module('ECLDQM')
         path.add_module(ecldqm)
         ecldqmext = b2.register_module('ECLDQMEXTENDED')
@@ -254,17 +254,17 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('ECLDQMInjection', histogramDirectoryName='ECLINJ')
 
     # TOP
-    if (components is None or 'TOP' in components) and (dqm_mode in ["dont_care", "filtered"]):
+    if is_detector_present("TOP", components) and (dqm_mode in ["dont_care", "filtered"]):
         topdqm = b2.register_module('TOPDQM')
         path.add_module(topdqm)
 
     # KLM
-    if (components is None or 'KLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
+    if is_detector_present("KLM", components) and (dqm_mode in ["dont_care", "filtered"]):
         klmdqm = b2.register_module("KLMDQM")
         path.add_module(klmdqm)
 
     # TRG before all reconstruction runs (so on all events with all unpacked information)
-    if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "before_filter"]):
+    if is_detector_present("TRG", components) and (dqm_mode in ["dont_care", "before_filter"]):
         # TRGECL
         trgecldqm = b2.register_module('TRGECLDQM')
         path.add_module(trgecldqm)
@@ -307,7 +307,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module('CDCTriggerNeuroDQM')
 
     # TRG for expressreco:
-    if dqm_environment == "expressreco" and (components is None or 'TRG' in components) and (dqm_mode in ["dont_care"]):
+    if dqm_environment == "expressreco" and is_detector_present("TRG", components) and (dqm_mode in ["dont_care"]):
         # TRGCDCTNN
         neurotrigger.add_neurotrigger_hw(path)
         path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneurotracks,
@@ -319,16 +319,13 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module('CDCTriggerNeuroDQMOnline', histogramDirectoryName="TRGCDCTNN2", useRecoTracks=True)
 
     # TRG after skim
-    if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "filtered"]):
+    if is_detector_present("TRG", components) and (dqm_mode in ["dont_care", "filtered"]):
         # TRGGDL
-        trggdldqm_skim = b2.register_module('TRGGDLDQM')
-        trggdldqm_skim.param('skim', 1)
-        path.add_module(trggdldqm_skim)
-        trgeffdqm = b2.register_module("TRGEFFDQM")
-        path.add_module(trgeffdqm)
+        path.add_module('TRGGDLDQM', skim=1)
+        path.add_module('TRGEfficiencyDQM')
 
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
-    if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
+    if is_any_detector_present(["PXD", "SVD"], components) and (dqm_mode in ["dont_care", "filtered"]):
         if (dqm_environment == "hlt"):
             path.add_module('TrackingHLTDQM')
         else:
@@ -343,7 +340,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                 .set_name("TrackingExpressRecoDQM_NotFromIP")
 
     # ARICH
-    if (components is None or 'ARICH' in components) and (dqm_mode in ["dont_care", "filtered"]):
+    if is_detector_present("ARICH", components) and (dqm_mode in ["dont_care", "filtered"]):
         path.add_module('ARICHDQM')
 
     if dqm_mode in ["dont_care", "filtered"]:
@@ -351,14 +348,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         add_analysis_dqm(path)
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         add_mirabelle_dqm(path)
-
-    # KLM2 (requires mu+ particle list from add_analysis_dqm)
-    if (components is None or ('KLM' in components and 'CDC' in components)) and (dqm_mode in ["dont_care", "filtered"]):
-        path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM',
-                        MinimalMatchingDigits=12,
-                        MinimalMatchingDigitsOuterLayers=0,
-                        MinimalMomentumNoOuterLayers=4.0,
-                        SoftwareTriggerName="")
+        get_hadB_path(path)
 
     # We want to see the datasize of all events after removing the raw data
     if dqm_mode in ["dont_care", "all_events"]:

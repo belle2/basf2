@@ -10,7 +10,7 @@
 
 ##############################################################################
 # This steering file creates the Belle II Magnetic field map and plots the
-# result overlayed over the Material distribution
+# result overlaid over the Material distribution
 ##############################################################################
 
 from matplotlib.backends.backend_pdf import PdfPages
@@ -146,8 +146,8 @@ rmaterial_file = root.TFile(material_file)
 mat_hist = rmaterial_file.Get("Planar/All_Regions_x0")
 mat_data, mat_extent = get_hist_data(mat_hist)
 # obtain nice colormaps
-cmap_fieldmap = mpl.cm.get_cmap('seismic')
-cmap_material = mpl.cm.get_cmap('binary')
+cmap_fieldmap = mpl.colormaps['seismic']
+cmap_material = mpl.colormaps['binary']
 # create pdf file and fill with plots
 pdf = PdfPages(filename)
 for component in ["Bx", "By", "Bz", "B"]:

@@ -15,6 +15,8 @@
 
 // analysis
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 

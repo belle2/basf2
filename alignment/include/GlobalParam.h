@@ -31,18 +31,18 @@ namespace Belle2 {
       /// Get global unique id = 0 (empty/none)
       static unsigned short getGlobalUniqueID() {return 0;}
       /// Get global parameter - return zero
-      double getGlobalParam(unsigned short, unsigned short) {return 0.;}
+      static double getGlobalParam(unsigned short, unsigned short) {return 0.;}
       /// Set global parameter - do nothing
-      void setGlobalParam(double, unsigned short, unsigned short) {}
+      static void setGlobalParam(double, unsigned short, unsigned short) {}
       /// list stored global parameters - empty list, no parameters
-      std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
+      static std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
       // ------------------------------------------------------------------------
     };
 
 
     /// Some tentative base class to allow to add functionality to the default
-    /// behavior, like manipulate constants in DB objects after clibration is finished
-    /// All methods to override have default implementaion which does nothing
+    /// behavior, like manipulate constants in DB objects after calibration is finished
+    /// All methods to override have default implementation which does nothing
     class IGlobalParamInterface {
     public:
       /// Destructor
@@ -55,7 +55,7 @@ namespace Belle2 {
       /// automatically (for DB objects which support it) and before its DBObjects are stored back into DB.
       virtual void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&,
                                   GlobalParamVector&) {};
-      /// Super-tentavive: not yet used
+      /// Super-tentative: not yet used
       virtual void setupAlignmentHierarchy(GlobalDerivativesHierarchy&) {}
     };
 
@@ -82,7 +82,7 @@ namespace Belle2 {
       /// Enable SVD in hierarchy?
       static bool s_enableSVD;
 
-      /// Very tentaive function: not yet used
+      /// Very tentative function: not yet used
       virtual void setupAlignmentHierarchy(GlobalDerivativesHierarchy& hierarchy) override final;
     };
 
@@ -115,7 +115,7 @@ namespace Belle2 {
       /// Useful to pass it to be stored in DB (and thus later deleted by framework)
       virtual TObject* releaseObject() = 0;
       /// Clone the object, making a copy of the internal object - has to be implemented in derived template class
-      /// to return the actuall type of the object
+      /// to return the actual type of the object
       virtual GlobalParamSetAccess* clone() = 0;
 
       /// Load the content (by copying obj retrieved from DB) for a given exp/run/event
@@ -192,7 +192,7 @@ namespace Belle2 {
         //  construct();
       }
       /// Destructor
-      ~GlobalParamSet() {m_object.reset();}
+      ~GlobalParamSet() override {m_object.reset();}
 
       /// The DB object unique id in global calibration
       virtual unsigned short getGlobalUniqueID() const override final {return DBObjType::getGlobalUniqueID();}

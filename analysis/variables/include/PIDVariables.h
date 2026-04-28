@@ -10,6 +10,8 @@
 
 #include <analysis/VariableManager/Manager.h>
 
+#include <framework/gearbox/Const.h>
+
 #include <vector>
 #include <string>
 
@@ -349,6 +351,16 @@ namespace Belle2 {
     Manager::FunctionPtr weightedDeuteronID(const std::vector<std::string>& arguments);
 
     /**
+     * @return electron ID from Neural Network to be used in the physics analyses
+     */
+    double electronIDNN(const Particle* particle);
+
+    /**
+     * @return muon ID from Neural Network to be used in the physics analyses
+     */
+    double muonIDNN(const Particle* particle);
+
+    /**
      * @return pion ID from Neural Network to be used in the physics analyses
      */
     double pionIDNN(const Particle* particle);
@@ -357,6 +369,16 @@ namespace Belle2 {
      * @return kaon ID from Neural Network to be used in the physics analyses
      */
     double kaonIDNN(const Particle* particle);
+
+    /**
+     * @return proton ID from Neural Network to be used in the physics analyses
+     */
+    double protonIDNN(const Particle* particle);
+
+    /**
+     * @return deuteron ID from Neural Network to be used in the physics analyses
+     */
+    double deuteronIDNN(const Particle* particle);
 
     /**
      * @return muon likelihoood from Neural Network (expert use only)

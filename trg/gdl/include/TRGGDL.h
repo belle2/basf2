@@ -219,10 +219,10 @@ namespace Belle2 {
     /// Firmware simulation mode.
     unsigned _firmwareSimulationMode;
 
-    //Phase
+    /// Phase
     std::string _Phase;
 
-    // Path to algorithm file
+    /// Path to algorithm file
     std::string _algFilePath;
 
     /// GDL trigger system clock.

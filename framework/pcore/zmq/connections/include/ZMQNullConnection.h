@@ -9,7 +9,6 @@
 
 #include <framework/pcore/zmq/connections/ZMQConnection.h>
 
-#include <memory>
 #include <zmq.hpp>
 
 namespace Belle2 {

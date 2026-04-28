@@ -29,8 +29,8 @@ namespace Belle2 {
     {
       m_filterInfos.clear();
       m_hits.clear();
-      m_mainMCParticleID = -666;
       m_mainPurity = 0;
+      m_mainMCParticleID = -666;
     };
 
     /** returns the filter info with the requested key
@@ -120,14 +120,14 @@ namespace Belle2 {
     /** stores the hits used in the filter, should have the order as used in the filter from outer to inner! */
     std::vector<SpacePointInfo>  m_hits;
 
-    /** dominating mcParticleID. */
-    int m_mainMCParticleID;
-
     /** purity for the dominating particleID. */
     double m_mainPurity;
 
+    /** dominating mcParticleID. */
+    int m_mainMCParticleID;
+
     //! Needed to make the ROOT object storable
-    ClassDef(ObserverInfo, 1);
+    ClassDef(ObserverInfo, 2);
   };
 
 }// end namespace Belle2

@@ -17,10 +17,7 @@
 #include <TTree.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportObjPtr.h>
 #include <framework/logging/Logger.h>
 using namespace std;
 using namespace Belle2;

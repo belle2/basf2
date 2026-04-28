@@ -26,20 +26,22 @@ namespace Belle2 {
     //! Set Run Number
     void setRunNumber(int start, int end)
     {
-      startRun = start;
-      endRun = end;
+      m_startRun = start;
+      m_endRun = end;
     }
-    //! Set Experimnet Number
+    //! Set Experiment Number
     void setExpNumber(int start, int end)
     {
-      startExp = start;
-      endExp = end;
+      m_startExp = start;
+      m_endExp = end;
     }
 
   public:
 
     //! Import FAM Parameters
     void importFAMParameter(std::string, std::string, std::string);
+    //! Import FAM TC ADC Threshold
+    void importFAMTCADCThreshold(std::string);
     //! Import TMM Parameters
     void importTMMParameter(std::string);
     //! Import ETM Parameters
@@ -51,14 +53,16 @@ namespace Belle2 {
     void printTCThreshold();
 
   private:
+    //! the number of total TC
+    const int c_NTC = 576;
     //! Start Experiment Number
-    int startExp;
+    int m_startExp;
     //! Start Run Number
-    int startRun;
+    int m_startRun;
     //! End Experiment Number
-    int endExp;
+    int m_endExp;
     //! End Run Number
-    int endRun;
+    int m_endRun;
   };
 } // End namespace Belle2
 #endif

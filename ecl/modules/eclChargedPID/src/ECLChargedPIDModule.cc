@@ -14,6 +14,7 @@
 
 /* C++ headers. */
 #include <algorithm>
+#include <cmath>
 
 using namespace Belle2;
 
@@ -85,7 +86,7 @@ void ECLChargedPIDModule::event()
 
       if (eclShower.getHypothesisId() != ECLShower::c_nPhotons) continue;
       if (m_applyClusterTimingSel) {
-        if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
+        if (std::abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
       }
 
       shEnergy = eclShower.getEnergy();

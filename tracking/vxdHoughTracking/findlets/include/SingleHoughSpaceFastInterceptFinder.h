@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <framework/datastore/StoreArray.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <string>
-#include <vector>
+#include <bitset>
+#include <array>
+#include <map>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -24,9 +24,9 @@ namespace Belle2 {
     * The found track candidates are then clustered via a recursive search. Afterwards track candidates are formed
     * and stored in the output vector.
     */
-    class SingleHoughSpaceFastInterceptFinder : public TrackFindingCDC::Findlet<VXDHoughState, std::vector<VXDHoughState*>> {
+    class SingleHoughSpaceFastInterceptFinder : public TrackingUtilities::Findlet<VXDHoughState, std::vector<VXDHoughState*>> {
       /// Parent class
-      using Super = TrackFindingCDC::Findlet<VXDHoughState, std::vector<VXDHoughState*>>;
+      using Super = TrackingUtilities::Findlet<VXDHoughState, std::vector<VXDHoughState*>>;
 
     public:
       /// Find intercepts in the 2D Hough space
@@ -76,7 +76,7 @@ namespace Belle2 {
       uint m_maxRecursionLevel = 9;
 
       /// number of sectors of the Hough Space on the horizontal axis
-      uint m_nAngleSectors = 256;
+      uint m_nAngleSectors = 512;
 
       /// number of sectors of the Hough Space on the vertical axis
       uint m_nVerticalSectors = 512;
@@ -92,11 +92,11 @@ namespace Belle2 {
       /// minimum cluster size of sectors belonging to intercepts in the Hough Space
       uint m_MinimumHSClusterSize = 1;
       /// maximum cluster size of sectors belonging to intercepts in the Hough Space
-      uint m_MaximumHSClusterSize = 10;
+      uint m_MaximumHSClusterSize = 12;
       /// maximum cluster size in x of sectors belonging to intercepts in the Hough Space
       uint m_MaximumHSClusterSizeX = 2;
       /// maximum cluster size in y of sectors belonging to intercepts in the Hough Space
-      uint m_MaximumHSClusterSizeY = 10;
+      uint m_MaximumHSClusterSizeY = 12;
 
       // class variables
       /// HS unit size in x

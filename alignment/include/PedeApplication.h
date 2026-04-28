@@ -26,7 +26,7 @@ namespace Belle2 {
       //! Run Pede and return full result with parameter corrections
       //! @param steering Pede steering object with commands
       PedeResult calibrate(PedeSteering& steering);
-      //! Was Pede successfull (can the result be used)?
+      //! Was Pede successful (can the result be used)?
       bool success() {return warnings() <= 1;}
       //! Level of warnings converted to int
       int warnings() const;
@@ -35,11 +35,11 @@ namespace Belle2 {
       //! Returns the Pede exit code (from millepede.end file)
       int getExitCode() const {return exitCode;}
       //! Returns the Pede exit message (from millepede.end file)
-      std::string getExitMessage() const {return exitMessage;}
+      const std::string& getExitMessage() const {return exitMessage;}
       //! Reads the millepede.end file and sets this object retrieved state
       void readEndFile(std::string filename = "millepede.end");
       //! Return Pede revision number
-      int revision();
+      static int revision();
 
     private:
       //! Pede exit code

@@ -71,7 +71,7 @@ main(int argc, char* argv[])
   TRGDebug::level(dl);
 
   //...Gearbox...
-  const string path = getenv(ENV_PATH);
+  const string path = (getenv(ENV_PATH) != nullptr ? getenv(ENV_PATH) : "");
   const string patht = path + "/data/trg/cdc/";
   vector<std::string> backends;
   backends.push_back("file:");

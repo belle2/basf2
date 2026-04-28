@@ -52,8 +52,6 @@ def run():
     # Process the path.
     basf2.process(main, max_event=1000)
 
-    print(basf2.statistics)
-
 
 if __name__ == '__main__':
     if ACTIVE:

@@ -71,7 +71,6 @@ namespace Belle2 {
     addParam("timePerWin", m_timePerWin, "time interval of a single window (=64 samples) [ns]", (float)23.581939);
   }
 
-  TOPInterimFENtupleModule::~TOPInterimFENtupleModule() {}
 
   void TOPInterimFENtupleModule::initialize()
   {
@@ -150,10 +149,6 @@ namespace Belle2 {
     m_tree->Branch("asicMask", m_asicMask, "asicMask[nDebugInfo]/s");
     m_tree->Branch("eventQueuDepth", m_eventQueuDepth, "eventQueuDepth[nDebugInfo]/s");
     m_tree->Branch("eventNumberByte", m_eventNumberByte, "eventNumberByte[nDebugInfo]/s");
-  }
-
-  void TOPInterimFENtupleModule::beginRun()
-  {
   }
 
   void TOPInterimFENtupleModule::event()
@@ -322,14 +317,6 @@ namespace Belle2 {
     getReferenceTiming();
 
     m_tree->Fill();
-  }
-
-  void TOPInterimFENtupleModule::endRun()
-  {
-  }
-
-  void TOPInterimFENtupleModule::terminate()
-  {
   }
 
   void TOPInterimFENtupleModule::getReferenceTiming()

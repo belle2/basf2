@@ -136,7 +136,7 @@ namespace Belle2 {
     void clearTemporaries();
 
     /**
-     * Clear the final EventT0, this is neded in case some algorithm has
+     * Clear the final EventT0, this is needed in case some algorithm has
      * set one for an itertive t0 finding procedure and none was set in
      * the beginning
     */

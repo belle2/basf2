@@ -416,6 +416,8 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
   m_pointUsed.clear();
   if (m_storeTracks.getEntries() < 1)
     return;
+  B2DEBUG(10, "BKLMTracking:generateEffi: " << iSection << " " << iSector << " " << iLayer);
+
 
   for (int it = 0; it < m_storeTracks.getEntries(); it++) {
     //if(m_storeTracks[it]->getTrackChi2()>10) continue;
@@ -429,6 +431,12 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
         cnt1++;
       if (hit2D.getLayer() < iLayer + 1)
         cnt2++;
+      if (hit2D.getLayer() == iLayer + 1) {
+        B2DEBUG(10, "generateEffi: Hit info. Secti/sector/Lay = " << hit2D.getSection()
+                << "/" << hit2D.getSector() - 1 << "/" << hit2D.getLayer() - 1);
+        B2DEBUG(11, "generateEffi: Hit info. x/y/z = " << hit2D.getPositionX()
+                << "/" << hit2D.getPositionY() << "/" << hit2D.getPositionZ());
+      }
     }
 
     if (iLayer != 0 && cnt2 < 1)
@@ -486,6 +494,11 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
     float localY = module->globalToLocal(global)[1];
     float localZ = module->globalToLocal(global)[2];
 
+    B2DEBUG(10, "BKLM:generateEffi: RefLocal " << reflocalX << " " << reflocalY << " " << reflocalZ);
+    B2DEBUG(10, "BKLM:generateEffi: Global " << global[0] << " " << global[1] << " " << global[2]);
+    B2DEBUG(10, "BKLM:generateEffi: Local " << 0 << " " << localY << " " << localZ);
+
+
 
     //geometry cut
     if (localY > minLocalY && localY < maxLocalY && localZ > minLocalZ && localZ < maxLocalZ) {
@@ -506,9 +519,11 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
 
         double error, sigma;
         float distance = distanceToHit(m_storeTracks[it], hits2D[he], error, sigma);
-
-        if (distance < m_maxDistance && sigma < m_maxSigma)
+        B2DEBUG(10, "BKLM Dist = " << distance <<  ", error = " << error);
+        if (distance < m_maxDistance && sigma < m_maxSigma) {
           m_iffound = true;
+          B2DEBUG(10, "BKLMTracking:generateEffi: Hit found!");;
+        }
         if (m_iffound) {
           m_pointUsed.insert(he);
           //global[0] = hits2D[he]->getPosition()[0];

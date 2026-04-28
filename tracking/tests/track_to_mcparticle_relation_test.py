@@ -9,10 +9,11 @@
 ##########################################################################
 
 
-from basf2 import set_random_seed, create_path, process, statistics, Module
+from basf2 import set_random_seed, create_path, process, Module
 from ROOT import Belle2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
+import logging
 
 
 class CheckPresenceOfTrackToMCParticleRelation(Module):
@@ -41,28 +42,32 @@ class CheckPresenceOfTrackToMCParticleRelation(Module):
         self.eventCount += 1
 
 
-set_random_seed(12345)
+def main():
+    """Main function to be executed if this script is run to avoid running if it's just imported."""
+    set_random_seed(12345)
 
-main = create_path()
+    main = create_path()
 
-# specify number of events to be generated
-main.add_module('EventInfoSetter', expList=[0], evtNumList=[5], runList=[1])
-main.add_module('ParticleGun',
-                pdgCodes=[211],
-                nTracks=1,
-                momentumGeneration='fixed',
-                momentumParams=[1.618034],
-                phiGeneration='fixed',
-                phiParams=[27.182818],
-                thetaGeneration='fixed',
-                thetaParams=[62.83185])
-add_simulation(main, bkgfiles=None)
-add_reconstruction(main)
+    # specify number of events to be generated
+    main.add_module('EventInfoSetter', expList=[0], evtNumList=[5], runList=[1])
+    main.add_module('ParticleGun',
+                    pdgCodes=[211],
+                    nTracks=1,
+                    momentumGeneration='fixed',
+                    momentumParams=[1.618034],
+                    phiGeneration='fixed',
+                    phiParams=[27.182818],
+                    thetaGeneration='fixed',
+                    thetaParams=[62.83185])
+    add_simulation(main, bkgfiles=None)
+    add_reconstruction(main)
 
-main.add_module(CheckPresenceOfTrackToMCParticleRelation())
+    main.add_module(CheckPresenceOfTrackToMCParticleRelation())
 
-main.add_module('Progress')
-process(main)
+    main.add_module('Progress')
+    process(main)
 
-# Print call statistics
-print(statistics)
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    main()

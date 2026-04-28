@@ -34,6 +34,6 @@ namespace Belle2 {
     {}
 
   private:
-    ClassDef(PXDSimHit, 3)
+    ClassDef(PXDSimHit, 4)
   };
 } // end namespace Belle2

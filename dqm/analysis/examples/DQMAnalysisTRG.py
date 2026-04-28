@@ -32,7 +32,7 @@ output.param('SaveCanvases', True)
 main.add_module(output)
 
 # Process main path.
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Statistics.
 print(b2.statistics)

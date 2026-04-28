@@ -189,6 +189,8 @@ namespace Belle2 {
 
   private:
 
+    std::vector<ARICHPhoton> m_photons; /**< collection of ARICHPhotons associated with the track */
+
     float m_x = 0;     /**< Reconstructed position.  */
     float m_y = 0;     /**< Reconstructed position.  */
     float m_z = 0;     /**< Reconstructed position.  */
@@ -197,14 +199,11 @@ namespace Belle2 {
     float m_dz = 0;   /**< Reconstructed direction. */
     float m_momentum;        /**< Reconstructed momentum. */
 
-    bool m_hitWin = 0;    /**< true if track hits HAPD window */
     float m_winX = 0;     /**< x position of track extrapolated to HAPD plane */
     float m_winY = 0;     /**< y position of track extrapolated to HAPD plane  */
+    bool m_hitWin = 0;    /**< true if track hits HAPD window */
 
-
-    std::vector<ARICHPhoton> m_photons; /**< collection of ARICHPhotons associated with the track */
-
-    ClassDef(ARICHTrack, 2); /**< the class title */
+    ClassDef(ARICHTrack, 3); /**< the class title */
 
   };
 } // namespace Belle2

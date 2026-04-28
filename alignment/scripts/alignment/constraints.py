@@ -73,8 +73,8 @@ class Constraints():
 
     def generate(self):
         """
-        Should be overriden by the deriving classes and actually
-        fill the dictionary with the constraints (this runs withing a basf2 module
+        Should be overridden by the deriving classes and actually
+        fill the dictionary with the constraints (this runs within a basf2 module
         event function - so you have geometry available)
         """
         consts = []
@@ -82,7 +82,7 @@ class Constraints():
 
     def configure_collector(self, collector):
         """
-        Can be overriden be child classes to pass additional configuration to the
+        Can be overridden be child classes to pass additional configuration to the
         MillepedeCollector (activated by the use of the constraints)
         """
         pass
@@ -236,7 +236,9 @@ class CDCLayerConstraints(Constraints):
 
         consts = []
 
-        for par in self.parameter:
+        parameters = self.parameter
+
+        for par in parameters:
             nTot = 0
             for sl in self.cdc:
                 nlyr = sl[1]
@@ -430,6 +432,7 @@ class CDCWireConstraints(Constraints):
         #: List of layers for whose wires to generate the constraints. None = all layers
         if layers is None:
             layers = list(range(0, 56))
+        #: set list of layers
         self.layers = layers
         #: 6 x 56 (6/layer) constraints. Sum(dX_B/dY_B/drot_B/dX_FB/dY_FB/drot_FB)=0 for all wires in each layer
         #  -> removes the basic unconstrained DoF when aligning wires and layers simultaneously.
@@ -440,6 +443,7 @@ class CDCWireConstraints(Constraints):
         #  same by this constraint (1 per layer)
         if layer_radius is None:
             layer_radius = []
+        #: set list of layer radii
         self.layer_radius = layer_radius
         #: 2 Constraints: Sum(dr)=0 for all wires in CDC at each end-plate -> "average CDC radius" kept same
         #  by this constraint (1 per CDC)
@@ -447,6 +451,7 @@ class CDCWireConstraints(Constraints):
         #: list of layer subject to hemisphere constraints
         if hemisphere is None:
             hemisphere = []
+        #: set list of layers
         self.hemisphere = hemisphere
 
     def configure_collector(self, collector):
@@ -470,7 +475,9 @@ class CDCWireConstraints(Constraints):
 
         layers = self.layers
 
-        if self.layer_rigid:
+        layer_rigid = self.layer_rigid
+
+        if layer_rigid:
             for layer in layers:
                 const = Constraint()
                 # sum of wire X (BWD) in layer
@@ -490,7 +497,7 @@ class CDCWireConstraints(Constraints):
                 # sum of wire rotations (BWD) in layer
                 for wire in range(0, self.wires_in_layer[layer]):
 
-                    wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
+                    wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
 
                     const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), -math.sin(wirePhi))
                     const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), +math.cos(wirePhi))
@@ -515,7 +522,7 @@ class CDCWireConstraints(Constraints):
                 # sum of wire rotations (FWD) in layer
                 for wire in range(0, self.wires_in_layer[layer]):
 
-                    wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
+                    wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
 
                     const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), -math.sin(wirePhi))
                     const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), +math.cos(wirePhi))
@@ -526,7 +533,7 @@ class CDCWireConstraints(Constraints):
             # sum of wire rotations (BWD) in layer ... RIGHT hemisphere
             for wire in range(0, self.wires_in_layer[layer]):
 
-                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
+                wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
 
                 if math.cos(wirePhi) <= 0.:
                     continue
@@ -540,7 +547,7 @@ class CDCWireConstraints(Constraints):
             # sum of wire rotations (BWD) in layer ... LEFT hemisphere
             for wire in range(0, self.wires_in_layer[layer]):
 
-                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
+                wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
 
                 if math.cos(wirePhi) > 0.:
                     continue
@@ -554,7 +561,7 @@ class CDCWireConstraints(Constraints):
             # sum of wire rotations (FWD) in layer ... RIGHT
             for wire in range(0, self.wires_in_layer[layer]):
 
-                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
+                wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
 
                 if math.cos(wirePhi) <= 0.:
                     continue
@@ -568,7 +575,7 @@ class CDCWireConstraints(Constraints):
             # sum of wire rotations (FWD) in layer ... LEFT
             for wire in range(0, self.wires_in_layer[layer]):
 
-                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
+                wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
 
                 if math.cos(wirePhi) > 0.:
                     continue
@@ -583,7 +590,7 @@ class CDCWireConstraints(Constraints):
             # sum of wire rotations (BWD) in layer
             for wire in range(0, self.wires_in_layer[layer]):
 
-                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
+                wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
 
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), +math.cos(wirePhi))
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), +math.sin(wirePhi))
@@ -595,7 +602,7 @@ class CDCWireConstraints(Constraints):
             # sum of wire rotations (FWD) in layer
             for wire in range(0, self.wires_in_layer[layer]):
 
-                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
+                wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
 
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), +math.cos(wirePhi))
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), +math.sin(wirePhi))
@@ -608,7 +615,7 @@ class CDCWireConstraints(Constraints):
             # sum of wire rotations (BWD) in layer
             for wire in range(0, self.wires_in_layer[layer]):
 
-                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
+                wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
 
                 if math.sin(wirePhi) >= 0:
                     continue
@@ -623,7 +630,7 @@ class CDCWireConstraints(Constraints):
             # sum of wire rotations (BWD) in layer
             for wire in range(0, self.wires_in_layer[layer]):
 
-                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
+                wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
 
                 if math.sin(wirePhi) < 0:
                     continue
@@ -638,7 +645,7 @@ class CDCWireConstraints(Constraints):
             # sum of wire rotations (FWD) in layer
             for wire in range(0, self.wires_in_layer[layer]):
 
-                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
+                wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
 
                 if math.sin(wirePhi) >= 0:
                     continue
@@ -653,7 +660,7 @@ class CDCWireConstraints(Constraints):
             # sum of wire rotations (FWD) in layer
             for wire in range(0, self.wires_in_layer[layer]):
 
-                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
+                wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
 
                 if math.sin(wirePhi) < 0:
                     continue
@@ -668,7 +675,7 @@ class CDCWireConstraints(Constraints):
             for layer in layers:
                 # sum of wire rotations (BWD) in layer
                 for wire in range(0, self.wires_in_layer[layer]):
-                    wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
+                    wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
                     const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), +math.cos(wirePhi))
                     const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), +math.sin(wirePhi))
             consts.append(const)
@@ -677,7 +684,7 @@ class CDCWireConstraints(Constraints):
             for layer in layers:
                 # sum of wire rotations (FWD) in layer
                 for wire in range(0, self.wires_in_layer[layer]):
-                    wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
+                    wirePhi = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
                     const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), +math.cos(wirePhi))
                     const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), +math.sin(wirePhi))
             consts.append(const)
@@ -706,7 +713,7 @@ if __name__ == '__main__':
 
     # phase 2
     # timedep = [([], [(0, 0, 1002)])]
-    # early phase 3
+    # Run 1 (early phase 3)
     # timedep = [([], [(0, 0, 1003)])]
 
     # final detector (phase 3)

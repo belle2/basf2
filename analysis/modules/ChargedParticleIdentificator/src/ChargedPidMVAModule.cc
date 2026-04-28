@@ -9,16 +9,17 @@
 #include <analysis/modules/ChargedParticleIdentificator/ChargedPidMVAModule.h>
 
 //ANALYSIS
-#include <mva/interface/Interface.h>
-#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dbobjects/ChargedPidMVAWeights.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/VariableManager/Utility.h>
 #include <analysis/variables/ECLVariables.h>
 
 // FRAMEWORK
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
-
+#include <mva/interface/Interface.h>
 
 using namespace Belle2;
 

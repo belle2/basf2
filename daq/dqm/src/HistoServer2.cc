@@ -9,6 +9,7 @@
 
 #include <framework/pcore/MsgHandler.h>
 #include <ctime>
+#include <unistd.h>
 #include <arpa/inet.h>
 
 using namespace Belle2;

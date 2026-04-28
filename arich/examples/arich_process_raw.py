@@ -104,7 +104,7 @@ arichHists = b2.register_module('ARICHDQM')
 main.add_module(arichHists)
 
 # store the dataobjects
-if(options.output != ''):
+if (options.output != ''):
     output = b2.register_module('RootOutput')
     output.param('outputFileName', options.output)
     branches = ['ARICHDigits', 'ARICHHits', 'ARICHInfo']
@@ -125,7 +125,7 @@ if int(options.arichtrk):
     arichHists.if_value('==1', store)
 
 # process
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # print stats
 print(b2.statistics)

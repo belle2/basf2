@@ -44,7 +44,7 @@ class ConstraintsGenerator(b2.Module):
     def event(self):
         """ Event: attempt to add constraints
         At each event, attempt to generate the constraints and add them
-        to the dict (same cheksum - using only labels - means it gets overriden!)
+        to the dict (same checksum - using only labels - means it gets overridden!)
         Thus is only works if the time-dependence is set (otherwise you always get the same labels and
         only the last constraint coefficients will be stored)
         """
@@ -117,7 +117,7 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None, init
 
     This is a bit tricky. I did not found a way to run basf2 over just a specified list of events
     other than generating the files with metadata for event and then running over the files.
-    This uses unning basf2 multiple times in one script - seems to work despite the warnings - but only
+    This uses running basf2 multiple times in one script - seems to work despite the warnings - but only
     for the generation of "event files"
 
     Parameters
@@ -160,6 +160,8 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None, init
     print(global_tags)
     print('Global tags reversed (this will be used for b2.conditions.override_globaltags(...)):')
     print([tag for tag in reversed(global_tags)])
+
+    b2.conditions.override_globaltags()
 
     for tag in [tag for tag in reversed(global_tags)]:
         if os.path.exists(tag):

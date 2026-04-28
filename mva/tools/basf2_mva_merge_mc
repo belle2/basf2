@@ -46,6 +46,7 @@ PyConfig.IgnoreCommandLineOptions = True  # noqa
 
 import argparse
 import numpy as np
+import pandas as pd
 import uproot
 from sklearn.model_selection import train_test_split
 
@@ -136,7 +137,7 @@ if __name__ == '__main__':
             df_bkg = df_bkg.sample(int(fb*n_bkg))
 
     # Merge signal and background DataFrame
-    df = df_bkg.append(df_sig, ignore_index=True)
+    df = pd.concat([df_bkg, df_sig], ignore_index=True)
 
     # Replace NaN
     if args.fillnan:

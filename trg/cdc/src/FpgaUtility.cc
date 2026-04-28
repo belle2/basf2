@@ -105,7 +105,7 @@ string FpgaUtility::doubleToArb(double in, int outRadix, int numberOfDigits)
   } else if (numberOfDigits == -1) {
   } else if (int(result.size()) > numberOfDigits) {
     cout << "[Error] doubleToArb() => numberOfDigits too small. Aborting." << endl;
-    return 0;
+    return "";
   }
   if (sign == -1) result.insert(0, "-");
   return result;

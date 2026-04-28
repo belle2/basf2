@@ -3,6 +3,7 @@ import os
 Import('env')
 
 env['SUBLIB'] = True
+env.Append(FORTRANFLAGS=["-ff2c"])
 env['LIBS'] = ['$ROOT_LIBS', 'mdst_dataobjects', 'framework',
                'eemmgisr', 'eemmgisrfsr', 'eemmg5', 'qcdloop1', 'gfortran']
 

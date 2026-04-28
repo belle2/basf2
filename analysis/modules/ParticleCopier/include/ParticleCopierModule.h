@@ -14,9 +14,6 @@
 
 namespace Belle2 {
 
-  // forward declaration
-  class Particle;
-
   /**
    * Module for creating copies of Particles. Module replaces each
    * Particle in the input ParticleList by its copy. Particle's

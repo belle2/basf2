@@ -41,7 +41,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~AlignableEKLMRecoHit();
+    ~AlignableEKLMRecoHit() override;
 
     /** @brief Labels and derivatives of residuals (local measurement coordinates) w.r.t. alignment/calibration parameters
     * Matrix "G" of derivatives valid for given prediction of track state:
@@ -64,7 +64,7 @@ namespace Belle2 {
     * G = ( du/da du/db du/dc ... )
     *     (   0     0     0   ... )    for U-strip,
     *
-    * Measurements with more dimesions (slopes, curvature) should provide
+    * Measurements with more dimensions (slopes, curvature) should provide
     * full 4-5Dx(n params) matrix (state as (q/p, u', v', u, v) or (u', v', u, v))
     *
     *
@@ -107,4 +107,3 @@ namespace Belle2 {
   };
 
 }
-

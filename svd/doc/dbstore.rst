@@ -11,7 +11,7 @@ Here we briefly describe the SVD objects that populate the Conditions Database. 
    * for run-dependent and data reconstruction revisions should be checked inspecting the content of the corresponding Global Tags.
    * you can also check the `SVD Payloads, Revisions and GT <https://xwiki.desy.de/xwiki/rest/p/8f607>`_ XWiki Page.
 
-We add a string, the ``UniqueID``, to the payloads that provides information on the content of the payload. In order to read the ``UniqueID`` you can setup basf2 and then:
+We add a string, the ``UniqueID``, to the payloads that provides information on the content of the payload. In order to read the ``UniqueID`` you can setup ``basf2`` and then:
 
 .. code::
 
@@ -173,12 +173,6 @@ Check `HitTimeSelection@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHitTim
 	       
 	       wrapper with the strip occupancy averaged over a run, strip granularity_
 
-.. _svdhotstrips:
-
-.. cpp:class:: SVDHotStripsCalibrations
-
-	       wrapper with the hot strips as determined by ``SVDHotStripFinder``, strip granularity_
-
 .. _svdtimegroupingconfiguration:
 
 .. cpp:class:: SVDTimeGroupingConfiguration
@@ -223,3 +217,18 @@ Check `ELS3Time@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVD3SampleELSTime
 	       Time shift adjustment depending on cluster-size, with sensor-on-ladder granularity_
 
    Check `SVDClusterTimeShifter@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDClusterTimeShifter&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** is used for experiment 0 and 1002/3/4 which corresponds to no shift, revision **3** is calculated from *Exp24,Run1726* and should only be used for data.
+
+SVD background study calibrations
+----------------------------------------
+
+.. _svdhotstrips:
+
+.. cpp:class:: SVDHotStripsCalibrations
+
+                DBobject with the hot strips as determined by the :ref:`svdhotstripscalibrations` with strip granularity_
+
+Check `SVDHotStrips@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHotStripsCalibrations&perpage=25&>`_ all revisions available in the Conditions Database
+
+The :ref:`SVDHotStripsCalibrations<svdhotstrips>` DBObject contains a list of hot-strips per sensor/side. The list of hot-strips is a 128-bit decimal number, split in two 64-bit decimal numbers, per APV25-readout-chip. For example: the list for Layer3 contains 7 lists, one per Ladder, where each of them contains 2 lists, one per sensor, and each of the sensor-lists contains 2 more lists, one per side. Each of the side-lists contains 12 numbers, corresponding to the 64-bit decimal numbers. For Layer-3 there are 12 numbers for both sides, because 6 APV25-chips per side are used for both sides of Layer-3. For the other SVD layers, there are 8 numbers for the V-side and 12 numbers for the U-side.
+
+This DBObject is used only for SVD background studies. It is **NOT** used in reconstruction.

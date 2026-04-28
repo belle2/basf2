@@ -288,7 +288,7 @@ namespace Belle2 {
 
 // Helicity Amplitudes
 // overall factor GF/sqrt(2) Vcb omitted
-// Wilson coefficients cXX ommited
+// Wilson coefficients cXX omitted
 
 // SM
   double EvtBSemiTauonicHelicityAmplitudeCalculator::helampSM(double mtau, int tauhel, int Dhel, double w, double costau) const

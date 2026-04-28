@@ -83,7 +83,7 @@ void EvtLLSWFF::getvectorff(EvtId parent, EvtId daughter,
   static EvtId D3P1SN = EvtPDL::getId("D'_s1-");
 
   // Form factors have a general form, with parameters passed in
-  // from the arguements.
+  // from the arguments.
 
   if (daughter == D3P1P || daughter == D3P1N || daughter == D3P10 || daughter == D3P1B || daughter == D3P1SP || daughter == D3P1SN) {
 

@@ -25,17 +25,26 @@ class Statistics:
     """
     def __init__(self):
         """Initialize members"""
+        #: number of code inclusions
         self.code_inclusions: int = 0
+        #: number of hints
         self.hints: int = 0
+        #: number of solutions
         self.solutions: int = 0
+        #: number of exercises
         self.exercises: int = 0
+        #: number of overview boxes
         self.overview_boxes: int = 0
+        #: number of key points
         self.key_points: int = 0
+        #: number of figures
         self.figures: int = 0
+        #: number of characters
         self.characters: int = 0
 
     def print_summary(self):
         """Print the summary"""
+        #: printing using data pretty print
         pprint.pprint(self.__dict__)
 
 

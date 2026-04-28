@@ -45,7 +45,7 @@ namespace Belle2 {
   private:
 
     /** Fills the pdf-related branches */
-    void fillPDF(Belle2::Const::ChargedStable, const Track*, TH2F*, short*, float*,  int&, int&);
+    void fillPDF(const Belle2::Const::ChargedStable&, const Track*, TH2F*, short*, float*,  int&, int&);
 
     /** reset the tree variables. Call it at the beginning of the event method! */
     void resetTree();
@@ -60,6 +60,7 @@ namespace Belle2 {
     int m_toyNumber = 1; /**< Number of toys used to populate the arrays of expected hits*/
     bool m_saveHistograms = false;  /**< Set true to save the histograms of the maps */
     bool m_saveLLScan = false; /**< Set to true to save the results of the LL scan */
+    bool m_dumpOtherSlots = false; /**< Set to to save the results of the LL scan */
 
     TFile* m_outputFile = nullptr;   /**< output file */
     TTree* m_tree = nullptr;   /**< tree where data are saved. One entry per particle in m_particleList */

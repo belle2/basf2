@@ -28,7 +28,7 @@ class Basf2Calculation(Calculation):
 
     def show_path(self, index=None):
         """
-        Show the underlaying ipython_handler_basf2 path in an interactive way
+        Show the underlying ipython_handler_basf2 path in an interactive way
         """
         def f(process):
             if process.path is not None:

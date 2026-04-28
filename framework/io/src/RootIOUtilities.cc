@@ -187,8 +187,8 @@ bool RootIOUtilities::hasStreamer(const TClass* cl)
 
 bool RootIOUtilities::hasCustomStreamer(const TClass* cl)
 {
-  //does this class have a custom streamer? (magic from from TTree.cxx)
-  return cl->TestBit(TClass::kHasCustomStreamerMember);
+  // Does this class have a custom streamer?
+  return cl->HasCustomStreamerMember();
 }
 
 void RootIOUtilities::setCreationData(FileMetaData& metadata)
@@ -217,4 +217,11 @@ void RootIOUtilities::setCreationData(FileMetaData& metadata)
 std::string RootIOUtilities::getCommitID()
 {
   return GIT_COMMITID;
+}
+
+bool RootIOUtilities::isReservedTreeName(const std::string& name)
+{
+  return std::any_of(std::begin(RootIOUtilities::c_treeNames),
+                     std::end(RootIOUtilities::c_treeNames),
+  [&name](const std::string & s) { return s == name; });
 }

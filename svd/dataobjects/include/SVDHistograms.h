@@ -126,7 +126,7 @@ namespace Belle2 {
     // Index 0 for the V side, index 1 for the U side
     // Please, please, pleaseeeee use SVDHistograms<...>::UIndex
     // and SVDHistograms<...>::VIndex instead of  1 and 0 for better
-    // code readibility
+    // code readability
     typedef std::vector< H* > t_SVDSensor;  /**< a vector of H, length = 2 */
 
     // A t_SVDLadder is a vector of t_SVDSensors

@@ -101,7 +101,7 @@ main.add_module(mcparticleprinter)
 main.add_module(output)
 
 # process the events
-process(main)
+process(main, calculateStatistics=True)
 
 # show call statistics
 print(statistics)

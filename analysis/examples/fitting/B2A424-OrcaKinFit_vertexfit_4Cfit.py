@@ -31,7 +31,7 @@ from modularAnalysis import inputMdst
 from modularAnalysis import fillParticleList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from vertex import raveFit
+from vertex import kFit
 from kinfit import fitKinematic4C
 from modularAnalysis import variablesToNtuple
 import pdg
@@ -52,8 +52,8 @@ pdg.add_particle('A', 9000008, 999., 999., 0, 0)  # name, PDG, mass, width, char
 reconstructDecay("A:sel -> mu-:sel mu+:sel", "", path=my_path)
 reconstructDecay("A:selvertex -> mu-:sel mu+:sel", "", path=my_path)
 
-# Perform four momentum constraint fit using Rave and update the Daughters
-raveFit("A:selvertex", -1.0, constraint="iptube", daughtersUpdate=True, path=my_path)
+# Perform four momentum constraint fit using KFit and update the daughters
+kFit("A:selvertex", -1.0, constraint="iptube", daughtersUpdate=True, path=my_path)
 
 pdg.add_particle('beam', 9000009, 999., 999., 0, 0)  # name, PDG, mass, width, charge, spin
 reconstructDecay("beam:sel -> A:sel gamma:sel", "", path=my_path)
@@ -65,7 +65,7 @@ matchMCTruth('beam:sel', path=my_path)
 matchMCTruth('beam:selv', path=my_path)
 matchMCTruth('beam:selv4c', path=my_path)
 
-# Perform four momentum constraint fit using OrcaKinFit and update the Daughters
+# Perform four momentum constraint fit using OrcaKinFit and update the daughters
 fitKinematic4C("beam:selv4c", path=my_path)
 
 # Select variables that we want to store to ntuple
@@ -98,5 +98,3 @@ variablesToNtuple('beam:sel', uvarsv,
 
 # Process the events
 b2.process(my_path)
-# print out the summary
-print(b2.statistics)

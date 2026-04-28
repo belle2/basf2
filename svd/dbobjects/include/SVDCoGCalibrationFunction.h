@@ -153,7 +153,7 @@ namespace Belle2 {
       return raw_timeErr * m_scale[ tb % nTriggerBins];
     };
 
-    //data member useful for polinomials
+    //data member useful for polynomials
     static const int m_nPar = 6; /**< number of parameters of highest-order implemented pol (5)*/
     double m_par[ m_nPar ] = {0}; /**< vector of parameters*/
 
@@ -209,10 +209,10 @@ namespace Belle2 {
     /** current function ID */
     int m_current;
 
-    /** vector of fuctions for time calibration, we use the m_current*/
+    /** vector of functions for time calibration, we use the m_current*/
     static std::vector < cogFunction > m_implementations; //! Do not stream this, please throw it in the WC
 
-    /** vector of fuctions for time error calibration, we use the m_current*/
+    /** vector of functions for time error calibration, we use the m_current*/
     static std::vector < cogFunctionErr > m_implementationsErr; //! Do not stream this, please throw it in the WC
 
 

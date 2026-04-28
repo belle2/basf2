@@ -133,7 +133,7 @@ namespace Belle2 {
      * This payload will be valid for all possible iov and will be used instead of values from the database.
      *
      * @param name Name under which the object will be accessible
-     * @param obj Pointer to the object to be used. Ownership will be transfered
+     * @param obj Pointer to the object to be used. Ownership will be transferred
      *            to the DBStore.
      * @param oneRun if true the override will only be in effect for this one run,
      *               not for any other runs

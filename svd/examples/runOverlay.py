@@ -58,7 +58,7 @@ main = b2.create_path()
 
 b2.set_random_seed(1)
 
-# set the exp/run event informations
+# set the exp/run event information
 eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
@@ -96,6 +96,6 @@ main.add_module('Progress')
 
 b2.print_path(main)
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 print(b2.statistics)

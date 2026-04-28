@@ -8,6 +8,8 @@
 
 #include "daq/dqm/DqmSharedMem.h"
 
+#include <unistd.h>
+
 #include "TH1F.h"
 #include "TMemFile.h"
 

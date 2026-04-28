@@ -46,8 +46,10 @@ namespace Belle2 {
     std::string m_outputAddress;
     /// Parameter: buffer size for storing input messages
     unsigned int m_maximalBufferSize = 80'000'000;
-    /// Parameter: Do not wait for a ready worker if set to true, but dismiss the incoming event
+    /// Parameter: send out event messages instead of raw messages
     bool m_expressRecoMode = false;
+    /// Parameter: Do not wait for a ready worker if set to true, but dismiss the incoming event
+    bool m_lax = false;
     /// Parameter: how long to wait after no events come anymore
     unsigned int m_stopWaitingTime = 2;
   };

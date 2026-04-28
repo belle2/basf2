@@ -153,7 +153,7 @@ namespace Belle2 {
                                                   for debug TTree output */
     double m_tree_t0 = realNaN;   /**< EventT0 (not from ECL) for debug TTree output */
     double m_tree_t0_unc = realNaN;   /**< EventT0 uncertainty for debug TTree output */
-    double m_tree_t0_ECLclosestCDC = realNaN;   /**< EventT0 (from ECL) closest to CDC for debug TTree output */
+    double m_tree_t0_ECLclosestSVD = realNaN;   /**< EventT0 (from ECL) closest to SVD for debug TTree output */
     double m_tree_t0_ECL_minChi2 = realNaN;   /**< EventT0 (from ECL) min chi2 for debug TTree output */
     double m_tree_d0 = realNaN;    /**< Track d0 for debug TTree output */
     double m_tree_z0 = realNaN;    /**< Track z0 for debug TTree output */
@@ -230,8 +230,8 @@ namespace Belle2 {
     std::unique_ptr< Belle2::ECL::ECLTimingUtilities > m_ECLTimeUtil =
       std::make_unique<Belle2::ECL::ECLTimingUtilities>(); /**< ECL timing tools */
 
-    /**  correction to apply to CDC event t0 values in bhabha events to correct for CDC event t0
-         bias compared to CDC event t0 in hadronic events in ns*/
+    /**  correction to apply to SVD event t0 values in bhabha events to correct for SVD event t0
+         bias compared to SVD event t0 in hadronic events in ns*/
     double m_hadronEventT0_TO_bhabhaEventT0_correction;
 
     bool skipTrgSel; /**< flag to skip the trigger skim selection in the module */

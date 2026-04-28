@@ -28,9 +28,6 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
-CONTACT = "oliver.frost@desy.de"
-
-
 class ClusterFilterValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     """Prepare and execute a basf2 job to read generated events or generate new events then validate the CDC cluster filter"""
     #: basf2 module for CDC cluster preparation

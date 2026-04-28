@@ -47,7 +47,7 @@ void EvtHQET3FF::getscalarff(EvtId parent, EvtId,
   double w = ((mb * mb) + (mass * mass) - t) / (2.0 * mb * mass);
 
   // Form factors have a general form, with parameters passed in
-  // from the arguements.
+  // from the arguments.
 
   // Use dispersion relation parametrization from
   // I.Caprini, L.Lelluch, M.Neubert, Nucl. Phys. B 530,153(1998)
@@ -73,7 +73,7 @@ void EvtHQET3FF::getvectorff(EvtId parent, EvtId,
   double w = ((mb * mb) + (mass * mass) - t) / (2.0 * mb * mass);
 
   // Form factors have a general form, with parameters passed in
-  // from the arguements.
+  // from the arguments.
 
   double rstar = (2.0 * sqrt(mb * mass)) / (mb + mass);
 

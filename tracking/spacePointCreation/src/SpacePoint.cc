@@ -15,7 +15,7 @@ using namespace Belle2;
 
 //---PXD related constructor---
 SpacePoint::SpacePoint(const PXDCluster* pxdCluster,
-                       const VXD::SensorInfoBase* aSensorInfo) :  m_clustersAssigned({true, true}), m_vxdID(pxdCluster->getSensorID())
+                       const VXD::SensorInfoBase* aSensorInfo) : m_vxdID(pxdCluster->getSensorID()), m_clustersAssigned({true, true})
 {
   //We need some handle to translate IDs to local and global coordinates.
   //aSensorInfo exists only for testing purposes, so this is the relevant case!

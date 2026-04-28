@@ -10,7 +10,6 @@
 #include <arich/calibration/ARICHCalibrationChecker.h>
 
 /* ARICH headers. */
-#include <arich/utility/ARICHChannelHist.h>
 #include <arich/dbobjects/ARICHChannelMask.h>
 
 /* Belle II headers. */
@@ -19,11 +18,8 @@
 #include <framework/database/Configuration.h>
 #include <framework/datastore/DataStore.h>
 
-/* ROOT include. */
-#include <TCanvas.h>
+/* ROOT headers. */
 #include <TFile.h>
-#include <TH1F.h>
-#include <TString.h>
 #include <TTree.h>
 
 using namespace Belle2;
@@ -73,7 +69,8 @@ void ARICHCalibrationChecker::resetDatabase()
 {
   /* Reset both DataStore and Database. */
   DataStore::Instance().reset();
-  Database::Instance().reset(false);
+  // Database::Instance().reset(false);
+  Database::Instance().reset(true); // keep the configuration
   DBStore::Instance().reset(false);
 }
 

@@ -35,7 +35,7 @@ bool CDCStateBasicVarSet::extract(const BaseCDCStateFilter::Object* pair)
   var<named("arcLength")>() = state->getArcLength() - lastState.getArcLength();
   var<named("hitDistance")>() = state->getHitDistance();
 
-  TrackFindingCDC::Vector3D wirePos = state->getWireHit()->getRefPos3D();
+  TrackingUtilities::Vector3D wirePos = state->getWireHit()->getRefPos3D();
   var<named("wire_r")>() = wirePos.cylindricalR();
   var<named("wire_z")>() = wirePos.z();
   var<named("wire_x")>() = wirePos.x();

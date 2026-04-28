@@ -363,7 +363,7 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
 
         #: distribution of EventT0
         self.EventT0Hist = TH1F("EventT0", " ", 200, -100, 100)
-        #: gaus function used for fitting distributions
+        #: gauss function used for fitting distributions
         self.gaus = TF1("gaus", 'gaus(0)', -150, 100)
         #: third order polynomial function used for fitting distributions
         self.pol = TF1("pol", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -150, 150)
@@ -372,7 +372,7 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
 
     def event(self):
         """
-        Function that allows to cicle on the events
+        Function that allows to cycle on the events
         """
         # timeClusterU = 0
         # timeClusterV = 0
@@ -393,7 +393,7 @@ class SVDCoGTimeCalibrationImporterModule(b2.Module):
 
     def terminate(self):
         """
-        Terminates te class and produces the output rootfile
+        Terminates the class and produces the output rootfile
         """
 
         tfile = TFile(self.outputFileName, 'recreate')

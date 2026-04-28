@@ -47,7 +47,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
   addParam("alarmAdhoc", m_alarmAdhoc, "Generate Alarm from adhoc values", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
-  addParam("excluded", m_excluded, "the list of excluded modules, indices from 0 to 39");
+  addParam("excluded", m_excluded, "the list of excluded modules, indices from 0 to 39", std::vector<int>());
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
@@ -526,7 +526,8 @@ void DQMHistAnalysisPXDEffModule::event()
       m_cEffAllUpdate->cd(0);
 
       auto gr = m_eEffAllUpdate->GetPaintedGraph();
-      auto gr3 = (TGraphAsymmErrors*) m_eEffAll->GetPaintedGraph()->Clone();
+      // A clone in next line would create a memory leak unless taken care of as member. No clone results in acceptable minor displayement of points
+      auto gr3 = (TGraphAsymmErrors*) m_eEffAll->GetPaintedGraph(); // ->Clone();
       if (gr3) {
         for (int i = 0; i < gr3->GetN(); i++) {
           Double_t x, y;
@@ -573,13 +574,14 @@ void DQMHistAnalysisPXDEffModule::event()
       if (gr3) gr3->Draw("P"); // both in one plot
 
       for (auto& it : m_excluded) {
-        std::map <int, TLatex*> ltmap;
+        static std::map <int, TLatex*> ltmap;
         auto tt = ltmap[it];
         if (!tt) {
           tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
           tt->SetTextSize(0.035);
           tt->SetTextAngle(90);// Rotated
           tt->SetTextAlign(12);// Centered
+          ltmap[it] = tt;
         } else {
           tt->SetY(scale_min);
         }

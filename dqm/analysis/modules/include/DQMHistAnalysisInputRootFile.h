@@ -34,6 +34,7 @@ namespace Belle2 {
      */
     DQMHistAnalysisInputRootFileModule();
 
+  private:
     /**
      * Initialize the module.
      */
@@ -49,7 +50,11 @@ namespace Belle2 {
      */
     void event() override final;
 
-  private:
+    /**
+     * Read histogram from key and add to list vector
+     */
+    void addToHistList(std::vector<TH1*>& inputHistList, std::string dirname, TKey* key);
+
     /**
      * Pattern match for histogram name
      * @param pattern Used for matchng the histogram name. Wildcards (* and ?) are supported
@@ -58,6 +63,7 @@ namespace Belle2 {
      */
     bool hnamePatternMatch(std::string pattern, std::string text);
 
+    // Data members
     /** The list of names of the input root file. */
     std::vector<std::string> m_fileList;
 
@@ -76,24 +82,24 @@ namespace Belle2 {
     std::vector<std::string> m_histograms;
 
     /** Exp number */
-    unsigned int m_expno = 0;
+    int m_expno = 0;
     /** Event number */
-    unsigned int m_count = 0;
+    int m_count = 0;
 
     /** Run Type Override*/
     std::string m_runType;
 
     /** Filled event number. */
-    int m_fillEvent = 0;
+    int m_fillNEvent = 0;
 
     /** List of total number of events for each run.
      * This is the number of issued update events for testing,
      * not the number of events from which histograms were filled
      */
-    std::vector<unsigned int> m_eventsList;
+    std::vector<int> m_eventsList;
 
     /** List of runs. */
-    std::vector<unsigned int> m_runList;
+    std::vector<int> m_runList;
 
     /** Time between two events in second. */
     unsigned int m_interval = 0;
@@ -101,17 +107,19 @@ namespace Belle2 {
     /** Index in the list of runs, events and files */
     unsigned int m_run_idx = 0;
 
-    /** Test mode for null histograms */
-    bool m_nullHistoMode = false;
-
-    /** Whether to add the run control histograms. */
-    bool m_add_runcontrol_hist;
     /** emulated histogram from runcontrol, expno */
     TH1F* m_h_expno{nullptr};
     /** emulated histogram from runcontrol, runno */
     TH1F* m_h_runno{nullptr};
     /** emulated histogram from runcontrol, runtype */
     TH1F* m_h_rtype{nullptr};
+    /** emulated histogram from daq, nevent */
+    TH1F* m_h_fillNEvent{nullptr};
+
+    /** last run */
+    int m_lastRun{-1};
+    /** last exp */
+    int m_lastExp{-1};
   };
 } // end namespace Belle2
 

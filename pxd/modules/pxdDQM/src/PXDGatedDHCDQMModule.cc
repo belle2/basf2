@@ -7,7 +7,9 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDGatedDHCDQMModule.h>
-#include "TDirectory.h"
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+#include <TDirectory.h>
 
 using namespace std;
 using namespace Belle2;
@@ -52,7 +54,7 @@ void PXDGatedDHCDQMModule::initialize()
 
 void PXDGatedDHCDQMModule::beginRun()
 {
-  // Assume that everthing is non-zero ;-)
+  // Assume that everything is non-zero ;-)
   hGateAfterInjLER->Reset();
   hGateAfterInjHER->Reset();
 }

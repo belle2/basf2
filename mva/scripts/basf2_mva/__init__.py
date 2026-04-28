@@ -14,7 +14,7 @@ the Belle2::MVA namespace.
 from variables import std_vector as vector  # noqa
 from basf2_mva.options import CombinationOptions, FANNOptions, FastBDTOptions, GeneralOptions, MetaOptions, \
     PDFOptions, PythonOptions, RegressionFastBDTOptions, ReweighterOptions, TMVAOptionsClassification, \
-    TMVAOptionsMulticlass, TMVAOptionsRegression, TrivialOptions  # noqa
+    TMVAOptionsMulticlass, TMVAOptionsRegression, TrivialOptions, ONNXOptions  # noqa
 from basf2_mva.weightfile import Weightfile  # noqa
 from basf2_mva.utility import available, download, expert, extract, info, save_custom_weightfile, teacher, \
     teacher_dataset, teacher_sideband_subtraction, teacher_splot, teacher_reweighting, upload, upload_array  # noqa

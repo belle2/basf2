@@ -48,7 +48,7 @@ namespace Belle2 {
   private:
 
     // Input, output.
-    TFile* m_outputRootFile = nullptr; /**< root ouput file pointer. */
+    TFile* m_outputRootFile = nullptr; /**< root output file pointer. */
     std::string m_outputDirName; /**< output directory. */
     std::string m_outputRootFileName; /**< root output file name. */
 
@@ -57,7 +57,7 @@ namespace Belle2 {
 
     // Store arrays.
     StoreArray<SVDCluster> m_svdClusters; /**< SVD clusters store array. */
-    StoreArray<Track> m_Tracks; /**< SVD Tracks strore array. */
+    StoreArray<Track> m_Tracks; /**< SVD Tracks store array. */
     StoreArray<RecoTrack> m_recoTracks; /**< SVD RecoTracks store array. */
     StoreArray<TrackFitResult> m_tfr; /**< Track Fit Result store array. */
 

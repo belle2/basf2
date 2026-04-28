@@ -13,10 +13,7 @@
 #include <TH2F.h>
 #include <TFile.h>
 #include <TTree.h>
-#include <TStopwatch.h>
 
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
 
 //#include "getSigma68WithUncertainty.h"
@@ -40,7 +37,7 @@ CalibrationAlgorithm::EResult FudgeFactorCalibrationAlgorithm::calibrate()
   gErrorIgnoreLevel = 3001;
   // We are potentially using data from several runs at once during execution
   // (which may have different DBObject values). So in general you would need to
-  // average them, or aply them to the correct collector data.
+  // average them, or apply them to the correct collector data.
 
   // However since this is the geometry lets assume it is fixed for now.
   const auto exprun = getRunList()[0];

@@ -11,17 +11,18 @@
 #include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/numerics/LookupTable.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/numerics/LookupTable.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <vector>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 OffOriginExtension::OffOriginExtension(std::vector<const CDCWireHit*> allAxialWireHits,
                                        double levelPrecision)
@@ -97,7 +98,7 @@ OffOriginExtension::roadSearch(const std::vector<const CDCWireHit*>& wireHits)
 std::vector<const CDCWireHit*>
 OffOriginExtension::getHitsWRTtoRefPos(const Vector2D& refPos, float curv, float theta)
 {
-  float thetaPrecision = 3.1415 / (pow(2., m_levelPrecision + 1));
+  float thetaPrecision = M_PI / (pow(2., m_levelPrecision + 1));
   float curvPrecision = 0.15 / (pow(2., m_levelPrecision));
 
   using YSpan = AxialHitQuadTreeProcessor::YSpan;

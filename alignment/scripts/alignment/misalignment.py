@@ -46,7 +46,7 @@ class GlobalDeformation:
         return d_xyz
 
     def _transform(self, r, phi, z):
-        """ Fcn to be overriden by child classes, return vector (list of 3 numbers) of displacement """
+        """ Fcn to be overridden by child classes, return vector (list of 3 numbers) of displacement """
 
     def _xyz_to_rphiz(self, xyz):
         """ Convert (x,y,z) to (r,phi,z) """
@@ -212,11 +212,13 @@ class CreateMisalignmentModule(b2.Module):
 
             delta = ROOT.TVector3(0., 0., 0.)
 
-            if self.global_deformations is not None:
-                if not isinstance(self.global_deformations, list):
-                    self.global_deformations = [self.global_deformations]
+            global_deformations = self.global_deformations
+            if global_deformations is not None:
+                if not isinstance(global_deformations, list):
+                    global_deformations = [global_deformations]
+                    self.global_deformations = global_deformations
 
-                for deformation in self.global_deformations:
+                for deformation in global_deformations:
                     delta += deformation(global_pos)
 
             if sensor == Belle2.VxdID(1, 1, 1):

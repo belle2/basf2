@@ -45,11 +45,11 @@ SVDIgnoredStripsMap::SVDIgnoredStripsMap(const string& xmlFilename):
   try {
     read_xml(xmlFullPath, propertyTree);
   } catch (std::exception const& ex) {
-    B2WARNING("STD excpetion raised during xml parsing " << ex.what() << endl <<
+    B2WARNING("STD exception raised during xml parsing " << ex.what() << endl <<
               "SVD ignored strips map cannot be initialized." << endl);
     return;
   } catch (...) {
-    B2WARNING("Unknown excpetion raised during xml parsing "
+    B2WARNING("Unknown exception raised during xml parsing "
               "SVD ignored strips map cannot be initialized." << endl);
     return;
   }
@@ -88,7 +88,7 @@ SVDIgnoredStripsMap::SVDIgnoredStripsMap(const string& xmlFilename):
           } // if ladder
       }  // if sensor
   } catch (...) {
-    B2WARNING("Unknown excpetion raised during map initialization! "
+    B2WARNING("Unknown exception raised during map initialization! "
               "SVD ignored strips map may be corrupted." << endl);
     return;
   }

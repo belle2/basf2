@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef VXDID_H
-#define VXDID_H
+#pragma once
 
 #include <string>
 #include <ostream>
@@ -22,7 +21,7 @@ namespace Belle2 {
    * - Segment ID is used for PXD to encode frame number. Currently no use for SVD.
    *
    * Internal use of a union gets rid of all the bit shifting which would be
-   * neccessary to represent the id as one baseType and get all the
+   * necessary to represent the id as one baseType and get all the
    * components out of it. Disadvantage is that it is not guaranteed to be
    * portable, but neither is bit shifting
    */
@@ -134,5 +133,3 @@ namespace Belle2 {
   /** Print id to stream by converting it to string */
   std::ostream& operator<<(std::ostream& out, const VxdID& id);
 }
-
-#endif //VXDID_H

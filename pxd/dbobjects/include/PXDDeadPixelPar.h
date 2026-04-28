@@ -17,7 +17,7 @@ namespace Belle2 {
   /** The payload telling which PXD pixel is dead (=Readout system does not receive signals)
    *
    *  There are multiple reasons for dead pixels:
-   *  1) Brocken (open) drain line (-> current cannot flow into DCD channel)
+   *  1) Broken (open) drain line (-> current cannot flow into DCD channel)
    *  2) DEPFET current into DCD out of dynamic range
    *  3) DHP subtracts too high pedestal correction
    *  4) ...

@@ -7,8 +7,11 @@
  **************************************************************************/
 
 #pragma once
+
 #include <TH1F.h>
-#include "string"
+
+#include <string>
+
 namespace Belle2 {
   namespace CDC {
     /**
@@ -45,7 +48,7 @@ namespace Belle2 {
       virtual bool calibrate();
       ///create histo for each channel
       virtual void CreateHisto();
-      /// write outut or store db
+      /// write output or store db
       virtual void Write();
     private:
       TH1F* m_hTotal;       /**< 1D histogram of delta T whole channel */

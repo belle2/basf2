@@ -45,7 +45,7 @@ with clean_working_directory():
     # evolution. With no '+' in linkdef, this crashes
     tree.Project("", "abs(MCParticles.m_pdg)")
 
-    # wether TTreeFormula chokes on something depends on alphabetical order...
+    # whether TTreeFormula chokes on something depends on alphabetical order...
     # so this should get it to iterate over the entire contents
     tree.Project("", "ZZZ.Doesnt.Exist")
 

@@ -21,7 +21,7 @@ namespace Belle2 {
    */
   class ZMQRxWorkerModule : public Module {
   public:
-    /// Constructor setting the moudle paramters
+    /// Constructor setting the module parameters
     ZMQRxWorkerModule();
     /// Receive an event and store it in the datastore. Tell the input process we are ready.
     void event() override;

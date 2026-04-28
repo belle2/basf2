@@ -82,10 +82,7 @@ variableList += vu.create_aliases(vc.kinematics, 'daughter(1, useCMSFrame({varia
 variables.addAlias('dmID', 'extraInfo(decayModeID)')
 variableList += ['dmID']
 
-ma.variablesToNtuple('B0', variables=variableList, filename="Reconstruct_jpsi_kl_example.root", treename='tree', path=main)
+ma.variablesToNtuple('B0', variables=variableList, filename="Reconstruct_jpsi_kl_example.root", treename='B0', path=main)
 
 # Process all modules added to the main path
 basf2.process(main)
-
-# Print out the summary
-print(basf2.statistics)

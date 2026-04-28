@@ -67,7 +67,7 @@ namespace Belle2 {
        * G4_Si, G4_Al and other materials are defined all uppercase, e.g.
        * G4_AIR, G4_TEFLON.
        *
-       * Found materials are cached internaly using an MRU cache so repitive
+       * Found materials are cached internally using an MRU cache so repetitive
        * access to materials should be O(1) in most cases
        *
        * @param name Name of the material to be found

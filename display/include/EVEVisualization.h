@@ -32,7 +32,6 @@
 
 #include <Math/Vector3D.h>
 #include <TEveStraightLineSet.h>
-#include <TVector3.h>
 #include <TEveTrack.h>
 
 #include <string>
@@ -75,11 +74,11 @@ namespace Belle2 {
       const MCParticle* parentParticle; /**< parent particle, or nullptr. */
     };
 
-    /** Group of TEveElements, remembers wether user wants it visible or not. */
+    /** Group of TEveElements, remembers whether user wants it visible or not. */
     struct ElementGroup {
       ElementGroup(): group(nullptr), visible(true) { }
       TEveElementList* group; /**< Contains elements of this group. Set to nullptr after event. */
-      bool visible; /**< Stores wether this group was visible in last event. */
+      bool visible; /**< Stores whether this group was visible in last event. */
     };
 
     /** Color for reco hits. */
@@ -177,7 +176,7 @@ namespace Belle2 {
     /** Add a reconstructed 2d hit in the EKLM. */
     void addEKLMHit2d(const KLMHit2d* eklm2dhit);
 
-    /** Add recontructed hit in ARICH */
+    /** Add reconstructed hit in ARICH */
     void addARICHHit(const ARICHHit* hit);
 
     /** Add a Region Of Interest, computed by the PXDDataReduction module */
@@ -217,8 +216,7 @@ namespace Belle2 {
      * Should be called by functions adding TEveElements to the event scene
      * (Hits are currently excluded).
      */
-    void addObject(const TObject* dataStoreObject, TEveElement* visualRepresentation);
-
+    static void addObject(const TObject* dataStoreObject, TEveElement* visualRepresentation);
 
     /** Add user-defined data (labels, points, etc.) */
     void showUserData(const DisplayData& displayData);
@@ -274,13 +272,13 @@ namespace Belle2 {
     /** @brief Create a box around o, oriented along u and v with widths ud, vd and depth and
      *  return a pointer to the box object.
      */
-    TEveBox* boxCreator(const ROOT::Math::XYZVector& o, ROOT::Math::XYZVector u, ROOT::Math::XYZVector v, float ud, float vd,
-                        float depth);
+    static TEveBox* boxCreator(const ROOT::Math::XYZVector& o, ROOT::Math::XYZVector u, ROOT::Math::XYZVector v, float ud, float vd,
+                               float depth);
 
     /** Create hit visualisation for the given options, and add them to 'eveTrack'. */
-    void makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state,
-                   const genfit::AbsTrackRep* rep,
-                   TEvePathMark::EType_e markType, bool drawErrors, int markerPos = 1);
+    static void makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state,
+                          const genfit::AbsTrackRep* rep,
+                          TEvePathMark::EType_e markType, bool drawErrors, int markerPos = 1);
 
     /** adds given VXD hit to lines. */
     template <class SomeVXDHit> void addRecoHit(const SomeVXDHit* hit, TEveStraightLineSet* lines)

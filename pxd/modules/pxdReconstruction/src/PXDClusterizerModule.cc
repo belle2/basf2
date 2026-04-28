@@ -7,12 +7,15 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdReconstruction/PXDClusterizerModule.h>
+#include <pxd/dbobjects/PXDClusterPositionErrorPar.h>
+#include <pxd/reconstruction/ClusterCache.h>
+#include <pxd/reconstruction/ClusterProjection.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 
+#include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -149,7 +152,7 @@ void PXDClusterizerModule::initialize()
   // Cluster position error from DB
   if (m_errorFromDB) {
     if (!m_positionErrorUName.size() || !m_positionErrorVName.size()) {
-      B2WARNING("You chose to use cluster position erros from DB but did not provide PositionErrorUPayloadName ("
+      B2WARNING("You chose to use cluster position errors from DB but did not provide PositionErrorUPayloadName ("
                 << m_positionErrorUName << ") and/or PositionErrorVPayloadName (" << m_positionErrorVName
                 << "). Disabling DB option.");
       m_errorFromDB = false;
@@ -398,7 +401,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     // FIXME: I am not 100% sure if cls.pixels() are sorted
     set<Pixel> pixelSet(cls.pixels().begin(), cls.pixels().end());
 
-    // Compute classifier variables needed for later retrival of position correction in PXD CKF
+    // Compute classifier variables needed for later retrieval of position correction in PXD CKF
     vector<float> sectorEtaValues = {0, 0, 0, 0};
     sectorEtaValues[0] = PXDClusterPositionEstimator::getInstance().computeEta(pixelSet, projV.getMinCell(), projV.getSize(), +1.0,
                          +1.0);
@@ -471,7 +474,7 @@ void PXDClusterizerModule::assignPositionErrorFromDB(ClusterProjection& primary,
   // Get error from DB [in units of pix]
   double error = errorPar.getContent(sensorID.getID(), uBin, vBin, primary.getSize());
   double sf = 1.;
-  // Apply additional factor if at sensor edges or adjacent to daed rows/colums
+  // Apply additional factor if at sensor edges or adjacent to dead rows/columns
   if (isAtUEdge)      sf *= errorPar.getSensorUEdgeFactor(sensorID.getID(), uBin, vBin, primary.getSize());
   if (isAtVEdge)      sf *= errorPar.getSensorVEdgeFactor(sensorID.getID(), uBin, vBin, primary.getSize());
   if (isAdjacentDead) sf *= errorPar.getDeadNeighbourFactor(sensorID.getID(), uBin, vBin, primary.getSize());

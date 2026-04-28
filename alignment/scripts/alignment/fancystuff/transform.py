@@ -142,15 +142,18 @@ class Transform(ProTool):
         :param x:   Input data
         :return:    Limited data
         """
+        x_min = self.min
+        x_max = self.max
+
         try:
             _ = len(x)  # to catch exception
-            x[x > self.max] = self.max
-            x[x < self.min] = self.min
+            x[x > x_max] = x_max
+            x[x < x_min] = x_min
         except TypeError:
-            if x < self.min:
-                x = self.min
-            if x > self.max:
-                x = self.max
+            if x < x_min:
+                x = x_min
+            if x > x_max:
+                x = x_max
         return x
 
 
@@ -259,7 +262,7 @@ class ToFlat(Transform):
         """
         Fit function calculates the cumulative distribution with numpy percentile.
 
-        :param x:   Inout distribution
+        :param x:   Input distribution
         :param y:   Will not be used in this transformation
         """
         self.io.debug("Fitting Flat")

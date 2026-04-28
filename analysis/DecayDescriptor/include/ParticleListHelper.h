@@ -16,7 +16,6 @@
 #include <optional>
 
 namespace Belle2 {
-  class Particle;
   class DecayDescriptor;
 
   /** Class to help managing creation and adding to ParticleLists.
@@ -78,7 +77,7 @@ namespace Belle2 {
     void create();
 
     /** Add a particle to the list by forwarding all arguments to the constructor
-     * of the Particle object: Any valid arguments to construct a Belle2::Particle work here.
+     * of the Particle object: Any valid arguments to construct a Particle work here.
      *
      * It will return a reference to the created particle for further modification.
      */

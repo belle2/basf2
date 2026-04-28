@@ -11,7 +11,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <cdc/dataobjects/CDCHit.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
@@ -23,6 +22,7 @@
 
 
 using namespace Belle2;
+using namespace TrackingUtilities;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -120,6 +120,33 @@ void TrackingAbortDQMModule::defineHisto()
   m_svdL3uZS5Occupancy[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
   m_svdL3uZS5Occupancy[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
+  //SVD L3 occupancy when VXDTF2 Aborts- see SVDDQMDose module for details
+  histoName = "SVDL3UOccVXDTF2aborts";
+  histoTitle = "SVD L3 u-side ZS5 Occupancy (%) when VXDTF2 Aborts";
+  //outside active_veto window:
+  m_svdL3uZS5Occupancy_VXDTF2aborts[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
+                                                  TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+                                                  180, 0, 100.0 / 1536.0 * 180);
+  m_svdL3uZS5Occupancy_VXDTF2aborts[0]->GetXaxis()->SetTitle("occupancy [%]");
+  m_svdL3uZS5Occupancy_VXDTF2aborts[0]->GetYaxis()->SetTitle("Number of Events");
+  //inside active_veto window:
+  m_svdL3uZS5Occupancy_VXDTF2aborts[1] = new TH1F(*m_svdL3uZS5Occupancy_VXDTF2aborts[0]);
+  m_svdL3uZS5Occupancy_VXDTF2aborts[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
+  m_svdL3uZS5Occupancy_VXDTF2aborts[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
+
+//SVD L3 occupancy when toSVDCFK Aborts- see SVDDQMDose module for details
+  histoName = "SVDL3UOccToSVDCKFaborts";
+  histoTitle = "SVD L3 u-side ZS5 Occupancy (%) when toSVDCKF Aborts";
+  //outside active_veto window:
+  m_svdL3uZS5Occupancy_toSVDCKFaborts[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
+                                                    TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+                                                    180, 0, 100.0 / 1536.0 * 180);
+  m_svdL3uZS5Occupancy_toSVDCKFaborts[0]->GetXaxis()->SetTitle("occupancy [%]");
+  m_svdL3uZS5Occupancy_toSVDCKFaborts[0]->GetYaxis()->SetTitle("Number of Events");
+  //inside active_veto window:
+  m_svdL3uZS5Occupancy_toSVDCKFaborts[1] = new TH1F(*m_svdL3uZS5Occupancy_toSVDCKFaborts[0]);
+  m_svdL3uZS5Occupancy_toSVDCKFaborts[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
+  m_svdL3uZS5Occupancy_toSVDCKFaborts[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
   //CDC extra hits
   histoName = "nCDCExtraHits";
@@ -143,7 +170,7 @@ void TrackingAbortDQMModule::defineHisto()
                           TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
                           300, -150, 150);
   m_svdTime[0]->GetXaxis()->SetTitle("cluster time (ns)");
-  m_svdTime[0]->GetYaxis()->SetTitle("Number of Events");
+  m_svdTime[0]->GetYaxis()->SetTitle("Number of Clusters");
   //inside active_veto window:
   m_svdTime[1] = new TH1F(*m_svdTime[0]);
   m_svdTime[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
@@ -167,6 +194,52 @@ void TrackingAbortDQMModule::defineHisto()
   m_integratedAverages[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
   m_integratedAverages[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
+  //CDC extra hits per SL
+  histoName = "nCDCExtraHitsSL";
+  histoTitle = "Number of CDC Extra Hits in SL";
+  for (int sl = 0; sl < 9; sl++) {
+    //outside active_veto window:
+    m_nCDCExtraHitsSL[0][sl] = new TH1F(TString::Format("%s%d_%s", histoName.c_str(), sl, tag[0].c_str()),
+                                        TString::Format("%s%d %s", histoTitle.c_str(), sl, title[0].c_str()),
+                                        201, -1000 / 200 / 2, 1000 + 1000 / 200 / 2);
+    m_nCDCExtraHitsSL[0][sl]->GetXaxis()->SetTitle("nCDCExtraHits");
+    m_nCDCExtraHitsSL[0][sl]->GetYaxis()->SetTitle("Number of Events");
+    //inside active_veto window:
+    m_nCDCExtraHitsSL[1][sl] = new TH1F(*m_nCDCExtraHitsSL[0][sl]);
+    m_nCDCExtraHitsSL[1][sl]->SetName(TString::Format("%s%d_%s", histoName.c_str(), sl, tag[1].c_str()));
+    m_nCDCExtraHitsSL[1][sl]->SetTitle(TString::Format("%s%d %s", histoTitle.c_str(), sl, title[1].c_str()));
+  }
+
+  //CDC signal hits per SL
+  histoName = "nCDCHitsSL";
+  histoTitle = "Average Number of CDC Hits per Track in SL";
+  for (int sl = 0; sl < 9; sl++) {
+    //outside active_veto window:
+    m_nCDCHitsSL[0][sl] = new TH1F(TString::Format("%s%d_%s", histoName.c_str(), sl, tag[0].c_str()),
+                                   TString::Format("%s%d %s", histoTitle.c_str(), sl, title[0].c_str()),
+                                   31, -0.5, 30 + 0.5);
+    m_nCDCHitsSL[0][sl]->GetXaxis()->SetTitle("average nCDCHits per track");
+    m_nCDCHitsSL[0][sl]->GetYaxis()->SetTitle("Number of Events");
+    //inside active_veto window:
+    m_nCDCHitsSL[1][sl] = new TH1F(*m_nCDCHitsSL[0][sl]);
+    m_nCDCHitsSL[1][sl]->SetName(TString::Format("%s%d_%s", histoName.c_str(), sl, tag[1].c_str()));
+    m_nCDCHitsSL[1][sl]->SetTitle(TString::Format("%s%d %s", histoTitle.c_str(), sl, title[1].c_str()));
+  }
+
+  //no CDC signal hits in SL
+  histoName = "noCDCHitsInSL";
+  histoTitle = "No Signal CDC Hits in SL";
+  //outside active_veto window:
+  m_noCDCHitsInSL[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
+                                TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+                                9, -0.5, 8 + 0.5);
+  m_noCDCHitsInSL[0]->GetXaxis()->SetTitle("SuperLayer");
+  m_noCDCHitsInSL[0]->GetYaxis()->SetTitle("Number of Events");
+  //inside active_veto window:
+  m_noCDCHitsInSL[1] = new TH1F(*m_noCDCHitsInSL[0]);
+  m_noCDCHitsInSL[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
+  m_noCDCHitsInSL[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
+
   oldDir->cd();
 
 }
@@ -177,7 +250,6 @@ void TrackingAbortDQMModule::initialize()
   m_eventMetaData.isOptional();
   m_trgSummary.isOptional();
   m_strips.isOptional();
-  m_cdcHits.isOptional();
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -193,14 +265,26 @@ void TrackingAbortDQMModule::beginRun()
   if (m_nEventsWithAbort[1] != nullptr)  m_nEventsWithAbort[1]->Reset();
   if (m_svdL3uZS5Occupancy[0] != nullptr)  m_svdL3uZS5Occupancy[0]->Reset();
   if (m_svdL3uZS5Occupancy[1] != nullptr)  m_svdL3uZS5Occupancy[1]->Reset();
+  if (m_svdL3uZS5Occupancy_VXDTF2aborts[0] != nullptr)  m_svdL3uZS5Occupancy_VXDTF2aborts[0]->Reset();
+  if (m_svdL3uZS5Occupancy_VXDTF2aborts[1] != nullptr)  m_svdL3uZS5Occupancy_VXDTF2aborts[1]->Reset();
+  if (m_svdL3uZS5Occupancy_toSVDCKFaborts[0] != nullptr)  m_svdL3uZS5Occupancy_toSVDCKFaborts[0]->Reset();
+  if (m_svdL3uZS5Occupancy_toSVDCKFaborts[1] != nullptr)  m_svdL3uZS5Occupancy_toSVDCKFaborts[1]->Reset();
   if (m_nCDCExtraHits[0] != nullptr) m_nCDCExtraHits[0]->Reset();
   if (m_nCDCExtraHits[1] != nullptr) m_nCDCExtraHits[1]->Reset();
   if (m_svdTime[0] != nullptr) m_svdTime[0]->Reset();
   if (m_svdTime[1] != nullptr) m_svdTime[1]->Reset();
   if (m_integratedAverages[0] != nullptr) m_integratedAverages[0]->Reset();
   if (m_integratedAverages[1] != nullptr) m_integratedAverages[1]->Reset();
-}
+  for (int sl = 0; sl < 9; sl++) {
+    if (m_nCDCExtraHitsSL[0][sl] != nullptr) m_nCDCExtraHitsSL[0][sl]->Reset();
+    if (m_nCDCExtraHitsSL[1][sl] != nullptr) m_nCDCExtraHitsSL[1][sl]->Reset();
+    if (m_nCDCHitsSL[0][sl] != nullptr) m_nCDCHitsSL[0][sl]->Reset();
+    if (m_nCDCHitsSL[1][sl] != nullptr) m_nCDCHitsSL[1][sl]->Reset();
+  }
+  if (m_noCDCHitsInSL[0] != nullptr) m_noCDCHitsInSL[0]->Reset();
+  if (m_noCDCHitsInSL[1] != nullptr) m_noCDCHitsInSL[1]->Reset();
 
+}
 
 void TrackingAbortDQMModule::event()
 {
@@ -224,8 +308,10 @@ void TrackingAbortDQMModule::event()
 
   //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
   int index = 0; //events accepted in the passive veto window but not in the active
-  if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1;
-
+  try {
+    if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1;
+  } catch (const std::exception&) {
+  }
 
   //fill the tracking abort reason histogram & nEvents with Abort
   if (m_eventLevelTrackingInfo.isValid()) {
@@ -279,18 +365,53 @@ void TrackingAbortDQMModule::event()
   }
 
   // fill the svd L3 v ZS5 occupancy, add the overflow in the last bin to make them visible in the plot
-  m_svdL3uZS5Occupancy[index]->Fill(std::min((double)nStripsL3UZS5 / m_nStripsL3U * 100, (double)5.82));
+  double tmp_L3uZS5occupancy = (double)nStripsL3UZS5 / m_nStripsL3U * 100;
+  double L3uZS5occupancy = std::min(tmp_L3uZS5occupancy, (double)100.0 / 1536.0 * 90);
+  m_svdL3uZS5Occupancy[index]->Fill(L3uZS5occupancy);
+  double L3uZS5occupancy_abort = std::min(tmp_L3uZS5occupancy, (double)100.0 / 1536.0 * 180);
+  if (m_eventLevelTrackingInfo->hasVXDTF2AbortionFlag())
+    m_svdL3uZS5Occupancy_VXDTF2aborts[index]->Fill(L3uZS5occupancy_abort);
+  if (m_eventLevelTrackingInfo->hasSVDCKFAbortionFlag())
+    m_svdL3uZS5Occupancy_toSVDCKFaborts[index]->Fill(L3uZS5occupancy_abort);
 
   //fill the nCDCExtraHits, add the overflow in the last bin to make them visible in the plot
   if (m_eventLevelTrackingInfo.isValid())
     m_nCDCExtraHits[index]->Fill(std::min((int)m_eventLevelTrackingInfo->getNCDCHitsNotAssigned(), (int)4999));
 
   //compute number of CDC hits in the inner and outer layers
+  //and the number of signal-per-track and extra hits per SL
+  int nTracks = m_tracks.getEntries();
+
   int nCDCHitsInner = 0;
   int nCDCHitsOuter = 0;
-  for (const CDCHit& hit : m_cdcHits) {
-    if (hit.getISuperLayer() == 0) nCDCHitsInner++;
+  int nTotalCDCHits[9] = {0};
+  int nTakenCDCHits[9] = {0};
+  int nBgCDCHits[9] = {0};
+
+  const std::vector<CDCWireHit>& wireHitVector = *m_wireHitVector;
+  int wireHitAmount = wireHitVector.size();
+  for (int hitID = 0; hitID < wireHitAmount; ++hitID) {
+    const auto& wireHit = wireHitVector[hitID];
+    int sl = wireHit.getISuperLayer();
+    if (sl == 0) nCDCHitsInner++;
     else nCDCHitsOuter++;
+
+    nTotalCDCHits[sl] += 1;
+    if (wireHit->hasTakenFlag()) nTakenCDCHits[sl] += 1;
+    if (wireHit->hasBackgroundFlag()) nBgCDCHits[sl] += 1;
+  }
+
+  for (int sl = 0; sl < 9; sl++) {
+
+    float nSignalCDCHits = nTakenCDCHits[sl] - nBgCDCHits[sl];
+    int nCDCExtraHits = nTotalCDCHits[sl] - nSignalCDCHits;
+    if (nTracks > 0) nSignalCDCHits = nSignalCDCHits / nTracks;
+
+    if (nSignalCDCHits == 0) m_noCDCHitsInSL[index]->Fill(sl);
+    else {
+      if (m_nCDCExtraHitsSL[index][sl] != nullptr) m_nCDCExtraHitsSL[index][sl]->Fill(std::min(nCDCExtraHits, (int)999));
+      if (m_nCDCHitsSL[index][sl] != nullptr) m_nCDCHitsSL[index][sl]->Fill(std::min(nSignalCDCHits, (float)30.5));
+    }
   }
 
   // fill the integrated averages TH1F

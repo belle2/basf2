@@ -12,14 +12,15 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <tracking/spacePointCreation/SpacePoint.h>
-#include <mdst/dataobjects/EventLevelTrackingInfo.h>
-
 #include <string>
 
 
 
 namespace Belle2 {
+  class PXDCluster;
+  class SpacePoint;
+  class EventLevelTrackingInfo;
+
   /**
    * Imports Clusters of the pxd detector and converts them to spacePoints.
    *
@@ -73,12 +74,12 @@ namespace Belle2 {
 
     // modification parameters
     std::string
-    m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
+    m_nameOfInstance; /**< allows the user to set an identifier for this module. Useful if one wants to use several instances of that module */
 
 
     //counters for testing
-    unsigned int m_TESTERPXDClusterCtr; /**< counts total number of PXDClusters occured */
+    unsigned int m_TESTERPXDClusterCtr; /**< counts total number of PXDClusters occurred */
 
-    unsigned int m_TESTERSpacePointCtr; /**< counts total number of SpacePoints occured */
+    unsigned int m_TESTERSpacePointCtr; /**< counts total number of SpacePoints occurred */
   };
 } // end namespace Belle2

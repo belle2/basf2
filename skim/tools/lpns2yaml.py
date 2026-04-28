@@ -219,15 +219,8 @@ def main():
 
                 # If beam energy is not 4S, then point it out in label
                 onres = beamEnergy == "4S"
-                scan = beamEnergy == "5S_scan"
                 if onres:
                     label = f"{campaign}_exp{expInteger}r{iGroup+1}"
-                elif scan:
-                    # more complicated process to retrieve the exact 5S_scan energy from output filename...
-                    pattern = r"_5Sscan_(\d+)"
-                    match = re.search(pattern, args.output)
-                    scanEnergy = match.group(1)
-                    label = f"{campaign}_{beamEnergy}_{scanEnergy}_exp{expInteger}r{iGroup+1}"
                 else:
                     label = f"{campaign}_{beamEnergy}_exp{expInteger}r{iGroup+1}"
 
@@ -277,16 +270,23 @@ def main():
                 DBGT = int(re.sub(r"^DB0*", "", DBGT))
                 expInteger = int(re.sub(r"^s00/e0*", "", expNumber))
 
+                # To differentiate between Whizard and default generator of lowmult MC
+                if "Whizard" in args.input or "whizard" in args.input:
+                    sampleLabel = (f"MC-{campaign}-{beamEnergy}-{MCEventType}-whizard-{args.bg}")
+                    addwhizard = "_whizard"
+                else:
+                    sampleLabel = (f"MC-{campaign}-{beamEnergy}-{MCEventType}-default-{args.bg}")
+                    addwhizard = ""
                 # If beam energy is not 4S, then point it out in label
                 onres = beamEnergy == "4S"
                 if onres:
-                    label = f"{campaign}_exp{expInteger}_{MCEventType}_{prodNumber}r{iGroup+1}"
+                    label = f"{campaign}_exp{expInteger}_{MCEventType}{addwhizard}_{prodNumber}r{iGroup+1}"
                 else:
-                    label = f"{campaign}_{beamEnergy}_exp{expInteger}_{MCEventType}_{prodNumber}r{iGroup+1}"
+                    label = f"{campaign}_{beamEnergy}_exp{expInteger}_{MCEventType}{addwhizard}_{prodNumber}r{iGroup+1}"
 
                 # Add everything to our mega dict
                 DataBlocks[label] = {
-                    "sampleLabel": (f"MC-{campaign}-{beamEnergy}-{MCEventType}-{args.bg}"),
+                    "sampleLabel": sampleLabel,
                     "LPNPrefix": prefix,
                     "inputReleaseNumber": release,
                     "mcCampaign": campaign,

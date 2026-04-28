@@ -19,7 +19,8 @@
 #include <RooDataHist.h>
 #include <RooAbsPdf.h>
 #include <RooPlot.h>
-
+#include <RooFitResult.h>
+#include "RooMsgService.h"
 
 using namespace std;
 using namespace Belle2;
@@ -45,8 +46,7 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 80.);
 //   addParam("PeakBefore", m_peakBefore, "Range for fit before peak (positive)", 5.);
 //   addParam("PeakAfter", m_peakAfter, "Range for after peak", 40.);
-  addParam("ColorAlert", m_color, "Whether to show the color alert", true);
-  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)", std::vector<int>());
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: Constructor done.");
 }
 
@@ -161,18 +161,81 @@ void DQMHistAnalysisPXDTrackChargeModule::beginRun()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: beginRun called.");
 
-  m_cCharge->Clear();
+  if (m_cCharge) m_cCharge->Clear();
+  if (m_cTrackedClusters) m_cTrackedClusters->Clear();
 }
 
 void DQMHistAnalysisPXDTrackChargeModule::event()
 {
-  if (!m_cCharge) return;
+  // need to be done every event in case someone else modifies it.
+  RooMsgService::instance().setSilentMode(true);
+  RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
 
   gStyle->SetOptStat(0);
   gStyle->SetStatStyle(1);
   gStyle->SetOptDate(22);// Date and Time in Bottom Right, does no work
 
-  bool enough = false;
+  if (m_cTrackedClusters and m_hTrackedClusters) { // tracked clusters
+    // we already have a plot, but we need to rearrange the X labels in a new plot and scale to events
+    std::string name = "Tracked_Clusters"; // new name
+    TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters", true);
+    if (hh2) {// update only if histogram is updated
+      m_cTrackedClusters->Clear();
+      m_cTrackedClusters->cd();
+      m_hTrackedClusters->Reset();
+
+      auto scale = hh2->GetBinContent(0);// overflow misused as event counter!
+      if (scale > 0) {
+        auto iscale = 1. / scale;
+        int j = 1;
+        for (int i = 0; i < 64; i++) {
+          auto layer = (((i >> 5) & 0x1) + 1);
+          auto ladder = ((i >> 1) & 0xF);
+          auto sensor = ((i & 0x1) + 1);
+
+          auto id = Belle2::VxdID(layer, ladder, sensor);
+          // Check if sensor exist
+          if (Belle2::VXD::GeoCache::getInstance().validSensorID(id)) {
+            m_hTrackedClusters->SetBinContent(j, hh2->GetBinContent(i + 1) * iscale);
+            j++;
+          }
+        }
+      }
+      m_hTrackedClusters->SetName(name.data());
+      m_hTrackedClusters->SetTitle("Tracked Clusters/Event");
+      m_hTrackedClusters->SetFillColor(kWhite);
+      m_hTrackedClusters->SetStats(kFALSE);
+      m_hTrackedClusters->SetLineStyle(1);// 2 or 3
+      m_hTrackedClusters->SetLineColor(kBlack);
+      m_hTrackedClusters->Draw("hist");
+
+      // get ref histogram
+      auto href2 = findRefHist(name); // no scaling!
+      // TODO: we would expect that it changes with luminosity and maybe beam condition, but not clear how to factor this out. simple scaling seems not the right way.
+      if (href2) {
+        href2->SetLineStyle(3);// 2 or 3
+        href2->SetLineColor(kBlue);
+        href2->Draw("same,hist");
+      }
+
+      for (auto& it : m_excluded) {
+        static std::map <int, TLatex*> ltmap;
+        auto tt = ltmap[it];
+        if (!tt) {
+          tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+          tt->SetTextSize(0.035);
+          tt->SetTextAngle(90);// Rotated
+          tt->SetTextAlign(12);// Centered
+          ltmap[it] = tt;
+        }
+        tt->Draw();
+      }
+
+      UpdateCanvas(m_cTrackedClusters);
+    }
+  } // end of tracked clusters plot
+
+  bool any_enought_flag = false;
 
 //   auto landau = m_rfws->pdf("landau");
 //   auto gauss = m_rfws->pdf("gauss");
@@ -183,57 +246,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 //   auto mg = m_rfws->var("mg");
 //   auto sg = m_rfws->var("sg");
 
-  {
-    std::string name = "Tracked_Clusters"; // new name
-    TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters", true);
-    if (hh2) {// update only if histogram is updated
-      m_cTrackedClusters->Clear();
-      m_cTrackedClusters->cd();
-      m_hTrackedClusters->Reset();
-
-      auto scale = hh2->GetBinContent(0);// overflow misused as event counter!
-      if (scale > 0) {
-        int j = 1;
-        for (int i = 0; i < 64; i++) {
-          auto layer = (((i >> 5) & 0x1) + 1);
-          auto ladder = ((i >> 1) & 0xF);
-          auto sensor = ((i & 0x1) + 1);
-
-          auto id = Belle2::VxdID(layer, ladder, sensor);
-          // Check if sensor exist
-          if (Belle2::VXD::GeoCache::getInstance().validSensorID(id)) {
-            m_hTrackedClusters->SetBinContent(j, hh2->GetBinContent(i + 1) / scale);
-            j++;
-          }
-        }
-      }
-      m_hTrackedClusters->SetName(name.data());
-      m_hTrackedClusters->SetTitle("Tracked Clusters/Event");
-      m_hTrackedClusters->SetFillColor(kWhite);
-      m_hTrackedClusters->SetStats(kFALSE);
-      m_hTrackedClusters->SetLineStyle(1);// 2 or 3
-      m_hTrackedClusters->SetLineColor(kBlue);
-      m_hTrackedClusters->Draw("hist");
-
-      // get ref histogram, assumes no m_histogramDirectoryName directory in ref file
-//       auto href2 = findHistInFile(m_refFile, name);
-//
-//       if (href2) {
-//         href2->SetLineStyle(3);// 2 or 3
-//         href2->SetLineColor(kBlack);
-//         href2->Draw("same,hist");
-//       }
-
-      // keep this commented code as we may have excluded modules in phase4
-//       auto tt = new TLatex(5.5, 0, " 1.3.2 Module is excluded, please ignore");
-//       tt->SetTextAngle(90);// Rotated
-//       tt->SetTextAlign(12);// Centered
-//       tt->Draw();
-
-      UpdateCanvas(m_cTrackedClusters);
-    }
-  }
-
+  if (!m_cCharge) return;
   m_gCharge->Set(0);
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
@@ -277,43 +290,34 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         hh1->Draw("hist"); // avoid to confuse people by showing nothing for low stat
       }
 
-      // get ref histogram, assumes no m_histogramDirectoryName directory in ref file
-//       auto hist2 = findHistInFile(m_refFile, name);
-//       if (hist2) {
-//         B2DEBUG(20, "Draw Normalized " << hist2->GetName());
-//         hist2->SetLineStyle(3);// 2 or 3
-//         hist2->SetLineColor(kBlack);
-//
-//         canvas->cd();
-//
-//         // if draw normalized
-//         TH1* h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
-//         // would it work to scale it each time again?
-//         if (abs(hist2->GetEntries()) > 0) h->Scale(hh1->GetEntries() / hist2->GetEntries());
-//
-//         h->SetStats(kFALSE);
-//         h->Draw("same,hist");
-//       }
+      // get ref histogram
+      auto hist2 = findRefHist(name);// no scaling
+      if (hist2) {
+        B2DEBUG(20, "Draw Normalized " << hist2->GetName());
+        hist2->SetLineStyle(3);// 2 or 3
+        hist2->SetLineColor(kBlack);
+
+        canvas->cd();
+
+        // if draw normalized
+        TH1* h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
+        // would it work to scale it each time again?
+        if (abs(hist2->GetEntries()) > 0) h->Scale(hh1->GetEntries() / hist2->GetEntries());
+
+        h->SetStats(kFALSE);
+        h->Draw("same,hist");
+      }
 
       // add coloring, cuts? based on fit, compare with ref?
-      canvas->Pad()->SetFrameFillColor(10);
-      if (m_color) {
-        if (hh1->GetEntries() < 100) {
-          // not enough Entries
-          canvas->Pad()->SetFillColor(kGray);
-        } else {
-          canvas->Pad()->SetFillColor(kGreen);
-        }
-      } else {
-        canvas->Pad()->SetFillColor(kWhite);// White
-      }
+      auto status = makeStatus(hh1->GetEntries() >= 100, false, false); // only statistics, no alarm (yet)
+      colorizeCanvas(canvas, status);
 
       canvas->Modified();
       canvas->Update();
       UpdateCanvas(canvas);
 
-      // means if ANY plot is > 100 entries, all plots are assumed to be o.k.
-      if (hh1->GetEntries() >= 1000) enough = true;
+      // means if ANY plot is > 100 entries, all plots are assumed to be o.k. from statistics
+      if (hh1->GetEntries() >= 1000) any_enought_flag = true;
     }
   }
 
@@ -405,7 +409,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
   double data = 0;
   double diff = 0;
-  if (m_gCharge && enough) {
+  if (m_gCharge && any_enought_flag) {
 //     double currentMin, currentMax;
     m_gCharge->Fit(m_fMean, "R");
     double mean = m_gCharge->GetMean(2);
@@ -431,29 +435,9 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   setEpicsPV("Mean", data);
   setEpicsPV("Diff", diff);
 
-  int status = 0;
-
-  if (!enough) {
-    // not enough Entries
-    m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
-    status = 0; // default
-  } else {
-    /// FIXME: what is the acceptable limit?
-    if (fabs(data - 30.) > 20. || diff > 12) {
-      m_cCharge->Pad()->SetFillColor(kRed);// Red
-      status = 4;
-    } else if (fabs(data - 30) > 15. || diff > 8) {
-      m_cCharge->Pad()->SetFillColor(kYellow);// Yellow
-      status = 3;
-    } else {
-      m_cCharge->Pad()->SetFillColor(kGreen);// Green
-      status = 2;
-    }
-
-    // FIXME overwrite for now
-    // m_cCharge->Pad()->SetFillColor(kGreen);// Green
-
-  }
+  // FIXME: what is the acceptable limit?
+  auto status = makeStatus(any_enought_flag, fabs(data - 30) > 15. || diff > 8, fabs(data - 30.) > 20. || diff > 12);
+  colorizeCanvas(m_cCharge, status);
 
   setEpicsPV("Status", status);
 }

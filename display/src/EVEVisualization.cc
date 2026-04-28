@@ -84,7 +84,6 @@
 #include <TMatrixD.h>
 #include <TMatrixDSymEigen.h>
 
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/algorithm/string/find.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -110,7 +109,7 @@ namespace {
 
   /** TEveGeoShape contains a TGeoShape and feels responsible for deletion; but TGeoShape is owned by global TGeoManager.
    *
-   * What we want is deletion by TEve (after changing events), so we explictly remove the object
+   * What we want is deletion by TEve (after changing events), so we explicitly remove the object
    * from TGeoManager's garbage collection list. (some objects might not be in the list because these
    * things are horribly inconsistent. doesn't hurt to try though.)
    */
@@ -283,7 +282,7 @@ void EVEVisualization::addTrackCandidateImproved(const std::string& collectionNa
   track->SetTitle(ObjectInfo::getTitle(&recoTrack));
   track->SetSmooth(true);
 
-  for (auto recoHit : recoTrack.getRecoHitInformations()) {
+  for (const auto recoHit : recoTrack.getRecoHitInformations()) {
     // skip for reco hits which have not been used in the fit (and therefore have no fitted information on the plane
     if (!recoHit->useInFit())
       continue;
@@ -469,7 +468,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
     const unsigned int numpoints = hitPoints.size();
 
     int hitCounter = -1;
-    for (genfit::TrackPoint* tp : hitPoints) { // loop over all points in the track
+    for (const genfit::TrackPoint* tp : hitPoints) { // loop over all points in the track
       hitCounter++;
 
       // get the fitter infos ------------------------------------------------------------------
@@ -601,9 +600,8 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
         double_t hit_v = 0;
         double_t plane_size = 4;
 
-        int hit_coords_dim = m->getDim();
-
         if (dynamic_cast<const genfit::PlanarMeasurement*>(m) != NULL) {
+          int hit_coords_dim = m->getDim();
           planar_hit = true;
           if (hit_coords_dim == 1) {
             hit_u = hit_coords(0);
@@ -715,7 +713,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
               const TMatrixD& eVec = eigen_values.GetEigenVectors();
               double pseudo_res_0 = m_errorScale * std::sqrt(ev(0));
               double pseudo_res_1 = m_errorScale * std::sqrt(ev(1));
-              // finished calcluating, got the values -----------------------------------
+              // finished calculating, got the values -----------------------------------
 
               // calculate the semiaxis of the error ellipse ----------------------------
               cov_shape->SetShape(new TGeoEltu(pseudo_res_0, pseudo_res_1, 0.0105));
@@ -847,7 +845,8 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
   addObject(belle2Track, eveTrack);
 }
 
-TEveBox* EVEVisualization::boxCreator(const ROOT::Math::XYZVector& o, ROOT::Math::XYZVector u, ROOT::Math::XYZVector v, float ud,
+TEveBox* EVEVisualization::boxCreator(const ROOT::Math::XYZVector& o, ROOT::Math::XYZVector u, ROOT::Math::XYZVector v,
+                                      float ud,
                                       float vd, float depth)
 {
   //force minimum width of polygon to deal with Eve limits
@@ -887,7 +886,8 @@ TEveBox* EVEVisualization::boxCreator(const ROOT::Math::XYZVector& o, ROOT::Math
   return box;
 }
 
-void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state,
+void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState,
+                                 const genfit::StateOnPlane* state,
                                  const genfit::AbsTrackRep* rep,
                                  TEvePathMark::EType_e markType, bool drawErrors, int markerPos)
 {
@@ -1135,7 +1135,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     mctrack = tparticle;
     mctrack.fTDecay = particle->getDecayTime();
     mctrack.fVDecay.Set(B2Vector3D(particle->getDecayVertex()));
-    mctrack.fDecayed = !boost::math::isinf(mctrack.fTDecay);
+    mctrack.fDecayed = !std::isinf(mctrack.fTDecay);
     mctrack.fIndex = particle->getIndex();
     m_mcparticleTracks[particle].track = new TEveTrack(&mctrack, m_trackpropagator);
 
@@ -1154,7 +1154,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
         m_mcparticleTracks[particle].track->AddPathMark(
           TEvePathMark(
             //Add the last trajectory point as decay point to prevent TEve to
-            //propagate beyond the end of the track. So lets compare the adress
+            //propagate beyond the end of the track. So lets compare the address
             //to the address of last point and choose the pathmark accordingly
             (&pt == &trajectory.back()) ? TEvePathMark::kDecay : TEvePathMark::kReference,
             TEveVector(pt.x, pt.y, pt.z),
@@ -1369,7 +1369,7 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
   //eVec(i,j) uses the method/overloaded operator ( . ) of the TMatrixT class to return the matrix entry.
   ROOT::Math::XYZVector eVec2(eVec(0, 1), eVec(1, 1), eVec(2, 1));
   ROOT::Math::XYZVector eVec3(eVec(0, 2), eVec(1, 2), eVec(2, 2));
-  // got everything we need -----------------------------------------------------   //Eigenvalues(semi axis) of the covariance matrix accquired!
+  // got everything we need -----------------------------------------------------   //Eigenvalues(semi axis) of the covariance matrix acquired!
 
 
   TGeoRotation det_rot("det_rot", (eVec1.Theta() * 180) / TMath::Pi(), (eVec1.Phi() * 180) / TMath::Pi(),
@@ -1494,7 +1494,7 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
 
 void EVEVisualization::addBKLMHit2d(const KLMHit2d* bklm2dhit)
 {
-  bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
+  const bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
   const bklm::Module* module = m_GeoPar->findModule(bklm2dhit->getSection(), bklm2dhit->getSector(), bklm2dhit->getLayer());
 
   CLHEP::Hep3Vector global;
@@ -1904,6 +1904,7 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
   }
 
 }
+
 void EVEVisualization::addObject(const TObject* dataStoreObject, TEveElement* visualRepresentation)
 {
   VisualRepMap::getInstance()->add(dataStoreObject, visualRepresentation);

@@ -21,7 +21,6 @@
 #include <G4RegionStore.hh>
 #include <G4ProductionCutsTable.hh>
 #include <G4ErrorPropagatorData.hh>
-#include <G4ErrorPropagator.hh>
 #include <G4StateManager.hh>
 #include <G4TransportationManager.hh>
 #include <G4FieldManager.hh>

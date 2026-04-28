@@ -17,6 +17,8 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/B2Vector3.h>
+
+#include <cmath>
 #include <limits>
 
 namespace Belle2 {
@@ -25,7 +27,7 @@ namespace Belle2 {
   public:
 
     /// Define names of variables that get extracted
-    explicit RecoTrackExtractor(std::vector<Named<float*>>& variableSet, const std::string& prefix = ""):
+    explicit RecoTrackExtractor(std::vector<TrackingUtilities::Named<float*>>& variableSet, const std::string& prefix = ""):
       VariableExtractor(), m_prefix(prefix)
     {
       addVariable(prefix + "pdg_ID", variableSet);
@@ -89,7 +91,7 @@ namespace Belle2 {
         pdgID = static_cast<float>(mcparticle->getPDG());
         pdgIDMother = static_cast<float>(mcparticle->getMother()->getPDG());
         isPrimary = static_cast<float>(mcparticle->isPrimaryParticle());
-        if (abs(pdgIDMother) == 310 || abs(pdgIDMother) == 3122) {
+        if (std::abs(pdgIDMother) == 310 || std::abs(pdgIDMother) == 3122) {
           isVzeroDaughter = 1;
         } else {
           isVzeroDaughter = 0;

@@ -168,9 +168,9 @@ public:
   double m_findArcCosMax;
   /// Holds the minimum value for arc cos(radius/2/rho).
   double  m_findArcCosMin;
-  /// Holds the maximum value for intger arc cos(radius/2/rho).
+  /// Holds the maximum value for integer arc cos(radius/2/rho).
   double m_findArcCosIntMax;
-  /// Holds the minimum value for intger arc cos(radius/2/rho).
+  /// Holds the minimum value for integer arc cos(radius/2/rho).
   double m_findArcCosIntMin;
   /// Holds the maximum for fitted axial phi location between superlayers.
   double m_findPhiZMax;

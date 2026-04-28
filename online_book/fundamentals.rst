@@ -6,7 +6,7 @@ Fundamentals
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 2-3 hrs
+    **Length**: 2-4.5 hrs
 
     **Prerequisites**:
 

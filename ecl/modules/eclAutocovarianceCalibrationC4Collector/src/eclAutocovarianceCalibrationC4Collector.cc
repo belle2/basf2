@@ -78,7 +78,10 @@ void eclAutocovarianceCalibrationC4CollectorModule::startRun()
     bool InvertStatus = dc.Invert(m_NoiseMatrix[id]);
 
     if (InvertStatus == 0) {
+      //Final Check.  Fail should never occur as is checked in eclAutocovarianceCalibrationC3 algo
       B2INFO("Invert Failed for " << id);
+      for (int i = 0; i < m_numberofADCPoints; i++) B2INFO("buf[" << i << "] = " << buf[i]);
+      B2FATAL("Invert Failed for " << id);
     }
 
   }

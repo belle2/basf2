@@ -5,8 +5,8 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef _VXD_TNiel_
-#define _VXD_TNiel_
+
+#pragma once
 
 #include <string>
 
@@ -18,7 +18,7 @@ class TNiel {
 
 private:
 
-  double nielfactor[1710];   /**< factor values, enough to acommodate the longest file.*/
+  double nielfactor[1710];   /**< factor values, enough to accommodate the longest file.*/
   double E_nielfactor[1710]; /**< particle energies at which the NIEL factor is tabulated.*/
   int niel_N; /**< number of rows in NIEL table */
 
@@ -34,5 +34,3 @@ public:
   double getNielFactor(double EMeV);
 
 };
-
-#endif

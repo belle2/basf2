@@ -246,7 +246,7 @@ void SVDPositionErrorScaleFactorImporterModule::endRun()
 
   IntervalOfValidity iov(0, 0, -1, -1);
 
-  auto scfs = new Belle2::SVDPosErrScaleFactors;
+  std::unique_ptr<Belle2::SVDPosErrScaleFactors> scfs = std::make_unique<Belle2::SVDPosErrScaleFactors>();
 
   //CoGOnly payload
   auto payload_cogOnly = new Belle2::SVDCoGOnlyErrorScaleFactors::t_payload(*scfs, m_uniqueID);
@@ -301,6 +301,7 @@ void SVDPositionErrorScaleFactorImporterModule::endRun()
           if (TString(m_posAlgorithm).Contains("OldDefault"))
             payload_oldDefault->set(theVxdID.getLayerNumber(), theVxdID.getLadderNumber(), theVxdID.getSensorNumber(), m_side, 1, *scfs);
         }
+
 
   if (TString(m_posAlgorithm).Contains("CoGOnly")) {
     Database::Instance().storeData(SVDCoGOnlyErrorScaleFactors::name, payload_cogOnly, iov);

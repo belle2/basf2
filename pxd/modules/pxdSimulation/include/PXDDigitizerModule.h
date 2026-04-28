@@ -9,8 +9,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <pxd/dataobjects/PXDSimHit.h>
-#include <pxd/dataobjects/PXDInjectionBGTiming.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <framework/dataobjects/RelationElement.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -18,6 +16,9 @@
 #include <vector>
 
 namespace Belle2 {
+  class PXDSimHit;
+  class PXDInjectionBGTiming;
+
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
   namespace PXD {
 
@@ -120,7 +121,7 @@ namespace Belle2 {
       void event() override final;
 
     protected:
-      /** Wether or not to apply noise */
+      /** Whether or not to apply noise */
       bool   m_applyNoise;
       /** Amount of noise to apply */
       double m_elNoise;
@@ -145,9 +146,9 @@ namespace Belle2 {
       std::string m_relDigitTrueHitName;
 
 
-      /** Wether or not to apply poission fluctuation of charge */
+      /** Whether or not to apply poission fluctuation of charge */
       bool   m_applyPoisson;
-      /** Wether or not to apply a time window cut */
+      /** Whether or not to apply a time window cut */
       bool   m_applyWindow;
 
       /** Digits from gated rows not sent to DHH */
@@ -190,7 +191,7 @@ namespace Belle2 {
       int                m_currentParticle;
       /** Index of the TrueHit the current hit belongs to */
       int                m_currentTrueHit;
-      /** Pointer to the sensor in which the current hit occured */
+      /** Pointer to the sensor in which the current hit occurred */
       Sensor*            m_currentSensor;
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo;

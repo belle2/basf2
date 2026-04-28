@@ -13,27 +13,21 @@
 
 #include <TH1.h>
 #include <TBufferJSON.h>
-#include <TMemFile.h>
+#include <TFile.h>
 
 #include <lz4.h>
 
 #include <boost/range/combine.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string/replace.hpp>
+#include <filesystem>
 
 using namespace Belle2;
 
-ZMQHistoServerToFileOutput::ZMQHistoServerToFileOutput(unsigned int maximalUncompressedBufferSize,
-                                                       const std::string& dqmFileName,
+ZMQHistoServerToFileOutput::ZMQHistoServerToFileOutput(const std::string& dqmFileName,
                                                        const std::string& rootFileName) :
   m_dqmMemFileName(dqmFileName), m_rootFileName(rootFileName)
 {
-
-  // We do not free this on purpose!
-  if (not m_dqmMemFileName.empty()) {
-    m_sharedMemory = new DqmSharedMem(m_dqmMemFileName.c_str(), maximalUncompressedBufferSize);
-  }
-
   log("histogram_merges", 0l);
   log("last_merged_histograms", 0l);
   log("average_merged_histograms", 0l);
@@ -54,11 +48,15 @@ void ZMQHistoServerToFileOutput::mergeAndSend(const std::map<std::string, Histog
 
   increment("histogram_merges");
 
+  TFile memFile(("/dev/shm/tmp_" + m_dqmMemFileName).c_str(), "RECREATE");
+  if (!memFile.IsOpen()) {
+    B2ASSERT("Writing to shared memory failed! ", ("/dev/shm/tmp_" + m_dqmMemFileName).c_str());
+    return;
+  }
+  memFile.cd();
+
   // We do not care if this is the run end, or run start or anything. We just write it out.
   HistogramMapping mergeHistograms;
-
-  TMemFile memFile(m_dqmMemFileName.c_str(), "RECREATE");
-  memFile.cd();
 
   log("last_merged_histograms", static_cast<long>(storedMessages.size()));
   average("average_merged_histograms", static_cast<double>(storedMessages.size()));
@@ -71,23 +69,23 @@ void ZMQHistoServerToFileOutput::mergeAndSend(const std::map<std::string, Histog
 
   memFile.Write();
 
-  average("memory_file_size", memFile.GetSize());
+  mergeHistograms.clear();
 
-  if (m_sharedMemory) {
-    m_sharedMemory->lock();
-    B2ASSERT("Writing to shared memory failed!",
-             memFile.CopyTo(m_sharedMemory->ptr(), memFile.GetSize()) == memFile.GetSize());
-    m_sharedMemory->unlock();
-  }
+  memFile.Close();
+
+  average("memory_file_size", memFile.GetSize());
 
   // Also write the memory content out to a regular ROOT file
   auto outputFileName = boost::replace_all_copy(m_rootFileName, "{run_number}", (boost::format("%05d") % *run).str());
   boost::replace_all(outputFileName, "{experiment_number}", (boost::format("%04d") % *experiment).str());
-  memFile.Cp(outputFileName.c_str(), false);
+  if (!std::filesystem::copy_file("/dev/shm/tmp_" + m_dqmMemFileName, outputFileName,
+                                  std::filesystem::copy_options::overwrite_existing)) {
+    perror("Copy from shm file failed ");
+  }
 
   log("last_written_file_name", outputFileName);
 
-  mergeHistograms.clear();
+  std::filesystem::rename("/dev/shm/tmp_" + m_dqmMemFileName, "/dev/shm/" + m_dqmMemFileName);
 }
 
 void ZMQHistoServerToFileOutput::handleIncomingData()
@@ -102,15 +100,13 @@ std::vector<zmq::socket_t*> ZMQHistoServerToFileOutput::getSockets() const
 
 void ZMQHistoServerToFileOutput::clear()
 {
-  // Clear the shared memory by writing an empty ROOT file into it
-  if (m_sharedMemory) {
-    TMemFile memFile(m_dqmMemFileName.c_str(), "RECREATE");
-    memFile.Close();
-    m_sharedMemory->lock();
-    B2ASSERT("Writing to shared memory failed!",
-             memFile.CopyTo(m_sharedMemory->ptr(), memFile.GetSize()) == memFile.GetSize());
-    m_sharedMemory->unlock();
+  // Make sure that the ROOT file is empty, and then closed.
+  TFile memFile(("/dev/shm/tmp_" + m_dqmMemFileName).c_str(), "RECREATE");
+  if (!memFile.IsOpen()) {
+    B2ASSERT("Writing to shared memory failed! ", ("/dev/shm/tmp_" + m_dqmMemFileName).c_str());
   }
+  memFile.Close();
+  std::filesystem::rename("/dev/shm/tmp_" + m_dqmMemFileName, "/dev/shm/" + m_dqmMemFileName);
 }
 
 ZMQHistoServerToZMQOutput::ZMQHistoServerToZMQOutput(const std::string& outputAddress, const std::shared_ptr<ZMQParent>& parent) :

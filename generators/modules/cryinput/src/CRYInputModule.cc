@@ -35,7 +35,7 @@ CRYInputModule::CRYInputModule() : Module()
   setDescription(R"DOC(Generates cosmic showers with CRY.
 
 The showers will be generated in the xz plane in a square plane of n bt n meters
-centered at the IP (n can be choosen with the boxLength parameter). Then the
+centered at the IP (n can be chosen with the boxLength parameter). Then the
 cosmics will be propagated from there to the boundary of the detector world volume.
 
 Finally, if the track would intersect with the acceptance volume the track is

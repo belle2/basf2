@@ -19,8 +19,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include <chrono>
-#include <functional>
-#include <limits>
 #include <thread>
 
 namespace Belle2::Conditions {
@@ -106,7 +104,7 @@ namespace Belle2::Conditions {
     {
       std::string prefix = "curl:";
       // Choose loglevel: if type is CURLINFO_TEXT the messages are general
-      // informations about what curl is doing. The more detailed information
+      // information about what curl is doing. The more detailed information
       // about incoming/outgoing headers is a bit less important so give it a
       // higher log level.
       int level = 39;

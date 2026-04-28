@@ -73,7 +73,7 @@ namespace Belle2 {
       void cook();
 
       /** Get pixel number if the given coordinate is in the
-       *  correspondin internal gate trapping region or -1 otherwise
+       *  corresponding internal gate trapping region or -1 otherwise
        * @param x u-coordinate in the local system
        * @param y v-coordinate in the local system
        * @return pixel number id = ix + 250*iy, or -1

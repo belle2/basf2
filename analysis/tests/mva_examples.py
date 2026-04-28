@@ -26,7 +26,7 @@ class ExamplesTest(b2tua.ExamplesTest):
                           'B2A714-DeepContinuumSuppression_MVAModel.py'  # MVA model description and not standalone example script
                           ]
 
-        self._test_examples_dir('analysis/examples/mva/', broken_mva_egs)
+        self._test_examples_dir('analysis/examples/mva/', broken_mva_egs, nevents=100)
 
 
 if __name__ == '__main__':

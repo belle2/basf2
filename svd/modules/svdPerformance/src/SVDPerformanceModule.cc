@@ -13,8 +13,6 @@
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 
-#include <boost/foreach.hpp>
-
 using namespace std;
 using namespace Belle2;
 
@@ -460,7 +458,7 @@ void SVDPerformanceModule::event()
     m_ntracks += m_Tracks.getEntries();
   }
 
-  BOOST_FOREACH(Track & track, m_Tracks) {
+  for (Track& track : m_Tracks) {
 
     const TrackFitResult* tfr = nullptr;
     if (m_is2017TBanalysis)

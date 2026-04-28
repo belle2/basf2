@@ -12,9 +12,9 @@
 #include <map>
 
 #include <pxd/dbobjects/PXDClusterShapeClassifierPar.h>
-#include <pxd/dbobjects/PXDClusterOffsetPar.h>
 
 namespace Belle2 {
+  class PXDClusterOffsetPar;
 
 
   /** The class for PXD cluster position lookup table payload
@@ -105,7 +105,7 @@ namespace Belle2 {
       return classifier.getOffset(shape_index, eta);
     }
 
-    /** Returns shape likelyhood. Returns zero if shape not known, otherwise positive float*/
+    /** Returns shape likelihood. Returns zero if shape not known, otherwise positive float*/
     float getShapeLikelyhood(int shape_index, double thetaU, double thetaV, int clusterkind) const
     {
       // Return zero if there no classifier
@@ -114,7 +114,7 @@ namespace Belle2 {
       }
       auto likelyhoodMap = getShapeClassifier(thetaU, thetaV, clusterkind).getShapeLikelyhoodMap();
 
-      // Return zero if no likelyhood was estimated
+      // Return zero if no likelihood was estimated
       auto it = likelyhoodMap.find(shape_index);
       if (it == likelyhoodMap.end())
         return 0;

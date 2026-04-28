@@ -108,7 +108,7 @@ namespace {
     EXPECT_B2FATAL(evtData.requireRelationTo(profileData));
   }
 
-  /** Test that Relations wich points to the wrong arrays yields a FATAL. */
+  /** Test that Relations which points to the wrong arrays yields a FATAL. */
   TEST_F(RelationsInternal, RelationWrongDeathTest)
   {
     DataStore::Instance().setInitializeActive(true);
@@ -236,7 +236,7 @@ namespace {
     }
   }
 
-  /** Check wether out-of-bound indices are caught by RelationIndex. */
+  /** Check whether out-of-bound indices are caught by RelationIndex. */
   TEST_F(RelationsInternal, InconsistentIndexDeathTest)
   {
     DataStore::Instance().setInitializeActive(true);

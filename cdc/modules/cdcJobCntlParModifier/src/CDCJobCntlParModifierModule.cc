@@ -45,7 +45,7 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
            true);
   //Switch for wire sag
   addParam("WireSag", m_wireSag,
-           "Switch on/off sense wire (gravitational) sag in FullSim. Here, sag means the main part which corresponds to design+displacement in case of wire position. You can control the perturbative part (corresponting to (mis)alignment in case of wire-position) of sag in Digitizer.",
+           "Switch on/off sense wire (gravitational) sag in FullSim. Here, sag means the main part which corresponds to design+displacement in case of wire position. You can control the perturbative part (corresponding to (mis)alignment in case of wire-position) of sag in Digitizer.",
            true);
   //Switch for modified left/right flag
   addParam("ModLeftRightFlag", m_modLeftRightFlag, "Switch on/off calculation of modified left/right flag in FullSim.", false);

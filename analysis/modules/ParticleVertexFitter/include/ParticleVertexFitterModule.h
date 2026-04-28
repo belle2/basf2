@@ -11,35 +11,29 @@
 #include <framework/core/Module.h>
 #include <string>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <Math/Vector3D.h>
 
 // framework - DataStore
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <framework/geometry/B2Vector3.h>
-
 // DataObjects
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dbobjects/BeamSpot.h>
 
-// KFit
-#include <analysis/VertexFitting/KFit/MassFitKFit.h>
-#include <analysis/VertexFitting/KFit/FourCFitKFit.h>
-#include <analysis/VertexFitting/KFit/MassFourCFitKFit.h>
-#include <analysis/VertexFitting/KFit/MassPointingVertexFitKFit.h>
-#include <analysis/VertexFitting/KFit/MassVertexFitKFit.h>
-#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
-#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
-#include <analysis/VertexFitting/KFit/RecoilMassKFit.h>
-
-// Rave
-#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
-#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
-#include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
-
 namespace Belle2 {
 
   class Particle;
+  namespace analysis {
+    class MassFitKFit;
+    class FourCFitKFit;
+    class MassFourCFitKFit;
+    class MassPointingVertexFitKFit;
+    class MassVertexFitKFit;
+    class VertexFitKFit;
+    class MakeMotherKFit;
+    class RecoilMassKFit;
+  }
 
   /**
    * Vertex fitter module
@@ -83,13 +77,12 @@ namespace Belle2 {
     bool m_updateDaughters;       /**< flag for daughters update */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
     bool m_hasCovMatrix = false;      /**< flag for mother covariance matrix (PseudoFitter)*/
-    B2Vector3D m_BeamSpotCenter;    /**< Beam spot position */
+    ROOT::Math::XYZVector m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
     double m_smearing;            /**< smearing width applied to IP tube */
     double m_recoilMass;            /**< recoil mass for constraint*/
     std::vector<int> m_massConstraintList; /**< PDG codes of the particles to be mass constraint (massfourC)*/
-    std::vector<std::string> m_massConstraintListParticlename; /**< Name of the particles to be mass constraint (massfourC)*/
 
     /**
      * Main steering routine

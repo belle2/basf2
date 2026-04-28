@@ -9,7 +9,7 @@
 ##########################################################################
 
 """\
-This tool is an extention of b2conditionsdb-extract for PXD calibration validation.
+This tool is an extension of b2conditionsdb-extract for PXD calibration validation.
 It reads the given conditions objects from the database and writes them
 to a TTree or histograms. Intra run dependencies are not supported.
 
@@ -19,7 +19,7 @@ For example the command ::
 
 will create a root file with validation histograms or a Tree containing the masked
 pixels of the runs 1, 2, 3, and 12 of experiment 5. The branch PXDMaskedPixelPar_valid
-contains 1 if the calibration costants are available for the given run and 0 if not.
+contains 1 if the calibration constants are available for the given run and 0 if not.
 
 """
 
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     # setup database if a tag is given
     if args.tag:
         # basf2.reset_database()
-        basf2.conditions.reset()
+        basf2.conditions.override_globaltags()
         basf2.conditions.expert_settings(usable_globaltag_states={"TESTING", "VALIDATED",  "PUBLISHED", "RUNNING", "OPEN"})
         tags = args.tag.split(':')
         # basf2.use_database_chain(False, basf2.LogLevel.DEBUG)

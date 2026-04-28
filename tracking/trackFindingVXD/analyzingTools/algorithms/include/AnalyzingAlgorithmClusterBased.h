@@ -87,8 +87,8 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      std::vector<const SVDCluster*> uClustersRef = AnalyzingAlgorithmHelper::getSVDClusters(tcs.refTC->tC, true);
-      std::vector<const SVDCluster*> uClustersTest = AnalyzingAlgorithmHelper::getSVDClusters(tcs.testTC->tC, true);
+      std::vector<const SVDCluster*> uClustersRef = AnalyzingAlgorithmHelper::getSVDClusters(tcs.refTC->m_tC, true);
+      std::vector<const SVDCluster*> uClustersTest = AnalyzingAlgorithmHelper::getSVDClusters(tcs.testTC->m_tC, true);
 
       return AnalyzingAlgorithmHelper::getUniqueClusters(uClustersRef, uClustersTest).size();
     }
@@ -108,8 +108,8 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      std::vector<const SVDCluster*> vClustersRef = AnalyzingAlgorithmHelper::getSVDClusters(tcs.refTC->tC, false);
-      std::vector<const SVDCluster*> vClustersTest = AnalyzingAlgorithmHelper::getSVDClusters(tcs.testTC->tC, false);
+      std::vector<const SVDCluster*> vClustersRef = AnalyzingAlgorithmHelper::getSVDClusters(tcs.refTC->m_tC, false);
+      std::vector<const SVDCluster*> vClustersTest = AnalyzingAlgorithmHelper::getSVDClusters(tcs.testTC->m_tC, false);
 
       return AnalyzingAlgorithmHelper::getUniqueClusters(vClustersRef, vClustersTest).size();
     }
@@ -130,8 +130,8 @@ namespace Belle2 {
     {
       DataType lostEdep;
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      std::vector<const SVDCluster*> uClustersRef = AnalyzingAlgorithmHelper::getSVDClusters(tcs.refTC->tC, true);
-      std::vector<const SVDCluster*> uClustersTest = AnalyzingAlgorithmHelper::getSVDClusters(tcs.testTC->tC, true);
+      std::vector<const SVDCluster*> uClustersRef = AnalyzingAlgorithmHelper::getSVDClusters(tcs.refTC->m_tC, true);
+      std::vector<const SVDCluster*> uClustersTest = AnalyzingAlgorithmHelper::getSVDClusters(tcs.testTC->m_tC, true);
 
       std::vector<const SVDCluster*> lostuClusters = AnalyzingAlgorithmHelper::getUniqueClusters(uClustersRef, uClustersTest);
 
@@ -157,8 +157,8 @@ namespace Belle2 {
     {
       DataType lostEdep;
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      std::vector<const SVDCluster*> vClustersRef = AnalyzingAlgorithmHelper::getSVDClusters(tcs.refTC->tC, false);
-      std::vector<const SVDCluster*> vClustersTest = AnalyzingAlgorithmHelper::getSVDClusters(tcs.testTC->tC, false);
+      std::vector<const SVDCluster*> vClustersRef = AnalyzingAlgorithmHelper::getSVDClusters(tcs.refTC->m_tC, false);
+      std::vector<const SVDCluster*> vClustersTest = AnalyzingAlgorithmHelper::getSVDClusters(tcs.testTC->m_tC, false);
 
       std::vector<const SVDCluster*> lostvClusters = AnalyzingAlgorithmHelper::getUniqueClusters(vClustersRef, vClustersTest);
 
@@ -187,7 +187,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const TCInfoType& thisTC = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC);
-      std::vector<const SVDCluster*> uClusters = AnalyzingAlgorithmHelper::getSVDClusters(thisTC.tC, true);
+      std::vector<const SVDCluster*> uClusters = AnalyzingAlgorithmHelper::getSVDClusters(thisTC.m_tC, true);
 
       return uClusters.size();
     }
@@ -207,7 +207,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const TCInfoType& thisTC = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC);
-      std::vector<const SVDCluster*> vClusters = AnalyzingAlgorithmHelper::getSVDClusters(thisTC.tC, false);
+      std::vector<const SVDCluster*> vClusters = AnalyzingAlgorithmHelper::getSVDClusters(thisTC.m_tC, false);
 
       return vClusters.size();
     }
@@ -228,7 +228,7 @@ namespace Belle2 {
     {
       DataType totalEDep;
       const TCInfoType& thisTC = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC);
-      std::vector<const SVDCluster*> uClusters = AnalyzingAlgorithmHelper::getSVDClusters(thisTC.tC, true);
+      std::vector<const SVDCluster*> uClusters = AnalyzingAlgorithmHelper::getSVDClusters(thisTC.m_tC, true);
 
       for (const SVDCluster* aCluster : uClusters) {
         totalEDep.push_back(double(aCluster->getCharge()));
@@ -252,7 +252,7 @@ namespace Belle2 {
     {
       DataType totalEDep;
       const TCInfoType& thisTC = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC);
-      std::vector<const SVDCluster*> vClusters = AnalyzingAlgorithmHelper::getSVDClusters(thisTC.tC, false);
+      std::vector<const SVDCluster*> vClusters = AnalyzingAlgorithmHelper::getSVDClusters(thisTC.m_tC, false);
 
       for (const SVDCluster* aCluster : vClusters) {
         totalEDep.push_back(double(aCluster->getCharge()));

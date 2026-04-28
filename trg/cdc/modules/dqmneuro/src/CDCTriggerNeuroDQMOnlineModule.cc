@@ -7,10 +7,12 @@
  **************************************************************************/
 #include <framework/dataobjects/EventMetaData.h>
 
-#include "TDirectory.h"
 #include <tracking/dataobjects/RecoTrack.h>
 #include <trg/cdc/modules/dqmneuro/CDCTriggerNeuroDQMOnlineModule.h>
 
+#include <TDirectory.h>
+
+#include <cmath>
 
 using namespace Belle2;
 //-----------------------------------------------------------------
@@ -103,7 +105,7 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
                                 "z Resolution of Simulated HW Tracks; delta z [cm]",
                                 200, -100, 100);
 
-  // histograms wih just hwneuro and hw2dtracks:
+  // histograms with just hwneuro and hw2dtracks:
 
   m_neuroHWOutZ = new TH1F("NeuroHWOutZ",
                            "z distribution of unpacked and valid neuro tracks; z [cm]",
@@ -369,15 +371,15 @@ void CDCTriggerNeuroDQMOnlineModule::fillHWPlots()
           if (unpackedInput[ii] != simInput[ii]) {sameInputId = false;}
           if (unpackedInput[ii + 2] != simInput[ii + 2]) {sameInputAlpha = false;}
           if (unpackedInput[ii + 1] != simInput[ii + 1]) {timeErr = true;}
-          if (unpackedInput[ii + 1] == 0 && fabs(simInput[ii + 1] > 0.99)) {scaleErr = true;}
-          if (simInput[ii + 1] == 0 && fabs(unpackedInput[ii + 1] > 0.99)) {scaleErr = true;}
+          if (unpackedInput[ii + 1] == 0 && simInput[ii + 1] > 0.99) {scaleErr = true;}
+          if (simInput[ii + 1] == 0 && unpackedInput[ii + 1] > 0.99) {scaleErr = true;}
           if (unpackedInput[ii] == 0 && unpackedInput[ii + 1] == 0 && unpackedInput[ii + 2] == 0) {hwZero = 1;}
           if (simInput[ii] == 0 && simInput[ii + 1] == 0 && simInput[ii + 2] == 0) {hwSimZero = 1;}
           if (hwZero > hwSimZero) {missingSwTS = true;}
           if (hwZero < hwSimZero) {missingHwTS = true;}
         }
         double diff = neuroHWTrack.getZ0() - neuroSimTrack->getZ0();
-        if (abs(diff) > 1.) {neuroHWTrack.setQualityVector(2);}
+        if (std::abs(diff) > 1.) {neuroHWTrack.setQualityVector(2);}
         if (!sameInputId) {neuroHWTrack.setQualityVector(4);}
         if (!sameInputAlpha) {neuroHWTrack.setQualityVector(8);}
         if (scaleErr) {neuroHWTrack.setQualityVector(16);}

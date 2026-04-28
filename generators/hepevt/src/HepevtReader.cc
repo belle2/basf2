@@ -14,7 +14,6 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
 #include <Math/Vector4D.h>
@@ -27,6 +26,8 @@ const boost::char_separator<char> HepevtReader::sep(",; \t");
 void HepevtReader::open(const string& filename)
 {
   m_lineNr = 0;
+  if (m_input.is_open()) m_input.close();
+  m_input.clear();
   m_input.open(filename.c_str());
   if (!m_input) throw(HepEvtCouldNotOpenFileError() << filename);
 }
@@ -88,6 +89,24 @@ bool HepevtReader::skipEvents(int n)
   return true;
 }
 
+int HepevtReader::countEvents(const std::string& filename)
+{
+  open(filename);
+
+  int count = 0;
+  int eventID;
+  double weight;
+
+  int nparticles;
+  while ((nparticles = readEventHeader(eventID, weight)) >= 0) {
+    count++;
+    for (int j = 0; j < nparticles; j++) getLine();
+  }
+
+  B2INFO("Counted " << count << " events in " << filename << ".");
+  return count;
+}
+
 
 //===================================================================
 //                  Protected methods
@@ -122,7 +141,7 @@ int HepevtReader::readEventHeader(int& eventID, double& eventWeight)
   tokenizer tokens(line, sep);
   int index(0);
 
-  BOOST_FOREACH(const string & tok, tokens) {
+  for (const string& tok : tokens) {
     ++index;
     try {
       fields.push_back(boost::lexical_cast<double>(tok));
@@ -161,7 +180,7 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle)
   tokenizer tokens(line, sep);
   int index(0);
 
-  BOOST_FOREACH(const string & tok, tokens) {
+  for (const string& tok : tokens) {
     ++index;
     try {
       fields.push_back(boost::lexical_cast<double>(tok));

@@ -43,13 +43,12 @@ namespace Belle2 {
     ActivatedSector* getMyPointer() { return this; }
 
   protected:
+    /** This vector carries a pointer to each spacePoint which inhabit this sector */
+    std::vector<const SpacePoint*> m_mySpacePoints;
 
     /** The sector is created once per run and carries all the stuff which does not change for each event. */
     Sector* m_myStaticSector;
 
-    /** This vector carries a pointer to each spacePoint which inhabit this sector */
-    std::vector<const SpacePoint*> m_mySpacePoints;
-
-    ClassDef(ActivatedSector, 1)
+    ClassDef(ActivatedSector, 2)
   };
 } //Belle2 namespace

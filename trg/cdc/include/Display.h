@@ -65,7 +65,7 @@ namespace Belle2 {
     /// returns present condition for wire name display.
     bool wireName(void) const;
 
-    /// stops display in next dispay run command.
+    /// stops display in next display run command.
     void stop(void);
 
   public: // Status

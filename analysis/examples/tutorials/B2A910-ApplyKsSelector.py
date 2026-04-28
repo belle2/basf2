@@ -33,28 +33,26 @@ ma.inputMdst(filename=b2.find_file('B02JpsiKs_Jpsi2mumu_Ks2pipi.root', 'examples
 # load V0s and copy it
 stdV0s.stdKshorts(path=my_path)
 
-# load globaltag
-useCentralDB = True
-centralDB = 'KsFinder_dev'
-localDB = ''
-if useCentralDB:
-    b2.conditions.prepend_globaltag(centralDB)
-else:
-    b2.conditions.append_testing_payloads(localDB)
+b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # apply ksSelector to the K_S0 particle list
 # list type can be 'all', 'standard', 'tight', or 'loose'
 # If 'all', no cut is applied by KsSelector, and mva output become available via extraInfo.
 # if other list type, cut is applied on the original particle list.
+# For any other payload except MC16 payload, please use customized cut.
 ksSelector.ksSelector(particleListName='K_S0:merged',
-                      identifier_Ks="sugiura_KsFinder_V0Selector",
-                      identifier_vLambda="sugiura_KsFinder_LambdaVeto",
-                      output_label_name='standard',
+                      output_label_name='custom',  # use 'standard', 'tight', or 'loose' for recommend cut of latest payload
                       extraInfoName_V0Selector='V0_mva',
                       extraInfoName_LambdaVeto='Lam_mva',
+                      useCustomThreshold=True,  # if you want to use customized threshold, set it true
+                      threshold_V0Selector=0.91,  # set customized v0 cut
+                      threshold_LambdaVeto=0.19,  # set customized lambda_veto cut
+                      identifier_Ks="Ks_LGBM_V0Selector",  # use Ks_LGBM_V0Selector_MC16 for MC 16
+                      identifier_vLambda="Ks_LGBM_LambdaVeto",  # use Ks_LGBM_LambdaVeto_MC16 for MC 16
                       path=my_path)
 
-ma.matchMCTruth(list_name='K_S0:standard', path=my_path)
+
+ma.matchMCTruth(list_name='K_S0:custom', path=my_path)
 
 # set variables
 vars = vc.kinematics + vc.mc_kinematics + vc.mc_truth
@@ -62,13 +60,10 @@ vars += ['extraInfo(V0_mva)']
 vars += ['extraInfo(Lam_mva)']
 
 # output
-ma.variablesToNtuple('K_S0:standard',
+ma.variablesToNtuple('K_S0:custom',
                      variables=vars,
                      filename=output_file,
-                     treename='tree',
+                     treename='ntuple',
                      path=my_path)
 
 b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)

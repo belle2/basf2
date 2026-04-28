@@ -16,6 +16,7 @@
 #include <framework/utilities/FileSystem.h>
 // framework - Database
 #include <framework/database/DBArray.h>
+#include <cdc/topology/CDCWireTopology.h>
 
 #include <iostream>
 
@@ -54,8 +55,8 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("enableDatabase", m_enableDatabase, "Enable database to read the channel map.", true);
   addParam("enable2ndHit", m_enable2ndHit, "Enable 2nd hit timing as a individual CDCHit object.", false);
   addParam("tdcAuxOffset", m_tdcAuxOffset, "TDC auxiliary offset (in TDC count).", 0);
-  addParam("pedestalSubtraction", m_pedestalSubtraction, "Enbale ADC pedestal subtraction.", m_pedestalSubtraction);
-  addParam("relationRawHits", m_relationRawHits, "Enbale relation of CDCHits, CDCRawHits, and CDCRawHitWaveForms.", false);
+  addParam("pedestalSubtraction", m_pedestalSubtraction, "Enable ADC pedestal subtraction.", m_pedestalSubtraction);
+  addParam("relationRawHits", m_relationRawHits, "Enable relation of CDCHits, CDCRawHits, and CDCRawHitWaveForms.", false);
   addParam("recoverBoardIdError", m_recoverBoardIdError, "Recover boardID errors", true);
 }
 
@@ -101,7 +102,7 @@ void CDCUnpackerModule::initialize()
     B2INFO("CDCUnpacker: " << LogVar("FADC threshold", m_fadcThreshold));
   }
 
-  TrackFindingCDC::CDCWireTopology::getInstance();
+  CDCWireTopology::getInstance();
 }
 
 void CDCUnpackerModule::beginRun()
@@ -124,7 +125,7 @@ void CDCUnpackerModule::event()
   // TDC count for the trigger scinti.
   int tdcCountTrig = m_tdcOffset;
 
-  const TrackFindingCDC::CDCWireTopology& wireTopology = TrackFindingCDC::CDCWireTopology::getInstance();
+  const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
   // Create Data objects.
   m_CDCHits.clear();
@@ -140,7 +141,7 @@ void CDCUnpackerModule::event()
   }
 
   //
-  // Proccess RawCDC data block.
+  // Process RawCDC data block.
   //
 
   const int nEntries = m_rawCDCs.getEntries();
@@ -207,17 +208,9 @@ void CDCUnpackerModule::event()
         setCDCPacketHeader(ibuf);
 
         // Skip invalid boardsIDs
-        if (m_boardId > 300) {
-          B2WARNING("Invalid board " << std::hex << m_boardId << std::dec << " readout buffer block: " << i << " block channel: " << iFiness);
-          if (m_recoverBoardIdError) {
-            m_boardId = m_boardId & 0x01ff;
-            if (m_boardId > 300) {
-              B2WARNING("Unrecoverable board " << std::hex << m_boardId);
-              continue;
-            }
-          } else {
-            continue;
-          }
+        if (m_boardId <= 0 or m_boardId >= 300) {
+          B2WARNING("Unrecoverable board " << std::hex << m_boardId);
+          continue;
         }
 
         const int dataType = getDataType();
@@ -252,7 +245,7 @@ void CDCUnpackerModule::event()
         }
 
         //
-        // Check the data type (raw or supressed mode?).
+        // Check the data type (raw or suppressed mode?).
         //
 
         if (dataType == 1) { //  Raw data mode.
@@ -275,9 +268,11 @@ void CDCUnpackerModule::event()
           std::vector<unsigned short> fadcs;
           std::vector<unsigned short> tdcs;
 
+          if (m_buffer.size() < fadcTdcChannels + 2 * fadcTdcChannels * nSamples) continue; // otherwise crash below
+
           for (int iCh = 0; iCh < fadcTdcChannels; ++iCh) {
             const int offset = fadcTdcChannels;
-            unsigned short fadcSum = 0;     // FADC sum below thereshold.
+            unsigned short fadcSum = 0;     // FADC sum below threshold.
             unsigned short tdc1 = 0x7fff;   // Fastest TDC.
             unsigned short tdc2 = 0x7fff;   // 2nd fastest TDC.
 
@@ -403,6 +398,14 @@ void CDCUnpackerModule::event()
               break;
             }
 
+            if (it + 2 >= bufSize) {
+              B2ERROR("CDCUnpacker : buffer overrun it + 2"
+                      << LogVar("data length from header", length)
+                      << LogVar("actual data length", bufSize)
+                      << LogVar("board id", board)
+                      << LogVar("channel", ch));
+              break; // exception below otherwise below
+            }
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.
             unsigned short fadcSum = m_buffer.at(it + 2);  // FADC sum.
 
@@ -419,8 +422,24 @@ void CDCUnpackerModule::event()
             unsigned short tdcFlag = 0;               // Multiple hit or not (1 for multi hits, 0 for single hit).
 
             if (length == 4) {
+              if (it + 3 >= bufSize) {
+                B2ERROR("CDCUnpacker : buffer overrun it + 3"
+                        << LogVar("data length from header", length)
+                        << LogVar("actual data length", bufSize)
+                        << LogVar("board id", board)
+                        << LogVar("channel", ch));
+                break; // exception below otherwise below
+              }
               tdc1 = m_buffer.at(it + 3);
             } else if (length == 5) {
+              if (it + 4 >= bufSize) {
+                B2ERROR("CDCUnpacker : buffer overrun it + 4"
+                        << LogVar("data length from header", length)
+                        << LogVar("actual data length", bufSize)
+                        << LogVar("board id", board)
+                        << LogVar("channel", ch));
+                break; // exception below otherwise below
+              }
               tdc1 = m_buffer.at(it + 3);
               tdc2 = m_buffer.at(it + 4) & 0x7fff;
               tdcFlag = (m_buffer.at(it + 4) & 0x8000) >> 15;

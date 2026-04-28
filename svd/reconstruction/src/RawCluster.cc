@@ -24,27 +24,27 @@ namespace Belle2 {
   namespace SVD {
 
     RawCluster::RawCluster(VxdID vxdID, bool isUside, double cutSeed, double cutAdjacent)
-      : m_vxdID(vxdID)
-      , m_isUside(isUside)
+      : m_storeShaperDigitsName("SVDShaperDigits")
       , m_cutSeed(cutSeed)
       , m_cutAdjacent(cutAdjacent)
-      , m_seedMaxSample(-1)
       , m_seedSNR(-1)
+      , m_seedMaxSample(-1)
       , m_seedIndex(-1)
       , m_seedInternalIndex(-1)
-      , m_storeShaperDigitsName("SVDShaperDigits")
+      , m_vxdID(vxdID)
+      , m_isUside(isUside)
     {m_strips.clear();};
 
     RawCluster::RawCluster(VxdID vxdID, bool isUside, double cutSeed, double cutAdjacent, const std::string& storeShaperDigitsName)
-      : m_vxdID(vxdID)
-      , m_isUside(isUside)
+      : m_storeShaperDigitsName(storeShaperDigitsName)
       , m_cutSeed(cutSeed)
       , m_cutAdjacent(cutAdjacent)
-      , m_seedMaxSample(-1)
       , m_seedSNR(-1)
+      , m_seedMaxSample(-1)
       , m_seedIndex(-1)
       , m_seedInternalIndex(-1)
-      , m_storeShaperDigitsName(storeShaperDigitsName)
+      , m_vxdID(vxdID)
+      , m_isUside(isUside)
     {m_strips.clear();};
 
     bool RawCluster::add(VxdID vxdID, bool isUside, struct StripInRawCluster& aStrip)

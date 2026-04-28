@@ -16,6 +16,7 @@
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 
+#include <cmath>
 #include <iostream>
 
 using namespace Belle2;
@@ -310,11 +311,11 @@ void SVDROIFinderAnalysisDataModule::event()
     B2DEBUG(21, "good U in range " << edgeStripsU << ", " << nStripsU - edgeStripsU);
     B2DEBUG(21, "good V in range " << edgeStripsV << ", " << nStripsV - edgeStripsV);
 
-    B2DEBUG(21, "U check: " << abs(centerROIU - centerSensorU) << " < (good) " << centerSensorU - edgeStripsU);
-    B2DEBUG(21, "V check: " << abs(centerROIV - centerSensorV) << " < (good) " << centerSensorV - edgeStripsV);
+    B2DEBUG(21, "U check: " << std::abs(centerROIU - centerSensorU) << " < (good) " << centerSensorU - edgeStripsU);
+    B2DEBUG(21, "V check: " << std::abs(centerROIV - centerSensorV) << " < (good) " << centerSensorV - edgeStripsV);
 
-    if ((abs(centerROIU - centerSensorU) > centerSensorU - edgeStripsU)
-        || (abs(centerROIV - centerSensorV) > centerSensorV - edgeStripsV))
+    if ((std::abs(centerROIU - centerSensorU) > centerSensorU - edgeStripsU)
+        || (std::abs(centerROIV - centerSensorV) > centerSensorV - edgeStripsV))
       continue;
 
     nGoodROIs++;

@@ -8,7 +8,6 @@
 #pragma once
 
 #include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLShower.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -31,7 +30,7 @@ namespace Belle2 {
     void event() override;
 
     /// Merge cosmic tracks.
-    void MergingTracks(RecoTrack*, RecoTrack*, StoreArray<RecoTrack>&);
+    void MergingTracks(const RecoTrack*, const RecoTrack*, StoreArray<RecoTrack>&);
 
   private:
     /// StoreArray name from which to read the reco tracks.

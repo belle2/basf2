@@ -92,7 +92,7 @@ namespace Belle2 {
     double m_timeWindow;             /**< Readout time window width in ns */
     double m_timeWindowStart;        /**< Readout time window shift w.r.t. the global time zero in ns */
     double m_bkgLevel;               /**< Number of background hits ped hapd per readout (electronics noise) */
-    int m_bdistort;                  /**< apply distorsion due to magnetic field */
+    int m_bdistort;                  /**< apply distortion due to magnetic field */
 
   };
 

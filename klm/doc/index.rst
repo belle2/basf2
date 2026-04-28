@@ -47,7 +47,6 @@ Tools
    :func: arg_parser
    :prog: b2klm-create-dqm
    :nodefault:
-   :nogroupsections:
 
 
 ``b2klm-mask-dqm``: Mask very hot channels in DQM reference plots
@@ -58,4 +57,17 @@ Tools
    :func: arg_parser
    :prog: b2klm-mask-dqm
    :nodefault:
-   :nogroupsections:
+
+
+Disclaimers for development
+----------------------------
+
+Charge or Pulse Height from Feature Extraction:
+* Due to (scintillator) firmware anamolies, there are peaks near 0 and :math:`> 400` ADC counts; these values are unreliable.
+
+   * The performance with and without the cuts should be evaluated before suppressing these peaks or replacing them with NaNs. 
+
+* The peaks at charge :math:`> 400` ADC counts have been a result overlapping ramps negatively shifting the output voltages (lower Wilkinson ADC counts).
+
+   * The KLM firmware was updated on Exp 40 Run 858 to properly address this bug.
+   * Details are outlined `here <https://indico.belle2.org/event/17965/contributions/109456/attachments/40138/59714/cketter_klm_weekly_260330.pdf>`.

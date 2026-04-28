@@ -7,17 +7,17 @@
  **************************************************************************/
 #include <tracking/ckf/svd/filters/states/SVDStateFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NegativeFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/SloppyFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NegativeFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AndFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/SloppyFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/TruthVarFilter.icc.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/ckf/general/filters/AdvanceFilter.h>
 #include <tracking/ckf/general/filters/KalmanFilter.h>
@@ -33,7 +33,7 @@
 #include <tracking/ckf/svd/filters/states/NonIPCrossingSVDStateFilter.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// MC filter for VXD - CDC relations.
@@ -96,7 +96,8 @@ std::map<std::string, std::string> SVDStateFilterFactory::getValidFilterNamesAnd
     {"simple", "simple filter to be used in svd"},
     {"residual", "residual filter to be used in svd"},
     {"recording", "record variables to a TTree"},
-    {"recording_and_truth", "record variables to a TTree and store truth information"},
+    // For details on why the "recording_and_truth" filter option is commented please see the comment below in ::create()
+    // {"recording_and_truth", "record variables to a TTree and store truth information"},
     {"recording_with_direction_check", "record variables to a TTree with direction check"},
     {"mva", "MVA filter"},
     {"mva_with_direction_check", "MVA filter with direction check"},
@@ -108,7 +109,7 @@ std::unique_ptr<BaseSVDStateFilter>
 SVDStateFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BaseSVDStateFilter>>();
+    return std::make_unique<TrackingUtilities::NoneFilter<BaseSVDStateFilter>>();
   } else if (filterName == "all") {
     return std::make_unique<AllSVDStateFilter>();
   } else if (filterName == "non_ip_crossing") {
@@ -129,10 +130,14 @@ SVDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<SloppyMCSVDStateFilter>();
   } else if (filterName == "recording") {
     return std::make_unique<RecordingSVDStateFilter>("SVDStateFilter.root");
-  } else if (filterName == "recording_and_truth") {
-    return std::make_unique<AndSVDStateFilter>(
-             std::make_unique<RecordingSVDStateFilter>("SVDStateFilter.root"),
-             std::make_unique<MCSVDStateFilter>());
+    // This filter causes trouble with the parameters added to the SVDStateTruthVarSet, as both the RecordingSVDStateFilter
+    // AND the MCSVDStateFilter internally use the SVDStateTruthVarSet, so the parameters are added twice for the same filter
+    // causing an error. Currently this filter isn't actively used, but to keep it in the code in some way, even if it would
+    // not work currently, it's commented.
+    // } else if (filterName == "recording_and_truth") {
+    //   return std::make_unique<AndSVDStateFilter>(
+    //            std::make_unique<RecordingSVDStateFilter>("SVDStateFilter.root"),
+    //            std::make_unique<MCSVDStateFilter>());
   } else if (filterName == "recording_with_direction_check") {
     return std::make_unique<AndSVDStateFilter>(
              std::make_unique<NonIPCrossingSVDStateFilter>(),

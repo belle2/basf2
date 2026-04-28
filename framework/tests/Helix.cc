@@ -815,7 +815,7 @@ namespace {
 
     TMatrixD moveByTwoYJacobian = helix.calcPassiveMoveByJacobian(ROOT::Math::XYZVector(0.0, 2.0, 0.0));
 
-    // Hand caluclated intermediate quantities;
+    // Hand calculated intermediate quantities;
     double deltaParallel = 2;
     double A = 4;
     double u = 1;

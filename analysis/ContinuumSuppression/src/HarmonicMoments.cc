@@ -19,7 +19,7 @@ void HarmonicMoments::calculateBasicMoments()
   for (auto& p : m_momenta) {
     // Gets momentum and costheta of the vector
     double pMag = p.R();
-    double cTheta = p.Dot(m_axis) / pMag;
+    double cTheta = p.Vect().Dot(m_axis) / pMag;
 
     // Fills the momenta.
     // This part is quite ugly, but hard-coding the Legendre polynomials makes the code
@@ -45,7 +45,7 @@ void HarmonicMoments::calculateAllMoments()
   for (auto& p : m_momenta) {
     // gets momentum and costheta of the vector
     double pMag = p.R();
-    double cTheta = p.Dot(m_axis) / pMag;
+    double cTheta = p.Vect().Dot(m_axis) / pMag;
 
     // Fills the momenta.
     // This part is quite ugly, but hard-coding the Legendre polynomials makes the code

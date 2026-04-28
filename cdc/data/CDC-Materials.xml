@@ -117,4 +117,21 @@
       <Element fraction="0.4878">H</Element>
     </Components>
    </Material>
+
+  <!-- Flexi-boron -->
+  <Material name="CDC-SWX-238">
+    <state>Solid</state>
+    <density unit="g/cm3">1.64</density>
+    <Components>
+       <Element  fraction="0.2755">B</Element>
+       <Element  fraction="0.2685">Si</Element>
+       <Element  fraction="0.2357">O</Element>
+       <Element  fraction="0.1869">C</Element>
+       <Element  fraction="0.0276">H</Element>
+       <Element  fraction="0.0026">Zn</Element>
+       <Element  fraction="0.0016">N</Element>
+       <Element  fraction="0.0016">Fe</Element>
+    </Components>
+  </Material>
+
 </Materials>

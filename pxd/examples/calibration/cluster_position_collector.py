@@ -16,7 +16,7 @@
 # The collector will create source files for training of clusterkind 0 by simulating
 # 10 million clusters.
 #
-# Full set of training sources for PXD requires starting the script 4x wiht clusterkinds
+# Full set of training sources for PXD requires starting the script 4x with clusterkinds
 # 0-3.
 
 import basf2 as b2
@@ -92,5 +92,5 @@ if __name__ == "__main__":
     main.add_module('PXDClusterPositionCollector', granularity="all", clusterKind=args.clusterkind)
     main.add_module("Progress")
 
-    b2.process(main)
+    b2.process(main, calculateStatistics=True)
     print(b2.statistics)

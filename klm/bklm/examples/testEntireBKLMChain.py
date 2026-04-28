@@ -83,5 +83,5 @@ main.add_module('RootOutput',
                 branchNamesPersistent='FileMetaData')
 
 # Process the path
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 print(basf2.statistics)

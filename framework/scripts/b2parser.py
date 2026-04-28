@@ -160,10 +160,12 @@ class B2Lexer(Lexer):
         Returns:
             sly.lex.Token
         """
+        # \cond false positive doxygen warning
         if "]" not in self.text[self.index:]:
             raise SyntaxError("Unmatched '[' in cut.")
         self.control_token_stack.append("BRACK")
         return t
+        # \endcond
 
     @_(r"\]")  # noqa: F821
     def RBRACK(self, t):
@@ -212,10 +214,12 @@ class B2Lexer(Lexer):
         Returns:
             sly.lex.Token
         """
+        # \cond false positive doxygen warning
         if ")" not in self.text[self.index:]:
             raise SyntaxError("Unmatched '('")
         self.control_token_stack.append("PAREN")
         return t
+        # \endcond
 
     @_(r"\)")  # noqa: F821
     def RPAREN(self, t):
@@ -258,8 +262,8 @@ class B2Lexer(Lexer):
 
         Possible notations covered by this regular expression:
             Normal decimal notation e.g 0.1
-            Hanging decimal seperator notation e.g 1.
-            Preceding decimal seperator notation e.g .1
+            Hanging decimal separator notation e.g 1.
+            Preceding decimal separator notation e.g .1
             Scientific notation with (signed) exponents e.g 1.0E4, 1.e-4, .1E+3
             Exponents are case insensitive e.g 1.e4, 1.E4
             Integer with exponent e.g 1E4
@@ -301,7 +305,7 @@ class B2Lexer(Lexer):
     @_(r"[a-zA-Z_][a-zA-Z_0-9]*")  # noqa: F821
     def IDENTIFIER(self, t):
         """
-        Scaning function for identifiers
+        Scanning function for identifiers
 
         If a matched sequence equals reserved keywords of other tokens
         the token type and value is remapped via the reserved dictionary.
@@ -334,6 +338,7 @@ class B2Lexer(Lexer):
         # Take care of special infinity and nan values.
         if t.type == "DOUBLE":
             t.value = float(t.value)
+        # \cond false positive doxygen warning
         if t.type == "IDENTIFIER":
             try:
                 if self.text[self.index] == "(":
@@ -345,6 +350,7 @@ class B2Lexer(Lexer):
             except IndexError:
                 pass
         return t
+        # \endcond
 
 
 def parser_class_decorator(cls, parser_type):

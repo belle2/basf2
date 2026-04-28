@@ -8,7 +8,6 @@
 #include <framework/pcore/zmq/connections/ZMQConfirmedConnection.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 
-#include <thread>
 #include <chrono>
 #include <set>
 

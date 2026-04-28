@@ -31,6 +31,7 @@ SignalSideVariablesToExtraInfoModule::SignalSideVariablesToExtraInfoModule() : M
                  "found in the input ParticleList as an ExtraInfo to the Particle related to\n"
                  "the current ROE. This module is intended to be executed only in for_each ROE\n"
                  "path.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   std::map<std::string, std::string> emptymap;

@@ -12,7 +12,6 @@
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 #include <mdst/dbobjects/CollisionAxisCMS.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/geometry/B2Vector3.h>
 #include <framework/utilities/LabToCms.h>
 
 #include <Math/LorentzRotation.h>
@@ -35,9 +34,9 @@ namespace Belle2 {
     /**
      * Returns boost vector (beta=p/E)
      */
-    B2Vector3D getBoostVector() const
+    ROOT::Math::XYZVector getBoostVector() const
     {
-      return m_boostVectorDB->getBoost();
+      return ROOT::Math::XYZVector(m_boostVectorDB->getBoost());
     }
 
     /**

@@ -22,9 +22,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
-#include <iostream>
-#include <cmath>
-
 using namespace std;
 
 namespace Belle2 {

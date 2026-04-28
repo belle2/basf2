@@ -17,7 +17,6 @@
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
 
 #include <framework/pcore/EvtMessage.h>
-#include <daq/dqm/DqmSharedMem.h>
 
 #include <string>
 #include <memory>
@@ -29,10 +28,6 @@ namespace Belle2 {
    * Output histograms into a ROOT file and shared memory after merging.
    * This "connection" class needs to be wrapped with a ZMQHistogramOutput
    * before using it as a real output connection (which adds the common functionalities).
-   *
-   * The ROOT and shared memory are written using ROOTs own serialization. The shared memory
-   * is herby filled with the content of a temporary TMemFile.
-   * On clear the shared memory is cleared (ROOT files stay what they are).
    *
    * Nothing special happens on stop or terminate other than that a merge is performed.
    *
@@ -47,8 +42,7 @@ namespace Belle2 {
   class ZMQHistoServerToFileOutput : public ZMQConnection {
   public:
     /// Create a new connection initializing the DQMMemFile.
-    ZMQHistoServerToFileOutput(unsigned int maximalUncompressedBufferSize,
-                               const std::string& dqmFileName,
+    ZMQHistoServerToFileOutput(const std::string& dqmFileName,
                                const std::string& rootFileName);
 
     /// Merge the given histograms into a single set of histograms and store them to file/shm
@@ -65,8 +59,6 @@ namespace Belle2 {
     /// Return the connection string
     std::string getEndPoint() const { return "file://" + m_rootFileName; }
   private:
-    /// The SHM file. Please note that we do not call its destructor on purpose.
-    DqmSharedMem* m_sharedMemory = nullptr;
     /// Name of the shared memory
     std::string m_dqmMemFileName;
     /// Output file name (possible with placeholders)

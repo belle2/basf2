@@ -14,7 +14,6 @@
 #include <TMath.h>
 
 #include <algorithm>
-#include <fstream>
 
 using namespace Belle2;
 using namespace std;
@@ -189,16 +188,14 @@ Const::DetectorSet::Iterator& Const::DetectorSet::Iterator::operator++()
   return *this;
 }
 
-bool Const::DetectorSet::Iterator::operator==(
-  const Const::DetectorSet::Iterator& iterator)
+bool Const::DetectorSet::Iterator::operator==(const Const::DetectorSet::Iterator& iterator) const
 {
-  return m_SetBit == iterator.m_SetBit;
+  return this->m_SetBit == iterator.m_SetBit;
 }
 
-bool Const::DetectorSet::Iterator::operator!=(
-  const Const::DetectorSet::Iterator& iterator)
+bool Const::DetectorSet::Iterator::operator!=(const Const::DetectorSet::Iterator& iterator) const
 {
-  return m_SetBit != iterator.m_SetBit;
+  return !(*this == iterator);
 }
 
 Const::DetectorSet::Iterator Const::DetectorSet::begin() const

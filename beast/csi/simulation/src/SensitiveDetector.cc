@@ -86,7 +86,7 @@ namespace Belle2 {
 
       G4Track& track  = * aStep->GetTrack();
       if (m_trackID != track.GetTrackID()) {
-        //TrackID changed, store track informations
+        //TrackID changed, store track information
         m_trackID = track.GetTrackID();
         //Get momentum
         m_momentum = preStep.GetMomentum() ;
@@ -94,7 +94,7 @@ namespace Belle2 {
         m_startEnergy =  preStep.GetKineticEnergy() ;
         //Reset energy deposit;
         m_energyDeposit = 0;
-        //Reset Wighted Time;
+        //Reset Weighted Time;
         m_WightedTime = 0;
         //Reset m_WightedPos;
         m_WightedPos.set(0, 0, 0);

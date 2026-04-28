@@ -138,7 +138,7 @@ namespace Belle2 {
     void setColdTubeMaterialName(const std::string& materialName) {m_coldTubeMaterialName = materialName;}
 
     /**
-     * Set dimentions of cooling test plates in x, y, z directions.
+     * Set dimensions of cooling test plates in x, y, z directions.
      * @param[in] lx Length of cooling test plate along x axis.
      * @param[in] ly Length of cooling test plate along y axis.
      * @param[in] lz Length of cooling test plate along z axis.
@@ -291,9 +291,9 @@ namespace Belle2 {
     const std::vector<double>& getCoolingPosR() const { return m_coolingPosR; }
 
     /**
-     * Get vector of azimuthal angle of rotation aroud Z - axis of the cooling
+     * Get vector of azimuthal angle of rotation around Z - axis of the cooling
      * system object in polar coordinate system in deg.
-     * @return Vector of Azimuthal angle of rotation aroud Z - axis of
+     * @return Vector of Azimuthal angle of rotation around Z - axis of
      * the cooling system object in polar coordinate system in deg.
      */
     const std::vector<double>& getCoolinRotationAngle() const { return m_coolinRotationAngle; }
@@ -409,11 +409,11 @@ namespace Belle2 {
     std::vector<double>
     m_coolingPosR;          /**< Radial distance (r, pho) of the cooling system object center in polar coordinate system in deg */
     std::vector<double>
-    m_coolinRotationAngle;  /**< Azimuthal angle of rotation aroud Z - axis of the cooling system object in polar coordinate system in deg */
+    m_coolinRotationAngle;  /**< Azimuthal angle of rotation around Z - axis of the cooling system object in polar coordinate system in deg */
     //Please note that ARICH detector envelope does not have enough
     //space for 8 mm thick cooling test plate (5.5 mm is only available).
     //For this reason the material assigned to the volume (aluminum)
-    //will have a bigger dencity for effective descrption of the material.
+    //will have a bigger dencity for effective description of the material.
     std::string m_coolingTestPlateMaterialName; /**< Material name of cooling test plates */
     std::string m_coldTubeMaterialName;         /**< Material name of cold tube */
     double m_coolingTestPlateslengthX = 0.0;    /**< Size of cooling test plates (x) */

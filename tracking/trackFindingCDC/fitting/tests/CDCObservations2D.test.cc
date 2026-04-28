@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <gtest/gtest.h>
@@ -14,6 +14,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 TEST(TrackFindingCDCTest, fitting_CDCObservations2D_centralize)

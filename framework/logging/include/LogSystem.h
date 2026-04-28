@@ -92,6 +92,15 @@ namespace Belle2 {
     LogConfig& getPackageLogConfig(const std::string& package) { return m_packageLogConfigs[package]; }
 
     /**
+     * Get the log configuration for the module with the given name.
+     * If no package specific configuration exists a new one is created.
+     *
+     * @param module The name of the package whose log configuration should be returned
+     * @return The log configuration of the given module
+     */
+    LogConfig& getModuleLogConfig(const std::string& module) { return m_moduleLogConfigs[module]; }
+
+    /**
      * Returns true if the given log level is allowed by the log system (i.e. >= the system level).
      *
      * @param level The log level which should be compared with the log level of the log system
@@ -207,7 +216,9 @@ namespace Belle2 {
     std::string m_moduleName;
     /** Stores the log configuration objects for packages. */
     std::map<std::string, LogConfig> m_packageLogConfigs;
-    /** Wether to re-print errors-warnings encountered during execution at the end. */
+    /** Stores the log configuration objects for module. */
+    std::map<std::string, LogConfig> m_moduleLogConfigs;
+    /** Whether to re-print errors-warnings encountered during execution at the end. */
     bool m_printErrorSummary;
     /** Count of previous log messages for the summary and to suppress repetitive messages */
     std::unordered_map<LogMessage, int, LogMessage::TextHasher, LogMessage::TextHasher> m_messageLog{100};

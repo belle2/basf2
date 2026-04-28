@@ -16,6 +16,7 @@ calibration script or the `settings <prompt.ValidationSettings>` variable of the
 """
 
 import ROOT
+
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 import basf2
@@ -25,6 +26,8 @@ from pathlib import Path
 
 from prompt import prompt_script_package, prompt_script_dir
 from prompt import prompt_validation_script_package, prompt_validation_script_dir
+from prompt.local_calibrations import settings_local_calibrations
+
 
 def get_all_script_paths(validation=False):
     if validation:
@@ -37,6 +40,7 @@ def get_all_script_paths(validation=False):
 
 def get_script_settings(name, validation=False):
     import importlib
+
     if validation:
         script_package = prompt_validation_script_package
     else:
@@ -48,21 +52,38 @@ def get_script_settings(name, validation=False):
 def get_argparser():
     """Setup the argparser for this command line tool"""
     import argparse
-    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
-                                     description="Prints details about the available prompt calibration (default) or validation scripts."
-                                    )
-    parser.add_argument("--script-name", dest="script_name", metavar="",
-                        help="The prompt script to print details about. If this is not given, a list of available scripts "
-                             "will instead be printed."
-                       )
-    parser.add_argument("--validation", dest="validation", action="store_true",
-                        help="Shows the validation scripts instead of the calibration scripts"
-                       )
+
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawTextHelpFormatter,
+        description="Prints details about the available prompt calibration (default) or validation scripts.",
+    )
+    parser.add_argument(
+        "--script-name",
+        dest="script_name",
+        metavar="",
+        help="The prompt script to print details about. If this is not given, a list of available scripts "
+        "will instead be printed.",
+    )
+    parser.add_argument(
+        "--validation",
+        dest="validation",
+        action="store_true",
+        help="Shows the validation scripts instead of the calibration scripts",
+    )
+    parser.add_argument(
+        "--local",
+        dest="local",
+        action="store_true",
+        help="Shows the settings of the local calibrations instead of the normal calibrations",
+    )
     parser.set_defaults(validation=False)
-    parser.add_argument("--json", dest="json", action="store_true",
-                        help="Script details will be printed as a JSON string instead of nice stdout. "
-                             "Used for automatic collection of calibration script details."
-                       )
+    parser.add_argument(
+        "--json",
+        dest="json",
+        action="store_true",
+        help="Script details will be printed as a JSON string instead of nice stdout. "
+        "Used for automatic collection of calibration script details.",
+    )
     parser.set_defaults(json=False)
 
     return parser
@@ -71,16 +92,27 @@ def get_argparser():
 def main():
     parser = get_argparser()
     args = parser.parse_args()
-    if not args.script_name:
-        all_script_paths = [p.name for p in get_all_script_paths(validation=args.validation)]
+    if args.local:
+        if args.json:
+            print(json.dumps(settings_local_calibrations))
+        else:
+            for key, val in settings_local_calibrations.items():
+                print(f"{key}:")
+                print(f"  {val}")
+    elif not args.script_name:
+        all_script_paths = [
+            p.name for p in get_all_script_paths(validation=args.validation)
+        ]
         if args.json:
             print(json.dumps(all_script_paths))
         else:
-            print("All available prompt calibration scripts (for usage in b2caf-prompt-run input config file):")
+            print(
+                "All available prompt calibration scripts (for usage in b2caf-prompt-run input config file):"
+            )
             for script_path in all_script_paths:
                 print(script_path)
     else:
-        settings = get_script_settings(args.script_name,validation=args.validation)
+        settings = get_script_settings(args.script_name, validation=args.validation)
         if args.json:
             print(settings.json_dumps())
         else:
@@ -90,4 +122,5 @@ def main():
 
 if __name__ == "__main__":
     import sys
+
     sys.exit(main())

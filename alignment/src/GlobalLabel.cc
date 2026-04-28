@@ -113,7 +113,7 @@ void GlobalLabel::construct(GlobalLabel::gidTYPE elementId,
   else {
     tid = it->second.get(GlobalLabel::getCurrentTimeIntervalRef());
     if (tid == 0) {
-      // actually the first instance of time dep. parameter -> def with orginal time. indep. label
+      // actually the first instance of time dep. parameter -> def with original time. indep. label
       //FIXME: code copied from above!
       tif = 0;
       gid = (tif * tifOffset + eid * eidOffest + pid * pidOffset);

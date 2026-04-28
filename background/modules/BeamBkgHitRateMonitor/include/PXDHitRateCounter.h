@@ -83,7 +83,7 @@ namespace Belle2 {
       /**
        * Get PXD::SensorInfo
        */
-      inline const PXD::SensorInfo& getInfo(VxdID sensorID) const;
+      static inline const PXD::SensorInfo& getInfo(VxdID sensorID);
 
       /**
        * Sets fractions of active channels
@@ -110,11 +110,11 @@ namespace Belle2 {
       // other
       double m_activePixels[40] = {0}; /**< number  of active pixels in sensor */
       double m_activeAreas[40] = {0}; /**< area of active pixels in sensor */
-      double m_segmentActivePixels[240] = {0}; /**< number of active pixels in v segements */
+      double m_segmentActivePixels[240] = {0}; /**< number of active pixels in v segments */
       double m_segmentActiveAreas[240] = {0}; /**< area of active pixels in v segments */
     };
 
-    inline const PXD::SensorInfo& PXDHitRateCounter::getInfo(VxdID sensorID) const
+    inline const PXD::SensorInfo& PXDHitRateCounter::getInfo(VxdID sensorID)
     {
       return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     }

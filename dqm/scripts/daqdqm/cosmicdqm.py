@@ -10,6 +10,7 @@
 
 
 from daqdqm.commondqm import add_common_dqm
+from geometry import is_detector_present, are_detectors_present
 
 
 def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mode="dont_care", create_hlt_unit_histograms=False):
@@ -41,7 +42,15 @@ def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         # PXD (not useful on HLT)
-        if components is None or 'PXD' in components:
+        if is_detector_present("PXD", components):
             # need to be behind add_common_dqm as intercepts are calculated there
             # disable d0 and z0 cut for cosmics
             path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF', z0minCut=-9999, z0maxCut=9999, d0Cut=9999)
+
+    # KLM2 (requires mu+ particle list from add_analysis_dqm)
+    if are_detectors_present(["KLM", "CDC"], components) and (dqm_mode in ["dont_care", "filtered"]):
+        path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM',
+                        MinimalMatchingDigits=14,
+                        MinimalMatchingDigitsOuterLayers=4,
+                        MinimalMomentumNoOuterLayers=4.0,
+                        SoftwareTriggerName="")

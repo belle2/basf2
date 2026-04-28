@@ -313,7 +313,7 @@ void PXDBackgroundModule::event()
     std::map<VxdID, std::vector<float> > firedPixels;
     for (const PXDDigit& storeDigit : storeDigits) {
       // Filter out digits with signals below zero-suppression threshold
-      // ARE THRE SUCH DIGITS?
+      // ARE THERE SUCH DIGITS?
       VxdID sensorID = storeDigit.getSensorID();
       if (sensorID != currentSensorID) {
         currentSensorID = sensorID;

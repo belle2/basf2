@@ -44,7 +44,8 @@ class CheckPayloadMetadata(b2.Module):
         else:
             assert (self.beam_parameters.getGlobaltag() == b2.conditions.default_globaltags[0])
             assert (self.beam_parameters.getRevision() > 0)
-            assert (self.beam_parameters.getFilename().startswith('/cvmfs'))
+            if os.path.isdir('/cvmfs'):
+                assert (self.beam_parameters.getFilename().startswith('/cvmfs'))
             assert (self.beam_parameters.getIoV() == B2.IntervalOfValidity(0, 0, 0, -1))
 
 
@@ -77,7 +78,7 @@ if __name__ == '__main__':
 
     with b2tu.clean_working_directory():
 
-        #: Path to the dabase with the testing payloads.
+        #: Path to the database with the testing payloads.
         testing_database_path = 'testingdb/testingdb.txt'
 
         # Create the testing payloads.

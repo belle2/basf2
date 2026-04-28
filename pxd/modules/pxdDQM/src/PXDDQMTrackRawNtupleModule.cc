@@ -7,13 +7,17 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdDQM/PXDDQMTrackRawNtupleModule.h>
-#include <tracking/dataobjects/ROIid.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/PXDIntercept.h>
+
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
 
 #include <pxd/reconstruction/PXDPixelMasker.h>
-#include <mdst/dataobjects/Track.h>
 #include <framework/gearbox/Const.h>
 
-#include "TMatrixDSym.h"
+#include <TMatrixDSym.h>
 using namespace Belle2;
 
 //-----------------------------------------------------------------

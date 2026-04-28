@@ -132,7 +132,7 @@ class EventRangePathSplitter(Module):
         """
         import ROOT  # noqa
         self.event_ranges = get_event_ranges(ROOT.Belle2.Environment.Instance().getNumberOfEvents(), self.event_codes)
-        self.event_extra_info.registerInDataStore()
+        self.event_extra_info.isRequired()
 
     def beginRun(self):
         """Begin run method of the module"""

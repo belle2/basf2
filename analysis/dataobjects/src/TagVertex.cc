@@ -7,13 +7,17 @@
  **************************************************************************/
 
 #include <analysis/dataobjects/TagVertex.h>
+#include <analysis/dataobjects/Particle.h>
+
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
 
 static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-static const B2Vector3D vecNaN(realNaN, realNaN, realNaN);
+static const ROOT::Math::XYZVector vecNaN(realNaN, realNaN, realNaN);
 
-B2Vector3D TagVertex::getTagVertex() const
+ROOT::Math::XYZVector TagVertex::getTagVertex() const
 {
   return m_tagVertex;
 }
@@ -52,7 +56,7 @@ float TagVertex::getDeltaTErr() const
   return m_deltaTErr;
 }
 
-B2Vector3D TagVertex::getMCTagVertex() const
+ROOT::Math::XYZVector TagVertex::getMCTagVertex() const
 {
   return m_mcTagV;
 }
@@ -82,7 +86,7 @@ std::string TagVertex::getConstraintType() const
   return m_constraintType;
 }
 
-B2Vector3D TagVertex::getConstraintCenter() const
+ROOT::Math::XYZVector TagVertex::getConstraintCenter() const
 {
   if (m_constraintType == "noConstraint") return vecNaN;
   return m_constraintCenter;
@@ -182,7 +186,7 @@ int TagVertex::getRollBackStatus() const
   return m_rollbackStatus;
 }
 
-void TagVertex::setTagVertex(const B2Vector3D& tagVertex)
+void TagVertex::setTagVertex(const ROOT::Math::XYZVector& tagVertex)
 {
   m_tagVertex = tagVertex;
 }
@@ -207,7 +211,7 @@ void TagVertex::setDeltaTErr(float DeltaTErr)
   m_deltaTErr = DeltaTErr;
 }
 
-void TagVertex::setMCTagVertex(const B2Vector3D& mcTagVertex)
+void TagVertex::setMCTagVertex(const ROOT::Math::XYZVector& mcTagVertex)
 {
   m_mcTagV = mcTagVertex;
 }
@@ -298,7 +302,7 @@ void TagVertex::setRaveWeights(const std::vector<double>& raveWeights)
   m_raveWeights = raveWeights;
 }
 
-void TagVertex::setConstraintCenter(const B2Vector3D& constraintCenter)
+void TagVertex::setConstraintCenter(const ROOT::Math::XYZVector& constraintCenter)
 {
   m_constraintCenter = constraintCenter;
 }

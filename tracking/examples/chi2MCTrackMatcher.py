@@ -32,6 +32,6 @@ add_prefilter_tracking_reconstruction(path)
 # Add the Chi2-matcher module to the execution path
 path.add_module("Chi2MCTrackMatcher", CutOffs=[128024, 95, 173, 424, 90, 424], linalg=False)
 # process the path
-process(path)
+process(path, calculateStatistics=True)
 # show some module statistics
 print(statistics)

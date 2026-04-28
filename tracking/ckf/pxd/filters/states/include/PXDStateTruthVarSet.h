@@ -7,16 +7,17 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
 
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <tracking/ckf/pxd/filters/states/BasePXDStateFilter.h>
 #include <tracking/ckf/pxd/utilities/PXDMCUtil.h>
 
 namespace Belle2 {
+  class EventMetaData;
+
   /// Names of the variables to be generated.
   constexpr
   static char const* const pxdStateTruthVarNames[] = {
@@ -32,11 +33,11 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class PXDStateTruthVarNames : public TrackFindingCDC::VarNames<BasePXDStateFilter::Object> {
+  class PXDStateTruthVarNames : public TrackingUtilities::VarNames<BasePXDStateFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(pxdStateTruthVarNames);
+    static const size_t nVars = TrackingUtilities::size(pxdStateTruthVarNames);
 
     /// Get the name of the column.
     constexpr
@@ -50,11 +51,14 @@ namespace Belle2 {
    * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match,
    * which knows the truth information if two tracks belong together or not.
    */
-  class PXDStateTruthVarSet : public TrackFindingCDC::VarSet<PXDStateTruthVarNames> {
+  class PXDStateTruthVarSet : public TrackingUtilities::VarSet<PXDStateTruthVarNames> {
 
   public:
     /// Generate and assign the variables from the object.
     virtual bool extract(const BasePXDStateFilter::Object* result) override;
+
+    /// Expose the parameters to the outside world
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
   private:
     /// Pointer to the object containing event number etc
@@ -62,5 +66,14 @@ namespace Belle2 {
 
     /// MC information used in the PXD CKF
     MCUtil m_mcUtil;
+
+    /// Only use a fraction of background events for recording for MVA training
+    bool m_UseFractionOfBackground = false;
+
+    /// Fraction of background to use in case m_UseFractionOfBackground is true
+    ///   The default value of 0.001 was chosen as it creates a roughly balanced training
+    ///   data set in case NO PXD data reduction is performed. With PXD data reduction the
+    ///   value must be larger to obtain a balanced data set.
+    double m_BackgroundFraction = 0.001;
   };
 }

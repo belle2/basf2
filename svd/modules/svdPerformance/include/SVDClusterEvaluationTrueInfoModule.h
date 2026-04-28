@@ -24,7 +24,7 @@
 namespace Belle2 {
 
   /**
-   * Clustering Performance, using true informations
+   * Clustering Performance, using true information
    */
 
   class SVDClusterEvaluationTrueInfoModule : public Module {
@@ -150,11 +150,11 @@ namespace Belle2 {
     /** Vectors used to compute the quantities depicted in Histos and Graphs */
     int m_NumberOfShaperDigit[m_Nsets] = {0};
     int m_NumberOfRecoDigit[m_Nsets] = {0}; /**< number of reco digits*/
-    int m_NumberOfTH[m_Nsets] = {0}; /**<  numner of true hits*/
+    int m_NumberOfTH[m_Nsets] = {0}; /**<  number of true hits*/
     int m_NumberOfClustersRelatedToTH[m_Nsets] = {0};  /**< number of clusters related to true hits*/
     int m_NumberOfClusters[m_Nsets] = {0}; /**< number of clusters*/
     int m_NumberOfTMClusters[m_Nsets] = {0}; /**< number of truth matched clusters*/
-    int m_NumberOfTMRecoInTMCluster = 0; /**<numnber of true match reco digit in truth match cluster*/
+    int m_NumberOfTMRecoInTMCluster = 0; /**<number of true match reco digit in truth match cluster*/
     int m_NumberOfTMRecoInNOTMCluster = 0; /**<number of truth matched reco digits in not truth matched clusters*/
 
     /** Control Histos and List to check if the function used to define a TH as "good" is working fine */
@@ -174,7 +174,7 @@ namespace Belle2 {
     /** Function returning "Internal" or "External" depending on the index */
     TString IntExtFromIndex(int idx);
 
-    /** Function returning "Forward" or "Backword" depending on the index */
+    /** Function returning "Forward" or "Backward" depending on the index */
     TString FWFromIndex(int idx);
 
     /** Function returning "U" or "V" depending on the index */
@@ -200,11 +200,11 @@ namespace Belle2 {
     void createArbitraryGraphErrorChooser(const char* name, const char* title, float x[m_Nsets], float xErr[m_Nsets], float y[m_Nsets],
                                           float yErr[m_Nsets], TString xTitle, TString yTitle, TList* list, int len);
 
-    /** Function returning an arbitrarly defined TGraph with arrays length equal to m_Nsets */
+    /** Function returning an arbitrarily defined TGraph with arrays length equal to m_Nsets */
     void createArbitraryGraphError_Std(const char* name, const char* title, float x[m_Nsets], float xErr[m_Nsets], float y[m_Nsets],
                                        float yErr[m_Nsets], TString xTitle, TString yTitle, TList* list);
 
-    /** Function returning an arbitrarly defined TGraph with arrays length equal to m_NsetsRed */
+    /** Function returning an arbitrarily defined TGraph with arrays length equal to m_NsetsRed */
     void createArbitraryGraphError_Red(const char* name, const char* title, float x[m_NsetsRed], float xErr[m_NsetsRed],
                                        float y[m_NsetsRed], float yErr[m_NsetsRed], TString xTitle, TString yTitle, TList* list);
 

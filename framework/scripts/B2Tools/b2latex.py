@@ -32,7 +32,7 @@ class LatexObject:
     def add(self):
         """
         Add latex-code to the output string.
-        This method is usually overriden in the subclasses
+        This method is usually overridden in the subclasses
         """
         return self
 
@@ -40,7 +40,7 @@ class LatexObject:
         """
         Finishes the generation of latex-code.
         E.g. adds end latex-commands
-        This method is usually overriden in the subclasses
+        This method is usually overridden in the subclasses
         """
         return self
 
@@ -100,7 +100,7 @@ class LatexObject:
             % In newer versions of latex there is a problem with the calc package and tikz
             % http://tex.stackexchange.com/questions/289551/how-to-resolve-conflict-between-versions-of-texlive-and-pgf
             \def\pgfmathparse@#1{%
-                % Stuff for calc compatiability.
+                % Stuff for calc compatibility.
                 \let\real=\pgfmath@calc@real
                 \let\minof=\pgfmath@calc@minof
                 \let\maxof=\pgfmath@calc@maxof
@@ -111,7 +111,7 @@ class LatexObject:
                 % No (math) units yet.
                 \global\pgfmathunitsdeclaredfalse
                 \global\pgfmathmathunitsdeclaredfalse
-                % Expand expression so any reamining CSs are registers
+                % Expand expression so any remaining CSs are registers
                 % or box dimensions (i.e. |\wd|, |\ht|, |\dp|).
                 \edef\pgfmath@expression{#1}%
                     %
@@ -139,7 +139,7 @@ class LatexObject:
 
 class LatexFile(LatexObject):
     """
-    Convinience class implementing += operator, can be used instead of raw LatexObject to collect
+    Convenience class implementing += operator, can be used instead of raw LatexObject to collect
     all the latex code in your project which should go into a common file.
     """
 
@@ -169,7 +169,7 @@ class String(LatexObject):
     def __init__(self, text=''):
         """
         Calls super-class initialize and adds initial text to output
-            @param text intial text, usually you want to give a raw string r"some text"
+            @param text initial text, usually you want to give a raw string r"some text"
         """
         super().__init__()
         #: output string
@@ -201,7 +201,7 @@ class Listing(LatexObject):
     def __init__(self, language='XML'):
         """
         Calls super-class initialize and adds initial text to output
-            @param text intial text, usually you want to give a raw string r"some text"
+            @param text initial text, usually you want to give a raw string r"some text"
         """
         super().__init__()
         #: output string

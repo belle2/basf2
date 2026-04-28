@@ -9,7 +9,7 @@
 ##########################################################################
 
 import basf2 as b2
-from geometry import check_components
+from geometry import check_components, is_detector_present
 from L1trigger import add_trigger_simulation
 from pxd import add_pxd_simulation
 from svd import add_svd_simulation
@@ -44,8 +44,15 @@ def check_simulation(path):
         b2.B2ERROR(f"Simulation modules in wrong order. Should be '{', '.join(required)}' but is '{', '.join(found)}'")
 
 
-def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered_digits',
-                         doCleanup=True, overrideDB=False, usePXDDataReduction=True, save_slow_pions_in_mc=False):
+def add_PXDDataReduction(
+        path,
+        components,
+        pxd_unfiltered_digits='pxd_unfiltered_digits',
+        doCleanup=True,
+        overrideDB=False,
+        usePXDDataReduction=True,
+        save_slow_pions_in_mc=False,
+        save_all_charged_particles_in_mc=False):
     """
     This function adds the standard simulation modules to a path.
     @param pxd_unfiltered_digits: the name of the StoreArray containing the input PXDDigits
@@ -67,8 +74,12 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
 
     add_roiFinder(path, svd_reco_tracks)
 
-    if save_slow_pions_in_mc:
-        path.add_module('MCSlowPionPXDROICreator', PXDDigitsName=pxd_unfiltered_digits, ROIsName='ROIs')
+    if save_slow_pions_in_mc or save_all_charged_particles_in_mc:
+        path.add_module('MCPXDROICreator',
+                        PXDDigitsName=pxd_unfiltered_digits,
+                        ROIsName='ROIs',
+                        createROIForSlowPionsOnly=save_slow_pions_in_mc,
+                        createROIForAll=save_all_charged_particles_in_mc)
 
     # Filtering of PXDDigits
     pxd_digifilter = b2.register_module('PXDdigiFilter')
@@ -123,7 +134,8 @@ def add_simulation(
         FilterEvents=False,
         usePXDGatedMode=False,
         skipExperimentCheckForBG=False,
-        save_slow_pions_in_mc=False):
+        save_slow_pions_in_mc=False,
+        save_all_charged_particles_in_mc=False):
     """
     This function adds the standard simulation modules to a path.
     @param forceSetPXDDataReduction: override settings from the DB with the value set in 'usePXDDataReduction'
@@ -137,11 +149,13 @@ def add_simulation(
       process and the beam background files. Note that this check should be skipped only by experts.
     @param save_slow_pions_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
       of slow pions from D* -> D pi^{\\pm} decays using the MCSlowPionPXDROICreator based on MC truth information
+    @param save_all_charged_particles_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
+      of all charged primary MCParticles that traverse PXD
     """
 
     path.add_module('StatisticsSummary').set_name('Sum_PreSimulation')
 
-    # Check compoments.
+    # Check components.
     check_components(components)
 
     # background mixing or overlay input before process forking
@@ -158,8 +172,8 @@ def add_simulation(
                 bkgmixer.param('components', components)
             path.add_module(bkgmixer)
             if usePXDGatedMode:
-                if components is None or 'PXD' in components:
-                    # PXD is sensitive to hits in intervall -20us to +20us
+                if is_detector_present("PXD", components):
+                    # PXD is sensitive to hits in interval -20us to +20us
                     bkgmixer.param('minTimePXD', -20000.0)
                     bkgmixer.param('maxTimePXD', 20000.0)
                     # Emulate injection vetos for PXD
@@ -200,30 +214,30 @@ def add_simulation(
     # have them in the path more than once
 
     # CDC digitization
-    if components is None or 'CDC' in components:
+    if is_detector_present("CDC", components):
         cdc_digitizer = b2.register_module('CDCDigitizer')
         cdc_digitizer.param("Output2ndHit", generate_2nd_cdc_hits)
         path.add_module(cdc_digitizer)
 
     # TOP digitization
-    if components is None or 'TOP' in components:
+    if is_detector_present("TOP", components):
         top_digitizer = b2.register_module('TOPDigitizer')
         path.add_module(top_digitizer)
 
     # ARICH digitization
-    if components is None or 'ARICH' in components:
+    if is_detector_present("ARICH", components):
         arich_digitizer = b2.register_module('ARICHDigitizer')
         path.add_module(arich_digitizer)
 
     # ECL digitization
-    if components is None or 'ECL' in components:
+    if is_detector_present("ECL", components):
         ecl_digitizer = b2.register_module('ECLDigitizer')
         if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
     # KLM digitization
-    if components is None or 'KLM' in components:
+    if is_detector_present("KLM", components):
         klm_digitizer = b2.register_module('KLMDigitizer')
         path.add_module(klm_digitizer)
 
@@ -232,11 +246,16 @@ def add_simulation(
         m = path.add_module('BGOverlayExecutor', components=['CDC', 'TOP', 'ARICH', 'KLM'])
         m.set_name('BGOverlayExecutor_CDC...KLM')
 
-    if components is None or 'TRG' in components:
+    if is_detector_present("TRG", components):
+        if bkgfiles is not None and bkgOverlay:
+            # BG Overlay for CDCTRG. That for KLMTRG is already covered by BG Overlay
+            # for KLM. ECL and ECLTRG are already covered independently.
+            m = path.add_module('BGOverlayExecutor', components=['CDC'], CDCHitsName='CDCHits4Trg')
+            m.set_name('BGOverlayExecutor_TRGCDC')
         add_trigger_simulation(path, simulateT0jitter=simulateT0jitter, FilterEvents=FilterEvents)
 
     # SVD digitization, BG Overlay, sorting and zero suppression
-    if components is None or 'SVD' in components:
+    if is_detector_present("SVD", components):
         add_svd_simulation(path)
         if bkgfiles is not None and bkgOverlay:
             m = path.add_module('BGOverlayExecutor', components=['SVD'])
@@ -245,7 +264,7 @@ def add_simulation(
         path.add_module('SVDZeroSuppressionEmulator')
 
     # PXD digitization, BG overlay, sorting and data reduction
-    if components is None or 'PXD' in components:
+    if is_detector_present("PXD", components):
         if forceSetPXDDataReduction:
             pxd_digits_name = ''
             if usePXDDataReduction:
@@ -263,7 +282,8 @@ def add_simulation(
                     doCleanup=cleanupPXDDataReduction,
                     overrideDB=forceSetPXDDataReduction,
                     usePXDDataReduction=usePXDDataReduction,
-                    save_slow_pions_in_mc=save_slow_pions_in_mc)
+                    save_slow_pions_in_mc=save_slow_pions_in_mc,
+                    save_all_charged_particles_in_mc=save_all_charged_particles_in_mc)
         else:
             # use DB conditional module to decide whether ROI finding should be activated
             path_disableROI_Sim = b2.create_path()
@@ -284,7 +304,8 @@ def add_simulation(
                 components,
                 pxd_unfiltered_digits='pxd_unfiltered_digits',
                 doCleanup=cleanupPXDDataReduction,
-                save_slow_pions_in_mc=save_slow_pions_in_mc)
+                save_slow_pions_in_mc=save_slow_pions_in_mc,
+                save_all_charged_particles_in_mc=save_all_charged_particles_in_mc)
 
             roi_condition_module_Sim = path.add_module('ROIfindingConditionFromDB')
             roi_condition_module_Sim.if_true(path_enableROI_Sim, b2.AfterConditionPath.CONTINUE)

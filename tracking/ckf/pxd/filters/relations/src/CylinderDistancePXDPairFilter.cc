@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/pxd/filters/relations/CylinderDistancePXDPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -14,13 +14,15 @@
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
-using namespace Belle2;
-using namespace TrackFindingCDC;
+#include <cmath>
 
-TrackFindingCDC::Weight
+using namespace Belle2;
+using namespace TrackingUtilities;
+
+TrackingUtilities::Weight
 CylinderDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation)
 {
   const CKFToPXDState& fromState = *(relation.first);
@@ -54,8 +56,8 @@ CylinderDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, 
       while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
       while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
       const float thetaDiff = positionOnCylinder.Theta() - toStateCache.theta;
-      if (abs(phiDiff) < static_cast<float>(m_param_CylinderExtrapolationToHitPhiCut) and
-          abs(thetaDiff) < static_cast<float>(m_param_CylinderExtrapolationToHitThetaCut)) {
+      if (std::abs(phiDiff) < static_cast<float>(m_param_CylinderExtrapolationToHitPhiCut) and
+          std::abs(thetaDiff) < static_cast<float>(m_param_CylinderExtrapolationToHitThetaCut)) {
         return 1.0;
       } else {
         return NAN;
@@ -66,8 +68,8 @@ CylinderDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, 
       while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
       while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
       const float thetaDiff = fromStateCache.theta - toStateCache.theta;
-      if (abs(phiDiff) < static_cast<float>(m_param_RecoTrackToHitPhiCut) and
-          abs(thetaDiff) < static_cast<float>(m_param_RecoTrackToHitThetaCut)) {
+      if (std::abs(phiDiff) < static_cast<float>(m_param_RecoTrackToHitPhiCut) and
+          std::abs(thetaDiff) < static_cast<float>(m_param_RecoTrackToHitThetaCut)) {
         return 1.0;
       }
       return NAN;
@@ -88,8 +90,8 @@ CylinderDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, 
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
   const float thetaDiff = fromStateCache.theta - toStateCache.theta;
 
-  if (abs(phiDiff) < static_cast<float>(m_param_HitHitPhiCut) and
-      abs(thetaDiff) < static_cast<float>(m_param_HitHitThetaCut)) {
+  if (std::abs(phiDiff) < static_cast<float>(m_param_HitHitPhiCut) and
+      std::abs(thetaDiff) < static_cast<float>(m_param_HitHitThetaCut)) {
     return 1.0;
   }
 
@@ -98,25 +100,25 @@ CylinderDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, 
 
 void CylinderDistancePXDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "isBackwardCKF"), m_param_isBackwardCKF,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "isBackwardCKF"), m_param_isBackwardCKF,
                                 "Does this CKF extrapolate the tracks backward or forward?",
                                 m_param_isBackwardCKF);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cylinderExtrapolationToHitPhiCut"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "cylinderExtrapolationToHitPhiCut"),
                                 m_param_CylinderExtrapolationToHitPhiCut,
                                 "Cut in phi for the difference between extrapolated position of the Seed to a cylinder with the radius of the ToState layer and the ToState.",
                                 m_param_CylinderExtrapolationToHitPhiCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cylinderExtrapolationToHitThetaCut"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "cylinderExtrapolationToHitThetaCut"),
                                 m_param_CylinderExtrapolationToHitThetaCut,
                                 "Cut in theta for the difference between extrapolated position of the Seed to a cylinder with the radius of the ToState layer and the ToState.",
                                 m_param_CylinderExtrapolationToHitThetaCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "recoTrackToHitPhiCut"), m_param_RecoTrackToHitPhiCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "recoTrackToHitPhiCut"), m_param_RecoTrackToHitPhiCut,
                                 "Cut in phi for the difference between RecoTrack information and current hit-based state.",
                                 m_param_RecoTrackToHitPhiCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "recoTrackToHitThetaCut"), m_param_RecoTrackToHitThetaCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "recoTrackToHitThetaCut"), m_param_RecoTrackToHitThetaCut,
                                 "Cut in theta for the difference between RecoTrack information and current hit-based state.",
                                 m_param_RecoTrackToHitThetaCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitHitPhiCut"), m_param_HitHitPhiCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "hitHitPhiCut"), m_param_HitHitPhiCut,
                                 "Cut in phi between two hit-based states.", m_param_HitHitPhiCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitHitThetaCut"), m_param_HitHitThetaCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "hitHitThetaCut"), m_param_HitHitThetaCut,
                                 "Cut in theta between two hit-based states.", m_param_HitHitThetaCut);
 }

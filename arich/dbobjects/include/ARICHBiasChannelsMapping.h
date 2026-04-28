@@ -108,7 +108,7 @@ namespace Belle2 {
   private:
 
     std::map<std::vector<int>, std::tuple<int, int, int, std::string>>
-        m_channel2type;   /**< power suply channel ID link to inner cable */
+        m_channel2type;   /**< power supply channel ID link to inner cable */
 
     ClassDef(ARICHBiasChannelsMapping, 1);  /**< ClassDef, must be the last term before the closing {}*/
 

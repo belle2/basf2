@@ -26,7 +26,7 @@ HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_
 
   //Parameter definition
   addParam("inputFileList", m_inputFileNames, "List of names of HepMC2 files");
-  addParam("ignoreReadEventNr", m_ignorereadEventNr, "Parallel pythia can have dublicate event nrs.", false);
+  addParam("ignoreReadEventNr", m_ignorereadEventNr, "Parallel pythia can have duplicate event nrs.", false);
   addParam("runNum", m_runNum, "Run number", -1);
   addParam("expNum", m_expNum, "Experiment number", -1);
   addParam("minEvt", m_minEvent, "Start converting at event number.", -1);

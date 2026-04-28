@@ -24,9 +24,9 @@ namespace Belle2 {
   public:
 
     /** default constructor for ROOT */
-    PXDOccupancyEvent(): m_layer(0), m_ladder(0), m_sensor(0),
-      m_posU(0.0), m_posV(0.0), m_size(0), m_charge(0.0),
-      m_occupancy(0.0)
+    PXDOccupancyEvent(): m_posU(0.0), m_posV(0.0), m_charge(0.0),
+      m_occupancy(0.0), m_layer(0), m_ladder(0), m_sensor(0),
+      m_size(0)
     {}
 
     /** Standard constructor
@@ -42,19 +42,19 @@ namespace Belle2 {
     PXDOccupancyEvent(unsigned short layer, unsigned short ladder, unsigned short sensor,
                       float posU, float posV, unsigned short size, float charge,
                       float occupancy):
-      m_layer(layer), m_ladder(ladder), m_sensor(sensor),  m_posU(posU), m_posV(posV),
-      m_size(size), m_charge(charge), m_occupancy(occupancy)
+      m_posU(posU), m_posV(posV), m_charge(charge), m_occupancy(occupancy),
+      m_layer(layer), m_ladder(ladder), m_sensor(sensor), m_size(size)
     {}
 
+    float m_posU;      /**< local coordinate of cluster */
+    float m_posV;      /**< local coordinate of cluster */
+    float m_charge;  /**< cluster charge */
+    float m_occupancy;   /**< contribution to occupancy */
     unsigned short m_layer; /**< layer number */
     unsigned short m_ladder;  /**< ladder number */
     unsigned short m_sensor; /**< sensor number */
-    float m_posU;      /**< local coordinate of cluster */
-    float m_posV;      /**< local coordinate of cluster */
     unsigned short m_size;   /**< Cluster size */
-    float m_charge;  /**< cluster charge */
-    float m_occupancy;   /**< contribution to occupancy */
 
-    ClassDef(PXDOccupancyEvent, 2)
+    ClassDef(PXDOccupancyEvent, 3)
   };
 } // end namespace Belle2

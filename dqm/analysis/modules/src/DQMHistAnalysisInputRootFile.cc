@@ -39,26 +39,24 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   addParam("FileList", m_fileList, "List of input files", std::vector<std::string> {"input_histo.root"});
   addParam("SelectHistograms", m_histograms, "List of histogram name patterns, empty for all. Support wildcard matching (* and ?).",
            std::vector<std::string>());
-  addParam("Experiment", m_expno, "Experiment Nr", 7u);
-  addParam("RunList", m_runList, "Run Number List", std::vector<unsigned int> {1u});
-  addParam("EventsList", m_eventsList, "Number of events for each run", std::vector<unsigned int> {10u});
+  addParam("EventsList", m_eventsList, "Number of events for each run", std::vector<int>());
+  addParam("Experiment", m_expno, "Experiment Nr override", 0);
+  addParam("RunList", m_runList, "Run Number List", std::vector<int>());
   addParam("RunType", m_runType, "Run Type override", std::string(""));
-  addParam("EventFilled", m_fillEvent, "Event override", 0);
+  addParam("FillNEvent", m_fillNEvent, "NEvent override", 0);
   addParam("EventInterval", m_interval, "Time between events (seconds)", 20u);
-  addParam("NullHistogramMode", m_nullHistoMode, "Test mode for null histograms", false);
   addParam("EnableRunInfo", m_enable_run_info, "Enable Run Info", false);
-  addParam("AddRunControlHist", m_add_runcontrol_hist, "Add Hists from Run Control", false);
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }
 
 void DQMHistAnalysisInputRootFileModule::initialize()
 {
-  if (m_file != nullptr) delete m_file;
-  if (m_fileList.size() == 0) B2ERROR("File list is empty.");
-  if (m_runList.size() == 0) B2ERROR("Run list is empty.");
-  if (m_eventsList.size() == 0) B2ERROR("Events list is empty.");
-  if (m_runList.size() != m_eventsList.size()) B2ERROR("Run list does not have the same size as events list.");
-  if (m_runList.size() != m_fileList.size()) B2ERROR("Run list does not have the same size as file list.");
+  if (m_fileList.size() == 0) B2FATAL("File list is empty.");
+  if (m_eventsList.size() == 0) {
+    m_eventsList.resize(m_fileList.size(), 1); // default one events per file
+  }
+  if (m_fileList.size() != m_eventsList.size()) B2ERROR("File list does not have the same size as events list.");
+  if (m_runList.size() != 0 and m_runList.size() != m_fileList.size()) B2ERROR("Run list does not have the same size as file list.");
   m_run_idx = 0;
   m_file = new TFile(m_fileList[m_run_idx].c_str());
   m_eventMetaDataPtr.registerInDataStore();
@@ -67,12 +65,14 @@ void DQMHistAnalysisInputRootFileModule::initialize()
     m_c_info = new TCanvas("DQMInfo/c_info", "");
     m_c_info->SetTitle("");
   }
-  if (m_add_runcontrol_hist) {
-    m_h_expno = new TH1F("DQMInfo/expno", "", 1, 0, 1);
-    m_h_runno = new TH1F("DQMInfo/runno", "", 1, 0, 1);
-    m_h_rtype = new TH1F("DQMInfo/rtype", "", 1, 0, 1);
+  if (m_expno > 0)  m_h_expno = new TH1F("DQMInfo/expno", "", 1, 0, 1);
+  if (m_runList.size() != 0)  m_h_runno = new TH1F("DQMInfo/runno", "", 1, 0, 1);
+  if (m_runType != "")  m_h_rtype = new TH1F("DQMInfo/rtype", m_runType.c_str(), 1, 0, 1);
+  if (m_fillNEvent > 0) {
+    m_h_fillNEvent = new TH1F("DAQ/Nevent", "", 1, 0, 1);
+    m_h_fillNEvent->Fill(0., m_fillNEvent);
+    m_h_fillNEvent->SetEntries(m_fillNEvent);
   }
-
   B2INFO("DQMHistAnalysisInputRootFile: initialized.");
 }
 
@@ -102,9 +102,60 @@ bool DQMHistAnalysisInputRootFileModule::hnamePatternMatch(std::string pattern, 
 
 void DQMHistAnalysisInputRootFileModule::beginRun()
 {
-  B2INFO("DQMHistAnalysisInputRootFile: beginRun called. Run: " << m_runList[m_run_idx]);
-  clearHistList();
+  B2INFO("DQMHistAnalysisInputRootFile: beginRun called.");
   clearRefList();
+}
+
+void DQMHistAnalysisInputRootFileModule::addToHistList(std::vector<TH1*>& inputHistList, std::string dirname, TKey* key)
+{
+  TH1* h = (TH1*)key->ReadObj();
+  if (h == nullptr) return; // would be strange, but better check
+  std::string hname = h->GetName();
+
+  if (hname.find("/") == std::string::npos) {
+    if (dirname != "") {
+      hname = dirname + "/" + hname;
+      h->SetName(hname.c_str());
+    } else {
+      // histo in root dir without prefix -> do not keep!
+      delete h;
+      return;
+    }
+  }
+
+  bool hpass = false;
+  if (m_histograms.size() == 0) {// workaround for run info???
+    hpass = true;
+  } else {
+    for (auto& hpattern : m_histograms) {
+      if (hnamePatternMatch(hpattern, h->GetName())) {
+        hpass = true;
+        break;
+      }
+    }
+  }
+  if (!hpass) {
+    delete h;
+    return;
+  }
+
+  // Remove ":" from folder name, workaround!
+  // Is this really needed?
+  if (hname.find(":") != std::string::npos) {
+    B2ERROR("histogram or folder name with : is problematic");
+  }
+  TString a = h->GetName();
+  a.ReplaceAll(":", "");
+  h->SetName(a);
+  B2DEBUG(1, "DQMHistAnalysisInput2: get histo " << a.Data());
+
+
+  Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
+  h->Scale(scale);
+  h->SetEntries(h->GetEntries()*scale); // empty hists are not marked for update!
+
+  // Histograms in the inputHistList list will be taken care of later (delete)
+  inputHistList.push_back(h);
 }
 
 void DQMHistAnalysisInputRootFileModule::event()
@@ -112,16 +163,27 @@ void DQMHistAnalysisInputRootFileModule::event()
   B2INFO("DQMHistAnalysisInputRootFile: event called.");
   TH1::AddDirectory(false);
 
-  sleep(m_interval);
+  if (m_count == 0) {
+    // special handling for 1 event to get proper max scaling
+    if (m_eventsList[m_run_idx] == 1) m_count++;
+    else m_eventsList[m_run_idx]--;
+  } else {
+    sleep(m_interval);
+  }
 
+  // Check for run change
   if (m_count > m_eventsList[m_run_idx]) {
     m_run_idx++;
-    if (m_run_idx == m_runList.size()) {
+    if (m_run_idx == m_fileList.size()) {
       m_eventMetaDataPtr.create();
       m_eventMetaDataPtr->setEndOfData();
       return;
     }
     m_count = 0;
+    // special handling for 1 event to get proper max scaling
+    if (m_eventsList[m_run_idx] == 1) m_count = 1;
+    else m_eventsList[m_run_idx]--;
+    // open next file
     if (m_file != nullptr) {
       m_file->Close();
       delete m_file;
@@ -133,126 +195,108 @@ void DQMHistAnalysisInputRootFileModule::event()
   // which expects analysis run in endRun function
   initHistListBeforeEvent();
 
-  if (m_nullHistoMode) {
-    m_eventMetaDataPtr.create();
-    m_eventMetaDataPtr->setExperiment(m_expno);
-    m_eventMetaDataPtr->setRun(m_runList[m_run_idx]);
-    m_eventMetaDataPtr->setEvent(m_count);
-    m_eventMetaDataPtr->setTime(0);
-    //setExpNr(m_expno); // redundant access from MetaData
-    //setRunNr(m_runno); // redundant access from MetaData
-    setRunType(m_runType);
-    //ExtractRunType();
-    setEventProcessed(m_fillEvent);
-    //ExtractEvent();
+  /** Input vector for histograms */
+  std::vector<TH1*> inputHistList;
 
-    B2INFO("DQMHistAnalysisInputRootFile: event finished. count: " << m_count);
-    m_count++;
-    return;
-  }
-
-  std::vector<TH1*> hs;
   unsigned long long int ts = 0;
   m_file->cd();
   TIter next(m_file->GetListOfKeys());
-  TKey* key = NULL;
-  while ((key = (TKey*)next())) {
+  while (auto key = (TKey*)next()) {
     TClass* cl = gROOT->GetClass(key->GetClassName());
     if (ts == 0) ts = key->GetDatime().Convert();
-    if (!cl->InheritsFrom("TDirectory")) continue;
-    TDirectory* d = (TDirectory*)key->ReadObj();
-    std::string dirname = d->GetName();
+    if (cl->InheritsFrom("TDirectory")) {
+      TDirectory* d = (TDirectory*)key->ReadObj();
+      std::string dirname = d->GetName();
 
-    d->cd();
-    TIter nextd(d->GetListOfKeys());
+      d->cd();
+      TIter nextd(d->GetListOfKeys());
 
-    TKey* dkey;
-    while ((dkey = (TKey*)nextd())) {
-      TClass* dcl = gROOT->GetClass(dkey->GetClassName());
-      if (!dcl->InheritsFrom("TH1")) continue;
-      TH1* h = (TH1*)dkey->ReadObj();
-      if (h->InheritsFrom("TH2")) h->SetOption("col");
-      else h->SetOption("hist");
-      Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
-      h->Scale(scale);
-      std::string hname = h->GetName();
-
-      bool hpass = false;
-      if (m_histograms.size() == 0) {
-        hpass = true;
-      } else {
-        for (auto& hpattern : m_histograms) {
-          if (hnamePatternMatch(hpattern, dirname + "/" + hname)) {
-            hpass = true;
-            break;
-          }
+      while (auto dkey = (TKey*)nextd()) {
+        if (gROOT->GetClass(dkey->GetClassName())->InheritsFrom("TH1")) {
+          addToHistList(inputHistList, dirname, dkey);
         }
       }
-      if (!hpass) continue;
-
-      if (hname.find("/") == std::string::npos) h->SetName((dirname + "/" + hname).c_str());
-      hs.push_back(h);
-    }
-    m_file->cd();
-  }
-
-  // if no histograms are found in the sub-directories
-  // search the top folder
-  if (hs.size() == 0) {
-    TIter nexth(m_file->GetListOfKeys());
-    TKey* keyh = NULL;
-    while ((keyh = (TKey*)nexth())) {
-      TClass* cl = gROOT->GetClass(keyh->GetClassName());
-      TH1* h;
-      if (!cl->InheritsFrom("TH1")) continue;
-      h = (TH1*)keyh->ReadObj();
-
-      bool hpass = false;
-      if (m_histograms.size() == 0) {
-        hpass = true;
-      } else {
-        for (auto& hpattern : m_histograms) {
-          if (hnamePatternMatch(hpattern, h->GetName())) {
-            hpass = true;
-            break;
-          }
-        }
-      }
-      if (!hpass) continue;
-
-      hs.push_back(h);
-      Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
-      h->Scale(scale);
+      m_file->cd();
+    } else if (cl->InheritsFrom("TH1")) {
+      addToHistList(inputHistList, "", key);
     }
   }
 
-  auto runno = m_runList[m_run_idx];
-  if (m_c_info != NULL) m_c_info->SetTitle(("OFFLINE: Exp " + std::to_string(m_expno) + ", Run " + std::to_string(
-                                                runno) + ", RunType " + m_runType + ", Last Changed NEVER, Last Updated NEVER, Last DQM event NEVER").c_str());
+  auto expno = m_expno;
+  auto runno = m_runList.size() ? m_runList[m_run_idx] : 0;
+  auto rtype = m_runType;
+
+  if (m_h_expno) {
+    m_h_expno->SetTitle(std::to_string(expno).c_str());
+    inputHistList.push_back((TH1*)(m_h_expno->Clone()));
+  }
+  if (m_h_runno) {
+    m_h_runno->SetTitle(std::to_string(runno).c_str());
+    inputHistList.push_back((TH1*)(m_h_runno->Clone()));
+  }
+  if (m_h_rtype) {
+    m_h_rtype->SetTitle(rtype.c_str());
+    inputHistList.push_back((TH1*)(m_h_rtype->Clone()));
+  }
+  if (m_fillNEvent > 0) {
+    inputHistList.push_back((TH1*)(m_h_fillNEvent->Clone()));
+  }
+  // check for no-override
+  for (auto& h : inputHistList) {
+    if (std::string(h->GetName()) == std::string("DQMInfo/expno")) {
+      if (expno == 0) {
+        expno = atoi(h->GetTitle());
+      } else {
+        h->SetTitle(std::to_string(expno).c_str());
+      }
+    }
+    if (std::string(h->GetName()) == std::string("DQMInfo/runno")) {
+      if (runno == 0) {
+        runno = atoi(h->GetTitle());
+      } else {
+        h->SetTitle(std::to_string(runno).c_str());
+      }
+    }
+    if (std::string(h->GetName()) == std::string("DQMInfo/rtype")) {
+      if (rtype == "") {
+        rtype = h->GetTitle();
+      } else {
+        h->SetTitle(rtype.c_str());
+      }
+    }
+    if (std::string(h->GetName()) == std::string("DAQ/Nevent")) {
+      if (m_fillNEvent > 0) {
+        Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
+        h->Scale(scale);
+        h->SetEntries(h->GetEntries()*scale); // empty hists are not marked for update!
+      }
+    }
+  }
+
+  if (m_c_info != nullptr) m_c_info->SetTitle(("OFFLINE: Exp " + std::to_string(expno) + ", Run " + std::to_string(
+                                                   runno) + ", RunType " + rtype + ", Last Changed NEVER, Last Updated NEVER, Last DQM event NEVER").c_str());
 
   m_count++;
   m_eventMetaDataPtr.create();
-  m_eventMetaDataPtr->setExperiment(m_expno);
-  m_eventMetaDataPtr->setRun(m_runList[m_run_idx]);
+  m_eventMetaDataPtr->setExperiment(expno);
+  m_eventMetaDataPtr->setRun(runno);
   m_eventMetaDataPtr->setEvent(m_count);
   m_eventMetaDataPtr->setTime(ts * 1e9);
 
-  if (m_add_runcontrol_hist) {
-    m_h_expno->SetTitle(std::to_string(m_expno).c_str());
-    hs.push_back(m_h_expno);
-    m_h_runno->SetTitle(std::to_string(runno).c_str());
-    hs.push_back(m_h_runno);
-    m_h_rtype->SetTitle(m_runType.c_str());
-    hs.push_back(m_h_rtype);
+  ExtractRunType(inputHistList);
+  ExtractNEvent(inputHistList);
+
+  if (m_lastRun != runno or m_lastExp != expno) {
+    // Run change detected
+    m_lastRun = runno;
+    m_lastExp = expno;
+    // we cannot do that in beginRun(), otherwise all histos are cleare before first event
+    clearHistList();
   }
-  //setExpNr(m_expno); // redundant access from MetaData
-  //setRunNr(m_runno); // redundant access from MetaData
-  if (m_runType == "") ExtractRunType(hs);
-  if (m_fillEvent <= 0) ExtractEvent(hs);
 
   // this code must be run after "event processed" has been extracted
-  for (size_t i = 0; i < hs.size(); i++) {
-    TH1* h = hs[i];
+  for (size_t i = 0; i < inputHistList.size(); i++) {
+    TH1* h = inputHistList[i];
     addHist("", h->GetName(), h);
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
   }

@@ -99,8 +99,7 @@ namespace Belle2 {
       m_i2io(-1),
       m_n_iecl(-1),
       m_n_iklm(-1),
-      m_n_eecleklm(-1),
-      m_tauNeuro(false)
+      m_n_eecleklm(-1)
     {}
     ~TRGGRLInfo() {}
 
@@ -215,17 +214,17 @@ namespace Belle2 {
     int getNshorttrk_fwd() const  {return m_n_st_fwd;}
     /**get the number of bwd short tracks*/
     int getNshorttrk_bwd() const  {return m_n_st_bwd;}
-    /**get s2s3: short-to-short b2b, 10 to 30 degress*/
+    /**get s2s3: short-to-short b2b, 10 to 30 degrees*/
     int gets2s3() const  {return m_s2s3;}
-    /**get s2s5: short-to-short b2b, 10 to 50 degress*/
+    /**get s2s5: short-to-short b2b, 10 to 50 degrees*/
     int gets2s5() const  {return m_s2s5;}
     /**get s2so: short-to-short opening angle > 90 degrees*/
     int gets2so() const  {return m_s2so;}
     /**get s2s30: short-to-short opening angle > 30 degrees*/
     int gets2s30() const  {return m_s2s30;}
-    /**get s2f3: short-to-full b2b, 10 to 30 degress*/
+    /**get s2f3: short-to-full b2b, 10 to 30 degrees*/
     int gets2f3() const  {return m_s2f3;}
-    /**get s2f5: short-to-full b2b, 10 to 50 degress*/
+    /**get s2f5: short-to-full b2b, 10 to 50 degrees*/
     int gets2f5() const  {return m_s2f5;}
     /**get s2fo: short-to-full opening angle > 90 degrees*/
     int gets2fo() const  {return m_s2fo;}
@@ -270,7 +269,7 @@ namespace Belle2 {
     /**get GDL input bit */
     bool getInputBits(int i) const {return m_InputBits[i];}
     /**get the the tau neuro net result*/
-    bool getTauNN() const  {return m_tauNeuro;}
+    bool getTauNN(int i) const  {return m_tauNeuro[i];}
 
     /**set the number of 2D tracks*/
     void setN2Dfindertrk(int N2Dfindertrk)  {m_n_2dfinder_track = N2Dfindertrk;}
@@ -380,17 +379,17 @@ namespace Belle2 {
     void setNshorttrk_fwd(int Nshorttrk_fwd)  {m_n_st_fwd = Nshorttrk_fwd;}
     /**set the number of bwd short tracks*/
     void setNshorttrk_bwd(int Nshorttrk_bwd)  {m_n_st_bwd = Nshorttrk_bwd;}
-    /**set s2s3: short-to-short b2b, 10 to 30 degress*/
+    /**set s2s3: short-to-short b2b, 10 to 30 degrees*/
     void sets2s3(int s2s3) {m_s2s3 = s2s3;}
-    /**set s2s5: short-to-short b2b, 10 to 50 degress*/
+    /**set s2s5: short-to-short b2b, 10 to 50 degrees*/
     void sets2s5(int s2s5) {m_s2s5 = s2s5;}
     /**set s2so: short-to-short opening angle > 90 degrees*/
     void sets2so(int s2so) {m_s2so = s2so;}
     /**set s2s30: short-to-short opening angle > 30 degrees*/
     void sets2s30(int s2s30) {m_s2s30 = s2s30;}
-    /**set s2f3: short-to-full b2b, 10 to 30 degress*/
+    /**set s2f3: short-to-full b2b, 10 to 30 degrees*/
     void sets2f3(int s2f3) {m_s2f3 = s2f3;}
-    /**set s2f5: short-to-full b2b, 10 to 50 degress*/
+    /**set s2f5: short-to-full b2b, 10 to 50 degrees*/
     void sets2f5(int s2f5) {m_s2f5 = s2f5;}
     /**set s2fo: short-to-full opening angle > 90 degrees*/
     void sets2fo(int s2fo) {m_s2fo = s2fo;}
@@ -435,7 +434,7 @@ namespace Belle2 {
     /**set GDL input bit*/
     void setInputBits(int i, bool bit) {m_InputBits[i] = bit;}
     /**set tau neuro net result*/
-    void setTauNN(bool istau)  {m_tauNeuro = istau;}
+    void setTauNN(int i, bool istau)  {m_tauNeuro[i] = istau;}
 
   private:
     /**#2D finder tracks*/
@@ -470,7 +469,7 @@ namespace Belle2 {
     int m_n_neutral_cluster;
     /**# ecl clusers with energy threshold 300Mev */
     int m_n_high_300_cluster;
-    /**# ecl clusers with energy threshold 1GeV, TC ID 1,2,17 is exlcuded for dedicated single photon trigger */
+    /**# ecl clusers with energy threshold 1GeV, TC ID 1,2,17 is excluded for dedicated single photon trigger */
     int m_n_high_1000_cluster;
     /**# ecl clusers with energy threshold 1GeV */
     int m_n_high_1000_cluster415;
@@ -488,7 +487,7 @@ namespace Belle2 {
     int m_n_high_2000_cluster117;
     /**# ecl clusers with energy threshold 2GeV in TC ID 1 and 17 */
     int m_n_high_2000_endcap_cluster;
-    /**# back to back ecl cluser pairs */
+    /**# back to back ecl cluster pairs */
     int m_nbbc;
     /**# back to back cdc track and ecl clsuter*/
     int m_nbbtc;
@@ -554,17 +553,17 @@ namespace Belle2 {
     int m_n_st_fwd;
     /**the number of bwd short tracks*/
     int m_n_st_bwd;
-    /**s2s3: short-to-short b2b, 10 to 30 degress*/
+    /**s2s3: short-to-short b2b, 10 to 30 degrees*/
     int m_s2s3;
-    /**s2s5: short-to-short b2b, 10 to 50 degress*/
+    /**s2s5: short-to-short b2b, 10 to 50 degrees*/
     int m_s2s5;
     /**s2so: short-to-short opening angle > 90 degrees*/
     int m_s2so;
     /**s2s30: short-to-short opening angle > 30 degrees*/
     int m_s2s30;
-    /**s2f3: short-to-full b2b, 10 to 30 degress*/
+    /**s2f3: short-to-full b2b, 10 to 30 degrees*/
     int m_s2f3;
-    /**s2f5: short-to-full b2b, 10 to 50 degress*/
+    /**s2f5: short-to-full b2b, 10 to 50 degrees*/
     int m_s2f5;
     /**s2fo: short-to-full opening angle > 90 degrees*/
     int m_s2fo;
@@ -609,10 +608,10 @@ namespace Belle2 {
     /**GDL input bits**/
     std::vector<bool> m_InputBits = std::vector<bool>(320, false);
     /**if the events satisfied tau neuro net selection*/
-    bool m_tauNeuro;
+    std::vector<bool> m_tauNeuro = std::vector<bool>(10, false);
 
     /**! The Class title*/
-    ClassDef(TRGGRLInfo, 7); /*< the class title */
+    ClassDef(TRGGRLInfo, 8); /*< the class title */
   };
 } // end namespace Belle2
 

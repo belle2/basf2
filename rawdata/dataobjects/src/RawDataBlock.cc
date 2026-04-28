@@ -37,7 +37,7 @@ void RawDataBlock::SetBuffer(int* bufin, int nwords, int delete_flag, int num_ev
 
   if (bufin == NULL) {
     char err_buf[500];
-    sprintf(err_buf, "[DEBUG] bufin is NULL. Exting...\n");
+    sprintf(err_buf, "[DEBUG] bufin is NULL. Exiting...\n");
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf);
   }

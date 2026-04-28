@@ -12,7 +12,6 @@
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <arich/dataobjects/ARICHTrack.h>
 #include <arich/dataobjects/ARICHPhoton.h>
-#include <arich/dataobjects/ARICHHit.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 
@@ -89,14 +88,14 @@ void arichToNtupleModule::initialize()
 
   // Initializing the output root file
   if (m_fileName.empty()) {
-    B2FATAL("Output root file name is not set. Please set a vaild root output file name (\"fileName\" module parameter).");
+    B2FATAL("Output root file name is not set. Please set a valid root output file name (\"fileName\" module parameter).");
   }
   // See if there is already a file in which case add a new tree to it ...
   // otherwise create a new file (all handled by framework)
   m_file =  RootFileCreationManager::getInstance().getFile(m_fileName);
   if (!m_file) {
     B2ERROR("Could not create file \"" << m_fileName <<
-            "\". Please set a vaild root output file name (\"fileName\" module parameter).");
+            "\". Please set a valid root output file name (\"fileName\" module parameter).");
     return;
   }
 
@@ -264,7 +263,7 @@ void arichToNtupleModule::terminate()
     const bool writeError = m_file->TestBit(TFile::kWriteError);
     m_file.reset();
     if (writeError) {
-      B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
+      B2FATAL("A write error occurred while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
   }
 }

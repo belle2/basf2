@@ -6,9 +6,7 @@ Various additions
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 30min
-
-    **Exercises**: 15min
+    **Length**: 45-60 min
 
     **Prerequisites**:
 
@@ -72,7 +70,7 @@ positrons.
    interfere with the flow of the lesson).
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    The case of parallel acceleration and velocity should be straightforward. For
    the perpendicular case, the next identity may be useful:
@@ -83,7 +81,7 @@ positrons.
         \dot{\beta}^2\beta^2 - \left(\vec{\beta} \times \dot{\vec{\beta}}\right)^2
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. math::
 
@@ -141,7 +139,7 @@ with the `passesCut` function.
     How would you define the alias ``myCut`` for the cut ``E > 1 and p > 1``?
 
 .. admonition:: Solution
-    :class: solution toggle
+    :class: dropdown solution
 
     You can use the ``passesCut`` function to turn a cut into a variable and
     assign an alias for it.
@@ -167,7 +165,7 @@ with the `passesCut` function.
    combine them to a ``goodGamma`` cut and use this to fill the particle list.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    The cuts will look like this:
 
@@ -180,7 +178,7 @@ with the `passesCut` function.
    where the ``XXX`` should be filled by you.
 
 .. admonition:: Another hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    This is the first one:
 
@@ -190,7 +188,7 @@ with the `passesCut` function.
            :language: python        
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
         .. literalinclude:: steering_files/039_various_additions.py
            :start-at: S20
@@ -217,7 +215,7 @@ one Bremsstrahlung photon was added to this particle.
    Bremsstrahlung corrected
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
         .. literalinclude:: steering_files/039_various_additions.py
            :start-at: S30
@@ -233,7 +231,7 @@ one Bremsstrahlung photon was added to this particle.
    daughter(s) momenta and this particle momentum?
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    No Bremsstrahlung photons were found for this particle, so it only has *one*
    daughter, the original uncorrected one.
@@ -247,12 +245,12 @@ one Bremsstrahlung photon was added to this particle.
    Belle II one?
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    Take a look at the documentation: `correctBremsBelle`
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. code-block:: python
 
@@ -292,7 +290,7 @@ Bremsstrahlung recovery?
     You may find the meta-variable `daughterCombination` useful.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     ``daughterCombination(M,0:0,1:0)`` will give us the invariant mass of the first
     daughter of the first daughter, and the first daughter of the second daughter.
@@ -301,14 +299,14 @@ Bremsstrahlung recovery?
     the :math:`J/\psi` meson.
 
 .. admonition:: Hint
-    :class: toggle xhint stacked
+    :class: dropdown xhint stacked
 
     We can do this by directly appending the expression to
     the list of :math:`J/\psi` variables we want to store, or we can rather make it a
     variable of the B mesons, by using the `daughter` meta-variable.
 
 .. admonition:: Solution
-    :class: toggle solution
+    :class: dropdown solution
 
     .. literalinclude:: steering_files/039_various_additions.py
       :start-at: S50
@@ -321,7 +319,7 @@ Bremsstrahlung recovery?
     Your steering file should now be complete. Please run it or compare it with the solution.
 
 .. admonition:: Solution
-    :class: solution toggle
+    :class: dropdown solution
 
     Your steering file should look like this:
 
@@ -335,7 +333,7 @@ Bremsstrahlung recovery?
     :math:`J/\psi` mesons
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
     .. literalinclude:: roe/invariant_mass_plot.py
       :language: python        
@@ -414,18 +412,18 @@ random seed.
 .. admonition:: Exercise
    :class: exercise stacked
 
-   Set the basf2 random seed to ``"Belle II StarterKit"``.
+   Set the ``basf2`` random seed to ``"Belle II StarterKit"``.
    Then, rank your B mesons using the `random` variable, with the one with the
    highest value first.
    Keep only the best candidate.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    You may want to check the documentation for the `rankByHighest` and `set_random_seed` functions.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
     .. literalinclude:: steering_files/039_various_additions.py
        :start-at: S60
@@ -446,7 +444,7 @@ random seed.
     solution.
 
 .. admonition:: Solution
-     :class: solution toggle
+     :class: dropdown solution
 
      .. literalinclude:: steering_files/039_various_additions.py
        :language: python        

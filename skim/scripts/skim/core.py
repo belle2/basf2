@@ -106,6 +106,12 @@ class BaseSkim(ABC):
     PID globaltag.
     """
 
+    roundToMdstPrecision = False
+    """
+    Add the MdstRounder module before running the skim.
+    Useful when skipping mdst output before skimming.
+    """
+
     @property
     @abstractmethod
     def __description__(self):
@@ -141,6 +147,7 @@ class BaseSkim(ABC):
         mc=True,
         analysisGlobaltag=None,
         pidGlobaltag=None,
+        roundToMdstPrecision=False
     ):
         """Initialise the BaseSkim class.
 
@@ -154,6 +161,7 @@ class BaseSkim(ABC):
             mc (bool): If True, include MC quantities in output.
             analysisGlobaltag (str): Analysis globaltag.
             pidGlobaltag (str): PID globaltag.
+            roundToMdstPrecision (bool): If True, add MdstRounder module before skim
         """
         self.name = self.__class__.__name__
         self.OutputFileName = OutputFileName
@@ -163,6 +171,7 @@ class BaseSkim(ABC):
         self.mc = mc
         self.analysisGlobaltag = analysisGlobaltag
         self.pidGlobaltag = pidGlobaltag
+        self.roundToMdstPrecision = roundToMdstPrecision
 
         if self.NoisyModules is None:
             self.NoisyModules = []
@@ -225,6 +234,10 @@ class BaseSkim(ABC):
             path (basf2.Path): Skim path to be processed.
         """
         self._MainPath = path
+
+        if self.roundToMdstPrecision:
+            path.add_module("PruneDataStore", keepMatchedEntries=False, matchEntries=[".*:all", ".*:kink", ".*:V0"])
+            path.add_module("MdstRounder")
 
         self.initialise_skim_flag(path)
         self.load_standard_lists(path)
@@ -491,7 +504,7 @@ class CombinedSkim(BaseSkim):
 
     The heavy-lifting functions `BaseSkim.additional_setup`, `BaseSkim.build_lists` and
     `BaseSkim.output_udst` are modified to loop over the corresponding functions of each
-    invididual skim. The `load_standard_lists` method is also modified to load all
+    individual skim. The `load_standard_lists` method is also modified to load all
     required lists, without accidentally loading a list twice.
 
     Calling an instance of the `CombinedSkim` class will load all the required particle
@@ -517,6 +530,7 @@ class CombinedSkim(BaseSkim):
             mc=None,
             analysisGlobaltag=None,
             pidGlobaltag=None,
+            roundToMdstPrecision=False
     ):
         """Initialise the CombinedSkim class.
 
@@ -535,6 +549,7 @@ class CombinedSkim(BaseSkim):
             mc (bool): If True, include MC quantities in output.
             analysisGlobaltag (str): Analysis globaltag.
             pidGlobaltag (str): PID globaltag.
+            roundToMdstPrecision (bool): If True, add MdstRounder module before skim
         """
 
         if NoisyModules is None:
@@ -577,6 +592,7 @@ class CombinedSkim(BaseSkim):
             for skim in self:
                 skim.pidGlobaltag = pidGlobaltag
 
+        self.roundToMdstPrecision = roundToMdstPrecision
         self._mdstOutput = mdstOutput
         self.mdst_kwargs = mdst_kwargs or {}
         self.mdst_kwargs.update(OutputFileName=OutputFileName)
@@ -595,6 +611,10 @@ class CombinedSkim(BaseSkim):
     def __call__(self, path):
         for skim in self:
             skim._MainPath = path
+
+        if self.roundToMdstPrecision:
+            path.add_module("PruneDataStore", keepMatchedEntries=False, matchEntries=[".*:all", ".*:kink", ".*:V0"])
+            path.add_module("MdstRounder")
 
         self.initialise_skim_flag(path)
         self.load_standard_lists(path)
@@ -701,6 +721,14 @@ class CombinedSkim(BaseSkim):
         passes_flag = path.add_module("VariableToReturnValue", variable=variable)
         passes_flag.if_value(">0", passes_flag_path, b2.AfterConditionPath.CONTINUE)
 
+        # Check if CombinedSkimName is registered and throw error if not
+        if self.name not in Registry.names:
+            b2.B2ERROR(f"Unrecognised skim name \"{self.name}\" in CombinedSkim with single "
+                       "mdst output. Please specify a valid name registered in `skim/scripts/skim/registry.py` "
+                       "by setting the CombinedSkimName argument of CombinedSkim, or use \"f_custom\" if you are "
+                       "running a custom skim combination.")
+            raise LookupError(self.name)
+
         filename = kwargs.get("filename", kwargs.get("OutputFileName", self.code))
 
         if filename is None:
@@ -715,15 +743,7 @@ class CombinedSkim(BaseSkim):
             del kwargs["OutputFileName"]
 
         kwargs.setdefault("dataDescription", {})
-
-        # If the combinedSkim is not in the registry getting the code will throw a LookupError.
-        # There is no requirement that a combinedSkim with single MDST output is
-        # registered so set the skimDecayMode to ``None`` if no code is defined.
-        try:
-            skim_code = self.code
-        except LookupError:
-            skim_code = None
-        kwargs["dataDescription"].setdefault("skimDecayMode", skim_code)
+        kwargs["dataDescription"].setdefault("skimDecayMode", self.code)
 
         try:
             kwargs["additionalBranches"] += ["EventExtraInfo"]

@@ -22,8 +22,6 @@ namespace Belle2 {
   /** Namespace to encapsulate code needed for the BEAMABORT detector */
   namespace beamabort {
 
-    class SensitiveDetector;
-
     /** The creator for the BEAMABORT geometry. */
     class BeamabortCreator : public geometry::CreatorBase {
     private:

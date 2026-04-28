@@ -47,7 +47,7 @@ namespace Belle2 {
         vxdServiceGeometryPar.getBoxTypes().push_back(boxtypePar);
       }
 
-      // Read paramater to place boxes
+      // Read parameter to place boxes
       for (const GearDir& position : content2.getNodes("Position")) {
         VXDBoxPositionsPar positionPar(
           position.getString("@name"),

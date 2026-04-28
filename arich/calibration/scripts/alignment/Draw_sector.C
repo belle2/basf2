@@ -81,7 +81,7 @@ void Draw_sector(const char*file){
   TF1*h2_fit=new TF1("h2_fit", "gaus(0)+pol1(3)", 0.98, 1.04);
   h2_fit->SetParameters(500000, 1.01, 0.004, 0, 0);
 
-  // Difine Canvas                                                                 
+  // Define Canvas                                                                 
   TCanvas* c1 = new TCanvas("c1");
   c1->Update();
   c1->Divide(2,2);
@@ -97,7 +97,7 @@ void Draw_sector(const char*file){
   g->Draw("AP");
 
 
-  //Difine Canvas 6*6   
+  //Define Canvas 6*6   
   TCanvas* c2=new TCanvas("c2");
   c2->Update();
   c2->Divide(6,6);
@@ -109,7 +109,7 @@ void Draw_sector(const char*file){
       int s=m+3*t; //0~35                                                                                 
       c2->cd(s+1); //change divided canvas                                                                
       h4[s]=new TH2D(Form("h4_%d",s),";phi[rad];n*cos(theta_c)", 32, -3.2, 3.2, 40, 0.98, 1.02); //Difine24 histograms                                   
-      //Difine range                                                                    
+      //Define range                                                                    
       int rmin=50+m*18.5; //50~87                                                        
       int rmax=50+(m+1)*18.5; //68.5~105.5                                             
       double phiMin=-TMath::Pi()+t*TMath::Pi()/6.0; //-pi~(2pi/3)   
@@ -142,8 +142,8 @@ void Draw_sector(const char*file){
     //c4[k]->Divide(5,3);
     for(Int_t i=0;i<N;i++){
       //c4[k]->cd(i+1);
-      first=h4[k]->GetXaxis()->FindBin(-3.0+i*0.5-0.1); //Difine first bin 0.92,0.92,...,1.05 
-      last=h4[k]->GetXaxis()->FindBin(-3.0+i*0.5+0.1); //Difine last bin 0.92,0.93,...,1.06   
+      first=h4[k]->GetXaxis()->FindBin(-3.0+i*0.5-0.1); //Define first bin 0.92,0.92,...,1.05 
+      last=h4[k]->GetXaxis()->FindBin(-3.0+i*0.5+0.1); //Define last bin 0.92,0.93,...,1.06   
       projection[i]=h4[k]->ProjectionY(Form("projection_%d",i),first,last); //Divide h2 into 13 (ProjectionY)                                                                   
              
       Float_t Max=projection[i]->GetMaximum();

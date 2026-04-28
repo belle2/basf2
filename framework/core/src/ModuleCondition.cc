@@ -20,7 +20,8 @@
 using namespace Belle2;
 using namespace boost::python;
 
-ModuleCondition::ModuleCondition(std::string expression, PathPtr conditionPath, EAfterConditionPath afterConditionPath):
+ModuleCondition::ModuleCondition(std::string expression, std::shared_ptr<Path> conditionPath,
+                                 EAfterConditionPath afterConditionPath):
   m_conditionPath(std::move(conditionPath)),
   m_afterConditionPath(afterConditionPath)
 {

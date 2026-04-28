@@ -33,7 +33,7 @@ class PxdROIPayloadTestModule(b2.Module):
         # first convert to a python-list to be able to sort
         py_list = list(unsortedPyStoreArray)
 
-        # sort via a hierachy of sort keys
+        # sort via a hierarchy of sort keys
         return sorted(py_list,
                       key=lambda x: (
                           x.getSensorID(),
@@ -124,7 +124,10 @@ class PxdROIPayloadTestModule(b2.Module):
                         j += 1
                         unp = unpackedrois[j]
 
-                if not(unp.getMinUid() == 0 and unp.getMinVid() == 0 and unp.getMaxUid() == 250 - 1 and unp.getMaxVid() == 768 - 1):
+                if not (unp.getMinUid() == 0
+                        and unp.getMinVid() == 0
+                        and unp.getMaxUid() == 250 - 1
+                        and unp.getMaxVid() == 768 - 1):
                     assert org.getSensorID().getID() == unp.getSensorID().getID()
                     assert org.getMinUid() == unp.getMinUid()
                     assert org.getMaxUid() == unp.getMaxUid()
@@ -163,7 +166,7 @@ main.add_module('Progress')
 
 main.add_module(PXDROIUnpackerModule.PXDPayloadROIUnpackerModule())
 
-# run custom test module to check ROI befor and after packing/unpacking
+# run custom test module to check ROI before and after packing/unpacking
 main.add_module(PxdROIPayloadTestModule())
 
 # Process events

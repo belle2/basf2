@@ -8,13 +8,11 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
-
 #include <vector>
 #include <string>
-//#include <algorithm>
 
 namespace Belle2 {
+  class Particle;
   namespace CurlTagger {
 
     /** class to contain particles identified to come from the same actual/mc particle */

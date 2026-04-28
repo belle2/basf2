@@ -41,9 +41,9 @@ namespace Belle2 {
     /** Terminates the module. */
     virtual void terminate() override;
 
-    /** Apply cuts on a Particle and call for all daugthers recursively.
+    /** Apply cuts on a Particle and call for all daughters recursively.
      * @param particle Particle to check
-     * @param cut Indicates wether the mother has been removed
+     * @param cut Indicates whether the mother has been removed
      */
     void applyCuts(const MCParticle& particle, bool cut = false);
 

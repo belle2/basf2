@@ -23,7 +23,7 @@ namespace Belle2 {
     typedef unsigned long bundleType; /**< typedef for the bundle type*/
     typedef std::vector< bundleType > payloadContainerType; /**< typedef of the vector of bundle type*/
 
-    static const int nBitsInBundle = CHAR_BIT * sizeof(bundleType); /**< nuber of bits in the bundle*/
+    static const int nBitsInBundle = CHAR_BIT * sizeof(bundleType); /**< number of bits in the bundle*/
 
     /** default constructor*/
     SVDCalibrationsBitmap() {};

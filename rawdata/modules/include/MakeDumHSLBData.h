@@ -37,7 +37,7 @@ namespace Belle2 {
     //! Output file name
     std::string m_out_fname;
 
-    //! File descripter
+    //! File descriptor
     int m_filefd;
 
   };

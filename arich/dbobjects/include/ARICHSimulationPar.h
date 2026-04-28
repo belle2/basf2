@@ -13,7 +13,7 @@
 
 namespace Belle2 {
   //! The Class for ARICH simulation parameters
-  /*! This class provides ARICH paramters for simulation, such as QE vs. wavelength curve for HAPDs,
+  /*! This class provides ARICH parameters for simulation, such as QE vs. wavelength curve for HAPDs,
       parameters to describe negative polarity crosstalk of channels of APD, ...
   */
 
@@ -43,7 +43,7 @@ namespace Belle2 {
     double getQEScaling() const {return (double)m_qeScale;}
 
     /**
-     * Get absorbtion probability for photons internally reflected in HAPD window
+     * Get absorption probability for photons internally reflected in HAPD window
      */
     double getWindowAbsorbtion() const {return (double)m_windowAbsorbtion;}
 
@@ -78,8 +78,8 @@ namespace Belle2 {
     void setQEScaling(double qescale) { m_qeScale = (float)qescale;}
 
     /**
-    * Set absorbtion probability for photons internally reflected in HAPD window
-    * @param abs absorbtion probability
+    * Set absorption probability for photons internally reflected in HAPD window
+    * @param abs absorption probability
     */
     void setWindowAbsorbtion(double abs) { m_windowAbsorbtion = (float)abs;}
 
@@ -109,7 +109,7 @@ namespace Belle2 {
   private:
 
     float m_qeScale = 0;                   /*!< QE scale factor for photons internally reflected in HAPD window */
-    float m_windowAbsorbtion = 0;          /*!< absorbtion probability for photons internally reflected in HAPD window */
+    float m_windowAbsorbtion = 0;          /*!< absorption probability for photons internally reflected in HAPD window */
     float m_chipNegativeCrosstalk = 0;     /*!< to simulate opposite polarity crosstalk among channels on chip */
     float m_peakQE = 0;                    /*!< maximal peak QE of all HAPDs */
 

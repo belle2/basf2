@@ -148,7 +148,7 @@ namespace Belle2 {
     /** List of all checked and validated filepaths that are searched for map files. */
     std::list<std::string> m_moduleSearchPathList;
 
-    /** Maps the module name to the filename of the shared library which containes the module. */
+    /** Maps the module name to the filename of the shared library which contains the module. */
     std::map<std::string, std::string> m_moduleNameLibMap;
 
     std::map<std::string, ModuleProxyBase*> m_registeredProxyMap; /**< Maps the module name to a pointer of its proxy. */

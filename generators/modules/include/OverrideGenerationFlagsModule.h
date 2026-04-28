@@ -16,7 +16,7 @@
 namespace Belle2 {
 
   /**
-   * Ovverride generation flags.
+   * Override generation flags.
    */
   class OverrideGenerationFlagsModule : public Module {
 

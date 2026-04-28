@@ -169,14 +169,14 @@ namespace Belle2 {
 
   double TRGCDCLpar::x(double r) const
   {
-    double t_x, t_y;
+    double t_x = 0, t_y = 0;
     xy(r, t_x, t_y);
     return t_x;
   }
 
   double TRGCDCLpar::y(double r) const
   {
-    double t_x, t_y;
+    double t_x = 0, t_y = 0;
     xy(r, t_x, t_y);
     return t_y;
   }

@@ -24,6 +24,7 @@ NeutralHadron4MomentumCalculatorModule::NeutralHadron4MomentumCalculatorModule()
   // Set module properties
   setDescription(
     R"DOC(Calculates 4-momentum of a neutral hadron in a given decay chain e.g. B0 -> J/Psi K_L0, or anti-B0 -> p+ K- anti-n0.)DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("decayString", m_decayString, "Decay string for which one wants to perform the calculation", std::string(""));

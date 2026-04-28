@@ -23,7 +23,7 @@ namespace Belle2 {
    */
   class ZMQTxWorkerModule : public Module {
   public:
-    /// Constructor setting the moudle paramters
+    /// Constructor setting the module parameters
     ZMQTxWorkerModule();
     /// Pack the datastore and stream it.
     void event() override;

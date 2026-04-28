@@ -19,7 +19,7 @@ namespace Belle2 {
     /// Short for the class of the time stamp (it is a system clock time stamp)
     using TimeStamp = std::chrono::time_point<std::chrono::system_clock>;
   public:
-    /// Constructor setting the informations. Takes ownership of the evtMsg.
+    /// Constructor setting the information. Takes ownership of the evtMsg.
     ProcessedEventBackup(std::unique_ptr<EvtMessage> evtMsg, const EventMetaData& evtMetaData,
                          unsigned int workerId);
 

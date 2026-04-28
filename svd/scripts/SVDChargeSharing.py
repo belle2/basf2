@@ -55,7 +55,7 @@ class SVDChargeSharing(b2.Module):
 
             # Now let's store some data
             s = ''
-            # Sesnor identification
+            # Sensor identification
             sensorID = Belle2.VxdID(truehit.getRawSensorID())
             info = geoCache.get(sensorID)
             layer = sensorID.getLayerNumber()

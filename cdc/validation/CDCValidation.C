@@ -315,7 +315,7 @@ void FitADC(Int_t iLayer, Int_t kDraw)
 
   if(hADCfit[iLayer]->GetEntries() ==0){
     printf("No entries for Layer %d\n", iLayer);
-    return 0;
+    return;
   }
 
   Char_t cOP[10]="0";

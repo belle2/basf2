@@ -21,7 +21,7 @@
 #    equivTime_us   equivalent SuperKEKB running time in micro-seconds
 #    num            output file number
 #    sampleType     one of: study, usual, PXD, ECL
-#    phase          2, 31 (= early phase 3) or 3
+#    phase          2, 31 (= Run 1, early phase 3) or 3
 #    sad            SAD file name from /home/belle/luka/public/SAD without bg type and ".root"
 #    outdir         output directory path
 # -------------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ realTime = float(equivTime) * 1000
 fname = bgType + '_' + sampleType + '-phase' + str(phase) + '-' + num
 outputFile = outdir + '/' + fname + '.root'
 
-# check for the existance of a SAD file
+# check for the existence of a SAD file
 
 if not os.path.exists(sadFile):
     b2.B2ERROR('SAD file ' + sadFile + ' not found')
@@ -127,7 +127,7 @@ gearbox = b2.register_module('Gearbox')
 if phase == 2:
     gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
 elif phase == 31:
-    gearbox.param('fileName', 'geometry/Belle2_earlyPhase3.xml')
+    gearbox.param('fileName', 'geometry/Belle2_Run1.xml')
 if sampleType == 'study':
     gearbox.param('override', [
         ("/DetectorComponent[@name='PXD']//ActiveChips", 'true', ''),
@@ -159,7 +159,7 @@ main.add_module(geometry)
 fullsim = b2.register_module('FullSim')
 if sampleType == 'study':
     fullsim.param('PhysicsList', 'FTFP_BERT_HP')
-    fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
+    fullsim.param('UICommandsAtIdle', ['/process/deactivate nKiller'])
     fullsim.param('StoreAllSecondaries', True)
     fullsim.param('SecondariesEnergyCut', 0.000001)  # [MeV] need for CDC EB neutron flux
 main.add_module(fullsim)
@@ -179,6 +179,3 @@ add_output(main, bgType, realTime, sampleType, phase, fileName=outputFile, exclu
 
 # Process events
 b2.process(main)
-
-# Print call statistics
-print(b2.statistics)

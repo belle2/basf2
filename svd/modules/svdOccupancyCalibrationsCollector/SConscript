@@ -7,5 +7,7 @@ env['LIBS'] = [
     'vxd_dataobjects',
     '$ROOT_LIBS',
     'calibration',
+    'hlt',
+    'mdst_dataobjects',
     ]
 Return('env')

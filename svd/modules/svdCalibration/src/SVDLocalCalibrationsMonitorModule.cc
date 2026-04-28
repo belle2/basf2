@@ -103,9 +103,9 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
     B2WARNING("No valid SVDPulseShapeCalibrations for the requested IoV");
   /*  if (!m_OccupancyCal.isValid())
     B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
+  */
   if (!m_HotStripsCal.isValid())
     B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");
-  */
 
   ///OCCUPANCY
   TH1F hOccupancy("occupancy_L@layerL@ladderS@sensor@view",
@@ -390,8 +390,8 @@ void SVDLocalCalibrationsMonitorModule::event()
 
 
             m_hotstrips = -1;
-            /*            if (m_HotStripsCal.isValid())
-              m_hotstrips = m_HotStripsCal.isHot(theVxdID, m_side, m_strip);*/
+            if (m_HotStripsCal.isValid())
+              m_hotstrips = m_HotStripsCal.isHot(theVxdID, m_side, m_strip);
 
             //aux histo for hotStripSummary table
             hm_hot_strips->getHistogram(*itSvdSensors, m_side)->SetBinContent(m_strip + 1, m_hotstrips);
@@ -495,8 +495,8 @@ void SVDLocalCalibrationsMonitorModule::event()
           m_pulseWidthRMS = (m_hPulseWidth->getHistogram(theVxdID, m_side))->GetRMS();
 
 
-          //            for (int s = 0; s < hm_hot_strips->getHistogram(*itSvdSensors, m_side)->GetEntries(); s++)
-          //  m_hHotStripsSummary->fill(*itSvdSensors, m_side, 1);
+          for (int s = 0; s < hm_hot_strips->getHistogram(*itSvdSensors, m_side)->GetEntries(); s++)
+            m_hHotStripsSummary->fill(*itSvdSensors, m_side, 1);
 
           m_tree->Fill();
 
@@ -521,11 +521,11 @@ void SVDLocalCalibrationsMonitorModule::endRun()
     B2RESULT("   - SVDOccupancyCalibrations:" << m_OccupancyCal.getUniqueID());
   else
     B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
-
+  */
   if (m_HotStripsCal.isValid())
     B2RESULT("   - SVDHotStripsCalibrations:" << m_HotStripsCal.getUniqueID());
   else
-  B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");*/
+    B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");
 
 
   if (m_MaskedStr.isValid())

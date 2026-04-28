@@ -36,7 +36,7 @@ namespace Belle2 {
     /** Initialize the module */
     void initialize() override
     {
-      m_eventExtraInfo.registerInDataStore();
+      m_eventExtraInfo.isRequired();
 
       generatorInitialize();
     };

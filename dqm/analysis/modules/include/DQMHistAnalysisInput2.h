@@ -39,6 +39,7 @@ namespace Belle2 {
      */
     DQMHistAnalysisInput2Module();
 
+  private:
     /**
      * Initialize the module.
      */
@@ -64,15 +65,17 @@ namespace Belle2 {
      */
     void terminate() override final;
 
+    /**
+     * Read histogram from key and add to list vector
+     */
+    void addToHistList(std::vector<TH1*>& inputHistList, std::string dirname, TKey* key);
+
     // Data members
-  private:
     /** The name of the shared memory for the histograms. */
     std::string m_mempath;
     /** The name of the memory file (HLT or ExpressReco). */
     /** The refresh interval. */
     int m_interval;
-    /** Whether to remove empty histograms. */
-    bool m_remove_empty;
     /** Whether to enable the run info to be displayed. */
     bool m_enable_run_info;
     /** The canvas hold the basic DQM info. */
@@ -88,9 +91,9 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
     /** Exp number */
-    unsigned int m_expno = 0;
+    int m_expno = 0;
     /** Run number */
-    unsigned int m_runno = 0;
+    int m_runno = 0;
     /** Event number */
     unsigned int m_count = 0;
 
@@ -108,8 +111,11 @@ namespace Belle2 {
     time_t m_last_content_update{};
     /** Last time input file changes */
     std::filesystem::file_time_type m_lasttime;
-    /** enforce a content change on next event */
-    bool m_forceChanged{false};
+
+    /** last run */
+    int m_lastRun{-1};
+    /** last exp */
+    int m_lastExp{-1};
   };
 } // end namespace Belle2
 

@@ -7,19 +7,19 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
-#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.dcl.h>
 
 #include <array>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
+    class VXDHoughState;
 
     /// Relation filter the creation of relations
     template <class AFilter>
-    class LayerRelationFilter : public TrackFindingCDC::RelationFilter<VXDHoughState> {
+    class LayerRelationFilter : public TrackingUtilities::RelationFilter<VXDHoughState> {
       /// The parent class
-      using Super = TrackFindingCDC::RelationFilter<VXDHoughState>;
+      using Super = TrackingUtilities::RelationFilter<VXDHoughState>;
 
     public:
       using Super::operator();
@@ -37,18 +37,18 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Get the weight of the relation between from and to
-      TrackFindingCDC::Weight operator()(const VXDHoughState& from, const VXDHoughState& to) final;
+      TrackingUtilities::Weight operator()(const VXDHoughState& from, const VXDHoughState& to) final;
 
       /// Initialize the maximal ladder cache
       void beginRun() final;
 
     private:
-      /// Parameter: Make it possible to jump over N layers.
-      int m_hitJumping = 1;
       /// Filter for rejecting the states
       AFilter m_filter;
       /// Cached number of ladders per layer
       std::array<ushort, 7> m_maximalLadderCache;
+      /// Parameter: Make it possible to jump over N layers.
+      int m_hitJumping = 1;
     };
 
   }

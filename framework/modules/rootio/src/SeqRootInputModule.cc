@@ -12,7 +12,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/FileMetaData.h>
-#include <framework/io/RootIOUtilities.h>
 #include <framework/database/Configuration.h>
 
 #include <cmath>

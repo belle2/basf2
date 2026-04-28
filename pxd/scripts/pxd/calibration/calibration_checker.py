@@ -24,7 +24,7 @@ from pxd.calibration.condition_checker import plot_type_dict
 
 # import basf2
 
-# lookup dictrionary for finding a checker based on objType
+# lookup dictionary for finding a checker based on objType
 __cal_checker_dict__ = {
     "PXDHotPixelMaskCalibrationChecker": {PXDMaskedPixelPar, PXDDeadPixelPar, PXDOccupancyInfoPar},
 }
@@ -42,7 +42,7 @@ class CalibrationCheckerBase(ABC):
           objType_list (list): a list of db objects used as keys to their checker.
             e.g., [Belle2.PXDMaskedPixelPar, Belle2.PXDDeadPixelPar]
         """
-        #: condition checkers which are assoicated to this calibration.
+        #: condition checkers which are associated to this calibration.
         self.condition_checkers = {}
         for objType in objType_list:
             self.condition_checkers[objType] = None
@@ -58,10 +58,12 @@ class CalibrationCheckerBase(ABC):
             for objType in self.condition_checkers.keys():
                 if objType == checker.objType:
                     self.condition_checkers[objType] = checker
+        # \cond false positive doxygen warning
         if self.valid:
             checker.tfile.cd()
             print(f"root file path: {checker.tfile}")
             self.define_graphs()
+        # \endcond
 
     @property
     def valid(self):
@@ -96,16 +98,20 @@ class CalibrationCheckerBase(ABC):
         """
         function to be executed at the beginning of a run
         """
+        # \cond false positive doxygen warning
         if self.valid:
             self.fill_graphs()
+        # \endcond
 
     def terminate(self):
         """
         Execute when terminating a basf2 module.
         All required TGraphs should be ready at this stage.
         """
+        # \cond false positive doxygen warning
         if self.valid:
             self.draw_plots()
+        # \endcond
 
 
 class PXDHotPixelMaskCalibrationChecker(CalibrationCheckerBase):
@@ -198,7 +204,7 @@ class PXDHotPixelMaskCalibrationChecker(CalibrationCheckerBase):
                 sum_hotdeadfraction += hotfraction + deadfraction
             if current_run == saved_run_occ:
                 # occupancy correction (it's overestiamting occ_masked?)
-                # By defaut, both occ and fractions are in percentage.
+                # By default, both occ and fractions are in percentage.
                 if deadfraction != 100.:
                     occupancynomask = (occupancymasked + hotfraction) / (1. - deadfraction / 100)
                     occupancymasked = occupancymasked / (1. - deadfraction / 100)

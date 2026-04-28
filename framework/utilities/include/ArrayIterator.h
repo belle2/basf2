@@ -85,14 +85,14 @@ namespace Belle2 {
 
   /** Generic iterator class for arrays, allowing use of STL algorithms, range-based for etc.
    *
-   * Implements all operations required for a forward iterator. Note that wether objects can actually
+   * Implements all operations required for a forward iterator. Note that whether objects can actually
    * be added (i.e. extending the array) depends on the implementation of operator[].
    *
    * It only requires that ArrayType provides operator[int] returning pointers or references to ValueType, you can then
    * return ArrayIterator objects * with indices 0 and size() from begin() and end(). You should also define
    * iterator and const_iterator typedefs as part of ArrayType. See StoreArray for examples.
    *
-   * Note that dereferencing an iterator via * returns a reference to ValueType, regardless of wether ArrayType::operator[]
+   * Note that dereferencing an iterator via * returns a reference to ValueType, regardless of whether ArrayType::operator[]
    * returns ValueType* or ValueType&.
    */
   template <class ArrayType, class ValueType> class ArrayIterator {

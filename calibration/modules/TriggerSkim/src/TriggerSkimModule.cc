@@ -12,7 +12,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/utilities/Utils.h>
 
-#include <algorithm>
 #include <stdexcept>
 
 using namespace Belle2;
@@ -110,7 +109,6 @@ bool TriggerSkimModule::checkTrigger(const std::string& name, unsigned int presc
   } catch(std::out_of_range &e) {
     // typo? change in lines? In any case we nope out of here but let's try to give a helpful message
     std::string available_lines = "";
-    // cppcheck-suppress unassignedVariable
     for(auto&& [line, result]: m_trigResults->getResults()) {
       available_lines += line + "(" + std::to_string((int)result) + ") ";
     }

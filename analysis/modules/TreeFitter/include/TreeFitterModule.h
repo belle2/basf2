@@ -8,23 +8,22 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
-
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
+#include <Eigen/Dense>
+
 namespace Belle2 {
-  class Particle;
 
   /** Module to fit an entire decay tree.
    * The newton method is used to minimize the chi2 derivative.
-   * We use a kalman filter within the newton method to smooth the statevector.   */
+   * We use a kalman filter within the newton method to smooth the statevector.
+   */
   class TreeFitterModule : public Module {
 
   public:
@@ -51,23 +50,24 @@ namespace Belle2 {
     /** input particle list */
     StoreObjPtr<ParticleList> m_plist;
 
-    /**   name of the particle list fed to the fitter  */
+    /** name of the particle list fed to the fitter  */
     std::string m_particleList;
 
     /** minimum confidence level to accept fit
      * calculated as f(chiSquared, NDF)
      * -2: accept all
      *  0: only accept fit survivors
-     *  0.001 loose cut
-     *  0.1 (too) tight cut
-     *  */
+     *  0.001: loose cut
+     *  0.1: (too) tight cut
+     */
     double m_confidenceLevel;
 
     /** convergence precision for the newton method
+     *
      * When the delta chiSquared between 2 iterations divided by the chiSquared of the previous iteration
-    * is smaller than this stop the fit and call it converged
+     * is smaller than this stop the fit and call it converged
      * optimized - don't touch
-     * */
+     */
     double m_precision;
 
     /** vector carrying the PDG codes of the particles to be mass constraint */
@@ -77,24 +77,25 @@ namespace Belle2 {
     std::vector<int> m_geoConstraintListPDG;
 
     /** list of pdg codes of particles where we use the same vertex for production and decay
-     * which is the vertex of the mother */
+     * which is the vertex of the mother
+     */
     std::vector<int> m_fixedToMotherVertexListPDG;
 
-    /** vector carrying the names of the particles to be mass constraint */
-    std::vector<std::string> m_massConstraintListParticlename;
     /** type of the mass constraint false: use normal one. true: use parameters of daughters experimental!
+     *
      *  WARNING not even guaranteed that it works
-     * */
+     */
     int m_massConstraintType;
 
     /** PDG code of particle to be constrained to the beam 4-momentum */
     int m_beamConstraintPDG;
 
     /** Use x-y-z beamspot constraint.
+     *
      * The Beamspot will be treated as the mother of the particle you feed,
      * thus pinning down the PRODUCTION vertex of the mother to the IP
-     * */
-    bool  m_ipConstraint;
+     */
+    bool m_ipConstraint;
 
     /** this fits all particle candidates contained in the m_particleList  */
     bool fitTree(Particle* head);
@@ -106,16 +107,13 @@ namespace Belle2 {
     unsigned int m_nCandidatesAfter;
 
     /** flag if you want to update all particle momenta in the decay tree.
+     *
      * False means only the head of the tree will be updated
-     * */
+     */
     bool m_updateDaughters;
 
-    /** use a custom vertex as the production vertex of the highest hierarchy particle
-     * */
+    /** use a custom vertex as the production vertex of the highest hierarchy particle */
     bool m_customOrigin;
-
-    /** linearise around a previous state of the Kalman Filter */
-    bool m_useReferencing;
 
     /** vertex coordinates of the custom origin  */
     std::vector<double> m_customOriginVertex;
@@ -124,13 +122,14 @@ namespace Belle2 {
     std::vector<double> m_customOriginCovariance;
 
     /** list of constraints not to be applied in tree fit
+     *
      *  WARNING only use if you know what you are doing
-     * */
+     */
     std::vector<std::string> m_removeConstraintList;
 
     /** should the vertex be joined with the mother and should it be geometrically constrained?
-     *  'I dont know hat I am doing'
-     * */
+     *  'I don't know what I am doing'
+     */
     bool m_automatic_vertex_constraining;
 
     /** dimension to use for beam/origin constraint  */
@@ -145,14 +144,26 @@ namespace Belle2 {
     /** beam covariance matrix */
     Eigen::Matrix<double, 4, 4> m_beamCovariance;
 
+    /** use PDG values for mass constraints */
+    bool m_usePDGMassForMassConstraint;
+
+    /** list of values for mass constraints */
+    std::vector<double> m_massConstraintMassValues;
+
+    /** decay string to select particles that will be mass-constrained */
+    std::string m_massConstraintDecayString;
+
     /** decay string to select one particle that will be treated as invisible */
-    std::string  m_treatAsInvisible;
+    std::string m_treatAsInvisible;
 
-    /** decay string to select one particle that will be ignored to determine the vertex position */
-    std::string  m_ignoreFromVertexFit;
+    /** decay string to select particles that will be ignored to determine the vertex position */
+    std::string m_ignoreFromVertexFit;
 
-    /** Decay descriptor of the invisible particles */
-    DecayDescriptor m_pDDescriptorInvisibles;
+    /** Decay descriptor of the mass constrained particles */
+    DecayDescriptor m_pDDescriptorMassConstraint;
+
+    /** Decay descriptor of the invisible particle */
+    DecayDescriptor m_pDDescriptorInvisible;
 
     /** Decay descriptor of the ignored particles */
     DecayDescriptor m_pDDescriptorForIgnoring;

@@ -132,7 +132,7 @@ namespace Belle2::Conditions {
     }
   protected:
     /** Check the status of a global tag with the given name.
-     * Returns "" if the tag doesn't exist or any other error occured */
+     * Returns "" if the tag doesn't exist or any other error occurred */
     virtual std::string getGlobaltagStatus(const std::string& name) = 0;
     /** Update the list of existing payloads from a given globaltag, exp and run
      * combination.

@@ -9,11 +9,7 @@
 #pragma once
 
 #include <arich/dbobjects/ARICHGeoBase.h>
-#include <arich/dbobjects/tessellatedSolidStr.h>
 #include <string>
-
-//root
-#include <TVector3.h>
 
 namespace Belle2 {
 

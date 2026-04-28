@@ -345,7 +345,7 @@ void Module::exposePythonAPI()
   .value("CONTINUE", Module::EAfterConditionPath::c_Continue)
   ;
 
-  /* Do not change the names of >, <, ... we use them to serialize conditional pathes */
+  /* Do not change the names of >, <, ... we use them to serialize conditional paths */
   enum_<Belle2::ModuleCondition::EConditionOperators>("ConditionOperator")
   .value(">", Belle2::ModuleCondition::EConditionOperators::c_GT)
   .value("<", Belle2::ModuleCondition::EConditionOperators::c_ST)

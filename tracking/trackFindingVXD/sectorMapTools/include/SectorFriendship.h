@@ -38,9 +38,7 @@ namespace Belle2 {
     typedef std::vector<std::vector<CompatibilityValue> > CompatibilityTable;
 
     /** constructor */
-    SectorFriendship() :
-      m_mainSector(nullptr),
-      m_friendSector(nullptr) {}
+    SectorFriendship() {}
 
     /** returns friend sector */
     Sector* getFriend() { return m_friendSector; }
@@ -55,18 +53,18 @@ namespace Belle2 {
     unsigned int checkCombinationsAlive() const;
   protected:
 
-    /** The mainSector is stored once per run and is a link to a compatible outer sector. */
-    Sector* m_mainSector;
-
-    /** The friendSector is stored once per run and is a link to a compatible inner sector. */
-    Sector* m_friendSector;
-
     /** This vector carries a pointer to all filters allowed for this sector-combination */
     std::vector<FilterBase*> m_myFilters;
 
     /** This table carries the compatibility for each combination of hits or segments. First dimension maps iD of hit on mainSector, second one maps iD on friendSector */
     std::vector<std::vector<CompatibilityValue> > m_compatibilityTable;
 
-    ClassDef(SectorFriendship, 1)
+    /** The mainSector is stored once per run and is a link to a compatible outer sector. */
+    Sector* m_mainSector = nullptr;
+
+    /** The friendSector is stored once per run and is a link to a compatible inner sector. */
+    Sector* m_friendSector = nullptr;
+
+    ClassDef(SectorFriendship, 2)
   };
 } //Belle2 namespace

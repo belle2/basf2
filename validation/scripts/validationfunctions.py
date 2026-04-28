@@ -262,6 +262,8 @@ def get_validation_folders(
 
     @param location: The location where we want to search for validation
         folders (either 'local' or 'central')
+    @param basepaths: The dictionary with base paths of local and release directory
+    @param log: The logging dictionary
     """
 
     # Make sure we only look in existing locations:
@@ -370,7 +372,8 @@ def get_argument_parser(
         "--select",
         help="The file name(s) of one or more space separated validation "
         "scripts that should be executed exclusively. All dependent "
-        "scripts will also be executed. E.g. -s ECL2D.C",
+        "scripts will also be executed. E.g. -s ECL2D.C "
+        "(use -si instead to execute script(s) ignoring dependencies)",
         type=str,
         nargs="+",
     )

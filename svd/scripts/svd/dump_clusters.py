@@ -64,7 +64,7 @@ class dump_clusters(b2.Module):
 
             uSide = cluster.isUCluster()
 
-            # Sesnor identification
+            # Sensor identification
             [layer, ladder, sensor] = self.decode(sensorID)
             side_str = 'u' if uSide else 'v'
 

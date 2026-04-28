@@ -14,11 +14,8 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <mva/interface/Interface.h>
-
-#include <boost/algorithm/string/predicate.hpp>
 
 #include <framework/logging/Logger.h>
 
@@ -29,7 +26,7 @@ REG_MODULE(MVAExpert);
 
 MVAExpertModule::MVAExpertModule() : Module()
 {
-  setDescription("Adds an ExtraInfo to the Particle objects in given ParticleLists which is calcuated by an expert defined by a weightfile.");
+  setDescription("Adds an ExtraInfo to the Particle objects in given ParticleLists which is calculated by an expert defined by a weightfile.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   std::vector<std::string> empty;
@@ -68,13 +65,13 @@ void MVAExpertModule::initialize()
 
   if (m_listNames.empty()) {
     StoreObjPtr<EventExtraInfo> extraInfo("", DataStore::c_Event);
-    extraInfo.registerInDataStore();
+    extraInfo.isRequired();
   } else {
     StoreObjPtr<ParticleExtraInfoMap> extraInfo("", DataStore::c_Event);
-    extraInfo.registerInDataStore();
+    extraInfo.isRequired();
   }
 
-  if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
+  if (not(m_identifier.ends_with(".root") or m_identifier.ends_with(".xml"))) {
     m_weightfile_representation = std::make_unique<DBObjPtr<DatabaseRepresentationOfWeightfile>>(
                                     MVA::makeSaveForDatabase(m_identifier));
   }

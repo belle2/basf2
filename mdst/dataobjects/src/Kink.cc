@@ -9,30 +9,18 @@
 
 using namespace Belle2;
 
-Kink::Kink():
-  m_trackIndexMother(-1),
-  m_trackIndexDaughter(-1),
-  m_trackFitResultIndexMotherStart(-1),
-  m_trackFitResultIndexMotherEnd(-1),
-  m_trackFitResultIndexDaughter(-1),
-  m_fittedVertexX(0.0),
-  m_fittedVertexY(0.0),
-  m_fittedVertexZ(0.0),
-  m_filterFlag(0)
-{}
-
 Kink::Kink(const std::pair<const Belle2::Track*,
            std::pair<const Belle2::TrackFitResult*, const Belle2::TrackFitResult*> >& trackPairMother,
            const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairDaughter,
            const Double32_t vertexX, const Double32_t vertexY, const Double32_t vertexZ, const short filterFlag) :
+  m_fittedVertexX(vertexX),
+  m_fittedVertexY(vertexY),
+  m_fittedVertexZ(vertexZ),
   m_trackIndexMother(trackPairMother.first->getArrayIndex()),
   m_trackIndexDaughter(trackPairDaughter.first->getArrayIndex()),
   m_trackFitResultIndexMotherStart(trackPairMother.second.first->getArrayIndex()),
   m_trackFitResultIndexMotherEnd(trackPairMother.second.second->getArrayIndex()),
   m_trackFitResultIndexDaughter(trackPairDaughter.second->getArrayIndex()),
-  m_fittedVertexX(vertexX),
-  m_fittedVertexY(vertexY),
-  m_fittedVertexZ(vertexZ),
   m_filterFlag(filterFlag)
 {}
 

@@ -19,16 +19,16 @@ This procedure can be quite complex since:
   But cDST production may also depend on earlier (tracking) calibrations.
 * Experts may create very complex CAF scripts which require different inputs and setup.
   The interface to them is generally not standardised, other than using the CAF.
-* These CAF scripts are also not often committed to basf2 and are kept private.
-  This means that there is usually no record of the *correct* scripts to use for a basf2 release.
+* These CAF scripts are also not often committed to ``basf2`` and are kept private.
+  This means that there is usually no record of the *correct* scripts to use for a ``basf2`` release.
 
 Automated systems for controlling the creation, submission, and monitoring of CAF jobs for prompt calibration
 are being created.
-In order to use them effectively some tools have been created in basf2:
+In order to use them effectively some tools have been created in ``basf2``:
 
-* A directory for official CAF scripts for prompt calibration, to keep them up to date with basf2 releases.
+* A directory for official CAF scripts for prompt calibration, to keep them up to date with ``basf2`` releases.
 * A standardised structure for these scripts so that an automatic system can discover available calibration scripts for a
-  basf2 release.
+  ``basf2`` release.
 * Command line tools that the automatic system will use to run these scripts.
   Developers can also use these tools to check that their scripts will run in the automatic system.
 
@@ -46,7 +46,7 @@ First Steps:
 #. Create a CalibrationCollectorModule (if a new one is necessary), and a CalibrationAlgorithm.
 #. Create a working CAF calibration python script using the :py:class:`Calibration <caf.framework.Calibration>` class.
 
-At this point you are working with the CAF and should be ready to add a prompt calibration script to basf2 and test it.
+At this point you are working with the CAF and should be ready to add a prompt calibration script to ``basf2`` and test it.
 Now identify the requirements of your calibration:
 
 * Which data formats will it take as input (raw, cDST)?
@@ -68,7 +68,7 @@ The format for a prompt calibration script is:
 
 As you can see you need to define only two things at the top-level of the script. A ``settings`` variable
 and a ``get_calibrations(input_data, **kwargs)`` function.
-You are free to import from other basf2 packages and create more variables and functions in this script.
+You are free to import from other ``basf2`` packages and create more variables and functions in this script.
 But these two must exist.
 
 The ``settings`` variable
@@ -87,7 +87,7 @@ the script standalone.
     (A -> C means C depends on A).
 
     It may also be the case that you need to run ``scons`` again to make your new ``prompt/calibrations/`` script known to
-    basf2.
+    ``basf2``.
 
 .. autoclass:: prompt.CalibrationSettings
     :members: allowed_data_formats
@@ -144,7 +144,6 @@ b2caf-prompt-show
     :func: get_argparser
     :prog: b2caf-prompt-show
     :nodefaultconst:
-    :nogroupsections:
 
 .. _b2caf_prompt_run:
 
@@ -156,7 +155,6 @@ b2caf-prompt-run
     :func: get_argparser
     :prog: b2caf-prompt-run
     :nodefaultconst:
-    :nogroupsections:
 
 .. _b2caf_prompt_check:
 
@@ -168,7 +166,6 @@ b2caf-prompt-check
     :func: get_argparser
     :prog: b2caf-prompt-check
     :nodefaultconst:
-    :nogroupsections:
 
 
 Utility Functions

@@ -75,6 +75,9 @@ namespace Belle2 {
     template<typename Scalar>
     Scalar convertPythonObject(const boost::python::object& pyObject, Scalar);
     /** Convert from Python to given type. */
+    template<typename T>
+    std::shared_ptr<T> convertPythonObject(const boost::python::object& pyObject, const std::shared_ptr<T>&);
+    /** Convert from Python to given type. */
     template<typename Key, typename Value>
     std::map<Key, Value> convertPythonObject(const boost::python::object& pyObject, const std::map<Key, Value>&);
     /** Convert from Python to given type. */
@@ -141,7 +144,7 @@ namespace Belle2 {
     template<typename T> struct Type { /** type name. */ static std::string name() { return "???";} };
     /** Converts a template argument into a string for corresponding Python type. */
     template<typename T> struct Type<std::vector<T> > { /** type name. */ static std::string name() { return std::string("list(") + Type<T>::name() + ")"; } };
-    /** Convert a templeate arugment into a string for corresponding Python type */
+    /** Convert a templeate argument into a string for corresponding Python type */
     template<typename T> struct Type<std::set<T>> { /** type name */ static std::string name() { return std::string("set(") + Type<T>::name() + ")"; }};
     /** Converts a template argument into a string for corresponding Python type. */
     template<typename A, typename B> struct Type<std::map<A, B> > { /** type name. */ static std::string name() { return std::string("dict(") + Type<A>::name() + " -> " + Type<B>::name() + ")"; } };
@@ -296,7 +299,7 @@ namespace Belle2 {
       return CheckTuple(tuple, pyTuple, std::index_sequence_for<Types ...>());
     }
 
-    /// Recursion sentinal for the case that all former type checks failed for the variant.
+    /// Recursion sentinel for the case that all former type checks failed for the variant.
     template<typename VariantType>
     bool CheckVariant(const VariantType&,
                       const boost::python::object&,
@@ -503,6 +506,32 @@ namespace Belle2 {
       } else {
         throw std::runtime_error(std::string("Could not convert value: Expected type '") + Type<Scalar>::name() + "' instead of '" +
                                  pyObject.ptr()->ob_type->tp_name + "'.");
+      }
+      return tmpValue;
+
+    }
+
+    /**
+     * Reads a std::shared_ptr<T> from a python object.
+     *
+     * @param pyObject Python object which stores the shared pointer.
+     * @param std::shared_ptr<T> A shared pointer.
+     * @return std::shared_ptr<T>, which holds the value from the python object.
+     */
+    template <typename T>
+    __attribute__((noinline))
+    std::shared_ptr<T> convertPythonObject(const boost::python::object& pyObject, const std::shared_ptr<T>&)
+    {
+
+      std::shared_ptr<T> tmpValue;
+      boost::python::extract<std::shared_ptr<T>> valueProxy(pyObject);
+      if (valueProxy.check()) {
+        tmpValue = valueProxy();
+      } else {
+        throw std::runtime_error(
+          std::string("Could not convert value: Expected type '") + Type<std::shared_ptr<T>>::name() + "' instead of '" +
+          pyObject.ptr()->ob_type->tp_name + "'."
+        );
       }
       return tmpValue;
 

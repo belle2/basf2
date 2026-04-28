@@ -579,7 +579,7 @@ namespace Belle2 {
       if (type == c_Left) {
         name += "Left";
       } else {
-        name += "Rigth";
+        name += "Right";
       }
 
       return new G4LogicalVolume(solid, material, name);
@@ -780,7 +780,7 @@ namespace Belle2 {
       if (!material) B2FATAL("Material '" << geo.getMaterial() << "' not found");
       auto* prism = new G4LogicalVolume(volume, material, geo.getName());
 
-      // wavelenght filter (old payload) and peel-off regions (if defined)
+      // wavelength filter (old payload) and peel-off regions (if defined)
       // new payload: wavelength filter is a part of PMT array
 
       if (geo.getFilterThickness() > 0 or !geo.getPeelOffRegions().empty()) {
@@ -872,7 +872,7 @@ namespace Belle2 {
         }
       }
 
-      // wavelenght filter and silicone cookies (new payload)
+      // wavelength filter and silicone cookies (new payload)
       if (geo.getFilterThickness() > 0) { // new payload
         double fullThickness = geo.getFilterThickness() + geo.getCookieThickness();
         auto* filter = createBox(geo.getName() + "Filter+Cookie",

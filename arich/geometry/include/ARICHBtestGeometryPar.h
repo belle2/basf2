@@ -87,7 +87,7 @@ namespace Belle2 {
   };
 
   //! The Class for ARICH Beamtest Geometry Parameters
-  /*! This class provides ARICH gemetry paramters for simulation, reconstruction and so on.
+  /*! This class provides ARICH geometry parameters for simulation, reconstruction and so on.
     These parameters are gotten from gearbox.
   */
 

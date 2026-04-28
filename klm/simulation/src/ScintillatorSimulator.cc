@@ -254,7 +254,7 @@ void KLM::ScintillatorSimulator::addRandomSiPMNoise()
   int i;
   for (i = 0; i < m_DigPar->getNDigitizations(); i++)
     m_amplitude[i] = m_amplitude[i] +
-                     gRandom->Poisson(m_DigPar->getMeanSiPMNoise());
+                     gRandom->PoissonD(m_DigPar->getMeanSiPMNoise());
 }
 
 int* KLM::ScintillatorSimulator::sortPhotoelectrons(int nPhotoelectrons)

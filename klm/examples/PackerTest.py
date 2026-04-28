@@ -76,7 +76,7 @@ main.add_module(klm_reconstructor)
 main.add_module(output)
 
 # Process the events
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 print(basf2.statistics)
 
 # Print size of raw data

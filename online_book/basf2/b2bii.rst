@@ -6,9 +6,7 @@ B2BII
 .. sidebar:: Overview
    :class: overview
 
-   **Teaching**: 30 min
-
-   **Exercises**: 60 min
+   **Length**: 1-1.5 hrs
 
    **Prerequisites**:
 
@@ -17,16 +15,16 @@ B2BII
 
    **Questions**:
 
-   * Can I use basf2 to analysis Belle data?
-   * Why can't I use the same basf2 particle lists and variables in my b2bii analysis?
+   * Can I use ``basf2`` to analysis Belle data?
+   * Why can't I use the same ``basf2`` particle lists and variables in my b2bii analysis?
 
    **Objectives**:
 
-   * Process Belle data with basf2
+   * Process Belle data with ``basf2``
 
 
-The ``b2bii`` package in basf2 converts Belle MDST files (basf data format) to
-Belle II MDST (basf2 data format). This enables performing physics analysis
+The ``b2bii`` package in ``basf2`` converts Belle MDST files (basf data format) to
+Belle II MDST (``basf2`` data format). This enables performing physics analysis
 using data collected with Belle detector with the analysis software and
 algorithms developed for the analysis of data collected with the Belle II
 detector. It allows for estimation and validation of
@@ -37,7 +35,7 @@ Belle II
 
 B2BII converter
 ---------------
-The b2bii convert reads and converts Belle MDST within basf2, and
+The b2bii convert reads and converts Belle MDST within ``basf2``, and
 the converted data can be then analysed within the same job, without any
 intermediate steps.
 
@@ -48,13 +46,13 @@ The workflow is illustrated in this figure:
 
 * Read Belle MDST file.
 * Apply momentum or energy corrections in the objects.
-* Save objects in basf2 format
-* Time for basf2 analysis!
+* Save objects in ``basf2`` format
+* Time for ``basf2`` analysis!
 
 
 MC samples
 ----------
-As the Belle detector geometry is not implemented in basf2, one needs to either
+As the Belle detector geometry is not implemented in ``basf2``, one needs to either
 use the official Belle MC samples or generate own signal MC using basf.
 The information of generating Belle MC can be found
 `here <https://belle.kek.jp/secured/wiki/doku.php?id=software%3Amcprod_scripts>`__
@@ -196,7 +194,7 @@ Now you have MDST files produced in the ``mcproduzh/gsim/mdst/`` directory.
    :math:`B^{+} \to \overline{D}^{0}(\to K^{+} \pi^{-}) \pi^{+}` events.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    Generation:
 
@@ -227,31 +225,31 @@ simple lines:
    from b2biiConversion import convertBelleMdstToBelleIIMdst
    convertBelleMdstToBelleIIMdst(inputfile, path=mypath)
 
-Now we can use basf2 and analysis tools in basf2 to perform analyses
+Now we can use ``basf2`` and analysis tools in ``basf2`` to perform analyses
 over Belle MDST files.
 
-The relations between basf and basf2 objects are shown in this figure:
+The relations between basf and ``basf2`` objects are shown in this figure:
 
 .. image:: b2bii/conversion.png
    :width: 600px
    :align: center
 
 However, there are still many differences between the Belle detector and the
-Belle II detector, as well as basf and basf2.
-Therefore, we can't simply use the same basf2 steering files, small
+Belle II detector, as well as basf and ``basf2``.
+Therefore, we can't simply use the same ``basf2`` steering files, small
 modifications are needed.
 
 .. _Charged_Final_State_Particles:
 .. rubric:: Charged Final State Particles
 
-basf and basf2 use different Helix parameterisations, however there exist a well
+The basf and ``basf2`` softwares use different helix parameterisations, however there exist a well
 defined transformation from one parameterisation to the other.
 Belle MDST stores in addition to the five helix parameters also the reference
 point (or pivot point), which is assumed to be always point ``(0,0,0)`` in the
 case of Belle II MDST.
 
 Despite the different parameterisations, charged final state particles can still
-be reconstructed using `fillParticleList` function in basf2.
+be reconstructed using `fillParticleList` function in ``basf2``.
 But due to the different definition, as well as detector, it is not
 recommended to use Belle II style PID in b2bii.
 
@@ -266,24 +264,25 @@ subdetector systems (CDC, ACC, TOF, ECL, KLM). The combination of individual
 likelihoods from each sub detector system is in some cases (eID) combined
 with the usage of external information, such as a priori probabilities of
 each particle type that is read from the Belle DB. Due to this fact the
-Belle-like PID probabilities can not be reproduced in basf2 from the raw
+Belle-like PID probabilities can not be reproduced in ``basf2`` from the raw
 likelihoods.
 
 Alternatively, we can use the following predefined Belle-style PID variables to
 reproduce them:
 
-   +------------------------------+------------------+
-   | Separation                   | basf2            |
-   +==============================+==================+
-   | Kaon vs pion                 | atcPIDBelle(3,2) |
-   +------------------------------+------------------+
-   | electron vs hadron           | eIDBelle         |
-   +------------------------------+------------------+
-   | muon likelihood              | muIDBelle        |
-   +------------------------------+------------------+
-   | muon likelihood quality flag | muIDBelleQuality |
-   +------------------------------+------------------+
+.. list-table::
+   :header-rows: 1
 
+   * - Separation
+     - basf2
+   * - Kaon vs pion
+     - atcPIDBelle(3,2)
+   * - electron vs hadron
+     - eIDBelle
+   * - muon likelihood
+     - muIDBelle
+   * - muon likelihood quality flag
+     - muIDBelleQuality
 
 .. admonition:: Exercise
    :class: exercise stacked
@@ -292,7 +291,7 @@ reproduce them:
    and another list of :math:`\pi^{+}` with :math:`\text{KID}<0.4`.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. code-block:: python
 
@@ -322,12 +321,12 @@ During the conversion, b2bii converter by default creates ``gamma:mdst`` and ``p
    between 1.7 to 2.0 GeV in a b2bii analysis.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    Always use premade particle lists for neutrals!
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. code-block:: python
 
@@ -338,7 +337,7 @@ During the conversion, b2bii converter by default creates ``gamma:mdst`` and ``p
 .. rubric:: V0 Particles
 
 As mentioned in :ref:`Charged_Final_State_Particles`, all charged tracks are
-parametrised with a helix with the reference point set to ``(0,0,0)`` in basf2.
+parametrised with a helix with the reference point set to ``(0,0,0)`` in ``basf2``.
 This is not optimal in the case of ``V0s`` whose decay vertices can be far away
 from the origin.
 Therefore, all V0 candidates from the ``Mdst_Vee2`` table in basf are converted to
@@ -359,12 +358,12 @@ In addition, the quality indicators for :math:`K_{S}^{0}` and
    Select ``good Kshort`` from ``K_S0:mdst`` list.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    Use `cutAndCopyList` to select candidates from an existing list.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. code-block:: python
 
@@ -401,7 +400,7 @@ The Klongs are stored in the default ``K_L0:mdst``.
       basf2.find_file('b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst', 'examples', False)
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    :ref:`onlinebook_first_steering_file` lesson is your best friend!
 
@@ -409,7 +408,7 @@ The Klongs are stored in the default ``K_L0:mdst``.
    Don't forget to use Belle-style PID for charged particles.
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    .. literalinclude:: b2bii/b2bii_example.py
       :language: python        
@@ -418,7 +417,7 @@ The Klongs are stored in the default ``K_L0:mdst``.
 .. admonition:: Key points
    :class: key-points
 
-   * Making basf2 process Belle data is as easy as adding
+   * Making a ``basf2`` process Belle data is as easy as adding
      ``convertBelleMdstToBelle2Mdst()`` to the top of your steering file.
    * Be careful with particle lists and variables in your analysis.
    * **Never use** `fillParticleList` **to create neutral final state particles!!**
@@ -428,4 +427,5 @@ The Klongs are stored in the default ``K_L0:mdst``.
 .. rubric:: Author of this lesson
 
 Chia-Ling Hsu
+
 

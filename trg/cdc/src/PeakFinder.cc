@@ -358,7 +358,7 @@ namespace Belle2 {
                                     vector<unsigned>& peakSerialIds) const
   {
 
-    TRGDebug::enterStage("Peak Finding (trasan methode)");
+    TRGDebug::enterStage("Peak Finding (trasan method)");
     if (TRGDebug::level())
       cout << TRGDebug::tab() << "threshold=" << threshold
            << ",plane name=[" << hp.name() << "]" << endl;
@@ -465,7 +465,7 @@ namespace Belle2 {
       cout << TRGDebug::tab() << peakSerialIds.size() << " peak(s)"
            << " found in total" << endl;
 
-    TRGDebug::leaveStage("Peak Finding (trasan methode)");
+    TRGDebug::leaveStage("Peak Finding (trasan method)");
     return;
   }
 

@@ -38,7 +38,7 @@ namespace Belle2 {
       {
         // check if we have properties defined for this material
         if (parameters.getNumberNodes("Property") > 0) {
-          //Apparantly we have properties, so lets add them to the Material
+          //Apparently we have properties, so lets add them to the Material
           for (const GearDir& property : parameters.getNodes("Property")) {
             string name;
             try {
@@ -176,7 +176,7 @@ namespace Belle2 {
           //elements do not have density
           if (component.getIselement()) {
             B2ERROR("createMaterial " << parameters.getName()
-                    << ": Cannot calculate density when adding elements, please provde a density");
+                    << ": Cannot calculate density when adding elements, please provide a density");
             return nullptr;
           }
           G4Material* mat = getMaterial(component.getName());

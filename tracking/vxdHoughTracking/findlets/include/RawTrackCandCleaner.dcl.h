@@ -7,31 +7,30 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/vxdHoughTracking/findlets/RelationCreator.h>
 #include <tracking/vxdHoughTracking/findlets/SVDHoughTrackingTreeSearcher.dcl.h>
 #include <tracking/vxdHoughTracking/findlets/TrackCandidateResultRefiner.h>
 #include <tracking/vxdHoughTracking/filters/relations/ChooseableRelationFilter.h>
 #include <tracking/vxdHoughTracking/filters/pathFilters/ChooseablePathFilter.h>
-
-#include <string>
-#include <vector>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   class ModuleParamList;
   class SpacePointTrackCand;
   class VxdID;
+  class SVDHoughParameters;
 
   namespace vxdHoughTracking {
 
     /// Findlet for rejecting wrong SpacePointTrackCands and for removing bad hits.
     template<class AHit>
-    class RawTrackCandCleaner : public TrackFindingCDC::Findlet<std::vector<AHit*>, SpacePointTrackCand> {
+    class RawTrackCandCleaner : public TrackingUtilities::Findlet<std::vector<AHit*>, SpacePointTrackCand> {
       /// Parent class
-      using Super =  TrackFindingCDC::Findlet<std::vector<AHit*>, SpacePointTrackCand>;
+      using Super =  TrackingUtilities::Findlet<std::vector<AHit*>, SpacePointTrackCand>;
 
       /// Shortcut definition for Result
-      using Result = std::vector<TrackFindingCDC::WithWeight<const AHit*>>;
+      using Result = std::vector<TrackingUtilities::WithWeight<const AHit*>>;
 
     public:
       /// Find intercepts in the 2D Hough space
@@ -45,6 +44,9 @@ namespace Belle2 {
 
       /// Create the store arrays
       void initialize() override;
+
+      /// Check dbobject validity
+      void beginRun() override;
 
       /// Reject bad SpacePointTrackCands and bad hits inside the remaining
       void apply(std::vector<std::vector<AHit*>>& rawTrackCandidates, std::vector<SpacePointTrackCand>& trackCandidates) override;
@@ -61,7 +63,7 @@ namespace Belle2 {
       TrackCandidateResultRefiner m_resultRefiner;
 
       /// vector containing the relations between the hits in the raw track candidate
-      std::vector<TrackFindingCDC::WeightedRelation<AHit>> m_relations;
+      std::vector<TrackingUtilities::WeightedRelation<AHit>> m_relations;
 
       /// vector containing track candidates after tree search
       std::vector<Result> m_results;
@@ -74,6 +76,9 @@ namespace Belle2 {
 
       /// maximum number of relations that can be created per track candidate
       uint m_maxRelations = 100;
+
+      /// DB object containing the SVDHough parameters
+      DBObjPtr<SVDHoughParameters> m_SVDHoughParameters;
     };
 
   }

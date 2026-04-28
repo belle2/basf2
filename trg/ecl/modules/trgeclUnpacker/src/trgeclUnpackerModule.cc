@@ -199,6 +199,7 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
     if (window_num == 3) win3_revo = summary_revo;
 
     if (summary_trg == true) { // Summary on
+
       sum_data.push_back(data_win);
       sum_data.push_back(summary_revo);
       for (int j = 0; j < 12; j++) {
@@ -381,6 +382,7 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
       cl_time[5]   = ((sum_info[j][11] & 0x7) << 5) + ((sum_info[j][10] >> 27) & 0x1F);
       cl_phi[5]    = (sum_info[j][11] >>  3) & 0xFF;
       cl_theta[5]  = (sum_info[j][11] >> 11) & 0x7F;
+
       // CL others
       for (int k = 0; k < 6; k++) {
         cl_1gev[k] = (sum_info[j][12] >>  k) & 0x1;
@@ -449,6 +451,7 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
           evt_1d_vector.push_back(cl_2d[k][l]);
         }
       }
+      cl_2d.clear();
       evt_1d_vector.push_back(ncl);
       evt_1d_vector.push_back(low_multi);
       evt_1d_vector.push_back(b2bhabha_v);
@@ -754,7 +757,14 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
       m_TRGECLClusterArray[m_clNum]->setMaxPhiId(cl_phiid);
       m_TRGECLClusterArray[m_clNum]->setClusterId(icluster);
       m_TRGECLClusterArray[m_clNum]->setEnergyDep((double)evt_cl_energy[icluster] * 5.25); // MeV
-      m_TRGECLClusterArray[m_clNum]->setTimeAve((double)evt_cl_time[icluster]);
+      double cl_timing = -1000;
+      for (int i_tc = 0; i_tc < tot_ntc; i_tc++) {
+        if (cl_tcid == tc_info[i_tc][0]) {
+          cl_timing = tc_info[i_tc][1];
+          break;
+        }
+      }
+      m_TRGECLClusterArray[m_clNum]->setTimeAve(cl_timing);
       m_TRGECLClusterArray[m_clNum]->setPositionX(mapping.getTCPosition(cl_tcid).X());
       m_TRGECLClusterArray[m_clNum]->setPositionY(mapping.getTCPosition(cl_tcid).Y());
       m_TRGECLClusterArray[m_clNum]->setPositionZ(mapping.getTCPosition(cl_tcid).Z());
@@ -940,6 +950,7 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
     if (window_num == 3) win3_revo = summary_revo;
 
     if (summary_trg == true) { // Summary on
+
       sum_data.push_back(data_win);
       sum_data.push_back(summary_revo);
       for (int j = 0; j < 9; j++) {
@@ -1220,6 +1231,7 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
         evt_1d_vector.push_back(cl_2d[k][2]);
         evt_1d_vector.push_back(cl_2d[k][3]);
       }
+      cl_2d.clear();
       evt_1d_vector.push_back(ncl);
       evt_1d_vector.push_back(low_multi);
       evt_1d_vector.push_back(b2bhabha_v);
@@ -1511,7 +1523,14 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
       m_TRGECLClusterArray[m_clNum]->setMaxPhiId(cl_phiid);
       m_TRGECLClusterArray[m_clNum]->setClusterId(icluster);
       m_TRGECLClusterArray[m_clNum]->setEnergyDep((double)evt_cl_energy[icluster] * 5.25); // MeV
-      m_TRGECLClusterArray[m_clNum]->setTimeAve((double)evt_cl_time[icluster]);
+      double cl_timing = -1000;
+      for (int i_tc = 0; i_tc < tot_ntc; i_tc++) {
+        if (cl_tcid == tc_info[i_tc][0]) {
+          cl_timing = tc_info[i_tc][1];
+          break;
+        }
+      }
+      m_TRGECLClusterArray[m_clNum]->setTimeAve(cl_timing);
       m_TRGECLClusterArray[m_clNum]->setPositionX(mapping.getTCPosition(cl_tcid).X());
       m_TRGECLClusterArray[m_clNum]->setPositionY(mapping.getTCPosition(cl_tcid).Y());
       m_TRGECLClusterArray[m_clNum]->setPositionZ(mapping.getTCPosition(cl_tcid).Z());

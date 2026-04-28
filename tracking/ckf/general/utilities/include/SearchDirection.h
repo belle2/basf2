@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <framework/logging/Logger.h>
 
 #include <string>
@@ -23,22 +23,22 @@ namespace Belle2 {
    *
    * If it is 0 or the direction is unknown, true is always returned.
    */
-  constexpr inline bool arcLengthInRightDirection(double arcLength2D, TrackFindingCDC::EForwardBackward forwardBackward)
+  constexpr inline bool arcLengthInRightDirection(double arcLength2D, TrackingUtilities::EForwardBackward forwardBackward)
   {
     return static_cast<double>(forwardBackward) * arcLength2D >= 0;
   }
 
   /// Helper function to turn a direction string into a valid forward backward information.
-  inline TrackFindingCDC::EForwardBackward fromString(const std::string& directionString)
+  inline TrackingUtilities::EForwardBackward fromString(const std::string& directionString)
   {
     if (directionString == "forward" or directionString == "above" or directionString == "after") {
-      return TrackFindingCDC::EForwardBackward::c_Forward;
+      return TrackingUtilities::EForwardBackward::c_Forward;
     } else if (directionString == "backward" or directionString == "below" or directionString == "before") {
-      return TrackFindingCDC::EForwardBackward::c_Backward;
+      return TrackingUtilities::EForwardBackward::c_Backward;
     } else if (directionString == "both" or directionString == "unknown") {
-      return TrackFindingCDC::EForwardBackward::c_Unknown;
+      return TrackingUtilities::EForwardBackward::c_Unknown;
     } else if (directionString == "none" or directionString == "invalid") {
-      return TrackFindingCDC::EForwardBackward::c_Invalid;
+      return TrackingUtilities::EForwardBackward::c_Invalid;
     } else {
       B2FATAL("Do not understand direction " << directionString << ". Valid names are " <<
               "forward/above/after, backward/below/before, both/unknown, none/invalid");

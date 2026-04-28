@@ -133,7 +133,7 @@ extern "C" {
     int igen; /**< total number of generated events */
   } westat_;
 
-  /** comon block for final event statistics */
+  /** common block for final event statistics */
   extern struct {
     double sumft; /**< sum of weights */
     double sumft2; /**< sum of weights squared */
@@ -155,7 +155,7 @@ void AAFHInterface::setGeneratorWeights(const std::vector<double>& weights)
               "ignoring the extra weights");
   } else if (weights.size() > 4 && weights.size() < 8) {
     B2WARNING("AAFH: more than 4 but less than 8 generator weights supplied, "
-              "ignoring everything afer the first four");
+              "ignoring everything after the first four");
   } else if (weights.size() < 4) {
     B2ERROR("AAFH: not enough generator weights, need exactly four or eight values");
   }
@@ -320,7 +320,7 @@ void AAFHInterface::finish()
 {
   aafhdiag36_finish_();
   // The following code just prints the results. If B2RESULT has been compiled
-  // out this is unneccesary and cppcheck complains so we enclose this in an
+  // out this is unnecessary and cppcheck complains so we enclose this in an
   // ifdef to only be executed if B2RESULT might actually be shown
 #ifndef LOG_NO_B2RESULT
   B2RESULT("AAFH Generation finished.");

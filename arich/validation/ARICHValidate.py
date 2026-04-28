@@ -87,7 +87,7 @@ main.add_module('Ext')
 main.add_module('ARICHFillHits')
 main.add_module('ARICHReconstructor', storePhotons=1)
 
-# Add module fpr ARICH efficiency analysis
+# Add module for ARICH efficiency analysis
 arichEfficiency = b2.register_module('ARICHNtuple')
 arichEfficiency.logging.log_level = b2.LogLevel.DEBUG
 arichEfficiency.logging.debug_level = debugLevel
@@ -100,6 +100,3 @@ main.add_module(progress)
 
 # Process events
 b2.process(main)
-
-# Print call statistics
-print(b2.statistics)

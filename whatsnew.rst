@@ -14,16 +14,324 @@ be adapted when changing to the new release.
 
 .. important changes should go here. Especially things that break backwards compatibility
 
+Changes since release-10
+========================
+
+.. admonition:: New, removed and updated packages in externals
+   :class: dropdown
+
+   .. list-table:: New, removed and updated packages in externals from v02-03-02 to v02-04-00
+      :widths: 50 25 25
+      :header-rows: 1
+
+      * - package
+        - old version
+        - new version
+      * - ``BELLE_FLC``
+        - ?
+        -
+      * - Boost C++ Libraries
+        - 1.88
+        - 1.90
+      * - CMake
+        - 3.28.3
+        - 3.31.8
+      * - Cppcheck
+        - 2.6
+        - 2.19.0
+      * - EPICS
+        - 7.0.5
+        - 7.0.10
+      * - FastBDT
+        - 5.2
+        - 5.4
+      * - GCC, the GNU Compiler Collection
+        - 14.2.0
+        - 15.2.0
+      * - GDB: The GNU Project Debugger
+        - 14.2
+        - 17.1
+      * - git
+        - 2.31.0
+        - 2.52.0
+      * - git-lfs
+        - 2.13.2
+        - 3.7.1
+      * - GMP, The GNU Multiple Precision Arithmetic Library
+        - 6.2.1
+        - 6.3.0
+      * - GNU Binutils
+        - 2.41
+        - 2.45
+      * - Google Test
+        - 1.10.0
+        - 1.17.0
+      * - Herwig
+        -
+        - 7.2.0
+      * - Integer Set Library
+        - 0.26
+        - 0.27
+      * - LHAPDF
+        -
+        - 6.5.5
+      * - LHAPDF - CT14lo PDF set
+        -
+        - 1
+      * - LHAPDF - CT14nlo PDF set
+        -
+        - 1
+      * - Libbsd, included only for EL7
+        - 0.12.2
+        -
+      * - libffi
+        - 3.3
+        - 3.5.2
+      * - Libmd, included only for EL7
+        - 1.1.0
+        -
+      * - Libxml2
+        - 2.9.13
+        - 2.15.1
+      * - Libxslt
+        - 1.1.35
+        - 1.1.45
+      * - LLVM/Clang, including libcxx and sanitizer tools
+        - 18.1.6
+        - 21.1.8
+      * - LZ4
+        - 1.9.3
+        - 1.10.0
+      * - Madgraph MG5\_aMC
+        - 3.4.0
+        - 3.7.0
+      * - ONNX Runtime
+        - 1.22.0
+        - 1.23.2
+      * - OpenSSL, included only for EL7
+        - 3.0.14
+        -
+      * - packaging
+        - 24.1
+        - 26.0
+      * - pip
+        - 24.1
+        - 26.0.1
+      * - PostgreSQL interface
+        - 13.2
+        - 13.23
+      * - pyhepmc
+        - 2.13.4
+        - 2.16.1
+      * - pypmc
+        - 1.2.3
+        - 1.2.5
+      * - PYTHIA
+        - 8.215
+        - 8.316
+      * - Python
+        - 3.11.9
+        - 3.12.13
+      * - ROOT
+        - 6.32/14
+        - 6.36/06
+      * - RooUnfold
+        - 3.0.2
+        - 3.1.0
+      * - setuptools
+        - 70.1.0
+        - 82.0.0
+      * - sphinx-togglebutton
+        -
+        - 0.3.2
+      * - tensorflow-io-gcs-filesystem
+        - 0.37.0
+        - 0.37.1
+      * - The GNU MPFR Library
+        - 4.1.0
+        - 4.2.2
+      * - Theano
+        - 1.0.5
+        -
+      * - ThePEG
+        -
+        - 2.2.3
+      * - uproot3
+        - 3.14.4
+        -
+      * - uproot3-methods
+        - 0.10.1
+        -
+      * - Valgrind
+        - 3.17.0
+        - 3.26.0
+      * - VecGeom Vectorized Geometry
+        - 1.2.8
+        - 2.0.0
+      * - wheel
+        - 0.43.0
+        - 0.46.3
+      * - WHIZARD
+        - 3.1.2
+        - 3.1.7
+      * - XRootD
+        - 5.6.1
+        - 5.9.1
+      * - xz
+        - 5.2.5
+        - 5.8.2
+      * - zlib
+        - 1.2.12
+        - 1.3.1
+
+.. rubric:: Calculation and printing of processing statistics
+
+The calculation of the processing statistics is by default turned off. It can be enabled for debugging purposes, e.g.,
+to learn about the execution time of a steering file so that it can be provided to gbasf2 jobs, by setting the argument
+``calculateStatistics`` of the `basf2.process` function to ``True``. For the hlt scripts it remains enabled to monitor
+the execution time and memory consumption. It is not necessary to explicitly print the statistics since this is
+automatically done when switching the calculation on.
+
+.. only:: not light
+
+   .. rubric:: Removed deprecated parameters from the ``LHEInput`` module
+
+   The deprecated parameters ``meanDecayLength``, ``Rmin``, ``Rmax`` and ``pdg_displaced``, which were used to displace
+   the vertex of a given ``MCParticle``, have been removed from the ``LHEInput`` module. Users should use the
+   ``GeneratedVertexDisplacer`` module to displace an ``MCParticle``.
+
+.. include:: analysis/doc/whatsnew-since/release-10-00.txt
+
+.. include:: generators/doc/whatsnew-since/release-10-00.txt
+
 Changes since release-09
 ========================
 
+.. admonition:: New and updated packages in externals
+   :class: dropdown
+
+   .. list-table:: New and updated packages in externals from v02-02-04 to v02-03-02
+      :widths: 50 25 25
+      :header-rows: 1
+
+      * - package
+        - old version
+        - new version
+      * - boost
+        - 1.85.0
+        - 1.88.0
+      * - doxygen
+        - 1.9.6
+        - 1.13.2
+      * - EvtGen
+        - R02-00-00
+        - R02-00-01
+      * - gcc
+        - 14.1.0
+        - 14.2.0
+      * - ONNX Runtime
+        -
+        - 1.22.0
+      * - ROOT
+        - 6.26/14
+        - 6.32/14
+      * - RooUnfold
+        - 3.0.0
+        - 3.0.2
+      * - VecCore
+        - 0.8.1
+        - 0.8.2
+      * - VGM
+        - 5.2
+        - 5.3
+      * - coloredlogs
+        -
+        - 15.0.1
+      * - human-friendly
+        -
+        - 10.0
+      * - jupyter-resource-usage
+        -
+        - 1.1.0
+      * - onnx
+        -
+        - 1.17.0
+      * - onnxconvert-common
+        -
+        - 1.13.0
+      * - onnxruntime
+        -
+        - 1.21.0
+      * - outcome
+        -
+        - 1.3.0.post0
+      * - psutil
+        - 5.9.8
+        - 6.0.0
+      * - PySide6
+        -
+        - 6.9.1
+      * - PySide6-Addons
+        -
+        - 6.9.1
+      * - PySide6-Essentials
+        -
+        - 6.9.1
+      * - PySocks
+        -
+        - 1.7.1
+      * - selenium
+        -
+        - 4.32.0
+      * - shiboken6
+        -
+        - 6.9.1
+      * - skl2onnx
+        -
+        - 1.18.0
+      * - sortedcontainers
+        -
+        - 2.4.0
+      * - sphinx-argparse
+        - 0.2.0
+        - 0.5.2
+      * - tensorboard
+        - 2.16.2
+        - 2.17.1
+      * - tensorflow
+        - 2.16.1
+        - 2.17.0
+      * - tf2onnx
+        -
+        - 1.8.4
+      * - trio
+        -
+        - 0.30.0
+      * - trio-websocket
+        -
+        - 0.12.2
+      * - uproot
+        - 5.3.7
+        - 5.6.1
+      * - wsproto
+        -
+        - 1.2.0
+      * - xxhash
+        -
+        - 3.5.0
+
 .. include:: analysis/doc/whatsnew-since/release-09-00.txt
+.. include:: mva/doc/whatsnew-since/release-09-00.txt
+.. include:: b2bii/doc/whatsnew-since/release-09-00.txt
+
+.. include:: framework/doc/whatsnew-since/release-09-00.txt
+.. include:: tracking/doc/whatsnew-since/release-09-00.txt
 
 Changes since release-08
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v02-00-02 to v02-02-04
       :widths: 50 25 25
@@ -953,7 +1261,7 @@ Changes since release-07
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v01-12-01 to v02-00-02
       :widths: 50 25 25
@@ -1018,7 +1326,7 @@ Changes since release-06
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v01-10-02 to v01-12-01
       :widths: 50 25 25
@@ -1701,7 +2009,7 @@ Changes since release-05
 ========================
 
 .. admonition:: New and updated packages in externals
-   :class: toggle
+   :class: dropdown
 
    .. list-table:: New and updated packages in externals from v01-09-01 to v01-10-02
       :widths: 50 25 25

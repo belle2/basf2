@@ -6,18 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <iostream>
-
 #include <analysis/modules/ParticleMomentumUpdater/ParticleMomentumUpdaterModule.h>
+
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
-
-#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
@@ -44,7 +43,7 @@ ParticleMomentumUpdaterModule::ParticleMomentumUpdaterModule() : Module()
 void ParticleMomentumUpdaterModule::initialize()
 {
   StoreObjPtr<ParticleList>().isRequired(m_particleList);
-  StoreArray<Belle2::Particle> particles;
+  StoreArray<Particle> particles;
   particles.isRequired();
 
   bool valid = m_pDDescriptorDaughters.init(m_decayStringDaughters);
@@ -89,7 +88,7 @@ void ParticleMomentumUpdaterModule::event()
     if (targetP == iParticle) {
       iParticle->set4Vector(boost4Vector - daughters4Vector);
     } else {
-      Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetP);
+      Particle* daughterCopy = ParticleCopy::copyParticle(targetP);
       daughterCopy->set4Vector(boost4Vector - daughters4Vector);
       bool isReplaced = iParticle->replaceDaughterRecursively(targetP, daughterCopy);
       if (!isReplaced)

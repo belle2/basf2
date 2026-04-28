@@ -15,6 +15,7 @@
 
 #include <vxd/geometry/GeoCache.h>
 
+#include <cmath>
 #include <tuple>
 
 namespace Belle2 {
@@ -91,10 +92,10 @@ namespace Belle2 {
             const auto& sInfo = geo.getSensorInfo(sensor);
             const auto& local = sInfo.pointToLocal(global, true);
             if (sInfo.inside(local.X(), local.Y(), 0.1, 0.1)) {
-              if (abs(local.Z()) < 0.1) {
+              if (std::abs(local.Z()) < 0.1) {
                 return std::make_tuple(local, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
               } else {
-                ROOT::Math::XYZVector localz{local.X(), local.Y(), abs(local.Z()) - 0.1};
+                ROOT::Math::XYZVector localz{local.X(), local.Y(), std::abs(local.Z()) - 0.1};
                 if (sInfo.inside(localz))
                   return std::make_tuple(local, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
               }

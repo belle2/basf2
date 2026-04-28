@@ -9,11 +9,10 @@
 #include <alignment/GlobalParam.h>
 
 #include <alignment/Hierarchy.h>
-#include <cdc/dbobjects/CDCLayerAlignment.h>
-#include <framework/database/Database.h>
-#include <framework/geometry/B2Vector3.h>
 #include <framework/logging/Logger.h>
 #include <vxd/geometry/GeoCache.h>
+
+#include <Math/Vector3D.h>
 
 #include <map>
 #include <string>
@@ -37,8 +36,15 @@ namespace Belle2 {
         return 0;
       }
 
-      if (auto bp = dynamic_cast<BeamSpot*>(this->getDBObj()))
-        return bp->getIPPosition()[param - 1];
+      if (auto bp = dynamic_cast<BeamSpot*>(this->getDBObj())) {
+        if (param == 1) {
+          return bp->getIPPosition().X();
+        } else if (param == 2) {
+          return bp->getIPPosition().Y();
+        } else if (param == 3) {
+          return bp->getIPPosition().Z();
+        }
+      }
 
       B2ERROR("Could not get value for BeamSpot");
       return 0.;
@@ -53,8 +59,10 @@ namespace Belle2 {
         return;
       }
       if (auto bp = dynamic_cast<BeamSpot*>(this->getDBObj())) {
-        B2Vector3D vertex = bp->getIPPosition();
-        vertex[param - 1] = value;
+        ROOT::Math::XYZVector vertex = bp->getIPPosition();
+        if (param == 1) vertex.SetX(value);
+        else if (param == 2) vertex.SetY(value);
+        else if (param == 3) vertex.SetZ(value);
         bp->setIP(vertex, bp->getIPPositionCovMatrix());
       } else {
         B2ERROR("Could not set value for BeamSpot");
@@ -223,7 +231,7 @@ namespace Belle2 {
                                vxdAlignments->get(ladderPlacement.first, VXDAlignment::dBeta),
                                vxdAlignments->get(ladderPlacement.first, VXDAlignment::dGamma)
                              );
-              // Do not insert ladder, but insert sensor directly into half-shells bellow, with the additional transformation from ladder
+              // Do not insert ladder, but insert sensor directly into half-shells below, with the additional transformation from ladder
               //rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(ladderPlacement.first, halfShellPlacement.first, trafoLadder);
 
               for (auto& sensorPlacement : geo.getSensorPlacements(ladderPlacement.first)) {

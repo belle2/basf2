@@ -113,9 +113,6 @@ namespace Belle2 {
     /** TLine object for lower limit of track cluster charge */
     TLine* m_line_low{};
 
-    /** Whether to use the color code for warnings and errors. */
-    bool m_color = true;
-
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
 

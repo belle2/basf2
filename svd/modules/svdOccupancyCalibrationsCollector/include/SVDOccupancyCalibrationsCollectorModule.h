@@ -9,17 +9,14 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <string>
-#include "TH1F.h"
-
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
-
 #include <svd/dataobjects/SVDHistograms.h>
-
-#include "TTree.h"
-
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <string>
+#include <TH1F.h>
+#include <TTree.h>
 
 namespace Belle2 {
   /**
@@ -60,6 +57,9 @@ namespace Belle2 {
      */
     void finish() override;
 
+    /** Store Object for reading the trigger decision. */
+    StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
+
     /** SVDShaperDigits*/
     std::string m_svdShaperDigitName;
     StoreArray<SVDShaperDigit> m_storeDigits; /**< shaper digits store array*/
@@ -70,17 +70,19 @@ namespace Belle2 {
     /** SVDHistograms */
     SVDHistograms<TH1F>* hm_occupancy = nullptr; /**< strip occupancy per sensor*/
 
-
     /** Tree */
     std::string m_tree = "tree";
     TTree* m_histogramTree = nullptr; /**<tree containing as events the histograms per layer, ladder, sensor, side*/
 
+    /** if true skip events rejected by HLT (default)*/
+    bool m_skipRejectedEvents = true;
+
     TH1F* m_hnevents = nullptr; /**<first bin of the histogram is counting the processed events*/
     TH1F* m_hist = nullptr; /**<pointer to occupancy histogram*/
-    int m_layer = 0;  /**<SVD layer identifier*/
-    int m_ladder = 0;/**<SVD ladder identifier*/
-    int m_sensor = 0;/**<SVD sensor identifier*/
-    int m_side = 0;/**<SVD side identifier*/
+    int m_layer = 0; /**<SVD layer identifier*/
+    int m_ladder = 0; /**<SVD ladder identifier*/
+    int m_sensor = 0; /**<SVD sensor identifier*/
+    int m_side = 0; /**<SVD side identifier*/
 
   private:
 

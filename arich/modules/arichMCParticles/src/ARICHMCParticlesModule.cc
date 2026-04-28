@@ -48,7 +48,7 @@ namespace Belle2 {
   void ARICHMCParticlesModule::initialize()
 
   {
-    // Dependecies check
+    // Dependencies check
     m_tracks.isRequired();
     m_extHits.isRequired();
 

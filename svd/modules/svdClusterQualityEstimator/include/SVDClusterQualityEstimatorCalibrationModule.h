@@ -71,7 +71,7 @@ namespace Belle2 {
     std::string m_outputFileName; /**< output filename*/
 
     std::string
-    m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
+    m_nameOfInstance; /**< allows the user to set an identifier for this module. Useful if one wants to use several instances of that module */
 
     //for setting up histograms
 

@@ -90,7 +90,7 @@ main.add_module(koralw)
 main.add_module(showMCPart)
 
 # generate events
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # show call statistics
 print(basf2.statistics)

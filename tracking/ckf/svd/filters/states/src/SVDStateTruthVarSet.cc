@@ -7,18 +7,24 @@
  **************************************************************************/
 #include <tracking/ckf/svd/filters/states/SVDStateTruthVarSet.h>
 
+#include <framework/core/ModuleParamList.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <framework/dataobjects/EventMetaData.h>
+
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <TRandom.h>
+
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool SVDStateTruthVarSet::extract(const BaseSVDStateFilter::Object* pair)
 {
-  const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& previousStates = pair->first;
+  const std::vector<TrackingUtilities::WithWeight<const CKFToSVDState*>>& previousStates = pair->first;
   CKFToSVDState* state = pair->second;
 
-  std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>> allStates = previousStates;
+  std::vector<TrackingUtilities::WithWeight<const CKFToSVDState*>> allStates = previousStates;
   allStates.emplace_back(state, 0);
 
   const RecoTrack* seedTrack = previousStates.front()->getSeed();
@@ -37,6 +43,9 @@ bool SVDStateTruthVarSet::extract(const BaseSVDStateFilter::Object* pair)
   var<named("truth")>() = 0;
 
   if (not m_mcUtil.allStatesCorrect(allStates)) {
+    if (m_UseFractionOfBackground and gRandom->Uniform() > m_BackgroundFraction) {
+      return false;
+    }
     // Keep all variables set to false and return.
     return true;
   }
@@ -56,4 +65,16 @@ bool SVDStateTruthVarSet::extract(const BaseSVDStateFilter::Object* pair)
   var<named("truth_momentum_z")>() = cdcMCTrack->getMomentumSeed().Z();
 
   return true;
+}
+
+void SVDStateTruthVarSet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "useFractionOfBackground"), m_UseFractionOfBackground,
+                                "Use only a fraction of background hits and combinations in recording to improve the signal fraction in the recording.",
+                                m_UseFractionOfBackground);
+
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "backgroundFraction"), m_BackgroundFraction,
+                                "Fraction of background hits and combinations to be used in recording to improve the signal fraction in the recording if " + \
+                                TrackingUtilities::prefixed(prefix, "useFractionOfBackground") + " is true.",
+                                m_BackgroundFraction);
 }

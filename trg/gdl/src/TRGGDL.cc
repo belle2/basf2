@@ -553,7 +553,7 @@ namespace Belle2 {
           }
           reading_word = false;
         } else {
-          // 2nd blank 'xx  ' or leading blanck '^ '
+          // 2nd blank 'xx  ' or leading blank '^ '
         }
       }
     }

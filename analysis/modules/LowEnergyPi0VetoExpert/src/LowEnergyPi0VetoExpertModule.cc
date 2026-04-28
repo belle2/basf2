@@ -11,13 +11,10 @@
 
 /* Analysis headers. */
 #include <analysis/variables/ECLVariables.h>
-#include <analysis/variables/HelicityVariables.h>
 
 /* Basf2 headers. */
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mva/interface/Interface.h>
-
-/* Boost headers. */
-#include <boost/algorithm/string/predicate.hpp>
 
 /* ROOT headers. */
 #include <Math/Vector3D.h>
@@ -55,7 +52,7 @@ void LowEnergyPi0VetoExpertModule::initialize()
   m_ListGamma.isRequired(m_GammaListName);
   if (m_VetoPi0Daughters)
     m_ListPi0.isRequired(m_Pi0ListName);
-  if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
+  if (not(m_identifier.ends_with(".root") or m_identifier.ends_with(".xml"))) {
     m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
                                   DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifier));
   }
@@ -149,8 +146,8 @@ float LowEnergyPi0VetoExpertModule::getMaximumVeto(const Particle* gamma1,
     gammaHighEnergyMomentum =
       ROOT::Math::VectorUtil::boost(gammaHighEnergyMomentum, boost);
     cosHelicityAngleMomentum =
-      fabs(ROOT::Math::VectorUtil::CosTheta(momentum.Vect(),
-                                            gammaHighEnergyMomentum.Vect()));
+      fabs(ROOT::Math::VectorUtil::CosTheta(momentum,
+                                            gammaHighEnergyMomentum));
     gammaLowEnergyE9E21 = Variable::eclClusterE9E21(gammaLowEnergy);
     gammaHighEnergyE9E21 = Variable::eclClusterE9E21(gammaHighEnergy);
     gammaLowEnergyClusterTheta = Variable::eclClusterTheta(gammaLowEnergy);

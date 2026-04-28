@@ -197,7 +197,7 @@ class printSVDLadders(b2.Module):
                 ladderNumber = ladder.getLadderNumber()
                 for sensor in geoCache.getSensors(ladder):
                     sensorNumber = sensor.getSensorNumber()
-                    if not(sensorNumber == layerNumber - 1):
+                    if not (sensorNumber == layerNumber - 1):
                         continue
                     # sensor ID string
                     sensorID = str(layerNumber) + "." + str(ladderNumber)
@@ -207,7 +207,7 @@ class printSVDLadders(b2.Module):
 
                     angleRad = m.atan2(glob.Y(), glob.X())
                     print(angleRad)
-                    if(angleRad < 0):
+                    if (angleRad < 0):
                         angleRad = 2 * m.pi + angleRad
                         print("second = " + str(angleRad))
 
@@ -247,5 +247,3 @@ b2.print_path(main)
 
 # Process events
 b2.process(main)
-
-print(b2.statistics)

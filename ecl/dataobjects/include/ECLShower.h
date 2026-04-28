@@ -60,7 +60,10 @@ namespace Belle2 {
 
     /** Default constructor for ROOT */
     ECLShower() :
-      m_isTrk(false),                          /**< Match with track */
+      m_listOfCrystalsForEnergy{},             /**< list of cell ids used for energy calculation*/
+      m_listOfCrystalEnergyRankAndQuality{},   /**< list of ECLCalDigit indices sorted by online energy*/
+      m_absZernikeMoments{ -999.0},            /**< Shower shape variables, absolute values of Zernike Moments 10 to 55 */
+      m_Error{0.0, 0.0, 0.0, 0.0, 0.0, 0.0},   /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
       m_status(0),                             /**< Status (e.g. shower contains one hot crystal) */
       m_showerId(0),                           /**< Shower ID */
       m_connectedRegionId(0),                  /**< Connected Region ID */
@@ -71,7 +74,6 @@ namespace Belle2 {
       m_theta(0.0),                            /**< Theta (rad) */
       m_phi(0.0),                              /**< Phi (rad) */
       m_r(0.0),                                /**< R (cm) */
-      m_Error{0.0, 0.0, 0.0, 0.0, 0.0, 0.0},   /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
       m_time(0),                               /**< Time */
       m_deltaTime99(0),                        /**< Time that contains 99% of true signals */
       m_energyHighestCrystal(0.0),             /**< Highest energy in Shower*/
@@ -80,7 +82,6 @@ namespace Belle2 {
       m_trkDepth(0.0),                         /**< Path on track extrapolation to POCA to average cluster direction   */
       m_showerDepth(0.0),                      /**< Same as above, but on the cluster average direction */
       m_numberOfCrystals(0.0),                 /**< Sum of weights of crystals (~number of crystals) */
-      m_absZernikeMoments{ -999.0},            /**< Shower shape variables, absolute values of Zernike Moments 10 to 55 */
       m_zernikeMVA(0.0),                       /**< Shower shape variable, Zernike MVA output */
       m_secondMoment(0.0),                     /**< Shower shape variable, second moment (needed for merged pi0) */
       m_E1oE9(0.0),                            /**< Shower shape variable, E1oE9 */
@@ -90,11 +91,10 @@ namespace Belle2 {
       m_NumberOfHadronDigits(0.0),             /**< Shower Number of hadron digits*/
       m_numberOfCrystalsForEnergy(0.0),        /**< number of crystals used for energy calculation*/
       m_nominalNumberOfCrystalsForEnergy(0.0), /**< nominal number of crystals used for energy calculation*/
+      m_nOptimalEnergy(0.0),                   /**< energy used to find nOptimalEnergyBin in ECLSplitterN1 */
       m_nOptimalGroupIndex(-1),                /**< index of group of crystals used to find m_nominalNumberOfCrystalsForEnergy */
-      m_nOptimalEnergyBin(-1),                      /**< energy bin used to find m_nominalNumberOfCrystalsForEnergy */
-      m_nOptimalEnergy(0.0),                    /**< energy used to find nOptimalEnergyBin in ECLSplitterN1 */
-      m_listOfCrystalsForEnergy{},             /**< list of cell ids used for energy calculation*/
-      m_listOfCrystalEnergyRankAndQuality{}    /**< list of ECLCalDigit indices sorted by online energy*/
+      m_nOptimalEnergyBin(-1),                 /**< energy bin used to find m_nominalNumberOfCrystalsForEnergy */
+      m_isTrk(false)                           /**< Match with track */
 
     { }
 
@@ -523,7 +523,12 @@ namespace Belle2 {
 
 
   private:
-    bool m_isTrk;                   /**< Match with track (GDN) */
+    std::vector<unsigned int> m_listOfCrystalsForEnergy; /**< list of cell ids used for energy calculation (TF)*/
+    std::vector<std::pair<unsigned int, bool>>
+                                            m_listOfCrystalEnergyRankAndQuality; /**< list of indices of related ECLCalDigits by energy. Also stores a quality flag for each digit denoting whether the PSD information can be used for charged particle ID. Cached here to avoid resorting the ECLCalDigit vector 90 times per track.*/
+
+    Double32_t m_absZernikeMoments[20];  /**< Shower shape variables, absolute values of Zernike Moments (MH) */
+    Double32_t m_Error[6];          /**< Error of Energy, Theta and Phi */
 
     int m_status;                   /**< Status */
     int m_showerId;                 /**< Shower ID */
@@ -536,7 +541,6 @@ namespace Belle2 {
     Double32_t m_theta;             /**< Theta (rad) */
     Double32_t m_phi;               /**< Phi (rad) */
     Double32_t m_r;                 /**< R (cm) */
-    Double32_t m_Error[6];          /**< Error of Energy, Theta and Phi */
     Double32_t m_time;              /**< Time */
     Double32_t m_deltaTime99;       /**< Time that contains 99% of signal crystals */
     Double32_t m_energyHighestCrystal;     /**< Highest Energy in Shower (GeV) (TF) */
@@ -545,7 +549,6 @@ namespace Belle2 {
     Double32_t m_trkDepth;          /**< Path on track ext. to POCA to avg. cluster dir. (GDN) */
     Double32_t m_showerDepth;       /**< Same as above, but on the cluster average direction (GDN) */
     Double32_t m_numberOfCrystals;       /**< Sum of weights of crystals (~number of crystals) (TF) */
-    Double32_t m_absZernikeMoments[20];  /**< Shower shape variables, absolute values of Zernike Moments (MH) */
     Double32_t m_zernikeMVA;        /**< Shower shape variable, zernike MVA output */
     Double32_t m_secondMoment;      /**< Shower shape variable, second moment (for merged pi0) (TF) */
     Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */
@@ -558,12 +561,11 @@ namespace Belle2 {
     m_NumberOfHadronDigits;         /**< Number of hadron digits in shower (pulse shape discrimination variable).  Weighted sum of digits in shower with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. (SL)*/
     Double32_t m_numberOfCrystalsForEnergy; /**< number of crystals used for energy calculation (TF)*/
     Double32_t m_nominalNumberOfCrystalsForEnergy; /**< number of crystals used for energy calculation (TF)*/
+    Double32_t m_nOptimalEnergy; /**< energy used in ECLSplitterN1 to find nOptimalEnergyBin (CH) */
     int m_nOptimalGroupIndex; /**< group (of crystals) number used to find nominalNumberOfCrystalsForEnergy (CH) */
     int m_nOptimalEnergyBin; /**< energy bin used to find nominalNumberOfCrystalsForEnergy (CH) */
-    Double32_t m_nOptimalEnergy; /**< energy used in ECLSplitterN1 to find nOptimalEnergyBin (CH) */
-    std::vector<unsigned int> m_listOfCrystalsForEnergy; /**< list of cell ids used for energy calculation (TF)*/
-    std::vector<std::pair<unsigned int, bool>>
-                                            m_listOfCrystalEnergyRankAndQuality; /**< list of indices of related ECLCalDigits by energy. Also stores a quality flag for each digit denoting whether the PSD information can be used for charged particle ID. Cached here to avoid resorting the ECLCalDigit vector 90 times per track.*/
+
+    bool m_isTrk;                   /**< Match with track (GDN) */
 
     // 2: added uniqueID and highestE (TF)
     // 3: added LAT and distance to closest track and trk match flag (GDN)
@@ -581,7 +583,8 @@ namespace Belle2 {
     // 15: added m_listOfCrystalsForEnergy, m_nominalNumberOfCrystalsForEnergy
     // 16: removed m_absZernike40 and 51, added m_absZernikeMoments, m_listOfCrystalEnergyRankAndQuality (MH)
     // 17: added m_nOptimalGroupIndex, m_nOptimalEnergyBin, and m_nOptimalEnergy (CH)
-    ClassDef(ECLShower, 17);/**< ClassDef */
+    // 18: Slightly reorder data members to improve memory layout (CW)
+    ClassDef(ECLShower, 18);/**< ClassDef */
 
   };
 

@@ -9,13 +9,10 @@
 // Own header.
 #include <background/modules/BeamBkgMixer/BeamBkgMixerModule.h>
 
-
-
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/core/ModuleParam.templateDetails.h>
@@ -32,7 +29,6 @@
 #include <simulation/dataobjects/BeamBackHit.h>
 
 // MetaData
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/BackgroundInfo.h>
 
 // Root
@@ -103,9 +99,6 @@ BeamBkgMixerModule::BeamBkgMixerModule() : Module()
            "file cache size in Mbytes. If negative, use root default", 0);
 }
 
-BeamBkgMixerModule::~BeamBkgMixerModule()
-{
-}
 
 void BeamBkgMixerModule::initialize()
 {
@@ -144,7 +137,7 @@ void BeamBkgMixerModule::initialize()
 
   // check files and append them to sample container
 
-  for (auto file : m_backgroundFiles) {
+  for (const auto& file : m_backgroundFiles) {
 
     // wildcarding is not allowed anymore
     if (TString(file.c_str()).Contains("*")) {
@@ -152,7 +145,7 @@ void BeamBkgMixerModule::initialize()
       continue;
     }
 
-    // check the file existance
+    // check the file existence
     TFile* f = TFile::Open(file.c_str(), "READ");
     if (!f) {
       B2ERROR(file << ": file not found");
@@ -189,7 +182,7 @@ void BeamBkgMixerModule::initialize()
     double realTime = 0;
     for (unsigned k = 0; k < persistent.GetEntries(); k++) {
       persistent.GetEntry(k);
-      BackgroundMetaData* bgMD = static_cast<BackgroundMetaData*>(bkgMetaData);
+      const BackgroundMetaData* bgMD = static_cast<BackgroundMetaData*>(bkgMetaData);
       tags.push_back(bgMD->getBackgroundTag());
       types.push_back(bgMD->getBackgroundType());
       fileTypes.push_back(bgMD->getFileType());
@@ -322,7 +315,7 @@ void BeamBkgMixerModule::initialize()
   bkgInfo->setMaxTimePXD(m_maxTimePXD);
   bkgInfo->setWrapAround(m_wrapAround);
   bkgInfo->setMaxEdepECL(m_maxEdepECL);
-  for (auto& bkg : m_backgrounds) {
+  for (const auto& bkg : m_backgrounds) {
     BackgroundInfo::BackgroundDescr descr;
     descr.tag = bkg.tag;
     descr.type = bkg.type;
@@ -336,10 +329,6 @@ void BeamBkgMixerModule::initialize()
     bkgInfo->appendBackgroundDescr(descr);
   }
 
-}
-
-void BeamBkgMixerModule::beginRun()
-{
 }
 
 void BeamBkgMixerModule::event()
@@ -392,7 +381,7 @@ void BeamBkgMixerModule::event()
       bkg.eventCount++;
       if (bkg.eventCount >= bkg.numEvents) {
         bkg.eventCount = 0;
-        std::string message = "BeamBkgMixer: events of " + bkg.type + " will be re-used";
+        std::string message = "BeamBkgMixer: events of " + bkg.type + " will be reused";
         m_reused[message] += 1;
         if (m_reused[message] == 1) B2INFO(message);
         bkgInfo->incrementReusedCounter(bkg.index);
@@ -439,7 +428,7 @@ void BeamBkgMixerModule::event()
       bkg.eventCount++;
       if (bkg.eventCount >= bkg.numEvents) {
         bkg.eventCount = 0;
-        std::string message = "BeamBkgMixer: events of " + bkg.type + " will be re-used";
+        std::string message = "BeamBkgMixer: events of " + bkg.type + " will be reused";
         m_reused[message] += 1;
         if (m_reused[message] == 1) B2INFO(message);
         bkgInfo->incrementReusedCounter(bkg.index);
@@ -473,7 +462,7 @@ void BeamBkgMixerModule::event()
       bkg.eventCount++;
       if (bkg.eventCount >= bkg.numEvents) {
         bkg.eventCount = 0;
-        std::string message = "BeamBkgMixer: events of " + bkg.type + " will be re-used";
+        std::string message = "BeamBkgMixer: events of " + bkg.type + " will be reused";
         m_reused[message] += 1;
         if (m_reused[message] == 1) B2INFO(message);
         bkgInfo->incrementReusedCounter(bkg.index);
@@ -485,20 +474,16 @@ void BeamBkgMixerModule::event()
 }
 
 
-void BeamBkgMixerModule::endRun()
-{
-}
-
 void BeamBkgMixerModule::terminate()
 {
 
   B2INFO("BeamBkgMixer - reused samples:");
   for (const auto& message : m_reused) {
-    B2INFO(message.first << "(occured " << message.second << " times)");
+    B2INFO(message.first << "(occurred " << message.second << " times)");
   }
   B2INFO("BeamBkgMixer - rejected events:");
   for (const auto& message : m_rejected) {
-    B2INFO(message.first << "(occured " << message.second << " times)");
+    B2INFO(message.first << "(occurred " << message.second << " times)");
   }
 
   for (auto& bkg : m_backgrounds) {
@@ -550,7 +535,7 @@ bool BeamBkgMixerModule::acceptEvent(TClonesArray* cloneArrayECL)
 
   int numEntries = cloneArrayECL->GetEntriesFast();
   for (int i = 0; i < numEntries; i++) {
-    ECLHit* simHit = static_cast<ECLHit*>(cloneArrayECL->AddrAt(i));
+    const ECLHit* simHit = static_cast<ECLHit*>(cloneArrayECL->AddrAt(i));
     if (simHit->getEnergyDep() > m_maxEdepECL) return false;
   }
   return true;

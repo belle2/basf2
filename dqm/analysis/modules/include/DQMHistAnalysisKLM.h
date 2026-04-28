@@ -111,10 +111,41 @@ namespace Belle2 {
     /**
      * Process histogram containing the number of hits in plane.
      * @param[in]  histName  Histogram name.
+     * @param[in]  histogram Histogram.
      * @param[out] latex     TLatex to draw messages.
      */
+    void processPlaneHistogram(const std::string& histName, TLatex* latex, TH1* histogram);
+
+    /**
+     * Process histogram containing the number of hits in plane.
+     * @param[in]  histName  Histogram name.
+     * @param[out] latex     TLatex to draw messages.
+     */
+    // Overloaded function for backward compatibility (TLatex reference)
+    // so that the above function can be used with or without TLatex for FE histograms.
     void processPlaneHistogram(const std::string& histName, TLatex& latex);
 
+    /**
+    * Helper function to update the canvas status based on dead modules.
+    * @param[in] canvas Canvas of interest.
+    * @param[in] deadModules List of dead modules.
+    * @param[in] latex LaTeX object to render text annotations.
+    * @param[out] message_counter Counter for how many messages are drawn.
+    * @param[out] xAlarm X-position for the alarm messages.
+    * @param[out] yAlarm Y-position for the alarm messages.
+    */
+    void updateCanvasStatus(
+      TCanvas* canvas, const std::vector<KLMModuleNumber>& deadModules,
+      TLatex* latex, int& message_counter, double xAlarm, double yAlarm);
+
+    /**
+     * Process histogram containing the efficiencies.
+     * @param[in]  feHist  Histogram itself.
+     * @param[in]  denominator Denominator for efficiency hist.
+     * @param[in]  numerator Numerator for efficiency hist.
+     * @param[in]  canvas Canvas of interest.
+     */
+    void processFEHistogram(TH1* feHist,  TH1* denominator, TH1* numerator, TCanvas* canvas);
 
     /**
      * Fill histogram containing masked channels per sector.
@@ -177,6 +208,18 @@ namespace Belle2 {
 
     /** TText for names in plane histograms. */
     TText m_PlaneText;
+
+    /** Histogram for BKLM plane events fraction w/ FE. */
+    TH1* m_fe_bklm_ratio = nullptr;
+
+    /** Canvas for BKLM plane events fraction w/ FE.  */
+    TCanvas* m_c_fe_bklm_ratio = nullptr;
+
+    /** Histogram for EKLM plane events fraction w/ FE. */
+    TH1* m_fe_eklm_ratio = nullptr;
+
+    /** Canvas for EKLM plane events fraction w/ FE. */
+    TCanvas* m_c_fe_eklm_ratio = nullptr;
 
     /** Run type flag for null runs. */
     bool m_IsNullRun;

@@ -16,8 +16,6 @@
 #include <framework/logging/Logger.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
 #include <boost/math/special_functions/sign.hpp>
 
 #include <G4LogicalVolume.hh>
@@ -31,7 +29,6 @@
 #include <G4SubtractionSolid.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -120,7 +117,7 @@ namespace Belle2 {
           double sizeY  = shield.getCutOutHeight() / Unit::mm / 2.;
           double depth2 = shield.getCutOutDepth() / Unit::mm / 2.;
           double sizeZ  = (maxZ - minZ) / 2.;
-          double sign = math::sign<double>(minZ);
+          double sign = boost::math::sign<double>(minZ);
           double minAbsZ = min(fabs(minZ), fabs(maxZ));
 
           G4ThreeVector origin1(0, 0, sign * (minAbsZ + sizeZ));

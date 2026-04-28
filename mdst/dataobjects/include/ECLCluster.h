@@ -65,6 +65,7 @@ namespace Belle2 {
       m_status(0),
       m_hypotheses(static_cast<unsigned short>(EHypothesisBit::c_nPhotons)), // set to c_nPhotons for b2bii
       m_maxECellId(0),
+      m_minTrkDistanceID(65535),
       m_connectedRegionId(0),
       m_clusterId(0),
       m_sqrtcovmat_00(0.),
@@ -75,7 +76,6 @@ namespace Belle2 {
       m_sqrtcovmat_22(0.),
       m_deltaL(0.),
       m_minTrkDistance(0.),
-      m_minTrkDistanceID(65535),
       m_absZernike40(0.),
       m_absZernike51(0.),
       m_zernikeMVA(0.),
@@ -221,11 +221,20 @@ namespace Belle2 {
     /** Set Corrected Energy (GeV). */
     void setEnergy(double energy) { m_logEnergy = log(energy); }
 
-    /** Set Uncorrect Energy deposited (GeV). */
+    /** Set Corrected log Energy (log(GeV)). */
+    void setLogEnergy(double logenergy) { m_logEnergy = logenergy; }
+
+    /** Set Incorrect Energy deposited (GeV). */
     void setEnergyRaw(double energyraw) { m_logEnergyRaw = log(energyraw); }
+
+    /** Set Incorrect log Energy deposited (log(GeV)). */
+    void setLogEnergyRaw(double logenergyraw) { m_logEnergyRaw = logenergyraw; }
 
     /** Set energy of highest energetic crystal (GeV). */
     void setEnergyHighestCrystal(double energyhighestcrystal) { m_logEnergyHighestCrystal = log(energyhighestcrystal); }
+
+    /** Set log energy of highest energetic crystal (log(GeV)). */
+    void setLogEnergyHighestCrystal(double logenergyhighestcrystal) { m_logEnergyHighestCrystal = logenergyhighestcrystal; }
 
     /** Return true if the cluster matches with track. */
     bool isTrack() const { return m_isTrack; }
@@ -376,6 +385,9 @@ namespace Belle2 {
     /** CellID of maximum energy crystal */
     unsigned short m_maxECellId;
 
+    /** Array index of the nearest track */
+    unsigned short m_minTrkDistanceID;
+
     /** Connected Region of this cluster. */
     int m_connectedRegionId;
 
@@ -410,9 +422,6 @@ namespace Belle2 {
 
     /** Distance between cluster center and track extrapolation to ECL. */
     Double32_t  m_minTrkDistance;  //[0.0, 250., 10]
-
-    /** Array index of the nearest track */
-    unsigned short m_minTrkDistanceID;
 
     /** Zernike 40. */
     Double32_t  m_absZernike40;  //[0.0, 1.7, 10]
@@ -472,7 +481,7 @@ namespace Belle2 {
     Double32_t m_NumberOfHadronDigits;  //[0, 255, 18]
 
     /** Class definition */
-    ClassDef(ECLCluster, 15);
+    ClassDef(ECLCluster, 16);
     // 15: Added m_minTrkDistanceID
     // 14: Added m_maxECellId
     // 13: Added m_hypotheses

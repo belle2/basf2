@@ -11,15 +11,11 @@
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/datastore/StoreArray.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
 #include <analysis/variables/SpecificKinematicVariables.h>
 #include <analysis/variables/Variables.h>
-
-#include <analysis/VariableManager/Manager.h>
 
 using namespace std;
 using namespace Belle2;
@@ -35,12 +31,10 @@ namespace {
 
       DataStore::Instance().setInitializeActive(true);
       StoreArray<ECLCluster> myECLClusters;
-      StoreArray<KLMCluster> myKLMClusters;
       StoreArray<TrackFitResult> myTFRs;
       StoreArray<Track> myTracks;
       StoreArray<Particle> myParticles;
       myECLClusters.registerInDataStore();
-      myKLMClusters.registerInDataStore();
       myTFRs.registerInDataStore();
       myTracks.registerInDataStore();
       myParticles.registerInDataStore();

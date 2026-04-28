@@ -6,14 +6,16 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/svd/filters/relations/DistanceSVDPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-using namespace Belle2;
-using namespace TrackFindingCDC;
+#include <cmath>
 
-TrackFindingCDC::Weight
+using namespace Belle2;
+using namespace TrackingUtilities;
+
+TrackingUtilities::Weight
 DistanceSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation)
 {
   const CKFToSVDState& fromState = *(relation.first);
@@ -30,7 +32,7 @@ DistanceSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CK
 
   if (not fromStateCache.isHitState) {
     // We are coming from a CDC track, so we can use its position to only look for matching ladders
-    if (fabs(phiDiff) < 0.2f and fabs(fromStateCache.theta - toStateCache.theta) < 0.2f) {
+    if (std::abs(phiDiff) < 0.2f and std::abs(fromStateCache.theta - toStateCache.theta) < 0.2f) {
       return 1.0;
     }
     // If the current state (fromState) is a RecoTrack-based state, but no relations could be created
@@ -45,7 +47,7 @@ DistanceSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CK
     return 1.0;
   }
 
-  if (abs(phiDiff) < 0.2f) {
+  if (std::abs(phiDiff) < 0.2f) {
     return 1.0;
   }
 

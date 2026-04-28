@@ -45,7 +45,7 @@ namespace Belle2 {
     *
     * When comparing double/int and a bool the double/int overload of the functionals are used to disable implicit conversion to bool:
     * std::equal_to<bool>{}(1.2, true) ==> true; 1.2 is implicitly converted to true, because of std::equal<bool>
-    * std::equal_to<double>{}(1.2, true) ==> false; true is implicity converted to 1.0, because of std::equal<double>
+    * std::equal_to<double>{}(1.2, true) ==> false; true is implicitly converted to 1.0, because of std::equal<double>
     */
   template <template <typename type> class operation>
   struct Visitor {
@@ -115,7 +115,7 @@ namespace Belle2 {
   };
 
   /**
-   * Seperate Visitor struct for equal_to comparison of variant<double, int bool>.
+   * Separate Visitor struct for equal_to comparison of variant<double, int bool>.
    * Uses almostEqualDouble if one argument is double.
   **/
   struct EqualVisitor {
@@ -619,7 +619,7 @@ namespace Belle2 {
     * @param center_node (const boost::python::tuple&): tuple containing an expression node
     * @param right_node (const boost::python::tuple&): tuple containing an expression node
     * @param lc_coperator (ComparisonOperator): comparison operator enum value specifying the comparison between left and center expression
-    * @param cr_coperator (ComparisonOperator): comparison operator enum value specifiying the comparison between center and right expression
+    * @param cr_coperator (ComparisonOperator): comparison operator enum value specifying the comparison between center and right expression
     **/
     explicit TernaryRelationalNode(Nodetuple left_node, Nodetuple center_node, Nodetuple right_node, ComparisonOperator lc_coperator,
                                    ComparisonOperator cr_coperator)
@@ -716,7 +716,7 @@ namespace Belle2 {
 
   /**
    * BinaryExpressionNode
-   * Node which connects two expression nodes with an arithemtic operation
+   * Node which connects two expression nodes with an arithmetic operation
    **/
   template<class AVariableManager>
   class BinaryExpressionNode : public AbstractExpressionNode<AVariableManager> {

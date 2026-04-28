@@ -10,7 +10,9 @@
 #include <TH1F.h>
 #include <cdc/dbobjects/CDCGeometry.h>
 #include <framework/database/DBObjPtr.h>
-#include "string"
+
+#include <string>
+
 namespace Belle2 {
   namespace CDC {
     /**
@@ -54,7 +56,7 @@ namespace Belle2 {
       EResult calibrate() override;
       ///create histo for each channel
       void createHisto();
-      /// write outut or store db
+      /// write output or store db
       int write();
       /// calculate mean of the T0 distribution
       double getMeanT0(TH1F* h1);

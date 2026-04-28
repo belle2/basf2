@@ -8,10 +8,9 @@
 
 #include <analysis/dbobjects/PIDNeuralNetworkParameters.h>
 
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <algorithm>
 
 using namespace Belle2;
 

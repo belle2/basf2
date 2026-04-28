@@ -9,7 +9,6 @@
 #include <framework/logging/Logger.h>
 
 #include <arich/dbobjects/ARICHHvCrateCableMapping.h>
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;

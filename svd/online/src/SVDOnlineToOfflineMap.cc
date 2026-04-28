@@ -44,12 +44,12 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
   try {
     read_xml(xmlFullPath, propertyTree);
   } catch (std::exception const& ex) {
-    B2ERROR("STD excpetion rised during xml parsing " << ex.what() << endl <<
+    B2ERROR("STD exception raised during xml parsing " << ex.what() << endl <<
             "SVD online to offline map cannot be initialized." << endl <<
             "Be aware: no SVDShaperDigits will be produced by this module." << endl);
     return;
   } catch (...) {
-    B2ERROR("Unknown excpetion rised during xml parsing "
+    B2ERROR("Unknown exception raised during xml parsing "
             "SVD online to offline map cannot be initialized." << endl <<
             "Be aware: no SVDShaperDigits will be produced by this module." << endl);
     return;
@@ -67,7 +67,7 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
         ReadLayer(v.second.get<int>("<xmlattr>.n"), v.second);
     }
   } catch (...) {
-    B2ERROR("Unknown excpetion rised during map initialization! "
+    B2ERROR("Unknown exception raised during map initialization! "
             "SVD online to offline map corrupted." << endl <<
             "Be aware: the SVDShaperDigits will be unreliable." << endl);
     // To Do: rise an exception so that the calling module will skip the

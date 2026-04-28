@@ -12,9 +12,6 @@
 Simple script to create some particles in a list with a python module
 """
 
-# Go away doxygen, no one likes you
-# @cond
-
 import basf2
 from ROOT import Belle2
 from ROOT.Math import PxPyPzEVector
@@ -41,5 +38,3 @@ path.add_module(MyParticleCreator())
 path.add_module("ParticlePrinter", listName="B0:all")
 path.add_module("ParticlePrinter", listName="pi0:all")
 basf2.process(path)
-
-# @endcond

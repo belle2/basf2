@@ -60,7 +60,8 @@ def require_file(filename, data_type="", py_case=None):
 
     Parameters:
         filename (str): relative filename to look for, either in a central place or in the current working directory
-        data_type (str): case insensitive data type to find.  Either empty string or one of ``"examples"`` or ``"validation"``.
+        data_type (str): case insensitive data type to find.  Either empty string or one of ``"examples"``, ``"validation"``
+          or ``"starterkit"``.
         py_case (unittest.TestCase): if this is to be skipped within python's native unittest then pass the TestCase instance
 
     Returns:
@@ -103,7 +104,7 @@ def show_only_errors():
         yield
 
 
-def configure_logging_for_tests(user_replacements=None):
+def configure_logging_for_tests(user_replacements=None, replace_cdb_provider=True):
     """
     Change the log system to behave a bit more appropriately for testing scenarios:
 
@@ -112,6 +113,7 @@ def configure_logging_for_tests(user_replacements=None):
     3. Intercept all log messages and replace
 
         * the current working directory in log messaged with ``${cwd}``
+        * the current release version with ``${release_version}``
         * the current default globaltags with ``${default_globaltag}``
         * the contents of the following environment variables with their name
           (or the listed replacement string):
@@ -127,6 +129,8 @@ def configure_logging_for_tests(user_replacements=None):
 
     Parameters:
         user_replacements (dict(str, str)): Additional strings and their replacements to replace in the output
+        replace_cdb_provider (bool): If False, it does not replace the conditions database metadata provider with
+          `BELLE2_CONDB_METADATA` (necessary for some specific tests)
 
     Warning:
         This function should be called **after** switching directory to replace the correct directory name
@@ -147,9 +151,15 @@ def configure_logging_for_tests(user_replacements=None):
     # current directory should go first and might be overridden if for example
     # the BELLE2_LOCAL_DIR is identical to the current working directory
     replacements = OrderedDict()
+    try:
+        replacements[basf2.version.get_version()] = "${release_version}"
+    except Exception:
+        pass
     replacements[", ".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
-    # add a special replacement for the CDB metadata provider URL, since it's not set via env. variable
-    replacements[basf2.conditions.default_metadata_provider_url] = "${BELLE2_CONDB_METADATA}"
+    # add a special replacement for the CDB metadata provider, since it's not set via env. variable
+    # use the first metadata provider in the list for the replacement
+    if replace_cdb_provider and len(basf2.conditions.metadata_providers) > 0:
+        replacements[basf2.conditions.metadata_providers[0]] = "${BELLE2_CONDB_METADATA}"
     # Let's be lazy and take the environment variables from the docstring so we don't have to repeat them here
     for env_name, replacement in re.findall(":envvar:`(.*?)`(?:.*``(.*?)``)?", configure_logging_for_tests.__doc__):
         if not replacement:
@@ -389,20 +399,21 @@ def print_belle2_environment():
 
 
 @contextmanager
-def temporary_set_environment(**environ):
+def temporary_environment(**environ):
     """
-    Temporarily set the process environment variables.
-    Inspired by https://stackoverflow.com/a/34333710
+    Context manager that temporarily sets environment variables
+    for the current process. Inspired by https://stackoverflow.com/a/34333710
 
-    >>> with temporary_set_environment(BELLE2_TEMP_DIR='/tmp/belle2'):
+    >>> with temporary_environment(BELLE2_TEMP_DIR='/tmp/belle2'):
     ...   "BELLE2_TEMP_DIR" in os.environ
     True
 
     >>> "BELLE2_TEMP_DIR" in os.environ
     False
 
-    Arguments:
-        environ(dict): Dictionary of environment variables to set
+    Args:
+        **environ: Arbitrary keyword arguments specifying environment
+                   variables and their values.
     """
     old_environ = dict(os.environ)
     os.environ.update(environ)
@@ -420,6 +431,34 @@ def is_ci() -> bool:
     tests are run.
     """
     return os.environ.get("BELLE2_IS_CI", "no").lower() in [
+        "yes",
+        "1",
+        "y",
+        "on",
+    ]
+
+
+def is_cdb_down() -> bool:
+    """
+    Returns true if the Conditions Database (CDB) is currently unavailable or slow to respond.
+    The 'BELLE2_IS_CDB_DOWN' environment variable can be used to dynamically exclude some
+    tests that rely on the CDB in case of problems.
+    """
+    return os.environ.get("BELLE2_IS_CDB_DOWN", "no").lower() in [
+        "yes",
+        "1",
+        "y",
+        "on",
+    ]
+
+
+def is_rundb_down() -> bool:
+    """
+    Returns true if the RunDB is currently unavailable or slow to respond.
+    The 'BELLE2_IS_RUNDB_DOWN' environment variable can be used to dynamically exclude some
+    tests that rely on the RunDB in case of problems.
+    """
+    return os.environ.get("BELLE2_IS_RUNDB_DOWN", "no").lower() in [
         "yes",
         "1",
         "y",

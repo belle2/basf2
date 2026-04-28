@@ -150,8 +150,11 @@ namespace Belle2 {
       /** implementation of FADC Trailer */
       struct FADCTrailer {
         unsigned int FTBFlags: 16;  /**< FTB Flags Field */
-        unsigned int dataSizeCut: 1; /**< APV data-size cut flag  */
-        unsigned int nullDigits: 7; /**< "0000000" */
+        unsigned int APVdataSizeCut: 1; /**< APV data-size cut flag  */
+        unsigned int FADCdataSizeCut: 1; /**< FADC data-size cut flag  */
+        unsigned int DummyAPVHeader: 1; /**< Dummy APV Header included flag */
+        unsigned int PiplAddrMismatch: 1; /**< Pipeline address mismatch detection flag */
+        unsigned int nullDigits: 4; /**< "0000" */
         unsigned int fifoErrOR: 1;  /**< FIFO full Error OR */
         unsigned int frameErrOR: 1; /**< Frame Error OR */
         unsigned int detectErrOR: 1;/**< Detection Error OR */
@@ -181,7 +184,7 @@ namespace Belle2 {
       StoreObjPtr<SVDEventInfo> m_svdEventInfoPtr;  /**< SVDEventInfo from simulation */
       StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
       StoreArray<SVDShaperDigit> m_svdShaperDigit; /**< Required input for SVDShaperDigit */
-      int m_FADCTriggerNumberOffset; /**< FADC trigger numnber offset*/
+      int m_FADCTriggerNumberOffset; /**< FADC trigger number offset*/
 
     };
   } //SVD

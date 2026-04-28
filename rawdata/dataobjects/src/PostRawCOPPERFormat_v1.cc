@@ -200,7 +200,7 @@ void PostRawCOPPERFormat_v1::CheckData(int n,
 
 
 //   if (err_flag == 1) {
-//     printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
+//     printf("[DEBUG] ========== dump a data block : block # %d==========\n", n);
 //     PrintData(GetBuffer(n), GetBlockNwords(n));
 //     printf("Print out variables to reduce unused-variables-warnings : %u %u\n", prev_copper_ctr, *cur_copper_ctr);
 //     string err_str = err_buf;

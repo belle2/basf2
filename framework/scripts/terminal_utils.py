@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# @cond dont_want_no_doxygen_warnings_this_is_sphinxed
-
 """
 terminal_utils - Helper functions for input from/output to a terminal
 ---------------------------------------------------------------------
@@ -62,6 +60,7 @@ class ANSIColors(enum.Enum):
     will be added to the output, for example when redirecting the output to a
     logfile.
     """
+    # \cond suppress doxygen warnings about undocumented colors
     BLACK = 0
     RED = 1
     GREEN = 2
@@ -70,6 +69,7 @@ class ANSIColors(enum.Enum):
     MAGENTA = 5
     CYAN = 6
     WHITE = 7
+    # \endcond
 
     @staticmethod
     def supported():
@@ -344,7 +344,7 @@ class InputEditor():
         """Constructor"""
         # Use provided editor command or editor command from environment variables
         editor_command_string = editor_command or self._default_environment_editor()
-        #: command line for the editor, split to seperate executable name command line arguments
+        #: command line for the editor, split to separate executable name command line arguments
         self.editor_command_list = shlex.split(editor_command_string, posix=True)
         # check if editor executable exists and if not, prompt for new editor command
         if shutil.which(self.editor_command_list[0]) is None:
@@ -416,5 +416,3 @@ class InputEditor():
 
             else:
                 print(f"Editor '{self.editor_command_list[0]}' not found in $PATH.")
-
-# @endcond

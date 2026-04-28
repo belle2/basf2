@@ -53,7 +53,7 @@ void ARICHSimulationPar::print() const
   cout << endl;
   cout << " HAPD simulation parameters" << endl;
   cout << "  QE scaling for photons internally reflected in HAPD window: " << getQEScaling() << endl;
-  cout << "  absorbtion probablity for internally reflected photons:     " << getWindowAbsorbtion() << endl;
+  cout << "  absorption probability for internally reflected photons:     " << getWindowAbsorbtion() << endl;
   cout << "  channels negative crosstalk factor:                         " << getChipNegativeCrosstalk() << endl;
   cout << "  collection efficiency:                                      " << m_colEff << endl;
 }

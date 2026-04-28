@@ -261,8 +261,11 @@ void SoftwareTriggerHLTDQMModule::initialize()
 
       pclose(pipe);
 
-      if (host.length() == 5) {
-        m_hlt_unit = atoi(host.substr(3, 2).c_str());
+      // Trim space and new line
+      host.erase(std::remove_if(host.begin(), host.end(), ::isspace), host.end());
+
+      if (host.rfind("hlt", 0) == 0 && host.length() == 5) {
+        m_hlt_unit = std::atoi(host.substr(3, 2).c_str());
       } else {
         B2WARNING("HLT unit number not found");
       }
@@ -277,14 +280,14 @@ void SoftwareTriggerHLTDQMModule::event()
   // this might be pre-scaled for performance reasons in the final configuration, therefore this structure
   // might not be filled in every event
   if (m_variables.isValid()) {
-    for (auto& variableNameAndTH1F : m_triggerVariablesHistograms) {
+    for (const auto& variableNameAndTH1F : m_triggerVariablesHistograms) {
       const std::string& variable = variableNameAndTH1F.first;
-      TH1F* histogram = variableNameAndTH1F.second;
 
       // try to load this variable from the computed trigger variables
       if (not m_variables->has(variable)) {
         B2ERROR("Variable " << variable << " configured for SoftwareTriggerDQM plotting is not available");
       } else {
+        TH1F* histogram = variableNameAndTH1F.second;
         const double value = m_variables->getVariable(variable);
         histogram->Fill(value);
       }
@@ -337,9 +340,12 @@ void SoftwareTriggerHLTDQMModule::event()
       if (m_param_create_total_result_histograms) {
         if (title == baseIdentifier) {
           const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalResultName(baseIdentifier);
-          const int cutResult = static_cast<int>(m_triggerResult->getResult(totalCutIdentifier));
-
-          m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult > 0);
+          // check if the cutResult is in the list, be graceful when not available
+          auto const cutEntry = results.find(totalCutIdentifier);
+          if (cutEntry != results.end()) {
+            const int cutResult = cutEntry->second;
+            m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult > 0);
+          }
         }
       }
     }

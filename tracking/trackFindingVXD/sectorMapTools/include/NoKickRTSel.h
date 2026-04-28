@@ -34,10 +34,12 @@ namespace Belle2 {
     std::vector<hitXP> m_8hitTrack; /**< vector of selected hit */
     NoKickCuts m_trackCuts; /**< auxiliary member to apply the cuts */
     double m_pmax = 10.; /**< range analyzed with cuts */
-    int m_numberOfCuts; /**< number of catastrophic interaction for each track */
-    bool m_outputFlag; /**< true=produce validation output */
+    double m_pMag; /**< momentum magnitut */
+    double m_pt; /**< transverse momentum */
+    double m_pdgID; /**< pdg Code */
 
     TFile* m_noKickOutputTFile; /**< validation output TFile */
+    TTree* m_noKickTree; /**< TTree to which the information is written */
     TH1F* m_momSel; /**< histogram of selected tracks */
     TH1F* m_momCut; /**< histogram of cut tracks */
     TH1F* m_momEff; /**< histogram for efficiency */
@@ -45,12 +47,11 @@ namespace Belle2 {
     TH1F* m_PDGIDSel; /**< histogram for PDGID of selected track */
     TH1F* m_PDGIDEff; /**< histogram for efficiency for each PDGID */
     TH1F* m_nCutHit; /**< histogram for number of cut hist per track */
-    bool m_isCutted; /**< Indicator if cut is applied */
-    double m_pMag; /**< momentum magnitut */
-    double m_pt; /**< transverse momentum */
-    double m_pdgID; /**< pdg Code */
+
+    int m_numberOfCuts; /**< number of catastrophic interaction for each track */
     int m_Ncuts; /**< number of times the cut is applied on a particle */
-    TTree* m_noKickTree; /**< TTree to which the information is written */
+    bool m_outputFlag; /**< true=produce validation output */
+    bool m_isCutted; /**< Indicator if cut is applied */
 
     /** Constructor with input file for use specific cuts file and allows validation */
     NoKickRTSel(const std::string& fileName, bool outputHisto) :
@@ -144,6 +145,6 @@ namespace Belle2 {
     void produceHistoNoKick();
 
     /// Making this class a ROOT class
-    ClassDef(NoKickRTSel, 1);
+    ClassDef(NoKickRTSel, 2);
   };
 } /** end namespace Belle2 */

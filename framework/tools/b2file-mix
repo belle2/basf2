@@ -9,14 +9,14 @@
 ##########################################################################
 
 """\
-This program is inteded to merge a set of basf2 output files and to make them
+This program is intended to merge a set of basf2 output files and to make them
 look like one run of mixed data. The events from the different files will be
 added together by picking a random input file for each event. All events will be
 added exactly once and the relative order of events from the same input file
 will be the same but they will be mixed between files.
 
 The EventMetaData of the events will be modified so that the output file will
-have continously numbered events starting at 1 (or at --start-event=N). The
+have continuously numbered events starting at 1 (or at --start-event=N). The
 experiment and run number will be set to the same value for all events and can
 be chosen using the --exp/--run parameter. In contrast, with --keep-eventinfo the
 original event and run numbers will be kept. This can lead to duplicate event
@@ -275,7 +275,7 @@ if __name__ == "__main__":
     total_mcevents = 0
     for index, (events, meta, tfile) in enumerate(inputfiles):
         total_mcevents += meta.getMcEvents()
-        # make it a bit easer to fine the input files again by adding them to
+        # make it a bit easier to fine the input files again by adding them to
         # the data description. Also add the number of events
         filemeta.setDataDescription(f"inputfile_{index}_lfn", meta.getLfn())
         filemeta.setDataDescription(f"inputfile_{index}_events", str(meta.getNEvents()))

@@ -238,10 +238,8 @@ namespace Belle2 {
     /** return the td part of an HTML table with green of the bit is > 0 */
     std::string outputBitWithColor(bool bit) const;
 
-    /**
-     * version of this code
-     */
-    static const int c_Version = 1;
+    /** the prescale factor of each bit*/
+    unsigned int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {{0}};
 
     /** input bits from subdetectors */
     unsigned int m_inputBits[c_ntrgWords] = {0};
@@ -254,20 +252,21 @@ namespace Belle2 {
      */
     unsigned int m_psnmBits[c_ntrgWords] = {0};
 
+    /**
+     * version of this code
+     */
+    static const int c_Version = 1;
+
     /** types of trigger timing source defined in b2tt firmware */
     ETimingType m_timType = TTYP_NONE;
 
     /** trigger timing type quality */
     ETimingQuality m_timQuality = TTYQ_NONE;
-
-    /** the prescale factor of each bit*/
-    unsigned int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {{0}};
-
     /** Poisson random trigger in injection veto or not */
     bool m_isPoissonInInjectionVeto = false;
 
     /**  Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
-    ClassDefOverride(TRGSummary, 7);
+    ClassDefOverride(TRGSummary, 8);
   };
 
 

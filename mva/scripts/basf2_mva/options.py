@@ -125,3 +125,12 @@ def TrivialOptions():
     # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
     return ROOT.Belle2.MVA.TrivialOptions()
+
+
+def ONNXOptions():
+    '''
+    Wrapper around ONNXOptions Belle2::MVA:ONNXOptions().
+    '''
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
+    return ROOT.Belle2.MVA.ONNXOptions()

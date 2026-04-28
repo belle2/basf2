@@ -40,7 +40,7 @@ namespace Belle2 {
     void initialize() override;
     /** event*/
     void event() override;
-    /** temrinate*/
+    /** terminate*/
     void terminate() override;
 
     std::string m_SVDShaperDigitsName; /**< shaper digit list name*/

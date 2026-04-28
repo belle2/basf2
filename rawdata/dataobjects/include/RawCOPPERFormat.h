@@ -60,7 +60,7 @@ namespace Belle2 {
     //
     // Functions for  RawDataBlock
     //
-    //! set buffer ( delete_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
+    //! set buffer ( delete_flag : m_buffer is freed( = 0 )/ not freed( = 1 ) in Destructor )
     /*     void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes); */
 
     /*     //! Get total length of m_buffer */
@@ -137,7 +137,7 @@ namespace Belle2 {
     virtual int* Get4thDetectorBuffer(int n) = 0;
     ///////////////////////////////////////////////////////////////////////////////////////
 
-    /*     //! get posistion of COPPER block in unit of word */
+    /*     //! get position of COPPER block in unit of word */
     /*     virtual int GetBufferPos(int n) = 0; */
 
     //! get buffer pointer of rawcopper header(Currently same as GetBufferPos)

@@ -15,7 +15,7 @@
 
 import basf2 as b2
 
-# output filename, can be overriden with -o
+# output filename, can be overridden with -o
 output_filename = "RootOutput_PXDOnly.root"
 
 # create path
@@ -34,5 +34,5 @@ main.add_module('RootInput', branchNames=branches)
 main.add_module("RootOutput", outputFileName=output_filename)
 
 # process events and print call statistics
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

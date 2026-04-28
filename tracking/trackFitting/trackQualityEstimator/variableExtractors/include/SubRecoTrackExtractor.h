@@ -16,13 +16,15 @@
 #include <Math/Vector3D.h>
 #include <TMatrixDSym.h>
 
+#include <cmath>
+
 namespace Belle2 {
   /// class to extract results from qualityEstimation
   class SubRecoTrackExtractor : public VariableExtractor {
   public:
 
     /// Define names of variables that get extracted
-    explicit SubRecoTrackExtractor(std::vector<Named<float*>>& variableSet):
+    explicit SubRecoTrackExtractor(std::vector<TrackingUtilities::Named<float*>>& variableSet):
       VariableExtractor()
     {
       addVariable("CDC_QI", variableSet);
@@ -48,14 +50,14 @@ namespace Belle2 {
     {
       if (PXDRecoTrack) {
         const float pxdQI = PXDRecoTrack->getQualityIndicator();
-        m_variables.at("PXD_QI") = isnan(pxdQI) ? 0. : pxdQI;
+        m_variables.at("PXD_QI") = std::isnan(pxdQI) ? 0. : pxdQI;
       } else {
         m_variables.at("PXD_QI") = -1.;
       }
 
       if (CDCRecoTrack) {
         const float cdcQI = CDCRecoTrack->getQualityIndicator();
-        m_variables.at("CDC_QI") = isnan(cdcQI) ? 0. : cdcQI;
+        m_variables.at("CDC_QI") = std::isnan(cdcQI) ? 0. : cdcQI;
         m_variables.at("CDC_FitSuccessful") = (float)CDCRecoTrack->wasFitSuccessful();
       } else {
         m_variables.at("CDC_QI") = -1.;
@@ -87,7 +89,7 @@ namespace Belle2 {
 
   protected:
     /// initialize statistics subsets of variables from clusters that get combined for SPTC
-    void initializeStats(const std::string& prefix, std::vector<Named<float*>>& variables)
+    void initializeStats(const std::string& prefix, std::vector<TrackingUtilities::Named<float*>>& variables)
     {
       addVariable(prefix + "_diff_Z", variables);
       addVariable(prefix + "_diff_Pt", variables);

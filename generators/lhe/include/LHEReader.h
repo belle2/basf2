@@ -72,7 +72,7 @@ namespace Belle2 {
      * Reads the next event and stores the result in the given MCParticle graph.
      * @param graph Reference to the graph which should be filled with the information from the LHE file.
      * @param weight Reference to the event weight which can be filled from the file.
-     * @return event numer if the event could be read and the number was provided in the file.
+     * @return event number if the event could be read and the number was provided in the file.
      */
     int getEvent(MCParticleGraph& graph, double& weight);
 
@@ -82,6 +82,13 @@ namespace Belle2 {
      * @return True if the events could be skipped.
      */
     bool skipEvents(int n);
+
+    /**
+     * Count events in the file by reading through it.
+     * @param filename The filename of the file to count events in.
+     * @return The number of events in the file.
+     */
+    int countEvents(const std::string& filename);
 
     /**
      * Set the maximum index of particles in each event that must be set as c_Initial (1-based).
@@ -96,10 +103,6 @@ namespace Belle2 {
     void setVirtualIndex(int index) { m_indexVirtual = index; }
 
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
-    double m_meanDecayLength = 0.;        /**< Mean lifetime*c of displaced particle. */
-    double m_Rmin = 0.; /**< Minimum  of vertex distance to IP.*/
-    double m_Rmax = 0.; /**< Maximum of vertex distance to IP.*/
-    int m_pdgDisplaced = 0; /**< PDG code of the displaced particle being studied*/
 
   protected:
     /** Just a typedef for simple use of the boost::tokenizer to split the lines */
@@ -109,10 +112,6 @@ namespace Belle2 {
 
     int m_lineNr;          /**< The current line number within the ascii file. */
     std::ifstream m_input; /**< The input stream of the ascii file. */
-
-    //  /*   int eventID; /**< The event ID number if provided in LHEfile else -1.  */ */
-    ///*     double eventWeight; /**< The event weight if provided in LHEfile else 1.  */ */
-
 
     /**
      * Returns the current line from the LHE ascii file.

@@ -32,7 +32,7 @@ namespace Belle2 {
     /** Navigate to given URI
      *
      * @param uri what to show, see InfoWidget::URI
-     * @param clearSelection when showing an object, this determines  wether to clear
+     * @param clearSelection when showing an object, this determines  whether to clear
      *        an existing selection
      */
     void show(const char* uri = "main:", bool clearSelection = true);

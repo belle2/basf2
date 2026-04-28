@@ -28,7 +28,7 @@ namespace Belle2 {
   class TRGECLQAMModule : public Module {
 
   public:
-    //! Costructor
+    //! Constructor
     TRGECLQAMModule();
     //! Destrunctor
     virtual ~TRGECLQAMModule();

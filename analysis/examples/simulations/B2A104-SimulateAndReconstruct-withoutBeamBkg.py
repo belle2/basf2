@@ -34,7 +34,7 @@ from mdst import add_mdst_output
 my_path = b2.create_path()
 
 # load input ROOT file
-inputMdst(filename=b2.find_file('B2A101-Y4SEventGeneration-evtgen.root'), path=my_path)
+inputMdst(filename=b2.find_file('B2A101-Y4SEventGeneration.root'), path=my_path)
 
 # simulation
 add_simulation(path=my_path)
@@ -51,7 +51,4 @@ add_mdst_output(path=my_path,
 my_path.add_module('ProgressBar')
 
 # Process the events
-b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)
+b2.process(my_path, calculateStatistics=True)

@@ -23,9 +23,9 @@ TBranch: z_uncertainty, 0.001815
 TBranch: dr, 0.01448
 TBranch: dphi, -0.5763
 TBranch: dcosTheta, 0.8445
-TBranch: prodVertexX, nan
-TBranch: prodVertexY, nan
-TBranch: prodVertexZ, nan
+TBranch: prodVertexX, 0.0001797
+TBranch: prodVertexY, 0.0007036
+TBranch: prodVertexZ, 0.01254
 TBranch: prodVertexXErr, nan
 TBranch: prodVertexYErr, nan
 TBranch: prodVertexZErr, nan

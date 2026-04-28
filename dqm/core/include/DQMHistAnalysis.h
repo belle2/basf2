@@ -14,9 +14,9 @@
 
 #include <framework/core/Module.h>
 #include <dqm/core/MonitoringObject.h>
-#include <dqm/analysis/HistObject.h>
-#include <dqm/analysis/RefHistObject.h>
-#include <dqm/analysis/HistDelta.h>
+#include <dqm/core/HistObject.h>
+#include <dqm/core/RefHistObject.h>
+#include <dqm/core/HistDelta.h>
 #include <TFile.h>
 #include <TH1.h>
 
@@ -170,7 +170,7 @@ namespace Belle2 {
      * @param keyname key name for easier access
      * @return an index which can be used to access the PV instead of key name, -1 if failure
      */
-    int registerEpicsPVwithPrefix(std::string prefix, std::string pvname, std::string keyname = "");
+    int registerEpicsPVwithPrefix(const std::string& prefix, const std::string& pvname, const std::string& keyname = "");
 
   public:
     /**
@@ -201,7 +201,8 @@ namespace Belle2 {
      * Get the list of the reference histograms.
      * @return The list of the reference  histograms.
      */
-    static /*const*/ RefList& getRefList() { return s_refList;};
+    // Unused:
+    //static const RefList& getRefList() { return s_refList;};
 
     /**
      * Get the Run Type.
@@ -219,20 +220,20 @@ namespace Belle2 {
      * Set the Run Type.
      * @par t Run type string.
      */
-    void setRunType(std::string& t) {s_runType = t;};
+    static void setRunType(const std::string& t) {s_runType = t;};
 
     /**
      * Set the number of processed events. (Attention, asynch histogram updates!)
      * @par e Processed events.
      */
-    void setEventProcessed(int e) {s_eventProcessed = e;};
+    static void setEventProcessed(int e) {s_eventProcessed = e;};
 
     /**
      * Find canvas by name
      * @param cname Name of the canvas
      * @return The pointer to the canvas, or nullptr if not found.
      */
-    TCanvas* findCanvas(TString cname);
+    static TCanvas* findCanvas(TString cname);
 
     /**
      * Get histogram from list (no other search).
@@ -309,7 +310,7 @@ namespace Belle2 {
      * @param h histogram
      * @return Half of the central interval covering 68% of a distribution.
      */
-    double getSigma68(TH1* h) const;
+    static double getSigma68(TH1* h);
 
   public:
     /**
@@ -322,14 +323,12 @@ namespace Belle2 {
     static bool addHist(const std::string& dirname,
                         const std::string& histname, TH1* h);
 
-    // /**
-    //  * Add reference.
-    //  * @param dirname The name of the directory.
-    //  * @param histname The name of the histogram.
-    //  * @param ref The TH1 pointer for the reference.
-    //  */
-    // void addRef(const std::string& dirname,
-    //             const std::string& histname, TH1* ref);
+    /**
+     * Add reference histogram.
+     * @param dirname The name of the directory.
+     * @param hist The TH1 pointer for the reference.
+    */
+    static void addRefHist(const std::string& dirname, TH1* hist);
 
 
     /**
@@ -342,7 +341,7 @@ namespace Belle2 {
     /**
      * Clear content of all Canvases
      */
-    void clearCanvases(void);
+    static void clearCanvases(void);
 
     /**
      * Reset the list of histograms.
@@ -362,7 +361,7 @@ namespace Belle2 {
     /**
      * Reset Delta
      */
-    void resetDeltaList(void);
+    static void resetDeltaList(void);
 
     /**
      * Get Delta histogram.
@@ -391,7 +390,8 @@ namespace Belle2 {
      * @param p numerical parameter depending on type, e.g. number of entries
      * @param a amount of histograms in the past
      */
-    void addDeltaPar(const std::string& dirname, const std::string& histname,  HistDelta::EDeltaType t, int p, unsigned int a = 1);
+    static void addDeltaPar(const std::string& dirname, const std::string& histname,  HistDelta::EDeltaType t, int p,
+                            unsigned int a = 1);
 
     /**
      * Check if Delta histogram parameters exist for histogram.
@@ -399,31 +399,31 @@ namespace Belle2 {
      * @param histname name of histogram
      * @return true if parameters have been set already
      */
-    bool hasDeltaPar(const std::string& dirname, const std::string& histname);
+    static bool hasDeltaPar(const std::string& dirname, const std::string& histname);
 
     /**
      * Mark canvas as updated (or not)
      * @param name name of Canvas
      * @param updated was updated
      */
-    void UpdateCanvas(std::string name, bool updated = true);
+    static void UpdateCanvas(const std::string& name, bool updated = true);
 
     /**
      * Mark canvas as updated (or not)
      * @param canvas Canvas from which to take the name for update
      * @param updated was updated
      */
-    void UpdateCanvas(TCanvas* canvas, bool updated = true);
+    static void UpdateCanvas(TCanvas* canvas, bool updated = true);
 
     /**
      * Extract Run Type from histogram title, called from input module
      */
-    void ExtractRunType(std::vector <TH1*>& hs);
+    static void ExtractRunType(std::vector <TH1*>& hs);
 
     /**
      * Extract event processed from daq histogram, called from input module
      */
-    void ExtractEvent(std::vector <TH1*>& hs);
+    static void ExtractNEvent(std::vector <TH1*>& hs);
 
     /// EPICS related Functions
 
@@ -433,7 +433,7 @@ namespace Belle2 {
      * @param keyname key name for easier access
      * @return an index which can be used to access the PV instead of key name, -1 if failure
      */
-    int registerEpicsPV(std::string pvname, std::string keyname = "");
+    int registerEpicsPV(const std::string& pvname, const std::string& keyname = "");
 
     /**
      * Register a PV with its name and a key name
@@ -441,28 +441,28 @@ namespace Belle2 {
      * @param keyname key name for easier access
      * @return an index which can be used to access the PV instead of key name, -1 if failure
      */
-    int registerExternalEpicsPV(std::string pvname, std::string keyname = "");
+    int registerExternalEpicsPV(const std::string& pvname, const std::string& keyname = "");
 
     /**
      * Write value to a EPICS PV
      * @param keyname key name (or full PV name) of PV
      * @param value value to write
      */
-    void setEpicsPV(std::string keyname, double value);
+    void setEpicsPV(const std::string& keyname, double value);
 
     /**
      * Write value to a EPICS PV
      * @param keyname key name (or full PV name) of PV
      * @param value value to write
      */
-    void setEpicsPV(std::string keyname, int value);
+    void setEpicsPV(const std::string& keyname, int value);
 
     /**
      * Write string to a EPICS PV
      * @param keyname key name (or full PV name) of PV
      * @param value string to write
      */
-    void setEpicsStringPV(std::string keyname, std::string value);
+    void setEpicsStringPV(const std::string& keyname, const std::string& value);
 
     /**
      * Write value to a EPICS PV
@@ -490,7 +490,7 @@ namespace Belle2 {
      * @param keyname key name (or full PV name) of PV
      * @return value or NAN if not existing
      */
-    double getEpicsPV(std::string keyname);
+    double getEpicsPV(const std::string& keyname);
 
     /**
      * Read value from a EPICS PV
@@ -505,7 +505,7 @@ namespace Belle2 {
      * @param status return status (true on success)
      * @return string value (empty string if non existing)
      */
-    std::string getEpicsStringPV(std::string keyname, bool& status);
+    std::string getEpicsStringPV(const std::string& keyname, bool& status);
 
     /**
      * Read value from a EPICS PV
@@ -527,7 +527,7 @@ namespace Belle2 {
      * @param keyname key name (or full PV name) of PV
      * @return Channel ID is written on success, otherwise nullptr
      */
-    chid getEpicsPVChID(std::string keyname);
+    chid getEpicsPVChID(const std::string& keyname);
 
     /**
      * Get EPICS PV Channel Id
@@ -556,7 +556,8 @@ namespace Belle2 {
      * @param &upperAlarm return upper Alarm limit (hihi) if set, not changed otherwise
      * @return true if limits could be read (even if there are none set)
      */
-    bool requestLimitsFromEpicsPVs(std::string keyname, double& lowerAlarm, double& lowerWarn, double& upperWarn, double& upperAlarm);
+    bool requestLimitsFromEpicsPVs(const std::string& keyname, double& lowerAlarm, double& lowerWarn, double& upperWarn,
+                                   double& upperAlarm);
 
     /**
      * Get Alarm Limits from EPICS PV
@@ -579,19 +580,19 @@ namespace Belle2 {
      * Setter EPICS flag in read only mode
      * @param flag set read only
      */
-    void setUseEpicsReadOnly(bool flag) {m_epicsReadOnly = flag;};
+    static void setUseEpicsReadOnly(bool flag) {m_epicsReadOnly = flag;};
 
     /**
      * Getter for EPICS usage
      * @return flag is in use
      */
-    bool getUseEpics(void) {return m_useEpics;};
+    static bool getUseEpics(void) {return m_useEpics;};
 
     /**
      * Getter EPICS flag in read only mode
      * @return flag if read only
      */
-    bool getUseEpicsReadOnly(void) {return m_epicsReadOnly;};
+    static bool getUseEpicsReadOnly(void) {return m_epicsReadOnly;};
 
     /**
      * Unsubscribe from EPICS PVs on terminate
@@ -599,16 +600,16 @@ namespace Belle2 {
     void cleanupEpicsPVs(void);
 
     /**
-     * get global Prefix for EPICS PVs
+     * get global prefix for EPICS PVs
      * @return prefix in use
      */
-    std::string& getPVPrefix(void) {return m_PVPrefix;};
+    static std::string& getPVPrefix(void) {return m_PVPrefix;};
 
     /**
-     * set global Prefix for EPICS PVs
+     * set global prefix for EPICS PVs
      * @param prefix Prefix to set
      */
-    void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
+    static void setPVPrefix(const std::string& prefix) { m_PVPrefix = prefix;};
 
     /**
      * Helper function to judge the status for coloring and EPICS
@@ -617,21 +618,21 @@ namespace Belle2 {
      * @param error_flag outside of warning range
      * @return the status
      */
-    EStatus makeStatus(bool enough, bool warn_flag, bool error_flag);
+    static EStatus makeStatus(bool enough, bool warn_flag, bool error_flag);
 
     /**
      * Helper function for Canvas colorization
      * @param canvas Canvas to change
      * @param status status to color
      */
-    void colorizeCanvas(TCanvas* canvas, EStatus status);
+    static void colorizeCanvas(TCanvas* canvas, EStatus status);
 
     /**
      * Return color for canvas state
      * @param status canvas status
      * @return alarm color
      */
-    EStatusColor getStatusColor(EStatus status);
+    static EStatusColor getStatusColor(EStatus status);
 
     /**
      * Check the status of all PVs and report if disconnected or not found
@@ -643,7 +644,7 @@ namespace Belle2 {
      * @param pv the chid of the PV to check
      * @param onlyError print only if in error condition (default)
      */
-    void printPVStatus(chid pv, bool onlyError = true);
+    static void printPVStatus(chid pv, bool onlyError = true);
 
     /**
      * check the return status and check PV in case of error
@@ -675,7 +676,7 @@ namespace Belle2 {
      * @param delim delimiter
      * @return vector of strings
      */
-    std::vector <std::string> StringSplit(const std::string& s, const char delim);
+    static std::vector <std::string> StringSplit(const std::string& s, const char delim);
 
     // Data members
   private:

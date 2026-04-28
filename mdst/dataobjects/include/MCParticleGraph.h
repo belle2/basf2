@@ -190,9 +190,9 @@ namespace Belle2 {
 
       MCParticleGraph* m_graph{0}; /**< internal pointer to the graph this particle belongs to */
       unsigned int m_vertexId{0};  /**< vertex id in the graph */
+      int m_trackID{0};            /**< The track ID from geant4 that created this particle. */
       bool m_ignore{false};        /**< ignore particle when writing MCParticle list ? */
       bool m_primary{true};        /**< Is this a primary particle ? */
-      int m_trackID{0};            /**< The track ID from geant4 that created this particle. */
 
       friend class MCParticleGraph;
       friend class ParticleSorter;

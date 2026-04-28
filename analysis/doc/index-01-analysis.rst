@@ -10,16 +10,12 @@ With these particle decay candidates, you can use high level tools such as :doc:
 
 .. tip:: For a series of hands-on introductory lessons, take a look at :numref:`onlinebook_basf2`.
 
-The core data objects of the ``basf2`` analysis package, are the `Particle`_ class, and the `ParticleList`_ class.
-Almost all analysis modules are concerned with the manipulation of `ParticleList`_ s.
+The core data objects of the ``basf2`` analysis package, are the :doxygen:`Particle <classBelle2_1_1Particle>` class, and the :doxygen:`ParticleList <classBelle2_1_1ParticleList>` class.
+Almost all analysis modules are concerned with the manipulation of :doxygen:`ParticleList <classBelle2_1_1ParticleList>` s.
 
 Examples of analysis steering files can be found in tutorial directory of analysis package::
 
         ls $BELLE2_RELEASE_DIR/analysis/examples/tutorials
-
-.. _ParticleList: https://software.belle2.org/|release|/classBelle2_1_1ParticleList.html
-
-.. _Particle: https://software.belle2.org/|release|/classBelle2_1_1Particle.html
 
 .. toctree::
    :maxdepth: 2

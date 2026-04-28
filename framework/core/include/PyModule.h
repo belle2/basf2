@@ -77,31 +77,31 @@ namespace Belle2 {
     /** default implementation used when Python module doesn't supply its own */
     virtual void def_initialize() override final
     {
-      // Call empty base implementation if initialize() is not overriden from Python.
+      // Call empty base implementation if initialize() is not overridden from Python.
       Module::initialize();
     }
 
     virtual void def_beginRun() override final
     {
-      // Call empty base implementation if beginRun() is not overriden from Python.
+      // Call empty base implementation if beginRun() is not overridden from Python.
       Module::beginRun();
     }
 
     virtual void def_event() override final
     {
-      // Call empty base implementation if event() is not overriden from Python.
+      // Call empty base implementation if event() is not overridden from Python.
       Module::event();
     }
 
     virtual void def_endRun() override final
     {
-      // Call empty base implementation if endRun() is not overriden from Python.
+      // Call empty base implementation if endRun() is not overridden from Python.
       Module::endRun();
     }
 
     virtual void def_terminate() override final
     {
-      // Call empty base implementation if terminate() is not overriden from Python.
+      // Call empty base implementation if terminate() is not overridden from Python.
       Module::terminate();
     }
     //@}

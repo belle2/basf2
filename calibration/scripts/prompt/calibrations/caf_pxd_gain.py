@@ -22,13 +22,14 @@ from prompt.calibrations.caf_beamspot import settings as beamspot_calibration
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="PXD gain calibration",
-                               expert_username="takaham",
+                               expert_username="3978526368",
+                               subsystem="pxd",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["physics"],
                                input_data_filters={
                                    "physics": [
-                                       INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
+                                       INPUT_DATA_FILTERS["Data Tag"]["bhabha_combined_calib"],
                                        INPUT_DATA_FILTERS["Beam Energy"]["4S"],
                                        INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
                                        INPUT_DATA_FILTERS["Beam Energy"]["Scan"],
@@ -45,7 +46,8 @@ settings = CalibrationSettings(name="PXD gain calibration",
                                    "max_files_per_run": 20,  # only valid when max_events/run = 0
                                    "payload_boundaries": []
                                },
-                               depends_on=[beamspot_calibration])
+                               depends_on=[beamspot_calibration],
+                               produced_payloads=["PXDGainMapPar"])
 
 
 def get_calibrations(input_data, **kwargs):

@@ -19,11 +19,10 @@
 </header>
 """
 
-import tracking
 from tracking.validation.run import TrackingValidationRun
+from tracking.path_utils import add_hit_preparation_modules, add_svd_hough_tracking
 import logging
 import basf2
-from tracking.path_utils import add_svd_hough_tracking
 
 VALIDATION_OUTPUT_FILE = 'SVDHoughTrackingValidation.root'
 N_EVENTS = 1000
@@ -46,7 +45,7 @@ class SVDHoughTrackingValidation(TrackingValidationRun):
     @staticmethod
     def finder_module(path):
         """Add the VXDHoughTracking module and related modules to the basf2 path"""
-        tracking.add_hit_preparation_modules(path, components=["SVD"])
+        add_hit_preparation_modules(path, components=["SVD"])
         add_svd_hough_tracking(path)
 
     #: use only the svd hits when computing efficiencies

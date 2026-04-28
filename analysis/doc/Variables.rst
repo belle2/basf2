@@ -3,24 +3,26 @@
 Variables
 =========
 
-While ``basf2`` operates on `ParticleList <https://software.belle2.org/|release|/classBelle2_1_1ParticleList.html>`_ s, it is also important to calculate physics quantities associated with a given candidate or event.
+While ``basf2`` operates on :doxygen:`ParticleList <classBelle2_1_1ParticleList>` objects, it is also important to calculate physics quantities associated with a given candidate or event.
 
-In ``basf2`` analysis, variables are handled by the `VariableManager`.
+In ``basf2``, variables are handled by the `VariableManager`.
 There are many variables available for use in analysis.
-Probably the most obvious, and useful are: :b2:var:`p`, :b2:var:`E`, :b2:var:`Mbc`, and :b2:var:`deltaE`.
+You can search the variables alphabetically in the :ref:`b2-varindex` or browse :ref:`variablesByGroup`.
 
-You can search the variables in an alphabetical :ref:`b2-varindex`, or browse :ref:`variablesByGroup`.
+.. danger::
+
+          Some variables return ``NaN`` instead of being converted to a numerical value. 
+          Before cutting on any variables, **please pay attention** to whether or not your variable returns ``NaN``. 
+          
 
 .. _analysis_variablemanager_class:
 
 VariableManager
 ---------------
 
-The VariableManager handles all variables in ``basf2`` analysis.
+The VariableManager handles all variables in ``basf2``.
 It is implemented as a `singleton <https://en.wikipedia.org/wiki/Singleton_pattern>`_
-C++ class with a python interface.
-
-The C++ documentation is `here <https://software.belle2.org/development/classBelle2_1_1Variable_1_1Manager.html>`_.
+C++ class with a python interface. The C++ documentation is :doxygen:`here<classBelle2_1_1Variable_1_1Manager>`.
 
 .. tip::
 
@@ -53,12 +55,12 @@ The C++ documentation is `here <https://software.belle2.org/development/classBel
       Variable names are deliberately verbose and explicit (to avoid ambiguity).
       However, it is often not desirable to deal with long unwieldy variable names particularly in the context of :doc:`VariableManagerOutput`.
 
-      Example:
+      Aliases for verbose variables may be set with:
 
-      Aliases to a verbose variable may be set with:
+      .. code-block:: python
 
-      >>> from variables import variables as vm
-      >>> vm.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
+            from variables import variables as vm
+            vm.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
 
       .. seealso::
 
@@ -68,7 +70,7 @@ The C++ documentation is `here <https://software.belle2.org/development/classBel
       .. warning::
 
           The VariableManager instance is configured independently of the `basf2.Path`.
-          In case of adding the same alias twice, the configuration just before calling `basf2.process` is what wins.
+          In case of adding the same alias twice, the alias implemented just before calling `basf2.process` is what wins.
 
       :param str alias: New alias to create
       :param str expression: The expression the alias should evaluate to
@@ -77,14 +79,16 @@ The C++ documentation is `here <https://software.belle2.org/development/classBel
 
    .. py:method:: getAliasNames()
 
-      Get a list of all alias names (in reverse order added)
+      Get a list of all alias names in reverse order of definition.
 
       .. tip::
 
           This returns a ``ROOT.vector`` which you will probably
-          need to convert into a python ``list(str)``.
+          need to convert into a python ``list(str)`` using the code below:
 
-          >>> my_aliases = list(vm.getAliasNames())
+          .. code-block:: python
+
+               my_aliases = list(vm.getAliasNames())
 
       :returns: ``ROOT.vector`` list of alias names
 
@@ -97,14 +101,14 @@ The C++ documentation is `here <https://software.belle2.org/development/classBel
          This method takes a ``ROOT.vector<string>`` as input.
          It's probably easier to use `variables.utils.add_collection` which wraps this function for you.
 
-      :param str collection: The new collection to create.
-      :param variables: A ``ROOT.std.vector(string)`` instance of variables to add as the variable collection.
+      :param str collection: The new collection to create
+      :param variables: A ``ROOT.std.vector(string)`` instance of variables to add as the variable collection
 
       :returns: True if the collection was successfully added
 
    .. py:method:: getCollection(collection)
 
-      Get a list of all variables in the ``collection``.
+      Get a list of all variables in the collection.
 
       :param str collection: The name of the existing variable collection
 
@@ -113,7 +117,7 @@ The C++ documentation is `here <https://software.belle2.org/development/classBel
    .. py:method:: printAliases()
 
       Prints all aliases currently registered.
-      Useful to call just before calling `basf2.process` on an analysis `basf2.Path` when debugging.
+      This is useful to call just before `basf2.process` on an analysis `basf2.Path` when debugging.
 
 
 .. _variablesByGroup:
@@ -156,24 +160,20 @@ Here is a list of track variables for V0 daughters:
 .. b2-variables::
    :group: V0Daughter
 
+.. _kinkvariables:
+
+Kink
+~~~~
+
+Here is a list of variables for kinks, which are reconstructed since release-09:
+
+.. b2-variables::
+   :group: Kink
+
 PID
 ~~~
 
 Here is a list of particle identification variables:
-
-.. warning ::
-  The **definitions** of the default PID variables have changed between
-  release-01 and release-02.
-
-  Prior to release-02-00-00 (i.e. in release-01-XX-YY) each ID was calculated
-  against the pion likelihood alone, or the kaon in the case of the pion itself.
-  Namely the pair probability (also known as the binary probability) was returned:
-
-  * for all particles: :math:`\text{<Part>ID}=\mathcal{L}_{\text{<Part>}}/\mathcal{L}_\pi`, where :math:`\text{<Part>}\in[e,\mu,K,p,d]`.
-  * for pions: :math:`\text{PionID}=\mathcal{L}_\pi/\mathcal{L}_K`.
-
-  In other words, pionID was sensitive only to the pion-kaon mis-id, and not to
-  the pion-proton or pion-muon mis-identification.
 
 .. b2-variables::
    :group: PID
@@ -199,35 +199,27 @@ If a likelihood is not available from the selected detector list, **NaN** is ret
 .. b2-variables::
    :group: PID_expert
 
-ECL Cluster
-~~~~~~~~~~~
-
-Here is a list of variables related to ECL cluster.
-All ECLCluster-based variables return NaN if no ECLCluster is found.
+ECL Clusters
+~~~~~~~~~~~~
 
 .. _importantNoteECL:
 
 .. note::
-    All floating type variables in the mdst dataobject ECLCluster use ROOT Double32_t types with
-    specific range declaration to save disk storage. This has two important consequences for a user:
+    All floating type variables in the mdst dataobject ``ECLCluster`` use `ROOT Double32_t <https://root.cern.ch/root/html520/ListOfTypes.html>`_ 
+    types with a specific range declaration to save disk storage. This has two important consequences for a user:
 
     - All ECL cluster variables have a limited precision. This precision is always better than
       the intrinsic ECL data acquisition precision. However, if these variables are histogrammed,
       binning effects are likely.
-    - All ECL cluster variables are clipped at the lower and upper boundaries: Values below (above)
-      these boundaries will be set to the lower (upper) bound.
+    - Values below the lower boundary will be set to the lower bound 
+      while values above the upper boundary will be set to the upper bound. 
 
-    Lower and upper limits, and precision of these variables are mentioned inside the note box below them.
+    If relevant, lower and upper limits as well as the variable precision are mentioned in the note box below the respective variable.
     One should note this in the context of binning effects.
 
 
 .. b2-variables::
-   :group: ECL Cluster related
-
-There are also some special variables related to the MC matching of ECL clusters (specifically).
-
-.. b2-variables::
-   :group: MC Matching for ECLClusters
+   :group: ECL cluster related
 
 Acceptance
 ~~~~~~~~~~
@@ -248,8 +240,7 @@ Here is a list of trigger variables:
    :group: L1 Trigger
 
 .. tip::
-  Please see the `Trigger Bits section
-  <https://software.belle2.org/development/sphinx/trg/doc/index.html#trigger-bits>`__
+  Please see the :sphinx:`Trigger Bits section <trg/doc/index.html#trigger-bits>`
   for further details.
   
 .. b2-variables::
@@ -521,7 +512,7 @@ events used for producing MC samples (both run-independent and run-dependent).
 
 .. b2-variables::
    :group: BeamBackgroundOverlay
-	     
+
 Calibration
 ~~~~~~~~~~~
 
@@ -537,7 +528,7 @@ They have a **[Calibration]** pretag.
    :group: ECL calibration
 .. b2-variables::
    :group: ECL trigger calibration
-	   
+
 Collections and Lists
 ---------------------
 
@@ -725,11 +716,7 @@ Step 3. Implement the function in the source file
     Boost boost2daughter(daughter4Vector.BoostToCM());
     particle4Vector = boost2daughter * particle4Vector;
     gDaughter4Vector = boost2daughter * gDaughter4Vector;
-    B2Vector3D particle3Vector = particle4Vector.Vect();
-    B2Vector3D gDaughter3Vector = gDaughter4Vector.Vect();
-    double numerator = gDaughter3Vector.Dot(particle3Vector);
-    double denominator = (gDaughter3Vector.Mag())*(particle3Vector.Mag());
-    return numerator/denominator;
+    return VectorUtil::CosTheta(particle4Vector, gDaughter4Vector);
   }
 
 Step 4. Register the new variable
@@ -763,7 +750,7 @@ How to use my variable at grid?
 
 * Prepare the environment with the ``b2analysis-create`` tool.
 
->>> b2analysis-create myanalysis <current central release, e.g. release-04-00-00>
+>>> b2analysis-create myanalysis <current central release, e.g. light-2509-fornax>
 >>> cd myanalysis
 >>> b2setup
 
@@ -811,4 +798,4 @@ with the -f option of ``gbasf2``:
 >>> gbasf2 ./steering.py -p project -i dataset -f myanalysis.so myanalysis.b2modmap
 
 .. warning:: This line implies that you already have working ``gbasf2`` installation and ``gbasf2`` syntax didn't
-  change since the moment of writing. Please refer gbasf2 `documentation <https://xwiki.desy.de/xwiki/rest/p/78b3b>`_ for more details.
+  change since the moment of writing. Please refer to the :doc:`gbasf2 documentation <gbasf2:index>` for more details.

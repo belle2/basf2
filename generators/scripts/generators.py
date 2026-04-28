@@ -15,6 +15,7 @@ in `BELLE2-NOTE-PH-2015-006`_
 '''
 
 import basf2 as b2
+import json
 import pdg
 
 
@@ -658,10 +659,14 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
         ).set_name('PHOKHARA_n0n0barISR')
 
     elif finalstate == 'Lambda0Lambda0bar':
+        b2.B2WARNING(
+            "The Lambda pair production and decays are implemented at the leading order only,"
+            " but as the expected number of events is modest, the accuracy of the code is"
+            " sufficient for the description of this process.")
         path.add_module(
             'PhokharaInput',
             FinalState=9,        # Lambda0Lambda0bar
-            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            LO=0, NLO=0, QED=0,  # use only one loop corrections
             MinInvMassHadrons=0.,
             eventType=eventType,
         ).set_name('PHOKHARA_Lambda0Lambda0barISR')
@@ -858,7 +863,7 @@ with
 
   path.add_module('CRYInput')
 
-in your steering file (the module parameter "acceptance" has to be set, see the module docummentation).''')
+in your steering file (the module parameter "acceptance" has to be set, see the module documentation).''')
 
     import cdc.cr as cosmics_setup
 
@@ -936,6 +941,13 @@ in your steering file (the module parameter "acceptance" has to be set, see the 
         cosmics_selector.if_false(empty_path)
 
 
+def _get_treps_finalstates():
+    """Return the TREPS final-state bookkeeping table."""
+    tableFile = b2.find_file('generators/treps/data/treps_finalstates.json')
+    with open(tableFile) as table:
+        return json.load(table)
+
+
 def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False, eventType=''):
     """
     Add TREPS generator to produce hadronic two-photon processes.
@@ -947,20 +959,14 @@ def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False, eventT
         eventType (str) : event type information
     """
 
-    if finalstate == 'e+e-pi+pi-':
-        parameterFile = b2.find_file('generators/treps/data/parameterFiles/treps_par_pipi.dat')
-        differentialCrossSectionFile = b2.find_file('generators/treps/data/differentialCrossSectionFiles/pipidcs.dat')
-        wListTableFile = b2.find_file('generators/treps/data/wListFiles/wlist_table_pipi.dat')
-    elif finalstate == 'e+e-K+K-':
-        parameterFile = b2.find_file('generators/treps/data/parameterFiles/treps_par_kk.dat')
-        differentialCrossSectionFile = b2.find_file('generators/treps/data/differentialCrossSectionFiles/kkdcs.dat')
-        wListTableFile = b2.find_file('generators/treps/data/wListFiles/wlist_table_kk.dat')
-    elif finalstate == 'e+e-ppbar':
-        parameterFile = b2.find_file('generators/treps/data/parameterFiles/treps_par_ppbar.dat')
-        differentialCrossSectionFile = b2.find_file('generators/treps/data/differentialCrossSectionFiles/ppbardcs.dat')
-        wListTableFile = b2.find_file('generators/treps/data/wListFiles/wlist_table_ppbar.dat')
-    else:
+    try:
+        finalstateFiles = _get_treps_finalstates()[finalstate]
+    except KeyError:
         b2.B2FATAL("add_treps_generator final state not supported: {}".format(finalstate))
+
+    parameterFile = b2.find_file(finalstateFiles['parameter'])
+    differentialCrossSectionFile = b2.find_file(finalstateFiles['differential_cross_section'])
+    wListTableFile = b2.find_file(finalstateFiles['w_list'])
 
     # use TREPS to generate two-photon events.
     path.add_module(

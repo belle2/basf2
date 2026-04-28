@@ -154,18 +154,18 @@ namespace Belle2 {
         for (int pixelID = 1; pixelID <= numPixels; pixelID++) {
           double effi = TOPGeometryPar::Instance()->getRelativePixelEfficiency(moduleID, pixelID);
           if (effi < minEffi) {
-            B2WARNING("TOPRecoManager::setChannelEffi: relative pixel efficiency found rather small"
-                      << LogVar("slot", moduleID)
-                      << LogVar("pixel", pixelID)
-                      << LogVar("efficiency", effi)
-                      << " -> will set it to " << minEffi);
+            B2INFO("TOPRecoManager::setChannelEffi: relative pixel efficiency found rather small"
+                   << LogVar("slot", moduleID)
+                   << LogVar("pixel", pixelID)
+                   << LogVar("efficiency", effi)
+                   << " -> will be set to " << minEffi);
             effi = minEffi;
           } else if (effi > maxEffi) {
-            B2WARNING("TOPRecoManager::setChannelEffi: relative pixel efficiency found rather large"
-                      << LogVar("slot", moduleID)
-                      << LogVar("pixel", pixelID)
-                      << LogVar("efficiency", effi)
-                      << " -> will set it to " << maxEffi);
+            B2INFO("TOPRecoManager::setChannelEffi: relative pixel efficiency found rather large"
+                   << LogVar("slot", moduleID)
+                   << LogVar("pixel", pixelID)
+                   << LogVar("efficiency", effi)
+                   << " -> will be set to " << maxEffi);
             effi = maxEffi;
           }
           pixelEfficiencies.set(pixelID, effi);
@@ -178,14 +178,14 @@ namespace Belle2 {
 
     void TOPRecoManager::setMirrorCenter(int moduleID, double xc, double yc)
     {
-      auto& inverseRaytracers = getInstance().inverseRaytracers();
-      auto& fastRaytracers = getInstance().fastRaytracers();
-      auto& yScanners = getInstance().yScanners();
+      auto& InverseRaytracers = getInstance().inverseRaytracers();
+      auto& FastRaytracers = getInstance().fastRaytracers();
+      auto& YScanners = getInstance().yScanners();
       unsigned k = moduleID - 1;
-      if (k < yScanners.size()) {
-        inverseRaytracers[k].setMirrorCenter(xc, yc);
-        fastRaytracers[k].setMirrorCenter(xc, yc);
-        yScanners[k].setMirrorCenter(xc, yc);
+      if (k < YScanners.size()) {
+        InverseRaytracers[k].setMirrorCenter(xc, yc);
+        FastRaytracers[k].setMirrorCenter(xc, yc);
+        YScanners[k].setMirrorCenter(xc, yc);
         return;
       }
 

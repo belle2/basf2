@@ -8,9 +8,9 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/combined/SegmentTrackCombiner.h>
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackingUtilities/eventdata/utils/ClassMnemomics.h>
 
 namespace Belle2 {
 
@@ -30,10 +30,10 @@ namespace Belle2 {
      *  3. Filtering of fake tracks in the made combinations.
      *  4. Cleanup of the lookup cache.
      */
-    class  TFCDC_SegmentTrackCombinerModule : public FindletModule<SegmentTrackCombiner> {
+    class  TFCDC_SegmentTrackCombinerModule : public TrackingUtilities::FindletModule<SegmentTrackCombiner> {
 
       /// The base class
-      using Super = FindletModule<SegmentTrackCombiner>;
+      using Super = TrackingUtilities::FindletModule<SegmentTrackCombiner>;
 
     public:
       /// Constructor

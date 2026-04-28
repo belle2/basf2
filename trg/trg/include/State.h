@@ -117,7 +117,7 @@ namespace Belle2 {
 
   public:// Utilities
 
-    /// Coverts from bool array to unsigned.
+    /// Converts from bool array to unsigned.
     static unsigned toUnsigned(unsigned n, const bool* array);
 
   private:

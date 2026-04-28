@@ -19,6 +19,7 @@
 #define T2D_TO_3D_WIDTH 747
 #define NN_IN_WIDTH 982
 #define NN_WIDTH 2048
+#define DNN_WIDTH 4096
 #define NN_OUT_WIDTH 570
 //#define NN_OUT_WIDTH 709
 
@@ -51,6 +52,7 @@ namespace Belle2 {
     friend class CDCTriggerUnpackerModule;
     friend struct Merger;
     friend struct Tracker2D;
+    template <int bitwidth, typename T_bitstream>
     friend struct Neuro;
   public:
     /** default constructor */

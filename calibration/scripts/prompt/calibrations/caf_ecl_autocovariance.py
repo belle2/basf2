@@ -17,7 +17,8 @@ from caf import strategies
 # ..Tell the automated script some required details
 settings = CalibrationSettings(
     name="ecl_autocovariance",
-    expert_username="longos",
+    expert_username="savino.longo",
+    subsystem="ecl",
     description=__doc__,
     input_data_formats=["raw"],
     input_data_names=["delayedbhabha_calib"],
@@ -31,7 +32,8 @@ settings = CalibrationSettings(
     expert_config={
         "C1_lowestEnergyFraction": 0.75,
         "C1_TotalCountsThreshold": 10000
-    })
+    },
+    produced_payloads=["ECLAutoCovariance"])
 
 
 # --------------------------------------------------------------
@@ -99,7 +101,6 @@ def get_calibrations(input_data, **kwargs):
                                   collector=collector_C4,
                                   algorithms=[algo_C4],
                                   input_files=input_files, max_files_per_collector_job=4)
-    cal_ecl_Auto_C4.strategies = strategies.SequentialRunByRun
 
     cal_ecl_Auto_C4.pre_collector_path = delayed_Bhabha_pre_path
 

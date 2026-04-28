@@ -135,7 +135,7 @@ namespace Belle2 {
        * @param layer layer number of the sensor (starting from 0)
        * @param isU true if the sensor is U side, false if V.
        */
-      int nStripsOnLayerSide(int layer, bool isU)
+      static int nStripsOnLayerSide(int layer, bool isU)
       {
         if (!isU && layer > 0) return 512; // V side on Layer 4,5,6
         else return 768;
@@ -143,14 +143,14 @@ namespace Belle2 {
 
       /**
        * Returns the (active) mass of the given sensor in Kg.
-       * @param layer tha layer number (starting from 0, not 3)
+       * @param layer the layer number (starting from 0, not 3)
        * @param ladder the ladder number (starting from 0, not 1)
        * @param sensor the sensor number (starting from 0, not 1)
        */
-      double massOfSensor(int layer, int ladder, int sensor);
+      static double massOfSensor(int layer, int ladder, int sensor);
 
       /**
-       * Returns wether a strips is active (neither hot nor masked),
+       * Returns whether a strips is active (neither hot nor masked),
        * taking into account the ignoreHotStrips and ignoreMaskedStrips
        * settings.
        * @param sensorID The VxdID of the sensor

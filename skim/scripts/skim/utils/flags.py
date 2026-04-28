@@ -48,16 +48,16 @@ class InitialiseSkimFlag(b2.Module):
 
     def initialize(self):
         """
-        Register EventExtraInfo in datastore if it has not been registered already.
+        Make sure that EventExtraInfo is present in datastore
         """
-        if not self.EventExtraInfo.isValid():
-            self.EventExtraInfo.registerInDataStore()
+        self.EventExtraInfo.isRequired()
 
     def event(self):
         """
         Initialise flags to zero.
         """
-        self.EventExtraInfo.create()
+        if not self.EventExtraInfo.isValid():
+            self.EventExtraInfo.create()
         for skim in self.skims:
             self.EventExtraInfo.addExtraInfo(skim.flag, 0)
 

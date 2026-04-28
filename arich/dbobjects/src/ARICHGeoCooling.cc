@@ -66,14 +66,14 @@ void ARICHGeoCooling::print(const std::string& title) const
 void ARICHGeoCooling::checkCoolingSystemDataConsistency() const
 {
 
-  B2ASSERT("Data of the cooling system positions is inconsisten : getCoolingGeometryID().size() != getCoolingL().size()",
+  B2ASSERT("Data of the cooling system positions is inconsistent : getCoolingGeometryID().size() != getCoolingL().size()",
            getCoolingGeometryID().size() == getCoolingL().size());
-  B2ASSERT("Data of the cooling system positions is inconsisten : getCoolingL().size() != getCoolingPosPhi().size()",
+  B2ASSERT("Data of the cooling system positions is inconsistent : getCoolingL().size() != getCoolingPosPhi().size()",
            getCoolingL().size() == getCoolingPosPhi().size());
-  B2ASSERT("Data of the cooling system positions is inconsisten : getCoolingPosPhi().size() != getCoolingPosR().size()",
+  B2ASSERT("Data of the cooling system positions is inconsistent : getCoolingPosPhi().size() != getCoolingPosR().size()",
            getCoolingPosPhi().size() == getCoolingPosR().size());
-  B2ASSERT("Data of the cooling system positions is inconsisten : getCoolingPosR().size() != getCoolinRotationAngle().size()",
+  B2ASSERT("Data of the cooling system positions is inconsistent : getCoolingPosR().size() != getCoolinRotationAngle().size()",
            getCoolingPosR().size() == getCoolinRotationAngle().size());
-  B2ASSERT("Data of the cooling system positions is inconsisten : getCoolingTestPlatePosR().size() != getCoolingTestPlatePosPhi().size()",
+  B2ASSERT("Data of the cooling system positions is inconsistent : getCoolingTestPlatePosR().size() != getCoolingTestPlatePosPhi().size()",
            getCoolingTestPlatePosR().size() == getCoolingTestPlatePosPhi().size());
 }

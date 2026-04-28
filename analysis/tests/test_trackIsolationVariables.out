@@ -108,7 +108,7 @@
 [INFO] Calculating track-based isolation variables for the decay string: Lambda0:merged -> p+ ^pi- using the reference ParticleList: pi+:all.
 [INFO] Will use track fit result for the most probable mass hypothesis in helix extrapolation.
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
+[INFO]  o) creating ParticleList with name: K_S0:V0
 [INFO]    -> MDST source: V0
 [INFO] ParticleSelector: K_S0:V0_ToFit
 [INFO]    -> With cuts  : 0.450 < M < 0.550

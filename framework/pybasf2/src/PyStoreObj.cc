@@ -41,7 +41,7 @@ PyStoreObj::PyStoreObj(const std::string& name,
                        DataStore::EDurability durability):
   PyStoreObj(replaceNullPtr(DataStore::getTClassFromDefaultObjectName(name),
                             TObject::Class()),
-             /* Default to TObject for unknown class for backwards compatability */
+             /* Default to TObject for unknown class for backwards compatibility */
              name,
              durability)
 {

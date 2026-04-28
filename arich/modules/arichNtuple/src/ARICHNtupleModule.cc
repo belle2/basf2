@@ -52,7 +52,7 @@ namespace Belle2 {
     m_tree(0)
   {
     // set module description (e.g. insert text)
-    setDescription("The module saves variables needed for performance analysis, such as postion and momentum of the hit, likelihoods for hypotheses and number of photons.");
+    setDescription("The module saves variables needed for performance analysis, such as position and momentum of the hit, likelihoods for hypotheses and number of photons.");
 
     // Add parameters
     addParam("outputFile", m_outputFile, "ROOT output file name", std::string("ARICHNtuple.root"));

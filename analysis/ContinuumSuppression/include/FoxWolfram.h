@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
-#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 #include <vector>
 
 
@@ -14,7 +14,7 @@ namespace Belle2 {
 
   /**
    * Class to calculate the Fox-Wolfram moments up to order 8.
-   * Since the most common user case is the calculation of the moments up to order 4, and the
+   * Since the most common use case is the calculation of the moments up to order 4, and the
    * calculation of the momenta 5-8 takes much longer, two methods have been implemented. FoxWolfram::calculateBasicMoments
    * will calculate the moments up to 4, while FoxWolfram::calculateAllMoments will perform the calculation
    * up to order 8. The two options have been implemented in two separate methods instead of using an if condition simply
@@ -31,9 +31,9 @@ namespace Belle2 {
 
 
     /**
-     * Constructor with an array of 3-momenta.
+     * Constructor with an array of 4-momenta.
      */
-    explicit FoxWolfram(const std::vector<ROOT::Math::XYZVector>& momenta)
+    explicit FoxWolfram(const std::vector<ROOT::Math::PxPyPzEVector>& momenta)
     {
       m_momenta.clear();
       m_momenta = momenta;
@@ -66,7 +66,7 @@ namespace Belle2 {
      * Sets the list of momenta used for the FW moment calculation, overwriting whatever list
      * has been set before.
      */
-    void setMomenta(const std::vector<ROOT::Math::XYZVector>& momenta)
+    void setMomenta(const std::vector<ROOT::Math::PxPyPzEVector>& momenta)
     {
       m_momenta.clear();
       m_momenta = momenta;
@@ -87,7 +87,7 @@ namespace Belle2 {
 
   private:
     double m_moment[9] = {0.}; /**< The moments */
-    std::vector<ROOT::Math::XYZVector> m_momenta; /**< The particle's momenta */
+    std::vector<ROOT::Math::PxPyPzEVector> m_momenta; /**< The particle's momenta */
   };
 
 } // Belle2 namespace

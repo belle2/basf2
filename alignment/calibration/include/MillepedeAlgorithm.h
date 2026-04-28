@@ -25,7 +25,7 @@ namespace Belle2 {
     MillepedeAlgorithm();
 
     /// Destructor
-    virtual ~MillepedeAlgorithm() {}
+    ~MillepedeAlgorithm() override {}
 
     /// Get the steering to set commands etc.
     PedeSteering& steering() {return m_steering;}
@@ -91,7 +91,7 @@ namespace Belle2 {
     ///
     /// Overrides the event slicing defined by setEvents()
     ///
-    void setTimedepConfig(std::vector< std::tuple< std::vector<int>, std::vector< std::tuple<int, int, int> > > >& config)
+    void setTimedepConfig(const std::vector< std::tuple< std::vector<int>, std::vector< std::tuple<int, int, int> > > >& config)
     {
       setEvents(alignment::timeline::setupTimedepGlobalLabels(config));
     }
@@ -110,7 +110,7 @@ namespace Belle2 {
     PedeSteering m_steering{"PedeSteering.txt"};
     /// The result (invalid until execution)
     alignment::PedeResult m_result{};
-    /// The Pede application (unsuccesfull until execution)
+    /// The Pede application (unsuccessful until execution)
     alignment::PedeApplication m_pede{};
     /// Report failure(false) or success (true) even if some parameters could not be determined
     bool m_ignoreUndeterminedParams{false};
@@ -126,5 +126,3 @@ namespace Belle2 {
 
   };
 } // namespace Belle2
-
-

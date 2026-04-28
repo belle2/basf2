@@ -24,7 +24,6 @@
 #include <daq/slc/base/StringUtil.h>
 */
 
-#include <sstream>
 #include <TH2F.h>
 
 namespace Belle2 {

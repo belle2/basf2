@@ -84,7 +84,7 @@ namespace Belle2 {
     ///// Calculate MPV from a histogram.
     //double FitLandau(TH1* hist);
 
-    /// Retrive current gain value from pulled in data base payload
+    /// Retrieve current gain value from pulled in data base payload
     double GetCurrentGainFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin);
 
     /// During findPayloadBoundaries and isBoundaryRequired this is used to define the boundaries we want.

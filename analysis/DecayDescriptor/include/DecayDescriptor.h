@@ -17,7 +17,6 @@
 
 namespace Belle2 {
   class MCParticle;
-  class Particle;
 
   /** The DecayDescriptor stores information about
   a decay tree or parts of a decay tree. It contains
@@ -62,8 +61,6 @@ namespace Belle2 {
     bool m_isInitOK;
 
   public:
-    /** Singleton object representing NULL. */
-    const static DecayDescriptor& s_NULL;
 
     /** Dereference operator. */
     operator DecayDescriptor* ()

@@ -15,7 +15,7 @@
 """
 <header>
 <output>ECLBkgOutput.root</output>
-<contact>Priyanka Cheema, pche3675@uni.sydney.edu.au</contact>
+<contact>Priyanka Cheema, priyanka.cheema@kit.edu</contact>
 </header>
 """
 
@@ -73,4 +73,3 @@ main.add_module(ecldataanalysis)
 
 main.add_module('Progress')
 b2.process(main)
-# print(statistics)

@@ -7,10 +7,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
+#include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
+#include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
+#include <analysis/VertexFitting/TreeFitter/Projection.h>
 
 namespace TreeFitter {
 
@@ -125,23 +126,22 @@ namespace TreeFitter {
   {
     std::string rc = "unknown constraint!";
     switch (m_type) {
-      case beamspot:     rc = "beamspot";   break;
-      case beamenergy:   rc = "beamenergy"; break;
-      case beam:         rc = "beam"; break;
-      case origin:       rc = "origin"; break;
-      case composite:    rc = "composite";  break;
-      case resonance:    rc = "resonance";  break;
-      case track:        rc = "track";      break;
-      case photon:       rc = "photon";     break;
-      case klong:        rc = "klong";     break;
-      case kinematic:    rc = "kinematic";  break;
-      case geometric:    rc = "geometric";  break;
-      case mass:         rc = "mass";       break;
-      case massEnergy:   rc = "massEnergy"; break;
-      case lifetime:     rc = "lifetime";   break;
-      case merged:       rc = "merged";     break;
-      case conversion:   rc = "conversion"; break;
-      case helix:        rc = "helix";      break;
+      case beamspot:      rc = "beamspot";      break;
+      case beamenergy:    rc = "beamenergy";    break;
+      case beam:          rc = "beam";          break;
+      case origin:        rc = "origin";        break;
+      case composite:     rc = "composite";     break;
+      case resonance:     rc = "resonance";     break;
+      case track:         rc = "track";         break;
+      case neutralHadron: rc = "neutralHadron"; break;
+      case kinematic:     rc = "kinematic";     break;
+      case geometric:     rc = "geometric";     break;
+      case mass:          rc = "mass";          break;
+      case massEnergy:    rc = "massEnergy";    break;
+      case lifetime:      rc = "lifetime";      break;
+      case merged:        rc = "merged";        break;
+      case conversion:    rc = "conversion";    break;
+      case helix:         rc = "helix";         break;
       case ntypes:
       case unknown:
         break;

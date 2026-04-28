@@ -162,7 +162,7 @@ namespace Belle2 {
 
         // accumulate hits
         for (const auto& digit : m_digits) {
-          // select digits to count (usualy only good ones)
+          // select digits to count (usually only good ones)
           VxdID sensorID = digit.getSensorID();
           int layer = sensorID.getLayerNumber() - 3;
           int ladder = sensorID.getLadderNumber() - 1;
@@ -330,6 +330,7 @@ namespace Belle2 {
 
       // Take the correct active strips counter
       const auto& activeStrips = isU ? m_activeStripsU : (isV ? m_activeStripsV : m_activeStrips);
+      // cppcheck-suppress constVariableReference
       const auto& layerActiveStrips = isU ? m_layerActiveStripsU : (isV ? m_layerActiveStripsV : m_layerActiveStrips);
       const auto& layerLadderActiveStrips = isU ? m_layerLadderActiveStripsU
                                             : (isV ? m_layerLadderActiveStripsV : m_layerLadderActiveStrips);

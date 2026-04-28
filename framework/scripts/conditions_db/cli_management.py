@@ -130,7 +130,7 @@ def command_tag_merge(args, db=None):
         payload1, rev 3, valid from 1,20 to 1,21
         payload2, rev 1, valid from 1,0 to 1,21
 
-    .. versionadded:: release-05-01-00
+    .. note:: Version added: release-05-01-00
     """
 
     if db is None:
@@ -533,7 +533,7 @@ class CommandIoVsHelper:
             "--iov-pattern",
             default=None,
             help="whitespace-separated string with pattern of the iov to be considered. "
-            " Use * to mark the fields that shold be ignored. Valid patterns are 0 0 -1 -1"
+            " Use * to mark the fields that should be ignored. Valid patterns are 0 0 -1 -1"
             " (a very specific IoV),  0 * -1 -1 (any iov that starts in any run of exp 0 and ends exactly in exp -1, run -1)"
             ", * * 3 45 (any Iov ending in exp 3, run 45, regardless from where it starts).")
         self._args.add_argument("--run-range", nargs=4, default=None, type=int,

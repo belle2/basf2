@@ -156,7 +156,7 @@ namespace Belle2 {
           m_rates.hardPhotonFluxes[index] *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
           m_rates.chargedFluxes[index] *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
 
-          // Loop over v segements
+          // Loop over v segments
           for (int vBin = 0; vBin < 6; ++vBin)  {
             double currentSegmentMass = m_segmentActiveAreas[vBin + index * 6] * info.getThickness() * c_densitySi;
             double currentSegmentArea = m_segmentActiveAreas[vBin + index * 6];
@@ -187,7 +187,7 @@ namespace Belle2 {
         // Compute nominal area of sensor
         m_activeAreas[index] = info.getWidth() * info.getLength();
 
-        // Loop over v segements
+        // Loop over v segments
         for (int vBin = 0; vBin < 6; ++vBin)  {
           // Compute nominal number of pixel per segment
           // Sgements have same number of rows, but due to pitch change a different length

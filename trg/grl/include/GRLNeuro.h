@@ -13,8 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
-//#include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
-//#include <framework/dataobjects/BinnedEventT0.h>
+
 
 namespace Belle2 {
 
@@ -46,12 +45,13 @@ namespace Belle2 {
        * The number of layers is derived from the shape.
        */
       std::vector<std::vector<float>> nHidden;
-      /** train result as output */
-      bool targetresult = true;
+      /** Number of output nodes */
+      std::vector<unsigned> nOutput;
+      /** Threshold of output nodes */
+      std::vector<std::vector<float>> nn_thres;
       /** If true, multiply nHidden with number of input nodes. */
       bool multiplyHidden = false;
-      /** Output scale for all networks. */
-      std::vector<std::vector<float>> outputScale = {{ -1., 1.}};
+
 
       /** Number of CDC sectors. */
       unsigned n_cdc_sector;
@@ -59,6 +59,35 @@ namespace Belle2 {
       /** Number of ECL sectors. */
       unsigned n_ecl_sector;
       std::vector<float> i_ecl_sector;
+
+      /** bit width etc. constant in each node */
+      std::vector<std::vector<int>> total_bit_bias;
+      std::vector<std::vector<int>> int_bit_bias;
+      std::vector<std::vector<bool>> is_signed_bias;
+      std::vector<std::vector<int>> rounding_bias;
+      std::vector<std::vector<int>> saturation_bias;
+      std::vector<std::vector<int>> total_bit_accum;
+      std::vector<std::vector<int>> int_bit_accum;
+      std::vector<std::vector<bool>> is_signed_accum;
+      std::vector<std::vector<int>> rounding_accum;
+      std::vector<std::vector<int>> saturation_accum;
+      std::vector<std::vector<int>> total_bit_weight;
+      std::vector<std::vector<int>> int_bit_weight;
+      std::vector<std::vector<bool>> is_signed_weight;
+      std::vector<std::vector<int>> rounding_weight;
+      std::vector<std::vector<int>> saturation_weight;
+      std::vector<std::vector<int>> total_bit_relu;
+      std::vector<std::vector<int>> int_bit_relu;
+      std::vector<std::vector<bool>> is_signed_relu;
+      std::vector<std::vector<int>> rounding_relu;
+      std::vector<std::vector<int>> saturation_relu;
+      std::vector<std::vector<int>> total_bit;
+      std::vector<std::vector<int>> int_bit;
+      std::vector<std::vector<bool>> is_signed;
+      std::vector<std::vector<int>> rounding;
+      std::vector<std::vector<int>> saturation;
+      std::vector<std::vector<std::vector<int>>> W_input;
+      std::vector<std::vector<std::vector<int>>> I_input;
     };
 
 
@@ -71,8 +100,6 @@ namespace Belle2 {
 
     /** Set parameters and get some network independent parameters. */
     void initialize(const Parameters& p);
-    /** Set parameters and get some network independent parameters. */
-    //void initialize(const std::vector<float>& nodes);
 
     /** return reference to a neural network */
     GRLMLP& operator[](unsigned index) { return m_MLPs[index]; }
@@ -81,14 +108,6 @@ namespace Belle2 {
     /** return number of neural networks */
     unsigned nSectors() const { return m_MLPs.size(); }
 
-    /** ReLu activation function*/
-    float relu(float x);
-
-    /** change the percision of number, m = number of integer bits, n = number of decimal**/
-    float float_to_fixed(float num, int m, int n);
-
-    /** discrete sigmoid activation function (1024 bins) **/
-    float mysigmiod(float num);
     /** Save MLPs to file.
      * @param filename name of the TFile to write to
      * @param arrayname name of the TObjArray holding the MLPs in the file
@@ -102,11 +121,12 @@ namespace Belle2 {
      */
     bool load(unsigned isector, const std::string& wfilename, const std::string& bfilename);
 
+    bool load(unsigned isector, std::vector<float> warray, std::vector<float> barray);//add
     /** Run an expert MLP.
      * @param isector index of the MLP
      * @param input vector of input values
      * @return output values (classifier) */
-    float runMLP(unsigned isector,  const std::vector<float>& input);
+    std::vector<float> runMLP(unsigned isector,  const std::vector<float>& input);
 
   private:
     /** List of networks */

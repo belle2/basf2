@@ -14,14 +14,14 @@
 
 #include <Eigen/Core>
 
-#include <analysis/dataobjects/Btube.h>
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
+  class Btube;
+  class Particle;
   /**
    * Calculates distance between two vertices, distance of closest approach between a vertex and a track, distance of closest approach between a vertex and Btube. The calculation ignores track curvature, it's negligible for small distances.
    */

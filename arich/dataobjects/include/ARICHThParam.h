@@ -24,7 +24,7 @@ namespace Belle2 {
   public:
 
     //! Default constructor for ROOT IO.
-    ARICHThParam() : m_index(-1), m_dth(-1), m_th0(0), m_nth(0)
+    ARICHThParam()
     {
       /*! does nothing */
     }
@@ -87,11 +87,11 @@ namespace Belle2 {
 
   private:
 
-    int m_index; /**< index */
-    double m_dth; /**< dth */
-    double m_th0; /**< th0 */
-    int m_nth; /**< nth */
-    ClassDef(ARICHThParam, 1); /**< the class title */
+    double m_dth = -1; /**< dth */
+    double m_th0 = 0; /**< th0 */
+    int m_index = -1; /**< index */
+    int m_nth = 0; /**< nth */
+    ClassDef(ARICHThParam, 2); /**< the class title */
 
   };
 

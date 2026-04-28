@@ -11,6 +11,10 @@
 #include <simulation/monopoles/G4MonopoleTransportation.h>
 #include <simulation/monopoles/G4Monopole.h>
 
+#include <G4Navigator.hh>
+#include <G4PropagatorInField.hh>
+#include <G4Track.hh>
+#include <G4Step.hh>
 #include <G4ProductionCutsTable.hh>
 #include <G4ParticleTable.hh>
 #include <G4ChordFinder.hh>
@@ -111,7 +115,7 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
   //    it will be necessary to add here (for all steps)
   // fCurrentTouchableHandle = aTrack->GetTouchableHandle();
 
-  // GPILSelection is set to defaule value of CandidateForSelection
+  // GPILSelection is set to default value of CandidateForSelection
   // It is a return value
   //
   *selection = CandidateForSelection ;

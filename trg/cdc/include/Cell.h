@@ -110,9 +110,9 @@ namespace Belle2 {
     /// position in backward endplate.
     double* backwardPosition(double p[3]) const;
 
-    /// returns middle position of a wire. z componet is 0.
+    /// returns middle position of a wire. z component is 0.
     const HepGeom::Point3D<double>& xyPosition(void) const;
-    /// middle position of a wire. z componet is 0.
+    /// middle position of a wire. z component is 0.
     double* xyPosition(double p[3]) const;
 
     /// returns direction vector of the wire.

@@ -257,7 +257,7 @@ namespace Belle2 {
     /// TSF input storage
     std::vector<TRGSignalVector*> _tsfIn;
 
-    /// TSF response storeage
+    /// TSF response storage
     std::vector<TRGSignalVector*> _tsfOut;
 
     /// One time info. to be deleted in next event;

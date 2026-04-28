@@ -8,7 +8,6 @@
 
 #include <arich/utility/ARICHChannelHist.h>
 #include <framework/logging/Logger.h>
-#include <math.h>
 #include <iostream>
 #include <algorithm>
 #include <TGraph.h>
@@ -239,6 +238,7 @@ void ARICHChannelHist::fillFromTH1(TH1* hist)
 
 void ARICHChannelHist::setPoly(TH2Poly* poly)
 {
+  if (poly == nullptr) return;
 
   if (poly->GetNumberOfBins() == 0) {
     for (const auto&& bin : *fBins) {

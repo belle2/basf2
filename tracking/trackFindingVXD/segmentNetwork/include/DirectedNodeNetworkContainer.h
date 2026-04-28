@@ -150,24 +150,6 @@ namespace Belle2 {
     ClassDef(DirectedNodeNetworkContainer, 0);
 
   protected:
-
-    /** Number of trackNodes collected. */
-    int m_trackNodesCollected = 0;
-    /** Number of activeSectors connections made. */
-    int m_activeSectorConnections = 0;
-    /** Number of trackNodes connections made. */
-    int m_trackNodeConnections = 0;
-    /** Number of segments connections made. */
-    int m_segmentConnections = 0;
-    /** Number of added activeSectors connections made. */
-    int m_activeSectorAddedConnections = 0;
-    /** Number of added trackNodes connections made. */
-    int m_trackNodeAddedConnections = 0;
-    /** Number of added segments connections made. */
-    int m_segmentAddedConnections = 0;
-    /** Number of paths found. */
-    int m_collectedPaths = 0;
-
     /** ************************* DATA MEMBERS ************************* */
     /** Stores the full network of activeSectors, which contain hits in that event and have compatible Sectors with hits too*/
     DirectedNodeNetwork<ActiveSector<StaticSectorType, TrackNode>, Belle2::VoidMetaInfo> m_ActiveSectorNetwork;
@@ -192,5 +174,22 @@ namespace Belle2 {
 
     /** Stores the SpacePoint needed for the virtual IP */
     SpacePoint* m_VIPSpacePoint;
+
+    /** Number of trackNodes collected. */
+    int m_trackNodesCollected = 0;
+    /** Number of activeSectors connections made. */
+    int m_activeSectorConnections = 0;
+    /** Number of trackNodes connections made. */
+    int m_trackNodeConnections = 0;
+    /** Number of segments connections made. */
+    int m_segmentConnections = 0;
+    /** Number of added activeSectors connections made. */
+    int m_activeSectorAddedConnections = 0;
+    /** Number of added trackNodes connections made. */
+    int m_trackNodeAddedConnections = 0;
+    /** Number of added segments connections made. */
+    int m_segmentAddedConnections = 0;
+    /** Number of paths found. */
+    int m_collectedPaths = 0;
   };
 }

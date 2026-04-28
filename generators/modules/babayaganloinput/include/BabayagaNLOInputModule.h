@@ -26,7 +26,7 @@ namespace Belle2 {
 
   /**
    * The Babayaga.NLO Generator module.
-   * Generates radiative Bhabha scattering and exlcusive photon pairs events using the Babayaga.NLO FORTRAN generator.
+   * Generates radiative Bhabha scattering and exclusive photon pairs events using the Babayaga.NLO FORTRAN generator.
    */
   class BabayagaNLOInputModule : public GeneratorBaseModule {
 

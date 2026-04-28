@@ -36,7 +36,7 @@ namespace Belle2 {
     /// Constructor
     VXDAlignment() : DBObjCalibrationConstMapBase() {}
     /// Destructor
-    ~VXDAlignment() {}
+    ~VXDAlignment() override {}
 
     // ------------- Interface to global Millepede calibration ----------------
     /// Get global unique id
@@ -47,12 +47,9 @@ namespace Belle2 {
     void setGlobalParam(double value, unsigned short element, unsigned short param) {set(element, param, value);}
     /// TODO: list stored global parameters
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
-    /// Not used
-    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&) {}
     // ------------------------------------------------------------------------
 
   private:
-    ClassDef(VXDAlignment, 2); /**< VXD allignment and calibration constants */
+    ClassDefOverride(VXDAlignment, 2); /**< VXD alignment and calibration constants */
   };
 } // end namespace Belle2
-

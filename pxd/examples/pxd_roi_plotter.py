@@ -33,8 +33,8 @@ main.add_module(PXDROIUnpackerModule.PXDRawROIUnpackerModule())
 # main.add_module(PXDROIUnpackerModule.PXDPayloadROIUnpackerModule())
 
 plotter = b2.register_module('PXDROIPlot')
-plotter.param("ROIsName", "ROIs")  # calculated on HLT ... before Payload assemly
-# plotter.param("ROIsName","PXDROIsPayHLT") # calculated on HLT ... unpacked from payload (depends whats in the sroot file)
+plotter.param("ROIsName", "ROIs")  # calculated on HLT ... before Payload assembly
+# plotter.param("ROIsName","PXDROIsPayHLT") # calculated on HLT ... unpacked from payload (depends what's in the sroot file)
 plotter.param("DCROIsName", "PXDROIsDC")  # output from DATCON by ONSEN
 plotter.param("HLTROIsName", "PXDROIsHLT")  # output from HLT by ONSEN
 main.add_module(plotter)

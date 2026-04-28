@@ -34,7 +34,7 @@
     <shift  unit="mm"> 3.500</shift>
     <!-- The nominal radius of the outer layer is 22 mm, but this is the
          outersurface of the sensor and here we give the center of the sensor,
-         so let's substract half of the sensor thickness -->
+         so let's subtract half of the sensor thickness -->
     <radius unit="mm">21.790</radius>
     <!-- Disabled as it causes problems with TGeo conversion -->
     <!--<Glue><oversize unit="um">20</oversize><Material>PXD-Glue</Material></Glue>-->

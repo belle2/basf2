@@ -23,7 +23,7 @@ outdir_sub = 'phase2.1.4_collimators_1_upd'  # output sub directory
 fileSAD = 'phase2.1.4_collimators_1_upd'  # sad filename from /group/belle2/BGcampaigns/SAD/forG4/
 # check the directory for existing SAD samples
 # 28.2.2019
-# early_phase3_1_step5, early phase 3; use 31 for phase!
+# early_phase3_1_step5, Run 1 (early phase 3); use 31 for phase!
 # phase2.1.7_Touschek_step5
 # phase2.1.3_june_Touschek_EM_0
 # phase2.1.3_june_Touschek_EM_1
@@ -32,13 +32,13 @@ fileSAD = 'phase2.1.4_collimators_1_upd'  # sad filename from /group/belle2/BGca
 
 outdir = outdir_base + outdir_sub
 
-bkgs = ['Touschek LER', 'Coulomb LER', 'Brems LER', 'Touschek HER', 'Coulomb HER', 'Brems HER']  # bacground types
+bkgs = ['Touschek LER', 'Coulomb LER', 'Brems LER', 'Touschek HER', 'Coulomb HER', 'Brems HER']  # background types
 
 bkgs_flag = [1, 1, 1, 1, 1, 1]  # skip backgrounds with flag 0
 
 time = [500, 500, 10000, 1000, 1000, 10000]  # simulation time in us (per job)
 
-files = 400  # number of jobs to be commited for each background type
+files = 400  # number of jobs to be committed for each background type
 
 q = ['l', 'l', 's', 's', 's', 's']  # queue for jobs of given background
 

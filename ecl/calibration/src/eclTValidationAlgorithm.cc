@@ -101,6 +101,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   auto clusterTimeClusterE = getObjectPtr<TH2F>("clusterTimeClusterE");
   auto dt99_clusterE = getObjectPtr<TH2F>("dt99_clusterE");
   auto eventT0 = getObjectPtr<TH1F>("eventT0");
+  auto eventT0Detector = getObjectPtr<TH1F>("eventT0Detector");
   auto clusterTimeE0E1diff = getObjectPtr<TH1F>("clusterTimeE0E1diff");
 
   // Collect other plots just for reference - combines all the runs for these plots.
@@ -252,6 +253,7 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
   clusterTimeClusterE ->Write();
   dt99_clusterE       ->Write();
   eventT0             ->Write();
+  eventT0Detector             ->Write();
   clusterTimeE0E1diff ->Write();
 
   cutflow->Write();

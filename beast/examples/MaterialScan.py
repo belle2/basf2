@@ -72,7 +72,7 @@ materialscan.param({  # Filename for output File
                       # Number of steps along the second axis
                       # Minimum value for the second axis
                       # Maximum value for the second axis
-                      # Split output by Material names insted of by Region
+                      # Split output by Material names instead of by Region
                       # Specify the names of Materials to ignore in the scan.
                       # Default is Air and Vacuum
     'Filename': 'MaterialScan.root',

@@ -18,6 +18,7 @@
 #include <top/dbobjects/TOPNominalQE.h>
 #include <top/dbobjects/TOPCalChannelRQE.h>
 #include <top/dbobjects/TOPCalChannelThresholdEff.h>
+#include <top/dbobjects/TOPCalChannelPulseHeight.h>
 #include <string>
 #include <map>
 
@@ -118,6 +119,12 @@ namespace Belle2 {
       double getRelativePixelEfficiency(int moduleID, int pixelID) const;
 
       /**
+       * Returns relative PDE on MC (including CE, tuning factor and threshold efficiency)
+       * @return pixel efficiency on MC relative to nominal photocathode
+       */
+      double getRelativePDEonMC(int moduleID, int pixelID) const;
+
+      /**
        * Returns PMT type at a given position
        * @param moduleID slot ID
        * @param pmtID PMT ID
@@ -138,35 +145,35 @@ namespace Belle2 {
        * @param energy photon energy [eV]
        * @return phase refractive index
        */
-      double getPhaseIndex(double energy) const;
+      static double getPhaseIndex(double energy);
 
       /**
        * Returns group refractive index of quartz at given photon energy
        * @param energy photon energy [eV]
        * @return group refractive index
        */
-      double getGroupIndex(double energy) const;
+      static double getGroupIndex(double energy);
 
       /**
        * Returns the derivative (dn/dE) of phase refractive index of quartz at given photon energy
        * @param energy photon energy [eV]
        * @return derivative of phase refractive index
        */
-      double getPhaseIndexDerivative(double energy) const;
+      static double getPhaseIndexDerivative(double energy);
 
       /**
        * Returns the derivative (dn_g/dE) of group refractive index of quartz at given photon energy
        * @param energy photon energy [eV]
        * @return group refractive index
        */
-      double getGroupIndexDerivative(double energy) const;
+      static double getGroupIndexDerivative(double energy);
 
       /**
-       * Returns bulk absorption lenght of quartz at given photon energy
+       * Returns bulk absorption length of quartz at given photon energy
        * @param energy photon energy [eV]
-       * @return bulk absorption lenght
+       * @return bulk absorption length
        */
-      double getAbsorptionLength(double energy) const;
+      static double getAbsorptionLength(double energy);
 
       static const double c_hc; /**< Planck constant times speed of light in [eV*nm] */
 
@@ -179,6 +186,16 @@ namespace Belle2 {
       {}
 
       /**
+       * Deleted copy constructor since it is a singleton class
+       */
+      TOPGeometryPar(const TOPGeometryPar&) = delete;
+
+      /**
+       * Deleted assignment operator since it is a singleton class
+       */
+      TOPGeometryPar& operator=(const TOPGeometryPar&) = delete;
+
+      /**
        * finalize initialization
        */
       void finalizeInitialization();
@@ -187,31 +204,31 @@ namespace Belle2 {
        * Create a parameter object from gearbox
        * @param content XML data directory
        */
-      TOPGeometry* createConfiguration(const GearDir& content);
+      static TOPGeometry* createConfiguration(const GearDir& content);
 
       /**
        * Create a parameter object from gearbox for bar segment
        * @param content XML data directory
        * @param serialNumber bar segment serial number
        */
-      TOPGeoBarSegment createBarSegment(const GearDir& content,
-                                        const std::string& serialNumber);
+      static TOPGeoBarSegment createBarSegment(const GearDir& content,
+                                               const std::string& serialNumber);
 
       /**
        * Create a parameter object from gearbox for mirror segment
        * @param content XML data directory
        * @param serialNumber mirror segment serial number
        */
-      TOPGeoMirrorSegment createMirrorSegment(const GearDir& content,
-                                              const std::string& serialNumber);
+      static TOPGeoMirrorSegment createMirrorSegment(const GearDir& content,
+                                                     const std::string& serialNumber);
 
       /**
        * Create a parameter object from gearbox for prism
        * @param content XML data directory
        * @param serialNumber prism serial number
        */
-      TOPGeoPrism createPrism(const GearDir& content,
-                              const std::string& serialNumber);
+      static TOPGeoPrism createPrism(const GearDir& content,
+                                     const std::string& serialNumber);
 
       /**
        * Adds number to string
@@ -219,7 +236,7 @@ namespace Belle2 {
        * @param number number to be added
        * @return string with a number
        */
-      std::string addNumber(const std::string& str, unsigned number);
+      static std::string addNumber(const std::string& str, unsigned number);
 
       /**
        * Clears cache for PMT dependent QE data - function is used in call backs
@@ -242,9 +259,14 @@ namespace Belle2 {
       void mapPmtTypeToPositions() const;
 
       /**
-       * Prepares a map of relative pixel efficiencies
+       * Prepares a map of relative pixel quantum times collection efficiencies (relative to nominal one)
        */
       void prepareRelEfficiencies() const;
+
+      /**
+       * Prepares a map of relative pixel photon detection efficiencies on MC
+       */
+      void prepareRelPDEonMC() const;
 
       /**
        * Returns unique PMT ID within the detector
@@ -252,7 +274,7 @@ namespace Belle2 {
        * @param pmtID PMT ID
        * @return unique ID
        */
-      int getUniquePmtID(int moduleID, int pmtID) const
+      static int getUniquePmtID(int moduleID, int pmtID)
       {
         return (moduleID << 16) + pmtID;
       }
@@ -263,7 +285,7 @@ namespace Belle2 {
        * @param pixelID pixel ID
        * @return unique ID
        */
-      int getUniquePixelID(int moduleID, int pixelID) const
+      static int getUniquePixelID(int moduleID, int pixelID)
       {
         return (moduleID << 16) + pixelID;
       }
@@ -272,7 +294,7 @@ namespace Belle2 {
        * Returns integral of quantum efficiency over photon energies
        * @param qe quantum efficiency data points
        * @param ce collection efficiency data points
-       * @param lambdaFirst wavelenght of the first data point [nm]
+       * @param lambdaFirst wavelength of the first data point [nm]
        * @param lambdaStep wavelength step [nm]
        * @return integral [eV]
        */
@@ -285,12 +307,12 @@ namespace Belle2 {
        * @param lambda photon wavelength [nm]
        * @return refractive index
        */
-      double refractiveIndex(double lambda) const;
+      static double refractiveIndex(double lambda);
 
       // Geometry
 
       TOPGeometry* m_geo = 0;             /**< geometry parameters from Gearbox */
-      DBObjPtr<TOPGeometry>* m_geoDB = 0; /**< geometry parameters from database */
+      DBObjPtr<TOPGeometry> m_geoDB;      /**< geometry parameters from database */
       bool m_fromDB = false;              /**< parameters from database or Gearbox */
       bool m_valid = false;               /**< true if geometry is available */
       bool m_oldPayload = false;          /**< true if old payload found in DB */
@@ -308,11 +330,13 @@ namespace Belle2 {
       OptionalDBArray<TOPPmtQE> m_pmtQEData; /**< quantum efficiencies */
       DBObjPtr<TOPCalChannelRQE> m_channelRQE; /**< channel relative quantum effi. */
       DBObjPtr<TOPCalChannelThresholdEff> m_thresholdEff; /**< channel threshold effi. */
+      DBObjPtr<TOPCalChannelPulseHeight> m_pulseHeights; /**< channel pulse height parametrizations */
 
       // cache
       mutable TOPNominalQE m_envelopeQE;  /**< envelope quantum efficiency */
       mutable std::map<int, const TOPPmtQE*> m_pmts; /**< QE data mapped to positions */
       mutable std::map<int, double> m_relEfficiencies; /**< pixel relative QE */
+      mutable std::map<int, double> m_relPDEonMC; /**< pixel relative photon detection efficiencies on MC */
       mutable std::map<int, unsigned> m_pmtTypes; /**< PMT types mapped to positions */
 
       // Other
@@ -321,22 +345,22 @@ namespace Belle2 {
 
     };
 
-    inline double TOPGeometryPar::getPhaseIndexDerivative(double energy) const
+    inline double TOPGeometryPar::getPhaseIndexDerivative(double energy)
     {
       double dE = 0.01; // [eV]
       return (getPhaseIndex(energy + dE / 2) - getPhaseIndex(energy - dE / 2)) / dE;
     }
 
-    inline double TOPGeometryPar::getGroupIndexDerivative(double energy) const
+    inline double TOPGeometryPar::getGroupIndexDerivative(double energy)
     {
       double dE = 0.01; // [eV]
       return (getGroupIndex(energy + dE / 2) - getGroupIndex(energy - dE / 2)) / dE;
     }
 
-    inline double TOPGeometryPar::getAbsorptionLength(double energy) const
+    inline double TOPGeometryPar::getAbsorptionLength(double energy)
     {
       double lambda = c_hc / energy;
-      return 15100 * pow(lambda / 405, 4); // Alan Schwartz, 2013 (private comunication)
+      return 15100 * pow(lambda / 405, 4); // Alan Schwartz, 2013 (private communication)
     }
 
   } // end of namespace TOP

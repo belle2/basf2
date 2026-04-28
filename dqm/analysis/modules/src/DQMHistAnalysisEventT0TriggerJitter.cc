@@ -50,6 +50,10 @@ void DQMHistAnalysisEventT0TriggerJitterModule::initialize()
   initializeCanvases();
 
   m_monObj = getMonitoringObject("eventT0");
+
+  registerEpicsPV("EventT0:ECLTRG_Hadron_Delta_CDCEventT0_SVDEventT0", "ECLTRG_Hadron_Delta_CDCEventT0_SVDEventT0");
+  registerEpicsPV("EventT0:ECLTRG_Hadron_Delta_ECLEventT0_SVDEventT0", "ECLTRG_Hadron_Delta_ECLEventT0_SVDEventT0");
+  registerEpicsPV("EventT0:ECLTRG_Hadron_Delta_TOPEventT0_SVDEventT0", "ECLTRG_Hadron_Delta_TOPEventT0_SVDEventT0");
 }
 
 
@@ -61,30 +65,28 @@ void DQMHistAnalysisEventT0TriggerJitterModule::beginRun()
   m_ECLTRGHLThadronCDCT0 = -999.;
   m_ECLTRGHLThadronTOPT0 = -999.;
   m_ECLTRGHLThadronSVDT0 = -999.;
-  m_ECLTRGHLTbhabhaECLT0 = -999.;
-  m_ECLTRGHLTbhabhaCDCT0 = -999.;
-  m_ECLTRGHLTbhabhaTOPT0 = -999.;
-  m_ECLTRGHLTbhabhaSVDT0 = -999.;
-  m_ECLTRGHLTmumuECLT0 = -999.;
-  m_ECLTRGHLTmumuCDCT0 = -999.;
-  m_ECLTRGHLTmumuTOPT0 = -999.;
-  m_ECLTRGHLTmumuSVDT0 = -999.;
 }
 
 void DQMHistAnalysisEventT0TriggerJitterModule::event()
 {
-  analyseECLTRGEventT0Distributions();
-  analyseCDCTRGEventT0Distributions();
-  analyseTOPTRGEventT0Distributions();
-}
+  m_ECLTRGHLThadronECLT0 = -999.;
+  m_ECLTRGHLThadronCDCT0 = -999.;
+  m_ECLTRGHLThadronTOPT0 = -999.;
+  m_ECLTRGHLThadronSVDT0 = -999.;
 
-void DQMHistAnalysisEventT0TriggerJitterModule::endRun()
-{
-  analyseECLTRGEventT0Distributions(true);
+  analyseECLTRGEventT0Distributions();
   analyseCDCTRGEventT0Distributions();
   analyseTOPTRGEventT0Distributions();
 
   setDeltaT0Values();
+}
+
+void DQMHistAnalysisEventT0TriggerJitterModule::endRun()
+{
+  // final calculation of the mean values for MiraBelle
+  analyseECLTRGEventT0Distributions(false);
+  analyseCDCTRGEventT0Distributions();
+  analyseTOPTRGEventT0Distributions();
 
   if (m_printCanvas) {
     printCanvases();
@@ -108,8 +110,8 @@ double DQMHistAnalysisEventT0TriggerJitterModule::fDoubleGaus(double* x, double*
   return N * frac * TMath::Gaus(x[0], mean, sigma) + N * (1 - frac) * TMath::Gaus(x[0], mean2, sigma2);
 }
 
-std::tuple<bool, std::optional<double>>
-                                     DQMHistAnalysisEventT0TriggerJitterModule::processHistogram(TH1* h,  TString tag, bool retrieveMeanT0)
+std::tuple<bool, std::optional<double>> DQMHistAnalysisEventT0TriggerJitterModule::processHistogram(TH1* h,  TString tag,
+                                     bool retrieveMeanT0)
 {
 
   if (h == nullptr) {
@@ -158,35 +160,49 @@ std::tuple<bool, std::optional<double>>
   TF1 gauss1("gauss1", "gaus", -100, 100);
   TF1 gauss2("gauss2", "gaus", -100, 100);
 
+  // Sometimes the first Gaussian isn't the main one, messing up the DQM plots
+  // Thus, chose the Gaussian with the larger relative contribution to be the main one
+  const double mainFrac     = par[1] > 0.5 ? par[1] : (1 - par[1]);
+  const double mainMean     = par[1] > 0.5 ? par[2] : par[4];
+  const double mainSigma    = par[1] > 0.5 ? par[3] : par[5];
+  const double miniMean     = par[1] > 0.5 ? par[4] : par[2];
+  const double miniSigma    = par[1] > 0.5 ? par[5] : par[3];
+  const double mainMeanErr  = par[1] > 0.5 ? parErr[2] : parErr[4];
+  const double mainSigmaErr = par[1] > 0.5 ? parErr[3] : parErr[5];
+  const double miniMeanErr  = par[1] > 0.5 ? parErr[4] : parErr[2];
+  const double miniSigmaErr = par[1] > 0.5 ? parErr[5] : parErr[3];
+
   gauss1.SetLineColor(kBlue);
   gauss1.SetLineStyle(kDashed);
-  gauss1.SetParameters(par[0]*par[1], par[2], par[3]);
+  gauss1.SetParameters(par[0]*mainFrac, mainMean, mainSigma);
 
   gauss2.SetLineColor(kRed);
   gauss2.SetLineStyle(kDashed);
-  gauss2.SetParameters(par[0] * (1 - par[1]), par[4], par[5]);
+  gauss2.SetParameters(par[0] * (1 - mainFrac), miniMean, miniSigma);
 
   m_monObj->setVariable(Form("fit_%s", tag.Data()), 1);
   m_monObj->setVariable(Form("N_%s", tag.Data()), nValidEntries, TMath::Sqrt(nValidEntries));
-  m_monObj->setVariable(Form("f_%s", tag.Data()), par[1], parErr[1]);
-  m_monObj->setVariable(Form("mean1_%s", tag.Data()), par[2], parErr[2]);
-  m_monObj->setVariable(Form("sigma1_%s", tag.Data()), par[3], parErr[3]);
-  m_monObj->setVariable(Form("mean2_%s", tag.Data()), par[4], parErr[4]);
-  m_monObj->setVariable(Form("sigma2_%s", tag.Data()), par[5], parErr[5]);
+  m_monObj->setVariable(Form("f_%s", tag.Data()), mainFrac, parErr[1]);
+  m_monObj->setVariable(Form("mean1_%s", tag.Data()), mainMean, mainMeanErr);
+  m_monObj->setVariable(Form("sigma1_%s", tag.Data()), mainSigma, mainSigmaErr);
+  m_monObj->setVariable(Form("mean2_%s", tag.Data()), miniMean, miniMeanErr);
+  m_monObj->setVariable(Form("sigma2_%s", tag.Data()), miniSigma, miniSigmaErr);
 
   //SETUP gSTYLE - all plots
   gStyle->SetOptFit(1111);
 
-  h->DrawClone();
-  fitf.DrawClone("same");
-  gauss1.DrawClone("same");
-  gauss2.DrawClone("same");
+  gPad->Clear();// better clear before to get rid of all fit lines drawn before
+  h->Draw();
+  fitf.DrawCopy("same");// Do not use DrawClone, it result in meory leak (even so unclear why)
+  gauss1.DrawCopy("same");
+  gauss2.DrawCopy("same");
 
   if (retrieveMeanT0) {
     // return mean of the core Gaussian
-    return {true, par[2]};
+    return {true, mainMean};
   }
   return {true, {}};
+
 
 }
 
@@ -218,19 +234,14 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
     m_cECLTimeHadronsECLTRG->Draw();
   }
 
-
   // find ECL EventT0 Bhabhas ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_ECL_bhabha_L1_ECLTRG");
   tag = "bhabhaECLTRG_ECLT0";
   m_cECLTimeBhaBhaECLTRG->cd();
-  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
-  if (processingSuccessful) {
+  if (std::get<0>(processHistogram(h, tag))) {
     m_cECLTimeBhaBhaECLTRG->SetFillColor(0);
     m_cECLTimeBhaBhaECLTRG->Modified();
     m_cECLTimeBhaBhaECLTRG->Update();
-    if (*currentT0) {
-      m_ECLTRGHLTbhabhaECLT0 = *currentT0;
-    }
   } else {
     B2DEBUG(29, Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -242,14 +253,10 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_ECL_mumu_L1_ECLTRG");
   tag = "mumuECLTRG_ECLT0";
   m_cECLTimeMuMuECLTRG->cd();
-  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
-  if (processingSuccessful) {
+  if (std::get<0>(processHistogram(h, tag))) {
     m_cECLTimeMuMuECLTRG->SetFillColor(0);
     m_cECLTimeMuMuECLTRG->Modified();
     m_cECLTimeMuMuECLTRG->Update();
-    if (*currentT0) {
-      m_ECLTRGHLTmumuECLT0 = *currentT0;
-    }
   } else {
     B2DEBUG(29, Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -283,14 +290,10 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_CDC_bhabha_L1_ECLTRG");
   tag = "bhabhaECLTRG_CDCT0";
   m_cCDCTimeBhaBhaECLTRG->cd();
-  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
-  if (processingSuccessful) {
+  if (std::get<0>(processHistogram(h, tag))) {
     m_cCDCTimeBhaBhaECLTRG->SetFillColor(0);
     m_cCDCTimeBhaBhaECLTRG->Modified();
     m_cCDCTimeBhaBhaECLTRG->Update();
-    if (*currentT0) {
-      m_ECLTRGHLTbhabhaCDCT0 = *currentT0;
-    }
   } else {
     B2DEBUG(29, Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -302,14 +305,10 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_CDC_mumu_L1_ECLTRG");
   tag = "mumuECLTRG_CDCT0";
   m_cCDCTimeMuMuECLTRG->cd();
-  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
-  if (processingSuccessful) {
+  if (std::get<0>(processHistogram(h, tag))) {
     m_cCDCTimeMuMuECLTRG->SetFillColor(0);
     m_cCDCTimeMuMuECLTRG->Modified();
     m_cCDCTimeMuMuECLTRG->Update();
-    if (*currentT0) {
-      m_ECLTRGHLTmumuCDCT0 = *currentT0;
-    }
   } else {
     B2DEBUG(29, Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -343,14 +342,10 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_ECLTRG");
   tag = "bhabhaECLTRG_TOPT0";
   m_cTOPTimeBhaBhaECLTRG->cd();
-  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
-  if (processingSuccessful) {
+  if (std::get<0>(processHistogram(h, tag))) {
     m_cTOPTimeBhaBhaECLTRG->SetFillColor(0);
     m_cTOPTimeBhaBhaECLTRG->Modified();
     m_cTOPTimeBhaBhaECLTRG->Update();
-    if (*currentT0) {
-      m_ECLTRGHLTbhabhaTOPT0 = *currentT0;
-    }
   } else {
     B2DEBUG(29, Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -362,14 +357,10 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_ECLTRG");
   tag = "mumuECLTRG_TOPT0";
   m_cTOPTimeMuMuECLTRG->cd();
-  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
-  if (processingSuccessful) {
+  if (std::get<0>(processHistogram(h, tag))) {
     m_cTOPTimeMuMuECLTRG->SetFillColor(0);
     m_cTOPTimeMuMuECLTRG->Modified();
     m_cTOPTimeMuMuECLTRG->Update();
-    if (*currentT0) {
-      m_ECLTRGHLTmumuTOPT0 = *currentT0;
-    }
   } else {
     B2DEBUG(29, Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -403,14 +394,10 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_ECLTRG");
   tag = "bhabhaECLTRG_SVDT0";
   m_cSVDTimeBhaBhaECLTRG->cd();
-  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
-  if (processingSuccessful) {
+  if (std::get<0>(processHistogram(h, tag))) {
     m_cSVDTimeBhaBhaECLTRG->SetFillColor(0);
     m_cSVDTimeBhaBhaECLTRG->Modified();
     m_cSVDTimeBhaBhaECLTRG->Update();
-    if (*currentT0) {
-      m_ECLTRGHLTbhabhaSVDT0 = *currentT0;
-    }
   } else {
     B2DEBUG(29, Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -422,14 +409,10 @@ void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distribution
   h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_ECLTRG");
   tag = "mumuECLTRG_SVDT0";
   m_cSVDTimeMuMuECLTRG->cd();
-  std::tie(processingSuccessful, currentT0) = processHistogram(h, tag, retrieveMeanT0);
-  if (processingSuccessful) {
+  if (std::get<0>(processHistogram(h, tag))) {
     m_cSVDTimeMuMuECLTRG->SetFillColor(0);
     m_cSVDTimeMuMuECLTRG->Modified();
     m_cSVDTimeMuMuECLTRG->Update();
-    if (*currentT0) {
-      m_ECLTRGHLTmumuSVDT0 = *currentT0;
-    }
   } else {
     B2DEBUG(29, Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
     if (h) h->Draw();
@@ -1016,47 +999,21 @@ void DQMHistAnalysisEventT0TriggerJitterModule::deleteCanvases()
   if (m_cCDCTimeMuMuTOPTRG) delete m_cCDCTimeMuMuTOPTRG;
 }
 
+
 void DQMHistAnalysisEventT0TriggerJitterModule::setDeltaT0Values()
 {
-  // Set the deltaT0 values to be accissble in MiraBelle, with SVD EventT0 being the reference
+  // Set the deltaT0 values to be accissble on the DQM web page for the shifters, with SVD EventT0 being the reference
   // As we are only interested in trends, just the raw difference is used, no (error) weighted values
   // However, not all values might exist, so make the algorithm fault tolerant
   if (m_ECLTRGHLThadronSVDT0 > -998) {
-    if (m_ECLTRGHLThadronECLT0 > -998) {
-      m_monObj->setVariable("hadron_Delta_ECLT0_SVDT0", m_ECLTRGHLThadronECLT0 - m_ECLTRGHLThadronSVDT0);
-    }
     if (m_ECLTRGHLThadronCDCT0 > -998) {
-      m_monObj->setVariable("hadron_Delta_CDCT0_SVDT0", m_ECLTRGHLThadronCDCT0 - m_ECLTRGHLThadronSVDT0);
+      setEpicsPV("ECLTRG_Hadron_Delta_CDCEventT0_SVDEventT0", m_ECLTRGHLThadronCDCT0 - m_ECLTRGHLThadronSVDT0);
+    }
+    if (m_ECLTRGHLThadronECLT0 > -998) {
+      setEpicsPV("ECLTRG_Hadron_Delta_ECLEventT0_SVDEventT0", m_ECLTRGHLThadronECLT0 - m_ECLTRGHLThadronSVDT0);
     }
     if (m_ECLTRGHLThadronTOPT0 > -998) {
-      m_monObj->setVariable("hadron_Delta_TOPT0_SVDT0", m_ECLTRGHLThadronTOPT0 - m_ECLTRGHLThadronSVDT0);
+      setEpicsPV("ECLTRG_Hadron_Delta_TOPEventT0_SVDEventT0", m_ECLTRGHLThadronTOPT0 - m_ECLTRGHLThadronSVDT0);
     }
   }
-
-
-  if (m_ECLTRGHLTbhabhaSVDT0 > -998) {
-    if (m_ECLTRGHLTbhabhaECLT0 > -998) {
-      m_monObj->setVariable("bhabha_Delta_ECLT0_SVDT0", m_ECLTRGHLTbhabhaECLT0 - m_ECLTRGHLTbhabhaSVDT0);
-    }
-    if (m_ECLTRGHLTbhabhaCDCT0 > -998) {
-      m_monObj->setVariable("bhabha_Delta_CDCT0_SVDT0", m_ECLTRGHLTbhabhaCDCT0 - m_ECLTRGHLTbhabhaSVDT0);
-    }
-    if (m_ECLTRGHLTbhabhaTOPT0 > -998) {
-      m_monObj->setVariable("bhabha_Delta_TOPT0_SVDT0", m_ECLTRGHLTbhabhaTOPT0 - m_ECLTRGHLTbhabhaSVDT0);
-    }
-  }
-
-
-  if (m_ECLTRGHLTmumuSVDT0 > -998) {
-    if (m_ECLTRGHLTmumuECLT0 > -998) {
-      m_monObj->setVariable("mumu_Delta_ECLT0_SVDT0", m_ECLTRGHLTmumuECLT0 - m_ECLTRGHLTmumuSVDT0);
-    }
-    if (m_ECLTRGHLTmumuCDCT0 > -998) {
-      m_monObj->setVariable("mumu_Delta_CDCT0_SVDT0", m_ECLTRGHLTmumuCDCT0 - m_ECLTRGHLTmumuSVDT0);
-    }
-    if (m_ECLTRGHLTmumuTOPT0 > -998) {
-      m_monObj->setVariable("mumu_Delta_TOPT0_SVDT0", m_ECLTRGHLTmumuTOPT0 - m_ECLTRGHLTmumuSVDT0);
-    }
-  }
-
 }

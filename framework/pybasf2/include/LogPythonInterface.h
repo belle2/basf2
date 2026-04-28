@@ -31,7 +31,7 @@ namespace Belle2 {
    * >>> print "Logging level set to", logging.log_level
    *
    * This module also allows to send log messages directly from python to ease
-   * consistent error reporting througout the framework
+   * consistent error reporting throughout the framework
    *
    * >>> B2WARNING("This is a warning message");
    *
@@ -122,6 +122,14 @@ namespace Belle2 {
      * @return The log configuration object
      */
     LogConfig& getPackageLogConfig(const std::string& package);
+
+    /**
+     * Get the LogConfig for the given module
+     *
+     * @param module The module name
+     * @return The log configuration object
+     */
+    LogConfig& getModuleLogConfig(const std::string& module);
 
     /**
      * Get maximum number of repetitions before silencing "identical" log messages

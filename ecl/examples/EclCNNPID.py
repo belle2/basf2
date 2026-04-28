@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
     mainPath.add_module(
         'EventInfoSetter',
-        expList=1003,  # Exp 1003 is early phase 3
+        expList=1003,  # Exp 1003 is Run 1 (early phase 3)
         runList=0,
         evtNumList=10)
 
@@ -133,5 +133,5 @@ if __name__ == '__main__':
     )
 
     mainPath.add_module('Progress')
-    b2.process(mainPath)
+    b2.process(mainPath, calculateStatistics=True)
     print(b2.statistics)

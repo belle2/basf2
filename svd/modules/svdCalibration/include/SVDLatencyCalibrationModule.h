@@ -21,7 +21,7 @@
 
 namespace Belle2 {
   /**
-   * this module perfoms an analysis to find the APV25 latency
+   * this module performs an analysis to find the APV25 latency
    *
    */
   class SVDLatencyCalibrationModule : public Module {

@@ -20,9 +20,6 @@
 #include <arich/dbobjects/ARICHPositionElement.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 
 // Geant4
 #include <G4LogicalVolume.hh>
@@ -45,7 +42,6 @@
 #include <G4Material.hh>
 
 using namespace std;
-using namespace boost;
 using namespace CLHEP;
 
 namespace Belle2 {
@@ -563,6 +559,7 @@ namespace Belle2 {
         wallName.str("");
         wallName << "supportWallPhi_" << iRing + 1;
         G4Box* wall = new G4Box(wallName.str(), (wallR[iRing] - wallR[iRing - 1] - wallThick) / 2. - 1., thick / 2., wallHeight / 2.);
+        [[clang::suppress]]
         G4LogicalVolume* wallLV = new G4LogicalVolume(wall, supportMaterial, string("ARICH.") + wallName.str());
         double r = (wallR[iRing - 1] + wallThick + wallR[iRing]) / 2.;
         double zLayer = 0;
@@ -580,6 +577,7 @@ namespace Belle2 {
                                          (tileGap + wallThick / 2.) / wallR[iRing], dphi - (2.*tileGap + wallThick) / wallR[iRing]);
 
           G4Material* aeroMaterial = Materials::get(aeroGeo.getLayerMaterial(iLayer));
+          [[clang::suppress]]
           G4LogicalVolume* tileLV = new G4LogicalVolume(tileShape, aeroMaterial, string("ARICH.") + tileName.str());
 
           while (iphi < 2 * M_PI - 0.0001) {
@@ -686,6 +684,7 @@ namespace Belle2 {
         wallName.str("");
         wallName << "supportWallPhi_" << iRing + 1;
         G4Box* wall = new G4Box(wallName.str(), (wallR[iRing] - wallR[iRing - 1] - wallThick) / 2. - 1., thick / 2., wallHeight / 2.);
+        [[clang::suppress]]
         G4LogicalVolume* wallLV = new G4LogicalVolume(wall, supportMaterial, string("ARICH.") + wallName.str());
         double r = (wallR[iRing - 1] + wallThick + wallR[iRing]) / 2.;
         ///////////////////////////////////////////////
@@ -766,7 +765,7 @@ namespace Belle2 {
               G4Tubs* compTileShape = new G4Tubs(compTileName.str(),                               //name
                                                  wallR[iRing - 1] + wallThick + tileGap,           //Rmin
                                                  wallR[iRing] - tileGap,                           //Rmax
-                                                 compTileUpThick / 2.0,                            //Thikness
+                                                 compTileUpThick / 2.0,                            //Thickness
                                                  (tileGap + wallThick / 2.0) / wallR[iRing],       //phi start
                                                  dphi - (2.0 * tileGap + wallThick) / wallR[iRing]); //delta phi
 
@@ -794,7 +793,7 @@ namespace Belle2 {
             G4Tubs* tileShape = new G4Tubs(tileName.str(),                                   //name
                                            wallR[iRing - 1] + wallThick + tileGap,           //Rmin
                                            wallR[iRing] - tileGap,                           //Rmax
-                                           layerThick / 2.0,                                 //Thikness
+                                           layerThick / 2.0,                                 //Thickness
                                            (tileGap + wallThick / 2.0) / wallR[iRing],       //phi start
                                            dphi - (2.0 * tileGap + wallThick) / wallR[iRing]); //delta phi
 
@@ -887,7 +886,7 @@ namespace Belle2 {
 
       // build HAPD walls
       G4Box* tempBox2 = new G4Box("tempBox2", hapdSizeX / 2. - wallThick, hapdSizeY / 2. - wallThick,
-                                  hapdSizeZ / 2. + 0.1); // Dont't care about "+0.1", needs to be there.
+                                  hapdSizeZ / 2. + 0.1); // Don't care about "+0.1", needs to be there.
       G4SubtractionSolid* moduleWall = new G4SubtractionSolid("Box-tempBox", hapdBox, tempBox2);
       G4LogicalVolume* lmoduleWall = new G4LogicalVolume(moduleWall, wallMaterial, "ARICH.HAPDWall");
       setColor(*lmoduleWall, "rgb(1.0,0.0,0.0,1.0)");
@@ -1093,7 +1092,7 @@ namespace Belle2 {
       const ARICHGeoMerger& mergerGeo = detectorGeo.getMergerGeometry();
 
       if (mergerGeo.getSingleMergerEnvelopeSizeW() < 1e-9) {
-        B2WARNING("GeoARICHCreator: Merger and merger cooling geometry will not be build as it is not availible in geometry configuration (ARICHGeometryConfig with ClasDef>4 is needed).");
+        B2WARNING("GeoARICHCreator: Merger and merger cooling geometry will not be build as it is not available in geometry configuration (ARICHGeometryConfig with ClasDef>4 is needed).");
         return NULL;
       }
 
@@ -1405,6 +1404,7 @@ namespace Belle2 {
                                             coolingGeo.getColdTubeR() * mm,
                                             coolingGeo.getCoolingTestPlateslengths().X() / 2.0 * mm,
                                             0, 360.0 * deg);
+      [[clang::suppress]]
       G4LogicalVolume* coldTube_logical = new G4LogicalVolume(coldTube_solid, Materials::get(coolingGeo.getColdTubeMaterialName()),
                                                               "ARICH.coldTube");
 
@@ -1474,6 +1474,7 @@ namespace Belle2 {
 
       G4Box* hole = new G4Box("hole", detGeo.getModuleHoleSize() / 2., detGeo.getModuleHoleSize() / 2.,
                               detGeo.getSupportThickness() / 2.); // +1 for thickness for subtraction solid
+      [[clang::suppress]]
       G4LogicalVolume* holeLV = new G4LogicalVolume(hole, Materials::get("Air"), "ARICH.detectorSupportHole");
 
       int nRings = detGeo.getNRings();
@@ -1481,6 +1482,7 @@ namespace Belle2 {
       double backWallThick = detGeo.getSupportBackWallThickness();
       double backWallHeight =  detGeo.getSupportBackWallHeight();
 
+      [[clang::suppress]]
       G4LogicalVolume* hapdSupportPlateLV = new G4LogicalVolume(supportPlate, supportMaterial, "hapdSupport");
 
       std::vector<double> wallR;
@@ -1738,7 +1740,7 @@ namespace Belle2 {
       double posX = aerogelParam.getLength("tileXPos") / Unit::mm;
       double posY = aerogelParam.getLength("tileYPos") / Unit::mm;
       int ilayer = 0;
-      BOOST_FOREACH(const GearDir & layer, aerogelParam.getNodes("Layers/Layer")) {
+      for (const GearDir& layer : aerogelParam.getNodes("Layers/Layer")) {
         double posZ = layer.getLength("zPosition");
         double sizeZ = layer.getLength("thickness");
         string tileMat = layer.getString("material");
@@ -1777,7 +1779,7 @@ namespace Belle2 {
       G4OpticalSurface* optSurf = materials.createOpticalSurface(surface);
       new G4LogicalSkinSurface("mirrorsSurface", lmirror, optSurf);
       int iMirror = 0;
-      BOOST_FOREACH(const GearDir & mirror, mirrorsParam.getNodes("Mirror")) {
+      for (const GearDir& mirror : mirrorsParam.getNodes("Mirror")) {
         double xpos = mirror.getLength("xPos") / Unit::mm;
         double ypos = mirror.getLength("yPos") / Unit::mm;
         double zpos = mirror.getLength("zPos") / Unit::mm;

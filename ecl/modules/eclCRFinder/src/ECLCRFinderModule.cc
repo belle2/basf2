@@ -22,6 +22,7 @@
 /* C++ headers. */
 #include <algorithm>
 #include <iostream>
+#include <array>
 
 // NAMESPACE(S)
 using namespace Belle2;
@@ -45,16 +46,16 @@ ECLCRFinderModule::ECLCRFinderModule() : Module(), m_eclCalDigits(eclCalDigitArr
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add module parameters.
-  addParam("energyCut0", m_energyCut[0], "Seed energy cut.", 10.0 * Belle2::Unit::MeV);
-  addParam("energyCut1", m_energyCut[1], "Growth energy cut.", 10.0 * Belle2::Unit::MeV);
+  addParam("energyCut0", m_energyCut[0], "Seed energy cut.", 20.0 * Belle2::Unit::MeV);
+  addParam("energyCut1", m_energyCut[1], "Growth energy cut.", 20.0 * Belle2::Unit::MeV);
   addParam("energyCut2", m_energyCut[2], "Digit energy cut.", 0.5 * Belle2::Unit::MeV);
-  addParam("timeCut0", m_timeCut[0], "Seed time cut (negative values for residual cut).", 99999.);
-  addParam("timeCut1", m_timeCut[1], "Growth time cut (negative values for residual cut).", 99999.);
+  addParam("timeCut0", m_timeCut[0], "Seed time cut (negative values for residual cut).", 400.);
+  addParam("timeCut1", m_timeCut[1], "Growth time cut (negative values for residual cut).", 400.);
   addParam("timeCut2", m_timeCut[2], "Digit time cut (negative values for residual cut).", 99999.);
   addParam("timeCut0maxEnergy", m_timeCut_maxEnergy[0], "Time cut is only applied below this energy for seed crystals.",
-           0.0 * Belle2::Unit::MeV);
+           99999.0 * Belle2::Unit::MeV);
   addParam("timeCut1maxEnergy", m_timeCut_maxEnergy[1], "Time cut is only applied below this energy for growth crystals.",
-           0.0 * Belle2::Unit::MeV);
+           99999.0 * Belle2::Unit::MeV);
   addParam("timeCut2maxEnergy", m_timeCut_maxEnergy[2], "Time cut is only applied below this energy for digits.",
            0.0 * Belle2::Unit::MeV);
   addParam("mapType0", m_mapType[0], "Map type for seed crystals.", std::string("N"));
@@ -64,6 +65,7 @@ ECLCRFinderModule::ECLCRFinderModule() : Module(), m_eclCalDigits(eclCalDigitArr
   addParam("mapPar1", m_mapPar[1],
            "Map parameter for growth crystals (radius (type=R), integer (for type=N) or fraction (for type=MC)).", 1.0);
   addParam("skipFailedTimeFitDigits", m_skipFailedTimeFitDigits, "Digits with failed fits are skipped when checking timing cuts.", 0);
+  addParam("useParametersFromDatabase", m_useParametersFromDatabase, "get energy and time cuts from payload", true);
 
 }
 
@@ -84,19 +86,6 @@ void ECLCRFinderModule::initialize()
   // Register relations.
   m_eclConnectedRegions.registerRelationTo(m_eclCalDigits);
 
-  // Check user inputs: [2]: digit, [1]: growth, [0]: seed
-  // overall energy thresholds
-  if (std::isless(m_energyCut[0], m_energyCut[1])) B2FATAL("ECLCRFinderModule::initialize(): m_energyCut[0]=" << m_energyCut[0] <<
-                                                             " must be larger or equal than m_energyCut[1]=" << m_energyCut[1]);
-  if (std::isless(m_energyCut[1], m_energyCut[2])) B2FATAL("ECLCRFinderModule::initialize(): m_energyCut[1]=" << m_energyCut[1] <<
-                                                             " must be larger or equal than m_energyCut[2]=" << m_energyCut[2]);
-
-  // timing threshold (can depend on energy, but we make the check here even stronger by checking that the timing is looser without checking the timing energy range)
-  if (std::isgreater(m_timeCut[0], m_timeCut[1]))
-    B2FATAL("ECLCRFinderModule::initialize(): m_timeCut[0] must be less or equal than m_timeCut[1].");
-  if (std::isgreater(m_timeCut[1], m_timeCut[2]))
-    B2FATAL("ECLCRFinderModule::initialize(): m_timeCut[1] must be less or equal than m_timeCut[2].");
-
   // Initialize neighbour maps.
   m_neighbourMaps.resize(2);
   m_neighbourMaps[0] = new ECL::ECLNeighbours(m_mapType[0], m_mapPar[0]);
@@ -110,12 +99,47 @@ void ECLCRFinderModule::initialize()
   m_cellIdToTempCRIdVec.resize(8737); /**< cellid -> CR. */
   m_calDigitStoreArrPosition.resize(8737);
 
+  m_adj.resize(8737);
+  m_visited.resize(8737);
 }
 
+//-----------------------------------------------------------------
+//..By default, get the energy and time thresholds from the
+//  eclClusteringParameters dbOject
 void ECLCRFinderModule::beginRun()
 {
+  if (m_useParametersFromDatabase and m_eclClusteringParameters.hasChanged()) {
+    std::array<double, 3> CRF_energyCut = m_eclClusteringParameters->getCRFEnergyCut();
+    m_energyCut[0] = CRF_energyCut[0];
+    m_energyCut[1] = CRF_energyCut[1];
+    m_energyCut[2] = CRF_energyCut[2];
 
+    std::array<double, 3> CRF_timeCut = m_eclClusteringParameters->getCRFTimeCut();
+    m_timeCut[0] = CRF_timeCut[0];
+    m_timeCut[1] = CRF_timeCut[1];
+    m_timeCut[2] = CRF_timeCut[2];
+
+    std::array<double, 3> CRF_timeCutMaxEnergy = m_eclClusteringParameters->getCRFTimeCutMaxEnergy();
+    m_timeCut_maxEnergy[0] = CRF_timeCutMaxEnergy[0];
+    m_timeCut_maxEnergy[1] = CRF_timeCutMaxEnergy[1];
+    m_timeCut_maxEnergy[2] = CRF_timeCutMaxEnergy[2];
+  }
+
+  // Check user inputs: [2]: digit, [1]: growth, [0]: seed
+  // overall energy thresholds
+  if (std::isless(m_energyCut[0], m_energyCut[1])) B2FATAL("ECLCRFinderModule::beginRun(): m_energyCut[0]=" << m_energyCut[0] <<
+                                                             " must be larger or equal than m_energyCut[1]=" << m_energyCut[1]);
+  if (std::isless(m_energyCut[1], m_energyCut[2])) B2FATAL("ECLCRFinderModule::beginRun(): m_energyCut[1]=" << m_energyCut[1] <<
+                                                             " must be larger or equal than m_energyCut[2]=" << m_energyCut[2]);
+  // timing threshold (can depend on energy, but we make the check here even stronger by checking that the timing is looser without checking the timing energy range)
+  if (std::isgreater(m_timeCut[0], m_timeCut[1]))
+    B2FATAL("ECLCRFinderModule::beginRun(): m_timeCut[0] must be less or equal than m_timeCut[1].");
+  if (std::isgreater(m_timeCut[1], m_timeCut[2]))
+    B2FATAL("ECLCRFinderModule::beginRun(): m_timeCut[1] must be less or equal than m_timeCut[2].");
 }
+
+
+//-----------------------------------------------------------------
 
 void ECLCRFinderModule::event()
 {
@@ -205,7 +229,7 @@ void ECLCRFinderModule::event()
   std::vector<std::vector<int>> connectedRegions_ABBC = getConnectedRegions(ABB, m_cellIdToDigitVec, 0);
 
   //final step: merge all CRs that share at least one crystal
-  std::vector<std::set<int>> connectedRegionsMerged_ABBC_sets = mergeVectorsUsingSets(connectedRegions_ABBC);
+  std::vector<std::set<int>> connectedRegionsMerged_ABBC_sets = mergeVectorsUsingBFSTraversal(connectedRegions_ABBC);
 
   // Create CRs and add relations to digits.
   unsigned int connectedRegionID = 0;
@@ -242,14 +266,6 @@ void ECLCRFinderModule::terminate()
 
 }
 
-bool ECLCRFinderModule::areNeighbours(const int cellid1, const int cellid2, const int maptype)
-{
-  for (const auto& neighbour : m_neighbourMaps[maptype]->getNeighbours(cellid1)) {
-    if (neighbour == cellid2) return true;
-  }
-  return false;
-}
-
 std::vector<int> ECLCRFinderModule::flattenVector(std::vector<std::vector<int>>& A)
 {
   std::vector<int> C;
@@ -272,27 +288,66 @@ std::vector<int> ECLCRFinderModule::oneHotVector(std::vector<int>& A, const int 
   return C;
 }
 
-std::vector<std::set<int>> ECLCRFinderModule::mergeVectorsUsingSets(std::vector<std::vector<int>>& A)
+std::vector<std::set<int>> ECLCRFinderModule::mergeVectorsUsingBFSTraversal(std::vector<std::vector<int>>& A)
 {
+  std::vector<std::set<int>> output;
 
-  // Make empty list of sets "output"
-  std::vector< std::set<int> > output;
+  // 1. Data Structures for lookup
+  // We use a fixed-size adjacency list for all crystals (Max ID 8736)
+  std::vector<int> relevantNodes;
+  relevantNodes.reserve(A.size() * 4);
 
-  for (auto& vec : A) {
-    std::set<int> s(vec.begin(), vec.end());
+  for (int node = 0; node < 8737; ++node) {
+    m_adj[node].clear();
+    m_visited[node] = false;
+  }
 
-    //Check whether element intersects with any in output
-    for (auto it = output.begin(); it != output.end();) {
-      std::set<int> intersect;
-      std::set_intersection(it->begin(), it->end(), s.begin(), s.end(),
-                            std::inserter(intersect, intersect.begin()));
+  // 2. Build the Graph
+  // If a vector contains {1, 2, 3}, we mark them as connected neighbors.
+  for (const auto& group : A) {
+    if (group.empty()) continue;
 
-      if (!intersect.empty()) {
-        s.insert(it->begin(), it->end());
-        it = output.erase(it);
-      } else ++it;
+    int root = group[0];
+    relevantNodes.push_back(root);
+
+    for (size_t i = 1; i < group.size(); ++i) {
+      int neighbor = group[i];
+      relevantNodes.push_back(neighbor);
+
+      // Add bi-directional edges
+      m_adj[root].push_back(neighbor);
+      m_adj[neighbor].push_back(root);
     }
-    output.push_back(s);
+  }
+
+  // 3. Find Connected Components (BFS)
+  // We only iterate over nodes that actually appeared in the event.
+  for (int startNode : relevantNodes) {
+    if (m_visited[startNode]) continue;
+
+    // Start a new cluster
+    std::set<int> component;
+    std::vector<int> q; // BFS Queue
+
+    m_visited[startNode] = true;
+    q.push_back(startNode);
+    component.insert(startNode);
+
+    int head = 0;
+    while (head < static_cast<int>(q.size())) {
+      int u = q[head++];
+
+      for (int v : m_adj[u]) {
+        if (!m_visited[v]) {
+          m_visited[v] = true;
+          component.insert(v);
+          q.push_back(v);
+        }
+      }
+    }
+
+    // Move the finished component to output
+    output.push_back(std::move(component));
   }
 
   return output;
@@ -303,19 +358,27 @@ std::vector<std::vector<int>> ECLCRFinderModule::getConnectedRegions(const std::
 {
   std::vector<std::vector<int>> connectedRegions;
 
+  // We iterate 0..8737 for the seeds (A), as A is a sparse vector mapped to cellID
   for (unsigned int i = 0; i < A.size(); ++i) {
     if (A[i] > 0) {
       std::vector<int> region;
+      // Reserve with neighbor count to prevent reallocations
+      region.reserve(21);
       region.push_back(i);
 
-      for (unsigned int j = 0; j < B.size(); ++j) {
-        if (B[j] > 0 && areNeighbours(i, j, maptype)) {
-          region.push_back(j);
+      // Instead of looping j = 0 to 8737, we only loop over actual geometric neighbors.
+      const auto& neighbors = m_neighbourMaps[maptype]->getNeighbours(i);
+
+      for (int neighborID : neighbors) {
+        // We only care if this specific neighbor is active in vector B
+        if (neighborID < static_cast<int>(B.size()) && B[neighborID] > 0) {
+          region.push_back(neighborID);
         }
       }
 
       std::sort(region.begin(), region.end());
-      region.erase(unique(region.begin(), region.end()), region.end());
+      region.erase(std::unique(region.begin(), region.end()), region.end());
+
       connectedRegions.push_back(region);
     }
   }

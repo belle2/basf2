@@ -30,25 +30,25 @@ namespace Belle2 {
     /** Noise Matrix */
     void readNoiseLMatrix(std::vector<std::vector<double>>&, std::vector<std::vector<double>>&);
     /** TC flight time latency  */
-    double GetTCFLatency(int);
+    double getTCFLatency(int);
     /** TC CM Phi  */
-    double GetCMPhi(int);
+    double getCMPhi(int);
     /** TC CM Phi  */
-    double GetCMTheta(int);
+    double getCMTheta(int);
     /** TC CM Phi  */
-    double GetCMEnergy(int);
+    double getCMEnergy(int);
     /** TC CM Phi  */
-    int Get3DBhabhaLUT(int);
-    //! Make Fitter Coefficients from Signal PDF and Noise covariance metrix
+    int get3DBhabhaLUT(int);
+    //! Make Fitter Coefficients from Signal PDF and Noise covariance matrix
     void MakeFitterCoefficient(const std::vector<int>&, std::vector<int>);
-    //! Util to interpalate Signal Shape
+    //! Util to interpolate Signal Shape
     double interFADC(double, std::vector<int>);
 
   private:
     /** Amplitude Coefficient */
-    std::vector<std::vector<int>> _AmpCoefficient;
+    std::vector<std::vector<int>> m_AmpCoefficient;
     /** Timing Coefficient */
-    std::vector<std::vector<int>> _TimingCoefficient;
+    std::vector<std::vector<int>> m_TimingCoefficient;
 
 
 

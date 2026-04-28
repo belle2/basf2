@@ -12,15 +12,21 @@
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.dcl.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCFacet;
     class CDCRLWireHitTriple;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter for the construction of good facets based on Monte Carlo information
     class MCFacetFilter : public MCSymmetric<BaseFacetFilter> {
     private:
       /// Type of the super class
       using Super = MCSymmetric<BaseFacetFilter>;
+
+    public:
+      /// Making expicit the Filter operator() to avoid [-Woverloaded-virtual=]
+      using Super::operator();
 
     public:
       /**
@@ -34,11 +40,11 @@ namespace Belle2 {
        *  Main filter method returning the weight of the facet.
        *  Returns NAN, if the cell shall be rejected.
        */
-      Weight operator()(const CDCFacet& facet) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCFacet& facet) final;
 
     private:
       /// Indicated if the oriented triple is a correct hypotheses
-      bool operator()(const CDCRLWireHitTriple& rlWireHitTriple, int maxInTrackHitIdDifference);
+      bool operator()(const TrackingUtilities::CDCRLWireHitTriple& rlWireHitTriple, int maxInTrackHitIdDifference);
     };
   }
 }

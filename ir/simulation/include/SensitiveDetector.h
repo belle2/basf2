@@ -15,7 +15,7 @@ namespace Belle2 {
     /**
      * The IR Sensitive Detector class.
      *
-     * This class stores Geant4 steps (pieces of tracks) in the IR acitve sensors
+     * This class stores Geant4 steps (pieces of tracks) in the IR active sensors
      * to IRSimHits. The steps are not aggregated and are intended to be directly
      * digitized. The IRSimHits are saved in a DataStore collection together with their
      * relations to MCParticles (actually, the relations are indexed by trackIDs rather than

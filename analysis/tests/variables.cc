@@ -13,19 +13,16 @@
 #include <analysis/variables/TrackVariables.h>
 
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/dataobjects/EventExtraInfo.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/TestHelpers.h>
-#include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/Const.h>
 
@@ -35,7 +32,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/V0.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
 
 #include <gtest/gtest.h>
 
@@ -44,7 +40,6 @@
 #include <Math/Cartesian2D.h>
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
-#include <TMath.h>
 #include <utility>
 
 using namespace std;
@@ -424,10 +419,9 @@ namespace {
 
   class MCTruthVariablesTest : public ::testing::Test {
   protected:
-    virtual void SetUp()
+    void SetUp() override
     {
       // datastore things
-      DataStore::Instance().reset();
       DataStore::Instance().setInitializeActive(true);
 
       // needed to mock up
@@ -524,7 +518,7 @@ namespace {
       misid_photon->addRelationTo(true_electron); // assume MC matching caught this
     }
 
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -649,7 +643,7 @@ namespace {
 
   class EventVariableTest : public ::testing::Test {
   protected:
-    /** register Particle array + ParticleExtraInfoMap object. */
+    /** register Particle array. */
     void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
@@ -808,12 +802,10 @@ namespace {
 
   class MetaVariableTest : public ::testing::Test {
   protected:
-    /** register Particle array + ParticleExtraInfoMap object. */
+    /** register Particle array. */
     void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
-      StoreObjPtr<EventExtraInfo>().registerInDataStore();
       StoreArray<Particle>().registerInDataStore();
       StoreArray<MCParticle>().registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
@@ -954,7 +946,6 @@ namespace {
   {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
     PCmsLabTransform T;
     PxPyPzEVector vec0 = {0.0, 0.0, 0.0, T.getCMSEnergy()};
@@ -993,8 +984,6 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<Particle> particles;
     StoreArray<MCParticle> mcparticles;
-    particles.registerInDataStore();
-    mcparticles.registerInDataStore();
     particles.registerRelationTo(mcparticles);
     MCParticleGraph mcGraph;
     // MC mother of the MC particle
@@ -1033,6 +1022,9 @@ namespace {
 
   TEST_F(MetaVariableTest, extraInfo)
   {
+    DataStore::Instance().setInitializeActive(true);
+    StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
     Particle p({ 0.1, -0.4, 0.8, 1.0 }, 11);
     p.addExtraInfo("pi", 3.14);
 
@@ -1046,7 +1038,10 @@ namespace {
 
   TEST_F(MetaVariableTest, eventExtraInfo)
   {
+    DataStore::Instance().setInitializeActive(true);
     StoreObjPtr<EventExtraInfo> eventExtraInfo;
+    eventExtraInfo.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
     if (not eventExtraInfo.isValid())
       eventExtraInfo.create();
     eventExtraInfo->addExtraInfo("pi", 3.14);
@@ -1057,10 +1052,13 @@ namespace {
 
   TEST_F(MetaVariableTest, eventCached)
   {
+    DataStore::Instance().setInitializeActive(true);
+    StoreObjPtr<EventExtraInfo> eventExtraInfo;
+    eventExtraInfo.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
     const Manager::Var* var = Manager::Instance().getVariable("eventCached(constant(3.14))");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(nullptr)), 3.14);
-    StoreObjPtr<EventExtraInfo> eventExtraInfo;
     EXPECT_TRUE(eventExtraInfo.isValid());
     EXPECT_TRUE(eventExtraInfo->hasExtraInfo("__constant__bo3__pt14__bc"));
     EXPECT_FLOAT_EQ(eventExtraInfo->getExtraInfo("__constant__bo3__pt14__bc"), 3.14);
@@ -1072,6 +1070,9 @@ namespace {
 
   TEST_F(MetaVariableTest, particleCached)
   {
+    DataStore::Instance().setInitializeActive(true);
+    StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
     Particle p({ 0.1, -0.4, 0.8, 2.0 }, 11);
     const Manager::Var* var = Manager::Instance().getVariable("particleCached(px)");
     ASSERT_NE(var, nullptr);
@@ -1099,6 +1100,15 @@ namespace {
     var = Manager::Instance().getVariable("max(E, pz)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 2.0);
+
+    // Test if min and max have correct behavior with bool variables
+    var = Manager::Instance().getVariable("min(passesCut(E > 1), passesCut(pz > 1))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.0);
+
+    var = Manager::Instance().getVariable("max(passesCut(E > 1), passesCut(pz > 1))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.0);
 
     var = Manager::Instance().getVariable("log10(px)");
     ASSERT_NE(var, nullptr);
@@ -1228,9 +1238,8 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
+    StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     // Create MC graph for B -> (muon -> electron + muon_neutrino) + anti_muon_neutrino
@@ -1448,8 +1457,6 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
     DataStore::Instance().setInitializeActive(false);
 
@@ -1514,6 +1521,10 @@ namespace {
     var = Manager::Instance().getVariable("mcDaughter(1, PDG)");
     EXPECT_FLOAT_EQ(std::get<double>(var->function(pGrandMother)), -14);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(pMother)), 14);
+    // Test last daughter
+    var = Manager::Instance().getVariable("mcDaughter(nMCDaughters-1, PDG)");
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(pGrandMother)), -14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(pMother)), 14);
     // Test for particle where mc daughter index is out of range of mc daughters
     var = Manager::Instance().getVariable("mcDaughter(2, PDG)");
     EXPECT_TRUE(std::isnan(std::get<double>(var->function(pGrandMother))));
@@ -1535,8 +1546,6 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
     DataStore::Instance().setInitializeActive(false);
 
@@ -1614,9 +1623,9 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
+    StoreArray<Particle>("tempParticles").registerInDataStore();
+    StoreArray<Particle>("tempParticles").registerRelationTo(mcParticles);
     DataStore::Instance().setInitializeActive(false);
 
     // Create MC graph for Upsilon(4S) -> (B^- -> electron + anti_electron_neutrino) + B^+
@@ -1709,9 +1718,9 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
+    StoreArray<Particle>("tempParticles").registerInDataStore();
+    StoreArray<Particle>("tempParticles").registerRelationTo(mcParticles);
     DataStore::Instance().setInitializeActive(false);
 
     // Create MC graph for Upsilon(4S) -> (B^- -> electron + anti_electron_neutrino) + B^+
@@ -2311,7 +2320,7 @@ namespace {
 
   TEST_F(MetaVariableTest, sin)
   {
-    Particle p({ 3.14159265359 / 2.0, -0.4, 0.8, 1.0}, 11);
+    Particle p({ M_PI / 2.0, -0.4, 0.8, 1.0}, 11);
     Particle p2({ 0.0, -0.4, 0.8, 1.0 }, -11);
 
     const Manager::Var* var = Manager::Instance().getVariable("sin(px)");
@@ -2323,7 +2332,7 @@ namespace {
 
   TEST_F(MetaVariableTest, cos)
   {
-    Particle p({ 3.14159265359 / 2.0, -0.4, 0.8, 1.0}, 11);
+    Particle p({ M_PI / 2.0, -0.4, 0.8, 1.0}, 11);
     Particle p2({ 0.0, -0.4, 0.8, 1.0 }, -11);
 
     const Manager::Var* var = Manager::Instance().getVariable("cos(px)");
@@ -2346,6 +2355,8 @@ namespace {
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
     particles.registerRelationTo(mcParticles);
+    StoreArray<Particle>("tempParticles").registerInDataStore();
+    StoreArray<Particle>("tempParticles").registerRelationTo(mcParticles);
     DataStore::Instance().setInitializeActive(false);
 
     auto* mcParticle = mcParticles.appendNew();
@@ -2487,7 +2498,6 @@ namespace {
   TEST_F(MetaVariableTest, sourceObjectIsInList)
   {
     // datastore things
-    DataStore::Instance().reset();
     DataStore::Instance().setInitializeActive(true);
 
     // needed to mock up
@@ -2496,7 +2506,6 @@ namespace {
     StoreObjPtr<ParticleList> gammalist("testGammaList");
 
     clusters.registerInDataStore();
-    particles.registerInDataStore();
     DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
     gammalist.registerInDataStore(flags);
 
@@ -2552,7 +2561,6 @@ namespace {
   TEST_F(MetaVariableTest, mcParticleIsInMCList)
   {
     // datastore things
-    DataStore::Instance().reset();
     DataStore::Instance().setInitializeActive(true);
 
     // needed to mock up
@@ -2561,8 +2569,6 @@ namespace {
     StoreObjPtr<ParticleList> list("testList");
     StoreObjPtr<ParticleList> anotherlist("supplimentaryList");
 
-    mcparticles.registerInDataStore();
-    particles.registerInDataStore();
     particles.registerRelationTo(mcparticles);
     DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
     list.registerInDataStore(flags);
@@ -3467,6 +3473,9 @@ namespace {
 
   TEST_F(MetaVariableTest, useAlternativeDaughterHypothesis)
   {
+    DataStore::Instance().setInitializeActive(true);
+    StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
     const int nDaughters = 5;
     StoreArray<Particle> particles;
 
@@ -3715,9 +3724,9 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
+    StoreArray<Particle>("tempParticles").registerInDataStore();
+    StoreArray<Particle>("tempParticles").registerRelationTo(mcParticles);
     StoreObjPtr<ParticleList> DList("D0:vartest");
     DList.registerInDataStore();
     DList.create();
@@ -4100,8 +4109,6 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
     StoreArray<Particle> particles;
-    particles.registerInDataStore();
-    mcParticles.registerInDataStore();
     particles.registerRelationTo(mcParticles);
     StoreObjPtr<ParticleList> BList("B:vartest");
     BList.registerInDataStore();
@@ -4340,22 +4347,93 @@ namespace {
   }
 
 
-
-
-
-  class PIDVariableTest : public ::testing::Test {
+  class ParameterVariableTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
     void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreObjPtr<ParticleExtraInfoMap> peim;
+      StoreArray<Particle>().registerInDataStore();
+      StoreArray<Particle> particles;
+      StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
+      DataStore::Instance().setInitializeActive(false);
+
+      PxPyPzEVector motherMomentum;
+      TMatrixFSym error(7);
+      error.Zero();
+      error(0, 0) = 0.05;
+      error(1, 1) = 0.2;
+      error(2, 2) = 0.4;
+      error(3, 3) = 0.01;
+
+      Particle pip(PxPyPzEVector(0.5, -0.774, 0, sqrt(.25 + 0.774 * 0.774 + Const::pionMass * Const::pionMass)),
+                   Const::pion.getPDGCode());
+      motherMomentum += pip.get4Vector();
+      pip.setMomentumVertexErrorMatrix(error);
+      Particle* newpip = particles.appendNew(pip);
+      Particle pim(PxPyPzEVector(-0.5, 0.774, 0, sqrt(.25 + 0.774 * 0.774 + Const::pionMass * Const::pionMass)),
+                   -Const::pion.getPDGCode());
+      motherMomentum += pim.get4Vector();
+      pim.setMomentumVertexErrorMatrix(error);
+      Particle* newpim = particles.appendNew(pim);
+
+      error(0, 0) = 0.02;
+      error(1, 1) = 0.1;
+      error(4, 4) = 0.04;
+      error(5, 5) = 0.00875;
+      error(6, 6) = 0.01;
+
+      Particle Dz(motherMomentum, 421, Particle::c_Flavored, Particle::c_Composite, 0);
+      Dz.appendDaughter(newpip);
+      Dz.appendDaughter(newpim);
+      Dz.setMomentumVertexErrorMatrix(error);
+      particles.appendNew(Dz);
+    }
+    /** clear datastore */
+    void TearDown() override
+    {
+      DataStore::Instance().reset();
+    }
+  };
+
+  TEST_F(ParameterVariableTest, MassDifference)
+  {
+    StoreArray<Particle> particles{};
+    const Particle* newDz = particles[2];
+
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("massDifference(0)")->function(newDz)), 1.72435668);
+    EXPECT_TRUE(std::isnan(std::get<double>(Manager::Instance().getVariable("massDifference(2)")->function(newDz))));
+  }
+
+  TEST_F(ParameterVariableTest, MassDifferenceError)
+  {
+    StoreArray<Particle> particles{};
+    const Particle* newDz = particles[2];
+
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("massDifferenceError(0)")->function(newDz)), 2.6692181);
+    EXPECT_TRUE(std::isnan(std::get<double>(Manager::Instance().getVariable("massDifferenceError(2)")->function(newDz))));
+  }
+
+  TEST_F(ParameterVariableTest, MassDifferenceSignificance)
+  {
+    StoreArray<Particle> particles{};
+    const Particle* newDz = particles[2];
+
+    EXPECT_NEAR(std::get<double>(Manager::Instance().getVariable("massDifferenceSignificance(0)")->function(newDz)), -0.000338, 5e-7);
+    EXPECT_TRUE(std::isnan(std::get<double>(Manager::Instance().getVariable("massDifferenceSignificance(2)")->function(newDz))));
+  }
+
+  class PIDVariableTest : public ::testing::Test {
+  protected:
+    /** register store arrays. */
+    void SetUp() override
+    {
+      DataStore::Instance().setInitializeActive(true);
       StoreArray<TrackFitResult> tfrs;
       StoreArray<MCParticle> mcparticles;
       StoreArray<PIDLikelihood> likelihood;
       StoreArray<Particle> particles;
       StoreArray<Track> tracks;
-      peim.registerInDataStore();
       tfrs.registerInDataStore();
       mcparticles.registerInDataStore();
       likelihood.registerInDataStore();
@@ -5226,7 +5304,7 @@ namespace {
     EXPECT_TRUE(std::isnan(std::get<double>(var->function(particle_with_no_cs))));
 
     // check that FS1 set as third argument, throws a B2ERROR
-    EXPECT_B2ERROR(Manager::Instance().getVariable("KSFWVariables(et, mask, FS1)"));
+    EXPECT_B2ERROR(Manager::Instance().getVariable("KSFWVariables(pt_sum, mask, FS1)"));
   }
 
   TEST_F(MetaVariableTest, CleoConeCS)
@@ -5264,7 +5342,10 @@ namespace {
     const Particle* particle = myParticles.appendNew();
     const Manager::Var* var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTENT, 0, 1)");
     EXPECT_TRUE(std::isnan(std::get<double>(var->function(particle))));
+    DataStore::Instance().setInitializeActive(true);
     StoreObjPtr<EventExtraInfo> eventExtraInfo;
+    eventExtraInfo.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
     if (not eventExtraInfo.isValid())
       eventExtraInfo.create();
     var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTENT, 0, 1)");

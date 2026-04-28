@@ -238,7 +238,6 @@ void SVDPackerModule::event()
       m_APVHeader.frameErr = 0;
       m_APVHeader.detectErr = 0;
       m_APVHeader.apvErr = 0;
-
       m_APVHeader.pipelineAddr = 0;
       m_APVHeader.APVnum = iAPV;
       m_APVHeader.check = 2;
@@ -279,7 +278,10 @@ void SVDPackerModule::event()
 
     // here goes FADC trailer
     m_FADCTrailer.FTBFlags = 0;
-    m_FADCTrailer.dataSizeCut = 0;
+    m_FADCTrailer.APVdataSizeCut = 0;
+    m_FADCTrailer.FADCdataSizeCut = 0;
+    m_FADCTrailer.DummyAPVHeader = 0;
+    m_FADCTrailer.PiplAddrMismatch = 0;
     m_FADCTrailer.nullDigits = 0;
     m_FADCTrailer.fifoErrOR = 0;
     m_FADCTrailer.frameErrOR = 0;

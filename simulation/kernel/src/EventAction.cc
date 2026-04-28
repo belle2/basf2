@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <string>
 

@@ -24,4 +24,5 @@ start their steering file or script with ::
    module_statistics
    conditions-database
    additional_functions
+   pythonizations
    other_modules

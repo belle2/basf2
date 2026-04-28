@@ -24,7 +24,7 @@ REG_MODULE(PrintBeamParameters);
 PrintBeamParametersModule::PrintBeamParametersModule() : Module()
 {
   // Set module properties
-  setDescription("Print the BeamParameters everytime they change");
+  setDescription("Print the BeamParameters every time they change");
 
   // Parameter definitions
 }

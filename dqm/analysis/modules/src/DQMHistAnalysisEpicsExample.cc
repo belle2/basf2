@@ -39,9 +39,6 @@ DQMHistAnalysisEpicsExampleModule::DQMHistAnalysisEpicsExampleModule()
 
 DQMHistAnalysisEpicsExampleModule::~DQMHistAnalysisEpicsExampleModule()
 {
-#ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
-#endif
 }
 
 void DQMHistAnalysisEpicsExampleModule::initialize()
@@ -84,23 +81,15 @@ void DQMHistAnalysisEpicsExampleModule::initialize()
   // need the function to get parameter names
   if (m_parameters > 0) {
     if (m_parameters > 10) m_parameters = 10; // hard limit
-#ifdef _BELLE2_EPICS
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-#endif
     for (auto i = 0; i < m_parameters; i++) {
       std::string aa;
       aa = m_f1->GetParName(i);
       if (aa == "") aa = string("par") + string(TString::Itoa(i, 10).Data());
-      aa = m_pvPrefix + aa;
-#ifdef _BELLE2_EPICS
-      SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[i]), "ca_create_channel failure");
-      // Read LO and HI limits from EPICS, seems this needs additional channels?
-      // SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
-#endif
+      mypv.push_back(aa);
+      registerEpicsPV(m_pvPrefix + aa, aa);
+      // Read LO and HI limits from EPICS if needed, like
+      // requestLimitsFromEpicsPVs("mean", m_meanLowerAlarm, m_meanLowerWarn, m_meanUpperWarn, m_meanUpperAlarm);
     }
-#ifdef _BELLE2_EPICS
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-#endif
   } else {
     m_parameters = 0;
   }
@@ -223,16 +212,13 @@ void DQMHistAnalysisEpicsExampleModule::event()
     B2DEBUG(20, "Histo " << m_histoname << " not found");
   }
 
-#ifdef _BELLE2_EPICS
   if (m_parameters > 0) {
     for (auto i = 0; i < m_parameters; i++) {
       double data;
       data = m_f1->GetParameter(i);
-      if (mychid[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid[i], (void*)&data), "ca_set failure");
+      setEpicsPV(mypv[i], data);
     }
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
-#endif
 }
 
 void DQMHistAnalysisEpicsExampleModule::endRun()
@@ -243,14 +229,6 @@ void DQMHistAnalysisEpicsExampleModule::endRun()
 
 void DQMHistAnalysisEpicsExampleModule::terminate()
 {
-#ifdef _BELLE2_EPICS
-  if (m_parameters > 0) {
-    for (auto i = 0; i < m_parameters; i++) {
-      if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
-    }
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
   B2DEBUG(20, "DQMHistAnalysisEpicsExample: terminate called");
 }
 

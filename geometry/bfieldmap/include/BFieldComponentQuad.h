@@ -50,12 +50,12 @@ namespace Belle2 {
     struct ParamPoint3 {
       double s{0};   /**< s in [cm] */
       double L{0};   /**< element length in [cm] */
-      double mxx{0}; /**< xx coefficents to calculate Bx */
-      double mxy{0}; /**< xy coefficents to calculate Bx */
-      double mx0{0}; /**< x0 coefficents to calculate Bx */
-      double myx{0}; /**< yx coefficents to calculate By */
-      double myy{0}; /**< yy coefficents to calculate By */
-      double my0{0}; /**< y0 coefficents to calculate By */
+      double mxx{0}; /**< xx coefficients to calculate Bx */
+      double mxy{0}; /**< xy coefficients to calculate Bx */
+      double mx0{0}; /**< x0 coefficients to calculate Bx */
+      double myx{0}; /**< yx coefficients to calculate By */
+      double myy{0}; /**< yy coefficients to calculate By */
+      double my0{0}; /**< y0 coefficients to calculate By */
       /**
        * Calculates the X component of the magnetic field vector at
        * the specified space point from a quadrupole lense.
@@ -93,7 +93,7 @@ namespace Belle2 {
       }
     };
 
-    /** start and stop indicies to narrow search in array */
+    /** start and stop indices to narrow search in array */
     struct irange_t {
       short int i0{0}; /**< start index */
       short int i1{0}; /**< stop index */

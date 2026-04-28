@@ -9,9 +9,9 @@
 #include <tracking/trackFindingCDC/hough/trees/WeightedFastHoughTree.h>
 #include <tracking/trackFindingCDC/hough/baseelements/SectoredLinearDivision.h>
 
-#include <tracking/trackFindingCDC/numerics/LookupTable.h>
+#include <tracking/trackingUtilities/numerics/LookupTable.h>
 
-#include <tracking/trackFindingCDC/utilities/TupleGenerate.h>
+#include <tracking/trackingUtilities/utilities/TupleGenerate.h>
 
 #include <type_traits>
 #include <utility>
@@ -73,7 +73,7 @@ namespace Belle2 {
       using Array = typename Type<I>::Array;
 
       /// Tuple type of the discrete value arrays
-      using Arrays = TupleGenerateN<Array, sizeof...(divisions)>;
+      using Arrays = TrackingUtilities::TupleGenerateN<Array, sizeof...(divisions)>;
 
     public:
       /// Getter the number of divisions at each level for coordinate index I.
@@ -115,7 +115,7 @@ namespace Belle2 {
                  nBinOverlap < nBinWidth);
 
         const auto nPositions = (nBinWidth - nBinOverlap) * nBins + nBinOverlap + 1;
-        std::get<I>(m_arrays) = linspace<float>(lowerBound, upperBound, nPositions);
+        std::get<I>(m_arrays) = TrackingUtilities::linspace<float>(lowerBound, upperBound, nPositions);
         std::get<I>(m_overlaps) = nBinOverlap;
       }
 
@@ -238,23 +238,23 @@ namespace Belle2 {
       }
 
     private:
+      /// Array of the number of divisions at each level
+      const std::array<size_t, sizeof ...(divisions)> m_divisions = {{divisions ...}};
+
+      /// Dynamic hough tree structure traversed in the leaf search.
+      std::unique_ptr<HoughTree> m_houghTree = nullptr;
+
       /// Number of the maximum tree level.
       int m_maxLevel;
 
       /// Number of levels to skip in first level to form a finer sectored hough space.
       int m_sectorLevelSkip;
 
-      /// Array of the number of divisions at each level
-      const std::array<size_t, sizeof ...(divisions)> m_divisions = {{divisions ...}};
-
       /// An tuple of division overlaps in each coordinate.
       typename HoughBox::Delta m_overlaps;
 
       /// A tuple of value arrays providing the memory for the discrete bin bounds.
       Arrays m_arrays;
-
-      /// Dynamic hough tree structure traversed in the leaf search.
-      std::unique_ptr<HoughTree> m_houghTree = nullptr;
     };
   }
 }

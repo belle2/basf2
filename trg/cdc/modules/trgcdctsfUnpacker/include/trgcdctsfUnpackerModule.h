@@ -213,7 +213,7 @@ namespace Belle2 {
       e_firmid, e_firmver, e_evt, e_clk
     };
 
-    /** enum of leafs, for 4k, 15 TS versoin **/
+    /** enum of leafs, for 4k, 15 TS version **/
     enum EBits_4k15ts {
       e1_c127,
       e1_validtracker, e1_trackercc,
@@ -1832,7 +1832,7 @@ namespace Belle2 {
       /** Destructor */
       virtual ~TRGCDCTSFUnpackerModule();
 
-      /** Initilizes TRGCDCTSFUnpackerModuel.*/
+      /** Initializes TRGCDCTSFUnpackerModuel.*/
       virtual void initialize() override;
 
       /** Called event by event.*/

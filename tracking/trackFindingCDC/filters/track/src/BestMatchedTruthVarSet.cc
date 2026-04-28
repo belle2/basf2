@@ -12,11 +12,12 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCCloneLookUp.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 void BestMatchedTruthVarSet::initialize()
 {
@@ -54,7 +55,7 @@ bool BestMatchedTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
     auto hitIsCorrect = [&hitLookUp, &trackMCMatch](const CDCRecoHit3D & recoHit) {
       return hitLookUp.getMCTrackId(recoHit.getWireHit().getHit()) == trackMCMatch;
     };
-    numberOfCorrectHits = std::count_if(begin(*ptrCDCTrack), end(*ptrCDCTrack), hitIsCorrect);
+    numberOfCorrectHits = std::count_if(std::begin(*ptrCDCTrack), std::end(*ptrCDCTrack), hitIsCorrect);
 
     const double purity = (double)numberOfCorrectHits / ptrCDCTrack->size();
     if (purity < 0.8) {

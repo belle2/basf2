@@ -12,11 +12,9 @@
 #include <framework/logging/Logger.h>
 
 //trg package headers
-#include "trg/ecl/modules/trgecl/TRGECLFAMModule.h"
-#include "trg/ecl/TrgEclDigitizer.h"
-#include "trg/ecl/TrgEclFAMFit.h"
-
-#include "trg/ecl/dbobjects/TRGECLFAMPara.h"
+#include <trg/ecl/modules/trgecl/TRGECLFAMModule.h>
+#include <trg/ecl/TrgEclDigitizer.h>
+#include <trg/ecl/TrgEclFAMFit.h>
 
 #include <iostream>
 
@@ -40,15 +38,15 @@ namespace Belle2 {
 //
   TRGECLFAMModule::TRGECLFAMModule()
     : Module::Module(),
-      _debugLevel(0),
-      _famMethod(1),
-      _binTimeInterval(125),
-      _waveform(0),
-      _beambkgtag(0),
-      _famana(0),
-      _threshold(100.0),
-      _FADC(1),
-      _ConditionDB(0),
+      m_debugLevel(0),
+      m_famMethod(1),
+      m_binTimeInterval(125),
+      m_SaveTCWaveForm(0),
+      m_beambkgtag(0),
+      m_famana(0),
+      m_SetTCEThreshold(100.0),
+      m_FADC(1),
+      m_ConditionDBFAM(true),
       m_SourceOfTC(3)
   {
 
@@ -56,29 +54,26 @@ namespace Belle2 {
     setDescription(desc);
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("DebugLevel", _debugLevel, "TRGECL debug level", _debugLevel);
-    addParam("FAMFitMethod", _famMethod, "TRGECLFAM fit method", _famMethod);
-    addParam("FAMBinTimeInterval", _binTimeInterval, "TRGECLFAM binTimeInterval",
-             _binTimeInterval);
-    addParam("TCWaveform", _waveform, "Output the TC waveform ",
-             _waveform);
-    addParam("FAMAnaTable", _famana, "Save FAM ana table ",
-             _famana);
-    addParam("BeamBkgTag", _beambkgtag, "Save beambackground tag in TRGECLHit table ",
-             _beambkgtag);
-    addParam("TCThreshold", _threshold, "Set FAM TC threshold ",
-             _threshold);
-    addParam("ShapingFunction", _FADC, "Set function of shaper ",  _FADC);
-    addParam("ConditionDB", _ConditionDB, "Use conditionDB ",  _ConditionDB);
+    addParam("DebugLevel", m_debugLevel, "TRGECL debug level", m_debugLevel);
+    addParam("FAMFitMethod", m_famMethod, "TRGECLFAM fit method", m_famMethod);
+    addParam("FAMBinTimeInterval", m_binTimeInterval, "TRGECLFAM binTimeInterval",
+             m_binTimeInterval);
+    addParam("TCWaveform", m_SaveTCWaveForm, "Output the TC waveform ",
+             m_SaveTCWaveForm);
+    addParam("FAMAnaTable", m_famana, "Save FAM ana table ",
+             m_famana);
+    addParam("BeamBkgTag", m_beambkgtag, "Save beambackground tag in TRGECLHit table ",
+             m_beambkgtag);
+    addParam("TCThreshold", m_SetTCEThreshold, "Set FAM TC threshold ",
+             m_SetTCEThreshold);
+    addParam("ShapingFunction", m_FADC, "Set function of shaper ",  m_FADC);
+    addParam("ConditionDBFAM", m_ConditionDBFAM, "Use conditionDB for FAM",  m_ConditionDBFAM);
     addParam("SourceOfTC", m_SourceOfTC,
              "Select source of TC data(1:=ECLHit or 2:=ECLSimHit or 3:=ECLHit+TRGECLBGTCHit)",
              m_SourceOfTC);
 
-    if (_ConditionDB == 1) { //Use global tag
-      m_FAMPara.addCallback(this, &TRGECLFAMModule::beginRun);
-    }
     B2DEBUG(100, "TRGECLFAMModule ... created");
-    Threshold.clear();
+    m_TCEThreshold.clear();
 
   }
 //
@@ -96,11 +91,10 @@ namespace Belle2 {
   void
   TRGECLFAMModule::initialize()
   {
-
     B2DEBUG(100, "TRGECLFAMModule::initialize ... options");
-    B2DEBUG(100, "TRGECLFAMModule::initialize> FAM Fit Method = " << _famMethod
-            << "  ; Bin of Time Interval = " << _binTimeInterval
-            << " ;output TC waveforml = " << _waveform);
+    B2DEBUG(100, "TRGECLFAMModule::initialize> FAM Fit Method = " << m_famMethod
+            << "  ; Bin of Time Interval = " << m_binTimeInterval
+            << " ;output TC waveforml = " << m_SaveTCWaveForm);
     if (m_SourceOfTC <= 0 ||
         m_SourceOfTC >= 4) {
       B2FATAL("TRGECLFAMModule::initialize> SourceOfTC must be 1 or 2 or 3");
@@ -118,7 +112,6 @@ namespace Belle2 {
     m_eventLevelClusteringInfo.isOptional() ? m_eventLevelClusteringInfo.isRequired() :
     m_eventLevelClusteringInfo.registerInDataStore();
 
-    //    m_FAMPara = new DBObjPtr<TRGECLFAMPara>;
   }
 //
 //
@@ -126,12 +119,18 @@ namespace Belle2 {
   void
   TRGECLFAMModule::beginRun()
   {
-    if (_ConditionDB == 0) {
-      Threshold.resize(576, _threshold);
-    } else if (_ConditionDB == 1) { //Use global tag
-      Threshold.resize(576, 0);
-      for (const auto& para : m_FAMPara) {
-        Threshold[para.getTCId() - 1] = (int)((para.getThreshold()) * (para.getConversionFactor()));
+    if (!m_ConditionDBFAM) {
+      m_TCEThreshold.resize(576, m_SetTCEThreshold);
+    } else {
+      //Use global tag
+      // get TC ADC-to-Eneryg converion factor from conditionDB
+      const auto& dbParmap = m_ETMParameters->getparMap();
+      m_TCADCtoEnergy = getDBparmap(dbParmap, "adc2energy", 0) * 1000; // (MeV)
+      // get TC Energy Threshold from TC ADC Threshold and ADC-to-Energy conversion factor
+      m_TCEThreshold.resize(576, 0);
+      for (const auto& para : m_FAMTCADCThreshold) {
+        int tc_id = (int) para.getTCId();
+        m_TCEThreshold[tc_id - 1] = floor(para.getTCADCThreshold() * m_TCADCtoEnergy);
       }
     }
 
@@ -160,31 +159,30 @@ namespace Belle2 {
     //
     // FAM Digitizer
     TrgEclDigitizer* obj_trgeclDigi = new TrgEclDigitizer();
-    obj_trgeclDigi->setWaveform(_waveform);
-    obj_trgeclDigi->setFADC(_FADC);
+    obj_trgeclDigi->setWaveform(m_SaveTCWaveForm);
+    obj_trgeclDigi->setFADC(m_FADC);
     obj_trgeclDigi->setup(m_SourceOfTC);
-    if (_famMethod == 1 || _famMethod == 2) {
+    if (m_famMethod == 1 || m_famMethod == 2) {
       // no-fit method = backup method 1
-      obj_trgeclDigi->digitization01(TCDigiE, TCDigiT);
-    } else if (_famMethod == 3) {
-      // orignal method = backup method 2
-      obj_trgeclDigi->digitization02(TCDigiE, TCDigiT);
+      obj_trgeclDigi->digitization01(m_TCDigiE, m_TCDigiT);
+    } else if (m_famMethod == 3) {
+      // original method = backup method 2
+      obj_trgeclDigi->digitization02(m_TCDigiE, m_TCDigiT);
     }
-    obj_trgeclDigi-> save(m_nEvent);
+    obj_trgeclDigi->save(m_nEvent);
 
 
     // FAM Fitter
     TrgEclFAMFit* obj_trgeclfit = new TrgEclFAMFit();
-    obj_trgeclfit-> SetBeamBkgTagFlag(_beambkgtag);
-    obj_trgeclfit-> SetAnaTagFlag(_famana);
-    obj_trgeclfit-> setup(m_nEvent);
-    obj_trgeclfit-> SetThreshold(Threshold);
+    obj_trgeclfit->setBeamBkgTagFlag(m_beambkgtag);
+    obj_trgeclfit->setAnaTagFlag(m_famana);
+    obj_trgeclfit->setup(m_nEvent);
+    obj_trgeclfit->setThreshold(m_TCEThreshold);
 
-    if (_famMethod == 1) {obj_trgeclfit->  FAMFit01(TCDigiE, TCDigiT); } // fitting method
-    else if (_famMethod == 2) {obj_trgeclfit->  FAMFit02(TCDigiE, TCDigiT); } // no-fit method = backup method 1
-    else if (_famMethod == 3) { obj_trgeclfit-> FAMFit03(TCDigiE, TCDigiT); } // orignal method = backup method 2
+    if (m_famMethod == 1) { obj_trgeclfit->FAMFit01(m_TCDigiE, m_TCDigiT); }      // fitting method
+    else if (m_famMethod == 2) { obj_trgeclfit->FAMFit02(m_TCDigiE, m_TCDigiT); } // no-fit method = backup method 1
+    else if (m_famMethod == 3) { obj_trgeclfit->FAMFit03(m_TCDigiE, m_TCDigiT); } // original method = backup method 2
     obj_trgeclfit-> save(m_nEvent);
-
 
     // Count number of trigger cells in each ECL region for EventLevelClusteringInfo
     uint16_t nTCsPerRegion[3] = {};
@@ -204,31 +202,44 @@ namespace Belle2 {
         }
       }
     }
-
     // Store
     if (!m_eventLevelClusteringInfo) { m_eventLevelClusteringInfo.create();}
     m_eventLevelClusteringInfo->setNECLTriggerCellsFWD(nTCsPerRegion[0]);
     m_eventLevelClusteringInfo->setNECLTriggerCellsBarrel(nTCsPerRegion[1]);
     m_eventLevelClusteringInfo->setNECLTriggerCellsBWD(nTCsPerRegion[2]);
-
-
-    //
-    //
     //
     m_nEvent++;
     delete obj_trgeclDigi;
     delete obj_trgeclfit;
-    //
-    //
-    //
   }
 //
 //
 //
+  double
+  TRGECLFAMModule::getDBparmap(const std::map<std::string, double> dbParmap,
+                               std::string parName,
+                               double parAlternativeValue)
+  {
+    double par;
+    if (dbParmap.count(parName)) {
+      par = dbParmap.at(parName);
+    } else {
+      par = parAlternativeValue;
+      B2WARNING("No key(\"" + parName +
+                "\") for map in DB and set alternative value(" + parAlternativeValue +
+                ")");
+    }
+
+    return par;
+  }
+  //
+  //
+  //
   void
   TRGECLFAMModule::endRun()
   {
     B2DEBUG(200, "TRGECLFAMModule ... endRun called ");
+    //    m_TCEThreshold.clear();
   }
 //
 //

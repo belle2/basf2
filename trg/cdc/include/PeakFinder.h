@@ -30,7 +30,7 @@ namespace Belle2 {
 
   public:
 
-    /// Contructor.
+    /// Constructor.
     explicit TRGCDCPeakFinder(const std::string& name);
 
     /// Destructor

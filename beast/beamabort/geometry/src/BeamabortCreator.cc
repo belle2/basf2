@@ -11,13 +11,9 @@
 
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
 #include <cmath>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -32,7 +28,6 @@
 #include <G4VisAttributes.hh>
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -56,7 +51,7 @@ namespace Belle2 {
       //get parameters from .xml file
       std::string prep = "Active.";
 
-      B2INFO("BeamabortCreator phase3");
+      B2DEBUG(20, "BeamabortCreator phase3");
       //Visualization Attributes
       G4VisAttributes* orange = new G4VisAttributes(G4Colour(1, 2, 0));
       orange->SetForceAuxEdgeVisible(true);
@@ -90,7 +85,7 @@ namespace Belle2 {
         thetaZ.push_back(ThetaZ);
       }
 
-      if (thetaZ.size() != dimz) { B2ERROR("Diamond data not consistent (i.e. not same number of all position parmeters)"); return;}
+      if (thetaZ.size() != dimz) { B2ERROR("Diamond data not consistent (i.e. not same number of all position parameters)"); return;}
 
       if (phase == 2 || phase == 3) {
 
@@ -109,7 +104,7 @@ namespace Belle2 {
         for (double addAngle : m_config.getParArray(prep + "addAngle", {0})) {
           svdAngle.push_back(addAngle);
         }
-        if (phi.size() != dimz || r.size() != dimz || deltaX.size() != dimz || svdAngle.size() != dimz) { B2ERROR("Diamond data not consistent (i.e. not same number of all position parmeters)"); return;}
+        if (phi.size() != dimz || r.size() != dimz || deltaX.size() != dimz || svdAngle.size() != dimz) { B2ERROR("Diamond data not consistent (i.e. not same number of all position parameters)"); return;}
       }
       if (phase == 1) {
         for (double x : m_config.getParArray(prep + "x", {0})) {
@@ -127,7 +122,7 @@ namespace Belle2 {
         for (double ThetaY : m_config.getParArray(prep + "ThetaY", {0})) {
           thetaY.push_back(ThetaY);
         }
-        if (x_pos.size() != dimz || y_pos.size() != dimz || thetaX.size() != dimz || thetaY.size() != dimz) { B2ERROR("Diamond data not consistent (i.e. not same number of all position parmeters)"); return;}
+        if (x_pos.size() != dimz || y_pos.size() != dimz || thetaX.size() != dimz || thetaY.size() != dimz) { B2ERROR("Diamond data not consistent (i.e. not same number of all position parameters)"); return;}
       }
 
       //create beamabort package
@@ -144,7 +139,7 @@ namespace Belle2 {
       l_pa->SetVisAttributes(magenta);
       G4Transform3D transform;
       for (unsigned int i = 0; i < dimz; i++) {
-        B2INFO("DIA-" << i << "RotateZ3D phi: " << phi[i]);
+        B2DEBUG(20, "DIA-" << i << "RotateZ3D phi: " << phi[i]);
 
         if (phase == 1) {
           transform = G4Translate3D(x_pos[i], y_pos[i], z_pos[i]) * G4RotateX3D(thetaX[i]) *
@@ -155,7 +150,7 @@ namespace Belle2 {
                       G4RotateZ3D(svdAngle[i]) * G4RotateY3D(M_PI / 2);
         }
         new G4PVPlacement(transform, l_pa, TString::Format("p_dia_pa_%d", i).Data(), &topVolume, false, 0);
-        B2INFO("DIA-" << i << " placed at: " << transform.getTranslation() << " mm ");
+        B2DEBUG(20, "DIA-" << i << " placed at: " << transform.getTranslation() << " mm ");
       }
 
       //create beamabort volumes
@@ -185,11 +180,11 @@ namespace Belle2 {
 
         new G4PVPlacement(transform, l_BEAMABORT, TString::Format("p_dia_%d", i).Data(), &topVolume, false, i);
 
-        B2INFO("DIA-sensitive volume-" << i << " placed at: " << transform.getTranslation() << " mm "
-               << "  at phi angle = " << phi[i] << "   at theta angle = "
-               << thetaZ[i]);
-        B2INFO("DIA-sensitive volume-" << i << " G4RotateZ3D of: phi= " << phi[i] << "  G4RotateX3D = "
-               << (-M_PI / 2 - thetaZ[i]));
+        B2DEBUG(20, "DIA-sensitive volume-" << i << " placed at: " << transform.getTranslation() << " mm "
+                << "  at phi angle = " << phi[i] << "   at theta angle = "
+                << thetaZ[i]);
+        B2DEBUG(20, "DIA-sensitive volume-" << i << " G4RotateZ3D of: phi= " << phi[i] << "  G4RotateX3D = "
+                << (-M_PI / 2 - thetaZ[i]));
       }
     }
   }

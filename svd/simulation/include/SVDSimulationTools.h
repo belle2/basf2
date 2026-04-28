@@ -44,7 +44,7 @@ namespace Belle2 {
 
     /** WaveformShape type.
      * This is the type for a naked waveform function, giving a single value for a
-     * properly scaled arguemnt.
+     * properly scaled argument.
      * The functions are scaled to 1.0 at mode, location (shift) 0.0, and scale 1.0.
      */
     typedef std::function<double(double)> WaveformShape;

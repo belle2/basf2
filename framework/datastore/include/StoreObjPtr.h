@@ -11,8 +11,8 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
 
-#include <stdexcept>
 #include <cassert>
+#include <stdexcept>
 
 namespace Belle2 {
 
@@ -81,7 +81,7 @@ namespace Belle2 {
       \endcode
    *
    *  In initialize(), you should also use registerInDataStore() or isOptional()/isRequired()
-   *  to specify wether it is an input or output.
+   *  to specify whether it is an input or output.
    *  For <b>non-default names</b> (which you might not know in the constructor, e.g. in the
    *  case of module parameters), set the 'name' argument of any of these three functions to
    *  permanently bind the StoreObjPtr to the array with the given name.

@@ -19,9 +19,9 @@ using namespace Belle2;
 //
 //
 TrgEclMapping::TrgEclMapping() :
-  _tcid(-1), _tcsubid(-1), _tcthetaid(-1), _tcphiid(-1)
+  m_tcid(-1), m_tcsubid(-1), m_tcthetaid(-1), m_tcphiid(-1)
 {
-  TC2Xtal.clear();
+  m_TC2Xtal.clear();
 }
 //
 //
@@ -42,84 +42,84 @@ TrgEclMapping::getTCIdFromXtalId(int XtalId)
     //
     // forward-endcap [Xtal=1-1152, TC=1-80(80)]
     //
-    if (XtalId0 <  48) { _tcid = ((XtalId0) / 3) * 5 + 1; }
-    else if (XtalId0 <  96) { _tcid = ((XtalId0 - 48) / 3) * 5 + 1; }
-    else if (XtalId0 < 160) { _tcid = ((XtalId0 - 96) / 4) * 5 + 1; }
-    else if (XtalId0 < 224) { _tcid = ((XtalId0 - 160) / 4) * 5 + 1; }
+    if (XtalId0 <  48) { m_tcid = ((XtalId0) / 3) * 5 + 1; }
+    else if (XtalId0 <  96) { m_tcid = ((XtalId0 - 48) / 3) * 5 + 1; }
+    else if (XtalId0 < 160) { m_tcid = ((XtalId0 - 96) / 4) * 5 + 1; }
+    else if (XtalId0 < 224) { m_tcid = ((XtalId0 - 160) / 4) * 5 + 1; }
     else if (XtalId0 < 288) {
       e_o = (XtalId0 - 224) / 2;
-      _tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 2 : e_o * 5 / 2 + 3;
+      m_tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 2 : e_o * 5 / 2 + 3;
     } else if (XtalId0 < 384) {
       e_o = (XtalId0 - 288) / 3;
-      _tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 2 : e_o * 5 / 2 + 3;
+      m_tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 2 : e_o * 5 / 2 + 3;
     } else if (XtalId0 < 480) {
       e_o = (XtalId0 - 384) / 3;
-      _tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 2 : e_o * 5 / 2 + 3;
+      m_tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 2 : e_o * 5 / 2 + 3;
     } else if (XtalId0 < 576) {
       e_o = (XtalId0 - 480) / 3;
-      _tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 2 : e_o * 5 / 2 + 3;
+      m_tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 2 : e_o * 5 / 2 + 3;
     } else if (XtalId0 < 672) {
       e_o = (XtalId0 - 576) / 3;
-      _tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 2 : e_o * 5 / 2 + 3;
+      m_tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 2 : e_o * 5 / 2 + 3;
     } else if (XtalId0 < 768) {
       e_o = (XtalId0 - 672) / 3;
-      _tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 3 : e_o * 5 / 2 + 2;
+      m_tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 3 : e_o * 5 / 2 + 2;
     } else if (XtalId0 < 864) {
       e_o = (XtalId0 - 768) / 3;
-      _tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 3 : e_o * 5 / 2 + 2;
+      m_tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 3 : e_o * 5 / 2 + 2;
     } else if (XtalId0 < 1008) {
       e_o = ((XtalId0 - 864) % 9 < 5) ? (XtalId0 - 864) / 9 * 2 : (XtalId0 - 864) / 9 * 2 + 1;
-      _tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 3 : e_o * 5 / 2 + 2;
+      m_tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 3 : e_o * 5 / 2 + 2;
     } else {
       e_o = ((XtalId0 - 864) % 9 < 5) ? (XtalId0 - 1008) / 9 * 2 : (XtalId0 - 1008) / 9 * 2 + 1;
-      _tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 3 : e_o * 5 / 2 + 2;
+      m_tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 3 : e_o * 5 / 2 + 2;
     }
   } else if (XtalId0 < 7776) {
     //
     // Barrel [Xtal=1153-7776, TC=81-512(432)]
     //
     int offset = ((XtalId0 - 1152) / 4) / 144;
-    _tcid = (((XtalId0 - 1152) / 4) % 36) * 12 + 81 + offset;
+    m_tcid = (((XtalId0 - 1152) / 4) % 36) * 12 + 81 + offset;
   } else {
     //
     // Backward-endcap [Xtal=7777-8736, TC=513-576(64)]
     //
     if (XtalId0 < 7920) {
       e_o = ((XtalId0 - 7776) % 9 < 5) ? (XtalId0 - 7776) / 9 * 2 : (XtalId0 - 7776) / 9 * 2 + 1;
-      _tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 2 : e_o * 2 + 513 - 1;
+      m_tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 2 : e_o * 2 + 513 - 1;
     } else if (XtalId0 < 8064) {
       e_o = ((XtalId0 - 7920) % 9 < 5) ? (XtalId0 - 7920) / 9 * 2 : (XtalId0 - 7920) / 9 * 2 + 1;
-      _tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 2 : e_o * 2 + 513 - 1;
+      m_tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 2 : e_o * 2 + 513 - 1;
     } else if (XtalId0 < 8160) {
       e_o = (XtalId0 - 8064) / 3;
-      _tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 2 : e_o * 2 + 513 - 1;
+      m_tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 2 : e_o * 2 + 513 - 1;
     } else if (XtalId0 < 8256) {
       e_o = (XtalId0 - 8160) / 3;
-      _tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 2 : e_o * 2 + 513 - 1;
+      m_tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 2 : e_o * 2 + 513 - 1;
     } else if (XtalId0 < 8352) {
       e_o = (XtalId0 - 8256) / 3;
-      _tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 3 : e_o * 2 + 513 - 2;
+      m_tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 3 : e_o * 2 + 513 - 2;
     } else if (XtalId0 < 8448) {
       e_o = (XtalId0 - 8352) / 3;
-      _tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 3 : e_o * 2 + 513 - 2;
+      m_tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 3 : e_o * 2 + 513 - 2;
     } else if (XtalId0 < 8544) {
       e_o = (XtalId0 - 8448) / 3;
-      _tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 3 : e_o * 2 + 513 - 2;
+      m_tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 3 : e_o * 2 + 513 - 2;
     } else if (XtalId0 < 8608) {
       e_o = (XtalId0 - 8544) / 2;
-      _tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 3 : e_o * 2 + 513 - 2;
+      m_tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 3 : e_o * 2 + 513 - 2;
     } else if (XtalId0 < 8672) {
       e_o = (XtalId0 - 8608) / 2;
-      _tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 3 : e_o * 2 + 513 - 2;
+      m_tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 3 : e_o * 2 + 513 - 2;
     } else if (XtalId0 < 8736) {
       e_o = (XtalId0 - 8672) / 2;
-      _tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 3 : e_o * 2 + 513 - 2;
+      m_tcid = (e_o % 2 == 0) ? e_o * 2 + 513 + 3 : e_o * 2 + 513 - 2;
     }
   }
-  if (_tcid < 1 || _tcid > 576) {
+  if (m_tcid < 1 || m_tcid > 576) {
     B2ERROR("TrgEclMapping> output TCId is wrong!!!");
   }
-  return _tcid;
+  return m_tcid;
 }
 //
 //
@@ -136,27 +136,27 @@ TrgEclMapping::getTCSubIdFromXtalId(int XtalId)
     //
     // FW XtalId = 1 - 1152
     //
-    if (XtalId <= 96) { _tcsubid = 1;}
+    if (XtalId <= 96) { m_tcsubid = 1;}
     else if (XtalId <= 160) {
       int aaa = (XtalId - 97) % 4;
-      _tcsubid = (aaa == 0 || aaa == 3) ? 0 : 1;
-    } else if (XtalId <= 224) {_tcsubid = 0;}
-    else if (XtalId <= 384) {_tcsubid = 1;}
+      m_tcsubid = (aaa == 0 || aaa == 3) ? 0 : 1;
+    } else if (XtalId <= 224) {m_tcsubid = 0;}
+    else if (XtalId <= 384) {m_tcsubid = 1;}
     else if (XtalId <= 480) {
       int aaa = (XtalId - 385) % 3;
-      _tcsubid = (aaa == 1) ? 1 : 0;
-    } else if (XtalId <= 672) {_tcsubid = 0;}
-    else if (XtalId <= 770) {_tcsubid = 1;}
+      m_tcsubid = (aaa == 1) ? 1 : 0;
+    } else if (XtalId <= 672) {m_tcsubid = 0;}
+    else if (XtalId <= 770) {m_tcsubid = 1;}
     else if (XtalId <= 863) {
       int aaa = ((XtalId - 771) % 6) / 3;
-      _tcsubid = (aaa == 0) ? 0 : 1;
+      m_tcsubid = (aaa == 0) ? 0 : 1;
     } else if (XtalId <= 1007) {
       int aaa = (XtalId - 864) % 9;
-      _tcsubid = (aaa == 0 || aaa == 1 || aaa == 4 || aaa == 7) ? 1 : 0;
-    } else if (XtalId <= 1008) {_tcsubid = 1;}
+      m_tcsubid = (aaa == 0 || aaa == 1 || aaa == 4 || aaa == 7) ? 1 : 0;
+    } else if (XtalId <= 1008) {m_tcsubid = 1;}
     else {
       int aaa = (XtalId - 1009) % 9;
-      _tcsubid = (aaa == 0) ? 1 : 0;
+      m_tcsubid = (aaa == 0) ? 1 : 0;
     }
   } else if (XtalId <= 7776) {
     //
@@ -164,28 +164,28 @@ TrgEclMapping::getTCSubIdFromXtalId(int XtalId)
     //
     if (XtalId <= 7488) {
       int aaa = (XtalId - 1153) % 4;
-      _tcsubid = (aaa < 2) ? 1 : 0;
-    } else { _tcsubid = 1;}
+      m_tcsubid = (aaa < 2) ? 1 : 0;
+    } else { m_tcsubid = 1;}
   } else {
     //
     // BW XtalId 7777 - 8736
     //
-    if (XtalId <= 7922) {_tcsubid = 0;}
+    if (XtalId <= 7922) {m_tcsubid = 0;}
     else if (XtalId <= 8061) {
       int aaa = (XtalId - 7923) % 9;
-      _tcsubid = (aaa == 0 || aaa == 1 || aaa == 5 || aaa == 6) ? 1 : 0;
-    } else if (XtalId <= 8062) {_tcsubid = 0;}
-    else if (XtalId <= 8256) {_tcsubid = 1;}
-    else if (XtalId <= 8449) {_tcsubid = 0;}
+      m_tcsubid = (aaa == 0 || aaa == 1 || aaa == 5 || aaa == 6) ? 1 : 0;
+    } else if (XtalId <= 8062) {m_tcsubid = 0;}
+    else if (XtalId <= 8256) {m_tcsubid = 1;}
+    else if (XtalId <= 8449) {m_tcsubid = 0;}
     else if (XtalId <= 8542) {
       int aaa = (XtalId - 8450) % 3;
-      _tcsubid = (aaa < 2) ? 1 : 0;
-    } else {_tcsubid = 1;}
+      m_tcsubid = (aaa < 2) ? 1 : 0;
+    } else {m_tcsubid = 1;}
   }
-  if (_tcsubid < 0 || _tcsubid > 1) {
+  if (m_tcsubid < 0 || m_tcsubid > 1) {
     B2ERROR("TrgEclMapping> output TCSubId is wrong!!!");
   }
-  return _tcsubid;
+  return m_tcsubid;
 }
 //
 //
@@ -203,16 +203,16 @@ TrgEclMapping::getTCThetaIdFromTCId(int TCId)
   // forward-endcap  [Xtal=   1-1152, TC=  1- 80(80)]
   // Barrel          [Xtal=1153-7776, TC= 81-512(432)]
   // Backward-endcap [Xtal=7777-8736, TC=513-576(64)]
-  if (TCId0 < 80) {_tcthetaid = (TCId0 % 5 < 3) ? 1 + TCId0 % 5 : 6 - TCId0 % 5;}
-  else if (TCId0 < 512) {_tcthetaid = (TCId0 - 80) % 12 + 4;}
+  if (TCId0 < 80) {m_tcthetaid = (TCId0 % 5 < 3) ? 1 + TCId0 % 5 : 6 - TCId0 % 5;}
+  else if (TCId0 < 512) {m_tcthetaid = (TCId0 - 80) % 12 + 4;}
   else {
-    if (TCId0 == 512) {_tcthetaid = 17;}
-    else             {_tcthetaid = (((TCId0 - 513) / 2) % 2) ? 17 : 16;}
+    if (TCId0 == 512) {m_tcthetaid = 17;}
+    else             {m_tcthetaid = (((TCId0 - 513) / 2) % 2) ? 17 : 16;}
   }
-  if (_tcthetaid < 1 || _tcthetaid > 18) {
+  if (m_tcthetaid < 1 || m_tcthetaid > 18) {
     B2ERROR("TrgEclMapping> output TCThetaId is wrong!!!");
   }
-  return _tcthetaid;
+  return m_tcthetaid;
 }
 //
 //
@@ -230,13 +230,13 @@ TrgEclMapping::getTCPhiIdFromTCId(int TCId)
   // forward-endcap  [Xtal=   1-1152, TC=  1- 80(80)]
   // Barrel          [Xtal=1153-7776, TC= 81-512(432)]
   // Backward-endcap [Xtal=7777-8736, TC=513-576(64)]
-  if (TCId0 <  80) {_tcphiid = (TCId0 % 5 < 3) ? (1 + (TCId0 / 5) * 2) : (2 + (TCId0 / 5) * 2);}
-  else if (TCId0 < 512) {_tcphiid = 1 + ((TCId0 - 80) / 12);}
-  else                 {_tcphiid = (((TCId0 - 512) / 2) % 2) ? ((TCId0 - 512) / 2)  : ((TCId0 - 512) / 2) + 2;}
-  if (_tcphiid < 1 || _tcphiid > 36) {
+  if (TCId0 <  80) {m_tcphiid = (TCId0 % 5 < 3) ? (1 + (TCId0 / 5) * 2) : (2 + (TCId0 / 5) * 2);}
+  else if (TCId0 < 512) {m_tcphiid = 1 + ((TCId0 - 80) / 12);}
+  else                 {m_tcphiid = (((TCId0 - 512) / 2) % 2) ? ((TCId0 - 512) / 2)  : ((TCId0 - 512) / 2) + 2;}
+  if (m_tcphiid < 1 || m_tcphiid > 36) {
     B2ERROR("TrgEclMapping> output TCPhiId is wrong!!!");
   }
-  return _tcphiid;
+  return m_tcphiid;
 }
 //
 //
@@ -843,7 +843,7 @@ TrgEclMapping::getXtalIdFromTCId(int TCId)
     B2ERROR("TrgEclMapping> Input TCId is wrong!!!");
   }
 
-  TC2Xtal = {
+  m_TC2Xtal = {
     {1, 2, 3, 49, 50, 51, 97, 98, 99, 100, 161, 162, 163, 164, 0, 0}, // TC Id : 1
     {225, 226, 289, 290, 291, 385, 386, 387, 481, 482, 483, 577, 578, 579, 0, 0}, // TC Id : 2
     {673, 674, 675, 769, 770, 771, 865, 866, 867, 868, 869, 1009, 1010, 1011, 1012, 1013}, // TC Id : 3
@@ -1422,7 +1422,7 @@ TrgEclMapping::getXtalIdFromTCId(int TCId)
     {8347, 8348, 8349, 8443, 8444, 8445, 8539, 8540, 8541, 8605, 8606, 8669, 8670, 8733, 8734,  0}  // TC Id : 576
   };
 
-  return TC2Xtal[TCId - 1];
+  return m_TC2Xtal[TCId - 1];
 }
 //
 //

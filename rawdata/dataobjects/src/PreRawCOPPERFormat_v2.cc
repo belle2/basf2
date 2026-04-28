@@ -328,7 +328,7 @@ void PreRawCOPPERFormat_v2::CheckData(int n,
 
   if (err_flag == 1) {
     printf("%s", err_buf); fflush(stdout);
-    printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
+    printf("[DEBUG] ========== dump a data block : block # %d==========\n", n);
     PrintData(GetBuffer(n), GetBlockNwords(n));
     for (int i = 0; i < 4; i++) {
       printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
@@ -498,7 +498,7 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
   m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] |= tmp_header.MAGIC_WORD;
 
   //
-  // Check FINESSEs which containes data
+  // Check FINESSEs which contains data
   //
   int* copper_buf = &(m_buffer[ tmp_header.RAWHEADER_NWORDS ]);
   if (copper_buf[ POS_CH_A_DATA_LENGTH ] == 0 &&
@@ -638,7 +638,7 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x1 << 28);
           sprintf(err_buf,
-                  "[WARNING] %s ch=%d : ARICH : B2link packet CRC error slot A eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
+                  "[WARNING] %s ch=%d : ARICH : B2link packet CRC error slot A eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file according to request from ARICH group: %s %s %d\n",
                   hostname, 0,
                   cur_ftsw_eve32,
                   m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
@@ -702,7 +702,7 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x2 << 28);
           sprintf(err_buf,
-                  "[WARNING] %s ch=%d : ARICH : B2link packet CRC error slot B eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
+                  "[WARNING] %s ch=%d : ARICH : B2link packet CRC error slot B eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file according to request from ARICH group: %s %s %d\n",
                   hostname, 1,
                   cur_ftsw_eve32,
                   m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
@@ -766,7 +766,7 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x4 << 28);
           sprintf(err_buf,
-                  "[WARNING] %s ch=%d : ARICH : B2link packet CRC error slot C eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
+                  "[WARNING] %s ch=%d : ARICH : B2link packet CRC error slot C eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file according to request from ARICH group: %s %s %d\n",
                   hostname, 2,
                   cur_ftsw_eve32,
                   m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
@@ -831,7 +831,7 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x8) << 28;
           sprintf(err_buf,
-                  "[WARNING] %s ch=%d : ARICH : B2link packet CRC error slot D eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
+                  "[WARNING] %s ch=%d : ARICH : B2link packet CRC error slot D eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file according to request from ARICH group: %s %s %d\n",
                   hostname, 3,
                   cur_ftsw_eve32,
                   m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
@@ -1203,13 +1203,13 @@ int PreRawCOPPERFormat_v2::CopyReducedBuffer(int n, int* buf_to)
   copyData(buf_to, &pos_nwords_to, buf_from, copy_nwords, nwords_buf_to);
 
 
-  //calcurate XOR checksum diff.( depends on data-format )
+  //calculate XOR checksum diff.( depends on data-format )
   removed_xor_chksum ^= buf_from[ tmp_header.POS_VERSION_HDRNWORDS ];
 
   // Unset the PreFormat bit ( 15th bit )
   buf_to[ tmp_header.POS_VERSION_HDRNWORDS ] &= 0xFFFF7FFF;
 
-  //calcurate XOR checksum diff.( depends on data-format )
+  //calculate XOR checksum diff.( depends on data-format )
   removed_xor_chksum ^=  buf_to[ tmp_header.POS_VERSION_HDRNWORDS ];
   for (int i = 0; i < SIZE_COPPER_HEADER; i++) {
     removed_xor_chksum ^=  buf_from[ tmp_header.RAWHEADER_NWORDS + i ];
@@ -1241,7 +1241,7 @@ int PreRawCOPPERFormat_v2::CopyReducedBuffer(int n, int* buf_to)
 
 
       // check finesse buffer size : ( When dumhslb was used, this type of error
-      // occured and RecvStream0.py died by Segmentation Fault. ) 2014.12.01.
+      // occurred and RecvStream0.py died by Segmentation Fault. ) 2014.12.01.
       if (finesse_nwords - SIZE_B2LHSLB_HEADER - SIZE_B2LFEE_HEADER
           - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER < 0) {
         char err_buf[500];
@@ -1257,7 +1257,7 @@ int PreRawCOPPERFormat_v2::CopyReducedBuffer(int n, int* buf_to)
         B2FATAL(err_buf); // to reduce multiple error messages
       }
 
-      //calcurate XOR checksum diff.( depends on data-format )
+      //calculate XOR checksum diff.( depends on data-format )
       for (int k = 1; k <= 4 ; k++) {
         removed_xor_chksum ^=  finesse_buf[ k ];
       }
@@ -1277,7 +1277,7 @@ int PreRawCOPPERFormat_v2::CopyReducedBuffer(int n, int* buf_to)
       buf_to[ pos_nwords_to ] |= (finesse_buf[ finesse_nwords - (static_cast<int>(SIZE_B2LHSLB_TRAILER) - POS_MAGIC_B2LHSLB) ] << 16) &
                                  0xFFFF0000;
 
-      //calcurate XOR checksum diff. ( depends on data-format )
+      //calculate XOR checksum diff. ( depends on data-format )
       for (int k = 0; k <= 2 ; k++) {
         removed_xor_chksum ^=  finesse_buf[ finesse_nwords - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER + k ];
       }
@@ -1298,7 +1298,7 @@ int PreRawCOPPERFormat_v2::CopyReducedBuffer(int n, int* buf_to)
   copy_nwords = tmp_trailer.GetTrlNwords();
   copyData(buf_to, &pos_nwords_to, buf_from, copy_nwords, nwords_buf_to);
 
-  //calcurate XOR checksum diff.( depends on data-format )
+  //calculate XOR checksum diff.( depends on data-format )
   unsigned int old_rawcopper_chksum = buf_from[ tmp_trailer.POS_CHKSUM ];
   for (int i = 0; i < SIZE_COPPER_TRAILER; i++) {
     removed_xor_chksum ^= (unsigned int) * (buf_from - SIZE_COPPER_TRAILER + i);

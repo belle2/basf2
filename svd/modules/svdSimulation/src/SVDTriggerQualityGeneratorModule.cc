@@ -23,7 +23,7 @@ SVDTriggerQualityGeneratorModule::SVDTriggerQualityGeneratorModule() : Module()
 {
   B2DEBUG(1, "Constructor");
   // Set module properties
-  setDescription("Generates a StoreObjPtr that contains random trigger quality chosen between FINE and CORSE");
+  setDescription("Generates a StoreObjPtr that contains random trigger quality chosen between FINE and COARSE");
 
   // Parameter definitions
   addParam("TRGSummaryName", m_trgQRGName, "TRGSummary name", m_trgQRGName);

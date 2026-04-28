@@ -133,14 +133,6 @@ namespace Belle2 {
        */
       void switchRow(unsigned int v);
 
-      /** number of columns of the cache. This is the actual number of columns + 2 to get rid of edge effects */
-      const unsigned int m_maxU;
-      /** current v coordinate, needed to switch top row */
-      unsigned int m_curV;
-      /** cache of the top row */
-      ClusterCandidate** m_clsTop;
-      /** cache of the current row */
-      ClusterCandidate** m_clsCur;
       /** list of all the clusters created so far */
       std::deque<ClusterCandidate> m_clusters;
       /** iterator to the next free cluster to be used if a new cluster is needed.
@@ -151,6 +143,15 @@ namespace Belle2 {
        * added to the front of the m_clusters container.
        */
       std::deque<ClusterCandidate>::iterator m_currCluster;
+
+      /** cache of the top row */
+      ClusterCandidate** m_clsTop;
+      /** cache of the current row */
+      ClusterCandidate** m_clsCur;
+      /** number of columns of the cache. This is the actual number of columns + 2 to get rid of edge effects */
+      const unsigned int m_maxU;
+      /** current v coordinate, needed to switch top row */
+      unsigned int m_curV;
     };
 
   }

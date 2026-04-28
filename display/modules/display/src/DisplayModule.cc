@@ -33,7 +33,7 @@ REG_MODULE(Display);
 
 DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 {
-  setDescription("Interactive visualisation of Monte Carlo, intermediate and reconstructed objects, plus geometry. See https://software.belle2.org/development/sphinx/display/doc/index.html for detailed documentation.");
+  setDescription("Interactive visualisation of Monte Carlo, intermediate and reconstructed objects, plus geometry. See https://software.belle2.org/|release|/sphinx/display/doc/index.html for detailed documentation.");
 
   addParam("options", m_options,
            "Drawing options for RecoTracks, a combination of DHMP. See EVEVisualization::setOptions or the display.py example for an explanation.",
@@ -43,7 +43,7 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            "If true, hits created by secondary particles (after scattering, decay-in-flight, ...) will be assigned to the original primary particle.",
            false);
   addParam("showAllPrimaries", m_showAllPrimaries,
-           "If true, all primary MCParticles will be shown, regardless of wether hits are produced.", true);
+           "If true, all primary MCParticles will be shown, regardless of whether hits are produced.", true);
   addParam("hideSecondaries", m_hideSecondaries, "If true, secondary MCParticles (and hits created by them) will not be shown.",
            false);
   addParam("showCharged", m_showCharged,
@@ -199,7 +199,7 @@ void DisplayModule::event()
   if (m_showRecoTracks) {
     //add all possible track candidate arrays
     const auto recoTrackArrays = StoreArray<RecoTrack>::getArrayList();
-    for (std::string colName : recoTrackArrays) {
+    for (const std::string& colName : recoTrackArrays) {
       StoreArray<RecoTrack> recoTracks(colName);
       for (const RecoTrack& recoTrack : recoTracks) {
         if (colName != "RecoTracksMpl") {
@@ -230,7 +230,7 @@ void DisplayModule::event()
 
   if (m_showCDCHits || m_showTriggerObjects) {
     StoreArray<CDCHit> cdchits;
-    for (auto& hit : cdchits)
+    for (const auto& hit : cdchits)
       m_visualizer->addCDCHit(&hit, m_showTriggerObjects);
   }
 
@@ -238,13 +238,13 @@ void DisplayModule::event()
     const auto arrayList = StoreArray<CDCTriggerSegmentHit>::getArrayList();
     for (const auto& i : arrayList) {
       StoreArray<CDCTriggerSegmentHit> tshits(i);
-      for (auto& hit : tshits)
+      for (const auto& hit : tshits)
         m_visualizer->addCDCTriggerSegmentHit(i, &hit);
     }
 
     //add all possible track candidate arrays
     const auto trgTrackArrays = StoreArray<CDCTriggerTrack>::getArrayList();
-    for (std::string colName : trgTrackArrays) {
+    for (const std::string& colName : trgTrackArrays) {
       StoreArray<CDCTriggerTrack> trgTracks(colName);
       for (const CDCTriggerTrack& trgTrack : trgTracks) {
         m_visualizer->addCDCTriggerTrack(colName, trgTrack);
@@ -254,7 +254,7 @@ void DisplayModule::event()
 
   if (m_showKLM2dHits) {
     StoreArray<KLMHit2d> klmHits;
-    for (auto& hit : klmHits) {
+    for (const auto& hit : klmHits) {
       if (hit.getSubdetector() == KLMElementNumbers::c_BKLM)
         m_visualizer->addBKLMHit2d(&hit);
       else
@@ -264,7 +264,7 @@ void DisplayModule::event()
 
   if (m_showARICHHits) {
     StoreArray<ARICHHit> arichhits;
-    for (auto& hit : arichhits)
+    for (const auto& hit : arichhits)
       m_visualizer->addARICHHit(&hit);
   }
 

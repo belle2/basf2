@@ -21,8 +21,10 @@
 #include <framework/datastore/RelationIndex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
+#include <pxd/dataobjects/PXDSimHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDInjectionBGTiming.h>
 #include <cmath>
 
 #include <TRandom.h>
@@ -482,7 +484,7 @@ double PXDDigitizerModule::addNoise(double charge)
         charge = gRandom->Gaus(charge, sqrt(charge));
       else
         // Otherwise Poisson distr.
-        charge = gRandom->Poisson(charge);
+        charge = gRandom->PoissonD(charge);
     }
     if (m_applyNoise) {
       charge += gRandom->Gaus(0., m_elNoise);
@@ -577,7 +579,7 @@ void PXDDigitizerModule::saveDigits()
 
       // Check if the readout digit is coming from a masked or dead area
       if (PXD::PXDPixelMasker::getInstance().pixelDead(sensorID, d.u(), d.v())
-          || !PXD::PXDPixelMasker::getInstance().pixelOK(sensorID, d.u(), d.v())) {
+          || charge <= PXD::PXDPixelMasker::getInstance().getPixelThreshold(sensorID, d.u(), d.v())) {
         continue;
       }
 

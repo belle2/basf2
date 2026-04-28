@@ -21,7 +21,6 @@
 
 #include <mdst/dbobjects/BeamSpot.h>
 #include <alignment/dbobjects/VXDAlignment.h>
-#include <alignment/dbobjects/CDCCalibration.h>
 #include <klm/dbobjects/bklm/BKLMAlignment.h>
 #include <klm/dbobjects/eklm/EKLMAlignment.h>
 #include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
@@ -93,7 +92,7 @@ namespace Belle2 {
       /// Initialize the manager with given configuration (from MillepedeCollector)
       void initialize(const std::vector<std::string>& components = {}, const std::vector<EventMetaData>& timeSlices = {});
 
-      /// Notice manager of a comming event (from MillepedeCollector)
+      /// Notice manager of a coming event (from MillepedeCollector)
       void preCollect(const EventMetaData& emd);
 
       /// -------------------------------------------------------------------------

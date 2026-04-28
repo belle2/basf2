@@ -10,12 +10,14 @@
 
 """ Skim list building functions for the low multiplicity physics working group """
 
+import math
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm
 
+__liaison__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
 _VALIDATION_SAMPLE = "mdst16.root"
 
 
@@ -26,7 +28,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
     """
     __authors__ = "Xing-Yu Zhou"
     __description__ = "Skim list for two track lepton (e+e- to e+e- and e+e- to mu+mu-) events for luminosity measurements."
-    __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
+    __contact__ = __liaison__
     __category__ = "physics, low multiplicity"
 
     TestSampleProcess = "mumu"
@@ -68,7 +70,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
         # candidates are : vpho -> e+ e- or vpho -> e gamma
         # daughter indices are:    0  1             0 1
         deltaTheta_cut = (
-            '[abs(formula(daughter(0, useCMSFrame(theta)) + daughter(1, useCMSFrame(theta)) - 3.1415927)) < 0.17453293]'
+            f'[abs(formula(daughter(0, useCMSFrame(theta)) + daughter(1, useCMSFrame(theta)) - {math.pi})) < 0.17453293]'
         )
 
         # convert the prescale from trigger convention
@@ -126,7 +128,7 @@ class LowMassTwoTrack(BaseSkim):
     __authors__ = ["Xing-Yu Zhou", "Guanda Gong"]
     __description__ = "Skim list for low mass events with at least two tracks and one hard photon" \
                       " in final state."
-    __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
+    __contact__ = __liaison__
     __category__ = "physics, low multiplicity"
 
     TestSampleProcess = "mumu"
@@ -182,12 +184,13 @@ class LowMassTwoTrack(BaseSkim):
         return ParticleLists
 
     def validation_histograms(self, path):
+        from ROOT import Belle2
         vm.addAlias('pip_p_cms', 'daughter(0, useCMSFrame(p))')
         vm.addAlias('pim_p_cms', 'daughter(1, useCMSFrame(p))')
         vm.addAlias('gamma_E_cms', 'daughter(2, useCMSFrame(E))')
-        vm.addAlias('pip_theta_lab', 'formula(daughter(0, theta)*180/3.1415927)')
-        vm.addAlias('pim_theta_lab', 'formula(daughter(1, theta)*180/3.1415927)')
-        vm.addAlias('gamma_theta_lab', 'formula(daughter(2, theta)*180/3.1415927)')
+        vm.addAlias('pip_theta_lab', f'formula(daughter(0, theta)/{Belle2.Unit.deg})')
+        vm.addAlias('pim_theta_lab', f'formula(daughter(1, theta)/{Belle2.Unit.deg})')
+        vm.addAlias('gamma_theta_lab', f'formula(daughter(2, theta)/{Belle2.Unit.deg})')
         vm.addAlias('Mpipi', 'daughterInvM(0,1)')
 
         ma.copyLists('vpho:LowMassTwoTrack', self.SkimLists, path=path)
@@ -227,7 +230,7 @@ class SingleTagPseudoScalar(BaseSkim):
     """
 
     __authors__ = ["Hisaki Hayashii"]
-    __contact__ = "Hisaki Hayashii <hisaki.hayashii@desy.de>"
+    __contact__ = __liaison__
     __description__ = "A skim script to select events with one high-energy electron and one or more pi0/eta/eta mesons."
     __category__ = "physics, low multiplicity"
     ApplyHLTHadronCut = False
@@ -290,7 +293,7 @@ class LowMassOneTrack(BaseSkim):
     """
     __authors__ = ["Gaurav Sharma", "Qingyuan Liu"]
     __description__ = "Skim list for low mass events with one track and one hard photon in final state."
-    __contact__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
+    __contact__ = __liaison__
     __category__ = "physics, low multiplicity"
 
     TestSampleProcess = "mumu"

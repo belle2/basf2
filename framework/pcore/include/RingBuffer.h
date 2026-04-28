@@ -114,7 +114,7 @@ namespace Belle2 {
 
     /** Is this process currently processing events from this RingBuffer?
      *
-     * set during remq() with value depending on wether data was returned.
+     * set during remq() with value depending on whether data was returned.
      * Always false for a process that is only using insq().
      */
     bool m_procIsBusy{false};

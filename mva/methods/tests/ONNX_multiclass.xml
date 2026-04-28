@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<method>ONNX</method>
+<weightfile>Simple</weightfile>
+<treename>tree</treename>
+<target_variable>isSignal</target_variable>
+<weight_variable>__weight__</weight_variable>
+<signal_class>1</signal_class>
+<max_events>0</max_events>
+<nClasses>2</nClasses>
+<number_feature_variables>16</number_feature_variables>
+<variable0>p</variable0>
+<variable1>pz</variable1>
+<variable2>daughter(0, p)</variable2>
+<variable3>daughter(0, pz)</variable3>
+<variable4>daughter(1, p)</variable4>
+<variable5>daughter(1, pz)</variable5>
+<variable6>chiProb</variable6>
+<variable7>dr</variable7>
+<variable8>dz</variable8>
+<variable9>daughter(0, dr)</variable9>
+<variable10>daughter(1, dr)</variable10>
+<variable11>daughter(0, chiProb)</variable11>
+<variable12>daughter(1, chiProb)</variable12>
+<variable13>daughter(0, kaonID)</variable13>
+<variable14>daughter(0, pionID)</variable14>
+<variable15>daughterAngle(0, 1)</variable15>
+<number_spectator_variables>0</number_spectator_variables>
+<number_data_files>1</number_data_files>
+<datafile0>dummy</datafile0>
+<ONNX_outputName/>
+<ONNX_modelFilename/>
+<ONNX_Modelfile>CAgSB3B5dG9yY2gaBTIuMi4yOsUCCloKBWlucHV0CgZ3ZWlnaHQKBGJpYXMSBm91dHB1dBoFL0dlbW0iBEdlbW0qDwoFYWxwaGEVAACAP6ABASoOCgRiZXRhFQAAgD+gAQEqDQoGdHJhbnNCGAGgAQISCm1haW5fZ3JhcGgqkQEIAggQEAFCBndlaWdodEqAAbivQz7helQ+jgZwvXo2az73dWC9O3BOPdk9+b29UhY+irBhPjbNO77kg14+W7E/Pf8hPT662go9tMj2PbyWEL0mU0U+UI0XPWkA770ldYI9+u3rvY4G8Lw738+9escpPgMJSr5oIuy9vJaQvT7oGb7KVME8W9N8vh04Zz5jf1m+KhQIAhABQgRiaWFzSgjLoUU+w2QqPVoXCgVpbnB1dBIOCgwIARIICgIIAQoCCBBiGAoGb3V0cHV0Eg4KDAgBEggKAggBCgIIAkICEBE</ONNX_Modelfile>

@@ -10,7 +10,6 @@
 
 #include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
-#include <alignment/Hierarchy.h>
 #include <framework/geometry/B2Vector3.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
@@ -31,7 +30,7 @@ AlignableBKLMRecoHit::AlignableBKLMRecoHit(const KLMHit2d* hit, const genfit::Tr
   const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
   m_KLMModule = elementNumbers->moduleNumberBKLM(section, sector, m_Layer);
 
-  bklm::GeometryPar* m_GeoPar = Belle2::bklm::GeometryPar::instance();
+  const bklm::GeometryPar* m_GeoPar = Belle2::bklm::GeometryPar::instance();
   m_Module = m_GeoPar->findModule(section, sector, m_Layer);
 
   //+++ global coordinates of the hit
@@ -163,7 +162,6 @@ std::pair<std::vector<int>, TMatrixD> AlignableBKLMRecoHit::globalDerivatives(co
   return alignment::GlobalDerivatives(labGlobal, derGlobal);
 
 }
-
 
 
 

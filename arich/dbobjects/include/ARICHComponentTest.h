@@ -110,7 +110,7 @@ namespace Belle2 {
     void setComponentTestComment(const std::string& comment) {m_comment = comment; }
 
   private:
-    int m_id;                    /**< Test Identfier */
+    int m_id;                    /**< Test Identifier */
     std::string m_componentID;   /**< Component identifier */
     TTimeStamp  m_timeStamp;     /**< Date of test measurement */
     int m_type;                  /**< Measurement type */

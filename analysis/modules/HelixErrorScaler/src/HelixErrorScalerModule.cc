@@ -14,8 +14,8 @@
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/B2Vector3.h>
 
+#include <TMath.h>
 #include <Math/Vector3D.h>
 #include <vector>
 
@@ -43,6 +43,7 @@ The module also accepts a V0 Kshort particle list as input and applies the error
 Note the difference in impact parameter resolution between V0 daughters and tracks from IP,
 as V0 daughters are free from multiple scattering through the beam pipe.
      )DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("inputListName", m_inputListName, "The name of input particle list (charged stable or V0 Kshort)", std::string(""));
@@ -203,7 +204,7 @@ std::vector<double> HelixErrorScalerModule::getScaleFactors(const Particle* part
   if (trkfit->getHitPatternVXD().getNPXDHits() > 0) {
 
     // d0, z0 resolution = a (+) b / pseudo-momentum
-    B2Vector3D p = particle->getMomentum();
+    ROOT::Math::XYZVector p = particle->getMomentum();
     double sinTheta = TMath::Sin(p.Theta());
     double pD0 = p.Mag2() / (particle->getEnergy()) * TMath::Power(sinTheta, 1.5); // p*beta*sinTheta**1.5
     double pZ0 = pD0 * sinTheta; // p*beta*sinTheta**2.5

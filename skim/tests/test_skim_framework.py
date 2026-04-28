@@ -65,7 +65,7 @@ class TestSkimRegistry(unittest.TestCase):
             self.assertFalse(
                 name.startswith("Base"),
                 (
-                    f"Invalid skim name in registry: {name}. Registed skim names cannot"
+                    f"Invalid skim name in registry: {name}. Registered skim names cannot"
                     " begin with 'Base'; this word is reserved for subclassing purposes."
                 ),
             )
@@ -116,6 +116,8 @@ class TestSkimRegistry(unittest.TestCase):
 
             SkimModule = import_module(f"skim.WGs.{ModuleName}")
             for SkimName in Registry.get_skims_in_module(ModuleName):
+                if "_invalid" in SkimName:
+                    continue
                 # Check the skim is defined in the module
                 self.assertIn(
                     SkimName,
@@ -194,7 +196,7 @@ class TestSkimValidation(unittest.TestCase):
         SkimsWithValidationMethod = [
             skim
             for skim in Registry.names
-            if skim[:2] != "f_" and not Registry.get_skim_function(skim)()._method_unchanged(
+            if (skim[:2] != "f_") and ("_invalid" not in skim) and not Registry.get_skim_function(skim)()._method_unchanged(
                 "validation_histograms"
             )
         ]
@@ -230,7 +232,7 @@ class TestSkimValidation(unittest.TestCase):
         Check that all ``validation_sample`` attributes of skims point to existing files.
         """
         for skim in Registry.names:
-            if skim[:2] == "f_":
+            if (skim[:2] == "f_") or ("_invalid" in skim):
                 continue
 
             SkimObject = Registry.get_skim_function(skim)()

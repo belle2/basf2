@@ -9,7 +9,6 @@
 #include <tracking/dataobjects/ExtHit.h>
 
 #include <TMatrixD.h>
-#include <TMatrixDSym.h>
 
 #include <cmath>
 
@@ -18,12 +17,12 @@ using namespace Belle2;
 // empty constructor for ROOT - do not use this
 ExtHit::ExtHit() :
   RelationsObject(),
+  m_TOF(0.0),
   m_PdgCode(0),
   m_DetectorID(Const::EDetector::invalidDetector),
   m_CopyID(0),
   m_Status(EXT_FIRST),
-  m_BackwardPropagation(false),
-  m_TOF(0.0)
+  m_BackwardPropagation(false)
 {
   m_Position[0] = 0.0;
   m_Position[1] = 0.0;
@@ -37,15 +36,15 @@ ExtHit::ExtHit() :
 }
 
 // Constructor with initial values
-ExtHit::ExtHit(int pdgCode, Const::EDetector detectorID, int copyID, ExtHitStatus status, bool backwardPropagation, double tof,
+ExtHit::ExtHit(double tof, int pdgCode, Const::EDetector detectorID, int copyID, ExtHitStatus status, bool backwardPropagation,
                const ROOT::Math::XYZPoint& position, const ROOT::Math::XYZVector& momentum, const TMatrixDSym& covariance) :
   RelationsObject(),
+  m_TOF(tof),
   m_PdgCode(pdgCode),
   m_DetectorID(detectorID),
   m_CopyID(copyID),
   m_Status(status),
-  m_BackwardPropagation(backwardPropagation),
-  m_TOF(tof)
+  m_BackwardPropagation(backwardPropagation)
 {
   m_Position[0] = position.X();
   m_Position[1] = position.Y();
@@ -62,15 +61,15 @@ ExtHit::ExtHit(int pdgCode, Const::EDetector detectorID, int copyID, ExtHitStatu
 }
 
 // Constructor with initial values
-ExtHit::ExtHit(int pdgCode, Const::EDetector detectorID, int copyID, ExtHitStatus status, bool backwardPropagation, double tof,
+ExtHit::ExtHit(double tof, int pdgCode, Const::EDetector detectorID, int copyID, ExtHitStatus status, bool backwardPropagation,
                const G4ThreeVector& position, const G4ThreeVector& momentum, const G4ErrorSymMatrix& covariance) :
   RelationsObject(),
+  m_TOF(tof),
   m_PdgCode(pdgCode),
   m_DetectorID(detectorID),
   m_CopyID(copyID),
   m_Status(status),
-  m_BackwardPropagation(backwardPropagation),
-  m_TOF(tof)
+  m_BackwardPropagation(backwardPropagation)
 {
   m_Position[0] = position.x();
   m_Position[1] = position.y();
@@ -89,11 +88,11 @@ ExtHit::ExtHit(int pdgCode, Const::EDetector detectorID, int copyID, ExtHitStatu
 // Copy constructor
 ExtHit::ExtHit(const ExtHit& h) :
   RelationsObject(h),
+  m_TOF(h.m_TOF),
   m_PdgCode(h.m_PdgCode),
   m_DetectorID(h.m_DetectorID),
   m_CopyID(h.m_CopyID),
-  m_Status(h.m_Status),
-  m_TOF(h.m_TOF)
+  m_Status(h.m_Status)
 {
   m_Position[0] = h.m_Position[0];
   m_Position[1] = h.m_Position[1];

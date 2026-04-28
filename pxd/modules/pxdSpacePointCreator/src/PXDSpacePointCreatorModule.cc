@@ -7,10 +7,12 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdSpacePointCreator/PXDSpacePointCreatorModule.h>
+#include <pxd/dataobjects/PXDCluster.h>
+
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 #include <framework/logging/Logger.h>
-
-
 
 
 using namespace std;
@@ -35,7 +37,7 @@ PXDSpacePointCreatorModule::PXDSpacePointCreatorModule() :
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
-           "allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module",
+           "allows the user to set an identifier for this module. Useful if one wants to use several instances of that module",
            string("PXDSpacePoints"));
 }
 
@@ -108,7 +110,7 @@ void PXDSpacePointCreatorModule::event()
 
 void PXDSpacePointCreatorModule::terminate()
 {
-  B2DEBUG(10, "PXDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
+  B2DEBUG(10, "PXDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occurred instances:\n" <<
           "pxdClusters: " << m_TESTERPXDClusterCtr <<
           ", spacePoints: " << m_TESTERSpacePointCtr);
 }

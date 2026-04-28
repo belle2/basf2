@@ -46,8 +46,8 @@ TRGGRLMatchModule::TRGGRLMatchModule() : Module()
   setDescription("match CDC trigger tracks and ECL trigger clusters");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("SimulationMode", m_simulationMode, "TRGGRL simulation switch", 1);
-  addParam("FastSimulationMode", m_fastSimulationMode, "TRGGRL fast simulation mode", m_fastSimulationMode);
-  addParam("FirmwareSimulationMode", m_firmwareSimulationMode, "TRGGRL firmware simulation mode", m_firmwareSimulationMode);
+  addParam("FastSimulationMode", m_fastSimulationMode, "TRGGRL fast simulation mode", 0);
+  addParam("FirmwareSimulationMode", m_firmwareSimulationMode, "TRGGRL firmware simulation mode", 0);
 
   addParam("DrMatch", m_dr_threshold, "the threshold of dr between track and cluster if they are matched successfully", 25.);
   addParam("DzMatch", m_dz_threshold, "the threshold of dz between track and cluster if they are matched successfully", 30.);
@@ -65,7 +65,8 @@ TRGGRLMatchModule::TRGGRLMatchModule() : Module()
   addParam("KLMmatchCollection", m_klmmatch_tracklist, "the 2d tracklist with associated KLM track",
            std::string("TRGKLMMatchTracks"));
   addParam("GRLphotonCollection", m_grlphotonlist, "the isolated cluster list", std::string("TRGGRLPhotons"));
-  addParam("hitCollectionName", m_hitCollectionName, "Name of the input StoreArray of CDCTriggerSegmentHits.", std::string(""));
+  addParam("hitCollectionName", m_hitCollectionName, "Name of the input StoreArray of CDCTriggerSegmentHits.",
+           std::string(""));
   addParam("TrgGrlInformation", m_TrgGrlInformationName,
            "Name of the StoreArray holding the information of tracks and clusters from cdc ecl klm.",
            std::string("TRGGRLObjects"));
@@ -303,7 +304,7 @@ void TRGGRLMatchModule::event()
     }
   }
 
-//pick up isolated clusters as photons with energy thrshold
+//pick up isolated clusters as photons with energy threshold
   for (int j = 0; j < clusterlist.getEntries(); j++) {
     if (photon_cluster(clusterlist[j], track_phimap, m_e_threshold)) {
       TRGGRLPHOTON* photon = grlphoton.appendNew();

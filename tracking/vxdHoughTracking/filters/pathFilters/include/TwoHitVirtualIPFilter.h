@@ -9,7 +9,6 @@
 
 #include <tracking/vxdHoughTracking/filters/pathFilters/BasePathFilter.h>
 #include <tracking/vxdHoughTracking/filters/pathFilters/ThreeHitVariables.h>
-#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
@@ -24,7 +23,7 @@ namespace Belle2 {
       /// Returns NAN if m_threeHitVariables.getCosAngleRZSimple() of the hit triplet is smaller than m_cosRZCut
       /// Returns NAN if m_threeHitVariables.getCircleDistanceIP() of the hit triplet is larger than m_circleIPDistanceCut
       /// Returns 1/m_threeHitVariables.getCircleDistanceIP() else
-      TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;
+      TrackingUtilities::Weight operator()(const BasePathFilter::Object& pair) override;
       /// Expose the parameters.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
@@ -32,6 +31,9 @@ namespace Belle2 {
       void beginRun() override;
 
     private:
+      /// Construct empty ThreeHitVariables instance
+      ThreeHitVariables m_threeHitVariables;
+
       /// virtual IP vector
       B2Vector3D m_virtualIPPosition;
       /// cut for cosine in RZ between the two vectors (oHit - cHit) and (cHit - iHit)
@@ -39,10 +41,6 @@ namespace Belle2 {
       /// cut on the difference between circle radius and circle center position in the x-y plane
       /// to check if the track is compatible with passing through the IP
       double m_circleIPDistanceCut = 2.0;
-
-      /// Construct empty ThreeHitVariables instance
-      ThreeHitVariables m_threeHitVariables;
-
     };
 
   }

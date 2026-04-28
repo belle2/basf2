@@ -32,7 +32,7 @@ namespace Belle2 {
 
   public:
 
-    /// Contructor.
+    /// Constructor.
     TRGCDCJLUT(const std::string& name = "no_name");
 
     /// Copy constructor.

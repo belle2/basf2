@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 #include <array>
 #include <vector>
@@ -19,6 +19,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   bool sameSign(double n1, double n2, double n3, double n4)
@@ -98,9 +99,9 @@ AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(int lastLevel,
                                                      const XYSpans& ranges,
                                                      PrecisionUtil::PrecisionFunction precisionFunction)
   : QuadTreeProcessor(lastLevel, seedLevel, ranges)
-  , m_cosSinLookupTable(&getCosSinLookupTable())
-  , m_localOrigin(0.0, 0.0)
   , m_precisionFunction(precisionFunction)
+  , m_localOrigin(0.0, 0.0)
+  , m_cosSinLookupTable(&getCosSinLookupTable())
 {
   m_twoSidedPhaseSpace = m_quadTree->getYMin() * m_quadTree->getYMax() < 0;
 }
@@ -109,8 +110,8 @@ AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(const Vector2D& localOrigin
                                                      const YSpan& curvSpan,
                                                      const LookupTable<Vector2D>* cosSinLookupTable)
   : QuadTreeProcessor(0, 0, { {0, cosSinLookupTable->getNPoints() - 1}, curvSpan})
-, m_cosSinLookupTable(cosSinLookupTable)
 , m_localOrigin(localOrigin)
+, m_cosSinLookupTable(cosSinLookupTable)
 {
   // Never use two sided mode in off origin extension
   m_twoSidedPhaseSpace = false;
@@ -313,12 +314,12 @@ void AxialHitQuadTreeProcessor::drawHits(std::vector<const CDCWireHit*> hits, un
   TCanvas* canv = new TCanvas("canv", "legendre transform", 0, 0, 1200, 600);
   canv->cd(1);
   TGraph* dummyGraph = new TGraph();
-  dummyGraph->SetPoint(1, -3.1415, 0);
-  dummyGraph->SetPoint(2, 3.1415, 0);
+  dummyGraph->SetPoint(1, -M_PI, 0);
+  dummyGraph->SetPoint(2, M_PI, 0);
   dummyGraph->Draw("AP");
   dummyGraph->GetXaxis()->SetTitle("#theta");
   dummyGraph->GetYaxis()->SetTitle("#rho");
-  dummyGraph->GetXaxis()->SetRangeUser(-3.1415, 3.1415);
+  dummyGraph->GetXaxis()->SetRangeUser(-M_PI, M_PI);
   dummyGraph->GetYaxis()->SetRangeUser(-0.02, 0.15);
 
   for (const CDCWireHit* wireHit : hits) {
@@ -328,8 +329,8 @@ void AxialHitQuadTreeProcessor::drawHits(std::vector<const CDCWireHit*> hits, un
     double y = pos2D.y();
     double r2 = pos2D.normSquared() - l * l;
 
-    TF1* concaveHitLegendre = new TF1("concaveHitLegendre", "2*([0]/[3])*cos(x) + 2*([1]/[3])*sin(x) + 2*([2]/[3])", -3.1415, 3.1415);
-    TF1* convexHitLegendre = new TF1("convexHitLegendre", "2*([0]/[3])*cos(x) + 2*([1]/[3])*sin(x) - 2*([2]/[3])", -3.1415, 3.1415);
+    TF1* concaveHitLegendre = new TF1("concaveHitLegendre", "2*([0]/[3])*cos(x) + 2*([1]/[3])*sin(x) + 2*([2]/[3])", -M_PI, M_PI);
+    TF1* convexHitLegendre = new TF1("convexHitLegendre", "2*([0]/[3])*cos(x) + 2*([1]/[3])*sin(x) - 2*([2]/[3])", -M_PI, M_PI);
     concaveHitLegendre->SetLineWidth(1);
     convexHitLegendre->SetLineWidth(1);
     concaveHitLegendre->SetLineColor(color);

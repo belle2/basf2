@@ -265,12 +265,18 @@ namespace Belle2 {
     /**
      * Returns the name the anti-particle ParticleList.
      */
-    std::string getAntiParticleListName() const { return m_antiListName; }
+    std::string getAntiParticleListName() const
+    {
+      return m_antiListName;
+    }
 
     /**
      * Returns the name this ParticleList.
      */
-    std::string getParticleListName() const { return m_thisListName; }
+    std::string getParticleListName() const
+    {
+      return m_thisListName;
+    }
 
     /**
      * Returns total number of particles in this list and anti list if requested
@@ -290,11 +296,20 @@ namespace Belle2 {
 
     /**
      * Returns the particle from the list matching the given mdst array index, if any is found.
+     * WARNING:: It is recommended to use getParticleWithMdstSouce instead of this function for safety.
      * @param mdstIdx mdst array index
      * @param includingAntiList consider anti-particle list as well?
      * @return pointer to Particle or NULL if no match is found.
      */
     Particle* getParticleWithMdstIdx(unsigned int mdstIdx, bool includingAntiList = true) const;
+
+    /**
+     * Returns the particle from the list matching the given mdst source, if any is found.
+     * @param mdstSource mdst source id
+     * @param includingAntiList consider anti-particle list as well?
+     * @return pointer to Particle or NULL if no match is found.
+     */
+    Particle* getParticleWithMdstSource(int mdstSource, bool includingAntiList = true) const;
 
     /**
      * Returns the number of flavor-specific particles or self-conjugated particles in this list or its anti-particle list
@@ -368,9 +383,18 @@ namespace Belle2 {
 
     int m_pdg;                   /**< PDG code of Particle */
     int m_pdgbar;                /**< PDG code of antiparticle */
-    std::vector<int> m_fsList;   /**< list of 0-based indices of flavor-specific Particles (particles that have an anti-particle) */
-    std::vector<int>
-    m_scList;   /**< list of 0-based indices of self-conjugated Particles (particles that do not have an anti-particle) */
+
+    /**
+     * List of 0-based indices of flavor-specific Particles (particles that
+     * have an anti-particle).
+     */
+    std::vector<int> m_fsList;
+
+    /**
+     * List of 0-based indices of self-conjugated Particles (particles that
+     * do not have an anti-particle).
+     */
+    std::vector<int> m_scList;
 
     std::string m_particleStore; /**< name of Particle store array */
 

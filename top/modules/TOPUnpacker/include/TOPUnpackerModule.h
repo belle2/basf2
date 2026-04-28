@@ -21,6 +21,8 @@
 #include <top/dataobjects/TOPTemplateFitResult.h>
 #include <top/dataobjects/TOPProductionEventDebug.h>
 #include <top/dataobjects/TOPProductionHitDebug.h>
+#include <top/dataobjects/TOPInjectionVeto.h>
+#include <top/dataobjects/TOPUnpackerErrors.h>
 #include <string>
 
 namespace Belle2 {
@@ -139,7 +141,7 @@ namespace Belle2 {
       /**
        * Swap bytes of a 32-bit integer
        */
-      int swap32(int x)
+      static int swap32(int x)
       {
         return (((x << 24) & 0xFF000000) |
                 ((x <<  8) & 0x00FF0000) |
@@ -171,11 +173,6 @@ namespace Belle2 {
     TOPUnpackerModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TOPUnpackerModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
@@ -198,18 +195,12 @@ namespace Belle2 {
      */
     virtual void endRun() override;
 
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
-
   private:
 
     /**
      * Expand 13-bit signed-word to 16-bit signed-word
      */
-    short expand13to16bits(unsigned short x) const
+    static short expand13to16bits(unsigned short x)
     {
       unsigned short signBit = x & 0x1000;
       return ((x & 0x1FFF) | signBit << 1 | signBit << 2 | signBit << 3);
@@ -219,7 +210,7 @@ namespace Belle2 {
     /**
      * sum both 16-bit words of 32-bit integer
      */
-    unsigned short sumShorts(unsigned int x) const
+    static unsigned short sumShorts(unsigned int x)
     {
       return x + (x >> 16);
     }
@@ -230,7 +221,15 @@ namespace Belle2 {
      * @param finesse finesse number
      * @return front-end name
      */
-    std::string getFrontEndName(RawTOP& raw, int finesse) const;
+    static std::string getFrontEndName(RawTOP& raw, int finesse);
+
+    /**
+     * Returns front-end number; this should be the same as the boardstack number within the TOP counted from 0.
+     * @param raw raw data
+     * @param finesse finesse number
+     * @return front-end number
+     */
+    static unsigned getFrontEndNumber(RawTOP& raw, int finesse);
 
     /**
      * Error messages suppression logic
@@ -269,7 +268,7 @@ namespace Belle2 {
      * @param swapBytes if true, swap bytes in buffer
      * @return true if buffer resembles interim format, false if not.
      */
-    bool unpackHeadersInterimFEVer01(const int* buffer, int bufferSize, bool swapBytes);
+    static bool unpackHeadersInterimFEVer01(const int* buffer, int bufferSize, bool swapBytes);
 
     /**
      * Unpack raw data given in production debugging format
@@ -277,9 +276,10 @@ namespace Belle2 {
      * @param bufferSize buffer size
      * @param dataFormat data format
      * @param pedestalSubtracted true, if pedestal is subtracted in waveforms
+     * @param expNo experiment number
      * @return number of words remaining in data buffer
      */
-    int unpackProdDebug(const int* buffer, int bufferSize, TOP::RawDataType dataFormat, bool pedestalSubtracted);
+    int unpackProdDebug(const int* buffer, int bufferSize, TOP::RawDataType dataFormat, bool pedestalSubtracted, int expNo);
 
     // module steering parameters
 
@@ -288,7 +288,7 @@ namespace Belle2 {
     std::string m_outputRawDigitsName;  /**< name of TOPRawDigit store array */
     std::string m_outputWaveformsName;  /**< name of TOPRawWaveform store array */
     std::string m_templateFitResultName; /**< name of TOPTemplateFitResult store array */
-    bool m_swapBytes;  /**< if true, swap bytes */
+    bool m_swapBytesDefault;  /**< if true, swap bytes (default by module parameter) */
     int m_dataFormat;  /**< data format */
     bool m_addRelations;  /**< switch ON/OFF relations to TOPProductionHitDebugs */
     unsigned m_errorSuppressFactor; /**< error messages suppression factor */
@@ -300,19 +300,23 @@ namespace Belle2 {
     StoreArray<TOPRawDigit> m_rawDigits;   /**< collection of raw digits */
     StoreArray<TOPSlowData> m_slowData;   /**< collection of slow data */
     StoreArray<TOPRawWaveform> m_waveforms;   /**< collection of waveforms */
-    StoreArray<TOPInterimFEInfo> m_interimFEInfos;   /**< collection of interim informations */
+    StoreArray<TOPInterimFEInfo> m_interimFEInfos;   /**< collection of interim information */
     StoreArray<TOPProductionEventDebug> m_productionEventDebugs;   /**< collection of event debug data */
     StoreArray<TOPProductionHitDebug> m_productionHitDebugs;   /**< collection of hit debug data */
     StoreArray<TOPTemplateFitResult> m_templateFitResults;   /**< collection of template fit results */
+    StoreObjPtr<TOPInjectionVeto> m_injectionVeto; /**< injection veto flag */
+    StoreObjPtr<TOPUnpackerErrors> m_unpackerErrors; /**< unpacker error flags */
 
     // other
 
+    bool m_swapBytes = false;  /**< if true, swap bytes (used in unpacking) */
     unsigned m_eventCount = 0;    /**< event count since last printed error message */
     unsigned m_errorCount = 0;    /**< error messages count within single event */
     bool m_resetEventCount = false; /**< request for event count reset */
     unsigned m_numErrors = 0; /**< number of error messages per event */
     TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance(); /**< geometry param */
     std::map<int, int> m_channelStatistics; /**<counts how many different channels have been parsed in a given SCROD packet */
+    unsigned m_BS = 0; /**< temporary boardstack number within the TOP detector */
 
   };
 

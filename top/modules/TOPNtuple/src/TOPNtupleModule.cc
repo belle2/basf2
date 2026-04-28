@@ -61,10 +61,6 @@ namespace Belle2 {
 
   }
 
-  TOPNtupleModule::~TOPNtupleModule()
-  {
-  }
-
   void TOPNtupleModule::initialize()
   {
     TDirectory::TContext context;
@@ -118,10 +114,6 @@ namespace Belle2 {
     barHits.isOptional();
     StoreObjPtr<MCInitialParticles> mcInitialParticles;
     mcInitialParticles.isOptional();
-  }
-
-  void TOPNtupleModule::beginRun()
-  {
   }
 
   void TOPNtupleModule::event()
@@ -262,10 +254,6 @@ namespace Belle2 {
 
   }
 
-
-  void TOPNtupleModule::endRun()
-  {
-  }
 
   void TOPNtupleModule::terminate()
   {

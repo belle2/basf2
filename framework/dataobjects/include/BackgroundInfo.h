@@ -17,7 +17,7 @@
 namespace Belle2 {
 
   /**
-   * This class stores the information about what background was mixed or overlayed.
+   * This class stores the information about what background was mixed or overlaid.
    */
   class BackgroundInfo: public Mergeable {
 
@@ -133,7 +133,7 @@ namespace Belle2 {
     void setWrapAround(bool wrapAround) {m_wrapAround = wrapAround;}
 
     /**
-     * Set maximal alowed energy deposited in ECL to use BG events
+     * Set maximal allowed energy deposited in ECL to use BG events
      * @param maxEdepECL energy cut [GeV]
      */
     void setMaxEdepECL(double maxEdepECL) {m_maxEdepECL = maxEdepECL;}
@@ -215,7 +215,7 @@ namespace Belle2 {
     bool getWrapAround() const {return m_wrapAround;}
 
     /**
-     * Returns maximal alowed energy deposited in ECL to use BG events
+     * Returns maximal allowed energy deposited in ECL to use BG events
      * @return energy cut [GeV]
      */
     double getMaxEdepECL() const {return m_maxEdepECL;}

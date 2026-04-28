@@ -40,7 +40,7 @@ namespace Belle2 {
     //   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
     addParam("DebugLevel", _debugLevel, "TRGECL debug level", _debugLevel);
-    addParam("Clustering", _Clustering, "TRGECL Clustering method  0 : use only ICN, 1 : ICN + Energy(Defult)", _Clustering);
+    addParam("Clustering", _Clustering, "TRGECL Clustering method  0 : use only ICN, 1 : ICN + Energy(Default)", _Clustering);
 
 
 

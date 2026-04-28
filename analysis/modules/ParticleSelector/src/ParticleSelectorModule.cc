@@ -65,7 +65,7 @@ void ParticleSelectorModule::initialize()
   // An exception is made for the gamma:all list. This can be limited to photons from the ECL only.
   if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(pdgCode))) and listLabel == "all") {
     if (abs(pdgCode) == Const::photon.getPDGCode() and m_cutParameter == "isFromECL")
-      m_exceptionForGammaAll = true;
+      m_allowRemovalOfFSParticles = true;
     else
       B2FATAL("You are trying to apply a cut on the list " << m_listName <<
               " but the label 'all' is protected for lists of final-state particles." <<
@@ -74,6 +74,9 @@ void ParticleSelectorModule::initialize()
     // the label V0 is also protected
     B2FATAL("You are trying to apply a cut on the list " << m_listName <<
             " but the label " << listLabel << " is protected and can not be reduced.");
+  } else if (abs(pdgCode) == Const::neutron.getPDGCode()) {
+    // neutron particle lists get an exception since no all list is filled for them
+    m_allowRemovalOfFSParticles = true;
   }
 
   m_particleList.isRequired(m_listName);
@@ -86,7 +89,7 @@ void ParticleSelectorModule::initialize()
 
 void ParticleSelectorModule::event()
 {
-  if (m_exceptionForGammaAll)
+  if (m_allowRemovalOfFSParticles)
     m_particleList->setEditable(true);
 
   // loop over list only if cuts should be applied
@@ -100,6 +103,6 @@ void ParticleSelectorModule::event()
     m_particleList->removeParticles(toRemove);
   }
 
-  if (m_exceptionForGammaAll)
+  if (m_allowRemovalOfFSParticles)
     m_particleList->setEditable(false);
 }

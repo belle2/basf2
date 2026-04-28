@@ -7,10 +7,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/ClusterPreparer.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 ClusterPreparer::ClusterPreparer()
 {

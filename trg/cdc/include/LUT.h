@@ -36,7 +36,7 @@ namespace Belle2 {
 
   public:
 
-    /// Contructor.
+    /// Constructor.
     TRGCDCLUT();
 
     /// Destructor

@@ -43,17 +43,17 @@ args = parser.parse_args()
 dataset_type = '*'
 if args.dataset:
     dataset_type = args.dataset
-    print(f'Cheking {dataset_type}')
+    print(f'Checking {dataset_type}')
     print('')
 else:
-    print('Cheking both Data and MC')
+    print('Checking both Data and MC')
 
 base_path = f'{args.path}/{dataset_type}/skim/'
 
 valueLIM = 2.5
 if args.MAXEventCPUTime:
     valueLIM = args.MAXEventCPUTime
-print('Looking for JSONs with ExpectedEventCPUTime > {valueLIM}')
+print(f'Looking for JSONs with ExpectedEventCPUTime > {valueLIM}')
 
 json_path = f'{base_path}*/*/*/*.json'
 if args.skim:

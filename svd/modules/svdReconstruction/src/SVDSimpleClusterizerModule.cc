@@ -267,7 +267,7 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   //depending on the algorithm, time contains different information:
   //6-sample CoG (0): this is the calibrated time already
   //3-sample CoG (1) or ELS (2) this is the raw time, you need to calibrate:
-  //It is possile to get the uncalibrated 3-sample raw time here
+  //It is possible to get the uncalibrated 3-sample raw time here
   //to get the 6-sample raw time there is an option in SVDCoGTimeEstimatorModule
   float caltime = time;
   if (m_timeAlgorithm == 1 and m_calibrate3SampleWithEventT0)

@@ -9,6 +9,8 @@
 #include "daq/expreco/EventServer.h"
 #include <framework/pcore/MsgHandler.h>
 
+#include <unistd.h>
+
 using namespace Belle2;
 using namespace std;
 

@@ -13,7 +13,6 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/Conversion.h>
 
 using namespace std;
 

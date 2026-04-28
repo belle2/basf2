@@ -143,7 +143,7 @@ namespace Belle2 {
     /** Get the filename this object is loaded from */
     const std::string& getFilename() const { ensureAttached(); return m_entry->getFilename(); }
 
-    /** Check wether this conditions object has some intra-run dependencies. */
+    /** Check whether this conditions object has some intra-run dependencies. */
     bool isIntraRunDependent() const { ensureAttached(); return m_entry->isIntraRunDependent(); }
 
     /**

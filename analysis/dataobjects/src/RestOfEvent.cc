@@ -12,12 +12,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <analysis/dataobjects/Particle.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-
-#include <analysis/ClusterUtility/ClusterUtils.h>
 
 using namespace Belle2;
 // New methods:

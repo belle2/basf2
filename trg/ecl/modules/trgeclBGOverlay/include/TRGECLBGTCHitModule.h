@@ -28,7 +28,7 @@ namespace Belle2 {
 
     /** Destructor */
     virtual ~TRGECLBGTCHitModule();
-    /** Initilizes TRGECLBGTCHitModule. */
+    /** Initializes TRGECLBGTCHitModule. */
     virtual void initialize() override;
     /** Called when new run started.*/
     virtual void beginRun() override;
@@ -46,29 +46,29 @@ namespace Belle2 {
 
   private: /** Parameters*/
 
-    // generate simulation TCHit data objection
+    /// generate simulation TCHit data objection
     void genSimulationObj();
-    // generate random trigger data TCHit data objection
+    /// generate random trigger data TCHit data objection
     void genRandomTrgObj();
-    // TC energy cut (GeV)
+    /// TC energy cut (GeV)
     double m_TCEnergyCut;
-    // TC timing cut (ns) for lower timing
+    /// TC timing cut (ns) for lower timing
     double m_TCTimingCutLow;
-    // TC timing cut (ns) for high timing
+    /// TC timing cut (ns) for high timing
     double m_TCTimingCutHigh;
-    // Debug level
+    /// Debug level
     int m_debugLevel;
 
   protected:
 
   private:
-    // hardware configuration
+    /// hardware configuration
     TrgEclMapping* m_TCMap;
-    // ECL data object
+    /// ECL data object
     StoreArray<ECLHit> m_eclHits;
-    // ecl trigger ETM dataobject
+    /// ecl trigger ETM dataobject
     StoreArray<TRGECLUnpackerStore> m_trgeclUnpackerStores;
-    // ecl trigger BG TC dataobject
+    /// ecl trigger BG TC dataobject
     StoreArray<TRGECLBGTCHit> m_trgeclBGTCHits;
   };
 

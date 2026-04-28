@@ -40,13 +40,9 @@ UpdateParticleTrackCandModule::UpdateParticleTrackCandModule() : Module()
   addParam("removeBKLM", m_removeBKLM, "Remove BKLM hits from TrackCand?", bool(false));
 }
 
-void UpdateParticleTrackCandModule::initialize()
-{
-}
-
 void UpdateParticleTrackCandModule::event()
 {
-  for (auto listName : m_motherListNames) {
+  for (const auto& listName : m_motherListNames) {
     StoreObjPtr<ParticleList> list(listName);
     auto listSize = list->getListSize(false);
     for (unsigned int iParticle = 0; iParticle < listSize; ++iParticle) {
@@ -86,6 +82,4 @@ void UpdateParticleTrackCandModule::event()
     }
   }
 }
-
-
 

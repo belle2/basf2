@@ -11,6 +11,7 @@
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
+#include <mdst/dataobjects/Kink.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -32,7 +33,7 @@
 #include <TMatrixFSym.h>
 #include <Math/Boost.h>
 
-#include <iostream>
+#include <cmath>
 #include <iomanip>
 #include <stdexcept>
 #include <queue>
@@ -44,7 +45,8 @@ using namespace ROOT::Math;
 
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(nan("")), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0),
+  m_pValue(nan("")), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0),
+  m_properties(0),
   m_arrayPointer(nullptr)
 {
   resetErrorMatrix();
@@ -53,7 +55,8 @@ Particle::Particle() :
 
 Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum, const int pdgCode) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0), m_properties(0),
+  m_arrayPointer(nullptr)
 {
   setFlavorType();
   set4Vector(momentum);
@@ -71,7 +74,7 @@ Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum,
                    const EParticleSourceObject source,
                    const unsigned mdstIndex) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(flavorType), m_particleSource(source), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(-1), m_flavorType(flavorType), m_particleSource(source), m_trackFitResultIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
   if (flavorType == c_Unflavored and pdgCode < 0)
     m_pdgCode = -pdgCode;
@@ -94,7 +97,7 @@ Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum,
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1),
   m_daughterIndices(daughterIndices),
-  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0),
+  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0),
   m_properties(0), m_arrayPointer(arrayPointer)
 {
   m_pdgCode = pdgCode;
@@ -128,7 +131,7 @@ Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum,
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1),
   m_daughterIndices(daughterIndices),
-  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0),
+  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0),
   m_arrayPointer(arrayPointer)
 {
   m_pdgCode = pdgCode;
@@ -165,7 +168,7 @@ Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum,
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1),
   m_daughterIndices(daughterIndices),
-  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0),
+  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0),
   m_daughterProperties(daughterProperties),
   m_arrayPointer(arrayPointer)
 {
@@ -201,7 +204,8 @@ Particle::Particle(const int trackArrayIndex,
                    const TrackFitResult* trackFit,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0), m_properties(0),
+  m_arrayPointer(nullptr)
 {
   if (!trackFit) return;
 
@@ -220,6 +224,33 @@ Particle::Particle(const int trackArrayIndex,
 
   // set momentum, position and error matrix
   setMomentumPositionErrorMatrix(trackFit);
+}
+
+Particle::Particle(const Kink* kink, const Const::ChargedStable& chargedStable, const unsigned trackFitResultIndex) :
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_trackFitResultIndex(0), m_properties(0),
+  m_arrayPointer(nullptr)
+{
+  if (!kink) return;
+
+  m_flavorType = c_Flavored;
+  m_particleSource = c_Kink;
+
+  setMdstArrayIndex(kink->getArrayIndex());
+  m_trackFitResultIndex = trackFitResultIndex;
+
+  StoreArray<TrackFitResult> trackFitResults{};
+  const TrackFitResult* particleTrackFitResult = trackFitResults[m_trackFitResultIndex];
+
+  m_pdgCode = generatePDGCodeFromCharge(particleTrackFitResult->getChargeSign(), chargedStable);
+
+  // set mass
+  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
+    B2FATAL("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
+  m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
+
+  // set momentum, position and error matrix
+  setMomentumPositionErrorMatrix(particleTrackFitResult);
 }
 
 Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type) :
@@ -634,7 +665,7 @@ const Particle* Particle::getDaughter(unsigned i) const
   return static_cast<Particle*>(getArrayPointer()->At(m_daughterIndices[i]));
 }
 
-std::vector<Belle2::Particle*> Particle::getDaughters() const
+std::vector<Particle*> Particle::getDaughters() const
 {
   const unsigned int nDaughters = getNDaughters();
   std::vector<Particle*> daughters(nDaughters);
@@ -646,7 +677,7 @@ std::vector<Belle2::Particle*> Particle::getDaughters() const
   return daughters;
 }
 
-std::vector<const Belle2::Particle*> Particle::getFinalStateDaughters() const
+std::vector<const Particle*> Particle::getFinalStateDaughters() const
 {
   std::vector<const Particle*> fspDaughters;
   fillFSPDaughters(fspDaughters);
@@ -654,7 +685,7 @@ std::vector<const Belle2::Particle*> Particle::getFinalStateDaughters() const
   return fspDaughters;
 }
 
-std::vector<const Belle2::Particle*> Particle::getAllDaughters() const
+std::vector<const Particle*> Particle::getAllDaughters() const
 {
   std::vector<const Particle*> allDaughters;
   fillAllDaughters(allDaughters);
@@ -784,6 +815,26 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
 
   } else if (this->getMdstSource() != oParticle->getMdstSource() and !doDetailedComparison) {
     // has no daughters: it's a FSP, compare MDST source and index
+    // Check if this or compared particle is a kink. If so, check that the particle is not a copy of daughter or mother.
+    // For consistency, return true if the daughter or mother is a copy of the target particle.
+    if (this->getParticleSource() == EParticleSourceObject::c_Kink &&
+        oParticle->getParticleSource() == EParticleSourceObject::c_Track) {
+      const Kink* kink = this->getKink();
+      const short motherTrackIndex = kink->getMotherTrackIndex();
+      const short daughterTrackIndex = kink->getDaughterTrackIndex();
+      const short trackIndex = oParticle->getTrack()->getArrayIndex();
+      if (trackIndex == motherTrackIndex || trackIndex == daughterTrackIndex)
+        return true;
+    }
+    if (this->getParticleSource() == EParticleSourceObject::c_Track &&
+        oParticle->getParticleSource() == EParticleSourceObject::c_Kink) {
+      const Kink* kink = oParticle->getKink();
+      const short motherTrackIndex = kink->getMotherTrackIndex();
+      const short daughterTrackIndex = kink->getDaughterTrackIndex();
+      const short trackIndex = this->getTrack()->getArrayIndex();
+      if (trackIndex == motherTrackIndex || trackIndex == daughterTrackIndex)
+        return true;
+    }
     return false;
   }
   // Stop here if we do not want a detailed comparison
@@ -805,6 +856,26 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
     return this->getMCParticle() == oParticle->getMCParticle();
   }
   if (this->getParticleSource() != oParticle->getParticleSource()) {
+    // Check if this or compared particle is a kink. If so, check that the particle is not a copy of daughter or mother.
+    // For consistency, return true if the daughter or mother is a copy of the target particle.
+    if (this->getParticleSource() == EParticleSourceObject::c_Kink &&
+        oParticle->getParticleSource() == EParticleSourceObject::c_Track) {
+      const Kink* kink = this->getKink();
+      const short motherTrackIndex = kink->getMotherTrackIndex();
+      const short daughterTrackIndex = kink->getDaughterTrackIndex();
+      const short trackIndex = oParticle->getTrack()->getArrayIndex();
+      if (trackIndex == motherTrackIndex || trackIndex == daughterTrackIndex)
+        return true;
+    }
+    if (this->getParticleSource() == EParticleSourceObject::c_Track &&
+        oParticle->getParticleSource() == EParticleSourceObject::c_Kink) {
+      const Kink* kink = oParticle->getKink();
+      const short motherTrackIndex = kink->getMotherTrackIndex();
+      const short daughterTrackIndex = kink->getDaughterTrackIndex();
+      const short trackIndex = this->getTrack()->getArrayIndex();
+      if (trackIndex == motherTrackIndex || trackIndex == daughterTrackIndex)
+        return true;
+    }
     return false;
   }
   if (this->getMdstSource() == oParticle->getMdstSource()) {
@@ -855,14 +926,19 @@ const TrackFitResult* Particle::getTrackFitResult() const
 {
   // if the particle is related to a TrackFitResult then return this
   auto* selfrelated = this->getRelatedTo<TrackFitResult>();
-  if (selfrelated && !isnan(selfrelated->getPValue()))
+  if (selfrelated && !std::isnan(selfrelated->getPValue()))
     return selfrelated;
+
+  if (m_particleSource == c_Kink) {
+    StoreArray<TrackFitResult> trackFitResults{};
+    return trackFitResults[m_trackFitResultIndex];
+  }
 
   // if not get the TFR with closest mass to this particle
   auto* selftrack = this->getTrack();
   if (selftrack)
     return selftrack->getTrackFitResultWithClosestMass(
-             Belle2::Const::ChargedStable(std::abs(this->getPDGCode())));
+             Const::ChargedStable(std::abs(this->getPDGCode())));
 
   // otherwise we're probably not a track based particle
   return nullptr;
@@ -887,6 +963,15 @@ const V0* Particle::getV0() const
   }
 }
 
+const Kink* Particle::getKink() const
+{
+  if (m_particleSource == c_Kink) {
+    StoreArray<Kink> kinks{};
+    return kinks[m_mdstIndex];
+  } else {
+    return nullptr;
+  }
+}
 
 const ECLCluster* Particle::getECLCluster() const
 {
@@ -975,7 +1060,7 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
     // indexString is a string. First try to convert it into an int
     int dauIndex = 0;
     try {
-      dauIndex = Belle2::convertString<int>(indexString);
+      dauIndex = convertString<int>(indexString);
     } catch (std::invalid_argument&) {
       B2WARNING("Found the string " << indexString << "instead of a daughter index.");
       return nullptr;
@@ -1111,7 +1196,7 @@ void Particle::storeJacobiMatrix(const TMatrixF& m)
 }
 
 
-void Particle::fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const
+void Particle::fillFSPDaughters(std::vector<const Particle*>& fspDaughters) const
 {
   // this is FSP
   if (getNDaughters() == 0) {
@@ -1124,7 +1209,7 @@ void Particle::fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughte
     getDaughter(i)->fillFSPDaughters(fspDaughters);
 }
 
-void Particle::fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const
+void Particle::fillAllDaughters(std::vector<const Particle*>& allDaughters) const
 {
   // this is FSP
   if (getNDaughters() == 0)
@@ -1406,10 +1491,10 @@ std::pair<Const::ChargedStable, const TrackFitResult*> Particle::getMostLikelyTr
 
   // Find the track fit with the highest pValue
   auto trackFitResults = track->getTrackFitResults();
-  auto it_maxPValue = std::max_element(std::begin(trackFitResults), std::end(trackFitResults),
+  auto it_maxPValue = std::max_element(trackFitResults.begin(), trackFitResults.end(),
   [](auto tfrAndM1, auto tfrAndM2) {return tfrAndM1.second->getPValue() < tfrAndM2.second->getPValue();});
 
-  return trackFitResults[std::distance(std::begin(trackFitResults), it_maxPValue)];
+  return trackFitResults[std::distance(trackFitResults.begin(), it_maxPValue)];
 
 }
 

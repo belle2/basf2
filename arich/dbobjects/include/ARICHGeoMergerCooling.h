@@ -56,14 +56,14 @@ namespace Belle2 {
     const std::string& getMergerCoolingBodiesMaterialName() const { return m_mergerCoolingBodiesMaterialName; }
 
     /**
-     * Returns structur which holds apexes of the tessellation volumes for (merger cooling bodyes).
-     * @return structur which holds apexes of the tessellation volumes for (merger cooling bodyes).
+     * Returns structure which holds apexes of the tessellation volumes for (merger cooling bodyes).
+     * @return structure which holds apexes of the tessellation volumes for (merger cooling bodyes).
      */
     const tessellatedSolidStr getMergerCoolingBodiesInfo(unsigned int iSlot) const { if (iSlot > 12 || iSlot == 0) B2ERROR("ARICHGeoCoolingv2: invalid merger cooling bodies iSlot  number! "); return m_mergerCoolingBodiesInfo[iSlot - 1];}
 
     /**
-     * Returns structur which holds apexes of the tessellation volumes for (merger cooling bodyes).
-     * @return structur which holds apexes of the tessellation volumes for (merger cooling bodyes).
+     * Returns structure which holds apexes of the tessellation volumes for (merger cooling bodyes).
+     * @return structure which holds apexes of the tessellation volumes for (merger cooling bodyes).
      */
     const tessellatedSolidStr getMergerCoolingBodiesInfo_globalMergerID(unsigned int iMergerSlot) const;
 

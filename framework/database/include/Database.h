@@ -56,7 +56,7 @@ namespace Belle2 {
      * Reset the database instance.
      *
      * @param keepConfig if true the configuration object itself is not
-     *   resetted so that initializing the database again will result in the
+     *   reset so that initializing the database again will result in the
      *   same configuration as before. This is useful when running process
      *   multiple times.
      */

@@ -39,7 +39,7 @@ void RawFTSW::SetVersion()
   //
   // Assign unpacker
   //
-  // Special treatment is required because Nakao-san did not set verision number in ver.0,1, and 2 header.
+  // Special treatment is required because Nakao-san did not set version number in ver.0,1, and 2 header.
   // I'm using the size of header which is stored the 1st word (0,1,..)
   //
   int temp_version = m_version;
@@ -109,7 +109,7 @@ void RawFTSW::SetBuffer(int* bufin, int nwords, int delete_flag, int num_events,
 
   if (bufin == NULL) {
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] bufin is NULL. Exting...\n");
+    sprintf(err_buf, "[FATAL] bufin is NULL. Exiting...\n");
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf);
   }

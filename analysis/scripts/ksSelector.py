@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -61,15 +60,76 @@ def add_variable_collection():
         'M_lambda_p', 'M_lambda_antip',
         'pip_p', 'pin_p',
         'pip_cosTheta', 'pin_cosTheta',
+        'ArmenterosLongitudinalMomentumAsymmetry',
+        'ArmenterosDaughter1Qt',
+        'ArmenterosDaughter2Qt'
     ]
     utils.add_collection(inputVariablesList, 'ks_selector_info')
 
 
+def LightGBM2ONNX(dumping_file_name,
+                  output_file_name,
+                  input_variable_list
+                  ):
+    """
+    Convert trained LightGBM payload to onnx format. Only work for (binary or regression) loss
+    @param dumping_file_name            file name for trained LightGBM payload
+    @param output_file_name             file name for output onnx payload
+    @param input_variable_list          model input variables list
+
+    """
+    import pickle
+    import base64
+    import ROOT
+    import basf2_mva_python_interface.lightgbm
+
+    with ROOT.TFile(dumping_file_name) as f:
+        w = ROOT.Belle2.MVA.Weightfile.loadFromStream(ROOT.stringstream(f.Get("Weightfile").m_data))
+
+    with open("temp_scripts.py", "w") as f:
+        f.write(pickle.loads(base64.b64decode(w.getElement["std::string"]("Python_Steeringfile")+"====")))
+
+    w.getFile("Python_Weightfile", "Python_Weightfile.pkl")
+
+    with open("temp_scripts.py") as f:
+        exec(f.read(), basf2_mva_python_interface.lightgbm.__dict__)
+
+    with open("Python_Weightfile.pkl", "rb") as f:
+        obj = pickle.load(f)
+        state = basf2_mva_python_interface.lightgbm.load(obj)
+        model = state.bst
+
+    from onnxmltools import convert_lightgbm
+    from onnxmltools.convert.common.data_types import FloatTensorType
+
+    num_features = len(input_variable_list)
+    initial_type = [('input', FloatTensorType([None, num_features]))]
+
+    onnx_model = convert_lightgbm(model, initial_types=initial_type)
+
+    with open("temp_model.onnx", "wb") as f:
+        f.write(onnx_model.SerializeToString())
+
+    from basf2_mva_util import create_onnx_mva_weightfile
+    weightfile = create_onnx_mva_weightfile(
+        "temp_model.onnx",
+        variables=input_variable_list,
+        target_variable="isSignal",
+    )
+    import os
+    os.remove("temp_model.onnx")
+    os.remove("Python_Weightfile.pkl")
+    os.remove("temp_scripts.py")
+    weightfile.save(output_file_name)
+
+
 def V0Selector_Training(
     train_data,
-    tree_name="tree",
+    tree_name="ntuple",
     mva_identifier="MVAFastBDT_V0Selector.root",
-    target_variable="isSignal"
+    target_variable="isSignal",
+    parameters={},
+    options={}
 ):
     """
     Defines the configuration of V0Selector Training.
@@ -79,6 +139,8 @@ def V0Selector_Training(
     @param tree_name                    Tree name for variables.
     @param mva_identifier               Name for output MVA weight file.
     @param target_variable              Target variable for MVA training.
+    @param parameters                   hyperparameter for LGBM
+    @param options                      MVA options
     """
     trainVars = [
         'cosVertexMomentum',
@@ -90,8 +152,7 @@ def V0Selector_Training(
         'decayAngle(1)',
         'daughterAngleDiffInMother',
         'daughtersDeltaZ',
-        'pip_nSVDHits', 'pip_nPXDHits',
-        'pin_nSVDHits', 'pin_nPXDHits',
+        'pip_nSVDHits', 'pin_nSVDHits',
         'pip_dr', 'pin_dr',
     ]
 
@@ -101,15 +162,49 @@ def V0Selector_Training(
     general_options.m_identifier = mva_identifier
     general_options.m_variables = basf2_mva.vector(*trainVars)
     general_options.m_target_variable = target_variable
-    fastbdt_options = basf2_mva.FastBDTOptions()
-    basf2_mva.teacher(general_options, fastbdt_options)
+    general_options.m_max_events = 0 if 'max_events' not in options else options['max_events']
+
+    python_options = basf2_mva.PythonOptions()
+    python_options.m_framework = "lightgbm"
+
+    import json
+    param = {'num_leaves': 256,
+             'learning_rate': 0.1,
+             'device_type': "cpu",
+             'deterministic': True,
+             'metric': 'auc',
+             'num_round': 100,
+             # 'stop_round' : 30,
+             'path': mva_identifier+'.txt',
+             'max_bin': 250,
+             'boosting': 'gbdt',
+             'trainFraction': 0.8,
+             'min_data_in_leaf': 4000,
+             'max_depth': 8,
+             'objective': 'cross_entropy',
+             'num_threads': 1
+             }
+    if isinstance(parameters, dict):
+        param.update(parameters)
+    config_string = json.dumps(param)
+    print("The json config string", config_string)
+    python_options.m_config = config_string
+
+    python_options.m_training_fraction = 1
+    python_options.m_normalize = False  # we do it inside MVA torch
+    python_options.m_nIterations = 1
+    python_options.m_mini_batch_size = 0
+
+    basf2_mva.teacher(general_options, python_options)
 
 
 def LambdaVeto_Training(
     train_data,
-    tree_name="tree",
+    tree_name="ntuple",
     mva_identifier="MVAFastBDT_LambdaVeto.root",
-    target_variable="isSignal"
+    target_variable="isSignal",
+    parameters={},
+    options={}
 ):
     """
     Defines the configuration of LambdaVeto Training.
@@ -119,25 +214,61 @@ def LambdaVeto_Training(
     @param tree_name                    Tree name for variables.
     @param mva_identifier               Name for output MVA weight file.
     @param target_variable              Target variable for MVA training.
+    @param parameters                   hyperparameter for LGBM
+    @param options                      MVA options
     """
     trainVars = [
         'pip_protonID',
         'pin_protonID',
         'M_lambda_p',
         'M_lambda_antip',
-        'pip_p',
-        'pin_p',
         'pip_cosTheta',
         'pin_cosTheta',
+        'ArmenterosLongitudinalMomentumAsymmetry',
+        'ArmenterosDaughter1Qt',
+        'ArmenterosDaughter2Qt'
     ]
+
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector(train_data)
     general_options.m_treename = tree_name
     general_options.m_identifier = mva_identifier
     general_options.m_variables = basf2_mva.vector(*trainVars)
     general_options.m_target_variable = target_variable
-    fastbdt_options = basf2_mva.FastBDTOptions()
-    basf2_mva.teacher(general_options, fastbdt_options)
+    general_options.m_max_events = 0 if 'max_events' not in options else options['max_events']
+
+    python_options = basf2_mva.PythonOptions()
+    python_options.m_framework = "lightgbm"
+
+    import json
+    param = {'num_leaves': 256,
+             'learning_rate': 0.2,
+             'device_type': "cpu",
+             'deterministic': True,
+             'metric': 'auc',
+             'num_round': 100,
+             # 'stop_round' : 30,
+             'path': mva_identifier+'.txt',
+             'max_bin': 250,
+             'boosting': 'dart',
+             'trainFraction': 0.8,
+             'min_data_in_leaf': 300,
+             'max_depth': 8,
+             'objective': 'cross_entropy',
+             'num_threads': 1
+             }
+    if isinstance(parameters, dict):
+        param.update(parameters)
+    config_string = json.dumps(param)
+    print("The json config string", config_string)
+    python_options.m_config = config_string
+
+    python_options.m_training_fraction = 1
+    python_options.m_normalize = False  # we do it inside MVA torch
+    python_options.m_nIterations = 1
+    python_options.m_mini_batch_size = 0
+
+    basf2_mva.teacher(general_options, python_options)
 
 # ****************************************
 # KS Selector MAIN FUNCTION
@@ -146,13 +277,13 @@ def LambdaVeto_Training(
 
 def ksSelector(
     particleListName,
-    identifier_Ks,
-    identifier_vLambda,
+    identifier_Ks="Ks_LGBM_V0Selector_MC16",
+    identifier_vLambda="Ks_LGBM_LambdaVeto_MC16",
     output_label_name='',
     extraInfoName_V0Selector='KsSelector_V0Selector',
     extraInfoName_LambdaVeto='KsSelector_LambdaVeto',
     useCustomThreshold=False,
-    threshold_V0Selector=0.90,
+    threshold_V0Selector=0.92,
     threshold_LambdaVeto=0.11,
     path=None
 ):
@@ -211,17 +342,20 @@ def ksSelector(
             V0_thr = 0
             Lambda_thr = 0
             if output_label_name == 'standard':
-                B2INFO('KsSelector: Standard Cut is applied on '+outputListName+'.')
-                V0_thr = 0.90
+                V0_thr = 0.92
                 Lambda_thr = 0.11
+                B2INFO('KsSelector: Standard Cut for MC16 is applied on '+outputListName+'.')
+
             elif output_label_name == 'tight':
-                B2INFO('KsSelector: Tight Cut is applied on '+outputListName+'.')
-                V0_thr = 0.96
-                Lambda_thr = 0.27
+                B2INFO('KsSelector: Tight Cut for MC16 is applied on '+outputListName+'.')
+                V0_thr = 0.98
+                Lambda_thr = 0.31
+
             elif output_label_name == 'loose':
-                B2INFO('KsSelector: Loose Cut is applied on '+outputListName+'.')
-                V0_thr = 0.49
+                B2INFO('KsSelector: Loose Cut for MC 16 is applied on '+outputListName+'.')
+                V0_thr = 0.43
                 Lambda_thr = 0.02
+
             B2INFO('KsSelector: Threshold is (' + str(V0_thr) + ', ' + str(Lambda_thr) + ')')
             cut_string = 'extraInfo('+extraInfoName_V0Selector+')>'+str(V0_thr) + \
                 ' and extraInfo('+extraInfoName_LambdaVeto+')>'+str(Lambda_thr)

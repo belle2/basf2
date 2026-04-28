@@ -17,7 +17,7 @@ d = datetime.datetime.today()
 print(d.strftime('job start: %Y-%m-%d %H:%M:%S\n'))
 
 print("Make a link to the input SAD files before running this steering script:")
-print("ln -s ~nakayama/[FIXME -> ask for the latest campaing] input")
+print("ln -s ~nakayama/[FIXME -> ask for the latest campaign] input")
 print("OR")
 print("Produce first the input SAD files before running this steering script:")
 print("Make a link to the input SAD files before running this steering script:")
@@ -195,7 +195,7 @@ main.add_module(sadinput)
 
 fullsim = b2.register_module('FullSim')
 fullsim.param('PhysicsList', 'FTFP_BERT_HP')
-fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
+fullsim.param('UICommandsAtIdle', ['/process/deactivate nKiller'])
 fullsim.param('StoreAllSecondaries', True)
 fullsim.param('SecondariesEnergyCut', 0.0)  # [MeV] need for CDC EB neutron flux
 main.add_module(fullsim)
@@ -299,9 +299,6 @@ else:
     add_output(main, bgType, realTime, sampleType, phase, outputfilename)
 
 b2.process(main)
-
-print('Event Statistics:')
-print(b2.statistics)
 
 d = datetime.datetime.today()
 print(d.strftime('job finish: %Y-%m-%d %H:%M:%S\n'))

@@ -64,7 +64,7 @@ void CopyRecoTracksWithOverlapModule::event()
         B2ERROR("No Track for particle.");
         continue;
       }
-      auto recoTrack = track->getRelatedTo<RecoTrack>();
+      const auto* recoTrack = track->getRelatedTo<RecoTrack>();
       if (!recoTrack) {
         B2ERROR("No RecoTrack for Track");
         continue;
@@ -73,7 +73,7 @@ void CopyRecoTracksWithOverlapModule::event()
       processRecoTrack(*recoTrack);
     }
   } else {
-    for (auto& recoTrack : m_RecoTracks)
+    for (const auto& recoTrack : m_RecoTracks)
       processRecoTrack(recoTrack);
   }
 }
@@ -84,17 +84,17 @@ void CopyRecoTracksWithOverlapModule::processRecoTrack(const RecoTrack& track)
   std::array<int, 6> nHitsInLayer = {0, 0, 0, 0, 0, 0};
 
   // PXD clusters
-  for (auto hit : track.getPXDHitList())
+  for (const auto* hit : track.getPXDHitList())
     ++nHitsInLayer.at(hit->getSensorID().getLayerNumber() - 1);
 
   // SVD clusters
-  for (auto hit : track.getSVDHitList())
+  for (const auto* hit : track.getSVDHitList())
     ++nHitsInLayer.at(hit->getSensorID().getLayerNumber() - 1);
 
   bool hasOverlap = false;
 
   // Let's be as explicit as possible here:
-  // NOTE: for SVD, U and V hits are stored separatelly in the RecoTrack.
+  // NOTE: for SVD, U and V hits are stored separately in the RecoTrack.
   //       Therefore double hit in a layer means 4 SVD clusters (at same layer)
   // NOTE: We ignore the possibility of curlers, non-2D SVD hits etc.
 
@@ -113,4 +113,3 @@ void CopyRecoTracksWithOverlapModule::processRecoTrack(const RecoTrack& track)
   }
 
 }
-

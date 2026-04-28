@@ -12,12 +12,12 @@
 #include <framework/core/Module.h>
 
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
-#include <framework/database/DBObjPtr.h>
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <string>
 
 namespace Belle2 {
+  class Particle;
+  template<class T> class DBObjPtr;
 
   /**
   * Adds Pi0Veto Efficiency Data/MC ratios To Particle List

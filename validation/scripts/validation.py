@@ -635,7 +635,7 @@ class Validation:
         """
         # Create the log and set its default level to DEBUG, which means that
         # it will store _everything_.
-        log = logging.getLogger("validate_basf2")
+        log = logging.getLogger("b2validation")
         log.setLevel(logging.DEBUG)
 
         # Now we add another custom level 'NOTE'. This is because we don't
@@ -674,7 +674,7 @@ class Validation:
 
         # Define the handler and its level (=DEBUG to get everything)
         file_handler = logging.FileHandler(
-            os.path.join(log_dir, "validate_basf2.log"), "w+"
+            os.path.join(log_dir, "b2validation.log"), "w+"
         )
         file_handler.setLevel(logging.DEBUG)
 
@@ -747,7 +747,7 @@ class Validation:
     def log_failed(self):
         """!
         This method logs all scripts with property failed into a single file
-        to be read in run_validation_server.py
+        to be read in b2validation-server
         """
 
         failed_log_path = os.path.join(
@@ -770,7 +770,7 @@ class Validation:
     def log_skipped(self):
         """!
         This method logs all scripts with property skipped into a single file
-        to be read in run_validation_server.py
+        to be read in b2validation-server
         """
 
         skipped_log_path = os.path.join(

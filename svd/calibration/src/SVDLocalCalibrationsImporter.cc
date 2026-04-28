@@ -42,7 +42,7 @@
 using namespace Belle2;
 using boost::property_tree::ptree;
 
-void SVDLocalCalibrationsImporter::importSVDChannelMapping(const std::string& fileName)
+void Belle2::SVDLocalCalibrationsImporter::importSVDChannelMapping(const std::string& fileName)
 {
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun, m_lastExperiment, m_lastRun);
@@ -57,7 +57,7 @@ void SVDLocalCalibrationsImporter::importSVDChannelMapping(const std::string& fi
 }
 
 
-void SVDLocalCalibrationsImporter::importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+void Belle2::SVDLocalCalibrationsImporter::importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
   // We do initialize the noise to a negative value so that
   // the SNR for not properly initialized channels is negative
@@ -71,21 +71,22 @@ void SVDLocalCalibrationsImporter::importSVDNoiseCalibrationsFromXML(const std::
       -1.0, errorTollerant);
 }
 
-void SVDLocalCalibrationsImporter::importSVDPedestalCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+void Belle2::SVDLocalCalibrationsImporter::importSVDPedestalCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
   importSVDCalibrationsFromXML< SVDPedestalCalibrations::t_payload  >(SVDPedestalCalibrations::name,
       xmlFileName, "pedestals",
       -1.0, errorTollerant);
 }
 
-void SVDLocalCalibrationsImporter::importSVDHotStripsCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+void Belle2::SVDLocalCalibrationsImporter::importSVDHotStripsCalibrationsFromXML(const std::string& xmlFileName,
+    bool errorTollerant)
 {
   importSVDCalibrationsFromXML< SVDHotStripsCalibrations::t_payload  >(SVDHotStripsCalibrations::name,
       xmlFileName, "hot_strips",
       false, errorTollerant);
 }
 
-void SVDLocalCalibrationsImporter::importSVDFADCMaskedStripsFromXML(const std::string& xmlFileName, bool errorTollerant)
+void Belle2::SVDLocalCalibrationsImporter::importSVDFADCMaskedStripsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
   importSVDCalibrationsFromXML< SVDFADCMaskedStrips::t_payload  >(SVDFADCMaskedStrips::name,
       xmlFileName, "masks",
@@ -96,7 +97,7 @@ void SVDLocalCalibrationsImporter::importSVDFADCMaskedStripsFromXML(const std::s
 
 
 template< class SVDcalibration >
-void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::string& condDbname,
+void Belle2::SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::string& condDbname,
     const std::string& xmlFileName,
     const std::string& xmlTag,
     typename SVDcalibration::t_perSideContainer::calibrationType defaultValue,
@@ -208,7 +209,7 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
 /****
  * HERE!
  */
-void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+void Belle2::SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
 
   DBImportObjPtr< typename SVDPulseShapeCalibrations::t_calAmp_payload > pulseShapes(SVDPulseShapeCalibrations::calAmp_name);

@@ -33,6 +33,10 @@ EventLimiterModule::EventLimiterModule() : Module()
            "It will only start returning True again once a new run begins. "
            "The default value (-1) means that this module always returns True regardless of how many events "
            "are processed in a run.", int(-1));
+
+  addParam("loadFromDB", m_loadFromDB,
+           "If true (default is false), maxEventsPerRun value will be "
+           "overriden by the EventLimit payload from the database", false);
 }
 
 void EventLimiterModule::initialize()
@@ -62,6 +66,10 @@ void EventLimiterModule::event()
 
 void EventLimiterModule::beginRun()
 {
+  if (m_loadFromDB && m_eventLimitFromDB.isValid()) {
+    m_maxEventsPerRun = m_eventLimitFromDB->getEventLimit();
+  }
+
   // Do we care about the number of events in each run?
   if (m_maxEventsPerRun > -1) {
     m_runEvents = 0;

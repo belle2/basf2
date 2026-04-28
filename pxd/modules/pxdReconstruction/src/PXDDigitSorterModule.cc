@@ -100,10 +100,12 @@ void PXDDigitSorterModule::event()
       continue;
     }
 
-    if (PXDPixelMasker::getInstance().pixelDead(storeDigit->getSensorID(), storeDigit->getUCellID(), storeDigit->getVCellID())
-        || !PXDPixelMasker::getInstance().pixelOK(storeDigit->getSensorID(), storeDigit->getUCellID(), storeDigit->getVCellID())) {
+    if (PXDPixelMasker::getInstance().pixelDead(storeDigit->getSensorID(), storeDigit->getUCellID(), storeDigit->getVCellID()) ||
+        storeDigit->getCharge() <= PXDPixelMasker::getInstance().getPixelThreshold(storeDigit->getSensorID(), storeDigit->getUCellID(),
+            storeDigit->getVCellID())) {
       continue;
     }
+
     // Trim digits
     if (!m_trimDigits || goodDigit(storeDigit)) {
       Pixel px(storeDigit, i);
@@ -156,7 +158,7 @@ void PXDDigitSorterModule::event()
   storeDigits.getPtr()->ExpandCreate(index);
 
   // Finally we just need to reorder the RelationArrays and delete elements
-  // referencing pixels which were ignored because that adress was set more
+  // referencing pixels which were ignored because that address was set more
   // than once
   RelationArray::ReplaceVec<> from(relationIndices);
   RelationArray::Identity to;

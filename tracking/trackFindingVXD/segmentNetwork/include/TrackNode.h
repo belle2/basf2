@@ -20,7 +20,7 @@ namespace Belle2 {
     using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
     /** Constructor */
-    TrackNode() : m_sector(nullptr), m_spacePoint(nullptr), m_identifier(-1) {}
+    TrackNode() {}
 
     /** Constructor with information from SpacePoint */
     explicit TrackNode(SpacePoint* spacePoint) :
@@ -32,13 +32,13 @@ namespace Belle2 {
 
 
     /** Pointer to sector */
-    ActiveSector<StaticSectorType, TrackNode>* m_sector;
+    ActiveSector<StaticSectorType, TrackNode>* m_sector = nullptr;
 
     /** Pointer to spacePoint */
-    SpacePoint* m_spacePoint;
+    SpacePoint* m_spacePoint = nullptr;
 
     /** Unique integer identifier */
-    const std::int32_t m_identifier;
+    const std::int32_t m_identifier = -1;
 
 
     /** Overloaded '=='-operator

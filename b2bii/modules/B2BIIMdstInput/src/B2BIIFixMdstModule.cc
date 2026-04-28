@@ -220,7 +220,7 @@ namespace Belle2 {
   {
     Muid_init();
     if (m_saveResultExtraInfo)
-      m_eventExtraInfo.registerInDataStore();
+      m_eventExtraInfo.isRequired();
   }
 
   void B2BIIFixMdstModule::terminate()

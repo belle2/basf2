@@ -21,7 +21,6 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-//#include <framework/dbobjects/RunInfo.h>
 #include <framework/datastore/DataStore.h>
 
 #include <TDirectory.h>
@@ -33,7 +32,6 @@
 #include <iostream>
 #include <fstream>
 #include <framework/logging/Logger.h>
-#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace Belle2;

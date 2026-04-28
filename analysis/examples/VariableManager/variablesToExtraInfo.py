@@ -57,4 +57,3 @@ for i, module in enumerate(mypath.modules()):
 
 # process the data
 basf2.process(mypath)
-print(basf2.statistics)

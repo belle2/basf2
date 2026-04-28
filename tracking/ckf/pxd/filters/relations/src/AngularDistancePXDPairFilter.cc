@@ -6,15 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/pxd/filters/relations/AngularDistancePXDPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
-using namespace Belle2;
-using namespace TrackFindingCDC;
+#include <cmath>
 
-TrackFindingCDC::Weight
+using namespace Belle2;
+using namespace TrackingUtilities;
+
+TrackingUtilities::Weight
 AngularDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation)
 {
   const CKFToPXDState& fromState = *(relation.first);
@@ -31,7 +33,7 @@ AngularDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, c
 
   if (not fromStateCache.isHitState) {
     // We are coming from an SVD / CDC-SVD track, so we can use its position to only look for matching ladders
-    if (abs(phiDiff) < static_cast<float>(m_param_PhiRecoTrackToHitCut)) {
+    if (std::abs(phiDiff) < static_cast<float>(m_param_PhiRecoTrackToHitCut)) {
       return 1.0;
     }
     return NAN;
@@ -46,7 +48,7 @@ AngularDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, c
     return 1.0;
   }
 
-  if (abs(phiDiff) < static_cast<float>(m_param_PhiHitHitCut)) {
+  if (std::abs(phiDiff) < static_cast<float>(m_param_PhiHitHitCut)) {
     return 1.0;
   }
 
@@ -55,8 +57,8 @@ AngularDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, c
 
 void AngularDistancePXDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiRecoTrackToHitCut"), m_param_PhiRecoTrackToHitCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "phiRecoTrackToHitCut"), m_param_PhiRecoTrackToHitCut,
                                 "Cut in phi for the difference between RecoTrack (seed) mSoP.getPos() and current hit-based state.", m_param_PhiRecoTrackToHitCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitCut,
                                 "Cut in phi between two hit-based states.", m_param_PhiHitHitCut);
 }

@@ -39,7 +39,7 @@ pdu.merge_h5s(['data/slim_dstar_pion.h5', 'data/slim_dstar_kaon.h5'], 'data/slim
 print("H5 files merged, written out to data/slim_dstar.h5")
 
 # Split into train/val/test sets for training
-pdu.split_h5('data/slim_dstar.h5', 'data/slim_dstar')
+pdu.split_h5('data/slim_dstar.h5', 'data/slim_dstar', random_state=42)
 print("Data in data/slim_dstar.h5 split into train/val/test files in directory: data/slim_dstar")
 
 # Now you can train weights using the pidTrainWeights script, e.g.

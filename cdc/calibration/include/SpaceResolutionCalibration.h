@@ -42,7 +42,7 @@ namespace Belle2 {
       {
         m_inputRootFileNames.assign(inputname);
       }
-      /// Store histograms durring the calibration or not
+      /// Store histograms during the calibration or not
       virtual void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
       /// File name describe theta/alpha bin, if don't want to use default from input sigma
       virtual void ProfileFileNames(std::string profileFileName)
@@ -96,8 +96,8 @@ namespace Belle2 {
       bool m_useProfileFromInputSigma = true; /**<  Use binning from old sigma or new one form input*/
       bool m_BField = true;                   /**< Work with BField, fit range and initial parameters is different incase B and noB */
       //      bool m_LRseparate = true;
-      double sigma_old[56][2][18][7][8]; /**<old sigma prameters.*/
-      double sigma_new[56][2][18][7][8]; /**<new sigma prameters.*/
+      double sigma_old[56][2][18][7][8]; /**<old sigma parameters.*/
+      double sigma_new[56][2][18][7][8]; /**<new sigma parameters.*/
       //TF1* ffit[56][2][18][7];           /**< fitting function*/
       TGraphErrors* gfit[56][2][18][7];  /**< sigma*sigma graph for fit*/
       TGraphErrors* gr[56][2][18][7];    /**< sigma graph.*/
@@ -121,21 +121,21 @@ namespace Belle2 {
 
       int m_nalpha; /**<number of alpha bins*/
       int m_ntheta;/**<number of  theta bins*/
-      double l_alpha[18];/**< Lower boundays of alpha bins. */
-      double u_alpha[18];/**< Upper boundays of alpha bins. */
+      double l_alpha[18];/**< Lower boundaries of alpha bins. */
+      double u_alpha[18];/**< Upper boundaries of alpha bins. */
       double ialpha[18]; /**< represented alphas of alpha bins. */
-      double l_theta[7]; /**< Lower boundays of theta bins. */
-      double u_theta[7];/**< Upper boundays of theta bins. */
+      double l_theta[7]; /**< Lower boundaries of theta bins. */
+      double u_theta[7];/**< Upper boundaries of theta bins. */
       double itheta[7]; /**< represented alphas of theta bins. */
 
 
       int nalpha_old; /**<number of alpha bins from input*/
       int ntheta_old;/**<number of  theta bins from input*/
-      double l_alpha_old[18];/**< Lower boundays of alpha bins from input */
-      double u_alpha_old[18];/**< Upper boundays of alpha bins from input */
+      double l_alpha_old[18];/**< Lower boundaries of alpha bins from input */
+      double u_alpha_old[18];/**< Upper boundaries of alpha bins from input */
       double ialpha_old[18]; /**< represented alphas of alpha bins from input. */
-      double l_theta_old[7]; /**< Lower boundays of theta bins from input. */
-      double u_theta_old[7];/**< Upper boundays of theta bins from input. */
+      double l_theta_old[7]; /**< Lower boundaries of theta bins from input. */
+      double u_theta_old[7];/**< Upper boundaries of theta bins from input. */
       double itheta_old[7]; /**< represented alphas of theta bins from input. */
 
       unsigned short m_sigmaParamMode_old; /**< sigma mode from input. */

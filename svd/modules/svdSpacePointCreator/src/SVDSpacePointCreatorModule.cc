@@ -41,7 +41,7 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
-           "allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module", string(""));
+           "allows the user to set an identifier for this module. Useful if one wants to use several instances of that module", string(""));
   addParam("OnlySingleClusterSpacePoints", m_onlySingleClusterSpacePoints,
            "standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more",
            bool(false));
@@ -190,6 +190,10 @@ void SVDSpacePointCreatorModule::initialize()
 
 void SVDSpacePointCreatorModule::event()
 {
+  // nothing to do if there are no clusters
+  // this check also avoids ERRORS when the SVD is excluded
+  // and either SVDGrouping or SNRFraction selection is ON
+  if (m_svdClusters.getEntries() == 0) return;
 
   bool useSVDGroupInfo = m_useSVDGroupInfoIn6Sample || m_useSVDGroupInfoIn3Sample;
   bool useSVDSpacePointSNRFraction = m_useSVDSpacePointSNRFractionFor6Samples
@@ -197,7 +201,7 @@ void SVDSpacePointCreatorModule::event()
   int  numberOfSignalGroups;
   bool formSingleSignalGroup;
   if (useSVDGroupInfo || useSVDSpacePointSNRFraction) {
-    // first take Event Informations:
+    // first take Event Information:
     StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);
     if (!temp_eventinfo.isValid())
       m_svdEventInfoName = "SVDEventInfoSim";
@@ -254,7 +258,7 @@ void SVDSpacePointCreatorModule::event()
 
 void SVDSpacePointCreatorModule::terminate()
 {
-  B2DEBUG(20, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
+  B2DEBUG(20, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occurred instances:\n" <<
           ", svdClusters: " << m_TESTERSVDClusterCtr <<
           ", spacePoints: " << m_TESTERSpacePointCtr);
   if (m_useQualityEstimator == true) {

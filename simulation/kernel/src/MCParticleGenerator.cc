@@ -23,6 +23,8 @@
 #include <G4LogicalVolume.hh>
 #include <G4VSolid.hh>
 #include <CLHEP/Vector/LorentzVector.h>
+#include <G4PrimaryParticle.hh>
+#include <G4Event.hh>
 
 using namespace std;
 using namespace Belle2;

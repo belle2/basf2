@@ -9,7 +9,6 @@
 #include <framework/logging/Logger.h>
 
 #include <arich/dbobjects/ARICHHvChannelsMapping.h>
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;

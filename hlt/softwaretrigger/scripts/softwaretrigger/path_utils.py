@@ -140,8 +140,8 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("pi+:hadb", 'p>0.1 and abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:tau", 'abs(d0) < 2 and abs(z0) < 8', path=path)
     modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', path=path)
-    stdV0s.stdKshorts(path=path, fitter='KFit')
-    modularAnalysis.cutAndCopyList('K_S0:dstSkim', 'K_S0:merged', 'goodBelleKshort == 1', path=path)
+    stdV0s.stdKshorts(path=path, fitter='KFit', addSuffix=True)
+    modularAnalysis.cutAndCopyList('K_S0:dstSkim', 'K_S0:merged_KFit', 'goodBelleKshort == 1', path=path)
     stdV0s.stdLambdas(path=path)
     modularAnalysis.fillParticleList("K+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
@@ -179,7 +179,7 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
 
 
-def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
+def add_pre_filter_reconstruction(path, run_type, components, switch_off_slow_modules_for_online, **kwargs):
     """
     Add everything needed to calculation a filter decision and if possible,
     also do the HLT filtering. This is only possible for beam runs (in the moment).
@@ -197,6 +197,7 @@ def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
             skipGeometryAdding=True,
             components=components,
             event_abort=hlt_event_abort,
+            switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
             **kwargs)
 
     elif run_type == constants.RunTypes.cosmic:
@@ -215,7 +216,7 @@ def add_filter_module(path):
     return path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"])
 
 
-def add_post_filter_reconstruction(path, run_type, components):
+def add_post_filter_reconstruction(path, run_type, components, switch_off_slow_modules_for_online):
     """
     Add all modules which should run after the HLT decision is taken
     and only on the accepted events.
@@ -227,7 +228,12 @@ def add_post_filter_reconstruction(path, run_type, components):
     check_components(components)
 
     if run_type == constants.RunTypes.beam:
-        reconstruction.add_postfilter_reconstruction(path, components=components, pruneTracks=False)
+        reconstruction.add_postfilter_reconstruction(
+            path,
+            components=components,
+            pruneTracks=False,
+            switch_off_slow_modules_for_online=switch_off_slow_modules_for_online
+        )
 
         add_skim_software_trigger(path, store_array_debug_prescale=1)
     elif run_type == constants.RunTypes.cosmic:
@@ -251,3 +257,19 @@ def hlt_event_abort(module, condition, error_flag):
     module.if_value(condition, p, basf2.AfterConditionPath.CONTINUE)
     if error_flag == ROOT.Belle2.EventMetaData.c_HLTDiscard:
         p.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')
+    elif error_flag == ROOT.Belle2.EventMetaData.c_HLTPrefilterDiscard:
+        p.add_module('StatisticsSummary').set_name('Sum_HLTPrefilter_Discard')
+
+
+def add_prefilter_module(path, mode):
+
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
+
+    # Only turn on the HLTPrefilter if prefilter mode is True
+    if mode == constants.HLTPrefilterModes.filter:
+        # Add HLTPrefilter module to the HLT path
+        hlt_prefilter_module = path.add_module('HLTPrefilter')
+        # Abort reconstruction of events from injection background
+        hlt_event_abort(hlt_prefilter_module, ">=1", ROOT.Belle2.EventMetaData.c_HLTPrefilterDiscard)
+        path.add_module('StatisticsSummary').set_name('Sum_HLTPrefilter')

@@ -11,12 +11,13 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <G4VPrimaryGenerator.hh>
-#include <G4PrimaryParticle.hh>
-#include <G4Event.hh>
 
 #include <string>
 
 class G4VSolid;
+class G4PrimaryParticle;
+class G4Event;
+class G4PrimaryVertex;
 
 namespace Belle2 {
 

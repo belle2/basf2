@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include<analysis/dataobjects/Particle.h>
 #include<vector>
 
 namespace Belle2 {
+  class Particle;
   namespace CurlTagger {
 
     /** Abstract base class for curl track selectors */

@@ -27,7 +27,7 @@ class CheckNumbering(basf2.Module):
 
     def initialize(self):
         """ Initialize the DQMCommonUtils class here. It builds
-        its lookup arrrays, so we want to do it only once."""
+        its lookup arrays, so we want to do it only once."""
         #: Reference to GeoTools class
         self.gTools = Belle2.VXD.GeoCache.getInstance().getGeoTools()
         if not self.gTools:
@@ -142,7 +142,7 @@ class CheckNumbering(basf2.Module):
         next_expected_sensorID.setSensorNumber(init_sensorID.getSensorNumber() + 1)
         if next_expected_sensorID.getID() != next_sensorID.getID():
             basf2.B2ERROR('Sensor index neighbourhood test failure: \n' +
-                          f'Initial id: {init_sensorID} \n Expected id: {next_expected_sensorID} \n Actaul id: ' +
+                          f'Initial id: {init_sensorID} \n Expected id: {next_expected_sensorID} \n Actual id: ' +
                           f'{next_sensorID} \n Index: {init_sensor_index + 1}.')
 
         # 1c. Sensor counting
@@ -199,7 +199,7 @@ class CheckNumbering(basf2.Module):
         if next_expected_sensorID.getID() != next_sensorID.getID():
             basf2.B2ERROR(
                 f'SVD sensor index neighbourhood test failure: \nInitial id: {init_sensorID} \n Expected id: ' +
-                f'{next_expected_sensorID} \n Actaul id: {next_sensorID} \n Index: {init_sensor_index + 1}.')
+                f'{next_expected_sensorID} \n Actual id: {next_sensorID} \n Index: {init_sensor_index + 1}.')
         # 3c. Sensor counting
         num_sensors_expected = 172
         if (self.gTools.getNumberOfSVDSensors() != num_sensors_expected):
@@ -221,7 +221,7 @@ class CheckNumbering(basf2.Module):
         if next_layer != next_expected_layer:
             basf2.B2ERROR(
                 f"Layer index neighbourhood test failure: \n Initial id: {init_layer} \n Expected: " +
-                f"{next_expected_layer} \n Actaul: {next_layer} \n Index: {init_layer_index + 1}.")
+                f"{next_expected_layer} \n Actual: {next_layer} \n Index: {init_layer_index + 1}.")
         #
         # 5. PXD chip indexing
         #

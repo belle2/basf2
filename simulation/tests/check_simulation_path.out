@@ -339,7 +339,7 @@
       zDefinition=min
   22. TRGECLFAM
       BeamBkgTag=0
-      ConditionDB=False
+      ConditionDBFAM=True
       DebugLevel=0
       FAMAnaTable=0
       FAMBinTimeInterval=125

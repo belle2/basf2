@@ -84,7 +84,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        legacy_ecl_charged_pid=False, emulate_HLT=False,
                        skip_full_grid_cdc_eventt0_if_svd_time_present=True,
                        switch_off_slow_modules_for_online=False,
-                       enable_top_cluster_timing=False):
+                       use_cat_finder=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -145,8 +145,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param switch_off_slow_modules_for_online: if true, it switches off some modules in the reconstruction chain by overriding
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
         to true in order to speed up the reconstruction.
-    :param enable_top_cluster_timing: if True switches on the measurement of the cluster time done using the backsplash in the
-        TOP.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
 
     # Set the run for beam data
@@ -181,7 +181,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
                                  append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
-                                 switch_off_slow_modules_for_online=switch_off_slow_modules_for_online)
+                                 switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
+                                 use_cat_finder=use_cat_finder)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if add_trigger_calculation and are_detectors_present(["CDC", "ECL", "KLM"], components):
@@ -195,8 +196,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                   addClusterExpertModules=addClusterExpertModules,
                                   reconstruct_cdst=reconstruct_cdst,
                                   legacy_ecl_charged_pid=legacy_ecl_charged_pid,
-                                  switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
-                                  enable_top_cluster_timing=enable_top_cluster_timing)
+                                  switch_off_slow_modules_for_online=switch_off_slow_modules_for_online)
 
     # Add the modules calculating the software trigger skims
     if add_trigger_calculation and are_detectors_present(["CDC", "ECL", "KLM"], components):
@@ -218,7 +218,8 @@ def add_prefilter_reconstruction(path,
                                  create_intercepts_for_pxd_ckf=False,
                                  append_full_grid_cdc_eventt0=True,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=True,
-                                 switch_off_slow_modules_for_online=False):
+                                 switch_off_slow_modules_for_online=False,
+                                 use_cat_finder=False):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -260,6 +261,8 @@ def add_prefilter_reconstruction(path,
     :param switch_off_slow_modules_for_online: if true, it switches off some modules in the reconstruction chain by overriding
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
         to true in order to speed up the reconstruction.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
 
     # If switch_off_slow_modules_for_online is True, we override some flags to make sure some slow modules are not executed
@@ -293,7 +296,8 @@ def add_prefilter_reconstruction(path,
         pxd_filtering_offline=pxd_filtering_offline,
         create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
-        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
+        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
+        use_cat_finder=use_cat_finder)
 
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Prefilter_Tracking')
@@ -319,8 +323,7 @@ def add_postfilter_reconstruction(path,
                                   addClusterExpertModules=True,
                                   reconstruct_cdst=None,
                                   legacy_ecl_charged_pid=False,
-                                  switch_off_slow_modules_for_online=False,
-                                  enable_top_cluster_timing=False):
+                                  switch_off_slow_modules_for_online=False):
     """
     This function adds the reconstruction modules not required to calculate HLT filter decision to a path.
 
@@ -337,8 +340,6 @@ def add_postfilter_reconstruction(path,
     :param switch_off_slow_modules_for_online: if true, it switches off some modules in the reconstruction chain by overriding
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
         to true in order to speed up the reconstruction.
-    :param enable_top_cluster_timing: if True switches on the measurement of the cluster time done using the backsplash
-        in the TOP (false).
     """
 
     # If switch_off_slow_modules_for_online is True, we override some flags to make sure some slow modules are not executed
@@ -381,8 +382,7 @@ def add_postfilter_reconstruction(path,
         components=components,
         addClusterExpertModules=addClusterExpertModules,
         legacy_ecl_charged_pid=legacy_ecl_charged_pid,
-        run_klm_dnn=run_klm_dnn,
-        enable_top_cluster_timing=enable_top_cluster_timing
+        run_klm_dnn=run_klm_dnn
     )
 
     # Prune tracks
@@ -409,7 +409,6 @@ def add_cosmics_reconstruction(
         reconstruct_cdst=False,
         posttracking=True,
         legacy_ecl_charged_pid=False,
-        enable_top_cluster_timing=False
         ):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
@@ -436,9 +435,7 @@ def add_cosmics_reconstruction(
     :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
     :param posttracking: run reconstruction for outer detectors.
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
-        MVA based charged particle ID (false).
-    :param enable_top_cluster_timing: if True switches on the measurement of the cluster time done using the backsplash
-        in the TOP (false).
+      MVA based charged particle ID (false).
     """
 
     # Set the run for cosmics data
@@ -477,18 +474,11 @@ def add_cosmics_reconstruction(
                                             addClusterExpertModules=addClusterExpertModules,
                                             add_muid_hits=add_muid_hits,
                                             cosmics=True,
-                                            legacy_ecl_charged_pid=legacy_ecl_charged_pid,
-                                            enable_top_cluster_timing=enable_top_cluster_timing)
+                                            legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
 
-def add_mc_reconstruction(path,
-                          components=None,
-                          pruneTracks=True,
-                          addClusterExpertModules=True,
-                          use_second_cdc_hits=False,
-                          add_muid_hits=False,
-                          legacy_ecl_charged_pid=False,
-                          enable_top_cluster_timing=False):
+def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
+                          use_second_cdc_hits=False, add_muid_hits=False, legacy_ecl_charged_pid=False):
     """
     This function adds the standard reconstruction modules with MC tracking
     to a path.
@@ -498,8 +488,6 @@ def add_mc_reconstruction(path,
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
-    :param enable_top_cluster_timing: if True switches on the measurement of the cluster time done using the backsplash
-        in the TOP (false).
     """
 
     # Set the run for beam data
@@ -524,8 +512,7 @@ def add_mc_reconstruction(path,
                                     pruneTracks=pruneTracks,
                                     add_muid_hits=add_muid_hits,
                                     addClusterExpertModules=addClusterExpertModules,
-                                    legacy_ecl_charged_pid=legacy_ecl_charged_pid,
-                                    enable_top_cluster_timing=enable_top_cluster_timing)
+                                    legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
 
 def add_prefilter_pretracking_reconstruction(path, components=None):
@@ -583,8 +570,7 @@ def add_postfilter_posttracking_reconstruction(path,
                                                cosmics=False,
                                                for_cdst_analysis=False,
                                                legacy_ecl_charged_pid=False,
-                                               run_klm_dnn=True,
-                                               enable_top_cluster_timing=False):
+                                               run_klm_dnn=True):
     """
     This function adds to the path the standard reconstruction modules whoose outputs are not needed in the filter.
 
@@ -599,12 +585,10 @@ def add_postfilter_posttracking_reconstruction(path,
         MVA based charged particle ID (false). This flag is automatically set to true on HLT and ExpressReco.
     :param run_klm_dnn: If True, add the ``KLMMuonIDDNNExpert`` module to the path. This flag is automatically set to
         false on HLT and ExpressReco.
-    :param enable_top_cluster_timing: if True switches on the measurement of the cluster time done using the
-        backsplash in the TOP (false).
     """
 
     add_dedx_modules(path, components, for_cdst_analysis=for_cdst_analysis)
-    add_top_modules(path, components, cosmics=cosmics, enable_top_cluster_timing=enable_top_cluster_timing)
+    add_top_modules(path, components, cosmics=cosmics)
     add_arich_modules(path, components)
 
     # only add the OnlineEventT0Creator if not preparing cDST
@@ -629,8 +613,7 @@ def add_posttracking_reconstruction(path,
                                     cosmics=False,
                                     for_cdst_analysis=False,
                                     add_eventt0_combiner_for_cdst=False,
-                                    legacy_ecl_charged_pid=False,
-                                    enable_top_cluster_timing=False):
+                                    legacy_ecl_charged_pid=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -651,8 +634,6 @@ def add_posttracking_reconstruction(path,
            add_eventt0_combiner_for_cdst=False), the EventT0Combiner module is added to the path.
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
-    :param enable_top_cluster_timing: if True switches on the measurement of the cluster time done using the
-           backsplash in the TOP (false).
     """
 
     add_prefilter_posttracking_reconstruction(path,
@@ -666,8 +647,7 @@ def add_posttracking_reconstruction(path,
                                                addClusterExpertModules=addClusterExpertModules,
                                                cosmics=cosmics,
                                                for_cdst_analysis=for_cdst_analysis,
-                                               legacy_ecl_charged_pid=legacy_ecl_charged_pid,
-                                               enable_top_cluster_timing=enable_top_cluster_timing)
+                                               legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
     # Prune tracks as soon as the post-tracking steps are complete
     # Not add prune tracks modules in prepare_cdst_analysis()
@@ -741,7 +721,7 @@ def add_arich_modules(path, components=None):
                         storePhotons=1)  # enabled for ARICH DQM plots
 
 
-def add_top_modules(path, components=None, cosmics=False, enable_top_cluster_timing=False):
+def add_top_modules(path, components=None, cosmics=False):
     """
     Add the TOP reconstruction to the path.
 
@@ -756,8 +736,6 @@ def add_top_modules(path, components=None, cosmics=False, enable_top_cluster_tim
         else:
             path.add_module('TOPBunchFinder')
         path.add_module('TOPReconstructor')
-        if enable_top_cluster_timing:
-            path.add_module('TOPBackSplashTiming')
 
 
 def add_cluster_expert_modules(path, components=None):
@@ -978,13 +956,7 @@ def add_special_vxd_modules(path, components=None):
         path.add_module("SVDShaperDigitsFromTracks")
 
 
-def prepare_cdst_analysis(
-        path,
-        components=None,
-        mc=False,
-        add_eventt0_combiner=False,
-        legacy_ecl_charged_pid=False,
-        enable_top_cluster_timing=False):
+def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=False, legacy_ecl_charged_pid=False):
     """
     Adds to a (analysis) path all the modules needed to analyse a cDST file in the raw+tracking format
     for collisions/cosmics data or in the digits+tracking format for MC data.
@@ -997,8 +969,6 @@ def prepare_cdst_analysis(
       for validation purposes or for the user analyses.
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
-    :param enable_top_cluster_timing: if True switches on the measurement of the cluster time done using the
-      backsplash in the TOP (false).
     """
     # Add the unpackers only if not running on MC, otherwise check the components and simply add
     # the Gearbox and the Geometry modules
@@ -1031,11 +1001,10 @@ def prepare_cdst_analysis(
                                     components=components,
                                     for_cdst_analysis=True,
                                     add_eventt0_combiner_for_cdst=add_eventt0_combiner,
-                                    legacy_ecl_charged_pid=legacy_ecl_charged_pid,
-                                    enable_top_cluster_timing=enable_top_cluster_timing)
+                                    legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
 
-def prepare_user_cdst_analysis(path, components=None, mc=False, enable_top_cluster_timing=False):
+def prepare_user_cdst_analysis(path, components=None, mc=False):
     """
     Adds to a (analysis) path all the modules needed to analyse a cDST file in the raw+tracking format
     for collisions/cosmics data or in the digits+tracking format for MC data.
@@ -1047,11 +1016,5 @@ def prepare_user_cdst_analysis(path, components=None, mc=False, enable_top_clust
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     :param mc: Are we running over MC data or not? If so, do not run the unpackers.
-    :param enable_top_cluster_timing: if True switches on the measurement of the cluster time done using the
-           backsplash in the TOP (false).
     """
-    prepare_cdst_analysis(path=path,
-                          components=components,
-                          mc=mc,
-                          add_eventt0_combiner=True,
-                          enable_top_cluster_timing=enable_top_cluster_timing)
+    prepare_cdst_analysis(path=path, components=components, mc=mc, add_eventt0_combiner=True)

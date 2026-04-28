@@ -36,9 +36,9 @@ namespace Belle2 {
     /// Name of the input VXD StoreArray
     std::string m_temp2RecoTracksStoreArrayName;
     /// Name of the input CDC SPTrackCands
-    std::string m_temp1SPTrackCandsStoreArrayName;
+    std::string m_temp1SPTrackCandsStoreArrayName = "";
     /// Name of the input VXD SPTrackCands
-    std::string m_temp2SPTrackCandsStoreArrayName;
+    std::string m_temp2SPTrackCandsStoreArrayName = "";
     /// Name of the output StoreArray
     std::string m_recoTracksStoreArrayName;
 

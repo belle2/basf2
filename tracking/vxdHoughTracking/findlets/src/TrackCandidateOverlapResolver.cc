@@ -59,7 +59,7 @@ void TrackCandidateOverlapResolver::initialize()
 void TrackCandidateOverlapResolver::beginRun()
 {
   if (!m_SVDHoughParameters.isValid()) {
-    B2DEBUG(20, "SVDHough - TrackCandidateOverlapResolver: SVDHoughParameter dbobject not found, using default parameters.");
+    B2ERROR("SVDHough - TrackCandidateOverlapResolver: SVDHoughParameter dbobject not found, using default parameters.");
   } else {
     if (m_prefix == "finalOverlapResolver") {
       m_minActivityState = m_SVDHoughParameters->getFinalOverlapResolverMinActivityState();

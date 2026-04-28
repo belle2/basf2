@@ -91,7 +91,7 @@ void TrackCandidateResultRefiner::beginRun()
     MCestimator->forceUpdateClusterNames();
   }
   if (!m_SVDHoughParameters.isValid())
-    B2DEBUG(20, "SVDHough - TrackCandidateResultRefiner: SVDHoughParameter dbobject not found, using default parameters.");
+    B2ERROR("SVDHough - TrackCandidateResultRefiner: SVDHoughParameter dbobject not found, using default parameters.");
   else {
     m_minQualitiyIndicatorSize3 = m_SVDHoughParameters->getMinQualitiyIndicatorSize3();
     m_minQualitiyIndicatorSize4 = m_SVDHoughParameters->getMinQualitiyIndicatorSize4();

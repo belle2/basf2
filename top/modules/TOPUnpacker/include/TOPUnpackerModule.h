@@ -22,6 +22,7 @@
 #include <top/dataobjects/TOPProductionEventDebug.h>
 #include <top/dataobjects/TOPProductionHitDebug.h>
 #include <top/dataobjects/TOPInjectionVeto.h>
+#include <top/dataobjects/TOPUnpackerErrors.h>
 #include <string>
 
 namespace Belle2 {
@@ -223,6 +224,14 @@ namespace Belle2 {
     static std::string getFrontEndName(RawTOP& raw, int finesse);
 
     /**
+     * Returns front-end number; this should be the same as the boardstack number within the TOP counted from 0.
+     * @param raw raw data
+     * @param finesse finesse number
+     * @return front-end number
+     */
+    static unsigned getFrontEndNumber(RawTOP& raw, int finesse);
+
+    /**
      * Error messages suppression logic
      * @return true to print the error message, false to suppress it
      */
@@ -279,7 +288,7 @@ namespace Belle2 {
     std::string m_outputRawDigitsName;  /**< name of TOPRawDigit store array */
     std::string m_outputWaveformsName;  /**< name of TOPRawWaveform store array */
     std::string m_templateFitResultName; /**< name of TOPTemplateFitResult store array */
-    bool m_swapBytes;  /**< if true, swap bytes */
+    bool m_swapBytesDefault;  /**< if true, swap bytes (default by module parameter) */
     int m_dataFormat;  /**< data format */
     bool m_addRelations;  /**< switch ON/OFF relations to TOPProductionHitDebugs */
     unsigned m_errorSuppressFactor; /**< error messages suppression factor */
@@ -296,15 +305,18 @@ namespace Belle2 {
     StoreArray<TOPProductionHitDebug> m_productionHitDebugs;   /**< collection of hit debug data */
     StoreArray<TOPTemplateFitResult> m_templateFitResults;   /**< collection of template fit results */
     StoreObjPtr<TOPInjectionVeto> m_injectionVeto; /**< injection veto flag */
+    StoreObjPtr<TOPUnpackerErrors> m_unpackerErrors; /**< unpacker error flags */
 
     // other
 
+    bool m_swapBytes = false;  /**< if true, swap bytes (used in unpacking) */
     unsigned m_eventCount = 0;    /**< event count since last printed error message */
     unsigned m_errorCount = 0;    /**< error messages count within single event */
     bool m_resetEventCount = false; /**< request for event count reset */
     unsigned m_numErrors = 0; /**< number of error messages per event */
     TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance(); /**< geometry param */
     std::map<int, int> m_channelStatistics; /**<counts how many different channels have been parsed in a given SCROD packet */
+    unsigned m_BS = 0; /**< temporary boardstack number within the TOP detector */
 
   };
 

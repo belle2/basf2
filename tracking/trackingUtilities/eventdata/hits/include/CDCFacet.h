@@ -42,7 +42,7 @@ namespace Belle2 {
                const UncertainParameterLine2D& fitLine);
 
       /// Reverses the facet in place including the fit line.
-      void reverse();
+      void reverse() override;
 
       /// Constructs the reverse triple from this one.
       CDCFacet reversed() const;

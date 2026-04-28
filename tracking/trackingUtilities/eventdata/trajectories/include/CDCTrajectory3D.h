@@ -204,13 +204,13 @@ namespace Belle2 {
       /// Get the momentum at the start point of the trajectory
       Vector3D getMom3DAtSupport(const double bZ) const
       {
-        return getFlightDirection3DAtSupport() *= getAbsMom3D(bZ);
+        return getFlightDirection3DAtSupport() * getAbsMom3D(bZ);
       }
 
       /// Get the momentum at the start point of the trajectory
       Vector3D getMom3DAtSupport() const
       {
-        return getFlightDirection3DAtSupport() *= getAbsMom3D();
+        return getFlightDirection3DAtSupport() * getAbsMom3D();
       }
 
       /// Get the unit momentum at the start point of the trajectory

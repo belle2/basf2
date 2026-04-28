@@ -60,7 +60,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             mcTrackCandidatesColumnName='MCRecoTracks',
             cdcHitsColumnName='CDCHits',
             write_tables=False,
-            plotTrackQualityIndicator=False):
+            plotTrackQualityIndicator=True):
         """Constructor"""
 
         TrackingValidationModule.__init__(

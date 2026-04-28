@@ -62,7 +62,7 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
     non_expert_parameters = ['p_{t}']
 
     #: Draw validation plots for track quality indicator
-    plotTrackQualityIndicator = False
+    plotTrackQualityIndicator = True
 
     def preparePathValidation(self, path):
         """The default way to add the validation module to the path.

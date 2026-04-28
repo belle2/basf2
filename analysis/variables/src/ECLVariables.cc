@@ -28,7 +28,6 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
-#include <mdst/dataobjects/TOPBackSplashFitResult.h>
 
 #include <Math/Vector4D.h>
 #include <TRandom.h>
@@ -1148,45 +1147,6 @@ namespace Belle2 {
     }
 
 
-    double topBackSplashTime(const Particle* particle)
-    {
-      const ECLCluster* cluster = particle->getECLCluster();
-      if (!cluster)
-        return Const::doubleNaN;
-
-      const TOPBackSplashFitResult* backsplash = cluster->getRelated<TOPBackSplashFitResult>();
-      if (!backsplash)
-        return Const::doubleNaN;
-
-      return backsplash->getTime();
-    }
-
-    double topBackSplashChi2(const Particle* particle)
-    {
-      const ECLCluster* cluster = particle->getECLCluster();
-      if (!cluster)
-        return Const::doubleNaN;
-
-      const TOPBackSplashFitResult* backsplash = cluster->getRelated<TOPBackSplashFitResult>();
-      if (!backsplash)
-        return Const::doubleNaN;
-
-      return backsplash->getChisqdof();
-    }
-
-    double topBackSplashNphotons(const Particle* particle)
-    {
-      const ECLCluster* cluster = particle->getECLCluster();
-      if (!cluster)
-        return Const::doubleNaN;
-
-      const TOPBackSplashFitResult* backsplash = cluster->getRelated<TOPBackSplashFitResult>();
-      if (!backsplash)
-        return Const::doubleNaN;
-
-      return backsplash->getNphotons();
-    }
-
     VARIABLE_GROUP("ECL cluster related");
     REGISTER_VARIABLE("clusterEoP", eclClusterEoP, R"DOC(
 Returns ratio of the cluster energy `clusterE` over momentum :math:`p`. 
@@ -2021,20 +1981,5 @@ energy, beam background level and cell ID. It also differs for data and MC.
     found on the `Performance Recommendations Webpage <https://belle2.pages.desy.de/performance/recommendations/>`_.
 
 )DOC", "dimensionless");
-
-    
-  REGISTER_VARIABLE("topBackSplashTime", topBackSplashTime,R"DOC(
-Returns the timing of the backsplash signal in the TOP detector. 
-)DOC", "ns");
-
-  REGISTER_VARIABLE("topBackSplashNphotons", topBackSplashNphotons,R"DOC(
-Returns the number of photoelectrons in the TOP detector associate to the cluster backsplash. 
-)DOC", "dimensionless");
-
-  REGISTER_VARIABLE("topBackSplashChi2", topBackSplashChi2,R"DOC(
-Returns the reduced chi square of the fit to the backsplash signal in the TOP
-)DOC", "dimensionless");
-
-    
   }
 }

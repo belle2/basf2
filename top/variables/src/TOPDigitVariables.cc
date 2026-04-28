@@ -23,6 +23,8 @@
 #include <top/dataobjects/TOPLikelihoodScanResult.h>
 
 #include <top/dataobjects/TOPBarHit.h>
+#include <top/dataobjects/TOPBackSplashFitResult.h>
+
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/dataobjects/MCInitialParticles.h>
 
@@ -704,6 +706,48 @@ namespace Belle2 {
         return nTracks;
       }
 
+
+      double topBackSplashTime(const Particle* particle)
+      {
+        const ECLCluster* cluster = particle->getECLCluster();
+        if (!cluster)
+          return Const::doubleNaN;
+
+        const TOPBackSplashFitResult* backsplash = cluster->getRelated<TOPBackSplashFitResult>();
+        if (!backsplash)
+          return Const::doubleNaN;
+
+        return backsplash->getTime();
+      }
+
+      double topBackSplashChi2(const Particle* particle)
+      {
+        const ECLCluster* cluster = particle->getECLCluster();
+        if (!cluster)
+          return Const::doubleNaN;
+
+        const TOPBackSplashFitResult* backsplash = cluster->getRelated<TOPBackSplashFitResult>();
+        if (!backsplash)
+          return Const::doubleNaN;
+
+        return backsplash->getChisqdof();
+      }
+
+      double topBackSplashNphotons(const Particle* particle)
+      {
+        const ECLCluster* cluster = particle->getECLCluster();
+        if (!cluster)
+          return Const::doubleNaN;
+
+        const TOPBackSplashFitResult* backsplash = cluster->getRelated<TOPBackSplashFitResult>();
+        if (!backsplash)
+          return Const::doubleNaN;
+
+        return backsplash->getNphotons();
+      }
+
+
+
     } // TOPVariable
 
 
@@ -831,5 +875,20 @@ namespace Belle2 {
                       "number of good photons in the given slot id");
     REGISTER_VARIABLE("topTracksInSlot", TOPVariable::TOPTracksInSlot,
                       "number of tracks in the same slot as particle");
+
+
+
+    REGISTER_VARIABLE("topBackSplashTime", TOPVariable::topBackSplashTime, R"DOC(
+                       Returns the timing of the backsplash signal in the TOP detector. )DOC", "ns");
+
+    REGISTER_VARIABLE("topBackSplashNphotons", TOPVariable::topBackSplashNphotons, R"DOC(
+                       Returns the number of photoelectrons in the TOP detector associate to the cluster backsplash.)DOC",
+                      "dimensionless");
+
+    REGISTER_VARIABLE("topBackSplashChi2", TOPVariable::topBackSplashChi2, R"DOC(
+                       Returns the reduced chi square of the fit to the backsplash signal in the TOP)DOC", "dimensionless");
+
+
+
   } // Variable
 } // Belle2

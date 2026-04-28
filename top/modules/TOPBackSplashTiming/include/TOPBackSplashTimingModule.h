@@ -10,7 +10,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/TOPBackSplashFitResult.h>
+#include <top/dataobjects/TOPBackSplashFitResult.h>
 #include <top/dataobjects/TOPDigit.h>
 
 #include <RooAbsPdf.h>

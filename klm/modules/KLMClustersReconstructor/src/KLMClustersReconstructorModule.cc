@@ -188,7 +188,21 @@ clusterFound:;
                    innermostLayer, p);
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it)
       klmCluster->addRelationTo(*it);
+
+    /* number of KLM digits in the cluster (BKLM via BKLMHit1d and EKLM directly). */
+    int nDigits = 0;
+    for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
+      auto bklmhit1ds = (*it)->getRelationsTo<BKLMHit1d>();
+      for (const auto& bklmhit1d : bklmhit1ds) {
+        auto klmdigits = bklmhit1d.getRelationsTo<KLMDigit>();
+        nDigits += klmdigits.size();
+      }
+      auto klmdigits = (*it)->getRelationsTo<KLMDigit>();
+      nDigits += klmdigits.size();
+    }
+    klmCluster->setKLMnDigits(nDigits);
   }
+
   delete[] layerHitsBKLM;
   delete[] layerHitsEKLM;
 }

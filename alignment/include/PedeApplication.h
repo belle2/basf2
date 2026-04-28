@@ -39,7 +39,7 @@ namespace Belle2 {
       //! Reads the millepede.end file and sets this object retrieved state
       void readEndFile(std::string filename = "millepede.end");
       //! Return Pede revision number
-      int revision();
+      static int revision();
 
     private:
       //! Pede exit code

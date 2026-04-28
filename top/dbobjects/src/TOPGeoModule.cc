@@ -97,48 +97,56 @@ namespace Belle2 {
   XYZPoint TOPGeoModule::pointToGlobal(const XYZPoint& point) const
   {
     if (not m_transform) setTransformation();
+    // cppcheck-suppress nullPointerRedundantCheck
     return *m_transform * point;
   }
 
   XYZVector TOPGeoModule::momentumToGlobal(const XYZVector& momentum) const
   {
     if (not m_transform) setTransformation();
+    // cppcheck-suppress nullPointerRedundantCheck
     return *m_transform * momentum;
   }
 
   XYZPoint TOPGeoModule::pointToLocal(const XYZPoint& point) const
   {
     if (not m_transform) setTransformation();
+    // cppcheck-suppress nullPointerRedundantCheck
     return m_transform->ApplyInverse(point);
   }
 
   XYZVector TOPGeoModule::momentumToLocal(const XYZVector& momentum) const
   {
     if (not m_transform) setTransformation();
+    // cppcheck-suppress nullPointerRedundantCheck
     return m_transform->ApplyInverse(momentum);
   }
 
   XYZPoint TOPGeoModule::pointNominalToGlobal(const XYZPoint& point) const
   {
     if (not m_transformNominal) setTransformation();
+    // cppcheck-suppress nullPointerRedundantCheck
     return *m_transformNominal * point;
   }
 
   XYZVector TOPGeoModule::momentumNominalToGlobal(const XYZVector& momentum) const
   {
     if (not m_transformNominal) setTransformation();
+    // cppcheck-suppress nullPointerRedundantCheck
     return *m_transformNominal * momentum;
   }
 
   XYZPoint TOPGeoModule::pointGlobalToNominal(const XYZPoint& point) const
   {
     if (not m_transformNominal) setTransformation();
+    // cppcheck-suppress nullPointerRedundantCheck
     return m_transformNominal->ApplyInverse(point);
   }
 
   XYZVector TOPGeoModule::momentumGlobalToNominal(const XYZVector& momentum) const
   {
     if (not m_transformNominal) setTransformation();
+    // cppcheck-suppress nullPointerRedundantCheck
     return m_transformNominal->ApplyInverse(momentum);
   }
 

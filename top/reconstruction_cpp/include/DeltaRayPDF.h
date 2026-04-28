@@ -143,7 +143,7 @@ namespace Belle2 {
        * @param z local z position of track at TOP
        * @return fraction of direct photons
        */
-      double directFraction(double z) const;
+      static double directFraction(double z);
 
       /**
        * Photon yield from delta-rays per track length in quartz for nominal photon detection efficiency
@@ -151,7 +151,7 @@ namespace Belle2 {
        * @param PDGCode PDG code
        * @return photon yield per cm
        */
-      double photonYield(double beta, int PDGCode) const;
+      static double photonYield(double beta, int PDGCode);
 
       // variables set in constructor (slot dependent)
       int m_moduleID; /**< slot ID */

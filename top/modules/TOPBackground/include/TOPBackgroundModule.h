@@ -32,9 +32,6 @@ namespace Belle2 {
     //! Constructor.
     TOPBackgroundModule();
 
-    //! Destructor.
-    virtual ~TOPBackgroundModule();
-
     /**
      * Initialize the Module.
      *
@@ -69,11 +66,6 @@ namespace Belle2 {
      * Clean-up, close files, summarize statistics, etc.
      */
     virtual void terminate() override;
-
-    /**
-     *Prints module parameters.
-     */
-    void printModuleParams() const;
 
     /**
      *Print histogram 1D, helper function.

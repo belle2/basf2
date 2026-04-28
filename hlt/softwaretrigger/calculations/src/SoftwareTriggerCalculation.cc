@@ -29,7 +29,7 @@ namespace Belle2 {
 
     void SoftwareTriggerCalculation::addDebugOutput(const StoreObjPtr<SoftwareTriggerVariables>& storeObject, const std::string& prefix)
     {
-      for (auto& identifierWithValue : m_calculationResult) {
+      for (const auto& identifierWithValue : m_calculationResult) {
         const std::string& identifier = identifierWithValue.first;
         const double value = identifierWithValue.second;
 

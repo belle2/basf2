@@ -1,0 +1,13 @@
+Import('env')
+
+env['LIBS'] = [
+  'cdc_dataobjects',
+  'framework',
+  'mva',
+  'tracking',
+  'tracking_dataobjects',
+  'tracking_gnnFinder',
+  '$ROOT_LIBS'
+]
+
+Return('env')

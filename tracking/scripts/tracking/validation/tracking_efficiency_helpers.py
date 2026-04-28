@@ -185,7 +185,6 @@ def run_reconstruction(path, output_file_name, input_file_name=''):
         path.add_module(geometry)
 
     add_reconstruction(path, get_reconstruction_components(), pruneTracks=0)
-    # add_mc_reconstruction(path, get_reconstruction_components(), pruneTracks=0)
 
     tracking_efficiency = b2.register_module('StandardTrackingPerformance')
     # tracking_efficiency.logging.log_level = LogLevel.DEBUG

@@ -9,8 +9,8 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include "TH1F.h"
-#include "TH2F.h"
+#include <TH1F.h>
+#include <TH2F.h>
 #include <string>
 #include <vector>
 
@@ -70,11 +70,6 @@ namespace Belle2 {
     TOPTBCComparatorModule();
 
     /**
-     * Destructor
-     */
-    ~TOPTBCComparatorModule() {};
-
-    /**
      * Defining the histograms. Reads once the  m_inputDirectoryList to initialize the proper amount of histograms.
      * Every new histogram added to the module has to be initialized here.
      */
@@ -84,16 +79,6 @@ namespace Belle2 {
      * Initialize the module
      */
     void initialize() override;
-
-    /**
-     * Called when entering a new run
-     */
-    void beginRun() override;
-
-    /**
-     * Event processor
-     */
-    void event() override;
 
     /**
      * End-of-run action.
@@ -121,18 +106,16 @@ namespace Belle2 {
      */
     int makeComparisons();
 
-
-
     /**
      * Utility function to parse  the slot and BS id from the calibration file names
      */
-    int parseSlotAndScrodIDfromFileName(std::string);
+    int parseSlotAndScrodIDfromFileName(const std::string&);
 
     /**
      * Utility function to get the directory name and the label from a line of the m_inputDirectoryList file
      * Sets the values of m_calSetDirectory and m_calSetLabel.
      */
-    int parseInputDirectoryLine(std::string);
+    int parseInputDirectoryLine(const std::string&);
 
     /**
      * Utility function to take the ratio of two histograms using TH1::Divide(), without overwriting the

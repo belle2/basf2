@@ -27,12 +27,6 @@ namespace Belle2 {
     TOPCosmicT0FinderModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TOPCosmicT0FinderModule()
-    {}
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */

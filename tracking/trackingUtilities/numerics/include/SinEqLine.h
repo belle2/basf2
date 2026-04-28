@@ -61,7 +61,7 @@ namespace Belle2 {
       { return cos(x) - getSlope(); }
 
       /// Returns the half period index in which the x position is located.
-      int getIHalfPeriod(const double x) const
+      static int getIHalfPeriod(const double x)
       { return floor(x / M_PI); }
 
       /* Computes the positive solution that has the smallest value of x.

@@ -613,7 +613,7 @@ def get_calibrations(input_data, **kwargs):
                                              input_files=good_input_files,
                                              pre_collector_path=absolute_shift_pre_collector_path)
 
-    absolute_shift_calibration.strategies = strategies.SingleIOV
+    absolute_shift_calibration.strategies = strategies.SequentialBoundaries
 
     for algorithm in absolute_shift_calibration.algorithms:
         algorithm.params = {"apply_iov": output_iov}

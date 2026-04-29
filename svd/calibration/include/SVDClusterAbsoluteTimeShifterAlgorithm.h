@@ -27,25 +27,53 @@ namespace Belle2 {
     /** Destructor*/
     virtual ~SVDClusterAbsoluteTimeShifterAlgorithm() {}
 
+    /** Setter for m_allowedTimeShift */
+    void setAllowedTimeShift(float value) {m_allowedTimeShift = value;}
+
+    /** Getter for m_allowedTimeShift */
+    float getAllowedTimeShift() {return m_allowedTimeShift;}
+
     /** Setter for m_allowedT0Shift*/
     void setMaximumAllowedShift(const float& value) {m_maximumAllowedShift = value;}
 
-    /** set list of time algorithm */
+    /** Get the maximum allowed deviation of clsOnTracks histo wrt EventT0 histo (m_allowedT0Shift)*/
+    float getMaximumAllowedShift() {return m_maximumAllowedShift;}
+
+    /** Set list of time algorithm */
     void setTimeAlgorithm(const std::vector<TString>& lst) {m_timeAlgorithms = lst;}
+
+    /** Get list of time algorithm */
+    std::vector<TString> getTimeAlgorithm() {return m_timeAlgorithms;}
 
     /** Set the minimum entries required in the histograms */
     void setMinEntries(const int& minEntries) {m_minEntries = minEntries;}
+
+    /** Get the minimum entries required in the histograms */
+    int getMinEntries() {return m_minEntries;}
 
   protected:
 
     /** Run algo on data*/
     virtual EResult calibrate() override;
 
+    /** If the event T0 changes significantly return true. This is run inside the findPayloadBoundaries member function
+    in the base class. */
+    virtual bool isBoundaryRequired(const Calibration::ExpRun& currentRun) override;
+
+    /** setup the boundary finding*/
+    virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) override
+    {
+      m_previousTimeMeanL3V.reset();
+    }
+
+
   private:
 
     std::string m_id = ""; /**< Parameter given to set the UniqueID of the payload*/
-    float m_maximumAllowedShift = 15; /**< Allowed deviation of clsOnTracks histo wrt EventT0 histo */
-    int m_minEntries = 0; /**< Set the minimum number of entries required in the histograms*/
+    std::optional<float> m_previousTimeMeanL3V; /**< Cluster time of the previous run*/
+    float m_allowedTimeShift = 2.; /**< Allowed Raw CoGshift*/
+    float m_maximumAllowedShift = 15.; /**< Allowed deviation of clsOnTracks histo wrt EventT0 histo */
+    int m_minEntries = 100; /**< Set the minimum number of entries required in the histograms*/
     std::vector<TString> m_timeAlgorithms = {"CoG3", "ELS3", "CoG6"}; /**< Hardcoded list of time algorithms to calibrate */
     int m_innerLayer = 3; /**< Inner layer of the SVD */
     int m_outerLayer = 6; /**< Outer layer of the SVD */

@@ -49,7 +49,7 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
   auto payload = new Belle2::SVDAbsoluteClusterTimeShift(Form("SVDClusterAbsoluteTimeShifter_%s_rev_%d", m_id.data(), cal_rev));
 
   // single gauss fit function
-  TF1* fn_singleGaus = new TF1("fn_singleGaus", AbssingleGaus, -50., 50., 4);
+  auto fn_singleGaus = std::make_unique<TF1>("fn_singleGaus", AbssingleGaus, -50., 50., 4);
   fn_singleGaus->SetLineColor(kGreen + 2);
   fn_singleGaus->SetParName(0, "N");
   fn_singleGaus->SetParName(1, "#mu");
@@ -57,7 +57,7 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
   fn_singleGaus->SetParName(3, "C");
 
   // double gauss fit function
-  TF1* fn_doubleGaus = new TF1("fn_doubleGaus", AbsdoubleGaus, -50., 50., 7);
+  auto fn_doubleGaus = std::make_unique<TF1>("fn_doubleGaus", AbsdoubleGaus, -50., 50., 7);
   fn_doubleGaus->SetLineColor(kRed + 2);
   fn_doubleGaus->SetParName(0, "N");
   fn_doubleGaus->SetParName(1, "f");
@@ -192,7 +192,7 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
           hist->Rebin(rebinValue);
         }
 
-        TPaveStats* ptstats = new TPaveStats(0.55, 0.73, 0.85, 0.88, "brNDC");
+        auto ptstats = std::make_unique<TPaveStats>(0.55, 0.73, 0.85, 0.88, "brNDC");
         ptstats->SetName("stats1");
         ptstats->SetBorderSize(1);
         ptstats->SetFillColor(0);
@@ -208,7 +208,7 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
                                            fn_singleGaus->GetParName(npar),
                                            fn_singleGaus->GetParameter(npar),
                                            fn_singleGaus->GetParError(npar)));
-        ptstats = new TPaveStats(0.55, 0.49, 0.85, 0.73, "brNDC");
+        ptstats = std::make_unique<TPaveStats>(0.55, 0.49, 0.85, 0.73, "brNDC");
         ptstats->SetName("stats2");
         ptstats->SetBorderSize(1);
         ptstats->SetFillColor(0);
@@ -224,7 +224,7 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
                                            fn_doubleGaus->GetParName(npar),
                                            fn_doubleGaus->GetParameter(npar),
                                            fn_doubleGaus->GetParError(npar)));
-        ptstats = new TPaveStats(0.55, 0.43, 0.85, 0.49, "brNDC");
+        ptstats = std::make_unique<TPaveStats>(0.55, 0.43, 0.85, 0.49, "brNDC");
         ptstats->SetName("stats3");
         ptstats->SetBorderSize(1);
         ptstats->SetFillColor(0);
@@ -315,3 +315,46 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
 
   return c_OK;
 }
+
+bool SVDClusterAbsoluteTimeShifterAlgorithm::isBoundaryRequired(const Calibration::ExpRun& currentRun)
+{
+
+  TString alg = "CoG3";
+  if (std::find(m_timeAlgorithms.begin(), m_timeAlgorithms.end(), "CoG3") == m_timeAlgorithms.end()) {
+    alg = m_timeAlgorithms[0];
+  }
+  float meanTimeL3V = 0;
+  auto h_ClustersOnTrack = getObjectPtr<TH2F>(("hClsTimeOnTracks_" + alg).Data());
+  int layer = 3;
+  int side = 0;
+  int LayerSensorID = 2 * layer - side;
+  auto timeL3V = (TH1F*)h_ClustersOnTrack->ProjectionX(Form("hClsTimeOnTracks_L%dS%c", layer, (side == 0 ? 'U' : 'V')), LayerSensorID,
+                                                       LayerSensorID, "");
+  if (!timeL3V) {
+    if (m_previousTimeMeanL3V)
+      meanTimeL3V = m_previousTimeMeanL3V.value();
+  } else {
+    if (timeL3V->GetEntries() > m_minEntries)
+      meanTimeL3V = timeL3V->GetMean();
+    else {
+      if (m_previousTimeMeanL3V)
+        meanTimeL3V = m_previousTimeMeanL3V.value();
+    }
+  }
+  if (!m_previousTimeMeanL3V) {
+    B2INFO("Setting start payload boundary to be the first run ("
+           << currentRun.first << "," << currentRun.second << ")");
+    m_previousTimeMeanL3V.emplace(meanTimeL3V);
+
+    return true;
+  } else if (abs(meanTimeL3V - m_previousTimeMeanL3V.value()) > m_allowedTimeShift) {
+    B2INFO("Histogram mean has shifted from " << m_previousTimeMeanL3V.value()
+           << " to " << meanTimeL3V << ". We are requesting a new payload boundary for ("
+           << currentRun.first << "," << currentRun.second << ")");
+    m_previousTimeMeanL3V.emplace(meanTimeL3V);
+    return true;
+  } else {
+    return false;
+  }
+}
+

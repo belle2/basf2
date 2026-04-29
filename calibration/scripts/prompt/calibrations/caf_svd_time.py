@@ -365,15 +365,15 @@ def get_calibrations(input_data, **kwargs):
     if isMC:
         calType = "MC"
     unique_id_cog6 = f"SVDCoGTimeCalibrations_{calType}_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
-                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
+        f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID_CoG6:\n{unique_id_cog6}")
 
     unique_id_cog3 = f"SVD3SampleCoGTimeCalibrations_{calType}_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
-                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
+        f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID_CoG3:\n{unique_id_cog3}")
 
     unique_id_els3 = f"SVD3SampleELSTimeCalibrations_{calType}_{now.isoformat()}_INFO:_TBindep_" \
-                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
+        f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID_ELS3:\n{unique_id_els3}")
 
     requested_iov = kwargs.get("requested_iov", None)
@@ -613,7 +613,7 @@ def get_calibrations(input_data, **kwargs):
                                              input_files=good_input_files,
                                              pre_collector_path=absolute_shift_pre_collector_path)
 
-    absolute_shift_calibration.strategies = strategies.SingleIOV
+    absolute_shift_calibration.strategies = strategies.SequentialBoundaries
 
     for algorithm in absolute_shift_calibration.algorithms:
         algorithm.params = {"apply_iov": output_iov}

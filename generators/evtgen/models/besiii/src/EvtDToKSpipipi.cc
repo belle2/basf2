@@ -1,3 +1,11 @@
+// Model: EvtDToKSpipipi
+// This file is an amplitude model for D+ -> K_S0 pi+ pi+ pi-.
+// The model is from the BESIII Collaboration in PRD 100, 072008 (2019). DOI:&nbsp; https://doi.org/10.1103/PhysRevD.100.072008
+//
+// Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
+//
+// Please cite the original reference for any public/published results where this model was used.
+
 #include <EvtGenBase/EvtPatches.hh>
 #include <EvtGenBase/EvtParticle.hh>
 #include <EvtGenBase/EvtGenKine.hh>

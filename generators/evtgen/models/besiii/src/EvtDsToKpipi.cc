@@ -1,3 +1,11 @@
+// Model: EvtDsToKpipi
+// This file is an amplitude model for Ds+ -> K- pi+ pi+.
+// The model is from JHEP08 (2022) 196. DOI: https://doi.org/10.1007/JHEP08(2022)196
+//
+// Permission to use these files in basf2 was generously granted by the BESIII Collaboration.
+//
+// Please cite the original reference for any public/published results where this model was used.
+
 #include <iostream>
 #include <cmath>
 #include <string>

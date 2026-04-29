@@ -1,3 +1,11 @@
+// Model: EvtDTopipi0Eta
+// This file is an amplitude model for D+ -> pi+ pi0 eta.
+// The model is from the BESIII Collaboration in Phys. Rev. D 110, L111102 (2024). DOI:&nbsp; https://doi.org/10.1103/PhysRevD.110.L111102
+//
+// Permission to include these files in basf2 was generously granted by the BESIII Collaboration.
+//
+// Please cite the original reference for any public/published results where this model was used.
+
 #include <EvtGenBase/EvtPatches.hh>
 #include <EvtGenBase/EvtParticle.hh>
 #include <EvtGenBase/EvtGenKine.hh>

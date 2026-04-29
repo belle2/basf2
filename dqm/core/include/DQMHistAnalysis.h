@@ -94,7 +94,7 @@ namespace Belle2 {
     /**
     * Clear all static global lists
     */
-    void clearlist(void);
+    static void clearlist(void);
 
 
   private:
@@ -637,7 +637,7 @@ namespace Belle2 {
     /**
      * Check the status of all PVs and report if disconnected or not found
      */
-    void checkPVStatus(void);
+    static void checkPVStatus(void);
 
     /**
      * check the status of a PVs and report if disconnected or not found
@@ -652,7 +652,7 @@ namespace Belle2 {
      * @param message message to print out
      * @param name the (key)name of the affected PV
      */
-    void CheckEpicsError(int state, const std::string& message, const std::string& name);
+    static void CheckEpicsError(int state, const std::string& message, const std::string& name);
 
     /**
      * check the return status and check PV in case of error
@@ -660,7 +660,7 @@ namespace Belle2 {
      * @param message message to print out
      * @param id the chid of the affected PV
      */
-    void CheckEpicsError(int state, const std::string& message, chid id);
+    static void CheckEpicsError(int state, const std::string& message, chid id);
 
 
     // Public functions

@@ -49,8 +49,8 @@ settings = CalibrationSettings(name="caf_svd_time",
                                depends_on=[cdc_tracking_calibration],  # SVD time depends on CDC tracking calibration
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
-                                   "listOfMutedCalibrations": ["rawTimeCalibration", "timeShiftCalibration",],
-                                    # "AbsoluteTimeShiftCalibration", "timeValidation"
+                                   "listOfMutedCalibrations": [],
+                                    # "rawTimeCalibration", "timeShiftCalibration", "AbsoluteTimeShiftCalibration", "timeValidation"
                                    "max_events_per_run":  10000,
                                    "max_events_per_file": 5000,
                                    "isMC": False,
@@ -603,9 +603,9 @@ def get_calibrations(input_data, **kwargs):
 
     absolute_shift_algo = SVDClusterAbsoluteTimeShifterAlgorithm(f"{calType}_{now.isoformat()}_INFO:_"
                                                                  f"Exp{expNum}_runsFrom{firstRun}to{lastRun}")
-    shift_algo.setMinEntries(100)
-    shift_algo.setMaximumAllowedShift(15.)
-    shift_algo.setTimeAlgorithm(timeAlgorithms)
+    absolute_shift_algo.setMinEntries(100)
+    absolute_shift_algo.setMaximumAllowedShift(15.)
+    absolute_shift_algo.setTimeAlgorithm(timeAlgorithms)
     print(f'Time algorithms for absolute shift: {timeAlgorithms}')
     absolute_shift_calibration = Calibration("SVDClusterAbsoluteTimeShift",
                                              collector=absolute_shift_collector,
@@ -613,7 +613,7 @@ def get_calibrations(input_data, **kwargs):
                                              input_files=good_input_files,
                                              pre_collector_path=absolute_shift_pre_collector_path)
 
-    absolute_shift_calibration.strategies = strategies.SingleIOV
+    absolute_shift_calibration.strategies = strategies.SequentialBoundaries
 
     for algorithm in absolute_shift_calibration.algorithms:
         algorithm.params = {"apply_iov": output_iov}

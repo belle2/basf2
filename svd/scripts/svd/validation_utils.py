@@ -292,7 +292,7 @@ def get_histos(CollectorHistograms):
         histos_all[name_side] = hClsTimeAll
         histos['diff'][name_side] = hClsDiffTimeOnTracks
         histos['timeShifter'][name_side] = hClusterSizeVsTimeResidual
-    __hAbsoluteShiftValues__.SetDirectory(0)
+    # __hAbsoluteShiftValues__.SetDirectory(0)
     #  for the absolute shift we are iterating on pair layers/side, not individual sensors
     for layer in range(3, 7):
         for side in [True, False]:

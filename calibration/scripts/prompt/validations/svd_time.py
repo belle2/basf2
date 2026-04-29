@@ -144,8 +144,6 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                     continue
                 # Free-up memory manually as I used `SetDirectory(0)`
                 for t0 in ['eventT0', 'CDCeventT0', 'SVDeventT0']:
-                    # histos[t0].Delete()
-                    # del histos[t0]
                     h = histos.pop(t0)
                     h.__python_owns__ = False
                     h.Delete()

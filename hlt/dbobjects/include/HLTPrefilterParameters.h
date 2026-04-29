@@ -311,7 +311,7 @@ namespace Belle2 {
     /**
      * Class version.
      */
-    ClassDef(HLTPrefilterParameters, 1);
+    ClassDef(HLTPrefilterParameters, 2);
 
   };
 

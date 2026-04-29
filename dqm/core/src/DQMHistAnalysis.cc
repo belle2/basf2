@@ -796,7 +796,7 @@ static void DQMHistAnalysisModule::printPVStatus(chid pv, bool onlyError)
   }
 }
 
-static void DQMHistAnalysisModule::CheckEpicsError(int state, const std::string& message, const std::string& name)
+void DQMHistAnalysisModule::CheckEpicsError(int state, const std::string& message, const std::string& name)
 {
   if (state != ECA_NORMAL) {
     B2WARNING(message << ": " << name);
